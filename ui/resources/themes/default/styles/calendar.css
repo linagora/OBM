@@ -258,9 +258,6 @@
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
-  background-image: url('../images/event_background.png');
-  background-repeat : repeat-x;
-  background-position: top center;
 }
 
 .event dl.allDay {
@@ -898,3 +895,143 @@ div.colorHint {
 #display_tag_color {
   background-color: #EFF0F2 ;
 }
+
+.tagLegend {
+  color: #FFF;
+  padding-left: 3px;
+}
+
+.needsAction {
+  color: gray;
+}
+
+
+
+
+
+.infoPopup {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  width: 20em;
+}
+
+.infoPopup h1{
+  margin: 0;
+  background-color: #d1d2d4;
+  font-weight: bold;
+  font-size: 100%;
+  background-image: url('../images/popup_title_border.png');
+  background-repeat: repeat-x;
+  background-position: 0 0.5em; 
+}
+
+.infoPopup h2{
+  background-color: #ebebeb;
+  font-weight: bold;
+  border-left: 1px solid #b3b3b3;
+  border-right: 1px solid #b3b3b3;
+  font-size: 100%;  
+  margin: 0;
+}
+
+.infoPopup ul{
+  margin: 0;
+  padding:0;
+  list-style: none;
+}
+
+.infoPopup li{
+  padding-left: 1.5em;
+}
+/* Planning list view */
+.eventList td {
+  vertical-align: top;
+}
+
+.eventDetail {
+  margin-left: 4em;
+  margin-bottom: 1em;
+  padding-left: 1em;
+  border-left: 4px solid #B3B3B3;
+}
+
+.eventDetail table {
+  border-spacing:0;
+}
+
+.eventDetail tbody th {
+  border-bottom: 1px solid #B3B3B3;
+  border-right: none;
+  border-top: none;
+  border-left: none;
+  background-color: transparent;
+}
+
+.eventDetail tbody td {
+  border-bottom: 1px solid #B3B3B3;
+  border-right: none;
+  border-left: none;
+  text-align: left;
+}
+
+table.planning td {
+  vertical-align: top;
+  padding: 0;
+  font-size: 120%;
+}
+
+table.planning tbody th {
+  text-align: left;
+}
+
+table.planning ul {
+  padding: 0;
+  padding-left: 15px;
+  margin: 0;
+  list-style: disc;
+}
+
+table.planning li {
+  padding: 0;
+  margin: 0;
+}
+
+table.planningRessource a {
+  color:#FFFFFF;
+}
+
+table.planningRessource td {
+  vertical-align: top;
+  padding: 0;
+  font-size: 90%;
+}
+
+table.planningRessource ul {
+  padding: 0;
+  padding-left: 15px;
+  margin: 0;
+  list-style: disc;
+}
+
+table.planningRessource li {
+  padding: 0;
+  margin: 0;
+}
+
+table.planningRessource thead div {
+  clip: rect(auto,auto,auto,auto);
+  overflow: hidden;
+}
+
+h1.hoursTitle{
+  margin:0;
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
+  font-size: 90%;
+  font-weight: bold;
+  padding: 2px;
+  color:white;
+  width:40%;
+}
+

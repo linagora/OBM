@@ -2678,12 +2678,9 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
       event_location $like '%$w%' OR 
       event_description $like '%$w%' OR
       eventcategory1_label $like '%$w%'OR
-      eventtag_label $like '%$w%'OR
-      u.userobm_lastname $like '%$w%' OR
-      u.userobm_firstname $like '%$w%' OR
-      a.userobm_lastname $like '%$w%' OR
-      a.userobm_firstname $like '%$w%'
-      )";
+      eventtag_label $like '%$w%' OR
+      userobm_lastname $like '%$w%' OR
+      userobm_firstname $like '%$w%' ";
     }
   } else {
     $event_pattern = array();
@@ -2694,12 +2691,12 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
 
         if ($field == 'owner') {
           foreach($words as $w) {
-            array_push($filter, "u.userobm_lastname $like '%$w%' OR u.userobm_firstname $like '%$w%'");
+            array_push($filter, "userobm_lastname $like '%$w%' OR userobm_firstname $like '%$w%'");
           }
-        } elseif ($field == 'attendees') {
-          foreach($words as $w) {
-            array_push($filter, "a.userobm_lastname $like '%$w%' OR a.userobm_firstname $like '%$w%'");
-          }
+        } elseif ($field == 'attendee') {
+          // foreach($words as $w) {
+          //   array_push($filter, "a.userobm_lastname $like '%$w%' OR a.userobm_firstname $like '%$w%'");
+          // }
         } elseif($field =='event_tag_id') {
             if ($words[0] != $GLOBALS['c_none']) {
               array_push($filter, "event_tag_id='$words[0]'");
@@ -2709,13 +2706,54 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
             array_push($filter, "$field $like '%$w%'");
           }
         }
-        array_push($event_pattern, "(".implode(' OR ', $filter).")");
+        if (sizeof($filter) > 0)
+          array_push($event_pattern, "(".implode(' OR ', $filter).")");
       }
     }
     if (sizeof($event_pattern) > 0) {
-      $return = "AND (".implode(" AND ", $event_pattern).")";
+      $return = "AND (".implode(" AND ", $event_pattern)."";
     }
   }
+
+  return $return;
+}
+
+function run_query_calendar_build_attendee_search_filters($pattern, $type, $like, $kind) {
+  $return = "";
+  return;
+  if ($type=='basic') {
+    if ($kind == 'user') {
+      $words = explode(' ', $pattern);
+      foreach($words as $w) {
+        $return .= " OR a.userobm_lastname $like '%$w%' OR a.userobm_firstname $like '%$w%'";
+      }
+    } else {
+      $words = explode(' ', $pattern);
+      foreach($words as $w) {
+        $return .= " OR resource_name $like '%$w%'";
+      }
+    }
+  } else {
+    $event_pattern = array();
+    foreach($pattern as $field => $pattern) {
+      if ($pattern) {
+        $words = explode(' ', $pattern); 
+        $filter = array();
+        if ($field == 'attendee') {
+          if ($kind == 'user') {
+            foreach($words as $w) {
+              array_push($filter, "a.userobm_lastname $like '%$w%' OR a.userobm_firstname $like '%$w%'");
+            }
+          } else {
+            foreach($words as $w) {
+              array_push($filter, "resource_name $like '%$w%'");
+            }
+          }
+        }
+      }
+    }
+  }
+
   return $return;
 }
 
@@ -2749,7 +2787,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
   if ($end) $event_date_end = "AND event_date <= '$end'";
 
   if ($pattern) {
-    $event_pattern = run_query_calendar_build_search_filters($pattern, $type, $like);
+    $event_search_pattern = run_query_calendar_build_search_filters($pattern, $type, $like);
   }
 
   $first = true;
@@ -2758,87 +2796,75 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       $where_status = "AND eventlink_state IN ('".implode("','",$status)."')"    ;
     }
 
+  $select_q = "
+    event_id,
+    $timeupdate,
+    $timecreate,
+    event_ext_id,
+    event_title,
+    event_privacy,
+    event_priority,
+    event_description,
+    event_properties,
+    event_location,
+    event_repeatfrequence,
+    event_owner,
+    userobm_lastname,
+    userobm_firstname,
+    event_timezone,
+    eventlink_state,
+    eventcategory1_label,
+    event_date,
+    event_duration,
+    eventtag_color AS event_color,
+    eventtag_label as tag,
+    eventtag_id,
+    event_allday,";
+
+  $left_q = "
+    LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+    INNER JOIN UserObm ON event_owner = userobm_id
+		LEFT JOIN EventTag ON event_tag_id = eventtag_id 
+    INNER JOIN EventLink ON event_id = eventlink_event_id";
+
   if (is_array($calendar_entity['user'])
     && (count($calendar_entity['user']) > 0) ) {
+      if ($pattern) {
+        $search_pattern = $event_search_pattern;
+        $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'user');
+        if ($search_pattern) $search_pattern .= ")";
+      }
       $select[] =  "SELECT
-        event_id,
-        $timeupdate,
-        $timecreate,
-        event_ext_id,
-        event_title,
-        event_privacy,
-        event_priority,
-        event_description,
-        event_properties,
-        event_location,
-        event_repeatfrequence,
-        event_owner,
-        u.userobm_lastname as userobm_lastname,
-        u.userobm_firstname as userobm_firstname,
-        a.userobm_lastname as attendee_lastname,
-        a.userobm_firstname as attendee_firstname,
-        event_timezone,
+        $select_q
         userentity_user_id as eventlink_entity_id,
-        'user' as eventlink_entity,
-        eventlink_state,
-        eventcategory1_label,
-        event_date,
-        event_duration,
-        eventtag_color AS event_color,
-        eventtag_label as tag,
-        eventtag_id,
-        event_allday
+        'user' as eventlink_entity
         FROM Event
-        LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-        INNER JOIN UserObm u ON event_owner = u.userobm_id
-				LEFT JOIN EventTag ON event_tag_id = eventtag_id 
-        INNER JOIN EventLink ON event_id = eventlink_event_id
+        $left_q 
         INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
-        INNER JOIN UserObm a ON userentity_user_id = a.userobm_id
         WHERE event_type='VEVENT'
         $where_status
         $filter
         AND event_repeatkind = 'none'
         $event_date_start
         $event_date_end
-        $event_pattern
+        $search_pattern
         AND userentity_user_id IN (".implode(',', array_keys($calendar_entity['user'])).")
         $multidomain";       
     }   	     	    
 
   if (is_array($calendar_entity['resource'])
     && (count($calendar_entity['resource']) > 0) ) {
+      if ($pattern) {
+        $search_pattern = $event_search_pattern;
+        $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'resource');
+        if ($search_pattern) $search_pattern .= ")";
+      }
       $select[] =  "SELECT
-        event_id,
-        $timeupdate,
-        $timecreate,
-        event_ext_id,
-        event_title,
-        event_privacy,
-        event_priority,
-        event_description,
-        event_properties,
-        event_location,
-        event_repeatfrequence,
-        event_owner,
-        userobm_lastname,
-        userobm_firstname,
-        event_timezone,
+        $select_q
         resourceentity_resource_id as eventlink_entity_id,
-        'resource' as eventlink_entity,
-        eventlink_state,
-        eventcategory1_label,
-        event_date,
-        event_duration,
-        eventtag_color AS event_color,
-        eventtag_label as tag,
-        eventtag_id,
-        event_allday
+        'resource' as eventlink_entity
         FROM Event
-        LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-				LEFT JOIN EventTag ON event_tag_id = eventtag_id 
-        INNER JOIN UserObm ON event_owner = userobm_id
-        INNER JOIN EventLink ON event_id = eventlink_event_id
+        $left_q 
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
         $where_status
@@ -2846,45 +2872,24 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         AND event_repeatkind = 'none'
         $event_date_start
         $event_date_end
-        $event_pattern
+        $search_pattern
         AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resource'])).")
         $multidomain";   
     }   	     	    
 
   if (is_array($calendar_entity['resourcegroup'])
     && (count($calendar_entity['resourcegroup']) > 0) ) {
-
+      if ($pattern) {
+        $search_pattern = $event_search_pattern;
+        $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'resource');
+        if ($search_pattern) $search_pattern .= ")";
+      }
       $select[] = "SELECT
-        event_id,
-        $timeupdate,
-        $timecreate,
-        event_ext_id,
-        event_title,
-        event_privacy,
-        event_priority,
-        event_description,
-        event_properties,
-        event_location,
-        event_repeatfrequence,
-        event_owner,
-        userobm_lastname,
-        userobm_firstname,
-        event_timezone,
+        $select_q
         resourceentity_resource_id as eventlink_entity_id,
-        'resourcegroup' as eventlink_entity,
-        eventlink_state,
-        eventcategory1_label,
-        event_date,
-        event_duration,
-        eventtag_color AS event_color,
-        eventtag_label as tag,
-        eventtag_id,
-        event_allday
+        'resourcegroup' as eventlink_entity
         FROM Event
-        LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-				LEFT JOIN EventTag ON event_tag_id = eventtag_id 
-        INNER JOIN UserObm ON event_owner = userobm_id
-        INNER JOIN EventLink ON event_id = eventlink_event_id
+        $left_q 
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
         $where_status
@@ -2892,7 +2897,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         AND event_repeatkind = 'none'
         $event_date_start
         $event_date_end
-        $event_pattern
+        $search_pattern
         AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resourcegroup'])).")
         $multidomain";
     }
@@ -2938,95 +2943,81 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
   if ($end) $event_date_end = "AND event_date <= '$end'";
 
   if ($pattern) {
-    $event_pattern = run_query_calendar_build_search_filters($pattern, $type, $like);
+    $event_search_pattern = run_query_calendar_build_search_filters($pattern, $type, $like);
   }
+
+  $select_q = "
+    event_id,
+    $timeupdate,
+    $timecreate,
+    event_ext_id,
+    event_title,
+    event_privacy,
+    event_priority,
+    event_description, 
+    event_properties, 
+    event_location, 
+    eventcategory1_label,
+    event_date,
+    event_duration,
+    event_repeatkind,
+    event_endrepeat,
+    event_repeatfrequence,
+    event_owner,
+    userobm_lastname,
+    userobm_firstname,
+    event_timezone,
+    eventlink_state,
+    event_repeatdays,
+    eventtag_color AS event_color,
+    eventtag_label as tag,
+    eventtag_id,
+    event_allday,";
+
+  $left_q = "
+    LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+		LEFT JOIN EventTag ON event_tag_id = eventtag_id 
+    INNER JOIN UserObm ON event_owner = userobm_id
+    INNER JOIN EventLink ON event_id = eventlink_event_id";
+
   if (is_array($calendar_entity['user'])
     && (count($calendar_entity['user']) > 0) ) {
+      if ($pattern) {
+        $search_pattern = $event_search_pattern;
+        $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'user');
+        if ($search_pattern) $search_pattern .= ")";
+      }
       $select[] =  "SELECT
-        event_id,
-        $timeupdate,
-        $timecreate,
-        event_ext_id,
-        event_title,
-        event_privacy,
-        event_priority,
-        event_description, 
-        event_properties, 
-        event_location, 
-        eventcategory1_label,
-        event_date,
-        event_duration,
-        event_repeatkind,
-        event_endrepeat,
-        event_repeatfrequence,
-        event_owner,
-        u.userobm_lastname as userobm_lastname,
-        u.userobm_firstname as userobm_firstname,
-        a.userobm_lastname as attendee_lastname,
-        a.userobm_firstname as attendee_firstname,
-        event_timezone,
+        $select_q
         'user' as eventlink_entity,
-        userentity_user_id as eventlink_entity_id,
-        eventlink_state,
-        event_repeatdays,
-        eventtag_color AS event_color,
-        eventtag_label as tag,
-        eventtag_id,
-        event_allday
+        userentity_user_id as eventlink_entity_id
         FROM Event
-        LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-        INNER JOIN UserObm u ON event_owner = u.userobm_id
-				LEFT JOIN EventTag ON event_tag_id = eventtag_id 
-        INNER JOIN EventLink ON event_id = eventlink_event_id
+        $left_q
         INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
-        INNER JOIN UserObm a ON userentity_user_id = a.userobm_id
         WHERE event_type='VEVENT'
         AND event_repeatkind != 'none'
         $where_status
         $filter
         $event_date_start
         $event_date_end
-        $event_pattern
+        $search_pattern
         AND userentity_user_id IN (".implode(',', array_keys($calendar_entity['user'])).")
         $multidomain";
     }   	     	    
 
   if (is_array($calendar_entity['resource'])
     && (count($calendar_entity['resource']) > 0) ) {
+      if ($pattern) {
+        $search_pattern = $event_search_pattern;
+        $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'resource');
+        if ($search_pattern) $search_pattern .= ")";
+      }
       $select[] = "SELECT
-        event_id,
-        $timeupdate,
-        $timecreate,
-        event_ext_id,
-        event_title,
-        event_privacy,
-        event_priority,
-        event_description, 
-        event_properties, 
-        event_location, 
-        eventcategory1_label,
-        event_date,
-        event_duration,
-        event_repeatkind,
-        event_endrepeat,
-        event_repeatfrequence,
-        event_owner,
-        userobm_lastname,
-        userobm_firstname,
-        event_timezone,
+        $select_q
         'resource' as eventlink_entity,
-        resourceentity_resource_id as eventlink_entity_id,
-        eventlink_state,
-        event_repeatdays,
-        eventtag_color AS event_color,
-        eventtag_label as tag,
-        eventtag_id,
-        event_allday
+        resourceentity_resource_id as eventlink_entity_id
         FROM Event
-        LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-				LEFT JOIN EventTag ON event_tag_id = eventtag_id 
-        INNER JOIN UserObm ON event_owner = userobm_id
-        INNER JOIN EventLink ON event_id = eventlink_event_id
+        $left_q
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
         AND event_repeatkind != 'none'
@@ -3034,48 +3025,24 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $filter
         $event_date_start
         $event_date_end
-        $event_pattern
+        $search_pattern
         AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resource'])).")
         $multidomain";
     }   	     	    
 
   if (is_array($calendar_entity['resourcegroup'])
     && (count($calendar_entity['resourcegroup']) > 0) ) {
-
+      if ($pattern) {
+        $search_pattern = $event_search_pattern;
+        $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'resource');
+        if ($search_pattern) $search_pattern .= ")";
+      }
       $select[] = "SELECT
-        event_id,
-        $timeupdate,
-        $timecreate,
-        event_ext_id,
-        event_title,
-        event_privacy,
-        event_priority,
-        event_description, 
-        event_properties, 
-        event_location, 
-        eventcategory1_label,
-        event_date,
-        event_duration,
-        event_repeatkind,
-        event_endrepeat,
-        event_repeatfrequence,
-        event_owner,
-        userobm_lastname,
-        userobm_firstname,
-        event_timezone,
+        $select_q
         'resourcegroup' as eventlink_entity,
-        resourceentity_resource_id as eventlink_entity_id,
-        eventlink_state,
-        event_repeatdays,
-        eventtag_color AS event_color,
-        eventtag_label as tag,
-        eventtag_id,
-        event_allday
+        resourceentity_resource_id as eventlink_entity_id
         FROM Event
-        LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-				LEFT JOIN EventTag ON event_tag_id = eventtag_id 
-        INNER JOIN UserObm ON event_owner = userobm_id
-        INNER JOIN EventLink ON event_id = eventlink_event_id
+        $left_q
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT' 
         AND event_repeatkind != 'none'
@@ -3083,7 +3050,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $filter
         $event_date_start
         $event_date_end
-        $event_pattern
+        $search_pattern
         AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resourcegroup'])).")
         $multidomain";
     }
@@ -3270,9 +3237,7 @@ function get_one_event_user_alert($event_id, $user_id = null) {
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_events_model($start, $end, $calendar_entity, $status=array('ACCEPTED'), $category_filter='', $unique=false, $pattern='',$searchType='') {
-  global $day_duration;
 
-  $day_duration = 86400;
   // Get all non repeating events and construct occurences & events model
   $nr_q = run_query_calendar_no_repeat_events($start,$end,$calendar_entity, $status, $category_filter,$pattern, $searchType);
   $of = &OccurrenceFactory::getInstance();
@@ -3407,7 +3372,6 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_daily_repeatition($date,$start,$end,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
-  global $day_duration;
 
   $current = clone $date;
   if ($current->compare($start) < 0) {
@@ -3431,7 +3395,7 @@ function calendar_daily_repeatition($date,$start,$end,$repeatfrequence,$event,$e
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
-  global $day_duration, $ccalendar_weekstart;
+  global $ccalendar_weekstart;
 
   $current = clone $date;
   $current->setWeekday($ccalendar_weekstart);
@@ -3466,7 +3430,7 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_monthlybyday_repeatition($date,$start,$end,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
-  global $day_duration,$ccalendar_weekstart;
+  global $ccalendar_weekstart;
 
   $current = clone $date;
   $current->setDay(1);
@@ -3503,7 +3467,6 @@ function calendar_monthlybyday_repeatition($date,$start,$end,$repeatfrequence,$e
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_monthlybydate_repeatition($date,$start,$end,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {  
-  global $day_duration;
 
   $current = clone $date;
   if ($current->compare($start) < 0) {
@@ -3527,7 +3490,6 @@ function calendar_monthlybydate_repeatition($date,$start,$end,$repeatfrequence,$
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_yearly_repeatition($date,$start,$end,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
-  global $day_duration;
 
   $current = clone $date;
   if ($current->compare($start) < 0) {

@@ -58,7 +58,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
  * @access public
  * @return void
  */
-function dis_calendar_search_result($calendar, &$sel_entity_id, $p_view, $p_range) {
+function dis_calendar_search_result($calendar, &$sel_entity_id) {
   global $obm;
 
   $calendar_entity = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
@@ -80,7 +80,7 @@ function dis_calendar_search_result($calendar, &$sel_entity_id, $p_view, $p_rang
     $pattern['event_description'] = $calendar['desc'];
     $pattern['eventcategory1_label'] = of_category_get_label('event', 'category1', $calendar['category_filter']);
     $pattern['owner'] = $calendar['owner'];
-    $pattern['attendees'] = $calendar['attendees'];
+    $pattern['attendee'] = $calendar['attendees'];
     $pattern['event_tag_id'] = $calendar['tag'];
     $begin = $calendar['date_begin'];
     $end = $calendar['date_end'];
@@ -175,7 +175,7 @@ function html_calendar_tag_legend($tags) {
   $tags_q = run_query_calendar_get_alltags($obm['uid']);
   while($tags_q->next_record()) {
     if (in_array($tags_q->f('eventtag_id'), $tags)) {
-      $block .= "<div style='color:#FFF;background:".$tags_q->f('eventtag_color')."'>".$tags_q->f('eventtag_label')."</div>";
+      $block .= "<div class='tagLegend' style='background:".$tags_q->f('eventtag_color')."'>".$tags_q->f('eventtag_label')."</div>";
     }
   }
 
@@ -1084,7 +1084,7 @@ function dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, 
   }
 
   $tags = array_unique($tags);
-  if (sizeof($tags) > 0) {
+  if (sizeof($tags) > 0 && sizeof($calendar_entity) == 1) {
     html_calendar_tag_legend($tags);
   }
 
@@ -1209,7 +1209,7 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
   }
 
   $tags = array_unique($tags);
-  if (sizeof($tags) > 0) {
+  if (sizeof($tags) > 0 && sizeof($calendar_entity) == 1) {
     html_calendar_tag_legend($tags);
   }
 
@@ -1370,7 +1370,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   
   $category_filter = $calendar['category_filter'];
 
-  $status = array('ACCEPTED');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true,$pattern,$searchType);
   $today_mark = false;
   $charset = mb_internal_encoding();
@@ -1410,7 +1410,12 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         $tag = $tags_q->f('eventtag_label');
         $item_list = phpStringToJsString(str_replace("\n\r", ', ', $item_list));
         $location = $event->location;
-
+        $class = '';
+        $needs_action = '';
+        if ($v->entity_state == 'NEEDS-ACTION') {
+          $class = 'needsAction';
+          $needs_action = "<i> - ".$GLOBALS['l_wait']."</i>";
+        }
         $attendee = $event->attendee;
         $category = $event->category1;
         $repeat = $event->repeat;
@@ -1600,8 +1605,8 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         }
 
         $dis_events .= "<div id=\"evt_${date}_$ev_id\" >
-          <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_people $dis_res</span>
-          $schedule - <strong>$title</strong></a>
+          <a href=\"javascript: void(0);\"><span style=\"float: right;\" class='$class'>$dis_people $dis_res</span>
+          <span class='$class'>$schedule - <strong>$title</strong> $needs_action </span></a>
           <div id=\"eventDetail_${date}_$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
             $event_details
           </div>
@@ -1801,7 +1806,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
   $end = clone $date;
   $end->addMonth(1);
 
-  $status = array('ACCEPTED');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $events = calendar_events_model($current,$end, $calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
 
@@ -2027,7 +2032,7 @@ function ViewRessource($calendar_entity,&$en_tete){
 function dis_calendar_planning_day_view($date, $end, $calendar_entity, $category_filter) {
   global $ccalendar_first_hour, $ccalendar_last_hour;
 
-  $status = array('ACCEPTED');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
   
@@ -2122,7 +2127,7 @@ function dis_calendar_planning_day_view($date, $end, $calendar_entity, $category
 function dis_calendar_planning_view($date, $end, $calendar_entity, $category_filter) {
   global $l_daysofweekfirst,$l_daysofweek;
   
-  $status = array('ACCEPTED');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance(); 
   $day_duration = 86400;
