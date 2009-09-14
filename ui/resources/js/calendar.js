@@ -55,19 +55,19 @@ Obm.CalendarManager = new Class({
     }
 
     // Initialize search field
-    if ($('event_search')) {
-      $('event_search').addEvent('keypress', function(e) {
-        switch (e.key) {
-        case 'enter' :
-          obm.calendarManager.search(this.value);
-          break;
-        case 'esc' : 
-          this.value = '';
-          obm.calendarManager.search(this.value);
-          break;
-        }
-      });
-    }
+    // if ($('event_search')) {
+    //   $('event_search').addEvent('keypress', function(e) {
+    //     switch (e.key) {
+    //     case 'enter' :
+    //       obm.calendarManager.search(this.value);
+    //       break;
+    //     case 'esc' : 
+    //       this.value = '';
+    //       obm.calendarManager.search(this.value);
+    //       break;
+    //     }
+    //   });
+    // }
 
   },
 
@@ -119,7 +119,7 @@ Obm.CalendarManager = new Class({
             if (more) {
               var title = '<b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title;
 	            var color = evt.content.getStyle('backgroundColor');
-              if (evt.event.colors.event) color = evt.event.colors.event;
+              if (evt.event.colors.event) color = evt.event.colors.event.body;
               var style = 'style="color:'+color+'"';
               if (evt.event.all_day) {
                 title = evt.event.title;
@@ -136,8 +136,8 @@ Obm.CalendarManager = new Class({
       }
 
       if (this.forceRedraw) {
-        //this.redrawAllDayGrid();
-        //this.resizeGrid();
+        this.redrawAllDayGrid();
+        this.resizeGrid();
       }
 
     } else {
@@ -521,18 +521,18 @@ Obm.CalendarManager = new Class({
     return new Array(startWeek, endWeek);
   },
 
-  /**
-   * Search event by title // TODO
-   */
-  search: function(title) {
-    this.events.each(function(evt) {
-      if (evt.event.title.contains(title)) {
-        evt.element.setStyle('display', '');
-      } else {
-        evt.element.setStyle('display', 'none');
-      }
-    });
-  },
+  // /**
+  //  * Search event by title // TODO
+  //  */
+  // search: function(title) {
+  //   this.events.each(function(evt) {
+  //     if (evt.event.title.contains(title)) {
+  //       evt.element.setStyle('display', '');
+  //     } else {
+  //       evt.element.setStyle('display', 'none');
+  //     }
+  //   });
+  // },
   
 
   /**
@@ -721,7 +721,6 @@ Obm.CalendarManager = new Class({
           evt.event.status = ivent.status;
           evt.event.time = ivent.time;
           evt.event.duration = ivent.duration;
-          //evt.event.week = ivent.week;
           evt.event.date =  new Obm.DateTime(ivent.time * 1000);
           if (obm.calendarManager.calendarView == 'month') {
             // Delete current event and create a new one (easy way)
@@ -1206,8 +1205,11 @@ Obm.CalendarAllDayEvent = new Class({
         this.element.injectInside($('allday_'+this.event.date.format('Y-m-d')));
       }
     } else {
-      var index = new Obm.DateTime(this.event.index*1000);
-      this.element.injectInside($('allday_'+index.format('Y-m-d')));
+      var index = this.event.date.format('Y-m-d');
+      if (this.event.index) {
+        index = new Obm.DateTime(this.event.index*1000).format('Y-m-d');
+      }
+      this.element.injectInside($('allday_'+index));
     }
 
   },
