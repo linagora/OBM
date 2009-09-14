@@ -58,35 +58,35 @@ if (isset($_SESSION['set_cal_first_hour'])) {
 if (isset($_SESSION['set_cal_last_hour'])) {
   $ccalendar_last_hour = $_SESSION['set_cal_last_hour'];
 }
-if (isset($_SESSION['cal_entity_id'])){
-  $cal_entity_id = $_SESSION['cal_entity_id'];
+if(isset($params['set_cal_view_id'])) {
+  $current_view = CalendarView::get_from_id($params['set_cal_view_id']);
 }
-if (isset($_SESSION['cal_category_filter'])){
-  $cal_category_filter = $_SESSION['cal_category_filter'];
+if (!($current_view instanceOf CalendarView) && isset($_SESSION['cal_current_view']) && (is_string($_SESSION['cal_current_view']))) {
+  $current_view = unserialize($_SESSION['cal_current_view']);
+}
+if(!($current_view instanceOf CalendarView) && isset($_SESSION['set_cal_default_view'])) {
+  $current_view = CalendarView::get_from_id($_SESSION['set_cal_default_view']);
+}
+if(!($current_view instanceOf CalendarView)) {
+  $current_view = new CalendarView(array(
+    // default view settings
+    'cal_view'  => 'agenda',
+    'cal_range' => 'week',
+    'category'  => $c_all,
+    'users'     => array($obm['uid'])
+  ));
+}
+if (isset($params['category_filter'])) {
+  $current_view->set_category($params['category_filter']);
 }
 if (isset($params['cal_view'])) {
-  $cal_view = $params['cal_view'];
-} elseif (isset($_SESSION['cal_view'])){
-  $cal_view = $_SESSION['cal_view'];
-} else {
-  $cal_view = 'agenda';
+  $current_view->set_cal_view($params['cal_view']);
 }
 if (isset($params['cal_range'])) {
-  $cal_range = $params['cal_range'];
-} elseif (isset($_SESSION['cal_range'])){
-  $cal_range = $_SESSION['cal_range'];
-} elseif(isset($_SESSION['set_cal_default_view'])) {
-  $params['view_id'] = $_SESSION['set_cal_default_view'];
-  $view_properties = run_query_calendar_get_BookmarkProperty_view($_SESSION['set_cal_default_view']);
-  $cal_view = $view_properties['cal_view'];
-  $cal_range = $view_properties['cal_range'];
-  $params['new_group'] = 1;
-  $params['group_view'] = $view_properties['group'];
-  $params['sel_user_id'] = $view_properties['users'];
-  $params['sel_resource_id'] = $view_properties['resources'];
-  $params['category_filter'] = $view_properties['category'];
-} else {
-  $cal_range = 'week';
+  $current_view->set_cal_range($params['cal_range']);
+}
+if (isset($params['group_view']) && ($params['group_view']!=$current_view->get_group())) {
+  $current_view->set_group($params['group_view']);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ $extra_css[] = $css_calendar;
 $extra_css[] = $css_ext_color_picker ;
 $extra_js_include[] = 'date.js';
 $extra_js_include[] = 'calendar.js';
-$extra_js_include[] = 'colorpicker.js';
+$extra_js_include[] = 'colorchooser.js';
 
 $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
 
@@ -113,24 +113,6 @@ page_close();
 
 OBM_EventFactory::getInstance()->attach(new OBM_EventMailObserver());
 
-// If a group has just been selected, automatically select all its members
-if ( ($params['new_group'] == '1')
-  && ($params['group_view'] != '') ) {
-    // If group selected is ALL, reset group
-    if ($params['group_view'] == $c_all) {
-      $cal_entity_id['group'] = array();
-    } else {
-      $cal_entity_id['user'] = of_usergroup_get_group_users($params['group_view']);
-      if(is_array($params['sel_user_id'])) {
-        array_merge($params['sel_user_id'],$cal_entity_id['user']);
-      } else {
-        $params['sel_user_id'] = $cal_entity_id['user'];
-      }
-      $cal_entity_id['group'] = array($params['group_view']);
-    }
-    $cal_entity_id['group_view'] = $params['group_view'];
-    $cal_entity_id['resource'] = array();
-  }
 // Resources groups, only on meeting
 if ($action == 'add_freebusy_entity' || $action == 'new_meeting' || 
   ($action == 'new' && $params['new_meeting'] == 1) || ($action == 'perform_meeting' &&
@@ -157,23 +139,25 @@ if ($action == 'add_freebusy_entity' || $action == 'new_meeting' ||
 if ($cal_entity_id['group_view'] == '') $cal_entity_id['group_view'] = $c_all;
 
 // If user selection present we override session content
-if (($params['new_sel']) || (is_array($params['sel_user_id'])) 
+if (($params['new_sel']) && (is_array($params['sel_user_id'])) 
   && !(($action == 'insert') || ($action == 'update'))) {
-    $cal_entity_id['user'] = $params['sel_user_id'];
-    if (is_array($params['sel_group_id'])) {
-      $cal_entity_id['group'] = $params['sel_group_id'];
-    }       
+    $current_view->set_users($params['sel_user_id']);
   }
 
 // If resources selection present we override session content
-if (($params['new_sel']) || (is_array($params['sel_resource_id']))
+if (($params['new_sel']) && (is_array($params['sel_resource_id']))
   && !(($action == 'insert') || ($action == 'update'))) {
-    $cal_entity_id['resource'] = $params['sel_resource_id'];
+    $current_view->set_resources($params['sel_resource_id']);
   }
 
 // If group selection present we override session content
 
 // If no user or resource selected, we select the connected user
+$users = $current_view->get_users();
+$resources = $current_view->get_resources();
+if (empty($users) && empty($resources)) {
+  $current_view->add_user($obm['uid']);
+}
 if ( ( (! is_array($cal_entity_id['user']))
        || (count($cal_entity_id['user']) == 0) )
      && ( (! is_array($cal_entity_id['resource']))
@@ -188,12 +172,11 @@ if (($action == 'insert') || ($action == 'update')
   || ($action == 'perform_meeting')) {
     $cal_category_filter = '';
   } elseif ( isset($params['category_filter'])) {
-    $cal_category_filter = str_replace($c_all,'',$params['category_filter']);
+    $cal_category_filter = str_replace($c_all,'',$current_view->get_category());
   }
 // We copy the entity array structure to the parameter hash
 $params['entity'] = $cal_entity_id;
 $params['category_filter'] = $cal_category_filter;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -213,23 +196,15 @@ if ($popup) {
 }
 
 
-$display['search'] = dis_calendar_view_bar($cal_view, $cal_range, $params['date'],$action, $params);
+$display['search'] = dis_calendar_view_bar($current_view, $params['date'],$action, $params);
 
 if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] .= dis_calendar_search_result($params, $cal_entity_id, $cal_view, $cal_range);
+  $display['detail'] .= dis_calendar_search_result($params, $current_view);
 
 } elseif ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
-  if(!$cal_view) {
-    $obm_wait = run_query_calendar_waiting_events();
-    if ($obm_wait->nf() != 0) {
-      $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
-      $display['detail'] .= html_calendar_waiting_events($obm_wait);
-    }
-  } else {
-    $display['detail'] .= dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
-  }
+  $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
 
 } elseif ($action == 'waiting_events') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -239,7 +214,7 @@ if ($action == 'search') {
     $display['detail'] = html_calendar_waiting_events($obm_wait);
   } else {
     $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
-    $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+    $display['detail'] = dis_calendar_calendar_view($params, $current_view);
   }
 
 } elseif ($action == 'decision') {
@@ -261,7 +236,7 @@ if ($action == 'search') {
       $display['detail'] = html_calendar_waiting_events($obm_wait);
     } else {
       $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
-      $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+      $display['detail'] = dis_calendar_calendar_view($params, $current_view);
     }
   }
 
@@ -333,7 +308,7 @@ if ($action == 'search') {
         }
         $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
         $params["date"] = $params["date_begin"];
-        $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+        $display['detail'] = dis_calendar_calendar_view($params, $current_view);
       }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -438,7 +413,7 @@ if ($action == 'search') {
 
         $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
         $params["date"] = $params["date_begin"];
-        $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+        $display['detail'] = dis_calendar_calendar_view($params, $current_view);
       }
     } else {
       $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -457,7 +432,7 @@ if ($action == 'search') {
       } else {
         $id = run_query_calendar_event_exception_insert($params,$eve_q);
       }
-      json_event_data($id,$params);
+      json_event_data($id, $params, $current_view);
       json_ok_msg("$l_event : $l_update_ok");
       echo "({".$display['json']."})";
       exit();
@@ -478,7 +453,7 @@ if ($action == 'search') {
     $id = run_query_calendar_quick_event_insert($params, $state);
     $params["calendar_id"] = $id;
     json_ok_msg("$l_event : $l_insert_ok");
-    json_event_data($id, $params);
+    json_event_data($id, $params, $current_view);
     echo "({".$display['json']."})";
     exit();
   } else {
@@ -492,7 +467,7 @@ if ($action == 'search') {
   $id = $params['calendar_id'];
   if (check_calendar_access($id)) {
     $eve_q = run_query_calendar_detail($id);    
-    json_event_data($id,$params);
+    json_event_data($id, $params, $current_view);
     if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {      
       run_query_calendar_quick_delete($params);
     } else {
@@ -609,7 +584,7 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'])) {
     run_query_calendar_delete($params);
-    $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+    $display['detail'] = dis_calendar_calendar_view($params, $current_view);
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
@@ -751,7 +726,7 @@ if ($action == 'search') {
     $display['detail'] .= dis_calendar_reset($params);
   } else {
     run_query_calendar_reset($obm['uid'],$params);
-    $display['detail'] .= dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+    $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
   }
 
 } elseif ($action == 'export')  {
@@ -775,7 +750,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'pdf_export_form') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_calendar_pdf_options($params, $cal_range, $cal_view);
+  $display['detail'] = dis_calendar_pdf_options($params, $current_view);
 
 } elseif ($action == 'pdf_export') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -785,7 +760,7 @@ if ($action == 'search') {
     $entities['user']  = array($obm['uid']);
     $params['sel_user_id'] = array($obm['uid']);
   }
-  dis_calendar_pdf_view($params, $cal_entity_id, $cal_range, $cal_view);
+  dis_calendar_pdf_view($params, $current_view);
   exit();
 
 } elseif ($action == 'conflict_manager') {
@@ -808,10 +783,7 @@ if ($action == 'search') {
   }
 }
 
-$_SESSION['cal_entity_id'] = $cal_entity_id;
-$_SESSION['cal_category_filter'] = $cal_category_filter;
-$_SESSION['cal_view'] = $cal_view;
-$_SESSION['cal_range'] = $cal_range;
+$_SESSION['cal_current_view'] = serialize($current_view);
 
 if (!$params['ajax']) {
   $display['head'] = display_head($l_calendar);
@@ -820,14 +792,20 @@ if (!$params['ajax']) {
 
 } elseif ($action == 'insert_view') {
 ///////////////////////////////////////////////////////////////////////////////
-  $msg = run_query_calendar_insert_view($params);
+  $view = clone $current_view;
+  $view->set_label($params['view_label']);
+  $view->save();
+  $view_id = $view->get_id();
+  $view_label = $view->get_label();
+  $msg = "\"obmbookmark_id\": \"$view_id\", \"obmbookmark_label\":\"$view_label\", \"obmbookmarkproperties\":\"$obmbookmarkproperty\"";
   json_ok_msg("$l_view : $l_insert_ok");
   echo "({".$display['json'].",$msg})";
   exit();
 
 } elseif ($action == 'delete_view') {
 ///////////////////////////////////////////////////////////////////////////////
-  $msg = run_query_calendar_delete_view($params);
+  $view = CalendarView::get_from_id($params['view_id']);
+  $msg = $view->delete();
   json_ok_msg("$l_view : $l_delete_ok");
   echo "({".$display['json'].",$msg})";
   exit();
@@ -870,6 +848,14 @@ if (!$params['ajax']) {
 ///////////////////////////////////////////////////////////////////////////////
   dis_calendar_free_interval($params);
   echo "({".$display['json']."})";
+  exit();
+
+} elseif ($action == 'set_entity_class')  {
+///////////////////////////////////////////////////////////////////////////////
+  $current_view->set_entity_class($params['entity_type'],$params['entity_id'],$params['entity_class']);
+  $_SESSION['cal_current_view'] = serialize($current_view);
+  json_ok_msg("$l_view : $l_insert_ok");
+  echo "({".$display['json'].",$msg})";
   exit();
 
 }
@@ -1276,6 +1262,13 @@ function get_calendar_action() {
   // Search meeting
   $actions['calendar']['perform_meeting'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=perform_meeting",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+
+  // Search meeting
+  $actions['calendar']['set_entity_class'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=set_entity_class",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );

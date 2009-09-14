@@ -3763,10 +3763,10 @@ function run_query_calendar_insert_view($calendar) {
   }
 
   // Range
-  $cal_range = $_SESSION['cal_range'];
+  $cal_range = 'week';//$_SESSION['cal_range'];
 
   // View
-  $cal_view = $_SESSION['cal_view'];
+  $cal_view = 'agenda';//$_SESSION['cal_view'];
 
   $user_id = sql_parse_id($obm['uid']);
   // Insert ObmBookmark
@@ -4687,6 +4687,573 @@ function can_force_resource_conflict($conflicts = array()) {
     }
   }
   return true;
+}
+
+
+
+/**
+ * Describe a calendar View
+ * 
+ */
+Class CalendarView {
+  protected $id;
+  protected $entity_id;
+  protected $label;
+  protected $modified;
+
+  protected $cal_range;
+  protected $cal_view;
+  protected $category;
+  protected $group;
+  protected $users;
+  protected $resources;
+  protected $classes;
+
+  /**
+   * CalendarView constructor
+   * 
+   * @param view data $data
+   * @access public
+   */
+  public function __construct($data = array()) {
+    $this->modified = true;
+    $this->set_cal_range($data['cal_range']);
+    $this->set_cal_view($data['cal_view']);
+    $this->set_category($data['category']);
+    $this->remove_all();
+    $this->set_group($data['group']);
+    $this->set_users($data['users']);
+    if (is_array($data['user_classes'])) {
+      foreach($data['user_classes'] as $user => $class) {
+        $this->set_user_class($user,$class);
+      }
+    }
+    $this->set_resources($data['resources']);
+    if (is_array($data['resource_classes'])) {
+      foreach($data['resource_classes'] as $resource => $class) {
+        $this->set_resource_class($resource,$class);
+      }
+    }
+  }
+
+  public function __clone() {
+    $this->id = null;
+  }
+
+  /**
+   * retrieve a CalendarView from database
+   * 
+   * @param bookmark id
+   * @access public
+   * @return CalendarView
+   */
+  public static function get_from_id($bookmark_id) {
+    global $cdg_sql;
+
+    $obm_q = new DB_OBM;
+    $id = sql_parse_id($bookmark_id);
+
+    $query = "SELECT * FROM ObmBookmarkProperty WHERE obmbookmarkproperty_bookmark_id='$id'";
+    display_debug_msg($query, $cdg_sql, "CalendarView::get_from_id()");
+    $obm_q->query($query);
+
+    $data = array();
+    while($obm_q->next_record()) {
+      $property = $obm_q->f("obmbookmarkproperty_property");
+      $value = $obm_q->f("obmbookmarkproperty_value");
+
+      if (in_array($property,array('users','resources'))) {
+        $data[$property] = explode(',',$value);
+      } elseif (in_array($property,array('user_classes','resource_classes'))) {
+        $data[$property] = unserialize($value);
+      } else {
+        $data[$property] = $value;
+      }
+    }
+    $view = new CalendarView($data);
+    $view->id = $bookmark_id;
+    $view->modified = false;
+
+    return $view;
+  }
+
+
+  /**
+   * standard id getter,
+   * the id is null if the CalendarView has no record in the database
+   * 
+   * @access public
+   * @return integer
+   */
+  public function get_id() {
+    return $this->id;
+  }
+
+  /**
+   * standard entity_id getter,
+   * the entity_id is null if the CalendarView has no record in the database
+   * 
+   * @access public
+   * @return integer
+   */
+  public function get_entity_id() {
+    if (!isset($this->entity_id) && ($this->id))
+      $this->entity_id = of_entity_get('obmbookmark',$this->id);
+    return $this->entity_id;
+  }
+
+  /**
+   * standard label getter,
+   * 
+   * @access public
+   * @return string
+   */
+  public function get_label() {
+    global $cdg_sql;
+
+    if (!isset($this->label) && ($this->id)) {
+      $obm_q = new DB_OBM;
+      $id = sql_parse_id($this->id);
+      $query = "SELECT obmbookmark_label FROM ObmBookmark WHERE obmbookmark_id='$id' AND obmbookmark_entity='calendar'";
+      display_debug_msg($query, $cdg_sql, "CalendarView::get_label()");
+      $obm_q->query($query);
+      if ($obm_q->next_record())
+        $this->label = $obm_q->f('obmbookmark_label');
+    }
+    return $this->label;
+  }
+
+  /**
+   * true if unsaved changes has been done to the view
+   * 
+   * @access public
+   * @return boolean
+   */
+  public function is_modified() {
+    return $this->modified;
+  }
+
+  /**
+   * true if current view is the default one
+   * default view id is read from $_SESSION['set_cal_default_view']
+   * 
+   * @access public
+   * @return boolean
+   */
+  public function is_default() {
+    return (($this->id) && ($this->id==$_SESSION['set_cal_default_view']));
+  }
+
+  /**
+   * get the selected cal_range
+   * 
+   * @access public
+   * @return string
+   */
+  public function get_cal_range() {
+    return $this->cal_range;
+  }
+
+  /**
+   * get the selected cal_view
+   * 
+   * @access public
+   * @return string
+   */
+  public function get_cal_view() {
+    return $this->cal_view;
+  }
+
+  /**
+   * get the selected category
+   * 
+   * @access public
+   * @return string
+   */
+  public function get_category() {
+    return $this->category;
+  }
+
+  /**
+   * get the selected group id
+   * 
+   * @access public
+   * @return integer
+   */
+  public function get_group() {
+    return $this->group;
+  }
+
+  public function get_users() {
+    return $this->users;
+  }
+
+  public function get_resources() {
+    return $this->resources;
+  }
+
+  public function get_entities($nb_max=0, $entity_readable=array()) {
+    $entities = array();
+    if ($nb_max <= 0) $nb_max = count($this->users) + count($this->resources);
+
+    if (count($this->users)>0) {
+      $user_readable = (is_array($entity_readable['user']['ids']) ? $entity_readable['user']['ids'] : $this->users);
+      $entities['user'] = $this->get_users_data($nb_max, $user_readable);
+      $nb_max = $nb_max - count($entities['user']);
+    }
+
+    if (count($this->resources)>0) {
+      $resource_readable = (is_array($entity_readable['resource']['ids']) ? $entity_readable['resource']['ids'] : $this->resources);
+      $entities['resource'] = $this->get_resources_data($nb_max, $entity_readable['resource']['ids']);
+      $nb_max = $nb_max - count($entities['resource']);
+    }
+
+/*    if ($this->group!=$GLOBALS['c_all']) {
+      $entities['group_view'] = $this->group;
+}*/
+
+    return $entities;
+  }
+
+  public function set_label($label) {
+    $this->label = $label;
+    $this->modified = true;
+  }
+
+  public function set_cal_range($cal_range = null) {
+    $this->cal_range = (empty($cal_range) ? 'week' : $cal_range);
+    $this->modified = true;
+  }
+
+  public function set_cal_view($cal_view = null) {
+    $this->cal_view = (empty($cal_view) ? 'agenda' : $cal_view);
+    $this->modified = true;
+  }
+
+  public function set_category($category = null) {
+    $this->category = (empty($category) ? $GLOBALS['c_all'] : $category);
+    $this->modified = true;
+  }
+
+  public function set_group($group_id) {
+    $this->group = (empty($group_id) ? $GLOBALS['c_all'] : $group_id);
+    if ($this->group!=$GLOBALS['c_all']) {
+      foreach ($this->resources as $resource_id) {
+        $this->remove_resource($resource_id);
+      }
+      $this->set_users(of_usergroup_get_group_users($this->group));
+    }
+    $this->modified = true;
+  }
+
+  public function set_users($user_ids) {
+    if (empty($user_ids))
+      $user_ids = array();
+    if (!is_array($user_ids))
+      $user_ids = array($user_ids);
+    $to_add = array_diff($user_ids,$this->users);
+    $to_remove = array_diff($this->users,$user_ids);
+    foreach ($to_remove as $user_id) {
+      $this->remove_user($user_id);
+    }
+    foreach ($to_add as $user_id) {
+      $this->add_user($user_id);
+    }
+  }
+
+  public function set_resources($resource_ids) {
+    if (empty($resource_ids))
+      $resource_ids = array();
+    if (!is_array($resource_ids))
+      $resource_ids = array($resource_ids);
+    $to_add = array_diff($resource_ids,$this->resources);
+    $to_remove = array_diff($this->resources,$resource_ids);
+    foreach ($to_remove as $resource_id) {
+      $this->remove_resource($resource_id);
+    }
+    foreach ($to_add as $resource_id) {
+      $this->add_resource($resource_id);
+    }
+  }
+
+  public function add_user($user_id) {
+    global $obm;
+    if (!in_array($user_id,$this->users)) {
+      $this->users[] = $user_id;
+      $this->set_class('user',$user_id,($user_id==$obm['uid'] ? 'eventOwner' : $this->generate_class()));
+      $this->modified = true;
+    }
+  }
+
+  public function add_resource($resource_id) {
+    if (!in_array($resource_id,$this->resources)) {
+      $this->resources[] = $resource_id;
+      $this->set_class('resource',$resource_id,$this->generate_class());
+      $this->modified = true;
+    }
+  }
+
+  public function set_user_class($user_id, $class = null) {
+    global $obm;
+    if (!in_array($user_id,$this->users))
+      return;
+    if (($user_id==$obm['uid']) && (empty($class))) {
+      $class='eventOwner';
+    } elseif (empty($class)) {
+      $class=$this->generate_class();
+    }
+    $this->set_class('user',$user_id,$class);
+  }
+
+  public function set_resource_class($resource_id, $class = null) {
+    global $obm;
+    if (!in_array($resource_id,$this->resources))
+      return;
+    if (empty($class)) {
+      $class=$this->generate_class();
+    }
+    $this->set_class('resource',$resource_id,$class);
+  }
+
+  public function set_entity_class($entity, $entity_id, $class = null) {
+    call_user_func(array($this,"set_{$entity}_class"),$entity_id, $class);
+  }
+
+  public function remove_user($user_id) {
+    $old_count = count($this->users);
+    $this->users = array_diff($this->users,array($user_id));
+    if (count($this->users)<$old_count)
+      $this->remove_class('user',$user_id);
+  }
+
+  public function remove_resource($resource_id) {
+    $old_count = count($this->resources);
+    $this->resources = array_diff($this->resources,array($resource_id));
+    if (count($this->resources)<$old_count)
+      $this->remove_class('resource',$resource_id);
+  }
+
+  public function remove_all() {
+    $this->group = null;
+    $this->users = array();
+    $this->resources = array();
+    $this->init_classes();
+  }
+
+  public function init_classes() {
+      $this->classes = array(
+      'by_entity' => array(
+        'user' => array(),
+        'resource' => array()
+      ),
+      'by_class' => array(
+        'eventOwner' => 0
+      )
+    );
+    for ($i=0;$i<20;$i++) {
+      $this->classes['by_class']["eventOwner{$i}"] = 0;
+    }
+  }
+
+  public function save() {
+    if ($this->id)
+      $return = $this->update();
+    else
+      $return = $this->insert();
+    $this->modified = false;
+    return $return;
+  }
+
+  public function delete() {
+    global $cdg_sql, $obm;
+
+    $user_id = sql_parse_id($obm['uid']);
+    $obm_q = new DB_OBM;
+
+    of_entity_delete('obmbookmark', $this->id);
+    $id = sql_parse_id( $this->id, true);
+
+    // Delete view
+    $query = "DELETE FROM ObmBookmark WHERE obmbookmark_id $id"; 
+    $obm_q->query($query);
+
+    // Delete default view (if the default view is the deleted one)
+    $query = "DELETE FROM UserObmPref
+      WHERE userobmpref_user_id=$user_id
+      AND userobmpref_option='set_cal_default_view'
+      AND userobmpref_value $id
+      ";
+    display_debug_msg($query, $cdg_sql, 'CalendarView::delete()');
+    $obm_q->query($query);
+
+    $message = "\"obmbookmark_id\": \"{$this->id}\"";
+
+    return $message;
+  }
+
+  protected function insert() {
+    global $cdg_sql, $obm;
+
+    $obm_q = new DB_OBM;
+
+    $calendar_bookmarkproperties = array(
+      'category'  => $this->category,
+      'cal_range' => $this->cal_range,
+      'cal_view'  => $this->cal_view
+    );
+
+    if ($this->group!=$GLOBALS['c_all']) {
+      $calendar_bookmarkproperties['group'] = $this->group;
+    } elseif (!empty($this->users)) {
+      $calendar_bookmarkproperties['users'] = implode(',', $this->users);
+      $calendar_bookmarkproperties['user_classes'] = serialize($this->classes['by_entity']['user']);
+    }
+    if (!empty($this->resources)) {
+      $calendar_bookmarkproperties['resources'] = implode(',', $this->resources);
+      $calendar_bookmarkproperties['resource_classes'] = serialize($this->classes['by_entity']['resource']);
+    }
+
+    $user_id = sql_parse_id($obm['uid']);
+    // Insert ObmBookmark
+    $query = "INSERT INTO ObmBookmark(
+      obmbookmark_user_id,
+      obmbookmark_label,
+      obmbookmark_entity) VALUES (
+        $user_id,
+        '{$this->label}',
+        'calendar')";
+    display_debug_msg($query, $cdg_sql, 'CalendarView::insert()');
+    $obm_q->query($query);
+
+    $this->id = $obm_q->lastid();
+    of_entity_insert('obmbookmark', $this->id);
+    // Insert ObmBookmark properties 
+    foreach($calendar_bookmarkproperties as $property => $value) {
+      $query = "INSERT INTO ObmBookmarkProperty (
+        obmbookmarkproperty_bookmark_id,
+        obmbookmarkproperty_property,
+        obmbookmarkproperty_value) VALUES (
+          {$this->id},
+          '$property',
+          '$value')";
+      display_debug_msg($query, $cdg_sql, 'CalendarView::insert()');
+      $obm_q->query($query);
+    }
+  }
+
+  protected function update() {
+    //FIXME: NOT implemented yet
+  }
+
+  protected function get_users_data($nb_max, $user_readable) {
+    global $cdg_sql;
+
+    $multidomain = sql_multidomain('userobm');
+
+    $obm_q = new DB_OBM;
+    $query = "SELECT userobm_lastname, userobm_firstname, userobm_id
+      FROM UserObm
+      WHERE userobm_id IN (".implode(",", $this->users).") $multidomain";
+    display_debug_msg($query, $cdg_sql, 'CalendarView::get_users_data()');
+    $obm_q->query($query);
+
+    $u = array();
+    while ($obm_q->next_record()) {
+      $id = $obm_q->f('userobm_id');
+      $firstname = $obm_q->f('userobm_firstname');
+      $lastname = $obm_q->f('userobm_lastname');
+      $u[$id] = "$firstname $lastname";
+    }
+
+    // Preserve the users order
+    $data = array();
+    foreach ($this->users as $id) {
+      if (in_array($id,$user_readable) && $nb_max>0) {
+        $data[$id] = array(
+          'name'  => $u[$id],
+          'class' => $this->get_class($id,'user'),
+          'type'  => "user",
+          'id'    => $id
+        );
+        $nb_max--;
+      }
+    }
+
+    return $data;
+  }
+
+  protected function get_resources_data($nb_max, $resource_readable) {
+    global $cdg_sql;
+
+    $multidomain = sql_multidomain('resource',$and);
+
+    $obm_q = new DB_OBM;
+    $query = "SELECT resource_name, resource_id
+      FROM Resource 
+      WHERE resource_id IN (".implode(",", $this->resources).") AND $multidomain";
+    display_debug_msg($query, $cdg_sql, 'CalendarView::get_resources_data()');
+    $obm_q->query($query);
+
+    $r = array();
+    while ($obm_q->next_record()) {
+      $id = $obm_q->f('resource_id');
+      $name = $obm_q->f('resource_name');
+      $r[$id] = "$name";
+    }
+
+    // Preserve the resources order
+    $data = array();
+    foreach ($this->resources as $id) {
+      if (in_array($id,$resource_readable) && $nb_max>0) {
+        $data[$id] = array(
+          'name'  => $r[$id],
+          'class' => $this->get_class($id,'resource'),
+          'type'  => "resource",
+          'id'    => $id
+        );
+        $nb_max--;
+      }
+    } 
+
+    return $data;
+  }
+
+  protected function get_class($id,$entity) {
+    $c = $this->classes['by_entity'][$entity][$id];
+    if (empty($c))
+      $c = $this->generate_class();
+    return $c;
+  }
+
+  protected function set_class($entity,$id,$class) {
+    $old_class = $this->classes['by_entity'][$entity][$id];
+    if (!empty($old_class))
+      $this->classes['by_class'][$old_class] = max(0,intval($this->classes['by_class'][$old_class])-1);
+    $this->classes['by_entity'][$entity][$id] = $class;
+    if (!empty($class))
+      $this->classes['by_class'][$class] = intval($this->classes['by_class'][$class])+1;
+  }
+
+  protected function remove_class($entity,$id) {
+    $old_class = $this->classes['by_entity'][$entity][$id];
+    if (!is_null($old_class)) {
+      $this->classes['by_entity'][$entity][$id] = null;
+      $this->classes['by_class'][$old_class] = max(0,intval($this->classes['by_class'][$old_class])-1);
+    }
+  }
+
+  protected function generate_class() {
+    $min = 9000;
+    $index = 0;
+    for ($i=0;($i<20);$i++) {
+      $class = "eventOwner{$i}";
+      if ($this->classes['by_class'][$class] < $min) {
+        $min = $this->classes['by_class'][$class];
+        $index = $class;
+      }
+    }
+    return $index;
+  }
 }
 
 ?>

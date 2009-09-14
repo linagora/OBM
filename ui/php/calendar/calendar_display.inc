@@ -14,27 +14,26 @@
 //   - $calendar        : calendar parameters
 //   - $sel_entity_id : array of entity Id ["user"] ["resource"]
 //     by reference as it can restrict the user selection
-//   - $p_view        : view selected "year", "month", "week" or "day"
+//   - $current_view        : CalendarView
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_range) {
+function dis_calendar_calendar_view($calendar, &$current_view) {
   global $display, $path, $ccalendar_max_users, $obm;
   global $l_module_calendar;
 
+  $p_view = $current_view->get_cal_view();
+  $p_range = $current_view->get_cal_range();
+
   $group_view = $calendar['entity']['group_view'];
   $entity_readable = get_calendar_entity_readable();
-  $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $entity_readable);
-  $sel_entity_id = $visible_entities_id;
-  // we restore the selected group for session storage
-  $sel_entity_id['group_view'] = $group_view;
+  $calendar_entity = $current_view->get_entities($ccalendar_max_users, $entity_readable);
 
-  $calendar_entity = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
   $my_views = run_query_calendar_get_my_views();
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view;
   
-  $display['features'] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable, $my_views, $p_view);
+  $display['features'] = html_calendar_planning_bar($calendar, $current_view, $calendar_entity, $entity_readable, $my_views, $p_view);
   $display['title'] = "<div class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"].' '.$GLOBALS["l_range_$p_range"].' </div>';
   if (function_exists($calendar_function)) {
     $block = $calendar_function($calendar, $calendar_entity,$writable_entity,$date);
@@ -58,10 +57,10 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
  * @access public
  * @return void
  */
-function dis_calendar_search_result($calendar, &$sel_entity_id) {
+function dis_calendar_search_result($calendar, $current_view) {
   global $obm;
 
-  $calendar_entity = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
+  $calendar_entity = $current_view->get_entities();
   $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
@@ -98,7 +97,7 @@ function dis_calendar_search_result($calendar, &$sel_entity_id) {
  * @access public
  * @return void
  */
-function dis_calendar_view_bar($p_kind, $p_range, $date, $action, $calendar) {
+function dis_calendar_view_bar($current_view, $date, $action, $calendar) {
   global $ico_week_view, $ico_day_view, $ico_month_view, $ico_list_view;
   global $ico_week_view_current, $ico_day_view_current, $ico_month_view_current;
   global $ico_agenda_view,  $ico_planning_view, $ico_list_view_current;
@@ -108,6 +107,8 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action, $calendar) {
   global $l_view_week_desc, $l_view_day_desc, $l_view_month_desc;
   global $path;
 
+  $p_kind = $current_view->get_cal_view();
+  $p_range = $current_view->get_cal_range();
   if ($p_kind) {
     ${'ico_'.$p_kind.'_view'} = ${'ico_'.$p_kind.'_view_current'};
   }
@@ -191,7 +192,7 @@ function html_calendar_tag_legend($tags) {
 //   - $calendar_entity : array of entities elements to display
 //   - $entity_readable : array of readable entities (['user'], ['resource']
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable, $my_views, $p_view) {
+function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, $entity_readable, $my_views, $p_view) {
   global $action;
   global $output_target;
 
@@ -199,8 +200,8 @@ function html_calendar_planning_bar($calendar, $calendar_entity, $entity_readabl
 
   $block = html_calendar_bar_legend($p_view, $calendar_entity,$calendar);
   if ($action != 'perform_meeting' && $output_target != 'print') {
-    $block .= html_calendar_select_calendar_entity($p_view, $calendar, $calendar_entity, $entity_readable);
-    $block .= html_calendar_view_selector($calendar, $my_views);
+    $block .= html_calendar_select_calendar_entity($p_view, $calendar, $current_view, $calendar_entity, $entity_readable);
+    $block .= html_calendar_view_selector($calendar, $my_views, $current_view);
     $block .= html_calendar_bar_date_selector($calendar);
   }
 
@@ -250,16 +251,17 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
     $script_range = 'obm.vars.conf.displayRange = true;';
     $l_legend = $l_calendar_displayed;
     foreach ($calendar_entity as $type => $entity) {
-      foreach ($entity as $id => $data) {      
-        $data_id = "data-$type-$id";        
+      foreach ($entity as $id => $data) {
+        $data_id = "data-$type-$id";
         $dis_legend .= "
-          <li title=\"$tooltip\" class=\"".$data['class']."\"><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
+          <li title=\"$tooltip\" class=\"".$data['class']."\"><input class=\"colorChooser\" name=\"class-$type-$id\" type=\"hidden\" /><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
           <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
         if ($output_target != 'print') {
           $dis_legend .= "<img src=\"$ico_delete\"
           onclick=\"\$('$data_id').dispose(); $('calendarSelectForm').submit();\" onmouseover=\"this.style.cursor = 'pointer';\"/>";
         }
         $dis_legend .= " &nbsp;".$data['name']."
+          
           </li>";
       }
     }
@@ -271,8 +273,8 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   <form action=\"\" id=\"calendarSelectForm\" onsubmit=\"return false;\">
   <script type=\"text/javascript\">
     obm.vars.conf.calendarColor = '$colorTemplate';
-    $script_range 
-   </script>      
+    $script_range
+   </script>
   <ul>
     $dis_legend
   </ul>
@@ -295,7 +297,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
 //   - $calendar_entity : array of entities elements to display
 //   - $entity_readable : array of readable entities (['user'], ['resource'])
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_entity, $entity_readable) {
+function html_calendar_select_calendar_entity($new_action, $calendar, $current_view, $calendar_entity, $entity_readable) {
   global $path, $obm, $c_all, $ccalendar_resource;
   global $ico_add, $popup_width, $popup_height, $l_today, $ico_add;
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
@@ -304,10 +306,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   global $ico_group, $l_calendar, $l_add;
 
   $iso = $calendar['date']->getURL();
-  $this_group = $calendar['entity']['group_view'];
+  $this_group = $current_view->get_group();
   $category_filter = $calendar['category_filter'];
-  $group_privacy = $calendar['group_privacy'];
-
 
   if (count($entity_readable['user']['ids']) > 1) {
     //-- Private Group selection
@@ -383,14 +383,16 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
         locked: 'true', resetable: 'true', selectfunction:'sel_public_group(\"$iso\", element, this.inputField.value)'});";
   }
   // loop through ['user'], ['resource']
+  $count = 0;
   foreach ($calendar_entity as $type => $entity) {
     foreach ($entity as $id => $data) {
       $name = $data['name'];
       $data_id = "data-$type-$id";
       $div_id = "sel_ent-$data_id";
-      $sel_ent .= "<input value=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
+      $sel_ent .= "<input value=\"$data_id\" name=\"sel_ent[$count]\" type=\"hidden\" />
+                   <input value=\"".$data['class']."\" name=\"sel_ent_class[$count]\" type=\"hidden\" />";
+      $count++;
     }
-
   }
 
 
@@ -436,7 +438,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     </form>";
 
    if(isset($_SESSION['set_cal_default_view'])) {
-      $default_view_url_params = run_query_calendar_get_bookmark_property($_SESSION['set_cal_default_view']);
+     $default_view_url_params = "set_cal_view_id=".$_SESSION['set_cal_default_view'];
+     //$default_view_url_params = run_query_calendar_get_bookmark_property($_SESSION['set_cal_default_view']);
       $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a> -";
     } else {
       $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a> -";
@@ -603,14 +606,14 @@ function html_calendar_bar_date_selector($calendar) {
  * @access public
  * @return HTML
 */
-function html_calendar_view_selector($calendar, $my_views) {
+function html_calendar_view_selector($calendar, $my_views, $current_view) {
   global $obm;
   global $l_views, $l_view_label, $l_select, $l_select_view, $l_label_default, $l_delete_default_view, $l_insert_default_view; 
   global $l_view_save, $l_view_delete, $l_validate, $l_fill_view_label;
   global $l_confirm_delete_view, $l_no_sel_view, $l_conflict_view_label, $l_confirm_default_view, $l_no_sel_default_view;
   global $ico_delete, $ico_add, $ico_popup_close;
 
-  $view_id = $calendar['view_id'];
+  $view_id = $current_view->get_id();
   $iso = $calendar['date']->getURL();
   $default_view_id = $_SESSION['set_cal_default_view'];
   $display = 'none';
@@ -638,7 +641,7 @@ function html_calendar_view_selector($calendar, $my_views) {
       $style_default = '';
     }
     
-    $obmbookmarkproperty = run_query_calendar_get_bookmark_property($id);
+    $obmbookmarkproperty = "set_cal_view_id=$id";// run_query_calendar_get_bookmark_property($id);
     $sel_view .= "
     <option id=\"opt_$id\" value=\"calendar_index.php?new_sel=1&amp;$obmbookmarkproperty\"$style_default$selected>$label</option>";
   }
@@ -5187,9 +5190,9 @@ function json_tag_search($tags_q) {
  * @access public
  * @return void
  */
-function json_event_data($id,$calendar) {
+function json_event_data($id,$calendar,$current_view) {
   global $obm, $display,$ccalendar_first_hour,$ccalendar_last_hour;
-  global $ccalendar_max_users, $cal_entity_id;
+  global $ccalendar_max_users;
   global $l_user, $l_resource;
 
   $context = $calendar['context'];
@@ -5232,8 +5235,7 @@ function json_event_data($id,$calendar) {
   $ed[] = "colors:{}";
   
   $entity_readable = get_calendar_entity_readable();
-  $sel_entity_id = slice_calendar_entities($cal_entity_id, $ccalendar_max_users, $entity_readable);
-  $calendar_entity = store_calendar_entities(get_calendar_entity_label($cal_entity_id));
+  $calendar_entity = $current_view->get_entities($ccalendar_max_users, $entity_readable);
   
   switch($context)  {
     case 'day' :
@@ -5347,12 +5349,15 @@ Class Item {
  * @access public
  * @return void
  */
-function dis_calendar_pdf_options($calendar, $p_range, $p_view) { 
+function dis_calendar_pdf_options($calendar, $current_view) { 
   global $l_print, $l_pagelayout, $l_pagelayout_portrait, $l_pagelayout_landscape;
   global $c_pagelayout_portrait, $c_pagelayout_landscape;
   global $ccalendar_first_hour, $ccalendar_last_hour, $ccalendar_weekstart;
   global $l_first_hour, $l_last_hour, $l_daysofweekshort, $l_display_details;
   global $l_one_day_per_page, $l_display_days ;
+
+  $p_view = $current_view->get_cal_view();
+  $p_range = $current_view->get_cal_range();
 
   if ($p_view == 'list') {
     $block_detail = "
@@ -5477,19 +5482,17 @@ function dis_calendar_pdf_options($calendar, $p_range, $p_view) {
  * @access public
  * @return void
  */
-function dis_calendar_pdf_view($calendar, &$sel_entity_id, $p_range, $p_view) {
+function dis_calendar_pdf_view($calendar, $current_view) {
   global $display, $path, $ccalendar_max_users, $obm;
   global $l_module_calendar;
 
+  $p_view = $current_view->get_cal_view();
+  $p_range = $current_view->get_cal_range();
+
   $group_view = $calendar['entity']['group_view'];
   $entity_readable = get_calendar_entity_readable();
-  $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $entity_readable);
 
-  $sel_entity_id = $visible_entities_id;
-  // we restore the selected group for session storage
-  $sel_entity_id['group_view'] = $group_view;
-
-  $calendar_entity = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
+  $calendar_entity = $current_view->get_entities($ccalendar_max_users, $entity_readable);
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view.'_pdf';
 
   $calendar_function($calendar, $calendar_entity);

@@ -1377,6 +1377,13 @@ input.colorPicker {
   color: #636466;
 }
 
+#colorChooserWidget {
+  border: 1px solid #aaa;
+  background-color: #D2D2D2;
+  position: absolute;
+  width: 13em;
+}
+
 ul.autocompleter-choices {
   position: absolute;
   margin: 0;
