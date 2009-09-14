@@ -218,9 +218,11 @@ Obm.CalendarManager = new Class({
 
 
   setEventsClass: function(entity, id, klass) {
-    obm.calendarManager.entityEvents[entity+'-'+id].each(function(e) {
-      e.addClass(klass);
-    });
+    if (obm.calendarManager.entityEvents[entity+'-'+id]) {
+      obm.calendarManager.entityEvents[entity+'-'+id].each(function(e) {
+        e.addClass(klass);
+      });
+    }
   },
 
   /**
