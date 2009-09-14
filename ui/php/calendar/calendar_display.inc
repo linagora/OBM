@@ -1175,12 +1175,20 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
     if (is_array($occurrences)) {
       foreach($occurrences as $occurrence) {
         if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
-        $occurrence->week = $current->getWeek();
+        $occurrence->index = $occurrence->date;
+        $occurrence->left = false;
+        $occurrence->right = false;
+
         // Left extension
-        if ($occurrence->date->compare($current) < 0) {
-          //$occurrence->end->subSecond($current->diff($occurrence->date));
-          $occurrence->date = $current;
+        if ($occurrence->index->compare($current) < 0) {
+           $occurrence->index = clone $current;
+           $occurrence->left = true;
         }
+        if ($occurrence->end->compare($endWeek) > 0) {
+           $occurrence->right = true;
+        }
+
+
         $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
       }
     }
@@ -1713,6 +1721,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $all_day = ($event->all_day)?1:0;
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
   $eventColor = get_color_data($event->color);
+
   $ed[] = "id:$id";
   $ed[] = "entity:'$entity'";
   $ed[] = "entity_id:$entity_id"; 
@@ -1742,10 +1751,15 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   switch($unit) {
     case 'day' :
       $day = true;
+      $index = $occurrence->index->getTimestamp();
+      $left = $occurrence->left;
+      $right = $occurrence->right;
+      $ed[] = "index:'$index'";
+      $ed[] = "left:'$left'";
+      $ed[] = "right:'$right'";
       if ($updatable) {
         $options[] = 'draggable:true';
       }
-      $ed[] = "week:".$occurrence->week;
       break;
     case 'hour' :
       $day = ($all_day) || ($end->compareDateIso($date)!=0 && ($end->getHour()>0 || $end->getMinute()>0 || $end->getSecond()>0));
@@ -5216,7 +5230,6 @@ function json_event_data($id,$calendar) {
   $ed[] = "location:''";
   $ed[] = "category:''";
   $ed[] = "colors:{}";
-  $ed[] = 'week:'.$date->getWeek();
   
   $entity_readable = get_calendar_entity_readable();
   $sel_entity_id = slice_calendar_entities($cal_entity_id, $ccalendar_max_users, $entity_readable);

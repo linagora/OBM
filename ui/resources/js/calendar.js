@@ -197,9 +197,9 @@ Obm.CalendarManager = new Class({
    * Add an all day event
    */
   newDayEvent: function(eventData,options) {
-    // obmEvent = new Obm.CalendarAllDayEvent(eventData,options);
-    // this.register(obmEvent);
-    // return obmEvent;
+    obmEvent = new Obm.CalendarAllDayEvent(eventData,options);
+    this.register(obmEvent);
+    return obmEvent;
   },
 
 
@@ -358,39 +358,41 @@ Obm.CalendarManager = new Class({
 
           var current = new Obm.DateTime(evt.event.time*1000);
 
-          // Left extension
-          if (obm.vars.consts.calendarView == 'day') {
-            if (evt.event.date < obm.vars.consts.startTime) {
-              columnIndex = obm.vars.consts.startTime.format('Y-m-d');
-              size = Math.ceil((end.getTime() - obm.vars.consts.startTime.getTime())/86400000);
-              current = new Obm.DateTime(obm.vars.consts.startTime);
-              evt.leftExtension.setStyle('display', '');
-              begin = obm.vars.consts.startTime.getTime(); 
-            }
-          } else {
+          // Extensions
+          if (obm.vars.consts.calendarView == 'month') {
             var weeks = obm.calendarManager.getEventWeeks(evt);
-            if (evt.event.week > weeks[0]) {
-              var current = new Obm.DateTime(obm.vars.consts.weekTime[evt.event.week][0] * 1000);
-              columnIndex = current.format('Y-m-d');
-              size = Math.ceil((end.getTime() - current.getTime())/86400000);
-              begin = current.getTime(); 
-              evt.leftExtension.setStyle('display', '');
-            }
-          }
+            var start = weeks[0];
 
-          // Right extension
-          if (obm.vars.consts.calendarView == 'day') {
-            if ((evt.event.date+evt.event.duration*1000) > obm.vars.consts.startTime.getTime() + (86400000 * obm.vars.consts.nbDisplayedDays)) {
-              size = Math.ceil((obm.vars.consts.startTime.getTime() + (86400000 * obm.vars.consts.nbDisplayedDays) - begin)/86400000);
-              evt.rightExtension.setStyle('display', '');
+            if (evt.event.left) {
+              oldBegin = begin
+              begin = evt.event.index*1000;
+              var current = new Obm.DateTime(begin);
+              columnIndex = current.format('Y-m-d');
+              evt.leftExtension.setStyle('display', '');
+              size = size - Math.ceil((begin-oldBegin)/86400000);
             }
-          } else {
-            var weeks = obm.calendarManager.getEventWeeks(evt);
-            if (weeks[1] > evt.event.week || weeks[1] == 0) {
-              var startWeek = obm.vars.consts.weekTime[evt.event.week][0] * 1000;
+
+            if (evt.event.right) {
+              var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
               size = Math.ceil((startWeek + (86400000 * 7) - begin)/86400000);
               evt.rightExtension.setStyle('display', '');
             }
+
+          } else {
+
+            if (begin < obm.calendarManager.startTime*1000) {
+              begin = obm.calendarManager.startTime*1000; 
+              current = new Obm.DateTime(begin);
+              columnIndex = current.format('Y-m-d');
+              size = Math.ceil((end.getTime() - begin)/86400000);
+              evt.leftExtension.setStyle('display', '');
+            }
+
+            if ((evt.event.date+evt.event.duration*1000) > obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays)) {
+              size = Math.ceil((obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays) - begin)/86400000);
+              evt.rightExtension.setStyle('display', '');
+            }
+
           }
 
           var coords = {'position': position, 'size': size,  'column': columnIndex, 'occurrence': evt};
@@ -637,10 +639,10 @@ Obm.CalendarManager = new Class({
       if (response.day == 1) {
         obm.calendarManager.newDayEvent(events[0].event,events[0].options);
         if (obm.calendarManager.calendarView == 'month') {
-          var time = events[0].event.time;
-          var day = time - obm.vars.consts.startTime/1000;
-          var iso = new Obm.DateTime(time*1000).format('Y-m-d');
-          obm.calendarManager.resizeAlldayCell($('dayContainer_'+day+'_'+iso));
+          // var time = events[0].event.time;
+          // var day = time - obm.vars.consts.startTime/1000;
+          // var iso = new Obm.DateTime(time*1000).format('Y-m-d');
+          //obm.calendarManager.resizeAlldayCell($('dayContainer_'+day+'_'+iso));
         }
 
       } else {
@@ -719,7 +721,7 @@ Obm.CalendarManager = new Class({
           evt.event.status = ivent.status;
           evt.event.time = ivent.time;
           evt.event.duration = ivent.duration;
-          evt.event.week = ivent.week;
+          //evt.event.week = ivent.week;
           evt.event.date =  new Obm.DateTime(ivent.time * 1000);
           if (obm.calendarManager.calendarView == 'month') {
             // Delete current event and create a new one (easy way)
@@ -731,7 +733,7 @@ Obm.CalendarManager = new Class({
                 obm.calendarManager.newDayEvent(evt.event,evt.options);
             } else { // multi weeks event
               weeks.each(function(w) {
-                evt.event.week = w;
+                //evt.event.week = w;
                 obm.calendarManager.newDayEvent(evt.event,evt.options);
               });
             }
@@ -894,8 +896,13 @@ Obm.CalendarEvent = new Class({
    */
   setColor: function(color) {
     if(color) {
-      this.content.setStyle('backgroundColor',color.body);
-      this.dragHandler.setStyle('backgroundColor',color.header);
+      if (obm.vars.consts.calendarView == 'month') {
+        this.content.setStyle('backgroundColor',color.body);
+        this.dragHandler.setStyle('backgroundColor',color.body);
+      } else {
+        this.content.setStyle('backgroundColor',color.body);
+        this.dragHandler.setStyle('backgroundColor',color.header);
+      }
     } else {
       this.content.setStyle('backgroundColor','');
       this.dragHandler.setStyle('backgroundColor','');
@@ -1199,15 +1206,8 @@ Obm.CalendarAllDayEvent = new Class({
         this.element.injectInside($('allday_'+this.event.date.format('Y-m-d')));
       }
     } else {
-      if (this.event.week != 0) {
-        var weeks = obm.calendarManager.getEventWeeks(this);
-        var startWeek = new Obm.DateTime(obm.vars.consts.weekTime[this.event.week][0] * 1000);
-        if (this.event.date.getTime() < startWeek.getTime()) {
-          this.element.injectInside($('allday_'+startWeek.format('Y-m-d')));
-        } else {
-          this.element.injectInside($('allday_'+this.event.date.format('Y-m-d')));
-        }
-      }
+      var index = new Obm.DateTime(this.event.index*1000);
+      this.element.injectInside($('allday_'+index.format('Y-m-d')));
     }
 
   },
@@ -1422,7 +1422,7 @@ Obm.CalendarQuickForm = new Class({
       var d = obm.calendarManager.startTime + Math.floor($('allday_'+str[1]).style.left.toInt()/obm.vars.consts.cellWidth.toInt())*86400;
       this.setDefaultFormValues(d,1, context);
     } else if (type == 'dayContainer' || type == 'more' ) { // Month view
-      var d = obm.vars.consts.startTime.getTime()/1000 + str[1].toInt();
+      var d = obm.calendarManager.startTime + str[1].toInt();
       this.setDefaultFormValues(d,1, context);
     } else {
       var evt = obm.calendarManager.events.get(str[1]);
@@ -1469,9 +1469,9 @@ Obm.CalendarQuickForm = new Class({
     this.location.set('html',evt.event.location);
     this.data.setStyle('display','block');
     if (!this.eventData.all_day) {
-      this.date.set('html',date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
+      this.date.set('html',date_begin.format(obm.vars.regexp.dateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dateFormat+' H:i'));
     } else {
-      this.date.set('html',date_begin.format('Y/m/d') + '-' + date_end.format('Y/m/d'));
+      this.date.set('html',date_begin.format(obm.vars.regexp.dateFormat) + ' - ' + date_end.format(obm.vars.regexp.dateFormat));
     }
     this.attendees.set('html','');
     for(var i=0;i<evt.event.attendees.length;i++) {
