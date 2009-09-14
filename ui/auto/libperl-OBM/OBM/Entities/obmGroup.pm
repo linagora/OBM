@@ -121,14 +121,26 @@ sub _init {
     if( $groupDesc->{'group_contacts'} ) {
         my @externelContacts = split( /\r\n/, $groupDesc->{'group_contacts'} );
         my %externelContacts;
+        my $return = 0;
         for( my $i=0; $i<=$#externelContacts; $i++ ) {
-            if( $externelContacts[$i] =~ /$OBM::Parameters::regexp::regexp_email/ ) {
-                $externelContacts{$externelContacts[$i]} = undef;
+            my $lcExternalContact = lc($externelContacts[$i]);
+            if( $lcExternalContact =~ /$OBM::Parameters::regexp::regexp_email/ ) {
+                $externelContacts{$lcExternalContact} = undef;
             }else {
                 $self->_log( 'adresse mail du contact externe \''.$externelContacts[$i].'\' incorrecte', 2 );
+                $return++;
             }
         }
+
+        if( $return ) {
+            $self->_log( $return.' contacts externes ont une adresse mail invalide', 0 );
+            return 1;
+        }
         @{$groupDesc->{'group_contacts_list'}} = keys(%externelContacts);
+
+        if( $#{$groupDesc->{'group_contacts_list'}} < 0 ) {
+            delete($groupDesc->{'group_contacts_list'});
+        }
     }
 
     # Le SID du domaine
