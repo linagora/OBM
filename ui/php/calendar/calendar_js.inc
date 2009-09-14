@@ -550,10 +550,11 @@ function disable(id){
   }
 }
 
-function updateExportForm(){
-  $('del_action').setProperty('value','reset');
-  $('del_popup').setProperty('value','0');
-  $('del_force').setProperty('value','1');
+function submitResetExportForm(){
+  $('export_action').setProperty('value','reset');
+  $('export_popup').setProperty('value','0');
+  $('export_force').setProperty('value','1');
+  $('f_entity').submit();
 }
 
 function detachDocument(documentId, eventEntityId, el) {

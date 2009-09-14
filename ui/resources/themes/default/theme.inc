@@ -178,6 +178,7 @@ $ico_planning_view_current  = "$theme_path/ico_calendar_planning_current.gif";
 $ico_printable_view_current = "$theme_path/ico_calendar_printable_current.gif";
 $ico_spinner                = "$theme_path/spinner.gif";
 $ico_undo                   = "$theme_path/ico_trash.gif";
+$ico_warning                = "$theme_path/ico_warning.gif";
 
 // OrganizationalChart icon
 $ico_outline_view = "$theme_path/ico_outline_view.gif";

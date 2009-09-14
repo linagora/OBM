@@ -4942,7 +4942,7 @@ function dis_calendar_admin_index($tags_q) {
 function dis_calendar_export_handle($calendar) {
   global $obm, $obm_version, $ccalendar_weekstart;
 
-  if($calendar[export] == "date") {
+  if($calendar['export'] == "date") {
     $date = $calendar['event_before_date'];
     $start = clone $date;
     $start = $start->subYear(100);
@@ -4998,7 +4998,7 @@ function dis_icalendar_export($params) {
   global $display;
   global $l_all_calendar, $l_event_before_date, $l_delete_meeting, $l_delete_event;
   global $l_ics_export_ok, $l_insert, $l_calendar , $l_validate, $l_purge_popup_title;
-  global $l_export, $l_cancel, $l_confirm, $l_confirm_delete_export;
+  global $l_export, $l_cancel, $l_confirm, $l_confirm_delete_export, $ico_warning;
 
   $date =new Of_Date();
 
@@ -5032,7 +5032,8 @@ function dis_icalendar_export($params) {
   $dis_popup = "
     <div id=\"exportPopupCalendar\" class=\"obmPopup\">
       <h1>
-      <span>$l_purge_popup_title</span>
+        <img style=\"position:relative;\" src=\"$ico_warning\" />
+        <span>$l_purge_popup_title</span>
       </h1>
       <h2>
         $l_ics_export_ok
@@ -5042,15 +5043,15 @@ function dis_icalendar_export($params) {
       </h2>
       <fieldset class=\"buttons\">
         <input type=\"submit\" onclick=\"obm.popup.hide('exportPopupCalendar')\" value=\"$l_cancel\"/>
-        <input type=\"submit\" onclick=\"updateExportForm();$('f_entity').submit()\" value=\"$l_confirm\"/>
+        <input type=\"submit\" onclick=\"submitResetExportForm();\" value=\"$l_confirm\"/>
       </fieldset>
     </div>
     ";
 
   // --- HTML Template --------------------------------------------------------
-  $dis_button = "<input id=\"del_action\" type=\"hidden\" name=\"action\" value=\"ics_export\">
-          <input id=\"del_popup\" type=\"hidden\" name=\"popup\" value=\"1\">
-          <input id=\"del_force\" type=\"hidden\" name=\"force\" value=\"0\">
+  $dis_button = "<input id=\"export_action\" type=\"hidden\" name=\"action\" value=\"ics_export\">
+          <input id=\"export_popup\" type=\"hidden\" name=\"popup\" value=\"1\">
+          <input id=\"export_force\" type=\"hidden\" name=\"force\" value=\"0\">
           <input type=\"submit\" onclick=\"$('cb_delete_event').checked?obm.popup.show('exportPopupCalendar'):0;\" value=\"$l_export\">";
 
   $block = "

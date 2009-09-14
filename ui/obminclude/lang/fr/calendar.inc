@@ -156,7 +156,7 @@ $l_event_before_date = "Uniquement les évènements antérieurs au : ";
 $l_delete_event = "Supprimer les rendez-vous de mon agendas";
 $l_delete_meeting = "Supprimer les réunions de mon agendas";
 $l_ics_export_ok = "Les évènements ont été exportés.";
-$l_confirm_delete_export = "Les événements de votre agenda vont maintenant être supprimés, cette opération ne pourra pas être annulées, voulez-vous continuer?";
+$l_confirm_delete_export = "Les événements de votre agenda vont maintenant être supprimés, cette opération ne pourra pas être annulée, voulez-vous continuer?";
 $l_purge_popup_title = "Purge de votre agenda";
 
 $l_cal_view = "Type d'affichage";
