@@ -3351,8 +3351,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['description'])) { $desc = stripslashes($calendar['description']); }
   if (isset($calendar['all_day'])) { $all_day = $calendar['all_day']; }
   if (isset($calendar['tag_id'])) { $tagid = $calendar['tag_id']; }
-  if (isset($calendar['tag_label'])) { $tagid = $calendar['tag_label']; }
-  if (isset($calendar['tag_color'])) { $tagid = $calendar['tag_color']; }
+  if (isset($calendar['tag_label'])) { $taglabel = $calendar['tag_label']; }
+  if (isset($calendar['tag_color'])) { $tagcolor = $calendar['tag_color']; }
   if (isset($calendar['repeatfrequency'])) { $repeatfrequency = $calendar['repeatfrequency']; }  
   if (isset($calendar['item'])) { $item = $calendar['item']; } 
   if (!is_object($event_q)) {$begin = $calendar['date_begin']; }
