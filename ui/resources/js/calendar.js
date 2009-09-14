@@ -18,7 +18,7 @@ Obm.CalendarManager = new Class({
     this.tips = new Obm.Tip(null, 'calTip'); 
     this.calendarView = obm.vars.consts.calendarView;
     var current = new Obm.DateTime(obm.vars.consts.startTime);
-
+    this.entityEvents = new Array();
     if (this.calendarView == 'day') {
       for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
         current.setTime(obm.vars.consts.startTime.getTime());
@@ -216,6 +216,12 @@ Obm.CalendarManager = new Class({
     }
   },
 
+
+  setEventsClass: function(entity, id, klass) {
+    obm.calendarManager.entityEvents[entity+'-'+id].each(function(e) {
+      e.addClass(klass);
+    });
+  },
 
   /**
    * Add an all day event
@@ -993,6 +999,10 @@ Obm.CalendarInDayEvent = new Class({
 
     this.setTitle();
     this.element.injectInside($('calendarGrid'));
+    if (!obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id]) {
+      obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id] = new Array();
+    }
+    obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id].push(this.content);
   },
 
 
@@ -1225,7 +1235,10 @@ Obm.CalendarAllDayEvent = new Class({
       }
       this.element.injectInside($('allday_'+index));
     }
-
+    if (!obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id]) {
+      obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id] = new Array();
+    }
+    obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id].push(this.content);
   },
 
 
@@ -1249,7 +1262,7 @@ Obm.CalendarAllDayEvent = new Class({
    */
   makeUpdatable: function() {
     var dragOptions = {
-      handle: this.dragHandler,
+      handle: this.content,
       preventDefault: true,
       units: {'x':'px', 'y':'px'},
       grid: {'x':0, 'y': obm.calendarManager.defaultHeight},
