@@ -72,6 +72,15 @@ sub _modifyAttrList {
         return $update;
     }
 
+    if( $#{$newValues} < 0 ) {
+        if( $ldapEntry->get_value( $attr, asref => 1) ) {
+            $ldapEntry->delete( $attr => [ ] );
+            $update = 1;
+        }
+
+        return $update,
+    }
+
 
     my $ldapValues = $ldapEntry->get_value( $attr, asref => 1);
     if( $newValues && !defined( $ldapValues ) ) {
