@@ -114,8 +114,8 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action, $calendar) {
   if ($p_range) {
     ${'ico_'.$p_range.'_view'} = ${'ico_'.$p_range.'_view_current'};
   }
-  $search_form = dis_calendar_html_search_form($calendar);
   if ($action == 'index' || $action == 'waiting_events' || $action == 'insert' || $action == 'update') {
+    $search_form = dis_calendar_html_search_form($calendar);
     $navbar = dis_calendar_navbar($calendar, $p_range);
   }
 
@@ -1176,6 +1176,11 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
       foreach($occurrences as $occurrence) {
         if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
         $occurrence->week = $current->getWeek();
+        // Left extension
+        if ($occurrence->date->compare($current) < 0) {
+          //$occurrence->end->subSecond($current->diff($occurrence->date));
+          $occurrence->date = $current;
+        }
         $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
       }
     }
