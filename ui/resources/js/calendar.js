@@ -94,8 +94,32 @@ Obm.CalendarManager = new Class({
         current = obm.vars.consts.startTime;
       }
       var beginDay = current.getTime();
-      var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000).getTime();
-      var size = Math.ceil((endDay - beginDay)/86400000);
+      var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
+      var size = Math.ceil((endDay.getTime() - beginDay)/86400000);
+      if (!evt.event.all_day && evt.event.date.getDate() != endDay.getDate()) {
+        size = size + 1;
+      }
+
+      // Extensions
+      if (obm.vars.consts.calendarView == 'month') {
+        var weeks = obm.calendarManager.getEventWeeks(evt);
+        var start = weeks[0];
+
+        if (evt.event.left) {
+          var oldBegin = beginDay
+          beginDay = evt.event.index*1000;
+          var current = new Obm.DateTime(beginDay);
+          size = size - Math.ceil((beginDay-oldBegin)/86400000);
+        }
+
+        if (evt.event.right) {
+          var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
+          size = Math.ceil((startWeek + (86400000 * 7) - beginDay)/86400000);
+        }
+
+      }
+
+      evt.size = size;
 
       for(var i=0;i<size;i++) {
         current.setTime(beginDay);
@@ -232,35 +256,32 @@ Obm.CalendarManager = new Class({
 
     var str = element.id.split('_');
     var content = $('allday_'+str[2]);
-    var evts = content.getElements('.event');
+    var canBeDisplayed = Math.floor(element.offsetHeight/15) - 2;
 
-    if ((evts.length+2)*14 > element.offsetHeight) {
-      // hide undisplayable events
-      var canBeDisplayed = Math.floor(element.offsetHeight/13 - 4);
-      var undisplayed = evts.length - canBeDisplayed;
+    if (obm.calendarManager.alldayEventGrid[str[2]] && 
+        obm.calendarManager.alldayEventGrid[str[2]].length>canBeDisplayed) {
+      var undisplayed = obm.calendarManager.alldayEventGrid[str[2]].length - canBeDisplayed;
       var i = 0;
-      evts.each(function(e) {
+      obm.calendarManager.alldayEventGrid[str[2]].each(function(e) {
         if (i<canBeDisplayed) {
-          e.style.visibility = 'visible';
+          e.element.style.display = '';
         } else {
-          e.style.visibility = 'hidden';
+          e.element.style.display = 'none';
         }
         i++;
       });
-
-
-      // display +more link
       var more = $('more_'+str[1]+'_'+str[2]);
       more.style.top = canBeDisplayed*15+'px';
-      more.style.visibility = 'visible';
+      more.style.display = '';
       more.set('html','+'+undisplayed+' '+obm.vars.labels.more);
       obm.calendarManager.tips.add(more);
-
     } else {
-      $('more_'+str[1]+'_'+str[2]).style.visibility = 'hidden';
-      evts.each(function(e) {
-        e.style.visibility = 'visible';
-      });
+      $('more_'+str[1]+'_'+str[2]).style.display = 'none';
+      if (obm.calendarManager.alldayEventGrid[str[2]]) {
+        obm.calendarManager.alldayEventGrid[str[2]].each(function(e) {
+          e.element.style.display = '';
+        });
+      }
     }
 
   },
@@ -350,16 +371,12 @@ Obm.CalendarManager = new Class({
 
           var end = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
           var begin = evt.event.date.getTime(); 
-          var size = Math.ceil((end.getTime() - begin)/86400000);
-
-          if (!evt.event.all_day && evt.event.date.getDate() != end.getDate()) {
-            size = size + 1;
-          }
-
+          var size = evt.size;
           var current = new Obm.DateTime(evt.event.time*1000);
 
           // Extensions
           if (obm.vars.consts.calendarView == 'month') {
+            size = evt.size;
             var weeks = obm.calendarManager.getEventWeeks(evt);
             var start = weeks[0];
 
@@ -369,12 +386,9 @@ Obm.CalendarManager = new Class({
               var current = new Obm.DateTime(begin);
               columnIndex = current.format('Y-m-d');
               evt.leftExtension.setStyle('display', '');
-              size = size - Math.ceil((begin-oldBegin)/86400000);
             }
 
             if (evt.event.right) {
-              var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
-              size = Math.ceil((startWeek + (86400000 * 7) - begin)/86400000);
               evt.rightExtension.setStyle('display', '');
             }
 
