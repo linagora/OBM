@@ -18,7 +18,7 @@
                connectionTimeout="600000" disableUploadTimeout="true" />
 
     <Connector port="8009"
-	       URIEncoding="UTF-8" maxThreads="400"
+	       URIEncoding="UTF-8" maxThreads="800"
 	       enableLookups="false" redirectPort="8443"
 	       protocol="AJP/1.3" />
 
