@@ -3215,7 +3215,8 @@ function html_user_batch_form($params) {
   	<option value=\"$sel_default[value]\" ".(!isset($profile_id) ? $selected : '').">$sel_default[label]</option>
   ";
   foreach($profiles as $profile_name => $profile_value) {
-    $profile_block .= "<option value=\"$profile_name\" ".($profile_name==$profile ? $selected : '').">$profile_name</option>";
+    $profile_label = isset($GLOBALS["l_perm_$profile_name"]) ? $GLOBALS["l_perm_$profile_name"] : $profile_name;
+    $profile_block .= "<option value=\"$profile_name\" ".($profile_name==$profile ? $selected : '').">$profile_label</option>";
   }
   
   $mail_perms_block = "
