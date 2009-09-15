@@ -578,7 +578,7 @@ function detachDocument(documentId, eventEntityId, el) {
 function setEventsColors(entity, entity_id, klass) {
   var req = new Request({
     url : '$path/calendar/calendar_index.php',
-    data: 'action=set_entity_class&ajax=1&entity_type='+entity+'&entity_id='+entity_id+'&entity_class='+klass,
+    data: 'action=set_entity_class&ajax=1&entity_type='+entity+'&entity_id='+entity_id+'&entity_class='+klass
   }); 
   req.send();
 }

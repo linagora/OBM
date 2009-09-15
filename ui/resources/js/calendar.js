@@ -28,7 +28,7 @@ Obm.CalendarManager = new Class({
     }
 
     // Window height observer 
-    new Obm.Observer(new Window(window), {onStop:this.resizeGrid, property:'innerHeight'});
+    //new Obm.Observer(new Window(window), {onStop:this.resizeGrid, property:'innerHeight'});
 
     this.popupManager = new Obm.CalendarPopupManager(); 
     if (obm.vars.consts.calendarView == 'day') {
@@ -1321,7 +1321,7 @@ Obm.CalendarAllDayEvent = new Class({
     this.event.time = Math.floor(obm.vars.consts.startTime.getTime()/1000 + str[1].toInt() + eventHour);
     this.event.date = new Obm.DateTime(this.event.time*1000);
     this.setTitle();
-  },
+  }
 
 });
 

@@ -441,7 +441,7 @@ Obm.Observer = new Class({
   },
   
   setValue: function() {
-    v = this.el[this.options.property];
+    var v = this.el[this.options.property];
     if(!v) 
       v = this.el.getStyle(this.options.property);
     return v;
