@@ -47,8 +47,8 @@ function run_query_people_search($people) {
   $multidomain_userobm = sql_multidomain('userobm');
   $multidomain_contact = sql_multidomain('contact');
 
-  $where_userobm = '1=1';
-  $where_contact = '1=1';
+  $where_userobm = "userobm_archive = 0";
+  $where_contact = "contact_archive = '0'";
 
   if ($filter_entity == 'calendar') {
     $users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', $filter_pattern);
@@ -206,7 +206,7 @@ function run_query_people_search($people) {
   if ((trim($where_userobm) != '') || (trim($where_filter_entity) != '')) {
     $whereq_userobm = " WHERE $where_userobm $where_filter_entity $multidomain_userobm";
   } else {
-    $whereq_userobm = " WHERE 1=1 $multidomain_userobm";
+    $whereq_userobm = " WHERE userobm_archive = 0 $multidomain_userobm";
   }
   // Contact
   $whereq_contact = " WHERE $where_contact $multidomain_contact";

@@ -2838,6 +2838,7 @@ function dis_user_import_file_run($params) {
     $user['lastname'] = addslashes(trim($row[$c_lastname]));
     $user['firstname'] = addslashes(trim($row[$c_firstname]));
     $user['delegation'] = addslashes(trim($row[$c_delegation]));
+    $user['delegation_target'] = addslashes(trim($row[$c_delegation]));
     $user['login'] = addslashes(trim($row[$c_login]));
     $user['passwd'] = addslashes(trim($row[$c_password]));
     if (trim($row[$c_password_type]) == 'CRYPT') {
@@ -2891,6 +2892,7 @@ function dis_user_import_file_run($params) {
 
     // Delegation
     $user['delegation'] = str_replace(';', '/', $row[$c_delegation]);
+    $user['delegation_target'] = $user['delegation']; 
     
     // Email Nomade
     if (trim($row[$c_email_nomade]) != '') {

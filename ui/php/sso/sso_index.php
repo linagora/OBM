@@ -37,8 +37,6 @@ $params = get_user_params();
 
 if($action == "ticket") {
   page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
-
-
   include("$obminclude/global_pref.inc");
   get_sso_action();
 
