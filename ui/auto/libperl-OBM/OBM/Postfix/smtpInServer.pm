@@ -90,65 +90,6 @@ sub getDescription {
 }
 
 
-sub _connect {
-    my $self = shift;
-
-    if( (ref($self->{'serverConn'}) eq 'Net::Telnet') && (!$self->{'serverConn'}->eof()) ) {
-        $self->_log( 'connexion déjà établie à l\'ObmSatellite de '.$self->getDescription(), 3 );
-        return 0;
-    }
-
-    $self->_log( 'connexion à '.$self->getDescription(), 3 );
-
-    require Net::Telnet;
-    $self->{'serverConn'} = Net::Telnet->new(
-        Host => $self->{'network_name'},
-        Port => 30000,
-        Timeout => 60,
-        errmode => 'return'
-    );
-
-    if( !defined($self->{'serverConn'}) || !$self->{'serverConn'}->open() ) {
-        $self->_log( 'échec de connexion à l\'ObmSatellite de '.$self->getDescription(), 0 );
-        return 1;
-    }
-
-    while( (!$self->{'serverConn'}->eof()) && (my $line = $self->{'serverConn'}->getline(Timeout => 1)) ) {
-        chomp($line);
-        $self->_log( 'réponse: '.$line, 3 );
-    }
-
-    if( $self->{'serverConn'}->eof() ) {
-        $self->_log( 'ObmSatellite de '.$self->getDescription().' a terminé la connexion. Vérifiez ses autorisations d\'accès', 0 );
-        return 1;
-    }
-
-    return 0;
-}
-
-
-sub _disConnect {
-    my $self = shift;
-
-    if( (ref($self->{'serverConn'}) ne 'Net::Telnet') || ($self->{'serverConn'}->eof()) ) {
-        $self->_log( 'connexion non établie à l\'ObmSatellite de '.$self->getDescription(), 3 );
-        return 0;
-    }
-
-    $self->_log( 'envoi de la commande: quit', 1 );
-    $self->{'serverConn'}->print( 'quit' );
-    while( !$self->{'serverConn'}->eof() && (my $line = $self->{'serverConn'}->getline(Timeout => 1)) ) {
-        chomp($line);
-        $self->_log( 'réponse: '.$line, 3 );
-    }
-
-    $self->_log( 'déconnexion de '.$self->getDescription(), 3 );
-    $self->{'serverConn'}->close();    
-
-    return 0;
-}
-
-
 sub enable {
     my $self = shift;
 
@@ -156,6 +97,7 @@ sub enable {
 
     return 0;
 }
+
 
 sub disable {
     my $self = shift;
@@ -175,25 +117,12 @@ sub update {
         return 1;
     }
 
-    if( $self->_connect() ) {
-        $self->_log( 'impossible d\'établir la connexion à '.$self->getDescription(), 3 );
+    require OBM::ObmSatellite::client;
+    my $obmSatelliteClient = OBM::ObmSatellite::client->instance();
+    if( !defined($obmSatelliteClient) ) {
+        $self->_log( 'Echec lors de l\'initialisation du client obmSatellite', 3 );
         return 1;
     }
 
-    my $cmd = 'smtpInConf: '.$self->{'host_name'};
-    $self->_log( 'envoi de la commande: '.$cmd, 1 );
-
-    $self->{'serverConn'}->print( $cmd );
-    if( (!$self->{'serverConn'}->eof()) && (my $line = $self->{'serverConn'}->getline()) ) {
-        chomp($line);
-        $self->_log( 'réponse: '.$line, 1 );
-
-        if( $line !~ /OK$/ ) {
-            $errorCode = 1;
-        }
-    }
-
-    $self->_disConnect();
-
-    return $errorCode;
+    return $obmSatelliteClient->post( $self->{'network_name'}, '/postfixsmtpinmaps/host/'.$self->{'host_name'} );
 }

@@ -1,8 +1,6 @@
 package OBM::Tools::commonMethods;
 
-
 $debug = 1;
-
 
 use 5.006_001;
 use strict;

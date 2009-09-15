@@ -65,55 +65,22 @@ sub addCyrusPartition {
         return 1;
     }
 
+    my $cyrusSrvName = $cyrusSrv->getCyrusServerName();
+    if( !$cyrusSrvName ) {
+        $self->_log( 'nom du serveur Cyrus incorrect, ajout de partition impossible', 3 );
+        return 1;
+    }
+
     $self->_log( 'connexion à obmSatellite de '.$cyrusSrv->getDescription(), 2 );
-    my $srvCon = new Net::Telnet(
-        Host => $cyrusSrvIp,
-        Port => $self->{'obmSatellitePort'},
-        Timeout => 60,
-        errmode => 'return'
-    );
 
-    if( !defined($srvCon) ) {
-        $self->_log( 'problème à l\'initialisation de la connexion à obmSatellite de '.$cyrusSrv->getDescription(), 0 );
+    require OBM::ObmSatellite::client;
+    my $obmSatelliteClient = OBM::ObmSatellite::client->instance();
+    if( !defined($obmSatelliteClient) ) {
+        $self->_log( 'Echec lors de l\'initialisation du client obmSatellite', 3  );
         return 1;
     }
 
-    if( !$srvCon->open() ) {
-        $self->_log( 'echec de connexion à obmSatellite de '.$cyrusSrv->getDescription().' : '.$srvCon->errmsg(), 0 );
-        return 1;
-    }
-
-    while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 2)) ) {
-        chomp($line);
-        $self->_log( 'réponse : \''.$line.'\'', 4 );
-    }
-
-    my $cmd = 'cyrusPartitions: add:'.$cyrusSrv->getCyrusServerName();
-    my $errorCode = 0;
-    $self->_log( 'envoi de la commande : '.$cmd, 2 );
-    $srvCon->print( $cmd );
-    if( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 60)) ) {
-        chomp($line);
-        $self->_log( 'réponse : \''.$line.'\'', 4 );
-        if( $line !~ /^ok$/i ) {
-            $self->_log( 'problème lors de l\'exécution de la commande '.$cmd, 0 );
-            $errorCode = 1;
-        }
-
-    }elsif( $srvCon->eof() ) {
-        $self->_log( 'problème lors de l\'exécution de la commande '.$cmd, 0 );
-        return 1;
-    }
-
-    $self->_log( 'déconnexion d\'obmSatellite de '.$cyrusSrv->getDescription(), 2 );
-    $srvCon->print( 'quit' );
-    while( !$srvCon->eof() && (my $line = $srvCon->getline(Timeout => 5)) ) {
-        chomp($line);
-        $self->_log( 'réponse : \''.$line.'\'', 4 );
-    }
-
-
-    return $errorCode;
+    return $obmSatelliteClient->post( $cyrusSrvIp, '/cyruspartition/host/add/'.$cyrusSrvName );
 }
 
 
