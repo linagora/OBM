@@ -3,9 +3,12 @@ ObmSatellite
 
 This service is needed by OBM to do operation on distant server.
 
-It's REST compatible, and use PLAIN or XML (depend of module) over HTTP.
+It's REST compatible, and use PLAIN or XML (depend of module) over HTTPs.
 
-ObmSatellite configuration file : /etc/obm-satellite/obmSatellite.ini
+ObmSatellite configuration file :
+  - /etc/obm/obm_conf.ini : needed
+  - /etc/obm-satellite/obmSatellite.ini : optional, override obm_conf.ini common
+    values
 
 To get information on module, see perldoc ObmSatellite::Modules::<moduleName>
 
@@ -26,7 +29,7 @@ Some of them doesn't need any configuration options,
 /etc/obm-satellite/mods-available corresponding file must exist anyway to
 enabling it.
 
-A module can use some services.
+A module can use services.
 
 
 Services:
