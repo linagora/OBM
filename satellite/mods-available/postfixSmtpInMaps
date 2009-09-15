@@ -1,0 +1,10 @@
+[postfixSmtpInMaps]
+
+# Postmap command
+# default: postmapCmd = /usr/sbin/postmap
+
+# LDAP root
+# no default
+# using LDAP root from LDAP server description see /etc/obm/obm_conf.ini or
+# /etc/obm-satellite/obmSatellite.ini or define in, this file
+# ldapRoot = 

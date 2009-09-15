@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w -T
+
+use strict;
+
+
+my @wwwDataDesc = getpwnam('root');
+if( $wwwDataDesc[2] != $< ) {
+    print STDERR 'This script must be run as \'root\'';
+    exit 1;
+}
+
+my $availableMods = '/etc/obm-satellite/mods-available';
+my $enabledMods = '/etc/obm-satellite/mods-enabled';
+
+foreach my $arg (@ARGV) {
+    if( $arg !~ /^(\w+)$/ ) {
+        print 'Invalid name for module \''.$arg.'\''."\n";
+        next;
+    }
+    $arg = $1;
+
+    if( ! -r $availableMods.'/'.$arg ) {
+        print 'Unknow module \''.$arg.'\''."\n";
+        next;
+    }
+
+    if( -e $enabledMods.'/'.$arg ) {
+        print 'Module \''.$arg.'\' already enabled'."\n";
+        next;
+    }
+
+    if( !symlink( $availableMods.'/'.$arg, $enabledMods.'/'.$arg ) ) {
+        print 'Failed to enable module \''.$arg.'\''."\n";
+        next;
+    }
+
+    print 'Module \''.$arg.'\' enabled sucessfully'."\n";
+}
+
+print 'You need to reload obm-satellite to activate new configuration'."\n";
+exit 0;
