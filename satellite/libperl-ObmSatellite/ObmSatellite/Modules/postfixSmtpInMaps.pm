@@ -85,6 +85,11 @@ sub _postMethod {
     $datas{'map'} = $3;
 
     SWITCH: {
+        if( !$datas{'map'} ) {
+            $datas{'maps'} = [ 'mailboxMap', 'aliasMap', 'transportMap', 'domainMap' ];
+            last SWITCH;
+        }
+
         if( $datas{'map'} eq 'mailbox' ) {
             $datas{'maps'} = [ 'mailboxMap' ];
             last SWITCH;
@@ -102,11 +107,6 @@ sub _postMethod {
 
         if( $datas{'map'} eq 'domain' ) {
             $datas{'maps'} = [ 'domainMap' ];
-            last SWITCH;
-        }
-
-        if( !$datas{'map'} ) {
-            $datas{'maps'} = [ 'mailboxMap', 'aliasMap', 'transportMap', 'domainMap' ];
             last SWITCH;
         }
 
