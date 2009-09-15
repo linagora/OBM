@@ -1615,7 +1615,7 @@ function run_query_userobm_update_lastaccess($id) {
   global $cdg_sql;
   $id = sql_parse_id($id, true);
   $query = "UPDATE UserObm
-    SET userobm_timelastaccess='".date('Y-m-d H:i:s')."'
+    SET userobm_timelastaccess = NOW()
     WHERE userobm_id $id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_userobm_update_lastaccess(2)');

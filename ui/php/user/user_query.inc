@@ -958,7 +958,7 @@ function run_query_user_update($u_id, $user) {
   }
   $id = sql_parse_id($u_id, true);
   $query = "UPDATE UserObm SET
-    userobm_timeupdate = '". date('Y-m-d H:i:s')."',
+    userobm_timeupdate = NOW(),
     userobm_userupdate = $obm[uid],
     $passwd_update_q
     $user_update_q

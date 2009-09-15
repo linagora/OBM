@@ -1518,12 +1518,12 @@ function display_record_info($obm_q) {
   if (is_object($obm_q)) {
     $usercreate = $obm_q->f('usercreate');
     $userupdate = $obm_q->f('userupdate');
-    $timecreate = of_datetime_format($obm_q->f('timecreate'), 1);
-    $timeupdate = of_datetime_format($obm_q->f('timeupdate'), 1);
+    $timecreate = new Of_Date($obm_q->f('timecreate'), 'GMT');
+    $timeupdate = new Of_Date($obm_q->f('timeupdate'), 'GMT');
     $datasource = $obm_q->f('datasource_name');
     $privacy = ($obm_q->f('privacy') == 0 ? $l_public : $l_private);
-    $created = "$usercreate : $timecreate";
-    $updated = "$userupdate : $timeupdate";
+    $created = "$usercreate : ".$timecreate->getOutputDateTime();
+    $updated = "$userupdate : ".$timeupdate->getOutputDateTime();
 
     if ($datasource != '') {
       $dis_dsrc = "<li><img src=\"$ico_data\" alt=\"Datasource\" /> : $datasource</li>";

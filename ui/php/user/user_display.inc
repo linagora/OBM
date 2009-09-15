@@ -170,8 +170,8 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == 'timelastaccess') {
-    $date = $OD->data_set->f($fieldname);
-    $res['name'] = of_datetime_format($date, 1);
+    $date = new Of_Date($OD->data_set->f($fieldname), 'GMT');
+    $res['name'] = $date->getOutputDateTime();
   }
   else if ($fieldname == 'datebegin') {
     $datebegin = $OD->data_set->f($fieldname);
