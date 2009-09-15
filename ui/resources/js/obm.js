@@ -441,9 +441,16 @@ Obm.Observer = new Class({
   },
   
   setValue: function() {
-    var v = this.el[this.options.property];
-    if(!v) 
-      v = this.el.getStyle(this.options.property);
+    var v;
+    if (this.options.property == 'innerHeight') {
+      v = this.el.getHeight();
+    } else if (this.options.property == 'innerWidth') {
+      v = this.el.getWidth();
+    } else {
+      v = this.el[this.options.property];
+      if(!v) 
+        v = this.el.getStyle(this.options.property);
+    }
     return v;
   },
   

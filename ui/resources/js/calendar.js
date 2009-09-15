@@ -28,7 +28,7 @@ Obm.CalendarManager = new Class({
     }
 
     // Window height observer 
-    //new Obm.Observer(new Window(window), {onStop:this.resizeGrid, property:'innerHeight'});
+    new Obm.Observer(window, {onStop:this.resizeGrid, property:'innerHeight'});
 
     this.popupManager = new Obm.CalendarPopupManager(); 
     if (obm.vars.consts.calendarView == 'day') {
@@ -249,10 +249,10 @@ Obm.CalendarManager = new Class({
    */
   resizeGrid: function() {
     if (obm.vars.consts.calendarView == 'day') {
-      $('calendarBody').setStyle('height',window.innerHeight - $('calendarBody').offsetTop -60);
+      $('calendarBody').setStyle('height',window.getHeight() - $('calendarBody').offsetTop -60);
     } else {
-      $('mainContent').setStyle('height',window.innerHeight - $('mainContent').offsetTop -50);
-      $('calendarHeaderGrid').setStyle('height',window.innerHeight - $('calendarHeaderGrid').offsetTop -50);
+      $('mainContent').setStyle('height',window.getHeight() - $('mainContent').offsetTop -50);
+      $('calendarHeaderGrid').setStyle('height',window.getHeight() - $('calendarHeaderGrid').offsetTop -50);
     }
   },
 
