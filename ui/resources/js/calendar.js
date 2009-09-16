@@ -240,6 +240,7 @@ Obm.CalendarManager = new Class({
     return obmEvent;
   },
 
+
   /**
    * Resize viewport
    */
@@ -313,7 +314,7 @@ Obm.CalendarManager = new Class({
         var position = 0;
 
         cell.each(function (evt, index) {
-          var updatedId = evt.event.id+'-'+evt.event.entity_id+'-'+evt.event.time;
+          var updatedId = evt.element.uid;
           var coords;
           if(!(coords = updated.get(updatedId))) {
             if(usedPositions.getLength() == 0) {
@@ -351,6 +352,7 @@ Obm.CalendarManager = new Class({
 
     updated.each(function(coords, key) {
         var size = coords.end.value - coords.position;
+console.log(coords.occurrence.event.title, coords.unit.value, coords.position, size, coords.column);
         coords.occurrence.updatePosition(coords.unit.value, coords.position, size, coords.column);
     }.bind(this));
 
@@ -565,7 +567,6 @@ Obm.CalendarManager = new Class({
 
   /**
    * Refresh the calendar grid
-   * // TODO
    */
   refresh: function() {
   },
@@ -576,6 +577,7 @@ Obm.CalendarManager = new Class({
    */
   prepareEventForUpdate: function(evt) {
     var eventData = new Object();
+    eventData.eventdate = evt.event.date;
     eventData.calendar_id = evt.event.id;
     eventData.element_id = evt.element.id;
     eventData.date_begin = evt.event.date.format('c');
@@ -725,7 +727,6 @@ Obm.CalendarManager = new Class({
       for(var i=0;i< events.length;i++) {
         var ivent = events[i].event;
         var evt = obm.calendarManager.events.get(ivent.id);
-
         if (ivent.status == 'ACCEPTED' || ivent.status == 'NEEDS-ACTION') {
           evt.event.id = ivent.id;
           evt.event.status = ivent.status;
@@ -1048,7 +1049,7 @@ Obm.CalendarInDayEvent = new Class({
     this.drag.addEvent('start', function() {
       this.element.setStyles({
         'width': obm.vars.consts.cellWidth+'%',
-        'z-index' : 1000
+        'z-index' : '1000'
       });
       this.element.setOpacity(.7);
       obm.calendarManager.unregister(this);
@@ -1061,7 +1062,7 @@ Obm.CalendarInDayEvent = new Class({
     this.drag.addEvent('complete', function() {
       this.element.setOpacity(this.getOpacity());
       this.element.setStyles({
-        'z-index' : 'auto' 
+        'z-index' : '10' 
       });
       obm.calendarManager.scroll.stop();
       obm.calendarManager.sendUpdateEvent(this);
@@ -1071,7 +1072,7 @@ Obm.CalendarInDayEvent = new Class({
     // Add resize events
     this.resize.addEvent('start', function() {
       this.element.setStyles({
-        'z-index' : 1000
+        'z-index' : '1000'
       });
       this.element.setOpacity(.7);
       obm.calendarManager.unregister(this);
@@ -1193,8 +1194,7 @@ Obm.CalendarAllDayEvent = new Class({
       this.dragHandler.setProperty('style','cursor: move;');
     }
 
-    this.titleContainer = new Element('span').injectInside(dd);
-    this.timeContainer = new Element('a')
+    this.titleContainer = new Element('a')
        .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
        .injectInside(this.dragHandler);
 
@@ -1235,7 +1235,7 @@ Obm.CalendarAllDayEvent = new Class({
     }
 
     this.element.setProperty('title', this.event.title);
-    this.timeContainer.set('html',time);
+    this.titleContainer.set('html',time);
   },
 
 
@@ -1256,7 +1256,7 @@ Obm.CalendarAllDayEvent = new Class({
     // Add drag events
     this.drag.addEvent('start', function() {
       this.element.setStyles({
-        'z-index' : 10000,
+        'z-index' : '10000',
         'width': obm.vars.consts.cellWidth+'%'
       });
       this.element.setOpacity(.7);
@@ -1305,7 +1305,7 @@ Obm.CalendarAllDayEvent = new Class({
     var eventHour = this.event.date.getHours()*3600 + this.event.date.getMinutes()*60;
     var delta = Math.floor(left/obm.vars.consts.cellWidth);
     var startTime = obm.calendarManager.startTime;
-    if (obm.calendarManager.calendarView == 'month') {
+    if (obm.calendarManager.calendarView == 'month') { // FIXME
       var rowHeight = $$('div.monthRow')[0].getHeight();
       var index = null;
       $$('div.monthRow').each(function(row, i) {
@@ -1373,6 +1373,7 @@ Obm.CalendarPopupManager = new Class({
 
   show: function(evt) {
     this.evtId = evt.element_id;
+    this.ivent = evt;
     this.chain.chain(this.complete.bind(this));
     this.chain.callChain();
   },
@@ -1387,6 +1388,8 @@ Obm.CalendarPopupManager = new Class({
     this.chain.clearChain();
     this.removeEvents();
     if (this.evtId) {
+      var evt = obm.calendarManager.events.get(this.ivent.calendar_id);
+      obm.calendarManager.redraw.set(evt.event.date.format('Y-m-d'), true);
       obm.calendarManager.redrawGrid();
     }
   },

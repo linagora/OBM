@@ -1142,6 +1142,7 @@ function dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, 
       obm.calendarManager.redrawGrid();
       obm.calendarManager.redrawAllDayGrid();
       obm.calendarManager.forceRedraw = true;
+      obm.calendarManager.resizeGrid();
     });
   </script>";
 
