@@ -119,6 +119,7 @@ $l_last_hour = "Hour end";
 // Templates
 $l_save_as_template = "Save as template";
 $l_create_from_template = "Create from template";
+$l_template = "Event template";
 $l_template_name = "Template name";
 $l_header_templates = "Templates";
 

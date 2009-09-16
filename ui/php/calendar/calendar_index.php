@@ -692,10 +692,13 @@ if ($action == 'search') {
     }
     $template_id = run_query_calendar_add_event_template($params);
     
-    $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
+    $display['msg'] .= display_ok_msg("$l_template : $l_insert_ok");
     $params["date"] = $params["date_begin"];
     $display['detail'] = dis_calendar_calendar_view($params, $current_view);
   } else {
+    foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
+      $entities[$type] = is_array($params["sel_{$type}_id"]) ? $params["sel_{$type}_id"] : array();
+    }
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
     $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
   }

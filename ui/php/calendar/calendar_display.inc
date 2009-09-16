@@ -3473,7 +3473,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" />";
-  } elseif (($action == 'new') || ($action == 'insert') || ($action == 'duplicate')) {
+  } elseif (($action == 'new') || ($action == 'insert') || ($action == 'duplicate') || ($action == 'save_as_template')) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />
