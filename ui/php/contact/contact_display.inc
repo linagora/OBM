@@ -2404,7 +2404,7 @@ function json_search_contact($contact ,$results) {
     }
     $contacts[] = "{name : '$name', email: '$email'}";
   }
-  $display['json'] = "[".implode(',',$contacts)."]";
+  $display['json'] = "{length:".$results['length'].", datas:[".implode(',',$contacts)."]}";
 }
 
 function json_sync_contact($err, $act) {
