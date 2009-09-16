@@ -13,6 +13,8 @@ require Config::IniFiles;
 require ObmSatellite::Log::log;
 
 use constant OBM_CONF => '/etc/obm/obm_conf.ini';
+# LDAP server dead time (s)
+use constant DEAD_STATUS_TIME => 180;
 
 
 sub _new_instance {
@@ -340,14 +342,20 @@ sub checkAuthentication {
 sub getDeadStatus {
     my $self = shift;
 
-    return $self->{'deadStatus'};
+    return $self->{'deadStatus'} if !$self->{'deadStatus'};
+
+    if( (time() - $self->{'deadStatus'}) < DEAD_STATUS_TIME ) {
+        return 1;
+    }
+
+    return $self->_unsetDeadStatus();
 }
 
 
 sub _setDeadStatus {
     my $self = shift;
 
-    $self->{'deadStatus'} = 1;
+    $self->{'deadStatus'} = time();
 
     return 0;
 }
