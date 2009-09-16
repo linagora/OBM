@@ -20,9 +20,11 @@ use constant LOG_DIR => '/var/log/obm';
 use constant LOG_LEVEL => 2;
 use constant SOCKET_TIMEOUT => 30;
 use constant SSL_PROTOCOL_VERSION => 'SSLv2/3';
+use constant SSL_CERT_DIR => '/etc/obm/certs';
 use constant PID_DIR => '/var/run/obm';
 use constant HTTP_AUTHENTICATION_VALID_USER => 'obmsatelliterequest';
 use constant HTTP_AUTHENTICATION_LDAP_FILTER => '(&(uid=%u)(objectclass=obmSystemUser))';
+use constant OBM_CONF => '/etc/obm/obm_conf.ini';
 
 
 sub _configure {
@@ -123,14 +125,23 @@ sub _loadConfFile {
 sub _configureSSL {
     my $self = shift;
 
+    if( !(-f OBM_CONF && -r OBM_CONF) ) {
+        die 'FATAL: can\'t read '.OBM_CONF.' file'."\n";
+    }
+
+    my $cfgFile = Config::IniFiles->new( -file => OBM_CONF );
+    die 'FATAL: can\'t read '.OBM_CONF.' file'."\n" if !defined($cfgFile);
+
+    my $externalUrl = $cfgFile->val( 'global', 'external-url' );
+
     $self->{'server'}->{'socketConf'}->{'LocalAddr'} = '';
     $self->{'server'}->{'socketConf'}->{'LocalPort'} = HTTP_PORT;
     $self->{'server'}->{'socketConf'}->{'Timeout'} = SOCKET_TIMEOUT;
     $self->{'server'}->{'socketConf'}->{'Listen'} = 1;
     $self->{'server'}->{'socketConf'}->{'ReuseAddr'} = 'TRUE';
-    $self->{'server'}->{'socketConf'}->{'SSL_key_file'} = CONF_DIR.'/host.key';
-    $self->{'server'}->{'socketConf'}->{'SSL_cert_file'} = CONF_DIR.'/host.cert';
-    $self->{'server'}->{'socketConf'}->{'SSL_ca_file'} = CONF_DIR.'/ca.cert';
+    $self->{'server'}->{'socketConf'}->{'SSL_key_file'} = SSL_CERT_DIR.'/'.$externalUrl.'_signed.pem';
+    $self->{'server'}->{'socketConf'}->{'SSL_cert_file'} = SSL_CERT_DIR.'/'.$externalUrl.'_signed.pem';
+    $self->{'server'}->{'socketConf'}->{'SSL_ca_file'} = SSL_CERT_DIR.'/obm_cert.pem';
     $self->{'server'}->{'socketConf'}->{'SSL_version'} = SSL_PROTOCOL_VERSION;
 }
 
