@@ -1193,11 +1193,12 @@ Obm.CalendarAllDayEvent = new Class({
       this.dragHandler.setProperty('style','cursor: move;');
     }
 
+    this.titleContainer = new Element('span').injectInside(dd);
     this.timeContainer = new Element('a')
        .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
        .injectInside(this.dragHandler);
 
-    this.linkContainer = this.timeContainer;
+    this.linkContainer = this.titleContainer;
     this.linkContainer.addEvent('mousedown', function (evt) {
       this.linkContainer.addEvent('mouseup', 
         function (evt) {
