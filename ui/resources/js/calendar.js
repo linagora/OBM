@@ -352,7 +352,6 @@ Obm.CalendarManager = new Class({
 
     updated.each(function(coords, key) {
         var size = coords.end.value - coords.position;
-console.log(coords.occurrence.event.title, coords.unit.value, coords.position, size, coords.column);
         coords.occurrence.updatePosition(coords.unit.value, coords.position, size, coords.column);
     }.bind(this));
 
