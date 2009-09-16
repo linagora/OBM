@@ -1135,13 +1135,40 @@ input.datePicker {
 /* Form widget for external element.
 /* ------------------------------------------------------------------------- */
 
+#sel_ent{
+  background-color: #ffffff;
+}
+
+.autocompleteResult, .detail td.autocompleteResult {
+  background-color: #ffffff;
+  border: 1px solid #d2d2d2;
+  padding: 2px;
+  white-space: pre-line;
+}
+
+.detail td.autocompleteField {
+  background-color: #ffffff;
+  border: 1px solid #d2d2d2;
+  cursor: text;
+  padding: 1px;
+}
+
+.detail td.autocompleteField input,
+.detail td.autocompleteField select {
+  background-color: #ffffff;
+  border: 1px solid #ffffff;
+  width: auto;
+}
+
+.autocompleteSource {
+  width: 80px;
+}
+
 .elementRow {
   color: #666666;
-  background-color: #ffffff;  
   overflow: hidden;
-  width: 15em;
-  float: left; 
   white-space: nowrap;
+  padding-right: 2px;
 }
 
 /*-------------------------------------------------------------------------- */

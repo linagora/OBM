@@ -3599,15 +3599,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         </a>
         $u_name
         <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-        </div>";
+        </div> ";
       }
     }
   }
 
-  $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=access";
+  $url = "&amp;action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=access";
   $user_add_button = "
     <a href=\"javascript: return false;\" 
-      onclick=\"popup('$url','');
+      onclick=\"popup(\$('userSearchSource').value+'$url','');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
@@ -3638,13 +3638,22 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $l_users / $GLOBALS[l_contacts]
       $user_add_button
       </th>
-      <td>
-        <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
+      <td class=\"autocompleteField\">
+      <select id=\"userSearchSource\" class=\"autocompleteSource\" name=\"\" style=\"float: right;\">
+        <option value=\"$path/user/user_index.php?from=calendar\">$GLOBALS[l_users]</option>
+        <option value=\"$path/contact/contact_index.php?from=calendar\">$GLOBALS[l_contacts]</option>
+        <!-- FIXME: lister les addressbook du user ici
+        <optgroup label=\"$GLOBALS[l_addressbook]\">
+          <option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=5\">Mon addressbook</option>
+        </optgroup>
+        -->
+      </select>
+      <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
       </td>
       </tr>
       <tr>
       <th>&nbsp;</th>    
-      <td id=\"sel_user_id\">$dis_sel_user</td>
+      <td id=\"sel_user_id\" class=\"autocompleteResult\">$dis_sel_user</td>
       </tr>
       <tr>
       $dis_others_attendees
@@ -3653,7 +3662,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </table>
       </fieldset>
       <p class=\"LC\" />";
-      $user_complete = "new obm.AutoComplete.Search('$path/people/people_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
+      $user_complete = "new obm.AutoComplete.ExtSearch(
+        function() { return \$('userSearchSource').value+'&action=ext_search'; },
+        'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
   } else {
     $block_user = "<fieldset class=\"detail infos H\"><div class='elementRow' id='sel_user_id-data-user-$obm[uid]'><input type='hidden' name='sel_user_id[]' value='data-user-$obm[uid]' />".$users['entity'][$obm['uid']]['label']."</div></fieldset>";
   }

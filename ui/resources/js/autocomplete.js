@@ -6,9 +6,12 @@
 // comments
 // Implement mono mode
 
-obm.vars.consts.tab = 9;
-obm.vars.consts.pgup = 33;
-obm.vars.consts.pgdown = 34;
+if (!obm.vars.consts.tab)
+  obm.vars.consts.tab = 9;
+if (!obm.vars.consts.pgup)
+  obm.vars.consts.pgup = 33;
+if (!obm.vars.consts.pgdown)
+  obm.vars.consts.pgdown = 34;
 
 obm.AutoComplete = obm.autocomplete = {};
 
@@ -133,6 +136,7 @@ obm.AutoComplete.Search = new Class({
     this.setOptions(options);
     this.url = url;                    // url used for ajax requests
     this.inputField = $(inputField);   // field used for the input
+    this.inputField.set('autocomplete','off');
     if(this.options.name == null) {
       this.name = selectedBox;           // the name of the form validation paramater (also used as a prefix for results id)
     } else {
@@ -202,6 +206,10 @@ obm.AutoComplete.Search = new Class({
                                       .set('html','&gt;&gt;&gt;');
 
     this.resetFunc();
+  },
+
+  getUrl: function() {
+    return this.url;
   },
 
   ///////////////////////////////////////////////////////////////////////////
@@ -305,7 +313,7 @@ obm.AutoComplete.Search = new Class({
       this.textChangedFunc();
       this.requestId++;
       new Request.JSON({
-        url : this.url,
+        url : this.getUrl(),
         secure : false,
         onFailure:this.onFailure.bindWithEvent(this),
         onComplete:this.onNewRequestSuccess.bindWithEvent(this,[this.requestId])
@@ -326,7 +334,7 @@ obm.AutoComplete.Search = new Class({
         var unknownResultsNbr = this.totalNbr-this.cache.getSize();
         var requestNbr = ((this.options.results*2)>unknownResultsNbr ? unknownResultsNbr : this.options.results*2);
         new Request.JSON({
-          url : this.url,
+          url : this.getUrl(),
           secure : false,
           onFailure:this.onFailure.bindWithEvent(this),
           onComplete:this.onCacheRequestSuccess.bindWithEvent(this)
@@ -659,3 +667,17 @@ obm.AutoComplete.Search = new Class({
   }
 
 });
+
+
+obm.AutoComplete.ExtSearch = new Class({
+  Extends: obm.AutoComplete.Search,
+
+  /*
+   * first parameter is a function used to retrieve request url
+   * */
+  initialize: function(getUrlFunc, selectedBox, inputField, options) {
+    this.parent('', selectedBox, inputField, options);
+    this.getUrl = getUrlFunc;
+  }
+});
+

@@ -229,6 +229,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
   global $l_visibility;
 
+  $addressbook_id = $contact['addressbook_id'];
   $lname = stripslashes($contact['lname']);
   $fname = stripslashes($contact['fname']);
   $phone = stripslashes($contact['phone']);
@@ -420,6 +421,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"hd_company_id\" type=\"hidden\" value=\"$company_id\" />
       <input id=\"hd_expanded\" name=\"hd_expanded\" type=\"hidden\" value=\"$expanded\" />
+      <input name=\"hd_addressbook_id\" type=\"hidden\" value=\"$addressbook_id\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext &nbsp;
