@@ -116,6 +116,12 @@ $l_view_delete = "Delete view";
 $l_first_hour = "Hour begin";
 $l_last_hour = "Hour end";
 
+// Templates
+$l_save_as_template = "Save as template";
+$l_create_from_template = "Create from template";
+$l_template_name = "Template name";
+$l_header_templates = "Templates";
+
 // actions 
 $l_insert = "Insert the event";
 $l_update = "Update the event";

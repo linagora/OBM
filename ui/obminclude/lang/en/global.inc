@@ -53,6 +53,7 @@ $l_groups = "Groups";
 $l_contacts = "Contacts";
 $l_yes = "Yes";
 $l_no = "No";
+$l_ok = "Ok";
 $l_all = "All";
 $l_all_f = "All";
 $l_none = "---";

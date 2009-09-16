@@ -983,7 +983,7 @@ CREATE TABLE eventlink (
 
 
 --
--- Table structure for table `EventTag`
+-- Name: eventtag; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE eventtag ( 
@@ -991,6 +991,44 @@ CREATE TABLE eventtag (
   eventtag_user_id integer NOT NULL, 
   eventtag_label character varying(128) DEFAULT ''::character varying,
   eventtag_color character(7) default NULL 
+);
+
+
+--
+-- Name: eventtemplate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE eventtemplate (
+    eventtemplate_id integer NOT NULL,
+    eventtemplate_domain_id integer NOT NULL,
+    eventtemplate_timeupdate timestamp without time zone,
+    eventtemplate_timecreate timestamp without time zone DEFAULT now(),
+    eventtemplate_userupdate integer DEFAULT NULL,
+    eventtemplate_usercreate integer DEFAULT NULL,
+    eventtemplate_owner integer,
+    eventtemplate_name character varying(255) DEFAULT NULL::character varying,
+    eventtemplate_title character varying(255) DEFAULT NULL::character varying,
+    eventtemplate_location character varying(100) DEFAULT NULL::character varying,
+    eventtemplate_category1_id integer,
+    eventtemplate_priority integer,
+    eventtemplate_privacy integer,
+    eventtemplate_date timestamp without time zone,
+    eventtemplate_duration integer DEFAULT 0 NOT NULL,
+    eventtemplate_allday boolean DEFAULT false,
+    eventtemplate_repeatkind character varying(20) DEFAULT 'none' NOT NULL,
+    eventtemplate_repeatfrequence integer,
+    eventtemplate_repeatdays character varying(7) DEFAULT NULL::character varying,
+    eventtemplate_endrepeat timestamp without time zone,
+    eventtemplate_allow_documents boolean DEFAULT false,
+    eventtemplate_alert integer DEFAULT 0 NOT NULL,
+    eventtemplate_description text,
+    eventtemplate_properties text,
+    eventtemplate_tag_id integer default NULL,
+    eventtemplate_user_ids text default NULL,
+    eventtemplate_contact_ids text default NULL,
+    eventtemplate_resource_ids text default NULL,
+    eventtemplate_document_ids text default NULL,
+    eventtemplate_group_ids text default NULL
 );
 
 
@@ -2899,7 +2937,7 @@ ALTER SEQUENCE eventcategory1_eventcategory1_id_seq OWNED BY eventcategory1.even
 
 
 --
--- Name: event_event_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: eventtag_eventtag_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE eventtag_eventtag_id_seq
@@ -2911,10 +2949,31 @@ CREATE SEQUENCE eventtag_eventtag_id_seq
 
 
 --
--- Name: event_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: eventtag_eventtag_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE eventtag_eventtag_id_seq OWNED BY eventtag.eventtag_id;
+
+
+--
+-- Name: eventtemplate_eventtemplate_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE eventtemplate_eventtemplate_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: eventtemplate_eventtemplate_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE eventtemplate_eventtemplate_id_seq OWNED BY eventtemplate.eventtemplate_id;
+
+
 --
 -- Name: host_host_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
@@ -4083,6 +4142,13 @@ ALTER TABLE eventtag ALTER COLUMN eventtag_id SET DEFAULT nextval('eventtag_even
 
 
 --
+-- Name: eventtemplate_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE eventtemplate ALTER COLUMN eventtemplate_id SET DEFAULT nextval('eventtemplate_eventtemplate_id_seq'::regclass);
+
+
+--
 -- Name: eventcategory1_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4872,6 +4938,12 @@ ALTER TABLE ONLY eventlink
 ALTER TABLE ONLY eventtag
     ADD CONSTRAINT eventtag_pkey PRIMARY KEY (eventtag_id);
 
+--
+-- Name: eventtemplate_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY eventtemplate
+    ADD CONSTRAINT eventtemplate_pkey PRIMARY KEY (eventtemplate_id);
 
 --
 -- Name: groupentity_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
@@ -6524,6 +6596,31 @@ CREATE INDEX eventlink_event_id_fkey ON eventlink (eventlink_event_id);
 --
 
 CREATE INDEX eventlink_userupdate_fkey ON eventlink (eventlink_userupdate);
+--
+-- Name: eventtemplate_category1_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX eventtemplate_category1_id_fkey ON eventtemplate (eventtemplate_category1_id);
+--
+-- Name: eventtemplate_domain_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX eventtemplate_domain_id_fkey ON eventtemplate (eventtemplate_domain_id);
+--
+-- Name: eventtemplate_owner_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX eventtemplate_owner_fkey ON eventtemplate (eventtemplate_owner);
+--
+-- Name: eventtemplate_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX eventtemplate_usercreate_fkey ON eventtemplate (eventtemplate_usercreate);
+--
+-- Name: eventtemplate_userupdate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX eventtemplate_userupdate_fkey ON eventtemplate (eventtemplate_userupdate);
 --
 -- Name: groupentity_group_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
@@ -8943,6 +9040,54 @@ ALTER TABLE ONLY eventlink
 
 ALTER TABLE ONLY eventtag
     ADD CONSTRAINT eventtag_user_id_userobm_id_fkey FOREIGN KEY (eventtag_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: eventtemplate_category1_id_eventcategory1_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY eventtemplate
+    ADD CONSTRAINT eventtemplate_category1_id_eventcategory1_id_fkey FOREIGN KEY (eventtemplate_category1_id) REFERENCES eventcategory1(eventcategory1_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: eventtemplate_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY eventtemplate
+    ADD CONSTRAINT eventtemplate_domain_id_domain_id_fkey FOREIGN KEY (eventtemplate_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: eventtemplate_owner_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY eventtemplate
+    ADD CONSTRAINT eventtemplate_owner_userobm_id_fkey FOREIGN KEY (eventtemplate_owner) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: eventtemplate_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY eventtemplate
+    ADD CONSTRAINT eventtemplate_usercreate_userobm_id_fkey FOREIGN KEY (eventtemplate_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: eventtemplate_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY eventtemplate
+    ADD CONSTRAINT eventtemplate_userupdate_userobm_id_fkey FOREIGN KEY (eventtemplate_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: eventtemplate_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY eventtemplate
+    ADD CONSTRAINT eventtemplate_tag_id_eventtag_id_fkey FOREIGN KEY (eventtemplate_tag_id) REFERENCES eventtag(eventtag_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --

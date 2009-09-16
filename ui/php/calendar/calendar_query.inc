@@ -53,9 +53,9 @@ function run_query_calendar_detail($calendar_id) {
     event_repeatdays,
     event_allday,
     event_tag_id,
-		eventtag_color,
-		eventtag_label,
-		event_endrepeat,
+    eventtag_color,
+    eventtag_label,
+    event_endrepeat,
     event_allow_documents,
     event_date
     FROM
@@ -65,7 +65,7 @@ function run_query_calendar_detail($calendar_id) {
     INNER JOIN UserObm AS c ON event_usercreate = c.userobm_id
     LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
     INNER JOIN UserObm AS o ON event_owner = o.userobm_id
-		LEFT JOIN EventTag AS t ON event_tag_id = t.eventtag_id
+    LEFT JOIN EventTag AS t ON event_tag_id = t.eventtag_id
     WHERE event_type='VEVENT'
     AND $get_id
     $multidomain";
@@ -698,43 +698,8 @@ function run_query_calendar_insert_event_data($calendar) {
   $res_id = $calendar['res-id'];
   $property = $calendar['property'];
 
-	$tagcolor = $calendar['tag_color'] ;
-	if ($tagcolor == '') {
-		$tagcolor = "#eff0f2" ; // default background ;
-	}
-	$taglabel = $calendar['tag_label'] ;
-	  $obm_q = new DB_OBM;
-	if ($taglabel != '') {
-		$query = "SELECT eventtag_id FROM EventTag 
-							WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
-		$obm_q->query($query);
-		if ($obm_q->num_rows() > 0) {
-			// update
-			$query = "UPDATE EventTag SET 
-								eventtag_color = '$tagcolor '
-								WHERE eventtag_label = '$taglabel'
-								AND eventtag_user_id = ".$obm['uid']." ;" ;
-			$obm_q->query($query) ; 
-		}
-		else {
-			$query = "INSERT INTO EventTag 
-								(eventtag_label, eventtag_color, eventtag_user_id) 
-								VALUES ('$taglabel', '$tagcolor', ".$obm['uid'].") ;" ;
-			$obm_q->query($query) ;
-			// get back the last inserted eventtag_id
-			$query = "SELECT eventtag_id FROM EventTag 
-								WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
-			$obm_q->query($query) ;
-			$obm_q->next_record() ;
-			$tagid = $obm_q->f('eventtag_id') ;
-			
-			// tweak
-			$calendar['tag_id'] = $tagid ; 
-		}
-	}
-	$event_tag_id = $calendar['tag_id'] ;
-
-	if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
+  $event_tag_id = run_query_calendar_create_or_update_tag($calendar);
+  
   if ($calendar['allow_documents'] != 1) $allow_documents = 0; else $allow_documents = 1; 
   $property_name = $calendar['property-name'];
   if (is_array($res_name)) {
@@ -800,7 +765,7 @@ function run_query_calendar_insert_event_data($calendar) {
     event_repeatfrequence,
     event_repeatdays,
     event_allday,
-		event_tag_id, 
+    event_tag_id, 
     event_allow_documents,
     event_endrepeat,
     event_domain_id)
@@ -821,17 +786,18 @@ function run_query_calendar_insert_event_data($calendar) {
     $category1_id,
     $priority,
     $privacy,
-    '$event_duration',		
+    '$event_duration',    
     '$repeat_kind',
     '$repeatfrequency',
     '$repeat_days',
     $all_day,
-		$event_tag_id,
+    $event_tag_id,
     '$allow_documents',
     $repeat_end,
     $obm[domain_id])";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
+  $obm_q = new DB_OBM();
   $obm_q->query($query);
 
   $id = $obm_q->lastid();
@@ -846,7 +812,6 @@ function run_query_calendar_insert_event_data($calendar) {
 
   return array($id, $eid);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Insert an occurrence of a event
@@ -881,6 +846,35 @@ function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q; 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get document infos from the document ids array given
+// Parameters:
+//   - $documents : array of document ids
+// Returns:
+// array [ids], [entity] (label=>)
+///////////////////////////////////////////////////////////////////////////////
+function get_calendar_document_from_ids($documents) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('document');
+  $where = '('.implode(',', $documents).')';
+  $query = "SELECT *
+    FROM Document 
+    WHERE document_id IN $where $multidomain
+    ORDER by document_name";
+  display_debug_msg($query, $cdg_sql, 'get_calendar_document_from_ids()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f('document_id');
+    $name = $obm_q->f('document_name');
+    $docs['ids'][] = $id;
+    $docs['entity'][$id] = array('label' => $name);
+  }
+
+  return $docs;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1180,7 +1174,7 @@ function check_calendar_decision_conflict($calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, $reset_state) {
   global $c_use_connectors, $obm, $ccalendar_resource_admin;
-	global $obm ;
+  global $obm ;
 
   $datebegin = $calendar['date_begin'];
   $dateend = $calendar['date_end'];
@@ -1271,42 +1265,6 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
       }
     }
   }
-
-	// couleur a mettre a jour ou a creer (s'il existe un label) ?
-	$tagcolor = $calendar['tag_color'] ;
-	if ($tagcolor == '') {
-		$tagcolor = "#eff0f2" ; // default background ;
-	}
-	$taglabel = $calendar['tag_label'] ;
-	
-	if ($taglabel != '') {
-		$query = "SELECT eventtag_id FROM EventTag 
-							WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
-		$obm_q->query($query);
-		if ($obm_q->num_rows() > 0) {
-			// update
-			$query = "UPDATE EventTag SET 
-								eventtag_color = '$tagcolor '
-								WHERE eventtag_label = '$taglabel'
-								AND eventtag_user_id = ".$obm['uid']." ;" ;
-			$obm_q->query($query) ; 
-		}
-		else {
-			$query = "INSERT INTO EventTag 
-								(eventtag_label, eventtag_color, eventtag_user_id) 
-								VALUES ('$taglabel', '$tagcolor', ".$obm['uid'].") ;" ;
-			$obm_q->query($query) ;
-			// get back the last inserted eventtag_id
-			$query = "SELECT eventtag_id FROM EventTag 
-								WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
-			$obm_q->query($query) ;
-			$obm_q->next_record() ;
-			$tagid = $obm_q->f('eventtag_id') ;
-			
-			// tweak
-			$calendar['tag_id'] = $tagid ; 
-		}
-	}
 
   // XXXX bizarre les old_end et old_begin semblent etre affectes par l'update
   // ci-dessous sous mysql 4.0.23-10 (portable fourmi)
@@ -1425,8 +1383,6 @@ function run_query_calendar_update_event_data($calendar) {
   $frequency = $calendar['repeatfrequency']; 
   $color = $calendar['color'];
   if ($calendar['allow_documents'] != 1) $allow_documents = 0; else $allow_documents = 1; 
-  $event_tag_id = $calendar['tag_id'] ;
-  if ($event_tag_id == $c_none) $event_tag_id = 'NULL' ;
   $date_exception = $calendar['date_exception'];
   $item = $calendar['list-item'];
   $item_id = $calendar['list-item-id'];
@@ -1452,6 +1408,8 @@ function run_query_calendar_update_event_data($calendar) {
     }
   }
   $properties = "<extended_desc>$properties</extended_desc>";
+  
+  $event_tag_id = run_query_calendar_create_or_update_tag($calendar);
 
   if ($all_day == 'TRUE') {
     $dateend = clone $datebegin;
@@ -1722,8 +1680,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $category1_id = sql_parse_id( $event_q->f('event_category1_id'));
     $priority = sql_parse_int( $event_q->f('event_priority'));
     //$color = $event_q->f('event_color');
-		$event_tag_id = $event_q->f('tag_id') ;
-		if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
+    $event_tag_id = $event_q->f('tag_id') ;
+    if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
     $description = $event_q->f('event_description');
     $properties = $event_q->f('event_properties');
     $location = $event_q->f('event_location');
@@ -1780,7 +1738,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       '$repeat_days',
       $all_day,
       '$color',
-			$event_tag_id,
+      $event_tag_id,
       $repeat_end,
       '$obm[domain_id]'
     )";
@@ -1899,6 +1857,252 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
   $obm_q->query($query);
 
   return true;
+}
+
+/**
+ * Insert an event template
+ * 
+ * @param $calendar array of calendar params
+ * @access public
+ * @return integer event template id inserted
+ */
+function run_query_calendar_add_event_template($calendar) {
+  global $cdg_sql, $obm;
+
+  if (!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
+    $owner = $obm['uid'];
+  } else {
+    $owner = $calendar['owner'];
+  }
+  $name = sql_parse_text($calendar['template_name']);
+  $title = sql_parse_text($calendar['title']);
+  $category1_id = sql_parse_id($calendar['category1']);
+  $priority = sql_parse_int($calendar['priority']);
+  $description = sql_parse_text($calendar['description']);
+  $location = sql_parse_text($calendar['location']);
+  $alert = sql_parse_int($calendar['alert']);
+  $all_day = ($calendar['all_day'] != 1) ? 'FALSE' : 'TRUE';
+  $datebegin = $calendar['date_begin'];
+  $event_duration = $calendar['event_duration'];
+  $privacy = ($calendar['privacy'] != 1) ? 0 : 1;
+  $repeat_kind = $calendar['repeat_kind'];
+  $repeat_days = $calendar['repeat_days'];
+  $repeat_end = isset($calendar['repeat_end']) ? "'$calendar[repeat_end]'" : 'NULL';
+  $repeatfrequency = $calendar['repeatfrequency'];
+  $date_exception = $calendar['date_exception'];
+  $allow_documents = ($calendar['allow_documents'] != 1) ? 0 : 1;
+  
+  $user_ids = is_array($calendar['sel_user_id']) ? "'".implode(',', $calendar['sel_user_id'])."'" : 'NULL';
+  $contact_ids = is_array($calendar['sel_contact_id']) ? "'".implode(',', $calendar['sel_contact_id'])."'" : 'NULL';
+  $resource_ids = is_array($calendar['sel_resource_id']) ? "'".implode(',', $calendar['sel_resource_id'])."'" : 'NULL';
+  $group_ids = is_array($calendar['sel_group_id']) ? "'".implode(',', $calendar['sel_group_id'])."'" : 'NULL';
+  $document_ids = is_array($calendar['sel_document_id']) ? "'".implode(',', $calendar['sel_document_id'])."'" : 'NULL';
+
+  $event_tag_id = run_query_calendar_create_or_update_tag($calendar);
+  
+  $item = $calendar['list-item'];
+  $item_id = $calendar['list-item-id'];
+  $res_name = $calendar['res-name'];
+  $res_id = $calendar['res-id'];
+  $property = $calendar['property'];
+  $property_name = $calendar['property-name'];
+  if (is_array($res_name)) {
+    foreach($res_name as $key=>$res) {
+      $properties .= "<resource>
+        <res_name>$res</res_name>
+        <res_id>$res_id[$key]</res_id>";
+
+      if (is_array($item) && isset($item[$key])) {
+        $properties .= "<item>$item[$key]</item>
+          <item_id>$item_id[$key]</item_id>";
+      }
+
+      if (is_array($property_name) && isset($property_name[$key])) {
+        $properties .= "<property_name>$property_name[$key]</property_name>
+          <property_value>$property[$key]</property_value>";
+      }
+      $properties .= "</resource>";
+    }
+  }
+  $properties = "<extended_desc>$properties</extended_desc>";
+  if($all_day == 'TRUE') {
+    $dateend = clone $datebegin;
+    $dateend->addSecond($event_duration - 1);
+    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
+    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
+    $event_duration = $dateend->diffTimestamp($datebegin);
+  }
+  if($repeat_kind == 'weekly') {
+    $days = str_split($repeat_days);
+    $event_day = $datebegin->getWeekday();
+    if($days[$event_day] != 1) {
+      for($i = ($event_day +1)%7; $i != $event_day; $i = ($i+1)%7) {
+        if($days[$i] == 1) {
+          $datebegin->setWeekday($i);
+          break;
+        } 
+      }      
+    } 
+  } else {
+    $repeat_days = '0000000';
+  }
+
+  $query = "INSERT INTO EventTemplate (
+    eventtemplate_name,
+    eventtemplate_timeupdate,                         
+    eventtemplate_timecreate,                         
+    eventtemplate_usercreate,
+    eventtemplate_owner,
+    eventtemplate_title, 
+    eventtemplate_date,     
+    eventtemplate_description,
+    eventtemplate_properties,
+    eventtemplate_location, 
+    eventtemplate_category1_id,
+    eventtemplate_priority,
+    eventtemplate_privacy, 
+    eventtemplate_duration,
+    eventtemplate_repeatkind,
+    eventtemplate_repeatfrequence,
+    eventtemplate_repeatdays,
+    eventtemplate_allday,
+    eventtemplate_tag_id, 
+    eventtemplate_allow_documents,
+    eventtemplate_alert,
+    eventtemplate_endrepeat,
+    eventtemplate_domain_id,
+    eventtemplate_user_ids,
+    eventtemplate_contact_ids,
+    eventtemplate_resource_ids,
+    eventtemplate_group_ids,
+    eventtemplate_document_ids)
+    VALUES (
+    '$name',
+    NOW(),
+    NOW(),
+    '$obm[uid]',
+    '$owner',
+    '$title',
+    '$datebegin',
+    '$description',
+    '$properties',
+    '$location',
+    $category1_id,
+    $priority,
+    $privacy,
+    '$event_duration',
+    '$repeat_kind',
+    '$repeatfrequency',
+    '$repeat_days',
+    $all_day,
+    $event_tag_id,
+    '$allow_documents',
+    $alert,
+    $repeat_end,
+    $obm[domain_id],
+    $user_ids,
+    $contact_ids,
+    $resource_ids,
+    $group_ids,
+    $document_ids)";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_template()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  $id = $obm_q->lastid();
+  
+  return $id;
+}
+
+/**
+ * Get all user-defined event templates
+ * 
+ * @param $user_id current user id
+ * @access public
+ * @return DBO
+ */
+function run_query_calendar_get_alltemplates($user_id) {
+  global $cdg_sql;
+  
+  $query = "SELECT eventtemplate_id, eventtemplate_name FROM EventTemplate 
+    WHERE eventtemplate_usercreate = $user_id 
+    ORDER BY eventtemplate_name";
+  
+  $obm_q = new DB_OBM ;
+  $obm_q->query($query) ;
+  display_debug_msg($query, $cdg_sql,"run_query_calendar_get_alltemplates()");
+  
+  return $obm_q ;
+}
+
+/**
+ * Get an event template
+ * 
+ * @param $template_id
+ * @access public
+ * @return array
+ */
+function run_query_calendar_get_template($template_id) {
+  global $cdg_sql;
+  
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $template_id = sql_parse_id($template_id, true);
+  $get_id = "eventtemplate_id $template_id";
+  $multidomain = sql_multidomain('eventtemplate');
+  $query = "SELECT 
+    eventtemplate_owner AS event_owner,
+    o.userobm_lastname AS owner_lastname,
+    o.userobm_firstname AS owner_firstname,
+    eventtemplate_title AS event_title,
+    eventtemplate_description AS event_description,
+    eventtemplate_properties AS event_properties,
+    eventtemplate_repeatfrequence AS event_repeatfrequence,
+    eventtemplate_location AS event_location,
+    eventtemplate_category1_id AS event_category1_id,
+    eventcategory1_label,
+    eventtemplate_privacy AS event_privacy,
+    eventtemplate_priority AS event_priority,
+    eventtemplate_repeatkind AS event_repeatkind,
+    eventtemplate_duration AS event_duration,
+    eventtemplate_repeatdays AS event_repeatdays,
+    eventtemplate_allday AS event_allday,
+    eventtemplate_tag_id AS event_tag_id,
+    eventtag_color,
+    eventtag_label,
+    eventtemplate_endrepeat AS event_endrepeat,
+    eventtemplate_allow_documents AS event_allow_documents,
+    eventtemplate_alert AS event_alert,
+    eventtemplate_date AS event_date,
+    eventtemplate_user_ids AS event_user_ids,
+    eventtemplate_contact_ids AS event_contact_ids,
+    eventtemplate_resource_ids AS event_resource_ids,
+    eventtemplate_group_ids AS event_group_ids,
+    eventtemplate_document_ids AS event_document_ids
+    FROM
+    EventTemplate 
+    LEFT JOIN EventCategory1 ON eventtemplate_category1_id = eventcategory1_id 
+    INNER JOIN UserObm AS o ON eventtemplate_owner = o.userobm_id 
+    LEFT JOIN EventTag AS t ON eventtemplate_tag_id = t.eventtag_id 
+    WHERE $get_id
+    $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_template()');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $entities = array();
+  foreach (array('user', 'contact', 'resource', 'group', 'document') as $type) {
+    $value = $obm_q->f("event_{$type}_ids");
+    if (!empty($value)) {
+      $entities[$type] = explode(',', $value);
+    } else {
+      $entities[$type] = array();
+    }
+  }
+  
+  return array($obm_q, $entities);
 }
 
 
@@ -2444,6 +2648,7 @@ function get_calendar_event_entity($calendar_id) {
     $entities['document']['entity'][$entity_id] = array(
       'title'=> $u_q->f('document_title'),
       'name' => $u_q->f('document_name'),
+      'label' => $u_q->f('document_name'),
       'private' => ($u_q->f('document_privacy') == 1),
       'user' => $u_q->f('documentlink_usercreate')
     );
@@ -2627,7 +2832,7 @@ function calendar_localizeDate($format, $date) {
   $month_list = Of_Date::OBM_DATE_MONTH_LIST;
   if(is_object($date)) {
 
-    return $date->localize(${$format});	
+    return $date->localize(${$format}); 
   }
 }
 
@@ -2859,7 +3064,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
   $left_q = "
     LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
     INNER JOIN UserObm ON event_owner = userobm_id
-		LEFT JOIN EventTag ON event_tag_id = eventtag_id 
+    LEFT JOIN EventTag ON event_tag_id = eventtag_id 
     INNER JOIN EventLink ON event_id = eventlink_event_id";
 
   if (is_array($calendar_entity['user'])
@@ -2885,7 +3090,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         $search_pattern
         AND userentity_user_id IN (".implode(',', array_keys($calendar_entity['user'])).")
         $multidomain";       
-    }   	     	    
+    }               
 
   if (is_array($calendar_entity['resource'])
     && (count($calendar_entity['resource']) > 0) ) {
@@ -2910,7 +3115,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         $search_pattern
         AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resource'])).")
         $multidomain";   
-    }   	     	    
+    }               
 
   if (is_array($calendar_entity['resourcegroup'])
     && (count($calendar_entity['resourcegroup']) > 0) ) {
@@ -3011,7 +3216,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
 
   $left_q = "
     LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-		LEFT JOIN EventTag ON event_tag_id = eventtag_id 
+    LEFT JOIN EventTag ON event_tag_id = eventtag_id 
     INNER JOIN UserObm ON event_owner = userobm_id
     INNER JOIN EventLink ON event_id = eventlink_event_id";
 
@@ -3038,7 +3243,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $search_pattern
         AND userentity_user_id IN (".implode(',', array_keys($calendar_entity['user'])).")
         $multidomain";
-    }   	     	    
+    }               
 
   if (is_array($calendar_entity['resource'])
     && (count($calendar_entity['resource']) > 0) ) {
@@ -3063,7 +3268,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $search_pattern
         AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resource'])).")
         $multidomain";
-    }   	     	    
+    }               
 
   if (is_array($calendar_entity['resourcegroup'])
     && (count($calendar_entity['resourcegroup']) > 0) ) {
@@ -3413,7 +3618,7 @@ function calendar_daily_repeatition($date,$start,$end,$repeatfrequence,$event,$e
     $diff = - ceil($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
     if ($diff > 0) {
       $diff = ($diff % $repeatfrequence);
-    }	    
+    }     
     $current->setDateIso($start)->subDay($diff);
   }
   while ($current->compare($end) < 0) {
@@ -3438,13 +3643,13 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
     $diff = - ceil($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
     if ($diff > 0) {
       $diff = ($diff % (($repeatfrequence) * 7));
-    }	    
+    }     
     $current->setDateIso($start)->subDay($diff);
   }
   $days = str_split($repeatdays);
   if($start->compare($date) < 0) $start = $date;
   while ($current->compare($end) < 0) {
-    foreach ($days as $num => $repeat) {	
+    foreach ($days as $num => $repeat) {  
       if ($repeat == 1) {
         $current->setWeekday($num);
         if($current->compare($start) >= 0 && $current->compare($end) < 0) {
@@ -3455,7 +3660,7 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
     } 
     $current->setWeekday($ccalendar_weekstart);
     $current->addWeek($repeatfrequence);
-  }	
+  } 
 }
 
 
@@ -3492,7 +3697,7 @@ function calendar_monthlybyday_repeatition($date,$start,$end,$repeatfrequence,$e
     $of = &OccurrenceFactory::getInstance();
     $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
     $current->setDay(1)->addMonth($repeatfrequence);
-  }	
+  } 
 }
 
 
@@ -3510,7 +3715,7 @@ function calendar_monthlybydate_repeatition($date,$start,$end,$repeatfrequence,$
       $diff = $diff  % $repeatfrequence;
     }
     $current->setYear($start)->setMonth($start)->subMonth($diff);    
-  }	
+  } 
   while ($current->compareDateIso($end) < 0) {
     $of = &OccurrenceFactory::getInstance();
     $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
@@ -3856,9 +4061,9 @@ function run_query_insert_others_attendees($calendar) {
     //// Check if exists
     // XXXXXX Migrate the access right to the Addressbook
     $query = "SELECT contact_id FROM Contact
-    	INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+      INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
         INNER JOIN Email ON email_entity_id = contactentity_entity_id 
-    	WHERE /*(contact_privacy = '0' OR contact_usercreate='$uid') AND*/ contact_archive='0' and email_address = '$email'";
+      WHERE /*(contact_privacy = '0' OR contact_usercreate='$uid') AND*/ contact_archive='0' and email_address = '$email'";
     display_debug_msg($query, $cdg_sql,"'run_query_insert_others_attendees($email)");
     $obm_q->query($query);    
 
@@ -3912,6 +4117,53 @@ function run_query_insert_others_attendees($calendar) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Create or update tag
+// Parameters:
+//   - $calendar : event params
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_create_or_update_tag(&$calendar) {
+  global $obm;
+  
+  $tagcolor = $calendar['tag_color'] ;
+  if ($tagcolor == '') {
+    $tagcolor = "#eff0f2" ; // default background ;
+  }
+  $taglabel = $calendar['tag_label'] ;
+  $obm_q = new DB_OBM;
+  
+  if ($taglabel != '') {
+    $query = "SELECT eventtag_id FROM EventTag 
+              WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
+    $obm_q->query($query);
+    if ($obm_q->num_rows() > 0) {
+      $query = "UPDATE EventTag SET 
+                eventtag_color = '$tagcolor '
+                WHERE eventtag_label = '$taglabel'
+                AND eventtag_user_id = ".$obm['uid']." ;" ;
+      $obm_q->query($query) ; 
+    } else {
+      $query = "INSERT INTO EventTag 
+                (eventtag_label, eventtag_color, eventtag_user_id) 
+                VALUES ('$taglabel', '$tagcolor', ".$obm['uid'].") ;" ;
+      $obm_q->query($query) ;
+      // get back the last inserted eventtag_id
+      $query = "SELECT eventtag_id FROM EventTag 
+                WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
+      $obm_q->query($query) ;
+      $obm_q->next_record() ;
+      $tagid = $obm_q->f('eventtag_id') ;
+      
+      // tweak
+      $calendar['tag_id'] = $tagid ; 
+    }
+  }
+  $event_tag_id = $calendar['tag_id'] ;
+  if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
+  
+  return $event_tag_id;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Get all user defined tags for event
 // Parameters:
 //   - $obmUserId : int obmuser identifier
@@ -3944,8 +4196,8 @@ function run_query_tag_update($uid, $params) {
   $tagcolor = $params['tag_color'] ;
   
   $query = "UPDATE EventTag 
-			SET eventtag_label = '$taglabel', eventtag_color = '$tagcolor' 
-			WHERE eventtag_id = $tagid AND eventtag_user_id = $uid ;" ;
+      SET eventtag_label = '$taglabel', eventtag_color = '$tagcolor' 
+      WHERE eventtag_id = $tagid AND eventtag_user_id = $uid ;" ;
 
   $obm_q->query($query) ;
   
@@ -3970,26 +4222,26 @@ function run_query_tag_insert($uid, $params) {
   
   // verifier si le tag n'existe pas deja
   $query = "SELECT eventtag_id 
-			FROM EventTag 
-			WHERE eventtag_label = '$taglabel' 
-			AND eventtag_user_id = $uid" ;
-	$obm_q->query($query) ;
-	
-	if ($obm_q->num_rows() > 0) {
-		// update the tag
-		$obm_q->next_record() ;
-		$tagid = $obm_q->f('eventtag_id') ;
-		$query = "UPDATE EventTag 
-			SET eventtag_label = '$taglabel', eventtag_color = '$tagcolor' 
-			WHERE eventtag_id = $tagid AND eventtag_user_id = $uid ;" ;
-	}
-	else {
-		// create the tag
-		$query = "INSERT INTO EventTag 
-							(eventtag_label, eventtag_color, eventtag_user_id)
-							VALUES ('$taglabel', '$tagcolor', $uid) ;" ;
-	}
-	
+      FROM EventTag 
+      WHERE eventtag_label = '$taglabel' 
+      AND eventtag_user_id = $uid" ;
+  $obm_q->query($query) ;
+  
+  if ($obm_q->num_rows() > 0) {
+    // update the tag
+    $obm_q->next_record() ;
+    $tagid = $obm_q->f('eventtag_id') ;
+    $query = "UPDATE EventTag 
+      SET eventtag_label = '$taglabel', eventtag_color = '$tagcolor' 
+      WHERE eventtag_id = $tagid AND eventtag_user_id = $uid ;" ;
+  }
+  else {
+    // create the tag
+    $query = "INSERT INTO EventTag 
+              (eventtag_label, eventtag_color, eventtag_user_id)
+              VALUES ('$taglabel', '$tagcolor', $uid) ;" ;
+  }
+  
   $obm_q->query($query) ;
   
   return $obm_q ;
@@ -4007,7 +4259,7 @@ function run_query_tag_delete($uid, $params) {
   $tagid = intval($params['tag_id']) ;
   
   $query = "DELETE FROM EventTag 
-						WHERE eventtag_id = $tagid AND eventtag_user_id = $uid" ;
+            WHERE eventtag_id = $tagid AND eventtag_user_id = $uid" ;
   $obm_q->query($query) ;
   
   return $obm_q ;
@@ -4020,29 +4272,29 @@ function run_query_tag_delete($uid, $params) {
 //   - $params : hashed tag params
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_tag_search($uid, $params) {
-	$obm_q = new DB_OBM ;
-	
-	$search_pattern = $params['label'] ;
-	$query = "SELECT eventtag_id, eventtag_label, eventtag_color 
-						FROM EventTag 
-						WHERE eventtag_label #LIKE '%$search_pattern%' 
-						AND eventtag_user_id = $uid ;" ;
-	$obm_q->xquery($query) ; // obm sql
-	
-	return $obm_q ;
+  $obm_q = new DB_OBM ;
+  
+  $search_pattern = $params['label'] ;
+  $query = "SELECT eventtag_id, eventtag_label, eventtag_color 
+            FROM EventTag 
+            WHERE eventtag_label #LIKE '%$search_pattern%' 
+            AND eventtag_user_id = $uid ;" ;
+  $obm_q->xquery($query) ; // obm sql
+  
+  return $obm_q ;
 }
 
 function check_tag_form($params) {
-	global $err, $l_tag_fill_label, $l_tag_fill_color ;
-	if (trim($params['tag_label']) === '') {
-		$err['msg'] = $l_tag_fill_label ;
-		return false ;
-	}
-	if (trim($params['tag_color']) === '') {
-		$err['msg'] = $l_tag_fill_color ;
-		return false ;
-	}
-	return true ;
+  global $err, $l_tag_fill_label, $l_tag_fill_color ;
+  if (trim($params['tag_label']) === '') {
+    $err['msg'] = $l_tag_fill_label ;
+    return false ;
+  }
+  if (trim($params['tag_color']) === '') {
+    $err['msg'] = $l_tag_fill_color ;
+    return false ;
+  }
+  return true ;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

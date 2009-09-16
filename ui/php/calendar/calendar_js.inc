@@ -573,6 +573,18 @@ function detachDocument(documentId, eventEntityId, el) {
   req.send();
 }
 
+function displayTemplateCreate() {
+  obm.popup.popups.erase('createTemplatePopup');
+  obm.popup.show('createTemplatePopup');
+}
+
+function setTemplateName(templateForm) {
+  var templateName = templateForm.getElement('input[name=name]').value;
+  var eventForm = $('new_event_form');
+  eventForm.getElement('input[id=action]').value = 'save_as_template';
+  eventForm.adopt(new Element('input').setProperty('type', 'hidden').setProperty('name', 'tf_template_name').setProperty('value', templateName));
+  eventForm.submit();
+}
 
 /////////////////////////////////////////////////////////////////////////////
 function setEventsColors(entity, entity_id, klass) {

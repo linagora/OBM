@@ -1457,6 +1457,57 @@ CREATE TABLE `EventTag` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
 --
+-- Table structure for table `EventTemplate`
+--
+
+DROP TABLE IF EXISTS `EventTemplate`;
+CREATE TABLE `EventTemplate` (
+  `eventtemplate_id` int(8) NOT NULL auto_increment,
+  `eventtemplate_domain_id` int(8) NOT NULL,
+  `eventtemplate_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `eventtemplate_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `eventtemplate_userupdate` int(8) default NULL,
+  `eventtemplate_usercreate` int(8) default NULL,
+  `eventtemplate_owner` int(8) default NULL,
+  `eventtemplate_name` varchar(255) default NULL,
+  `eventtemplate_title` varchar(255) default NULL,
+  `eventtemplate_location` varchar(100) default NULL,
+  `eventtemplate_category1_id` int(8) default NULL,
+  `eventtemplate_priority` int(2) default NULL,
+  `eventtemplate_privacy` int(2) NOT NULL default '0',
+  `eventtemplate_date` datetime default NULL,
+  `eventtemplate_duration` int(8) NOT NULL default '0',
+  `eventtemplate_allday` tinyint(1) default '0',
+  `eventtemplate_repeatkind` varchar(20) NOT NULL default 'none',
+  `eventtemplate_repeatfrequence` int(3) default NULL,
+  `eventtemplate_repeatdays` varchar(7) default NULL,
+  `eventtemplate_endrepeat` datetime default NULL,
+  `eventtemplate_allow_documents` tinyint(1) NULL DEFAULT '0',
+  `eventtemplate_alert` int(8) NOT NULL default '0',
+  `eventtemplate_description` text,
+  `eventtemplate_properties` text,
+  `eventtemplate_tag_id` int(8) default NULL,
+  `eventtemplate_user_ids` text NULL,
+  `eventtemplate_contact_ids` text NULL,
+  `eventtemplate_resource_ids` text NULL,
+  `eventtemplate_document_ids` text NULL,
+  `eventtemplate_group_ids` text NULL,
+  PRIMARY KEY  (`eventtemplate_id`),
+  KEY `eventtemplate_domain_id_domain_id_fkey` (`eventtemplate_domain_id`),
+  KEY `eventtemplate_owner_userobm_id_fkey` (`eventtemplate_owner`),
+  KEY `eventtemplate_userupdate_userobm_id_fkey` (`eventtemplate_userupdate`),
+  KEY `eventtemplate_usercreate_userobm_id_fkey` (`eventtemplate_usercreate`),
+  KEY `eventtemplate_category1_id_eventcategory1_id_fkey` (`eventtemplate_category1_id`),
+	KEY `eventtemplate_tag_id_eventtag_id_fkey` (`eventtemplate_tag_id`),
+  CONSTRAINT `eventtemplate_category1_id_eventcategory1_id_fkey` FOREIGN KEY (`eventtemplate_category1_id`) REFERENCES `EventCategory1` (`eventcategory1_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `eventtemplate_domain_id_domain_id_fkey` FOREIGN KEY (`eventtemplate_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `eventtemplate_owner_userobm_id_fkey` FOREIGN KEY (`eventtemplate_owner`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `eventtemplate_tag_id_eventtag_id_fkey` FOREIGN KEY (`eventtemplate_tag_id`) REFERENCES `EventTag` (`eventtag_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+	CONSTRAINT `eventtemplate_usercreate_userobm_id_fkey` FOREIGN KEY (`eventtemplate_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `eventtemplate_userupdate_userobm_id_fkey` FOREIGN KEY (`eventtemplate_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `GroupEntity`
 --
 

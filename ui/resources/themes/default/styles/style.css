@@ -656,6 +656,14 @@ input.box {
   cursor: pointer;
 }
 
+.buttonTo input {
+  background: transparent url('../images/ico_trash.gif') no-repeat;
+  border: none;
+  color: transparent;
+  cursor: pointer;
+  width:16px;
+}
+
 /* ------------------------------------------------------------------------- */
 /* DatePicker layout */
 /* ------------------------------------------------------------------------- */

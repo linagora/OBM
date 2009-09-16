@@ -106,6 +106,12 @@ $l_today_date = "Date du jour";
 $l_first_hour = "Heure de début";
 $l_last_hour = "Heure de fin";
 
+// Templates
+$l_save_as_template = "Enregistrer comme modèle";
+$l_create_from_template = "Créer d'après modèle";
+$l_template_name = "Nom du template";
+$l_header_templates = "Modèles";
+
 // actions 
 $l_meeting_perform = "Rechercher les créneaux libres";
 $l_insert = "Enregistrer l'événement";

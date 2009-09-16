@@ -101,6 +101,7 @@ $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
 
 require('calendar_display.inc');
 require_once('calendar_js.inc');
+require("$obminclude/of/of_helpers.php");
 require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 require('calendar_mailer.php');
@@ -671,6 +672,38 @@ if ($action == 'search') {
 	$json = json_tag_search($tags_q) ;
 	echo "(".$json.")" ;
 	exit() ;
+  
+} elseif ($action == 'save_as_template') {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_calendar_data_form($params)) {
+    // Insert "others attendees" as private contacts
+    if ($params['others_attendees'] != "") {
+      $others_attendees = run_query_insert_others_attendees($params);
+      $params['sel_contact_id'] = is_array($params['sel_contact_id']) 
+                                ? array_merge($params['sel_contact_id'], $others_attendees)
+                                : $others_attendees;
+    }
+    // Insert "other files" as private documents
+    if (is_array($params['other_files'])) {
+      $other_files = run_query_insert_other_files($params);
+      $params['sel_document_id'] = is_array($params['sel_document_id'])
+                                 ? array_merge($params['sel_document_id'], $other_files)
+                                 : $other_files;
+    }
+    $template_id = run_query_calendar_add_event_template($params);
+    
+    $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
+    $params["date"] = $params["date_begin"];
+    $display['detail'] = dis_calendar_calendar_view($params, $current_view);
+  } else {
+    $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+  }
+  
+} elseif ($action == 'list_templates')  {
+///////////////////////////////////////////////////////////////////////////////
+  $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
+  $display['detail'] = dis_calendar_templates_list($templates_q);
 
 } elseif ($action == 'category1_insert')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -871,6 +904,8 @@ function get_calendar_params() {
 
   // Get global params
   $params = get_global_params('Entity');
+  
+  
 
   // Get calendar specific params
   if ($params['group_view'] == '') {
@@ -1093,7 +1128,7 @@ function get_calendar_action() {
   global $l_header_planning, $l_header_list, $l_header_duplicate, $l_header_delete;
   global $l_header_new_event,$l_header_admin, $l_header_export, $l_header_import;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
-  global $l_header_waiting_events, $l_calendar;
+  global $l_header_waiting_events, $l_calendar, $l_header_templates;
 
   $id = $params['calendar_id'];
   $date = $params['date'];
@@ -1144,7 +1179,7 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
     'update_decision','update_ext_decision', 'update_alert','decision','update','delete', 'new_meeting',
-    'rights_admin','rights_update', 'waiting_events','planning')
+    'rights_admin','rights_update', 'waiting_events','planning','save_as_template')
   );
 
   // Detail Consult
@@ -1367,6 +1402,15 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('all') 
   );
+  
+  // Templates
+  $actions['calendar']['list_templates'] = array (
+    'Name'     => $l_header_templates,
+    'Url'      => "$path/calendar/calendar_index.php?action=list_templates",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all') 
+  );
+  
   // Reset Calendar
   $actions['calendar']['reset'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=reset",
@@ -1444,6 +1488,12 @@ function get_calendar_action() {
   $actions['calendar']['detach_document'] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None')
+  );
+  
+  // Save as template
+  $actions['calendar']['save_as_template'] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
   );
 }
 

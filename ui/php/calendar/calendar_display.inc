@@ -119,6 +119,10 @@ function dis_calendar_view_bar($current_view, $date, $action, $calendar) {
     $search_form = dis_calendar_html_search_form($calendar);
     $navbar = dis_calendar_navbar($calendar, $p_range);
   }
+  
+  if ($action == 'new') {
+    $select_template_form = dis_calendar_select_template_form($action);
+  }
 
   $block = "
   <div id=\"calendarToolbar\">
@@ -147,6 +151,7 @@ function dis_calendar_view_bar($current_view, $date, $action, $calendar) {
       </a>
     </div>
     $search_form
+    $select_template_form
   </div>
   <p class=\"LC\" />
   $navbar 
@@ -937,7 +942,7 @@ function dis_calendar_html_search_form($calendar) {
           <td>$GLOBALS[l_tag]</td>
           <td>$sel_tags</td>
           <td>$GLOBALS[l_datebegin]</td>
-					<td><input type='text' id='tf_date_begin' name='tf_date_begin' value='".$date_begin->getOutputDate()."' class='datePicker' /></td>
+          <td><input type='text' id='tf_date_begin' name='tf_date_begin' value='".$date_begin->getOutputDate()."' class='datePicker' /></td>
           <td>
             <input type='radio' id='rd_today' name='rd_period' value='today' onclick='setAdvancedSearchDate(this);' ". ($period=="today" ? "checked" : "") .">
             <label for='rd_today'>$GLOBALS[l_today]</label>
@@ -985,6 +990,29 @@ function dis_calendar_html_search_form($calendar) {
     </div>";
 
   return $block;
+}
+
+function dis_calendar_select_template_form($action) {
+  global $obm;
+  
+  $template_q = run_query_calendar_get_alltemplates($obm['uid']);
+  
+  while ($template_q->next_record()) {
+    $id = $template_q->f('eventtemplate_id');
+    $name = $template_q->f('eventtemplate_name');
+    $select.= "<option value=\"$id\">$name</option>";
+  }
+  return "<div style=\"padding-left:1em;padding-right:1em;\">
+    <div id=\"templateSelect\" style=\"float:right;\">
+      <form id=\"templateSelectForm\" action=\"calendar_index.php\">
+        $GLOBALS[l_create_from_template]
+        <select name=\"template_id\">
+          $select
+        </select>
+        <input type=\"hidden\" name=\"action\" value=\"$action\" />
+        <input type=\"submit\" value=\"$GLOBALS[l_ok]\" />
+      </form>
+    </div>";
 }
 
 
@@ -3033,58 +3061,71 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
     $exception_q = run_query_get_one_event_exception($calendar['calendar_id']);
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
   } else {
-    $users_id = $entities['user'];
-    $contacts_id = $entities['contact'];
-    $res_id = $entities['resource'];
+    $users_id = is_array($entities['user']) ? $entities['user'] : array();
+    $contacts_id = is_array($entities['contact']) ? $entities['contact'] : array();
+    $res_id = is_array($entities['resource']) ? $entities['resource'] : array();
+    $groups_id = is_array($entities['group']) ? $entities['group'] : array();
+    $documents_id = is_array($entities['document']) ? $entities['document'] : array();
     // If new event, add the optionnal new users (here to get the user's infos)
     if ($action == 'new') {
+      if (isset($calendar['template_id'])) {
+        list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
+        $users_id = array_merge($users_id, $template_entities['user']);
+        $contacts_id = array_merge($contacts_id, $template_entities['contact']);
+        $res_id = array_merge($res_id, $template_entities['resource']);
+        $groups_id = array_merge($groups_id, $template_entities['group']);
+        $documents_id = array_merge($documents_id, $template_entities['document']);
+      }
+      // free-busy ???
       if (is_array($calendar['new_user_id'])) {
-	      foreach ($calendar['new_user_id'] as $new_user_id) {
-	        if ($new_user_id > 0) {
-	          $users_id[] = $new_user_id;
-	        }
-	      }
+        foreach ($calendar['new_user_id'] as $new_user_id) {
+          if ($new_user_id > 0) {
+            $users_id[] = $new_user_id;
+          }
+        }
       }
       if (!isset($calendar['new_meeting'])) { 
        $users_id[] = $obm['uid'];
       }
       if (is_array($calendar['sel_contact_id'])) {
-	      foreach ($calendar['sel_contact_id'] as $new_contact_id) {
-	        if ($new_contact_id > 0) {
-	          $contacts_id[] = $new_contact_id;
-	        }
-	      }
+        foreach ($calendar['sel_contact_id'] as $new_contact_id) {
+          if ($new_contact_id > 0) {
+            $contacts_id[] = $new_contact_id;
+          }
+        }
       }
       if (is_array($calendar['new_resource_id'])) {
-	      foreach ($calendar['new_resource_id'] as $new_resource_id) {
-	        if ($new_resource_id > 0) {
-	          $res_id[] = $new_resource_id;
-	        }
-	      }
+        foreach ($calendar['new_resource_id'] as $new_resource_id) {
+          if ($new_resource_id > 0) {
+            $res_id[] = $new_resource_id;
+          }
+        }
       }
     }
-    if (count($users_id > 0)) {
+    if (count($users_id) > 0) {
       $users = get_userobm_from_ids($users_id);
     } else {
       $users = array();
     }
-    if (is_array($entities['contact'])) $contacts_id = array_merge($contacts_id, $entities['contact']);
-    if (count($contacts_id > 0)) {
+    if (count($contacts_id) > 0) {
       $contacts = get_contact_from_ids($contacts_id);
     } else {
       $contacts = array();
     }
-    if (is_array($entities['resource'])) $res_id = array_merge($res_id, $entities['resource']);
-    if (count($res_id > 0)) {
+    if (count($res_id) > 0) {
       $resources = get_calendar_resource_from_ids($res_id);
     } else {
       $resources = array();
     }
-    $groups_id = $entities['group'];
-    if (count($groups_id > 0)) {
+    if (count($groups_id) > 0) {
       $groups = get_calendar_group_from_ids($groups_id);
     } else {
       $groups = array();
+    }
+    if (count($documents_id) > 0) {
+      $documents = get_calendar_document_from_ids($documents_id);
+    } else {
+      $documents = array();
     }
   }
   $possible_owners = OBM_Acl_Utils::expandEntitiesArray(
@@ -3269,7 +3310,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
   global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
-	global $ico_cancel;
+  global $ico_cancel;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   // -- Labels
   global $l_users, $l_attendees, $l_title, $l_location, $l_priority, $l_private, $l_desc;
@@ -3282,20 +3323,20 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color;
   global $l_documents, $l_allow_documents;
-	global $l_tag ;
-	global $c_none ;
+  global $l_tag ;
+  global $c_none ;
 
   $repeatfrequency = 1;
   $uid = $obm['uid']; 
-	$tagcolor = "#eff0f2" ; // backcolor by default
+  $tagcolor = "#eff0f2" ; // backcolor by default
 
-  if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager')) {
+  if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') || ($action == 'new' && $event_q != '')) {
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
     $cat1 = $event_q->f('event_category1_id');
-		$tagid = $event_q->f('event_tag_id');
-		$taglabel = $event_q->f('eventtag_label');
-		$tagcolor = $event_q->f('eventtag_color');
+    $tagid = $event_q->f('event_tag_id');
+    $taglabel = $event_q->f('eventtag_label');
+    $tagcolor = $event_q->f('eventtag_color');
     $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');
     $owner_firstname = $event_q->f('owner_firstname');
@@ -3333,12 +3374,16 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
     $id = $event_q->f('event_id');
 
-    while($exception_q->next_record()) {
-      $date_exception[] = new Of_Date($exception_q->f('eventexception_date'), 'GMT'); 
+    if (isset($exception_q)) {
+      while($exception_q->next_record()) {
+        $date_exception[] = new Of_Date($exception_q->f('eventexception_date'), 'GMT'); 
+      }
     }
     // Alerts
     if (is_array($alerts) && isset($alerts[$owner])) {
       $selected_alert = $alerts[$owner];
+    } elseif (isset($calendar['template_id'])) {
+      $selected_alert = $event_q->f('event_alert');
     }
     $dis_title = $title;
 
@@ -3404,10 +3449,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $selected_alert = $calendar['alert'];
     }
   }
-	if ($tagid == '') {
-		$tagid = $c_none ;
-		$tagcolor = "#eff0f2" ;
-	}
+  if ($tagid == '') {
+    $tagid = $c_none ;
+    $tagcolor = "#eff0f2" ;
+  }
 
   $dis_attendees_notification = "
   <fieldset class=\"detail extra\">    
@@ -3431,7 +3476,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   } elseif (($action == 'new') || ($action == 'insert') || ($action == 'duplicate')) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />";
+      <input type=\"submit\" value=\"$l_insert\" />
+      <input type=\"submit\" onclick=\"displayTemplateCreate();return false;\" value=\"Enregistrer comme modèle\" />";
   }
 
   $repeat_end_value = isset($repeat_end) ? $repeat_end->getInputDate() : '';
@@ -3490,7 +3536,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
      </td>
     </tr>";
 
-  if ($action == 'new' && !isset($calendar['new_meeting'])) {
+  if ($action == 'new' && !isset($calendar['new_meeting']) && !isset($calendar['template_id'])) {
     // If one new user is given in parameters, pre-select it
     if (is_array($calendar['new_user_id']) && count($calendar['new_user_id']) == 1) {
       $u_id = $calendar['new_user_id'][0];
@@ -3745,7 +3791,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
     // resource select
-    if ($action == 'new' && !isset($calendar['new_meeting'])) {
+    if ($action == 'new' && !isset($calendar['new_meeting']) && !isset($calendar['template_id'])) {
       if (is_array($res['entity']) && sizeof($res['entity']) >= 1) {
         $u = array();
         foreach($res['entity'] as $id => $res) {
@@ -3801,7 +3847,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         if ($item != '') {
             $xml = parse_item($item);
         }
-        if (is_object($xml) && ($action == 'detailupdate' || $action == 'update'  || $action == 'duplicate' )) {
+        if (is_object($xml) && ($action == 'detailupdate' || $action == 'update'  || $action == 'duplicate' || ($action == 'new' && isset($calendar['template_id'])))) {
           foreach($xml->resource as $key => $value) {
             if ($value->res_id == $r_id) {
               $list_item = $value->item;
@@ -3969,6 +4015,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $sel_alert .= ">$alert_label</option>";
   }
   $sel_alert .= '</select>';
+  
+  // Template name popup
+  $template_popup = html_calendar_template_name_popup();
 
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -4034,21 +4083,21 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <tr>
     <th>$l_tag</th>
     <td>
-		  <div id=\"tag_wrapper\">
-			  <input type=\"text\" value=\"$taglabel\" name=\"tf_tag_label\" id=\"tf_tag_label\" style=\"width:70%;\">
-			  <div id=\"display_tag_color\">&nbsp;</div>
-				<a href=\"#\" onclick=\"tag_reset();return false\"><img alt=\"reset\" title=\"reset\" src=\"$ico_cancel\"></a>
-			</div>
-		  <script type=\"text/javascript\" langage=\"javascript\">
-				obm.initialize.chain(function () {
-					$('display_tag_color').setStyle('background-color', '$tagcolor') ;
-					obm.calendarColorPicker.manualSet('$tagcolor', 'hex') ;
-					add_label_autocomplete('tf_tag_label');
-				});
-			</script>
-			<input type=\"hidden\" name=\"tf_tag_color\" id=\"tf_tag_color\" value=\"$tagcolor\">
-			<input type=\"hidden\" name=\"tf_tag_id\" id=\"tf_tag_id\" value=\"$tagid\">
-		</td>
+      <div id=\"tag_wrapper\">
+        <input type=\"text\" value=\"$taglabel\" name=\"tf_tag_label\" id=\"tf_tag_label\" style=\"width:70%;\">
+        <div id=\"display_tag_color\">&nbsp;</div>
+        <a href=\"#\" onclick=\"tag_reset();return false\"><img alt=\"reset\" title=\"reset\" src=\"$ico_cancel\"></a>
+      </div>
+      <script type=\"text/javascript\" langage=\"javascript\">
+        obm.initialize.chain(function () {
+          $('display_tag_color').setStyle('background-color', '$tagcolor') ;
+          obm.calendarColorPicker.manualSet('$tagcolor', 'hex') ;
+          add_label_autocomplete('tf_tag_label');
+        });
+      </script>
+      <input type=\"hidden\" name=\"tf_tag_color\" id=\"tf_tag_color\" value=\"$tagcolor\">
+      <input type=\"hidden\" name=\"tf_tag_id\" id=\"tf_tag_id\" value=\"$tagid\">
+    </td>
   </tr>     
   </table>
   </fieldset>
@@ -4121,8 +4170,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     repeat_form($('sel_repeat_kind').value);
   </script>
   <div id=\"fbcContainer\"></div>
-
-"; 
+  $template_popup
+  "; 
 
    return $block;
 }
@@ -4294,19 +4343,19 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
      <input type=\"submit\" value=\"$l_meeting_perform\" />";
 
   $users_id = $sel_entity_id['user'];
-  if (count($users_id > 0)) {
+  if (count($users_id) > 0) {
     $users = get_userobm_from_ids($users_id);
   } else {
     $users = array();
   }
   $res_id = $sel_entity_id['resource'];
-  if (count($res_id > 0)) {
+  if (count($res_id) > 0) {
     $res = get_calendar_resource_from_ids($res_id);
   } else {
     $res = array();
   }
   $groups_id = $sel_entity_id['group'];
-  if (count($groups_id > 0)) {
+  if (count($groups_id) > 0) {
     $groups = get_calendar_group_from_ids($groups_id);
   } else {
     $groups = array();
@@ -4857,7 +4906,7 @@ function html_calendar_ressource_list($groupLabel,$resource_group,$free=false) {
 function dis_calendar_admin_index($tags_q) {
   global $ico_delete, $ico_ok ;
   global $l_label, $l_c_new, $l_c_checkdelete, $l_c_update, $l_c_insert ;
-	global $l_tag_management ;
+  global $l_tag_management ;
 
   // category1
   $cats1 = of_category_get_ordered('event', 'category1');
@@ -4865,11 +4914,11 @@ function dis_calendar_admin_index($tags_q) {
 
   // tags , poubelle et input
   if ($tags_q->num_rows() > 0) {
-	$block .= "<div class=\"detail admin\" >
+  $block .= "<div class=\"detail admin\" >
     <form id=\"form_tags_update\" action=\"?action=tags_update\" method=\"post\">
     <input type=\"hidden\" name=\"tf_tag_id\" value=\"\" />
-	<input type=\"hidden\" name=\"tf_tag_label\" value=\"\" />
-	<input type=\"hidden\" name=\"tf_tag_color\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_tag_label\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_tag_color\" value=\"\" />
     </form>    
     <h1>$l_tag_management</h1>
     <div class=\"overflow\">
@@ -4882,45 +4931,45 @@ function dis_calendar_admin_index($tags_q) {
       </tr>    
       </thead>
       <tbody>" ;
-	$flip = 1 ;
+  $flip = 1 ;
     while ($tags_q->next_record()) {
-		$class = "" ;
-		if ($flip == 1) {
-			$class = "class=\"pair\"" ;
-		}
-		$flip *= -1 ;
-		$tagid = $tags_q->f('eventtag_id') ;
-		$taglabel = $tags_q->f('eventtag_label') ;
-		$tagcolor = $tags_q->f('eventtag_color') ;
-		$block .= "<tr $class>
+    $class = "" ;
+    if ($flip == 1) {
+      $class = "class=\"pair\"" ;
+    }
+    $flip *= -1 ;
+    $tagid = $tags_q->f('eventtag_id') ;
+    $taglabel = $tags_q->f('eventtag_label') ;
+    $tagcolor = $tags_q->f('eventtag_color') ;
+    $block .= "<tr $class>
           <td>
           <input type=\"hidden\" id=\"tf_tag_id_$tagid\" value=\"$tagid\" />
           <a href=\"?action=tag_delete&amp;tag_id=$tagid\">
           <img src=\"$ico_delete\" alt=\"$l_c_checkdelete\" title=\"$l_c_checkdelete\" />
           </a></td>
           <td> 
-		  
-		  <div class=\"extColorPickerWrapper\">
-		  <input type=\"text\" id=\"tf_tag_label_$tagid\" value=\"$taglabel\" />
-		  
-		  <div id=\"cp_$tagid\" class=\"extColorPicker\">
-		    <div id=\"cp_back_$tagid\">&nbsp;</div>
-			<input type=\"hidden\" id=\"tf_tag_color_$tagid\" value=\"$tagcolor\">
-			<img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" /></a>
-		  </div>
-		  
-		  </div>
-		  
-		  </td>
+      
+      <div class=\"extColorPickerWrapper\">
+      <input type=\"text\" id=\"tf_tag_label_$tagid\" value=\"$taglabel\" />
+      
+      <div id=\"cp_$tagid\" class=\"extColorPicker\">
+        <div id=\"cp_back_$tagid\">&nbsp;</div>
+      <input type=\"hidden\" id=\"tf_tag_color_$tagid\" value=\"$tagcolor\">
+      <img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" /></a>
+      </div>
+      
+      </div>
+      
+      </td>
           <td>
           <a href=\"#\" onclick=\"updateLine($tagid,'tags')\">
           <img src=\"$ico_ok\" alt=\"$l_c_update\" title=\"$l_c_update\" />
           </a>
-	      </td>
+        </td>
         </tr>" ;
-	} ;
-	// tag, ajout
-	$block .= "</tbody>
+  } ;
+  // tag, ajout
+  $block .= "</tbody>
     </table>
     </div>
     <form id=\"form_tag_new\" action=\"\" method=\"post\">
@@ -4935,19 +4984,19 @@ function dis_calendar_admin_index($tags_q) {
       </tr>       
       <tr>
         <td>
-		
-		  <div class=\"extColorPickerWrapper\">
-		  <input type=\"text\" name=\"tf_tag_label\" id=\"tf_tag_label\" value=\"\" />
-		  
-		  <div id=\"cp\" class=\"extColorPicker\">
-		    <div id=\"cp_back\">&nbsp;</div>
-			<input type=\"hidden\" name=\"tf_tag_color\" id=\"tf_tag_color\" value=\"#eff0f2\">
-			<img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" /></a>
-		  </div>
-		  
-		  </div>
-		  
-		</td>    
+    
+      <div class=\"extColorPickerWrapper\">
+      <input type=\"text\" name=\"tf_tag_label\" id=\"tf_tag_label\" value=\"\" />
+      
+      <div id=\"cp\" class=\"extColorPicker\">
+        <div id=\"cp_back\">&nbsp;</div>
+      <input type=\"hidden\" name=\"tf_tag_color\" id=\"tf_tag_color\" value=\"#eff0f2\">
+      <img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" /></a>
+      </div>
+      
+      </div>
+      
+    </td>    
       </tr>  
     </tbody>
     <tfoot>
@@ -4965,6 +5014,30 @@ function dis_calendar_admin_index($tags_q) {
   return $block;
 }
 
+function dis_calendar_templates_list($templates_q) {
+  global $l_name;
+  
+  $block = "<div class=\"detail admin\">
+    <table>
+      <thead>
+        <tr><td>$l_name</td><td>&nbsp;</td></tr>
+      </thead>
+      <tbody>
+      ";
+  while ($templates_q->next_record()) {
+    $id = $templates_q->f('eventtemplate_id');
+    $name = $templates_q->f('eventtemplate_name');
+    $block.= "<tr>
+        <td>$name</td>
+        <td>".button_to('[delete]', "$path/calendar/calendar_index.php?action=delete_template&template_id=$id")."</td>
+      </tr>";
+  }
+  $block.= "</tbody>
+      </table>
+    </div>";
+  
+  return $block;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Perform the export to the vCalendar format
@@ -5187,14 +5260,14 @@ function json_error_msg($msg) {
 }
 
 function json_tag_search($tags_q) {
-	$json_tags = "" ;
-	if ($tags_q->num_rows() > 0) {
-		while($tags_q->next_record()) {
-			$json_tags .= "{'id':".$tags_q->f('eventtag_id').",'label':'".$tags_q->f('eventtag_label')."','color':'".$tags_q->f('eventtag_color')."'}," ;
-		}
-		$json_tags = rtrim($json_tags, ',') ;
-	}
-	return "[".$json_tags."]" ;
+  $json_tags = "" ;
+  if ($tags_q->num_rows() > 0) {
+    while($tags_q->next_record()) {
+      $json_tags .= "{'id':".$tags_q->f('eventtag_id').",'label':'".$tags_q->f('eventtag_label')."','color':'".$tags_q->f('eventtag_color')."'}," ;
+    }
+    $json_tags = rtrim($json_tags, ',') ;
+  }
+  return "[".$json_tags."]" ;
 }
 
 /**
@@ -7484,6 +7557,31 @@ function dis_calendar_mail_field($emails, $class) {
   return $email_block;
 }
 
+function html_calendar_template_name_popup() {
+  global $ico_popup_close, $l_save_as_template, $l_template_name,
+  $l_validate, $l_cancel;
+  
+  return "<div id=\"createTemplatePopup\" class=\"obmPopup\">
+    <h1>
+      <a href=\"\" class=\"closeSticky\" onclick=\"return false;\">
+        <img src=\"$ico_popup_close\" alt=\"close\" />
+      </a>
+      <span>$l_save_as_template</span>
+    </h1>
+    <div>
+      <form id=\"createTemplatePopupForm\" onsubmit=\"setTemplateName(this);return false;\">
+        <fieldset style=\"border:none;\">
+          $l_template_name : <input type=\"text\" maxlength=\"255\" name=\"name\" />
+        </fieldset>
+        <fieldset class=\"buttons\">
+          <input class=\"button closeSticky\" type=\"submit\" value=\"$l_validate\" />
+          <input class=\"button closeSticky\" onclick=\"return false;\" type=\"submit\" value=\"$l_cancel\" />
+        </fieldset>
+      </form>
+    </div>
+  </div>";
+}
+
 /**
  * Generate file upload block
  * 
@@ -7518,7 +7616,7 @@ function html_calendar_documents_form_fieldset($documents = null) {
   
   if (is_array($documents)) {
     foreach ($documents as $d_id => $d_ent) {
-      $d_name = $d_ent['name'];
+      $d_name = $d_ent['label'];
       $sel_id = "data-document-$d_id";
       $div_id = "sel_document_id-$sel_id";
       $dis_sel_document .= "

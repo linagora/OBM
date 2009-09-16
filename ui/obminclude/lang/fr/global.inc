@@ -54,6 +54,7 @@ $l_basic_search = "Recherche simple";
 // Common messages
 $l_yes = "Oui";
 $l_no = "Non";
+$l_ok = "Ok";
 $l_all = "Tout";
 $l_all_f = "Toutes";
 $l_none = "Aucun";
