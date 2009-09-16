@@ -74,14 +74,6 @@ sub _configurePreBind {
         exit 1;
     }
 
-    if( $self->_getHttpAuthValidUserDN() ) {
-        $self->log( 0, 'Unable to find DN of valid user \''.$self->{'httpAuthentication'}->{'validUser'}.'\'' );
-        exit 1;
-    }
-
-    # Disconnect from LDAP server before forking...
-    $self->{'services'}->{'LDAP'}->disconnect();
-
     # Load modules
     if( $self->_loadModules() ) {
         $self->log( 2, 'Modules initialization fail' );
@@ -210,70 +202,6 @@ sub _startServices {
             $self->log( 0, 'needed '.$service.' service initialized' );
         }
     }
-
-    return 0;
-}
-
-
-sub _getHttpAuthValidUserDN {
-    my $self = shift;
-    my $validUser = $self->{'httpAuthentication'}->{'validUser'};
-
-    eval {
-        require ObmSatellite::Services::LDAP;
-    } or ($self->log( 0, 'Unable to load LDAP service' ) && return 1);
-    my $ldapServer = ObmSatellite::Services::LDAP->instance();
-
-    if( !defined($ldapServer) ) {
-        $self->log( 0, 'Unable to load LDAP service' );
-        return 1;
-    }
-
-    my $ldapConn;
-    if( !($ldapConn = $ldapServer->getConn()) ) {
-        return 1;
-    }
-
-    my $ldapRoot = $ldapServer->getLdapRoot();
-
-    my $ldapFilter = $self->{'httpAuthentication'}->{'ldapFilter'};
-    $ldapFilter =~ s/%u/$self->{'httpAuthentication'}->{'validUser'}/g;
-
-    $self->log( 4, 'Search LDAP root \''.$ldapRoot.'\', filter '.$ldapFilter ) if $ldapRoot;
-    $self->log( 4, 'Search default LDAP server root, filter '.$ldapFilter ) if !$ldapRoot;
-
-    my $ldapResult;
-    if( $ldapRoot ) {
-        $ldapResult = $ldapConn->search(
-                            base => $ldapRoot,
-                            scope => 'sub',
-                            filter => $ldapFilter,
-                            attrs => [ 'uid' ]
-                        );
-    }else {
-        $ldapResult = $ldapConn->search(
-                            scope => 'sub',
-                            filter => $ldapFilter,
-                            attrs => [ 'uid' ]
-                        );
-    }
-
-    if( $ldapResult->is_error() ) {
-        $self->log( 0, 'LDAP search fail on error : '.$ldapResult->error() );
-        return 1;
-    }
-
-    my @results = $ldapResult->entries();
-    if( $#results < 0 ) {
-        $self->log( 0, 'User \''.$validUser.'\' not found in LDAP' );
-        return 1;
-    }elsif( $#results > 0 ) {
-        $self->log( 0, 'More than one user \''.$validUser.'\' LDAP entries found' );
-        return 1;
-    }
-
-    $self->{'httpAuthentication'}->{'validUserDn'} = $results[0]->dn();
-    $self->log( 3, 'DN of valid user HTTP basic authentication : '.$self->{'httpAuthentication'}->{'validUserDn'} );
 
     return 0;
 }

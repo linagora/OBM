@@ -35,7 +35,6 @@ sub process_request {
             }
 
             if( $self->_checkHttpBasicAuth( $httpRequest->authorization_basic()) ) {
-                $processedRequest++;
                 $self->processHttpRequest( $httpRequest, $connection );
             }else {
                 my $res = HTTP::Response->new( 401, 'Auth Required', undef, $self->{'server'}->{'name'}.' need valid authentication' );
@@ -43,6 +42,7 @@ sub process_request {
                 $connection->send_response($res);
             }
 
+            $processedRequest++;
         }
 
         $self->log( 2, 'Disconnect from: '.$connection->peerhost());
@@ -55,9 +55,6 @@ sub process_request {
     }else {
         $self->log( 3, $processedRequest.' processed requests ( maximum allowed '.$self->{'server'}->{'max_requests'}.'). Process renewed' );
     }
-
-
-    $self->log( 0, 'fin' );
 }
 
 
@@ -73,6 +70,13 @@ sub _checkHttpBasicAuth {
     if( $user ne $self->{'httpAuthentication'}->{'validUser'} ) {
         $self->log( 0, 'HTTP authentication : invalid login \''.$user.'\'' );
         return 0;
+    }
+
+    if( !defined($self->{'httpAuthentication'}->{'validUserDn'}) ) {
+        if( $self->_getHttpAuthValidUserDN() ) {
+            $self->log( 0, 'Unable to find DN of valid user \''.$self->{'httpAuthentication'}->{'validUser'}.'\'' );
+            return 0;
+        }
     }
 
     # Check password against cache
@@ -112,4 +116,68 @@ sub _checkHttpBasicAuth {
     $self->{'httpAuthentication'}->{'validPasswdTime'} = time();
 
     return 1;
+}
+
+
+sub _getHttpAuthValidUserDN {
+    my $self = shift;
+    my $validUser = $self->{'httpAuthentication'}->{'validUser'};
+
+    eval {
+        require ObmSatellite::Services::LDAP;
+    } or ($self->log( 0, 'Unable to load LDAP service' ) && return 1);
+    my $ldapServer = ObmSatellite::Services::LDAP->instance();
+
+    if( !defined($ldapServer) ) {
+        $self->log( 0, 'Unable to load LDAP service' );
+        return 1;
+    }
+
+    my $ldapConn;
+    if( !($ldapConn = $ldapServer->getConn()) ) {
+        return 1;
+    }
+
+    my $ldapRoot = $ldapServer->getLdapRoot();
+
+    my $ldapFilter = $self->{'httpAuthentication'}->{'ldapFilter'};
+    $ldapFilter =~ s/%u/$self->{'httpAuthentication'}->{'validUser'}/g;
+
+    $self->log( 4, 'Search LDAP root \''.$ldapRoot.'\', filter '.$ldapFilter ) if $ldapRoot;
+    $self->log( 4, 'Search default LDAP server root, filter '.$ldapFilter ) if !$ldapRoot;
+
+    my $ldapResult;
+    if( $ldapRoot ) {
+        $ldapResult = $ldapConn->search(
+                            base => $ldapRoot,
+                            scope => 'sub',
+                            filter => $ldapFilter,
+                            attrs => [ 'uid' ]
+                        );
+    }else {
+        $ldapResult = $ldapConn->search(
+                            scope => 'sub',
+                            filter => $ldapFilter,
+                            attrs => [ 'uid' ]
+                        );
+    }
+
+    if( $ldapResult->is_error() ) {
+        $self->log( 0, 'LDAP search fail on error : '.$ldapResult->error() );
+        return 1;
+    }
+
+    my @results = $ldapResult->entries();
+    if( $#results < 0 ) {
+        $self->log( 0, 'User \''.$validUser.'\' not found in LDAP' );
+        return 1;
+    }elsif( $#results > 0 ) {
+        $self->log( 0, 'More than one user \''.$validUser.'\' LDAP entries found' );
+        return 1;
+    }
+
+    $self->{'httpAuthentication'}->{'validUserDn'} = $results[0]->dn();
+    $self->log( 3, 'DN of valid user HTTP basic authentication : '.$self->{'httpAuthentication'}->{'validUserDn'} );
+
+    return 0;
 }
