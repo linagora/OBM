@@ -35,7 +35,7 @@ sub _new_instance {
 
 
     my $regexp_ip = '^((ldap|ldaps):\/\/){0,1}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)[/]{0,1}$';
-    my $regexp_hostname = '^((ldap|ldaps):\/\/){0,1}[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,6}[/]{0,1}$';
+    my $regexp_hostname = '^((ldap|ldaps):\/\/){0,1}[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,6}){0,1}[/]{0,1}$';
 
     # Load LDAP configuration options
     if( defined($ldapDesc->{'ldap_server'}) && (($ldapDesc->{'ldap_server'} =~ $regexp_ip || ($ldapDesc->{'ldap_server'} =~ /$regexp_hostname/)) ) ) {
@@ -43,7 +43,7 @@ sub _new_instance {
 
         $self->{'ldap_server'} = $ldapDesc->{'ldap_server'};
         if( $self->{'ldap_server'} !~ /^(ldap|ldaps):/ ) {
-            $self->{'ldap_server'} = 'ldap://'.$self->{'ldap_server'}->{'server'};
+            $self->{'ldap_server'} = 'ldap://'.$self->{'ldap_server'}.'/';
         }
 
         $self->{'ldap_server_tls'} = $ldapDesc->{'ldap_server_tls'};
