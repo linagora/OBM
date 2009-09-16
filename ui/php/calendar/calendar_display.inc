@@ -1094,18 +1094,19 @@ function dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, 
   $block .= "
   <div id='calendarHeader' style='margin-bottom: 8px;margin-right:15px;'>
     <table class='calendarTable'>
+      <colgroup style='background:#EFF0F2;text-align:right;'>
+      <colgroup />
       <tr>
-        <td style='background:#EFF0F2;width:3em;text-align:center;'>
-          $week_num
-        </td><td>
+        <td style='width:3em;'>$week_num</td>
+        <td>
           <div style='position:relative;height:{$height}px'>
               $week_day_list
           </div>
         </td>
       </tr>
       <tr>
-        <td style='background:#EFF0F2;width:3em;text-align:center;'>
-        </td><td>
+        <td style='width:3em;'></td>
+        <td>
           <div id='calendarHeaderGrid' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
               $week_day_event_list
           </div>
@@ -1163,6 +1164,7 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
   $height = round(100/$weeks, 2);
   $current = clone $date;
   $dis_week_time = "obm.vars.consts.weekTime = new Array();";
+  $dis_weekbegin_time = "obm.vars.consts.weekBegin = new Array();";
   $tags = array();
 
   // calendar grid
@@ -1173,7 +1175,7 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
     $endWeek->addDay(7);
 
     $dis_week_time .= "obm.vars.consts.weekTime[".$current->getWeek()."] = new Array('".$current->getTimestamp()."','".$endWeek->getTimestamp()."');";
-
+    $dis_weekbegin_time .= "obm.vars.consts.weekBegin.push(".$current->getTimestamp().");";
     $occurrences = $of->getPeriodOccurrences($current,$endWeek);
     if (is_array($occurrences)) {
       foreach($occurrences as $occurrence) {
@@ -1195,7 +1197,6 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
         $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
       }
     }
-
     while($current->compare($endWeek) < 0) {
       $today = "";
       if ($current->isToday()) {
@@ -1212,7 +1213,7 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
       $week_day_left = $step*$width;
       $week_day_event_list .= "
         <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='height:{$height}%;width:$width%;left:$week_day_left%;$today'>
-          <div class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
+          <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
           <div id='allday_$date_iso' class='alldayCell' style='width:100%;'>
             <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title</h1>' style='text-align:center;position:absolute;display;none;width:100%;'></div>
           </div>
@@ -1263,9 +1264,11 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
     </table>
   </div>
   <script type=\"text/javascript\">
+    obm.vars.consts.cellWidth = $width;
     obm.vars.labels.more = '".phpStringToJsString($GLOBALS['l_more'])."';
     obm.vars.consts.calendarView = 'month';
     $dis_week_time
+    $dis_weekbegin_time
     obm.initialize.chain(function () {
       obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');

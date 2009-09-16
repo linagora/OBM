@@ -282,7 +282,6 @@ Obm.Popup = new Class ({
  *
  * Extends Mootools Drag.Move class
  * Support overflow & x/y units 
- * Add style on overed elements // FIXME: this.checkDroppables is too slow
  *
  */
 Obm.Drag = new Class ({ 
@@ -291,13 +290,11 @@ Obm.Drag = new Class ({
 
   options: {
     overflow:false,
-    units: {'x':'px', 'y':'px'},
-    overStyle: null
+    units: {'x':'px', 'y':'px'}
   },
 
   start: function(event){
     this.parent(event);
-    // this.overed = null;
 
     this.pixelUnitSize = new Object();
     if (this.options.preventDefault) event.preventDefault();
@@ -333,11 +330,6 @@ Obm.Drag = new Class ({
   },
 
   drag: function(event) {
-
-    // if (this.overed && this.options.overStyle) {
-    //   this.overed.removeClass(this.options.overStyle);
-    // }
-
     if (this.options.preventDefault) event.preventDefault();
     this.mouse.now = event.page;
     for (var z in this.options.modifiers){
@@ -361,23 +353,8 @@ Obm.Drag = new Class ({
       else this.element[this.options.modifiers[z]] = this.value.now[z];
     }
     this.fireEvent('drag', this.element);
+  }
 
-		// this.checkDroppables();
-    // if (this.overed && this.options.overStyle) {
-    //   this.overed.addClass(this.options.overStyle);
-    // }
-
-  },
-
-	stop: function(event){
-    this.checkDroppables();
-		this.fireEvent('drop', [this.element, this.overed]);
-    this.overedElement = this.overed;
-    // if (this.overed && this.options.overStyle) {
-    //   this.overed.removeClass(this.options.overStyle);
-    // }
-		return this.parent(event);
-	}
 });
 
 
