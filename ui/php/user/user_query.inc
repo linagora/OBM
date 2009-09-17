@@ -2081,18 +2081,18 @@ function run_query_user_delete_profile($user_id)  {
   $user_id = sql_parse_id($user_id, true);
 
 
-  $query = "DELETE FROM Entity 
-    WHERE entity_id IN (
-      SELECT contactentity_entity_id FROM ContactEntity INNER JOIN  Contact ON contactentity_contact_id = contact_id
-      WHERE contact_usercreate $user_id AND contact_privacy != 0)";
-  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Contact)');
-  $obm_q->query($query);
-  // Delete all the user private contact
-  $query = "DELETE FROM Contact
-    WHERE contact_usercreate $user_id 
-      AND contact_privacy != 0"; 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Contact)');
-  $obm_q->query($query);
+#  $query = "DELETE FROM Entity 
+#    WHERE entity_id IN (
+#      SELECT contactentity_entity_id FROM ContactEntity INNER JOIN  Contact ON contactentity_contact_id = contact_id
+#      WHERE contact_usercreate $user_id AND contact_privacy != 0)";
+#  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Contact)');
+#  $obm_q->query($query);
+#  // Delete all the user private contact
+#  $query = "DELETE FROM Contact
+#    WHERE contact_usercreate $user_id 
+#      AND contact_privacy != 0"; 
+#  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Contact)');
+#  $obm_q->query($query);
 
   // Move all the user deal from private to public
   $query = "UPDATE Deal SET
