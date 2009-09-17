@@ -1913,9 +1913,24 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
  * @access public
  * @return integer event template id inserted
  */
-function run_query_calendar_add_event_template($calendar) {
+function run_query_calendar_create_or_update_event_template($calendar) {
   global $cdg_sql, $obm;
 
+  // Insert "others attendees" as private contacts
+  if ($calendar['others_attendees'] != "") {
+    $others_attendees = run_query_insert_others_attendees($calendar);
+    $calendar['sel_contact_id'] = is_array($calendar['sel_contact_id']) 
+                              ? array_merge($calendar['sel_contact_id'], $others_attendees)
+                              : $others_attendees;
+  }
+  // Insert "other files" as private documents
+  if (is_array($calendar['other_files'])) {
+    $other_files = run_query_insert_other_files($calendar);
+    $calendar['sel_document_id'] = is_array($calendar['sel_document_id'])
+                               ? array_merge($calendar['sel_document_id'], $other_files)
+                               : $other_files;
+  }
+  
   if (!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
     $owner = $obm['uid'];
   } else {
@@ -1993,67 +2008,97 @@ function run_query_calendar_add_event_template($calendar) {
   } else {
     $repeat_days = '0000000';
   }
+  
+  if (isset($calendar['template_id'])) {
+    $template_id = (int) $calendar['template_id'];
+    $query = "UPDATE EventTemplate SET
+      eventtemplate_timeupdate = NOW(),
+      eventtemplate_owner = '$owner',
+      eventtemplate_title = '$title', 
+      eventtemplate_date = '$datebegin',     
+      eventtemplate_description = '$description',
+      eventtemplate_properties = '$properties',
+      eventtemplate_location = '$location',
+      eventtemplate_category1_id = $category1_id,
+      eventtemplate_priority = $priority,
+      eventtemplate_privacy = $privacy,
+      eventtemplate_duration = '$event_duration',
+      eventtemplate_repeatkind = '$repeat_kind',
+      eventtemplate_repeatfrequence = '$repeatfrequency',
+      eventtemplate_repeatdays = '$repeat_days',
+      eventtemplate_allday = $all_day,
+      eventtemplate_tag_id = $event_tag_id,
+      eventtemplate_allow_documents = '$allow_documents',
+      eventtemplate_alert = $alert,
+      eventtemplate_endrepeat = $repeat_end,
+      eventtemplate_user_ids = $user_ids,
+      eventtemplate_contact_ids = $contact_ids,
+      eventtemplate_resource_ids = $resource_ids,
+      eventtemplate_group_ids = $group_ids,
+      eventtemplate_document_ids = $document_ids 
+      WHERE eventtemplate_id = $template_id";
+  } else {
+    $query = "INSERT INTO EventTemplate (
+      eventtemplate_name,
+      eventtemplate_timeupdate,                         
+      eventtemplate_timecreate,                         
+      eventtemplate_usercreate,
+      eventtemplate_owner,
+      eventtemplate_title, 
+      eventtemplate_date,     
+      eventtemplate_description,
+      eventtemplate_properties,
+      eventtemplate_location, 
+      eventtemplate_category1_id,
+      eventtemplate_priority,
+      eventtemplate_privacy, 
+      eventtemplate_duration,
+      eventtemplate_repeatkind,
+      eventtemplate_repeatfrequence,
+      eventtemplate_repeatdays,
+      eventtemplate_allday,
+      eventtemplate_tag_id, 
+      eventtemplate_allow_documents,
+      eventtemplate_alert,
+      eventtemplate_endrepeat,
+      eventtemplate_domain_id,
+      eventtemplate_user_ids,
+      eventtemplate_contact_ids,
+      eventtemplate_resource_ids,
+      eventtemplate_group_ids,
+      eventtemplate_document_ids)
+      VALUES (
+      '$name',
+      NOW(),
+      NOW(),
+      '$obm[uid]',
+      '$owner',
+      '$title',
+      '$datebegin',
+      '$description',
+      '$properties',
+      '$location',
+      $category1_id,
+      $priority,
+      $privacy,
+      '$event_duration',
+      '$repeat_kind',
+      '$repeatfrequency',
+      '$repeat_days',
+      $all_day,
+      $event_tag_id,
+      '$allow_documents',
+      $alert,
+      $repeat_end,
+      $obm[domain_id],
+      $user_ids,
+      $contact_ids,
+      $resource_ids,
+      $group_ids,
+      $document_ids)";
+  }
 
-  $query = "INSERT INTO EventTemplate (
-    eventtemplate_name,
-    eventtemplate_timeupdate,                         
-    eventtemplate_timecreate,                         
-    eventtemplate_usercreate,
-    eventtemplate_owner,
-    eventtemplate_title, 
-    eventtemplate_date,     
-    eventtemplate_description,
-    eventtemplate_properties,
-    eventtemplate_location, 
-    eventtemplate_category1_id,
-    eventtemplate_priority,
-    eventtemplate_privacy, 
-    eventtemplate_duration,
-    eventtemplate_repeatkind,
-    eventtemplate_repeatfrequence,
-    eventtemplate_repeatdays,
-    eventtemplate_allday,
-    eventtemplate_tag_id, 
-    eventtemplate_allow_documents,
-    eventtemplate_alert,
-    eventtemplate_endrepeat,
-    eventtemplate_domain_id,
-    eventtemplate_user_ids,
-    eventtemplate_contact_ids,
-    eventtemplate_resource_ids,
-    eventtemplate_group_ids,
-    eventtemplate_document_ids)
-    VALUES (
-    '$name',
-    NOW(),
-    NOW(),
-    '$obm[uid]',
-    '$owner',
-    '$title',
-    '$datebegin',
-    '$description',
-    '$properties',
-    '$location',
-    $category1_id,
-    $priority,
-    $privacy,
-    '$event_duration',
-    '$repeat_kind',
-    '$repeatfrequency',
-    '$repeat_days',
-    $all_day,
-    $event_tag_id,
-    '$allow_documents',
-    $alert,
-    $repeat_end,
-    $obm[domain_id],
-    $user_ids,
-    $contact_ids,
-    $resource_ids,
-    $group_ids,
-    $document_ids)";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_template()');
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_create_or_update_event_template()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -2099,6 +2144,8 @@ function run_query_calendar_get_template($template_id) {
   $get_id = "eventtemplate_id $template_id";
   $multidomain = sql_multidomain('eventtemplate');
   $query = "SELECT 
+    eventtemplate_id,
+    eventtemplate_name,
     eventtemplate_owner AS event_owner,
     o.userobm_lastname AS owner_lastname,
     o.userobm_firstname AS owner_firstname,

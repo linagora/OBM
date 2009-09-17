@@ -672,28 +672,14 @@ if ($action == 'search') {
 } elseif ($action == 'tag_search')  {
 ///////////////////////////////////////////////////////////////////////////////
   $tags_q = run_query_tag_search($obm['uid'], $params);
-	$json = json_tag_search($tags_q) ;
-	echo "(".$json.")" ;
-	exit() ;
+  $json = json_tag_search($tags_q) ;
+  echo "(".$json.")" ;
+  exit() ;
   
 } elseif ($action == 'save_as_template') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_form($params)) {
-    // Insert "others attendees" as private contacts
-    if ($params['others_attendees'] != "") {
-      $others_attendees = run_query_insert_others_attendees($params);
-      $params['sel_contact_id'] = is_array($params['sel_contact_id']) 
-                                ? array_merge($params['sel_contact_id'], $others_attendees)
-                                : $others_attendees;
-    }
-    // Insert "other files" as private documents
-    if (is_array($params['other_files'])) {
-      $other_files = run_query_insert_other_files($params);
-      $params['sel_document_id'] = is_array($params['sel_document_id'])
-                                 ? array_merge($params['sel_document_id'], $other_files)
-                                 : $other_files;
-    }
-    $template_id = run_query_calendar_add_event_template($params);
+    $template_id = run_query_calendar_create_or_update_event_template($params);
     
     $display['msg'] .= display_ok_msg("$l_template : $l_insert_ok");
     $params["date"] = $params["date_begin"];
@@ -704,6 +690,27 @@ if ($action == 'search') {
     }
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
     $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+  }
+  
+} elseif ($action == 'edit_template') {
+///////////////////////////////////////////////////////////////////////////////
+    list($template_q, $entity_ids) = run_query_calendar_get_template($params['template_id']);
+    $display['detail'] = dis_calendar_template_form($action, $params, $template_q, $entity_ids);
+    
+} elseif ($action == 'update_template') {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_calendar_data_form($params)) {
+    run_query_calendar_create_or_update_event_template($params);
+    
+    $display['msg'] .= display_ok_msg("$l_template : $l_update_ok");
+    $params["date"] = $params["date_begin"];
+    $display['detail'] = dis_calendar_calendar_view($params, $current_view);
+  } else {
+    foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
+      $entities[$type] = is_array($params["sel_{$type}_id"]) ? $params["sel_{$type}_id"] : array();
+    }
+    $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['detail'] = dis_calendar_template_form($action, $params, '', $entities);
   }
   
 } elseif ($action == 'list_templates')  {
@@ -1172,7 +1179,7 @@ function get_calendar_action() {
   global $l_header_planning, $l_header_list, $l_header_duplicate, $l_header_delete;
   global $l_header_new_event,$l_header_admin, $l_header_export, $l_header_import;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
-  global $l_header_waiting_events, $l_calendar, $l_header_templates;
+  global $l_header_waiting_events, $l_calendar, $l_header_templates, $l_edit_template;
 
   $id = $params['calendar_id'];
   $date = $params['date'];
@@ -1555,6 +1562,19 @@ function get_calendar_action() {
   
   // Set template name
   $actions['calendar']['set_template_name'] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+  
+  // Edit template
+  $actions['calendar']['edit_template'] = array (
+    'Name'     => $l_edit_template,
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+  
+  // Update template
+  $actions['calendar']['update_template'] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );

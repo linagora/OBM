@@ -111,8 +111,10 @@ $l_last_hour = "Heure de fin";
 
 // Templates
 $l_save_as_template = "Enregistrer comme modèle";
+$l_save_template = "Enregistrer le modèle";
 $l_create_from_template = "Créer d'après modèle";
 $l_duplicate_template = "Dupliquer le modèle";
+$l_edit_template = "Modifier le modèle";
 $l_template = "Modèle d'évènement";
 $l_template_name = "Nom du modèle";
 $l_header_templates = "Modèles";

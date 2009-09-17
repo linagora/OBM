@@ -112,6 +112,7 @@ $ico_delete         = "$theme_path/ico_trash.gif";
 $ico_cancel         = "$theme_path/ico_delete.gif";
 $ico_validate       = "$theme_path/ico_validate.gif";
 $ico_update         = "$theme_path/ico_update.gif";
+$ico_edit           = "$theme_path/ico_modify.gif";
 $ico_ok             = "$theme_path/ico_validate.gif";
 $ico_nok            = "$theme_path/ico_delete.gif";
 $ico_lock           = "$theme_path/ico_lock.gif";

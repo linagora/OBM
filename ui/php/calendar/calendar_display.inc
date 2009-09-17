@@ -3335,6 +3335,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color;
   global $l_documents, $l_allow_documents;
+  global $l_save_as_template, $l_save_template;
   global $l_tag ;
   global $c_none ;
 
@@ -3342,7 +3343,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $uid = $obm['uid']; 
   $tagcolor = "#eff0f2" ; // backcolor by default
 
-  if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') || ($action == 'new' && $event_q != '')) {
+  if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') || ($action == 'new' && $event_q != '') || ($action == 'edit_template')) {
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
     $cat1 = $event_q->f('event_category1_id');
@@ -3398,10 +3399,13 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     } elseif (isset($calendar['template_id'])) {
       $selected_alert = $event_q->f('event_alert');
     }
-    $dis_title = $title;
 
     if ($action == 'duplicate') {
       $dis_title = "$title ($l_header_new)";
+    } elseif ($action == 'edit_template') {
+      $dis_title = $event_q->f('eventtemplate_name');
+    } else {
+      $dis_title = $title;
     }
   }
   if (isset($calendar['new_meeting'])) $event_q = '';
@@ -3474,18 +3478,20 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $l_check_busy = "checked='checked'";
   }
 
-  $dis_attendees_notification = "
-  <fieldset class=\"detail extra\">    
-  <legend>$GLOBALS[l_notification]</legend>  
-  <table>    
-  <tr>    
-    <th><label for=\"cba_attendees_notification\">$GLOBALS[l_sendamail]</label></th> 
-    <td>
-      <input style=\"margin:0\" type=\"checkbox\" id=\"cba_attendees_notification\" name=\"cba_attendees_notification\" value=\"1\" $attendees_notification />
-    </td>
-  </tr>
-  </table>
-  </fieldset>";
+  if ($action != 'edit_template' && $action != 'update_template') {
+    $dis_attendees_notification = "
+    <fieldset class=\"detail extra\">    
+    <legend>$GLOBALS[l_notification]</legend>  
+    <table>    
+    <tr>    
+      <th><label for=\"cba_attendees_notification\">$GLOBALS[l_sendamail]</label></th> 
+      <td>
+        <input style=\"margin:0\" type=\"checkbox\" id=\"cba_attendees_notification\" name=\"cba_attendees_notification\" value=\"1\" $attendees_notification />
+      </td>
+    </tr>
+    </table>
+    </fieldset>";
+  }
 
   if (($action == 'detailupdate') || ($action == 'update') || ($action == 'conflict_manager')) {
     $dis_button = "
@@ -3497,7 +3503,13 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />
-      <input type=\"submit\" onclick=\"displayTemplateCreate();return false;\" value=\"Enregistrer comme modèle\" />";
+      <input type=\"submit\" onclick=\"displayTemplateCreate();return false;\" value=\"$l_save_as_template\" />";
+  } elseif (($action == 'edit_template') || ($action == 'update_template')) {
+      $template_id = isset($calendar['template_id']) ? $calendar['template_id'] : $event_q->f('eventtemplate_id');
+      $dis_button = "
+      <input type=\"hidden\" name=\"template_id\" id=\"template_id\" value=\"$template_id\" />
+      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"update_template\" />
+      <input type=\"submit\" value=\"$l_save_template\" />";
   }
 
   $repeat_end_value = isset($repeat_end) ? $repeat_end->getInputDate() : '';
@@ -5048,14 +5060,59 @@ function dis_calendar_admin_index($tags_q) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the event template form
+// Parameters:
+//   - $action   : action called
+//   - $params   : parameters
+//   - $template_q  : DBO : event result
+//   - $entity_ids : linked entity ids
+///////////////////////////////////////////////////////////////////////////////
+function dis_calendar_template_form($action, $params, $template_q, $entity_ids) {
+  global $obm;
+  
+  $users_id = is_array($params['sel_user_id']) ? $params['sel_user_id'] : array();
+  $contacts_id = is_array($params['sel_contact_id']) ? $params['sel_contact_id'] : array();
+  $res_id = is_array($params['sel_resource_id']) ? $params['sel_resource_id'] : array();
+  $groups_id = is_array($params['sel_group_id']) ? $params['sel_group_id'] : array();
+  $documents_id = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
+
+  $users_id = array_merge($users_id, $entity_ids['user']);
+  $contacts_id = array_merge($contacts_id, $entity_ids['contact']);
+  $res_id = array_merge($res_id, $entity_ids['resource']);
+  $groups_id = array_merge($groups_id, $entity_ids['group']);
+  $documents_id = array_merge($documents_id, $entity_ids['document']);
+  
+  $users = (count($users_id) > 0) ? get_userobm_from_ids($users_id) : array();
+  $contacts = (count($contacts_id) > 0) ? get_contact_from_ids($contacts_id) : array();
+  $resources = (count($res_id) > 0) ? get_calendar_resource_from_ids($res_id) : array();
+  $groups = (count($groups_id) > 0) ? get_calendar_group_from_ids($groups_id) : array();
+  $documents = (count($documents_id) > 0) ? get_calendar_document_from_ids($documents_id) : array();
+  
+  $possible_owners = OBM_Acl_Utils::expandEntitiesArray(
+    OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
+  );
+  $possible_owners = $possible_owners['entity'];
+  $cats1 = of_category_get_ordered('event', 'category1');
+  
+  $block = html_calendar_event_form($action, $params, $template_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents);
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display event templates list
+// Parameters:
+//   - $templates_q : DBO
+///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_templates_list($templates_q) {
-  global $ico_popup_close, $l_name, $l_duplicate_template, $l_template_name,
+  global $ico_popup_close, $ico_edit, $l_name, $l_duplicate_template, $l_template_name,
     $l_validate, $l_cancel, $l_copy_of;
   
   $block = "<div class=\"detail admin\">
     <table>
       <thead>
-        <tr><td>$l_name</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>$l_name</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
       </thead>
       <tbody style=\"text-align: left;\">
       ";
@@ -5064,6 +5121,11 @@ function dis_calendar_templates_list($templates_q) {
     $name = $templates_q->f('eventtemplate_name');
     $block.= "<tr>
         <td><span class=\"editable\" rel=\"$id\">$name</span></td>
+        <td>
+          <a href=\"$path/calendar/calendar_index.php?action=edit_template&template_id=$id\">
+            <img src=\"$ico_edit\" />
+          </a>
+        </td>
         <td>".button_to('[delete]', "$path/calendar/calendar_index.php?action=delete_template&template_id=$id", 'delete')."</td>
         <td>
           <form id=\"duplicateButtonForm$id\" method=\"post\" action=\"$path/calendar/calendar_index.php?action=duplicate_template&template_id=$id\" class=\"buttonTo\">
