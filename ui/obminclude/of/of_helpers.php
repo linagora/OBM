@@ -27,18 +27,22 @@
  * 
  * @param $label button label
  * @param $url form action url
+ * @param $btn_class CSS class given to the button itself
  * @param $confirm_msg if set to a string, a JS confirm popup will be displayed
  * @access public
  * @return string
  */
-function button_to($label, $url, $confirm_msg = false)
+function button_to($label, $url, $btn_class = false, $confirm_msg = false)
 {
     if (is_string($confirm_msg)) {
-      $confirm_msg = "onclick=\"return confirm('".phpStringToJsString($confirm_msg)."');\"";
+      $confirm_msg = " onclick=\"return confirm('".phpStringToJsString($confirm_msg)."');\"";
+    }
+    if (is_string($btn_class)) {
+      $btn_class = " class=\"$btn_class\"";
     }
     return "<form method=\"post\" action=\"$url\" class=\"buttonTo\">
         <div>
-          <input type=\"submit\" value=\"$label\"$confirm_msg />
+          <input type=\"submit\" value=\"$label\"{$btn_class}{$confirm_msg} />
         </div>
       </form>";
 }

@@ -638,8 +638,9 @@ if ($action == 'search') {
   else {
     $display['msg'] .= display_err_msg($err['msg']);
   }
-	$tags_q = run_query_calendar_get_alltags($obm['uid']) ;
+  $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
   $display['detail'] .= dis_calendar_admin_index($tags_q);
+  
 } elseif ($action == 'tag_insert')  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_tag_form($params)) {
@@ -653,8 +654,9 @@ if ($action == 'search') {
   else {
     $display['msg'] .= display_err_msg($err['msg']);
   }
-	$tags_q = run_query_calendar_get_alltags($obm['uid']) ;
+  $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
   $display['detail'] .= dis_calendar_admin_index($tags_q);
+  
 } elseif ($action == 'tag_delete')  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_tag_delete($obm['uid'], $params);
@@ -705,6 +707,28 @@ if ($action == 'search') {
   
 } elseif ($action == 'list_templates')  {
 ///////////////////////////////////////////////////////////////////////////////
+  $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
+  $display['detail'] = dis_calendar_templates_list($templates_q);
+  
+} elseif ($action == 'duplicate_template')  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_calendar_duplicate_template($params['template_id'], $params['template_name']);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_template : $l_duplicate_ok");
+  } else {
+    $display['msg'] .= display_ok_msg("$l_template : $l_duplicate_error");
+  }
+  $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
+  $display['detail'] = dis_calendar_templates_list($templates_q);
+  
+} elseif ($action == 'delete_template')  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_calendar_delete_template($params['template_id']);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_template : $l_delete_ok");
+  } else {
+    $display['msg'] .= display_err_msg("$l_template : $l_delete_error");
+  }
   $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
   $display['detail'] = dis_calendar_templates_list($templates_q);
 
@@ -1507,6 +1531,18 @@ function get_calendar_action() {
   
   // Save as template
   $actions['calendar']['save_as_template'] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+  
+  // Duplicate template
+  $actions['calendar']['duplicate_template'] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+  
+  // Delete template
+  $actions['calendar']['delete_template'] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );

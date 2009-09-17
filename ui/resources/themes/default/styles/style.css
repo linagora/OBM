@@ -657,11 +657,19 @@ input.box {
 }
 
 .buttonTo input {
-  background: transparent url('../images/ico_trash.gif') no-repeat;
+  background-color: transparent;
+  background-repeat: no-repeat;
   border: none;
   color: transparent;
   cursor: pointer;
   width:16px;
+}
+
+.buttonTo input.delete {
+  background-image: url('../images/ico_trash.gif');
+}
+.buttonTo input.duplicate {
+  background-image: url('../images/ico_add.gif');
 }
 
 /* ------------------------------------------------------------------------- */

@@ -5049,12 +5049,13 @@ function dis_calendar_admin_index($tags_q) {
 }
 
 function dis_calendar_templates_list($templates_q) {
-  global $l_name;
+  global $ico_popup_close, $l_name, $l_duplicate_template, $l_template_name,
+    $l_validate, $l_cancel, $l_copy_of;
   
   $block = "<div class=\"detail admin\">
     <table>
       <thead>
-        <tr><td>$l_name</td><td>&nbsp;</td></tr>
+        <tr><td>$l_name</td><td>&nbsp;</td><td>&nbsp;</td></tr>
       </thead>
       <tbody>
       ";
@@ -5063,11 +5064,37 @@ function dis_calendar_templates_list($templates_q) {
     $name = $templates_q->f('eventtemplate_name');
     $block.= "<tr>
         <td>$name</td>
-        <td>".button_to('[delete]', "$path/calendar/calendar_index.php?action=delete_template&template_id=$id")."</td>
+        <td>".button_to('[delete]', "$path/calendar/calendar_index.php?action=delete_template&template_id=$id", 'delete')."</td>
+        <td>
+          <form id=\"duplicateButtonForm$id\" method=\"post\" action=\"$path/calendar/calendar_index.php?action=duplicate_template&template_id=$id\" class=\"buttonTo\">
+            <div>
+              <input type=\"submit\" class=\"duplicate\" value=\"[duplicate]\" onclick=\"displayTemplateDuplicate(this.form, '$l_copy_of $name'); return false;\" />
+            </div>
+          </form>
+        </td>
       </tr>";
   }
   $block.= "</tbody>
       </table>
+    </div>
+    <div id=\"duplicateTemplatePopup\" class=\"obmPopup\">
+      <h1>
+        <a href=\"\" class=\"closeSticky\" onclick=\"return false;\">
+          <img src=\"$ico_popup_close\" alt=\"close\" />
+        </a>
+        <span>$l_duplicate_template</span>
+      </h1>
+      <div>
+        <form id=\"duplicateTemplatePopupForm\">
+          <fieldset style=\"border:none;\">
+            $l_template_name : <input type=\"text\" maxlength=\"255\" name=\"name\" />
+          </fieldset>
+          <fieldset class=\"buttons\">
+            <input class=\"button closeSticky\" type=\"submit\" value=\"$l_validate\" />
+            <input class=\"button closeSticky\" onclick=\"return false;\" type=\"submit\" value=\"$l_cancel\" />
+          </fieldset>
+        </form>
+      </div>
     </div>";
   
   return $block;

@@ -2152,6 +2152,100 @@ function run_query_calendar_get_template($template_id) {
   return array($obm_q, $entities);
 }
 
+/**
+ * Duplicate an event template
+ * 
+ * @param $template_id
+ * @param $duplicate_name
+ * @access public
+ * @return integer duplicate ID
+ */
+function run_query_calendar_duplicate_template($template_id, $duplicate_name) {
+  global $cdg_sql;
+  
+  $query = "INSERT INTO EventTemplate (
+    eventtemplate_name,
+    eventtemplate_timeupdate,                         
+    eventtemplate_timecreate,                         
+    eventtemplate_usercreate,
+    eventtemplate_owner,
+    eventtemplate_title, 
+    eventtemplate_date,     
+    eventtemplate_description,
+    eventtemplate_properties,
+    eventtemplate_location, 
+    eventtemplate_category1_id,
+    eventtemplate_priority,
+    eventtemplate_privacy, 
+    eventtemplate_duration,
+    eventtemplate_repeatkind,
+    eventtemplate_repeatfrequence,
+    eventtemplate_repeatdays,
+    eventtemplate_allday,
+    eventtemplate_tag_id, 
+    eventtemplate_allow_documents,
+    eventtemplate_alert,
+    eventtemplate_endrepeat,
+    eventtemplate_domain_id,
+    eventtemplate_user_ids,
+    eventtemplate_contact_ids,
+    eventtemplate_resource_ids,
+    eventtemplate_group_ids,
+    eventtemplate_document_ids) 
+    SELECT 
+    '$duplicate_name',
+    NOW(),
+    NOW(),
+    eventtemplate_usercreate,
+    eventtemplate_owner,
+    eventtemplate_title, 
+    eventtemplate_date,     
+    eventtemplate_description,
+    eventtemplate_properties,
+    eventtemplate_location, 
+    eventtemplate_category1_id,
+    eventtemplate_priority,
+    eventtemplate_privacy, 
+    eventtemplate_duration,
+    eventtemplate_repeatkind,
+    eventtemplate_repeatfrequence,
+    eventtemplate_repeatdays,
+    eventtemplate_allday,
+    eventtemplate_tag_id, 
+    eventtemplate_allow_documents,
+    eventtemplate_alert,
+    eventtemplate_endrepeat,
+    eventtemplate_domain_id,
+    eventtemplate_user_ids,
+    eventtemplate_contact_ids,
+    eventtemplate_resource_ids,
+    eventtemplate_group_ids,
+    eventtemplate_document_ids
+    FROM EventTemplate 
+    WHERE eventtemplate_id = $template_id";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_duplicate_template()');
+  $obm_q = new DB_OBM;
+  return $obm_q->query($query);
+}
+
+/**
+ * Delete an event template
+ * 
+ * @param $template_id
+ * @access public
+ * @return void
+ */
+function run_query_calendar_delete_template($template_id) {
+  global $cdg_sql;
+  
+  $template_id = (int) $template_id;
+  $query = "DELETE FROM EventTemplate WHERE eventtemplate_id = $template_id";
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete_template()');
+  $obm_q = new DB_OBM;
+  return $obm_q->query($query);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the event can be accessed
@@ -4250,9 +4344,7 @@ function run_query_tag_update($uid, $params) {
       SET eventtag_label = '$taglabel', eventtag_color = '$tagcolor' 
       WHERE eventtag_id = $tagid AND eventtag_user_id = $uid ;" ;
 
-  $obm_q->query($query) ;
-  
-  return $obm_q ;
+  return $obm_q->query($query) ;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4293,9 +4385,7 @@ function run_query_tag_insert($uid, $params) {
               VALUES ('$taglabel', '$tagcolor', $uid) ;" ;
   }
   
-  $obm_q->query($query) ;
-  
-  return $obm_q ;
+  return $obm_q->query($query) ;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4311,9 +4401,8 @@ function run_query_tag_delete($uid, $params) {
   
   $query = "DELETE FROM EventTag 
             WHERE eventtag_id = $tagid AND eventtag_user_id = $uid" ;
-  $obm_q->query($query) ;
   
-  return $obm_q ;
+  return $obm_q->query($query) ;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

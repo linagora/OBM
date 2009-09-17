@@ -588,6 +588,22 @@ function setTemplateName(templateForm) {
   eventForm.submit();
 }
 
+function displayTemplateDuplicate(btnForm, initialNameValue) {
+  obm.popup.popups.erase('duplicateTemplatePopup');
+  var popupForm = $('duplicateTemplatePopupForm');
+  var input = popupForm.getElement('input[name=name]');
+  popupForm.addEvent('submit', function() {
+    var templateName = input.value;
+    btnForm.adopt(new Element('input').setProperty('type', 'hidden').setProperty('name', 'tf_template_name').setProperty('value', templateName));
+    btnForm.submit();
+    return false;
+  });
+  input.value = initialNameValue;
+  obm.popup.show('duplicateTemplatePopup');
+  input.focus();
+  input.select();
+}
+
 /////////////////////////////////////////////////////////////////////////////
 function setEventsColors(entity, entity_id, klass) {
   var req = new Request({
