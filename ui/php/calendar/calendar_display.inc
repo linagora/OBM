@@ -5057,13 +5057,13 @@ function dis_calendar_templates_list($templates_q) {
       <thead>
         <tr><td>$l_name</td><td>&nbsp;</td><td>&nbsp;</td></tr>
       </thead>
-      <tbody>
+      <tbody style=\"text-align: left;\">
       ";
   while ($templates_q->next_record()) {
     $id = $templates_q->f('eventtemplate_id');
     $name = $templates_q->f('eventtemplate_name');
     $block.= "<tr>
-        <td>$name</td>
+        <td><span class=\"editable\" rel=\"$id\">$name</span></td>
         <td>".button_to('[delete]', "$path/calendar/calendar_index.php?action=delete_template&template_id=$id", 'delete')."</td>
         <td>
           <form id=\"duplicateButtonForm$id\" method=\"post\" action=\"$path/calendar/calendar_index.php?action=duplicate_template&template_id=$id\" class=\"buttonTo\">
@@ -5095,7 +5095,12 @@ function dis_calendar_templates_list($templates_q) {
           </fieldset>
         </form>
       </div>
-    </div>";
+    </div>
+    <script type=\"text/javascript\">
+      obm.initialize.chain(function () {
+        new obm.InPlaceEditor('$path/calendar/calendar_index.php?action=set_template_name');
+      });
+    </script>";
   
   return $block;
 }

@@ -2230,6 +2230,23 @@ function run_query_calendar_duplicate_template($template_id, $duplicate_name) {
 }
 
 /**
+ * Update the name of an event template
+ * 
+ * @param $template_id, $new_name
+ * @access public
+ * @return void
+ */
+function run_query_calendar_set_template_name($template_id, $new_name) {
+  global $obm;
+  
+  $template_id = (int) $template_id;
+  $query = "UPDATE EventTemplate SET eventtemplate_name = '$new_name' 
+    WHERE eventtemplate_id = $template_id AND eventtemplate_usercreate = $obm[uid]";
+  $obm_q = new DB_OBM;
+  return $obm_q->query($query);
+}
+
+/**
  * Delete an event template
  * 
  * @param $template_id

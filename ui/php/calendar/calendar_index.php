@@ -96,6 +96,7 @@ $extra_css[] = $css_ext_color_picker ;
 $extra_js_include[] = 'date.js';
 $extra_js_include[] = 'calendar.js';
 $extra_js_include[] = 'colorchooser.js';
+$extra_js_include[] = 'inplaceeditor.js';
 
 $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
 
@@ -720,6 +721,17 @@ if ($action == 'search') {
   }
   $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
   $display['detail'] = dis_calendar_templates_list($templates_q);
+  
+} elseif ($action == 'set_template_name')  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_calendar_set_template_name($params['id'], $params['content']);
+  if ($retour) {
+    echo $params['content'];  
+  } else {
+    header('HTTP/1.x 500');
+    echo 'Error on setting template name';   
+  }
+  exit();
   
 } elseif ($action == 'delete_template')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -1537,6 +1549,12 @@ function get_calendar_action() {
   
   // Duplicate template
   $actions['calendar']['duplicate_template'] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+  
+  // Set template name
+  $actions['calendar']['set_template_name'] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );
