@@ -381,6 +381,14 @@ sub _init {
             $userDesc->{'userobm_samba_flags'} = '[UX]';
 
             # User home share
+            if( $userDesc->{'userobm_samba_home_drive'} ) {
+                $userDesc->{'userobm_samba_home_drive'} =~ s/\s//g;
+                if( $userDesc->{'userobm_samba_home_drive'} !~ /^[D-Z]$/ ) {
+                    delete( $userDesc->{'userobm_samba_home_drive'} );
+                    $self->_log( 'lettre du lecteur windows personnel incorrecte pour l\'utilisateur '.$userDesc->{'userobm_login'} );
+                }
+            }
+
             if( !$userDesc->{'userobm_samba_home_drive'} || !$userDesc->{'userobm_samba_home'} ) {
                 delete( $userDesc->{'userobm_samba_home_drive'} );
                 delete( $userDesc->{'userobm_samba_home'} );
