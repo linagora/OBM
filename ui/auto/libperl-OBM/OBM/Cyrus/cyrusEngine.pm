@@ -63,7 +63,6 @@ sub DESTROY {
 
 sub _doWork {
     my $self = shift;
-    my $returnCode = 1;
 
     my $entity = $self->{'currentEntity'};
     if( !defined($entity) ) {
@@ -80,31 +79,31 @@ sub _doWork {
 
     }elsif( $isExist && $entity->getDelete() ) {
         # On la supprime
-        $returnCode = $self->_deleteBox();
-        if( $returnCode ) {
+        if( $self->_deleteBox() ) {
             $self->_log( 'echec lors de la suppression de la boite', 2 );
             return 1;
         }
 
+    }elsif( !$isExist && $entity->getDelete() ) {
+        $self->_log( 'boite deja supprimee', 2 );
+
     }elsif( $isExist && !$entity->getDelete() ) {
         # On met à jour
-        $returnCode = $self->_updateMailbox();
-        if( $returnCode ) {
+        if( $self->_updateMailbox() ) {
             $self->_log( 'echec lors de la MAJ de la boite', 2 );
             return 1;
         }
 
     }elsif( !$isExist && !$entity->getDelete() ) {
         # On la crée
-        $returnCode = $self->_createMailbox();
-        if( $returnCode ) {
+        if( $self->_createMailbox() ) {
             $self->_log( 'echec lors de la creation/renommage de la boite', 2 );
             return 1;
         }
 
     }
 
-    return $returnCode;
+    return 0;
 }
 
 
