@@ -562,3 +562,18 @@ function last_visit_calendar_view() {
   }
   window.location=url;
 }
+
+function refreshWaitEvent() {
+  new Request.JSON({
+        url: '/calendar/calendar_index.php',
+        secure: false,
+        async: true,
+        onComplete: function(response) {
+            var elem = $('bannerWaitingEvent');
+            if(elem){
+              elem.set('text',response.msg);
+              //setTimeout(refreshWaitEvent,30000);
+            }
+        }
+  }).post({ajax : 1,action : 'get_json_waiting_events'});
+}

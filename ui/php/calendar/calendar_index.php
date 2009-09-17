@@ -880,6 +880,11 @@ if (!$params['ajax']) {
   echo "({".$display['json']."})";
   exit();
 
+} elseif($action == 'get_json_waiting_events') {
+  get_json_waiting_events($obm['uid']);
+  echo '('.$display['json'].')';
+  exit();
+
 } elseif ($action == 'perform_meeting')  {
 ///////////////////////////////////////////////////////////////////////////////
   dis_calendar_free_interval($params);
@@ -1480,6 +1485,13 @@ function get_calendar_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None')
   );
+  
+  // Get JSON waiting event 
+  $actions['calendar']['get_json_waiting_events'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=get_json_waiting_events",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+                                                 );
   
   // Document add
   $actions['calendar']['document_add'] = array (

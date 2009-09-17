@@ -33,6 +33,7 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
   private $id;
   private $title;
   private $owner;
+  private $opacity;
   private $allday;
   private $location;
   private $category1;
@@ -430,6 +431,7 @@ class OBM_EventFactory /*Implements OBM_Subject*/{
     $event = new OBM_Event($id);
     $event->title = $this->db->f('event_title');
     $event->owner = new OBM_EventAttendee($this->db->f('userobm_id'), null, $this->db->f('userobm_firstname').' '.$this->db->f('userobm_lastname')) ;
+    $event->opacity = $this->db->f('event_opacity');
     $event->location = $this->db->f('event_location');
     $event->category1 = $this->db->f('event_category1_id');
     $event->privacy = $this->db->f('event_privacy');

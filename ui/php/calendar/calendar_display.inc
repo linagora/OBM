@@ -2582,6 +2582,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week,$l_desc,$l_high;
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_state, $l_user;
   global $l_change_state,$l_groups,$l_all_day,$l_every,$l_owner;
+  global $l_opacity, $l_opacity_free, $l_opacity_busy;
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_none, $c_none; 
   global $l_wait, $l_exception, $l_yes, $l_no, $path;
   global $l_carac,$l_module_calendar, $l_items, $ccalendar_alerts;
@@ -2649,6 +2650,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   }     
   $privacy = $event_q->f('event_privacy') == 1? $l_yes : $l_no;
   
+  if($event_q->f('event_opacity') == "OPAQUE"){
+    $opacity = $l_opacity_busy;
+  } else {
+    $opacity = $l_opacity_free;
+  }
+
   $allow_documents = ($event_q->f('event_allow_documents') == 1);
   
   if ($event_q->f('event_repeatkind') != 'none') {
@@ -3019,6 +3026,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
      <th>$l_priority :</th>
      <td>$priority</td>
     </tr>
+    <tr>
+      <th>$l_opacity :</th>
+      <td>$opacity</td>
+    </tr>
    </table>
    </div>
   $repeat_block
@@ -3316,6 +3327,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_users, $l_attendees, $l_title, $l_location, $l_priority, $l_private, $l_desc;
   global $l_items, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_owner;
+  global $l_opacity, $l_opacity_free, $l_opacity_busy;
   global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
   global $l_none,$l_force,$l_repeat_update,$l_groups,$l_force_disabled;
@@ -3340,6 +3352,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');
     $owner_firstname = $event_q->f('owner_firstname');
+    $opacity = $event_q->f('event_opacity');
     $priority = $event_q->f('event_priority');
     $properties = $event_q->f('event_properties');
     $desc = $event_q->f('event_description');
@@ -3417,6 +3430,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['repeat_end'])) $repeat_end = $calendar['repeat_end'];
   if (isset($calendar['force'])) { $force = $calendar['force']; }
   if (isset($calendar['force_disabled'])) { $force_disabled = $calendar['force_disabled']; }
+  if (isset($calendar['opacity'])) { $opacity = $calendar['opacity']; }
   if ($repeat_kind != 'weekly') {
     $repeat_days = '000000';
     $repeatDaysDisplay = 'none';
@@ -3452,6 +3466,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if ($tagid == '') {
     $tagid = $c_none ;
     $tagcolor = "#eff0f2" ;
+  }
+
+  if($opacity == 'TRANSPARENT'){
+    $l_check_free = "checked='checked'";
+  } else {
+    $l_check_busy = "checked='checked'";
   }
 
   $dis_attendees_notification = "
@@ -4055,7 +4075,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <tr>
     <th><label for=\"cba_all_day\">$l_all_day</label></th>
     <td>
-      <input onchange=\"show_hide_calendar_dates(this)\" onclick=\"show_hide_calendar_dates(this)\" type=\"checkbox\" id=\"cba_all_day\" name=\"cba_all_day\" value=\"1\" $all_day_checked />
+      <input onchange=\"show_hide_calendar_dates(this)\" onclick=\"show_hide_calendar_dates(this);\" type=\"checkbox\" id=\"cba_all_day\" name=\"cba_all_day\" value=\"1\" $all_day_checked />
     </td>
   </tr>   
   <tr>
@@ -4071,6 +4091,19 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <input type=\"text\" name=\"tf_date_end\" id=\"tf_date_end\" value=\"".$end->getInputDate()."\" class=\"datePicker\" onkeypress=\"repeatEndAuto=false;\" />
       <span id=\"hour_end\" style=\"$style\"  class=\"NW\">$l_hour : $dis_hour_e : $dis_min_e</span>
     </td>       
+  </tr>
+  <tr>
+    <th>$l_opacity</th>
+    <td>
+      <span class=\"NW\">
+        <input type=\"radio\" name=\"rd_opacity\" id=\"rd_opacity_busy\" $l_check_busy value=\"OPAQUE\" />
+        $l_opacity_busy
+      </span>
+      <span class=\"NW\">
+        <input type=\"radio\" name=\"rd_opacity\" id=\"rd_opacity_free\" $l_check_free value=\"TRANSPARENT\" />
+        $l_opacity_free
+      </span>
+    </td>
   </tr>
   <tr>
     <th>&nbsp</th>
@@ -4189,7 +4222,7 @@ function html_calendar_waiting_events($obm_wait) {
    
   $owner_notification = "checked";
   if (isset($_GET['owner_notification'])) {$owner_notification =  ($_GET['owner_notification'] == "true" ? "checked":"");}
-
+  
   $block = "<div class=\"detail\">
       <input type=\"checkbox\" id=\"owner_notification\" $owner_notification /><label for=\"owner_notification\">$GLOBALS[l_owner_notification]</label>
   </div>";
@@ -4286,6 +4319,7 @@ function html_calendar_waiting_events($obm_wait) {
   if($block != '') {
     $block .= '</tbody></table>';
   }
+  
   return $block;
 }
 

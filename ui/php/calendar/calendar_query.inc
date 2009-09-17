@@ -39,6 +39,7 @@ function run_query_calendar_detail($calendar_id) {
     event_owner,
     o.userobm_lastname AS owner_lastname,
     o.userobm_firstname AS owner_firstname,
+    event_opacity,
     event_title,
     event_description,
     event_properties,
@@ -501,6 +502,38 @@ function run_query_calendar_waiting_events() {
   return $obm_q;
 }
 
+function get_json_waiting_events($id) {
+  global $obm, $cdg_sql, $display;
+  global $l_waiting_events;
+
+  $multidomain = sql_multidomain('event');
+  $obm_q = new DB_OBM;
+
+  $query = "
+    SELECT count(event_id) as nb_event
+    FROM Event
+    INNER JOIN EventLink ON event_id  = eventlink_event_id
+    INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+    INNER JOIN UserObm attendee ON userentity_user_id = attendee.userobm_id
+    INNER JOIN UserObm u ON event_owner = u.userobm_id
+    WHERE
+    event_type='VEVENT'
+    AND eventlink_state = 'NEEDS-ACTION'
+    AND userentity_user_id = $id
+    ";
+
+  $obm_q->query($query);
+  if ($obm_q->num_rows() == 1) {
+    $obm_q->next_record();
+    $nb_event = $obm_q->f('nb_event');
+    if($nb_event != 0) {
+      $display['json'] = "{msg : '".phpStringToJsString($l_waiting_events.' : '.$nb_event)."'}";
+    } else {
+      $display['json'] = "{msg : '".phpStringToJsString($l_waiting_events.' : 0')."'}";
+    }
+
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Delete all participation to an event
@@ -701,6 +734,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $event_tag_id = run_query_calendar_create_or_update_tag($calendar);
   
   if ($calendar['allow_documents'] != 1) $allow_documents = 0; else $allow_documents = 1; 
+  $opacity = $calendar['opacity'];
   $property_name = $calendar['property-name'];
   if (is_array($res_name)) {
     foreach($res_name as $key=>$res) {
@@ -752,6 +786,7 @@ function run_query_calendar_insert_event_data($calendar) {
     event_origin,
     event_owner,
     event_timezone,
+    event_opacity,
     event_title, 
     event_date,     
     event_description,
@@ -777,7 +812,8 @@ function run_query_calendar_insert_event_data($calendar) {
     'VEVENT',
     '$GLOBALS[c_origin_web]',
     '$owner',
-    '".Of_Date::getOption('timezone')."', 
+    '".Of_Date::getOption('timezone')."',
+    '$opacity', 
     '$title',
     '$datebegin',
     '$description',
@@ -1034,10 +1070,15 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   if(!$calendar['all_day']) {
     $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $calendar['date_end']);
   }
-  if(isset($calendar['calendar_id']) && !is_null($occurrences)) {
-    $event_id = $calendar["calendar_id"];
+
+  if( !is_null($occurrences)) {
+    if(isset($calendar['calendar_id'])) {
+      $event_id = $calendar["calendar_id"];
+    } else {
+      $event_id = NULL;
+    }
     foreach($occurrences as $occurrence) {
-      if($occurrence->event->id != $event_id) {
+      if($occurrence->event->id != $event_id && $occurrence->event->isOpaque()) {
         $oc[] = $occurrence;
       }
     }
@@ -1077,13 +1118,13 @@ function quick_check_calendar_conflict($calendar, $entities) {
   if(!is_null($occurrences)) {
     if(isset($calendar['calendar_id'])) {
       $event_id = $calendar["calendar_id"];
-      foreach($occurrences as $occurrence) {
-        if($occurrence->event->id != $event_id) {
-          return true;
-        }
+    } else {
+      $event_id = NULL;
+    }
+    foreach($occurrences as $occurrence) {
+      if($occurrence->event->id != $event_id && $occurrence->event->isOpaque()) {
+        return true;
       }
-    } elseif (count($occurrences) > 0) {
-      return true;
     }
   }
   return false;
@@ -1149,10 +1190,15 @@ function check_calendar_decision_conflict($calendar) {
 
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
-  if (isset($calendar['calendar_id']) && !is_null($occurrences)) {
+  if (!is_null($occurrences)) {
+    if(isset($calendar['calendar_id'])) {
+      $event_id = $calendar["calendar_id"];
+    } else {
+      $event_id = NULL;
+    }
     $event_id = $calendar['calendar_id'];
     foreach($occurrences as $occurrence) {
-      if ($occurrence->event->id != $event_id) {
+      if ($occurrence->event->id != $event_id && $occurrence->event->isOpaque()) {
         $oc[] = $occurrence;
       }
     }
@@ -1359,7 +1405,6 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_update_event_data($calendar) {
   global $cdg_sql, $obm, $c_none;
-
   $title = sql_parse_text($calendar['title']);
   if (is_numeric($calendar['owner']) && $calendar['owner'] >= 0) {
     $owner = "event_owner = $calendar[owner],";
@@ -1390,6 +1435,7 @@ function run_query_calendar_update_event_data($calendar) {
   $res_id = $calendar['res-id'];
   $property = $calendar['property'];
   $property_name = $calendar['property-name'];
+  $opacity = $calendar['opacity'];
   if (is_array($res_name)) {
     foreach($res_name as $key=>$res) {
       $properties .= "<resource>
@@ -1446,6 +1492,7 @@ function run_query_calendar_update_event_data($calendar) {
       event_category1_id = $category1_id,
       event_priority = '$priority',
       event_privacy = '$privacy', 
+      event_opacity = '$opacity', 
       event_duration = '$event_duration',
       event_allday = $all_day, 
       event_tag_id = $event_tag_id,
@@ -2720,7 +2767,7 @@ function check_calendar_data_form($calendar) {
   $event_duration = $calendar['event_duration'];
   ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
   $others_attendees = $calendar['others_attendees'];
-
+  
   if (trim($title) == '') {
     $err['msg'] = $l_fill_title;
     return false;
@@ -3052,6 +3099,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     userobm_lastname,
     userobm_firstname,
     event_timezone,
+    event_opacity,
     eventlink_state,
     eventcategory1_label,
     event_date,
@@ -3207,6 +3255,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     userobm_lastname,
     userobm_firstname,
     event_timezone,
+    event_opacity,
     eventlink_state,
     event_repeatdays,
     eventtag_color AS event_color,
@@ -3502,6 +3551,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $owner = $nr_q->f('event_owner');
     $owner_name = $nr_q->f('userobm_lastname').' '.$nr_q->f('userobm_firstname');
     $timezone = $nr_q->f('event_timezone');
+    $opacity = $nr_q->f('event_opacity');
     $tag = $nr_q->f('eventtag_id');
     if (isset($of->events[$id])) {
       $event = $of->events[$id];
@@ -3509,7 +3559,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
         $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
       }
     } else {
-      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color, $tag);
+      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color,$opacity);
       $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
     }
   }
@@ -3539,6 +3589,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $owner = $r_q->f('event_owner');
     $owner_name = $r_q->f('userobm_lastname').' '.$r_q->f('userobm_firstname');
     $timezone = $r_q->f('event_timezone');
+    $opacity = $r_q->f('event_opacity');
     $tag = $r_q->f('eventtag_id');
     if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
       $endrepeat = $end;
@@ -3550,7 +3601,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
         $addOcc = false;
       }
     } else {
-      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color, $tag);
+      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color,$opacity);
       $event->setTimezone($timezone);
     }
     $tz = new DateTimeZone($timezone);
@@ -4352,6 +4403,7 @@ Class Event {
   var $properties;
   var $attendee;
   var $repeat;
+  var $opacity;
   var $all_day;
   var $owner;
   var $owner_name;
@@ -4378,7 +4430,7 @@ Class Event {
    * @access public
    * @return void
    */
-  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color, $tag) {
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color,$opacity) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
@@ -4393,6 +4445,7 @@ Class Event {
     $this->owner = $owner;
     $this->owner_name = $owner_name;
     $this->color = $color;
+    $this->opacity = $opacity;
     $this->tag = $tag;
   }
 
@@ -4433,6 +4486,20 @@ Class Event {
 
   function isAllDay() {
     return ($this->all_day == 1);
+  }
+  
+  /**
+   *isOpaque
+   *
+   * @access public
+   * @return bool
+   */
+  public function isOpaque() {
+    $retour = false;
+    if($this->opacity == 'OPAQUE'){
+      $retour = true;
+    }
+    return $retour;
   }
 
   /**
@@ -4896,27 +4963,29 @@ function build_json_event($ocs, $json_evts) {
 
   if (is_array($ocs)) {
     foreach($ocs as $oc) {
-      $date = $oc->date;
-      $begin = clone $date;
-      $end = clone $date;
-      $end->addTimestamp($oc->event->duration); 
-      $evt = "{event:{";
-      $title = $oc->event->title;
-      $entity = $oc->entity;
-      $entity_id = $oc->id;
-      if (!is_array($json_evts[$entity][$entity_id])) $json_evts[$entity][$entity_id] = array();
-      if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
-        $title = $GLOBALS['l_private'];
+      if($oc->event->isOpaque()) {
+        $date = $oc->date;
+        $begin = clone $date;
+        $end = clone $date;
+        $end->addTimestamp($oc->event->duration); 
+        $evt = "{event:{";
+        $title = $oc->event->title;
+        $entity = $oc->entity;
+        $entity_id = $oc->id;
+        if (!is_array($json_evts[$entity][$entity_id])) $json_evts[$entity][$entity_id] = array();
+        if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
+          $title = $GLOBALS['l_private'];
+        }
+        $evt .= "begin:'".$begin->getTimestamp()."',";
+        $evt .= "end:'".$end->getTimestamp()."',";
+        $evt .= "title:'".phpStringToJsString($title)."',";
+        $evt .= "meeting:".($oc->event->isMeeting()?'true':'false').",";
+        $evt .= "private:".($oc->event->isPrivate()?'true':'false').",";
+        $evt .= "allday:".($oc->event->isAllDay()?'true':'false').",";
+        $evt .= "periodic:".($oc->event->isPeriodic()?'true':'false')."";
+        $evt .= "}}";
+        array_push($json_evts[$entity][$entity_id], $evt);
       }
-      $evt .= "begin:'".$begin->getTimestamp()."',";
-      $evt .= "end:'".$end->getTimestamp()."',";
-      $evt .= "title:'".phpStringToJsString($title)."',";
-      $evt .= "meeting:".($oc->event->isMeeting()?'true':'false').",";
-      $evt .= "private:".($oc->event->isPrivate()?'true':'false').",";
-      $evt .= "allday:".($oc->event->isAllDay()?'true':'false').",";
-      $evt .= "periodic:".($oc->event->isPeriodic()?'true':'false')."";
-      $evt .= "}}";
-      array_push($json_evts[$entity][$entity_id], $evt);
     }
   }
   return $json_evts;
