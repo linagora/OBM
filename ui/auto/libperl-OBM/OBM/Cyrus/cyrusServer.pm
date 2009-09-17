@@ -11,6 +11,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+require OBM::Parameters::regexp;
+
 
 sub new {
     my $class = shift;

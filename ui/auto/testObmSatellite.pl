@@ -84,6 +84,17 @@ sub run {
                 }
                 last SWITCH;
             }
+
+            if( $paramName =~ /^cyruspartitionsadd$/i ) {
+                if( $self->cyrusPartitionConf() ) {
+                    $self->_log( 'probleme lors de la mise à jour des partitions cyrus', 0 );
+                    print STDERR 'probleme lors de la mise à jour des partitions cyrus'."\n";
+                }else {
+                    $self->_log( 'Mise a jour des partition Cyrus réussi', 0 );
+                    print STDERR 'Mise a jour des partition Cyrus réussi'."\n";
+                }
+                last SWITCH;
+            }
         }
     }
 
@@ -106,19 +117,19 @@ sub getParameter {
                 last SWITCH;
             }
 
-            if( $paramName eq /^smtpoutconf$/i ) {
+            if( $paramName =~ /^smtpoutconf$/i ) {
                 $self->_log( 'Mise a jour des tables Postfix des serveurs SMTP-out', 2 );
                 $goodParams++;
                 last SWITCH;
             }
 
-            if( $paramName eq /^cyruspartitionsadd$/i ) {
+            if( $paramName =~ /^cyruspartitionsadd$/i ) {
                 $self->_log( 'Mise a jour (ajout) des partitions Cyrus', 2 );
                 $goodParams++;
                 last SWITCH;
             }
 
-            if( $paramName eq /^cyruspartitionsdel$/i ) {
+            if( $paramName =~ /^cyruspartitionsdel$/i ) {
                 $self->_log( 'Mise a jour (suppression) des partitions Cyrus', 2 );
                 $goodParams++;
                 last SWITCH;
@@ -164,7 +175,7 @@ sub smtpInConf {
     my $dbHandler = $self->{'dbHandler'};
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
         $self->_log( 'chargement des Ids de domaines depuis la BD impossible', 3 );
-        return 0;
+        return 1;
     }
 
     while( my $domainId = $sth->fetchrow_hashref() ) {
@@ -176,4 +187,36 @@ sub smtpInConf {
     }
 
     return 0;
+}
+
+
+sub cyrusPartitionConf {
+    my $self = shift;
+
+    require OBM::Cyrus::cyrusRemoteEngine;
+    my $imapUpdater = OBM::Cyrus::cyrusRemoteEngine->instance();
+    if( !defined($imapUpdater) ) {
+        return 1;
+    }
+
+    my $query = 'SELECT host.host_id
+                    FROM Host host
+                    INNER JOIN ServiceProperty ON CAST(serviceproperty_value AS UNSIGNED)=host_id AND serviceproperty_service=\'mail\' AND serviceproperty_property=\'imap\'';
+
+    my $sth;
+    my $dbHandler = $self->{'dbHandler'};
+    if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+        $self->_log( 'chargement des Ids de erveur IMAP depuis la BD impossible', 3 );
+        return 1;
+    }
+
+    my $errorCode = 0;
+    while( my $imapSrvId = $sth->fetchrow_hashref() ) {
+        require OBM::Cyrus::cyrusServer;
+        if( $imapUpdater->addCyrusPartition( OBM::Cyrus::cyrusServer->new( $imapSrvId->{'host_id'} ) ) ) {
+            $errorCode = 1;
+        }
+    }
+
+    return $errorCode;
 }
