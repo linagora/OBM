@@ -551,6 +551,8 @@ function disable(id){
 }
 
 function submitResetExportForm(){
+  disable('bt_submit');
+  disable('bt_cancel');
   $('export_action').setProperty('value','reset');
   $('export_popup').setProperty('value','0');
   $('export_force').setProperty('value','1');

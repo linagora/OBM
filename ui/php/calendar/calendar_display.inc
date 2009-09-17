@@ -5044,7 +5044,7 @@ function dis_calendar_templates_list($templates_q) {
 // Parameters:
 //   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_export_handle($calendar) {
+function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null) {
   global $obm, $obm_version, $ccalendar_weekstart;
 
   if($calendar['export'] == "date") {
@@ -5062,8 +5062,12 @@ function dis_calendar_export_handle($calendar) {
   
   include_once('obminclude/of/vcalendar/writer/ICS.php');
   include_once('obminclude/of/vcalendar/reader/OBM.php');
-
-  $calendar_user['user'] = array ($obm['uid'] => 'dummy');
+  
+  if ($entity != null && $entity_id != null) {
+    $calendar_user[$entity] = array ($entity_id => 'dummy');
+  } else {
+    $calendar_user['user'] = array ($obm['uid'] => 'dummy');
+  }
   
   $reader = new Vcalendar_Reader_OBM($calendar_user,NULL,$start,$end);
   $document = $reader->getDocument();
@@ -5147,8 +5151,8 @@ function dis_icalendar_export($params) {
         <br/>
       </h2>
       <fieldset class=\"buttons\">
-        <input type=\"submit\" onclick=\"obm.popup.hide('exportPopupCalendar')\" value=\"$l_cancel\"/>
-        <input type=\"submit\" onclick=\"submitResetExportForm();\" value=\"$l_confirm\"/>
+        <input id=\"bt_cancel\" type=\"submit\" onclick=\"obm.popup.hide('exportPopupCalendar')\" value=\"$l_cancel\"/>
+        <input id=\"bt_submit\" type=\"submit\" onclick=\"submitResetExportForm();\" value=\"$l_confirm\"/>
       </fieldset>
     </div>
     ";
