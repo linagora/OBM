@@ -5107,7 +5107,11 @@ function dis_calendar_template_form($action, $params, $template_q, $entity_ids) 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_templates_list($templates_q) {
   global $ico_popup_close, $ico_edit, $l_name, $l_duplicate_template, $l_template_name,
-    $l_validate, $l_cancel, $l_copy_of;
+    $l_validate, $l_cancel, $l_copy_of, $l_no_template;
+  
+  if ($templates_q->num_rows() === 0) {
+    return "<div class=\"detail\"><p class=\"emptyset\">$l_no_template</p></div>";
+  }
   
   $block = "<div class=\"detail admin\">
     <table>

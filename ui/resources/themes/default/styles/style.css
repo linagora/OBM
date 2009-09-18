@@ -672,6 +672,13 @@ input.box {
   background-image: url('../images/ico_add.gif');
 }
 
+p.emptyset {
+  margin: 1em O;
+  padding: 1em;
+  border:1px solid #d2d2d2;
+  font-size: 1.4em;
+}
+
 /* ------------------------------------------------------------------------- */
 /* DatePicker layout */
 /* ------------------------------------------------------------------------- */

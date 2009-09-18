@@ -118,6 +118,7 @@ $l_edit_template = "Modifier le modèle";
 $l_template = "Modèle d'évènement";
 $l_template_name = "Nom du modèle";
 $l_header_templates = "Modèles";
+$l_no_template = "Aucun modèle trouvé.";
 $l_copy_of = "Copie de";
 
 // actions 
