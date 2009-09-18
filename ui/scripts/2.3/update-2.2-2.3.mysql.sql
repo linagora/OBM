@@ -161,6 +161,24 @@ CREATE TABLE `EventTemplate` (
   CONSTRAINT `eventtemplate_userupdate_userobm_id_fkey` FOREIGN KEY (`eventtemplate_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Event exceptions : drop parent_id from Event and add parent_id/child_id in EventException
+--
+ALTER TABLE `EventException` DROP FOREIGN KEY `eventexception_event_id_eventevent_id_fkey`;
+ALTER TABLE `EventException` CHANGE COLUMN eventexception_event_id eventexception_parent_id INT(8) NOT NULL;
+ALTER TABLE `EventException` ADD CONSTRAINT `eventexception_parent_id_event_id_fkey` FOREIGN KEY (`eventexception_parent_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `EventException` ADD COLUMN eventexception_child_id INT(8) DEFAULT NULL AFTER eventexception_parent_id;
+ALTER TABLE `EventException` ADD CONSTRAINT `eventexception_child_id_event_id_fkey` FOREIGN KEY (`eventexception_child_id`) REFERENCES `Event` (`event_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--useless because event_parent_id was not used
+--UPDATE EventException ee
+--SET ee.eventexception_child_id = (
+--    SELECT e.event_id
+--    FROM Event e
+--    WHERE e.event_parent_id = ee.eventexception_parent_id);
+
+ALTER TABLE `Event` DROP COLUMN `event_parent_id`;
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.2->2.3 is completed
 UPDATE ObmInfo SET obminfo_value='2.3.0' WHERE obminfo_name='db_version';

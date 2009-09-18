@@ -2592,6 +2592,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $ico_add, $ico_delete, $ico_spinner;
 
   $id = $event_q->f('event_id');
+  $is_exception = $event_q->f('event_is_exception');
   
   if ($event_q->f('event_privacy') == 0 || 
       $event_q->f('event_owner') == $obm['uid'] ||
@@ -2657,8 +2658,27 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   }
 
   $allow_documents = ($event_q->f('event_allow_documents') == 1);
-  
-  if ($event_q->f('event_repeatkind') != 'none') {
+
+  if ($is_exception) {
+    $parent_event_id = $event_q->f('event_eventexception_parent_id');
+    $parent_event_url = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=$parent_event_id";
+    $show_parent_link = "<a href=\"$parent_event_url\" title=\"$GLOBALS[l_parent_event]\">$GLOBALS[l_show_parent_event]</a>";
+    $repeat_block = "
+    <div class=\"detail infos\">
+     <h1>$l_repeat</h1>
+     <table>   
+      <tr>    
+       <th>$GLOBALS[l_exception] :</th> 
+       <td>$GLOBALS[l_event_is_exception]</td>
+      </tr>
+      <tr>    
+       <th>$GLOBALS[l_parent_event] :</th> 
+       <td>$show_parent_link</td>
+      </tr>
+     </table>
+    </div>";
+
+  } elseif ($event_q->f('event_repeatkind') != 'none') {
     $kind = $GLOBALS['l_'.$event_q->f('event_repeatkind')];
     $kind_unit = $GLOBALS['l_'.$event_q->f('event_repeatkind').'_unit'];
     $repeat_days = $event_q->f('event_repeatdays'); 
@@ -2691,7 +2711,16 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $block_exception_detail = '';
     while($exception_q->next_record()) {
       $date = new Of_Date($exception_q->f('eventexception_date'), 'GMT');
-      $block_exception_detail .= $date->getOutputDate()."<br />";
+      $exception_child_id = $exception_q->f('eventexception_child_id');
+      if ($exception_child_id) {
+        $exception_date = new Of_Date($exception_q->f('eventexception_event_date'), 'GMT');
+        $exception_url = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=$exception_child_id";
+        $exception_link = "<a href=\"$exception_url\">".$exception_date->getOutputDateTime()."</a>";
+        $exception_desc = sprintf($GLOBALS['l_eventexception_moved_to'],$exception_link);
+      } else {
+        $exception_desc = $GLOBALS['l_eventexception_canceled'];
+      }
+      $block_exception_detail .= $date->getOutputDate()." ($exception_desc)<br />";
     }
     $repeat_block = "
     <div class=\"detail infos\">

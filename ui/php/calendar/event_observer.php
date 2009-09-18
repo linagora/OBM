@@ -458,7 +458,7 @@ class OBM_EventFactory /*Implements OBM_Subject*/{
 
   private function getEventExceptions($id) {
     $exceptions = array();
-    $query = 'SELECT * FROM EventException WHERE eventexception_event_id = '.$id.'';
+    $query = 'SELECT * FROM EventException WHERE eventexception_parent_id = '.$id.'';
     $this->db->query($query);
     while($this->db->next_record()) {
       $exceptions[] = new Of_Date($this->db->f('eventexception_date'), 'GMT');

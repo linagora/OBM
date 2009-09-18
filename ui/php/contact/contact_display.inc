@@ -349,6 +349,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     $ext_title = $contact['ext_title'];
     $ext_target = $contact['ext_target'];
     $ext_widget = $contact['ext_widget'];
+    $ext_element = $user['ext_element'];
     $ext_widget_text = $contact['ext_widget_text'];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_type\" type=\"hidden\" value=\"$ext_type\">
@@ -357,6 +358,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
+	    <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\" />
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     $display['title'] = $ext_title;
   }

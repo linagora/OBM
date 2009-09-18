@@ -28,6 +28,7 @@ function run_query_calendar_detail($calendar_id) {
   $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'event_timecreate', 'timecreate');
   $multidomain = sql_multidomain('event');
+  $eventexception_sql_if = sql_if($db_type, 'ee.eventexception_parent_id IS  NULL', '0', '1');
   $query = "SELECT 
     event_id,
     event_ext_id,
@@ -58,7 +59,10 @@ function run_query_calendar_detail($calendar_id) {
     eventtag_label,
     event_endrepeat,
     event_allow_documents,
-    event_date
+    event_date,
+    $eventexception_sql_if AS event_is_exception,
+    ee.eventexception_parent_id AS event_eventexception_parent_id,
+    ee.eventexception_date AS event_eventexception_date
     FROM
     Event
     INNER JOIN EventEntity AS e ON event_id = evententity_event_id
@@ -67,6 +71,7 @@ function run_query_calendar_detail($calendar_id) {
     LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
     INNER JOIN UserObm AS o ON event_owner = o.userobm_id
     LEFT JOIN EventTag AS t ON event_tag_id = t.eventtag_id
+    LEFT JOIN EventException AS ee ON event_id = ee.eventexception_child_id
     WHERE event_type='VEVENT'
     AND $get_id
     $multidomain";
@@ -1509,7 +1514,7 @@ function run_query_calendar_update_event_data($calendar) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);
 
-  $query = "DELETE FROM EventException WHERE eventexception_event_id $event_id"; 
+  $query = "DELETE FROM EventException WHERE eventexception_parent_id $event_id"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
   $obm_q->query($query);
 
@@ -1675,43 +1680,6 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   $oldEvent = OBM_EventFactory::getInstance()->getById($id);
 
   $obm_q = new DB_OBM;
-  $sql_id = sql_parse_id($id, true);
-  $query = "UPDATE Event SET event_timeupdate = NOW() WHERE event_id = $id";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(0)');
-  $obm_q->query($query);
-  $sql_id = sql_parse_id($id);
-  $query = "INSERT INTO EventException (
-    eventexception_usercreate,
-    eventexception_timecreate,
-    eventexception_userupdate,
-    eventexception_timeupdate,
-    eventexception_event_id,
-    eventexception_date)
-    VALUES (
-      $obm[uid],
-      NOW(),
-        $obm[uid],
-        NOW(),
-        $id,
-        '$olddatebegin'
-      )";
-
-  $sql_id = sql_parse_id($id, true);
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(1)');
-  $obm_q->query($query);
-  $query = "Update Event SET
-    event_userupdate = $obm[uid],
-    event_timeupdate = NOW()
-    WHERE
-    event_id $sql_id";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(2)');
-  $obm_q->query($query);
-  // Send mail
-  if ($calendar['send_mail']) {
-    $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
-    OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
-  }
 
   if (is_object($event_q)) {
     if ($event_q->f('event_privacy')!=1) $privacy = 0; else $privacy = 1; 
@@ -1726,9 +1694,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $repeatfrequency = $event_q->f('event_repeatfrequence');
     $category1_id = sql_parse_id( $event_q->f('event_category1_id'));
     $priority = sql_parse_int( $event_q->f('event_priority'));
-    //$color = $event_q->f('event_color');
     $event_tag_id = $event_q->f('tag_id') ;
     if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
+    if (is_null($event_tag_id)) $event_tag_id = 'NULL' ;
     $description = $event_q->f('event_description');
     $properties = $event_q->f('event_properties');
     $location = $event_q->f('event_location');
@@ -1784,13 +1752,12 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       '$repeatfrequency',
       '$repeat_days',
       $all_day,
-      '$color',
       $event_tag_id,
       $repeat_end,
       '$obm[domain_id]'
     )";
 
-    display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data(3)');
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data(0)');
     $obm_q->query($query);
     $new_id = $obm_q->lastid();
     of_entity_insert('event', $new_id);
@@ -1800,6 +1767,48 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
         run_query_calendar_insert_entity_event($entity, $entity_id, $new_id, $entity_data['state']);
       }
     }
+  }
+
+  $sql_id = sql_parse_id($id);
+  $sql_new_id = ( $new_id ? sql_parse_id($new_id) : 'NULL' );
+  $query = "UPDATE Event SET event_timeupdate = NOW() WHERE event_id = $sql_id";
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(1)');
+  $obm_q->query($query);
+  $query = "INSERT INTO EventException (
+    eventexception_usercreate,
+    eventexception_timecreate,
+    eventexception_userupdate,
+    eventexception_timeupdate,
+    eventexception_parent_id,
+    eventexception_child_id,
+    eventexception_date)
+    VALUES (
+      $obm[uid],
+      NOW(),
+        $obm[uid],
+        NOW(),
+        $sql_id,
+        $sql_new_id,
+        '$olddatebegin'
+      )";
+
+  $sql_id = sql_parse_id($id, true);
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(2)');
+  $obm_q->query($query);
+  $query = "Update Event SET
+    event_userupdate = $obm[uid],
+    event_timeupdate = NOW()
+    WHERE event_id $sql_id";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(3)');
+  $obm_q->query($query);
+  // Send mail
+  if ($calendar['send_mail']) {
+    $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
+    OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
+  }
+
+  if ($new_id) {
     if ($calendar['send_mail']) {
       OBM_EventFactory::getInstance()->create(array('id' => $new_id));
     }
@@ -3599,11 +3608,11 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
   $query = "SELECT
     event_duration,
     event_timezone,
-    eventexception_event_id,
+    eventexception_parent_id,
     eventexception_date
     FROM EventException
-    JOIN Event ON eventexception_event_id = event_id
-    WHERE eventexception_event_id IN ($event_list) 
+    JOIN Event ON eventexception_parent_id = event_id
+    WHERE eventexception_parent_id IN ($event_list) 
     $start $end";
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_exception()');
   $obm_q->query($query);
@@ -3625,10 +3634,13 @@ function run_query_get_one_event_exception($calendar_id) {
   $calendar_id = sql_parse_id( $calendar_id, true);
 
   $query = "SELECT
-    eventexception_event_id,
-    eventexception_date
+    eventexception_parent_id,
+    eventexception_child_id,
+    eventexception_date,
+    event_date AS eventexception_event_date
     FROM EventException
-    WHERE eventexception_event_id $calendar_id"; 
+    LEFT JOIN Event ON eventexception_child_id = event_id
+    WHERE eventexception_parent_id $calendar_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_get_one_event_exception()');
   $obm_q->query($query);
@@ -3796,7 +3808,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     // Handle exceptions : remove occurences from the model
     $exception_q = run_query_get_events_exception(array_keys($of->events),$start,$end);
     while($exception_q->next_record()) {
-      $of->removeOccurrences($exception_q->f('eventexception_event_id'), new Of_Date($exception_q->f('eventexception_date'), 'GMT'));
+      $of->removeOccurrences($exception_q->f('eventexception_parent_id'), new Of_Date($exception_q->f('eventexception_date'), 'GMT'));
     }
 
     // Add attendees to events

@@ -1,2 +1,2 @@
-"eventexception_timeupdate";"eventexception_timecreate";"eventexception_userupdate";"eventexception_usercreate";"eventexception_event_id";"eventexception_date"
-"2009-03-24 01:16:23";"2009-03-24 01:16:23";2;2;1;"2009-03-25 07:00:00"
+"eventexception_timeupdate";"eventexception_timecreate";"eventexception_userupdate";"eventexception_usercreate";"eventexception_parent_id";"eventexception_child_id";"eventexception_date"
+"2009-03-24 01:16:23";"2009-03-24 01:16:23";2;2;1;NULL;"2009-03-25 07:00:00"

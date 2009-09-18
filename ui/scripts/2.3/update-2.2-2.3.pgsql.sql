@@ -216,6 +216,31 @@ ALTER TABLE event ADD COLUMN event_allow_documents boolean default false;
 ALTER TABLE documentlink ADD COLUMN documentlink_usercreate integer DEFAULT NULL;
 CREATE INDEX documentlink_usercreate_fkey ON documentlink (documentlink_usercreate);
 ALTER TABLE ONLY documentlink ADD CONSTRAINT documentlink_usercreate_userobm_id_fkey FOREIGN KEY (documentlink_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
+-- Event exceptions : drop parent_id from Event and add parent_id/child_id in EventException
+--
+ALTER TABLE eventexception DROP CONSTRAINT eventexception_event_id_event_id_fkey;
+DROP INDEX eventexception_usercreate_fkey;
+
+ALTER TABLE eventexception RENAME COLUMN eventexception_event_id TO eventexception_parent_id;
+CREATE INDEX eventexception_parent_id_fkey ON eventexception (eventexception_parent_id);
+ALTER TABLE ONLY eventexception
+    ADD CONSTRAINT eventexception_parent_id_event_id_fkey FOREIGN KEY (eventexception_parent_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE eventexception ADD COLUMN eventexception_child_id INTEGER DEFAULT NULL;
+CREATE INDEX eventexception_child_id_fkey ON eventexception (eventexception_child_id);
+ALTER TABLE ONLY eventexception
+    ADD CONSTRAINT eventexception_child_id_event_id_fkey FOREIGN KEY (eventexception_child_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--useless because event_parent_id was not used
+--UPDATE EventException ee
+--SET ee.eventexception_child_id = e.event_id
+--FROM Event e
+--WHERE e.event_parent_id = ee.eventexception_parent_id;
+
+ALTER TABLE Event DROP COLUMN event_parent_id;
+
 -- -----------------------------------------------------------------------------
 
 

@@ -304,7 +304,7 @@ class EventAlertCronJob extends CronJob{
       $exception_q = run_query_get_events_exception(array_keys($of->events),$start,$end);
       $this->logger->debug($exception_q->nf()." exceptions founded");
       while($exception_q->next_record()) {
-        $of->removeOccurrences($exception_q->f('eventexception_event_id'), new Of_Date($exception_q->f('eventexception_date'), 'GMT'));
+        $of->removeOccurrences($exception_q->f('eventexception_parent_id'), new Of_Date($exception_q->f('eventexception_date'), 'GMT'));
       }
     }
   }    

@@ -853,7 +853,6 @@ CREATE TABLE event (
     event_timecreate timestamp without time zone DEFAULT now(),
     event_userupdate integer DEFAULT NULL,
     event_usercreate integer DEFAULT NULL,
-    event_parent_id integer,
     event_ext_id character varying(255) DEFAULT ''::character varying,
     event_type vcomponent DEFAULT 'VEVENT'::vcomponent,
     event_origin character varying(255) DEFAULT ''::character varying NOT NULL,
@@ -933,7 +932,8 @@ CREATE TABLE eventexception (
     eventexception_timecreate timestamp without time zone DEFAULT now(),
     eventexception_userupdate integer DEFAULT NULL,
     eventexception_usercreate integer DEFAULT NULL,
-    eventexception_event_id integer NOT NULL,
+    eventexception_parent_id integer NOT NULL,
+    eventexception_child_id integer DEFAULT NULL,
     eventexception_date timestamp without time zone NOT NULL
 );
 
@@ -6567,10 +6567,15 @@ CREATE INDEX evententity_entity_id_fkey ON evententity (evententity_entity_id);
 
 CREATE INDEX eventexception_usercreate_fkey ON eventexception (eventexception_usercreate);
 --
--- Name: eventexception_event_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+-- Name: eventexception_parent_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
-CREATE INDEX eventexception_event_id_fkey ON eventexception (eventexception_event_id);
+CREATE INDEX eventexception_parent_id_fkey ON eventexception (eventexception_parent_id);
+--
+-- Name: eventexception_child_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX eventexception_child_id_fkey ON eventexception (eventexception_child_id);
 --
 -- Name: eventexception_userupdate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
@@ -8979,11 +8984,19 @@ ALTER TABLE ONLY evententity
 
 
 --
--- Name: eventexception_event_id_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: eventexception_parent_id_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY eventexception
-    ADD CONSTRAINT eventexception_event_id_event_id_fkey FOREIGN KEY (eventexception_event_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT eventexception_parent_id_event_id_fkey FOREIGN KEY (eventexception_parent_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: eventexception_child_id_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY eventexception
+    ADD CONSTRAINT eventexception_child_id_event_id_fkey FOREIGN KEY (eventexception_child_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --

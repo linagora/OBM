@@ -89,6 +89,11 @@ $l_days = 'jours';
 $l_more = 'de plus';
 $l_search_my_calendar = "Rechercher dans mon agenda";
 $l_basic_search_result = "Résultat de recherche pour les évenements à venir";
+$l_event_is_exception = "Cette évènement a été modifié et ne fait plus partie d'une série";
+$l_parent_event = "Evènement parent";
+$l_show_parent_event = "Consulter la série auquel il était rattaché";
+$l_eventexception_canceled = "annulé";
+$l_eventexception_moved_to = "déplacé vers le %s";
 
 // PDF Options
 $l_display_details = "Afficher les détails";

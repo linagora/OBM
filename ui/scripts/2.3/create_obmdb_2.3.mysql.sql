@@ -1293,7 +1293,6 @@ CREATE TABLE `Event` (
   `event_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
   `event_userupdate` int(8) default NULL,
   `event_usercreate` int(8) default NULL,
-  `event_parent_id` int(8) default NULL,
   `event_ext_id` varchar(255) default '',
   `event_type` enum('VEVENT','VTODO','VJOURNAL','VFREEBUSY') default 'VEVENT',
   `event_origin` varchar(255) NOT NULL default '',
@@ -1405,13 +1404,15 @@ CREATE TABLE `EventException` (
   `eventexception_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
   `eventexception_userupdate` int(8) default NULL,
   `eventexception_usercreate` int(8) default NULL,
-  `eventexception_event_id` int(8) NOT NULL,
+  `eventexception_parent_id` int(8) NOT NULL,
+  `eventexception_child_id` int(8) DEFAULT NULL,
   `eventexception_date` datetime NOT NULL,
   PRIMARY KEY  (`eventexception_event_id`,`eventexception_date`),
   KEY `eventexception_userupdate_userobm_id_fkey` (`eventexception_userupdate`),
   KEY `eventexception_usercreate_userobm_id_fkey` (`eventexception_usercreate`),
   CONSTRAINT `eventexception_usercreate_userobm_id_fkey` FOREIGN KEY (`eventexception_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `eventexception_event_id_eventevent_id_fkey` FOREIGN KEY (`eventexception_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `eventexception_parent_id_event_id_fkey` FOREIGN KEY (`eventexception_parent_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `eventexception_child_id_event_id_fkey` FOREIGN KEY (`eventexception_child_id`) REFERENCES `Event` (`event_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `eventexception_userupdate_userobm_id_fkey` FOREIGN KEY (`eventexception_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

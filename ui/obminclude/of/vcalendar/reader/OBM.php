@@ -67,12 +67,12 @@ class Vcalendar_Reader_OBM {
         $date = new Of_Date($exceptions->f('eventexception_date'));
         $timezone = $exceptions->f('event_timezone');
         if ($timezone) $date->setOriginalTimeZone($timezone);
-        $this->addExdate($this->vevents[$exceptions->f('eventexception_event_id')] , $date);
+        $this->addExdate($this->vevents[$exceptions->f('eventexception_parent_id')] , $date);
         
         
         $enddate = clone $date;
         $enddate->addSecond(3600);
-        $this->addExdate($this->vevents[$exceptions->f('eventexception_event_id')] , $enddate);
+        $this->addExdate($this->vevents[$exceptions->f('eventexception_parent_id')] , $enddate);
 
       }    
     }
