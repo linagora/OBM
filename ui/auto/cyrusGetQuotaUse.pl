@@ -67,7 +67,7 @@ sub run {
     if( $errorCode ) {
         $self->_log( 'échec de la mise à jour du quota Cyrus utilisé', 0 );
     }else {
-        $self->_log( 'mise à jour du quota Cyrus utilisé avec succés', 0 );
+        $self->_log( 'mise à jour du quota Cyrus utilisé avec succés', -1 );
     }
 
     return $errorCode;

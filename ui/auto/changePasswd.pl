@@ -69,7 +69,7 @@ sub run {
             print STDERR 'Password update failed'."\n";
         }
     }else {
-        $self->_log( 'mot de passe mis à jour avec succés', 0 );
+        $self->_log( 'mot de passe mis à jour avec succés', -1 );
 
         if( $parameters->{interactiv} ) {
             print STDERR 'Password update success'."\n";

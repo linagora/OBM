@@ -66,7 +66,7 @@ sub run {
     if( $errorCode ) {
         $self->_log( 'échec de mise à jour des ACLs Cyrus', 0 );
     }else {
-        $self->_log( 'mise à jour des ACLs Cyrus avec succés', 0 );
+        $self->_log( 'mise à jour des ACLs Cyrus avec succés', -1 );
     }
 
     return $errorCode;
