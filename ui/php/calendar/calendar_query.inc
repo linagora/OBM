@@ -2209,6 +2209,40 @@ function run_query_calendar_get_template($template_id) {
 }
 
 /**
+ * Get one (or many) event template(s) details
+ * 
+ * @param $columns array of columns to be retrieved
+ * @param $template_id optional
+ * @access public
+ * @return DBO
+ */
+function run_query_calendar_get_templates_details($columns, $template_id = null) {
+  global $obm, $cdg_sql;
+  
+  if (count($columns) == 0) {
+    $columns = '*';
+  } else {
+    foreach ($columns as $k => $c) {
+      $columns[$k] = 'eventtemplate_'.$c;
+    }
+    $columns = implode(',', $columns);
+  }
+  
+  $query = "SELECT $columns FROM EventTemplate ";
+  if (is_null($template_id)) {
+    $query.= "WHERE eventtemplate_usercreate = $obm[uid]";
+  } else {
+    $template_id = (int) $template_id;
+    $query.= "WHERE eventtemplate_id = $template_id";
+  }
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_templates_details()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
+/**
  * Duplicate an event template
  * 
  * @param $template_id

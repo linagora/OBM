@@ -740,6 +740,22 @@ if ($action == 'search') {
   }
   exit();
   
+} elseif ($action == 'export_template')  {
+///////////////////////////////////////////////////////////////////////////////
+  list($name, $xml) = xml_calendar_export_templates($params['template_id']);
+  header('Content-Type: text/xml');
+  header('Content-Disposition: attachment; filename="template_'.$name.'.xml"');
+  echo $xml->flush();
+  exit();
+  
+} elseif ($action == 'export_all_templates')  {
+///////////////////////////////////////////////////////////////////////////////
+  $xml = xml_calendar_export_templates();
+  header('Content-Type: text/xml');
+  header('Content-Disposition: attachment; filename="event_templates.xml"');
+  echo $xml->flush();
+  exit();
+  
 } elseif ($action == 'delete_template')  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_calendar_delete_template($params['template_id']);
@@ -1230,7 +1246,7 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
     'update_decision','update_ext_decision', 'update_alert','decision','update','delete', 'new_meeting',
-    'rights_admin','rights_update', 'waiting_events','planning','save_as_template')
+    'rights_admin','rights_update', 'waiting_events','planning','save_as_template', 'list_templates')
   );
 
   // Detail Consult
@@ -1575,6 +1591,18 @@ function get_calendar_action() {
   
   // Update template
   $actions['calendar']['update_template'] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+  
+  // Export template
+  $actions['calendar']['export_template'] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+  
+  // Export all templates
+  $actions['calendar']['export_all_templates'] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );

@@ -5135,7 +5135,7 @@ function dis_calendar_template_form($action, $params, $template_q, $entity_ids) 
 //   - $templates_q : DBO
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_templates_list($templates_q) {
-  global $ico_popup_close, $ico_edit, $l_name, $l_duplicate_template, $l_template_name,
+  global $ico_popup_close, $ico_edit, $ico_backup, $l_name, $l_duplicate_template, $l_template_name,
     $l_validate, $l_cancel, $l_copy_of, $l_no_template;
   
   if ($templates_q->num_rows() === 0) {
@@ -5145,7 +5145,7 @@ function dis_calendar_templates_list($templates_q) {
   $block = "<div class=\"detail admin\">
     <table>
       <thead>
-        <tr><td>$l_name</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>$l_name</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
       </thead>
       <tbody style=\"text-align: left;\">
       ";
@@ -5157,6 +5157,11 @@ function dis_calendar_templates_list($templates_q) {
         <td>
           <a href=\"$path/calendar/calendar_index.php?action=edit_template&template_id=$id\">
             <img src=\"$ico_edit\" />
+          </a>
+        </td>
+        <td>
+          <a href=\"$path/calendar/calendar_index.php?action=export_template&template_id=$id\">
+            <img src=\"$ico_backup\" />
           </a>
         </td>
         <td>".button_to('[delete]', "$path/calendar/calendar_index.php?action=delete_template&template_id=$id", 'delete')."</td>
@@ -5198,6 +5203,61 @@ function dis_calendar_templates_list($templates_q) {
     </script>";
   
   return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Export event templates to XML
+// Parameters:
+//   - $templates_id (optional)
+///////////////////////////////////////////////////////////////////////////////
+function xml_calendar_export_templates($template_id = null) {
+  $columns = array('name','title','date','description','properties','location',
+    'category1_id','priority','privacy','duration','repeatkind','repeatfrequence',
+    'repeatdays','allday','tag_id','allow_documents','alert','endrepeat','user_ids',
+    'contact_ids','resource_ids','group_ids','document_ids');
+  
+  $template_q = run_query_calendar_get_templates_details($columns, $template_id);
+  $only_one = ($template_q->num_rows() == 1);
+  
+  $xml = new XMLWriter();
+  $xml->openMemory();
+  $xml->setIndent(true);
+  $xml->setIndentString(' ');
+  $xml->startDocument('1.0', 'UTF-8');
+  if (!$only_one) $xml->startElement('event_templates');
+  while ($template_q->next_record()) {
+    if ($only_one) {
+      $template_name = $template_q->f('eventtemplate_name');
+    }
+    $xml->startElement('event_template');
+    foreach ($columns as $column) {
+      if ($column == 'properties') continue;
+      $xml->writeElement($column, $template_q->f('eventtemplate_'.$column));
+    }
+    $xml->startElement('properties');
+    $xml->startElement('extended_desc');
+    $desc = new SimpleXMLElement($template_q->f('eventtemplate_properties'));
+    foreach ($desc->resource as $resource) {
+      $xml->startElement('resource');
+      $xml->writeElement('res_name', $resource->res_name);
+      $xml->writeElement('res_id', $resource->res_id);
+      $xml->writeElement('item', $resource->item);
+      $xml->writeElement('item_id', $resource->item_id);
+      $xml->writeElement('property_name', $resource->property_name);
+      $xml->writeElement('property_value', $resource->property_value);
+      $xml->endElement();
+    }
+    $xml->endElement();
+    $xml->endElement();
+    $xml->endElement();
+  }
+  if (!$only_one) $xml->endElement();
+  
+  if (!$only_one) {
+    return $xml;
+  } else {
+    return array($template_name, $xml);
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
