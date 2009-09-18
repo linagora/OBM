@@ -358,7 +358,6 @@ function run_query_contact_detail($p_id) {
   $timeupdate = sql_date_format($db_type, 'contact_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'contact_timecreate', 'timecreate');
   $lang = get_lang();
-  $date = sql_date_format($db_type, 'contact_date', 'contact_date');
   $birthday = sql_date_format($db_type, 'bd.event_date', 'contact_birthday');
   $anniversary = sql_date_format($db_type, 'an.event_date', 'contact_anniversary');
   $multidomain = sql_multidomain('contact');

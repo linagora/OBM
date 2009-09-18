@@ -173,9 +173,8 @@ class OBM_DISPLAY {
       } else {
 	$fieldname_base = $fieldname;
       }
-
       if ($cgp_hide[$entity][$fieldname]
-	  || $cgp_hide[$entity][$fieldname_base]) {
+	  || $cgp_hide[$entity][$fieldname_base] || !isset($fieldnames[$fieldname])) {
 	$td_class = 'resultPrefHide';
       } 
       if($i%2 == 0) {
@@ -281,7 +280,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call
   /////////////////////////////////////////////////////////////////////////////
   function dis_data($dis_data_entity) {
-    global $path, $cgp_hide, $cdg_id;
+    global $path, $cgp_hide, $cdg_id, $fieldnames;
 
     $link_ok = $this->display_link;
     $entity = $this->display_entity;
@@ -362,7 +361,7 @@ class OBM_DISPLAY {
 	}
 
 	if (! ($cgp_hide[$entity][$fieldname]
-	       || $cgp_hide[$entity][$fieldname_base])) {
+	       || $cgp_hide[$entity][$fieldname_base]) && isset($fieldnames[$fieldname])) {
 
 	  // Default values
 	  $name = $this->data_set->f($fieldname);
@@ -674,7 +673,7 @@ class OBM_DISPLAY {
       }
 
       if (! ($cgp_hide[$entity][$fieldname]
-	     || $cgp_hide[$entity][$fieldname_base])) {
+	     || $cgp_hide[$entity][$fieldname_base]) && isset($fieldnames[$fieldname])) {
 	$label = $fieldnames[$fieldname];
   
         $img = '';
@@ -735,7 +734,7 @@ class OBM_DISPLAY {
       }
 
       if (! ($cgp_hide[$entity][$fieldname]
-	  || $cgp_hide[$entity][$fieldname_base])) {
+	  || $cgp_hide[$entity][$fieldname_base]) && isset($fieldnames[$fieldname])) {
 	$label = $fieldnames[$fieldname];
 	// if label empty or is an image or a link, we display the column name
 	if ( ($label == '') || (preg_match("/.*<.*>.*/", $label) ) ) {
@@ -753,7 +752,7 @@ class OBM_DISPLAY {
   //   for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_file($first_row, $nb_rows, $sep, $dis_data_entity) {
-    global $cgp_hide, $cdg_id, $ctu_sql_limit;
+    global $cgp_hide, $cdg_id, $ctu_sql_limit, $fieldnames;
 
     $entity = $this->display_entity;
     $this->dis_data_header_file($sep);
@@ -782,7 +781,7 @@ class OBM_DISPLAY {
 	}
 
 	if (! ($cgp_hide[$entity][$fieldname]
-	       || $cgp_hide[$entity][$fieldname_base])) {
+	       || $cgp_hide[$entity][$fieldname_base]) && isset($fieldnames[$fieldname])) {
 	  $txt_name = $this->data_set->f($fieldname);
 
 	  //--------------------------------------------------

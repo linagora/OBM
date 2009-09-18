@@ -204,6 +204,7 @@ $c_max_group_alias = 1;
 // 2 - write : data
 // 3 - read  : admin 
 // 4 - write : admin 
+$cright_none = 0;
 $cright_read = 1;
 $cright_own = 2;
 $cright_write = 4;

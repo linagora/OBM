@@ -484,7 +484,7 @@ class Perm {
 
     // If action right not defined or user has not access rights
     if ( ( ($module_right & $action_right) != $action_right)
-      || ($action_right == "") ) {
+      || ($action_right == "" && $action_right !== 0) ) {
         if ($_SESSION['set_debug'] == 0) {
           header("location: $path/obm.php?error=perms");
         } else {

@@ -13,12 +13,13 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames['resource_name'] = $l_name;
-$fieldnames['resource_delegation'] = $l_delegation;
-$fieldnames['resource_description'] = $l_desc;
-$fieldnames['resource_qty'] = $l_qty;
-$fieldnames['resourcetype_label'] = $l_rtype;
-$fieldnames['resource_id'] = $l_update;
-
+if($perm->check_right('resource', $cright_read)) {
+  $fieldnames['resource_delegation'] = $l_delegation;
+  $fieldnames['resource_description'] = $l_desc;
+  $fieldnames['resource_qty'] = $l_qty;
+  $fieldnames['resourcetype_label'] = $l_rtype;
+  $fieldnames['resource_id'] = $l_update;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display resource specific dataset fields

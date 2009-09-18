@@ -635,7 +635,7 @@ function html_contact_header($co_q, $funcs) {
   $mailok = ($co_q->f('contact_mailing_ok') == 1 ? $l_yes : $l_no);
   $newsletter = ($co_q->f('contact_newsletter') == 1 ? $l_yes : $l_no);
 
-  if ($co_q->f('contact_date')) {
+  if ($co_q->f('contact_date') > '0000-00-00 00:00:00') {
     $date = new Of_Date($co_q->f('contact_date'), 'GMT');
     $date = $date->getOutputDate();
   } else {

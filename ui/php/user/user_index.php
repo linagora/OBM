@@ -448,6 +448,7 @@ function get_user_action() {
   global $l_header_upd_group,$l_header_admin, $l_header_reset, $l_header_batch;
   global $l_header_wait;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+  global $cright_none;
   
   of_category_user_module_action('user');
 
@@ -462,7 +463,7 @@ function get_user_action() {
 // Get Ids
   $actions['user']['ext_get_ids'] = array (
     'Url'      => "$path/user/user_index.php?action=ext_get_ids",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('none'),
     'popup' => 1
                                     );
@@ -470,7 +471,7 @@ function get_user_action() {
 // Get Ids
   $actions['user']['ext_get_id'] = array (
     'Url'      => "$path/user/user_index.php?action=ext_get_id",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('none'),
     'popup' => 1
                                     );
@@ -494,20 +495,20 @@ function get_user_action() {
 // Search
   $actions['user']['search'] = array (
     'Url'      => "$path/user/user_index.php?action=search",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('None')
                                   );
 // Search
   $actions['user']['ext_search'] = array (
     'Url'      => "$path/user/user_index.php?action=ext_search",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('None')
   );  
 
 // Get user id from external window (js)
   $actions['user']['getsearch'] = array (
     'Url'      => "$path/user/user_index.php?action=search",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('None')
                                   );
 // Detail Consult

@@ -12,29 +12,30 @@
 //------------------------------------//
 // Direct fields
 $fieldnames['group_name'] = $l_name;
-$fieldnames['domain_label'] = $l_domain;
-$fieldnames['group_gid'] = $l_gid;
-$fieldnames['group_delegation'] = $l_delegation;
-$fieldnames['group_system'] = $l_system;
-$fieldnames['group_privacy'] = $l_private;
-$fieldnames['group_local'] = $l_local;
-$fieldnames['group_ext_id'] = $l_ext_id;
-$fieldnames['group_samba'] = $l_smb;
-$fieldnames['group_desc'] = $l_desc;
 $fieldnames['group_email'] = $l_email;
-$fieldnames['usercreate'] = $l_creator;
-$fieldnames['userupdate'] = $l_updater;
-$fieldnames['timecreate'] = $l_date_creation;
-$fieldnames['timeupdate'] = $l_date_last_update;
-// Calculated fields
-$fieldnames['group_nb_user'] = $l_nb_user;
-$fieldnames['group_user_login'] = $l_login;
-$fieldnames['group_user_lastname'] = $l_lastname;
-$fieldnames['group_user_firstname'] = $l_firstname;
-$fieldnames['group_user_function'] = $l_function;
-$fieldnames['group_user_phone'] = $l_phone;
-$fieldnames['group_user_email'] = $l_email;
-
+if($perm->check_right('group', $cright_read)) {
+  $fieldnames['domain_label'] = $l_domain;
+  $fieldnames['group_gid'] = $l_gid;
+  $fieldnames['group_delegation'] = $l_delegation;
+  $fieldnames['group_system'] = $l_system;
+  $fieldnames['group_privacy'] = $l_private;
+  $fieldnames['group_local'] = $l_local;
+  $fieldnames['group_ext_id'] = $l_ext_id;
+  $fieldnames['group_samba'] = $l_smb;
+  $fieldnames['group_desc'] = $l_desc;
+  $fieldnames['usercreate'] = $l_creator;
+  $fieldnames['userupdate'] = $l_updater;
+  $fieldnames['timecreate'] = $l_date_creation;
+  $fieldnames['timeupdate'] = $l_date_last_update;
+  // Calculated fields
+  $fieldnames['group_nb_user'] = $l_nb_user;
+  $fieldnames['group_user_login'] = $l_login;
+  $fieldnames['group_user_lastname'] = $l_lastname;
+  $fieldnames['group_user_firstname'] = $l_firstname;
+  $fieldnames['group_user_function'] = $l_function;
+  $fieldnames['group_user_phone'] = $l_phone;
+  $fieldnames['group_user_email'] = $l_email;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Group specific dataset fields

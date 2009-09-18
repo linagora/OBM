@@ -435,6 +435,7 @@ function get_group_action() {
   global $l_header_consult,$l_header_display,$l_header_import, $l_header_admin;
   global $l_header_add_user, $l_add_user, $l_header_add_group, $l_add_group;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+  global $cright_none;
 
   of_category_user_module_action('group');
 
@@ -448,13 +449,13 @@ function get_group_action() {
 
 // Search
   $actions['group']['search'] = array (
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('None') 
                                   );
 
   $actions['group']['ext_search'] = array (
     'Url'      => "$path/group/group_index.php?action=ext_search",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('None')
   );  
 
@@ -519,14 +520,14 @@ function get_group_action() {
 
 // Ext get Ids : external Group selection
   $actions['group']['ext_get_ids'] = array (
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('None') 
                                   	  );
 
 // Get Ids
   $actions['group']['ext_get_id'] = array (
     'Url'      => "$path/group/group_index.php?action=ext_get_id",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('none'),
     'popup' => 1
                                     );

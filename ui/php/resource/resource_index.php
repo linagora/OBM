@@ -346,6 +346,7 @@ function get_resource_action() {
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin,$l_header_reset,$l_header_right;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin, $l_header_admin;
+  global $cright_none;
 
 // Index
   $actions['resource']['index'] = array (
@@ -358,7 +359,7 @@ function get_resource_action() {
 // Get Ids
   $actions['resource']['ext_get_ids'] = array (
     'Url'      => "$path/resource/resource_index.php?action=ext_get_ids",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('none'),
     'popup' => 1
                                     );
@@ -374,13 +375,13 @@ function get_resource_action() {
 // Search
   $actions['resource']['search'] = array (
     'Url'      => "$path/resource/resource_index.php?action=search",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('None') 
   );
 
   $actions['resource']['ext_search'] = array (
     'Url'      => "$path/resource/resource_index.php?action=ext_search",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('None')
 
   );  
@@ -388,7 +389,7 @@ function get_resource_action() {
   // Get resource id from external window (js)
   $actions['resource']['getsearch'] = array (
     'Url'      => "$path/resource/resource_index.php?action=search",
-    'Right'    => $cright_read,
+    'Right'    => $cright_none,
     'Condition'=> array ('None') 
                                   );
 // Detail Consult

@@ -13,32 +13,34 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames['userobm_login'] = $l_login;
-$fieldnames['userobm_system'] = $l_system;
-$fieldnames['domain_label'] = $l_domain;
-$fieldnames['userobm_local'] = $l_local;
-$fieldnames['userobm_ext_id'] = $l_ext_id;
-$fieldnames['userobm_perms'] = $l_profile;
-$fieldnames['userobm_delegation'] = $l_delegation;
-$fieldnames['userobm_archive'] = $l_archive;
 $fieldnames['userobm_lastname'] = $l_lastname;
 $fieldnames['userobm_firstname'] = $l_firstname;
-$fieldnames['userobm_title'] = $l_title;
-$fieldnames['userobm_phone'] = $l_phone;
-$fieldnames['userobm_phone2'] = $l_phone2;
-$fieldnames['userobm_mobile'] = $l_mphone;
-$fieldnames['userobm_fax'] = $l_fax;
-$fieldnames['userobm_fax2'] = $l_fax2;
-$fieldnames['datebegin'] = $l_datebegin;
-$fieldnames['userobm_account_dateexp'] = $l_dateexp;
-$fieldnames['timelastaccess'] = $l_lastaccess;
 $fieldnames['userobm_email'] = $l_email;
-$fieldnames['userobm_mail_quota'] = $l_quota;
-$fieldnames['userobm_mail_login_date'] = $l_date;
-$fieldnames['userobm_nomade'] = $l_access_nomade;
-$fieldnames['userobm_samba_perms'] = $l_smb_perms;
-$fieldnames['userobm_description'] = $l_desc;
-$fieldnames['userobm_delegation_target'] = $l_delegation_target;
-$fieldnames['host_name'] = $l_mail_server;
+if($perm->check_right('user', $cright_read)) {
+  $fieldnames['userobm_system'] = $l_system;
+  $fieldnames['domain_label'] = $l_domain;
+  $fieldnames['userobm_local'] = $l_local;
+  $fieldnames['userobm_ext_id'] = $l_ext_id;
+  $fieldnames['userobm_perms'] = $l_profile;
+  $fieldnames['userobm_delegation'] = $l_delegation;
+  $fieldnames['userobm_archive'] = $l_archive;
+  $fieldnames['userobm_title'] = $l_title;
+  $fieldnames['userobm_phone'] = $l_phone;
+  $fieldnames['userobm_phone2'] = $l_phone2;
+  $fieldnames['userobm_mobile'] = $l_mphone;
+  $fieldnames['userobm_fax'] = $l_fax;
+  $fieldnames['userobm_fax2'] = $l_fax2;
+  $fieldnames['datebegin'] = $l_datebegin;
+  $fieldnames['userobm_account_dateexp'] = $l_dateexp;
+  $fieldnames['timelastaccess'] = $l_lastaccess;
+  $fieldnames['userobm_mail_quota'] = $l_quota;
+  $fieldnames['userobm_mail_login_date'] = $l_date;
+  $fieldnames['userobm_nomade'] = $l_access_nomade;
+  $fieldnames['userobm_samba_perms'] = $l_smb_perms;
+  $fieldnames['userobm_description'] = $l_desc;
+  $fieldnames['userobm_delegation_target'] = $l_delegation_target;
+  $fieldnames['host_name'] = $l_mail_server;
+}
 $fieldnames["userobm_direction"] = $l_direction;
 $fieldnames["userobm_service"] = $l_service;
 
