@@ -1534,6 +1534,7 @@ function make_list_query_from_criteria($list) {
 
 
   $max_line = 0;
+  $has_join_nn = array();
 
   // handle "n-n relation" as special case (for "AND NOT" or exclusions)
   // To direct criteria (eg contact_name like...) nothing changed
@@ -1689,7 +1690,11 @@ function make_list_query_from_criteria($list) {
 		      $join_nb[$module] = 0;
 		      $from .= str_replace('%j',$join_nb[$field_join],$add_join[$field_join]);
 		    }
-		    
+
+		    // Do nothing if the field has an equivalent field in the
+		    // same line, as the from clause will already be set
+		  } elseif (($field != $field_join) && ($module_criteria[$field_join][$line] != '')) {
+
 		    // XXXX not optimal as same criteria not tested
 		    // But what about crit1 AND toto OR B AND crit2
 		    // => crit1 AND (toto OR ( B AND crit2 )) not so easy
@@ -1704,11 +1709,18 @@ function make_list_query_from_criteria($list) {
 		    }
 		  }
 
+		  // join_line to remember the join number for a field on a line
+		  // to handle fields that links to the same join
+		  // (eg pub_id and subscription_reception)
+		  if (! isset($join_line[$field_join][$line])) {
+		    $join_line[$field_join][$line] = $join_nb[$field_join];
+		  }
+
 		  // tag the module has having criteria
 		  $module_fill[$module] = true;
 
 		  $operation = $operateurs[$field];
-		  $operation = str_replace('%j',$join_nb[$field_join],$operation);
+		  $operation = str_replace('%j',$join_line[$field_join][$line],$operation);
 		  $operation = str_replace('%f',$field,$operation);
 
 		  // handle multi-criteria that need a loop
@@ -1800,12 +1812,12 @@ function make_list_query_from_criteria($list) {
 
   // Handle the Mailing enable flag
   if ($mailing_ok == 1) {
-    $where = " contact_mailing_ok = 1 AND ($where) ";
+    $where = " contact_mailing_ok = '1' AND ($where) ";
   }
 
   // Handle the contact archive flag
   if ($contact_arch == 0) {
-    $where = " (contact_archive != 1) AND ($where) ";
+    $where = " (contact_archive != '1') AND ($where) ";
   }
 
   // Handle the privacy
@@ -1858,9 +1870,9 @@ function make_list_query_from_criteria($list) {
 
     // If no pub criteria selected add Subscription and publication Join
     if (! $module_fill['publication']) {
-      $from .= "
+      $from .= '
         LEFT JOIN Subscription ON subscription_contact_id = contact_id
-        LEFT JOIN Publication ON subscription_publication_id = publication_id";
+        LEFT JOIN Publication ON subscription_publication_id = publication_id';
     }
 
     // We transform field "column_name as col" to col
