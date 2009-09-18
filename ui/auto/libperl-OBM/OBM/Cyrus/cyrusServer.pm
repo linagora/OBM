@@ -13,6 +13,8 @@ use strict;
 
 require OBM::Parameters::regexp;
 
+use constant IMAP_TCP_CONN_TIMEOUT => 20;
+
 
 sub new {
     my $class = shift;
@@ -148,9 +150,21 @@ sub _connect {
 
     $self->_log( 'connexion au '.$self->getDescription(), 2 );
 
+    eval {
+        local $SIG{ALRM} = sub {
+            $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 0 );
+            delete($self->{'ServerConn'});
+            die 'alarm'."\n";
+        };
+
+        alarm IMAP_TCP_CONN_TIMEOUT;
+        $self->{'ServerConn'} = OBM::Cyrus::cyrusAdmin->new( $self->{'serverDesc'}->{'host_ip'} );
+        alarm 0;
+    };
+
     my @tempo = ( 1, 3, 5, 10, 20, 30 );
-    while( !($self->{'ServerConn'} = OBM::Cyrus::cyrusAdmin->new( $self->{'serverDesc'}->{'host_ip'} )) ) {
-        $self->_log( 'échec de connexion au '.$self->getDescription(), 0 );
+    while( !$self->{'ServerConn'} ) {
+        $self->_log( 'échec de connexion au '.$self->getDescription(), 0 ) if (defined($@) && ($@ ne 'alarm'."\n"));
 
         my $tempo = shift(@tempo);
         if( !defined($tempo) ) {
@@ -159,6 +173,18 @@ sub _connect {
 
         $self->_log( 'prochaine tentative dans '.$tempo.'s', 3 );
         sleep $tempo;
+
+        eval {
+            local $SIG{ALRM} = sub {
+                $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 0 );
+                delete($self->{'ServerConn'});
+                die 'alarm'."\n";
+            };
+    
+            alarm IMAP_TCP_CONN_TIMEOUT;
+            $self->{'ServerConn'} = OBM::Cyrus::cyrusAdmin->new( $self->{'serverDesc'}->{'host_ip'} );
+            alarm 0;
+        };
     }
 
     if( !$self->{'ServerConn'} ) {
