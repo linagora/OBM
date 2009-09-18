@@ -286,7 +286,7 @@ if ($action == 'search') {
         }
         $event_id = run_query_calendar_add_event($params, $entities);
         $params["calendar_id"] = $event_id;
-        if ($params['date_begin']->compare(Of_Date()::today) <= 0) {
+        if ($params['date_begin']->compare(Of_Date::today()) <= 0) {
           $display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
         }
 
