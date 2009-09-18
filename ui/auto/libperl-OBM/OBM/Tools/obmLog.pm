@@ -54,7 +54,7 @@ sub writeLog {
         return 0;
     }
 
-    if( !defined($level) || ($level !~ /^[0-9]+$/) ) {
+    if( !defined($level) || ($level !~ /^[-]{0,1}[0-9]+$/) ) {
         $level = 0;
     }
 
@@ -96,6 +96,10 @@ sub _convertLevel {
     my( $level ) = @_;
 
     SWITCH: {
+        if( $level == -1 ) {
+            return '';
+        }
+
         if( $level == 0 ) {
             return 'CRITICAL: ';
         }

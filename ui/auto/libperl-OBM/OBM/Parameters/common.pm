@@ -135,7 +135,7 @@ if( !defined($logLevel) || ($logLevel !~ /^[0-9]+$/) ) {
 }elsif( $logLevel < 0 ) {
     $logLevel = 0;
 }
-$facility_log = "local1";
+$facility_log = 'local1';
 
 # La descrption de l'annuaire LDAP
 $ldapServerId = 0;

@@ -79,7 +79,7 @@ sub run {
                 return 1;
             }
 
-            $self->_log( 'Mise à jour terminée avec succés', 0 );
+            $self->_log( 'Mise à jour terminée avec succés', -1 );
         }
     }
 
@@ -97,7 +97,8 @@ sub getParameter {
         $parameters->{'help'} = 1;
 
     }else {
-        $self->_log( 'Mise a jour du domaine d\'identifiant \''.$parameters->{'domain-id'}.'\'', 0 );
+        $self->_log( 'Mise a jour du domaine d\'identifiant
+        \''.$parameters->{'domain-id'}.'\'', -1 );
     }
 
     if( exists($parameters->{'user'}) ) {
