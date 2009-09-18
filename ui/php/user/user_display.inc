@@ -3423,7 +3423,7 @@ function dis_user_wait_list($user) {
   
   $user['archive'] = 1;
   $user['status'] = 'INIT';
-  $user['delegation'] = $obm['delegation'];
+  $user['delegation'] = $obm['delegation_target'];
 
   $popup = $user['popup'];
   $filter_entity = $user['filter_entity'];
