@@ -206,7 +206,7 @@ sub _getGlobalDomainId {
     
     my $sth;
     if( !defined($dbHandler->execQuery( $query, \$sth )) ) {
-        $self->_log( 'chargement des utilisateurs depuis la BD impossible', 3 );
+        $self->_log( 'Chargement de l\'ID du domaine global d\'OBM impossible', 3 );
         return 1;
     }
 
@@ -240,7 +240,7 @@ sub _getNameDomainId {
 
     my $sth;
     if( !defined($dbHandler->execQuery( $query, \$sth )) ) {
-        $self->_log( 'chargement des utilisateurs depuis la BD impossible', 3 );
+        $self->_log( 'Impossible de charger l\'ID du domaine OBM ayant pour domaine de messagerie principal \''.$domainName;'\'', 3 );
         return 1;
     }
 
