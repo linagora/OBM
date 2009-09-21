@@ -5136,13 +5136,25 @@ function dis_calendar_template_form($action, $params, $template_q, $entity_ids) 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_templates_list($templates_q) {
   global $ico_popup_close, $ico_edit, $ico_backup, $l_name, $l_duplicate_template, $l_template_name,
-    $l_validate, $l_cancel, $l_copy_of, $l_no_template;
+    $l_validate, $l_cancel, $l_copy_of, $l_no_template, $l_export_templates,
+    $l_import_template;
+  
+  $block = "
+    <div class=\"detail\">
+      <form style=\"display: inline\" method=\"post\" enctype=\"multipart/form-data\" action=\"$path/calendar/calendar_index.php?action=import_template\">
+        <label for=\"template_file\">$l_import_template :</label>
+        <input type=\"file\" name=\"template_file\" size=\"12\" />
+        <input type=\"submit\" value=\"Ok\" />
+      </form>
+    </div>";
   
   if ($templates_q->num_rows() === 0) {
-    return "<div class=\"detail\"><p class=\"emptyset\">$l_no_template</p></div>";
+    return $block."<div class=\"detail\"><p class=\"emptyset\">$l_no_template</p></div>";
   }
   
-  $block = "<div class=\"detail admin\">
+  $block.= "
+    <div class=\"detail admin\">
+    <p><a href=\"$path/calendar/calendar_index.php?action=export_all_templates\">$l_export_templates</a></p>
     <table>
       <thead>
         <tr><td>$l_name</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
@@ -5211,7 +5223,7 @@ function dis_calendar_templates_list($templates_q) {
 //   - $templates_id (optional)
 ///////////////////////////////////////////////////////////////////////////////
 function xml_calendar_export_templates($template_id = null) {
-  $columns = array('name','title','date','description','properties','location',
+  $columns = array('name','title','owner','date','description','properties','location',
     'category1_id','priority','privacy','duration','repeatkind','repeatfrequence',
     'repeatdays','allday','tag_id','allow_documents','alert','endrepeat','user_ids',
     'contact_ids','resource_ids','group_ids','document_ids');

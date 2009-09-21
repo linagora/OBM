@@ -129,6 +129,8 @@ $l_template = "Event template";
 $l_template_name = "Template name";
 $l_header_templates = "Templates";
 $l_no_template = "No template found.";
+$l_export_templates = "Export all templates";
+$l_import_template = "Import template";
 $l_copy_of = "Copy of";
 
 // actions 

@@ -2337,6 +2337,100 @@ function run_query_calendar_set_template_name($template_id, $new_name) {
 }
 
 /**
+ * Import event templates from a XML file
+ * 
+ * @param $xml SimpleXMLElement object
+ * @access public
+ * @return boolean
+ */
+function run_query_calendar_import_template($xml) {
+  global $obm, $cdg_sql;
+  
+  if ($xml->getName() == 'event_templates') {
+    $retour = true;
+    foreach ($xml->event_template as $template) {
+      $retour = run_query_calendar_import_template($template);
+    }
+    return $retour;
+  }
+  
+  $columns = array('name','title','owner','date','description','location',
+    'category1_id','priority','privacy','duration','repeatkind','repeatfrequence',
+    'repeatdays','allday','tag_id','allow_documents','alert','endrepeat','user_ids',
+    'contact_ids','resource_ids','group_ids','document_ids');
+    
+  foreach ($columns as $column) {
+    $value = (string) $xml->{$column};
+    $$column = ($value == '') ? 'NULL' : "'$value'";
+  }
+  
+  $properties = $xml->properties->extended_desc->asXML();
+  
+  $query = "INSERT INTO EventTemplate (
+      eventtemplate_name,
+      eventtemplate_timeupdate,                         
+      eventtemplate_timecreate,                         
+      eventtemplate_usercreate,
+      eventtemplate_owner,
+      eventtemplate_title, 
+      eventtemplate_date,     
+      eventtemplate_description,
+      eventtemplate_properties,
+      eventtemplate_location, 
+      eventtemplate_category1_id,
+      eventtemplate_priority,
+      eventtemplate_privacy, 
+      eventtemplate_duration,
+      eventtemplate_repeatkind,
+      eventtemplate_repeatfrequence,
+      eventtemplate_repeatdays,
+      eventtemplate_allday,
+      eventtemplate_tag_id, 
+      eventtemplate_allow_documents,
+      eventtemplate_alert,
+      eventtemplate_endrepeat,
+      eventtemplate_domain_id,
+      eventtemplate_user_ids,
+      eventtemplate_contact_ids,
+      eventtemplate_resource_ids,
+      eventtemplate_group_ids,
+      eventtemplate_document_ids)
+      VALUES (
+      $name,
+      NOW(),
+      NOW(),
+      '$obm[uid]',
+      $owner,
+      $title,
+      $date,
+      $description,
+      '$properties',
+      $location,
+      $category1_id,
+      $priority,
+      $privacy,
+      $duration,
+      $repeatkind,
+      $repeatfrequence,
+      $repeatdays,
+      $allday,
+      $tag_id,
+      $allow_documents,
+      $alert,
+      $endrepeat,
+      '$obm[domain_id]',
+      $user_ids,
+      $contact_ids,
+      $resource_ids,
+      $group_ids,
+      $document_ids)";
+  
+  display_debug_msg($query, $cdg_sql,"run_query_calendar_import_template()");
+  $obm_q = new DB_OBM ;
+  return $obm_q->query($query);
+}
+
+/**
  * Delete an event template
  * 
  * @param $template_id

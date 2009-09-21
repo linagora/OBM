@@ -124,6 +124,8 @@ $l_template = "Modèle d'évènement";
 $l_template_name = "Nom du modèle";
 $l_header_templates = "Modèles";
 $l_no_template = "Aucun modèle trouvé.";
+$l_export_templates = "Exporter tous les modèles";
+$l_import_template = "Importer un modèle";
 $l_copy_of = "Copie de";
 
 // actions 
