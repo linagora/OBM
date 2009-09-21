@@ -141,16 +141,18 @@ if ($action == 'add_freebusy_entity' || $action == 'new_meeting' ||
 if ($cal_entity_id['group_view'] == '') $cal_entity_id['group_view'] = $c_all;
 
 // If user selection present we override session content
-if (($params['new_sel']) && (is_array($params['sel_user_id'])) 
-  && !(($action == 'insert') || ($action == 'update'))) {
+if ($params['new_sel'] && is_array($params['sel_user_id'])) {
+  if ( ($action != 'insert') && ($action != 'update') ) {
     $current_view->set_users($params['sel_user_id']);
   }
+}
 
 // If resources selection present we override session content
-if (($params['new_sel']) && (is_array($params['sel_resource_id']))
-  && !(($action == 'insert') || ($action == 'update'))) {
+if ($params['new_sel'] && is_array($params['sel_resource_id'])) {
+  if ( ($action != 'insert') && ($action != 'update') ) {
     $current_view->set_resources($params['sel_resource_id']);
   }
+}
 
 // If group selection present we override session content
 
@@ -290,24 +292,23 @@ if ($action == 'search') {
           $display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
         }
 
-        if ($params['add_displayed_users']) {
-          if ($params['show_attendees_calendar']) {
-            // Display attendees
-            $cal_entity_id['user'] = $params['sel_user_id'];
-            $cal_entity_id['resource'] = $params['sel_resource_id'];
-          } else {
-            // Display calendars
-          }
+//        if ($params['add_displayed_users']) {
+//          if ($params['show_attendees_calendar']) {
+//            // Display attendees
+//            $cal_entity_id['user'] = $params['sel_user_id'];
+//            $cal_entity_id['resource'] = $params['sel_resource_id'];
+//          } else {
+//            // Display calendars
+//          }
+//        }
+        if ($params['show_attendees_calendar']) {
+          // Display attendees
+          $current_view->set_users($params['sel_user_id']);
+          $current_view->set_resources($params['sel_resource_id']);
         } else {
-          if ($params['show_attendees_calendar']) {
-            // Display attendees
-            $cal_entity_id['user'] = $params['sel_user_id'];
-            $cal_entity_id['resource'] = $params['sel_resource_id'];
-          } else {
-            // Display calendars
-
-          }
+          // Display calendars
         }
+
         $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
         $params["date"] = $params["date_begin"];
         $display['detail'] = dis_calendar_calendar_view($params, $current_view);
@@ -394,23 +395,21 @@ if ($action == 'search') {
         }
         run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
 
-        if ($params['add_displayed_users']) {
-          if ($params['show_attendees_calendar']) {
-            // Display attendees
-            $cal_entity_id['user'] = $params['sel_user_id'];
-            $cal_entity_id['resource'] = $params['sel_resource_id'];
-          } else {
-            // Display calendars
-          }
+//        if ($params['add_displayed_users']) {
+//          if ($params['show_attendees_calendar']) {
+//            // Display attendees
+//            $cal_entity_id['user'] = $params['sel_user_id'];
+//            $cal_entity_id['resource'] = $params['sel_resource_id'];
+//          } else {
+//            // Display calendars
+//          }
+//        }
+        if ($params['show_attendees_calendar']) {
+          // Display attendees
+          $current_view->set_users($params['sel_user_id']);
+          $current_view->set_resources($params['sel_resource_id']);
         } else {
-          if ($params['show_attendees_calendar']) {
-            // Display attendees
-            $cal_entity_id['user'] = $params['sel_user_id'];
-            $cal_entity_id['resource'] = $params['sel_resource_id'];
-          } else {
-            // Display calendars
-
-          }
+          // Display calendars
         }
 
         $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
@@ -984,8 +983,6 @@ function get_calendar_params() {
 
   // Get global params
   $params = get_global_params('Entity');
-  
-  
 
   // Get calendar specific params
   if ($params['group_view'] == '') {

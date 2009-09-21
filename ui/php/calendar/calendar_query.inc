@@ -1514,15 +1514,41 @@ function run_query_calendar_update_event_data($calendar) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);
 
-  $query = "DELETE FROM EventException WHERE eventexception_parent_id $event_id"; 
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
-  $obm_q->query($query);
+  $event_id = $calendar['calendar_id'];
 
-  if ($repeat_kind != 'none' && is_array($date_exception)) {
-    foreach($date_exception as $key => $value) {
+  if ($repeat_kind == 'none') {
+    run_query_delete_event_exceptions($event_id);
+    return;
+  }
+  //else
+
+  $old_exceptions = array();
+  $exceptions_q = run_query_get_events_exception(array($event_id));
+  while ($exceptions_q->next_record()) {
+    $eventexception_date = $exceptions_q->f('eventexception_date');
+    $date = new Of_Date($eventexception_date);
+    $iso_date = $date->format(Of_Date::DATE_ISO);
+    $old_exceptions[$iso_date] = array(
+      'eventexception_date' => $eventexception_date,
+      'child_id' => $exceptions_q->f('eventexception_child_id')
+    );
+  }
+
+  if (!is_array($date_exception)) $date_exception = array();
+  foreach ($date_exception as $value) {
+    $iso_date = $value->format(Of_Date::DATE_ISO);
+    if (isset($old_exceptions[$iso_date])) {
+      $old_exceptions[$iso_date] = null;
+      unset($old_exceptions[$iso_date]);
+    } else {
       $calendar['old_date_begin'] = $value->setHour($datebegin)->setMinute($datebegin);
       run_query_calendar_event_exception_insert($calendar);
     }
+  }
+
+  foreach($old_exceptions as $data) {
+    if (!empty($data))
+      run_query_delete_one_event_exception($event_id,$data['eventexception_date'],$data['child_id']);
   }
 }
 
@@ -1815,6 +1841,73 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   }
 
   return $new_id;
+}
+
+
+/**
+ * Delete all exceptions for an event 
+ * 
+ * @param mixed $event_id 
+ * @access public
+ * @return void
+ */
+function run_query_delete_event_exceptions($event_id) {
+  global $cdg_sql, $obm;
+
+  $obm_q = new DB_OBM;
+  $event_id = sql_parse_id($event_id);
+  $query = "SELECT eventexception_child_id
+            FROM EventException
+            WHERE eventexception_parent_id = $event_id"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_delete_event_exceptions(0)');
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows()>0) {
+    $childs = array();
+    while ($obm_q->next_record()) {
+      $child_id = $obm_q->f('eventexception_child_id');
+      if (!empty($child_id))
+        $childs[] = $child_id;
+    }
+
+    if (!empty($childs)) {
+      $query = "DELETE FROM Event WHERE id IN (".implode(',',$childs).")";
+      display_debug_msg($query, $cdg_sql, 'run_query_delete_event_exceptions(1)');
+      $obm_q->query($query);
+    }
+
+    $query = "DELETE FROM EventException WHERE eventexception_parent_id = $event_id";
+    display_debug_msg($query, $cdg_sql, 'run_query_delete_event_exceptions(2)');
+    $obm_q->query($query);
+  }
+}
+
+
+/**
+ * Delete one exception of an event 
+ * 
+ * @param mixed $event_id
+ * @param mixed $eventexception_date
+ * @param mixed $child_id
+ * @access public
+ * @return void
+ */
+function run_query_delete_one_event_exception($event_id, $eventexception_date, $child_id=null) {
+  global $cdg_sql, $obm;
+
+  $obm_q = new DB_OBM;
+  $event_id = sql_parse_id($event_id);
+  if (!empty($child_id)) {
+    $child_id = sql_parse_id($child_id);
+    $query = "DELETE FROM Event WHERE event_id = $child_id";
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
+    $obm_q->query($query);
+  }
+  $query = "DELETE FROM EventException "
+          ."WHERE eventexception_parent_id = $event_id "
+          ."AND eventexception_date = '$eventexception_date'";
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(3)');
+  $obm_q->query($query);
 }
 
 
@@ -3737,6 +3830,7 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
     event_duration,
     event_timezone,
     eventexception_parent_id,
+    eventexception_child_id,
     eventexception_date
     FROM EventException
     JOIN Event ON eventexception_parent_id = event_id
@@ -5313,7 +5407,6 @@ Class CalendarView {
   protected $id;
   protected $entity_id;
   protected $label;
-  protected $modified;
 
   protected $cal_range;
   protected $cal_view;
@@ -5330,7 +5423,7 @@ Class CalendarView {
    * @access public
    */
   public function __construct($data = array()) {
-    $this->modified = true;
+    $this->modify();
     $this->set_cal_range($data['cal_range']);
     $this->set_cal_view($data['cal_view']);
     $this->set_category($data['category']);
@@ -5351,7 +5444,7 @@ Class CalendarView {
   }
 
   public function __clone() {
-    $this->id = null;
+    $this->modify();
   }
 
   /**
@@ -5386,7 +5479,6 @@ Class CalendarView {
     }
     $view = new CalendarView($data);
     $view->id = $bookmark_id;
-    $view->modified = false;
 
     return $view;
   }
@@ -5435,16 +5527,6 @@ Class CalendarView {
         $this->label = $obm_q->f('obmbookmark_label');
     }
     return $this->label;
-  }
-
-  /**
-   * true if unsaved changes has been done to the view
-   * 
-   * @access public
-   * @return boolean
-   */
-  public function is_modified() {
-    return $this->modified;
   }
 
   /**
@@ -5531,22 +5613,22 @@ Class CalendarView {
 
   public function set_label($label) {
     $this->label = $label;
-    $this->modified = true;
+    $this->modify();
   }
 
   public function set_cal_range($cal_range = null) {
     $this->cal_range = (empty($cal_range) ? 'week' : $cal_range);
-    $this->modified = true;
+    $this->modify();
   }
 
   public function set_cal_view($cal_view = null) {
     $this->cal_view = (empty($cal_view) ? 'agenda' : $cal_view);
-    $this->modified = true;
+    $this->modify();
   }
 
   public function set_category($category = null) {
     $this->category = (empty($category) ? $GLOBALS['c_all'] : $category);
-    $this->modified = true;
+    $this->modify();
   }
 
   public function set_group($group_id) {
@@ -5557,7 +5639,7 @@ Class CalendarView {
       }
       $this->set_users(of_usergroup_get_group_users($this->group));
     }
-    $this->modified = true;
+    $this->modify();
   }
 
   public function set_users($user_ids) {
@@ -5595,7 +5677,7 @@ Class CalendarView {
     if (!in_array($user_id,$this->users)) {
       $this->users[] = $user_id;
       $this->set_class('user',$user_id,($user_id==$obm['uid'] ? 'eventOwner' : $this->generate_class()));
-      $this->modified = true;
+      $this->modify();
     }
   }
 
@@ -5603,7 +5685,7 @@ Class CalendarView {
     if (!in_array($resource_id,$this->resources)) {
       $this->resources[] = $resource_id;
       $this->set_class('resource',$resource_id,$this->generate_class());
-      $this->modified = true;
+      $this->modify();
     }
   }
 
@@ -5617,6 +5699,7 @@ Class CalendarView {
       $class=$this->generate_class();
     }
     $this->set_class('user',$user_id,$class);
+    $this->modify();
   }
 
   public function set_resource_class($resource_id, $class = null) {
@@ -5627,6 +5710,7 @@ Class CalendarView {
       $class=$this->generate_class();
     }
     $this->set_class('resource',$resource_id,$class);
+    $this->modify();
   }
 
   public function set_entity_class($entity, $entity_id, $class = null) {
@@ -5638,6 +5722,7 @@ Class CalendarView {
     $this->users = array_diff($this->users,array($user_id));
     if (count($this->users)<$old_count)
       $this->remove_class('user',$user_id);
+    $this->modify();
   }
 
   public function remove_resource($resource_id) {
@@ -5645,6 +5730,7 @@ Class CalendarView {
     $this->resources = array_diff($this->resources,array($resource_id));
     if (count($this->resources)<$old_count)
       $this->remove_class('resource',$resource_id);
+    $this->modify();
   }
 
   public function remove_all() {
@@ -5652,6 +5738,7 @@ Class CalendarView {
     $this->users = array();
     $this->resources = array();
     $this->init_classes();
+    $this->modify();
   }
 
   public function init_classes() {
@@ -5670,12 +5757,7 @@ Class CalendarView {
   }
 
   public function save() {
-    if ($this->id)
-      $return = $this->update();
-    else
-      $return = $this->insert();
-    $this->modified = false;
-    return $return;
+    return $this->insert();
   }
 
   public function delete() {
@@ -5753,10 +5835,6 @@ Class CalendarView {
       display_debug_msg($query, $cdg_sql, 'CalendarView::insert()');
       $obm_q->query($query);
     }
-  }
-
-  protected function update() {
-    //FIXME: NOT implemented yet
   }
 
   protected function get_users_data($nb_max, $user_readable) {
@@ -5867,6 +5945,12 @@ Class CalendarView {
       }
     }
     return $index;
+  }
+
+  protected function modify() {
+    $this->id = null;
+    $this->entity_id = null;
+    $this->label = null;
   }
 }
 

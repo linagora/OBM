@@ -3308,9 +3308,43 @@ function dis_calendar_conflict_popup() {
           <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
          </fieldset>
       </div>
-   </div>
+    </div>
 
-  <div id=\"calendarSendMail\" class=\"obmPopup\">
+    <div id=\"calendarOccurencyUpdate\" class=\"obmPopup\">
+      <h1>
+        <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
+          <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+        </a>
+        <span>$GLOBALS[l_update_event_occurrence]</span>
+      </h1>
+      <div class=\"content\">
+        <h2>$GLOBALS[l_update_occurrence_message]</h2>
+         <fieldset class=\"buttons\"> 
+          <input type=\"button\" id=\"popup_update_one\" class=\"closeSticky\" value=\"$GLOBALS[l_update_occurrence]\" /><br/>
+          <input type=\"button\" id=\"popup_update_all\" value=\"$GLOBALS[l_update_all_occurrences]\" /><br/>
+          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+         </fieldset>
+      </div>
+    </div>
+
+    <div id=\"calendarOccurencyDelete\" class=\"obmPopup\">
+      <h1>
+        <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
+          <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+        </a>
+        <span>$GLOBALS[l_delete_event_occurrence]</span>
+      </h1>
+      <div class=\"content\">
+        <h2>$GLOBALS[l_delete_occurrence_message]</h2>
+         <fieldset class=\"buttons\"> 
+          <input type=\"button\" id=\"popup_delete_one\" class=\"closeSticky\" value=\"$GLOBALS[l_delete_occurrence]\" /><br/>
+          <input type=\"button\" id=\"popup_delete_all\" value=\"$GLOBALS[l_delete_all_occurrences]\" /><br/>
+          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+         </fieldset>
+      </div>
+    </div>
+
+   <div id=\"calendarSendMail\" class=\"obmPopup\">
      <h1>
        <a href=\"#\" id=\"popup_sendmail_close\" class=\"closeSticky\">
          <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
