@@ -4917,14 +4917,6 @@ ALTER TABLE ONLY evententity
 
 
 --
--- Name: eventexception_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY eventexception
-    ADD CONSTRAINT eventexception_pkey PRIMARY KEY (eventexception_event_id, eventexception_date);
-
-
---
 -- Name: eventlink_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
