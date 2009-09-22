@@ -78,7 +78,9 @@ Obm.CalendarManager = new Class({
    * Register an event
    */
   register: function(evt) {
-    this.events.set(evt.event.id, evt);
+    if (!this.events.get(evt.event.id)) {
+      this.events.set(evt.event.id, evt);
+    }
     var index = new Obm.DateTime(evt.event.time * 1000).format('Y-m-d');
     if (evt.kind == 'all_day') {
       var current = new Obm.DateTime(evt.event.time*1000);
@@ -170,6 +172,7 @@ Obm.CalendarManager = new Class({
         this.redrawGrid();
       }
     }
+    this.oldEvent = new Object();
   },
 
 
@@ -199,8 +202,7 @@ Obm.CalendarManager = new Class({
         }
       }
     } else {
-      var event_date = new Obm.DateTime(evt.event.time * 1000);
-      var day = event_date.format('Y-m-d');
+      var day = evt.event.date.format('Y-m-d');
       var begin = evt.element.offsetTop.toFloat();
       var end = begin + evt.element.getStyle('height').toFloat();
       for(var i=begin;i<end;i++) {
@@ -830,6 +832,36 @@ Obm.CalendarManager = new Class({
       //   evt.redraw(); 
       // });      
     }
+  },
+
+
+  /**
+   * Cancel drag&drop
+   * register/redraw initial event
+   */
+  cancel: function(id) {
+    var evt = this.events.get(id);
+    // Set event initial date
+    evt.event.date.setTime(obm.calendarManager.oldEvent.time*1000);
+    evt.event.time = obm.calendarManager.oldEvent.time;
+    // register the old event
+    // fix position & title 
+    evt.setPosition();
+    evt.setTitle();
+    this.register(evt);
+  },
+
+
+  /**
+   * Add keyboard lister on drag&drop
+   */
+  keyboardListener: function(e, eventId) {
+    switch(e.key) {
+      case 'esc':
+        obm.calendarManager.cancel(eventId);
+        window.removeEvents('keydown');
+        break;
+    }
   }
 
 });
@@ -1059,6 +1091,9 @@ Obm.CalendarInDayEvent = new Class({
       // Enable scroller
       obm.calendarManager.scroll.start();
 
+      // Add listener
+      // window.addEvent('keydown', obm.calendarManager.keyboardListener.bindWithEvent(this, this.event.id));
+
     }.bind(this));
     this.drag.addEvent('drag', this.updateTime.bind(this));
     this.drag.addEvent('complete', function() {
@@ -1068,6 +1103,10 @@ Obm.CalendarInDayEvent = new Class({
       });
       obm.calendarManager.scroll.stop();
       obm.calendarManager.sendUpdateEvent(this);
+
+      // remove listener
+      // window.removeEvents('keydown');
+
     }.bind(this));
 
 
@@ -1390,15 +1429,7 @@ Obm.CalendarPopupManager = new Class({
     this.chain.clearChain();
     this.removeEvents();
     if (this.evtId) {
-      var evt = obm.calendarManager.events.get(this.ivent.calendar_id);
-      // Set event initial date
-      evt.event.date.setTime(obm.calendarManager.oldEvent.time*1000);
-      evt.event.time = obm.calendarManager.oldEvent.time;
-      // register the old event
-      obm.calendarManager.register(evt);
-      // fix position & title 
-      evt.setPosition();
-      evt.setTitle();
+      obm.calendarManager.cancel(this.ivent.calendar_id);
     }
   },
   
