@@ -24,8 +24,20 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   $p_view = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
 
-  $entity_readable = get_calendar_entity_readable();
-  $calendar_entity = $current_view->get_entities($ccalendar_max_users, $entity_readable);
+  if(!empty($sel_entity_id['user']))  {
+    $entities['user'] = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $sel_entity_id['user']));
+    $entities['user'] = $entities['user']['entity'];
+  }
+  if(!empty($sel_entity_id['resource'])) {
+    $entities['resource'] = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read', $sel_entity_id['resource']));
+    $entities['resource'] = $entities['resource']['entity'];
+  }
+  if(!empty($sel_entity_id['group'])) {
+    $entities['group'] = run_query_get_allowed_groups($sel_entity_id['group']);
+    $entities['group'] = $entities['group']['entity'];
+  }
+  // we restore the selected group for session storage
+  $entities['group_view'] = $group_view;
 
   $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
@@ -317,7 +329,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   $this_group = $current_view->get_group();
   $category_filter = $current_view->get_category();
 
-  if (count($entity_readable['user']['ids']) > 1) {
+  if (OBM_Acl::hasAllowedEntities($obm['uid'],'calendar','read')) {
     //-- Private Group selection
     if ($this_group == $c_all) {
       $sel_group = "<option selected=\"selected\">$l_select_group</option>";
@@ -325,10 +337,11 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       $sel_group = "<option value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_select_group</option>";
     }
 
-    while ($entity_readable['group']->next_record()) {
-      $g_id = $entity_readable['group']->f('group_id');
-      $g_priv = $entity_readable['group']->f('group_privacy');
-      $g_name = $entity_readable['group']->f('group_name');
+    if(is_array($entity_readable['group']))
+    foreach($entity_readable['group'] as $id => $group) {
+      $g_id = $id;
+      $g_priv = $group['privacy'];
+      $g_name = $group['label'];
       if ($g_priv) {
         if ($g_id == $this_group) {
           $selected_s = "selected=\"selected\"";
@@ -404,7 +417,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   }
 
 
-  if ($ccalendar_resource && count($entity_readable['resource']['ids']) > 0) {
+  if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'],'resource','read')) {
     $resource_text = phpStringToJsString($l_search_resources);
     $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;filter_entity=Resource";
     $resource_add_button = "    
@@ -5617,9 +5630,23 @@ function json_event_data($id,$calendar,$current_view) {
   $ed[] = "category:''";
   $ed[] = "colors:{}";
   
-  $entity_readable = get_calendar_entity_readable();
-  $calendar_entity = $current_view->get_entities($ccalendar_max_users, $entity_readable);
-  
+  $group_view = $calendar['entity']['group_view'];
+  if(!empty($cal_entity_id['user']))  {
+    $calentities['user'] = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $cal_entity_id['user']));
+    $calentities['user'] = $calentities['user']['entity'];
+  }
+  if(!empty($cal_entity_id['resource'])) {
+    $calentities['resource'] = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read', $cal_entity_id['resource']));
+    $calentities['resource'] = $calentities['resource']['entity'];
+  }
+  if(!empty($cal_entity_id['group'])) {
+    $calentities['group'] = run_query_get_allowed_groups($cal_entity_id['group']);
+    $calentities['group'] = $calentities['group']['entity'];
+  }
+  // we restore the selected group for session storage
+  $calentities['group_view'] = $group_view;
+
+  $calendar_entity = store_calendar_entities($calentities);
   switch($context)  {
     case 'day' :
       $options = array(); 
@@ -5870,9 +5897,25 @@ function dis_calendar_pdf_view($calendar, $current_view) {
 
   $p_view = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
-  $entity_readable = get_calendar_entity_readable();
 
-  $calendar_entity = $current_view->get_entities($ccalendar_max_users, $entity_readable);
+  $group_view = $calendar['entity']['group_view'];
+  if(!empty($sel_entity_id['user']))  {
+    $entities['user'] = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $sel_entity_id['user']));
+    $entities['user'] = $entities['user']['entity'];
+  }
+  if(!empty($sel_entity_id['resource'])) {
+    $entities['resource'] = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read', $sel_entity_id['resource']));
+    $entities['resource'] = $entities['resource']['entity'];
+  }
+  if(!empty($sel_entity_id['group'])) {
+    $entities['group'] = run_query_get_allowed_groups($sel_entity_id['group']);
+    $entities['group'] = $entities['group']['entity'];
+  }
+  // we restore the selected group for session storage
+  $entities['group_view'] = $group_view;
+
+  $calendar_entity = store_calendar_entities($entities);
+
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view.'_pdf';
 
   $calendar_function($calendar, $current_view, $calendar_entity);

@@ -99,9 +99,9 @@ class EventAlertCronJob extends CronJob{
         }        
         array_push($recipients, $occurrence->id);
         $events[$event->id] = array (
-          "subject" => sprintf($l_alert_mail_subject,addslashes($event->title)),
+          "subject" => sprintf($l_alert_mail_subject,($event->title)),
           "message" => sprintf($l_alert_mail_body,
-                          addslashes($event->title), 
+                          ($event->title), 
                           $current->addSecond($delta)->getOutputDateTime(), 
                           $current->addSecond($event->duration)->getOutputDateTime(), 
                           ($delta/60),

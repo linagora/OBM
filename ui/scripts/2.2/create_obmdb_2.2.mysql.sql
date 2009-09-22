@@ -1219,6 +1219,10 @@ CREATE TABLE `EntityRight` (
   PRIMARY KEY  (`entityright_id`),
   KEY `entityright_entity_id_entity_id` (`entityright_entity_id`),
   KEY `entityright_consumer_id_entity_id` (`entityright_consumer_id`),
+  KEY `entityright_admin_key` (`entityright_admin`),
+  KEY `entityright_read_key` (`entityright_read`),
+  KEY `entityright_access_key` (`entityright_access`),
+  KEY `entityright_write_key` (`entityright_write`)
   CONSTRAINT `entityright_entity_id_entity_id` FOREIGN KEY (`entityright_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `entityright_consumer_id_entity_id` FOREIGN KEY (`entityright_consumer_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1261,12 +1265,14 @@ CREATE TABLE `Event` (
   `event_properties` text,
   PRIMARY KEY  (`event_id`),
   KEY `event_domain_id_domain_id_fkey` (`event_domain_id`),
+  KEY `event_parent_id_event_id_fkey` (`event_parent_id`),
   KEY `event_owner_userobm_id_fkey` (`event_owner`),
   KEY `event_userupdate_userobm_id_fkey` (`event_userupdate`),
   KEY `event_usercreate_userobm_id_fkey` (`event_usercreate`),
   KEY `event_category1_id_eventcategory1_id_fkey` (`event_category1_id`),
   CONSTRAINT `event_category1_id_eventcategory1_id_fkey` FOREIGN KEY (`event_category1_id`) REFERENCES `EventCategory1` (`eventcategory1_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `event_domain_id_domain_id_fkey` FOREIGN KEY (`event_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `event_parent_id_event_id_fkey` FOREIGN KEY (`event_parent_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `event_owner_userobm_id_fkey` FOREIGN KEY (`event_owner`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `event_usercreate_userobm_id_fkey` FOREIGN KEY (`event_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `event_userupdate_userobm_id_fkey` FOREIGN KEY (`event_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE

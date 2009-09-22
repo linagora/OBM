@@ -6289,6 +6289,16 @@ CREATE INDEX domainpropertyvalue_domain_id_fkey ON domainpropertyvalue (domainpr
 
 CREATE INDEX email_entity_id_fkey ON email (email_entity_id);
 --
+-- Name: entityright_access_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX entityright_access_key ON EntityRight (entityright_access) ; 
+--
+-- Name: entityright_admin_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX entityright_admin_key ON EntityRight (entityright_admin) ; 
+--
 -- Name: entityright_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
@@ -6299,6 +6309,16 @@ CREATE INDEX entityright_entity_id_fkey ON entityright (entityright_entity_id);
 
 CREATE INDEX entityright_consumer_id_fkey ON entityright (entityright_consumer_id);
 --
+-- Name: entityright_read_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX entityright_read_key ON EntityRight (entityright_read) ; 
+--
+-- Name: entityright_write_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX entityright_write_key ON EntityRight (entityright_write) ;
+--
 -- Name: event_category1_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
@@ -6308,6 +6328,11 @@ CREATE INDEX event_category1_id_fkey ON event (event_category1_id);
 --
 
 CREATE INDEX event_domain_id_fkey ON event (event_domain_id);
+--
+-- Name: event_parent_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX event_parent_id_fkey ON event (event_parent_id);
 --
 -- Name: event_owner_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
@@ -8624,6 +8649,14 @@ ALTER TABLE ONLY event
 
 ALTER TABLE ONLY event
     ADD CONSTRAINT event_domain_id_domain_id_fkey FOREIGN KEY (event_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: event_parent_id_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY event
+    ADD CONSTRAINT event_parent_id_event_id_fkey FOREIGN KEY (event_parent_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
