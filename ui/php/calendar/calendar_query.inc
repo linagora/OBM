@@ -2678,40 +2678,9 @@ function run_query_calendar_delete($calendar) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the list of readable calendar entities for the current user:
-//   - user
-//   - users group
-//   - resource
-//   - resources group
-///////////////////////////////////////////////////////////////////////////////
-function get_calendar_entity_readable() {
-
-  $ent = array (
-    'user' => get_calendar_user_readable(),
-    'group' => get_calendar_group_readable(),
-    'resource' => get_calendar_resource_readable()
-  );
-
-  return $ent;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the list of readable calendar users for the current user
-///////////////////////////////////////////////////////////////////////////////
-function get_calendar_user_readable() {
-  global $cdg_sql, $obm, $calendar, $c_all;
-
-  $readable_calendars = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read');
-
-  return OBM_Acl_Utils::expandEntitiesArray($readable_calendars);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Get the list of readable calendar group for the current user
 ///////////////////////////////////////////////////////////////////////////////
-function get_calendar_group_readable() {
+function run_query_get_allowed_groups($ids) {
   global $cdg_sql, $obm, $ccalendar_public_groups;
 
   $uid = $obm['uid'];
@@ -2719,33 +2688,23 @@ function get_calendar_group_readable() {
   if (! $ccalendar_public_groups) {
     $where .= " AND group_privacy=1";
   }
-
   $multidomain = sql_multidomain('group');
   $query = "
     SELECT group_id, group_privacy, group_name
     FROM UGroup
-    WHERE $where $multidomain
+    WHERE $where AND group_id IN (".implode(',', $ids).") $multidomain
     ORDER BY group_privacy DESC, group_name";
 
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, 'get_calendar_group_readable()');
+  display_debug_msg($query, $cdg_sql, 'run_query_get_allowed_groups');
   $obm_q->query($query);
-
-  return $obm_q;
+  $entities = array('ids' => array(), 'entity' => array());
+  while($obm_q->next_record()) {
+    $entities['ids'][] = $obm_q->f('group_id');
+    $entities['entity'][$obm_q->f('group_id')] = array('id' => $obm_q->f('group_id'),'label' => $obm_q->f('group_name'));
+  }
+  return $entities;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the list of readable calendar group for the current user
-///////////////////////////////////////////////////////////////////////////////
-function get_calendar_resource_readable() {
-  global $cdg_sql, $obm, $ccalendar_public_groups;
-
-  $readable_resources = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read');
-
-  return OBM_Acl_Utils::expandEntitiesArray($readable_resources);
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get resource infos from the resources id array given
@@ -2834,41 +2793,46 @@ function get_calendar_group_from_ids($groups) {
 function store_calendar_entities($entities_q) {
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
   global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5;
-  global $display, $obm;
+  global $display, $obm, $ccalendar_max_users;
 
   $i = 0;
-  $entity_tab = array();
+  $j = 0;
+  $entities = array();
   $users = $entities_q['user'];
   if (is_array($users)) {
-    foreach ($users as $id => $name) {
+    foreach ($users as $id => $data) {
+      if($j > $ccalendar_max_users) return $entities;
       if ($obm['uid'] == $id) {
-        $entity_tab['user'][$id] = array(
-          'name'  => $name,
+        $entities['user'][$id] = array(
+          'name'  => $data['label'],
           'class' => 'eventOwner',
           'type'  => 'user',
           'id'    => $id);
       } else {
-        $entity_tab['user'][$id] = array(
-          'name'  => $name,
+        $entities['user'][$id] = array(
+          'name'  => $data['label'],
           'class' => "eventOwner$i",
           'type'  => 'user',
           'id'    => $id);
         $i++;
+        $j++;
         $i = $i%20;
       }
     }
   }
   $resources = $entities_q['resource'];
   if (is_array($resources)) {
-    foreach ($resources as $id => $name) {
-      $entity_tab['resource'][$id] = array(
-        'name'  => $name,
+    foreach ($resources as $id => $data) {
+      if($j > $ccalendar_max_users) return $entities;
+      $entities['resource'][$id] = array(
+        'name'  => $data['label'],
         'class' => "eventOwner$i",
         'image' => ${'ico_calendar_user'.$i},
         'type'  => 'resource',
         'id'    => $id
       );
       $i++;
+      $j++;
       $i = $i%20;
     }
   }
@@ -2876,7 +2840,7 @@ function store_calendar_entities($entities_q) {
   if (is_object($resourcegroup_q)) {
     while($resourcegroup_q->next_record()) {
       $id = $resourcegroup_q->f('resource_id');
-      $entity_tab['resourcegroup'][$id] = array(
+      $entities['resourcegroup'][$id] = array(
         'name'  => $resourcegroup_q->f('resource_name'),
         'class' => "eventBg$i",
         'image' => ${'ico_calendar_user'.$i},
@@ -2890,7 +2854,7 @@ function store_calendar_entities($entities_q) {
     }
   }  
 
-  return $entity_tab;
+  return $entities;
 }
 
 
@@ -3272,73 +3236,6 @@ function calendar_localizeDate($format, $date) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Slice the entities to display. Limit the entities selected to the entities
-// really readable by the user, and limit to a max (=6) for display
-// Parameters:
-//   - $sel_entity_id   : ['user'] ['resource'] ids
-//   - $nb_max          : nb max entities to display
-//   - $entity_readable : if given, entities eligibles
-///////////////////////////////////////////////////////////////////////////////
-function slice_calendar_entities($sel_entity_id, $nb_max, $entity_readable='') {
-  global $obm;
-
-  $sel_user_id = $sel_entity_id['user'];
-  $sel_group_id = $sel_entity_id['group'];
-  $sel_resource_id = $sel_entity_id['resource'];
-
-  // users : slice only if users are selected 
-  if (is_array($sel_user_id)) {
-    $res_user_id = array();
-    if ($action != 'perform_meeting') {
-      foreach ($sel_user_id as $u_id) {
-        if (is_array($entity_readable)) {
-          if (in_array($u_id, $entity_readable['user']['ids'])) {
-            $res_user_id[] = $u_id;
-          }
-        } else {
-          $res_user_id[] = $u_id;
-        }
-      }
-    }
-  }
-  if (count($res_user_id) > $nb_max) {
-    $res_user_id = array_slice ($res_user_id, 0, $nb_max);
-  }
-  $nb_user = count($res_user_id);
-
-  // resources : slice only if resources are selected 
-  if (is_array($sel_resource_id)) {
-    $res_resource_id = array();
-    if ($action != 'perform_meeting') {
-      foreach ($sel_resource_id as $r_id) {
-        if (is_array($entity_readable)) {
-          if (in_array($r_id, $entity_readable['resource']['ids'])) {
-            $res_resource_id[] = $r_id;
-          }
-        } else {
-          $res_resource_id[] = $r_id;
-        }
-      }
-    }
-  }
-  $max_res = $nb_max - $nb_user;
-  $nb_res = count($res_resource_id);
-  if ($nb_res > $max_res) {
-    $res_resource_id = array_slice ($res_resource_id, 0, $max_res);
-  }
-  $nb_res = count($res_resource_id);
-  if (($nb_user == 0) && ($nb_res == 0)) {
-    $res_user_id = array($obm['uid']);
-  }
-
-  return array(
-    'user' => $res_user_id,
-    'group' => $sel_group_id,
-    'resource' => $res_resource_id
-  );
-}
-
-
 /**
  * Search fiter
  * Construct WHERE clause 
@@ -3433,8 +3330,6 @@ function run_query_calendar_build_attendee_search_filters($pattern, $type, $like
 }
 
 
-//FIXME HERE I AM
-///////////////////////////////////////////////////////////////////////////////
 // Return all not rejected events in a week of users or/and groups
 // Parameters:
 //   - $start           : timestamp of start date

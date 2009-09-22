@@ -175,9 +175,19 @@ class OBM_Acl {
    * @return bool
    */
   public static function hasAllowedEntities($userId, $entityType, $action) {
-    $query = self::getAclQuery('1', $entityType, null, $userId, $action);
+    $query = self::getAclQuery('1', $entityType, null, $userId, $action, '', '', FALSE, FALSE) . " LIMIT 1";
     self::$db->query($query);
-    self::log($query, 'hasAllowedEntities');
+    self::log($query, 'hasAllowedEntities[peer to peer]');
+    if(self::$db->nf() <= 0) {
+      $query = self::getPublicAclQuery(1, $entityType, null, $action, '') . " LIMIT 1"; 
+      self::$db->query($query);
+      self::log($query, 'hasAllowedEntities[public]');
+    }
+    if(self::$db->nf() <= 0) {
+      $query = self::getGroupAclQuery(1, $entityType, null, $userId, $action, '') . " LIMIT 1";
+      self::$db->query($query);
+      self::log($query, 'hasAllowedEntities[groups]');
+    }
     return self::$db->nf() > 0;
   }
   
@@ -719,7 +729,7 @@ class OBM_Acl_Utils {
       'entity' => array()
     );
     foreach ($entities as $id => $label) {
-      $expandedArray['entity'][] = array('id' => $id, 'label' => $label);
+      $expandedArray['entity'][$id] = array('id' => $id, 'label' => $label);
     }
     return $expandedArray;
   }

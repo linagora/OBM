@@ -3066,11 +3066,11 @@ function json_search_users($user,$results) {
   $user_q = $results['datas'];
 
   $users = array();
-  while($user_q->next_record()) {
-    $id = $user_q->f('userobm_id');
-    $label = phpStringToJsString($user_q->f('userobm_lastname').' '.$user_q->f('userobm_firstname'));
-    if($user_q->f('userobm_hidden') != 1 || $perm->check_right($module, $cright_write_admin)) {
-      $extra = phpStringToJsString($user_q->f('userobm_email'));
+  foreach($user_q as $name => $data) {
+    $id = $data['userobm_id'];
+    $label = phpStringToJsString($data['userobm_lastname'].' '.$user_q['userobm_firstname']);
+    if($user_q['userobm_hidden'] != 1 || $perm->check_right($module, $cright_write_admin)) {
+      $extra = phpStringToJsString($user_q['userobm_email']);
     } else {
       $extra = '';
     }

@@ -946,18 +946,18 @@ function dis_people_display_pref($prefs) {
 function json_search_users($user,$results) {
   global $display, $module, $cright_write_admin, $perm;
 
-  $people_q = $results['datas'];
+  $people = $results['datas'];
 
   $users = array();
-  while($people_q->next_record()) {
-    $id = $people_q->f("id");
-    $label = phpStringToJsString($people_q->f("lastname")." ".$people_q->f("firstname"));
-    if($people_q->f('userobm_hidden') != 1 || $perm->check_right($module, $cright_write_admin)) {
-      $extra = phpStringToJsString($people_q->f("email"));
+  foreach($people as $name => $data) {
+    $id = $data["id"];
+    $label = phpStringToJsString($name);
+    if($data['userobm_hidden'] != 1 || $perm->check_right($module, $cright_write_admin)) {
+      $extra = phpStringToJsString($data["email"]);
     } else {
       $extra = '';
     }
-    $users[] = "{id:'data-".$people_q->f('type')."-$id', label:'$label', extra:'$extra'}";
+    $users[] = "{id:'data-".$data['type']."-$id', label:'$label', extra:'$extra'}";
   }
   $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$users)."]}";
 }

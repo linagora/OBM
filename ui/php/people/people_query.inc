@@ -323,46 +323,37 @@ function run_query_people_ext_search($people) {
   else $first_row = 0;
 
   if ($filter_entity == 'calendar') {
-    $users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', $filter_pattern);
-    $users_ids = array_keys($users);
-    if ((is_array($users_ids)) && (count($users_ids) > 0)) {
-      $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
-      foreach($users_ids as $u_id) {
-	      $where_filter_entity .= "$coma'$u_id'";
-	      $coma = ',';
-      }
-      $where_filter_entity .= '))';
-    } else {
-      // If no users have given $uid with read right, return empty set
-      $where_filter_entity = ' AND userobm_id < 0';
-    }
+    $where_filter_entity = ' INNER JOIN ('.OBM_Acl::getAclSubselect('calendarentity_calendar_id', 'calendar', null, $obm['uid'], $filter_pattern).') as Rights ON Rights.calendarentity_calendar_id = userobm_id';
   }
   // XXXXXX Migrate the access right to the Addressbook
-  $where_contact_acl = "AND (";
-  $where_contact_acl.= "1 = 1";
   $f_contact_ids = run_query_people_allowed_access_contacts();
   if ((is_array($f_contact_ids)) && (count($f_contact_ids) > 0)) {
     $f_contact_ids = array_map(sql_parse_id,$f_contact_ids);
-    $where_contact_acl .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
+    $where_contact_acl = " OR contact_id IN (".implode(',',$f_contact_ids).")";
   }
-  $where_contact_acl.= ")";
+  $where_contact_acl = "AND (contact_privacy = 0 $where_contact_acl)";
+  $patterns = explode(' ', $pattern);
+
+  foreach ($patterns as $pattern) {
+    $userpattern .= "AND (userobm_lastname $like '$pattern%' OR userobm_firstname $like '$pattern%' OR userobm_email $like  '%$pattern%' )";
+    $contactpattern .= "AND (contact_lastname $like '$pattern%' OR contact_firstname $like '$pattern%' OR contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$pattern%'))";
+  }
 
   $query_userobm = "SELECT 
       userobm_id as id,
       userobm_lastname as lastname,
       userobm_firstname as firstname,
       userobm_email as email,
-      'user' as type
+      'user' as type,
+      userobm_hidden
     FROM UserObm
-    WHERE (
-      userobm_lastname $like '$pattern%' 
-      OR userobm_firstname $like '$pattern%' 
-      OR userobm_email $like  '%$pattern%' )
+    WHERE 1 = 1 $userpattern 
       AND userobm_archive = 0
       $multidomain
-      $where_filter_entity";
-
-  $query_contact = "SELECT 
+      $where_filter_entity
+      LIMIT $limit OFFSET $first_row";
+  $query_contact = "
+    SELECT 
       contact_id as id,
       contact_lastname as lastname,
       contact_firstname as firstname,
@@ -371,25 +362,29 @@ function run_query_people_ext_search($people) {
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
     LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label LIKE 'INTERNET;X-OBM-Ref1'
-    WHERE (
-      contact_lastname $like '$pattern%'
-      OR contact_firstname $like '$pattern%'
-      OR contactentity_entity_id IN (
-        SELECT email_entity_id FROM Email WHERE email_address $like '$pattern%'
-      ))
+    WHERE 1 = 1 $contactpattern 
       AND contact_archive = 0
-      $multidomain_contact
-      $where_contact_acl";
+      $where_contact_acl
+      $multidomain_contact   
+      LIMIT $limit OFFSET $first_row
+    ";
 
-
-  $query = "$query_userobm UNION $query_contact ORDER BY lastname, firstname
-    LIMIT $limit OFFSET $first_row";
 
   display_debug_msg($query, $cdg_sql, 'run_query_people_ext_search()');
-  $obm_q->query($query);
+  $rows =  array();
+  $obm_q->query($query_userobm);
+  while($obm_q->next_record()) {
+    $rows[$obm_q->f("lastname")." ".$obm_q->f("firstname")] = $obm_q->Record;
+  }
   $resultsCount = $obm_q->num_rows();
+  $obm_q->query($query_contact);
+  while($obm_q->next_record()) {
+    $rows[$obm_q->f("lastname")." ".$obm_q->f("firstname")] = $obm_q->Record;
+  }
+  ksort($rows);
+  $resultsCount += $obm_q->num_rows();
 
-  return array('length' => $resultsCount, 'datas' => $obm_q);
+  return array('length' => $resultsCount, 'datas' => $rows);
 }
 
 
