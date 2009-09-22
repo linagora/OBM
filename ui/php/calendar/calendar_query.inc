@@ -5407,6 +5407,7 @@ Class CalendarView {
   protected $id;
   protected $entity_id;
   protected $label;
+  protected $date;
 
   protected $cal_range;
   protected $cal_view;
@@ -5424,6 +5425,7 @@ Class CalendarView {
    */
   public function __construct($data = array()) {
     $this->modify();
+    $this->date = new Of_Date();
     $this->set_cal_range($data['cal_range']);
     $this->set_cal_view($data['cal_view']);
     $this->set_category($data['category']);
@@ -5530,6 +5532,16 @@ Class CalendarView {
   }
 
   /**
+   * standard date getter,
+   * 
+   * @access public
+   * @return Of_Date
+   */
+  public function get_date() {
+    return $this->date;
+  }
+
+  /**
    * true if current view is the default one
    * default view id is read from $_SESSION['set_cal_default_view']
    * 
@@ -5568,6 +5580,16 @@ Class CalendarView {
    */
   public function get_category() {
     return $this->category;
+  }
+
+  /**
+   * get the selected category
+   * 
+   * @access public
+   * @return string
+   */
+  public function get_category_filter() {
+    return $this->category == $GLOBALS['c_all'] ? '' : $this->category;
   }
 
   /**
@@ -5614,6 +5636,10 @@ Class CalendarView {
   public function set_label($label) {
     $this->label = $label;
     $this->modify();
+  }
+
+  public function set_date($date) {
+    $this->date = $date;
   }
 
   public function set_cal_range($cal_range = null) {

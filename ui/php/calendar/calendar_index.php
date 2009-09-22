@@ -88,6 +88,9 @@ if (isset($params['cal_range'])) {
 if (isset($params['group_view']) && ($params['group_view']!=$current_view->get_group())) {
   $current_view->set_group($params['group_view']);
 }
+if (isset($params['date']) && !empty($params['date'])) {
+  $current_view->set_date($params['date']);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -200,7 +203,6 @@ if ($popup) {
 }
 
 
-$display['search'] = dis_calendar_view_bar($current_view, $params['date'],$action, $params);
 
 if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -292,15 +294,6 @@ if ($action == 'search') {
           $display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
         }
 
-//        if ($params['add_displayed_users']) {
-//          if ($params['show_attendees_calendar']) {
-//            // Display attendees
-//            $cal_entity_id['user'] = $params['sel_user_id'];
-//            $cal_entity_id['resource'] = $params['sel_resource_id'];
-//          } else {
-//            // Display calendars
-//          }
-//        }
         if ($params['show_attendees_calendar']) {
           // Display attendees
           $current_view->set_users($params['sel_user_id']);
@@ -310,7 +303,7 @@ if ($action == 'search') {
         }
 
         $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
-        $params["date"] = $params["date_begin"];
+        $current_view->set_date($params["date_begin"]);
         $display['detail'] = dis_calendar_calendar_view($params, $current_view);
       }
   } else {
@@ -395,15 +388,6 @@ if ($action == 'search') {
         }
         run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
 
-//        if ($params['add_displayed_users']) {
-//          if ($params['show_attendees_calendar']) {
-//            // Display attendees
-//            $cal_entity_id['user'] = $params['sel_user_id'];
-//            $cal_entity_id['resource'] = $params['sel_resource_id'];
-//          } else {
-//            // Display calendars
-//          }
-//        }
         if ($params['show_attendees_calendar']) {
           // Display attendees
           $current_view->set_users($params['sel_user_id']);
@@ -413,7 +397,7 @@ if ($action == 'search') {
         }
 
         $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
-        $params["date"] = $params["date_begin"];
+        $current_view->set_date($params["date_begin"]);
         $display['detail'] = dis_calendar_calendar_view($params, $current_view);
       }
     } else {
@@ -570,7 +554,7 @@ if ($action == 'search') {
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'])) {
-    $display['detail'] = html_calendar_dis_delete($params);
+    $display['detail'] = html_calendar_dis_delete($current_view, $params['calendar_id']);
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
@@ -618,7 +602,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'new_meeting')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_calendar_meeting_form($params, $cal_entity_id);
+  $display['detail'] = dis_calendar_meeting_form($current_view, $params, $cal_entity_id);
 
 } elseif ($action == 'admin')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -681,7 +665,7 @@ if ($action == 'search') {
     $template_id = run_query_calendar_create_or_update_event_template($params);
     
     $display['msg'] .= display_ok_msg("$l_template : $l_insert_ok");
-    $params["date"] = $params["date_begin"];
+    $current_view->set_date($params["date_begin"]);
     $display['detail'] = dis_calendar_calendar_view($params, $current_view);
   } else {
     foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
@@ -702,7 +686,7 @@ if ($action == 'search') {
     run_query_calendar_create_or_update_event_template($params);
     
     $display['msg'] .= display_ok_msg("$l_template : $l_update_ok");
-    $params["date"] = $params["date_begin"];
+    $current_view->set_date($params["date_begin"]);
     $display['detail'] = dis_calendar_calendar_view($params, $current_view);
   } else {
     foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
@@ -857,7 +841,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'pdf_export_form') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_calendar_pdf_options($params, $current_view);
+  $display['detail'] = dis_calendar_pdf_options($current_view);
 
 } elseif ($action == 'pdf_export') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -889,6 +873,9 @@ if ($action == 'search') {
     $display['msg'] .= display_err_msg($l_err_reference);
   }
 }
+
+// displayed after, because $params['date'] can be updated by actions
+$display['search'] = dis_calendar_view_bar($current_view, $action, $params);
 
 $_SESSION['cal_current_view'] = serialize($current_view);
 
@@ -958,7 +945,7 @@ if (!$params['ajax']) {
 
 } elseif ($action == 'perform_meeting')  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_calendar_free_interval($params);
+  dis_calendar_free_interval($current_view);
   echo "({".$display['json']."})";
   exit();
 

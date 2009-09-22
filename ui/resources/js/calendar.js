@@ -1102,6 +1102,10 @@ Obm.CalendarInDayEvent = new Class({
         'z-index' : '10' 
       });
       obm.calendarManager.scroll.stop();
+//      obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
+//      obm.calendarManager.popupManager.addEvent('update_occurency', function () {
+//        eventData.update_occurency = true;
+//      });
       obm.calendarManager.sendUpdateEvent(this);
 
       // remove listener
@@ -1129,6 +1133,10 @@ Obm.CalendarInDayEvent = new Class({
         'z-index' : '10' 
       });
       obm.calendarManager.scroll.stop();
+//      obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
+//      obm.calendarManager.popupManager.addEvent('update_occurency', function () {
+//        eventData.update_occurency = true;
+//      });
       obm.calendarManager.sendUpdateEvent(this);
     }.bind(this));
   },
@@ -1309,6 +1317,10 @@ Obm.CalendarAllDayEvent = new Class({
       this.element.setStyles({
         'z-index' : '10' 
       });
+//      obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
+//      obm.calendarManager.popupManager.addEvent('update_occurency', function () {
+//        eventData.update_occurency = true;
+//      });
       obm.calendarManager.sendUpdateEvent(this);
     }.bind(this));
   },
@@ -1395,6 +1407,16 @@ Obm.CalendarPopupManager = new Class({
     // Close popup and redraw event
     $('popup_cancel').addEvent('click', function() {
       this.cancel();
+    }.bind(this));
+
+    // Repeated event popup
+    $('popup_update_one').addEvent('click', function() {
+      this.fireEvent('update_occurency');
+      this.chain.callChain();
+    }.bind(this));
+
+    $('popup_delete_one').addEvent('click', function() {
+      this.chain.callChain();
     }.bind(this));
 
     // Mail Notification actions

@@ -20,10 +20,10 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   global $display, $path, $ccalendar_max_users, $obm;
   global $l_module_calendar;
 
+  $date = $current_view->get_date();
   $p_view = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
 
-  $group_view = $calendar['entity']['group_view'];
   $entity_readable = get_calendar_entity_readable();
   $calendar_entity = $current_view->get_entities($ccalendar_max_users, $entity_readable);
 
@@ -36,15 +36,15 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   $display['features'] = html_calendar_planning_bar($calendar, $current_view, $calendar_entity, $entity_readable, $my_views, $p_view);
   $display['title'] = "<div class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"].' '.$GLOBALS["l_range_$p_range"].' </div>';
   if (function_exists($calendar_function)) {
-    $block = $calendar_function($calendar, $calendar_entity,$writable_entity,$date);
-    $block .= dis_calendar_quick_form($calendar,$calendar_entity);
+    $block = $calendar_function($current_view, $calendar_entity, $writable_entity);
+    $block .= dis_calendar_quick_form($calendar_entity);
     $block .= dis_calendar_conflict_popup();
     $calendar_function_pdf = $calendar_function."_pdf";
     if (function_exists($calendar_function_pdf)) {
-      $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$calendar['date']->getURL()."&amp;output_target=print";
+      $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$date->getURL()."&amp;output_target=print";
     }
   } else {
-    $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
+    $block .= dis_calendar_month_planning($current_view, $calendar_entity, $writable_entity);
   }
   return $block;
 }
@@ -84,7 +84,7 @@ function dis_calendar_search_result($calendar, $current_view) {
     $begin = $calendar['date_begin'];
     $end = $calendar['date_end'];
   }
-  $block .= dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $begin, $end, $pattern, $calendar['searchType']);
+  $block .= dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $begin, $end, $pattern, $calendar['searchType']);
 
   return $block;
 }
@@ -97,7 +97,7 @@ function dis_calendar_search_result($calendar, $current_view) {
  * @access public
  * @return void
  */
-function dis_calendar_view_bar($current_view, $date, $action, $calendar) {
+function dis_calendar_view_bar($current_view, $action, $calendar) {
   global $ico_week_view, $ico_day_view, $ico_month_view, $ico_list_view;
   global $ico_week_view_current, $ico_day_view_current, $ico_month_view_current;
   global $ico_agenda_view,  $ico_planning_view, $ico_list_view_current;
@@ -107,6 +107,7 @@ function dis_calendar_view_bar($current_view, $date, $action, $calendar) {
   global $l_view_week_desc, $l_view_day_desc, $l_view_month_desc;
   global $path;
 
+  $date = $current_view->get_date();
   $p_kind = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
   if ($p_kind) {
@@ -117,7 +118,7 @@ function dis_calendar_view_bar($current_view, $date, $action, $calendar) {
   }
   if ($action == 'index' || $action == 'waiting_events' || $action == 'insert' || $action == 'update') {
     $search_form = dis_calendar_html_search_form($calendar);
-    $navbar = dis_calendar_navbar($calendar, $p_range);
+    $navbar = dis_calendar_navbar($current_view);
   }
   
   if ($action == 'new') {
@@ -203,11 +204,11 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
 
   $output_target = $calendar['output_target'];
 
-  $block = html_calendar_bar_legend($p_view, $calendar_entity,$calendar);
+  $block = html_calendar_bar_legend($p_view, $calendar_entity, $current_view);
   if ($action != 'perform_meeting' && $output_target != 'print') {
-    $block .= html_calendar_select_calendar_entity($p_view, $calendar, $current_view, $calendar_entity, $entity_readable);
-    $block .= html_calendar_view_selector($calendar, $my_views, $current_view);
-    $block .= html_calendar_bar_date_selector($calendar);
+    $block .= html_calendar_select_calendar_entity($p_view, $current_view, $calendar_entity, $entity_readable);
+    $block .= html_calendar_view_selector($current_view, $my_views);
+    $block .= html_calendar_bar_date_selector($current_view);
   }
 
   return $block;
@@ -219,14 +220,15 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
 // Parameters:
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
+function html_calendar_bar_legend($p_view, $calendar_entity, $current_view) {
   global $ico_user, $ico_resource, $obm;
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
   global $l_calendar_displayed, $l_resource_displayed,$c_all,$l_event_color_tt;
   global $action,$ico_delete,$output_target,$l_color,$l_users,$l_events;
   global $mono_user;
 
-  $iso = $calendar['date']->getURL();
+  $date = $current_view->get_date();
+  $iso = $date->getURL();
   if (count($calendar_entity) == 1 && is_array($calendar_entity['user'])
      && count($calendar_entity['user']) == 1) {
     $colorTemplate = 'event';
@@ -283,7 +285,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   <ul>
     $dis_legend
   </ul>
-  <input type=\"hidden\" name=\"date\" value=\"".$calendar['date']->getIso()."\" />
+  <input type=\"hidden\" name=\"date\" value=\"".$date->getIso()."\" />
   <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
   <input type=\"hidden\" name=\"new_group\" value=\"1\" />
   <input type=\"hidden\" name=\"new_sel\" value=\"1\" />    
@@ -298,11 +300,11 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
 // Display the "View type" navigation bar component (User, Resource)
 // Parameters:
 //   - $new_action      : action to be passed
-//   - $calendar          : hash values
+//   - $current_view    : current calendar view
 //   - $calendar_entity : array of entities elements to display
 //   - $entity_readable : array of readable entities (['user'], ['resource'])
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_select_calendar_entity($new_action, $calendar, $current_view, $calendar_entity, $entity_readable) {
+function html_calendar_select_calendar_entity($new_action, $current_view, $calendar_entity, $entity_readable) {
   global $path, $obm, $c_all, $ccalendar_resource;
   global $ico_add, $popup_width, $popup_height, $l_today, $ico_add;
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
@@ -310,9 +312,10 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $current_v
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
   global $ico_group, $l_calendar, $l_add;
 
-  $iso = $calendar['date']->getURL();
+  $date = $current_view->get_date();
+  $iso = $date->getURL();
   $this_group = $current_view->get_group();
-  $category_filter = $calendar['category_filter'];
+  $category_filter = $current_view->get_category();
 
   if (count($entity_readable['user']['ids']) > 1) {
     //-- Private Group selection
@@ -377,7 +380,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $current_v
       $user_add_button
       </legend>
       <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"user\" autocomplete=\"off\" />
-      <input type=\"hidden\" name=\"date\" value=\"".$calendar['date']->getIso()."\" />
+      <input type=\"hidden\" name=\"date\" value=\"".$date->getIso()."\" />
       <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
       <input type=\"hidden\" name=\"new_group\" value=\"1\" />
       <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
@@ -458,7 +461,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $current_v
     <fieldset class=\"detail extra\">
     <legend>$l_category_filter</legend>
       $sel_cat1 
-      <input type=\"hidden\" name=\"date\" value=\"".$calendar['date']->getIso()."\" />
+      <input type=\"hidden\" name=\"date\" value=\"".$date->getIso()."\" />
     </fieldset>
     </form>
     $block_entity
@@ -485,13 +488,13 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $current_v
 ///////////////////////////////////////////////////////////////////////////////
 // Display the navigation date selector 
 // Parameters:
-//   - $calendar: calendar parameters
+//   - $current_view: current calendar view
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_bar_date_selector($calendar) {
+function html_calendar_bar_date_selector($current_view) {
   global $ccalendar_weekstart,$ico_ok, $path;
   global $l_go, $l_go_to, $l_daysofweekfirst;
   
-  $date = $calendar['date'];
+  $date = $current_view->get_date();
   $date_end = clone $date; 
   $date_end->addMonth(9);
   // Week Selection
@@ -606,20 +609,21 @@ function html_calendar_bar_date_selector($calendar) {
 /**
  * HTML for the view selector portlet
  *
- * @param $calendar calendar parameters 
+ * @param $current_view current calendar view
  * @param $my_view user's views
  * @access public
  * @return HTML
 */
-function html_calendar_view_selector($calendar, $my_views, $current_view) {
+function html_calendar_view_selector($current_view, $my_views) {
   global $obm;
   global $l_views, $l_view_label, $l_select, $l_select_view, $l_label_default, $l_delete_default_view, $l_insert_default_view; 
   global $l_view_save, $l_view_delete, $l_validate, $l_fill_view_label;
   global $l_confirm_delete_view, $l_no_sel_view, $l_conflict_view_label, $l_confirm_default_view, $l_no_sel_default_view;
   global $ico_delete, $ico_add, $ico_popup_close;
 
+  $date = $current_view->get_date();
   $view_id = $current_view->get_id();
-  $iso = $calendar['date']->getURL();
+  $iso = $date->getURL();
   $default_view_id = $_SESSION['set_cal_default_view'];
   $display = 'none';
   if (isset($default_view_id)) {
@@ -706,21 +710,21 @@ function html_calendar_view_selector($calendar, $my_views, $current_view) {
 /**
  * Display the HTML day view
  *
- * @param array $calendar calendar parameters
+ * @param CalendarView $current_view : current calendar view
  * @param array $calendar_entity : entities to display ['user'] ['resource'] 
  * @param array $writable_entity : entities with write access
  */
-function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
+function dis_calendar_day_agenda($current_view, $calendar_entity, $writable_entity) {
 
   $display_days = 1;
 
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setHour(0)->setMinute(0)->setSecond(0);
 
   $end = clone $date;
   $end->addDay(1);
 
-  $block = dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, $date, $end);
+  $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end);
 
   return $block;
 }
@@ -729,19 +733,19 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
 /**
  * Display the HTML week view
  *
- * @param array $calendar calendar parameters
+ * @param CalendarView $current_view : current calendar view
  * @param array $calendar_entity : entities to display ['user'] ['resource'] 
  * @param array $writable_entity : entities with write access
  */
-function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) {
+function dis_calendar_week_agenda($current_view, $calendar_entity, $writable_entity) {
 
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
 
   $end = clone $date;
   $end->addDay(7);
 
-  $block = dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, $date, $end);
+  $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end);
 
   return $block;
 }
@@ -750,19 +754,19 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
 /**
  * Display the HTML month view
  *
- * @param array $calendar calendar parameters
+ * @param CalendarView $current_view : current calendar view
  * @param array $calendar_entity : entities to display ['user'] ['resource'] 
  * @param array $writable_entity : entities with write access
  */
-function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity) {
+function dis_calendar_month_agenda($current_view, $calendar_entity, $writable_entity) {
 
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setDay(1)->addDay(1)->subWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
 
-  $end = clone $calendar['date'];
+  $end = clone $current_view->get_date();
   $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
 
-  $block .= dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, $date, $end);
+  $block .= dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end);
   return $block;
 }
 
@@ -774,24 +778,25 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
  *   today link
  *   search field
  */
-function dis_calendar_navbar($calendar, $range) {
+function dis_calendar_navbar($current_view) {
  
-  $current = clone $calendar['date'];
+  $range = $current_view->get_cal_range();
+  $current = clone $current_view->get_date();
+  $date = clone $current_view->get_date();
 
   switch($range) {
     case 'day':
-      $url_prev = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->subDay(1)->getURL();
-      $url_next = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->addDay(1)->getURL();
-      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getURL();
-      $url_far_next = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getURL();
-      $label = $calendar['date']->localize(Of_Date::OBM_DATE_DAY);
+      $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subDay(1)->getURL();
+      $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addDay(1)->getURL();
+      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subWeek(1)->getURL();
+      $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addWeek(1)->getURL();
+      $label = $date->localize(Of_Date::OBM_DATE_DAY);
       break;
     case 'week':
-      $url_prev = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getURL();
-      $url_next = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getURL();
-      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getURL();
-      $url_far_next = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getURL();
-      $date = clone $calendar['date'];
+      $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subWeek(1)->getURL();
+      $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addWeek(1)->getURL();
+      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getURL();
+      $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getURL();
       $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
       $end = clone $date;
       $end->addDay(7);
@@ -811,11 +816,11 @@ function dis_calendar_navbar($calendar, $range) {
       $label = "$label_begin - $label_end";
       break;
     case 'month':
-      $url_prev = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getURL();
-      $url_next = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getURL();
-      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->subYear(1)->getURL();
-      $url_far_next = "calendar_index.php?date=".$current->setDateIso($calendar['date'])->addYear(1)->getURL();
-      $label = $calendar['date']->localize(Of_Date::OBM_DATE_MONTH);
+      $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getURL();
+      $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getURL();
+      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subYear(1)->getURL();
+      $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addYear(1)->getURL();
+      $label = $date->localize(Of_Date::OBM_DATE_MONTH);
       break;
     default:
       break;
@@ -1019,13 +1024,13 @@ function dis_calendar_select_template_form($action) {
 /**
  * Display the HTML calendar view
  *
- * @param array $calendar calendar parameters
+ * @param array $current_view current calendar view
  * @param array $calendar_entity : entities to display ['user'] ['resource'] 
  * @param array $writable_entity : entities with write access
  * @param Of_Date $date : date begin
  * @param int $display_days: nb days to display 
  */
-function dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, $date, $end) {
+function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end) {
  
   $GLOBALS['js']['vars']['images']['resize'] = $GLOBALS['ico_resize'];
   $GLOBALS['js']['vars']['images']['periodic'] = $GLOBALS['ico_periodic'];
@@ -1039,11 +1044,11 @@ function dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, 
   $display_days = ($end->getTimestamp() - $date->getTimestamp())/86400;
 
   if ($display_days > 14) {
-    $block .= dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_entity, $date, $end);
+    $block .= dis_calendar_html_month_agenda($current_view, $calendar_entity,$writable_entity, $date, $end);
     return $block;
   }
 
-  $category_filter = $calendar['category_filter'];
+  $category_filter = $current_view->get_category_filter();
   $week_num = $date->get(Of_Date::WEEK);
   $start_time = $date->getTimestamp();
 
@@ -1179,13 +1184,13 @@ function dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, 
 
 
 
-function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_entity, $date, $end) {
+function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writable_entity, $date, $end) {
  
+  $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
 
-  $category_filter = $calendar['category_filter'];
   $start_time = $date->getTimestamp();
 
   $weeks = $end->diffWeek($date); 
@@ -1230,7 +1235,7 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
       $today = "";
       if ($current->isToday()) {
         $today = "background:#FFFFCC;";
-      } elseif ($current->compareMonth($calendar['date']) != 0) {
+      } elseif ($current->compareMonth($current_view->get_date()) != 0) {
         $klass = 'downlight';
       } else {
         $klass = '';
@@ -1314,21 +1319,20 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
 /**
  * Display Event List over one week
  * 
- * @param mixed $calendar 
+ * @param CalendarView $current_view : current calendar view
  * @param mixed $calendar_entity 
  * @param mixed $writable_entity 
  * @access public
  * @return void
  */
-function dis_calendar_day_list($calendar, $calendar_entity, $writable_entity) {
+function dis_calendar_day_list($current_view, $calendar_entity, $writable_entity) {
   global $ccalendar_weekstart, $ccalendar_first_hour, $ccalendar_last_hour;
 
-  $category_filter = $calendar['category_filter'];
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(1);
-  $block = dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end);
+  $block = dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end);
 
   return $block;
 }
@@ -1336,21 +1340,20 @@ function dis_calendar_day_list($calendar, $calendar_entity, $writable_entity) {
 /**
  * Display Event List over one week
  * 
- * @param mixed $calendar 
+ * @param CalendarView $current_view : current calendar view
  * @param mixed $calendar_entity 
  * @param mixed $writable_entity 
  * @access public
  * @return void
  */
-function dis_calendar_week_list($calendar, $calendar_entity, $writable_entity) {
+function dis_calendar_week_list($current_view, $calendar_entity, $writable_entity) {
   global $ccalendar_weekstart, $ccalendar_first_hour, $ccalendar_last_hour;
 
-  $category_filter = $calendar['category_filter'];
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(6);
-  $block = dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end);
+  $block = dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end);
 
   return $block;
 }
@@ -1359,20 +1362,20 @@ function dis_calendar_week_list($calendar, $calendar_entity, $writable_entity) {
 /**
  * Display Event List over one month
  * 
- * @param mixed $calendar 
+ * @param CalendarView $current_view : current calendar view
  * @param mixed $calendar_entity 
  * @param mixed $writable_entity 
  * @access public
  * @return void
  */
-function dis_calendar_month_list($calendar, $calendar_entity, $writable_entity) {
+function dis_calendar_month_list($current_view, $calendar_entity, $writable_entity) {
   
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setDay(1)->setHour(0)->setMinute(0)->setSecond(0);
-  $category_filter = $calendar['category_filter'];
   $end = clone $date;
   $end->addMonth(1);
-  $block = dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end);
+  $block = dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end);
+
   return $block;
 }
 
@@ -1380,11 +1383,10 @@ function dis_calendar_month_list($calendar, $calendar_entity, $writable_entity) 
 /**
  * Display Event List
  * 
- * @param mixed $calendar 
  * @param mixed $calendar_entity 
  * @return event list HTML code
  */
-function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end, $pattern='',$searchType='') {
+function dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end, $pattern='',$searchType='') {
   global $obm;
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
   global $l_desc, $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
@@ -1416,7 +1418,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
     }    
   }
   
-  $category_filter = $calendar['category_filter'];
+  $category_filter = $current_view->get_category_filter();
 
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true,$pattern,$searchType);
@@ -1845,15 +1847,16 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the month
 // Parameters:
-//   - $calendar: calendar parameters
+//   - $current_view : current calendar view
 //   - $calendar_entity : array of entities to display ['user'] ['resource'] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_month_planning($calendar, $calendar_entity, $writable_entity) { 
+function dis_calendar_month_planning($current_view, $calendar_entity, $writable_entity) { 
   global $obm, $ico_new_event;
   global $ccalendar_weekstart, $l_week, $l_all_day;
   global $l_private,$l_daysofweekfirst,$l_daysofweek;
 
-  $date = clone $calendar['date'];
+  $category_filter = $current_view->get_category_filter();
+  $date = clone $current_view->get_date();
   $date->setDay(1);
   $current = clone $date;
   $current->setHour(0)->setMinute(0)->setSecond(0);
@@ -1864,14 +1867,12 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
   $events = calendar_events_model($current,$end, $calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
 
-  $category_filter = $calendar['category_filter'];
   $cats1 = of_category_get_ordered('event', 'category1');
   $nb = count($cats1);
   $colors = random_color($nb);
   foreach($cats1 as $key => $cat_info) {
     $cats_color[$cat_info['label']] = $colors[$key];
   }
-
 
   $day_amount = 0;
   while($current->compare($end) < 0) {
@@ -2006,13 +2007,13 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
 /**
  * dis_calendar_week_planning 
  * 
- * @param mixed $calendar 
+ * @param CalendarView $current_view : current calendar view
  * @param mixed $calendar_entity 
  * @param mixed $writable_entity 
  * @access public
  * @return void
  */
-function dis_calendar_week_planning($calendar, $calendar_entity, $writable_entity) {
+function dis_calendar_week_planning($current_view, $calendar_entity, $writable_entity) {
   global $path,$l_week;
   global $ccalendar_weekstart, $obm;
   global $ccalendar_first_hour;
@@ -2021,8 +2022,8 @@ function dis_calendar_week_planning($calendar, $calendar_entity, $writable_entit
   $display_days = $_SESSION['set_cal_display_days'];
   if (empty($display_days)) $display_days = '1111111';
 
-  $category_filter = $calendar['category_filter'];
-  $date = clone $calendar['date'];
+  $category_filter = $current_view->get_category_filter();
+  $date = clone $current_view->get_date();
   $date->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(7);
@@ -2035,17 +2036,17 @@ function dis_calendar_week_planning($calendar, $calendar_entity, $writable_entit
 /**
  * dis_calendar_day_planning
  * 
- * @param mixed $calendar 
+ * @param CalendarView $current_view : current calendar view
  * @param mixed $calendar_entity 
  * @param mixed $writable_entity 
  * @access public
  * @return void
  */
-function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity) {
+function dis_calendar_day_planning($current_view, $calendar_entity,$writable_entity) {
   global $path, $obm;
 
-  $category_filter = $calendar['category_filter'];
-  $date = $calendar['date'];
+  $category_filter = $current_view->get_category_filter();
+  $date = clone $current_view->get_date();
   $date->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(1);
@@ -3189,7 +3190,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
  * @access public
  * @return HTML
  */
-function dis_calendar_quick_form($calendar,$calendar_entity) {
+function dis_calendar_quick_form($calendar_entity) {
   global $obm,$ico_popup_close,$popup_queue,$l_validate, $l_edit, $l_edit_full;
   global $l_confirm_delete,$l_c_delete, $l_title, $l_category1, $l_desc;
   global $l_location, $l_owner, $l_members, $l_users, $l_carac, $l_items, $l_details;
@@ -3407,6 +3408,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $tagcolor = "#eff0f2" ; // backcolor by default
 
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') || ($action == 'new' && $event_q != '') || ($action == 'edit_template')) {
+    $is_exception = $event_q->f('event_is_exception');
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
     $cat1 = $event_q->f('event_category1_id');
@@ -3473,6 +3475,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   if (isset($calendar['new_meeting'])) $event_q = '';
 
+  if ($event_q=='') { $is_exception = $calendar['is_exception']; }
   // If parameters have been given, they supercede the default action value
   if (isset($calendar['calendar_id'])) { $id = $calendar['calendar_id']; }
   if (isset($calendar['title'])) { $title = stripslashes($calendar['title']); }
@@ -4093,11 +4096,66 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
          <a href=\"javascript: remove_element('date_exception-$key','exceptionHome');\">
          <img src=\"$ico_delete\" alt=\"[Delete]\">
          </a>
-         <input type=\"text\" name=\"tf_date_exception[]\" value=\"".$exception->getInputDate()."\" class=\"datePicker\" />
+         <input type=\"hidden\" name=\"hf_date_exception[]\" value=\"".$exception->getInputDate()."\" />
+         ".$exception->getInputDate()."
        </div>";
     }
   }
   $add_date = "<a href=\"javascript: add_exdate();\"><img src=\"$ico_add\" alt=\"[Date]\" /></a>";
+
+  if ($is_exception) {
+    $block_repeat = "
+    <fieldset class=\"detail infos\">
+    <legend>$l_repeat</legend>
+    <input type=\"hidden\" name=\"is_exception\" value=\"1\" />
+    <input type=\"hidden\" name=\"repeat_kind\" value=\"none\" />
+    <input type=\"hidden\" name=\"tf_repeatfrequency\" value=\"1\" />
+    <table>
+    <tr>
+      <th>$GLOBALS[l_exception] :</th>
+      <td>$GLOBALS[l_event_is_exception]</td>
+    </tr>
+    </table>
+    </fieldset>";
+
+  } else {
+    $block_repeat = "
+    <fieldset class=\"detail infos\">
+    <legend>$l_repeat</legend>
+    <table>    
+    <tr>    
+      <th>$l_repeatkind</th> 
+      <td>$dis_sel_kind</td>
+    </tr>
+    <tr id=\"repeatFrequency\" style=\"display:$repeatDisplay\">    
+      <th>$l_repeatfrequency</th> 
+      <td>$frequency_block</td>
+    </tr>    
+    <tr id=\"noRepeatEnd\">    
+      <th>Pas de date de fin</th> 
+      <td><input type=\"checkbox\" id=\"cbx_no_repeatend\" onclick=\"toggleDisplay($('repeatEnd'));\" /></td>
+    </tr>
+    <tr id=\"repeatEnd\" style=\"display:$repeatDisplay\">    
+      <th>$l_date_repeatend</th> 
+      <td>
+        <input type=\"text\" name=\"tf_repeat_end\" id=\"tf_repeat_end\" value=\"$repeat_end_value\" class=\"datePicker\" />
+      </td>
+    </tr>
+    <tr id=\"repeatDays\" style=\"display:$repeatDaysDisplay\">  
+      <th>$l_repeatdays2</th>
+      <td>$dis_repeat_day</td>
+    </tr>
+    <tr id=\"repeatException\" style=\"display:$repeatDisplay; white-space:nowrap;\">
+      <th> $l_exception $add_date</th>
+      <td id=\"exceptionHome\">$block_exception_detail</td>
+      </tr>
+    <tr>
+      <th></th>
+      <td>&nbsp;</td>
+    </tr>    
+    </table>
+    </fieldset>";
+  }
 
   // Alerts
   $sel_alert = "<select name=\"sel_alert\">
@@ -4209,41 +4267,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   </tr>     
   </table>
   </fieldset>
-  <fieldset class=\"detail infos\">
-  <legend>$l_repeat</legend>
-  <table>    
-  <tr>    
-    <th>$l_repeatkind</th> 
-    <td>$dis_sel_kind</td>
-  </tr>
-  <tr id=\"repeatFrequency\" style=\"display:$repeatDisplay\">    
-    <th>$l_repeatfrequency</th> 
-    <td>$frequency_block</td>
-  </tr>    
-  <tr id=\"noRepeatEnd\">    
-    <th>Pas de date de fin</th> 
-    <td><input type=\"checkbox\" id=\"cbx_no_repeatend\" onclick=\"toggleDisplay($('repeatEnd'));\" /></td>
-  </tr>
-  <tr id=\"repeatEnd\" style=\"display:$repeatDisplay\">    
-    <th>$l_date_repeatend</th> 
-    <td>
-      <input type=\"text\" name=\"tf_repeat_end\" id=\"tf_repeat_end\" value=\"$repeat_end_value\" class=\"datePicker\" />
-    </td>
-  </tr>
-  <tr id=\"repeatDays\" style=\"display:$repeatDaysDisplay\">  
-    <th>$l_repeatdays2</th>
-    <td>$dis_repeat_day</td>
-  </tr>
-  <tr id=\"repeatException\" style=\"display:$repeatDisplay; white-space:nowrap;\">
-    <th> $l_exception $add_date</th>
-    <td id=\"exceptionHome\">$block_exception_detail</td>
-    </tr>
-  <tr>
-    <th></th>
-    <td>&nbsp;</td>
-  </tr>    
-  </table>
-  </fieldset>
+  $block_repeat
   $block_user
   $block_resource
   $block_group
@@ -4402,15 +4426,15 @@ function html_calendar_waiting_events($obm_wait) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Delete Options
 // Parameters:
-//   - $calendar:
+//   - $current_view
+//   - $event_id
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_dis_delete($calendar) {
+function html_calendar_dis_delete($current_view, $event_id) {
   global $obm, $perm, $ico_validate,$ico_cancel,$ico_confirm_mail;
   global $display, $l_confirm_delete_all,$l_confirm,$l_cancel,$l_confirm_mail;
   global $l_event_cant_delete, $module, $cright_write_admin;
 
-  $iso = $calendar['date']->getURL();
-  $event_id = $calendar['calendar_id'];
+  $iso = $current_view->get_date()->getURL();
 
   $block = "
    <h1>$l_confirm_delete_all</h1>
@@ -4432,7 +4456,7 @@ function html_calendar_dis_delete($calendar) {
 //   - $calendar        : calendar parameters
 //   - $sel_entity_id : array of entity Id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_meeting_form($calendar, $sel_entity_id) {
+function dis_calendar_meeting_form($current_view, $calendar, $sel_entity_id) {
   global $display, $path;
   global $ico_add, $ico_delete, $ico_mini_cal;
   global $ccalendar_resource, $obm;
@@ -4440,7 +4464,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $l_groups,$l_resources,$l_module_resourcegroup, $l_module_calendar;
   global $l_resources_one_freebusy,$l_resources_all_freebusy,$l_resource_group_search;
 
-  $date = $calendar['date'];
+  $date = $current_view->get_date();
   $hourbegin = $calendar['time_duration'];
   $minbegin = $calendar['min_duration'];
   if (($hourbegin == '') || ($hourbegin <= 0)) {
@@ -4727,13 +4751,13 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
 // Free meeting performing and display
 // Free/Busy interface
 // Parameters:
-//   - $calendar       : calendar parameters
+//   - $current_view : current calendar view
 //   - $entity_store : array of entities to display
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_free_interval($calendar) {
+function dis_calendar_free_interval($current_view) {
   global $obm, $display;
 
-  $date = $calendar['date'];
+  $date = $current_view->get_date();
   $date_ts = $date->setHour($GLOBALS['ccalendar_first_hour'])->setMinute(0)->setSecond(0)->getTimestamp();
 
   $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
@@ -4789,10 +4813,10 @@ function dis_calendar_free_interval($calendar) {
 
   // Navigation
   $current = clone $date;
-  $prev_month = $current->setDateIso($calendar['date'])->subMonth(1)->getDateIso();
-  $prev_week = $current->setDateIso($calendar['date'])->subWeek(1)->getDateIso();
-  $next_week = $current->setDateIso($calendar['date'])->addWeek(1)->getDateIso();
-  $next_month = $current->setDateIso($calendar['date'])->addMonth(1)->getDateIso();
+  $prev_month = $current->setDateIso($current_view->get_date())->subMonth(1)->getDateIso();
+  $prev_week  = $current->setDateIso($current_view->get_date())->subWeek(1)->getDateIso();
+  $next_week  = $current->setDateIso($current_view->get_date())->addWeek(1)->getDateIso();
+  $next_month = $current->setDateIso($current_view->get_date())->addMonth(1)->getDateIso();
   $label = $date->localize(Of_Date::OBM_DATE_DAY)." - ".$date->addDay(6)->localize(Of_Date::OBM_DATE_DAY);
   if (!OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access')) {
     $visiblityU = "style='visibility:hidden;'";
@@ -5708,13 +5732,14 @@ Class Item {
  * @access public
  * @return void
  */
-function dis_calendar_pdf_options($calendar, $current_view) { 
+function dis_calendar_pdf_options($current_view) { 
   global $l_print, $l_pagelayout, $l_pagelayout_portrait, $l_pagelayout_landscape;
   global $c_pagelayout_portrait, $c_pagelayout_landscape;
   global $ccalendar_first_hour, $ccalendar_last_hour, $ccalendar_weekstart;
   global $l_first_hour, $l_last_hour, $l_daysofweekshort, $l_display_details;
   global $l_one_day_per_page, $l_display_days ;
 
+  $date = $current_view->get_date();
   $p_view = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
 
@@ -5805,8 +5830,6 @@ function dis_calendar_pdf_options($calendar, $current_view) {
       $block_week";
   }
 
-  $date = $calendar["date"];
-
   $block = "<form action=\"\" method=\"get\" onsubmit=\"return check_calendar_pdf_options();\">
     <div class=\"detail extra\">
       <h1>Options</h1>
@@ -5847,15 +5870,12 @@ function dis_calendar_pdf_view($calendar, $current_view) {
 
   $p_view = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
-
-  $group_view = $calendar['entity']['group_view'];
   $entity_readable = get_calendar_entity_readable();
 
   $calendar_entity = $current_view->get_entities($ccalendar_max_users, $entity_readable);
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view.'_pdf';
 
-  $calendar_function($calendar, $calendar_entity);
-
+  $calendar_function($calendar, $current_view, $calendar_entity);
 }
 
 
@@ -5867,14 +5887,14 @@ function dis_calendar_pdf_view($calendar, $current_view) {
  * @access public
  * @return void
  */
-function dis_calendar_month_agenda_pdf($calendar, $calendar_entity) {
+function dis_calendar_month_agenda_pdf($calendar, $current_view, $calendar_entity) {
   global $ccalendar_weekstart, $ccalendar_first_hour;
 
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setDay(1)->addDay(1)->subWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
-  $end = clone $calendar['date'];
+  $end = clone $current_view->get_date();
   $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
-  $category_filter = $calendar['category_filter'];
+  $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
 
@@ -5886,7 +5906,7 @@ function dis_calendar_month_agenda_pdf($calendar, $calendar_entity) {
     array_push($updated[$id], $occurrence);
   }
 
-  $pdf = new CalendarPdfMonthAgenda($calendar, $calendar_entity, $updated);
+  $pdf = new CalendarPdfMonthAgenda($current_view, $calendar, $calendar_entity, $updated);
   $pdf->drawCalendar();
   $pdf->download();
 
@@ -5901,17 +5921,17 @@ function dis_calendar_month_agenda_pdf($calendar, $calendar_entity) {
  * @access public
  * @return void
  */
-function dis_calendar_week_agenda_pdf($calendar, $calendar_entity) {
+function dis_calendar_week_agenda_pdf($calendar, $current_view, $calendar_entity) {
   global $ccalendar_first_hour, $ccalendar_last_hour, $ccalendar_weekstart;
 
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   
   $date->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(7);
 
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $category_filter = $calendar['category_filter'];
+  $category_filter = $current_view->get_category_filter();
 
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
 
@@ -5942,7 +5962,7 @@ function dis_calendar_week_agenda_pdf($calendar, $calendar_entity) {
   foreach($columns as $date => $column){
     $updated[$date] = check_conflict($column);
   }
-  $pdf = new CalendarPdfDayAgenda('week', $updated, $calendar_entity, $calendar);
+  $pdf = new CalendarPdfDayAgenda($current_view, 'week', $updated, $calendar_entity, $calendar);
   $pdf->drawCalendar();
   $pdf->download();
 }
@@ -5956,14 +5976,14 @@ function dis_calendar_week_agenda_pdf($calendar, $calendar_entity) {
  * @access public
  * @return void
  */
-function dis_calendar_day_agenda_pdf($calendar, $calendar_entity) {
+function dis_calendar_day_agenda_pdf($calendar, $current_view, $calendar_entity) {
   
-  $date = $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(1);
 
-  $category_filter = $calendar['category_filter'];
+  $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
   $id = $date->getTimestamp();
@@ -5988,7 +6008,7 @@ function dis_calendar_day_agenda_pdf($calendar, $calendar_entity) {
     $updated[$date] = check_conflict($column);
   }
 
-  $pdf = new CalendarPdfDayAgenda('day', $updated, $calendar_entity, $calendar);
+  $pdf = new CalendarPdfDayAgenda($current_view, 'day', $updated, $calendar_entity, $calendar);
   $pdf->drawCalendar();
   $pdf->download();
 
@@ -6003,19 +6023,19 @@ function dis_calendar_day_agenda_pdf($calendar, $calendar_entity) {
  * @access public
  * @return void
  */
-function dis_calendar_month_list_pdf($calendar, $calendar_entity) {
+function dis_calendar_month_list_pdf($calendar, $current_view, $calendar_entity) {
   global $ccalendar_weekstart, $ccalendar_first_hour;
 
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setDay(1)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addMonth(1);
 
-  $category_filter = $calendar['category_filter'];
+  $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED');
 
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
-  $pdf = new CalendarPdfList('month', $calendar, $calendar_entity, $occurrences);
+  $pdf = new CalendarPdfList($current_view, 'month', $calendar, $calendar_entity, $occurrences);
   $pdf->drawCalendar();
   $pdf->download();
 
@@ -6030,18 +6050,18 @@ function dis_calendar_month_list_pdf($calendar, $calendar_entity) {
  * @access public
  * @return void
  */
-function dis_calendar_week_list_pdf($calendar, $calendar_entity) {
+function dis_calendar_week_list_pdf($calendar, $current_view, $calendar_entity) {
   global $ccalendar_first_hour, $ccalendar_weekstart;
 
-  $date = clone $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(7);
-  $category_filter = $calendar['category_filter'];
+  $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED');
 
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
-  $pdf = new CalendarPdfList('week', $calendar, $calendar_entity, $occurrences);
+  $pdf = new CalendarPdfList($current_view, 'week', $calendar, $calendar_entity, $occurrences);
   $pdf->drawCalendar();
   $pdf->download();
 }
@@ -6056,20 +6076,20 @@ function dis_calendar_week_list_pdf($calendar, $calendar_entity) {
  * @return void
  */
 
-function dis_calendar_day_list_pdf($calendar, $calendar_entity) {
+function dis_calendar_day_list_pdf($calendar, $current_view, $calendar_entity) {
   global $ccalendar_first_hour;
 
-  $date = $calendar['date'];
+  $date = clone $current_view->get_date();
   $date->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(1);
 
-  $category_filter = $calendar['category_filter'];
+  $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED');
 
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
 
-  $pdf = new CalendarPdfList('day', $calendar, $calendar_entity, $occurrences);
+  $pdf = new CalendarPdfList($current_view, 'day', $calendar, $calendar_entity, $occurrences);
   $pdf->drawCalendar();
   $pdf->download();
 
@@ -6346,10 +6366,10 @@ Class CalendarPdf{
   public $content_x1, $content_y1;
   public $calendar_weekstart;
   public $tmp_filename;
-  public $calendar, $calendar_entity;
+  public $current_view, $calendar_entity;
   public $editor;
 
-  function __construct($calendar, $calendar_entity){
+  function __construct($current_view, $calendar, $calendar_entity){
     global $ccalendar_weekstart, $ico_pdf_logo, $path;
     global $ico_pdf_private, $ico_pdf_meeting, $ico_pdf_periodic, $ico_pdf_allday;
 
@@ -6418,7 +6438,7 @@ Class CalendarPdf{
     $this->calendar_weekstart = $ccalendar_weekstart;
     $this->tmp_filename = tempnam("/tmp", "obm_") ;
 
-    $this->calendar = $calendar;
+    $this->current_view = $current_view;
     $this->calendar_entity = $calendar_entity;
 
     $userinfo = get_entity_info($obm['uid'], 'user');
@@ -6479,8 +6499,9 @@ Class CalendarPdf{
       'UTF-8');
 
     // Category
-    if (!empty($this->calendar["category_filter"])){
-      $category = of_category_get_label("event", "category1", $this->calendar["category_filter"]);
+    $category_filter = $this->current_view->get_category_filter();
+    if (!empty($category_filter)){
+      $category = of_category_get_label("event", "category1", $category_filter);
     } else {
       $category = $l_all_f; 
     }
@@ -6643,10 +6664,10 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
   var $calendar_first_hour;
   var $usedPosition;
 
-  function __construct($calendar, $calendar_entity, $updated){
+  function __construct($current_view, $calendar, $calendar_entity, $updated){
     global $l_daysofweekl, $ccalendar_first_hour;
 
-    parent::__construct($calendar, $calendar_entity);
+    parent::__construct($current_view, $calendar, $calendar_entity);
 
     $this->calendar_x0 = $this->content_x0 + 10;
     $this->calendar_y0 = $this->content_y0 + 18;
@@ -6657,7 +6678,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $this->current_y = 0;
 
     // Display date
-    $this->display_date = $this->calendar['date']->localize(Of_Date::OBM_DATE_MONTH);
+    $this->display_date = $this->current_view->get_date()->localize(Of_Date::OBM_DATE_MONTH);
 
     $this->calendar_first_hour = $ccalendar_first_hour;
     $this->updated = $updated;
@@ -6682,7 +6703,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $this->calendar_y1+2*$this->font_height+2,
     Zend_Pdf_Page::SHAPE_DRAW_FILL);
 
-    $date = clone $this->calendar['date'];
+    $date = clone $this->current_view->get_date();
     $date->setWeekday($this->calendar_weekstart)->setHour($this->calendar_first_hour)->setMinute(0)->setSecond(0);
     $end = clone $date;
     $end->addDay(7);
@@ -6709,9 +6730,9 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
    */
   function drawCalendar(){
 
-    $date = clone $this->calendar['date'];
+    $date = clone $this->current_view->get_date();
     $date->setDay(1)->addDay(1)->subWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
-    $end = clone $this->calendar['date'];
+    $end = clone $this->current_view->get_date();
     $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $current = clone $date;
 
@@ -6725,7 +6746,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
       // Style
       if ($current->isToday()) {
         $bgcolor = new Zend_Pdf_Color_Html('#FDDAA4');
-      } elseif ($current->compareMonth($this->calendar['date']) != 0) {
+      } elseif ($current->compareMonth($this->current_view->get_date()) != 0) {
         $bgcolor = new Zend_Pdf_Color_Html('#EFF0F2');
       } else {
         $bgcolor = new Zend_Pdf_Color_Html('#FFFFFF');
@@ -6809,9 +6830,9 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $this->current_y = 0;
     $page = 0;
     $this->page = $this->pdf->pages[$page];
-    $date = clone $this->calendar['date'];
+    $date = clone $this->current_view->get_date();
     $date->setDay(1)->addDay(1)->subWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
-    $end = clone $this->calendar['date'];
+    $end = clone $this->current_view->get_date();
     $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $current = clone $date;
 
@@ -7015,9 +7036,9 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
   var $current_out_event;
   var $usedPosition;
 
-  function __construct($range, $updated, $calendar_entity, $calendar){
+  function __construct($current_view, $range, $updated, $calendar_entity, $calendar){
 
-    parent::__construct($calendar, $calendar_entity);
+    parent::__construct($current_view, $calendar, $calendar_entity);
 
     // Page Coord.
     $this->calendar_x0 = $this->content_x0 + $this->margin;
@@ -7032,7 +7053,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
     $this->calendar_nb_hours = $this->calendar_last_hour - $this->calendar_first_hour;
     $this->calendar_entity = $calendar_entity;
 
-    $date = clone $calendar['date'];
+    $date = clone $current_view->get_date();
 
     if ($this->range == 'week') {
       $begin = clone $date;
@@ -7425,12 +7446,12 @@ Class CalendarPdfList Extends CalendarPdf{
   var $calendar_x1, $calendar_y1;
   var $occurrences;
 
-  function __construct($range, $calendar, $calendar_entity, $occurrences){
+  function __construct($current_view, $range, $calendar, $calendar_entity, $occurrences){
     global $ccalendar_first_hour;
     global $ico_pdf_private_alt, $ico_pdf_meeting_alt, $ico_pdf_periodic_alt;
     global $ico_pdf_allday_alt;
 
-    parent::__construct($calendar, $calendar_entity);
+    parent::__construct($current_view, $calendar, $calendar_entity);
 
     $this->ico_private = Zend_Pdf_Image::imageWithPath($ico_pdf_private_alt);
     $this->ico_meeting = Zend_Pdf_Image::imageWithPath($ico_pdf_meeting_alt);
@@ -7442,7 +7463,7 @@ Class CalendarPdfList Extends CalendarPdf{
     $this->calendar_x1 = $this->content_x1;
     $this->occurrences = $occurrences;
     $this->calendar_entity = $calendar_entity;
-    $date = $calendar['date'];
+    $date = $this->current_view->get_date();
     $end = clone $date;
 
     if ($range == 'week') {
