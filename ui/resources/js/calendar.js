@@ -581,7 +581,7 @@ Obm.CalendarManager = new Class({
    */
   prepareEventForUpdate: function(evt) {
     var eventData = new Object();
-    eventData.eventdate = evt.event.date;
+    eventData.eventdate = evt.event.date.format('c');
     eventData.calendar_id = evt.event.id;
     eventData.element_id = evt.element.id;
     eventData.date_begin = evt.event.date.format('c');
