@@ -1093,7 +1093,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     $id = $current->getTimestamp() - $date->getTimestamp();
 
     $background = "";
-    if($current->compareHour($GLOBALS['ccalendar_first_hour']) < 0 || $current->compareHour($GLOBALS['ccalendar_last_hour']) > 0) {
+    if($current->compareHour($GLOBALS['ccalendar_first_hour']) < 0 || $current->compareHour($GLOBALS['ccalendar_last_hour']) >= 0) {
       $background="background:#EEE";
     }
 
