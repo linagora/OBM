@@ -177,6 +177,9 @@ Obm.CalendarManager = new Class({
    * Unregister an event
    */
   unregister: function(evt) {
+    this.oldEvent = $merge(new Object(), evt);
+    this.oldEvent.event.date = new Obm.DateTime(evt.event.time*1000);
+    this.oldEvent.time = evt.event.time;
     if (evt.kind == 'all_day') {
       var current = new Obm.DateTime(evt.event.time*1000);
       var beginDay = current.getTime();
@@ -1388,8 +1391,14 @@ Obm.CalendarPopupManager = new Class({
     this.removeEvents();
     if (this.evtId) {
       var evt = obm.calendarManager.events.get(this.ivent.calendar_id);
-      obm.calendarManager.redraw.set(evt.event.date.format('Y-m-d'), true);
-      obm.calendarManager.redrawGrid();
+      // Set event initial date
+      evt.event.date.setTime(obm.calendarManager.oldEvent.time*1000);
+      evt.event.time = obm.calendarManager.oldEvent.time;
+      // register the old event
+      obm.calendarManager.register(evt);
+      // fix position & title 
+      evt.setPosition();
+      evt.setTitle();
     }
   },
   
