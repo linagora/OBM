@@ -681,7 +681,6 @@ Obm.CalendarManager = new Class({
    */
   sendUpdateEvent: function(evt) {
     var eventData = this.prepareEventForUpdate(evt);
-
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,

@@ -144,14 +144,14 @@ if ($action == 'add_freebusy_entity' || $action == 'new_meeting' ||
 if ($cal_entity_id['group_view'] == '') $cal_entity_id['group_view'] = $c_all;
 
 // If user selection present we override session content
-if ($params['new_sel'] && is_array($params['sel_user_id'])) {
+if ($params['new_sel']) {
   if ( ($action != 'insert') && ($action != 'update') ) {
     $current_view->set_users($params['sel_user_id']);
   }
 }
 
 // If resources selection present we override session content
-if ($params['new_sel'] && is_array($params['sel_resource_id'])) {
+if ($params['new_sel']) {
   if ( ($action != 'insert') && ($action != 'update') ) {
     $current_view->set_resources($params['sel_resource_id']);
   }

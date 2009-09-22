@@ -5505,25 +5505,19 @@ Class CalendarView {
     return $this->resources;
   }
 
-  public function get_entities($nb_max=0, $entity_readable=array()) {
+  public function get_entities() {
+    global $ccalendar_max_users;
+    $remaining_count = $ccalendar_max_users;
+
     $entities = array();
-    if ($nb_max <= 0) $nb_max = count($this->users) + count($this->resources);
-
     if (count($this->users)>0) {
-      $user_readable = (is_array($entity_readable['user']['ids']) ? $entity_readable['user']['ids'] : $this->users);
-      $entities['user'] = $this->get_users_data($nb_max, $user_readable);
-      $nb_max = $nb_max - count($entities['user']);
+      $entities['user'] = $this->get_users_data($remaining_count);
+      $remaining_count = $remaining_count - count($entities['user']);
     }
-
     if (count($this->resources)>0) {
-      $resource_readable = (is_array($entity_readable['resource']['ids']) ? $entity_readable['resource']['ids'] : $this->resources);
-      $entities['resource'] = $this->get_resources_data($nb_max, $entity_readable['resource']['ids']);
-      $nb_max = $nb_max - count($entities['resource']);
+      $entities['resource'] = $this->get_resources_data($remaining_count);
+      $remaining_count = $remaining_count - count($entities['resource']);
     }
-
-/*    if ($this->group!=$GLOBALS['c_all']) {
-      $entities['group_view'] = $this->group;
-}*/
 
     return $entities;
   }
@@ -5758,34 +5752,20 @@ Class CalendarView {
     }
   }
 
-  protected function get_users_data($nb_max, $user_readable) {
-    global $cdg_sql;
+  protected function get_users_data($nb_max) {
+    global $cdg_sql, $obm;
 
-    $multidomain = sql_multidomain('userobm');
-
-    $obm_q = new DB_OBM;
-    $query = "SELECT userobm_lastname, userobm_firstname, userobm_id
-      FROM UserObm
-      WHERE userobm_id IN (".implode(",", $this->users).") $multidomain";
-    display_debug_msg($query, $cdg_sql, 'CalendarView::get_users_data()');
-    $obm_q->query($query);
-
-    $u = array();
-    while ($obm_q->next_record()) {
-      $id = $obm_q->f('userobm_id');
-      $firstname = $obm_q->f('userobm_firstname');
-      $lastname = $obm_q->f('userobm_lastname');
-      $u[$id] = "$firstname $lastname";
-    }
+    $users = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $this->users));
+    $u = $users['entity'];
 
     // Preserve the users order
     $data = array();
     foreach ($this->users as $id) {
-      if (in_array($id,$user_readable) && $nb_max>0) {
+      if (isset($u[$id]) && $nb_max>0) {
         $data[$id] = array(
-          'name'  => $u[$id],
+          'name'  => $u[$id]['label'],
           'class' => $this->get_class($id,'user'),
-          'type'  => "user",
+          'type'  => 'user',
           'id'    => $id
         );
         $nb_max--;
@@ -5795,33 +5775,20 @@ Class CalendarView {
     return $data;
   }
 
-  protected function get_resources_data($nb_max, $resource_readable) {
-    global $cdg_sql;
+  protected function get_resources_data($nb_max) {
+    global $cdg_sql, $obm;
 
-    $multidomain = sql_multidomain('resource',$and);
-
-    $obm_q = new DB_OBM;
-    $query = "SELECT resource_name, resource_id
-      FROM Resource 
-      WHERE resource_id IN (".implode(",", $this->resources).") AND $multidomain";
-    display_debug_msg($query, $cdg_sql, 'CalendarView::get_resources_data()');
-    $obm_q->query($query);
-
-    $r = array();
-    while ($obm_q->next_record()) {
-      $id = $obm_q->f('resource_id');
-      $name = $obm_q->f('resource_name');
-      $r[$id] = "$name";
-    }
+    $resources = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read', $this->resources));
+    $r = $resources['entity'];
 
     // Preserve the resources order
     $data = array();
     foreach ($this->resources as $id) {
-      if (in_array($id,$resource_readable) && $nb_max>0) {
+      if (isset($r[$id]) && $nb_max>0) {
         $data[$id] = array(
-          'name'  => $r[$id],
+          'name'  => $r[$id]['label'],
           'class' => $this->get_class($id,'resource'),
-          'type'  => "resource",
+          'type'  => 'resource',
           'id'    => $id
         );
         $nb_max--;
@@ -5829,6 +5796,11 @@ Class CalendarView {
     } 
 
     return $data;
+  }
+
+  protected function get_group_data() {
+    $groups = run_query_get_allowed_groups($sel_entity_id['group']);
+    return $groups['entity'];
   }
 
   protected function get_class($id,$entity) {
