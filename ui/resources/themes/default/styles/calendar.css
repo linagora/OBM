@@ -781,6 +781,7 @@ h1.hoursTitle{
   border: 1px dotted #666;
   margin: 0;
   padding: 0;
+  height: 1.4em;
 }
 
 .timeSlotNoCalendar {
@@ -789,6 +790,7 @@ h1.hoursTitle{
   padding: 0;
   background: #CCC;
   background-image: url('../images/hatch.gif');
+  height: 1.4em;
 }
 
 .haveEvent {
