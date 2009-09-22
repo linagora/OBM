@@ -1323,6 +1323,7 @@ class Of_Date extends DateTime {
       $weekday = ($weekday == 0)?7:$weekday;
       $year = $this->format('Y');
       if($week == 1 && $this->format('m') == '12') $year ++;
+      elseif($week >= 52 && $this->format('m') == 1) $year --;
       $this->setISODate($year, $week, $weekday);
     }  
     return $this;
