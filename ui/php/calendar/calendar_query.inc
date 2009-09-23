@@ -1391,6 +1391,8 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   // Insert My alert if set
   if (($calendar['alert']) > 0) {
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
+  } else {
+    run_query_calendar_event_alert_delete($event_id, $obm['uid']);
   }
 
   // Send mail
