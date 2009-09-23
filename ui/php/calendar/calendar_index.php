@@ -623,6 +623,9 @@ if ($action == 'search') {
 
 } elseif ($action == 'admin')  {
 ///////////////////////////////////////////////////////////////////////////////
+  $extra_js_include[] = 'inplaceeditor.js';
+  $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+  $extra_css[] = $css_ext_color_picker ;
   $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
   $display['detail'] = dis_calendar_admin_index($tags_q);
 
@@ -639,6 +642,9 @@ if ($action == 'search') {
   else {
     $display['msg'] .= display_err_msg($err['msg']);
   }
+  $extra_js_include[] = 'inplaceeditor.js';
+  $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+  $extra_css[] = $css_ext_color_picker ;
   $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
   $display['detail'] .= dis_calendar_admin_index($tags_q);
   
@@ -655,6 +661,9 @@ if ($action == 'search') {
   else {
     $display['msg'] .= display_err_msg($err['msg']);
   }
+  $extra_js_include[] = 'inplaceeditor.js';
+  $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+  $extra_css[] = $css_ext_color_picker ;
   $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
   $display['detail'] .= dis_calendar_admin_index($tags_q);
   
@@ -666,6 +675,9 @@ if ($action == 'search') {
   } else {
     $display['msg'] .= display_err_msg("Tag : $l_delete_error");
   }
+  $extra_js_include[] = 'inplaceeditor.js';
+  $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+  $extra_css[] = $css_ext_color_picker ;
   $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
   $display['detail'] .= dis_calendar_admin_index($tags_q);
 

@@ -109,17 +109,23 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
   $date = $current_view->get_date();
   $p_kind = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
+
   if ($p_kind) {
     ${'ico_'.$p_kind.'_view'} = ${'ico_'.$p_kind.'_view_current'};
   }
+
   if ($p_range) {
     ${'ico_'.$p_range.'_view'} = ${'ico_'.$p_range.'_view_current'};
   }
-  if ($action == 'index' || $action == 'waiting_events' || $action == 'insert' || $action == 'update') {
+
+  if ($action=='search' || $action == 'index' || $action == 'waiting_events' || $action == 'insert' || $action == 'update') {
     $search_form = dis_calendar_html_search_form($calendar);
+  }
+
+  if ($action == 'index' || $action == 'waiting_events' || $action == 'insert' || $action == 'update') {
     $navbar = dis_calendar_navbar($current_view);
   }
-  
+
   if ($action == 'new') {
     $select_template_form = dis_calendar_select_template_form($action);
   }
@@ -1192,18 +1198,17 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
 
   $start_time = $date->getTimestamp();
 
-  $weeks = $end->diffWeek($date); 
   $width = round(100/7, 2);
-  $height = round(100/$weeks, 2);
   $current = clone $date;
   $dis_week_time = "obm.vars.consts.weekTime = new Array();";
   $dis_weekbegin_time = "obm.vars.consts.weekBegin = new Array();";
   $tags = array();
 
   // calendar grid
+  $weeks = 0;
   while($current->compare($end) < 0) {
     $step = 0;
-    $week_day_event_list .= "<div class='monthRow' style='height:{$height}%'>";
+    $week_day_event_list .= "<div class='monthRow'>";
     $endWeek = clone $current;
     $endWeek->addDay(7);
 
@@ -1245,7 +1250,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $date_iso = $current->getDateIso();
       $week_day_left = $step*$width;
       $week_day_event_list .= "
-        <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='height:{$height}%;width:$width%;left:$week_day_left%;$today'>
+        <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='width:$width%;left:$week_day_left%;$today'>
           <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
           <div id='allday_$date_iso' class='alldayCell' style='width:100%;'>
             <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title</h1>' style='text-align:center;position:absolute;display;none;width:100%;'></div>
@@ -1254,10 +1259,10 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $step++;
       $current->addDay(1);
     }
+    $weeks++;
     $week_day_event_list .= "</div>";
 
   }
-
   $tags = array_unique($tags);
   if (sizeof($tags) > 0 && sizeof($calendar_entity) == 1) {
     html_calendar_tag_legend($tags);
@@ -1297,6 +1302,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     </table>
   </div>
   <script type=\"text/javascript\">
+    obm.vars.consts.nbWeeks = 100/$weeks;
     obm.vars.consts.cellWidth = $width;
     obm.vars.labels.more = '".phpStringToJsString($GLOBALS['l_more'])."';
     obm.vars.consts.calendarView = 'month';
@@ -2989,21 +2995,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
           <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
           <input type=\"submit\" value=\"$l_update\" />
-        </fieldset>";
+        </fieldset>
+        </form>";
     }
-    /*$dis_document_block = "
-      <div class=\"detail infos\">
-      <h1>$l_documents</h1>
-      <table class=\"spreadSheet\">
-      <thead>
-      <tr>
-      <td>$l_title</td><td>$l_name</td>
-      </tr>
-      </thead>
-      $dis_document_list
-      </table>
-      $dis_document_form
-      </div>";*/
+
     $dis_document_block = "
       <div class=\"detail infos\">
       <h1>$l_documents</h1>
@@ -3073,13 +3068,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   $dis_resource_block
   $dis_item_list
 
-   <div class=\"detail extra\">
-   <h1>$l_desc</h1>
-   $description
-   </div>
-    $dis_decision_radio
-  </form>
-";
+  <div class=\"detail extra\">
+  <h1>$l_desc</h1>
+  $description
+  </div>
+  $dis_decision_radio";
+
   return $block;
 }
 

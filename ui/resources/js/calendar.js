@@ -25,6 +25,8 @@ Obm.CalendarManager = new Class({
         current.setDate(obm.vars.consts.startTime.getDate() + i);
         this.eventGrid[current.format('Y-m-d')] = new Hash();
       }
+    } else {
+
     }
 
     // Window height observer 
@@ -82,10 +84,7 @@ Obm.CalendarManager = new Class({
     var index = new Obm.DateTime(evt.event.time * 1000).format('Y-m-d');
     if (evt.kind == 'all_day') {
       var current = new Obm.DateTime(evt.event.time*1000);
-      if (evt.event.date < obm.vars.consts.startTime) {
-        current = obm.vars.consts.startTime;
-      }
-      var begin = current.getTime();
+      var begin = evt.event.time*1000;;
       var end = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
       var size = Math.ceil((end.getTime() - begin)/86400000);
       if (!evt.event.all_day && evt.event.date.getDate() != end.getDate()) {
@@ -106,19 +105,15 @@ Obm.CalendarManager = new Class({
       if (obm.vars.consts.calendarView == 'month') {
         var weeks = obm.calendarManager.getEventWeeks(evt);
         var start = weeks[0];
-
         if (evt.event.left) {
           var oldBegin = begin
           begin = evt.event.index*1000;
-          var current = new Obm.DateTime(begin);
           size = size - Math.ceil((begin-oldBegin)/86400000);
         }
-
         if (evt.event.right) {
           var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
           size = Math.ceil((startWeek + (86400000 * 7) - begin)/86400000);
         }
-
       }
 
       evt.size = size;
@@ -156,8 +151,6 @@ Obm.CalendarManager = new Class({
               more.set('title', more.get('title')+'<div '+style+'>'+ title+'</div>');
             }
           }
-        } else {
-
         }
       }
 
@@ -210,6 +203,8 @@ Obm.CalendarManager = new Class({
           }.bind(this));
         }
       }
+      this.redrawAllDayGrid();
+      this.resizeGrid();
     } else {
       var day = evt.event.date.format('Y-m-d');
       var begin = evt.element.offsetTop.toFloat();
@@ -268,6 +263,12 @@ Obm.CalendarManager = new Class({
     } else {
       $('mainContent').setStyle('height',window.getHeight() - $('mainContent').offsetTop -50);
       $('calendarHeaderGrid').setStyle('height',window.getHeight() - $('calendarHeaderGrid').offsetTop -50);
+      $$('div.monthRow').each(function(e) {
+        e.style.height = obm.vars.consts.nbWeeks+'%';
+      });
+      $$('div.alldayContainer').each(function(e) {
+        e.style.height = obm.vars.consts.nbWeeks+'%';
+      });
     }
   },
 
@@ -667,13 +668,6 @@ Obm.CalendarManager = new Class({
 
       if (response.day == 1) {
         obm.calendarManager.newDayEvent(events[0].event,events[0].options);
-        if (obm.calendarManager.calendarView == 'month') {
-          // var time = events[0].event.time;
-          // var day = time - obm.vars.consts.startTime/1000;
-          // var iso = new Obm.DateTime(time*1000).format('Y-m-d');
-          //obm.calendarManager.resizeAlldayCell($('dayContainer_'+day+'_'+iso));
-        }
-
       } else {
         obm.calendarManager.newEvent(events[0].event,events[0].options);
       }
@@ -751,9 +745,10 @@ Obm.CalendarManager = new Class({
     var events = response.eventsData;
     if (response.error == 0) {
       showOkMessage(response.message);
+      var str = response.elementId.split('_');
       for(var i=0;i< events.length;i++) {
         var ivent = events[i].event;
-        var element_id = 'event_'+ivent.id+'_'+ivent.entity+'_'+ivent.entity_id;
+        var element_id = 'event_'+ivent.id+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
         var evt = obm.calendarManager.events.get(element_id);
         try {
           obm.calendarManager.unregister(evt);
@@ -850,10 +845,11 @@ Obm.CalendarManager = new Class({
     }
     var events = response.eventsData;
     if (response.error == 0) {
+      var str = response.elementId.split('_');
       showOkMessage(response.message);
       for(var i=0;i< events.length;i++) {
         var ivent = events[i].event;
-        var element_id = 'event_'+ivent.id+'_'+ivent.entity+'_'+ivent.entity_id;
+        var element_id = 'event_'+ivent.id+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
         var evt = obm.calendarManager.events.get(element_id);
         if (evt) {
           obm.calendarManager.unregister(evt);
@@ -862,6 +858,7 @@ Obm.CalendarManager = new Class({
           delete evt;
         }
       }
+      // TODO: REDRAW CALENDAR
     } else {
       showErrorMessage(response.message);
       // obm.calendarManager.events.each(function(evt, key) {
@@ -1019,7 +1016,7 @@ Obm.CalendarInDayEvent = new Class({
    * Draw event and inject it into calendarGrid
    */
   draw: function() {
-    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id;
+    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
     this.element = new Element('div').addClass('event')
                                      .setProperties({'id':id,'title':this.event.title})
                                      .setOpacity(this.getOpacity());
@@ -1259,8 +1256,8 @@ Obm.CalendarAllDayEvent = new Class({
    * Draw event and inject it into calendarGrid
    */
   draw: function() {
-    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id;
-    this.element = new Element('div').addClass('event evt_'+this.event.id)
+    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
+    this.element = new Element('div').addClass('event')
                                      .setProperties({'id':id,'title':this.event.title})
                                      .setOpacity(this.getOpacity());
 
