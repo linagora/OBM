@@ -2688,7 +2688,7 @@ function run_query_calendar_delete($calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of readable calendar group for the current user
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_allowed_groups($ids) {
+function run_query_get_allowed_groups($ids=null) {
   global $cdg_sql, $obm, $ccalendar_public_groups;
 
   $uid = $obm['uid'];
@@ -2696,11 +2696,14 @@ function run_query_get_allowed_groups($ids) {
   if (! $ccalendar_public_groups) {
     $where .= " AND group_privacy=1";
   }
+  if($id !== null) {
+    $where .=  "AND group_id IN (".implode(',', $ids).")";
+  }
   $multidomain = sql_multidomain('group');
   $query = "
     SELECT group_id, group_privacy, group_name
     FROM UGroup
-    WHERE $where AND group_id IN (".implode(',', $ids).") $multidomain
+    WHERE $where  $multidomain
     ORDER BY group_privacy DESC, group_name";
 
   $obm_q = new DB_OBM;
@@ -2709,7 +2712,7 @@ function run_query_get_allowed_groups($ids) {
   $entities = array('ids' => array(), 'entity' => array());
   while($obm_q->next_record()) {
     $entities['ids'][] = $obm_q->f('group_id');
-    $entities['entity'][$obm_q->f('group_id')] = array('id' => $obm_q->f('group_id'),'label' => $obm_q->f('group_name'));
+    $entities['entity'][$obm_q->f('group_id')] = array('id' => $obm_q->f('group_id'),'label' => $obm_q->f('group_name'), 'privacy' => $obm_q->f('group_privacy'));
   }
   return $entities;
 }
