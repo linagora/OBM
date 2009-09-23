@@ -153,7 +153,7 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
     $search_form
     $select_template_form
   </div>
-  <p class=\"LC\" />
+  <p class=\"LC\"></p>
   $navbar 
 
   <script type=\"text/javascript\">
@@ -162,7 +162,7 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
      }
   </script>
 
-  <p class=\"LC\" />";
+  <p class=\"LC\"></p>";
 
   return $block;
 }
@@ -338,7 +338,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
         $sel_group .= "<option value=\"calendar_index.php?date=$iso&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
       }
     }
-    $sel_group .= '</select>';
 
     if ($this_group != $c_all && empty($selected_s)) {
       $g_public_name = get_last_group_text($this_group);
@@ -943,7 +942,7 @@ function dis_calendar_html_search_form($calendar) {
           <td><input type='text' id='tf_desc' name='tf_desc' value='$desc' /></td>
           <td>$GLOBALS[l_attendees]</td>
           <td><input type='text' id='tf_attendees' name='tf_attendees' value='$attendees' /></td>
-        <tr></tr>
+        </tr><tr>
           <td>$GLOBALS[l_tag]</td>
           <td>$sel_tags</td>
           <td>$GLOBALS[l_datebegin]</td>
@@ -3067,7 +3066,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   
   $dis_document_block
 
-  <p class=\"LC\" />
+  <p class=\"LC\"></p>
   $dis_contacts_block
   $dis_resource_block
   $dis_item_list
@@ -3200,7 +3199,7 @@ function dis_calendar_quick_form($calendar_entity) {
   if(is_array($calendar_entity['user'])){
     foreach($calendar_entity['user'] as $user){
       if(OBM_Acl::canAccess($obm['uid'], 'calendar',array($user['id']))) {
-        $entity_view.="<option value=\"$user[id]\" />$user[name]</option>";
+        $entity_view.="<option value=\"$user[id]\">$user[name]</option>";
         if($obm['uid'] == $user["id"]) {
           $uid = true;
         }
@@ -3209,7 +3208,7 @@ function dis_calendar_quick_form($calendar_entity) {
   }
 
   if(!isset($uid)) {
-    $entity_view.="<option value=\"$obm[uid]\" />$u[firstname] $u[lastname]</option>";
+    $entity_view.="<option value=\"$obm[uid]\">$u[firstname] $u[lastname]</option>";
   }
 
   $entity_view.="</select>";
@@ -3806,7 +3805,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $dis_show_attendees_calendar
       </table>
       </fieldset>
-      <p class=\"LC\" />";
+      <p class=\"LC\"></p>";
       $user_complete = "new obm.AutoComplete.ExtSearch(
         function() { return \$('userSearchSource').value+'&action=ext_search'; },
         'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
@@ -5386,7 +5385,7 @@ function dis_calendar_reset() {
       <a href='$path/calendar/calendar_index.php'>$l_cancel</a>
       <a href='$path/calendar/calendar_index.php?action=reset&amp;force=1' onclick=\"return confirm('$l_js_confirm_reset');\">$l_confirm</a>
     </div>
-    <p class=\"LC\" />" ;
+    <p class=\"LC\"></p>" ;
 
   return $block ;
 }
@@ -5472,8 +5471,7 @@ function dis_icalendar_export($params) {
     </fieldset>
     </form>
     $dis_popup
-    <p class=\"LC\" />
-    " ;
+    <p class=\"LC\"></p>";
 
   return $block ;
 }
@@ -5505,7 +5503,7 @@ function dis_icalendar_import($params) {
       $dis_button
     </fieldset>
     </form>
-    <p class=\"LC\" />" ;
+    <p class=\"LC\"></p>" ;
 
   return $block ;
 }

@@ -880,7 +880,7 @@ function display_page(&$display) {
       &nbsp;".
       $display['search'] .
       $display['detail']." 
-       <p class=\"LC\" />
+       <p class=\"LC\"></p>
        </div>
       ".
       $display['result'] . 
@@ -920,7 +920,7 @@ function display_page(&$display) {
         &nbsp;".
       $display['search'] .
       $display['detail'] . "
-      <p class=\"LC\" />
+      <p class=\"LC\"></p>
       </div>";
     }
     echo $display['result'] ."
