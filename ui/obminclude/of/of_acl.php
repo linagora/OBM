@@ -179,12 +179,12 @@ class OBM_Acl {
     self::$db->query($query);
     self::log($query, 'hasAllowedEntities[peer to peer]');
     if(self::$db->nf() <= 0) {
-      $query = self::getPublicAclQuery(1, $entityType, null, $action, '') . " LIMIT 1"; 
+      $query = self::getPublicAclQuery('1', $entityType, null, $action, '') . " LIMIT 1"; 
       self::$db->query($query);
       self::log($query, 'hasAllowedEntities[public]');
     }
     if(self::$db->nf() <= 0) {
-      $query = self::getGroupAclQuery(1, $entityType, null, $userId, $action, '') . " LIMIT 1";
+      $query = self::getGroupAclQuery('1', $entityType, null, $userId, $action, '') . " LIMIT 1";
       self::$db->query($query);
       self::log($query, 'hasAllowedEntities[groups]');
     }
@@ -513,7 +513,6 @@ class OBM_Acl {
     }
     
     $query = "SELECT {$columns} FROM UserObm u1 
-              INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id 
               INNER JOIN of_usergroup ON userobm_id = of_usergroup_user_id
               INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id 
               INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id              
