@@ -11,10 +11,10 @@ global $set_lang_default, $set_theme_default, $c_singleNameSpace;
 
 $login_javascript_footer = "
 <script type=\"text/javascript\">
-  if (document.forms.login.login.value == '') {
-    document.forms.login.login.focus();
+  if (document.forms.loginform.login.value == '') {
+    document.forms.loginform.login.focus();
   } else {
-    document.forms.login.password.focus();
+    document.forms.loginform.password.focus();
   }
 </script>
 ";
