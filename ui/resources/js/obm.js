@@ -558,7 +558,7 @@ function change_view(url) {
 function last_visit_calendar_view() {
   url = obm.vars.consts.calendarUrl;
   if (Cookie.read('calendar_view') != null) {
-    url = '/calendar/'+Cookie.read('calendar_view');
+    url = obm.vars.consts.obmUrl+'/calendar/'+Cookie.read('calendar_view');
   }
   window.location=url;
 }
