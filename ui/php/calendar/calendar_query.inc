@@ -2558,6 +2558,10 @@ function check_calendar_access($id, $right = 'write') {
     return false;
   }
   $e = get_calendar_event_info($id);
+  if(!$e) {
+    $err['msg'] = $l_err_reference;    
+    return false;
+  }
   if ($e['owner'] == $obm['uid']) {
     return true;
   }
@@ -2883,7 +2887,9 @@ function get_calendar_event_info($id,$attendees=true) {
   display_debug_msg($query, $cdg_sql, 'get_calendar_event_info()');
   $obm_q->query($query);
   $e = array('attendees' => array('user' => array()));
-  $obm_q->next_record();
+  if(!$obm_q->next_record()) {
+    return false;
+  }
   $e['usercreate'] = $obm_q->f('event_usercreate');
   $e['owner'] = $obm_q->f('event_owner');
   $e['date'] = new  Of_Date($obm_q->f('event_date'), 'GMT');
