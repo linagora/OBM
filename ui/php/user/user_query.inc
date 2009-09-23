@@ -273,10 +273,16 @@ function run_query_user_search($user) {
     $whereq = " WHERE 1=1 $multidomain";
   }
 
+  // Magic quota : the quota usage formula is userobm_mail_quota_use / userobm_mail_quota
+  // But userobm_mail_quota can is an integer >= 0 and userobm_mail_quota_use / 0 > *
+  // So the sort by formula can be (userobm_mail_quota_use / (userobm_mail_quota * 2 - 1))
+  // -0.5 to prevent divized by 0 and to prevent quota = 1 (so quota - 1 => 0) and to force
+  // float
   $select = "SELECT distinct UserObm.*,
       userobm_id as id,
       domain_label,
       domain_name,
+     (userobm_mail_quota_use / (userobm_mail_quota  - 0.5)) as mockup_quota_used,
       $datebegin,
       $dateexp,
       $lastaccess
@@ -292,7 +298,7 @@ function run_query_user_search($user) {
   // ORDER construction
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'userobm_login';
   if ($order == 'userobm_mail_quota') {
-    $order = 'userobm_mail_quota_use / userobm_mail_quota';
+    $order = 'mockup_quota_used';
   } else if ($order == 'userobm_nomade') {
     $order = "userobm_nomade_perms $sql_order_dir, userobm_nomade_enable $sql_order_dir, userobm_nomade_local_copy";
   }
