@@ -87,11 +87,21 @@ Obm.CalendarManager = new Class({
       if (evt.event.date < obm.vars.consts.startTime) {
         current = obm.vars.consts.startTime;
       }
-      var beginDay = current.getTime();
-      var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
-      var size = Math.ceil((endDay.getTime() - beginDay)/86400000);
-      if (!evt.event.all_day && evt.event.date.getDate() != endDay.getDate()) {
-        size = size + 1;
+      var begin = current.getTime();
+      var end = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
+      var size = Math.ceil((end.getTime() - begin)/86400000);
+      if (!evt.event.all_day && evt.event.date.getDate() != end.getDate()) {
+        var beginDay = new Obm.DateTime(evt.event.time*1000);
+        var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
+        beginDay.setHours(0);
+        beginDay.setMinutes(0);
+        beginDay.setSeconds(0);
+        beginDay.setMilliseconds(0);
+        endDay.setHours(0);
+        endDay.setMinutes(0);
+        endDay.setSeconds(0)
+        endDay.setMilliseconds(0);
+        size = 1+Math.ceil((endDay.getTime() - beginDay)/86400000);
       }
 
       // Extensions
@@ -100,15 +110,15 @@ Obm.CalendarManager = new Class({
         var start = weeks[0];
 
         if (evt.event.left) {
-          var oldBegin = beginDay
-          beginDay = evt.event.index*1000;
-          var current = new Obm.DateTime(beginDay);
-          size = size - Math.ceil((beginDay-oldBegin)/86400000);
+          var oldBegin = begin
+          begin = evt.event.index*1000;
+          var current = new Obm.DateTime(begin);
+          size = size - Math.ceil((begin-oldBegin)/86400000);
         }
 
         if (evt.event.right) {
           var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
-          size = Math.ceil((startWeek + (86400000 * 7) - beginDay)/86400000);
+          size = Math.ceil((startWeek + (86400000 * 7) - begin)/86400000);
         }
 
       }
@@ -116,7 +126,7 @@ Obm.CalendarManager = new Class({
       evt.size = size;
 
       for(var i=0;i<size;i++) {
-        current.setTime(beginDay);
+        current.setTime(begin);
         current.setDate(current.getDate()+ i);
         var index = current.format('Y-m-d');
 
