@@ -3856,7 +3856,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
         $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
       }
     } else {
-      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color,$opacity);
+      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color,$opacity,$tag);
       $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
     }
   }
@@ -3898,7 +3898,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
         $addOcc = false;
       }
     } else {
-      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color,$opacity);
+      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color,$opacity,$tag);
       $event->setTimezone($timezone);
     }
     $tz = new DateTimeZone($timezone);
@@ -4722,7 +4722,7 @@ Class Event {
    * @access public
    * @return void
    */
-  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color,$opacity) {
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color,$opacity,$tag) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;

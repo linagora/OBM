@@ -977,7 +977,7 @@ Obm.CalendarEvent = new Class({
    */
   setColor: function(color) {
     if(color) {
-      if (obm.vars.consts.calendarView == 'month') {
+      if (this.kind == 'all_day') {
         this.content.setStyle('backgroundColor',color.body);
         this.dragHandler.setStyle('backgroundColor',color.body);
       } else {
