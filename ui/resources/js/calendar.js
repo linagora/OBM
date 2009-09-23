@@ -78,9 +78,7 @@ Obm.CalendarManager = new Class({
    * Register an event
    */
   register: function(evt) {
-    if (!this.events.get(evt.event.id)) {
-      this.events.set(evt.event.id, evt);
-    }
+    this.events.set(evt.element.id, evt);
     var index = new Obm.DateTime(evt.event.time * 1000).format('Y-m-d');
     if (evt.kind == 'all_day') {
       var current = new Obm.DateTime(evt.event.time*1000);
@@ -182,7 +180,7 @@ Obm.CalendarManager = new Class({
         this.redrawGrid();
       }
     }
-    this.oldEvent = new Object();
+    this.oldEvent = null;
   },
 
 
@@ -193,6 +191,7 @@ Obm.CalendarManager = new Class({
     this.oldEvent = $merge(new Object(), evt);
     this.oldEvent.event.date = new Obm.DateTime(evt.event.time*1000);
     this.oldEvent.time = evt.event.time;
+    this.oldEvent.event.duration = evt.event.duration;
     if (evt.kind == 'all_day') {
       var current = new Obm.DateTime(evt.event.time*1000);
       var beginDay = current.getTime();
@@ -214,7 +213,11 @@ Obm.CalendarManager = new Class({
     } else {
       var day = evt.event.date.format('Y-m-d');
       var begin = evt.element.offsetTop.toFloat();
-      var end = begin + evt.element.getStyle('height').toFloat();
+      var height = obm.calendarManager.defaultHeight;
+      if (evt.event.duration > obm.vars.consts.timeUnit) {
+        height = evt.event.duration/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight;
+      }
+      var end = begin + height;
       for(var i=begin;i<end;i++) {
         this.eventGrid[day].get(i).erase(evt);
       }
@@ -689,36 +692,48 @@ Obm.CalendarManager = new Class({
   /**
    * Update the event on OBM server 
    */
-  sendUpdateEvent: function(evt) {
+  sendUpdateEvent: function(evt, forceUpdate) {
     var eventData = this.prepareEventForUpdate(evt);
+    if (forceUpdate) {
+      obm.calendarManager.updateRequest(eventData);
+    } else {
+      new Request.JSON({
+        url: obm.vars.consts.calendarUrl,
+        secure : false,
+        onComplete : function(response) {
+          if (response.conflict) {
+            $('popup_force').value = obm.vars.labels.conflict_force;
+            obm.calendarManager.popupManager.add('calendarConflictPopup');
+          }
+          if (response.mail) {
+            obm.calendarManager.popupManager.add('calendarSendMail');
+          }
+          obm.calendarManager.popupManager.addEvent('mail', function () {
+            eventData.send_mail = true;
+          });        
+          obm.calendarManager.popupManager.addEvent('conflict', function() {
+            eventData = $merge({action : 'conflict_manager'}, eventData)
+            window.location=obm.vars.consts.calendarUrl+'?'+Hash.toQueryString(eventData);
+          });
+          obm.calendarManager.popupManager.addEvent('complete', function () {
+            obm.calendarManager.updateRequest(eventData);
+          }.bind(this));
+          obm.calendarManager.popupManager.show(eventData);
+        }.bind(this)
+      }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));    
+    }
+  },
+
+
+  /**
+   * Update request
+   */
+  updateRequest: function(eventData) {
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,
-      onComplete : function(response) {
-        if (response.conflict) {
-          $('popup_force').value = obm.vars.labels.conflict_force;
-          obm.calendarManager.popupManager.add('calendarConflictPopup');
-        }
-        if (response.mail) {
-          obm.calendarManager.popupManager.add('calendarSendMail');
-        }
-        obm.calendarManager.popupManager.addEvent('mail', function () {
-          eventData.send_mail = true;
-        });        
-        obm.calendarManager.popupManager.addEvent('conflict', function() {
-          eventData = $merge({action : 'conflict_manager'}, eventData)
-          window.location=obm.vars.consts.calendarUrl+'?'+Hash.toQueryString(eventData);
-        });
-        obm.calendarManager.popupManager.addEvent('complete', function () {
-          new Request.JSON({
-            url: obm.vars.consts.calendarUrl,
-            secure : false,
-            onComplete : this.receiveUpdateEvent.bind(this)
-          }).post($merge({ajax : 1, action : 'quick_update'}, eventData));
-        }.bind(this));
-        obm.calendarManager.popupManager.show(eventData);
-      }.bind(this)
-    }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));    
+      onComplete : this.receiveUpdateEvent.bind(this)
+    }).post($merge({ajax : 1, action : 'quick_update'}, eventData));
   },
 
 
@@ -736,36 +751,48 @@ Obm.CalendarManager = new Class({
     var events = response.eventsData;
     if (response.error == 0) {
       showOkMessage(response.message);
-      var str = response.elementId.split('_');
       for(var i=0;i< events.length;i++) {
         var ivent = events[i].event;
-        var evt = obm.calendarManager.events.get(ivent.id);
+        var element_id = 'event_'+ivent.id+'_'+ivent.entity+'_'+ivent.entity_id;
+        var evt = obm.calendarManager.events.get(element_id);
+        try {
+          obm.calendarManager.unregister(evt);
+        } catch(e) {}
+
         if (ivent.status == 'ACCEPTED' || ivent.status == 'NEEDS-ACTION') {
-          evt.event.id = ivent.id;
-          evt.event.status = ivent.status;
+          evt.event.title = ivent.title;
           evt.event.time = ivent.time;
           evt.event.duration = ivent.duration;
-          evt.event.date =  new Obm.DateTime(ivent.time * 1000);
-          if (obm.calendarManager.calendarView == 'month') {
-            // Delete current event and create a new one (easy way)
-            $$('.evt_'+ivent.id).each(function(e) {
-              e.destroy();
-            });
-            var weeks = obm.calendarManager.getEventWeeks(evt);
-            if (weeks[0] == weeks[1]) {
-                obm.calendarManager.newDayEvent(evt.event,evt.options);
-            } else { // multi weeks event
-              weeks.each(function(w) {
-                //evt.event.week = w;
-                obm.calendarManager.newDayEvent(evt.event,evt.options);
-              });
-            }
-          } else {
-            obm.calendarManager.register(evt);           
-            evt.setTitle(ivent.title);
+          evt.event.date = new Obm.DateTime(ivent.time*1000);
+
+          // if (obm.calendarManager.calendarView == 'month') {
+          //   // // Delete current event and create a new one (easy way)
+          //   // $$('.evt_'+ivent.id).each(function(e) {
+          //   //   e.destroy();
+          //   // });
+          //   // var weeks = obm.calendarManager.getEventWeeks(evt);
+          //   // if (weeks[0] == weeks[1]) {
+          //   //     obm.calendarManager.newDayEvent(evt.event,evt.options);
+          //   // } else { // multi weeks event
+          //   //   weeks.each(function(w) {
+          //   //     //evt.event.week = w;
+          //   //     obm.calendarManager.newDayEvent(evt.event,evt.options);
+          //   //   });
+          //   // }
+          //   obm.calendarManager.register(evt);  
+          // } else {
+          //   obm.calendarManager.register(evt);
+          // }
+
+          if (evt.kind == 'in_day') {
+            evt.element.style.height = evt.event.duration/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight+'px';
+            evt.element.style.top = (evt.event.date.getHours()*3600 + evt.event.date.getMinutes()*60)/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight + 'px';
           }
+
+          obm.calendarManager.register(evt);
+          evt.setTitle();
         } else if (evt) {
-          obm.calendarManager.events.erase(str[1]);
+          obm.calendarManager.events.erase(element_id);
           evt.destroy();
           delete evt;
         }
@@ -774,7 +801,6 @@ Obm.CalendarManager = new Class({
       showErrorMessage(response.message);
       // TODO: redraw event
     }
-    obm.calendarManager.redrawAllDayGrid();
   },
 
 
@@ -825,12 +851,13 @@ Obm.CalendarManager = new Class({
     var events = response.eventsData;
     if (response.error == 0) {
       showOkMessage(response.message);
-      var str = response.elementId.split('_');
       for(var i=0;i< events.length;i++) {
-        var evt = obm.calendarManager.events.get(str[1]);
+        var ivent = events[i].event;
+        var element_id = 'event_'+ivent.id+'_'+ivent.entity+'_'+ivent.entity_id;
+        var evt = obm.calendarManager.events.get(element_id);
         if (evt) {
           obm.calendarManager.unregister(evt);
-          obm.calendarManager.events.erase(str[1]);
+          obm.calendarManager.events.erase(element_id);
           evt.element.destroy();
           delete evt;
         }
@@ -850,13 +877,14 @@ Obm.CalendarManager = new Class({
    */
   cancel: function(id) {
     var evt = this.events.get(id);
-    // Set event initial date
+    // Set event initial date&duration
     evt.event.date.setTime(obm.calendarManager.oldEvent.time*1000);
     evt.event.time = obm.calendarManager.oldEvent.time;
-    // register the old event
+    evt.event.duration = obm.calendarManager.oldEvent.event.duration;
     // fix position & title 
     evt.setPosition();
     evt.setTitle();
+    // register the old event
     this.register(evt);
   },
 
@@ -991,7 +1019,7 @@ Obm.CalendarInDayEvent = new Class({
    * Draw event and inject it into calendarGrid
    */
   draw: function() {
-    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
+    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id;
     this.element = new Element('div').addClass('event')
                                      .setProperties({'id':id,'title':this.event.title})
                                      .setOpacity(this.getOpacity());
@@ -1231,7 +1259,7 @@ Obm.CalendarAllDayEvent = new Class({
    * Draw event and inject it into calendarGrid
    */
   draw: function() {
-    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
+    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id;
     this.element = new Element('div').addClass('event evt_'+this.event.id)
                                      .setProperties({'id':id,'title':this.event.title})
                                      .setOpacity(this.getOpacity());
@@ -1377,9 +1405,9 @@ Obm.CalendarAllDayEvent = new Class({
       });
      startTime = obm.vars.consts.weekBegin[index-1];
     }
-    this.event.time = startTime + eventHour;
-    this.event.date = new Obm.DateTime(this.event.time*1000);
+    this.event.date = new Obm.DateTime((startTime + eventHour)*1000);
     this.event.date.setDate(this.event.date.getDate()+delta);
+    this.event.time = this.event.date.getTime()/1000;
     this.setTitle();
   }
 
@@ -1460,7 +1488,7 @@ Obm.CalendarPopupManager = new Class({
     this.chain.clearChain();
     this.removeEvents();
     if (this.evtId) {
-      obm.calendarManager.cancel(this.ivent.calendar_id);
+      obm.calendarManager.cancel(this.ivent.element_id);
     }
   },
   
@@ -1527,7 +1555,7 @@ Obm.CalendarQuickForm = new Class({
       var d = obm.calendarManager.startTime + str[1].toInt();
       this.setDefaultFormValues(d,1, context);
     } else {
-      var evt = obm.calendarManager.events.get(str[1]);
+      var evt = obm.calendarManager.events.get(target.id);
       this.setFormValues(evt,context);
     }
 
@@ -1640,7 +1668,9 @@ Obm.CalendarQuickForm = new Class({
     } else if (action == 'quick_delete') {
       obm.calendarManager.sendDeleteEvent(this.eventData); 
     } else {
-      obm.calendarManager.sendUpdateEvent(this.eventData);
+      var evt = obm.calendarManager.events.get(this.eventData.element_id);
+      evt.event.title = this.eventData.title;
+      obm.calendarManager.sendUpdateEvent(evt, true);
     }
     this.hide();
   },

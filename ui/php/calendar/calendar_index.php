@@ -95,13 +95,9 @@ if (isset($params['date']) && !empty($params['date'])) {
 ///////////////////////////////////////////////////////////////////////////////
 
 $extra_css[] = $css_calendar;
-$extra_css[] = $css_ext_color_picker ;
 $extra_js_include[] = 'date.js';
 $extra_js_include[] = 'calendar.js';
 $extra_js_include[] = 'colorchooser.js';
-$extra_js_include[] = 'inplaceeditor.js';
-
-$extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
 
 require('calendar_display.inc');
 require_once('calendar_js.inc');
@@ -248,6 +244,9 @@ if ($action == 'search') {
 
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
+  $extra_js_include[] = 'inplaceeditor.js';
+  $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+  $extra_css[] = $css_ext_color_picker ;
   $display['detail'] = dis_calendar_event_form($action, $params, '', $cal_entity_id);
 
 } elseif ($action == 'insert') {
@@ -274,6 +273,9 @@ if ($action == 'search') {
           $params['force_disabled'] = 1;
           $params['force'] = 0;
         }
+        $extra_js_include[] = 'inplaceeditor.js';
+        $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+        $extra_css[] = $css_ext_color_picker ;
         $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
         $display['detail'] = dis_calendar_event_form($action, $params, '',$entities);
@@ -308,6 +310,9 @@ if ($action == 'search') {
       }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $extra_js_include[] = 'inplaceeditor.js';
+    $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_css[] = $css_ext_color_picker ;
     $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
   }
 
@@ -322,6 +327,9 @@ if ($action == 'search') {
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params['calendar_id'] > 0) {  
+    $extra_js_include[] = 'inplaceeditor.js';
+    $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_css[] = $css_ext_color_picker ;
     if (check_calendar_access($params['calendar_id'], 'read')) {
       $eve_q = run_query_calendar_detail($params['calendar_id']);
       $entities = get_calendar_event_entity($params['calendar_id']);
@@ -337,6 +345,9 @@ if ($action == 'search') {
 } elseif ($action == 'duplicate') {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params['calendar_id'] > 0) {  
+    $extra_js_include[] = 'inplaceeditor.js';
+    $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_css[] = $css_ext_color_picker ;
     $eve_q = run_query_calendar_detail($params['calendar_id']);
     $entities = get_calendar_event_entity($params['calendar_id']);
     $display['detailInfo'] = display_record_info($eve_q);
@@ -372,6 +383,9 @@ if ($action == 'search') {
           $params['force_disabled'] = 1;
           $params['force'] = 0;
         }
+        $extra_js_include[] = 'inplaceeditor.js';
+        $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+        $extra_css[] = $css_ext_color_picker ;
         $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_update_error");
         $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
@@ -402,6 +416,9 @@ if ($action == 'search') {
       }
     } else {
       $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+      $extra_js_include[] = 'inplaceeditor.js';
+      $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+      $extra_css[] = $css_ext_color_picker ;
       $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
     }
 
@@ -672,6 +689,9 @@ if ($action == 'search') {
       $entities[$type] = is_array($params["sel_{$type}_id"]) ? $params["sel_{$type}_id"] : array();
     }
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $extra_js_include[] = 'inplaceeditor.js';
+    $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_css[] = $css_ext_color_picker ;
     $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
   }
   
@@ -864,6 +884,9 @@ if ($action == 'search') {
       $conflicts_entities['group'] = $params['entity']['group'];
       $conflicts_entities['resource'] = $params['entity']['resource'];
       $conflicts = check_calendar_conflict($params, $conflicts_entities);
+      $extra_js_include[] = 'inplaceeditor.js';
+      $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+      $extra_css[] = $css_ext_color_picker ;
       $display['search'] .= html_calendar_dis_conflict($params, $conflicts) ;
       $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities);
     } else {

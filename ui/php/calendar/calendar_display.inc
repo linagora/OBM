@@ -1127,7 +1127,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   <div id='calendarHeader' style='margin-bottom: 8px;margin-right:15px;'>
     <table class='calendarTable'>
       <colgroup style='background:#EFF0F2;text-align:right;'>
-      <colgroup />
+      <colgroup></colgroup>
       <tr>
         <td style='width:3em;'>$week_num</td>
         <td>
@@ -4888,13 +4888,13 @@ function dis_calendar_free_interval($current_view) {
       <div ></div>
         <div id='calendarFreeBusyScroll'>
           <table id='calendarFreeBusyTable'> 
-            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
-            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
-            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
-            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
-            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
-            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
-            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'></colgroup>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'></colgroup>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'></colgroup>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'></colgroup>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'></colgroup>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'></colgroup>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'></colgroup>
             <thead id='calendarHead'>
               <tr>$week_day_list</tr>
               <tr>$day_hours_list</tr>
