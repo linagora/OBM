@@ -1231,7 +1231,7 @@ function html_user_group_consult($usr_q) {
     </tr>";
   }
 
-  $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group&amp;ext_container=table";
+  $url = "$GLOBALS[path]/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group&amp;ext_container=table";
   $popup_group_add_button = "
     <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
     <img src=\"$ico_add\" alt=\"[Add]\" />
@@ -1327,7 +1327,7 @@ function html_user_group_consult($usr_q) {
     apply_backgroud();
 
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group', 'groupSearch',{resultValue:resultValue});
+      new obm.AutoComplete.Search('$GLOBAL[path]/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group', 'groupSearch',{resultValue:resultValue});
     })
     </script>
     ";
