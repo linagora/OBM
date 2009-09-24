@@ -1128,6 +1128,8 @@ Obm.CalendarInDayEvent = new Class({
       // Add listener
       // window.addEvent('keydown', obm.calendarManager.keyboardListener.bindWithEvent(this, this.event.id));
 
+      // Fix mouse position
+      this.drag.mouse.pos.x = $('calendarGridContainer').offsetLeft.toInt();
     }.bind(this));
     this.drag.addEvent('drag', this.updateTime.bind(this));
     this.drag.addEvent('complete', function() {
@@ -1344,6 +1346,8 @@ Obm.CalendarAllDayEvent = new Class({
       });
       this.element.setOpacity(.7);
       obm.calendarManager.unregister(this);
+      // Fix mouse position
+      this.drag.mouse.pos.x = $('calendarHeaderGrid').offsetLeft.toInt();
     }.bind(this));
     this.drag.addEvent('complete', function() {
       this.updateTime();

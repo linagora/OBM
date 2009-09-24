@@ -1158,7 +1158,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       <td style='background:#EFF0F2;width:3em;'>
           $week_hour
       </td><td>
-        <div style='position:relative;'>
+        <div id='calendarGridContainer' style='position:relative;'>
           $today_marker
           <div id='calendarGrid' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
             $week_day_col
