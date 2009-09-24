@@ -565,11 +565,10 @@ obm.AutoComplete.Search = new Class({
                           .setProperty('name',this.name+'[]')
                           .setProperty('value',id)
                           .injectInside(result);
-    } else {
-      this.inputField.blur();
-      this.resetFunc();
-      this.inputField.focus();
     }
+    this.inputField.blur();
+    this.resetFunc();
+    this.inputField.focus();
     eval(this.options.selectfunction);
   },
 
