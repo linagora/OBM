@@ -143,8 +143,7 @@ if ($cgp_show['module']['settings'] && $perm->check_right('settings', $cright_re
 
 $display['result'] = "
 $block
-<p style=\"clear:both;\"/>  
-";
+<p style=\"clear:both;\"></p>";
 
 $display['end'] = display_end();
 display_page($display);

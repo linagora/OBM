@@ -748,7 +748,7 @@ Obm.CalendarManager = new Class({
       var str = response.elementId.split('_');
       for(var i=0;i< events.length;i++) {
         var ivent = events[i].event;
-        var element_id = 'event_'+ivent.id+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
+        var element_id = 'event_'+str[1]+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
         var evt = obm.calendarManager.events.get(element_id);
         try {
           obm.calendarManager.unregister(evt);
@@ -849,7 +849,7 @@ Obm.CalendarManager = new Class({
       showOkMessage(response.message);
       for(var i=0;i< events.length;i++) {
         var ivent = events[i].event;
-        var element_id = 'event_'+ivent.id+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
+        var element_id = 'event_'+str[1]+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
         var evt = obm.calendarManager.events.get(element_id);
         if (evt) {
           obm.calendarManager.unregister(evt);
