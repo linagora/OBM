@@ -1024,6 +1024,7 @@ function display_head($p_module, $standard=true) {
 <html xmlns=\"http://www.w3.org/1999/xhtml\">     
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
+  <meta http-equiv=\"X-UA-Compatible\" content=\"chrome=1\" />
   <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css\" />
   $dis_extra_css
