@@ -113,6 +113,7 @@ Obm.CalendarManager = new Class({
         if (evt.event.right) {
           var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
           size = Math.ceil((startWeek + (86400000 * 7) - begin)/86400000);
+          if (evt.event.left) size = 7; // very, very crappy fix
         }
       }
 
@@ -174,6 +175,11 @@ Obm.CalendarManager = new Class({
       }
     }
     this.oldEvent = null;
+
+    if (!this.entityEvents[evt.event.entity+'-'+evt.event.entity_id]) {
+      this.entityEvents[evt.event.entity+'-'+evt.event.entity_id] = new Array();
+    }
+    this.entityEvents[evt.event.entity+'-'+evt.event.entity_id].push(evt.content);
   },
 
 
@@ -226,8 +232,8 @@ Obm.CalendarManager = new Class({
    * Set custom class
    */
   setEventsClass: function(entity, id, klass) {
-    if (obm.calendarManager.entityEvents[entity+'-'+id]) {
-      obm.calendarManager.entityEvents[entity+'-'+id].each(function(e) {
+    if (this.entityEvents[entity+'-'+id]) {
+      this.entityEvents[entity+'-'+id].each(function(e) {
         e.set('class',klass);
       });
     }
@@ -748,37 +754,30 @@ Obm.CalendarManager = new Class({
       var str = response.elementId.split('_');
       for(var i=0;i< events.length;i++) {
         var ivent = events[i].event;
-        var element_id = 'event_'+str[1]+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
-        var evt = obm.calendarManager.events.get(element_id);
+        var elementId = 'event_'+str[1]+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
+        var evt = obm.calendarManager.events.get(elementId);
+
         try {
           obm.calendarManager.unregister(evt);
         } catch(e) {}
+
+        // Update event extensions
+        $$('div.'+elementId).each(function(e) {
+          var ext = obm.calendarManager.events.get(e.id);
+          obm.calendarManager.unregister(ext);
+          ext.event.title = ivent.title;
+          ext.event.time = ivent.time;
+          ext.event.duration = ivent.duration;
+          ext.event.date = new Obm.DateTime(ivent.time*1000);
+          ext.setTitle();
+          obm.calendarManager.register(ext);
+        });
 
         if (ivent.status == 'ACCEPTED' || ivent.status == 'NEEDS-ACTION') {
           evt.event.title = ivent.title;
           evt.event.time = ivent.time;
           evt.event.duration = ivent.duration;
           evt.event.date = new Obm.DateTime(ivent.time*1000);
-
-          // if (obm.calendarManager.calendarView == 'month') {
-          //   // // Delete current event and create a new one (easy way)
-          //   // $$('.evt_'+ivent.id).each(function(e) {
-          //   //   e.destroy();
-          //   // });
-          //   // var weeks = obm.calendarManager.getEventWeeks(evt);
-          //   // if (weeks[0] == weeks[1]) {
-          //   //     obm.calendarManager.newDayEvent(evt.event,evt.options);
-          //   // } else { // multi weeks event
-          //   //   weeks.each(function(w) {
-          //   //     //evt.event.week = w;
-          //   //     obm.calendarManager.newDayEvent(evt.event,evt.options);
-          //   //   });
-          //   // }
-          //   obm.calendarManager.register(evt);  
-          // } else {
-          //   obm.calendarManager.register(evt);
-          // }
-
           if (evt.kind == 'in_day') {
             evt.element.style.height = evt.event.duration/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight+'px';
             evt.element.style.top = (evt.event.date.getHours()*3600 + evt.event.date.getMinutes()*60)/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight + 'px';
@@ -786,8 +785,9 @@ Obm.CalendarManager = new Class({
 
           obm.calendarManager.register(evt);
           evt.setTitle();
+
         } else if (evt) {
-          obm.calendarManager.events.erase(element_id);
+          obm.calendarManager.events.erase(elementId);
           evt.destroy();
           delete evt;
         }
@@ -1057,11 +1057,8 @@ Obm.CalendarInDayEvent = new Class({
     }.bind(this));       
 
     this.setTitle();
+
     this.element.injectInside($('calendarGrid'));
-    if (!obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id]) {
-      obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id] = new Array();
-    }
-    obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id].push(this.content);
   },
 
 
@@ -1248,22 +1245,23 @@ Obm.CalendarAllDayEvent = new Class({
     this.event = eventData;
     this.event.date =  new Obm.DateTime(this.event.time * 1000);
     this.draw();
-    //this.setPosition();
     this.switchColor(obm.vars.conf.calendarColor);
     if (this.event.updatable) this.makeUpdatable();
-
-    // Hide events in month view
-    // Events will be visible on obm.CalendarManager.resizeAlldayCell
-    // if (obm.vars.consts.calendarView == 'month') this.element.style.visibility='hidden';
   },
 
   
   /**
-   * Draw event and inject it into calendarGrid
+   * Draw event and inject it into calendarHeaderGrid
    */
   draw: function() {
     var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
-    this.element = new Element('div').addClass('event')
+    var extClass;
+    if ($(id)) { 
+      extClass = id;
+      id += '_'+$(id).uid; // multi-weeks event
+    }
+
+    this.element = new Element('div').addClass('event '+extClass)
                                      .setProperties({'id':id,'title':this.event.title})
                                      .setOpacity(this.getOpacity());
 
@@ -1305,11 +1303,6 @@ Obm.CalendarAllDayEvent = new Class({
     this.setTitle();
 
     this.element.injectInside($('calendarHeaderGrid'));
-
-    if (!obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id]) {
-      obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id] = new Array();
-    }
-    obm.calendarManager.entityEvents[this.event.entity+'-'+this.event.entity_id].push(this.content);
   },
 
 
