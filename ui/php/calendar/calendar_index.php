@@ -487,12 +487,18 @@ if ($action == 'search') {
 } elseif ($action == 'check_conflict') {
 ///////////////////////////////////////////////////////////////////////////////
   if(isset($params['calendar_id']) && $params['calendar_id'] != '') {
+    $event_q = run_query_calendar_detail($params['calendar_id']);
     $entities = get_calendar_event_entity($params['calendar_id']);
   } else {
     $entities['user']['ids'][] = $params['entity_id'];
     $entities['resource']['ids'] = array();
   }
   $conflicts = quick_check_calendar_conflict($params, $entities);
+  if ((!$event_q) || ($event_q->f('event_repeatkind')=='none')) {
+    $json[] = 'occUpdate:false';
+  } else {
+    $json[] = 'occUpdate:true';
+  }
   if ($entities['user']['ids'] == array($obm['uid'])) {
     $json[] = 'mail:false';
   } else {
@@ -503,6 +509,32 @@ if ($action == 'search') {
   } else {
     $json[] = "conflict:true";    
   }
+  echo "({".implode(',',$json)."})";    
+  exit();
+
+
+} elseif ($action == 'quick_check_delete') {
+///////////////////////////////////////////////////////////////////////////////
+  if(isset($params['calendar_id']) && $params['calendar_id'] != '') {
+    $event_q = run_query_calendar_detail($params['calendar_id']);
+    $entities = get_calendar_event_entity($params['calendar_id']);
+  } else {
+    $entities['user']['ids'][] = $params['entity_id'];
+    $entities['resource']['ids'] = array();
+  }
+  if ((!$event_q) || ($event_q->f('event_repeatkind')=='none')) {
+    $json[] = 'occDelete:false';
+    $json[] = 'checkDelete:true';
+  } else {
+    $json[] = 'occDelete:true';
+    $json[] = 'checkDelete:false';
+  }
+  if ($entities['user']['ids'] == array($obm['uid'])) {
+    $json[] = 'mail:false';
+  } else {
+    $json[] = 'mail:true';
+  }
+  $json[] = "conflict:false";
   echo "({".implode(',',$json)."})";    
   exit();
 
@@ -1247,6 +1279,13 @@ function get_calendar_action() {
   // Looking for Conflicts
   $actions['calendar']['check_conflict'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=check_conflict",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+  // Looking for Delete Conflicts
+  $actions['calendar']['quick_check_delete'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=quick_check_delete",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );

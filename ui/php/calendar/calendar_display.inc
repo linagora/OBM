@@ -38,6 +38,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
     $block = $calendar_function($current_view, $calendar_entity, $writable_entity);
     $block .= dis_calendar_quick_form($calendar_entity);
     $block .= dis_calendar_conflict_popup();
+    $block .= dis_calendar_occurency_popup();
     $calendar_function_pdf = $calendar_function."_pdf";
     if (function_exists($calendar_function_pdf)) {
       $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$date->getURL()."&amp;output_target=print";
@@ -3234,8 +3235,7 @@ function dis_calendar_quick_form($calendar_entity) {
             <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" />
             <input type=\"button\" id=\"calendarQuickFormDetail\" onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value=\"$l_details\" />
             <input type=\"button\" class=\"closeSticky\" id=\"calendarQuickFormDelete\" 
-              onclick=\"if(confirm('".phpStringToJsString($l_confirm_delete)."')) obm.calendarQuickForm.submit('quick_delete');\"
-          value=\"$l_c_delete\" />
+              onclick=\"obm.calendarQuickForm.submit('quick_delete');\" value=\"$l_c_delete\" />
           </fieldset>
         </form>
         <div id=\"calendarQuickFormData\">
@@ -3306,6 +3306,55 @@ function dis_calendar_conflict_popup() {
       </div>
     </div>
 
+   <div id=\"calendarSendMail\" class=\"obmPopup\">
+     <h1>
+       <a href=\"#\" id=\"popup_sendmail_close\" class=\"closeSticky\">
+         <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+       </a>
+       <span>$GLOBALS[l_confirm]</span>
+     </h1>
+     <div class=\"content\">
+        <h2>$GLOBALS[l_conflict_sendmail]</h2>
+         <fieldset class=\"buttons\"> 
+          <input type=\"button\" id=\"popup_sendmail_yes\" class=\"closeSticky\" value=\"$GLOBALS[l_yes]\" />
+          <input type=\"button\" id=\"popup_sendmail_no\" class=\"closeSticky\" value=\"$GLOBALS[l_no]\" />
+        </fieldset>
+     </div>
+   </div>  
+    <script type=\"text/javascript\">
+      obm.vars.labels.conflict_force = '".phpStringToJsString($GLOBALS['l_conflict_force'])."';
+      obm.vars.labels.insert_force = '".phpStringToJsString($GLOBALS['l_force'])."';
+    </script>";
+
+  return $block;
+}
+
+
+/**
+ * HTML for the occurency modification popup in the calendar view.
+ *  
+ * @access public
+ * @return HTML
+ */
+function dis_calendar_occurency_popup() {
+
+  $block = "
+    <div id=\"calendarConfirmDelete\" class=\"obmPopup\">
+      <h1>
+        <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
+          <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+        </a>
+        <span>$GLOBALS[l_confirm]</span>
+      </h1>
+      <div class=\"content\">
+        <h2>$GLOBALS[l_delete_event_message]</h2>
+         <fieldset class=\"buttons\"> 
+          <input type=\"button\" id=\"popup_delete\" class=\"closeSticky\" value=\"$GLOBALS[l_delete]\" /><br/>
+          <input type=\"button\" id=\"popup_cancel_delete\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+         </fieldset>
+      </div>
+    </div>
+
     <div id=\"calendarOccurencyUpdate\" class=\"obmPopup\">
       <h1>
         <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
@@ -3317,7 +3366,7 @@ function dis_calendar_conflict_popup() {
         <h2>$GLOBALS[l_update_occurrence_message]</h2>
          <fieldset class=\"buttons\"> 
           <input type=\"button\" id=\"popup_update_one\" class=\"closeSticky\" value=\"$GLOBALS[l_update_occurrence]\" /><br/>
-          <input type=\"button\" id=\"popup_update_all\" value=\"$GLOBALS[l_update_all_occurrences]\" /><br/>
+          <input type=\"button\" id=\"popup_update_all\" class=\"closeSticky\" value=\"$GLOBALS[l_update_all_occurrences]\" /><br/>
           <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
          </fieldset>
       </div>
@@ -3338,27 +3387,7 @@ function dis_calendar_conflict_popup() {
           <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
          </fieldset>
       </div>
-    </div>
-
-   <div id=\"calendarSendMail\" class=\"obmPopup\">
-     <h1>
-       <a href=\"#\" id=\"popup_sendmail_close\" class=\"closeSticky\">
-         <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
-       </a>
-       <span>$GLOBALS[l_confirm]</span>
-     </h1>
-     <div class=\"content\">
-        <h2>$GLOBALS[l_conflict_sendmail]</h2>
-         <fieldset class=\"buttons\"> 
-          <input type=\"button\" id=\"popup_sendmail_yes\" class=\"closeSticky\" value=\"$GLOBALS[l_yes]\" />
-          <input type=\"button\" id=\"popup_sendmail_no\" class=\"closeSticky\" value=\"$GLOBALS[l_no]\" />
-        </fieldset>
-     </div>
-   </div>  
-    <script type=\"text/javascript\">
-      obm.vars.labels.conflict_force = '".phpStringToJsString($GLOBALS['l_conflict_force'])."';
-      obm.vars.labels.insert_force = '".phpStringToJsString($GLOBALS['l_force'])."';
-    </script>";
+    </div>";
 
   return $block;
 }
@@ -4505,25 +4534,42 @@ function dis_calendar_meeting_form($current_view, $calendar, $sel_entity_id) {
     }
   }
 
-  $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=access";
+  $url = "&amp;action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=access";
   $user_add_button = "
-    <a href=\"javascript: return false;\"
-      onclick=\"popup('$url','');
+    <a href=\"javascript: return false;\" 
+      onclick=\"popup(\$('userSearchSource').value+'$url','');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
-  $block_user = "
-    <th>
-    $GLOBALS[l_users]/$GLOBALS[l_contacts]
-    $user_add_button
-    </th>
-    <td id=\"sel_user_id\">
+
+    $block_user = "
+      <tr>
+      <th>
+      $GLOBALS[l_users] / $GLOBALS[l_contacts]
+      $user_add_button
+      </th>
+      <td class=\"autocompleteField\">
+      <select id=\"userSearchSource\" class=\"autocompleteSource\" name=\"\" style=\"float: right;\">
+        <option value=\"$path/user/user_index.php?from=calendar\">$GLOBALS[l_users]</option>
+        <option value=\"$path/contact/contact_index.php?from=calendar\">$GLOBALS[l_contacts]</option>
+        <!-- FIXME: lister les addressbook du user ici
+        <optgroup label=\"$GLOBALS[l_addressbook]\">
+          <option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=5\">Mon addressbook</option>
+        </optgroup>
+        -->
+      </select>
       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
-      $dis_sel_user
-    </td>";
+      </td>
+      </tr>
+      <tr>
+      <th>&nbsp;</th>    
+      <td id=\"sel_user_id\" class=\"autocompleteResult\">$dis_sel_user</td>
+      </tr>";
+
     $user_js = "
-    new obm.AutoComplete.Search('$path/people/people_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});
-    new obm.AutoComplete.Search('$path/people/people_index.php?action=ext_search', 'sel_user_id', 'userSearch');
+    new obm.AutoComplete.ExtSearch(
+        function() { return \$('userSearchSource').value+'&action=ext_search'; },
+        'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});
     new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
 
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
@@ -4658,9 +4704,7 @@ function dis_calendar_meeting_form($current_view, $calendar, $sel_entity_id) {
     $dis_block_user = "<fieldset class=\"detail infos\">  
       <legend>$GLOBALS[l_attendees]</legend>
       <table>
-      <tr>
         $block_user
-      </tr>
       <tr>
         $block_group
         </tr>
@@ -4670,9 +4714,7 @@ function dis_calendar_meeting_form($current_view, $calendar, $sel_entity_id) {
     $dis_block_user = "<fieldset style='display:none;' 'class=\"detail infos\">  
       <legend>$GLOBALS[l_attendees]</legend>
       <table>
-      <tr>
         $block_user
-      </tr>
       <tr>
         $block_group
         </tr>

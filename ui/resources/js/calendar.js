@@ -701,6 +701,9 @@ Obm.CalendarManager = new Class({
         url: obm.vars.consts.calendarUrl,
         secure : false,
         onComplete : function(response) {
+          if(response.occUpdate) {
+            obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
+          }
           if (response.conflict) {
             $('popup_force').value = obm.vars.labels.conflict_force;
             obm.calendarManager.popupManager.add('calendarConflictPopup');
@@ -708,6 +711,9 @@ Obm.CalendarManager = new Class({
           if (response.mail) {
             obm.calendarManager.popupManager.add('calendarSendMail');
           }
+          obm.calendarManager.popupManager.addEvent('update_all', function () {
+            eventData.all = 1;
+          });
           obm.calendarManager.popupManager.addEvent('mail', function () {
             eventData.send_mail = true;
           });        
@@ -812,23 +818,32 @@ Obm.CalendarManager = new Class({
       url: obm.vars.consts.calendarUrl,
       secure : false,
       onComplete : function(response) {
+        if(response.checkDelete) {
+          obm.calendarManager.popupManager.add('calendarConfirmDelete');
+        }
+        if(response.occDelete) {
+          obm.calendarManager.popupManager.add('calendarOccurencyDelete');
+        }
         if(response.mail) {
           obm.calendarManager.popupManager.add('calendarSendMail');
         }
+        obm.calendarManager.popupManager.addEvent('delete_all', function () {
+          eventData.all = 1;
+        });
         obm.calendarManager.popupManager.addEvent('mail', function () {
           eventData.send_mail = true;
-        });        
+        });
         obm.calendarManager.popupManager.addEvent('complete', function () {
           new Request.JSON({
             url: obm.vars.consts.calendarUrl,
             secure : false,
             onComplete : this.receiveDeleteEvent
-          }).post($merge({ajax : 1, action : 'quick_delete'}, eventData));             
+          }).post($merge({ajax : 1, action : 'quick_delete'}, eventData));
         }.bind(this));
         obm.calendarManager.popupManager.show(eventData);
       }.bind(this)
-    }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));    
- 
+    }).post($merge({ajax : 1, action : 'quick_check_delete'}, eventData));
+
   },
 
 
@@ -1139,10 +1154,6 @@ Obm.CalendarInDayEvent = new Class({
         'z-index' : '10' 
       });
       obm.calendarManager.scroll.stop();
-//      obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
-//      obm.calendarManager.popupManager.addEvent('update_occurency', function () {
-//        eventData.update_occurency = true;
-//      });
       obm.calendarManager.sendUpdateEvent(this);
 
       // remove listener
@@ -1170,10 +1181,6 @@ Obm.CalendarInDayEvent = new Class({
         'z-index' : '10' 
       });
       obm.calendarManager.scroll.stop();
-//      obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
-//      obm.calendarManager.popupManager.addEvent('update_occurency', function () {
-//        eventData.update_occurency = true;
-//      });
       obm.calendarManager.sendUpdateEvent(this);
     }.bind(this));
   },
@@ -1352,10 +1359,6 @@ Obm.CalendarAllDayEvent = new Class({
       this.element.setStyles({
         'z-index' : '10' 
       });
-//      obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
-//      obm.calendarManager.popupManager.addEvent('update_occurency', function () {
-//        eventData.update_occurency = true;
-//      });
       obm.calendarManager.sendUpdateEvent(this);
     }.bind(this));
   },
@@ -1444,13 +1447,32 @@ Obm.CalendarPopupManager = new Class({
       this.cancel();
     }.bind(this));
 
+    // Event delete confirmation
+    $('popup_delete').addEvent('click', function() {
+      this.chain.callChain();
+    }.bind(this));
+
+    $('popup_cancel_delete').addEvent('click', function() {
+      this.evtId = null;
+      this.cancel();
+    }.bind(this));
+
     // Repeated event popup
     $('popup_update_one').addEvent('click', function() {
-      this.fireEvent('update_occurency');
+      this.chain.callChain();
+    }.bind(this));
+
+    $('popup_update_all').addEvent('click', function() {
+      this.fireEvent('update_all');
       this.chain.callChain();
     }.bind(this));
 
     $('popup_delete_one').addEvent('click', function() {
+      this.chain.callChain();
+    }.bind(this));
+
+    $('popup_delete_all').addEvent('click', function() {
+      this.fireEvent('delete_all');
       this.chain.callChain();
     }.bind(this));
 

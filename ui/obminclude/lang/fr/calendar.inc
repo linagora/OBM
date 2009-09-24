@@ -318,6 +318,7 @@ $l_conflict_manage = 'Gérer le conflit';
 $l_conflict_force = 'Forcer le déplacement';
 $l_conflict_sendmail = 'Souhaitez-vous notifier les participants?';
 
+$l_delete_event_message = 'Confirmez vous la suppression de cet évènement ?';
 $l_update_event_occurrence = 'Modification d\'un rendez-vous répété';
 $l_update_occurrence_message = 'Modifier uniquement cet occurrence ou l\'ensemble de la série ?';
 $l_update_occurrence = 'Modifier l\'occurrence';
