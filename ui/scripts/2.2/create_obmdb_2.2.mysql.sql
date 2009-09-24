@@ -1222,7 +1222,7 @@ CREATE TABLE `EntityRight` (
   KEY `entityright_admin_key` (`entityright_admin`),
   KEY `entityright_read_key` (`entityright_read`),
   KEY `entityright_access_key` (`entityright_access`),
-  KEY `entityright_write_key` (`entityright_write`)
+  KEY `entityright_write_key` (`entityright_write`),
   CONSTRAINT `entityright_entity_id_entity_id` FOREIGN KEY (`entityright_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `entityright_consumer_id_entity_id` FOREIGN KEY (`entityright_consumer_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
