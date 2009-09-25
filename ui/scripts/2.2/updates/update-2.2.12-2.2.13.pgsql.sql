@@ -8,17 +8,17 @@
 
 UPDATE ObmInfo SET obminfo_value = '2.2.13-pre' WHERE obminfo_name = 'db_version';
 --
--- Name: event_domain_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+-- Name: event_parent_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
-CREATE INDEX event_domain_id_fkey ON event (event_domain_id);
+CREATE INDEX event_parent_id_fkey ON event (event_parent_id);
 
 --
--- Name: event_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: event_parent_id_parent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY event
-    ADD CONSTRAINT event_domain_id_domain_id_fkey FOREIGN KEY (event_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT event_parent_id_parent_id_fkey FOREIGN KEY (event_parent_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 CREATE INDEX entityright_admin_key ON EntityRight (entityright_admin) ; 
 CREATE INDEX entityright_read_key ON EntityRight (entityright_read) ; 
