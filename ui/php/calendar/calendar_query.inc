@@ -2205,8 +2205,11 @@ function run_query_calendar_create_or_update_event_template($calendar) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_create_or_update_event_template()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-
-  $id = $obm_q->lastid();
+  if (isset($calendar['template_id'])) {
+    $id = $calendar['template_id'];
+  } else {
+    $id = $obm_q->lastid();
+  }
   
   return $id;
 }

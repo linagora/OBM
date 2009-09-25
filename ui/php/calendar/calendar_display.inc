@@ -127,7 +127,7 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
     $navbar = dis_calendar_navbar($current_view);
   }
 
-  if ($action == 'new') {
+  if ($action == 'new' || $action == 'save_as_template' || $action == 'update_template') {
     $select_template_form = dis_calendar_select_template_form($action);
   }
 
