@@ -33,26 +33,25 @@ NameVirtualHost *:443
     LimitRequestBody 20971520
 
     Alias /stats /var/www/munin
-#obm#<Location /funambol>
-#obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/funambol
-#obm#</Location>
 
-#obm#<Location /obm-sync>
-#obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/obm-sync
-#obm#</Location>
+#obm#ProxyPass /obm-sync http://_TOMCAT_SERVER_:8080/obm-sync
+#obm#ProxyPassReverse /obm-sync http://_TOMCAT_SERVER_:8080/obm-sync
+
+#obm#ProxyPass /funambol http://_TOMCAT_SERVER_:8080/funambol
+#obm#ProxyPassReverse /funambol http://_TOMCAT_SERVER_:8080/funambol
+
+#obm#ProxyPass /minig http://_TOMCAT_SERVER_:8080/minig
+#obm#ProxyPassReverse /minig http://_TOMCAT_SERVER_:8080/minig
 
 
-#obm#<Location /minig>
-#obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/minig
 #obm#</Location>
 #obm# alias /webmail/images /usr/lib/minig/images
-#I you install minig on an other server,
-#comment alias /webmail/images, and use
-#proxyPass ajp:
-#<Location /webmail/images>
-#ProxyPass ajp://_TOMCAT_SERVER_Minig:8009/minig/images
-#</Location>
 
+#If you install minig on an other server,
+#comment alias /webmail/images, and use
+#proxyPass/Reverse :
+#ProxyPass /minig http://_TOMCAT_SERVER_:8080/minig/images
+#ProxyPassReverse /minig http://_TOMCAT_SERVER_:8080/minig/images
 
 #obm#ProxyRequests On
 
