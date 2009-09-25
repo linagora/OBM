@@ -34,6 +34,9 @@ sub _loadModules {
         my $modulePath = 'ObmSatellite/Modules/'.$moduleInternalName.'.pm';
         my $moduleClass = 'ObmSatellite::Modules::'.$moduleInternalName;
 
+        # Disable SIGDIE handler to load only valid modules without fatal error
+        local $SIG{__DIE__} = undef;
+
         eval {
             require $modulePath;
         } or ($self->log( 0, 'Unknow or invalid module \''.$modules[$i].'\'' ) && next);

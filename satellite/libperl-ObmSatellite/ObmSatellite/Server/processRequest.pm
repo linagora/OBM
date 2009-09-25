@@ -8,7 +8,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use Digest::SHA qw(sha256_hex);
 use HTTP::Status;
 
 use constant PASSWORD_LIFE_TIME => 120;
@@ -84,7 +83,25 @@ sub _checkHttpBasicAuth {
         my $currentTime = time();
         $currentTime = $currentTime - $self->{'httpAuthentication'}->{'validPasswdTime'};
 
-        if( ($currentTime < PASSWORD_LIFE_TIME) && defined($self->{'httpAuthentication'}->{'validPasswd'}) && ($self->{'httpAuthentication'}->{'validPasswd'} eq sha256_hex($pass)) ) {
+        # Disable SIGDIE handler to load only valid modules without fatal error
+        my $oldSigDie = $SIG{__DIE__};
+        $SIG{__DIE__} = undef;
+
+        my $currentPasswdSsha;
+        eval {
+            require Digest::SHA;
+            $currentPasswdSsha = Digest::SHA::sha256_hex($pass);
+        } or eval {
+            # Lower encryption, but this module is native on more platforms
+            require Digest::SHA1;
+            $currentPasswdSsha = Digest::SHA1::sha1_hex($pass);
+        } or ($self->log( 0, 'Digest::SHA or Digest::SHA1 modue needed' ) && exit 10); 
+
+        # Re-enable SIGDIE handler
+        $SIG{__DIE__} = $oldSigDie;
+
+
+        if( ($currentTime < PASSWORD_LIFE_TIME) && defined($self->{'httpAuthentication'}->{'validPasswd'}) && ($self->{'httpAuthentication'}->{'validPasswd'} eq $currentPasswdSsha) ) {
             $self->log( 3, 'Basic HTTP authentication : ckeck against cache password success' );
             return 1;
         }else {
@@ -111,8 +128,22 @@ sub _checkHttpBasicAuth {
         return 0;
     }
 
+    # Disable SIGDIE handler to load only valid modules without fatal error
+    my $oldSigDie = $SIG{__DIE__};
+    $SIG{__DIE__} = undef;
+
     $self->log( 3, 'Basic HTTP authentication : LDAP check HTTP basic password success !' );
-    $self->{'httpAuthentication'}->{'validPasswd'} = sha256_hex($pass);
+    eval {
+        require 'Digest/SHA.pm';
+        $self->{'httpAuthentication'}->{'validPasswd'} = Digest::SHA::sha256_hex($pass);
+    } or eval {
+        require 'Digest/SHA1.pm';
+        $self->{'httpAuthentication'}->{'validPasswd'} = Digest::SHA1::sha1_hex($pass);
+    } or ($self->log( 0, 'Digest::SHA or Digest::SHA1 modue needed' ) && exit 10); 
+
+    # Re-enable SIGDIE handler
+    $SIG{__DIE__} = $oldSigDie;
+
     $self->{'httpAuthentication'}->{'validPasswdTime'} = time();
 
     return 1;
