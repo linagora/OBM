@@ -1087,6 +1087,7 @@ function display_head($p_module, $standard=true) {
   }
 
   obm.initialize.chain(datePickerGenerator);
+  obm.initialize.chain(refreshWaitEvent);
   window.addEvent('load', function () {
     while(obm.initialize.\$chain && obm.initialize.\$chain.length > 0) {
       obm.initialize.callChain();
@@ -1125,7 +1126,7 @@ function display_menu($module) {
 
   global $path, $obm, $display, $obm_version, $cgp_show, $modules;
   global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope;
-  global $l_logout, $l_profile, $l_scope_update;
+  global $l_logout, $l_profile, $l_scope_update, $l_waiting_events;
   global $perm, $cright_write_admin;
 
 
@@ -1151,6 +1152,9 @@ function display_menu($module) {
     $url = $display['print_url']."&amp;output_target=print";
     $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
   }
+
+  $wait_event = "<li><a id=\"bannerWaitingEvent\" href='".$path."/calendar/calendar_index.php?action=waiting_events'></a></li>";
+
   $block = "
 <!-- Bandeau -->
 <div id='banner'>
@@ -1160,6 +1164,8 @@ $display['section']
 ."
 <ul id='information'>
 $dis_scope
+
+$wait_event
 <li> $login ($domain)</li>
 <li>$l_profile : $p</li>
 <li><a href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
