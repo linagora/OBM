@@ -128,7 +128,7 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
   }
 
   if ($action == 'new' || $action == 'save_as_template' || $action == 'update_template') {
-    $select_template_form = dis_calendar_select_template_form($action);
+    $select_template_form = dis_calendar_select_template_form($action, $calendar);
   }
 
   $block = "
@@ -1003,15 +1003,19 @@ function dis_calendar_html_search_form($calendar) {
   return $block;
 }
 
-function dis_calendar_select_template_form($action) {
+function dis_calendar_select_template_form($action, $calendar) {
   global $obm;
   
   $template_q = run_query_calendar_get_alltemplates($obm['uid']);
-  
+  $t_id = $calendar['template_id'];
   while ($template_q->next_record()) {
     $id = $template_q->f('eventtemplate_id');
     $name = $template_q->f('eventtemplate_name');
-    $select.= "<option value=\"$id\">$name</option>";
+    $selected = "";
+    if (isset($t_id) && $t_id == $id) {
+      $selected = "selected=\"selected\"";
+    }
+    $select.= "<option value=\"$id\" $selected>$name</option>";
   }
   return "<div style=\"padding-left:1em;padding-right:1em;\">
     <div id=\"templateSelect\" style=\"float:right;\">
