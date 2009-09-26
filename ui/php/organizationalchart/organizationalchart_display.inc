@@ -921,7 +921,6 @@ function organizationalchart_export_pdf($organizationalchart, $view) {
 
     } else {
       // Download file
-      $file = fopen($tmpfname, 'r');
       header('Content-Type: application/pdf') ;
       header("Content-Disposition: attachment; filename=\"$oc_name.pdf\";") ;
       header('Cache-Control: maxage=3600');
