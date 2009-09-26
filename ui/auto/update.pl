@@ -240,6 +240,7 @@ sub _getNameDomainId {
 
     my $sth;
     if( !defined($dbHandler->execQuery( $query, \$sth )) ) {
+
         $self->_log( 'Impossible de charger l\'ID du domaine OBM ayant pour domaine de messagerie principal \''.$domainName.'\'', 3 );
         return 1;
     }
