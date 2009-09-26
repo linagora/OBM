@@ -2388,6 +2388,40 @@ CREATE TABLE `Phone` (
   CONSTRAINT `phone_entity_id_entity_id_fkey` FOREIGN KEY (`phone_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+--
+-- Table structure for table `PlannedTask`
+--
+DROP TABLE IF EXISTS `PlannedTask`;
+CREATE TABLE `PlannedTask` (
+  `plannedtask_id` int(8) NOT NULL auto_increment,
+  `plannedtask_domain_id` int(8) default '0',
+  `plannedtask_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `plannedtask_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `plannedtask_userupdate` int(8) default NULL,
+  `plannedtask_usercreate` int(8) default NULL,
+  `plannedtask_user_id` int(8) default NULL,
+  `plannedtask_datebegin` date default NULL,
+  `plannedtask_dateend` date default NULL,
+  `plannedtask_period` int(8) enum ('0','1','2') NOT NULL default '0',
+  `plannedtask_project_id` int(8) default NULL,
+  `plannedtask_tasktype_id` int(8) default NULL,
+  `plannedtask_overrun` int(1) enum ('0','1') NOT NULL default '0',
+  `plannedtask_comment` text,
+  PRIMARY KEY  (`plannedtask_id`),
+  KEY `plannedtask_domain_id_domain_id_fkey` (`plannedtask_domain_id`),
+  KEY `plannedtask_user_id_userobm_id_fkey` (`plannedtask_user_id`),
+  KEY `plannedtask_datebegin_key` (`plannedtask_datebegin`),
+  KEY `plannedtask_dateend_key` (`plannedtask_dateend`),
+  CONSTRAINT `plannedtask_domain_id_domain_id_fkey` FOREIGN KEY (`plannedtask_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `plannedtask_usercreate_userobm_id_fkey` FOREIGN KEY (`plannedtask_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `plannedtask_userupdate_userobm_id_fkey` FOREIGN KEY (`plannedtask_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `plannedtask_project_id_project_id_fkey` FOREIGN KEY (`plannedtask_project_id`) REFERENCES `Project` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `plannedtask_tasktype_id_tasktype_id_fkey` FOREIGN KEY (`plannedtask_tasktype_id`) REFERENCES `TaskType` (`tasktype_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `plannedtask_user_id_userobm_id_fkey` FOREIGN KEY (`plannedtask_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 --
 -- Table structure for table `Profile`
 --
@@ -3021,10 +3055,10 @@ CREATE TABLE `TaskEvent` (
   CONSTRAINT `taskevent_event_id_event_id_fkey` FOREIGN KEY (`taskevent_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
 --
 -- Table structure for table `TaskType`
 --
-
 DROP TABLE IF EXISTS `TaskType`;
 CREATE TABLE `TaskType` (
   `tasktype_id` int(8) NOT NULL auto_increment,
@@ -3034,6 +3068,7 @@ CREATE TABLE `TaskType` (
   `tasktype_userupdate` int(8) default NULL,
   `tasktype_usercreate` int(8) default NULL,
   `tasktype_internal` int(1) NOT NULL,
+  `tasktype_tasktypegroup_id` int(8),
   `tasktype_code` varchar(10) default NULL,
   `tasktype_label` varchar(32) default NULL,
   PRIMARY KEY  (`tasktype_id`),
@@ -3042,13 +3077,39 @@ CREATE TABLE `TaskType` (
   KEY `tasktype_usercreate_userobm_id_fkey` (`tasktype_usercreate`),
   CONSTRAINT `tasktype_usercreate_userobm_id_fkey` FOREIGN KEY (`tasktype_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `tasktype_domain_id_domain_id_fkey` FOREIGN KEY (`tasktype_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `tasktype_userupdate_userobm_id_fkey` FOREIGN KEY (`tasktype_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `tasktype_userupdate_userobm_id_fkey` FOREIGN KEY (`tasktype_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `tasktype_tasktypegroup_id_tasktypegroup_id_fkey` FOREIGN KEY (`tasktype_tasktypegroup_id`) REFERENCES `TaskTypeGroup` (`tasktypegroup_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+--
+-- Table structure for table `TaskTypeGroup`
+--
+
+DROP TABLE IF EXISTS `TaskTypeGroup`;
+CREATE TABLE `TaskTypeGroup` (
+  `tasktypegroup_id` int(8) NOT NULL auto_increment,
+  `tasktypegroup_domain_id` int(8) default '0',
+  `tasktypegroup_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `tasktypegroup_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `tasktypegroup_userupdate` int(8) default NULL,
+  `tasktypegroup_usercreate` int(8) default NULL,
+  `tasktypegroup_label` varchar(32) default NULL,
+  `tasktypegroup_code` varchar(20) default NULL,
+  `tasktypegroup_bgcolor` varchar(7) default NULL,
+  `tasktypegroup_fgcolor` varchar(7) default NULL,
+  KEY `tasktypegroup_domain_id_domain_id_fkey` (`tasktypegroup_domain_id`),
+  CONSTRAINT `tasktypegroup_domain_id_domain_id_fkey` FOREIGN KEY (`tasktypegroup_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `tasktypegroup_usercreate_userobm_id_fkey` FOREIGN KEY (`tasktypegroup_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `tasktypegroup_userupdate_userobm_id_fkey` FOREIGN KEY (`tasktypegroup_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  PRIMARY KEY  (`tasktypegroup_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
 
 --
 -- Table structure for table `TimeTask`
 --
-
 DROP TABLE IF EXISTS `TimeTask`;
 CREATE TABLE `TimeTask` (
   `timetask_id` int(8) NOT NULL auto_increment,

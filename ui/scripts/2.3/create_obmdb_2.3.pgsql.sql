@@ -1656,6 +1656,27 @@ CREATE TABLE phone (
 
 
 --
+-- Table structure for table plannedtask
+--
+CREATE TABLE plannedtask (
+  plannedtask_id integer NOT NULL,
+  plannedtask_domain_id integer default 0,
+  plannedtask_timeupdate timestamp without time zone,
+  plannedtask_timecreate timestamp without time zone DEFAULT now(),
+  plannedtask_userupdate integer default NULL,
+  plannedtask_usercreate integer default NULL,
+  plannedtask_user_id integer default NULL,
+  plannedtask_datebegin date,
+  plannedtask_dateend date,
+  plannedtask_period integer enum (0, 1, 2) NOT NULL default 0,
+  plannedtask_project_id integer default NULL,
+  plannedtask_tasktype_id integer default NULL,
+  plannedtask_overrun integer enum (0, 1) NOT NULL default 0,
+  plannedtask_comment text
+);
+
+
+--
 -- Name: profile; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2069,15 +2090,33 @@ CREATE TABLE syncedaddressbook (
 --
 
 CREATE TABLE tasktype (
-    tasktype_id integer NOT NULL,
-    tasktype_domain_id integer NOT NULL,
-    tasktype_timeupdate timestamp without time zone,
-    tasktype_timecreate timestamp without time zone DEFAULT now(),
-    tasktype_userupdate integer DEFAULT NULL,
-    tasktype_usercreate integer DEFAULT NULL,
-    tasktype_internal integer NOT NULL,
-    tasktype_code character varying(10),
-    tasktype_label character varying(32) DEFAULT NULL::character varying
+  tasktype_id integer NOT NULL,
+  tasktype_domain_id integer NOT NULL,
+  tasktype_timeupdate timestamp without time zone,
+  tasktype_timecreate timestamp without time zone DEFAULT now(),
+  tasktype_userupdate integer DEFAULT NULL,
+  tasktype_usercreate integer DEFAULT NULL,
+  tasktype_internal integer NOT NULL,
+  tasktype_tasktypegroup_id integer,
+  tasktype_code character varying(10),
+  tasktype_label character varying(32) DEFAULT NULL::character varying
+);
+
+
+--
+-- Table structure for table tasktypegroup
+--
+CREATE TABLE tasktypegroup (
+  tasktypegroup_id integer NOT NULL,
+  tasktypegroup_domain_id integer NOT NULL,
+  tasktypegroup_timeupdate timestamp without time zone,
+  tasktypegroup_timecreate without time zone DEFAULT now(),
+  tasktypegroup_userupdate integer default NULL,
+  tasktypegroup_usercreate integer default NULL,
+  tasktypegroup_label varchar(32),
+  tasktypegroup_code varchar(20),
+  tasktypegroup_bgcolor varchar(7) default NULL,
+  tasktypegroup_fgcolor varchar(7) default NULL
 );
 
 
@@ -3408,6 +3447,25 @@ ALTER SEQUENCE phone_phone_id_seq OWNED BY phone.phone_id;
 
 
 --
+-- Name: plannedtask_plannedtask_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE plannedtask_plannedtask_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: plannedtask_plannedtask_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE plannedtask_plannedtask_id_seq OWNED BY plannedtask.plannedtask_id;
+
+
+--
 -- Name: profile_profile_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -3761,6 +3819,24 @@ CREATE SEQUENCE tasktype_tasktype_id_seq
 --
 
 ALTER SEQUENCE tasktype_tasktype_id_seq OWNED BY tasktype.tasktype_id;
+
+
+--
+-- Name: tasktypegroup_tasktypegroup_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE tasktypegroup_tasktypegroup_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: tasktypegroup_tasktypegroup_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE tasktypegroup_tasktypegroup_id_seq OWNED BY tasktypegroup.tasktypegroup_id;
 
 
 --
@@ -4317,6 +4393,13 @@ ALTER TABLE phone ALTER COLUMN phone_id SET DEFAULT nextval('phone_phone_id_seq'
 
 
 --
+-- Name: plannedtask_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE plannedtask ALTER COLUMN plannedtask_id SET DEFAULT nextval('plannedtask_plannedtask_id_seq'::regclass);
+
+
+--
 -- Name: profile_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4445,8 +4528,12 @@ ALTER TABLE subscriptionreception ALTER COLUMN subscriptionreception_id SET DEFA
 --
 -- Name: tasktype_id; Type: DEFAULT; Schema: public; Owner: -
 --
-
 ALTER TABLE tasktype ALTER COLUMN tasktype_id SET DEFAULT nextval('tasktype_tasktype_id_seq'::regclass);
+
+--
+-- Name: tasktypegroup_id; Type: DEFAULT; Schema: public; Owner: -
+--
+ALTER TABLE tasktypegroup ALTER COLUMN tasktypegroup_id SET DEFAULT nextval('tasktypegroup_tasktypegroup_id_seq'::regclass);
 
 
 --
@@ -5297,6 +5384,13 @@ ALTER TABLE ONLY phone
 
 
 --
+-- Name: plannedtask_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_pkey PRIMARY KEY (plannedtask_id);
+
+--
 -- Name: profile_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -5516,6 +5610,13 @@ ALTER TABLE ONLY syncedaddressbook
 
 ALTER TABLE ONLY tasktype
     ADD CONSTRAINT tasktype_pkey PRIMARY KEY (tasktype_id);
+
+--
+-- Name: tasktype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY tasktypegroup
+    ADD CONSTRAINT tasktypegroup_pkey PRIMARY KEY (tasktypegroup_id);
 
 
 --
@@ -7213,10 +7314,31 @@ CREATE INDEX paymentkind_domain_id_fkey ON paymentkind (paymentkind_domain_id);
 --
 
 CREATE INDEX phone_entity_id_fkey ON phone (phone_entity_id);
+
+--
+-- Name: plannedtask_domain_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX plannedtask_domain_id_fkey ON plannedtask (plannedtask_domain_id);
+
+--
+-- Name: plannedtask_user_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX plannedtask_user_id_fkey ON plannedtask (plannedtask_user_id);
+
+--
+-- Name: plannedtask_datebegin_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX plannedtask_datebegin_fkey ON plannedtask (plannedtask_datebegin);
+
+--
+-- Name: plannedtask_dateend_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX plannedtask_dateend_fkey ON plannedtask (plannedtask_dateend);
+
+
 --
 -- Name: profileentity_profile_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-
 CREATE INDEX profileentity_profile_id_fkey ON profileentity (profileentity_profile_id);
 --
 -- Name: profileentity_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
@@ -7558,25 +7680,40 @@ CREATE INDEX subscriptionreception_domain_id_fkey ON subscriptionreception (subs
 --
 
 CREATE INDEX subscriptionreception_userupdate_fkey ON subscriptionreception (subscriptionreception_userupdate);
---
--- Name: tasktype_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
 
-CREATE INDEX tasktype_usercreate_fkey ON tasktype (tasktype_usercreate);
 --
 -- Name: tasktype_domain_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-
 CREATE INDEX tasktype_domain_id_fkey ON tasktype (tasktype_domain_id);
+
 --
 -- Name: tasktype_userupdate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-
 CREATE INDEX tasktype_userupdate_fkey ON tasktype (tasktype_userupdate);
+
+--
+-- Name: tasktype_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX tasktype_usercreate_fkey ON tasktype (tasktype_usercreate);
+
+--
+-- Name: tasktypegroup_domain_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX tasktypegroup_domain_id_fkey ON tasktypegroup (tasktypegroup_domain_id);
+
+--
+-- Name: tasktypegroup_userupdate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX tasktypegroup_userupdate_fkey ON tasktypegroup (tasktypegroup_userupdate);
+
+--
+-- Name: tasktypegroup_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX tasktypegroup_usercreate_fkey ON tasktypegroup (tasktypegroup_usercreate);
+
 --
 -- Name: timetask_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-
 CREATE INDEX timetask_usercreate_fkey ON timetask (timetask_usercreate);
 --
 -- Name: timetask_projecttask_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
@@ -9986,7 +10123,6 @@ ALTER TABLE ONLY parentdealentity
 --
 -- Name: payment_account_id_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY payment
     ADD CONSTRAINT payment_account_id_account_id_fkey FOREIGN KEY (payment_account_id) REFERENCES account(account_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -9994,7 +10130,6 @@ ALTER TABLE ONLY payment
 --
 -- Name: payment_company_id_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY payment
     ADD CONSTRAINT payment_company_id_company_id_fkey FOREIGN KEY (payment_company_id) REFERENCES company(company_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
@@ -10002,7 +10137,6 @@ ALTER TABLE ONLY payment
 --
 -- Name: payment_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY payment
     ADD CONSTRAINT payment_domain_id_domain_id_fkey FOREIGN KEY (payment_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -10010,7 +10144,6 @@ ALTER TABLE ONLY payment
 --
 -- Name: payment_paymentkind_id_paymentkind_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY payment
     ADD CONSTRAINT payment_paymentkind_id_paymentkind_id_fkey FOREIGN KEY (payment_paymentkind_id) REFERENCES paymentkind(paymentkind_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
@@ -10018,7 +10151,6 @@ ALTER TABLE ONLY payment
 --
 -- Name: payment_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY payment
     ADD CONSTRAINT payment_usercreate_userobm_id_fkey FOREIGN KEY (payment_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
@@ -10026,7 +10158,6 @@ ALTER TABLE ONLY payment
 --
 -- Name: payment_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY payment
     ADD CONSTRAINT payment_userupdate_userobm_id_fkey FOREIGN KEY (payment_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
@@ -10034,7 +10165,6 @@ ALTER TABLE ONLY payment
 --
 -- Name: paymententity_entity_id_entity_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY paymententity
     ADD CONSTRAINT paymententity_entity_id_entity_id_fkey FOREIGN KEY (paymententity_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -10042,7 +10172,6 @@ ALTER TABLE ONLY paymententity
 --
 -- Name: paymententity_payment_id_payment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY paymententity
     ADD CONSTRAINT paymententity_payment_id_payment_id_fkey FOREIGN KEY (paymententity_payment_id) REFERENCES payment(payment_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -10050,7 +10179,6 @@ ALTER TABLE ONLY paymententity
 --
 -- Name: paymentinvoice_invoice_id_invoice_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY paymentinvoice
     ADD CONSTRAINT paymentinvoice_invoice_id_invoice_id_fkey FOREIGN KEY (paymentinvoice_invoice_id) REFERENCES invoice(invoice_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -10058,7 +10186,6 @@ ALTER TABLE ONLY paymentinvoice
 --
 -- Name: paymentinvoice_payment_id_payment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY paymentinvoice
     ADD CONSTRAINT paymentinvoice_payment_id_payment_id_fkey FOREIGN KEY (paymentinvoice_payment_id) REFERENCES payment(payment_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -10066,7 +10193,6 @@ ALTER TABLE ONLY paymentinvoice
 --
 -- Name: paymentinvoice_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY paymentinvoice
     ADD CONSTRAINT paymentinvoice_usercreate_userobm_id_fkey FOREIGN KEY (paymentinvoice_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
@@ -10074,7 +10200,6 @@ ALTER TABLE ONLY paymentinvoice
 --
 -- Name: paymentinvoice_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY paymentinvoice
     ADD CONSTRAINT paymentinvoice_userupdate_userobm_id_fkey FOREIGN KEY (paymentinvoice_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
@@ -10082,7 +10207,6 @@ ALTER TABLE ONLY paymentinvoice
 --
 -- Name: paymentkind_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY paymentkind
     ADD CONSTRAINT paymentkind_domain_id_domain_id_fkey FOREIGN KEY (paymentkind_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -10090,15 +10214,49 @@ ALTER TABLE ONLY paymentkind
 --
 -- Name: phone_entity_id_entity_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY phone
     ADD CONSTRAINT phone_entity_id_entity_id_fkey FOREIGN KEY (phone_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
+-- Name: plannedtask_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_domain_id_domain_id_fkey FOREIGN KEY (plannedtask_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Name: plannedtask_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_userupdate_userobm_id_fkey FOREIGN KEY (plannedtask_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
+-- Name: plannedtask_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_usercreate_userobm_id_fkey FOREIGN KEY (plannedtask_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
+-- Name: plannedtask_project_id_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_project_id_project_id_fkey FOREIGN KEY (plannedtask_project_id) REFERENCES project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Name: plannedtask_tasktype_id_tasktype_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_tasktype_id_tasktype_id_fkey FOREIGN KEY (plannedtask_tasktype_id) REFERENCES tasktype(tasktype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
+-- Name: plannedtask_user_id_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_user_id_userobm_id_fkey FOREIGN KEY (plannedtask_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
 -- Name: profileentity_entity_id_entity_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY profileentity
     ADD CONSTRAINT profileentity_entity_id_entity_id_fkey FOREIGN KEY (profileentity_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -10665,7 +10823,6 @@ ALTER TABLE ONLY subscriptionreception
 --
 -- Name: tasktype_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY tasktype
     ADD CONSTRAINT tasktype_domain_id_domain_id_fkey FOREIGN KEY (tasktype_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -10673,7 +10830,6 @@ ALTER TABLE ONLY tasktype
 --
 -- Name: tasktype_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY tasktype
     ADD CONSTRAINT tasktype_usercreate_userobm_id_fkey FOREIGN KEY (tasktype_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
@@ -10681,15 +10837,32 @@ ALTER TABLE ONLY tasktype
 --
 -- Name: tasktype_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY tasktype
     ADD CONSTRAINT tasktype_userupdate_userobm_id_fkey FOREIGN KEY (tasktype_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
+-- Name: tasktypegroup_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY tasktypegroup
+    ADD CONSTRAINT tasktypegroup_domain_id_domain_id_fkey FOREIGN KEY (tasktypegroup_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Name: tasktypegroup_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY tasktypegroup
+    ADD CONSTRAINT tasktypegroup_userupdate_userobm_id_fkey FOREIGN KEY (tasktypegroup_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
+-- Name: tasktypegroup_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY tasktypegroup
+    ADD CONSTRAINT tasktypegroup_usercreate_userobm_id_fkey FOREIGN KEY (tasktypegroup_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
 -- Name: timetask_projecttask_id_projecttask_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY timetask
     ADD CONSTRAINT timetask_projecttask_id_projecttask_id_fkey FOREIGN KEY (timetask_projecttask_id) REFERENCES projecttask(projecttask_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -10697,7 +10870,6 @@ ALTER TABLE ONLY timetask
 --
 -- Name: timetask_tasktype_id_tasktype_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-
 ALTER TABLE ONLY timetask
     ADD CONSTRAINT timetask_tasktype_id_tasktype_id_fkey FOREIGN KEY (timetask_tasktype_id) REFERENCES tasktype(tasktype_id) ON UPDATE CASCADE ON DELETE CASCADE;
 

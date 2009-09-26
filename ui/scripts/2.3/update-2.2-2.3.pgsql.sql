@@ -241,6 +241,94 @@ ALTER TABLE ONLY eventexception
 
 ALTER TABLE Event DROP COLUMN event_parent_id;
 
+
+--
+-- Table structure for table plannedtask
+--
+CREATE TABLE plannedtask (
+  plannedtask_id integer NOT NULL,
+  plannedtask_domain_id integer default 0,
+  plannedtask_timeupdate timestamp without time zone,
+  plannedtask_timecreate timestamp without time zone DEFAULT now(),
+  plannedtask_userupdate integer default NULL,
+  plannedtask_usercreate integer default NULL,
+  plannedtask_user_id integer default NULL,
+  plannedtask_datebegin date,
+  plannedtask_dateend date,
+  plannedtask_period integer enum (0, 1, 2) NOT NULL default 0,
+  plannedtask_project_id integer default NULL,
+  plannedtask_tasktype_id integer default NULL,
+  plannedtask_overrun integer enum (0, 1) NOT NULL default 0,
+  plannedtask_comment text
+);
+
+--
+-- Name: plannedtask_plannedtask_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+CREATE SEQUENCE plannedtask_plannedtask_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE plannedtask_plannedtask_id_seq OWNED BY plannedtask.plannedtask_id;
+ALTER TABLE plannedtask ALTER COLUMN plannedtask_id SET DEFAULT nextval('plannedtask_plannedtask_id_seq'::regclass);
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_pkey PRIMARY KEY (plannedtask_id);
+CREATE INDEX plannedtask_domain_id_fkey ON plannedtask (plannedtask_domain_id);
+CREATE INDEX plannedtask_user_id_fkey ON plannedtask (plannedtask_user_id);
+CREATE INDEX plannedtask_datebegin_fkey ON plannedtask (plannedtask_datebegin);
+CREATE INDEX plannedtask_dateend_fkey ON plannedtask (plannedtask_dateend);
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_domain_id_domain_id_fkey FOREIGN KEY (plannedtask_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_userupdate_userobm_id_fkey FOREIGN KEY (plannedtask_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_usercreate_userobm_id_fkey FOREIGN KEY (plannedtask_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_project_id_project_id_fkey FOREIGN KEY (plannedtask_project_id) REFERENCES project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_tasktype_id_tasktype_id_fkey FOREIGN KEY (plannedtask_tasktype_id) REFERENCES tasktype(tasktype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY plannedtask
+    ADD CONSTRAINT plannedtask_user_id_userobm_id_fkey FOREIGN KEY (plannedtask_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Table structure for table TaskTypeGroup
+--
+CREATE TABLE tasktypegroup (
+  tasktypegroup_id integer NOT NULL,
+  tasktypegroup_domain_id integer NOT NULL,
+  tasktypegroup_timeupdate timestamp without time zone,
+  tasktypegroup_timecreate without time zone DEFAULT now(),
+  tasktypegroup_userupdate integer default NULL,
+  tasktypegroup_usercreate integer default NULL,
+  tasktypegroup_label varchar(32),
+  tasktypegroup_code varchar(20),
+  tasktypegroup_bgcolor varchar(7) default NULL,
+  tasktypegroup_fgcolor varchar(7) default NULL
+);
+
+CREATE SEQUENCE tasktypegroup_tasktypegroup_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE tasktypegroup_tasktypegroup_id_seq OWNED BY tasktypegroup.tasktypegroup_id;
+ALTER TABLE tasktypegroup ALTER COLUMN tasktypegroup_id SET DEFAULT nextval('tasktypegroup_tasktypegroup_id_seq'::regclass);
+ALTER TABLE ONLY tasktypegroup
+    ADD CONSTRAINT tasktypegroup_pkey PRIMARY KEY (tasktypegroup_id);
+CREATE INDEX tasktypegroup_domain_id_fkey ON tasktypegroup (tasktypegroup_domain_id);
+CREATE INDEX tasktypegroup_userupdate_fkey ON tasktypegroup (tasktypegroup_userupdate);
+CREATE INDEX tasktypegroup_usercreate_fkey ON tasktypegroup (tasktypegroup_usercreate);
+
+ALTER TABLE tasktype ADD tasktype_tasktypegroup_id integer;
+CREATE INDEX tasktype_tasktypegroup_id_fkey ON tasktype (tasktype_tasktypegroup_id);
+ALTER TABLE ONLY tasktype
+  CONSTRAINT tasktype_tasktypegroup_id_tasktypegroup_id_fkey FOREIGN KEY (tasktype_tasktypegroup_id) REFERENCES tasktypegroup (tasktypegroup_id) ON DELETE SET NULL ON UPDATE CASCADE;
+
+
 -- -----------------------------------------------------------------------------
 
 
