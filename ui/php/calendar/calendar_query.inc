@@ -29,7 +29,7 @@ function run_query_calendar_detail($calendar_id) {
   $timecreate = sql_date_format($db_type, 'event_timecreate', 'timecreate');
   $multidomain = sql_multidomain('event');
   $eventexception_sql_if = sql_if($db_type, 'ee.eventexception_parent_id IS  NULL', '0', '1');
-  $query = "SELECT 
+  $query = "SELECT
     event_id,
     event_ext_id,
     e.evententity_entity_id AS event_entity_id,
@@ -280,6 +280,23 @@ function run_query_calendar_get_group_resource($group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Update event timeupdate                                 //
+// Parameters:
+//   - $event_id : ...
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_touch_event($event_id) {
+  $obm_q = new DB_OBM;
+  $id = sql_parse_id($event_id, true);
+  $query = "UPDATE Event
+    SET event_timeupdate = NOW()
+    WHERE event_id $id";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_touch_event()');
+  return $obm_q->query($query);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Insert a user decision for an user
 // Parameters:
 //   - $calendar : Calendar params
@@ -335,12 +352,7 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $query = "UPDATE Event
-      SET event_timeupdate = NOW()
-      WHERE event_id $id";
-
-    display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');
-    $retour = $obm_q->query($query);
+    $retour = run_query_calendar_touch_event($event_id);
 
     // Send mail
     if ($owner_notification == 'true') {
@@ -1799,9 +1811,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
 
   $sql_id = sql_parse_id($id);
   $sql_new_id = ( $new_id ? sql_parse_id($new_id) : 'NULL' );
-  $query = "UPDATE Event SET event_timeupdate = NOW() WHERE event_id = $sql_id";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(1)');
-  $obm_q->query($query);
+  if ($new_id)
+    run_query_calendar_touch_event($new_id);
   $query = "INSERT INTO EventException (
     eventexception_usercreate,
     eventexception_timecreate,
@@ -2595,7 +2606,7 @@ function check_calendar_access($id, $right = 'write') {
 // Parameters: 
 //   - $calendar : calendar infos hash
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_quick_delete($calendar) {
+function run_query_calendar_delete($calendar,$force_sendmail = true) {
   global $cdg_sql, $c_use_connectors, $ccalendar_resource_admin;
 
   $obm_q = new DB_OBM;
@@ -2603,28 +2614,31 @@ function run_query_calendar_quick_delete($calendar) {
   $mail = $calendar['mail'];
 
   $users_array = get_calendar_event_users_info($event_id);
+  $obm_q = run_query_calendar_detail($event_id);
 
-  $multidomain = sql_multidomain('event');
-  $query = "SELECT event_title
-    FROM Event
-    WHERE event_id = $event_id $multidomain";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(1)');
-  $obm_q->query($query);
-  $obm_q->next_record();
   $title = $obm_q->f('event_title');
+  $is_exception = $obm_q->f('event_is_exception');
 
   // If connectors in use
   if ($c_use_connectors) {
-    $query = "SELECT userentity_user_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE eventlink_event_id = $event_id";
-    $obm_q->query($query);
-    $obm_qm = new DB_OBM;
-    $users = array();
-    while ($obm_q->next_record()) {
-      // We note the event deletion
-      $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_origin, deletedevent_type, deletedevent_timestamp)
-        VALUES ($event_id, ".$obm_q->f('userentity_user_id').",'$GLOBALS[c_origin_web]', 'VEVENT', NOW())";
-      display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
-      $retour = $obm_qm->query($query);
+
+    // if deleted event is an exception, we touch parent event timeupdate (for connectors)
+    if ($is_exception) {
+      $parent_event_id = $obm_q->f('event_eventexception_parent_id');
+      run_query_calendar_touch_event($parent_event_id);
+
+    } else {
+      $query = "SELECT userentity_user_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE eventlink_event_id = $event_id";
+      $obm_q->query($query);
+      $obm_qm = new DB_OBM;
+      $users = array();
+      while ($obm_q->next_record()) {
+        // We note the event deletion
+        $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_origin, deletedevent_type, deletedevent_timestamp)
+          VALUES ($event_id, ".$obm_q->f('userentity_user_id').",'$GLOBALS[c_origin_web]', 'VEVENT', NOW())";
+        display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
+        $retour = $obm_qm->query($query);
+      }
     }
   }
 
@@ -2633,57 +2647,9 @@ function run_query_calendar_quick_delete($calendar) {
   of_entity_delete('event', $event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
-  if($calendar['send_mail']) {
+  if($force_sendmail || $calendar['send_mail']) {
     OBM_EventFactory::getInstance()->delete($event);
   }
-  $obm_q->query($query);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Delete all events of a evenements, and the event
-// Parameters: 
-//   - $calendar : calendar infos hash
-///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_delete($calendar) {
-  global $cdg_sql, $c_use_connectors, $ccalendar_resource_admin;
-
-  $obm_q = new DB_OBM;
-  $event_id =  $calendar['calendar_id'];
-  $mail = $calendar['mail'];
-
-  $users_array = get_calendar_event_users_info($event_id);
-
-  $multidomain = sql_multidomain('event');
-  $query = "SELECT event_title
-    FROM Event
-    WHERE event_id = $event_id $multidomain";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(1)');
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $title = $obm_q->f('event_title');
-
-  // If connectors in use
-  if ($c_use_connectors) {
-    $obm_qm = new DB_OBM;
-    $query = "SELECT userentity_user_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE eventlink_event_id = $event_id";
-    $obm_q->query($query);
-    $users = array();
-    while ($obm_q->next_record()) {
-      // We note the event deletion
-      $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_origin, deletedevent_type, deletedevent_timestamp)
-        VALUES ($event_id, ".$obm_q->f('userentity_user_id').",'$GLOBALS[c_origin_web]', 'VEVENT', NOW())";
-      display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
-      $retour = $obm_qm->query($query);
-    }
-  }
-
-  // Send mail
-  $event = OBM_EventFactory::getInstance()->getById($event_id);
-  of_entity_delete('event', $event_id);
-  $query = "DELETE FROM Event WHERE event_id = $event_id";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
-
-  OBM_EventFactory::getInstance()->delete($event);
   $obm_q->query($query);
 }
 

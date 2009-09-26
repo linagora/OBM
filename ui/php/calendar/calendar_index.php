@@ -468,10 +468,10 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $id = $params['calendar_id'];
   if (check_calendar_access($id)) {
-    $eve_q = run_query_calendar_detail($id);    
+    $eve_q = run_query_calendar_detail($id);
     json_event_data($id, $params, $current_view);
-    if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {      
-      run_query_calendar_quick_delete($params);
+    if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {
+      run_query_calendar_delete($params,false);
     } else {
       run_query_calendar_event_exception_insert($params);
     }
