@@ -1668,10 +1668,10 @@ CREATE TABLE plannedtask (
   plannedtask_user_id integer default NULL,
   plannedtask_datebegin date,
   plannedtask_dateend date,
-  plannedtask_period integer enum (0, 1, 2) NOT NULL default 0,
+  plannedtask_period enum (0, 1, 2) NOT NULL default 0,
   plannedtask_project_id integer default NULL,
   plannedtask_tasktype_id integer default NULL,
-  plannedtask_overrun integer enum (0, 1) NOT NULL default 0,
+  plannedtask_overrun enum (0, 1) NOT NULL default 0,
   plannedtask_comment text
 );
 
