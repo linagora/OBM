@@ -53,9 +53,9 @@ class OBM_Contact {
     return self::fetchAll($where);
   }
   
-  public static function fetchAll($where) {
+  public static function fetchAll($where, $limit=false, $offset=0) {
     $db = new DB_OBM();
-    $contacts = self::fetchDetails($db, $where);
+    $contacts = self::fetchDetails($db, $where, $limit, $offset);
     if (count($contacts) != 0) {
       $contacts = self::fetchCoords($db, $contacts);
     }
@@ -215,11 +215,13 @@ class OBM_Contact {
     return $card;
   }
   
-  private static function fetchDetails($db, $where) {
+  private static function fetchDetails($db, $where, $limit=false, $offset=0) {
 
     $db_type = $db->type;
     $birthday = sql_date_format($db_type, 'bd.event_date', 'contact_birthday');
     $anniversary = sql_date_format($db_type, 'an.event_date', 'contact_anniversary');
+    if ($limit)
+      $sql_limit = sql_limit($db_type, $limit, $offset);
     $contacts = array();
 
     $query = "SELECT contact_id,
@@ -250,7 +252,8 @@ class OBM_Contact {
          LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id
          LEFT JOIN Event as an ON contact_anniversary_id = an.event_id
          LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
-    WHERE {$where}";
+    WHERE {$where}
+    {$sql_limit}";
 
     $db->query($query);
     while ($db->next_record()) {
