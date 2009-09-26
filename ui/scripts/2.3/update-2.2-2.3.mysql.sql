@@ -238,7 +238,8 @@ CREATE TABLE `TaskTypeGroup` (
 
 
 ALTER TABLE TaskType ADD
-  `tasktype_tasktypegroup_id` int(8),
+  `tasktype_tasktypegroup_id` int(8) AFTER tasktype_internal;
+ALTER TABLE TaskType ADD
   CONSTRAINT `tasktype_tasktypegroup_id_tasktypegroup_id_fkey` FOREIGN KEY (`tasktype_tasktypegroup_id`) REFERENCES `TaskTypeGroup` (`tasktypegroup_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 
