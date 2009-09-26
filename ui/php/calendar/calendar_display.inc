@@ -4183,6 +4183,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </tr>    
     </table>
     </fieldset>";
+    $js_event_repeat = "
+    if ($('tf_repeat_end').value == '') {
+      $('cbx_no_repeatend').checked = true;
+    }
+    repeat_form($('sel_repeat_kind').value);";
   }
 
   // Alerts
@@ -4324,10 +4329,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $group_complete
       $document_complete
     });
-    if ($('tf_repeat_end').value == '') {
-      $('cbx_no_repeatend').checked = true;
-    }
-    repeat_form($('sel_repeat_kind').value);
+    $js_event_repeat
   </script>
   <div id=\"fbcContainer\"></div>
   $template_popup

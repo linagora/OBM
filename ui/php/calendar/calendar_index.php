@@ -428,7 +428,7 @@ if ($action == 'search') {
     check_calendar_data_quick_form($params)) {
       $id = $params['calendar_id'];
       $eve_q = run_query_calendar_detail($id);
-      run_query_quick_attendee_update($params,$eve_q);    
+      run_query_quick_attendee_update($params,$eve_q);
       if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {
         run_query_calendar_quick_event_update($params);
       } else {
@@ -477,12 +477,25 @@ if ($action == 'search') {
     }
     json_ok_msg("$l_event : $l_delete_ok");
     echo "({".$display['json']."})";
-    exit();            
+    exit();
   } else {
     json_error_msg($l_invalid_data . " : $err[msg]");
-    echo "({".$display['json']."})";    
+    echo "({".$display['json']."})";
     exit();
   }
+
+} elseif ($action == 'check_update') {
+///////////////////////////////////////////////////////////////////////////////
+  if(isset($params['calendar_id']) && $params['calendar_id'] != '') {
+    $event_q = run_query_calendar_detail($params['calendar_id']);
+  }
+  if ((!$event_q) || ($event_q->f('event_repeatkind')=='none')) {
+    $json[] = 'occUpdate:false';
+  } else {
+    $json[] = 'occUpdate:true';
+  }
+  echo "({".implode(',',$json)."})";
+  exit();
 
 } elseif ($action == 'check_conflict') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -494,7 +507,7 @@ if ($action == 'search') {
     $entities['resource']['ids'] = array();
   }
   $conflicts = quick_check_calendar_conflict($params, $entities);
-  if ((!$event_q) || ($event_q->f('event_repeatkind')=='none')) {
+  if ((!$event_q) || ($event_q->f('event_repeatkind')=='none') || ($params['date_begin']!=$params['old_date_begin'])) {
     $json[] = 'occUpdate:false';
   } else {
     $json[] = 'occUpdate:true';
@@ -505,11 +518,11 @@ if ($action == 'search') {
     $json[] = 'mail:true';
   }
   if (!$conflicts) {
-    $json[] = "conflict:false";    
+    $json[] = "conflict:false";
   } else {
-    $json[] = "conflict:true";    
+    $json[] = "conflict:true";
   }
-  echo "({".implode(',',$json)."})";    
+  echo "({".implode(',',$json)."})";
   exit();
 
 
@@ -1275,6 +1288,13 @@ function get_calendar_action() {
 
   $actions['calendar']['search'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+  // Looking for Conflicts
+  $actions['calendar']['check_update'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=check_update",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );

@@ -694,40 +694,40 @@ Obm.CalendarManager = new Class({
    */
   sendUpdateEvent: function(evt, forceUpdate) {
     var eventData = this.prepareEventForUpdate(evt);
+    var action_cmd = 'check_conflict';
     if (forceUpdate) {
-      obm.calendarManager.updateRequest(eventData);
-    } else {
-      new Request.JSON({
-        url: obm.vars.consts.calendarUrl,
-        secure : false,
-        onComplete : function(response) {
-          if(response.occUpdate) {
-            obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
-          }
-          if (response.conflict) {
-            $('popup_force').value = obm.vars.labels.conflict_force;
-            obm.calendarManager.popupManager.add('calendarConflictPopup');
-          }
-          if (response.mail) {
-            obm.calendarManager.popupManager.add('calendarSendMail');
-          }
-          obm.calendarManager.popupManager.addEvent('update_all', function () {
-            eventData.all = 1;
-          });
-          obm.calendarManager.popupManager.addEvent('mail', function () {
-            eventData.send_mail = true;
-          });        
-          obm.calendarManager.popupManager.addEvent('conflict', function() {
-            eventData = $merge({action : 'conflict_manager'}, eventData)
-            window.location=obm.vars.consts.calendarUrl+'?'+Hash.toQueryString(eventData);
-          });
-          obm.calendarManager.popupManager.addEvent('complete', function () {
-            obm.calendarManager.updateRequest(eventData);
-          }.bind(this));
-          obm.calendarManager.popupManager.show(eventData);
-        }.bind(this)
-      }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));    
+      action_cmd = 'check_update';
     }
+    new Request.JSON({
+      url: obm.vars.consts.calendarUrl,
+      secure : false,
+      onComplete : function(response) {
+        if(response.occUpdate) {
+          obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
+        }
+        if (response.conflict) {
+          $('popup_force').value = obm.vars.labels.conflict_force;
+          obm.calendarManager.popupManager.add('calendarConflictPopup');
+        }
+        if (response.mail) {
+          obm.calendarManager.popupManager.add('calendarSendMail');
+        }
+        obm.calendarManager.popupManager.addEvent('update_all', function () {
+          eventData.all = 1;
+        });
+        obm.calendarManager.popupManager.addEvent('mail', function () {
+          eventData.send_mail = true;
+        });        
+        obm.calendarManager.popupManager.addEvent('conflict', function() {
+          eventData = $merge({action : 'conflict_manager'}, eventData)
+          window.location=obm.vars.consts.calendarUrl+'?'+Hash.toQueryString(eventData);
+        });
+        obm.calendarManager.popupManager.addEvent('complete', function () {
+          obm.calendarManager.updateRequest(eventData);
+        }.bind(this));
+        obm.calendarManager.popupManager.show(eventData);
+      }.bind(this)
+    }).post($merge({ajax : 1, action : action_cmd}, eventData));
   },
 
 
