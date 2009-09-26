@@ -3078,8 +3078,7 @@ CREATE TABLE `TaskType` (
   CONSTRAINT `tasktype_usercreate_userobm_id_fkey` FOREIGN KEY (`tasktype_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `tasktype_domain_id_domain_id_fkey` FOREIGN KEY (`tasktype_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `tasktype_userupdate_userobm_id_fkey` FOREIGN KEY (`tasktype_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `tasktype_tasktypegroup_id_tasktypegroup_id_fkey` FOREIGN KEY (`tasktype_tasktypegroup_id`) REFERENCES `TaskTypeGroup` (`tasktypegroup_id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
+  CONSTRAINT `tasktype_tasktypegroup_id_tasktypegroup_id_fkey` FOREIGN KEY (`tasktype_tasktypegroup_id`) REFERENCES `TaskTypeGroup` (`tasktypegroup_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -3104,7 +3103,7 @@ CREATE TABLE `TaskTypeGroup` (
   CONSTRAINT `tasktypegroup_usercreate_userobm_id_fkey` FOREIGN KEY (`tasktypegroup_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `tasktypegroup_userupdate_userobm_id_fkey` FOREIGN KEY (`tasktypegroup_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   PRIMARY KEY  (`tasktypegroup_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 --
