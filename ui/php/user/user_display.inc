@@ -320,7 +320,7 @@ function html_batch_user_search_form($user) {
     </label>
 ";
 
-  $block.= "<p class=\"CL\" />
+  $block.= "<p class=\"CL\"></p>
    </form>";
 
   return $block;
@@ -548,7 +548,7 @@ $dis_domain";
       $ext
     </label>";
 
-    $block.= "<p class=\"CL\" />
+    $block.= "<p class=\"CL\"></p>
    </form>";
 
   return $block;
