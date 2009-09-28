@@ -2727,7 +2727,6 @@ function check_user_wait($user){
 //   - $user_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_valid($user_id){
-  global $obm;
 
   $status = 'VALID';
   $archive = 0;
@@ -2745,4 +2744,88 @@ function run_query_user_valid($user_id){
 
   return $retour;
 }
+
+
+/**
+ * Get mobile devices
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function run_query_userobm_get_devices($user_id) {
+  global $cdg_sql;
+
+  $uid = $obm['uid'];
+  $first_sync = sql_date_format($db_type, 'MIN(f.last_sync)', 'first_sync');
+  $last_sync = sql_date_format($db_type, 'MAX(l.last_sync)', 'last_sync');
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT 
+    opush_device.id,
+    opush_device.owner,
+    opush_device.identifier,
+    opush_device.type, 
+    $first_sync as first_sync,
+    $last_sync as last_sync,
+    opush_sync_perms.device_id, 
+    opush_sync_perms.policy 
+    FROM opush_device 
+    LEFT JOIN opush_sync_state f ON f.device_id=opush_device.id
+    LEFT JOIN opush_sync_state l ON l.device_id=opush_device.id
+    LEFT JOIN opush_sync_perms ON opush_sync_perms.device_id = opush_device.id
+    WHERE opush_device.owner='$user_id'
+    GROUP BY opush_device.id, opush_device.owner, opush_device.identifier,opush_device.type,opush_sync_perms.device_id, opush_sync_perms.policy";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_userobm_get_devices()');
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+/**
+ * Add mobile partnership
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function run_query_userobm_mobile_add_partnership($user) {
+  global $display;
+
+  $owner = $user['owner'];
+  $device_id = $user['device_id'];
+
+  $query = "INSERT INTO opush_sync_perms(
+    owner,
+    device_id,
+    policy) VALUES(
+    '$owner',
+    '$device_id',
+    NULL)";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+}
+
+
+/**
+ * Remove mobile partnership
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function run_query_userobm_mobile_remove_partnership($user) {
+  global $display;
+
+  $owner = $user['owner'];
+  $device_id = $user['device_id'];
+
+  $query = "DELETE FROM opush_sync_perms WHERE owner='$owner' AND device_id='$device_id';";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+}
+
 ?>

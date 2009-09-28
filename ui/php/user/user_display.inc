@@ -1024,6 +1024,9 @@ function html_user_consult($obm_q) {
     </div>";
   }
 
+  // Mobile devices
+  $mobile_devices = html_user_mobile_devices($id, 'consult');
+
   // Photo
   if ($photo_id > 0) {
     $block_photo = "<img src=\"$path/document/document_index.php?action=accessfile&document_id=$photo_id\" alt=\"[Photo]\"/ />";
@@ -1090,10 +1093,10 @@ function html_user_consult($obm_q) {
     <td>$datebegin</td>
   </tr>
   <tr>
-  <tr>
     <th>$l_dateexp</th>
     <td>$dateexp</td>
   </tr>
+  <tr>
     <th>$l_lastaccess</th>
     <td>$lastaccess</td>
   </tr>
@@ -1187,11 +1190,100 @@ $nomad_section
 $vacation_section
 $samba_section
 $dis_group
-";
+$mobile_devices";
 
   return $block;
 }
 
+
+/**
+ * Mobile device management HTML
+ */
+function html_user_mobile_devices($user_id, $type) {
+ 
+  $mobile_devices  = "";
+  $opush = false;
+  $obm_q = new DB_OBM();
+  foreach($obm_q->table_names() as $table) {
+    if ($table['table_name'] == 'opush_device') {
+      $opush = true;
+    }
+  }
+  if ($user_id && $opush) {
+    $mobile_q = run_query_userobm_get_devices($user_id);
+    while($mobile_q->next_record()) {
+      $mobile_id = $mobile_q->f('id');
+      $mobile_owner = $mobile_q->f('owner');
+      $mobile_user_agent = $mobile_q->f('identifier');
+      $mobile_type = $mobile_q->f('type');
+      $policy = $mobile_q->f('policy');
+      $perms_device_id = $mobile_q->f('device_id');
+      $last_sync = $GLOBALS['l_undef'];
+      if ($mobile_q->f('last_sync')) {
+        $last_sync = new Of_Date($mobile_q->f('last_sync'), 'GMT');
+      }
+      $first_sync = $GLOBALS['l_undef'];
+      if ($mobile_q->f('first_sync')) {
+        $first_sync = new Of_Date($mobile_q->f('first_sync'), 'GMT');
+      }
+      $devices .= "<tr id='mobile_$mobile_id' class='mobile'>
+        <td>$mobile_user_agent</td>
+        <td>$mobile_type</td>
+        <td>$last_sync</td>
+        <td><img src='$GLOBALS[ico_search]' onclick='obm.userMobileDeviceManager.showInfo(\"$mobile_id\");'/></td>
+      </tr>";
+      $userMobileDeviceManager .= "obm.userMobileDeviceManager.addDevice('$mobile_id', '$mobile_owner', '$first_sync', '$last_sync', '$perms_device_id');";
+    }
+
+    $mobile_devices = "
+      <div class='detail infos'>
+      <h1>$GLOBALS[l_mobile_devices]</h1>";
+    $mobile_devices_partnership = "";
+    $mobile_devices_close = "</div>";
+
+    if ($type == 'form') {
+    $mobile_devices = "
+      <fieldset class='detail infos'>
+      <legend>$GLOBALS[l_mobile_devices]</legend>";
+    $mobile_devices_partnership = "<tr>
+      <td><input type='button' id='mobile_partnership' value='$GLOBALS[l_mobile_add_partnership]' /></td>
+      <td></td>
+    </tr>";
+    $mobile_devices_close = "</fieldset>";
+    }
+
+    $mobile_devices .= "
+      <table class='spreadSheet'>
+        <thead>
+          <tr>
+            <td>$GLOBALS[l_mobile_identifier]</td>
+            <td>$GLOBALS[l_type]</td>
+            <td>$GLOBALS[l_last_sync]</td>
+            <td></td>
+          </tr>
+        </thead> 
+        $devices
+      </table>
+
+      <table id='mobile_info' style='visibility:hidden;'>
+        <tr>
+          <th>$GLOBALS[l_first_sync]</th>
+          <td id='mobile_first_sync'></td>
+        </tr>
+        $mobile_devices_partnership
+      </table>
+      $mobile_devices_close
+      <script type='text/javascript'>
+        obm.vars.labels.addPartnership = '".phpStringToJsString($GLOBALS['l_mobile_add_partnership'])."';
+        obm.vars.labels.removePartnership = '".phpStringToJsString($GLOBALS['l_mobile_remove_partnership'])."';
+        obm.userMobileDeviceManager = new Obm.UserMobileDeviceManager();
+        $userMobileDeviceManager
+      </script>";
+  }
+
+  return $mobile_devices;
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display User Group form
@@ -1985,7 +2077,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
         </a>
         <span>$l_password_update</span>
         </h1>
-        </br>
+        <br />
         $l_change_password_confirm
       <fieldset class=\"buttons\">
         <input type=\"button\" onclick=\"generate_passwd()\" id=\"popup_confirm\" class=\"closeSticky\" value=\"$GLOBALS[l_confirm]\" />
@@ -2089,6 +2181,9 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
     $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
   }
+
+  // Mobile devices
+  $mobile_devices = html_user_mobile_devices($id, 'form');
 
   // some constants
   $csize_add = '48';
@@ -2268,7 +2363,7 @@ $mail_section
 $nomad_section
 $vacation_section
 $samba_section
-
+$mobile_devices
   <fieldset class=\"buttons\">
   $dis_button
   </fieldset>

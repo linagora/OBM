@@ -197,6 +197,12 @@ $l_recursive = "Récursif";
 $l_hour = "Heure";
 $l_type = "Type";
 
+$l_first_sync = "Première synchronisation";
+$l_last_sync = "Dernière synchronisation";
+$l_mobile_identifier = "Identifiant";
+$l_mobile_add_partnership = "Ajouter partenariat";
+$l_mobile_remove_partnership = "Supprimer partenariat";
+
 // Profiles
 $l_perm_admin = "Admin";
 $l_perm_admin_delegue = "Admin délégué";
@@ -245,6 +251,7 @@ $l_control = "Tableau de bord";
 $l_insufficient_permission = "Permissions insuffisantes";
 $l_scope_update = "Mettre à jour le systeme";
 $l_organizationalchart = "Organigramme";
+$l_mobile_devices = "Périphériques mobile";
 
 $l_permission_denied = $l_insufficient_permission;
 // OBM_DISPLAY

@@ -124,6 +124,7 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
+  $extra_js_include[] = 'user.js';
   $display['detail'] = dis_user_consult($params);
 
 } elseif ($action == 'wait') {
@@ -133,6 +134,7 @@ if ($action == 'ext_get_ids') {
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_update_rights($params)) {
+    $extra_js_include[] = 'user.js';
     $display['detail'] = dis_user_form($action, $params);
   } else {
     $display['msg'] .= display_warn_msg($err['msg']);
@@ -359,6 +361,17 @@ if ($action == 'ext_get_ids') {
     $display['msg'] .= display_err_msg($err['msg'], false);
     $display['detail'] = html_user_batch_form($params);
   }
+} else if ($action == 'add_partnership') {
+///////////////////////////////////////////////////////////////////////////////
+  $add_q = run_query_userobm_mobile_add_partnership($params);
+  echo "({".$display['json']."})";
+  exit();
+
+} else if ($action == 'remove_partnership') {
+///////////////////////////////////////////////////////////////////////////////
+  $remove_q = run_query_userobm_mobile_remove_partnership($params);
+  echo "({".$display['json']."})";
+  exit();
 }
 
 of_category_user_action_switch($module, $action, $params);
@@ -660,6 +673,20 @@ function get_user_action() {
 // Batch processing
   $actions['user']['batch_processing'] = array (
     'Url'	   => "$path/user/user_index.php?action=batch_processing",
+    'Right'	   => $cright_write_admin,
+    'Condition'=> array('None')
+  );
+
+  // Add partnership
+  $actions['user']['add_partnership'] = array (
+    'Url'	   => "$path/user/user_index.php?action=add_partnership",
+    'Right'	   => $cright_write_admin,
+    'Condition'=> array('None')
+  );
+
+  // Remove partnership
+  $actions['user']['remove_partnership'] = array (
+    'Url'	   => "$path/user/user_index.php?action=remove_partnership",
     'Right'	   => $cright_write_admin,
     'Condition'=> array('None')
   );

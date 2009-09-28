@@ -194,6 +194,12 @@ $l_advanced_search = "Advanced search";
 $l_hide_advanced_search = "Hide search options";
 $l_basic_search = "Basic search";
 
+$l_first_sync = "First sync time";
+$l_last_sync = "Last sync time";
+$l_mobile_identifier = "User Agent";
+$l_mobile_add_partnership = "Add partnership";
+$l_mobile_remove_partnership = "Remove partnership";
+
 // Entities
 $l_company = "Company";
 $l_contact = "Contact";
@@ -236,6 +242,7 @@ $l_host = "Host";
 $l_scope_update = "Update system";
 $l_insufficient_permission = "Insufficient permissions";
 $l_organizationalchart = "Organizational chart";
+$l_mobile_devices = "Mobile devices";
 
 $l_permission_denied = $l_insufficient_permission;
 
