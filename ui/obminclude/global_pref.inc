@@ -431,6 +431,13 @@ if ($cgp_show["module"]["organizationalchart"]) {
 			            'Right'=> $cright_read);
 }
 
+if ($cgp_show["module"]["device"]) {
+  $modules["device"] = array('Name'=> $l_module_device,
+                                    'Ico' => "$ico_phone",
+                                    'Url' => "$path/device/device_index.php",
+			            'Right'=> $cright_read);
+}
+
 if ($cgp_show["module"]["webmail"]) {
 #  $modules["webmail"] = array('Name'=> $l_webmail,
 #                                    'Ico' => "$ico_webmail",

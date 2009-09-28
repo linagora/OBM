@@ -95,6 +95,7 @@ $ico_user           = "$theme_path/ico_user.gif";
 $ico_vacation       = "$theme_path/ico_vacation.gif";
 $ico_organizationalchart = "$theme_path/ico_organizational_chart.gif";
 $ico_load            = "$theme_path/ico_load.gif";
+$ico_phone          = "$theme_path/ico_phone.gif";
 
 // Globals Icons
 $ico_arrow_up       = "$theme_path/arrow_up.gif";
