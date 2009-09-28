@@ -95,7 +95,7 @@ sub _checkHttpBasicAuth {
             # Lower encryption, but this module is native on more platforms
             require Digest::SHA1;
             $currentPasswdSsha = Digest::SHA1::sha1_hex($pass);
-        } or ($self->log( 0, 'Digest::SHA or Digest::SHA1 modue needed' ) && exit 10); 
+        } or ($self->log( 0, 'Digest::SHA or Digest::SHA1 module needed' ) && exit 10); 
 
         # Re-enable SIGDIE handler
         $SIG{__DIE__} = $oldSigDie;
