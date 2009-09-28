@@ -9,18 +9,18 @@
 
 // Update the cookie expires time : now + lifetime or session wide
 // but not in txt mode or if headers have already been sent
-if ( (! headers_sent()) && ($params["mode"] != "txt"))
+if ( (! headers_sent()) && ($params['mode'] != 'txt'))
   $sess->setcookie();
 
 // if prefs have not been loaded (we check the var set_lang) - Login Phase
-if (($_SESSION['set_lang'] == "") && ($params["mode"] != "txt")) {
+if (($_SESSION['set_lang'] == '') && ($params['mode'] != 'txt')) {
   // We Load and make session variables from User preferences
   session_load_user_prefs();
-  if ($cgp_show["module"]["todo"]) 
+  if ($cgp_show['module']['todo']) 
     global_session_load_user_todos($_SESSION['set_todo']); 
 
   // We update the last login date for the user
-  run_query_userobm_update_lastaccess($obm["uid"]);
+  run_query_userobm_update_lastaccess($obm['uid']);
 }
 
 // Display parameters if debug level is set
@@ -33,17 +33,17 @@ if (($_SESSION['set_debug'] & $cdg_sess) == $cdg_sess) {
       $val = var_export($val, true);
     }
     if(is_object($val)) {
-      $val = "Object";
+      $val = 'Object';
     }
     $dis_session .= "<b>$key</b> : $val<br />\n";
   }
 }
 
 // Default settings
-$set_lang_default = "en";
-$set_theme_default = "default";
+$set_lang_default = 'en';
+$set_theme_default = 'default';
 $set_menu_default = $cme_both;
-$set_display_default = "no";
+$set_display_default = 'no';
 $set_rows_default = 10;
 $set_todo_default = 'todo_priority';
 $set_date_upd_default = $cda_dmy;
@@ -61,7 +61,7 @@ if ($_SESSION['set_rows'] == '') $_SESSION['set_rows'] = $set_rows_default;
 if ($_SESSION['set_date_upd'] == '') $_SESSION['set_date_upd'] = $set_date_upd_default;
 if ($_SESSION['set_date'] == '') $_SESSION['set_date'] = $set_date_default;
 if ($_SESSION['set_commentorder'] == '') $_SESSION['set_commentorder'] = $set_commentorder_default;
-if ($_SESSION['set_debug'] == "") $_SESSION['set_debug'] = $set_debug_default;
+if ($_SESSION['set_debug'] == '') $_SESSION['set_debug'] = $set_debug_default;
 if ($_SESSION['set_cal_interval'] == '') $_SESSION['set_cal_interval'] = $set_cal_interval_default;
 
 
@@ -87,14 +87,14 @@ if (file_exists("$path/../".$lang_file)) {
 
 // Specific conf global lang file
 if ($conf_lang) {
-  $lang_file = "conf/lang/".$_SESSION['set_lang'].'/global.inc';
+  $lang_file = 'conf/lang/'.$_SESSION['set_lang'].'/global.inc';
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");
   }
 }
 
 // Module lang file
-if ($module != "") {
+if ($module != '') {
   $lc_module = strtolower($module);
   $lang_file = "$obminclude/lang/".$_SESSION['set_lang']."/$lc_module.inc";
   if (file_exists("$path/../".$lang_file)) {
@@ -108,7 +108,7 @@ if ($module != "") {
 
   // Specific conf module lang file
   if ($conf_lang) {
-    $lang_file = "conf/lang/".$_SESSION['set_lang']."/$lc_module.inc";
+    $lang_file = 'conf/lang/'.$_SESSION['set_lang']."/$lc_module.inc";
     if (file_exists("$path/../".$lang_file)) {
       include("$lang_file");
     } else {
@@ -141,13 +141,13 @@ if ($conf_modules && file_exists("$path/../conf/modules/$module.inc")) {
 //while (list($sec,$value) = each($cgp_show['section'])) { // <-- BUG, Why ???
 foreach ($cgp_show['section'] as $sec => $value) {
   if ($value) {
-    $sec_right = $value["right"];
-    if ($sec_right == "") {
+    $sec_right = $value['right'];
+    if ($sec_right == '') {
       $sec_right = $cright_read;
     }
     $sections[$sec] = array('Name' => ${"l_section_$sec"},
-                           'Url'  => $cgp_show["section"][$sec]["url"],
-                           'Target'  => $cgp_show["section"][$sec]['target'],
+                           'Url'  => $cgp_show['section'][$sec]['url'],
+                           'Target'  => $cgp_show['section'][$sec]['target'],
                            'Right'=> $sec_right);
   }
 }
@@ -155,294 +155,300 @@ foreach ($cgp_show['section'] as $sec => $value) {
 ///////////////////////////////////////////////////////////////////////////////
 // Modules definition
 ///////////////////////////////////////////////////////////////////////////////
-if ($cgp_show["module"]["company"]) {
-  $modules["company"] = array('Name'=> $l_module_company,
+if ($cgp_show['module']['company']) {
+  $modules['company'] = array('Name'=> $l_module_company,
    			     'Ico' => "$ico_company",
 			     'Url' => "$path/company/company_index.php",
 			     'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["contact"]) {
-  $modules["contact"] = array('Name'=> $l_module_contact,
+if ($cgp_show['module']['contact']) {
+  $modules['contact'] = array('Name'=> $l_module_contact,
                              'Ico' => "$ico_contact",
                              'Url' => "$path/contact/contact_index.php",
                              'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["lead"]) {
-  $modules["lead"] = array('Name'=> $l_module_lead,
+if ($cgp_show['module']['lead']) {
+  $modules['lead'] = array('Name'=> $l_module_lead,
                                   'Ico' => "$ico_lead",
                                   'Url' => "$path/lead/lead_index.php",
                                   'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["deal"]) {
-  $modules["deal"] = array('Name'=> $l_module_deal,
+if ($cgp_show['module']['deal']) {
+  $modules['deal'] = array('Name'=> $l_module_deal,
                                   'Ico' => "$ico_deal",
                                   'Url' => "$path/deal/deal_index.php",
                                   'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["list"]) {
-  $modules["list"] = array('Name'=> $l_module_list,
+if ($cgp_show['module']['list']) {
+  $modules['list'] = array('Name'=> $l_module_list,
                                   'Ico' => "$ico_list",
                                   'Url' => "$path/list/list_index.php",
                                   'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["calendar"]) {
-  $modules["calendar"] = array('Name'=> $l_module_calendar,
+if ($cgp_show['module']['calendar']) {
+  $modules['calendar'] = array('Name'=> $l_module_calendar,
                                     'Ico' => "$ico_calendar",
                                     'Url' => "$path/calendar/calendar_index.php?action=waiting_events",
                                     'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["cv"]) {
-  $modules["cv"] = array('Name'=> $l_module_cv,
+if ($cgp_show['module']['cv']) {
+  $modules['cv'] = array('Name'=> $l_module_cv,
                                   'Ico' => "$ico_cv",
                                   'Url' => "$path/cv/cv_index.php",
                                   'Right'=> $cright_read);
                                     
 }
-if ($cgp_show["module"]["todo"]) {
-  $modules["todo"] = array('Name'=> $l_module_todo,
+if ($cgp_show['module']['todo']) {
+  $modules['todo'] = array('Name'=> $l_module_todo,
                                   'Ico' => "$ico_todo",
                                   'Url' => "$path/todo/todo_index.php",
                                   'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["publication"]) {
-  $modules["publication"] = array('Name'=> $l_module_publication,
+if ($cgp_show['module']['publication']) {
+  $modules['publication'] = array('Name'=> $l_module_publication,
 			           'Ico' => "$ico_publication",
 			           'Url' => "$path/publication/publication_index.php",
 			           'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["statistic"]) {
-  $modules["statistic"] = array('Name'=> $l_module_statistic,
+if ($cgp_show['module']['statistic']) {
+  $modules['statistic'] = array('Name'=> $l_module_statistic,
 			           'Ico' => "$ico_statistic",
 			           'Url' => "$path/statistic/statistic_index.php",
 			           'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["time"]) {
-  $modules["time"] = array('Name'=> $l_module_time,
+if ($cgp_show['module']['time']) {
+  $modules['time'] = array('Name'=> $l_module_time,
                                    'Ico' => "$ico_time",
                                    'Url' => "$path/time/time_index.php",
                                    'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["project"]) {
-  $modules["project"] = array('Name'=> $l_module_project,
+if ($cgp_show['module']['project']) {
+  $modules['project'] = array('Name'=> $l_module_project,
                               'Ico' => "$ico_project",
                               'Url' => "$path/project/project_index.php",
                               'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["contract"]) {
-  $modules["contract"] = array('Name' => $l_module_contract,
+if ($cgp_show['module']['planning']) {
+  $modules['planning'] = array('Name'=> $l_module_planning,
+                               'Ico' => "$ico_time",
+                               'Url' => "$path/planning/planning_index.php",
+                               'Right'=> $cright_read);
+}
+if ($cgp_show['module']['contract']) {
+  $modules['contract'] = array('Name' => $l_module_contract,
                                'Ico' => "$ico_contract",
                                'Url' => "$path/contract/contract_index.php",
                                'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["incident"]) {
-  $modules["incident"] = array('Name'=> $l_module_incident,
+if ($cgp_show['module']['incident']) {
+  $modules['incident'] = array('Name'=> $l_module_incident,
                                'Ico' => "$ico_incident",
                                'Url' => "$path/incident/incident_index.php",
                                'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["document"]) {
-  $modules["document"] = array('Name'=> $l_module_document,
+if ($cgp_show['module']['document']) {
+  $modules['document'] = array('Name'=> $l_module_document,
                                'Ico' => "$ico_document",
                                'Url' => "$path/document/document_index.php",
                                'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["campaign"]) {
-  $modules["campaign"] = array('Name'=> $l_module_campaign,
+if ($cgp_show['module']['campaign']) {
+  $modules['campaign'] = array('Name'=> $l_module_campaign,
                                   'Ico' => "$ico_cancel",
                                   'Url' => "$path/campaign/campaign_index.php",
                                   'Right'=> $cright_read);
 }
 
-$modules["admin_code"] = array('Name'=> $l_module_admin_code,
+$modules['admin_code'] = array('Name'=> $l_module_admin_code,
                   'Ico' => "$ico_code",
 		  'Url' => "$path/admin_code/admin_code_index.php?mode=html",
 		  'Right'=> $cright_read_admin);
-$modules["admin_pref"] = array('Name'=> $l_module_admin_pref,
+$modules['admin_pref'] = array('Name'=> $l_module_admin_pref,
                   'Ico' => "$ico_pref",
                   'Url' => "$path/admin_pref/admin_pref_index.php?mode=html",
                   'Right'=> $cright_read_admin);
-$modules["admin_data"] = array('Name'=> $l_module_admin_data,
+$modules['admin_data'] = array('Name'=> $l_module_admin_data,
                   'Ico' => "$ico_data",
                   'Url' => "$path/admin_data/admin_data_index.php?mode=html",
                   'Right'=> $cright_read_admin);
-$modules["admin_lang"] = array('Name'=> $l_module_admin_lang,
+$modules['admin_lang'] = array('Name'=> $l_module_admin_lang,
                   'Ico' => "$ico_lang",
                   'Url' => "$path/admin_lang/admin_lang_index.php?mode=html",
                   'Right'=> $cright_read_admin);
-$modules["admin_ref"] = array('Name'=> $l_module_admin_ref,
+$modules['admin_ref'] = array('Name'=> $l_module_admin_ref,
                   'Ico' => "$ico_ref",
                   'Url' => "$path/admin_ref/admin_ref_index.php",
                   'Right'=> $cright_read_admin);
 
-$modules["admin"] = array('Name'=> $l_module_admin,
+$modules['admin'] = array('Name'=> $l_module_admin,
                   'Ico' => "$ico_admin",
                   'Url' => "$path/admin/admin_index.php?mode=html",
                   'Right'=> $cright_read_admin);
-$modules["tools"] = array('Name'=> $l_module_tools,
+$modules['tools'] = array('Name'=> $l_module_tools,
                   'Ico' => "$ico_tools",
                   'Url' => "$path/tools/tools_index.php",
                   'Right'=> $cright_read_admin);
-$modules["control"] = array('Name'=> $l_module_control,
+$modules['control'] = array('Name'=> $l_module_control,
                   'Ico' => "$ico_control",
                   'Url' => "$path/control/control_index.php",
                   'Right'=> $cright_read_admin);
-$modules["import"] = array('Name'=> $l_module_import,
+$modules['import'] = array('Name'=> $l_module_import,
                   'Ico' => "$ico_import",
                   'Url' => "$path/import/import_index.php",
                   'Right'=> $cright_read_admin);
-$modules["backup"] = array('Name'=> $l_module_backup,
+$modules['backup'] = array('Name'=> $l_module_backup,
                   'Ico' => "$ico_backup",
                   'Url' => "$path/backup/backup_index.php",
                   'Right'=> $cright_read_admin);
-$modules["domain"] = array('Name'=> $l_module_domain,
+$modules['domain'] = array('Name'=> $l_module_domain,
 	       	   'Ico' => "$ico_ref",
                    'Url' => "$path/domain/domain_index.php",
                    'Right'=> $cright_read_admin);
-$modules["samba"] = array('Name'=> $l_module_samba,
+$modules['samba'] = array('Name'=> $l_module_samba,
                   'Ico' => "$ico_samba",
                   'Url' => "$path/samba/samba_index.php",
                   'Right'=> $cright_read_admin);
-$modules["report"] = array('Name'=> $l_module_report,
+$modules['report'] = array('Name'=> $l_module_report,
                   'Ico' => "$ico_report",
                   'Url' => "$path/report/report_index.php?mode=html",
                   'Right'=> $cright_read_admin);
 
-if ($cgp_show["module"]["account"]) {
-  $modules["account"] = array('Name'=> $l_module_account,
+if ($cgp_show['module']['account']) {
+  $modules['account'] = array('Name'=> $l_module_account,
                                'Ico' => "$ico_account",
                                'Url' => "$path/account/account_index.php",
                                'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["invoice"]) {
-  $modules["invoice"] = array('Name'=> $l_module_invoice,
+if ($cgp_show['module']['invoice']) {
+  $modules['invoice'] = array('Name'=> $l_module_invoice,
                                 'Ico' => "$ico_invoice",
                                 'Url' => "$path/invoice/invoice_index.php",
                                 'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["payment"]) {
-  $modules["payment"] = array('Name'=> $l_module_payment,
+if ($cgp_show['module']['payment']) {
+  $modules['payment'] = array('Name'=> $l_module_payment,
                                 'Ico' => "$ico_payment",
                                 'Url' => "$path/payment/payment_index.php",
                                 'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["user"]) {
-  $modules["user"] = array('Name'=> $l_module_user,
+if ($cgp_show['module']['user']) {
+  $modules['user'] = array('Name'=> $l_module_user,
                                    'Ico' => "$ico_user",
                                    'Url' => "$path/user/user_index.php",
                                    'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["people"]) {
-  $modules["people"] = array('Name'=> $l_module_people,
+if ($cgp_show['module']['people']) {
+  $modules['people'] = array('Name'=> $l_module_people,
                                    'Ico' => "$ico_user",
                                    'Url' => "$path/people/people_index.php",
                                    'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["resource"]) {
-  $modules["resource"] = array('Name'=> $l_module_resource,
+if ($cgp_show['module']['resource']) {
+  $modules['resource'] = array('Name'=> $l_module_resource,
                                    'Ico' => "$ico_resource",
                                    'Url' => "$path/resource/resource_index.php",
                                    'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["group"]) {
-  $modules["group"] = array('Name'=> $l_module_group,
+if ($cgp_show['module']['group']) {
+  $modules['group'] = array('Name'=> $l_module_group,
                                     'Ico' => "$ico_group",
                                     'Url' => "$path/group/group_index.php",
 			            'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["resourcegroup"]) {
-  $modules["resourcegroup"] = array('Name'=> $l_module_resourcegroup,
+if ($cgp_show['module']['resourcegroup']) {
+  $modules['resourcegroup'] = array('Name'=> $l_module_resourcegroup,
                                     'Ico' => "$ico_resourcegroup",
                                     'Url' => "$path/resourcegroup/resourcegroup_index.php",
 			            'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["mailshare"]) {
-  $modules["mailshare"] = array('Name'=> $l_module_mailshare,
+if ($cgp_show['module']['mailshare']) {
+  $modules['mailshare'] = array('Name'=> $l_module_mailshare,
                                     'Ico' => "$ico_mailshare",
                                     'Url' => "$path/mailshare/mailshare_index.php",
 			            'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["host"]) {
-  $modules["host"] = array('Name'=> $l_module_host,
+if ($cgp_show['module']['host']) {
+  $modules['host'] = array('Name'=> $l_module_host,
                                'Ico' => "$ico_host",
                                'Url' => "$path/host/host_index.php",
                                'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["settings"]) {
-  $modules["settings"] = array(
+if ($cgp_show['module']['settings']) {
+  $modules['settings'] = array(
                                'Name'=> $l_module_settings,
                                'Ico' => "$ico_settings",
 		               'Url' => "$path/settings/settings_index.php",
 			       'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["password"]) {
-  $modules["password"] = array(
+if ($cgp_show['module']['password']) {
+  $modules['password'] = array(
                                'Name'=> $l_module_password,
                                'Ico' => "$ico_password",
 		               'Url' => "$path/password/password_index.php",
 			       'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["mailforward"]) {
-  $modules["mailforward"] = array(
+if ($cgp_show['module']['mailforward']) {
+  $modules['mailforward'] = array(
                                'Name'=> $l_module_mailforward,
                                'Ico' => "$ico_mailforward",
 		               'Url' => "$path/mailforward/mailforward_index.php",
 			       'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["vacation"]) {
-  $modules["vacation"] = array(
+if ($cgp_show['module']['vacation']) {
+  $modules['vacation'] = array(
                                'Name'=> $l_module_vacation,
                                'Ico' => "$ico_vacation",
 		               'Url' => "$path/vacation/vacation_index.php",
 			       'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["mailbox"]) {
-  $modules["mailbox"] = array(
+if ($cgp_show['module']['mailbox']) {
+  $modules['mailbox'] = array(
                                'Name'=> $l_module_mailbox,
                                'Ico' => "$ico_mailbox",
 		               'Url' => "$path/mailbox/mailbox_index.php",
 			       'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["organizationalchart"]) {
-  $modules["organizationalchart"] = array('Name'=> $l_module_organizationalchart,
+if ($cgp_show['module']['organizationalchart']) {
+  $modules['organizationalchart'] = array('Name'=> $l_module_organizationalchart,
                                     'Ico' => "$ico_organizationalchart",
                                     'Url' => "$path/organizationalchart/organizationalchart_index.php",
 			            'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["profile"]) {
-  $modules["profile"] = array('Name'  => $l_module_profile,
+if ($cgp_show['module']['profile']) {
+  $modules['profile'] = array('Name'  => $l_module_profile,
 			      'Ico'   => "$ico_profile",
 			      'Url'   => "$path/profile/profile_index.php",
 			      'Right' => $cright_read);
 }
 
-if ($cgp_show["module"]["organizationalchart"]) {
-  $modules["organizationalchart"] = array('Name'=> $l_module_organizationalchart,
+if ($cgp_show['module']['organizationalchart']) {
+  $modules['organizationalchart'] = array('Name'=> $l_module_organizationalchart,
                                     'Ico' => "$ico_organizationalchart",
                                     'Url' => "$path/organizationalchart/organizationalchart_index.php",
 			            'Right'=> $cright_read);
 }
 
-if ($cgp_show["module"]["device"]) {
-  $modules["device"] = array('Name'=> $l_module_device,
-                                    'Ico' => "$ico_phone",
-                                    'Url' => "$path/device/device_index.php",
-			            'Right'=> $cright_read);
-}
-
-if ($cgp_show["module"]["webmail"]) {
-#  $modules["webmail"] = array('Name'=> $l_webmail,
+if ($cgp_show['module']['webmail']) {
+#  $modules['webmail'] = array('Name'=> $l_webmail,
 #                                    'Ico' => "$ico_webmail",
 #                                    'Url' => "$path/webmail/webmail_index.php",
 #			            'Right'=> $cright_read);
+}
+
+if ($cgp_show['module']['device']) {
+  $modules['device'] = array('Name'=> $l_module_device,
+                                    'Ico' => "$ico_phone",
+                                    'Url' => "$path/device/device_index.php",
+			            'Right'=> $cright_read);
 }
 
 

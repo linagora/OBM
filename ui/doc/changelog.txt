@@ -41,4 +41,5 @@ To do
   * #554 Document creation from Project or other module do not link the document
   * #556 Project consult displays all the users as members
   * #520 Better log message on applying ACL on mailbox or mailshare before creation
+  * #783 New Planning module
   * LDAP attribute mapping

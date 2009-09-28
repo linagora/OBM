@@ -337,6 +337,7 @@ $cgp_show['module']['contact'] = 'gw';
 $cgp_show['module']['todo'] = 'gw';
 $cgp_show['module']['time'] = 'prod';
 $cgp_show['module']['project'] = 'prod';
+$cgp_show['module']['planning'] = 'prod';
 $cgp_show['module']['contract'] = 'prod';
 $cgp_show['module']['incident'] = 'prod';
 $cgp_show['module']['document'] = 'prod';

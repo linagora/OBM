@@ -215,6 +215,7 @@ $l_calendar = "Calendar";
 $l_cv = "CV";
 $l_project = "Project";
 $l_projects = "Projects";
+$l_planning = "Planning";
 $l_contract = "Contract";
 $l_incident = "Incident";
 $l_document = "Document";
@@ -351,6 +352,7 @@ $l_module_report = "Report";
 
 $l_module_time = "Time management";
 $l_module_project = "Projects";
+$l_module_planning = "Planning";
 $l_module_contract = "Contracts";
 $l_module_incident = "Incidents";
 $l_module_document = "Documents";
