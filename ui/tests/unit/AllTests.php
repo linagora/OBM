@@ -24,6 +24,7 @@ require_once 'AclTest.php';
 require_once 'VpdiTest.php';
 require_once 'EventTest.php';
 require_once 'EventMailObserverTest.php';
+require_once 'SearchTest.php';
 //require_once 'ReportTest.php';
 //require_once 'UserReportCommandTest.php';
 //require_once 'ReportSenderTest.php';
@@ -38,6 +39,7 @@ class AllTests {
     $suite->addTestSuite('VpdiTest');
     $suite->addTestSuite('EventTest');
     $suite->addTestSuite('EventMailObserverTest');
+    $suite->addTestSuite('SearchTest');
     return $suite;
   }
 }
