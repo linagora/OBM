@@ -30,7 +30,6 @@ $params = get_device_params();
 include("$obminclude/global_pref.inc");
 
 require('device_display.inc');
-require('device_query.inc');
 require('../user/user_display.inc');
 require('../user/user_query.inc');
 
