@@ -24,12 +24,12 @@ function run_query_domain_search($domain, $restriction='') {
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
 
-  $where = '';
+  $where = '1=1';
 
   // If a domain label has been specified, get it
   if (trim($text) != '') {
-    $where .= " domain_label $like '$text%'
-      OR domain_description like '$text%'";
+    $where .= " AND (domain_label $like '$text%'
+      OR domain_description like '$text%')";
   }
 
   //if ((trim($where) != '') || (trim($where_restriction) != '')) {
@@ -53,9 +53,9 @@ function run_query_domain_search($domain, $restriction='') {
 
   if ($ctu_sql_limit) {
     if (trim($text) != '') {
-      $count = get_query_count("SELECT count(distinct domain_id) FROM Domain WHERE $where");
+      $count = get_query_count("SELECT count(distinct domain_id) FROM Domain WHERE domain_global = false AND $where");
     } else {
-      $count = get_query_count("SELECT count(distinct domain_id) FROM Domain");
+      $count = get_query_count("SELECT count(distinct domain_id) FROM Domain WHERE domain_global = false");
     }
     $obm_q->set_num_rows_total($count);
   }

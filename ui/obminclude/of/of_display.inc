@@ -1129,7 +1129,6 @@ function display_menu($module) {
   global $l_logout, $l_profile, $l_scope_update, $l_waiting_events;
   global $perm, $cright_write_admin;
 
-
   $obm['uid'];
   $login = $obm['login'];
   $profil = $obm['profile'];
