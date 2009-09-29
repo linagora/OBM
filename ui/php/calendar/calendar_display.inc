@@ -33,7 +33,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view;
   
   $display['features'] = html_calendar_planning_bar($calendar, $current_view, $calendar_entity, $entity_readable, $my_views, $p_view);
-  $display['title'] = "<div class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"].' '.$GLOBALS["l_range_$p_range"].' </div>';
+  $display['title'] = "<h1 class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"].' '.$GLOBALS["l_range_$p_range"].' </h1>';
   if (function_exists($calendar_function)) {
     $block = $calendar_function($current_view, $calendar_entity, $writable_entity);
     $block .= dis_calendar_quick_form($calendar_entity);
