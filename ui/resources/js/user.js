@@ -60,18 +60,22 @@ Obm.UserMobileDevice = new Class({
   },
 
   addPartnership: function() {
-    var eventData = new Object();
-    eventData.owner = this.owner;
-    eventData.device_id = this.id;
-    new Request.JSON({
-      url : '/user/user_index.php',
-      secure: false,
-      onComplete: function(response) {
-        $('mobile_partnership').value = obm.vars.labels.removePartnership;
-        var device = obm.userMobileDeviceManager.devices.get(this.id);
-        device.permsDeviceId = eventData.device_id;
-      }.bind(this)
-    }).post($merge({ajax:1, action:'add_partnership'}, eventData)); 
+    if(obm.vars.consts.isSuperman) {
+      var eventData = new Object();
+      eventData.owner = this.owner;
+      eventData.device_id = this.id;
+      new Request.JSON({
+        url : '/user/user_index.php',
+        secure: false,
+        onComplete: function(response) {
+          $('mobile_partnership').value = obm.vars.labels.removePartnership;
+          var device = obm.userMobileDeviceManager.devices.get(this.id);
+          device.permsDeviceId = eventData.device_id;
+        }.bind(this)
+      }).post($merge({ajax:1, action:'add_partnership'}, eventData));
+    } else {
+      showErrorMessage(obm.vars.labels.permsError);
+    }
   },
 
   removePartnership: function() {

@@ -1200,7 +1200,10 @@ $mobile_devices";
  * Mobile device management HTML
  */
 function html_user_mobile_devices($user_id, $type) {
- 
+  global $perm;
+
+  $is_superman = 'obm.vars.consts.isSuperman='.($perm->is_superman('user')==true?1:0).';';
+  $perms_error = 'obm.vars.labels.permsError="'.phpStringToJsString($GLOBALS['l_error_permission']).'";';
   $mobile_devices  = "";
   $opush = false;
   $obm_q = new DB_OBM();
@@ -1274,6 +1277,8 @@ function html_user_mobile_devices($user_id, $type) {
       </table>
       $mobile_devices_close
       <script type='text/javascript'>
+        $is_superman
+        $perms_error
         obm.vars.labels.addPartnership = '".phpStringToJsString($GLOBALS['l_mobile_add_partnership'])."';
         obm.vars.labels.removePartnership = '".phpStringToJsString($GLOBALS['l_mobile_remove_partnership'])."';
         obm.userMobileDeviceManager = new Obm.UserMobileDeviceManager();
