@@ -18,18 +18,19 @@
 */
 
 $path = '..';
-$module = 'device';
+$module = 'admin_device';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
 
 include("$obminclude/global.inc");
 
-$params = get_global_params();
+$params = get_device_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 $params = get_device_params();
 include("$obminclude/global_pref.inc");
 
-require('device_display.inc');
+require('admin_device_display.inc');
+require('admin_device_query.inc');
 require('../user/user_display.inc');
 require('../user/user_query.inc');
 
@@ -42,11 +43,15 @@ $extra_js_include[] = 'user.js';
 
 if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_device_form();
+  $display['detail'] = html_admin_device_search_form($params);
+} elseif ($action == 'search') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = html_admin_device_search_form($params);
+  $display['result'] = dis_admin_device_search_list($params);
 }
 
 // Display page
-$display['head'] = display_head($GLOBALS['l_module_device']);
+$display['head'] = display_head($GLOBALS['l_module_admin_device']);
 $display['header'] = display_menu($module);
 $display['end'] = display_end();
 display_page($display);
@@ -69,11 +74,15 @@ function get_device_params() {
 function get_device_action() {
   global $path, $actions, $cright_read;
 
-  $actions['device']['index'] = array (
-    'Name'     => $GLOBALS['l_header_consult'],
-    'Url'      => "$path/device/device_index.php?action=index",
+  $actions['admin_device']['index'] = array (
+    'Name'     => $GLOBALS['l_header_find'],
+    'Url'      => "$path/admin_device/admin_device_index.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('all'));
 
+  $actions['admin_device']['search'] = array (
+    'Url'      => "$path/admin_device/admin_device_index.php?action=search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None'));
 }
 ?>

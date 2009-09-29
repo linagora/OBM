@@ -2757,17 +2757,15 @@ function run_query_userobm_get_devices($user_id) {
   global $cdg_sql;
 
   $uid = $obm['uid'];
-  $first_sync = sql_date_format($db_type, 'MIN(f.last_sync)', 'first_sync');
-  $last_sync = sql_date_format($db_type, 'MAX(l.last_sync)', 'last_sync');
-
   $obm_q = new DB_OBM;
+
   $query = "SELECT 
     opush_device.id,
     opush_device.owner,
     opush_device.identifier,
     opush_device.type, 
-    $first_sync as first_sync,
-    $last_sync as last_sync,
+    MIN(f.last_sync) as first_sync,
+    MAX(f.last_sync) as last_sync,
     opush_sync_perms.device_id, 
     opush_sync_perms.policy 
     FROM opush_device 
@@ -2775,7 +2773,8 @@ function run_query_userobm_get_devices($user_id) {
     LEFT JOIN opush_sync_state l ON l.device_id=opush_device.id
     LEFT JOIN opush_sync_perms ON opush_sync_perms.device_id = opush_device.id
     WHERE opush_device.owner='$user_id'
-    GROUP BY opush_device.id, opush_device.owner, opush_device.identifier,opush_device.type,opush_sync_perms.device_id, opush_sync_perms.policy";
+    GROUP BY opush_device.id, opush_device.owner, opush_device.identifier,opush_device.type,opush_sync_perms.device_id, opush_sync_perms.policy
+    ORDER BY identifier";
 
   display_debug_msg($query, $cdg_sql, 'run_query_userobm_get_devices()');
   $obm_q->query($query);
@@ -2792,7 +2791,6 @@ function run_query_userobm_get_devices($user_id) {
  * @return void
  */
 function run_query_userobm_mobile_add_partnership($user) {
-  global $display;
 
   $owner = $user['owner'];
   $device_id = $user['device_id'];
@@ -2817,7 +2815,6 @@ function run_query_userobm_mobile_add_partnership($user) {
  * @return void
  */
 function run_query_userobm_mobile_remove_partnership($user) {
-  global $display;
 
   $owner = $user['owner'];
   $device_id = $user['device_id'];

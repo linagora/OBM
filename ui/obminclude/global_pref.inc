@@ -450,5 +450,10 @@ if ($cgp_show['module']['device']) {
                                     'Url' => "$path/device/device_index.php",
 			            'Right'=> $cright_read);
 }
-
+if ($cgp_show['module']['admin_device']) {
+  $modules['admin_device'] = array('Name'=> $l_module_admin_device,
+                                    'Ico' => "$ico_phone",
+                                    'Url' => "$path/admin_device/admin_device_index.php",
+			            'Right'=> $cright_write_admin);
+}
 

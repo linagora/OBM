@@ -68,9 +68,10 @@ Obm.UserMobileDevice = new Class({
         url : '/user/user_index.php',
         secure: false,
         onComplete: function(response) {
-          $('mobile_partnership').value = obm.vars.labels.removePartnership;
-          var device = obm.userMobileDeviceManager.devices.get(this.id);
-          device.permsDeviceId = eventData.device_id;
+          if ($('mobile_partnership')) $('mobile_partnership').value = obm.vars.labels.removePartnership;
+          if ($('mobile_'+this.id)) $('mobile_'+this.id).set('src', obm.vars.images.sync);
+          this.permsDeviceId = eventData.device_id;
+          showOkMessage(obm.vars.labels.updateOk);
         }.bind(this)
       }).post($merge({ajax:1, action:'add_partnership'}, eventData));
     } else {
@@ -86,9 +87,10 @@ Obm.UserMobileDevice = new Class({
       url : '/user/user_index.php',
       secure: false,
       onComplete: function(response) {
-        $('mobile_partnership').value = obm.vars.labels.addPartnership;
-        var device = obm.userMobileDeviceManager.devices.get(this.id);
-        device.permsDeviceId = '';
+        if ($('mobile_partnership')) $('mobile_partnership').value = obm.vars.labels.addPartnership;
+        if ($('mobile_'+this.id)) $('mobile_'+this.id).set('src', obm.vars.images.desync);
+        this.permsDeviceId = '';
+        showOkMessage(obm.vars.labels.updateOk);
       }.bind(this)
     }).post($merge({ajax:1, action:'remove_partnership'}, eventData)); 
 

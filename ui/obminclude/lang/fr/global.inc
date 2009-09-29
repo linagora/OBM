@@ -399,6 +399,7 @@ $l_module_vacation = "Répondeur messagerie";
 $l_module_mailbox = "Boîte aux lettres";
 $l_module_webmail = "Webmail";
 $l_module_device = "Périphériques mobile";
+$l_module_admin_device = "Gestion des périphériques mobile";
 
 $l_header_admin = "Administration";
 $l_header_import = "Importer";

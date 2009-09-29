@@ -1204,6 +1204,9 @@ function html_user_mobile_devices($user_id, $type) {
 
   $is_superman = 'obm.vars.consts.isSuperman='.($perm->is_superman('user')==true?1:0).';';
   $perms_error = 'obm.vars.labels.permsError="'.phpStringToJsString($GLOBALS['l_error_permission']).'";';
+  $update_ok = 'obm.vars.labels.updateOk="'.phpStringToJsString($GLOBALS['l_update_ok']).'";';
+  $update_error = 'obm.vars.labels.updateError="'.phpStringToJsString($GLOBALS['l_update_error']).'";';
+
   $mobile_devices  = "";
   $opush = false;
   $obm_q = new DB_OBM();
@@ -1279,6 +1282,8 @@ function html_user_mobile_devices($user_id, $type) {
       <script type='text/javascript'>
         $is_superman
         $perms_error
+        $update_ok
+        $update_error
         obm.vars.labels.addPartnership = '".phpStringToJsString($GLOBALS['l_mobile_add_partnership'])."';
         obm.vars.labels.removePartnership = '".phpStringToJsString($GLOBALS['l_mobile_remove_partnership'])."';
         obm.userMobileDeviceManager = new Obm.UserMobileDeviceManager();

@@ -389,6 +389,7 @@ if (!$cgp_use['service']['ldap']) {
 $cgp_use['property']['delegation'] = true;
 
 $cgp_show['module']['device'] = 'my';
+$cgp_show['module']['admin_device'] = 'admin';
 
 // Specific user data
 $cgp_user = array();
