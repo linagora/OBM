@@ -7,37 +7,91 @@ require_once 'vpdi/vcard.php';
 
 class OBM_Contact {
   
-  public $id;
-  public $lastname;
-  public $firstname;
-  public $mname;//middlename
-  public $kind;
-  public $title;
-  public $function;
-  public $company_id;
-  public $company;
-  public $market;//marketingmanager_id
-  public $suffix;
-  public $aka;
-  public $sound;
-  public $manager;
-  public $assistant;
-  public $spouse;
-  public $category;
-  public $service;
-  public $mailok;//mailing_ok
-  public $newsletter;
-  public $date;
-  public $birthday;
-  public $anniversary;
-  public $phone = array();
-  public $email = array();
-  public $address = array();
-  public $im = array();
-  public $website = array();
+  protected $id;
+  protected $entity_id;
+
+  protected $lastname;
+  protected $firstname;
+  protected $mname;//middlename
+  protected $kind;
+  protected $title;
+  protected $function;
+  protected $company_id;
+  protected $company;
+  protected $market;//marketingmanager_id
+  protected $suffix;
+  protected $aka;
+  protected $sound;
+  protected $manager;
+  protected $assistant;
+  protected $spouse;
+  protected $category;
+  protected $service;
+  protected $mailok;//mailing_ok
+  protected $newsletter;
+  protected $date;
+  protected $birthday;
+  protected $birthday_event;
+  protected $anniversary;
+  protected $anniversary_event;
+  protected $phone = array();
+  protected $email = array();
+  protected $address = array();
+  protected $im = array();
+  protected $website = array();
+  protected $archive;
+  protected $datasource_id;
+  protected $comment;
+  protected $comment2;
+  protected $comment3;
+  protected $origin;
  
   private static $kinds = null;
-  
+
+  public function display_name() {
+    return "{$this->firstname} {$this->lastname}";
+  }
+
+  public function __get($key) {
+    if (($key=='entity_id') && !is_null($this->id) && is_null($this->entity_id))
+      $this->entity_id = of_entity_get('contact', $this->id);
+    return $this->$key;
+  }
+
+  public function __set($key,$value) {
+    // Can't modify id
+    if ($key=='id')
+      return;
+
+    // remember that company, anniversary or birthday has been modified
+    if ($key=='company_id')
+      $this->old_company_id = $this->company_id;
+    if ($key=='birthday')
+      $this->old_birthday = $this->birthday;
+    if ($key=='anniversary')
+      $this->old_anniversary = $this->anniversary;
+
+    // update phonetic if lastname is modified
+    if ($key=='lastname')
+      $this->sound = phonetic_key($value);
+
+    // Archived contact unsubscribed from mailings
+    if (($key=='archive') && ($value)) {
+      $this->mailok = '0';
+      $this->newsletter = '0';
+    }
+
+    //check data
+    if (($key=='mailok') || ($key=='newsletter') || ($key=='archive'))
+      $value = $value ? '1' : '0';
+    if (($key=='birthday') || ($key=='anniversary')) {
+      $date = of_isodate_convert($value, true);
+      $value = (!empty($date) ? new Of_Date($date) : null);
+    }
+
+    $this->$key = $value;
+  }
+
   public static function get($id, $domain = null) {
     $where = "contact_id = '{$id}'";
     if ($domain !== null) {
@@ -62,6 +116,289 @@ class OBM_Contact {
     return $contacts;
   }
   
+  public static function create($data) {
+    global $cgp_show, $cdg_sql, $obm;
+
+    $uid = sql_parse_id($obm['uid']);
+    $domain_id = sql_parse_id($obm['domain_id']);
+
+    $data['aka'] = trim($data['aka']);
+    // If aka is empty we auto fill it
+    if ($aka == '') {
+      $auto_aka = format_name($data['lname'], 0, true, true);
+      if ($auto_aka != $data['lname']) {
+        $data['aka'] = $auto_aka;
+      }
+    }
+    $data['sound'] = phonetic_key($data['lname']);
+    $add_comment = $data['add_comment'];
+    if ($add_comment != '') {
+      $datecomment = of_isodate_convert($data['datecomment']);
+      $usercomment = $data['usercomment'];
+      $data['comment'] = "\n$datecomment:$usercomment:$add_comment";
+    }
+    $add_comment2 = $data['add_comment'];
+    if ($add_comment2 != '') {
+      $datecomment2 = of_isodate_convert($data['datecomment2']);
+      $usercomment2 = $data['usercomment2'];
+      $data['comment2'] = "\n$datecomment2:$usercomment2:$add_comment2";
+    }
+    $add_comment3 = $data['add_comment3'];
+    if ($add_comment3 != '') {
+      $datecomment3 = of_isodate_convert($data['datecomment3']);
+      $usercomment3 = $data['usercomment3'];
+      $data['comment3'] = "\n$datecomment3:$usercomment3:$add_comment3";
+    }
+    $data['mailok'] = ($data['mailok'] == '1' ? '1' : '0');
+    $data['newsletter'] = ($data['newsletter'] == '1' ? '1' : '0');
+    $data['archive'] = ($data['archive'] == '1' ? '1' : '0');
+    if (empty($data['datasource_id'])) $data['datasource_id'] = $data['datasource'];
+
+    $contact = new OBM_Contact;
+    $contact->lastname  = $data['lname'];
+    $contact->firstname = $data['fname'];
+    $fields = array('mname','kind','title','function','company_id','company',
+      'market','suffix','aka','sound','manager','assistant','spouse','category',
+      'service','mailok','newsletter','archive','comment','comment2','comment3',
+      'origin'
+    );
+    foreach($fields as $field) {
+      $contact->$field = $data[$field];
+    }
+    $date_fields = array('date','birthday','anniversary');
+    foreach($date_fields as $field) {
+      $date = of_isodate_convert($data[$field], true);
+      $contact->$field = (!empty($date) ? new Of_Date($date) : null);
+    }
+    $contact->phone   = is_array($data['phones'])   ? $data['phones']    : array();
+    $contact->email   = is_array($data['emails'])   ? $data['emails']    : array();
+    $contact->address = is_array($data['addresses'])? $data['addresses'] : array();
+    $contact->im      = is_array($data['ims'])      ? $data['ims']       : array();
+    $contact->website = is_array($data['websites']) ? $data['websites']  : array();
+
+    $comp_id = sql_parse_id($contact->company_id);
+    $dsrc    = sql_parse_id($contact->datasource_id);
+    $kind    = sql_parse_id($contact->kind);
+    $market  = sql_parse_id($contact->market);
+    $func    = sql_parse_id($contact->function);
+
+    $date = ($contact->date ? "'{$contact->date}'" : 'null');
+
+    $query = "INSERT INTO Contact (contact_timeupdate,
+      contact_timecreate,
+      contact_userupdate,
+      contact_usercreate,
+      contact_domain_id,
+      contact_datasource_id,
+      contact_company_id,
+      contact_company,
+      contact_kind_id,
+      contact_marketingmanager_id,
+      contact_lastname,
+      contact_firstname,
+      contact_middlename,
+      contact_suffix,
+      contact_aka,
+      contact_sound,
+      contact_manager,
+      contact_assistant,
+      contact_spouse,
+      contact_category,
+      contact_service,
+      contact_function_id,
+      contact_title,
+      contact_mailing_ok,
+      contact_newsletter,
+      contact_archive,
+      contact_date,
+      contact_comment,
+      contact_comment2,
+      contact_comment3,
+      contact_origin
+    ) VALUES (
+      NOW(),
+      NOW(),
+      $uid,
+      $uid,
+      $domain_id,
+      $dsrc,
+      $comp_id,
+      '{$contact->company}',
+      $kind,
+      $market,
+      '{$contact->lastname}',
+      '{$contact->firstname}',
+      '{$contact->mname}',
+      '{$contact->suffix}',
+      '{$contact->aka}',
+      '{$contact->sound}',
+      '{$contact->manager}',
+      '{$contact->assistant}',
+      '{$contact->spouse}',
+      '{$contact->category}',
+      '{$contact->service}',
+      $func,
+      '{$contact->title}',
+      {$contact->mailok},
+      {$contact->newsletter},
+      {$contact->archive},
+      $date,
+      '{$contact->comment}',
+      '{$contact->comment2}',
+      '{$contact->comment3}',
+      '{$GLOBALS['c_origin_web']}'
+    )";
+
+    display_debug_msg($query, $cdg_sql, 'OBM_Contact:create(1)');
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+
+    $contact->id = $obm_q->lastid();
+    if ($contact->id > 0) {
+      if (($cgp_show['module']['company']) && ($retour)) {
+        run_query_global_company_contact_number_update($comp_id);
+      }
+      $contact->entity_id = of_entity_insert('contact',$contact->id);
+
+      // Birthday & Anniversary support
+      //FIXME: do it better
+      self::storeAnniversary('birthday', $contact->id, $uid, null, $contact->display_name(), null, $contact->birthday);
+      self::storeAnniversary('anniversary', $contact->id, $uid, null, $contact->display_name(), null, $contact->anniversary);
+
+      //FIXME: do it better
+      self::storeCoords($contact);
+      of_userdata_query_update('contact', $contact->id, $data);
+    }
+
+    return $contact;
+  }
+  
+  public function store() {
+    global $obm, $cgp_show, $cdg_sql;
+
+    if (!$this->id) return false;
+    //else
+
+    $now = date('Y-m-d H:i:s');
+    $uid = $obm['uid'];
+    $multidomain = sql_multidomain('contact');
+
+    // In case company module not used, to avoid postgres error
+    $comp_id = sql_parse_id($this->company_id);
+    $dsrc    = sql_parse_id($this->datasource_id);
+    $kind    = sql_parse_id($this->kind);
+    $market  = sql_parse_id($this->market);
+    $func    = sql_parse_id($this->function);
+
+    $date = ($contact->date ? "'{$contact->date}'" : 'null');
+
+    $sql_id = sql_parse_id($this->id, true);
+    $query = "UPDATE Contact SET
+      contact_timeupdate='{$now}',
+      contact_userupdate='{$uid}',
+      contact_datasource_id=$dsrc,
+      contact_company_id=$comp_id,
+      contact_company='{$this->company}',
+      contact_kind_id=$kind,
+      contact_marketingmanager_id=$market,
+      contact_lastname='{$this->lastname}',
+      contact_firstname='{$this->firstname}',
+      contact_middlename='{$this->mname}',
+      contact_suffix='{$this->suffix}',
+      contact_aka='{$this->aka}',
+      contact_sound='{$this->sound}',
+      contact_manager='{$this->manager}',
+      contact_assistant='{$this->assistant}',
+      contact_spouse='{$this->spouse}',
+      contact_category='{$this->category}',
+      contact_service='{$this->service}',
+      contact_function_id=$func,
+      contact_title='{$this->title}',
+      contact_mailing_ok={$this->mailok},
+      contact_newsletter={$this->newsletter},
+      contact_archive={$this->archive},
+      contact_date=$date,
+      contact_comment='{$this->comment}',
+      contact_comment2='{$this->comment2}',
+      contact_comment3='{$this->comment3}',
+      contact_origin='{$GLOBALS['c_origin_web']}'
+    WHERE contact_id $sql_id 
+      $multidomain";
+
+    display_debug_msg($query, $cdg_sql, 'OBM_Contact::store()');
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+
+    if ($cgp_show['module']['company']) {
+      // If company has changed, update the companies contact number
+      if (($retour) && (!empty($this->old_company_id)) && ($this->company_id!=$this->old_company_id)) {
+        run_query_global_company_contact_number_update($this->old_company_id);
+        run_query_global_company_contact_number_update($comp_id);
+      }
+    }
+
+    // Birthday & Anniversary support
+    //FIXME: do it better
+    self::storeAnniversary('birthday', $this->id, $uid, $this->birthday_event, $this->display_name(), $this->old_birthday, $this->birthday);
+    self::storeAnniversary('anniversary', $this->id, $uid, $this->anniversary_event, $this->display_name(), $this->old_anniversary, $this->anniversary);
+
+    if ($retour) {
+      $ret = of_userdata_query_update('contact', $this->id, $contact);
+      self::storeCoords($this);
+    }
+
+    return $this;
+  }
+
+  public function delete() {
+    global $obm, $cdg_sql, $c_use_connectors;
+    if (!$this->id) return false;
+    //else
+  
+    $obm_q = new DB_OBM;
+  
+    $multidomain = sql_multidomain('contact');
+    $sql_id = sql_parse_id($this->id);
+    $comp_id = sql_parse_id($this->company_id);
+  
+    run_query_global_delete_document_links($this->id, 'contact');    
+    $ret = of_userdata_query_delete('contact', $this->id);
+  
+    //FIXME: do it better
+    // BEGIN birthday and anniversary support
+    run_query_contact_birthday_update('birthday', null, null, $this->birthday_event, null, null, null);
+    run_query_contact_birthday_update('anniversary', null, null, $this->anniversary_event, null, null, null);
+    // END birthday and anniversary support
+  
+    of_entity_delete('contact', $this->id);
+  
+    $query = "DELETE FROM Contact WHERE contact_id = $sql_id $multidomain";
+    display_debug_msg($query, $cdg_sql, 'OBM_Contact::delete(1)');
+    $retour = $obm_q->query($query);
+  
+    // If connectors in use
+    if ($c_use_connectors) {
+      $uid = sql_parse_id($obm['uid']);
+      $query = "INSERT INTO DeletedContact (
+          deletedcontact_contact_id,
+          deletedcontact_user_id,
+          deletedcontact_timestamp,
+          deletedcontact_origin)
+        VALUES (
+          $sql_id,
+          $uid,
+          NOW(),
+          '$GLOBALS[c_origin_web]')";
+      display_debug_msg($query, $cdg_sql, 'OBM_Contact::delete(2)');
+      $retour = $obm_q->query($query);
+    }
+  
+    // After contact deletion to get correct number
+    run_query_global_company_contact_number_update($comp_id);
+  
+    return $retour;
+  }
+
   public static function import($vcard) {
     $contact = array(
       'lname' => $vcard->name->family,
@@ -244,9 +581,17 @@ class OBM_Contact {
       contact_service,
       contact_mailing_ok,
       contact_newsletter,
+      contact_archive,
       contact_date,
+      bd.event_id as contact_birthday_event,
       bd.event_date as contact_birthday,
-      an.event_date as contact_anniversary
+      an.event_id as contact_anniversary_event,
+      an.event_date as contact_anniversary,
+      contact_datasource_id,
+      contact_comment,
+      contact_comment2,
+      contact_comment3,
+      contact_origin
     FROM Contact
          LEFT JOIN Kind ON kind_id = contact_kind_id
          LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id
@@ -258,37 +603,47 @@ class OBM_Contact {
     $db->query($query);
     while ($db->next_record()) {
       $contact = new OBM_Contact;
-      $contact->id          = $db->f('contact_id');
-      $contact->lastname    = $db->f('contact_lastname');
-      $contact->firstname   = $db->f('contact_firstname');
-      $contact->mname       = $db->f('contact_middlename');
-      $contact->kind        = $db->f('contact_kind');
-      $contact->title       = $db->f('contact_title');
-      $contact->function    = $db->f('contact_function');
-      $contact->company_id  = $db->f('contact_company_id');
-      $contact->company     = $db->f('contact_company');
-      $contact->market      = $db->f('contact_marketingmanager_id');
-      $contact->suffix      = $db->f('contact_suffix');
-      $contact->aka         = $db->f('contact_aka');
-      $contact->sound       = $db->f('contact_sound');
-      $contact->manager     = $db->f('contact_manager');
-      $contact->assistant   = $db->f('contact_assistant');
-      $contact->spouse      = $db->f('contact_spouse');
-      $contact->category    = $db->f('contact_category');
-      $contact->service     = $db->f('contact_service');
-      $contact->mailok      = $db->f('contact_mailing_ok');
-      $contact->newsletter  = $db->f('contact_newsletter');
+      $contact->id            = $db->f('contact_id');
+      $contact->lastname      = $db->f('contact_lastname');
+      $contact->firstname     = $db->f('contact_firstname');
+      $contact->mname         = $db->f('contact_middlename');
+      $contact->kind          = $db->f('contact_kind');
+      $contact->title         = $db->f('contact_title');
+      $contact->function      = $db->f('contact_function');
+      $contact->company_id    = $db->f('contact_company_id');
+      $contact->company       = $db->f('contact_company');
+      $contact->market        = $db->f('contact_marketingmanager_id');
+      $contact->suffix        = $db->f('contact_suffix');
+      $contact->aka           = $db->f('contact_aka');
+      $contact->sound         = $db->f('contact_sound');
+      $contact->manager       = $db->f('contact_manager');
+      $contact->assistant     = $db->f('contact_assistant');
+      $contact->spouse        = $db->f('contact_spouse');
+      $contact->category      = $db->f('contact_category');
+      $contact->service       = $db->f('contact_service');
+      $contact->mailok        = $db->f('contact_mailing_ok');
+      $contact->newsletter    = $db->f('contact_newsletter');
+      $contact->archive       = $db->f('contact_archive');
+      $contact->datasource_id = $db->f('contact_datasource_id');
+      $contact->comment       = $db->f('contact_comment');
+      $contact->comment2      = $db->f('contact_comment2');
+      $contact->comment3      = $db->f('contact_comment3');
+      $contact->origin        = $db->f('contact_origin');
       if ($db->f('contact_date'))
         $contact->date        = new Of_Date($db->f('contact_date'), 'GMT');
-      if ($db->f('contact_birthday'))
+      if ($db->f('contact_birthday')) {
+        $contact->birthday_event = $db->f('contact_birthday_event');
         $contact->birthday    = new Of_Date($db->f('contact_birthday'), 'GMT');
-      if ($db->f('contact_anniversary'))
+      }
+      if ($db->f('contact_anniversary')) {
+        $contact->anniversary_event = $db->f('contact_anniversary_event');
         $contact->anniversary = new Of_Date($db->f('contact_anniversary'), 'GMT');
+      }
       $contacts[$contact->id] = $contact;
     }
     return $contacts;
   }
-  
+
   private static function fetchCoords($db, $contacts) {
     $contact_ids = implode(',', array_keys($contacts));
     $query = "SELECT contactentity_contact_id AS contact_id, phone_label, phone_number FROM Phone 
@@ -368,7 +723,250 @@ class OBM_Contact {
     
     return $contacts;
   }
+
+  private static function storeCoords($contact) {
+    global $cdg_sql;
+
+    $id = sql_parse_id($contact->__get('entity_id'));
+    $obm_q = new DB_OBM;
   
+    $query = "DELETE FROM Phone WHERE phone_entity_id = $id";
+    display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(phone)');
+    $obm_q->query($query);
+    if(is_array($contact->phone)) {
+      $cpt = array();
+      foreach($contact->phone as $phone) {
+        if(trim($phone['number']) != '' ) {
+          $phone['label'] = str_replace('_', ';', $phone['label']);
+          $cpt[$phone['label']]++;
+          $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
+          display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(phone)');
+          $obm_q->query($query);
+        }
+      }
+    }
+  
+    $query = "DELETE FROM Address WHERE address_entity_id = $id";
+    display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(address)');
+    $obm_q->query($query);
+    if(is_array($contact->addresse)) {
+      $cpt = array();
+      foreach($contact->addresse as $address) {
+        if(trim($address['street']) != '' || (trim($address['country']) != '' && trim($address['country']) != 'none') || trim($address['zipcode']) != ''
+           || trim($address['expresspostal']) != '') {
+          if(trim($address['country']) == 'none') $address['country'] = '';
+          $address['label'] = str_replace('_', ';', $address['label']);
+          $cpt[$address['label']]++;
+          $query = "INSERT INTO Address (
+            address_entity_id,
+            address_street,
+            address_zipcode,
+            address_town,
+            address_expresspostal,
+            address_country,
+            address_label
+          ) VALUES (
+            $id, 
+            '$address[street]',
+            '$address[zipcode]',
+            '$address[town]',
+            '$address[expresspostal]',
+            '$address[country]',
+            '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
+          )";
+          display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(address)');
+          $obm_q->query($query);
+        }
+      }
+    }
+  
+    $query = "DELETE FROM Website WHERE website_entity_id = $id";
+    display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(website)');
+    $obm_q->query($query);
+  
+    if(is_array($contact->website)) {
+      $cpt = array();
+      foreach($contact->website as $website) {
+        if(trim($website['url']) != '' ) {
+          $website['label'] = str_replace('_', ';', $website['label']);
+          $cpt[$website['label']]++;
+          $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
+          display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(website)');
+          $obm_q->query($query);
+        }
+      }
+    }
+  
+    $query = "DELETE FROM IM WHERE im_entity_id = $id";
+    display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(IM)');
+    $obm_q->query($query);
+  
+    if(is_array($contact->im)) {
+      $cpt = array();
+      foreach($contact->im as $im) {
+        if(trim($im['address']) != '' ) {
+          $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[label]')";
+          display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(IM)');
+          $obm_q->query($query);
+        }
+      }
+    }
+  
+    $query = "DELETE FROM Email WHERE email_entity_id = $id";
+    display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(Email)');
+    $obm_q->query($query);
+  
+    if(is_array($contact->email)) {
+      $cpt = array();
+      foreach($contact->email as $email) {
+        if(trim($email['address']) != '' ) {
+          $email['label'] = str_replace('_', ';', $email['label']);
+          $cpt[$email['label']]++;
+          $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".trim($email['address'])."', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
+          display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(Email)');
+          $obm_q->query($query);
+        }
+      }
+    }
+  }
+
+  private static function storeAnniversary($date='birthday', $contact_id, $contact_usercreate, $event_id, $contact_fullname, $old_value, $new_value) {
+    global $cdg_sql, $obm;
+    global $l_birthday_event_title, $l_anniversary_event_title;
+
+    list($nope_event, $insert_event, $update_event, $delete_event) = array(0,1,2,3);
+    if ($event_id == null) {
+      if ($new_value != null) {
+        $do = $insert_event;
+      }
+    } else {
+      if ($new_value == null) {
+        $do = $delete_event;
+      } else if ($new_value->compare($old_value) != 0) {
+        $do = $update_event;
+      }
+    }
+
+    $obm_q = new DB_OBM;
+
+    $multidomain_contact = sql_multidomain('contact');
+    $multidomain_event = sql_multidomain('event');
+
+    switch ($do) {
+    case $insert_event:
+      $duration = 3600*24;
+      $label = ${"l_${date}_event_title"};
+      $title = str_replace('\'', '\\\'', sprintf($label, $contact_fullname));
+
+      $query = "INSERT INTO Event
+        (event_timeupdate,
+        event_timecreate,
+        event_usercreate,
+        event_origin,
+        event_owner,
+        event_timezone,
+        event_title,
+        event_date,
+        event_description,
+        event_properties,
+        event_location,
+        event_category1_id,
+        event_priority,
+        event_privacy,
+        event_duration,
+        event_repeatkind,
+        event_repeatfrequence,
+        event_repeatdays,
+        event_allday,
+        event_color,
+        event_endrepeat,
+        event_domain_id)
+        VALUES
+        (
+         NOW(),
+         NOW(),
+        '$contact_usercreate',
+        '$GLOBALS[c_origin_web]',
+        '$contact_usercreate',
+        '".Of_Date::getOption('timezone')."',
+        '$title',
+        '$new_value',
+        '',
+        '',
+        '',
+        NULL,
+        '2',
+        '0',
+        '$duration',
+        'yearly',
+        '1',
+        '0000000',
+        '1',
+        '',
+        NULL,
+        '$obm[domain_id]')";
+
+      $obm_q->query($query);
+      display_debug_msg($query, $cdg_sql, 'run_query_contact_birthday_update(insert event)');
+
+      $insert_event_id = $obm_q->lastid();
+      if ($insert_event_id) {
+        of_entity_insert('event', $insert_event_id);
+        $sql_id = sql_parse_id($contact_id);
+        $query = "UPDATE Contact
+          SET contact_${date}_id = $insert_event_id
+          WHERE
+          contact_id = $sql_id
+          $multidomain_contact";
+
+        $obm_q->query($query);
+        display_debug_msg($query, $cdg_sql, "run_query_contact_birthday_update(update birthday id)");
+        $entity_id = of_entity_get('user', $contact_usercreate);
+        $query = "INSERT INTO EventLink (
+          eventlink_timecreate,
+          eventlink_usercreate,
+          eventlink_event_id, 
+          eventlink_entity_id,
+          eventlink_state) 
+        VALUES (
+          NOW(),
+          $contact_usercreate,
+          $insert_event_id,
+          $entity_id,
+          'ACCEPTED')";
+
+        $obm_q->query($query);
+        display_debug_msg($query, $cdg_sql, "run_query_contact_birthday_update(insert entity)");
+      }
+
+      break;
+
+    case $update_event:
+      $sql_id = sql_parse_id($event_id);
+      $query = "UPDATE Event SET
+        event_date = '$new_value',
+        event_origin = '$GLOBALS[c_origin_web]'
+      WHERE
+        event_id = $sql_id
+        $multidomain_event";
+
+      $obm_q->query($query);
+      display_debug_msg($query, $cdg_sql, 'run_query_contact_birthday_update(update event)');
+
+      break;
+
+    case $delete_event:
+      of_entity_delete('event',$event_id);
+      $sql_id = sql_parse_id($event_id);
+      $query = "DELETE FROM Event WHERE event_id = $sql_id
+        $multidomain_event";
+      $obm_q->query($query);
+      display_debug_msg($query, $cdg_sql, 'run_query_contact_birthday_update(delete event)');
+
+      break;
+    }
+  }
+
   private static function getKindId($kind) {
     if (self::$kinds === null) {
       self::$kinds = self::fetchKinds();

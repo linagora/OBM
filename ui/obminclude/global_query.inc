@@ -39,8 +39,7 @@ function run_query_global_company_contact_number_update($comp_id) {
   $query = "SELECT count(*) as nb
       FROM Contact
       WHERE contact_company_id $comp_id 
-        AND contact_archive = '0'
-        AND contact_privacy = 0";
+        AND contact_archive = '0'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_global_company_contact_number_update()');
   $obm_q = new DB_OBM;

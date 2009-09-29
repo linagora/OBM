@@ -507,7 +507,7 @@ if ($action == 'search') {
     $entities['resource']['ids'] = array();
   }
   $conflicts = quick_check_calendar_conflict($params, $entities);
-  if ((!$event_q) || ($event_q->f('event_repeatkind')=='none') || ($params['date_begin']!=$params['old_date_begin'])) {
+  if ((!$event_q) || ($event_q->f('event_repeatkind')=='none') || ($params['date_begin']->equals($params['old_date_begin']))) {
     $json[] = 'occUpdate:false';
   } else {
     $json[] = 'occUpdate:true';
