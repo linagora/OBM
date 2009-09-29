@@ -61,6 +61,7 @@ if ($action == "validate") {
   } else {
     if(isset($params['service'])) {
 	if (strrpos($params[service], "?") > 0) {
+          preg_replace("")
           header("location:$params[service]&ticket=$ticket");
           echo "<html><body onload=\"document.location='$params[service]&ticket=$ticket'\"></body></html>";
 	} else {

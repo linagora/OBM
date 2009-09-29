@@ -1076,6 +1076,7 @@ function display_head($p_module, $standard=true) {
   <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/dropdown.js\" ></script>
   $js_include
 
   <script type=\"text/javascript\">

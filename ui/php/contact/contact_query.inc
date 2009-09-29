@@ -29,8 +29,8 @@ function run_query_contact_search($contact) {
 
   $company_id = $contact['company_id'];
   $fuzzy = $contact['fuzzy'];
-  $lname = sql_search_text_parse($contact['lname']);
-  $fname = sql_search_text_parse($contact['fname']);
+  $lastname = sql_search_text_parse($contact['lastname']);
+  $firstname = sql_search_text_parse($contact['firstname']);
   $phone = sql_search_text_parse($contact['phone']);
   $email = sql_search_text_parse($contact['email']);
   $company = sql_search_text_parse($contact['company']);
@@ -100,12 +100,12 @@ function run_query_contact_search($contact) {
   }
 
   // If a lastname has been specified, get it 
-  if ($lname != '') {
-    $where_name .= "(contact_lastname #LIKE '$lname%' or contact_aka #LIKE '$lname%')";
+  if ($lastname != '') {
+    $where_name .= "(contact_lastname #LIKE '$lastname%' or contact_aka #LIKE '$lastname%')";
   }
   // If a firstname has been specified, get it 
-  if ($fname != '') {
-    $where .= " AND contact_firstname #LIKE '$fname%'";
+  if ($firstname != '') {
+    $where .= " AND contact_firstname #LIKE '$firstname%'";
   }
   // If a phone number has been specified, get it 
   if ($phone != '') {
@@ -286,7 +286,7 @@ function run_query_contact_search($contact) {
     ";
 
 
-  if ((! $fuzzy) || ($lname == '')) {
+  if ((! $fuzzy) || ($lastname == '')) {
     if ($_SESSION['set_rows'] != '') {
       $limit = $_SESSION['set_rows'];
     } else {
@@ -317,9 +317,9 @@ function run_query_contact_search($contact) {
     }
   }
   // if fuzzy or unsuccessful search (meaningful only if name has been entered)
-  if ( ( ($fuzzy) || ($count == 0) ) && ($lname != '') ) {
-    $auto_aka = format_name($lname, 0, true, true);
-    $sound = phonetic_key($lname);
+  if ( ( ($fuzzy) || ($count == 0) ) && ($lastname != '') ) {
+    $auto_aka = format_name($lastname, 0, true, true);
+    $sound = phonetic_key($lastname);
     $where_name = " AND ($where_name OR contact_aka #LIKE '%$auto_aka%'
       OR contact_sound = '$sound')";
     $whereq = " WHERE $where $where_name";
@@ -376,8 +376,8 @@ function run_query_contact_detail($p_id) {
     kind_lang,
     kind_minilabel,
     kind_header,
-    m.userobm_lastname as market_lname,
-    m.userobm_firstname as market_fname,
+    m.userobm_lastname as market_lastname,
+    m.userobm_firstname as market_firstname,
     contactfunction_label,
     datasource_name,
     contact_date,
@@ -490,7 +490,7 @@ function run_query_contact_remove_rights($contact_id) {
 // Contact update query execution
 // Parameters:
 //   - $contact[] : Entry's values
-//     keys used  : id, company_id, kind, lname, fname ad1, ad2, ad2, zip, town
+//     keys used  : id, company_id, kind, lastname, firstname ad1, ad2, ad2, zip, town
 //                : cdx, ctry, func, phone, hphone, mphone, fax, email
 //                : com, com2, com3
 ///////////////////////////////////////////////////////////////////////////////
@@ -512,19 +512,19 @@ function run_query_contact_update($contact) {
   $company = $contact['company'];
   $kind = sql_parse_id($contact['kind']);
   $market = sql_parse_id($contact['market']);
-  $lname = $contact['lname'];
-  $fname = $contact['fname'];
+  $lastname = $contact['lastname'];
+  $firstname = $contact['firstname'];
   $mname = $contact['mname'];
   $suffix = $contact['suffix'];
   $aka = trim($contact['aka']);
   // If aka is empty we auto fill it
   if ($aka == '') {
-    $auto_aka = format_name($lname, 0, true, true);
-    if ($auto_aka != $lname) {
+    $auto_aka = format_name($lastname, 0, true, true);
+    if ($auto_aka != $lastname) {
       $aka = $auto_aka;
     }
   }
-  $sound = phonetic_key($lname);
+  $sound = phonetic_key($lastname);
   $service = $contact['service'];
   $func = sql_parse_id($contact['function']);
   $title = $contact['title'];
@@ -577,8 +577,8 @@ function run_query_contact_update($contact) {
     contact_company='$company',
     contact_kind_id=$kind,
     contact_marketingmanager_id=$market,
-    contact_lastname='$lname',
-    contact_firstname='$fname',
+    contact_lastname='$lastname',
+    contact_firstname='$firstname',
     contact_middlename='$mname',
     contact_suffix='$suffix',
     contact_aka='$aka',
@@ -628,7 +628,7 @@ function run_query_contact_update($contact) {
     $old_birthday = null;
   }
   run_query_contact_birthday_update('birthday', $id, $old_contact->f('contact_usercreate'),
-    $old_contact->f('contact_birthday_id'), "$fname $lname", $old_birthday, $birthday);
+    $old_contact->f('contact_birthday_id'), "$firstname $lastname", $old_birthday, $birthday);
 
   // BEGIN anniversary support
 
@@ -644,7 +644,7 @@ function run_query_contact_update($contact) {
     $old_anniversary = null;
   }
   run_query_contact_birthday_update('anniversary', $id, $old_contact->f('contact_usercreate'),
-    $old_contact->f('contact_anniversary_id'), "$fname $lname", $old_anniversary, $anniversary);
+    $old_contact->f('contact_anniversary_id'), "$firstname $lastname", $old_anniversary, $anniversary);
 
   if ($retour) {
     $ret = of_userdata_query_update('contact', $id, $contact);
@@ -1065,10 +1065,10 @@ function run_query_contact_delete_subscription($p_id) {
 // Parameters:
 //   - $cid     : contact id
 //   - $comp_id : company id
-//   - $lname   : lastname
-//   - $fname   : firstname
+//   - $lastname   : lastname
+//   - $firstname   : firstname
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_check($cid, $comp_id, $lname, $fname) {
+function run_query_contact_check($cid, $comp_id, $lastname, $firstname) {
   global $cdg_sql, $cgp_show, $obm;
 
   $uid = sql_parse_id($obm['uid'], true);
@@ -1082,7 +1082,7 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
   if ($cgp_show['module']['company']) {
     $comp_id = sql_parse_id($comp_id, true);
     $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id';
-    $where_comp = "OR (contact_company_id $comp_id AND contact_lastname='$lname')";
+    $where_comp = "OR (contact_company_id $comp_id AND contact_lastname='$lastname')";
     $select_comp = ', company_name';
   }
 
@@ -1095,7 +1095,7 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
     FROM Contact
     $join_comp
     WHERE $where_id
-    ((contact_lastname='$lname' AND contact_firstname='$fname') $where_comp)
+    ((contact_lastname='$lastname' AND contact_firstname='$firstname') $where_comp)
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_contact_check()');
@@ -1153,22 +1153,22 @@ function run_query_check_contact_existence($contact_id) {
 // Parameters:
 //   - $cid       : contact id
 //   - $contact[] : contact's values
-//     keys used  : lname, fname
+//     keys used  : lastname, firstname
 // Returns:
 //   - Contact Database object with list of similar contacts
 ///////////////////////////////////////////////////////////////////////////////
 function check_contact_context($cid, $contact) {
   global $cgp_show;
 
-  $lname = $contact['lname'];
-  $fname = $contact['fname'];
+  $lastname = $contact['lastname'];
+  $firstname = $contact['firstname'];
   $comp_new_id = $contact['company_new_id'];
   $comp_id = $contact['company_id'];
   $comp = ($comp_new_id != '') ? $comp_new_id : $comp_id;
 
   // return contacts with same lastname and firstname or
-  // within the same company with same lname
-  $co_q = run_query_contact_check($cid, $comp, $lname, $fname);
+  // within the same company with same lastname
+  $co_q = run_query_contact_check($cid, $comp, $lastname, $firstname);
 
   return $co_q;
 }
@@ -1227,7 +1227,7 @@ function check_contact_update_rights($params, $c='') {
 // Parameters:
 //   - $cid       : contact id  (empty on insertion)
 //   - $contact[] : values checked
-//     keys used  : lname, fname, phone, hphone, mphone, fax, email
+//     keys used  : lastname, firstname, phone, hphone, mphone, fax, email
 //                  company_id, comp_new_id
 ///////////////////////////////////////////////////////////////////////////////
 function check_contact_data_form($cid, &$contact) {
@@ -1243,8 +1243,8 @@ function check_contact_data_form($cid, &$contact) {
     return false;
   }
 
-  $lname = $contact['lname'];
-  $fname = $contact['fname'];
+  $lastname = $contact['lastname'];
+  $firstname = $contact['firstname'];
   $c_id = $contact['company_id'];
   $c_new_id = $contact['company_new_id'];
   $phones = $contact['phones'];
@@ -1252,10 +1252,10 @@ function check_contact_data_form($cid, &$contact) {
   $addresses = $contact['addresses'];
 
   // MANDATORY: Contact name
-  $lname = strtoupper($lname);
-  if (trim($lname) == '') {
+  $lastname = strtoupper($lastname);
+  if (trim($lastname) == '') {
     $err['msg'] = $l_fill_lastname;
-    return false;
+    OBM_Error::getInstance()->addError('lastname', $l_fill_lastname);
   }
 
   /*if ($cgp_show['module']['company']) {
@@ -1267,40 +1267,39 @@ function check_contact_data_form($cid, &$contact) {
   }*/
 
   // Contact Firstname
-  $fname = ucfirst($fname);
+  $firstname = ucfirst($firstname);
 
   // Contact phone
   if(is_array($phones)) {
-    foreach($phones as $phone) {
+    foreach($phones as $i => $phone) {
       if (($phone['number'] != '') && (preg_match($php_regexp_phone, $phone['number']) == 0)) {
-        $err['msg'] = $l_j_check_phone . " : $phone[number]";
-        return false;
+        $err['msg'] = $l_j_check_phone;
+        OBM_Error::getInstance()->addError('phones-'.$i, $err['msg']);
       }
     }
   }
 
   // Contact email
   if(is_array($emails)) {
-    foreach($emails as $email) {
+    foreach($emails as $i => $email) {
       if (($email['address'] != '') && (preg_match($php_regexp_email, $email['address']) == 0)) {
-        $err['msg'] = $l_j_check_email . " : $email[address]";
-        return false;
+        $err['msg'] = $l_j_check_email;
+        OBM_Error::getInstance()->addError('emails-'.$i, $err['msg']);
       }  
     }
   }
 
   // Check if express postal is not too long
   if (is_array($addresses)){
-    foreach ($addresses as $addresse){
+    foreach ($addresses as $i => $addresse){
       $express_postal = $addresse['expresspostal'];
       if(strlen($express_postal)>16){
         $err['msg'] = $l_err_length_express_postal;
-        return false;
+        OBM_Error::getInstance()->addError('addresses-'.$i, $err['msg']);
       }
     }
   } 
-
-  return true;
+  return !OBM_Error::getInstance()->inError();
 }
 
 
@@ -1608,7 +1607,7 @@ function run_query_contact_subscription_nb($id) {
  *
  * When new need : - $contact_id
  *                 - $contact_usercreate
- *                 - $contact_fullname
+ *                 - $contact_fullastname
  *                 - $new_value
  *                 - set $event_id to null
  * 
@@ -1627,7 +1626,7 @@ function run_query_contact_subscription_nb($id) {
  * @param Of_Date $old_value
  * @param Of_Date $new_value
  */
-function run_query_contact_birthday_update ($date='birthday', $contact_id, $contact_usercreate, $event_id, $contact_fullname, $old_value, $new_value) {
+function run_query_contact_birthday_update ($date='birthday', $contact_id, $contact_usercreate, $event_id, $contact_fullastname, $old_value, $new_value) {
     global $cdg_sql, $obm;
     global $l_birthday_event_title, $l_anniversary_event_title;
 
@@ -1653,7 +1652,7 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
     case $insert_event:
       $duration = 3600*24;
       $label = ${"l_${date}_event_title"};
-      $title = str_replace('\'', '\\\'', sprintf($label, $contact_fullname));
+      $title = str_replace('\'', '\\\'', sprintf($label, $contact_fullastname));
 
       $query = "INSERT INTO Event
         (event_timeupdate,

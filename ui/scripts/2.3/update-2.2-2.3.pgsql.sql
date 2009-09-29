@@ -63,6 +63,53 @@ CREATE TABLE addressbookentity (
   addressbookentity_addressbook_id integer NOT NULL
 );
 
+--
+-- Contact update
+--
+ALTER TABLE Contact ADD COLUMN contact_addressbook_id integer default NULL;
+CREATE INDEX contact_addressbook_id_addressbook_id_fkey ON contact (contact_addressbook_id);
+
+ALTER TABLE Contact ADD CONSTRAINT contact_addressbook_id_addressbook_id_fkey FOREIGN KEY (contact_addressbook_id) REFERENCES addressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Migrate Contact
+--
+
+-- --
+-- -- Create Default Address books
+-- --
+
+CREATE TABLE TmpEntity (
+  entity_id     serial,
+  id_entity     integer,
+  PRIMARY KEY (entity_id)
+);
+
+INSERT INTO addressbook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable) 
+SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'contacts', true, true
+FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
+
+INSERT INTO addressbook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable) 
+SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'collected_contacts', true, true
+FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
+
+INSERT INTO addressbook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable)
+SELECT domain_id, NOW(), MIN(userobm_id), 'obm-storage-migration-2.3', MIN(userobm_id), 'public_contacts', true, false
+FROM Domain INNER JOIN UserObm ON userobm_domain_id = domain_id WHERE domain_global = false AND userobm_perms = 'admin'
+GROUP BY domain_id;
+
+INSERT INTO addressbookentity (addressbookentity_addressbook_id, addressbookentity_entity_id) SELECT id, nextval('entity_entity_id_seq') from addressbook;
+
+INSERT INTO entity (entity_id , entity_mailing) SELECT addressbookentity_entity_id, true FROM addressbookentity ;
+
+UPDATE contact SET contact_addressbook_id = (SELECT id from addressbook WHERE owner = contact_usercreate and name = 'contacts') WHERE contact_privacy = 1 AND contact_collected = false;
+UPDATE contact SET contact_addressbook_id = (SELECT id from addressbook WHERE owner = contact_usercreate and name = 'collected_contacts') WHERE contact_privacy = 1 AND contact_collected = true;
+UPDATE contact SET contact_addressbook_id = (SELECT id from addressbook WHERE domain_id = contact_domain_id and name = 'public_contacts') WHERE contact_privacy = 0;
+
+-- --
+-- -- Add constraints
+-- --
+
 ALTER TABLE ONLY addressbookentity
     ADD CONSTRAINT addressbookentity_pkey PRIMARY KEY (addressbookentity_entity_id, addressbookentity_addressbook_id);
 
@@ -81,13 +128,6 @@ ALTER TABLE ONLY addressbookentity
     ADD CONSTRAINT addressbookentity_entity_id_entity_id_fkey FOREIGN KEY (addressbookentity_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
---
--- Contact update
---
-ALTER TABLE Contact ADD COLUMN contact_addressbook_id integer default NULL;
-CREATE INDEX contact_addressbook_id_addressbook_id_fkey ON contact (contact_addressbook_id);
-
-ALTER TABLE Contact ADD CONSTRAINT contact_addressbook_id_addressbook_id_fkey FOREIGN KEY (contact_addressbook_id) REFERENCES addressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE Contact DROP COLUMN contact_privacy;
 

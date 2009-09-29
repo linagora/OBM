@@ -77,6 +77,8 @@ Number.prototype.pad = function(l,s,t) {
 Obm.CoordonateWidget = new Class({
   Implements: Options,
 
+  kind: 'dummy',
+  options: {inject: 'inside'},
   newId: function() { return 0;},
 
   setValues: function() {
@@ -87,13 +89,12 @@ Obm.CoordonateWidget = new Class({
     this.id = this.newId();
     this.setOptions(options);
     this.setValues(fields);
-    this.table = new Element('table');
+    this.table = new Element('table').addClass('coordinate').set('id', this.kind + '-' + this.id);
     this.element = new Element('tbody');
     this.table.adopt(this.element);
     this.container = $(this.options.container);
     this.displayForm(); 
-    this.container.adopt(this.table);
-    OverText.update();
+    this.table.inject(this.container, this.options.inject);
   },    
 
   displayForm: function() {
@@ -103,14 +104,14 @@ Obm.CoordonateWidget = new Class({
       if(data.newCell == true || data.newLine == true) {cell = new Element('th');line.adopt(cell);}
       if(!data.newCell && !data.newLine) cell.adopt(new Element('br'));
       cell.adopt(this.makeField(field, data));
-      new OverText(cell.getElements('input, textarea'));
     }
     line.adopt(new Element('td').adopt(
-      new Element('a').appendText(obm.vars.labels.remove)
-        .addEvent('click', function() {this.element.dispose();OverText.update();}.bind(this))
+      new Element('a').adopt(new Element('img').setProperties({'src' : obm.vars.images.del,'alt' : obm.vars.labels.remove}))
+        .addEvent('click', function() {this.table.dispose();}.bind(this))
         .setStyle('cursor','pointer')
       )
     );
+    new Obm.OverText(this.table.getElements('input, textarea'));
   },
 
   makeField: function(fieldName, field) {
@@ -151,14 +152,82 @@ Obm.CoordonateWidget = new Class({
           'title' : field.label
         }).set('inputValue',field.value);
         break;        
+      case 'hidden' :
+        var element = new Element('input').setProperties({
+          'type' : 'hidden',
+          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']'
+        }).set('inputValue',field.value);
+      break;
+      case 'label' :
+        var element = new Element('label').set('html',field.label)
+          .adopt(new Element('input').setProperties({
+            'type' : 'hidden',
+            'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']'
+          }).set('inputValue',field.value));
+      break;
     }
 
     return element;
   }
 });
-/**
- *  
- */
-/**
- *  
- */
+
+Obm.OverText = new Class({
+  Implements: [Options, Events],
+  
+  initialize: function(inputs, options) {
+    this.setOptions(options);
+    $G(inputs).each(this.addElement, this);
+  },
+
+  addElement: function(el){
+    el.addEvents({
+      focus: this.hideTxt.pass([el, true], this),
+      blur: this.testOverTxt.pass(el, this),
+      change: this.testOverTxt.pass(el, this)
+    });
+    this.testOverTxt(el);
+  },
+
+  hideTxt: function(el, focus){
+    if(el.get('disabled')) {
+      el.removeClass('overText');
+      el.set('inputValue'); 
+      el.set('disabled',false);
+      try {
+        if (focus) el.fireEvent('focus').focus();
+      } catch(e){};
+    }
+    return this;
+  },
+
+  showTxt: function(el){
+    if(!el.get('disabled')) {
+      var txt = el.get('alt') || el.get('title')
+      el.set('disabled',true);
+      el.addClass('overText');
+      el.set('inputValue',txt); 
+    }
+    return this;
+  },
+
+  testOverTxt: function(el){
+      if (el.get('inputValue') != '') this.hideTxt(el);
+      else this.showTxt(el);  
+  }
+});
+
+Obm.Error = {
+  
+  formUpdate: function(errors, caller)  {
+    errors.error.each(function( msg, field) {
+      if($(field)) {
+        var field = $(field);
+        var title = field.get('title');
+        field.addClass('error');
+        field.set('title', msg);
+        caller.addEvent('request', function() { field.removeClass('error'); field.set('title', title)});
+      }
+    });
+  }
+
+}

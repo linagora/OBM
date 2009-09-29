@@ -62,35 +62,35 @@ class SearchTest extends PHPUnit_Framework_TestCase {
 
   public function testBuildQuery() {
       $strings[] = "toto";
-      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto%') OR (lastname #LIKE 'toto%')))";
+      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto%' OR lastname #LIKE 'toto%')))";
       $strings[] = "toto titi";
-      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto%' AND firstname #LIKE 'titi%') OR (lastname #LIKE 'toto%' AND lastname #LIKE 'titi%')))";
+      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto%' OR lastname #LIKE 'toto%') AND (firstname #LIKE 'titi%' OR lastname #LIKE 'titi%')))";
       $strings[] = "name:toto";
       $assert[] = "(1 = 1 AND firstname #LIKE 'toto%')";
       $strings[] = "name:toto:";
       $assert[] = "(1 = 1 AND firstname #LIKE 'toto:%')";
       $strings[] = "toto:";
-      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto:%') OR (lastname #LIKE 'toto:%')))";
+      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto:%' OR lastname #LIKE 'toto:%')))";
       $strings[] = "name:toto lname:titi";
       $assert[] = "(1 = 1 AND firstname #LIKE 'toto%' AND lastname #LIKE 'titi%')";
       $strings[] = '"toto titi"';
-      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto titi%') OR (lastname #LIKE 'toto titi%')))";
+      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto titi%' OR lastname #LIKE 'toto titi%')))";
       $strings[] = "name:\"toto titi\"";
       $assert[] = "(1 = 1 AND firstname #LIKE 'toto titi%')";
       $strings[] = "name:\"toto titi\" lname:\"titi toto\"";
       $assert[] = "(1 = 1 AND firstname #LIKE 'toto titi%' AND lastname #LIKE 'titi toto%')";
       $strings[] = "(toto titi)";
-      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto%' AND firstname #LIKE 'titi%') OR (lastname #LIKE 'toto%' AND lastname #LIKE 'titi%')))";
+      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto%' OR lastname #LIKE 'toto%') AND (firstname #LIKE 'titi%' OR lastname #LIKE 'titi%')))";
       $strings[] = "name:(toto titi)";
       $assert[] = "(1 = 1 AND firstname #LIKE 'toto%' AND firstname #LIKE 'titi%')";
       $strings[] = "name:(toto titi) lname:(titi toto)";
       $assert[] = "(1 = 1 AND firstname #LIKE 'toto%' AND firstname #LIKE 'titi%' AND lastname #LIKE 'titi%' AND lastname #LIKE 'toto%')";
       $strings[] = "toto titi lname:tutu";
-      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto%' AND firstname #LIKE 'titi%') OR (lastname #LIKE 'toto%' AND lastname #LIKE 'titi%')) AND lastname #LIKE 'tutu%')";
+      $assert[] = "(1 = 1 AND ((firstname #LIKE 'toto%' OR lastname #LIKE 'toto%') AND (firstname #LIKE 'titi%' OR lastname #LIKE 'titi%')) AND lastname #LIKE 'tutu%')";
       $strings[] = "name:toto titi lname:tutu";
-      $assert[] = "(1 = 1 AND firstname #LIKE 'toto%' AND ((firstname #LIKE 'titi%') OR (lastname #LIKE 'titi%')) AND lastname #LIKE 'tutu%')";
+      $assert[] = "(1 = 1 AND firstname #LIKE 'toto%' AND ((firstname #LIKE 'titi%' OR lastname #LIKE 'titi%')) AND lastname #LIKE 'tutu%')";
       $strings[] = "txtx name:toto titi lname:(tutu tata) tyty name:\"test de\"";
-      $assert[] = "(1 = 1 AND ((firstname #LIKE 'txtx%' AND firstname #LIKE 'titi%' AND firstname #LIKE 'tyty%') OR (lastname #LIKE 'txtx%' AND lastname #LIKE 'titi%' AND lastname #LIKE 'tyty%')) AND firstname #LIKE 'toto%' AND firstname #LIKE 'test de%' AND lastname #LIKE 'tutu%' AND lastname #LIKE 'tata%')";
+      $assert[] = "(1 = 1 AND ((firstname #LIKE 'txtx%' OR lastname #LIKE 'txtx%') AND (firstname #LIKE 'titi%' OR lastname #LIKE 'titi%') AND (firstname #LIKE 'tyty%' OR lastname #LIKE 'tyty%')) AND firstname #LIKE 'toto%' AND firstname #LIKE 'test de%' AND lastname #LIKE 'tutu%' AND lastname #LIKE 'tata%')";
       foreach($strings as $index => $string) {
         $result = OBM_Search::buildSearchQuery('SearchableMockup',$string);
         $this->assertEquals($assert[$index], $result);

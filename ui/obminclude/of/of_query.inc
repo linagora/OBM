@@ -3031,6 +3031,7 @@ function isWindows() {
  */
 function check_user_defined_rules() {
   global $err, $rules, $params;
+  include_once('obminclude/of/of_error.php');
   $return = true;
 
   if (is_array($rules)) {
@@ -3064,6 +3065,7 @@ function check_user_defined_rules() {
               $err['msg'] = $field_rules['message']['default'];
             }
             $err['field'] = $field;
+            Of_Error::getInstance()->addError($field, $err['msg']);
             $return = false;
           }
         }

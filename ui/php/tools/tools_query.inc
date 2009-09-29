@@ -950,6 +950,7 @@ function run_query_tools_get_steps($global=false, $domain = null) {
     
   }
   $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_steps()');
   $obm_q->query($query);
   $obm_q->next_record();
   return $obm_q->f('steps');

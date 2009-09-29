@@ -35,16 +35,9 @@ function displayDatePicker(dateField, displayBelowThisObject, dtFormat) {
     dateFormat = 'ymd';
 //    dateFormat = obm.vars.regexp.dateFormat;
 
-  var x = displayBelowThisObject.offsetLeft;
-  var y = displayBelowThisObject.offsetTop + displayBelowThisObject.offsetHeight ;
-
-  // deal with elements inside tables and such
-  var parent = displayBelowThisObject;
-  while (parent.offsetParent) {
-    parent = parent.offsetParent;
-    x += parent.offsetLeft;
-    y += parent.offsetTop ;
-  }
+  var x = displayBelowThisObject.getPosition().x;
+  var y = displayBelowThisObject.getPosition().y + displayBelowThisObject.getSize().y ;
+  console.log(x,y)
 
   drawDatePicker(targetDateField, x, y);
 }

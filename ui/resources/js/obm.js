@@ -1,3 +1,8 @@
+/*
+ *
+ *
+ */
+
 Obm.Menu = new Class({
   
   initialize: function() {
@@ -70,6 +75,10 @@ Obm.Menu = new Class({
   }
 });
 
+/*
+ *
+ *
+ */
 
 Obm.Portlets = new Class({
   
@@ -186,6 +195,7 @@ Obm.Portlets = new Class({
 /*
  *
  * OBM Tip 
+ * A simple wrapper arround mootools Tips.
  *
  */
 Obm.Tip = new Class({
@@ -233,6 +243,7 @@ Obm.Tip = new Class({
 /*
  *
  * OBM Popup
+ * A simple wrapper arround the StickyWinModal.
  *
  */
 Obm.Popup = new Class ({
@@ -400,7 +411,10 @@ Obm.Scroller = new Class({
  *
  * OBM Observer
  *
- * Add element property observer
+ * Add a periodical check on an element property
+ * If the property change it call the onStart function, will changing 
+ * it call the onChange  function, and when not changing anymore the
+ * onStop function.
  *
  */
 Obm.Observer = new Class({ 
@@ -457,6 +471,33 @@ Obm.Observer = new Class({
   }
 });
 
+/*
+ * Add caching method on the mootools Request
+ *
+ */
+
+//Request.Cache = {};
+//
+//Request.prototype._send = Request.prototype.send;
+//
+//Request.prototype.send = function(options){
+//  var url = url = options.url || this.options.url;
+//  var data = options.data || this.options.data;
+//  var cacheId = JSON.encode($merge(data, {url : url}));
+//  //if(Request.Cache[cacheId] && 1==0) {
+//  //  this.response = Request.Cache[cacheId];
+//  //  this.xhr = {status: 200, readyState: 4};
+//  //  this.running = true;
+//  //  this.onStateChange();
+//  //  this.xhr = new Browser.Request();
+//
+//  //} else {
+//    this._send(options);
+//    this.addEvent('complete', function() { Request.Cache[cacheId] = this.response; }); 
+//  //}
+//  return this;
+//}
+//
 
 function popup(url,name,height,width) {
   if(!width)

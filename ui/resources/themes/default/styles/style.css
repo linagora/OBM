@@ -202,7 +202,7 @@ form {
 #mainPanel {
   z-index:100;
   min-width: 120px;
-  margin: 0 0px 20px 17.5em;
+  margin: 0 0px 0px 17.5em;
   padding: 2em 1em 0em;
 /*IE workaround*/
   height: auto!important;
@@ -982,7 +982,6 @@ input.datePicker {
   border-left: 1px solid #fff;
   border-top: 1px solid #fff;
   border-bottom: 1px solid #a0a0a0; 
-  width: auto;
 }
 
 .spreadSheet thead td{
@@ -993,7 +992,6 @@ input.datePicker {
   border-left: 1px solid #fff;
   border-top: 1px solid #fff;
   border-bottom: 1px solid #b2b2b2;  
-  width: auto;
 }
 
 .spreadSheet tbody th, .spreadSheet tbody .head{
@@ -1005,7 +1003,6 @@ input.datePicker {
   border-left: 1px solid #fff;
   border-top: 1px solid #fff;
   border-bottom: 1px solid #c9c9c9;   
-  width: auto;
 }
 
 .spreadSheet tbody tr.highlight {
@@ -1022,7 +1019,6 @@ input.datePicker {
   border-bottom: 1px solid #ececec;
   border-right: 1px solid #d3d1d6;
   border-left: 1px solid #fff;
-  width: auto;
 }
 
 .spreadSheet tbody th.money, .spreadSheet tbody td.money {
@@ -1076,7 +1072,7 @@ input.datePicker {
 }
 
 .error {
-  color: #c62a2a;
+  color: #c62a2a; 
   background-color: #fcd9d9;
 }
 
@@ -1488,10 +1484,8 @@ form.button-to {
 form.button-to input {
   border: none;
 }
-div.overTxtDiv {
+.overTxtDiv, .overText {
   font-weight: bold;
-  font-family: arial, helvetica, verdana;
-  font-size: 12px;
   color: #999;
   overflow: hidden;
   white-space: nowrap;
@@ -1631,4 +1625,35 @@ div.overTxtDiv {
   display:inline;
 }
 
+.dropDownMenu {
+}
 
+.dropDownMenu ul {
+  background-color: red;
+}
+.submenu-down  {
+  background-image: url('../images/arrow_single_down.gif');
+  background-repeat: no-repeat;
+  background-position: center right;  
+  padding-right: 14px;
+}
+
+.submenu-down ul {
+  padding-left: 14px;
+}
+
+.submenu-down li {
+  background-color: #b3b2b2;
+}
+
+.submenu-left {
+  background-image: url('../images/arrow_right.gif');
+  background-repeat: no-repeat;
+  background-position: center right;  
+  padding-right: 14px;
+}
+
+.submenu-left ul{
+  padding-left: 5px;
+  width:10em;
+}

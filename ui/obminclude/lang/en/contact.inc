@@ -10,15 +10,18 @@
 // Database fields
 $l_addressbook = "Address book";
 $l_middlename = 'Middle Name';
+$l_mname = 'Middle Name';
 $l_suffix = 'Suffix';
 $l_market = "Person in charge";
 $l_function = "Function";
 $l_title = "Job Title";
 $l_minihphone = "(Home)";
 $l_minimphone = "(Mobile)";
+$l_no_name = "No name";
 $l_email = "E-Mail";
 $l_email_other = "Other E-Mail";
 $l_mailing_ok = "Mailing enabled";
+$l_mailok = "Mailing enabled";
 $l_mailing_ok_only = "Mailing enabled only";
 $l_private_only = "Private contacts only";
 $l_newsletter = "Newsletter";
@@ -132,6 +135,7 @@ $l_phone_labels = array ('HOME_VOICE' => 'Home phone', 'WORK_VOICE' => 'Work pho
 $l_email_labels = array ('INTERNET' => 'Home', 'OTHER' => 'Other');
 $l_address_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');
 $l_website_labels = array ('URL' => 'Homepage', 'BLOG' => 'Blog', 'OTHER' => 'Other');
-
+$l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ');
 // Error Messages
 $l_err_length_express_postal = "Field 'EXPRESS POSTAL' has 16 characters max";
+$l_add_fields =  'Add more fields';

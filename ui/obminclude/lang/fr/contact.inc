@@ -10,6 +10,7 @@
 // Database fields
 $l_addressbook = "Carnet d'adresse";
 $l_middlename = 'Deuxième prénom';
+$l_mname = 'Deuxième prénom';
 $l_suffix = 'Suffixe';
 $l_market = "Responsable";
 $l_function = "Fonction";
@@ -18,11 +19,13 @@ $l_minimphone = "(Mobile)";
 $l_email = "@M";
 $l_email_other = "Autre Mail";
 $l_mailing_ok = "Activé pour mailing";
+$l_mailok = "Activé pour mailing";
 $l_mailing_ok_only = "Activé pour mailing seulement";
 $l_private_only = "Contacts privé uniquement";
 $l_newsletter = "Newsletter";
 $l_news = "News";
 $l_contact_name = "Nom Contact";
+$l_no_name = "Sans nom";
 $l_from_company = "&nbsp;&nbsp;Société";
 $l_telother = "Autres tel";
 $l_contact_select_company = "Sélectionner la société du Contact.";
@@ -142,3 +145,4 @@ $l_website_labels = array ('URL' => 'Site web', 'BLOG' => 'Log internet', 'OTHER
 
 // Error Messages
 $l_err_length_express_postal = "Le champs 'CEDEX' doit etre au maximum de 16 charactères.";
+$l_add_fields =  'Ajouter des champs';

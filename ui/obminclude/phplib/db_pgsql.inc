@@ -37,6 +37,16 @@ class DB_Sql {
   /* public: last query string : added PB Aliacom */
   var $obm_query;
 
+  var $boolean_values = array(  
+    'is_default',
+    'syncable',
+    'contact_collected',
+    'domain_global',
+    'entity_mailing',
+    'event_allday',
+    'event_allow_documents',
+    'profilesection_show');
+
   function ifadd($add, $me) {
           if("" != $add) return " ".$me.$add;
   }
@@ -64,6 +74,7 @@ class DB_Sql {
   // Added an argument to hide error reporting if it must be handled by OBM
   // Extends: in Dynamic lists, a user can fill a query, checked by OBM
   function query($Query_String, $hide_error="") {
+    $this->cache['metadata'] = null;
     /* No empty queries, please, since PHP4 chokes on them. */
     if ($Query_String == "")
       /* The empty query string is passed on from the constructor,
@@ -111,13 +122,21 @@ class DB_Sql {
 
     $stat = is_array($this->Record);
     if($stat) {
-      $count = $this->num_fields($this->Query_ID);
-      for ($i=0; $i<$count; $i++) {
-        $type = pg_FieldType  ($this->Query_ID, $i);
-        $name = pg_FieldName  ($this->Query_ID, $i);
-        $this->Record[$i] = $this->parse($type, $this->Record[$i]);
-        $this->Record[$name] = $this->Record[$i];
-      }     
+      if($this->cache['metadata'] === null) {
+        $this->cache['metadata'] = array();
+        $count = $this->num_fields($this->Query_ID);
+        for ($i=0; $i<$count; $i++) {
+          $type = pg_FieldType  ($this->Query_ID, $i);
+          $name = pg_FieldName  ($this->Query_ID, $i);
+          if($this->mustBeParsed($type)) {
+            $this->cache['metadata'][$i] = $type;
+            $this->cache['metadata'][$name] = $type;
+          }
+        }
+      }
+      foreach($this->cache['metadata'] as $field => $type) {
+        $this->Record[$field] = $this->parse($type, $this->Record[$field]);
+      }
     }
     if (!$stat && $this->Auto_Free) {
       pg_freeresult($this->Query_ID);
@@ -296,6 +315,15 @@ class DB_Sql {
       return ($data == 't')? TRUE:FALSE;
     default :
       return $data;
+    }
+  }
+
+  function mustBeParsed($type) {
+    switch(strtolower($type)) {
+    case 'bool' :
+      return true;
+    default :
+      return false;
     }
   }
 

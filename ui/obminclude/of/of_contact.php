@@ -4,8 +4,9 @@ require_once 'vpdi/vpdi.php';
 require_once 'vpdi/field.php';
 require_once 'vpdi/entity.php';
 require_once 'vpdi/vcard.php';
+require_once 'obminclude/of/of_search.php';
 
-class OBM_Contact {
+class OBM_Contact implements OBM_ISearchable {
   
   protected $id;
   protected $entity_id;
@@ -92,7 +93,8 @@ class OBM_Contact {
     $this->$key = $value;
   }
 
-  public static function get($id, $domain = null) {
+  public static function get($id = null, $domain = null) {
+    if(!$id) return new OBM_Contact();
     $where = "contact_id = '{$id}'";
     if ($domain !== null) {
       $where.= " AND (contact_domain_id='{$domain}')";
@@ -100,11 +102,65 @@ class OBM_Contact {
     $contacts = self::fetchAll($where);
     return array_pop($contacts);
   }
-  
+
+
   public static function fetchPrivate($userId) {
     $where = "contact_usercreate = {$userId} ";
     $where.= sql_multidomain('contact');
     return self::fetchAll($where);
+  }
+
+  
+  public static function fieldsMap() {
+    $fields['*'] = array(
+      'contact_lastname' => 'text',
+      'contact_firstname' => 'text',
+      'contact_middlename' => 'text',
+      'contact_spouse' => 'text',
+      'contact_suffix' => 'text',
+      'contact_title' => 'text',
+      'contact_aka' => 'text',
+      'contact_sound' => 'text'
+    );
+    $fields['addressbook'] = array(
+      'contact_addressbook_id' => 'integer'
+    );
+    $fields['displayname'] = array(
+      'contact_lastname' => 'text',
+      'contact_firstname' => 'text'
+    );
+    $fields['lastname'] = array('contact_lastname' => 'text');
+    $fields['firstname'] = array('contact_firstname' => 'text');
+    $fields['mname'] = array('contact_middlename' => 'text');
+    $fields['title'] = array('contact_title' => 'text');
+    $fields['assistant'] = array('contact_assistant' => 'text');
+    $fields['spouse'] = array('contact_spouse' => 'text');
+    $fields['category'] = array('contact_category' => 'text');
+    $fields['service'] = array('contact_service' => 'text');
+    $fields['suffix'] = array('contact_suffix' => 'text');
+    $fields['aka'] = array('contact_aka' => 'text');
+    $fields['sound'] = array('contact_sound' => 'text');
+
+    //$fields['kind'] array('kind_label' => 'text');
+    //$fields['function'] = 'contactfunction_label';
+    //$fields['company'] = '';
+    //$fields['market'] = '';
+    //$fields['manager'] = '';
+    //$fields['mailok'] = '';
+    //$fields['newsletter'] = '';
+    //$fields['date'] = 'contact_date';
+    //$fields['birthday'] = '';
+    //$fields['anniversary'] = '';
+    //$fields['phone'] = 'phone_number';
+    //$fields['email'] = 'email_address';
+    //$fields['address'] = 'address_street';
+    //$fields['im'] = 'im_address';
+    //$fields['website'] = 'website_url';
+    return $fields;
+  }
+
+  public static function search($pattern, $limit=100, $offset=0) {
+    return OBM_Contact::fetchAll(OBM_Search::buildSearchQuery('OBM_Contact', $pattern));
   }
   
   public static function fetchAll($where, $limit=false, $offset=0) {
@@ -524,17 +580,17 @@ class OBM_Contact {
 
     foreach ($this->phone as $phone) {
       $ph = new Vpdi_VCard_Phone($phone['number']);
-      $ph->location[] = $phone['label'];
+      $ph->location = $phone['label'];
       $card->addPhone($ph);
     }
     foreach ($this->email as $email) {
       $em = new Vpdi_VCard_Email($email['address']);
-      $em->location[] = $email['label'];
+      $em->location = $email['label'];
       $card->addEmail($em);
     }
     foreach ($this->address as $address) {
       $ad = new Vpdi_VCard_Address();
-      $ad->location[] = $address['label'];
+      $ad->location = $address['label'];
       $ad->street = str_replace("\r", "\n", str_replace("\r\n", "\n", (trim($address['street']))));
       $ad->postalcode = $address['zipcode'];
       $ad->pobox = $address['expresspostal'];
@@ -599,13 +655,13 @@ class OBM_Contact {
          LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
     WHERE {$where}
     {$sql_limit}";
-
-    $db->query($query);
+    $db->xquery($query);
     while ($db->next_record()) {
       $contact = new OBM_Contact;
       $contact->id            = $db->f('contact_id');
       $contact->lastname      = $db->f('contact_lastname');
       $contact->firstname     = $db->f('contact_firstname');
+      $contact->displayname = $db->f('contact_lastname').' '.$db->f('contact_firstname');
       $contact->mname         = $db->f('contact_middlename');
       $contact->kind          = $db->f('contact_kind');
       $contact->title         = $db->f('contact_title');
@@ -649,30 +705,20 @@ class OBM_Contact {
     $query = "SELECT contactentity_contact_id AS contact_id, phone_label, phone_number FROM Phone 
               INNER JOIN ContactEntity ON phone_entity_id = contactentity_entity_id 
               WHERE contactentity_contact_id IN ({$contact_ids})  ";
-    /*$query.= "UNION 
-              SELECT contact_id, 'COMPANY' as phone_label, phone_number FROM Phone 
-              INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id 
-              INNER JOIN Contact ON contact_company_id = companyentity_company_id
-              WHERE contact_id IN ({$contact_ids})  ";*/
     $query.= "ORDER BY phone_label";
-    $db->query($query);        
+    $db->xquery($query);        
     while ($db->next_record()) {
-      $label = current(explode(';', $db->f('phone_label')));
+      $label = (explode(';', $db->f('phone_label')));
       $contacts[$db->f('contact_id')]->phone[] = array('label' => $label, 'number' => $db->f('phone_number'));
     }
     
     $query = "SELECT contactentity_contact_id AS contact_id, email_label, email_address FROM Email 
               INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id 
               WHERE contactentity_contact_id IN ({$contact_ids})  ";
-    /*$query.= "UNION 
-              SELECT contact_id, 'COMPANY' as email_label, email_address FROM Email 
-              INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id 
-              INNER JOIN Contact ON contact_company_id = companyentity_company_id
-              WHERE contact_id IN ({$contact_ids})  ";*/
     $query.= "ORDER BY email_label";
-    $db->query($query);        
+    $db->xquery($query);        
     while ($db->next_record()) {
-      $label = current(explode(';', $db->f('email_label')));
+      $label = (explode(';', $db->f('email_label')));
       $contacts[$db->f('contact_id')]->email[] = array('label' => $label, 'address' => $db->f('email_address'));
     }
     
@@ -682,17 +728,10 @@ class OBM_Contact {
               INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id 
               LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' 
               WHERE contactentity_contact_id IN ({$contact_ids})  ";
-    /*$query.= "UNION 
-              SELECT contact_id, 'COMPANY' as address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name 
-              FROM Address 
-              INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
-              INNER JOIN Contact ON contact_company_id = companyentity_company_id
-              LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' 
-              WHERE contact_id IN ({$contact_ids})  ";*/
     $query.= "ORDER BY address_label";
-    $db->query($query);        
+    $db->xquery($query);        
     while ($db->next_record()) {
-      $label = current(explode(';',$db->f('address_label')));
+      $label = (explode(';',$db->f('address_label')));
       $contacts[$db->f('contact_id')]->address[] = array(
         'label' => $label, 'street' => $db->f('address_street'), 'zipcode' => $db->f('address_zipcode'),
         'expresspostal' => $db->f('address_expresspostal'), 'town' => $db->f('address_town'), 'country' => $db->f('country_name'));
@@ -701,7 +740,7 @@ class OBM_Contact {
     $query = "SELECT contactentity_contact_id AS contact_id, IM.* FROM IM 
               INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id 
               WHERE  contactentity_contact_id IN ({$contact_ids})";
-    $db->query($query);        
+    $db->xquery($query);        
     while ($db->next_record()) {
       $contacts[$db->f('contact_id')]->im[] = array('protocol' => $db->f('im_protocol'),'address' => $db->f('im_address'));
     }
@@ -709,15 +748,10 @@ class OBM_Contact {
     $query = "SELECT contactentity_contact_id AS contact_id, website_label, website_url FROM Website 
               INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id 
               WHERE contactentity_contact_id IN ({$contact_ids}) ";
-    /*$query.= "UNION 
-              SELECT contact_id, 'COMPANY' as website_label, website_url FROM Website
-              INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
-              INNER JOIN Contact ON contact_company_id = companyentity_company_id
-              WHERE contact_id IN ({$contact_ids}) ";*/
     $query .= "ORDER BY website_label";
-    $db->query($query);        
+    $db->xquery($query);        
     while ($db->next_record()) {
-      $label = current(explode(';', $db->f('website_label')));
+      $label = (explode(';', $db->f('website_label')));
       $contacts[$db->f('contact_id')]->website[] = array('label' => $label, 'url' => $db->f('website_url'));
     }
     
@@ -978,10 +1012,20 @@ class OBM_Contact {
     $kinds = array();
     $query = "SELECT kind_id, kind_minilabel FROM Kind";
     $db = new DB_OBM();
-    $db->query($query);        
+    $db->xquery($query);        
     while ($db->next_record()) {
       $kinds[$db->f('kind_id')] = $db->f('kind_minilabel');
     }
     return $kinds;
+  }
+
+  public static function labelToString($label, $kind, $translate=true) {
+    if(is_array($label))array_pop($label);
+    else $label = array($label);
+    if($translate && $GLOBALS['l_'.strtolower($kind).'_labels'][implode('_',$label)]) {
+      return $GLOBALS['l_'.strtolower($kind).'_labels'][implode('_',$label)];
+    } else {
+      return implode(';',$label);
+    }
   }
 }

@@ -75,6 +75,7 @@ require_once('contact_js.inc');
 require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 $extra_js_include[] = 'contact.js';
+$extra_css[] = $css_contact;
 
 get_contact_action();
 
@@ -123,7 +124,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $display['msg'] .= display_info_msg($l_no_display);
   }
   
-} elseif ($action == 'search') {
+} elseif ($action == 'search2') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['search'] = dis_contact_search_form($params);
   $display['result'] = dis_contact_search_list($params);
@@ -425,7 +426,73 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   if ($params['contact_id'] > 0) {
     $display['detail'] = dis_contact_consult($params);
   }
+
+
+
+} elseif ($action == 'consult')  {
+///////////////////////////////////////////////////////////////////////////////
+  $params['contact_id'] = $params['id'];
+  $block = dis_contact_consult2($params);
+  echo $block;
+  exit();
+} elseif ($action == 'updateContact')  {
+///////////////////////////////////////////////////////////////////////////////
+  $params['contact_id'] = $params['id'];
+  $block = dis_contact_form2($params);
+  echo $block;
+  exit();  
+} elseif ($action == 'storeContact') {
+///////////////////////////////////////////////////////////////////////////////
+  $params['contact_id'] = $params['id'];
+  if (check_contact_update_rights($params)) {
+    if (check_user_defined_rules() && check_contact_data_form('', $params)) {
+      if(isset($params['contact_id'])) {
+        $retour = run_query_contact_update($params);
+      } else {
+        $id = run_query_contact_insert($params);
+        $params['contact_id'] = $id;
+      }
+      $block = dis_contact_consult2($params);
+      echo $block;
+      exit();
+    } else {
+      header('HTTP', true, 400);
+      echo OBM_Error::getInstance()->toJson();
+      exit();
+    }
+  } else {
+    $block = dis_contact_consult2($params);
+    echo $block;
+    exit();    
+  }
+  
+} elseif ($action == 'list')  {
+///////////////////////////////////////////////////////////////////////////////
+  include('addressbook.php');
+  $addressBook = new OBM_AddressBook($params['id'], null, null, null, null, null, null, null);
+  $contactHeaders = html_contact_get_headers();
+  $block = html_contact_get_list($addressBook->getContacts(), $contactHeaders);
+  echo $block;
+  exit();
+} elseif ($action == 'search') {
+///////////////////////////////////////////////////////////////////////////////
+  include('addressbook.php');
+  $contactHeaders = html_contact_get_headers();
+  $addressBooks = OBM_AddressBook::search();
+  $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern']), $contactHeaders);
+  echo $block;
+  exit();
+} elseif ($action == 'filterContact') {
+///////////////////////////////////////////////////////////////////////////////
+  
+} elseif ($action == 'filterGroup') {
+///////////////////////////////////////////////////////////////////////////////
+
 }
+
+
+
+
 
 of_category_user_action_switch($module, $action, $params);
 
@@ -502,6 +569,38 @@ function get_contact_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                         );
+
+//FIXME
+// Index
+  $actions['contact']['consult'] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contact/contact_index.php?action=index",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+  $actions['contact']['updateContact'] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contact/contact_index.php?action=list",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );  
+  $actions['contact']['storeContact'] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contact/contact_index.php?action=list",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );    
+  $actions['contact']['list'] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contact/contact_index.php?action=list",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+
+
+
 
 // Search
   $actions['contact']['search'] = array (

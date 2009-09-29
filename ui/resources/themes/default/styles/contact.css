@@ -1,0 +1,453 @@
+/* Head styling */
+#searchForm {
+  text-align: right;
+  margin: 5px 30px 5px 0;
+}
+
+/*Tables styling*/
+
+#contactPanel table {
+  width: 100%;
+  border-collapse : collapse;
+  empty-cells: show;
+}
+
+#contactPanel {
+  width: 100%;
+  border: 2px solid #d2d6da;
+  border-spacing: 0;
+}
+
+.contactPanelContainer thead td, .contactPanelContainer thead th {
+  line-height: 25px;
+  height: 25px;
+  overflow: hidden;
+  background-color: #b3b2b2;
+  font-weight: bold;
+  text-align: center;
+  background-image: url('../images/background_tableHead.gif');
+  background-repeat: repeat-x;
+  background-position: top;
+  border-right: 1px solid #aeaeae;
+  border-left: 1px solid #fff;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #a0a0a0; 
+  vertical-align: middle;
+  color: #000;
+  white-space: nowrap;
+}
+
+.contactPanelContainer thead td.search, .contactPanelContainer thead th.search {
+  text-align: left;
+  background: #dee1e3;
+  height: 23px;
+  padding-left: 3px;
+  overflow: visible;
+}
+
+#addressBookContainer tbody td:hover, #dataGrid tbody tr.even:hover,  #dataGrid tbody tr.odd:hover {
+  background-color: #99a8b7;
+  cursor: pointer;
+}
+
+#addressBookContainer td.current, #dataGrid tr.current {
+  background-color: #99a8b7;
+}
+
+/* Address Book column styling */
+
+#addressBookGrid {
+  border-right: 2px solid #d2d6da;
+  width: 15em;
+  background-color: #dee1e3;
+}
+
+#addressBookContainer tbody tr{
+  height: 3em;
+}
+
+#addressBookContainer td{
+  border-left: 0;
+  padding-left: 10px;
+  line-height: 3em;
+  border-top: 1px solid #e0e2e4;
+  border-bottom: 1px solid #d4d8db;
+  color: black;
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+#addressBookContainer tr.filler, #dataContainer tr.filler {
+  visibility: hidden;
+  height: auto;
+}
+
+/* Data rows styling */
+
+#dataGrid {
+  border-right: 2px solid #d2d6da;
+}
+
+#dataGrid.expanded {
+  width: auto;
+}
+
+#dataGrid.shrinked {
+  width: 20em;
+}
+
+#dataGrid th {
+  width: 20em;
+}
+
+#dataContainer tr.odd {
+  line-height: 2em;
+  height: 2em;
+  background-color: #fafafa;
+}
+
+#dataContainer tr.even {
+  line-height: 2em;
+  height: 2em;
+}
+
+#dataGrid tr.current {
+  background-color: #99a8b7;
+}
+
+#dataContainer td, #dataContainer th{
+  border-left: 1px solid #e0e2e4;
+}
+
+/* Contact card styling */
+
+#informationGrid img#photo {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;  
+  margin: 0 10px 2px 20px ;
+  float: left;
+  border: 3px solid #ddd;
+}
+
+#informationGrid .details {
+  border: 2px solid #ddd;
+  min-width : 325px;
+  width:80%;
+  margin: 12px 0 0 20px;
+  background-color: #fafafa;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;  
+  float:left;
+}
+
+#informationGrid .details dt, #informationGrid legend {
+  float:left;
+  clear: left;
+  color: #888;
+  display: inline;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+#informationGrid .details dd {
+  float: left;
+  margin-bottom: 0.5em;
+  margin-left: 1em;
+}
+
+#informationGrid dl.details {
+  margin: 12px 0 0 15px;
+  padding: 3px 0 5px 10px;
+}
+
+#informationGrid .head {
+  margin-top: 30px;
+}
+
+#informationGrid .head h1, #informationGrid .head h3 {
+  text-align: left;
+  display: inline;
+}
+
+#informationGrid .toolbar{
+  padding: 0;
+  margin: 0;
+}
+
+#informationGrid .toolbar li{
+  display: inline;
+}
+
+/*Overflow in grid*/
+
+.contactPanelContainer {
+  overflow: auto;
+  position: relative;  
+}
+
+html>/**/body .contactPanelContainer table>tbody {  
+  overflow-y: auto; 
+  overflow-x: hidden;
+}
+
+.contactPanelContainer thead tr	{
+  position:relative;
+}
+
+#addressBookGrid, #dataGrid, #informationGrid, #informationGrid td{
+  vertical-align: top;
+}
+
+#informationGrid tbody td{
+  padding-top: 5px;
+}
+
+.contactPanelContainer td:last-child {
+  padding-right: 20px;
+}
+
+/* Form */
+
+.coordinate th{
+  width: 12em;
+}
+
+#informationGrid fieldset.details {
+  margin: 3px 0 0 15px;
+  padding: 1px 0 1px 10px;
+}
+
+
+#informationGrid fieldset.head {
+  border: 2px solid #ddd;
+  background-color: #fafafa;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;  
+  margin: 5px 2px;
+  display:inline;
+  padding: 0;
+  line-height: 0;
+  clear: left;
+}
+
+#informationGrid fieldset.head input {
+  border: none;
+  color:#636466;
+  font-size:100%;
+  vertical-align:middle;  
+}
+
+input, textarea {
+  border: 1px solid #ddd;
+  background-color: #fafafa;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+#informationGrid dl, #informationGrid ul {
+  line-height: 1.3em;
+  list-style: none;
+}
+
+#informationGrid .details label {
+  color: #888;
+  display: inline;
+  font-weight: bold;
+  font-size: 100%;
+  margin-right: 2em;
+}
+
+#informationGrid .coordinate table {
+  float: left;
+  clear: left;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+#informationGrid .coordinate table {
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  border: none;
+}
+
+#informationGrid fieldset.error {
+  border-color: #c62a2a;
+}
+
+#informationGrid div.error {
+  border-color: #c62a2a;
+}
+
+#informationGrid .error legend {
+  color: #c62a2a; 
+}
+
+/*
+.grid-contact_displayname {
+  width: 20em;
+  max-width: 20em;
+  overflow: hidden;
+}
+
+.grid-contact_lastname {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-contact_firstname {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-contact_aka {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-contact_archive {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-function_label {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-contact_title {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-kind_minilabel {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-kind_header {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-kind_lang {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-company_name {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-company_aka {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-contact_address {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-address_street {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-contact_service {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-address_zipcode {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-address_town {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-address_expresspostal {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-country_name {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-WorkPhone.phone_number {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-HomePhone.phone_number {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-MobilePhone.phone_number {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-FaxPhone.phone_number {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-email_address {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-contact_date {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-contact_mailing_ok {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}
+
+.grid-contact_newsletter {
+  width: 10em;
+  max-width: 10em;
+  overflow: hidden;
+}*/

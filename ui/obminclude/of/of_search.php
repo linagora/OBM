@@ -20,29 +20,47 @@
 <?php
 class  OBM_Search {
 
+  /**
+   * The search pattern must be of the form  [word:]word|"string"|(string) *
+   * if the field prefix is not present the pattern will be searched on all fields.
+   * exemple of valid pattern :
+   * field:value value2 field:(value3 value4) field:"value 5" (value5 value6) "value 7"
+   * 
+   *
+   * @param mixed $searchable 
+   * @param mixed $pattern 
+   * @static
+   * @access public
+   * @return void
+   */
   public static function buildSearchQuery($searchable, $pattern) {
     $fields = call_user_func(array($searchable,'fieldsMap'));
     $search = self::parse($pattern);
     $query = '1 = 1';
     foreach($search as $fieldname => $values)  {
       $conditions = array();
-      if($fieldname == '*') {
-        foreach($fields as $map => $sql) {
-          $subconditions = array();
-          foreach($values as $value) {
-            $subconditions[] = "$sql #LIKE '$value%'";
+      foreach($values as $value) {
+        $subconditions = array();
+        if(is_array($fields[$fieldname])) {
+          foreach($fields[$fieldname] as $sql => $type) {
+            $subconditions[] = self::buildSql($sql, $type, $value);
           }
-          $conditions[]  =  '('.implode(' AND ', $subconditions).')';
-        } 
-        $query .= ' AND ('.implode(' OR ', $conditions).')';
-      } elseif($fields[$fieldname]) {
-        foreach($values as $value) {
-          $conditions[] .= $fields[$fieldname]." #LIKE '$value%'";
+          $conditions[]  =  '('.implode(' OR ', $subconditions).')';
         }
-        $query .= ' AND '.implode(' AND ', $conditions);
       }
+      $query .= ' AND '.implode(' AND ', $conditions);
     }
     return "($query)";
+  }
+
+  public static function buildSql($sql, $type, $value) {
+    switch($type) {
+    case 'integer' :
+      if(is_numeric($value) || strpos($value, ',') !== false) return "$sql IN ($value)";
+      break;
+    case 'text' :
+      return "$sql #LIKE '$value'";
+    }
   }
 
   public static function parse($pattern) {
@@ -78,6 +96,26 @@ class  OBM_Search {
   }
 }
 
+/**
+ * OBM_ISearchable 
+ * 
+ * @package 
+ * @version $id:$
+ * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
+ * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @license GPL 2.0
+ */
 interface OBM_ISearchable {
+  /**
+   * must return an hashmap with :
+   * key = key in the search form
+   * value = sql field name
+   * exemple :
+   * return array('lastname' => 'contact_lastname') 
+   * 
+   * @static
+   * @access public
+   * @return array() 
+   */
   public static function fieldsMap();
 }

@@ -11,23 +11,23 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames['contact_displayname'] = $l_displayname;
-$fieldnames['contact_lastname'] = $l_lastname;
-$fieldnames['contact_firstname'] = $l_firstname;
-$fieldnames['contact_aka'] = $l_aka;
+//$fieldnames['contact_displayname'] = $l_displayname;
+//$fieldnames['contact_lastname'] = $l_lastname;
+//$fieldnames['contact_firstname'] = $l_firstname;
+//$fieldnames['contact_aka'] = $l_aka;
 $fieldnames['addressbook_name'] = $l_addressbook;
 $fieldnames['function_label'] = $l_function;
 $fieldnames['contact_title'] = $l_title;
-$fieldnames['kind_minilabel'] = $l_kind;
-$fieldnames['kind_header'] = $l_header;
-$fieldnames['kind_lang'] = $l_lang;
-$fieldnames['address_street'] = $l_address;
-$fieldnames['contact_address'] = $l_address;
-$fieldnames['contact_service'] = $l_service;
-$fieldnames['address_zipcode'] = $l_postcode;
-$fieldnames['address_town'] = $l_town;
-$fieldnames['address_expresspostal'] = $l_expresspostal;
-$fieldnames['country_name'] = $l_country;
+//$fieldnames['kind_minilabel'] = $l_kind;
+//$fieldnames['kind_header'] = $l_header;
+//$fieldnames['kind_lang'] = $l_lang;
+//$fieldnames['address_street'] = $l_address;
+//$fieldnames['contact_address'] = $l_address;
+//$fieldnames['contact_service'] = $l_service;
+//$fieldnames['address_zipcode'] = $l_postcode;
+//$fieldnames['address_town'] = $l_town;
+//$fieldnames['address_expresspostal'] = $l_expresspostal;
+//$fieldnames['country_name'] = $l_country;
 $fieldnames['FaxPhone.phone_number'] = $l_phone_labels['WORK_FAX'];
 $fieldnames['HomePhone.phone_number'] = $l_phone_labels['HOME_VOICE'];
 $fieldnames['WorkPhone.phone_number'] = $l_phone_labels['WORK_VOICE'];
@@ -39,7 +39,7 @@ $fieldnames['contact_mailing_ok'] = $l_mailing_ok_first;
 $fieldnames['contact_newsletter'] = $l_news;
 // Calculated fields
 $fieldnames['company_name'] = $l_company;
-$fieldnames['company_aka'] = "$l_company $l_aka";
+//$fieldnames['company_aka'] = "$l_company $l_aka";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -198,18 +198,599 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 function dis_contact_search_form($contact='') {
   global $cgp_hide;
 
+  $GLOBALS['js']['vars']['labels']['label'] = $GLOBALS['l_label'];
+  $GLOBALS['js']['vars']['labels']['remove'] = $GLOBALS['l_remove'];
+  $GLOBALS['js']['vars']['labels']['phoneLabel'] = $GLOBALS['l_phone_labels'];
+  $GLOBALS['js']['vars']['labels']['emailLabel'] = $GLOBALS['l_email_labels'];
+  $GLOBALS['js']['vars']['labels']['addressLabel'] = $GLOBALS['l_address_labels'];
+  $GLOBALS['js']['vars']['labels']['websiteLabel'] = $GLOBALS['l_website_labels'];
+  $GLOBALS['js']['vars']['labels']['imLabel'] = $GLOBALS['l_im_labels'];
+  $GLOBALS['js']['vars']['labels']['phoneNumber'] = $GLOBALS['l_number'];
+  $GLOBALS['js']['vars']['labels']['emailAddress'] = $GLOBALS['l_email'];
+  $GLOBALS['js']['vars']['labels']['websiteUrl'] = $GLOBALS['l_website'];
+  $GLOBALS['js']['vars']['labels']['imAddress'] = $GLOBALS['l_im'];
+  $GLOBALS['js']['vars']['labels']['addressStreet'] = $GLOBALS['l_street'];
+  $GLOBALS['js']['vars']['labels']['addressTown'] = $GLOBALS['l_town'];
+  $GLOBALS['js']['vars']['labels']['addressZipcode'] = $GLOBALS['l_postcode'];
+  $GLOBALS['js']['vars']['labels']['addressExpressPostal'] = $GLOBALS['l_expresspostal']; 
+  $GLOBALS['js']['vars']['labels']['addressCountry'] = $GLOBALS['l_country'];
+
+  $ctry_q = run_query_global_country_for_lang();
+  $GLOBALS['js']['vars']['labels']['countries']['none'] = '---';
+  while($ctry_q->next_record()) {
+    $GLOBALS['js']['vars']['labels']['countries'][$ctry_q->f('country_iso3166')] = $ctry_q->f('country_name');
+  }   
+
+
   if ($cgp_hide['contact']['responsible']) {
     $usr_q = '';
   } else {
     $usr_q = run_query_userobm_responsable('Contact',array('contact_marketingmanager_id'));
   }
   $funcs = of_category_get_ordered('contact', 'function');
-  $ctry_q = run_query_global_country_for_lang();
   $dsrc_q = run_query_global_datasource();
-  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q);
+//  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q);
+  $block = html_contact();
+  return $block;
+}
+
+/**
+ * html_contact 
+ * 
+ * @access public
+ * @return void
+ */
+function html_contact() {
+  include('addressbook.php');
+  $addressBooks = OBM_AddressBook::search();
+  $contactHeaders = html_contact_get_headers();
+  $addressBook = $addressBooks->getMyContacts();
+  $contacts = $addressBook->getContacts();
+  $contactsList = html_contact_get_list($contacts, $contactHeaders);
+  foreach($addressBooks as $id => $ad) {
+    if($id == $addressBook->id) {
+      $adList .= '<tr><td onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'" class="current">'.$ad->name.'</td></tr>';
+    } else {
+      $adList .= '<tr><td onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'">'.$ad->name.'</td></tr>';
+    }
+  }
+  $adList .= "<tr class='filler'><th>&nbsp;</th></tr>";
+  $block = "
+  <form name='search' onsubmit='obm.contact.addressbook.searchContact(this); return false;' id='searchForm'>
+    <input type='hidden' name='action' value='search'  />
+    <input size='40' type='text' value='' name='searchpattern' id='searchpattern' /> $GLOBALS[l_advanced_search]
+  </form>
+  <table id='contactPanel'>
+    <tr>
+      <td id='addressBookGrid'>
+        <div  id='addressBookContainer' class='contactPanelContainer'>
+        <table>  
+          <thead>
+          <tr><th>Carnets d'addresses</th></tr>
+          <tr><td class='search'><input size='15' type='text' value='' name='addressbookfilter' id='addressbookfilter' /> </td></tr>
+          </thead>           
+          <tbody>
+          $adList
+          </tbody>
+        </table>
+        </div>
+        <input type='button' value='+' id='addAddressBook' onclick='obm.contact.addressbook.addAddressBook();'/>
+      </td>
+      <td id='dataGrid'>
+        <div id='dataContainer' class='contactPanelContainer'>
+        $contactsList
+        </div>
+        <input type='button' value='+' id='addContact' onclick='obm.contact.addressbook.addContact();'/>
+      </td>
+      <td id='informationGrid'>
+        <div class='contactPanelContainer' id='informationContainer'>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <script type='text/javascript'>
+    $('informationGrid').setStyle('display','none');
+    obm.initialize.chain(function () {
+      obm.contact.addressbook = new Obm.Contact.AddressBook();
+    })
+  </script>
+  ";
 
   return $block;
 }
+
+/**
+ * html_contact_get_headers 
+ * 
+ * @access public
+ * @return void
+ */
+function html_contact_get_headers() {
+  $prefs = get_display_pref($obm['uid'], 'contact');
+  $headers = array();
+  $headers['displayname'] = array(
+    'html'=> '<th id="grid-displayname">'.$GLOBALS['l_displayname'].'</th>',
+    'template' => '<th>%s</th>'
+  );
+  unset($prefs['contact_displayname']);
+  foreach($prefs as $fieldname => $metada) {
+    if(isset($GLOBALS['fieldnames'][$fieldname])) {
+      $headers[$fieldname]['html'] = '<td id="grid-'.$fieldname.'" class="grid-'.$fieldname.'">'.$GLOBALS['fieldnames'][$fieldname].'</td>';
+      $headers[$fieldname]['template'] = '<td class="grid-'.$fieldname.'">%s</td>';
+    }
+  } 
+  return $headers;
+}
+
+/**
+ * html_contact_get_list 
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function html_contact_get_list($contacts, $headers) {
+  foreach($contacts as $id => $contact) {
+    if($class == 'even') {
+      $class = 'odd';
+    } else {
+      $class = 'even';
+    } 
+    $contactRow = '';
+    foreach($headers as $field => $metada) {
+      $fieldname = str_replace('contact_','', $field);
+      $contactRow .= sprintf($metada['template'], $contact->$fieldname);
+      $contactHeader .= $headers['html'];
+    }
+    $contactList .= "<tr onclick='obm.contact.addressbook.selectContact(this)' id='contact-$id'class='$class'>$contactRow</tr>\n";
+  }
+  foreach($headers as $fieldname => $header) {
+    $contactHeader .= $header['html'];
+  }
+
+  
+  $block = "
+    <table>
+    <thead>
+      <tr>$contactHeader</tr>
+      <tr><th class='search' colspan='".count($headers)."'>
+      <form name='contactfilter' onsubmit='obm.contact.addressbook.filterContact(this); return false;' id='contactFilterForm' >    
+        <input type='hidden' name='action' value='filterContact'  />
+        <input size='15' type='text' value='' name='contactfilter' id='contactfilter' />
+      </form>
+      </th></tr>
+    </thead>
+    <tbody>
+      $contactList
+      <tr class='filler'><th>&nbsp;</th></tr>
+    </tbody>
+    </table>";
+  return $block;
+  
+}
+
+/**
+ * dis_contact_consult2 
+ * 
+ * @param mixed $contact 
+ * @access public
+ * @return void
+ */
+function dis_contact_consult2($contact) {
+
+  $contact = OBM_Contact::get($contact['id']);
+  //if(OBM_Acl::canWrite($obm['uid'], 'contact', $contact['id'])) {
+    $toolbar = "
+      <ul class='toolbar'>
+        <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' ><img src='$GLOBALS[ico_update]' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
+        <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' ><img src='$GLOBALS[ico_delete]' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
+      </ul>
+      ";
+  //}
+
+  if($contact->lastname) {
+    $nameLayout =  strtoupper($contact->lastname).' ';
+  }
+  if($contact->mname) {
+    $nameLayout .= ucwords($contact->mname).' ';
+  }
+  if($contact->firstname) {
+    $nameLayout .= ucwords($contact->firstname).' ';
+  }
+  if($contact->suffix) {
+    $nameLayout .= '('.ucwords($contact->suffix).') ';
+  }
+  if(isset($nameLayout)) {
+    $nameLayout = '<h1>'.$nameLayout.'</h1>';
+  } else {
+    $nameLayout = '<h1>'.$GLOBALS['l_noname'].'</h1>';
+  }
+  if($contact->aka) {
+    $nicknameLayout = '<br /><h3>'.$GLOBALS['l_aka'].' : </h3><span>'.$contact->aka.'</span>';
+  }
+  if($contact->company) {
+    $company = $contact->company;
+    if($contact->company_id > 0) {
+      $company = "<a href='$GLOBALS[path]/company/company_index.php?action=detailconsult&amp;company_id=".$contact->company_id."'>$company</a>";
+    }
+    $companyLayout = '<br /><h3>'.$GLOBALS['l_company'].' : </h3><span>'.$company.'</span>';
+  }
+  if($contact->title) {
+    $titleLayout = '<h3>'.$GLOBALS['l_title'].' : </h3><span>'.$contact->title.'</span>';
+  }
+  
+  $class = 'H';
+  foreach($contact->phone as $phone) {
+    $class = '';
+    $phoneLayout .= '<dt>'.$contact->labelToString($phone['label'], 'phone').' : </dt><dd>'.$phone['number'].'</dd>';
+  }
+  $phoneLayout ='<dl id="phoneLayout" class="details '.$class.'">'.$phoneLayout.'</dl>';
+  
+  $class = 'H';
+  foreach($contact->email as $email) {
+    $class = '';
+    $emailLayout .= '<dt>'.$contact->labelToString($email['label'], 'email').' : </dt><dd><a href="mailto:'.$email['address'].'">'.$email['address'].'</a></dd>';
+  }   
+  $emailLayout ='<dl id="emailLayout" class="details '.$class.'">'.$emailLayout.'</dl>';
+  
+  $class = 'H';
+  foreach($contact->address as $address) {
+    $class = '';
+    $label = $address['label'];
+    unset($address['label']);
+    $addressLayout .= '<dt>'.$contact->labelToString($label, 'address').' : </dt><dd>'.implode('<br />',array_filter($address)).'</dd>';
+  }  
+  $addressLayout ='<dl id="addressLayout" class="details '.$class.'">'.$addressLayout.'</dl>';
+
+  $class = 'H';
+  foreach($contact->im as $im) {
+    $class = '';
+    $imLayout .= '<dt>'.$contact->labelToString($im['protocol'], 'im').' : </dt><dd>'.$im['address'].'</dd>';
+  }  
+  $imLayout ='<dl id="imLayout" class="details '.$class.'">'.$imLayout.'</dl>';
+
+  $class = 'H';
+  foreach($contact->website as $website) {
+    $class = '';
+    $websiteLayout .= '<dt>'.$contact->labelToString($website['label'], 'website').' : </dt><dd><a  target="_blank" href="'.$website['url'].'">'.$website['url'].'</a></dd>';
+  }  
+  $websiteLayout ='<dl id="websiteLayout" class="details '.$class.'">'.$websiteLayout.'</dl>';
+
+  $class = 'H';
+  if($contact->birthday) {
+    $class = '';
+    $anniversaryLayout = '<dt>'.$GLOBALS['l_birthday'].' : </dt><dd>'.$contact->birthday->getOutputDate().'</dd>';
+  }
+  if($contact->anniversary) {
+    $class = '';
+    $anniversaryLayout .= '<dt>'.$GLOBALS['l_anniversary'].' : </dt><dd>'.$contact->anniversary->getOutputDate().'</dd>';
+  }
+  if($contact->date) {
+    $class = '';
+    $anniversaryLayout .= '<dt>'.$GLOBALS['l_date'].' : </dt><dd>'.$contact->date->getOutputDate().'</dd>';
+  }  
+  $anniversaryLayout ='<dl id="anniversaryLayout" class="details '.$class.'">'.$anniversaryLayout.'</dl>';
+  
+  $class = 'H';
+  if($contact->manager) {
+    $class = '';
+    $otherLayout .= '<dt>'.$GLOBALS['l_manager'].' : </dt><dd> '.$contact->manager.'</dd>';
+  }
+  if($contact->assistant) {
+    $class = '';
+    $otherLayout .= '<dt>'.$GLOBALS['l_assistant'].' : </dt><dd> '.$contact->assistant.'</dd>';
+  }
+  if($contact->spouse) {
+    $class = '';
+    $otherLayout .= '<dt>'.$GLOBALS['l_spouse'].' : </dt><dd> '.$contact->spouse.'</dd>';
+  }
+  if($contact->category) {
+    $class = '';
+    $otherLayout .= '<dt>'.$GLOBALS['l_category'].' : </dt><dd> '.$contact->category.'</dd>';
+  }
+  if($contact->service) {
+    $class = '';
+    $otherLayout .= '<dt>'.$GLOBALS['l_service'].' : </dt><dd> '.$contact->service.'</dd>';
+  }
+  if($contact->mailok) {
+    $class = '';
+    $otherLayout .= '<dt>'.$GLOBALS['l_mailing_ok'].' : </dt><dd> '.(($contact->mailok)?$GLOBALS['l_yes']:$GLOBALS['l_no']).'</dd>';
+  }
+  if($contact->newsletter) {
+    $class = '';
+    $otherLayout .= '<dt>'.$GLOBALS['l_newsletter'].' : </dt><dd> '.(($contact->newsletter)?$GLOBALS['l_yes']:$GLOBALS['l_no']).'</dd>';
+  }
+  $otherLayout ='<dl id="otherLayout" class="details '.$class.'">'.$otherLayout.'</dl>';
+
+  $class = 'H';
+  if($contact->comment) {
+    $class = '';
+  }
+  $commentLayout ='<dl id="commentLayout" class="details '.$class.'">'.$contact->comment2.'</dl>';
+
+  $class = 'H';
+  if($contact->comment2) {
+    $class = '';
+  }
+  $comment2Layout ='<dl id="comment2Layout" class="details '.$class.'">'.$contact->comment2.'</dl>';
+
+  $class = 'H';
+  if($contact->comment3) {
+    $class = '';
+  }
+  $comment3Layout ='<dl id="comment3Layout" class="details '.$class.'">'.$contact->comment2.'</dl>';
+
+  //  datasource
+  //  archive
+  //  photo
+  //  public 'kind' => null
+  //  public 'function' => null
+  //  userupdate
+  //  usercreate
+  //  of_category...
+
+
+  $block = "
+    <table>
+    <thead>
+    <tr><th>Contact</th></tr>
+    <tr><td class='search'>$toolbar</td></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+    <img id='photo' src='$GLOBALS[ico_nophoto]' />
+    <div class='head'>
+    $nameLayout
+    $nicknameLayout
+    $titleLayout
+    $companyLayout
+    </div>
+    <p class='LC' />
+    $phoneLayout
+    $emailLayout
+    $addressLayout
+    $websiteLayout
+    $imLayout
+    $anniversaryLayout
+    $otherLayout
+    $commentLayout
+    $comment2Layout
+    $comment3Layout
+    </td>
+    </tr>
+    </tbody>
+    </table>
+  ";
+  return $block;
+}
+
+/**
+ * dis_contact_consult2 
+ * 
+ * @param mixed $contact 
+ * @access public
+ * @return void
+ */
+function dis_contact_form2($contact) {
+
+  $add = array();
+  if($contact['id'])
+    $contact = OBM_Contact::get($contact['id']);
+  else
+    $contact = OBM_Contact::get();
+  $fields = array(
+    'lastname' => array('class' => 'head', 'size' => 10, 'mandatory' => true),
+    'mname' => array('class' => 'head', 'size' => 8),
+    'firstname' => array('class' => 'head', 'size' => 10, 'mandatory' => true),
+    'suffix' => array('class' => 'head', 'size' => 4),
+    'aka' => array('class' => 'head', 'prepend' => '<br />'),
+    'company' => array('class' => 'head', 'prepend' => '<br />', 'mandatory' => true),
+    'title' => array('class' => 'head'),
+    'phone' => array('type' => 'phone', 'class' => 'details coordinate', 'prepend' => '<p class="LC" />', 'mandatory' => true), 
+    'email' => array('type' => 'email', 'class' => 'details coordinate', 'mandatory' => true), 
+    'address' => array('type' => 'address', 'class' => 'details coordinate', 'mandatory' => true), 
+    'im' => array('type' => 'im', 'class' => 'details coordinate'), 
+    'website' => array('type' => 'website', 'class' => 'details coordinate'), 
+    'birthday' => array('type' => 'date'), 
+    'anniversary' => array('type' => 'date'),
+    'date' => array('type' => 'date'),
+    'manager' => array(), 
+    'assistant' => array(),
+    'spouse' => array(), 
+    'category' => array(),
+    'service' => array(), 
+    'mailok' => array('type' => 'checkbox'),
+    'newsletter' => array('type' => 'checkbox'), 
+    'comment' => array('type' => 'textarea', 'mandatory' => true),
+    'comment2' => array('type' => 'textarea'),
+    'comment3' => array('type' => 'textarea')
+  );
+  foreach($fields as $fieldname => $metadata) {
+    $addable = false;
+    $addJs = array();
+    if(isset($metadata['class'])) $class = $metadata['class']; else $class = 'details';
+    switch($metadata['type']) {
+    case 'date' :
+      $addJs[$fieldname] = "$('$fieldname').setStyle('display','');";
+      $value = ($contact->$fieldname)?$contact->$fieldname->getInputDate() : '';
+      $field = '
+        <span class="NW"><input autocomplete="off" size="'.$metadata['size'].'" type="text" title="'.$GLOBALS['l_'.$fieldname].'" name="'.$fieldname.'" value="'.$value.'" />
+        <img src="'.$GLOBALS['ico_datepicker'].'" onclick="displayDatePicker($(\''.$fieldname.'\').getElement(\'input\'))" /></span>';
+      break;
+    case 'checkbox' :
+      $addJs[$fieldname] = "$('$fieldname').setStyle('display','');";
+      $checked = ($contact->$fieldname == 1)? 'checked="checked"' : '';
+      $field = '<input type="checkbox" '.$checked.' title="'.$GLOBALS['l_'.$fieldname].'" name="'.$fieldname.'" value="1" />';
+      break;
+    case 'textarea':
+      $addJs[$fieldname] = "$('$fieldname').setStyle('display','');";
+      $value = ($contact->$fieldname)?$contact->$fieldname : '';
+      $field = '<textarea size="'.$metadata['size'].'" title="'.$GLOBALS['l_'.$fieldname].'" name="'.$fieldname.'">'.$value.'</textarea>';
+      break;      
+    case 'phone':
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><a href="" /><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+      foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
+        $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
+        $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
+      }
+      $field .= '</li></ul>';      
+      if(!empty($contact->$fieldname)) {
+        foreach($contact->$fieldname as $coords) {
+          $value = "{label: {value: '".phpStringToJsString($contact->labelToString($coords['label'], $fiedname, false))."', label:'".phpStringToJsString($contact->labelToString($coords['label'], $fieldname))."'}, number: {value: '".phpStringToJsString($coords['number'])."'}}";
+          $field .=  "<script language='text/javascript'>new Obm.Contact.".ucfirst($fieldname)."Widget($value,{container:'${fieldname}Menu', inject: 'before'});</script>";
+
+        }
+      } else {
+        $field .=  "<script language='text/javascript'>new Obm.Contact.".ucfirst($fieldname)."Widget({},{container:'${fieldname}Menu', inject: 'before'});</script>";
+      }
+      $addable = true;
+      break;
+    case 'website':
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
+      foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
+        $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
+        $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
+      }
+      $field .= '</li></ul>';      
+      if(!empty($contact->$fieldname)) {
+        foreach($contact->$fieldname as $coords) {
+          $value = "{label: {value: '".phpStringToJsString($contact->labelToString($coords['label'], $fiedname, false))."', label:'".phpStringToJsString($contact->labelToString($coords['label'], $fieldname))."'}, url: {value: '".phpStringToJsString($coords['url'])."'}}";
+          $field .=  "<script language='text/javascript'>new Obm.Contact.".ucfirst($fieldname)."Widget($value,{container:'${fieldname}Menu', inject: 'before'});</script>";
+        }
+      } else {
+        $field .=  "<script language='text/javascript'>new Obm.Contact.".ucfirst($fieldname)."Widget({},{container:'${fieldname}Menu', inject: 'before'});</script>";
+      }      
+      $addable = true;
+      break;
+    case 'email':
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
+      foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
+        $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
+        $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
+      }
+      $field .= '</li></ul>';      
+      if(!empty($contact->$fieldname)) {
+        foreach($contact->$fieldname as $coords) {
+          $value = "{label: {value: '".phpStringToJsString($contact->labelToString($coords['label'], $fiedname, false))."', label:'".phpStringToJsString($contact->labelToString($coords['label'], $fieldname))."'}, address: {value: '".phpStringToJsString($coords['address'])."'}}";
+          $field .=  "<script language='text/javascript'>new Obm.Contact.".ucfirst($fieldname)."Widget($value,{container:'${fieldname}Menu', inject: 'before'});</script>";
+        }
+      } else {
+        $field .=  "<script language='text/javascript'>new Obm.Contact.".ucfirst($fieldname)."Widget({},{container:'${fieldname}Menu', inject: 'before'});</script>";
+      }      
+      $addable = true;
+      break; 
+    case 'im':
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
+      foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
+        $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".strtoupper($fieldname)."Widget({protocol: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
+        $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
+      }
+      $field .= '</li></ul>';      
+      if(!empty($contact->$fieldname)) {
+        foreach($contact->$fieldname as $coords) {
+          $value = "{protocol: {value: '".phpStringToJsString($coords['protocol'])."', label:'".phpStringToJsString($contact->labelToString($coords['protocol'], $fieldname))."'}, address: {value: '".phpStringToJsString($coords['address'])."'}}";
+          $field .=  "<script language='text/javascript'>new Obm.Contact.".strtoupper($fieldname)."Widget($value,{container:'${fieldname}Menu', inject: 'before'});</script>";
+        }
+      } else {
+        $field .=  "<script language='text/javascript'>new Obm.Contact.".strtoupper($fieldname)."Widget({},{container:'${fieldname}Menu', inject: 'before'});</script>";
+      }      
+      $addable = true;
+      break;   
+    case 'address':
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
+      foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
+        $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
+        $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
+      }
+      $field .= '</li></ul>';      
+      if(!empty($contact->$fieldname)) {
+        foreach($contact->$fieldname as $coords) {
+          $value = "street: {value: '".phpStringToJsString($coords['street'])."'}, zipcode: {value: '".phpStringToJsString($coords['zipcode'])."'}, town: {value: '".phpStringToJsString($coords['town'])."'}, expresspostal: {value: '".phpStringToJsString($coords['expresspostal'])."', country: {value: '".phpStringToJsString($coords['country'])."'}";
+          $value = "{label: {value: '".phpStringToJsString($contact->labelToString($coords['label'], $fiedname, false))."', label:'".phpStringToJsString($contact->labelToString($coords['label'], $fieldname))."'}, $value}}";
+          $field .=  "<script language='text/javascript'>new Obm.Contact.".ucfirst($fieldname)."Widget($value,{container:'${fieldname}Menu', inject: 'before'});</script>";
+        }
+      } else {
+        $field .=  "<script language='text/javascript'>new Obm.Contact.".ucfirst($fieldname)."Widget({},{container:'${fieldname}Menu', inject: 'before'});</script>";
+      }      
+      $addable = true;
+      break;         
+    case 'text' :
+    default:
+      $addJs[$fieldname] = "$('$fieldname').setStyle('display','');";
+      $value = ($contact->$fieldname)? $contact->$fieldname : '';
+      $field = '<input size="'.$metadata['size'].' "type="text" title="'.$GLOBALS['l_'.$fieldname].'" name="'.$fieldname.'" value="'.$value.'" />';
+      break;      
+    }
+    if(!empty($contact->$fieldname)) {
+      $layout .= $metadata['prepend'].'<fieldset id="'.$fieldname.'" class="'.$class.'"><legend>'.$GLOBALS['l_'.$fieldname].'</legend>'.$field.'</fieldset>';
+    } elseif($metadata['mandatory']) {
+      $layout .= $metadata['prepend'].'<fieldset id="'.$fieldname.'" class="'.$class.'"><legend>'.$GLOBALS['l_'.$fieldname].'</legend>'.$field.'</fieldset>';
+    } else {
+      $addable = true;
+      $layout .= $metadata['prepend'].'<fieldset id="'.$fieldname.'" class="'.$class.'" style="display:none;"><legend>'.$GLOBALS['l_'.$fieldname].'</legend>'.$field.'</fieldset>';
+    }
+    if($addable )$add = array_merge($add, $addJs); 
+  }
+
+  //FIXME
+  //if(OBM_Acl::canWrite($obm['uid'], 'contact', $contact['id'])) {
+
+  //}
+
+
+  foreach($add as $label => $options) {
+    if(is_array($options)) {
+      $addBar .= '<li><a href="" >'.$label.'</a><ul>';
+      foreach($options as $sublabel => $suboptions) {
+        $addBar .= '<li><a href="" onclick="'.$suboptions.'; this.dispose(); return false;">'.$sublabel.'</a></li>';
+      }
+      $addBar .='</ul></li>';
+    } else {
+      $addBar .= '<li><a href="" onclick="'.$options.'; this.dispose(); return false;">'.$label.'</a></li>';
+    } 
+  }
+    $toolbar = "
+      <ul id='addFieldMenu' class='toolbar'>
+        <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' ><img src='$GLOBALS[ico_update]' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
+        <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' ><img src='$GLOBALS[ico_delete]' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
+        <li><a href=''><img src='$GLOBALS[ico_add]' title='$GLOBALS[l_add_fields]' alt='$GLOBALS[l_add_fields]' /></a><ul>$addBar</ul></li>
+      </ul>
+      <script type='text/javascript'>
+        new Obm.DropDownMenu($('addFieldMenu'));
+        new Obm.DropDownMenu($('addressMenu'));
+        new Obm.DropDownMenu($('phoneMenu'));
+        new Obm.DropDownMenu($('emailMenu'));
+        new Obm.DropDownMenu($('imMenu'));
+        new Obm.DropDownMenu($('websiteMenu'));
+      </script>
+      ";  
+    $block = "
+    <table>
+    <thead>
+    <tr><th>Contact</th></tr>
+    <tr><td  class='search'>$toolbar</td></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+    <form id='contactForm' name='contactForm' action='#' method='post' onsubmit=\"obm.contact.addressbook.storeContact($(this), '$contact->id'); return false;\">
+      <img id='photo' src='$GLOBALS[ico_nophoto]' />
+      $layout
+      <p class='LC C'>
+      <br />
+      <input type='hidden' name='action' value='storeContact'  />
+      <input type='hidden' name='id' value='$contact->id'  />
+      <input style='margin:auto;' type='submit' value='$GLOBALS[l_save]' />
+      <input style='margin:auto;' type='button' value='$GLOBALS[l_cancel]' onclick=\"obm.contact.addressbook.consultContact('$contact->id');\" />
+      </p>
+    </form> 
+    </td>
+    </tr>
+    </tbody>
+    </table>         
+  ";
+  return $block;      
+}
+
 
 
 /**
@@ -230,8 +811,8 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $l_visibility;
 
   $addressbook_id = $contact['addressbook_id'];
-  $lname = stripslashes($contact['lname']);
-  $fname = stripslashes($contact['fname']);
+  $lastname = stripslashes($contact['lastname']);
+  $firstname = stripslashes($contact['firstname']);
   $phone = stripslashes($contact['phone']);
   $company = stripslashes($contact['company']);
   $email = stripslashes($contact['email']);
@@ -368,10 +949,10 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   <form class=\"search\" method=\"get\" name=\"f_search\" 
   action=\"contact_index.php\">
     <label>$l_contact_name<br />
-      <input type=\"text\" name=\"tf_lname\" size=\"12\" value=\"$lname\" />
+      <input type=\"text\" name=\"tf_lastname\" size=\"12\" value=\"$lastname\" />
     </label>
     <label>$l_firstname<br />
-      <input type=\"text\" name=\"tf_fname\" size=\"12\" value=\"$fname\" />
+      <input type=\"text\" name=\"tf_firstname\" size=\"12\" value=\"$firstname\" />
     </label>
     <label>$l_from_company<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
@@ -494,8 +1075,8 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $archive = $contact['archive'];
   $advanced = $contact['fuzzy'];
   $mailing_ok_only = $contact['mailing_ok_only'];
-  $lname = urlencode(stripslashes($contact['lname']));
-  $fname = stripslashes($contact['fname']);
+  $lastname = urlencode(stripslashes($contact['lastname']));
+  $firstname = stripslashes($contact['firstname']);
   $phone = urlencode(stripslashes($contact['phone']));
   $email = stripslashes($contact['email']);
   $zip = stripslashes($contact['zip']);
@@ -512,7 +1093,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('contact', $contact);
 
-  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lastname=$lastname&amp;tf_firstname=$firstname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
 
   $dis_contact = new OBM_DISPLAY('DATA', $prefs, 'contact');
   if ($popup) {
@@ -622,9 +1203,9 @@ function html_contact_header($co_q, $funcs) {
   }
   $function = $co_q->f('function_label');
   $title = $co_q->f('contact_title');
-  $market = $co_q->f('market_lname') . ' ' . $co_q->f('market_fname');
-  $lname = $co_q->f('contact_lastname');
-  $fname = $co_q->f('contact_firstname');
+  $market = $co_q->f('market_lastname') . ' ' . $co_q->f('market_firstname');
+  $lastname = $co_q->f('contact_lastname');
+  $firstname = $co_q->f('contact_firstname');
   $mname = $co_q->f('contact_middlename');
   $suffix = $co_q->f('contact_suffix');
   $aka = $co_q->f('contact_aka');
@@ -679,7 +1260,7 @@ function html_contact_header($co_q, $funcs) {
   $show_mailing = (! $cgp_hide['contact']['contact_mailing']);
   $show_service = (! $cgp_hide['contact']['contact_service']);
 
-  $display['title'] = "$lname $fname";
+  $display['title'] = "$lastname $firstname";
 
   // Function
   $block_function = of_category_dis_block_consult('contact', 'function', $funcs, 'mono');
@@ -781,11 +1362,11 @@ function html_contact_header($co_q, $funcs) {
     <table>
     <tr>
       <th>$l_lastname</th>
-      <td>$lname</td>
+      <td>$lastname</td>
     </tr>
     <tr>
       <th>$l_firstname</th>
-      <td>$fname</td>
+      <td>$firstname</td>
     </tr>
     <tr>
       <th>$l_middlename</th>
@@ -864,8 +1445,8 @@ function html_contact_view_main($co_q, $coords) {
   $title = $co_q->f('contact_title');
   $c_name = $co_q->f('company_name');
   $kind_minilabel = $co_q->f('kind_minilabel');
-  $lname = $co_q->f('contact_lastname');
-  $fname = $co_q->f('contact_firstname');
+  $lastname = $co_q->f('contact_lastname');
+  $firstname = $co_q->f('contact_firstname');
   $com  = beautify_comment(nl2br($co_q->f('contact_comment')));
   $com2 = beautify_comment(nl2br($co_q->f('contact_comment2')));
   $com3 = beautify_comment(nl2br($co_q->f('contact_comment3')));
@@ -879,7 +1460,7 @@ function html_contact_view_main($co_q, $coords) {
   // User defined data
   $block_userdata .= of_userdata_dis_entity_consult('contact', $id);
 
-  $copy = addslashes("$kind_minilabel $fname $lname") . $newline;
+  $copy = addslashes("$kind_minilabel $firstname $lastname") . $newline;
   if (($title != '')  && (in_array('title', $cclipboard_address))) {
     $copy .= addslashes($title) . $newline;
   }
@@ -1190,8 +1771,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       $anniversary = $anniversary->getInputDate();
     }
 
-    $lname = $co_q->f('contact_lastname');
-    $fname = $co_q->f('contact_firstname');
+    $lastname = $co_q->f('contact_lastname');
+    $firstname = $co_q->f('contact_firstname');
     $mname = $co_q->f('contact_middlename');
     $suffix = $co_q->f('contact_suffix');
     $aka = $co_q->f('contact_aka');
@@ -1214,7 +1795,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $comment3 = $co_q->f('contact_comment3');
     $usercomment3 = $uid;
     $datecomment3 = of_date_upd_format();
-    $dis_title = "$lname $fname";
+    $dis_title = "$lastname $firstname";
     $phones = $coords['phone'];
     $addresses = $coords['address'];
     $emails = $coords['email'];
@@ -1260,8 +1841,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   if (isset($contact['date'])) { $date = of_date_upd_format($contact['date'],true); }
   if (isset($contact['birthday'])) { $birthday = of_date_upd_format($contact['birthday'],true); }
   if (isset($contact['anniversary'])) { $anniversary = of_date_upd_format($contact['anniversary'],true); }
-  if (isset($contact['lname'])) { $lname = stripslashes($contact['lname']); }
-  if (isset($contact['fname'])) { $fname = stripslashes($contact['fname']); }
+  if (isset($contact['lastname'])) { $lastname = stripslashes($contact['lastname']); }
+  if (isset($contact['firstname'])) { $firstname = stripslashes($contact['firstname']); }
   if (isset($contact['mname'])) { $mname = stripslashes($contact['mname']); }
   if (isset($contact['suffix'])) { $suffix = stripslashes($contact['suffix']); }
   if (isset($contact['aka'])) { $aka = stripslashes($contact['aka']); }
@@ -1694,11 +2275,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $block_kind
     <tr>
       <th>$l_lastname</th>
-      <td><input type=\"text\" name=\"tf_lname\" size=\"30\" maxlength=\"64\" value=\"$lname\" /></td>
+      <td><input type=\"text\" name=\"tf_lastname\" size=\"30\" maxlength=\"64\" value=\"$lastname\" /></td>
     </tr>
     <tr>
       <th>$l_firstname</th>
-      <td><input type=\"text\" name=\"tf_fname\" size=\"30\" maxlength=\"64\" value=\"$fname\" /></td>
+      <td><input type=\"text\" name=\"tf_firstname\" size=\"30\" maxlength=\"64\" value=\"$firstname\" /></td>
     </tr>
     <tr>
       <th>$l_middlename</th>
@@ -1819,7 +2400,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
 //   - $cid       : contact id
 //   - $co_q      : contact database result (at least 1 row)
 //   - $contact[] : values for insertion/update (if confirmation)
-//     keys used  : company_id, kind, lname, fname ad1, ad2, ad3, zip, town,cdx
+//     keys used  : company_id, kind, lastname, firstname ad1, ad2, ad3, zip, town,cdx
 //                : ctry, func, phone, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_warn_insert($cid, $co_q, $contact) {
@@ -1827,8 +2408,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $c_yes, $c_no;
 
   $comp_id = ($contact['company_new_id'] ? $contact['company_new_id'] : $contact['company_id']);
-  $lname = stripslashes($contact['lname']);
-  $fname = stripslashes($contact['fname']);
+  $lastname = stripslashes($contact['lastname']);
+  $firstname = stripslashes($contact['firstname']);
   $mname = stripslashes($contact['mname']);
   $suffix = stripslashes($contact['suffix']);
   $kind = $contact['kind'];
@@ -1920,8 +2501,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 
   $hidden = "
     <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
-    <input type=\"hidden\" name=\"tf_lname\" value=\"$lname\" />
-    <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
+    <input type=\"hidden\" name=\"tf_lastname\" value=\"$lastname\" />
+    <input type=\"hidden\" name=\"tf_firstname\" value=\"$firstname\" />
     <input type=\"hidden\" name=\"tf_mname\" value=\"$mname\" />
     <input type=\"hidden\" name=\"tf_suffix\" value=\"$suffix\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
