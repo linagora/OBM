@@ -75,6 +75,9 @@ INSERT INTO UserSystem (usersystem_login,usersystem_password,usersystem_uid,user
 -- utilisateur 'obmsatellite', mot de passe 'mG4_Zdnh' - doit avoir le droit de
 -- lecture sur l'arborescence d'OBM
 INSERT INTO UserSystem (usersystem_login,usersystem_password,usersystem_uid,usersystem_gid,usersystem_homedir,usersystem_lastname,usersystem_firstname,usersystem_shell) VALUES ('obmsatellite','mG4_Zdnh','200','65534','/','OBM Satellite','LDAP Reader','/bin/false');
+-- utilisateur 'obmsatelliterequest', mot de passe 'PgpTWb7x' - utilisé pour
+-- s'authentifier auprès d'obmSatellite
+INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_uid, usersystem_gid,usersystem_homedir, usersystem_lastname, usersystem_firstname, usersystem_shell) VALUES ( 'obmsatelliterequest', 'PgpTWb7x', 201, 65534, '/', 'OBM Satellite', 'HTTP auth request', '/bin/false' );
 
 
 -- ------------------------------------------------------------------------------
