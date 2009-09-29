@@ -1444,7 +1444,8 @@ function get_calendar_action() {
     'Name'     => $l_header_waiting_events,
     'Url'      => "$path/calendar/calendar_index.php?action=waiting_events",
     'Right'    => $cright_write,
-    'Condition'=> array ('all')
+    'Condition'=> array ('all'),
+    'Toolbar'   => '0'
   );
 
   // New meeting

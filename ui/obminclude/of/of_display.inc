@@ -1331,6 +1331,10 @@ function display_actions($section, $module) {
     $module_right = $perm->get_module_rights($module); 
     $block = "<ul id=\"action\">"; 
     foreach ($actions[$module] as $key => $value) {
+      
+      if ($value['Toolbar'] == '0') {
+      	continue;
+      }
 
       // If the current action has this action in target
       if (!in_array("!$action",$value['Condition']) 
