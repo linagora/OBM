@@ -252,7 +252,7 @@ $l_control = "Tableau de bord";
 $l_insufficient_permission = "Permissions insuffisantes";
 $l_scope_update = "Mettre à jour le systeme";
 $l_organizationalchart = "Organigramme";
-$l_mobile_devices = "Périphériques mobile";
+$l_mobile_devices = "Périphériques mobiles";
 
 $l_permission_denied = $l_insufficient_permission;
 // OBM_DISPLAY
@@ -398,8 +398,8 @@ $l_module_mailforward = "Redirection messagerie";
 $l_module_vacation = "Répondeur messagerie";
 $l_module_mailbox = "Boîte aux lettres";
 $l_module_webmail = "Webmail";
-$l_module_device = "Périphériques mobile";
-$l_module_admin_device = "Gestion des périphériques mobile";
+$l_module_device = "Périphériques mobiles";
+$l_module_admin_device = "Gestion des périphériques mobiles";
 
 $l_header_admin = "Administration";
 $l_header_import = "Importer";

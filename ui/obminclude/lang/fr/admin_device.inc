@@ -17,7 +17,7 @@
  +-------------------------------------------------------------------------+
 */
 
-$l_found = "péripĥérique(s) mobile trouvé(s)";
+$l_found = "péripĥérique(s) mobile(s) trouvé(s)";
 $l_no_found = "Aucun périphérique mobile trouvé";
 $l_partnership = "Partenariat";
 ?>
