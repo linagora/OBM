@@ -26,7 +26,7 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 use Getopt::Long;
 my %parameters;
-my $return = GetOptions( \%parameters, 'user=s', 'domain-id=s', 'domain-global', 'domain-name=s', 'delegation=s', 'global', 'incremental', 'help' );
+my $return = GetOptions( \%parameters, 'user=s', 'domain=s', 'domain-id=s', 'domain-global', 'domain-name=s', 'delegation=s', 'global', 'incremental', 'help' );
 
 if( !$return ) {
     undef %parameters;
@@ -117,6 +117,12 @@ sub getParameter {
 
     SWITCH: {
         if( $parameters->{'domain-id'} ) {
+            last SWITCH;
+        }
+
+        # --domain is deprecated from OBM 2.3 and may be remove on OBM 2.4
+        if( $parameters->{'domain'} ) {
+            $parameters->{'domain-id'} = $parameters->{'domain'};
             last SWITCH;
         }
 
