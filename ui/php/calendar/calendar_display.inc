@@ -3592,18 +3592,18 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <!-- Update button -->
       <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
-      <input type=\"submit\" value=\"$l_update\" />";
+      <input type=\"submit\" id=\"updateBtn\" value=\"$l_update\" />";
   } elseif (($action == 'new') || ($action == 'insert') || ($action == 'duplicate') || ($action == 'save_as_template')) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />
-      <input type=\"submit\" onclick=\"displayTemplateCreate();return false;\" value=\"$l_save_as_template\" />";
+      <input type=\"submit\" id=\"insertBtn\" value=\"$l_insert\" />
+      <input type=\"submit\" id=\"saveTemplateBtn\" onclick=\"displayTemplateCreate();return false;\" value=\"$l_save_as_template\" />";
   } elseif (($action == 'edit_template') || ($action == 'update_template')) {
       $template_id = isset($calendar['template_id']) ? $calendar['template_id'] : $event_q->f('eventtemplate_id');
       $dis_button = "
       <input type=\"hidden\" name=\"template_id\" id=\"template_id\" value=\"$template_id\" />
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"update_template\" />
-      <input type=\"submit\" value=\"$l_save_template\" />";
+      <input type=\"submit\" id=\"saveTemplateBtn\" value=\"$l_save_template\" />";
   }
 
   $repeat_end_value = isset($repeat_end) ? $repeat_end->getInputDate() : '';
