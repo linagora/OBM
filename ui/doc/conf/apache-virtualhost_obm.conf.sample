@@ -44,7 +44,6 @@ NameVirtualHost *:443
 #obm#ProxyPassReverse /minig http://_TOMCAT_SERVER_:8080/minig
 
 
-#obm#</Location>
 #obm# alias /webmail/images /usr/lib/minig/images
 
 #If you install minig on an other server,
