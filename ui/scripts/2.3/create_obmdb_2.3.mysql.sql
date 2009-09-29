@@ -523,7 +523,7 @@ CREATE TABLE `Contact` (
   CONSTRAINT `contact_function_id_contactfunction_id_fkey` FOREIGN KEY (`contact_function_id`) REFERENCES `ContactFunction` (`contactfunction_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `contact_company_id_company_id_fkey` FOREIGN KEY (`contact_company_id`) REFERENCES `Company` (`company_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `contact_datasource_id_datasource_id_fkey` FOREIGN KEY (`contact_datasource_id`) REFERENCES `DataSource` (`datasource_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `contact_addressbook_id_addressbook_id_fkey` FOREIGN KEY (`contact_addressbook_id`) REFERENCES `addressbook` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `contact_addressbook_id_addressbook_id_fkey` FOREIGN KEY (`contact_addressbook_id`) REFERENCES `AddressBook` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `contact_domain_id_domain_id_fkey` FOREIGN KEY (`contact_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `contact_kind_id_kind_id_fkey` FOREIGN KEY (`contact_kind_id`) REFERENCES `Kind` (`kind_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `contact_marketingmanager_id_userobm_id_fkey` FOREIGN KEY (`contact_marketingmanager_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
