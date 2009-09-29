@@ -41,8 +41,8 @@ $params = get_global_params('Tools');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 $params = get_tools_params();
 include("$obminclude/global_pref.inc");
-require('tools_display.inc');
-require('tools_query.inc');
+require_once('tools_display.inc');
+require_once('tools_query.inc');
 
 if ($action == 'index') $action = 'update_detail';
 if ($action == 'update_index') $action = 'update_detail';
