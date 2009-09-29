@@ -11,41 +11,41 @@ class OBM_Contact implements OBM_ISearchable {
   protected $id;
   protected $entity_id;
 
-  protected $lastname;
-  protected $firstname;
-  protected $mname;//middlename
-  protected $kind;
-  protected $title;
-  protected $function;
-  protected $company_id;
-  protected $company;
-  protected $market;//marketingmanager_id
-  protected $suffix;
-  protected $aka;
-  protected $sound;
-  protected $manager;
-  protected $assistant;
-  protected $spouse;
-  protected $category;
-  protected $service;
-  protected $mailok;//mailing_ok
-  protected $newsletter;
-  protected $date;
-  protected $birthday;
-  protected $birthday_event;
-  protected $anniversary;
-  protected $anniversary_event;
-  protected $phone = array();
-  protected $email = array();
-  protected $address = array();
-  protected $im = array();
-  protected $website = array();
-  protected $archive;
-  protected $datasource_id;
-  protected $comment;
-  protected $comment2;
-  protected $comment3;
-  protected $origin;
+  public $lastname;
+  public $firstname;
+  public $mname;//middlename
+  public $kind;
+  public $title;
+  public $function;
+  public $company_id;
+  public $company;
+  public $market;//marketingmanager_id
+  public $suffix;
+  public $aka;
+  public $sound;
+  public $manager;
+  public $assistant;
+  public $spouse;
+  public $category;
+  public $service;
+  public $mailok;//mailing_ok
+  public $newsletter;
+  public $date;
+  public $birthday;
+  public $birthday_event;
+  public $anniversary;
+  public $anniversary_event;
+  public $phone = array();
+  public $email = array();
+  public $address = array();
+  public $im = array();
+  public $website = array();
+  public $archive;
+  public $datasource_id;
+  public $comment;
+  public $comment2;
+  public $comment3;
+  public $origin;
  
   private static $kinds = null;
 
