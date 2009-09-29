@@ -27,16 +27,23 @@ function run_query_admin_device_search($device) {
   $user = $device['user'];
   $type = $device['type'];
   $partnership = $device['partnership'];
+  $where = array();
+  if (isset($user) && $user != '') {
+    array_push($where, "(userobm_login #LIKE '%$user%' OR userobm_lastname #LIKE '%$user%' OR userobm_firstname #LIKE '%$user%')");
+  }
 
   if (isset($type) && $type != $GLOBALS['c_none']) {
-    $where .= "AND type='$type'";
+    array_push($where, "type='$type'");
   }
 
   if ($partnership == $GLOBALS['c_yes']) {
-    $where .= "AND opush_sync_perms.device_id IS NOT NULL";
+    array_push($where, "opush_sync_perms.device_id IS NOT NULL");
   } else if ($partnership == $GLOBALS['c_no']) {
-    $where .= "AND opush_sync_perms.device_id IS NULL";
+    array_push($where, "opush_sync_perms.device_id IS NULL");
   }
+
+  if (sizeof($where) >= 1)
+    $where_clause = "WHERE ".implode('AND ', $where);
 
   $ORDER_BY = "ORDER BY userobm_lastname";
   if (isset($device['sql_order_field'])) {
@@ -63,7 +70,7 @@ function run_query_admin_device_search($device) {
     LEFT JOIN opush_sync_state l ON l.device_id=opush_device.id
     LEFT JOIN opush_sync_perms ON opush_sync_perms.device_id = opush_device.id
     LEFT JOIN UserObm ON userobm_id = opush_device.owner
-    WHERE userobm_login #LIKE '%$user%' $where
+    $where_clause
     GROUP BY 
       opush_device.id, opush_device.owner, opush_device.identifier,opush_device.type,
       opush_sync_perms.device_id, opush_sync_perms.policy,
