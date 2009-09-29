@@ -90,15 +90,12 @@ sub _checkHttpBasicAuth {
         my $currentPasswdSsha;
         eval {
             require Digest::SHA;
-            $currentPasswdSsha = Digest::SHA::sha256_hex($pass);
-        } or eval {
-            # Lower encryption, but this module is native on more platforms
-            require Digest::SHA1;
-            $currentPasswdSsha = Digest::SHA1::sha1_hex($pass);
-        } or ($self->log( 0, 'Digest::SHA or Digest::SHA1 module needed' ) && exit 10); 
+        } or ($self->log( 0, 'Digest::SHA module needed' ) && exit 10); 
 
         # Re-enable SIGDIE handler
         $SIG{__DIE__} = $oldSigDie;
+
+        $currentPasswdSsha = Digest::SHA::sha256_hex($pass);
 
 
         if( ($currentTime < PASSWORD_LIFE_TIME) && defined($self->{'httpAuthentication'}->{'validPasswd'}) && ($self->{'httpAuthentication'}->{'validPasswd'} eq $currentPasswdSsha) ) {
@@ -134,16 +131,13 @@ sub _checkHttpBasicAuth {
 
     $self->log( 3, 'Basic HTTP authentication : LDAP check HTTP basic password success !' );
     eval {
-        require 'Digest/SHA.pm';
-        $self->{'httpAuthentication'}->{'validPasswd'} = Digest::SHA::sha256_hex($pass);
-    } or eval {
-        require 'Digest/SHA1.pm';
-        $self->{'httpAuthentication'}->{'validPasswd'} = Digest::SHA1::sha1_hex($pass);
-    } or ($self->log( 0, 'Digest::SHA or Digest::SHA1 modue needed' ) && exit 10); 
+        require Digest::SHA;
+    } or ($self->log( 0, 'Digest::SHA module needed' ) && exit 10); 
 
     # Re-enable SIGDIE handler
     $SIG{__DIE__} = $oldSigDie;
 
+    $self->{'httpAuthentication'}->{'validPasswd'} = Digest::SHA::sha256_hex($pass);
     $self->{'httpAuthentication'}->{'validPasswdTime'} = time();
 
     return 1;
