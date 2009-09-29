@@ -1655,6 +1655,13 @@ CREATE TABLE phone (
 );
 
 
+
+CREATE TYPE taskperiod AS ENUM (
+  'MORNING',
+  'AFTERNOON',
+  'ALLDAY'
+);
+
 --
 -- Table structure for table plannedtask
 --
@@ -1668,10 +1675,10 @@ CREATE TABLE plannedtask (
   plannedtask_user_id integer default NULL,
   plannedtask_datebegin date,
   plannedtask_dateend date,
-  plannedtask_period enum (0, 1, 2) NOT NULL default 0,
+  plannedtask_period taskperiod DEFAULT 'MORNING'::taskperiod,
   plannedtask_project_id integer default NULL,
   plannedtask_tasktype_id integer default NULL,
-  plannedtask_overrun enum (0, 1) NOT NULL default 0,
+  plannedtask_overrun boolean DEFAULT false,
   plannedtask_comment text
 );
 
@@ -2110,7 +2117,7 @@ CREATE TABLE tasktypegroup (
   tasktypegroup_id integer NOT NULL,
   tasktypegroup_domain_id integer NOT NULL,
   tasktypegroup_timeupdate timestamp without time zone,
-  tasktypegroup_timecreate without time zone DEFAULT now(),
+  tasktypegroup_timecreate timestamp without time zone DEFAULT now(),
   tasktypegroup_userupdate integer default NULL,
   tasktypegroup_usercreate integer default NULL,
   tasktypegroup_label varchar(32),
