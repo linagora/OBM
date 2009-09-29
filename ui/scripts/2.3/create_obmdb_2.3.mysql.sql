@@ -86,8 +86,8 @@ CREATE TABLE `Address` (
 --
 -- Table structure for table `addressbook`
 --
-DROP TABLE IF EXISTS `addressbook`;
-CREATE TABLE `addressbook` (
+DROP TABLE IF EXISTS `AddressBook`;
+CREATE TABLE `AddressBook` (
   `id`         int(8) NOT NULL auto_increment,
   `domain_id`  int(8) NOT NULL,
   `timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
@@ -119,7 +119,7 @@ CREATE TABLE `AddressbookEntity` (
   `addressbookentity_addressbook_id` int(8) NOT NULL,
   PRIMARY KEY (`addressbookentity_entity_id`,`addressbookentity_addressbook_id`),
   KEY `addressbookentity_addressbook_id_addressbook_id_fkey` (`addressbookentity_addressbook_id`),
-  CONSTRAINT addressbookentity_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbookentity_addressbook_id) REFERENCES addressbook (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT addressbookentity_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbookentity_addressbook_id) REFERENCES AddressBook (id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `addressbookentity_entity_id_entity_id_fkey` FOREIGN KEY (`addressbookentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
