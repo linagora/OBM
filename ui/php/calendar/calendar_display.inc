@@ -1130,7 +1130,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   }
 
   $tags = array_unique($tags);
-  if (sizeof($tags) > 0 && sizeof($calendar_entity) == 1) {
+  if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
     html_calendar_tag_legend($tags);
   }
 
@@ -1269,7 +1269,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
 
   }
   $tags = array_unique($tags);
-  if (sizeof($tags) > 0 && sizeof($calendar_entity) == 1) {
+  if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
     html_calendar_tag_legend($tags);
   }
 
@@ -4263,11 +4263,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <td>
       <span class=\"NW\">
         <input type=\"radio\" name=\"rd_opacity\" id=\"rd_opacity_busy\" $l_check_busy value=\"OPAQUE\" />
-        $l_opacity_busy
+        <label for='rd_opacity_busy'>$l_opacity_busy</label>
       </span>
       <span class=\"NW\">
         <input type=\"radio\" name=\"rd_opacity\" id=\"rd_opacity_free\" $l_check_free value=\"TRANSPARENT\" />
-        $l_opacity_free
+        <label for='rd_opacity_free'>$l_opacity_free</label>
       </span>
     </td>
   </tr>
@@ -5630,6 +5630,8 @@ function json_event_data($id,$calendar,$current_view) {
   $end = clone $date;
   $end->addSecond($duration);
   $title = $calendar['title'];
+  $all = isset($calendar['all']) ? 1:0;
+  $periodic = $calendar['periodic'];
   while($ent_q->next_record()) {
     $entity = $ent_q->f('eventlink_entity');
     $entity_id = $ent_q->f('eventlink_entity_id');
@@ -5658,6 +5660,7 @@ function json_event_data($id,$calendar,$current_view) {
   $ed[] = "location:''";
   $ed[] = "category:''";
   $ed[] = "colors:{}";
+  $ed[] = "all:$all";
  
   $calendar_entity = $current_view->get_entities();
   switch($context)  {
@@ -5710,6 +5713,8 @@ function json_event_data($id,$calendar,$current_view) {
   if($element_id != '') {
     $display['json'] .= "elementId:'$element_id',";
   }
+  $display['json'] .= "isPeriodic:$periodic,";
+  $display['json'] .= "all:$all,";
   $display['json'] .=  "eventsData:[$json]";
 }
 

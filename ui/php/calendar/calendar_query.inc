@@ -1590,13 +1590,17 @@ function run_query_calendar_quick_event_update($calendar) {
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
   }
+  $all = $calendar['all'];
+  if ($all != 1) {
+    $event_date = "event_date = '$datebegin',";
+  }
   $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
       event_userupdate = $obm[uid],
       event_title = '$title',
-      event_date = '$datebegin',
+      $event_date
       event_origin = '$GLOBALS[c_origin_ajax]',
       event_duration = '$event_duration'
       WHERE
