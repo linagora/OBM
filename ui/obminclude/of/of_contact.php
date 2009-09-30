@@ -94,8 +94,7 @@ class OBM_Contact implements OBM_ISearchable {
     $this->$key = $value;
   }
 
-  public static function get($id = null, $domain = null) {
-    if(!$id) return new OBM_Contact();
+  public static function get($id, $domain = null) {
     $where = "contact_id = '{$id}'";
     if ($domain !== null) {
       $where.= " AND (contact_domain_id='{$domain}')";

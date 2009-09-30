@@ -79,9 +79,8 @@
   height: 3em;
 }
 
-#addressBookContainer td{
+#addressBookContainer tbody td{
   border-left: 0;
-  padding-left: 10px;
   height: 3em;
   border-top: 1px solid #e0e2e4;
   border-bottom: 1px solid #d4d8db;

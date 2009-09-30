@@ -323,7 +323,7 @@ function html_addressbooks_get_list() {
     if ($sync) $ico = $GLOBALS['ico_sync'];
      
     // Build drop down menu
-    $field = '<ul id="ad'.$id.'" class="dropDownMenu addressBookMenu"><li><a href=""><img src="'.$GLOBALS['icones']['dropdown'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+    $field = '<ul id="ad'.$id.'" class="dropDownMenu addressBookMenu"><li><img src="'.$GLOBALS['icones']['dropdown'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
     // Can't update or delete default addressbook
     if (!$ad->isDefault) {
       $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.updateAddressBook($id);return false;\" >$GLOBALS[l_update_ad]</a></li>";
@@ -424,10 +424,10 @@ function dis_contact_consult2($contact) {
       <ul id='toolbarMenu' class='dropDownMenu'>
         <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' > <img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
         <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' > <img src='".$GLOBALS['icones']['delete']."' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
-        <li><a href=''><img src='".$GLOBALS['icones']['others']."' title='$GLOBALS[l_others]' alt='$GLOBALS[l_others]' /></a>
-          <ul><li><a href=''>Copier</a></li>
-          <li><a href=''>Deplacer</a></li>
-          <li><a href=''>Exporter</a></li>
+        <li><img src='".$GLOBALS['icones']['others']."' title='$GLOBALS[l_others]' alt='$GLOBALS[l_others]' />
+          <ul><li><a href='' onclick='return false;'>Copier</a></li>
+          <li><a href='' onclick='return false;'>Deplacer</a></li>
+          <li><a href='' onclick='return false;'>Exporter</a></li>
           </ul>
         </li>
       </ul>
@@ -501,7 +501,7 @@ function dis_contact_consult2($contact) {
   $class = 'H';
   foreach($contact->website as $website) {
     $class = '';
-    $websiteLayout .= '<dt>'.$contact->labelToString($website['label'], 'website').' : </dt><dd><a  target="_blank" href="'.$website['url'].'">'.$website['url'].'</a></dd>';
+    $websiteLayout .= '<dt>'.$contact->labelToString($website['label'], 'website').' : </dt><dd><a target="_blank" href="'.$website['url'].'">'.$website['url'].'</a></dd>';
   }  
   $websiteLayout ='<dl id="websiteLayout" class="details '.$class.'">'.$websiteLayout.'</dl>';
 
@@ -620,13 +620,15 @@ function dis_contact_consult2($contact) {
  * @access public
  * @return void
  */
-function dis_contact_form2($contact) {
+function dis_contact_form2($params) {
 
   $add = array();
-  if($contact['id'])
-    $contact = OBM_Contact::get($contact['id']);
-  else
-    $contact = OBM_Contact::get();
+  if($params['id'])
+    $contact = OBM_Contact::get($params['id']);
+  else {
+    $contact = new OBM_Contact();
+    $contact->addressbook = $params['addressbook'];
+  }
   $fields = array(
     'lastname' => array('class' => 'head', 'size' => 10, 'mandatory' => true),
     'mname' => array('class' => 'head', 'size' => 8),
@@ -828,6 +830,7 @@ function dis_contact_form2($contact) {
       <br />
       <input type='hidden' name='action' value='storeContact'  />
       <input type='hidden' name='id' value='$contact->id'  />
+      <input type='hidden' name='addressbook' value='$contact->addressbook' />
       <input style='margin:auto;' type='submit' value='$GLOBALS[l_save]' />
       <input style='margin:auto;' type='button' value='$GLOBALS[l_cancel]' onclick=\"obm.contact.addressbook.consultContact('$contact->id');\" />
       </p>

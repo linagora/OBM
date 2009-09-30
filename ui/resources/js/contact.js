@@ -128,8 +128,9 @@ Obm.Contact.AddressBook = new Class ({
   },  
 
   addContact: function(id) {
+    var id = $('addressBookGrid').getElement('td.current').get('id').split('-')[1];
     $('informationGrid').setStyle('display',''); 
-    this.dataRequest.get({ajax : 1, action : 'updateContact'}); 
+    this.dataRequest.get({ajax : 1, action : 'updateContact', addressbook: id}); 
     $('dataContainer').getElements('td').setStyle('display','none');
     $('dataContainer').removeClass('expanded');
     $('dataContainer').addClass('shrinked');
