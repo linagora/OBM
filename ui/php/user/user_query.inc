@@ -718,6 +718,8 @@ function run_query_user_insert($user) {
   }
 
   if ($id > 0) {
+    // Insert Address book
+    run_query_user_addressbook_insert($id, $domain_id);
     $user['entity_id'] = $id;
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $entity_id = of_entity_insert('calendar', $id);    
@@ -745,6 +747,48 @@ function run_query_user_insert($user) {
   run_query_user_init_group($domain_id, $id, $gid);
 
   return $id;
+}
+
+
+/**
+ * Insert default address book
+ * address_book type:
+ *   +contacts
+ *   +collected_contacts
+ *   +public_contacts
+ */
+function run_query_user_addressbook_insert($user_id, $domain_id) {
+  global $cdg_sql, $obm;
+
+  $uid = $obm['uid'];
+  $obm_q = new DB_OBM;
+
+  foreach($GLOBALS['c_addressbook_type'] as $addressbook_type) {
+    $query = "INSERT INTO AddressBook (
+      domain_id,
+      timeupdate,
+      timecreate,
+      userupdate,
+      usercreate,
+      origin,
+      owner,
+      name,
+      is_default,
+      syncable) VALUES (
+      $domain_id,
+      NOW(),
+      NOW(),
+      $uid,
+      $uid,
+      '$GLOBALS[c_origin_web]',
+      $user_id,
+      '$addressbook_type',
+      true,
+      true)";
+    display_debug_msg($query, $cdg_sql, "run_query_user_addressbook_insert($addressbook_type)");
+    $obm_q->query($query);
+  }
+
 }
 
 
