@@ -432,7 +432,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'consult')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $contact = OBM_Contact::get($contact['id']);
+  $contact = OBM_Contact::get($params['id']);
   $block = dis_contact_consult2($contact);
   echo $block;
   exit();
@@ -449,7 +449,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if (check_user_defined_rules() && check_contact_data_form('', $params)) {
       if(isset($params['contact_id'])) {
         $retour = run_query_contact_update($params);
-        $contact = OBM_Contact::get($contact['id']);
+        $contact = OBM_Contact::get($params['id']);
       } else {
         if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
         else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
@@ -464,8 +464,8 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       exit();
     }
   } else {
-    $contact = OBM_Contact::get($contact['id']);
-    $block = dis_contact_consult2($params);
+    $contact = OBM_Contact::get($params['id']);
+    $block = dis_contact_consult2($contact);
     echo $block;
     exit();    
   }
