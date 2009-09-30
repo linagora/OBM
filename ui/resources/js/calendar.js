@@ -863,18 +863,30 @@ Obm.CalendarManager = new Class({
     if (response.error == 0) {
       var str = response.elementId.split('_');
       showOkMessage(response.message);
-      for(var i=0;i< events.length;i++) {
-        var ivent = events[i].event;
-        var element_id = 'event_'+str[1]+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
-        var evt = obm.calendarManager.events.get(element_id);
-        if (evt) {
-          obm.calendarManager.unregister(evt);
-          obm.calendarManager.events.erase(element_id);
-          evt.element.destroy();
-          delete evt;
+
+      if (response.isPeriodic && response.all) { 
+        $$('div.evt_'+str[1]).each(function(e) {
+          var evt = obm.calendarManager.events.get(e.id);
+          if(evt) {
+            obm.calendarManager.unregister(evt);
+            obm.calendarManager.events.erase(evt.element.id);
+            evt.element.destroy();
+            delete evt;
+          }
+        });
+      } else {      
+        for(var i=0;i< events.length;i++) {
+          var ivent = events[i].event;
+          var element_id = 'event_'+str[1]+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
+          var evt = obm.calendarManager.events.get(element_id);
+          if (evt) {
+            obm.calendarManager.unregister(evt);
+            obm.calendarManager.events.erase(element_id);
+            evt.element.destroy();
+            delete evt;
+          }
         }
       }
-      // TODO: REDRAW CALENDAR
     } else {
       showErrorMessage(response.message);
       // obm.calendarManager.events.each(function(evt, key) {
@@ -1604,6 +1616,7 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.date_begin = date_begin.format('c');
     this.eventData.old_date_begin = new Obm.DateTime(evt.event.time * 1000).format('c');
     this.eventData.duration = evt.event.duration;
+    this.eventData.periodic = evt.event.periodic;
     this.eventData.context = context;
     this.eventData.element_id = evt.element.id;
     this.eventData.formAction = 'quick_update';

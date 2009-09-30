@@ -3387,7 +3387,7 @@ function dis_calendar_occurency_popup() {
         <h2>$GLOBALS[l_delete_occurrence_message]</h2>
          <fieldset class=\"buttons\"> 
           <input type=\"button\" id=\"popup_delete_one\" class=\"closeSticky\" value=\"$GLOBALS[l_delete_occurrence]\" /><br/>
-          <input type=\"button\" id=\"popup_delete_all\" value=\"$GLOBALS[l_delete_all_occurrences]\" /><br/>
+          <input type=\"button\" id=\"popup_delete_all\" class=\"closeSticky\" value=\"$GLOBALS[l_delete_all_occurrences]\" /><br/>
           <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
          </fieldset>
       </div>
