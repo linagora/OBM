@@ -472,9 +472,9 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   
 } elseif ($action == 'list')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $addressBook =  OBM_AddressBook::get($params['id']);
   $contactHeaders = html_contact_get_headers();
-  $block = html_contact_get_list($addressBook->getContacts(), $contactHeaders);
+  $addressBooks = OBM_AddressBook::search();
+  $block = html_contact_get_list($addressBooks->searchContacts('in:'.$params['id']), $contactHeaders);
   echo $block;
   exit();
 } elseif ($action == 'search') {

@@ -154,26 +154,29 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public static function delete($addressbook) {
-    $addressbook_id = $addressbook['addressbook_id'];
+    $id = $addressbook['addressbook_id'];
     $uid = $GLOBALS['obm']['uid'];
-    $ad = self::get($addressbook_id);
+    $ad = self::get($id);
     if (!$ad->isDefault && $ad->write && $ad->owner==$uid) {
       $db = new DB_OBM;
       // Delete contacts
-      $query = "DELETE FROM Contact WHERE contact_addressbook_id='$addressbook_id'";
+      $query = "DELETE FROM Contact WHERE contact_addressbook_id='$id'";
       $db->query($query);
       // Delete addressbook
-      $query = "DELETE FROM AddressBook WHERE id='$addressbook_id' and owner='$uid'";
+      $query = "DELETE FROM AddressBook WHERE id='$id' and owner='$uid'";
       $db->query($query);
     }
   }
 
   public static function store($addressbook) {
     $id = $addressbook['id'];
-    $name = $addressbook['name'];
-    $query = "UPDATE AddressBook SET name='$name' WHERE id='$id'";
-    $db = new DB_OBM;
-    $db->query($query);
+    $ad = self::get($id);
+    if (!$ad->isDefault && $ad->write && $ad->owner==$GLOBALS['obm']['uid']) {
+      $name = $addressbook['name'];
+      $query = "UPDATE AddressBook SET name='$name' WHERE id='$id'";
+      $db = new DB_OBM;
+      $db->query($query);
+    }
   }
 }
 
