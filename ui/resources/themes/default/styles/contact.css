@@ -62,6 +62,19 @@
   background-color: #dee1e3;
 }
 
+#addressBookGrid input[type="text"]{
+  width: 130px;
+}
+
+.addressbookForm {
+  position:absolute;
+  margin-left: 30px;
+}
+
+.addressbookForm input {
+  width: 140px;
+}
+
 #addressBookContainer tbody tr{
   height: 3em;
 }

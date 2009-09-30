@@ -78,6 +78,13 @@ $l_sync_contact = "PDA synchronisation";
 $l_sync = "Subscirbe for synchronisation";
 $l_desync = "Unsubscribe for synchronisation";
 
+// Address books
+$l_delete_ad = "Delete";
+$l_update_ad = "Update";
+$l_sync_ad = "Synchronize";
+$l_confirm_delete_ad = "Remove address book ";
+
+
 // Messages
 $l_check_samecontact = "These contacts seem similar to this new entry !";
 $l_link_deal = "The contact is involved in some deals";

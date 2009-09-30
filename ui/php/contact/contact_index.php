@@ -502,6 +502,12 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $block = html_addressbooks_get_list();
   echo $block;
   exit();
+} elseif ($action == 'updateAddressBook') {
+///////////////////////////////////////////////////////////////////////////////
+  OBM_AddressBook::store($params);
+  $block = html_addressbooks_get_list();
+  echo $block;
+  exit();
 }
 
 of_category_user_action_switch($module, $action, $params);
@@ -851,14 +857,17 @@ function get_contact_action() {
 
 
   $actions['contact']['storeAddressBook'] = array (
-    'Name'     => $l_header_find,
     'Url'      => "$path/contact/contact_index.php?action=storeAddressBook",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );    
   $actions['contact']['deleteAddressBook'] = array (
-    'Name'     => $l_header_find,
     'Url'      => "$path/contact/contact_index.php?action=deleteAddressBook",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );  
+  $actions['contact']['updateAddressBook'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=updateAddressBook",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );  

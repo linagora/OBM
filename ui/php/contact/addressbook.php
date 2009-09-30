@@ -45,6 +45,10 @@ class OBM_AddressBook implements OBM_ISearchable {
     $this->db = new DB_OBM;
   }
 
+  public function __set($property, $value) {
+    if ($property == "name") $this->name = $value; 
+  }
+
   public static function fieldsMap() {
     $fields['*'] = array('AddressBook.name' => 'text');
     $fields['name'] = array('AddressBook.name' => 'text');
@@ -119,7 +123,7 @@ class OBM_AddressBook implements OBM_ISearchable {
 
     $domain_id = $GLOBALS['obm']['domain_id'];
     $uid = $GLOBALS['obm']['uid'];
-    $ad_name = $addressbook['addressbook'];
+    $ad_name = $addressbook['name'];
 
     $query = "INSERT INTO AddressBook (
       domain_id,
@@ -164,7 +168,12 @@ class OBM_AddressBook implements OBM_ISearchable {
     }
   }
 
-  public static function store() {
+  public static function store($addressbook) {
+    $id = $addressbook['id'];
+    $name = $addressbook['name'];
+    $query = "UPDATE AddressBook SET name='$name' WHERE id='$id'";
+    $db = new DB_OBM;
+    $db->query($query);
   }
 }
 

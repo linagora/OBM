@@ -49,6 +49,9 @@ Obm.Contact.AddressBook = new Class ({
       evalScripts : true,
       update: $('addressBookContainer')
     });
+    this.addressBookRequest.addEvent('complete', function () {
+      $('contactPanel').getElements('div.contactPanelContainer > table > tbody').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 100);
+    }.bind(this));
 
     this.contactRequest = new Request.HTML({
       url: obm.vars.consts.obmUrl + '/contact/contact_index.php',
@@ -167,16 +170,36 @@ Obm.Contact.AddressBook = new Class ({
     $('tf_addressbook').value = '';
   },
 
-  storeAddressBook: function() {
-    this.addressBookRequest.addEvent('complete', function() {
-      showOkMessage(obm.vars.labels.insertOk);
-      $('tf_addressbook').value = '';
-      $('f_addressbook').style.visibility = 'hidden';
-    });
-    this.addressBookRequest.post({ajax:1, action:'storeAddressBook', 'tf_addressbook':$('tf_addressbook').value});
+  updateAddressBook: function(id) {
+    $('addressbook_'+id).style.display='none';
+    $('tf_addressbook_'+id).style.display='';
   },
 
-  deleteAddressbook: function(id, name) {
+  storeAddressBook: function(id) {
+    if (!$chk(id)) {
+      if (!$chk($('tf_addressbook').value)) {
+        showErrorMessage(obm.vars.labels.insertError);
+      } else {
+        this.addressBookRequest.addEvent('complete', function() {
+          showOkMessage(obm.vars.labels.insertOk);
+          $('tf_addressbook').value = '';
+          $('f_addressbook').style.visibility = 'hidden';
+        });
+        this.addressBookRequest.post({ajax:1, action:'storeAddressBook', 'tf_name':$('tf_addressbook').value});
+      }
+    } else {
+      if (!$chk($('tf_addressbook_'+id).value)) {
+        showErrorMessage(obm.vars.labels.updateError);
+      } else {
+        this.addressBookRequest.addEvent('complete', function() {
+          showOkMessage(obm.vars.labels.updateOk);
+        });
+        this.addressBookRequest.post({ajax:1, action:'updateAddressBook', 'id':id, 'name':$('tf_addressbook_'+id).value});
+      }
+    }
+  },
+
+  deleteAddressBook: function(id, name) {
     if(confirm(obm.vars.labels.confirmDeleteAddressBook+'\''+name+'\' ?')){
       this.addressBookRequest.addEvent('complete', function() {
         showOkMessage(obm.vars.labels.deleteOk);

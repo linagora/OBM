@@ -56,6 +56,9 @@ $l_synchronisation = "Abonnement";
 
 
 // Address books
+$l_delete_ad = "Supprimer";
+$l_update_ad = "Modifier";
+$l_sync_ad = "Synchroniser";
 $l_confirm_delete_ad = "Voulez-vous supprimer le carnet d'adresse ";
 
 // Actions

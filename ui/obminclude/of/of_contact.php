@@ -123,6 +123,11 @@ class OBM_Contact implements OBM_ISearchable {
       'contact_aka' => 'text',
       'contact_sound' => 'text'
     );
+
+    $fields['in'] = array(
+      'contact_addressbook_id' => 'integer'
+    );
+
     $fields['addressbook'] = array(
       'contact_addressbook_id' => 'integer'
     );

@@ -258,7 +258,7 @@ function html_contact() {
         <div  id='addressBookContainer' class='contactPanelContainer'>
           $adList
         </div>
-        <form name='f_addressbook' id='f_addressbook' onsubmit='obm.contact.addressbook.storeAddressBook();return false;' style='visibility:hidden;'>
+        <form name='f_addressbook' id='f_addressbook' class='addressbookForm' onsubmit='obm.contact.addressbook.storeAddressBook();return false;' style='visibility:hidden;'>
           <input type='text' id='tf_addressbook'/>
         </form>
         <input type='button' value='+' id='addAddressBook' onclick='obm.contact.addressbook.addAddressBook();'/>
@@ -321,25 +321,25 @@ function html_addressbooks_get_list() {
 
     // Build drop down menu
     $field = '<ul id="ad'.$id.'" class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
-
     // Can't update or delete default addressbook
     if (!$ad->isDefault) {
-      //$field .= "<li><a href=\"\" onclick=\"console.log('update')\" >update</a></li>";
-      $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.deleteAddressbook($id, '".phpStringToJsString($name)."');return false;\" >delete</a></li>";
+      $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.updateAddressBook($id);return false;\" >$GLOBALS[l_update_ad]</a></li>";
+      $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.deleteAddressBook($id, '".phpStringToJsString($name)."');return false;\" >$GLOBALS[l_delete_ad]</a></li>";
+      $dblclick = 'onDblclick="obm.contact.addressbook.updateAddressBook('.$id.');"';
     }
 
-    //$field .= "<li><a href=\"\" onclick=\"console.log('right')\" >right</a></li>";
-    //$field .= "<li><a href=\"\" onclick=\"console.log('sync')\" >synchronized</a></li>";
+    $field .= "<li><a href=\"\" onclick=\"console.log('right')\" >$GLOBALS[l_rights]</a></li>";
+    $field .= "<li><a href=\"\" onclick=\"console.log('sync')\" >$GLOBALS[l_sync_ad]</a></li>";
     $field .= "</ul>";
 
     $dropDownMenu .= "new Obm.DropDownMenu($('ad$id'));";
 
-    $name = $name.''.$field;
-    if($id == $addressBook->id) {
-      $adList .= '<tr><td onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'" class="current">'.$name.'</td></tr>';
-    } else {
-      $adList .= '<tr><td onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'">'.$name.'</td></tr>';
-    }
+    $content = "<div id='addressbook_$id'>$name $field </div>
+      <form id='f_addressbook_$id' name='f_addressbook_$id' onsubmit='obm.contact.addressbook.storeAddressBook($id);return false;'>
+      <input type='text' id='tf_addressbook_$id' value='$name' style='display:none;'/>
+      </form>";
+    if($id == $addressBook->id) $class = "current";
+    $adList .= '<tr><td '.$dblclick.' onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'" class="'.$class.'">'.$content.'</td></tr>';
   }
   $adList .= "<tr class='filler'><th>&nbsp;</th></tr>";
 

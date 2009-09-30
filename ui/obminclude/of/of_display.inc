@@ -1069,7 +1069,11 @@ function display_head($p_module, $standard=true) {
   obm.vars.labels.autocompleteField = '".phpStringToJsString($l_autocomplete_field)."'
   obm.vars.labels.fatalServerErr = '".phpStringToJsString($l_fatal_server_err)."';
   obm.vars.labels.insertOk = '".phpStringToJsString($GLOBALS['l_insert_ok'])."';
+  obm.vars.labels.updateOk = '".phpStringToJsString($GLOBALS['l_update_ok'])."';
   obm.vars.labels.deleteOk = '".phpStringToJsString($GLOBALS['l_delete_ok'])."';
+  obm.vars.labels.insertError = '".phpStringToJsString($GLOBALS['l_insert_error'])."';
+  obm.vars.labels.updateError = '".phpStringToJsString($GLOBALS['l_update_error'])."';
+  obm.vars.labels.deleteError = '".phpStringToJsString($GLOBALS['l_delete_error'])."';
   $obm_vars
   // ]]>
   </script> 
