@@ -79,6 +79,9 @@ $l_sync = "Subscirbe for synchronisation";
 $l_desync = "Unsubscribe for synchronisation";
 
 // Address books
+$l_contacts = "My contacts";
+$l_public_contacts = "Public Contacts";
+$l_collected_contacts = "Collected Contacts";
 $l_delete_ad = "Delete";
 $l_update_ad = "Update";
 $l_sync_ad = "Synchronize";

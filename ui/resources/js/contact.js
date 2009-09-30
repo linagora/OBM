@@ -206,8 +206,7 @@ Obm.Contact.AddressBook = new Class ({
       showOkMessage(obm.vars.labels.updateOk);
     });
     this.addressBookRequest.post({ajax:1, action:'toggleSync', 'id':id});
-  } 
-
+  }
 });
 
 

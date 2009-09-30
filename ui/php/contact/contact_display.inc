@@ -317,7 +317,7 @@ function html_contact_get_headers() {
 function html_addressbooks_get_list() {
   $addressBooks = OBM_AddressBook::search();
   foreach($addressBooks as $id => $ad) {
-    $name = $ad->name;
+    $name = $ad->__get('name');
     $sync = $ad->sync;
     $ico = $GLOBALS['ico_desync'];
     if ($sync) $ico = $GLOBALS['ico_sync'];
@@ -328,10 +328,10 @@ function html_addressbooks_get_list() {
     if (!$ad->isDefault) {
       $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.updateAddressBook($id);return false;\" >$GLOBALS[l_update_ad]</a></li>";
       $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.deleteAddressBook($id, '".phpStringToJsString($name)."');return false;\" >$GLOBALS[l_delete_ad]</a></li>";
-      $dblclick = 'onDblclick="obm.contact.addressbook.updateAddressBook('.$id.');"';
+      //$dblclick = 'onDblclick="obm.contact.addressbook.updateAddressBook('.$id.');"';
     }
 
-    $field .= "<li><a href=\"\" onclick=\"console.log('right')\" >$GLOBALS[l_rights]</a></li>";
+    $field .= "<li><a href=\"contact_index.php?action=rights_admin&entity_id=$id\" >$GLOBALS[l_rights]</a></li>";
     $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.toggleSync($id);return false;\" >$GLOBALS[l_sync_ad]</a></li>";
     $field .= "</ul></ul>";
 
@@ -3061,5 +3061,17 @@ function json_sync_contact($err, $act) {
   $info[] = "message : '$msg'";
   $info[] = "newact : '$newact'";
   $display['json'] = implode(',',$info);
+}
+
+function dis_addressbook_right_dis_admin($addressbook) {
+  global $display;
+
+  $display['title'] = $name;
+
+  $ad = OBM_AddressBook::get($addressbook['entity_id']);
+  $display['title'] = $ad->__get('name');
+
+  $block = of_right_dis_admin('addressbook', $addressbook['entity_id']);
+  return $block;
 }
 ?>

@@ -56,6 +56,9 @@ $l_synchronisation = "Abonnement";
 
 
 // Address books
+$l_contacts = "Mes contacts";
+$l_public_contacts = "Contacts publics";
+$l_collected_contacts = "Contacts collectés";
 $l_delete_ad = "Supprimer";
 $l_update_ad = "Modifier";
 $l_sync_ad = "Synchroniser";

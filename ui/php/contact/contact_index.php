@@ -315,16 +315,16 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'rights_admin') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_contact_right_dis_admin($params['contact_id']);
+  $display['detail'] = dis_addressbook_right_dis_admin($params);
 
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (OBM_Acl_Utils::updateRights('contact', $params['entity_id'], $obm['uid'], $params)) {
+  if (OBM_Acl_Utils::updateRights('addressbook', $params['entity_id'], $obm['uid'], $params)) {
     $display['msg'] .= display_ok_msg($l_right_update_ok);
   } else {
     $display['msg'] .= display_warn_msg($l_of_right_err_auth);
   }
-  $display['detail'] = dis_contact_right_dis_admin($params['entity_id']);
+  $display['detail'] = dis_addressbook_right_dis_admin($params);
 
 } elseif ($action == 'admin') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -514,7 +514,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $block = html_addressbooks_get_list();
   echo $block;
   exit();
-}
+} 
 
 of_category_user_action_switch($module, $action, $params);
 
@@ -882,6 +882,7 @@ function get_contact_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );  
+
   update_action_rights();
 }
 

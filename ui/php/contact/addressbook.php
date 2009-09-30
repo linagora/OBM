@@ -34,9 +34,6 @@ class OBM_AddressBook implements OBM_ISearchable {
   public function __construct($id, $name, $is_default, $owner, $sync, $access, $read, $write, $admin) {
     $this->id = $id;
     $this->name = $name;
-    //if($name == 'contacts' && $is_default) $this->name = 'Mes contacts';
-    //if($name == 'public_contacts' && $is_default) $this->name = 'Contacts publics';
-    //if($name == 'collected_contacts' && $is_default) $this->name = 'Contacts collectés';
     $this->access = $access;
     $this->read = $write;
     $this->write = $write;
@@ -52,7 +49,13 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public function __get($property) {
-    if ($property == "name") $this->name = $value; 
+    if ($property == "name") {
+      if ($this->isDefault) {
+        return $GLOBALS["l_{$this->name}"];
+      } else {
+        return $this->name;
+      }
+    }
   }
 
   public static function fieldsMap() {
@@ -155,7 +158,7 @@ class OBM_AddressBook implements OBM_ISearchable {
     $db = new DB_OBM;
     $db->query($query);
     $id = $db->lastid();
-
+    $entity_id = of_entity_insert('addressbook', $id);    
     return self::get($id);
   }
 
