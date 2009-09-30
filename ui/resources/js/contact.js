@@ -206,6 +206,13 @@ Obm.Contact.AddressBook = new Class ({
       });      
       this.addressBookRequest.post({ajax:1, action:'deleteAddressBook', 'addressbook_id':id});
     }
+  },
+
+  toggleSync: function(id) {
+    this.addressBookRequest.addEvent('complete', function() {
+      showOkMessage(obm.vars.labels.updateOk);
+    });
+    this.addressBookRequest.post({ajax:1, action:'toggleSync', 'id':id});
   } 
 
 });

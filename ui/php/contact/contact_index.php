@@ -508,6 +508,12 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $block = html_addressbooks_get_list();
   echo $block;
   exit();
+} elseif ($action == 'toggleSync') {
+///////////////////////////////////////////////////////////////////////////////
+  OBM_AddressBook::store($params);
+  $block = html_addressbooks_get_list();
+  echo $block;
+  exit();
 }
 
 of_category_user_action_switch($module, $action, $params);
@@ -868,6 +874,11 @@ function get_contact_action() {
   );  
   $actions['contact']['updateAddressBook'] = array (
     'Url'      => "$path/contact/contact_index.php?action=updateAddressBook",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );  
+  $actions['contact']['toggleSync'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=toggleSync",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );  

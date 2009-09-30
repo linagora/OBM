@@ -318,7 +318,10 @@ function html_addressbooks_get_list() {
   $addressBooks = OBM_AddressBook::search();
   foreach($addressBooks as $id => $ad) {
     $name = $ad->name;
-
+    $sync = $ad->sync;
+    $ico = $GLOBALS['ico_desync'];
+    if ($sync) $ico = $GLOBALS['ico_sync'];
+     
     // Build drop down menu
     $field = '<ul id="ad'.$id.'" class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
     // Can't update or delete default addressbook
@@ -329,12 +332,12 @@ function html_addressbooks_get_list() {
     }
 
     $field .= "<li><a href=\"\" onclick=\"console.log('right')\" >$GLOBALS[l_rights]</a></li>";
-    $field .= "<li><a href=\"\" onclick=\"console.log('sync')\" >$GLOBALS[l_sync_ad]</a></li>";
+    $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.toggleSync($id);return false;\" >$GLOBALS[l_sync_ad]</a></li>";
     $field .= "</ul>";
 
     $dropDownMenu .= "new Obm.DropDownMenu($('ad$id'));";
 
-    $content = "<div id='addressbook_$id'>$name $field </div>
+    $content = "<div id='addressbook_$id'><img src='$ico' />$name $field </div>
       <form id='f_addressbook_$id' name='f_addressbook_$id' onsubmit='obm.contact.addressbook.storeAddressBook($id);return false;'>
       <input type='text' id='tf_addressbook_$id' value='$name' style='display:none;'/>
       </form>";
