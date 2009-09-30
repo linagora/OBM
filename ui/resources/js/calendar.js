@@ -789,7 +789,9 @@ Obm.CalendarManager = new Class({
           var evt = obm.calendarManager.events.get(id);
           ivent.meeting = evt.event.meeting;
           ivent.periodic = evt.event.periodic;
-          obm.calendarManager.unregister(evt);
+          try {
+            obm.calendarManager.unregister(evt);
+          } catch(e) {}
           obm.calendarManager.events.erase(evt.element.id);
           evt.element.destroy();
           if (ivent.all_day) {
