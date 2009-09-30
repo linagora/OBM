@@ -323,7 +323,7 @@ function html_addressbooks_get_list() {
     if ($sync) $ico = $GLOBALS['ico_sync'];
      
     // Build drop down menu
-    $field = '<ul id="ad'.$id.'" class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['icones']['dropdown'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+    $field = '<ul id="ad'.$id.'" class="dropDownMenu addressBookMenu"><li><a href=""><img src="'.$GLOBALS['icones']['dropdown'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
     // Can't update or delete default addressbook
     if (!$ad->isDefault) {
       $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.updateAddressBook($id);return false;\" >$GLOBALS[l_update_ad]</a></li>";
@@ -333,7 +333,7 @@ function html_addressbooks_get_list() {
 
     $field .= "<li><a href=\"\" onclick=\"console.log('right')\" >$GLOBALS[l_rights]</a></li>";
     $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.toggleSync($id);return false;\" >$GLOBALS[l_sync_ad]</a></li>";
-    $field .= "</ul>";
+    $field .= "</ul></ul>";
 
     $dropDownMenu .= "new Obm.DropDownMenu($('ad$id'));";
 
@@ -425,8 +425,7 @@ function dis_contact_consult2($contact) {
         <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' > <img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
         <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' > <img src='".$GLOBALS['icones']['delete']."' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
         <li><a href=''><img src='".$GLOBALS['icones']['others']."' title='$GLOBALS[l_others]' alt='$GLOBALS[l_others]' /></a>
-          <ul>
-          <li><a href=''>Copier</a></li>
+          <ul><li><a href=''>Copier</a></li>
           <li><a href=''>Deplacer</a></li>
           <li><a href=''>Exporter</a></li>
           </ul>
@@ -583,7 +582,7 @@ function dis_contact_consult2($contact) {
   $block = "
     <table>
     <thead>
-    <tr><th>Contact</th></tr>
+    <tr><th><a href='' onclick='obm.contact.addressbook.hideContact(); return false;'><img class='RF' src='".$GLOBALS['icones']['close']."' alt='$GLOBALS[l_close]' /></a>$GLOBALS[l_contact]</th></tr>
     <tr><td class='toolbar'>$toolbar</td></tr>
     </thead>
     <tbody>

@@ -82,7 +82,7 @@
 #addressBookContainer td{
   border-left: 0;
   padding-left: 10px;
-  line-height: 3em;
+  height: 3em;
   border-top: 1px solid #e0e2e4;
   border-bottom: 1px solid #d4d8db;
   color: black;
@@ -99,9 +99,15 @@
   display: inline;
 }
 
-#addressBookContainer td {
+.addressBookMenu {
+  position: absolute;
+  right: 5px;
+  display: inline;
 }
 
+.addressBookMenu ul{
+  right: 0px;
+}
 /* Data rows styling */
 
 #dataGrid {
@@ -203,7 +209,8 @@
 /*Overflow in grid*/
 
 .contactPanelContainer {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;  
 }
 

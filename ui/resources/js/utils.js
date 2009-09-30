@@ -111,7 +111,7 @@ Obm.CoordonateWidget = new Class({
         .setStyle('cursor','pointer')
       )
     );
-    new Obm.OverText(this.table.getElements('input, textarea'));
+    //new Obm.OverText(this.table.getElements('input, textarea'));
   },
 
   makeField: function(fieldName, field) {

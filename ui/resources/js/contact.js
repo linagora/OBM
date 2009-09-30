@@ -82,18 +82,22 @@ Obm.Contact.AddressBook = new Class ({
 
   selectContact: function(elem) {
     if(elem.hasClass('current')) {
-      $('dataContainer').getElements('tr.current').removeClass('current');
-      $('dataGrid').getElements('td').setStyle('display','');
-      $('informationGrid').setStyle('display','none'); 
-      $('dataContainer').removeClass('shrinked');
-      $('dataContainer').addClass('expanded');
-      $('dataGrid').setStyle('width', 'auto');
+      this.hideContact();
     } else {
       var id = elem.get('id').split('-')[1];
       $('dataContainer').getElements('tr.current').removeClass('current');
       elem.addClass('current');
       this.consultContact(id);
     }
+  },
+
+  hideContact: function() {
+    $('dataContainer').getElements('tr.current').removeClass('current');
+    $('dataGrid').getElements('td').setStyle('display','');
+    $('informationGrid').setStyle('display','none'); 
+    $('dataContainer').removeClass('shrinked');
+    $('dataContainer').addClass('expanded');
+    $('dataGrid').setStyle('width', 'auto');
   },
 
   consultContact: function(id) {
@@ -108,12 +112,7 @@ Obm.Contact.AddressBook = new Class ({
   selectAddressBook: function(elem) {
     if(!elem.hasClass('current')) {
       var id = elem.get('id').split('-')[1];
-      $('dataContainer').getElements('tr.current').removeClass('current');
-      $('dataGrid').getElements('td').setStyle('display','');
-      $('informationGrid').setStyle('display','none'); 
-      $('dataContainer').removeClass('shrinked');
-      $('dataContainer').addClass('expanded');      
-      $('dataGrid').setStyle('width', 'auto');
+      this.hideContact();
       this.contactRequest.get({ajax : 1, action : 'list', id : id}); 
       $('addressBookGrid').getElements('td.current').removeClass('current');
       elem.addClass('current');
@@ -149,12 +148,7 @@ Obm.Contact.AddressBook = new Class ({
   },    
 
   searchContact: function(form) {
-    $('dataContainer').getElements('tr.current').removeClass('current');
-    $('dataGrid').getElements('td').setStyle('display','');
-    $('informationGrid').setStyle('display','none'); 
-    $('dataContainer').removeClass('shrinked');
-    $('dataContainer').addClass('expanded');      
-    $('dataGrid').setStyle('width', 'auto');
+    this.hideContact();
     this.contactRequest.get(form); 
     $('addressBookGrid').getElements('td.current').removeClass('current');
   },
