@@ -469,7 +469,34 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     echo $block;
     exit();    
   }
-  
+} elseif ($action == 'copyContact') {
+///////////////////////////////////////////////////////////////////////////////
+  $params['contact_id'] = $params['id'];
+  if (check_contact_update_rights($params)) {
+    if (check_user_defined_rules() && check_contact_data_form('', $params)) {
+      if(isset($params['contact_id'])) {
+        $retour = run_query_contact_update($params);
+        $contact = OBM_Contact::get($params['id']);
+      } else {
+        if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
+        else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
+        $contact = $addressBook->addContact($params);
+      }
+      $block = dis_contact_consult2($contact);
+      echo $block;
+      exit();
+    } else {
+      header('HTTP', true, 400);
+      echo OBM_Error::getInstance()->toJson();
+      exit();
+    }
+  } else {
+    $contact = OBM_Contact::get($params['id']);
+    $block = dis_contact_consult2($contact);
+    echo $block;
+    exit();    
+  }
+   
 } elseif ($action == 'list')  {
 ///////////////////////////////////////////////////////////////////////////////
   $contactHeaders = html_contact_get_headers();

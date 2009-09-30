@@ -418,16 +418,22 @@ function html_contact_get_list($contacts, $headers) {
  * @return void
  */
 function dis_contact_consult2($contact) {
-
+  $addressBooks = OBM_AddressBook::search();
+  foreach($addressBooks as $id => $addressBook) {
+    if($addressBook->write == 1) {
+      $copy .= '<li><a href="" onclick="obm.contact.addressbook.copyContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->name.'</a></li>';
+      //$move .= '<li><a href="" onclick="obm.contact.addressbook.moveContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->name.'</a></li>';
+    }
+  }
   //if(OBM_Acl::canWrite($obm['uid'], 'contact', $contact['id'])) {
+  //<li>$GLOBALS[l_move]<ul>$move</ul></li>
     $toolbar = "
       <ul id='toolbarMenu' class='dropDownMenu'>
         <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' > <img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
         <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' > <img src='".$GLOBALS['icones']['delete']."' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
         <li><img src='".$GLOBALS['icones']['others']."' title='$GLOBALS[l_others]' alt='$GLOBALS[l_others]' />
-          <ul><li><a href='' onclick='return false;'>Copier</a></li>
-          <li><a href='' onclick='return false;'>Deplacer</a></li>
-          <li><a href='' onclick='return false;'>Exporter</a></li>
+          <ul><li>$GLOBALS[l_copy]<ul>$copy</ul></li>
+          <li><a href='$GLOBALS[path]/contact/contact_index.php?action=vcard&amp;contact_id=$contact->id' onclick='return false;'>Exporter</a></li>
           </ul>
         </li>
       </ul>
@@ -555,7 +561,7 @@ function dis_contact_consult2($contact) {
   if($contact->comment) {
     $class = '';
   }
-  $commentLayout ='<dl id="commentLayout" class="details '.$class.'">'.$contact->comment2.'</dl>';
+  $commentLayout ='<dl id="commentLayout" class="details '.$class.'">'.$contact->comment.'</dl>';
 
   $class = 'H';
   if($contact->comment2) {
@@ -679,7 +685,7 @@ function dis_contact_form2($params) {
       $field = '<textarea size="'.$metadata['size'].'" title="'.$GLOBALS['l_'.$fieldname].'" name="'.$fieldname.'">'.$value.'</textarea>';
       break;      
     case 'phone':
-      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><a href="" /><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a></a><ul>';
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
       foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
         $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
         $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
@@ -697,7 +703,7 @@ function dis_contact_form2($params) {
       $addable = true;
       break;
     case 'website':
-      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
       foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
         $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
         $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
@@ -714,7 +720,7 @@ function dis_contact_form2($params) {
       $addable = true;
       break;
     case 'email':
-      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
       foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
         $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
         $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
@@ -731,7 +737,7 @@ function dis_contact_form2($params) {
       $addable = true;
       break; 
     case 'im':
-      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
       foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
         $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".strtoupper($fieldname)."Widget({protocol: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
         $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
@@ -748,7 +754,7 @@ function dis_contact_form2($params) {
       $addable = true;
       break;   
     case 'address':
-      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+      $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
       foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
         $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
         $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
@@ -791,7 +797,7 @@ function dis_contact_form2($params) {
 
   foreach($add as $label => $options) {
     if(is_array($options)) {
-      $addBar .= '<li><a href="" >'.$label.'</a><ul>';
+      $addBar .= '<li>'.$label.'<ul>';
       foreach($options as $sublabel => $suboptions) {
         $addBar .= '<li><a href="" onclick="'.$suboptions.'; this.getParent().dispose(); return false;">'.$sublabel.'</a></li>';
       }
