@@ -1069,6 +1069,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.labels.autocompleteField = '".phpStringToJsString($l_autocomplete_field)."'
   obm.vars.labels.fatalServerErr = '".phpStringToJsString($l_fatal_server_err)."';
   obm.vars.labels.insertOk = '".phpStringToJsString($GLOBALS['l_insert_ok'])."';
+  obm.vars.labels.deleteOk = '".phpStringToJsString($GLOBALS['l_delete_ok'])."';
   $obm_vars
   // ]]>
   </script> 

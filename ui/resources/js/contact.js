@@ -178,6 +178,9 @@ Obm.Contact.AddressBook = new Class ({
 
   deleteAddressbook: function(id, name) {
     if(confirm(obm.vars.labels.confirmDeleteAddressBook+'\''+name+'\' ?')){
+      this.addressBookRequest.addEvent('complete', function() {
+        showOkMessage(obm.vars.labels.deleteOk);
+      });      
       this.addressBookRequest.post({ajax:1, action:'deleteAddressBook', 'addressbook_id':id});
     }
   } 
