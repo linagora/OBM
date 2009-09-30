@@ -186,8 +186,10 @@ class OBM_AddressBook implements OBM_ISearchable {
       $sync = !$sync;
     }
     $sync = $sync ? 'true':'false';
-    if (!$ad->isDefault && $ad->write) {
-      $query = "UPDATE AddressBook SET name='$name', syncable='$sync' WHERE id='$id'";
+
+    if ($ad->write) {
+      if (!$ad->isDefault) $name_q =  "name='$name',";
+      $query = "UPDATE AddressBook SET $name_q syncable='$sync' WHERE id='$id'";
       $db = new DB_OBM;
       $db->query($query);
     }
