@@ -176,9 +176,9 @@ Obm.Contact.AddressBook = new Class ({
     this.addressBookRequest.post({ajax:1, action:'storeAddressBook', 'tf_addressbook':$('tf_addressbook').value});
   },
 
-  deleteAddressbook: function(id) {
-    if(confirm('blah')){
-      console.log('DELETE addressbook '+id);
+  deleteAddressbook: function(id, name) {
+    if(confirm(obm.vars.labels.confirmDeleteAddressBook+'\''+name+'\' ?')){
+      this.addressBookRequest.post({ajax:1, action:'deleteAddressBook', 'addressbook_id':id});
     }
   } 
 

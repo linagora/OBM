@@ -277,7 +277,7 @@ function html_contact() {
   </table>
   <script type='text/javascript'>
     $('informationGrid').setStyle('display','none');
-    $dropDownMenu
+    obm.vars.labels.confirmDeleteAddressBook = '".phpStringToJsString($GLOBALS['l_confirm_delete_ad'])."';
     obm.initialize.chain(function () {
       obm.contact.addressbook = new Obm.Contact.AddressBook();
     })
@@ -320,19 +320,19 @@ function html_addressbooks_get_list() {
     $name = $ad->name;
 
     // Build drop down menu
-    // $field = '<ul id="ad'.$id.'" class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+    $field = '<ul id="ad'.$id.'" class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
 
-    // // Can't update or delete default addressbook
-    // if (!$ad->isDefault) {
-    //   $field .= "<li><a href=\"\" onclick=\"console.log('update')\" >update</a></li>";
-    //   $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.deleteAddressbook($id);return false;\" >delete</a></li>";
-    // }
+    // Can't update or delete default addressbook
+    if (!$ad->isDefault) {
+      //$field .= "<li><a href=\"\" onclick=\"console.log('update')\" >update</a></li>";
+      $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.deleteAddressbook($id, '".phpStringToJsString($name)."');return false;\" >delete</a></li>";
+    }
 
-    // $field .= "<li><a href=\"\" onclick=\"console.log('right')\" >right</a></li>";
-    // $field .= "<li><a href=\"\" onclick=\"console.log('sync')\" >synchronized</a></li>";
-    // $field .= "</ul>";
+    //$field .= "<li><a href=\"\" onclick=\"console.log('right')\" >right</a></li>";
+    //$field .= "<li><a href=\"\" onclick=\"console.log('sync')\" >synchronized</a></li>";
+    $field .= "</ul>";
 
-    // $dropDownMenu .= "new Obm.DropDownMenu($('ad$id'));";
+    $dropDownMenu .= "new Obm.DropDownMenu($('ad$id'));";
 
     $name = $name.''.$field;
     if($id == $addressBook->id) {

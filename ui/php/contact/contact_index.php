@@ -496,6 +496,12 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $block = html_addressbooks_get_list();
   echo $block;
   exit();
+} elseif ($action == 'deleteAddressBook') {
+///////////////////////////////////////////////////////////////////////////////
+  OBM_AddressBook::delete($params);
+  $block = html_addressbooks_get_list();
+  echo $block;
+  exit();
 }
 
 of_category_user_action_switch($module, $action, $params);
@@ -850,7 +856,12 @@ function get_contact_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );    
-
+  $actions['contact']['deleteAddressBook'] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contact/contact_index.php?action=deleteAddressBook",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );  
   update_action_rights();
 }
 

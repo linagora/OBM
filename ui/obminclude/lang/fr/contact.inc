@@ -54,6 +54,10 @@ $l_assistant = 'Assistant';
 $l_spouse = 'Conjoint';
 $l_synchronisation = "Abonnement";
 
+
+// Address books
+$l_confirm_delete_ad = "Voulez-vous supprimer le carnet d'adresse ";
+
 // Actions
 $l_j_check_date = "Remplissez la date avec une date valide";
 $l_insert = "Enregistrer le Contact";

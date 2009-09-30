@@ -116,10 +116,9 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public static function create($addressbook) {
-    global $obm;
 
-    $domain_id = $obm['domain_id'];
-    $uid = $obm['uid'];
+    $domain_id = $GLOBALS['obm']['domain_id'];
+    $uid = $GLOBALS['obm']['uid'];
     $ad_name = $addressbook['addressbook'];
 
     $query = "INSERT INTO AddressBook (
@@ -144,12 +143,28 @@ class OBM_AddressBook implements OBM_ISearchable {
       false,
       true)";
     $db = new DB_OBM;
-    $db->xquery($query);
+    $db->query($query);
+    $id = $db->lastid();
 
+    return self::get($id);
+  }
+
+  public static function delete($addressbook) {
+    $addressbook_id = $addressbook['addressbook_id'];
+    $uid = $GLOBALS['obm']['uid'];
+    $ad = self::get($addressbook_id);
+    if (!$ad->isDefault && $ad->write && $ad->owner==$uid) {
+      $db = new DB_OBM;
+      // Delete contacts
+      $query = "DELETE FROM Contact WHERE contact_addressbook_id='$addressbook_id'";
+      $db->query($query);
+      // Delete addressbook
+      $query = "DELETE FROM AddressBook WHERE id='$addressbook_id' and owner='$uid'";
+      $db->query($query);
+    }
   }
 
   public static function store() {
-
   }
 }
 
