@@ -5631,7 +5631,7 @@ function json_event_data($id,$calendar,$current_view) {
   $end->addSecond($duration);
   $title = $calendar['title'];
   $all = isset($calendar['all']) ? 1:0;
-  $periodic = $calendar['periodic'];
+  $periodic = isset($calendar['periodic'])?$calendar['periodic']:'false';
   while($ent_q->next_record()) {
     $entity = $ent_q->f('eventlink_entity');
     $entity_id = $ent_q->f('eventlink_entity_id');

@@ -162,7 +162,11 @@ Obm.CalendarManager = new Class({
 
     } else {
       var begin = evt.element.offsetTop.toFloat();
-      var end = begin + evt.element.getStyle('height').toFloat();
+      var height = obm.calendarManager.defaultHeight;
+      if (evt.event.duration > obm.vars.consts.timeUnit) {
+        height = evt.event.duration/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight;
+      }
+      var end = begin + height;
       for(var i=begin;i<end;i++) {
         if(!this.eventGrid[index].get(i)) {
           this.eventGrid[index].set(i,new Array());
