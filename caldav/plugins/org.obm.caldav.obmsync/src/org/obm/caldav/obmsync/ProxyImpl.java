@@ -75,4 +75,8 @@ public class ProxyImpl implements IProxy {
 		return hasRightsOnCalendar;
 	}
 
+	@Override
+	public String getETag() throws Exception {
+		return calendarService.getLastUpdate();
+	}
 }

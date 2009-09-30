@@ -54,7 +54,6 @@ public class DeleteHandler extends DavMethodHandler {
 			resp.setStatus(HttpServletResponse.SC_OK);
 			resp.setContentLength(0);
 			resp.setDateHeader("Delete", new Date().getTime());
-			resp.setHeader("ETag", extId);
 		} catch (MalformedURLException e) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			resp.setContentLength(0);

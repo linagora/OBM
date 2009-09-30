@@ -22,6 +22,6 @@ import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Element;
 
 public interface PropfindPropertyHandler {
-	void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy);
+	void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy, String url);
 	boolean isUsed();
 }

@@ -73,8 +73,7 @@ public class WebdavServlet extends HttpServlet {
 		IProxy proxy = null;
 		try {
 			String method = request.getMethod();
-
-			logger.info("[" + method + "] " + request.getRequestURI());
+			logger.info("\n[" + method + "] " + request.getRequestURI());
 			DavRequest dr = new DavRequest(request);
 			Token token = authHandler.doAuth(dr);
 			proxy = getProxy();
@@ -85,7 +84,7 @@ public class WebdavServlet extends HttpServlet {
 						+ request.getQueryString();
 				logger.debug("invalid auth, sending http 401 (uri: " + uri
 						+ ")");
-				String s = "Basic realm=\"CalDavService\"";
+				String s = "Basic realm=\"Obm CalDav\"";
 				response.setHeader("WWW-Authenticate", s);
 
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -108,7 +107,7 @@ public class WebdavServlet extends HttpServlet {
 			response.sendError(StatusCodeConstant.SC_INTERNAL_SERVER_ERROR);
 			logger.error(e.getMessage(), e);
 		} finally {
-			appendHearder(response);
+			appendHearder(response,proxy);
 			if (proxy != null) {
 				proxy.logout();
 			}
@@ -116,15 +115,21 @@ public class WebdavServlet extends HttpServlet {
 	}
 	
 	
-	private void appendHearder(HttpServletResponse response){
+	private void appendHearder(HttpServletResponse response, IProxy proxy){
 //		head[Content-Length] => 147
 //		head[Date] => Wed, 29 Jul 2009 11:29:03 GMT
 //		head[Expires] => Wed, 29 Jul 2009 11:29:03 GMT
 //		head[Cache-Control] => private, max-age=0
 //		head[X-Content-Type-Options] => nosniff
 //		head[DAV] => 1, calendar-access, calendar-schedule, calendar-proxy
+//		head[ETag] => "14F6F6-1000-4A7061DA"
 		response.setHeader("DAV", "1, calendar-access, calendar-schedule, calendar-proxy");
 		response.setHeader("Cache-Control", "private, max-age=0");
+		if(proxy != null){
+			try {
+				response.setHeader("ETag", proxy.getETag());
+			} catch (Exception e) {}
+		}
 	}
 
 	private IProxy getProxy() throws CoreException {
@@ -142,10 +147,8 @@ public class WebdavServlet extends HttpServlet {
 						+ current.getAttribute(currentAttributeName));
 			}
 		}
-
 		return (IProxy) configurationElements[0]
 				.createExecutableExtension("IProxy");
-
 	}
 
 	@Override

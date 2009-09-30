@@ -23,9 +23,12 @@ import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.exception.AppendPropertyException;
+import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
+import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
+import org.obm.caldav.server.share.Token;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Element;
@@ -47,10 +50,11 @@ import org.w3c.dom.Element;
  * @author adrienp
  * 
  */
-public class GetETag extends DavPropertyHandler implements CalendarQueryPropertyHandler, CalendarMultiGetPropertyHandler {
+public class GetETag extends DavPropertyHandler implements CalendarQueryPropertyHandler, CalendarMultiGetPropertyHandler,PropfindPropertyHandler {
 
 	protected Log logger = LogFactory.getLog(getClass());
 	
+	@Override	
 	public void appendCalendarQueryPropertyValue(Element prop, IProxy proxy,
 			EventTimeUpdate event) {
 		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
@@ -64,10 +68,22 @@ public class GetETag extends DavPropertyHandler implements CalendarQueryProperty
 		appendValue(val, event.getExtId(), event.getTimeUpdate() );
 	}
 	
+	@Override
+	public void appendPropertyValue(Element prop, Token t, DavRequest req,
+			IProxy proxy, String url) {
+		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
+		appendValue(val,"", new Date());
+	}
+	
 	private void appendValue(Element e, String extId, Date dateupdate){
 		if(dateupdate == null){
 			dateupdate = new Date();
 		}
 		e.setTextContent("\"" + extId + "-" + dateupdate.getTime() + "\"");
+	}
+
+	@Override
+	public boolean isUsed() {
+		return true;
 	}
 }

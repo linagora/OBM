@@ -50,7 +50,7 @@ public class CalendarDescription extends DavPropertyHandler implements
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IProxy proxy) {
+			IProxy proxy, String url) {
 		appendElement(prop, "calendar-description",
 				NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent(
 				"Calendar " + t.getCalendarName() + " from OBM-CalDav");

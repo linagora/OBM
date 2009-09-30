@@ -74,7 +74,7 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 	}
 	
 	@Override
-	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
+	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy, String url) {
 		Element elem = appendElement(prop, "getctag", NameSpaceConstant.CALENDARSERVER_NAMESPACE_PREFIX); 
 		Date lastChange = lastChangeByUser.get(t.getLoginAtDomain());
 		

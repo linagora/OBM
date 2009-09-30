@@ -42,7 +42,7 @@ public class DisplayName extends DavPropertyHandler implements
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IProxy proxy) {
+			IProxy proxy, String url) {
 		appendElement(prop, "displayname",
 				NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent(
 				"OBM CalDav " + req.getCalendarComponantName());

@@ -71,7 +71,7 @@ public class DavRequest {
 		if(uri.startsWith("/")){
 			uri = uri.substring(1);
 		}
-		String[] comp = uri.split("/");
+		String[] comp = uri.replaceAll("%40", "@").split("/");
 		if(comp.length == 0 || !comp[0].contains("@")){
 			throw new CalDavException(StatusCodeConstant.SC_NOT_FOUND);
 		} else {

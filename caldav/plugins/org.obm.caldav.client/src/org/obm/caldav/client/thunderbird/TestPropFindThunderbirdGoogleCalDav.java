@@ -41,4 +41,22 @@ public class TestPropFindThunderbirdGoogleCalDav extends GoogleCaldavPushTest{
 
 		DOMUtils.logDom(ret);
 	}
+	
+	public void testCalSync3() throws Exception {
+		InputStream in = loadDataFile("thunderbird/thunderbirdPropFind3.xml");
+		Document doc = DOMUtils.parse(in);
+		Document ret = propFindQuery(doc);
+		assertNotNull(ret);
+
+		DOMUtils.logDom(ret);
+	}
+	
+	public void testCalSync4() throws Exception {
+		InputStream in = loadDataFile("thunderbird/thunderbirdCalendarMultiGet1.xml");
+		Document doc = DOMUtils.parse(in);
+		Document ret = propFindQuery(doc);
+		assertNotNull(ret);
+
+		DOMUtils.logDom(ret);
+	}
 }

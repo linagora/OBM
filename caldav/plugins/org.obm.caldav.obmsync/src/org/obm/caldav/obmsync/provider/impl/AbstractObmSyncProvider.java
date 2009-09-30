@@ -188,11 +188,10 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 
 		for (Iterator<Event> it = events.iterator(); it.hasNext();) {
 			Event ev = it.next();
-			if (ev.getParentId() != 0) {
+			if (ev.getRecurrenceId() != null) {
 				it.remove();
 			}
 		}
-
 		return events;
 	}
 
@@ -207,7 +206,6 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			if (id != null && !"".equals(id)) {
 				event = client.getEventFromExtId(token, calendar, id);
 			}
-
 			if (event != null) {
 				fixPrioriryForTB(event);
 				listICS.put(event, client.parseEvent(token, event));
@@ -236,9 +234,8 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 	public void updateParticipationState(AccessToken token, String userId,
 			Event event, String participationState) throws AuthFault,
 			ServerFault {
-		CalendarInfo ci = getMyCalendar(token, userId);
 		for (Attendee att : event.getAttendees()) {
-			if (getMyCalendar(token, userId).getMail().equals(att.getEmail())) {
+			if (userId.equals(att.getEmail())) {
 				if (Constants.PARTICIPATION_STATE_ACCEPTED
 						.equals(participationState)) {
 					att.setState(ParticipationState.ACCEPTED);
@@ -251,7 +248,7 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				}
 			}
 		}
-		client.modifyEvent(token, ci.getUid(), event, true);
+		client.modifyEvent(token, userId, event, true);
 	}
 
 	protected Attendee getAttendee(String email) {
@@ -289,11 +286,18 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 
 		for (Iterator<EventTimeUpdate> it = events.iterator(); it.hasNext();) {
 			EventTimeUpdate ev = it.next();
-			if (ev.getParentId() != 0) {
+			logger.info("ev "+ev.getUid()+ " "+ev.getRecurrenceId());
+			if (ev.getRecurrenceId() != null) {
 				it.remove();
 			}
 		}
 		return events;
+	}
+	
+	public List<EventTimeUpdate> getEventTimeUpdateFromIntervalDate(AccessToken token,
+			String calendar, Date start, Date end) throws ServerFault, AuthFault {
+		return client.getEventTimeUpdateNotRefusedFromIntervalDate(token,
+				calendar, start, end);
 	}
 
 	public List<Event> getListEventsFromIntervalDate(AccessToken token,
@@ -314,6 +318,10 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			}
 		}
 		return false;
+	}
+	
+	public Date getLastUpdate(AccessToken token, String calendarName) throws ServerFault, AuthFault{
+		return client.getLastUpdate(token, calendarName);
 	}
 
 }

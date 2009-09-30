@@ -45,7 +45,7 @@ public class CalendarMultiGet extends ReportProvider {
 
 	public CalendarMultiGet() {
 		properties = new HashMap<String, CalendarMultiGetPropertyHandler>();
-		properties.put("D:getetag", new GetETag());
+		properties.put("getetag", new GetETag());
 		properties.put("calendar-data", new CalendarData());
 	}
 
@@ -143,7 +143,7 @@ public class CalendarMultiGet extends ReportProvider {
 	private Set<String> getListExtId(Element root){
 		Set<String> listExtIDEvent = new HashSet<String>();
 		if(root!= null){
-			NodeList dl = root.getElementsByTagName(NameSpaceConstant.DAV_NAMESPACE_PREFIX+"href");
+			NodeList dl = root.getElementsByTagNameNS(NameSpaceConstant.DAV_NAMESPACE, "href");
 			for(int i = 0; i<dl.getLength(); i++ ){
 				Element dhref = (Element)dl.item(i);
 				String hrefContent = dhref.getTextContent();

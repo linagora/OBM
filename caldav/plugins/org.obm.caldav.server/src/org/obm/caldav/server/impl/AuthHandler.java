@@ -40,7 +40,8 @@ public class AuthHandler {
 							.toCharArray()));
 					int p = userPass.indexOf(":");
 					if (p != -1) {
-						String userId = userPass.substring(0, p);
+						String userId = userPass.substring(0, p).replaceAll("%40", "@");
+						logger.info("userId "+userId);
 						String loginAtDomain = getLoginAtDomain(userId);
 						String password = userPass.substring(p + 1);
 						t = new Token(loginAtDomain, password, request.getCalendarComponantName());

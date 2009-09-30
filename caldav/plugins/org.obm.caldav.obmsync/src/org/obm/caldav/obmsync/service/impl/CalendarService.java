@@ -19,7 +19,6 @@ package org.obm.caldav.obmsync.service.impl;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,22 +119,14 @@ public class CalendarService implements ICalendarService{
 				end = gc.getTime();
 			}
 
-			
-			List<Event> events = providerEvent.getListEventsFromIntervalDate(token, calendar, cf.getTimeRange().getStart(), end);
-			List<EventTimeUpdate> allEvent = new LinkedList<EventTimeUpdate>();
-			for(Event e : events){
-				EventTimeUpdate etu = new EventTimeUpdate();
-				etu.setExtId(e.getExtId());
-				etu.setParentId(e.getParentId());
-				etu.setTimeUpdate(e.getTimeUpdate());
-				etu.setUid(e.getUid());
-				allEvent.add(etu);
-			}
-			
-			return allEvent;
-			
+			return providerEvent.getEventTimeUpdateFromIntervalDate(token, calendar, cf.getTimeRange().getStart(), end);
 		}
 		return providerEvent.getAllEventTimeUpdate(token, calendar); 
+	}
+	
+	@Override
+	public List<EventTimeUpdate> getAllLastUpdateEvents() throws Exception {
+		return getAllLastUpdateEvents(new CompFilter());
 	}
 
 	@Override
@@ -166,5 +157,10 @@ public class CalendarService implements ICalendarService{
 	@Override
 	public boolean hasRightsOnCalendar(String calendarName) throws Exception {
 		return providerEvent.hasRightsOnCalendar(token, calendarName);
+	}
+
+	@Override
+	public String getLastUpdate() throws Exception {
+		return providerEvent.getLastUpdate(token, calendar).toString();
 	}
 }

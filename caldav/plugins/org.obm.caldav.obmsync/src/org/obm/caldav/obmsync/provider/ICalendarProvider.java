@@ -79,7 +79,13 @@ public interface ICalendarProvider {
 	List<Event> getListEventsFromIntervalDate(AccessToken token,
 			String calendar, Date start, Date end) throws AuthFault,
 			ServerFault;
+	
+	List<EventTimeUpdate> getEventTimeUpdateFromIntervalDate(AccessToken token,
+			String calendar, Date start, Date end) throws ServerFault, AuthFault;
 
 	boolean hasRightsOnCalendar(AccessToken token, String calendarName) throws AuthFault,
 			ServerFault;
+
+	Date getLastUpdate(AccessToken token, String calendarName) throws AuthFault,
+	ServerFault;
 }

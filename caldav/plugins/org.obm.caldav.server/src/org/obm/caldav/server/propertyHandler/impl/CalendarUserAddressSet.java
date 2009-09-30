@@ -54,7 +54,7 @@ public class CalendarUserAddressSet extends DavPropertyHandler implements
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IProxy proxy) {
+			IProxy proxy, String url) {
 		Element elem = appendElement(prop, "calendar-user-address-set",
 				NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
 		appendElement(elem, "href", NameSpaceConstant.DAV_NAMESPACE_PREFIX)

@@ -26,7 +26,7 @@ public class CalendarColor implements PropfindPropertyHandler {
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IProxy proxy) {
+			IProxy proxy, String url) {
 	}
 
 	@Override

@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
 public class ResourceType extends DavPropertyHandler implements PropfindPropertyHandler, CalendarQueryPropertyHandler{
 
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
+	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy, String url) {
 		Element elem = appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		
 		appendElement(elem,"collection", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
