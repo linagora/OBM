@@ -38,7 +38,6 @@ Obm.Contact.AddressBook = new Class ({
 
   initialize: function() {
     $('contactPanel').getElements('div.contactPanelContainer > table > tbody').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 100);
-
     new Obm.Observer(new Window(window), {property:'innerHeight', onStop:function() {
       $('contactPanel').getElements('div.contactPanelContainer > table > tbody').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 100);
     }});
@@ -47,7 +46,7 @@ Obm.Contact.AddressBook = new Class ({
       url: obm.vars.consts.obmUrl + '/contact/contact_index.php',
       secure : false,
       evalScripts : true,
-      update: $('addressBookContainer')
+      update: $('addressBookContainer'),
     });
     this.addressBookRequest.addEvent('complete', function () {
       $('contactPanel').getElements('div.contactPanelContainer > table > tbody').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 100);
@@ -57,7 +56,7 @@ Obm.Contact.AddressBook = new Class ({
       url: obm.vars.consts.obmUrl + '/contact/contact_index.php',
       secure : false,
       evalScripts : true,
-      update: $('dataContainer')
+      update: $('dataContainer'),
     });
     this.contactRequest.addEvent('complete', function () {
       $('contactPanel').getElements('div.contactPanelContainer > table > tbody').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 100);

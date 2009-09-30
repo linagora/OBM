@@ -323,7 +323,7 @@ function html_addressbooks_get_list() {
     if ($sync) $ico = $GLOBALS['ico_sync'];
      
     // Build drop down menu
-    $field = '<ul id="ad'.$id.'" class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+    $field = '<ul id="ad'.$id.'" class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['icones']['dropdown'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
     // Can't update or delete default addressbook
     if (!$ad->isDefault) {
       $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.updateAddressBook($id);return false;\" >$GLOBALS[l_update_ad]</a></li>";
@@ -421,10 +421,20 @@ function dis_contact_consult2($contact) {
 
   //if(OBM_Acl::canWrite($obm['uid'], 'contact', $contact['id'])) {
     $toolbar = "
-      <ul class='toolbar'>
-        <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' ><img src='$GLOBALS[ico_update]' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
-        <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' ><img src='$GLOBALS[ico_delete]' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
+      <ul id='toolbarMenu' class='dropDownMenu'>
+        <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' > <img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
+        <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' > <img src='".$GLOBALS['icones']['delete']."' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
+        <li><a href=''><img src='".$GLOBALS['icones']['others']."' title='$GLOBALS[l_others]' alt='$GLOBALS[l_others]' /></a>
+          <ul>
+          <li><a href=''>Copier</a></li>
+          <li><a href=''>Deplacer</a></li>
+          <li><a href=''>Exporter</a></li>
+          </ul>
+        </li>
       </ul>
+      <script type='text/javascript'>
+        new Obm.DropDownMenu($('toolbarMenu'));
+      </script>
       ";
   //}
 
@@ -790,13 +800,13 @@ function dis_contact_form2($contact) {
     } 
   }
     $toolbar = "
-      <ul id='addFieldMenu' class='toolbar dropDownMenu'>
-        <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' ><img src='$GLOBALS[ico_update]' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
-        <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' ><img src='$GLOBALS[ico_delete]' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
-        <li><a href=''><img src='$GLOBALS[ico_add]' title='$GLOBALS[l_add_fields]' alt='$GLOBALS[l_add_fields]' /></a><ul>$addBar</ul></li>
+      <ul id='toolbarMenu' class='dropDownMenu'>
+        <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' ><img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
+        <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' ><img src='".$GLOBALS['icones']['delete']."' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
+        <li><a href=''><img src='".$GLOBALS['icones']['add']."' title='$GLOBALS[l_add_fields]' alt='$GLOBALS[l_add_fields]' /></a><ul>$addBar</ul></li>
       </ul>
       <script type='text/javascript'>
-        new Obm.DropDownMenu($('addFieldMenu'));
+        new Obm.DropDownMenu($('toolbarMenu'));
         new Obm.DropDownMenu($('addressMenu'));
         new Obm.DropDownMenu($('phoneMenu'));
         new Obm.DropDownMenu($('emailMenu'));

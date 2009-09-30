@@ -207,4 +207,9 @@ $ico_file           = "$theme_path/ico_file.gif";
 // Contact Icons
 $ico_sync           = "$theme_path/ico_sync.gif";
 $ico_desync         = "$theme_path/ico_unsync.gif";
- 
+$icones['edit']     = "$theme_path/edit.png";
+$icones['delete']   = "$theme_path/delete.png";
+$icones['others']   = "$theme_path/othersDropDown.png";
+$icones['add']      = "$theme_path/addDropDown.png";
+$icones['close']    = "$theme_path/close.png";
+$icones['dropdown'] = "$theme_path/dropDown.png";

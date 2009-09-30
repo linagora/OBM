@@ -65,7 +65,7 @@ Obm.DropDownMenu= new Class({
 			visibility:'visible'
 		});
 		//hack for IE, again
-		this.menu.getElements('a').setStyle('display',(Browser.Engine.trident?'inline-block':'block'));
+		//this.menu.getElements('a').setStyle('display',(Browser.Engine.trident?'inline-block':'block'));
 	},
 	
 	createSubmenu:function(ul){
@@ -111,7 +111,7 @@ Obm.DropDownMenu= new Class({
 							$clear(li.retrieve('closeDelay'));
 						}.bind(this)
 					);
-					li.getFirst('a').addEvent('click',function(e){
+					li.addEvent('click',function(e){
 						e.stop();
 						$clear(li.retrieve('closeDelay'));
 						this.showChildList(li);

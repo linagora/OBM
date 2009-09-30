@@ -39,9 +39,9 @@
 
 .contactPanelContainer thead td.toolbar, .contactPanelContainer thead th.toolbar {
   text-align: left;
-  background: #dee1e3;
+  background: #c5d2d8;
   height: 23px;
-  padding-left: 3px;
+  padding-left: 10px;
   overflow: visible;
 }
 
@@ -96,7 +96,7 @@
 }
 
 #addressBookContainer ul {
-  float: right;
+  display: inline;
 }
 
 #addressBookContainer td {

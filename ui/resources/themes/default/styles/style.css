@@ -1633,6 +1633,10 @@ form.button-to input {
 /* ------------------------------------------------------------------------- */
 
 .dropDownMenu {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
 }
 
 .dropDownMenu ul {
@@ -1652,9 +1656,6 @@ form.button-to input {
 }
 
 .submenu-down  {
-  background-image: url('../images/arrow_single_down.gif');
-  background-repeat: no-repeat;
-  background-position: center right;  
 }
 
 .submenu-down ul {

@@ -1077,7 +1077,6 @@ function display_head($p_module, $standard=true) {
   $obm_vars
   // ]]>
   </script> 
-  <!-- <script type=\"text/javascript\" src=\"$resources_path/js/mootools.js\" ></script> -->
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
