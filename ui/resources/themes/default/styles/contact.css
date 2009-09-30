@@ -37,7 +37,7 @@
   white-space: nowrap;
 }
 
-.contactPanelContainer thead td.search, .contactPanelContainer thead th.search {
+.contactPanelContainer thead td.toolbar, .contactPanelContainer thead th.toolbar {
   text-align: left;
   background: #dee1e3;
   height: 23px;
@@ -80,6 +80,13 @@
 #addressBookContainer tr.filler, #dataContainer tr.filler {
   visibility: hidden;
   height: auto;
+}
+
+#addressBookContainer ul {
+  float: right;
+}
+
+#addressBookContainer td {
 }
 
 /* Data rows styling */

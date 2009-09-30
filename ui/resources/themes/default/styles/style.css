@@ -1577,6 +1577,9 @@ form.button-to input {
   padding-top: 12px;
 }
 
+/* ------------------------------------------------------------------------- */ 
+/* Advanced search
+/* ------------------------------------------------------------------------- */
 #advancedSearch .header {
   border:3px solid #74dd82;
   border-bottom: none;
@@ -1625,35 +1628,44 @@ form.button-to input {
   display:inline;
 }
 
+/* ------------------------------------------------------------------------- */ 
+/* Drop Down menu
+/* ------------------------------------------------------------------------- */
+
 .dropDownMenu {
 }
 
 .dropDownMenu ul {
-  background-color: red;
+  width: 10em;
+  padding: 0;
 }
+
+.dropDownMenu ul li {
+  padding-left: 1em;
+  line-height: 1.5em;
+  background-color:#C8D3D9;
+  border: 1px solid #A8BAC8;  
+}
+
+.dropDownMenu ul li:hover {
+  background-color: #F0F4F7;
+}
+
 .submenu-down  {
   background-image: url('../images/arrow_single_down.gif');
   background-repeat: no-repeat;
   background-position: center right;  
-  padding-right: 14px;
 }
 
 .submenu-down ul {
-  padding-left: 14px;
-}
-
-.submenu-down li {
-  background-color: #b3b2b2;
 }
 
 .submenu-left {
   background-image: url('../images/arrow_right.gif');
   background-repeat: no-repeat;
   background-position: center right;  
-  padding-right: 14px;
 }
 
 .submenu-left ul{
-  padding-left: 5px;
-  width:10em;
+  margin-left: 9em;
 }

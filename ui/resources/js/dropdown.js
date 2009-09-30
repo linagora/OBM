@@ -3,9 +3,9 @@ Obm.DropDownMenu= new Class({
 	Implements:Options,
 	
 	options:{
-		clickToOpen:false,	//if set to true,  must click to open submenues
-		openDelay:150,	//if hover mode, duration the mouse must stay on target before submenu is opened. if exits before delay expires, timer is cleared 
-		closeDelay:150,	//delay before the submenu close when mouse exits. If mouse enter the submenu again before timer expires, it's cleared
+		clickToOpen:true,	//if set to true,  must click to open submenues
+		openDelay:50,	//if hover mode, duration the mouse must stay on target before submenu is opened. if exits before delay expires, timer is cleared 
+		closeDelay:50,	//delay before the submenu close when mouse exits. If mouse enter the submenu again before timer expires, it's cleared
 		link:'cancel',
 		mode:'horizontal' //if set to horizontal, the top level menu will be displayed horizontally. If set to vertical, it will be displayed vertically. If it does not match any of those two words, 'horizontal' will be used.
 	},
