@@ -46,6 +46,7 @@ class OBM_Contact implements OBM_ISearchable {
   public $comment2;
   public $comment3;
   public $origin;
+  public $addressbook;
  
   private static $kinds = null;
 
@@ -172,7 +173,7 @@ class OBM_Contact implements OBM_ISearchable {
     return $contacts;
   }
   
-  public static function create($data) {
+  public static function create($data, $addressbook) {
     global $cgp_show, $cdg_sql, $obm;
 
     $uid = sql_parse_id($obm['uid']);
@@ -181,12 +182,12 @@ class OBM_Contact implements OBM_ISearchable {
     $data['aka'] = trim($data['aka']);
     // If aka is empty we auto fill it
     if ($aka == '') {
-      $auto_aka = format_name($data['lname'], 0, true, true);
-      if ($auto_aka != $data['lname']) {
+      $auto_aka = format_name($data['lastname'], 0, true, true);
+      if ($auto_aka != $data['lastname']) {
         $data['aka'] = $auto_aka;
       }
     }
-    $data['sound'] = phonetic_key($data['lname']);
+    $data['sound'] = phonetic_key($data['lastname']);
     $add_comment = $data['add_comment'];
     if ($add_comment != '') {
       $datecomment = of_isodate_convert($data['datecomment']);
@@ -211,8 +212,8 @@ class OBM_Contact implements OBM_ISearchable {
     if (empty($data['datasource_id'])) $data['datasource_id'] = $data['datasource'];
 
     $contact = new OBM_Contact;
-    $contact->lastname  = $data['lname'];
-    $contact->firstname = $data['fname'];
+    $contact->lastname  = $data['lastname'];
+    $contact->firstname = $data['firstname'];
     $fields = array('mname','kind','title','function','company_id','company',
       'market','suffix','aka','sound','manager','assistant','spouse','category',
       'service','mailok','newsletter','archive','comment','comment2','comment3',
@@ -270,7 +271,8 @@ class OBM_Contact implements OBM_ISearchable {
       contact_comment,
       contact_comment2,
       contact_comment3,
-      contact_origin
+      contact_origin,
+      contact_addressbook_id
     ) VALUES (
       NOW(),
       NOW(),
@@ -302,7 +304,8 @@ class OBM_Contact implements OBM_ISearchable {
       '{$contact->comment}',
       '{$contact->comment2}',
       '{$contact->comment3}',
-      '{$GLOBALS['c_origin_web']}'
+      '{$GLOBALS['c_origin_web']}',
+      '{$addressbook->id}'
     )";
 
     display_debug_msg($query, $cdg_sql, 'OBM_Contact:create(1)');
@@ -457,8 +460,8 @@ class OBM_Contact implements OBM_ISearchable {
 
   public static function import($vcard) {
     $contact = array(
-      'lname' => $vcard->name->family,
-      'fname' => $vcard->name->given,
+      'lastname' => $vcard->name->family,
+      'firstname' => $vcard->name->given,
       'function' => $vcard->role,
       'title' => $vcard->title,
       'addresses' => array(),

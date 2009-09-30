@@ -492,7 +492,6 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'storeAddressBook') {
 ///////////////////////////////////////////////////////////////////////////////
-  include('addressbook.php');
   OBM_AddressBook::create($params);
   $block = html_addressbooks_get_list();
   echo $block;

@@ -753,12 +753,14 @@ class DummyGenerators extends PDO {
     $start = 0;
     $total = $eventIdsSet->getSize() * $this->eventMeetingRatio * 6 ;
     $this->massiveInsert('TmpEventLink', $staticsColumns, 1, $total);
+    exit();
     $size = $eventIdsSet->getSize();
     $start = 0;
     while($size > 0) {
       $this->query("INSERT INTO TmpEventLink (tmpevent_id, tmpentity_id) SELECT event_id, userentity_entity_id
         FROM Event 
         INNER JOIN UserEntity ON userentity_user_id =  event_owner WHERE  event_domain_id = ".$this->domain." LIMIT ".$this->limit." OFFSET $start");    
+
       $start += $this->limit;
       $size -= $this->limit;
     }

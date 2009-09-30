@@ -60,6 +60,11 @@ class  OBM_Search {
       break;
     case 'text' :
       return "$sql #LIKE '$value%'";
+      break;
+    case 'boolean' :
+      $val = ($value)?'TRUE':'FALSE';
+      return "$sql = ".$val;
+      break;
     }
   }
 
