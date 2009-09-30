@@ -100,6 +100,43 @@ class OBM_AddressBook implements OBM_ISearchable {
 
     return new OBM_AddressBookArray($addressBooks);
   }
+
+  public static function create($addressbook) {
+    global $obm;
+
+    $domain_id = $obm['domain_id'];
+    $uid = $obm['uid'];
+    $ad_name = $addressbook['addressbook'];
+
+    $query = "INSERT INTO AddressBook (
+      domain_id,
+      timeupdate,
+      timecreate,
+      userupdate,
+      usercreate,
+      origin,
+      owner,
+      name,
+      is_default,
+      syncable) VALUES (
+      $domain_id,
+      NOW(),
+      NOW(),
+      $uid,
+      $uid,
+      '$GLOBALS[c_origin_web]',
+      $uid,
+      '$ad_name',
+      false,
+      true)";
+    $db = new DB_OBM;
+    $db->xquery($query);
+
+  }
+
+  public static function store() {
+
+  }
 }
 
 

@@ -1068,6 +1068,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.labels.transparent = '".phpStringToJsString($l_transparent)."';
   obm.vars.labels.autocompleteField = '".phpStringToJsString($l_autocomplete_field)."'
   obm.vars.labels.fatalServerErr = '".phpStringToJsString($l_fatal_server_err)."';
+  obm.vars.labels.insertOk = '".phpStringToJsString($GLOBALS['l_insert_ok'])."';
   $obm_vars
   // ]]>
   </script> 

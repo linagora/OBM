@@ -247,14 +247,7 @@ function html_contact() {
   $addressBook = $addressBooks->getMyContacts();
   $contacts = $addressBook->getContacts();
   $contactsList = html_contact_get_list($contacts, $contactHeaders);
-  foreach($addressBooks as $id => $ad) {
-    if($id == $addressBook->id) {
-      $adList .= '<tr><td onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'" class="current">'.$ad->name.'</td></tr>';
-    } else {
-      $adList .= '<tr><td onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'">'.$ad->name.'</td></tr>';
-    }
-  }
-  $adList .= "<tr class='filler'><th>&nbsp;</th></tr>";
+  $adList = html_addressbooks_get_list();
   $block = "
   <form name='search' onsubmit='obm.contact.addressbook.searchContact(this); return false;' id='searchForm'>
     <input type='hidden' name='action' value='search'  />
@@ -264,16 +257,11 @@ function html_contact() {
     <tr>
       <td id='addressBookGrid'>
         <div  id='addressBookContainer' class='contactPanelContainer'>
-        <table>  
-          <thead>
-          <tr><th>Carnets d'addresses</th></tr>
-          <tr><td class='search'><input size='15' type='text' value='' name='addressbookfilter' id='addressbookfilter' /> </td></tr>
-          </thead>           
-          <tbody>
           $adList
-          </tbody>
-        </table>
         </div>
+        <form name='f_addressbook' id='f_addressbook' onsubmit='obm.contact.addressbook.storeAddressBook();return false;' style='visibility:hidden;'>
+          <input type='text' id='tf_addressbook'/>
+        </form>
         <input type='button' value='+' id='addAddressBook' onclick='obm.contact.addressbook.addAddressBook();'/>
       </td>
       <td id='dataGrid'>
@@ -290,6 +278,7 @@ function html_contact() {
   </table>
   <script type='text/javascript'>
     $('informationGrid').setStyle('display','none');
+    $dropDownMenu
     obm.initialize.chain(function () {
       obm.contact.addressbook = new Obm.Contact.AddressBook();
     })
@@ -321,6 +310,56 @@ function html_contact_get_headers() {
   } 
   return $headers;
 }
+
+
+/**
+ * html_addressbooks_get_list()
+ */
+function html_addressbooks_get_list() {
+  $addressBooks = OBM_AddressBook::search();
+  foreach($addressBooks as $id => $ad) {
+    $name = $ad->name;
+
+    // Build drop down menu
+    // $field = '<ul id="ad'.$id.'" class="dropDownMenu"><li><a href=""><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /></a><ul>';
+
+    // // Can't update or delete default addressbook
+    // if (!$ad->isDefault) {
+    //   $field .= "<li><a href=\"\" onclick=\"console.log('update')\" >update</a></li>";
+    //   $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.deleteAddressbook($id);return false;\" >delete</a></li>";
+    // }
+
+    // $field .= "<li><a href=\"\" onclick=\"console.log('right')\" >right</a></li>";
+    // $field .= "<li><a href=\"\" onclick=\"console.log('sync')\" >synchronized</a></li>";
+    // $field .= "</ul>";
+
+    // $dropDownMenu .= "new Obm.DropDownMenu($('ad$id'));";
+
+    $name = $name.''.$field;
+    if($id == $addressBook->id) {
+      $adList .= '<tr><td onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'" class="current">'.$name.'</td></tr>';
+    } else {
+      $adList .= '<tr><td onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'">'.$name.'</td></tr>';
+    }
+  }
+  $adList .= "<tr class='filler'><th>&nbsp;</th></tr>";
+
+  $block = "<table>  
+     <thead>
+     <tr><th>Carnets d'addresses</th></tr>
+     <tr><td class='search'><input size='15' type='text' value='' name='addressbookfilter' id='addressbookfilter' /> </td></tr>
+     </thead>           
+     <tbody>
+     $adList
+     </tbody>
+   </table>
+   <script type='text/javascript'>
+     $dropDownMenu
+   </script>";
+  return $block;
+
+}
+
 
 /**
  * html_contact_get_list 
