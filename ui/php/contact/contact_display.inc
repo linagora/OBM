@@ -241,7 +241,6 @@ function dis_contact_search_form($contact='') {
  * @return void
  */
 function html_contact() {
-  include('addressbook.php');
   $addressBooks = OBM_AddressBook::search();
   $contactHeaders = html_contact_get_headers();
   $addressBook = $addressBooks->getMyContacts();
@@ -417,7 +416,6 @@ function html_contact_get_list($contacts, $headers) {
  */
 function dis_contact_consult2($contact) {
 
-  $contact = OBM_Contact::get($contact['id']);
   //if(OBM_Acl::canWrite($obm['uid'], 'contact', $contact['id'])) {
     $toolbar = "
       <ul class='toolbar'>

@@ -471,6 +471,7 @@ function run_query_contact_kind() {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_insert($contact) {
   $c = OBM_Contact::create($contact);
+  var_dump($c);
   return $c->id;
 }
 

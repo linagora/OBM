@@ -74,6 +74,7 @@ require('contact_query.inc');
 require_once('contact_js.inc');
 require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
+require_once('addressbook.php');
 $extra_js_include[] = 'contact.js';
 $extra_css[] = $css_contact;
 
@@ -431,8 +432,8 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'consult')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $params['contact_id'] = $params['id'];
-  $block = dis_contact_consult2($params);
+  $contact = OBM_Contact::get($contact['id']);
+  $block = dis_contact_consult2($contact);
   echo $block;
   exit();
 } elseif ($action == 'updateContact')  {
@@ -448,11 +449,13 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if (check_user_defined_rules() && check_contact_data_form('', $params)) {
       if(isset($params['contact_id'])) {
         $retour = run_query_contact_update($params);
+        $contact = OBM_Contact::get($contact['id']);
       } else {
-        $id = run_query_contact_insert($params);
-        $params['contact_id'] = $id;
+        if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
+        else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
+        $contact = $addressBook->addContact($params);
       }
-      $block = dis_contact_consult2($params);
+      $block = dis_contact_consult2($contact);
       echo $block;
       exit();
     } else {
@@ -461,6 +464,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       exit();
     }
   } else {
+    $contact = OBM_Contact::get($contact['id']);
     $block = dis_contact_consult2($params);
     echo $block;
     exit();    
@@ -468,15 +472,13 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   
 } elseif ($action == 'list')  {
 ///////////////////////////////////////////////////////////////////////////////
-  include('addressbook.php');
-  $addressBook = new OBM_AddressBook($params['id'], null, null, null, null, null, null, null);
+  $addressBook =  OBM_AddressBook::get($params['id']);
   $contactHeaders = html_contact_get_headers();
   $block = html_contact_get_list($addressBook->getContacts(), $contactHeaders);
   echo $block;
   exit();
 } elseif ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
-  include('addressbook.php');
   $contactHeaders = html_contact_get_headers();
   $addressBooks = OBM_AddressBook::search();
   $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern']), $contactHeaders);

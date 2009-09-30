@@ -48,12 +48,26 @@ class OBM_AddressBook implements OBM_ISearchable {
   public static function fieldsMap() {
     $fields['*'] = array('AddressBook.name' => 'text');
     $fields['name'] = array('AddressBook.name' => 'text');
+    $fields['id'] = array('AddressBook.id' => 'integer');
+    $fields['owner'] = array('AddressBook.owner' => 'integer');
+    $fields['default'] = array('AddressBook.is_default' => 'boolean');
+
     return $fields;
   }
 
   public function getContacts($pattern='', $offset=0, $limit=100) {
     $pattern .= ' addressbook:'.$this->id;
     return OBM_Contact::search($pattern, $limit, $offset);
+  }
+
+  public function addContact($fields) {
+    return OBM_Contact::create($fields, $this);
+  }
+
+  public static function get($pattern) {
+    if(is_numeric($pattern))
+      $pattern = 'id:'.$pattern; 
+    return self::search($pattern)->current();
   }
 
   public static function search($searchPattern=null) {
