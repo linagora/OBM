@@ -318,9 +318,9 @@ function html_addressbooks_get_list() {
   $addressBooks = OBM_AddressBook::search();
   foreach($addressBooks as $id => $ad) {
     $name = $ad->__get('name');
-    $sync = $ad->sync;
+    $synced = $ad->__get('synced');
     $ico = $GLOBALS['ico_desync'];
-    if ($sync) $ico = $GLOBALS['ico_sync'];
+    if ($synced) $ico = $GLOBALS['ico_sync'];
      
     // Build drop down menu
     $field = '<ul id="ad'.$id.'" class="dropDownMenu addressBookMenu"><li><img src="'.$GLOBALS['icones']['dropdown'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
@@ -334,7 +334,11 @@ function html_addressbooks_get_list() {
     if ($ad->admin) {
       $field .= "<li><a href=\"contact_index.php?action=rights_admin&entity_id=$id\" >$GLOBALS[l_rights]</a></li>";
     }
-    $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.toggleSync($id);return false;\" >$GLOBALS[l_sync_ad]</a></li>";
+
+    if ($ad->syncable) {
+      $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.toggleSynced($id);return false;\" >$GLOBALS[l_sync_ad]</a></li>";
+    }
+
     $field .= "</ul></ul>";
 
     $dropDownMenu .= "new Obm.DropDownMenu($('ad$id'));";

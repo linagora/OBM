@@ -29,9 +29,10 @@ class OBM_AddressBook implements OBM_ISearchable {
   public $read;
   public $write;
   public $admin;
-  public $sync;
+  public $syncable;
+  public $synced;
 
-  public function __construct($id, $name, $is_default, $owner, $sync, $access, $read, $write, $admin) {
+  public function __construct($id, $name, $is_default, $owner, $syncable, $synced, $access, $read, $write, $admin) {
     $this->id = $id;
     $this->name = $name;
     $this->access = $access;
@@ -40,7 +41,8 @@ class OBM_AddressBook implements OBM_ISearchable {
     $this->admin = $admin;
     $this->isDefault = $is_default;
     $this->owner = $owner;
-    $this->sync = $sync;
+    $this->syncable = $syncable;
+    $this->synced = $synced;
     $this->db = new DB_OBM;
   }
 
@@ -106,12 +108,13 @@ class OBM_AddressBook implements OBM_ISearchable {
         Rights.entityright_access,
         Rights.entityright_read,
         Rights.entityright_write,
-        Rights.entityright_admin
+        Rights.entityright_admin,
+        (SELECT count (*) FROM SyncedAddressbook WHERE addressbook_id=AddressBook.id) AS synced
       FROM AddressBook 
       INNER JOIN ('.OBM_Acl::getAclSubselect($columns, 'addressbook', null, $GLOBALS['obm']['uid'], 'read').') AS Rights ON AddressBook.id = Rights.addressbookentity_addressbook_id
       WHERE 1=1 '.$query.' ORDER BY AddressBook.name');
     while($db->next_record()) {
-      $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('entityright_access'),
+      $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
                                                         $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));
     }    
     $db->xquery('
@@ -124,10 +127,12 @@ class OBM_AddressBook implements OBM_ISearchable {
         1 as entityright_access,
         1 as entityright_read,
         1 as entityright_write,
-        1 as entityright_admin
-      FROM AddressBook WHERE AddressBook.owner = '.$GLOBALS['obm']['uid']. $query.' ORDER BY AddressBook.name'); 
+        1 as entityright_admin,
+        (SELECT count (*) FROM SyncedAddressbook WHERE addressbook_id=AddressBook.id) AS synced
+      FROM AddressBook 
+      WHERE AddressBook.owner = '.$GLOBALS['obm']['uid']. $query.' ORDER BY AddressBook.name'); 
     while($db->next_record()) {
-      $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('entityright_access'),
+      $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
                                                         $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));
     }
 
@@ -185,23 +190,38 @@ class OBM_AddressBook implements OBM_ISearchable {
 
   public static function store($addressbook) {
     $id = $addressbook['id'];
-    $sync = $addressbook['sync'];
+    $syncable = $addressbook['sync'];
     $name = $addressbook['name'];
     $ad = self::get($id);
-    $sync = $ad->sync;
+    $syncable = $ad->syncable;
     $name = $ad->name;
     if (isset($addressbook['name'])) $name = $addressbook['name'];
-    if ($addressbook['action'] == 'toggleSync') {
-      $sync = !$sync;
+    if ($addressbook['action'] == 'toggleSyncable') {
+      $syncable = !$syncable;
     }
-    $sync = $sync ? 'true':'false';
+    $syncable = $syncable ? 'true':'false';
 
     if ($ad->write) {
       if (!$ad->isDefault) $name_q =  "name='$name',";
-      $query = "UPDATE AddressBook SET $name_q syncable='$sync' WHERE id='$id'";
+      $query = "UPDATE AddressBook SET $name_q syncable='$syncable' WHERE id='$id'";
       $db = new DB_OBM;
       $db->query($query);
     }
+  }
+
+  public static function setSynced($addressbook) {
+    $id = $addressbook['id'];
+    $ad = self::get($id);
+    $uid = $GLOBALS['obm']['uid'];
+    if ($ad->synced) {
+      // Remove synchronized addressbook
+      $query = "DELETE FROM SyncedAddressbook WHERE user_id='$uid' AND addressbook_id='$id'";
+    } else {
+      // Add synchronized addressbook
+      $query = "INSERT INTO SyncedAddressbook VALUES ($uid, $id, NOW())"; 
+    }
+    $db = new DB_OBM;
+    $db->query($query);
   }
 }
 

@@ -208,12 +208,25 @@ Obm.Contact.AddressBook = new Class ({
     }
   },
 
-  toggleSync: function(id) {
+  /*
+   * Set true or false AddressBook.sync
+   */
+  toggleSyncable: function(id) {
     this.addressBookRequest.addEvent('complete', function() {
       showOkMessage(obm.vars.labels.updateOk);
     });
-    this.addressBookRequest.post({ajax:1, action:'toggleSync', 'id':id});
-  }
+    this.addressBookRequest.post({ajax:1, action:'toggleSyncable', 'id':id});
+  },
+
+  /*
+   * SynchedAddressBook
+   */
+  toggleSynced: function(id) {
+    this.addressBookRequest.addEvent('complete', function() {
+      showOkMessage(obm.vars.labels.updateOk);
+    });
+    this.addressBookRequest.post({ajax:1, action:'toggleSynced', 'id':id});
+  },
 });
 
 

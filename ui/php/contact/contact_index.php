@@ -119,11 +119,11 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 } else if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['search'] = dis_contact_search_form($params);
-  if ($_SESSION['set_display'] == 'yes') {
-    $display['result'] = dis_contact_search_list($params);
-  } else {
-    $display['msg'] .= display_info_msg($l_no_display);
-  }
+  // if ($_SESSION['set_display'] == 'yes') {
+  //   $display['result'] = dis_contact_search_list($params);
+  // } else {
+  //   $display['msg'] .= display_info_msg($l_no_display);
+  // }
   
 } elseif ($action == 'search2') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -535,13 +535,19 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $block = html_addressbooks_get_list();
   echo $block;
   exit();
-} elseif ($action == 'toggleSync') {
+} elseif ($action == 'toggleSyncable') {
 ///////////////////////////////////////////////////////////////////////////////
   OBM_AddressBook::store($params);
   $block = html_addressbooks_get_list();
   echo $block;
   exit();
-} 
+} elseif ($action == 'toggleSynced') {
+///////////////////////////////////////////////////////////////////////////////
+  OBM_AddressBook::setSynced($params);
+  $block = html_addressbooks_get_list();
+  echo $block;
+  exit();
+}
 
 of_category_user_action_switch($module, $action, $params);
 
@@ -904,12 +910,16 @@ function get_contact_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );  
-  $actions['contact']['toggleSync'] = array (
-    'Url'      => "$path/contact/contact_index.php?action=toggleSync",
+  $actions['contact']['toggleSyncable'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=toggleSyncable",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );  
-
+  $actions['contact']['toggleSynced'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=toggleSynced",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );  
   update_action_rights();
 }
 
