@@ -106,6 +106,7 @@ require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 require('calendar_mailer.php');
 require('event_observer.php');
+require('../contact/addressbook.php');
 get_calendar_action();
 update_calendar_action();
 $perm->check_permissions($module, $action);
@@ -247,7 +248,6 @@ if ($action == 'search') {
   $extra_js_include[] = 'inplaceeditor.js';
   $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
   $extra_css[] = $css_ext_color_picker ;
-  include('../contact/addressbook.php');
   $display['detail'] = dis_calendar_event_form($action, $params, '', $cal_entity_id);
 
 } elseif ($action == 'insert') {

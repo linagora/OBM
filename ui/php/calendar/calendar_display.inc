@@ -3800,7 +3800,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </td>";
   
   $dis_others_attendees = dis_calendar_mail_field($others_attendees, $class);
-  if ($has_access_to_other_calendars = OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access') || true) {
+  if ($has_access_to_other_calendars = OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access') || true) { // FIXME
     $addressbooks = OBM_Addressbook::search();
     foreach($addressbooks as $id => $addressbook) {
       $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->__get('id')."\">".$addressbook->__get('name')."</option>";
@@ -3813,7 +3813,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <tr>
       <th>
       $l_users / $GLOBALS[l_contacts]
-      $user_add_button
       </th>
       <td class=\"autocompleteField\">
       <select id=\"userSearchSource\" class=\"autocompleteSource\" name=\"\" style=\"float: right;\">
@@ -4548,22 +4547,22 @@ function dis_calendar_meeting_form($current_view, $calendar, $sel_entity_id) {
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
-
+    $addressbooks = OBM_Addressbook::search();
+    foreach($addressbooks as $id => $addressbook) {
+      $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->__get('id')."\">".$addressbook->__get('name')."</option>";
+    }    
     $block_user = "
       <tr>
       <th>
       $GLOBALS[l_users] / $GLOBALS[l_contacts]
-      $user_add_button
       </th>
       <td class=\"autocompleteField\">
       <select id=\"userSearchSource\" class=\"autocompleteSource\" name=\"\" style=\"float: right;\">
         <option value=\"$path/user/user_index.php?from=calendar\">$GLOBALS[l_users]</option>
         <option value=\"$path/contact/contact_index.php?from=calendar\">$GLOBALS[l_contacts]</option>
-        <!-- FIXME: lister les addressbook du user ici
         <optgroup label=\"$GLOBALS[l_addressbook]\">
-          <option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=5\">Mon addressbook</option>
+          $addressbook_options
         </optgroup>
-        -->
       </select>
       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
       </td>
@@ -4707,7 +4706,7 @@ function dis_calendar_meeting_form($current_view, $calendar, $sel_entity_id) {
       <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />
       $dis_sel_group
   </td>";
-  if (OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access')) {
+  if (OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access') || true) { // FIXME
     $dis_block_user = "<fieldset class=\"detail infos\">  
       <legend>$GLOBALS[l_attendees]</legend>
       <table>
