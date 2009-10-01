@@ -137,8 +137,6 @@ sub getParameter {
             $parameters->{'domain-id'} = $self->_getNameDomainId( $parameters->{'domain-name'} );
             last SWITCH;
         }
-
-        die;
     }
 
     if( defined($parameters->{'domain-id'}) && ($parameters->{'domain-id'} =~ /^[0-9]+$/) ) {
