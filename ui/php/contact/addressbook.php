@@ -66,16 +66,6 @@ class OBM_AddressBook implements OBM_ISearchable {
     }
   }
 
-  public static function getCollectedAddressbook() {
-    $addressbooks = self::search();
-    foreach($addressbooks as $addressbook) {
-      if ($addressbook->name == 'collected_contacts') {
-        $ret = $addressbook->id;
-      }
-    }
-    return $ret;
-  }
-
   public static function fieldsMap() {
     $fields['*'] = array('AddressBook.name' => 'text');
     $fields['name'] = array('AddressBook.name' => 'text');
@@ -259,7 +249,14 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
         return $addressbook;
     }
   }
-  
+
+  public function getCollectedAddressbook() {
+    foreach($this->addressbooks as $addressbook) {
+      if($addressbook->isDefault && $addressbook->name == 'collected_contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
+        return $addressbook;
+    }
+  }
+
   public function offsetSet($offset, $value) {
     $this->$addressbooks[$offset] = $value;
   }

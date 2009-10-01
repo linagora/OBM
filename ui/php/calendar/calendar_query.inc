@@ -4382,7 +4382,8 @@ function run_query_insert_others_attendees($calendar) {
   $ret = array();
 
   // Get collected addressbook
-  $addressbook_id = OBM_AddressBook::getCollectedAddressbook();
+  $addressBooks = OBM_AddressBook::search();
+  $addressbook_id = $addressBooks->getCollectedAddressbook()->id;
 
   foreach($attendees as $email) {
     //// Check if exists

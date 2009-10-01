@@ -376,14 +376,14 @@ function html_addressbooks_get_list() {
   }
 
   $adList .= "<tr>
-   <td onclick='obm.contact.addressbook.selectAddressBook(this)' id='addressbook-archive'>$GLOBALS[l_archive]
+   <td onclick='obm.contact.addressbook.selectAddressBook(this)' id='addressbook-archive' style='padding-left:16px;'>$GLOBALS[l_archive]
    <input type='hidden' value='archive:1' id='searchPattern-archive' />
    <input type='hidden' value='0' id='ad-write-archive'/>
    </td>
   </tr>
 
   <tr id='searchResultsFolder' style='display:none;'>
-   <td onclick='obm.contact.addressbook.selectAddressBook(this);' id='addressbook-searchResults'>$GLOBALS[l_search_results]
+   <td onclick='obm.contact.addressbook.selectAddressBook(this);' id='addressbook-searchResults' style='padding-left:16px;'>$GLOBALS[l_search_results]
    <input type='hidden' value='' id='searchPattern-searchResults' />
    <input type='hidden' value='0' id='ad-write-searchResults'/>
    </td>
