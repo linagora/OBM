@@ -60,7 +60,8 @@ $l_public_contacts = "Contacts publics";
 $l_collected_contacts = "Contacts collectés";
 $l_delete_ad = "Supprimer";
 $l_update_ad = "Modifier";
-$l_sync_ad = "Synchroniser";
+$l_sync_ad = "S'abonner";
+$l_desync_ad = "Se désabonner";
 $l_confirm_delete_ad = "Voulez-vous supprimer le carnet d'adresse ";
 
 // Actions

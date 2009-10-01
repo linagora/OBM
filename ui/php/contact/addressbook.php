@@ -196,7 +196,7 @@ class OBM_AddressBook implements OBM_ISearchable {
     $syncable = $ad->syncable;
     $name = $ad->name;
     if (isset($addressbook['name'])) $name = $addressbook['name'];
-    if ($addressbook['action'] == 'toggleSyncable') {
+    if ($addressbook['action'] == 'setSyncable') {
       $syncable = !$syncable;
     }
     $syncable = $syncable ? 'true':'false';

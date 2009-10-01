@@ -230,7 +230,7 @@ function dis_contact_search_form($contact='') {
   $funcs = of_category_get_ordered('contact', 'function');
   $dsrc_q = run_query_global_datasource();
 //  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q);
-  $block = html_contact();
+  $block = html_contact($contact['contact_id']);
   return $block;
 }
 
@@ -240,13 +240,25 @@ function dis_contact_search_form($contact='') {
  * @access public
  * @return void
  */
-function html_contact() {
+function html_contact($contact_id) {
   $addressBooks = OBM_AddressBook::search();
   $contactHeaders = html_contact_get_headers();
   $addressBook = $addressBooks->getMyContacts();
   $contacts = $addressBook->getContacts();
   $contactsList = html_contact_get_list($contacts, $contactHeaders);
   $adList = html_addressbooks_get_list();
+
+  if (isset($contact_id)) {
+    $c = OBM_Contact::get($contact_id);
+    
+    $detailconsult = "
+      obm.contact.addressbook.selectAddressBook($('addressbook-$c->addressbook'));
+        obm.contact.addressbook.contactRequest.addEvent('complete', function() {
+        obm.contact.addressbook.selectContact($('contact-'+$contact_id));
+        obm.contact.addressbook.contactRequest.removeEvents('complete');
+      }.bind(this));";
+  }
+
   $block = "
   <form name='search' onsubmit='obm.contact.addressbook.searchContact(this); return false;' id='searchForm'>
     <input type='hidden' name='action' value='search'  />
@@ -280,6 +292,7 @@ function html_contact() {
     obm.vars.labels.confirmDeleteAddressBook = '".phpStringToJsString($GLOBALS['l_confirm_delete_ad'])."';
     obm.initialize.chain(function () {
       obm.contact.addressbook = new Obm.Contact.AddressBook();
+      $detailconsult
     })
   </script>
   ";
@@ -320,7 +333,11 @@ function html_addressbooks_get_list() {
     $name = $ad->__get('name');
     $synced = $ad->__get('synced');
     $ico = $GLOBALS['ico_desync'];
-    if ($synced) $ico = $GLOBALS['ico_sync'];
+    $l_sync = $GLOBALS['l_sync_ad'];
+    if ($synced) {
+      $ico = $GLOBALS['ico_sync'];
+      $l_sync = $GLOBALS['l_desync_ad'];
+    }
      
     // Build drop down menu
     $field = '<ul id="ad'.$id.'" class="dropDownMenu addressBookMenu"><li><img src="'.$GLOBALS['icones']['dropdown'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
@@ -336,7 +353,7 @@ function html_addressbooks_get_list() {
     }
 
     if ($ad->syncable) {
-      $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.toggleSynced($id);return false;\" >$GLOBALS[l_sync_ad]</a></li>";
+      $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.setSubscription($id);return false;\" >$l_sync</a></li>";
     }
 
     $field .= "</ul></ul>";
@@ -440,23 +457,24 @@ function dis_contact_consult2($contact) {
       $write = $addressBook->write;
     }
   }
-    if ($write) {
-      $toolbar = "
-      <ul id='toolbarMenu' class='dropDownMenu'>
-        <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' >
-          <img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
-        <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' >
-          <img src='".$GLOBALS['icones']['delete']."' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
-        <li><img src='".$GLOBALS['icones']['others']."' title='$GLOBALS[l_others]' alt='$GLOBALS[l_others]' />
-          <ul><li>$GLOBALS[l_copy]<ul>$copy</ul></li>
-          <li><a href='$GLOBALS[path]/contact/contact_index.php?action=vcard&amp;contact_id=$contact->id' onclick='return false;'>Exporter</a></li>
-          </ul>
-        </li>
-      </ul>
-      <script type='text/javascript'>
-        new Obm.DropDownMenu($('toolbarMenu'));
-      </script>";
-     };
+
+  if ($write) {
+    $toolbar = "
+    <ul id='toolbarMenu' class='dropDownMenu'>
+      <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id); return false;' >
+        <img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
+      <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id); return false;' >
+        <img src='".$GLOBALS['icones']['delete']."' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
+      <li><img src='".$GLOBALS['icones']['others']."' title='$GLOBALS[l_others]' alt='$GLOBALS[l_others]' />
+        <ul><li>$GLOBALS[l_copy]<ul>$copy</ul></li>
+        <li><a href='$GLOBALS[path]/contact/contact_index.php?action=vcard&amp;contact_id=$contact->id' onclick='return false;'>Exporter</a></li>
+        </ul>
+      </li>
+    </ul>
+    <script type='text/javascript'>
+      new Obm.DropDownMenu($('toolbarMenu'));
+    </script>";
+  }
 
   if($contact->lastname) {
     $nameLayout =  strtoupper($contact->lastname).' ';

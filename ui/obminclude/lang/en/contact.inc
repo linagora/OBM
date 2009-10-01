@@ -78,9 +78,10 @@ $l_sync = "Subscirbe for synchronisation";
 $l_desync = "Unsubscribe for synchronisation";
 
 // Address books
+$l_sync_ad = "Subscribe";
+$l_desync_ad = "Unsubscribe";
 $l_delete_ad = "Delete";
 $l_update_ad = "Update";
-$l_sync_ad = "Synchronize";
 $l_confirm_delete_ad = "Remove address book ";
 
 

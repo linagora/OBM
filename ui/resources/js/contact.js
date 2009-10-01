@@ -211,21 +211,21 @@ Obm.Contact.AddressBook = new Class ({
   /*
    * Set true or false AddressBook.sync
    */
-  toggleSyncable: function(id) {
+  setSyncable: function(id) {
     this.addressBookRequest.addEvent('complete', function() {
       showOkMessage(obm.vars.labels.updateOk);
     });
-    this.addressBookRequest.post({ajax:1, action:'toggleSyncable', 'id':id});
+    this.addressBookRequest.post({ajax:1, action:'setSyncable', 'id':id});
   },
 
   /*
    * SynchedAddressBook
    */
-  toggleSynced: function(id) {
+  setSubscription: function(id) {
     this.addressBookRequest.addEvent('complete', function() {
       showOkMessage(obm.vars.labels.updateOk);
     });
-    this.addressBookRequest.post({ajax:1, action:'toggleSynced', 'id':id});
+    this.addressBookRequest.post({ajax:1, action:'setSubscription', 'id':id});
   },
 });
 

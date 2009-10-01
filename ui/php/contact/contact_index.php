@@ -85,7 +85,7 @@ $perm->check_permissions($module, $action);
 //  $display['msg'] = display_err_msg($l_error_visibility);
 //  $action = 'index';
 //} else {
-update_last_visit('contact', $params['contact_id'], $action);
+// update_last_visit('contact', $params['contact_id'], $action);
 //}
 page_close();
 
@@ -159,9 +159,10 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params['contact_id'] > 0) {
-    $display['detail'] = dis_contact_consult($params);
-  }
+  $display['search'] = dis_contact_search_form($params);
+  // if ($params['contact_id'] > 0) {
+  //   $display['detail'] = dis_contact_consult($params);
+  // }
   
 } elseif ($action == 'sync' || $action == 'desync') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -434,6 +435,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 ///////////////////////////////////////////////////////////////////////////////
   $contact = OBM_Contact::get($params['id']);
   $block = dis_contact_consult2($contact);
+  update_last_visit('contact', $params['id'], $action);
   echo $block;
   exit();
 } elseif ($action == 'updateContact')  {
@@ -541,7 +543,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $block = html_addressbooks_get_list();
   echo $block;
   exit();
-} elseif ($action == 'toggleSynced') {
+} elseif ($action == 'setSubscription') {
 ///////////////////////////////////////////////////////////////////////////////
   OBM_AddressBook::setSynced($params);
   $block = html_addressbooks_get_list();
@@ -910,13 +912,13 @@ function get_contact_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );  
-  $actions['contact']['toggleSyncable'] = array (
-    'Url'      => "$path/contact/contact_index.php?action=toggleSyncable",
+  $actions['contact']['setSyncable'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=setSyncable",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );  
-  $actions['contact']['toggleSynced'] = array (
-    'Url'      => "$path/contact/contact_index.php?action=toggleSynced",
+  $actions['contact']['setSubscription'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=setSubscription",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );  
