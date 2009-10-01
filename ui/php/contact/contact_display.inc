@@ -325,13 +325,15 @@ function html_addressbooks_get_list() {
     // Build drop down menu
     $field = '<ul id="ad'.$id.'" class="dropDownMenu addressBookMenu"><li><img src="'.$GLOBALS['icones']['dropdown'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
     // Can't update or delete default addressbook
-    if (!$ad->isDefault) {
+    if (!$ad->isDefault && $ad->admin) {
       $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.updateAddressBook($id);return false;\" >$GLOBALS[l_update_ad]</a></li>";
       $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.deleteAddressBook($id, '".phpStringToJsString($name)."');return false;\" >$GLOBALS[l_delete_ad]</a></li>";
       //$dblclick = 'onDblclick="obm.contact.addressbook.updateAddressBook('.$id.');"';
     }
 
-    $field .= "<li><a href=\"contact_index.php?action=rights_admin&entity_id=$id\" >$GLOBALS[l_rights]</a></li>";
+    if ($ad->admin) {
+      $field .= "<li><a href=\"contact_index.php?action=rights_admin&entity_id=$id\" >$GLOBALS[l_rights]</a></li>";
+    }
     $field .= "<li><a href=\"\" onclick=\"obm.contact.addressbook.toggleSync($id);return false;\" >$GLOBALS[l_sync_ad]</a></li>";
     $field .= "</ul></ul>";
 
