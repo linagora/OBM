@@ -472,7 +472,6 @@ function dis_contact_consult2($contact) {
       $write = $addressBook->write;
     }
   }
-
   if ($write) {
     $toolbar = "
     <ul id='toolbarMenu' class='dropDownMenu'>
@@ -788,7 +787,7 @@ function dis_contact_form2($params) {
       $field = '<ul id="'.$fieldname.'Menu"  class="dropDownMenu"><li><img src="'.$GLOBALS['ico_add'].'" alt="'.$GLOBALS['l_add'].'" /><ul>';
       foreach($GLOBALS['l_'.$fieldname.'_labels'] as $label => $title) {
         $field .= "<li><a href=\"\" onclick=\"new Obm.Contact.".strtoupper($fieldname)."Widget({protocol: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});return false;\" value=\"$label\">$title</a></li>";
-        $addJs[$fieldname][$title] = "new Obm.Contact.".ucfirst($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
+        $addJs[$fieldname][$title] = "new Obm.Contact.".strtoupper($fieldname)."Widget({label: {value: '".phpStringToJsString($label)."', label:'".phpStringToJsString($title)."'}},{container:'${fieldname}Menu', inject: 'before'});$('$fieldname').setStyle('display','');return false;";
       }
       $field .= '</li></ul>';      
       if(!empty($contact->$fieldname)) {

@@ -182,6 +182,7 @@ class OBM_Contact implements OBM_ISearchable {
     return $contacts;
   }
   
+  //FIXME Redo this, it's totally buggy and crappy
   public static function create($data, $addressbook) {
     global $cgp_show, $cdg_sql, $obm;
 
@@ -341,10 +342,10 @@ class OBM_Contact implements OBM_ISearchable {
     return $contact;
   }
   
-  public function store() {
+  public static function store($contact) {
     global $obm, $cgp_show, $cdg_sql;
 
-    if (!$this->id) return false;
+    if (!$contact->id) return false;
     //else
 
     $now = date('Y-m-d H:i:s');
@@ -352,43 +353,43 @@ class OBM_Contact implements OBM_ISearchable {
     $multidomain = sql_multidomain('contact');
 
     // In case company module not used, to avoid postgres error
-    $comp_id = sql_parse_id($this->company_id);
-    $dsrc    = sql_parse_id($this->datasource_id);
-    $kind    = sql_parse_id($this->kind);
-    $market  = sql_parse_id($this->market);
-    $func    = sql_parse_id($this->function);
+    $comp_id = sql_parse_id($contact->company_id);
+    $dsrc    = sql_parse_id($contact->datasource_id);
+    $kind    = sql_parse_id($contact->kind);
+    $market  = sql_parse_id($contact->market);
+    $func    = sql_parse_id($contact->function);
 
     $date = ($contact->date ? "'{$contact->date}'" : 'null');
 
-    $sql_id = sql_parse_id($this->id, true);
+    $sql_id = sql_parse_id($contact->id, true);
     $query = "UPDATE Contact SET
       contact_timeupdate='{$now}',
       contact_userupdate='{$uid}',
       contact_datasource_id=$dsrc,
       contact_company_id=$comp_id,
-      contact_company='{$this->company}',
+      contact_company='{$contact->company}',
       contact_kind_id=$kind,
       contact_marketingmanager_id=$market,
-      contact_lastname='{$this->lastname}',
-      contact_firstname='{$this->firstname}',
-      contact_middlename='{$this->mname}',
-      contact_suffix='{$this->suffix}',
-      contact_aka='{$this->aka}',
-      contact_sound='{$this->sound}',
-      contact_manager='{$this->manager}',
-      contact_assistant='{$this->assistant}',
-      contact_spouse='{$this->spouse}',
-      contact_category='{$this->category}',
-      contact_service='{$this->service}',
+      contact_lastname='{$contact->lastname}',
+      contact_firstname='{$contact->firstname}',
+      contact_middlename='{$contact->mname}',
+      contact_suffix='{$contact->suffix}',
+      contact_aka='{$contact->aka}',
+      contact_sound='{$contact->sound}',
+      contact_manager='{$contact->manager}',
+      contact_assistant='{$contact->assistant}',
+      contact_spouse='{$contact->spouse}',
+      contact_category='{$contact->category}',
+      contact_service='{$contact->service}',
       contact_function_id=$func,
-      contact_title='{$this->title}',
-      contact_mailing_ok={$this->mailok},
-      contact_newsletter={$this->newsletter},
-      contact_archive={$this->archive},
+      contact_title='{$contact->title}',
+      contact_mailing_ok={$contact->mailok},
+      contact_newsletter={$contact->newsletter},
+      contact_archive={$contact->archive},
       contact_date=$date,
-      contact_comment='{$this->comment}',
-      contact_comment2='{$this->comment2}',
-      contact_comment3='{$this->comment3}',
+      contact_comment='{$contact->comment}',
+      contact_comment2='{$contact->comment2}',
+      contact_comment3='{$contact->comment3}',
       contact_origin='{$GLOBALS['c_origin_web']}'
     WHERE contact_id $sql_id 
       $multidomain";
@@ -399,46 +400,45 @@ class OBM_Contact implements OBM_ISearchable {
 
     if ($cgp_show['module']['company']) {
       // If company has changed, update the companies contact number
-      if (($retour) && (!empty($this->old_company_id)) && ($this->company_id!=$this->old_company_id)) {
-        run_query_global_company_contact_number_update($this->old_company_id);
+      if (($retour) && (!empty($contact->old_company_id)) && ($contact->company_id!=$contact->old_company_id)) {
+        run_query_global_company_contact_number_update($contact->old_company_id);
         run_query_global_company_contact_number_update($comp_id);
       }
     }
 
     // Birthday & Anniversary support
     //FIXME: do it better
-    self::storeAnniversary('birthday', $this->id, $uid, $this->birthday_event, $this->display_name(), $this->old_birthday, $this->birthday);
-    self::storeAnniversary('anniversary', $this->id, $uid, $this->anniversary_event, $this->display_name(), $this->old_anniversary, $this->anniversary);
+    self::storeAnniversary('birthday', $contact->id, $uid, $contact->birthday_event, $contact->display_name(), $contact->old_birthday, $contact->birthday);
+    self::storeAnniversary('anniversary', $contact->id, $uid, $contact->anniversary_event, $contact->display_name(), $contact->old_anniversary, $contact->anniversary);
 
     if ($retour) {
-      $ret = of_userdata_query_update('contact', $this->id, $contact);
-      self::storeCoords($this);
+      $ret = of_userdata_query_update('contact', $contact->id, $contact);
+      self::storeCoords($contact);
     }
 
-    return $this;
+    return $contact;
   }
 
-  public function delete() {
+  public static function delete($contact) {
     global $obm, $cdg_sql, $c_use_connectors;
-    if (!$this->id) return false;
+    if (!$contact->id) return false;
     //else
-  
     $obm_q = new DB_OBM;
   
     $multidomain = sql_multidomain('contact');
-    $sql_id = sql_parse_id($this->id);
-    $comp_id = sql_parse_id($this->company_id);
+    $sql_id = sql_parse_id($contact->id);
+    $comp_id = sql_parse_id($contact->company_id);
   
-    run_query_global_delete_document_links($this->id, 'contact');    
-    $ret = of_userdata_query_delete('contact', $this->id);
+    run_query_global_delete_document_links($contact->id, 'contact');    
+    $ret = of_userdata_query_delete('contact', $contact->id);
   
     //FIXME: do it better
     // BEGIN birthday and anniversary support
-    run_query_contact_birthday_update('birthday', null, null, $this->birthday_event, null, null, null);
-    run_query_contact_birthday_update('anniversary', null, null, $this->anniversary_event, null, null, null);
+    run_query_contact_birthday_update('birthday', null, null, $contact->birthday_event, null, null, null);
+    run_query_contact_birthday_update('anniversary', null, null, $contact->anniversary_event, null, null, null);
     // END birthday and anniversary support
   
-    of_entity_delete('contact', $this->id);
+    of_entity_delete('contact', $contact->id);
   
     $query = "DELETE FROM Contact WHERE contact_id = $sql_id $multidomain";
     display_debug_msg($query, $cdg_sql, 'OBM_Contact::delete(1)');
@@ -452,11 +452,8 @@ class OBM_Contact implements OBM_ISearchable {
           deletedcontact_user_id,
           deletedcontact_timestamp,
           deletedcontact_origin)
-        VALUES (
-          $sql_id,
-          $uid,
-          NOW(),
-          '$GLOBALS[c_origin_web]')";
+        SELECT $contact->id, user_id, NOW(), '$GLOBALS[c_origin_web]' FROM  SyncedAddressbook 
+        WHERE addressbook_id = $contact->addressbook";
       display_debug_msg($query, $cdg_sql, 'OBM_Contact::delete(2)');
       $retour = $obm_q->query($query);
     }

@@ -41,11 +41,11 @@ Obm.Contact.AddressBook = new Class ({
     new Obm.Observer(new Window(window), {property:'innerHeight', onStop:function() {
       $('contactPanel').getElements('div.contactPanelContainer > table > tbody').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 100);
     }});
-
     this.addressBookRequest = new Request.HTML({
       url: obm.vars.consts.obmUrl + '/contact/contact_index.php',
       secure : false,
       evalScripts : true,
+      onRequest: function () {this.options.update.set('html','<table><tr class="filler"><td></td></tr>')},
       update: $('addressBookContainer'),
     });
     this.addressBookRequest.addEvent('complete', function () {
@@ -56,6 +56,7 @@ Obm.Contact.AddressBook = new Class ({
       url: obm.vars.consts.obmUrl + '/contact/contact_index.php',
       secure : false,
       evalScripts : true,
+      onRequest: function () {this.options.update.set('html','<table><tr class="filler"><td></td></tr>')},
       update: $('dataContainer'),
     });
     this.contactRequest.addEvent('complete', function () {
@@ -67,6 +68,7 @@ Obm.Contact.AddressBook = new Class ({
       secure : false,
       evalScripts : true,
       update: $('informationContainer'),
+      onRequest: function () {this.options.update.set('html','<table><tr class="filler"><td></td></tr>')},
       onFailure: function (response) {
         var errors = JSON.decode(response.responseText, false);
         errors.error = new Hash(errors.error);
@@ -155,6 +157,16 @@ Obm.Contact.AddressBook = new Class ({
     $('dataContainer').addClass('shrinked');
   },    
 
+  deleteContact: function(id, name) {
+    if(confirm(obm.vars.labels.confirmDeleteContact+'\''+name+'\' ?')){
+      this.addressBookRequest.addEvent('success', function() {
+        showOkMessage(obm.vars.labels.deleteOk);
+      });      
+      this.contactRequest.post({ajax:1, action:'deleteContact', 'contact_id':id});
+      this.hideContact();
+    }
+  },
+
   searchContact: function(form) {
     this.hideContact();
     this.contactRequest.get(form); 
@@ -206,7 +218,7 @@ Obm.Contact.AddressBook = new Class ({
 
   deleteAddressBook: function(id, name) {
     if(confirm(obm.vars.labels.confirmDeleteAddressBook+'\''+name+'\' ?')){
-      this.addressBookRequest.addEvent('complete', function() {
+      this.addressBookRequest.addEvent('success', function() {
         showOkMessage(obm.vars.labels.deleteOk);
       });      
       this.addressBookRequest.post({ajax:1, action:'deleteAddressBook', 'addressbook_id':id});

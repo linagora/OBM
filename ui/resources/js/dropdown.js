@@ -23,8 +23,8 @@ Obm.DropDownMenu= new Class({
 		this.menu = $(this.menu);
 		//start setup
 		this.menu.setStyles({
-			visibility:'hidden',
 			overflow:'hidden',
+                        zIndex: 1,
 			height:0,
 		});
 		//we call the createSubmenu function on the main UL, which is a recursive function
@@ -61,7 +61,7 @@ Obm.DropDownMenu= new Class({
 		this.menu.setStyles({
 			height:'auto',
 			overflow:'visible',
-			visibility:'visible'
+			display:''
 		});
 		//hack for IE, again
 		//this.menu.getElements('a').setStyle('display',(Browser.Engine.trident?'inline-block':'block'));
@@ -131,17 +131,19 @@ Obm.DropDownMenu= new Class({
 	
 	//display submenu
 	showChildList:function(li){
+                this.menu.setStyle('z-index', 1000);
                 li.setStyle('z-index', 1000);
-		li.getFirst('ul').setStyles({'opacity' : 1, 'visibility' :'visible'});
-                li.getFirst('ul').getChildren('li').setStyles({'opacity' : 1, 'visibility' :'visible', 'z-index' : 1000});
+		li.getFirst('ul').setStyles({'opacity' : 1, 'display' :'block'});
+                li.getFirst('ul').getChildren('li').setStyles({'opacity' : 1, 'display' :'block', 'z-index' : 1000});
 
 	},
 	
 	//hide the menu
 	hideChildList:function(li){
+          this.menu.setStyle('z-index', 1);
           li.setStyle('z-index', 1);
-          li.getFirst('ul').setStyles({'opacity' : 0, 'visibility' : 'hidden'});
-          li.getFirst('ul').getChildren('li').setStyles({'opacity' : 0, 'visibility' : 'hidden'});        
-          li.getFirst('ul').getChildren('li').setStyles({'opacity' : 1, 'visibility' :'visible', 'z-index' : 1});
+          li.getFirst('ul').setStyles({'opacity' : 0, 'display' : 'none'});
+          li.getFirst('ul').getChildren('li').setStyles({'opacity' : 0, 'display' : 'none'});        
+          li.getFirst('ul').getChildren('li').setStyles({'opacity' : 1, 'display' :'block', 'z-index' : 1});
 	}
 });

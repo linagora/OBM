@@ -431,6 +431,8 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'consult')  {
 ///////////////////////////////////////////////////////////////////////////////
+  //FIXME Errors 
+  //FIXME Right Management
   $contact = OBM_Contact::get($params['id']);
   $block = dis_contact_consult2($contact);
   update_last_visit('contact', $params['id'], $action);
@@ -438,12 +440,15 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   exit();
 } elseif ($action == 'updateContact')  {
 ///////////////////////////////////////////////////////////////////////////////
+  //FIXME Right Management
+  //FIXME Errors 
   $params['contact_id'] = $params['id'];
   $block = dis_contact_form2($params);
   echo $block;
   exit();  
 } elseif ($action == 'storeContact') {
 ///////////////////////////////////////////////////////////////////////////////
+  //FIXME Right Management
   $params['contact_id'] = $params['id'];
   if (check_contact_update_rights($params)) {
     if (check_user_defined_rules() && check_contact_data_form('', $params)) {
@@ -464,6 +469,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       exit();
     }
   } else {
+  //FIXME Errors 
     $contact = OBM_Contact::get($params['id']);
     $block = dis_contact_consult2($contact);
     echo $block;
@@ -471,36 +477,45 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   }
 } elseif ($action == 'copyContact') {
 ///////////////////////////////////////////////////////////////////////////////
+  //FIXME Right Management
   $params['contact_id'] = $params['id'];
   if (check_contact_update_rights($params)) {
-    if (check_user_defined_rules() && check_contact_data_form('', $params)) {
-      if(isset($params['contact_id'])) {
-        $retour = run_query_contact_update($params);
-        $contact = OBM_Contact::get($params['id']);
-      } else {
-        if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
-        else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
-        $contact = $addressBook->addContact($params);
-      }
-      $block = dis_contact_consult2($contact);
-      echo $block;
-      exit();
-    } else {
-      header('HTTP', true, 400);
-      echo OBM_Error::getInstance()->toJson();
-      exit();
-    }
+    $retour = run_query_contact_update($params);
+    $contact = OBM_Contact::get($params['id']);
+    if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
+    else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
+    $contact = $addressBook->addContact($params);
+    $block = dis_contact_consult2($contact);
+    echo $block;
+    exit();
   } else {
     $contact = OBM_Contact::get($params['id']);
     $block = dis_contact_consult2($contact);
     echo $block;
     exit();    
   }
-   
+} elseif ($action == 'deleteContact') {
+///////////////////////////////////////////////////////////////////////////////
+  //FIXME Right Management
+  $contact = OBM_Contact::get($params['contact_id']);
+  if($contact->archive) {
+    OBM_Contact::delete($contact);
+  } else {
+    $contact->archive = 1;
+    OBM_Contact::store($contact);
+  }
+  $addressBooks = OBM_AddressBook::search();
+  $contactHeaders = html_contact_get_headers();
+  $block = html_contact_get_list($addressBooks->searchContacts('in:'.$contact->addressbook), $contactHeaders);
+  echo $block;
+  //FIXME Errors 
+    exit();      
 } elseif ($action == 'list')  {
 ///////////////////////////////////////////////////////////////////////////////
   $contactHeaders = html_contact_get_headers();
   $addressBooks = OBM_AddressBook::search();
+  //FIXME Right Management
+  //FIXME Errors 
   $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern']), $contactHeaders);
   echo $block;
   exit();
@@ -646,6 +661,12 @@ function get_contact_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );    
+  $actions['contact']['deleteContact'] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contact/contact_index.php?action=deleteContact",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );      
   $actions['contact']['list'] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/contact/contact_index.php?action=list",
