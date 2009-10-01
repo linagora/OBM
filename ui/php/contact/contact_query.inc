@@ -1776,61 +1776,29 @@ function run_query_contact_ext_search($contact) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $pattern = $contact['pattern'];
-  $filter_pattern = (isset($contact['filter_pattern']))?$contact['filter_pattern'] : 'access';
-
-  $uid = $obm['uid'];
+  $addressbook_id = $contact['addressbook_id'];
   $obm_q = new DB_OBM;
-  $multidomain = sql_multidomain('Contact');
-
- // Now we play with ACLs
-  $query = "
-    SELECT contactentity_contact_id AS id
-    FROM UserEntity
-    INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
-    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
-    WHERE userentity_user_id = $uid
-      AND entityright_$filter_pattern = 1
-    UNION ALL SELECT contactentity_contact_id AS id FROM UserEntity
-    INNER JOIN of_usergroup ON userentity_user_id = of_usergroup_user_id
-    INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id
-    INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id
-    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
-    WHERE userentity_user_id = $uid
-      AND entityright_$filter_pattern = 1
-    UNION ALL SELECT contact_id as id FROM Contact 
-    WHERE contact_usercreate = $uid";
-  display_debug_msg($query, $cdg_sql, 'run_query_contact_ext_search(0)');
-  $obm_q->query($query);
-  $f_contact_ids = array();
-  while ($obm_q->next_record()) {
-    $f_contact_ids[] = sql_parse_id($obm_q->f('id'));
-  }
-  $where = "AND ((1=1 $multidomain)";
-  if (count($f_contact_ids) > 0) {
-    $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
-  }
-  $where.= ")";
-
-  $resultsCount = $obm_q->f('resultscount')+0;
+  $multidomain = sql_multidomain('contact');
 
   $query = "SELECT 
+      contact_id,
       contact_firstname,
       contact_lastname,
       email_address
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-    INNER JOIN Email ON contactentity_entity_id = email_entity_id 
-    WHERE (((contact_firstname #LIKE '%$pattern%' 
-      OR contact_lastname #LIKE '%$pattern%')
-      AND email_label #LIKE 'INTERNET;X-OBM-Ref1') OR email_address #LIKE '%$pattern%')
-      $where
-    GROUP BY contact_firstname, contact_lastname, email_address
+    LEFT JOIN Email ON contactentity_entity_id = email_entity_id 
+    WHERE ((contact_firstname #LIKE '%$pattern%' OR contact_lastname #LIKE '%$pattern%') AND 
+          ((email_label #LIKE 'INTERNET;X-OBM-Ref1' AND email_address #LIKE '%$pattern%') OR email_address IS NULL))
+      AND contact_addressbook_id='$addressbook_id' $multidomain
+    GROUP BY contact_id, contact_firstname, contact_lastname, email_address
     ORDER BY contact_lastname, contact_firstname
     LIMIT 20 OFFSET 0";
+
   display_debug_msg($query, $cdg_sql, 'run_query_contact_ext_search()');
   $obm_q->xquery($query);
 
-  return array('length' => $resultsCount, 'datas' => $obm_q);
+  return array('length' => $obm_q->num_rows()+0, 'datas' => $obm_q);
 }
 
 

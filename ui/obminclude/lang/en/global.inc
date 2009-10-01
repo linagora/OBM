@@ -194,6 +194,10 @@ $l_advanced_search = "Advanced search";
 $l_hide_advanced_search = "Hide search options";
 $l_basic_search = "Basic search";
 
+$l_addressbook = "Addressbook";
+$l_contacts = "My contacts";
+$l_public_contacts = "Public Contacts";
+$l_collected_contacts = "Collected Contacts";
 $l_first_sync = "First sync time";
 $l_last_sync = "Last sync time";
 $l_mobile_identifier = "User Agent";

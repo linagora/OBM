@@ -360,7 +360,7 @@ function html_addressbooks_get_list() {
 
   $block = "<table>  
      <thead>
-     <tr><th>Carnets d'addresses</th></tr>
+     <tr><th>$GLOBALS[l_addressbook]</th></tr>
      <tr><td class='search'><input size='15' type='text' value='' name='addressbookfilter' id='addressbookfilter' /> </td></tr>
      </thead>           
      <tbody>
@@ -3051,6 +3051,7 @@ function json_search_contact($contact ,$results) {
 
   $contacts = array();
   while($contact_q->next_record()) {
+    $id = $contact_q->f('contact_id');
     $label = phpStringToJsString(trim($contact_q->f('contact_lastname').' '.$contact_q->f('contact_firstname')));
     $email = phpStringToJsString(trim($contact_q->f('email_address')));
     if($label != $email) {
@@ -3058,7 +3059,7 @@ function json_search_contact($contact ,$results) {
     } else {
       $name = '';
     }
-    $contacts[] = "{name : '$name', email: '$email'}";
+    $contacts[] = "{id:'data-contact-$id', label : '$name', extra: '$email'}";
   }
   $display['json'] = "{length:".$results['length'].", datas:[".implode(',',$contacts)."]}";
 }

@@ -247,6 +247,7 @@ if ($action == 'search') {
   $extra_js_include[] = 'inplaceeditor.js';
   $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
   $extra_css[] = $css_ext_color_picker ;
+  include('../contact/addressbook.php');
   $display['detail'] = dis_calendar_event_form($action, $params, '', $cal_entity_id);
 
 } elseif ($action == 'insert') {

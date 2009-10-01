@@ -197,6 +197,11 @@ $l_recursive = "Récursif";
 $l_hour = "Heure";
 $l_type = "Type";
 
+$l_addressbook = "Carnet d'adresses";
+$l_contacts = "Mes contacts";
+$l_public_contacts = "Contacts publics";
+$l_collected_contacts = "Contacts collectés";
+
 $l_first_sync = "Première synchronisation";
 $l_last_sync = "Dernière synchronisation";
 $l_mobile_identifier = "Identifiant";
