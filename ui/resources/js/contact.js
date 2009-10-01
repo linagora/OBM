@@ -112,10 +112,16 @@ Obm.Contact.AddressBook = new Class ({
   selectAddressBook: function(elem) {
     if(!elem.hasClass('current')) {
       var id = elem.get('id').split('-')[1];
+      if ($('addContact')) $('addContact').destroy();
       this.hideContact();
       this.contactRequest.get({ajax : 1, action : 'list', id : id}); 
       $('addressBookGrid').getElements('td.current').removeClass('current');
       elem.addClass('current');
+      if ($('ad-write-'+id).value == 1 && !$('addContact')) {
+        $('dataGrid').adopt(new Element('input').setProperties(
+          {'type':'button', 'value':'+', 'id':'addContact'}
+        ).addEvent('click', function() {obm.contact.addressbook.addContact();}));      
+      } 
     }
   },
 

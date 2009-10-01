@@ -646,6 +646,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_newsletter,
       contact_archive,
       contact_date,
+      contact_addressbook_id,
       bd.event_id as contact_birthday_event,
       bd.event_date as contact_birthday,
       an.event_id as contact_anniversary_event,
@@ -692,6 +693,7 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->comment2      = $db->f('contact_comment2');
       $contact->comment3      = $db->f('contact_comment3');
       $contact->origin        = $db->f('contact_origin');
+      $contact->addressbook   = $db->f('contact_addressbook_id');
       if ($db->f('contact_date'))
         $contact->date        = new Of_Date($db->f('contact_date'), 'GMT');
       if ($db->f('contact_birthday')) {

@@ -45,7 +45,11 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public function __set($property, $value) {
-    if ($property == "name") $this->name = $value; 
+    if ($property == "name") {
+      $this->name = $value;
+    } else {
+      return;
+    }
   }
 
   public function __get($property) {
@@ -55,6 +59,8 @@ class OBM_AddressBook implements OBM_ISearchable {
       } else {
         return $this->name;
       }
+    } else {
+      return $this->$property;
     }
   }
 
