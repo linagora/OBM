@@ -66,6 +66,16 @@ class OBM_AddressBook implements OBM_ISearchable {
     }
   }
 
+  public static function getCollectedAddressbook() {
+    $addressbooks = self::search();
+    foreach($addressbooks as $addressbook) {
+      if ($addressbook->name == 'collected_contacts') {
+        $ret = $addressbook->id;
+      }
+    }
+    return $ret;
+  }
+
   public static function fieldsMap() {
     $fields['*'] = array('AddressBook.name' => 'text');
     $fields['name'] = array('AddressBook.name' => 'text');

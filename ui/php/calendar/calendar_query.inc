@@ -4381,6 +4381,9 @@ function run_query_insert_others_attendees($calendar) {
   $attendees = $calendar['others_attendees'];
   $ret = array();
 
+  // Get collected addressbook
+  $addressbook_id = OBM_AddressBook::getCollectedAddressbook();
+
   foreach($attendees as $email) {
     //// Check if exists
     // XXXXXX Migrate the access right to the Addressbook
@@ -4405,6 +4408,7 @@ function run_query_insert_others_attendees($calendar) {
         contact_domain_id,
         contact_lastname,
         contact_firstname,
+        contact_addressbook_id,
         contact_marketingmanager_id,
         contact_archive,
         contact_origin) VALUES (
@@ -4415,6 +4419,7 @@ function run_query_insert_others_attendees($calendar) {
         $domain_id,
         '$last_name',
         '$first_name',
+        '$addressbook_id',
         '$uid',
         '0',
         '$GLOBALS[c_origin_web]')";
