@@ -208,6 +208,8 @@ $l_mobile_identifier = "Identifiant";
 $l_mobile_add_partnership = "Ajouter partenariat";
 $l_mobile_remove_partnership = "Supprimer partenariat";
 
+$l_search_results = "Résultats de recherche";
+
 // Profiles
 $l_perm_admin = "Admin";
 $l_perm_admin_delegue = "Admin délégué";

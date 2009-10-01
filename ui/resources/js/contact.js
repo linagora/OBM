@@ -111,10 +111,11 @@ Obm.Contact.AddressBook = new Class ({
 
   selectAddressBook: function(elem) {
     if(!elem.hasClass('current')) {
+      $('searchpattern').value = '';
       var id = elem.get('id').split('-')[1];
       if ($('addContact')) $('addContact').destroy();
       this.hideContact();
-      this.contactRequest.get({ajax : 1, action : 'list', id : id}); 
+      this.contactRequest.get({ajax : 1, action : 'list', searchpattern : $('searchPattern-'+id).value}); 
       $('addressBookGrid').getElements('td.current').removeClass('current');
       elem.addClass('current');
       if ($('ad-write-'+id).value == 1 && !$('addContact')) {
@@ -158,6 +159,10 @@ Obm.Contact.AddressBook = new Class ({
     this.hideContact();
     this.contactRequest.get(form); 
     $('addressBookGrid').getElements('td.current').removeClass('current');
+    // Display "search results" folder
+    $('searchResultsFolder').style.display = '';
+    $('addressbook-searchResults').set('class', 'current');
+    $('searchPattern-searchResults').value = $('searchpattern').value;
   },
 
   addAddressBook: function() {

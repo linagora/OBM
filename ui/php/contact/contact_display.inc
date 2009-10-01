@@ -371,8 +371,24 @@ function html_addressbooks_get_list() {
       if($id == $addressBook->id) $class = "current";
     }
     $adList .= '<tr><td '.$dblclick.' onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'" class="'.$class.'">'.$content.'
+      <input type="hidden" value="in:'.$ad->id.' archive:0" id="searchPattern-'.$ad->id.'" />
       <input type="hidden" value="'.$ad->write.'" id="ad-write-'.$ad->id.'"/></td></tr>';
   }
+
+  $adList .= "<tr>
+   <td onclick='obm.contact.addressbook.selectAddressBook(this)' id='addressbook-archive'>$GLOBALS[l_archive]
+   <input type='hidden' value='archive:1' id='searchPattern-archive' />
+   <input type='hidden' value='0' id='ad-write-archive'/>
+   </td>
+  </tr>
+
+  <tr id='searchResultsFolder' style='display:none;'>
+   <td onclick='obm.contact.addressbook.selectAddressBook(this);' id='addressbook-searchResults'>$GLOBALS[l_search_results]
+   <input type='hidden' value='' id='searchPattern-searchResults' />
+   <input type='hidden' value='0' id='ad-write-searchResults'/>
+   </td>
+  </tr>";
+
   $adList .= "<tr class='filler'><th>&nbsp;</th></tr>";
 
   $block = "<table>  
@@ -417,7 +433,6 @@ function html_contact_get_list($contacts, $headers) {
   foreach($headers as $fieldname => $header) {
     $contactHeader .= $header['html'];
   }
-
   
   $block = "
     <table>

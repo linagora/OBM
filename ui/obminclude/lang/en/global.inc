@@ -203,6 +203,7 @@ $l_last_sync = "Last sync time";
 $l_mobile_identifier = "User Agent";
 $l_mobile_add_partnership = "Add partnership";
 $l_mobile_remove_partnership = "Remove partnership";
+$l_search_results = "Search results";
 
 // Entities
 $l_company = "Company";

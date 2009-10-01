@@ -130,6 +130,11 @@ class OBM_Contact implements OBM_ISearchable {
     $fields['addressbook'] = array(
       'contact_addressbook_id' => 'integer'
     );
+
+    $fields['archive'] = array(
+      'contact_archive' => 'integer'
+    );
+
     $fields['displayname'] = array(
       'contact_lastname' => 'text',
       'contact_firstname' => 'text'

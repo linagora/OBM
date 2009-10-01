@@ -503,7 +503,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 ///////////////////////////////////////////////////////////////////////////////
   $contactHeaders = html_contact_get_headers();
   $addressBooks = OBM_AddressBook::search();
-  $block = html_contact_get_list($addressBooks->searchContacts('in:'.$params['id']), $contactHeaders);
+  $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern']), $contactHeaders);
   echo $block;
   exit();
 } elseif ($action == 'search') {
