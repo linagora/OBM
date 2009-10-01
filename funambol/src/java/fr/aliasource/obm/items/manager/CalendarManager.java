@@ -2,6 +2,7 @@ package fr.aliasource.obm.items.manager;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -392,10 +393,24 @@ public class CalendarManager extends ObmManager {
 
 			if (rp != null) {
 				Date[] exceptions = obmrec.getExceptions();
-				if (exceptions != null) {
+				List<Event> evtExceptions = obmrec.getEventExceptions();
+				Date[] eventExceptions = new Date[evtExceptions.size()];
+				int i = 0;
+				for (Event evEx : obmrec.getEventExceptions()) {
+					//add original occurrence as exception
+					eventExceptions[i++] = evEx.getRecurrenceId();
+				}
+				Date[] allExceptions = new Date[exceptions.length
+						+ eventExceptions.length];
+				System.arraycopy(exceptions, 0, allExceptions, 0,
+						exceptions.length);
+				System.arraycopy(eventExceptions, 0, allExceptions,
+						exceptions.length, eventExceptions.length);
+				
+				if (allExceptions != null) {
 					List<ExceptionToRecurrenceRule> exceps = new ArrayList<ExceptionToRecurrenceRule>(
-							exceptions.length);
-					for (Date d : exceptions) {
+							allExceptions.length);
+					for (Date d : allExceptions) {
 						ExceptionToRecurrenceRule ex = new ExceptionToRecurrenceRule(
 								false, CalendarHelper.getUTCFormat(d));
 						exceps.add(ex);
