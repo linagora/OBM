@@ -341,7 +341,12 @@ function html_addressbooks_get_list() {
       <form id='f_addressbook_$id' name='f_addressbook_$id' onsubmit='obm.contact.addressbook.storeAddressBook($id);return false;'>
       <input type='text' id='tf_addressbook_$id' value='$name' style='display:none;'/>
       </form>";
-    if($id == $addressBook->id) $class = "current";
+    $class = "";
+    if (!isset($addressBook->id)) {
+      if ($ad->name == 'contacts') $class = "current";
+    } else {
+      if($id == $addressBook->id) $class = "current";
+    }
     $adList .= '<tr><td '.$dblclick.' onclick="obm.contact.addressbook.selectAddressBook(this)" id="addressbook-'.$ad->id.'" class="'.$class.'">'.$content.'</td></tr>';
   }
   $adList .= "<tr class='filler'><th>&nbsp;</th></tr>";
@@ -421,7 +426,7 @@ function dis_contact_consult2($contact) {
   $addressBooks = OBM_AddressBook::search();
   foreach($addressBooks as $id => $addressBook) {
     if($addressBook->write == 1) {
-      $copy .= '<li><a href="" onclick="obm.contact.addressbook.copyContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->name.'</a></li>';
+      $copy .= '<li><a href="" onclick="obm.contact.addressbook.copyContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->__get('name').'</a></li>';
       //$move .= '<li><a href="" onclick="obm.contact.addressbook.moveContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->name.'</a></li>';
     }
   }
