@@ -315,6 +315,11 @@ input, textarea {
   color: #c62a2a; 
 }
 
+.coordinateMenu li.submenu-down{
+  left: 40em;
+
+}
+
 /*
 .grid-contact_displayname {
   width: 20em;
