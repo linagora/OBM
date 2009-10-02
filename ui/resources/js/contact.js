@@ -180,7 +180,7 @@ Obm.Contact.AddressBook = new Class ({
   },
 
   copyContact: function(contact_id, addressbook_id) {
-    this.dataRequest.get({ajax:1, action:'copyContact', 'id':contact_id, 'addressbook':addressbook_id});
+    this.dataRequest.post({ajax:1, action:'copyContact', 'id':contact_id, 'addressbook':addressbook_id});
   },
 
   searchContact: function(form) {
