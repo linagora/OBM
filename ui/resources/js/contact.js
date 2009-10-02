@@ -45,7 +45,7 @@ Obm.Contact.AddressBook = new Class ({
       url: obm.vars.consts.obmUrl + '/contact/contact_index.php',
       secure : false,
       evalScripts : true,
-      onRequest: function () {this.options.update.set('html','<table><tr class="filler"><td></td></tr>')},
+      onRequest: function () {this.options.update.getElement('table > tbody').set('html','<tr class="filler"><td></td></tr>')},
       update: $('addressBookContainer'),
     });
     this.addressBookRequest.addEvent('complete', function () {
@@ -56,7 +56,7 @@ Obm.Contact.AddressBook = new Class ({
       url: obm.vars.consts.obmUrl + '/contact/contact_index.php',
       secure : false,
       evalScripts : true,
-      onRequest: function () {this.options.update.set('html','<table><tr class="filler"><td></td></tr>')},
+      onRequest: function () {this.options.update.getElement('table > tbody').set('html','<tr class="filler"><td></td></tr>')},
       update: $('dataContainer'),
     });
     this.contactRequest.addEvent('complete', function () {
@@ -68,7 +68,7 @@ Obm.Contact.AddressBook = new Class ({
       secure : false,
       evalScripts : true,
       update: $('informationContainer'),
-      onRequest: function () {this.options.update.set('html','<table><tr class="filler"><td></td></tr>')},
+      onRequest: function () {this.options.update.getElement('table > tbody').set('html','<tr class="filler"><td></td></tr>')},
       onFailure: function (response) {
         var errors = JSON.decode(response.responseText, false);
         errors.error = new Hash(errors.error);
@@ -103,12 +103,16 @@ Obm.Contact.AddressBook = new Class ({
   },
 
   consultContact: function(id) {
-    $('informationGrid').setStyle('display',''); 
-    this.dataRequest.get({ajax : 1, action : 'consult', id : id}); 
-    $('dataGrid').getElements('td').setStyle('display','none');
-    $('dataContainer').removeClass('expanded');
-    $('dataContainer').addClass('shrinked');    
-    $('dataGrid').setStyle('width', '20em');
+    if(id) {
+      $('informationGrid').setStyle('display',''); 
+      this.dataRequest.get({ajax : 1, action : 'consult', id : id}); 
+      $('dataGrid').getElements('td').setStyle('display','none');
+      $('dataContainer').removeClass('expanded');
+      $('dataContainer').addClass('shrinked');    
+      $('dataGrid').setStyle('width', '20em');
+    } else {
+      this.hideContact();
+    }
   },
 
   selectAddressBook: function(elem) {
@@ -138,6 +142,7 @@ Obm.Contact.AddressBook = new Class ({
     } else {
       showErrorMessage(obm.vars.labels.permsError);
     }
+    $('dataGrid').setStyle('width', '20em');
   },  
 
   addContact: function(id) {
@@ -147,18 +152,16 @@ Obm.Contact.AddressBook = new Class ({
     $('dataContainer').getElements('td').setStyle('display','none');
     $('dataContainer').removeClass('expanded');
     $('dataContainer').addClass('shrinked');
+      $('dataGrid').setStyle('width', '20em');
   },  
 
   storeContact: function(form, id) {
     $('informationGrid').setStyle('display',''); 
-    if(id) {
-      this.dataRequest.post(form); 
-    } else {
-      this.dataRequest.post(form);
-    }
+    this.dataRequest.post(form);
     $('dataContainer').getElements('td').setStyle('display','none');
     $('dataContainer').removeClass('expanded');
     $('dataContainer').addClass('shrinked');
+    $('dataGrid').setStyle('width', '20em');
   },    
 
   deleteContact: function(id, name, addressbook) {
@@ -183,6 +186,11 @@ Obm.Contact.AddressBook = new Class ({
     $('searchResultsFolder').style.display = '';
     $('addressbook-searchResults').set('class', 'current');
     $('searchPattern-searchResults').value = $('searchpattern').value;
+  },
+
+  filterContact: function(form) {
+    this.hideContact();
+    this.contactRequest.get(form); 
   },
 
   addAddressBook: function() {

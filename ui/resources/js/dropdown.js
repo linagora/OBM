@@ -111,7 +111,11 @@ Obm.DropDownMenu= new Class({
 						}.bind(this)
 					);
 					li.addEvent('click',function(e){
-						e.stop();
+                                                if(e.target.get('tag') == 'a') {
+                                                  e.target.addEvent('click', function(e) {e.stop()})
+                                                } else {
+                                                  e.stop();
+                                                }
 						$clear(li.retrieve('closeDelay'));
 						this.showChildList(li);
 					}.bind(this));
