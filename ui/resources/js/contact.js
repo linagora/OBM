@@ -69,6 +69,7 @@ Obm.Contact.AddressBook = new Class ({
       evalScripts : true,
       update: $('informationContainer'),
       onRequest: function () {this.options.update.getElement('table > tbody').set('html','<tr class="filler"><td></td></tr>')},
+      onSuccess: function (response) { console.log(this.options.method);},
       onFailure: function (response) {
         var errors = JSON.decode(response.responseText, false);
         errors.error = new Hash(errors.error);
@@ -180,6 +181,16 @@ Obm.Contact.AddressBook = new Class ({
 
   searchContact: function(form) {
     this.hideContact();
+    if(form.get('id') == 'advancedSearchForm') {
+      var searchpattern='';
+      form.getElements('input[type=text]').each(function (elem) {
+        if(elem.get('inputValue') != '') {
+          searchpattern += elem.get('name') + ':(' + elem.get('inputValue') + ') ';
+        }
+      });
+      $('searchpattern').set('inputValue',  searchpattern)
+      form = $('searchForm');
+    }
     this.contactRequest.get(form); 
     $('addressBookGrid').getElements('td.current').removeClass('current');
     // Display "search results" folder

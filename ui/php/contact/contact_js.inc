@@ -28,6 +28,7 @@ function check_contact_get_id(valeur,text) {
 }
 
 $extra_js .= "
+
 function confirm_contact_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;

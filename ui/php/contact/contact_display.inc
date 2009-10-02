@@ -263,12 +263,9 @@ function html_contact($contact_id) {
       $detailconsult = "showErrorMessage(obm.vars.labels.permsError);";
     }
   }
-
+  $searchForm = dis_contact_html_search_form(array());
   $block = "
-  <form name='search' onsubmit='obm.contact.addressbook.searchContact(this); return false;' id='searchForm'>
-    <input type='hidden' name='action' value='search'  />
-    <input size='40' type='text' value='' name='searchpattern' id='searchpattern' /> $GLOBALS[l_advanced_search]
-  </form>
+  $searchForm
   <table id='contactPanel'>
     <tr>
       <td id='addressBookGrid'>
@@ -449,13 +446,13 @@ function html_contact_get_list($contacts, $headers) {
     <table>
     <thead>
       <tr>$contactHeader</tr>
-      <tr><th class='search' colspan='".count($headers)."'>
+      <tr><th class='search'>
       <form name='contactfilter' onsubmit='obm.contact.addressbook.filterContact(this); return false;' id='contactFilterForm' >    
         <input type='hidden' name='action' value='filterContact'  />
         $input
         <input size='15' type='text' value='".$GLOBALS['params']['contactfilter']."' name='contactfilter' id='contactfilter' />
       </form>
-      </th></tr>
+      </th><td colspan='".(count($headers) - 1)."'></td></tr>
     </thead>
     <tbody>
       $contactList
@@ -465,6 +462,57 @@ function html_contact_get_list($contacts, $headers) {
   return $block;
   
 }
+
+
+/**
+ * Event search form
+ * Basic and advanced form
+ */
+function dis_contact_html_search_form($calendar) {
+  global $obm;
+
+
+  $block = "<div style='padding-left:1em;padding-right:1em;'>
+
+    <div id='basicSearch' style='float:right;'>
+      <form id='searchForm' onsubmit='obm.contact.addressbook.searchContact(this); return false;'>
+        <input type='text' id='searchpattern' name='searchpattern' value='' />
+        <input type='submit' value='$GLOBALS[l_search]' />
+        <input type='hidden' name='action' value='search' />
+        <a href=\"#\" onclick=\"$$('#advancedSearch','#basicSearch').toggle();\">$GLOBALS[l_advanced_search]</a>
+      </form>
+    </div>
+    <div id='advancedSearch' style='display:none;'>
+      <div class='header'>
+        <span class='title'>$GLOBALS[l_advanced_search]</span>
+        <span class='link'><a href=\"#\" onclick=\"$$('#advancedSearch','#basicSearch').toggle();\">$GLOBALS[l_hide_advanced_search]</a></span>
+      </div>
+      <div class='content'>
+      <form id='advancedSearchForm' onsubmit='obm.contact.addressbook.searchContact(this);return false;'>
+        <table>
+        <tr>
+          <td>$GLOBALS[l_displayname]</td>
+          <td><input type='text' id='searchDisplayname' name='displayname' value='' /></td>
+          <td>$GLOBALS[l_middlename]</td>
+          <td><input type='text' id='searchMiddlename' name='middlename' value='' /></td>
+        </tr><tr>
+          <td>$GLOBALS[l_company]</td>
+          <td><input type='text' id='searchCompany' name='company' value='' /></td>
+          <td>$GLOBALS[l_title]</td>
+          <td><input type='text' id='searchTitle' name='title' value='' /></td>
+        </tr>
+        </table>
+
+        <input type='submit' value='$GLOBALS[l_search]' />
+        <input type='button' onclick=\"$$('#advancedSearch','#basicSearch').toggle();\" value='$GLOBALS[l_cancel]'>
+      </form>
+      </div>
+    </div>
+    </div>";
+
+  return $block;
+}
+
 
 
 /**
