@@ -778,6 +778,7 @@ Obm.CalendarManager = new Class({
             obm.calendarManager.events.erase(evt.element.id);
           } catch(e) {}
           evt.event.title = evtModel.title;
+          evt.event.location = evtModel.location;
           evt.event.duration = evtModel.duration;
           evt.setTitle();
           obm.calendarManager.register(evt);
@@ -789,6 +790,7 @@ Obm.CalendarManager = new Class({
           var evt = obm.calendarManager.events.get(id);
           ivent.meeting = evt.event.meeting;
           ivent.periodic = evt.event.periodic;
+          ivent.location = evt.event.location;
           try {
             obm.calendarManager.unregister(evt);
           } catch(e) {}
