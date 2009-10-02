@@ -533,7 +533,12 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   exit();
 } elseif ($action == 'filterContact') {
 ///////////////////////////////////////////////////////////////////////////////
-  
+  $contactHeaders = html_contact_get_headers();
+  $addressBooks = OBM_AddressBook::search();
+  if($params['contactfilter']) $pattern = 'displayname:'.$params['contactfilter'];
+  $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern'].' '.$pattern), $contactHeaders);  
+  echo $block;
+  exit;
 } elseif ($action == 'filterGroup') {
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -678,7 +683,37 @@ function get_contact_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
-
+  $actions['contact']['filterContact'] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contact/contact_index.php?action=list",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+  $actions['contact']['storeAddressBook'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=storeAddressBook",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );    
+  $actions['contact']['deleteAddressBook'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=deleteAddressBook",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );  
+  $actions['contact']['updateAddressBook'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=updateAddressBook",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );  
+  $actions['contact']['setSyncable'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=setSyncable",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );  
+  $actions['contact']['setSubscription'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=setSubscription",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );  
 
 
 
@@ -921,31 +956,6 @@ function get_contact_action() {
                                                 );
 
 
-  $actions['contact']['storeAddressBook'] = array (
-    'Url'      => "$path/contact/contact_index.php?action=storeAddressBook",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-  );    
-  $actions['contact']['deleteAddressBook'] = array (
-    'Url'      => "$path/contact/contact_index.php?action=deleteAddressBook",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-  );  
-  $actions['contact']['updateAddressBook'] = array (
-    'Url'      => "$path/contact/contact_index.php?action=updateAddressBook",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-  );  
-  $actions['contact']['setSyncable'] = array (
-    'Url'      => "$path/contact/contact_index.php?action=setSyncable",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-  );  
-  $actions['contact']['setSubscription'] = array (
-    'Url'      => "$path/contact/contact_index.php?action=setSubscription",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-  );  
   update_action_rights();
 }
 

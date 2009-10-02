@@ -57,6 +57,16 @@ class OBM_Contact implements OBM_ISearchable {
   public function __get($key) {
     if (($key=='entity_id') && !is_null($this->id) && is_null($this->entity_id))
       $this->entity_id = of_entity_get('contact', $this->id);
+    if ($key == 'email_address') {
+      return $this->email[0]['address'];
+    }
+    if ($key == 'phone_number') {
+      foreach($this->phone as $phone) {
+        if($phone['label'][0] == 'CELL' && $phone['label'][1] == 'VOICE') {
+          return $phone['number'];
+        }
+      }
+    }    
     if ($key == 'name')
       return $this->lastname.' '.$this->firstname;
     return $this->$key;
@@ -122,14 +132,19 @@ class OBM_Contact implements OBM_ISearchable {
       'contact_suffix' => 'text',
       'contact_title' => 'text',
       'contact_aka' => 'text',
-      'contact_sound' => 'text'
+      'contact_sound' => 'text',
+      'contact_company' => 'text'
     );
 
     $fields['in'] = array(
       'contact_addressbook_id' => 'integer'
     );
 
-    $fields['addressbook'] = array(
+    $fields['company'] = array(
+      'contact_company' => 'text'
+    );
+
+    $fields['in'] = array(
       'contact_addressbook_id' => 'integer'
     );
 
@@ -340,8 +355,8 @@ class OBM_Contact implements OBM_ISearchable {
       self::storeCoords($contact);
       of_userdata_query_update('contact', $contact->id, $data);
     }
-
-    return $contact;
+    
+    return OBM_Contact::get($contact->id);
   }
   
   public static function store($contact) {
@@ -622,8 +637,6 @@ class OBM_Contact implements OBM_ISearchable {
   private static function fetchDetails($db, $where, $limit=false, $offset=0) {
 
     $db_type = $db->type;
-    $birthday = sql_date_format($db_type, 'bd.event_date', 'contact_birthday');
-    $anniversary = sql_date_format($db_type, 'an.event_date', 'contact_anniversary');
     if ($limit)
       $sql_limit = sql_limit($db_type, $limit, $offset);
     $contacts = array();
@@ -666,7 +679,8 @@ class OBM_Contact implements OBM_ISearchable {
          LEFT JOIN Event as an ON contact_anniversary_id = an.event_id
          LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
     WHERE {$where}
-    {$sql_limit}";
+      {$sql_limit}
+    ORDER BY contact_lastname, contact_firstname";
     $db->xquery($query);
     while ($db->next_record()) {
       $contact = new OBM_Contact;

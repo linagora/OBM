@@ -85,7 +85,7 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public function getContacts($pattern='', $offset=0, $limit=100) {
-    $pattern .= ' addressbook:'.$this->id;
+    $pattern .= ' in:'.$this->id;
     return OBM_Contact::search($pattern, $limit, $offset);
   }
 
@@ -246,7 +246,7 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
 
   public function searchContacts($pattern) {
     if(!empty($this->addressbooks)) {
-      $pattern .= ' addressbook:('.implode(',',array_keys($this->addressbooks)).')';
+      $pattern .= ' in:('.implode(',',array_keys($this->addressbooks)).')';
       return OBM_Contact::search($pattern);
     }
   }
