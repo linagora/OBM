@@ -255,7 +255,7 @@ function html_contact($contact_id) {
     if ($addressbook && $addressbook->read) { 
       $detailconsult = "
         obm.contact.addressbook.selectAddressBook($('addressbook-$c->addressbook'));
-          obm.contact.addressbook.contactRequest.addEvent('complete', function() {
+        obm.contact.addressbook.contactRequest.addEvent('complete', function() {
           obm.contact.addressbook.selectContact($('contact-'+$contact_id));
           obm.contact.addressbook.contactRequest.removeEvents('complete');
         }.bind(this));";
