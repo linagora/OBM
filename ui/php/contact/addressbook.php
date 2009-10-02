@@ -117,7 +117,7 @@ class OBM_AddressBook implements OBM_ISearchable {
         Rights.entityright_read,
         Rights.entityright_write,
         Rights.entityright_admin,
-        (SELECT count (*) FROM SyncedAddressbook WHERE addressbook_id=AddressBook.id) AS synced
+        (SELECT count(*) FROM SyncedAddressbook WHERE addressbook_id=AddressBook.id) AS synced
       FROM AddressBook 
       INNER JOIN ('.OBM_Acl::getAclSubselect($columns, 'addressbook', null, $GLOBALS['obm']['uid'], 'read').') AS Rights ON AddressBook.id = Rights.addressbookentity_addressbook_id
       WHERE 1=1 '.$query.' ORDER BY AddressBook.name');
@@ -136,7 +136,7 @@ class OBM_AddressBook implements OBM_ISearchable {
         1 as entityright_read,
         1 as entityright_write,
         1 as entityright_admin,
-        (SELECT count (*) FROM SyncedAddressbook WHERE addressbook_id=AddressBook.id) AS synced
+        (SELECT count(*) FROM SyncedAddressbook WHERE addressbook_id=AddressBook.id) AS synced
       FROM AddressBook 
       WHERE AddressBook.owner = '.$GLOBALS['obm']['uid']. $query.' ORDER BY AddressBook.name'); 
     while($db->next_record()) {
