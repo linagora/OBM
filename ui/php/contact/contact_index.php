@@ -442,9 +442,15 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   exit();
 } elseif ($action == 'updateContact')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $contact = OBM_Contact::get($params['id']);
-  $addressbook = OBM_AddressBook::get($contact->addressbook);
-  if ($addressbook && $addressbook->write) {
+  if (isset($params['id'])){
+    $contact = OBM_Contact::get($params['id']);
+    $addressbook = OBM_AddressBook::get($contact->addressbook);
+    if ($addressbook && $addressbook->write) {
+      $params['contact_id'] = $params['id'];
+      $block = dis_contact_form2($params);
+      echo $block;
+    }
+  } else {
     $params['contact_id'] = $params['id'];
     $block = dis_contact_form2($params);
     echo $block;
