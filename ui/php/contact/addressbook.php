@@ -23,7 +23,7 @@ require_once 'obminclude/of/of_search.php';
 class OBM_AddressBook implements OBM_ISearchable {
   private $id;
   private $name;
-  private $sysName;
+  private $displayName;
   private $owner;
   private $isDefault;
   private $access;
@@ -36,7 +36,7 @@ class OBM_AddressBook implements OBM_ISearchable {
   public function __construct($id, $name, $is_default, $owner, $syncable, $synced, $access, $read, $write, $admin) {
     $this->id = $id;
     $this->name = $name;
-    $this->sysName = $name;
+    $this->displayName = $name;
     $this->access = $access;
     $this->read = $read;
     $this->write = $write;
@@ -56,7 +56,7 @@ class OBM_AddressBook implements OBM_ISearchable {
 
   public function __get($property) {
     if (property_exists($this, $property)) {
-      if ($property == "name") {
+      if ($property == "displayName") {
         if ($this->isDefault) {
           if ($this->owner == $GLOBALS['obm']['uid']) {
             return $GLOBALS["l_{$this->name}"];
@@ -253,14 +253,14 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
 
   public function getMyContacts() {
     foreach($this->addressbooks as $addressbook) {
-      if($addressbook->isDefault && $addressbook->sysName == 'contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
+      if($addressbook->isDefault && $addressbook->name == 'contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
         return $addressbook;
     }
   }
 
   public function getCollectedAddressbook() {
     foreach($this->addressbooks as $addressbook) {
-      if($addressbook->isDefault && $addressbook->sysName == 'collected_contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
+      if($addressbook->isDefault && $addressbook->name == 'collected_contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
         return $addressbook;
     }
   }
