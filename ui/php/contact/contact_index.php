@@ -213,7 +213,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     } else {
       $obm_q = check_contact_context('', $params);
       if ((is_object($obm_q)) && ($obm_q->num_rows() > 0)) {
-	$display['title'] = display_title("$l_contact : $l_insert");
+	      $display['title'] = display_title("$l_contact : $l_insert");
         $display['detail'] = dis_contact_warn_insert('', $obm_q, $params);
       } else {
         $id = run_query_contact_insert($params);
@@ -431,91 +431,96 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'consult')  {
 ///////////////////////////////////////////////////////////////////////////////
-  //FIXME Errors 
-  //FIXME Right Management
   $contact = OBM_Contact::get($params['id']);
-  $block = dis_contact_consult2($contact);
-  update_last_visit('contact', $params['id'], $action);
-  echo $block;
+  $addressbook = $contact->addressbook;
+  if ($addressbook && $addressbook->read) {
+    $contact = OBM_Contact::get($params['id']);
+    $block = dis_contact_consult2($contact);
+    update_last_visit('contact', $params['id'], $action);
+    echo $block;
+  }
   exit();
 } elseif ($action == 'updateContact')  {
 ///////////////////////////////////////////////////////////////////////////////
-  //FIXME Right Management
-  //FIXME Errors 
-  $params['contact_id'] = $params['id'];
-  $block = dis_contact_form2($params);
-  echo $block;
+  $contact = OBM_Contact::get($params['id']);
+  $addressbook = $contact->addressbook;
+  if ($addressbook && $addressbook->write) {
+    $params['contact_id'] = $params['id'];
+    $block = dis_contact_form2($params);
+    echo $block;
+  }
   exit();  
 } elseif ($action == 'storeContact') {
 ///////////////////////////////////////////////////////////////////////////////
-  //FIXME Right Management
   $params['contact_id'] = $params['id'];
-  if (check_contact_update_rights($params)) {
-    if (check_user_defined_rules() && check_contact_data_form('', $params)) {
-      if(isset($params['contact_id'])) {
-        $retour = run_query_contact_update($params);
-        $contact = OBM_Contact::get($params['id']);
+  $contact = OBM_Contact::get($params['contact_id']);
+  $addressbook = $contact->addressbook; 
+  if ($addressbook && $addressbook->write) {
+    if (check_contact_update_rights($params)) {
+      if (check_user_defined_rules() && check_contact_data_form('', $params)) {
+        if(isset($params['contact_id'])) {
+          $retour = run_query_contact_update($params);
+          $contact = OBM_Contact::get($params['id']);
+        } else {
+          if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
+          else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
+          $contact = $addressBook->addContact($params);
+        }
+        $block = dis_contact_consult2($contact);
+        echo $block;
       } else {
-        if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
-        else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
-        $contact = $addressBook->addContact($params);
+        header('HTTP', true, 400);
+        echo OBM_Error::getInstance()->toJson();
       }
+    } else {
+      $contact = OBM_Contact::get($params['id']);
       $block = dis_contact_consult2($contact);
       echo $block;
-      exit();
-    } else {
-      header('HTTP', true, 400);
-      echo OBM_Error::getInstance()->toJson();
-      exit();
     }
-  } else {
-  //FIXME Errors 
-    $contact = OBM_Contact::get($params['id']);
-    $block = dis_contact_consult2($contact);
-    echo $block;
-    exit();    
   }
+  exit();
 } elseif ($action == 'copyContact') {
 ///////////////////////////////////////////////////////////////////////////////
-  //FIXME Right Management
   $params['contact_id'] = $params['id'];
-  if (check_contact_update_rights($params)) {
-    $retour = run_query_contact_update($params);
-    $contact = OBM_Contact::get($params['id']);
-    if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
-    else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
-    $contact = $addressBook->addContact($params);
-    $block = dis_contact_consult2($contact);
-    echo $block;
-    exit();
-  } else {
-    $contact = OBM_Contact::get($params['id']);
-    $block = dis_contact_consult2($contact);
-    echo $block;
-    exit();    
+
+  if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
+  else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
+
+  if ($addressBook && $addressBook->write) {
+    if (check_contact_update_rights($params)) {
+      $retour = run_query_contact_update($params);
+      $contact = OBM_Contact::get($params['id']);
+      $contact = $addressBook->addContact($params);
+      $block = dis_contact_consult2($contact);
+      echo $block;
+    } else {
+      $contact = OBM_Contact::get($params['id']);
+      $block = dis_contact_consult2($contact);
+      echo $block;
+    }
   }
+  exit();
 } elseif ($action == 'deleteContact') {
 ///////////////////////////////////////////////////////////////////////////////
-  //FIXME Right Management
   $contact = OBM_Contact::get($params['contact_id']);
-  if($contact->archive) {
-    OBM_Contact::delete($contact);
-  } else {
-    $contact->archive = 1;
-    OBM_Contact::store($contact);
+  $addressbook = $contact->addressbook;
+  if ($addressbook && $addressbook->write) {
+    if($contact->archive) {
+      OBM_Contact::delete($contact);
+    } else {
+      $contact->archive = 1;
+      OBM_Contact::store($contact);
+    }
+    $addressBooks = OBM_AddressBook::search();
+    $contactHeaders = html_contact_get_headers();
+    $block = html_contact_get_list($addressBooks->searchContacts('in:'.$contact->addressbook), $contactHeaders);
+    echo $block;
   }
-  $addressBooks = OBM_AddressBook::search();
-  $contactHeaders = html_contact_get_headers();
-  $block = html_contact_get_list($addressBooks->searchContacts('in:'.$contact->addressbook), $contactHeaders);
-  echo $block;
-  //FIXME Errors 
-    exit();      
+  exit();      
 } elseif ($action == 'list')  {
 ///////////////////////////////////////////////////////////////////////////////
   $contactHeaders = html_contact_get_headers();
   $addressBooks = OBM_AddressBook::search();
-  //FIXME Right Management
-  //FIXME Errors 
   $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern']), $contactHeaders);
   echo $block;
   exit();

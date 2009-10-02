@@ -1186,6 +1186,7 @@ function check_contact_update_rights($params, $c='') {
   global $actions, $perm, $err, $cright_write_admin;
   global $l_err_public_rights, $l_error_permission, $l_error_delegation;
 
+
   $id = $params['contact_id'];
   if ($id > 0) {
     // Get current contact info if not given
@@ -1194,6 +1195,8 @@ function check_contact_update_rights($params, $c='') {
     }
   }
 
+  $contact = OBM_Contact::get($id);
+  
   // Hook : Pre
   if (function_exists('hook_pre_check_contact_update_rights')) {
     if (! hook_pre_check_contact_update_rights($params, $c)) {
@@ -1216,6 +1219,10 @@ function check_contact_update_rights($params, $c='') {
     }
 
     // XXXXX Check addressbook write_access ?
+    $addressbook = $contact->addressbook; 
+    if (!$addressbook || !$addressbook->write) {
+      return false;
+    }
 
   }
 

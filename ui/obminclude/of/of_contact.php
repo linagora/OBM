@@ -57,6 +57,8 @@ class OBM_Contact implements OBM_ISearchable {
   public function __get($key) {
     if (($key=='entity_id') && !is_null($this->id) && is_null($this->entity_id))
       $this->entity_id = of_entity_get('contact', $this->id);
+    if ($key == 'name')
+      return $this->lastname.' '.$this->firstname;
     return $this->$key;
   }
 

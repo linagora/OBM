@@ -622,5 +622,5 @@ function refreshWaitEvent() {
               //setTimeout(refreshWaitEvent,30000);
             }
         }
-  }).post({ajax : 1,action : 'get_json_waiting_events'});
+  }).get({ajax : 1,action : 'get_json_waiting_events'});
 }

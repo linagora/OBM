@@ -128,12 +128,16 @@ Obm.Contact.AddressBook = new Class ({
     }
   },
 
-  updateContact: function(id) {
-    $('informationGrid').setStyle('display',''); 
-    this.dataRequest.get({ajax : 1, action : 'updateContact', id : id}); 
-    $('dataContainer').getElements('td').setStyle('display','none');
-    $('dataContainer').removeClass('expanded');
-    $('dataContainer').addClass('shrinked');
+  updateContact: function(id, addressbook) {
+    if ($('ad-write-'+addressbook).value == 1) {
+      $('informationGrid').setStyle('display',''); 
+      this.dataRequest.get({ajax : 1, action : 'updateContact', id : id}); 
+      $('dataContainer').getElements('td').setStyle('display','none');
+      $('dataContainer').removeClass('expanded');
+      $('dataContainer').addClass('shrinked');
+    } else {
+      showErrorMessage(obm.vars.labels.permsError);
+    }
   },  
 
   addContact: function(id) {
@@ -157,13 +161,17 @@ Obm.Contact.AddressBook = new Class ({
     $('dataContainer').addClass('shrinked');
   },    
 
-  deleteContact: function(id, name) {
-    if(confirm(obm.vars.labels.confirmDeleteContact+'\''+name+'\' ?')){
-      this.addressBookRequest.addEvent('success', function() {
-        showOkMessage(obm.vars.labels.deleteOk);
-      });      
-      this.contactRequest.post({ajax:1, action:'deleteContact', 'contact_id':id});
-      this.hideContact();
+  deleteContact: function(id, name, addressbook) {
+    if ($('ad-write-'+addressbook).value == 1) {
+      if(confirm(obm.vars.labels.confirmDeleteContact+' \''+name+'\' ?')){
+        this.addressBookRequest.addEvent('success', function() {
+          showOkMessage(obm.vars.labels.deleteOk);
+        });      
+        this.contactRequest.post({ajax:1, action:'deleteContact', 'contact_id':id});
+        this.hideContact();
+      }
+    } else {
+      showErrorMessage(obm.vars.labels.permsError);
     }
   },
 

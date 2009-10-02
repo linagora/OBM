@@ -1155,7 +1155,7 @@ Obm.CalendarInDayEvent = new Class({
       obm.calendarManager.scroll.start();
 
       // Add listener
-      // window.addEvent('keydown', obm.calendarManager.keyboardListener.bindWithEvent(this, this.event.id));
+      // window.addEvent('keydown', obm.calendarManager.keyboardListener.bindWithEvent(this, this.element.id));
 
       // Fix mouse position
       this.drag.mouse.pos.x = $('calendarGridContainer').offsetLeft.toInt();

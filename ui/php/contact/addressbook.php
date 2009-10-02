@@ -21,22 +21,24 @@
 require_once 'obminclude/of/of_search.php';
 
 class OBM_AddressBook implements OBM_ISearchable {
-  public $id;
-  public $name;
-  public $owner;
-  public $isDefault;
-  public $access;
-  public $read;
-  public $write;
-  public $admin;
-  public $syncable;
-  public $synced;
+  private $id;
+  private $name;
+  private $sysName;
+  private $owner;
+  private $isDefault;
+  private $access;
+  private $read;
+  private $write;
+  private $admin;
+  private $syncable;
+  private $synced;
 
   public function __construct($id, $name, $is_default, $owner, $syncable, $synced, $access, $read, $write, $admin) {
     $this->id = $id;
     $this->name = $name;
+    $this->sysName = $name;
     $this->access = $access;
-    $this->read = $write;
+    $this->read = $read;
     $this->write = $write;
     $this->admin = $admin;
     $this->isDefault = $is_default;
@@ -47,23 +49,29 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public function __set($property, $value) {
-    if ($property == "name") {
-      $this->name = $value;
-    } else {
-      return;
+    if ($property != 'id') {
+      $this->$property = $value;
     }
   }
 
   public function __get($property) {
-    if ($property == "name") {
-      if ($this->isDefault) {
-        return $GLOBALS["l_{$this->name}"];
+    if (property_exists($this, $property)) {
+      if ($property == "name") {
+        if ($this->isDefault) {
+          if ($this->owner == $GLOBALS['obm']['uid']) {
+            return $GLOBALS["l_{$this->name}"];
+          } else {
+            $owner = get_entity_info($this->owner, 'user');
+            return $GLOBALS["l_{$this->name}"]." ($owner[label])";
+          }
+        } else {
+          return $this->name;
+        }
       } else {
-        return $this->name;
+        return $this->$property;
       }
-    } else {
-      return $this->$property;
     }
+    return;
   }
 
   public static function fieldsMap() {
@@ -245,14 +253,14 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
 
   public function getMyContacts() {
     foreach($this->addressbooks as $addressbook) {
-      if($addressbook->isDefault && $addressbook->name == 'contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
+      if($addressbook->isDefault && $addressbook->sysName == 'contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
         return $addressbook;
     }
   }
 
   public function getCollectedAddressbook() {
     foreach($this->addressbooks as $addressbook) {
-      if($addressbook->isDefault && $addressbook->name == 'collected_contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
+      if($addressbook->isDefault && $addressbook->sysName == 'collected_contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
         return $addressbook;
     }
   }
