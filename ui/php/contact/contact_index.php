@@ -459,8 +459,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 } elseif ($action == 'storeContact') {
 ///////////////////////////////////////////////////////////////////////////////
   $params['contact_id'] = $params['id'];
-  $contact = OBM_Contact::get($params['contact_id']);
-  $addressbook = OBM_AddressBook::get($contact->addressbook);
+  $addressbook = OBM_AddressBook::get($params['addressbook']);
   if ($addressbook && $addressbook->write) {
     if (check_contact_update_rights($params)) {
       if (check_user_defined_rules() && check_contact_data_form('', $params)) {

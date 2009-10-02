@@ -1195,8 +1195,6 @@ function check_contact_update_rights($params, $c='') {
     }
   }
 
-  $contact = OBM_Contact::get($id);
-  
   // Hook : Pre
   if (function_exists('hook_pre_check_contact_update_rights')) {
     if (! hook_pre_check_contact_update_rights($params, $c)) {
@@ -1219,6 +1217,7 @@ function check_contact_update_rights($params, $c='') {
     }
 
     // XXXXX Check addressbook write_access ?
+    $contact = OBM_Contact::get($id);
     $addressbook = OBM_AddressBook::get($contact->addressbook);
     if (!$addressbook || !$addressbook->write) {
       return false;
