@@ -1219,7 +1219,7 @@ function check_contact_update_rights($params, $c='') {
     }
 
     // XXXXX Check addressbook write_access ?
-    $addressbook = $contact->addressbook; 
+    $addressbook = OBM_AddressBook::get($contact->addressbook);
     if (!$addressbook || !$addressbook->write) {
       return false;
     }
