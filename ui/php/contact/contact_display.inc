@@ -526,7 +526,7 @@ function dis_contact_consult2($contact) {
   $addressBooks = OBM_AddressBook::search();
   foreach($addressBooks as $id => $addressBook) {
     if($addressBook->write == 1) {
-      $copy .= '<li><a href="" onclick="obm.contact.addressbook.copyContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->displayName.'</a></li>';
+      $copy .= '<li><a href="" onclick="obm.contact.addressbook.copyContact('.$contact->id.','.$addressBook->id.'); return false;">'.$addressBook->displayName.'</a></li>';
       //$move .= '<li><a href="" onclick="obm.contact.addressbook.moveContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->displayName.'</a></li>';
     }
     if ($addressBook->id == $contact->addressbook) {

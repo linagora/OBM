@@ -488,22 +488,16 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 ///////////////////////////////////////////////////////////////////////////////
   $params['contact_id'] = $params['id'];
 
-  if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
-  else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
-
+  $addressBook = OBM_AddressBook::get($params['addressbook']);
   if ($addressBook && $addressBook->write) {
-    if (check_contact_update_rights($params)) {
-      $retour = run_query_contact_update($params);
-      $contact = OBM_Contact::get($params['id']);
-      $contact = $addressBook->addContact($params);
-      $block = dis_contact_consult2($contact);
-      echo $block;
-    } else {
-      $contact = OBM_Contact::get($params['id']);
-      $block = dis_contact_consult2($contact);
-      echo $block;
-    }
-  }
+   $contact = OBM_Contact::get($params['id']);
+   OBM_Contact::copy($contact, $addressBook);
+  } 
+
+  $contact = OBM_Contact::get($params['id']);
+  $block = dis_contact_consult2($contact);
+  echo $block;
+
   exit();
 } elseif ($action == 'deleteContact') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -577,7 +571,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $block = html_addressbooks_get_list();
   echo $block;
   exit();
-}
+} 
 
 of_category_user_action_switch($module, $action, $params);
 
@@ -784,6 +778,15 @@ function get_contact_action() {
  $actions['contact']['desync']   = array (
     'Url'      => "$path/contact/contact_index.php?action=desync&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_read,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+                                    		 );
+
+
+// Contact copy
+ $actions['contact']['copyContact']   = array (
+    'Url'      => "$path/contact/contact_index.php?action=copyContact",
+    'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None')
                                     		 );

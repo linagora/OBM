@@ -259,7 +259,6 @@ class OBM_Contact implements OBM_ISearchable {
     $contact->address = is_array($data['addresses'])? $data['addresses'] : array();
     $contact->im      = is_array($data['ims'])      ? $data['ims']       : array();
     $contact->website = is_array($data['websites']) ? $data['websites']  : array();
-
     $comp_id = sql_parse_id($contact->company_id);
     $dsrc    = sql_parse_id($contact->datasource_id);
     $kind    = sql_parse_id($contact->kind);
@@ -434,6 +433,38 @@ class OBM_Contact implements OBM_ISearchable {
     }
 
     return $contact;
+  }
+
+  public function copy($contact, $addressbook) {
+    $data = (array)$contact;
+    $data['phones'] = array();
+    foreach($contact->phone as $phone) {
+      array_push($data['phones'], array('label'=>$phone['label'][0]."_".$phone['label']['1'], 'number'=>$phone['number']));
+    }
+    $data['emails'] = array();
+    foreach($contact->email as $email) {
+      array_push($data['emails'], array('label'=>$email['label'][0], 'address'=>$email['address']));
+    }
+    $data['ims'] = $contact->im;
+
+    $data['websites'] = array();
+    foreach($contact->website as $website) {
+      array_push($data['websites'], array('label'=>$website['label'][0], 'url'=>$website['url']));
+    }
+    $data['addresses'] = array();
+    foreach($contact->address as $address) {
+      array_push($data['addresses'], array(
+        'street' => $address['street'],
+        'label' => $address['label'][0],
+        'zipcode' => $address['zipcode'],
+        'town' => $address['locality'],
+        'expresspostal' => $address['expresspostal'],
+        'country' => $address['country']
+      ));
+    }
+
+    $ret = self::create($data,$addressbook);
+    return $ret;
   }
 
   public static function delete($contact) {
@@ -810,9 +841,9 @@ class OBM_Contact implements OBM_ISearchable {
     $query = "DELETE FROM Address WHERE address_entity_id = $id";
     display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(address)');
     $obm_q->query($query);
-    if(is_array($contact->addresse)) {
+    if(is_array($contact->address)) {
       $cpt = array();
-      foreach($contact->addresse as $address) {
+      foreach($contact->address as $address) {
         if(trim($address['street']) != '' || (trim($address['country']) != '' && trim($address['country']) != 'none') || trim($address['zipcode']) != ''
            || trim($address['expresspostal']) != '') {
           if(trim($address['country']) == 'none') $address['country'] = '';
