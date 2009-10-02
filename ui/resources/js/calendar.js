@@ -50,9 +50,7 @@ Obm.CalendarManager = new Class({
       $('calendarBody').scrollTo(0, obm.vars.consts.firstHour*this.defaultHeight*(3600/obm.vars.consts.timeUnit));
     } else {
       // month view
-      $$('div.alldayContainer').each(function(element, index) {
-        new Obm.Observer(element, {onStop:this.resizeAlldayCell, property:'offsetHeight'});
-      }.bind(this)); 
+      new Obm.Observer($('calendarHeaderGrid'), {onStop:this.resizeAlldayContainer, property:'offsetHeight'});
       this.resizeGrid();
     }
 
@@ -64,7 +62,6 @@ Obm.CalendarManager = new Class({
       });
     }
   },
-
 
   /**
    * Update hour marker (left panel & in-day) 
@@ -288,38 +285,40 @@ Obm.CalendarManager = new Class({
   /**
    * Ajust displayd events on month view // FIXME
    */
-  resizeAlldayCell: function(element) {
+  resizeAlldayContainer: function() {
 
-    var str = element.id.split('_');
-    var content = $('allday_'+str[2]);
-    var canBeDisplayed = Math.floor(element.offsetHeight/15) - 2;
+    $$('div.alldayContainer').each(function(element) {
+      var str = element.id.split('_');
+      var content = $('allday_'+str[2]);
+      var canBeDisplayed = Math.floor(element.offsetHeight/15) - 2;
 
-    if (obm.calendarManager.alldayEventGrid[str[2]] && 
-        obm.calendarManager.alldayEventGrid[str[2]].length>canBeDisplayed) {
-      var undisplayed = obm.calendarManager.alldayEventGrid[str[2]].length - canBeDisplayed;
-      var i = 0;
-      obm.calendarManager.alldayEventGrid[str[2]].each(function(e) {
-        if (i<canBeDisplayed) {
-          e.element.style.display = '';
-        } else {
-          e.element.style.display = 'none';
-        }
-        i++;
-      });
-      var more = $('more_'+str[1]+'_'+str[2]);
-      more.style.top = canBeDisplayed*15+'px';
-      more.style.display = '';
-      more.set('html','+'+undisplayed+' '+obm.vars.labels.more);
-      obm.calendarManager.tips.add(more);
-    } else {
-      $('more_'+str[1]+'_'+str[2]).style.display = 'none';
-      if (obm.calendarManager.alldayEventGrid[str[2]]) {
+      if (obm.calendarManager.alldayEventGrid[str[2]] && 
+          obm.calendarManager.alldayEventGrid[str[2]].length>canBeDisplayed) {
+        var undisplayed = obm.calendarManager.alldayEventGrid[str[2]].length - canBeDisplayed;
+        var i = 0;
         obm.calendarManager.alldayEventGrid[str[2]].each(function(e) {
-          e.element.style.display = '';
+          if (i<canBeDisplayed) {
+            e.element.style.display = '';
+          } else {
+            e.element.style.display = 'none';
+          }
+          i++;
         });
+        var more = $('more_'+str[1]+'_'+str[2]);
+        more.style.top = canBeDisplayed*15+'px';
+        more.style.display = '';
+        more.set('html','+'+undisplayed+' '+obm.vars.labels.more);
+        obm.calendarManager.tips.add(more);
+      } else {
+        $('more_'+str[1]+'_'+str[2]).style.display = 'none';
+        if (obm.calendarManager.alldayEventGrid[str[2]]) {
+          obm.calendarManager.alldayEventGrid[str[2]].each(function(e) {
+            e.element.style.display = '';
+          });
+        }
       }
-    }
-
+    });
+    obm.calendarManager.redrawAllDayGrid();
   },
 
 
