@@ -4,6 +4,10 @@ NameVirtualHost *:443
     ServerAdmin root@localhost
     DocumentRoot /usr/share/obm/www/php
     ServerName FULL_NAME
+   
+   
+    Timeout 3000
+    ProxyTimeout 3000
     
     # SSL
     SSLEngine on
@@ -42,6 +46,11 @@ NameVirtualHost *:443
 
 #obm#ProxyPass /minig http://_TOMCAT_SERVER_:8080/minig
 #obm#ProxyPassReverse /minig http://_TOMCAT_SERVER_:8080/minig
+
+
+
+#opush#ProxyPass /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/Microsoft-Server-ActiveSync
+#opush#ProxyPassReverse /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/Microsoft-Server-ActiveSync
 
 
 #obm# alias /webmail/images /usr/lib/minig/images
