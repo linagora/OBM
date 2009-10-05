@@ -44,9 +44,9 @@ NameVirtualHost *:443
 #obm#ProxyPass /funambol http://_TOMCAT_SERVER_:8080/funambol
 #obm#ProxyPassReverse /funambol http://_TOMCAT_SERVER_:8080/funambol
 
-<Location /minig>
+#obm#<Location /minig>
 #obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/minig
-</Location>
+#obm#</Location>
 
 
 #opush#ProxyPass /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/Microsoft-Server-ActiveSync
