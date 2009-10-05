@@ -128,6 +128,8 @@ function dis_admin_device_search_list($device) {
     while($devices_q->next_record()) {
       $device_id = $devices_q->f('id');
       $device_owner = $devices_q->f('owner');
+      $userobm_delegation = $devices_q->f('userobm_delegation');
+      $delegation = of_delegation_check_update_rights($device, $userobm_delegation);
       $perms_device_id = $devices_q->f('partnership');
       $last_sync = $GLOBALS['l_undef'];
       if ($devices_q->f('last_sync')) {
@@ -137,7 +139,7 @@ function dis_admin_device_search_list($device) {
       if ($devices_q->f('first_sync')) {
         $first_sync = new Of_Date($devices_q->f('first_sync'), 'GMT');
       }
-      $userMobileDeviceManager .= "obm.userMobileDeviceManager.addDevice('$device_id', '$device_owner', '$first_sync', '$last_sync', '$perms_device_id');";
+      $userMobileDeviceManager .= "obm.userMobileDeviceManager.addDevice('$device_id', '$device_owner', '$first_sync', '$last_sync', '$perms_device_id', '$delegation');";
     }
     $block .= "
       <script type='text/javascript'>

@@ -7,8 +7,8 @@ Obm.UserMobileDeviceManager = new Class({
     this.devices = new Hash();
   },
 
-  addDevice: function(id, owner, firstSeen, lastSeen, permsDeviceId) {
-    var device = new Obm.UserMobileDevice(id, owner, firstSeen, lastSeen, permsDeviceId);
+  addDevice: function(id, owner, firstSeen, lastSeen, permsDeviceId, delegation) {
+    var device = new Obm.UserMobileDevice(id, owner, firstSeen, lastSeen, permsDeviceId, delegation);
     this.devices.set(id, device);
   },
 
@@ -51,16 +51,17 @@ Obm.UserMobileDeviceManager = new Class({
  *****************************************************************************/
 Obm.UserMobileDevice = new Class({
 
-  initialize: function(id, owner, firstSeen, lastSeen, permsDeviceId) {
+  initialize: function(id, owner, firstSeen, lastSeen, permsDeviceId, delegation) {
     this.id = id;
     this.owner = owner;
     this.firstSeen = firstSeen;
     this.lastSeen = lastSeen;
     this.permsDeviceId = permsDeviceId;
+    this.delegation = delegation;
   },
 
   addPartnership: function() {
-    if(obm.vars.consts.isSuperman) {
+    if(obm.vars.consts.isSuperman && this.delegation) {
       var eventData = new Object();
       eventData.owner = this.owner;
       eventData.device_id = this.id;
@@ -80,20 +81,23 @@ Obm.UserMobileDevice = new Class({
   },
 
   removePartnership: function() {
-    var eventData = new Object();
-    eventData.owner = this.owner;
-    eventData.device_id = this.id;
-    new Request.JSON({
-      url : '/user/user_index.php',
-      secure: false,
-      onComplete: function(response) {
-        if ($('mobile_partnership')) $('mobile_partnership').value = obm.vars.labels.addPartnership;
-        if ($('mobile_'+this.id)) $('mobile_'+this.id).set('src', obm.vars.images.desync);
-        this.permsDeviceId = '';
-        showOkMessage(obm.vars.labels.updateOk);
-      }.bind(this)
-    }).post($merge({ajax:1, action:'remove_partnership'}, eventData)); 
-
+    if (this.delegation) {
+      var eventData = new Object();
+      eventData.owner = this.owner;
+      eventData.device_id = this.id;
+      new Request.JSON({
+        url : '/user/user_index.php',
+        secure: false,
+        onComplete: function(response) {
+          if ($('mobile_partnership')) $('mobile_partnership').value = obm.vars.labels.addPartnership;
+          if ($('mobile_'+this.id)) $('mobile_'+this.id).set('src', obm.vars.images.desync);
+          this.permsDeviceId = '';
+          showOkMessage(obm.vars.labels.updateOk);
+        }.bind(this)
+      }).post($merge({ajax:1, action:'remove_partnership'}, eventData)); 
+    } else {
+      showErrorMessage(obm.vars.labels.permsError);
+    }
   }
 
 });

@@ -1232,13 +1232,14 @@ function html_user_mobile_devices($user_id, $type) {
       if ($mobile_q->f('first_sync')) {
         $first_sync = new Of_Date($mobile_q->f('first_sync'), 'GMT');
       }
+      $delegation = of_delegation_check_update_rights($user, $userobm_delegation);
       $devices .= "<tr id='mobile_$mobile_id' class='mobile'>
         <td>$mobile_user_agent</td>
         <td>$mobile_type</td>
         <td>$last_sync</td>
         <td><img src='$GLOBALS[ico_search]' onclick='obm.userMobileDeviceManager.showInfo(\"$mobile_id\");'/></td>
       </tr>";
-      $userMobileDeviceManager .= "obm.userMobileDeviceManager.addDevice('$mobile_id', '$mobile_owner', '$first_sync', '$last_sync', '$perms_device_id');";
+      $userMobileDeviceManager .= "obm.userMobileDeviceManager.addDevice('$mobile_id', '$mobile_owner', '$first_sync', '$last_sync', '$perms_device_id', '$delegation');";
     }
 
     $mobile_devices = "

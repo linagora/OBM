@@ -56,6 +56,7 @@ function run_query_admin_device_search($device) {
   $query = "SELECT 
     userobm_id,
     userobm_login,
+    userobm_delegation,
     #CONCAT(userobm_lastname, ' ', userobm_firstname) as user,
     opush_device.id,
     opush_device.owner,
@@ -74,7 +75,7 @@ function run_query_admin_device_search($device) {
     GROUP BY 
       opush_device.id, opush_device.owner, opush_device.identifier,opush_device.type,
       opush_sync_perms.device_id, opush_sync_perms.policy,
-      userobm_id, userobm_login, userobm_lastname, userobm_firstname
+      userobm_id, userobm_login, userobm_delegation, userobm_lastname, userobm_firstname
     $ORDER_BY";
 
   display_debug_msg($query, $cdg_sql, 'run_query_admin_device_search()');
