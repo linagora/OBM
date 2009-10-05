@@ -39,7 +39,7 @@ CREATE TABLE `AddressbookEntity` (
   `addressbookentity_addressbook_id` int(8) NOT NULL,
   PRIMARY KEY (`addressbookentity_entity_id`,`addressbookentity_addressbook_id`),
   KEY `addressbookentity_addressbook_id_addressbook_id_fkey` (`addressbookentity_addressbook_id`),
-  CONSTRAINT addressbookentity_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbookentity_addressbook_id) REFERENCES addressbook (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT addressbookentity_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbookentity_addressbook_id) REFERENCES AddressBook (id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `addressbookentity_entity_id_entity_id_fkey` FOREIGN KEY (`addressbookentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -47,7 +47,41 @@ CREATE TABLE `AddressbookEntity` (
 -- Contact update
 --
 ALTER TABLE Contact ADD COLUMN contact_addressbook_id int(8) default NULL AFTER contact_datasource_id; 
-ALTER TABLE Contact ADD CONSTRAINT contact_addressbook_id_addressbook_id_fkey FOREIGN KEY (contact_addressbook_id) REFERENCES addressbook (id) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE Contact ADD CONSTRAINT contact_addressbook_id_addressbook_id_fkey FOREIGN KEY (contact_addressbook_id) REFERENCES AddressBook (id) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- Populating AddressBook
+INSERT INTO AddressBook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable) 
+SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'contacts', true, true
+FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
+
+INSERT INTO AddressBook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable) 
+SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'collected_contacts', true, true
+FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
+
+INSERT INTO AddressBook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable)
+SELECT domain_id, NOW(), MIN(userobm_id), 'obm-storage-migration-2.3', MIN(userobm_id), 'public_contacts', true, false
+FROM Domain INNER JOIN UserObm ON userobm_domain_id = domain_id WHERE domain_global = false AND userobm_perms = 'admin'
+GROUP BY domain_id;
+
+CREATE TABLE TmpEntity (
+  entity_id     int(8) auto_increment,
+  id_entity     integer,
+  PRIMARY KEY (entity_id)
+);
+INSERT INTO TmpEntity (entity_id) SELECT MAX(entity_id) FROM Entity;
+DELETE FROM TmpEntity;
+INSERT INTO TmpEntity (id_entity) SELECT id from AddressBook;
+INSERT INTO Entity (entity_id , entity_mailing) SELECT entity_id , true FROM TmpEntity ;
+INSERT INTO AddressbookEntity (addressbookentity_addressbook_id, addressbookentity_entity_id) SELECT id_entity, entity_id FROM TmpEntity;
+
+DROP TABLE TmpEntity;
+
+
+UPDATE Contact SET contact_addressbook_id = (SELECT id from AddressBook WHERE owner = contact_usercreate and name = 'contacts') WHERE contact_privacy = 1 AND contact_collected = false;
+UPDATE Contact SET contact_addressbook_id = (SELECT id from AddressBook WHERE owner = contact_usercreate and name = 'collected_contacts') WHERE contact_privacy = 1 AND contact_collected = true;
+UPDATE Contact SET contact_addressbook_id = (SELECT id from AddressBook WHERE domain_id = contact_domain_id and name = 'public_contacts') WHERE contact_privacy = 0;
+-- End populating addressbook
+
 ALTER TABLE Contact DROP COLUMN contact_privacy;
 
 
@@ -76,7 +110,7 @@ CREATE TABLE `SyncedAddressbook` (
   KEY `syncedaddressbook_user_id_user_id_fkey` (`user_id`),
   KEY `syncedaddressbook_addressbook_id_addressbook_id_fkey` (`addressbook_id`),
   CONSTRAINT `syncedaddressbook_user_id_userobm_id_fkey` FOREIGN KEY (user_id) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook (id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES AddressBook (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 DROP TABLE IF EXISTS `SynchedContact`;
