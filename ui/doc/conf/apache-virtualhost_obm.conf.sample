@@ -44,22 +44,14 @@ NameVirtualHost *:443
 #obm#ProxyPass /funambol http://_TOMCAT_SERVER_:8080/funambol
 #obm#ProxyPassReverse /funambol http://_TOMCAT_SERVER_:8080/funambol
 
-#obm#ProxyPass /minig http://_TOMCAT_SERVER_:8080/minig
-#obm#ProxyPassReverse /minig http://_TOMCAT_SERVER_:8080/minig
-
+<Location /minig>
+#obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/minig
+</Location>
 
 
 #opush#ProxyPass /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/Microsoft-Server-ActiveSync
 #opush#ProxyPassReverse /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/Microsoft-Server-ActiveSync
 
-
-#obm# alias /webmail/images /usr/lib/minig/images
-
-#If you install minig on an other server,
-#comment alias /webmail/images, and use
-#proxyPass/Reverse :
-#ProxyPass /minig http://_TOMCAT_SERVER_:8080/minig/images
-#ProxyPassReverse /minig http://_TOMCAT_SERVER_:8080/minig/images
 
 #obm#ProxyRequests On
 
