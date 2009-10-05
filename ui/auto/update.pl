@@ -26,7 +26,7 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 use Getopt::Long;
 my %parameters;
-my $return = GetOptions( \%parameters, 'user=s', 'domain=s', 'domain-id=s', 'domain-global', 'domain-name=s', 'delegation=s', 'global', 'incremental', 'help' );
+my $return = GetOptions( \%parameters, 'user=s', 'domain=s', 'domain-id=s', 'domain-global', 'domain-name=s', 'delegation=s', 'global', 'incremental', 'entity', 'help' );
 
 if( !$return ) {
     undef %parameters;
@@ -63,6 +63,12 @@ sub run {
             $update = OBM::Update::updateGlobal->new( $parameters );
             last SWITCH;
         }
+
+        if( $parameters->{'entity'} ) {
+            require OBM::Update::updateEntity;
+            $update = OBM::Update::updateEntity->new( $parameters );
+            last SWITCH;
+        }
     }
 
     if( !defined($update) ) {
@@ -93,19 +99,24 @@ sub getParameter {
     my( $parameters ) = @_;
 
     local $SIG{__DIE__} = sub {
-         $self->_log( 'Affichage de l\'aide', 3 );
+        $self->_log( 'Affichage de l\'aide', 3 );
 
         print STDERR "Veuillez indiquer les parametres de mise a jour :\n";
-        print STDERR "\tSyntaxe: update.pl [--domain-id id | --domain-name domainName | --domain-global] [--user id | --delegation word] [--global | --incremental]\n";
-        print STDERR "\tdomain-id <id> : domaine d'identifiant <id> ;\n";
-        print STDERR "\tdomain-name <domainName> : domaine de domaine de messagerie <domainName> ;\n";
-        print STDERR "\tdomain-global : domaine global ;\n";
-        print STDERR "\tuser <id> : utilisateur d'identifiant <id> ;\n";
-        print STDERR "\tdelegation <word> : delegation de mot cle <word> ;\n";
-        print STDERR "\tglobal : fait une mise a jour globale du domaine ;\n";
-        print STDERR "\tincremental : fait une mise a jour incrementale du domaine.\n";
+        print STDERR "Syntaxe:\n";
+        print STDERR "\tupdate.pl [--domain-id id | --domain-name domainName | --domain-global] [--user id | --delegation word] [--global | --incremental]\n";
+        print STDERR "\tupdate.pl [--domain-id id | --domain-name domainName | --domain-global] --entity\n";
+        print STDERR "\t\tdomain-id <id> : domaine d'identifiant <id> ;\n";
+        print STDERR "\t\tdomain-name <domainName> : domaine de domaine de messagerie <domainName> ;\n";
+        print STDERR "\t\tdomain-global : domaine global ;\n";
+        print STDERR "\t\tuser <id> : utilisateur d'identifiant <id> ;\n";
+        print STDERR "\t\tdelegation <word> : delegation de mot cle <word> ;\n";
+        print STDERR "\t\tglobal : fait une mise a jour globale du domaine ;\n";
+        print STDERR "\t\tincremental : fait une mise a jour incrementale du domaine.\n";
+        print STDERR "\t\tentity : fait une mise a jour par entité. Les entités à mettre à jour sont indiquées sur l'entrée standard sous la forme 'type:nom', un par ligne\n";
+        print STDERR "\t\t\ttype : [user|mailshare|group|host]\n";
+        print STDERR "\t\t\tname : nom/identifiant de l'entité\n";
         print STDERR "Un des paramètres '--domain-id', '--domain-name' ou '--domain-global' doit être indiqué. '--domain-id' est prioritaire.\n";
-        print STDERR "Un des paramètres '--global' ou '--incremental' doit être indiqué.\n";
+        print STDERR "Un et un seul des paramètres '--global', '--incremental' ou '--entity' peuvent être indiqués à la fois.\n";
 
         exit 0;
     };
@@ -148,23 +159,6 @@ sub getParameter {
         die;
     }
 
-    if( exists($parameters->{'user'}) ) {
-        if( exists($parameters->{'delegation'}) ) {
-            $self->_log( 'Trop de parametres de mise a jour precise', 0 );
-            die;
-        }else{
-            $self->_log( 'Uniquement les mises a jour de l\'utilisateur d\'identifiant \''.$parameters->{'user'}.'\'', 0 );
-        }
-
-    }elsif( exists($parameters->{'delegation'}) ) {
-        if( exists($parameters->{'user'}) ) {
-            $self->_log( 'Trop de parametres de mise a jour precise', 0 );
-            die;
-        }else {
-            $self->_log( 'Uniquement les mises a jour de la delegation \''.$parameters->{'delegation'}.'\'', 0 );
-        }
-
-    }
 
     my $mode = 0;
     if( $parameters->{'incremental'} ) {
@@ -177,15 +171,51 @@ sub getParameter {
         $mode++;
     }
 
+    if( $parameters->{'entity'} ) {
+        $parameters->{'entity'} = 1;
+        $mode++;
+    }
+
     SWITCH: {
         if( $mode == 0 ) {
-            $self->_log( 'un paramètre de mode d\'exécution doit être indiqué [global|incremental]', 0 );
+            $self->_log( 'un paramètre de mode d\'exécution doit être indiqué [global|incremental|entity]', 0 );
             die;
         }
 
         if( $mode > 1 ) {
             $self->_log( 'un et un seul mode d\'exécution doit être indiqué [global|incremental]', 0 );
             die;
+        }
+    }
+
+
+    SWITCH: {
+        if( $parameters->{'incremental'} || $parameters->{'global'} ) {
+            if( exists($parameters->{'user'}) ) {
+                if( exists($parameters->{'delegation'}) ) {
+                    $self->_log( 'Trop de parametres de mise a jour precise', 0 );
+                    die;
+                }else{
+                    $self->_log( 'Uniquement les mises a jour de l\'utilisateur d\'identifiant \''.$parameters->{'user'}.'\'', 0 );
+                }
+        
+            }elsif( exists($parameters->{'delegation'}) ) {
+                if( exists($parameters->{'user'}) ) {
+                    $self->_log( 'Trop de parametres de mise a jour precise', 0 );
+                    die;
+                }else {
+                    $self->_log( 'Uniquement les mises a jour de la delegation \''.$parameters->{'delegation'}.'\'', 0 );
+                }
+            }
+
+            last SWITCH;
+        }
+
+
+        if( $parameters->{'entity'} ) {
+            $self->_log( 'Lit les entités à mettre à jour depuis l\'entrée standard', 2 );
+            @{$parameters->{'updateEntityList'}} = <STDIN>;
+            last SWITCH;
         }
     }
 }

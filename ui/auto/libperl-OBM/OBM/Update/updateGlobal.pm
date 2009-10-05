@@ -11,6 +11,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+
 use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::regexp;
 
@@ -45,6 +46,7 @@ sub new {
         $self->{'domainId'} = $parameters->{'domain-id'};
     }else {
         $self->_log( 'Le parametre domain-id doit etre precise', 0 );
+        return undef;
     }
 
     # User identifier

@@ -80,6 +80,11 @@ sub addEntities {
             last SWITCH;
         }
 
+        if( $programmingObj->getEntitiesType() eq 'HOST' ) {
+            $self->_initHostFactory();
+            last SWITCH;
+        }
+
         $self->_log( 'type d\'entité non supporté', 0 );
     }
 

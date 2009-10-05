@@ -42,7 +42,7 @@ sub _getUserIdFromUserLoginDomain {
 
 
     use OBM::Parameters::regexp;
-    if( $userLogin !~ /$regexp_login/ ) {
+    if( $userLogin !~ /$regexp_login/i ) {
         $self->_log( 'nom d\'utilisateur non specifié ou incorrect', 0 );
         return undef;
     }
@@ -54,7 +54,7 @@ sub _getUserIdFromUserLoginDomain {
 
     my $query = 'SELECT userobm_id
                  FROM '.$self->_userObmTable().'
-                 WHERE userobm_login='.$dbHandler->quote(lc($userLogin)).' AND userobm_domain_id='.$domainId;
+                 WHERE LOWER(userobm_login)='.$dbHandler->quote(lc($userLogin)).' AND userobm_domain_id='.$domainId;
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return undef;
@@ -68,6 +68,132 @@ sub _getUserIdFromUserLoginDomain {
     }
 
     return $userId;
+}
+
+
+sub _getMailshareIdFromMailshareNameDomain {
+    my $self = shift;
+    my( $mailshareName, $domainId ) = @_;
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connection à la base de données incorrecte !', 0 );
+        return undef;
+    }
+
+
+    use OBM::Parameters::regexp;
+    if( $mailshareName !~ /$regexp_mailsharename/i ) {
+        $self->_log( 'nom du mailshare non specifié ou incorrect', 0 );
+        return undef;
+    }
+
+    if( $domainId !~ /$regexp_id/ ) {
+        $self->_log( 'Id BD de domaine non specifié ou incorrect', 0 );
+        return undef;
+    }
+
+    my $query = 'SELECT mailshare_id
+                 FROM MailShare
+                 WHERE LOWER(mailshare_name)='.$dbHandler->quote(lc($mailshareName)).' AND mailshare_domain_id='.$domainId;
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return undef;
+    }
+
+    my( $mailshareId ) = $queryResult->fetchrow_array();
+    $queryResult->finish();
+
+    if( defined($mailshareId) ) {
+        $self->_log( 'mailshare \''.$mailshareName.'\' du domaine d\'ID \''.$domainId.'\' a l\'ID BD '.$mailshareId, 3 );
+    }
+
+    return $mailshareId;
+}
+
+
+sub _getGroupIdFromGroupNameDomain {
+    my $self = shift;
+    my( $groupName, $domainId ) = @_;
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connection à la base de données incorrecte !', 0 );
+        return undef;
+    }
+
+
+    use OBM::Parameters::regexp;
+    if( $groupName !~ /$regexp_groupname/i ) {
+        $self->_log( 'nom du groupe non specifié ou incorrect', 0 );
+        return undef;
+    }
+
+    if( $domainId !~ /$regexp_id/ ) {
+        $self->_log( 'Id BD de domaine non specifié ou incorrect', 0 );
+        return undef;
+    }
+
+    my $query = 'SELECT group_id
+                 FROM UGroup
+                 WHERE group_name='.$dbHandler->quote(lc($groupName)).' AND group_domain_id='.$domainId;
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return undef;
+    }
+
+    my( $groupId ) = $queryResult->fetchrow_array();
+    $queryResult->finish();
+
+    if( defined($groupId) ) {
+        $self->_log( 'groupe \''.$groupName.'\' du domaine d\'ID \''.$domainId.'\' a l\'ID BD '.$groupId, 3 );
+    }
+
+    return $groupId;
+}
+
+
+sub _getHostIdFromHostNameDomain {
+    my $self = shift;
+    my( $hostName, $domainId ) = @_;
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connection à la base de données incorrecte !', 0 );
+        return undef;
+    }
+
+
+    use OBM::Parameters::regexp;
+    if( $hostName !~ /$regexp_hostname/i ) {
+        $self->_log( 'nom de l\'hôte non specifié ou incorrect', 0 );
+        return undef;
+    }
+
+    if( $domainId !~ /$regexp_id/ ) {
+        $self->_log( 'Id BD de domaine non specifié ou incorrect', 0 );
+        return undef;
+    }
+
+    my $query = 'SELECT host_id
+                 FROM Host
+                 WHERE LOWER(host_name)='.$dbHandler->quote(lc($hostName)).' AND host_domain_id='.$domainId;
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return undef;
+    }
+
+    my( $hostId ) = $queryResult->fetchrow_array();
+    $queryResult->finish();
+
+    if( defined($hostId) ) {
+        $self->_log( 'hôte \''.$hostName.'\' du domaine d\'ID \''.$domainId.'\' a l\'ID BD '.$hostId, 3 );
+    }
+
+    return $hostId;
 }
 
 

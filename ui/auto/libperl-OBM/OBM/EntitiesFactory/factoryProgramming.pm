@@ -50,25 +50,31 @@ sub setEntitiesType {
 
     SWITCH: {
         if( $type eq 'USER' ) {
-            $self->_log( 'initialisation d\'un programateur d\'entité de type utilisateur', 3 );
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type utilisateur', 3 );
             $self->{'entityType'} = $type;
             last SWITCH;
         }
 
         if( $type eq 'MAILSHARE' ) {
-            $self->_log( 'initialisation d\'un programateur d\'entité de type partage messagerie', 3 );
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type partage messagerie', 3 );
             $self->{'entityType'} = $type;
             last SWITCH;
         }
 
         if( $type eq 'CONTACT' ) {
-            $self->_log( 'initialisation d\'un programateur d\'entité de type contacts', 3 );
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type contacts', 3 );
             $self->{'entityType'} = $type;
             last SWITCH;
         }
 
         if( $type eq 'GROUP' ) {
-            $self->_log( 'initialisation d\'un programateur d\'entité de type groupe', 4 );
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type groupe', 3 );
+            $self->{'entityType'} = $type;
+            last SWITCH;
+        }
+
+        if( $type eq 'HOST' ) {
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type hôte', 3 );
             $self->{'entityType'} = $type;
             last SWITCH;
         }
