@@ -3,10 +3,10 @@ UPDATE ObmInfo SET obminfo_value='2.2.x->2.3.0' WHERE obminfo_name='db_version';
 -- -----------------------------------------------------------------------------
 
 --
--- Table structure for table `addressbook`
+-- Table structure for table `AddressBook`
 --
-DROP TABLE IF EXISTS `addressbook`;
-CREATE TABLE `addressbook` (
+DROP TABLE IF EXISTS `AddressBook`;
+CREATE TABLE `AddressBook` (
   `id`         int(8) NOT NULL auto_increment,
   `domain_id`  int(8) NOT NULL,
   `timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
