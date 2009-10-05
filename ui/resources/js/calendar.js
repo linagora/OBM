@@ -1190,6 +1190,8 @@ Obm.CalendarInDayEvent = new Class({
       // Enable scroller
       obm.calendarManager.scroll.start();
 
+      // Fix y limit
+      this.resize.limit.y[1] =  $('calendarGridContainer').offsetHeight.toFloat() - this.element.offsetTop.toFloat();
     }.bind(this));
     this.resize.addEvent('drag', this.updateDuration.bind(this));
     this.resize.addEvent('complete', function() {
