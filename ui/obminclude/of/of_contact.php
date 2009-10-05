@@ -829,7 +829,12 @@ class OBM_Contact implements OBM_ISearchable {
       $cpt = array();
       foreach($contact->phone as $phone) {
         if(trim($phone['number']) != '' ) {
-          $phone['label'] = str_replace('_', ';', $phone['label']);
+          if(is_array($phone['label'])) {
+            array_pop($phone['label']);
+            $phone['label'] = implode(';',$phone['label']); 
+          } else {
+            $phone['label'] = str_replace('_', ';', $phone['label']);
+          }
           $cpt[$phone['label']]++;
           $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
           display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(phone)');
@@ -847,7 +852,12 @@ class OBM_Contact implements OBM_ISearchable {
         if(trim($address['street']) != '' || (trim($address['country']) != '' && trim($address['country']) != 'none') || trim($address['zipcode']) != ''
            || trim($address['expresspostal']) != '') {
           if(trim($address['country']) == 'none') $address['country'] = '';
-          $address['label'] = str_replace('_', ';', $address['label']);
+          if(is_array($address['label'])) {
+            array_pop($address['label']);
+            $address['label'] = implode(';',$address['label']); 
+          } else {
+            $address['label'] = str_replace('_', ';', $address['label']);
+          }          
           $cpt[$address['label']]++;
           $query = "INSERT INTO Address (
             address_entity_id,
@@ -880,7 +890,12 @@ class OBM_Contact implements OBM_ISearchable {
       $cpt = array();
       foreach($contact->website as $website) {
         if(trim($website['url']) != '' ) {
-          $website['label'] = str_replace('_', ';', $website['label']);
+          if(is_array($website['label'])) {
+            array_pop($website['label']);
+            $website['label'] = implode(';',$website['label']); 
+          } else {
+            $website['label'] = str_replace('_', ';', $website['label']);
+          }              
           $cpt[$website['label']]++;
           $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
           display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(website)');
@@ -912,7 +927,12 @@ class OBM_Contact implements OBM_ISearchable {
       $cpt = array();
       foreach($contact->email as $email) {
         if(trim($email['address']) != '' ) {
-          $email['label'] = str_replace('_', ';', $email['label']);
+          if(is_array($email['label'])) {
+            array_pop($email['label']);
+            $email['label'] = implode(';',$email['label']); 
+          } else {
+            $email['label'] = str_replace('_', ';', $email['label']);
+          }                
           $cpt[$email['label']]++;
           $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".trim($email['address'])."', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
           display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(Email)');

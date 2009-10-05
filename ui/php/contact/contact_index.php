@@ -512,7 +512,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     }
     $addressBooks = OBM_AddressBook::search();
     $contactHeaders = html_contact_get_headers();
-    $block = html_contact_get_list($addressBooks->searchContacts('in:'.$contact->addressbook), $contactHeaders);
+    $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern']), $contactHeaders);
     echo $block;
   }
   exit();      

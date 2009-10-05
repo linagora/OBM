@@ -54,6 +54,10 @@
   background-color: #99a8b7;
 }
 
+
+#addressBookContainer td div img {
+  padding: 0 2px 2px 0;
+}
 /* Address Book column styling */
 
 #addressBookGrid {

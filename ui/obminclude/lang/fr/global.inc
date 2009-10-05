@@ -47,7 +47,7 @@ $l_generate = "Générer";
 $l_autocomplete_field = "Rechercher ...";
 $l_fatal_server_err = "Erreur fatale du serveur, veuillez recharger la page";
 $l_search = "Rechercher";
-$l_advanced_search = "Recherche avancée";
+$l_advanced_search = "Afficher les options de recherche";
 $l_hide_advanced_search = "Masquer les options de recherche";
 $l_basic_search = "Recherche simple";
 

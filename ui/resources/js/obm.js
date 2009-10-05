@@ -439,7 +439,11 @@ Obm.Observer = new Class({
   
   setValue: function() {
     var v;
-    if (this.options.property == 'innerHeight') {
+    if(this.options.property == 'contentHeight') {
+      v = this.el.getHeight() + this.el.getScrollHeight();
+    } else if(this.options.property == 'contentWidth') {
+      v = this.el.getWidth() + this.el.getScrollWidth();      
+    } else if (this.options.property == 'innerHeight') {
       v = this.el.getHeight();
     } else if (this.options.property == 'innerWidth') {
       v = this.el.getWidth();

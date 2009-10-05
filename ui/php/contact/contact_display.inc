@@ -472,9 +472,9 @@ function dis_contact_html_search_form($calendar) {
   global $obm;
 
 
-  $block = "<div style='padding-left:1em;padding-right:1em;'>
-
-    <div id='basicSearch' style='float:right;'>
+  $block = "
+    <div id='searchHolder'>
+    <div id='basicSearch'>
       <form id='searchForm' onsubmit='obm.contact.addressbook.searchContact(this); return false;'>
         <input type='text' id='searchpattern' name='searchpattern' value='' />
         <input type='submit' value='$GLOBALS[l_search]' />
@@ -541,12 +541,12 @@ function dis_contact_consult2($contact) {
       <a href='' onclick='obm.contact.addressbook.updateContact($contact->id, $contact->addressbook); return false;' >
       <img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a>
     </li><li>
-      <a href='' onclick='obm.contact.addressbook.deleteContact($contact->id, \"".$contact->name."\", $contact->addressbook); return false;' >
+      <a href='' onclick='obm.contact.addressbook.deleteContact($contact->id, \"".$contact->name."\"); return false;' >
       <img src='".$GLOBALS['icones']['delete']."' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>";
   }
   $toolbar .="<li><img src='".$GLOBALS['icones']['others']."' title='$GLOBALS[l_others]' alt='$GLOBALS[l_others]' />
         <ul><li>$GLOBALS[l_copy]<ul>$copy</ul></li>
-        <li><a href='$GLOBALS[path]/contact/contact_index.php?action=vcard&amp;contact_id=$contact->id' onclick='return false;'>Exporter</a></li>
+        <li><a href='$GLOBALS[path]/contact/contact_index.php?action=vcard&amp;contact_id=$contact->id' >Exporter</a></li>
         </ul>
       </li>
     </ul>
@@ -697,7 +697,7 @@ function dis_contact_consult2($contact) {
 
 
   $block = "
-    <table>
+    <table id='contact-card-".$contact->id."'>
     <thead>
     <tr><th><a href='' onclick='obm.contact.addressbook.hideContact(); return false;'><img class='RF' src='".$GLOBALS['icones']['close']."' alt='$GLOBALS[l_close]' /></a>$GLOBALS[l_contact]</th></tr>
     <tr><td class='toolbar'>$toolbar</td></tr>
