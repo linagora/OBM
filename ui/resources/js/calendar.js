@@ -795,7 +795,7 @@ Obm.CalendarManager = new Class({
           } catch(e) {}
           obm.calendarManager.events.erase(evt.element.id);
           evt.element.destroy();
-          if (ivent.all_day) {
+          if (evt.kind == 'all_day') {
             obm.calendarManager.newDayEvent(ivent, e.options);
           } else {
             obm.calendarManager.newEvent(ivent, e.options);
