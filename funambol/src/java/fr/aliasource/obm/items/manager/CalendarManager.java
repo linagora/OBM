@@ -17,6 +17,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
@@ -298,8 +299,8 @@ public class CalendarManager extends ObmManager {
 			Event obmevent, String type) {
 
 		com.funambol.common.pim.calendar.Calendar calendar = new com.funambol.common.pim.calendar.Calendar();
-		com.funambol.common.pim.calendar.CalendarContent event = new com.funambol.common.pim.calendar.Event();
-		calendar.setEvent((com.funambol.common.pim.calendar.Event) event);
+		com.funambol.common.pim.calendar.Event event = new com.funambol.common.pim.calendar.Event();
+		calendar.setEvent(event);
 
 		event.getUid().setPropertyValue(obmevent.getUid());
 
@@ -374,7 +375,15 @@ public class CalendarManager extends ObmManager {
 		} else {
 			event.getAccessClass().setPropertyValue(new Short((short) 0)); // olNormal
 		}
-		event.setBusyStatus(new Short((short) 2)); // olBusy
+		if (obmevent.getOpacity() == EventOpacity.TRANSPARENT) {
+			event.setBusyStatus(new Short((short) 0)); // olFree
+			event.getTransp().setPropertyValue("1");
+		} else {
+			event.setBusyStatus(new Short((short) 2)); // olBusy
+			event.getTransp().setPropertyValue("0");
+		}
+		
+		
 
 		event.getPriority().setPropertyValue("1");
 		event.getStatus().setPropertyValue("0");
@@ -545,6 +554,15 @@ public class CalendarManager extends ObmManager {
 			event.setPrivacy(1); // private
 		}
 
+		if (foundation.getTransp() != null
+				&& Helper.nullToEmptyString(
+						foundation.getTransp().getPropertyValueAsString())
+						.equals("1")) {
+			event.setOpacity(EventOpacity.TRANSPARENT);
+		} else {
+			event.setOpacity(EventOpacity.OPAQUE);
+		}
+		
 		EventRecurrence recurrence = null;
 		if (foundation.isRecurrent()) {
 			recurrence = CalendarHelper.getRecurrenceFromFoundation(foundation
