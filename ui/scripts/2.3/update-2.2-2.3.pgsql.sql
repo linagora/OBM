@@ -79,12 +79,6 @@ ALTER TABLE Contact ADD CONSTRAINT contact_addressbook_id_addressbook_id_fkey FO
 -- -- Create Default Address books
 -- --
 
-CREATE TABLE TmpEntity (
-  entity_id     serial,
-  id_entity     integer,
-  PRIMARY KEY (entity_id)
-);
-
 INSERT INTO addressbook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable) 
 SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'contacts', true, true
 FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
@@ -101,6 +95,13 @@ GROUP BY domain_id;
 INSERT INTO addressbookentity (addressbookentity_addressbook_id, addressbookentity_entity_id) SELECT id, nextval('entity_entity_id_seq') from addressbook;
 
 INSERT INTO entity (entity_id , entity_mailing) SELECT addressbookentity_entity_id, true FROM addressbookentity ;
+
+-- setting default right on public_contacts address book
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id, entityright_access, entityright_read, entityright_write, entityright_admin)
+SELECT AddressbookEntity.addressbookentity_entity_id, NULL, 0, 1, 0, 0
+FROM AddressbookEntity INNER JOIN AddressBook
+ON AddressBook.id=AddressbookEntity.addressbookentity_addressbook_id
+WHERE AddressBook.name='public_contacts';
 
 UPDATE contact SET contact_addressbook_id = (SELECT id from addressbook WHERE owner = contact_usercreate and name = 'contacts') WHERE contact_privacy = 1 AND contact_collected = false;
 UPDATE contact SET contact_addressbook_id = (SELECT id from addressbook WHERE owner = contact_usercreate and name = 'collected_contacts') WHERE contact_privacy = 1 AND contact_collected = true;

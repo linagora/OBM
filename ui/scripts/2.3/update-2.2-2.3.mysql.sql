@@ -76,6 +76,13 @@ INSERT INTO AddressbookEntity (addressbookentity_addressbook_id, addressbookenti
 
 DROP TABLE TmpEntity;
 
+-- setting default right on public_contacts address book
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id, entityright_access, entityright_read, entityright_write, entityright_admin)
+SELECT AddressbookEntity.addressbookentity_entity_id, NULL, 0, 1, 0, 0
+FROM AddressbookEntity INNER JOIN AddressBook
+ON AddressBook.id=AddressbookEntity.addressbookentity_addressbook_id
+WHERE AddressBook.name='public_contacts';
+
 
 UPDATE Contact SET contact_addressbook_id = (SELECT id from AddressBook WHERE owner = contact_usercreate and name = 'contacts') WHERE contact_privacy = 1 AND contact_collected = false;
 UPDATE Contact SET contact_addressbook_id = (SELECT id from AddressBook WHERE owner = contact_usercreate and name = 'collected_contacts') WHERE contact_privacy = 1 AND contact_collected = true;
