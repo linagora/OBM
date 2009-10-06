@@ -3705,10 +3705,10 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
   $obm_q = new DB_OBM;
   $event_list = implode(',',$events);
   if(!is_null($start_time)) {
-    $start = "AND eventexception_date >= '$start_time'";
+    $start = "AND eventexception_date >= #SUBSECONDS('$start_time',event_duration)";
   }
   if(!is_null($end_time)) {
-    $end = "AND eventexception_date < '$end_time'";
+    $end = "AND eventexception_date <= '$end_time'";
   }
   $query = "SELECT
     event_duration,
@@ -3717,11 +3717,11 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
     eventexception_child_id,
     eventexception_date
     FROM EventException
-    JOIN Event ON eventexception_parent_id = event_id
+    INNER JOIN Event ON eventexception_parent_id = event_id
     WHERE eventexception_parent_id IN ($event_list) 
     $start $end";
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_exception()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   return $obm_q;
 }
 
