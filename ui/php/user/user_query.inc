@@ -350,7 +350,7 @@ function run_query_user_ext_search($user) {
   foreach ($patterns as $pattern) {
     $userpattern .= "AND (userobm_lastname #LIKE '$pattern%' OR userobm_firstname #LIKE '$pattern%' OR userobm_email #LIKE  '%$pattern%' )";
   }
-   $query = "SELECT 
+  $query = "SELECT 
       userobm_id,
       userobm_lastname,
       userobm_firstname,
