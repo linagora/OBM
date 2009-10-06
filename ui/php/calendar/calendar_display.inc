@@ -72,7 +72,7 @@ function dis_calendar_search_result($calendar, $current_view) {
     $begin = new Of_Date();
     $end = clone $begin;
     $end->addMonth(3);
-    $block = "<h1>$GLOBALS[l_basic_search_result] \"$pattern\"</h1>";
+    $block = "<h1>$GLOBALS[l_basic_search_result] \"".stripslashes($pattern)."\"</h1>";
   } else {
     $pattern['event_title'] = $calendar['title'];
     $pattern['event_location'] = $calendar['location'];
@@ -851,12 +851,12 @@ function dis_calendar_navbar($current_view) {
 function dis_calendar_html_search_form($calendar) {
   global $obm;
 
-  $pattern = $calendar['pattern'];
-  $title = $calendar['title'];
-  $owner = $calendar['owner'];
-  $location = $calendar['location'];
-  $desc = $calendar['desc'];
-  $attendees = $calendar['attendees'];
+  $pattern = stripslashes($calendar['pattern']);
+  $title = stripslashes($calendar['title']);
+  $owner = stripslashes($calendar['owner']);
+  $location = stripslashes($calendar['location']);
+  $desc = stripslashes($calendar['desc']);
+  $attendees = stripslashes($calendar['attendees']);
   $category_filter = $calendar['category_filter'];
   $period = $calendar['period'];
   $tag = $calendar['tag'];
@@ -919,7 +919,7 @@ function dis_calendar_html_search_form($calendar) {
 
     <div id='basicSearch' style='display:$basic;'>
       <form id='eventSearchForm' action='calendar_index.php' onsubmit='return checkSearchForm();'>
-        <input type='text' id='tf_pattern' name='tf_pattern' value='$pattern' />
+        <input type='text' id='tf_pattern' name='tf_pattern' value=\"$pattern\" />
         <input type='submit' value='$GLOBALS[l_search]' />
         <input type='hidden' name='searchType' value='basic' />
         <input type='hidden' name='action' value='search' />
@@ -937,18 +937,18 @@ function dis_calendar_html_search_form($calendar) {
         <table>
         <tr>
           <td>$GLOBALS[l_title]</td>
-          <td><input type='text' id='tf_title' name='tf_title' value='$title' /></td>
+          <td><input type='text' id='tf_title' name='tf_title' value=\"$title\" /></td>
           <td>$GLOBALS[l_owner]</td>
-          <td><input type='text' id='tf_owner' name='tf_owner' value='$owner' /></td>
+          <td><input type='text' id='tf_owner' name='tf_owner' value=\"$owner\" /></td>
           <td>$GLOBALS[l_location]</td>
-          <td><input type='text' id='tf_location' name='tf_location' value='$location' /></td>
+          <td><input type='text' id='tf_location' name='tf_location' value=\"$location\" /></td>
         </tr><tr>
           <td>$GLOBALS[l_category]</td>
           <td>$sel_cat1</td>
           <td>$GLOBALS[l_desc]</td>
-          <td><input type='text' id='tf_desc' name='tf_desc' value='$desc' /></td>
+          <td><input type='text' id='tf_desc' name='tf_desc' value=\"$desc\" /></td>
           <td>$GLOBALS[l_attendees]</td>
-          <td><input type='text' id='tf_attendees' name='tf_attendees' value='$attendees' /></td>
+          <td><input type='text' id='tf_attendees' name='tf_attendees' value=\"$attendees\" /></td>
         </tr><tr>
           <td>$GLOBALS[l_tag]</td>
           <td>$sel_tags</td>

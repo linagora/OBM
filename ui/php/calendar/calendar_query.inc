@@ -3231,14 +3231,15 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
   if ($type == 'basic') {
     $words = explode(' ', $pattern);
     foreach($words as $w) {
+      $parsed_word = sql_search_text_parse($w);
       $return .= "AND (
-      event_title $like '%$w%' OR 
-      event_location $like '%$w%' OR 
-      event_description $like '%$w%' OR
-      eventcategory1_label $like '%$w%'OR
-      eventtag_label $like '%$w%' OR
-      userobm_lastname $like '%$w%' OR
-      userobm_firstname $like '%$w%' ";
+      event_title #LIKE '%$parsed_word%' OR 
+      event_location #LIKE '%$parsed_word%' OR 
+      event_description #LIKE '%$parsed_word%' OR
+      eventcategory1_label #LIKE '%$parsed_word%'OR
+      eventtag_label #LIKE '%$parsed_word%' OR
+      userobm_lastname #LIKE '%$parsed_word%' OR
+      userobm_firstname #LIKE '%$parsed_word%' ";
     }
   } else {
     $event_pattern = array();
@@ -3249,7 +3250,8 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
 
         if ($field == 'owner') {
           foreach($words as $w) {
-            array_push($filter, "userobm_lastname $like '%$w%' OR userobm_firstname $like '%$w%'");
+            $parsed_word = sql_search_text_parse($w);            
+            array_push($filter, "userobm_lastname $like '%$parsed_word%' OR userobm_firstname $like '%$parsed_word%'");
           }
         } elseif ($field == 'attendee') {
           // foreach($words as $w) {
@@ -3261,7 +3263,8 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
             }
         } else {
           foreach($words as $w) {
-            array_push($filter, "$field $like '%$w%'");
+            $parsed_word = sql_search_text_parse($w);                        
+            array_push($filter, "$field $like '%$parsed_word%'");
           }
         }
         if (sizeof($filter) > 0)
