@@ -393,7 +393,9 @@ class OBM_Acl {
     if (self::isSpecialEntity($entityType)) {
       $columns = array('u2.userobm_id AS id', self::getUsernameColumns('u2').' AS label');
       $additionalJoins = "INNER JOIN UserObm u2 ON {$entityType}entity_{$entityType}_id = u2.userobm_id";
-      $unions = "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId}";
+      if($entityId === null || (!is_array($entityId) && $entityId == $userId) || (is_array($entityId) && in_array($userId, $entityId))) {
+        $unions = "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId}";
+      }
     } else {
       $entityTable = self::getEntityTable($entityType);
       if ($entityType=='contact') {
