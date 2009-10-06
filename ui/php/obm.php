@@ -60,7 +60,7 @@ if ($action == 'logout') {
   $entities = searchWritablesEntities($params['entity'], $obm['uid'], $params['pattern'], true);
   $users = array();
   foreach($entities as $id => $entity) {
-    $users[] = "{id:'$id', label:'$entity'}";
+    $users[] = "{id:'$id', label:'$entity', extra:''}";
   }
   $display['json'] = "{length:".count($entities).", datas:[".implode(',',$users)."]}";  
   echo $display['json'];
