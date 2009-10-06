@@ -138,7 +138,7 @@ class OBM_AddressBook implements OBM_ISearchable {
         1 as entityright_admin,
         (SELECT count(*) FROM SyncedAddressbook WHERE addressbook_id=AddressBook.id) AS synced
       FROM AddressBook 
-      WHERE AddressBook.owner = '.$GLOBALS['obm']['uid']. $query.' ORDER BY AddressBook.name'); 
+      WHERE AddressBook.owner = '.$GLOBALS['obm']['uid'].' '. $query.' ORDER BY AddressBook.name'); 
     while($db->next_record()) {
       $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
                                                         $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));
