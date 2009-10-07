@@ -217,7 +217,7 @@ ALTER TABLE `EventException` ADD CONSTRAINT `eventexception_child_id_event_id_fk
 --    SELECT e.event_id
 --    FROM Event e
 --    WHERE e.event_parent_id = ee.eventexception_parent_id);
-
+ALTER TABLE `Event` DROP FOREIGN KEY `event_parent_id_event_id_fkey`;
 ALTER TABLE `Event` DROP COLUMN `event_parent_id`;
 
 
