@@ -1,0 +1,531 @@
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : English for global                                       //
+//     - File     : global.inc                                               //
+// 2001-12-27 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+
+// Common actions
+$l_find = "Find";
+$l_back = "Back";
+$l_cancel = "Cancel";
+$l_close = "Close the window";
+$l_insert = "Create";
+$l_update = "Update";
+$l_delete = "Delete";
+$l_validate = "Validate";
+$l_execute = "Execute action";
+$l_confirm = "Confirm";
+$l_add = "Add";
+$l_remove = "Remove";
+$l_import_file = "Import this file";
+$l_home = "Home";
+$l_entity_right = "Manage rights for";
+$l_access_permission = "Access rights";
+$l_read_permission = "Read rights";
+$l_write_permission = "Write rights";
+$l_admin_permission = "Admin rights";
+$l_right_validate = "Validate these rights";
+$l_right_update_ok = "New rights validated";
+$l_rights_on_my = "Rights for the object";
+$l_rights_my_on = "My rights";
+$l_infos = "Information";
+$l_creator = "Created by";
+$l_date_creation = "Created on";
+$l_updater = "Last updated by";
+$l_date_last_update = "Last updated on";
+$l_delegation = "Delegation";
+$l_print = "Print";
+$l_transparent = "Transparent";
+$l_select_all = "Select all";
+$l_fast_search = "Fast search";
+$l_or = "or";
+$l_generate = "Generate";
+$l_data_unfilled = 'Unfilled';
+$l_more_fields = "More fields";
+$l_less_fields = "Less fields";
+
+// Common messages
+$l_users = "Users";
+$l_groups = "Groups";
+$l_contacts = "Contacts";
+$l_yes = "Yes";
+$l_no = "No";
+$l_all = "All";
+$l_all_f = "All";
+$l_none = "---";
+$l_undef = "---";
+$l_without = "Without";
+$l_selection = "Selection";
+$l_enabled = "Enabled";
+$l_disabled = "Disabled";
+$l_id = "Id";
+$l_comment = "Comment";
+$l_add_comment = "Add a comment";
+$l_upd_comment = "Update comment";
+$l_mail_comment = "Send Mail";
+$l_members = "Members";
+$l_rights = "Rights";
+$l_lang = "Lang";
+$l_default = "Default";
+$l_status = "Status";
+$l_archive = "Archive";
+$l_archive_first = "Arc";
+$l_show_archive = "Show archives";
+$l_dates = "Dates";
+$l_date = "Date";
+$l_begin = "Begin";
+$l_datebegin = "Begin date";
+$l_dateend = "End date";
+$l_end = "End";
+$l_alarm = "Alarm";
+$l_previous = "Previous";
+$l_next = "Next";
+$l_text = "Text";
+$l_name = "Name";
+$l_kind = "Kind";
+$l_displayname = 'Display name';
+$l_displayname_alternative = "[Show details]";
+$l_lastname = "Last name";
+$l_firstname = "First name";
+$l_title = "Title";
+$l_label = "Label";
+$l_number = "Number";
+$l_format = "Format";
+$l_file_format = "File format";
+$l_file = "File";
+$l_file_error = "The file is not available (or not filled) !";
+$l_size = "Size";
+$l_email = "Email";
+$l_quota = "Quota";
+$l_invalid_data = "Invalid Data";
+$l_invalid_email = "Invalid Email";
+$l_insert_ok = "Insertion successful";
+$l_insert_error = "Insertion Error";
+$l_update_ok = "Update successful";
+$l_update_error = "Update Error";
+$l_delete_ok = "Deletion successful";
+$l_delete_error = "Deletion Error";
+$l_date_incionsistency = "Dates inconsistency";
+$l_error_permission = "You are not allowed to execute this action";
+$l_error_delegation = "You are not allowed to update this target";
+$l_error_visibility = "You can't access this information, it is private.";
+$l_err_public_rights = "Insufficients rights to manage this public data !";
+$l_err_reference = "Wrong reference. This entity does not exist.";
+$l_err_fill = "The field must be filled";
+$l_color = "Color";
+$l_phone = "Phone";
+$l_hphone = "Home phone";
+$l_mphone = "Mobile phone";
+$l_fax = "Fax";
+$l_coord = "Details";
+$l_direction = "Direction";
+$l_service = "Service";
+$l_address = "Address";
+$l_street = "Street";
+$l_postcode = "Zip Code";
+$l_town = "Town";
+$l_expresspostal = "Express postal";
+$l_country = "Country";
+$l_im = "Instant Messaging";
+$l_website = "Website";
+$l_desc = "Description";
+$l_priority = "Priority";
+$l_region = "Region";
+$l_datasource = "Data source";
+$l_source = "Source";
+$l_after = "After";
+$l_before = "Before";
+$l_fuzzy = "Advanced";
+$l_visibility = "Access";
+$l_private = "Private";
+$l_public = "Public";
+$l_local = "Local";
+$l_ext_id = "Ext Id";
+$l_manager = "Manager";
+$l_project_manager = "Manager";
+$l_select_group = "Select group";
+$l_group_members = "Members of group";
+$l_private_group_members = "My groups";
+$l_public_group_members = "Public groups";
+$l_member = "Member";
+$l_attendee = "Attendee";
+$l_relation = "Relation";
+$l_client = "Customer";
+$l_supplier = "Supplier";
+$l_total = "Total";
+$l_potential = "Potential";
+$l_year_detail = "Year detail";
+$l_active = "Active";
+$l_new = "New";
+$l_last = "Last";
+$l_login = "Login";
+$l_logout = "Logout";
+$l_profile = "Profile";
+$l_connection_end = "Connection end";
+$l_reconnect = "Click here to reconnect";
+$l_version = "Version";
+$l_aka = "Also known as";
+$l_cat_tree = "Category tree";
+$l_category = "Category";
+$l_category1 = "Category";
+$l_aduplicate = "Duplicate";
+$l_hide = "Hide";
+$l_show = "Show";
+$l_advanced = "Advanced";
+$l_properties = "Properties";
+$l_items = "Items";
+$l_received = "Received";
+$l_emitted = "Emitted";
+$l_recursive = "Recursive";
+$l_hour = "Time";
+$l_type ="Type";
+$l_autocomplete_field = "Search...";
+$l_fatal_server_err = "Fatal server error, please reload";
+
+// Entities
+$l_company = "Company";
+$l_contact = "Contact";
+$l_lead = "Lead";
+$l_deal = "Deal";
+$l_list = "List";
+$l_event = "Event";
+$l_publication = "Publication";
+$l_todo = "To Do";
+$l_stats = "Stats";
+$l_time = "Time management";
+$l_calendar = "Calendar";
+$l_cv = "CV";
+$l_project = "Project";
+$l_projects = "Projects";
+$l_contract = "Contract";
+$l_incident = "Incident";
+$l_document = "Document";
+$l_account = "Account";
+$l_invoice = "Invoice";
+$l_payment = "Payment";
+$l_user = "User";
+$l_people = "People";
+$l_resource = "Resource";
+$l_group = "Group";
+$l_resourcegroup = "Resources Group";
+$l_mailshare = "Mail share";
+$l_backup = "Backup";
+$l_domain = "Domain";
+$l_system = "System";
+$l_settings = "Settings";
+$l_password = "Password";
+$l_mailforward = "Mail forwarding";
+$l_mail = "Mail";
+$l_vacation = "Mail Vacation";
+$l_mailbox = "Mailbox";
+$l_tools = "Update tools";
+$l_control = "Dashboard";
+$l_host = "Host";
+$l_scope_update = "Update system";
+$l_insufficient_permission = "Insufficient permissions";
+$l_organizationalchart = "Organizational chart";
+
+$l_permission_denied = $l_insufficient_permission;
+
+// Global display
+$l_last_visit = "Last visits";
+
+// OBM_DISPLAY
+$l_entries = "# Entries:";
+$l_page_res = "Results pages";
+$l_export = "Export";
+$l_export_all = "Export All";
+$l_field = "Field";
+$l_displayed = "Displayed";
+$l_order = "Order";
+$l_move = "Move";
+$l_mandatory = "Display of this field is mandatory";
+$l_display_no = "Stop displaying this field";
+$l_display_yes = "Display this field";
+$l_down = "Move the field down one row";
+$l_up = "Move the field up one row";
+$l_select_all = "Select all";
+$l_unselect_all = "Unselect all";
+$l_pagelayout = "Orientation";
+$l_pagelayout_portrait = "Portrait";
+$l_pagelayout_landscape = "Landscape";
+
+// OBM_DISPLAY help screen
+$l_help = "Help";
+$l_help_display_yes = "This field is displayed. Click on this button if you want the field not to be displayed";
+$l_help_display_no = "This field is not displayed. Click on this button if you want the field to be displayed";
+$l_help_mandatory = "This field is mandatory";
+$l_help_down  = "Move the field up";
+$l_help_up = "Move the field down";
+$l_document_added = " added documents";
+$l_no_document_added = "No documents added";
+
+// Javascript common messages
+$l_fill_label = "You have to fill the label";
+$l_fill_status = "You have to fill the status";
+$l_fill_priority = "You have to fill the priority";
+$l_fill_date = "The date must be filled";
+$l_invalid_date = "Invalid date format";
+$l_invalid_date_day = "Invalid day";
+$l_invalid_date_month = "Invalid month";
+$l_invalid_date_year = "Invalid year";
+
+// Tasktype groups
+$l_tt = "Task Type";
+$l_tt_sales = "Billed Tasks";
+$l_tt_research = "Internal Projects";
+$l_tt_others = "Non Billed Tasks";
+
+$l_gid = "Gid";
+$l_gid_user = "Users";
+// Samba groups
+$l_gid_smb_admin = "Domain Admins";
+$l_gid_smb_user = "Domain users";
+$l_gid_smb_guest = "Domain guests";
+
+// Days and months
+$l_day = "Day";
+$l_days = "days";
+$l_week = "Week";
+$l_month = "Month";
+$l_year = "Year";
+$l_today = "Today";
+$l_period = "Period";
+$l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');
+$l_monthsofyearshort = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+$l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
+$l_daysofweekshort = array('Sun','Mon','Tue','Wed','Thu','Fri','Sat');
+$l_daysofweekfirst = array ('S','M','T','W','T','F','S');
+
+//---------------------------------------------------------------------------//
+// Theme headers lang files
+//---------------------------------------------------------------------------//
+
+$l_section_com    = "Sales";
+$l_section_gw     = "Groupware";
+$l_section_prod   = "Production";
+$l_section_compta = "Accounting";
+$l_section_user   = "Users";
+$l_section_admin  = "Administration";
+$l_section_dic    = "Dictionary";
+$l_section_my  = "My account";
+$l_section_webmail= "Webmail";
+
+$l_module_company = "Companies";
+$l_module_contact = "Contacts";
+$l_module_lead = "Leads";
+$l_module_deal = "Deals";
+$l_module_list = "Lists";
+$l_module_calendar = "Calendar";
+$l_module_cv  = "CV";
+$l_module_todo    = "Todo";
+$l_module_publication = "Publications";
+$l_module_statistic = "Statistics";
+$l_module_domain = "Domains";
+$l_module_campaign = "Campaign";
+$l_module_report = "Report";
+
+$l_module_time = "Time management";
+$l_module_project = "Projects";
+$l_module_contract = "Contracts";
+$l_module_incident = "Incidents";
+$l_module_document = "Documents";
+
+$l_module_account = "Accounts";
+$l_module_invoice = "Invoices";
+$l_module_payment = "Payments";
+
+$l_module_user = "Users";
+$l_module_people = "People";
+$l_module_resource = "Resources";
+$l_module_group = "Groups";
+$l_module_resourcegroup = "Resources group";
+$l_module_host = "Hosts";
+$l_module_mailshare = "Mail shares";
+$l_module_organizationalchart = "Organizational chart";
+
+$l_module_admin_lang = "Lang";
+$l_module_admin_data = "Data";
+$l_module_admin_pref = "Prefs";
+$l_module_admin_code = "Code";
+$l_module_admin_ref = "Referential";
+
+$l_module_admin = "Connections";
+$l_module_import = "Import";
+$l_module_backup = "Backup";
+$l_module_tools = "Update tools";
+$l_module_control = "Dashboard";
+$l_module_mailserver = "Mail servers";
+$l_module_samba = "Samba Server";
+$l_module_profile = "User profiles";
+
+$l_module_settings = "Settings";
+$l_module_password = "Password";
+$l_module_mailforward = "Mail Forward";
+$l_module_vacation = "Mail Vacation";
+$l_module_mailbox = "Mailbox";
+$l_module_webmail = "Webmail";
+
+$l_header_admin = "Administration";
+$l_header_import = "Import";
+$l_header_new_f = "New";
+$l_header_new = "New";
+$l_header_find = "Find";
+$l_header_display = "Display";
+$l_header_global_export = "Export";
+$l_header_export = "Export";
+$l_header_vcard = "Vcard";
+$l_header_consult = "Consult";
+$l_header_duplicate = "Duplicate";
+$l_header_quickupdate = "Quick Update";
+$l_header_update = "Update";
+$l_header_delete = "Delete";
+$l_header_add_contact = "Add contact";
+$l_header_add_user = "Add user";
+$l_header_add_resource = "Add resource";
+$l_header_add_group = "Add group";
+$l_header_add_mailserver = "Add mail server";
+$l_header_upd_group = "Update groups";
+$l_header_convert_deal = "Convert to Deal";
+$l_header_add_deal = "Add deal";
+$l_header_list = "List";
+$l_header_closing = "Closings";
+$l_header_closing_new = "New closing";
+$l_header_tools_upd = "Update";
+
+$l_header_new_child = "New linked Deal";
+$l_header_new_parent = "New Parent Deal";
+
+$l_header_reconcile = "Reconcile";
+$l_header_compute_balance = "Compute balance";
+$l_header_duplicate = "Duplicate";
+
+$l_header_add_contact = "Add contact";
+
+$l_header_batch = "Batch processing";
+
+// Project Agenda
+$l_header_right = "Right management";
+
+// Payment
+$l_header_link_invoice = "Link to invoice";
+
+// Project headers
+$l_header_man_task = "Tasks";
+$l_header_man_member = "Members";
+$l_header_advance = "Advance";
+$l_header_man_affect = "Allocation";
+$l_header_add_member = "Add member";
+$l_header_dashboard = "Dashboard";
+$l_header_planning = "Planning";
+
+// Admin headers
+$l_header_index = "Main";
+$l_header_help = "Help";
+$l_header_amp = "Show amp";
+$l_header_func_unused = "Functions";
+$l_header_clear_sess = "Clear sessions";
+$l_header_pref_update = "Reset users preferences";
+$l_header_reset = "Default Preferences";
+$l_header_country = "Country";
+$l_header_datasource = "Data Source";
+$l_header_tasktype = "Task Type";
+$l_header_region = "Regions";
+
+$l_header_year = "Year";
+$l_header_day = "Day";
+$l_header_week = "Week";
+$l_header_month = "Month";
+$l_header_new_event = "New appointment";
+
+//time headers
+$l_header_stats = "Statistics";
+$l_header_statsmonth = "Monthly stats";
+$l_header_statsuser = "User stats";
+$l_header_weeklyview = "Week";
+$l_header_monthlyview = "Month";
+$l_header_globalview = "Validation";
+$l_header_activityreport = "Activity Report";
+
+//document headers
+$l_document_new = "New document";
+$l_document_add = "Link some documents";
+
+//Profile headers
+$l_header_properties = "Properties";
+
+//People headers
+$l_header_wait = "Waiting";
+
+//---------------------------------------------------------------------------//
+// Category labels
+//---------------------------------------------------------------------------//
+$l_code = "Code";
+$l_c_manage = "Management: ";
+$l_c_new = "New";
+$l_c_update = "Update";
+$l_c_checkdelete = "Check or delete";
+$l_c_delete =  "Delete";
+$l_c_update = "Update";
+$l_c_insert = "Insert";
+$l_c_can_delete = "deletion is possible";
+$l_c_cant_delete = " deletion is not possible";
+$l_c_link = "references found for ";
+$l_c_link_no = "no reference found for ";
+$l_c_j_create = "The label must be filled";
+$l_c_j_update = "An entry must be selected and a new label must be given";
+$l_c_j_delete = "An entry must be selected";
+
+
+//---------------------------------------------------------------------------//
+// OF messages
+//---------------------------------------------------------------------------//
+$l_of_right_err_auth = "Insufficient rights to update rights!";
+$l_of_right_err_empty = "The object reference is missing!";
+$l_of_right_err_user = "Insufficient rights on users !";
+$l_of_right_err_resource = "Insufficient rights on resources !";
+//---------------------------------------------------------------------------//
+// Home page portlets
+//---------------------------------------------------------------------------//
+$l_waiting_events = "Waiting event(s)";
+$l_unfilled = "Day(s) unfilled";
+$l_my_calendar = "My calendar";
+$l_my_time = "My time management";
+
+$l_my_lead = "My leads";
+$l_late = "Late";
+
+$l_my_deal_current = "My current deals";
+$l_my_deal = "My deals";
+$l_deal_total = "Total amount";
+$l_deal_balanced = "Balanced amount";
+
+$l_my_project = "My projects";
+$l_my_project_current = "My current projects";
+
+$l_my_incident = "My incidents";
+$l_my_incident_current = "My current incidents";
+
+$l_my_contract = "My contracts";
+$l_my_contract_current = "My current contracts";
+$l_cr_date[$cr_date_tosign] = "To sign";
+$l_cr_date[$cr_date_tobegin] = "To begin";
+$l_cr_date[$cr_date_current] = "Running";
+$l_cr_date[$cr_date_torenew] = "To renew";
+$l_cr_date[$cr_date_ended] = "Expired";
+
+$l_billed = "Billed";
+$l_order_no_bill = "Ordered";
+
+// Debug
+$l_dg_id = "Id";
+$l_dg_param = "Parameters";
+$l_dg_sess = "Session";
+$l_dg_sql = "SQL";
+$l_dg_exe = "Exec";
+
+$l_all_aliases = "All aliases";
+$l_timezone = "Timezone";
