@@ -356,7 +356,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   <br />
   <form method=\"post\" name=\"f_mod_right\" action=\"$path/$module/${module}_index.php\">
     <table class=\"spreadSheet\">
-      <colgroup class=\"highlight\"/>
+      <colgroup class=\"highlight\"></colgroup>
       <thead>
         <tr>
           <th colspan=\"2\">$l_header_right</th>
