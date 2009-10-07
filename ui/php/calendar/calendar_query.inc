@@ -3221,7 +3221,6 @@ function calendar_localizeDate($format, $date) {
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 /**
  * Search fiter
  * Construct WHERE clause 
@@ -3230,17 +3229,19 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
   $return = "";
   if ($type == 'basic') {
     $words = explode(' ', $pattern);
+    $whereq = array();
     foreach($words as $w) {
       $parsed_word = sql_search_text_parse($w);
-      $return .= "AND (
+      array_push($whereq, " (
       event_title #LIKE '%$parsed_word%' OR 
       event_location #LIKE '%$parsed_word%' OR 
       event_description #LIKE '%$parsed_word%' OR
       eventcategory1_label #LIKE '%$parsed_word%'OR
       eventtag_label #LIKE '%$parsed_word%' OR
       userobm_lastname #LIKE '%$parsed_word%' OR
-      userobm_firstname #LIKE '%$parsed_word%' ";
+      userobm_firstname #LIKE '%$parsed_word%') ");
     }
+    $return = " AND (".implode('OR', $whereq)."";
   } else {
     $event_pattern = array();
     foreach($pattern as $field => $pattern) {
@@ -3276,7 +3277,7 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
     }
   }
 
-  return $return;
+  return $return.")";
 }
 
 function run_query_calendar_build_attendee_search_filters($pattern, $type, $like, $kind) {
@@ -3315,10 +3316,11 @@ function run_query_calendar_build_attendee_search_filters($pattern, $type, $like
     }
   }
 
-  return $return;
+  return $return.")";
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
 // Return all not rejected events in a week of users or/and groups
 // Parameters:
 //   - $start           : timestamp of start date
@@ -3392,7 +3394,6 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       if ($pattern) {
         $search_pattern = $event_search_pattern;
         $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'user');
-        if ($search_pattern) $search_pattern .= ")";
       }
       $select[] =  "SELECT
         $select_q
@@ -3417,7 +3418,6 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       if ($pattern) {
         $search_pattern = $event_search_pattern;
         $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'resource');
-        if ($search_pattern) $search_pattern .= ")";
       }
       $select[] =  "SELECT
         $select_q
@@ -3442,7 +3442,6 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       if ($pattern) {
         $search_pattern = $event_search_pattern;
         $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'resource');
-        if ($search_pattern) $search_pattern .= ")";
       }
       $select[] = "SELECT
         $select_q
@@ -3546,7 +3545,6 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       if ($pattern) {
         $search_pattern = $event_search_pattern;
         $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'user');
-        if ($search_pattern) $search_pattern .= ")";
       }
       $select[] =  "SELECT
         $select_q
@@ -3571,7 +3569,6 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       if ($pattern) {
         $search_pattern = $event_search_pattern;
         $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'resource');
-        if ($search_pattern) $search_pattern .= ")";
       }
       $select[] = "SELECT
         $select_q
@@ -3596,7 +3593,6 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       if ($pattern) {
         $search_pattern = $event_search_pattern;
         $search_pattern .= run_query_calendar_build_attendee_search_filters($pattern, $type, $like,'resource');
-        if ($search_pattern) $search_pattern .= ")";
       }
       $select[] = "SELECT
         $select_q
