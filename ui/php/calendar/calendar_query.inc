@@ -3276,8 +3276,11 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
       $return = "AND (".implode(" OR ", $event_pattern)."";
     }
   }
+  if ($return != "") {
+    return $return.")";
+  }
 
-  return $return.")";
+  return ;
 }
 
 function run_query_calendar_build_attendee_search_filters($pattern, $type, $like, $kind) {
@@ -3315,8 +3318,11 @@ function run_query_calendar_build_attendee_search_filters($pattern, $type, $like
       }
     }
   }
+  if ($return != "") {
+    return $return.")";
+  }
 
-  return $return.")";
+  return ;
 }
 
 
