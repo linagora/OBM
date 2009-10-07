@@ -110,27 +110,27 @@ sub _setPhoneLinks {
         my $currentPhone = $phoneLinks->[$i];
 
         SWITCH: {
-            if( $currentPhone->{'phone_label'} =~ /HOME;VOICE/ ) {
+            if( $currentPhone->{'phone_label'} =~ /^HOME;VOICE/ ) {
                 $entityDesc->{'phones'}->{'homePhone'}->{$currentPhone->{'phone_number'}} = 1;
                 last SWITCH;
             }
 
-            if( $currentPhone->{'phone_label'} =~ /WORK;VOICE/ ) {
+            if( $currentPhone->{'phone_label'} =~ /^WORK;VOICE/ ) {
                 $entityDesc->{'phones'}->{'workPhone'}->{$currentPhone->{'phone_number'}} = 1;
                 last SWITCH;
             }
 
-            if( $currentPhone->{'phone_label'} =~ /WORK;FAX/ ) {
+            if( $currentPhone->{'phone_label'} =~ /^WORK;FAX/ ) {
                 $entityDesc->{'phones'}->{'workFax'}->{$currentPhone->{'phone_number'}} = 1;
                 last SWITCH;
             }
 
-            if( $currentPhone->{'phone_label'} =~ /CELL;VOICE/ ) {
+            if( $currentPhone->{'phone_label'} =~ /^CELL;VOICE/ ) {
                 $entityDesc->{'phones'}->{'mobilePhone'}->{$currentPhone->{'phone_number'}} = 1;
                 last SWITCH;
             }
 
-            if( $currentPhone->{'phone_label'} =~ /PAGER/ ) {
+            if( $currentPhone->{'phone_label'} =~ /^PAGER/ ) {
                 $entityDesc->{'phones'}->{'pager'}->{$currentPhone->{'phone_number'}} = 1;
                 last SWITCH;
             }
@@ -155,13 +155,13 @@ sub _setAddresses {
         my $currentAddress = $addressLinks->[$i];
 
         SWITCH: {
-            if( $currentAddress->{'address_label'} =~ /^PREF/ ) {
+            if( $currentAddress->{'address_label'} =~ /^WORK;X-OBM-Ref1$/ ) {
                 if( my $address = $self->_ldapPostalAddressFormatting( $currentAddress ) ) {
                     $entityDesc->{'address'}->{'prefered'} = $self->_ldapPostalAddressFormatting( $currentAddress );
                 }
             }
 
-            if( $currentAddress->{'address_label'} =~ /WORK/ ) {
+            if( $currentAddress->{'address_label'} =~ /^WORK/ ) {
                 if( !defined($entityDesc->{'address'}->{'work'}) ) {
                     if( my $address = $self->_ldapAddressFormatting( $currentAddress ) ) {
                         $entityDesc->{'address'}->{'work'} = $address;
@@ -170,7 +170,7 @@ sub _setAddresses {
                 last SWITCH;
             }
 
-            if( $currentAddress->{'address_label'} =~ /HOME/ ) {
+            if( $currentAddress->{'address_label'} =~ /^HOME/ ) {
                 if( my $address = $self->_ldapPostalAddressFormatting( $currentAddress ) ) {
                     $entityDesc->{'address'}->{'home'}->{$address} = 1;
                 }

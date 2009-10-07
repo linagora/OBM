@@ -97,8 +97,7 @@ sub _getLdapContacts {
         attrs => ['obmUID']
     );
 
-    if( $result->code == 32 ) {
-    }elsif($result->is_error()) {
+    if( ($result->code != 32) && ($result->is_error()) ) {
         $self->_log( 'problème lors de la recherche LDAP \''.$result->code.'\', '.$result->error, 3 );
         return 0;
     }

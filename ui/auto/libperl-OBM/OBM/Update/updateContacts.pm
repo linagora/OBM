@@ -185,11 +185,15 @@ sub _updateUpdatedDomainContacts {
     my $self = shift;
     my( $domainId ) = @_;
 
+    $self->_log( 'Programmation de la suppression des contacts qui ne sont plus publics', 2 );
     if( $self->_deleteDomainContacts( $domainId ) ) {
+        $self->_log( 'Erreur à la programmation de la suppression des contacts qui ne sont plus publics', 0 );
         return 1;
     }
 
+    $self->_log( 'Programmation de la mise à jour des contacts publics', 2 );
     if( $self->_updateDomainContacts( $domainId ) ) {
+        $self->_log( 'Erreur à la programmation de la mise à jour des contacts publics', 0 );
         return 1;
     }
 
@@ -252,13 +256,17 @@ sub _deleteDomainContacts {
         return 1;
     }
 
-    my $query = 'SELECT contact_id
+    my $query = 'SELECT Contact.contact_id
                     FROM Contact
-                    WHERE (contact_privacy=1 OR contact_archive=\'1\')
-                    AND contact_domain_id=\''.$domainId.'\'';
-    if( $self->{'timestamp'} ) {
-        $query .= ' AND unix_timestamp(contact_timeupdate) > \''.$self->{'timestamp'}.'\'';
-    }
+                    WHERE (Contact.contact_addressbook_id NOT IN (
+                        SELECT AddressBook.id
+                        FROM AddressBook
+                        INNER JOIN AddressbookEntity ON AddressbookEntity.addressbookentity_addressbook_id=AddressBook.id
+                        INNER JOIN EntityRight ON AddressbookEntity.addressbookentity_entity_id=EntityRight.entityright_entity_id
+                        WHERE EntityRight.entityright_consumer_id is NULL
+                            AND EntityRight.entityright_read=1)
+                    OR Contact.contact_archive=1)
+                    AND Contact.contact_domain_id=1';
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
@@ -304,11 +312,15 @@ sub _updateDomainContacts {
         return 1;
     }
 
-    my $query = 'SELECT contact_id
-                 FROM Contact
-                 WHERE  contact_privacy=0
-                    AND contact_archive=\'0\'
-                    AND contact_domain_id=\''.$domainId.'\'';
+    my $query = 'SELECT Contact.contact_id
+                    FROM Contact
+                    INNER JOIN AddressBook ON Contact.contact_addressbook_id=AddressBook.id
+                    INNER JOIN AddressbookEntity ON AddressbookEntity.addressbookentity_addressbook_id=AddressBook.id
+                    INNER JOIN EntityRight ON AddressbookEntity.addressbookentity_entity_id=EntityRight.entityright_entity_id
+                    WHERE EntityRight.entityright_consumer_id IS NULL
+                        AND EntityRight.entityright_read=1
+                        AND Contact.contact_archive=0
+                        AND Contact.contact_domain_id='.$domainId;
     if( $self->{'timestamp'} ) {
         $query .= ' AND unix_timestamp(contact_timeupdate) > \''.$self->{'timestamp'}.'\'';
     }
