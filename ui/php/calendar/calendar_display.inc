@@ -453,7 +453,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
 
    if(isset($_SESSION['set_cal_default_view'])) {
      $default_view_url_params = "set_cal_view_id=".$_SESSION['set_cal_default_view'];
-     //$default_view_url_params = run_query_calendar_get_bookmark_property($_SESSION['set_cal_default_view']);
       $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a> -";
     } else {
       $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a> -";
@@ -656,7 +655,7 @@ function html_calendar_view_selector($current_view, $my_views) {
       $style_default = '';
     }
     
-    $obmbookmarkproperty = "set_cal_view_id=$id";// run_query_calendar_get_bookmark_property($id);
+    $obmbookmarkproperty = "set_cal_view_id=$id";
     $sel_view .= "
     <option id=\"opt_$id\" value=\"calendar_index.php?new_sel=1&amp;$obmbookmarkproperty\"$style_default$selected>$label</option>";
   }
@@ -3091,7 +3090,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 //   - $event_q  : DBO : event result
 //   - $entities : entities linked (event) or selected ['user'], ['resource']
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
+function dis_calendar_event_form($action, $calendar, $event_q, $entities, $current_view) {
   global $obm;
 
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') ) {
@@ -3175,7 +3174,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   $possible_owners = $possible_owners['entity'];
   $cats1 = of_category_get_ordered('event', 'category1');
 
-  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents);
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view);
 
   return $block;
 }
@@ -3409,7 +3408,7 @@ function dis_calendar_occurency_popup() {
 //   - $cats1        : Array : Calendar categories1
 //   - $documents    : Array : Attached documents
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts, $tags_q, $documents) {
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts, $tags_q, $documents, $current_view) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
   global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
@@ -3664,11 +3663,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   if ($action == 'new' && !isset($calendar['new_meeting']) && !isset($calendar['template_id'])) {
     // If one new user is given in parameters, pre-select it
+    $displayed_users = $current_view->get_users();
     if (is_array($calendar['new_user_id']) && count($calendar['new_user_id']) == 1) {
       $u_id = $calendar['new_user_id'][0];
-    } else if (is_array($calendar['entity']['user']) && count($calendar['entity']['user'])==1) {
+    } else if (is_array($displayed_users) && count($displayed_users)==1) {
       // Else if calendar displayed was only one user, pre-select him
-      $u_id = $calendar['entity']['user'][0];
+      $u_id = $displayed_users[0];
     } else {
       // Else auto-select the connected user
       $u_id = "$uid";
@@ -4486,7 +4486,7 @@ function html_calendar_dis_delete($current_view, $event_id) {
 //   - $calendar        : calendar parameters
 //   - $sel_entity_id : array of entity Id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_meeting_form($current_view, $calendar, $sel_entity_id) {
+function dis_calendar_meeting_form($current_view, $calendar) {
   global $display, $path;
   global $ico_add, $ico_delete, $ico_mini_cal;
   global $ccalendar_resource, $obm;
@@ -4505,21 +4505,22 @@ function dis_calendar_meeting_form($current_view, $calendar, $sel_entity_id) {
      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"perform_meeting\" />
      <input type=\"submit\" value=\"$l_meeting_perform\" />";
 
-  $users_id = $sel_entity_id['user'];
+  $users_id = $current_view->get_users();
   if (count($users_id) > 0) {
     $users = get_userobm_from_ids($users_id);
   } else {
     $users = array();
   }
-  $res_id = $sel_entity_id['resource'];
+  $res_id = $current_view->get_resources();
   if (count($res_id) > 0) {
     $res = get_calendar_resource_from_ids($res_id);
   } else {
     $res = array();
   }
-  $groups_id = $sel_entity_id['group'];
+  $group = $current_view->get_group();
+  $groups_id = ( (empty($group) || $group==$GLOBALS['c_all']) ? array($group) : array() );
   if (count($groups_id) > 0) {
-    $groups = get_calendar_group_from_ids($groups_id);
+//    $groups = get_calendar_group_from_ids($groups_id);
   } else {
     $groups = array();
   }
@@ -5198,7 +5199,7 @@ function dis_calendar_admin_index($tags_q) {
 //   - $template_q  : DBO : event result
 //   - $entity_ids : linked entity ids
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_template_form($action, $params, $template_q, $entity_ids) {
+function dis_calendar_template_form($action, $params, $template_q, $entity_ids, $current_view) {
   global $obm;
   
   $users_id = is_array($params['sel_user_id']) ? $params['sel_user_id'] : array();
@@ -5225,7 +5226,7 @@ function dis_calendar_template_form($action, $params, $template_q, $entity_ids) 
   $possible_owners = $possible_owners['entity'];
   $cats1 = of_category_get_ordered('event', 'category1');
   
-  $block = html_calendar_event_form($action, $params, $template_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents);
+  $block = html_calendar_event_form($action, $params, $template_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view);
 
   return $block;
 }

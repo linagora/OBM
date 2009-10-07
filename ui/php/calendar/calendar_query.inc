@@ -4197,179 +4197,6 @@ function run_query_calendar_get_my_views() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Construct URL parameters
-// Parameters:
-//   - $id : OBM bookmark id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_get_bookmark_property($id) {
-  global $cdg_sql, $c_all;
-
-  $obm_q = new DB_OBM;
-  $url_param = array();
-
-  $query = "SELECT * FROM ObmBookmarkProperty WHERE obmbookmarkproperty_bookmark_id='$id'";
-  display_debug_msg($query, $cdg_sql, "run_query_calendar_get_bookmark_property()");
-  $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $property = $obm_q->f("obmbookmarkproperty_property");
-    $value = $obm_q->f("obmbookmarkproperty_value");
-
-    switch($property) {
-    case "users":
-      if (!empty($value)) {
-        $users = explode(",", $value);
-        if (is_array($users)) {
-          foreach($users as $user) {
-            array_push($url_param, "sel_ent[]=data-user-$user");
-          }
-        } else {
-          array_push($url_param, "sel_ent[]=data-user-$value"); 
-        }
-      }
-      break;
-    case "resources":
-      if (!empty($value)) {
-        $resources = explode(",", $value);
-        if (is_array($resources)) {
-          foreach($resources as $resource) {
-            array_push($url_param, "sel_ent[]=data-resource-$resource");
-          }
-        } else {
-          array_push($url_param, "sel_ent[]=data-resource-$value"); 
-        }
-      }
-      break;
-    case "group":
-      if (empty($value)) {
-        array_push($url_param, "new_group=1&amp;group_view=$c_all");
-      } else {
-        array_push($url_param, "group_id=$value&amp;new_group=1");
-      }
-      break;
-    case "category":
-      array_push($url_param, "sel_category_filter=$value");
-      break;
-    default:
-      array_push($url_param, "$property=$value");
-      break; 
-    }
-  }
-
-  array_push($url_param, "view_id=$id");
-
-  $return = implode("&amp;", $url_param);
-  return $return;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Insert a calendar view
-// Parameters:
-//   - $calendar : hashed calendar params
-///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_insert_view($calendar) {
-  global $cdg_sql, $obm;
-  global $c_all;
-
-  $calendar_bookmarkproperties = array('category', 'cal_range', 'cal_view');
-
-  $obm_q = new DB_OBM;
-
-  $label = $calendar['view_label'];
-  // Category
-  $category = $calendar['category_filter'];
-  if (empty($category)) {
-    $category = $c_all;
-  }
-
-  // Entity
-  $group = $calendar['entity']['group'][0];
-  if (empty($group)) {
-    $users = is_array($calendar['entity']['user']) ? implode(',', array_unique($calendar['entity']['user'])) : '';
-    array_push($calendar_bookmarkproperties, 'users');
-  } else {
-    array_push($calendar_bookmarkproperties, 'group');
-  }
-  $resources = is_array($calendar['entity']['resource']) ? implode(',', array_unique($calendar['entity']['resource'])) : '';
-  if (!empty($resources)) {
-    array_push($calendar_bookmarkproperties, 'resources');
-  }
-
-  // Range
-  $cal_range = 'week';//$_SESSION['cal_range'];
-
-  // View
-  $cal_view = 'agenda';//$_SESSION['cal_view'];
-
-  $user_id = sql_parse_id($obm['uid']);
-  // Insert ObmBookmark
-  $query = "INSERT INTO ObmBookmark(
-    obmbookmark_user_id,
-    obmbookmark_label,
-    obmbookmark_entity) VALUES (
-      $user_id,
-      '$label',
-      'calendar')";
-  $obm_q->query($query);
-
-  $obmbookmark_id = $obm_q->lastid();
-  of_entity_insert('obmbookmark', $obmbookmark_id);
-  // Insert ObmBookmark properties 
-  if (is_array($calendar_bookmarkproperties)) {
-    foreach($calendar_bookmarkproperties as $property) {
-      $query = "INSERT INTO ObmBookmarkProperty (
-        obmbookmarkproperty_bookmark_id,
-        obmbookmarkproperty_property,
-        obmbookmarkproperty_value) VALUES (
-          $obmbookmark_id,
-          '$property',
-          '".${$property}."')";
-      $obm_q->query($query);
-    }
-  }
-
-  $properties = str_replace("&amp;", "&", run_query_calendar_get_bookmark_property($obmbookmark_id));
-
-  $message = "\"obmbookmark_id\": \"$obmbookmark_id\", \"obmbookmark_label\":\"$label\", \"obmbookmarkproperties\":\"$properties\"";
-
-  return $message;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Delete a calendar view
-// Parameters:
-//   - $calendar : hashed calendar params
-///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_delete_view($calendar) {
-  global $cdg_sql, $obm;
-
-  $user_id = sql_parse_id($obm['uid']);
-  $obm_q = new DB_OBM;
-
-  of_entity_delete('obmbookmark', $calendar['view_id']);
-  $id = sql_parse_id( $calendar['view_id'], true);
-
-  // Delete view
-  $query = "DELETE FROM ObmBookmark WHERE obmbookmark_id $id"; 
-  $obm_q->query($query);
-
-  // Delete default view (if the default view is the deleted one)
-  $query = "DELETE FROM UserObmPref
-    WHERE userobmpref_user_id=$user_id
-    AND userobmpref_option='set_cal_default_view'
-    AND userobmpref_value $id
-    ";
-  $obm_q->query($query);
-
-  $message = "\"obmbookmark_id\": \"$calendar[view_id]\"";
-
-  return $message;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Insert others attendees as private contacts
 // Parameters:
 //   - $attendees : hashed attendees email
@@ -5411,7 +5238,7 @@ Class CalendarView {
   public function get_label() {
     global $cdg_sql;
 
-    if (!isset($this->label) && ($this->id)) {
+    if (empty($this->label) && ($this->id)) {
       $obm_q = new DB_OBM;
       $id = sql_parse_id($this->id);
       $query = "SELECT obmbookmark_label FROM ObmBookmark WHERE obmbookmark_id='$id' AND obmbookmark_entity='calendar'";
@@ -5498,8 +5325,16 @@ Class CalendarView {
     return $this->users;
   }
 
+  public function users_count() {
+    return count($this->users);
+  }
+
   public function get_resources() {
     return $this->resources;
+  }
+
+  public function resources_count() {
+    return count($this->resources);
   }
 
   public function get_entities() {
@@ -5517,6 +5352,10 @@ Class CalendarView {
     }
 
     return $entities;
+  }
+
+  public function entities_count() {
+    return count($this->users) + count($this->resources);
   }
 
   public function set_label($label) {
@@ -5646,7 +5485,7 @@ Class CalendarView {
   }
 
   public function remove_all() {
-    $this->group = null;
+    $this->group = $GLOBALS['c_all'];
     $this->users = array();
     $this->resources = array();
     $this->init_classes();

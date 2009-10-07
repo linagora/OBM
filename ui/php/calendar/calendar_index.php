@@ -115,31 +115,6 @@ page_close();
 
 OBM_EventFactory::getInstance()->attach(new OBM_EventMailObserver());
 
-// Resources groups, only on meeting
-if ($action == 'add_freebusy_entity' || $action == 'new_meeting' || 
-  ($action == 'new' && $params['new_meeting'] == 1) || ($action == 'perform_meeting' &&
-  ($params['sel_resource_group_id'] || $params['sel_user_id'] ||
-  $params['sel_resource_id'] || $params['sel_group_id']))) { 
-    $cal_entity_id['user'] = $params['sel_user_id'];
-    $cal_entity_id['resource'] = $params['sel_resource_id'];    
-    $cal_entity_id['group'] = $params['sel_group_id'];
-    $cal_entity_id['contact'] = $params['sel_contact_id'];
-    if($params['resource_group_search'] == 'all') {
-      if(!is_array($cal_entity_id['resource'])) {
-        $cal_entity_id['resource'] = array();
-      }
-      $resources = run_query_calendar_get_group_resource($params['sel_resource_group_id']);
-      $cal_entity_id['resource'] = array_merge($cal_entity_id['resource'], $resources );
-    } else {
-      $cal_entity_id['resource_group'] = $params['sel_resource_group_id'];
-    }
-  } elseif ($action != 'perform_meeting') {
-    unset($cal_entity_id['resource_group']);
-  }
-
-// If no group view selected, explicitely set it
-if ($cal_entity_id['group_view'] == '') $cal_entity_id['group_view'] = $c_all;
-
 // If user selection present we override session content
 if ($params['new_sel']) {
   if ( ($action != 'insert') && ($action != 'update') ) {
@@ -162,14 +137,6 @@ $resources = $current_view->get_resources();
 if (empty($users) && empty($resources)) {
   $current_view->add_user($obm['uid']);
 }
-if ( ( (! is_array($cal_entity_id['user']))
-       || (count($cal_entity_id['user']) == 0) )
-     && ( (! is_array($cal_entity_id['resource']))
-	  || (count($cal_entity_id['resource']) == 0))
-     && ( (! is_array($cal_entity_id['resource_group']))
-          || (count($cal_entity_id['resource_group']) == 0)) ) {
-  $cal_entity_id['user'] = array($obm['uid']);
-}
 
 // Category Filter 
 if (($action == 'insert') || ($action == 'update') 
@@ -179,7 +146,6 @@ if (($action == 'insert') || ($action == 'update')
     $cal_category_filter = str_replace($c_all,'',$current_view->get_category());
   }
 // We copy the entity array structure to the parameter hash
-$params['entity'] = $cal_entity_id;
 $params['category_filter'] = $cal_category_filter;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -248,7 +214,18 @@ if ($action == 'search') {
   $extra_js_include[] = 'inplaceeditor.js';
   $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
   $extra_css[] = $css_ext_color_picker ;
-  $display['detail'] = dis_calendar_event_form($action, $params, '', $cal_entity_id);
+  if (is_array($params['sel_user_id']) || is_array($params['sel_resource_id'])) {
+    $entities = array(
+      'user' => $params['sel_user_id'],
+      'resource' => $params['sel_resource_id']
+    );
+  } else {
+    $entities = array(
+      'user' => $current_view->get_users(),
+      'resource' => $current_view->get_resources()
+    );
+  }
+  $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -279,7 +256,7 @@ if ($action == 'search') {
         $extra_css[] = $css_ext_color_picker ;
         $display['detail'] .= html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
-        $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities);
+        $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
       } else {
         // Insert "others attendees" as private contacts
         if ($params['others_attendees'] != "") {
@@ -314,7 +291,7 @@ if ($action == 'search') {
     $extra_js_include[] = 'inplaceeditor.js';
     $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
     $extra_css[] = $css_ext_color_picker ;
-    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
   }
 
 } elseif ($action == 'detailconsult') {
@@ -335,7 +312,7 @@ if ($action == 'search') {
       $eve_q = run_query_calendar_detail($params['calendar_id']);
       $entities = get_calendar_event_entity($params['calendar_id']);
 			$display['detailInfo'] = display_record_info($eve_q);
-      $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities);
+      $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities, $current_view);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
     }
@@ -352,7 +329,7 @@ if ($action == 'search') {
     $eve_q = run_query_calendar_detail($params['calendar_id']);
     $entities = get_calendar_event_entity($params['calendar_id']);
     $display['detailInfo'] = display_record_info($eve_q);
-    $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities);
+    $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities, $current_view);
   } else {
     $display['msg'] .= display_err_msg($l_err_reference);
   }
@@ -389,7 +366,7 @@ if ($action == 'search') {
         $extra_css[] = $css_ext_color_picker ;
         $display['detail'] = html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_update_error");
-        $display['detail'] .= dis_calendar_event_form($action, $params, '', $entities);
+        $display['detail'] .= dis_calendar_event_form($action, $params, '', $entities, $current_view);
       } else {
         // Insert "others attendees" as private contacts
         if ($params['others_attendees'] != "") {
@@ -420,7 +397,7 @@ if ($action == 'search') {
       $extra_js_include[] = 'inplaceeditor.js';
       $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
       $extra_css[] = $css_ext_color_picker ;
-      $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+      $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
     }
 
 } elseif ($action == 'quick_update') {
@@ -665,7 +642,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'new_meeting')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_calendar_meeting_form($current_view, $params, $cal_entity_id);
+  $display['detail'] = dis_calendar_meeting_form($current_view, $params);
 
 } elseif ($action == 'admin')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -742,7 +719,7 @@ if ($action == 'search') {
     $display['msg'] .= display_ok_msg("$l_template : $l_insert_ok");
     $current_view->set_date($params["date_begin"]);
     $params['template_id'] = $template_id;
-    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
 
   } else {
     foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
@@ -752,13 +729,13 @@ if ($action == 'search') {
     $extra_js_include[] = 'inplaceeditor.js';
     $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
     $extra_css[] = $css_ext_color_picker ;
-    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
   }
   
 } elseif ($action == 'edit_template') {
 ///////////////////////////////////////////////////////////////////////////////
     list($template_q, $entity_ids) = run_query_calendar_get_template($params['template_id']);
-    $display['detail'] = dis_calendar_template_form($action, $params, $template_q, $entity_ids);
+    $display['detail'] = dis_calendar_template_form($action, $params, $template_q, $entity_ids, $current_view);
     
 } elseif ($action == 'update_template') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -768,13 +745,13 @@ if ($action == 'search') {
     $display['msg'] .= display_ok_msg("$l_template : $l_update_ok");
     $current_view->set_date($params["date_begin"]);
     $params['template_id'] = $template_id;
-    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
   } else {
     foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
       $entities[$type] = is_array($params["sel_{$type}_id"]) ? $params["sel_{$type}_id"] : array();
     }
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
-    $display['detail'] = dis_calendar_template_form($action, $params, '', $entities);
+    $display['detail'] = dis_calendar_template_form($action, $params, '', $entities, $current_view);
   }
   
 } elseif ($action == 'list_templates')  {
@@ -927,11 +904,6 @@ if ($action == 'search') {
 } elseif ($action == 'pdf_export') {
 ///////////////////////////////////////////////////////////////////////////////
   require_once("$obminclude/lib/Zend/Pdf.php");
-  $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
-  if (count($entities,COUNT_RECURSIVE) <= 4) {
-    $entities['user']  = array($obm['uid']);
-    $params['sel_user_id'] = array($obm['uid']);
-  }
   dis_calendar_pdf_view($params, $current_view);
   exit();
 
@@ -949,7 +921,7 @@ if ($action == 'search') {
       $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
       $extra_css[] = $css_ext_color_picker ;
       $display['detail'] = html_calendar_dis_conflict($params, $conflicts) ;
-      $display['detail'] .= dis_calendar_event_form($action, $params, $eve_q, $entities);
+      $display['detail'] .= dis_calendar_event_form($action, $params, $eve_q, $entities, $current_view);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
     }
@@ -1014,9 +986,11 @@ if (!$params['ajax']) {
 
 } elseif ($action == 'add_freebusy_entity') {
 ///////////////////////////////////////////////////////////////////////////////
-  $cal_entity_id['user'] = $params['user_id'];
-  $ret = get_calendar_entity_label($cal_entity_id);
-  $ret['resourcegroup'] = run_query_resource_resourcegroup($cal_entity_id['resource_group']);
+  $entities = array();
+  $entities['user'] = is_array($params['sel_user_id']) ? $params['sel_user_id'] : array();
+  $entities['resource'] = is_array($params['sel_resource_id']) ? $params['sel_resource_id'] : array();
+  $ret = get_calendar_entity_label($entities);
+  $ret['resourcegroup'] = run_query_resource_resourcegroup($params['sel_resource_group_id']);
   $entity_store = store_calendar_entities($ret);
   get_json_entity_events($params, $entity_store);
   echo "({".$display['json']."})";
