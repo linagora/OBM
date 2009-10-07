@@ -3273,7 +3273,7 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
       }
     }
     if (sizeof($event_pattern) > 0) {
-      $return = "AND (".implode(" OR ", $event_pattern)."";
+      $return = "AND (".implode(" AND ", $event_pattern)."";
     }
   }
   if ($return != "") {

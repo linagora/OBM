@@ -317,13 +317,12 @@ function run_query_people_ext_search($people) {
   $multidomain = sql_multidomain('UserObm.userobm');
   $multidomain_contact = sql_multidomain('Contact');
   $like = sql_casei_like($db_type);
-
-  $limit = $people['limit'];
+  $limit = sql_limit($db_type);
   if(isset($people['first_row'])) $first_row = $people['first_row'] - 1;
   else $first_row = 0;
 
   if ($filter_entity == 'calendar') {
-    $where_filter_entity = ' INNER JOIN ('.OBM_Acl::getAclSubselect('calendarentity_calendar_id', 'calendar', null, $obm['uid'], $filter_pattern).') as Rights ON Rights.calendarentity_calendar_id = userobm_id';
+    $join_filter_entity = ' INNER JOIN ('.OBM_Acl::getAclSubselect('calendarentity_calendar_id', 'calendar', null, $obm['uid'], $filter_pattern).') as Rights ON Rights.calendarentity_calendar_id = userobm_id';
   }
   // XXXXXX Migrate the access right to the Addressbook
   $f_contact_ids = run_query_people_allowed_access_contacts();
@@ -331,7 +330,7 @@ function run_query_people_ext_search($people) {
     $f_contact_ids = array_map(sql_parse_id,$f_contact_ids);
     $where_contact_acl = " OR contact_id IN (".implode(',',$f_contact_ids).")";
   }
-  $where_contact_acl = "AND (contact_privacy = 0 $where_contact_acl)";
+  //$where_contact_acl = "AND (contact_privacy = 0 $where_contact_acl)";
   $patterns = explode(' ', $pattern);
 
   foreach ($patterns as $pattern) {
@@ -347,11 +346,11 @@ function run_query_people_ext_search($people) {
       'user' as type,
       userobm_hidden
     FROM UserObm
+    $join_filter_entity
     WHERE 1 = 1 $userpattern 
       AND userobm_archive = 0
       $multidomain
-      $where_filter_entity
-      LIMIT $limit OFFSET $first_row";
+      $limit ";
   $query_contact = "
     SELECT 
       contact_id as id,
@@ -366,8 +365,7 @@ function run_query_people_ext_search($people) {
       AND contact_archive = 0
       $where_contact_acl
       $multidomain_contact   
-      LIMIT $limit OFFSET $first_row
-    ";
+      $limit ";
 
 
   display_debug_msg($query, $cdg_sql, 'run_query_people_ext_search()');

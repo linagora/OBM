@@ -257,7 +257,7 @@ function html_people_search_form($user) {
       $dis_filter_entity
       $ext
     </label>
-    <p class=\"CL\" />
+    <p class=\"CL\"></p>
    </form>";
 
   return $block;
