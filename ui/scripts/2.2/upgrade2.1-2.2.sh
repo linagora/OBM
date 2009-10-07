@@ -9,7 +9,7 @@
 #set -x
 set -e
 
-OBM_PATH_UPDATE="upgrade22/scripts/2.2/"
+OBM_PATH_UPDATE="update22/scripts/2.2/"
 
 pushd ${OBM_PATH_UPDATE}
 ./update-2.1-2.2.sh
