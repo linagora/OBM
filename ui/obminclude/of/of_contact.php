@@ -459,7 +459,7 @@ class OBM_Contact implements OBM_ISearchable {
         'zipcode' => $address['zipcode'],
         'town' => $address['locality'],
         'expresspostal' => $address['expresspostal'],
-        'country' => $address['country']
+        'country' => $address['country_iso3166']
       ));
     }
 
@@ -781,7 +781,7 @@ class OBM_Contact implements OBM_ISearchable {
     }
     
     $lang = get_lang();
-    $query = "SELECT contactentity_contact_id AS contact_id, address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name
+    $query = "SELECT contactentity_contact_id AS contact_id, address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name, country_iso3166
               FROM Address 
               INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id 
               LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' 
@@ -792,7 +792,7 @@ class OBM_Contact implements OBM_ISearchable {
       $label = (explode(';',$db->f('address_label')));
       $contacts[$db->f('contact_id')]->address[] = array(
         'label' => $label, 'street' => $db->f('address_street'), 'zipcode' => $db->f('address_zipcode'),
-        'expresspostal' => $db->f('address_expresspostal'), 'town' => $db->f('address_town'), 'country' => $db->f('country_name'));
+        'expresspostal' => $db->f('address_expresspostal'), 'town' => $db->f('address_town'), 'country' => $db->f('country_name'), 'country_iso3166' => $db->f('country_iso3166'));
     }
     
     $query = "SELECT contactentity_contact_id AS contact_id, IM.* FROM IM 
