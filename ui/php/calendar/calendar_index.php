@@ -223,8 +223,8 @@ if ($action == 'search') {
 } elseif ($action == 'decision') {
 ///////////////////////////////////////////////////////////////////////////////
   if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
-    $display['search'] .= html_calendar_dis_conflict($params, $conflicts) ;
-    $display['detail'] = html_calendar_conflict_form($params);
+    $display['detail'] = html_calendar_dis_conflict($params, $conflicts) ;
+    $display['detail'] .= html_calendar_conflict_form($params);
     $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
   } else {
     $params['conflicts'] = $conflicts;
@@ -277,9 +277,9 @@ if ($action == 'search') {
         $extra_js_include[] = 'inplaceeditor.js';
         $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
         $extra_css[] = $css_ext_color_picker ;
-        $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
+        $display['detail'] .= html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
-        $display['detail'] = dis_calendar_event_form($action, $params, '',$entities);
+        $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities);
       } else {
         // Insert "others attendees" as private contacts
         if ($params['others_attendees'] != "") {
@@ -387,9 +387,9 @@ if ($action == 'search') {
         $extra_js_include[] = 'inplaceeditor.js';
         $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
         $extra_css[] = $css_ext_color_picker ;
-        $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
+        $display['detail'] = html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_update_error");
-        $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+        $display['detail'] .= dis_calendar_event_form($action, $params, '', $entities);
       } else {
         // Insert "others attendees" as private contacts
         if ($params['others_attendees'] != "") {
@@ -948,8 +948,8 @@ if ($action == 'search') {
       $extra_js_include[] = 'inplaceeditor.js';
       $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
       $extra_css[] = $css_ext_color_picker ;
-      $display['search'] .= html_calendar_dis_conflict($params, $conflicts) ;
-      $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities);
+      $display['detail'] = html_calendar_dis_conflict($params, $conflicts) ;
+      $display['detail'] .= dis_calendar_event_form($action, $params, $eve_q, $entities);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
     }
