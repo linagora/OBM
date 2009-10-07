@@ -4840,7 +4840,8 @@ function dis_calendar_free_interval($current_view) {
 
   $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_attendees_id&amp;filter_entity=calendar&amp;filter_pattern=access";
   $user_add_button = "
-    <a href='javascript: return false;' onclick='popup(\"$url\",\"\"); return false;'>
+    <a href='javascript: return false;'
+      onclick='popup(\$(\"freeBusySearchSource\").value+\"$url\",\"\"); return false;'>
       <img src='$GLOBALS[ico_add]' alt='[Add]' />
     </a>";
 
@@ -4868,6 +4869,13 @@ function dis_calendar_free_interval($current_view) {
   if (!OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
     $visiblityR = "style='visibility:hidden;'";
   }
+
+  //addressbooks
+  $addressbooks = OBM_Addressbook::search();
+  foreach($addressbooks as $id => $addressbook) {
+    $addressbook_options .= "<option value='$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->__get('id')."'>".$addressbook->displayName."</option>";
+  }
+
   $block = "
   <div id='fbc' class='freeBusyContent obmPopup'>
     <div  style='position:relative;'>
@@ -4906,7 +4914,15 @@ function dis_calendar_free_interval($current_view) {
             <td>$GLOBALS[l_users]/$GLOBALS[l_contacts] $user_add_button</td>
           </tr>
           <tr>
-            <td><input type='text' name='' value='' id='freeBusyUserSearch' autocomplete='off' /></td>
+            <td class='autocompleteField'>
+            <select id='freeBusySearchSource' class='autocompleteSource' name='' style='float: right;'>
+              <option value='$path/user/user_index.php?from=calendar'>$GLOBALS[l_users]</option>
+              <optgroup label='$GLOBALS[l_addressbook]'>
+                $addressbook_options
+              </optgroup>
+            </select>
+            <input type='text' name='' value='' id='freeBusyUserSearch' autocomplete='off' />
+            </td>
           </tr>
           <tr>
             <td>$GLOBALS[l_others_attendees]</td>
@@ -5009,7 +5025,9 @@ function dis_calendar_free_interval($current_view) {
     obm.vars.images.ico_private = '$GLOBALS[ico_private_alt]';
     obm.vars.images.ico_allday = '$GLOBALS[ico_allday_alt]';
     obm.vars.images.ico_periodic = '$GLOBALS[ico_periodic_alt]';
-    new obm.AutoComplete.Search('$GLOBALS[path]/people/people_index.php?action=ext_search&ajax=1', 'dummy', 'freeBusyUserSearch',
+    new obm.AutoComplete.ExtSearch(
+      function() { return \$('freeBusySearchSource').value+'&action=ext_search&ajax=1'; },
+      'dummy', 'freeBusyUserSearch',
       {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee([id]);'});
     new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'dummy', 'freeBusyResourceSearch',
       {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee([id]);'});";

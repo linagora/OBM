@@ -989,6 +989,8 @@ if (!$params['ajax']) {
   $entities = array();
   $entities['user'] = is_array($params['sel_user_id']) ? $params['sel_user_id'] : array();
   $entities['resource'] = is_array($params['sel_resource_id']) ? $params['sel_resource_id'] : array();
+  if (!is_array($entities['user']) || count($entities['user'])==0)
+    $entities['user'] = array($obm['uid']);
   $ret = get_calendar_entity_label($entities);
   $ret['resourcegroup'] = run_query_resource_resourcegroup($params['sel_resource_group_id']);
   $entity_store = store_calendar_entities($ret);
@@ -1140,6 +1142,9 @@ function get_calendar_params() {
         $data = explode('-', $value);
         $id = $data[2];
         $params['sel_contact_id'][] = $id;
+      } else {
+        // direct id
+        $params['sel_user_id'][] = $value;
       }
     }
   }
