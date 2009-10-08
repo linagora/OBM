@@ -1001,6 +1001,7 @@ if (!$params['ajax']) {
   exit();
 
 } elseif($action == 'get_json_waiting_events') {
+///////////////////////////////////////////////////////////////////////////////
   get_json_waiting_events($obm['uid']);
   echo '('.$display['json'].')';
   exit();

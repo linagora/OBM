@@ -1715,6 +1715,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   global $output_target;
 
   $event = $occurrence->event;
+  $entity = $occurrence->entity;
   $owner = $event->owner;
   $owner_name = phpStringToJsString($event->owner_name);
 
@@ -1734,6 +1735,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $description = $title;
     $location = $title;
     $category = $title;
+    $attendees = $title;
   } else {
     $title = phpStringToJsString($event->title);
     $description = phpStringToJsString($event->description);
@@ -1755,6 +1757,15 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     }
     $location = phpStringToJsString($event->location);
     $category = phpStringToJsString($event->category1);  
+    $attendees = array();
+    foreach ($attendee as $entity => $entities) {
+      $label_entity = phpStringToJsString(${"l_$entity"});
+      $ent = array();
+      foreach($entities as $at) {
+        $ent[] = phpStringToJsString($at);
+      }
+      $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}"; 
+    }
   }
 
   $duration = $event->duration;
@@ -1762,7 +1773,6 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $end = $occurrence->end;
   $id = $event->id;
   $entity_id = $occurrence->id;
-  $entity = $occurrence->entity;
   $entity_state = $occurrence->entity_state;
   $all_day = ($event->all_day)?1:0;
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
@@ -1784,16 +1794,11 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "colors: {event: {body:'$eventColor[body]', header:'$eventColor[header]'}}";
   //$ed[] = "colors: {event: {body:'".$event->color."'}}";
   $ed[] = "status:'$entity_state'";
-  $attendees = array();
-  foreach ($attendee as $entity => $entities) {
-    $label_entity = phpStringToJsString(${"l_$entity"});
-    $ent = array();
-    foreach($entities as $at) {
-      $ent[] = phpStringToJsString($at);
-    }
-    $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}";
-  }
-  $ed[] = 'attendees:['.implode(',',$attendees).']';
+  if (is_array($attendees))
+    $ed[] = "attendees:[".implode(',',$attendees)."]";
+  else
+    $ed[] = "attendees:'$attendees'";
+
   switch($unit) {
     case 'day' :
       $day = true;

@@ -1658,14 +1658,18 @@ Obm.CalendarQuickForm = new Class({
       this.date.set('html',date_begin.format(obm.vars.regexp.dateFormat) + ' - ' + date_end.format(obm.vars.regexp.dateFormat));
     }
     this.attendees.set('html','');
-    for(var i=0;i<evt.event.attendees.length;i++) {
-      var attendee = evt.event.attendees[i];
-      new Element('h4').appendText(attendee.label).injectInside(this.attendees);
-      var ul = new Element('ul').injectInside(this.attendees);
-      for(var j=0;j<attendee.entities.length;j++) {
-        entity = attendee.entities[j];
-        new Element('li').appendText(entity).injectInside(ul);
+    if (typeof(evt.event.attendees)=='object'&&(evt.event.attendees instanceof Array)) {
+      for(var i=0;i<evt.event.attendees.length;i++) {
+        var attendee = evt.event.attendees[i];
+        new Element('h4').appendText(attendee.label).injectInside(this.attendees);
+        var ul = new Element('ul').injectInside(this.attendees);
+        for(var j=0;j<attendee.entities.length;j++) {
+          entity = attendee.entities[j];
+          new Element('li').appendText(entity).injectInside(ul);
+        }
       }
+    } else {
+      this.attendees.set('html',evt.event.attendees);
     }
   },
 
