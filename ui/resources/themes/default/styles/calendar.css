@@ -65,6 +65,13 @@
 /* ------------------------------------------------------------------------- */
 
 
+.waitingEventsContainer {
+  height: 200px;
+  overflow-x:hidden;
+  overflow-y:scroll;
+  border: 1px solid #CCC;
+}
+
 #calendarNavBar {
   padding-left: 1em;
   font-weight: bold;

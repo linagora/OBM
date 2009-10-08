@@ -54,6 +54,12 @@ Obm.CalendarManager = new Class({
       this.resizeGrid();
     }
 
+    // set waiting events panel class
+    if ($('waitingEventsContainer')) {
+       $('waitingEventsContainer').set('class', 'waitingEventsContainer');
+    }
+
+
     // *************************************** IE6 CRAPPY FIX
     if ($('calendarGrid')) {
       var height = $('calendarGrid').getHeight();

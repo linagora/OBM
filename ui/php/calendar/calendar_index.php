@@ -178,12 +178,12 @@ if ($action == 'search') {
 } elseif ($action == 'waiting_events') {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_wait = run_query_calendar_waiting_events();
+  $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
   if ($obm_wait->nf() != 0) {
-    $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
     $display['detail'] = html_calendar_waiting_events($obm_wait);
-  } else {
-    $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
-    $display['detail'] = dis_calendar_calendar_view($params, $current_view);
+  }
+  if ($params['show_calendar']) {
+    $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
   }
 
 } elseif ($action == 'decision') {

@@ -4352,7 +4352,7 @@ function html_calendar_waiting_events($obm_wait) {
   $owner_notification = "checked";
   if (isset($_GET['owner_notification'])) {$owner_notification =  ($_GET['owner_notification'] == "true" ? "checked":"");}
   
-  $block = "<div class=\"detail\">
+  $block = "<div class=\"detail \">
       <input type=\"checkbox\" id=\"owner_notification\" $owner_notification /><label for=\"owner_notification\">$GLOBALS[l_owner_notification]</label>
   </div>";
 
@@ -4416,9 +4416,13 @@ function html_calendar_waiting_events($obm_wait) {
     $date_end = urldecode($end->getURL());
     $time_end = $end->getHour();
     $min_end = $end->getMinute();
+
     $block .= "
     <tr>
-     <td><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$obm_wait->f('event_id')."\">".$obm_wait->f('event_title')."</a></td>
+     <td>
+       <a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$obm_wait->f('event_id')."\">".$obm_wait->f('event_title')."</a>
+       <a href=\"$path/calendar/calendar_index.php?action=waiting_events&show_calendar=1&date=$begin\"><img src=\"$GLOBALS[ico_calendar]\" /></a>
+     </td>
      <td>$periodic</td> 
      <td>".$obm_wait->f('event_location')."</td>
      <td>".$obm_wait->f('eventcategory1_label')."</td>
@@ -4449,6 +4453,7 @@ function html_calendar_waiting_events($obm_wait) {
     $block .= '</tbody></table>';
   }
   
+  $block = "<div id='waitingEventsContainer'>$block</div>";
   return $block;
 }
 

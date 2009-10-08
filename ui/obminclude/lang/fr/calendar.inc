@@ -329,7 +329,7 @@ $l_delete_occurrence = 'Supprimer l\'occurrence';
 $l_delete_all_occurrences = 'Supprimer la série';
 
 $l_toggle_public_access = "Ceci entrainera que tout le monde pourra inviter cette personne à un rendez-vous. Désirez-vous continuer?";
-$l_toggle_public_read = "Ceci entrainera que tout le monde pourra vous voire ce calendrier. Désirez-vous continuer?";
+$l_toggle_public_read = "Ceci entrainera que tout le monde pourra voir ce calendrier. Désirez-vous continuer?";
 $l_toggle_public_write = "Ceci entrainera que tout le monde pourra vous modifier ce rendez-vous et la participation de cette personne à un rendez-vous. Désirez-vous continuer?";
 $l_toggle_public_admin = "Ceci entrainera que tout le monde pourra modifier les droits de ce calendrier. Désirez-vous continuer?";
 
