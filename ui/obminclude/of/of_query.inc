@@ -3065,7 +3065,7 @@ function check_user_defined_rules() {
               $err['msg'] = $field_rules['message']['default'];
             }
             $err['field'] = $field;
-            Of_Error::getInstance()->addError($field, $err['msg']);
+            OBM_Error::getInstance()->addError($field, $err['msg']);
             $return = false;
           }
         }
