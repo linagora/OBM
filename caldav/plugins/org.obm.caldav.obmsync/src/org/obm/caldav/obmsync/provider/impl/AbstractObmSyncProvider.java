@@ -311,13 +311,7 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 	@Override
 	public boolean hasRightsOnCalendar(AccessToken token, String calendarName) throws AuthFault,
 			ServerFault {
-		CalendarInfo[] listCalInfo = client.listCalendars(token);
-		for (CalendarInfo calInfo : listCalInfo) {
-			if (calInfo.getUid().equals(calendarName)) {
-				return calInfo.isWrite();
-			}
-		}
-		return false;
+		return client.isWritableCalendar(token, calendarName);
 	}
 	
 	public Date getLastUpdate(AccessToken token, String calendarName) throws ServerFault, AuthFault{
