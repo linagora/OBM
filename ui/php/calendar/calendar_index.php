@@ -181,8 +181,10 @@ if ($action == 'search') {
   $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
   if ($obm_wait->nf() != 0) {
     $display['detail'] = html_calendar_waiting_events($obm_wait);
-  }
-  if ($params['show_calendar']) {
+    if ($params['show_calendar']) {
+      $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
+    }
+  } else {
     $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
   }
 
