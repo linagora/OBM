@@ -313,7 +313,7 @@ Obm.Contact.PhoneWidget = new Class ({
 Obm.Contact.EmailWidget = new Class ({
   kind : 'emails',
   structure : {
-    label: { kind: 'label', value: 'INTENET', newLine : true, label : obm.vars.labels.emailLabel.INTERNET},
+    label: { kind: 'label', value: 'INTERNET', newLine : true, label : obm.vars.labels.emailLabel.INTERNET},
     address: { kind: 'text', value: '', newCell : true, label : obm.vars.labels.emailAddress}
   },
 
