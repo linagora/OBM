@@ -1794,7 +1794,7 @@ function run_query_contact_ext_search($contact) {
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
     LEFT JOIN Email ON contactentity_entity_id = email_entity_id 
-    WHERE ((contact_firstname #LIKE '%$pattern%' OR contact_lastname #LIKE '%$pattern%') AND 
+    WHERE ((contact_firstname #LIKE '%$pattern%' OR contact_lastname #LIKE '%$pattern%') OR 
           ((email_label #LIKE 'INTERNET;X-OBM-Ref1' AND email_address #LIKE '%$pattern%') OR email_address IS NULL))
       AND contact_addressbook_id='$addressbook_id' $multidomain
     GROUP BY contact_id, contact_firstname, contact_lastname, email_address
