@@ -81,9 +81,6 @@ $profiles['admin'] = array (
 );
 
 include("../../obminclude/global.inc");
-include("$path/admin_data/admin_data_display.inc");
-include("$path/admin_data/admin_data_query.inc");
-include("../../obminclude/lang/fr/global.inc");
 
 echo "**** OBM : data migration 2.1 -> 2.2 : DB $obmdb_db ($obmdb_host)\n";
 

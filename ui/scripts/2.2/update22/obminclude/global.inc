@@ -537,20 +537,7 @@ $cgp_default_right['contact'] = array (
 // OBM authentication Management : 
 // Just change $cas_version according to your phpCAS lib
 //---------------------------------------------------------------------------//
-if ($auth_kind == 'CAS') {
-  $auth_class_name = 'CAS_Auth';
-} elseif (strcasecmp($auth_kind,'LemonLDAP') == 0) {
-  require_once dirname(__FILE__) . '/lib/LemonLDAP/package.inc';
-  $auth_class_name = 'LemonLDAP_Auth';
-} elseif ($auth_kind == 'standalone') {
-  $auth_class_name = 'OBM_Challenge_Auth';
-} elseif ($auth_kind == 'ldap') {
-  $auth_class_name = 'LDAP_Auth';
-} else {
-  echo 'unknown Authentication kind !<br/>';
-  echo 'please edit $auth_kind in conf/obm_conf.inc';
-  exit;
-}
+$auth_class_name = 'OBM_Challenge_Auth';
 
 //---------------------------------------------------------------------------//
 // OBM internal Constants : Do not change 
