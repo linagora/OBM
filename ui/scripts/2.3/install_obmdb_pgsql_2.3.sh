@@ -34,11 +34,11 @@ EOF
   createdb -O ${user} --encoding=UTF-8 ${db}
 fi
 
-su -c postgres psql ${db} <<EOF
+su -c postgres "psql ${db} <<EOF
 CREATE LANGUAGE plpgsql;
 ALTER DATABASE ${db} SET TIMEZONE='GMT';
 \q
-EOF
+EOF"
 
 psql -U ${user} -h ${host} ${db} -f \
 create_obmdb_2.3.pgsql.sql > /tmp/data_insert.log 2>&1
