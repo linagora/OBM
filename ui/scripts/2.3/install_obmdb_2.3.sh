@@ -4,7 +4,6 @@
 #     - Desc : OBM Database 2.3 installation script                           #
 ###############################################################################
 
-set -x
 installation_type=$1
 
 source `dirname $0`/obm-sh.lib
