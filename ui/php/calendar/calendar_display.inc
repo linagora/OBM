@@ -5061,6 +5061,58 @@ function dis_calendar_right_dis_admin($id='') {
   }
   $block .= of_right_dis_admin('calendar', $id);
 
+  $accessEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access'); 
+  foreach($accessEntities as $entity) {
+    $dis_access .= "<li>$entity</li>";
+  }
+  $readEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read'); 
+  foreach($readEntities as $entity) {
+    $dis_read .= "<li>$entity</li>";
+  }
+  $writeEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write'); 
+  foreach($writeEntities as $entity) {
+    $dis_write .= "<li>$entity</li>";
+  }
+  $adminEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'admin'); 
+  foreach($adminEntities as $entity) {
+    $dis_admin .= "<li>$entity</li>";
+  }
+  $block .= "<h1>$GLOBALS[l_rights_my_on]</h1>
+    <table class=\"spreadSheet\">
+    <thead>
+      <tr>
+        <th>$GLOBALS[l_access_permission]</th>
+        <th>$GLOBALS[l_read_permission]</th>
+        <th>$GLOBALS[l_write_permission]</th>
+        <th>$GLOBALS[l_admin_permission]</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>
+        <ul>
+          $dis_access
+        </ul>
+      </td>
+      <td>
+        <ul>
+          $dis_read
+        </ul>
+      </td>
+      <td>
+        <ul>
+          $dis_write
+        </ul>
+      </td>
+      <td>
+        <ul>
+          $dis_admin
+        </ul>
+      </td>
+    </tr>
+    </tbody>
+    </table>";
+
   return $block;
 }
 
