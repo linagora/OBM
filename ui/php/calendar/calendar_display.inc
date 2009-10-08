@@ -3803,7 +3803,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if ($has_access_to_other_calendars = OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access') || true) { // FIXME
     $addressbooks = OBM_Addressbook::search();
     foreach($addressbooks as $id => $addressbook) {
-      $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->__get('id')."\">".$addressbook->displayName."</option>";
+      $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."\">".$addressbook->displayName."</option>";
     }    
     $block_user = "
       <fieldset class=\"detail infos\">
@@ -4550,7 +4550,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
     </a>";
     $addressbooks = OBM_Addressbook::search();
     foreach($addressbooks as $id => $addressbook) {
-      $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->__get('id')."\">".$addressbook->displayName."</option>";
+      $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."\">".$addressbook->displayName."</option>";
     }    
     $block_user = "
       <tr>
@@ -4873,7 +4873,8 @@ function dis_calendar_free_interval($current_view) {
   //addressbooks
   $addressbooks = OBM_Addressbook::search();
   foreach($addressbooks as $id => $addressbook) {
-    $addressbook_options .= "<option value='$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->__get('id')."'>".$addressbook->displayName."</option>";
+    $addressbook_options .= "
+      <option value='$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."'>".phpStringToJsString($addressbook->displayName)."</option>";
   }
 
   $block = "
@@ -4911,7 +4912,7 @@ function dis_calendar_free_interval($current_view) {
       <table>
         <tbody class='readable' $visiblityU>
           <tr>
-            <td>$GLOBALS[l_users]/$GLOBALS[l_contacts] $user_add_button</td>
+            <td>$GLOBALS[l_users]/$GLOBALS[l_contacts]</td>
           </tr>
           <tr>
             <td class='autocompleteField'>
