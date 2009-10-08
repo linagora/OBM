@@ -1,7 +1,7 @@
 #!/bin/bash
 
-test $# -eq 4 || {
-    echo "usage: $0 db user password lang"
+test $# -eq 5 || {
+    echo "usage: $0 db user password lang installation type"
     exit 1
 }
 
@@ -9,14 +9,18 @@ db=$1
 user=$2
 pw=$3
 obm_lang=$4
+obm_installation_type=$5
 
-echo "*** Database creation"
+if [ $obm_installation_type = "full" ]; then
 
-echo "  Delete old database if exists"
-mysql -u $user -p$pw -e "DROP DATABASE IF EXISTS $db"
-
-echo "  Create new $db database"
-mysql -u $user -p$pw -e "CREATE DATABASE $db CHARACTER SET utf8 COLLATE utf8_general_ci"
+  echo "*** Database creation"
+  
+  echo "  Delete old database if exists"
+  mysql -u $user -p$pw -e "DROP DATABASE IF EXISTS $db"
+  
+  echo "  Create new $db database"
+  mysql -u $user -p$pw -e "CREATE DATABASE $db CHARACTER SET utf8 COLLATE utf8_general_ci"
+fi
 
 echo "  Create new $db database model"
 mysql -u $user -p$pw $db < create_obmdb_2.3.mysql.sql

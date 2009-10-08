@@ -19,6 +19,4 @@ locate_php_interp
   exit 1
 }
 
-$PHP `dirname $0`/update-2.2-2.3.php
-
 exit 0
