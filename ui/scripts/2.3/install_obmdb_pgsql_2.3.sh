@@ -34,7 +34,7 @@ EOF
   createdb -O ${user} --encoding=UTF-8 ${db}
 fi
 
-su -c postgres "psql ${db} <<EOF
+su - postgres -c "psql ${db} <<EOF
 CREATE LANGUAGE plpgsql;
 ALTER DATABASE ${db} SET TIMEZONE='GMT';
 \q
