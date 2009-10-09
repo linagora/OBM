@@ -102,6 +102,7 @@ class Vcalendar_Reader_OBM {
     $dtstart->setOriginalTimeZone($data['event_timezone']);
     $vevent->set('dtstart', $dtstart);
     $vevent->set('duration', $data['event_duration']);
+    $vevent->set('transp', $data['event_opacity']);
     if($data['event_allday'] != 0) {
       $vevent->set('x-obm-all-day', 1);
     }
