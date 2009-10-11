@@ -274,11 +274,11 @@ CREATE INDEX eventexception_child_id_fkey ON eventexception (eventexception_chil
 ALTER TABLE ONLY eventexception
     ADD CONSTRAINT eventexception_child_id_event_id_fkey FOREIGN KEY (eventexception_child_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
---useless because event_parent_id was not used
---UPDATE EventException ee
---SET ee.eventexception_child_id = e.event_id
---FROM Event e
---WHERE e.event_parent_id = ee.eventexception_parent_id;
+-- useless because event_parent_id was not used
+-- UPDATE EventException ee
+-- SET ee.eventexception_child_id = e.event_id
+-- FROM Event e
+-- WHERE e.event_parent_id = ee.eventexception_parent_id;
 
 ALTER TABLE Event DROP COLUMN event_parent_id;
 
@@ -286,6 +286,12 @@ ALTER TABLE Event DROP COLUMN event_parent_id;
 --
 -- Table structure for table plannedtask
 --
+CREATE TYPE taskperiod AS ENUM (
+  'MORNING',
+  'AFTERNOON',
+  'ALLDAY'
+);
+
 CREATE TABLE plannedtask (
   plannedtask_id integer NOT NULL,
   plannedtask_domain_id integer default 0,
@@ -296,10 +302,10 @@ CREATE TABLE plannedtask (
   plannedtask_user_id integer default NULL,
   plannedtask_datebegin date,
   plannedtask_dateend date,
-  plannedtask_period enum (0, 1, 2) NOT NULL default 0,
+  plannedtask_period taskperiod DEFAULT 'MORNING'::taskperiod,
   plannedtask_project_id integer default NULL,
   plannedtask_tasktype_id integer default NULL,
-  plannedtask_overrun enum (0, 1) NOT NULL default 0,
+  plannedtask_overrun boolean DEFAULT false,
   plannedtask_comment text
 );
 
@@ -341,7 +347,7 @@ CREATE TABLE tasktypegroup (
   tasktypegroup_id integer NOT NULL,
   tasktypegroup_domain_id integer NOT NULL,
   tasktypegroup_timeupdate timestamp without time zone,
-  tasktypegroup_timecreate without time zone DEFAULT now(),
+  tasktypegroup_timecreate timestamp without time zone DEFAULT now(),
   tasktypegroup_userupdate integer default NULL,
   tasktypegroup_usercreate integer default NULL,
   tasktypegroup_label varchar(32),
@@ -367,7 +373,7 @@ CREATE INDEX tasktypegroup_usercreate_fkey ON tasktypegroup (tasktypegroup_userc
 ALTER TABLE tasktype ADD tasktype_tasktypegroup_id integer;
 CREATE INDEX tasktype_tasktypegroup_id_fkey ON tasktype (tasktype_tasktypegroup_id);
 ALTER TABLE ONLY tasktype
-  CONSTRAINT tasktype_tasktypegroup_id_tasktypegroup_id_fkey FOREIGN KEY (tasktype_tasktypegroup_id) REFERENCES tasktypegroup (tasktypegroup_id) ON DELETE SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT tasktype_tasktypegroup_id_tasktypegroup_id_fkey FOREIGN KEY (tasktype_tasktypegroup_id) REFERENCES tasktypegroup (tasktypegroup_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 
 -- -----------------------------------------------------------------------------

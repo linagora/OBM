@@ -1655,7 +1655,6 @@ CREATE TABLE phone (
 );
 
 
-
 CREATE TYPE taskperiod AS ENUM (
   'MORNING',
   'AFTERNOON',
