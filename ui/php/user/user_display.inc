@@ -441,77 +441,77 @@ function html_user_search_form($user) {
 $dis_domain";
   }
   if($display_pref['userobm_perms']['status'] != 0) {
-    $block .= "<label>$l_profile<br />
+    $block .= "
+<label>$l_profile<br />
       <select type=\"text\" name=\"sel_profile\">
         <option value=\"$c_all\"> $l_all</option>
         $block_profile
       </select>
-    </label>
-                ";
+    </label>";
   }
   if($display_pref['userobm_delegation']['status'] != 0) {
-    $block .= "$dis_delegation
-                ";
+    $block .= "
+$dis_delegation";
   }
   if($display_pref['userobm_email']['status'] != 0) {
-    $block .= "<label>$l_email<br />
+    $block .= "
+<label>$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" maxlength=\"32\"
       value=\"$email\" />
-    </label>
-                ";
+    </label>";
   }
   if($display_pref['userobm_phone']['status'] != 0) {
-    $block .= "<label>$l_phone<br />
+    $block .= "
+<label>$l_phone<br />
       <input type=\"text\" name=\"tf_phone\" size=\"16\" maxlength=\"16\"
       value=\"$phone\" />
-    </label>
-                ";
+    </label>";
   }
   if($display_pref['userobm_description']['status'] != 0) {
-    $block .= "<label>$l_desc<br />
+    $block .= "
+<label>$l_desc<br />
       <input type=\"text\" name=\"tf_desc\" size=\"16\" maxlength=\"32\"
       value=\"$desc\" />
-    </label>
-                ";
+    </label>";
   }
   if($display_pref['userobm_account_dateexp']['status'] != 0) {
-    $block .= "<label>$l_exp<br />
+    $block .= "
+<label>$l_exp<br />
       <input type=\"text\" name=\"tf_exp\" size=\"16\" maxlength=\"32\"
       value=\"$exp\" />
-    </label>
-                ";
+    </label>";
   }
   if($display_pref['userobm_login']['status'] != 0) {
-    $block .= "<label>$l_group<br />
+    $block .= "
+<label>$l_group<br />
       <input type=\"text\" name=\"tf_group\" size=\"16\" maxlength=\"32\"
       value=\"$group\" />
-    </label>
-                ";
+    </label>";
   }
   if($display_pref['userobm_login']['status'] != 0) {
-    $block .= "$block_userdata
-                ";
+    $block .= "
+$block_userdata";
   }
   if($display_pref['userobm_delegation_target']['status'] != 0) {
-    $block .= "<label>$l_delegation_target<br \>
+    $block .= "
+<label>$l_delegation_target<br \>
       <input type=\"text\" name=\"tf_delegation_target\" size=\"16\" maxlength=\"32\"
       value=\"$delegation_target\" />
-    </label>
-                ";
+    </label>";
   }
   if($display_pref['host_name']['status'] != 0) {
-    $block .= "<label>$l_mail_server<br \>
+    $block .= "
+<label>$l_mail_server<br \>
       <input type=\"text\" name=\"tf_host_name\" size=\"16\" maxlength=\"32\"
       value=\"$mail_server_host_name\" />
-    </label>
-                ";
+    </label>";
   }
   if($display_pref['userobm_mail_quota']['status'] != 0) {
-    $block .= "<label>$l_quota<br \>
+    $block .= "
+<label>$l_quota<br \>
       <input type=\"text\" name=\"tf_quota\" size=\"16\" maxlength=\"32\"
       value=\"$quota\" />
-    </label>
-                ";
+    </label>";
   }
   if ($display_pref['datebegin']['status'] != 0) {
     $block .= "
@@ -2678,10 +2678,12 @@ function dis_user_import_index() {
   global $display, $l_user, $l_header_import, $l_enabled, $l_kind, $l_profile;
   global $l_lastname, $l_firstname, $l_login, $l_password, $l_password_type;
   global $l_mail, $l_mail_server, $l_email, $l_quota;
-  global $l_desc, $l_group, $l_delegation, $l_email_nomade, $l_access_nomade;
+  global $l_desc, $l_group, $l_email_nomade, $l_access_nomade;
+  global $l_delegation, $l_delegation_target;
   global $l_title, $l_phone, $l_mphone, $l_fax, $l_company, $l_direction;
   global $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
   global $l_import_msg, $l_file_format, $l_perms, $l_local_copy;
+  global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
 
   $block = "
   <div class=\"detail extra\">
@@ -2721,8 +2723,12 @@ function dis_user_import_index() {
     <th>29</th>
     <th>30</th>
     <th>31</th>
-    <th>32</th> 
-    <th>33</th> 
+    <th>32</th>
+    <th>33</th>
+    <th>34</th>
+    <th>35</th>
+    <th>36</th>
+    <th>37</th>
  </tr>
   <tr>
     <th>$l_kind</th>
@@ -2737,10 +2743,7 @@ function dis_user_import_index() {
     <th>$l_mail_server</th>
     <th>$l_email</th>
     <th>$l_quota</th>
-    <th>$l_email_nomade</th>
-    <th>$l_access_nomade $l_perms</th>
-    <th>$l_access_nomade $l_enabled</th>
-    <th>$l_access_nomade $l_local_copy</th>
+    <th colspan=\"4\">$l_email_nomade</th>
     <th>$l_title</th>
     <th>$l_phone</th>
     <th>$l_phone 2</th>
@@ -2750,14 +2753,49 @@ function dis_user_import_index() {
     <th>$l_company</th>
     <th>$l_direction</th>
     <th>$l_service</th>
-    <th>$l_address 1</th>
-    <th>$l_address 2</th>
-    <th>$l_address 3</th>
+    <th colspan=\"6\">$l_address</th>
+    <th>$l_desc</th>
+    <th colspan=\"4\">$l_smb</th>
+    <th>$l_group</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th>$l_email_nomade</th>
+    <th>$l_perms</th>
+    <th>$l_enabled</th>
+    <th>$l_local_copy</th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
     <th>$l_postcode</th>
     <th>$l_town</th>
     <th>$l_expresspostal</th>
-    <th>$l_desc</th>
-    <th>$l_group</th>
+    <th></th>
+    <th>$l_smb_perms</th>
+    <th>$l_smb_home</th>
+    <th>$l_smb_home_drive</th>
+    <th>$l_smb_logon</th>
+    <th></th>
   </tr>
   </thead>
   <tr>
@@ -2793,6 +2831,10 @@ function dis_user_import_index() {
     <td>Ramonville</td>
     <td>cedex 5</td>
     <td>nice guy</td>
+    <td>X</td>
+    <td>\\home\mydir</td>
+    <td>E</td>
+    <td>mylogon.bat</td>
     <td>Direction, Production</td>
   </tr>
   <tr>
@@ -2894,6 +2936,10 @@ function dis_user_import_file_run($params) {
   $c_town = $cpt++;
   $c_cdx = $cpt++;
   $c_description = $cpt++;
+  $c_smb_perms = $cpt++;
+  $c_smb_home = $cpt++;
+  $c_smb_home_drive = $cpt++;
+  $c_smb_logon = $cpt++;
   $c_group = $cpt++;
 
   $nb_col = $cpt;
@@ -3008,13 +3054,29 @@ function dis_user_import_file_run($params) {
     }
     if (in_array(trim($row[$c_nomade_perms]), $array_true)) {
       $user['nomade_perms'] = 1;
+    } else {
+      $user['nomade_perms'] = 0;
     }
     if (in_array(trim($row[$c_nomade_enable]), $array_true)) {
       $user['nomade_enable'] = 1;
+    } else {
+      $user['nomade_enable'] = 0;
     }
     if (in_array(trim($row[$c_nomade_local_copy]), $array_true)) {
       $user['nomade_local_copy'] = 1;
+    } else {
+      $user['nomade_local_copy'] = 0;
     }
+    echo "AA-".$row[$c_smb_perms]."-bb";
+    if (in_array(trim($row[$c_smb_perms]), $array_true)) {
+      $user['smb_perms'] = 1;
+    } else {
+      $user['smb_perms'] = 0;
+    }
+    $user['smb_home'] = addslashes($row[$c_smb_home]);
+    $user['smb_home_drive'] = addslashes($row[$c_smb_home_drive]);
+    $user['smb_logon'] = addslashes($row[$c_smb_logon]);
+
     if (count($row) != $nb_col) {
       // Row not OK
       $user['user_id'] = false;
