@@ -1430,7 +1430,7 @@ function html_user_group_consult($usr_q) {
     apply_backgroud();
 
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$GLOBAL[path]/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group', 'groupSearch',{resultValue:resultValue});
+      new obm.AutoComplete.Search('$GLOBALS[path]/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group', 'groupSearch',{resultValue:resultValue});
     })
     </script>
     ";
