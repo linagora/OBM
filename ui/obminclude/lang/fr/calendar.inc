@@ -127,6 +127,7 @@ $l_no_template = "Aucun modèle trouvé.";
 $l_export_templates = "Exporter tous les modèles";
 $l_import_template = "Importer un modèle";
 $l_copy_of = "Copie de";
+$l_template_entities_loading_warning = "Certains éléments sauvegardés ne peuvent être rappelés";
 
 // actions 
 $l_meeting_perform = "Rechercher les créneaux libres";

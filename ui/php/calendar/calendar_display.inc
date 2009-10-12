@@ -3173,6 +3173,22 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
       $documents = array();
     }
   }
+  
+  // we check if all template entities have been successfully loaded ; if not (deleted ? ACL ?), we notice the user
+  if (isset($calendar['template_id'])) {
+    $loaded['user'] = isset($users['ids']) ? $users['ids'] : array();
+    $loaded['contact'] = isset($contacts['ids']) ? $contacts['ids'] : array();
+    $loaded['resource'] = isset($resources['ids']) ? $resources['ids'] : array();
+    $loaded['group'] = isset($groups['ids']) ? $groups['ids'] : array();
+    $loaded['document'] = isset($documents['ids']) ? $documents['ids'] : array();
+    foreach ($loaded as $type => $loaded_ids) {
+      if (count(array_diff($template_entities[$type], $loaded_ids)) > 0) {
+        $GLOBALS['display']['msg'] .= display_warn_msg($GLOBALS['l_template_entities_loading_warning']);
+        break;
+      }
+    }
+  }
+  
   $possible_owners = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
@@ -4541,6 +4557,19 @@ function dis_calendar_meeting_form($current_view, $calendar) {
 //    $groups = get_calendar_group_from_ids($groups_id);
   } else {
     $groups = array();
+  }
+  
+  // we check if all template entities have been successfully loaded ; if not (deleted ? ACL ?), we notice the user
+  if (isset($calendar['template_id'])) {
+    $loaded['user'] = isset($users['ids']) ? $users['ids'] : array();
+    $loaded['resource'] = isset($res['ids']) ? $res['ids'] : array();
+    $loaded['group'] = isset($groups['ids']) ? $groups['ids'] : array();
+    foreach ($loaded as $type => $loaded_ids) {
+      if (count(array_diff($template_entities[$type], $loaded_ids)) > 0) {
+        $GLOBALS['display']['msg'] .= display_warn_msg($GLOBALS['l_template_entities_loading_warning']);
+        break;
+      }
+    }
   }
 
   // user select
