@@ -12,6 +12,7 @@ $l_alias = "Alias";
 $l_mail_server = "Mail server choice";
 $l_mail_servers = "Mail servers";
 $l_sync_servers = "Synchronization servers";
+$l_solr_servers = "Indexing servers";
 
 // Mail chooser labels
 $l_mailboxchoice_least_boxes = "having less mailboxes";
@@ -65,6 +66,7 @@ $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM sync';
+$l_obm_solr = 'Solr';
 
 $l_samba = 'Windows server';
 $l_samba_sid = 'domain SID';

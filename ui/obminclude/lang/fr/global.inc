@@ -428,6 +428,7 @@ $l_header_add_user = "Ajouter utilisateur";
 $l_header_add_resource = "Ajouter ressource";
 $l_header_add_group = "Ajouter groupe";
 $l_header_select_syncserver = "Selection du serveur obm-sync";
+$l_header_select_solrserver = "Selection du serveur Solr";
 $l_header_upd_group = "Modifier groupes";
 $l_header_convert_deal = "Convertir en Affaire";
 $l_header_add_deal = "Ajouter affaire";

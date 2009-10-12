@@ -258,6 +258,7 @@ $auth_ldap_filter = $ini_array['auth-ldap-filter'];
 $cgp_use['service']['web'] = $ini_array['obm-web'];
 $cgp_use['service']['mail'] = $ini_array['obm-mail'];
 $cgp_use['service']['sync'] = $ini_array['obm-mail'];
+$cgp_use['service']['solr'] = $ini_array['obm-solr'];
 $cgp_use['service']['mail_nomad'] = $ini_array['obm-mail'];
 $cgp_use['service']['mail_vacation'] = $ini_array['obm-mail'];
 $cgp_use['service']['samba'] = $ini_array['obm-samba'];

@@ -65,6 +65,7 @@ $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM Sync';
+$l_obm_solr = 'Solr';
 $l_monitor = 'Monitoring';
 
 $l_fqdn = 'Fully qualified name';

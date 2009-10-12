@@ -135,9 +135,10 @@ function dis_domain_consult($domain) {
   $properties_q = run_query_domain_properties($id);
   $mailservers = of_domain_get_domain_mailserver('', $id);
   $syncservers = of_domain_get_domain_syncserver($id);
+  $solrservers = of_domain_get_domain_solrserver($id);
   $samba = run_query_domain_samba_properties($id);
   if ($obm_q->num_rows() == 1) {
-    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers);
+    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers, $solrservers);
   } else {
     $display['msg'] .= display_err_msg($l_query_error);
   }
@@ -152,8 +153,8 @@ function dis_domain_consult($domain) {
 //   - $obm_q       : domain database result
 //   - $mailservers : domain mailservers array
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL) {
-  global $display, $ico_delete, $l_mail_server, $l_sync_servers, $cgp_use, $l_properties;
+function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL,$solrservers=NULL) {
+  global $display, $ico_delete, $l_mail_server, $l_sync_servers, $cgp_use, $l_properties, $l_solr_servers;
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
   global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
 
@@ -278,6 +279,48 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
     }
   }
 
+
+  if ($cgp_use['service']['solr']) {
+    // Domain solrservers
+    // Get the domain solrservers
+    $block_s = '';
+    if (is_array($solrservers)) {
+      foreach ($solrservers as $s_id => $syncserver_info) {
+	      // $mailserver_info is an array of info rows about this mail server
+	      foreach ($syncserver_info as $server_info) {
+	        $name = $server_info['name'];
+	        $ip = $server_info['ip'];
+	        $role = $server_info['role'];
+	        $block_solrservers .= "
+              <tr>
+              <td>$name</td>
+              <td>$ip</td>
+              <td>$role</td>
+              </tr>";
+	      }
+      }
+      if ($block_solrservers != '') {
+	      $block_solr = "
+            <div class=\"detail infos\">
+            <h1>$l_solr_servers</h1>
+
+            <table class=\"spreadSheet\">
+            <thead>
+            <tr>
+              <th>$l_host</th>
+              <th>$l_ip</th>
+              <th>$l_role</th>
+            </tr>
+            </thead>
+            $block_solrservers
+            </table>
+            </div>";
+      }
+    }
+  }
+
+
+
   if ($cgp_use['service']['samba'] && ($samba['drive'] || $samba['domain'] || $samba['sid'] || $samba['profile'] || $samba['home'])) {
     $dis_samba = "
       <div class=\"detail infos\">
@@ -356,6 +399,7 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
   </div>
 $block_ms
 $block_sync
+$block_solr
 $dis_samba
 $properties_block    
 ";
@@ -371,7 +415,7 @@ $properties_block
 //   - $domain      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $samba, $properties_q, $domain) {
+function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrservers = NULL, $samba, $properties_q, $domain) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
   global $l_insert, $l_update,$l_mail_server, $l_header_add_mailserver;
   global $display, $cgp_use, $c_none, $l_none, $l_properties;
@@ -396,6 +440,9 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $samba, $pr
     foreach($syncservers as $syncserver_id => $syncserver) {
       $obm_sync[] = $syncserver_id;
     }
+    foreach($solrservers as $solrserver_id => $solrserver) {
+      $obm_solr[] = $solrserver_id;
+    }
   }
 
   // If parameters have been given, they supercede the default action value
@@ -409,6 +456,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $samba, $pr
   if (isset($domain['smtp_in'])) { $smtp_in = $domain['smtp_in'];}
   if (isset($domain['smtp_out'])) { $smtp_out = $domain['smtp_out'];}
   if (isset($domain['obm_sync'])) { $obm_sync = $domain['obm_sync'];}
+  if (isset($domain['obm_solr'])) { $obm_solr = $domain['obm_solr'];}
   if (isset($domain['samba'])) { $samba = $domain['samba'];}
 
   while($properties_q->next_record()) {
@@ -686,6 +734,39 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $samba, $pr
       ";
   }
 
+  if ($cgp_use['service']['solr']) {
+    $solrservers = get_domain_solrservers($id);
+    $serversynclist = get_domain_syncservers($id);
+    if (is_array($obm_solr)) {
+      foreach($obm_solr as $obm_solr_id) {
+        $obm_solr_sel = $obm_solr_id;
+      }
+    }
+    if (sizeof($solrservers) > 0) {
+      foreach($solrservers as $host_id => $serverinfos) {
+        $selected = '';
+        if(isset($obm_solr_sel) && $obm_solr_sel == $host_id) $selected = "selected='selected'";        
+        $solr_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
+      }
+      $dis_solr = "<fieldset class=\"detail infos\">
+        <legend>$GLOBALS[l_obm_solr]</legend>
+          <table>
+          <tr>
+          <th>$GLOBALS[l_header_select_solrserver]</th>
+          <td id='obm_syncServer'>
+            <div class=\"multiple\">
+            <select name='sel_obm_solr[]'>
+              <option value=''>---</option>
+              $solr_list
+            </select> 
+            </div>              
+          </td>
+          </tr>
+          </table>
+      </fieldset>";
+    } 
+  }
+
   $display['title'] = $label;
 
   // --- HTML Template --------------------------------------------------------
@@ -717,6 +798,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $samba, $pr
 
     $dis_mailserver
     $dis_samba
+    $dis_solr
     $properties_block
     <fieldset class=\"buttons\">
     $dis_button

@@ -12,6 +12,7 @@ $l_alias = "Alias";
 $l_mail_server = "Choix du serveur de mail";
 $l_mail_servers = "Serveurs de mail";
 $l_sync_servers = "Serveurs de synchronisation";
+$l_solr_servers = "Serveurs d'indexation";
 
 $l_update_state = "Etat de mise à jour";
 
@@ -64,6 +65,7 @@ $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM sync';
+$l_obm_solr = 'Solr';
 
 $l_samba = 'Serveur windows';
 $l_samba_sid = 'SID du domaine';

@@ -155,6 +155,7 @@ function html_host_search_form($host) {
   $smtp_in = ($host['smtp_in'] == '1' ? "checked = \"checked\"" : '');
   $smtp_out = ($host['smtp_out'] == '1' ? "checked = \"checked\"" : '');
   $obm_sync = ($host['obm_sync'] == '1' ? "checked = \"checked\"" : '');
+  $obm_solr = ($host['obm_solr'] == '1' ? "checked = \"checked\"" : '');
   $imap = ($host['imap'] == '1' ? "checked = \"checked\"" : '');
   $monitor = ($host['monitor'] == '1' ? "checked = \"checked\"" : '');
 
@@ -189,7 +190,13 @@ function html_host_search_form($host) {
     </label>
     ";
   }
-
+  if ($cgp_use['service']['solr']) {
+    $block_solr = "
+    <label>$GLOBALS[l_obm_solr]<br />
+      <input type=\"checkbox\" name=\"cb_obm_solr\" value=\"1\" $obm_solr />
+    </label>
+    ";
+  }
   $block = "
     <form method=\"get\" name=\"f_search\" class=\"search\" action=\"".url_prepare("host_index.php")."\">
     <div class=\"search\">
@@ -203,6 +210,7 @@ function html_host_search_form($host) {
       $block_samba
       $block_mail
       $block_sync
+      $block_solr
       <label>$GLOBALS[l_monitor]<br />
         <input type=\"checkbox\" name=\"cb_monitor\" value=\"1\" $monitor />
       </label>
@@ -276,10 +284,11 @@ function html_host_search_list($obm_q, $pref_q, $host) {
   $smtp_in = $host['smtp_in'];
   $smtp_out = $host['smtp_out'];
   $obm_sync = $host['obm_sync'];
+  $obm_solr = $host['obm_solr'];
   $monitor = $host['monitor'];
 
 
-  $url = url_prepare("host_index.php?action=search&amp;tf_name=$name&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_samba=$smb&amp;cb_imap=$imap&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out&amp;cb_obm_sync=$obm_sync&amp;cb_monitor=$monitor$url_ext");
+  $url = url_prepare("host_index.php?action=search&amp;tf_name=$name&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_samba=$smb&amp;cb_imap=$imap&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out&amp;cb_obm_sync=$obm_sync&amp;cb_obm_solr=$obm_solr&amp;cb_monitor=$monitor$url_ext");
 
   $dis_host = new OBM_DISPLAY('DATA', $pref_q, $module);
 
@@ -352,6 +361,7 @@ function html_host_consult($host_q) {
   $imap = $host_q->f('host_imap');
   $smtp_out = $host_q->f('host_smtp_out');
   $obm_sync = $host_q->f('host_obm_sync');
+  $obm_solr = $host_q->f('host_obm_solr');
   $smtp_in = $host_q->f('host_smtp_in');
   $monitor = $host_q->f('host_monitor');
   $name = $host_q->f('host_name');
@@ -374,6 +384,7 @@ function html_host_consult($host_q) {
   if ($smtp_in) $smtp_in = $l_yes; else $smtp_in = $l_no;
   if ($smtp_out) $smtp_out = $l_yes; else $smtp_out = $l_no;
   if ($obm_sync) $obm_sync = $l_yes; else $obm_sync = $l_no;
+  if ($obm_solr) $obm_solr = $l_yes; else $obm_solr = $l_no;
   if ($monitor) $monitor = $l_yes; else $monitor = $l_no;
   if ($user_login == '') {
     $dis_user = $l_not_assigned;
@@ -421,7 +432,14 @@ function html_host_consult($host_q) {
     </tr>
       ";    
   }
-
+  if ($cgp_use['service']['solr']) {
+    $block_solr = "
+    <tr>
+      <th>$GLOBALS[l_obm_solr]</th>
+      <td>$obm_solr</td>
+    </tr>
+      ";    
+  }
   $host_domain_explode = explode('.', $fqdn, 2 );
   $host_domain = $host_domain_explode[1];
   $graph_list = get_host_graph_list($fqdn);
@@ -496,6 +514,7 @@ function html_host_consult($host_q) {
 
     $block_mail
     $block_sync
+    $block_solr
     <tr>
       <th>$GLOBALS[l_monitor]</th>
       <td>$monitor</td>
@@ -546,6 +565,7 @@ function html_host_form($action, $host_q, $host, $field='') {
     $smtp_in = $host_q->f('host_smtp_in');
     $smtp_out = $host_q->f('host_smtp_out');
     $obm_sync = $host_q->f('host_obm_sync');
+    $obm_solr = $host_q->f('host_obm_solr');
     $monitor = $host_q->f('host_monitor');
     $desc = $host_q->f('host_description');
     $u_login = $host_q->f('userobm_login');
@@ -569,6 +589,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['smtp_in'])) { $smtp_in = $host['smtp_in']; }
   if (isset($host['smtp_out'])) { $smtp_out = $host['smtp_out']; }
   if (isset($host['obm_sync'])) { $obm_sync = $host['obm_sync']; }
+  if (isset($host['obm_solr'])) { $obm_solr = $host['obm_solr']; }
   if (isset($host['monitor'])) { $monitor = $host['monitor']; }
   if (isset($host['desc'])) { $desc = stripslashes($host['desc']); }
   if (isset($host['domain_id'])) { $domain_id = $host['domain_id']; }
@@ -588,6 +609,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   $smtp_in_state  = ($smtp_in ? 'checked' : '');
   $smtp_out_state  = ($smtp_out ? 'checked' : '');
   $obm_sync_state  = ($obm_sync ? 'checked' : '');
+  $obm_solr_state  = ($obm_solr ? 'checked' : '');
   $monitor_state  = ($monitor ? 'checked' : '');
 
 
@@ -645,7 +667,15 @@ function html_host_form($action, $host_q, $host, $field='') {
       </td>
     </tr>";
   }
-
+  if ($cgp_use['service']['solr']) {
+    $block_solr = "
+    <tr>
+      <th class=\"$class[obm_solr]\">$GLOBALS[l_obm_solr]</th>
+      <td>
+        <input name=\"cb_obm_solr\" type=\"checkbox\" value=\"1\" $obm_solr_state>
+      </td>
+    </tr>";
+  }
 
   $dis_user = "
   <tr>
@@ -690,6 +720,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   $block_samba
   $block_mail
   $block_sync
+  $block_solr
    <tr>
      <th class=\"$class[monitor]\">$GLOBALS[l_monitor]</th>
      <td>
@@ -809,6 +840,7 @@ function dis_host_warn_insert($id, $h_q, $host) {
   $smtp_in = $host['smtp_in'];
   $smtp_out = $host['smtp_out'];
   $obm_sync = $host['obm_sync'];
+  $obm_solr = $host['obm_solr'];
   $samba = $host['samba'];
 
   $display['msg'] .= display_warn_msg($l_check_samehost);
@@ -829,7 +861,7 @@ function dis_host_warn_insert($id, $h_q, $host) {
     <input type=\"hidden\" name=\"cb_imap\" value=\"$imap\" />
     <input type=\"hidden\" name=\"cb_smtp_in\" value=\"$smtp_in\" />
     <input type=\"hidden\" name=\"cb_smtp_out\" value=\"$smtp_out\" />
-    <input type=\"hidden\" name=\"cb_obm_sync\" value=\"$obm_sync\" />
+    <input type=\"hidden\" name=\"cb_obm_sync\" value=\"$obm_solr\" />
     <input type=\"hidden\" name=\"cb_samba\" value=\"$samba\" />
     <input type=\"hidden\" name=\"tf_fqdn\" value=\"$fqdn\" />
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
