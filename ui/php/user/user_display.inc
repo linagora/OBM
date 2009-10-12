@@ -2729,12 +2729,14 @@ function dis_user_import_index() {
     <th>35</th>
     <th>36</th>
     <th>37</th>
+    <th>38</th>
  </tr>
   <tr>
     <th>$l_kind</th>
     <th>$l_lastname</th>
     <th>$l_firstname</th>
     <th>$l_profile</th>
+    <th>$l_delegation_target</th>
     <th>$l_delegation</th>
     <th>$l_login</th>
     <th>$l_password</th>
@@ -2759,6 +2761,7 @@ function dis_user_import_index() {
     <th>$l_group</th>
   </tr>
   <tr>
+    <th></th>
     <th></th>
     <th></th>
     <th></th>
@@ -2803,7 +2806,8 @@ function dis_user_import_index() {
     <td>BAUD</td>
     <td>Pierre</td>
     <td>admin</td>
-    <td>dele</td>
+    <td>France</td>
+    <td>France</td>
     <td>pierre</td>
     <td>mot</td>
     <td>PLAIN</td>
@@ -2908,6 +2912,7 @@ function dis_user_import_file_run($params) {
   $c_lastname = $cpt++;
   $c_firstname = $cpt++;
   $c_profile = $cpt++;
+  $c_delegation_target = $cpt++;
   $c_delegation = $cpt++;
   $c_login = $cpt++;
   $c_password = $cpt++;
@@ -2984,15 +2989,15 @@ function dis_user_import_file_run($params) {
     return;
   }
 
-  while ( ($row = fgetcsv($fh, 2000, $csv_sep)) ) {
+  while ( ($row = fgetcsv($fh, 4000, $csv_sep)) ) {
     $num_line++;
     $nb_group_ins = 0;
     $user['user_id'] = 0;
     $user['kind'] = addslashes(trim($row[$c_kind]));
     $user['lastname'] = addslashes(trim($row[$c_lastname]));
     $user['firstname'] = addslashes(trim($row[$c_firstname]));
+    $user['delegation_target'] = addslashes(trim($row[$c_delegation_target]));
     $user['delegation'] = addslashes(trim($row[$c_delegation]));
-    $user['delegation_target'] = addslashes(trim($row[$c_delegation]));
     $user['login'] = addslashes(trim($row[$c_login]));
     $user['passwd'] = addslashes(trim($row[$c_password]));
     if (trim($row[$c_password_type]) == 'CRYPT') {
@@ -3067,7 +3072,6 @@ function dis_user_import_file_run($params) {
     } else {
       $user['nomade_local_copy'] = 0;
     }
-    echo "AA-".$row[$c_smb_perms]."-bb";
     if (in_array(trim($row[$c_smb_perms]), $array_true)) {
       $user['smb_perms'] = 1;
     } else {

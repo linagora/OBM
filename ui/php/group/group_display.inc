@@ -240,8 +240,7 @@ function html_group_search_form ($group) {
     $block .= "
     <label>$l_name<br />
       <input name=\"tf_name\" size=\"16\" maxlength=\"256\" value=\"$name\" />
-    </label>
-    ";
+    </label>";
   }
   
   if ($display_pref['domain_label']['status'] != 0) {
@@ -255,31 +254,27 @@ function html_group_search_form ($group) {
   $block .= "
     <label>$l_group_user<br />
       <input name=\"tf_user\" size=\"16\" maxlength=\"16\" value=\"$user\" />
-    </label>
-    ";
+    </label>";
   
   if ($display_pref['group_email']['status'] != 0) {
     $block .= "
     <label>$l_email<br />
       <input name=\"tf_email\" size=\"24\" maxlength=\"64\" value=\"$email\" />
-    </label>
-    ";
+    </label>";
   }
   
   if ($display_pref['group_desc']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_desc]<br />
       <input name=\"tf_desc\" size=\"24\" maxlength=\"128\" value=\"$desc\" />
-    </label>
-    ";
+    </label>";
   }
   
   if ($display_pref['group_samba']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_smb]<br />
       <input name=\"tf_samba\" size=\"24\" maxlength=\"128\" value=\"$samba\" />
-    </label>
-    ";
+    </label>";
   }
   
   $block .= "
@@ -1035,7 +1030,7 @@ function dis_group_admin_index() {
 function dis_group_import_index() {
   global $display, $l_group, $l_header_import;
   global $l_name, $l_email, $l_file_format, $l_user_member, $l_login;
-
+  global $l_delegation, $l_smb;
 
   $block = "
   <div class=\"detail extra\">
@@ -1045,13 +1040,17 @@ function dis_group_import_index() {
   <thead>
   <tr>
     <th>$l_name</th>
+    <th>$l_delegation</th>
     <th>$l_email</th>
+    <th>$l_smb</th>
     <th>$l_user_member ($l_login)</th>
   </tr>
   </thead>
   <tr>
     <td>CO Coteaux</td>
+    <td>France</td>
     <td>coc.football</td>
+    <td>X</td>
     <td>pierre.baudracco,mehdi.rande,anthony.prades</td>
   </tr>
   </table>
@@ -1095,7 +1094,8 @@ function html_group_import_file() {
  * Process Import file
  **/
 function dis_group_import_file_run($params) {
-  global $obm, $display, $ccscd_tab, $l_group, $l_name, $l_email, $l_header_import;
+  global $obm, $display, $err, $ccscd_tab;
+  global $l_group, $l_name, $l_email, $l_header_import, $l_delegation, $l_smb;
 
   $file = $params['file_saved'];
   if ($file == '') {
@@ -1108,14 +1108,29 @@ function dis_group_import_file_run($params) {
     $csv_sep = "\t";
   }
 
+  $array_true = array('X', 'x', 'Y', 'YES', 'y', 'yes', 'O', 'OUI', 'o', 'oui', '1');
+
+  $cpt = 0;
+
+  $c_name = $cpt++;
+  $c_delegation = $cpt++;
+  $c_email = $cpt++;
+  $c_samba = $cpt++;
+  $c_users_login = $cpt++;
+
+  $nb_col = $cpt;
+
   $dis_import .= "
   <thead>
   <tr>
     <th>$l_name</th>
+    <th>$l_delegation</th>
     <th>$l_email</th>
+    <th>$l_smb</th>
     <th></th>
   </tr>
   </thead>";
+
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('group');
   $num_line = 0;
@@ -1123,12 +1138,18 @@ function dis_group_import_file_run($params) {
   while ( ($row = fgetcsv($fh, 4000, $csv_sep)) ) {
     $num_line++;
 
-    $group['name'] = $row[0];
-    $group['email'] = $row[1];
-    $group['users_login'] = $row[2];
+    $group['name'] = addslashes(trim($row[$c_name]));
+    $group['delegation'] = addslashes(trim($row[$c_delegation]));
+    $group['email'] = addslashes(trim($row[$c_email]));
+    $group['users_login'] = addslashes(trim($row[$c_users_login]));
+    if (in_array(trim($row[$c_samba]), $array_true)) {
+      $group['samba'] = 1;
+    } else {
+      $group['samba'] = 0;
+    }
 
     // Test if group name or email exists
-    $query = "SELECT group_id, group_name, group_email
+    $query = "SELECT group_id, group_name, group_delegation, group_email
     FROM UGroup
     WHERE (group_name='$group[name]' OR group_email='$group[email]')
       AND (group_privacy=0 OR group_usercreate='$obm[uid]')
@@ -1151,7 +1172,7 @@ function dis_group_import_file_run($params) {
       } else {
 	// Group not ok, stop for this row
 	$group['id'] = false;
-	$res = '!';
+	$res = "! $err[field] - $err[msg]";
       }
     }
 
@@ -1187,10 +1208,16 @@ function dis_group_import_file_run($params) {
       }
     }
 
+    $dis_samba = '';
+    if ($group['samba'] == 1) {
+      $dis_samba = 'X';
+    }
     $dis_import .= "
     <tr>
       <td>$group[name]</td>
+      <td>$group[delegation]</td>
       <td>$group[email]</td>
+      <td>$dis_samba</td>
       <td>$res</td>
     </tr>";
   }
