@@ -868,6 +868,8 @@ class LemonLDAP_Engine {
 
 		foreach ($groups_str as $group_str)
 		{
+			if (strlen($group_str))
+			{
 			$group = explode('|', $group_str);
 			for ($i=0; $i<sizeof($group); $i++)
 			{
@@ -886,6 +888,7 @@ class LemonLDAP_Engine {
 				unset($group[$i]);
 			}
 			$groups[$group[$this->_sqlMap['group_name']]] = $group;
+		}
 		}
 
 		return $groups;
@@ -1105,7 +1108,7 @@ class LemonLDAP_Engine {
                 $sql_query = 'SELECT userobm_id FROM UserObm WHERE ' . $sql_query;
 
 		$this->_db->query($sql_query);
-		while ($this->_db->next_record() && is_null($user_id))
+		while ($this->_db->next_record() && is_null($user_id_tmp))
 		{
 			$user_id_tmp = $this->_db->f('userobm_id');
 		}
