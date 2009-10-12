@@ -218,7 +218,7 @@
             <desc name='group_main_email'/>
         </map>
         <map>
-            <ldap name='emailAlias'/>
+            <ldap name='mailAlias'/>
             <desc name='group_alias_email'/>
         </map>
         <map>
