@@ -148,6 +148,11 @@ function checkAvailability() {
 function displayFreeBusy(date_begin, duration, entities, readOnly, otherAttendee) {
   var q = new Object();
   q.date = date_begin;
+  q.ajax = 1;
+  q.action = 'perform_meeting';
+  if ($('template_id') != null) {
+    q.template_id = $('template_id').value;
+  }
   new Request.JSON({
     url : 'calendar_index.php',
     secure : false,
@@ -167,7 +172,7 @@ function displayFreeBusy(date_begin, duration, entities, readOnly, otherAttendee
       $('fbcContainer').innerHTML = '';
 
     }
-  }).post(\$merge({ajax : 1, action : 'perform_meeting'}, q)); 
+  }).post(q); 
 }
 
 

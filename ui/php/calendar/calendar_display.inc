@@ -127,7 +127,7 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
     $navbar = dis_calendar_navbar($current_view);
   }
 
-  if ($action == 'new' || $action == 'save_as_template' || $action == 'update_template') {
+  if ($action == 'new' || $action == 'new_meeting' || $action == 'save_as_template' || $action == 'update_template') {
     $select_template_form = dis_calendar_select_template_form($action, $calendar);
   }
 
@@ -4510,25 +4510,33 @@ function dis_calendar_meeting_form($current_view, $calendar) {
   if (($hourbegin == '') || ($hourbegin <= 0)) {
     $hourbegin = '1';
   }
-  $dis_button = "
-     <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
-     <input type=\"hidden\" name=\"action\" id=\"action\" value=\"perform_meeting\" />
-     <input type=\"submit\" value=\"$l_meeting_perform\" />";
-
-  $users_id = $current_view->get_users();
+  $dis_button = "<input type=\"button\" onclick=\"performMeeting();\" value=\"$GLOBALS[l_meeting_perform]\" />";
+     
+  if (isset($calendar['template_id'])) {
+    $dis_button.= "<input type=\"hidden\" name=\"template_id\" id=\"template_id\" value=\"$calendar[template_id]\" />";
+    list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
+    $users_id = $template_entities['user'];
+    $res_id = $template_entities['resource'];
+    $groups_id = $template_entities['group'];
+  } else {
+    $users_id = $current_view->get_users();
+    $res_id = $current_view->get_resources();
+    $group = $current_view->get_group();
+    $groups_id = ( (empty($group) || $group==$GLOBALS['c_all']) ? array($group) : array() );
+  }
+  
   if (count($users_id) > 0) {
     $users = get_userobm_from_ids($users_id);
   } else {
     $users = array();
   }
-  $res_id = $current_view->get_resources();
+  
   if (count($res_id) > 0) {
     $res = get_calendar_resource_from_ids($res_id);
   } else {
     $res = array();
   }
-  $group = $current_view->get_group();
-  $groups_id = ( (empty($group) || $group==$GLOBALS['c_all']) ? array($group) : array() );
+  
   if (count($groups_id) > 0) {
 //    $groups = get_calendar_group_from_ids($groups_id);
   } else {
@@ -4786,7 +4794,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
     $dis_block_user 
     $dis_block_resource
   <fieldset class=\"buttons\">
-    <input type=\"button\" onclick=\"performMeeting();\" value=\"$GLOBALS[l_meeting_perform]\" />
+    $dis_button
   </fieldset>    
   </form>
   <div id=\"fbcContainer\"></div>
@@ -5009,6 +5017,7 @@ function dis_calendar_free_interval($current_view) {
           <input type='hidden' name='time_begin' id='time_begin' value='' />
           <input type='hidden' name='min_begin' id='min_begin' value='' />
           <input type='hidden' name='new_meeting' value='1'>
+          <input type='hidden' name='template_id' value='$_POST[template_id]'>
           <input type='hidden' id='freebusy_action' name='action' value='new'>
         </form>
       </div>
