@@ -818,12 +818,16 @@ function global_session_load_user_todos($pri='todo_priority') {
   $order = ($pri != '' ? $pri : 'todo_priority');
   if ($order == 'todo_priority') {
     $order = ' event_priority desc';
+  } elseif($order == 'todo_deadline') {
+    $order = ' event_deadline desc';
   }
 
   // create the todo list
   $query = "SELECT
       event_id,
-      event_title
+      event_title,
+      event_priority,
+      #ADDSECONDS(event_date, event_duration) as event_deadline
     FROM EventLink
       INNER JOIN Event on eventlink_event_id=event_id
       INNER JOIN UserEntity on eventlink_entity_id=userentity_entity_id
@@ -835,7 +839,7 @@ function global_session_load_user_todos($pri='todo_priority') {
 
   display_debug_msg($query, $cdg_sql, 'global_session_load_user_todos()');
   $todolist_q = new DB_OBM;
-  $todolist_q->query($query);
+  $todolist_q->xquery($query);
 
   $nb_todo = $todolist_q->num_rows();
   $max = min ($cgp_todo_nb, $nb_todo);
