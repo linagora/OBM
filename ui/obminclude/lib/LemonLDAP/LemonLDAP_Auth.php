@@ -176,8 +176,12 @@ class LemonLDAP_Auth extends Auth {
 		if ($this->_auto)
 		{
 			$user_id = $this->sso_manageAccount($login, $user_id, $domain_id);
+
 			if ($user_id !== false)
 				$this->sso_manageGroups($user_id, $domain_id);
+
+			if ($this->_engine->isExternalUpdate())
+                                $this->_engine->updateExternalData($user_name, $domain_id, $user_id);
 		}
 
 		$user_authenticated = $this->sso_authenticate($user_id, $domain_id);
@@ -258,9 +262,14 @@ class LemonLDAP_Auth extends Auth {
 	function sso_manageAccount ($user_name, $user_id, $domain_id)
 	{
 		if (!is_null($user_id) && $user_id !== false)
-			return $this->_engine->updateUser($user_name, $domain_id, $user_id);
+		{
+			if ($this->_engine->verifyUserData($user_name, $domain_id, $user_id))
+				return $this->_engine->updateUser($user_name, $domain_id, $user_id);
+		}
 		else
+		{
 			return $this->_engine->addUser($user_name, $domain_id);
+		}
 	}
 
 	/**

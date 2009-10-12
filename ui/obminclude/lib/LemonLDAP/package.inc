@@ -48,4 +48,6 @@ $_files = Array(
 foreach ($_files as $index => $file)
 	require_once dirname(__FILE__) . '/' . $file;
 
+require_once dirname(__FILE__) . '/../../../php/tools/tools_query.inc';
+
 ?>

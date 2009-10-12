@@ -208,6 +208,12 @@ class LemonLDAP_Engine {
 	var $_db_userData = null;
 
 	/**
+	 * Flag that indicate if the connected user should be update on external
+	 * database (ldap,etc.)
+	 */
+	var $_externalUpdate = false;
+
+	/**
 	 * Constructor.
 	 * Initialize headers from what are found into the HTTP request.
 	 */
@@ -232,7 +238,15 @@ class LemonLDAP_Engine {
 		{
 			$value = $this->getHeaderValue($this->_headersMap[$key]);
 			if (!is_null($value))
+			{
+				// No multi values for any user keys.
+				if (strncmp($key, 'userobm', strlen('userobm')) == 0)
+				{
+					$tab = split(';', $value);
+					$value = $tab[0];
+				}
 				$values[$key_obm] = $value;
+			}
 		}
 
 		return $values;
@@ -478,6 +492,7 @@ class LemonLDAP_Engine {
 			$params['user_id'] = $user_id;
 			set_update_state();
 			$succeed = $user_id;
+			$this->_externalUpdate = true;
 		}
 
 		$obm['uid'] = $backup['uid'];
@@ -789,6 +804,14 @@ class LemonLDAP_Engine {
 	}
 
 	/**
+	 * Indicates if a external update should be made.
+	 */
+	function isExternalUpdate ()
+	{
+		return $this->_externalUpdate;
+	}
+
+	/**
 	 * Indicates if a group exists in the database.
 	 * @param $groupname A group name.
 	 * @param $domain_id A valid domain identifier.
@@ -992,7 +1015,6 @@ class LemonLDAP_Engine {
 		if (lmng_check_user_data_form($user_id, $params_db)
 				&& lmng_run_query_user_update($user_id, $params_db))
 		{
-			set_update_state();
 			$succeed = $user_id;
 		}
 
@@ -1002,6 +1024,37 @@ class LemonLDAP_Engine {
 		unset($backup);
 
 		return $succeed;
+	}
+
+	/**
+	 * Update external repositories, such the OBM LDAP directory,
+	 * with new informations provides by LemonLDAP.
+	 * User data are synchronized, like groups and user password.
+	 * @param $user_name Login of the user
+	 * @param $domain_id
+	 * @param $user_id
+	 */
+	function updateExternalData ($user_name, $domain_id, $user_id)
+	{
+		// Call global external update
+		$params['update_type'] = "global";
+		$params['domain_id'] = $domain_id;
+		$params['realm'] = 'domain';
+		set_update_lock();
+		set_update_state($domain_id);
+		store_update_data($params);
+		$res = exec_tools_update_update($params);
+		remove_update_lock();
+
+		$user_data = $this->getUserDataFromId($user_id, $domain_id);
+		$password_new = $this->getHeaderValue($this->getHeaderName('userobm_password'));
+		$password_old = $user_data[$this->_sqlMap['userobm_password']];
+
+		if (strcmp($password_new, $password_old) != 0)
+		{
+			passthru("/usr/share/obm/www/auto/changePasswd.pl --login $user_name --domain-id $domain_id --passwd $password_new --old-passwd $password_old --unix");
+			passthru("/usr/share/obm/www/auto/changePasswd.pl --login $user_name --domain-id $domain_id --passwd $password_new --old-passwd $password_old --samba");
+                }
 	}
 
 	/**
@@ -1022,6 +1075,48 @@ class LemonLDAP_Engine {
 		$this->_headersMap = $headersMap;
 	}
 
+	/**
+	 * Verify if user should be updated.
+	 * @param $login
+	 * @param $domain_id
+	 * @param $user_id
+	 */
+	function verifyUserData ($login, $domain_id, $user_id)
+	{
+		$user_data = $this->_buildInternalUserData();
+		$sql_query = '';
+		$sql_query_tab = Array();
+
+		foreach ($this->_sqlMap as $key => $key_obm)
+		{
+			if (strncmp($key, 'group', strlen('group')) == 0)
+				continue;
+			if (array_key_exists($key_obm, $user_data) && strlen($user_data[$key_obm]) > 0)
+				$sql_query_tab[] = $key . ' = \'' . addslashes($user_data[$key_obm]) . '\'';
+		}
+
+		$sql_query_tab_max = sizeof($sql_query_tab);
+		for ($i=0; $i<$sql_query_tab_max-1; $i++)
+		{
+			$sql_query .= $sql_query_tab[$i] . ' AND ';
+		}
+		$sql_query .= $sql_query_tab[$sql_query_tab_max-1];
+
+                $sql_query = 'SELECT userobm_id FROM UserObm WHERE ' . $sql_query;
+
+		$this->_db->query($sql_query);
+		while ($this->_db->next_record() && is_null($user_id))
+		{
+			$user_id_tmp = $this->_db->f('userobm_id');
+		}
+
+		$update = false;
+		if (is_null($user_id_tmp))
+			$update = true;
+
+		$this->_externalUpdate = $update;
+		return $update;
+	}
 }
 
 ?>
