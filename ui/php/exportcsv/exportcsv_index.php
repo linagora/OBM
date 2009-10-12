@@ -70,7 +70,7 @@ if (($action == 'index') || ($action == '')) {
   }
   $first_row = $params['first_row'];
   $nb_rows = $params['nb_rows'];
-  $query = stripslashes($params['query']);
+  $query = stripslashes(html_entity_decode($params['query']));
 
   if ($ctu_sql_limit && ($nb_rows > $_SESSION['set_rows'])) {
     // We remove the limit clause
