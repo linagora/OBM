@@ -12,8 +12,6 @@ dbtype=`echo $VALUE | tr A-Z a-z`
 
 echo "dbtype: ${dbtype}"
 
-locate_php_interp
-
 `dirname $0`/update-2.2-2.3.${dbtype}.sh || {
   echo "Error running update-2.2-2.3.sh abort."
   exit 1
