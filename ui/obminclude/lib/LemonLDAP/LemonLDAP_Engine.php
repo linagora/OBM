@@ -589,7 +589,7 @@ class LemonLDAP_Engine {
 		$groups = Array();
 
 		$sql_query = 'SELECT group_id, group_name ';
-		$sql_query .= 'FROM of_usergroup, ugroup ';
+		$sql_query .= 'FROM of_usergroup, UGroup ';
 		$sql_query .= 'WHERE of_usergroup_group_id = group_id ';
 		$sql_query .= 'AND of_usergroup_user_id = \'' . addslashes($user_id) . '\' ';
 		$sql_query .= 'AND group_domain_id = \'' . addslashes($domain_id) . '\' ';
@@ -603,7 +603,7 @@ class LemonLDAP_Engine {
 		}
 
 		$sql_query = 'SELECT group_id, group_name ';
-		$sql_query .= 'FROM userobm, ugroup ';
+		$sql_query .= 'FROM UserObm, UGroup ';
 		$sql_query .= 'WHERE userobm_gid = group_gid ';
 		
 		$this->_db->query($sql_query);
@@ -631,7 +631,7 @@ class LemonLDAP_Engine {
 			return false;
 
 		$sql_query = 'SELECT group_id';
-		$sql_query .= ' FROM ugroup WHERE group_name = \'' . addslashes($groupname) . '\'';
+		$sql_query .= ' FROM UGroup WHERE group_name = \'' . addslashes($groupname) . '\'';
 		$sql_query .= ' AND group_domain_id = \'' . addslashes($domain_id) . '\'';
 
 		$group_id = null;
@@ -699,7 +699,7 @@ class LemonLDAP_Engine {
 		//
 
 		$sql_query = 'SELECT userobm_id';
-		$sql_query .= ' FROM userobm WHERE userobm_login = \'' . addslashes($login) . '\'';
+		$sql_query .= ' FROM UserObm WHERE userobm_login = \'' . addslashes($login) . '\'';
 		$sql_query .= ' AND userobm_domain_id = \'' . addslashes($domain_id) . '\'';
 
 		$user_id = null;
