@@ -854,21 +854,7 @@ function display_page(&$display) {
   global $ico_nav_open, $l_hide, $l_show;
   global $l_print,  $params;
 
-  // If print activated, display only the detail
-  if ($params['output_target'] == 'print') {
-    echo $display['head'] . '
-' .
-      $display['title'] .
-      $display['msg'] .
-      "
-      <div id=\"ajaxMessage\"></div>
-      &nbsp;".
-      $display['detail'] . "
-      </div>
-      " .
-      $display['end'];
-    return;
-  }
+
 
   // If header is null, display only the detail (Popup windows)
   if ($display['header'] == '') {
@@ -969,12 +955,12 @@ function display_head($p_module, $standard=true) {
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
   global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
-  global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include, $path;
+  global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include, $path, $params;
 
   $css = $css_obm;
 
-  if ($output_target == 'print') {
-   $css = $css_print_obm;
+  if ($params['output_target'] == 'print') {
+    $extra_css[] = $css_print_obm;
   }
 
   $monthShort =  phpArrayToJsArray($l_monthsofyearshort);
@@ -1027,6 +1013,7 @@ function display_head($p_module, $standard=true) {
   <meta http-equiv=\"X-UA-Compatible\" content=\"chrome=1\" />
   <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css\" />
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_print_obm\" media=\"print\" />
   $dis_extra_css
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/mootools-1.2-more.js\" ></script>
