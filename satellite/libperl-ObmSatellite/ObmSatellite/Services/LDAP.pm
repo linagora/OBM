@@ -145,7 +145,7 @@ sub DESTROY {
     my $self = shift;
 
 
-    $self->log( 0, 'Deleting LDAP server' );
+    $self->log( 4, 'Deleting LDAP server' );
 
     if( ref( $self->{'ldapServerConn'} ) eq 'Net::LDAP' ) {
         $self->disconnect();
