@@ -16,22 +16,22 @@ export PGPASSWORD=$pw
 
 if [ $obm_installation_type = "full" ]; then
   echo "  Delete old database"
-  dropdb ${db}
+  su - postgres -c "dropdb ${db}"
   
   
-  dropuser ${user}
+  su - postgres -c "dropuser ${user}"
   
   echo "Creating role '${user}' (pw: ${pw}) & db '${db}' (lang: ${obm_lang})..."
-  createuser --createdb --no-superuser --no-createrole --login ${user}
+  su - postgres -c "createuser --createdb --no-superuser --no-createrole --login ${user}"
   
-  psql template1 <<EOF
+  su - postgres -c "psql template1 <<EOF
 ALTER USER ${user} WITH PASSWORD '${pw}'
 \q
-EOF
+EOF"
   
   echo "  Create new $DB database"
   
-  createdb -O ${user} --encoding=UTF-8 ${db}
+  su - postgres -c "createdb -O ${user} --encoding=UTF-8 ${db}"
 fi
 
 su - postgres -c "psql ${db} <<EOF
