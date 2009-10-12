@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<solr persistent="false">
+  <cores adminPath="null" >
+    <core name="default" instanceDir="default"/>
+    <core name="webmail" instanceDir="webmail"/>
+  </cores>
+</solr>

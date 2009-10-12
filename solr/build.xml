@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<project name="obm-solr" default="install" basedir=".">
+
+  <target name="build">
+  </target>  
+
+  <target name="install">
+    <echo>Preparing ${ant.project.name} distribution...</echo>
+
+    <!-- destination directory -->
+    <property name="pack" 
+	      value="debian/${ant.project.name}"/>
+    <property name="dd" 
+	      value="debian/${ant.project.name}/usr/share"/>
+
+    <mkdir dir="${dd}"/>
+
+    <exec executable="tar" failonerror="true">
+      <arg line="xfj obm-solr.tar.bz2 -C ${dd}"/>
+    </exec>
+
+    <!-- default core -->
+    <mkdir dir="${pack}/etc/solr/conf/default/"/>
+    <copy todir="${pack}/etc/solr/conf/default/">
+      <fileset dir="conf/default" includes="*.xml"/>
+    </copy>
+    <mkdir dir="${pack}/var/solr/default"/>
+
+    <!-- webmail core -->
+    <mkdir dir="${pack}/etc/solr/conf/webmail/"/>
+    <copy todir="${pack}/etc/solr/conf/webmail/">
+      <fileset dir="conf/webmail" includes="*.xml"/>
+    </copy>
+    <mkdir dir="${pack}/var/solr/webmail"/>
+
+    <copy todir="${pack}/var/solr" file="solr.xml"/>
+
+
+    <echo>${ant.project.name} distribution done.</echo>
+  </target>
+  
+  <target name="clean">
+  </target>  
+
+</project>
