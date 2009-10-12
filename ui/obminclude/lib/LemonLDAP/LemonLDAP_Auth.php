@@ -214,7 +214,7 @@ class LemonLDAP_Auth extends Auth {
 	 */
 	function of_session_dis_login_page ()
 	{
-		$this->debug("of_session_dis_login_page()");
+		$this->_debug("of_session_dis_login_page()");
 		echo "Permission denied.";
 	}
 
