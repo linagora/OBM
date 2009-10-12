@@ -265,6 +265,7 @@ class LemonLDAP_Auth extends Auth {
 		{
 			if ($this->_engine->verifyUserData($user_name, $domain_id, $user_id))
 				return $this->_engine->updateUser($user_name, $domain_id, $user_id);
+			return $user_id; 
 		}
 		else
 		{
