@@ -56,12 +56,17 @@ sub new {
         my $query = 'SELECT userobm_login FROM UserObm WHERE userobm_id='.$self->{'user'};
         my $queryResult;
         if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-            $self->_log( 'l\'utilisateur d\'identifiant \''.$self->{'user'}.' n\'existe pas', 0 );
+            $self->_log( 'erreur lors de l\'exécution de la requête de vérification du paramètre \'--user\'', 0 );
             return undef;
         }
 
         ( $self->{'user_login'} ) = $queryResult->fetchrow_array();
         $queryResult->finish();
+
+        if( !defined($self->{'user_login'}) ) {
+            $self->_log( 'l\'utilisateur d\'identifiant \''.$self->{'user'}.' n\'existe pas', 0 );
+            return undef;
+        }
     }
 
     # Delegation

@@ -189,6 +189,14 @@ sub getParameter {
     }
 
 
+    if( defined($parameters->{'delegation'}) && $parameters->{'delegation'} eq '' ) {
+        delete($parameters->{'delegation'});
+    }
+
+    if( defined($parameters->{'user'}) && $parameters->{'user'} !~ /^\d+$/ ) {
+        delete($parameters->{'user'});
+    }
+
     SWITCH: {
         if( $parameters->{'incremental'} || $parameters->{'global'} ) {
             if( exists($parameters->{'user'}) ) {

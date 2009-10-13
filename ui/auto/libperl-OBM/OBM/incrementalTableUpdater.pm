@@ -117,7 +117,7 @@ sub _purgeUpdated {
     }
 
     if( defined($self->{'delegation'}) ) {
-        $query .= ' AND updated_delegation='.$self->{'delegation'};
+        $query .= ' AND updated_delegation=\''.$self->{'delegation'}.'\'';
     }
 
     $self->_log( 'nettoyage de la table Updated', 3 );
@@ -149,7 +149,7 @@ sub _purgeUpdatedlinks {
     }
 
     if( defined($self->{'delegation'}) ) {
-        $query .= ' AND updatedlinks_delegation='.$self->{'delegation'};
+        $query .= ' AND updatedlinks_delegation=\''.$self->{'delegation'}.'\'';
     }
 
     $self->_log( 'nettoyage de la table Updatedlinks', 3 );
@@ -211,7 +211,7 @@ sub _deleteDeleted {
     }
 
     if( defined($self->{'deleted_delegation'}) ) {
-        $query .= ' AND deleted_delegation='.$self->{'delegation'};
+        $query .= ' AND deleted_delegation=\''.$self->{'delegation'}.'\'';
     }
 
     $self->_log( 'nettoyage de la table Deleted', 3 );
