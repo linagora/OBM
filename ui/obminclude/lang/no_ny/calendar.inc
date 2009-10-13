@@ -37,11 +37,6 @@ $l_exception = "Exceptions";
 
 $l_link_events = "linked events with this category.";
 $l_accepted = "Accept";
-$l_rejected = "Reject";
-$l_waiting  = "Waiting for confirmation";
-$l_short_accepted = "A";
-$l_short_rejected = "R";
-$l_short_waiting  = "Wait";
 $l_wait = "Waiting";
 $l_free = "Free but restricted";
 $l_possible = "Free";

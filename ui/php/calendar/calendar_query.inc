@@ -4618,7 +4618,7 @@ Class Event {
    * @return void
    */
   function addAttendee($entity,$entity_id,$entity_label, $entity_state) {
-    $this->attendee[$entity][$entity_id] = $entity_label.'('.$GLOBALS["l_".strtolower($entity_state)].')';
+    $this->attendee[$entity][$entity_id] = $entity_label.'('.$GLOBALS["l_".strtolower(str_replace('-', '_', $entity_state))].')';
   }
 
 }

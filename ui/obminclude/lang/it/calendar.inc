@@ -31,12 +31,9 @@ $l_waiting_events = "Appuntamento in attesa ";
 $l_calendar_visible = "Select calendars";
 $l_calendar_displayed = "Calendars displayed";
 
-$l_accepted = "accetta";
-$l_rejected = "respingi";
-$l_waiting  = "In attesa di conferma";
-$l_short_accepted = "A";
-$l_short_rejected = "R";
-$l_short_waiting  = "Att";
+$l_accepted = "Accetta";
+$l_needs_action = "Attesa";
+$l_declined = "Respingi";
 
 $l_daily = "giornaliero";
 $l_weekly = "settimanale";

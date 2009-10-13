@@ -32,8 +32,6 @@ $l_force = "Force insertion";
 $l_waiting_events = "waiting events";
 
 $l_accepted = "Accepted";
-$l_rejected = "Rejected";
-$l_waiting  = "Waiting";
 $l_short_accepted = "A";
 $l_short_rejected = "R";
 $l_short_waiting  = "W";

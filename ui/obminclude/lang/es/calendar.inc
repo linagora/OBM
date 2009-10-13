@@ -46,11 +46,8 @@ $l_selection = "Selección";
 $l_exception = "Exceptions";
 
 $l_accepted = "Aceptar";
-$l_rejected = "Rechazar";
-$l_waiting  = "esperando por confirmación";
-$l_short_accepted = "A";
-$l_short_rejected = "R";
-$l_short_waiting  = "Espere";
+$l_needs_action = "Esperando";
+$l_declined = "Rechazar";
 $l_wait = "Esperando";
 
 $l_daily = "diario";
