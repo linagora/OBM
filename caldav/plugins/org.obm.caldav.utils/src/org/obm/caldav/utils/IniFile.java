@@ -63,7 +63,7 @@ public abstract class IniFile {
 		try {
 			Properties p = new Properties();
 			in = new FileInputStream(f);
-			p.load(new FileInputStream(f));
+			p.load(in);
 			for (Object key : p.keySet()) {
 				settings.put((String) key, p.getProperty((String) key));
 			}

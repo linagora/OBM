@@ -30,11 +30,11 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obm.caldav.obmsync.ObmSyncConfIni;
 import org.obm.caldav.obmsync.provider.ICalendarProvider;
 import org.obm.caldav.server.exception.AuthorizationException;
 import org.obm.caldav.utils.CalDavUtils;
 import org.obm.caldav.utils.Constants;
+import org.obm.locator.client.LocatorClient;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
@@ -47,52 +47,53 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.obm.sync.client.calendar.CalendarClient;
-import org.obm.sync.locators.CalendarLocator;
 
 public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 
 	protected static final Log logger = LogFactory
 			.getLog(AbstractObmSyncProvider.class);
-	protected AbstractEventSyncClient client;
+
+	protected static String urlSync;
+
+	protected static String getObmSyncUrl(String loginAtDomain) {
+		if (urlSync == null) {
+			LocatorClient lc = new LocatorClient();
+			urlSync = "http://"+lc.locateHost("sync/obm_sync", loginAtDomain)+":8080/obm-sync/services";
+			logger.info("locator returned the following url: "+urlSync);
+		}
+		return urlSync;
+	}
+
+	protected abstract AbstractEventSyncClient getClient(String loginAtDomain);
+
+	protected AbstractEventSyncClient getClient(AccessToken token) {
+		return getClient(token.getUser() + "@" + token.getDomain());
+	}
 
 	public static AccessToken login(String username, String password) {
 		logger.info("login in obm-sync");
-		ObmSyncConfIni obmCalendarParameters = new ObmSyncConfIni();
-		String url = obmCalendarParameters
-				.getPropertyValue("obmsync.server.url");
+		String url = getObmSyncUrl(username);
 		CalendarClient client = new CalendarClient(url);
 		return client.login(username, password, "obm-caldav");
 	}
 
 	public static void logout(AccessToken token) {
-		logger.info("logout in obm-sync");
-		ObmSyncConfIni obmCalendarParameters = new ObmSyncConfIni();
-		String url = obmCalendarParameters
-				.getPropertyValue("obmsync.server.url");
-
-		CalendarClient client = new CalendarClient(url);
-		client.logout(token);
+		if (token != null) {
+			logger.info("logout in obm-sync " + token.getUser() + "@"
+					+ token.getDomain());
+			String url = getObmSyncUrl(token.getUser() + "@"
+					+ token.getDomain());
+			CalendarClient client = new CalendarClient(url);
+			client.logout(token);
+		}
 	}
 
 	protected AbstractObmSyncProvider() {
-		ObmSyncConfIni obmCalendarParameters = new ObmSyncConfIni();
-		String url = obmCalendarParameters
-				.getPropertyValue("obmsync.server.url");
-		this.client = getObmSyncClient(url);
-	}
-
-	protected abstract AbstractEventSyncClient getObmSyncClient(String url);
-
-	protected AbstractObmSyncProvider(AbstractEventSyncClient client) {
-		ObmSyncConfIni obmCalendarParameters = new ObmSyncConfIni();
-		String url = obmCalendarParameters
-				.getPropertyValue("obmsync.server.url");
-		this.client = new CalendarLocator().locate(url);
 	}
 
 	public CalendarInfo getMyCalendar(AccessToken token, String userId)
 			throws ServerFault, AuthFault {
-		CalendarInfo[] listCalInfo = client.listCalendars(token);
+		CalendarInfo[] listCalInfo = getClient(token).listCalendars(token);
 		for (CalendarInfo calInfo : listCalInfo) {
 			if (calInfo.getMail().equals(userId)) {
 				return calInfo;
@@ -104,12 +105,12 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 	public Event getEventFromExtId(AccessToken token, String calendar,
 			String extId) throws AuthFault, ServerFault {
 		logger.info("search event with " + extId + "from obm-sync");
-		return client.getEventFromExtId(token, calendar, extId);
+		return getClient(token).getEventFromExtId(token, calendar, extId);
 	}
 
 	public Event createEvent(AccessToken token, String calendar, Event event)
 			throws AuthFault, ServerFault {
-		String uid = client.createEvent(token, calendar, event);
+		String uid = getClient(token).createEvent(token, calendar, event);
 		event.setUid(uid);
 		return event;
 	}
@@ -117,7 +118,7 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 	public List<Event> createEventsFromICS(AccessToken token, String login,
 			String ics, String extId) throws Exception {
 		logger.info("Parse event ics");
-		List<Event> events = client.parseICS(token, ics);
+		List<Event> events = getClient(token).parseICS(token, ics);
 		for (Event event : events) {
 			if (event.getDate() == null) {
 				Calendar cal = new GregorianCalendar();
@@ -133,7 +134,7 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			event.addAttendee(getAttendee(login));
 			fixPrioriryForObm(event);
 			logger.info("Create event with extId " + extId);
-			String uid = client.createEvent(token, login, event);
+			String uid = getClient(token).createEvent(token, login, event);
 			event.setUid(uid);
 		}
 
@@ -146,7 +147,7 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 		List<Event> ret = new LinkedList<Event>();
 
 		String uid = eventOrigin.getUid();
-		List<Event> events = client.parseICS(token, ics);
+		List<Event> events = getClient(token).parseICS(token, ics);
 		for (Event event : events) {
 			event.setExtId(eventOrigin.getExtId());
 			event.setUid(uid);
@@ -162,28 +163,28 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				}
 			}
 			fixPrioriryForObm(event);
-			event = client.modifyEvent(token, login, event, true);
+			event = getClient(token).modifyEvent(token, login, event, true);
 			ret.add(event);
 		}
 		return ret;
 	}
 
 	public String getUserEmail(AccessToken token) throws AuthFault, ServerFault {
-		return client.getUserEmail(token);
+		return getClient(token).getUserEmail(token);
 	}
 
 	public Set<CalendarInfo> getListCalendars(AccessToken token)
 			throws ServerFault, AuthFault {
 
-		Set<CalendarInfo> list = new HashSet<CalendarInfo>(Arrays.asList(client
-				.listCalendars(token)));
+		Set<CalendarInfo> list = new HashSet<CalendarInfo>(Arrays
+				.asList(getClient(token).listCalendars(token)));
 		return list;
 	}
 
 	public List<Event> getAll(AccessToken token, String calendar,
 			EventType eventType) throws ServerFault, AuthFault {
 		logger.info("Get all event from obm-sync");
-		List<Event> events = this.client.getAllEvents(token, calendar,
+		List<Event> events = getClient(token).getAllEvents(token, calendar,
 				eventType);
 
 		for (Iterator<Event> it = events.iterator(); it.hasNext();) {
@@ -204,11 +205,11 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			logger.info("Get ics event with extId " + id + " from obm-sync");
 			Event event = null;
 			if (id != null && !"".equals(id)) {
-				event = client.getEventFromExtId(token, calendar, id);
+				event = getClient(token).getEventFromExtId(token, calendar, id);
 			}
 			if (event != null) {
 				fixPrioriryForTB(event);
-				listICS.put(event, client.parseEvent(token, event));
+				listICS.put(event, getClient(token).parseEvent(token, event));
 			} else {
 				event = new Event();
 				event.setExtId(id);
@@ -223,9 +224,10 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			throws AuthFault, ServerFault, AuthorizationException {
 		logger.info("delete event with uid " + event.getUid()
 				+ " from obm-sync");
-		client.removeEvent(token, login, event.getUid());
+		getClient(token).removeEvent(token, login, event.getUid());
 
-		Event ret = client.getEventFromId(token, login, event.getUid());
+		Event ret = getClient(token).getEventFromId(token, login,
+				event.getUid());
 		if (ret != null) {
 			throw new AuthorizationException();
 		}
@@ -248,7 +250,7 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				}
 			}
 		}
-		client.modifyEvent(token, userId, event, true);
+		getClient(token).modifyEvent(token, userId, event, true);
 	}
 
 	protected Attendee getAttendee(String email) {
@@ -281,41 +283,42 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 
 	public List<EventTimeUpdate> getAllEventTimeUpdate(AccessToken token,
 			String calendar, EventType et) throws ServerFault, AuthFault {
-		List<EventTimeUpdate> events = client.getAllEventTimeUpdate(token,
-				calendar, et);
+		List<EventTimeUpdate> events = getClient(token).getAllEventTimeUpdate(
+				token, calendar, et);
 
 		for (Iterator<EventTimeUpdate> it = events.iterator(); it.hasNext();) {
 			EventTimeUpdate ev = it.next();
-			logger.info("ev "+ev.getUid()+ " "+ev.getRecurrenceId());
+			logger.info("ev " + ev.getUid() + " " + ev.getRecurrenceId());
 			if (ev.getRecurrenceId() != null) {
 				it.remove();
 			}
 		}
 		return events;
 	}
-	
-	public List<EventTimeUpdate> getEventTimeUpdateFromIntervalDate(AccessToken token,
-			String calendar, Date start, Date end) throws ServerFault, AuthFault {
-		return client.getEventTimeUpdateNotRefusedFromIntervalDate(token,
-				calendar, start, end);
+
+	public List<EventTimeUpdate> getEventTimeUpdateFromIntervalDate(
+			AccessToken token, String calendar, Date start, Date end)
+			throws ServerFault, AuthFault {
+		return getClient(token).getEventTimeUpdateNotRefusedFromIntervalDate(
+				token, calendar, start, end);
 	}
 
 	public List<Event> getListEventsFromIntervalDate(AccessToken token,
 			String calendar, Date start, Date end) throws AuthFault,
 			ServerFault {
-		return client
-				.getListEventsFromIntervalDate(token, calendar, start, end);
+		return getClient(token).getListEventsFromIntervalDate(token, calendar,
+				start, end);
 	}
-	
 
 	@Override
-	public boolean hasRightsOnCalendar(AccessToken token, String calendarName) throws AuthFault,
-			ServerFault {
-		return client.isWritableCalendar(token, calendarName);
+	public boolean hasRightsOnCalendar(AccessToken token, String calendarName)
+			throws AuthFault, ServerFault {
+		return getClient(token).isWritableCalendar(token, calendarName);
 	}
-	
-	public Date getLastUpdate(AccessToken token, String calendarName) throws ServerFault, AuthFault{
-		return client.getLastUpdate(token, calendarName);
+
+	public Date getLastUpdate(AccessToken token, String calendarName)
+			throws ServerFault, AuthFault {
+		return getClient(token).getLastUpdate(token, calendarName);
 	}
 
 }

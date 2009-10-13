@@ -35,7 +35,7 @@ function aliasource_equinox_run_server_appid() {
 	exit 1
     }
 
-    exec $JAVA_HOME/bin/java ${JVM_OPTS} -Dosgi.noShutdown=true -cp ${equinox_jar} ${equinox_main_class} \
+    exec $JAVA_HOME/bin/java ${JVM_OPTS} -Dosgi.noShutdown=true -Duser.timzone=GMT -cp ${equinox_jar} ${equinox_main_class} \
     -application $appid_to_run "$@"
 }
 

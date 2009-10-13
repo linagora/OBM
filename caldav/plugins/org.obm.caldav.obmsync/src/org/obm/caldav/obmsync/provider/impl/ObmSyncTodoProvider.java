@@ -49,16 +49,17 @@ public class ObmSyncTodoProvider extends AbstractObmSyncProvider  {
 		super(); 
 	}
 	
+	
 	@Override
-	protected AbstractEventSyncClient getObmSyncClient(String url) {
-		return new TodoClient(url);
+	protected AbstractEventSyncClient getClient(String loginAtDomain) {
+		return new TodoClient(getObmSyncUrl(loginAtDomain));
 	}
 	
 	@Override
 	public EventChanges getSync(AccessToken token, String userId, Date lastSync)
 	throws AuthFault, ServerFault {
 		logger.info("Get sync["+lastSync+"] from obm-sync");
-		return client.getSync(token, userId, lastSync);
+		return getClient(token).getSync(token, userId, lastSync);
 	}
 
 	@Override

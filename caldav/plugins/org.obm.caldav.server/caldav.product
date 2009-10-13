@@ -7,7 +7,7 @@
    </configIni>
 
    <launcherArgs>
-      <vmArgs>-Dosgi.noShutdown=true</vmArgs>
+      <vmArgs>-Dosgi.noShutdown=true -Duser.timezone=GMT</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -47,6 +47,7 @@
       <plugin id="org.obm.caldav.obmsync.lib"/>
       <plugin id="org.obm.caldav.server"/>
       <plugin id="org.obm.caldav.utils"/>
+      <plugin id="org.obm.locator.client"/>
    </plugins>
 
 

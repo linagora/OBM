@@ -51,15 +51,10 @@ public class ObmSyncEventProvider extends AbstractObmSyncProvider  {
 	}
 	
 	@Override
-	protected AbstractEventSyncClient getObmSyncClient(String url) {
-		return new CalendarClient(url);
-	}
-	
-	@Override
 	public EventChanges getSync(AccessToken token, String userId, Date lastSync)
 	throws AuthFault, ServerFault {
 		logger.info("Get sync["+lastSync+"] from obm-sync");
-		return client.getSync(token, userId, lastSync);
+		return getClient(token).getSync(token, userId, lastSync);
 	}
 
 	@Override
@@ -74,5 +69,10 @@ public class ObmSyncEventProvider extends AbstractObmSyncProvider  {
 			String calendar) throws ServerFault, AuthFault {
 		logger.info("Get all EventTimeUpdate from obm-sync");
 		return super.getAllEventTimeUpdate(token, calendar, EventType.VEVENT);
+	}
+
+	@Override
+	protected AbstractEventSyncClient getClient(String loginAtDomain) {
+		return new CalendarClient(getObmSyncUrl(loginAtDomain));
 	}
 }

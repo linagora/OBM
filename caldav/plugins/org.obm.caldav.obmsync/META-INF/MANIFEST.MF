@@ -8,6 +8,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.obm.caldav.obmsync.lib;bundle-version="1.0.0",
  org.obm.caldav.utils;bundle-version="1.0.0",
  org.obm.caldav.server,
- org.apache.commons.logging;bundle-version="1.0.4"
+ org.apache.commons.logging;bundle-version="1.0.4",
+ org.obm.locator.client;bundle-version="2.3.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
