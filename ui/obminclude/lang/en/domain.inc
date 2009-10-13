@@ -61,6 +61,8 @@ $l_domain_confirm_delete = "CAUTION : You will delete a profile ! This operation
 
 $l_mailserver_warn = "You have to create an host of this kind first";
 $l_syncserver_warn = "You have to create an host of this kind first";
+$l_solrserver_warn = "You have to create an host of this kind first";
+
 $l_mailserver = "Mail server";
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';

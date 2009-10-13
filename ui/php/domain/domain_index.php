@@ -78,7 +78,7 @@ if ($action == 'index' || $action == '') {
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
   $prop_q = run_query_domain_properties();
-  $display['detail'] = html_domain_form('','','', null, $prop_q,$params);
+  $display['detail'] = html_domain_form('','','', null, null, $prop_q,$params);
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////

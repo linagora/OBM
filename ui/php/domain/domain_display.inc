@@ -285,9 +285,9 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
     // Get the domain solrservers
     $block_s = '';
     if (is_array($solrservers)) {
-      foreach ($solrservers as $s_id => $syncserver_info) {
+      foreach ($solrservers as $s_id => $solrserver_info) {
 	      // $mailserver_info is an array of info rows about this mail server
-	      foreach ($syncserver_info as $server_info) {
+	      foreach ($solrserver_info as $server_info) {
 	        $name = $server_info['name'];
 	        $ip = $server_info['ip'];
 	        $role = $server_info['role'];
@@ -764,6 +764,11 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
           </tr>
           </table>
       </fieldset>";
+    } else {
+      $dis_solr = "
+        <fieldset class=\"detail infos\">
+          <legend class='warning'>$GLOBALS[l_obm_solr] : $GLOBALS[l_solrserver_warn]</legend>
+        </fieldset>";
     } 
   }
 

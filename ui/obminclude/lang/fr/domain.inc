@@ -61,6 +61,8 @@ $l_mailserver = "Serveur de mail";
 
 $l_mailserver_warn = 'Vous devez créer un hôte de ce type';
 $l_syncserver_warn = 'Vous devez créer un hôte de ce type';
+$l_solrserver_warn = 'Vous devez créer un hôte de ce type';
+
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
