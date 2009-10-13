@@ -34,6 +34,13 @@
     </copy>
     <mkdir dir="${pack}/var/solr/webmail"/>
 
+    <!-- event core -->
+    <mkdir dir="${pack}/etc/solr/conf/event/"/>
+    <copy todir="${pack}/etc/solr/conf/event/">
+      <fileset dir="conf/event" includes="*.xml"/>
+    </copy>
+    <mkdir dir="${pack}/var/solr/event"/>
+
     <copy todir="${pack}/var/solr" file="solr.xml"/>
 
 

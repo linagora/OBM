@@ -3,5 +3,6 @@
   <cores adminPath="null" >
     <core name="default" instanceDir="default"/>
     <core name="webmail" instanceDir="webmail"/>
+    <core name="event" instanceDir="event"/>
   </cores>
 </solr>
