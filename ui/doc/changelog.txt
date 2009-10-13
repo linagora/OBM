@@ -26,6 +26,7 @@ To do
   * #310 fax, desc, categories criteria not ok in people module for user+contact
   * #330 obmSatellite.cf is not handled by debconf
   * #412 Calendar: Private Events : list of attendees are visible
+  * #434 [project] Impossible to set a participant as project manager
   * #449 Account : pb on "solde"
   * #450 Account : pb on "calculate solde"
   * #502 Contact: No test for express postal length 

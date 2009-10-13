@@ -130,9 +130,9 @@ function check_project(form) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_taskadd(form)
 {
-
     return true;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // Select the task add form                                                  //
 ///////////////////////////////////////////////////////////////////////////////
@@ -146,7 +146,7 @@ function check_tasktype(sel_tasktype) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check the add new task form                                                  //
+// Check the add new task form                                               //
 ///////////////////////////////////////////////////////////////////////////////
 function check_task_new(form) {
   if (form.tf_reftask_label.value != \"\") {
@@ -156,6 +156,7 @@ function check_task_new(form) {
     return false;
   }
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check the task update form                                                //
 ///////////////////////////////////////////////////////////////////////////////
@@ -177,10 +178,33 @@ function submit_memberdel(form)
   form.submit();
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Select the project members form                                           //
+///////////////////////////////////////////////////////////////////////////////
+// Set the hidden fields to update (or delete) the user
+function change_status(user_id, user_status, form)
+{
+  for (i = 0; i < form.length; i++) {
+    i_name = form.elements[i].name;
+    i_value = form.elements[i].value;
+
+    if (i_name == \"user_id\")
+      form.elements[i].value = user_id;
+    else if (i_name == \"user_status\")
+      form.elements[i].value = user_status;
+    else if (i_name == \"action\")
+      form.elements[i].value = \"member_update\";
+    else
+      null;
+  }
+
+  form.submit();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Fill the project select input
 ///////////////////////////////////////////////////////////////////////////////
-
 function fill_project(tasktype_id,sel_project,sel_task) {
   current_project = projects[tasktype_id];
   empty_select(sel_project,true);

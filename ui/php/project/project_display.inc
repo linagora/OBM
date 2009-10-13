@@ -1749,12 +1749,12 @@ function html_project_member_form($members_q, $project) {
 
       if ($m_manager) {
 	$rd_manager = "
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" checked />$l_project_manager
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" />$l_member";
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" checked onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" onchange=\"change_status($m_id, 0, f_entity)\" />$l_member";
       } else {
 	$rd_manager = "
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" />$l_project_manager
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" checked />$l_member";
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" checked onchange=\"change_status($m_id, 0, f_entity)\"/>$l_member";
       }
 
       $dis_member .= "
@@ -1778,7 +1778,6 @@ function html_project_member_form($members_q, $project) {
 
   } else {
 
-
     $dis_member = "
       <tr>
        <th>$l_no_members</th>
@@ -1793,7 +1792,7 @@ function html_project_member_form($members_q, $project) {
 
   $block = "
    <form name=\"f_entity\" method=\"post\"
-         action=\"".url_prepare("project_index.php")."\">
+         action=\"".url_prepare('project_index.php')."\">
     
    <div class=\"detail extra\"> 
     <h1>$l_members_info</h1>
