@@ -76,7 +76,7 @@ sub _hostEntity {
         my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
         $return->[1]->{'help'} = [
             $self->getModuleName().' URI must be : /locator/<entity>/<operation>',
-            '<operation> : [add]'
+            '<operation> : [add|del]'
             ];
         return $return;
     }
@@ -86,6 +86,10 @@ sub _hostEntity {
     SWITCH: {
         if( $datas->{'operation'} eq 'add' ) {
             return $self->_addPartition( $datas );
+        }
+
+        if( $datas->{'operation'} eq 'del' ) {
+            return $self->_delPartition( $datas );
         }
     }
 
@@ -112,6 +116,29 @@ sub _addPartition {
         return $return;
     }elsif( $#{$domainList} < 0 ) {
         my $return = $self->_returnStatus( RC_NOT_FOUND, 'No domain linked to host '.$datas->{'hostname'}.' as IMAP service' );
+        return $return;
+    }
+
+    return $self->_updateImapdConf($datas->{'hostname'}, $domainList);
+}
+
+
+sub _delPartition {
+    my $self = shift;
+    my( $datas ) = @_;
+
+    my $regexp = '^\/cyruspartition\/'.$datas->{'entity'}.'\/'.$datas->{'operation'}.'\/([^\/]+)$';
+    if( $datas->{'requestUri'} !~ /$regexp/ ) {
+        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
+        $return->[1]->{'help'} = [ 'Locator URI must be : /cyruspartition/'.$datas->{'entity'}.'/<entityId>' ];
+        return $return;
+    }
+
+    $datas->{'hostname'} = $1;
+
+    my $domainList = $self->_getHostDomains( 'imapHost', $datas->{'hostname'} );
+    if( !defined($domainList) ) {
+        my $return = $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' );
         return $return;
     }
 
@@ -162,6 +189,15 @@ sub _updateImapdConf {
         }else {
             push( @template, $file[$i] );
         }
+    }
+
+    # Keep only default partition
+    while( my($partitionName, $path) = each(%currentPartitions) ) {
+        if( $partitionName eq $defaultPartitionName ) {
+            next;
+        }
+
+        delete($currentPartitions{$partitionName});
     }
 
     if( !defined($defaultPartitionName) ) {
