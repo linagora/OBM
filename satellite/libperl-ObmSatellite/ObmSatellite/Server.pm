@@ -167,7 +167,7 @@ sub _newChildren {
         $self->{'childrens'}->{$pid} = 1;
         $self->{'forkedChildren'}++;
 
-        $self->log( 2, 'new child forked (PID: '.$pid.'), we now have '.$self->{'forkedChildren'}.' children' );
+        $self->log( 2, 'new child forked (PID: '.$pid.'), we now have '.$self->{'forkedChildren'}.' child' );
         return;
     }
     
