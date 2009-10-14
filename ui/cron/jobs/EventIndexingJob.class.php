@@ -115,12 +115,14 @@ class EventIndexingJob extends CronJob {
         WHERE event_domain_id='$domain'";
         
         $db->xquery($query);
+        $db_id = array();
         
         while($db->next_record()) {
           $part = new Apache_Solr_Document();
         
           // id
           $part->setField('id', $db->f('event_id'));
+          array_push($db_id, $db->f('event_id'));
         
           // domain
           $part->setField('domain', $db->f('event_domain_id'));
@@ -183,6 +185,14 @@ class EventIndexingJob extends CronJob {
           $documents[] = $part;
         }
         
+        // Remove deleted event
+        $solr_id = $solr->search("domain:$domain",0, 200000000);
+        foreach ($solr_id->response->docs as $doc ) { 
+          if (!in_array($doc->id, $db_id)) {
+            $solr->deleteById($doc->id);
+          }
+        }
+
         try {
           $solr->addDocuments($documents);
           $solr->commit();
