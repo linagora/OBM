@@ -1715,7 +1715,6 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   global $output_target;
 
   $event = $occurrence->event;
-  $entity = $occurrence->entity;
   $owner = $event->owner;
   $owner_name = phpStringToJsString($event->owner_name);
 
@@ -1773,6 +1772,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $end = $occurrence->end;
   $id = $event->id;
   $entity_id = $occurrence->id;
+  $entity = $occurrence->entity;
   $entity_state = $occurrence->entity_state;
   $all_day = ($event->all_day)?1:0;
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
