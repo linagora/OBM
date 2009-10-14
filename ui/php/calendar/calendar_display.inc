@@ -2602,7 +2602,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_wait, $l_exception, $l_yes, $l_no, $path;
   global $l_carac,$l_module_calendar, $l_items, $ccalendar_alerts;
   global $l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
-  global $l_documents,$l_title,$l_name;
+  global $l_documents,$l_attach_documents,$l_title,$l_name;
   global $l_accepted, $l_needs_action, $l_declined;
   global $ico_add, $ico_delete, $ico_spinner;
 
@@ -2995,8 +2995,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       </fieldset>
       <fieldset class=\"buttons\">
         <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
-        <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
-        <input type=\"submit\" value=\"$l_update\" />
+        <input type=\"hidden\" name=\"action\" id=\"action\" value=\"attach_documents\" />
+        <input type=\"submit\" value=\"$l_attach_documents\" />
       </fieldset>
       </form>";
   }

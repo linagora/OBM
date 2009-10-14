@@ -4473,7 +4473,12 @@ function run_query_insert_other_files($params) {
     $document['kind'] = 1;
     $document['privacy'] = 1;
     
-    $doc_ids[] = run_query_document_insert($document);
+    $doc_id = run_query_document_insert($document);
+    if (!$doc_id) {
+      return false;
+    } else {
+      $doc_ids[] = $doc_id;
+    }
   }
   
   return $doc_ids;

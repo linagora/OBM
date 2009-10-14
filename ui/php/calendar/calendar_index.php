@@ -268,7 +268,11 @@ if ($action == 'search') {
         // Insert "other files" as private documents
         if (is_array($params['other_files'])) {
           $other_files = run_query_insert_other_files($params);
-          $entities['document'] = array_merge($entities['document'], $other_files);
+          if (!$other_files) {
+            $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
+          } else {
+            $entities['document'] = array_merge($entities['document'], $other_files);
+          }
         }
         $event_id = run_query_calendar_add_event($params, $entities);
         $params["calendar_id"] = $event_id;
@@ -378,7 +382,11 @@ if ($action == 'search') {
         // Insert "other files" as private documents
         if (is_array($params['other_files'])) {
           $other_files = run_query_insert_other_files($params);
-          $entities['document'] = array_merge($entities['document'], $other_files);
+          if (!$other_files) {
+            $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
+          } else {
+            $entities['document'] = array_merge($entities['document'], $other_files);
+          }
         }
         run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
 
@@ -628,6 +636,21 @@ if ($action == 'search') {
   json_ok_msg("$l_document : $l_delete_ok");
   echo "({".$display['json']."})";
   exit();
+  
+} elseif ($action == 'attach_documents') {
+///////////////////////////////////////////////////////////////////////////////
+  $doc_ids = isset($params['sel_document_id']) ? $params['sel_document_id'] : array();
+  $event_entity_id = of_entity_get('event', $params['calendar_id']);
+  $other_files = run_query_insert_other_files($params);
+  if (!$other_files) {
+    $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
+  } else {
+    $doc_ids = array_merge($doc_ids, $other_files);
+  }
+  foreach ($doc_ids as $document_id) {
+    run_query_calendar_attach_document($document_id, $event_entity_id);
+  }
+  $display['detail'] .= dis_calendar_event_consult($params['calendar_id']);
 
 } elseif ($action == 'rights_admin') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -860,17 +883,6 @@ if ($action == 'search') {
   $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
   $display['detail'] .= dis_calendar_admin_index($tags_q);
   
-} elseif ($action == 'document_add') {
-///////////////////////////////////////////////////////////////////////////////
-  $params['event_id'] = $params['ext_id'];
-  if ($params['doc_nb'] > 0) {
-    $nb = run_query_global_insert_documents_links($params, 'event');
-    $display['msg'] .= display_ok_msg("$nb $l_document_added");
-  } else {
-    $display['msg'] .= display_err_msg($l_no_document_added);
-  }
-  $display['detail'] .= dis_calendar_event_consult($params['event_id']);
-
 } elseif ($action == 'reset')  {
 ///////////////////////////////////////////////////////////////////////////////
   if(!$params['force']) {
@@ -1637,6 +1649,12 @@ function get_calendar_action() {
   
   // Detach document
   $actions['calendar']['detach_document'] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+  );
+  
+  // Attach documents
+  $actions['calendar']['attach_documents'] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None')
   );

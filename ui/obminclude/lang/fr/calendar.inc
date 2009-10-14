@@ -150,6 +150,7 @@ $l_sendamail = "Notifier les participants";
 $l_calendar_select_group = "Sélectionner les groupes.";
 $l_owner_notification = "Notifier par e-mail l'organisateur de la réunion";
 $l_notification = "Notification";
+$l_attach_documents = "Attacher";
 
 $l_view = "Vue";
 $l_view_default = "Vue Défaut";
@@ -205,6 +206,7 @@ $l_fill_title = "Veuillez remplir le champ [ $l_title ]";
 $l_fill_dateend = "Veuillez remplir le champ [ $l_dateend ]";
 $l_fill_datebegin = "Veuillez remplir le champ [ $l_datebegin ]";
 $l_warn_date_past = "La date de début de l'événement est dans le passé";
+$l_warn_file_upload = "Certains fichiers n'ont pu être téléchargés";
 $l_err_no_calendar_selected = "Aucun agenda séléctionné";
 $l_err_begin_end = "La date de fin doit être supérieure à la date de début";
 $l_err_end_repeat = "La fin de répétition doit être supérieure à la date de fin";

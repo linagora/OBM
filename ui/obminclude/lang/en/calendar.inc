@@ -152,6 +152,7 @@ $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free time slots";
 $l_owner_notification = "Notify event owner";
 $l_notification =  "Notify";
+$l_attach_documents = "Attach";
 
 $l_event_color_tt = "Event's colors are the ones defined during the event creation.";
 
@@ -173,6 +174,8 @@ $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour ";
 $l_fill_title = "You have to fill the [ $l_title ] field";
 $l_fill_dateend = "You have to fill the [ $l_dateend ] field";
 $l_fill_datebegin = "You have to fill the field [ $l_datebegin ]";
+$l_warn_date_past = "Event date begin is in the past";
+$l_warn_file_upload = "Some files could not be uploaded";
 $l_err_no_calendar_selected = "No calendar selected";
 $l_err_begin_end = "End date must be after begin date!";
 $l_err_end_repeat = "Repetion end must be after end date";
