@@ -65,26 +65,57 @@ function dis_calendar_search_result($calendar, $current_view) {
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
 
-  $pattern = array();
+  $events = null;
+
   if ($calendar['searchType'] == 'basic') {
-    $pattern = $calendar['pattern'];
     // Set date_begin == today and date_end == today +3months
     $begin = new Of_Date();
     $end = clone $begin;
     $end->addMonth(3);
-    $block = "<h1>$GLOBALS[l_basic_search_result] \"".stripslashes($pattern)."\"</h1>";
+    $block = "<h1>$GLOBALS[l_basic_search_result] \"".stripslashes($calendar['pattern'])."\"</h1>";
+    $events = run_query_calendar_solr_query(format_name($calendar['pattern'], 1, true));
   } else {
-    $pattern['event_title'] = $calendar['title'];
-    $pattern['event_location'] = $calendar['location'];
-    $pattern['event_description'] = $calendar['desc'];
-    $pattern['eventcategory1_label'] = of_category_get_label('event', 'category1', $calendar['category_filter']);
-    $pattern['owner'] = $calendar['owner'];
-    $pattern['attendee'] = $calendar['attendees'];
-    $pattern['event_tag_id'] = $calendar['tag'];
-    $begin = $calendar['date_begin'];
-    $end = $calendar['date_end'];
+    $begin = clone $calendar['date_begin'];
+    $begin->setHour(0);
+    $begin->setMinute(0);
+    $begin->setSecond(0);
+    $end = clone $calendar['date_end'];
+    $end->setHour(0);
+    $end->setMinute(0);
+    $end->setSecond(0);
+    $end->addDay(1);
+
+    if (isset($calendar['title']) && $calendar['title'] != '') {
+      $pattern = "title:".format_name($calendar['title'], 1, true);
+    }    
+    if (isset($calendar['location']) && $calendar['location'] != '') {
+      $pattern .= " location:".format_name($calendar['location'], 1, true);
+    }    
+    if (isset($calendar['desc']) && $calendar['desc'] != '') {
+      $pattern .= " description:".format_name($calendar['desc'], 1, true);
+    }   
+    if (isset($calendar['owner']) && $calendar['owner'] != '') {
+      $pattern .= " owner:".format_name($calendar['owner'], 1, true);
+    }   
+    if (isset($calendar['attendees']) && $calendar['attendees'] != '') {
+      $pattern .= " with:".format_name($calendar['attendees'], 1, true);
+    }   
+    if (isset($calendar['tag']) && $calendar['tag'] != '') {
+      $pattern .= " tag:$calendar[tag]";
+    }
+    if (isset($calendar['category']) && $calendar['category'] != $GLOBALS['c_all']) {
+      $pattern .= " category:$calendar[category]";
+    }
+
+    // doesn't work with repeated events
+    // $from = $begin->format('Y-m-d\T00:00:00\Z');
+    // $to = $end->format('Y-m-d\T23:59:59\Z');
+    // $pattern .= " date:[$from TO $to]";
+
+    $events = run_query_calendar_solr_query($pattern);
   }
-  $block .= dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $begin, $end, $pattern, $calendar['searchType']);
+
+  $block .= dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $begin, $end, $events);
 
   return $block;
 }
@@ -856,7 +887,7 @@ function dis_calendar_html_search_form($calendar) {
   $location = stripslashes($calendar['location']);
   $desc = stripslashes($calendar['desc']);
   $attendees = stripslashes($calendar['attendees']);
-  $category_filter = $calendar['category_filter'];
+  $category = $calendar['category'];
   $period = $calendar['period'];
   $tag = $calendar['tag'];
   if (!isset($period)) $period = 'today';
@@ -870,7 +901,7 @@ function dis_calendar_html_search_form($calendar) {
   }
 
   $cats1 = of_category_get_ordered('event', 'category1');
-  $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category_filter,'all_f',"",'category_filter');
+  $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category,'all_f',"",'category');
 
   $date_begin = new Of_Date();
 
@@ -952,7 +983,7 @@ function dis_calendar_html_search_form($calendar) {
           <td>$GLOBALS[l_tag]</td>
           <td>$sel_tags</td>
           <td>$GLOBALS[l_datebegin]</td>
-          <td><input type='text' id='tf_date_begin' name='tf_date_begin' value='".$date_begin->getOutputDate()."' class='datePicker' /></td>
+          <td><input type='text' id='tf_date_begin' name='tf_date_begin' value='".$date_begin->getInputDate()."' class='datePicker' /></td>
           <td>
             <input type='radio' id='rd_today' name='rd_period' value='today' onclick='setAdvancedSearchDate(this);' ". ($period=="today" ? "checked" : "") .">
             <label for='rd_today'>$GLOBALS[l_today]</label>
@@ -965,7 +996,7 @@ function dis_calendar_html_search_form($calendar) {
           <td></td>
           <td></td>
           <td>$GLOBALS[l_dateend]</td>
-          <td><input type='text' id='tf_date_end' name='tf_date_end' value='".$date_end->getOutputDate()."' class='datePicker' /></td>
+          <td><input type='text' id='tf_date_end' name='tf_date_end' value='".$date_end->getInputDate()."' class='datePicker' /></td>
           <td>
             <input type='radio' id='rd_this_week' name='rd_period' value='this_week' onclick='setAdvancedSearchDate(this);' ". ($period=="this_week" ? "checked" : "") .">
             <label for='rd_this_week'>$GLOBALS[l_this_week]</label>
@@ -1395,7 +1426,7 @@ function dis_calendar_month_list($current_view, $calendar_entity, $writable_enti
  * @param mixed $calendar_entity 
  * @return event list HTML code
  */
-function dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end, $pattern='',$searchType='') {
+function dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end, $events=null) {
   global $obm;
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
   global $l_desc, $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
@@ -1430,7 +1461,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
   $category_filter = $current_view->get_category_filter();
 
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true,$pattern,$searchType);
+  $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true,$events);
   $today_mark = false;
   $charset = mb_internal_encoding();
 

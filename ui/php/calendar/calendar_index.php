@@ -169,6 +169,7 @@ if ($popup) {
 
 if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
+  include_once('obminclude/lib/Solr/Service.php');
   $display['detail'] .= dis_calendar_search_result($params, $current_view);
 
 } elseif ($action == 'index') {
