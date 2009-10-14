@@ -248,6 +248,7 @@ sub getParameter {
         $self->_log( 'Mise a jour du domaine \''.$parameters->{'domain-name'}.'\' (ID: '.$parameters->{'domain-id'}.')', -1 );
     }else {
         $self->_log( 'Paramétre \'--domain-id\' ou \'--domain-name\' ou \'--domain-global\' manquant ou incorrect', 0 );
+        print STDERR 'Paramétre \'--domain-id\' ou \'--domain-name\' ou \'--domain-global\' manquant ou incorrect'."\n";
         die;
     }
 }
