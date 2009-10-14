@@ -88,10 +88,16 @@ sub _initMode {
         return $self->_initIncremental();
     }
 
-    if( $self->{'mode'} =~ /^PROGRAMMABLE$/ ) {
+    if( $self->{'mode'} =~ /^PROGRAMMABLEWITHOUTDOMAIN$/ ) {
         $self->_log( 'mode d\'exécution programmable', 3 );
         return $self->_initProgrammable();
     }
+
+    if( $self->{'mode'} =~ /^PROGRAMMABLE$/ ) {
+        $self->_log( 'mode d\'exécution programmable', 3 );
+        return $self->_initProgrammable( 1 );
+    }
+
 
     $self->_log( 'mode d\'exécution \''.$self->{'mode'}.'\' incorrect', 3 );
 
@@ -175,11 +181,12 @@ sub _initIncremental {
 
 sub _initProgrammable {
     my $self = shift;
+    my( $withDomain ) = @_;
 
     require OBM::EntitiesFactory::domainFactory;
     my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'SYSTEM', $self->{'domainId'} );
 
-    if( $self->_loadDomains( $entityFactory, 0 ) ) {
+    if( $self->_loadDomains( $entityFactory, $withDomain ) ) {
         return 1;
     }
 

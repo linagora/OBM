@@ -27,7 +27,7 @@ sub new {
         $self->_log( 'Usage: PACKAGE->new(PARAMLIST)', 4 );
         return undef;
     }elsif( !exists($parameters->{'user'}) && !exists($parameters->{'domain-id'}) && !exists($parameters->{'delegation' }) ) {
-        $self->_log( 'Usage: PARAMLIST: table de hachage avec la clé \'domain\' et optionnellement les cles \'user\' ou \'delegation\'', 4 );
+        $self->_log( 'Usage: PARAMLIST: table de hachage avec la clé \'domain-id\' et optionnellement les cles \'user\' ou \'delegation\'', 4 );
         return undef;
     }
 

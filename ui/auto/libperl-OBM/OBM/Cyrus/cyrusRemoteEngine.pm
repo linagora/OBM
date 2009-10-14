@@ -120,5 +120,5 @@ sub delCyrusPartition {
     }
 
 
-    return $obmSatelliteClient->post( $cyrusSrvIp, '/cyruspartition/host/add/'.$cyrusSrvName );
+    return $obmSatelliteClient->post( $cyrusSrvIp, '/cyruspartition/host/del/'.$cyrusSrvName );
 }

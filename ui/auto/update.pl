@@ -26,7 +26,7 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 use Getopt::Long;
 my %parameters;
-my $return = GetOptions( \%parameters, 'user=s', 'domain=s', 'domain-id=s', 'domain-global', 'domain-name=s', 'delegation=s', 'global', 'incremental', 'entity', 'help' );
+my $return = GetOptions( \%parameters, 'user=s', 'domain=s', 'domain-id=s', 'domain-global', 'domain-name=s', 'delegation=s', 'global', 'incremental', 'entity', 'delete', 'help' );
 
 if( !$return ) {
     undef %parameters;
@@ -69,6 +69,12 @@ sub run {
             $update = OBM::Update::updateEntity->new( $parameters );
             last SWITCH;
         }
+
+        if( $parameters->{'delete'} ) {
+            require OBM::Update::deleteDomain;
+            $update = OBM::Update::deleteDomain->new( $parameters );
+            last SWITCH;
+        }
     }
 
     if( !defined($update) ) {
@@ -77,6 +83,8 @@ sub run {
         if( my $code = $update->update() ) {
             $self->_log( 'La mise à jour ne s\'est pas correctement déroulée', 0 );
             return $code;
+        }elsif( $parameters->{'delete'} ) {
+            $self->_log( 'Suppression de domaine terminée avec succés', -1 );
         }else {
             require OBM::updateStateUpdater;
             my $updateState;
@@ -105,6 +113,7 @@ sub getParameter {
         print STDERR "Syntaxe:\n";
         print STDERR "\tupdate.pl [--domain-id id | --domain-name domainName | --domain-global] [--user id | --delegation word] [--global | --incremental]\n";
         print STDERR "\tupdate.pl [--domain-id id | --domain-name domainName | --domain-global] --entity\n";
+        print STDERR "\tupdate.pl [--domain-id id | --domain-name domainName | --domain-global] --delete\n";
         print STDERR "\t\tdomain-id <id> : domaine d'identifiant <id> ;\n";
         print STDERR "\t\tdomain-name <domainName> : domaine de domaine de messagerie <domainName> ;\n";
         print STDERR "\t\tdomain-global : domaine global ;\n";
@@ -113,10 +122,11 @@ sub getParameter {
         print STDERR "\t\tglobal : fait une mise a jour globale du domaine ;\n";
         print STDERR "\t\tincremental : fait une mise a jour incrementale du domaine.\n";
         print STDERR "\t\tentity : fait une mise a jour par entité. Les entités à mettre à jour sont indiquées sur l'entrée standard sous la forme 'type:nom', un par ligne\n";
+        print STDERR "\t\tdelete : suppression d'un domaine.\n";
         print STDERR "\t\t\ttype : [user|mailshare|group|host]\n";
         print STDERR "\t\t\tname : nom/identifiant de l'entité\n";
         print STDERR "Un des paramètres '--domain-id', '--domain-name' ou '--domain-global' doit être indiqué. '--domain-id' est prioritaire.\n";
-        print STDERR "Un et un seul des paramètres '--global', '--incremental' ou '--entity' peuvent être indiqués à la fois.\n";
+        print STDERR "Un et un seul des paramètres '--global', '--incremental', '--entity' ou '--delete' peuvent être indiqués à la fois.\n";
 
         exit 0;
     };
@@ -125,40 +135,6 @@ sub getParameter {
     if( exists( $parameters->{'help'} ) ) {
         die;
     }
-
-    SWITCH: {
-        if( $parameters->{'domain-id'} ) {
-            last SWITCH;
-        }
-
-        # --domain is deprecated from OBM 2.3 and may be remove on OBM 2.4
-        if( $parameters->{'domain'} ) {
-            $parameters->{'domain-id'} = $parameters->{'domain'};
-            last SWITCH;
-        }
-
-        if( exists($parameters->{'domain-global'}) ) {
-            $self->_log( 'Obtention de l\'ID du domaine global', 3 );
-            $parameters->{'domain-id'} = $self->_getGlobalDomainId();
-            last SWITCH;
-        }
-
-        if( $parameters->{'domain-name'} ) {
-            $self->_log( 'Obtention de l\'ID du domaine \''.$parameters->{'domain-name'}.'\'', 3 );
-            $parameters->{'domain-id'} = $self->_getNameDomainId( $parameters->{'domain-name'} );
-            last SWITCH;
-        }
-    }
-
-    if( defined($parameters->{'domain-id'}) && ($parameters->{'domain-id'} =~ /^[0-9]+$/) ) {
-        $self->_log( 'Mise a jour du domaine d\'identifiant \''.$parameters->{'domain-id'}.'\'', -1 );
-        delete($parameters->{'domain-global'});
-        delete($parameters->{'domain-name'});
-    }else {
-        $self->_log( 'Paramétre \'--domain-id\' manquant ou incorrect', 0 );
-        die;
-    }
-
 
     my $mode = 0;
     if( $parameters->{'incremental'} ) {
@@ -173,6 +149,11 @@ sub getParameter {
 
     if( $parameters->{'entity'} ) {
         $parameters->{'entity'} = 1;
+        $mode++;
+    }
+
+    if( $parameters->{'delete'} ) {
+        $parameters->{'delete'} = 1;
         $mode++;
     }
 
@@ -198,6 +179,13 @@ sub getParameter {
     }
 
     SWITCH: {
+        if( $parameters->{'delete'} ) {
+            delete($parameters->{'user'});
+            delete($parameters->{'delegation'});
+            last SWITCH;
+        }
+
+
         if( $parameters->{'incremental'} || $parameters->{'global'} ) {
             if( exists($parameters->{'user'}) ) {
                 if( exists($parameters->{'delegation'}) ) {
@@ -226,11 +214,48 @@ sub getParameter {
             last SWITCH;
         }
     }
+
+
+    SWITCH: {
+        if( $parameters->{'domain-id'} ) {
+            $self->_log( 'Obtention du nom du domaine d\'ID \''.$parameters->{'domain-id'}.'\'', 3 );
+            $parameters->{'domain-name'} = $self->_getIdDomainName( $parameters->{'domain-id'}, $parameters->{'delete'} );
+            last SWITCH;
+        }
+
+        # --domain is deprecated from OBM 2.3 and may be remove on OBM 2.4
+        if( $parameters->{'domain'} ) {
+            $parameters->{'domain-id'} = $parameters->{'domain'};
+            $self->_log( 'Obtention du nom du domaine d\'ID \''.$parameters->{'domain-id'}.'\'', 3 );
+            $parameters->{'domain-name'} = $self->_getIdDomainName( $parameters->{'domain-id'}, $parameters->{'delete'} );
+            last SWITCH;
+        }
+
+        if( exists($parameters->{'domain-global'}) ) {
+            $self->_log( 'Obtention de l\'ID du domaine global', 3 );
+            ( $parameters->{'domain-id'}, $parameters->{'domain-name'} ) = $self->_getGlobalDomainId( $parameters->{'delete'} );
+            last SWITCH;
+        }
+
+        if( $parameters->{'domain-name'} ) {
+            $self->_log( 'Obtention de l\'ID du domaine \''.$parameters->{'domain-name'}.'\'', 3 );
+            $parameters->{'domain-id'} = $self->_getNameDomainId( $parameters->{'domain-name'}, $parameters->{'delete'} );
+            last SWITCH;
+        }
+    }
+
+    if( defined($parameters->{'domain-id'}) && ($parameters->{'domain-id'} =~ /^[0-9]+$/) ) {
+        $self->_log( 'Mise a jour du domaine \''.$parameters->{'domain-name'}.'\' (ID: '.$parameters->{'domain-id'}.')', -1 );
+    }else {
+        $self->_log( 'Paramétre \'--domain-id\' ou \'--domain-name\' ou \'--domain-global\' manquant ou incorrect', 0 );
+        die;
+    }
 }
 
 
 sub _getGlobalDomainId {
     my $self = shift;
+    my( $productionTable ) = @_;
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -240,8 +265,14 @@ sub _getGlobalDomainId {
         return undef;
     }
 
-    my $query = 'SELECT Domain.domain_id
-                    FROM Domain
+    my $table = 'Domain';
+    if( $productionTable ) {
+        $table = 'P_'.$table;
+    }
+
+    my $query = 'SELECT '.$table.'.domain_id,
+                    '.$table.'.domain_name
+                    FROM '.$table.'
                     WHERE domain_global
                     LIMIT 1';
 
@@ -255,13 +286,13 @@ sub _getGlobalDomainId {
     my $rowResult = $sth->fetchrow_hashref();
     $sth->finish();
 
-    return $rowResult->{'domain_id'};
+    return ($rowResult->{'domain_id'}, $rowResult->{'domain_name'});
 }
 
 
 sub _getNameDomainId {
     my $self = shift;
-    my( $domainName ) = @_;
+    my( $domainName, $productionTable ) = @_;
 
     if( !defined($domainName) ) {
         return undef;
@@ -275,8 +306,13 @@ sub _getNameDomainId {
         return undef;
     }
 
-    my $query = 'SELECT Domain.domain_id
-                    FROM Domain
+    my $table = 'Domain';
+    if( $productionTable ) {
+        $table = 'P_'.$table;
+    }
+
+    my $query = 'SELECT '.$table.'.domain_id
+                    FROM '.$table.'
                     WHERE domain_name=\''.$domainName.'\'
                     LIMIT 1';
 
@@ -290,6 +326,45 @@ sub _getNameDomainId {
     $sth->finish();
 
     return $rowResult->{'domain_id'};
+}
+
+
+sub _getIdDomainName {
+    my $self = shift;
+    my( $domainId, $productionTable ) = @_;
+
+    if( !defined($domainId) ) {
+        return undef;
+    }
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return undef;
+    }
+
+    my $table = 'Domain';
+    if( $productionTable ) {
+        $table = 'P_'.$table;
+    }
+
+    my $query = 'SELECT '.$table.'.domain_name
+                    FROM '.$table.'
+                    WHERE domain_id=\''.$domainId.'\'
+                    LIMIT 1';
+
+    my $sth;
+    if( !defined($dbHandler->execQuery( $query, \$sth )) ) {
+        $self->_log( 'Impossible de charger le nom du domaine OBM ayant pour domaine ID \''.$domainId.'\'', 3 );
+        return 1;
+    }
+
+    my $rowResult = $sth->fetchrow_hashref();
+    $sth->finish();
+
+    return $rowResult->{'domain_name'};
 }
 
 

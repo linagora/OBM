@@ -63,7 +63,7 @@ sub _getEntities {
         }
 
         require OBM::entitiesFactory;
-        my $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLE', $domainId );
+        my $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLEWITHOUTDOMAIN', $domainId );
         if( !defined($entitiesFactory) ) {
             $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
             $errorCode = 1;

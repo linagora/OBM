@@ -342,7 +342,7 @@ sub _enqueueLinkedEntitiesFactory {
 
     if( !defined($self->{'linkedEntitiesFactory'}) ) {
         require OBM::entitiesFactory;
-        $self->{'linkedEntitiesFactory'} = OBM::entitiesFactory->new( 'PROGRAMMABLE', $self->{'currentEntity'}->getDomainId() );
+        $self->{'linkedEntitiesFactory'} = OBM::entitiesFactory->new( 'PROGRAMMABLEWITHOUTDOMAIN', $self->{'currentEntity'}->getDomainId() );
         if( !defined($self->{'linkedEntitiesFactory'}) ) {
             $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
             return 1;

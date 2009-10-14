@@ -408,7 +408,7 @@ sub _imapSetMailboxAcls {
     }
 
     my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
-    if( !defined($cyrusSrv) || !defined($entity) ) {
+    if( !defined($cyrusSrv) ) {
         return 1;
     }
 
@@ -431,14 +431,14 @@ sub _imapSetMailboxAcls {
     my $boxPattern = $boxPrefix.$boxName;
     my @boxStruct = $cyrusSrv->listmailbox( $boxPattern, '' );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 2 );
+        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 0 );
         return 1;
     }
 
     $boxPattern =~ s/(@.*)$/\/*$1/;
     push( @boxStruct, $cyrusSrv->listmailbox( $boxPattern, '' ) );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 2 );
+        $self->_log( 'erreur Cyrus a l\'obtention de la structure de la BAL : '.$cyrusSrv->error(), 2 );
         return 1;
     }
 
@@ -731,7 +731,7 @@ sub _imapSetMailboxAcl {
 
     $cyrusSrvConn->setaclmailbox( $boxName, $boxRightUser => $imapRight );
     if( $cyrusSrvConn->error() ) {
-        $self->_log( 'erreur Cyrus au positionnement des ACLs de la BAL : '.$cyrusSrvConn->error(), 3 );
+        $self->_log( 'erreur Cyrus au positionnement des ACLs de la BAL \''.$boxName.'\' : '.$cyrusSrvConn->error(), 0 );
         return 1;
     }
 

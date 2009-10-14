@@ -116,7 +116,7 @@ sub _updateInitFactory {
 
     require OBM::entitiesFactory;
     $self->_log( 'initialisation de l\'entity factory', 2 );
-    if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'PROGRAMMABLE', $self->{'domainId'} )) ) {
+    if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'PROGRAMMABLEWITHOUTDOMAIN', $self->{'domainId'} )) ) {
         $self->_log( 'echec de l\'initialisation de l\'entity factory', 0 );
         return 1;
     }

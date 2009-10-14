@@ -169,7 +169,7 @@ sub _initFactories {
         $self->_log( 'initialisation de l\'entity factory pour le domaine '.$domainIdList->[$i], 2 );
 
         my $entitiesFactory;
-        if( !( $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLE', $domainIdList->[$i], undef, undef ) ) ) {
+        if( !( $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLEWITHOUTDOMAIN', $domainIdList->[$i], undef, undef ) ) ) {
             $self->_log( 'echec de l\'initialisation de l\'entity factory pour le domaine d\'ID '.$domainIdList->[$i], 0 );
             return 1;
         }
