@@ -1055,6 +1055,11 @@ function dis_deal_form($deal) {
     $deal['company_id'] = $deal_q->f('deal_company_id');
     $users = array($obm['uid'], $deal_q->f('deal_marketingmanager_id'), $deal_q->f('deal_technicalmanager_id'), );
     $dc = get_deal_dealcompany_info($deal['deal_id']);
+  } else if ($action == 'duplicate') {
+    $deal_q = run_query_deal_detail($deal['deal_id']);
+    $deal['company_id'] = $deal_q->f('deal_company_id');
+    $users = array($obm['uid'], $deal_q->f('deal_marketingmanager_id'), $deal_q->f('deal_technicalmanager_id'), );
+    $dc = get_deal_dealcompany_info($deal['deal_id']);
   } else if ($action == 'update') {
     $users = array($obm['uid'], $deal['market'], $deal['tech']);
     $deal_q = '';
@@ -1119,7 +1124,7 @@ function dis_deal_form($deal) {
 //   - deal[]     : default or transmitted values
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $users_c,$users_p,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
-  global $ico_company,$ico_contact,$ico_add, $l_header_new_f;
+  global $ico_company,$ico_contact,$ico_add, $l_header_new_f, $l_aduplicate;
   global $c_php_isodate_format,$l_deal,$l_update,$l_insert, $l_private;
   global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label;
   global $l_number, $l_type, $l_region, $l_todo;
@@ -1136,7 +1141,7 @@ function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $users_c,
   $comp_id = $deal['company_id'];
 
   // if update mode and first time, values are taken from db
-  if ($action == 'detailupdate') {
+  if (($action == 'detailupdate') || ($action == 'duplicate')) {
     $id = $deal_q->f('deal_id');
     $pid = $deal_q->f('deal_parentdeal_id');
     $usercreate = $deal_q->f('deal_usercreate');
@@ -1171,7 +1176,11 @@ function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $users_c,
     $ad1 = $deal_q->f('company_address1');
     $zip = $deal_q->f('company_zipcode');
     $town = $deal_q->f('company_town');
-    $dis_title = $label;
+    if ($action == 'detailupdate') {
+      $dis_title = $label;
+    } else if ($action == 'duplicate') {
+      $dis_title = "$label ($l_aduplicate)";
+    }
   } elseif (($action == 'new') || ($action == 'insert')) {
     $comp = $comp_q->f('company_name');
     $ad1 = $comp_q->f('company_address1');
@@ -1459,9 +1468,7 @@ $js_status_loop
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"deal_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />";
-  }
- 
-  else {
+  } else {
     $dis_button1 = "<input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"hidden\" name=\"lead_id\" value=\"$deal[lead_id]\" />
@@ -1617,7 +1624,6 @@ $js_status_loop
       $dis_comment
   </fieldset>
  
-
   <fieldset class=\"buttons\">
     $dis_button1   
   </fieldset>
