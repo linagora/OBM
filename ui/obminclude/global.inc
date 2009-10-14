@@ -579,6 +579,7 @@ $cdg_param = 2;  // parameter display
 $cdg_sess = 4;   // session display
 $cdg_sql = 8;    // sql query display
 $cdg_exe = 16;   // program execution
+$cdg_solr = 32;   // solr query display
 
 // Date constants
 $c_php_isodate_format = 'Y-m-d';  // AAAA-MM-JJ iso format for php date()
@@ -780,6 +781,18 @@ function display_debug_msg($msg, $debug=0, $function_name='') {
   return $global_dis_debug_msg;
 }  
 
+function display_debug_solr($msg, $debug=0, $function_name='') {
+  global $global_dis_debug_solr, $cdg_solr;
+
+  if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $debug) == $debug)) {
+    if($debug == $cdg_solr) {
+      $msg = DB_OBM::xParser($msg);
+    }
+    $global_dis_debug_solr .= "<b>$function_name</b> : $msg<hr />";
+  }
+
+  return $global_dis_debug_solr;
+}  
 
 function display_debug_variables() {
   global  $global_dis_debug_custom;

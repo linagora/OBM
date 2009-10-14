@@ -196,6 +196,7 @@ $l_emitted = "Emis";
 $l_recursive = "Récursif";
 $l_hour = "Heure";
 $l_type = "Type";
+$l_solr_connection_err = "Error lors de la connexion au serveur d'indexation";
 
 $l_addressbook = "Carnet d'adresses";
 $l_contacts = "Mes contacts";
@@ -575,6 +576,7 @@ $l_dg_param = "Paramètres";
 $l_dg_sess = "Session";
 $l_dg_sql = "SQL";
 $l_dg_exe = "Exec";
+$l_dg_solr = "Solr";
 
 $l_all_aliases = "Tous les alias";
 $l_timezone = "Fuseau horaire";

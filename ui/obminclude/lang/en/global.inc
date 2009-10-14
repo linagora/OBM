@@ -193,6 +193,8 @@ $l_search = "Search";
 $l_advanced_search = "Advanced search";
 $l_hide_advanced_search = "Hide search options";
 $l_basic_search = "Basic search";
+$l_solr_connection_err = "Indexing server connection error";
+
 
 $l_addressbook = "Addressbook";
 $l_contacts = "My contacts";
@@ -559,6 +561,7 @@ $l_dg_param = "Parameters";
 $l_dg_sess = "Session";
 $l_dg_sql = "SQL";
 $l_dg_exe = "Exec";
+$l_dg_solr = "Solr";
 
 $l_all_aliases = "All aliases";
 $l_timezone = "Timezone";

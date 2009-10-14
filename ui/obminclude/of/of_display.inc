@@ -1548,15 +1548,22 @@ function display_record_info($obm_q) {
 // Display : debug
 ///////////////////////////////////////////////////////////////////////////////
 function display_debug() {
-  global $l_dg_sql, $l_dg_param, $l_dg_sess,$global_dis_debug_custom;
-  global $global_dis_debug_msg, $global_dis_debug_param, $dis_session;
-  global $cdg_param, $cdg_sql, $cdg_exe, $cdg_sess;
+  global $l_dg_sql, $l_dg_param, $l_dg_sess, $l_dg_solr, $global_dis_debug_custom;
+  global $global_dis_debug_msg, $global_dis_debug_solr, $global_dis_debug_param, $dis_session;
+  global $cdg_param, $cdg_sql, $cdg_exe, $cdg_sess, $cdg_solr;
 
   if (debug_level_isset($cdg_sql) || debug_level_isset($cdg_exe)) {
     $dis_debug_sql = "
       <h1>$l_dg_sql</h1>
       $global_dis_debug_msg";
   }
+
+  if (debug_level_isset($cdg_solr)) {
+    $dis_debug_solr = "
+      <h1>$l_dg_solr</h1>
+      $global_dis_debug_solr";
+  }
+
     
   if (debug_level_isset($cdg_param)) {
     $dis_debug_param = "
@@ -1571,7 +1578,7 @@ function display_debug() {
   }
   if ($_SESSION['set_debug'] > 0) {
     $dis_debug_custom = "
-      <h1>=>$l_dg_custom</h1>
+      <h1>$l_dg_custom</h1>
       $global_dis_debug_custom";
   }
   
@@ -1580,6 +1587,7 @@ function display_debug() {
       <div class=\"debug\">".
       $dis_session_content.
       $dis_debug_sql.
+      $dis_debug_solr.
       $dis_debug_param.
       $dis_debug_custom.
       "</div>";

@@ -51,7 +51,7 @@ if ($params['theme'] != '') {
 if ($params['form_user_pref']) {
 
   if ($perm->check_right($module, $cright_write_admin)) {
-    $set_debug = $params['debug_id'] | $params['debug_param'] | $params['debug_sess'] | $params['debug_sql'] | $params['debug_exe'];
+    $set_debug = $params['debug_id'] | $params['debug_param'] | $params['debug_sess'] | $params['debug_sql'] | $params['debug_exe'] | $params['debug_solr'];
     $_SESSION['set_debug'] = $set_debug;
     update_user_pref($obm['uid'], 'set_debug', $_SESSION['set_debug']);
   }
@@ -175,6 +175,7 @@ if (($_SESSION['set_debug'] & $cdg_param) == $cdg_param) $dg_param = 'checked';
 if (($_SESSION['set_debug'] & $cdg_sess) == $cdg_sess) $dg_sess = 'checked';
 if (($_SESSION['set_debug'] & $cdg_sql) == $cdg_sql) $dg_sql = 'checked';
 if (($_SESSION['set_debug'] & $cdg_exe) == $cdg_exe) $dg_exe = 'checked';
+if (($_SESSION['set_debug'] & $cdg_solr) == $cdg_solr) $dg_solr = 'checked';
 
 if ($_SESSION['set_menu'] == $cme_txt) $me_txt = 'checked';
 if ($_SESSION['set_menu'] == $cme_ico) $me_ico = 'checked';
@@ -239,6 +240,7 @@ if ($perm->check_right($module, $cright_write_admin)) {
       <input type=\"checkbox\" class=\"box\" name=\"debug_sess\" value=\"$cdg_sess\" $dg_sess />$l_dg_sess
       <input type=\"checkbox\" class=\"box\" name=\"debug_sql\" value=\"$cdg_sql\" $dg_sql />$l_dg_sql
       <input type=\"checkbox\" class=\"box\" name=\"debug_exe\" value=\"$cdg_exe\" $dg_exe />$l_dg_exe
+      <input type=\"checkbox\" class=\"box\" name=\"debug_solr\" value=\"$cdg_solr\" $dg_solr />$l_dg_solr
     </td>
   </tr>";
 }
