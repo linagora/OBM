@@ -186,7 +186,7 @@ class EventIndexingJob extends CronJob {
         }
         
         // Remove deleted event
-        $solr_id = $solr->search("domain:$domain",0, 200000000);
+        $solr_id = $solr->search("domain:$domain",0, $db->num_rows());
         foreach ($solr_id->response->docs as $doc ) { 
           if (!in_array($doc->id, $db_id)) {
             $solr->deleteById($doc->id);
