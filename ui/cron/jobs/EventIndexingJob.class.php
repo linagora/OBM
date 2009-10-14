@@ -104,6 +104,7 @@ class EventIndexingJob extends CronJob {
           event_allday,
           event_repeatkind,
           event_opacity,
+          event_privacy,
           eventlink_state,
           #CONCAT(userobm_lastname, ' ', userobm_firstname) as owner 
         FROM Event
@@ -166,6 +167,9 @@ class EventIndexingJob extends CronJob {
             $part->setMultiValue('is', 'busy');
           } elseif ($db->f('event_opacity') == 'TRANSPARENT') {
             $part->setMultiValue('is', 'free');
+          }
+          if ($db->f('event_privacy')) {
+            $part->setMultiValue('is', 'private');
           }
         
           $obm['domain_id'] = $db->f('event_domain_id'); 
