@@ -38,7 +38,7 @@ obm-web = false
 obm-contact = false
 
 ; singleNameSpace mode is anaivalable from OBM 2.3
-; Read XXXX file for migration instructions
+; Read /'etc/imapd.conf' and '/etc/saslauthd.conf' file for migration instructions
 
 ; backupRoot is the directory used to store backup data
 backupRoot = "/var/lib/obm/backup"
