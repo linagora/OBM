@@ -2963,14 +2963,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   
   $docs = $entities['document'];
   if (is_array($docs['entity'])) {
-    /*foreach ($docs['entity'] as $d_id => $entity) {
-      $link = "$path/document/document_index.php?action=accessfile&document_id=$d_id&popup=1";
-      $dis_document_list .= "
-        <tr>
-        <td><a href=\"$link\">$entity[title]</a></td>
-        <td>$entity[name]</td>
-        </tr>";
-    }*/
     $dis_document_list = '';
     $event_entity_id = $event_q->f('event_entity_id');
     foreach ($docs['entity'] as $d_id => $entity) {
@@ -2985,38 +2977,38 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $dis_document_list.= "<li>$content</li>";
       }
     }
-    
-    if ($display_documents_form) {
-      $dis_document_form = "
-        <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\" action=\"calendar_index.php\">
-        <fieldset class=\"detail\">
-        <legend>Ajouter des documents</legend>
-        <table>
-          ".html_calendar_documents_form_fieldset()."
-        </table>
-        <script type=\"text/javascript\">
-          obm.initialize.chain(function () {
-            new obm.AutoComplete.Search('$path/document/document_index.php?action=ext_search', 'sel_document_id', 'documentSearch');
-          });
-        </script>
-        </fieldset>
-        <fieldset class=\"buttons\">
-          <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
-          <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
-          <input type=\"submit\" value=\"$l_update\" />
-        </fieldset>
-        </form>";
-    }
-
-    $dis_document_block = "
-      <div class=\"detail infos\">
-      <h1>$l_documents</h1>
-      <ul>
-      $dis_document_list
-      </ul>
-      $dis_document_form
-      </div>";
   }
+    
+  if ($display_documents_form) {
+    $dis_document_form = "
+      <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\" action=\"calendar_index.php\">
+      <fieldset class=\"detail\">
+      <legend>Ajouter des documents</legend>
+      <table>
+        ".html_calendar_documents_form_fieldset()."
+      </table>
+      <script type=\"text/javascript\">
+        obm.initialize.chain(function () {
+          new obm.AutoComplete.Search('$path/document/document_index.php?action=ext_search', 'sel_document_id', 'documentSearch');
+        });
+      </script>
+      </fieldset>
+      <fieldset class=\"buttons\">
+        <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
+        <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
+        <input type=\"submit\" value=\"$l_update\" />
+      </fieldset>
+      </form>";
+  }
+
+  $dis_document_block = "
+    <div class=\"detail infos\">
+    <h1>$l_documents</h1>
+    <ul>
+    $dis_document_list
+    </ul>
+    $dis_document_form
+    </div>";
 
 
   // --- HTML Template --------------------------------------------------------
