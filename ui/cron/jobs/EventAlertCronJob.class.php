@@ -215,10 +215,12 @@ class EventAlertCronJob extends CronJob{
       $entity = $nr_q->f("eventlink_entity");
       $entity_id = $nr_q->f("eventlink_entity_id");
       $owner = $nr_q->f("event_owner");
+      $opacity = $nr_q->f('event_opacity');
+      $tag = $nr_q->f('eventtag_id');
       if (isset($of->events[$id])) {
         $event = &$of->events[$id];
       } else {
-        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner, '',$color);
+        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner, '',$color,$opacity,$tag);
       }
       $this->logger->debug("$entity $entity_id ($entity_label) added on event ".$event->id);
       $event->addAttendee($entity,$entity_id,$entity_label,$state);
@@ -262,13 +264,15 @@ class EventAlertCronJob extends CronJob{
       $entity_label = $r_q->f('userobm_lastname') .' '.$r_q->f('userobm_firstname');
       $state = $r_q->f('eventlink_state');
       $timezone = $r_q->f('event_timezone');
+      $opacity = $r_q->f('event_opacity');
+      $tag = $r_q->f('eventtag_id');
       if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
         $endrepeat = $end;
       }
       if (isset($of->events[$id])) {
         $event = $of->events[$id];
       } else {
-        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,'',$color);
+        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,'',$color,$opacity,$tag);
         $event->setTimezone($timezone);
       }
       $this->logger->debug("$entity $entity_id ($entity_label) added on event ".$event->id);
