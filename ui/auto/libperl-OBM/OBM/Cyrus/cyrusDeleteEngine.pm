@@ -142,11 +142,18 @@ sub _listDomainMailboxes {
     my @domainBoxes;
     push( @domainBoxes, $cyrusSrv->listmailbox( '*@'.$domainName, '' ) );
 
-    while( ref( my $mailbox = shift( @domainBoxes ) ) eq 'ARRAY' ) {
+    my $mailbox;
+    while( ref( $mailbox = shift( @domainBoxes ) ) eq 'ARRAY' ) {
+        if( $mailbox->[0] =~ /[^\@]/ ) {
+            $mailbox->[0] .= '@'.$domainName;
+        }
+
         if( $mailbox->[0] =~ /^((user\/[^\/]+)|[^user\/].+)\@$domainName$/ ) {
             push( @domainBoxes, $mailbox->[0] );
         }
     }
+
+    unshift( @domainBoxes, $mailbox ) if $mailbox;
 
     return \@domainBoxes;
 }

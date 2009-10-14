@@ -86,6 +86,8 @@ sub _init {
             $self->_log( 'Nom actuel du mailshare \''.$mailshareDesc->{'mailshare_name_current'}.'\' incorrect', 0 );
             return 1;
         }
+    }else {
+        $mailshareDesc->{'mailshare_name_current'} = $mailshareDesc->{'mailshare_name_new'};
     }
 
     # OBM Domain
@@ -123,13 +125,9 @@ sub _init {
     # LDAP BAL destination
     $mailshareDesc->{'mailshare_ldap_mailbox'} = '+'.$mailshareDesc->{'mailshare_name_new'}.'@'.$self->{'parent'}->getDesc('domain_name');
     # Cyrus BAL destination
-    $mailshareDesc->{'mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name_new'};
+    $mailshareDesc->{'mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name_new'}.'@'.$self->{'parent'}->getDesc('domain_name');
     # Current Cyrus BAL destination
-    $mailshareDesc->{'current_mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name_current'};
-    if( !$OBM::Parameters::common::singleNameSpace ) {
-        $mailshareDesc->{'mailshare_cyrus_mailbox'} .= '@'.$self->{'parent'}->getDesc('domain_name');
-        $mailshareDesc->{'current_mailshare_cyrus_mailbox'} .= '@'.$self->{'parent'}->getDesc('domain_name');
-    }
+    $mailshareDesc->{'current_mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name_current'}.'@'.$self->{'parent'}->getDesc('domain_name');
 
     # Cyrus partition
     if( $OBM::Parameters::common::cyrusDomainPartition ) {
@@ -151,11 +149,7 @@ sub _init {
                     $folder =~ s/^\s+//;
 
                     $folderName .= '/'.$folder;
-                    if( !$singleNameSpace ) {
-                        push( @{$mailshareDesc->{mailbox_folders}}, $folderName.'@'.$self->{'parent'}->getDesc('domain_name') );
-                    }else {
-                        push( @{$mailshareDesc->{mailbox_folders}}, $folderName );
-                    }
+                    push( @{$mailshareDesc->{mailbox_folders}}, $folderName.'@'.$self->{'parent'}->getDesc('domain_name') );
                 }
             }
         }

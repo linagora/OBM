@@ -37,11 +37,8 @@ obm-samba = false
 obm-web = false
 obm-contact = false
 
-; singleNameSpace mode allow only one domain
-; login are 'login' and not 'login@domain'
-; Going multi-domain from mono domain needs system work (ldap, cyrus,...)
-; Multi-domain disabled by default
-singleNameSpace = false
+; singleNameSpace mode is anaivalable from OBM 2.3
+; Read XXXX file for migration instructions
 
 ; backupRoot is the directory used to store backup data
 backupRoot = "/var/lib/obm/backup"

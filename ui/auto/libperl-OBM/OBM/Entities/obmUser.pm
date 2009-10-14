@@ -275,13 +275,9 @@ sub _init {
     # LDAP BAL destination
     $userDesc->{'userobm_ldap_mailbox'} = $userDesc->{'userobm_login_new'}.'@'.$self->{'parent'}->getDesc('domain_name');
     # Cyrus BAL destination
-    $userDesc->{'userobm_cyrus_mailbox'} = $userDesc->{'userobm_login_new'};
+    $userDesc->{'userobm_cyrus_mailbox'} = $userDesc->{'userobm_login_new'}.'@'.$self->{'parent'}->getDesc('domain_name');
     # Current Cyrus BAL destination
-    $userDesc->{'current_userobm_cyrus_mailbox'} = $userDesc->{'userobm_login_current'};
-    if( !$OBM::Parameters::common::singleNameSpace ) {
-        $userDesc->{'userobm_cyrus_mailbox'} .= '@'.$self->{'parent'}->getDesc('domain_name');
-        $userDesc->{'current_userobm_cyrus_mailbox'} .= '@'.$self->{'parent'}->getDesc('domain_name');
-    }
+    $userDesc->{'current_userobm_cyrus_mailbox'} = $userDesc->{'userobm_login_current'}.'@'.$self->{'parent'}->getDesc('domain_name');
 
     # Cyrus partition
     if( $OBM::Parameters::common::cyrusDomainPartition ) {
@@ -303,11 +299,7 @@ sub _init {
                     $folder =~ s/^\s+//;
 
                     $folderName .= '/'.$folder;
-                    if( !$OBM::Parameters::common::singleNameSpace ) {
-                        push( @{$userDesc->{'mailbox_folders'}}, $folderName.'@'.$self->{'parent'}->getDesc('domain_name') );
-                    }else {
-                        push( @{$userDesc->{'mailbox_folders'}}, $folderName );
-                    }
+                    push( @{$userDesc->{'mailbox_folders'}}, $folderName.'@'.$self->{'parent'}->getDesc('domain_name') );
                 }
             }
         }

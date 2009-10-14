@@ -210,9 +210,7 @@ sub _getEntityRight {
         }
 
         while( my( $userId, $userLogin ) = $queryResult->fetchrow_array ) {
-            if( defined($domainName) && !$OBM::Parameters::common::singleNameSpace ) {
-                $userLogin .= '@'.$domainName;
-            }
+            $userLogin .= '@'.$domainName;
 
             # Si l'utilisateur n'a pas déjà été trouvé, on l'initialise
             # avec les valeurs du template

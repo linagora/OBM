@@ -3,7 +3,10 @@ ldap_version: 3
 ldap_search_base: dc=local
 ldap_verbose: off
 ldap_debug: 0
-# Filtre à utiliser lorsque le paramètre 'singleNameSpace' est à 'false'
+# Use this filter on standard installation
 ldap_filter: (|(&(mailBox=%U@%d)(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus)(objectClass=posixAccount)))
-# Filtre à utiliser lorsque le paramètre 'singleNameSpace' est à 'true'
-#ldap_filter: (|(&(uid=%U)(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus)(objectClass=posixAccount)))
+# Use this filter when migrating from an SingleNameSpace installation
+# IMPORTANT : see 'defaultdomain' into '/etc/imapd.conf' too
+# ie: migrating a single namespace installation, domain : foo.com
+#     replace '<singleDomainName>' by 'foo.com'
+#ldap_filter: (|(&(|(mailBox=%U@%d)(mailBox=%U@<singleDomainName>))(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))

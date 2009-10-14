@@ -190,10 +190,12 @@ virtdomains: userid
 # be determined by doing a reverse lookup on the interface IP, this
 # domain is used.
 #
-# OBM-Cyrus : determine le domaine par defaut d'un utilisateur si
-# son login ne contient pas cette information
 #defaultdomain: 
-#defaultdomain: aliacom.fr
+# Enable this option when migrating from an SingleNameSpace installation
+# IMPORTANT : see LDAP filter into '/etc/saslauthd.conf' too
+# ie: migrating a single namespace installation, domain : foo.com
+#     replace '<singleDomainName>' by 'foo.com'
+#defaultdomain: '<singleDomainName>'
 
 #
 # SASL library options (these are handled directly by the SASL libraries,

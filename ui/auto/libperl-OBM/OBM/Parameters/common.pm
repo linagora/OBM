@@ -11,7 +11,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db $dbType);
@@ -90,14 +90,6 @@ SWITCH: {
 
 # Construction de la chaîne DBI de connexion à la BD
 $db = 'dbi:'.$dbDriver.':database=$dbName;host='.$dbHost;
-
-# Mode d'espace de nom OBM
-$singleNameSpace = $cfgFile->val( 'global', 'singleNameSpace' );
-if( defined( $singleNameSpace ) && lc($singleNameSpace) eq "true" ) {
-    $singleNameSpace = 1;
-}else {
-    $singleNameSpace = 0;
-}
 
 # La racine du backup
 $backupRoot = $cfgFile->val( 'global', 'backupRoot' );
