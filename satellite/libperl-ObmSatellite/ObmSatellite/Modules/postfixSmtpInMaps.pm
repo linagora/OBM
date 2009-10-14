@@ -125,9 +125,6 @@ sub _generateMaps {
     if( !defined($domainList) ) {
         my $return = $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' );
         return $return;
-    }elsif( $#{$domainList} < 0 ) {
-        my $return = $self->_returnStatus( RC_NOT_FOUND, 'No domain linked to host '.$datas->{'hostname'}.' as SMTP service' );
-        return $return;
     }
 
     foreach my $map ( @{$datas->{'maps'}} ) {
