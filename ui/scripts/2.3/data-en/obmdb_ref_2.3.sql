@@ -155,6 +155,16 @@ INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label
 VALUES ((SELECT domain_id From Domain), 'PowerPoint File','ppt','application/vnd.ms-powerpoint');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
 VALUES ((SELECT domain_id From Domain), 'CSV File','csv','text/c-xsv');
+INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ((SELECT domain_id From Domain), 'ODT File','odt','application/vnd.oasis.opendocument.text');
+INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ((SELECT domain_id From Domain), 'ODS File','ods','application/vnd.oasis.opendocument.spreadsheet');
+INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ((SELECT domain_id From Domain), 'ODP File','odp','application/vnd.oasis.opendocument.presentation');
+INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ((SELECT domain_id From Domain), 'ODG File','odg','application/vnd.oasis.opendocument.graphics');
+INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ((SELECT domain_id From Domain), 'ODF File','odf','application/vnd.oasis.opendocument.formula');
 
 
 --
