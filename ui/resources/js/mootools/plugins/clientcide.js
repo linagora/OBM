@@ -889,13 +889,13 @@ Element.implement({
 			//IE fails here if the element is not in the dom
 			if ('none' != this.getStyle('display')) d = this.getStyle('display');
 		} catch(e){}
-		this.store('originalDisplay', d||'block'); 
+		this.store('originalDisplay', d||''); 
 		this.setStyle('display','none');
 		return this;
 	},
 	show: function(display) {
 		original = this.retrieve('originalDisplay')?this.retrieve('originalDisplay'):this.get('originalDisplay');
-		this.setStyle('display',(display || original || 'block'));
+		this.setStyle('display',(display || original || ''));
 		return this;
 	},
 	swapClass: function(remove, add) {

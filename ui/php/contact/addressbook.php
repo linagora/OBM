@@ -117,9 +117,10 @@ class OBM_AddressBook implements OBM_ISearchable {
         Rights.entityright_read,
         Rights.entityright_write,
         Rights.entityright_admin,
-        (SELECT count(*) FROM SyncedAddressbook WHERE addressbook_id=AddressBook.id) AS synced
+        SyncedAddressbook.user_id as synced
       FROM AddressBook 
       INNER JOIN ('.OBM_Acl::getAclSubselect($columns, 'addressbook', null, $GLOBALS['obm']['uid'], 'read').') AS Rights ON AddressBook.id = Rights.addressbookentity_addressbook_id
+      LEFT JOIN SyncedAddressbook ON SyncedAddressbook.addressbook_id = AddressBook.id
       WHERE 1=1 '.$query.' ORDER BY AddressBook.name');
     while($db->next_record()) {
       $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
@@ -136,9 +137,10 @@ class OBM_AddressBook implements OBM_ISearchable {
         1 as entityright_read,
         1 as entityright_write,
         1 as entityright_admin,
-        (SELECT count(*) FROM SyncedAddressbook WHERE addressbook_id=AddressBook.id) AS synced
+        SyncedAddressbook.user_id as synced
       FROM AddressBook 
-      WHERE AddressBook.owner = '.$GLOBALS['obm']['uid'].' '. $query.' ORDER BY AddressBook.name'); 
+      LEFT JOIN SyncedAddressbook ON SyncedAddressbook.addressbook_id = AddressBook.id
+      WHERE AddressBook.owner = '.$GLOBALS['obm']['uid'].' '.$query.' ORDER BY AddressBook.name'); 
     while($db->next_record()) {
       $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
                                                         $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));

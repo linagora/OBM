@@ -418,6 +418,7 @@ $set_timezone_default = 'Europe/Paris';
 require_once('conf/obm_conf.inc');
 require_once("$obminclude/phplib/obmlib.inc");
 require_once("$obminclude/of/of_date.inc");
+require_once("$obminclude/of/of_template.php");
 
 // Document root
 if (is_null($ini_array['documentRoot'])) {

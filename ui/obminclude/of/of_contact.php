@@ -7,46 +7,85 @@ require_once 'vpdi/vcard.php';
 require_once 'obminclude/of/of_search.php';
 
 class OBM_Contact implements OBM_ISearchable {
-  
-  protected $id;
-  protected $entity_id;
 
-  public $lastname;
-  public $firstname;
-  public $mname;//middlename
-  public $kind;
-  public $title;
-  public $function;
-  public $company_id;
-  public $company;
-  public $market;//marketingmanager_id
-  public $suffix;
-  public $aka;
-  public $sound;
-  public $manager;
-  public $assistant;
-  public $spouse;
-  public $category;
-  public $service;
-  public $mailok;//mailing_ok
-  public $newsletter;
-  public $date;
-  public $birthday;
-  public $birthday_event;
-  public $anniversary;
-  public $anniversary_event;
-  public $phone = array();
-  public $email = array();
-  public $address = array();
-  public $im = array();
-  public $website = array();
-  public $archive;
-  public $datasource_id;
-  public $comment;
-  public $comment2;
-  public $comment3;
-  public $origin;
-  public $addressbook;
+  public static $fields = array (
+    'lastname' 	=> array('sql' => 'contact_lastname', 'sqlkind' => 'text', 'type' => 'text'),
+    'firstname'	=> array('sql' => 'contact_firstname', 'sqlkind' => 'text', 'type' => 'text'),
+    'mname' 	=> array('sql' => 'contact_mname', 'sqlkind' => 'text', 'type' => 'text'),
+    'kind' 	=> array('sql' => 'contact_kind', 'sqlkind' => 'text', 'type' => 'text'),
+    'title' 	=> array('sql' => 'contact_title', 'sqlkind' => 'text', 'type' => 'text'),
+    'function' 	=> array('sql' => 'contact_function', 'sqlkind' => 'text', 'type' => 'text'),
+    'company_id'=> array('sql' => 'contact_company_id', 'sqlkind' => 'text', 'type' => 'text'),
+    'company' 	=> array('sql' => 'contact_company', 'sqlkind' => 'text', 'type' => 'text'),
+    'market' 	=> array('sql' => 'contact_market', 'sqlkind' => 'text', 'type' => 'text'),
+    'suffix' 	=> array('sql' => 'contact_suffix', 'sqlkind' => 'text', 'type' => 'text'),
+    'aka' 	=> array('sql' => 'contact_aka', 'sqlkind' => 'text', 'type' => 'text'),
+    'sound' 	=> array('sql' => 'contact_sound', 'sqlkind' => 'text', 'type' => 'text'),
+    'manager' 	=> array('sql' => 'contact_manager', 'sqlkind' => 'text', 'type' => 'text'),
+    'assistant' => array('sql' => 'contact_assistant', 'sqlkind' => 'text', 'type' => 'text'),
+    'spouse' 	=> array('sql' => 'contact_spouse', 'sqlkind' => 'text', 'type' => 'text'),
+    'category' 	=> array('sql' => 'contact_category', 'sqlkind' => 'text', 'type' => 'text'),
+    'service' 	=> array('sql' => 'contact_service', 'sqlkind' => 'text', 'type' => 'text'),
+    'mailok' 	=> array('sql' => 'contact_mailok', 'sqlkind' => 'text', 'type' => 'text'),
+    'newsletter'=> array('sql' => 'contact_newsletter', 'sqlkind' => 'text', 'type' => 'text'),
+    'date' 	=> array('sql' => 'contact_date', 'sqlkind' => 'text', 'type' => 'text'),
+    'birthday' 	=> array('sql' => 'contact_birthday', 'sqlkind' => 'text', 'type' => 'text'),
+    'birthday_event' 	=> array('sql' => 'contact_birthday_event', 'sqlkind' => 'text', 'type' => 'text'),
+    'anniversary' 	=> array('sql' => 'contact_anniversary', 'sqlkind' => 'text', 'type' => 'text'),
+    'anniversary_event'	=> array('sql' => 'contact_anniversary_event', 'sqlkind' => 'text', 'type' => 'text'),
+    'phone' 	=> array('sql' => 'contact_phone', 'sqlkind' => 'text', 'type' => 'text'),
+    'email' 	=> array('sql' => 'contact_email', 'sqlkind' => 'text', 'type' => 'text'),
+    'address' 	=> array('sql' => 'contact_address', 'sqlkind' => 'text', 'type' => 'text'),
+    'im' 	=> array('sql' => 'contact_im', 'sqlkind' => 'text', 'type' => 'text'),
+    'website' 	=> array('sql' => 'contact_website', 'sqlkind' => 'text', 'type' => 'text'),
+    'archive' 	=> array('sql' => 'contact_archive', 'sqlkind' => 'text', 'type' => 'text'),
+    'datasource_id' 	=> array('sql' => 'contact_datasource_id', 'sqlkind' => 'text', 'type' => 'text'),
+    'comment' 	=> array('sql' => 'contact_comment', 'sqlkind' => 'text', 'type' => 'text'),
+    'comment2' 	=> array('sql' => 'contact_comment2', 'sqlkind' => 'text', 'type' => 'text'),
+    'comment3' 	=> array('sql' => 'contact_comment3', 'sqlkind' => 'text', 'type' => 'text'),
+    'origin' 	=> array('sql' => 'contact_origin', 'sqlkind' => 'text', 'type' => 'text'),
+    'addressbook' 	=> array('sql' => 'contact_addressbook', 'sqlkind' => 'text', 'type' => 'text')
+  ); 
+
+  private  $id;
+  private  $entity_id;
+
+  private  $lastname;
+  private  $firstname;
+  private  $mname;//middlename
+  private  $kind;
+  private  $title;
+  private  $function;
+  private  $company_id;
+  private  $company;
+  private  $market;//marketingmanager_id
+  private  $suffix;
+  private  $aka;
+  private  $sound;
+  private  $manager;
+  private  $assistant;
+  private  $spouse;
+  private  $category;
+  private  $service;
+  private  $mailok;//mailing_ok
+  private  $newsletter;
+  private  $date;
+  private  $birthday;
+  private  $birthday_event;
+  private  $anniversary;
+  private  $anniversary_event;
+  private  $phone = array();
+  private  $email = array();
+  private  $address = array();
+  private  $im = array();
+  private  $website = array();
+  private  $archive;
+  private  $datasource_id;
+  private  $comment;
+  private  $comment2;
+  private  $comment3;
+  private  $origin;
+  private  $addressbook;
  
   private static $kinds = null;
 
@@ -67,9 +106,13 @@ class OBM_Contact implements OBM_ISearchable {
         }
       }
     }    
-    if ($key == 'name')
+    if ($key == 'name' || $key == 'displayname')
       return $this->lastname.' '.$this->firstname;
     return $this->$key;
+  }
+
+  public function __isset($key) {
+    return isset($this->$key);
   }
 
   public function __set($key,$value) {
@@ -106,6 +149,18 @@ class OBM_Contact implements OBM_ISearchable {
     $this->$key = $value;
   }
 
+  public function getCoords($kind, $label = null) {
+    if(!$label) return $this->$kind;
+    $label = explode(';', $label);
+    $return = array();
+    foreach($this->$kind as $coord) {
+      $clabel = $coord['label'];
+      array_pop($clabel);
+      if($label == $clabel) $return[] = $coord; 
+    }
+    return $return;
+  }
+
   public static function get($id, $domain = null) {
     $where = "contact_id = '{$id}'";
     if ($domain !== null) {
@@ -123,6 +178,47 @@ class OBM_Contact implements OBM_ISearchable {
   }
 
   
+  public static function fieldsDescriptor() {
+
+    $fields['lastname']	= array('sql' => 'contact_lastname', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['firstname']= array('sql' => 'contact_firstname', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['mname']	= array('sql' => 'contact_mname', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['kind']	= array('sql' => 'contact_kind', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['title']	= array('sql' => 'contact_title', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['function']	= array('sql' => 'contact_function', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['company_id']	= array('sql' => 'contact_company_id', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['company']	= array('sql' => 'contact_company', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['market']	= array('sql' => 'contact_market', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['suffix']	= array('sql' => 'contact_suffix', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['aka']	= array('sql' => 'contact_aka', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['sound']	= array('sql' => 'contact_sound', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['manager']	= array('sql' => 'contact_manager', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['assistant']	= array('sql' => 'contact_assistant', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['spouse']	= array('sql' => 'contact_spouse', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['category']	= array('sql' => 'contact_category', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['service']	= array('sql' => 'contact_service', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['mailok']	= array('sql' => 'contact_mailok', 'sqlkind' => 'text', 'type' => 'text');//mailing_ok
+    $fields['newsletter']	= array('sql' => 'contact_newsletter', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['date']	= array('sql' => 'contact_date', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['birthday']	= array('sql' => 'contact_birthday', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['birthday_event']	= array('sql' => 'contact_birthday_event', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['anniversary']	= array('sql' => 'contact_anniversary', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['anniversary_event']= array('sql' => 'contact_anniversary_event', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['phone']	= array('sql' => 'contact_phone', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['email']	= array('sql' => 'contact_email', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['address']	= array('sql' => 'contact_address', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['im']	= array('sql' => 'contact_im', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['website']	= array('sql' => 'contact_website', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['archive']	= array('sql' => 'contact_archive', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['datasource_id']	= array('sql' => 'contact_datasource_id', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['comment']	= array('sql' => 'contact_comment', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['comment2']	= array('sql' => 'contact_comment2', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['comment3']	= array('sql' => 'contact_comment3', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['origin']	= array('sql' => 'contact_origin', 'sqlkind' => 'text', 'type' => 'text');
+    $fields['addressbook']	= array('sql' => 'contact_addressbook', 'sqlkind' => 'text', 'type' => 'text');
+    return $fields; 
+  }
+
   public static function fieldsMap() {
     $fields['*'] = array(
       'contact_lastname' => 'text',
@@ -135,27 +231,27 @@ class OBM_Contact implements OBM_ISearchable {
       'contact_sound' => 'text',
       'contact_company' => 'text'
     );
-
-    $fields['in'] = array(
-      'contact_addressbook_id' => 'integer'
-    );
-
     $fields['company'] = array(
-      'contact_company' => 'text'
+      'contact_company' => 'text',
+      'company_name' => 'text'
     );
-
-    $fields['in'] = array(
-      'contact_addressbook_id' => 'integer'
-    );
-
-    $fields['archive'] = array(
-      'contact_archive' => 'integer'
-    );
-
     $fields['displayname'] = array(
       'contact_lastname' => 'text',
       'contact_firstname' => 'text'
     );
+    $fields['country'] = array(
+      'address_country' => 'text',
+      'country_name' => 'text'
+    );
+    $fields['in'] = array('contact_addressbook_id' => 'integer');
+    $fields['addressbook'] = array('AddressBook.name' => 'text');
+    $fields['archive'] = array('contact_archive' => 'integer');
+    $fields['newsletter'] = array('contact_newsletter' =>  'integer');
+    $fields['mailok'] = array('contact_mailing_ok' => 'integer');
+    $fields['phone'] = array('phone_number' => 'text' );
+    $fields['email'] = array('email_address' => 'text');
+    $fields['town'] = array('address_town' => 'text');
+    $fields['zipcode'] = array('address_zipcode' => 'text');
     $fields['lastname'] = array('contact_lastname' => 'text');
     $fields['firstname'] = array('contact_firstname' => 'text');
     $fields['mname'] = array('contact_middlename' => 'text');
@@ -173,16 +269,10 @@ class OBM_Contact implements OBM_ISearchable {
     //$fields['company'] = '';
     //$fields['market'] = '';
     //$fields['manager'] = '';
-    //$fields['mailok'] = '';
-    //$fields['newsletter'] = '';
     //$fields['date'] = 'contact_date';
     //$fields['birthday'] = '';
     //$fields['anniversary'] = '';
-    //$fields['phone'] = 'phone_number';
-    //$fields['email'] = 'email_address';
     //$fields['address'] = 'address_street';
-    //$fields['im'] = 'im_address';
-    //$fields['website'] = 'website_url';
     return $fields;
   }
 
@@ -436,7 +526,9 @@ class OBM_Contact implements OBM_ISearchable {
   }
 
   public function copy($contact, $addressbook) {
-    $data = (array)$contact;
+    foreach(self::$fields as $field => $metadata) {
+      $data[$field] = $contact->$field;
+    }
     $data['phones'] = array();
     foreach($contact->phone as $phone) {
       array_push($data['phones'], array('label'=>$phone['label'][0]."_".$phone['label']['1'], 'number'=>$phone['number']));
@@ -457,12 +549,11 @@ class OBM_Contact implements OBM_ISearchable {
         'street' => $address['street'],
         'label' => $address['label'][0],
         'zipcode' => $address['zipcode'],
-        'town' => $address['locality'],
+        'town' => $address['town'],
         'expresspostal' => $address['expresspostal'],
-        'country' => $address['country_iso3166']
+        'country' => $address['country']
       ));
     }
-
     $ret = self::create($data,$addressbook);
     return $ret;
   }
@@ -705,12 +796,51 @@ class OBM_Contact implements OBM_ISearchable {
       contact_comment3,
       contact_origin
     FROM Contact
+         INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+         INNER JOIN AddressBook ON AddressBook.id = contact_addressbook_id
+         LEFT JOIN Phone as HomePhone ON HomePhone.phone_entity_id = contactentity_entity_id 
+         LEFT JOIN Address ON address_entity_id = contactentity_entity_id 
+         LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
+         LEFT JOIN Email ON email_entity_id = contactentity_entity_id 
+         LEFT JOIN Company ON contact_company_id = company_id
          LEFT JOIN Kind ON kind_id = contact_kind_id
          LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id
          LEFT JOIN Event as an ON contact_anniversary_id = an.event_id
          LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
     WHERE {$where}
       {$sql_limit}
+    GROUP BY contact_id,
+      contact_lastname,
+      contact_firstname,
+      contact_middlename,
+      kind_minilabel,
+      contact_title,
+      contactfunction_label,
+      contact_company_id,
+      contact_company,
+      contact_marketingmanager_id,
+      contact_suffix,
+      contact_aka,
+      contact_sound,
+      contact_manager,
+      contact_assistant,
+      contact_spouse,
+      contact_category,
+      contact_service,
+      contact_mailing_ok,
+      contact_newsletter,
+      contact_archive,
+      contact_date,
+      contact_addressbook_id,
+      bd.event_id,
+      bd.event_date,
+      an.event_id,
+      an.event_date,
+      contact_datasource_id,
+      contact_comment,
+      contact_comment2,
+      contact_comment3,
+      contact_origin
     ORDER BY contact_lastname, contact_firstname";
     $db->xquery($query);
     while ($db->next_record()) {

@@ -301,3 +301,6 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 -- obmSatellite
 DELETE FROM UserSystem WHERE usersystem_login='obmsatelliterequest';
 INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_uid, usersystem_gid,usersystem_homedir, usersystem_lastname, usersystem_firstname, usersystem_shell) VALUES ( 'obmsatelliterequest', 'PgpTWb7x', 201, 65534, '/', 'OBM Satellite', 'HTTP auth request', '/bin/false' );
+
+-- Reset all contacts display prefs
+DELETE FROM DisplayPref WHERE display_user_id IS NOT NULL and display_entity = 'contact';

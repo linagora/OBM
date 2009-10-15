@@ -470,8 +470,7 @@ function run_query_contact_kind() {
 //   - $contact[]: Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_insert($contact) {
-  $c = OBM_Contact::create($contact);
-  var_dump($c);
+  $c = OBM_Contact::create($contact, $contact['addressbook']);
   return $c->id;
 }
 
@@ -1112,7 +1111,7 @@ function run_query_contact_check($cid, $comp_id, $lastname, $firstname) {
 // Parameters:
 //   - $params : form values
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_vcard_insert($params) {
+function run_query_vcard_insert($params, $addressbook) {
   $file_content = file_get_contents($params['vcard_tmp']);
   try {
     $vcards = Vpdi::decode($file_content, 'VCARD');
@@ -1121,12 +1120,13 @@ function run_query_vcard_insert($params) {
   $ids = array();
   foreach ($vcards as $vcard) {
     $contact = OBM_Contact::import($vcard);
-    if (isset($contact['contact_id']) && run_query_check_contact_existence($contact['contact_id'])) {
+    if (isset($contact['contact_id']) && run_query_check_contact_existence($contact['contact_id'], $addressbook)) {
       if (run_query_contact_update($contact)) {
         $ids[] = $contact['contact_id'];
       }
     } else {
-      $id = run_query_contact_insert($contact);
+      $c = OBM_Contact::create($contact, $addressbook);
+      $id = $c->id; 
       if ($id > 0) {
         $ids[] = $id;
       }
@@ -1142,9 +1142,9 @@ function run_query_vcard_insert($params) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check contact existence
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_contact_existence($contact_id) {
+function run_query_check_contact_existence($contact_id, $addressbook) {
   $obm_q = new DB_OBM;
-  $obm_q->query("SELECT 1 FROM Contact WHERE contact_id='{$contact_id}'");
+  $obm_q->query("SELECT 1 FROM Contact WHERE contact_id='{$contact_id}' and contact_addressbook_id = $addressbook->id ");
   return $obm_q->next_record() !== false;
 }
 
@@ -1203,12 +1203,6 @@ function check_contact_update_rights($params, $c='') {
   }
 
   if ($id > 0) {
-
-    /*    // Check delegation update right
-    if (! of_delegation_check_update_rights($params, $g['delegation'])) {
-      $err['msg'] .= $l_error_delegation;
-      return false;
-    }*/
 
     // Check update right is set
     if (! $perm->check_right('contact', $actions['contact']['update']['Right'])) {

@@ -143,17 +143,19 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   
 } elseif ($action == 'import') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_vcard_import_form();
-  
+  if($params['addressbook'] && OBM_AddressBook::get($params['addressbook'])->write == 1) {
+    $display['detail'] = dis_vcard_import_form($params['addressbook']);
+  } else {
+    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
+  }
 } elseif ($action == 'export') {
 ///////////////////////////////////////////////////////////////////////////////
-  $contacts = OBM_Contact::fetchPrivate($obm['uid']);
-  if (count($contacts) == 0) {
-    $display['msg'] .= display_warn_msg($l_no_export);
-  } else {
+  $addressbooks = OBM_AddressBook::search();
+  $contacts = $addressbooks->searchContacts($params['searchpattern']);
+  if (count($contacts) != 0) {
     dis_contact_vcard_export_all($contacts);
-    exit();
   }
+  exit();
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -285,15 +287,14 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   
 } elseif ($action == 'vcard_insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  $ids = run_query_vcard_insert($params);
+  $addressbook = OBM_AddressBook::get($params['addressbook']);
+  if($addressbook->write) {
+    $ids = run_query_vcard_insert($params, $addressbook);
+  } else {
+    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
+  }
   if ($ids !== false) {
-    $display['msg'] .= display_ok_msg("$l_contact : $l_insert_ok");
-    if (count($ids) == 1) {
-      $params['contact_id'] = $ids[0];
-      $display['detail'] = dis_contact_consult($params);
-    } else {
-      $display['detail'] = dis_vcard_import_form();
-    }
+    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
   } else {
     $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
     $display['detail'] .= dis_vcard_import_form();
@@ -432,77 +433,86 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 } elseif ($action == 'consult')  {
 ///////////////////////////////////////////////////////////////////////////////
   $contact = OBM_Contact::get($params['id']);
-  $addressbook = OBM_AddressBook::get($contact->addressbook);
+  $addressbooks = OBM_AddressBook::search();
+  $addressbook = $addressbooks[$contact->addressbook];
   if ($addressbook && $addressbook->read) {
-    $contact = OBM_Contact::get($params['id']);
-    $block = dis_contact_consult2($contact);
+    $template = new OBM_Template('card');
+    $template->set('contact', $contact);
+    $template->set('addressbooks', $addressbooks);
+    echo $template->render();    
     update_last_visit('contact', $params['id'], $action);
-    echo $block;
   }
+  //FIXME Erreur de droit
   exit();
 } elseif ($action == 'updateContact')  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (isset($params['id'])){
+  $addressbooks = OBM_AddressBook::search();
+  if (isset($params['id'])) {
     $contact = OBM_Contact::get($params['id']);
-    $addressbook = OBM_AddressBook::get($contact->addressbook);
-    if ($addressbook && $addressbook->write) {
-      $params['contact_id'] = $params['id'];
-      $block = dis_contact_form2($params);
-      echo $block;
-    }
   } else {
-    $params['contact_id'] = $params['id'];
-    $block = dis_contact_form2($params);
-    echo $block;
+    $contact = new OBM_Contact();
+    $contact->addressbook = $params['addressbook'];    
   }
+  $addressbook = $addressbooks[$contact->addressbook];
+  if ($addressbook && $addressbook->write) {
+    $template = new OBM_Template('form');
+    $template->set('addressbooks', $addressbooks);
+    $template->set('contact', $contact);      
+    echo $template->render();    
+  }
+  //FIXME Erreur de droit
   exit();  
 } elseif ($action == 'storeContact') {
 ///////////////////////////////////////////////////////////////////////////////
   $params['contact_id'] = $params['id'];
-  $addressbook = OBM_AddressBook::get($params['addressbook']);
+  $addressbooks = OBM_AddressBook::search();
+  if($params['addressbook']) 
+    $addressbook = $addressbooks[$params['addressbook']];
+  else  
+    $addressbook = $addressbooks->getMyContacts();
+  
   if ($addressbook && $addressbook->write) {
-    if (check_contact_update_rights($params)) {
-      if (check_user_defined_rules() && check_contact_data_form('', $params)) {
-        if(isset($params['contact_id'])) {
-          $retour = run_query_contact_update($params);
-          $contact = OBM_Contact::get($params['id']);
-        } else {
-          if($params['addressbook']) $addressBook = OBM_AddressBook::get($params['addressbook']);
-          else  $addressBook = OBM_AddressBook::get('default:1 name:contacts owner:'.$GLOBALS['obm']['uid']); 
-          $contact = $addressBook->addContact($params);
-        }
-        $block = dis_contact_consult2($contact);
-        echo $block;
+    if (check_user_defined_rules() && check_contact_data_form('', $params)) {
+      if(isset($params['id'])) {
+        $retour = run_query_contact_update($params);
+        $contact = OBM_Contact::get($params['id']);
+        update_last_visit('contact', $params['id'], $action);    
       } else {
-        header('HTTP', true, 400);
-        echo OBM_Error::getInstance()->toJson();
+        $contact = $addressbook->addContact($params);
       }
+      $template = new OBM_Template('card');
+      $template->set('contact', $contact);
+      $template->set('addressbooks', $addressbooks);
+      echo $template->render();          
     } else {
-      $contact = OBM_Contact::get($params['id']);
-      $block = dis_contact_consult2($contact);
-      echo $block;
+      header('HTTP', true, 400);
+      echo OBM_Error::getInstance()->toJson();
     }
   }
+  //FIXME Erreur de droit
   exit();
 } elseif ($action == 'copyContact') {
 ///////////////////////////////////////////////////////////////////////////////
   $params['contact_id'] = $params['id'];
-
-  $addressBook = OBM_AddressBook::get($params['addressbook']);
-  if ($addressBook && $addressBook->write) {
-   $contact = OBM_Contact::get($params['id']);
-   OBM_Contact::copy($contact, $addressBook);
-  } 
-
+  $addressbooks = OBM_AddressBook::search();
   $contact = OBM_Contact::get($params['id']);
-  $block = dis_contact_consult2($contact);
-  echo $block;
-
+  $source = $addressbooks[$contact->addressbook];
+  $destination = $addressbooks[$params['addressbook']];
+  if ($source->read && $destination && $destination->write) {
+    OBM_Contact::copy($contact, $destination);
+    $template = new OBM_Template('card');
+    $template->set('contact', $contact);
+    $template->set('addressbooks', $addressbooks);
+    echo $template->render();          
+  } 
+  //FIXME Erreur de droit
   exit();
 } elseif ($action == 'deleteContact') {
 ///////////////////////////////////////////////////////////////////////////////
-  $contact = OBM_Contact::get($params['contact_id']);
-  $addressbook = OBM_AddressBook::get($contact->addressbook);
+  $params['contact_id'] = $params['id'];
+  $contact = OBM_Contact::get($params['id']);
+  $addressbooks = OBM_AddressBook::search();
+  $addressbook = $addressbooks[$contact->addressbook];
   if ($addressbook && $addressbook->write) {
     if($contact->archive) {
       OBM_Contact::delete($contact);
@@ -510,67 +520,70 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       $contact->archive = 1;
       OBM_Contact::store($contact);
     }
-    $addressBooks = OBM_AddressBook::search();
-    $contactHeaders = html_contact_get_headers();
-    $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern']), $contactHeaders);
-    echo $block;
+    $template = new OBM_Template('contacts');
+    $template->set('contacts',$addressbooks->searchContacts($params['searchpattern']));
+    $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
+    echo $template->render();    
   }
+  //FIXME Erreur de droit
   exit();      
-} elseif ($action == 'list')  {
-///////////////////////////////////////////////////////////////////////////////
-  $contactHeaders = html_contact_get_headers();
-  $addressBooks = OBM_AddressBook::search();
-  $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern']), $contactHeaders);
-  echo $block;
-  exit();
 } elseif ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
-  $contactHeaders = html_contact_get_headers();
-  $addressBooks = OBM_AddressBook::search();
-  $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern']), $contactHeaders);
-  echo $block;
+  $addressbooks = OBM_AddressBook::search();
+  $template = new OBM_Template('contacts');
+  $template->set('contacts',$addressbooks->searchContacts($params['searchpattern']));
+  $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
+  echo $template->render();
   exit();
 } elseif ($action == 'filterContact') {
 ///////////////////////////////////////////////////////////////////////////////
-  $contactHeaders = html_contact_get_headers();
-  $addressBooks = OBM_AddressBook::search();
+  $addressbooks = OBM_AddressBook::search();
   if($params['contactfilter']) $pattern = 'displayname:'.$params['contactfilter'];
-  $block = html_contact_get_list($addressBooks->searchContacts($params['searchpattern'].' '.$pattern), $contactHeaders);  
-  echo $block;
+  $template = new OBM_Template('contacts');
+  $template->set('contacts',$addressbooks->searchContacts($params['searchpattern'].' '.$pattern));
+  $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
+  echo $template->render();  
   exit;
-} elseif ($action == 'filterGroup') {
-///////////////////////////////////////////////////////////////////////////////
-
 } elseif ($action == 'storeAddressBook') {
 ///////////////////////////////////////////////////////////////////////////////
-  OBM_AddressBook::create($params);
-  $block = html_addressbooks_get_list();
-  echo $block;
+  if($params['id']) {
+    OBM_AddressBook::store($params);
+  } else {
+    OBM_AddressBook::create($params);
+  }
+  $addressbooks = OBM_AddressBook::search();
+  $template = new OBM_Template('addressbooks');
+  $template->set('addressbooks', $addressbooks);  
+  echo $template->render();  
   exit();
+  //FIXME Erreur de droit
 } elseif ($action == 'deleteAddressBook') {
 ///////////////////////////////////////////////////////////////////////////////
   OBM_AddressBook::delete($params);
-  $block = html_addressbooks_get_list();
-  echo $block;
+  $addressbooks = OBM_AddressBook::search();
+  $template = new OBM_Template('addressbooks');
+  $template->set('addressbooks', $addressbooks);  
+  echo $template->render();  
   exit();
-} elseif ($action == 'updateAddressBook') {
-///////////////////////////////////////////////////////////////////////////////
-  OBM_AddressBook::store($params);
-  $block = html_addressbooks_get_list();
-  echo $block;
-  exit();
+  //FIXME Erreur de droit
 } elseif ($action == 'toggleSyncable') {
 ///////////////////////////////////////////////////////////////////////////////
   OBM_AddressBook::store($params);
-  $block = html_addressbooks_get_list();
-  echo $block;
+  $addressbooks = OBM_AddressBook::search();
+  $template = new OBM_Template('addressbooks');
+  $template->set('addressbooks', $addressbooks);  
+  echo $template->render();
   exit();
+  //FIXME Erreur de droit
 } elseif ($action == 'setSubscription') {
 ///////////////////////////////////////////////////////////////////////////////
   OBM_AddressBook::setSynced($params);
-  $block = html_addressbooks_get_list();
-  echo $block;
+  $addressbooks = OBM_AddressBook::search();
+  $template = new OBM_Template('addressbooks');
+  $template->set('addressbooks', $addressbooks);
+  echo $template->render();
   exit();
+  //FIXME Erreur de droit
 } 
 
 of_category_user_action_switch($module, $action, $params);
@@ -646,7 +659,7 @@ function get_contact_action() {
     'Name'     => $l_header_find,
     'Url'      => "$path/contact/contact_index.php?action=index",
     'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('None') 
                                         );
 
 //FIXME
@@ -736,7 +749,7 @@ function get_contact_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','index','search','insert','new','detailconsult','detailupdate','update','rights_update','rights_admin','statistics','check_delete','delete','admin','display') 
+    'Condition'=> array ('None') 
                                      );
                                      
 // Import VCard
@@ -745,7 +758,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=import",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('','index','search','new','statistics','admin','display')
+    'Condition'=> array ('None')
                                      		 );
                                      		 
 // Export all contacts as VCards
@@ -754,7 +767,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=export",
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('index','search','new','statistics','admin','display')
+    'Condition'=> array ('None')
                                      		 );
 
 // Detail Consult

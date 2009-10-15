@@ -206,10 +206,10 @@ $ico_file           = "$theme_path/ico_file.gif";
 
 // Contact Icons
 $ico_sync           = "$theme_path/ico_sync.png";
-$ico_desync         = "$theme_path/ico_unsync.png";
-$icones['edit']     = "$theme_path/edit.png";
-$icones['delete']   = "$theme_path/delete.png";
-$icones['others']   = "$theme_path/othersDropDown.png";
-$icones['add']      = "$theme_path/addDropDown.png";
-$icones['close']    = "$theme_path/close.png";
-$icones['dropdown'] = "$theme_path/dropDown.png";
+$ico_unsync         = "$theme_path/ico_unsync.png";
+$icons['edit']     = "$theme_path/edit.png";
+$icons['delete']   = "$theme_path/delete.png";
+$icons['others']   = "$theme_path/othersDropDown.png";
+$icons['add']      = "$theme_path/addDropDown.png";
+$icons['close']    = "$theme_path/close.png";
+$icons['dropdown'] = "$theme_path/dropDown.png";

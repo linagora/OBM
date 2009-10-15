@@ -43,12 +43,14 @@ class  OBM_Search {
         $subconditions = array();
         if(is_array($fields[$fieldname])) {
           foreach($fields[$fieldname] as $sql => $type) {
-            $subconditions[] = self::buildSql($sql, $type, $value);
+            $sql = self::buildSql($sql, $type, $value);
+            if($sql) $subconditions[] = $sql;
           }
           $conditions[]  =  '('.implode(' OR ', $subconditions).')';
         }
       }
-      $query .= ' AND '.implode(' AND ', $conditions);
+//      if(!empty($conditions))
+        $query .= ' AND '.implode(' AND ', $conditions);
     }
     return "($query)";
   }
@@ -66,6 +68,7 @@ class  OBM_Search {
       return "$sql = ".$val;
       break;
     }
+    return false;
   }
 
   public static function parse($pattern) {

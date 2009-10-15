@@ -89,7 +89,7 @@ Obm.CoordonateWidget = new Class({
     this.id = this.newId();
     this.setOptions(options);
     this.setValues(fields);
-    this.table = new Element('table').addClass('coordinate').set('id', this.kind + '-' + this.id);
+    this.table = new Element('table').addClass('coordinate').addClass(this.kind).set('id', this.kind + '-' + this.id);
     this.element = new Element('tbody');
     this.table.adopt(this.element);
     this.container = $(this.options.container);

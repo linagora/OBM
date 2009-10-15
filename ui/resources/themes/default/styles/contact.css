@@ -6,19 +6,23 @@
 
 /*Tables styling*/
 
-#contactPanel table {
-  width: 100%;
-  border-collapse : collapse;
-  empty-cells: show;
-}
-
 #contactPanel {
   width: 100%;
   border: 2px solid #d2d6da;
   border-spacing: 0;
 }
 
-.contactPanelContainer thead td, .contactPanelContainer thead th {
+#contactPanel table {
+  width: 100%;
+  border-collapse : collapse;
+  empty-cells: show;
+}
+
+#contactPanel td {
+  vertical-align: top;
+}
+
+.contactPanelHeader thead td, .contactPanelHeader thead th {
   line-height: 25px;
   height: 25px;
   overflow: hidden;
@@ -29,7 +33,6 @@
   background-repeat: repeat-x;
   background-position: top;
   border-right: 1px solid #aeaeae;
-  border-left: 1px solid #fff;
   border-top: 1px solid #fff;
   border-bottom: 1px solid #a0a0a0; 
   vertical-align: middle;
@@ -37,17 +40,27 @@
   white-space: nowrap;
 }
 
-.contactPanelContainer thead td.toolbar, .contactPanelContainer thead th.toolbar {
+.contactPanelHeader thead td.toolbar, .contactPanelHeader thead th.toolbar {
   text-align: left;
   background: #c5d2d8;
-  height: 23px;
+  height: 25px;
   padding-left: 10px;
   overflow: visible;
 }
 
-#addressBookContainer tbody td:hover, #dataGrid tbody tr.even:hover,  #dataGrid tbody tr.odd:hover {
+#addressBookContainer tbody td a {
+  color: black;
+}
+
+#addressBookContainer tbody td a:hover, #dataGrid tbody tr.even:hover,  #dataGrid tbody tr.odd:hover {
   background-color: #99a8b7;
   cursor: pointer;
+  color: black;
+}
+
+#addressBookContainer tbody td .dropDownMenu ul a:hover {
+  color: #368397;
+  background-color: transparent;
 }
 
 #addressBookContainer td.current, #dataGrid tr.current {
@@ -66,7 +79,17 @@
   background-color: #dee1e3;
 }
 
-#addressBookGrid input[type="text"]{
+#addressBookGrid input.consult {
+  background-color: transparent;
+  color: black;
+  border:none;
+}
+
+#addressBookGrid input.consult:hover {
+  cursor: pointer;
+}
+
+#addressBookContainer input{
   width: 130px;
 }
 
@@ -76,7 +99,7 @@
 }
 
 .addressbookForm input {
-  width: 140px;
+  width: 130px;
 }
 
 #addressBookContainer tbody tr{
@@ -101,28 +124,18 @@
 #addressBookContainer ul {
   display: inline;
 }
-
-.addressBookMenu {
-  position: absolute;
-  right: 5px;
-  display: inline;
-}
-
-.addressBookMenu ul{
-  right: 0px;
-}
 /* Data rows styling */
 
 #dataGrid {
   border-right: 2px solid #d2d6da;
 }
 
-#dataGrid.expanded {
+#dataContainer.expanded {
   width: auto;
 }
 
-#dataGrid.shrinked {
-  width: 20em;
+#dataContainer.shrinked {
+  width: 22em;
 }
 
 #dataGrid th {
@@ -150,13 +163,15 @@
 
 /* Contact card styling */
 
-#informationGrid img#photo {
+#informationGrid img.photo {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;  
   margin: 0 10px 2px 20px ;
   float: left;
   border: 3px solid #ddd;
+  height: 96px;
+  width: 96px;
 }
 
 #informationGrid .details {
@@ -168,7 +183,7 @@
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;  
-  float:left;
+  float: left;
 }
 
 #informationGrid .details dt, #informationGrid legend {
@@ -209,35 +224,6 @@
   display: inline;
 }
 
-/*Overflow in grid*/
-
-.contactPanelContainer {
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;  
-}
-
-html>/**/body .contactPanelContainer table>tbody {  
-  overflow-y: auto; 
-  overflow-x: hidden;
-}
-
-.contactPanelContainer thead tr	{
-  position:relative;
-}
-
-#addressBookGrid, #dataGrid, #informationGrid, #informationGrid td{
-  vertical-align: top;
-}
-
-#informationGrid tbody td{
-  padding-top: 5px;
-}
-
-.contactPanelContainer td:last-child {
-  padding-right: 20px;
-}
-
 /* Form */
 
 .coordinate th{
@@ -256,15 +242,15 @@ html>/**/body .contactPanelContainer table>tbody {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;  
-  margin: 5px 2px;
+  margin: 0 2px;
   display:inline;
-  padding: 0;
-  line-height: 0;
+  padding: 5px 0 0 5px;
   clear: left;
+  height: 86px;
+  min-width: 32em;
 }
 
 #informationGrid fieldset.head input {
-  border: none;
   color:#636466;
   font-size:100%;
   vertical-align:middle;  
@@ -273,9 +259,10 @@ html>/**/body .contactPanelContainer table>tbody {
 input, textarea {
   border: 1px solid #ddd;
   background-color: #fafafa;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
+}
+
+select {
+  width: 15em;
 }
 
 #informationGrid dl, #informationGrid ul {
@@ -283,12 +270,36 @@ input, textarea {
   list-style: none;
 }
 
+#informationGrid span.formField {
+  float: left;
+  clear: left;
+  padding-top: 2px;
+}
+
 #informationGrid .details label {
   color: #888;
-  display: inline;
   font-weight: bold;
   font-size: 100%;
-  margin-right: 2em;
+  margin-right: 1em;
+  text-align: left;
+  min-width: 11em;
+  display: inline-block;
+}
+
+
+#informationGrid .head label {
+  color: #888;
+  font-weight: bold;
+  font-size: 100%;
+  margin-right: 1em;
+  text-align: left;
+  margin-left: 5px;
+  min-width: 6em;
+  display: inline-block;
+}
+
+#informationGrid .coordinate {
+  table-layout: auto;
 }
 
 #informationGrid .coordinate table {
@@ -296,14 +307,6 @@ input, textarea {
   clear: left;
   margin: 0;
   padding: 0;
-  border: none;
-}
-
-#informationGrid .coordinate table {
-  padding: 0;
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-left: 0;
   border: none;
 }
 
@@ -321,9 +324,34 @@ input, textarea {
 
 .coordinateMenu li.submenu-down{
   left: 40em;
-
 }
 
+/*Overflow in grid*/
+
+.contactPanelContainer {
+  overflow-y: auto;
+  overflow-x: show;
+}
+
+table.contactPanelHeader {
+  table-layout: fixed;
+}
+
+table.contactPanelHeader th, .contactPanelContainer table td {
+  overflow-x: show;
+}
+
+.contactPanelContainer table {
+  table-layout: fixed;
+}
+
+.contactPanelHeader td.filler {
+  width: 15px
+}
+
+.contactPanelContainer table td, .contactPanelContainer table th {
+  overflow-x : show;
+}
 /*
 .grid-contact_displayname {
   width: 20em;

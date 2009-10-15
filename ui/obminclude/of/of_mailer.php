@@ -20,7 +20,7 @@
 <?php
 
 require(dirname(__FILE__).'/../lib/Stato/mailer/mailer.php');
-require(dirname(__FILE__).'/../lib/Stato/i18n/i18n.php');
+require_once(dirname(__FILE__).'/../lib/Stato/i18n/i18n.php');
 
 /**
  * OBM Mailer Class

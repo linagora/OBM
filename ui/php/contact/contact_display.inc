@@ -11,10 +11,10 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames['contact_displayname'] = $l_displayname;
-$fieldnames['contact_lastname'] = $l_lastname;
-$fieldnames['contact_firstname'] = $l_firstname;
-$fieldnames['contact_aka'] = $l_aka;
+$fieldnames['displayname'] = $l_displayname;
+$fieldnames['lastname'] = $l_lastname;
+$fieldnames['firstname'] = $l_firstname;
+$fieldnames['aka'] = $l_aka;
 $fieldnames['addressbook_name'] = $l_addressbook;
 $fieldnames['function_label'] = $l_function;
 $fieldnames['contact_title'] = $l_title;
@@ -243,15 +243,11 @@ function dis_contact_search_form($contact='') {
  */
 function html_contact($contact_id) {
   $addressBooks = OBM_AddressBook::search();
-  $contactHeaders = html_contact_get_headers();
-  $addressBook = $addressBooks->getMyContacts();
-  $contacts = $addressBook->getContacts();
-  $contactsList = html_contact_get_list($contacts, $contactHeaders);
-  $adList = html_addressbooks_get_list();
 
   if (isset($contact_id)) {
     $c = OBM_Contact::get($contact_id);
-    $addressbook = OBM_AddressBook::get($c->addressbook);
+    $addressBook = OBM_AddressBook::get($c->addressbook);
+    $contacts = $addressBook->getContacts();
     if ($addressbook && $addressbook->read) { 
       $detailconsult = "
         obm.contact.addressbook.selectAddressBook($('addressbook-$c->addressbook'));
@@ -262,47 +258,18 @@ function html_contact($contact_id) {
     } else {
       $detailconsult = "showErrorMessage(obm.vars.labels.permsError);";
     }
+  } else {
+    $addressBook = $addressBooks->getMyContacts();
+    $contacts = $addressBook->getContacts();
   }
-  $searchForm = dis_contact_html_search_form(array());
-  $block = "
-  $searchForm
-  <table id='contactPanel'>
-    <tr>
-      <td id='addressBookGrid'>
-        <div  id='addressBookContainer' class='contactPanelContainer'>
-          $adList
-        </div>
-        <form name='f_addressbook' id='f_addressbook' class='addressbookForm' onsubmit='obm.contact.addressbook.storeAddressBook();return false;' style='visibility:hidden;'>
-          <input type='text' id='tf_addressbook'/>
-        </form>
-        <input type='button' value='+' id='addAddressBook' onclick='obm.contact.addressbook.addAddressBook();'/>
-      </td>
-      <td id='dataGrid'>
-        <div id='dataContainer' class='contactPanelContainer'>
-        $contactsList
-        </div>
-        <input type='button' value='+' id='addContact' onclick='obm.contact.addressbook.addContact();'/>
-      </td>
-      <td id='informationGrid'>
-        <div class='contactPanelContainer' id='informationContainer'>
-        <table>
-        <tbody>
-        </tbody>
-        </table>
-        </div>
-      </td>
-    </tr>
-  </table>
-  <script type='text/javascript'>
-    $('informationGrid').setStyle('display','none');
-    obm.vars.labels.confirmDeleteAddressBook = '".phpStringToJsString($GLOBALS['l_confirm_delete_ad'])."';
-    obm.initialize.chain(function () {
-      obm.contact.addressbook = new Obm.Contact.AddressBook();
-      $detailconsult
-    })
-  </script>
-  ";
 
+  $searchForm = dis_contact_html_search_form(array());
+  $template = new OBM_Template('main');
+  $template->set('searchfields', OBM_Contact::fieldsMap());
+  $template->set('contacts', $contacts);
+  $template->set('addressbooks', $addressBooks);
+  $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
+  return $template->render();
   return $block;
 }
 
@@ -314,18 +281,6 @@ function html_contact($contact_id) {
  */
 function html_contact_get_headers() {
   $prefs = get_display_pref($obm['uid'], 'contact');
-  $headers = array();
-  $headers['displayname'] = array(
-    'html'=> '<th id="grid-displayname">'.$GLOBALS['l_displayname'].'</th>',
-    'template' => '<th>%s</th>'
-  );
-  unset($prefs['contact_displayname']);
-  foreach($prefs as $fieldname => $metada) {
-    if(isset($GLOBALS['fieldnames'][$fieldname])) {
-      $headers[$fieldname]['html'] = '<td id="grid-'.$fieldname.'" class="grid-'.$fieldname.'">'.$GLOBALS['fieldnames'][$fieldname].'</td>';
-      $headers[$fieldname]['template'] = '<td class="grid-'.$fieldname.'">%s</td>';
-    }
-  } 
   return $headers;
 }
 
@@ -398,10 +353,6 @@ function html_addressbooks_get_list() {
   $adList .= "<tr class='filler'><th>&nbsp;</th></tr>";
 
   $block = "<table>  
-     <thead>
-     <tr><th>$GLOBALS[l_addressbook]</th></tr>
-     <tr><td class='search'><input size='15' type='text' value='' name='addressbookfilter' id='addressbookfilter' /> </td></tr>
-     </thead>           
      <tbody>
      $adList
      </tbody>
@@ -432,28 +383,11 @@ function html_contact_get_list($contacts, $headers) {
     foreach($headers as $field => $metada) {
       $fieldname = str_replace('contact_','', $field);
       $contactRow .= sprintf($metada['template'], $contact->$fieldname);
-      $contactHeader .= $headers['html'];
     }
     $contactList .= "<tr onclick='obm.contact.addressbook.selectContact(this)' id='contact-$id'class='$class'>$contactRow</tr>\n";
   }
-  foreach($headers as $fieldname => $header) {
-    $contactHeader .= $header['html'];
-  }
-  if($GLOBALS['params']['searchpattern']) {
-    $input='<input type="hidden" name="searchpattern" value="'.$GLOBALS['params']['searchpattern'].'" />';
-  } 
   $block = "
     <table>
-    <thead>
-      <tr>$contactHeader</tr>
-      <tr><th class='search'>
-      <form name='contactfilter' onsubmit='obm.contact.addressbook.filterContact(this); return false;' id='contactFilterForm' >    
-        <input type='hidden' name='action' value='filterContact'  />
-        $input
-        <input size='15' type='text' value='".$GLOBALS['params']['contactfilter']."' name='contactfilter' id='contactfilter' />
-      </form>
-      </th><td colspan='".(count($headers) - 1)."'></td></tr>
-    </thead>
     <tbody>
       $contactList
       <tr class='filler'><th>&nbsp;</th></tr>
@@ -687,8 +621,6 @@ function dis_contact_consult2($contact) {
   $comment3Layout ='<dl id="comment3Layout" class="details '.$class.'">'.$contact->comment2.'</dl>';
 
   //  datasource
-  //  archive
-  //  photo
   //  public 'kind' => null
   //  public 'function' => null
   //  userupdate
@@ -3001,15 +2933,18 @@ function dis_contact_display_pref($prefs) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the VCard import form
 ///////////////////////////////////////////////////////////////////////////////
-function dis_vcard_import_form() {
+function dis_vcard_import_form($addressbook) {
   global $l_header_import, $l_vcf_file;
   // --- HTML Template --------------------------------------------------------
-  $dis_button = "<input type=\"hidden\" name=\"action\" value=\"vcard_insert\">
-          <input type=\"submit\" value=\"$l_header_import\">";
+  $dis_button = "
+    <input type=\"hidden\" name=\"action\" value=\"vcard_insert\">
+    <input type=\"hidden\" name=\"addressbook\" value=\"$addressbook\">
+    <input type=\"submit\" value=\"$l_header_import\">
+    <input type=\"button\" value=\"$GLOBALS[l_cancel]\" onclick=\"window.location.href='$GLOBALS[path]/contact/contact_index.php'\"/>
+    ";
 
   $block = "
-    <form method=\"post\" name=\"vcard_import\" enctype=\"multipart/form-data\"
-      action=\"contact_index.php\">
+    <form method=\"post\" name=\"vcard_import\" enctype=\"multipart/form-data\" action=\"contact_index.php\">
     <fieldset class=\"detail extra\">
       <legend></legend>
       <table class=\"detail\">
