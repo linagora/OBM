@@ -1044,3 +1044,30 @@ h1.hoursTitle{
   width:40%;
 }
 
+
+/* PORTLETS */
+
+.calendarPortlet {
+  border: 1px solid #666;
+}
+.calendarPortlet table {
+  font-size: 100%;
+}
+
+.tab {
+  border-bottom:1px solid black;
+  padding-top: 2px;
+}
+
+.tab label {
+  padding-left: 2px;
+  padding-right: 2px;
+  border: 1px solid black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.tabSelected {
+  background: #4692a9;
+  color: #FFF;
+}

@@ -943,6 +943,11 @@ if ($action == 'search') {
   } else {
     $display['msg'] .= display_err_msg($l_err_reference);
   }
+
+} elseif ($action == 'portlet') {
+///////////////////////////////////////////////////////////////////////////////
+  echo dis_calendar_portlet($params);
+  exit();
 }
 
 // displayed after, because $params['date'] can be updated by actions
@@ -1714,6 +1719,15 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );
+
+  // Portlet
+  $actions['calendar']['portlet'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=portlet",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+
 }
 
 
