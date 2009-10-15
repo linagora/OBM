@@ -18,7 +18,7 @@ function check_category(label,category) {
    if (label.value != \"\") {
       return true;
    } else {
-      msg = category+' : $l_c_j_create';
+      msg = category+' : ".phpStringToJsString($l_c_j_create)."';
       alert(msg);
       return false;
    }
