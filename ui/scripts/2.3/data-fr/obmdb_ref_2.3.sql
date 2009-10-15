@@ -154,15 +154,15 @@ VALUES ((SELECT domain_id From Domain), 'Fichier PowerPoint','ppt','application/
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
 VALUES ((SELECT domain_id From Domain), 'Fichier CSV','csv','text/x-csv');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES ((SELECT domain_id From Domain), 'ODT Fichier','odt','application/vnd.oasis.opendocument.text');
+VALUES ((SELECT domain_id From Domain), 'Fichier ODT','odt','application/vnd.oasis.opendocument.text');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES ((SELECT domain_id From Domain), 'ODS Fichier','ods','application/vnd.oasis.opendocument.spreadsheet');
+VALUES ((SELECT domain_id From Domain), 'Fichier ODS','ods','application/vnd.oasis.opendocument.spreadsheet');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES ((SELECT domain_id From Domain), 'ODP Fichier','odp','application/vnd.oasis.opendocument.presentation');
+VALUES ((SELECT domain_id From Domain), 'Fichier ODP','odp','application/vnd.oasis.opendocument.presentation');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES ((SELECT domain_id From Domain), 'ODG Fichier','odg','application/vnd.oasis.opendocument.graphics');
+VALUES ((SELECT domain_id From Domain), 'Fichier ODG','odg','application/vnd.oasis.opendocument.graphics');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES ((SELECT domain_id From Domain), 'ODF Fichier','odf','application/vnd.oasis.opendocument.formula');
+VALUES ((SELECT domain_id From Domain), 'Fichier ODF','odf','application/vnd.oasis.opendocument.formula');
 
 
 
