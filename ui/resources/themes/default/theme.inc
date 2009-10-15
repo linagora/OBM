@@ -142,6 +142,7 @@ $flag_es            = "$theme_path/flag_es.gif";
 $flag_fr            = "$theme_path/flag_fr.gif";
 $flag_it            = "$theme_path/flag_it.gif";
 $flag_no_ny         = "$theme_path/flag_no_ny.gif";
+$flag_ro            = "$theme_path/flag_ro.gif";
 $preview_default    = "$theme_path/preview_theme.gif";
 $img_home           = "$theme_path/home_obm.png";
 

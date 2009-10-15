@@ -2215,7 +2215,7 @@ function of_category_user_dis_links($params) {
 function of_category_user_get_ordered($cat, $entity='', $entity_id=0) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain('Category');
+  $multidomain = sql_multidomain('category');
   $entityTable = ucfirst($entity).'Entity';
   $entityEntityId = strtolower($entity).'entity_'.strtolower($entity).'_id';
   $entityId = strtolower($entity).'entity_entity_id';
@@ -2289,7 +2289,7 @@ function of_category_user_get_entitycategories($entity, $category, $entity_id) {
   $entityEntityId = strtolower($entity).'entity_'.strtolower($entity).'_id';
   $entityId = strtolower($entity).'entity_entity_id';
   $cats = array();
-  $multidomain = sql_multidomain('Category');
+  $multidomain = sql_multidomain('category');
   $entity_id = sql_parse_id($entity_id, true);
   $query = "SELECT category_id, category_code, category_label 
       FROM CategoryLink
@@ -2384,7 +2384,7 @@ function of_category_user_query_update($params) {
   $cat_id = sql_parse_id($params['category_id'], true);
   $cat_label = $params['category_label'];
   $cat_code = $params['category_code'];
-  $multidomain = sql_multidomain('Category');
+  $multidomain = sql_multidomain('category');
 	
   $query = "UPDATE Category SET
     category_timeupdate = '$timeupdate',
@@ -2416,7 +2416,7 @@ function of_category_user_query_delete($params) {
 
   $category_id = sql_parse_id($params['category_id'], true);
   $category = $params['category'];
-  $multidomain = sql_multidomain('Category');
+  $multidomain = sql_multidomain('category');
 
   if ($params['category_id'] > 0) {
     $query = "DELETE FROM Category
@@ -2619,7 +2619,7 @@ function of_category_user_get_infos($cat_id) {
 function of_category_user_get_code_hash($category) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain('Category');
+  $multidomain = sql_multidomain('category');
 
   $query = "SELECT category_id, category_code
       FROM Category
@@ -2649,7 +2649,7 @@ function of_category_user_get_code_hash($category) {
 function of_category_user_get_category_distribution($entity, $category) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain('Category');
+  $multidomain = sql_multidomain('category');
 	
   $query = "SELECT
       category_id,

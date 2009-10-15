@@ -20,7 +20,7 @@ To do
 
 2009-10-17 : version 2.3.0
 
-  * All changes up to 2.2.6
+  * All changes and fixes up to 2.2.14
   * Add munin framework integration for stats and allow stats for hosts
   * Automate: fix update by delegation
   * #310 fax, desc, categories criteria not ok in people module for user+contact
@@ -45,3 +45,6 @@ To do
   * #727 [Deal] Add the ability to duplicate a deal
   * #783 New Planning module
   * LDAP attribute mapping
+  * #857 [Translation] Romanian obm-ui translation
+  * #858 [Translation] Italian obm-ui translation
+  * #859 [Translation] Deutsch obm-ui translation

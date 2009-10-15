@@ -82,9 +82,9 @@ function run_query_contact_search($contact) {
     if (count($f_contact_ids) > 0) {
       $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
     }
-    $where.= ")";
+    $where.= ')';
   } else {
-    $where = " 1=1 ";
+    $where = ' 1=1 ';
   }
 
   // If company module used (external from Contact)
@@ -274,16 +274,15 @@ function run_query_contact_search($contact) {
     LEFT JOIN Phone as HomePhone ON HomePhone.phone_entity_id = contactentity_entity_id  AND HomePhone.phone_label = 'HOME;VOICE;X-OBM-Ref1'
     LEFT JOIN Address ON address_entity_id = contactentity_entity_id AND address_label = 'WORK;X-OBM-Ref1'
     LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
-  
-  ";
+";
   $left_join = "
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id 
     $join_userdata
     $coords_join
     LEFT JOIN Kind ON contact_kind_id = kind_id
     LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
-    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
-    ";
+    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR'
+";
 
 
   if ((! $fuzzy) || ($lastname == '')) {

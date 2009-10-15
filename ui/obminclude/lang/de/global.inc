@@ -7,8 +7,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
+// Modified on 2009-09-24T17:31:43+02:00 using OBMtranslation (0.4.1)
 
-// Common actions
 $l_find = "Suche";
 $l_back = "Zurück";
 $l_cancel = "Abbruch";
@@ -22,8 +22,6 @@ $l_date_creation = "Erstellungsdatum";
 $l_updater = "Updated by";
 $l_date_last_update = "Last Update";
 $l_delegation = "Delegation";
-
-// Common messages
 $l_yes = "Ja";
 $l_no = "Nein";
 $l_all = "Alle";
@@ -76,8 +74,6 @@ $l_aduplicate = "Duplicate";
 $l_profile = "Berechtigung";
 $l_autocomplete_field = "Search ...";
 $l_fatal_server_err = "Fatal server error, please reload";
-
-// Entities
 $l_company = "Firma";
 $l_contact = "Contact";
 $l_lead = "Lead";
@@ -100,8 +96,6 @@ $l_group = "Groupe";
 $l_resourcegroup = "Groupe de ressources";
 $l_settings = "Configuration";
 $l_kind = "Branche";
-
-// OBM_DISPLAY
 $l_entries = "Einträge #";
 $l_page_res = "Ergebnisse";
 $l_export = "Export";
@@ -115,8 +109,6 @@ $l_display_no = "nicht anzeigen";
 $l_display_yes = "anzeigen";
 $l_down = "Feld eine Zeile nach oben";
 $l_up = "Feld eine Zeile nach unten";
-
-// OBM_DISPLAY help screen
 $l_help = "Hilfe";
 $l_help_display_yes = "Feld wird angezeigt";
 $l_help_display_no = "Feld wird nicht angezeigt";
@@ -125,19 +117,13 @@ $l_help_down = "Feld nach unten schieben";
 $l_help_up = "Feld nach oben schieben";
 $l_document_added = " Dokumente hinzugefügt";
 $l_no_document_added = "keine Dokumente hinzugefügt";
-
-// Javascript common messages
 $l_fill_label = "Label muß eingetragen sein";
 $l_fill_date = "Datum muß eingetragen sein";
 $l_invalid_date = "Falsches Datumsformat";
-
-// Tasktype groups
 $l_tt = "Task Type";
 $l_tt_sales = "abrechenbare Aufgaben";
 $l_tt_research = "interne Aufgaben";
 $l_tt_others = "nicht abrechenbare Aufgaben";
-
-// days and months
 $l_today = "Heute";
 $l_monthsofyear = array (	'Januar','Februar',
 				'März','April','Mai',
@@ -149,19 +135,12 @@ $l_monthsofyearshort = array ('jan','feb','mar','apr','mai','jun',
 $l_daysofweek = array('Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag');
 $l_daysofweekshort = array('So','Mo','Di','Mi','Do','Fr','Sa');
 $l_daysofweekfirst = array ('S','M','D','M','D','F','S');
-
 $l_invalid_perm = "keine Berechtigung";
-
-////////////////////////////////////////////////////////
-////// Theme headers lang files ////////////////////////
-////////////////////////////////////////////////////////
-
 $l_section_com    = "Verwaltung";
 $l_section_prod   = "Produktion";
 $l_section_compta = "Buchhaltung";
 $l_section_user   = "Benutzer";
 $l_section_admin  = "Administration";
-
 $l_module_company = "Firmen";
 $l_module_contact = "Kontakte";
 $l_module_lead = "Lead";
@@ -171,28 +150,23 @@ $l_module_calendar = "Kalender";
 $l_module_todo    = "Aufgaben";
 $l_module_publication  = "Veröffentlichungen";
 $l_module_statistic    = "Statistiken";
-
 $l_module_time = "Zeiterfassung";
 $l_module_project = "Projekt";
 $l_module_contract = "Kontrakt";
 $l_module_incident = "Vorfall";
 $l_module_document = "Dokument";
-
 $l_module_account = "Konto";
 $l_module_invoice = "Rechnung";
 $l_module_payment = "Zahlung";
-
 $l_module_settings = "Einstellungen";
 $l_module_user = "Benutzer";
 $l_module_group = "Gruppe";
-
 $l_module_admin = "Administration";
 $l_module_admin_lang = "Sprache";
 $l_module_admin_data = "Daten";
 $l_module_admin_pref = "Eigenschaften";
 $l_module_admin_code = "Code";
 $l_module_admin_ref = "Referential";
-
 $l_header_new_f = "Neu";
 $l_header_new = "Neu";
 $l_header_find = "Suche";
@@ -201,7 +175,6 @@ $l_header_global_export = "Export";
 $l_header_export = "Export";
 $l_header_consult = "?Consult";
 $l_header_duplicate = "Duplicate";
-
 $l_header_update = "Ändern";
 $l_header_delete =  "Löschen";
 $l_header_add_contact = "Neuer Kontakt";
@@ -209,23 +182,17 @@ $l_header_add_user = "Neuer Benutzer";
 $l_header_add_group = "Neue Gruppe";
 $l_header_add_deal = "Neuer Vertrag";
 $l_header_list = "Liste";
-
 $l_header_new_child = "Neuer Untervertrag";
 $l_header_new_parent = "Neuer Hauptvertrag";
-
 $l_header_reconcile =  "?reconcile";
 $l_header_compute_balance =  "?compute balance?";
 $l_header_duplicate =  "?duplicate";
 $l_header_add_contact = "Neuer Kontakt";
-
-// Project headers
 $l_header_man_task = "Aufgaben";
 $l_header_man_member = "Mitglieder";
 $l_header_advance = "Fortschritt";
 $l_header_man_affect = "?affect";
 $l_header_add_member = "neues Mitglied";
-
-// Admin headers
 $l_header_index = "Main";
 $l_header_help = "Hilfe";
 $l_header_amp = "Show amp";
@@ -236,14 +203,11 @@ $l_header_reset = "?reset";
 $l_header_country = "Country";
 $l_header_datasource = "Data Source";
 $l_header_tasktype = "Aufgabe Type";
-
 $l_header_year = "Jahr";
 $l_header_day = "Tag";
 $l_header_week = "Woche";
 $l_header_month = "Monat";
 $l_header_new_event = "Neues Ereignis";
-
-//time headers
 $l_header_stats = "Statistik";
 $l_header_statsmonth = "Monatsstatistik";
 $l_header_statsuser = "Benutzerstatistik";
@@ -251,13 +215,277 @@ $l_header_weeklyview = "Wochenansicht";
 $l_header_monthlyview = "Monatsansicht";
 $l_header_globalview = "?globalview";
 $l_header_activityreport = "Tätigkeitsbericht";
-
-//document headers
 $l_document_new = "Neues Dokument";
 $l_document_add = "Dokument hinzufügen";
-
-// Debug
 $l_dg_id = "Id";
 $l_dg_param = "Parameters";
 $l_dg_sess = "Session";
 $l_dg_sql = "SQL";
+
+// lines below have been created with OBMtranslation (0.4.1) on 2009-09-24T17:31:43+02:00
+$l_scope_update = ""; 
+$l_login = ""; 
+$l_lang = ""; 
+$l_service = ""; 
+$l_c_link_no = ""; 
+$l_source = ""; 
+$l_module_password = ""; 
+$l_host = ""; 
+$l_number = ""; 
+$l_begin = ""; 
+$l_dg_exe = ""; 
+$l_perm_admin_delegue = ""; 
+$l_header_region = ""; 
+$l_vacation = ""; 
+$l_mphone = ""; 
+$l_connection_end = ""; 
+$l_dates = ""; 
+$l_contacts = ""; 
+$l_my_incident_current = ""; 
+$l_module_resource = ""; 
+$l_section_gw = ""; 
+$l_deal_balanced = ""; 
+$l_insert = ""; 
+$l_last = ""; 
+$l_firstname = ""; 
+$l_recursive = ""; 
+$l_category1 = ""; 
+$l_ok = ""; 
+$l_section_webmail = ""; 
+$l_this_week = ""; 
+$l_err_fill = ""; 
+$l_of_right_err_empty = ""; 
+$l_code = ""; 
+$l_displayname = ""; 
+$l_header_tools_remote = ""; 
+$l_module_mailforward = ""; 
+$l_c_j_delete = ""; 
+$l_admin_permission = ""; 
+$l_module_organizationalchart = ""; 
+$l_import_ok = ""; 
+$l_module_people = ""; 
+$l_client = ""; 
+$l_people = ""; 
+$l_header_closing = ""; 
+$l_update_error = ""; 
+$l_fuzzy = ""; 
+$l_err_delegation_outside_domain = ""; 
+$l_my_lead = ""; 
+$l_my_project_current = ""; 
+$l_potential = ""; 
+$l_supplier = ""; 
+$l_err_delegation_outside_target = ""; 
+$l_public_group_members = ""; 
+$l_right_update_ok = ""; 
+$l_module_import = ""; 
+$l_gid_smb_guest = ""; 
+$l_module_webmail = ""; 
+$l_update = ""; 
+$l_projects = ""; 
+$l_my_project = ""; 
+$l_group_members = ""; 
+$l_file = ""; 
+$l_system = ""; 
+$l_remove = ""; 
+$l_rights_my_on = ""; 
+$l_gid_user = ""; 
+$l_year = ""; 
+$l_header_right = ""; 
+$l_perm_editor = ""; 
+$l_waiting_events = ""; 
+$l_module_tools = ""; 
+$l_before = ""; 
+$l_fill_status = ""; 
+$l_header_closing_new = ""; 
+$l_previous = ""; 
+$l_file_format = ""; 
+$l_project_manager = ""; 
+$l_select_all = ""; 
+$l_basic_search = ""; 
+$l_access_permission = ""; 
+$l_entity_right = ""; 
+$l_duplicate_ok = ""; 
+$l_permission_denied = ; 
+$l_gid_smb_user = ""; 
+$l_order_no_bill = ""; 
+$l_module_mailshare = ""; 
+$l_c_update = ""; 
+$l_coord = ""; 
+$l_j_copy_privilege_alert = ""; 
+$l_cv = ""; 
+$l_day = ""; 
+$l_date_inconsistency = ""; 
+$l_header_convert_deal = ""; 
+$l_timezone = ""; 
+$l_c_checkdelete = ""; 
+$l_section_dic = ""; 
+$l_error_delegation = ""; 
+$l_c_insert = ""; 
+$l_module_cv = ""; 
+$l_late = ""; 
+$l_billed = ""; 
+$l_my_deal = ""; 
+$l_header_tools_upd = ""; 
+$l_password = ""; 
+$l_transparent = ""; 
+$l_street = ""; 
+$l_header_vcard = ""; 
+$l_week = ""; 
+$l_write_permission = ""; 
+$l_header_add_resource = ""; 
+$l_disabled = ""; 
+$l_next = ""; 
+$l_read_permission = ""; 
+$l_header_link_invoice = ""; 
+$l_select_group = ""; 
+$l_import_error = ""; 
+$l_valid_error = ""; 
+$l_module_samba = ""; 
+$l_cr_date[$cr_date_current] = ""; 
+$l_insufficient_permission = ""; 
+$l_c_j_update = ""; 
+$l_home = ""; 
+$l_header_planning = ""; 
+$l_perm_user = ""; 
+$l_data_unfilled = ""; 
+$l_website = ""; 
+$l_unselect_all = ""; 
+$l_header_batch = ""; 
+$l_pagelayout_portrait = ""; 
+$l_backup = ""; 
+$l_section_my = ""; 
+$l_print = ""; 
+$l_module_domain = ""; 
+$l_gid = ""; 
+$l_active = ""; 
+$l_right_validate = ""; 
+$l_module_resourcegroup = ""; 
+$l_header_quickupdate = ""; 
+$l_all_aliases = ""; 
+$l_type = ""; 
+$l_period = ""; 
+$l_module_vacation = ""; 
+$l_valid_ok = ""; 
+$l_tomorrow = ""; 
+$l_header_admin = ""; 
+$l_logout = ""; 
+$l_reconnect = ""; 
+$l_advanced = ""; 
+$l_header_properties = ""; 
+$l_perm_admin = ""; 
+$l_header_import = ""; 
+$l_delete_error = ""; 
+$l_header_select_syncserver = ""; 
+$l_less_fields = ""; 
+$l_role = ""; 
+$l_cr_date[$cr_date_torenew] = ""; 
+$l_c_new = ""; 
+$l_of_right_err_auth = ""; 
+$l_after = ""; 
+$l_invalid_date_year = ""; 
+$l_module_monitoring = ""; 
+$l_private_group_members = ""; 
+$l_header_wait = ""; 
+$l_cr_date[$cr_date_ended] = ""; 
+$l_delete_ok = ""; 
+$l_hide = ""; 
+$l_invalid_date_month = ""; 
+$l_my_calendar = ""; 
+$l_groups = ""; 
+$l_pagelayout_landscape = ""; 
+$l_show = ""; 
+$l_unfilled = ""; 
+$l_enabled = ""; 
+$l_import_file = ""; 
+$l_size = ""; 
+$l_days = ""; 
+$l_delete = ""; 
+$l_control = ""; 
+$l_items = ""; 
+$l_module_backup = ""; 
+$l_last_visit = ""; 
+$l_cr_date[$cr_date_tosign] = ""; 
+$l_im = ""; 
+$l_cat_tree = ""; 
+$l_version = ""; 
+$l_header_dashboard = ""; 
+$l_header_upd_group = ""; 
+$l_domain = ""; 
+$l_c_j_create = ""; 
+$l_attendee = ""; 
+$l_next_week = ""; 
+$l_emitted = ""; 
+$l_module_host = ""; 
+$l_ip = ""; 
+$l_module_profile = ""; 
+$l_selection = ""; 
+$l_c_link = ""; 
+$l_err_public_rights = ""; 
+$l_mailforward = ""; 
+$l_file_error = ""; 
+$l_header_syntheticview = ""; 
+$l_title = ""; 
+$l_format = ""; 
+$l_hphone = ""; 
+$l_organizationalchart = ""; 
+$l_infos = ""; 
+$l_tools = ""; 
+$l_cr_date[$cr_date_tobegin] = ""; 
+$l_total = ""; 
+$l_deal_total = ""; 
+$l_my_incident = ""; 
+$l_c_manage = ""; 
+$l_mailshare = ""; 
+$l_without = ""; 
+$l_c_delete = ""; 
+$l_c_can_delete = ""; 
+$l_c_cant_delete = ""; 
+$l_received = ""; 
+$l_module_report = ""; 
+$l_manager = ""; 
+$l_mailbox = ""; 
+$l_advanced_search = ""; 
+$l_module_campaign = ""; 
+$l_c_upd = ""; 
+$l_hour = ""; 
+$l_of_right_err_resource = ""; 
+$l_email = ""; 
+$l_direction = ""; 
+$l_my_contract_current = ""; 
+$l_this_month = ""; 
+$l_displayname_alternative = ""; 
+$l_properties = ""; 
+$l_my_contract = ""; 
+$l_mail = ""; 
+$l_region = ""; 
+$l_year_detail = ""; 
+$l_generate = ""; 
+$l_users = ""; 
+$l_update_ok = ""; 
+$l_my_time = ""; 
+$l_lastname = ""; 
+$l_gid_smb_admin = ""; 
+$l_of_right_err_user = ""; 
+$l_search = ""; 
+$l_month = ""; 
+$l_pagelayout = ""; 
+$l_member = ""; 
+$l_new = ""; 
+$l_stats = ""; 
+$l_quota = ""; 
+$l_fill_priority = ""; 
+$l_more_fields = ""; 
+$l_invalid_date_day = ""; 
+$l_err_reference = ""; 
+$l_my_deal_current = ""; 
+$l_module_control = ""; 
+$l_next_month = ""; 
+$l_duplicate_error = ""; 
+$l_rights_on_my = ""; 
+$l_hide_advanced_search = ""; 
+$l_invalid_email = ""; 
+$l_module_mailbox = ""; 
+$l_insert_error = ""; 
+$l_insert_ok = ""; 
+$l_calendar = ""; 
+

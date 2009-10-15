@@ -343,7 +343,7 @@ function sql_multidomain($entity, $and=true) {
   if ($and) {
     $wand = 'AND';
   }
-  $where = "$wand (${entity}_domain_id='$domain_id' $wext)";
+  $where = "$wand (${entity}_domain_id='$domain_id')";
 
   return $where;
 }
