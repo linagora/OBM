@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-// Database fields
 $l_middlename = 'Middle Name';
 $l_mname = 'Middle Name';
 $l_suffix = 'Suffix';
@@ -26,25 +25,23 @@ $l_private_only = "Private contacts only";
 $l_newsletter = "Newsletter";
 $l_news = "News";
 $l_code = "Code";
-$l_letter = "Letter Head";
+$l_letter = "Letterhead"; 
 $l_comment1 = "Comment";
 $l_comment2 = "Comment 2";
 $l_comment3 = "Comment 3";
 $l_date_after = "Inscription date after";
 $l_date_before = "Inscription date before";
 $l_mailing_ok_first = "Mail.";
-$l_other_infos = 'Other Informations';
-$l_birthday = "Birth day";
+$l_other_infos = "Other Information"; 
+$l_birthday = "Birthday"; 
 $l_anniversary = 'Anniversary';
 $l_assistant = 'Assistant';
 $l_spouse = 'Spouse';
 $l_synchronisation = "Subscription";
-
-// Labels and texts
 $l_contact_name = "Contact Name";
 $l_from_company = "From Company";
 $l_telother = "Other tel";
-$l_contact_select_company = "Select the company for the contact.";
+$l_contact_select_company = "Select company for contact."; 
 $l_kind_manage = "Contact Kind Management";
 $l_kind_exist = "Existing Kinds";
 $l_kind_no = "No kind defined";
@@ -53,11 +50,9 @@ $l_header = "Header";
 $l_subscription = "Subscriptions";
 $l_subscription_list = "Subscriptions";
 $l_subscription_new= "New subscription";
-
-// Actions
-$l_insert = "Insert the Contact";
+$l_insert = "Insert Contact"; 
 $l_update = "Update the Contact";
-$l_checkdelete = "Check or Delete the Contact";
+$l_checkdelete = "Check or Delete Contact"; 
 $l_delete = "Delete the Contact";
 $l_kind_update = "Update Kind";
 $l_kind_checkdelete = "Check or Delete Kind";
@@ -71,7 +66,7 @@ $l_add_comment3 = "Add a comment 3";
 $l_upd_comment3 = "Update comment 3";
 $l_copy = "Copy";
 $l_exportation = "Export";
-$l_download_contact_card = "Download contact informations";
+$l_download_contact_card = "Download contact information"; 
 $l_vcard = "Vcard";
 $l_sync_contact = "PDA synchronisation";
 $l_sync = "Subscirbe for synchronisation";
@@ -88,46 +83,39 @@ $l_confirm_delete_ad = "Remove address book ";
 // Messages
 $l_check_samecontact = "These contacts seem similar to this new entry !";
 $l_link_deal = "The contact is involved in some deals";
-$l_link_deal_no = "The contact isn't involved in any deal";
+$l_link_deal_no = "The contact is not involved in any deal"; 
 $l_link_contract = "The contact is involved in some contracts";
-$l_link_contract_no = "The contact isn't involved in any contract";
+$l_link_contract_no = "The contact is not involved in any contract"; 
 $l_link_list = "The contact is registered in some lists";
-$l_link_list_no = "The contact isn't registered in any list";
+$l_link_list_no = "The contact is not registered in any list"; 
 $l_link_publication = "The contact has some subscriptions";
-$l_link_publication_no = "The contact hasn't any subscription";
-$l_cant_delete = "The contact can't be deleted !";
+$l_link_publication_no = "The contact has no subscription"; 
+$l_cant_delete = "The contact cannot be deleted !"; 
 $l_can_delete = "The contact can be deleted.";
-$l_no_display = "Fill the search fields and press < Find > to retrieve the contacts";
+$l_no_display = "Fill in the search fields and press < Find > to retrieve the contacts"; 
 $l_found = "contacts found.";
-$l_no_found = "No contact found matching the query !";
+$l_no_found = "No contact matching the query has been found!"; 
 $l_no_export = "No contact to export !";
-// Kind Messages
 $l_kind_link_company = "These companies are referenced as";
 $l_kind_link_company_no = "No company referenced as";
-$l_kind_cant_delete = "The Kind can't be deleted !";
+$l_kind_cant_delete = "The Kind cannot be deleted !"; 
 $l_kind_can_delete = "The Kind can be deleted.";
-
 $l_birthday_event_title = "%s's birthday";
 $l_anniversary_event_title = "%s's anniversary";
-
-// JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
-$l_fill_lastname = "You have to fill the Lastname before submitting.";
+$l_fill_lastname = "You have to fill in the Last name before submitting."; 
 $l_fill_company = "You have to select a company before submitting.";
-$l_fill_phone = "You have to fill the Phone before submitting.";
-$l_delete_confirm = "Really delete the contact ?";
+$l_fill_phone = "You have to fill in the Phone number before submitting."; 
+$l_delete_confirm = "Confirm contact deletion?"; 
 $l_j_check_phone = "The phone number is not valid.";
 $l_j_check_hphone = "The personal phone number is not valid.";
 $l_j_check_mphone = "The mobile phone number is not valid.";
 $l_j_check_fax = "The fax number is not valid.";
-$l_j_check_email = "The email address is not valid.";
+$l_j_check_email = "The email address is not valid. Verify domain."; 
 $l_j_select_contact = "You have to select a contact !";
-// JavaScript messages - Kind
 $l_j_kind_delete = "You have to select a kind to check or delete it !";
 $l_j_kind_update = "You have to select a kind and enter a new name to update it !";
-$l_j_kind_create = "You have to fill all kind informations kind to create it !";
-// For the display parameters modification screen
-$l_contact_display = "Display options for contacts list"; 
-//External Field
+$l_j_kind_create = "You have to fill in all kind information to create it !"; 
+$l_contact_display = "Display options for contact lists"; 
 $l_timecreate = "Creation";
 $l_timeupdate = "Last update";
 $l_publication_title = "Title";
@@ -135,9 +123,7 @@ $l_renewal = "Automatic renewal";
 $l_recept = "Reception mode";
 $l_quantity = "Quantity";
 $l_no_found_subscription = "No subscription found for this contact !";
-
 $l_vcf_file = "VCF file to import";
-
 $l_phone_labels = array ('HOME_VOICE' => 'Home phone', 'WORK_VOICE' => 'Work phone', 'CELL_VOICE' => 'Mobile phone', 'HOME_FAX' => 'Home fax', 'WORK_FAX' => 'Work fax', 'PAGER' => 'Pager', 'OTHER' => 'Other phone');
 $l_email_labels = array ('INTERNET' => 'Home', 'OTHER' => 'Other');
 $l_address_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');

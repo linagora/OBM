@@ -1,6 +1,6 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                   //
+// OBM - Language : English                                                   //
 //     - File     : calendar.inc                                             //
 // 2002-01-06 by Pierre Baudracco                                            //
 ///////////////////////////////////////////////////////////////////////////////
@@ -18,9 +18,6 @@ $l_resources = "Resources";
 $l_groups = "Groups";
 $l_title = "Title";
 $l_location = "Location";
-$l_documents = "Documents";
-$l_other_files = "Other files";
-$l_allow_documents = "Allow attendees to attach documents";
 $l_private_description = "This is a private event, you cannot see the details";
 $l_back_mono = "Back to your own view";
 $l_free_resources = "Free resources";
@@ -29,11 +26,8 @@ $l_high = "High";
 $l_low = "Low";
 $l_medium = "Medium";
 $l_details = "Details";
-
 $l_occupied_day = "Whole day";
 $l_user_right = "Manage rights for";
-$l_search_my_calendar = "Search in my calendar";
-$l_basic_search_result = "Search result for future events";
 $l_exception = "Exceptions";
 $l_alerts = "Alerts";
 $l_alerts_time = "Alerts (minutes before)";
@@ -54,11 +48,11 @@ $l_resource_allocated = "Resources allocated";
 $l_repeatdays2 = "Repetition days";
 $l_repeatfrequency = "Frequency";
 $l_everybody = "Everybody";
-$l_everyresources = "Every resources";
+$l_everyresources = "All resources";
 $l_all_day = "All day";
 $l_begin = "Beginning";
 $l_end = "End";
-$l_link_events = "linked events with this category.";
+$l_link_events = "events linked to this category ";
 $l_accepted = "Accepted";
 $l_needs_action = "Needs action";
 $l_declined = "Declined";
@@ -93,16 +87,12 @@ $l_category_filter = "Filter by category";
 $l_events = "Events";
 $l_days = 'days';
 $l_more = 'more';
-
-// PDF Options
 $l_display_details = "Display details";
 $l_one_day_per_page = "One day per page";
 $l_display_days = "Display days";
-
 $l_collapse_all = "Collapse all";
 $l_expand_all = "Expand all";
 $l_edit = "Edit";
-
 $l_view = "View";
 $l_view_default = "Default view";
 $l_views = "Views";
@@ -112,9 +102,8 @@ $l_delete_default_view = "Delete default view";
 $l_view_label = "View label";
 $l_view_save = "Save view";
 $l_view_delete = "Delete view";
-
-$l_first_hour = "Hour begin";
-$l_last_hour = "Hour end";
+$l_first_hour = "Starting hour";
+$l_last_hour = "End Hour";
 
 // Templates
 $l_save_as_template = "Save as template";
@@ -145,8 +134,8 @@ $l_change_state = "Your event participation";
 $l_force_insert = "Force insert";
 $l_refuse_insert = "Refuse event";
 $l_cancel_insert = "Wait...";
-$l_calendar_select_group = "Select the groups.";
-$l_force = "Force the event insertion";
+$l_calendar_select_group = "Select groups.";
+$l_force = "Force event insertion";
 $l_force_disabled = "(impossible because of a conflictual resource)";
 $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free time slots";
@@ -155,8 +144,7 @@ $l_notification =  "Notify";
 $l_attach_documents = "Attach";
 
 $l_event_color_tt = "Event's colors are the ones defined during the event creation.";
-
-$l_confirm_delete ="This operation will remove this occurence of this event for all the users, are you sure to want to continue?";
+$l_confirm_delete = "This operation will remove the occurence of this event for all users, are you sure you want to continue?";
 $l_confirm = "Confirm";
 $l_cancel = "Cancel";
 $l_update_warning = "Warning: some conflicts have been detected";
@@ -164,40 +152,35 @@ $l_insert_warning = "Warning: some conflicts have been detected";
 $l_update_error = "Conflicts have been detected, update cancelled";
 $l_insert_error = "Conflicts have been detected, insertion cancelled";
 $l_view_type = "View type";
-
-// Messages
 $l_sendamail = "Attendees Notification";
 $l_select_contacts = "You have to select a user or group.";
 $l_select_repeat_day = "You have to select the repetition days.";
 $l_select_pdf_day = "You have to select one day";
-$l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour "; 
-$l_fill_title = "You have to fill the [ $l_title ] field";
-$l_fill_dateend = "You have to fill the [ $l_dateend ] field";
-$l_fill_datebegin = "You have to fill the field [ $l_datebegin ]";
+$l_conflict_events = "The chosen time slots are occupied for ";
+$l_fill_title = "You have to fill in the [ $l_title ] field";
+$l_fill_dateend = "You have to fill in the [ $l_dateend ] field";
+$l_fill_datebegin = "You have to fill in the [ $l_datebegin ] field";
 $l_warn_date_past = "Event date begin is in the past";
 $l_warn_file_upload = "Some files could not be uploaded";
 $l_err_no_calendar_selected = "No calendar selected";
 $l_err_begin_end = "End date must be after begin date!";
 $l_err_end_repeat = "Repetion end must be after end date";
 $l_err_end_repeat2 = "The max duration of a repetition is one year";
-$l_err_end_repeat3 = "The max duration of a repetition is ten years when the repetition kind is yearly";
-$l_err_days_repeat = "You must check one or more repetition day.";
-$l_err_days_repeat_not_weekly = "You can give repetition days only on weekly repetition.";
-$l_err_weekly_repeat = "For weekly repetition, the end of the repetition must at least be seven day after the end of the event.";
+$l_err_end_repeat3 = "The max duration of a repetition is ten years when the repetition is yearly";
+$l_err_days_repeat = "You must check one or more repetition days.";
+$l_err_days_repeat_not_weekly = "You can select repetition days only on weekly repetition.";
+$l_err_weekly_repeat = "For weekly repetition, the end of the repetition must be at least seven days after the end of the event.";
 $l_err_monthly_dateend_repeat = "Monthly repetition date end must be at least one month later than the event date end.";
 $l_err_yearly_dateend_repeat = "Yearly repetition date end must be at least one year later than the event date end.";
 $l_err_repeatfrequency = "Frequency is invalid";
 $l_event_cant_delete = "You can only delete your own events!";
-
-$l_fill_view_label = "You have to fill the [$l_view_label] field";
-$l_confirm_delete_view = "Do you realy want to delete this view?";
-$l_confirm_default_view = "Do you realy want to delete the default view ?";
-$l_no_sel_view = "Can't delete: no selected view";
+$l_fill_view_label = "You have to fill in the [$l_view_label] field";
+$l_confirm_delete_view = "Do you really want to delete this view?";
+$l_confirm_default_view = "Do you really want to delete the default view ?";
+$l_no_sel_view = "Cannot delete: no selected view";
 $l_no_sel_default_view = "Default view : no selected view";
 $l_conflict_view_label = "$l_view_label: Conflict has been detected";
-
-$l_unknown = "Inconnu";
-
+$l_unknown = "Unknown ";
 $l_header_planning = "Planning";
 $l_header_meeting = "New meeting";
 $l_header_admin = "Administration";
@@ -212,11 +195,9 @@ $l_noone = "Authorized nobody";
 $l_authorize = "Authorize";
 $l_deny = "&gt;&gt;&gt;&gt;";
 $l_periodic = "Periodic";
-//Mail
 $l_add_event_mail_head = "New event on OBM:";
 $l_update_event_mail_head = "Event updated on OBM:";
 $l_delete_event_mail_head = "Event deleted on OBM:";
-
 $l_today_date = "Today";
 $l_update_event_mail_body = "Instead of: ";
 $l_delete_event_mail_body = "Date: ";
@@ -224,68 +205,44 @@ $l_confirm_mail = "Confirm+Force notification";
 $l_add_event_mail_subject = "New event on obm";
 $l_update_event_mail_subject = "Updated event on obm";
 $l_delete_event_mail_subject = "Deleted event on obm";
-// JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_interval_null = "Duration cannot be null";
-$mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";
-$mj_fill_time_begin = "\\n Vous devez saisir une heure de debut.";
-$mj_fill_time_end = "\\n Vous devez saisir une heure de fin.";
-$mj_fill_valid_time_begin = "\\n Vous devez saisir une heure de debut valide.";
-$mj_fill_valid_time_end = "\\n Vous devez saisir une heure de fin valide.";
-$mj_delete_confirm = "Confirmer la suppression du rdv ?";
-$mj_invalid_day = "Ce jour n'existe pas pour le mois selectionne.";
-$mj_date_incompatibility = "La date de fin ne peut etre anterieure a la date de debut.";
-$mj_repeat_date_incompatibility = "La date de fin de repetition ne peut etre anterieure a la date de debut."; 
-$mj_event_delete_confirm = "Confirmer la suppression du rdv ?"; 
-$mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses repetitions ?";
-
+$mj_fill_title_event = "You have to enter a title for the event ";
+$mj_fill_time_begin = "You have to enter a starting hour";
+$mj_fill_time_end = "You have to enter an end date";
+$mj_fill_valid_time_begin = "You have to insert a valid beginning date ";
+$mj_fill_valid_time_end = "You have to enter a valide time end"; 
+$mj_delete_confirm = "Confirm event deletion?"; 
+$mj_invalid_day = "This day does not exist for the selected month";
+$mj_date_incompatibility = "The end date must not be prior to the beginning date ";
+$mj_repeat_date_incompatibility = "The repetition end date cannot be prior to the beginning one.";
+$mj_event_delete_confirm = "Confirm event deletion?";
+$mj_event_delete_all_confirm = "Do you confirm the cancellation of the event and all its repetitions ?";
 $l_view_agenda_desc = 'Calendar view, this view is editable';
 $l_view_planning_desc = 'Planning view, this view cannot be edited';
 $l_view_printable_desc = 'Printable view, this view cannot be edited';
 $l_view_list_desc = 'List view, this view cannot be edited';
 $l_view_week_desc = 'Week view';
 $l_view_day_desc = 'Day view ';
-$l_view_month_desc = 'Month_view';
+$l_view_month_desc = "Month view";
 $l_expand_all = "Expand All";
 $l_edit_full = "Advanced";
-$l_confirm_delete_all ="This operation will remove all occurences of this event for all the users, are you sure to want to continue?";
-
+$l_confirm_delete_all = "This operation will remove all occurences of this event for all users, are you sure you want to continue?";
 $l_ics_insert = 'Import';
 $l_ics_file = 'ICS file to import';
-$l_ics_import_ok = 'event(s) have been inserted.';
-
-
-$l_tag = "Tag" ;
-$l_tags = "Tags" ;
-$l_tag_management = "Tags management" ;
-$l_tag_fill_label = "You have to fill the label." ;
-$l_tag_fill_color = "You have to choose a color." ;
-
-//Export calendar
-$l_all_calendar = "All calendar";
-$l_event_before_date = "Only events before : ";
-$l_delete_event = "Delete appointement";
-$l_delete_meeting = "Delete meeting";
-$l_ics_export_ok = 'Event(s) have been exported.';
-$l_confirm_delete_export ="This operation will remove some event in calendar, are you sure to want to continue?";
-$l_purge_popup_title = "Purge on your calendar";
-
+$l_ics_import_ok = 'events have been inserted.';
 $l_add_exception_mail_body = 'Updated event on OBM: %s';
 $l_delete_exception_mail_subject = 'Updated event on OBM: %s';
 $l_update_state_mail_subject = 'Attendees update on OBM event: %s';
-
 $l_resource_group_search = "Slot is free if";
 $l_resources_one_freebusy = "One resource is free by group";
 $l_resources_all_freebusy = "All resources are free";
-
 $l_freebusy_autopick_prev = "«";
 $l_freebusy_autopick_next = "AutoPick Next »";
 $l_display_entites_freebusy = "Display busy attendees/resources";
 $l_show_calendar = "See calendar";
-$l_calendar_not_available = "Calendar doesn't exist or isn't shared";
+$l_calendar_not_available = "Calendar does not exist or is not shared";
 $l_freebusy_check_availability = "Check attendees and resources availability ";
-
 $l_no_end_repeat = "No end repeat";
-
 $l_add_event_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -306,7 +263,6 @@ on the subject of %s (location: %s).
 -------------------------------------------------------------------
 This message was sent on %s at %s by %s %s from OBM 
 %s";
-
 $l_add_resource_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -323,7 +279,6 @@ A new resource reservation was scheduled on %s to %s for %s
 -------------------------------------------------------------------
 This message was sent on %s at %s by %s %s from OBM 
 %s";
-
 $l_update_event_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -343,7 +298,6 @@ was updated and will take place from %s to %s (location: %s).
 -------------------------------------------------------------------
 This message was sent on %s at %s by %s %s from OBM 
 %s";
-
 $l_update_resource_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -360,7 +314,6 @@ The resource reservation %s, initially scheduled from %s to %s
 -------------------------------------------------------------------
 This message was sent on %s at %s by %s %s from OBM 
 %s";
-
 $l_delete_event_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -376,7 +329,6 @@ was deleted.
 -------------------------------------------------------------------
 This message was sent on %s at %s by %s %s from OBM 
 %s";
-
 $l_delete_resource_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -392,7 +344,6 @@ The resource reservation %s, initially scheduled from %s to %s
 -------------------------------------------------------------------
 This message was sent on %s at %s by %s %s from OBM 
 %s";
-
 $l_delete_exception_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -408,7 +359,6 @@ One or more occurrences of the appointment %s, initially cancelled
 -------------------------------------------------------------------
 This message was sent on %s at %s by %s %s from OBM 
 %s";
-
 $l_add_exception_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -424,7 +374,6 @@ on %s were cancelled.
 -------------------------------------------------------------------
 This message was sent on %s at %s by %s %s from OBM 
 %s";
-
 $l_update_state_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -439,7 +388,6 @@ The attendee %s to %s have changed to %s.
 -------------------------------------------------------------------
 This message was sent on %s at %s by %s %s from OBM 
 %s";
-
 $l_alert_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
@@ -454,18 +402,49 @@ The appointment %s(%s) will take place in %s minutes (location: %s).
 -------------------------------------------------------------------
 This message was sent on %s at %s by OBM 
 %s";
-
-
-$l_confirm_reset = 'This will completly reset your calendar, and will cancell all your scheduled meetings. Are you sure you want to continue?';
+$l_confirm_reset = "This will completely reset your calendar, and will cancel all your scheduled meetings. Are you sure you want to continue?";
 $l_js_confirm_reset = 'This cannot be canceled, do you want to continue ?';
-
-
 $l_conflict_message = 'Some attendees are not available for this time slot';
 $l_conflict_manage = 'Manage conflict';
 $l_conflict_force = 'Force move';
 $l_conflict_sendmail = 'Notification by email?';
-
-$l_toggle_public_access = "This will allow everybody to invite this user. Do you want to continue ?";
-$l_toggle_public_read = "This will make this calendar readable for everybody. Do you want to continue ?";
+$l_toggle_public_access = "This will allow everybody to invite this user to a meeting. Do you want to continue ?";
+$l_toggle_public_read = "This will make the calendar readable by everybody. Do you want to continue ?";
 $l_toggle_public_write = "This will allow everybody to update, accept and refuse event for this user. Do you want to continue ?";
-$l_toggle_public_admin = "This will allow everybody to update this user's calendar right. Do you want to continue ?";
+$l_toggle_public_admin = "This will allow everybody to update this calendar rights. Do you want to continue ?";
+$l_items = "Items";
+$l_view_printable = "Printable";
+$l_range_month = "monthly";
+$l_view_agenda = "Calendar";
+$l_ics = "Import";
+$l_warn_date_past = "The event's beginning date is in the past ";
+$l_add_exception_mail_subject = 
+"Event modification in OBM : %s
+";
+$l_range_week = "weekly";
+$l_rights_on_my = "Calendar rights";
+$l_rights_my_on = "My calendar rights";
+$l_alert_mail_subject = "Impending event ";
+$l_cal_view = "View type";
+$l_range_day = "daily";
+$l_view_planning = "Planning";
+$l_view_list = "Events list";
+$l_cal_range = "Display period";
+$l_tag_management = "Tag Management"; 
+$l_other_files = "Other files"; 
+$l_event_before_date = "Events date before :"; 
+$l_tags = "Tags"; 
+$l_purge_popup_title = "Purge address book"; 
+$l_allow_documents = "Allow participants to attach documents"; 
+$l_tag_fill_color = "You have to choose a colour."; 
+$l_delete_meeting = "Delete meetings from my calendar"; 
+$l_search_my_calendar = "Search in my calendar"; 
+$l_confirm_delete_export = "The events from your calendar are going to be deleted, this process cannot be cancelled, do you want to continue? "; 
+$l_ics_export_ok = "The events have been exported."; 
+$l_tag = "Tag"; 
+$l_documents = "Documents"; 
+$l_all_calendar = "All calendar"; 
+$l_basic_search_result = "Search result for future events"; 
+$l_delete_event = "Delete appointment from my calendar"; 
+$l_tag_fill_label = "You have to insert a tag."; 
+

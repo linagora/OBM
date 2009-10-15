@@ -6,49 +6,309 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
+// Modified on 2009-09-11T17:44:00+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:18:05+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:19:13+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:20:59+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:22:33+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:28:39+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:29:34+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:33:01+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:34:57+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:36:25+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:38:05+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:46:32+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:47:32+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:50:41+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:51:53+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:52:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:53:32+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:54:59+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T14:57:03+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:05:01+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:16:15+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:31:39+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:35:56+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:38:59+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:42:38+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:51:18+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:51:56+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:51:58+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:52:47+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T15:59:15+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:00:30+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:01:36+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:05:43+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:05:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:08:36+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:08:39+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:14:00+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:14:03+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:27:13+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:30:25+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:35:28+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:36:38+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:37:27+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:38:26+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:43:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:44:24+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:48:32+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:51:47+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:54:00+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:56:16+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:56:52+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:57:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:57:58+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T16:59:40+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:00:23+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:05:12+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:07:43+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:07:45+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:12:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:14:28+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:15:52+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:20:34+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:21:47+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:27:57+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:28:45+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:28:47+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:38:44+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T17:52:16+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T18:01:39+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T18:02:32+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-15T18:02:34+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:30:44+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:32:47+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:32:49+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:37:35+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:40:11+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:41:02+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:45:47+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:51:02+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:53:32+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T14:55:53+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:02:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:12:01+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:14:59+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:17:04+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:22:29+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:22:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:26:15+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:26:49+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:27:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:44:15+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:46:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T15:59:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T16:01:01+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T16:08:40+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T16:27:18+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T16:31:21+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T17:09:15+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T17:27:44+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T17:27:47+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T17:46:55+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T18:12:05+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T18:12:39+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-16T18:22:05+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:18:40+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:20:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:20:45+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:22:09+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:22:25+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:23:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:24:22+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:27:52+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:28:11+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:30:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:31:35+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:32:24+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:33:00+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:34:37+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:35:33+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:36:05+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:36:33+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:37:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:37:38+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:38:20+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:39:32+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:40:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:41:27+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:42:40+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:42:52+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:45:00+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:45:42+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:47:16+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T11:49:25+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:01:37+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:02:09+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:05:02+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:06:48+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:10:58+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:14:37+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:15:03+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:16:37+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:17:35+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:18:50+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:21:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:21:56+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T12:23:57+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:24:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:25:13+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:30:53+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:32:39+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:34:54+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:35:30+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:37:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:37:42+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:39:50+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:41:20+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:41:56+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:41:59+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:43:50+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:54:52+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:54:55+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:55:40+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:55:54+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:57:39+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:57:59+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:58:08+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:58:54+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T14:59:14+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:00:42+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:03:14+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:06:26+02:00 using OBMtranslation (0.4.1)
 
 $l_user_name = "Utente";
 $l_password = "Password";
 $l_lastaccess = "Ultimo Accesso";
 $l_email = "@M";
 $l_perms_user = "Utente";
-$l_perms_editor = "Editor";
+$l_perms_editor = "Editore";
 $l_perms_admin = "Amministratore";
-$l_check_usercreate = " voci dell'utente.";
+$l_check_usercreate = " Voci dell'utente."; 
 $l_check_userupdate = " voci aggiornate dall'utente.";
-$l_no_user = "No campi utente nella tabella";
-$l_group_member = "dai gruppi";
-$l_delegation_target = "Delegation mira";
-
-// Actions
+$l_no_user = "Nessun campo utente nella tabella";
+$l_group_member = "Membri gruppo";
+$l_delegation_target = "Amministrazione delegata";
 $l_insert = "Crea utente";
 $l_update = "Modifica utente";
-$l_update_group = "Modifica i gruppi";
+$l_update_group = "Modifica i gruppi di utenti";
 $l_checkdelete = "Controlla o elimina utente";
-$l_reset = "Reset impostazioni utente";
+$l_reset = "Resetta impostazioni utente";
 $l_delete = "Elimina utente";
-$l_add = "Aggiungi i utenti";
-$l_delete_userobmphoto = "Delete user's photo";
-
-// Messages
-$l_no_display = "Riempi i campi e premi <TROVA> per la ricerca";
-$l_found = "utenti in elenco.";
+$l_add = "Aggiungi utenti";
+$l_delete_userobmphoto = "Elimina foto utente";
+$l_no_display = "Riempi i campi di ricerca e premi <CERCA> per ottenere l'elenco degli utenti";
+$l_found = "utenti trovati.";
 $l_no_found = "Nessun utente trovato!";
-$l_reset_ok = "Impostazioni utente reimpostate";
+$l_reset_ok = "Preferenze utente reimpostate";
 $l_login_error = "Nome utente non valido!";
-$l_password_error = "Passoword noon valida!";
+$l_password_error = "Password non valida!";
 $l_email_error = "Email non valida";
 $l_lname_error = "Nome non valido !";
-$l_exist_error = "già esistente";
-$l_check_sameuser = "Utenti simili a nuovo!";
-
-$l_add_users = "AAggiungi Utenti";
-
-// JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
+$l_exist_error = "Un utente con questo nome esiste già !"; 
+$l_check_sameuser = "Questi utenti sembrano simili al nuovo inserito!";
+$l_add_users = "Aggiungi Utenti";
 $l_fill_username = "Scrivi prima il nome utente.";
 $l_fill_password = "Scrivi prima la password.";
 $l_delete_confirm = "Confermi eliminazione utente?";
-$l_j_check_email = "Email non valida";
-$l_change_login_confirm = "Really update user's login ?";
+$l_j_check_email = "Email non valida. Controlla dominio.";
+$l_change_login_confirm = "Hai modificato l'username dell'utente. E necessario che l'utente sia sconnesso di tutte le applicazioni OBM durante la validazione di questa modifica (OBM, client di posta, webmail, connettore). Confermi la modifica di username?"; 
+$l_user_display = "Opzioni di visualizzazione dell'elenco Utenti"; 
+$l_err_web_all = "La modalità di acesso Web non è indicata!";
+$l_phone2 = "$l_phone 2";
+$l_web_mode = "Accesso web autorizzato";
+$l_password_empty = "Inserisci una password valida - da 4 a 12 caratteri (alfanumerici o -\$\&~#{([|_`^@);]+=}%!:/.,?<>\) !";
+$l_login_in_use = "Il login è stato attribuito ad un altro utente!";
+$l_create_date = "Data di creazione";
+$l_uemail_exist = "Indirizzo email inseriro più volte!";
+$l_smb_home = "Directory home";
+$l_err_home = "Directory Home Windows non valida!";
+$l_user_import_row_cols_error = "Riga non valida. Numero di colonne scorretto!";
+$l_vacation_datebegin = "Da";
+$l_administration = "Amministrazione";
+$l_coord_same_phone_error = "Devi inserire numeri di telefono diversi!";
+$l_empty_vacation_message = "Il messaggio di assenza non può essere vuoto quando l'invio è attivo!";
+$l_vacation_message = "Messaggio";
+$l_nomade_perms_error = "L'email nomade non può essere attivato se non è autorizzato!";
+$l_web_consult_list = "Controlla l'elenco URL";
+$l_do_batch_processing = "Lancia elaborazione sequenziale";
+$l_phone_error = "Numero di telefono scorretto";
+$l_mailserver_auto = "Automatico";
+$l_err_drive = "Il lettore Home  WIndows  è scorretto!";
+$l_web = "Accesso Web";
+$l_vacation_without_mail_perms = "Il messaggio di assenza non può essere attivato se la posta non è autorizzata!";
+$l_smb_perms = "Utente Windows";
+$l_email_nomad_error = "La posta nomade non può essere attivata se l'indirizzo email nomade non è riempito!";
+$l_password_update = "Modificazione password";
+$l_group = "Gruppo";
+$l_quota_error = "Quota posta non valida!";
+$l_host_enable = "Attivo sull'Host";
+$l_download_user_card = "Scarica scheda utente";
+$l_user_delete_himself_error = "Non puoi eliminarti!";
+$l_mail_perms_error = "La posta interna deve essere attiva per utilizzare la posta esterna!";
+$l_email_exist = "L'indirizzo email inserito è già usato!";
+$l_fax_error = "Numero fax non valido";
+$l_nomade = "Accesso Email nomade";
+$l_quota = "Quota";
+$l_smb_home_drive = "Lettore home";
+$l_j_coord_same_fax_error = "Devi inserire numeri di fax diversi!";
+$l_dateexp = "Data di scadenza";
+$l_nomade_local_copy_error = "La copia locale non può essere attivata se l'email nomade non è autorizzata ed attiva.";
+$l_access = "Accesso Internet";
+$l_link_timetask_no = "L'utente non è referenziato nella gestione di tempo del progetto";
+$l_expresspostal_error = "C.A.P non valido!";
+$l_web_all = "Tutto senza elenco";
+$l_last_admin_error = "Il profilo dell'ultimo amministratore non può essere modificato!";
+$l_web_list_only = "Solo elenco";
+$l_vacation_dateend = "A";
+$l_enable_auto_vacation = "Imposta l'attivazione automatica del messaggio di assenza";
+$l_noexperie = "Non scade mai";
+$l_image_size_error = "La foto non deve superare 96px x 96px e deve avere 100 kb";
+$l_hidden = "Posta nascosta";
+$l_perms = "Autorizzato";
+$l_err_host_already_used_by = "La macchina è collegata all'utente";
+$l_fill_login = "Inserisci prima il login";
+$l_mail_server_error = "Server mail non valido o nessun server mail non è definito nel dominio. Contatta l'amministratore di dominio!";
+$l_zip_error = "C.A.P non valido";
+$l_mail_server = "Server di posta";
+$l_local_copy = "Copia locale";
+$l_vacation = "Messaggio di assenza";
+$l_account_dateexp = "Data di scadenza";
+$l_profile_privilege_error = "Permessi insufficienti per gestire questo profilo!";
+$l_host = "Host";
+$l_fax2 = "$l_fax 2";
+$l_smb_logon = "Script di autenticazione";
+$l_nomade_without_mail_perms = "La posta nomade non può essere autorizzata se la posta non è consentita!";
+$l_err_delegation_target_outside_domain = "La delega di amministrazione deve essere nel dominio di delegazione";
+$l_web_list = "Elenco di accesso";
+$l_email_empty = "Devi inserire un'indirizzo email per attivare la posta!";
+$l_user_select_host = "Scegli la macchina utente";
+$l_err_delegation_target_outside_target = "La delega di amministrazione deve essere nel tuo dominio di delegazione!";
+$l_email_nomade = "Indirizzo email nomade";
+$l_generate_passwd = "Generare";
+$l_mail_ext = "Posta esterna";
+$l_serv_mail = "Server di posta";
+$l_batch_no_user_error = "Nessun utente non è selezionato per l'elaborazione sequenziale";
+$l_err_delegation_target_profile = "Questo profilo utente non può avere la delega di amministrazione!";
+$l_err_system_samba = "La modifica dei permessi windows di un utente di sistema non è consentita.";
+$l_change_password_confirm = "Eliminerai la password attuale. </br> Vuoi continuare?";
+$l_image_type_error = "La foto deve essere un file di tipo immagine (gif, jpeg o png)";
+$l_password_type = "Password cifrata";
+$l_coord_same_fax_error = "Devi inserire numeri di fax diversi!";
+$l_datebegin = "Data inizio";
+$l_photo = "Foto";
+$l_smb = "Reti Windows";
+$l_email_nomad_error_loop = "La posta nomade non deve corrispondere all'indirizzo email del utente!";
+$l_j_coord_same_phone_error = "Devi inserire numeri di telefono diversi!";
+$l_can_delete = "L'utente può essere eliminato";
+$l_update_valid = "Modifica e valida utente"; 
+$l_forbidden = "Vietato";
+$l_infos = "Informazioni";
+$l_exp = "Giorni prima della scadenza";
+$l_login = "Username";
+$l_cant_delete = "L'utente non può essere elimimato!";
+$l_access_nomade = "Accesso nomade";
+$l_link_timetask = "L'utente è riferenziato nella gestione di tempo del progetto";
+$l_edit_users = "Edita le proprietà utenti";
 
-$l_user_display = "Mostra opzioni lista Utenti";

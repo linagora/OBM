@@ -6,8 +6,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: host.inc 2072 2007-09-13 23:49:27Z pierre $
 ///////////////////////////////////////////////////////////////////////////////
+// Modified on 2009-09-10T15:14:07+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T15:23:26+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T15:34:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T15:43:06+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T15:44:26+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T16:32:41+02:00 using OBMtranslation (0.4.1)
 
-// Database fields
 $l_smb = "Windows";
 $l_smb_only = "Windows Only.";
 $l_host_select_user = "Select the computer user";
@@ -24,19 +29,12 @@ $l_web_access = "Internet acces";
 $l_restrict = "restrictions";
 $l_not_assigned = "Not assigned";
 $l_ip = "IP";
-
-// Labels et textes
-$l_host_display = "Display options for hosts list";
+$l_host_display = "Display options for host lists"; 
 $l_consult_web_list = "Refer to the URLs list";
-
-// Actions
 $l_clear = "Break link";
-
-// Messages
-$l_no_display = "Fill the search fields and press < Find > to retrieve the hosts";
+$l_no_display = "Fill in the search fields and press < Find > to retrieve the hosts"; 
 $l_found = "hosts found.";
-$l_no_found = "No host found matching the query !";
-
+$l_no_found = "No host matching the query has been found!"; 
 $l_insert_ok = "Host insertion successful.";
 $l_insert_error = "Host insertion fail !";
 $l_update_ok = "Host update successful.";
@@ -44,29 +42,24 @@ $l_update_error = "Host update fail !";
 $l_delete_ok = "Host delete successful.";
 $l_delete_error = "Host delete fail !";
 $l_can_delete = "Host can be delete";
-
-$l_err_host_monitoring = "Host must have ip adress and full qualified name to be monitor";
-$l_err_host_name_empty = "Host name must be fill";
+$l_err_host_monitoring = "Host must have ip adress and full qualified name to be monitored"; 
+$l_err_host_name_empty = "Host name must be filled in"; 
 $l_err_host_name_exist = "Host name already used";
 $l_err_host_name = "Invalid host name";
-$l_err_host_windows_not_global = "A windows host can not be in the Global domain !";
-$l_check_samehost = "This host seems similar to the new host";
-
+$l_err_host_windows_not_global = "A Windows host can notbe in the Global domain !"; 
+$l_check_samehost = "This host seems similar to the new one"; 
 $l_err_host_ip_exist = "Host IP address already used";
 $l_err_host_ip = "Invalid host IP address";
-$l_err_host_ip_not_in_lan="Host IP address isn't in the local network";
+$l_err_host_ip_not_in_lan = "Host IP address is not in the local network"; 
 $l_err_firewall_perms = "Invalid advanced perms syntax";
-
 $l_help_system = "System host is needed for the system.";
-
-$l_cant_delete = 'This host is linked to one or more domains so it can\'t be deleted';
-
+$l_cant_delete = "This host is linked to one or more domains thus it cannot be deleted"; 
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM Sync';
 $l_obm_solr = 'Solr';
 $l_monitor = 'Monitoring';
-
 $l_fqdn = 'Fully qualified name';
 $l_err_host_fqdn = 'The fully qualified name is not well formed (computername.domaine.name)';
+

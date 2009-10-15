@@ -6,6 +6,54 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
+// Modified on 2009-09-09T15:20:48+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:26:54+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:32:27+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:33:01+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:33:22+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:34:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:35:35+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:36:55+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:40:08+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:42:23+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:52:14+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:56:15+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:56:54+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:57:59+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:59:20+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T10:59:34+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T11:07:00+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T11:11:16+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:39:56+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:43:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:43:32+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:43:43+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:44:13+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:46:42+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:47:34+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:47:47+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:50:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:51:23+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:51:35+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:51:50+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:52:01+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:52:08+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:52:53+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:53:09+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:54:16+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:55:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:55:22+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:55:33+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:55:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:56:02+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:56:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:56:28+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:56:37+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:56:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:57:19+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:57:36+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:57:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-17T15:58:16+02:00 using OBMtranslation (0.4.1)
 
 $l_login = "Login";
 $l_password = "Password";
@@ -14,8 +62,8 @@ $l_phone2 = "$l_phone 2";
 $l_fax2 = "$l_fax 2";
 $l_email = "Email address";
 $l_datebegin = "Entry date";
-$l_dateexp = "Expiration date";
-$l_exp = "Day before expery";
+$l_dateexp = "Expiry date";
+$l_exp = "Day before expiry";
 $l_noexperie = "Never expire";
 $l_perms_user = "User";
 $l_perms_editor = "Editor";
@@ -28,12 +76,10 @@ $l_group = "Group";
 $l_delegation_target = "Delegation target";
 $l_photo = "Photo";
 $l_delete_userobmphoto = "Delete user's photo";
-
 $l_quota = "Quota";
 $l_administration = "Administration";
 $l_serv_mail = "Mail Server";
 $l_create_date = "Create date";
-
 $l_hidden = 'Hidden mailbox';
 $l_mail_server = "Mail Server";
 $l_email_nomade = "Nomad email address";
@@ -53,75 +99,63 @@ $l_smb_perms = "Windows user";
 $l_smb_home = "Home directory";
 $l_smb_home_drive = "Home drive";
 $l_smb_logon = "Logon script";
-$l_group_member = "Member of groups";
+$l_group_member = "Group member";
 $l_password_type = "Password Crypt";
 $l_mailserver_auto = "Automatic";
-
-// Actions
-$l_insert = "Insert the User";
-$l_update = "Update the User";
-$l_update_group = "Update the User groups";
-$l_checkdelete = "Check or Delete the User";
-$l_reset = "Reset user's preferences";
-$l_delete = "Delete the User";
+$l_insert = "Insert User";
+$l_update = "Update User";
+$l_update_group = "Update User groups";
+$l_checkdelete = "Check or Delete User";
+$l_reset = "Reset user preferences by default";
+$l_delete = "Delete User";
 $l_add = "Add these users";
 $l_generate_passwd = "Generate";
-
 $l_edit_users = "Edit users properties";
-
 $l_do_batch_processing = "Do batch processing";
-
 $l_download_user_card = 'Download user information';
-// Messages
-$l_no_display = "Fill the search fields and press < Find > to retrieve the users";
+$l_no_display = "Fill in the search fields and press < Find > to retrieve the users";
 $l_found = "users found";
-$l_no_found = "No user found matching the query !";
-$l_reset_ok = "User's preferences reseted to default values";
+$l_no_found = "No user matching the query has been found  !";
+$l_reset_ok = "User preferences reseted to default values";
 $l_can_delete = "The user can be deleted.";
-$l_cant_delete = "The user can't be deleted !";
+$l_cant_delete = "The user cannot be deleted !";
 $l_link_timetask = "The user is referenced on project in time management";
 $l_link_timetask_no = "The user is not referenced on projects in time management";
-$l_login_error = "Invalid login!";
+$l_login_error = "Invalid login! It must not be empty or containing special characters ";
 $l_login_in_use = "This login is already used !";
-$l_password_empty = "The password must be fill and valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
+$l_password_empty = "You must enter a valid password - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
 $l_password_error = "The password is not valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
-$l_profile_privilege_error = "Insufficients privileges to update this profile level !";
-$l_last_admin_error = "The last admin profile can't be updated !";
+$l_profile_privilege_error = "Insufficient privileges to update this profile level !";
+$l_last_admin_error = "The last admin profile cannot be updated !";
 $l_mail_perms_error = "The mail must be activated to allow external email !";
 $l_mail_server_error = "The mail server is invalid or no mail server has been defined for this domain, please contact the domain administrator !";
-
 $l_email_error = "The email given is not valid !";
 $l_email_empty = "An email address must be given to activate the mail !";
 $l_email_exist = "The email address is already in use !";
 $l_uemail_exist = "The email address is present more than once !";
 $l_quota_error = "The email Quota is not valid !";
 $l_err_web_all = "The web access mode must be set !";
-$l_nomade_without_mail_perms = "The mail forwarding can't be allowed if the mail is not enabled !";
+$l_nomade_without_mail_perms = "The mail forwarding cannot be allowed if the mail is not enabled !";
 $l_nomade_perms_error = "The mail forwarding must be allowed to be activated !";
-$l_nomade_local_copy_error = "The local copy can't be activated if the mail forwarding is not allowed and activated !";
+$l_nomade_local_copy_error = "The local copy cannot be activated if the mail forwarding is not allowed and activated !";
 $l_email_nomad_error = "The mail forwarding email must be given to enable the mail forwarding !";
-$l_email_nomad_error_loop = "The mail forwarding email must not be one of the user emails !";
-$l_vacation_without_mail_perms = "The mail vacation can't be activated if the mail is disabled !";
-$l_empty_vacation_message = "The vacation message can't be empty if the vacation is activated !" ;
+$l_vacation_without_mail_perms = "The mail vacation cannot be activated if the mail is disabled !";
+$l_empty_vacation_message = "The vacation message cannot be empty if the vacation is activated !";
 $l_check_sameuser = "These users seem similar to this new entry !";
 $l_exist_error = "A user with that name already exists !";
 $l_lname_error = "Invalid Name !";
 $l_err_home = "The Windows home directory is incorrect !";
 $l_err_drive = "The Windows home drive is incorrect !";
-$l_err_system_samba = "Windows rights can't be updated for a system user !";
+$l_err_system_samba = "Windows rights cannot be updated for a system user !";
 $l_err_host_already_used_by = "The host is already affected to the user ";
 $l_image_type_error = "The photo must be an image file (gif, jpeg or png)";
 $l_image_size_error = "The photo image max size is 96px x 96px and must not exceed 100 kbytes";
-
 $l_err_delegation_target_outside_domain = "The delegation target must be in the domain delegation !";
-$l_err_delegation_target_outside_target = "The delegation target must be in your delegation target !";
-$l_err_delegation_target_profile = "This profile don't support delegation target !";
+$l_err_delegation_target_outside_target = "The delegation target must be in your target !";
+$l_err_delegation_target_profile = "This profile does not support delegation target !";
 $l_user_import_row_cols_error = "Invalid row. Incorrect columns number !";
-
-$l_batch_no_user_error = "Any users for batch processing is selected";
-
+$l_batch_no_user_error = "No selected users for batch processing";
 $l_add_users = "Add users";
-
 $l_phone_error = "The phone number is not correct";
 $l_fax_error = "The fax number is not correct";
 $l_zip_error = "Zip code is not correct";
@@ -129,15 +163,27 @@ $l_expresspostal_error = "Express postal code is incorrect";
 $l_coord_same_phone_error = "You have to enter different phone numbers !";
 $l_coord_same_fax_error = "You have to enter different fax numbers !";
 $l_user_delete_himself_error = "You cannot delete yourself !";
-
-// JavaScript Messages (special characters must be escaped with \ -> \\)
-$l_fill_login = "You have to fill the login before submitting.";
-$l_fill_password = "You have to fill the password before submitting.";
+$l_fill_login = "You have to fill in the login before submitting.";
+$l_fill_password = "You have to fill in the password before submitting.";
 $l_delete_confirm = "CAUTION : You will delete a user ! This operation is irreversible.\\nContinue anyway ?";
-$l_j_check_email = "The email address is not valid.";
-$l_change_login_confirm = "Really update user's login ?";
+$l_j_check_email = "The email address is not valid. Verify domain";
+$l_change_login_confirm = "You have changed the user login. The user must logout from all OBM applications during the update (OBM, email client, webmail, connector). Confirm user login update?";
 $l_j_coord_same_phone_error = "You have to enter different phone numbers !";
 $l_j_coord_same_fax_error = "You have to enter different fax numbers !";
-
-$l_user_display = "Display options for users lists"; 
+$l_user_display = "Display options for users lists";
+$l_web_mode = "Authorised web access";
+$l_web_consult_list = "Verify URL list";
+$l_password_update = "Password update";
+$l_host_enable = "Host enable ";
+$l_web_all = "All except list";
+$l_web_list_only = "List only";
+$l_account_dateexp = "Expiry date";
+$l_host = "Host";
+$l_user_select_host = "User select host";
+$l_web_list = "Web access ";
+$l_mail_ext = "external mail";
+$l_change_password_confirm = "You will delete the present password. Do you want to continue?";
+$l_update_valid = "Update and validate user";
+$l_forbidden = "Forbidden";
+$l_email_nomad_error_loop = "Nomad email address must not correspond to the user's email address!"; 
 

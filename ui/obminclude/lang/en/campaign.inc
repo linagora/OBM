@@ -7,12 +7,79 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: $ //
 ///////////////////////////////////////////////////////////////////////////////
+// Modified on 2009-09-09T15:44:22+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T15:54:28+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T15:57:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:00:19+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:08:45+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:11:23+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:12:58+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:21:08+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:25:41+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:32:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:36:27+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:38:44+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:41:14+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:43:01+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:45:49+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T16:58:37+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:00:58+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:01:06+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:05:48+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:08:21+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:18:06+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:21:40+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:23:48+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:30:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:30:14+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:35:50+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:38:30+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:43:36+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:43:45+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:46:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:46:18+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:51:02+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T17:58:30+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T18:07:04+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T18:15:48+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T18:15:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T18:16:06+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:25:38+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:26:00+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:26:26+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:27:04+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:27:29+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:27:57+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:29:37+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:30:09+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:31:16+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:32:28+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:33:15+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:34:40+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:37:21+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:38:13+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:40:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:40:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:40:58+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:42:49+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:43:42+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:43:52+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:45:30+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:45:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:47:57+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:53:53+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:54:13+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:54:43+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T15:00:36+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T15:01:06+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T16:37:24+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T16:51:15+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T16:51:26+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T16:53:47+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T16:54:25+02:00 using OBMtranslation (0.4.1)
 
 $l_campaign_archive = "Archive";
 $l_campaign_unarchive = "Unarchive";
-
-// Properties and labels
-
 $l_created = "Created";
 $l_ready = "Ready";
 $l_running = "Running";
@@ -20,13 +87,11 @@ $l_planified = "Planified";
 $l_finished = "Finished";
 $l_archived = "Archived";
 $l_error_mail_format = "Mail file rejected";
-$l_error_target = "Error target";
+$l_error_target = "Target error";
 $l_error_misc = "Error";
-
 $l_email_exists = "You have already uploaded a file. Click here to reload another.";
 $l_email_undefined = "N/A";
 $l_email_view = "Voir";
-
 $l_campaign = "Campaign";
 $l_name = "Name";
 $l_status = "Status";
@@ -38,28 +103,22 @@ $l_objective = "Objective";
 $l_comment = "Comments";
 $l_progress = "Progression";
 $l_targets = "Targets";
-
 $l_listes = "Lists";
 $l_users = "Users";
 $l_groups = "Groups";
-
 $l_listss = "list(s)";
 $l_userss = "user(s)";
 $l_groupss = "group(s)";
-
 $l_target_type = "Target kind";
 $l_target_desc = "Name";
-
 $l_subcampaign = "Subcampaign";
 $l_subcampaignss = "$l_subcampaign(s)";
-
 $l_parent_campaign = "Parent campaign";
 $l_go = "Go";
-
-// Messages
 $l_campaign_can_delete = "Campaign can be deleted.";
 $l_campaign_found = "campaign(s) found.";
 $l_campaign_no_found = "No campaign found.";
-$l_err_name_empty = "Name field can't be empty.";
-$l_err_dateanteriority = "Start date must be anterior to end date.";
+$l_err_name_empty = "Name field cannot be empty.";
+$l_err_dateanteriority = "Beginning date must be anterior to end date."; 
 $l_campaign_not_found = "Campaign not found.";
+

@@ -6,7 +6,69 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: people.inc 3097 2008-09-22 14:22:46Z benoitc $ //
 ///////////////////////////////////////////////////////////////////////////////
-
+// Modified on 2009-09-09T15:20:48+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T18:15:48+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T18:15:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-09T18:16:06+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T09:23:19+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T09:38:33+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T09:38:49+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T09:46:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:05:17+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:09:45+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:15:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:15:25+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:20:18+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:32:21+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:35:21+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:47:13+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:49:11+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:51:27+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:55:31+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T10:57:49+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:00:19+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:07:59+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:09:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:09:53+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:16:16+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:17:21+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:17:43+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:18:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:19:21+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:22:30+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:22:53+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:23:11+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:24:57+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:27:20+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:28:53+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:30:27+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:41:18+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:50:42+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:52:36+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:54:32+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T11:54:39+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T12:10:09+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T12:11:18+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T12:12:38+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T12:12:50+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T12:17:45+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-10T12:20:54+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:37:22+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:38:13+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:40:10+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:40:51+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:40:58+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:42:49+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:43:42+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:43:52+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:45:30+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:45:46+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:47:57+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:53:54+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:54:13+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T14:54:43+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T15:00:36+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-09-11T15:01:06+02:00 using OBMtranslation (0.4.1)
 
 $l_login = "Login";
 $l_password = "Password";
@@ -15,9 +77,9 @@ $l_phone2 = "$l_phone 2";
 $l_fax2 = "$l_fax 2";
 $l_email = "Email address";
 $l_datebegin = "Entry date";
-$l_dateexp = "Expery date";
-$l_exp = "Day before expery";
-$l_noexperie = "Never experie";
+$l_dateexp = "Expiry date";
+$l_exp = "Day before expiry";
+$l_noexperie = "Never expire";
 $l_perms_user = "User";
 $l_perms_editor = "Editor";
 $l_perms_admin = "Administrator";
@@ -28,40 +90,35 @@ $l_no_user = "No user fields in this table";
 $l_group = "Group";
 $l_delegation_target = "Delegation target";
 $l_photo = "Photo";
-$l_delete_userobmphoto = "Delete user's photo";
+$l_delete_userobmphoto = "Delete user photo"; 
 $l_delegation = 'Delegation';
 $l_vacation = 'Vacation';
-
 $l_hidden = 'Hidden mailbox';
 $l_perms = "Allowed";
-$l_group_member = "Member of groups";
+$l_group_member = "Group member"; 
 $l_password_type = "Password Crypt";
-
-// Actions
-$l_insert = "Insert the User";
-$l_update = "Update the User";
+$l_insert = "Insert User";
+$l_update = "Update User";
 $l_update_group = "Update the User groups";
-$l_checkdelete = "Check or Delete the User";
-$l_reset = "Reset user's preferences";
-$l_delete = "Delete the User";
+$l_checkdelete = "Check or Delete User";
+$l_reset = "Reset user preferences by default";
+$l_delete = "Delete User";
 $l_add = "Add these users";
-
-// Messages
-$l_no_display = "Fill the search fields and press < Find > to retrieve the users";
+$l_no_display = "Fill in the search fields and press < Find > to retrieve the users.";
 $l_found = "users found";
-$l_no_found = "No user found matching the query !";
-$l_reset_ok = "User's preferences reseted to default values";
+$l_no_found = "No user matching the query was found !";
+$l_reset_ok = "User preferences have been reset to default values";
 $l_can_delete = "The user can be deleted.";
-$l_cant_delete = "The user can't be deleted !";
-$l_link_timetask = "The user is referenced on project in time management";
+$l_cant_delete = "The user cannot be deleted !";
+$l_link_timetask = "The user is referenced on projects in time management";
 $l_link_timetask_no = "The user is not referenced on projects in time management";
 $l_login_error = "Invalid login!";
 $l_login_in_use = "This login is already used !";
-$l_password_empty = "The password must be fill and valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
+$l_password_empty = "You must enter a valid password - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\\\") !";
 $l_password_error = "The password is not valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
-$l_profile_privilege_error = "Insufficients privileges to update this profile level !";
-$l_last_admin_error = "The last admin profile can't be updated !";
-$l_email_error = "The email given is not valid !";
+$l_profile_privilege_error = "Insufficient privileges to update this profile level !"; 
+$l_last_admin_error = "The last admin profile cannot be updated !"; 
+$l_email_error = "Invalid email address!"; 
 $l_email_empty = "An email address must be given to activate the mail !";
 $l_email_exist = "The email address is already in use !";
 $l_uemail_exist = "The email address is present more than once !";
@@ -70,18 +127,16 @@ $l_exist_error = "A user with that name already exists !";
 $l_lname_error = "Invalid Name !";
 $l_image_type_error = "The photo must be an image file (gif, jpeg or png)";
 $l_image_size_error = "The photo image max size is 96px x 96px and must not exceed 100 kbytes";
-
 $l_err_delegation_target_outside_domain = "The delegation target must be in the domain delegation !";
-$l_err_delegation_target_outside_target = "The delegation target must be in your delegation target !";
-$l_err_delegation_target_profile = "This profile don't support delegation target !";
-
+$l_err_delegation_target_outside_target = "The delegation target must be in your target !";
+$l_err_delegation_target_profile = "This profile does not support delegation target !"; 
 $l_add_users = "Add users";
+$l_fill_login = "You must enter a User ID before submitting."; 
+$l_fill_password = "You must enter the password before submitting.";
+$l_delete_confirm = "Confirm user delete?"; 
+$l_j_check_email = "Invalid email address. Verify domain."; 
+$l_change_login_confirm = "You have changed the user login. The user must logout from all OBM applications during the update (OBM, email client, webmail, connector). Confirm user login update?";
+$l_people_display = "Display options for user lists";
+$l_account_dateexp = "Expiry date";
+$l_forbidden = "Forbidden";
 
-// JavaScript Messages (special characters must be escaped with \ -> \\)
-$l_fill_login = "You have to fill the login before submitting.";
-$l_fill_password = "You have to fill the password before submitting.";
-$l_delete_confirm = "Really delete the user?";
-$l_j_check_email = "The email address is not valid.";
-$l_change_login_confirm = "Really update user's login ?";
-
-$l_people_display = "Display options for users lists";
