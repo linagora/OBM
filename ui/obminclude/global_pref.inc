@@ -120,6 +120,7 @@ if ($module != '') {
   }
 }
 
+if($_SESSION['set_lang']) SI18n::set_locale($_SESSION['set_lang']);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Display file (global display functions)          //

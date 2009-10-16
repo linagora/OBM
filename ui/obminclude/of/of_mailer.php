@@ -20,7 +20,6 @@
 <?php
 
 require(dirname(__FILE__).'/../lib/Stato/mailer/mailer.php');
-require_once(dirname(__FILE__).'/../lib/Stato/i18n/i18n.php');
 
 /**
  * OBM Mailer Class
@@ -48,7 +47,6 @@ class OBM_Mailer extends SMailer {
     // to move somewhere else...
     mb_internal_encoding("UTF-8");
     SI18n::set_locale($this->locale);
-    SI18n::add_data_path(dirname(__FILE__).'/../../locale');
     self::set_template_root(dirname(__FILE__).'/../../views/mail');
     $this->userInfo = get_user_info();
   }

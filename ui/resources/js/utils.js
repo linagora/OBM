@@ -111,7 +111,7 @@ Obm.CoordonateWidget = new Class({
         .setStyle('cursor','pointer')
       )
     );
-    //new Obm.OverText(this.table.getElements('input, textarea'));
+    new Obm.OverText(this.table.getElements('input, textarea'));
   },
 
   makeField: function(fieldName, field) {
@@ -189,10 +189,10 @@ Obm.OverText = new Class({
   },
 
   hideTxt: function(el, focus){
-    if(el.get('disabled')) {
+    if(el.get('active') != 'true') {
       el.removeClass('overText');
       el.set('inputValue'); 
-      el.set('disabled',false);
+      el.set('active','true');
       try {
         if (focus) el.fireEvent('focus').focus();
       } catch(e){};
@@ -201,9 +201,9 @@ Obm.OverText = new Class({
   },
 
   showTxt: function(el){
-    if(!el.get('disabled')) {
+    if(el.get('active') != 'false') {
       var txt = el.get('alt') || el.get('title')
-      el.set('disabled',true);
+      el.set('active','false');
       el.addClass('overText');
       el.set('inputValue',txt); 
     }

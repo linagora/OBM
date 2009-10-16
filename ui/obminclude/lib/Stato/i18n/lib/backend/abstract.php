@@ -18,6 +18,11 @@ abstract class SAbstractBackend
     {
         $entry = $this->lookup($locale, $key);
         if (!empty($values)) $entry = $this->interpolate($locale, $entry, $values);
+        if($entry == $key){
+          $f = fopen('/tmp/trad.log','a');
+          fwrite($f, $key."\n");
+          fclose($f);
+        }
         return $entry;
     }
     

@@ -20,6 +20,7 @@
 <?php
 
 return array(
+  //FIXME : Move this into a specific module file
   'NEEDS-ACTION' => 'mis en attente',
   'ACCEPTED' => 'accepté',
   'DECLINED' => 'refusé',
@@ -33,5 +34,35 @@ return array(
   '%displayname% validation confirmation' => 'Confirmation de la validation de l\'utilisateur %displayname%',
   'Resource participation updated on OBM: %title%' => 'La réservation d\'une resource à été statuée dans OBM : %title%',
   'Participation updated on OBM: %title%' => 'Mise à jour de participation dans OBM : %title%',
-  'User %displayname% is to be validated' => 'L\'utilisateur %displayname doit être validé'
+  'User %displayname% is to be validated' => 'L\'utilisateur %displayname doit être validé',
+
+  'Search results' => 'Résultats de recherche',
+  'Search' => 'Rechercher',
+  'Advanced search' => 'Recherch avancé',
+  'Hide advanced search' => 'Cacher la recherche avancé',
+  'Displayname' => 'Nom complet',
+  'Company' =>  'Société',
+  'Archived' => 'Archivé',
+  'Archive' => 'Archive',
+  'Lastname' => 'Nom',
+  'Firstname' => 'Prénom',
+  'Title' => 'Titre',
+  'Email' => 'Courriel', 
+  'Phone' => 'Téléphone',
+  'Country' => 'Pays',
+  'Town' => 'Ville',
+  'Zip code' => 'Code postal',
+  'Subscribed for newsletter' => "Inscrit à l'infolettre",
+  'Mailing activated' => 'Accepte les courriels',
+  'Cancel' => 'Annuler',
+  'Save' => 'Sauvegarder',
+  'Export' => 'Exporter',
+  'Import' => 'Importer',
+  'Right management'  => 'Gestion des droits',
+  'Update' => 'Mettre à jour',
+  'Delete' => 'Supprimer',
+  'Address' => 'Addresse',
+  'Istant messaging' => 'Messagerie instantanée',
+  'Website' => 'Site web',
+  'Comment' => 'Commentaires', 
 );

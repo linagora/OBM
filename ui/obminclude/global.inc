@@ -419,6 +419,7 @@ require_once('conf/obm_conf.inc');
 require_once("$obminclude/phplib/obmlib.inc");
 require_once("$obminclude/of/of_date.inc");
 require_once("$obminclude/of/of_template.php");
+require_once("$obminclude/of/of_i18n.php");
 
 // Document root
 if (is_null($ini_array['documentRoot'])) {

@@ -131,4 +131,5 @@ $l_website_labels = array ('URL' => 'Homepage', 'BLOG' => 'Blog', 'OTHER' => 'Ot
 $l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ');
 // Error Messages
 $l_err_length_express_postal = "Field 'EXPRESS POSTAL' has 16 characters max";
+$l_err_length_express_postal = "Field 'ZIP CODE' has 14 characters max";
 $l_add_fields =  'Add more fields';

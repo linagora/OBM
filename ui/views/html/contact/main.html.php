@@ -15,7 +15,7 @@
         <input type='text' name='name' value='' />
         <input type='hidden' name='action' value='storeAddressBook' />
       </form>
-      <input type='button' value='+' id='addAddressBook' onclick="$(this).getPrevious().toggle().name.set('value','');"/>
+      <input type='button' value='+' id='addAddressBook' title='<?php __('Add addressbook')?>' onclick="$(this).getPrevious().toggle().name.set('value','');"/>
     </td>
     <td id='dataGrid'>
       <table class='contactPanelHeader'>
@@ -45,7 +45,7 @@
       <div id='dataContainer' class='contactPanelContainer'>
         <?php include($this->__template('contacts')); ?>
       </div>
-      <input type='button' value='+' id='addContact' onclick='obm.contact.addressbook.addContact();'/>
+      <input type='button' value='+' id='addContact' title='<?php __('Add contact')?>' onclick='obm.contact.addressbook.addContact();'/>
     </td>
     <td id='informationGrid'>
         <?php if(isset($contact)) include($this->__template('card')); ?>

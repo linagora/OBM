@@ -10,37 +10,26 @@
 //---------------------------------------------------------------------------//
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
+
+
 // Direct fields
 $fieldnames['displayname'] = $l_displayname;
-$fieldnames['lastname'] = $l_lastname;
-$fieldnames['firstname'] = $l_firstname;
 $fieldnames['aka'] = $l_aka;
 $fieldnames['addressbook_name'] = $l_addressbook;
 $fieldnames['function_label'] = $l_function;
-$fieldnames['contact_title'] = $l_title;
-$fieldnames['kind_minilabel'] = $l_kind;
-$fieldnames['kind_header'] = $l_header;
-$fieldnames['kind_lang'] = $l_lang;
-$fieldnames['address_street'] = $l_address;
-$fieldnames['contact_address'] = $l_address;
-$fieldnames['contact_service'] = $l_service;
-$fieldnames['address_zipcode'] = $l_postcode;
-$fieldnames['address_town'] = $l_town;
-$fieldnames['address_expresspostal'] = $l_expresspostal;
-$fieldnames['country_name'] = $l_country;
-$fieldnames['FaxPhone.phone_number'] = $l_phone_labels['WORK_FAX'];
-$fieldnames['HomePhone.phone_number'] = $l_phone_labels['HOME_VOICE'];
-$fieldnames['WorkPhone.phone_number'] = $l_phone_labels['WORK_VOICE'];
-$fieldnames['MobilePhone.phone_number'] = $l_phone_labels['CELL_VOICE'];
-$fieldnames['phone_number'] = $l_phone_labels['CELL_VOICE'];
-$fieldnames['email_address'] = $l_email;
-$fieldnames['contact_archive'] = $l_archive_first;
-$fieldnames['contact_date'] = $l_date;
-$fieldnames['contact_mailing_ok'] = $l_mailing_ok_first;
-$fieldnames['contact_newsletter'] = $l_news;
+$fieldnames['title'] = $l_title;
+$fieldnames['address'] = $l_address;
+$fieldnames['service'] = $l_service;
+$fieldnames['country'] = $l_country;
+$fieldnames['workfax'] = $l_phone_labels['WORK_FAX'];
+$fieldnames['homevoice'] = $l_phone_labels['HOME_VOICE'];
+$fieldnames['workvoice'] = $l_phone_labels['WORK_VOICE'];
+$fieldnames['cellvoice'] = $l_phone_labels['CELL_VOICE'];
+$fieldnames['email'] = $l_email;
+$fieldnames['archive'] = $l_archive_first;
+$fieldnames['date'] = $l_date;
+$fieldnames['company'] = $l_company;
 // Calculated fields
-$fieldnames['contact_company'] = $l_company;
-//$fieldnames['company_aka'] = "$l_company $l_aka";
 
 
 ///////////////////////////////////////////////////////////////////////////////

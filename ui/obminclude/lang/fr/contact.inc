@@ -156,4 +156,5 @@ $l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'A
 
 // Error Messages
 $l_err_length_express_postal = "Le champs 'CEDEX' doit etre au maximum de 16 charactères.";
+$l_err_length_zipcode = "Le champs 'Code postal' doit etre au maximum de 14 charactères.";
 $l_add_fields =  'Ajouter des champs';

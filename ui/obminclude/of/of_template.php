@@ -27,33 +27,30 @@ class OBM_Template {
   
   private $locals;
 
-  private static $paths;
+  private $paths;
 
   public function __construct($name, $module=null, $mode='html') {
-    if(!self::$paths) {
-      self::$paths = array(
-        dirname(__FILE__)."/../../conf/views/html/",
-        dirname(__FILE__).'/../../views/html/'
-      );
-    }
     if(!$module && $GLOBALS['module']) 
       $module = $GLOBALS['module'];
     else
       $module = '';
     $this->mode = $mode;
+    $this->paths = array(
+      dirname(__FILE__)."/../../conf/views/html/".$module,
+      dirname(__FILE__).'/../../views/html/'.$module,
+      dirname(__FILE__)."/../../conf/views/html/common",
+      dirname(__FILE__).'/../../views/html/common'
+    );    
     $this->module = $module;
     $this->template = $this->__template($name);
     $this->locals = array();
   }
 
   private function __template($name) {
-    foreach (self::$paths as $path) {
-      if (file_exists($path.$this->module.'/'.$name.'.'.$this->mode.'.php') && is_readable($path)) {
-        return $path.$this->module.'/'.$name.'.'.$this->mode.'.php';
+    foreach ($this->paths as $path) {
+      if (file_exists($path.'/'.$name.'.'.$this->mode.'.php') && is_readable($path)) {
+        return $path.'/'.$name.'.'.$this->mode.'.php';
       }
-      if (file_exists($path.'/common/'.$name.'.'.$this->mode.'.php') && is_readable($path)) {
-        return $path.'/common/'.$name.'.'.$this->mode.'.php';
-      }      
     }
     return false;    
   }

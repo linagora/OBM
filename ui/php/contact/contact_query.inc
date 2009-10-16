@@ -1293,7 +1293,7 @@ function check_contact_data_form($cid, &$contact) {
   if (is_array($addresses)){
     foreach ($addresses as $i => $addresse){
       $express_postal = $addresse['expresspostal'];
-      if(strlen($express_postal)>16){
+      if(strlen($express_postal)>14){
         $err['msg'] = $l_err_length_express_postal;
         OBM_Error::getInstance()->addError('addresses-'.$i, $err['msg']);
       }

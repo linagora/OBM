@@ -6,9 +6,9 @@
       <?php /*FIXME*/?>
       <form onsubmit="obm.contact.addressbook.storeAddressBook(this);return false;">
         <?php if($_addressbook->synced) { ?>
-        <img alt='<?php echo __('Subscribed') ?>' title='<?php echo __('Subscribed') ?>' src="<?php echo self::__icon('sync') ?>"/>
+        <img alt='<?php echo __('Synchronized') ?>' title='<?php echo __('Synchronized') ?>' src="<?php echo self::__icon('sync') ?>"/>
         <?php } else { ?>
-        <img alt='<?php echo __('Not subscribed') ?>' title='<?php echo __('Not subscribed') ?>' src="<?php echo self::__icon('unsync') ?>"/>
+        <img alt='<?php echo __('Not synchronized') ?>' title='<?php echo __('Not synchronized') ?>' src="<?php echo self::__icon('unsync') ?>"/>
         <?php } ?>
         <input onblur="$(this).hide();$(this).getNext().show();$(this).set('value', '<?php echo self::toJs($_addressbook->name); ?>')" type="text" style='display: none' name='name' value="<?php echo $_addressbook->name ?>" />
         <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-<?php echo $_id ?>')); return false;"><?php echo $_addressbook->name; ?></a> 
@@ -28,9 +28,9 @@
               <li><a href="<?php echo self::__actionlink('rights_admin', array('entity_id' => $_id))?>"><?php echo __('Right management') ?></a></li>
               <?php } ?> 
               <?php if ($_addressbook->syncable && $_addressbook->synced) { ?>
-              <li><a href="" onclick="obm.contact.addressbook.setSubscription(<?php echo $_id ?>);return false;" ><?php echo __('Unsubscribe') ?></a></li>
+              <li><a href="" onclick="obm.contact.addressbook.setSubscription(<?php echo $_id ?>);return false;" ><?php echo __('Do not synchronize') ?></a></li>
               <?php } elseif ($_addressbook->syncable) { ?>
-              <li><a href="" onclick="obm.contact.addressbook.setSubscription(<?php echo $_id ?>);return false;" ><?php echo __('Subscribe') ?></a></li>
+              <li><a href="" onclick="obm.contact.addressbook.setSubscription(<?php echo $_id ?>);return false;" ><?php echo __('Synchronize') ?></a></li>
               <?php } ?> 
             </ul> 
           </li>
@@ -61,7 +61,7 @@
     <tr style="display: none;">
       <td class="<?php echo ('search' == $current['addressbook'])? 'current':'' ?>" id="addressbook-search">
         <div>
-          <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-search')); return false;"><?php echo __('Search Results') ?></a>
+          <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-search')); return false;"><?php echo __('Search results') ?></a>
           <script type='text/javascript'>
             $('addressbook-search').set('write', 0);
             $('addressbook-search').set('search', '');

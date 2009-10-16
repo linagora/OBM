@@ -17,7 +17,7 @@
           </li>
           <?php } ?> 
           <li>
-            <img alt="<?php echo __('Others actions') ?>" title="<?php echo __('Others actions') ?>" src="<?php echo self::__icon('others') ?>"/>
+            <img alt="<?php echo __('Other actions') ?>" title="<?php echo __('Other actions') ?>" src="<?php echo self::__icon('others') ?>"/>
             <ul>
               <li><?php echo __('Copy') ?>
                 <ul>
