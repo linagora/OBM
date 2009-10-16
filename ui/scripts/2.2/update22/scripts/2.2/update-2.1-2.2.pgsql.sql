@@ -1239,21 +1239,40 @@ DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT incident_id
 UPDATE DocumentLink SET documentlink_entity_id = (SELECT incidententity_entity_id FROM IncidentEntity INNER JOIN Incident ON incidententity_incident_id = incident_id WHERE incident_id = documentlink_entity_id), documentlink_entity = 'entity' WHERE documentlink_entity = 'incident';
 ALTER TABLE DocumentLink DROP COLUMN documentlink_entity;
 
+-- Category Link migration needs a tmp table to not trigger the unique contraint
+-- and allow update request while moving to the entity model
+
+CREATE TABLE CategoryLinkTmp (
+  categorylink_category_id integer,
+  categorylink_entity_id   integer,
+  categorylink_category    varchar(24) NOT NULL default '',
+  categorylink_entity      varchar(32) NOT NULL default ''
+);
+
+
 DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT contact_id FROM Contact) AND categorylink_entity = 'contact';
-UPDATE CategoryLink SET categorylink_entity_id = (SELECT contactentity_entity_id FROM ContactEntity INNER JOIN Contact ON contactentity_contact_id = contact_id WHERE contact_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'contact';
 DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT company_id FROM Company) AND categorylink_entity = 'company';
-UPDATE CategoryLink SET categorylink_entity_id = (SELECT companyentity_entity_id FROM CompanyEntity INNER JOIN Company ON companyentity_company_id = company_id WHERE company_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'company';
 DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT document_id FROM Document) AND categorylink_entity = 'document';
-UPDATE CategoryLink SET categorylink_entity_id = (SELECT documententity_entity_id FROM DocumentEntity INNER JOIN Document ON documententity_document_id = document_id WHERE document_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'document';
 DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT incident_id FROM Incident) AND categorylink_entity = 'incident';
-UPDATE CategoryLink SET categorylink_entity_id = (SELECT incidententity_entity_id FROM IncidentEntity INNER JOIN Incident ON incidententity_incident_id = incident_id WHERE incident_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'incident';
 DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT userobm_id FROM UserObm) AND categorylink_entity = 'user';
-UPDATE CategoryLink SET categorylink_entity_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'user';
 DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT group_id FROM UGroup) AND categorylink_entity = 'group';
-UPDATE CategoryLink SET categorylink_entity_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'group';
 DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT deal_id FROM Deal) AND categorylink_entity = 'deal';
-UPDATE CategoryLink SET categorylink_entity_id = (SELECT dealentity_entity_id FROM DealEntity INNER JOIN Deal ON dealentity_deal_id = deal_id WHERE deal_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'deal';
+
+INSERT INTO CategoryLinkTmp SELECT * FROM CategoryLink;
+
+UPDATE CategoryLinkTmp SET categorylink_entity_id = (SELECT contactentity_entity_id FROM ContactEntity INNER JOIN Contact ON contactentity_contact_id = contact_id WHERE contact_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'contact';
+UPDATE CategoryLinkTmp SET categorylink_entity_id = (SELECT companyentity_entity_id FROM CompanyEntity INNER JOIN Company ON companyentity_company_id = company_id WHERE company_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'company';
+UPDATE CategoryLinkTmp SET categorylink_entity_id = (SELECT documententity_entity_id FROM DocumentEntity INNER JOIN Document ON documententity_document_id = document_id WHERE document_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'document';
+UPDATE CategoryLinkTmp SET categorylink_entity_id = (SELECT incidententity_entity_id FROM IncidentEntity INNER JOIN Incident ON incidententity_incident_id = incident_id WHERE incident_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'incident';
+UPDATE CategoryLinkTmp SET categorylink_entity_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'user';
+UPDATE CategoryLinkTmp SET categorylink_entity_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'group';
+UPDATE CategoryLinkTmp SET categorylink_entity_id = (SELECT dealentity_entity_id FROM DealEntity INNER JOIN Deal ON dealentity_deal_id = deal_id WHERE deal_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'deal';
+
+DELETE FROM CategoryLink;
+INSERT INTO CategoryLink SELECT * from CategoryLinkTmp;
+DROP TABLE CategoryLinkTmp;
 ALTER TABLE CategoryLink DROP COLUMN categorylink_entity;
+-- Ends category link migration
 
 DELETE FROM OGroupLink WHERE ogrouplink_entity_id NOT IN (SELECT group_id FROM UGroup) AND ogrouplink_entity = 'group';
 UPDATE OGroupLink SET ogrouplink_entity_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = ogrouplink_entity_id), ogrouplink_entity = 'entity' WHERE ogrouplink_entity = 'group';
