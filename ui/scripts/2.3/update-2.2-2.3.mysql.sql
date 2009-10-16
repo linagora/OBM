@@ -344,3 +344,8 @@ INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_uid, u
 
 -- Reset all contacts display prefs
 DELETE FROM DisplayPref WHERE display_user_id IS NOT NULL and display_entity = 'contact';
+
+-- ----------------------------------------------------------------------------
+-- Delete unused domain properties
+DELETE FROM DomainProperty WHERE domainproperty_key='last_public_contact_export';
+DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_property_key='last_public_contact_export';
