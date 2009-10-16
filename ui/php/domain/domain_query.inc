@@ -157,10 +157,8 @@ function run_query_domain_insert($domain) {
       of_service_insert('sync', $entity_id);
       of_service_property_insert('sync','obm_sync', $entity_id, $domain['obm_sync']);
     }
-    if ($cgp_use['service']['solr']) {
-      of_service_insert('solr', $entity_id);
-      of_service_property_insert('solr','obm_solr', $entity_id, $domain['obm_solr']);
-    }
+    of_service_insert('solr', $entity_id);
+    of_service_property_insert('solr','obm_solr', $entity_id, $domain['obm_solr']);
     if ($cgp_use['service']['samba']) {
       if(is_array($samba)) {
         of_service_insert('samba', $entity_id);
@@ -415,9 +413,7 @@ function run_query_domain_update($domain_id, $domain) {
   if ($cgp_use['service']['sync']) {
     of_service_property_replace('sync','obm_sync', $entity_id, $domain['obm_sync']);
   }
-  if ($cgp_use['service']['solr']) {
-    of_service_property_replace('solr','obm_solr', $entity_id, $domain['obm_solr']);
-  }
+  of_service_property_replace('solr','obm_solr', $entity_id, $domain['obm_solr']);
   if ($cgp_use['service']['samba']) {
     if(is_array($samba)) {
       of_service_insert('samba', $entity_id);

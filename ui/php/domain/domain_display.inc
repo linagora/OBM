@@ -280,42 +280,40 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
   }
 
 
-  if ($cgp_use['service']['solr']) {
-    // Domain solrservers
-    // Get the domain solrservers
-    $block_s = '';
-    if (is_array($solrservers)) {
-      foreach ($solrservers as $s_id => $solrserver_info) {
-	      // $mailserver_info is an array of info rows about this mail server
-	      foreach ($solrserver_info as $server_info) {
-	        $name = $server_info['name'];
-	        $ip = $server_info['ip'];
-	        $role = $server_info['role'];
-	        $block_solrservers .= "
-              <tr>
-              <td>$name</td>
-              <td>$ip</td>
-              <td>$role</td>
-              </tr>";
-	      }
-      }
-      if ($block_solrservers != '') {
-	      $block_solr = "
-            <div class=\"detail infos\">
-            <h1>$l_solr_servers</h1>
-
-            <table class=\"spreadSheet\">
-            <thead>
+  // Domain solrservers
+  // Get the domain solrservers
+  $block_s = '';
+  if (is_array($solrservers)) {
+    foreach ($solrservers as $s_id => $solrserver_info) {
+	    // $mailserver_info is an array of info rows about this mail server
+	    foreach ($solrserver_info as $server_info) {
+	      $name = $server_info['name'];
+	      $ip = $server_info['ip'];
+	      $role = $server_info['role'];
+	      $block_solrservers .= "
             <tr>
-              <th>$l_host</th>
-              <th>$l_ip</th>
-              <th>$l_role</th>
-            </tr>
-            </thead>
-            $block_solrservers
-            </table>
-            </div>";
-      }
+            <td>$name</td>
+            <td>$ip</td>
+            <td>$role</td>
+            </tr>";
+	    }
+    }
+    if ($block_solrservers != '') {
+	    $block_solr = "
+          <div class=\"detail infos\">
+          <h1>$l_solr_servers</h1>
+
+          <table class=\"spreadSheet\">
+          <thead>
+          <tr>
+            <th>$l_host</th>
+            <th>$l_ip</th>
+            <th>$l_role</th>
+          </tr>
+          </thead>
+          $block_solrservers
+          </table>
+          </div>";
     }
   }
 
@@ -734,43 +732,41 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
       ";
   }
 
-  if ($cgp_use['service']['solr']) {
-    $solrservers = get_domain_solrservers($id);
-    $serversynclist = get_domain_syncservers($id);
-    if (is_array($obm_solr)) {
-      foreach($obm_solr as $obm_solr_id) {
-        $obm_solr_sel = $obm_solr_id;
-      }
+  $solrservers = get_domain_solrservers($id);
+  $serversynclist = get_domain_syncservers($id);
+  if (is_array($obm_solr)) {
+    foreach($obm_solr as $obm_solr_id) {
+      $obm_solr_sel = $obm_solr_id;
     }
-    if (sizeof($solrservers) > 0) {
-      foreach($solrservers as $host_id => $serverinfos) {
-        $selected = '';
-        if(isset($obm_solr_sel) && $obm_solr_sel == $host_id) $selected = "selected='selected'";        
-        $solr_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
-      }
-      $dis_solr = "<fieldset class=\"detail infos\">
-        <legend>$GLOBALS[l_obm_solr]</legend>
-          <table>
-          <tr>
-          <th>$GLOBALS[l_header_select_solrserver]</th>
-          <td id='obm_syncServer'>
-            <div class=\"multiple\">
-            <select name='sel_obm_solr[]'>
-              <option value=''>---</option>
-              $solr_list
-            </select> 
-            </div>              
-          </td>
-          </tr>
-          </table>
-      </fieldset>";
-    } else {
-      $dis_solr = "
-        <fieldset class=\"detail infos\">
-          <legend class='warning'>$GLOBALS[l_obm_solr] : $GLOBALS[l_solrserver_warn]</legend>
-        </fieldset>";
-    } 
   }
+  if (sizeof($solrservers) > 0) {
+    foreach($solrservers as $host_id => $serverinfos) {
+      $selected = '';
+      if(isset($obm_solr_sel) && $obm_solr_sel == $host_id) $selected = "selected='selected'";        
+      $solr_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
+    }
+    $dis_solr = "<fieldset class=\"detail infos\">
+      <legend>$GLOBALS[l_obm_solr]</legend>
+        <table>
+        <tr>
+        <th>$GLOBALS[l_header_select_solrserver]</th>
+        <td id='obm_syncServer'>
+          <div class=\"multiple\">
+          <select name='sel_obm_solr[]'>
+            <option value=''>---</option>
+            $solr_list
+          </select> 
+          </div>              
+        </td>
+        </tr>
+        </table>
+    </fieldset>";
+  } else {
+    $dis_solr = "
+      <fieldset class=\"detail infos\">
+        <legend class='warning'>$GLOBALS[l_obm_solr] : $GLOBALS[l_solrserver_warn]</legend>
+      </fieldset>";
+  } 
 
   $display['title'] = $label;
 

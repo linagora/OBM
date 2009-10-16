@@ -190,13 +190,12 @@ function html_host_search_form($host) {
     </label>
     ";
   }
-  if ($cgp_use['service']['solr']) {
-    $block_solr = "
-    <label>$GLOBALS[l_obm_solr]<br />
-      <input type=\"checkbox\" name=\"cb_obm_solr\" value=\"1\" $obm_solr />
-    </label>
-    ";
-  }
+
+  $block_solr = "
+  <label>$GLOBALS[l_obm_solr]<br />
+    <input type=\"checkbox\" name=\"cb_obm_solr\" value=\"1\" $obm_solr />
+  </label>";
+
   $block = "
     <form method=\"get\" name=\"f_search\" class=\"search\" action=\"".url_prepare("host_index.php")."\">
     <div class=\"search\">
@@ -432,14 +431,13 @@ function html_host_consult($host_q) {
     </tr>
       ";    
   }
-  if ($cgp_use['service']['solr']) {
-    $block_solr = "
-    <tr>
-      <th>$GLOBALS[l_obm_solr]</th>
-      <td>$obm_solr</td>
-    </tr>
-      ";    
-  }
+
+  $block_solr = "
+  <tr>
+    <th>$GLOBALS[l_obm_solr]</th>
+    <td>$obm_solr</td>
+  </tr>";    
+
   $host_domain_explode = explode('.', $fqdn, 2 );
   $host_domain = $host_domain_explode[1];
   $graph_list = get_host_graph_list($fqdn);
@@ -667,15 +665,14 @@ function html_host_form($action, $host_q, $host, $field='') {
       </td>
     </tr>";
   }
-  if ($cgp_use['service']['solr']) {
-    $block_solr = "
-    <tr>
-      <th class=\"$class[obm_solr]\">$GLOBALS[l_obm_solr]</th>
-      <td>
-        <input name=\"cb_obm_solr\" type=\"checkbox\" value=\"1\" $obm_solr_state>
-      </td>
-    </tr>";
-  }
+
+  $block_solr = "
+  <tr>
+    <th class=\"$class[obm_solr]\">$GLOBALS[l_obm_solr]</th>
+    <td>
+      <input name=\"cb_obm_solr\" type=\"checkbox\" value=\"1\" $obm_solr_state>
+    </td>
+  </tr>";
 
   $dis_user = "
   <tr>
