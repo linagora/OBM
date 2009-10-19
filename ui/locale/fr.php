@@ -38,8 +38,8 @@ return array(
 
   'Search results' => 'Résultats de recherche',
   'Search' => 'Rechercher',
-  'Advanced search' => 'Recherch avancé',
-  'Hide advanced search' => 'Cacher la recherche avancé',
+  'Advanced search' => 'Recherche avancée',
+  'Hide advanced search' => 'Cacher la recherche avancée',
   'Displayname' => 'Nom complet',
   'Company' =>  'Société',
   'Archived' => 'Archivé',
