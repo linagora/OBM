@@ -1283,6 +1283,7 @@ var OverText = new Class({
 				position: 'absolute'
 			},
 		  html: val,
+                  title: val,
 		  events: {
 		    click: this.hideTxt.pass([el, true], this)
 		  }
@@ -1356,6 +1357,7 @@ var OverText = new Class({
 			if (!txt || !el.getParent()) return;
 			this.testOverTxt(el);
 			txt.setPosition($merge(this.options.positionOptions, {relativeTo: el}));
+                        txt.setStyle('width', (el.getWidth() - this.options.positionOptions.offset.x) + 'px');
 			if (el.offsetHeight) this.testOverTxt(el);
 			else this.hideTxt(el);
 		} catch(e){

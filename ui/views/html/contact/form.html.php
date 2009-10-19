@@ -65,10 +65,10 @@
                 </ul>
               </li>
               <?php if(empty($contact->mname)) { ?>
-              <li><a href="" onclick="$('mname').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Middle name') ?></a></li>
+              <li><a href="" onclick="$('mname').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Middle name') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->suffix)) { ?>
-              <li><a href="" onclick="$('suffix').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Suffix') ?></a></li>
+              <li><a href="" onclick="$('suffix').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Suffix') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->aka)) { ?>
               <li><a href="" onclick="$('aka').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Also known as') ?></a></li>
@@ -130,8 +130,11 @@
               <input id="lastname" size="12" type="text" name="lastname" value="<?php echo $contact->lastname ?>" title="<?php echo __('Lastname') ?>" />
               <input id="mname" size="5" class="<?php echo (empty($contact->mname)?'H':'') ?>" type="text" name="mname" value="<?php echo $contact->mname ?>" title="<?php echo __('Middle name') ?>" /> 
               <input id="firstname" size="12" type="text" name="firstname" value="<?php echo $contact->firstname ?>" title="<?php echo __('Firstname') ?>" />
-              <input id="suffix" size="5" class="<?php echo (empty($contact->suffix)?'H':'') ?>" type="text" name="suffix" value="<?php echo $contact->suffix ?>" title="<?php echo __('Middle name') ?>" /> 
+              <input id="suffix" size="5" class="<?php echo (empty($contact->suffix)?'H':'') ?>" type="text" name="suffix" value="<?php echo $contact->suffix ?>" title="<?php echo __('Suffix') ?>" /> 
               <br />
+              <script type="text/javascript">
+                new OverText('#lastname, #mname, #firstname, #suffix');
+              </script>
               <span id="aka" class="formField <?php echo (empty($contact->aka)?'H':'') ?>">
                 <label for="akaField"><?php echo __('Also known as') ?> : </label>
                 <input type="text" name="aka" id="akaField" value="<?php echo $contact->aka ?>" title="<?php echo __('Also known as') ?>" />

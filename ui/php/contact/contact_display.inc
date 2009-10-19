@@ -232,21 +232,11 @@ function dis_contact_search_form($contact='') {
  */
 function html_contact($contact_id) {
   $addressBooks = OBM_AddressBook::search();
-
-  if (isset($contact_id)) {
+  //HERE
+  if($contact_id) {
     $c = OBM_Contact::get($contact_id);
     $addressBook = OBM_AddressBook::get($c->addressbook);
     $contacts = $addressBook->getContacts();
-    if ($addressbook && $addressbook->read) { 
-      $detailconsult = "
-        obm.contact.addressbook.selectAddressBook($('addressbook-$c->addressbook'));
-        obm.contact.addressbook.contactRequest.addEvent('complete', function() {
-          obm.contact.addressbook.selectContact($('contact-'+$contact_id));
-          obm.contact.addressbook.contactRequest.removeEvents('complete');
-        }.bind(this));";
-    } else {
-      $detailconsult = "showErrorMessage(obm.vars.labels.permsError);";
-    }
   } else {
     $addressBook = $addressBooks->getMyContacts();
     $contacts = $addressBook->getContacts();
@@ -259,7 +249,6 @@ function html_contact($contact_id) {
   $template->set('addressbooks', $addressBooks);
   $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
   return $template->render();
-  return $block;
 }
 
 /**

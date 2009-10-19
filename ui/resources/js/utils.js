@@ -95,6 +95,7 @@ Obm.CoordonateWidget = new Class({
     this.container = $(this.options.container);
     this.displayForm(); 
     this.table.inject(this.container, this.options.inject);
+    OverText.update();
   },    
 
   displayForm: function() {
@@ -104,14 +105,14 @@ Obm.CoordonateWidget = new Class({
       if(data.newCell == true || data.newLine == true) {cell = new Element('th');line.adopt(cell);}
       if(!data.newCell && !data.newLine) cell.adopt(new Element('br'));
       cell.adopt(this.makeField(field, data));
+      new OverText(cell.getElements('input, textarea'));      
     }
     line.adopt(new Element('td').adopt(
       new Element('a').adopt(new Element('img').setProperties({'src' : obm.vars.images.del,'alt' : obm.vars.labels.remove}))
-        .addEvent('click', function() {this.table.dispose();}.bind(this))
+        .addEvent('click', function() {this.table.dispose();OverText.update();}.bind(this))
         .setStyle('cursor','pointer')
       )
     );
-    new Obm.OverText(this.table.getElements('input, textarea'));
   },
 
   makeField: function(fieldName, field) {
@@ -168,51 +169,6 @@ Obm.CoordonateWidget = new Class({
     }
 
     return element;
-  }
-});
-
-Obm.OverText = new Class({
-  Implements: [Options, Events],
-  
-  initialize: function(inputs, options) {
-    this.setOptions(options);
-    $G(inputs).each(this.addElement, this);
-  },
-
-  addElement: function(el){
-    el.addEvents({
-      focus: this.hideTxt.pass([el, true], this),
-      blur: this.testOverTxt.pass(el, this),
-      change: this.testOverTxt.pass(el, this)
-    });
-    this.testOverTxt(el);
-  },
-
-  hideTxt: function(el, focus){
-    if(el.get('active') != 'true') {
-      el.removeClass('overText');
-      el.set('inputValue'); 
-      el.set('active','true');
-      try {
-        if (focus) el.fireEvent('focus').focus();
-      } catch(e){};
-    }
-    return this;
-  },
-
-  showTxt: function(el){
-    if(el.get('active') != 'false') {
-      var txt = el.get('alt') || el.get('title')
-      el.set('active','false');
-      el.addClass('overText');
-      el.set('inputValue',txt); 
-    }
-    return this;
-  },
-
-  testOverTxt: function(el){
-      if (el.get('inputValue') != '') this.hideTxt(el);
-      else this.showTxt(el);  
   }
 });
 

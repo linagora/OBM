@@ -163,6 +163,10 @@
 
 /* Contact card styling */
 
+#informationContainer {
+  position: relative;
+}
+
 #informationGrid img.photo {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
