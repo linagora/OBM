@@ -4,7 +4,7 @@
 # default: imapdConfFile = /etc/imapd.conf
 
 # Cyrus init script
-# default: cyrusStartupScript = /etc/init.d/cyrus2.2
+# default: cyrusStartupScript = /etc/init.d/cyrus2.3
 
 # Cyrus partition root directory
 # default: imapdPartitionRoot = /var/spool/cyrus

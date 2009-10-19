@@ -14,7 +14,7 @@ use strict;
 use HTTP::Status;
 
 use constant IMAPD_CONF_FILE => '/etc/imapd.conf';
-use constant CYRUS_STARTUP_SCRIPT => '/etc/init.d/cyrus2.2';
+use constant CYRUS_STARTUP_SCRIPT => '/etc/init.d/cyrus2.3';
 use constant IMAPD_PARTITION_ROOT => '/var/spool/cyrus';
 
 
