@@ -242,7 +242,6 @@ function html_contact($contact_id) {
     $contacts = $addressBook->getContacts();
   }
 
-  $searchForm = dis_contact_html_search_form(array());
   $template = new OBM_Template('main');
   $template->set('searchfields', OBM_Contact::fieldsMap());
   $template->set('contacts', $contacts);
@@ -374,57 +373,6 @@ function html_contact_get_list($contacts, $headers) {
   return $block;
   
 }
-
-
-/**
- * Event search form
- * Basic and advanced form
- */
-function dis_contact_html_search_form($calendar) {
-  global $obm;
-
-
-  $block = "
-    <div id='searchHolder'>
-    <div id='basicSearch'>
-      <form id='searchForm' onsubmit='obm.contact.addressbook.searchContact(this); return false;'>
-        <input type='text' id='searchpattern' name='searchpattern' value='' />
-        <input type='submit' value='$GLOBALS[l_search]' />
-        <input type='hidden' name='action' value='search' />
-        <a href=\"#\" onclick=\"$$('#advancedSearch','#basicSearch').toggle();\">$GLOBALS[l_advanced_search]</a>
-      </form>
-    </div>
-    <div id='advancedSearch' style='display:none;'>
-      <div class='header'>
-        <span class='title'>$GLOBALS[l_advanced_search]</span>
-        <span class='link'><a href=\"#\" onclick=\"$$('#advancedSearch','#basicSearch').toggle();\">$GLOBALS[l_hide_advanced_search]</a></span>
-      </div>
-      <div class='content'>
-      <form id='advancedSearchForm' onsubmit='obm.contact.addressbook.searchContact(this);return false;'>
-        <table>
-        <tr>
-          <td>$GLOBALS[l_displayname]</td>
-          <td><input type='text' id='searchDisplayname' name='displayname' value='' /></td>
-          <td>$GLOBALS[l_middlename]</td>
-          <td><input type='text' id='searchMiddlename' name='middlename' value='' /></td>
-        </tr><tr>
-          <td>$GLOBALS[l_company]</td>
-          <td><input type='text' id='searchCompany' name='company' value='' /></td>
-          <td>$GLOBALS[l_title]</td>
-          <td><input type='text' id='searchTitle' name='title' value='' /></td>
-        </tr>
-        </table>
-
-        <input type='submit' value='$GLOBALS[l_search]' />
-        <input type='button' onclick=\"$$('#advancedSearch','#basicSearch').toggle();\" value='$GLOBALS[l_cancel]'>
-      </form>
-      </div>
-    </div>
-    </div>";
-
-  return $block;
-}
-
 
 
 /**
