@@ -334,12 +334,11 @@ select {
 
 .contactPanelContainer {
   overflow-y: auto;
-  overflow-x: show;
+  overflow-x: hidden;
 }
 
-.cardPanelContainer {
-  overflow-y: auto;
-  overflow-x: show;
+#dataContainer {
+  overflow-y: scroll;
 }
 
 table.contactPanelHeader {
@@ -347,8 +346,9 @@ table.contactPanelHeader {
 }
 
 table.contactPanelHeader th, .contactPanelContainer table td {
-  overflow-x: show;
+  overflow-x: hidden;
 }
+
 
 .contactPanelContainer table {
   table-layout: fixed;
@@ -359,7 +359,7 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 }
 
 .contactPanelContainer table td, .contactPanelContainer table th {
-  overflow-x : show;
+  overflow-x : hidden;
 }
 
 .cardPanelContainer table td, .cardPanelContainer table th {

@@ -788,7 +788,10 @@ function run_query_user_addressbook_insert($user_id, $domain_id) {
     display_debug_msg($query, $cdg_sql, "run_query_user_addressbook_insert($addressbook_type)");
     $obm_q->query($query);
     $id = $obm_q->lastid();
+    $query = "INSERT INTO SyncedAddressbook VALUES ($user_id, $id, NOW())"; 
+    $obm_q->query($query);
     $entity_id = of_entity_insert('addressbook', $id);    
+
   }
 
 }

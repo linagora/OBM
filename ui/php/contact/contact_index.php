@@ -116,320 +116,25 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } else if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['search'] = dis_contact_search_form($params);
-  // if ($_SESSION['set_display'] == 'yes') {
-  //   $display['result'] = dis_contact_search_list($params);
-  // } else {
-  //   $display['msg'] .= display_info_msg($l_no_display);
-  // }
-  
-} elseif ($action == 'search2') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['search'] = dis_contact_search_form($params);
-  $display['result'] = dis_contact_search_list($params);
-} elseif ($action == 'ext_search') {
-///////////////////////////////////////////////////////////////////////////////
-  $res_q = run_query_contact_ext_search($params);
-  json_search_contact($params, $res_q);
-  echo '('.$display['json'].')';
-  exit();
-
-} elseif ($action == 'new') {
-///////////////////////////////////////////////////////////////////////////////
-  if (isset($params['company_id'])) {
-    $comp_q = run_query_contact_company($params['company_id']);
-  }
-  $display['detail'] = dis_contact_form($action, $comp_q, $params);
-  
-} elseif ($action == 'import') {
-///////////////////////////////////////////////////////////////////////////////
-  if($params['addressbook'] && OBM_AddressBook::get($params['addressbook'])->write == 1) {
-    $display['detail'] = dis_vcard_import_form($params['addressbook']);
+  contact_export_js_labels();
+  $addressBooks = OBM_AddressBook::search();
+  if($params['contact_id']) {
+    $current['contact'] = $contact_id;
+    $c = OBM_Contact::get($contact_id);
+    $addressBook = OBM_AddressBook::get($c->addressbook);
+    $contacts = $addressBook->getContacts();
   } else {
-    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
+    $addressBook = $addressBooks->getMyContacts();
+    $contacts = $addressBook->getContacts();
   }
-} elseif ($action == 'export') {
-///////////////////////////////////////////////////////////////////////////////
-  $addressbooks = OBM_AddressBook::search();
-  $contacts = $addressbooks->searchContacts($params['searchpattern']);
-  if (count($contacts) != 0) {
-    dis_contact_vcard_export_all($contacts);
-  }
-  exit();
-
-} elseif ($action == 'detailconsult') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['search'] = dis_contact_search_form($params);
-  // if ($params['contact_id'] > 0) {
-  //   $display['detail'] = dis_contact_consult($params);
-  // }
-  
-} elseif ($action == 'sync' || $action == 'desync') {
-///////////////////////////////////////////////////////////////////////////////
-  if ($params['contact_id'] > 0) {
-    $ok = run_query_do_contact_sync($params['contact_id'], ($action == 'sync'));
-    /*if ($ok) {
-      $display["msg"] .= display_ok_msg("$l_synchronisation : $l_update_ok");
-    } else {
-      $display["msg"] .= display_err_msg("$l_synchronisation : $l_update_error");
-    }
-    $display['detail'] = dis_contact_consult($params);*/
-
-    json_sync_contact(!$ok, $action);
-    echo "({".$display['json']."})";
-    exit();
-  }
-  
-} elseif ($action == 'detailupdate') {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_contact_update_rights($params)) {
-    if ($params['contact_id'] > 0) {
-      $con_q = run_query_contact_detail($params['contact_id']);
-      if ($con_q->num_rows() == 1) {
-	$display['detailInfo'] = display_record_info($con_q);
-	$display['detail'] = dis_contact_form($action, $con_q, $params);
-      } else {
-	$display['msg'] .= display_err_msg($l_err_reference);
-      }
-    }
-  } else {
-    $display['msg'] .= display_warn_msg($err['msg']);
-    $display['detail'] = dis_contact_consult($params);
-  }
-
-} elseif ($action == 'insert') {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_user_defined_rules() && check_contact_data_form('', $params)) {
-    // If the context (same contacts) was confirmed ok, we proceed
-    if ($params['confirm'] == $c_yes) {
-      $id = run_query_contact_insert($params);
-      if ($id > 0) {
-        $params['contact_id'] = $id;
-        $display['msg'] .= display_ok_msg("$l_contact : $l_insert_ok");
-      } else {
-        $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
-      }
-      $display['detail'] = dis_contact_consult($params);
-
-    // If it is the first try, we warn the user if some contacts seem similar
-    } else {
-      $obm_q = check_contact_context('', $params);
-      if ((is_object($obm_q)) && ($obm_q->num_rows() > 0)) {
-	      $display['title'] = display_title("$l_contact : $l_insert");
-        $display['detail'] = dis_contact_warn_insert('', $obm_q, $params);
-      } else {
-        $id = run_query_contact_insert($params);
-        if ($id > 0) {
-          $params['contact_id'] = $id;
-          $display['msg'] .= display_ok_msg("$l_contact : $l_insert_ok");
-          $display['detail'] = dis_contact_consult($params);
-        } else {
-          $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
-          $display['detail'] = dis_contact_form($action, '', $params);
-        }
-      }
-    }
-
-  // Form data are not valid
-  } else {
-    $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
-    $display['detail'] = dis_contact_form($action, '', $params);
-  }
-  
-} elseif ($action == 'update') {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_contact_update_rights($params)) {
-    if (check_user_defined_rules() && check_contact_data_form('', $params)) {
-      $retour = run_query_contact_update($params);
-      if ($retour) {
-	$display['msg'] .= display_ok_msg("$l_contact : $l_update_ok");
-      } else {
-	$display['msg'] .= display_err_msg("$l_contact : $l_update_error");
-      }
-      if ($params['contact_id'] > 0) {
-	$display['detail'] = dis_contact_consult($params);
-      }
-    } else {
-      $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
-      $display['detail'] = dis_contact_form($action, '', $params);
-    }
-  } else {
-    $display['msg'] .= display_warn_msg($err['msg']);
-    $display['detail'] = dis_contact_consult($params);
-  }
-  
-} elseif ($action == 'check_delete') {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_contact($params['contact_id'])) {
-    $display['msg'] .= display_info_msg($ok_msg, false);
-    $display['detail'] = dis_can_delete_contact($params['contact_id']);
-  } else {
-    $display['msg'] .= display_warn_msg($err['msg'], false);
-    $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $display['detail'] = dis_contact_consult($params);
-  }
-
-} elseif ($action == 'delete') {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_contact($params['contact_id'])) {
-    $retour = run_query_contact_delete($params['contact_id']);
-    if ($retour) {
-      $display['msg'] .= display_ok_msg("$l_contact : $l_delete_ok");
-    } else {
-      $display['msg'] .= display_err_msg("$l_contact : $l_delete_error");
-    }
-    $display['search'] = dis_contact_search_form($params);
-  } else {
-    $display['msg'] .= display_warn_msg($err['msg'], false);
-    $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $display['detail'] = dis_contact_consult($params);
-  }
-  
-} elseif ($action == 'vcard_insert') {
-///////////////////////////////////////////////////////////////////////////////
-  $addressbook = OBM_AddressBook::get($params['addressbook']);
-  if($addressbook->write) {
-    $ids = run_query_vcard_insert($params, $addressbook);
-  } else {
-    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
-  }
-  if ($ids !== false) {
-    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
-  } else {
-    $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
-    $display['detail'] .= dis_vcard_import_form();
-  }
-
-} elseif ($action == 'statistics') {
-///////////////////////////////////////////////////////////////////////////////
-  require_once("$obminclude/lang/".$_SESSION['set_lang'].'/statistic.inc');
-  // Specific conf statistics lang file
-  if ($conf_lang) {
-    $lang_file = "$obminclude/conf/lang/".$_SESSION['set_lang']."/statistic.inc";
-    if (file_exists("$path/../".$lang_file)) {
-      include("$lang_file");
-    }
-  }
-  $display['title'] = display_title($l_stats);
-  $display['detail'] = dis_category_contact_stats($params);
-
-} elseif ($action == 'rights_admin') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_addressbook_right_dis_admin($params);
-
-} elseif ($action == 'rights_update') {
-///////////////////////////////////////////////////////////////////////////////
-  if (OBM_Acl_Utils::updateRights('addressbook', $params['entity_id'], $obm['uid'], $params)) {
-    $display['msg'] .= display_ok_msg($l_right_update_ok);
-  } else {
-    $display['msg'] .= display_warn_msg($l_of_right_err_auth);
-  }
-  $display['detail'] = dis_addressbook_right_dis_admin($params);
-
-} elseif ($action == 'admin') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_contact_admin_index();
-
-} elseif ($action == 'function_insert') {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert('contact', 'function', $params);
-  if ($retour) {
-    $display['msg'] .= display_ok_msg("$l_function : $l_insert_ok");
-  } else {
-    $display['msg'] .= display_err_msg("$l_function : $l_insert_error");
-  }
-  $display['detail'] .= dis_contact_admin_index();
-
-} elseif ($action == 'function_update') {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update('contact', 'function', $params);
-  if ($retour) {
-    $display['msg'] .= display_ok_msg("$l_function : $l_update_ok");
-  } else {
-    $display['msg'] .= display_err_msg("$l_function : $l_update_error");
-  }
-  $display['detail'] .= dis_contact_admin_index();
-
-} elseif ($action == 'function_checklink') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] .= of_category_dis_links('contact', 'function', $params, 'mono');
-
-} elseif ($action == 'function_delete') {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete('contact', 'function', $params);
-  if ($retour) {
-    $display['msg'] .= display_ok_msg("$l_function : $l_delete_ok");
-  } else {
-    $display['msg'] .= display_err_msg("$l_function : $l_delete_error");
-  }
-  $display['detail'] .= dis_contact_admin_index();
-
-} elseif ($action == 'kind_insert') {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contact_kind_insert($params);
-  if ($retour) {
-    $display['msg'] .= display_ok_msg("$l_kind : $l_insert_ok");
-  } else {
-    $display['msg'] .= display_err_msg("$l_kind : $l_insert_error");
-  }
-  $display['detail'] .= dis_contact_admin_index();
-
-} elseif ($action == 'kind_update') {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contact_kind_update($params);
-  if ($retour) {
-    $display['msg'] .= display_ok_msg("$l_kind : $l_update_ok");
-  } else {
-    $display['msg'] .= display_err_msg("$l_kind : $l_update_error");
-  }
-  $display['detail'] .= dis_contact_admin_index();
-
-} elseif ($action == 'kind_checklink') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] .= dis_contact_kind_links($params);
-
-} elseif ($action == 'kind_delete') {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contact_kind_delete($params['kind']);
-  if ($retour) {
-    $display['msg'] .= display_ok_msg("$l_kind : $l_delete_ok");
-  } else {
-    $display['msg'] .= display_err_msg("$l_kind : $l_delete_error");
-  }
-  $display['detail'] .= dis_contact_admin_index();
-
-} elseif ($action == 'display') {
-///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($obm['uid'], 'contact', 1);
-  $display['detail'] = dis_contact_display_pref($prefs); 
-  
-} else if ($action == 'dispref_display') {
-///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($params);
-  $prefs = get_display_pref($obm['uid'], 'contact', 1);
-  $display['detail'] = dis_contact_display_pref($prefs);
-  
-} else if ($action == 'dispref_level') {
-///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($params);
-  $prefs = get_display_pref($obm['uid'], 'contact', 1);
-  $display['detail'] = dis_contact_display_pref($prefs);
-
-} elseif ($action == 'document_add')  {
-///////////////////////////////////////////////////////////////////////////////
-  $params['contact_id'] = $params['ext_id'];
-  if ($params['doc_nb'] > 0) {
-    $nb = run_query_global_insert_documents_links($params, 'contact');
-    $display['msg'] .= display_ok_msg("$nb $l_document_added");
-  } else {
-    $display['msg'] .= display_err_msg($l_no_document_added);
-  }
-  if ($params['contact_id'] > 0) {
-    $display['detail'] = dis_contact_consult($params);
-  }
-
-
-
+  $current['addressbook'] = $addressBook->id;
+  $template = new OBM_Template('main');
+  $template->set('searchfields', OBM_Contact::fieldsMap());
+  $template->set('contacts', $contacts);
+  $template->set('addressbooks', $addressBooks);
+  $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
+  $template->set('current', $current);
+  $display['detail'] = $template->render();
 } elseif ($action == 'consult')  {
 ///////////////////////////////////////////////////////////////////////////////
   $contact = OBM_Contact::get($params['id']);
@@ -584,7 +289,171 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   echo $template->render();
   exit();
   //FIXME Erreur de droit
-} 
+} elseif ($action == 'ext_search') {
+///////////////////////////////////////////////////////////////////////////////
+  $res_q = run_query_contact_ext_search($params);
+  json_search_contact($params, $res_q);
+  echo '('.$display['json'].')';
+  exit();
+
+} elseif ($action == 'import') {
+///////////////////////////////////////////////////////////////////////////////
+  if($params['addressbook'] && OBM_AddressBook::get($params['addressbook'])->write == 1) {
+    $display['detail'] = dis_vcard_import_form($params['addressbook']);
+  } else {
+    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
+  }
+} elseif ($action == 'export') {
+///////////////////////////////////////////////////////////////////////////////
+  $addressbooks = OBM_AddressBook::search();
+  $contacts = $addressbooks->searchContacts($params['searchpattern']);
+  if (count($contacts) != 0) {
+    dis_contact_vcard_export_all($contacts);
+  }
+  exit();
+} elseif ($action == 'vcard_insert') {
+///////////////////////////////////////////////////////////////////////////////
+  $addressbook = OBM_AddressBook::get($params['addressbook']);
+  if($addressbook->write) {
+    $ids = run_query_vcard_insert($params, $addressbook);
+  } else {
+    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
+  }
+  if ($ids !== false) {
+    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
+  } else {
+    $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
+    $display['detail'] .= dis_vcard_import_form();
+  }
+
+} elseif ($action == 'statistics') {
+///////////////////////////////////////////////////////////////////////////////
+  require_once("$obminclude/lang/".$_SESSION['set_lang'].'/statistic.inc');
+  // Specific conf statistics lang file
+  if ($conf_lang) {
+    $lang_file = "$obminclude/conf/lang/".$_SESSION['set_lang']."/statistic.inc";
+    if (file_exists("$path/../".$lang_file)) {
+      include("$lang_file");
+    }
+  }
+  $display['title'] = display_title($l_stats);
+  $display['detail'] = dis_category_contact_stats($params);
+
+} elseif ($action == 'rights_admin') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_addressbook_right_dis_admin($params);
+
+} elseif ($action == 'rights_update') {
+///////////////////////////////////////////////////////////////////////////////
+  if (OBM_Acl_Utils::updateRights('addressbook', $params['entity_id'], $obm['uid'], $params)) {
+    $display['msg'] .= display_ok_msg($l_right_update_ok);
+  } else {
+    $display['msg'] .= display_warn_msg($l_of_right_err_auth);
+  }
+  $display['detail'] = dis_addressbook_right_dis_admin($params);
+
+} elseif ($action == 'admin') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_contact_admin_index();
+
+} elseif ($action == 'function_insert') {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_category_query_insert('contact', 'function', $params);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_function : $l_insert_ok");
+  } else {
+    $display['msg'] .= display_err_msg("$l_function : $l_insert_error");
+  }
+  $display['detail'] .= dis_contact_admin_index();
+
+} elseif ($action == 'function_update') {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_category_query_update('contact', 'function', $params);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_function : $l_update_ok");
+  } else {
+    $display['msg'] .= display_err_msg("$l_function : $l_update_error");
+  }
+  $display['detail'] .= dis_contact_admin_index();
+
+} elseif ($action == 'function_checklink') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] .= of_category_dis_links('contact', 'function', $params, 'mono');
+
+} elseif ($action == 'function_delete') {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_category_query_delete('contact', 'function', $params);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_function : $l_delete_ok");
+  } else {
+    $display['msg'] .= display_err_msg("$l_function : $l_delete_error");
+  }
+  $display['detail'] .= dis_contact_admin_index();
+
+} elseif ($action == 'kind_insert') {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_contact_kind_insert($params);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_kind : $l_insert_ok");
+  } else {
+    $display['msg'] .= display_err_msg("$l_kind : $l_insert_error");
+  }
+  $display['detail'] .= dis_contact_admin_index();
+
+} elseif ($action == 'kind_update') {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_contact_kind_update($params);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_kind : $l_update_ok");
+  } else {
+    $display['msg'] .= display_err_msg("$l_kind : $l_update_error");
+  }
+  $display['detail'] .= dis_contact_admin_index();
+
+} elseif ($action == 'kind_checklink') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] .= dis_contact_kind_links($params);
+
+} elseif ($action == 'kind_delete') {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_contact_kind_delete($params['kind']);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_kind : $l_delete_ok");
+  } else {
+    $display['msg'] .= display_err_msg("$l_kind : $l_delete_error");
+  }
+  $display['detail'] .= dis_contact_admin_index();
+
+} elseif ($action == 'display') {
+///////////////////////////////////////////////////////////////////////////////
+  $prefs = get_display_pref($obm['uid'], 'contact', 1);
+  $display['detail'] = dis_contact_display_pref($prefs); 
+  
+} else if ($action == 'dispref_display') {
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($params);
+  $prefs = get_display_pref($obm['uid'], 'contact', 1);
+  $display['detail'] = dis_contact_display_pref($prefs);
+  
+} else if ($action == 'dispref_level') {
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($params);
+  $prefs = get_display_pref($obm['uid'], 'contact', 1);
+  $display['detail'] = dis_contact_display_pref($prefs);
+
+} elseif ($action == 'document_add')  {
+///////////////////////////////////////////////////////////////////////////////
+  $params['contact_id'] = $params['ext_id'];
+  if ($params['doc_nb'] > 0) {
+    $nb = run_query_global_insert_documents_links($params, 'contact');
+    $display['msg'] .= display_ok_msg("$nb $l_document_added");
+  } else {
+    $display['msg'] .= display_err_msg($l_no_document_added);
+  }
+  if ($params['contact_id'] > 0) {
+    $display['detail'] = dis_contact_consult($params);
+  }
+}
 
 of_category_user_action_switch($module, $action, $params);
 
@@ -636,7 +505,7 @@ function get_contact_params() {
 function get_contact_action() {
   global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_stats;
-  global $l_header_consult, $l_header_display, $l_header_admin;
+  global $l_header_consult, $l_header_display, $l_header_admin, $l_header_index;
   global $l_header_import,$l_header_export, $l_header_vcard, $l_header_right;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
@@ -656,10 +525,10 @@ function get_contact_action() {
 
 // Index
   $actions['contact']['index'] = array (
-    'Name'     => $l_header_find,
+    'Name'     => $l_header_index,
     'Url'      => "$path/contact/contact_index.php?action=index",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('all') 
                                         );
 
 //FIXME
@@ -776,8 +645,8 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','detailupdate','check_delete','rights_admin','rights_update','check_delete') 
-                                                 );
+    'Condition'=> array ('None')
+  );
 
 // Contact synchronisation
  $actions['contact']['sync']   = array (
@@ -810,7 +679,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=vcard&amp;popup=1&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_read,
     'Privacy'  => true,    
-    'Condition'=> array ('detailconsult','detailupdate','update','rights_admin','rights_update','check_delete')    
+    'Condition'=> array ('None')    
                                        );
 
 // Detail Update
@@ -819,7 +688,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','update','rights_admin','rights_update','check_delete')
+    'Condition'=> array ('None')
                                      		 );
 
 // Insert
@@ -857,7 +726,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','detailupdate','rights_admin','rights_update','update','check_delete') 
+    'Condition'=> array ('None') 
                                      	      );
 
 // Delete
@@ -873,7 +742,7 @@ function get_contact_action() {
     'Name'     => $l_header_right,
     'Url'      => "$path/contact/contact_index.php?action=rights_admin&amp;entity_id=".$params['entity_id'],
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult','detailupdate','rights_admin','rights_update','detailupdate','update','check_delete')
+    'Condition'=> array ('None')
                                      );
 
 // Rights Update

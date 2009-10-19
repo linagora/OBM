@@ -10,8 +10,10 @@
         <?php } else { ?>
         <img alt='<?php echo __('Not synchronized') ?>' title='<?php echo __('Not synchronized') ?>' src="<?php echo self::__icon('unsync') ?>"/>
         <?php } ?>
+        <?php if ($_addressbook->write == 1) { ?>
         <input onblur="$(this).hide();$(this).getNext().show();$(this).set('value', '<?php echo self::toJs($_addressbook->name); ?>')" type="text" style='display: none' name='name' value="<?php echo $_addressbook->name ?>" />
-        <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-<?php echo $_id ?>')); return false;"><?php echo $_addressbook->name; ?></a> 
+        <?php } ?>
+        <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-<?php echo $_id ?>')); return false;"><?php echo $_addressbook->displayname; ?></a> 
         <ul class="dropDownMenu addressBookMenu" >
           <li>
             <img alt="<?php echo __('Addressbook menu')?>" src="<?php echo self::__icon('dropdown') ?>" />
@@ -38,8 +40,8 @@
         <input type='hidden' name='action' value='storeAddressBook' />
         <input type='hidden' name='id' value='<?php echo $_id ?>' />
         <script type='text/javascript'>
-          $('addressbook-<?php echo $_id ?>').set('write', <?php echo $_addressbook->write ?>);
-          $('addressbook-<?php echo $_id ?>').set('search', 'in:<?php echo $_id ?> archive:0');
+          $('addressbook-<?php echo $_id ?>').store('write', <?php echo $_addressbook->write ?>);
+          $('addressbook-<?php echo $_id ?>').store('search', 'in:<?php echo $_id ?> archive:0');
           new Obm.DropDownMenu($('addressbook-<?php echo $_id ?>').getElement('ul'));
         </script>
       </form>

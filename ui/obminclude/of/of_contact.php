@@ -786,6 +786,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_archive,
       contact_date,
       contact_addressbook_id,
+      addressbook_name,
       bd.event_id as contact_birthday_event,
       bd.event_date as contact_birthday,
       an.event_id as contact_anniversary_event,
@@ -832,6 +833,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_archive,
       contact_date,
       contact_addressbook_id,
+      addressbook_name,
       bd.event_id,
       bd.event_date,
       an.event_id,
@@ -872,7 +874,7 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->comment2      = $db->f('contact_comment2');
       $contact->comment3      = $db->f('contact_comment3');
       $contact->origin        = $db->f('contact_origin');
-      $contact->addressbook   = $db->f('contact_addressbook_id');
+      $contact->addressbook_id= $db->f('contact_addressbook_id');
       if ($db->f('contact_date'))
         $contact->date        = new Of_Date($db->f('contact_date'), 'GMT');
       if ($db->f('contact_birthday')) {
@@ -1003,7 +1005,7 @@ class OBM_Contact implements OBM_ISearchable {
             '$address[zipcode]',
             '$address[town]',
             '$address[expresspostal]',
-            '$address[country]',
+            '$address[country_iso3166]',
             '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
           )";
           display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(address)');
