@@ -119,7 +119,7 @@
     </tr>
   </thead>
 </table>
-<div class='cardPanelContainer' id='informationContainer'>
+<div class='contactPanelContainer' id='informationContainer'>
   <table id="contact-card-<?php echo $contact->id ?>">
     <tbody>
       <tr>
