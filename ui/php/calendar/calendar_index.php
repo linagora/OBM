@@ -905,8 +905,8 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $result = run_query_icalendar_insert($params) ;
   if($result !== false) {
-    $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
-    $display['detail'] = dis_icalendar_insert($result);
+    $display['msg'] .= display_ok_msg("$result[0] $l_ics_import_ok");
+    $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
   } else {
     $display['msg'] .= display_err_msg("$l_file_format $l_unknown");
     $display['detail'] .= dis_icalendar_import($params);

@@ -2648,13 +2648,13 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
 
   // Send mail
   $event = OBM_EventFactory::getInstance()->getById($event_id);
-  of_entity_delete('event', $event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
   if($force_sendmail || $calendar['send_mail']) {
     OBM_EventFactory::getInstance()->delete($event);
   }
   $obm_q->query($query);
+  of_entity_delete('event', $event_id);
 }
 
 
@@ -4852,7 +4852,7 @@ function run_query_calendar_reset($id,$params) {
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") AND event_date < '$date'
     GROUP BY event_id HAVING COUNT(*) = 1";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(1)');
   $obm_q->query($query);
 
   while($obm_q->next_record()) {
@@ -4865,6 +4865,7 @@ function run_query_calendar_reset($id,$params) {
     # Refuse all other events
     $query = "SELECT eventlink_event_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id INNER JOIN Event ON event_id = eventlink_event_id WHERE userentity_user_id = $id 
       AND eventlink_state != 'DECLINED' AND event_date < '$date'";
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(2)');
     $obm_q->query($query);
     while($obm_q->next_record()) {
       $event[] = $obm_q->f('eventlink_event_id');
@@ -4875,7 +4876,7 @@ function run_query_calendar_reset($id,$params) {
   # Delete all alerts
   if(!is_null($event)) {
     $query = "DELETE FROM EventAlert WHERE eventalert_user_id = $id AND eventalert_event_id IN (".implode(',',$event).")"; 
-    display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(3)');
     $obm_q->query($query);
   }
 }
