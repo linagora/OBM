@@ -4247,7 +4247,7 @@ function run_query_calendar_create_or_update_tag(&$calendar) {
     }
   }
   $event_tag_id = $calendar['tag_id'] ;
-  if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
+  if (!isset($event_tag_id) || $event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
   
   return $event_tag_id;
 }

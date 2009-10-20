@@ -120,6 +120,7 @@ class Vcalendar_Writer_OBM {
     $event['date_end'] = $vevent->get('dtend');
     $event['event_duration'] = $vevent->get('duration');
     $event['duration'] = $vevent->get('duration');
+    $event['opacity'] = $vevent->get('transp');
     
     $event['date_exception'] = array();
     $exdates = $vevent->get('exdate');
