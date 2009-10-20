@@ -8,6 +8,45 @@ require_once 'obminclude/of/of_search.php';
 
 class OBM_Contact implements OBM_ISearchable {
 
+  public static $fields = array (
+    'lastname' 	=> array('sql' => 'contact_lastname', 'sqlkind' => 'text', 'type' => 'text'),
+    'firstname'	=> array('sql' => 'contact_firstname', 'sqlkind' => 'text', 'type' => 'text'),
+    'mname' 	=> array('sql' => 'contact_mname', 'sqlkind' => 'text', 'type' => 'text'),
+    'kind' 	=> array('sql' => 'contact_kind', 'sqlkind' => 'text', 'type' => 'text'),
+    'title' 	=> array('sql' => 'contact_title', 'sqlkind' => 'text', 'type' => 'text'),
+    'function' 	=> array('sql' => 'contact_function', 'sqlkind' => 'text', 'type' => 'text'),
+    'company_id'=> array('sql' => 'contact_company_id', 'sqlkind' => 'text', 'type' => 'text'),
+    'company' 	=> array('sql' => 'contact_company', 'sqlkind' => 'text', 'type' => 'text'),
+    'market_id' 	=> array('sql' => 'contact_market', 'sqlkind' => 'text', 'type' => 'text'),
+    'suffix' 	=> array('sql' => 'contact_suffix', 'sqlkind' => 'text', 'type' => 'text'),
+    'aka' 	=> array('sql' => 'contact_aka', 'sqlkind' => 'text', 'type' => 'text'),
+    'sound' 	=> array('sql' => 'contact_sound', 'sqlkind' => 'text', 'type' => 'text'),
+    'manager' 	=> array('sql' => 'contact_manager', 'sqlkind' => 'text', 'type' => 'text'),
+    'assistant' => array('sql' => 'contact_assistant', 'sqlkind' => 'text', 'type' => 'text'),
+    'spouse' 	=> array('sql' => 'contact_spouse', 'sqlkind' => 'text', 'type' => 'text'),
+    'category' 	=> array('sql' => 'contact_category', 'sqlkind' => 'text', 'type' => 'text'),
+    'service' 	=> array('sql' => 'contact_service', 'sqlkind' => 'text', 'type' => 'text'),
+    'mailok' 	=> array('sql' => 'contact_mailok', 'sqlkind' => 'text', 'type' => 'text'),
+    'newsletter'=> array('sql' => 'contact_newsletter', 'sqlkind' => 'text', 'type' => 'text'),
+    'date' 	=> array('sql' => 'contact_date', 'sqlkind' => 'text', 'type' => 'text'),
+    'birthday' 	=> array('sql' => 'contact_birthday', 'sqlkind' => 'text', 'type' => 'text'),
+    'birthday_event' 	=> array('sql' => 'contact_birthday_event', 'sqlkind' => 'text', 'type' => 'text'),
+    'anniversary' 	=> array('sql' => 'contact_anniversary', 'sqlkind' => 'text', 'type' => 'text'),
+    'anniversary_event'	=> array('sql' => 'contact_anniversary_event', 'sqlkind' => 'text', 'type' => 'text'),
+    'phone' 	=> array('sql' => 'contact_phone', 'sqlkind' => 'text', 'type' => 'text'),
+    'email' 	=> array('sql' => 'contact_email', 'sqlkind' => 'text', 'type' => 'text'),
+    'address' 	=> array('sql' => 'contact_address', 'sqlkind' => 'text', 'type' => 'text'),
+    'im' 	=> array('sql' => 'contact_im', 'sqlkind' => 'text', 'type' => 'text'),
+    'website' 	=> array('sql' => 'contact_website', 'sqlkind' => 'text', 'type' => 'text'),
+    'archive' 	=> array('sql' => 'contact_archive', 'sqlkind' => 'text', 'type' => 'text'),
+    'datasource_id' 	=> array('sql' => 'contact_datasource_id', 'sqlkind' => 'text', 'type' => 'text'),
+    'comment' 	=> array('sql' => 'contact_comment', 'sqlkind' => 'text', 'type' => 'text'),
+    'comment2' 	=> array('sql' => 'contact_comment2', 'sqlkind' => 'text', 'type' => 'text'),
+    'comment3' 	=> array('sql' => 'contact_comment3', 'sqlkind' => 'text', 'type' => 'text'),
+    'origin' 	=> array('sql' => 'contact_origin', 'sqlkind' => 'text', 'type' => 'text'),
+    'addressbook' 	=> array('sql' => 'contact_addressbook', 'sqlkind' => 'text', 'type' => 'text')
+  ); 
+
   private  $id;
   private  $entity_id;
 
