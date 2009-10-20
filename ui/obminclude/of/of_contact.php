@@ -8,45 +8,6 @@ require_once 'obminclude/of/of_search.php';
 
 class OBM_Contact implements OBM_ISearchable {
 
-  public static $fields = array (
-    'lastname' 	=> array('sql' => 'contact_lastname', 'sqlkind' => 'text', 'type' => 'text'),
-    'firstname'	=> array('sql' => 'contact_firstname', 'sqlkind' => 'text', 'type' => 'text'),
-    'mname' 	=> array('sql' => 'contact_mname', 'sqlkind' => 'text', 'type' => 'text'),
-    'kind' 	=> array('sql' => 'contact_kind', 'sqlkind' => 'text', 'type' => 'text'),
-    'title' 	=> array('sql' => 'contact_title', 'sqlkind' => 'text', 'type' => 'text'),
-    'function' 	=> array('sql' => 'contact_function', 'sqlkind' => 'text', 'type' => 'text'),
-    'company_id'=> array('sql' => 'contact_company_id', 'sqlkind' => 'text', 'type' => 'text'),
-    'company' 	=> array('sql' => 'contact_company', 'sqlkind' => 'text', 'type' => 'text'),
-    'market' 	=> array('sql' => 'contact_market', 'sqlkind' => 'text', 'type' => 'text'),
-    'suffix' 	=> array('sql' => 'contact_suffix', 'sqlkind' => 'text', 'type' => 'text'),
-    'aka' 	=> array('sql' => 'contact_aka', 'sqlkind' => 'text', 'type' => 'text'),
-    'sound' 	=> array('sql' => 'contact_sound', 'sqlkind' => 'text', 'type' => 'text'),
-    'manager' 	=> array('sql' => 'contact_manager', 'sqlkind' => 'text', 'type' => 'text'),
-    'assistant' => array('sql' => 'contact_assistant', 'sqlkind' => 'text', 'type' => 'text'),
-    'spouse' 	=> array('sql' => 'contact_spouse', 'sqlkind' => 'text', 'type' => 'text'),
-    'category' 	=> array('sql' => 'contact_category', 'sqlkind' => 'text', 'type' => 'text'),
-    'service' 	=> array('sql' => 'contact_service', 'sqlkind' => 'text', 'type' => 'text'),
-    'mailok' 	=> array('sql' => 'contact_mailok', 'sqlkind' => 'text', 'type' => 'text'),
-    'newsletter'=> array('sql' => 'contact_newsletter', 'sqlkind' => 'text', 'type' => 'text'),
-    'date' 	=> array('sql' => 'contact_date', 'sqlkind' => 'text', 'type' => 'text'),
-    'birthday' 	=> array('sql' => 'contact_birthday', 'sqlkind' => 'text', 'type' => 'text'),
-    'birthday_event' 	=> array('sql' => 'contact_birthday_event', 'sqlkind' => 'text', 'type' => 'text'),
-    'anniversary' 	=> array('sql' => 'contact_anniversary', 'sqlkind' => 'text', 'type' => 'text'),
-    'anniversary_event'	=> array('sql' => 'contact_anniversary_event', 'sqlkind' => 'text', 'type' => 'text'),
-    'phone' 	=> array('sql' => 'contact_phone', 'sqlkind' => 'text', 'type' => 'text'),
-    'email' 	=> array('sql' => 'contact_email', 'sqlkind' => 'text', 'type' => 'text'),
-    'address' 	=> array('sql' => 'contact_address', 'sqlkind' => 'text', 'type' => 'text'),
-    'im' 	=> array('sql' => 'contact_im', 'sqlkind' => 'text', 'type' => 'text'),
-    'website' 	=> array('sql' => 'contact_website', 'sqlkind' => 'text', 'type' => 'text'),
-    'archive' 	=> array('sql' => 'contact_archive', 'sqlkind' => 'text', 'type' => 'text'),
-    'datasource_id' 	=> array('sql' => 'contact_datasource_id', 'sqlkind' => 'text', 'type' => 'text'),
-    'comment' 	=> array('sql' => 'contact_comment', 'sqlkind' => 'text', 'type' => 'text'),
-    'comment2' 	=> array('sql' => 'contact_comment2', 'sqlkind' => 'text', 'type' => 'text'),
-    'comment3' 	=> array('sql' => 'contact_comment3', 'sqlkind' => 'text', 'type' => 'text'),
-    'origin' 	=> array('sql' => 'contact_origin', 'sqlkind' => 'text', 'type' => 'text'),
-    'addressbook' 	=> array('sql' => 'contact_addressbook', 'sqlkind' => 'text', 'type' => 'text')
-  ); 
-
   private  $id;
   private  $entity_id;
 
@@ -58,7 +19,7 @@ class OBM_Contact implements OBM_ISearchable {
   private  $function;
   private  $company_id;
   private  $company;
-  private  $market;//marketingmanager_id
+  private  $market_id;//marketingmanager_id
   private  $suffix;
   private  $aka;
   private  $sound;
@@ -177,48 +138,6 @@ class OBM_Contact implements OBM_ISearchable {
     return self::fetchAll($where);
   }
 
-  
-  public static function fieldsDescriptor() {
-
-    $fields['lastname']	= array('sql' => 'contact_lastname', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['firstname']= array('sql' => 'contact_firstname', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['mname']	= array('sql' => 'contact_mname', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['kind']	= array('sql' => 'contact_kind', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['title']	= array('sql' => 'contact_title', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['function']	= array('sql' => 'contact_function', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['company_id']	= array('sql' => 'contact_company_id', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['company']	= array('sql' => 'contact_company', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['market']	= array('sql' => 'contact_market', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['suffix']	= array('sql' => 'contact_suffix', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['aka']	= array('sql' => 'contact_aka', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['sound']	= array('sql' => 'contact_sound', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['manager']	= array('sql' => 'contact_manager', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['assistant']	= array('sql' => 'contact_assistant', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['spouse']	= array('sql' => 'contact_spouse', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['category']	= array('sql' => 'contact_category', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['service']	= array('sql' => 'contact_service', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['mailok']	= array('sql' => 'contact_mailok', 'sqlkind' => 'text', 'type' => 'text');//mailing_ok
-    $fields['newsletter']	= array('sql' => 'contact_newsletter', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['date']	= array('sql' => 'contact_date', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['birthday']	= array('sql' => 'contact_birthday', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['birthday_event']	= array('sql' => 'contact_birthday_event', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['anniversary']	= array('sql' => 'contact_anniversary', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['anniversary_event']= array('sql' => 'contact_anniversary_event', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['phone']	= array('sql' => 'contact_phone', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['email']	= array('sql' => 'contact_email', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['address']	= array('sql' => 'contact_address', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['im']	= array('sql' => 'contact_im', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['website']	= array('sql' => 'contact_website', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['archive']	= array('sql' => 'contact_archive', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['datasource_id']	= array('sql' => 'contact_datasource_id', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['comment']	= array('sql' => 'contact_comment', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['comment2']	= array('sql' => 'contact_comment2', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['comment3']	= array('sql' => 'contact_comment3', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['origin']	= array('sql' => 'contact_origin', 'sqlkind' => 'text', 'type' => 'text');
-    $fields['addressbook']	= array('sql' => 'contact_addressbook', 'sqlkind' => 'text', 'type' => 'text');
-    return $fields; 
-  }
-
   public static function fieldsMap() {
     $fields['*'] = array(
       'contact_lastname' => 'text',
@@ -332,7 +251,7 @@ class OBM_Contact implements OBM_ISearchable {
     $contact->lastname  = $data['lastname'];
     $contact->firstname = $data['firstname'];
     $fields = array('mname','kind','title','function','company_id','company',
-      'market','suffix','aka','sound','manager','assistant','spouse','category',
+      'market_id','suffix','aka','sound','manager','assistant','spouse','category',
       'service','mailok','newsletter','archive','comment','comment2','comment3',
       'origin'
     );
@@ -352,7 +271,7 @@ class OBM_Contact implements OBM_ISearchable {
     $comp_id = sql_parse_id($contact->company_id);
     $dsrc    = sql_parse_id($contact->datasource_id);
     $kind    = sql_parse_id($contact->kind);
-    $market  = sql_parse_id($contact->market);
+    $market_id  = sql_parse_id($contact->market_id);
     $func    = sql_parse_id($contact->function);
 
     $date = ($contact->date ? "'{$contact->date}'" : 'null');
@@ -399,7 +318,7 @@ class OBM_Contact implements OBM_ISearchable {
       $comp_id,
       '{$contact->company}',
       $kind,
-      $market,
+      $market_id,
       '{$contact->lastname}',
       '{$contact->firstname}',
       '{$contact->mname}',
@@ -462,7 +381,7 @@ class OBM_Contact implements OBM_ISearchable {
     $comp_id = sql_parse_id($contact->company_id);
     $dsrc    = sql_parse_id($contact->datasource_id);
     $kind    = sql_parse_id($contact->kind);
-    $market  = sql_parse_id($contact->market);
+    $market_id  = sql_parse_id($contact->market_id);
     $func    = sql_parse_id($contact->function);
 
     $date = ($contact->date ? "'{$contact->date}'" : 'null');
@@ -475,7 +394,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_company_id=$comp_id,
       contact_company='{$contact->company}',
       contact_kind_id=$kind,
-      contact_marketingmanager_id=$market,
+      contact_marketingmanager_id=$market_id,
       contact_lastname='{$contact->lastname}',
       contact_firstname='{$contact->firstname}',
       contact_middlename='{$contact->mname}',
@@ -627,7 +546,7 @@ class OBM_Contact implements OBM_ISearchable {
     }
 
     // x-obm-* (OBM specific fields)
-    $obmSpecificFields = array('mname','company_id','company','market','suffix',
+    $obmSpecificFields = array('mname','company_id','company','market_id','suffix',
       'aka','sound','manager','assistant','spouse','category','service',
       'mailok','newsletter');
     foreach ($obmSpecificFields as $field) {
@@ -705,7 +624,7 @@ class OBM_Contact implements OBM_ISearchable {
     }
 
     // x-obm-* (OBM specific fields)
-    $obmSpecificFields = array('mname','company_id','company','market','suffix',
+    $obmSpecificFields = array('mname','company_id','company','market_id','suffix',
       'aka','sound','manager','assistant','spouse','category','service',
       'mailok','newsletter');
     foreach ($obmSpecificFields as $field) {
@@ -769,9 +688,13 @@ class OBM_Contact implements OBM_ISearchable {
       contact_middlename,
       kind_minilabel as contact_kind,
       contact_title,
+      contact_function_id,
       contactfunction_label as contact_function,
       contact_company_id,
       contact_company,
+      company_name,
+      userobm_lastname as market_lastname,
+      userobm_firstname as market_firstname,
       contact_marketingmanager_id,
       contact_suffix,
       contact_aka,
@@ -799,6 +722,7 @@ class OBM_Contact implements OBM_ISearchable {
     FROM Contact
          INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
          INNER JOIN AddressBook ON AddressBook.id = contact_addressbook_id
+         LEFT JOIN UserObm ON userobm_id = contact_marketingmanager_id
          LEFT JOIN Phone as HomePhone ON HomePhone.phone_entity_id = contactentity_entity_id 
          LEFT JOIN Address ON address_entity_id = contactentity_entity_id 
          LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
@@ -819,6 +743,10 @@ class OBM_Contact implements OBM_ISearchable {
       contactfunction_label,
       contact_company_id,
       contact_company,
+      company_name,
+      contact_function_id,
+      userobm_lastname,
+      userobm_firstname,
       contact_marketingmanager_id,
       contact_suffix,
       contact_aka,
@@ -857,7 +785,7 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->function      = $db->f('contact_function');
       $contact->company_id    = $db->f('contact_company_id');
       $contact->company       = $db->f('contact_company');
-      $contact->market        = $db->f('contact_marketingmanager_id');
+      $contact->market_id     = $db->f('contact_marketingmanager_id');
       $contact->suffix        = $db->f('contact_suffix');
       $contact->aka           = $db->f('contact_aka');
       $contact->sound         = $db->f('contact_sound');
@@ -874,7 +802,7 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->comment2      = $db->f('contact_comment2');
       $contact->comment3      = $db->f('contact_comment3');
       $contact->origin        = $db->f('contact_origin');
-      $contact->addressbook_id= $db->f('contact_addressbook_id');
+      $contact->addressbook   = $db->f('contact_addressbook_id');
       if ($db->f('contact_date'))
         $contact->date        = new Of_Date($db->f('contact_date'), 'GMT');
       if ($db->f('contact_birthday')) {
