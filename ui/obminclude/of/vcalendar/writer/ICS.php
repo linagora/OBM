@@ -54,7 +54,6 @@ class Vcalendar_Writer_ICS {
     
     // FIXME ??? maybe a good substitute
     $this->writeProperty('dtstamp', $this->parseDate(new Of_Date()));
-    $this->writeProperty('transp', $this->parseName($vevent->transp));
     $this->buffer .= 'END:'.$this->parseName($vevent->name)."\r\n";
   }
 
