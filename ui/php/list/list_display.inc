@@ -844,7 +844,7 @@ function html_list_form($action, $list_q, $list) {
     </tr>
   </table>
   <div class=\"O FW\">
-  <textarea id=\"ta_query\" $style_query name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea>
+  <textarea id=\"ta_query\" $style_query name=\"ta_query\" cols=\"68\" rows=\"16\">$query</textarea>
   $dis_query
   </div>
   </fieldset>";
@@ -1181,9 +1181,6 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
     $display = "style=\"display:none\"";
   }
   
-
-
-  
   $block = "
   <table id=\"list_criterion\" class=\"spreadSheet\">
   <tbody>
@@ -1271,33 +1268,6 @@ function dis_list_add_criterion_userdata_form($entity) {
   }
 
   return $block_cat;
-
-
-
-  // User data categories handling
-  if (is_array($cgp_user['contact']['category'])) {
-    foreach($cgp_user['contact']['category'] as $cat_name => $one_cat) {
-      $cat_id = "${cat_name}_id";
-      $cat_code = "${cat_name}_code";
-      $cat_label = "l_$cat_name";
-      global $$cat_label;
-      $cats = of_category_user_get_ordered($cat_name);
-      $sel_cat = "<option value=\"\">$l_all</option>";
-      if (is_array($cats)) {
-	foreach($cats as $one_entry) {
-	  $entry_id = $one_entry['id'];
-	  $entry_code = $one_entry['code'];
-	  $entry_label = substr($one_entry['label'],0,30);
-	  $sel_cat .= "
-  <option value=\"$entry_id\">$entry_code $entry_label</option>";
-	}
-      }
-      $dis_cat .= "<p>
-    ${$cat_label}<br/><select multiple=\"multiple\" size=\"5\" name=\"sel_$cat_id\">$sel_cat</select>";
-    }
-  }
-
-
 }
 
 
@@ -1340,36 +1310,44 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   <tr>
     <th>$l_company</th>
     <td><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
-  </tr><tr>  
+  </tr>
+  <tr>  
     <th>$l_country</th>
     <td><select name=\"sel_company_country_iso3166\">$sel_cty</select></td>
-   </tr><tr>   
+  </tr>
+  <tr>   
     <th>$l_timeafter</th>
     <td><input type=\"text\" name=\"tf_company_timeafter\" value=\"$company_timeafter\" class=\"datePicker\"/></td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_postcode</th>
     <td><input type=\"text\" size=\"10\" name=\"tf_company_zipcode\" value=\"\" /></td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>$l_market</th>
     <td><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>
- </tr><tr>
+  </tr>
+  <tr>
     <th>$l_timebefore</th>
       <td><input type=\"text\" name=\"tf_company_timebefore\" value=\"$company_timebefore\" class=\"datePicker\"/></td>
   </tr>
   
-    <tr>
+  <tr>
     <th>$l_town</th>
     <td><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td>
-    </tr><tr>
+  </tr>
+  <tr>
     <th>$l_category</th>
     <td>$dis_cat</td>
-    </tr><tr>
+  </tr>
+  <tr>
     <th>$l_datasource</th>
     <td><select name=\"sel_company_datasource_id\">$sel_dsr</select></td>
   </tr>
   </table>
   </fieldset>
 ";
+
   return $block;
 }
 

@@ -31,29 +31,30 @@ $time_start = microtime_float();
 //-----------------------------------------------------------------------------
 // Parametres modifiables
 //-----------------------------------------------------------------------------
-$sep = ";";
+$sep = ';';
 //-----------------------------------------------------------------------------
 
-$path = "../php";
-$obminclude = "../obminclude";
-include("../obminclude/global.inc");
-include("global_test.inc");
-include("../obminclude/of/of_category.inc");
+$path = '../php';
+$obminclude = '../obminclude';
+include('../obminclude/global.inc');
+include('global_test.inc');
+include('../obminclude/of/of_category.inc');
 require("$path/list/list_query.inc");
 
 $params = parse_arg($argv);
-$date = date("Ymd-His");
+$obm['domain_id'] = $params['domain_id'];
+$date = date('Ymd-His');
 $file = "test-list-$date.txt";
 
 echo "\n**********************************************************************
 ***** Traitement Listes : OBM $obm_version : DB $obmdb_db $obmdb_dbtype
 **********************************************************************";
 
-if ($params["action"] == "dump") {
+if ($params['action'] == 'dump') {
 ///////////////////////////////////////////////////////////////////////////////
 
   // Open dump file in write mode
-  $handle = fopen("$file", "w");
+  $handle = fopen("$file", 'w');
   if (! $handle) {
     echo "ERREUR: impossible d'ouvrir le fichier $file. Fin...";
     exit;
@@ -64,30 +65,31 @@ if ($params["action"] == "dump") {
   $lists = get_list_list();
   process_list_list($lists);
 
-} elseif ($params["action"] == "test") {
+} elseif ($params['action'] == 'test') {
 ///////////////////////////////////////////////////////////////////////////////
 
-  $handle_f = fopen("$params[from_file]", "r");
+  $handle_f = fopen("$params[from_file]", 'r');
   if (! $handle_f) {
     echo "ERREUR: impossible d'ouvrir le fichier $params[from_file]. Fin...";
     exit;
   }
 
-  $handle_t = fopen("$params[to_file]", "r");
+  $handle_t = fopen("$params[to_file]", 'r');
   if (! $handle_t) {
     echo "ERREUR: impossible d'ouvrir le fichier $params[to_file]. Fin...";
     exit;
   }
 
   $list_num = 1;
+  $cpt_diff = 0;
   $end = $false;
   while ($end == false) {
     $lf = get_next_list_from_dump($handle_f);
     if ($lf == false) {
       $end = true;
     } else {
-      $lt = get_list_from_dump_id($handle_t, $lf["id"]);
-      compare_lists($lf, $lt);
+      $lt = get_list_from_dump_id($handle_t, $lf['id']);
+      compare_lists($lf, $lt, $list_num);
     }
     $list_num++;
     //$end = true;
@@ -109,53 +111,65 @@ exit;
 
 function microtime_float()
 {
-   list($usec, $sec) = explode(" ", microtime());
+   list($usec, $sec) = explode(' ', microtime());
    return ((float)$usec + (float)$sec);
 } 
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Recuperation de la prochaine list du fichier dump donne
-// Parameters:
-//   - $lf : from list
-//   - $tf : to list
-// Returns:
-// $l hash with list infos [name], [id], [nb_contact], [nb_company], []
-///////////////////////////////////////////////////////////////////////////////
-function compare_lists($lf, $lt) {
-  global $params;
+/**
+ * Recuperation de la prochaine list du fichier dump donne
+ * @param $lf : from list
+ * @param $tf : to list
+ * @param $nb : list number
+ * @return :
+ * $l hash with list infos [name], [id], [nb_contact], [nb_company], []
+ */
+function compare_lists($lf, $lt, $list_num) {
+  global $params, $cpt_diff;
 
-  $diff = "";
-  $nb_contact = str_pad($lf["nb_contact"],6," ", STR_PAD_LEFT);
-  $nb_company = str_pad($lf["nb_company"],6," ", STR_PAD_LEFT);
+  $diff = '';
+  $nb_contact = str_pad($lf['nb_contact'],6,' ', STR_PAD_LEFT);
+  $nb_company = str_pad($lf['nb_company'],6,' ', STR_PAD_LEFT);
   if ($lt == false) {
-    $diff .= " REMOVED !";
+    $diff .= ' REMOVED !';
   } else {
-    if ($lf["name"] != $lt["name"]) {
-      $diff .= " NAME";
+    if ($lf['name'] != $lt['name']) {
+      $diff .= ' NAME';
     }
-    if ($lf["nb_contact"] != $lt["nb_contact"]) {
-      $diff .= " #Cont($lt[nb_contact])";
+    if ($lf['nb_contact'] != $lt['nb_contact']) {
+      $dis_lf = str_pad($lf['nb_contact'], 4, ' ', STR_PAD_LEFT);
+      $dis_lt = str_pad($lt['nb_contact'], 4, ' ', STR_PAD_LEFT);
+      $diff .= " #Cont($dis_lf/$dis_lt)";
+    } else {
+      $diff .= str_pad('', 17, ' ', STR_PAD_LEFT);
     }
-    if ($lf["nb_company"] != $lt["nb_company"]) {
-      $diff .= " #Comp($lt[nb_company])";
+    if ($lf['nb_company'] != $lt['nb_company']) {
+      $dis_lf = str_pad($lf['nb_company'], 4, ' ', STR_PAD_LEFT);
+      $dis_lt = str_pad($lt['nb_company'], 4, ' ', STR_PAD_LEFT);
+      $diff .= " #Comp($dis_lf/$dis_lt)";
+    } else {
+      $diff .= str_pad('', 17, ' ', STR_PAD_LEFT);
     }
   }
-  if ($params["verbose"] == "all" || $params["verbose"] == "verbose" || $diff != "") {
-    $diff = str_pad($diff,24," ", STR_PAD_LEFT);
-    $log = "\n:List($lf[id]):$nb_contact:$nb_company: $diff : $lf[name]:";
+  if ($params['verbose'] == 'all' || $params['verbose'] == 'verbose' || trim($diff) != '') {
+    $cpt_diff++;
+    $dis_nb_diff = str_pad($cpt_diff, 4, ' ', STR_PAD_LEFT);
+    $diff = str_pad($diff,24,' ', STR_PAD_LEFT);
+    $dis_id = str_pad($lf['id'],4,' ', STR_PAD_LEFT);
+    $nb = str_pad($list_num,4,' ', STR_PAD_LEFT);
+    $log = "\n$dis_nb_diff:$nb:List($dis_id): $diff : $lf[name]:";
     echo $log;
   }
 
-  if (($params["verbose"] == "all" || $params["verbose"] == "detail") && $diff != "") {
-    $res = array_diff($lf["cids"], $lt["cids"]);
+  if (($params['verbose'] == 'all' || $params['verbose'] == 'detail') && $diff != '') {
+    $res = array_diff($lf['cids'], $lt['cids']);
     if (is_array($res) && count($res) > 0) {
       echo "\nContacts entries removed:";
       foreach ($res as $entry) {
 	echo "$entry-";
       }
     }
-    $res = array_diff($lt["cids"], $lf["cids"]);
+    $res = array_diff($lt['cids'], $lf['cids']);
     if (is_array($res) && count($res) > 0) {
       echo "\nNew Contacts entries:";
       foreach ($res as $entry) {
@@ -189,19 +203,19 @@ function get_next_list_from_dump($handle) {
     return false;
   }
 
-  $l["id"] = $matches[1];
-  $l["name"] = $matches[2];
-  $l["nb_row"] = $matches[3];
-  $l["nb_contact"] = $matches[4];
-  $l["nb_company"] = $matches[5];
-  $l["cids"] = array();
+  $l['id'] = $matches[1];
+  $l['name'] = $matches[2];
+  $l['nb_row'] = $matches[3];
+  $l['nb_contact'] = $matches[4];
+  $l['nb_company'] = $matches[5];
+  $l['cids'] = array();
 
   // get contact lines
   $line = fgets($handle);
   $matches = array();
   while (preg_match('/^C:(.*)$/', $line, $matches)) {
     $cid = $matches[1];
-    $l["cids"][] = $cid;
+    $l['cids'][] = $cid;
     $line = fgets($handle);
   }
 
@@ -249,24 +263,24 @@ function get_list_from_dump_id($handle, $list_id) {
     }
   }
 
-  $l["id"] = $matches[1];
-  $l["name"] = $matches[2];
-  $l["nb_row"] = $matches[3];
-  $l["nb_contact"] = $matches[4];
-  $l["nb_company"] = $matches[5];
-  $l["cids"] = array();
+  $l['id'] = $matches[1];
+  $l['name'] = $matches[2];
+  $l['nb_row'] = $matches[3];
+  $l['nb_contact'] = $matches[4];
+  $l['nb_company'] = $matches[5];
+  $l['cids'] = array();
 
   // get contact lines
   $line = fgets($handle);
   $matches = array();
   while (preg_match('/^C:(.*)$/', $line, $matches)) {
     $cid = $matches[1];
-    $l["cids"][] = $cid;
+    $l['cids'][] = $cid;
     $line = fgets($handle);
   }
 
   //  print_r($l);
-  //  echo "\n".$l["name"];
+  //  echo "\n".$l['name'];
   return $l;
 }
 
@@ -280,29 +294,29 @@ function get_list_list() {
 
   $l = array();
 
-  $query = "SELECT *
+  $query = 'SELECT *
     FROM List
-    ORDER BY list_id";
+    ORDER BY list_id';
 
   $l_q = new DB_OBM;
   $l_q->query($query);
 
   while ($l_q->next_record()) {
-    $id = $l_q->f("list_id");
-    $l[$id]["id"] = $id;
-    $l[$id]["list_id"] = $id;
-    $l[$id]["privacy"] = $l_q->f("list_privacy");
-    $l[$id]["name"] = $l_q->f("list_name");
-    $l[$id]["subject"] = $l_q->f("list_subject");
-    $l[$id]["email"] = $l_q->f("list_email");
-    $l[$id]["mode"] = $l_q->f("list_mode");
-    $l[$id]["mailing_ok"] = $l_q->f("list_mailing_ok");
-    $l[$id]["contact_archive"] = $l_q->f("list_contact_archive");
-    $l[$id]["info_pub"] = $l_q->f("list_info_publication");
-    $l[$id]["static_nb"] = $l_q->f("list_static_nb");
-    $l[$id]["query_nb"] = $l_q->f("list_query_nb");
-    $l[$id]["query"] = $l_q->f("list_query");
-    $l[$id]["structure"] = $l_q->f("list_structure");
+    $id = $l_q->f('list_id');
+    $l[$id]['id'] = $id;
+    $l[$id]['list_id'] = $id;
+    $l[$id]['privacy'] = $l_q->f('list_privacy');
+    $l[$id]['name'] = $l_q->f('list_name');
+    $l[$id]['subject'] = $l_q->f('list_subject');
+    $l[$id]['email'] = $l_q->f('list_email');
+    $l[$id]['mode'] = $l_q->f('list_mode');
+    $l[$id]['mailing_ok'] = $l_q->f('list_mailing_ok');
+    $l[$id]['contact_archive'] = $l_q->f('list_contact_archive');
+    $l[$id]['info_pub'] = $l_q->f('list_info_publication');
+    $l[$id]['static_nb'] = $l_q->f('list_static_nb');
+    $l[$id]['query_nb'] = $l_q->f('list_query_nb');
+    $l[$id]['query'] = $l_q->f('list_query');
+    $l[$id]['structure'] = $l_q->f('list_structure');
   }
 
   return $l;
@@ -325,32 +339,34 @@ function process_list_list() {
   echo $txt;
 
   $obm_q = new DB_OBM;
+  $nb_lists = count($lists);
+  $cpt = 0;
 
   foreach ($lists as $id => $l) {
-    
-    $query = "";
+    $cpt++;
+    $query = '';
 
     // get the list query
-    if ($l["mode"] == $clist_mode_normal) {
-      if ($l["structure"] != "") {
-	$criteria = unserialize($l["structure"]);
-	if ($criteria != "") {
+    if ($l['mode'] == $clist_mode_normal) {
+      if ($l['structure'] != '') {
+	$criteria = unserialize($l['structure']);
+	if ($criteria != '') {
 	  $as_criteria = $criteria;
 	  if (is_array($as_criteria)) {
 	    array_walk($as_criteria, 'list_add_slashes_array');
 	  }
-	  $l["criteria"] = $as_criteria;
+	  $l['criteria'] = $as_criteria;
 	  $dynlist = make_list_query_from_criteria($l);
-	  $query = $dynlist["query"];
+	  $query = $dynlist['query'];
 	}
       }
       // expert mode
     } else {
-      $query = $l["query"];
+      $query = $l['query'];
     }
 
     $obm_q->query($query);
-    process_one_list($l, $obm_q);
+    process_one_list($l, $obm_q, $nb_lists, $cpt);
   }
 
   echo "\n***** Fin traitement des listes";
@@ -360,20 +376,21 @@ function process_list_list() {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Process one List
-// Parameters:
-//   - $l   : array with list infos
-//   - $l_q : DBO with list own query result
-///////////////////////////////////////////////////////////////////////////////
-function process_one_list($l, $l_q) {
+/**
+ * Process one List
+ * @param $l array with list infos
+ * @param $l_q DBO with list own query result
+ * @param $nb_lists mixed total list number
+ * @param $cpt current list number
+ **/
+function process_one_list($l, $l_q, $nb_lists, $cpt) {
   global $handle;
 
-  $to_write = "";
-  $id = $l["id"];
-  $name = $l["name"];
+  $to_write = '';
+  $id = $l['id'];
+  $name = $l['name'];
 
-  $txt = "\n***** List : $id : $name";
+  $txt = "\n***** List : $id ($cpt/$nb_lists) : $name";
   $log .= $txt;
   echo $txt;
 
@@ -381,8 +398,8 @@ function process_one_list($l, $l_q) {
   $company_ids = array();
   $row_ids = array();
   while ($l_q->next_record()) {
-    $cid = $l_q->f("contact_id");
-    $compid = $l_q->f("company_id");
+    $cid = $l_q->f('contact_id');
+    $compid = $l_q->f('company_id');
     if (! in_array($cid, $contact_ids)) {
       $contact_ids[] = $cid;
     }
@@ -427,7 +444,7 @@ function parse_arg($argv) {
     case '--help':
       echo "Usage: php test-list.php -a dump\n";
       echo "Usage: php test-list.php -v verbose -a test -f file1 -t file2\n";
-      echo "-a [dump | test]\n";
+      echo "-a [dump | test] (default is 'dump')\n";
       echo "-v [normal | verbose | detail | all]\n\n";
       return true;
       break;
@@ -437,29 +454,40 @@ function parse_arg($argv) {
       $params["action"] = $val2;
       if ($debug > 0) { echo "-f -> \$action=$val2\n"; }
       break;
+    case '-d':
+    case '--domain_id':
+      list($nb3, $val3) = each ($argv);
+      $params['domain_id'] = $val3;
+      if ($debug > 0) { echo "-f -> \$domain_id=$val3\n"; }
+      break;
     case '-f':
     case '--from-file':
       list($nb3, $val3) = each ($argv);
-      $params["from_file"] = $val3;
+      $params['from_file'] = $val3;
       if ($debug > 0) { echo "-f -> \$from_file=$val3\n"; }
       break;
     case '-t':
     case '--to-file':
       list($nb4, $val4) = each ($argv);
-      $params["to_file"] = $val4;
+      $params['to_file'] = $val4;
       if ($debug > 0) { echo "-t -> \$to_file=$val4\n"; }
       break;
     case '-v':
     case '--verbose':
       list($nb5, $val5) = each ($argv);
-      $params["verbose"] = $val5;
+      $params['verbose'] = $val5;
       if ($debug > 0) { echo "-v -> \$verbose=$val5\n"; }
       break;
     }
   }
 
-  if ($params["action"] == "") {
-    $params["action"] = "dump";
+  // Default values
+  if ($params['action'] == '') {
+    $params['action'] = 'dump';
+  }
+
+  if ($params['domain_id'] == '') {
+    $params['domain_id'] = 1;
   }
 
   return $params;

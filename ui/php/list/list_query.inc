@@ -553,14 +553,14 @@ function run_query_list_contacts_list($list, $entity='') {
     FROM ContactList
       LEFT JOIN Contact ON contactlist_contact_id=contact_id
       INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-      LEFT JOIN Address as ad1 ON contactentity_entity_id=ad1.address_entity_id
+      LEFT JOIN Address as ad1 ON contactentity_entity_id=ad1.address_entity_id AND ad1.address_label = 'WORK;X-OBM-Ref1'
       LEFT JOIN Country as ctry1 ON ad1.address_country=ctry1.country_iso3166
            AND ctry1.country_lang='$lang'
       LEFT JOIN Phone AS ph1 ON contactentity_entity_id=ph1.phone_entity_id
       LEFT JOIN Email ON contactentity_entity_id=email_entity_id
       LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
       LEFT JOIN CompanyEntity ON companyentity_company_id = company_id
-      LEFT JOIN Address as ad2 ON companyentity_entity_id=ad2.address_entity_id
+      LEFT JOIN Address as ad2 ON companyentity_entity_id=ad2.address_entity_id AND ad2.address_label = 'HQ;X-OBM-Ref1'
       LEFT JOIN Country as ctry2 ON ad2.address_country=ctry2.country_iso3166
            AND ctry2.country_lang='$lang'
       LEFT JOIN ContactFunction ON Contact.contact_function_id = contactfunction_id
@@ -1411,51 +1411,68 @@ function make_list_query_from_criteria($list) {
   $comp_time_inf = "(company_timecreate <= '%v' OR company_timeupdate <= '%v')";
   $cont_time_sup = "(contact_timecreate >= '%v' OR contact_timeupdate >= '%v')";
   $cont_time_inf = "(contact_timecreate <= '%v' OR contact_timeupdate <= '%v')";
-  // Contact Country specific case (if not set, test with company one)
-  $contact_country = "(%f = '%v' OR (%f = '' AND company_country_iso3166 = '%v'))";
+  // Contact Address specific case (if not set, test with company one)
+  // sad1 for Search Address 1
+  $contact_zipcode = "(sad1%j.address_zipcode $like '%v%' OR (sad1%j.address_zipcode = '' AND sad2%j.address_zipcode $like '%v%'))";
+  $company_zipcode = "(sad3%j.address_zipcode $like '%v%')";
+  $contact_town = "(sad1%j.address_town $like '%v%' OR (sad1%j.address_town = '' AND sad2%j.address_town $like '%v%'))";
+  $company_town = "(sad3%j.address_town $like '%v%')";
+  $contact_country = "(sad1%j.address_country = '%v' OR (sad1%j.address_country = '' AND sad2%j.address_country = '%v'))";
+  $company_country = "(sad3%j.address_country = '%v')";
   $sub_time_aft = "(s%j.subscription_timecreate >= '%v' OR s%j.subscription_timeupdate >= '%v')";
   $sub_time_bef = "(s%j.subscription_timecreate <= '%v' OR s%j.subscription_timeupdate <= '%v')";
 
   $operateurs = array(
     'company_name' => $common_like,
-    'company_country_iso3166' => $common_equal,
-    'company_timeafter'  => $comp_time_sup,
-    'company_timebefore' => $comp_time_inf,
-    'company_zipcode'  => $common_like,
+    'company_country_iso3166' => $company_country,
+    'company_timeafter' => $comp_time_sup,
+    'company_timebefore'=> $comp_time_inf,
+    'company_zipcode' => $company_zipcode,
     'company_marketingmanager_id' => $common_equal,
-    'company_town'  => $common_like,
+    'company_town' => $company_town,
     'company_datasource_id' => $common_equal,
-    'contact_firstname'  => $common_like,
+    'contact_firstname' => $common_like,
     'contact_country_iso3166' => $contact_country,
-    'contact_timeafter'  => $cont_time_sup,
-    'contact_timebefore'  => $cont_time_inf,
-    'contact_lastname'  => $common_like,
+    'contact_timeafter' => $cont_time_sup,
+    'contact_timebefore' => $cont_time_inf,
+    'contact_lastname' => $common_like,
     'contact_marketingmanager_id' => $common_equal,
     'contact_datasource_id' => $common_equal,
-    'contact_town'  => $common_like,
-    'contact_zipcode'  => $common_like,
+    'contact_town' => $contact_town,
+    'contact_zipcode' => $contact_zipcode,
     'contact_function_id' => $common_equal,
-    'subscription_publication_id'  => $subscription_equal,
-    'publication_lang'  => $pub_lang_like,
-    'publication_year'  => "p%j.".$common_like,
-    'subscription_renewal'  => "s%j.".$common_equal,
-    'subscription_reception_id'  => "s%j.".$common_equal,
-    'subscription_timeafter'  => $sub_time_aft,
-    'subscription_timebefore' => $sub_time_bef,
-    'kind_lang'  => $common_equal
+    'subscription_publication_id' => $subscription_equal,
+    'publication_lang' => $pub_lang_like,
+    'publication_year' => "p%j.".$common_equal,
+    'subscription_renewal' => "s%j.".$common_equal,
+    'subscription_reception_id' => "s%j.".$common_equal,
+    'subscription_timeafter' => $sub_time_aft,
+    'subscription_timebefore'=> $sub_time_bef,
+    'kind_lang' => $common_equal
   );
 
   // hash field criteria -> join associated needed
   $add_join = array (
     'subscription_publication_id' => "
        LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ");
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id");
+  $add_join['contact_country_iso3166'] = "
+       LEFT JOIN Address AS sad1%j ON contactentity_entity_id=sad1%j.address_entity_id
+       LEFT JOIN Address AS sad2%j ON companyentity_entity_id=sad2%j.address_entity_id";
+  $add_join['company_country_iso3166'] = "
+       LEFT JOIN Address AS sad3%j ON companyentity_entity_id=sad3%j.address_entity_id";
+
   $field_join_equiv['publication_lang'] = 'subscription_publication_id';
   $field_join_equiv['publication_year'] = 'subscription_publication_id';
   $field_join_equiv['subscription_renewal'] = 'subscription_publication_id';
   $field_join_equiv['subscription_reception_id'] = 'subscription_publication_id';
   $field_join_equiv['subscription_timeafter'] = 'subscription_publication_id';
   $field_join_equiv['subscription_timebefore'] = 'subscription_publication_id';
+
+  $field_join_equiv['contact_zipcode'] = 'contact_country_iso3166';
+  $field_join_equiv['company_zipcode'] = 'company_country_iso3166';
+  $field_join_equiv['contact_town'] = 'contact_country_iso3166';
+  $field_join_equiv['company_town'] = 'company_country_iso3166';
 
   // User data categories handling
   $cat_nb = 0;
@@ -1497,40 +1514,42 @@ function make_list_query_from_criteria($list) {
         contactfunction_label,
         contact_title,
         contact_service,
-        contact_address1,
-        contact_address2,
-        contact_address3,
-        contact_zipcode,
-        contact_town,
-        contact_expresspostal,
-        contact_country_iso3166,
+        ad1.address_street AS contact_street,
+        ad1.address_zipcode AS contact_zipcode,
+        ad1.address_town AS contact_town,
+        ad1.address_expresspostal AS contact_expresspostal,
+        ad1.address_state AS contact_state,
         ctry1.country_name as contact_country,
-        contact_phone,
-        contact_homephone,
-        contact_mobilephone,
-        contact_fax,
-        contact_email,
+        WorkPhone.phone_number as \"WorkPhone.phone_number\",
+        MobilePhone.phone_number as \"MobilePhone.phone_number\",
+        FaxPhone.phone_number as \"FaxPhone.phone_number\",
+        HomePhone.phone_number as \"HomePhone.phone_number\",
+        email_address,
         contact_archive,
         contact_company,
         company_id,
         company_name,
-        company_address1,
-        company_address2,
-        company_address3,
-        company_zipcode,
-        company_town,
-        company_expresspostal,
-        company_phone,
-        company_fax,
+        ad2.address_street AS company_street,
+        ad2.address_zipcode AS company_zipcode,
+        ad2.address_town AS company_town,
+        ad2.address_expresspostal AS company_expresspostal,
+        ad2.address_state AS company_state,
         ctry2.country_name as company_country";
 
   $from = " Contact LEFT JOIN Company ON contact_company_id=company_id
-                    INNER JOIN ContactEntity ON contact_id = contactentity_contact_id
-                    INNER JOIN CompanyEntity ON company_id = companyentity_company_id
-                    LEFT JOIN Country as ctry1 ON Contact.contact_country_iso3166=ctry1.country_iso3166 AND ctry1.country_lang='$lang'
-                    LEFT JOIN Country as ctry2 ON Company.company_country_iso3166=ctry2.country_iso3166 AND ctry2.country_lang='$lang'
-                    LEFT JOIN Kind ON contact_kind_id = kind_id
-                    LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id";
+    INNER JOIN ContactEntity ON contact_id = contactentity_contact_id
+    LEFT JOIN Address as ad1 ON contactentity_entity_id=ad1.address_entity_id AND ad1.address_label = 'WORK;X-OBM-Ref1'
+    LEFT JOIN Country as ctry1 ON ad1.address_country=ctry1.country_iso3166 AND ctry1.country_lang='$lang'
+    LEFT JOIN Phone as WorkPhone ON WorkPhone.phone_entity_id = contactentity_entity_id AND WorkPhone.phone_label = 'WORK;VOICE;X-OBM-Ref1'
+    LEFT JOIN Phone as MobilePhone ON MobilePhone.phone_entity_id = contactentity_entity_id  AND MobilePhone.phone_label = 'CELL;VOICE;X-OBM-Ref1'
+    LEFT JOIN Phone as FaxPhone ON FaxPhone.phone_entity_id = contactentity_entity_id  AND FaxPhone.phone_label = 'WORK;FAX;X-OBM-Ref1'
+    LEFT JOIN Phone as HomePhone ON HomePhone.phone_entity_id = contactentity_entity_id  AND HomePhone.phone_label = 'HOME;VOICE;X-OBM-Ref1'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
+    INNER JOIN CompanyEntity ON company_id = companyentity_company_id
+    LEFT JOIN Address as ad2 ON companyentity_entity_id=ad2.address_entity_id AND ad2.address_label = 'HQ;X-OBM-Ref1'
+    LEFT JOIN Country as ctry2 ON ad2.address_country=ctry2.country_iso3166 AND ctry2.country_lang='$lang'
+    LEFT JOIN Kind ON contact_kind_id = kind_id
+    LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id";
 
 
   $max_line = 0;
@@ -1957,7 +1976,7 @@ function ext_list_get_contact_ids($id) {
     $query_c = "SELECT
         distinct contactlist_contact_id as contact_id
       FROM ContactList
-      WHERE contactlist_list_id $id ";
+      WHERE contactlist_list_id $id";
   }
 
   display_debug_msg($query_c, $cdg_sql, 'ext_list_get_contact_ids()');
