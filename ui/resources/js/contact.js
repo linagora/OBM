@@ -6,8 +6,11 @@ Obm.Contact.AddressBook = new Class ({
   addressbook: null,
 
   contact: null,
+
+  default: null,
   
-  initialize: function() {
+  initialize: function(defaultAddressbook) {
+    this.default = defaultAddressbook;
     $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 80);
     new Obm.Observer(new Window(window), {property:'contentHeight', onStop:function() {
       $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 80);
@@ -18,6 +21,11 @@ Obm.Contact.AddressBook = new Class ({
       secure : false,
       evalScripts : true,
       update: $('addressBookContainer'),
+      onComplete: function(response) {
+        this.addressbook = $(this.addressbook.get('id'));
+        if(!this.addressbook) this.addressbook = $(this.default);
+        this.addressbook.addClass('current');
+      }.bind(this)
     });
 
     this.contactRequest = new Request.HTML({

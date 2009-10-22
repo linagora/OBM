@@ -62,7 +62,7 @@
 </table>
 <script type='text/javascript'>
   obm.initialize.chain(function () {
-    obm.contact.addressbook = new Obm.Contact.AddressBook();
+    obm.contact.addressbook = new Obm.Contact.AddressBook('addressbook-<?php echo $addressbooks->getMyContacts()->id ?>');
     <?php if(isset($contact)) { ?>
     //obm.contact.addressbook.hideContact();
     <?php } else { ?>
