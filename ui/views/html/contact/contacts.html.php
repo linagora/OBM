@@ -20,7 +20,7 @@
           break;
         case 'workvoice':
           $phones = $_contact->getCoords('phone','WORK;VOICE');
-          if($phones[0]) echo $phones[0];
+          if($phones[0]) echo $phones[0]['number'];
           break;
         case 'cellvoice':
           $phones = $_contact->getCoords('phone','CELL;VOICE');

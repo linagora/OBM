@@ -6,9 +6,9 @@
       <?php /*FIXME*/?>
       <form onsubmit="obm.contact.addressbook.storeAddressBook(this);return false;">
         <?php if($_addressbook->synced) { ?>
-        <img alt='<?php echo __('Synchronized') ?>' title='<?php echo __('Synchronized') ?>' src="<?php echo self::__icon('sync') ?>"/>
+        <a href="" onclick="obm.contact.addressbook.setSubscription(<?php echo $_id ?>);return false;" ><img alt='<?php echo __('Synchronized') ?>' title='<?php echo __('Synchronized') ?>' src="<?php echo self::__icon('sync') ?>"/></a>
         <?php } else { ?>
-        <img alt='<?php echo __('Not synchronized') ?>' title='<?php echo __('Not synchronized') ?>' src="<?php echo self::__icon('unsync') ?>"/>
+        <a href="" onclick="obm.contact.addressbook.setSubscription(<?php echo $_id ?>);return false;" ><img alt='<?php echo __('Not synchronized') ?>' title='<?php echo __('Not synchronized') ?>' src="<?php echo self::__icon('unsync') ?>"/></a>
         <?php } ?>
         <?php if ($_addressbook->write == 1) { ?>
         <input onblur="$(this).hide();$(this).getNext().show();$(this).set('value', '<?php echo self::toJs($_addressbook->name); ?>')" type="text" style='display: none' name='name' value="<?php echo $_addressbook->name ?>" />

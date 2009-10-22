@@ -8,11 +8,11 @@ Obm.Contact.AddressBook = new Class ({
   contact: null,
   
   initialize: function() {
-    $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 100);
+    $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 80);
     new Obm.Observer(new Window(window), {property:'contentHeight', onStop:function() {
-      $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 100);
+      $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 80);
     }});
-
+    
     this.addressBookRequest = new Request.HTML({
       url: obm.vars.consts.obmUrl + '/contact/contact_index.php',
       secure : false,
@@ -49,6 +49,7 @@ Obm.Contact.AddressBook = new Class ({
       this.dataRequest.get(options);
     }.bind(this);
     
+    this.addressbook = $('addressBookContainer').getElement('.current');
   },
 
   selectContact: function(elem) {
@@ -189,6 +190,7 @@ Obm.Contact.AddressBook = new Class ({
       showErrorMessage(obm.vars.labels.insertError);
     } else {
       this.addressBookRequest.post(form);
+      $(form).name.set('value', '');
     }
   },
 
@@ -252,7 +254,7 @@ Obm.Contact.AddressWidget = new Class ({
     zipcode: { kind: 'text', value: '' , newCell : true, label : obm.vars.labels.addressZipcode},
     town: { kind: 'text', value: '', label : obm.vars.labels.addressTown },
     expresspostal: { kind: 'text', value: '', label : obm.vars.labels.addressExpressPostal },
-    country: { kind: 'select', value: '', token: obm.vars.labels.countries, label : obm.vars.labels.addressCountry }
+    country_iso3166: { kind: 'select', value: '', token: obm.vars.labels.countries, label : obm.vars.labels.addressCountry }
   },
 
   options: {container: 'addressHolder'},

@@ -89,17 +89,14 @@
   cursor: pointer;
 }
 
-#addressBookContainer input{
-  width: 130px;
-}
-
-.addressbookForm {
+#addressbookForm {
   position:absolute;
-  margin-left: 30px;
+  width: 350px;
 }
 
-.addressbookForm input {
-  width: 130px;
+#addressbookForm fieldset {
+  border : none;
+  text-align: center;
 }
 
 #addressBookContainer tbody tr{
@@ -123,6 +120,25 @@
 
 #addressBookContainer ul {
   display: inline;
+}
+
+#addAddressBook {
+  background-image: url('../images/addAddressbook.gif');
+  padding-right: 18px;
+  background-repeat: no-repeat;
+  background-position: right 70%;    
+  border: 1px solid black;
+  margin-left: 1em;
+}
+
+
+#addContact {
+  background-image: url('../images/addContact.gif');
+  padding-right: 18px;
+  background-repeat: no-repeat;
+  background-position: right 70%;    
+  border: 1px solid black;
+  margin-left: 2em;
 }
 /* Data rows styling */
 
@@ -220,6 +236,7 @@
 }
 
 #informationGrid .toolbar{
+  vertical-align: middle;
   padding: 0;
   margin: 0;
 }
@@ -362,9 +379,6 @@ table.contactPanelHeader th, .contactPanelContainer table td {
   overflow-x : hidden;
 }
 
-.cardPanelContainer table td, .cardPanelContainer table th {
-  overflow-x : show;
-}
 /*
 .grid-contact_displayname {
   width: 20em;

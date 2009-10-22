@@ -5,17 +5,26 @@
       <table class='contactPanelHeader'>
         <thead>
           <tr><th><?php echo __('Addressbook')?></th></tr>
-          <tr><td class='toolbar'></td></tr>
+          <tr><td class='toolbar'>
+            <input type='button' value='' id='addAddressBook' title='<?php echo __('Add addressbook')?>' onclick="obm.popup.show('addressbookForm');"/>
+            <input type='button' value='' id='addContact' title='<?php echo __('Add contact')?>' onclick='obm.contact.addressbook.addContact();'/>
+          </td></tr>
         </thead>           
       </table>
       <div  id='addressBookContainer' class='contactPanelContainer'>
         <?php include($this->__template('addressbooks')); ?>
       </div>
-      <form class='addressbookForm' onsubmit="obm.contact.addressbook.storeAddressBook(this); $(this).hide();return false;" style='display:none'>
-        <input type='text' name='name' value='' />
-        <input type='hidden' name='action' value='storeAddressBook' />
+      <form id='addressbookForm' class='obmPopup' onsubmit="obm.popup.hide('addressbookForm');obm.contact.addressbook.storeAddressBook(this); return false;" style='display:none'>
+        <h1><? echo __('What would you like to name this group?') ?></h1>
+        <fieldset>
+          <input type='text' name='name' value='' />
+        </fieldset>
+        <fieldset class='buttons'>
+          <input type='hidden' name='action' value='storeAddressBook' />
+          <input type='submit' value='<?php echo __('Validate') ?>' />
+          <input type='button' value='<?php echo __('Close') ?>' onclick="obm.popup.hide('addressbookForm');this.form.name.set('value','');"/>
+        </fieldset>
       </form>
-      <input type='button' value='+' id='addAddressBook' title='<?php __('Add addressbook')?>' onclick="$(this).getPrevious().toggle().name.set('value','');"/>
     </td>
     <td id='dataGrid'>
       <table class='contactPanelHeader'>
@@ -45,7 +54,6 @@
       <div id='dataContainer' class='contactPanelContainer'>
         <?php include($this->__template('contacts')); ?>
       </div>
-      <input type='button' value='+' id='addContact' title='<?php __('Add contact')?>' onclick='obm.contact.addressbook.addContact();'/>
     </td>
     <td id='informationGrid'>
         <?php if(isset($contact)) include($this->__template('card')); ?>

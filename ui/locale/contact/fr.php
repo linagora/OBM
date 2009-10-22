@@ -25,7 +25,7 @@ return array(
   'Contact card' => 'Fiche contact',
   'Update contact' => 'Mettre à jour le contact',
   'Delete contact' => 'Supprimer le contact',
-  'Other actions' => 'Autres actions',
+  'More actions' => 'Autres actions',
   'Copy' => 'Copier',
   'Export as Vcard' => 'Exporter en Vcard',
   'Contact photo' => 'Photographie',

@@ -10,14 +10,14 @@
         <ul class="dropDownMenu" id="contactToolbar">
           <?php if($addressbooks[$contact->addressbook]->write) { ?>
           <li>
-            <a onclick="obm.contact.addressbook.updateContact(<?php echo $contact->id ?>); return false;" href=""><img title="<?php echo __('Update contact') ?>" alt="<?php echo __('Update contact') ?>" src="<?php echo self::__icon('edit') ?>"/></a>
+            <input onclick="obm.contact.addressbook.updateContact(<?php echo $contact->id ?>);" type='button' value='<?php echo __('Update') ?>' title="<?php echo __('Update contact') ?>" class='updateButton' />
           </li>
           <li>
-            <a onclick='obm.contact.addressbook.deleteContact(<?php echo $contact->id ?>); return false;' href=""><img title="<?php echo __('Delete contact') ?>" alt="<?php echo __('Delete contact') ?>" src="<?php echo self::__icon('delete') ?>"/></a>
+            <input onclick='obm.contact.addressbook.deleteContact(<?php echo $contact->id ?>);' type='button' value='<?php echo __('Delete') ?>' title="<?php echo __('Delete contact') ?>" class='deleteButton' />
           </li>
           <?php } ?> 
           <li>
-            <img alt="<?php echo __('Add fields') ?>" title="<?php echo __('Add fields') ?>" src="<?php echo self::__icon('add') ?>"/>
+            <input type='button' value='<?php echo __('Add fields') ?>' title="<?php echo __('Add Fields') ?>" class='dropDownButton' />
             <ul>
               <li><?php echo __('Address') ?>
                 <ul>

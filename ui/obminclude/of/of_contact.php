@@ -235,7 +235,7 @@ class OBM_Contact implements OBM_ISearchable {
   }
 
   public static function search($pattern, $limit=100, $offset=0) {
-    return OBM_Contact::fetchAll(OBM_Search::buildSearchQuery('OBM_Contact', $pattern));
+    return OBM_Contact::fetchAll(OBM_Search::buildSearchQuery('OBM_Contact', $pattern), $limit, $offset);
   }
   
   public static function fetchAll($where, $limit=false, $offset=0) {
@@ -772,7 +772,6 @@ class OBM_Contact implements OBM_ISearchable {
          LEFT JOIN Event as an ON contact_anniversary_id = an.event_id
          LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
     WHERE {$where}
-      {$sql_limit}
     GROUP BY contact_id,
       contact_lastname,
       contact_firstname,
@@ -810,14 +809,16 @@ class OBM_Contact implements OBM_ISearchable {
       contact_comment2,
       contact_comment3,
       contact_origin
-    ORDER BY contact_lastname, contact_firstname";
+    ORDER BY contact_lastname, contact_firstname
+    {$sql_limit}";
+
     $db->xquery($query);
     while ($db->next_record()) {
       $contact = new OBM_Contact;
       $contact->id            = $db->f('contact_id');
       $contact->lastname      = $db->f('contact_lastname');
       $contact->firstname     = $db->f('contact_firstname');
-      $contact->displayname = $db->f('contact_lastname').' '.$db->f('contact_firstname');
+      $contact->displayname   = $db->f('contact_lastname').' '.$db->f('contact_firstname');
       $contact->mname         = $db->f('contact_middlename');
       $contact->kind          = $db->f('contact_kind');
       $contact->title         = $db->f('contact_title');
@@ -948,9 +949,12 @@ class OBM_Contact implements OBM_ISearchable {
     if(is_array($contact->address)) {
       $cpt = array();
       foreach($contact->address as $address) {
-        if(trim($address['street']) != '' || (trim($address['country']) != '' && trim($address['country']) != 'none') || trim($address['zipcode']) != ''
-           || trim($address['expresspostal']) != '') {
-          if(trim($address['country']) == 'none') $address['country'] = '';
+        if(trim($address['country_iso3166']) == 'none') $address['country_iso3166'] = '';
+        if(trim($address['country_iso3166']) == '' &&  trim($address['country']) != '') {
+          $address['country_iso3166'] = self::getCountryIso3166($address['country']);
+        }
+        if(trim($address['street']) != '' || trim($address['country_iso3166']) != '' 
+          || trim($address['zipcode']) != '' || trim($address['expresspostal']) != '') {
           if(is_array($address['label'])) {
             array_pop($address['label']);
             $address['label'] = implode(';',$address['label']); 
@@ -1204,5 +1208,13 @@ class OBM_Contact implements OBM_ISearchable {
     } else {
       return implode(';',$label);
     }
+  }
+
+  public static function getCountryIso3166($name) {
+    $obm_q = new DB_OBM;
+    $query = "SELECT country_iso3166 FROM Country WHERE country_name #LIKE '".$name."' LIMIT 1";
+    $obm_q->xquery($query);
+    $obm_q->next_record();
+    return $obm_q->f('country_iso3166');
   }
 }

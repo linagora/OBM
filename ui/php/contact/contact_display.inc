@@ -821,7 +821,6 @@ function dis_contact_form2($params) {
 
 
 /**
->>>>>>> .r5262
  * Display: XHTML Contact search Form
  *
  * @param $contact[] : default form values

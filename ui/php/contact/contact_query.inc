@@ -702,7 +702,11 @@ function run_query_contact_coords_update($id, $contact) {
   if(is_array($addresses)) {
     $cpt = array();
     foreach($addresses as $address) {
-      if(trim($address['street']) != '' || (trim($address['country']) != '' && trim($address['country']) != 'none') || trim($address['zipcode']) != ''
+      if(trim($address['country_iso3166']) == 'none') $address['country_iso3166'] = '';
+      if(trim($address['country_iso3166']) == '' &&  trim($address['country']) != '') {
+        $address['country_iso3166'] = self::getCountryIso3166($address['country']);
+      }      
+      if(trim($address['street']) != '' || trim($address['country_iso3166']) != ''  || trim($address['zipcode']) != ''
          || trim($address['expresspostal']) != '') {
         if(trim($address['country']) == 'none') $address['country'] = '';
         $address['label'] = str_replace('_', ';', $address['label']);
@@ -721,7 +725,7 @@ function run_query_contact_coords_update($id, $contact) {
           '$address[zipcode]',
           '$address[town]',
           '$address[expresspostal]',
-          '$address[country]',
+          '$address[country_iso3166]',
           '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
         )";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(address)');
