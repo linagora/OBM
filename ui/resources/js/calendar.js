@@ -114,7 +114,7 @@ Obm.CalendarManager = new Class({
         }
         if (evt.event.right) {
           var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
-          size = Math.ceil((startWeek + (86400000 * 7) - begin)/86400000);
+          size = Math.ceil((startWeek + (86400000 * 7) - evt.event.index*1000)/86400000);
           if (evt.event.left) size = 7; // very, very crappy fix
         }
       }
@@ -409,12 +409,10 @@ Obm.CalendarManager = new Class({
 
           var end = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
           var begin = evt.event.date.getTime(); 
-          var size = evt.size;
           var current = new Obm.DateTime(evt.event.time*1000);
 
           // Extensions
           if (obm.vars.consts.calendarView == 'month') {
-            size = evt.size;
             var weeks = obm.calendarManager.getEventWeeks(evt);
             var start = weeks[0];
 
@@ -436,21 +434,20 @@ Obm.CalendarManager = new Class({
               begin = obm.calendarManager.startTime*1000; 
               current = new Obm.DateTime(begin);
               columnIndex = current.format('Y-m-d');
-              size = Math.ceil((end.getTime() - begin)/86400000);
+              evt.size = Math.ceil((end.getTime() - begin)/86400000);
               evt.leftExtension.setStyle('display', '');
             }
-
             if ((evt.event.date+evt.event.duration*1000) > obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays)) {
-              size = Math.ceil((obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays) - begin)/86400000);
+              evt.size = Math.ceil((obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays) - begin)/86400000);
               evt.rightExtension.setStyle('display', '');
             }
 
           }
 
-          var coords = {'position': position, 'size': size,  'column': columnIndex, 'occurrence': evt};
+          var coords = {'position': position, 'size': evt.size,  'column': columnIndex, 'occurrence': evt};
           var currentTime = current.getTime();
 
-          for(var i=0;i<size;i++) {
+          for(var i=0;i<evt.size;i++) {
             current.setTime(currentTime);
             current.setDate(current.getDate()+i);
             var index = current.format('Y-m-d');

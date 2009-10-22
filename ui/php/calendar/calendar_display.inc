@@ -1081,7 +1081,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $GLOBALS['js']['vars']['images']['extension_right'] = $GLOBALS['ico_extension_right'];
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
 
-  $display_days = ($end->getTimestamp() - $date->getTimestamp())/86400;
+  $display_days = floor(($end->getTimestamp() - $date->getTimestamp())/86400);
 
   if ($display_days > 14) {
     $block .= dis_calendar_html_month_agenda($current_view, $calendar_entity,$writable_entity, $date, $end);
