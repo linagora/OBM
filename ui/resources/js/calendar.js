@@ -88,9 +88,8 @@ Obm.CalendarManager = new Class({
     if (evt.kind == 'all_day') {
       var current = new Obm.DateTime(evt.event.time*1000);
       var begin = evt.event.time*1000;;
-      var end = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
-      var size = Math.ceil((end.getTime() - begin)/86400000);
-      if (!evt.event.all_day && evt.event.date.getDate() != end.getDate()) {
+      var size = Math.floor(evt.event.duration/86400);
+      if (!evt.event.all_day) {
         var beginDay = new Obm.DateTime(evt.event.time*1000);
         var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
         beginDay.setHours(0);
@@ -201,9 +200,7 @@ Obm.CalendarManager = new Class({
     if (evt.kind == 'all_day') {
       var current = new Obm.DateTime(evt.event.time*1000);
       var beginDay = current.getTime();
-      var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000).getTime();
-      var size = Math.ceil((endDay - beginDay)/86400000);
-      for(var i=0;i<size;i++) {
+      for(var i=0;i<evt.size;i++) {
         current.setTime(beginDay);
         current.setDate(current.getDate()+ i);
         var index = current.format('Y-m-d');
