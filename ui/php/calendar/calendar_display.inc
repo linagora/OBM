@@ -1681,7 +1681,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
         }
         if($event->all_day) {
           if($end->subSecond(1)->compareDateIso($date) != 0) {
-            $diff = ceil($end->diff($date)/86400);
+            $diff = floor($event->duration/86400);
             $schedule = $GLOBALS['l_all_day']." ($diff $GLOBALS[l_days])";
           } else {
             $schedule = $GLOBALS['l_all_day']; 
