@@ -6616,6 +6616,16 @@ CREATE INDEX event_usercreate_fkey ON event (event_usercreate);
 
 CREATE INDEX event_userupdate_fkey ON event (event_userupdate);
 --
+-- Name: event_timecreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX event_timecreate_id_fkey ON event (event_timecreate);
+--
+-- Name: event_timeupdate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX event_timeupdate_fkey ON event (event_timeupdate);
+--
 -- Name: eventalert_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
