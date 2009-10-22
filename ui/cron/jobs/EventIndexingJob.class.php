@@ -41,7 +41,6 @@ class EventIndexingJob extends CronJob {
    * @return void
    */
   function mustExecute($date) {
-return true;
     $date = new Of_Date($date);
     $min = date("i");
     $modulo = $this->jobDelta / 60;
