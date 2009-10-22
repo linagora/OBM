@@ -93,12 +93,12 @@ ldapAllMainMailAddress = false
 ; à -> &AOA-
 ; & -> &
 ; Example : userMailboxDefaultFolders = "Envoy&AOk-s,Corbeille,Brouillons,El&AOk-ments ind&AOk-sirables"
-userMailboxDefaultFolders = ""
+userMailboxDefaultFolders = 'Trash,Drafts,SPAM,Templates'
 ;
 ; shareMailboxDefaultFolders are IMAP folders who are automaticaly created
 ; at share creation ( must be enclosed with " and in IMAP UTF-7 modified
 ; encoding)
-shareMailboxDefaultFolders = ""
+shareMailboxDefaultFolders = ''
 ;
 ; oldSidMapping mode is for compatibility with Aliamin and old install
 ; Modifying this on a running system need Samba domain work (re-register host,

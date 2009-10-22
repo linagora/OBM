@@ -232,7 +232,7 @@ if( defined( $obmModule ) && lc($obmModule) eq 'true' ) {
 
 # Creation de repertoires a la creation de l'utilisateur
 $userMailboxDefaultFolders = $cfgFile->val( 'automate', 'userMailboxDefaultFolders' );
-if( defined( $userMailboxDefaultFolders ) && $userMailboxDefaultFolders =~ /^"(.*)"$/ ) {
+if( defined( $userMailboxDefaultFolders ) && $userMailboxDefaultFolders =~ /^['"](.*)['"]$/ ) {
     $userMailboxDefaultFolders = $1;
 }else {
     $userMailboxDefaultFolders = undef;
@@ -240,7 +240,7 @@ if( defined( $userMailboxDefaultFolders ) && $userMailboxDefaultFolders =~ /^"(.
 
 # Creation de repertoires a la creation de partage
 $shareMailboxDefaultFolders = $cfgFile->val( 'automate', 'shareMailboxDefaultFolders' );
-if( defined( $shareMailboxDefaultFolders ) && $shareMailboxDefaultFolders =~ /^"(.*)"$/ ) {
+if( defined( $shareMailboxDefaultFolders ) && $shareMailboxDefaultFolders =~ /^['"](.*)['"]$/ ) {
     $shareMailboxDefaultFolders = $1;
 }else {
     $shareMailboxDefaultFolders = undef;
