@@ -50,6 +50,6 @@ return array(
   'Newsletter' => "Inscrit à l'infolettre",
   'Notes' => 'Note',
   'Other comment' => 'Autres commentaires',
-  'Add addressbook' => "Ajouter un carnet d'addresses'",
+  'Add addressbook' => "Ajouter un carnet d'addresses",
   'Add contact' => 'Ajouter un contact'
 );
