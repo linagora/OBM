@@ -150,25 +150,3 @@ abstract class Command {
   }
 }
 
-class Stato_FileTransport implements Stato_IMailTransport {
-
-  private static $mailQ;
-
-  public function __construct() {
-    self::$mailQ = array();
-  }
-
-  public function send(Stato_Mail $mail) {
-    $file = fopen('/tmp/testfile.txt','wb');
-    fwrite($file,$mail->getTo());
-    fwrite($file,$mail->getSubject());
-    fwrite($file,$mail->getContent());
-    //    self::$mailQ[] = array('to' => $mail->getTo(), 'subject' => $mail->getSubject(), 'content' => $mail->getContent());
-    fclose($file);
-  }
-
-  public static function getMailQ() {
-    return self::$mailQ;
-  }
-}
-
