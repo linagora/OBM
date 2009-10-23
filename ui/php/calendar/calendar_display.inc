@@ -1259,7 +1259,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
 
         // Left extension
         if ($occurrence->index->compare($current) < 0) {
-           $occurrence->index = clone $current;
+           $occurrence->index = $current;
            $occurrence->left = true;
         }
         if ($occurrence->end->compare($endWeek) > 0) {

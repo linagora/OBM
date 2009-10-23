@@ -88,7 +88,7 @@ Obm.CalendarManager = new Class({
     if (evt.kind == 'all_day') {
       var current = new Obm.DateTime(evt.event.time*1000);
       var begin = evt.event.time*1000;;
-      var size = Math.floor(evt.event.duration/86400);
+      evt.size = Math.floor(evt.event.duration/86400);
       if (!evt.event.all_day) {
         var beginDay = new Obm.DateTime(evt.event.time*1000);
         var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
@@ -100,7 +100,7 @@ Obm.CalendarManager = new Class({
         endDay.setMinutes(0);
         endDay.setSeconds(0)
         endDay.setMilliseconds(0);
-        size = 1+Math.ceil((endDay.getTime() - beginDay)/86400000);
+        evt.size = 1+Math.ceil((endDay.getTime() - beginDay)/86400000);
       }
 
       // Extensions
@@ -110,18 +110,17 @@ Obm.CalendarManager = new Class({
         if (evt.event.left) {
           var oldBegin = begin
           begin = evt.event.index*1000;
-          size = size - Math.ceil((begin-oldBegin)/86400000);
+          evt.size = evt.size - Math.ceil((begin-oldBegin)/86400000);
+          if (evt.size == 0) evt.size = 1; // very, very crappy fix 
         }
         if (evt.event.right) {
           var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
-          size = Math.ceil((startWeek + (86400000 * 7) - evt.event.index*1000)/86400000);
-          if (evt.event.left) size = 7; // very, very crappy fix
+          evt.size = Math.ceil((startWeek + (86400000 * 7) - evt.event.index*1000)/86400000);
+          if (evt.event.left) evt.size = 7; // very, very crappy fix
         }
       }
 
-      evt.size = size;
-
-      for(var i=0;i<size;i++) {
+      for(var i=0;i<evt.size;i++) {
         current.setTime(begin);
         current.setDate(current.getDate()+ i);
         var index = current.format('Y-m-d');
