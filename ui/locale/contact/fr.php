@@ -20,7 +20,7 @@
 <?php
 
 return array(
-  'Addressbook' => "Carnet d'addresses",
+  'Addressbook' => "Carnet d'adresses",
   'Close the window' => 'Fermer la fenêtre',
   'Contact card' => 'Fiche contact',
   'Update contact' => 'Mettre à jour le contact',
@@ -30,7 +30,6 @@ return array(
   'Export as Vcard' => 'Exporter en Vcard',
   'Contact photo' => 'Photographie',
   'Anniversary' => 'Fête',
-  'Not synchronized' => 'Pas synchronisé',
   'Addressbook menu' => "Menu des carnets d'addresses",
   'Synchronized' => 'Synchronisé',
   'Synchronize' => 'Synchroniser',
@@ -50,6 +49,6 @@ return array(
   'Newsletter' => "Inscrit à l'infolettre",
   'Notes' => 'Note',
   'Other comment' => 'Autres commentaires',
-  'Add addressbook' => "Ajouter un carnet d'addresses",
+  'Add addressbook' => "Ajouter un carnet d'adresses",
   'Add contact' => 'Ajouter un contact'
 );
