@@ -51,7 +51,7 @@ class OBM_Acl {
   /**
    * These entity types have no related table (i.e. one entity per user)
    */
-  private static $specialEntityTypes = array('calendar', 'mailbox');
+  private static $specialEntityTypes = array('calendar', 'mailbox', 'addressbook');
   
   /**
    * Initializes the DB connection and the cache
@@ -135,7 +135,7 @@ class OBM_Acl {
    * @return bool
    */
   public static function isAllowed($userId, $entityType, $entityId, $action) {
-    if (self::isSpecialEntity($entityType) && $userId == $entityId) {
+    if (self::isSpecialEntity($entityType) && count(self::hasSpecialCredential($userId, $entityType, $entityId)) > 0) {
       return true;
     }
     $query = self::getAclQuery('1', $entityType, $entityId, $userId, $action);
@@ -157,8 +157,8 @@ class OBM_Acl {
     $query = self::getAclQuery('COUNT(1) as count', $entityType, $entityIds, $userId, $action);
     self::$db->query($query);
     self::log($query, 'areAllowed');
-    if (self::isSpecialEntity($entityType) && in_array($userId, $entityIds)) {
-      $count = 1;
+    if (self::isSpecialEntity($entityType)) {
+      $count = count(self::hasSpecialCredential($userId, $entityType, $entityIds));
     } else {
       $count = 0;
     }
@@ -198,7 +198,7 @@ class OBM_Acl {
    * @return bool
    */
   public static function areSomeAllowed($userId, $entityType, $entityIds, $action) {
-    if (self::isSpecialEntity($entityType) && in_array($userId, $entityIds)) {
+    if (self::isSpecialEntity($entityType) && count(self::hasSpecialCredential($userId, $entityType, $entityIds)) > 0) {
       return true;
     }
     $query = self::getAclQuery('1', $entityType, $entityIds, $userId, $action);
@@ -651,7 +651,31 @@ class OBM_Acl {
     $ctt[2]['value'] = "{$prefix}contact_firstname";
     return sql_string_concat(self::$db->type, $ctt);
   }
-  
+
+  public static function hasSpecialCredential($userId, $entityType, $entityId = null) {
+    $function = 'has'.ucfirst($entityType).'Credential';
+    if(method_exists('OBM_Acl', $function)) {
+      return self::$function($userId, $entityId);
+    } elseif(!$entityId || $entityId == $userId || (is_array($entityId) && in_array($userId, $entityId))) {
+      return array($userId);
+    }
+    return array();
+  }
+
+  public static function hasAddressbookCredential($userId, $entityId) {
+    if($entityId) {
+      if(!is_array($entityId)) $entityId = array($entityId);
+      $subset = 'AND id IN ('.implode(',', $entityId).')';
+    }
+    self::$db->query("SELECT id FROM AddressBook WHERE owner = $userId $subset");
+    self::log($query, 'hasAddressbookCredential');
+    $idSet = array();
+    while(self::$db->next_record()) {
+      $idSet[] = self::$db->f('id');
+    }
+    return $idSet;
+  }
+
   private static function log($sql, $methodCall) {
     global $cdg_sql;
     display_debug_msg($sql, $cdg_sql, "OBM_Acl::$methodCall()");
@@ -734,4 +758,5 @@ class OBM_Acl_Utils {
     }
     return $expandedArray;
   }
+
 }
