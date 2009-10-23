@@ -741,14 +741,14 @@ function get_contact_action() {
   $actions['contact']['rights_admin'] = array (
     'Name'     => $l_header_right,
     'Url'      => "$path/contact/contact_index.php?action=rights_admin&amp;entity_id=".$params['entity_id'],
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_read,
     'Condition'=> array ('None')
                                      );
 
 // Rights Update
   $actions['contact']['rights_update'] = array (
     'Url'      => "$path/contact/contact_index.php?action=rights_update&amp;entity_id=".$params['contact_id'],
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_read,
     'Condition'=> array ('None')
                                      );
 // Statistics
