@@ -3198,7 +3198,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
   }
   
   // we check if all template entities have been successfully loaded ; if not (deleted ? ACL ?), we notice the user
-  if (isset($calendar['template_id'])) {
+  if ($action == 'new' && isset($calendar['template_id'])) {
     $loaded['user'] = isset($users['ids']) ? $users['ids'] : array();
     $loaded['contact'] = isset($contacts['ids']) ? $contacts['ids'] : array();
     $loaded['resource'] = isset($resources['ids']) ? $resources['ids'] : array();
