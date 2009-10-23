@@ -101,6 +101,7 @@ pushd zip_update_dir >/dev/null 2>&1
 unzip ../${product_name}-svn-linux.gtk.x86.zip >/dev/null 2>&1
 pushd ${product_name} >/dev/null 2>&1
 rm -f webmail about.html libcairo-swt.so
+find . -type f -name "*.so" | xargs rm -fr
 echo `pwd`
 cp ../../scripts/equinox.lib .
 cp ../../scripts/obm-caldav .
