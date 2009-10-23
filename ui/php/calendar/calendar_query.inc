@@ -2032,7 +2032,7 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
  * @access public
  * @return integer event template id inserted
  */
-function run_query_calendar_create_or_update_event_template($calendar) {
+function run_query_calendar_create_or_update_event_template(&$calendar) {
   global $cdg_sql, $obm;
 
   // Insert "others attendees" as private contacts
