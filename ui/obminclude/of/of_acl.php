@@ -656,7 +656,7 @@ class OBM_Acl {
     $function = 'has'.ucfirst($entityType).'Credential';
     if(method_exists('OBM_Acl', $function)) {
       return self::$function($userId, $entityId);
-    } elseif(!$entityId || $entityId == $userId || (is_array($entityId) && in_array($userId, $entityId))) {
+    } elseif(!$entityId || $entityId == $userId ||(is_array($entityId) && in_array($userId, $entityId))) {
       return array($userId);
     }
     return array();
