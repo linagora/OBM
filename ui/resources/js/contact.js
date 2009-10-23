@@ -7,10 +7,10 @@ Obm.Contact.AddressBook = new Class ({
 
   contact: null,
 
-  default: null,
+  mycontacts: null,
   
-  initialize: function(defaultAddressbook) {
-    this.default = defaultAddressbook;
+  initialize: function(mycontacts) {
+    this.mycontacts = mycontacts;
     $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 80);
     new Obm.Observer(new Window(window), {property:'contentHeight', onStop:function() {
       $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 80);
@@ -22,10 +22,13 @@ Obm.Contact.AddressBook = new Class ({
       evalScripts : true,
       update: $('addressBookContainer'),
       onComplete: function(response) {
+        console.log('complete');
         this.addressbook = $(this.addressbook.get('id'));
-        if(!this.addressbook) this.addressbook = $(this.default);
+        if(!this.addressbook) this.addressbook = $(this.mycontacts);
         this.addressbook.addClass('current');
-      }.bind(this)
+        $('spinner').hide();
+      }.bind(this),
+      onRequest: $('spinner').show.bind($('spinner')),
     });
 
     this.contactRequest = new Request.HTML({
@@ -33,6 +36,8 @@ Obm.Contact.AddressBook = new Class ({
       secure : false,
       evalScripts : true,
       update: $('dataContainer'),
+      onComplete: $('spinner').hide.bind($('spinner')),
+      onRequest: $('spinner').show.bind($('spinner'))
     });
 
     this.dataRequest = new Request.HTML({
@@ -45,15 +50,17 @@ Obm.Contact.AddressBook = new Class ({
         errors.error = new Hash(errors.error);
         errors.warning = new Hash(errors.warning);
         Obm.Error.formUpdate(errors, this.dataRequest);
-      }.bind(this)
+      }.bind(this),
+      onComplete: $('spinner').hide.bind($('spinner')),
+      onRequest: $('spinner').show.bind($('spinner')) 
     });    
     this.dataRequest.write = function (options) {
-      this.dataRequest.onSuccess = function() {this.refreshContact();}.bind(this)
+      this.dataRequest.setOptions({onSuccess : function() {this.refreshContact();}.bind(this)});
       this.dataRequest.post(options);
     }.bind(this);
 
     this.dataRequest.read = function (options) {
-      this.dataRequest.onSuccess = $empty; 
+      this.dataRequest.setOptions({onSuccess : $empty});
       this.dataRequest.get(options);
     }.bind(this);
     

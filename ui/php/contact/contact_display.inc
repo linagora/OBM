@@ -387,7 +387,7 @@ function dis_contact_consult2($contact) {
       $copy .= '<li><a href="" onclick="obm.contact.addressbook.copyContact('.$contact->id.','.$addressBook->id.'); return false;">'.$addressBook->displayName.'</a></li>';
       //$move .= '<li><a href="" onclick="obm.contact.addressbook.moveContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->displayName.'</a></li>';
     }
-    if ($addressBook->id == $contact->addressbook) {
+    if ($addressBook->id == $contact->addressbook_id) {
       $write = $addressBook->write;
     }
   }
@@ -396,7 +396,7 @@ function dis_contact_consult2($contact) {
 
   if ($write) {
     $toolbar .="<li>
-      <a href='' onclick='obm.contact.addressbook.updateContact($contact->id, $contact->addressbook); return false;' >
+      <a href='' onclick='obm.contact.addressbook.updateContact($contact->id, $contact->addressbook_id); return false;' >
       <img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a>
     </li><li>
       <a href='' onclick='obm.contact.addressbook.deleteContact($contact->id, \"".$contact->name."\"); return false;' >
@@ -600,7 +600,7 @@ function dis_contact_form2($params) {
     $contact = OBM_Contact::get($params['id']);
   else {
     $contact = new OBM_Contact();
-    $contact->addressbook = $params['addressbook'];
+    $contact->addressbook_id = $params['addressbook'];
   }
   $fields = array(
     'lastname' => array('class' => 'head', 'size' => 10, 'mandatory' => true),
@@ -775,9 +775,9 @@ function dis_contact_form2($params) {
   }
     $toolbar = "
       <ul id='toolbarMenu' class='dropDownMenu'>
-        <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id, $contact->addressbook); return false;' >
+        <li><a href='' onclick='obm.contact.addressbook.updateContact($contact->id, $contact->addressbook_id); return false;' >
             <img src='".$GLOBALS['icones']['edit']."' alt='$GLOBALS[l_header_update]' title='$GLOBALS[l_header_update]' /></a></li>
-        <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id, \"".$contact->name."\", $contact->addressbook); return false;' >
+        <li><a href='' onclick='obm.contact.addressbook.deleteContact($contact->id, \"".$contact->name."\", $contact->addressbook_id); return false;' >
             <img src='".$GLOBALS['icones']['delete']."' alt='$GLOBALS[l_header_delete]' title='$GLOBALS[l_header_delete]' /></a></li>
         <li><a href=''><img src='".$GLOBALS['icones']['add']."' title='$GLOBALS[l_add_fields]' alt='$GLOBALS[l_add_fields]' /></a><ul>$addBar</ul></li>
       </ul>
@@ -805,7 +805,7 @@ function dis_contact_form2($params) {
       <br />
       <input type='hidden' name='action' value='storeContact'  />
       <input type='hidden' name='id' value='$contact->id'  />
-      <input type='hidden' name='addressbook' value='$contact->addressbook' />
+      <input type='hidden' name='addressbook' value='$contact->addressbook_id' />
       <input style='margin:auto;' type='submit' value='$GLOBALS[l_save]' />
       <input style='margin:auto;' type='button' value='$GLOBALS[l_cancel]' onclick=\"obm.contact.addressbook.consultContact('$contact->id');\" />
       </p>

@@ -8,7 +8,7 @@
     <tr>
       <td class="toolbar">
         <ul class="dropDownMenu" id="contactToolbar">
-          <?php if($addressbooks[$contact->addressbook]->write) { ?>
+          <?php if($addressbooks[$contact->addressbook_id]->write) { ?>
           <li>
             <input onclick="obm.contact.addressbook.updateContact(<?php echo $contact->id ?>);" type='button' value='<?php echo __('Update') ?>' title="<?php echo __('Update contact') ?>" class='updateButton' />
           </li>
@@ -37,7 +37,7 @@
                   <?php } ?>
                 </ul>
               </li>
-              <li><?php echo __('IM') ?>
+              <li><?php echo __('Instant messaging') ?>
                 <ul>
                   <?php foreach($GLOBALS['l_im_labels'] as $label => $title) { ?>
                   <li>
@@ -171,7 +171,7 @@
               </script>
             </fieldset>
             <fieldset id="IM" class="details <?php echo (empty($contact->im)?'H':'') ?>">
-              <legend><?php echo __('IMs') ?></legend>
+              <legend><?php echo __('Instant messagings') ?></legend>
               <script type="text/javascript">
                 <?php if(!empty($contact->im)) foreach($contact->im as $im) { ?>
                 new Obm.Contact.IMWidget({protocol: {value: '<?php echo self::toJs($im['protocol']) ?>', label:'<?php echo ($contact->labelToString($GLOBALS['l_im_labels'][$im['protocol']], 'IM')) ?>'}, address: {value: '<?php echo self::toJs($im['address']) ?>'}},{container:'IM'});
@@ -257,7 +257,7 @@
             <p class='LC C'>
               <input type='hidden' name='action' value='storeContact'  />
               <input type='hidden' name='id' value='<?php echo $contact->id ?>'  />
-              <input type='hidden' name='addressbook' value='<?php echo $contact->addressbook ?>' />
+              <input type='hidden' name='addressbook' value='<?php echo $contact->addressbook_id ?>' />
               <input type='submit' value='<?php echo __('Save') ?>' />
               <input type='button' value='<?php echo __('Cancel') ?>' onclick="obm.contact.addressbook.consultContact('<?php echo $contact->id ?>');" />
             </p>

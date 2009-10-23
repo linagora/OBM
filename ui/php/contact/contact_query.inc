@@ -1215,7 +1215,7 @@ function check_contact_update_rights($params, $c='') {
 
     // XXXXX Check addressbook write_access ?
     $contact = OBM_Contact::get($id);
-    $addressbook = OBM_AddressBook::get($contact->addressbook);
+    $addressbook = OBM_AddressBook::get($contact->addressbook_id);
     if (!$addressbook || !$addressbook->write) {
       return false;
     }

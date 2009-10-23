@@ -118,8 +118,9 @@
   height: auto;
 }
 
-#addressBookContainer ul {
+.addressBookMenu {
   display: inline;
+  margin-left: 13.5em;
 }
 
 #addAddressBook {
@@ -236,12 +237,15 @@
 }
 
 #informationGrid .toolbar{
-  vertical-align: middle;
-  padding: 0;
+  padding: 3px 0 0 3px;
   margin: 0;
 }
 
 #informationGrid .toolbar li{
+  display: inline;
+}
+
+#informationGrid .toolbar ul{
   display: inline;
 }
 

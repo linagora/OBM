@@ -1156,6 +1156,7 @@ function display_menu($module) {
 $display['section']
 ."
 <ul id='information'>
+<li id='spinner' style='display:none' ><img src='$GLOBALS[ico_spinner]' alt='' /></li>
 $dis_scope
 
 $wait_event

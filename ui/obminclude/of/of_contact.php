@@ -85,6 +85,7 @@ class OBM_Contact implements OBM_ISearchable {
   private  $comment2;
   private  $comment3;
   private  $origin;
+  private  $addressbook_id;
   private  $addressbook;
  
   private static $kinds = null;
@@ -550,7 +551,7 @@ class OBM_Contact implements OBM_ISearchable {
           deletedcontact_timestamp,
           deletedcontact_origin)
         SELECT $contact->id, user_id, NOW(), '$GLOBALS[c_origin_web]' FROM  SyncedAddressbook 
-        WHERE addressbook_id = $contact->addressbook";
+        WHERE addressbook_id = $contact->addressbook_id";
       display_debug_msg($query, $cdg_sql, 'OBM_Contact::delete(2)');
       $retour = $obm_q->query($query);
     }
@@ -754,6 +755,7 @@ class OBM_Contact implements OBM_ISearchable {
       an.event_id as contact_anniversary_event,
       an.event_date as contact_anniversary,
       contact_datasource_id,
+      datasource_name,
       contact_comment,
       contact_comment2,
       contact_comment3,
@@ -762,6 +764,7 @@ class OBM_Contact implements OBM_ISearchable {
          INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
          INNER JOIN AddressBook ON AddressBook.id = contact_addressbook_id
          LEFT JOIN UserObm ON userobm_id = contact_marketingmanager_id
+         LEFT JOIN DataSource ON contact_datasource_id = datasource_id
          LEFT JOIN Phone as HomePhone ON HomePhone.phone_entity_id = contactentity_entity_id 
          LEFT JOIN Address ON address_entity_id = contactentity_entity_id 
          LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
@@ -805,6 +808,7 @@ class OBM_Contact implements OBM_ISearchable {
       an.event_id,
       an.event_date,
       contact_datasource_id,
+      datasource_name,
       contact_comment,
       contact_comment2,
       contact_comment3,
@@ -820,12 +824,15 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->firstname     = $db->f('contact_firstname');
       $contact->displayname   = $db->f('contact_lastname').' '.$db->f('contact_firstname');
       $contact->mname         = $db->f('contact_middlename');
+      $contact->kind_id       = $db->f('contact_kind_id');
       $contact->kind          = $db->f('contact_kind');
       $contact->title         = $db->f('contact_title');
+      $contact->function_id   = $db->f('contact_function_id');
       $contact->function      = $db->f('contact_function');
       $contact->company_id    = $db->f('contact_company_id');
       $contact->company       = $db->f('contact_company');
       $contact->market_id     = $db->f('contact_marketingmanager_id');
+      $contact->market        = $db->f('market_lastname').' '.$db->f('market_firstname');
       $contact->suffix        = $db->f('contact_suffix');
       $contact->aka           = $db->f('contact_aka');
       $contact->sound         = $db->f('contact_sound');
@@ -838,11 +845,13 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->newsletter    = $db->f('contact_newsletter');
       $contact->archive       = $db->f('contact_archive');
       $contact->datasource_id = $db->f('contact_datasource_id');
+      $contact->datasource    = $db->f('datasource_name');
       $contact->comment       = $db->f('contact_comment');
       $contact->comment2      = $db->f('contact_comment2');
       $contact->comment3      = $db->f('contact_comment3');
       $contact->origin        = $db->f('contact_origin');
-      $contact->addressbook   = $db->f('contact_addressbook_id');
+      $contact->addressbook_id= $db->f('contact_addressbook_id');
+      $contact->addressbook   = $db->f('name');
       if ($db->f('contact_date'))
         $contact->date        = new Of_Date($db->f('contact_date'), 'GMT');
       if ($db->f('contact_birthday')) {

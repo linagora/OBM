@@ -121,7 +121,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   if($params['contact_id']) {
     $current['contact'] = $contact_id;
     $c = OBM_Contact::get($contact_id);
-    $addressBook = OBM_AddressBook::get($c->addressbook);
+    $addressBook = OBM_AddressBook::get($c->addressbook_id);
     $contacts = $addressBook->getContacts();
   } else {
     $addressBook = $addressBooks->getMyContacts();
@@ -139,7 +139,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 ///////////////////////////////////////////////////////////////////////////////
   $contact = OBM_Contact::get($params['id']);
   $addressbooks = OBM_AddressBook::search();
-  $addressbook = $addressbooks[$contact->addressbook];
+  $addressbook = $addressbooks[$contact->addressbook_id];
   if ($addressbook && $addressbook->read) {
     $template = new OBM_Template('card');
     $template->set('contact', $contact);
@@ -156,9 +156,9 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $contact = OBM_Contact::get($params['id']);
   } else {
     $contact = new OBM_Contact();
-    $contact->addressbook = $params['addressbook'];    
+    $contact->addressbook_id = $params['addressbook'];    
   }
-  $addressbook = $addressbooks[$contact->addressbook];
+  $addressbook = $addressbooks[$contact->addressbook_id];
   if ($addressbook && $addressbook->write) {
     $template = new OBM_Template('form');
     $template->set('addressbooks', $addressbooks);
@@ -201,7 +201,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $params['contact_id'] = $params['id'];
   $addressbooks = OBM_AddressBook::search();
   $contact = OBM_Contact::get($params['id']);
-  $source = $addressbooks[$contact->addressbook];
+  $source = $addressbooks[$contact->addressbook_id];
   $destination = $addressbooks[$params['addressbook']];
   if ($source->read && $destination && $destination->write) {
     OBM_Contact::copy($contact, $destination);
@@ -217,7 +217,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $params['contact_id'] = $params['id'];
   $contact = OBM_Contact::get($params['id']);
   $addressbooks = OBM_AddressBook::search();
-  $addressbook = $addressbooks[$contact->addressbook];
+  $addressbook = $addressbooks[$contact->addressbook_id];
   if ($addressbook && $addressbook->write) {
     if($contact->archive) {
       OBM_Contact::delete($contact);

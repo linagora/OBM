@@ -8,7 +8,7 @@
     <tr>
       <td class="toolbar">
         <ul class="dropDownMenu" id="contactToolbar">
-          <?php if($addressbooks[$contact->addressbook]->write) { ?>
+          <?php if($addressbooks[$contact->addressbook_id]->write) { ?>
           <li>
             <input onclick="obm.contact.addressbook.updateContact(<?php echo $contact->id ?>);" type='button' value='<?php echo __('Update') ?>' title="<?php echo __('Update contact') ?>" class='updateButton' />
           </li>
@@ -22,7 +22,7 @@
               <li><?php echo __('Copy') ?>
                 <ul>
                   <?php foreach($addressbooks as $_id => $_addressbook) { ?>
-                  <?php if($_id != $contact->addressbook) { ?>
+                  <?php if($_id != $contact->addressbook_id) { ?>
                   <li>
                     <a onclick="obm.contact.addressbook.copyContact(<?php echo $contact->id ?>,<?php echo $_id ?>); return false;" href=""><?php echo $_addressbook->name ?></a>
                   </li>
