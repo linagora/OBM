@@ -1119,6 +1119,7 @@ function quick_check_calendar_conflict($calendar, $entities) {
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
+  $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
   // Event entities
   $sel_entity_id['user'] = $entities['user']['ids'];
@@ -1128,7 +1129,7 @@ function quick_check_calendar_conflict($calendar, $entities) {
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
   $of = &OccurrenceFactory::getInstance(); 
   if(!$calendar['all_day']) {
-    $occurrences = $of->getPeriodOccurrences($begin, $end);
+    $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $calendar['date_end']);
   }
 
   if(!is_null($occurrences)) {
