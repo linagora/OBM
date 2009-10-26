@@ -89,6 +89,7 @@ Obm.CalendarManager = new Class({
       var current = new Obm.DateTime(evt.event.time*1000);
       var begin = evt.event.time*1000;;
       evt.size = Math.floor(evt.event.duration/86400);
+      if (evt.size == 0) evt.size = 1; // very, very crappy fix 
       if (!evt.event.all_day) {
         var beginDay = new Obm.DateTime(evt.event.time*1000);
         var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
@@ -1060,7 +1061,7 @@ Obm.CalendarInDayEvent = new Class({
     this.setTitleIcons();
 
     if(this.event.updatable) {
-    this.dragHandler.setProperty('style','cursor: move;');
+    this.element.setProperty('style','cursor: move;');
     this.resizeHandler = new Element('div')
       .addClass('handle')
       .injectInside(this.element)
@@ -1311,7 +1312,7 @@ Obm.CalendarAllDayEvent = new Class({
     this.setTitleIcons();
 
     if(this.event.updatable) {
-      this.dragHandler.setProperty('style','cursor: move;');
+      this.element.setProperty('style','cursor: move;');
     }
 
     this.titleContainer = new Element('a')
@@ -1423,19 +1424,18 @@ Obm.CalendarAllDayEvent = new Class({
     var delta = Math.floor(left/obm.vars.consts.cellWidth);
     var startTime = obm.calendarManager.startTime;
     if (obm.calendarManager.calendarView == 'month') { // FIXME
-      var rowHeight = $$('div.monthRow')[0].getHeight();
       var index = null;
       $$('div.monthRow').each(function(row, i) {
         if (row.offsetTop > top && index == null) {
           index = i;
         }
       });
-     startTime = obm.vars.consts.weekBegin[index-1];
+      if (index == null) index = $$('div.monthRow').length;
+
+      startTime = obm.vars.consts.weekBegin[index-1];
     }
-    this.event.date = new Obm.DateTime((startTime + eventHour)*1000);
-    this.event.date.setDate(this.event.date.getDate()+delta);
-    this.event.time = this.event.date.getTime()/1000;
-    this.setTitle();
+    this.event.time = startTime + eventHour + delta*86400;
+    this.event.date = new Obm.DateTime(this.event.time*1000);
   }
 
 });

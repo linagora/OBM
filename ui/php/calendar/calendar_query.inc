@@ -1119,7 +1119,6 @@ function quick_check_calendar_conflict($calendar, $entities) {
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
-  $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
   // Event entities
   $sel_entity_id['user'] = $entities['user']['ids'];
@@ -1129,7 +1128,7 @@ function quick_check_calendar_conflict($calendar, $entities) {
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
   $of = &OccurrenceFactory::getInstance(); 
   if(!$calendar['all_day']) {
-    $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $calendar['date_end']);
+    $occurrences = $of->getPeriodOccurrences($begin, $end);
   }
 
   if(!is_null($occurrences)) {
@@ -1578,18 +1577,18 @@ function run_query_calendar_quick_event_update($calendar) {
   global $cdg_sql, $obm;
 
   $multidomain = sql_multidomain('event');
-  $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
+  // $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $title = sql_parse_text($calendar['title']);
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $event_id = sql_parse_id($calendar['calendar_id'], true);
-  if ($all_day == 'TRUE') {
-    $dateend = clone $datebegin;
-    $dateend->addSecond($event_duration - 1);
-    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
-    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
-    $event_duration = $dateend->diffTimestamp($datebegin);
-  }
+  // if ($all_day == 'TRUE') {
+  //   $dateend = clone $datebegin;
+  //   $dateend->addSecond($event_duration - 1);
+  //   $dateend->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
+  //   $datebegin->setHour(0)->setMinute(0)->setSecond(0);
+  //   $event_duration = $dateend->diffTimestamp($datebegin);
+  // }
   $all = $calendar['all'];
   if ($all != 1) {
     $event_date = "event_date = '$datebegin',";
@@ -1631,11 +1630,12 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
   $event_duration = $calendar['duration'];
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   if ($all_day == 'TRUE') {
-    $dateend = clone $datebegin;
-    $dateend->addSecond($event_duration - 1);
-    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
-    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
-    $event_duration = $dateend->diffTimestamp($datebegin);
+    // $dateend = clone $datebegin;
+    // $dateend->addSecond($event_duration - 1);
+    // $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
+    // $datebegin->setHour(0)->setMinute(0)->setSecond(0);
+    // $event_duration = $dateend->diffTimestamp($datebegin);
+    $event_duration = "86400";
   }
   $ext_id = genUniqueExtEventId();
 
