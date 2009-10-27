@@ -923,7 +923,12 @@ function run_query_user_update($u_id, $user) {
   if ($cgp_use['service']['mail']) {
     $mail_perms = sql_parse_int($user['mail_perms']);
     $mail_ext_perms = sql_parse_int($user['mail_ext_perms']);
-    $mail_server_id = sql_parse_id($user['mail_server_id']);
+    // Once mail server is assigned, it can't be modified for now
+    if( !$u['mail_server_id'] ) {
+      $mail_server_id = sql_parse_id($user['mail_server_id']);
+    }else {
+      $mail_server_id = $u['mail_server_id'];
+    }
     $mail_quota = (isset($user['mail_quota']) ? $user['mail_quota'] : 0);
     $query_mail = ",
     userobm_mail_perms=$mail_perms,
