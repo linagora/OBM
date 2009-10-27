@@ -1451,6 +1451,15 @@ function make_list_query_from_criteria($list) {
     'kind_lang' => $common_equal
   );
 
+  // With NOT (or exclusion), some operators needs a different writing
+  // eg: equals to a field that can be null (cause if null must return true)
+  $common_equal_not = "(%f = '%v' AND NOT %f IS NULL)";
+
+  $operateurs_not = $operateurs;
+  $operateurs_not['company_datasource_id'] = $common_equal_not;
+  $operateurs_not['contact_datasource_id'] = $common_equal_not;
+  $operateurs_not['contact_function_id'] = $common_equal_not;
+
   // hash field criteria -> join associated needed
   $add_join = array (
     'subscription_publication_id' => "
@@ -1484,6 +1493,8 @@ function make_list_query_from_criteria($list) {
 	$cat_link = "cat${cat_nb}${entity}l%j";
 	$operateurs["$cat_name"] = str_replace('%t',"$cat_link",$usercategory_id_in); 
 	$operateurs["${cat_name}_code"] = str_replace('%t',"$cat",$usercategory_code_equal); 
+	$operateurs_not["$cat_name"] = $operateurs["$cat_name"];
+	$operateurs_not["${cat_name}_code"] = $operateurs["${cat_name}_code"];
 	$add_join["$cat_name"] = " LEFT JOIN CategoryLink $cat_link
          ON ${entity}entity_entity_id = $cat_link.categorylink_entity_id
            AND $cat_link.categorylink_category = '$cat_name'
@@ -1661,7 +1672,7 @@ function make_list_query_from_criteria($list) {
 		  } else {
 		    $exclusion_join_field[$line][$field_join]++;
 		  }
-		  $operation = $operateurs[$field];
+		  $operation = $operateurs_not[$field];
 		  $operation = str_replace('%j','',$operation);
 		  $operation = str_replace('%f',$field,$operation);
 
@@ -1699,7 +1710,7 @@ function make_list_query_from_criteria($list) {
 
 		  $select .= $add_select[$field];
 
-		  // If field has not already create a join
+		  // If field has not already created a join
 		  if (!isset($join_nb[$field_join])) {
 		    $join_nb[$field_join] = 0;
 		    // If module nb is set And module = publication, do nothing
@@ -1738,7 +1749,12 @@ function make_list_query_from_criteria($list) {
 		  // tag the module has having criteria
 		  $module_fill[$module] = true;
 
-		  $operation = $operateurs[$field];
+		  //
+		  if ($boolean_criterion[$line] == 'NOT') {
+		    $operation = $operateurs_not[$field];
+		  } else {
+		    $operation = $operateurs[$field];
+		  }
 		  $operation = str_replace('%j',$join_line[$field_join][$line],$operation);
 		  $operation = str_replace('%f',$field,$operation);
 
@@ -1905,7 +1921,7 @@ function make_list_query_from_criteria($list) {
         $conv_select";
   }
 
-  $query = trim("$over_select SELECT distinct $select FROM $from WHERE $where $over_end ORDER BY contact_lastname");
+  $query = trim("$over_select SELECT distinct $select FROM $from WHERE $where $over_end ORDER BY contact_id");
 
   $ret['query'] = $query;
   $ret['where'] = $where;

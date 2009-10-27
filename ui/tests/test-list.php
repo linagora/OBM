@@ -34,6 +34,7 @@ $time_start = microtime_float();
 $sep = ';';
 //-----------------------------------------------------------------------------
 
+$params = parse_arg($argv);
 $path = '../php';
 $obminclude = '../obminclude';
 include('../obminclude/global.inc');
@@ -41,14 +42,16 @@ include('global_test.inc');
 include('../obminclude/of/of_category.inc');
 require("$path/list/list_query.inc");
 
-$params = parse_arg($argv);
 $obm['domain_id'] = $params['domain_id'];
 $date = date('Ymd-His');
 $file = "test-list-$date.txt";
 
-echo "\n**********************************************************************
+if ($params['action'] != 'help') {
+  echo "\n**********************************************************************
 ***** Traitement Listes : OBM $obm_version : DB $obmdb_db $obmdb_dbtype
 **********************************************************************";
+}
+
 
 if ($params['action'] == 'dump') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,7 +65,7 @@ if ($params['action'] == 'dump') {
   fwrite($handle, "TESTS:List:version : $obm_version\n");
 
   // Process Lists
-  $lists = get_list_list();
+  $lists = get_list_list($params['list_id']);
   process_list_list($lists);
 
 } elseif ($params['action'] == 'test') {
@@ -287,16 +290,23 @@ function get_list_from_dump_id($handle, $list_id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Recuperation de la liste des listes
+// Parameters:
+//   - $list_ids : list ids (in a coma separated string)
 // Returns:
 // $l hash with : $l[$id]=array(list_infos)
 ///////////////////////////////////////////////////////////////////////////////
-function get_list_list() {
+function get_list_list($list_ids='') {
 
   $l = array();
+  $where = '';
+  if (trim($list_ids) != '') {
+    $where = "WHERE list_id IN ($list_ids)";
+  }
 
-  $query = 'SELECT *
+  $query = "SELECT *
     FROM List
-    ORDER BY list_id';
+    $where
+    ORDER BY list_id";
 
   $l_q = new DB_OBM;
   $l_q->query($query);
@@ -442,16 +452,12 @@ function parse_arg($argv) {
     switch($val) {
     case '-h':
     case '--help':
-      echo "Usage: php test-list.php -a dump\n";
-      echo "Usage: php test-list.php -v verbose -a test -f file1 -t file2\n";
-      echo "-a [dump | test] (default is 'dump')\n";
-      echo "-v [normal | verbose | detail | all]\n\n";
-      return true;
+      $params['action'] = 'help';
       break;
     case '-a':
     case '--action':
       list($nb2, $val2) = each ($argv);
-      $params["action"] = $val2;
+      $params['action'] = $val2;
       if ($debug > 0) { echo "-f -> \$action=$val2\n"; }
       break;
     case '-d':
@@ -459,6 +465,12 @@ function parse_arg($argv) {
       list($nb3, $val3) = each ($argv);
       $params['domain_id'] = $val3;
       if ($debug > 0) { echo "-f -> \$domain_id=$val3\n"; }
+      break;
+    case '-l':
+    case '--list_id':
+      list($nb3, $val3) = each ($argv);
+      $params['list_id'] = $val3;
+      if ($debug > 0) { echo "-f -> \$list_id=$val3\n"; }
       break;
     case '-f':
     case '--from-file':
@@ -483,14 +495,58 @@ function parse_arg($argv) {
 
   // Default values
   if ($params['action'] == '') {
-    $params['action'] = 'dump';
+    $params['action'] = 'help';
   }
 
   if ($params['domain_id'] == '') {
     $params['domain_id'] = 1;
   }
 
+  // Check list id values
+  if ($params['list_id'] != '') {
+    $lists = explode(',', $params['list_id']);
+    foreach ($lists as $id) {
+      if ($id > 0) {
+	$new_list[] = $id;
+      }
+    }
+    $params['list_id'] = implode(',', $new_list);
+  }
+
+  if ($params['action'] == 'help') {
+    display_help();
+    exit;
+  }
+
   return $params;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display help
+///////////////////////////////////////////////////////////////////////////////
+function display_help() {
+  global $debug;
+
+  echo "Usage: php test-list.php -a dump\n";
+  echo "Usage: php test-list.php -v verbose -a test -f file1 -t file2\n";
+  echo "-a|--action [dump | test] (default is 'dump')\n";
+  echo "-v|--verbose [normal | verbose | detail | all]\n";
+  echo "-l|--list [id1,id2,..,idn] : list of list ids (if not set, all the lists)\n";
+  echo "\n";
+  echo "actions :\n";
+  echo "-a dump : dump the lists infos in the dump file test-list-AAMMDD-HHMMSS.txt\n";
+  echo "-a test : compare 2 dump files and display the list differences (#contacts, #companies)\n";
+  echo "\n";
+  echo "Eg:\n";
+  echo "# Dump the lists infos for the old database\n";
+  echo "cd ~/svn/obm/b-2_1/tests\n";
+  echo "php -d include_path=~/svn/obm/b-2_1/ test-list.php -a dump\n";
+  echo "# Dump the lists infos for the new database\n";
+  echo "cd ../../b-2_2/tests\n";
+  echo "php -d include_path=~/svn/obm/b-2_2/ test-list.php -a dump\n";
+  echo "# compare the dump files\n";
+  echo "php test-list.php -a test -f ../../b-2_1/tests/test-list-20091017-004836.txt -t test-list-20091027-115055.txt\n";
 }
 
 
