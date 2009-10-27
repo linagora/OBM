@@ -30,7 +30,6 @@ import org.obm.caldav.server.exception.CalDavException;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 
-
 public class DavRequest {
 
 	private static final Log logger = LogFactory.getLog(DavRequest.class);
@@ -46,33 +45,31 @@ public class DavRequest {
 		while (headerNames.hasMoreElements()) {
 			String hn = (String) headerNames.nextElement();
 			String val = req.getHeader(hn);
-			logger.debug(hn + ": " + val);
+			logger.info(hn + ": " + val);
 		}
 
 		initRequest();
 	}
-	
+
 	private void initRequest() throws CalDavException {
-		
+
 		if (req.getHeader("Content-Type") != null
 				&& !req.getContentType().contains("calendar")) {
 			try {
 				InputStream in = req.getInputStream();
 				document = DOMUtils.parse(in);
-				if(logger.isDebugEnabled()){
-					DOMUtils.logDom(document);
-				}
+				DOMUtils.logDom(document);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
 		}
-		
-		String uri = req.getRequestURI(); 
-		if(uri.startsWith("/")){
+
+		String uri = req.getRequestURI();
+		if (uri.startsWith("/")) {
 			uri = uri.substring(1);
 		}
 		String[] comp = uri.replaceAll("%40", "@").split("/");
-		if(comp.length == 0 || !comp[0].contains("@")){
+		if (comp.length == 0 || !comp[0].contains("@")) {
 			throw new CalDavException(StatusCodeConstant.SC_NOT_FOUND);
 		} else {
 			this.calendarName = comp[0];
@@ -94,16 +91,16 @@ public class DavRequest {
 	public String getHref() {
 		return req.getRequestURL().toString();
 	}
-	
+
 	public String getURI() {
 		return req.getRequestURI();
 	}
-	
-	public String getCalendarComponantName(){
+
+	public String getCalendarComponantName() {
 		return this.calendarName;
 	}
-	
-	public HttpSession getSession(){
+
+	public HttpSession getSession() {
 		return this.req.getSession();
 	}
 }

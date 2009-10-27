@@ -23,7 +23,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.reports.CalendarMultiGet;
 import org.obm.caldav.server.reports.CalendarQuery;
@@ -46,7 +46,7 @@ public class ReportHandler extends DavMethodHandler {
 	}
 
 	@Override
-	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp) {
+	public void process(Token token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
 		Document d = req.getDocument();
 		Element r = d.getDocumentElement();

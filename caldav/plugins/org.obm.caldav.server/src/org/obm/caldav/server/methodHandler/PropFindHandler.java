@@ -25,7 +25,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.propertyHandler.impl.CalendarColor;
@@ -83,7 +83,7 @@ public class PropFindHandler extends DavMethodHandler {
 	
 	
 	@Override
-	public void process(Token t, IProxy proxy, DavRequest req, HttpServletResponse resp) throws Exception {
+	public void process(Token t, IBackend proxy, DavRequest req, HttpServletResponse resp) throws Exception {
 		Set<PropfindPropertyHandler> toLoad = new HashSet<PropfindPropertyHandler>();
 		Set<Element> toNotImplemented = new HashSet<Element>();
 		Document doc = req.getDocument();

@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.utils.DOMUtils;
@@ -63,7 +63,7 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 	// </D:response>
 	// </D:multistatus>
 
-	public Document build(DavRequest req, IProxy proxy,
+	public Document build(DavRequest req, IBackend proxy,
 			Set<String> properties,
 			Map<String, EventTimeUpdate> listEvents, Set<CalendarQueryPropertyHandler> propertiesValues) {
 		Document doc = null;

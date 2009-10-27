@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.exception.CalDavException;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
@@ -65,7 +65,7 @@ public class CalendarMultiGetQueryResultBuilder extends ResultBuilder {
 	// </D:response>
 	// </D:multistatus>
 
-	public Document build(DavRequest req, IProxy proxy,
+	public Document build(DavRequest req, IBackend proxy,
 			Set<CalendarMultiGetPropertyHandler> properties,
 			Map<Event, String> listEvents) {
 		Document doc = null;

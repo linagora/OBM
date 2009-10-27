@@ -17,7 +17,7 @@
 package org.obm.caldav.server.propertyHandler.impl;
 
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
@@ -44,10 +44,12 @@ import org.w3c.dom.Element;
 public class Owner extends DavPropertyHandler implements PropfindPropertyHandler{
 
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy, String url) {
+	public void appendPropertyValue(Element prop, Token t, DavRequest req, IBackend proxy, String url) {
 		Element elem = appendElement(prop, "owner", NameSpaceConstant.DAV_NAMESPACE_PREFIX); 
+//		appendElement(elem, "href", NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent("/"
+//				+ t.getLoginAtDomain() + "/events/");
 		appendElement(elem, "href", NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent("/"
-				+ t.getLoginAtDomain() + "/events");
+				+ t.getLoginAtDomain() + "/");
 	}
 
 	@Override

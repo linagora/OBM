@@ -24,7 +24,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.Token;
 import org.obm.sync.calendar.Event;
@@ -43,7 +43,7 @@ import org.obm.sync.calendar.Event;
 public class GetHandler extends DavMethodHandler {
 
 	@Override
-	public void process(Token token, IProxy proxy, DavRequest req,
+	public void process(Token token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp) throws Exception {
 		logger.info("process(req, resp)");
 		List<Event> event = proxy.getCalendarService().getAllEvents();

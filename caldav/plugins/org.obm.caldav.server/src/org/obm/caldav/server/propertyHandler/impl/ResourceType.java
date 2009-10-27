@@ -17,7 +17,7 @@
 package org.obm.caldav.server.propertyHandler.impl;
 
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
@@ -41,15 +41,15 @@ import org.w3c.dom.Element;
 public class ResourceType extends DavPropertyHandler implements PropfindPropertyHandler, CalendarQueryPropertyHandler{
 
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy, String url) {
+	public void appendPropertyValue(Element prop, Token t, DavRequest req, IBackend proxy, String url) {
 		Element elem = appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
-		
 		appendElement(elem,"collection", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		appendElement(elem,"calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+//		appendElement(elem,"schedule-calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
 	}
 
 	@Override
-	public void appendCalendarQueryPropertyValue(Element prop, IProxy proxy,
+	public void appendCalendarQueryPropertyValue(Element prop, IBackend proxy,
 			EventTimeUpdate event) {
 		appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 	}

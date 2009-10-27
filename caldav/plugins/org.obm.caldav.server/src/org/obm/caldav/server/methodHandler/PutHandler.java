@@ -22,7 +22,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.CalDavUtils;
@@ -35,7 +35,7 @@ public class PutHandler extends DavMethodHandler {
 	}
 
 	@Override
-	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp) {
+	public void process(Token token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
 		InputStream in;
 		try {

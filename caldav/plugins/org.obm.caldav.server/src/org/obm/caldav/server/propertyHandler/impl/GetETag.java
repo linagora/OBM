@@ -20,7 +20,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.exception.AppendPropertyException;
 import org.obm.caldav.server.impl.DavRequest;
@@ -55,14 +55,14 @@ public class GetETag extends DavPropertyHandler implements CalendarQueryProperty
 	protected Log logger = LogFactory.getLog(getClass());
 	
 	@Override	
-	public void appendCalendarQueryPropertyValue(Element prop, IProxy proxy,
+	public void appendCalendarQueryPropertyValue(Element prop, IBackend proxy,
 			EventTimeUpdate event) {
 		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		appendValue(val, event.getExtId() , event.getTimeUpdate());
 	}
 
 	@Override
-	public void appendCalendarMultiGetPropertyValue(Element prop, IProxy proxy,
+	public void appendCalendarMultiGetPropertyValue(Element prop, IBackend proxy,
 			Event event, String eventIcs) throws AppendPropertyException{
 		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		appendValue(val, event.getExtId(), event.getTimeUpdate() );
@@ -70,7 +70,7 @@ public class GetETag extends DavPropertyHandler implements CalendarQueryProperty
 	
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IProxy proxy, String url) {
+			IBackend proxy, String url) {
 		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		appendValue(val,"", new Date());
 	}

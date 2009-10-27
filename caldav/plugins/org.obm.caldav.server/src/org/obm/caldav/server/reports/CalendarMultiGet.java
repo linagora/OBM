@@ -24,7 +24,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
@@ -105,7 +105,7 @@ public class CalendarMultiGet extends ReportProvider {
 	// </D:multistatus>
 
 	@Override
-	public void process(Token token, IProxy proxy, DavRequest req,
+	public void process(Token token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp, Set<String> requestPropList) {
 		logger.info("process(" + token.getLoginAtDomain() + ", req, resp)");
 

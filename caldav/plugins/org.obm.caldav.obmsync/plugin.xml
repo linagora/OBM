@@ -2,9 +2,9 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.obm.caldav.server.proxy">
+         point="org.obm.caldav.server.backend">
       <proxy
-            IProxy="org.obm.caldav.obmsync.ProxyImpl">
+            IProxy="org.obm.caldav.obmsync.OBMBackend">
       </proxy>
    </extension>
 

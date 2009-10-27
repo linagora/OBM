@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
@@ -74,7 +74,7 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 	}
 	
 	@Override
-	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy, String url) {
+	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req, IBackend proxy, String url) {
 		Element elem = appendElement(prop, "getctag", NameSpaceConstant.CALENDARSERVER_NAMESPACE_PREFIX); 
 		Date lastChange = lastChangeByUser.get(t.getLoginAtDomain());
 		

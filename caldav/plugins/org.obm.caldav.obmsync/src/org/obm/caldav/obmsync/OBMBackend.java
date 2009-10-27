@@ -21,11 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.obmsync.provider.impl.AbstractObmSyncProvider;
 import org.obm.caldav.obmsync.service.impl.CalendarService;
 import org.obm.caldav.server.ICalendarService;
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.share.Token;
 import org.obm.sync.auth.AccessToken;
 
-public class ProxyImpl implements IProxy {
+public class OBMBackend implements IBackend {
 
 	private AccessToken token;
 	private String userId;
@@ -33,7 +33,7 @@ public class ProxyImpl implements IProxy {
 	private ICalendarService calendarService;
 	private Log logger = LogFactory.getLog(getClass());
 
-	public ProxyImpl() {
+	public OBMBackend() {
 	}
 
 	private void initService() {

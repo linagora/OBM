@@ -21,7 +21,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.exception.AuthorizationException;
 import org.obm.caldav.server.exception.ResultBuilderException;
@@ -44,7 +44,7 @@ import org.w3c.dom.Document;
 public class DeleteHandler extends DavMethodHandler {
 
 	@Override
-	public void process(Token token, IProxy proxy, DavRequest req,
+	public void process(Token token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp) throws ResultBuilderException {
 		try {
 			String extId = CalDavUtils.getExtIdFromURL(req.getURI());

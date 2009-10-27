@@ -70,19 +70,19 @@ public class WebdavServlet extends HttpServlet {
 	 */
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		IProxy proxy = null;
+		IBackend proxy = null;
 		try {
 			String method = request.getMethod();
 			logger.info("\n[" + method + "] " + request.getRequestURI());
 			DavRequest dr = new DavRequest(request);
 			Token token = authHandler.doAuth(dr);
-			proxy = getProxy();
+			proxy = getBackend();
 
 			if (!proxy.validateToken(token)) {
 				String uri = request.getMethod() + " "
 						+ request.getRequestURI() + " "
 						+ request.getQueryString();
-				logger.debug("invalid auth, sending http 401 (uri: " + uri
+				logger.info("invalid auth, sending http 401 (uri: " + uri
 						+ ")");
 				String s = "Basic realm=\"Obm CalDav\"";
 				response.setHeader("WWW-Authenticate", s);
@@ -115,7 +115,7 @@ public class WebdavServlet extends HttpServlet {
 	}
 	
 	
-	private void appendHearder(HttpServletResponse response, IProxy proxy){
+	private void appendHearder(HttpServletResponse response, IBackend proxy){
 //		head[Content-Length] => 147
 //		head[Date] => Wed, 29 Jul 2009 11:29:03 GMT
 //		head[Expires] => Wed, 29 Jul 2009 11:29:03 GMT
@@ -123,8 +123,9 @@ public class WebdavServlet extends HttpServlet {
 //		head[X-Content-Type-Options] => nosniff
 //		head[DAV] => 1, calendar-access, calendar-schedule, calendar-proxy
 //		head[ETag] => "14F6F6-1000-4A7061DA"
-		response.setHeader("DAV", "1, calendar-access, calendar-schedule, calendar-proxy");
-		response.setHeader("Cache-Control", "private, max-age=0");
+		response.addHeader("Allow", "OPTIONS, PROPFIND, HEAD, GET, REPORT, PROPPATCH, PUT, DELETE, POST");
+		response.addHeader("DAV", "1, calendar-access, calendar-schedule, calendar-proxy, calendar-auto-schedule");
+		response.addHeader("Cache-Control", "private, max-age=0");
 		if(proxy != null){
 			try {
 				response.setHeader("ETag", proxy.getETag());
@@ -132,10 +133,10 @@ public class WebdavServlet extends HttpServlet {
 		}
 	}
 
-	private IProxy getProxy() throws CoreException {
+	private IBackend getBackend() throws CoreException {
 		IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
 		IExtensionPoint extPoint = extensionRegistry
-				.getExtensionPoint("org.obm.caldav.server.proxy");
+				.getExtensionPoint("org.obm.caldav.server.backend");
 		IConfigurationElement[] configurationElements = extPoint
 				.getConfigurationElements();
 
@@ -147,7 +148,7 @@ public class WebdavServlet extends HttpServlet {
 						+ current.getAttribute(currentAttributeName));
 			}
 		}
-		return (IProxy) configurationElements[0]
+		return (IBackend) configurationElements[0]
 				.createExecutableExtension("IProxy");
 	}
 

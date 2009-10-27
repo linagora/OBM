@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.exception.ResultBuilderException;
@@ -58,7 +58,7 @@ public abstract class DavMethodHandler {
 		return toLoad;
 	}
 
-	public abstract void process(Token token,IProxy proxy, DavRequest req, HttpServletResponse resp) throws Exception;
+	public abstract void process(Token token,IBackend proxy, DavRequest req, HttpServletResponse resp) throws Exception;
 	
 	public void sendDom(Document doc, HttpServletResponse resp) throws ResultBuilderException{
 		resp.setContentType("text/xml; charset=utf-8");

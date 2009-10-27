@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
@@ -34,7 +34,7 @@ public class PropertyListBuilder extends ResultBuilder {
 
 	public Document build(Token t, DavRequest req, Set<String> urls,
 			Set<PropfindPropertyHandler> toLoad, Set<Element> notUsed,
-			IProxy proxy) {
+			IBackend proxy) {
 		try {
 
 			Document ret = createDocument();

@@ -16,7 +16,7 @@
 
 package org.obm.caldav.server.propertyHandler.impl;
 
-import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
@@ -73,7 +73,7 @@ public class SupportedCalendarComponentSet extends DavPropertyHandler implements
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IProxy proxy, String url) {
+			IBackend proxy, String url) {
 		Element elem = appendElement(prop, "supported-calendar-component-set", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
 		appendElement(elem, "comp", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX).setAttribute("name", "VEVENT");
 		appendElement(elem, "comp", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX).setAttribute("name", "VTODO");

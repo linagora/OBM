@@ -14,14 +14,20 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server.propertyHandler;
+package org.obm.caldav.server;
 
-import org.obm.caldav.server.IBackend;
-import org.obm.caldav.server.exception.AppendPropertyException;
-import org.obm.sync.calendar.Event;
-import org.w3c.dom.Element;
+import org.obm.caldav.server.share.Token;
 
-public interface CalendarMultiGetPropertyHandler {
-	public void appendCalendarMultiGetPropertyValue(Element prop, IBackend proxy,
-			Event event, String eventICS) throws AppendPropertyException;
+public interface IBackend {
+
+	ICalendarService getCalendarService();
+
+	boolean validateToken(Token token) throws Exception;
+
+	void login(Token token);
+
+	void logout();
+	
+	String getETag() throws Exception ;
+
 }
