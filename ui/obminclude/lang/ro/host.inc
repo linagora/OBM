@@ -186,12 +186,13 @@
 // Modified on 2009-09-23T17:27:34+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-23T17:30:38+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-23T17:30:41+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-27T18:15:57+01:00 using OBMtranslation (0.4.1)
 
 $l_smb = "Windows";
 $l_smb_only = "Doar Windows.";
 $l_host_select_user = "Alegerea utilizatorului calculatorului";
 $l_user = "Utilizator";
-$l_web = "Acces Internet"; 
+$l_web = "Acces Internet";
 $l_web_mode = "Acces web autorizat";
 $l_web_list = "Listă de acces";
 $l_web_all = "Totul în afară de listă";
@@ -234,4 +235,7 @@ $l_obm_sync = "OBM Sync";
 $l_monitor = "Monitorizare";
 $l_fqdn = "Numele complet al calculatorului";
 $l_err_host_fqdn = "Numele complet al calculatorului este incorect (numecalculator.nume.domeniu)";
+
+// lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00
+$l_obm_solr = ""; 
 

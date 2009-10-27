@@ -30,15 +30,16 @@
 // Modified on 2009-09-23T13:35:36+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-23T13:37:46+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-23T13:37:48+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-27T18:15:57+01:00 using OBMtranslation (0.4.1)
 
 $l_domain_name = "Nume de domeniu";
 $l_alias = "Alias";
 $l_mail_server = "Alegeți serverul mail";
 $l_mail_servers = "Server mail";
 $l_sync_servers = "Servere de sincronizare";
-$l_update_state = "Statutul actualizării"; 
-$l_mailboxchoice_least_boxes = "gestionând cât mai puține căsuțe poștale"; 
-$l_mailboxchoice_least_used_memory = "folosind cât mai puțină memorie "; 
+$l_update_state = "Statutul actualizării";
+$l_mailboxchoice_least_boxes = "gestionând cât mai puține căsuțe poștale";
+$l_mailboxchoice_least_used_memory = "folosind cât mai puțină memorie ";
 $l_insert = "Introduceți domeniul";
 $l_update = "Actualizare domeniu";
 $l_delete = "Ștergeți Domeniul";
@@ -66,7 +67,7 @@ $l_link_host = "Domeniul are hosturi";
 $l_link_host_no = "Domeniul nu are Hosturi";
 $l_link_user_mailserver = "Serverul de mesagerie conține utilizatori de domeniu";
 $l_name_in_use = "Numele de domeniu sau unul dintre alias-uri sunt deja folosite";
-$l_alias_user_used = "Alias-urile adreselor e-mail sunt imposibil de modificat sau de șters "; 
+$l_alias_user_used = "Alias-urile adreselor e-mail sunt imposibil de modificat sau de șters ";
 $l_fill_title = "Introduceți Eticheta înainte de a valida.";
 $l_domain_confirm_delete = "ATENȚIE: Veți șterge profilul: Acestă acțiune este ireversibilă.\\nDoriți să continuați?";
 $l_mailserver = "Server mail";
@@ -90,4 +91,9 @@ $l_samba_domain_used = "Acest nume de domeniu este deja folosit de un alt domeni
 $l_samba_profile_error = "Parcurs predefinit invalid al profilului, trebuie să fie de tipul \\\\calculator\\parcurs\profil";
 $l_samba_home_error = "Parcurs predefinit invalid al fișierului Home al utilizatorului";
 $l_samba_drive_error = "Driver predefinit invalid al fișierelor Home ale utilizatorilor";
+
+// lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00
+$l_solrserver_warn = "Creaţi un host de acest fel"; 
+$l_obm_solr = ""; 
+$l_solr_servers = "Server de indexare"; 
 

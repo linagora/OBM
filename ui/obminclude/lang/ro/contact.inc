@@ -192,6 +192,7 @@
 // Modified on 2009-09-24T09:58:28+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-24T09:58:30+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-24T10:01:31+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-27T18:15:57+01:00 using OBMtranslation (0.4.1)
 
 $l_addressbook = "Agendă";
 $l_middlename = "Al doilea prenume";
@@ -299,7 +300,7 @@ $l_timecreate = "Dată de Creare";
 $l_timeupdate = "Dată de actualizare";
 $l_publication_title = "Titlu";
 $l_renewal = "Reînnoire automatică";
-$l_quantity = "Cantitate"; 
+$l_quantity = "Cantitate";
 $l_recept = "Modalitate de primire";
 $l_quantity = "Cantitate";
 $l_quantity = "Cantitate";
@@ -310,4 +311,20 @@ $l_email_labels = array ('INTERNET' => 'Internet', 'OTHER' => 'Altul');
 $l_address_labels = array ('HOME' => 'Domiciliu', 'WORK' => 'Serviciu', 'OTHER' => 'Altul');
 $l_website_labels = array ('URL' => 'Web Site ', 'BLOG' => 'Log internet', 'OTHER' => 'Altul');
 $l_err_length_express_postal = "Câmpul 'Cod Poștal' trebuie să conțină maxim 16 caractere.";
+
+// lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00
+$l_mailok = "Activă pentru recepţionarea de mail-uri"; 
+$l_update_ad = "Modificaţi"; 
+$l_err_length_zipcode = "Câmpul ”Cod Poştal” trebuie să conţină cel mult 14 caractere."; 
+$l_sync_ad = "Deveniţi abonat"; 
+$l_delete_ad = "Ştergeţi"; 
+$l_mname = "Al doilea prenume"; 
+$l_contacts = "Contactele mele"; 
+$l_no_name = "Fără nume"; 
+$l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ'); 
+$l_add_fields = "Adăugaţi câmpurile"; 
+$l_collected_contacts = "Persoane "; 
+$l_desync_ad = "Reziliaţi"; 
+$l_confirm_delete_ad = "Doriţi să ştergeţi agenda"; 
+$l_public_contacts = "Persoane publice"; 
 

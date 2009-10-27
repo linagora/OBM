@@ -142,6 +142,7 @@
 // Modified on 2009-09-23T17:27:34+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-23T17:30:39+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-23T17:30:41+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-27T18:15:57+01:00 using OBMtranslation (0.4.1)
 
 $l_attendees = "Participanți";
 $l_others_attendees = "Alți participanți";
@@ -162,8 +163,8 @@ $l_details = "Consultați";
 $l_private_description = "Acest eveniment este privat. Este imposibil să vizualizați detaliile.";
 $l_high = "Mare";
 $l_low = "Joasă";
-$l_medium = "Normală"; 
-$l_go = "Vizualizați"; 
+$l_medium = "Normală";
+$l_go = "Vizualizați";
 $l_occupied_day = "Toată ziua";
 $l_event_duration = "Durata ședinței";
 $l_repeat = "Repetare";
@@ -273,7 +274,7 @@ $l_view_label = "Numele Temei";
 $l_view_save = "Salvați tema";
 $l_view_delete = "Ștergeți tema";
 $l_ics = "Import";
-$l_ics_insert = "Importați"; 
+$l_ics_insert = "Importați";
 $l_ics_file = "Fișier ICS de importat";
 $l_ics_import_ok = "evenimentele au fost importate.";
 $l_all_calendar = "Toată agenda";
@@ -286,12 +287,12 @@ $l_purge_popup_title = "Eliminarea agendei";
 $l_cal_view = "Tip de afișare";
 $l_cal_range = "Perioadă de vizualizare";
 $l_view_agenda = "Calendar";
-$l_view_planning = "Planificare"; 
+$l_view_planning = "Planificare";
 $l_view_printable = "Versiune de printat";
 $l_view_list = "Lista evenimentelor";
-$l_range_day = "pe zi"; 
-$l_range_week = "pe săptămână"; 
-$l_range_month = "pe lună"; 
+$l_range_day = "pe zi";
+$l_range_week = "pe săptămână";
+$l_range_month = "pe lună";
 $l_view_agenda_desc = "Temă calendar, această temă poate fi editată";
 $l_view_printable_desc = "Temă calendar printabilă, această temă nu poate fi modificată";
 $l_view_planning_desc = "Tema planificării calendarului, această temă nu poate fi editată";
@@ -339,7 +340,7 @@ $l_deny = "&gt;&gt;&gt;&gt;";
 $l_add_event_mail_head = "Eveniment nou în Obm : ";
 $l_update_event_mail_head = "Modificați evenimentul:";
 $l_delete_event_mail_head = "Ștergeți evenimentul : ";
-$l_add_event_mail_subject = "Eveniment nou în OBM : %s"; 
+$l_add_event_mail_subject = "Eveniment nou în OBM : %s";
 $l_update_event_mail_subject = "Modificare eveniment în OBM : %s";
 $l_delete_event_mail_subject = "Ștergere eveniment în OBM : %s";
 $l_update_event_mail_body = "\nÎn loc de :";
@@ -409,4 +410,40 @@ $l_tags = "Etichete";
 $l_tag_management = "Gestiunea Etichetelor";
 $l_tag_fill_label = "Introduceți o etichetă";
 $l_tag_fill_color = "Alegeți o culoare";
+
+// lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00
+$l_needs_action = "În aşteptare"; 
+$l_create_from_template = "Creat după model"; 
+$l_save_as_template = "Salvaţi ca model"; 
+$l_delete_occurrence_message = "Doriţi să ştergeţi doar această rubrică sau toată seria?"; 
+$l_parent_event = "Eveniment principal"; 
+$l_warn_file_upload = "Anumite fişiere nu au putut fi încărcate"; 
+$l_delete_all_occurrences = "Ştergeţi seria"; 
+$l_template_entities_loading_warning = "Anumite elemente salvate nu au putut fi reproduse"; 
+$l_edit_template = "Modificaţi modelul"; 
+$l_duplicate_template = "Copiaţi modelul"; 
+$l_template_name = "Titlul modelului"; 
+$l_show_parent_event = "Consultaţi seria căreia a fost adăugat"; 
+$l_delete_event_message = "Confirmaţi ştergerea acestui eveniment?"; 
+$l_eventexception_moved_to = "deplasat pe %s"; 
+$l_declined = "Refuzat"; 
+$l_delete_occurrence = "Ştergeţi rubrica"; 
+$l_save_template = "Salvaţi modelul"; 
+$l_eventexception_canceled = "anulat"; 
+$l_opacity = "Disponibilitate"; 
+$l_opacity_busy = "indisponibil"; 
+$l_no_template = "Niciun model nu a fost găsit"; 
+$l_event_is_exception = "Acest eveniment a fost modificat si nu parţine niciunei serii"; 
+$l_update_occurrence = "Modificaţi rubrica"; 
+$l_update_event_occurrence = "Modificare unei întâlniri repetate"; 
+$l_update_all_occurrences = "Modificaţi seria"; 
+$l_copy_of = "Copia"; 
+$l_header_templates = "Modele"; 
+$l_opacity_free = "liber"; 
+$l_export_templates = "Exportaţi toate modele"; 
+$l_delete_event_occurrence = "Ştergeţi o întâlnire repetată"; 
+$l_import_template = "Importaţi un model"; 
+$l_template = "Model de eveniment"; 
+$l_attach_documents = "Anexaţi"; 
+$l_update_occurrence_message = "Modificaţi doar această rubrică sau toată seria?"; 
 

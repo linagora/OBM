@@ -132,6 +132,7 @@
 // Modified on 2009-09-24T09:58:29+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-24T09:58:30+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-24T10:01:31+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-27T18:15:57+01:00 using OBMtranslation (0.4.1)
 
 $l_find = "Căutare";
 $l_back = "Revenire";
@@ -167,7 +168,7 @@ $l_date_last_update = "Actualizare";
 $l_delegation = "Delegare";
 $l_print = "Printați";
 $l_transparent = "Transparent";
-$l_select_all = "Selectați tot"; 
+$l_select_all = "Selectați tot";
 $l_generate = "Generați";
 $l_autocomplete_field = "Căutare ...";
 $l_fatal_server_err = "Eroare fatală a sistemului, reîncărcați pagina";
@@ -480,7 +481,7 @@ $l_module_vacation = "Mesaj de răspuns";
 $l_module_mailbox = "Căsuțe poștale";
 $l_module_webmail = "Webmail";
 $l_header_admin = "Admin";
-$l_header_import = "Importați"; 
+$l_header_import = "Importați";
 $l_header_new_f = "Nouă";
 $l_header_new = "Nou";
 $l_header_find = "Căutați";
@@ -491,10 +492,10 @@ $l_header_import = "Importați";
 $l_header_display = "Vizualizare";
 $l_header_consult = "Consultați";
 $l_header_quickupdate = "Actualizare rapidă";
-$l_header_duplicate = "Reproduceți"; 
+$l_header_duplicate = "Reproduceți";
 $l_header_update = "Modificați";
 $l_header_delete = "Ștergeți";
-$l_header_add_contact = "Adăugați contact"; 
+$l_header_add_contact = "Adăugați contact";
 $l_header_add_user = "Adăugați utilizatorii";
 $l_header_add_resource = "Adăugați resursă";
 $l_header_add_group = "Adăugați grupul";
@@ -601,4 +602,29 @@ $l_dg_sql = "SQL";
 $l_dg_exe = "Exec";
 $l_all_aliases = "Toate alias-urile";
 $l_timezone = "Fus orar";
+
+// lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00
+$l_ok = "Ok"; 
+$l_import_ok = "Import reuşit"; 
+$l_search_results = "Rezultatele căutării"; 
+$l_duplicate_ok = "Copie efectuată"; 
+$l_mobile_add_partnership = "Adăugaţi un parteneriat"; 
+$l_header_select_solrserver = "Selectaţi serverul Solr"; 
+$l_mobile_identifier = "Identificator"; 
+$l_save = "Salvaţi"; 
+$l_import_error = "Eroare de import"; 
+$l_public_contacts = "Persoane publice"; 
+$l_planning = "Planificare"; 
+$l_collected_contacts = "Persoane"; 
+$l_mobile_remove_partnership = "Ştergeţi parteneriatul"; 
+$l_mobile_devices = "Dispozitive telefon"; 
+$l_dg_solr = "Solr"; 
+$l_addressbook = "Agendă"; 
+$l_last_sync = "Ultima sincronizare"; 
+$l_first_sync = "Prima sincronizare"; 
+$l_module_admin_device = "Gestionarea dispozitivelor de telefon"; 
+$l_module_planning = "Planificare"; 
+$l_module_device = "Dispozitive de telefon"; 
+$l_solr_connection_err = "Eroare înregistrată în timpul conexiunii la serverul de indexare"; 
+$l_duplicate_error = "Eroare copie"; 
 
