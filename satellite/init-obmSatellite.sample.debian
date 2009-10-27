@@ -94,6 +94,18 @@ do_reload() {
 	return 0
 }
 
+do_status() {
+  PID=$(cat $PIDFILE)
+  if [ -n $PID ]; then
+    log_success_msg "ObmSatellite is running (pid $PID)."
+    exit 0
+  else
+    log_failure_msg "ObmSatellite i not running."
+    exit 1
+  fi
+
+}
+
 case "$1" in
   start)
 	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
@@ -120,6 +132,9 @@ case "$1" in
 	#do_reload
 	#log_end_msg $?
 	#;;
+  status)
+        do_status
+        ;;
   restart|force-reload)
 	#
 	# If the "reload" option is implemented then remove the
@@ -144,7 +159,7 @@ case "$1" in
 	;;
   *)
 	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
-	echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
 	exit 3
 	;;
 esac
