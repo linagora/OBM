@@ -307,10 +307,16 @@ Obm.Drag = new Class ({
 
   options: {
     overflow:false,
-    units: {'x':'px', 'y':'px'}
+    units: {'x':'px', 'y':'px'},
+    initialWidth: false
   },
 
   start: function(event){
+
+    if (this.options.initialWidth) {
+      this.element.style.width = this.options.initialWidth;
+    }
+
     this.parent(event);
 
     this.pixelUnitSize = new Object();

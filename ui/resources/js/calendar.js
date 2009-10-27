@@ -1364,7 +1364,8 @@ Obm.CalendarAllDayEvent = new Class({
       preventDefault: true,
       units: {'x':'%', 'y':'px'},
       grid: {'x':obm.vars.consts.cellWidth, 'y': 0},
-      container: $('calendarHeaderGrid')
+      container: $('calendarHeaderGrid'),
+      initialWidth: obm.vars.consts.cellWidth+'%'
     };
 
     this.drag = new Obm.Drag(this.element, dragOptions);
