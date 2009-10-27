@@ -286,14 +286,14 @@ ALTER TABLE TaskType ADD
 
 
 CREATE TABLE opush_device (
-       id 		SERIAL PRIMARY KEY,
+       id 		INT(8) NOT NULL AUTO_INCREMENT PRIMARY KEY,
        identifier 	VARCHAR(255) NOT NULL,
        owner		INTEGER REFERENCES userobm(userobm_id) ON DELETE CASCADE,
        type		VARCHAR(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE opush_folder_mapping (
-       id		SERIAL PRIMARY KEY,
+       id		INT(8) NOT NULL AUTO_INCREMENT PRIMARY KEY,
        device_id	INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
        collection	VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -309,7 +309,7 @@ ALTER TABLE opush_sync_state ADD CONSTRAINT
 unique_opush_col_dev UNIQUE (collection_id, device_id);
 
 CREATE TABLE opush_sec_policy (
-       id				SERIAL PRIMARY KEY,
+       id				INT(8) NOT NULL AUTO_INCREMENT PRIMARY KEY,
        device_password_enabled		BOOLEAN DEFAULT FALSE
        -- add other fields fields...
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
