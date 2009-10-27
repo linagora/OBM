@@ -95,12 +95,18 @@ do_reload() {
 }
 
 do_status() {
-  PID=$(cat $PIDFILE)
+  if [ -e $PIDFILE ]; then
+    PID=$(cat $PIDFILE)
+  else
+    log_failure_msg "ObmSatellite is not running."
+    exit 1
+  fi
+
   if [ -n $PID ]; then
     log_success_msg "ObmSatellite is running (pid $PID)."
     exit 0
   else
-    log_failure_msg "ObmSatellite i not running."
+    log_failure_msg "ObmSatellite is not running."
     exit 1
   fi
 
