@@ -766,7 +766,16 @@ Obm.CalendarManager = new Class({
       showOkMessage(response.message);
 
       var evtModel = events[0].event;
-      var str = response.elementId.split('_');          
+      var str = response.elementId.split('_');        
+
+      // Remove event extensions  
+      $$('div.'+response.elementId).each(function(e) {
+        var ext = obm.calendarManager.events.get(e.id);
+        obm.calendarManager.unregister(ext);
+        obm.calendarManager.events.erase(ext.element.id);
+        ext.element.destroy();
+        delete ext;
+      });
 
       if (response.isPeriodic && response.all) { 
         // Update all occurrences(only title & duration)
