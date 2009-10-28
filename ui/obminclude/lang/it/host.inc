@@ -186,6 +186,7 @@
 // Modified on 2009-09-16T18:12:04+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-16T18:12:39+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-16T18:22:04+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-28T10:03:12+01:00 using OBMtranslation (0.4.1)
 
 $l_web_all = "Tutto senza lista";
 $l_ftp = "Accesso FTP";
@@ -193,7 +194,7 @@ $l_insert_ok = "l'Host è stato inserito correttamente.";
 $l_obm_sync = "OBM Sync";
 $l_user = "Utente";
 $l_web_list = "Lista di accesso";
-$l_web_list_only = "Solo lista"; 
+$l_web_list_only = "Solo lista";
 $l_host_display = "Opzioni visualizzazione dell'elenco Host";
 $l_clear = "Cancella";
 $l_delete_error = "Eliminazione host fallita!";
@@ -234,4 +235,7 @@ $l_update_error = "Modifica Host fallita!";
 $l_web_access = "Accesso Internet";
 $l_restrict = "restrizione";
 $l_can_delete = "L'Host può essere eliminato";
+
+// lines below have been created with OBMtranslation (0.4.1) on 2009-10-28T10:03:12+01:00
+$l_obm_solr = "Solr"; 
 

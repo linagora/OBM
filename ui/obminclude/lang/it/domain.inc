@@ -65,6 +65,8 @@
 // Modified on 2009-09-17T15:00:43+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-17T15:03:14+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-17T15:06:26+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-28T10:03:12+01:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-28T14:28:06+01:00 using OBMtranslation (0.4.1)
 
 $l_mail_server = "Scelta server mail";
 $l_update = "Aggiornamento dominio";
@@ -103,7 +105,7 @@ $l_mailboxchoice_least_boxes = "Gestione di meno caselle di posta";
 $l_label_error = "Etichetta non valida!";
 $l_cant_delete = "Il dominio non può essere eliminato!";
 $l_samba_domain = "Nome di dominio windows";
-$l_samba_profile = "Percorso di default del profillo"; 
+$l_samba_profile = "Percorso di default del profillo";
 $l_update_state = "Stato di aggiornamento";
 $l_insert = "Inserisci dominio";
 $l_no_display = "Riempi i campi di ricerca e premi < Cerca > per ottenere l'elenco dei domini.";
@@ -125,4 +127,7 @@ $l_samba_domain_error = "Nome di dominio windows non valido";
 $l_can_delete = "Il dominio può essere eliminato.";
 $l_max_resources = "# risorse max";
 $l_mailserver = "Server di posta";
+$l_solrserver_warn = "Crea un host di questo tipo"; 
+$l_obm_solr = "Solr"; 
+$l_solr_servers = "Server di indicizzazione"; 
 

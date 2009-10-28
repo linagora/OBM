@@ -225,6 +225,7 @@
 // Modified on 2009-09-17T15:00:42+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-17T15:03:14+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-17T15:06:26+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-28T10:03:12+01:00 using OBMtranslation (0.4.1)
 
 $l_market = "Responsabile";
 $l_function = "Funzione";
@@ -233,13 +234,13 @@ $l_minihphone = "(Casa)";
 $l_mphone = "Cell.";
 $l_minimphone = "(Minitel)";
 $l_email = "E-Mail";
-$l_mailing_ok = "Posta abilitata"; 
+$l_mailing_ok = "Posta abilitata";
 $l_newsletter = "Newsletter";
 $l_news = "News";
 $l_contact_name = "Nome Contatto";
 $l_from_company = "Azienda";
 $l_telother = "Altro Tel";
-$l_contact_select_company = "Scegli l'azienda del Contatto."; 
+$l_contact_select_company = "Scegli l'azienda del Contatto.";
 $l_insert = "Inserisci Contatto ";
 $l_update = "Modifica Contatto";
 $l_checkdelete = "Verifica o Elimina il Contatto";
@@ -247,17 +248,17 @@ $l_delete = "Elimina Contatto";
 $l_copy = "Copia";
 $l_check_samecontact = "Questi contatti sembrano simili al nuovo inserito!";
 $l_link_deal = "Questo contatto ha impegni in corso";
-$l_link_deal_no = "Il contatto non ha affari."; 
+$l_link_deal_no = "Il contatto non ha affari.";
 $l_link_contract = "Questo contatto ha contratti in corso";
 $l_link_contract_no = "Il contatto non ha contratti";
 $l_link_list = "Il contatto è registrato in queste liste";
 $l_link_list_no = "Il Contatto non è registrato in nessuna lista";
-$l_link_publication = "Il contatto ha pubblicazioni"; 
-$l_link_publication_no = "Il Contatto non ha publicazioni"; 
+$l_link_publication = "Il contatto ha pubblicazioni";
+$l_link_publication_no = "Il Contatto non ha publicazioni";
 $l_cant_delete = "Il contatto non può essere eliminato !";
 $l_can_delete = "Il contatto può essere eliminato.";
 $l_no_display = "Riempi i campi di ricerca e premi <Cerca> per ottenere l'elenco di contatti.";
-$l_found = "Contatti trovati."; 
+$l_found = "Contatti trovati.";
 $l_no_found = "Non sono stati trovati contatti!";
 $l_fill_lastname = "Inserisci prima il Cognome.";
 $l_fill_company = "Scegli un'Azienda prima di proseguire.";
@@ -269,7 +270,7 @@ $l_j_check_hphone = "Numero di telefono privato non valido.";
 $l_j_check_mphone = "Numero cellulare non valido.";
 $l_j_check_fax = "Numero fax non valido.";
 $l_j_check_email = "Indirizzo email non valido. Controlla il dominio.";
-$l_contact_display = "Opzioni di visualizzazione dell'elenco contatti"; 
+$l_contact_display = "Opzioni di visualizzazione dell'elenco contatti";
 $l_date = "Data";
 $l_suffix = "Suffisso";
 $l_timeupdate = "Data aggiornamento";
@@ -343,4 +344,20 @@ $l_add_comment3 = "Aggiungi un commento 3";
 $l_birthday = "Data di nascita";
 $l_kind_cant_delete = "Il genere non può essere eliminato!";
 $l_renewal = "Rinnovamento automatico";
+
+// lines below have been created with OBMtranslation (0.4.1) on 2009-10-28T10:03:12+01:00
+$l_mailok = "Attivata per la ricezione di mail"; 
+$l_update_ad = "Modifica"; 
+$l_err_length_zipcode = "Il campo \"Codice postale\" deve contenere al massimo 14 caratteri."; 
+$l_sync_ad = "Abbonarsi"; 
+$l_delete_ad = "Cancellare"; 
+$l_mname = "Secondo nome"; 
+$l_contacts = "Contatti"; 
+$l_no_name = "Senza nome"; 
+$l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ'); 
+$l_add_fields = "Aggiungi i campi"; 
+$l_collected_contacts = "Contatti raccolti"; 
+$l_desync_ad = "Desabbonarsi"; 
+$l_confirm_delete_ad = "Vuoi cancellare i contatti?"; 
+$l_public_contacts = "Contatti pubblici"; 
 

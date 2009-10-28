@@ -81,6 +81,8 @@
 // Modified on 2009-09-23T17:27:33+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-23T17:30:38+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-23T17:30:40+02:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-28T10:03:12+01:00 using OBMtranslation (0.4.1)
+// Modified on 2009-10-28T14:28:06+01:00 using OBMtranslation (0.4.1)
 
 $l_find = "Cerca";
 $l_back = "Indietro";
@@ -215,7 +217,7 @@ $l_projects = "Progetti";
 $l_contract = "Contratto";
 $l_incident = "Incidente";
 $l_document = "Documento";
-$l_account = "Conto"; 
+$l_account = "Conto";
 $l_invoice = "Fattura";
 $l_payment = "Pagamento";
 $l_user = "Utente";
@@ -283,7 +285,7 @@ $l_module_admin_pref = "Preferenze";
 $l_module_admin_code = "Codice";
 $l_module_admin_ref = "Referenze";
 $l_module_computer = "Computer";
-$l_module_account = "Conto"; 
+$l_module_account = "Conto";
 $l_module_invoice = "Fatture";
 $l_module_payment = "Pagamenti";
 $l_module_time = "Gestione Tempo";
@@ -550,4 +552,27 @@ $l_invalid_email = "Email invalido";
 $l_module_mailbox = "Casella di posta";
 $l_header_monthlyview = "Mese";
 $l_calendar = "Calendario";
+$l_ok = "Ok"; 
+$l_import_ok = "Importo effettuato"; 
+$l_search_results = "Risultati della ricerca"; 
+$l_duplicate_ok = "Copia effettuata"; 
+$l_mobile_add_partnership = "Aggiungi associazione "; 
+$l_header_select_solrserver = "Selezione del server Solr"; 
+$l_mobile_identifier = "username"; 
+$l_save = "Salva"; 
+$l_import_error = "Errore durante l'importo"; 
+$l_public_contacts = "Contatti publici"; 
+$l_planning = "Pianificazione"; 
+$l_collected_contacts = "Contatti"; 
+$l_mobile_remove_partnership = "Cancella associazione"; 
+$l_mobile_devices = "Periferiche cellulare"; 
+$l_dg_solr = "Solr"; 
+$l_addressbook = "Contatti"; 
+$l_last_sync = "Ultima sincronizzazione "; 
+$l_first_sync = "Prima sincronizzazione"; 
+$l_module_admin_device = "Gestione delle periferice per i cellulari"; 
+$l_module_planning = "Pianificazione"; 
+$l_module_device = "Periferice cellulari"; 
+$l_solr_connection_err = "Errore durante la connessione con il server di indicizzazione "; 
+$l_duplicate_error = "Errore copia"; 
 
