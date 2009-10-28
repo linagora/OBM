@@ -5294,7 +5294,6 @@ Class CalendarView {
 
   public function set_label($label) {
     $this->label = $label;
-    $this->modify();
   }
 
   public function set_date($date) {
