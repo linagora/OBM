@@ -761,56 +761,18 @@ Obm.CalendarManager = new Class({
       resp.error = 1;
       resp.message = obm.vars.labels.fatalServerErr;
     }
-    var events = response.eventsData;
     if (response.error == 0) {
       showOkMessage(response.message);
-
-      var evtModel = events[0].event;
-      var str = response.elementId.split('_');        
-
-      // Remove event extensions  
-      $$('div.'+response.elementId).each(function(e) {
+      $$('div.evt_'+response.eventId).each(function(e) {
         var ext = obm.calendarManager.events.get(e.id);
         obm.calendarManager.unregister(ext);
         obm.calendarManager.events.erase(ext.element.id);
         ext.element.destroy();
         delete ext;
       });
-
-      if (response.isPeriodic && response.all) { 
-        // Update all occurrences(only title & duration)
-        $$('div.evt_'+str[1]).each(function(e) {
-          var evt = obm.calendarManager.events.get(e.id);
-          try {
-            obm.calendarManager.unregister(evt);
-            obm.calendarManager.events.erase(evt.element.id);
-          } catch(e) {}
-          evt.event.title = evtModel.title;
-          evt.event.location = evtModel.location;
-          evt.event.duration = evtModel.duration;
-          evt.setTitle();
-          obm.calendarManager.register(evt);
-        });
-      } else { 
-        events.each(function(e) {
-          var ivent = e.event;
-          var id = str[0]+'_'+str[1] +'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
-          var evt = obm.calendarManager.events.get(id);
-          ivent.meeting = evt.event.meeting;
-          ivent.periodic = evt.event.periodic;
-          ivent.location = evt.event.location;
-          try {
-            obm.calendarManager.unregister(evt);
-          } catch(e) {}
-          obm.calendarManager.events.erase(evt.element.id);
-          evt.element.destroy();
-          if (evt.kind == 'all_day') {
-            obm.calendarManager.newDayEvent(ivent, e.options);
-          } else {
-            obm.calendarManager.newEvent(ivent, e.options);
-          }
-        });
-      }
+      response.events.each(function(evt) {
+        eval(evt);
+      });
     } else {
       showErrorMessage(response.message);
       // TODO: redraw event

@@ -5741,6 +5741,52 @@ function json_tag_search($tags_q) {
   return "[".$json_tags."]" ;
 }
 
+
+/**
+ * Build html event 
+ */
+function json_build_html_event($calendar, $current_view, $id) {
+  global $display;
+
+  $status = array('NEEDS-ACTION', 'ACCEPTED');
+  $calendar_entity = $current_view->get_entities();
+  $category_filter = $current_view->get_category_filter();
+  $unit = "hour";
+  if ($current_view->get_cal_range() == "month") $unit = "day";
+  $date = $current_view->get_date_range();
+  $begin = $date['begin'];
+  $end = $date['end'];
+
+  calendar_events_model($begin,$end,$calendar_entity, $status, $category_filter);
+  $of = &OccurrenceFactory::getInstance();
+  $occurrences = $of->getOccurrences();
+  if (is_array($occurrences)) {
+    foreach($occurrences as $occurrence) {
+      if ($occurrence->event->id == $id) {
+        if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
+        $occurrence->index = $occurrence->date;
+        $occurrence->left = false;
+        $occurrence->right = false;
+
+        // Left extension
+        if ($occurrence->index->compare($begin) < 0) {
+           $occurrence->index = $begin;
+           $occurrence->left = true;
+        }
+        if ($occurrence->end->compare($end) > 0) {
+           $occurrence->right = true;
+        }
+
+        $dis_events[] = "'".phpStringToJsString(dis_calendar_event($occurrence, $unit, $calendar_entity, $writable_entity))."'";
+      }
+    }
+  }
+
+  $display['json'] =  "eventId:$id, events:[".implode(',', $dis_events)."]";
+
+}
+
+
 /**
  * Build a JSON message with all the event data
  * the respone is a table of event objects.

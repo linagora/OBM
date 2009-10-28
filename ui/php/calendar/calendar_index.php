@@ -423,7 +423,7 @@ if ($action == 'search') {
       } else {
         $id = run_query_calendar_event_exception_insert($params,$eve_q);
       }
-      json_event_data($id, $params, $current_view);
+      json_build_html_event($params, $current_view, $id);
       json_ok_msg("$l_event : $l_update_ok");
       echo "({".$display['json']."})";
       exit();

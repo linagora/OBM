@@ -5216,6 +5216,33 @@ Class CalendarView {
   }
 
   /**
+   * get the date range
+   *
+   * @access public
+   * @return array
+   */
+  public function get_date_range() {
+    if ($this->cal_range == "day") {
+      $begin = clone $this->get_date();
+      $begin->setHour(0)->setMinute(0)->setSecond(0);
+      $end = clone $begin;
+      $end->addDay(1);
+    } else if ($this->cal_range == "week") {
+      $begin = clone $this->get_date();
+      $begin->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+      $end = clone $begin;
+      $end->addDay(7);
+    } else if ($this->cal_range == "month") {
+      $begin = clone $this->get_date();
+      $begin->setDay(1)->addDay(1)->subWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+      $end = clone $this->get_date();
+      $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+    }
+
+    return array('begin' => $begin, 'end' => $end);
+  }
+
+  /**
    * get the selected cal_view
    * 
    * @access public
@@ -5302,17 +5329,14 @@ Class CalendarView {
 
   public function set_cal_range($cal_range = null) {
     $this->cal_range = (empty($cal_range) ? 'week' : $cal_range);
-    $this->modify();
   }
 
   public function set_cal_view($cal_view = null) {
     $this->cal_view = (empty($cal_view) ? 'agenda' : $cal_view);
-    $this->modify();
   }
 
   public function set_category($category = null) {
     $this->category = (empty($category) ? $GLOBALS['c_all'] : $category);
-    $this->modify();
   }
 
   public function set_group($group_id) {
@@ -5323,7 +5347,6 @@ Class CalendarView {
       }
       $this->set_users(of_usergroup_get_group_users($this->group));
     }
-    $this->modify();
   }
 
   public function set_users($user_ids) {
@@ -5361,7 +5384,6 @@ Class CalendarView {
     if (!in_array($user_id,$this->users)) {
       $this->users[] = $user_id;
       $this->set_class('user',$user_id,($user_id==$obm['uid'] ? 'eventOwner' : $this->generate_class()));
-      $this->modify();
     }
   }
 
@@ -5369,7 +5391,6 @@ Class CalendarView {
     if (!in_array($resource_id,$this->resources)) {
       $this->resources[] = $resource_id;
       $this->set_class('resource',$resource_id,$this->generate_class());
-      $this->modify();
     }
   }
 
@@ -5383,7 +5404,6 @@ Class CalendarView {
       $class=$this->generate_class();
     }
     $this->set_class('user',$user_id,$class);
-    $this->modify();
   }
 
   public function set_resource_class($resource_id, $class = null) {
@@ -5394,7 +5414,6 @@ Class CalendarView {
       $class=$this->generate_class();
     }
     $this->set_class('resource',$resource_id,$class);
-    $this->modify();
   }
 
   public function set_entity_class($entity, $entity_id, $class = null) {
@@ -5406,7 +5425,6 @@ Class CalendarView {
     $this->users = array_diff($this->users,array($user_id));
     if (count($this->users)<$old_count)
       $this->remove_class('user',$user_id);
-    $this->modify();
   }
 
   public function remove_resource($resource_id) {
@@ -5414,7 +5432,6 @@ Class CalendarView {
     $this->resources = array_diff($this->resources,array($resource_id));
     if (count($this->resources)<$old_count)
       $this->remove_class('resource',$resource_id);
-    $this->modify();
   }
 
   public function remove_all() {
@@ -5422,7 +5439,6 @@ Class CalendarView {
     $this->users = array();
     $this->resources = array();
     $this->init_classes();
-    $this->modify();
   }
 
   public function init_classes() {
