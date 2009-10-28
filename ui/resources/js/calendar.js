@@ -762,17 +762,22 @@ Obm.CalendarManager = new Class({
       resp.message = obm.vars.labels.fatalServerErr;
     }
     if (response.error == 0) {
-      showOkMessage(response.message);
       $$('div.evt_'+response.eventId).each(function(e) {
         var ext = obm.calendarManager.events.get(e.id);
-        obm.calendarManager.unregister(ext);
+        try {
+          obm.calendarManager.unregister(ext);
+        } catch (e) {}
         obm.calendarManager.events.erase(ext.element.id);
-        ext.element.destroy();
+        e.destroy();
         delete ext;
       });
+
       response.events.each(function(evt) {
         eval(evt);
       });
+
+      showOkMessage(response.message);
+
     } else {
       showErrorMessage(response.message);
       // TODO: redraw event

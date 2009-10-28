@@ -5753,9 +5753,14 @@ function json_build_html_event($calendar, $current_view, $id) {
   $category_filter = $current_view->get_category_filter();
   $unit = "hour";
   if ($current_view->get_cal_range() == "month") $unit = "day";
-  $date = $current_view->get_date_range();
-  $begin = $date['begin'];
-  $end = $date['end'];
+  if ($calendar['periodic']) {
+    $date = $current_view->get_date_range();
+    $begin = $date['begin'];
+    $end = $date['end'];
+  } else {
+    $begin = $calendar['date_begin'];
+    $end = $calendar['date_end'];
+  }
 
   calendar_events_model($begin,$end,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
