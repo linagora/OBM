@@ -359,10 +359,16 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field='') {
 
     $right_manager = "
       <fieldset class=\"detail extra\">
-      <legend>$l_admin_permission : <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" /></legend>
-      <input type=\"hidden\" name=\"sel_accept_admin[]\" value=\"data-user-$obm[uid]\" />
-      <div id=\"sel_accept_admin\">     
-      </div>
+      <legend>$l_admin_permission</legend>
+      <table>
+        <th class=\"$class[name]\">$l_admin_permission</th>
+        <td>
+          <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
+          <input type=\"hidden\" name=\"sel_accept_admin[]\" value=\"data-user-$obm[uid]\" />
+          <div id=\"sel_accept_admin\">     
+          </div>
+        </td>
+      </table>
       </fieldset>";
     $js = "
     <script type=\"text/javascript\">
