@@ -342,8 +342,7 @@ function html_host_consult($host_q) {
   global $l_yes, $l_no, $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;
   global $l_perms, $l_enable, $l_disable, $l_empty, $l_not_assigned;
   global $l_user, $l_fqdn, $l_system, $l_help_system,$l_domain;
-  global $l_module_monitoring, $ico_day_view_current;
-  global $ico_week_view_current, $ico_month_view_current, $ico_year_view_current;
+  global $l_module_monitoring, $l_day, $l_week, $l_month, $l_year;
 
   // Check if domain is a samba domain
   $samba_domain = false;
@@ -461,16 +460,16 @@ function html_host_consult($host_q) {
      <h1>$l_module_monitoring</h1>
       <div id=\"menuDay\" >
         <a href=# title='day'>
-          <img src=\"$ico_day_view_current\" />
+          ".$l_day."
         </a>
         <a href=# title='week'>
-          <img src=\"$ico_week_view_current\" />
+          ".$l_week."
         </a>
         <a href=# title='month'>
-          <img src=\"$ico_month_view_current\" />
+          ".$l_month."
         </a>
         <a href=# title='year'>
-          <img src=\"$ico_year_view_current\" />
+          ".$l_year."
         </a>
       </div> 
       ".$block_stat_menu."
