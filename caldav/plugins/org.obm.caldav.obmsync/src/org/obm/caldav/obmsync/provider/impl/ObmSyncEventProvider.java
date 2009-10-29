@@ -73,6 +73,11 @@ public class ObmSyncEventProvider extends AbstractObmSyncProvider  {
 
 	@Override
 	protected AbstractEventSyncClient getClient(String loginAtDomain) {
-		return new CalendarClient(getObmSyncUrl(loginAtDomain));
+		try {
+			return new CalendarClient(getObmSyncUrl(loginAtDomain));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
 	}
 }

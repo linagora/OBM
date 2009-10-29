@@ -3,7 +3,7 @@
 <schema targetNamespace="org.obm.caldav.server" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.obm.caldav.server" id="org.obm.caldav.server.proxy" name="proxy"/>
+         <meta.schema plugin="org.obm.caldav.server" id="org.obm.caldav.server.backend" name="backend"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="proxy"/>
+            <element ref="backend"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,15 +47,15 @@
       </complexType>
    </element>
 
-   <element name="proxy">
+   <element name="backend">
       <complexType>
-         <attribute name="IProxy" type="string" use="required">
+         <attribute name="implementation" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  Loads a caldav backend in the sync engine
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.obm.caldav.server.IProxy"/>
+                  <meta.attribute kind="java" basedOn=":org.obm.caldav.server.IBackendFactory"/>
                </appinfo>
             </annotation>
          </attribute>

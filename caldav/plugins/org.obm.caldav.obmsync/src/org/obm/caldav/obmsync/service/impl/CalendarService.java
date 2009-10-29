@@ -19,6 +19,7 @@ package org.obm.caldav.obmsync.service.impl;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,8 @@ import org.obm.caldav.obmsync.provider.ICalendarProvider;
 import org.obm.caldav.obmsync.provider.impl.ObmSyncEventProvider;
 import org.obm.caldav.obmsync.provider.impl.ObmSyncTodoProvider;
 import org.obm.caldav.server.ICalendarService;
+import org.obm.caldav.server.exception.AuthenticationException;
+import org.obm.caldav.server.share.DavComponentName;
 import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.utils.Constants;
 import org.obm.sync.auth.AccessToken;
@@ -39,71 +42,75 @@ import org.obm.sync.items.EventChanges;
 
 public class CalendarService implements ICalendarService{
 
-	private ICalendarProvider providerEvent;
-	private ICalendarProvider providerTodo;
+	private Map<DavComponentName, ICalendarProvider> providers;
 	private AccessToken token;
 	private String calendar;
-	private String userEmail;
+	private String loginAtDomaine;
 	
-	public CalendarService(AccessToken token, String calendar, String userEmail) {
-		this.providerEvent = ObmSyncEventProvider.getInstance();
-		this.providerTodo = ObmSyncTodoProvider.getInstance();
-		this.token = token;
-		this.calendar = calendar;
-		this.userEmail = userEmail;
+	public CalendarService() {
+		this.providers = new HashMap<DavComponentName, ICalendarProvider>();
+		this.providers.put(DavComponentName.VCALENDAR, ObmSyncEventProvider.getInstance());
+		this.providers.put(DavComponentName.VEVENT, ObmSyncEventProvider.getInstance());
+		this.providers.put(DavComponentName.VTODO, ObmSyncTodoProvider.getInstance());
 	}
-
+	
 	public Event getEventFromExtId(String externalUID) throws AuthFault,
 			ServerFault {
-		return providerEvent.getEventFromExtId(token, calendar, externalUID);
+		return getVCalendarProvider().getEventFromExtId(token, calendar, externalUID);
 	}
 	
 	public List<Event> updateOrCreateEvent(String ics, String extId)  throws Exception {
-		Event event = providerEvent.getEventFromExtId(token, calendar, extId);
+		Event event = getVCalendarProvider().getEventFromExtId(token, calendar, extId);
 		if (event != null) {
-			return providerEvent.updateEventFromICS(token, calendar, ics, event);
+			return getVCalendarProvider().updateEventFromICS(token, calendar, ics, event);
 		} else {
-			return providerEvent.createEventsFromICS(token, calendar, ics, extId);
+			return getVCalendarProvider().createEventsFromICS(token, calendar, ics, extId);
 		}
 	}
 
-	public Event createEvent(Event event) throws AuthFault, ServerFault {
-		return providerEvent.createEvent(token, calendar, event);
-	}
-
-	public boolean isConnected() {
-		return this.token != null && this.token.getSessionId() != null;
-	}
-
+	@Override
 	public Map<Event,String> getICSFromExtId(Set<String> listExtIdEvent) throws Exception {
-		return providerEvent.getICSEventsFromExtId(token, calendar, listExtIdEvent);
+		return getVCalendarProvider().getICSEventsFromExtId(token, calendar, listExtIdEvent);
 	}
 
+	@Override
 	public void removeOrUpdateParticipationState(String extId) throws Exception{
-		Event event = providerEvent.getEventFromExtId(token, calendar, extId);
+		Event event = getVCalendarProvider().getEventFromExtId(token, calendar, extId);
 		if(event != null){
-			if(userEmail.equals(event.getOwnerEmail())){
-				providerEvent.remove(token, calendar, event);
+			if(loginAtDomaine.equals(event.getOwnerEmail())){
+				getVCalendarProvider().remove(token, calendar, event);
 			} else {
-				providerEvent.updateParticipationState(token, calendar, event, Constants.PARTICIPATION_STATE_DECLINED);
+				getVCalendarProvider().updateParticipationState(token, calendar, event, Constants.PARTICIPATION_STATE_DECLINED);
 			}
 		}
 	}
 	
+	@Override
 	public String getICSName(Event event){
 		return event.getExtId()+".ics";
 	}
 	
+	@Override
 	public String getICSName(EventTimeUpdate etu) {
 		return etu.getExtId()+".ics";
 	}
 	
-	public List<Event> getAllEvents() throws Exception {
-		return providerEvent.getAll(token, calendar);
+	@Override
+	public List<Event> getAll(DavComponentName componant) throws Exception {
+		return providers.get(componant).getAll(token, calendar);
 	}
 	
 	@Override
-	public List<EventTimeUpdate> getAllLastUpdateEvents(CompFilter cf) throws Exception{
+	public List<EventTimeUpdate> getAllLastUpdate(CompFilter cf) throws Exception{
+		return getAllLastUpdate(cf.getName(), cf);
+	}
+	
+	@Override
+	public List<EventTimeUpdate> getAllLastUpdate(DavComponentName componant) throws Exception {
+		return getAllLastUpdate(componant,new CompFilter());
+	}
+	
+	private List<EventTimeUpdate> getAllLastUpdate(DavComponentName componant, CompFilter cf) throws Exception{
 		if(cf.getTimeRange() != null && (cf.getTimeRange().getStart() != null || cf.getTimeRange().getEnd() != null)){
 			Date start = cf.getTimeRange().getStart();
 			Date end = cf.getTimeRange().getEnd();
@@ -119,34 +126,19 @@ public class CalendarService implements ICalendarService{
 				end = gc.getTime();
 			}
 
-			return providerEvent.getEventTimeUpdateFromIntervalDate(token, calendar, cf.getTimeRange().getStart(), end);
+			return providers.get(componant).getEventTimeUpdateFromIntervalDate(token, calendar, cf.getTimeRange().getStart(), end);
 		}
-		return providerEvent.getAllEventTimeUpdate(token, calendar); 
-	}
-	
-	@Override
-	public List<EventTimeUpdate> getAllLastUpdateEvents() throws Exception {
-		return getAllLastUpdateEvents(new CompFilter());
-	}
-
-	@Override
-	public List<Event> getAllTodos() throws Exception {
-		return providerTodo.getAll(token, calendar);
-	}
-	
-	@Override
-	public List<EventTimeUpdate> getAllLastUpdateTodos() throws Exception{
-		return providerTodo.getAllEventTimeUpdate(token, calendar);
+		return  providers.get(componant).getAllEventTimeUpdate(token, calendar); 
 	}
 
 	@Override
 	public boolean getSync(Date lastSync)
 			throws Exception {
-		EventChanges ec = providerEvent.getSync(token, calendar, lastSync);
+		EventChanges ec = providers.get(DavComponentName.VEVENT).getSync(token, calendar, lastSync);
 		if(ec.getUpdated().length != 0 || ec.getRemoved().length != 0){
 			return true;
 		} else {
-			ec = providerTodo.getSync(token, calendar, lastSync);
+			ec = providers.get(DavComponentName.VTODO).getSync(token, calendar, lastSync);
 			if(ec.getUpdated().length != 0 || ec.getRemoved().length != 0){
 				return true;
 			}
@@ -155,12 +147,38 @@ public class CalendarService implements ICalendarService{
 	}
 
 	@Override
-	public boolean hasRightsOnCalendar(String calendarName) throws Exception {
-		return providerEvent.hasRightsOnCalendar(token, calendarName);
+	public boolean hasRightsOnCalendar() throws Exception {
+		return getVCalendarProvider().hasRightsOnCalendar(token, calendar);
 	}
 
 	@Override
 	public String getLastUpdate() throws Exception {
-		return providerEvent.getLastUpdate(token, calendar).toString();
+		return getVCalendarProvider().getLastUpdate(token, calendar).toString();
 	}
+
+	@Override
+	public void login(String loginAtDomaine, String password, String calendar) throws AuthenticationException {
+		this.token = this.providers.get(DavComponentName.VEVENT).login(loginAtDomaine,password);
+		if (this.token == null || this.token.getSessionId() == null
+				|| "".equals(this.token.getSessionId())) {
+			throw new AuthenticationException();
+		}
+		String[] split = loginAtDomaine.split("@");
+		token.setUser(split[0]);
+		token.setDomain(split[1]);
+		this.calendar = calendar;
+		this.loginAtDomaine = loginAtDomaine;
+	}
+
+	@Override
+	public void logout() {
+		this.providers.get(DavComponentName.VEVENT).logout(token);
+	}
+	
+	private ICalendarProvider getVCalendarProvider(){
+		return this.providers.get(DavComponentName.VCALENDAR);
+	}
+
+
+
 }

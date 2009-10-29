@@ -16,47 +16,47 @@
 
 package org.obm.caldav.obmsync;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obm.caldav.obmsync.provider.impl.AbstractObmSyncProvider;
 import org.obm.caldav.obmsync.service.impl.CalendarService;
 import org.obm.caldav.server.ICalendarService;
 import org.obm.caldav.server.IBackend;
+import org.obm.caldav.server.exception.AuthenticationException;
 import org.obm.caldav.server.share.Token;
-import org.obm.sync.auth.AccessToken;
 
 public class OBMBackend implements IBackend {
 
-	private AccessToken token;
-	private String userId;
-	private String calendar;
+//	private AccessToken token;
+//	private String userId;
+//	private String calendar;
 	private ICalendarService calendarService;
 	private Log logger = LogFactory.getLog(getClass());
 
-	public OBMBackend() {
+	public OBMBackend(Token davToken) throws Exception {
+		initService();
+		boolean isValid = validateToken(davToken);
+		if(!isValid){
+			throw new AuthenticationException();
+		}
 	}
 
 	private void initService() {
-		calendarService = new CalendarService(token, calendar, userId);
+		calendarService = new CalendarService();
 	}
 
 	@Override
-	public void login(Token token) {
-		this.userId = token.getLoginAtDomain();
-		this.calendar = token.getCalendarName();
-		this.token = AbstractObmSyncProvider.login(userId, token.getPassword());
-		if (this.token == null) {
-			logger.warn("null token: " + userId + " " + token.getPassword());
-		}
-		String[] split = userId.split("@");
-		this.token.setUser(split[0]);
-		this.token.setDomain(split[1]);
-		this.initService();
+	public void login(Token davToken) throws AuthenticationException {
+		calendarService.login(davToken.getLoginAtDomain(), davToken.getPassword(),davToken.getCalendarName());
 	}
 
 	@Override
 	public void logout() {
-		AbstractObmSyncProvider.logout(token);
+		try {
+			calendarService.logout();
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		}
 	}
 
 	@Override
@@ -67,20 +67,13 @@ public class OBMBackend implements IBackend {
 		return calendarService;
 	}
 
-	@Override
-	public boolean validateToken(Token t) throws Exception {
+	private boolean validateToken(Token t) throws Exception {
 		if (t == null) {
 			return false;
 		}
 		this.login(t);
-
-		if (this.token == null || this.token.getSessionId() == null
-				|| "".equals(this.token.getSessionId())) {
-			return false;
-		}
-
-		boolean hasRightsOnCalendar = calendarService
-				.hasRightsOnCalendar(this.calendar);
+		
+		boolean hasRightsOnCalendar = calendarService.hasRightsOnCalendar();
 		this.logout();
 		return hasRightsOnCalendar;
 	}

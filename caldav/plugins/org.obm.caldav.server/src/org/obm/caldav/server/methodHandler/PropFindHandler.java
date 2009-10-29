@@ -42,6 +42,7 @@ import org.obm.caldav.server.propertyHandler.impl.ScheduleInboxURL;
 import org.obm.caldav.server.propertyHandler.impl.ScheduleOutboxURL;
 import org.obm.caldav.server.propertyHandler.impl.SupportedCalendarComponentSet;
 import org.obm.caldav.server.resultBuilder.PropertyListBuilder;
+import org.obm.caldav.server.share.DavComponentName;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.obm.sync.calendar.EventTimeUpdate;
@@ -86,7 +87,7 @@ public class PropFindHandler extends DavMethodHandler {
 	public void process(Token t, IBackend proxy, DavRequest req, HttpServletResponse resp) throws Exception {
 		Set<PropfindPropertyHandler> toLoad = new HashSet<PropfindPropertyHandler>();
 		Set<Element> toNotImplemented = new HashSet<Element>();
-		Document doc = req.getDocument();
+		Document doc = req.getXml();
 		
 		Set<Element> propsToLoad = getPropList(doc);
 		for (Element node : propsToLoad) {
@@ -103,7 +104,7 @@ public class PropFindHandler extends DavMethodHandler {
 		urls.add(req.getURI());
 		
 		if(toLoad.contains(propertiesHandler.get("getcontenttype"))){
-			List<EventTimeUpdate> events = proxy.getCalendarService().getAllLastUpdateEvents();
+			List<EventTimeUpdate> events = proxy.getCalendarService().getAllLastUpdate(DavComponentName.VEVENT);
 			for(EventTimeUpdate event : events){
 				urls.add(req.getURI()+proxy.getCalendarService().getICSName(event));
 			}

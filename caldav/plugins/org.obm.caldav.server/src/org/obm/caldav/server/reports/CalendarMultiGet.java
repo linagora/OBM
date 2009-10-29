@@ -121,7 +121,7 @@ public class CalendarMultiGet extends ReportProvider {
 		}
 
 		try {
-			Element root = req.getDocument().getDocumentElement();
+			Element root = req.getXml().getDocumentElement();
 			Set<String> listExtIDEvent = getListExtId(root);
 			
 			Map<Event, String> listICS = proxy.getCalendarService().getICSFromExtId(listExtIDEvent);

@@ -46,7 +46,7 @@ import org.w3c.dom.Document;
 public class CalendarQuery extends ReportProvider {
 
 	private Map<String, CalendarQueryPropertyHandler> properties;
-	
+
 	public CalendarQuery() {
 		properties = new HashMap<String, CalendarQueryPropertyHandler>();
 		properties.put("getetag", new GetETag());
@@ -70,7 +70,7 @@ public class CalendarQuery extends ReportProvider {
 			HttpServletResponse resp, Set<String> requestPropList) {
 		logger.info("process(" + token.getLoginAtDomain() + ", req, resp)");
 
-		Filter filter = FilterParser.parse(req.getDocument());
+		Filter filter = FilterParser.parse(req.getXml());
 		CompFilter compFilter = filter.getCompFilter();
 
 		Set<CalendarQueryPropertyHandler> propertiesValues = new HashSet<CalendarQueryPropertyHandler>();
@@ -89,25 +89,27 @@ public class CalendarQuery extends ReportProvider {
 			Document ret = null;
 			Map<String, EventTimeUpdate> events = new HashMap<String, EventTimeUpdate>();
 			CompFilter cf = compFilter.getCompFilters().get(0);
-			if (CompFilter.VEVENT.equalsIgnoreCase(cf.getName())) {
-				List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdateEvents(cf);
-				for (EventTimeUpdate event : retEvents) {
-					String href = req.getHref()
-							+ proxy.getCalendarService().getICSName(event);
-					events.put(href, event);
-				}
-
-			} else if (CompFilter.VTODO.equalsIgnoreCase(cf.getName())) {
-				List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdateTodos();
-				for (EventTimeUpdate event : retEvents) {
-					String href = req.getHref()
-							+ proxy.getCalendarService().getICSName(event);
-					events.put(href, event);
-				}
-			} else {
-				logger.warn("the component filter [" + cf.getName()
-						+ "] is not implemented");
+//			if (CompFilter.VEVENT.equalsIgnoreCase(cf.getName())) {
+			List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdate(cf);
+			for (EventTimeUpdate event : retEvents) {
+				String href = req.getHref()
+						+ proxy.getCalendarService().getICSName(event);
+				events.put(href, event);
 			}
+
+//			} 
+//			else if (CompFilter.VTODO.equalsIgnoreCase(cf.getName())) {
+//				List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdateTodos();
+//				for (EventTimeUpdate event : retEvents) {
+//					String href = req.getHref()
+//							+ proxy.getCalendarService().getICSName(event);
+//					events.put(href, event);
+//				}
+//			} 
+//			else {
+//				logger.warn("the component filter [" + cf.getName()
+//						+ "] is not implemented");
+//			}
 			ret = new CalendarQueryResultBuilder().build(req, proxy,
 					requestPropList, events, propertiesValues);
 			

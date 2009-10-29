@@ -53,13 +53,17 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 	protected static final Log logger = LogFactory
 			.getLog(AbstractObmSyncProvider.class);
 
-	protected static String urlSync;
+	protected String urlSync;
 
-	protected static String getObmSyncUrl(String loginAtDomain) {
+	protected String getObmSyncUrl(String loginAtDomain) {
 		if (urlSync == null) {
 			LocatorClient lc = new LocatorClient();
-			urlSync = "http://"+lc.locateHost("sync/obm_sync", loginAtDomain)+":8080/obm-sync/services";
-			logger.info("locator returned the following url: "+urlSync);
+			String serverName = lc.locateHost("sync/obm_sync", loginAtDomain);
+			if(serverName == null || "".equals(serverName)){
+				return null;
+			}
+			urlSync = "http://" + serverName + ":8080/obm-sync/services";
+			logger.info("locator returned the following url: " + urlSync);
 		}
 		return urlSync;
 	}
@@ -70,14 +74,14 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 		return getClient(token.getUser() + "@" + token.getDomain());
 	}
 
-	public static AccessToken login(String username, String password) {
+	public AccessToken login(String username, String password){
 		logger.info("login in obm-sync");
 		String url = getObmSyncUrl(username);
 		CalendarClient client = new CalendarClient(url);
 		return client.login(username, password, "obm-caldav");
 	}
 
-	public static void logout(AccessToken token) {
+	public void logout(AccessToken token) {
 		if (token != null) {
 			logger.info("logout in obm-sync " + token.getUser() + "@"
 					+ token.getDomain());

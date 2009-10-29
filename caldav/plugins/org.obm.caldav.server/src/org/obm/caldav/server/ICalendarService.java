@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.caldav.server.exception.AuthenticationException;
 import org.obm.caldav.server.exception.AuthorizationException;
+import org.obm.caldav.server.share.DavComponentName;
 import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventTimeUpdate;
@@ -32,8 +34,6 @@ public interface ICalendarService {
 	final static String PARTICIPATION_STATE_DECLINED = "no";
 	final static String PARTICIPATION_STATE_NEEDSACTION = "maybe";
 
-	Event createEvent(Event event) throws Exception;
-
 	List<Event> updateOrCreateEvent(String ics, String extId) throws Exception;
 
 	String getICSName(Event event);
@@ -42,17 +42,13 @@ public interface ICalendarService {
 
 	Event getEventFromExtId(String externalUrl) throws Exception;
 
-	List<Event> getAllEvents() throws Exception;
+	List<Event> getAll(DavComponentName componant) throws Exception;
 
-	List<EventTimeUpdate> getAllLastUpdateEvents()
+	List<EventTimeUpdate> getAllLastUpdate(DavComponentName componant)
 	throws Exception;
 	
-	List<EventTimeUpdate> getAllLastUpdateEvents(CompFilter cf)
+	List<EventTimeUpdate> getAllLastUpdate(CompFilter cf)
 			throws Exception;
-
-	List<Event> getAllTodos() throws Exception;
-
-	List<EventTimeUpdate> getAllLastUpdateTodos() throws Exception;
 
 	Map<Event, String> getICSFromExtId(Set<String> listExtIdEvent)
 			throws Exception;
@@ -62,8 +58,12 @@ public interface ICalendarService {
 
 	boolean getSync(Date lastSync) throws Exception;
 
-	boolean hasRightsOnCalendar(String calendarName) throws Exception;
+	boolean hasRightsOnCalendar() throws Exception;
 
 	String getLastUpdate() throws Exception;
+
+	void login(String userId, String password, String calendar) throws AuthenticationException;
+
+	void logout();
 
 }

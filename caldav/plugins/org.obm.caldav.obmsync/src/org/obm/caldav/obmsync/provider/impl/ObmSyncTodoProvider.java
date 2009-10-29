@@ -52,7 +52,12 @@ public class ObmSyncTodoProvider extends AbstractObmSyncProvider  {
 	
 	@Override
 	protected AbstractEventSyncClient getClient(String loginAtDomain) {
-		return new TodoClient(getObmSyncUrl(loginAtDomain));
+		try {
+			return new TodoClient(getObmSyncUrl(loginAtDomain));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
 	}
 	
 	@Override

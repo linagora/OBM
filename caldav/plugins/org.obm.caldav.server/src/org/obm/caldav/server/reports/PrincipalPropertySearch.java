@@ -35,7 +35,7 @@ public class PrincipalPropertySearch extends ReportProvider {
 	public void process(Token token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp, Set<String> propList) {
 		logger.info("process(" + token.getLoginAtDomain() + ", req, resp)");
-		Document doc = req.getDocument();
+		Document doc = req.getXml();
 		Element r = doc.getDocumentElement();
 
 		// search criteria

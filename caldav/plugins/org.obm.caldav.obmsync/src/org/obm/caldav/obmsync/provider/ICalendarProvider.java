@@ -88,4 +88,8 @@ public interface ICalendarProvider {
 
 	Date getLastUpdate(AccessToken token, String calendarName) throws AuthFault,
 	ServerFault;
+
+	AccessToken login(String loginAtDomaine, String password);
+
+	void logout(AccessToken token);
 }

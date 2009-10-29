@@ -19,6 +19,8 @@ package org.obm.caldav.server.share.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obm.caldav.server.share.DavComponentName;
+
 
 
 /**
@@ -29,26 +31,25 @@ import java.util.List;
  */
 public class CompFilter {
 	
-	public final static String VCALENDAR = "vcalendar";
-	public final static String VEVENT = "vevent";
-	public final static String VTODO = "vtodo";
+//	public final static String VCALENDAR = "vcalendar";
+//	public final static String VEVENT = "vevent";
+//	public final static String VTODO = "vtodo";
 	public final static String NAMESPACE = "urn:ietf:params:xml:ns:caldav";
 	
-	private String name;
+	private DavComponentName name;
 	private boolean isNotDefined;
 	private TimeRange timeRange;
 	private List<PropFilter> propFilters;
 	private List<CompFilter> compFilters;
 	
 	public CompFilter() {
-		this.name = "";
 		this.isNotDefined = false;
 		this.timeRange = null;
 		this.propFilters = new ArrayList<PropFilter>();
 		this.compFilters = new ArrayList<CompFilter>();
 	}
 
-	public String getName() {
+	public DavComponentName getName() {
 		return name;
 	}
 
@@ -74,7 +75,7 @@ public class CompFilter {
 
 
 
-	public void setName(String name) {
+	public void setName(DavComponentName name) {
 		this.name = name;
 	}
 

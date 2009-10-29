@@ -48,7 +48,7 @@ public class ReportHandler extends DavMethodHandler {
 	@Override
 	public void process(Token token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
-		Document d = req.getDocument();
+		Document d = req.getXml();
 		Element r = d.getDocumentElement();
 		
 		String reportKind = r.getLocalName();

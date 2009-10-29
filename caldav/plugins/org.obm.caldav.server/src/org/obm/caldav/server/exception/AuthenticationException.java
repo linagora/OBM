@@ -14,18 +14,23 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server;
+package org.obm.caldav.server.exception;
 
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.StatusCodeConstant;
 
-public interface IBackend {
-
-	ICalendarService getCalendarService();
+/**
+ * 
+ * @author adrienp
+ *
+ */
+public class AuthenticationException extends CalDavException{
 	
-	void login(Token davToken) throws Exception;
-
-	void logout();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2388282495295018733L;
 	
-	String getETag() throws Exception ;
-
+	public AuthenticationException(){
+		super(StatusCodeConstant.SC_FORBIDDEN);
+	}
 }

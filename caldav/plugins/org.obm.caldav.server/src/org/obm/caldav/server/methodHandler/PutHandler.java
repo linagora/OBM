@@ -16,7 +16,6 @@
 
 package org.obm.caldav.server.methodHandler;
 
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Date;
 
@@ -26,7 +25,6 @@ import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.CalDavUtils;
-import org.obm.caldav.utils.FileUtils;
 
 
 public class PutHandler extends DavMethodHandler {
@@ -37,15 +35,11 @@ public class PutHandler extends DavMethodHandler {
 	@Override
 	public void process(Token token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
-		InputStream in;
 		try {
 			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
 
-			in = req.getInputStream();
-			String ics = FileUtils.streamString(in, false);
-			if(logger.isDebugEnabled()){
-				logger.debug("ics: "+ics);
-			}
+			String ics = req.getICS();
+			logger.info("ics: "+ics);
 			proxy.getCalendarService().updateOrCreateEvent(ics, extId);
 			
 			resp.setStatus(HttpServletResponse.SC_CREATED);

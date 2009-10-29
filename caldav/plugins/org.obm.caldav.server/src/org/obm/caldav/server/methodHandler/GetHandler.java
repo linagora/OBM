@@ -17,17 +17,12 @@
 package org.obm.caldav.server.methodHandler;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.Token;
-import org.obm.sync.calendar.Event;
 
 
 /**
@@ -43,17 +38,17 @@ import org.obm.sync.calendar.Event;
 public class GetHandler extends DavMethodHandler {
 
 	@Override
-	public void process(Token token, IBackend proxy, DavRequest req,
+	public void process(Token token, IBackend backend, DavRequest req,
 			HttpServletResponse resp) throws Exception {
 		logger.info("process(req, resp)");
-		List<Event> event = proxy.getCalendarService().getAllEvents();
-		Event ev = event.get(0);
-		Set<String> l = new HashSet<String>();
-		l.add(ev.getExtId());
-		Map<Event,String>  e = proxy.getCalendarService().getICSFromExtId(l);
-		String ics = e.values().iterator().next();
-		resp.getOutputStream().write(ics.getBytes());
-		
+//		List<Event> event = proxy.getCalendarService().getAll(DavComponent.VEVENT);
+//		Event ev = event.get(0);
+//		Set<String> l = new HashSet<String>();
+//		l.add(ev.getExtId());
+//		Map<Event,String>  e = proxy.getCalendarService().getICSFromExtId(l);
+//		String ics = e.values().iterator().next();
+//		resp.getOutputStream().write(ics.getBytes());
+		backend.getETag();
 		//throw new CalDavException(StatusCodeConstant.SC_NOT_ALLOWED);
 	}
 

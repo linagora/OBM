@@ -24,6 +24,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.share.DavComponentName;
 import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.server.share.filter.Filter;
 import org.obm.caldav.server.share.filter.ParamFilter;
@@ -62,7 +63,7 @@ public class FilterParser {
 		if (compFilterNode != null) {
 			compFilter = new CompFilter();
 			String name = compFilterNode.getAttribute("name");
-			compFilter.setName(name);
+			compFilter.setName(DavComponentName.valueOf(name));
 
 			compFilter.setIsNotDefined(getIsNotDefined(compFilterNode));
 			compFilter.setTimeRange(getTimeRange(compFilterNode));

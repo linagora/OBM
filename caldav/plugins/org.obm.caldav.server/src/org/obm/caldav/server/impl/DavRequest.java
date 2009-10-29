@@ -21,20 +21,21 @@ import java.io.InputStream;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.exception.CalDavException;
 import org.obm.caldav.utils.DOMUtils;
+import org.obm.caldav.utils.FileUtils;
 import org.w3c.dom.Document;
 
 public class DavRequest {
 
 	private static final Log logger = LogFactory.getLog(DavRequest.class);
 
-	private Document document;
+	private Document xml;
+	private String ics;
 	private String calendarName;
 	private HttpServletRequest req;
 
@@ -53,14 +54,24 @@ public class DavRequest {
 
 	private void initRequest() throws CalDavException {
 
-		if (req.getHeader("Content-Type") != null
-				&& !req.getContentType().contains("calendar")) {
-			try {
-				InputStream in = req.getInputStream();
-				document = DOMUtils.parse(in);
-				DOMUtils.logDom(document);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+		if (req.getHeader("Content-Type") != null){
+			logger.info(req.getContentType());
+			if(req.getContentType().contains("text/xml")) {
+				try {
+					InputStream in = req.getInputStream();
+					xml = DOMUtils.parse(in);
+					DOMUtils.logDom(xml);
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+			} else if(req.getContentType().contains("text/calendar")) {
+				try {
+					InputStream in = req.getInputStream();
+					ics = FileUtils.streamString(in, false);
+					logger.info(ics);
+				} catch (IOException e) {
+					logger.error(e.getMessage(), e);
+				}
 			}
 		}
 
@@ -84,8 +95,12 @@ public class DavRequest {
 		return req.getHeader(string);
 	}
 
-	public Document getDocument() {
-		return document;
+	public Document getXml() {
+		return xml;
+	}
+	
+	public String getICS() {
+		return ics;
 	}
 
 	public String getHref() {
@@ -100,7 +115,15 @@ public class DavRequest {
 		return this.calendarName;
 	}
 
-	public HttpSession getSession() {
-		return this.req.getSession();
+	public String getMethod() {
+		return req.getMethod();
+	}
+
+	public String getRequestURI() {
+		return req.getRequestURI();
+	}
+
+	public String getQueryString() {
+		return req.getQueryString();
 	}
 }

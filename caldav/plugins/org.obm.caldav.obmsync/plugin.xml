@@ -3,9 +3,9 @@
 <plugin>
    <extension
          point="org.obm.caldav.server.backend">
-      <proxy
-            IProxy="org.obm.caldav.obmsync.OBMBackend">
-      </proxy>
+      <backend
+            implementation="org.obm.caldav.obmsync.BackendFactory">
+      </backend>
    </extension>
 
 </plugin>
