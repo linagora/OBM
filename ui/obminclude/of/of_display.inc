@@ -1467,7 +1467,7 @@ function display_todos($path='..') {
   for ($i = 1; $i <= $nb; $i++) {
     $t_id = $_SESSION['todos'][$i]['id'];
     $t_title = $_SESSION['todos'][$i]['title'];
-    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;todo_id=$t_id");
+    $todo_url = url_prepare("$GLOBALS[path]/todo/todo_index.php?action=detailconsult&amp;todo_id=$t_id");
     $todo_title = substr($t_title, 0, 30);
     $block_todo .= "
       <li><a href=\"$todo_url\">$todo_title</a></li>";
