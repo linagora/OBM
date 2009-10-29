@@ -194,6 +194,7 @@ Obm.CalendarManager = new Class({
    */
   unregister: function(evt) {
     this.oldEvent = $merge(new Object(), evt);
+    this.oldEvent.elementId = evt.element.id;
     this.oldEvent.event.date = new Obm.DateTime(evt.event.time*1000);
     this.oldEvent.time = evt.event.time;
     this.oldEvent.event.duration = evt.event.duration;
@@ -505,7 +506,7 @@ Obm.CalendarManager = new Class({
 
 
   /**
-   *  Show last month events // TODO
+   *  Show last month events // TODO OBM2.4
    */
   subMonth: function() {
    this.clearGrid();
@@ -514,7 +515,7 @@ Obm.CalendarManager = new Class({
 
 
   /**
-   *  Show last week events // TODO
+   *  Show last week events // TODO OBM2.4
    */
   subWeek: function() {
    this.clearGrid();
@@ -523,7 +524,7 @@ Obm.CalendarManager = new Class({
 
 
   /**
-   *  Show last day events // TODO
+   *  Show last day events // TODO OBM2.4
    */
   subDay: function() {
    this.clearGrid();
@@ -532,7 +533,7 @@ Obm.CalendarManager = new Class({
 
 
   /**
-   *  Show next month events // TODO
+   *  Show next month events // TODO OBM2.4
    */
   addMonth: function() {
    this.clearGrid();
@@ -541,7 +542,7 @@ Obm.CalendarManager = new Class({
 
 
   /**
-   * Show next week events  // TODO
+   * Show next week events  // TODO OBM2.4
    */
   addWeek: function() {
    this.clearGrid();
@@ -550,7 +551,7 @@ Obm.CalendarManager = new Class({
 
 
   /**
-   * Show next day events  // TODO
+   * Show next day events  // TODO OBM2.4
    */
   addDay: function() {
    this.clearGrid();
@@ -583,19 +584,12 @@ Obm.CalendarManager = new Class({
     $$('.event').each(function(evt) {
       evt.destroy();
     });
-    this.events = new Hash();
-    this.eventGrid = new Hash();
-    this.alldayEventGrid = new Hash();
-    for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
-      this.eventGrid[i] = new Hash();
-      this.alldayEventGrid[i] = new Hash();
-    }
-    $('calendarHeaderGrid').style.height  = this.defaultHeight+'px';
+    this.initialize(this.startTime);
   },
 
 
   /**
-   * Refresh the calendar grid
+   * Refresh the calendar grid // TODO OBM2.4
    */
   refresh: function() {
   },
@@ -762,16 +756,32 @@ Obm.CalendarManager = new Class({
       resp.message = obm.vars.labels.fatalServerErr;
     }
     if (response.error == 0) {
+
+      // Delete dragged event
+      if (this.oldEvent) {
+        var evt = obm.calendarManager.events.get(this.oldEvent.elementId);
+        if (evt) {
+          try {
+            obm.calendarManager.unregister(evt);
+          } catch (e) {}
+          obm.calendarManager.events.erase(evt.element.id);
+          evt.element.destroy();
+          delete evt;
+        }
+      }
+
+      // Delete serie events
       $$('div.evt_'+response.eventId).each(function(e) {
-        var ext = obm.calendarManager.events.get(e.id);
+        var evt = obm.calendarManager.events.get(e.id);
         try {
-          obm.calendarManager.unregister(ext);
+          obm.calendarManager.unregister(evt);
         } catch (e) {}
-        obm.calendarManager.events.erase(ext.element.id);
-        e.destroy();
-        delete ext;
+        obm.calendarManager.events.erase(evt.element.id);
+        evt.element.destroy();
+        delete evt;
       });
 
+      // Redraw events
       response.events.each(function(evt) {
         eval(evt);
       });

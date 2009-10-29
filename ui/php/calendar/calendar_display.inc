@@ -5753,7 +5753,7 @@ function json_build_html_event($calendar, $current_view, $id) {
   $category_filter = $current_view->get_category_filter();
   $unit = "hour";
   if ($current_view->get_cal_range() == "month") $unit = "day";
-  if ($calendar['periodic']) {
+  if ($calendar['periodic'] && $current_view->get_cal_range() == "week") {
     $date = $current_view->get_date_range();
     $begin = $date['begin'];
     $end = $date['end'];
