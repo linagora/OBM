@@ -102,8 +102,12 @@ pushd zip_update_dir >/dev/null 2>&1
 unzip ../${product_name}-svn-linux.gtk.x86_64.zip >/dev/null 2>&1
 pushd ${product_name} >/dev/null 2>&1
 rm -f obm-caldav about.html libcairo-swt.so
+find . -type f -name "*.so" | xargs rm -fr
 cp ../../scripts/equinox.lib .
 cp ../../scripts/obm-caldav .
+
+echo "osgi.noShutdown=true" >> configuration/config.ini
+echo "osgi.configuration.area=/var/lib/obm-caldav/" >> configuration/config.ini
 #cp ../../scripts/obm-caldav-profile .
 popd >/dev/null 2>&1
 tar cfj ../${product_name}.tar.bz2 ${product_name}
