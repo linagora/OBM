@@ -1366,6 +1366,7 @@ function run_query_project_tasks($pid) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $if_parentgroup = sql_if($db_type, "(Task.projecttask_parenttask_id IS NOT NULL)", 'PTask.projecttask_label', 'Task.projecttask_label');
+  $if_parent_order = sql_if($db_type, "(Task.projecttask_parenttask_id IS NOT NULL)", 'Task.projecttask_parenttask_id', '0');
   $multidomain = sql_multidomain('project');
   $pid = sql_parse_id($pid, true);
 
@@ -1375,12 +1376,13 @@ function run_query_project_tasks($pid) {
       Task.projecttask_label,
       PTask.projecttask_id as parent_id,
       PTask.projecttask_label as parent_label,
-      $if_parentgroup as parent_group
+      $if_parentgroup as parent_group,
+      $if_parent_order as parent_order
     FROM ProjectTask as Task
       JOIN Project ON project_id = Task.projecttask_project_id
       LEFT JOIN ProjectTask as PTask on Task.projecttask_parenttask_id=PTask.projecttask_id
     WHERE project_id $pid $multidomain
-    ORDER BY parent_group, parent_id DESC, Task.projecttask_label";
+    ORDER BY parent_group, parent_order ASC, Task.projecttask_label";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_tasks');
   $obm_q->query($query);

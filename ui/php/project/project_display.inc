@@ -1672,7 +1672,7 @@ function html_project_tasklist($tasks_q, $project) {
       $t_parent = $tasks_q->f('parent_id');
       $t_rank = $tasks_q->f('projecttask_rank');
       
-      if ($t_parent == 0) {
+      if (($t_parent == 0) || ($t_parent == '')) {
 	$dis_task .= "
          <tr>
           <td >
