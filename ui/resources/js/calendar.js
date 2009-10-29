@@ -781,7 +781,7 @@ Obm.CalendarManager = new Class({
         delete evt;
       });
 
-      // Redraw events
+      // Draw updated event
       response.events.each(function(evt) {
         eval(evt);
       });
