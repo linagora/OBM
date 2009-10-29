@@ -775,11 +775,15 @@ function dis_calendar_day_agenda($current_view, $calendar_entity, $writable_enti
  */
 function dis_calendar_week_agenda($current_view, $calendar_entity, $writable_entity) {
 
+
+  $display_days = $_SESSION['set_cal_display_days'];
+  if (empty($display_days)) $display_days = '1111111';
+
   $date = clone $current_view->get_date();
   $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
 
   $end = clone $date;
-  $end->addDay(7);
+  $end->addDay(substr_count($display_days, 1));
 
   $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end);
 
