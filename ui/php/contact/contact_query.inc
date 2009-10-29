@@ -1286,6 +1286,7 @@ function check_contact_data_form($cid, &$contact) {
   // Contact email
   if(is_array($emails)) {
     foreach($emails as $i => $email) {
+      $email['address'] = stripslashes($email['address']);
       if (($email['address'] != '') && (preg_match($php_regexp_email, $email['address']) == 0)) {
         $err['msg'] = $l_j_check_email;
         OBM_Error::getInstance()->addError('emails-'.$i, $err['msg']);
