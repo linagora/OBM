@@ -251,7 +251,7 @@ if ($perm->check_right($module, $cright_write_admin)) {
 ///////////////////////////////////////////////////////////////////////////////
 $lang_dir = dir("$path/../$obminclude/lang");
 while ($entry=$lang_dir->read()) {
-  if (!preg_match("/^\..*$/",$entry) && is_dir($lang_dir->path."/".$entry)) {
+  if (!preg_match("/^(\.|_).*$/",$entry) && is_dir($lang_dir->path."/".$entry)) {
         $dis_lang .= "
       <a href=\"settings_index.php?lang=$entry\">
         <img src=\"".${"flag_$entry"}."\" alt=\"[Language $entry]\"/></a>";
