@@ -5753,6 +5753,8 @@ function json_build_html_event($calendar, $current_view, $id) {
   $category_filter = $current_view->get_category_filter();
   $unit = "hour";
   if ($current_view->get_cal_range() == "month") $unit = "day";
+  $isMultiWeek = true;
+  $current_view->set_date($calendar['date_begin']);
   if ($calendar['periodic'] && $current_view->get_cal_range() == "week") {
     $date = $current_view->get_date_range();
     $begin = $date['begin'];
@@ -5760,6 +5762,9 @@ function json_build_html_event($calendar, $current_view, $id) {
   } else {
     $begin = $calendar['date_begin'];
     $end = $calendar['date_end'];
+    if ($begin->format('W') != $end->format('W')) {
+      $isMultiWeek = true;
+    }
   }
 
   calendar_events_model($begin,$end,$calendar_entity, $status, $category_filter);
@@ -5778,6 +5783,8 @@ function json_build_html_event($calendar, $current_view, $id) {
            $occurrence->index = $begin;
            $occurrence->left = true;
         }
+
+        // Right extension
         if ($occurrence->end->compare($end) > 0) {
            $occurrence->right = true;
         }
