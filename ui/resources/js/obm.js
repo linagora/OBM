@@ -622,7 +622,7 @@ function last_visit_calendar_view() {
 
 function refreshWaitEvent() {
   new Request.JSON({
-        url: '/calendar/calendar_index.php',
+        url: obm.vars.consts.obmUrl+'/calendar/calendar_index.php',
         secure: false,
         async: true,
         onComplete: function(response) {
