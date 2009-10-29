@@ -18,6 +18,7 @@ $l_total_period="Durée sur la période";
 $l_total_spent="Temps période";
 $l_total_before="Total précédent";
 $l_total_after="Total actuel";
+$l_missing = "Estimé restant";
 
 $l_task_del="Suppr.";
 $l_from = "du";

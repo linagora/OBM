@@ -4,26 +4,6 @@
 //     - File     : project.inc                                               //
 // 2009-09-24                                                                 //
 ////////////////////////////////////////////////////////////////////////////////
-// Modified on 2009-09-24T11:08:55+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T11:17:40+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T11:17:44+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T12:24:57+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T12:26:49+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T12:28:35+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T12:32:32+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T13:39:27+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T14:25:44+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T14:25:46+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T15:28:47+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T16:03:52+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T16:22:48+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T16:29:26+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T16:31:11+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T16:36:05+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T16:43:39+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T16:54:24+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-28T18:14:52+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-28T18:19:39+02:00 using OBMtranslation (0.4.1)
 
 $l_task_del = "Löschen Sie den ausgewählten Aufgaben";
 $l_fill_tasklabel = "Sie müssen einen Namen für diese Aufgabe geben.";

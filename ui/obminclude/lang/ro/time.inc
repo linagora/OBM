@@ -1,80 +1,11 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Romanian                                                   //
+// OBM - Language : Romanian                                                 //
 //     - File     : time.inc                                                 //
 // 1999-01-24 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: time.inc 2972 2008-07-02 09:42:54Z mehdi $ //
 ///////////////////////////////////////////////////////////////////////////////
-// Modified on 2009-09-22T10:49:08+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-22T10:57:16+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-22T11:05:00+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-22T11:13:59+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-22T11:21:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-22T11:23:51+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-22T11:29:18+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-22T11:44:33+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-22T11:50:01+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:02:53+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:05:40+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:05:42+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:09:26+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:16:45+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:18:12+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:18:43+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:19:53+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:19:55+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:22:06+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:23:18+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:25:08+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:26:23+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:30:06+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T12:32:34+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T13:31:47+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T13:32:09+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T13:35:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T13:37:46+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-23T13:37:48+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:51:01+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:51:03+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:51:04+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:51:06+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:51:08+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:20+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:21+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:23+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:26+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:28+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:32+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:33+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:34+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:35+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:37+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:37+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:37+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:38+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:38+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:38+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:38+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:39+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:39+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:53:39+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:55:25+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:55:27+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:55:28+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:56:02+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:56:03+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:56:04+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:57:32+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:57:34+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:57:35+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:58:29+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T09:58:30+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-24T10:01:31+02:00 using OBMtranslation (0.4.1)
 
 $l_date_task = "Dată";
 $l_task_del = "Ștergeți"; 
@@ -85,7 +16,9 @@ $l_total_period = "Durata perioadei";
 $l_total_spent = "Timpul folosit";
 $l_total_before = "Total precedent";
 $l_total_after = "Total actual";
-$l_task_del="Suppr.";
+$l_missing = "Estimat restant"; 
+
+$l_task_del = "Suppr.";
 $l_from = "de la ";
 $l_to = "la";
 $l_user = "Utilizator";

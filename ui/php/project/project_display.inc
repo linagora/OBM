@@ -1717,7 +1717,7 @@ function html_project_tasklist($tasks_q, $project) {
     $dis_button
     </fieldset>     
     </form>
-  ";
+";
 
   return $block;
 }
@@ -1773,7 +1773,6 @@ function html_project_member_form($members_q, $project) {
       <input type=\"hidden\" name=\"action\" value=\"member_del\" />
       <input type=\"submit\" value=\"$l_del_member_sel\"
              onclick=\"submit_memberdel(this.form)\" />";
-
     $span = 3;
 
   } else {
@@ -1798,12 +1797,12 @@ function html_project_member_form($members_q, $project) {
     <h1>$l_members_info</h1>
 
     <table>
-       $dis_member
+      $dis_member
     </table>
     </div>
 
     <div class=\"buttons\">
-     $dis_button
+      $dis_button
     </div>
 
    </form>
@@ -1943,7 +1942,7 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
    </fieldset>
 
    </form>
-   ";
+";
 
    return $block;
 }

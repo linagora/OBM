@@ -131,7 +131,7 @@ function get_time_stat_project($time) {
   while ($key = each($time['user_ids'])) {
     $uid_tab[] = $key['value'];
   }
-  if(count($uid_tab)) {
+  if (count($uid_tab)) {
     $uids_str = 'AND timetask_user_id IN ('.implode(', ', $uid_tab).')';
   }
 
@@ -150,19 +150,18 @@ function get_time_stat_project($time) {
       (sum($iftd_begin) / $c_day_fraction) as total_before,
       (sum($iftd_end) / $c_day_fraction) as total_length,
       (sum(timetask_length) / $c_day_fraction) as total_after
-    FROM TimeTask, ProjectTask, Project
+    FROM TimeTask
+      INNER JOIN ProjectTask ON timetask_projecttask_id = projecttask_id
+      INNER JOIN Project ON projecttask_project_id = project_id
       LEFT JOIN Company ON project_company_id = company_id
       LEFT JOIN TaskType ON project_tasktype_id = tasktype_id
     WHERE timetask_date <= '$date_end'
-      AND timetask_projecttask_id = projecttask_id
-      AND projecttask_project_id = project_id
       $uids_str
     GROUP BY project_id,project_name,tasktype_label,company_name
-    having (sum($iftd_end)) != 0
+    HAVING (sum($iftd_end)) != 0
 ";
 
-  display_debug_msg($query, $cdg_sql, 'get_time_stat_project()');
-
+  display_debug_msg($query, $cdg_sql, 'get_time_stat_project(1)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -191,6 +190,27 @@ function get_time_stat_project($time) {
   $keys = array_keys($res);
   if (count($keys) > 0) {
     $projects = implode(',', $keys);
+    $where_pid = "WHERE project_id IN($projects)";
+
+    $query = "
+    SELECT
+      project_id,
+      project_name,
+      (sum(projectuser_missingtime)) as total_missing
+    FROM ProjectUser
+      INNER JOIN Project ON projectuser_project_id = project_id
+    $where_pid
+    GROUP BY project_id
+";
+
+    display_debug_msg($query, $cdg_sql, 'get_time_stat_project(2)');
+    $obm_q->query($query);
+    while ($obm_q->next_record()) {
+      $p_id = $obm_q->f('project_id');
+      $missing = $obm_q->f('total_missing');
+      $res[$p_id]['missing'] = $missing;
+    }
+
     $query = "
     SELECT
       projecttask_project_id,

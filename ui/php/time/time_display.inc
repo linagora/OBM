@@ -789,7 +789,6 @@ function dis_time_form_addtask($time, $validate_days) {
 	  $dis_attr = " checked=\"checked\"";
 	}
 
-
         $ch_day .= "<input type=\"checkbox\" id=\"lbl_$day\" name=\"cb_day[$ddate]\" $dis_attr /><label for=\"lbl_$day\">$dlabel</label>\n";
       }
     }
@@ -1103,9 +1102,6 @@ function html_time_month_users_total($time, $array_res) {
 }
 
 
-
-
-
 /**
  * Display Projects activity stats
  *
@@ -1113,10 +1109,10 @@ function html_time_month_users_total($time, $array_res) {
  * @param mixed $time[] : time parameters
  */
 function dis_time_stats_project($statp, $time) {
-  global $cdg_param, $obm;
+  global $cdg_param, $obm, $path;
   global $l_proj_stats, $l_no_proj_stats, $l_project, $l_tt, $l_company;
   global $l_total,$l_total_period, $l_total_before, $l_total_after;
-  global $l_all, $l_selection;
+  global $l_all, $l_selection, $l_missing;
 
   if (is_array($statp)) {
     foreach($statp as $p_id => $p) {
@@ -1128,19 +1124,22 @@ function dis_time_stats_project($statp, $time) {
           $class = '';
         }
 	$name = $p['project'];
+	$p_url = "<a href=\"$path/project/project_index.php?action=detailconsult&amp;project_id=$p_id\">$name</a>";
 	$tasktype = $p['tasktype'];
 	$company = $p['company'];
 	$time = $p['time'];
 	$time_before = $p['time_before'];
 	$time_after = $p['time_after'];
+	$missing = $p['missing'];
 	$all_time = $p['all_time'];
 	$all_time_before = $p['all_time_before'];
 	$all_time_after = $p['all_time_after'];
 	$dis_p_array .= "
       <tr $class>
-        <td>$name</td>
+        <td>$p_url</td>
         <td>$tasktype</td>
         <td>$company</td>
+        <td style=\"text-align: right;\">$missing&nbsp;</td>
         <td style=\"text-align: right;\">$time&nbsp;</td>
         <td style=\"text-align: right;\">$all_time</td>
         <td style=\"text-align: right;\">$time_before&nbsp;</td>
@@ -1167,6 +1166,7 @@ function dis_time_stats_project($statp, $time) {
       <th rowspan=\"2\">$l_project</th>
       <th rowspan=\"2\">$l_tt</th>
       <th rowspan=\"2\">$l_company</th>
+      <th rowspan=\"2\">$l_missing</th>
       <th colspan=\"2\">$l_total_period</th>
       <th colspan=\"2\">$l_total_before</th>
       <th colspan=\"2\">$l_total_after</th>
@@ -1183,7 +1183,7 @@ function dis_time_stats_project($statp, $time) {
     $dis_p_array
     <tfoot>
     <tr>
-      <td colspan=\"3\">$l_total</td>
+      <td colspan=\"4\">$l_total</td>
       <td>$total_time&nbsp;</td>
       <td>$all_total_time</td>
       <td>$total_time_before&nbsp;</td>

@@ -2,12 +2,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // OBM - Language :                                                           //
 //     - File     : time.inc                                                  //
-// 2009-09-24                                                                 //
+// 2010-10-29 obm.org                                                         //
 ////////////////////////////////////////////////////////////////////////////////
-// Modified on 2009-09-24T17:31:43+02:00 using OBMtranslation (0.4.1)
 
-
-// lines below have been created with OBMtranslation (0.4.1) on 2009-09-24T17:31:43+02:00
 $l_date_task = ""; 
 $l_update = ""; 
 $l_intern = ""; 
@@ -51,6 +48,8 @@ $l_pdf_visa_client = "";
 $l_total_period = ""; 
 $l_total_spent = ""; 
 $l_total_before = ""; 
+$l_missing = "bleibende Bewertung";
+
 $l_see = ""; 
 $l_searchtime_display = ""; 
 $total_tasks = ""; 
