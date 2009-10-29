@@ -5767,29 +5767,48 @@ function json_build_html_event($calendar, $current_view, $id) {
     }
   }
 
-  calendar_events_model($begin,$end,$calendar_entity, $status, $category_filter);
-  $of = &OccurrenceFactory::getInstance();
-  $occurrences = $of->getOccurrences();
-  if (is_array($occurrences)) {
-    foreach($occurrences as $occurrence) {
-      if ($occurrence->event->id == $id) {
-        if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
-        $occurrence->index = $occurrence->date;
-        $occurrence->left = false;
-        $occurrence->right = false;
-
-        // Left extension
-        if ($occurrence->index->compare($begin) < 0) {
-           $occurrence->index = $begin;
-           $occurrence->left = true;
+  if ($isMultiWeek) {
+    $date = $current_view->get_date_range();
+    $current = clone $date['begin'];
+    calendar_events_model($begin,$end,$calendar_entity, $status, $category_filter);
+    $of = &OccurrenceFactory::getInstance();
+    while($current->compare($end) < 0) {
+      $endWeek = clone $current;
+      $endWeek->addDay(7);
+      $occurrences = $of->getPeriodOccurrences($current,$endWeek);
+      if (is_array($occurrences)) {
+        foreach($occurrences as $occurrence) {
+          if ($occurrence->event->id == $id) {
+            if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
+            $occurrence->index = $occurrence->date;
+            $occurrence->left = false;
+            $occurrence->right = false;
+            // Left extension
+            if ($occurrence->index->compare($current) < 0) {
+               $occurrence->index = $current;
+               $occurrence->left = true;
+            }
+            // Right extension
+            if ($occurrence->end->compare($endWeek) > 0) {
+               $occurrence->right = true;
+            }
+            $dis_events[] = "'".phpStringToJsString(dis_calendar_event($occurrence, $unit, $calendar_entity, $writable_entity))."'";
+          }
         }
-
-        // Right extension
-        if ($occurrence->end->compare($end) > 0) {
-           $occurrence->right = true;
+      }
+      $current->addDay(7);
+    }
+  } else {
+    calendar_events_model($begin,$end,$calendar_entity, $status, $category_filter);
+    $of = &OccurrenceFactory::getInstance();
+    $occurrences = $of->getOccurrences();
+    if (is_array($occurrences)) {
+      foreach($occurrences as $occurrence) {
+        if ($occurrence->event->id == $id) {
+          if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
+          $occurrence->index = $occurrence->date;
+          $dis_events[] = "'".phpStringToJsString(dis_calendar_event($occurrence, $unit, $calendar_entity, $writable_entity))."'";
         }
-
-        $dis_events[] = "'".phpStringToJsString(dis_calendar_event($occurrence, $unit, $calendar_entity, $writable_entity))."'";
       }
     }
   }
