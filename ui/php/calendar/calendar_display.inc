@@ -5381,7 +5381,7 @@ function dis_calendar_template_form($action, $params, $template_q, $entity_ids, 
 function dis_calendar_templates_list($templates_q) {
   global $ico_popup_close, $ico_edit, $ico_backup, $l_name, $l_duplicate_template, $l_template_name,
     $l_validate, $l_cancel, $l_copy_of, $l_no_template, $l_export_templates,
-    $l_import_template;
+    $l_import_template, $path;
   
   $block = "
     <div class=\"detail\">
@@ -8183,7 +8183,7 @@ function html_calendar_documents_form_fieldset($documents = null) {
       <th>
       $l_documents
         <a href=\"javascript: return false;\" 
-          onclick=\"popup('$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_document_id','');
+          onclick=\"popup('$GLOBALS[path]/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_document_id','');
           return false;\">
           <img src=\"$ico_add\" alt=\"[Add]\" />
         </a>
