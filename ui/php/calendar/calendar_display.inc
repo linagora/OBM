@@ -4869,7 +4869,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
 //   - $entity_store : array of entities to display
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_free_interval($current_view) {
-  global $obm, $display;
+  global $obm, $display, $path;
 
   $date = $current_view->get_date();
   $date_ts = $date->setHour($GLOBALS['ccalendar_first_hour'])->setMinute(0)->setSecond(0)->getTimestamp();
