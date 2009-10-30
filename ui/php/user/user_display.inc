@@ -232,7 +232,9 @@ function html_batch_user_search_form($user) {
 
   foreach ($user['profiles'] as $k_profile => $one_profile) {
     $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
-    $block_profile .= "<option value=\"$k_profile\">$profile</option>";
+    $selected = "";
+    if ($k_profile == $user['profile']) $selected = "selected=\"selected\"";
+    $block_profile .= "<option value=\"$k_profile\" $selected>$profile</option>";
   }
   $options = array('=' => '=', '<' => '<', '>' => '>');
   foreach($options as $topt => $opt) {
@@ -401,7 +403,9 @@ function html_user_search_form($user) {
 
   foreach ($user['profiles'] as $k_profile => $one_profile) {
     $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
-    $block_profile .= "<option value=\"$k_profile\">$profile</option>";
+    $selected = "";
+    if ($k_profile == $user['profile']) $selected = "selected=\"selected\"";
+    $block_profile .= "<option value=\"$k_profile\" $selected>$profile</option>";
   }
 
   if ($obm['domain_global']) {
