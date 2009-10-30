@@ -37,7 +37,6 @@ function displayDatePicker(dateField, displayBelowThisObject, dtFormat) {
 
   var x = displayBelowThisObject.getPosition().x;
   var y = displayBelowThisObject.getPosition().y + displayBelowThisObject.getSize().y ;
-  console.log(x,y)
 
   drawDatePicker(targetDateField, x, y);
 }
