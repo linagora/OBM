@@ -905,9 +905,9 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
        ( (($action == "detailupdate") || ($action == "update")) && 
          ($usercreate == $obm["uid"]) ) ) {
     $dis_vis = "<tr>
-      <th>$l_private</th>
-      <td><input name=\"cba_vis\" type=\"checkbox\" value=\"1\" ";
-    if ($vis == 1) $dis_vis .= "checked=\"checked\"";
+      <th><label for=\"cba_vis\">$l_private</label></th>
+      <td><input id=\"cba_vis\" name=\"cba_vis\" type=\"checkbox\" value=\"1\"";
+    if ($vis == 1) $dis_vis .= " checked=\"checked\"";
       $dis_vis .= " /></td></tr>";
   }
 
@@ -991,7 +991,7 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
   if ($autorenewal == 1) { 
     $autorenew_c = "checked=\"checked\"";
   }
-  $autorenewal_display = "<input type=\"checkbox\" name=\"cba_autorenew\" value=\"1\" $autorenew_c />";
+  $autorenewal_display = "<input type=\"checkbox\" id=\"cba_autorenew\" name=\"cba_autorenew\" value=\"1\" $autorenew_c />";
 
   // Contract kind : customer or supplier
   if ($kind == "$cck_customer") {
@@ -1000,8 +1000,8 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
     $kind_supplier_c = "checked=\"checked\"";
   }
   
-  $radio_kind = "<input type=\"radio\" name=\"rd_kind\" value=\"$cck_customer\" $kind_customer_c/> $l_cck_customer ";
-  $radio_kind .= "<input type=\"radio\" name=\"rd_kind\" value=\"$cck_supplier\" $kind_supplier_c/> $l_cck_supplier<br /> ";
+  $radio_kind = "<label><input type=\"radio\" name=\"rd_kind\" value=\"$cck_customer\" $kind_customer_c/> $l_cck_customer</label>";
+  $radio_kind .= "<label><input type=\"radio\" name=\"rd_kind\" value=\"$cck_supplier\" $kind_supplier_c/> $l_cck_supplier</label><br /> ";
 
   if ($format == $ccf_period) {
     $cb_period_c = "checked=\"checked\"";
@@ -1018,6 +1018,7 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
   }
 
   $dis_format = "
+    <label>
     <input type=\"radio\" name=\"rd_format\" value=\"$ccf_period\" $cb_period_c
       onclick=\"
           this.form.tf_ticket_nb.style.display = 'none';
@@ -1025,19 +1026,22 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
 	  document.getElementById('label_ticket').style.display = 'none';
 	  document.getElementById('label_duration').style.display = 'none';
       \" /> $l_ccf_period
-
+    </label>
+    <label>
     <input type=\"radio\" name=\"rd_format\" value=\"$ccf_duration\" $cb_duration_c onclick=\"this.form.tf_ticket_nb.style.display = 'none';
 	  document.getElementById('label_ticket').style.display = 'none';
 	  document.getElementById('label_duration').style.display = 'block';
 	  this.form.tf_duration.style.display = 'block';
         \" /> $l_ccf_duration
-
+    </label>
+    <label>
     <input type=\"radio\" name=\"rd_format\" value=\"$ccf_ticket\" $cb_ticket_c onclick=\"
           this.form.tf_ticket_nb.style.display = 'block';
           document.getElementById('label_ticket').style.display = 'block';
           document.getElementById('label_duration').style.display = 'none';
           this.form.tf_duration.style.display = 'none';
-         \" /> $l_ccf_ticket";
+         \" /> $l_ccf_ticket
+    </label>";
 
   $dis_format_detail = "
     <tr>
@@ -1230,11 +1234,11 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
       <th>$l_priority</th>
       <td>$sel_pri</td> 
     </tr><tr>
-      <th>$l_autorenewal</th>
+      <th><label for=\"cba_autorenew\">$l_autorenewal</label></th>
       <td>$autorenewal_display</td>
     </tr><tr>
-      <th>$l_archive</th>
-      <td><input name=\"cba_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
+      <th><label for=\"cba_archive\">$l_archive</label></th>
+      <td><input id=\"cba_archive\" name=\"cba_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
     </tr><tr>
       <th>$l_contract_kind</th>
       <td>$radio_kind</td>

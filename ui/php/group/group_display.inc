@@ -745,7 +745,7 @@ function html_group_form($action, $group_q, $group, $field='') {
   // Privacy can not be updated !
   if ($action == 'new' || $action == 'insert') {
     if (! $perm->check_right('group', $cright_write_admin)) {
-      $dis_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_private";
+      $dis_private = "<label><input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_private</label>";
 
     } else {
       if ($priv == '1') {
@@ -787,7 +787,7 @@ function html_group_form($action, $group_q, $group, $field='') {
         }
       }
     </script>
-    <input name=\"cba_privacy\" type=\"checkbox\" 
+    <input id=\"cba_privacy\" name=\"cba_privacy\" type=\"checkbox\" 
     onclick=\"privacyShowHide(this)\" value=\"1\" $private_c />";
     }
   } else {
@@ -802,8 +802,8 @@ function html_group_form($action, $group_q, $group, $field='') {
   
       $block_samba = "
     <tr id=\"sambaGroup\" class=\"$mail_class\">
-      <th class=\"$class[samba]\">$l_smb</th>
-      <td><input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state></td>
+      <th class=\"$class[samba]\"><label for=\"cb_samba\">$l_smb</label></th>
+      <td><input id=\"cb_samba\" name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state></td>
     </tr>";
     }
    if ($cgp_use['service']['mail']) {
@@ -815,8 +815,7 @@ function html_group_form($action, $group_q, $group, $field='') {
       <table>
       $dis_contact
       </table>
-      </fieldset>
-      ";
+      </fieldset>";
    } else {
      $dis_mail = "<th>$l_email</th>
       <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>";
@@ -870,7 +869,7 @@ function html_group_form($action, $group_q, $group, $field='') {
   $block_manager
   $block_delegation
   <tr>
-    <th>$l_private</th>
+    <th><label for=\"cba_privacy\">$l_private</label></th>
     <td>$dis_private</td>
   </tr>
   $block_samba

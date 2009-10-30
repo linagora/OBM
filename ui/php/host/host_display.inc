@@ -180,15 +180,13 @@ function html_host_search_form($host) {
     </label>
     <label>$GLOBALS[l_smtp_out]<br />
       <input type=\"checkbox\" name=\"cb_smtp_out\" value=\"1\" $smtp_out />
-    </label>
-    ";
+    </label>";
   }
   if ($cgp_use['service']['sync']) {
     $block_sync = "
     <label>$GLOBALS[l_obm_sync]<br />
       <input type=\"checkbox\" name=\"cb_obm_sync\" value=\"1\" $obm_sync />
-    </label>
-    ";
+    </label>";
   }
 
   $block_solr = "
@@ -610,7 +608,6 @@ function html_host_form($action, $host_q, $host, $field='') {
   $monitor_state  = ($monitor ? 'checked' : '');
 
 
-
   // Mark the error field
   if ($field != '') {
     $class[$field] = 'error';
@@ -630,46 +627,46 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (($cgp_use['service']['samba']) && ($samba_domain)) {
     $block_samba = "
     <tr>
-      <th class=\"$class[samba]\">$l_smb</th>
+      <th class=\"$class[samba]\"><label for=\"cb_samba\">$l_smb</label></th>
       <td>
-        <input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state>
+        <input id=\"cb_samba\" name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state>
       </td>
     </tr>";
   }
   if ($cgp_use['service']['mail']) {
     $block_mail = "
     <tr>
-      <th class=\"$class[imap]\">$GLOBALS[l_imap]</th>
+      <th class=\"$class[imap]\"><label for=\"cb_imap\">$GLOBALS[l_imap]</label></th>
       <td>
-        <input name=\"cb_imap\" type=\"checkbox\" value=\"1\" $imap_state>
+        <input id=\"cb_imap\" name=\"cb_imap\" type=\"checkbox\" value=\"1\" $imap_state>
       </td>
     </tr><tr>
-      <th class=\"$class[smtp_in]\">$GLOBALS[l_smtp_in]</th>
+      <th class=\"$class[smtp_in]\"><label for=\"cb_smtp_in\">$GLOBALS[l_smtp_in]</label></th>
       <td>
-        <input name=\"cb_smtp_in\" type=\"checkbox\" value=\"1\" $smtp_in_state>
+        <input id=\"cb_smtp_in\" name=\"cb_smtp_in\" type=\"checkbox\" value=\"1\" $smtp_in_state>
       </td>
     </tr><tr>
-      <th class=\"$class[smtp_out]\">$GLOBALS[l_smtp_out]</th>
+      <th class=\"$class[smtp_out]\"><label for=\"cb_smtp_out\">$GLOBALS[l_smtp_out]</label></th>
       <td>
-        <input name=\"cb_smtp_out\" type=\"checkbox\" value=\"1\" $smtp_out_state>
+        <input id=\"cb_smtp_out\" name=\"cb_smtp_out\" type=\"checkbox\" value=\"1\" $smtp_out_state>
       </td>
     </tr>";
   }
   if ($cgp_use['service']['sync']) {
     $block_sync = "
     <tr>
-      <th class=\"$class[obm_sync]\">$GLOBALS[l_obm_sync]</th>
+      <th class=\"$class[obm_sync]\"><label for=\"cb_obm_sync\">$GLOBALS[l_obm_sync]</label></th>
       <td>
-        <input name=\"cb_obm_sync\" type=\"checkbox\" value=\"1\" $obm_sync_state>
+        <input id=\"cb_obm_sync\" name=\"cb_obm_sync\" type=\"checkbox\" value=\"1\" $obm_sync_state>
       </td>
     </tr>";
   }
 
   $block_solr = "
   <tr>
-    <th class=\"$class[obm_solr]\">$GLOBALS[l_obm_solr]</th>
+    <th class=\"$class[obm_solr]\"><label for=\"cb_obm_solr\">$GLOBALS[l_obm_solr]</label></th>
     <td>
-      <input name=\"cb_obm_solr\" type=\"checkbox\" value=\"1\" $obm_solr_state>
+      <input id=\"cb_obm_solr\" name=\"cb_obm_solr\" type=\"checkbox\" value=\"1\" $obm_solr_state>
     </td>
   </tr>";
 

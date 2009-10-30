@@ -1278,8 +1278,8 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $users) {
   <tr>
     <th>$l_csv_sep</th>
     <td>
-      <input type=\"radio\" name=\"rd_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc
-      <input type=\"radio\" name=\"rd_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab
+      <label><input type=\"radio\" name=\"rd_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc</label>
+      <label><input type=\"radio\" name=\"rd_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab</label>
     </td>
   </tr><tr>
     <th>$l_enclosed</th>

@@ -692,8 +692,8 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
     <legend>$l_todo</legend>
     <table>    
     <tr>
-      <th>$l_archive</th>
-      <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
+      <th><label for=\"lbl_arch\">$l_archive</label></th>
+      <td><input type=\"checkbox\" id=\"lbl_arch\" name=\"cba_archive\" value=\"1\" $archive /></td>
     </tr>
     $block_status
     <tr>
@@ -724,10 +724,10 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
       $sel_usercomment
       $l_mail_comment
       
-        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
-        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
-        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
-      
+        <label><input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no</label>
+        <label><input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members</label>
+        <label><input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group</label>
+
    <textarea name=\"ta_add_comment\" rows=\"16\" cols=\"78\">$add_comment</textarea>
     $dis_comment
     </fieldset>

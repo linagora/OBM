@@ -1444,8 +1444,8 @@ $js_status_loop
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert \" />";
     $dis_priv = "
-      <th>$l_private</th>
-      <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
+      <th><label for=\"lbl_priv\">$l_private</label></th>
+      <td><input id=\"lbl_priv\" name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
     if ($priv == 1) $dis_priv .= "checked = \"checked\"";
     $dis_priv .= ' /></td></tr><tr>';
   }
@@ -1604,8 +1604,8 @@ $js_status_loop
       <td><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
     </tr>
     <tr>
-      <th>$l_archive</th>
-      <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
+      <th><label for=\"lbl_arch\">$l_archive</label></th>
+      <td><input type=\"checkbox\" id=\"lbl_arch\" name=\"cba_archive\" value=\"1\" $archive /></td>
     </tr>
     </table>
     </fieldset>
@@ -1617,9 +1617,9 @@ $js_status_loop
       <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
       $sel_usercomment
       $l_mail_comment
-        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
-        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
-        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
+        <label><input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no</label>
+        <label><input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members</label>
+        <label><input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group</label>
      <textarea name=\"ta_add_comment\" rows=\"12\" cols=\"78\">$add_comment</textarea>
       $dis_comment
   </fieldset>
@@ -1798,23 +1798,23 @@ $js_status_loop
   <fieldset class=\"detail extra\">
   <legend>$l_comment</legend>
 
-   $l_add_comment
-      <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
-      $sel_usercomment
+  $l_add_comment
+    <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+    $sel_usercomment
     $l_mail_comment
-     <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
-     <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
-     <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
-     <textarea name=\"ta_add_comment\" rows=\"12\" cols=\"78\">$add_comment</textarea>
-     $l_upd_comment
-     <textarea name=\"ta_comment\" rows=\"20\" cols=\"78\">$comment</textarea>
+    <label><input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no</label>
+    <label><input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members</label>
+    <label><input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group</label>
+    <textarea name=\"ta_add_comment\" rows=\"12\" cols=\"78\">$add_comment</textarea>
+    $l_upd_comment
+    <textarea name=\"ta_comment\" rows=\"20\" cols=\"78\">$comment</textarea>
   </fieldset>
 
     <fieldset class=\"buttons\">
-        <input type=\"hidden\" name=\"action\" value=\"quick_update\" />
-        <input type=\"hidden\" name=\"deal_id\" value=\"$id\" />
-        <input type=\"submit\" value=\"$l_update\" />
-     </fieldset>
+      <input type=\"hidden\" name=\"action\" value=\"quick_update\" />
+      <input type=\"hidden\" name=\"deal_id\" value=\"$id\" />
+      <input type=\"submit\" value=\"$l_update\" />
+    </fieldset>
     </form>
 ";
 

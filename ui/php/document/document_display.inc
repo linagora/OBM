@@ -550,8 +550,8 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
       <th>$l_author</th>
       <td><input type=\"text\" id=\"tf_author\" name=\"tf_author\" value=\"$author\" size=\"50\"/ /></td>
     </tr><tr>
-      <th>$l_private</th>
-      <td><input type=\"checkbox\" name=\"cba_privacy\" value=\"1\" $privacy /></td> 
+      <th><label for=\"cba_privacy\">$l_private</label></th>
+      <td><input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy /></td> 
     </tr>
     $block_userdata
     </table>

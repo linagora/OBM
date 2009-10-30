@@ -996,9 +996,9 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
   $dis_inout = "
     <th>$l_inout</th>
     <td>
-      <input type=\"radio\" name=\"rd_inout\" value=\"+\" $inout_c /> $l_client
-      <input type=\"radio\" name=\"rd_inout\" value=\"-\" $inout_s /> $l_supplier
-      </td>";
+      <label><input type=\"radio\" name=\"rd_inout\" value=\"+\" $inout_c /> $l_client</label>
+      <label><input type=\"radio\" name=\"rd_inout\" value=\"-\" $inout_s /> $l_supplier</label>
+    </td>";
 
   $cm_c = ($credit_memo == '1') ? 'checked' : '';
   $cm_i = ($credit_memo == '0') ? 'checked' : '';
@@ -1006,9 +1006,9 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
   $dis_credit_memo = "
     <th>$l_invoice / $l_credit_memo</th>
     <td>
-      <input type=\"radio\" name=\"rd_credit_memo\" value=\"0\" $cm_i /> $l_invoice
-      <input type=\"radio\" name=\"rd_credit_memo\" value=\"1\" $cm_c /> $l_credit_memo
-      </td>";
+      <label><input type=\"radio\" name=\"rd_credit_memo\" value=\"0\" $cm_i /> $l_invoice</label>
+      <label><input type=\"radio\" name=\"rd_credit_memo\" value=\"1\" $cm_c /> $l_credit_memo</label>
+    </td>";
 
   // tax select
   if (is_array($cdefault_tax)) {
@@ -1134,8 +1134,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
       <input name=\"tf_number\" type=\"text\" size=\"11\" value=\"$number\" />
     </td>
   </tr><tr>
-    <th class=\"$class[archive]\">$l_archive</th>
-    <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
+    <th class=\"$class[archive]\"><label for=\"cba_archive\">$l_archive</label></th>
+    <td><input type=\"checkbox\" id=\"cba_archive\" name=\"cba_archive\" value=\"1\" $archive /></td>
   </tr><tr>
     <th class=\"$class[date]\">$l_date</th>
     <td>

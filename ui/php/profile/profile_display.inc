@@ -187,7 +187,7 @@ function html_profile_consult($profile) {
     if($name != 'default_right')
     $dis_properties .= "
       <tr $class>
-      <th><dfn title='".$GLOBALS["l_help_$name"]."' class='helpTooltip'>".$GLOBALS["l_$name"]."</dfn></th>
+      <th><label for=\"property[$name]\"><dfn title='".$GLOBALS["l_help_$name"]."' class='helpTooltip'>".$GLOBALS["l_$name"]."</dfn></label></th>
       <td>".dis_property_value($name, $value)."</td>
       </tr>";
   }  
@@ -306,7 +306,7 @@ function html_profile_form($profile) {
     if($name != 'default_right')
     $dis_properties .= "
       <tr >
-      <th><dfn title='".$GLOBALS["l_help_$name"]."' class='helpTooltip'>".$GLOBALS["l_$name"]."</dfn></th>
+      <th><label for=\"property[$name]\"><dfn title='".$GLOBALS["l_help_$name"]."' class='helpTooltip'>".$GLOBALS["l_$name"]."</dfn></label></th>
       <td>".dis_property_value($name, $value, true)."</td>
       </tr>";
   }  
@@ -455,7 +455,7 @@ function dis_property_level_value($value, $update=false) {
 function dis_property_level_managepeers_value($value, $update=false) {
   if($update) {
     $checked = ($value == 1)?'checked=\"checked\"':'';
-    return '<input type="hidden" name="property[level_managepeers]" value="0"/><input type="checkbox" name="property[level_managepeers]" value="1" '.$checked.'/>';
+    return '<input type="hidden" name="property[level_managepeers]" value="0"/><input type="checkbox" id="property[level_managepeers]" name="property[level_managepeers]" value="1" '.$checked.'/>';
   } else {
     return ($value == 1)?$GLOBALS['l_yes']:$GLOBALS['l_no'];
   }

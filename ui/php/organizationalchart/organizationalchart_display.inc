@@ -280,8 +280,8 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
           <th>$l_desc</th>
           <td><input type=\"text\" id=\"tf_desc\" name=\"tf_desc\" maxlength=\"255\" size=\"50\" value=\"$desc\" /></td>
         </tr><tr>
-          <th>$l_archive</th>
-          <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
+          <th><label for=\"cba_archive\">$l_archive</label></th>
+          <td><input type=\"checkbox\" id=\"cba_archive\" name=\"cba_archive\" value=\"1\" $archive /></td>
         </tr>
       </table>
     </fieldset>

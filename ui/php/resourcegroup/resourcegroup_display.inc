@@ -306,8 +306,8 @@ function html_resourcegroup_form($action, $group_q, $group) {
     }
     $dis_private = "
   <tr>
-    <th>$l_private</th>
-    <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
+    <th><label for=\"cba_privacy\">$l_private</label></th>
+    <td><input id=\"cba_privacy\" name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
   </tr>";
   } else {
   $dis_private = "

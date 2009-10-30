@@ -2829,9 +2829,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <td>$label</td>
           <td>$sel_alert</td>
           <td class=\"C\">
-          <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_accepted</span>
-          <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_needs_action</span>
-          <input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_declined</span>
+          <label><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_accepted</span></label>
+          <label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_needs_action</span></label>
+          <label><input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_declined</span></label>
           </td>
           </tr>";
           $$state = '';
@@ -2841,9 +2841,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           $DECLINED = 'class="disabled"';
           $$state = '';
           $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">
-          <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_accepted</span>
-    <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_needs_action</span>
-          <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_declined</span>
+          <label><input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_accepted</span></label>
+          <label><input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_needs_action</span></label>
+          <label><input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_declined</span></label>
             </td></tr>";
         }
       }
@@ -2864,9 +2864,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <tr>
           <td>$label</td>
           <td class=\"C\">
-          <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_accepted</span>
-    <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_needs_action</span>
-          <input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_declined</span>
+          <label><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_accepted</span></label>
+          <label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_needs_action</span></label>
+          <label><input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_declined</span></label>
           </td>
           </tr>";
           $$state = '';
@@ -2878,7 +2878,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $dis_users_block ="
       <div class=\"detail infos\">
       <h1>$l_users</h1>
-      <table  class=\"spreadSheet\">
+      <table class=\"spreadSheet\">
       <thead>
       <tr>
       <td>$l_users</td><td>$l_alerts</td><td>$l_state</td>
@@ -2949,8 +2949,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$url&rd_decision_event=NEEDS-ACTION'\" />$l_needs_action
           <input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$url&rd_decision_event=DECLINED'\" />$l_declined
           </td>
-          </tr>
-        ";
+          </tr>";
           $$state = '';
         } else {
         
@@ -3467,8 +3466,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_items, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_owner;
   global $l_opacity, $l_opacity_free, $l_opacity_busy;
-  global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_daily, $l_weekly;
-  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
+  global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_no_end_repeat;
+  global $l_daily, $l_weekly, $l_monthlybydate,$l_monthlybyday,$l_yearly;
+  global $l_carac,$l_module_calendar;
   global $l_none,$l_force,$l_repeat_update,$l_groups,$l_force_disabled;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
@@ -3613,7 +3613,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $tagcolor = "#eff0f2" ;
   }
 
-  if($opacity == 'TRANSPARENT'){
+  if ($opacity == 'TRANSPARENT') {
     $l_check_free = "checked='checked'";
   } else {
     $l_check_busy = "checked='checked'";
@@ -3690,9 +3690,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $day = $week->localize(Of_Date::WEEKDAY_NARROW) ;
     $j = $week->getWeekday();
     if (strcmp(substr($repeat_days,$j,1),'1') ==0) {
-      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"cba_repeatday_".$j."\" name=\"cba_repeatday_".$j."\" value=\"1\" checked = \"checked\"/><label for=\"cba_repeatday_".$j."\">$day</label></span>&nbsp;&nbsp; ";
+      $dis_repeat_day .= "<span class=\"NW\"><label><input type=\"checkbox\" name=\"cba_repeatday_".$j."\" value=\"1\" checked = \"checked\"/>$day</label></span>&nbsp;&nbsp; ";
     } else {
-      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"cba_repeatday_".$j."\" name=\"cba_repeatday_".$j."\" value=\"1\" /><label for=\"cba_repeatday_".$j."\">$day</label></span>&nbsp;&nbsp; ";
+      $dis_repeat_day .= "<span class=\"NW\"><label><input type=\"checkbox\" name=\"cba_repeatday_".$j."\" value=\"1\" />$day</label></span>&nbsp;&nbsp; ";
     }
     $week->addDay(1);
   }
@@ -3950,8 +3950,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <legend>$l_documents</legend>    
     <table>
     <tr>
-      <th>
-      $l_allow_documents
+      <th><label for=\"cba_allow_documents\">$l_allow_documents</label>
       </th>
       <td>
         $dis_allow_documents
@@ -4208,7 +4207,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <td>$frequency_block</td>
     </tr>    
     <tr id=\"noRepeatEnd\">    
-      <th>Pas de date de fin</th> 
+      <th><label for=\"cbx_no_repeatend\">$l_no_end_repeat</label></th> 
       <td><input type=\"checkbox\" id=\"cbx_no_repeatend\" onclick=\"toggleDisplay($('repeatEnd'));\" /></td>
     </tr>
     <tr id=\"repeatEnd\" style=\"display:$repeatDisplay\">    

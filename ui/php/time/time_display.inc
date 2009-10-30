@@ -1328,7 +1328,6 @@ function dis_time_display_pref($prefs) {
 //////////////////////////////////////////////////////////////////////////
 function dis_time_form_ra($time)
 {
-
   global $display;
   global $c_undef, $l_undef, $l_intern, $l_comment;
   global $l_projects, $l_week, $l_month, $l_period, $l_date;
@@ -1425,13 +1424,10 @@ function dis_time_form_ra($time)
         <tr>
           <th>'.$l_period.'</th>
           <td>
-            <input type="radio" name="interval" id="int_week" value="week" '.$chk_week.' />
-            '.$l_week.': '.$sel_week.'
-            <input type="radio" name="interval" id="int_month" value="month" '.$chk_month.' />
-            '.$l_month.': '.$sel_month.'
+            <label><input type="radio" name="interval" id="int_week" value="week" '.$chk_week.' />'.$l_week.': '.$sel_week.'</label>
+            <label><input type="radio" name="interval" id="int_month" value="month" '.$chk_month.' />'.$l_month.': '.$sel_month.'</label>
             <br />
-            <input type="radio" name="interval" id="int_date" value="date" '.$chk_date.' />
-            '.$l_date.':
+            <label><input type="radio" name="interval" id="int_date" value="date" '.$chk_date.' />'.$l_date.':</label>
             <input type="text" name="tf_int_date" onChange="selectRadio(\'int_date\')" class="datePicker" />
             '.$sel_int.'
           </td>

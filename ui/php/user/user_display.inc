@@ -256,7 +256,8 @@ function html_batch_user_search_form($user) {
 
     $block .= "$dis_delegation
                 ";
-    $block .= "<label<br />
+    $block .= "
+    <label<br />
       <select type=\"text\" name=\"sel_exp_op\">
         $block_exp_opt
       </select>
@@ -264,40 +265,39 @@ function html_batch_user_search_form($user) {
     <label>$l_exp<br />
       <input type=\"text\" name=\"tf_exp\" size=\"16\" maxlength=\"32\"
       value=\"$exp\" />
-    </label>
-                ";
-    $block .= "<label>$l_profile<br />
+    </label>";
+    $block .= "
+    <label>$l_profile<br />
       <select type=\"text\" name=\"sel_profile\">
         <option value=\"$c_all\"> $l_all</option>
         $block_profile
       </select>
-    </label>
-                ";
-    $block .= "<label>$l_title<br />
+    </label>";
+    $block .= "
+    <label>$l_title<br />
       <input type=\"text\" name=\"tf_title\" size=\"16\" maxlength=\"32\"
       value=\"$title\" />
-    </label>
-                ";
-    $block .= "<label>$l_fax<br />
+    </label>";
+    $block .= "
+    <label>$l_fax<br />
       <input type=\"text\" name=\"tf_fax\" size=\"16\" maxlength=\"16\"
       value=\"$fax\" />
-    </label>
-                ";
-    $block .= "<label>$l_direction<br />
+    </label>";
+    $block .= "
+    <label>$l_direction<br />
       <input type=\"text\" name=\"tf_direction\" size=\"16\" maxlength=\"32\"
       value=\"$direction\" />
-    </label>
-                ";
-    $block .= "<label>$l_service<br />
+    </label>";
+    $block .= "
+    <label>$l_service<br />
       <input type=\"text\" name=\"tf_service\" size=\"16\" maxlength=\"32\"
       value=\"$service\" />
-    </label>
-                ";    
-    $block .= "<label>$l_group<br />
+    </label>";
+    $block .= "
+    <label>$l_group<br />
       <input type=\"text\" name=\"tf_group\" size=\"16\" maxlength=\"32\"
       value=\"$group\" />
-    </label>
-                ";
+    </label>";
     $block .= "
       <label>$l_nomade<br />
         <input type=\"checkbox\" name=\"cba_nomade\" value=\"1\" $nomade />
@@ -1768,8 +1768,8 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
   <table>
   <tr>
-    <th class=\"$class[web_perms]\">$l_web</th>
-    <td><input name=\"cb_web_perms\" type=\"checkbox\" value=\"1\" $web_state /></td>
+    <th class=\"$class[web_perms]\"><label for=\"cb_web_perms\">$l_web</label></th>
+    <td><input id=\"cb_web_perms\" name=\"cb_web_perms\" type=\"checkbox\" value=\"1\" $web_state /></td>
   </tr>
   $dis_access
   </table>
@@ -1813,7 +1813,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <legend>$l_mail</legend>
   <table>
     <tr>
-      <th class=\"$class[mail_perms]\">$l_mail</th>
+      <th class=\"$class[mail_perms]\"><label for=\"userMailActive\">$l_mail</label></th>
       <td><input name=\"cb_mail_perms\" type=\"checkbox\" id=\"userMailActive\" onclick=\"switch_mail_mode();\" value=\"1\" $mail_state /></td>
     </tr>          
   </table>
@@ -1875,16 +1875,16 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     <td><input name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\" /></td>
   </tr>
   <tr>
-    <th class=\"$class[nomade_perms]\">$l_perms</th>
-    <td><input name=\"cb_nomade_perms\" type=\"checkbox\" value=\"1\" $nomade_perms_c /></td>
+    <th class=\"$class[nomade_perms]\"><label for=\"cb_nomade_perms\">$l_perms</label></th>
+    <td><input id=\"cb_nomade_perms\" name=\"cb_nomade_perms\" type=\"checkbox\" value=\"1\" $nomade_perms_c /></td>
   </tr>
   <tr>
-    <th class=\"$class[nomade_enable]\">$l_enabled</th>
-    <td><input name=\"cb_nomade_enable\" type=\"checkbox\" value=\"1\" $nomade_enable_c /></td>
+    <th class=\"$class[nomade_enable]\"><label for=\"cb_nomade_enable\">$l_enabled</label></th>
+    <td><input id=\"cb_nomade_enable\" name=\"cb_nomade_enable\" type=\"checkbox\" value=\"1\" $nomade_enable_c /></td>
   </tr>
   <tr>
-    <th class=\"$class[nomade_local_copy]\">$l_local_copy</th>
-    <td><input name=\"cb_nomade_local_copy\" type=\"checkbox\" value=\"1\" $nomade_local_copy_c /></td>
+    <th class=\"$class[nomade_local_copy]\"><label for=\"cb_nomade_local_copy\">$l_local_copy</label></th>
+    <td><input id=\"cb_nomade_local_copy\" name=\"cb_nomade_local_copy\" type=\"checkbox\" value=\"1\" $nomade_local_copy_c /></td>
   </tr>
   </table>
   </fieldset>";
@@ -1970,12 +1970,12 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </script>
   <table>
   <tr>
-    <th class=\"$class[vacation_enable]\">$l_enabled</th>
-    <td><input name=\"cb_vacation_enable\" type=\"checkbox\" value=\"1\" $vacation_state /></td>
+    <th class=\"$class[vacation_enable]\"><label for=\"cb_vacation_enable\">$l_enabled</label></th>
+    <td><input id=\"cb_vacation_enable\" name=\"cb_vacation_enable\" type=\"checkbox\" value=\"1\" $vacation_state /></td>
   </tr>
   <tr >
-    <th>$l_enable_auto_vacation</th>
-    <td><input $schedule_enable type=\"checkbox\" name=\"cba_auto_enable\" $auto_enable value=\"1\" 
+    <th><label for=\"cba_auto_enable\">$l_enable_auto_vacation</th>
+    <td><input $schedule_enable type=\"checkbox\" id=\"cba_auto_enable\" name=\"cba_auto_enable\" $auto_enable value=\"1\" 
     onchange=\"showHideVacationDate(this);\"
   </tr>  
   <tr $display_auto id=\"vacation_datebegin\">
@@ -2026,11 +2026,11 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
       <table>
       <tr>
-        <th class=\"$class[smb_perms]\">$l_smb_perms</th>
-        <td><input name=\"cb_smb_perms\" type=\"checkbox\" id=\"userSambaActive\" onclick=\"switch_samba_mode();\"  value=\"1\" $smb_state /></td>
+        <th class=\"$class[smb_perms]\"><label for=\"userSambaActive\">$l_smb_perms</label></th>
+        <td><input name=\"cb_smb_perms\" type=\"checkbox\" id=\"userSambaActive\" onclick=\"switch_samba_mode();\" value=\"1\" $smb_state /></td>
       </tr>
       </table>
-      <table  id=\"userSambaProperties\" class='$sambaKlass'>
+      <table id=\"userSambaProperties\" class='$sambaKlass'>
       <tr>
         <th class=\"$class[smb_home]\">$l_smb_home</th>
         <td>
@@ -2122,8 +2122,8 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   } else {
     $dis_archive = "
       <tr>
-        <th class=\"$class[archive]\">$l_archive</th>
-        <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
+        <th class=\"$class[archive]\"><label for=\"cba_archive\">$l_archive</label></th>
+        <td><input id=\"cba_archive\" name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
       </tr>";
   }
 
@@ -2262,8 +2262,8 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   $dis_status
   $dis_domain
   <tr>
-    <th class=\"$class[hidden]\">$l_hidden</th>
-    <td><input name=\"cba_hidden\" type=\"checkbox\" value=\"1\" $hidden /></td>
+    <th class=\"$class[hidden]\"><label for=\"cba_hidden\">$l_hidden</label></th>
+    <td><input id=\"cba_hidden\" name=\"cba_hidden\" type=\"checkbox\" value=\"1\" $hidden /></td>
   </tr>
   $dis_archive
   $dis_gid
@@ -2285,7 +2285,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
   </tr>
   <tr>
-    <th class=\"$class[noexperie]\">$l_noexperie</th>
+    <th class=\"$class[noexperie]\"><label for=\"noexperie\">$l_noexperie</label></th>
     <td><input id=\"noexperie\" name=\"cba_noexperie\" type=\"checkbox\" value=\"1\" $noexperie onclick='showExpiration();'/></td>
   </tr>
   <tr id=\"exp\" style=\"$showexp\">

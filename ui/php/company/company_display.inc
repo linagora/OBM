@@ -1221,8 +1221,8 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
     <th>$l_datasource :</th> 
     <td>$sel_dsrc</td>
   </tr><tr>
-    <th>$l_archive :</th>
-    <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
+    <th><label for=\"lbl_arch\">$l_archive :</label></th>
+    <td><input type=\"checkbox\" id=\"lbl_arch\" name=\"cba_archive\" value=\"1\" $archive /></td>
   $block_type
   $block_userdata
   $block_activity

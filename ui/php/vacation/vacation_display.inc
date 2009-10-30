@@ -17,17 +17,17 @@ function html_vacation_consult($usr_q) {
   global $l_vacation, $l_vacation_enabled, $l_vacation_message;
   global $l_enabled, $l_disabled, $l_vacation_datebegin, $l_vacation_dateend;
 
-  $enabled = $usr_q->f("userobm_vacation_enable");
+  $enabled = $usr_q->f('userobm_vacation_enable');
   if ($enabled == 1) {
     $status = $l_enabled;
   } else {
     $status = $l_disabled;
   }
 
-  if ($usr_q->f("userobm_vacation_message") != "") {
-    $message = nl2br(stripslashes( $usr_q->f("userobm_vacation_message") ));
+  if ($usr_q->f('userobm_vacation_message') != '') {
+    $message = nl2br(stripslashes( $usr_q->f('userobm_vacation_message') ));
   } else {
-    $message = "---";
+    $message = '---';
   }
 
   $vacation_datebegin = new Of_Date($usr_q->f('userobm_vacation_datebegin'), 'GMT');
@@ -78,15 +78,15 @@ function html_vacation_consult($usr_q) {
 //   - $vacation : parameters hash
 //   - $field : if set, field in error
 ///////////////////////////////////////////////////////////////////////////////
-function html_vacation_form($usr_q, $vacation, $field="") {
+function html_vacation_form($usr_q, $vacation, $field='') {
   global $obm, $l_vacation, $l_enable_vacation, $l_vacation_message;
   global $l_update, $l_vacation_not_allowed, $l_vacation_datebegin, $l_vacation_dateend;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_hour, $l_enable_auto_vacation;
 
-  $action = $vacation["action"];
+  $action = $vacation['action'];
   
   // if update mode and first time value are taken from database
-  if ($action == "detailupdate") {
+  if ($action == 'detailupdate') {
 
     $vacation_datebegin = new Of_Date($usr_q->f('userobm_vacation_datebegin'), 'GMT');
     $vacation_dateend = new Of_Date($usr_q->f('userobm_vacation_dateend'), 'GMT');
@@ -98,22 +98,22 @@ function html_vacation_form($usr_q, $vacation, $field="") {
       $vacation_dateend->addWeek(1);
     }
 
-    $enabled = $usr_q->f("userobm_vacation_enable");
-    $message = stripslashes( $usr_q->f("userobm_vacation_message") );
-    $mail_enable = $usr_q->f("userobm_mail_perms");
+    $enabled = $usr_q->f('userobm_vacation_enable');
+    $message = stripslashes( $usr_q->f('userobm_vacation_message') );
+    $mail_enable = $usr_q->f('userobm_mail_perms');
   } else if ($action == 'update') {
     $obm_q = run_query_vacation_detail($obm['uid']);
-    $mail_enable = $obm_q->f("userobm_mail_perms");
+    $mail_enable = $obm_q->f('userobm_mail_perms');
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($vacation["enabled"])) { $enabled = $vacation["enabled"]; }
-  if (isset($vacation["message"])) { $message = $vacation["message"]; }
-  if (isset($vacation["vacation_datebegin"])) { $vacation_datebegin = $vacation["vacation_datebegin"]; } 
+  if (isset($vacation['enabled'])) { $enabled = $vacation['enabled']; }
+  if (isset($vacation['message'])) { $message = $vacation['message']; }
+  if (isset($vacation['vacation_datebegin'])) { $vacation_datebegin = $vacation['vacation_datebegin']; } 
   elseif(!$vacation_dateend) { $vacation_datebegin = new Of_Date();$vacation_datebegin->addHour(1)->setMinute(0)->setSecond(0);}
-  if (isset($vacation["vacation_dateend"])) { $vacation_dateend = $vacation["vacation_dateend"]; }
+  if (isset($vacation['vacation_dateend'])) { $vacation_dateend = $vacation['vacation_dateend']; }
   elseif(!$vacation_dateend) { $vacation_dateend = clone $vacation_datebegin; $vacation_dateend->addWeek(1); }
-  if (isset($vacation["auto_enable"])) {$auto_enable = $vacation["auto_enable"]; }
+  if (isset($vacation['auto_enable'])) {$auto_enable = $vacation['auto_enable']; }
 
   if (! $mail_enable) {
     return display_warn_msg($l_vacation_not_allowed);
@@ -127,10 +127,10 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   }
   // vacation enabled checkbox
   if ($enabled == 1) {
-    $enabled_checked = " checked=\"checked\" " ;
-    $message_enabled = "";
+    $enabled_checked = " checked=\"checked\" ";
+    $message_enabled = '';
   } else {
-    $enabled_checked = " " ;
+    $enabled_checked = ' ';
   }
   // hour begin
   $dis_hour_b = "<select $schedule_disabled name=\"sel_time_begin\" style=\"width:4em;\">";
@@ -151,7 +151,7 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   }
   $step = 60 / $hour_fraction;
   for ($i=$hour_fraction; $i>=1; $i--) {
-    $current_min = substr("0".round((60 - ($step*$i))),-2);
+    $current_min = substr('0'.round((60 - ($step*$i))),-2);
     if ($current_min  == $vacation_datebegin->getMinute()) {
       $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     } else {
@@ -173,7 +173,7 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   $dis_hour_e .= "</select>";  
   $dis_min_e = "<select $schedule_disabled name=\"sel_min_end\" style=\"width:4em;\">";
   for ($i=$hour_fraction; $i>=1; $i--) {
-    $current_min = substr("0".round((60 - ($step*$i))),-2);
+    $current_min = substr('0'.round((60 - ($step*$i))),-2);
     if ($current_min  == $vacation_dateend->getMinute()) {
       $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     } else {
@@ -183,8 +183,8 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   $dis_min_e .= "</select>";
 
   // error and css classes : 
-  $enabled_css = $field == "enabled" ?  "detailError" : "detailLabel";
-  $message_css = $field == "message" ?  "detailError" : "detailLabel";
+  $enabled_css = $field == 'enabled' ?  'detailError' : 'detailLabel';
+  $message_css = $field == 'message' ?  'detailError' : 'detailLabel';
   
   $block = "
 <form method=\"POST\" name=\"form_vacation\" action=\"vacation_index.php\">
@@ -212,12 +212,12 @@ function html_vacation_form($usr_q, $vacation, $field="") {
 
   <table>
   <tr>
-    <th>$l_enable_vacation</th>
-    <td><input type=\"checkbox\" name=\"cba_enabled\" value=\"1\" $enabled_checked /></td>
+    <th><label for=\"cba_enabled\">$l_enable_vacation</label></th>
+    <td><input type=\"checkbox\" id=\"cba_enabled\" name=\"cba_enabled\" value=\"1\" $enabled_checked /></td>
   </tr>
   <tr >
-    <th>$l_enable_auto_vacation</th>
-    <td><input type=\"checkbox\" name=\"cba_auto_enable\" $schedule_enable value=\"1\" 
+    <th><label for=\"cba_auto_enable\">$l_enable_auto_vacation</label></th>
+    <td><input type=\"checkbox\" id=\"cba_auto_enable\" name=\"cba_auto_enable\" $schedule_enable value=\"1\" 
     onclick=\"showHideVacationDate(this);\"
   </tr>
   <tr $display_auto id=\"vacation_datebegin\">

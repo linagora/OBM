@@ -1415,8 +1415,8 @@ function html_project_form($action, $project_q, $project) {
       <th>$l_dateend</th>
       <td><input type=\"text\" name=\"tf_dateend\" value=\"$dateend\" class=\"datePicker\"/></td>
     </tr><tr>
-      <th>$l_archive</th>
-      <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $arc_val /></td>
+      <th><label for=\"cba_archive\">$l_archive</label></th>
+      <td><input type=\"checkbox\" id=\"cba_archive\" name=\"cba_archive\" value=\"1\" $arc_val /></td>
     </tr>
     </table>
     </fieldset>
@@ -1671,25 +1671,25 @@ function html_project_tasklist($tasks_q, $project) {
       $t_label = $tasks_q->f('projecttask_label');
       $t_parent = $tasks_q->f('parent_id');
       $t_rank = $tasks_q->f('projecttask_rank');
-      
+
       if (($t_parent == 0) || ($t_parent == '')) {
 	$dis_task .= "
-         <tr>
-          <td >
-	   <input type=\"checkbox\" name=\"data-task-$t_id\" />
-	  </td>
-	  <td  colspan=\"2\">$t_label</td>
-         </tr>";
+      <tr>
+        <td>
+        <input type=\"checkbox\" id=\"data-task-$t_id\" name=\"data-task-$t_id\" />
+        </td>
+        <td colspan=\"2\"><label for=\"data-task-$t_id\">$t_label</label></td>
+       </tr>";
       } else {
 	$dis_task .= "
-         <tr>
-          <td>
-           <input type=\"checkbox\" name=\"data-task-$t_id\" />
-          </td>
-	  <td colspan=\"2\">
-           <img border=\"0\" src=\"$ico_hierarchy\" alt=\"\" />$t_label
-          </td>
-         </tr>";
+      <tr>
+        <td>
+        <input type=\"checkbox\" id=\"data-task-$t_id\" name=\"data-task-$t_id\" />
+        </td>
+        <td colspan=\"2\">
+        <label for=\"data-task-$t_id\"><img border=\"0\" src=\"$ico_hierarchy\" alt=\"\" />$t_label</label>
+        </td>
+      </tr>";
       }
    }
     
@@ -1749,21 +1749,21 @@ function html_project_member_form($members_q, $project) {
 
       if ($m_manager) {
 	$rd_manager = "
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" checked onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" onchange=\"change_status($m_id, 0, f_entity)\" />$l_member";
+          <label><input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" checked onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager</label>
+          <label><input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" onchange=\"change_status($m_id, 0, f_entity)\" />$l_member</label>";
       } else {
 	$rd_manager = "
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" checked onchange=\"change_status($m_id, 0, f_entity)\"/>$l_member";
+          <label><input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager</label>
+          <label><input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" checked onchange=\"change_status($m_id, 0, f_entity)\"/>$l_member</label>";
       }
 
       $dis_member .= "
-        <tr>
-        <td>
-         <input type=\"checkbox\" name=\"data-u-$m_id\"/>
-         $m_name</td>
-         <td>$rd_manager</td>
-        </tr>";
+      <tr>
+      <td>
+       <label><input type=\"checkbox\" name=\"data-u-$m_id\"/>$m_name</label>
+      </td>
+      <td>$rd_manager</td>
+      </tr>";
     }
 
     $dis_button = "

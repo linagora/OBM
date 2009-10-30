@@ -784,8 +784,8 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $users_p, $pri, 
       <th>$l_owner</th>
       <td>$dis_sel_owner</td>
     </tr><tr>
-      <th>$l_archive_new</th>
-      <td><input name=\"cba_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
+      <th><label for=\"cba_archive\">$l_archive_new</label></th>
+      <td><input id=\"cba_archive\" name=\"cba_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
     </tr>
     $block_priority
     <tr>
