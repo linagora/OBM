@@ -13,6 +13,8 @@ use strict;
 
 use OBM::Parameters::common;
 
+use constant LDAPDN => 'mailServer';
+
 
 # Needed
 sub new {
@@ -206,7 +208,7 @@ sub getDnPrefix {
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'cn='.$self->{'parent'}->getDesc('domain_label').','.$rootDn->[$i] );
+        push( @dnPrefixes, 'cn='.LDAPDN.','.$rootDn->[$i] );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
@@ -257,7 +259,7 @@ sub createLdapEntry {
 
     $entry->add(
         objectClass => $self->_getLdapObjectclass(),
-        cn => $self->{'parent'}->getDesc('domain_label')
+        cn => LDAPDN
     );
 
     # Mail domains
