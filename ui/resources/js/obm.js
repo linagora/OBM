@@ -312,12 +312,19 @@ Obm.Drag = new Class ({
   },
 
   start: function(event){
+    var width = this.element.style.width;
 
+    // Set correct width to initialize limit
     if (this.options.initialWidth) {
       this.element.style.width = this.options.initialWidth;
     }
 
     this.parent(event);
+
+    // Reset element width
+    if (this.options.initialWidth) {
+      this.element.style.width = width;
+    }
 
     this.pixelUnitSize = new Object();
     if (this.options.preventDefault) event.preventDefault();
