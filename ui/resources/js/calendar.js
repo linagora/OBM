@@ -1196,7 +1196,6 @@ Obm.CalendarInDayEvent = new Class({
    */
   setPosition: function() {
     this.element.style.top = (this.event.date.getHours()*3600 + this.event.date.getMinutes()*60)/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight + 'px';
-    this.element.style.top = (this.event.date.getHours()*3600 + this.event.date.getMinutes()*60)/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight + 'px';
     if (this.event.duration < obm.vars.consts.timeUnit) {
       this.element.style.height = obm.calendarManager.defaultHeight+'px';
     } else {
