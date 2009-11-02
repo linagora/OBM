@@ -28,7 +28,7 @@ Obm.Contact.AddressBook = new Class ({
         this.addressbook.addClass('current');
         $('spinner').hide();
       }.bind(this),
-      onRequest: $('spinner').show.bind($('spinner')),
+      onRequest: $('spinner').show.bind($('spinner'))
     });
 
     this.contactRequest = new Request.HTML({
@@ -227,7 +227,7 @@ Obm.Contact.AddressBook = new Class ({
    */
   setSubscription: function(id) {
     this.addressBookRequest.post({ajax:1, action:'setSubscription', 'id':id});
-  },
+  }
 });
 
 
@@ -237,7 +237,7 @@ Obm.Contact.PhoneWidget = new Class ({
   kind : 'phones',
   structure : {
     label: { kind: 'label', value: 'CELL_VOICE', newLine : true, label : obm.vars.labels.phoneLabel.WORK_VOICE}, 
-    number: { kind: 'text', value: '', newCell : true, label : obm.vars.labels.phoneNumber},
+    number: { kind: 'text', value: '', newCell : true, label : obm.vars.labels.phoneNumber}
   },
 
   options: {container: 'phoneHolder'},
