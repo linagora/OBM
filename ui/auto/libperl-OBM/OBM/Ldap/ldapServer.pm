@@ -196,17 +196,17 @@ sub _connect {
 
     $self->_log( 'connexion au '.$self->getDescription(), 2 );
 
-    my @tempo = ( 1, 3, 5, 10, 20, 30 );
+    my @tempo = ( 1, 3, 5, 10, 20 );
     require Net::LDAP;
     while( !($self->{'ldapServerConn'} = Net::LDAP->new( $self->{'ldapUri'}, debug => '0', timeout => '60', version => '3' )) ) {
-        $self->_log( 'échec de connexion au '.$self->getDescription(), 0 );
+        $self->_log( 'échec de connexion au '.$self->getDescription(), 1 );
 
         my $tempo = shift(@tempo);
         if( !defined($tempo) ) {
             last;
         }
 
-        $self->_log( 'prochaine tentative dans '.$tempo.'s', 3 );
+        $self->_log( 'prochaine tentative dans '.$tempo.'s', 1 );
         sleep $tempo;
     }
 

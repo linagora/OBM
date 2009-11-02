@@ -152,7 +152,7 @@ sub _connect {
 
     eval {
         local $SIG{ALRM} = sub {
-            $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 0 );
+            $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 1 );
             delete($self->{'ServerConn'});
             die 'alarm'."\n";
         };
@@ -162,21 +162,21 @@ sub _connect {
         alarm 0;
     };
 
-    my @tempo = ( 1, 3, 5, 10, 20, 30 );
+    my @tempo = ( 1, 3, 5, 10, 20 );
     while( !$self->{'ServerConn'} ) {
-        $self->_log( 'échec de connexion au '.$self->getDescription(), 0 ) if (defined($@) && ($@ ne 'alarm'."\n"));
+        $self->_log( 'échec de connexion au '.$self->getDescription(), 1 ) if (defined($@) && ($@ ne 'alarm'."\n"));
 
         my $tempo = shift(@tempo);
         if( !defined($tempo) ) {
             last;
         }
 
-        $self->_log( 'prochaine tentative dans '.$tempo.'s', 3 );
+        $self->_log( 'prochaine tentative dans '.$tempo.'s', 1 );
         sleep $tempo;
 
         eval {
             local $SIG{ALRM} = sub {
-                $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 0 );
+                $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 1 );
                 delete($self->{'ServerConn'});
                 die 'alarm'."\n";
             };
