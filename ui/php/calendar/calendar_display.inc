@@ -1138,17 +1138,17 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
 
     $background = "";
     if($current->compareHour($GLOBALS['ccalendar_first_hour']) < 0 || $current->compareHour($GLOBALS['ccalendar_last_hour']) >= 0) {
-      $background="background:#EEE";
+      $background="background:#EEE;";
     }
 
     if($current->compareMinute(0) == 0) {
       $label = $current->get(Of_Date::TIME_SHORT);
       $week_hour .= "<div class='hourFull' style='$background;height:{$height}px;'>$label</div>";
-      $week_time .= "<div id='time_$id' class='hourFull' style='$background;height:{$height}px;'></div>";
+      $week_time .= "<div id='time_$id' class='hourFull' style='$background height:{$height}px;'></div>";
     } else {
       $label = '';
       $week_hour .= "<div class='hourPartial' style='$background;height:{$height}px;'></div>";
-      $week_time .= "<div id='time_$id' class='hourPartial' style='$background;height:{$height}px;'></div>";
+      $week_time .= "<div id='time_$id' class='hourPartial' style='$background height:{$height}px;'></div>";
     }
     $current->addMinute(60/$_SESSION['set_cal_interval']);
   }
