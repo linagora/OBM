@@ -3884,7 +3884,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </fieldset>
       <p class=\"LC\"></p>";
       $user_complete = "new obm.AutoComplete.ExtSearch(
-        function() { return '$GLOBALS[path]/'+\$('userSearchSource').value+'&action=ext_search'; },
+        function() { return \$('userSearchSource').value+'&action=ext_search'; },
         'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
   } else {
     $block_user = "<fieldset class=\"detail infos H\"><div class='elementRow' id='sel_user_id-data-user-$obm[uid]'><input type='hidden' name='sel_user_id[]' value='data-user-$obm[uid]' />".$users['entity'][$obm['uid']]['label']."</div></fieldset>";
@@ -4648,7 +4648,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
 
     $user_js = "
     new obm.AutoComplete.ExtSearch(
-        function() { return '$path/'+\$('userSearchSource').value+'&action=ext_search'; },
+        function() { return \$('userSearchSource').value+'&action=ext_search'; },
         'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});
     new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
 
@@ -5101,7 +5101,7 @@ function dis_calendar_free_interval($current_view) {
     obm.vars.images.ico_allday = '$GLOBALS[ico_allday_alt]';
     obm.vars.images.ico_periodic = '$GLOBALS[ico_periodic_alt]';
     new obm.AutoComplete.ExtSearch(
-      function() { return '$GLOBALS[path]/'+\$('freeBusySearchSource').value+'&action=ext_search&ajax=1'; },
+      function() { return \$('freeBusySearchSource').value+'&action=ext_search&ajax=1'; },
       'dummy', 'freeBusyUserSearch',
       {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee([id]);'});
     new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'dummy', 'freeBusyResourceSearch',
