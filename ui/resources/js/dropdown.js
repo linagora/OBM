@@ -16,7 +16,7 @@ Obm.DropDownMenu= new Class({
 		if(this.options.mode != 'horizontal' && this.options.mode != 'vertical'){
 			this.options.mode = 'horizontal';
 		}
-                this.build();
+    this.build();
 	},
 	
 	build:function(){
@@ -24,8 +24,8 @@ Obm.DropDownMenu= new Class({
 		//start setup
 		this.menu.setStyles({
 			overflow:'hidden',
-                        zIndex: 1,
-			height:0,
+      zIndex: 1,
+			height:0
 		});
 		//we call the createSubmenu function on the main UL, which is a recursive function
 		this.createSubmenu(this.menu);

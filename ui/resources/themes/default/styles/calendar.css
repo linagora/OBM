@@ -155,10 +155,20 @@
   background-image: url(../images/hour_marker.gif);
 }
 
+#calendarHeader {
+  margin-bottom:8px;
+  margin-right:15px;
+}
+
+#calendarGridContainer {
+  position:relative;
+}
+
 #calendarBody {
   border:1px solid #AAAAAA;
   overflow-y:scroll;
   overflow-x:hidden;
+  position:relative;
 }
 
 .calendarTable {

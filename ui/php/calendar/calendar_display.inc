@@ -1169,7 +1169,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   }
 
   $block .= "
-  <div id='calendarHeader' style='margin-bottom: 8px;margin-right:15px;'>
+  <div id='calendarHeader'>
     <table class='calendarTable'>
       <colgroup style='background:#EFF0F2;text-align:right;'></colgroup>
       <colgroup></colgroup>
@@ -1197,7 +1197,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       <td style='background:#EFF0F2;width:3em;'>
           $week_hour
       </td><td>
-        <div id='calendarGridContainer' style='position:relative;'>
+        <div id='calendarGridContainer'>
           $today_marker
           <div id='calendarGrid' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
             $week_day_col
@@ -1322,7 +1322,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   }
 
   $block = "
-  <div id='calendarHeader' style='margin-bottom: 8px;margin-right:15px;'>
+  <div id='calendarHeader'>
     <table class='calendarTable'>
       <tr>
         <td>
