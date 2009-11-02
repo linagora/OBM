@@ -1578,8 +1578,12 @@ Obm.CalendarQuickForm = new Class({
 
     var type = str[0];
     if (type == 'time') {
-      var d = obm.calendarManager.startTime + str[1].toInt() + 
-				Math.floor(ivent.event.offsetX/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth.toInt()))*86400;
+      /* Crappy ie fix*/
+      var x = ivent.event.layerX;
+      if (!x) x =ivent.event.offsetX;
+      /* End of crappy ie fix*/
+
+      var d = obm.calendarManager.startTime + str[1].toInt() + Math.floor(x/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth.toInt()))*86400;
       this.setDefaultFormValues(d,0, context);
     } else if (type == 'allday') {
       var d = obm.calendarManager.startTime + Math.floor($('allday_'+str[1]).style.left.toInt()/obm.vars.consts.cellWidth.toInt())*86400;
