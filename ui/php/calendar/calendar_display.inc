@@ -1061,7 +1061,7 @@ function dis_calendar_select_template_form($action, $calendar) {
         <input type=\"hidden\" name=\"action\" value=\"$action\" />
         <input type=\"submit\" value=\"$GLOBALS[l_ok]\" />
       </form>
-    </div>";
+    </div></div>";
 }
 
 
