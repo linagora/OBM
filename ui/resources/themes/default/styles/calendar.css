@@ -168,6 +168,7 @@
   border:1px solid #AAAAAA;
   overflow-y:scroll;
   overflow-x:hidden;
+  position:relative;
 }
 
 .calendarTable {
