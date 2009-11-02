@@ -200,7 +200,7 @@ function get_time_stat_project($time) {
     FROM ProjectUser
       INNER JOIN Project ON projectuser_project_id = project_id
     $where_pid
-    GROUP BY project_id
+    GROUP BY project_id, project_name
 ";
 
     display_debug_msg($query, $cdg_sql, 'get_time_stat_project(2)');
@@ -218,7 +218,7 @@ function get_time_stat_project($time) {
       (sum($iftd_end) / $c_day_fraction) as total_length,
       (sum(timetask_length) / $c_day_fraction) as total_after
     FROM ProjectTask
-      INNER JOIN TimeTask
+      INNER JOIN TimeTask on projecttask_id=timetask_projecttask_id
     WHERE timetask_date <= '$date_end'
       AND timetask_projecttask_id = projecttask_id
       AND projecttask_project_id IN ($projects)
