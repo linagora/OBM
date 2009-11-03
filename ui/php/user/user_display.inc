@@ -2243,15 +2243,15 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table>
   <tr>
     <th class=\"$class[kind]\">$l_kind</th>
-    <td><input name=\"tf_kind\" size=\"32\" maxlength=\"32\" value=\"$kind\" /></td>
+    <td><input name=\"tf_kind\" size=\"32\" maxlength=\"12\" value=\"$kind\" /></td>
   </tr>
   <tr>
     <th class=\"$class[lastname]\">$l_lastname</th>
-    <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
+    <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"64\" value=\"$lname\" /></td>
   </tr>
   <tr>
     <th class=\"$class[firstname]\">$l_firstname</th>
-    <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
+    <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"64\" value=\"$fname\" /></td>
   </tr>
   <tr>
     <th class=\"$class[login]\">$l_login</th>
@@ -2282,7 +2282,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   $dis_delegation_target
   <tr>
     <th class=\"$class[title]\">$l_title</th>
-    <td><input name=\"tf_title\" size=\"32\" maxlength=\"32\" value=\"$title\" /></td>
+    <td><input name=\"tf_title\" size=\"32\" maxlength=\"64\" value=\"$title\" /></td>
   </tr>
   <tr>
     <th class=\"$class[datebegin]\">$l_datebegin</th>
