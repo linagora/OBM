@@ -1118,8 +1118,8 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     $week_day_list .= "<td class='dayLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a></td>";
 
     $week_day_event_list .= "
-    <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer' style='height:{$height}%;width:$width%;left:$week_day_left%;$today'>
-      <div id='allday_$date_iso' class='alldayCell' style='width:100%;'></div>
+    <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer' style='height:$height%;width:$width%;left:$week_day_left%;$today'>
+      <div id='allday_$date_iso' class='alldayCell'></div>
     </div>";
 
     $week_day_col .= "<div id='day_$date_iso' class='dayCol' style='left:$week_day_left%;'></div>";
@@ -1285,7 +1285,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $week_day_event_list .= "
         <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='width:$width%;left:$week_day_left%;$today'>
           <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
-          <div id='allday_$date_iso' class='alldayCell' style='width:100%;'>
+          <div id='allday_$date_iso' class='alldayCell'>
             <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title</h1>' style='text-align:center;position:absolute;display;none;width:100%;'></div>
           </div>
         </div>";

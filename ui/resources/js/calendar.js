@@ -1379,7 +1379,7 @@ Obm.CalendarAllDayEvent = new Class({
    */
   updatePosition: function(position, size, col) {
     var alldayColumn = $('allday_'+col);
-    this.element.style.top = alldayColumn.offsetHeight + alldayColumn.getParent().offsetTop+ position * this.element.offsetHeight+'px';
+    this.element.style.top = alldayColumn.getParent().offsetTop+ position * this.element.offsetHeight+'px';
     if (obm.calendarManager.calendarView == 'month') {
       this.element.style.top = this.element.style.top.toFloat()+$('dayMonthLabel_'+col).getHeight()+'px';
     }
