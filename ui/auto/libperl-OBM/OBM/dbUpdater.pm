@@ -57,6 +57,7 @@ sub update {
         if( !$entity->getUpdated() ) {
             $self->_log( 'l\'entité '.$entity->getDescription().' est en erreur de traitement', 3 );
             $self->_log( 'pas de traitement BD de l\'entité de '.$entity->getDescription(), 2 );
+            $returnCode = 1;
             last SWITCH;
         }
 

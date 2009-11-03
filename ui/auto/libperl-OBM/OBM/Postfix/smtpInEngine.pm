@@ -50,16 +50,16 @@ sub update {
     }
 
  
-    # If entity is not updated (but only links)
-    if( !$entity->smtpInUpdateMap() ) {
-        $self->_log( 'entité '.$entity->getDescription().' mise à jour mais pas d\'impact sur les maps postfix', 1 );
-        return 0;
-    }
-
     # If entity update error
     if( !$entity->getUpdated() ) {
         $self->_log( 'entité '.$entity->getDescription().' en erreur de mise à jour', 1 );
         push( @{$self->{'entitiesUpdateErrorDesc'}}, $entity->getDescription() );
+        return 0;
+    }
+
+    # If entity is not updated (but only links)
+    if( !$entity->smtpInUpdateMap() ) {
+        $self->_log( 'entité '.$entity->getDescription().' mise à jour mais pas d\'impact sur les maps postfix', 1 );
         return 0;
     }
 
