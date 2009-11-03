@@ -2963,7 +2963,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
               }
             }
             if (sizeof($emails) > 0) {
-              $label = "<a href='mailto:".implode(',', $emails)."'><img src='$GLOBALS[ico_mail]' /></a> ";
+              $label = "<a href='mailto:".implode(',', $emails)."'><img src='$GLOBALS[ico_mail]' /></a>$label ";
             }
           }          
           $ACCEPTED = 'class="disabled"';

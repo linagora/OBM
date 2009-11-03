@@ -288,7 +288,7 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
 function html_resource_form($usr_q, $resource) {
   global $l_name, $l_desc, $l_qty, $l_rtype, $l_header_new_f;
   global $l_resource, $l_insert, $l_update;
-  global $action, $display, $obm;
+  global $action, $display, $obm, $path;
   global $l_undef, $c_undef,$l_admin_permission;
 
   // if update mode and first time value are taken from database
