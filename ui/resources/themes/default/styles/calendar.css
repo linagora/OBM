@@ -94,6 +94,11 @@
   vertical-align:middle;
 }
 
+.monthDayLabel {
+  text-align:center;
+  background:#EFF0F2;
+}
+
 .dayCol {
   border-left:1px solid #CCC;
   position:absolute;

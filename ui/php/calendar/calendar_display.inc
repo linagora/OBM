@@ -1311,28 +1311,19 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   $current = clone $date;
   $end = clone $date;
   $end->addDay(7);
-  $step = 0;
   while($current->compare($end) < 0) {
-    $day = $current->localize(Of_Date::WEEKDAY);
-    $iso = $current->getURL();
-    $week_day_left = $step*$width;
-    $week_day_list .= "<div class='dayColLabel' style='width:$width%;left:$week_day_left%;line-height:20px'>$day</div>";
-    $step++;
+    $week_day_list .= "<td class='monthDayLabel'>".$current->localize(Of_Date::WEEKDAY)."</td>";
     $current->addDay(1);
   }
 
   $block = "
   <div id='calendarHeader'>
     <table class='calendarTable'>
-      <tr>
-        <td>
-          <div style='position:relative;height:20px'>
-              $week_day_list
-          </div>
-        </td>
+      <tr class=''>
+        $week_day_list
       </tr>
       <tr>
-        <td>
+        <td colspan='7'>
           <div id='calendarHeaderGrid' style='height:400px' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
             $week_day_event_list
           </div>
