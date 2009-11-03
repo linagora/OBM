@@ -40,6 +40,7 @@ Obm.CalendarManager = new Class({
 
     if ($('todayHourMarker')) {
       // Set hourMarker initial position
+      this.now = new Date();
       this.updateHourMarker();
       this.updateHourMarker.periodical(120000, this);
     }
@@ -59,8 +60,7 @@ Obm.CalendarManager = new Class({
        $('waitingEventsContainer').set('class', 'waitingEventsContainer');
     }
 
-
-    // *************************************** IE6 CRAPPY FIX
+    // *************************************** IE6 CRAPPY FIX, height:100% => doesn't work
     if ($('calendarGrid')) {
       var height = $('calendarGrid').getHeight();
       $$('div.dayCol').each(function(e) {
@@ -73,9 +73,8 @@ Obm.CalendarManager = new Class({
    * Update hour marker (left panel & in-day) 
    */ 
   updateHourMarker: function() {
-    var now = new Date();
-    $('todayHourMarker').style.top = (now.getHours()*3600 + now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
-    // $('hourMarker').style.top = (now.getHours()*3600 + now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
+    $('todayHourMarker').style.top = (this.now.getHours()*3600 + this.now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
+    // $('hourMarker').style.top = (this.now.getHours()*3600 + this.now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
   },
 
 
@@ -878,9 +877,6 @@ Obm.CalendarManager = new Class({
       }
     } else {
       showErrorMessage(response.message);
-      // obm.calendarManager.events.each(function(evt, key) {
-      //   evt.redraw(); 
-      // });      
     }
   },
 
@@ -1207,12 +1203,6 @@ Obm.CalendarInDayEvent = new Class({
    * Update event position when redrawGrid (to prevent conflict)
    */
   updatePosition: function(unit, position, size, column) {
-    this.element.style.top = (this.event.date.getHours()*3600 + this.event.date.getMinutes()*60)/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight + 'px';
-    if (this.event.duration < obm.vars.consts.timeUnit) {
-      this.element.style.height = obm.calendarManager.defaultHeight+'px';
-    } else {
-      this.element.style.height = this.event.duration/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight+'px';
-    }
     this.element.style.width = (obm.vars.consts.cellWidth/unit*size) + '%';
     this.element.style.left = ($('day_'+column).style.left.toFloat()) + ((obm.vars.consts.cellWidth/unit) * position) + '%';
   },
