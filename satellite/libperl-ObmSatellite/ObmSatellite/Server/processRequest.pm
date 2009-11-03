@@ -23,7 +23,7 @@ sub process_request {
         # Accept a connection from HTTP::Daemon
         my $connection = $self->{'server'}->{'socket'}->accept() or next;
 
-        $self->log( 0, 'Connect from: '.$connection->peerhost() );
+        $self->log( -1, 'Connect from: '.$connection->peerhost() );
         
         # Get the request
         while( ($processedRequest < $self->{'server'}->{'max_requests'}) && ($httpRequest = $connection->get_request()) ) {

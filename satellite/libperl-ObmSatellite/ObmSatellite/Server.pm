@@ -63,7 +63,7 @@ sub _daemonize {
     # If we're the shell-called process, exit back.
     exit if $pid;
 
-    $self->log( 0, 'Parent daemon running (PID: '.$$.')' );
+    $self->log( -1, 'Parent daemon running (PID: '.$$.')' );
     $self->_writePidFile();
     
     # Now we're a daemonized parent process!
@@ -103,7 +103,7 @@ sub _daemonize {
         $self->log( 3, 'Send SIGTERM to : '.join( ' ', keys(%{$self->{'childrens'}}) ) );
         kill 'TERM' => keys(%{$self->{'childrens'}});
 
-        $self->log( 0, 'Daemon stopped by '.$sig );
+        $self->log( -1, 'Daemon stopped by '.$sig );
 
         unlink($self->{'server'}->{'pid_file'});
         exit;
@@ -173,7 +173,7 @@ sub _newChildren {
     
     $self->_childSig();
 
-    $self->log( 0, 'child '.$$.' ready to process requests' );
+    $self->log( -1, 'child '.$$.' ready to process requests' );
 
     $self->process_request();
     exit 0;
@@ -187,7 +187,7 @@ sub _childSig {
         # Any sort of death trigger results in death of all
         my $sig = shift;
         $SIG{$sig} = 'IGNORE';
-        $self->log( 0, 'Daemon stopped by '.$sig );
+        $self->log( -1, 'Daemon stopped by '.$sig );
         exit;
     };
     

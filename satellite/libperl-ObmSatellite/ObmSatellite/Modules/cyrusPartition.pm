@@ -216,7 +216,7 @@ sub _updateImapdConf {
 
         if( !exists($currentPartitions{$domainPartitionName}) ) {
             $currentPartitions{$domainPartitionName} = $self->{'imapdPartitionRoot'}.'/'.$domainPartitionName;
-            $self->log( 0, 'Add Cyrus Imapd partition \''.$domainPartitionName.'\', directory \''.$currentPartitions{$domainPartitionName}.'\'' );
+            $self->log( -1, 'Add Cyrus Imapd partition \''.$domainPartitionName.'\', directory \''.$currentPartitions{$domainPartitionName}.'\'' );
         }
     }
 

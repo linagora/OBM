@@ -57,12 +57,40 @@ sub log {
     }
 
     if( $logLevel <= $self->{'logLevel'} ) {
-        print _LOG_HDL $self->log_time().' ['.$$.']: '.$logMessage;
+        my $level = $self->_convertLevel( $logLevel );
+
+        print _LOG_HDL $self->log_time().' ['.$$.']: '.$level.$logMessage;
 
         if( $logMessage !~ /\n$/ ) {
             print _LOG_HDL "\n";
         }
     }
+}
+
+
+sub _convertLevel {
+    my $self = shift;
+    my( $level ) = @_;
+
+    SWITCH: {
+        if( $level == -1 ) {
+            return '';
+        }
+
+        if( $level == 0 ) {
+            return 'CRITICAL: ';
+        }
+
+        if( $level == 1 ) {
+            return 'BASIC: ';
+        }
+
+        if( $level == 2 ) {
+            return 'ADVANCED: ';
+        }
+    }
+
+    return 'DEBUG: '
 }
 
 
