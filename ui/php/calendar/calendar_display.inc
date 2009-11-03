@@ -1099,13 +1099,11 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $width = round(100/$display_days, 2);
   $height = 20;
   $today_marker = "";
-  $today_left = 0;
   $current = clone $date;
   $step = 0;
 
   // days header
   while($current->compare($end) < 0) {
-    $day = $current->localize(Of_Date::OBM_DATE_WEEK_LIST);
     $date_iso = $current->getDateIso();
     $iso = $current->getURL();
     $week_day_left = $step*$width;
@@ -1117,9 +1115,8 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       $today = "background:#FFFFCC;";
     }
 
-    $week_day_list .= "<div class='dayColLabel' style='width:$width%;left:$week_day_left%;line-height:{$height}px'>
-      <a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a>
-    </div>";
+    $week_day_list .= "<td class='dayLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a></td>";
+
     $week_day_event_list .= "
     <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer' style='height:{$height}%;width:$width%;left:$week_day_left%;$today'>
       <div id='allday_$date_iso' class='alldayCell' style='width:100%;'></div>
@@ -1174,16 +1171,12 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       <colgroup style='background:#EFF0F2;text-align:right;'></colgroup>
       <colgroup></colgroup>
       <tr>
-        <td style='width:3em;'>$week_num</td>
-        <td>
-          <div style='position:relative;height:{$height}px'>
-              $week_day_list
-          </div>
-        </td>
+        <td style='width:3em;'></td>
+        $week_day_list
       </tr>
       <tr>
-        <td style='width:3em;'></td>
-        <td>
+        <td style='width:3em;text-align:center;'>$week_num</td>
+        <td colspan='$display_days'>
           <div id='calendarHeaderGrid' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
               $week_day_event_list
           </div>
@@ -1208,6 +1201,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     </tr>
     </table>
   </div>
+
   <script type=\"text/javascript\">
     obm.vars.consts.cellWidth = $width;
     obm.vars.consts.nbDisplayedDays = $display_days;
@@ -1312,7 +1306,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   $end = clone $date;
   $end->addDay(7);
   while($current->compare($end) < 0) {
-    $week_day_list .= "<td class='monthDayLabel'>".$current->localize(Of_Date::WEEKDAY)."</td>";
+    $week_day_list .= "<td class='dayLabel'>".$current->localize(Of_Date::WEEKDAY)."</td>";
     $current->addDay(1);
   }
 
