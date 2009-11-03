@@ -1036,10 +1036,9 @@ Obm.CalendarInDayEvent = new Class({
     var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
     serieClass = 'evt_'+this.event.id;
     this.element = new Element('div').addClass('event '+serieClass)
-                                     .setProperties({'id':id,'title':this.event.title})
-                                     .setOpacity(this.getOpacity());
+                                     .setProperties({'id':id,'title':this.event.title});
 
-    this.content = new Element('dl').addClass(this.event.klass).injectInside(this.element);
+    this.content = new Element('dl').addClass(this.event.klass).setOpacity(this.getOpacity()).injectInside(this.element);
     var dt = new Element('dt').injectInside(this.content);
     var dd = new Element('dd').injectInside(this.content);
 
@@ -1281,10 +1280,9 @@ Obm.CalendarAllDayEvent = new Class({
     }
 
     this.element = new Element('div').addClass('event '+extClass+' '+serieClass)
-                                     .setProperties({'id':id,'title':this.event.title})
-                                     .setOpacity(this.getOpacity());
+                                     .setProperties({'id':id,'title':this.event.title});
 
-    this.content = new Element('dl').addClass(this.event.klass+' allDay').injectInside(this.element);
+    this.content = new Element('dl').addClass(this.event.klass+' allDay').setOpacity(this.getOpacity()).injectInside(this.element);
     var dt = new Element('dt').injectInside(this.content);
     var dd = new Element('dd').injectInside(this.content);
 
