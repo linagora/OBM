@@ -109,7 +109,7 @@ sub _loadConfFile {
 
         # Log level
         $iniValue = $cfgFile->val( 'server', 'log-level' );
-        $self->{'logLevel'} = $iniValue if $iniValue;
+        $self->{'logLevel'} = $iniValue if defined($iniValue);
     }
 }
 

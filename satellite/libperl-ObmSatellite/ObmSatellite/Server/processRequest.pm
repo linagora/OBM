@@ -44,7 +44,7 @@ sub process_request {
             $processedRequest++;
         }
 
-        $self->log( 2, 'Disconnect from: '.$connection->peerhost());
+        $self->log( -1, 'Disconnect from: '.$connection->peerhost());
 
         $connection->close();
     }
