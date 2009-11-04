@@ -242,7 +242,8 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			Event event, String participationState) throws AuthFault,
 			ServerFault {
 		for (Attendee att : event.getAttendees()) {
-			if (userId.equals(att.getEmail())) {
+			String email = userId + "@" + token.getDomain();
+			if (email.equalsIgnoreCase(att.getEmail())) {
 				if (Constants.PARTICIPATION_STATE_ACCEPTED
 						.equals(participationState)) {
 					att.setState(ParticipationState.ACCEPTED);
