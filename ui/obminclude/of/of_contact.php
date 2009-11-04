@@ -235,13 +235,13 @@ class OBM_Contact implements OBM_ISearchable {
     return $fields;
   }
 
-  public static function search($pattern, $limit=100, $offset=0) {
-    return OBM_Contact::fetchAll(OBM_Search::buildSearchQuery('OBM_Contact', $pattern), $limit, $offset);
+  public static function search($pattern, $offset=0, $limit=100) {
+    return OBM_Contact::fetchAll(OBM_Search::buildSearchQuery('OBM_Contact', $pattern), $offset, $limit);
   }
   
-  public static function fetchAll($where, $limit=false, $offset=0) {
+  public static function fetchAll($where, $offset=0, $limit=false) {
     $db = new DB_OBM();
-    $contacts = self::fetchDetails($db, $where, $limit, $offset);
+    $contacts = self::fetchDetails($db, $where, $offset, $limit);
     if (count($contacts) != 0) {
       $contacts = self::fetchCoords($db, $contacts);
     }
@@ -715,7 +715,7 @@ class OBM_Contact implements OBM_ISearchable {
     return $card;
   }
   
-  private static function fetchDetails($db, $where, $limit=false, $offset=0) {
+  private static function fetchDetails($db, $where, $offset=0, $limit=false) {
 
     $db_type = $db->type;
     if ($limit)
@@ -727,6 +727,9 @@ class OBM_Contact implements OBM_ISearchable {
       contact_firstname,
       contact_middlename,
       kind_minilabel as contact_kind,
+      kind_lang as contact_language,
+      kind_header as contact_header,
+      contact_kind_id,
       contact_title,
       contact_function_id,
       contactfunction_label as contact_function,
@@ -780,6 +783,9 @@ class OBM_Contact implements OBM_ISearchable {
       contact_firstname,
       contact_middlename,
       kind_minilabel,
+      kind_lang,
+      kind_header,
+      contact_kind_id,
       contact_title,
       contactfunction_label,
       contact_company_id,
@@ -822,10 +828,12 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->id            = $db->f('contact_id');
       $contact->lastname      = $db->f('contact_lastname');
       $contact->firstname     = $db->f('contact_firstname');
-      $contact->displayname   = $db->f('contact_lastname').' '.$db->f('contact_firstname');
+      $contact->displayname   = __('%lastname% %firstname%', array('%lastname%' => $db->f('contact_lastname'), '%firstname%' => $db->f('contact_firstname')));
       $contact->mname         = $db->f('contact_middlename');
       $contact->kind_id       = $db->f('contact_kind_id');
       $contact->kind          = $db->f('contact_kind');
+      $contact->language      = $db->f('contact_language');
+      $contact->header        = $db->f('contact_header');
       $contact->title         = $db->f('contact_title');
       $contact->function_id   = $db->f('contact_function_id');
       $contact->function      = $db->f('contact_function');

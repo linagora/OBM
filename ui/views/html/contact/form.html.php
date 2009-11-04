@@ -8,10 +8,12 @@
     <tr>
       <td class="toolbar">
         <ul class="dropDownMenu" id="contactToolbar">
-          <?php if($addressbooks[$contact->addressbook_id]->write) { ?>
+          <?php if($addressbooks[$contact->addressbook_id]->read) { ?>
           <li>
-            <input onclick="obm.contact.addressbook.updateContact(<?php echo $contact->id ?>);" type='button' value='<?php echo __('Update') ?>' title="<?php echo __('Update contact') ?>" class='updateButton' />
+            <input onclick="obm.contact.addressbook.consultContact(<?php echo $contact->id ?>);" type='button' value='<?php echo __('Consult') ?>' title="<?php echo __('Consult contact') ?>" class='updateButton' />
           </li>
+          <?php } ?> 
+          <?php if($addressbooks[$contact->addressbook_id]->write) { ?>
           <li>
             <input onclick='obm.contact.addressbook.deleteContact(<?php echo $contact->id ?>);' type='button' value='<?php echo __('Delete') ?>' title="<?php echo __('Delete contact') ?>" class='deleteButton' />
           </li>
@@ -64,6 +66,28 @@
                   <?php } ?>
                 </ul>
               </li>
+              <?php if((empty($contact->function_id) && !empty($functions)) || empty($contact->market_id) || (empty($contact->datasource_id) && !empty($datasources)) || empty($contact->kind_id) || empty($contact->mailok) || empty($contact->newsletter)) { ?>
+              <li>
+                <?php echo __('Commercial fields') ?>
+                <ul>
+                  <?php if(!$contact->datasource_id && !empty($datasources)) { ?>
+                  <li><a href="" onclick="$('datasource').getParent().removeClass('H');$('datasource').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Datasource') ?></a></li>
+                  <?php } ?>
+                  <?php if(!$contact->function_id && !empty($functions)) { ?>
+                  <li><a href="" onclick="$('function').getParent().removeClass('H');$('function').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Function') ?></a></li>
+                  <?php } ?>
+                  <?php if(!$contact->market_id) { ?>
+                  <li><a href="" onclick="$('market').getParent().removeClass('H');$('market').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Market') ?></a></li>
+                  <?php } ?>
+                  <?php if(!$contact->mailok) { ?>
+                  <li><a href="" onclick="$('mailok').getParent().removeClass('H');$('mailok').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Mailing') ?></a></li>
+                  <?php } ?>
+                  <?php if(!$contact->newsletter) { ?>
+                  <li><a href="" onclick="$('newsletter').getParent().removeClass('H');$('newsletter').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Newsletter') ?></a></li>
+                  <?php } ?>
+                </ul>
+              </li>
+              <?php } ?>
               <?php if(empty($contact->mname)) { ?>
               <li><a href="" onclick="$('mname').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Middle name') ?></a></li>
               <?php } ?>
@@ -76,7 +100,7 @@
               <?php if(empty($contact->title)) { ?>
               <li><a href="" onclick="$('title').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Title') ?></a></li>
               <?php } ?>
-              <?php if(empty($contact->birtday)) { ?>
+              <?php if(empty($contact->birthday)) { ?>
               <li><a href="" onclick="$('birthday').getParent().removeClass('H');$('birthday').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Birthday') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->anniversary)) { ?>
@@ -96,12 +120,6 @@
               <?php } ?>
               <?php if(empty($contact->service)) { ?>
               <li><a href="" onclick="$('service').getParent().removeClass('H');$('service').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Service') ?></a></li>
-              <?php } ?>
-              <?php if(!$contact->mailok) { ?>
-              <li><a href="" onclick="$('mailok').getParent().removeClass('H');$('mailok').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Mailing') ?></a></li>
-              <?php } ?>
-              <?php if(!$contact->newsletter) { ?>
-              <li><a href="" onclick="$('newsletter').getParent().removeClass('H');$('newsletter').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Newsletter') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->comment2)) { ?>
               <li><a href="" onclick="$('comment2').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Notes') ?></a></li>
@@ -147,6 +165,10 @@
               <span id="company" class="formField">
                 <label for="companyField"><?php echo __('Company') ?> : </label>
                 <input id="companyField" type="text" name="company" id="companyField" value="<?php echo $contact->company ?>" title="<?php echo __('Company') ?>" />
+              </span>
+              <span id="addressbook" class="formField">
+                <label for="addressbookField"><?php echo __('Addressbook') ?> : </label>
+                <?php echo self::__setlist('addressbook', $addressbooks, 'Addressbook', $contact->addressbook_id, false) ?>
               </span>
             </fieldset>
             <p class="LC"></p>
@@ -211,7 +233,30 @@
                 <?php echo self::__setdate('date', $contact->date, 'Date') ?>
               </span>    
             </fieldset>
-            <fieldset id="otherLayout" class="details <?php echo (empty($contact->spouse) && empty($contact->manager) && empty($contact->assistant) && empty($contact->category) && empty($contact->service) && empty($contact->mailok) && empty($contact->newsletter))? 'H':'' ?>">
+            <fieldset id="crmLayout" class="details <?php echo (empty($contact->function_id) && empty($contact->market_id) && empty($contact->datasource_id) && empty($contact->kind_id) && empty($contact->mailok) && empty($contact->newsletter))? 'H':'' ?>">
+              <legend><?php echo __('CRM properties') ?></legend>
+              <span id="datasource" class="formField <?php echo (empty($contact->datasource_id))?'H':'' ?>">
+                <label for="datasourceField"><?php echo __('Datasource') ?> : </label>
+                <?php echo self::__setlist('datasource', $datasources, 'Datasource', $contact->datasource_id, true); ?>
+              </span>  
+              <span id="function" class="formField <?php echo (empty($contact->function_id))?'H':'' ?>">
+                <label for="functionField"><?php echo __('Function') ?> : </label>
+                <?php echo self::__setlist('function', $functions, 'Function', $contact->function_id, true); ?>
+              </span>  
+              <span id="market" class="formField <?php echo (empty($contact->market_id))?'H':'' ?>">
+                <label for="marketField"><?php echo __('Market') ?> : </label>
+                <?php echo self::__setlist('market', $markets, 'Market', $contact->market_id, true); ?>
+              </span>  
+              <span id="mailok" class="formField <?php echo (empty($contact->mailok))?'H':'' ?>">
+                <label for="mailokField"><?php echo __('Mailing activated') ?> : </label>
+                <?php echo self::__setboolean('mailok', $contact->mailok, 'Mailing activated') ?>
+              </span>
+              <span id="newsletter" class="formField <?php echo (empty($contact->newsletter))?'H':'' ?>">
+                <label for="newsletterField"><?php echo __('Subscribe for newsletter') ?> : </label>
+                <?php echo self::__setboolean('newsletter', $contact->newsletter, 'Subscribe for newsletter') ?>
+              </span>
+            </fieldset>
+            <fieldset id="otherLayout" class="details <?php echo (empty($contact->spouse) && empty($contact->manager) && empty($contact->assistant) && empty($contact->category) && empty($contact->service))? 'H':'' ?>">
               <legend><?php echo __('Other properties') ?></legend>
               <span id="spouse" class="formField <?php echo (empty($contact->spouse))?'H':'' ?>">
                 <label for="spouseField"><?php echo __('Spouse') ?> : </label>
@@ -232,14 +277,6 @@
               <span id="service" class="formField <?php echo (empty($contact->service))?'H':'' ?>">
                 <label for="serviceField"><?php echo __('Service') ?> : </label>
                 <input type="text" name="service" id="serviceField" value="<?php echo $contact->service?>" title="<?php echo __('Service') ?>" />
-              </span>
-              <span id="mailok" class="formField <?php echo (empty($contact->mailok))?'H':'' ?>">
-                <label for="mailokField"><?php echo __('Mailing activated') ?> : </label>
-                <?php echo self::__setboolean('mailok', $contact->mailok, 'Mailing activated') ?>
-              </span>
-              <span id="newsletter" class="formField <?php echo (empty($contact->newsletter))?'H':'' ?>">
-                <label for="newsletterField"><?php echo __('Subscribe for newsletter') ?> : </label>
-                <?php echo self::__setboolean('newsletter', $contact->newsletter, 'Subscribe for newsletter') ?>
               </span>
             </fieldset>
             <fieldset id="comment" class="details">

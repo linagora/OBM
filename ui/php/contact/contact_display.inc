@@ -15,7 +15,7 @@
 // Direct fields
 $fieldnames['displayname'] = $l_displayname;
 $fieldnames['aka'] = $l_aka;
-$fieldnames['addressbook_name'] = $l_addressbook;
+$fieldnames['addressbook'] = $l_addressbook;
 $fieldnames['archive'] = $l_archive;
 $fieldnames['function_label'] = $l_function;
 $fieldnames['title'] = $l_title;

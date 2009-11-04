@@ -22,7 +22,6 @@ Obm.Contact.AddressBook = new Class ({
       evalScripts : true,
       update: $('addressBookContainer'),
       onComplete: function(response) {
-        console.log('complete');
         this.addressbook = $(this.addressbook.get('id'));
         if(!this.addressbook) this.addressbook = $(this.mycontacts);
         this.addressbook.addClass('current');
@@ -103,7 +102,7 @@ Obm.Contact.AddressBook = new Class ({
       }
       this.contactRequest.onSuccess = $empty;
     }.bind(this);
-    this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search')}); 
+    this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')}); 
 
   },
 
@@ -154,7 +153,7 @@ Obm.Contact.AddressBook = new Class ({
       //this.addressBookRequest.addEvent('success', function() {
       //  showOkMessage(obm.vars.labels.deleteOk);
       //});      
-      this.contactRequest.post({ajax:1, action:'deleteContact', 'id':id, searchpattern : this.addressbook.retrieve('search')});
+      this.contactRequest.post({ajax:1, action:'deleteContact', 'id':id, searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')});
       this.hideContact();
     }
   },
@@ -164,6 +163,7 @@ Obm.Contact.AddressBook = new Class ({
   },
 
   searchContact: function(form) {
+    $('contactfilter').set('value','');
     this.hideContact();
     if(form.get('id') == 'advancedSearchForm') {
       var searchpattern='';
@@ -180,17 +180,23 @@ Obm.Contact.AddressBook = new Class ({
     // Display "search results" folder
     $('addressbook-search').getParent().show();
     $('addressbook-search').set('class', 'current');
-    $('addressbook-search').set('search',$('searchpattern').value)
+    $('addressbook-search').store('search',$('searchpattern').value)
   },
 
   filterContact: function(form) {
     this.hideContact();
-    this.contactRequest.get(form); 
+    this.contactRequest.get({ajax:1, action:'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')});
+  },
+
+  moreContact: function(offset) {
+    this.hideContact();
+    this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value'), offset: offset});
   },
 
   selectAddressBook: function(elem) {
     if(!elem.hasClass('current')) {
       this.hideContact();
+      $('contactfilter').set('value','');
       this.contactRequest.get({ajax : 1, action : 'search', searchpattern : elem.retrieve('search')}); 
       $('addressBookGrid').getElements('td.current').removeClass('current');
       elem.addClass('current');

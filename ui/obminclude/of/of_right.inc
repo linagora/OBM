@@ -508,14 +508,21 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   global $cdg_sql, $obm;
 
   // GLOBAL - superman has all rights on entities
-  
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
 
+   
+  $db = new DB_OBM;
   $ent_array = array();
   $id_array = array();
 
   $entity = strtolower($entityu);
+  //$query =  "SELECT ".OBM_Acl::getEntityColumns($entity)." FROM (".OBM_Acl::getAclSubselect('', $entityType, $entityId = null, $userId = null, $action = null).")" as AllowedEntity WHERE id IN (".OBM_Acl::getAclSubselect('', $entityType, $entityId = null, $userId = null, $action = null).")"
+  //while ($db->next_record()) {
+  //  $id = $db->f('id');
+  //  if (is_numeric($id)) {
+  //    $entities[$id] = $db->f('label');
+  //  }
+  //}
+  //return OBM_Acl::getAllowedEntities($user_id, $entity, 'admin');
   if (OBM_Acl::isSpecialEntity($entityu)) {
     $table_entity = 'UserObm';
     $e_id = 'e.userobm_id';

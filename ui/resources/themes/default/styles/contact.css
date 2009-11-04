@@ -71,6 +71,10 @@
 #addressBookContainer td div img {
   padding: 0 2px 2px 0;
 }
+
+#addressBookContainer form input {
+  width: 11em;
+}
 /* Address Book column styling */
 
 #addressBookGrid {
@@ -271,7 +275,7 @@
   display:inline;
   padding: 5px 0 0 5px;
   clear: left;
-  height: 86px;
+  height: 110px;
   min-width: 32em;
 }
 
@@ -358,6 +362,10 @@ select {
   overflow-x: hidden;
 }
 
+.contactPanelContainer tfoot th {
+  text-align: left;
+}
+
 #dataContainer {
   overflow-y: scroll;
 }
@@ -383,165 +391,3 @@ table.contactPanelHeader th, .contactPanelContainer table td {
   overflow-x : hidden;
 }
 
-/*
-.grid-contact_displayname {
-  width: 20em;
-  max-width: 20em;
-  overflow: hidden;
-}
-
-.grid-contact_lastname {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-contact_firstname {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-contact_aka {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-contact_archive {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-function_label {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-contact_title {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-kind_minilabel {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-kind_header {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-kind_lang {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-company_name {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-company_aka {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-contact_address {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-address_street {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-contact_service {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-address_zipcode {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-address_town {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-address_expresspostal {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-country_name {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-WorkPhone.phone_number {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-HomePhone.phone_number {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-MobilePhone.phone_number {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-FaxPhone.phone_number {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-email_address {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-contact_date {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-contact_mailing_ok {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}
-
-.grid-contact_newsletter {
-  width: 10em;
-  max-width: 10em;
-  overflow: hidden;
-}*/

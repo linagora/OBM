@@ -105,6 +105,25 @@ class OBM_AddressBook implements OBM_ISearchable {
     }
     $db = new DB_OBM;
     $addressBooks = array();
+    $db->xquery('
+      SELECT 
+        AddressBook.id,
+        AddressBook.owner,
+        AddressBook.name,
+        AddressBook.is_default,
+        AddressBook.syncable,
+        1 as entityright_access,
+        1 as entityright_read,
+        1 as entityright_write,
+        1 as entityright_admin,
+        SyncedAddressbook.user_id as synced
+      FROM AddressBook 
+      LEFT JOIN SyncedAddressbook ON SyncedAddressbook.addressbook_id = AddressBook.id AND SyncedAddressbook.user_id = '.$GLOBALS['obm']['uid'].'
+      WHERE AddressBook.owner = '.$GLOBALS['obm']['uid'].' '.$query.' ORDER BY AddressBook.is_default DESC, AddressBook.name'); 
+    while($db->next_record()) {
+      $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
+                                                        $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));
+    }    
     $columns = array('addressbookentity_addressbook_id', 'entityright_access', 'entityright_read', 'entityright_write', 'entityright_admin');
     $db->xquery('
       SELECT 
@@ -126,25 +145,6 @@ class OBM_AddressBook implements OBM_ISearchable {
       $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
                                                         $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));
     }    
-    $db->xquery('
-      SELECT 
-        AddressBook.id,
-        AddressBook.owner,
-        AddressBook.name,
-        AddressBook.is_default,
-        AddressBook.syncable,
-        1 as entityright_access,
-        1 as entityright_read,
-        1 as entityright_write,
-        1 as entityright_admin,
-        SyncedAddressbook.user_id as synced
-      FROM AddressBook 
-      LEFT JOIN SyncedAddressbook ON SyncedAddressbook.addressbook_id = AddressBook.id AND SyncedAddressbook.user_id = '.$GLOBALS['obm']['uid'].'
-      WHERE AddressBook.owner = '.$GLOBALS['obm']['uid'].' '.$query.' ORDER BY AddressBook.name'); 
-    while($db->next_record()) {
-      $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
-                                                        $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));
-    }
 
     return new OBM_AddressBookArray($addressBooks);
   }
@@ -233,6 +233,10 @@ class OBM_AddressBook implements OBM_ISearchable {
     $db = new DB_OBM;
     $db->query($query);
   }
+
+  public function __toString() {
+    return $this->__get('displayname');
+  }
 }
 
 
@@ -246,10 +250,10 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
     $this->addressbooks = $addressbooks;
   }
 
-  public function searchContacts($pattern) {
+  public function searchContacts($pattern, $offset=0) {
     if(!empty($this->addressbooks)) {
       $pattern .= ' in:('.implode(',',array_keys($this->addressbooks)).')';
-      return OBM_Contact::search($pattern);
+      return OBM_Contact::search($pattern, $offset);
     }
   }
 

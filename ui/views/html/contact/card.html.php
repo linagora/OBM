@@ -24,7 +24,7 @@
                   <?php foreach($addressbooks as $_id => $_addressbook) { ?>
                   <?php if($_id != $contact->addressbook_id) { ?>
                   <li>
-                    <a onclick="obm.contact.addressbook.copyContact(<?php echo $contact->id ?>,<?php echo $_id ?>); return false;" href=""><?php echo $_addressbook->name ?></a>
+                    <a onclick="obm.contact.addressbook.copyContact(<?php echo $contact->id ?>,<?php echo $_id ?>); return false;" href=""><?php echo $_addressbook->displayname ?></a>
                   </li>
                   <?php } ?> 
                   <?php } ?> 
@@ -50,7 +50,7 @@
         <td>
           <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>">
           <div class="head">
-            <h1><?php echo $contact->lastname.' '.$contact->mname.''.$contact->firstname.' '.$contact->suffix ?></h1>
+            <h1><?php echo $contact->lastname.' '.$contact->mname.' '.$contact->firstname.' '.$contact->suffix ?></h1>
             <?php if(!empty($contact->aka)) { ?>
             <br><h3><?php echo __('Also known as') ?> : </h3><span><?php echo $contact->aka ?></span>
             <?php } ?>
@@ -58,14 +58,14 @@
             <br><h3><?php echo __('Title') ?> : </h3><span><?php echo $contact->title ?></span>
             <?php } ?>
             <?php if(!empty($contact->company)) { ?>
-            <br><h3><?php echo __('Company') ?> : </h3><span><?php echo $contact->company ?></span>
+            <br><h3><?php echo __('Company') ?> : </h3><span><?php if($contact->company_id) echo self::__getentitylink($contact->company, $contact->company_id, 'company'); else echo $contact->company; ?></span>
             <?php } ?>
           </div>
           <p class="LC"></p>
-          <?php if(!empty($contact->phone)) { ?>
-          <dl id="phoneLayout" class="details ">
-            <?php foreach($contact->phone as $phone) { ?>
-            <dt><?php echo $contact->labelToString($phone['label'], 'PHONE') ?> : </dt><dd><?php echo $phone['number'] ?></dd>
+          <?php if(!empty($contact->address)) { ?>
+          <dl id="addressLayout" class="details ">
+            <?php foreach($contact->address as $address) { ?>
+            <dt><?php echo $contact->labelToString($address['label'], 'ADDRESS') ?> : </dt><dd><?php echo self::__getaddress($address) ?></dd>
             <?php } ?>
           </dl>
           <?php } ?>
@@ -76,10 +76,17 @@
             <?php } ?>
           </dl>
           <?php } ?>
-          <?php if(!empty($contact->address)) { ?>
-          <dl id="addressLayout" class="details ">
-            <?php foreach($contact->address as $address) { ?>
-            <dt><?php echo $contact->labelToString($address['label'], 'ADDRESS') ?> : </dt><dd><?php echo self::__getaddress($address) ?></dd>
+          <?php if(!empty($contact->im)) { ?>
+          <dl id="imLayout" class="details">
+            <?php foreach($contact->im as $im) { ?>
+            <dt><?php echo $GLOBALS['l_im_labels'][$im['protocol']] ?> : </dt><dd><?php echo $im['address'] ?></dd>
+            <?php } ?>     
+          </dl>
+          <?php } ?>
+          <?php if(!empty($contact->phone)) { ?>
+          <dl id="phoneLayout" class="details ">
+            <?php foreach($contact->phone as $phone) { ?>
+            <dt><?php echo $contact->labelToString($phone['label'], 'PHONE') ?> : </dt><dd><?php echo $phone['number'] ?></dd>
             <?php } ?>
           </dl>
           <?php } ?>
@@ -88,13 +95,6 @@
             <?php foreach($contact->website as $website) { ?>
             <dt><?php echo $contact->labelToString($website['label'], 'WEBSITE') ?> : </dt><dd><?php echo self::__getlink($website['url']) ?></dd>
             <?php } ?>        
-          </dl>
-          <?php } ?>
-          <?php if(!empty($contact->im)) { ?>
-          <dl id="imLayout" class="details">
-            <?php foreach($contact->im as $im) { ?>
-            <dt><?php echo $GLOBALS['l_im_labels'][$im['protocol']] ?> : </dt><dd><?php echo $im['address'] ?></dd>
-            <?php } ?>     
           </dl>
           <?php } ?>
           <?php if(!empty($contact->date) || !empty($contact->birthday) || !empty($contact->anniversary)) { ?>
@@ -110,7 +110,29 @@
             <?php } ?>
           </dl>
           <?php } ?>
-          <?php if(!empty($contact->spouse) || !empty($contact->manager) || !empty($contact->assistant) || !empty($contact->category) || !empty($contact->service) || !empty($contact->mailok) || !empty($contact->newsletter)) { ?>
+          <?php if(!empty($contact->function_id) || !empty($contact->market_id) || !empty($contact->datasource_id) || !empty($contact->kind_id) || !empty($contact->mailok) || !empty($contact->newsletter)) { ?>
+          <dl id="crmLayout" class="details ">
+           <?php if($contact->kind_id) { ?>
+            <dt><?php echo __('Language') ?> : </dt><dd><?php echo $contact->language ?></dd>
+            <?php } ?>
+            <?php if($contact->datasource_id) { ?>
+            <dt><?php echo __('Datasource') ?> : </dt><dd><?php echo $contact->datasource ?></dd>
+            <?php } ?>
+            <?php if($contact->function_id) { ?>
+            <dt><?php echo __('Function') ?> : </dt><dd><?php echo $contact->function ?></dd>
+            <?php } ?>
+            <?php if($contact->market_id) { ?>
+            <dt><?php echo __('Marketing manager') ?> : </dt><dd><?php echo self::__getentitylink($contact->market, $contact->market_id, 'people') ?></dd>
+            <?php } ?>
+            <?php if($contact->mailok) { ?>
+            <dt><?php echo __('Mailing activated') ?> : </dt><dd><?php echo self::__getboolean($contact->mailok) ?></dd>
+            <?php } ?>
+            <?php if($contact->newsletter) { ?>
+            <dt><?php echo __('Subscribe for newsletter') ?> : </dt><dd><?php echo self::__getboolean($contact->newsletter) ?></dd>
+            <?php } ?>
+          </dl>
+          <?php } ?>
+          <?php if(!empty($contact->spouse) || !empty($contact->manager) || !empty($contact->assistant) || !empty($contact->category) || !empty($contact->service)) { ?>
           <dl id="otherLayout" class="details ">
             <?php if(!empty($contact->spouse)) { ?>
             <dt><?php echo __('Spouse') ?> : </dt><dd><?php echo $contact->spouse ?></dd>
@@ -126,12 +148,6 @@
             <?php } ?>
             <?php if(!empty($contact->service)) { ?>
             <dt><?php echo __('Service') ?> : </dt><dd><?php echo $contact->service ?></dd>
-            <?php } ?>
-            <?php if($contact->mailok) { ?>
-            <dt><?php echo __('Mailing activated') ?> : </dt><dd><?php echo self::__getboolean($contact->mailok) ?></dd>
-            <?php } ?>
-            <?php if($contact->newsletter) { ?>
-            <dt><?php echo __('Subscribe for newsletter') ?> : </dt><dd><?php echo self::__getboolean($contact->newsletter) ?></dd>
             <?php } ?>
           </dl>
           <?php } ?>

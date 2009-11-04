@@ -177,16 +177,16 @@ class OBM_Acl {
   public static function hasAllowedEntities($userId, $entityType, $action) {
     $query = self::getAclQuery('1', $entityType, null, $userId, $action, '', '', FALSE, FALSE) . " LIMIT 1";
     self::$db->query($query);
-    self::log($query, 'hasAllowedEntities[peer to peer]');
+    self::log($query, 'hasAllowedEntity[peer to peer]');
     if(self::$db->nf() <= 0) {
       $query = self::getPublicAclQuery('1', $entityType, null, $action, '') . " LIMIT 1"; 
       self::$db->query($query);
-      self::log($query, 'hasAllowedEntities[public]');
+      self::log($query, 'hasAllowedEntity[public]');
     }
     if(self::$db->nf() <= 0) {
       $query = self::getGroupAclQuery('1', $entityType, null, $userId, $action, '') . " LIMIT 1";
       self::$db->query($query);
-      self::log($query, 'hasAllowedEntities[groups]');
+      self::log($query, 'hasAllowedEntity[groups]');
     }
     return self::$db->nf() > 0;
   }
@@ -390,20 +390,12 @@ class OBM_Acl {
    * @return array
    */
   public static function getAllowedEntities($userId, $entityType, $action, $entityId = null, $labelColumn = 'name') {
+    $columns = self::getEntityColumns($entityType);
+    $additionalJoins = self::getEntityJoin($entityType);
+  
     if (self::isSpecialEntity($entityType)) {
-      $columns = array('u2.userobm_id AS id', self::getUsernameColumns('u2').' AS label');
-      $additionalJoins = "INNER JOIN UserObm u2 ON {$entityType}entity_{$entityType}_id = u2.userobm_id";
-      if($entityId === null || (!is_array($entityId) && $entityId == $userId) || (is_array($entityId) && in_array($userId, $entityId))) {
-        $unions = "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId}";
-      }
+      $unions = self::getEntityUnion($userId, $entityType, $entityId);
     } else {
-      $entityTable = self::getEntityTable($entityType);
-      if ($entityType=='contact') {
-        $columns = array("{$entityType}_id AS id", self::getContactnameColumns()." AS label");
-      } else {
-        $columns = array("{$entityType}_id AS id, {$entityType}_{$labelColumn} AS label");
-      }
-      $additionalJoins = "INNER JOIN {$entityTable} ON {$entityType}entity_{$entityType}_id = {$entityType}_id";
       $unions = '';
     }
     $query = self::getAclQuery($columns, $entityType, $entityId, $userId, $action, $additionalJoins, $unions);
@@ -652,11 +644,75 @@ class OBM_Acl {
     return sql_string_concat(self::$db->type, $ctt);
   }
 
+  public static function getEntityColumns($entityType) {
+    $function = 'get'.ucfirst($entityType).'Columns';
+    if(method_exists('OBM_Acl', $function)) {
+      return self::$function($entityType); 
+    } else {
+      return array("AllowedEntity.{$entityType}_id AS id, AllowedEntity.{$entityType}_name AS label");
+    }
+  }
+
+  public static function getCalendarColumns() {
+    return array('AllowedEntity.userobm_id AS id', self::getUsernameColumns('AllowedEntity').' AS label'); 
+  }
+
+  public static function getMailboxColumns() {
+    return array('AllowedEntity.userobm_id AS id', self::getUsernameColumns('AllowedEntity').' AS label'); 
+  }
+
+  public static function getAddressbookColumns() {
+    return array('AllowedEntity.id as id', 'AllowedEntity.name as label');
+  }
+
+  public static function getEntityJoin($entityType) {
+    $function = 'get'.ucfirst($entityType).'Join';
+    if(method_exists('OBM_Acl', $function)) {
+      return self::$function($entityType); 
+    } else {
+      $entityTable = self::getEntityTable($entityType);
+      return "INNER JOIN {$entityTable} as AllowedEntity ON {$entityType}entity_{$entityType}_id = AllowedEntity.{$entityType}_id";
+    }
+  }
+
+  public static function getCalendarJoin() {
+    return "INNER JOIN UserObm as AllowedEntity ON calendarentity_calendar_id = AllowedEntity.userobm_id";
+  }
+
+  public static function getMailboxJoin() {
+    return "INNER JOIN UserObm as AllowedEntity ON mailboxentity_mailbox_id = AllowedEntity.userobm_id";
+  }
+
+  public static function getAddressbookJoin() {
+    return "INNER JOIN AddressBook as AllowedEntity ON addressbookentity_addressbook_id = AllowedEntity.id";
+  }
+
+  public static function getEntityUnion($userId, $entityType, $entityId) {
+    $function = 'get'.ucfirst($entityType).'Union';
+    if(method_exists('OBM_Acl', $function)) {
+      return self::$function($userId, $entityId); 
+    } else {
+      if($entityId) {
+        if(!is_array($entityId)) $entityId = array($entityId);
+        $subset = 'AND userobm_id IN ('.implode(',', $entityId).')';
+      }      
+      return "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId} $subset";
+    }
+  }
+
+  public static function getAddressbookUnion($userId, $entityId) {
+    if($entityId) {
+      if(!is_array($entityId)) $entityId = array($entityId);
+      $subset = 'AND id IN ('.implode(',', $entityId).')';
+    }
+    return "UNION SELECT id, name as label FROM AddressBook WHERE owner = $userId $subset";
+  }
+
   public static function hasSpecialCredential($userId, $entityType, $entityId = null) {
     $function = 'has'.ucfirst($entityType).'Credential';
     if(method_exists('OBM_Acl', $function)) {
       return self::$function($userId, $entityId);
-    } elseif(!$entityId || $entityId == $userId ||(is_array($entityId) && in_array($userId, $entityId))) {
+    } elseif(!$entityId || $entityId == $userId || (is_array($entityId) && in_array($userId, $entityId))) {
       return array($userId);
     }
     return array();

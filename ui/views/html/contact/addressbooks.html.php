@@ -53,8 +53,8 @@
         <div>
           <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-archive')); return false;"><?php echo __('Archive'); ?></a>
           <script type='text/javascript'>
-            $('addressbook-archive').set('write', 0);
-            $('addressbook-archive').set('search', 'archive:1');
+            $('addressbook-archive').store('write', 0);
+            $('addressbook-archive').store('search', 'archive:1');
           </script>            
         </div>
       </td>
@@ -65,14 +65,11 @@
         <div>
           <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-search')); return false;"><?php echo __('Search results') ?></a>
           <script type='text/javascript'>
-            $('addressbook-search').set('write', 0);
-            $('addressbook-search').set('search', '');
+            $('addressbook-search').store('write', 0);
+            $('addressbook-search').store('search', '');
           </script>                  
         </div>
       </td>
-    </tr>
-    <tr class="filler">
-      <th> </th>
     </tr>
   </tbody>
 </table>

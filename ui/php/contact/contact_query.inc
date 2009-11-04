@@ -1827,7 +1827,34 @@ function get_contact_is_synced($ab_id) {
   return $obm_q->next_record();
 }
 
+function run_query_contact_get_datasources() {
+  $datasources = array();
+  $dsrc_q = run_query_global_datasource();
+  while($dsrc_q->next_record()) {
+    $datasources[$dsrc_q->f('datasource_id')] = $dsrc_q->f('datasource_name');
+  }
+  return $datasources;
+}
 
+function run_query_contact_get_functions() {
+  $functions = array();
+  $funcs = of_category_get_ordered('contact', 'function');
+  foreach($funcs as $function_data) {
+    $functions[$function_data['id']]  = $function_data['label'];
+  }
+  return $functions;
+}
+
+function run_query_contact_get_markets($id) {
+  $markets = array();
+  $uids = array($GLOBALS['obm']['uid']);
+  if($id) $uids[] = $id;
+  $users = of_usergroup_get_group_users($GLOBALS['obm']['group_com'], true, $uids, 'userobm_lastname');
+  foreach($users as $user) {
+    $markets[$user['id']] = $user['lastname'].' '.$user['firstname'];
+  }
+  return $markets;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Synchronise or desyncronise a user from a contact 
 // Parameters:

@@ -136,6 +136,29 @@ class OBM_Template {
   public static function __setboolean($name, $value, $label, $idSuffix = 'Field') {
     return "<input id='${name}$idSuffix' type='checkbox' name='$name' value='1' ".(($value)? "checked='checked'": '')."' title='".__($label)."'/>";
   }
-  
 
+  public static function __setlist($name, $datas, $label, $selected=null, $none=false, $idSuffix = 'Field') {
+    $list = '';
+    if($none) $list = '<option value="">---</option>';
+    if(is_array($datas))
+        var_dump($id, $datas);
+      foreach($datas as $id => $data) {
+        if($id == $selected) $list .= '<option value="'.$id.'" selected="selected">'.$data.'</option>';
+        else $list .= '<option value="'.$id.'">'.$data.'</option>';
+      }
+
+    return '<select name="'.$name.'" title="'.__($label).'" id="'.$name.$idSuffix.'">'.$list.'</select>';
+  } 
+
+  public static function __getentitylink($value, $id, $module) {
+    if($GLOBALS['perm']->check_module_rights('contract')) {
+      return '<a href='.$GLOBALS['path'].'/'.$module.'/'.$module.'_index.php?action=detailconsult&amp;'.$module.'_id='.$id.'>'.$value.'</a>';
+    } else {
+      return $value;
+    }
+  }
+
+  public static function __setentitylink($name, $value, $id, $label, $idSuffix = 'Field') {
+
+  }
 }

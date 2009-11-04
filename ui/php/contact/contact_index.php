@@ -161,6 +161,10 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $addressbook = $addressbooks[$contact->addressbook_id];
   if ($addressbook && $addressbook->write) {
     $template = new OBM_Template('form');
+
+    $template->set('functions', run_query_contact_get_functions());
+    $template->set('datasources', run_query_contact_get_datasources());
+    $template->set('markets', run_query_contact_get_markets($contact->market_id));
     $template->set('addressbooks', $addressbooks);
     $template->set('contact', $contact);      
     echo $template->render();    
@@ -226,6 +230,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       OBM_Contact::store($contact);
     }
     $template = new OBM_Template('contacts');
+    $template->set('addressbooks', $addressbooks);
     $template->set('contacts',$addressbooks->searchContacts($params['searchpattern']));
     $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
     echo $template->render();    
@@ -235,8 +240,11 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 } elseif ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $addressbooks = OBM_AddressBook::search();
+  if($params['contactfilter']) $pattern = 'displayname:'.$params['contactfilter'];
   $template = new OBM_Template('contacts');
-  $template->set('contacts',$addressbooks->searchContacts($params['searchpattern']));
+  $template->set('addressbooks', $addressbooks);
+  $template->set('offset', $params['offset']);
+  $template->set('contacts',$addressbooks->searchContacts($params['searchpattern'].' '.$pattern, $params['offset']));
   $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
   echo $template->render();
   exit();
@@ -245,6 +253,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $addressbooks = OBM_AddressBook::search();
   if($params['contactfilter']) $pattern = 'displayname:'.$params['contactfilter'];
   $template = new OBM_Template('contacts');
+  $template->set('addressbooks', $addressbooks);
   $template->set('contacts',$addressbooks->searchContacts($params['searchpattern'].' '.$pattern));
   $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
   echo $template->render();  

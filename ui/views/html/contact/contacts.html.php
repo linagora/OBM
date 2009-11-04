@@ -37,6 +37,12 @@
         case 'country':
           if($contact->address[0]) echo $contact->address[0]['country'];
           break;
+        case 'addressbook' :
+          if(isset($addressbooks[$_contact->addressbook_id]))
+            echo $addressbooks[$_contact->addressbook_id]->displayname;
+          else 
+            echo $_contact->addressbook;
+          break;
         default:
           echo $_contact->$_fieldname.'';
         }
@@ -44,6 +50,18 @@
       <?php } ?>
     </tr>
     <?php } ?>
-    <tr class='filler'><th> </th></tr>
+    <?php if(count($contacts) > 100 || $offset > 0) { ?>
   </tbody>
+  <tfoot>
+    <tr class="<?php echo ($_class == 'even')? 'odd':'even' ?>" >
+    <th colspan="<?php echo count($fields) ?>">
+    <?php if($offset > 0) { ?>
+      <a href='#' onclick="obm.contact.addressbook.moreContact(<?php echo $offset - 100 ?>); return false;">&lt;&lt; <?php echo __('Previous page'); ?></a>
+    <?php } ?>
+    <?php if(count($contacts) > 100) { ?>
+    | <a href='#' onclick="obm.contact.addressbook.moreContact(<?php echo $offset + 100 ?>); return false;"><?php echo __('Next page'); ?> &gt;&gt;</a>
+    <?php } ?>
+    </tr>
+    <?php } ?>
+  </tfoot>
 </table>
