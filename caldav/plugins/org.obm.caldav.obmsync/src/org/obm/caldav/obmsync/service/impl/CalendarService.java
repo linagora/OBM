@@ -204,7 +204,7 @@ public class CalendarService implements ICalendarService {
 		logger.info(freeBusys.size());
 		for (FreeBusy freeBusy : freeBusys) {
 			logger.info("freebusy " + freeBusy.getAtt().getEmail() + " dstart: " + fbr.getStart() + " dend: "+ fbr.getEnd());
-			logger.info("freebusy found " + freeBusy.getFreeBusyLines().size() + " events.");
+			logger.info("freebusy found " + freeBusy.getFreeBusyIntervals().size() + " events.");
 			String icsFB = getVCalendarProvider().parseFreeBusyToICS(token,
 					freeBusy);
 			ret.put(freeBusy.getAtt().getEmail(), icsFB);
