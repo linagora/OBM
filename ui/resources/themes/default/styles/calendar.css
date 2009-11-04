@@ -100,13 +100,9 @@
 }
 
 .dayCol {
-  border-left:1px solid #CCC;
+  border-left:1px solid #AAA;
   position:absolute;
   height:100%;
-}
-
-.monthRow{
-  height: 100%;
 }
 
 .alldayContainer {
@@ -163,7 +159,8 @@
 
 #calendarHeader {
   margin-bottom:8px;
-  margin-right:15px;
+  padding-right:15px;
+  position:relative;
 }
 
 #calendarGridContainer {
@@ -313,6 +310,10 @@
   border-top: rgb(102, 140, 217);
   border-bottom: rgb(102, 140, 217);
 }
+li.eventOwnerLegend {
+  background-color: rgb(102, 140, 217);
+  color: #FFF;
+}
 
 .eventOwner0 {
   color: #fff;
@@ -324,6 +325,10 @@
   border-top: rgb(216, 102, 102);
   border-bottom: rgb(216, 102, 102);
 }
+li.eventOwner0Legend {
+  background-color: rgb(216, 102, 102);
+  color: #FFF;
+}
 
 .eventOwner1 {
   color: #fff;
@@ -332,8 +337,12 @@
 }
 .eventOwner1 h1, li.eventOwner1, .eventOwner1 .handle {
   background-color: rgb(82, 41, 163);
-  border-top: rgb(163, 41, 41);
-  border-bottom: rgb(163, 41, 41);
+  border-top: rgb(140, 102, 217);
+  border-bottom: rgb(140, 102, 217);
+}
+li.eventOwner1Legend {
+  background-color: rgb(140, 102, 217);
+  color: #FFF;
 }
 
 .eventOwner2 {
@@ -346,6 +355,10 @@
   border-top: rgb(101, 173, 137);
   border-bottom: rgb(101, 173, 137);
 }
+li.eventOwner2Legend {
+  background-color: rgb(101, 173, 137);
+  color: #FFF;
+}
 
 .eventOwner3 {
   color: #fff;
@@ -356,6 +369,10 @@
   background-color: rgb(136, 136, 14);
   border-top: rgb(191, 191, 77);
   border-bottom: rgb(191, 191, 77);
+}
+li.eventOwner3Legend {
+  background-color: rgb(191, 191, 77);
+  color: #FFF;
 }
 
 .eventOwner4 {
@@ -368,6 +385,10 @@
   border-top: rgb(230, 128, 77);
   border-bottom: rgb(230, 128, 77);
 }
+li.eventOwner4Legend {
+  background-color: rgb(230, 128, 77);
+  color: #FFF;
+}
 
 .eventOwner5 {
   color: #fff;
@@ -378,6 +399,10 @@
   background-color: rgb(78, 93, 108);
   border-top: rgb(137, 151, 165);
   border-bottom: rgb(137, 151, 165);
+}
+li.eventOwner5Legend {
+  background-color: rgb(137, 151, 165);
+  color: #FFF;
 }
 
 .eventOwner6 {
@@ -390,6 +415,10 @@
   border-top: rgb(167, 167, 125);
   border-bottom: rgb(167, 167, 125);
 }
+li.eventOwner6Legend {
+  background-color: rgb(167, 167, 125);
+  color: #FFF;
+}
 
 .eventOwner7 {
   color: #fff;
@@ -398,8 +427,12 @@
 }
 .eventOwner7 h1, li.eventOwner7, .eventOwner7 .handle {
   background-color: rgb(177, 54, 95);
-  border-top: rgb(163, 41, 41);
-  border-bottom: rgb(163, 41, 41);
+  border-top: rgb(177, 54, 95);
+  border-bottom: rgb(177, 54, 95);
+}
+li.eventOwner7Legend {
+  background-color: rgb(230, 115, 153);
+  color: #FFF;
 }
 
 .eventOwner8 {
@@ -412,6 +445,10 @@
   border-top: rgb(102, 140, 179);
   border-bottom: rgb(102, 140, 179);
 }
+li.eventOwner8Legend {
+  background-color: rgb(102, 140, 179);
+  color: #FFF;
+}
 
 .eventOwner9 {
   color: #fff;
@@ -422,6 +459,10 @@
   background-color: rgb(13, 120, 19);
   border-top: rgb(76, 176, 82);
   border-bottom: rgb(76, 176, 82);
+}
+li.eventOwner9Legend {
+  background-color: rgb(76, 176, 82);
+  color: #FFF;
 }
 
 .eventOwner10 {
@@ -434,6 +475,10 @@
   border-top: rgb(224, 194, 64);
   border-bottom: rgb(224, 194, 64);
 }
+li.eventOwner10Legend {
+  background-color: rgb(224, 194, 64);
+  color: #FFF;
+}
 
 .eventOwner11 {
   color: #fff;
@@ -444,6 +489,10 @@
   background-color: rgb(134, 90, 90);
   border-top: rgb(190, 148, 148);
   border-bottom: rgb(190, 148, 148);
+}
+li.eventOwner11Legend {
+  background-color: rgb(190, 148, 148);
+  color: #FFF;
 }
 
 .eventOwner12 {
@@ -456,6 +505,10 @@
   border-top: rgb(148, 162, 190);
   border-bottom: rgb(148, 162, 190);
 }
+li.eventOwner12Legend {
+  background-color: rgb(148, 162, 190);
+  color: #FFF;
+}
 
 .eventOwner13 {
   color: #fff;
@@ -466,6 +519,10 @@
   background-color: rgb(141, 111, 71);
   border-top: rgb(196, 168, 131);
   border-bottom: rgb(196, 168, 131);
+}
+li.eventOwner13Legend {
+  background-color: rgb(196, 168, 131);
+  color: #FFF;
 }
 
 .eventOwner14 {
@@ -478,6 +535,10 @@
   border-top: rgb(163, 41, 41);
   border-bottom: rgb(163, 41, 41);
 }
+li.eventOwner14Legend {
+  background-color: rgb(179, 115, 179);
+  color: #FFF;
+}
 
 .eventOwner15 {
   color: #fff;
@@ -488,6 +549,10 @@
   background-color: rgb(27, 136, 122);
   border-top: rgb(89, 191, 179);
   border-bottom: rgb(89, 191, 179);
+}
+li.eventOwner15Legend {
+  background-color: rgb(89, 191, 179);
+  color: #FFF;
 }
 
 .eventOwner16 {
@@ -500,6 +565,10 @@
   border-top: rgb(140, 191, 64);
   border-bottom: rgb(140, 191, 64);
 }
+li.eventOwner16Legend {
+  background-color: rgb(140, 191, 64);
+  color: #FFF;
+}
 
 .eventOwner17 {
   color: #fff;
@@ -510,6 +579,10 @@
   background-color: rgb(190, 109, 0);
   border-top: rgb(242, 166, 64);
   border-bottom: rgb(242, 166, 64);
+}
+li.eventOwner17Legend {
+  background-color: rgb(242, 166, 64);
+  color: #FFF;
 }
 
 .eventOwner18 {
@@ -522,6 +595,10 @@
   border-top: rgb(169, 146, 169);
   border-bottom: rgb(169, 146, 169);
 }
+li.eventOwner18Legend {
+  background-color: rgb(169, 146, 169);
+  color: #FFF;
+}
 
 .eventOwner19 {
   color: #fff;
@@ -533,7 +610,10 @@
   border-top: rgb(133, 170, 165);
   border-bottom: rgb(133, 170, 165);
 }
-
+li.eventOwner19Legend {
+  background-color: rgb(133, 170, 165);
+  color: #FFF;
+}
 
 /* ------------------------------------------------------------------------- */
 /* Calendar Quick Form */

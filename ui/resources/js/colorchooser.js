@@ -103,7 +103,7 @@ Obm.ColorChooser = new Class({
   setElementColor: function(evt) {
     var event = new Event(evt);
     klass = event.target.get('class');
-    this.currentElement.set('class',klass);
+    this.currentElement.set('class',klass+'Legend');
     if (obm.calendarManager) obm.calendarManager.setEventsClass(this.currentEntity, this.currentEntityId, klass);
     setEventsColors(this.currentEntity, this.currentEntityId, klass);
     overListBoxFix($('colorChooserWidget'),'none');

@@ -298,7 +298,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity, $current_view) {
       foreach ($entity as $id => $data) {
         $data_id = "data-$type-$id";
         $dis_legend .= "
-          <li title=\"$tooltip\" class=\"".$data['class']."\"><input class=\"colorChooser\" name=\"class-$type-$id\" type=\"hidden\" /><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
+          <li title=\"$tooltip\" class=\"".$data['class']."Legend\"><input class=\"colorChooser\" name=\"class-$type-$id\" type=\"hidden\" /><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
           <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
         if ($output_target != 'print') {
           $dis_legend .= "<img src=\"$ico_delete\"
@@ -1184,6 +1184,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       </tr>
     </table>
   </div>
+
   <div id='calendarBody'>
     <table id='calendarBodyTable' class='calendarTable'>
     <tr>
@@ -1238,10 +1239,13 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   $tags = array();
 
   // calendar grid
-  $weeks = 0;
+  $weeks_diff = $end->diffWeek($date);
+  if ($weeks_diff<0) $weeks_diff = 53 + $weeks_diff;
+  $weeks = 100/$weeks_diff;
+
   while($current->compare($end) < 0) {
     $step = 0;
-    $week_day_event_list .= "<div class='monthRow'>";
+    $week_day_event_list .= "<div class='monthRow' style='height:$weeks%'>";
     $endWeek = clone $current;
     $endWeek->addDay(7);
 
@@ -1283,7 +1287,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $date_iso = $current->getDateIso();
       $week_day_left = $step*$width;
       $week_day_event_list .= "
-        <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='width:$width%;left:$week_day_left%;$today'>
+        <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
           <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
           <div id='allday_$date_iso' class='alldayCell'>
             <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title</h1>' style='text-align:center;position:absolute;display;none;width:100%;'></div>
@@ -1292,7 +1296,6 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $step++;
       $current->addDay(1);
     }
-    $weeks++;
     $week_day_event_list .= "</div>";
 
   }
@@ -1318,15 +1321,15 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       </tr>
       <tr>
         <td colspan='7'>
-          <div id='calendarHeaderGrid' style='height:400px' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
+          <div id='calendarHeaderGrid' style='height:200px' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
             $week_day_event_list
           </div>
         </td>
       </tr>
     </table>
   </div>
+
   <script type=\"text/javascript\">
-    obm.vars.consts.nbWeeks = 100/$weeks;
     obm.vars.consts.cellWidth = $width;
     obm.vars.labels.more = '".phpStringToJsString($GLOBALS['l_more'])."';
     obm.vars.consts.calendarView = 'month';

@@ -59,14 +59,6 @@ Obm.CalendarManager = new Class({
     if ($('waitingEventsContainer')) {
        $('waitingEventsContainer').set('class', 'waitingEventsContainer');
     }
-
-    // *************************************** IE6 CRAPPY FIX, height:100% => doesn't work
-    if ($('calendarGrid')) {
-      var height = $('calendarGrid').getHeight();
-      $$('div.dayCol').each(function(e) {
-        e.setStyle('height', height+'px');
-      });
-    }
   },
 
   /**
@@ -271,16 +263,29 @@ Obm.CalendarManager = new Class({
    */
   resizeGrid: function() {
     if (obm.vars.consts.calendarView == 'day') {
-      $('calendarBody').setStyle('height',window.getHeight() - $('calendarBody').offsetTop -60);
+      $('calendarBody').setStyle('height',window.getHeight() - $('calendarBody').offsetTop - 40);
+      // *************************************** 
+      // IE6 CRAPPY FIX, height:100% => doesn't work
+      if (Browser.Engine.trident) {
+        var height = $('calendarGrid').getHeight();
+        $$('div.dayCol').each(function(e) {
+          e.setStyle('height', height+'px');
+        });
+      }
+      // ***************************************
     } else {
-      $('mainContent').setStyle('height',window.getHeight() - $('mainContent').offsetTop -50);
-      $('calendarHeaderGrid').setStyle('height',window.getHeight() - $('calendarHeaderGrid').offsetTop -50);
-      $$('div.monthRow').each(function(e) {
-        e.style.height = obm.vars.consts.nbWeeks+'%';
-      });
-      $$('div.alldayContainer').each(function(e) {
-        e.style.height = obm.vars.consts.nbWeeks+'%';
-      });
+      $('mainContent').setStyle('height',window.getHeight() - $('mainContent').offsetTop -20);
+      $('calendarHeaderGrid').setStyle('height',window.getHeight() - $('calendarHeader').offsetTop - 40);
+      // *************************************** 
+      // IE6 CRAPPY FIX (one more time), height:100% => doesn't work
+      if (Browser.Engine.trident) {
+        var height = $('calendarHeaderGrid').getHeight() / 100* $$('div.monthRow')[0].style.height.toFloat();
+        $$('div.alldayContainer').each(function(e) {
+          e.setStyle('height', height+'px');
+        });
+      }
+      // ***************************************
+      
     }
   },
 
@@ -289,7 +294,6 @@ Obm.CalendarManager = new Class({
    * Ajust displayd events on month view // FIXME
    */
   resizeAlldayContainer: function() {
-
     $$('div.alldayContainer').each(function(element) {
       var str = element.id.split('_');
       var content = $('allday_'+str[2]);
@@ -1352,7 +1356,8 @@ Obm.CalendarAllDayEvent = new Class({
       this.element.setOpacity(.7);
       obm.calendarManager.unregister(this);
       // Fix mouse position
-      this.drag.mouse.pos.x = $('calendarHeaderGrid').offsetLeft.toInt();
+      this.drag.mouse.pos.x = $('calendarHeaderGrid').offsetLeft.toInt() + $('calendarHeader').offsetLeft.toInt();
+
     }.bind(this));
     this.drag.addEvent('complete', function() {
       this.updateTime();
