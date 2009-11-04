@@ -28,6 +28,8 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventTimeUpdate;
+import org.obm.sync.calendar.FreeBusy;
+import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.items.EventChanges;
 
 /**
@@ -79,17 +81,26 @@ public interface ICalendarProvider {
 	List<Event> getListEventsFromIntervalDate(AccessToken token,
 			String calendar, Date start, Date end) throws AuthFault,
 			ServerFault;
-	
+
 	List<EventTimeUpdate> getEventTimeUpdateFromIntervalDate(AccessToken token,
-			String calendar, Date start, Date end) throws ServerFault, AuthFault;
+			String calendar, Date start, Date end) throws ServerFault,
+			AuthFault;
 
-	boolean hasRightsOnCalendar(AccessToken token, String calendarName) throws AuthFault,
-			ServerFault;
+	boolean hasRightsOnCalendar(AccessToken token, String calendarName)
+			throws AuthFault, ServerFault;
 
-	Date getLastUpdate(AccessToken token, String calendarName) throws AuthFault,
-	ServerFault;
+	Date getLastUpdate(AccessToken token, String calendarName)
+			throws AuthFault, ServerFault;
 
 	AccessToken login(String loginAtDomaine, String password);
 
 	void logout(AccessToken token);
+
+	public List<FreeBusy> getFreeBusy(AccessToken token, FreeBusyRequest fbrs) throws ServerFault,
+			AuthFault;
+
+	FreeBusyRequest getFreeBusyRequest(AccessToken token, String ics)
+			throws ServerFault, AuthFault;
+
+	String parseFreeBusyToICS(AccessToken token, FreeBusy freeBusy) throws ServerFault, AuthFault;
 }

@@ -45,7 +45,7 @@ public class ResourceType extends DavPropertyHandler implements PropfindProperty
 		Element elem = appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		appendElement(elem,"collection", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		appendElement(elem,"calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
-//		appendElement(elem,"schedule-calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+		appendElement(elem,"schedule-calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
 	}
 
 	@Override

@@ -121,7 +121,7 @@ public class WebdavServlet extends HttpServlet {
 			String uri = dr.getMethod() + " " + dr.getRequestURI() + " "
 					+ dr.getQueryString();
 			logger.info("invalid auth, sending http 401 (uri: " + uri + ")");
-			String s = "Basic realm=\"Obm CalDav\"";
+			String s = "Basic realm=\"Obm CalDav for calendar "+ dr.getCalendarComponantName() +"\"";
 			response.setHeader("WWW-Authenticate", s);
 
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

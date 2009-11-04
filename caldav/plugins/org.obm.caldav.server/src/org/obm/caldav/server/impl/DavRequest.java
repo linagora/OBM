@@ -19,6 +19,8 @@ package org.obm.caldav.server.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -55,7 +57,6 @@ public class DavRequest {
 	private void initRequest() throws CalDavException {
 
 		if (req.getHeader("Content-Type") != null){
-			logger.info(req.getContentType());
 			if(req.getContentType().contains("text/xml")) {
 				try {
 					InputStream in = req.getInputStream();
@@ -125,5 +126,16 @@ public class DavRequest {
 
 	public String getQueryString() {
 		return req.getQueryString();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Set<String> getRecipients(){
+		Set<String> recipients = new HashSet<String>();
+		Enumeration headerNames = req.getHeaders("Recipient");
+		while(headerNames.hasMoreElements()){
+			String recipient = (String) headerNames.nextElement();
+			recipients.add(recipient);
+		}
+		return recipients;
 	}
 }

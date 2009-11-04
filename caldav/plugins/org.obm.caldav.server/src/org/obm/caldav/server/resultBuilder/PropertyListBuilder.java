@@ -37,7 +37,7 @@ public class PropertyListBuilder extends ResultBuilder {
 			IBackend proxy) {
 		try {
 
-			Document ret = createDocument();
+			Document ret = createMultiStatusDocument();
 			Element r = ret.getDocumentElement();
 			for (String url : urls) {
 				Element response = DOMUtils.createElement(r, "D:response");

@@ -46,7 +46,7 @@ public class ErreurBuiler extends ResultBuilder {
 	public Document build(Token token, DavRequest req, int code) {
 		Document doc = null;
 		try {
-			doc = createDocument();
+			doc = createMultiStatusDocument();
 			Element root = doc.getDocumentElement();
 			Element response = DOMUtils.createElement(root, "D:response");
 			DOMUtils.createElementAndText(response, "D:href", getHref(req));

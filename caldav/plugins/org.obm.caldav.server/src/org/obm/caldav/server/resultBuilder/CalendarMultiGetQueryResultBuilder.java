@@ -70,7 +70,7 @@ public class CalendarMultiGetQueryResultBuilder extends ResultBuilder {
 			Map<Event, String> listEvents) {
 		Document doc = null;
 		try {
-			doc = createDocument();
+			doc = createMultiStatusDocument();
 			Element root = doc.getDocumentElement();
 			if (listEvents.size() > 0) {
 				for (Entry<Event, String> entry : listEvents.entrySet()) {

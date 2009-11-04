@@ -40,8 +40,6 @@ public interface ICalendarService {
 
 	String getICSName(EventTimeUpdate etu);
 
-	Event getEventFromExtId(String externalUrl) throws Exception;
-
 	List<Event> getAll(DavComponentName componant) throws Exception;
 
 	List<EventTimeUpdate> getAllLastUpdate(DavComponentName componant)
@@ -65,5 +63,7 @@ public interface ICalendarService {
 	void login(String userId, String password, String calendar) throws AuthenticationException;
 
 	void logout();
+
+	public Map<String,String> getFreeBuzy(String ics) throws Exception;
 
 }

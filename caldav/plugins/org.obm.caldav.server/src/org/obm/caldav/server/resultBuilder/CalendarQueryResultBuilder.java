@@ -68,7 +68,7 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 			Map<String, EventTimeUpdate> listEvents, Set<CalendarQueryPropertyHandler> propertiesValues) {
 		Document doc = null;
 		try {
-			doc = createDocument();
+			doc = createMultiStatusDocument();
 			Element root = doc.getDocumentElement();
 			for (Entry<String, EventTimeUpdate> entry : listEvents.entrySet()) {
 				EventTimeUpdate event = entry.getValue();
