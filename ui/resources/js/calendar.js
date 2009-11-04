@@ -18,6 +18,7 @@ Obm.CalendarManager = new Class({
     this.tips = new Obm.Tip(null, 'calTip'); 
     this.calendarView = obm.vars.consts.calendarView;
     var current = new Obm.DateTime(obm.vars.consts.startTime);
+    this.lock = false;
     this.entityEvents = new Array();
     if (this.calendarView == 'day') {
       for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
@@ -795,6 +796,7 @@ Obm.CalendarManager = new Class({
       showErrorMessage(response.message);
       // TODO: redraw event
     }
+    obm.calendarManager.lock = false;
   },
 
 
@@ -1058,15 +1060,17 @@ Obm.CalendarInDayEvent = new Class({
        .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
        .injectInside(this.dragHandler);
 
-    this.linkContainer = this.titleContainer;
+    this.linkContainer = this.timeContainer;
     this.linkContainer.addEvent('mousedown', function (evt) {
       this.linkContainer.addEvent('mouseup', 
         function (evt) {
           this.linkContainer.addEvent('click',
             function(evt) {
-              evt.preventDefault();
-              this.linkContainer.removeEvents('click');
-              this.linkContainer.removeEvents('mouseup');
+              if (obm.calendarManager.lock) {
+                evt.preventDefault();
+                this.linkContainer.removeEvents('click');
+                this.linkContainer.removeEvents('mouseup');
+              }
             }.bind(this)
           );
         }.bind(this)
@@ -1129,6 +1133,7 @@ Obm.CalendarInDayEvent = new Class({
 
     // Add drag events
     this.drag.addEvent('start', function() {
+      obm.calendarManager.lock = true;
       this.element.setStyles({
         'width': obm.vars.consts.cellWidth+'%',
         'z-index' : '1000'
@@ -1302,9 +1307,11 @@ Obm.CalendarAllDayEvent = new Class({
         function (evt) {
           this.linkContainer.addEvent('click',
             function(evt) {
-              evt.preventDefault();
-              this.linkContainer.removeEvents('click');
-              this.linkContainer.removeEvents('mouseup');
+              if (obm.calendarManager.lock) {
+                evt.preventDefault();
+                this.linkContainer.removeEvents('click');
+                this.linkContainer.removeEvents('mouseup');
+              }
             }.bind(this)
           );
         }.bind(this)
@@ -1349,6 +1356,7 @@ Obm.CalendarAllDayEvent = new Class({
 
     // Add drag events
     this.drag.addEvent('start', function() {
+      obm.calendarManager.lock = true;
       this.element.setStyles({
         'z-index' : '10000',
         'width': obm.vars.consts.cellWidth+'%'
