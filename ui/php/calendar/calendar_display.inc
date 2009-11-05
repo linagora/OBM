@@ -1231,7 +1231,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   $of = &OccurrenceFactory::getInstance();
 
   $start_time = $date->getTimestamp();
-
+  $ico_close = $GLOBALS['icons']['close'];
   $width = round(100/7, 2);
   $current = clone $date;
   $dis_week_time = "obm.vars.consts.weekTime = new Array();";
@@ -1290,7 +1290,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
         <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
           <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
           <div id='allday_$date_iso' class='alldayCell'>
-            <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title</h1>' style='text-align:center;position:absolute;display;none;width:100%;'></div>
+            <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title <img id=\"close_$date_iso\" src=\"$ico_close\"/> </h1>' style='text-align:center;position:absolute;display:none;width:100%;'></div>
           </div>
         </div>";
       $step++;

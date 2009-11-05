@@ -15,20 +15,11 @@ Obm.CalendarManager = new Class({
     this.maxHeight = 1;
     this.startTime = time;
     this.forceRedraw = false;
-    this.tips = new Obm.Tip(null, 'calTip'); 
+    this.tips = new Obm.Tip(null, {fixed:true, click:true}, 'calTip'); 
     this.calendarView = obm.vars.consts.calendarView;
     var current = new Obm.DateTime(obm.vars.consts.startTime);
     this.lock = false;
     this.entityEvents = new Array();
-    if (this.calendarView == 'day') {
-      for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
-        current.setTime(obm.vars.consts.startTime.getTime());
-        current.setDate(obm.vars.consts.startTime.getDate() + i);
-        this.eventGrid[current.format('Y-m-d')] = new Hash();
-      }
-    } else {
-
-    }
 
     // Window height observer 
     new Obm.Observer(window, {onStop:this.resizeGrid, property:'innerHeight'});
@@ -37,6 +28,13 @@ Obm.CalendarManager = new Class({
     if (obm.vars.consts.calendarView == 'day') {
       this.defaultHeight = $('calendarBody').getElement('div').offsetHeight;    
       this.scroll = new Obm.Scroller($('calendarBody'), {area: this.defaultHeight, velocity: 1});
+
+      for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
+        current.setTime(obm.vars.consts.startTime.getTime());
+        current.setDate(obm.vars.consts.startTime.getDate() + i);
+        this.eventGrid[current.format('Y-m-d')] = new Hash();
+      }
+
     }
 
     if ($('todayHourMarker')) {
@@ -133,19 +131,20 @@ Obm.CalendarManager = new Class({
             var day = (current.getTime()-obm.vars.consts.startTime.getTime())/1000;
             var more = $('more_'+day+'_'+index);
             if (more) {
-              var title = '<b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title;
+              var title = '<a href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title+'</a>';
 	            var color = evt.content.getStyle('backgroundColor');
-              if (evt.event.colors.event) color = evt.event.colors.event.body;
+              if (evt.event.colors.event.body) color = evt.event.colors.event.body;
               var style = 'style="color:'+color+'"';
               if (evt.event.all_day) {
-                title = evt.event.title;
+                title = '<a href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'>'+evt.event.title+'</a>';
                 color = "#fff";
-                klass='class="'+evt.event.klass+'"';
+                klass='class="moreEvent '+evt.event.klass+'"';
                 style = 'style="background:'+evt.event.colors.event+'; color:'+color+'" '+klass ;
               }
               more.set('title', more.get('title')+'<div '+style+'>'+ title+'</div>');
             }
           }
+
         }
       }
 

@@ -201,8 +201,13 @@ Obm.Portlets = new Class({
 Obm.Tip = new Class({
   Extends: Tips,
 
-  initialize: function(e, klass) {
-    this.parent(e);
+  options: {
+    fixed:false,
+    click:false
+  },
+
+  initialize: function(e, options, klass) {
+    this.parent(e, options);
     if (klass) {
       this.tip.addClass(klass);
     } else {
@@ -226,9 +231,23 @@ Obm.Tip = new Class({
     }
     var title = element.retrieve('tip:title', content);
     var text = element.retrieve('tip:text', element.get('rel') || element.get('href'));
-    var enter = element.retrieve('tip:enter', this.elementEnter.bindWithEvent(this, element));
-    var leave = element.retrieve('tip:leave', this.elementLeave.bindWithEvent(this, element));
-    element.addEvents({mouseenter: enter, mouseleave: leave});
+    if (this.options.click) { 
+      element.addEvent('click', function() {
+        if (this.tip.style.visibility == 'hidden') {
+          this.elementEnter(this, element);
+        } else {
+          this.elementLeave(this, element);
+        }
+        var elementId = element.id.split('_');
+        $('close_'+elementId[2]).addEvent('click', function() {
+          this.elementLeave(this, element);
+        }.bind(this));
+      }.bind(this));
+    } else {
+      var enter = element.retrieve('tip:enter', this.elementEnter.bindWithEvent(this, element));
+      var leave = element.retrieve('tip:leave', this.elementLeave.bindWithEvent(this, element));
+      element.addEvents({mouseenter: enter, mouseleave: leave});
+    }
     if (!this.options.fixed){
       var move = element.retrieve('tip:move', this.elementMove.bindWithEvent(this, element));
       element.addEvent('mousemove', move);

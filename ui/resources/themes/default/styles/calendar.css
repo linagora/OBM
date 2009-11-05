@@ -195,20 +195,34 @@
   cursor:pointer;
 }
 
+.calTip a {
+  color:inherit;
+}
+
 .calTip h1 {
-  background: #CCC;
-  font-size: 90%;
+  font-size: 100%;
   font-weight: bold;
   margin: 0;
   padding: 0;
+  padding-bottom: 4px;
   white-space: nowrap;
 }
 
 .calTip .tip {
   background: #FFF;
-  border: 1px solid #666;
+  border: 2px solid orange;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
   margin: 0;
-  padding: 0;
+  padding: 8px;
+}
+
+.moreEvent {
+  padding: 0 0 1px 5px ;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
 }
 
 .calendarDayOver {
