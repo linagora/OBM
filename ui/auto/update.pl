@@ -122,9 +122,9 @@ sub getParameter {
         print STDERR "\t\tglobal : fait une mise a jour globale du domaine ;\n";
         print STDERR "\t\tincremental : fait une mise a jour incrementale du domaine.\n";
         print STDERR "\t\tentity : fait une mise a jour par entité. Les entités à mettre à jour sont indiquées sur l'entrée standard sous la forme 'type:nom', un par ligne\n";
-        print STDERR "\t\tdelete : suppression d'un domaine.\n";
         print STDERR "\t\t\ttype : [user|mailshare|group|host]\n";
         print STDERR "\t\t\tname : nom/identifiant de l'entité\n";
+        print STDERR "\t\tdelete : suppression d'un domaine.\n";
         print STDERR "Un des paramètres '--domain-id', '--domain-name' ou '--domain-global' doit être indiqué. '--domain-id' est prioritaire.\n";
         print STDERR "Un et un seul des paramètres '--global', '--incremental', '--entity' ou '--delete' peuvent être indiqués à la fois.\n";
 
@@ -377,6 +377,9 @@ update.pl - OBM administration tool, alter ego of Cyrus::IMAP::Shell
 
 =head1 SYNOPSIS
 
+  # Generic command
+  $ update.pl <ACTION_PARAM> <CONFIG_PARAM>
+
   # Domain global update
   $ update.pl --domain-id <DOMAIN_ID> --global
 
@@ -389,6 +392,23 @@ update.pl - OBM administration tool, alter ego of Cyrus::IMAP::Shell
   # Domain incremental update - only updates done for a delegation
   $ update.pl --domain-id <DOMAIN_ID> --delegation <DELEGATION> --incremental
 
+  # Global update on global domain
+  $ update.pl --domain-global --global
+
+  # Global update domain by domain name
+  $ update.pl --domain-name <DOMAIN_NAME> --global
+
+  # Update entity
+  $ update.pl --domain-id <DOMAIN_ID> --entity <<EOF
+  user:login
+  mailshare:mailshare_name
+  host:host_name
+  group:group_name
+  EOF
+
+  # Delete entire domain
+  $ update.pl --domain-id <DOMAIN_ID> --delete
+
   # Display help
   $ update.pl --help
 
@@ -396,36 +416,43 @@ update.pl - OBM administration tool, alter ego of Cyrus::IMAP::Shell
 
 This script is used by OBM-UI when an admin apply updates.
 
+C<ACTION_PARAM> are :
+
+=over 4
+
+=item global : global update
+
+=item incremental : incremental update
+
+=item entity : entity update
+
+=item delete : domain delete
+
+=back
+
+C<CONFIG_PARAM> are :
+
+=over 4
+
+=item domain-id (or domain-name, or domain-global) : run on this OBM domain
+
+=item user : apply updates done by only this user - used on icremental mode only
+
+=item delegation : apply updates done by only this delegation - used on
+icremental mode only
+
+=back
+
 Global update apply all datas for a domain in the system regardless of BD
 updates.
 
 Incremental update apply only updates mark by the scope. It's possible to apply
 updates for only a particular user or for a delegation.
 
-=head1 COMMANDS
+Only one C<ACTION_PARAM> must be specify at same time.
 
-=over 4
-
-=item C<help> : display help
-
-=item C<domain-id> : B<needed>
-
-=over 4
-
-=item domain BD ID
-
-=back
-
-=item C<global> : global update
-
-=item C<incremental> : incremental update
-
-=item C<user> : apply updates done by only this user
-
-=item C<delegation> : apply update done by only this delegation
-
-=back
+Only one C<CONFIG_PARAM> must be specify at same time.
 
 Parameters 'user' and 'delegation' are exclusive.
 
-This script generate log via syslog.
+This script log via syslog.
