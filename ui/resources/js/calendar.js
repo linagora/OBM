@@ -82,7 +82,7 @@ Obm.CalendarManager = new Class({
       if (evt.size == 0) evt.size = 1; // very, very crappy fix 
       if (!evt.event.all_day) {
         var beginDay = new Obm.DateTime(evt.event.time*1000);
-        var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
+        var endDay = new Obm.DateTime((evt.event.time+evt.event.duration-1)*1000); // -1 => event end at midnight
         beginDay.setHours(0);
         beginDay.setMinutes(0);
         beginDay.setSeconds(0);
@@ -133,7 +133,7 @@ Obm.CalendarManager = new Class({
             if (more) {
               var title = '<a href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title+'</a>';
 	            var color = evt.content.getStyle('backgroundColor');
-              if (evt.event.colors.event.body) color = evt.event.colors.event.body;
+              if (evt.event.colors.event && evt.event.colors.event.body) color = evt.event.colors.event.body;
               var style = 'style="color:'+color+'"';
               if (evt.event.all_day) {
                 title = '<a href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'>'+evt.event.title+'</a>';
