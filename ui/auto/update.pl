@@ -248,7 +248,7 @@ sub getParameter {
         $self->_log( 'Mise a jour du domaine \''.$parameters->{'domain-name'}.'\' (ID: '.$parameters->{'domain-id'}.')', -1 );
     }else {
         $self->_log( 'Paramétre \'--domain-id\' ou \'--domain-name\' ou \'--domain-global\' manquant ou incorrect', 0 );
-        print STDERR 'Paramétre \'--domain-id\' ou \'--domain-name\' ou \'--domain-global\' manquant ou incorrect'."\n";
+        print STDERR 'Paramétre \'--domain-id\' ou \'--domain-name\' ou \'--domain-global\' manquant ou incorrect, vérifiez les fichiers journaux'."\n";
         die;
     }
 }
@@ -281,7 +281,7 @@ sub _getGlobalDomainId {
     my $sth;
     if( !defined($dbHandler->execQuery( $query, \$sth )) ) {
         $self->_log( 'Chargement de l\'ID du domaine global d\'OBM impossible', 3 );
-        return 1;
+        return undef;
     }
 
     my $rowResult = $sth->fetchrow_hashref();
