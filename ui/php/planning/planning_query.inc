@@ -4,7 +4,7 @@
 //     - Desc : Planning query File                                          //
 // 2008-10-14 Guillaume Lardon                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id: planning_query.inc 17 2009-09-24 07:38:03Z glardon $
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -116,11 +116,12 @@ function run_query_plannedtask_projects($user,$project=null)
  **/
 function run_query_planning_groups() {
   global $cdg_sql,$obm;
+  global $cplanning_groups;
 
   $query = "SELECT group_id,group_name
     FROM UGroup
     WHERE (group_privacy='O' or (group_privacy='1' and group_usercreate=".$obm['uid'].") )
-    AND group_desc like '%[PROD]%'
+    AND group_id in (".implode(",",$cplanning_groups).")
     order by group_name";
   display_debug_msg($query, $cdg_sql, 'run_query_planning_groups()');
   $obm_q = new DB_OBM;
@@ -129,29 +130,44 @@ function run_query_planning_groups() {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : TaskType Group list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktypegroup_list() {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('tasktypegroup');
+
+  $query = "SELECT tasktypegroup_id,
+    tasktypegroup_label,
+    tasktypegroup_code,
+    tasktypegroup_bgcolor,
+    tasktypegroup_fgcolor
+  FROM TaskTypeGroup WHERE 1=1 $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_tasktypegroup_list()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
+
 /**
  * Get task groups
  * @return array of tasktypegroups datas
  **/
 function get_tasktypegroups_infos()
 {
-  $query = "select tasktypegroup_id,
-    tasktypegroup_label,
-    tasktypegroup_code,
-    tasktypegroup_bgcolor,
-    tasktypegroup_fgcolor
-   from TaskTypeGroup";
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $tg = array();
-  while($obm_q->next_record()) {
-    $id = $obm_q->f('tasktypegroup_id');
-    $tg[$id]['label'] = $obm_q->f('tasktypegroup_label');
-    $tg[$id]['code'] = $obm_q->f('tasktypegroup_code');
-    $tg[$id]['bgcolor'] = $obm_q->f('tasktypegroup_bgcolor');
-    $tg[$id]['fgcolor'] = $obm_q->f('tasktypegroup_fgcolor');
+  $ttg_q = run_query_tasktypegroup_list();
+  $ttg = array();
+  while($ttg_q->next_record()) {
+    $id = $ttg_q->f('tasktypegroup_id');
+    $ttg[$id]['label'] = $ttg_q->f('tasktypegroup_label');
+    $ttg[$id]['code'] = $ttg_q->f('tasktypegroup_code');
+    $ttg[$id]['bgcolor'] = $ttg_q->f('tasktypegroup_bgcolor');
+    $ttg[$id]['fgcolor'] = $ttg_q->f('tasktypegroup_fgcolor');
   }
-  return $tg;
+  return $ttg;
 }
 
 /**
@@ -181,14 +197,13 @@ function run_query_planning_get_usernames($users)
  *
  * @return database object with search result
  */
-function run_query_plannedtask_tasks()
+function run_query_plannedtask_tasks($internal_cond="1=1")
 {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('tasktype');
-
-  $query = "SELECT tasktype_id,tasktype_label FROM TaskType WHERE tasktype_internal!=0 $multidomain order by tasktype_label";
+  $query = "SELECT tasktype_id,tasktype_label,tasktype_tasktypegroup_id FROM TaskType WHERE $internal_cond $multidomain order by tasktype_label";
   display_debug_msg($query, $cdg_sql, 'run_query_plannedtask_task()');
   $obm_q->query($query) ;
   return $obm_q;
@@ -240,50 +255,6 @@ function run_query_plannedtask_detail($id) {
 
   return $obm_q;
 }
-
-
-/**
- * Planning user month detail query execution
- *
- * @param mixed $user_id : user id
- * @param mixed $month : selected month
- * @return database object with plannedtask info
- */
-function run_query_plannedtask_user_detail($user_id,$month) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-
-  $multidomain = sql_multidomain('plannedtask');
-/*
-  $query = "SELECT *,
-      plannedtask_user_id,
-      plannedtask_datebegin,
-      plannedtask_dateend,
-      plannedtask_period,
-      plannedtask_project_id,
-      plannedtask_tasktype_id,
-      plannedtask_overrun,
-      plannedtask_comment,
-      project_name,
-      tasktype_label
-    FROM PlannedTask
-    LEFT JOIN Project on project_id=plannedtask_project_id
-    LEFT JOIN TaskType on tasktype_id=plannedtask_tasktype_id
-    WHERE plannedtask_id = '$id'
-      $multidomain";
-*/
-// TODO
-  $query = "select 1";
-  display_debug_msg($query, $cdg_sql, 'run_query_planning_user_detail()');
-  $obm_q->query($query) ;
-  $obm_q->next_record();
-
-  return $obm_q;
-}
-
-
 
 function add_week_item(&$parts,$date1,$date2)
 {
@@ -617,13 +588,171 @@ function get_planning_groups($group_ids)
   return $groups;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Tasktype Group insert
+// Parameters:
+//   - $params[] : tasktype group hash info
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktypegroup_insert($params) {
+  global $cdg_sql, $obm;
+	
+  $label = $params['label'];
+  $code = $params['code'];
+  $bgcolor = $params['bgcolor'];
+  $fgcolor = $params['fgcolor'];
+  $domain_id = sql_parse_id($obm['domain_id']);
+	
+  $query = "INSERT INTO TaskTypeGroup (tasktypegroup_timeupdate,
+    tasktypegroup_timecreate,
+    tasktypegroup_usercreate,
+    tasktypegroup_domain_id,
+    tasktypegroup_label,
+    tasktypegroup_code,
+    tasktypegroup_bgcolor,
+    tasktypegroup_fgcolor)
+  VALUES (null,
+    '".date('Y-m-d H:i:s')."',
+    ".$obm['uid'].",
+    $domain_id,
+    '$label',
+    '$code',
+    '$bgcolor',
+    '$fgcolor')";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_tasktypegroup_insert()');
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Tasktypegroup update
+// Parameters:
+//   - $params[] : tasktypegroup hash info
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktypegroup_update($params) {
+  global $obm, $cdg_sql;
+  
+  $id = sql_parse_id($params['tasktypegroup'], true);
+
+  $label = $params['tasktypegroup_label'];
+  $code = $params['tasktypegroup_code'];
+  $bgcolor = $params['tasktypegroup_bgcolor'];
+  $fgcolor = $params['tasktypegroup_fgcolor'];
+  $multidomain = sql_multidomain('tasktypegroup');
+
+  $query = "UPDATE TaskTypeGroup SET
+    tasktypegroup_label='$label',
+    tasktypegroup_timeupdate='".date('Y-m-d H:i:s')."',
+    tasktypegroup_userupdate='".$obm['uid']."',
+    tasktypegroup_code='$code',
+    tasktypegroup_bgcolor='$bgcolor',
+    tasktypegroup_fgcolor='$fgcolor'
+  WHERE tasktypegroup_id $id
+    $multidomain";
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_tasktypegroup_update()');
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the label of a tasktype group
+// Parameters:
+//   - $id : tasktypegroup id
+///////////////////////////////////////////////////////////////////////////////
+function get_tasktypegroup_label($id) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('tasktypegroup');
+  $id = sql_parse_id($id, true);
+  $query = "SELECT tasktypegroup_label FROM TaskTypeGroup 
+		WHERE tasktypegroup_id $id $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'get_tasktypegroup_label()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f('tasktypegroup_label');
+  return $retour;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Links to the tasktypegroup given
+// Parameters:
+//   - $s_id : tasktypegroup id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_planning_tasktypegroup_links($s_id) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('tasktype');
+  $s_id = sql_parse_id($s_id, true);	
+  $query = "SELECT tasktype_id, tasktype_label FROM TaskType WHERE tasktype_tasktypegroup_id $s_id $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_planning_tasktypegroup_links()');
+  $sta_q = new DB_OBM;
+  $sta_q->query($query);
+
+  return $sta_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Tasktypegroup deletion
+// Parameters:
+//   - $id : tasktypegroup id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktypegroup_delete($id) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('tasktypegroup');
+  $id = sql_parse_id($id, true);
+  $query = "DELETE FROM TaskTypeGroup WHERE tasktypegroup_id $id $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_tasktypegroup_delete()');
+  $sta_q = new DB_OBM;
+  $retour = $sta_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Tasktype update
+// Parameters:
+//   - $params[] : tasktype hash info
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktype_update($params) {
+  global $obm, $cdg_sql;
+
+  $id = sql_parse_id($params['tasktype'], true);
+
+  $ttg = $params['tasktype_tasktypegroup_id'];
+  $multidomain = sql_multidomain('tasktype');
+
+  $query = "UPDATE TaskType SET
+    tasktype_tasktypegroup_id='$ttg',
+    tasktype_timeupdate='".date('Y-m-d H:i:s')."',
+    tasktype_userupdate='".$obm['uid']."'
+  WHERE tasktype_id $id
+    $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_tasktype_update()');
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
 
 // Fonction d'assert pour debug en cas de probleme
 /* exemple d'appel :
   pt_assert(0,__FILE__,__LINE__,"test","quiet",$buggy_var);
   actions possibles : 'die','report','quiet'
 */
-// TODO : retirer tout ce qui est relatif a cette assertion en version finale
 function pt_assert($cond,$file,$line,$context="non defini",$action='die',$extravar=null)
 {
   if(!$cond)
@@ -638,7 +767,7 @@ Source code : $file:$line
 URL : $url
 User : $user
 Version : $obm_version
-Planning revision : $Id: planning_query.inc 17 2009-09-24 07:38:03Z glardon $
+Planning revision : $Id$
 
 Additionnal infos :
 ".var_export($extravar,true)."

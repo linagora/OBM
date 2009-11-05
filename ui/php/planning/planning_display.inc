@@ -4,7 +4,7 @@
 //     - Desc : Planning Display File                                        //
 // 2008-10-14 Guillaume Lardon                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id: planning_display.inc 15 2009-09-21 19:45:25Z glardon $
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -299,7 +299,7 @@ function dis_planning_user_month($obm_q, $params ) {
 
     $planning[$u_id][$day][$period]["type"] = $type;
     $planning[$u_id][$day][$period]["label"] = "<abbr title=\"$label\">$shortname</abbr>";
-    $planning[$u_id][$day][$period]["taskgroup"] = $obm_q->f('tasktype_taskgroup_id');
+    $planning[$u_id][$day][$period]["taskgroup"] = $obm_q->f('tasktype_tasktypegroup_id');
 
     $planning[$u_id][$day][$period]["end"] = $dayend;
     $planning[$u_id][$day][$period]["id"] = $obm_q->f('plannedtask_id');
@@ -362,13 +362,7 @@ function dis_planning_month_userslines($year,$month,$first_day,$last_day,$group_
   {
     $lday = $l_daysofweekfirst[$array_res[$day]['dow']];
 
-    // TODO : niveau admin necessaire pour le moment le temps de
-    // l'implementer. Ensuite, passer à cright_write
-    if($perm->check_right('planning', $cright_read_admin))
-    $line0 .= "<th><a href=\"$path/planning/planning_index.php?action=detailupdate&amp;date=$year-$month-$day\">$lday</a></th>\n";
-    else
     $line0 .= "<th>$lday</th>\n";
- 
     $line1 .= "<td style=\"text-align: center\">$day</td>\n";
   }
 
@@ -417,18 +411,12 @@ function dis_planning_month_userslines($year,$month,$first_day,$last_day,$group_
         if($period==1)
         {
           $block.= "<tr><td rowspan=\"2\" style=\"color:#aaaaaa\">".($i+1)."</td>";
-          // TODO : niveau admin necessaire pour le moment le temps de
-          // l'implementer. Ensuite, passer à cright_write
-          if($perm->check_right('planning', $cright_read_admin))
-          $block .= "<td rowspan=\"2\"><a href=\"$path/planning/planning_index.php?action=detailuserupdate&amp;date=$year-$month-01&amp;user_id=$u_id\">$user_name</a></td>\n";
-          else
           $block .= "<td rowspan=\"2\">$user_name</td>";
         }
         else
         $block .= "<tr>";
         for($day=$first_day;$day<=$last_day;$day++)
         {
-          // print "$u_id / $day / $period --\n";
           // C'est un week-end (samedi+dimanche)
           if($array_res[$day]['dow']==6 )
           {
@@ -664,91 +652,6 @@ function dis_group_select($planning, $grp_q, $multi=false) {
   return $block;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Display planning import file select form
-// Parameters : 
-//   - $params[] : form values
-//     keys used : name, user
-///////////////////////////////////////////////////////////////////////////////
-function html_planning_import_fileselect_form($params) {
-  global $l_import, $l_file, $l_confirm;
-  global $cgp_use;
-
-  $url = url_prepare('planning_index.php');
-
-  $block = "
-    <div class=\"detail extra\">
-    <h1>$l_file</h1>
-    <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
-      <input type=\"hidden\" name=\"action\" value=\"import_tabselect\" />
-    <table>
-    <tr>
-      <th>$l_sample_file</th>
-      <td>
-        <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
-        <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
-        <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" /></td>
-    </tr>
-    </table>
-    </form>
-    </div>";
-  return $block;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Display planning import tab select form
-// Parameters : 
-//   - $params[] : form values
-//   - $tabnames[] : tabs
-//     keys used : name, user
-///////////////////////////////////////////////////////////////////////////////
-function html_planning_import_tabselect_form($params,$tabs) {
-  global $l_import, $l_file, $l_confirm;
-  global $cgp_use;
-
-  $url = url_prepare('planning_index.php');
-  $block = "
-    <div class=\"detail extra\">
-    <h1>$l_file</h1>
-    <form method=\"post\" name=\"f_file\" action=\"$url\">
-      <input type=\"hidden\" name=\"action\" value=\"import\" />
-      <input type=\"hidden\" name=\"file\" value=\"".$params['file']."\" />
-    <table>
-    <tr>
-      <th>$l_sample_file</th>
-      <td>";
-   
-   foreach($tabs as $i=>$name)
-   $block.= "<label><input type=\"checkbox\" name=\"tab$i\" value=\"1\" />$name</label> <br />\n";
-
-   $block.="
-        <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" /></td>
-    </tr>
-    </table>
-    </form>
-    </div>";
-  
-  return $block;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Display planning import tab result report
-// Parameters : 
-//   - $params[] : form values
-//     keys used : name, user
-///////////////////////////////////////////////////////////////////////////////
-function html_planning_import_report($result) {
- // TODO : trauire cette chaine
-  $block = "
-    <div class=\"detail extra\">
-    <h1>Resultat de l'importation</h1>
-    <pre>
-    $result
-    </pre>
-    </div>";
-  return $block;
-}
-
 /**
  * XHTML Display PlannedTask Detail
  *
@@ -806,7 +709,7 @@ function html_plannedtask_consult($plannedtask_q) {
   }
   $sel_project .= '</select>';
 */
-  $obm_q = run_query_plannedtask_tasks();
+  $obm_q = run_query_plannedtask_tasks("tasktype_internal!=0");
   $sel_task = "<select name=\"sel_task\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($obm_q->next_record())  {
@@ -1032,7 +935,7 @@ function html_plannedtask_form($action, $plannedtask_q, $plannedtask, $field='',
   }
   $sel_project .= '</select>';
 
-  $obm_q = run_query_plannedtask_tasks();
+  $obm_q = run_query_plannedtask_tasks("tasktype_internal!=0");
   $sel_task = "<select name=\"sel_task\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($obm_q->next_record())  {
@@ -1156,276 +1059,313 @@ function html_plannedtask_form($action, $plannedtask_q, $plannedtask, $field='',
   return $block;
 }
 
-// TODO : ECRIRE et FACTORISER avec la fonction precedente
 ///////////////////////////////////////////////////////////////////////////////
-// Display PlannedTask Line Form
-// Parameters :
-//   - $action   : action called
-//   - $plannedtask_q : DBO : information about the planned task(null for new)
-//   - $plannedtask[]   : default or transmitted values
-//     keys used : name, desc, usercreate
-//   - $field    : field in error
+// Display Planning Administration Index
 ///////////////////////////////////////////////////////////////////////////////
-function html_plannedtask_user_form($action, $plannedtask_q, $params, $field='') {
-  global $cgp_use, $l_domain, $l_insert, $l_update, $l_delete, $l_back,$l_web_list;
-  global $l_module_planning, $l_begin, $l_end, $l_project, $l_overrun, $l_comment, $l_user;
-  global $display, $obm;
+function dis_planning_admin_index() {
+  $ttg_q = run_query_tasktypegroup_list();
+  $tasktypegroups =  get_tasktypegroups_infos();
 
-  global $c_week_first_day;
-  global $ico_previous, $ico_next,$l_monthsofyear;
-  global $perm, $cright_write;
-  global $l_daysofweekfirst;
+  $block = html_planning_admin_form($ttg_q,$tasktypegroups);
+  return $block;
+}
 
-  $iso_date = $params['date'];
-  $ts_date = strtotime($iso_date);
-  $month = of_date_get_month($ts_date);
-  $year = of_date_get_year($ts_date);
-
-  // first day of the month in second
-  $first_day_sec = mktime(0,0,0,$month, 1, $year);
-  $last_day_sec = mktime(23,0,0,$month+1, 0, $year);
-  $day_in_sec = $first_day_sec;
-  $dow = date('w', $day_in_sec);
-  $obm_dow = ($dow - $c_week_first_day + 7) % 7;
-
-  // Fill the day array -------------------------------------------------------
-  $day = 1;
-  while ($day_in_sec < $last_day_sec) {
-    //$fday = ($day>9) ? "$day" : "0$day";
-    $fday = $day;
-    $array_res["$fday"]['length'] = 0;
-    $array_res["$fday"]['dow'] = $dow;
-    $array_res["$fday"]['obm_dow'] = $obm_dow;
-    $day++;
-
-    $day_in_sec += 86400;
-    $dow = date('w', $day_in_sec);
-    $obm_dow = ($dow - $c_week_first_day + 7) % 7;
-  }
-
-  $user = $plannedtask['user_id'];
-  $month = $plannedtask['month'];
- 
-  // Initialisation du 1er et du dernier jour du mois
-  // on saute les samedi/dimanche qui seraient en debut de mois
-  if($array_res[1]['dow']==6)
-  $first_day = 3;
-  else if($array_res[1]['dow']==0)
-  $first_day = 2; 
-  else 
-  $first_day = 1;
-
-  $last_day = $day-1;
-
-  $week = get_calendar_week_num(strtotime("$year-$month-".sprintf("%02d",$day) ));
- 
-  for($day=$first_day;$day<=$last_day;$day++)
+function html_tasktypegroup_select($tasktype_id,$tasktypegroup_sel,$tasktypegroups)
+{
+  $bgcolor = $tasktypegroups[$tasktypegroup_sel]['bgcolor'];
+  $fgcolor = $tasktypegroups[$tasktypegroup_sel]['fgcolor'];
+  $block = "<select style=\"color: $fgcolor; background-color: $bgcolor\" id=\"rd_tasktype_tasktypegroup_id_$tasktype_id\">";
+  foreach($tasktypegroups as $ttg_id => $ttg_infos)
   {
-    $dow = $array_res[$day]['dow'];
-    $lday = $l_daysofweekfirst[$dow];
-    
-    if($dow==1)
-    {
-      $week = get_calendar_week_num(strtotime("$year-$month-".sprintf("%02d",$day) ));
-      $line0.="<td colspan=\"7\" style=\"background-color: lightgray\">S$week</td>";
+    $block.= "<option value=\"".$ttg_id."\"";
+    if($ttg_id==$tasktypegroup_sel)
+    $block.= " selected";
+
+    $block.="/>".$ttg_infos['label']."</option>";
+  }
+  $block .="</select>";
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Planning Administration Forms
+// Parametres:
+//   - $ttg_q : DBO : TaskType Group list
+///////////////////////////////////////////////////////////////////////////////
+function html_planning_admin_form($ttg_q,$tasktypegroups) {
+  global $l_label, $l_code, $l_bgcolor,$l_fgcolor ;
+  global $l_tasktypegroup_insert, $l_tasktypegroup_update;
+  global $l_tasktypegroup_manage,$l_status_exist,$l_status_new,$l_c_new;
+  global $l_type_label,$l_order,$ico_delete,$ico_ok;
+  global $l_tasktypegroup_checkdelete, $l_tasktypegroup_update, $l_tasktypetype_insert;
+  global $l_header_tasktype, $l_tasktypegroup;
+  global $l_tasktype_affect,$l_group;
+
+  $char_title = '=';
+  $key = 0;
+  $ttg_list="";
+  while ($ttg_q->next_record()) {
+
+   $id = $ttg_q->f('tasktypegroup_id');
+   $label = $ttg_q->f('tasktypegroup_label');
+   $code = $ttg_q->f('tasktypegroup_code');
+   $bgcolor = $ttg_q->f('tasktypegroup_bgcolor');
+   $fgcolor = $ttg_q->f('tasktypegroup_fgcolor');
+
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = '';
     }
-     
-    // TODO : niveau admin necessaire pour le moment le temps de
-    // l'implementer. Ensuite, passer à cright_write
-    if($perm->check_right('planning', $cright_read_admin))
-    $line1 .= "<th><a href=\"$path/planning/planning_index.php?action=detailupdate&amp;date=$year-$month-$day\">$lday</a></th>\n";
-    else
-    $line1 .= "<th>$lday</th>\n";
- 
-    $line2 .= "<td style=\"text-align: center\">$day</td>\n";
-  }
-  $line0 = "<tr><th></th>$line0</tr>\n";
-  $line1 = "<tr><th></th>$line1</tr>\n";
-  $line2 = "<tr><th></th>$line2</tr>\n";
-  
-  $block="<form method=\"get\" name=\"f_plannedtask\" action=\"planning_index.php\">";
-
-  $block .= "<table \"planning\">\n";
-  $block .= "
-  <colgroup>
-  </colgroup>
-  <colgroup class=\"main\" span=\"$day_amount\">
-  </colgroup> 
-  <colgroup class=\"total\" span=\"2\">
-  </colgroup>    
-  <thead>$line0 $line1 $line2</thead>";
-
-  $block.="<tr><td>Jour</td>";
-  for($day=$first_day;$day<=$last_day;$day++)
-  {
-    $block.="<td><input type=\"checkbox\" id=\"d$day\"></td>";
-  }
-  $block.="</tr>";
-  $block.="</table></form>";
-  return $block;  
-  
-/*tout ce qui est apres cette ligne n'est pas utile************/
-
-  // if update mode and first time, values are taken from db
-  if ($action == 'detailupdate') {
-    $id = $plannedtask_q->f('plannedtask_id');
-    
-    $name = $plannedtask_q->f('project_name') . $plannedtask_q->f('tasktype_label') . $plannedtask_q->f('plannedtask_label');
-    $project = $plannedtask_q->f('project_id');
-    $task = $plannedtask_q->f('tasktype_id');
-    $overrun = $plannedtask_q->f('plannedtask_overrun');
-    $comment = $plannedtask_q->f('plannedtask_comment');
-    $datebegin = of_date_upd_format($plannedtask_q->f('plannedtask_datebegin'),true);
-    $dateend = of_date_upd_format($plannedtask_q->f('plannedtask_dateend'),true);
-    $period = $plannedtask_q->f('plannedtask_period');
-    $user = $plannedtask_q->f('plannedtask_user_id');
-
-    $dis_title = $name;
+    $ttg_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"tasktypegroup_$id\" value=\"$id\" />
+    <a href=\"?action=tasktypegroup_checklink&amp;tasktypegroup=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_tasktypegroup_checkdelete\" title=\"$l_tasktypegroup_checkdelete\" />
+    </a></td>
+    <td><input type=\"text\" id=\"tf_tasktypegroup_label_$id\" value=\"$label\" /></td>
+    <td><input type=\"text\" id=\"tf_tasktypegroup_code_$id\" value=\"$code\" size=\"8\"/></td>
+    <td><input type=\"text\" id=\"tf_tasktypegroup_bgcolor_$id\" value=\"$bgcolor\" size=\"6\"/></td>
+    <td><input type=\"text\" id=\"tf_tasktypegroup_fgcolor_$id\" value=\"$fgcolor\" size=\"6\"/></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'tasktypegroup');\">
+    <img src=\"$ico_ok\" alt=\"$l_tasktypegroup_update\" title=\"$l_tasktypegroup_update\" />
+    </a>
+    </td>
+    </tr>";
   }
 
-  // If parameters have been given, they supercede the default action value
-  if (isset($plannedtask['id'])) { $id = $plannedtask['id']; }
-  if (isset($plannedtask['datebegin'])) { $datebegin = of_date_upd_format($plannedtask['datebegin'],true); }
-  if (isset($plannedtask['dateend'])) { $dateend = of_date_upd_format($plannedtask['dateend'],true); }
-  if (isset($plannedtask['user'])) { $user = $plannedtask['user']; }
-  if (isset($plannedtask['period'])) { $period = $plannedtask['period']; }
-  if (isset($plannedtask['overrun'])) { $overrun = $plannedtask['overrun']; }
-// TODO... rajouter label, projet et task
 
-  if (!$dateend) { $dateend = $datebegin; }
-
-  // overrun checkbox checked value
-  $overrun_state  = ($overrun ? 'checked' : '');
-
-  // Mark the error field
-  if ($field != '') {
-    $class[$field] = 'error';
+  $tt_q = run_query_plannedtask_tasks();
+  $tt_list = "";
+  $char_title = '=';
+  $key = 0;
+  while ($tt_q->next_record()) {
+    $key++;
+    $id = $tt_q->f('tasktype_id');
+    $label = $tt_q->f('tasktype_label');
+    $ttg = $tt_q->f('tasktype_tasktypegroup_id');
+   
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = '';
+    }
+    $tt_list .= "
+    <tr $class>
+    <input type=\"hidden\" id=\"tasktype_$id\" value=\"$id\" />
+    <td>$label</td>
+    <td> ".html_tasktypegroup_select($id,$ttg,&$tasktypegroups)." </td>
+    <td>
+      <a href=\"#\" onclick=\"return updateLine($id,'tasktype');\">
+      <img src=\"$ico_ok\" alt=\"$l_type_update\" title=\"$l_type_update\" />
+      </a>
+    </td>
+    </tr>";
   }
-
-  $display['detailInfo'] = display_record_info($plannedtask_q);
-  $display['title'] = $dis_title;
-
-  $block.="";
-  $obm_q = run_query_plannedtask_projects($user);
-
-
-  $sel_project = "<select name=\"sel_project\">
-    <option value=\"$c_undef\">$l_undef</option>";
-  while ($obm_q->next_record())  {
-    $p_id = $obm_q->f('project_id');
-    $sel_project .= "<option value=\"$p_id\"";
-    if ($project == $p_id) $sel_project .= " selected = \"selected\""; 
-    $sel_project .= ">".$obm_q->f('project_name').' - '.$obm_q->f('company_name')."</option>\n";
-  }
-  $sel_project .= '</select>';
-
-  $obm_q = run_query_plannedtask_tasks();
-  $sel_task = "<select name=\"sel_task\">
-    <option value=\"$c_undef\">$l_undef</option>";
-  while ($obm_q->next_record())  {
-    $t_id = $obm_q->f('tasktype_id');
-    $sel_task .= "<option value=\"$t_id\"";
-    if ($task == $t_id) $sel_task .= " selected = \"selected\""; 
-    $sel_task .= ">".$obm_q->f('tasktype_label')."</option>\n";
-  }
-  $sel_task .= '</select>';
-
-  // TODO : globaliser et internationnaliser cette chaine
-  $plannedtask_periods = array (
-    1 => "Matin",
-    2 => "Apres-midi",
-    0 => "Toute la journee"
-  );
-  $sel_period = "<select name=\"sel_period\">";
-  foreach($plannedtask_periods as $p => $l) {
-    $sel_period .= "<option value=\"$p\"";
-    if ($period == $p) $sel_period .= " selected = \"selected\""; 
-    $sel_period .= ">$l</option>\n";
-  }
-  $sel_period .= '</select>';
 
   $block = "
-  <form method=\"get\" name=\"f_plannedtask\" action=\"planning_index.php\">
-
-  <fieldset class=\"detail infos\">
-  <legend>$l_activity</legend>
-
+  <div class=\"detail admin\" >
+  <form id=\"form_tasktypegroup_update\" action=\"?action=tasktypegroup_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_tasktypegroup_label\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_tasktypegroup_code\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_tasktypegroup_bgcolor\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_tasktypegroup_fgcolor\" value=\"\" />
+  <input type=\"hidden\" name=\"tasktypegroup\" value=\"\" />
+  </form>    
+  <h1>$l_tasktypegroup_manage</h1>
+  <div class=\"overflow\">
   <table>
+  <thead>
   <tr>
-    <th>$l_project</th>
-    <td>
-    $sel_project
-    </td
-  </tr>
-  <tr>
-    <th>Tache</th>
-    <td>
-    $sel_task
-    </td
-  </tr>
-  <tr>
-    <th>$l_overrun</th>
-    <td>
-      <input name=\"cb_overrun\" type=\"checkbox\" value=\"0\" $overrun_state>
-    </td>
-  </tr>
-  <tr>
-    <th>$l_comment</th>
-    <td>
-      <input name=\"tf_comment\" value=\"$comment\" size=\"32\" maxlength=\"128\" />
-    </td
-  </tr>
+    <td>&nbsp;</td>
+    <td>$l_label</td>
+    <td>$l_code</td>
+    <td>$l_bgcolor</td>
+    <td>$l_fgcolor</td>
+    <td>&nbsp;</td>  
+  </tr>    
+  </thead>
+  <tbody>
+  $ttg_list
+  </tbody>
   </table>
-  </fieldset>
+  </div>
 
-  <fieldset class=\"detail infos\">
-  <legend>Affectation</legend>
+  <form id=\"form_tasktypegroup_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category(this.tf_tasktypegroup_label,'$jslabel')\">
   <table>
+  <thead>
   <tr>
-    <th>$l_user</th>
-    <td>$sel_user</td>
+  <td colspan=\"4\">$l_c_new</td>
+  </tr>
+  <tbody>
+  <tr>
+  <td>$l_code</td>
+  <td>$l_label</td>
+  <td>$l_bgcolor</td>
+  <td>$l_fgcolor</td>
   </tr>
   <tr>
-    <th>$l_begin</th>
-    <td><input type=\"text\" name=\"tf_datebegin\" value=\"".of_date_upd_format($datebegin,true)."\" class=\"datePicker\"/> </td>
+  <td>
+  <input type=\"text\" name=\"tf_label\" value=\"\" />
+  </td>
+  <td>
+  <input type=\"text\" name=\"tf_code\" size=\"10\" maxlength=\"10\" value=\"\" />
+  </td>
+  <td>
+  <input type=\"text\" name=\"tf_bgcolor\" size=\"7\" maxlength=\"7\" value=\"\" />
+  </td>
+  <td>
+  <input type=\"text\" name=\"tf_fgcolor\" size=\"7\" maxlength=\"7\" value=\"\" />
+  </td>
   </tr>
+  </tbody>
+  <tfoot>
   <tr>
-    <th>$l_end</th>
-    <td><input type=\"text\" name=\"tf_dateend\" value=\"".of_date_upd_format($dateend,true)."\" class=\"datePicker\"/> </td>
+  <td colspan=\"4\"><input type=\"submit\" value=\"$l_tasktypegroup_insert\" /></td>
   </tr>
-  <tr>
-    <th>Periode</th>
-    <td>$sel_period</td>
-  </tr>
+  </tfoot>
   </table>
-  </fieldset>";
+  <input type=\"hidden\" name=\"action\" value=\"tasktypegroup_insert\" />
+  </form>
+  </div>
 
-  $block .= "<fieldset class=\"buttons\">";
+  <div class=\"detail admin\" >
+  <form id=\"form_tasktype_update\" action=\"?action=tasktype_update\" method=\"post\">
+  <input type=\"hidden\" name=\"rd_tasktype_tasktypegroup_id\" value=\"\" />
+  <input type=\"hidden\" name=\"tasktype\" value=\"\" />
+  </form>    
+  <h1>$l_tasktype_affect</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>$l_header_tasktype</td>
+  <td>$l_tasktypegroup</td>
+  <td>&nbsp;</td>  
+  </tr>    
+  </thead>
+  <tbody>
+  $tt_list
+  </tbody>
+  </table>
+  </div>";
+/*
+  <form id=\"form_status_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category(this.tf_status_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td>
+  $l_order
+  </td>
+  <td>
+  $l_status_new
+  </td>
+  <td>
+  $l_hitrate
+  </td> 
+  </tr>
+  <tr>
+  <td>
+  <input type=\"text\" name=\"tf_status_order\" value=\"\" />
+  </td>
+  <td>
+  <input type=\"text\" name=\"tf_status_label\" value=\"\" />
+  </td>
+  <td>
+  <input type=\"text\" name=\"tf_status_hitrate\" value=\"\" />
+  </td>
+  </tr>
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_status_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"status_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"status\" />
+  </form>
+  </div>";
+*/
+  return $block;
+}
 
-   if (($action == 'detailupdate') || ($action == 'update')) {
-    $block .= "
-      <input type=\"hidden\" name=\"id\" value=\"$id\" />
-      <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"submit\" value=\"$l_update\" />";
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the tasktypegroup links
+// Parameters:
+//   - $id : ttg id
+///////////////////////////////////////////////////////////////////////////////
+function dis_tasktypegroup_links($id) {
+  global $display, $l_tasktypegroup_link_tasktype, $l_tasktypegroup_link_tasktype_no, $l_back;
+  global $l_tasktypegroup_can_delete, $l_tasktypegroup_cant_delete, $l_tasktypegroup_delete;
+
+  $delete_ok = true;
+  $label = get_tasktypegroup_label($id);
+  $obm_q = run_query_planning_tasktypegroup_links($id);
+
+  $nb_stat = $obm_q->num_rows();
+  if ($nb_stat > 0) {
+    $delete_ok = false;
+    $dis_link_head = "<h1>$label : $l_tasktypegroup_link_tasktype ($nb_stat)</h1>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $ttid = $obm_q->f('tasktype_id');
+      $ttlabel = $obm_q->f('tasktype_label');
+      $dis_link.= "<li><a href=\"" .url_prepare("planning_index.php?action=admin") . "\">$ttlabel</a></li>";
+    }
+    if ($cpt < $nb_stat) {
+      $dis_link .= '<li>...</li>';
+    }
 
   } else {
-    $block .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />";
+    $dis_link_head = "<h1>$l_tasktypegroup_link_tasktype_no</h1>";
   }
-  $block .="</form>
-  <form name=\"form_back\" action=\"" .url_prepare("planning_index.php") . "\">
-    <input type=\"submit\" value=\"$l_back\" />
-  </form>";
-     
-  if (($action == 'detailupdate') || ($action == 'update')) 
-  $block .= "<form name=\"f_plannedtask_delete\" action=\"".url_prepare("planning_index.php")."\">
-    <input type=\"hidden\" name=\"plannedtask_id\" value=\"$id\" />
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"submit\" value=\"$l_delete\" />
-  </form>";
 
-  $block .="</fieldset>";
-  
+  $block .= "<div class=\"detail\">
+   $dis_link_head
+   <ul>
+   $dis_link
+   </ul>
+   </div>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare('planning_index.php') . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display['msg'] .= display_ok_msg($l_tasktypegroup_can_delete);
+    $dis_del = "<form name=\"form_type_delete\".
+        method=\"post\" action=\"" . url_prepare('planning_index.php') . "\">
+      <input type=\"hidden\" name=\"action\" value=\"tasktypegroup_delete\" />
+      <input type=\"hidden\" name=\"sel_tasktypegroup_id\" value=\"$id\" />
+      <input type=\"submit\" name=\"sub_tasktypegroup\" value=\"$l_tasktypegroup_delete\" />
+      </form>";
+
+    $block .= "<div class=\"buttons\">
+        $dis_del
+        $dis_back
+      </div>";
+  } else {
+    $display['msg'] .= display_warn_msg($l_tasktypegroup_cant_delete);
+    $block .= "
+      <div class=\"buttons\">
+        $dis_back
+      </div>";
+  }
+
   return $block;
 }
 
