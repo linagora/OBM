@@ -3574,3 +3574,8 @@ CREATE TABLE opush_sync_mail (
         device_id       INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
         mail_uid        INTEGER NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------------------------------------------------------
+-- Obm product ID
+INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(RAND()*NOW())), 24, 0);
+

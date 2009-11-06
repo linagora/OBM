@@ -448,3 +448,7 @@ DELETE FROM DisplayPref WHERE display_user_id IS NOT NULL and display_entity = '
 -- Delete unused domain properties
 DELETE FROM DomainProperty WHERE domainproperty_key='last_public_contact_export';
 DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_property_key='last_public_contact_export';
+
+-- ----------------------------------------------------------------------------
+-- Obm product ID
+INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text), 24);

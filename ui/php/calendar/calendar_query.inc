@@ -4883,55 +4883,14 @@ function run_query_calendar_reset($id,$params) {
 }
 
 /**
- * Returns the OBM product id or create a new one
- * @access public
- * @return unique id (21 hex chars sized)
- */
-function get_or_create_prod_id(){
-  global $cdg_sql;
-
-  $prod_id = get_obm_info('prod_id');
-
-  if(!is_null($prod_id)) {
-    return $prod_id;
-  }
-
-  $prod_id = uniqid(dechex(rand()));
-  $obm_q = new DB_OBM;
-  $query = "INSERT INTO ObmInfo
-            (obminfo_name, obminfo_value) VALUES
-            ('prod_id', '$prod_id')";
-
-  display_debug_msg($query, $cdg_sql, 'get_or_create_prod_id()');
-  $obm_q->query($query);
-
-  return $prod_id;
-}
-
-/**
- * Generates a world-wide unique event id. Format is :
- * OBM-<obm version>-<obm prod id>-<hash>@domain
+ * Generates a world-wide unique event id.
  * @access public
  * @return unique id
  */
 function genUniqueExtEventId() {
-  global $obm_version;
-
-  $domain = $GLOBALS['obm']['domain_name'];
-  $version = 'OBM-'.substr($obm_version, 0, 15).'-'.get_or_create_prod_id();
-
-  /* 255 (max event_ext_id field) - 128 (max domain len) - 21 (prod id)
-     - 15 (max version length guess) - 7 (strlen('OBM---@'))
-     = 84
-     = (the Answer to the Ultimate Question of Life, the Universe, and Everything) * 2
-  */
-  $max_len = 84;
-  $event_ext_id = '';
-  while(strlen($event_ext_id) < $max_len) {
-    $event_ext_id .= dechex(rand()%16);
-  }
-  return $version.'-'.$event_ext_id.'@'.$domain;
+  return get_obm_info('product_id').sha1(uniqid()).sha1($GLOBALS['obm']['domain_name']).sha1(mktime()*rand());
 }
+
 
 /**
  * Get events for an entity
