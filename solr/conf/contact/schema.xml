@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<schema name="contact" version="1.0">
+  <types>
+    <fieldtype name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+	      <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+	      <filter class="solr.WordDelimiterFilterFactory" 
+	      	generateWordParts="1" generateNumberParts="1" 
+	      	catenateWords="0" catenateNumbers="0" 
+	      	catenateAll="0" splitOnCaseChange="1"/>
+	      <filter class="solr.LowerCaseFilterFactory"/>
+	      <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+	      <!--<filter class="solr.SnowballPorterFilterFactory" language="French" />-->
+	      <filter class="solr.ISOLatin1AccentFilterFactory" />
+      </analyzer>
+    </fieldType>
+    <fieldType name="date" class="solr.DateField"/>
+    <fieldType name="integer" class="solr.IntField"/>
+  </types>
+
+  <fields>   
+    <field name="id" type="integer" indexed="true" stored="true" multiValued="false" required="true"/>
+    <field name="timecreate" type="date" indexed="true" stored="false" multiValued="false" />
+    <field name="timeupdate" type="date" indexed="true" stored="false" multiValued="false" />
+    <field name="usercreate" type="text" indexed="true" stored="false" multiValued="true" />
+    <field name="userupdate" type="text" indexed="true" stored="false" multiValued="true" />
+    <field name="datasource" type="integer" indexed="true" stored="false"  multiValued="false" /> 
+    <field name="domain" type="integer" indexed="true" stored="false"  multiValued="false" /> 
+    <!-- in == addressbook-->
+    <field name="in" type="text" indexed="true" stored="false" multiValued="true" />
+    <field name="company" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="lastname" type="text" indexed="true" stored="false"  multiValued="false" /> 
+    <field name="firstname" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="middlename" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="suffix" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="aka" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="manager" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="assistant" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="spouse" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="category" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="service" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="function" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="title" type="text" indexed="true" stored="false" multiValued="false" /> 
+
+    <!-- is:archive, is:collected -->
+    <field name="is" type="text" indexed="true" stored="false" multiValued="true" /> 
+
+    <!-- has:mailing, has:newletter -->
+    <field name="has" type="text" indexed="true" stored="false" multiValued="true" /> 
+
+    <field name="date" type="date" indexed="true" stored="false" multiValued="false" /> 
+    <field name="birthday" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="anniversary" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="comment1" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="comment2" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="comment3" type="text" indexed="true" stored="false" multiValued="false" /> 
+
+    <!-- from == contact_origin -->
+    <field name="from" type="text" indexed="true" stored="false" multiValued="false" /> 
+
+    <field name="email" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="phone" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="fax" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="jabber" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="street" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="zipcode" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="expresspostal" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="town" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="country" type="text" indexed="true" stored="false" multiValued="true" /> 
+
+    <field name="dsf" type="text" indexed="true" stored="false"  multiValued="true" /> 
+    <field name="address" type="text" indexed="true" stored="false"  multiValued="true" /> 
+    <field name="comment" type="text" indexed="true" stored="false"  multiValued="true" /> 
+
+  </fields>
+
+  <uniqueKey>id</uniqueKey>
+
+  <copyField source="lastname" dest="dsf"/>
+  <copyField source="firstname" dest="dsf"/>
+  <copyField source="aka" dest="dsf"/>
+  <copyField source="email" dest="dsf"/>
+
+  <copyField source="street" dest="address"/>
+  <copyField source="town" dest="address"/>
+  <copyField source="zipcode" dest="address"/>
+  <copyField source="expresspostal" dest="address"/>
+  <copyField source="country" dest="address"/>
+
+  <copyField source="comment1" dest="comment"/>
+  <copyField source="comment2" dest="comment"/>
+  <copyField source="comment3" dest="comment"/>
+
+  <defaultSearchField>dsf</defaultSearchField>
+
+  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
+  <solrQueryParser defaultOperator="AND"/>
+
+</schema>
+
