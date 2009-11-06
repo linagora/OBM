@@ -1076,6 +1076,8 @@ function search_user_by_name($lastname, $firstname) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_conflict($calendar, $sel_entity_id) {
 
+  if ($calendar['opacity'] == 'TRANSPARENT') return false;
+
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
@@ -1115,6 +1117,7 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 //   - $calendar       : calendar parameters
 ///////////////////////////////////////////////////////////////////////////////
 function quick_check_calendar_conflict($calendar, $entities) {
+  if ($calendar['all_day']) return false;
 
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
