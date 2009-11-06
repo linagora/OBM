@@ -97,7 +97,7 @@ Obm.Contact.AddressBook = new Class ({
   },
 
   refreshContact: function() {
-    this.contactRequest.onSuccess = function() {
+    this.contactRequest.setOptions({onSuccess : function() {
       this.contact = $(this.contact.get('id'));
       if(this.contact) {
         $('dataGrid').getElements('td').hide();
@@ -108,10 +108,9 @@ Obm.Contact.AddressBook = new Class ({
       } else {
         this.hideContact();
       }
-      this.contactRequest.onSuccess = $empty;
-    }.bind(this);
+      this.contactRequest.setOptions({onSuccess : $empty});
+    }.bind(this)});
     this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')}); 
-
   },
 
   consultContact: function(id) {
