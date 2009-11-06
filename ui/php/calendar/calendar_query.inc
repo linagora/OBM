@@ -1630,6 +1630,7 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
+  $opacity = 'OPAQUE';
   if ($all_day == 'TRUE') {
     // $dateend = clone $datebegin;
     // $dateend->addSecond($event_duration - 1);
@@ -1637,6 +1638,7 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     // $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     // $event_duration = $dateend->diffTimestamp($datebegin);
     $event_duration = "86400";
+    $opacity = 'TRANSPARENT';
   }
   $ext_id = genUniqueExtEventId();
 
@@ -1653,6 +1655,7 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     event_date,
     event_duration,
     event_allday,
+    event_opacity,
     event_description,
     event_properties,
     event_privacy,
@@ -1678,6 +1681,7 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     '$datebegin',     
     '$event_duration',
     $all_day,
+    '$opacity',
     '',
     '',
     0,

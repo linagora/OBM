@@ -277,9 +277,13 @@ function show_hide_calendar_dates(field) {
   if(field.checked) {
     end.style.display = 'none';
     begin.style.display = 'none';
+    $('rd_opacity_free').checked = true;
+    $('rd_opacity_busy').checked = false;
   } else {
     end.style.display = 'inline';
     begin.style.display = 'inline';
+    $('rd_opacity_free').checked = false;
+    $('rd_opacity_busy').checked = true;
   }     
 }
 
