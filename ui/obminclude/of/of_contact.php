@@ -1112,7 +1112,8 @@ class OBM_Contact implements OBM_ISearchable {
         event_allday,
         event_color,
         event_endrepeat,
-        event_domain_id)
+        event_domain_id,
+        event_opacity)
         VALUES
         (
          NOW(),
@@ -1136,7 +1137,8 @@ class OBM_Contact implements OBM_ISearchable {
         '1',
         '',
         NULL,
-        '$obm[domain_id]')";
+        '$obm[domain_id]',
+        'TRANSPARENT')";
 
       $obm_q->query($query);
       display_debug_msg($query, $cdg_sql, 'run_query_contact_birthday_update(insert event)');

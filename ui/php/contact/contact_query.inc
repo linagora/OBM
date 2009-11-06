@@ -1679,6 +1679,7 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
         event_repeatfrequence,
         event_repeatdays,
         event_allday,
+        event_opacity,
         event_color,
         event_endrepeat,
         event_domain_id)
@@ -1703,6 +1704,7 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
         '1',
         '0000000',
         '1',
+        'TRANSPARENT',
         '',
         NULL,
         '$obm[domain_id]')";
