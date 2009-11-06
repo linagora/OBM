@@ -56,6 +56,7 @@ class OBM_Contact implements OBM_ISearchable {
   private  $kind;
   private  $title;
   private  $function;
+  private  $categories = array();
   private  $company_id;
   private  $company;
   private  $market_id;//marketingmanager_id
@@ -244,6 +245,7 @@ class OBM_Contact implements OBM_ISearchable {
     $contacts = self::fetchDetails($db, $where, $offset, $limit);
     if (count($contacts) != 0) {
       $contacts = self::fetchCoords($db, $contacts);
+      $contacts = self::fetchCategories($db, $contacts);
     }
     return $contacts;
   }
@@ -477,7 +479,7 @@ class OBM_Contact implements OBM_ISearchable {
     self::storeAnniversary('anniversary', $contact->id, $uid, $contact->anniversary_event, $contact->display_name(), $contact->old_anniversary, $contact->anniversary);
 
     if ($retour) {
-      $ret = of_userdata_query_update('contact', $contact->id, $contact);
+      $ret = of_userdata_query_update('contact', $contact->id, $contact->categories);
       self::storeCoords($contact);
     }
 
@@ -933,6 +935,7 @@ class OBM_Contact implements OBM_ISearchable {
     return $contacts;
   }
 
+
   private static function storeCoords($contact) {
     global $cdg_sql;
 
@@ -1060,6 +1063,25 @@ class OBM_Contact implements OBM_ISearchable {
         }
       }
     }
+  }
+
+  private static function fetchCategories($db, $contacts) {
+    $contact_ids = implode(',', array_keys($contacts));
+    $query = "SELECT contactentity_contact_id, category_category, category_code, category_id, category_label FROM CategoryLink
+      INNER JOIN Category ON categorylink_category_id = category_id
+      INNER JOIN ContactEntity ON contactentity_entity_id = categorylink_entity_id
+      WHERE contactentity_contact_id IN ($contact_ids)
+      $multidomain
+      ORDER BY contactentity_contact_id, category_category, category_code, category_label";
+    $db->xquery($query);        
+    while ($db->next_record()) {
+      $contacts[$db->f('contactentity_contact_id')]->categories[$db->f('category_category')][$db->f('category_id')] = array('code' => $db->f('category_code'), 'label' => $db->f('category_label'));
+    }
+    return $contacts;
+  }
+
+  private static function storeCategories($db, $contacts) {
+
   }
 
   private static function storeAnniversary($date='birthday', $contact_id, $contact_usercreate, $event_id, $contact_fullname, $old_value, $new_value) {

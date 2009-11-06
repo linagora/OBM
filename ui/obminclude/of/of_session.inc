@@ -302,7 +302,8 @@ class Auth {
       $this->auth["refresh"] = time() + (60 * $this->refresh);
       return true;
     }
-
+    header('HTTP', true, 401);
+    
     // Show the login form
     $this->of_session_dis_login_page();
     $obm["uid"] = "form";

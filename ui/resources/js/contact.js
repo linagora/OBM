@@ -27,7 +27,10 @@ Obm.Contact.AddressBook = new Class ({
         this.addressbook.addClass('current');
         $('spinner').hide();
       }.bind(this),
-      onRequest: $('spinner').show.bind($('spinner'))
+      onRequest: $('spinner').show.bind($('spinner')),
+      onFailure: function (response) {
+        Obm.Error.parseStatus(this.addressBookRequest.status);
+      }
     });
 
     this.contactRequest = new Request.HTML({
@@ -36,7 +39,10 @@ Obm.Contact.AddressBook = new Class ({
       evalScripts : true,
       update: $('dataContainer'),
       onComplete: $('spinner').hide.bind($('spinner')),
-      onRequest: $('spinner').show.bind($('spinner'))
+      onRequest: $('spinner').show.bind($('spinner')),
+      onFailure: function (response) {
+        Obm.Error.parseStatus(this.contactRequest.status);
+      }
     });
 
     this.dataRequest = new Request.HTML({
@@ -45,6 +51,7 @@ Obm.Contact.AddressBook = new Class ({
       evalScripts : true,
       update: $('informationGrid'),
       onFailure: function (response) {
+        Obm.Error.parseStatus(this.dataRequest.status);
         var errors = JSON.decode(response.responseText, false);
         errors.error = new Hash(errors.error);
         errors.warning = new Hash(errors.warning);
@@ -53,6 +60,7 @@ Obm.Contact.AddressBook = new Class ({
       onComplete: $('spinner').hide.bind($('spinner')),
       onRequest: $('spinner').show.bind($('spinner')) 
     });    
+
     this.dataRequest.write = function (options) {
       this.dataRequest.setOptions({onSuccess : function() {this.refreshContact();}.bind(this)});
       this.dataRequest.post(options);
@@ -270,12 +278,12 @@ Obm.Contact.EmailWidget = new Class ({
 Obm.Contact.AddressWidget = new Class ({
   kind : 'addresses',
   structure : {
-    label: { kind: 'label', value: 'WORK', newLine : true, label : obm.vars.labels.addressLabel.WORK}, 
-    street: { kind: 'textarea', value: '', newCell : true, rows: 3, label : obm.vars.labels.addressStreet},
-    zipcode: { kind: 'text', value: '' , newCell : true, label : obm.vars.labels.addressZipcode},
-    town: { kind: 'text', value: '', label : obm.vars.labels.addressTown },
-    expresspostal: { kind: 'text', value: '', label : obm.vars.labels.addressExpressPostal },
-    country_iso3166: { kind: 'select', value: '', token: obm.vars.labels.countries, label : obm.vars.labels.addressCountry }
+    label: { kind: 'label', value: 'WORK', newLine : true, label : obm.vars.labels.addressLabel.WORK, properties: {rowspan: 3}}, 
+    street: { kind: 'textarea', value: '', newCell : true,  rows: 3, label : obm.vars.labels.addressStreet, properties: {colspan: 2}},
+    zipcode: { kind: 'text', value: '' , newLine : true, label : obm.vars.labels.addressZipcode},
+    town: { kind: 'text', value: '',  newCell : true, label : obm.vars.labels.addressTown },
+    expresspostal: { kind: 'text', value: '', newLine : true, label : obm.vars.labels.addressExpressPostal },
+    country_iso3166: { kind: 'select', newCell : true, value: '', token: obm.vars.labels.countries, label : obm.vars.labels.addressCountry }
   },
 
   options: {container: 'addressHolder'},

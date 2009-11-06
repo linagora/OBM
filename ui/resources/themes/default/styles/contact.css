@@ -259,6 +259,11 @@
   width: 12em;
 }
 
+.addresses textarea, .addresses select {
+  width: 100%;
+}
+
+
 #informationGrid fieldset.details {
   margin: 3px 0 0 15px;
   padding: 1px 0 1px 10px;
@@ -275,7 +280,7 @@
   display:inline;
   padding: 5px 0 0 5px;
   clear: left;
-  height: 110px;
+  height: 86px;
   min-width: 32em;
 }
 

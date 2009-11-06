@@ -110,8 +110,17 @@
             <?php } ?>
           </dl>
           <?php } ?>
+          <?php if(!empty($contact->categories)) { ?>
+          <dl id='categoriesLayout' class='details'>
+            <?php foreach($contact->categories as $_name => $_category) { ?>
+            <?php foreach($_category as $_categoryId => $_categoryValue) { ?>
+              <dt><?php echo $GLOBALS['l_'.$_name] ?> : </dt><dd><?php echo $_categoryValue['code'].' '.$_categoryValue['label'] ?></dd>
+            <?php } ?> 
+            <?php } ?>
+          </dl>
+          <?php } ?>
           <?php if(!empty($contact->function_id) || !empty($contact->market_id) || !empty($contact->datasource_id) || !empty($contact->kind_id) || !empty($contact->mailok) || !empty($contact->newsletter)) { ?>
-          <dl id="crmLayout" class="details ">
+          <dl id="crmLayout" class="details">
            <?php if($contact->kind_id) { ?>
             <dt><?php echo __('Language') ?> : </dt><dd><?php echo $contact->language ?></dd>
             <?php } ?>

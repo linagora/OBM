@@ -109,6 +109,13 @@ if ($action == 'ext_get_id') {
   $display['search'] = dis_company_search_form($params);
   $display['result'] = dis_company_search_list($params);
 
+} elseif ($action == 'ext_search') {
+///////////////////////////////////////////////////////////////////////////////
+  $company_q = run_query_company_ext_search($params);
+  json_search_companies($params, $company_q);
+  echo '('.$display['json'].')';
+  exit();
+
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_company_form($action, $params);
@@ -419,6 +426,12 @@ function get_company_action() {
     'Condition'=> array ('None') 
                                     	 );
 
+// Search
+  $actions['company']['ext_search'] = array (
+    'Url'      => "$path/company/company_index.php?action=ext_search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                    	 );
 // New
   $actions['company']['new'] = array (
     'Name'     => $l_header_new_f,

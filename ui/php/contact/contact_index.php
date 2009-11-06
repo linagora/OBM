@@ -161,7 +161,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $addressbook = $addressbooks[$contact->addressbook_id];
   if ($addressbook && $addressbook->write) {
     $template = new OBM_Template('form');
-
+    $template->set('categories', of_category_user_get_all('contact'));
     $template->set('functions', run_query_contact_get_functions());
     $template->set('datasources', run_query_contact_get_datasources());
     $template->set('markets', run_query_contact_get_markets($contact->market_id));

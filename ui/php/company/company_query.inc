@@ -856,6 +856,50 @@ function check_company_data_form($cid, $company) {
 
 
 /**
+ * Search companies from a single field 
+ * 
+ * @param mixed $company 
+ * @access public
+ * @return array of 'length' => DB company results nb, and 'datas' => DB User search query results
+ */
+function run_query_company_ext_search($company) {
+  global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
+
+  $pattern = $company['pattern'];
+  $obm_q = new DB_OBM;
+  $multidomain = sql_multidomain('Company');
+
+  $limit = $company['limit'];
+  if(isset($company['first_row'])) $first_row = $company['first_row'] - 1;
+  else $first_row = 0;
+
+  $patterns = explode(' ', $pattern);
+  foreach ($patterns as $pattern) {
+    $companypattern .= "AND (company_name #LIKE '%$pattern%' OR company_aka #LIKE '%$pattern%')";
+  }
+  $query = "SELECT 
+      company_id,
+      company_name,
+      company_aka 
+    FROM Company 
+    WHERE
+      1 = 1 $companypattern 
+      AND company_archive = 0
+      $multidomain
+    LIMIT $limit OFFSET $first_row";
+  display_debug_msg($query, $cdg_sql, 'run_query_company_ext_search()');
+  $obm_q->xquery($query);
+  $rows =  array();
+  while($obm_q->next_record()) {
+    $rows[] = $obm_q->Record;
+  }
+  $resultsCount = $obm_q->num_rows();
+  ksort($rows);
+  return array('length' => $resultsCount, 'datas' => $rows);
+}
+
+
+/**
  * Check if the company can be deleted
  *
  * @param mixed $p_id : company id

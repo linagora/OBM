@@ -104,6 +104,7 @@ Obm.CoordonateWidget = new Class({
       if(data.newLine == true) {line =  new Element('tr'); this.element.adopt(line);}
       if(data.newCell == true || data.newLine == true) {cell = new Element('th');line.adopt(cell);}
       if(!data.newCell && !data.newLine) cell.adopt(new Element('br'));
+      cell.setProperties(data.properties);
       cell.adopt(this.makeField(field, data));
       new OverText(cell.getElements('input, textarea'));      
     }
@@ -173,7 +174,18 @@ Obm.CoordonateWidget = new Class({
 });
 
 Obm.Error = {
-  
+ 
+  parseStatus: function(state) {
+    switch(state) {
+      case 401:
+        window.location.href=window.location.href;
+        exit;
+        break;
+      default:
+        break;
+    }
+  },
+
   formUpdate: function(errors, caller)  {
     errors.error.each(function( msg, field) {
       if($(field)) {

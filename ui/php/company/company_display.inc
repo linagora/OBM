@@ -1682,5 +1682,28 @@ function dis_select_company_nafcode($naf_q, $line1, $selected) {
   return $sel_naf;
 }
 
+/**
+ * Build a JSON array with all search results 
+ * 
+ * @param $results array of 'length' => DB company results nb, and 'datas' => DB User search query results
+ * @access public
+ * @return void
+ */
+function json_search_companies($company,$results) {
+  global $display, $module, $cright_write_admin, $perm;
+
+  $company_q = $results['datas'];
+
+  $companies = array();
+  foreach($company_q as $name => $data) {
+    $id = $data['company_id'];
+    $label = phpStringToJsString($data['company_name']);
+    $companies[] = "{id:'$id', label:'$label', extra:'".$data['company_aka']."'}";
+  }
+  $display['json'] = "{length:".$results['length'].", datas:[".implode(',',$companies)."]}";
+}
+
+
+
 
 ?>

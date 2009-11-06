@@ -1279,7 +1279,7 @@ input.datePicker {
 }
 
 input.downlight {
-  color: #ddd;
+  color: #ddd !important;
 }
 
 input.validated {

@@ -61,7 +61,7 @@ class  OBM_Search {
       if(is_numeric($value) || strpos($value, ',') !== false) return "$sql IN ($value)";
       break;
     case 'text' :
-      return "$sql #LIKE '$value%'";
+      return "$sql #LIKE '%$value%'";
       break;
     case 'boolean' :
       $val = ($value)?'TRUE':'FALSE';

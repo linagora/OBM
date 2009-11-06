@@ -498,8 +498,8 @@ function run_query_contact_update($contact) {
 
   $multidomain = sql_multidomain('contact');
   $id =  $contact['contact_id'];
-  $comp_old_id =  $contact['company_id'];
-  $comp_new_id =  $contact['company_new_id'];
+  $comp_old_id =  $contact['company_old_id'];
+  $comp_new_id =  $contact['company_id'];
 
   $comp_id = $contact['company_new_id'];
   if ($comp_id < 1) {

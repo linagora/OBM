@@ -65,25 +65,25 @@
                   </li>
                   <?php } ?>
                 </ul>
-              </li>
+              </li>         
               <?php if((empty($contact->function_id) && !empty($functions)) || empty($contact->market_id) || (empty($contact->datasource_id) && !empty($datasources)) || empty($contact->kind_id) || empty($contact->mailok) || empty($contact->newsletter)) { ?>
               <li>
                 <?php echo __('Commercial fields') ?>
                 <ul>
                   <?php if(!$contact->datasource_id && !empty($datasources)) { ?>
-                  <li><a href="" onclick="$('datasource').getParent().removeClass('H');$('datasource').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Datasource') ?></a></li>
+                  <li><a href="" onclick="$('datasource').getParent().removeClass('H');$('datasource').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose(); return false;"><?php echo __('Datasource') ?></a></li>
                   <?php } ?>
                   <?php if(!$contact->function_id && !empty($functions)) { ?>
-                  <li><a href="" onclick="$('function').getParent().removeClass('H');$('function').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Function') ?></a></li>
+                  <li><a href="" onclick="$('function').getParent().removeClass('H');$('function').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose();return false;"><?php echo __('Function') ?></a></li>
                   <?php } ?>
                   <?php if(!$contact->market_id) { ?>
-                  <li><a href="" onclick="$('market').getParent().removeClass('H');$('market').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Market') ?></a></li>
+                  <li><a href="" onclick="$('market').getParent().removeClass('H');$('market').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose();return false;"><?php echo __('Market') ?></a></li>
                   <?php } ?>
                   <?php if(!$contact->mailok) { ?>
-                  <li><a href="" onclick="$('mailok').getParent().removeClass('H');$('mailok').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Mailing') ?></a></li>
+                  <li><a href="" onclick="$('mailok').getParent().removeClass('H');$('mailok').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose();return false;"><?php echo __('Mailing') ?></a></li>
                   <?php } ?>
                   <?php if(!$contact->newsletter) { ?>
-                  <li><a href="" onclick="$('newsletter').getParent().removeClass('H');$('newsletter').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Newsletter') ?></a></li>
+                  <li><a href="" onclick="$('newsletter').getParent().removeClass('H');$('newsletter').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose();return false;"><?php echo __('Newsletter') ?></a></li>
                   <?php } ?>
                 </ul>
               </li>
@@ -164,11 +164,7 @@
               <br />
               <span id="company" class="formField">
                 <label for="companyField"><?php echo __('Company') ?> : </label>
-                <input id="companyField" type="text" name="company" id="companyField" value="<?php echo $contact->company ?>" title="<?php echo __('Company') ?>" />
-              </span>
-              <span id="addressbook" class="formField">
-                <label for="addressbookField"><?php echo __('Addressbook') ?> : </label>
-                <?php echo self::__setlist('addressbook', $addressbooks, 'Addressbook', $contact->addressbook_id, false) ?>
+                <?php echo self::__setentitylink('company', $contact->company, $contact->company_id, 'company', 'Company'); ?>
               </span>
             </fieldset>
             <p class="LC"></p>
@@ -232,6 +228,28 @@
                 <label for="dateField"><?php echo __('Date') ?> : </label>
                 <?php echo self::__setdate('date', $contact->date, 'Date') ?>
               </span>    
+            </fieldset>
+            <fieldset id="categories" class="details <?php echo (empty($contact->categories))?'H':'' ?>">
+              <legend><?php echo __('Other cateogies') ?></legend>
+              <?php foreach($categories as $_name => $_category) { ?>
+              <?php if($_category['mode'] == 'mono') { ?>
+              <span id='cateogry-<?php echo $_name  ?>' class='formField'>
+                <label for='cateogry-<?php echo $_name  ?>Field'><?php echo $GLOBALS['l_'.$_name] ?></label>
+                <?php echo self::__setlist($_name, $_category['values'], $GLOBALS['l_'.$_name], @key($contact->categories[$_name]), true) ?>
+              </span>
+              <?php } else { ?>
+              <?php if(is_array($contact->categories[$_name])) foreach($contact->categories[$_name] as $_categoryId => $_categoryValue) { ?>
+              <span id='cateogry-<?php echo $_name  ?>' class='formField'>
+                <label for='cateogry-<?php echo $_name  ?>Field'><?php echo $GLOBALS['l_'.$_name] ?></label>
+                <?php echo self::__setlist($_name, $_category['values'], $GLOBALS['l_'.$_name], $_categoryId, true);  ?>
+              </span>
+              <?php } ?>
+              <span id='cateogry-<?php echo $_name  ?>' class='formField'>
+                <label for='cateogry-<?php echo $_name  ?>Field'><?php echo $GLOBALS['l_'.$_name] ?></label>              
+                <?php echo self::__setlist($_name, $_category['values'], $GLOBALS['l_'.$_name], NULL, true);  ?>
+              </span>
+              <?php } ?>
+              <?php } ?>
             </fieldset>
             <fieldset id="crmLayout" class="details <?php echo (empty($contact->function_id) && empty($contact->market_id) && empty($contact->datasource_id) && empty($contact->kind_id) && empty($contact->mailok) && empty($contact->newsletter))? 'H':'' ?>">
               <legend><?php echo __('CRM properties') ?></legend>

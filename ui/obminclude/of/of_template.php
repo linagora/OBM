@@ -141,7 +141,6 @@ class OBM_Template {
     $list = '';
     if($none) $list = '<option value="">---</option>';
     if(is_array($datas))
-        var_dump($id, $datas);
       foreach($datas as $id => $data) {
         if($id == $selected) $list .= '<option value="'.$id.'" selected="selected">'.$data.'</option>';
         else $list .= '<option value="'.$id.'">'.$data.'</option>';
@@ -151,14 +150,34 @@ class OBM_Template {
   } 
 
   public static function __getentitylink($value, $id, $module) {
-    if($GLOBALS['perm']->check_module_rights('contract')) {
+    if($GLOBALS['perm']->check_module_rights($module)) {
       return '<a href='.$GLOBALS['path'].'/'.$module.'/'.$module.'_index.php?action=detailconsult&amp;'.$module.'_id='.$id.'>'.$value.'</a>';
     } else {
       return $value;
     }
   }
 
-  public static function __setentitylink($name, $value, $id, $label, $idSuffix = 'Field') {
+  public static function __setentitylink($name, $value, $id, $module, $label, $idSuffix = 'Field') {
+    if($GLOBALS['perm']->check_module_rights('company')) {
+      return  "
+        <input type='text' name='$name' value='$value' id='${name}Field' autocomplete='off'/>
+        <input type='hidden' name='${name}_id' value='id' id='${name}_idField' />
+        <script type='text/javascript'>
+          new obm.AutoComplete.Search('$path/$module/${module}_index.php?action=ext_search', '${name}_idField', '${name}Field', {mode: 'mono', locked: true, resetable: true});
+        </script>
+      ";
+    } else {
+      return "<input type='text' name='$name' id='".$name."Field' value='$value' title='".__($label)."' />";
+    }
+  }
 
+  public static function __setcategory($name, $datas, $label, $selected=null) {
+    if($selected !== null) {
+      foreach($selected as $id => $label) {
+        $data .= self::__setlist($name, $datas, 'TOTO', $id, true);
+      }
+    }
+    $data .= self::__setlist($name, $datas, 'TOTO', null, true);
+    return $data;
   }
 }

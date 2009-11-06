@@ -607,6 +607,7 @@ obm.AutoComplete.Search = new Class({
 
   // validate the current selection
   setResultValue: function(element, extension) {
+    this.inputField.removeClass('downlight');
     var item_id = element.getProperty('id');
     this.selectedBox.value = item_id.substr(('item_').length,item_id.length);
     this.currentValue = $(item_id+'_label').innerHTML;

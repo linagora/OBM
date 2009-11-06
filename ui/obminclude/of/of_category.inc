@@ -2202,7 +2202,38 @@ function of_category_user_dis_links($params) {
 
 // Data functions -------------------------------------------------------------
 
-
+///////////////////////////////////////////////////////////////////////////////
+// Category query execution
+// Parameters:
+//   - $entity    : target entity
+// Return:
+//   Array with orderer categories
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_get_all($entity) {
+  $multidomain = sql_multidomain('category');
+  $entityTable = ucfirst($entity).'Entity';
+  $entityId = strtolower($entity).'entity_entity_id';  
+  $cats = array();
+  if(is_array($GLOBALS['cgp_user'][$entity])) {
+    foreach($GLOBALS['cgp_user'][$entity]['category'] as $category => $mode) {
+      $categories[] = "'$category'";
+    }
+    $query = "SELECT * FROM Category 
+      WHERE category_category IN (".implode(',' , $categories).")
+      $multidomain ORDER BY category_category, category_code, category_label";
+    $cat_q = new DB_OBM;
+    $cat_q->query($query);
+    while($cat_q->next_record()) {
+      if($cat_q->f('category_code')) {
+        $cats[$cat_q->f('category_category')]['values'][$cat_q->f('category_id')] = str_pad($cat_q->f('category_code') . ' ', 5, '.').$cat_q->f('category_label');
+      } else {
+        $cats[$cat_q->f('category_category')]['values'][$cat_q->f('category_id')] = $cat_q->f('category_label');
+      }
+      $cats[$cat_q->f('category_category')]['mode'] = $GLOBALS['cgp_user'][$entity]['category'][$cat_q->f('category_category')]['mode'];
+    }
+  }
+  return $cats;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Category query execution
 // Parameters:
