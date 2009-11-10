@@ -4400,19 +4400,21 @@ function run_query_insert_other_files($params) {
   require(dirname(__FILE__).'/../document/document_query.inc');
   
   $doc_ids = array();
-  foreach ($params['other_files'] as $document) {
-    $document['title'] = $document['name'];
-    $document['author'] = $obm['login'];
-    $document['mime'] = get_document_auto_mime_type($document);
-    $document['path'] = $default_path.'/';
-    $document['kind'] = 1;
-    $document['privacy'] = 1;
-    
-    $doc_id = run_query_document_insert($document);
-    if (!$doc_id) {
-      return false;
-    } else {
-      $doc_ids[] = $doc_id;
+  if (is_array($params['other_files'])) {
+    foreach ($params['other_files'] as $document) {
+      $document['title'] = $document['name'];
+      $document['author'] = $obm['login'];
+      $document['mime'] = get_document_auto_mime_type($document);
+      $document['path'] = $default_path.'/';
+      $document['kind'] = 1;
+      $document['privacy'] = 1;
+      
+      $doc_id = run_query_document_insert($document);
+      if (!$doc_id) {
+        return false;
+      } else {
+        $doc_ids[] = $doc_id;
+      }
     }
   }
   
