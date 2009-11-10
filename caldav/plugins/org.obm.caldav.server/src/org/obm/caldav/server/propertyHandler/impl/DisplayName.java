@@ -45,7 +45,7 @@ public class DisplayName extends DavPropertyHandler implements
 			IBackend proxy, String url) {
 		appendElement(prop, "displayname",
 				NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent(
-				"OBM CalDav " + req.getCalendarComponantName());
+				"OBM CalDav " + req.getCalendarName());
 	}
 
 	@Override

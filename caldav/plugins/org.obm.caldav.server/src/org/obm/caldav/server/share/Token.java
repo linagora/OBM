@@ -23,6 +23,7 @@ public class Token {
 	private String loginAtDomain;
 	private String password;
 	private String calendarName;
+	private String calendarNameAtDomain;
 
 	public Token(String loginAtDomain, String password, String calendarName) {
 		super();
@@ -43,6 +44,8 @@ public class Token {
 		} else {
 			this.calendarName = calendarName;
 		}
+		
+		this.calendarNameAtDomain = calendarName;
 	}
 
 	public String getLogin() {
@@ -71,6 +74,10 @@ public class Token {
 	
 	public String getCalendarName() {
 		return calendarName;
+	}
+	
+	public String getCalendarNameAtDomain() {
+		return calendarNameAtDomain;
 	}
 	
 }

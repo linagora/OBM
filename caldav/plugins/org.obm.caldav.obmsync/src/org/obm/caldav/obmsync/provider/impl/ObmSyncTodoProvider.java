@@ -22,7 +22,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.obmsync.provider.ICalendarProvider;
-import org.obm.sync.auth.AccessToken;
+import org.obm.caldav.obmsync.service.impl.CalDavInfo;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
@@ -61,23 +61,22 @@ public class ObmSyncTodoProvider extends AbstractObmSyncProvider  {
 	}
 	
 	@Override
-	public EventChanges getSync(AccessToken token, String userId, Date lastSync)
+	public EventChanges getSync(CalDavInfo caldavInfo, Date lastSync)
 	throws AuthFault, ServerFault {
 		logger.info("Get sync["+lastSync+"] from obm-sync");
-		return getClient(token).getSync(token, userId, lastSync);
+		return getClient(caldavInfo).getSync(caldavInfo.getToken(), caldavInfo.getCalendar(), lastSync);
 	}
 
 	@Override
-	public List<Event> getAll(AccessToken token, String calendar)
+	public List<Event> getAll(CalDavInfo caldavInfo)
 			throws ServerFault, AuthFault {
 		logger.info("Get all Event from obm-sync");
-		return super.getAll(token, calendar, EventType.VTODO);
+		return super.getAll(caldavInfo, EventType.VTODO);
 	}
 
 	@Override
-	public List<EventTimeUpdate> getAllEventTimeUpdate(AccessToken token,
-			String calendar) throws ServerFault, AuthFault {
+	public List<EventTimeUpdate> getAllEventTimeUpdate(CalDavInfo caldavInfo) throws ServerFault, AuthFault {
 		logger.info("Get all EventTimeUpdate from obm-sync");
-		return super.getAllEventTimeUpdate(token, calendar, EventType.VTODO);
+		return super.getAllEventTimeUpdate(caldavInfo, EventType.VTODO);
 	}
 }

@@ -27,9 +27,6 @@ import org.obm.caldav.server.share.Token;
 
 public class OBMBackend implements IBackend {
 
-//	private AccessToken token;
-//	private String userId;
-//	private String calendar;
 	private ICalendarService calendarService;
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -47,7 +44,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public void login(Token davToken) throws AuthenticationException {
-		calendarService.login(davToken.getLoginAtDomain(), davToken.getPassword(),davToken.getCalendarName());
+		calendarService.login(davToken.getLoginAtDomain(), davToken.getPassword(),davToken.getCalendarName(), davToken.getCalendarNameAtDomain());
 	}
 
 	@Override

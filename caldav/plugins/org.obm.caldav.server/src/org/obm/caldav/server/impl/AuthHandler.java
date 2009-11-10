@@ -44,7 +44,7 @@ public class AuthHandler {
 						logger.info("userId "+userId);
 						String loginAtDomain = getLoginAtDomain(userId);
 						String password = userPass.substring(p + 1);
-						t = new Token(loginAtDomain, password, request.getCalendarComponantName());
+						t = new Token(loginAtDomain, password, request.getCalendarName());
 					}
 				}
 			}

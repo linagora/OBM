@@ -60,7 +60,7 @@ public interface ICalendarService {
 
 	String getLastUpdate() throws Exception;
 
-	void login(String userId, String password, String calendar) throws AuthenticationException;
+	void login(String userId, String password, String calendar, String calendarAtDomain) throws AuthenticationException;
 
 	void logout();
 

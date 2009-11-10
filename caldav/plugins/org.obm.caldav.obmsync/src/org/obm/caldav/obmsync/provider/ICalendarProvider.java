@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.obm.caldav.server.exception.AuthorizationException;
+import org.obm.caldav.obmsync.service.impl.CalDavInfo;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
@@ -39,68 +39,57 @@ import org.obm.sync.items.EventChanges;
  */
 public interface ICalendarProvider {
 
-	CalendarInfo getMyCalendar(AccessToken token, String userId)
-			throws ServerFault, AuthFault;
-
-	Event getEventFromExtId(AccessToken token, String userId, String extId)
+	Event getEventFromExtId(CalDavInfo caldavInfo, String extId)
 			throws AuthFault, ServerFault;
 
-	Event createEvent(AccessToken token, String userId, Event event)
+	Event createEvent(CalDavInfo caldavInfo, Event event)
 			throws AuthFault, ServerFault;
 
-	String getUserEmail(AccessToken token) throws AuthFault, ServerFault;
-
-	Set<CalendarInfo> getListCalendars(AccessToken token) throws ServerFault,
+	List<Event> getAll(CalDavInfo caldavInfo) throws ServerFault,
 			AuthFault;
 
-	List<Event> getAll(AccessToken token, String calendar) throws ServerFault,
-			AuthFault;
+	List<EventTimeUpdate> getAllEventTimeUpdate(CalDavInfo caldavInfo) throws ServerFault, AuthFault;
 
-	List<EventTimeUpdate> getAllEventTimeUpdate(AccessToken token,
-			String calendar) throws ServerFault, AuthFault;
-
-	Map<Event, String> getICSEventsFromExtId(AccessToken token, String userId,
+	Map<Event, String> getICSEventsFromExtId(CalDavInfo caldavInfo,
 			Set<String> listUidEvent) throws AuthFault, ServerFault;
 
-	void remove(AccessToken token, String login, Event event)
-			throws ServerFault, AuthFault, AuthorizationException;
+	void remove(CalDavInfo caldavInfo, Event event)
+			throws ServerFault, AuthFault;
 
-	void updateParticipationState(AccessToken token, String userId,
+	void updateParticipationState(CalDavInfo caldavInfo,
 			Event event, String participationState) throws AuthFault,
 			ServerFault;
 
-	List<Event> createEventsFromICS(AccessToken token, String login,
+	List<Event> createEventsFromICS(CalDavInfo caldavInfo,
 			String ics, String extId) throws Exception;
 
-	List<Event> updateEventFromICS(AccessToken token, String login, String ics,
+	List<Event> updateEventFromICS(CalDavInfo caldavInfo, String ics,
 			Event event) throws Exception;
 
-	EventChanges getSync(AccessToken token, String calendar, Date lastSync)
+	EventChanges getSync(CalDavInfo caldavInfo, Date lastSync)
 			throws AuthFault, ServerFault;
 
-	List<Event> getListEventsFromIntervalDate(AccessToken token,
-			String calendar, Date start, Date end) throws AuthFault,
+	List<Event> getListEventsFromIntervalDate(CalDavInfo caldavInfo, Date start, Date end) throws AuthFault,
 			ServerFault;
 
-	List<EventTimeUpdate> getEventTimeUpdateFromIntervalDate(AccessToken token,
-			String calendar, Date start, Date end) throws ServerFault,
+	List<EventTimeUpdate> getEventTimeUpdateFromIntervalDate(CalDavInfo caldavInfo, Date start, Date end) throws ServerFault,
 			AuthFault;
 
-	boolean hasRightsOnCalendar(AccessToken token, String calendarName)
+	CalendarInfo getRightsOnCalendar(CalDavInfo caldavInfo)
 			throws AuthFault, ServerFault;
 
-	Date getLastUpdate(AccessToken token, String calendarName)
+	Date getLastUpdate(CalDavInfo caldavInfo)
 			throws AuthFault, ServerFault;
 
 	AccessToken login(String loginAtDomaine, String password);
 
 	void logout(AccessToken token);
 
-	public List<FreeBusy> getFreeBusy(AccessToken token, FreeBusyRequest fbrs) throws ServerFault,
+	public List<FreeBusy> getFreeBusy(CalDavInfo caldavInfo, FreeBusyRequest fbrs) throws ServerFault,
 			AuthFault;
 
-	FreeBusyRequest getFreeBusyRequest(AccessToken token, String ics)
+	FreeBusyRequest getFreeBusyRequest(CalDavInfo caldavInfo, String ics)
 			throws ServerFault, AuthFault;
 
-	String parseFreeBusyToICS(AccessToken token, FreeBusy freeBusy) throws ServerFault, AuthFault;
+	String parseFreeBusyToICS(CalDavInfo caldavInfo, FreeBusy freeBusy) throws ServerFault, AuthFault;
 }

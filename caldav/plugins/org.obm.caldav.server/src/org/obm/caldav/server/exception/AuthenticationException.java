@@ -31,6 +31,6 @@ public class AuthenticationException extends CalDavException{
 	private static final long serialVersionUID = -2388282495295018733L;
 	
 	public AuthenticationException(){
-		super(StatusCodeConstant.SC_FORBIDDEN);
+		super(StatusCodeConstant.SC_NOT_ALLOWED);
 	}
 }

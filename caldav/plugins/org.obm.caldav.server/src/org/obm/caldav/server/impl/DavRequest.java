@@ -112,10 +112,10 @@ public class DavRequest {
 		return req.getRequestURI();
 	}
 
-	public String getCalendarComponantName() {
+	public String getCalendarName() {
 		return this.calendarName;
 	}
-
+	
 	public String getMethod() {
 		return req.getMethod();
 	}

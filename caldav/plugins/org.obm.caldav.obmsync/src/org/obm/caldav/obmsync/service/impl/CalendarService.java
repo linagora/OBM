@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ import org.obm.caldav.server.share.DavComponentName;
 import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.utils.Constants;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.FreeBusy;
@@ -42,13 +44,12 @@ import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.items.EventChanges;
 
 public class CalendarService implements ICalendarService {
-	
+
 	protected Log logger = LogFactory.getLog(getClass());
-	
+
 	private Map<DavComponentName, ICalendarProvider> providers;
-	private AccessToken token;
-	private String calendar;
-	private String loginAtDomaine;
+	private CalDavInfo caldavInfo;
+	private CalDavRigth caldavRigth;
 
 	public CalendarService() {
 		this.providers = new HashMap<DavComponentName, ICalendarProvider>();
@@ -62,35 +63,44 @@ public class CalendarService implements ICalendarService {
 
 	public List<Event> updateOrCreateEvent(String ics, String extId)
 			throws Exception {
-		Event event = getVCalendarProvider().getEventFromExtId(token, calendar,
+		Event event = getVCalendarProvider().getEventFromExtId(caldavInfo,
 				extId);
-		if (event != null) {
-			return getVCalendarProvider().updateEventFromICS(token, calendar,
-					ics, event);
+		if (caldavRigth.isWritable()) {
+			if (event != null) {
+				return getVCalendarProvider().updateEventFromICS(caldavInfo,
+						ics, event);
+			} else {
+				return getVCalendarProvider().createEventsFromICS(caldavInfo,
+						ics, extId);
+			}
 		} else {
-			return getVCalendarProvider().createEventsFromICS(token, calendar,
-					ics, extId);
+			List<Event> ret = new LinkedList<Event>();
+			if (event == null) {
+				ret.add(event);
+			}
+			return ret;
 		}
 	}
 
 	@Override
 	public Map<Event, String> getICSFromExtId(Set<String> listExtIdEvent)
 			throws Exception {
-		return getVCalendarProvider().getICSEventsFromExtId(token, calendar,
+		return getVCalendarProvider().getICSEventsFromExtId(caldavInfo,
 				listExtIdEvent);
 	}
 
 	@Override
 	public void removeOrUpdateParticipationState(String extId) throws Exception {
-		Event event = getVCalendarProvider().getEventFromExtId(token, calendar,
+		Event event = getVCalendarProvider().getEventFromExtId(caldavInfo,
 				extId);
 		if (event != null) {
-			if (loginAtDomaine.equals(event.getOwnerEmail())) {
-				getVCalendarProvider().remove(token, calendar, event);
-			} else {
-				getVCalendarProvider()
-						.updateParticipationState(token, calendar, event,
-								Constants.PARTICIPATION_STATE_DECLINED);
+			if (caldavRigth.isWritable()) {
+				if (caldavInfo.getCalendar().equals(event.getOwnerEmail())) {
+					getVCalendarProvider().remove(caldavInfo, event);
+				} else {
+					getVCalendarProvider().updateParticipationState(caldavInfo,
+							event, Constants.PARTICIPATION_STATE_DECLINED);
+				}
 			}
 		}
 	}
@@ -107,7 +117,7 @@ public class CalendarService implements ICalendarService {
 
 	@Override
 	public List<Event> getAll(DavComponentName componant) throws Exception {
-		return providers.get(componant).getAll(token, calendar);
+		return providers.get(componant).getAll(caldavInfo);
 	}
 
 	@Override
@@ -142,19 +152,19 @@ public class CalendarService implements ICalendarService {
 			}
 
 			return providers.get(componant).getEventTimeUpdateFromIntervalDate(
-					token, calendar, cf.getTimeRange().getStart(), end);
+					caldavInfo, cf.getTimeRange().getStart(), end);
 		}
-		return providers.get(componant).getAllEventTimeUpdate(token, calendar);
+		return providers.get(componant).getAllEventTimeUpdate(caldavInfo);
 	}
 
 	@Override
 	public boolean getSync(Date lastSync) throws Exception {
-		EventChanges ec = providers.get(DavComponentName.VEVENT).getSync(token,
-				calendar, lastSync);
+		EventChanges ec = providers.get(DavComponentName.VEVENT).getSync(
+				caldavInfo, lastSync);
 		if (ec.getUpdated().length != 0 || ec.getRemoved().length != 0) {
 			return true;
 		} else {
-			ec = providers.get(DavComponentName.VTODO).getSync(token, calendar,
+			ec = providers.get(DavComponentName.VTODO).getSync(caldavInfo,
 					lastSync);
 			if (ec.getUpdated().length != 0 || ec.getRemoved().length != 0) {
 				return true;
@@ -165,48 +175,68 @@ public class CalendarService implements ICalendarService {
 
 	@Override
 	public boolean hasRightsOnCalendar() throws Exception {
-		return getVCalendarProvider().hasRightsOnCalendar(token, calendar);
+		if (this.caldavRigth == null) {
+			CalendarInfo ci = getVCalendarProvider().getRightsOnCalendar(
+					caldavInfo);
+			if (ci != null) {
+				this.caldavRigth = new CalDavRigth(ci.isRead(), ci.isWrite());
+			} else {
+				this.caldavRigth = new CalDavRigth();
+			}
+			logger.info("Rigth on calendar " + caldavInfo.getCalendar()
+					+ " : Read[" + caldavRigth.isReadable() + "] Write["
+					+ caldavRigth.isWritable() + "]");
+		}
+		return this.caldavRigth.isReadable() || this.caldavRigth.isWritable();
 	}
 
 	@Override
 	public String getLastUpdate() throws Exception {
-		return getVCalendarProvider().getLastUpdate(token, calendar).toString();
+		return getVCalendarProvider().getLastUpdate(caldavInfo).toString();
 	}
 
 	@Override
-	public void login(String loginAtDomaine, String password, String calendar)
-			throws AuthenticationException {
-		this.token = this.providers.get(DavComponentName.VEVENT).login(
-				loginAtDomaine, password);
-		if (this.token == null || this.token.getSessionId() == null
-				|| "".equals(this.token.getSessionId())) {
+	public void login(String loginAtDomain, String password, String calendar,
+			String calendarAtDomain) throws AuthenticationException {
+		AccessToken token = this.providers.get(DavComponentName.VEVENT).login(
+				loginAtDomain, password);
+		if (token == null || token.getSessionId() == null
+				|| "".equals(token.getSessionId())) {
 			throw new AuthenticationException();
 		}
-		String[] split = loginAtDomaine.split("@");
+		String[] split = loginAtDomain.split("@");
 		token.setUser(split[0]);
 		token.setDomain(split[1]);
-		this.calendar = calendar;
-		this.loginAtDomaine = loginAtDomaine;
+		this.caldavInfo = new CalDavInfo(token, calendar, calendarAtDomain,
+				loginAtDomain);
+		try {
+			hasRightsOnCalendar();
+		} catch (Exception e) {
+			throw new AuthenticationException();
+		}
 	}
 
 	@Override
 	public void logout() {
-		this.providers.get(DavComponentName.VEVENT).logout(token);
+		this.providers.get(DavComponentName.VCALENDAR).logout(
+				caldavInfo.getToken());
 	}
 
 	@Override
 	public Map<String, String> getFreeBuzy(String ics) throws Exception {
 		Map<String, String> ret = new HashMap<String, String>();
-		FreeBusyRequest fbr = getVCalendarProvider().getFreeBusyRequest(token,
-				ics);
-		List<FreeBusy> freeBusys = getVCalendarProvider().getFreeBusy(token,
-				fbr);
+		FreeBusyRequest fbr = getVCalendarProvider().getFreeBusyRequest(
+				caldavInfo, ics);
+		List<FreeBusy> freeBusys = getVCalendarProvider().getFreeBusy(
+				caldavInfo, fbr);
 		logger.info(freeBusys.size());
 		for (FreeBusy freeBusy : freeBusys) {
-			logger.info("freebusy " + freeBusy.getAtt().getEmail() + " dstart: " + fbr.getStart() + " dend: "+ fbr.getEnd());
-			logger.info("freebusy found " + freeBusy.getFreeBusyIntervals().size() + " events.");
-			String icsFB = getVCalendarProvider().parseFreeBusyToICS(token,
-					freeBusy);
+			logger.info("freebusy " + freeBusy.getAtt().getEmail()
+					+ " dstart: " + fbr.getStart() + " dend: " + fbr.getEnd());
+			logger.info("freebusy found "
+					+ freeBusy.getFreeBusyIntervals().size() + " events.");
+			String icsFB = getVCalendarProvider().parseFreeBusyToICS(
+					caldavInfo, freeBusy);
 			ret.put(freeBusy.getAtt().getEmail(), icsFB);
 		}
 		return ret;
@@ -215,5 +245,4 @@ public class CalendarService implements ICalendarService {
 	private ICalendarProvider getVCalendarProvider() {
 		return this.providers.get(DavComponentName.VCALENDAR);
 	}
-
 }

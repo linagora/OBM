@@ -59,9 +59,8 @@ public class DeleteHandler extends DavMethodHandler {
 			resp.setContentLength(0);
 			logger.error(e.getMessage(), e);
 		}catch (AuthorizationException e) {
-			//FIXME RETOURNE LE BON STATUS D'ERREUR
 			resp.setStatus(StatusCodeConstant.SC_MULTI_STATUS);
-			Document ret = new ErreurBuiler().build(token, req, StatusCodeConstant.SC_METHOD_FAILURE);
+			Document ret = new ErreurBuiler().build(token, req, e.getHttpStatusCode());
 			sendDom(ret, resp);
 		}catch (Exception e) {
 			resp.setStatus(StatusCodeConstant.SC_MULTI_STATUS);
