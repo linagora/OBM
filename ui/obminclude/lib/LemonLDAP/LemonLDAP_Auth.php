@@ -176,7 +176,19 @@ class LemonLDAP_Auth extends Auth {
     
     if (!$this->checkRequest())
       return false;
-    
+
+    // Check if headers are not found, use normal authentication process.
+    // The method auth_validatelogin() corresponding to class defined
+    // by the constant DEFAULT_AUTH_CLASSNAME will be automatically called.
+    // We can not use auth_preauth function instead, because it does not
+    // the job correctly for us.
+
+    if (!$this->sso_isValidAuthenticationRequest()) {
+      $d_auth_class_name = DEFAULT_AUTH_CLASSNAME;
+      $d_auth_object = new $d_auth_class_name ();
+      return $d_auth_object->auth_validatelogin();
+    }
+
     //
     // First of all, we have to check if the user exists.
     // OBM stores login in lowercase
@@ -227,16 +239,24 @@ class LemonLDAP_Auth extends Auth {
   /**
    * Disconnect the user by destroying its session.
    */
-  function logout ($nobody = "")
+  function logout ($nobody = '')
   {
     global $obm, $lock, $sess;
+
+    if (!$this->sso_isValidAuthenticationRequest()) {
+      $d_auth_class_name = DEFAULT_AUTH_CLASSNAME;
+      $d_auth_object = new $d_auth_class_name ();
+      if (method_exists($d_auth_object, 'logout'))
+	return $d_auth_object->logout();
+      return;
+    }
 
     $login = $_SESSION['obm']['uid'];
     $sess->delete();
     $_SESSION['obm'] = '';
     $_SESSION['auth'] = '';
     unset($this->auth['uname']);
-    $this->unauth($nobody == "" ? $this->nobody : $nobody);
+    $this->unauth($nobody == '' ? $this->nobody : $nobody);
     $sess->delete();
 
     $this->_debug('logout: disconnect ' . $this->_engine->getHeaderValue($this->_debug_header));
@@ -246,12 +266,16 @@ class LemonLDAP_Auth extends Auth {
 
   /**
    * Display login page.
-   * For LemonLDAP authentication process, we display a blank page.
+   * For LemonLDAP authentication process, we display a blank page. ???
    */
   function of_session_dis_login_page ()
   {
-    $this->_debug("of_session_dis_login_page()");
-    echo "Permission denied.";
+    global $obminclude, $l_obm_title, $obm_version, $module, $path;
+    global $login_action;
+    global $params, $c_singleNameSpace, $c_default_domain;
+
+    $login_page = $path.'/../'.$obminclude.'/login.inc';
+    include($login_page);
   }
 
   /**
@@ -263,7 +287,7 @@ class LemonLDAP_Auth extends Auth {
   function sso_authenticate ($user_id, $domain_id)
   {
     global $obm;
-    
+
     $data = $this->_engine->getUserDataFromId($user_id, $domain_id);
 
     if (!is_array($data) || !array_key_exists('user_id', $data))
@@ -279,7 +303,7 @@ class LemonLDAP_Auth extends Auth {
 	$obm['delegation'] = $data['delegation_target'];
 	return $data['user_id'];
       }
-    
+
     return false;
   }
 
@@ -357,7 +381,22 @@ class LemonLDAP_Auth extends Auth {
 
     return true;
   }
-  
+
+  /**
+   * This will tell us if we could use headers to authenticate a user.
+   * The obligatory header correspond to the key userobm_login.
+   */
+  function sso_isValidAuthenticationRequest ()
+  {
+    $header = $this->_engine->getHeaderName('userobm_login');
+    $login = $this->_engine->getHeaderValue($header);
+
+    if (!is_null($login))
+      return true;
+
+    return false;
+  }
+
 }
 
 ?>
