@@ -160,10 +160,11 @@ class LemonLDAP_Auth extends Auth {
 
 		//
 		// First of all, we have to check if the user exists.
+		// OBM stores login in lowercase
 		//
 
 		$header = $this->_engine->getHeaderName('userobm_login');
-		$login = $this->_engine->getHeaderValue($header);
+		$login = strtolower($this->_engine->getHeaderValue($header));
 		$domain_id = $this->_engine->getDomainID($login);
 		$user_id = $this->_engine->isUserExists($login, $domain_id);
 
