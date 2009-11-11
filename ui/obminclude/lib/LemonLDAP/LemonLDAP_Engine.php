@@ -1,6 +1,8 @@
 <?php
 
 //
+// $Id$
+//
 // Copyright (c) 2009, Thomas Chemineau - thomas.chemineau<at>gmail.com
 // All rights reserved.
 // 
@@ -682,9 +684,11 @@ class LemonLDAP_Engine {
 		$group = Array();
 		foreach ($this->_sqlMap as $key => $key_obm)
 		{
-			if (substr($key, 0, strpos($key, '_')) != "group")
-				continue;
-			$group[$key_obm] = $grp_q->f($key);
+		  if (substr($key, 0, strpos($key, '_')) != "group")
+		    continue;
+		  if (is_null($grp_q->f($key)))
+		    continue;
+		  $group[$key_obm] = $grp_q->f($key);
 		}
 
 		$obm['domain_id'] = $backup['obm_domain_id'];
@@ -747,60 +751,60 @@ class LemonLDAP_Engine {
 	 */
 	function getUserDataFromId ($user_id, $domain_id, $force = false)
 	{
-		global $obm;
-
-		if (is_null($user_id))
-			return false;
-		if (!is_null($this->_db_userData) && !$force)
-			return $this->_db_userData;
-
-		$backup['obm_domain_id'] = $obm['domain_id'];
-		$obm['domain_id'] = $domain_id;
-		$usr_q = lmng_run_query_user_detail($user_id);
-
-		$user = Array();
-		foreach ($this->_sqlMap as $key => $key_obm)
+	  global $obm;
+	  
+	  if (is_null($user_id))
+	    return false;
+	  if (!is_null($this->_db_userData) && !$force)
+	    return $this->_db_userData;
+	  
+	  $backup['obm_domain_id'] = $obm['domain_id'];
+	  $obm['domain_id'] = $domain_id;
+	  $usr_q = lmng_run_query_user_detail($user_id);
+	  
+	  $user = Array();
+	  foreach ($this->_sqlMap as $key => $key_obm)
+	    {
+	      if (substr($key, 0, strpos($key, '_')) != "userobm")
+		continue;
+	      switch ($key)
 		{
-			if (substr($key, 0, strpos($key, '_')) != "userobm")
-				continue;
-			switch ($key)
-			{
-				case 'userobm_datebegin':
-					$value = of_date_upd_format($usr_q->f($key_obm),true);
-					break;
-				case 'userobm_account_dateexp':
-					$value = of_date_upd_format($usr_q->f($key_obm),true);
-					break;
-				case 'userobm_mail_server_id':
-					$value = $usr_q->f('mailserver_id');
-					break;
-				case 'userobm_mail_server_hostname':
-					$value = $usr_q->f('mailserver_hostname');
-					break;
-				case 'userobm_vacation_datebegin':
-					$value = of_date_upd_format($usr_q->f($key), true);
-					break;
-				case 'userobm_vacation_dateend':
-					$value = of_date_upd_format($usr_q->f($key), true);
-					break;
-				case 'userobm_vacation_message':
-					$value = stripslashes($usr_q->f($key));
-					break;
-				case 'userobm_samba_home_drive':
-					$value = trim($usr_q->f($key));
-					break;
-				default:
-					$value = $usr_q->f($key);
-					break;
-			}
-			$user[$key_obm] = $value;
+		case 'userobm_datebegin':
+		  $value = of_date_upd_format($usr_q->f($key_obm),true);
+		  break;
+		case 'userobm_account_dateexp':
+		  $value = of_date_upd_format($usr_q->f($key_obm),true);
+		  break;
+		case 'userobm_mail_server_id':
+		  $value = $usr_q->f('mailserver_id');
+		  break;
+		case 'userobm_mail_server_hostname':
+		  $value = $usr_q->f('mailserver_hostname');
+		  break;
+		case 'userobm_vacation_datebegin':
+		  $value = of_date_upd_format($usr_q->f($key), true);
+		  break;
+		case 'userobm_vacation_dateend':
+		  $value = of_date_upd_format($usr_q->f($key), true);
+		  break;
+		case 'userobm_vacation_message':
+		  $value = stripslashes($usr_q->f($key));
+		  break;
+		case 'userobm_samba_home_drive':
+		  $value = trim($usr_q->f($key));
+		  break;
+		default:
+		  $value = $usr_q->f($key);
+		  break;
 		}
+	      $user[$key_obm] = $value;
+	    }
+	  
+	  $this->_db_userData = $user;
+	  $obm['domain_id'] = $backup['obm_domain_id'];
+	  unset($backup);
 
-		$this->_db_userData = $user;
-		$obm['domain_id'] = $backup['obm_domain_id'];
-		unset($backup);
-
-		return $user;
+	  return $user;
 	}
 
 	/**
@@ -808,7 +812,7 @@ class LemonLDAP_Engine {
 	 */
 	function isExternalUpdate ()
 	{
-		return $this->_externalUpdate;
+	  return $this->_externalUpdate;
 	}
 
 	/**
@@ -819,16 +823,16 @@ class LemonLDAP_Engine {
 	 */
 	function isGroupExists ($groupname, $domain_id)
 	{
-		if (!$this->_checkInternalObjects())
-			return false;
-		if (is_null($groupname))
-			return false;
-
-		$group = $this->getGroupData($groupname, $domain_id);
-
-		if (is_array($group) && array_key_exists('group_id', $group))
-			return $group['group_id'];
-		return false;
+	  if (!$this->_checkInternalObjects())
+	    return false;
+	  if (is_null($groupname))
+	    return false;
+	  
+	  $group = $this->getGroupData($groupname, $domain_id);
+	  
+	  if (is_array($group) && array_key_exists('group_id', $group))
+	    return $group['group_id'];
+	  return false;
 	}
 
 	/**
@@ -839,18 +843,18 @@ class LemonLDAP_Engine {
 	 */
 	function isUserExists ($login, $domain_id)
 	{
-	        if (!$this->_checkInternalObjects())
-			return false;
-		if (is_null($login))
-			return false;
-
-		$user = $this->getUserData($login, $domain_id, true);
-
-		if (is_array($user) && array_key_exists('user_id', $user))
-			return $user['user_id'];
-		return false;
+	  if (!$this->_checkInternalObjects())
+	    return false;
+	  if (is_null($login))
+	    return false;
+	  
+	  $user = $this->getUserData($login, $domain_id, true);
+	  
+	  if (is_array($user) && array_key_exists('user_id', $user))
+	    return $user['user_id'];
+	  return false;
 	}
-
+	
 	/**
 	 * Parse a group header.
 	 * @param $headerName The header name of the header that contains all
@@ -859,39 +863,38 @@ class LemonLDAP_Engine {
 	 */
 	function parseGroupsHeader ($headerName)
 	{
-		$values = $this->getHeaderValue($headerName);
-		if (is_null($values))
-			return false;
+	  $values = $this->getHeaderValue($headerName);
+	  if (is_null($values))
+	    return false;
 
-		$groups = Array();
-		$groups_str = explode(' ', $values);
-
-		foreach ($groups_str as $group_str)
+	  $groups = Array();
+	  $groups_str = explode(';', $values);
+	  
+	  foreach ($groups_str as $group_str) {
+	    if (!strlen($group_str))
+	      continue;
+	    
+	    $group_str = trim($group_str);
+	    $group = explode('|', $group_str);
+	    for ($i=0; $i<sizeof($group); $i++) {
+	      switch($i)
 		{
-			if (strlen($group_str))
-			{
-			$group = explode('|', $group_str);
-			for ($i=0; $i<sizeof($group); $i++)
-			{
-				switch($i)
-				{
-					case 0:
-						$group[$this->_sqlMap['group_name']] = $group[$i];
-						break;
-					case 1:
-						$group[$this->_sqlMap['group_email']] = $group[$i];
-						break;
-					case 2:
-						$group[$this->_sqlMap['group_privacy']] = $group[$i];
-						break;
-				}
-				unset($group[$i]);
-			}
-			$groups[$group[$this->_sqlMap['group_name']]] = $group;
+		case 0:
+		  $group[$this->_sqlMap['group_name']] = $group[$i];
+		  break;
+		case 1:
+		  $group[$this->_sqlMap['group_email']] = $group[$i];
+		  break;
+		case 2:
+		  $group[$this->_sqlMap['group_privacy']] = $group[$i];
+		  break;
 		}
-		}
-
-		return $groups;
+	      unset($group[$i]);
+	    }
+	    $groups[$group[$this->_sqlMap['group_name']]] = $group;
+	  }
+	  
+	  return $groups;
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 
 //
-// $Id:$
+// $Id$
 //
 // Copyright (c) 2009, Thomas Chemineau - thomas.chemineau<at>gmail.com
 // Copyright (c) 2009, Guillaume Lardon - glardon<at>linagora.com
@@ -326,18 +326,17 @@ class LemonLDAP_Auth extends Auth {
     if (is_null($groups_ldap) || sizeof($groups_ldap) == 0 || $groups_ldap === false)
       return false;
 
-    foreach ($groups_ldap as $group_name => $group_data)
-      {
-	$group_id = $this->_engine->isGroupExists($group_name, $domain_id);
-	
-	if ($group_id !== false)
-	  $this->_engine->updateGroup($group_name, $group_id, $group_data, $user_id, $domain_id);
-	else
-	  $group_id = $this->_engine->addGroup($group_name, $group_data, $user_id, $domain_id);
-	
-	if ($group_id !== false)
-	  $groups_ldap[$group_name]['group_id'] = $group_id;
-      }
+    foreach ($groups_ldap as $group_name => $group_data) {
+      $group_id = $this->_engine->isGroupExists($group_name, $domain_id);
+      
+      if ($group_id !== false)
+	$this->_engine->updateGroup($group_name, $group_id, $group_data, $user_id, $domain_id);
+      else
+	$group_id = $this->_engine->addGroup($group_name, $group_data, $user_id, $domain_id);
+      
+      if ($group_id !== false)
+	$groups_ldap[$group_name]['group_id'] = $group_id;
+    }
     
     //
     // Calculate the intersection between groups in database and groups
@@ -349,8 +348,8 @@ class LemonLDAP_Auth extends Auth {
     $groups_db = $this->_engine->getGroups($user_id, $domain_id);
 
     foreach ($groups_ldap as $group_name => $group_data)
-      if (!array_key_exists($group_name, $groups_db))
-	$this->_engine->addUserInGroup($user_id, $group_data['group_id'], $domain_id);
+      if (!array_key_exists($group_name, $groups_db) && ($group_id = $this->_engine->isGroupExists($group_name, $domain_id)) !== false)
+	$this->_engine->addUserInGroup($user_id, $group_id, $domain_id);
 
     foreach ($groups_db as $group_name => $group_id)
       if (!array_key_exists($group_name, $groups_ldap))
