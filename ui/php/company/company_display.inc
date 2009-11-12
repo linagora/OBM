@@ -1377,10 +1377,12 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   while ($co_q->next_record()) {
     $id = $co_q->f('company_id');
     $samename = $co_q->f('company_name');
-    $samezip = $co_q->f('company_zip');
+    $samestreet = $co_q->f('address_street');
+    $samezip = $co_q->f('address_zipcode');
+    $sametown = $co_q->f('address_town');
     $dis_same_comp .= "
     <li><a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;company_id=$id") . "\">
-        $samename ($samezip)</a>
+        <b>$samename</b> ($samestreet $samezip $sametown)</a>
     </li>";
   }
 

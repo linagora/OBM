@@ -1,4 +1,4 @@
-<?php
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contact_query.inc                                            //
 //     - Desc : contact query File                                           //
@@ -1085,7 +1085,7 @@ function run_query_contact_check($cid, $comp_id, $lastname, $firstname) {
   if ($cgp_show['module']['company']) {
     $comp_id = sql_parse_id($comp_id, true);
     $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id';
-    $where_comp = "OR (contact_company_id $comp_id AND contact_lastname='$lastname')";
+    $where_comp = "OR (contact_company_id $comp_id AND contact_lastname #LIKE '$lastname')";
     $select_comp = ', company_name';
   }
 
@@ -1098,12 +1098,12 @@ function run_query_contact_check($cid, $comp_id, $lastname, $firstname) {
     FROM Contact
     $join_comp
     WHERE $where_id
-    ((contact_lastname='$lastname' AND contact_firstname='$firstname') $where_comp)
+    ((contact_lastname #LIKE '$lastname' AND contact_firstname #LIKE '$firstname') $where_comp)
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_contact_check()');
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
+  $obm_q->xquery($query);
 
   return $obm_q;
 }

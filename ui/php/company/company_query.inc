@@ -592,8 +592,15 @@ function run_query_check_company($p_id, $name) {
   $like = sql_casei_like($db_type);
   $multidomain = sql_multidomain('company');
 	
-  $query = "SELECT DISTINCT company_id, company_name 
+  $query = "SELECT DISTINCT company_id,
+      company_name,
+      address_street, 
+      address_zipcode, 
+      address_town
     FROM Company
+      INNER JOIN CompanyEntity ON company_id=companyentity_company_id
+      LEFT JOIN Address ON address_entity_id = companyentity_entity_id
+                           AND address_label = 'HQ;X-OBM-Ref1'
     WHERE company_name $like '$name%'
       $where_id
       $multidomain";

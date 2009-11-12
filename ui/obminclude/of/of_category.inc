@@ -2680,7 +2680,11 @@ function of_category_user_get_code_hash($category) {
 function of_category_user_get_category_distribution($entity, $category) {
   global $cdg_sql;
 
+  $entityTable = ucfirst($entity).'Entity';
+  $entityEntityId = strtolower($entity).'entity_'.strtolower($entity).'_id';
+  $entityId = strtolower($entity).'entity_entity_id';
   $multidomain = sql_multidomain('category');
+  $entity_id = sql_parse_id($entity_id, true);
 	
   $query = "SELECT
       category_id,
@@ -2689,8 +2693,8 @@ function of_category_user_get_category_distribution($entity, $category) {
       count(category_id) as nb_category
     FROM CategoryLink
       LEFT JOIN Category ON categorylink_category_id = category_id
-    WHERE categorylink_entity='$entity'
-      AND categorylink_category='$category'
+      INNER JOIN $entityTable ON categorylink_entity_id = $entityId
+    WHERE categorylink_category='$category'
       $multidomain
     GROUP BY category_id, category_code, category_label
     ORDER BY category_code, category_label";
