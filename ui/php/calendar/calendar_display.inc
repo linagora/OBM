@@ -2945,13 +2945,13 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           if (is_array($admins)) {
             $emails = array();
             foreach($admins as $admin) {
-              $user = get_entity_info($admin['id'], 'user'); 
+              $user = get_user_info($admin['id'], 'user'); 
               if ($user['email'] != '') {
-                array_push($emails, $user['email']."@".$user['entity_domain']);
+                array_push($emails, $user['email']);
               }
             }
             if (sizeof($emails) > 0) {
-              $label = "<a href='mailto:".implode(',', $emails)."'><img src='$GLOBALS[ico_mail]' /></a>$label ";
+              $label = "<a href='mailto:".implode(',', $emails)."'><img src='$GLOBALS[ico_mail]' />$entity[label]</a> ";
             }
           }          
           $ACCEPTED = 'class="disabled"';

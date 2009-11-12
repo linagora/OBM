@@ -495,3 +495,5 @@ $l_all_aliases = "All aliases";
 $l_timezone = "Timezone";
 $l_save = 'Save';
 
+
+$l_displayname_template = '%1$s %2$s';

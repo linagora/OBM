@@ -98,7 +98,7 @@ class OBM_Mailer extends SMailer {
     
     $email = $this->getEntityEmail($db->f('userobm_email'), $db->f('domain_name'));
     if(!$email) $email = $this->getEntityEmail('noreply');
-    return array($email, $db->f('userobm_firstname').' '.$db->f('userobm_lastname'));
+    return array($email, sprintf($GLOBALS['l_displayname_template'], $db->f('userobm_firstname'), $db->f('userobm_lastname')));
   }
   
   /**

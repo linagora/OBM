@@ -581,3 +581,5 @@ $l_dg_solr = "Solr";
 $l_all_aliases = "Tous les alias";
 $l_timezone = "Fuseau horaire";
 $l_save = 'Sauvegarder';
+
+$l_displayname_template = '%1$s %2$s';

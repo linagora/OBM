@@ -374,13 +374,12 @@ function run_query_people_ext_search($people) {
   while($obm_q->next_record()) {
     $rows[$obm_q->f("lastname")." ".$obm_q->f("firstname")] = $obm_q->Record;
   }
-  $resultsCount = $obm_q->num_rows();
   $obm_q->query($query_contact);
   while($obm_q->next_record()) {
     $rows[$obm_q->f("lastname")." ".$obm_q->f("firstname")] = $obm_q->Record;
   }
   ksort($rows);
-  $resultsCount += $obm_q->num_rows();
+  $resultsCount = count($rows);
 
   return array('length' => $resultsCount, 'datas' => $rows);
 }
