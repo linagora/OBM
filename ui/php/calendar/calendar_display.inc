@@ -6046,7 +6046,7 @@ function dis_calendar_pdf_options($current_view) {
         $day = $l_daysofweekshort[$day_num];
         $cba_id = "cba_repeatday_$i";
         $dis_list_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"$cba_id\" name=\"$cba_id\" value=\"1\"";
-        if (strcmp(substr($display_days,$i,1),'1')==0) {
+        if (strcmp(substr($display_days,$day_num,1),'1')==0) {
           $dis_list_day .= " checked = \"checked\"";
         }
         $dis_list_day .= " /><label for=\"$cba_id\">$day</label></span>&nbsp;&nbsp; ";
