@@ -6,29 +6,29 @@
 // Copyright (c) 2009, Thomas Chemineau - thomas.chemineau<at>gmail.com
 // All rights reserved.
 // 
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
 //
-//   * Redistributions of source code must retain the above copyright notice, this
-//     list of conditions and the following disclaimer.
+//   * Redistributions of source code must retain the above copyright notice,
+//     this list of conditions and the following disclaimer.
 //   * Redistributions in binary form must reproduce the above copyright notice,
 //     this list of conditions and the following disclaimer in the documentation
 //     and/or other materials provided with the distribution.
-//   * Neither the name of the LINAGORA GROUP nor the names of its contributors may
-//     be used to endorse or promote products derived from this software without
-//     specific prior written permission.
+//   * Neither the name of the LINAGORA GROUP nor the names of its contributors
+//     may be used to endorse or promote products derived from this software
+//     without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-// ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-// ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 //
 //require_once(dirname(__FILE__) . '/obm/of_category.inc');
 //require_once(dirname(__FILE__) . '/obm/group_query.inc');
@@ -213,7 +213,17 @@ class LemonLDAP_Engine {
 	 * Flag that indicate if the connected user should be update on external
 	 * database (ldap,etc.)
 	 */
-	var $_externalUpdate = false;
+	var $_updated = false;
+
+	/**
+	 * Indicate debug state
+	 */
+	var $_debug = false;
+
+	/**
+	 * Specify the debug file path.
+	 */
+	var $_debug_file = '/tmp/obm-lemonldapng.log';
 
 	/**
 	 * Constructor.
@@ -494,7 +504,7 @@ class LemonLDAP_Engine {
 			$params['user_id'] = $user_id;
 			set_update_state();
 			$succeed = $user_id;
-			$this->_externalUpdate = true;
+			$this->_updated = true;
 		}
 
 		$obm['uid'] = $backup['uid'];
@@ -531,6 +541,23 @@ class LemonLDAP_Engine {
 		if ($c > 0)
 			return true;
 		return false;
+	}
+
+ 	/**
+	 * Print some debug trace.
+	 * @param $msg The message to trace.
+	 */
+	function debug ($msg)
+	{
+		if (!$this->_debug)
+			return;
+		$traces = debug_backtrace(false);
+		$function = $traces[1]['function'];
+		$line = $traces[0]['line'];
+		$now = date("Y-m-d H:i:s");
+		$f = fopen($this->_debug_file, "a+");
+		fputs($f, "[$now] $function:$line - $msg\n");
+		fclose($f);
 	}
 
 	/**
@@ -808,11 +835,11 @@ class LemonLDAP_Engine {
 	}
 
 	/**
-	 * Indicates if a external update should be made.
+	 * Indicates if data has been updated
 	 */
-	function isExternalUpdate ()
+	function isDataUpdated ()
 	{
-	  return $this->_externalUpdate;
+	  return $this->_updated;
 	}
 
 	/**
@@ -952,9 +979,10 @@ class LemonLDAP_Engine {
 		$backup['globals_module'] = $GLOBALS['module'];
 		$obm['domain_id'] = $domain_id;
 		$obm['uid'] = $params_db[$this->_sqlMap['group_usercreate']];
-		$GLOBALS['module'] = "group";
+		$GLOBALS['module'] = 'group';
 
-		$succeed = false ;
+		$succeed = false;
+
 		if (lmng_check_group_data_form($params_db)
 				&& lmng_run_query_group_update($params_db))
 		{
@@ -982,8 +1010,8 @@ class LemonLDAP_Engine {
 		global $obm;
 
 		//
-		// Some internal functions used global variables. To prevent from
-		// unstable creation, we prefer to set those internal variables.
+		// Some internal functions used global variables
+		// Set those internal variables to be in a known state
 		//
 
 		$backup['domain_id'] = $obm['domain_id'];
@@ -992,7 +1020,7 @@ class LemonLDAP_Engine {
 
 		$obm['uid'] = $user_id;
 		$obm['domain_id'] = $domain_id;
-		$GLOBALS['module'] = "user";
+		$GLOBALS['module'] = 'user';
 
 		//
 		// We have to retrieve all informations from database. Do not
@@ -1033,43 +1061,30 @@ class LemonLDAP_Engine {
 	}
 
 	/**
-	 * Update external repositories, such the OBM LDAP directory,
-	 * with new informations provides by LemonLDAP.
-	 * User data are synchronized, like groups and user password.
-	 * @param $user_name Login of the user
-	 * @param $domain_id
-	 * @param $user_id
-	 */
-	function updateExternalData ($user_name, $domain_id, $user_id)
-	{
-		// Call global external update
-		$params['update_type'] = "global";
-		$params['domain_id'] = $domain_id;
-		$params['realm'] = 'domain';
-		set_update_lock();
-		set_update_state($domain_id);
-		store_update_data($params);
-		$res = exec_tools_update_update($params);
-		remove_update_lock();
-
-		$user_data = $this->getUserDataFromId($user_id, $domain_id);
-		$password_new = $this->getHeaderValue($this->getHeaderName('userobm_password'));
-		$password_old = $user_data[$this->_sqlMap['userobm_password']];
-
-		if (strcmp($password_new, $password_old) != 0)
-		{
-			passthru("/usr/share/obm/www/auto/changePasswd.pl --login $user_name --domain-id $domain_id --passwd $password_new --old-passwd $password_old --unix");
-			passthru("/usr/share/obm/www/auto/changePasswd.pl --login $user_name --domain-id $domain_id --passwd $password_new --old-passwd $password_old --samba");
-                }
-	}
-
-	/**
 	 * Set database object to be used.
 	 * @param $database The database object.
 	 */
 	function setDatabase ($database)
 	{
-		$this->_db = $database;
+	  $this->_db = $database;
+	}
+
+	/**
+	 * Set debug On/off.
+	 * @param $debug True or False.
+	 */
+	function setDebug ($debug)
+	{
+	  $this->_debug = $debug;
+ 	}
+
+	/**
+	 * Set debug file path.
+	 * @param $file A file path.
+	 */
+	function setDebugFile ($file)
+ 	{
+	  $this->_debugFile = $file;
 	}
 
 	/**
@@ -1078,7 +1093,7 @@ class LemonLDAP_Engine {
 	 */
 	function setHeadersMap ($headersMap)
 	{
-		$this->_headersMap = $headersMap;
+	  $this->_headersMap = $headersMap;
 	}
 
 	/**
@@ -1120,7 +1135,7 @@ class LemonLDAP_Engine {
 		if (is_null($user_id_tmp))
 			$update = true;
 
-		$this->_externalUpdate = $update;
+		$this->_updated = $update;
 		return $update;
 	}
 }
