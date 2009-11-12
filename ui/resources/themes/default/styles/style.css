@@ -947,6 +947,11 @@ input.datePicker {
   background-color: #fafafa;
 }
 
+
+.result tfoot tr{
+  background-color: #f4f3c5;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Generic table styles*/
 /* ------------------------------------------------------------------------- */

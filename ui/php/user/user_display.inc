@@ -3246,7 +3246,7 @@ function json_search_users($user,$results) {
     $id = $data['userobm_id'];
     $label = phpStringToJsString($data['userobm_lastname'].' '.$data['userobm_firstname']);
     if($user_q['userobm_hidden'] != 1 || $perm->check_right($module, $cright_write_admin)) {
-      $extra = phpStringToJsString($data['userobm_email']);
+      $extra = phpStringToJsString(get_entity_email($data['userobm_email']));
     } else {
       $extra = '';
     }

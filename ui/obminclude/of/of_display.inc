@@ -40,6 +40,8 @@ class OBM_DISPLAY {
   var $data_form_end = '';    // Form end
   var $delimiter = '"';       // CVS field delimiter (enclosed by)
   var $sql_order_dir = 'ASC'; // SQL Sorting direction
+  var $dis_data_footer = null;
+  var $footer_data = array();
 
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY Constructor
@@ -399,7 +401,11 @@ class OBM_DISPLAY {
 	    $popup_width = $res['popup_width'];
 	    $popup_height = $res['popup_height'];
 	  }
-
+	  if (function_exists($this->dis_data_footer)) {
+            if(!$this->footer_data[$fieldname]) $this->footer_data[$fieldname] = '';
+            $func = $this->dis_data_footer;
+            $func($this, $fieldname, $link_ok);
+	  }	 
 	  //--------------------------------------------------
 	  // Column display
 	  //--------------------------------------------------
@@ -463,6 +469,13 @@ class OBM_DISPLAY {
     // Data Set end : if header set to both, display an header
     //--------------------------------------------------------
     $block .= '</tbody>';
+    if (function_exists($this->dis_data_footer)) {
+      $block .= "<tfoot><tr>";
+      foreach($this->footer_data as $fieldname => $value) {
+        $block .= '<td>'.$value.'</td>' ;
+      }
+      $block .= "</tr></tfoot>";
+    }
     if ($this->data_header == 'both') {
       $block .= $block_header;
     }

@@ -145,7 +145,23 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   return $res;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display Invoice specific dataset fields
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_footer_invoice(&$OD, $fieldname=null, $link_ok=null) {
+  if($fieldname == 'invoice_amount_ht') {
+    $OD->footer_data[$fieldname] += $OD->data_set->f($fieldname);
+  } elseif ($fieldname == 'invoice_amount_ttc') {
+    $OD->footer_data[$fieldname] += $OD->data_set->f($fieldname);
+  }
 
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Display Invoice search form
 // Parameters:
@@ -493,6 +509,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
   $dis_invoice->data_set = $inv_q;
   $dis_invoice->data_header = 'top';
   $dis_invoice->data_url = $url;
+  $dis_invoice->dis_data_footer = 'dis_footer_invoice';
   $block .= $dis_invoice->display('dis_data_invoice');
   $block .= $display_popup_end;  
 

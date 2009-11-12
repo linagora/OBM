@@ -462,9 +462,9 @@ function dis_time_user_planning($obm_q, $time) {
   </colgroup> 
   <colgroup class=\"total\" span=\"2\">
   </colgroup>    
-  <thead>
+  <body>
   $d_l
-  </thead>
+  </body>
   </table>
 ";
 

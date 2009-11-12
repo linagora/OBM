@@ -953,7 +953,7 @@ function json_search_users($user,$results) {
     $id = $data["id"];
     $label = phpStringToJsString($name);
     if($data['userobm_hidden'] != 1 || $perm->check_right($module, $cright_write_admin)) {
-      $extra = phpStringToJsString($data["email"]);
+      $extra = phpStringToJsString(get_entity_email($data['email']));
     } else {
       $extra = '';
     }

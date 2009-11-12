@@ -176,7 +176,6 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }
   }
 
-
   return $res;
 }
 
@@ -1162,6 +1161,367 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   // --- HTML Template --------------------------------------------------------
   $block .= $dis_contact->display('dis_data_contact');
   $block .= $display_popup_end;
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Contact Consultation
+// Parameters:
+//   - $co_q : contact database result
+//   - $funcs     : array with contact function list
+///////////////////////////////////////////////////////////////////////////////
+function html_contact_header($co_q, $funcs) {
+  global $cgp_show, $cgp_hide, $l_yes, $l_no;
+  global $display, $path, $action, $ccontact_simple_kind;
+  global $l_lastname, $l_firstname, $l_middlename, $l_suffix, $l_aka, $l_kind;
+  global $l_contact, $l_company, $l_title, $l_market, $l_archive;
+  global $l_date, $l_no_date, $l_birthday, $l_anniversary;
+  global $l_other_infos, $l_manager, $l_assistant, $l_spouse, $l_category;
+  global $l_service, $l_mailing_ok, $l_newsletter;
+  global $l_download_contact_card, $l_exportation, $l_vcard;
+  global $l_sync_contact, $l_desync, $l_sync;
+
+  $c_id = $co_q->f('contact_company_id');
+  $c_name = $co_q->f('company_name');
+  $id = $co_q->f('contact_id');
+  $kind_minilabel = $co_q->f('kind_minilabel');
+  if (!$ccontact_simple_kind && !empty($kind_minilabel)) {
+    $kind = "[" . $co_q->f('kind_lang') . "] $kind_minilabel";
+    $kind_header = $co_q->f('kind_header');
+    if ($kind_header != $kind) $kind .= " ($kind_header)";
+  } else {
+    $kind = $kind_minilabel;
+  }
+  $function = $co_q->f('function_label');
+  $title = $co_q->f('contact_title');
+  $market = $co_q->f('market_lname') . ' ' . $co_q->f('market_fname');
+  $lname = $co_q->f('contact_lastname');
+  $fname = $co_q->f('contact_firstname');
+  $mname = $co_q->f('contact_middlename');
+  $suffix = $co_q->f('contact_suffix');
+  $aka = $co_q->f('contact_aka');
+  $service = $co_q->f('contact_service');
+  $archive = ($co_q->f('contact_archive') == 1 ? $l_yes : $l_no);
+  $manager = $co_q->f('contact_manager');
+  $assistant = $co_q->f('contact_assistant');
+  $spouse = $co_q->f('contact_spouse');
+  $category = $co_q->f('contact_category');
+  $mailok = ($co_q->f('contact_mailing_ok') == 1 ? $l_yes : $l_no);
+  $newsletter = ($co_q->f('contact_newsletter') == 1 ? $l_yes : $l_no);
+
+  if ($co_q->f('contact_date') > '0000-00-00 00:00:00') {
+    $date = new Of_Date($co_q->f('contact_date'), 'GMT');
+    $date = $date->getOutputDate();
+  } else {
+    $date = $l_no_date;
+  }
+
+  if ($co_q->f('contact_birthday')) {
+    $birthday = new Of_Date($co_q->f('contact_birthday'), 'GMT');
+    $birthday = $birthday->getOutputDate();
+  } else {
+    $birthday = $l_no_date;
+  }
+
+  if ($co_q->f('contact_anniversary')) {
+    $anniversary = new Of_Date($co_q->f('contact_anniversary'), 'GMT');
+    $anniversary = $anniversary->getOutputDate();
+  } else {
+    $anniversary = $l_no_date;
+  }
+  
+  // Display Aka only if non empty
+  if ($aka != '') {
+    $dis_aka = "
+    <tr> 
+      <th>$l_aka</th>
+      <td>$aka</td>
+    </tr>";
+  } else {
+    $dis_aka = '';
+  }
+
+  // Conditionnal fields
+  $show_title = (! $cgp_hide['contact']['contact_title']);
+  $show_resp = (! $cgp_hide['contact']['responsible']);
+  $show_date = (! $cgp_hide['contact']['contact_date']);
+  $show_birthday = (! $cgp_hide['contact']['contact_birthday']);
+  $show_anniversary = (! $cgp_hide['contact']['contact_anniversary']);
+
+  $show_mailing = (! $cgp_hide['contact']['contact_mailing']);
+  $show_service = (! $cgp_hide['contact']['contact_service']);
+
+  $display['title'] = "$lname $fname";
+
+  // Function
+  $block_function = of_category_dis_block_consult('contact', 'function', $funcs, 'mono');
+
+  // Company Display
+  if ($cgp_show['module']['company']) {
+    $dis_company = "<a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\"> $c_name</a>";
+  } else {
+    $dis_company = $c_name;
+  }
+
+  // Title field
+  if ($show_title) {
+    $block_title = "
+    <tr>
+      <th>$l_title</th>
+      <td>$title</td>
+    </tr>";
+  }
+
+  // Responsible field
+  if ($show_resp) {
+    $block_resp = "
+    <tr>
+      <th>$l_market</th>
+      <td>$market</td>
+    </tr>";
+  }
+
+  // Date field
+  if ($show_date) {
+    $block_date = "
+    <tr>
+      <th>$l_date</th>
+      <td>$date</td>
+    </tr>";
+  }
+  
+  // Birthday field
+  if ($show_birthday) {
+    $block_birthday = "
+    <tr>
+      <th>$l_birthday</th>
+      <td>$birthday</td>
+    </tr>";
+  }
+  // Anniversary field
+  if ($show_anniversary) {
+    $block_anniversary = "
+    <tr>
+      <th>$l_anniversary</th>
+      <td>$anniversary</td>
+    </tr>";
+  }
+  // Service field
+  if ($show_service) {
+    $block_service = "
+    <tr>
+      <th>$l_service</th>
+      <td>$service</td>
+    </tr>";
+  }
+  if ($show_mailing) {
+    $block_mailing = "
+    <tr>
+      <th>$l_mailing_ok</th>
+      <td>$mailok</td>
+    </tr>
+    <tr>
+      <th>$l_newsletter</th>
+      <td>$newsletter</td>
+    </tr>";
+  }  
+
+  // Export buttons
+  $vcard_button = "
+      <input type=\"hidden\" name=\"action\" value=\"vcard\" />
+      <input type=\"hidden\" name=\"contact_id\" value=\"$id\" />
+      <input type=\"submit\" value=\"$l_download_contact_card\" />";
+
+  $is_synched = run_query_is_contact_synched($id);
+  if($is_synched) {
+    $act = 'desync';
+    $button_value = $l_desync;
+  } else {
+    $act = 'sync';
+    $button_value = $l_sync;
+  }
+  $sync_contact_button = "
+      <input type=\"submit\" x-obm-sync=\"$is_synched\" onclick=\"Obm.Contact.syncContact($id, this);\" value=\"$button_value\" />";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <div class=\"detail infos\">
+    <h1>$l_contact</h1>
+    
+    <table>
+    <tr>
+      <th>$l_lastname</th>
+      <td>$lname</td>
+    </tr>
+    <tr>
+      <th>$l_firstname</th>
+      <td>$fname</td>
+    </tr>
+    <tr>
+      <th>$l_middlename</th>
+      <td>$mname</td>
+    </tr>
+    <tr>
+      <th>$l_suffix</th>
+      <td>$suffix</td>
+    </tr>
+    $dis_aka
+    <tr>
+      <th>$l_kind</th>
+      <td>$kind</td>
+    </tr>
+    <tr>
+      <th>$l_company</th>
+      <td>$dis_company</td>
+    </tr>
+    $block_function
+    $block_title
+    $block_service
+    $block_resp
+    </table>
+    &nbsp;
+    <h1>$l_other_infos</h1>
+    <table>
+    <tr>
+      <th>$l_archive</th>
+      <td>$archive</td>
+    </tr>
+    <tr>
+      <th>$l_manager</th>
+      <td>$manager</td>
+    </tr>
+    <tr>
+      <th>$l_assistant</th>
+      <td>$assistant</td>
+    </tr>
+    <tr>
+      <th>$l_spouse</th>
+      <td>$spouse</td>
+    </tr>
+    <tr>
+      <th>$l_category</th>
+      <td>$category</td>
+    </tr>
+    $block_date
+    $block_birthday
+    $block_anniversary
+    $block_mailing
+    </table>
+
+    </div>
+";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Contact Consultation : main info tab
+// Parameters:
+//   - $co_q : contact database result
+//   - $coords : contact secondary info (addresses, phone numbers, ...)
+///////////////////////////////////////////////////////////////////////////////
+function html_contact_view_main($co_q, $coords) {
+  global $l_phone, $l_address, $l_postcode;
+  global $l_service, $l_coord, $l_town, $l_country;
+  global $l_expresspostal, $l_comment1, $l_comment2, $l_comment3;
+  global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
+  global $ico_clipboard, $l_copy, $l_yes, $l_no, $ico_mail;
+  global $display, $cgp_show, $cgp_hide, $cclipboard_address;
+  global $l_company;
+
+  $id = $co_q->f('contact_id');
+  $title = $co_q->f('contact_title');
+  $c_name = $co_q->f('company_name');
+  $kind_minilabel = $co_q->f('kind_minilabel');
+  $lname = $co_q->f('contact_lastname');
+  $fname = $co_q->f('contact_firstname');
+  $com  = beautify_comment(nl2br($co_q->f('contact_comment')));
+  $com2 = beautify_comment(nl2br($co_q->f('contact_comment2')));
+  $com3 = beautify_comment(nl2br($co_q->f('contact_comment3')));
+  
+  $newline = "\\r\\n";
+
+  // Conditionnal fields
+  $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
+  $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
+
+  // User defined data
+  $block_userdata .= of_userdata_dis_entity_consult('contact', $id);
+
+  $copy = addslashes("$kind_minilabel $fname $lname") . $newline;
+  if (($title != '')  && (in_array('title', $cclipboard_address))) {
+    $copy .= addslashes($title) . $newline;
+  }
+  if ($c_name != '') {
+    $copy .= addslashes($c_name) . $newline;
+  }
+  if ($service != '') {
+    $copy .= addslashes($service) . $newline;
+  }
+  
+  foreach($coords as $kind => $row) {
+    $coords = '';
+    $GLOBALS["l_${kind}_labels"]['COMPANY'] = $l_company;
+    foreach($row as $values) {
+      $datas = array();
+      foreach($values as $label => $value) {
+        if ($label == 'label' || $label == 'protocol') {
+          if (isset($GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)])) {
+            $header = $GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)];
+          } else {
+            $header = $value;
+          }
+        } elseif(!empty($value)) {
+          $datas[] = nl2br($value);
+        }
+      }
+      //if($kind == 'address') {
+      //  $l_address 1
+      //  <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"$l_copy\" ><img alt=\"$l_copy\" src=\"$ico_clipboard\" /></a>
+      //}
+      $template='<tr><th>%s</th><td>%s</td></tr>';
+      switch ($kind) {
+        case 'website' :
+          $data = ((strpos($datas[0],'://') === false)?'http://'.$datas[0]:$datas[0]);
+          $data = "<a target='_blank' href=\"$data\">$data</a>";
+          break;
+        case 'email' :
+          $data = "<a href=\"mailto:$datas[0]\">$datas[0]</a>";
+          break;
+        case 'address' :
+          $data = implode('<br />', $datas);
+          $template = '<tr><th>%s</th><td>%s</td></tr><tr><td colspan="2">&nbsp;</td></tr>';
+          break;
+        default :
+          $data = implode('<br />', $datas);
+      }
+      if(function_exists('hook_pre_contact_consult_coordinate')) {
+        $data = hook_pre_contact_consult_coordinate($datas, $kind);
+      }
+      $coords .= sprintf($template, $header, $data);
+    }
+    $block .= "
+    <div class=\"detail infos\">
+    <h1>".$GLOBALS["l_$kind"]."</h1>
+    <table>
+    $coords
+    </table>
+    </div>";
+  }
+  // --- HTML Template --------------------------------------------------------
+
+  $block .= "
+    $block_userdata
+    <div class=\"detail extra\">
+    <h1>$l_comment1</h1>
+    $com
+    </div>
+    $block_comment2 
+    $block_comment3 ";
 
   return $block;
 }
