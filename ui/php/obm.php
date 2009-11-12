@@ -31,17 +31,17 @@ $module = 'obm';
 $path = '.';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
-include("$obminclude/global.inc");
+include_once("$obminclude/global.inc");
 $params = get_obm_params();
 include_once('obm_query.inc');
-require("$obminclude/of/of_right.inc");
+require_once("$obminclude/of/of_right.inc");
 
 $OBM_Session = $params['OBM_Session'];
 if ($action == '') { $action = 'home'; }
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 
 if ($action == 'logout') {
-  include("$obminclude/global_pref.inc");
+  include_once("$obminclude/global_pref.inc");
   run_query_logout();
   if($auth_kind == "CAS" || strcasecmp($auth_kind,"LemonLDAP") == 0) {
     $auth->logout();
@@ -66,7 +66,7 @@ if ($action == 'logout') {
   echo $display['json'];
   exit();
 } else {
-  include("$obminclude/global_pref.inc");
+  include_once("$obminclude/global_pref.inc");
   $uid = $obm['uid'];
 }
 
@@ -102,7 +102,7 @@ $l_obm_title version $obm_version - " . date('Y-m-d H:i:s') . "
 </h1>";
 
 if ($cgp_show['module']['calendar'] && $perm->check_right('calendar', $cright_read)) { 
-  require("$path/calendar/calendar_query.inc");
+  require_once("$path/calendar/calendar_query.inc");
   $block .= dis_calendar_portal();
 }
 

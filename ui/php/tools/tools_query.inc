@@ -262,11 +262,11 @@ function exec_tools_cancel_update($params) {
 
   switch ($state) {
     case 'created':
-      require "$obminclude/of/of_category.inc";
-      require "../{$entity}/{$entity}_query.inc";
+      include_once("$obminclude/of/of_category.inc");
+      include_once("../{$entity}/{$entity}_query.inc");
       $function = "run_query_{$entity}_delete";
       $check = "check_{$entity}_can_delete";
-      if($check($params['id'])) {
+      if ($check($params['id'])) {
         return $function($params['id']);
       } else  {
         return false;

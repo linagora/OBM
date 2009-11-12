@@ -36,11 +36,11 @@ $path = '..';
 $module = 'tools';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
-include("$obminclude/global.inc");
+include_once("$obminclude/global.inc");
 $params = get_global_params('Tools');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 $params = get_tools_params();
-include("$obminclude/global_pref.inc");
+include_once("$obminclude/global_pref.inc");
 require_once('tools_display.inc');
 require_once('tools_query.inc');
 

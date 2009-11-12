@@ -21,10 +21,10 @@ $login_javascript_footer = "
 
 
 $theme_file = "resources/themes/$set_theme_default/theme.inc";
-include($theme_file);
+include_once($theme_file);
 
 $lang_file = "obminclude/lang/$set_lang_default/login.inc";
-include($lang_file);
+include_once($lang_file);
 
 $conf_login_page = "$path/../conf/themes/login.html";
 if (file_exists($conf_login_page)) {

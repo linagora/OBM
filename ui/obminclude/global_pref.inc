@@ -70,9 +70,9 @@ if ($_SESSION['set_cal_interval'] == '') $_SESSION['set_cal_interval'] = $set_ca
 ///////////////////////////////////////////////////////////////////////////////
 $theme_file = 'resources/themes/'.$_SESSION['set_theme'].'/theme.inc';
 if (file_exists("$path/../$theme_file")) {
-  include("$theme_file");
+  include_once("$theme_file");
 } else {
-  include ("resources/themes/$set_theme_default/theme.inc");
+  include_once("resources/themes/$set_theme_default/theme.inc");
 }
 
 
@@ -82,14 +82,14 @@ if (file_exists("$path/../$theme_file")) {
 ///////////////////////////////////////////////////////////////////////////////
 $lang_file = "$obminclude/lang/".$_SESSION['set_lang'].'/global.inc';
 if (file_exists("$path/../".$lang_file)) {
-  include("$lang_file");
+  include_once("$lang_file");
 }
 
 // Specific conf global lang file
 if ($conf_lang) {
   $lang_file = 'conf/lang/'.$_SESSION['set_lang'].'/global.inc';
   if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
+    include_once("$lang_file");
   }
 }
 
@@ -98,11 +98,11 @@ if ($module != '') {
   $lc_module = strtolower($module);
   $lang_file = "$obminclude/lang/".$_SESSION['set_lang']."/$lc_module.inc";
   if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
+    include_once("$lang_file");
   } else {
     $lang_file = "$obminclude/lang/$set_lang_default/$lc_module.inc";
     if (file_exists("$path/../".$lang_file)) {
-      include("$lang_file");
+      include_once("$lang_file");
     }
   }
 
@@ -110,11 +110,11 @@ if ($module != '') {
   if ($conf_lang) {
     $lang_file = 'conf/lang/'.$_SESSION['set_lang']."/$lc_module.inc";
     if (file_exists("$path/../".$lang_file)) {
-      include("$lang_file");
+      include_once("$lang_file");
     } else {
       $lang_file = "conf/lang/$set_lang_default/$lc_module.inc";
       //      if (file_exists("$path/../".$lang_file)) {
-      //	include("$lang_file");
+      //	include_once("$lang_file");
       //      }
     }
   }
@@ -126,7 +126,7 @@ if($_SESSION['set_lang']) SI18n::set_locale($_SESSION['set_lang']);
 // Inclusion of the correct Display file (global display functions)          //
 ///////////////////////////////////////////////////////////////////////////////
 $display_include_file = 'resources/themes/'.$_SESSION['set_theme'].'/display.inc';
-include("$display_include_file");
+include_once("$display_include_file");
 
 
 ///////////////////////////////////////////////////////////////////////////////

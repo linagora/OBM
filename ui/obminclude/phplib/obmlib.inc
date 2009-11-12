@@ -152,7 +152,7 @@ class OBM_Challenge_Auth extends Auth {
     global $params, $c_singleNameSpace, $c_default_domain;
 
     $login_page = "$path/../$obminclude/login.inc";
-    include($login_page);
+    include_once($login_page);
   }
   
   function auth_validatelogin() {
@@ -280,14 +280,14 @@ class OBM_Challenge_Auth extends Auth {
 class CAS_Auth extends Auth {
 
   var $lifetime       =  0;
-  var $magic          = "CASSimsalabim";  ## Challenge seed
-  var $database_class = "DB_OBM";
-  var $database_table = "UserObm";
+  var $magic          = 'CASSimsalabim';  ## Challenge seed
+  var $database_class = 'DB_OBM';
+  var $database_table = 'UserObm';
 
   function of_session_dis_login_page() {
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
 
-    include_once("obmCAS.inc");
+    include_once('obmCAS.inc');
     obmCAS::setDebug('/tmp/obm-cas.log');
     if (!$lock) {
       obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri,true);
@@ -338,10 +338,10 @@ class CAS_Auth extends Auth {
     global $obm, $lock;
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
 
-    include_once("obmCAS.inc");
+    include_once('obmCAS.inc');
     if (!$lock) {
       obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
-      $lock = "true";
+      $lock = 'true';
     }
     //valider le login CAS
     if (!obmCAS::checkAuthentication()) {
@@ -362,11 +362,11 @@ class CAS_Auth extends Auth {
 			     $this->database_table,
 			     addslashes($login)));
     if ($this->db->next_record()) {
-      $domain_id = $this->db->f("userobm_domain_id");
-      $uid  = $this->db->f("userobm_id");
-      $perm = $this->db->f("userobm_perms");
+      $domain_id = $this->db->f('userobm_domain_id');
+      $uid  = $this->db->f('userobm_id');
+      $perm = $this->db->f('userobm_perms');
     } else {
-      header("location:".obmCAS::getServerBaseURL());
+      header('location:'.obmCAS::getServerBaseURL());
     }
 
     if (global_allow_access($perm)) {
@@ -379,18 +379,18 @@ class CAS_Auth extends Auth {
     }
   }
    
-  function logout($nobody = "") {
+  function logout($nobody = '') {
     global $lock;
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
     
-    include_once("obmCAS.inc");
-    $_SESSION['auth'] = "";
-    unset($this->auth["uname"]);
-    $this->unauth($nobody == "" ? $this->nobody : $nobody);
+    include_once('obmCAS.inc');
+    $_SESSION['auth'] = '';
+    unset($this->auth['uname']);
+    $this->unauth($nobody == '' ? $this->nobody : $nobody);
     
     if (!$lock) {
       obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
-      $lock = "true";
+      $lock = 'true';
     }
 
     obmCAS::logout();
@@ -413,7 +413,7 @@ class LDAP_Auth extends Auth {
     global $params, $c_singleNameSpace, $c_default_domain;
 
     $login_page = $path.'/../'.$obminclude.'/login.inc';
-    include($login_page);
+    include_once($login_page);
   }
 
   function auth_validatelogin() {
