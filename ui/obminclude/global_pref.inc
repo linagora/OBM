@@ -141,10 +141,22 @@ if ($conf_modules && file_exists("$path/../conf/modules/$module.inc")) {
 ///////////////////////////////////////////////////////////////////////////////
 //while (list($sec,$value) = each($cgp_show['section'])) { // <-- BUG, Why ???
 foreach ($cgp_show['section'] as $sec => $value) {
+
   if ($value) {
     $sec_right = $value['right'];
     if ($sec_right == '') {
       $sec_right = $cright_read;
+    }
+    if ($sec == 'webmail'){
+      $u = get_user_info($obm['uid']);
+      $mail_perms = $u['mail_perms'];
+      if ($mail_perms == '0') {
+        $cgp_show['section']['webmail'] = false;
+      }else{
+        $lang = get_lang();
+        $lang = strtolower($lang);
+        $cgp_show['section']['webmail']['url'] = $cgp_show['section']['webmail']['url']."/WebmailUI.".$lang.".html";
+      }
     }
     $sections[$sec] = array('Name' => ${"l_section_$sec"},
                            'Url'  => $cgp_show['section'][$sec]['url'],
