@@ -316,11 +316,11 @@ $l_conflict_force = 'Forcer le déplacement';
 $l_conflict_sendmail = 'Souhaitez-vous notifier les participants?';
 
 $l_delete_event_message = 'Confirmez vous la suppression de cet évènement ?';
-$l_update_event_occurrence = 'Modification d\'un rendez-vous répété';
+$l_update_event_occurrence = 'Modification d\'un rendez-vous récurrent';
 $l_update_occurrence_message = 'Modifier uniquement cet occurrence ou l\'ensemble de la série ?';
 $l_update_occurrence = 'Modifier l\'occurrence';
 $l_update_all_occurrences = 'Modifier la série';
-$l_delete_event_occurrence = 'Suppression d\'un rendez-vous répété';
+$l_delete_event_occurrence = 'Suppression d\'un rendez-vous récurrent';
 $l_delete_occurrence_message = 'Supprimer uniquement cet occurrence ou l\'ensemble de la série ?';
 $l_delete_occurrence = 'Supprimer l\'occurrence';
 $l_delete_all_occurrences = 'Supprimer la série';

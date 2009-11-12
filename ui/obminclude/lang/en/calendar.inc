@@ -6,6 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
+// Modified on 2009-11-12T18:44:51+01:00 using OBMtranslation (0.5a)
 
 $l_attendees = "Attendees";
 $l_others_attendees = "Other attendees";
@@ -104,8 +105,6 @@ $l_view_save = "Save view";
 $l_view_delete = "Delete view";
 $l_first_hour = "Starting hour";
 $l_last_hour = "End Hour";
-
-// Templates
 $l_save_as_template = "Save as template";
 $l_save_template = "Save template";
 $l_create_from_template = "Create from template";
@@ -119,8 +118,6 @@ $l_export_templates = "Export all templates";
 $l_import_template = "Import template";
 $l_copy_of = "Copy of";
 $l_template_entities_loading_warning = "Some template elements could not be loaded";
-
-// actions 
 $l_insert = "Insert the event";
 $l_update = "Update the event";
 $l_accept = "Accept";
@@ -142,7 +139,6 @@ $l_meeting_perform = "Seek for free time slots";
 $l_owner_notification = "Notify event owner";
 $l_notification =  "Notify";
 $l_attach_documents = "Attach";
-
 $l_event_color_tt = "Event's colors are the ones defined during the event creation.";
 $l_confirm_delete = "This operation will remove the occurence of this event for all users, are you sure you want to continue?";
 $l_confirm = "Confirm";
@@ -210,8 +206,8 @@ $mj_fill_title_event = "You have to enter a title for the event ";
 $mj_fill_time_begin = "You have to enter a starting hour";
 $mj_fill_time_end = "You have to enter an end date";
 $mj_fill_valid_time_begin = "You have to insert a valid beginning date ";
-$mj_fill_valid_time_end = "You have to enter a valide time end"; 
-$mj_delete_confirm = "Confirm event deletion?"; 
+$mj_fill_valid_time_end = "You have to enter a valide time end";
+$mj_delete_confirm = "Confirm event deletion?";
 $mj_invalid_day = "This day does not exist for the selected month";
 $mj_date_incompatibility = "The end date must not be prior to the beginning date ";
 $mj_repeat_date_incompatibility = "The repetition end date cannot be prior to the beginning one.";
@@ -430,21 +426,37 @@ $l_range_day = "daily";
 $l_view_planning = "Planning";
 $l_view_list = "Events list";
 $l_cal_range = "Display period";
-$l_tag_management = "Tag Management"; 
-$l_other_files = "Other files"; 
-$l_event_before_date = "Events date before :"; 
-$l_tags = "Tags"; 
-$l_purge_popup_title = "Purge address book"; 
-$l_allow_documents = "Allow participants to attach documents"; 
-$l_tag_fill_color = "You have to choose a colour."; 
-$l_delete_meeting = "Delete meetings from my calendar"; 
-$l_search_my_calendar = "Search in my calendar"; 
-$l_confirm_delete_export = "The events from your calendar are going to be deleted, this process cannot be cancelled, do you want to continue? "; 
-$l_ics_export_ok = "The events have been exported."; 
-$l_tag = "Tag"; 
-$l_documents = "Documents"; 
-$l_all_calendar = "All calendar"; 
-$l_basic_search_result = "Search result for future events"; 
-$l_delete_event = "Delete appointment from my calendar"; 
-$l_tag_fill_label = "You have to insert a tag."; 
+$l_tag_management = "Tag Management";
+$l_other_files = "Other files";
+$l_event_before_date = "Events date before :";
+$l_tags = "Tags";
+$l_purge_popup_title = "Purge address book";
+$l_allow_documents = "Allow participants to attach documents";
+$l_tag_fill_color = "You have to choose a colour.";
+$l_delete_meeting = "Delete meetings from my calendar";
+$l_search_my_calendar = "Search in my calendar";
+$l_confirm_delete_export = "The events from your calendar are going to be deleted, this process cannot be cancelled, do you want to continue? ";
+$l_ics_export_ok = "The events have been exported.";
+$l_tag = "Tag";
+$l_documents = "Documents";
+$l_all_calendar = "All calendar";
+$l_basic_search_result = "Search result for future events";
+$l_delete_event = "Delete appointment from my calendar";
+$l_tag_fill_label = "You have to insert a tag.";
+
+// lines below have been created with OBMtranslation (0.5a) on 2009-11-12T18:44:51+01:00
+$l_delete_occurrence_message = "Delete only this instance or all events in the series ?"; 
+$l_parent_event = "Parent event"; 
+$l_delete_all_occurrences = "Delete all event in the series"; 
+$l_show_parent_event = "See the serie"; 
+$l_delete_event_message = "Delete Events ?"; 
+$l_eventexception_moved_to = "move to %s"; 
+$l_delete_occurrence = "Delete this event"; 
+$l_eventexception_canceled = "cancel"; 
+$l_event_is_exception = "This event has been changed and is no longer part of a series"; 
+$l_update_occurrence = "Update this event"; 
+$l_update_event_occurrence = "Update recurring event"; 
+$l_update_all_occurrences = "Update serie"; 
+$l_delete_event_occurrence = "Delete recurring event"; 
+$l_update_occurrence_message = "Change only this event or the series ?"; 
 
