@@ -248,10 +248,10 @@ function get_statistic_contact_date_total() {
   if ($obmdb_dbtype == $db_type_mysql) {
     $query = "SELECT count(*) as nb,
         YEAR(contact_date) as year,
-        MONTH(contact_date) as month 
+        MONTH(contact_date) as month
       FROM Contact
-      WHERE contact_date !='0'
-        $multidomain 
+      WHERE contact_date !='0000-00-00'
+        $multidomain
       GROUP BY YEAR(contact_date),
         MONTH(contact_date)
       ORDER BY YEAR(contact_date), MONTH(contact_date)";
@@ -261,45 +261,56 @@ function get_statistic_contact_date_total() {
         extract(month from contact_date) as month 
       FROM Contact
       WHERE contact_date is not null
-        $multidomain 
-      GROUP BY extract (year from contact_date), extract(month from contact_date)";
+        $multidomain
+      GROUP BY extract (year from contact_date),
+               extract(month from contact_date)
+      ORDER BY year ASC, month ASC
+";
   }
+
   display_debug_msg($query, $cdg_sql, 'get_statistic_contact_date_total()');
-  $obm_q= new DB_OBM;
+  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
-  $data=array(); $i=0; $sum=0;
-  $month=0;$year=0; 
+  $obm_q->next_record();
+  $first_year = $obm_q->f('year');
+  $first_month = $obm_q->f('month');
   while ($obm_q->next_record()) {
-    // Months without data
-    if (($obm_q->f('month') != (($month % 12) + 1))) {
-      while ($obm_q->f('month') != (($month % 12) + 1)) {
-        $month = ($month % 12) + 1;
+    $last_year = $obm_q->f('year');
+    $last_month = $obm_q->f('month');
+  }
+  $end_month = 12;
+  $obm_q->seek(0);
 
-	if ($year == 0) {
-           $year = $obm_q->f('year');
-        } elseif ($month == 1) {
-           $year += 1;
-        } 
-	if ($month == 1)
-          $legend[$i] = $year;
-        else
-          $legend[$i] = '';
-        $data[$i] = $sum;
-        $i++;
-      }
+  for($year = $first_year; $year <= $last_year; $year++) {
+    if ($year == $last_year) $end_month = $last_month;
+    for($month = $first_month; $month <= $end_month; $month++) {
+      $values[$year][$month] = 0;
     }
+    $first_month = 1;
+  }
 
-    $sum +=  $obm_q->f('nb');
-	if ($obm_q->f('month') == 1)
-          $legend[$i] = $obm_q->f('year');
-        else
-          $legend[$i] = '';
-    $data[$i] = $sum;
-
-    $month = $obm_q->f('month');
+  while ($obm_q->next_record()) {
     $year = $obm_q->f('year');
-    $i++;
+    $month = $obm_q->f('month');
+    $nb = $obm_q->f('nb');
+    $values[$year][$month] = $nb;
+  }
+
+  $data = array();
+  $legend = array();
+  $i = 0;
+  foreach ($values as $year => $one_year) {
+    foreach ($one_year as $month => $nb) {
+      $total += $nb;
+      $data[$i] = $total;
+      if ($month == 1) {
+	$legend[$i] = "$month/$year";
+      } else {
+	$legend[$i] = "$month";
+      }
+      $i++;
+    }
   }
 
   return array (

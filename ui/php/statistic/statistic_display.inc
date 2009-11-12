@@ -400,7 +400,7 @@ function dis_statistic_contact_date_evolution_graph($stats) {
     $green = new Color(0, 200, 0);
 
     $group = new PlotGroup;
-    $group->setBackgroundColor( new Color(240, 240, 240));
+    $group->setBackgroundColor(new Color(240, 240, 240));
     $group->setPadding(40, 40);
 
     $values = $stats['data'];
