@@ -111,8 +111,9 @@ Obm.DropDownMenu= new Class({
 						}.bind(this)
 					);
 					li.addEvent('click',function(e){
-                                                if(e.target.get('tag') == 'a') {
-                                                  e.target.addEvent('click', function(e) {e.stop()})
+                                                var target = $(e.target);
+                                                if(target.get('tag') == 'a') {
+                                                  target.addEvent('click', function(e) {e.stop()})
                                                 } else {
                                                   e.stop();
                                                 }
@@ -144,10 +145,12 @@ Obm.DropDownMenu= new Class({
 	
 	//hide the menu
 	hideChildList:function(li){
-          this.menu.setStyle('z-index', 1);
-          li.setStyle('z-index', 1);
-          li.getFirst('ul').setStyles({'opacity' : 0, 'display' : 'none'});
-          li.getFirst('ul').getChildren('li').setStyles({'opacity' : 0, 'display' : 'none'});        
-          li.getFirst('ul').getChildren('li').setStyles({'opacity' : 1, 'display' :'block', 'z-index' : 1});
+          try {
+            this.menu.setStyle('z-index', 1);
+            li.setStyle('z-index', 1);
+            li.getFirst('ul').setStyles({'opacity' : 0, 'display' : 'none'});
+            li.getFirst('ul').getChildren('li').setStyles({'opacity' : 0, 'display' : 'none'});        
+            li.getFirst('ul').getChildren('li').setStyles({'opacity' : 1, 'display' :'block', 'z-index' : 1});
+          } catch (e) {};
 	}
 });

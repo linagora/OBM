@@ -98,13 +98,17 @@ Obm.Contact.AddressBook = new Class ({
 
   refreshContact: function() {
     this.contactRequest.setOptions({onSuccess : function() {
-      this.contact = $(this.contact.get('id'));
       if(this.contact) {
-        $('dataGrid').getElements('td').hide();
-        $('dataContainer').removeClass('expanded');
-        $('dataContainer').addClass('shrinked');    
-        $('dataGrid').setStyle('width', '20em');
-        this.contact.addClass('current');
+        this.contact = $(this.contact.get('id'));
+        if(this.contact) {
+          $('dataGrid').getElements('td').hide();
+          $('dataContainer').removeClass('expanded');
+          $('dataContainer').addClass('shrinked');    
+          $('dataGrid').setStyle('width', '20em');
+          this.contact.addClass('current');
+        } else {
+          this.hideContact();
+        }
       } else {
         this.hideContact();
       }
@@ -214,11 +218,11 @@ Obm.Contact.AddressBook = new Class ({
   },
 
   storeAddressBook: function(form) {
-    if($(form).name.get('value') == '') {
+    if($(form.name).get('value') == '') {
       showErrorMessage(obm.vars.labels.insertError);
     } else {
       this.addressBookRequest.post(form);
-      $(form).name.set('value', '');
+      $(form.name).set('value', '');
     }
   },
 

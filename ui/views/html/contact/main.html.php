@@ -22,7 +22,7 @@
         <fieldset class='buttons'>
           <input type='hidden' name='action' value='storeAddressBook' />
           <input type='submit' value='<?php echo __('Validate') ?>' />
-          <input type='button' value='<?php echo __('Close') ?>' onclick="obm.popup.hide('addressbookForm');this.form.name.set('value','');"/>
+          <input type='button' value='<?php echo __('Close') ?>' onclick="obm.popup.hide('addressbookForm');$(this.form.name).set('value','');"/>
         </fieldset>
       </form>
     </td>
