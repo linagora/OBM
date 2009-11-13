@@ -1059,6 +1059,7 @@ function dis_calendar_select_template_form($action, $calendar) {
       <form id=\"templateSelectForm\" action=\"calendar_index.php\">
         $GLOBALS[l_create_from_template]
         <select name=\"template_id\">
+          <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
           $select
         </select>
         <input type=\"hidden\" name=\"action\" value=\"$action\" />
