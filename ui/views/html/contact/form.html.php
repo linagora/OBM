@@ -21,73 +21,6 @@
           <li>
             <input type='button' value='<?php echo __('Add fields') ?>' title="<?php echo __('Add Fields') ?>" class='dropDownButton' />
             <ul>
-              <li><?php echo __('Address') ?>
-                <ul>
-                  <?php foreach($GLOBALS['l_address_labels'] as $label => $title) { ?>
-                  <li>
-                    <a href="" onclick=" new Obm.Contact.AddressWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Address'});return false;"><?php echo $title ?></a>
-                  </li>
-                  <?php } ?>
-                </ul>
-              </li>
-              <li><?php echo __('Email') ?>
-                <ul>
-                  <?php foreach($GLOBALS['l_email_labels'] as $label => $title) { ?>
-                  <li>
-                    <a href="" onclick=" new Obm.Contact.EmailWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Email'});return false;"><?php echo $title ?></a>
-                  </li>
-                  <?php } ?>
-                </ul>
-              </li>
-              <li><?php echo __('Instant messaging') ?>
-                <ul>
-                  <?php foreach($GLOBALS['l_im_labels'] as $label => $title) { ?>
-                  <li>
-                    <a href="" onclick="$('IM').removeClass('H'); new Obm.Contact.IMWidget({protocol: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'IM'});return false;"><?php echo $title ?></a>
-                  </li>
-                  <?php } ?>
-                </ul>
-              </li>
-              <li><?php echo __('Phone') ?>
-                <ul>
-                  <?php foreach($GLOBALS['l_phone_labels'] as $label => $title) { ?>
-                  <li>
-                    <a href="" onclick=" new Obm.Contact.PhoneWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Phone'});return false;"><?php echo $title ?></a>
-                  </li>
-                  <?php } ?>
-                </ul>
-              </li>
-              <li><?php echo __('Website') ?>
-                <ul>
-                  <?php foreach($GLOBALS['l_website_labels'] as $label => $title) { ?>
-                  <li>
-                    <a href="" onclick="$('Website').removeClass('H'); new Obm.Contact.WebsiteWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Website'});return false;"><?php echo $title ?></a>
-                  </li>
-                  <?php } ?>
-                </ul>
-              </li>         
-              <?php if((empty($contact->function_id) && !empty($functions)) || empty($contact->market_id) || (empty($contact->datasource_id) && !empty($datasources)) || empty($contact->kind_id) || empty($contact->mailok) || empty($contact->newsletter)) { ?>
-              <li>
-                <?php echo __('Commercial fields') ?>
-                <ul>
-                  <?php if(!$contact->datasource_id && !empty($datasources)) { ?>
-                  <li><a href="" onclick="$('datasource').getParent().removeClass('H');$('datasource').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose(); return false;"><?php echo __('Datasource') ?></a></li>
-                  <?php } ?>
-                  <?php if(!$contact->function_id && !empty($functions)) { ?>
-                  <li><a href="" onclick="$('function').getParent().removeClass('H');$('function').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose();return false;"><?php echo __('Function') ?></a></li>
-                  <?php } ?>
-                  <?php if(!$contact->market_id) { ?>
-                  <li><a href="" onclick="$('market').getParent().removeClass('H');$('market').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose();return false;"><?php echo __('Market') ?></a></li>
-                  <?php } ?>
-                  <?php if(!$contact->mailok) { ?>
-                  <li><a href="" onclick="$('mailok').getParent().removeClass('H');$('mailok').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose();return false;"><?php echo __('Mailing') ?></a></li>
-                  <?php } ?>
-                  <?php if(!$contact->newsletter) { ?>
-                  <li><a href="" onclick="$('newsletter').getParent().removeClass('H');$('newsletter').removeClass('H');if(this.getParent().getParent().getElements('li').length == 1) this.getParent().getParent().getParent().dispose(); else this.getParent().dispose();return false;"><?php echo __('Newsletter') ?></a></li>
-                  <?php } ?>
-                </ul>
-              </li>
-              <?php } ?>
               <?php if(empty($contact->mname)) { ?>
               <li><a href="" onclick="$('mname').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Middle name') ?></a></li>
               <?php } ?>
@@ -100,26 +33,20 @@
               <?php if(empty($contact->title)) { ?>
               <li><a href="" onclick="$('title').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Title') ?></a></li>
               <?php } ?>
-              <?php if(empty($contact->birthday)) { ?>
-              <li><a href="" onclick="$('birthday').getParent().removeClass('H');$('birthday').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Birthday') ?></a></li>
+              <?php if(empty($contact->im)) { ?>
+              <li><a  href="" onclick="$('IM').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Instant messaging') ?></a></li>
               <?php } ?>
-              <?php if(empty($contact->anniversary)) { ?>
-              <li><a href="" onclick="$('anniversary').getParent().removeClass('H');$('anniversary').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Anniversary') ?></a></li>
+              <?php if(empty($contact->website)) { ?>
+              <li><a  href="" onclick="$('Website').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Website') ?></a></li>
               <?php } ?>
-              <?php if(empty($contact->date)) { ?>
-              <li><a href="" onclick="$('date').getParent().removeClass('H');$('date').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Date') ?></a></li>
+              <?php if(empty($contact->birthday) && empty($contact->anniversary) && empty($contact->date)) { ?>
+              <li><a href="" onclick="$('dates').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Dates') ?></a></li>
               <?php } ?>
-              <?php if(empty($contact->manager)) { ?>
-              <li><a href="" onclick="$('manager').getParent().removeClass('H');$('manager').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Manager') ?></a></li>
+              <?php if((empty($contact->function_id) && !empty($functions)) && empty($contact->market_id) && (empty($contact->datasource_id) && !empty($datasources)) && empty($contact->kind_id) && empty($contact->mailok) && empty($contact->newsletter)) { ?>
+              <li><a href="" onclick="$('crmLayout').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Commercial fields') ?></a></li> 
               <?php } ?>
-              <?php if(empty($contact->spouse)) { ?>
-              <li><a href="" onclick="$('spouse').getParent().removeClass('H');$('spouse').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Spouse') ?></a></li>
-              <?php } ?>
-              <?php if(empty($contact->category)) { ?>
-              <li><a href="" onclick="$('category').getParent().removeClass('H');$('category').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Category') ?></a></li>
-              <?php } ?>
-              <?php if(empty($contact->service)) { ?>
-              <li><a href="" onclick="$('service').getParent().removeClass('H');$('service').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Service') ?></a></li>
+              <?php if(empty($contact->manager) && empty($contact->spouse) && empty($contact->assistant) && empty($contact->category) && empty($contact->service)) { ?>
+              <li><a href="" onclick="$('otherLayout').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Other properties') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->comment2)) { ?>
               <li><a href="" onclick="$('comment2').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Notes') ?></a></li>
@@ -177,6 +104,21 @@
                 new Obm.Contact.AddressWidget({},{container:'Address'}); 
                 <?php } ?>
               </script>
+              <ul class="dropDownMenu" id='addressAddButton'>
+                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Address') ?>' />
+                  <ul>
+                    <?php foreach($GLOBALS['l_address_labels'] as $label => $title) { ?>
+                    <li>
+                      <a href="" onclick="new Obm.Contact.AddressWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Address'}); $('addressAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
+                    </li>
+                    <?php } ?>
+                  </ul>
+                </li>
+              </ul>
+              <script type="text/javascript">
+                new Obm.DropDownMenu($('addressAddButton'));
+                new Obm.MultipleField($('Address'),'table.coordinate', {add:$('addressAddButton')})
+              </script>
             </fieldset>
             <fieldset id="Email" class="details ">
               <legend><?php echo __('Emails') ?></legend>
@@ -187,13 +129,45 @@
                 new Obm.Contact.EmailWidget({},{container:'Email'}); 
                 <?php } ?>
               </script>
+              <ul class="dropDownMenu" id='emailAddButton'>
+                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Email') ?>' />
+                  <ul>
+                    <?php foreach($GLOBALS['l_email_labels'] as $label => $title) { ?>
+                    <li>
+                      <a href="" onclick=" new Obm.Contact.EmailWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Email'});$('emailAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
+                    </li>
+                    <?php } ?>
+                  </ul>
+                </li>
+              </ul>
+              <script type="text/javascript">
+                new Obm.DropDownMenu($('emailAddButton'));
+                new Obm.MultipleField($('Email'),'table.coordinate', {add:$('emailAddButton')})
+              </script>
             </fieldset>
             <fieldset id="IM" class="details <?php echo (empty($contact->im)?'H':'') ?>">
               <legend><?php echo __('Instant messagings') ?></legend>
               <script type="text/javascript">
                 <?php if(!empty($contact->im)) foreach($contact->im as $im) { ?>
                 new Obm.Contact.IMWidget({protocol: {value: '<?php echo self::toJs($im['protocol']) ?>', label:'<?php echo ($contact->labelToString($GLOBALS['l_im_labels'][$im['protocol']], 'IM')) ?>'}, address: {value: '<?php echo self::toJs($im['address']) ?>'}},{container:'IM'});
+                <?php } else { ?>
+                new Obm.Contact.IMWidget({},{container:'IM'}); 
                 <?php } ?>
+              </script>
+              <ul class="dropDownMenu" id='imAddButton'>
+                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Instant messaging') ?>' />
+                  <ul>
+                    <?php foreach($GLOBALS['l_im_labels'] as $label => $title) { ?>
+                    <li>
+                      <a href="" onclick="$('IM').removeClass('H'); new Obm.Contact.IMWidget({protocol: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'IM'});$('imAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
+                    </li>
+                    <?php } ?>
+                  </ul>
+                </li>
+              </ul>
+              <script type="text/javascript">
+                new Obm.DropDownMenu($('imAddButton'));
+                new Obm.MultipleField($('IM'),'table.coordinate', {add:$('imAddButton')})
               </script>
             </fieldset>
             <fieldset id="Phone" class="details">
@@ -205,32 +179,64 @@
                 new Obm.Contact.PhoneWidget({},{container:'Phone'}); 
                 <?php } ?>
               </script>
+              <ul class="dropDownMenu" id='phoneAddButton'>
+                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Phone') ?>' />
+                  <ul>
+                    <?php foreach($GLOBALS['l_phone_labels'] as $label => $title) { ?>
+                    <li>
+                      <a href="" onclick=" new Obm.Contact.PhoneWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Phone'});$('phoneAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
+                    </li>
+                    <?php } ?>
+                  </ul>
+                </li>
+              </ul>
+              <script type="text/javascript">
+                new Obm.DropDownMenu($('phoneAddButton'));
+                new Obm.MultipleField($('Phone'),'table.coordinate', {add:$('phoneAddButton')})
+              </script>
             </fieldset>
             <fieldset id="Website" class="details <?php echo (empty($contact->website)?'H':'') ?>">
               <legend><?php echo __('Websites') ?></legend>
               <script type="text/javascript">
                 <?php if(!empty($contact->website)) foreach($contact->website as $website) { ?>
                 new Obm.Contact.WebsiteWidget({label: {value: '<?php echo self::toJs($contact->labelToString($website['label'], 'Website', false)) ?>', label:'<?php echo ($contact->labelToString($website['label'], 'Website')) ?>'}, url: {value: '<?php echo self::toJs($website['url']) ?>'}},{container:'Website'});
+                <?php } else { ?>
+                new Obm.Contact.WebsiteWidget({},{container:'Website'}); 
                 <?php } ?>
               </script>
+              <ul class="dropDownMenu" id='websiteAddButton'>
+                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Website') ?>' />
+                  <ul>
+                    <?php foreach($GLOBALS['l_website_labels'] as $label => $title) { ?>
+                    <li>
+                      <a href="" onclick="$('Website').removeClass('H'); new Obm.Contact.WebsiteWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Website'});$('websiteAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
+                    </li>
+                    <?php } ?>
+                  </ul>
+                </li>
+              </ul>
+              <script type="text/javascript">
+                new Obm.DropDownMenu($('websiteAddButton'));
+                new Obm.MultipleField($('Website'),'table.coordinate', {add:$('websiteAddButton')})
+              </script>
             </fieldset>
-            <fieldset id="anniversaryLayout" class="details <?php echo (empty($contact->date) && empty($contact->birthday) && empty($contact->anniversary))? 'H':''; ?>">
+            <fieldset id="datesLayout" class="details <?php echo (empty($contact->date) && empty($contact->birthday) && empty($contact->anniversary))? 'H':''; ?>">
               <legend><?php echo __('Dates') ?></legend>
-              <span id="birthday" class="formField <?php echo (empty($contact->birthday))?'H':'' ?>">
+              <span id="birthday" class="formField">
                 <label for="birthdayField"><?php echo __('Birthday') ?> : </label>
                 <?php echo self::__setdate('birthday', $contact->birthday, 'Birthday') ?>
               </span>            
-              <span id="anniversary" class="formField <?php echo (empty($contact->anniversary))?'H':'' ?>">
+              <span id="anniversary" class="formField">
                 <label for="anniversaryField"><?php echo __('Anniversary') ?> : </label>
                 <?php echo self::__setdate('anniversary', $contact->anniversary, 'Anniversary') ?>
               </span>    
-              <span id="date" class="formField <?php echo (empty($contact->date))?'H':'' ?>">
+              <span id="date" class="formField">
                 <label for="dateField"><?php echo __('Date') ?> : </label>
                 <?php echo self::__setdate('date', $contact->date, 'Date') ?>
               </span>    
             </fieldset>
-            <fieldset id="categories" class="details <?php echo (empty($contact->categories))?'H':'' ?>">
-              <legend><?php echo __('Other cateogies') ?></legend>
+            <fieldset id="categories" class="details <?php echo (empty($categories))?'H':'' ?>">
+              <legend><?php echo __('Other categories') ?></legend>
               <?php foreach($categories as $_name => $_category) { ?>
               <?php if($_category['mode'] == 'mono') { ?>
               <span id='cateogry-<?php echo $_name  ?>' class='formField'>
@@ -238,61 +244,66 @@
                 <?php echo self::__setlist($_name, $_category['values'], $GLOBALS['l_'.$_name], @key($contact->categories[$_name]), true) ?>
               </span>
               <?php } else { ?>
+              <div id='category-<?php echo $_name  ?>'>
               <?php if(is_array($contact->categories[$_name])) foreach($contact->categories[$_name] as $_categoryId => $_categoryValue) { ?>
-              <span id='cateogry-<?php echo $_name  ?>' class='formField'>
+              <span class='formField'>
                 <label for='cateogry-<?php echo $_name  ?>Field'><?php echo $GLOBALS['l_'.$_name] ?></label>
-                <?php echo self::__setlist($_name, $_category['values'], $GLOBALS['l_'.$_name], $_categoryId, true);  ?>
+                <?php echo self::__setlist($_name.'[]', $_category['values'], $GLOBALS['l_'.$_name], $_categoryId, true);  ?>
               </span>
               <?php } ?>
-              <span id='cateogry-<?php echo $_name  ?>' class='formField'>
+              <span class='formField'>
                 <label for='cateogry-<?php echo $_name  ?>Field'><?php echo $GLOBALS['l_'.$_name] ?></label>              
-                <?php echo self::__setlist($_name, $_category['values'], $GLOBALS['l_'.$_name], NULL, true);  ?>
+                <?php echo self::__setlist($_name.'[]', $_category['values'], $GLOBALS['l_'.$_name], NULL, true);  ?>
               </span>
+              </div>
+              <script language='text/javascript'>
+                new Obm.MultipleField($('category-<?php echo $_name  ?>'),'span.formField')
+              </script>
               <?php } ?>
               <?php } ?>
             </fieldset>
             <fieldset id="crmLayout" class="details <?php echo (empty($contact->function_id) && empty($contact->market_id) && empty($contact->datasource_id) && empty($contact->kind_id) && empty($contact->mailok) && empty($contact->newsletter))? 'H':'' ?>">
               <legend><?php echo __('CRM properties') ?></legend>
-              <span id="datasource" class="formField <?php echo (empty($contact->datasource_id))?'H':'' ?>">
+              <span id="datasource" class="formField">
                 <label for="datasourceField"><?php echo __('Datasource') ?> : </label>
                 <?php echo self::__setlist('datasource', $datasources, 'Datasource', $contact->datasource_id, true); ?>
               </span>  
-              <span id="function" class="formField <?php echo (empty($contact->function_id))?'H':'' ?>">
+              <span id="function" class="formField">
                 <label for="functionField"><?php echo __('Function') ?> : </label>
                 <?php echo self::__setlist('function', $functions, 'Function', $contact->function_id, true); ?>
               </span>  
-              <span id="market" class="formField <?php echo (empty($contact->market_id))?'H':'' ?>">
+              <span id="market" class="formField">
                 <label for="marketField"><?php echo __('Market') ?> : </label>
                 <?php echo self::__setlist('market', $markets, 'Market', $contact->market_id, true); ?>
               </span>  
-              <span id="mailok" class="formField <?php echo (empty($contact->mailok))?'H':'' ?>">
+              <span id="mailok" class="formField">
                 <label for="mailokField"><?php echo __('Mailing activated') ?> : </label>
                 <?php echo self::__setboolean('mailok', $contact->mailok, 'Mailing activated') ?>
               </span>
-              <span id="newsletter" class="formField <?php echo (empty($contact->newsletter))?'H':'' ?>">
+              <span id="newsletter" class="formField">
                 <label for="newsletterField"><?php echo __('Subscribe for newsletter') ?> : </label>
                 <?php echo self::__setboolean('newsletter', $contact->newsletter, 'Subscribe for newsletter') ?>
               </span>
             </fieldset>
             <fieldset id="otherLayout" class="details <?php echo (empty($contact->spouse) && empty($contact->manager) && empty($contact->assistant) && empty($contact->category) && empty($contact->service))? 'H':'' ?>">
               <legend><?php echo __('Other properties') ?></legend>
-              <span id="spouse" class="formField <?php echo (empty($contact->spouse))?'H':'' ?>">
+              <span id="spouse" class="formField">
                 <label for="spouseField"><?php echo __('Spouse') ?> : </label>
                 <input type="text" name="spouse" id="spouseField" value="<?php echo $contact->spouse?>" title="<?php echo __('Spouse') ?>" />
               </span>  
-              <span id="manager" class="formField <?php echo (empty($contact->manager))?'H':'' ?>">
+              <span id="manager" class="formField">
                 <label for="managerField"><?php echo __('Manager') ?> : </label>
                 <input type="text" name="manager" id="managerField" value="<?php echo $contact->manager?>" title="<?php echo __('Manager') ?>" />
               </span>
-              <span id="assistant" class="formField <?php echo (empty($contact->assistant))?'H':'' ?>">
+              <span id="assistant" class="formField">
                 <label for="assistantField"><?php echo __('Assistant') ?> : </label>
                 <input type="text" name="assistant" id="assistantField" value="<?php echo $contact->assistant?>" title="<?php echo __('Assistant') ?>" />
               </span>
-              <span id="category" class="formField <?php echo (empty($contact->category))?'H':'' ?>">
+              <span id="category" class="formField">
                 <label for="categoryField"><?php echo __('Category') ?> : </label>
                 <input type="text" name="category" id="categoryField" value="<?php echo $contact->category?>" title="<?php echo __('Category') ?>" />
               </span>
-              <span id="service" class="formField <?php echo (empty($contact->service))?'H':'' ?>">
+              <span id="service" class="formField">
                 <label for="serviceField"><?php echo __('Service') ?> : </label>
                 <input type="text" name="service" id="serviceField" value="<?php echo $contact->service?>" title="<?php echo __('Service') ?>" />
               </span>

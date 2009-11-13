@@ -963,7 +963,7 @@ function display_head($p_module, $standard=true) {
   if (function_exists('display_head_theme')) {
     return display_head_theme($module);
   }
-  global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus;
+  global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus, $ico_add;
   global $ico_datepicker,$l_monthsofyear,$l_daysofweekfirst,$ico_colorpicker;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
@@ -1047,6 +1047,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.images.datePicker = '$ico_datepicker';
   obm.vars.images.colorPicker = '$ico_colorpicker';
   obm.vars.images.update = '$ico_update';
+  obm.vars.images.add = '$ico_add';
   obm.vars.images.del = '$ico_delete';
   obm.vars.regexp.dateFormat = '$_SESSION[set_date_upd]';
   obm.vars.consts.popupHeight = '$popup_height';

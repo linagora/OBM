@@ -114,11 +114,13 @@ Obm.DropDownMenu= new Class({
                                                 var target = $(e.target);
                                                 if(target.get('tag') == 'a') {
                                                   target.addEvent('click', function(e) {e.stop()})
+                                                  $clear(li.retrieve('closeDelay'));
+                                                  this.hideChildList(li);
                                                 } else {
                                                   e.stop();
+                                                  $clear(li.retrieve('closeDelay'));
+                                                  this.showChildList(li);
                                                 }
-						$clear(li.retrieve('closeDelay'));
-						this.showChildList(li);
 					}.bind(this));
 				}else{
 					li.addEvent('mouseenter',function(){

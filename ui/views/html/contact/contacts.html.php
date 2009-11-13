@@ -50,7 +50,7 @@
       <?php } ?>
     </tr>
     <?php } ?>
-    <?php if(count($contacts) > 100 || $offset > 0) { ?>
+    <?php if(count($contacts) >= 100 || $offset > 0) { ?>
   </tbody>
   <tfoot>
     <tr class="<?php echo ($_class == 'even')? 'odd':'even' ?>" >
@@ -58,7 +58,7 @@
     <?php if($offset > 0) { ?>
       <a href='#' onclick="obm.contact.addressbook.moreContact(<?php echo $offset - 100 ?>); return false;">&lt;&lt; <?php echo __('Previous page'); ?></a>
     <?php } ?>
-    <?php if(count($contacts) > 100) { ?>
+    <?php if(count($contacts) >= 100) { ?>
     | <a href='#' onclick="obm.contact.addressbook.moreContact(<?php echo $offset + 100 ?>); return false;"><?php echo __('Next page'); ?> &gt;&gt;</a>
     <?php } ?>
     </tr>

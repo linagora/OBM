@@ -257,7 +257,7 @@ Obm.Contact.PhoneWidget = new Class ({
     number: { kind: 'text', value: '', newCell : true, label : obm.vars.labels.phoneNumber}
   },
 
-  options: {container: 'phoneHolder'},
+  options: {container: 'phoneHolder', remove: false},
   
   newId: function() {if(!Obm.Contact.PhoneWidget.phoneId) Obm.Contact.PhoneWidget.phoneId = 0; return Obm.Contact.PhoneWidget.phoneId++;},
 
@@ -271,7 +271,7 @@ Obm.Contact.EmailWidget = new Class ({
     address: { kind: 'text', value: '', newCell : true, label : obm.vars.labels.emailAddress}
   },
 
-  options: {container: 'emailHolder'},
+  options: {container: 'emailHolder', remove: false},
 
   newId: function() {if(!Obm.Contact.EmailWidget.emailId) Obm.Contact.EmailWidget.emailId = 0; return Obm.Contact.EmailWidget.emailId++;},
 
@@ -289,7 +289,7 @@ Obm.Contact.AddressWidget = new Class ({
     country_iso3166: { kind: 'select', newCell : true, value: '', token: obm.vars.labels.countries, label : obm.vars.labels.addressCountry }
   },
 
-  options: {container: 'addressHolder'},
+  options: {container: 'addressHolder', remove: false},
 
   newId: function() {if(!Obm.Contact.AddressWidget.addressId) Obm.Contact.AddressWidget.addressId = 0; return Obm.Contact.AddressWidget.addressId++;},
 
@@ -299,11 +299,11 @@ Obm.Contact.AddressWidget = new Class ({
 Obm.Contact.WebsiteWidget = new Class ({
   kind : 'websites',
   structure : {
-    label: { kind: 'label', value: 'HOMEPAGE', newLine : true, label: obm.vars.labels.websiteLabel.HOMEPAGE},
+    label: { kind: 'label', value: 'HOMEPAGE', newLine : true, label: obm.vars.labels.websiteLabel.URL},
     url: { kind: 'text', value: '', newCell : true, label: obm.vars.labels.websiteUrl}
   },
 
-  options: {container: 'websiteHolder'},
+  options: {container: 'websiteHolder', remove: false},
 
   newId: function() {if(!Obm.Contact.WebsiteWidget.websiteId) Obm.Contact.WebsiteWidget.websiteId = 0; return Obm.Contact.WebsiteWidget.websiteId++;},
 
@@ -314,11 +314,11 @@ Obm.Contact.IMWidget = new Class ({
 
   kind : 'ims',
   structure : {
-    protocol: { kind: 'label', value: 'JABBER', newLine : true, label: obm.vars.labels.imLabel.JABBER}, 
+    protocol: { kind: 'label', value: 'XMPP', newLine : true, label: obm.vars.labels.imLabel.XMPP}, 
     address: { kind: 'text', value: '', newCell : true, label: obm.vars.labels.imAddress}
   },
 
-  options: {container: 'imHolder'},
+  options: {container: 'imHolder', remove: false},
   
   newId: function() {if(!Obm.Contact.IMWidget.imId) Obm.Contact.IMWidget.imId = 0; return Obm.Contact.IMWidget.imId++;},
 

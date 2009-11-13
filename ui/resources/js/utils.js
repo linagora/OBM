@@ -78,7 +78,7 @@ Obm.CoordonateWidget = new Class({
   Implements: Options,
 
   kind: 'dummy',
-  options: {inject: 'inside'},
+  options: {inject: 'inside', remove: true},
   newId: function() { return 0;},
 
   setValues: function() {
@@ -108,12 +108,14 @@ Obm.CoordonateWidget = new Class({
       cell.adopt(this.makeField(field, data));
       new OverText(cell.getElements('input, textarea'));      
     }
-    line.adopt(new Element('td').adopt(
-      new Element('a').adopt(new Element('img').setProperties({'src' : obm.vars.images.del,'alt' : obm.vars.labels.remove}))
-        .addEvent('click', function() {this.table.dispose();OverText.update();}.bind(this))
-        .setStyle('cursor','pointer')
-      )
-    );
+    if(this.options.remove) {
+      line.adopt(new Element('td').adopt(
+        new Element('a').adopt(new Element('img').setProperties({'src' : obm.vars.images.del,'alt' : obm.vars.labels.remove}))
+          .addEvent('click', function() {this.table.dispose();OverText.update();}.bind(this))
+          .setStyle('cursor','pointer')
+        )
+      );
+    }
   },
 
   makeField: function(fieldName, field) {
@@ -173,12 +175,95 @@ Obm.CoordonateWidget = new Class({
   }
 });
 
+Obm.MultipleField = new Class({
+  Implements: Options,
+
+  options : {
+    min: 1,
+    max: null,
+    add: null,
+    filter: null
+  },
+
+  initialize: function(element, selector, options) {
+    this.setOptions(options);
+    this.element = $(element);
+    this.selector = selector
+    if(!$chk(this.options.add)) this.add = this.buildAddButton();
+    else this.add = this.options.add;
+    this.add.addEvent('add', this.addField.bind(this));
+    this.buildMultipleField();
+  },
+
+  buildRemoveButton: function(element) {
+    var remove = new Element('a').set('href','#').addEvent('click', function (evt) {
+      remove.getParent().dispose();
+      this.removeField(element);
+    }.bind(this)).adopt(new Element('img').set('src', obm.vars.images.del))
+    return remove; 
+  },
+
+  buildAddButton: function() {
+    var add = new Element('a').set('href','#').addEvent('click', function (evt) {
+     var clone = this.last.clone();
+     clone.getElements('input, select, textarea').set('inputValue','')
+     this.element.adopt(clone);
+     this.add.fireEvent('add'); 
+    }.bind(this)).adopt(new Element('img')
+                 .set('src', obm.vars.images.add));
+    return add; 
+  },
+
+  buildMultipleField: function() {
+    var elements = this.element.getElements(this.selector);
+    this.last = elements[elements.length - 1];
+    if(elements.length > this.options.min) {
+      elements.each(function(child, index) {
+        new Element('span').addClass('multipleFieldButtons').setStyle('float','left').injectAfter(child);
+        this.buildRemoveButton(child).injectInside(child.getNext());
+      }.bind(this))
+    } else {
+      new Element('span').addClass('multipleFieldButtons').setStyle('float','left').injectAfter(this.last); 
+    }
+    this.add.injectBottom(this.last.getNext());
+  },
+
+  removeField: function(element) {
+    element.dispose();
+    OverText.update();
+    var elements = this.element.getElements(this.selector);
+    if(elements.length == this.options.min) {
+      this.element.getElements('.multipleFieldButtons img[src='+obm.vars.images.del+']').dispose();
+    }
+    this.setLastField();
+  },
+
+  addField: function() {
+    var elements = this.element.getElements(this.selector);
+    if(elements.length == this.options.min + 1) {
+      this.buildRemoveButton(this.last).addEvent('click', this.last.dispose.bind(this.last)).injectTop(this.last.getNext());
+    }
+    new Element('span').addClass('multipleFieldButtons').setStyle('float','left').injectAfter(elements[elements.length - 1]);
+    this.setLastField();
+    this.buildRemoveButton(this.last).addEvent('click', this.last.dispose.bind(this.last)).injectTop(this.last.getNext());
+  },
+  
+  setLastField: function() {
+    var elements = this.element.getElements(this.selector);
+    this.last = elements[elements.length - 1];
+    this.add.dispose();
+    this.add.injectBottom(this.last.getNext());
+  }
+
+
+});
+
 Obm.Error = {
  
   parseStatus: function(state) {
     switch(state) {
       case 401:
-        window.location.href=window.location.href;
+        window.location.href= obm.vars.consts.obmUrl + '/';
         exit;
         break;
       default:

@@ -573,13 +573,13 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   // END - superman has all rights on entities
 
   display_debug_msg($query, $cdg_sql, 'of_right_entity_for_user()');
-  $obm_q->xquery($query);
+  $db->xquery($query);
   $ret_array = array();
 
-  while($obm_q->next_record()) {
-    $id = $obm_q->f('id');
+  while($db->next_record()) {
+    $id = $db->f('id');
     if ( ($ids_set == '') || ( (is_array($ids_set)) && (in_array($id, $ids_set)) ) ) {
-      $label = $obm_q->f('label');
+      $label = $db->f('label');
       $id_array[] = $id;
       $ret_array[$id] = $label;
     }

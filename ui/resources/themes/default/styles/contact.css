@@ -334,6 +334,9 @@ select {
 
 #informationGrid .coordinate {
   table-layout: auto;
+  width: auto;
+  float: left;
+  clear: left;
 }
 
 #informationGrid .coordinate table {
@@ -342,6 +345,9 @@ select {
   margin: 0;
   padding: 0;
   border: none;
+}
+
+#informationGrid .addresses {
 }
 
 #informationGrid fieldset.error {
@@ -396,3 +402,6 @@ table.contactPanelHeader th, .contactPanelContainer table td {
   overflow-x : hidden;
 }
 
+#Address .multipleFieldButtons {
+  margin-top: 50px;
+}
