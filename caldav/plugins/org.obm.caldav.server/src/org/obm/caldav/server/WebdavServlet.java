@@ -89,6 +89,7 @@ public class WebdavServlet extends HttpServlet {
 				handler.process(token, backend, dr, response);
 
 			} else {
+				logger.warn("no handler for command " + method);
 				super.service(request, response);
 			}
 		} catch (CalDavException e) {
@@ -153,7 +154,6 @@ public class WebdavServlet extends HttpServlet {
 	}
 
 	private IBackendFactory getBackendFactory() {
-
 		RunnableExtensionLoader<IBackendFactory> rel = new RunnableExtensionLoader<IBackendFactory>();
 		List<IBackendFactory> backs = rel
 				.loadExtensions("org.obm.caldav.server", "backend", "backend",

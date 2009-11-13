@@ -61,7 +61,7 @@ public class DavRequest {
 				try {
 					InputStream in = req.getInputStream();
 					xml = DOMUtils.parse(in);
-					DOMUtils.logDom(xml);
+					logger.info(DOMUtils.toString(xml));
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 				}

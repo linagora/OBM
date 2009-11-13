@@ -280,6 +280,12 @@ public final class DOMUtils {
 		serialise(doc, out, true);
 		System.out.println(out.toString());
 	}
+	
+	public static String toString(Document doc) throws TransformerException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		serialise(doc, out, true);
+		return out.toString();
+	}
 
 	public static Document parse(InputStream is) throws SAXException,
 			IOException, ParserConfigurationException,

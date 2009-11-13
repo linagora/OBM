@@ -89,27 +89,12 @@ public class CalendarQuery extends ReportProvider {
 			Document ret = null;
 			Map<String, EventTimeUpdate> events = new HashMap<String, EventTimeUpdate>();
 			CompFilter cf = compFilter.getCompFilters().get(0);
-//			if (CompFilter.VEVENT.equalsIgnoreCase(cf.getName())) {
 			List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdate(cf);
 			for (EventTimeUpdate event : retEvents) {
 				String href = req.getHref()
 						+ proxy.getCalendarService().getICSName(event);
 				events.put(href, event);
 			}
-
-//			} 
-//			else if (CompFilter.VTODO.equalsIgnoreCase(cf.getName())) {
-//				List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdateTodos();
-//				for (EventTimeUpdate event : retEvents) {
-//					String href = req.getHref()
-//							+ proxy.getCalendarService().getICSName(event);
-//					events.put(href, event);
-//				}
-//			} 
-//			else {
-//				logger.warn("the component filter [" + cf.getName()
-//						+ "] is not implemented");
-//			}
 			ret = new CalendarQueryResultBuilder().build(req, proxy,
 					requestPropList, events, propertiesValues);
 			
