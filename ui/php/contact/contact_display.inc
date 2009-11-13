@@ -265,7 +265,7 @@ function html_contact_get_headers() {
 function html_addressbooks_get_list() {
   $addressBooks = OBM_AddressBook::search();
   foreach($addressBooks as $id => $ad) {
-    $name = $ad->displayName;
+    $name = $ad->displayname;
     $synced = $ad->synced;
     $ico = $GLOBALS['ico_desync'];
     $l_sync = $GLOBALS['l_sync_ad'];
@@ -383,8 +383,8 @@ function dis_contact_consult2($contact) {
   $addressBooks = OBM_AddressBook::search();
   foreach($addressBooks as $id => $addressBook) {
     if($addressBook->write == 1) {
-      $copy .= '<li><a href="" onclick="obm.contact.addressbook.copyContact('.$contact->id.','.$addressBook->id.'); return false;">'.$addressBook->displayName.'</a></li>';
-      //$move .= '<li><a href="" onclick="obm.contact.addressbook.moveContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->displayName.'</a></li>';
+      $copy .= '<li><a href="" onclick="obm.contact.addressbook.copyContact('.$contact->id.','.$addressBook->id.'); return false;">'.$addressBook->displayname.'</a></li>';
+      //$move .= '<li><a href="" onclick="obm.contact.addressbook.moveContact('.$contact->id.','.$addressBook->id.')return false;">'.$addressBook->displayname.'</a></li>';
     }
     if ($addressBook->id == $contact->addressbook_id) {
       $write = $addressBook->write;
@@ -2087,7 +2087,7 @@ function dis_addressbook_right_dis_admin($addressbook) {
   $display['title'] = $name;
 
   $ad = OBM_AddressBook::get($addressbook['entity_id']);
-  $display['title'] = $ad->displayName;
+  $display['title'] = $ad->displayname;
 
   $block = of_right_dis_admin('addressbook', $addressbook['entity_id']);
   return $block;

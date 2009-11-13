@@ -3844,7 +3844,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if ($has_access_to_other_calendars = OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access') || true) { // FIXME
     $addressbooks = OBM_Addressbook::search();
     foreach($addressbooks as $id => $addressbook) {
-      $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."\">".$addressbook->displayName."</option>";
+      $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."\">".$addressbook->displayname."</option>";
     }    
     $block_user = "
       <fieldset class=\"detail infos\">
@@ -4616,7 +4616,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
     </a>";
     $addressbooks = OBM_Addressbook::search();
     foreach($addressbooks as $id => $addressbook) {
-      $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."\">".$addressbook->displayName."</option>";
+      $addressbook_options .= "<option value=\"$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."\">".$addressbook->displayname."</option>";
     }    
     $block_user = "
       <tr>
@@ -4940,7 +4940,7 @@ function dis_calendar_free_interval($current_view) {
   $addressbooks = OBM_Addressbook::search();
   foreach($addressbooks as $id => $addressbook) {
     $addressbook_options .= "
-      <option value='$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."'>".phpStringToJsString($addressbook->displayName)."</option>";
+      <option value='$path/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."'>".phpStringToJsString($addressbook->displayname)."</option>";
   }
 
   $block = "
