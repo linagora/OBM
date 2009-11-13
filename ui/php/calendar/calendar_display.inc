@@ -5742,7 +5742,7 @@ function json_tag_search($tags_q) {
  * Build html event 
  */
 function json_build_html_event($calendar, $current_view, $id) {
-  global $display;
+  global $display, $obm;
 
   $status = array('NEEDS-ACTION', 'ACCEPTED');
   $calendar_entity = $current_view->get_entities();
@@ -5762,6 +5762,10 @@ function json_build_html_event($calendar, $current_view, $id) {
       $isMultiWeek = true;
     }
   }
+
+  $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
+    OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
+  );
 
   if ($isMultiWeek) {
     $date = $current_view->get_date_range();
