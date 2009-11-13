@@ -138,6 +138,8 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
   global $l_view_week_desc, $l_view_day_desc, $l_view_month_desc;
   global $path;
 
+  // TODO: Add "Back to Calendar" button
+
   $date = $current_view->get_date();
   $p_kind = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
@@ -154,7 +156,8 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
     $search_form = dis_calendar_html_search_form($calendar);
   }
 
-  if ($action == 'index' || $action == 'waiting_events' || $action == 'insert' || $action == 'update') {
+  if ($action == 'index' || $action == 'waiting_events' || $action == 'insert' || 
+    $action == 'update' || $action == 'delete' || $action == 'reset') {
     $navbar = dis_calendar_navbar($current_view);
   }
 
@@ -1799,6 +1802,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $entity_state = $occurrence->entity_state;
   $all_day = ($event->all_day)?1:0;
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
+  $opacity = strtolower($occurrence->event->opacity);
   $eventColor = get_color_data($event->color);
 
   $ed[] = "id:$id";
@@ -5598,11 +5602,11 @@ function dis_icalendar_export($params) {
   $dis_checkbox = "
     <tr>
       <th><input type=\"checkbox\" id=\"cb_delete_event\" onClick=\"disable('cb_delete_meeting')\" name=\"cb_delete_event\" /></th>
-      <td>$l_delete_event</td>
+      <td><label for=\"cb_delete_event\">$l_delete_event</label></td>
     </tr>
     <tr>
       <th><input disabled=\"disabled\" type=\"checkbox\" id=\"cb_delete_meeting\" name=\"cb_delete_meeting\" /></th>
-      <td>$l_delete_meeting</td>
+      <td><label for=\"cb_delete_meeting\">$l_delete_meeting</label></td>
     </tr>
     ";
 
