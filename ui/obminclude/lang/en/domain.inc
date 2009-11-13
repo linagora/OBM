@@ -60,7 +60,7 @@ $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM sync';
-$l_obm_solr = 'Solr';
+$l_solr_calendar = 'Solr';
 
 $l_samba = 'Windows server';
 $l_samba_sid = 'domain SID';

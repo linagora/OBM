@@ -14,9 +14,26 @@
     <service key='obm_sync' />
     <!-- Is set if this host is monitoring by munin -->
     <service key='monitor' />
+    <!-- Is set if this host has solr server-->
+    <service key='solr' />
 
   </entity>
   <entity type='domain'>
+
+    <!-- Is set if this domain provide solr service -->
+    <service key='solr'>
+      <property key='calendar'>
+        <type>id</type>
+        <min>1</min>
+        <max>1</max>
+      </property>
+      <property key='contact'>
+        <type>id</type>
+        <min>1</min>
+        <max>1</max>
+      </property>
+    </service>
+
     <!-- Is set if this domain provide mail sevices (imap, smtp) -->
     <service key='mail'>
       <!-- Domain imap host(s) id(s), those host must have the imap service -->

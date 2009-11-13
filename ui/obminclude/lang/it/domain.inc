@@ -128,6 +128,6 @@ $l_can_delete = "Il dominio può essere eliminato.";
 $l_max_resources = "# risorse max";
 $l_mailserver = "Server di posta";
 $l_solrserver_warn = "Crea un host di questo tipo"; 
-$l_obm_solr = "Solr"; 
+$l_solr_calendar = "Solr"; 
 $l_solr_servers = "Server di indicizzazione"; 
 

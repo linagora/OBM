@@ -94,6 +94,6 @@ $l_samba_drive_error = "Driver predefinit invalid al fișierelor Home ale utiliz
 
 // lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00
 $l_solrserver_warn = "Creaţi un host de acest fel"; 
-$l_obm_solr = ""; 
+$l_solr_calendar = ""; 
 $l_solr_servers = "Server de indexare"; 
 

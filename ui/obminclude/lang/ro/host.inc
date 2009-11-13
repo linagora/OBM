@@ -237,5 +237,5 @@ $l_fqdn = "Numele complet al calculatorului";
 $l_err_host_fqdn = "Numele complet al calculatorului este incorect (numecalculator.nume.domeniu)";
 
 // lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00
-$l_obm_solr = ""; 
+$l_solr_calendar = ""; 
 
