@@ -724,7 +724,13 @@ sub getSieveVacation {
         return undef;
     }
 
-    my $vacationMsg = 'vacation :addresses [ ';
+    # does not answer vacation for mailing lists or SPAMS
+    my $vacationMsg = 'if allof (
+not header :contains "Precedence" ["bulk","list"],
+not header :contains "X-Spam-Flag" "YES"
+) {
+  vacation :addresses [ ';
+
     my $firstAddress = 1;
     for( my $i=0; $i<=$#{$boxEmails}; $i++ ) {
         if( !$firstAddress ) {
@@ -746,7 +752,8 @@ sub getSieveVacation {
         $vacationMsg .= '"'.$boxEmailsAlias->[$i].'"';
     }
 
-    $vacationMsg .= ' ] "'.$self->{'entityDesc'}->{'userobm_vacation_message'}.'";';
+    $vacationMsg .= ' ] "'.$self->{'entityDesc'}->{'userobm_vacation_message'}.'";
+}';
 
     return $vacationMsg;
 }
