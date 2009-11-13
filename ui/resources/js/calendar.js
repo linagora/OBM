@@ -774,15 +774,17 @@ Obm.CalendarManager = new Class({
       }
 
       // Delete serie events
-      $$('div.evt_'+response.eventId).each(function(e) {
-        var evt = obm.calendarManager.events.get(e.id);
-        try {
-          obm.calendarManager.unregister(evt);
-        } catch (e) {}
-        obm.calendarManager.events.erase(evt.element.id);
-        evt.element.destroy();
-        delete evt;
-      });
+      if (obm.vars.consts.calendarView == 'day') {
+        $$('div.evt_'+response.eventId).each(function(e) {
+          var evt = obm.calendarManager.events.get(e.id);
+          try {
+            obm.calendarManager.unregister(evt);
+          } catch (e) {}
+          obm.calendarManager.events.erase(evt.element.id);
+          evt.element.destroy();
+          delete evt;
+        });
+      }
 
       // Draw updated event
       response.events.each(function(evt) {
