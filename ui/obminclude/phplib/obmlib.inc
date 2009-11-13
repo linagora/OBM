@@ -40,14 +40,15 @@ class OBM_Perm extends Perm {
 
 
 class DB_OBM extends DB_Sql {
-  var $Host     = "";
-  var $Database = "";
-  var $type     = "";
-  var $User     = "";
-  var $Password = "";
-  var $Rows_nolimit = "";
+  var $Host     = '';
+  var $Database = '';
+  var $type     = '';
+  var $User     = '';
+  var $Password = '';
+  var $Rows_nolimit = '';
+  var $obm_query_exportall = '';
 
-  function DB_OBM ($query = "") {
+  function DB_OBM ($query = '') {
     global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
 
     $this->Host     = "$obmdb_host";
@@ -142,9 +143,9 @@ class OBM_User_Sql extends CT_Sql {
 class OBM_Challenge_Auth extends Auth {
 
   var $lifetime       =  86400;
-  var $magic          = "Simsalabim";  // Challenge seed
-  var $database_class = "DB_OBM";
-  var $database_table = "UserObm";
+  var $magic          = 'Simsalabim';  // Challenge seed
+  var $database_class = 'DB_OBM';
+  var $database_table = 'UserObm';
 
   function of_session_dis_login_page() {
     global $obminclude, $l_obm_title, $obm_version, $module, $path;
@@ -166,25 +167,25 @@ class OBM_Challenge_Auth extends Auth {
       }
       $params = array_merge($params,$udata);
     }
-    $login = $params["login"];
+    $login = $params['login'];
     $password = stripslashes($params['password']);
     $domain = $params['domain_id'];
     if(!$c_singleNameSpace) {
-      if(strpos($login,"@") !== false) {
-        list($login, $domain) = split("@",$login);
-        $domain_query = "domain_name";
+      if(strpos($login, '@') !== false) {
+        list($login, $domain) = split('@',$login);
+        $domain_query = 'domain_name';
       } else {
-        $domain_query = "userobm_domain_id";
+        $domain_query = 'userobm_domain_id';
       }      
       // if no domain set, set the default domain
-      if ((! isset($domain)) || ($domain == "")) {
+      if ((! isset($domain)) || ($domain == '')) {
         $domain = "$c_default_domain";
       }
       $where_domain = "AND $domain_query = '$domain'";
 
     }
     if (isset($login)) {
-      $obm["login"] = $login; // provides access for loginform.ihtml
+      $obm['login'] = $login; // provides access for loginform.ihtml
     }
 
     $user_table = $this->database_table;
@@ -199,7 +200,7 @@ class OBM_Challenge_Auth extends Auth {
         userobm_delegation,
         userobm_delegation_target
       FROM $user_table
-      LEFT JOIN Domain ON userobm_domain_id = domain_id      
+      LEFT JOIN Domain ON userobm_domain_id = domain_id
       WHERE userobm_login = '$user_login'
         AND userobm_archive = 0
         $where_domain";
@@ -264,11 +265,11 @@ class OBM_Challenge_Auth extends Auth {
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $buf = curl_exec ($ch);
-    if ( $buf === FALSE || $buf == "") {
+    if ( $buf === FALSE || $buf == '') {
       return false;
     }
     curl_close ($ch);
-    if($buf == "invalidOBMTicket") {
+    if($buf == 'invalidOBMTicket') {
       return false;
     }
     parse_str($buf,$values);
@@ -298,36 +299,36 @@ class CAS_Auth extends Auth {
 
   function is_authenticated() {
     global $ticket, $obm;
-    $ticket = $_REQUEST["ticket"];
+    $ticket = $_REQUEST['ticket'];
     if (
-      $obm["uid"] 
+      $obm['uid']
         && 
-      (($this->lifetime <= 0) || (time() < $this->auth["exp"]))
+      (($this->lifetime <= 0) || (time() < $this->auth['exp']))
     ) {
       # If more than $this->refresh minutes are passed since last check,
       # perform auth data refreshing. Refresh is only done when current
       # session is valid (registered, not expired).
       if (
-        ($this->refresh > 0) 
-         && 
-        ($this->auth["refresh"])
-         && 
-        ($this->auth["refresh"] < time())
+        ($this->refresh > 0)
+         &&
+        ($this->auth['refresh'])
+         &&
+        ($this->auth['refresh'] < time())
       ) {
         if ( $this->auth_refreshlogin() ) {
-          $this->auth["refresh"] = time() + (60 * $this->refresh);
+          $this->auth['refresh'] = time() + (60 * $this->refresh);
         } else {
           return false;
         }
       }
-      $unfreeze = global_unfreeze_user($obm["uid"]);
+      $unfreeze = global_unfreeze_user($obm['uid']);
       if ($unfreeze) {
-        return $obm["uid"] ;
+        return $obm['uid'];
       } else {
         return false;
       }
     } elseif (isset($ticket)) {
-      return "form" ;
+      return 'form';
     } else { 
       global_freeze_user($params);
       return false;
@@ -378,7 +379,7 @@ class CAS_Auth extends Auth {
       return false;
     }
   }
-   
+
   function logout($nobody = '') {
     global $lock;
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;

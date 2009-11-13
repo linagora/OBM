@@ -327,6 +327,11 @@ class DB_Sql {
     }
   }
 
+  function xquery_expand($query, $hide_error='') {
+    $query = self::xParser($query);
+    return $query;
+  }
+
   function xquery($query, $hide_error='') {
     $query = self::xParser($query);
     $this->query($query, $hide_error);

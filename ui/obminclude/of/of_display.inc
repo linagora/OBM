@@ -508,6 +508,9 @@ class OBM_DISPLAY {
     $this_name = $this->display_name;
     $sql_order_dir = $this->sql_order_dir;
     $query = $this->data_set->obm_query;
+    if ($this->data_set->obm_query_exportall != '') {
+      $query = $this->data_set->obm_query_exportall;
+    }
     $have_cb = ($this->data_cb_text != '');
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {

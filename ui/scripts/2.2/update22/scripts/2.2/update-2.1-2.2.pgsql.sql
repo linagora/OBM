@@ -889,7 +889,10 @@ UPDATE Contact SET contact_origin='obm21';
 ALTER TABLE Contact ALTER COLUMN contact_origin SET DEFAULT NOT NULL;
 
 ALTER TABLE DeletedContact ADD COLUMN deletedcontact_user_id integer;
-ALTER TABLE DeletedContact ADD COLUMN deletedcontact_origin varchar(255) NOT NULL;
+ALTER TABLE DeletedContact ADD COLUMN deletedcontact_origin varchar(255);
+UPDATE DeletedContact SET deletedcontact_origin='obm21';
+ALTER TABLE DeletedContact ALTER COLUMN deletedcontact_origin SET NOT NULL;
+
 
 CREATE TYPE userstatus AS ENUM ('INIT', 'VALID');
 ALTER TABLE UserObm ADD COLUMN userobm_status userstatus DEFAULT 'VALID';

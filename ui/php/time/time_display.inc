@@ -14,7 +14,7 @@
 // Direct fields
 // Stat entries
 $fieldnames['project_name'] = $l_project;
-$fieldnames['tasktype_label'] = $l_cat;
+$fieldnames['tasktype_label'] = $l_tt;
 $fieldnames['projecttask_label'] = $l_task;
 $fieldnames['timetask_label'] = $l_comment;
 $fieldnames['company_name'] = $l_company;
