@@ -237,9 +237,9 @@ Obm.Tip = new Class({
           this.elementEnter(this, element);
         } else {
           this.elementLeave(this, element);
-        }
+        }
         var elementId = element.id.split('_');
-        $('close_'+elementId[2]).addEvent('click', function() {
+        $('close_'+elementId[2]).addEvent('click', function() {
           this.elementLeave(this, element);
         }.bind(this));
       }.bind(this));
@@ -577,7 +577,7 @@ function overListBoxFix(overObject, forceDisplay) {
         .injectInside($(document.body));
     }
     overObject = $(overObject);
-    if(overObject.getStyle("zIndex") == 0 || overObject.getStyle("zIndex") == 'auto' ) {
+    if(overObject.getStyle("zIndex") == 0 || overObject.getStyle("zIndex") == 'auto' ) {
       overObject.setStyle("zIndex","1000");
     }
     $('listBoxHider').setStyles({

@@ -103,7 +103,7 @@ function check_contract_priority_new(form)
 {
    if (form.tf_priority_label.value != \"\"
        && form.tf_priority_code.value != \"\"
-       && form.tf_priority_color.value != \"\")
+       && form.tf_priority_color.value != \"\")
       return true;
    else
    {

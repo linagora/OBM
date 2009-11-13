@@ -156,7 +156,7 @@ Obm.CalendarManager = new Class({
     } else {
       var begin = evt.element.offsetTop.toFloat();
       var height = obm.calendarManager.defaultHeight;
-      if (evt.event.duration > obm.vars.consts.timeUnit) {
+      if (evt.event.duration > obm.vars.consts.timeUnit) {
         height = evt.event.duration/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight;
       }
       var end = begin + height;
@@ -211,7 +211,7 @@ Obm.CalendarManager = new Class({
       var day = evt.event.date.format('Y-m-d');
       var begin = evt.element.offsetTop.toFloat();
       var height = obm.calendarManager.defaultHeight;
-      if (evt.event.duration > obm.vars.consts.timeUnit) {
+      if (evt.event.duration > obm.vars.consts.timeUnit) {
         height = evt.event.duration/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight;
       }
       var end = begin + height;
@@ -1201,7 +1201,7 @@ Obm.CalendarInDayEvent = new Class({
    */
   setPosition: function() {
     this.element.style.top = (this.event.date.getHours()*3600 + this.event.date.getMinutes()*60)/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight + 'px';
-    if (this.event.duration < obm.vars.consts.timeUnit) {
+    if (this.event.duration < obm.vars.consts.timeUnit) {
       this.element.style.height = obm.calendarManager.defaultHeight+'px';
     } else {
       this.element.style.height = this.event.duration/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight+'px';
@@ -2310,7 +2310,7 @@ Obm.CalendarFreeBusy = new Class({
       }
     }.bind(this));
 
-    if (data.sel_user_id.length > 0 || data.sel_resource_id.length > 0 || data.sel_contact_id.length > 0) {
+    if (data.sel_user_id.length > 0 || data.sel_resource_id.length > 0 || data.sel_contact_id.length > 0) {
       new Request.JSON({
         url: obm.vars.consts.calendarUrl,
         secure: false,

@@ -144,7 +144,7 @@ function dis_tools_update_detail() {
             onComplete : function(response) {
               var progress = response.steps;
               var completed = response.completed;
-              if(steps == 0 || completed == 1) {
+              if(steps == 0 || completed == 1) {
                 window.location.href = 'tools_index.php';
               }
               var percent = Math.round((progress / steps) * 100);

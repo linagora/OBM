@@ -220,6 +220,11 @@
   margin-bottom: 0.5em;
 }
 
+#informationGrid legend {
+  margin:auto auto auto 40px;
+  color: #444;
+}
+
 #informationGrid .details dd {
   float: left;
   margin-bottom: 0.5em;
@@ -254,6 +259,10 @@
 }
 
 /* Form */
+
+#contactToolbar {
+  width: 100%;
+}
 
 .coordinate th{
   width: 12em;
