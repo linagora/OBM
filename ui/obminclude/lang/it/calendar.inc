@@ -293,6 +293,8 @@ $l_parent_event = "Evento principale";
 $l_warn_file_upload = "Alcuni file non sono stati scaricati."; 
 $l_delete_all_occurrences = "Cancellare la fila"; 
 $l_template_entities_loading_warning = "Alcuni elementi salvati non possono essere riprestinati"; 
+$l_delete_template = "Confermi l'eliminazione di modello?";
+
 $l_edit_template = "Modifica il modello"; 
 $l_duplicate_template = "Copia il modello"; 
 $l_template_name = "Nome modello"; 

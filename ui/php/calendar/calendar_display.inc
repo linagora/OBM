@@ -5377,7 +5377,7 @@ function dis_calendar_template_form($action, $params, $template_q, $entity_ids, 
 function dis_calendar_templates_list($templates_q) {
   global $ico_popup_close, $ico_edit, $ico_backup, $l_name, $l_duplicate_template, $l_template_name,
     $l_validate, $l_cancel, $l_copy_of, $l_no_template, $l_export_templates,
-    $l_import_template, $path;
+    $l_import_template, $path, $ico_add, $ico_delete;
   
   $block = "
     <div class=\"detail\">
@@ -5397,7 +5397,7 @@ function dis_calendar_templates_list($templates_q) {
     <p><a href=\"$path/calendar/calendar_index.php?action=export_all_templates\">$l_export_templates</a></p>
     <table>
       <thead>
-        <tr><td>$l_name</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>$l_name</td><td>$GLOBALS[l_edit]</td><td>$GLOBALS[l_export]</td><td>$GLOBALS[l_delete]</td><td>$GLOBALS[l_duplicate_template]</td></tr>
       </thead>
       <tbody style=\"text-align: left;\">
       ";
@@ -5408,19 +5408,25 @@ function dis_calendar_templates_list($templates_q) {
         <td><span class=\"editable\" rel=\"$id\">$name</span></td>
         <td>
           <a href=\"$path/calendar/calendar_index.php?action=edit_template&template_id=$id\">
-            <img src=\"$ico_edit\" />
+            <img title='$GLOBALS[l_edit]' src=\"$ico_edit\" />
           </a>
         </td>
         <td>
           <a href=\"$path/calendar/calendar_index.php?action=export_template&template_id=$id\">
-            <img src=\"$ico_backup\" />
+            <img title='$GLOBALS[l_export]' src=\"$ico_backup\" />
           </a>
         </td>
-        <td>".button_to('[delete]', "$path/calendar/calendar_index.php?action=delete_template&template_id=$id", 'delete')."</td>
         <td>
-          <form id=\"duplicateButtonForm$id\" method=\"post\" action=\"$path/calendar/calendar_index.php?action=duplicate_template&template_id=$id\" class=\"buttonTo\">
+          <form id=\"deleteButtonForm$id\" method=\"post\" action=\"$path/calendar/calendar_index.php?action=delete_template&template_id=$id\">
             <div>
-              <input type=\"submit\" class=\"duplicate\" value=\"[duplicate]\" onclick=\"displayTemplateDuplicate(this.form, '$l_copy_of $name'); return false;\" />
+              <input type=\"image\" src=\"$ico_delete\" style='border:none;' onclick=\"return confirm('$GLOBALS[l_delete_template]');\" />
+            </div>
+          </form>
+        </td>
+        <td>
+          <form id=\"duplicateButtonForm$id\" method=\"post\" action=\"$path/calendar/calendar_index.php?action=duplicate_template&template_id=$id\">
+            <div>
+              <input type=\"image\" src=\"$ico_add\" style='border:none;' onclick=\"displayTemplateDuplicate(this.form, '$l_copy_of $name'); return false;\" />
             </div>
           </form>
         </td>
@@ -5449,9 +5455,10 @@ function dis_calendar_templates_list($templates_q) {
       </div>
     </div>
     <script type=\"text/javascript\">
-      obm.initialize.chain(function () {
-        new obm.InPlaceEditor('$path/calendar/calendar_index.php?action=set_template_name');
-      });
+      // WTF ??????
+      // obm.initialize.chain(function () {
+      //   new obm.InPlaceEditor('$path/calendar/calendar_index.php?action=set_template_name');
+      // });
     </script>";
   
   return $block;

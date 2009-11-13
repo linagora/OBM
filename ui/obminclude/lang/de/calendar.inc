@@ -96,6 +96,8 @@ $l_authorize_list = "erlaubte Personnen";
 $l_create_from_template = "Erstellen von Vorlage";
 $l_delete_occurrence_message = "Löschen Sie nur dieses Ereignis oder das gesamte Serie ? ";
 $l_save_as_template = "Als Vorlage speichern";
+$l_delete_template = "Template löschen ?";
+
 $l_category_filter = "Nach Kategorie filtern";
 $l_conflict_force = "beschleunigen die Verschiebung";
 $l_view_printable = "Drucken";
