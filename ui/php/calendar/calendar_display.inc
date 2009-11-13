@@ -8119,7 +8119,7 @@ function html_calendar_template_name_popup() {
     <div>
       <form id=\"createTemplatePopupForm\" onsubmit=\"setTemplateName(this);return false;\">
         <fieldset style=\"border:none;\">
-          $l_template_name : <input type=\"text\" maxlength=\"255\" name=\"name\" />
+          $l_template_name : <input type=\"text\" maxlength=\"255\" id=\"tf_template_name\" name=\"name\" />
         </fieldset>
         <fieldset class=\"buttons\">
           <input class=\"button closeSticky\" type=\"submit\" value=\"$l_validate\" />
