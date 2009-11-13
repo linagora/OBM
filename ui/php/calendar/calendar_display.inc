@@ -2997,7 +2997,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $content = "<a href=\"$path/document/document_index.php?action=accessfile&document_id=$d_id&popup=1\">$entity[title]</a>";
         if ($event_q->f('event_owner') == $obm['uid'] || $entity['user'] == $obm['uid']) {
           $content = "
-            <a onclick=\"detachDocument('$d_id', '$event_entity_id', this);\" id='test'>
+            <a onclick=\"detachDocument('$d_id', '$event_entity_id', this);\" id='doc$d_id'>
               <img src=\"$ico_delete\" alt=\"[Delete]\" />
             </a>".$content;
         }

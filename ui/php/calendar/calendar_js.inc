@@ -573,12 +573,12 @@ function detachDocument(documentId, eventEntityId, el) {
     url: '$path/calendar/calendar_index.php',
     data: 'action=detach_document&document_id='+documentId+'&event_entity_id='+eventEntityId,
     onRequest: function() {
-      el.setProperty('style', 'display:none');
+      el.style.display = 'none';
       var spinner = new Element('img').setProperty('src','$ico_spinner');
       spinner.inject(el, 'before');
     },
     onSuccess: function(responseText, responseXML) {
-      el.getParent().destroy();
+      $(el).getParent().destroy();
     }
   });
   req.send();
