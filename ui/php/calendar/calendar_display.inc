@@ -4164,7 +4164,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
          <a href=\"javascript: remove_element('date_exception-$key','exceptionHome');\">
          <img src=\"$ico_delete\" alt=\"[Delete]\">
          </a>
-         <input type=\"hidden\" name=\"hf_date_exception[]\" value=\"".$exception->getInputDate()."\" />
+         <input type=\"hidden\" name=\"tf_date_exception[]\" value=\"".$exception->getInputDate()."\" />
          ".$exception->getInputDate()."
        </div>";
     }
