@@ -5150,7 +5150,7 @@ function dis_calendar_right_dis_admin($id='') {
         <th>$GLOBALS[l_admin_permission]</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody style='vertical-align:top;'>
     <tr>
       <td>
         <ul>
