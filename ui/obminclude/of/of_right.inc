@@ -510,7 +510,7 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   // GLOBAL - superman has all rights on entities
 
    
-  $db = new DB_OBM;
+  $obm_q = new DB_OBM;
   $ent_array = array();
   $id_array = array();
 
