@@ -158,8 +158,8 @@ function run_query_domain_insert($domain) {
       of_service_property_insert('sync','obm_sync', $entity_id, $domain['obm_sync']);
     }
     of_service_insert('solr', $entity_id);
-    of_service_property_insert('solr','calendar', $entity_id, $domain['solr_calendar']);
-    of_service_property_insert('solr','contact', $entity_id, $domain['solr_calendar']);
+    of_service_property_insert('solr','event', $entity_id, $domain['solr']);
+    of_service_property_insert('solr','contact', $entity_id, $domain['solr']);
     if ($cgp_use['service']['samba']) {
       if(is_array($samba)) {
         of_service_insert('samba', $entity_id);
@@ -414,8 +414,8 @@ function run_query_domain_update($domain_id, $domain) {
   if ($cgp_use['service']['sync']) {
     of_service_property_replace('sync','obm_sync', $entity_id, $domain['obm_sync']);
   }
-  of_service_property_replace('solr','calendar', $entity_id, $domain['solr_calendar']);
-  of_service_property_replace('solr','contact', $entity_id, $domain['solr_calendar']);
+  of_service_property_replace('solr','event', $entity_id, $domain['solr']);
+  of_service_property_replace('solr','contact', $entity_id, $domain['solr']);
   if ($cgp_use['service']['samba']) {
     if(is_array($samba)) {
       of_service_insert('samba', $entity_id);
@@ -915,7 +915,7 @@ function get_domain_solrservers($domain_id= NULL) {
     FROM Host 
     INNER JOIN HostEntity ON hostentity_host_id = host_id
     LEFT JOIN Domain ON domain_id = host_domain_id
-    LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'calendar' AND obm_sync.service_entity_id = hostentity_entity_id    
+    LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'solr' AND obm_sync.service_entity_id = hostentity_entity_id    
     WHERE 1 = 1
     $where
     $where_domain";
@@ -927,7 +927,7 @@ function get_domain_solrservers($domain_id= NULL) {
     $id = $obm_q->f('host_id');
     $m[$id]['id'] = $id;
     $m[$id]['name'] = $obm_q->f('host_name');
-    $m[$id]['solr_calendar'] = $obm_q->f('host_solr_calendar');
+    $m[$id]['solr'] = $obm_q->f('host_solr');
   }
 
   return $m;

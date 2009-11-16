@@ -237,5 +237,5 @@ $l_restrict = "restrizione";
 $l_can_delete = "L'Host può essere eliminato";
 
 // lines below have been created with OBMtranslation (0.4.1) on 2009-10-28T10:03:12+01:00
-$l_solr_calendar = "Solr"; 
+$l_solr = "Solr"; 
 

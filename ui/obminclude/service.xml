@@ -22,7 +22,7 @@
 
     <!-- Is set if this domain provide solr service -->
     <service key='solr'>
-      <property key='calendar'>
+      <property key='event'>
         <type>id</type>
         <min>1</min>
         <max>1</max>

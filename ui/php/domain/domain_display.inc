@@ -285,7 +285,6 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
   $block_s = '';
   if (is_array($solrservers)) {
     foreach ($solrservers as $s_id => $solrserver_info) {
-	    // $mailserver_info is an array of info rows about this mail server
 	    foreach ($solrserver_info as $server_info) {
 	      $name = $server_info['name'];
 	      $ip = $server_info['ip'];
@@ -439,7 +438,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
       $obm_sync[] = $syncserver_id;
     }
     foreach($solrservers as $solrserver_id => $solrserver) {
-      $solr_calendar[] = $solrserver_id;
+      $solr[] = $solrserver_id;
     }
   }
 
@@ -454,7 +453,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
   if (isset($domain['smtp_in'])) { $smtp_in = $domain['smtp_in'];}
   if (isset($domain['smtp_out'])) { $smtp_out = $domain['smtp_out'];}
   if (isset($domain['obm_sync'])) { $obm_sync = $domain['obm_sync'];}
-  if (isset($domain['solr_calendar'])) { $solr_calendar = $domain['solr_calendar'];}
+  if (isset($domain['solr'])) { $solr = $domain['solr'];}
   if (isset($domain['samba'])) { $samba = $domain['samba'];}
 
   while($properties_q->next_record()) {
@@ -733,26 +732,25 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
   }
 
   $solrservers = get_domain_solrservers($id);
-  $serversynclist = get_domain_syncservers($id);
-  if (is_array($solr_calendar)) {
-    foreach($solr_calendar as $solr_calendar_id) {
-      $solr_calendar_sel = $solr_calendar_id;
+  if (is_array($solr)) {
+    foreach($solr as $solr_id) {
+      $solr_sel = $solr_id;
     }
   }
   if (sizeof($solrservers) > 0) {
     foreach($solrservers as $host_id => $serverinfos) {
       $selected = '';
-      if(isset($solr_calendar_sel) && $solr_calendar_sel == $host_id) $selected = "selected='selected'";        
+      if(isset($solr_sel) && $solr_sel == $host_id) $selected = "selected='selected'";        
       $solr_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
     }
     $dis_solr = "<fieldset class=\"detail infos\">
-      <legend>$GLOBALS[l_solr_calendar]</legend>
+      <legend>$GLOBALS[l_solr]</legend>
         <table>
         <tr>
         <th>$GLOBALS[l_header_select_solrserver]</th>
         <td id='obm_syncServer'>
           <div class=\"multiple\">
-          <select name='sel_solr_calendar[]'>
+          <select name='sel_solr[]'>
             <option value=''>---</option>
             $solr_list
           </select> 
@@ -764,7 +762,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
   } else {
     $dis_solr = "
       <fieldset class=\"detail infos\">
-        <legend class='warning'>$GLOBALS[l_solr_calendar] : $GLOBALS[l_solrserver_warn]</legend>
+        <legend class='warning'>$GLOBALS[l_solr] : $GLOBALS[l_solrserver_warn]</legend>
       </fieldset>";
   } 
 

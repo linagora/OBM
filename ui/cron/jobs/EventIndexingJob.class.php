@@ -91,7 +91,7 @@ class EventIndexingJob extends CronJob {
     // Get domain solr server
     $domains = of_domain_get_list();
     foreach($domains as $domain_id => $domain) {
-      $solrservers = of_domain_get_domain_solrserver($domain_id);
+      $solrservers = of_domain_get_domain_solrserver($domain_id, 'event');
       foreach ($solrservers as $s_id => $solrserver_info) {
 	      foreach ($solrserver_info as $server_info) {
           $ip = $server_info['ip']; 

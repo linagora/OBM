@@ -111,13 +111,13 @@ if ($action == 'index' || $action == '') {
     } else {
       $display['msg'] .= display_err_msg($l_insert_error);
       $prop_q = run_query_domain_properties();
-      $display['detail'] = html_domain_form('','','', null, $prop_q,$params);
+      $display['detail'] = html_domain_form('','','', null, null, $prop_q,$params);
     }
     // Form data are not valid
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
     $prop_q = run_query_domain_properties();
-    $display['detail'] = html_domain_form('','','', null, $prop_q,$params);
+    $display['detail'] = html_domain_form('','','', null, null,  $prop_q,$params);
   }
 
 } elseif ($action == 'update') {
@@ -134,7 +134,7 @@ if ($action == 'index' || $action == '') {
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
     $prop_q = run_query_domain_properties($params['domain_id']);
-    $display['detail'] = html_domain_form('','','', null, $prop_q, $params);
+    $display['detail'] = html_domain_form('','','', null, null,  $prop_q, $params);
   }
 
 } elseif ($action == 'check_delete') {

@@ -3237,7 +3237,7 @@ function run_query_calendar_solr_query($pattern) {
   global $obm, $cdg_solr, $display;
 
   $events = array();
-  $solrserver = of_domain_get_domain_solrserver($obm['domain_id']);
+  $solrserver = of_domain_get_domain_solrserver($obm['domain_id'], 'event');
   foreach ($solrserver as $s_id => $solrserver_info){
     foreach ($solrserver_info as $server_info){
       $solr_ip = $server_info['ip'];

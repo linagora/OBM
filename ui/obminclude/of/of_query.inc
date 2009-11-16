@@ -513,7 +513,7 @@ function of_domain_get_domain_syncserver($domain_id = NULL) {
  * @param mixed $domain_id : domain_id
  * @return solrserver array
  **/
-function of_domain_get_domain_solrserver($domain_id = NULL) {
+function of_domain_get_domain_solrserver($domain_id = NULL, $entity = "") {
   global $cdg_sql, $obm;
 
   if (!is_null($domain_id)) {
@@ -523,7 +523,9 @@ function of_domain_get_domain_solrserver($domain_id = NULL) {
       $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
     }
   }
-  $where = "AND serviceproperty_property = 'calendar'";
+  if ($entity != "") {
+    $where = "AND serviceproperty_property = '$entity'";
+  }
 
   $query = "SELECT 
     serviceproperty_property,
