@@ -6,8 +6,8 @@
         <thead>
           <tr><th><?php echo __('Addressbook')?></th></tr>
           <tr><td class='toolbar'>
-            <input type='button' value='' id='addAddressBook' title="<?php echo __('Add addressbook')?>" onclick="obm.popup.show('addressbookForm');"/>
             <input type='button' value='' id='addContact' title="<?php echo __('Add contact')?>" onclick='obm.contact.addressbook.addContact();'/>
+            <input type='button' value='' id='addAddressBook' title="<?php echo __('Add addressbook')?>" onclick="obm.popup.show('addressbookForm');"/>
           </td></tr>
         </thead>           
       </table>

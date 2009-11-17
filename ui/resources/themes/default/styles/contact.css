@@ -128,22 +128,22 @@
 }
 
 #addAddressBook {
-  background-image: url('../images/addAddressbook.gif');
-  padding-right: 18px;
+  height:1.8em;
+  width:45px;
+  background-image: url('../images/addAddressbook.png');
   background-repeat: no-repeat;
-  background-position: right 70%;    
-  border: 1px solid black;
-  margin-left: 1em;
+  background-position: center;    
+  border: 1px solid black;  
 }
 
 
 #addContact {
-  background-image: url('../images/addContact.gif');
-  padding-right: 18px;
+  height:1.8em;
+  width:45px;
+  background-image: url('../images/addContact.png');
   background-repeat: no-repeat;
-  background-position: right 70%;    
+  background-position: center;    
   border: 1px solid black;
-  margin-left: 2em;
 }
 /* Data rows styling */
 
