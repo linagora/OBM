@@ -163,7 +163,7 @@ function html_group_search_form ($group) {
     $cal_res = "<input type=\"hidden\" name=\"restriction_calendar\" value=\"calendar\" />";
   }
   if (isset($group['iso_date'])) {
-    $iso_date = $group['iso_date'];
+    $iso_date = urlencode($group['iso_date']);
     $date_res = "<input type=\"hidden\" name=\"date\" value=\"$iso_date\" />";
   }
   if ($popup) {
