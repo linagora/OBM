@@ -1,7 +1,7 @@
 <div id='searchHolder'>
   <div id='basicSearch'>
     <form id='searchForm' onsubmit='obm.contact.addressbook.searchContact(this); return false;'>
-      <input type='text' id='searchpattern' name='searchpattern' value='' />
+      <input type='text' id='searchpattern' name='searchpattern' value='<?php echo $searchpattern ?>' />
       <input type='submit' value='<?php echo __('Search') ?>' />
       <input type='hidden' name='action' value='search' />
       <a href="#" onclick="$$('#advancedSearch','#basicSearch').toggle();"><?php echo __('Advanced search') ?></a>

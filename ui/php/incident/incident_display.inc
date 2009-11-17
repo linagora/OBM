@@ -421,7 +421,7 @@ function html_incident_consult($inc_q) {
     <td>$dis_con2</td>
   </tr><tr>
     <th>
-      <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contract_id=$con_cli2")."\"></a> 
+      <a href=\"". url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$con_cli2")."\"></a> 
       $con_label
       <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$con_id") . "\">
       <img src=\"$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;

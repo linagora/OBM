@@ -174,7 +174,7 @@ function dis_admin_ref_country_links($ref) {
       $cid = $obm_q->f('contact_id');
       $cname = $obm_q->f('contact_lastname').' '.$obm_q->f('contact_firstname');
       $dis_link_cont .= "<li><a href=\""
-      .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid")
+      .url_prepare("contact_index.php?action=consult&amp;id=$cid")
       . "\">$cname</a></li>";
     }
 
@@ -354,7 +354,7 @@ function dis_admin_ref_datasource_links($ref) {
     while ($obm_q->next_record()) {
       $cid = $obm_q->f('contact_id');
       $cname = $obm_q->f('contact_lastname').' '.$obm_q->f('contact_firstname');
-      $dis_link_cont .= "<li><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$cid"). "\">$cname</a></li>";
+      $dis_link_cont .= "<li><a href=\"".url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$cid"). "\">$cname</a></li>";
     }
 
   } else {

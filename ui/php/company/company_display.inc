@@ -103,7 +103,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == 'company_contact_number') {
     $res['name'] = $OD->data_set->f('company_contact_number');
     if (($res['name'] > 0) && $link_ok) {
-      $res['url'] = "$path/contact/contact_index.php?action=search&amp;company_id=".$OD->data_set->f('company_id')."&amp;tf_company=".urlencode(''.$OD->data_set->f('company_name'));
+      $res['url'] = "$path/contact/contact_index.php?action=search&amp;searchpattern=".urlencode('company_id:'.$OD->data_set->f('company_id'));
     }
     $res['align'] = 'center';
   }
@@ -113,7 +113,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $market = $OD->data_set->f('company_marketingmanager_id');
     $email = $OD->data_set->f('company_email');
     $ctry = $OD->data_set->f('company_country_iso3166');
-    $res['url'] = "$path/contact/contact_index.php?action=new&amp;company_id=".$OD->data_set->f('company_id')."&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email";
+    $res['url'] = "$path/contact/contact_index.php?action=updateContact&amp;company_id=".$OD->data_set->f('company_id')."&amp;market=$market";
     $res['name'] = "<img src=\"$ico_add\" title=\"Add contact\" alt=\"Add Contact\" />";
     $res['txt_name'] = ' ';
   }
@@ -468,8 +468,8 @@ function html_company_links($co_q) {
 
   // Contact
   if ($perm->check_module_rights('contact')) {
-    $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;company_id=$id&amp;tf_company=$uname");
-    $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;company_id=$id&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email");
+    $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;&amp;searchpattern=".urlencode('company_id:'.$id);
+    $url_con_new = url_prepare("$path/contact/contact_index.php?action=updateContact&amp;company_id=$id&amp;market=$market");
     $block_contact = "
 <div class=\"portlet\" id=\"companyContact\">
   <h1>$l_module_contact</h1>

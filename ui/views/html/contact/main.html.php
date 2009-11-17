@@ -1,4 +1,4 @@
-<?php include($this->__template('search')) ?>
+<?php echo $this->__template('search') ?>
 <table id='contactPanel'>
   <tr>
     <td id='addressBookGrid'>
@@ -12,7 +12,7 @@
         </thead>           
       </table>
       <div  id='addressBookContainer' class='contactPanelContainer'>
-        <?php include($this->__template('addressbooks')); ?>
+        <?php echo $this->__template($template['addressbooks'], 'addressbooks'); ?>
       </div>
       <form id='addressbookForm' class='obmPopup' onsubmit="obm.popup.hide('addressbookForm');obm.contact.addressbook.storeAddressBook(this); return false;" style='display:none'>
         <h1><? echo __('What would you like to name this group?') ?></h1>
@@ -26,7 +26,7 @@
         </fieldset>
       </form>
     </td>
-    <td id='dataGrid'>
+    <td id='dataGrid' class='<?php echo (empty($template['card'])?'expanded':'shrinked')?>'>
       <table class='contactPanelHeader'>
         <thead>
           <tr>
@@ -52,21 +52,22 @@
         </thead>
       </table>
       <div id='dataContainer' class='contactPanelContainer'>
-        <?php include($this->__template('contacts')); ?>
+        <?php echo $this->__template($template['contacts'], 'contacts'); ?>
       </div>
     </td>
     <td id='informationGrid'>
-        <?php if(isset($contact)) include($this->__template('card')); ?>
+        <?php echo $this->__template($template['card']); ?>
     </td>
   </tr>
 </table>
 <script type='text/javascript'>
   obm.initialize.chain(function () {
     obm.contact.addressbook = new Obm.Contact.AddressBook('addressbook-<?php echo $addressbooks->getMyContacts()->id ?>');
-    <?php if(isset($contact)) { ?>
+    //FIXME No js here should coded on server side;
+    <?php if(isset($template['card'])) { ?>
+      //obm.contact.addressbook.showContact();
+      //OverText.update();
     //obm.contact.addressbook.hideContact();
-    <?php } else { ?>
-    //obm.contact.addressbook.showContact();
     <?php } ?>    
   });
 </script>

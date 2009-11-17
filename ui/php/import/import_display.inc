@@ -1013,7 +1013,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
       $rd_check = ($checked) ? '' : 'checked';
       $checked = true;
       $con_id = $con['con_id'];
-      $url = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con_id");
+      $url = url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$con_id");
       $line_log .= "<br />
         <input type=\"radio\" name=\"contact_id\" value=\"$con_id\" $rd_check />
         <a target=\"New\" href=\"$url\">".$con['con_lname'] . ' '.$con['con_fname'] ."</a>";

@@ -3,7 +3,6 @@
     <?php foreach($addressbooks as $_id => $_addressbook ) { ?>
     <tr>
     <td class="<?php echo ($_id == $current['addressbook'])? 'current':'' ?>" id="addressbook-<?php echo $_id ?>" >
-      <?php /*FIXME*/?>
       <form onsubmit="obm.contact.addressbook.storeAddressBook(this);return false;">
         <ul class="dropDownMenu addressBookMenu" >
           <li>
@@ -59,14 +58,13 @@
         </div>
       </td>
     </tr>
-    <?php /*FIXME*/?>
-    <tr style="display: none;">
+    <tr style="<?php echo ('search' == $current['addressbook'])? '':'display:none;' ?>">
       <td class="<?php echo ('search' == $current['addressbook'])? 'current':'' ?>" id="addressbook-search">
         <div>
           <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-search')); return false;"><?php echo __('Search results') ?></a>
           <script type='text/javascript'>
             $('addressbook-search').store('write', 0);
-            $('addressbook-search').store('search', '');
+            $('addressbook-search').store('search', '<?php $search ?>');
           </script>                  
         </div>
       </td>

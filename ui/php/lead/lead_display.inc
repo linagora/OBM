@@ -54,7 +54,7 @@ function dis_data_lead(&$OD, $fieldname, $link_ok) {
   }
 
   elseif ($fieldname == 'lead_contact') {
-    $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
+    $res['url'] = "$path/contact/contact_index.php?action=consult&amp;id=".$OD->data_set->f('contact_id');
   }
 
   else if ($fieldname == 'lead_archive') {
@@ -377,7 +377,7 @@ function html_lead_consult($l_q) {
       <img src=\"$ico_company\" alt=\"[details]\" /></a>";
   }
   if ($contact_id > 0) {
-    $link_contact = "<a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$contact_id")."\">
+    $link_contact = "<a href=\"". url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$contact_id")."\">
       <img src=\"$ico_contact\" alt=\"[details]\" /></a>";
   }
 
@@ -603,7 +603,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
       <input type=\"text\" size=\"30\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 
   // Contact Display
-  $dis_contact = "<a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$contact_id") . "\">
+  $dis_contact = "<a href=\"". url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$contact_id") . "\">
       $contact_name
       </a><input type=\"hidden\" name=\"contact_id\" value=\"$contact_id\" />
       <input type=\"hidden\" name=\"contact_name\" value=\"$contact_name\" />

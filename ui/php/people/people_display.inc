@@ -58,7 +58,7 @@ function dis_people_data(&$OD, $fieldname, $link_ok) {
         if ($OD->data_set->f("type") == "user") {
           $res["url"] = "$path/people/people_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
         } else {
-          $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f("userobm_id");
+          $res["url"] = "$path/contact/contact_index.php?action=consult&amp;id=".$OD->data_set->f("userobm_id");
         }
       }
     }

@@ -2164,6 +2164,35 @@ function get_contact_info($con_id) {
 
 
 /**
+ * Get the company infos
+ * @param $con_id : company id
+ * @return : $c hash with company infos
+ **/
+function get_company_info($con_id) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('company');
+  $con_id = sql_parse_id($con_id, true);
+  $query = "SELECT
+    company_id,
+    company_usercreate,
+    company_name
+    FROM Company
+    WHERE company_id $con_id $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'get_company_info()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $c['id'] = $obm_q->f('company_id');
+  $c['usercreate'] = $obm_q->f('company_usercreate');
+  $c['name'] = $obm_q->f('company_name');
+
+  return $c;
+}
+
+
+/**
  * Format entities email. 
  * 
  * @param mixed $mail Brut email(s) (if not set use id and entity to retrieve

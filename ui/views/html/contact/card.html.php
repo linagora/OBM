@@ -13,7 +13,7 @@
             <input onclick="obm.contact.addressbook.updateContact(<?php echo $contact->id ?>);" type='button' value='<?php echo __('Update') ?>' title="<?php echo __('Update contact') ?>" class='updateButton' />
           </li>
           <li>
-            <input onclick='obm.contact.addressbook.deleteContact(<?php echo $contact->id ?>);' type='button' value='<?php echo __('Delete') ?>' title="<?php echo __('Delete contact') ?>" class='deleteButton' />
+            <input onclick='obm.contact.addressbook.deleteContact(<?php echo $contact->id ?>, "<?php echo self::toJs($contact->displayname) ?>");' type='button' value='<?php echo __('Delete') ?>' title="<?php echo __('Delete contact') ?>" class='deleteButton' />
           </li>
           <?php } ?> 
           <li>
@@ -50,7 +50,7 @@
         <td>
           <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>">
           <div class="head">
-            <h1><?php echo $contact->lastname.' '.$contact->mname.' '.$contact->firstname.' '.$contact->suffix ?></h1>
+            <h1><?php echo $contact->firstname.' '.$contact->mname.' '.$contact->lastname.' '.$contact->suffix ?></h1>
             <?php if(!empty($contact->aka)) { ?>
             <br><h3><?php echo __('Also known as') ?> : </h3><span><?php echo $contact->aka ?></span>
             <?php } ?>

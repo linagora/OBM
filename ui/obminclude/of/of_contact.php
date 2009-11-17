@@ -205,6 +205,7 @@ class OBM_Contact implements OBM_ISearchable {
     );
     $fields['in'] = array('contact_addressbook_id' => 'integer');
     $fields['addressbook'] = array('AddressBook.name' => 'text');
+    $fields['company_id'] = array ('contact_company_id' => 'integer');
     $fields['archive'] = array('contact_archive' => 'integer');
     $fields['newsletter'] = array('contact_newsletter' =>  'integer');
     $fields['mailok'] = array('contact_mailing_ok' => 'integer');

@@ -1339,7 +1339,7 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
       $timeupdate = '&nbsp;';
     }
     $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;publication_id=$p_id");
-    $ext_url = urlencode(url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$c_id&amp;view=publication"));
+    $ext_url = urlencode(url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$c_id&amp;view=publication"));
 
     if ($has_write_right) {
       $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;contact_id=$c_id&amp;subscription_id=$s_id&amp;popup=1&amp;ext_url=$ext_url");

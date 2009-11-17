@@ -62,7 +62,8 @@ $l_delete_ad = "Supprimer";
 $l_update_ad = "Modifier";
 $l_sync_ad = "S'abonner";
 $l_desync_ad = "Se désabonner";
-$l_confirm_delete_ad = "Voulez-vous supprimer le carnet d'adresse ";
+$l_confirm_delete_ad = "Voulez-vous supprimer le carnet d'adresse";
+$l_confirm_delete_contact = "Voulez-vous supprimer le contact";
 
 // Actions
 $l_j_check_date = "Remplissez la date avec une date valide";

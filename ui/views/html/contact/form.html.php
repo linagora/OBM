@@ -8,14 +8,14 @@
     <tr>
       <td class="toolbar">
         <ul class="dropDownMenu" id="contactToolbar">
-          <?php if($addressbooks[$contact->addressbook_id]->read) { ?>
+          <?php if($addressbooks[$contact->addressbook_id]->read && $contact->id) { ?>
           <li>
             <input onclick="obm.contact.addressbook.consultContact(<?php echo $contact->id ?>);" type='button' value='<?php echo __('Consult') ?>' title="<?php echo __('Consult contact') ?>" class='updateButton' />
           </li>
           <?php } ?> 
-          <?php if($addressbooks[$contact->addressbook_id]->write) { ?>
+          <?php if($addressbooks[$contact->addressbook_id]->write && $contact->id) { ?>
           <li>
-            <input onclick='obm.contact.addressbook.deleteContact(<?php echo $contact->id ?>);' type='button' value='<?php echo __('Delete') ?>' title="<?php echo __('Delete contact') ?>" class='deleteButton' />
+            <input onclick='obm.contact.addressbook.deleteContact(<?php echo $contact->id ?>, "<?php echo self::toJs($contact->displayname) ?>");' type='button' value='<?php echo __('Delete') ?>' title="<?php echo __('Delete contact') ?>" class='deleteButton' />
           </li>
           <?php } ?> 
           <li>
@@ -72,9 +72,9 @@
           <form id='contactForm' name='contactForm' action='#' method='post' onsubmit="obm.contact.addressbook.storeContact($(this), '$contact->id'); return false;">
             <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>">
             <fieldset class="head">
-              <input id="lastname" size="12" type="text" name="lastname" value="<?php echo $contact->lastname ?>" title="<?php echo __('Lastname') ?>" />
-              <input id="mname" size="5" class="<?php echo (empty($contact->mname)?'H':'') ?>" type="text" name="mname" value="<?php echo $contact->mname ?>" title="<?php echo __('Middle name') ?>" /> 
               <input id="firstname" size="12" type="text" name="firstname" value="<?php echo $contact->firstname ?>" title="<?php echo __('Firstname') ?>" />
+              <input id="mname" size="5" class="<?php echo (empty($contact->mname)?'H':'') ?>" type="text" name="mname" value="<?php echo $contact->mname ?>" title="<?php echo __('Middle name') ?>" /> 
+              <input id="lastname" size="12" type="text" name="lastname" value="<?php echo $contact->lastname ?>" title="<?php echo __('Lastname') ?>" />
               <input id="suffix" size="5" class="<?php echo (empty($contact->suffix)?'H':'') ?>" type="text" name="suffix" value="<?php echo $contact->suffix ?>" title="<?php echo __('Suffix') ?>" /> 
               <br />
               <script type="text/javascript">
@@ -97,128 +97,59 @@
             <p class="LC"></p>
             <fieldset id="Address" class="details ">
               <legend><?php echo __('Addresses') ?></legend>
+              <?php if(!empty($contact->address)) foreach($contact->address as $_address) { ?>
+              <?php echo self::__setaddress($_address) ?>
+              <?php } else { ?>
+              <?php echo self::__setaddress() ?>
+              <?php }?>
               <script type="text/javascript">
-                <?php if(!empty($contact->address)) foreach($contact->address as $address) { ?>
-                new Obm.Contact.AddressWidget({label: {value: '<?php echo self::toJs($contact->labelToString($address['label'], 'Address', false)) ?>', label:'<?php echo ($contact->labelToString($address['label'], 'Address')) ?>'}, street: {value: '<?php echo self::toJs($address['street']) ?>'}, zipcode: {value: '<?php echo self::toJs($address['zipcode']) ?>'}, town: {value: '<?php echo self::toJs($address['town']) ?>'}, expresspostal: {value: '<?php echo self::toJs($address['expresspostal']) ?>'}, country: {value: '<?php echo self::toJs($address['country']) ?>'}},{container:'Address'});
-                <?php } else { ?>
-                new Obm.Contact.AddressWidget({},{container:'Address'}); 
-                <?php } ?>
-              </script>
-              <ul class="dropDownMenu" id='addressAddButton'>
-                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Address') ?>' />
-                  <ul>
-                    <?php foreach($GLOBALS['l_address_labels'] as $label => $title) { ?>
-                    <li>
-                      <a href="" onclick="new Obm.Contact.AddressWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Address'}); $('addressAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
-                    </li>
-                    <?php } ?>
-                  </ul>
-                </li>
-              </ul>
-              <script type="text/javascript">
-                new Obm.DropDownMenu($('addressAddButton'));
-                new Obm.MultipleField($('Address'),'table.coordinate', {add:$('addressAddButton')})
+                new Obm.MultipleField($('Address'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
             <fieldset id="Email" class="details ">
               <legend><?php echo __('Emails') ?></legend>
+              <?php if(!empty($contact->email)) foreach($contact->email as $_email) { ?>
+              <?php echo self::__setemail($_email) ?>
+              <?php } else { ?>
+              <?php echo self::__setemail() ?>
+              <?php }?>
               <script type="text/javascript">
-                <?php if(!empty($contact->email)) foreach($contact->email as $email) { ?>
-                new Obm.Contact.EmailWidget({label: {value: '<?php echo self::toJs($contact->labelToString($email['label'], 'Email', false)) ?>', label:'<?php echo ($contact->labelToString($email['label'], 'Email')) ?>'}, address: {value: '<?php echo self::toJs($email['address']) ?>'}},{container:'Email'});
-                <?php } else { ?>
-                new Obm.Contact.EmailWidget({},{container:'Email'}); 
-                <?php } ?>
-              </script>
-              <ul class="dropDownMenu" id='emailAddButton'>
-                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Email') ?>' />
-                  <ul>
-                    <?php foreach($GLOBALS['l_email_labels'] as $label => $title) { ?>
-                    <li>
-                      <a href="" onclick=" new Obm.Contact.EmailWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Email'});$('emailAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
-                    </li>
-                    <?php } ?>
-                  </ul>
-                </li>
-              </ul>
-              <script type="text/javascript">
-                new Obm.DropDownMenu($('emailAddButton'));
-                new Obm.MultipleField($('Email'),'table.coordinate', {add:$('emailAddButton')})
+                new Obm.MultipleField($('Email'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
             <fieldset id="IM" class="details <?php echo (empty($contact->im)?'H':'') ?>">
               <legend><?php echo __('Instant messagings') ?></legend>
+              <?php if(!empty($contact->im)) foreach($contact->im as $_im) { ?>
+              <?php echo self::__setim($_im) ?>
+              <?php } else { ?>
+              <?php echo self::__setim() ?>
+              <?php }?>
               <script type="text/javascript">
-                <?php if(!empty($contact->im)) foreach($contact->im as $im) { ?>
-                new Obm.Contact.IMWidget({protocol: {value: '<?php echo self::toJs($im['protocol']) ?>', label:'<?php echo ($contact->labelToString($GLOBALS['l_im_labels'][$im['protocol']], 'IM')) ?>'}, address: {value: '<?php echo self::toJs($im['address']) ?>'}},{container:'IM'});
-                <?php } else { ?>
-                new Obm.Contact.IMWidget({},{container:'IM'}); 
-                <?php } ?>
-              </script>
-              <ul class="dropDownMenu" id='imAddButton'>
-                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Instant messaging') ?>' />
-                  <ul>
-                    <?php foreach($GLOBALS['l_im_labels'] as $label => $title) { ?>
-                    <li>
-                      <a href="" onclick="$('IM').removeClass('H'); new Obm.Contact.IMWidget({protocol: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'IM'});$('imAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
-                    </li>
-                    <?php } ?>
-                  </ul>
-                </li>
-              </ul>
-              <script type="text/javascript">
-                new Obm.DropDownMenu($('imAddButton'));
-                new Obm.MultipleField($('IM'),'table.coordinate', {add:$('imAddButton')})
+                new Obm.MultipleField($('IM'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
             <fieldset id="Phone" class="details">
               <legend><?php echo __('Phones') ?></legend>
+              <?php if(!empty($contact->phone)) foreach($contact->phone as $_phone) { ?>
+              <?php echo self::__setphone($_phone) ?>
+              <?php } else { ?>
+              <?php echo self::__setphone() ?>
+              <?php }?>
               <script type="text/javascript">
-                <?php if(!empty($contact->phone)) foreach($contact->phone as $phone) { ?>
-                new Obm.Contact.PhoneWidget({label: {value: '<?php echo self::toJs($contact->labelToString($phone['label'], 'Phone', false)) ?>', label:'<?php echo ($contact->labelToString($phone['label'], 'Phone')) ?>'}, number: {value: '<?php echo self::toJs($phone['number']) ?>'}},{container:'Phone'});
-                <?php } else { ?>
-                new Obm.Contact.PhoneWidget({},{container:'Phone'}); 
-                <?php } ?>
-              </script>
-              <ul class="dropDownMenu" id='phoneAddButton'>
-                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Phone') ?>' />
-                  <ul>
-                    <?php foreach($GLOBALS['l_phone_labels'] as $label => $title) { ?>
-                    <li>
-                      <a href="" onclick=" new Obm.Contact.PhoneWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Phone'});$('phoneAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
-                    </li>
-                    <?php } ?>
-                  </ul>
-                </li>
-              </ul>
-              <script type="text/javascript">
-                new Obm.DropDownMenu($('phoneAddButton'));
-                new Obm.MultipleField($('Phone'),'table.coordinate', {add:$('phoneAddButton')})
+                new Obm.MultipleField($('Phone'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
             <fieldset id="Website" class="details <?php echo (empty($contact->website)?'H':'') ?>">
               <legend><?php echo __('Websites') ?></legend>
+              <?php if(!empty($contact->website)) foreach($contact->website as $_website) { ?>
+              <?php echo self::__setwebsite($_website) ?>
+              <?php } else { ?>
+              <?php echo self::__setwebsite() ?>
+              <?php }?>
               <script type="text/javascript">
-                <?php if(!empty($contact->website)) foreach($contact->website as $website) { ?>
-                new Obm.Contact.WebsiteWidget({label: {value: '<?php echo self::toJs($contact->labelToString($website['label'], 'Website', false)) ?>', label:'<?php echo ($contact->labelToString($website['label'], 'Website')) ?>'}, url: {value: '<?php echo self::toJs($website['url']) ?>'}},{container:'Website'});
-                <?php } else { ?>
-                new Obm.Contact.WebsiteWidget({},{container:'Website'}); 
-                <?php } ?>
+                new Obm.MultipleField($('Website'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
-              <ul class="dropDownMenu" id='websiteAddButton'>
-                <li><img src='<?php echo $GLOBALS['ico_add'] ?>' alt='<?php echo __('Website') ?>' />
-                  <ul>
-                    <?php foreach($GLOBALS['l_website_labels'] as $label => $title) { ?>
-                    <li>
-                      <a href="" onclick="$('Website').removeClass('H'); new Obm.Contact.WebsiteWidget({label: {value: '<?php echo self::toJs($label) ?>', label:'<?php echo self::toJs($title) ?>'}},{container:'Website'});$('websiteAddButton').fireEvent('add');return false;"><?php echo $title ?></a>
-                    </li>
-                    <?php } ?>
-                  </ul>
-                </li>
-              </ul>
-              <script type="text/javascript">
-                new Obm.DropDownMenu($('websiteAddButton'));
-                new Obm.MultipleField($('Website'),'table.coordinate', {add:$('websiteAddButton')})
-              </script>
+            </fieldset>
             </fieldset>
             <fieldset id="datesLayout" class="details <?php echo (empty($contact->date) && empty($contact->birthday) && empty($contact->anniversary))? 'H':''; ?>">
               <legend><?php echo __('Dates') ?></legend>

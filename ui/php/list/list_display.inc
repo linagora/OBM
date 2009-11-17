@@ -108,7 +108,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
 
   // For contacts urls (link):
   else if ($fieldname == 'contact_lastname') {
-    $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
+    $res['url'] = "$path/contact/contact_index.php?action=consult&amp;id=".$OD->data_set->f('contact_id');
   }
 
   else if ($fieldname == 'company_name') {

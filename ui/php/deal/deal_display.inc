@@ -977,12 +977,12 @@ function html_deal_consult($deal_q, $dc='') {
       <img src=\"$ico_company\" alt=\"[details]\" /></a> $comp<br />$ad1<br/>$zip $town</td>
     </tr><tr>
       <th>$l_contact 1</th>
-      <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1") . "\">
+      <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$con1") . "\">
       <img src=\"$ico_contact\" alt=\"[details]\" /></a> $dis_con1 - $phone_con1
       </td>
     </tr><tr>
       <th>$l_contact 2</th>
-      <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2") . "\">
+      <td><a href=\"".url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$con2") . "\">
       <img src=\"$ico_contact\" alt=\"[details]\" /></a> $dis_con2 - $phone_con2
       </td>
     </tr>
@@ -1451,10 +1451,10 @@ $js_status_loop
   }
 
   if ($action == 'detailupdate') {
-    $dis_contact_2 = "<a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2")."\">
+    $dis_contact_2 = "<a href=\"".url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$con2")."\">
              <img src=\"$ico_contact\" alt=\"[details]\" />
              </a>";
-    $dis_contact_1 = "<a href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1")."\">
+    $dis_contact_1 = "<a href=\"" . url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$con1")."\">
              <img src=\"$ico_contact\" alt=\"[details]\" />
              </a>";
   }

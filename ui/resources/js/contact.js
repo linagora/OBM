@@ -88,12 +88,17 @@ Obm.Contact.AddressBook = new Class ({
 
   hideContact: function() {
     $('dataContainer').getElements('tr.current').removeClass('current');
-    $('dataGrid').getElements('td').show();
     $('informationGrid').hide(); 
-    $('dataContainer').removeClass('shrinked');
-    $('dataContainer').addClass('expanded');
-    $('dataGrid').setStyle('width', 'auto');
+    $('dataGrid').removeClass('shrinked');
+    $('dataGrid').addClass('expanded');
     this.contact = null;
+  },
+
+  showContact: function() {
+      $('informationGrid').show(); 
+      $('dataGrid').getElements('td').hide();
+      $('dataContainer').removeClass('expanded');
+      $('dataContainer').addClass('shrinked');    
   },
 
   refreshContact: function() {
@@ -101,10 +106,8 @@ Obm.Contact.AddressBook = new Class ({
       if(this.contact) {
         this.contact = $(this.contact.get('id'));
         if(this.contact) {
-          $('dataGrid').getElements('td').hide();
-          $('dataContainer').removeClass('expanded');
-          $('dataContainer').addClass('shrinked');    
-          $('dataGrid').setStyle('width', '20em');
+          $('dataGrid').removeClass('expanded');
+          $('dataGrid').addClass('shrinked');
           this.contact.addClass('current');
         } else {
           this.hideContact();
@@ -119,12 +122,10 @@ Obm.Contact.AddressBook = new Class ({
 
   consultContact: function(id) {
     if(id) {
-      $('informationGrid').show(); 
       this.dataRequest.read({ajax : 1, action : 'consult', id : id}); 
-      $('dataGrid').getElements('td').hide();
-      $('dataContainer').removeClass('expanded');
-      $('dataContainer').addClass('shrinked');    
-      $('dataGrid').setStyle('width', '20em');
+      $('informationGrid').show(); 
+      $('dataGrid').removeClass('expanded');
+      $('dataGrid').addClass('shrinked');
     } else {
       this.hideContact();
     }
@@ -133,29 +134,23 @@ Obm.Contact.AddressBook = new Class ({
   updateContact: function(id, addressbook) {
     $('informationGrid').show(); 
     this.dataRequest.read({ajax : 1, action : 'updateContact', id : id}); 
-    $('dataContainer').getElements('td').hide();
-    $('dataContainer').removeClass('expanded');
-    $('dataContainer').addClass('shrinked');
-    $('dataGrid').setStyle('width', '20em');
+    $('dataGrid').removeClass('expanded');
+    $('dataGrid').addClass('shrinked');
   },  
 
   addContact: function(id) {
     var id = this.addressbook.get('id').split('-')[1];
     $('informationGrid').show(); 
     this.dataRequest.read({ajax : 1, action : 'updateContact', addressbook: id}); 
-    $('dataContainer').getElements('td').hide();
-    $('dataContainer').removeClass('expanded');
-    $('dataContainer').addClass('shrinked');
-    $('dataGrid').setStyle('width', '20em');
+    $('dataGrid').removeClass('expanded');
+    $('dataGrid').addClass('shrinked');
   },  
 
   storeContact: function(form, id) {
     $('informationGrid').show(); 
     this.dataRequest.write(form);
-    $('dataContainer').getElements('td').hide();
-    $('dataContainer').removeClass('expanded');
-    $('dataContainer').addClass('shrinked');
-    $('dataGrid').setStyle('width', '20em');
+    $('dataGrid').removeClass('expanded');
+    $('dataGrid').addClass('shrinked');
   },    
 
   deleteContact: function(id, name) {
@@ -227,7 +222,7 @@ Obm.Contact.AddressBook = new Class ({
   },
 
   deleteAddressBook: function(id, name) {
-    if(confirm(obm.vars.labels.confirmDeleteAddressBook+'\''+name+'\' ?')){
+    if(confirm(obm.vars.labels.confirmDeleteAddressBook+' \''+name+'\' ?')){
       this.addressBookRequest.post({ajax:1, action:'deleteAddressBook', 'addressbook_id':id});
     }
   },
@@ -246,83 +241,3 @@ Obm.Contact.AddressBook = new Class ({
     this.addressBookRequest.post({ajax:1, action:'setSubscription', 'id':id});
   }
 });
-
-
-
-
-Obm.Contact.PhoneWidget = new Class ({
-  kind : 'phones',
-  structure : {
-    label: { kind: 'label', value: 'CELL_VOICE', newLine : true, label : obm.vars.labels.phoneLabel.WORK_VOICE}, 
-    number: { kind: 'text', value: '', newCell : true, label : obm.vars.labels.phoneNumber}
-  },
-
-  options: {container: 'phoneHolder', remove: false},
-  
-  newId: function() {if(!Obm.Contact.PhoneWidget.phoneId) Obm.Contact.PhoneWidget.phoneId = 0; return Obm.Contact.PhoneWidget.phoneId++;},
-
-  Extends: Obm.CoordonateWidget
-});
-
-Obm.Contact.EmailWidget = new Class ({
-  kind : 'emails',
-  structure : {
-    label: { kind: 'label', value: 'INTERNET', newLine : true, label : obm.vars.labels.emailLabel.INTERNET},
-    address: { kind: 'text', value: '', newCell : true, label : obm.vars.labels.emailAddress}
-  },
-
-  options: {container: 'emailHolder', remove: false},
-
-  newId: function() {if(!Obm.Contact.EmailWidget.emailId) Obm.Contact.EmailWidget.emailId = 0; return Obm.Contact.EmailWidget.emailId++;},
-
-  Extends: Obm.CoordonateWidget
-});
-
-Obm.Contact.AddressWidget = new Class ({
-  kind : 'addresses',
-  structure : {
-    label: { kind: 'label', value: 'WORK', newLine : true, label : obm.vars.labels.addressLabel.WORK, properties: {rowspan: 3}}, 
-    street: { kind: 'textarea', value: '', newCell : true,  rows: 3, label : obm.vars.labels.addressStreet, properties: {colspan: 2}},
-    zipcode: { kind: 'text', value: '' , newLine : true, label : obm.vars.labels.addressZipcode},
-    town: { kind: 'text', value: '',  newCell : true, label : obm.vars.labels.addressTown },
-    expresspostal: { kind: 'text', value: '', newLine : true, label : obm.vars.labels.addressExpressPostal },
-    country_iso3166: { kind: 'select', newCell : true, value: '', token: obm.vars.labels.countries, label : obm.vars.labels.addressCountry }
-  },
-
-  options: {container: 'addressHolder', remove: false},
-
-  newId: function() {if(!Obm.Contact.AddressWidget.addressId) Obm.Contact.AddressWidget.addressId = 0; return Obm.Contact.AddressWidget.addressId++;},
-
-  Extends: Obm.CoordonateWidget
-});
-
-Obm.Contact.WebsiteWidget = new Class ({
-  kind : 'websites',
-  structure : {
-    label: { kind: 'label', value: 'HOMEPAGE', newLine : true, label: obm.vars.labels.websiteLabel.URL},
-    url: { kind: 'text', value: '', newCell : true, label: obm.vars.labels.websiteUrl}
-  },
-
-  options: {container: 'websiteHolder', remove: false},
-
-  newId: function() {if(!Obm.Contact.WebsiteWidget.websiteId) Obm.Contact.WebsiteWidget.websiteId = 0; return Obm.Contact.WebsiteWidget.websiteId++;},
-
-  Extends: Obm.CoordonateWidget
-});
-
-Obm.Contact.IMWidget = new Class ({
-
-  kind : 'ims',
-  structure : {
-    protocol: { kind: 'label', value: 'XMPP', newLine : true, label: obm.vars.labels.imLabel.XMPP}, 
-    address: { kind: 'text', value: '', newCell : true, label: obm.vars.labels.imAddress}
-  },
-
-  options: {container: 'imHolder', remove: false},
-  
-  newId: function() {if(!Obm.Contact.IMWidget.imId) Obm.Contact.IMWidget.imId = 0; return Obm.Contact.IMWidget.imId++;},
-
-  Extends: Obm.CoordonateWidget
-});
-
-

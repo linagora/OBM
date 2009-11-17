@@ -151,12 +151,20 @@
   border-right: 2px solid #d2d6da;
 }
 
-#dataContainer.expanded {
+#dataGrid.shrinked {
+  width: 20em;
+}
+
+#dataGrid.expanded #dataContainer {
   width: auto;
 }
 
-#dataContainer.shrinked {
+#dataGrid.shrinked #dataContainer{
   width: 22em;
+}
+
+#dataGrid.shrinked td {
+  display: none;
 }
 
 #dataGrid th {

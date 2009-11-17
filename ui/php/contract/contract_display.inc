@@ -630,13 +630,13 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
         <td>$comp_name</td>
       </tr><tr>
         <th>$l_client_manager 1
-          <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1_id") . "\">
+          <a href=\"".url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$con1_id") . "\">
           <img src=\"$ico_contact\" alt=\"[Contact]\" /></a>
         </th>
         <td>$con1</td> 
       </tr><tr>
         <th>$l_client_manager 2
-          <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2_id") . "\">
+          <a href=\"".url_prepare("$path/contact/contact_index.php?action=consult&amp;id=$con2_id") . "\">
           <img src=\"$ico_contact\" alt=\"[Contact]\" /></a>
         </th>
         <td>$con2</td>
@@ -1076,7 +1076,7 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
   if ($action == "detailupdate") {
     if ($con1_id > 0) {
       $dis_con1 = "
-      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$con1_id)."\"><img src=\"$ico_contact\" alt=\"[contact\" /></a>";    
+      <a href=\"".url_prepare("$path/contact/contact_index.php?action=consult&amp;id=".$con1_id)."\"><img src=\"$ico_contact\" alt=\"[contact\" /></a>";    
     }
   }
 
@@ -1115,7 +1115,7 @@ function html_contract_form($action,$contract_q,$type_q,$users_c,$users_p,$comp_
   if ($action == "detailupdate") {
     if ($con2_id > 0) {
       $dis_con2 = "
-      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$con2_id)."\"><img src=\"$ico_contact\" alt=\"[contact]\" /></a>";    
+      <a href=\"".url_prepare("$path/contact/contact_index.php?action=consult&amp;id=".$con2_id)."\"><img src=\"$ico_contact\" alt=\"[contact]\" /></a>";    
     }
   }
 

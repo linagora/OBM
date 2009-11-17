@@ -182,6 +182,7 @@ Obm.MultipleField = new Class({
     min: 1,
     max: null,
     add: null,
+    overtext: false,
     filter: null
   },
 
@@ -207,6 +208,7 @@ Obm.MultipleField = new Class({
     var add = new Element('a').set('href','#').addEvent('click', function (evt) {
      var clone = this.last.clone();
      clone.getElements('input, select, textarea').set('inputValue','')
+     clone.getElements('.overTxtDiv').dispose();
      this.element.adopt(clone);
      this.add.fireEvent('add'); 
     }.bind(this)).adopt(new Element('img')
@@ -226,6 +228,11 @@ Obm.MultipleField = new Class({
       new Element('span').addClass('multipleFieldButtons').setStyle('float','left').injectAfter(this.last); 
     }
     this.add.injectBottom(this.last.getNext());
+    if(this.options.overtext) {
+      new OverText(this.element.getElements(this.options.overtext));
+    }
+    
+    OverText.update();    
   },
 
   removeField: function(element) {
@@ -245,6 +252,10 @@ Obm.MultipleField = new Class({
     }
     new Element('span').addClass('multipleFieldButtons').setStyle('float','left').injectAfter(elements[elements.length - 1]);
     this.setLastField();
+    if(this.options.overtext) {
+      new OverText(this.last.getElements(this.options.overtext));
+    }
+    OverText.update();    
     this.buildRemoveButton(this.last).addEvent('click', this.last.dispose.bind(this.last)).injectTop(this.last.getNext());
   },
   
