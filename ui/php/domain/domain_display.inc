@@ -744,7 +744,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
       $solr_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
     }
     $dis_solr = "<fieldset class=\"detail infos\">
-      <legend>$GLOBALS[l_solr]</legend>
+      <legend>$GLOBALS[l_solr_servers]</legend>
         <table>
         <tr>
         <th>$GLOBALS[l_header_select_solrserver]</th>
