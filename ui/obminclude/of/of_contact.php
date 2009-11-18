@@ -491,6 +491,7 @@ class OBM_Contact implements OBM_ISearchable {
     foreach(self::$fields as $field => $metadata) {
       $data[$field] = $contact->$field;
     }
+    $data['archive'] = 0;
     $data['phones'] = array();
     foreach($contact->phone as $phone) {
       array_push($data['phones'], array('label'=>$phone['label'][0]."_".$phone['label']['1'], 'number'=>$phone['number']));

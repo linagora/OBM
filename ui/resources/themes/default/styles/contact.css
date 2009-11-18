@@ -145,6 +145,13 @@
   background-position: center;    
   border: 1px solid black;
 }
+
+
+.error input , input.error {
+  background-color: #ff9f9f;
+  color:#636466;
+}
+
 /* Data rows styling */
 
 #dataGrid {
