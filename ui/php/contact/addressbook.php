@@ -220,10 +220,11 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public static function setSynced($addressbook) {
-    if(!$addressbook->syncable) return false;
     $id = $addressbook['id'];
     $ad = self::get($id);
     $uid = $GLOBALS['obm']['uid'];
+    $db = new DB_OBM;
+    if(!$ad->syncable) return $db->query("DELETE FROM SyncedAddressbook WHERE user_id='$uid' AND addressbook_id='$id'");
     if ($ad->synced) {
       // Remove synchronized addressbook
       $query = "DELETE FROM SyncedAddressbook WHERE user_id='$uid' AND addressbook_id='$id'";
@@ -231,7 +232,6 @@ class OBM_AddressBook implements OBM_ISearchable {
       // Add synchronized addressbook
       $query = "INSERT INTO SyncedAddressbook VALUES ($uid, $id, NOW())"; 
     }
-    $db = new DB_OBM;
     $db->query($query);
   }
 

@@ -279,15 +279,16 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $display['detail'] = dis_contact_consult($params);
   }
 } else {
-  $addressbooks = OBM_AddressBook::search();
   if ($action == 'index' || $action == '') {
   ///////////////////////////////////////////////////////////////////////////////
+    $addressbooks = OBM_AddressBook::search();
     contact_export_js_labels();
     $addressbook = $addressbooks->getMyContacts();
     $contacts = $addressbooks->searchContacts("in:$addressbook->id archive:0");
     $current['addressbook'] = $addressbook->id;
   } elseif ($action == 'consult')  {
-  ///////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+    $addressbooks = OBM_AddressBook::search();
     $contact = OBM_Contact::get($params['id']);
     $addressbook = $addressbooks[$contact->addressbook_id];
     $current['addressbook'] = $addressbook->id;
@@ -299,6 +300,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     //FIXME Erreur de droit
   } elseif ($action == 'updateContact')  {
   ///////////////////////////////////////////////////////////////////////////////
+    $addressbooks = OBM_AddressBook::search();
     if (isset($params['id'])) {
       $contact = OBM_Contact::get($params['id']);
     } else {
@@ -329,6 +331,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     //FIXME Erreur de droit
   } elseif ($action == 'storeContact') {
   ///////////////////////////////////////////////////////////////////////////////
+    $addressbooks = OBM_AddressBook::search();
     $params['contact_id'] = $params['id'];
     if($params['addressbook']) 
       $addressbook = $addressbooks[$params['addressbook']];
@@ -357,6 +360,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     //FIXME Erreur de droit
   } elseif ($action == 'copyContact') {
   ///////////////////////////////////////////////////////////////////////////////
+    $addressbooks = OBM_AddressBook::search();
     $params['contact_id'] = $params['id'];
     $contact = OBM_Contact::get($params['id']);
     $current['addressbook'] = $addressbook->id;
@@ -370,6 +374,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     //FIXME Erreur de droit
   } elseif ($action == 'deleteContact') {
   ///////////////////////////////////////////////////////////////////////////////
+    $addressbooks = OBM_AddressBook::search();
     $params['contact_id'] = $params['id'];
     $contact = OBM_Contact::get($params['id']);
     $current['addressbook'] = $addressbook->id;
@@ -388,6 +393,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     //FIXME Erreur de droit
   } elseif ($action == 'search') {
   ///////////////////////////////////////////////////////////////////////////////
+    $addressbooks = OBM_AddressBook::search();
     if($params['contactfilter']) $pattern = 'displayname:'.$params['contactfilter'];
     if($params['addressbook']) $current['addressbook'] = $params['addressbook'];
     else $current['addressbook'] = 'search';
@@ -397,6 +403,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
   } elseif ($action == 'filterContact') {
   ///////////////////////////////////////////////////////////////////////////////
+    $addressbooks = OBM_AddressBook::search();
     if($params['contactfilter']) $pattern = 'displayname:'.$params['contactfilter'];
     $contacts = $addressbooks->searchContacts($params['searchpattern'].' '.$pattern);
     $subTemplate['contacts'] = new OBM_Template('contacts');
@@ -408,21 +415,25 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     } else {
       OBM_AddressBook::create($params);
     }
+    $addressbooks = OBM_AddressBook::search();
     $subTemplate['addressbooks'] = new OBM_Template('addressbooks');
     //FIXME Erreur de droit
   } elseif ($action == 'deleteAddressBook') {
   ///////////////////////////////////////////////////////////////////////////////
     OBM_AddressBook::delete($params);
+    $addressbooks = OBM_AddressBook::search();
     $subTemplate['addressbooks'] = new OBM_Template('addressbooks');
     //FIXME Erreur de droit
   } elseif ($action == 'toggleSyncable') {
   ///////////////////////////////////////////////////////////////////////////////
     OBM_AddressBook::store($params);
+    $addressbooks = OBM_AddressBook::search();
     $subTemplate['addressbooks'] = new OBM_Template('addressbooks');
     //FIXME Erreur de droit
   } elseif ($action == 'setSubscription') {
   ///////////////////////////////////////////////////////////////////////////////
     OBM_AddressBook::setSynced($params);
+    $addressbooks = OBM_AddressBook::search();
     $subTemplate['addressbooks'] = new OBM_Template('addressbooks');
     //FIXME Erreur de droit
   } 
