@@ -220,6 +220,7 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public static function setSynced($addressbook) {
+    if(!$addressbook->syncable) return false;
     $id = $addressbook['id'];
     $ad = self::get($id);
     $uid = $GLOBALS['obm']['uid'];
