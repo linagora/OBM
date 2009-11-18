@@ -27,7 +27,7 @@ $fieldnames['homevoice'] = $l_phone_labels['HOME_VOICE'];
 $fieldnames['workvoice'] = $l_phone_labels['WORK_VOICE'];
 $fieldnames['cellvoice'] = $l_phone_labels['CELL_VOICE'];
 $fieldnames['email'] = $l_email;
-$fieldnames['archive'] = $l_archive_first;
+$fieldnames['archive'] = $l_archive;
 $fieldnames['date'] = $l_date;
 $fieldnames['company'] = $l_company;
 // Calculated fields
