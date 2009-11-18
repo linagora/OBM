@@ -3532,47 +3532,104 @@ CREATE TABLE `P_of_usergroup` (LIKE `of_usergroup`);
 -- OPush tables
 --
 
-CREATE TABLE opush_device (
-       id 		INT(8) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-       identifier 	VARCHAR(255) NOT NULL,
-       owner		INTEGER REFERENCES userobm(userobm_id) ON DELETE CASCADE,
-       type		VARCHAR(64) NOT NULL
+
+--
+-- Table structure for table `opush_device`
+--
+
+DROP TABLE IF EXISTS `opush_device`;
+CREATE TABLE `opush_device` (
+       `id`               INT(8) NOT NULL auto_increment,
+       `identifier`       VARCHAR(255) NOT NULL,
+       `owner`            INTEGER,
+       `type`             VARCHAR(64) NOT NULL,
+       PRIMARY KEY  (`id`),
+       KEY `opush_device_owner_userobm_id_fkey` (`owner`),
+       CONSTRAINT `opush_device_owner_userobm_id_fkey` FOREIGN KEY (`owner`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE opush_folder_mapping (
-       id		INT(8) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-       device_id	INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
-       collection	VARCHAR(255) NOT NULL
+
+--
+-- Table structure for table `opush_folder_mapping`
+--
+
+DROP TABLE IF EXISTS `opush_folder_mapping`;
+CREATE TABLE `opush_folder_mapping` (
+       `id`               INT(8) NOT NULL auto_increment,
+       `device_id`        INTEGER NOT NULL,
+       `collection`       VARCHAR(255) NOT NULL,
+       PRIMARY KEY  (`id`),
+       KEY `opush_folder_mapping_device_id_opush_device_id_fkey` (`device_id`),
+       CONSTRAINT `opush_folder_mapping_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+--
+-- Table structure for table `opush_sync_state`
+--
 
 -- store last sync dates
-CREATE TABLE opush_sync_state (
-	sync_key	VARCHAR(64) UNIQUE NOT NULL,
-	collection_id   INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
-	device_id	INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
-	last_sync	TIMESTAMP NOT NULL
+DROP TABLE IF EXISTS `opush_sync_state`;
+CREATE TABLE `opush_sync_state` (
+        `sync_key`        VARCHAR(64) UNIQUE NOT NULL,
+        `collection_id`   INTEGER NOT NULL,
+        `device_id`       INTEGER NOT NULL,
+        `last_sync`       TIMESTAMP NOT NULL,
+        KEY `opush_sync_state_collection_id_opush_folder_mapping_id_fkey` (`collection_id`),
+        KEY `opush_sync_state_device_id_opush_device_id_fkey` (`device_id`),
+        CONSTRAINT `opush_sync_state_collection_id_opush_folder_mapping_id_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE,
+        CONSTRAINT `opush_sync_state_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-ALTER TABLE opush_sync_state ADD CONSTRAINT 
-unique_opush_col_dev UNIQUE (collection_id, device_id);
+ALTER TABLE `opush_sync_state` ADD CONSTRAINT
+unique_opush_col_dev UNIQUE (`collection_id`, `device_id`);
 
-CREATE TABLE opush_sec_policy (
-       id				INT(8) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-       device_password_enabled		BOOLEAN DEFAULT FALSE
+
+--
+-- Table structure for table `opush_sec_policy`
+--
+
+DROP TABLE IF EXISTS `opush_sec_policy`;
+CREATE TABLE `opush_sec_policy` (
+       `id`                               INT(8) NOT NULL auto_increment,
+       `device_password_enabled`          BOOLEAN DEFAULT FALSE,
+        PRIMARY KEY  (`id`)
        -- add other fields fields...
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+--
+-- Table structure for table `opush_sync_perms`
+--
+
 -- A row exists if a user is allowed to Sync.
-CREATE TABLE opush_sync_perms (
-       owner		INTEGER REFERENCES userobm(userobm_id) ON DELETE CASCADE,
-       device_id	INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
+DROP TABLE IF EXISTS `opush_sync_perms`;
+CREATE TABLE `opush_sync_perms` (
+       `owner`            INTEGER,
+       `device_id`        INTEGER,
        -- add not null later
-       policy		INTEGER REFERENCES opush_sec_policy(id) ON DELETE SET NULL
+       `policy`           INTEGER,
+       KEY `opush_sync_perms_owner_userobm_id_fkey` (`owner`),
+       KEY `opush_sync_perms_device_id_opush_device_id_fkey` (`device_id`),
+       KEY `opush_sync_perms_policy_opush_sec_policy_id_fkey` (`policy`),
+       CONSTRAINT `opush_sync_perms_owner_userobm_id_fkey` FOREIGN KEY (`owner`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE,
+       CONSTRAINT `opush_sync_perms_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE,
+       CONSTRAINT `opush_sync_perms_policy_opush_sec_policy_id_fkey` FOREIGN KEY (`policy`) REFERENCES `opush_sec_policy` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+--
+-- Table structure for table `opush_sync_mail`
+--
+
+DROP TABLE IF EXISTS `opush_sync_mail`;
 CREATE TABLE opush_sync_mail (
-        collection_id   INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
-        device_id       INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
-        mail_uid        INTEGER NOT NULL
+        `collection_id`   INTEGER NOT NULL,
+        `device_id`       INTEGER NOT NULL,
+        `mail_uid`        INTEGER NOT NULL,
+        KEY `opush_sync_mail_collection_id_opush_folder_mapping_id_fkey` (`collection_id`),
+        KEY `opush_sync_mail_device_id_opush_device_id_fkey` (`device_id`),
+        CONSTRAINT `opush_sync_mail_collection_id_opush_folder_mapping_id_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE,
+        CONSTRAINT `opush_sync_mail_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------------------------------------------------------
