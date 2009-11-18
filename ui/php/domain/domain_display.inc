@@ -762,7 +762,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
   } else {
     $dis_solr = "
       <fieldset class=\"detail infos\">
-        <legend class='warning'>$GLOBALS[l_solr] : $GLOBALS[l_solrserver_warn]</legend>
+        <legend class='warning'>$GLOBALS[l_solr_servers] : $GLOBALS[l_solrserver_warn]</legend>
       </fieldset>";
   } 
 
