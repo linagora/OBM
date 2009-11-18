@@ -489,7 +489,7 @@ class OBM_Contact implements OBM_ISearchable {
 
   public function copy($contact, $addressbook) {
     foreach(self::$fields as $field => $metadata) {
-      $data[$field] = $contact->$field;
+      $data[$field] = addslashes($contact->$field);
     }
     $data['archive'] = 0;
     $data['phones'] = array();

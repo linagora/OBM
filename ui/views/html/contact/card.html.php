@@ -22,7 +22,7 @@
               <li><?php echo __('Copy') ?>
                 <ul>
                   <?php foreach($addressbooks as $_id => $_addressbook) { ?>
-                  <?php if($_id != $contact->addressbook_id) { ?>
+                  <?php if($_id != $contact->addressbook_id && $_addressbook->write == 1) { ?>
                   <li>
                     <a onclick="obm.contact.addressbook.copyContact(<?php echo $contact->id ?>,<?php echo $_id ?>); return false;" href=""><?php echo $_addressbook->displayname ?></a>
                   </li>

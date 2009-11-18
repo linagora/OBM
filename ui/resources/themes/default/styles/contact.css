@@ -217,7 +217,7 @@
 #informationGrid .details {
   border: 2px solid #ddd;
   min-width : 325px;
-  width:80%;
+  width:90%;
   margin: 12px 0 0 20px;
   background-color: #fafafa;
   -moz-border-radius: 5px;
@@ -276,11 +276,16 @@
 /* Form */
 
 #contactToolbar {
-  width: 100%;
+  width: 350px;
 }
 
 .coordinate th{
   width: 12em;
+}
+
+
+.addresses th{
+  width: 11em;
 }
 
 .addresses textarea, .addresses select {
