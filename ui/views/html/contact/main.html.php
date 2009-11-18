@@ -15,7 +15,7 @@
         <?php echo $this->__template($template['addressbooks'], 'addressbooks'); ?>
       </div>
       <form id='addressbookForm' class='obmPopup' onsubmit="obm.popup.hide('addressbookForm');obm.contact.addressbook.storeAddressBook(this); return false;" style='display:none'>
-        <h1><? echo __('What would you like to name this group?') ?></h1>
+        <h1><? echo __('What would you like to name this addressbook ?') ?></h1>
         <fieldset>
           <input type='text' name='name' value='' />
         </fieldset>

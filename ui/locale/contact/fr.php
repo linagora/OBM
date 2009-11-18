@@ -57,5 +57,5 @@ return array(
   'Synchronize' => 'Synchroniser',
   'Synchronized' => 'Synchronisé',
   'Update contact' => 'Mettre à jour le contact',
-
+  'What would you like to name this addressbook ?' => 'Comment voulez-vous nommer ce carnet d\'addresse ?',
 );
