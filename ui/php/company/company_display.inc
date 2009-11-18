@@ -468,7 +468,7 @@ function html_company_links($co_q) {
 
   // Contact
   if ($perm->check_module_rights('contact')) {
-    $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;&amp;searchpattern=".urlencode('company_id:'.$id);
+    $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;&amp;searchpattern=".urlencode('company_id:'.$id));
     $url_con_new = url_prepare("$path/contact/contact_index.php?action=updateContact&amp;company_id=$id&amp;market=$market");
     $block_contact = "
 <div class=\"portlet\" id=\"companyContact\">
