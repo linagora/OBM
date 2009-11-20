@@ -296,8 +296,13 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if ($addressbook && $addressbook->read) {
       $subTemplate['card'] = new OBM_Template('card');
       update_last_visit('contact', $params['id'], $action);
+    } else {
+      header('HTTP', true, 403);
+      //FIXME : Not compatible with the HTML/Ajax implemetation
+      OBM_Error::getInstance()->addError('rights', __('Permission denied'));
+      echo OBM_Error::getInstance()->toJson();
+      exit();
     }
-    //FIXME Erreur de droit
   } elseif ($action == 'updateContact')  {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
@@ -327,8 +332,13 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       $subTemplate['card']->set('functions', run_query_contact_get_functions());
       $subTemplate['card']->set('datasources', run_query_contact_get_datasources());
       $subTemplate['card']->set('markets', run_query_contact_get_markets($contact->market_id));
+    } else {
+      header('HTTP', true, 403);
+      //FIXME : Not compatible with the HTML/Ajax implemetation
+      OBM_Error::getInstance()->addError('rights', __('Permission denied'));
+      echo OBM_Error::getInstance()->toJson();
+      exit();
     }
-    //FIXME Erreur de droit
   } elseif ($action == 'storeContact') {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
@@ -356,8 +366,13 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
         echo OBM_Error::getInstance()->toJson();
         exit();
       }
+    } else {
+      header('HTTP', true, 403);
+      //FIXME : Not compatible with the HTML/Ajax implemetation
+      OBM_Error::getInstance()->addError('rights', __('Permission denied'));
+      echo OBM_Error::getInstance()->toJson();
+      exit();
     }
-    //FIXME Erreur de droit
   } elseif ($action == 'copyContact') {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
@@ -370,8 +385,13 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if ($source->read && $destination && $destination->write) {
       OBM_Contact::copy($contact, $destination);
       $subTemplate['card'] = new OBM_Template('card');
+    } else {
+      header('HTTP', true, 403);
+      //FIXME : Not compatible with the HTML/Ajax implemetation
+      OBM_Error::getInstance()->addError('rights', __('Permission denied'));
+      echo OBM_Error::getInstance()->toJson();
+      exit();
     } 
-    //FIXME Erreur de droit
   } elseif ($action == 'deleteContact') {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
@@ -389,8 +409,13 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       $contacts = $addressbooks->searchContacts($params['searchpattern']);
       $subTemplate['contacts'] = new OBM_Template('contacts');
       $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
+    } else {
+      header('HTTP', true, 403);
+      //FIXME : Not compatible with the HTML/Ajax implemetation
+      OBM_Error::getInstance()->addError('rights', __('Permission denied'));
+      echo OBM_Error::getInstance()->toJson();
+      exit();
     }
-    //FIXME Erreur de droit
   } elseif ($action == 'search') {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();

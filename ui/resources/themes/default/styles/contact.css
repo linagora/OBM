@@ -227,12 +227,15 @@
 }
 
 #informationGrid .details dt, #informationGrid legend {
-  float:left;
-  clear: left;
-  color: #888;
-  display: inline;
   font-weight: bold;
   margin-bottom: 0.5em;
+}
+
+#informationGrid .details dt {
+  float:left;
+  clear: left;
+  margin-right: 1em;
+  color: #888;
 }
 
 #informationGrid legend {
@@ -241,7 +244,6 @@
 }
 
 #informationGrid .details dd {
-  float: left;
   margin-bottom: 0.5em;
   margin-left: 1em;
 }
@@ -276,7 +278,7 @@
 /* Form */
 
 #contactToolbar {
-  width: 350px;
+  width: 400px;
 }
 
 .coordinate th{
@@ -335,7 +337,7 @@ select {
 
 #informationGrid span.formField {
   float: left;
-  clear: left;
+  clear: both;
   padding-top: 2px;
 }
 

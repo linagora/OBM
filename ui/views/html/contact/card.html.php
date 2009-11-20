@@ -65,7 +65,7 @@
           <?php if(!empty($contact->address)) { ?>
           <dl id="addressLayout" class="details ">
             <?php foreach($contact->address as $address) { ?>
-            <dt><?php echo $contact->labelToString($address['label'], 'ADDRESS') ?> : </dt><dd><?php echo self::__getaddress($address) ?></dd>
+            <dt><?php echo $contact->labelToString($address['label'], 'ADDRESS') ?> : </dt> <dd><?php echo self::__getaddress($address) ?></dd>
             <?php } ?>
           </dl>
           <?php } ?>

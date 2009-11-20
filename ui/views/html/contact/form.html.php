@@ -34,10 +34,10 @@
               <li><a href="" onclick="$('title').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Title') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->im)) { ?>
-              <li><a  href="" onclick="$('IM').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Instant messaging') ?></a></li>
+              <li><a  href="" onclick="$('IMLayout').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Instant messaging') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->website)) { ?>
-              <li><a  href="" onclick="$('Website').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Website') ?></a></li>
+              <li><a  href="" onclick="$('WebsiteLayout').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Website') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->birthday) && empty($contact->anniversary) && empty($contact->date)) { ?>
               <li><a href="" onclick="$('dates').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Dates') ?></a></li>
@@ -69,7 +69,7 @@
     <tbody>
       <tr>
         <td>
-          <form id='contactForm' name='contactForm' action='#' method='post' onsubmit="obm.contact.addressbook.storeContact($(this), '$contact->id'); return false;">
+          <form id='contactForm' name='contactForm' action='#' method='post' onsubmit="obm.contact.addressbook.storeContact($(this), '<?php echo $contact->id?>'); return false;">
             <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>">
             <fieldset class="head">
               <input id="firstname" size="12" type="text" name="firstname" value="<?php echo $contact->firstname ?>" title="<?php echo __('Firstname') ?>" />
@@ -95,7 +95,7 @@
               </span>
             </fieldset>
             <p class="LC"></p>
-            <fieldset id="Address" class="details ">
+            <fieldset id="AddressLayout" class="details ">
               <legend><?php echo __('Addresses') ?></legend>
               <?php if(!empty($contact->address)) foreach($contact->address as $_address) { ?>
               <?php echo self::__setaddress($_address) ?>
@@ -103,10 +103,10 @@
               <?php echo self::__setaddress() ?>
               <?php }?>
               <script type="text/javascript">
-                new Obm.MultipleField($('Address'),'table.coordinate', {overtext: 'input, textarea'});
+                new Obm.MultipleField($('AddressLayout'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
-            <fieldset id="Email" class="details ">
+            <fieldset id="EmailLayout" class="details ">
               <legend><?php echo __('Emails') ?></legend>
               <?php if(!empty($contact->email)) foreach($contact->email as $_email) { ?>
               <?php echo self::__setemail($_email) ?>
@@ -114,10 +114,10 @@
               <?php echo self::__setemail() ?>
               <?php }?>
               <script type="text/javascript">
-                new Obm.MultipleField($('Email'),'table.coordinate', {overtext: 'input, textarea'});
+                new Obm.MultipleField($('EmailLayout'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
-            <fieldset id="IM" class="details <?php echo (empty($contact->im)?'H':'') ?>">
+            <fieldset id="IMLayout" class="details <?php echo (empty($contact->im)?'':'') ?>">
               <legend><?php echo __('Instant messagings') ?></legend>
               <?php if(!empty($contact->im)) foreach($contact->im as $_im) { ?>
               <?php echo self::__setim($_im) ?>
@@ -125,10 +125,10 @@
               <?php echo self::__setim() ?>
               <?php }?>
               <script type="text/javascript">
-                new Obm.MultipleField($('IM'),'table.coordinate', {overtext: 'input, textarea'});
+                new Obm.MultipleField($('IMLayout'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
-            <fieldset id="Phone" class="details">
+            <fieldset id="PhoneLayout" class="details">
               <legend><?php echo __('Phones') ?></legend>
               <?php if(!empty($contact->phone)) foreach($contact->phone as $_phone) { ?>
               <?php echo self::__setphone($_phone) ?>
@@ -136,10 +136,10 @@
               <?php echo self::__setphone() ?>
               <?php }?>
               <script type="text/javascript">
-                new Obm.MultipleField($('Phone'),'table.coordinate', {overtext: 'input, textarea'});
+                new Obm.MultipleField($('PhoneLayout'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
-            <fieldset id="Website" class="details <?php echo (empty($contact->website)?'H':'') ?>">
+            <fieldset id="WebsiteLayout" class="details <?php echo (empty($contact->website)?'':'') ?>">
               <legend><?php echo __('Websites') ?></legend>
               <?php if(!empty($contact->website)) foreach($contact->website as $_website) { ?>
               <?php echo self::__setwebsite($_website) ?>
@@ -147,7 +147,7 @@
               <?php echo self::__setwebsite() ?>
               <?php }?>
               <script type="text/javascript">
-                new Obm.MultipleField($('Website'),'table.coordinate', {overtext: 'input, textarea'});
+                new Obm.MultipleField($('WebsiteLayout'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
             </fieldset>

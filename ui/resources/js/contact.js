@@ -51,11 +51,7 @@ Obm.Contact.AddressBook = new Class ({
       evalScripts : true,
       update: $('informationGrid'),
       onFailure: function (response) {
-        Obm.Error.parseStatus(this.dataRequest.status);
-        var errors = JSON.decode(response.responseText, false);
-        errors.error = new Hash(errors.error);
-        errors.warning = new Hash(errors.warning);
-        Obm.Error.formUpdate(errors, this.dataRequest);
+        Obm.Error.parseStatus(this);
       }.bind(this),
       onComplete: $('spinner').hide.bind($('spinner')),
       onRequest: $('spinner').show.bind($('spinner')) 

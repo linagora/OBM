@@ -206,11 +206,16 @@ Obm.MultipleField = new Class({
 
   buildAddButton: function() {
     var add = new Element('a').set('href','#').addEvent('click', function (evt) {
-     var clone = this.last.clone();
-     clone.getElements('input, select, textarea').set('inputValue','')
-     clone.getElements('.overTxtDiv').dispose();
-     this.element.adopt(clone);
-     this.add.fireEvent('add'); 
+      var expr = /\[([0-9+])\]/;
+      var clone = this.last.clone();
+      clone.getElements('input, select, textarea').each(function (element) {
+        element.get('name').match(expr);
+        element.set('name', element.get('name').replace(expr, '[' + (RegExp.$1.toInt() + 1)  + ']'));
+        element.set('inputValue','');
+      });
+      clone.getElements('.overTxtDiv').dispose();
+      this.element.adopt(clone);
+      this.add.fireEvent('add'); 
     }.bind(this)).adopt(new Element('img')
                  .set('src', obm.vars.images.add));
     return add; 
@@ -218,13 +223,15 @@ Obm.MultipleField = new Class({
 
   buildMultipleField: function() {
     var elements = this.element.getElements(this.selector);
-    this.last = elements[elements.length - 1];
+    this.last = elements.getLast()
     if(elements.length > this.options.min) {
       elements.each(function(child, index) {
+        new Element('span').addClass('LC').injectAfter(child);
         new Element('span').addClass('multipleFieldButtons').setStyle('float','left').injectAfter(child);
         this.buildRemoveButton(child).injectInside(child.getNext());
       }.bind(this))
     } else {
+      new Element('span').addClass('LC').injectAfter(this.last);
       new Element('span').addClass('multipleFieldButtons').setStyle('float','left').injectAfter(this.last); 
     }
     this.add.injectBottom(this.last.getNext());
@@ -250,7 +257,8 @@ Obm.MultipleField = new Class({
     if(elements.length == this.options.min + 1) {
       this.buildRemoveButton(this.last).addEvent('click', this.last.dispose.bind(this.last)).injectTop(this.last.getNext());
     }
-    new Element('span').addClass('multipleFieldButtons').setStyle('float','left').injectAfter(elements[elements.length - 1]);
+    new Element('span').addClass('LC').injectAfter(elements.getLast());
+    new Element('span').addClass('multipleFieldButtons').setStyle('float','left').injectAfter(elements.getLast());
     this.setLastField();
     if(this.options.overtext) {
       new OverText(this.last.getElements(this.options.overtext));
@@ -261,7 +269,7 @@ Obm.MultipleField = new Class({
   
   setLastField: function() {
     var elements = this.element.getElements(this.selector);
-    this.last = elements[elements.length - 1];
+    this.last = elements.getLast();
     this.add.dispose();
     this.add.injectBottom(this.last.getNext());
   }
@@ -271,21 +279,36 @@ Obm.MultipleField = new Class({
 
 Obm.Error = {
  
-  parseStatus: function(state) {
-    switch(state) {
+  parseStatus: function(caller) {
+    switch(caller.status) {
+      case 400:
+        var errors = JSON.decode(caller.response.responseText, false);
+        errors.error = new Hash(errors.error);
+        errors.warning = new Hash(errors.warning);
+        Obm.Error.contentMessage(errors, caller);      
+        break;
       case 401:
         window.location.href= obm.vars.consts.obmUrl + '/';
         exit;
+        break;
+      case 403:
+        var errors = JSON.decode(caller.response.responseText, false);
+        Obm.Error.globalMessage(errors);
         break;
       default:
         break;
     }
   },
 
-  formUpdate: function(errors, caller)  {
+  globalMessage: function(errors, caller) {
+    errors.error.each(function (msg) {
+      showErrorMessage(msg);
+    })
+  },
+  
+  contentMessage: function(errors, caller)  {
     errors.error.each(function( msg, field) {
       if($(field)) {
-        var field = $(field);
         var title = field.get('title');
         field.addClass('error');
         field.set('title', msg);

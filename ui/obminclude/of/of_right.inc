@@ -510,7 +510,7 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   // GLOBAL - superman has all rights on entities
 
    
-  $obm_q = new DB_OBM;
+  $db = new DB_OBM;
   $ent_array = array();
   $id_array = array();
 
@@ -523,7 +523,13 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   //  }
   //}
   //return OBM_Acl::getAllowedEntities($user_id, $entity, 'admin');
-  if (OBM_Acl::isSpecialEntity($entityu)) {
+  $multidomain = sql_multidomain(strtolower($table_entity));
+  if ($entity=='addressbook') {
+    $table_entity = 'AddressBook';
+    $e_id = "e.id";
+    $e_label = "e.name";
+    $multidomain = ' AND domain_id = '.$GLOBALS['obm']['domain_id'];
+  } elseif (OBM_Acl::isSpecialEntity($entityu)) {
     $table_entity = 'UserObm';
     $e_id = 'e.userobm_id';
     $ctt[0]['type'] = 'field';
@@ -534,17 +540,6 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
     $ctt[2]['value'] = 'userobm_firstname';
     $e_label = sql_string_concat($db_type, $ctt);
     $u = get_user_info($user_id);
-  } elseif ($entity=='contact') {
-    $table_entity = 'Contact';
-    $e_id = "e.contact_id";
-    $ctt[0]['type'] = 'field';
-    $ctt[0]['value'] = 'contact_lastname';
-    $ctt[1]['type'] = 'string';
-    $ctt[1]['value'] = ' ';
-    $ctt[2]['type'] = 'field';
-    $ctt[2]['value'] = 'contact_firstname';
-    $e_label = sql_string_concat($db_type, $ctt);
-    $where = "AND contact_privacy = 1";
   } else {
     switch($entity) {
     case 'resource':
@@ -569,7 +564,6 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
 
   $multidomain = sql_multidomain(strtolower($table_entity));
   $query = "SELECT $e_id AS id, $e_label AS label, '$entity' as entityright_entity FROM $table_entity AS e WHERE 1=1 $where $where_filter_entity $multidomain $sqllimit";
-  
   // END - superman has all rights on entities
 
   display_debug_msg($query, $cdg_sql, 'of_right_entity_for_user()');

@@ -40,7 +40,9 @@ class OBM_AddressBook implements OBM_ISearchable {
     $this->access = $access;
     $this->read = $read;
     $this->write = $write;
-    $this->admin = $admin;
+    if($GLOBALS['obm'])
+    if((Perm::get_module_rights($entityType) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin']) $this->admin = 1;
+    else $this->admin = $admin;
     $this->isDefault = $is_default;
     $this->owner = $owner;
     $this->syncable = $syncable;
@@ -142,8 +144,15 @@ class OBM_AddressBook implements OBM_ISearchable {
       LEFT JOIN SyncedAddressbook ON SyncedAddressbook.addressbook_id = AddressBook.id AND SyncedAddressbook.user_id = '.$GLOBALS['obm']['uid'].'
       WHERE 1=1 '.$query.' ORDER BY AddressBook.name');
     while($db->next_record()) {
-      $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
-                                                        $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));
+      if($addressBooks[$db->f('id')]) {
+        if($db->f('entityright_access') == 1) $addressBooks[$db->f('id')]->access = 1;
+        if($db->f('entityright_read') == 1) $addressBooks[$db->f('id')]->read = 1;
+        if($db->f('entityright_write') == 1) $addressBooks[$db->f('id')]->write = 1;
+        if($db->f('entityright_admin') == 1) $addressBooks[$db->f('id')]->admin = 1;
+      } else {
+        $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), $db->f('name'), $db->f('is_default'), $db->f('owner'), $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
+                                                          $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));
+      }
     }    
 
     return new OBM_AddressBookArray($addressBooks);

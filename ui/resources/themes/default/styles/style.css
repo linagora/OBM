@@ -1578,7 +1578,7 @@ form.button-to input {
 }
 
 #searchHolder {
-  padding: 0 1em;
+  padding: 0.5em 1em 0 0;
 }
 
 #basicSearch a {
