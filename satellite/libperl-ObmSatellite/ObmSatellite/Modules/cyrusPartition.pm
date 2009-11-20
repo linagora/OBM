@@ -213,6 +213,7 @@ sub _updateImapdConf {
     for( my $i=0; $i<=$#{$domainList}; $i++ ) {
         my $domainPartitionName = $domainList->[$i];
         $domainPartitionName =~ s/\./_/g;
+        $domainPartitionName =~ s/-/_/g;
 
         if( !exists($currentPartitions{$domainPartitionName}) ) {
             $currentPartitions{$domainPartitionName} = $self->{'imapdPartitionRoot'}.'/'.$domainPartitionName;
