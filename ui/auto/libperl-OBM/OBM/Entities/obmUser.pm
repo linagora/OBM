@@ -163,6 +163,20 @@ sub _init {
         $userDesc->{'userobm_full_address'} .= $userDesc->{'userobm_address3'};
     }
 
+    # User registered address
+    my @registeredAddress;
+    push( @registeredAddress, $userDesc->{'userobm_address1'} ) if $userDesc->{'userobm_address1'};
+    push( @registeredAddress, $userDesc->{'userobm_address2'} ) if $userDesc->{'userobm_address2'};
+    push( @registeredAddress, $userDesc->{'userobm_address3'} ) if $userDesc->{'userobm_address3'};
+    my $town = $userDesc->{'userobm_town'};
+    if( $town && $userDesc->{'userobm_zipcode'} ) {
+        $town .= ', ';
+    }
+    $town .= $userDesc->{'userobm_zipcode'} if $userDesc->{'userobm_zipcode'};
+    push( @registeredAddress, $town ) if $town;
+    push( @registeredAddress, $userDesc->{'userobm_expresspostal'} ) if $userDesc->{'userobm_expresspostal'};
+    $userDesc->{'userobm_registered_address'} = join( '$', @registeredAddress ) if $#registeredAddress >= 0;
+
     # User phone
     my %phoneList;
     if( $userDesc->{'userobm_phone'} ) {

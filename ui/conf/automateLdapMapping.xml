@@ -133,6 +133,10 @@
             <desc name='userobm_full_address'/>
         </map>
         <map>
+            <ldap name='registeredAddress'/>
+            <desc name='userobm_registered_address'/>
+        </map>
+        <map>
             <ldap name='postalCode'/>
             <desc name='userobm_zipcode'/>
         </map>
