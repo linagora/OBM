@@ -41,6 +41,13 @@
     </copy>
     <mkdir dir="${pack}/var/solr/event"/>
 
+    <!-- contact core -->
+    <mkdir dir="${pack}/etc/solr/conf/contact/"/>
+    <copy todir="${pack}/etc/solr/conf/contact/">
+      <fileset dir="conf/contact" includes="*.xml"/>
+    </copy>
+    <mkdir dir="${pack}/var/solr/contact"/>
+
     <copy todir="${pack}/var/solr" file="solr.xml"/>
 
 
