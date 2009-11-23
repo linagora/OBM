@@ -208,6 +208,9 @@ Obm.MultipleField = new Class({
     var add = new Element('a').set('href','#').addEvent('click', function (evt) {
       var expr = /\[([0-9+])\]/;
       var clone = this.last.clone();
+      clone.removeClass('error');
+      this.last.get('id').match(expr);
+      clone.set('id', this.last.get('id').replace(expr, '[' + (RegExp.$1.toInt() + 1)  + ']'));
       clone.getElements('input, select, textarea').each(function (element) {
         element.get('name').match(expr);
         element.set('name', element.get('name').replace(expr, '[' + (RegExp.$1.toInt() + 1)  + ']'));
@@ -282,7 +285,7 @@ Obm.Error = {
   parseStatus: function(caller) {
     switch(caller.status) {
       case 400:
-        var errors = JSON.decode(caller.response.responseText, false);
+        var errors = JSON.decode(caller.xhr.responseText, false);
         errors.error = new Hash(errors.error);
         errors.warning = new Hash(errors.warning);
         Obm.Error.contentMessage(errors, caller);      
@@ -292,7 +295,7 @@ Obm.Error = {
         exit;
         break;
       case 403:
-        var errors = JSON.decode(caller.response.responseText, false);
+        var errors = JSON.decode(caller.xhr.responseText, false);
         Obm.Error.globalMessage(errors);
         break;
       default:
@@ -309,6 +312,7 @@ Obm.Error = {
   contentMessage: function(errors, caller)  {
     errors.error.each(function( msg, field) {
       if($(field)) {
+        field = $(field);
         var title = field.get('title');
         field.addClass('error');
         field.set('title', msg);

@@ -122,7 +122,7 @@ class OBM_Template {
     static $addressIndex = 0;
     if(!$value) $value['label'] = 'WORK';
     $return = '
-      <table class="coordinate addresses" id="addresses-'.$addressIndex.'">
+      <table class="coordinate addresses" id="addresses['.$addressIndex.']">
       <tbody>
       <tr>
       <th rowspan="3"><select  name="addresses['.$addressIndex.'][label]">';
@@ -188,7 +188,7 @@ class OBM_Template {
     static $emailIndex = 0;
     if(!$value) $value['label'] = 'INTERNET';
     $return = '
-      <table class="coordinate emails" id="emails-'.$emailIndex.'">
+      <table class="coordinate emails" id="emails['.$emailIndex.']">
       <tbody>
       <tr>
         <th><select  name="emails['.$emailIndex.'][label]">';
@@ -237,7 +237,7 @@ class OBM_Template {
     static $imIndex = 0;
     if(!$value) $value['label'] = 'XMPP';
     $return = '
-      <table class="coordinate ims" id="ims-'.$imIndex.'">
+      <table class="coordinate ims" id="ims['.$imIndex.']">
       <tbody>
       <tr>
         <th><select  name="ims['.$imIndex.'][protocol]">';
@@ -283,7 +283,7 @@ class OBM_Template {
     static $phoneIndex = 0;
     if(!$value) $value['label'] = 'WORK_VOICE';
     $return = '
-      <table class="coordinate phones" id="phones-'.$phoneIndex.'">
+      <table class="coordinate phones" id="phones['.$phoneIndex.']">
       <tbody>
       <tr>
         <th><select  name="phones['.$phoneIndex.'][label]">';
@@ -310,7 +310,7 @@ class OBM_Template {
     static $websiteIndex = 0;
     if(!$value) $value['label'] = 'URL';
     $return = '
-      <table class="coordinate websites" id="websites-'.$websiteIndex.'">
+      <table class="coordinate websites" id="websites['.$websiteIndex.']">
       <tbody>
       <tr>
         <th><select  name="websites['.$websiteIndex.'][label]">';

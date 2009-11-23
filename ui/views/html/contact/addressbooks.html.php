@@ -37,7 +37,7 @@
         <?php } ?>
         <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-<?php echo $_id ?>')); return false;"><?php echo $_addressbook->displayname; ?></a> 
         <input type='hidden' name='action' value='storeAddressBook' />
-        <input type='hidden' name='id' value='<?php echo $_id ?>' />
+        <input type='hidden' name='addressbook_id' value='<?php echo $_id ?>' />
         <script type='text/javascript'>
           $('addressbook-<?php echo $_id ?>').store('write', <?php echo $_addressbook->write ?>);
           $('addressbook-<?php echo $_id ?>').store('search', 'in:<?php echo $_id ?> archive:0');

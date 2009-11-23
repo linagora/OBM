@@ -85,7 +85,7 @@ $perm->check_permissions($module, $action);
 //  $display['msg'] = display_err_msg($l_error_visibility);
 //  $action = 'index';
 //} else {
-// update_last_visit('contact', $params['contact_id'], $action);
+update_last_visit('contact', $params['id'], $action);
 //}
 page_close();
 
@@ -286,7 +286,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $addressbook = $addressbooks->getMyContacts();
     $contacts = $addressbooks->searchContacts("in:$addressbook->id archive:0");
     $current['addressbook'] = $addressbook->id;
-  } elseif ($action == 'consult')  {
+  } elseif ($action == 'consult' || $action == 'detailconsult')  {
   //////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
     $contact = OBM_Contact::get($params['id']);
@@ -435,7 +435,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
   } elseif ($action == 'storeAddressBook') {
   ///////////////////////////////////////////////////////////////////////////////
-    if($params['id']) {
+    if($params['addressbook_id']) {
       OBM_AddressBook::store($params);
     } else {
       OBM_AddressBook::create($params);
@@ -520,7 +520,7 @@ function get_contact_params() {
   if ((isset ($params['entity_id'])) && (! isset($params['contact_id']))) {
     $params['contact_id'] = $params['entity_id'];
   }
-
+  if(isset($params['contact_id'])) $params['id'] = $params['contact_id'];
   get_global_params_document($params);
   
   // imported file

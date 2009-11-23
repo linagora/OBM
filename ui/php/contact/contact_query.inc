@@ -1278,7 +1278,7 @@ function check_contact_data_form($cid, &$contact) {
     foreach($phones as $i => $phone) {
       if (($phone['number'] != '') && (preg_match($php_regexp_phone, $phone['number']) == 0)) {
         $err['msg'] = $l_j_check_phone;
-        OBM_Error::getInstance()->addError('phones-'.$i, $err['msg']);
+        OBM_Error::getInstance()->addError('phones['.$i.']', $err['msg']);
       }
     }
   }
@@ -1289,7 +1289,7 @@ function check_contact_data_form($cid, &$contact) {
       $email['address'] = stripslashes($email['address']);
       if (($email['address'] != '') && (preg_match($php_regexp_email, $email['address']) == 0)) {
         $err['msg'] = $l_j_check_email;
-        OBM_Error::getInstance()->addError('emails-'.$i, $err['msg']);
+        OBM_Error::getInstance()->addError('emails['.$i.']', $err['msg']);
       }  
     }
   }
@@ -1300,7 +1300,7 @@ function check_contact_data_form($cid, &$contact) {
       $express_postal = $addresse['expresspostal'];
       if(strlen($express_postal)>16){
         $err['msg'] = $l_err_length_express_postal;
-        OBM_Error::getInstance()->addError('addresses-'.$i, $err['msg']);
+        OBM_Error::getInstance()->addError('addresses['.$i.']', $err['msg']);
       }
     }
   } 

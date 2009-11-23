@@ -208,7 +208,7 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public static function store($addressbook) {
-    $id = $addressbook['id'];
+    $id = $addressbook['addressbook_id'];
     $syncable = $addressbook['sync'];
     $name = $addressbook['name'];
     $ad = self::get($id);
@@ -229,7 +229,7 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public static function setSynced($addressbook) {
-    $id = $addressbook['id'];
+    $id = $addressbook['addressbook_id'];
     $ad = self::get($id);
     $uid = $GLOBALS['obm']['uid'];
     $db = new DB_OBM;

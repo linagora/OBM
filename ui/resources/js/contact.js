@@ -52,7 +52,7 @@ Obm.Contact.AddressBook = new Class ({
       update: $('informationGrid'),
       onFailure: function (response) {
         Obm.Error.parseStatus(this);
-      }.bind(this),
+      },
       onComplete: $('spinner').hide.bind($('spinner')),
       onRequest: $('spinner').show.bind($('spinner')) 
     });    
@@ -227,13 +227,13 @@ Obm.Contact.AddressBook = new Class ({
    * Set true or false AddressBook.sync
    */
   setSyncable: function(id) {
-    this.addressBookRequest.post({ajax:1, action:'setSyncable', 'id':id});
+    this.addressBookRequest.post({ajax:1, action:'setSyncable', 'addressbook_id':id});
   },
 
   /*
    * SynchedAddressBook
    */
   setSubscription: function(id) {
-    this.addressBookRequest.post({ajax:1, action:'setSubscription', 'id':id});
+    this.addressBookRequest.post({ajax:1, action:'setSubscription', 'addressbook_id':id});
   }
 });
