@@ -199,6 +199,10 @@ public class CalendarManager extends ObmManager {
 		try {
 			Event forCreate = foundationCalendarToObmEvent(event, type, true);
 			String uid = binding.createEvent(token, calendar, forCreate);
+			if (event.getEvent().getUid() != null
+					&& !event.getEvent().getUid().getPropertyValueAsString().equals("")) {
+				forCreate.setExtId(event.getEvent().getUid().getPropertyValueAsString());
+			}
 			evt = binding.getEventFromId(token, calendar, uid);
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
@@ -475,7 +479,7 @@ public class CalendarManager extends ObmManager {
 			com.funambol.common.pim.calendar.Event foundation, boolean ignoreUid) {
 		Event event = new Event();
 		if (!ignoreUid && foundation.getUid() != null
-				&& foundation.getUid().getPropertyValueAsString() != "") {
+				&& !foundation.getUid().getPropertyValueAsString().equals("")) {
 			event.setUid(foundation.getUid().getPropertyValueAsString());
 		}
 
