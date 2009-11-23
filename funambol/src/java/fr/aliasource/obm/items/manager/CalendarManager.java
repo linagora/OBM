@@ -198,11 +198,11 @@ public class CalendarManager extends ObmManager {
 
 		try {
 			Event forCreate = foundationCalendarToObmEvent(event, type, true);
-			String uid = binding.createEvent(token, calendar, forCreate);
 			if (event.getEvent().getUid() != null
 					&& !event.getEvent().getUid().getPropertyValueAsString().equals("")) {
 				forCreate.setExtId(event.getEvent().getUid().getPropertyValueAsString());
 			}
+			String uid = binding.createEvent(token, calendar, forCreate);
 			evt = binding.getEventFromId(token, calendar, uid);
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
