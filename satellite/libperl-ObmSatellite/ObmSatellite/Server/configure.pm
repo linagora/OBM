@@ -199,7 +199,7 @@ sub _startServices {
             $self->log( 0, 'unable to initialize needed '.$service.' service' );
             return 1;
         }else {
-            $self->log( 0, 'needed '.$service.' service initialized' );
+            $self->log( 2, 'needed '.$service.' service initialized' );
         }
     }
 

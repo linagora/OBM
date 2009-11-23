@@ -20,6 +20,11 @@ sub _loadModules {
     my @modules;
     my @modulesEnabled = </etc/obm-satellite/mods-enabled/*>;
     for( my $i=0; $i<=$#modulesEnabled; $i++ ) {
+        if( ! -l $modulesEnabled[$i] ) {
+            $self->log( 3, 'Ignoring module \''.$modules[$i].'\'. Must be symlink to ../mods-available files' );
+            next;
+        }
+
         my $enMod = basename( $modulesEnabled[$i] );
         if( $enMod !~ /^(\w+)$/ ) {
             next;
@@ -59,7 +64,7 @@ sub _loadModules {
             push( @{$self->{'modules'}->{$urls->[$i]}}, $module );
         }
 
-        $self->log( 0, 'loading module \''.$modules[$i].'\' success' );
+        $self->log( 2, 'loading module \''.$modules[$i].'\' success' );
     }
 
     my @loadedModules = keys(%{$self->{'modules'}});

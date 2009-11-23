@@ -1,3 +1,6 @@
 Link ../mods-available files to this directory to enable module.
+Use commands : 
+ - osenmod <moduleName> : to enable <moduleName> module
+ - osdismod <moduleName> : to disable <moduleName> module
 
 obmSatellite restart needed
