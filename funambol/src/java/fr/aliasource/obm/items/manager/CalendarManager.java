@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -198,10 +199,7 @@ public class CalendarManager extends ObmManager {
 
 		try {
 			Event forCreate = foundationCalendarToObmEvent(event, type, true);
-			if (event.getEvent().getUid() != null
-					&& !event.getEvent().getUid().getPropertyValueAsString().equals("")) {
-				forCreate.setExtId(event.getEvent().getUid().getPropertyValueAsString());
-			}
+			forCreate.setExtId(UUID.randomUUID().toString());
 			String uid = binding.createEvent(token, calendar, forCreate);
 			evt = binding.getEventFromId(token, calendar, uid);
 		} catch (AuthFault e) {
