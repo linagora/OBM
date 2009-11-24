@@ -40,7 +40,7 @@
               <li><a  href="" onclick="$('WebsiteLayout').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Website') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->birthday) && empty($contact->anniversary) && empty($contact->date)) { ?>
-              <li><a href="" onclick="$('dates').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Dates') ?></a></li>
+              <li><a href="" onclick="$('datesLayout').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Dates') ?></a></li>
               <?php } ?>
               <?php if((empty($contact->function_id) && !empty($functions)) && empty($contact->market_id) && (empty($contact->datasource_id) && !empty($datasources)) && empty($contact->kind_id) && empty($contact->mailok) && empty($contact->newsletter)) { ?>
               <li><a href="" onclick="$('crmLayout').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Commercial fields') ?></a></li> 
