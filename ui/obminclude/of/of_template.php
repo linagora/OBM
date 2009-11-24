@@ -121,6 +121,7 @@ class OBM_Template {
   public static function __setaddress($value = null) {
     static $addressIndex = 0;
     if(!$value) $value['label'] = 'WORK';
+    else $value['label'] = OBM_Contact::labelToString($value['label'], null, false, '_');
     $return = '
       <table class="coordinate addresses" id="addresses['.$addressIndex.']">
       <tbody>
@@ -187,6 +188,7 @@ class OBM_Template {
   public static function __setemail($value=null) {
     static $emailIndex = 0;
     if(!$value) $value['label'] = 'INTERNET';
+    else $value['label'] = OBM_Contact::labelToString($value['label'], null, false, '_');
     $return = '
       <table class="coordinate emails" id="emails['.$emailIndex.']">
       <tbody>
@@ -237,6 +239,7 @@ class OBM_Template {
   public static function __setim($value=null) {
     static $imIndex = 0;
     if(!$value) $value['label'] = 'XMPP';
+    else $value['label'] = OBM_Contact::labelToString($value['label'], null, false, '_');
     $return = '
       <table class="coordinate ims" id="ims['.$imIndex.']">
       <tbody>
@@ -284,6 +287,7 @@ class OBM_Template {
   public static function __setphone($value=null) {
     static $phoneIndex = 0;
     if(!$value) $value['label'] = 'WORK_VOICE';
+    else $value['label'] = OBM_Contact::labelToString($value['label'], null, false, '_');
     $return = '
       <table class="coordinate phones" id="phones['.$phoneIndex.']">
       <tbody>
@@ -312,6 +316,7 @@ class OBM_Template {
   public static function __setwebsite($value=null) {
     static $websiteIndex = 0;
     if(!$value) $value['label'] = 'URL';
+    else $value['label'] = OBM_Contact::labelToString($value['label'], null, false, '_');
     $return = '
       <table class="coordinate websites" id="websites['.$websiteIndex.']">
       <tbody>
@@ -323,7 +328,7 @@ class OBM_Template {
     }
     $return .= '
         </select></th>
-        <th><input type="text" name="websites['.$websiteIndex.'][address]" alt="'.__('Website').'" title="'.__('Website').'" value="'.$value['address'].'"/></th>
+        <th><input type="text" name="websites['.$websiteIndex.'][url]" alt="'.__('Website').'" title="'.__('Website').'" value="'.$value['url'].'"/></th>
       </tr>
       </tbody>
       </table>';    

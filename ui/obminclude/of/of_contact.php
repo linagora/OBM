@@ -1243,13 +1243,13 @@ class OBM_Contact implements OBM_ISearchable {
     return $kinds;
   }
 
-  public static function labelToString($label, $kind, $translate=true) {
+  public static function labelToString($label, $kind=null, $translate=true, $separator=';') {
     if(is_array($label))array_pop($label);
     else $label = array($label);
     if($translate && $GLOBALS['l_'.strtolower($kind).'_labels'][implode('_',$label)]) {
       return $GLOBALS['l_'.strtolower($kind).'_labels'][implode('_',$label)];
     } else {
-      return implode(';',$label);
+      return implode($separator,$label);
     }
   }
 

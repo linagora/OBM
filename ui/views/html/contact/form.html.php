@@ -117,7 +117,7 @@
                 new Obm.MultipleField($('EmailLayout'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
-            <fieldset id="IMLayout" class="details <?php echo (empty($contact->im)?'':'') ?>">
+            <fieldset id="IMLayout" class="details <?php echo (empty($contact->im)?'H':'') ?>">
               <legend><?php echo __('Instant messagings') ?></legend>
               <?php if(!empty($contact->im)) foreach($contact->im as $_im) { ?>
               <?php echo self::__setim($_im) ?>
@@ -139,7 +139,7 @@
                 new Obm.MultipleField($('PhoneLayout'),'table.coordinate', {overtext: 'input, textarea'});
               </script>
             </fieldset>
-            <fieldset id="WebsiteLayout" class="details <?php echo (empty($contact->website)?'':'') ?>">
+            <fieldset id="WebsiteLayout" class="details <?php echo (empty($contact->website)?'H':'') ?>">
               <legend><?php echo __('Websites') ?></legend>
               <?php if(!empty($contact->website)) foreach($contact->website as $_website) { ?>
               <?php echo self::__setwebsite($_website) ?>
