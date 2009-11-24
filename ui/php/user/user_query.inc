@@ -2321,6 +2321,22 @@ function check_batch_processing_data($params) {
   if (!check_user_phone_fax($params)) {
     return false;
   }
+  // XXXXXXX verifier ici + fichiers de langue
+  
+  $d = of_domain_get_domain_infos($GLOBALS['obm']['domain_id'], true);
+  
+  // Les contraintes sur la delegation ne sont pas valables pour le domaine global
+  if (!$d['global'] && $GLOBALS['cgp_use']['property']['delegation']) {
+    if ($params['to_update_delegation'] == 'true' && !of_delegation_check_data($params['delegation'], $d['delegation'])) { 
+      $err['field'] = 'delegation';
+      return false;
+    }
+    if ($params['to_update_delegation_target'] == 'true' && !of_delegation_check_data($params['delegation_target'], $d['delegation'])) {
+      $err['field'] = 'delegation_target';
+      return false;
+    }
+  }
+
   
   return true;
 }
@@ -2478,6 +2494,8 @@ function run_query_batch_processing_update($params, $users_id) {
   $is_address3_up = (strtolower($params['to_update_address3']) == 'true');
   $is_zipcode_up = (strtolower($params['to_update_zipcode']) == 'true');
   $is_town_up = (strtolower($params['to_update_town']) == 'true');
+  $is_delelagation = (strtolower($params['to_update_delegation']) == 'true');
+  $is_delelagation_target= (strtolower($params['to_update_delegation_target']) == 'true');
   $is_expresspostal_up = (strtolower($params['to_update_expresspostal']) == 'true');
   $phone = "".$params['phone'];
   $phone2 = "".$params['phone2'];
@@ -2492,8 +2510,9 @@ function run_query_batch_processing_update($params, $users_id) {
   $address3 = "".$params['address3'];
   $zipcode = "".$params['zipcode'];
   $town = "".$params['town'];
-  $expresspostal = "".$params['expresspostal'];
-  
+  $expresspostal = $params['expresspostal'];
+  $delegation_target = $params[delegation_target] ;
+  $delegation = $params[delegation];
   $set = array();
   
   if(sizeof($users_id) == 0) return true;
@@ -2536,6 +2555,8 @@ function run_query_batch_processing_update($params, $users_id) {
   if ($is_zipcode_up) { $set[] = "userobm_zipcode='$zipcode'"; }
   if ($is_town_up) { $set[] = "userobm_town='$town'"; }
   if ($is_expresspostal_up) { $set[] = "userobm_expresspostal='$expresspostal'"; }
+  if ($is_delelagation_target ) { $set[] = "userobm_delegation_target = '$delegation_target'";}
+  if ($is_delelagation ) { $set[] = "userobm_delegation = '$delegation'";}
   
   $obm_q = new DB_OBM;
   

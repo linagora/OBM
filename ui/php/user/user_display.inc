@@ -3380,6 +3380,8 @@ function html_user_batch_form($params) {
   $nomade_perms = $params['nomade_perms'];
   $nomade_enable = $params['nomade_enable'];
   $nomade_local_copy = $params['nomade_local_copy'];
+  if (isset($params['delegation_target'])) { $delegation_target = stripslashes($params['delegation_target']); }
+  if (isset($params['delegation'])) { $delegation = stripslashes($params['delegation']); }  
   
   $archive_block = "
   <select name=\"sel_archive\">
@@ -3448,7 +3450,24 @@ function html_user_batch_form($params) {
       <input type=\"hidden\" name=\"data-u-id"."[]\" value=\"$u_id\" />";
     }
   }
-  
+
+  if ($GLOBALS['cgp_use']['property']['delegation']) {
+    $delegation_block = "
+    <fieldset class=\"detail infos\">
+      <legend>$GLOBALS[l_delegation]</legend>
+      <table id=\"delegation\">
+        <tr id=\"delegation_field\">
+          <th>$GLOBALS[l_delegation]</th>
+          <td>".disp_tf_coord('delegation', 128, $params)."</td>
+        </tr><tr id=\"delegation_target_field\">
+          <th>$GLOBALS[l_delegation_target]</th>
+          <td>".disp_tf_coord('delegation_target', 128, $params)."</td>
+        </tr>
+      </table> 
+    </fieldset>
+    ";
+  }
+
   $form_block = "
   <fieldset class=\"detail infos\">
   <legend>$l_user</legend>
@@ -3493,6 +3512,7 @@ function html_user_batch_form($params) {
     </tr>
     </table>
   </fieldset>
+  $delegation_block
   <fieldset class=\"detail infos\">
     <legend>$l_coord</legend>
     <table id=\"coord\">
@@ -3548,7 +3568,8 @@ function html_user_batch_form($params) {
   $js_block = "
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      fill_coords();
+      fill_coords($('delegation'))
+      fill_coords($('coord'));
     })
   </script>";
   

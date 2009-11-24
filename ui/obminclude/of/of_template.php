@@ -202,6 +202,7 @@ class OBM_Template {
       </tr>
       </tbody>
       </table>';    
+    $emailIndex++;
     return $return;
   }
 
@@ -251,6 +252,7 @@ class OBM_Template {
       </tr>
       </tbody>
       </table>';    
+    $imIndex++;
     return $return;
   }
 
@@ -297,6 +299,7 @@ class OBM_Template {
       </tr>
       </tbody>
       </table>';    
+    $phoneIndex++;
     return $return;
   }
 
@@ -324,6 +327,7 @@ class OBM_Template {
       </tr>
       </tbody>
       </table>';    
+    $websiteIndex++;
     return $return;
   }
 }

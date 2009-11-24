@@ -159,8 +159,7 @@ function show_hide_add_button() {
   }
 }
 
-function fill_coords() {
-  var element = $('coord');
+function fill_coords(element) {
   var childs = element.getChildren()[0].getChildren();
   
   for (var i=0; i<childs.length; i++) {
