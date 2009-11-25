@@ -114,6 +114,10 @@ class EventIndexingJob extends CronJob {
         $select = "
         SELECT 
           event_id,
+          event_timeupdate,
+          event_timecreate,
+          event_usercreate,
+          event_userupdate,
           event_domain_id,
           event_title,
           event_location,
@@ -156,6 +160,13 @@ class EventIndexingJob extends CronJob {
           $id = $db->f('event_id');
           $doc->setField('id', $id);
           $maxid = $id;
+          
+          $timecreate = new Of_Date($db->f('event_timecreate'));
+          $doc->setField('timecreate', $timecreate->format('Y-m-d\TH:i:s\Z'));
+          $timeupdate = new Of_Date($db->f('event_timeupdate'));
+          $doc->setField('timeupdate', $timeupdate->format('Y-m-d\TH:i:s\Z'));
+          $doc->setField('usercreate', $db->f('event_usercreate'));
+          $doc->setField('userupdate', $db->f('event_userupdate'));
 
           // domain
           $doc->setField('domain', $db->f('event_domain_id'));
@@ -179,7 +190,7 @@ class EventIndexingJob extends CronJob {
           
           // owner
           $doc->setMultiValue('owner', $db->f('owner'));
-          $doc->setMultiValue('owner', $db->f('event_owner'));
+          $doc->setMultiValue('ownerId', $db->f('event_owner'));
           
           // description
           $doc->setField('description', $db->f('event_description'));
@@ -216,6 +227,7 @@ class EventIndexingJob extends CronJob {
           $attendees_q = run_query_get_events_attendee(array($id));
           while($attendees_q->next_record()) {
             $doc->setMultiValue('with', $attendees_q->f('eventlink_label'));
+            $doc->setMultiValue('withId', $attendees_q->f('eventlink_entity_id'));
           }
 
           $documents[] = $doc;

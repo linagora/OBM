@@ -296,7 +296,6 @@ Obm.CalendarManager = new Class({
   resizeAlldayContainer: function() {
     $$('div.alldayContainer').each(function(element) {
       var str = element.id.split('_');
-      var content = $('allday_'+str[2]);
       var canBeDisplayed = Math.floor(element.offsetHeight/15) - 2;
 
       if (obm.calendarManager.alldayEventGrid[str[2]] && 
