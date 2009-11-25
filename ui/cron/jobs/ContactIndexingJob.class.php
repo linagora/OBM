@@ -115,12 +115,16 @@ class ContactIndexingJob extends CronJob {
           Addressbook.name as addressbook_name,
           Company.company_name as company_name,
           Kind.*,
-          ContactFunction.contactfunction_label
+          ContactFunction.contactfunction_label,
+          e1.event_date as birthday,
+          e2.event_date as anniversary
           FROM Contact 
           LEFT JOIN Addressbook ON contact_addressbook_id=id
           LEFT JOIN Company ON contact_company_id=company_id
           LEFT JOIN Kind ON contact_kind_id=kind_id
           LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
+          LEFT JOIN Event e1 ON contact_birthday_id=e1.event_id
+          LEFT JOIN Event e2 ON contact_anniversary_id=e2.event_id
           WHERE contact_domain_id='$domain'";
 
         if (!$solr_contact_lastupdate) {
@@ -162,6 +166,12 @@ class ContactIndexingJob extends CronJob {
           $doc->setField('manager', $db->f('contact_manager'));
           $doc->setField('assistant', $db->f('contact_assistant'));
           $doc->setField('spouse', $db->f('contact_spouse'));
+          $doc->setField('birthdayEventId', $db->f('contact_birthday_id'));
+          $doc->setField('anniversaryEventId', $db->f('contact_anniversary_id'));
+          $birthday = new Of_Date($db->f('birthday'));
+          $doc->setField('birthday', $birthday->format('Y-m-d\TH:i:s\Z'));
+          $anniversary = new Of_Date($db->f('anniversary'));
+          $doc->setField('anniversary', $anniversary->format('Y-m-d\TH:i:s\Z'));
           $doc->setField('category', $db->f('contact_category'));
           $categories = self::getCategories($id);
           while($categories->next_record()){
