@@ -129,6 +129,7 @@ class EventIndexingJob extends CronJob {
           event_repeatkind,
           event_opacity,
           event_privacy,
+          event_origin,
           #CONCAT(userobm_lastname, ' ', userobm_firstname) as owner 
         FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
@@ -206,6 +207,8 @@ class EventIndexingJob extends CronJob {
           if ($db->f('event_privacy')) {
             $doc->setMultiValue('is', 'private');
           }
+
+          $doc->setField('from', $db->f('event_origin'));
           
           $obm['domain_id'] = $db->f('event_domain_id'); 
           

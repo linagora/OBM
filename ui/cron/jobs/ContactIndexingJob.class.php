@@ -165,7 +165,7 @@ class ContactIndexingJob extends CronJob {
           $doc->setField('category', $db->f('contact_category'));
           $categories = self::getCategories($id);
           while($categories->next_record()){
-            $doc->setField('category', $categories->f('category_label'));
+            $doc->setMultiValue('category', $categories->f('category_label'));
           }
           $doc->setField('service', $db->f('contact_service'));
           $doc->setField('function', $db->f('contactfunction_label'));
@@ -191,24 +191,24 @@ class ContactIndexingJob extends CronJob {
           $coords = self::getCoords($id);
           $emails = $coords['emails'];
           foreach($emails as $email) {
-            $doc->setField('email', $email['address']);
+            $doc->setMultiValue('email', $email['address']);
           }
           $phones = $coords['phones'];
           foreach($phones as $phone) {
-            $doc->setField('phone', $phone['number']);
+            $doc->setMultiValue('phone', $phone['number']);
           }
           $ims = $coords['jabber'];
           foreach($ims as $im) {
-            $doc->setField('jabber', $im['address']);
+            $doc->setMultiValue('jabber', $im['address']);
           }
 
           $addresses = $coords['addresses'];
           foreach($addresses as $address) {
-            $doc->setField('street', $address['street']);
-            $doc->setField('zipcode', $address['zipcode']);
-            $doc->setField('expresspostal', $address['expresspostal']);
-            $doc->setField('town', $address['town']);
-            $doc->setField('country', $address['country']);
+            $doc->setMultiValue('street', $address['street']);
+            $doc->setMultiValue('zipcode', $address['zipcode']);
+            $doc->setMultiValue('expresspostal', $address['expresspostal']);
+            $doc->setMultiValue('town', $address['town']);
+            $doc->setMultiValue('country', $address['country']);
           }
 
           $documents[] = $doc;
