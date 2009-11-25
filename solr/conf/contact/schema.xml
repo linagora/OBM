@@ -53,8 +53,10 @@
     <field name="is" type="text" indexed="true" stored="false" multiValued="true" /> 
 
     <field name="date" type="date" indexed="true" stored="false" multiValued="false" /> 
-    <field name="birthday" type="text" indexed="true" stored="false" multiValued="true" /> 
-    <field name="anniversary" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="birthday" type="date" indexed="true" stored="false" multiValued="false" />
+    <field name="anniversary" type="date" indexed="true" stored="false" multiValued="false" />
+    <field name="birthdayEventId" type="integer" indexed="true" stored="false" multiValued="false" />
+    <field name="anniversaryEventId" type="integer" indexed="true" stored="false" multiValued="false" />
     <field name="comment1" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="comment2" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="comment3" type="text" indexed="true" stored="false" multiValued="false" /> 
