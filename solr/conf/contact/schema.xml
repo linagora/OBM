@@ -24,31 +24,33 @@
     <field name="id" type="integer" indexed="true" stored="true" multiValued="false" required="true"/>
     <field name="timecreate" type="date" indexed="true" stored="false" multiValued="false" />
     <field name="timeupdate" type="date" indexed="true" stored="false" multiValued="false" />
-    <field name="usercreate" type="text" indexed="true" stored="false" multiValued="true" />
-    <field name="userupdate" type="text" indexed="true" stored="false" multiValued="true" />
+    <field name="usercreate" type="integer" indexed="true" stored="false" multiValued="false" />
+    <field name="userupdate" type="integer" indexed="true" stored="false" multiValued="false" />
     <field name="datasource" type="integer" indexed="true" stored="false"  multiValued="false" /> 
     <field name="domain" type="integer" indexed="true" stored="false"  multiValued="false" /> 
     <!-- in == addressbook-->
     <field name="in" type="text" indexed="true" stored="false" multiValued="true" />
+    <field name="addressbookId" type="integer" indexed="true" stored="false" multiValued="false" />
+
     <field name="company" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="companyId" type="integer" indexed="true" stored="false" multiValued="false" /> 
     <field name="lastname" type="text" indexed="true" stored="false"  multiValued="false" /> 
     <field name="firstname" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="middlename" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="suffix" type="text" indexed="true" stored="false" multiValued="false" /> 
-    <field name="aka" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="aka" type="text" indexed="true" stored="false" multiValued="false" />
+    <!-- M Monsieur .... --> 
+    <field name="kind" type="text" indexed="true" stored="false" multiValued="true" /> 
     <field name="manager" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="assistant" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="spouse" type="text" indexed="true" stored="false" multiValued="false" /> 
-    <field name="category" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="category" type="text" indexed="true" stored="false" multiValued="true" /> 
     <field name="service" type="text" indexed="true" stored="false" multiValued="false" /> 
-    <field name="function" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="function" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="title" type="text" indexed="true" stored="false" multiValued="false" /> 
 
-    <!-- is:archive, is:collected -->
+    <!-- is:archive, is:collected is:mailing, is:newletter-->
     <field name="is" type="text" indexed="true" stored="false" multiValued="true" /> 
-
-    <!-- has:mailing, has:newletter -->
-    <field name="has" type="text" indexed="true" stored="false" multiValued="true" /> 
 
     <field name="date" type="date" indexed="true" stored="false" multiValued="false" /> 
     <field name="birthday" type="text" indexed="true" stored="false" multiValued="true" /> 
@@ -58,12 +60,12 @@
     <field name="comment3" type="text" indexed="true" stored="false" multiValued="false" /> 
 
     <!-- from == contact_origin -->
-    <field name="from" type="text" indexed="true" stored="false" multiValued="false" /> 
+    <field name="from" type="string" indexed="true" stored="false" multiValued="false" /> 
 
-    <field name="email" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="email" type="string" indexed="true" stored="false" multiValued="true" /> 
     <field name="phone" type="text" indexed="true" stored="false" multiValued="true" /> 
     <field name="fax" type="text" indexed="true" stored="false" multiValued="true" /> 
-    <field name="jabber" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="jabber" type="string" indexed="true" stored="false" multiValued="true" /> 
     <field name="street" type="text" indexed="true" stored="false" multiValued="true" /> 
     <field name="zipcode" type="text" indexed="true" stored="false" multiValued="true" /> 
     <field name="expresspostal" type="text" indexed="true" stored="false" multiValued="true" /> 
@@ -73,6 +75,7 @@
     <field name="dsf" type="text" indexed="true" stored="false"  multiValued="true" /> 
     <field name="address" type="text" indexed="true" stored="false"  multiValued="true" /> 
     <field name="comment" type="text" indexed="true" stored="false"  multiValued="true" /> 
+    <field name="displayname" type="text" indexed="true" stored="false"  multiValued="true" /> 
 
   </fields>
 
@@ -92,6 +95,12 @@
   <copyField source="comment1" dest="comment"/>
   <copyField source="comment2" dest="comment"/>
   <copyField source="comment3" dest="comment"/>
+
+  <copyField source="lastname" dest="displayname" />
+  <copyField source="firstname" dest="displayname" />
+  <copyField source="middlename" dest="displayname" />
+  <copyField source="suffix" dest="displayname" />
+
 
   <defaultSearchField>dsf</defaultSearchField>
 

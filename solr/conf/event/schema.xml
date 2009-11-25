@@ -22,6 +22,10 @@
 
   <fields>   
     <field name="id" type="integer" indexed="true" stored="true" multiValued="false" required="true"/>
+    <field name="timecreate" type="date" indexed="true" stored="false" multiValued="false" />
+    <field name="timeupdate" type="date" indexed="true" stored="false" multiValued="false" />
+    <field name="usercreate" type="integer" indexed="true" stored="false" multiValued="false" />
+    <field name="userupdate" type="integer" indexed="true" stored="false" multiValued="false" />
     <field name="domain" type="integer" indexed="true" stored="false"  multiValued="false" /> 
     <field name="dsf" type="text" indexed="true" stored="false"  multiValued="true" /> 
     <field name="title" type="text" indexed="true" stored="false"  multiValued="false" /> 
@@ -29,12 +33,15 @@
     <field name="category" type="text" indexed="true" stored="false" multiValued="true" /> 
     <field name="date" type="date" indexed="true" stored="false" multiValued="false" />
     <field name="duration" type="integer" indexed="true" stored="false" multiValued="false" /> 
-    <field name="owner" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="owner" type="text" indexed="true" stored="false" multiValued="true" />  <!-- Owner label, email -->
+    <field name="ownerId" type="integer" indexed="true" stored="false" multiValued="false" />
     <field name="description" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="tag" type="text" indexed="true" stored="false" multiValued="true" /> 
-    <field name="with" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="with" type="text" indexed="true" stored="false" multiValued="true" /> <!-- Attendees label, email --> 
+    <field name="withId" type="integer" indexed="true" stored="false" multiValued="true" /> 
     <field name="is" type="text" indexed="true" stored="false" multiValued="true" />
     <field name="state" type="text" indexed="true" stored="false" multiValued="false" />
+    <field name="from" type="string" indexed="true" stored="false" multiValued="false" /> 
   </fields>
 
   <uniqueKey>id</uniqueKey>
