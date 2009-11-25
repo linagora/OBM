@@ -49,18 +49,18 @@ $module = 'user';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
 
-include("$obminclude/global.inc");
+include_once("$obminclude/global.inc");
 
 $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 $params = get_user_params();
-include("$obminclude/global_pref.inc");
-require('../profile/profile_query.inc');
-require('user_display.inc');
-require('user_query.inc');
-require('user_js.inc');
+include_once("$obminclude/global_pref.inc");
+require_once('../profile/profile_query.inc');
+require_once('user_display.inc');
+require_once('user_query.inc');
+require_once('user_js.inc');
 require_once("$obminclude/of/of_category.inc");
-require("$obminclude/of/of_right.inc"); // needed by call from calendar
+require_once("$obminclude/of/of_right.inc"); // needed by call from calendar
 
 // detailconsult can be accessed without user_id (-> display current user)
 if (($action == 'detailconsult') && (! $params['user_id'])) $params['user_id'] = $obm['uid'];

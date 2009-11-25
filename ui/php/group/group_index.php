@@ -50,14 +50,14 @@ $path = '..';
 $module = 'group';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
-include("$obminclude/global.inc");
+include_once("$obminclude/global.inc");
 $params = get_group_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
-include("$obminclude/global_pref.inc");
+include_once("$obminclude/global_pref.inc");
 
-require('group_display.inc');
-require('group_query.inc');
-require('group_js.inc');
+require_once('group_display.inc');
+require_once('group_query.inc');
+require_once('group_js.inc');
 require_once("$obminclude/of/of_category.inc");
 
 get_group_action();

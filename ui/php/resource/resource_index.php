@@ -48,15 +48,15 @@ $path = '..';
 $module = 'resource';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
-include("$obminclude/global.inc");
+include_once("$obminclude/global.inc");
 $params = get_resource_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
-include("$obminclude/global_pref.inc");
-require('resource_display.inc');
-require('resource_query.inc');
-require('resource_js.inc');
-require("$obminclude/of/of_right.inc");
-include("$obminclude/of/of_category.inc");
+include_once("$obminclude/global_pref.inc");
+require_once('resource_display.inc');
+require_once('resource_query.inc');
+require_once('resource_js.inc');
+require_once("$obminclude/of/of_right.inc");
+include_once("$obminclude/of/of_category.inc");
 
 get_resource_action();
 
