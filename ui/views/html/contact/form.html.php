@@ -204,7 +204,7 @@
                 <?php echo self::__setlist('function', $functions, 'Function', $contact->function_id, true); ?>
               </span>  
               <span id="market" class="formField">
-                <label for="marketField"><?php echo __('Market') ?> : </label>
+                <label for="marketField"><?php echo __('Marketing manager') ?> : </label>
                 <?php echo self::__setlist('market', $markets, 'Market', $contact->market_id, true); ?>
               </span>  
               <span id="mailok" class="formField">

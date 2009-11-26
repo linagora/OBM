@@ -35,10 +35,9 @@ return array(
   'Resource participation updated on OBM: %title%' => 'La réservation d\'une resource à été statuée dans OBM : %title%',
   'Participation updated on OBM: %title%' => 'Mise à jour de participation dans OBM : %title%',
   'User %displayname% is to be validated' => 'L\'utilisateur %displayname doit être validé',
-
   '%lastname% %firstname%' => '%firstname% %lastname%',
-  'Address' => 'Addresse',
-  'Addresses' => 'Addresses',
+  'Address' => 'Adresse',
+  'Addresses' => 'Adresses',
   'Advanced search' => 'Recherche avancée',
   'Archive' => 'Archive',
   'Archived' => 'Archivé',
@@ -74,4 +73,7 @@ return array(
   'Websites' => 'Sites web',
   'Yes' => 'Oui',
   'Zip code' => 'Code postal',
+  'Street' => 'Rue',
+  'Express postal' => 'Cedex',
+  'Function' => 'Fonction'
 );
