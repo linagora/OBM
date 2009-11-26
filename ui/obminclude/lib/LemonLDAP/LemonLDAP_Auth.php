@@ -121,8 +121,6 @@ class LemonLDAP_Auth extends Auth {
   {
     global $obm, $lock;
     
-    $this->_engine->debug(var_export($this->_engine->_headers, true));
-    
     if (!$this->sso_checkRequest())
       return false;
 
@@ -140,15 +138,23 @@ class LemonLDAP_Auth extends Auth {
     }
 
     //
+    // Formate headers.
+    //
+
+    $this->_engine->debug("Headers: " . var_export($this->_engine->getHeaders(), true));
+    $this->_engine->setHeaders($this->_engine->formateHeaders());
+    $this->_engine->debug("Formated headers: " . var_export($this->_engine->getHeaders(), true));
+
+    //
     // First of all, we have to check if the user exists.
     // OBM stores login in lowercase
     //
-    
+
     $header = $this->_engine->getHeaderName('userobm_login');
-    $login = strtolower($this->_engine->getHeaderValue($header));
+    $login = $this->_engine->getHeaderValue($header);
     $domain_id = $this->_engine->getDomainID($login);
     $user_id = $this->_engine->isUserExists($login, $domain_id);
-    
+
     //
     // Then, we try to update/create the account. If this operation failed we
     // can not do anything else. If not it is not necessary for the user to be

@@ -543,6 +543,32 @@ class LemonLDAP_Engine {
 		return false;
 	}
 
+	/**
+	 * Formate HTTP headers.
+	 * Formate retrieved HTTP headers, so that they were conformed with OBM.
+	 * @return Array All formated HTTP headers.
+	 */
+	function formateHeaders ()
+	{
+		$headers = array();
+		if (is_null($this->_headers) || !is_array($this->_headers))
+		{
+			return $headers;
+		}
+		foreach ($this->_headers as $key => $value)
+		{
+			$key_obm = array_search($key, $this->_headersMap);
+			switch ($key_obm)
+			{
+				case 'userobm_login':
+					$value = strtolower($value);
+					break;
+			}
+			$headers[strtoupper($key)] = $value;
+		}
+		return $headers;
+	}
+
  	/**
 	 * Print some debug trace.
 	 * @param $msg The message to trace.
@@ -617,6 +643,15 @@ class LemonLDAP_Engine {
 		if (is_null($headerName) || !array_key_exists(strtoupper($headerName), $this->_headers))
 			return null;
 		return $this->_headers[strtoupper($headerName)];
+	}
+
+	/**
+	 * Get HTTP headers.
+	 * @return Array An array of HTTP headers.
+	 */
+	function getHeaders()
+	{
+	  return $this->_headers;
 	}
 
 	/**
@@ -1049,6 +1084,7 @@ class LemonLDAP_Engine {
 		if (lmng_check_user_data_form($user_id, $params_db)
 				&& lmng_run_query_user_update($user_id, $params_db))
 		{
+			$this->_updated = true;
 			$succeed = $user_id;
 		}
 
@@ -1085,6 +1121,15 @@ class LemonLDAP_Engine {
 	function setDebugFile ($file)
  	{
 	  $this->_debugFile = $file;
+	}
+
+	/**
+	 * Set headers.
+	 * @param $headers The HTTP headers.
+	 */
+	function setHeaders ($headers)
+	{
+	  $this->_headers = $headers;
 	}
 
 	/**

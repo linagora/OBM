@@ -38,6 +38,11 @@
 class LemonLDAP_Sync {
 
 	/**
+	 * Force update instead of verify if there are available updates.
+	 */
+	var $_forceUpdate = false;
+
+	/**
 	 * The LemonLDAP engine.
 	 */
 	var $_engine = null;
@@ -48,6 +53,16 @@ class LemonLDAP_Sync {
 	function __construct ($engine)
 	{
 		$this->_engine = $engine;
+		$this->initializeFromConfiguration();
+	}
+
+	/**
+	 * Initiliaze internal parameters from configuration.
+	 */
+	function initializeFromConfiguration()
+	{
+		global $lemonldap_config;
+		$this->_forceUpdate = $lemonldap_config['auto_update_force'];
 	}
 
 	/**
@@ -105,7 +120,7 @@ class LemonLDAP_Sync {
 	{
 		if (!is_null($user_id) && $user_id !== false)
 		{
-			if ($this->_engine->verifyUserData($user_name, $domain_id, $user_id))
+			if ($this->_forceUpdate || $this->_engine->verifyUserData($user_name, $domain_id, $user_id))
 				return $this->_engine->updateUser($user_name, $domain_id, $user_id);
 			return $user_id; 
 		}
