@@ -238,16 +238,16 @@ class OBM_Template {
   //TODO : Add getim function.
   public static function __setim($value=null) {
     static $imIndex = 0;
-    if(!$value) $value['label'] = 'XMPP';
-    else $value['label'] = OBM_Contact::labelToString($value['label'], null, false, '_');
+    if(!$value) $value['protocol'] = 'XMPP';
+    else $value['protocol'] = OBM_Contact::labelToString($value['protocol'], null, false, '_');
     $return = '
       <table class="coordinate ims" id="ims['.$imIndex.']">
       <tbody>
       <tr>
         <th><select  name="ims['.$imIndex.'][protocol]">';
-    foreach($GLOBALS['l_im_labels'] as $label => $locale) {
-      if($value['label'] == $label) $return .= '<option selected="selected" value="'.$label.'">'.$locale.'</option>';
-      else $return .= '<option value="'.$label.'">'.$locale.'</option>';
+    foreach($GLOBALS['l_im_labels'] as $protocol => $locale) {
+      if($value['protocol'] == $protocol) $return .= '<option selected="selected" value="'.$protocol.'">'.$locale.'</option>';
+      else $return .= '<option value="'.$protocol.'">'.$locale.'</option>';
     }
     $return .= '
         </select></th>
