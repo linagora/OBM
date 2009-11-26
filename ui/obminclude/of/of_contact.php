@@ -189,7 +189,8 @@ class OBM_Contact implements OBM_ISearchable {
       'contact_title' => 'text',
       'contact_aka' => 'text',
       'contact_sound' => 'text',
-      'contact_company' => 'text'
+      'contact_company' => 'text',
+      'company_name' => 'text'
     );
     $fields['company'] = array(
       'contact_company' => 'text',
@@ -825,7 +826,6 @@ class OBM_Contact implements OBM_ISearchable {
       contact_origin
     ORDER BY contact_lastname, contact_firstname
     {$sql_limit}";
-
     $db->xquery($query);
     while ($db->next_record()) {
       $contact = new OBM_Contact;
@@ -842,7 +842,11 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->function_id   = $db->f('contact_function_id');
       $contact->function      = $db->f('contact_function');
       $contact->company_id    = $db->f('contact_company_id');
-      $contact->company       = $db->f('contact_company');
+      if($contact->company_id) {
+        $contact->company       = $db->f('company_name');
+      } else {
+        $contact->company       = $db->f('contact_company');
+      }
       $contact->market_id     = $db->f('contact_marketingmanager_id');
       $contact->market        = $db->f('market_lastname').' '.$db->f('market_firstname');
       $contact->suffix        = $db->f('contact_suffix');

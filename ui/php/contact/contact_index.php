@@ -332,6 +332,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       $subTemplate['card']->set('functions', run_query_contact_get_functions());
       $subTemplate['card']->set('datasources', run_query_contact_get_datasources());
       $subTemplate['card']->set('markets', run_query_contact_get_markets($contact->market_id));
+      $subTemplate['card']->set('kinds', run_query_contact_get_kinds());
     } else {
       header('HTTP', true, 403);
       //FIXME : Not compatible with the HTML/Ajax implemetation

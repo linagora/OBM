@@ -219,8 +219,8 @@ class OBM_Template {
   public static function __setentitylink($name, $value, $id, $module, $label, $idSuffix = 'Field') {
     if($GLOBALS['perm']->check_module_rights('company')) {
       return  "
-        <input type='text' name='$name' value='$value' id='${name}Field' autocomplete='off'/>
-        <input type='hidden' name='${name}_id' value='id' id='${name}_idField' />
+        <input type='text' name='${name}_text' value='$value' id='${name}Field' autocomplete='off'/>
+        <input type='hidden' name='${name}_id' value='$id' id='${name}_idField' />
         <script type='text/javascript'>
           new obm.AutoComplete.Search('$path/$module/${module}_index.php?action=ext_search', '${name}_idField', '${name}Field', {mode: 'mono', locked: true, resetable: true});
         </script>

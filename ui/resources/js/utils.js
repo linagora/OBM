@@ -209,8 +209,10 @@ Obm.MultipleField = new Class({
       var expr = /\[([0-9+])\]/;
       var clone = this.last.clone();
       clone.removeClass('error');
-      this.last.get('id').match(expr);
-      clone.set('id', this.last.get('id').replace(expr, '[' + (RegExp.$1.toInt() + 1)  + ']'));
+      if(this.last.get('id')) {
+        this.last.get('id').match(expr);
+        clone.set('id', this.last.get('id').replace(expr, '[' + (RegExp.$1.toInt() + 1)  + ']'));
+      }
       clone.getElements('input, select, textarea').each(function (element) {
         element.get('name').match(expr);
         element.set('name', element.get('name').replace(expr, '[' + (RegExp.$1.toInt() + 1)  + ']'));

@@ -21,11 +21,8 @@
           <li>
             <input type='button' value='<?php echo __('Add fields') ?>' title="<?php echo __('Add Fields') ?>" class='dropDownButton' />
             <ul>
-              <?php if(empty($contact->mname)) { ?>
-              <li><a href="" onclick="$('mname').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Middle name') ?></a></li>
-              <?php } ?>
-              <?php if(empty($contact->suffix)) { ?>
-              <li><a href="" onclick="$('suffix').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Suffix') ?></a></li>
+              <?php if(empty($contact->mname) && empty($contact->suffix)) { ?>
+              <li><a href="" onclick="$('kindField').removeClass('H');$('extendedName').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Extended name') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->aka)) { ?>
               <li><a href="" onclick="$('aka').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Also known as') ?></a></li>
@@ -72,11 +69,16 @@
           <form id='contactForm' name='contactForm' action='#' method='post' onsubmit="obm.contact.addressbook.storeContact($(this), '<?php echo $contact->id?>'); return false;">
             <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>">
             <fieldset class="head">
+              <span id="kindField" class="<?php echo (empty($contact->mname) && empty($contact->suffix) && empty($contact->kind_id)?'H':'') ?>">
+                <?php echo self::__setlist('kind', $kinds, 'Kind', $contact->kind_id, true) ?>
+              </span>
               <input id="firstname" size="12" type="text" name="firstname" value="<?php echo $contact->firstname ?>" title="<?php echo __('Firstname') ?>" />
-              <input id="mname" size="5" class="<?php echo (empty($contact->mname)?'H':'') ?>" type="text" name="mname" value="<?php echo $contact->mname ?>" title="<?php echo __('Middle name') ?>" /> 
               <input id="lastname" size="12" type="text" name="lastname" value="<?php echo $contact->lastname ?>" title="<?php echo __('Lastname') ?>" />
-              <input id="suffix" size="5" class="<?php echo (empty($contact->suffix)?'H':'') ?>" type="text" name="suffix" value="<?php echo $contact->suffix ?>" title="<?php echo __('Suffix') ?>" /> 
               <br />
+              <span id='extendedName' class="formField <?php echo (empty($contact->mname) && empty($contact->suffix)?'H':'') ?>">
+                <input id="mname" type="text" name="mname" value="<?php echo $contact->mname ?>" title="<?php echo __('Middle name') ?>" /> 
+                <input id="suffix" type="text" name="suffix" value="<?php echo $contact->suffix ?>" title="<?php echo __('Suffix') ?>" /> 
+              </span>
               <script type="text/javascript">
                 new OverText('#lastname, #mname, #firstname, #suffix');
               </script>
@@ -93,6 +95,7 @@
                 <label for="companyField"><?php echo __('Company') ?> : </label>
                 <?php echo self::__setentitylink('company', $contact->company, $contact->company_id, 'company', 'Company'); ?>
               </span>
+              <p class='CL' />
             </fieldset>
             <p class="LC"></p>
             <fieldset id="AddressLayout" class="details ">

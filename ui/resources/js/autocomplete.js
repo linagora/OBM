@@ -180,13 +180,23 @@ obm.AutoComplete.Search = new Class({
                    .addEvent('focus', this.onFocus.bindWithEvent(this))
                    .addEvent('blur', this.onBlur.bindWithEvent(this));
     var inputCoords = this.inputField.getCoordinates();
+    if(this.options.resetable) {
+      new Element('img').set('src', obm.vars.images.del).injectAfter(this.inputField).addEvent('click', function () {
+        this.currentValue = this.options.fieldText;
+        this.selectedBox.value = '';
+        this.inputField.value = this.options.fieldText;
+        this.lockedKey = this.options.fieldText;
+        this.lockedLabel = this.options.fieldText;
+        this.inputField.addClass('downlight');      
+      }.bind(this)).setStyle('cursor', 'pointer');
+    }
     this.resultBox = new Element('div').addClass('autoCompleteResultBox')
-                                       .injectInside($(document.body))
+                                       .injectAfter(this.inputField)
                                        .addEvent('mouseenter', function() {this.isMouseOver=true;}.bindWithEvent(this))
                                        .addEvent('mouseleave', function() {this.isMouseOver=false;}.bindWithEvent(this))
                                        .setStyles({
-                                         'top':(inputCoords.top + inputCoords.height + 2) + 'px',
-                                         'left':inputCoords.left + 'px'
+                                         'top': this.inputField.offsetTop + inputCoords.height + 2 + 'px',
+                                         'left': this.inputField.offsetLeft + 'px'
                                        });
     this.infos = new Element('h2').injectInside(this.resultBox)
                                   .addEvent('mousedown', function() {this.inputField.focus();}.bindWithEvent(this))
@@ -476,8 +486,9 @@ obm.AutoComplete.Search = new Class({
   showResultBox: function() {
     var inputCoords = this.inputField.getCoordinates();
     this.resultBox.setStyles({                  
-      'top':(inputCoords.top + inputCoords.height + 2) + 'px',
-      'left':(inputCoords.left + 20) + 'px'});
+      'top':  this.inputField.offsetTop + inputCoords.height + 2  + 'px',
+     'left': this.inputField.offsetLeft + 'px'
+      });
     this.resultBox.setStyle('display', '');
   },
 
@@ -646,14 +657,7 @@ obm.AutoComplete.Search = new Class({
   monoModeOnKeyPress: function(e) {
     switch (e.key) {
       case 'enter' :
-        if (this.options.resetable) {
-          this.currentValue = this.options.fieldText;
-          this.inputField.value = this.options.fieldText;
-          this.lockedKey = this.options.fieldText;
-          this.lockedLabel = this.options.fieldText;
-          this.inputField.addClass('downlight');
-        }
-        e.stop();
+        if(this.resultBox.getStyle('display')!='none') e.stop();
         break;
       case 'esc' : 
         this.inputField.blur();

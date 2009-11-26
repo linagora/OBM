@@ -704,7 +704,7 @@ function run_query_contact_coords_update($id, $contact) {
     foreach($addresses as $address) {
       if(trim($address['country_iso3166']) == 'none') $address['country_iso3166'] = '';
       if(trim($address['country_iso3166']) == '' &&  trim($address['country']) != '') {
-        $address['country_iso3166'] = self::getCountryIso3166($address['country']);
+        $address['country_iso3166'] = OBM_Contact::getCountryIso3166($address['country']);
       }      
       if(trim($address['street']) != '' || trim($address['country_iso3166']) != ''  || trim($address['zipcode']) != ''
          || trim($address['expresspostal']) != '') {
@@ -1856,6 +1856,19 @@ function run_query_contact_get_markets($id) {
     $markets[$user['id']] = $user['lastname'].' '.$user['firstname'];
   }
   return $markets;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Contact: Kind select query execution
+// Returns : DB object result with all kinds
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contact_get_kinds() {
+  $db = run_query_contact_kind();
+  $kinds = array();
+  while($db->next_record()) {
+    $kinds[$db->f('kind_id')] = $db->f('kind_header');
+  }
+  return $kinds;
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Synchronise or desyncronise a user from a contact 

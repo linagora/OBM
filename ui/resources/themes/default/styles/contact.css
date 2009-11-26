@@ -311,14 +311,30 @@
   display:inline;
   padding: 5px 0 0 5px;
   clear: left;
-  height: 86px;
+  height: 100px;
   min-width: 32em;
+}
+
+#informationGrid .head label {
+  color: #888;
+  font-weight: bold;
+  font-size: 100%;
+  margin-right: 1em;
+  text-align: left;
+  margin-left: 5px;
+  min-width: 6em;
+  display: inline-block;
 }
 
 #informationGrid fieldset.head input {
   color:#636466;
   font-size:100%;
   vertical-align:middle;  
+  width: 10em;
+}
+
+#informationGrid select {
+  width: 10em;
 }
 
 input, textarea {
@@ -348,18 +364,6 @@ select {
   margin-right: 1em;
   text-align: left;
   min-width: 11em;
-  display: inline-block;
-}
-
-
-#informationGrid .head label {
-  color: #888;
-  font-weight: bold;
-  font-size: 100%;
-  margin-right: 1em;
-  text-align: left;
-  margin-left: 5px;
-  min-width: 6em;
   display: inline-block;
 }
 

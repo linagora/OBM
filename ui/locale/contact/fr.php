@@ -39,6 +39,7 @@ return array(
   'Delete contact' => 'Supprimer le contact',
   'Do not synchronize' => 'Ne plus synchroniser',
   'Export as Vcard' => 'Exporter en Vcard',
+  'Extended name' => 'Nom étendu',
   'Mailing' => 'Accepte les courriels',
   'Manager' => 'Responsable',
   'Marketing manager' => 'Responsable commercial',
