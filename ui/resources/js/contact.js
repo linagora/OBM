@@ -58,12 +58,12 @@ Obm.Contact.AddressBook = new Class ({
     });    
 
     this.dataRequest.write = function (options) {
-      this.dataRequest.setOptions({onSuccess : function() {this.refreshContact();}.bind(this)});
+      this.dataRequest.addEvent('success', this.refreshContact.bind(this));
       this.dataRequest.post(options);
     }.bind(this);
 
     this.dataRequest.read = function (options) {
-      this.dataRequest.setOptions({onSuccess : $empty});
+      this.dataRequest.removeEvents('success');
       this.dataRequest.get(options);
     }.bind(this);
     
@@ -98,7 +98,7 @@ Obm.Contact.AddressBook = new Class ({
   },
 
   refreshContact: function() {
-    this.contactRequest.setOptions({onSuccess : function() {
+    this.contactRequest.addEvent('success', function() {
       if(this.contact) {
         this.contact = $(this.contact.get('id'));
         if(this.contact) {
@@ -111,8 +111,8 @@ Obm.Contact.AddressBook = new Class ({
       } else {
         this.hideContact();
       }
-      this.contactRequest.setOptions({onSuccess : $empty});
-    }.bind(this)});
+      this.contactRequest.removeEvents('success');
+    }.bind(this));
     this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')}); 
   },
 
