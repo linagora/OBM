@@ -179,6 +179,7 @@ Obm.Contact.AddressBook = new Class ({
     }
     this.contactRequest.get(form); 
     $('addressBookGrid').getElements('td.current').removeClass('current');
+    this.addressbook = $('addressbook-search');
     // Display "search results" folder
     $('addressbook-search').getParent().show();
     $('addressbook-search').set('class', 'current');
