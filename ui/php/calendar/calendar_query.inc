@@ -1170,6 +1170,23 @@ function check_access_entity($calendar_ids, $resource_ids) {
   return $ok;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Check if the user is an event's attendee
+///////////////////////////////////////////////////////////////////////////////
+function check_user_attendance($event_id, $user_id) {
+  $sql = "
+    SELECT 1 FROM EventLink 
+    INNER JOIN EventEntity ON eventlink_event_id = evententity_event_id 
+    INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id 
+    WHERE eventlink_event_id = $event_id 
+    AND userentity_user_id = $user_id";
+    
+  $obm_q = new DB_OBM;
+  $obm_q->query($sql);
+  return $obm_q->num_rows() == 1;
+}
+
+
 
 /**
  * Check for participation decision

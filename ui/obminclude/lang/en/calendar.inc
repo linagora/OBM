@@ -160,6 +160,7 @@ $l_fill_dateend = "You have to fill in the [ $l_dateend ] field";
 $l_fill_datebegin = "You have to fill in the [ $l_datebegin ] field";
 $l_warn_date_past = "Event date begin is in the past";
 $l_warn_file_upload = "Some files could not be uploaded";
+$l_err_file_access_forbidden = "You're not allowed to access this document";
 $l_err_no_calendar_selected = "No calendar selected";
 $l_err_begin_end = "End date must be after begin date!";
 $l_err_end_repeat = "Repetion end must be after end date";

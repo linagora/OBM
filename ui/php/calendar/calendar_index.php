@@ -651,6 +651,22 @@ if ($action == 'search') {
     run_query_calendar_attach_document($document_id, $event_entity_id);
   }
   $display['detail'] .= dis_calendar_event_consult($params['calendar_id']);
+  
+} elseif ($action == 'download_document') {
+///////////////////////////////////////////////////////////////////////////////
+  require '../document/document_query.inc';
+  require '../document/document_display.inc';
+  
+  if (!check_user_attendance($params['event_id'], $obm['uid'])) {
+    $display['msg'] .= display_err_msg("$l_err_file_access_forbidden");
+  } else {
+    $doc_q = run_query_document_detail($params['document_id']);
+    if ($doc_q->num_rows() == 1) {
+      dis_document_file($doc_q);
+    } else {
+      $display['msg'] .= display_err_msg("$l_no_document !");
+    }
+  }
 
 } elseif ($action == 'rights_admin') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -1662,6 +1678,12 @@ function get_calendar_action() {
   // Attach documents
   $actions['calendar']['attach_documents'] = array (
     'Right'    => $cright_write,
+    'Condition'=> array ('None')
+  );
+  
+  // Download documents
+  $actions['calendar']['download_document'] = array (
+    'Right'    => $cright_read,
     'Condition'=> array ('None')
   );
   
