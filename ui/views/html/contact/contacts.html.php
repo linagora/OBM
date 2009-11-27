@@ -48,6 +48,7 @@
           echo $_contact->$_fieldname.'';
         }
       ?>
+      <?php if($_metadata['status'] == 2) { ?></th><?php } else { ?></td><?php } ?>
       <?php } ?>
     </tr>
     <?php } ?>
