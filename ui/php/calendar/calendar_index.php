@@ -380,7 +380,7 @@ if ($action == 'search') {
           $entities['contact'] = array_merge($entities['contact'], $others_attendees);
         }
         // Insert "other files" as private documents
-        if (is_array($params['other_files'])) {
+        if (count($params['other_files']) > 0) {
           $other_files = run_query_insert_other_files($params);
           if (!$other_files) {
             $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
