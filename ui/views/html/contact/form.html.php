@@ -67,7 +67,7 @@
       <tr>
         <td>
           <form id='contactForm' name='contactForm' action='#' method='post' onsubmit="obm.contact.addressbook.storeContact($(this), '<?php echo $contact->id?>'); return false;">
-            <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>">
+            <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>" />
             <fieldset class="head">
               <span id="kindField" class="<?php echo (empty($contact->mname) && empty($contact->suffix) && empty($contact->kind_id)?'H':'') ?>">
                 <?php echo self::__setlist('kind', $kinds, 'Kind', $contact->kind_id, true) ?>

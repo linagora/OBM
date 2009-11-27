@@ -48,7 +48,7 @@
     <tbody>
       <tr>
         <td>
-          <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>">
+          <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>" />
           <div class="head">
             <h1><?php echo $contact->header.' '.$contact->firstname.' '.$contact->mname.' '.$contact->lastname.' '.$contact->suffix ?></h1>
             <?php if(!empty($contact->aka)) { ?>
