@@ -156,11 +156,8 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 ///////////////////////////////////////////////////////////////////////////////
   $addressbooks = OBM_AddressBook::search();
   $contacts = $addressbooks->searchContacts($params['searchpattern']."  archive:0");
-  if (count($contacts) != 0) {
-    dis_contact_csv_export_all($contacts);
-  }
+  dis_contact_csv_export_all($contacts);
   exit();
-
 } elseif ($action == 'statistics') {
 ///////////////////////////////////////////////////////////////////////////////
   require_once("$obminclude/lang/".$_SESSION['set_lang'].'/statistic.inc');

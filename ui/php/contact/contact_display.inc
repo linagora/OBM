@@ -1978,9 +1978,11 @@ function dis_contact_csv_export_all($contacts) {
   foreach($fields as $field) {
     $f[] = $GLOBALS['fieldnames'][$field];
   }
-
-  foreach ($contacts as $c) {
-    $csv[] = $c->toCsv();
+  
+  if (count($contacts)>0) {
+    foreach ($contacts as $c) {
+      $csv[] = $c->toCsv();
+    }
   }
   
   header("Content-Type: text/csv");
