@@ -78,8 +78,8 @@
             new Obm.DropDownMenu($('addressbook-search').getElement('ul'));
             function setSearchFolderLinks() {
               var pattern = $('searchpattern').value;
-              $('saveSearchFolder').href = $('saveSearchFolder').href+pattern;
-              $('exportSearchFolder').href = $('exportSearchFolder').href+pattern;
+              $('saveSearchFolder').href = 'contact_index.php?action=save&searchpattern='+pattern;
+              $('exportSearchFolder').href = 'contact_index.php?action=export&searchpattern='+pattern;
             }
           </script>                  
         </div>
