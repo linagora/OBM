@@ -9,8 +9,8 @@
   </div>
   <div id='advancedSearch' style='display:none;'>
     <div class='header'>
-      <span class='title'><?php echo __('Advanced search') ?></span>
       <span class='link'><a href="#" onclick="$$('#advancedSearch','#basicSearch').toggle();"><?php echo __('Hide advanced search') ?></a></span>
+      <span class='title'><?php echo __('Advanced search') ?></span>
     </div>
     <div class='content'>
       <form id='advancedSearchForm' onsubmit='obm.contact.addressbook.searchContact(this);return false;'>

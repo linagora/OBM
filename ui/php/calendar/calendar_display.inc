@@ -966,8 +966,8 @@ function dis_calendar_html_search_form($calendar) {
 
     <div id='advancedSearch' style='display:$advanced;'>
       <div class='header'>
-        <span class='title'>$GLOBALS[l_advanced_search]</span>
         <span class='link'><a href=\"#\" onclick=\"toggleSearchForm('basicSearch', 'advancedSearch');\">$GLOBALS[l_hide_advanced_search]</a></span>
+        <span class='title'>$GLOBALS[l_advanced_search]</span>
       </div>
       <div class='content'>
       <form id='advancedEventSearchForm' action='calendar_index.php'>
