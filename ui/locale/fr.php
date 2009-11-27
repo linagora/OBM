@@ -59,6 +59,7 @@ return array(
   'Lastname' => 'Nom',
   'Mailing activated' => 'Accepte les courriels',
   'No' => 'Non',
+  'Permission denied' => 'Permissions insuffisantes',
   'Phone' => 'Téléphone',
   'Phones' => 'Téléphones',
   'Right management'  => 'Gestion des droits',

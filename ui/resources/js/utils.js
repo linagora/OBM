@@ -298,6 +298,8 @@ Obm.Error = {
         break;
       case 403:
         var errors = JSON.decode(caller.xhr.responseText, false);
+        errors.error = new Hash(errors.error);
+        errors.warning = new Hash(errors.warning);
         Obm.Error.globalMessage(errors);
         break;
       default:

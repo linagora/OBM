@@ -203,8 +203,8 @@ Obm.Contact.AddressBook = new Class ({
       $('addressBookGrid').getElements('td.current').removeClass('current');
       elem.addClass('current');
       this.addressbook = elem;
-      if(elem.retrieve('write') != 1) $('addContact').addClass('H'); 
-      else $('addContact').removeClass('H');
+      if(elem.retrieve('write') != 1) $('addContact').setStyle('visibility','hidden'); 
+      else $('addContact').setStyle('visibility','visible'); 
     }
   },
 

@@ -74,6 +74,7 @@ require('contact_query.inc');
 require_once('contact_js.inc');
 require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
+require_once("$obminclude/of/of_error.php");
 require_once('addressbook.php');
 $extra_js_include[] = 'contact.js';
 $extra_css[] = $css_contact;
