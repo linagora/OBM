@@ -17,7 +17,7 @@
           if($_contact->email[0]) echo self::__getmail($_contact->email[0]['address']);
           break;
         case 'date':
-          if($_contact->date) echo self::__getdate($contact->date);
+          if($_contact->date) echo self::__getdate($_contact->date);
           break;
         case 'workvoice':
           $phones = $_contact->getCoords('phone','WORK;VOICE');
