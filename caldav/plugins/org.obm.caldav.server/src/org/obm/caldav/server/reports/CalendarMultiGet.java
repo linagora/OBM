@@ -129,9 +129,8 @@ public class CalendarMultiGet extends ReportProvider {
 			
 			
 			Document ret = new CalendarMultiGetQueryResultBuilder().build(req, proxy, propertiesValues, listICS);
-			if(logger.isDebugEnabled()){
-				DOMUtils.logDom(ret);
-			}
+			logger.info(DOMUtils.toString(ret));
+			
 			resp.setStatus(207); // multi status webdav
 			resp.setContentType("text/xml; charset=utf-8");
 			DOMUtils.serialise(ret, resp.getOutputStream());

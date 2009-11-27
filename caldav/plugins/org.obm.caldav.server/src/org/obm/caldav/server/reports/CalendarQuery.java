@@ -98,9 +98,7 @@ public class CalendarQuery extends ReportProvider {
 			ret = new CalendarQueryResultBuilder().build(req, proxy,
 					requestPropList, events, propertiesValues);
 			
-			if(logger.isDebugEnabled()){
-				DOMUtils.logDom(ret);
-			}
+			logger.info(DOMUtils.toString(ret));
 
 			resp.setStatus(207); // multi status webdav
 			resp.setContentType("text/xml; charset=utf-8");
