@@ -66,8 +66,8 @@
             <li>
               <img onclick='setSearchFolderLinks();' alt="<?php echo __('Addressbook menu')?>" src="<?php echo self::__icon('dropdown') ?>" />
               <ul>
-                <li><a id='saveSearchFolder' href='contact_index.php?action=save&searchpattern='><?php echo __('Save') ?></a></li>
-                <li><a id='exportSearchFolder' href='contact_index.php?action=export&searchpattern='><?php echo __('Export') ?></a></li>
+                <li><a id='saveSearchFolder' href='contact_index.php?action=save&amp;searchpattern='><?php echo __('Save') ?></a></li>
+                <li><a id='exportSearchFolder' href='contact_index.php?action=export&amp;searchpattern='><?php echo __('Export') ?></a></li>
               </ul> 
             </li>
           </ul>

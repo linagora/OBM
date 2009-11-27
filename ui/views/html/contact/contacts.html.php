@@ -52,8 +52,8 @@
       <?php } ?>
     </tr>
     <?php } ?>
-    <?php if(count($contacts) >= 100 || $offset > 0) { ?>
   </tbody>
+  <?php if(count($contacts) >= 100 || $offset > 0) { ?>
   <tfoot>
     <tr class="<?php echo ($_class == 'even')? 'odd':'even' ?>" >
     <th colspan="<?php echo count($fields) ?>">
