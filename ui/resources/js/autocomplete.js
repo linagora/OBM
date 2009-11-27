@@ -137,6 +137,7 @@ obm.AutoComplete.Search = new Class({
     this.url = url;                    // url used for ajax requests
     this.inputField = $(inputField);   // field used for the input
     this.inputField.set('autocomplete','off');
+    this.inputField.setStyle('position', 'relative');
     if(this.options.name == null) {
       this.name = selectedBox;           // the name of the form validation paramater (also used as a prefix for results id)
     } else {

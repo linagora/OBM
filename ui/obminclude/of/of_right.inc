@@ -562,7 +562,6 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   }    
 
 
-  $multidomain = sql_multidomain(strtolower($table_entity));
   $query = "SELECT $e_id AS id, $e_label AS label, '$entity' as entityright_entity FROM $table_entity AS e WHERE 1=1 $where $where_filter_entity $multidomain $sqllimit";
   // END - superman has all rights on entities
 
