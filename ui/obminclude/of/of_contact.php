@@ -719,6 +719,61 @@ class OBM_Contact implements OBM_ISearchable {
     
     return $card;
   }
+
+  public function toCsv() {
+    $csv = array();
+    $fields = array_keys(get_display_pref($GLOBALS['obm']['uid'], 'contact'));
+    foreach($fields as $field) {
+      if (!is_array($this->$field)){
+        if ($field == "country") {
+          array_push($csv, "\"".$this->address[0]['country']."\"");
+        } else if($field == "cellvoice") {
+          $cellvoice = "";
+          foreach($this->phone as $phone) {
+            if($phone['label'][0] == 'CELL' && $phone['label'][1] == 'VOICE') {
+              $cellvoice = $phone['number'];
+            }
+          }
+          array_push($csv, "\"".$cellvoice."\"");
+        } else if($field == "workvoice") {
+          $workvoice = "";
+          foreach($this->phone as $phone) {
+            if($phone['label'][0] == 'WORK' && $phone['label'][1] == 'VOICE') {
+              $workvoice = $phone['number'];
+            }
+          }
+          array_push($csv, "\"".$workvoice."\"");
+        } else if($field == "workfax") {
+          $workfax = "";
+          foreach($this->phone as $phone) {
+            if($phone['label'][0] == 'WORK' && $phone['label'][1] == 'FAX') {
+              $workfax = $phone['number'];
+            }
+          }
+          array_push($csv, "\"".$workfax."\"");
+        } else if($field == "homevoice") {
+          $homevoice = "";
+          foreach($this->phone as $phone) {
+            if($phone['label'][0] == 'HOME' && $phone['label'][1] == 'VOICE') {
+              $homevoice = $phone['number'];
+            }
+          }
+          array_push($csv, "\"".$homevoice."\"");
+        } else {
+          array_push($csv,"\"".$this->$field."\"");
+        }
+      } else {
+        if ($field == "email") {
+          array_push($csv,"\"".$this->email[0]['address']."\"");
+        } else if ($field == "address") {
+          array_push($csv,"\"".$this->address[0]['street']." ".
+            $this->address[0]['zipcode']." ".$this->address[0]['expresspostal']." ".
+            $this->address[0]['town']." ".$this->address[0]['country']."\"");
+        }
+      }
+    }
+    return implode(";", $csv);
+  }
   
   private static function fetchDetails($db, $where, $offset=0, $limit=false) {
 

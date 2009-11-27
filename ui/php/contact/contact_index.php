@@ -129,7 +129,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   } else {
     header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
   }
-} elseif ($action == 'export') {
+} elseif ($action == 'save') {
 ///////////////////////////////////////////////////////////////////////////////
   $addressbooks = OBM_AddressBook::search();
   $contacts = $addressbooks->searchContacts($params['searchpattern']);
@@ -151,6 +151,15 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
     $display['detail'] .= dis_vcard_import_form();
   }
+
+} elseif ($action == 'export') {
+///////////////////////////////////////////////////////////////////////////////
+  $addressbooks = OBM_AddressBook::search();
+  $contacts = $addressbooks->searchContacts($params['searchpattern']."  archive:0");
+  if (count($contacts) != 0) {
+    dis_contact_csv_export_all($contacts);
+  }
+  exit();
 
 } elseif ($action == 'statistics') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -669,8 +678,15 @@ function get_contact_action() {
                                      		 );
                                      		 
 // Export all contacts as VCards
+  $actions['contact']['save'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=save",
+    'Right'    => $cright_read,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+                                     		 );
+
+// Export all contacts as CSV
   $actions['contact']['export'] = array (
-    'Name'     => $l_header_export,
     'Url'      => "$path/contact/contact_index.php?action=export",
     'Right'    => $cright_read,
     'Privacy'  => true,
@@ -916,7 +932,7 @@ function update_contact_action() {
 
   } else {
     $actions['contact']['import']['Condition'][] = 'insert';
-    $actions['contact']['export']['Condition'][] = 'insert';
+    $actions['contact']['save']['Condition'][] = 'insert';
   }
 }
 

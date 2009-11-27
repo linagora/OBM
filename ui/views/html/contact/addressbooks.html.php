@@ -8,10 +8,11 @@
           <li>
             <img alt="<?php echo __('Addressbook menu')?>" src="<?php echo self::__icon('dropdown') ?>" />
             <ul>
-              <li><a href='<?php echo self::__actionlink('export', array('searchpattern' => 'in:'.$_id))?>'><?php echo __('Export') ?></a></li>
+              <li><a href='<?php echo self::__actionlink('save', array('searchpattern' => 'in:'.$_id))?>'><?php echo __('Save') ?></a></li>
               <?php if ($_addressbook->write == 1) { ?>
               <li><a href='<?php echo self::__actionlink('import', array('addressbook' => $_id))?>'><?php echo __('Import') ?></a></li>
               <?php } ?>  
+              <li><a href='<?php echo self::__actionlink('export', array('searchpattern' => 'in:'.$_id))?>'><?php echo __('Export') ?></a></li>
               <?php if (!$_addressbook->isDefault && $_addressbook->admin) { ?>
               <li><a href="" onclick="$('addressbook-<?php echo $_id ?>').getElement('input').show().getNext().hide();return false;" ><?php echo __('Update') ?></a></li>
               <li><a href="" onclick="obm.contact.addressbook.deleteAddressBook(<?php echo $_id ?>, '<?php echo $this->toJs($_addressbook->name) ?>'); return false;" ><?php echo __('Delete') ?></a></li>
@@ -61,10 +62,25 @@
     <tr style="<?php echo ('search' == $current['addressbook'])? '':'display:none;' ?>">
       <td class="<?php echo ('search' == $current['addressbook'])? 'current':'' ?>" id="addressbook-search">
         <div>
+          <ul class="dropDownMenu addressBookMenu" >
+            <li>
+              <img onclick='setSearchFolderLinks();' alt="<?php echo __('Addressbook menu')?>" src="<?php echo self::__icon('dropdown') ?>" />
+              <ul>
+                <li><a id='saveSearchFolder' href='contact_index.php?action=save&searchpattern='><?php echo __('Save') ?></a></li>
+                <li><a id='exportSearchFolder' href='contact_index.php?action=export&searchpattern='><?php echo __('Export') ?></a></li>
+              </ul> 
+            </li>
+          </ul>
           <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-search')); return false;"><?php echo __('Search results') ?></a>
           <script type='text/javascript'>
             $('addressbook-search').store('write', 0);
             $('addressbook-search').store('search', '<?php $search ?>');
+            new Obm.DropDownMenu($('addressbook-search').getElement('ul'));
+            function setSearchFolderLinks() {
+              var pattern = $('searchpattern').value;
+              $('saveSearchFolder').href = $('saveSearchFolder').href+pattern;
+              $('exportSearchFolder').href = $('exportSearchFolder').href+pattern;
+            }
           </script>                  
         </div>
       </td>

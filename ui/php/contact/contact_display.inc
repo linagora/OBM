@@ -1965,6 +1965,34 @@ function dis_contact_vcard_export_all($contacts) {
   echo implode("\n", $vcards);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display Export all contacts to CSV
+///////////////////////////////////////////////////////////////////////////////
+function dis_contact_csv_export_all($contacts) {
+  global $obm;
+  
+  $csv = array();
+  $f = array();
+  $fields = array_keys(get_display_pref($GLOBALS['obm']['uid'], 'contact'));
+  $f[] = $GLOBALS['fieldnames']["displayname"];
+  foreach($fields as $field) {
+    $f[] = $GLOBALS['fieldnames'][$field];
+  }
+
+  foreach ($contacts as $c) {
+    $csv[] = $c->toCsv();
+  }
+  
+  header("Content-Type: text/csv");
+  header("Content-Disposition: inline; filename=contacts.csv");
+  header('Cache-Control: maxage=3600'); 
+  header('Pragma: public');  
+  header('charset=utf-8');
+  echo implode(";", $f);
+  echo "\n";
+  echo implode("\n", $csv);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About Contact number evolution by date
