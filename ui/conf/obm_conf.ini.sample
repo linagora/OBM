@@ -118,4 +118,20 @@ ldapAtts = cn,mail,mailAlias,mailBox,obmDomain,uid
 ldapFilter = "mail"
 configXml = /usr/lib/obm-autoconf/config.xml
 ;
+;
+[obm-sync]
+;Specials accounts for obm-sync : authentication with no password check
+;rootAccounts : create/modify/delete events in any calendar
+;appliAccounts : create/modify/delete events as appli user
+;anyUserAccounts : create/modify/delete events as user specified
+;
+;login@domain|ip,login@domain|ip,...
+rootAccounts=
+;
+;login@domain|ip,login@domain|ip,...
+appliAccounts=
+;
+;ip,ip,...
+anyUserAccounts=
+;
 ; EOF
