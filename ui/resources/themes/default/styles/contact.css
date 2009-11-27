@@ -178,6 +178,10 @@
   width: 20em;
 }
 
+#dataGrid .contactPanelHeader{
+  table-layout: fixed;
+}
+
 #dataContainer tr.odd {
   line-height: 2em;
   height: 2em;
@@ -414,10 +418,6 @@ select {
 
 #dataContainer {
   overflow-y: scroll;
-}
-
-table.contactPanelHeader {
-  table-layout: fixed;
 }
 
 table.contactPanelHeader th, .contactPanelContainer table td {

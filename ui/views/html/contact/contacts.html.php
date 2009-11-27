@@ -1,12 +1,13 @@
 <table>
   <tbody>
     <?php 
+    $_size = floor(100/count($fields)).'%';
     foreach($contacts as $_id => $_contact) {
       $_class = ($_class == 'even')? 'odd':'even';
     ?>
     <tr class="<?php echo $_class ?> <?php echo ($_id == $current['contact'])? 'current':'' ?>" id="contact-<?php echo $_id ?>" onclick="obm.contact.addressbook.selectContact($(this))">
       <?php foreach($fields as $_fieldname => $_metadata) { ?>
-      <?php if($_metadata['status'] == 2) { ?><th><?php } else { ?><td><?php } ?>
+      <?php if($_metadata['status'] == 2) { ?><th><?php } else { ?><td style='width:<?php echo $_size; ?>'><?php } ?>
       <?php
         switch($_fieldname) {
         case 'address':

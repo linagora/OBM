@@ -30,11 +30,12 @@
       <table class='contactPanelHeader'>
         <thead>
           <tr>
+            <?php $_size = floor(100/count($fields)).'%'; ?>
             <?php foreach($fields as $_fieldname => $_metadata)  { ?>
             <?php if($_metadata['status'] == 2) { ?>
             <th><?php echo $GLOBALS['fieldnames'][$_fieldname] ?></th>
             <?php } else { ?>
-            <td><?php echo $GLOBALS['fieldnames'][$_fieldname] ?></td>
+            <td style='width:<?php echo $_size; ?>'><?php echo $GLOBALS['fieldnames'][$_fieldname] ?></td>
             <?php }?>
             <?php } ?>
             <td class='filler'> </td>
