@@ -20,6 +20,7 @@
 <?php
 
 require_once(dirname(__FILE__).'/../lib/Stato/i18n/i18n.php');
+require_once('of_helpers.php');
 
 class OBM_Template {
   
@@ -114,7 +115,7 @@ class OBM_Template {
     if(!empty($address['street'])) $formatedAddress[] = $address['street'];
     if(!empty($address['zipcode']) || !empty($address['town'])) $formatedAddress[] = $address['zipcode'].' '.$address['town'];
     if(!empty($address['expresspostal']) || !empty($address['state'])) $formatedAddress[] = $address['expresspostal'].' '.$address['state'];
-    if(!empty($address['country'])) $formatedAddress[] = $address['country'];
+    if(!empty($address['address_country'])) $formatedAddress[] = get_localized_country($address['address_country']);
     return implode('<br />', $formatedAddress);
   }
 
@@ -131,6 +132,12 @@ class OBM_Template {
       if($value['label'] == $label) $return .= '<option selected="selected" value="'.$label.'">'.$locale.'</option>';
       else $return .= '<option value="'.$label.'">'.$locale.'</option>';
     }
+
+    $country = $value['country_iso3166'];
+    $countries = get_localized_countries_array();
+    $sel_countries = self::__setlist('addresses['.$addressIndex.'][country_iso3166]', $countries, __('Country'), $value['country_iso3166'], true, '');
+
+    
     $return .= '
         </select></th>
         <th colspan="2"><textarea rows="3" name="addresses['.$addressIndex.'][street]" alt="'.__('Street').'" title="'.__('Street').'">'.$value['street'].'</textarea></th>
@@ -139,7 +146,7 @@ class OBM_Template {
         <th><input type="text" name="addresses['.$addressIndex.'][town]" alt="'.__('Town').'" title="'.__('Town').'" value="'.$value['town'].'"/></th>
       </tr><tr>
         <th><input type="text" name="addresses['.$addressIndex.'][expresspostal]" alt="'.__('Express postal').'" title="'.__('Express postal').'" value="'.$value['expresspostal'].'"/></th>
-        <th><select name="addresses['.$addressIndex.'][country_iso3166]" alt="'.__('Country').'" title="'.__('Country').'"><option value="none">---</option><option value="AL">Albanie</option><option value="DZ">Algérie</option><option value="DE">Allemagne</option><option value="AO">Angola</option><option value="SA">Arabie Saoudite</option><option value="AM">Arménie</option><option value="AU">Australie</option><option value="AZ">Azerbaidjan</option><option value="BS">Bahamas</option><option value="BD">Bangladesh</option><option value="BE">Belgique</option><option value="BJ">Benin</option><option value="BY">Bielorussie</option><option value="BO">Bolivie</option><option value="BR">Brésil</option><option value="BG">Bulgarie</option><option value="BF">Burkina Faso</option><option value="CM">Cameroun</option><option value="CA">Canada</option><option value="CN">Chine</option><option value="CY">Chypre</option><option value="CO">Colombie</option><option value="KP">Corée du Nord</option><option value="CR">Costa Rica</option><option value="HR">Croatie</option><option value="CU">Cuba</option><option value="DK">Danemark</option><option value="EG">Egypte</option><option value="AE">Emirats Arabes Unis</option><option value="EC">Equateur</option><option value="ES">Espagne</option><option value="EE">Estonie</option><option value="GA">Gabon</option><option value="GE">Georgie</option><option value="GH">Ghana</option><option value="GI">Gibraltar</option><option value="GR">Grèce</option><option value="GL">Groenland</option><option value="GT">Guatemala</option><option value="GN">Guinée</option><option value="HK">Hong Kong</option><option value="HU">Hongrie</option><option value="IN">Inde</option><option value="IR">Iran</option><option value="IE">Irlande</option><option value="IS">Islande</option><option value="IL">Israel</option><option value="IT">Italie</option><option value="JM">Jamaique</option><option value="JP">Japon</option><option value="JO">Jordanie</option><option value="KZ">Kazakhstan</option><option value="KE">Kenya</option><option value="KW">Koweit</option><option value="BB">La Barbade</option><option value="LV">Lettonie</option><option value="LB">Liban</option><option value="LY">Libye</option><option value="LI">Liechtenstein</option><option value="LU">Luxembourg</option><option value="MY">Malaisie</option><option value="MW">Malawi</option><option value="MT">Malte</option><option value="MA">Maroc</option><option value="MU">Mauritius</option><option value="MX">Mexique</option><option value="MD">Moldova</option><option value="MC">Monaco</option><option value="NP">Népal</option><option value="NI">Nicaragua</option><option value="NE">Nigeria</option><option value="NO">Norvège</option><option value="NZ">Nouvelle Zélande</option><option value="OM">Oman</option><option value="PK">Pakistan</option><option value="NL">Pays Bas</option><option value="PE">Pérou</option><option value="PH">Phillipines</option><option value="PL">Pologne</option><option value="PT">Portugal</option><option value="CZ">Rep.Tchèque</option><option value="GB">Royaume Uni</option><option value="LK">Sri Lanka</option><option value="CH">Suisse</option></select></th>
+        <th>'.$sel_countries.'</th>
       </tr>
       </tbody>
       </table>

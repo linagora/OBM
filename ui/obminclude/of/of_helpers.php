@@ -46,3 +46,15 @@ function button_to($label, $url, $btn_class = false, $confirm_msg = false)
         </div>
       </form>";
 }
+
+
+function get_localized_countries_array() {
+  $countries = require_once(dirname(__FILE__)."/../lib/Stato/i18n/data/countries/".SI18n::get_locale().".php");
+  asort($countries);
+  return $countries;
+}
+
+function get_localized_country($code) {
+  $countries = require_once(dirname(__FILE__)."/../lib/Stato/i18n/data/countries/".SI18n::get_locale().".php");
+  return $countries[$code];
+}

@@ -101,7 +101,6 @@ $extra_js_include[] = 'colorchooser.js';
 
 require('calendar_display.inc');
 require_once('calendar_js.inc');
-require("$obminclude/of/of_helpers.php");
 require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 require('calendar_mailer.php');
