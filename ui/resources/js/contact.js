@@ -11,9 +11,9 @@ Obm.Contact.AddressBook = new Class ({
   
   initialize: function(mycontacts) {
     this.mycontacts = mycontacts;
-    $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 80);
+    $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.getHeight() - $('contactPanel').offsetTop - 100);
     new Obm.Observer(new Window(window), {property:'contentHeight', onStop:function() {
-      $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.innerHeight - $('contactPanel').offsetTop - 80);
+      $('contactPanel').getElements('div.contactPanelContainer').setStyle('height',window.getHeight() - $('contactPanel').offsetTop - 100);
     }});
     
     this.addressBookRequest = new Request.HTML({
