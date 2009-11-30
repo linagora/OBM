@@ -28,10 +28,14 @@
             </ul> 
           </li>
         </ul>
-        <?php if($_addressbook->synced) { ?>
+        <?php if($_addressbook->synced && $_addressbook->syncable) { ?>
         <a href="" onclick="obm.contact.addressbook.setSubscription(<?php echo $_id ?>);return false;" ><img alt='<?php echo __('Synchronized') ?>' title='<?php echo __('Synchronized') ?>' src="<?php echo self::__icon('sync') ?>"/></a>
-        <?php } else { ?>
+        <?php } elseif(!$_addressbook->synced && $_addressbook->syncable) { ?>
         <a href="" onclick="obm.contact.addressbook.setSubscription(<?php echo $_id ?>);return false;" ><img alt='<?php echo __('Not synchronized') ?>' title='<?php echo __('Not synchronized') ?>' src="<?php echo self::__icon('unsync') ?>"/></a>
+        <?php } elseif($_addressbook->synced && !$_addressbook->syncable) { ?>
+        <img alt='<?php echo __('Synchronized') ?>' title='<?php echo __('Synchronized') ?>' src="<?php echo self::__icon('sync_lock') ?>"/>
+        <?php } elseif(!$_addressbook->synced && !$_addressbook->syncable) { ?>
+        <img alt='<?php echo __('Not synchronized') ?>' title='<?php echo __('Not synchronized') ?>' src="<?php echo self::__icon('unsync_lock') ?>"/>
         <?php } ?>
         <?php if ($_addressbook->write == 1) { ?>
         <input onblur="$(this).hide();$(this).getNext().show();$(this).set('value', '<?php echo self::toJs($_addressbook->name); ?>')" type="text" style='display: none' name='name' value="<?php echo $_addressbook->name ?>" />

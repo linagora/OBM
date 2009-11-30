@@ -80,8 +80,11 @@ ALTER TABLE Contact ADD CONSTRAINT contact_addressbook_id_addressbook_id_fkey FO
 -- --
 
 INSERT INTO addressbook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable) 
-SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'contacts', true, true
+SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'contacts', true, false 
 FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
+
+INSERT INTO syncedaddressbook (user_id, addressbook_id, timestamp)
+SELECT owner, id FROM addressbook WHERE name = 'contacts' AND is_default = true;
 
 INSERT INTO addressbook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable) 
 SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'collected_contacts', true, true

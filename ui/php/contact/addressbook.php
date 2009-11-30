@@ -233,7 +233,7 @@ class OBM_AddressBook implements OBM_ISearchable {
     $ad = self::get($id);
     $uid = $GLOBALS['obm']['uid'];
     $db = new DB_OBM;
-    if(!$ad->syncable) return $db->query("DELETE FROM SyncedAddressbook WHERE user_id='$uid' AND addressbook_id='$id'");
+    if(!$ad->syncable) return true;
     if ($ad->synced) {
       // Remove synchronized addressbook
       $query = "DELETE FROM SyncedAddressbook WHERE user_id='$uid' AND addressbook_id='$id'";
