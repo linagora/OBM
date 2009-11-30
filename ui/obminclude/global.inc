@@ -468,10 +468,6 @@ if (! $cgp_use['service']['samba']) {
   $cgp_show['module']['samba'] = false;
 }
 
-if ((! $cgp_use['service']['mail']) && (! $cgp_use['service']['samba'])) {
-  $cgp_show['module']['host'] = false;
-}
-
 //----------------------------//
 // Calculated Displayed Infos //
 //----------------------------//
