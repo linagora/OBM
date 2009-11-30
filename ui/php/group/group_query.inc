@@ -25,7 +25,7 @@ function run_query_group_search($group) {
   $privacy = $group['privacy'];
   $user = sql_search_text_parse($group['user']);
   $desc = sql_search_text_parse($group['desc']);
-  $samba = sql_search_text_parse($group['samba']);
+  $samba = ($group['samba']);
 
   $sql_order_field = $group['sql_order_field'];
   $sql_order_dir = $group['sql_order_dir'];
@@ -78,8 +78,8 @@ function run_query_group_search($group) {
   if (trim($desc) != '') {
     $where .= " AND group_desc $like '%$desc%'";
   }
-  if (trim($samba) != '') {
-    $where .= " AND group_samba $like '$samba%'";
+  if ($samba == 1) {
+    $where .= " AND group_samba = $samba";
   }
   // only the one which are allowed (ie. publics )
   $where .=  ' AND ' .sql_obm_entity_privacy('group');

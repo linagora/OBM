@@ -202,7 +202,6 @@ function html_group_search_form ($group) {
   $privacy = $group['privacy'];
   $desc = $group['desc'];
   $samba = $group['samba'];
-
   if ($obm['domain_global']) {
     $sel_domain = of_domain_dis_select($domain_id, 'all');
     $dis_domain = "<label>$l_domain<br />
@@ -273,7 +272,7 @@ function html_group_search_form ($group) {
   if ($display_pref['group_samba']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_smb]<br />
-      <input name=\"tf_samba\" size=\"24\" maxlength=\"128\" value=\"$samba\" />
+      <input type='checkbox' name=\"cb_samba\" ".($samba == 1?'checked="true"':'')." value=\"1\" />
     </label>";
   }
   
@@ -359,9 +358,10 @@ function html_group_search_group($obm_q, $prefs, $group) {
   $delegation = urlencode(stripslashes($group['delegation']));
   $user = urlencode(stripslashes($group['user']));
   $email = urlencode(stripslashes($group['email']));
+  $samba = urlencode(stripslashes($group['samba']));
   $privacy = $group['privacy'];
 
-  $url = url_prepare("group_index.php?action=search&amp;tf_name=$name&amp;tf_email=$email&amp;tf_user=$user&amp;tf_delegation=$delegation&amp;privacy=$privacy$url_ext");
+  $url = url_prepare("group_index.php?action=search&amp;tf_name=$name&amp;tf_email=$email&amp;tf_user=$user&amp;tf_delegation=$delegation&amp;cb_samba=$samba&amp;privacy=$privacy$url_ext");
   
   $dis_group = new OBM_DISPLAY('DATA', $prefs, 'group');
   if ($popup) {
