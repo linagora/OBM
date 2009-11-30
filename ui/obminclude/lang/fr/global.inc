@@ -196,7 +196,7 @@ $l_emitted = "Emis";
 $l_recursive = "Récursif";
 $l_hour = "Heure";
 $l_type = "Type";
-$l_solr_connection_err = "Error lors de la connexion au serveur d'indexation";
+$l_solr_connection_err = "Erreur lors de la connexion au serveur d'indexation";
 
 $l_addressbook = "Carnet d'adresses";
 $l_contacts = "Mes contacts";

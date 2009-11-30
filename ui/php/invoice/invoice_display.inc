@@ -155,10 +155,20 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_footer_invoice(&$OD, $fieldname=null, $link_ok=null) {
+  if($OD->data_set->f('invoice_inout') == '-') {
+    $multiplicator = -1;
+  } else {
+    $multiplicator = 1;
+  }  
+  if($OD->data_set->f('invoice_credit_memo') == '1') {
+    $multiplicator = -1 * $multiplicator;
+  } else {
+    $multiplicator = 1 * $multiplicator;
+  }    
   if($fieldname == 'invoice_amount_ht') {
-    $OD->footer_data[$fieldname] += $OD->data_set->f($fieldname);
+    $OD->footer_data[$fieldname] += $OD->data_set->f($fieldname) * $multiplicator;
   } elseif ($fieldname == 'invoice_amount_ttc') {
-    $OD->footer_data[$fieldname] += $OD->data_set->f($fieldname);
+    $OD->footer_data[$fieldname] += $OD->data_set->f($fieldname) * $multiplicator;
   }
 
 }

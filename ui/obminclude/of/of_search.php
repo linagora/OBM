@@ -35,7 +35,7 @@ class  OBM_Search {
    */
   public static function buildSearchQuery($searchable, $pattern) {
     $fields = call_user_func(array($searchable,'fieldsMap'));
-    $search = self::parse($pattern);
+    $search = self::parse($pattern, $fields);
     $query = '1 = 1';
     foreach($search as $fieldname => $values)  {
       $conditions = array();
@@ -71,7 +71,7 @@ class  OBM_Search {
     return false;
   }
 
-  public static function parse($pattern) {
+  public static function parse($pattern, $fields = null) {
     // Add a delimiter at the end of the string
     $pattern .= ' ';
     $searchPattern = array();
@@ -83,6 +83,9 @@ class  OBM_Search {
       // If no field present, the pattern must be search on *
       if($match[2][$index] == '') {
         $field = '*';
+      } elseif ($fields && !$fields[$match[2][$index]]){
+        $field = '*';
+        $searchPattern[$field][] = $match[2][$index].':';
       } else {
         $field = $match[2][$index];
       }
