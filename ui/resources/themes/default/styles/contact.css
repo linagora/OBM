@@ -166,10 +166,6 @@
   width: auto;
 }
 
-#dataGrid.shrinked #dataContainer{
-  width: 22em;
-}
-
 #dataGrid.shrinked td {
   display: none;
 }

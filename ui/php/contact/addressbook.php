@@ -196,13 +196,13 @@ class OBM_AddressBook implements OBM_ISearchable {
     $id = $addressbook['addressbook_id'];
     $uid = $GLOBALS['obm']['uid'];
     $ad = self::get($id);
-    if (!$ad->isDefault && $ad->write) {
+    if (!$ad->isDefault && $ad->admin) {
       $db = new DB_OBM;
       // Delete contacts
       $query = "DELETE FROM Contact WHERE contact_addressbook_id='$id'";
       $db->query($query);
       // Delete addressbook
-      $query = "DELETE FROM AddressBook WHERE id='$id' and owner='$uid'";
+      $query = "DELETE FROM AddressBook WHERE id='$id'";
       $db->query($query);
     }
   }

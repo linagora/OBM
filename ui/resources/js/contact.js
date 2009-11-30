@@ -22,10 +22,9 @@ Obm.Contact.AddressBook = new Class ({
       evalScripts : true,
       update: $('addressBookContainer'),
       onComplete: function(response) {
-        this.addressbook = $(this.addressbook.get('id'));
-        if(!this.addressbook) this.addressbook = $(this.mycontacts);
-        this.addressbook.addClass('current');
         $('spinner').hide();
+        this.addressbook = $(this.addressbook.get('id'));
+        if(!this.addressbook)  this.selectAddressBook($(this.mycontacts));
       }.bind(this),
       onRequest: $('spinner').show.bind($('spinner')),
       onFailure: function (response) {
