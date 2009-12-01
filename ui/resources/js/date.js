@@ -161,65 +161,65 @@ Obm.DateTime = new Class({
 
   setTime: function(Time) {
     this.inputDate.setTime(Time);
-    var time = this.inputDate.getTime() - this.inputDate.getTimezoneOffset() * 60 * 1000 - obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    var time = this.inputDate.getTime() + this.inputDate.getTimezoneOffset() * 60 * 1000 + this.offset;     
     this.outputDate.setTime(time);
-    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.outputDate.getTime());
   },
 
 
   setUTCDate: function(UTCDate) {
     this.inputDate.setUTCDate(UTCDate);
-    var time = this.inputDate.getTime() - this.inputDate.getTimezoneOffset() * 60 * 1000 - obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    var time = this.inputDate.getTime() + this.inputDate.getTimezoneOffset() * 60 * 1000 + this.offset;     
     this.outputDate.setTime(time);
-    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.outputDate.getTime());
   },
 
 
   setUTCFullYear: function(UTCFullYear) {
     this.inputDate.setUTCFullYear(UTCFullYear);
-    var time = this.inputDate.getTime() - this.inputDate.getTimezoneOffset() * 60 * 1000 - obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    var time = this.inputDate.getTime() + this.inputDate.getTimezoneOffset() * 60 * 1000 + this.offset;     
     this.outputDate.setTime(time);
-    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.outputDate.getTime());
   },
 
 
   setUTCHours: function(UTCHours) {
     this.inputDate.setUTCHours(UTCHours);
-    var time = this.inputDate.getTime() - this.inputDate.getTimezoneOffset() * 60 * 1000 - obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    var time = this.inputDate.getTime() + this.inputDate.getTimezoneOffset() * 60 * 1000 + this.offset;     
     this.outputDate.setTime(time);
-    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.outputDate.getTime());
   },
 
 
   setUTCMilliseconds: function(UTCMilliseconds) {
     this.inputDate.setUTCMilliseconds(UTCMilliseconds);
-    var time = this.inputDate.getTime() - this.inputDate.getTimezoneOffset() * 60 * 1000 - obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    var time = this.inputDate.getTime() + this.inputDate.getTimezoneOffset() * 60 * 1000 + this.offset;     
     this.outputDate.setTime(time);
-    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.outputDate.getTime());
   },
 
 
   setUTCMinutes: function(UTCMinutes) {
     this.inputDate.setUTCMinutes(UTCMinutes);
-    var time = this.inputDate.getTime() - this.inputDate.getTimezoneOffset() * 60 * 1000 - obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    var time = this.inputDate.getTime() + this.inputDate.getTimezoneOffset() * 60 * 1000 + this.offset;     
     this.outputDate.setTime(time);
-    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.outputDate.getTime());
   },
 
 
   setUTCMonth: function(UTCMonth) {
     this.inputDate.setUTCMonth(UTCMonth);
-    var time = this.inputDate.getTime() - this.inputDate.getTimezoneOffset() * 60 * 1000 - obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    var time = this.inputDate.getTime() + this.inputDate.getTimezoneOffset() * 60 * 1000 + this.offset;     
     this.outputDate.setTime(time);
-    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.outputDate.getTime());
   },
 
 
   setUTCSeconds: function(UTCSeconds) {
     this.inputDate.setUTCSeconds(UTCSeconds);
-    var time = this.inputDate.getTime() - this.inputDate.getTimezoneOffset() * 60 * 1000 - obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
+    var time = this.inputDate.getTime() + this.inputDate.getTimezoneOffset() * 60 * 1000 + this.offset;     
     this.outputDate.setTime(time);
-    this.offset = obm.timeZoneParser.getTimeZoneOffset(this.outputDate.getTime());
   },
 
 

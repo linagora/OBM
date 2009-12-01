@@ -76,8 +76,7 @@ Obm.CalendarManager = new Class({
     this.events.set(evt.element.id, evt);
     var index = new Obm.DateTime(evt.event.time * 1000).format('Y-m-d');
     if (evt.kind == 'all_day') {
-      var current = new Obm.DateTime(evt.event.time*1000);
-      var begin = evt.event.time*1000;;
+      var begin = evt.event.time*1000;
       evt.size = Math.floor(evt.event.duration/86400);
       if (evt.size == 0) evt.size = 1; // very, very crappy fix 
       if (!evt.event.all_day) {
@@ -111,6 +110,7 @@ Obm.CalendarManager = new Class({
         }
       }
 
+      var current = new Obm.DateTime(begin);
       for(var i=0;i<evt.size;i++) {
         current.setTime(begin);
         current.setDate(current.getDate()+ i);
