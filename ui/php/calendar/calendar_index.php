@@ -770,8 +770,10 @@ if ($action == 'search') {
   
 } elseif ($action == 'edit_template') {
 ///////////////////////////////////////////////////////////////////////////////
-    list($template_q, $entity_ids) = run_query_calendar_get_template($params['template_id']);
-    $display['detail'] = dis_calendar_template_form($action, $params, $template_q, $entity_ids, $current_view);
+  $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+  $extra_css[] = $css_ext_color_picker ;
+  list($template_q, $entity_ids) = run_query_calendar_get_template($params['template_id']);
+  $display['detail'] = dis_calendar_template_form($action, $params, $template_q, $entity_ids, $current_view);
     
 } elseif ($action == 'update_template') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -783,6 +785,8 @@ if ($action == 'search') {
     $params['template_id'] = $template_id;
     $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
   } else {
+    $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_css[] = $css_ext_color_picker ;
     foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
       $entities[$type] = is_array($params["sel_{$type}_id"]) ? $params["sel_{$type}_id"] : array();
     }
