@@ -1361,7 +1361,7 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
     'update_decision','update_ext_decision', 'update_alert','decision','update','delete', 'new_meeting',
-    'rights_admin','rights_update', 'waiting_events','planning','save_as_template', 'list_templates')
+    'rights_admin','rights_update', 'waiting_events','planning','save_as_template', 'list_templates', 'edit_template')
   );
 
   // Detail Consult
