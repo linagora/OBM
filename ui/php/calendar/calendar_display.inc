@@ -428,7 +428,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
 
     $user_complete = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {filter_entity:'calendar', filter_pattern:'read', defaultText:'$user_text'});";
     $group_complete = "new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {filter_entity:'calendar', filter_pattern:'read', mode: 'mono',
-        locked: 'true', resetable: 'true', selectfunction:'sel_public_group(\"$iso\", element, this.inputField.value)'});";
+        locked: 'true', selectfunction:'sel_public_group(\"$iso\", element, this.inputField.value)'});";
   }
   // loop through ['user'], ['resource']
   $count = 0;
