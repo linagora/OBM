@@ -1516,28 +1516,28 @@ function get_calendar_action() {
   // Tag Update
   $actions['calendar']['tags_update'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=tag_update",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );
 
   // Tag Insert
   $actions['calendar']['tag_insert'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=tag_insert",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );
 
   // Tag Delete
   $actions['calendar']['tag_delete'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=tag_delete",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );
 
   // Tag Search
   $actions['calendar']['tag_search'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=tag_search",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );
 
