@@ -523,7 +523,6 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   //  }
   //}
   //return OBM_Acl::getAllowedEntities($user_id, $entity, 'admin');
-  $multidomain = sql_multidomain(strtolower($table_entity));
   if ($entity=='addressbook') {
     $table_entity = 'AddressBook';
     $e_id = "e.id";
@@ -554,6 +553,7 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
     $e_id = "e.${entity}_id";
     $e_label = "e.${entity}_name";
   }
+  if(!$multidomain) $multidomain = sql_multidomain(strtolower($table_entity));
   if($limit) $sqllimit = 'LIMIT 24 OFFSET 0' ;
   if($pattern !== false) $where .= "AND $e_label #LIKE '%$pattern%'";
 
