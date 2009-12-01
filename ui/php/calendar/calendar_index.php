@@ -781,7 +781,9 @@ if ($action == 'search') {
   $extra_css[] = $css_ext_color_picker ;
   if (check_calendar_data_form($params)) {
     $template_id = run_query_calendar_create_or_update_event_template($params);
-    
+    foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
+      $entities[$type] = is_array($params["sel_{$type}_id"]) ? $params["sel_{$type}_id"] : array();
+    }
     $display['msg'] .= display_ok_msg("$l_template : $l_update_ok");
     $current_view->set_date($params["date_begin"]);
     $params['template_id'] = $template_id;
