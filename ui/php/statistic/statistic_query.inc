@@ -87,8 +87,10 @@ function run_query_statistic_entity_per_country_per_cat($entity, $category) {
       count(${entity}_id) as nb 
     FROM $table
       INNER JOIN $entityTable ON $entityEntityId =  ${entity}_id
-      LEFT JOIN Country ON ${entity}_country_iso3166 = country_iso3166
-                           AND country_lang='$lang'
+      LEFT JOIN Address as ad1 ON $entityId=ad1.address_entity_id
+        AND ad1.address_label = 'WORK;X-OBM-Ref1'
+      LEFT JOIN Country as ctry1 ON ad1.address_country=ctry1.country_iso3166
+           AND ctry1.country_lang='$lang'
       LEFT JOIN CategoryLink ON categorylink_category = '$category'
                                AND categorylink_entity_id = $entityId
       LEFT JOIN Category ON categorylink_category_id = category_id
@@ -210,10 +212,12 @@ function run_query_statistic_selected_entity_per_country_per_cat($obm_q, $entity
       count(${entity}_id) as nb 
     FROM $table
       INNER JOIN $entityTable ON $entityEntityId =  ${entity}_id
-      LEFT JOIN Country ON ${entity}_country_iso3166 = country_iso3166
-                           AND country_lang='$lang'
+      LEFT JOIN Address as ad1 ON $entityId=ad1.address_entity_id
+        AND ad1.address_label = 'WORK;X-OBM-Ref1'
+      LEFT JOIN Country as ctry1 ON ad1.address_country=ctry1.country_iso3166
+           AND ctry1.country_lang='$lang'
       LEFT JOIN CategoryLink ON categorylink_category = '$category'
-                               AND categorylink_entity_id = $entityId                           
+                               AND categorylink_entity_id = $entityId
       LEFT JOIN Category ON categorylink_category_id = category_id
     WHERE 1=1
       $where_entity
