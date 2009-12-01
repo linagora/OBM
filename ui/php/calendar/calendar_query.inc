@@ -5461,7 +5461,7 @@ Class CalendarView {
     $query = "DELETE FROM UserObmPref
       WHERE userobmpref_user_id=$user_id
       AND userobmpref_option='set_cal_default_view'
-      AND userobmpref_value $id
+      AND userobmpref_id $id
       ";
     display_debug_msg($query, $cdg_sql, 'CalendarView::delete()');
     $obm_q->query($query);
