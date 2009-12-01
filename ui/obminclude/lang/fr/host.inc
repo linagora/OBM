@@ -65,6 +65,7 @@ $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM Sync';
 $l_solr = 'Solr';
+$l_imap_frontend = 'IMAP Frontal';
 $l_monitor = 'Supervison';
 
 

@@ -152,6 +152,7 @@ function run_query_domain_insert($domain) {
       of_service_property_insert('mail','imap', $entity_id, $domain['imap']);
       of_service_property_insert('mail','smtp_in', $entity_id, $domain['smtp_in']);
       of_service_property_insert('mail','smtp_out', $entity_id, $domain['smtp_out']);
+      of_service_property_insert('mail','imap_frontend', $entity_id, $domain['imap_frontend']);
     }
     if ($cgp_use['service']['sync']) {
       of_service_insert('sync', $entity_id);
@@ -410,6 +411,7 @@ function run_query_domain_update($domain_id, $domain) {
     of_service_property_replace('mail','imap',$entity_id , $domain['imap']);
     of_service_property_replace('mail','smtp_in', $entity_id, $domain['smtp_in']);
     of_service_property_replace('mail','smtp_out', $entity_id, $domain['smtp_out']);
+    of_service_property_replace('mail','imap_frontend', $entity_id, $domain['imap_frontend']);
   }  
   if ($cgp_use['service']['sync']) {
     of_service_property_replace('sync','obm_sync', $entity_id, $domain['obm_sync']);
@@ -920,6 +922,53 @@ function get_domain_solrservers($domain_id= NULL) {
     $where
     $where_domain";
   display_debug_msg($query, $cdg_sql, 'get_domain_solrservers()');
+  $obm_q->query($query);
+
+  $m = array();
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('host_id');
+    $m[$id]['id'] = $id;
+    $m[$id]['name'] = $obm_q->f('host_name');
+    $m[$id]['solr'] = $obm_q->f('host_solr');
+  }
+
+  return $m;
+}
+
+
+/**
+ * Get the frontendserver list candidate for a domain
+ * where frontendserver host_domain_id matches or from domain 0)
+ * @param $role : restrict list to sync server role
+ * @param $domain_id : restrict list to frontend server in this domain
+ *   if doma
+ * @return array with solr servers
+ **/
+function get_domain_frontendservers($domain_id= NULL) {
+  global $cdg_sql;
+
+  if ($domain_id > 0) {
+    $domain_id = sql_parse_id($domain_id, true);
+    // For one domain specified (domain update), global or domain syncserver
+    $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+  } else {
+    // New domain (no id specified), host from domain 0
+    $where_domain = "AND (domain_global = true)";
+  }
+  $where = " AND (imap_frontend.service_id IS NOT NULL) ";
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT 
+      Host.*,
+      imap_frontend.service_id as host_imap_frontend
+    FROM Host 
+    INNER JOIN HostEntity ON hostentity_host_id = host_id
+    LEFT JOIN Domain ON domain_id = host_domain_id
+    LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id    
+    WHERE 1 = 1
+    $where
+    $where_domain";
+  display_debug_msg($query, $cdg_sql, 'get_domain_frontendservers()');
   $obm_q->query($query);
 
   $m = array();

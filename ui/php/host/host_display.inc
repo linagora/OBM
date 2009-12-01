@@ -158,6 +158,7 @@ function html_host_search_form($host) {
   $solr = ($host['solr'] == '1' ? "checked = \"checked\"" : '');
   $imap = ($host['imap'] == '1' ? "checked = \"checked\"" : '');
   $monitor = ($host['monitor'] == '1' ? "checked = \"checked\"" : '');
+  $imap_frontend = ($host['imap_frontend'] == '1' ? "checked = \"checked\"" : '');
 
 
   $dis_delegation = of_delegation_dis_search_form($delegation);
@@ -180,6 +181,9 @@ function html_host_search_form($host) {
     </label>
     <label>$GLOBALS[l_smtp_out]<br />
       <input type=\"checkbox\" name=\"cb_smtp_out\" value=\"1\" $smtp_out />
+    </label>
+    <label>$GLOBALS[l_imap_frontend]<br />
+      <input type=\"checkbox\" name=\"cb_imap_frontend\" value=\"1\" $imap_frontend />
     </label>";
   }
   if ($cgp_use['service']['sync']) {
@@ -358,6 +362,7 @@ function html_host_consult($host_q) {
   $smtp_out = $host_q->f('host_smtp_out');
   $obm_sync = $host_q->f('host_obm_sync');
   $solr = $host_q->f('host_solr');
+  $imap_frontend = $host_q->f('host_imap_frontend');
   $smtp_in = $host_q->f('host_smtp_in');
   $monitor = $host_q->f('host_monitor');
   $name = $host_q->f('host_name');
@@ -381,6 +386,7 @@ function html_host_consult($host_q) {
   if ($smtp_out) $smtp_out = $l_yes; else $smtp_out = $l_no;
   if ($obm_sync) $obm_sync = $l_yes; else $obm_sync = $l_no;
   if ($solr) $solr = $l_yes; else $solr = $l_no;
+  if ($imap_frontend) $imap_frontend = $l_yes; else $imap_frontend = $l_no;
   if ($monitor) $monitor = $l_yes; else $monitor = $l_no;
   if ($user_login == '') {
     $dis_user = $l_not_assigned;
@@ -416,6 +422,10 @@ function html_host_consult($host_q) {
     <tr>
       <th>$GLOBALS[l_smtp_out]</th>
       <td>$smtp_out</td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_imap_frontend]</th>
+      <td>$imap_frontend</td>
     </tr>
       ";    
   }
@@ -561,6 +571,7 @@ function html_host_form($action, $host_q, $host, $field='') {
     $smtp_out = $host_q->f('host_smtp_out');
     $obm_sync = $host_q->f('host_obm_sync');
     $solr = $host_q->f('host_solr');
+    $imap_frontend = $host_q->f('host_imap_frontend');
     $monitor = $host_q->f('host_monitor');
     $desc = $host_q->f('host_description');
     $u_login = $host_q->f('userobm_login');
@@ -585,6 +596,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['smtp_out'])) { $smtp_out = $host['smtp_out']; }
   if (isset($host['obm_sync'])) { $obm_sync = $host['obm_sync']; }
   if (isset($host['solr'])) { $solr = $host['solr']; }
+  if (isset($host['imap_frontend'])) { $imap_frontend = $host['imap_frontend']; }
   if (isset($host['monitor'])) { $monitor = $host['monitor']; }
   if (isset($host['desc'])) { $desc = stripslashes($host['desc']); }
   if (isset($host['domain_id'])) { $domain_id = $host['domain_id']; }
@@ -605,6 +617,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   $smtp_out_state  = ($smtp_out ? 'checked' : '');
   $obm_sync_state  = ($obm_sync ? 'checked' : '');
   $solr_state  = ($solr ? 'checked' : '');
+  $imap_frontend_state  = ($imap_frontend ? 'checked' : '');
   $monitor_state  = ($monitor ? 'checked' : '');
 
 
@@ -649,6 +662,11 @@ function html_host_form($action, $host_q, $host, $field='') {
       <th class=\"$class[smtp_out]\"><label for=\"cb_smtp_out\">$GLOBALS[l_smtp_out]</label></th>
       <td>
         <input id=\"cb_smtp_out\" name=\"cb_smtp_out\" type=\"checkbox\" value=\"1\" $smtp_out_state>
+      </td>
+    </tr><tr>
+      <th class=\"$class[imap_frontend]\"><label for=\"cb_smtp_out\">$GLOBALS[l_imap_frontend]</label></th>
+      <td>
+        <input id=\"cb_imap_frontend\" name=\"cb_imap_frontend\" type=\"checkbox\" value=\"1\" $imap_frontend_state>
       </td>
     </tr>";
   }
@@ -834,6 +852,7 @@ function dis_host_warn_insert($id, $h_q, $host) {
   $smtp_out = $host['smtp_out'];
   $obm_sync = $host['obm_sync'];
   $solr = $host['solr'];
+  $imap_frontend = $host['imap_frontend'];
   $samba = $host['samba'];
 
   $display['msg'] .= display_warn_msg($l_check_samehost);
@@ -856,6 +875,7 @@ function dis_host_warn_insert($id, $h_q, $host) {
     <input type=\"hidden\" name=\"cb_smtp_out\" value=\"$smtp_out\" />
     <input type=\"hidden\" name=\"cb_obm_sync\" value=\"$obm_sync\" />
     <input type=\"hidden\" name=\"cb_solr\" value=\"$solr\" />
+    <input type=\"hidden\" name=\"cb_imap_frontend\" value=\"$imap_frontend\" />
     <input type=\"hidden\" name=\"cb_samba\" value=\"$samba\" />
     <input type=\"hidden\" name=\"tf_fqdn\" value=\"$fqdn\" />
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />

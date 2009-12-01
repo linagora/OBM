@@ -130,4 +130,5 @@ $l_mailserver = "Server di posta";
 $l_solrserver_warn = "Crea un host di questo tipo"; 
 $l_solr_calendar = "Solr"; 
 $l_solr_servers = "Server di indicizzazione"; 
-
+$l_imap_frontend_servers = "IMAP frontend servers";
+$l_imapfrontendserver_warn = "Crea un host di questo tipo"; 

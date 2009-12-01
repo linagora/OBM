@@ -16,7 +16,8 @@
     <service key='monitor' />
     <!-- Is set if this host has solr server-->
     <service key='solr' />
-
+    <!-- Is set if this host has imap frontend server-->
+    <service key='imap_frontend' />
   </entity>
   <entity type='domain'>
 
@@ -36,6 +37,12 @@
 
     <!-- Is set if this domain provide mail sevices (imap, smtp) -->
     <service key='mail'>
+      <!-- Domain imap frontend host(s) id(s), those host must have the imap service -->
+      <property key='imap_frontend'>
+        <type>id</type>
+        <min>1</min>
+        <max>*</max>
+      </property>
       <!-- Domain imap host(s) id(s), those host must have the imap service -->
       <property key='imap'>
         <type>id</type>

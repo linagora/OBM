@@ -29,6 +29,7 @@ function run_query_host_search($host) {
   $smtp_out = $host['smtp_out'];
   $obm_sync = $host['obm_sync'];
   $solr = $host['solr'];
+  $imap_frontend = $host['imap_frontend'];
   $monitor = $host['monitor'];
   $imap = $host['imap'];
 
@@ -62,8 +63,11 @@ function run_query_host_search($host) {
   if ($obm_sync != '') {
     $where .= ' AND obm_sync.service_id IS NOT NULL';
   }
-  if ($solr!= '') {
+  if ($solr != '') {
     $where .= ' AND solr.service_id IS NOT NULL';
+  }
+  if ($imap_frontend != '') {
+    $where .= ' AND imap_frontend.service_id IS NOT NULL';
   }
   if ($monitor != '') {
     $where .= ' AND monitor.service_id IS NOT NULL';
@@ -86,6 +90,7 @@ function run_query_host_search($host) {
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as solr ON solr.service_service = 'solr' AND solr.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id"; 
 
   $multidomain = sql_multidomain('host');
@@ -145,6 +150,7 @@ function run_query_host_detail($id) {
       smtp_out.service_id as host_smtp_out,
       obm_sync.service_id as host_obm_sync,
       solr.service_id as host_solr,
+      imap_frontend.service_id as host_imap_frontend,
       monitor.service_id as host_monitor,
       $timecreate,
       $timeupdate,
@@ -163,6 +169,7 @@ function run_query_host_detail($id) {
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as solr ON solr.service_service = 'solr' AND solr.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
       LEFT JOIN Domain ON host_domain_id = domain_id
     WHERE host_id $id 
@@ -193,6 +200,7 @@ function run_query_host_insert($host) {
   $smtp_out = sql_parse_int($host['smtp_out']);
   $obm_sync = sql_parse_int($host['obm_sync']);
   $solr = sql_parse_int($host['solr']);
+  $imap_frontend = sql_parse_int($host['imap_frontend']);
   $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
   $list = $host['web_list'];
@@ -261,6 +269,9 @@ function run_query_host_insert($host) {
   if($solr > 0) {
     of_service_insert('solr', $entity_id); 
   }
+  if($imap_frontend > 0) {
+    of_service_insert('imap_frontend', $entity_id); 
+  }
   if($monitor > 0) {
     of_service_insert('monitor', $entity_id); 
   }
@@ -309,6 +320,7 @@ function run_query_host_update($host) {
   $smtp_out = sql_parse_int($host['smtp_out']);
   $obm_sync = sql_parse_int($host['obm_sync']);
   $solr = sql_parse_int($host['solr']);
+  $imap_frontend = sql_parse_int($host['imap_frontend']);
   $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
   $desc = $host['desc'];
@@ -359,6 +371,11 @@ function run_query_host_update($host) {
       of_service_insert('solr', $entity_id); 
     } else {
       of_service_delete('solr', $entity_id); 
+    }
+    if($imap_frontend > 0) {
+      of_service_insert('imap_frontend', $entity_id); 
+    } else {
+      of_service_delete('imap_frontend', $entity_id); 
     }
     if($monitor > 0) {
       of_service_insert('monitor', $entity_id); 
@@ -477,7 +494,9 @@ function get_host_info($id) {
       imap.service_id as host_imap,
       smtp_in.service_id as host_smtp_in,
       smtp_out.service_id as host_smtp_out,
-      solr.service_id as host_obm_sync,
+      solr.service_id as host_solr,
+      obm_sync.service_id as host_obm_sync,
+      imap_frontend.service_id as host_imap_frontend,
       monitor.service_id as host_monitor
     FROM Host
       INNER JOIN HostEntity ON hostentity_host_id = host_id
@@ -487,6 +506,7 @@ function get_host_info($id) {
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as solr ON solr.service_service = 'solr' AND solr.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
     WHERE host_id $id $multidomain";
 
@@ -504,6 +524,7 @@ function get_host_info($id) {
   $h['smtp_out'] = $obm_q->f('host_smtp_out');
   $h['obm_sync'] = $obm_q->f('host_obm_sync');
   $h['solr'] = $obm_q->f('host_solr');
+  $h['imap_frontend'] = $obm_q->f('host_imap_frontend');
   $h['monitor'] = $obm_q->f('host_monitor');
   $h['imap'] = $obm_q->f('host_imap');
   $h['desc'] = $obm_q->f('host_description');

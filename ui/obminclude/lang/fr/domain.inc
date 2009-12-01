@@ -13,6 +13,7 @@ $l_mail_server = "Choix du serveur de mail";
 $l_mail_servers = "Serveurs de mail";
 $l_sync_servers = "Serveurs de synchronisation";
 $l_solr_servers = "Serveurs d'indexation";
+$l_imap_frontend_servers = "Serveurs IMAP frontaux";
 
 $l_update_state = "Etat de mise à jour";
 
@@ -62,6 +63,7 @@ $l_mailserver = "Serveur de mail";
 $l_mailserver_warn = 'Vous devez créer un hôte de ce type';
 $l_syncserver_warn = 'Vous devez créer un hôte de ce type';
 $l_solrserver_warn = 'Vous devez créer un hôte de ce type';
+$l_imapfrontendserver_warn = 'Vous devez créer un hôte de ce type';
 
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';

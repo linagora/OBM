@@ -13,6 +13,7 @@ $l_mail_server = "Mail server choice";
 $l_mail_servers = "Mail servers";
 $l_sync_servers = "Synchronization servers";
 $l_solr_servers = "Indexing servers";
+$l_imap_frontend_servers = "IMAP frontend servers";
 
 // Mail chooser labels
 $l_mailboxchoice_least_boxes = "having less mailboxes";
@@ -54,6 +55,7 @@ $l_domain_confirm_delete = "CAUTION : You will delete a profile ! This operation
 $l_mailserver_warn = "You have to create a host of this kind first"; 
 $l_syncserver_warn = "You have to create an host of this kind first";
 $l_solrserver_warn = "You have to create an host of this kind first";
+$l_imapfrontendserver_warn = "You have to create an host of this kind first";
 
 $l_mailserver = "Mail server";
 $l_imap = 'IMAP';

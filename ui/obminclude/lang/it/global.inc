@@ -558,6 +558,7 @@ $l_search_results = "Risultati della ricerca";
 $l_duplicate_ok = "Copia effettuata"; 
 $l_mobile_add_partnership = "Aggiungi associazione "; 
 $l_header_select_solrserver = "Selezione del server Solr"; 
+$l_header_select_imapfrontendserver = "Selezionne del server IMAP frontend";
 $l_mobile_identifier = "username"; 
 $l_save = "Salva"; 
 $l_import_error = "Errore durante l'importo"; 

@@ -136,9 +136,10 @@ function dis_domain_consult($domain) {
   $mailservers = of_domain_get_domain_mailserver('', $id);
   $syncservers = of_domain_get_domain_syncserver($id);
   $solrservers = of_domain_get_domain_solrserver($id);
+  $imapfrontendservers = of_domain_get_domain_imapfrontendserver($id);
   $samba = run_query_domain_samba_properties($id);
   if ($obm_q->num_rows() == 1) {
-    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers, $solrservers);
+    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers, $solrservers, $imapfrontendservers);
   } else {
     $display['msg'] .= display_err_msg($l_query_error);
   }
@@ -153,7 +154,7 @@ function dis_domain_consult($domain) {
 //   - $obm_q       : domain database result
 //   - $mailservers : domain mailservers array
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL,$solrservers=NULL) {
+function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL,$solrservers=NULL, $imapfrontendservers=NULL) {
   global $display, $ico_delete, $l_mail_server, $l_sync_servers, $cgp_use, $l_properties, $l_solr_servers;
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
   global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
@@ -316,6 +317,41 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
     }
   }
 
+  // Domain imap frontend server 
+  // Get the domain imapfrontendservers
+  $block_s = '';
+  if (is_array($imapfrontendservers)) {
+    foreach ($imapfrontendservers as $s_id => $imapfrontendserver_info) {
+	    foreach ($imapfrontendserver_info as $server_info) {
+	      $name = $server_info['name'];
+	      $ip = $server_info['ip'];
+	      $role = $server_info['role'];
+	      $block_imapfrontendservers .= "
+            <tr>
+            <td>$name</td>
+            <td>$ip</td>
+            <td>$role</td>
+            </tr>";
+	    }
+    }
+    if ($block_imapfrontendservers != '') {
+	    $block_imapfrontend = "
+          <div class=\"detail infos\">
+          <h1>$GLOBALS[l_imap_frontend_servers]</h1>
+
+          <table class=\"spreadSheet\">
+          <thead>
+          <tr>
+            <th>$l_host</th>
+            <th>$l_ip</th>
+            <th>$l_role</th>
+          </tr>
+          </thead>
+          $block_imapfrontendservers
+          </table>
+          </div>";
+    }
+  }
 
 
   if ($cgp_use['service']['samba'] && ($samba['drive'] || $samba['domain'] || $samba['sid'] || $samba['profile'] || $samba['home'])) {
@@ -395,6 +431,7 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
   </table>
   </div>
 $block_ms
+$block_imapfrontend
 $block_sync
 $block_solr
 $dis_samba
@@ -412,7 +449,7 @@ $properties_block
 //   - $domain      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrservers = NULL, $samba, $properties_q, $domain) {
+function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrservers = NULL, $imapfrontendservers, $samba, $properties_q, $domain) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
   global $l_insert, $l_update,$l_mail_server, $l_header_add_mailserver;
   global $display, $cgp_use, $c_none, $l_none, $l_properties;
@@ -440,6 +477,9 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
     foreach($solrservers as $solrserver_id => $solrserver) {
       $solr[] = $solrserver_id;
     }
+    foreach($imapfrontendservers as $imapfrontendserver_id => $imapfrontendserver) {
+      $imap_frontend[] = $imapfrontendserver_id;
+    }
   }
 
   // If parameters have been given, they supercede the default action value
@@ -454,6 +494,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
   if (isset($domain['smtp_out'])) { $smtp_out = $domain['smtp_out'];}
   if (isset($domain['obm_sync'])) { $obm_sync = $domain['obm_sync'];}
   if (isset($domain['solr'])) { $solr = $domain['solr'];}
+  if (isset($domain['imap_frontend'])) { $imap_frontend = $domain['imap_frontend'];}
   if (isset($domain['samba'])) { $samba = $domain['samba'];}
 
   while($properties_q->next_record()) {
@@ -766,6 +807,43 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
       </fieldset>";
   } 
 
+
+  $imap_frontend_servers = get_domain_frontendservers($id);
+  if (is_array($imap_frontend)) {
+    foreach($imap_frontend as $imap_frontend_id) {
+      $imap_frontend_sel = $imap_frontend_id;
+    }
+  }
+  if (sizeof($imap_frontend_servers) > 0) {
+    foreach($imap_frontend_servers as $host_id => $serverinfos) {
+      $selected = '';
+      if(isset($imap_frontend_sel) && $imap_frontend_sel == $host_id) $selected = "selected='selected'";        
+      $imap_frontend_servers_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
+    }
+    $dis_imap_frontend = "<fieldset class=\"detail infos\">
+      <legend>$GLOBALS[l_imap_frontend_servers]</legend>
+        <table>
+        <tr>
+        <th>$GLOBALS[l_header_select_imapfrontendserver]</th>
+        <td id='obm_imapFrontendServer'>
+          <div class=\"multiple\">
+          <select name='sel_imap_frontend[]'>
+            <option value=''>---</option>
+            $imap_frontend_servers_list
+          </select> 
+          </div>              
+        </td>
+        </tr>
+        </table>
+    </fieldset>";
+  } else {
+    $dis_imap_frontend = "
+      <fieldset class=\"detail infos\">
+        <legend class='warning'>$GLOBALS[l_imap_frontend_servers] : $GLOBALS[l_imapfrontendserver_warn]</legend>
+      </fieldset>";
+  } 
+
+
   $display['title'] = $label;
 
   // --- HTML Template --------------------------------------------------------
@@ -796,6 +874,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
     $dis_alias
 
     $dis_mailserver
+    $dis_imap_frontend
     $dis_samba
     $dis_solr
     $properties_block
