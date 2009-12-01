@@ -45,6 +45,7 @@
     <field name="assistant" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="spouse" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="category" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="categoryId" type="integer" indexed="true" stored="false" multiValued="true" />
     <field name="service" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="function" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="title" type="text" indexed="true" stored="false" multiValued="false" /> 
@@ -55,8 +56,8 @@
     <field name="date" type="date" indexed="true" stored="false" multiValued="false" /> 
     <field name="birthday" type="date" indexed="true" stored="false" multiValued="false" />
     <field name="anniversary" type="date" indexed="true" stored="false" multiValued="false" />
-    <field name="birthdayEventId" type="integer" indexed="true" stored="false" multiValued="false" />
-    <field name="anniversaryEventId" type="integer" indexed="true" stored="false" multiValued="false" />
+    <field name="birthdayId" type="integer" indexed="true" stored="false" multiValued="false" />
+    <field name="anniversaryId" type="integer" indexed="true" stored="false" multiValued="false" />
     <field name="comment1" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="comment2" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="comment3" type="text" indexed="true" stored="false" multiValued="false" /> 
