@@ -691,7 +691,7 @@ function html_calendar_view_selector($current_view, $my_views) {
     
     $obmbookmarkproperty = "set_cal_view_id=$id";
     $sel_view .= "
-    <option id=\"opt_$id\" value=\"calendar_index.php?new_sel=1&amp;$obmbookmarkproperty\"$style_default$selected>$label</option>";
+    <option id=\"opt_$id\" value=\"calendar_index.php?new_sel=0&amp;$obmbookmarkproperty\"$style_default$selected>$label</option>";
   }
 
   // Javascript Strings
