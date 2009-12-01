@@ -106,17 +106,21 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  // amount column color 
+  // amount
   elseif (($fieldname == 'invoice_amount_ht') 
 	  || ($fieldname == 'invoice_amount_ttc')
 	  || ($fieldname == 'invoice_paid')) {
     $amount = $OD->data_set->f($fieldname);
     if ($OD->data_set->f('invoice_inout') == '+') {
-      $couleur = $col_client;
+      $mul = 1;
     } else {
-      $couleur = $col_frs;
+      $mul = -1;
     }
-    $res['name'] = "$amount";
+    if ($OD->data_set->f('invoice_credit_memo') == '1') {
+      $mul = $mul * -1;
+    }
+    $res['align'] = 'right';
+    $res['name'] = number_format($mul * $amount, 2);
   }
 
   else if ($fieldname == 'invoice_date') {
@@ -137,13 +141,14 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
     $pi_amount = $OD->data_set->f('paymentinvoice_amount');
     if ($amount == $pi_amount) {
       $res['name'] = $amount;
-    } else { 
+    } else {
       $res['name'] = "$pi_amount ($amount)";
     }
   }
 
   return $res;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Invoice specific dataset fields
@@ -155,23 +160,26 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_footer_invoice(&$OD, $fieldname=null, $link_ok=null) {
-  if($OD->data_set->f('invoice_inout') == '-') {
+
+  if ($OD->data_set->f('invoice_inout') == '-') {
     $multiplicator = -1;
   } else {
     $multiplicator = 1;
-  }  
-  if($OD->data_set->f('invoice_credit_memo') == '1') {
+  }
+  if ($OD->data_set->f('invoice_credit_memo') == '1') {
     $multiplicator = -1 * $multiplicator;
   } else {
     $multiplicator = 1 * $multiplicator;
-  }    
-  if($fieldname == 'invoice_amount_ht') {
+  }
+
+  if ($fieldname == 'invoice_amount_ht') {
     $OD->footer_data[$fieldname] += $OD->data_set->f($fieldname) * $multiplicator;
   } elseif ($fieldname == 'invoice_amount_ttc') {
     $OD->footer_data[$fieldname] += $OD->data_set->f($fieldname) * $multiplicator;
   }
-
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Invoice search form
 // Parameters:

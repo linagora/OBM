@@ -416,6 +416,8 @@ class OBM_DISPLAY {
 	    $td = "<td $style>";
 	  } else if ($align == 'center') {
 	    $td = "<td class=\"C\">";
+	  } else if ($align == 'right') {
+	    $td = "<td class=\"R\">";
 	  } else {
 	    $td = '<td>';
 	  }

@@ -158,6 +158,10 @@ form {
   text-align: center;
 }
 
+.R {
+  text-align: right;
+}
+
 .B {
   font-weight: bold;
 }
