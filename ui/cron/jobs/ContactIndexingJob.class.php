@@ -166,8 +166,8 @@ class ContactIndexingJob extends CronJob {
           $doc->setField('manager', $db->f('contact_manager'));
           $doc->setField('assistant', $db->f('contact_assistant'));
           $doc->setField('spouse', $db->f('contact_spouse'));
-          $doc->setField('birthdayEventId', $db->f('contact_birthday_id'));
-          $doc->setField('anniversaryEventId', $db->f('contact_anniversary_id'));
+          $doc->setField('birthdayId', $db->f('contact_birthday_id'));
+          $doc->setField('anniversaryId', $db->f('contact_anniversary_id'));
           $birthday = new Of_Date($db->f('birthday'));
           $doc->setField('birthday', $birthday->format('Y-m-d\TH:i:s\Z'));
           $anniversary = new Of_Date($db->f('anniversary'));
@@ -176,6 +176,7 @@ class ContactIndexingJob extends CronJob {
           $categories = self::getCategories($id);
           while($categories->next_record()){
             $doc->setMultiValue('category', $categories->f('category_label'));
+            $doc->setMultiValue('categoryId', $categories->f('category_id'));
           }
           $doc->setField('service', $db->f('contact_service'));
           $doc->setField('function', $db->f('contactfunction_label'));

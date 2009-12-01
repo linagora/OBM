@@ -204,6 +204,25 @@ class OBM_Contact implements OBM_ISearchable {
       'address_country' => 'text',
       'country_name' => 'text'
     );
+
+    $fields['address'] = array(
+      'address_street' => 'text',
+      'address_zipcode' => 'text',
+      'address_expresspostal' => 'text',
+      'country_name' => 'text',
+      'address_country' => 'text',
+      'address_state' => 'text',
+      'address_town' => 'text'
+    );
+    $fields['kind'] = array(
+      'kind_header' => 'text',
+      'kind_minilabel' => 'text'
+    );
+    $fields['comment'] = array(
+      'contact_comment'  => 'text',
+      'contact_comment2' => 'text',
+      'contact_comment3' => 'text'
+    );
     $fields['in'] = array('contact_addressbook_id' => 'integer');
     $fields['addressbook'] = array('AddressBook.name' => 'text');
     $fields['company_id'] = array ('contact_company_id' => 'integer');
@@ -225,16 +244,7 @@ class OBM_Contact implements OBM_ISearchable {
     $fields['suffix'] = array('contact_suffix' => 'text');
     $fields['aka'] = array('contact_aka' => 'text');
     $fields['sound'] = array('contact_sound' => 'text');
-
-    //$fields['kind'] array('kind_label' => 'text');
-    //$fields['function'] = 'contactfunction_label';
-    //$fields['company'] = '';
-    //$fields['market'] = '';
-    //$fields['manager'] = '';
-    //$fields['date'] = 'contact_date';
-    //$fields['birthday'] = '';
-    //$fields['anniversary'] = '';
-    //$fields['address'] = 'address_street';
+    $fields['function'] = array('contactfunction_label' => 'text');
     return $fields;
   }
 

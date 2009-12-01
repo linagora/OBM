@@ -223,6 +223,8 @@ ALTER TABLE `EventException` ADD CONSTRAINT `eventexception_child_id_event_id_fk
 --    WHERE e.event_parent_id = ee.eventexception_parent_id);
 ALTER TABLE `Event` DROP FOREIGN KEY `event_parent_id_event_id_fkey`;
 ALTER TABLE `Event` DROP COLUMN `event_parent_id`;
+CREATE INDEX event_ext_id_idx ON Event (event_ext_id);
+ALTER TABLE `Event` MODIFY COLUMN `event_ext_id` varchar(300);
 
 
 --
@@ -363,3 +365,5 @@ DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_property_key='last_pub
 -- ----------------------------------------------------------------------------
 -- Obm product ID
 INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(RAND()*NOW())), 24, 0);
+UPDATE Event SET event_ext_id = CONCAT((select obminfo_value from ObmInfo where obminfo_name = 'prod_id'),MD5(FLOOR(RAND()*NOW())),MD5(FLOOR(RAND()*NOW())),MD5(FLOOR(RAND()*NOW())),MD5(FLOOR(RAND()*NOW())),MD5(FLOOR(RAND()*NOW()))) WHERE event_ext_id IS NULL OR event_ext_id = '';
+

@@ -853,7 +853,7 @@ CREATE TABLE event (
     event_timecreate timestamp without time zone DEFAULT now(),
     event_userupdate integer DEFAULT NULL,
     event_usercreate integer DEFAULT NULL,
-    event_ext_id character varying(255) DEFAULT ''::character varying,
+    event_ext_id character varying(300) DEFAULT ''::character varying,
     event_type vcomponent DEFAULT 'VEVENT'::vcomponent,
     event_origin character varying(255) DEFAULT ''::character varying NOT NULL,
     event_owner integer,

@@ -261,6 +261,8 @@ $cgp_show['module']['document'] = 'com';
 //$l_documentcategory1 = 'Doc cat1';
 //$cgp_user['document']['category']['documentcategory1'] = array('mode'=>'mono');
 
+//$l_documentcategory1 = 'Doc cat1';
+//$cgp_user['user']['category']['documentcategory1'] = array('mode'=>'mono');
 
 
 </script>

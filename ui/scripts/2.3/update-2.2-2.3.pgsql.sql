@@ -283,7 +283,9 @@ ALTER TABLE ONLY eventexception
 -- FROM Event e
 -- WHERE e.event_parent_id = ee.eventexception_parent_id;
 
-ALTER TABLE Event DROP COLUMN event_parent_id;
+ALTER TABLE event DROP COLUMN event_parent_id;
+CREATE INDEX event_ext_id_idx ON event (event_ext_id);
+ALTER TABLE event ALTER COLUMN event_ext_id TYPE varchar(300);
 
 
 --
@@ -455,3 +457,5 @@ DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_property_key='last_pub
 -- ----------------------------------------------------------------------------
 -- Obm product ID
 INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text), 24);
+UPDATE Event SET event_ext_id = (select obminfo_value from obminfo where obminfo_name = 'prod_id') || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text) || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text) || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text) || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text) || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text)
+WHERE event_ext_id IS NULL OR event_ext_id = '';
