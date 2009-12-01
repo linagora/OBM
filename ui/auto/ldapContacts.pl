@@ -60,22 +60,19 @@ sub run {
     require OBM::Update::updateContacts;
     my $updateContacts = OBM::Update::updateContacts->new( $parameters );
 
-    my $errorCode = 0;
-    if( !defined($updateContacts) ) {
-        $self->_log( 'problème à l\'initialisation du contact updater', 0 );
-        $errorCode = 1;
+    if( defined($updateContacts) ) {
+        my $errorCode = $updateContacts->update();
 
-    }elsif( ref($updateContacts) ) {
-        $errorCode = $updateContacts->update();
+        if( $errorCode ) {
+            $self->_log( 'échec de mise à jour des contacts', 0 );
+        }else {
+            $self->_log( 'mise à jour des contacts avec succés', -1 );
+        }
+
+        return $errorCode;
     }
 
-    if( $errorCode ) {
-        $self->_log( 'échec de mise à jour des contacts', 0 );
-    }else {
-        $self->_log( 'mise à jour des contacts avec succés', -1 );
-    }
-
-    return $errorCode;
+    return 1;
 }
 
 
@@ -96,20 +93,20 @@ sub _getParameter {
         }
         
         if( exists($parameters->{'incremental'}) ) {
-            $self->_log( 'Mise a jour incrementale', 0 );
+            $self->_log( 'Mise a jour incrementale', 2 );
             $parameters->{'incremental'} = 1;
             $parameters->{'global'} = 0;
             last SWITCH;
         }
         
         if( exists($parameters->{'global'}) ) {
-            $self->_log( 'Mise a jour globale', 0 );
+            $self->_log( 'Mise a jour globale', 2 );
             $parameters->{'incremental'} = 0;
             $parameters->{'global'} = 1;
             last SWITCH;
         }
 
-        $self->_log( 'Mise a jour globale', 0 );
+        $self->_log( 'Mise a jour globale', 2 );
         $parameters->{'incremental'} = 0;
         $parameters->{'global'} = 1;
     }
