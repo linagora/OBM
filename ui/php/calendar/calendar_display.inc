@@ -3597,7 +3597,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" id=\"insertBtn\" value=\"$l_insert\" />
-      <input type=\"submit\" id=\"saveTemplateBtn\" onclick=\"displayTemplateCreate();return false;\" value=\"$l_save_as_template\" />";
+      <input type=\"submit\" id=\"saveTemplateBtn\" onclick=\"if (check_calendar_calendar($('new_event_form'))) { displayTemplateCreate(); } return false;\" value=\"$l_save_as_template\" />";
   } elseif (($action == 'edit_template') || ($action == 'update_template')) {
       $template_id = isset($calendar['template_id']) ? $calendar['template_id'] : $event_q->f('eventtemplate_id');
       $dis_button = "
