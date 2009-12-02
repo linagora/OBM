@@ -2072,7 +2072,7 @@ function get_userobm_from_ids($users) {
  * @param contacts : array of contacts id
  * @return array [ids], [entity] (label=>, email_address=>)
  **/
-function get_contact_from_ids($contacts) {
+function get_contact_from_ids($contacts, $fetch_email = true) {
   global $cdg_sql;
 
   if (is_array($contacts)) {
@@ -2083,9 +2083,11 @@ function get_contact_from_ids($contacts) {
     $where .= ')';
     $query = "SELECT *
       FROM Contact
-      INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-      INNER JOIN Email ON email_entity_id = contactentity_entity_id
-      WHERE contact_archive = 0
+      INNER JOIN ContactEntity ON contactentity_contact_id = contact_id ";
+    if ($fetch_email) {
+      $query.= "INNER JOIN Email ON email_entity_id = contactentity_entity_id ";
+    }
+    $query.= "WHERE contact_archive = 0
       AND contact_id IN $where
       ORDER by contact_lastname";
     display_debug_msg($query, $cdg_sql, 'get_contact_from_ids()');

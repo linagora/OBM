@@ -5313,7 +5313,7 @@ function dis_calendar_template_form($action, $params, $template_q, $entity_ids, 
   $documents_id = array_merge($documents_id, $entity_ids['document']);
   
   $users = (count($users_id) > 0) ? get_userobm_from_ids($users_id) : array();
-  $contacts = (count($contacts_id) > 0) ? get_contact_from_ids($contacts_id) : array();
+  $contacts = (count($contacts_id) > 0) ? get_contact_from_ids($contacts_id, false) : array();
   $resources = (count($res_id) > 0) ? get_calendar_resource_from_ids($res_id) : array();
   $groups = (count($groups_id) > 0) ? get_calendar_group_from_ids($groups_id) : array();
   $documents = (count($documents_id) > 0) ? get_calendar_document_from_ids($documents_id) : array();
