@@ -3132,7 +3132,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
       $users = array();
     }
     if (count($contacts_id) > 0) {
-      $contacts = get_contact_from_ids($contacts_id);
+      $contacts = get_contact_from_ids($contacts_id, false);
     } else {
       $contacts = array();
     }
