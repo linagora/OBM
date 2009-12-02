@@ -50,7 +50,7 @@ function button_to($label, $url, $btn_class = false, $confirm_msg = false)
 
 function get_localized_countries_array() {
   $countries = require_once(dirname(__FILE__)."/../lib/Stato/i18n/data/countries/".SI18n::get_locale().".php");
-  asort($countries);
+  if (is_array($countries)) asort($countries);
   return $countries;
 }
 
