@@ -223,6 +223,7 @@ class OBM_Contact implements OBM_ISearchable {
       'contact_comment2' => 'text',
       'contact_comment3' => 'text'
     );
+    $fields['id'] = array('contact_id' => 'integer');
     $fields['in'] = array('contact_addressbook_id' => 'integer');
     $fields['addressbook'] = array('AddressBook.name' => 'text');
     $fields['company_id'] = array ('contact_company_id' => 'integer');
