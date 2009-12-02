@@ -417,6 +417,7 @@ class OBM_Contact implements OBM_ISearchable {
       self::storeCoords($contact);
       of_userdata_query_update('contact', $contact->id, $data);
     }
+    OBM_AddressBook::timestamp($addressbook->id);
     
     return OBM_Contact::get($contact->id);
   }
@@ -494,6 +495,7 @@ class OBM_Contact implements OBM_ISearchable {
       $ret = of_userdata_query_update('contact', $contact->id, $contact->categories);
       self::storeCoords($contact);
     }
+    OBM_AddressBook::timestamp($contact->addressbook_id);
 
     return $contact;
   }
@@ -556,7 +558,7 @@ class OBM_Contact implements OBM_ISearchable {
     $query = "DELETE FROM Contact WHERE contact_id = $sql_id $multidomain";
     display_debug_msg($query, $cdg_sql, 'OBM_Contact::delete(1)');
     $retour = $obm_q->query($query);
-    AddressBook::timestamp($contact->addressbook);
+    OBM_AddressBook::timestamp($contact->addressbook_id);
     // If connectors in use
     if ($c_use_connectors) {
       $uid = sql_parse_id($obm['uid']);

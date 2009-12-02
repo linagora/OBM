@@ -658,6 +658,7 @@ function run_query_contact_update($contact) {
     }
   }
 
+  OBM_AddressBook::timestamp($contact['addressbook']);
   return $retour;
 }
 
