@@ -1151,7 +1151,7 @@ Obm.CalendarInDayEvent = new Class({
       this.drag.mouse.pos.x = $('calendarGridContainer').offsetLeft.toInt() + $('calendarBody').offsetLeft.toInt();
 
       // Fix grid limit
-      this.drag.limit.x[1] = $('calendarGridContainer').offsetWidth.toInt();
+      this.drag.limit.x[1] = $('calendarGridContainer').offsetWidth.toInt()-1;
 
     }.bind(this));
     this.drag.addEvent('drag', this.updateTime.bind(this));
