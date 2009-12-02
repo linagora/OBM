@@ -44,7 +44,7 @@ function dis_data_admin_device(&$OD, $fieldname) {
   if ($fieldname == 'partnership') {
     $id = $OD->data_set->f('id');
     if ($OD->data_set->f('partnership') == '') {
-      $res['name'] = "<img id='mobile_$id' src='$GLOBALS[ico_desync]' onclick='obm.userMobileDeviceManager.togglePartnership($id);'/>";
+      $res['name'] = "<img id='mobile_$id' src='$GLOBALS[ico_unsync]' onclick='obm.userMobileDeviceManager.togglePartnership($id);'/>";
     } else {
       $res['name'] = "<img id='mobile_$id' src='$GLOBALS[ico_sync]' onclick='obm.userMobileDeviceManager.togglePartnership($id);'/>";
     }
@@ -144,7 +144,7 @@ function dis_admin_device_search_list($device) {
     $block .= "
       <script type='text/javascript'>
         obm.vars.images.sync = '$GLOBALS[ico_sync]';
-        obm.vars.images.desync = '$GLOBALS[ico_desync]';
+        obm.vars.images.desync = '$GLOBALS[ico_unsync]';
         obm.userMobileDeviceManager = new Obm.UserMobileDeviceManager();
         $userMobileDeviceManager
         $is_superman
