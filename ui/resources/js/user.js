@@ -66,7 +66,7 @@ Obm.UserMobileDevice = new Class({
       eventData.owner = this.owner;
       eventData.device_id = this.id;
       new Request.JSON({
-        url : '/user/user_index.php',
+        url : obm.vars.consts.obmUrl+'/user/user_index.php',
         secure: false,
         onComplete: function(response) {
           if ($('mobile_partnership')) $('mobile_partnership').value = obm.vars.labels.removePartnership;
@@ -86,7 +86,7 @@ Obm.UserMobileDevice = new Class({
       eventData.owner = this.owner;
       eventData.device_id = this.id;
       new Request.JSON({
-        url : '/user/user_index.php',
+        url : obm.vars.consts.obmUrl+'/user/user_index.php',
         secure: false,
         onComplete: function(response) {
           if ($('mobile_partnership')) $('mobile_partnership').value = obm.vars.labels.addPartnership;
