@@ -207,6 +207,13 @@ class OBM_AddressBook implements OBM_ISearchable {
     }
   }
 
+  public static function timestamp($id) {
+    $query = "UPDATE AddressBook SET timeupdate=NOW() WHERE id='$id'";
+    $db = new DB_OBM;
+    $db->query($query);
+  }
+
+
   public static function store($addressbook) {
     $id = $addressbook['addressbook_id'];
     $syncable = $addressbook['sync'];
@@ -222,7 +229,7 @@ class OBM_AddressBook implements OBM_ISearchable {
 
     if ($ad->write) {
       if (!$ad->isDefault) $name_q =  "name='$name',";
-      $query = "UPDATE AddressBook SET $name_q syncable='$syncable' WHERE id='$id'";
+      $query = "UPDATE AddressBook SET $name_q syncable=$syncable WHERE id='$id'";
       $db = new DB_OBM;
       $db->query($query);
     }

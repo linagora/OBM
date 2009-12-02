@@ -550,13 +550,13 @@ class OBM_Contact implements OBM_ISearchable {
     run_query_contact_birthday_update('birthday', null, null, $contact->birthday_event, null, null, null);
     run_query_contact_birthday_update('anniversary', null, null, $contact->anniversary_event, null, null, null);
     // END birthday and anniversary support
-  
+
     of_entity_delete('contact', $contact->id);
-  
+     
     $query = "DELETE FROM Contact WHERE contact_id = $sql_id $multidomain";
     display_debug_msg($query, $cdg_sql, 'OBM_Contact::delete(1)');
     $retour = $obm_q->query($query);
-  
+    AddressBook::timestamp($contact->addressbook);
     // If connectors in use
     if ($c_use_connectors) {
       $uid = sql_parse_id($obm['uid']);
@@ -626,7 +626,7 @@ class OBM_Contact implements OBM_ISearchable {
       $contact['addresses'][] = array(
         'street' => addslashes($add->street),
         'label' => strtoupper($add->location[0]),
-        'zipcode' => addslashes($add->postalcode,)
+        'zipcode' => addslashes($add->postalcode),
         'town' => addslashes($add->locality),
         'expresspostal' => addslashes($add->pobox),
         'country' => addslashes($add->country)
