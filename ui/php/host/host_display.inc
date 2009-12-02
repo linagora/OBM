@@ -664,7 +664,7 @@ function html_host_form($action, $host_q, $host, $field='') {
         <input id=\"cb_smtp_out\" name=\"cb_smtp_out\" type=\"checkbox\" value=\"1\" $smtp_out_state>
       </td>
     </tr><tr>
-      <th class=\"$class[imap_frontend]\"><label for=\"cb_smtp_out\">$GLOBALS[l_imap_frontend]</label></th>
+      <th class=\"$class[imap_frontend]\"><label for=\"cb_imap_frontend\">$GLOBALS[l_imap_frontend]</label></th>
       <td>
         <input id=\"cb_imap_frontend\" name=\"cb_imap_frontend\" type=\"checkbox\" value=\"1\" $imap_frontend_state>
       </td>
