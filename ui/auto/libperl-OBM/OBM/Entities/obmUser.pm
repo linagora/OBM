@@ -246,12 +246,12 @@ sub _init {
     }
 
     # User e-mails
-    if( !($self->_makeEntityEmail( $userDesc->{'userobm_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') ) ) ) {
+    ( $userDesc->{'userobm_main_email'}, $userDesc->{'userobm_alias_email'} ) = $self->_makeEntityEmail( $userDesc->{'userobm_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') );
+    if( !defined($userDesc->{'userobm_main_email'}) ) {
         $self->_log( 'droit mail de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' annulé, pas d\'adresses mails valides', 2 );
         $userDesc->{'userobm_mail_perms'} = 0;
-    }else {
-        $userDesc->{'userobm_main_email'} = $self->{'email'};
-        $userDesc->{'userobm_alias_email'} = $self->{'emailAlias'};
+        delete($userDesc->{'userobm_main_email'});
+        delete($userDesc->{'userobm_alias_email'});
     }
 
     # User mail permission
@@ -729,8 +729,8 @@ sub getSieveVacation {
         return undef;
     }
 
-    my $boxEmails = $self->{'email'};
-    my $boxEmailsAlias = $self->{'emailAlias'};
+    my $boxEmails = $self->{'entityDesc'}->{'userobm_main_email'};
+    my $boxEmailsAlias = $self->{'entityDesc'}->{'userobm_alias_email'};
 
     # If no mail addess, then no vacation message
     if( ($#{$boxEmails} < 0) && ($#{$boxEmailsAlias} < 0) ) {
@@ -893,11 +893,13 @@ sub updateLinkedEntities {
     my $self = shift;
     my( $updateType ) = @_;
 
+    # Update linked entities on login update
     if( $self->{'entityDesc'}->{'userobm_login_current'} && ($self->{'entityDesc'}->{'userobm_login_new'} ne $self->{'entityDesc'}->{'userobm_login_current'}) ) {
         $self->_log( 'le login a été modifié, les entités liées doivent être mises à jour', 3 );
         return 1;
     }
 
+    # Update linked entities on archive update
     if( !$self->getArchive() != !$self->{'entityDesc'}->{'user_obm_archive_current'} ) {
         $self->_log( 'changement d\'état d\'archivage de '.$self->getDescription().', les entités liées doivent être mises à jour', 3 );
         return 1;

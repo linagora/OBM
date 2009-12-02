@@ -106,15 +106,15 @@ sub _init {
     }
 
     # Le droit de messagerie
-    if( !$self->_makeEntityEmail( $groupDesc->{'group_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') ) ) {
+    ( $groupDesc->{'group_main_email'}, $groupDesc->{'group_alias_email'} ) = $self->_makeEntityEmail( $groupDesc->{'group_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') );
+    if( !defined($groupDesc->{'group_main_email'}) ) {
         $groupDesc->{'group_mailperms_access'} = 'REJECT';
+        delete($groupDesc->{'group_main_email'});
+        delete($groupDesc->{'group_alias_email'});
         $groupDesc->{'group_mailperms'} = 0;
     }else {
         $groupDesc->{'group_mailperms_access'} = 'PERMIT';
         $groupDesc->{'group_mailperms'} = 1;
-
-        $groupDesc->{'group_main_email'} = $self->{'email'};
-        $groupDesc->{'group_alias_email'} = $self->{'emailAlias'};
     }
 
     # External contacts

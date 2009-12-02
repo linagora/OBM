@@ -110,14 +110,15 @@ sub _init {
             $mailshareDesc->{'mailshare_mail_server'} = 'lmtp:'.$cyrusHostName.':24';
         }
 
-        if( !($self->_makeEntityEmail( $mailshareDesc->{'mailshare_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') )) ) {
+        ( $mailshareDesc->{'mailshare_main_email'}, $mailshareDesc->{'mailshare_alias_email'} ) = $self->_makeEntityEmail( $mailshareDesc->{'mailshare_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') );
+        if( !defined($mailshareDesc->{'mailshare_main_email'}) ) {
             $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.'annulé, pas d\'adresses mails valides', 2 );
             $mailshareDesc->{'mailshare_mail_perms'} = 0;
+            delete($mailshareDesc->{'mailshare_main_email'});
+            delete($mailshareDesc->{'mailshare_alias_email'});
+
             last SWITCH;
         }
-
-        $mailshareDesc->{'mailshare_main_email'} = $self->{'email'};
-        $mailshareDesc->{'mailshare_alias_email'} = $self->{'emailAlias'};
 
         $mailshareDesc->{'mailshare_mail_perms'} = 1;
     }

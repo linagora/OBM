@@ -294,18 +294,17 @@ sub _makeEntityEmail {
     require OBM::Parameters::regexp;
     my $self = shift;
     my( $mailAddress, $mainDomain, $domainAlias ) = @_;
-    my $totalEmails = 0;
     my %emails;
     my %emailsAlias;
 
     if( !$mailAddress ) {
         $self->_log( 'pas d\'adresses mails définis', 3 );
-        return $totalEmails;
+        return (undef, undef);
     }
 
     if( !$mainDomain ) {
         $self->_log( 'pas de domaine principal défini', 3 );
-        return $totalEmails;
+        return (undef, undef);
     }
 
     if( ref($domainAlias) ne 'ARRAY' ) {
@@ -321,17 +320,14 @@ sub _makeEntityEmail {
         SWITCH: {
             if( $email[$i] =~ /$OBM::Parameters::regexp::regexp_email/ ) {
                 $emails{$email[$i]} = 1;
-                $totalEmails++;
                 last SWITCH;
             }
 
             if( $email[$i] =~ /$OBM::Parameters::regexp::regexp_email_left/ ) {
                 $emails{$email[$i].'@'.$mainDomain} = 1;
-                $totalEmails++;
 
                 for( my $j=0; $j<=$#{$domainAlias}; $j++ ) {
                     $emailsAlias{$email[$i].'@'.$domainAlias->[$j]} = 1;
-                    $totalEmails++;
                 }
 
                 last SWITCH;
@@ -340,16 +336,18 @@ sub _makeEntityEmail {
     }
 
     my @emails = keys(%emails);
+    my $emails = undef;
     if( $#emails >= 0 ) {
-        $self->{'email'} = \@emails;
+        $emails = \@emails;
     }
 
     my @emailsAlias = keys(%emailsAlias);
+    my $emailsAlias = undef;
     if( $#emailsAlias >= 0 ) {
-        $self->{'emailAlias'} = \@emailsAlias;
+        $emailsAlias = \@emailsAlias;
     }
 
-    return $totalEmails;
+    return ( $emails, $emailsAlias );
 }
 
 
