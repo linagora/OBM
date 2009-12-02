@@ -118,13 +118,13 @@ function dis_admin_device_search_list($device) {
   $update_error = 'obm.vars.labels.updateError="'.phpStringToJsString($GLOBALS['l_update_error']).'";';
   $prefs = get_display_pref($obm['uid'], 'admin_device');
 	$devices_q = run_query_admin_device_search($device);
-  $dev_q = clone $devices_q;
-  $nb_devices = $dev_q->num_rows_total();
+  $nb_devices = $devices_q->num_rows_total();
   if ($nb_devices == 0) {
     $display['msg'] .= display_warn_msg($GLOBALS['l_no_found']);
   } else {
     $display['msg'] .= display_info_msg("$nb_devices $GLOBALS[l_found]");
-    $block = html_admin_device_search_list($device, $prefs, $dev_q);
+    $block = html_admin_device_search_list($device, $prefs, $devices_q);
+    $devices_q->seek(0);
     while($devices_q->next_record()) {
       $device_id = $devices_q->f('id');
       $device_owner = $devices_q->f('owner');
