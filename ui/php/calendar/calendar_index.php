@@ -781,19 +781,12 @@ if ($action == 'search') {
   $extra_css[] = $css_ext_color_picker ;
   if (check_calendar_data_form($params)) {
     $template_id = run_query_calendar_create_or_update_event_template($params);
-    foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
-      $entities[$type] = is_array($params["sel_{$type}_id"]) ? $params["sel_{$type}_id"] : array();
-    }
     $display['msg'] .= display_ok_msg("$l_template : $l_update_ok");
-    $current_view->set_date($params["date_begin"]);
-    $params['template_id'] = $template_id;
-    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
+    $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
+    $display['detail'] = dis_calendar_templates_list($templates_q);
   } else {
-    foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
-      $entities[$type] = is_array($params["sel_{$type}_id"]) ? $params["sel_{$type}_id"] : array();
-    }
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
-    $display['detail'] = dis_calendar_template_form($action, $params, '', $entities, $current_view);
+    $display['detail'] = dis_calendar_template_form('update_template', $params, '', array(), $current_view);
   }
   
 } elseif ($action == 'list_templates')  {
@@ -1720,6 +1713,7 @@ function get_calendar_action() {
   
   // Update template
   $actions['calendar']['update_template'] = array (
+    'Name'     => $l_edit_template,
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );

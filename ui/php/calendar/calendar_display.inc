@@ -161,7 +161,7 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
     $navbar = dis_calendar_navbar($current_view);
   }
 
-  if ($action == 'new' || $action == 'new_meeting' || $action == 'save_as_template' || $action == 'update_template') {
+  if ($action == 'new' || $action == 'new_meeting' || $action == 'save_as_template') {
     $select_template_form = dis_calendar_select_template_form($action, $calendar);
   }
 
@@ -5299,7 +5299,9 @@ function dis_calendar_admin_index($tags_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_template_form($action, $params, $template_q, $entity_ids, $current_view) {
   global $obm;
-  
+  if (empty($entity_ids)) {
+    $entity_ids = array('user' => array(), 'contact' => array(), 'resource' => array(), 'group' => array(), 'document' => array());
+  }
   $users_id = is_array($params['sel_user_id']) ? $params['sel_user_id'] : array();
   $contacts_id = is_array($params['sel_contact_id']) ? $params['sel_contact_id'] : array();
   $res_id = is_array($params['sel_resource_id']) ? $params['sel_resource_id'] : array();
