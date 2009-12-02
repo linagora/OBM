@@ -132,7 +132,7 @@ CREATE TABLE `SyncedAddressbook` (
 );
 
 INSERT INTO SyncedAddressbook (user_id, addressbook_id, timestamp)
-SELECT owner, id FROM Addressbook WHERE name = 'contacts' AND is_default = true;
+SELECT owner, id, now() FROM AddressBook WHERE name = 'contacts' AND is_default = true;
 
 DROP TABLE IF EXISTS `SynchedContact`;
 

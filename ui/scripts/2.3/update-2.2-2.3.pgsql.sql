@@ -172,7 +172,7 @@ CREATE TABLE syncedaddressbook (
 
 
 INSERT INTO syncedaddressbook (user_id, addressbook_id, timestamp)
-SELECT owner, id FROM addressbook WHERE name = 'contacts' AND is_default = true;
+SELECT owner, id, now() FROM addressbook WHERE name = 'contacts' AND is_default = true;
 --
 -- addressbook indexes
 --
