@@ -520,10 +520,10 @@ class OBM_Contact implements OBM_ISearchable {
     $data['addresses'] = array();
     foreach($contact->address as $address) {
       array_push($data['addresses'], array(
-        'street' => $address['street'],
+        'street' => addslashes($address['street']),
         'label' => $address['label'][0],
-        'zipcode' => $address['zipcode'],
-        'town' => $address['town'],
+        'zipcode' => addslashes($address['zipcode']),
+        'town' => addslashes($address['town']),
         'expresspostal' => $address['expresspostal'],
         'country' => $address['country']
       ));
@@ -579,10 +579,10 @@ class OBM_Contact implements OBM_ISearchable {
 
   public static function import($vcard) {
     $contact = array(
-      'lastname' => $vcard->name->family,
-      'firstname' => $vcard->name->given,
-      'function' => $vcard->role,
-      'title' => $vcard->title,
+      'lastname' => addslashes($vcard->name->family),
+      'firstname' => addslashes($vcard->name->given),
+      'function' => addslashes($vcard->role),
+      'title' => addslashes($vcard->title),
       'addresses' => array(),
       'phones' => array(),
       'emails' => array(),
@@ -607,7 +607,7 @@ class OBM_Contact implements OBM_ISearchable {
     foreach ($obmSpecificFields as $field) {
       $value = $vcard->getValue("x-obm-{$field}");
       if (!empty($value)) {
-        $contact[$field] = $value;
+        $contact[$field] = addslashes($value);
       }
     }
     $date = $vcard->getValue("x-obm-date");
@@ -624,12 +624,12 @@ class OBM_Contact implements OBM_ISearchable {
     }
     foreach ($vcard->addresses as $add) {
       $contact['addresses'][] = array(
-        'street' => $add->street,
+        'street' => addslashes($add->street),
         'label' => strtoupper($add->location[0]),
-        'zipcode' => $add->postalcode,
-        'town' => $add->locality,
-        'expresspostal' => $add->pobox,
-        'country' => $add->country
+        'zipcode' => addslashes($add->postalcode,)
+        'town' => addslashes($add->locality),
+        'expresspostal' => addslashes($add->pobox),
+        'country' => addslashes($add->country)
       );
     }
     foreach ($vcard->phones as $ph) {
