@@ -54,10 +54,6 @@ INSERT INTO AddressBook (domain_id, timecreate, usercreate, origin, owner, name,
 SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'contacts', true, true
 FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
 
-INSERT INTO SyncedAddressbook (user_id, addressbook_id, timestamp)
-SELECT owner, id FROM Addressbook WHERE name = 'contacts' AND is_default = true;
-
-
 INSERT INTO AddressBook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable) 
 SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'collected_contacts', true, true
 FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
@@ -134,6 +130,9 @@ CREATE TABLE `SyncedAddressbook` (
   CONSTRAINT `syncedaddressbook_user_id_userobm_id_fkey` FOREIGN KEY (user_id) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES AddressBook (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+INSERT INTO SyncedAddressbook (user_id, addressbook_id, timestamp)
+SELECT owner, id FROM Addressbook WHERE name = 'contacts' AND is_default = true;
 
 DROP TABLE IF EXISTS `SynchedContact`;
 

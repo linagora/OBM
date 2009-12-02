@@ -83,9 +83,6 @@ INSERT INTO addressbook (domain_id, timecreate, usercreate, origin, owner, name,
 SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'contacts', true, false 
 FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
 
-INSERT INTO syncedaddressbook (user_id, addressbook_id, timestamp)
-SELECT owner, id FROM addressbook WHERE name = 'contacts' AND is_default = true;
-
 INSERT INTO addressbook (domain_id, timecreate, usercreate, origin, owner, name, is_default, syncable) 
 SELECT userobm_domain_id, NOW(), userobm_id, 'obm-storage-migration-2.3', userobm_id, 'collected_contacts', true, true
 FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE domain_global = false;
@@ -173,6 +170,9 @@ CREATE TABLE syncedaddressbook (
   timestamp      timestamp without time zone NOT NULL DEFAULT now()
 );
 
+
+INSERT INTO syncedaddressbook (user_id, addressbook_id, timestamp)
+SELECT owner, id FROM addressbook WHERE name = 'contacts' AND is_default = true;
 --
 -- addressbook indexes
 --
