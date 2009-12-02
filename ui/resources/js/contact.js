@@ -28,7 +28,7 @@ Obm.Contact.AddressBook = new Class ({
       }.bind(this),
       onRequest: $('spinner').show.bind($('spinner')),
       onFailure: function (response) {
-        Obm.Error.parseStatus(this.addressBookRequest.status);
+        Obm.Error.parseStatus(this);
       }
     });
 
@@ -40,7 +40,7 @@ Obm.Contact.AddressBook = new Class ({
       onComplete: $('spinner').hide.bind($('spinner')),
       onRequest: $('spinner').show.bind($('spinner')),
       onFailure: function (response) {
-        Obm.Error.parseStatus(this.contactRequest.status);
+        Obm.Error.parseStatus(this);
       }
     });
 
