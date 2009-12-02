@@ -146,6 +146,17 @@ CREATE TABLE deletedaddressbook (
   origin         varchar(255) NOT NULL
 );
 
+
+--
+-- Table structure for table `DeletedContact`
+--
+DROP TABLE deletedcontact;
+CREATE TABLE deletedcontact (
+  deletedcontact_contact_id integer NOT NULL,
+  deletedcontact_addressbook_id    integer,
+  deletedcontact_timestamp  timestamp without time zone,
+  deletedcontact_origin     varchar(255) NOT NULL
+);
 --
 -- deletedaddressbook indexes
 --

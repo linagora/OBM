@@ -89,6 +89,7 @@ class ContactExpiration extends CronJob {
     $birthday_id = $obm_q->f('contact_birthday_id');
     $privacy = $obm_q->f('contact_privacy');
     $uid = $obm_q->f('contact_usercreate');
+    $ad = $obm_q->f('contact_addressbook_id');
     
     // Hook : Pre
     if (function_exists('hook_pre_run_query_contact_delete')) {
@@ -119,8 +120,8 @@ class ContactExpiration extends CronJob {
     
     if ($c_use_connectors && $privacy == 1) {
       $query = "INSERT INTO
-        DeletedContact (deletedcontact_contact_id, deletedcontact_user_id, deletedcontact_timestamp, deletedcontact_origin)
-        VALUES ($c_id, $uid, NOW(), '$GLOBALS[c_origin_cron]')";
+        DeletedContact (deletedcontact_contact_id, deletedcontact_addressbook_id, deletedcontact_timestamp, deletedcontact_origin)
+        VALUES ($c_id, $ad, NOW(), '$GLOBALS[c_origin_cron]')";
       $this->logger->core($query);
       $obm_q->query($query);
     }

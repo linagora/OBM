@@ -1031,7 +1031,7 @@ CREATE TABLE `DeletedAddressbook` (
 DROP TABLE IF EXISTS `DeletedContact`;
 CREATE TABLE `DeletedContact` (
   `deletedcontact_contact_id` int(8) NOT NULL,
-  `deletedcontact_user_id` int(8) NOT NULL,
+  `deletedcontact_addressbook_id` int(8) NOT NULL,
   `deletedcontact_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `deletedcontact_origin` varchar(255) NOT NULL,
   PRIMARY KEY  (`deletedcontact_contact_id`)

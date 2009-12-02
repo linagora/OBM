@@ -564,11 +564,16 @@ class OBM_Contact implements OBM_ISearchable {
       $uid = sql_parse_id($obm['uid']);
       $query = "INSERT INTO DeletedContact (
           deletedcontact_contact_id,
-          deletedcontact_user_id,
+          deletedcontact_addressbook_id,
           deletedcontact_timestamp,
           deletedcontact_origin)
-        SELECT $contact->id, user_id, NOW(), '$GLOBALS[c_origin_web]' FROM  SyncedAddressbook 
-        WHERE addressbook_id = $contact->addressbook_id";
+          VALUES (
+            $contact->id, 
+            $contact->addressbook_id,
+            NOW(),
+            '$GLOBALS[c_origin_web]' 
+          )
+          ";
       display_debug_msg($query, $cdg_sql, 'OBM_Contact::delete(2)');
       $retour = $obm_q->query($query);
     }
