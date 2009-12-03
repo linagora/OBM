@@ -134,4 +134,7 @@ appliAccounts=
 ;ip,ip,...
 anyUserAccounts=
 ;
+;
+;LemonLDAP authentication with no password check
+lemonLdapIp=
 ; EOF
