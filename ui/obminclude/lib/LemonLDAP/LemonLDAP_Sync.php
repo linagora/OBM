@@ -144,7 +144,7 @@ class LemonLDAP_Sync {
 		$groups_ldap = $groups;
 
 		if (is_null($groups_ldap) || sizeof($groups_ldap) == 0 || $groups_ldap === false)
-			return false;
+			return true;
 
 		//
 		// Update or create groups in OBM.
