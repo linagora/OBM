@@ -175,7 +175,6 @@ class ContactIndexingJob extends CronJob {
           $doc->setField('category', $db->f('contact_category'));
           $categories = self::getCategories($id);
           while($categories->next_record()){
-            $doc->setMultiValue('category', $categories->f('category_label'));
             $doc->setMultiValue('categoryId', $categories->f('category_id'));
           }
           $doc->setField('service', $db->f('contact_service'));

@@ -143,6 +143,7 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
+  $extra_js_include[] = 'user.js';
   if (check_user_defined_rules() && check_user_data_form('', $params)) {
 
     // If the context (same user) was confirmed ok, we proceed
@@ -194,6 +195,7 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
+  $extra_js_include[] = 'user.js';
   if (check_user_defined_rules() && check_user_data_form($params['user_id'], $params)) {
     $retour = run_query_user_update($params['user_id'], $params);
     if ($retour) {
