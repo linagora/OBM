@@ -611,7 +611,7 @@ class OBM_Contact implements OBM_ISearchable {
     // x-obm-* (OBM specific fields)
     $obmSpecificFields = array('mname','company_id','company','market_id','suffix',
       'aka','sound','manager','assistant','spouse','category','service',
-      'mailok','newsletter');
+      'mailok','newsletter', 'comment');
     foreach ($obmSpecificFields as $field) {
       $value = $vcard->getValue("x-obm-{$field}");
       if (!empty($value)) {
@@ -642,7 +642,7 @@ class OBM_Contact implements OBM_ISearchable {
     }
     foreach ($vcard->phones as $ph) {
       $contact['phones'][] = array(
-        'number' => $ph->value,
+        'number' => addslashes($ph->value),
         'label' => strtoupper($ph->location[0])
       );
     }
@@ -655,7 +655,7 @@ class OBM_Contact implements OBM_ISearchable {
     foreach ($vcard->getFieldsByName('IMPP') as $im) {
       $contact['ims'][] = array(
         'protocol' => $im->getParam('TYPE'),
-        'address' => $im->value()
+        'address' => addslashes($im->value())
       );
     }
     foreach ($vcard->getFieldsByName('URL') as $www) {
@@ -689,10 +689,10 @@ class OBM_Contact implements OBM_ISearchable {
     // x-obm-* (OBM specific fields)
     $obmSpecificFields = array('mname','company_id','company','market_id','suffix',
       'aka','sound','manager','assistant','spouse','category','service',
-      'mailok','newsletter');
+      'mailok','newsletter', 'comment');
     foreach ($obmSpecificFields as $field) {
       if (!empty($this->$field)) {
-        $card->addField(new Vpdi_Field("x-obm-{$field}", $this->$field));
+        $card->addField(new Vpdi_Field("x-obm-{$field}", str_replace("\r\n", "\n", (trim($this->$field)))));        
       }
     }
     if (!empty($this->date)) {

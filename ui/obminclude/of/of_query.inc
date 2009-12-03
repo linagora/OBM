@@ -2822,7 +2822,6 @@ function send_mail($subject, $message, $recipients, $r_addr, $setting='set_mail'
   $send_q = run_query_get_sender();
   $reci_q = run_query_get_recipients($recipients, $setting, $force);
 
-  // If AliaSuite, get local main mail domain.
 
   // Construct recipient list
   if (is_object($reci_q)) {
@@ -2855,7 +2854,6 @@ function send_mail($subject, $message, $recipients, $r_addr, $setting='set_mail'
   $boundary = '--' . md5( uniqid('myboundary') );
 
   $headers .= 'From: ';
-  // If AliaSuite, construct sender address.
   $headers .= get_entity_email($send_q->f('userobm_email'), $send_q->f('domain_name'))."\n";
 
   // If attachements are provided
