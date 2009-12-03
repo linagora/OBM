@@ -1815,25 +1815,10 @@ function run_query_contact_ext_search($contact) {
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('contact');
 
-  $query = "SELECT 
-      contact_id,
-      contact_firstname,
-      contact_lastname,
-      email_address
-    FROM Contact
-    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-    LEFT JOIN Email ON contactentity_entity_id = email_entity_id 
-    WHERE ((contact_firstname #LIKE '%$pattern%' OR contact_lastname #LIKE '%$pattern%') OR 
-          ((email_label #LIKE 'INTERNET;X-OBM-Ref1' AND email_address #LIKE '%$pattern%') OR email_address IS NULL))
-      AND contact_addressbook_id='$addressbook_id' $multidomain
-    GROUP BY contact_id, contact_firstname, contact_lastname, email_address
-    ORDER BY contact_lastname, contact_firstname
-    LIMIT 20 OFFSET 0";
+  $addressbooks = OBM_AddressBook::get($contact['addressbook_id']);
+  $contacts = $addressbooks->getContacts($contact['pattern']);
 
-  display_debug_msg($query, $cdg_sql, 'run_query_contact_ext_search()');
-  $obm_q->xquery($query);
-
-  return array('length' => $obm_q->num_rows()+0, 'datas' => $obm_q);
+  return $contacts;
 }
 
 

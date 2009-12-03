@@ -2069,23 +2069,14 @@ function dis_category_contact_stats($params) {
  * @return void
  */
 function json_search_contact($contact ,$results) {
-  global $display, $module, $cright_write_admin, $perm;
-
-  $contact_q = $results['datas'];
-
+  global $display;
   $contacts = array();
-  while($contact_q->next_record()) {
-    $id = $contact_q->f('contact_id');
-    $label = phpStringToJsString(trim($contact_q->f('contact_lastname').' '.$contact_q->f('contact_firstname')));
-    $email = phpStringToJsString(trim($contact_q->f('email_address')));
-    if($label != $email) {
-      $name = $label;
-    } else {
-      $name = '';
+  if (is_array($results)) {
+    foreach($results as $c) {
+      $contacts[] = "{id:'data-contact-$c->id', label : '$c->displayname', extra: '$c->email_address'}";
     }
-    $contacts[] = "{id:'data-contact-$id', label : '$name', extra: '$email'}";
   }
-  $display['json'] = "{length:".$results['length'].", datas:[".implode(',',$contacts)."]}";
+  $display['json'] = "{length:".sizeof($results).", datas:[".implode(',',$contacts)."]}";
 }
 
 function json_sync_contact($err, $act) {

@@ -117,8 +117,8 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'ext_search') {
 ///////////////////////////////////////////////////////////////////////////////
-  $res_q = run_query_contact_ext_search($params);
-  json_search_contact($params, $res_q);
+  $contacts = run_query_contact_ext_search($params);
+  json_search_contact($params, $contacts);
   echo '('.$display['json'].')';
   exit();
 
