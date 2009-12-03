@@ -1194,3 +1194,21 @@ END
 CREATE TRIGGER profile_created BEFORE INSERT ON profile FOR EACH ROW EXECUTE PROCEDURE on_profile_create();
 CREATE TRIGGER profile_changed BEFORE UPDATE ON profile FOR EACH ROW EXECUTE PROCEDURE on_profile_change();
 
+UPDATE addressbook SET timecreate=NOW() WHERE timecreate IS NULL;
+ALTER TABLE addressbook ALTER COLUMN timecreate SET DEFAULT NOW();
+
+CREATE OR REPLACE FUNCTION on_addressbook_change() RETURNS trigger AS '
+BEGIN
+new.timeupdate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION on_addressbook_create() RETURNS trigger AS '
+BEGIN
+new.timecreate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER addressbook_created BEFORE INSERT ON addressbook FOR EACH ROW EXECUTE PROCEDURE on_addressbook_create();
+CREATE TRIGGER addressbook_changed BEFORE UPDATE ON addressbook FOR EACH ROW EXECUTE PROCEDURE on_addressbook_change();
+
