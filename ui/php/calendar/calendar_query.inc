@@ -2365,55 +2365,65 @@ function check_template_entities_acl($entities) {
   
   $acl_ok = true;
   
-  $allowed_resources = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'access', $entities['resource']);
-  if (count($allowed_resources) < count($entities['resource'])) {
-    $entities['resource'] = array_keys($allowed_resources);
-    $acl_ok = false;
+  if (count($entities['resource']) > 0) {
+    $allowed_resources = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'access', $entities['resource']);
+    if (count($allowed_resources) < count($entities['resource'])) {
+      $entities['resource'] = array_keys($allowed_resources);
+      $acl_ok = false;
+    }
   }
   
-  $allowed_users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access', $entities['user']);
-  if (count($allowed_users) < count($entities['user'])) {
-    $entities['user'] = array_keys($allowed_users);
-    $acl_ok = false;
+  if (count($entities['user']) > 0) {
+    $allowed_users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access', $entities['user']);
+    if (count($allowed_users) < count($entities['user'])) {
+      $entities['user'] = array_keys($allowed_users);
+      $acl_ok = false;
+    }
   }
   
-  $allowed_groups = array();
-  $group_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, 'check_template_entities_acl()');
-  $group_q->query("SELECT group_id FROM UGroup WHERE group_id IN (".implode(',', $entities['group']).") AND group_privacy = 0");
-  while ($group_q->next_record()) {
-    $allowed_groups[] = $group_q->f('group_id');
-  }
-  if (count($allowed_groups) < count($entities['group'])) {
-    $entities['group'] = array_keys($allowed_groups);
-    $acl_ok = false;
-  }
-  
-  $allowed_docs = array();
-  $doc_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, 'check_template_entities_acl()');
-  $doc_q->query("SELECT document_id FROM Document WHERE document_id IN (".implode(',', $entities['document']).") AND (document_privacy = 0 OR document_usercreate = $obm[uid])");
-  while ($doc_q->next_record()) {
-    $allowed_docs[] = $doc_q->f('document_id');
-  }
-  if (count($allowed_docs) < count($entities['document'])) {
-    $entities['document'] = array_keys($allowed_docs);
-    $acl_ok = false;
+  if (count($entities['group']) > 0) {
+    $allowed_groups = array();
+    $group_q = new DB_OBM;
+    display_debug_msg($query, $cdg_sql, 'check_template_entities_acl()');
+    $group_q->query("SELECT group_id FROM UGroup WHERE group_id IN (".implode(',', $entities['group']).") AND group_privacy = 0");
+    while ($group_q->next_record()) {
+      $allowed_groups[] = $group_q->f('group_id');
+    }
+    if (count($allowed_groups) < count($entities['group'])) {
+      $entities['group'] = array_keys($allowed_groups);
+      $acl_ok = false;
+    }
   }
   
-  $allowed_contacts = array();
-  $books = OBM_AddressBook::search();
-  $books_ids = array();
-  foreach ($books as $b) $books_ids[] = $b->id;
-  $contact_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, 'check_template_entities_acl()');
-  $contact_q->query("SELECT contact_id FROM Contact WHERE contact_id IN (".implode(',', $entities['contact']).") AND contact_addressbook_id IN (".implode(',', $books_ids).")");
-  while ($contact_q->next_record()) {
-    $allowed_contacts[] = $contact_q->f('contact_id');
+  if (count($entities['document']) > 0) {
+    $allowed_docs = array();
+    $doc_q = new DB_OBM;
+    display_debug_msg($query, $cdg_sql, 'check_template_entities_acl()');
+    $doc_q->query("SELECT document_id FROM Document WHERE document_id IN (".implode(',', $entities['document']).") AND (document_privacy = 0 OR document_usercreate = $obm[uid])");
+    while ($doc_q->next_record()) {
+      $allowed_docs[] = $doc_q->f('document_id');
+    }
+    if (count($allowed_docs) < count($entities['document'])) {
+      $entities['document'] = array_keys($allowed_docs);
+      $acl_ok = false;
+    }
   }
-  if (count($allowed_contacts) < count($entities['contact'])) {
-    $entities['contact'] = array_keys($allowed_contacts);
-    $acl_ok = false;
+  
+  if (count($entities['contact']) > 0) {
+    $allowed_contacts = array();
+    $books = OBM_AddressBook::search();
+    $books_ids = array();
+    foreach ($books as $b) $books_ids[] = $b->id;
+    $contact_q = new DB_OBM;
+    display_debug_msg($query, $cdg_sql, 'check_template_entities_acl()');
+    $contact_q->query("SELECT contact_id FROM Contact WHERE contact_id IN (".implode(',', $entities['contact']).") AND contact_addressbook_id IN (".implode(',', $books_ids).")");
+    while ($contact_q->next_record()) {
+      $allowed_contacts[] = $contact_q->f('contact_id');
+    }
+    if (count($allowed_contacts) < count($entities['contact'])) {
+      $entities['contact'] = array_keys($allowed_contacts);
+      $acl_ok = false;
+    }
   }
   
   if (!$acl_ok) {
