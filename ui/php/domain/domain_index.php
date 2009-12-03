@@ -49,6 +49,7 @@ include("$obminclude/global_pref.inc");
 require('domain_display.inc');
 require('domain_query.inc');
 require('domain_js.inc');
+require_once("$obminclude/of/of_right.inc");
 
 if ($action == '') $action = 'index';
 get_domain_action();

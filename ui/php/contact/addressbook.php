@@ -142,7 +142,7 @@ class OBM_AddressBook implements OBM_ISearchable {
       FROM AddressBook 
       INNER JOIN ('.OBM_Acl::getAclSubselect($columns, 'addressbook', null, $GLOBALS['obm']['uid']).') AS Rights ON AddressBook.id = Rights.addressbookentity_addressbook_id
       LEFT JOIN SyncedAddressbook ON SyncedAddressbook.addressbook_id = AddressBook.id AND SyncedAddressbook.user_id = '.$GLOBALS['obm']['uid'].'
-      WHERE 1=1 '.$query.' ORDER BY AddressBook.name');
+      WHERE 1=1 '.$query.' AND AddressBook.domain_id = '.$GLOBALS['obm']['domain_id'].' ORDER BY AddressBook.name');
     while($db->next_record()) {
       if($addressBooks[$db->f('id')]) {
         if($db->f('entityright_access') == 1) $addressBooks[$db->f('id')]->access = 1;

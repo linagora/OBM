@@ -182,10 +182,39 @@ function run_query_domain_insert($domain) {
 
     // Init domain reference data
     run_query_domain_init_data($domain_id);
+
+    // Create public_contacts address book
+    $query = "INSERT INTO AddressBook (
+      domain_id,
+      timeupdate,
+      timecreate,
+      userupdate,
+      usercreate,
+      origin,
+      owner,
+      name,
+      is_default,
+      syncable) VALUES (
+      $domain_id,
+      NOW(),
+      NOW(),
+      $uid,
+      $uid,
+      '$GLOBALS[c_origin_web]',
+      $uid,
+      'public_contacts',
+      true,
+      false)";
+    display_debug_msg($query, $cdg_sql, "run_query_domain_insert(public_contact addressbook)");
+    $obm_q->query($query);
+    $id = $obm_q->lastid();
+    $entity_id = of_entity_insert('addressbook', $id);    
+
+    OBM_Acl::setPublicRights('addressbook', $id, array('access'=>1, 'read'=>1));
+
   } else {
     $domain_id = false;
   }
-
   return $domain_id;
 }
 

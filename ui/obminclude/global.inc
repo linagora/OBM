@@ -190,7 +190,7 @@ $c_frozen_duration = 10;
 // Activate user defined code : check rules, hook functions
 $conf_modules = false;
 
-$c_addressbook_type = array('contacts', 'collected_contacts');
+$c_addressbook_type = array('contacts' => 'false', 'collected_contacts' => 'true');
 
 // Max domain alias, users, group and mailshares mail alias (0=unlimted)
 $c_max_user_alias = 0;

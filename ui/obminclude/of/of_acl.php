@@ -449,7 +449,6 @@ class OBM_Acl {
     } else {
       $consumerEntityId = self::getEntityId($consumerType, $consumerId);
     }
-    
     $delete = "DELETE FROM EntityRight 
                WHERE entityright_consumer_id ".(($consumerId === null) ? "IS NULL" : "= {$consumerEntityId}")." 
                AND entityright_entity_id = '{$realEntityId}'";
@@ -460,7 +459,8 @@ class OBM_Acl {
                '{$realEntityId}', {$consumerEntityId}, '{$rights[access]}',
                '{$rights[read]}', '{$rights[write]}', '{$rights[admin]}')";
     self::$db->query($delete);
-    self::$db->query($insert);
+		if(array_sum($rights) > 0) 
+	    self::$db->query($insert);
   }
 
   public static function getAclQuery($columns, $entityType, $entityId = null, $userId = null, $action = null, 
@@ -532,9 +532,7 @@ class OBM_Acl {
     if ($public) {
       $clauses['public'] = "entityright_consumer_id IS NULL";
     }
-    if ($action !== null) {
-      $clauses['action'] = self::getActionClause($action);
-    }
+		$clauses['action'] = self::getActionClause($action);
     if (count($clauses) != 0) {
       return 'WHERE '.implode(' AND ', $clauses);
     }
@@ -542,6 +540,13 @@ class OBM_Acl {
   }
   
   private static function getActionClause($action) {
+		if($action === null) {
+			$clause = array();
+			foreach(self::$actions as $action) {
+				$clause[] = self::getActionClause($action);
+			}
+			return '('.implode(' OR ', $clause).')';
+		}
     if (!in_array($action, self::$actions)) {
       throw new Exception("Unknown action: $action");
     }
