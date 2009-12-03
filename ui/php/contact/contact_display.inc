@@ -1355,6 +1355,10 @@ function html_contact_header($co_q, $funcs) {
     
     <table>
     <tr>
+      <th>$l_kind</th>
+      <td>$kind</td>
+    </tr>    
+    <tr>
       <th>$l_lastname</th>
       <td>$lname</td>
     </tr>
@@ -1371,10 +1375,6 @@ function html_contact_header($co_q, $funcs) {
       <td>$suffix</td>
     </tr>
     $dis_aka
-    <tr>
-      <th>$l_kind</th>
-      <td>$kind</td>
-    </tr>
     <tr>
       <th>$l_company</th>
       <td>$dis_company</td>
@@ -1956,7 +1956,6 @@ function dis_contact_vcard_export_all($contacts) {
   foreach ($contacts as $c) {
     $vcards[] = $c->toVcard()->__toString();
   }
-  
   header("Content-Type: text/x-vCard");
   header("Content-Disposition: inline; filename=contacts.vcf");
   header('Cache-Control: maxage=3600'); 

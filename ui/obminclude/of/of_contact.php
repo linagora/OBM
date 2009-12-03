@@ -1193,6 +1193,7 @@ class OBM_Contact implements OBM_ISearchable {
       $duration = 3600*24;
       $label = ${"l_${date}_event_title"};
       $title = str_replace('\'', '\\\'', sprintf($label, $contact_fullname));
+      $ext_id =  get_obm_info('product_id').sha1(uniqid()).sha1($GLOBALS['obm']['domain_name']).sha1(mktime()*rand());
 
       $query = "INSERT INTO Event
         (event_timeupdate,
@@ -1200,6 +1201,7 @@ class OBM_Contact implements OBM_ISearchable {
         event_usercreate,
         event_origin,
         event_owner,
+        event_ext_id,
         event_timezone,
         event_title,
         event_date,
@@ -1225,6 +1227,7 @@ class OBM_Contact implements OBM_ISearchable {
         '$contact_usercreate',
         '$GLOBALS[c_origin_web]',
         '$contact_usercreate',
+        '$ext_id',
         '".Of_Date::getOption('timezone')."',
         '$title',
         '$new_value',

@@ -1609,6 +1609,31 @@ function run_query_contact_subscription_nb($id) {
 
 
 /**
+ * Generates a world-wide unique event id. Format is :
+ * OBM-<obm version>-<obm prod id>-<hash>@domain
+ * @access public
+ * @return unique id
+ */
+function genUniqueExtEventId() {
+  global $obm_version;
+
+  $domain = $GLOBALS['obm']['domain_name'];
+  $version = 'OBM-'.substr($obm_version, 0, 15).'-'.get_or_create_prod_id();
+
+  /* 255 (max event_ext_id field) - 128 (max domain len) - 21 (prod id)
+     - 15 (max version length guess) - 7 (strlen('OBM---@'))
+     = 84
+     = (the Answer to the Ultimate Question of Life, the Universe, and Everything) * 2
+  */
+  $max_len = 84;
+  $event_ext_id = '';
+  while(strlen($event_ext_id) < $max_len) {
+    $event_ext_id .= dechex(rand()%16);
+  }
+  return $version.'-'.$event_ext_id.'@'.$domain;
+}
+
+/**
  * Update contact birthday or anniversary
  *
  * When new need : - $contact_id
@@ -1659,12 +1684,14 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
       $duration = 3600*24;
       $label = ${"l_${date}_event_title"};
       $title = str_replace('\'', '\\\'', sprintf($label, $contact_fullastname));
+      $ext_id = genUniqueExtEventId();
 
       $query = "INSERT INTO Event
         (event_timeupdate,
         event_timecreate,
         event_usercreate,
         event_origin,
+        event_ext_id,
         event_owner,
         event_timezone,
         event_title,
@@ -1690,6 +1717,7 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
          NOW(),
         '$contact_usercreate',
         '$GLOBALS[c_origin_web]',
+        '$ext_id',
         '$contact_usercreate',
         '".Of_Date::getOption('timezone')."',
         '$title',
