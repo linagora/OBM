@@ -124,8 +124,7 @@ $l_no_template = "Aucun modèle trouvé.";
 $l_export_templates = "Exporter tous les modèles";
 $l_import_template = "Importer un modèle";
 $l_copy_of = "Copie de";
-$l_template_entities_loading_warning = "Certains éléments sauvegardés ne peuvent être rappelés";
-$l_template_entities_access_warning = "Vous n'avez pas les droits sur certains éléments du modèle";
+$l_template_entities_access_warning = "Vous n'avez pas les droits sur certains éléments du modèle ou ils ont été supprimés";
 $l_delete_template = "Supprimer le modèle?";
 
 // actions 

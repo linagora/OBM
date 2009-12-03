@@ -3153,21 +3153,6 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     }
   }
   
-  // we check if all template entities have been successfully loaded ; if not (deleted), we notice the user
-  if ($action == 'new' && isset($calendar['template_id'])) {
-    $loaded['user'] = isset($users['ids']) ? $users['ids'] : array();
-    $loaded['contact'] = isset($contacts['ids']) ? $contacts['ids'] : array();
-    $loaded['resource'] = isset($resources['ids']) ? $resources['ids'] : array();
-    $loaded['group'] = isset($groups['ids']) ? $groups['ids'] : array();
-    $loaded['document'] = isset($documents['ids']) ? $documents['ids'] : array();
-    foreach ($loaded as $type => $loaded_ids) {
-      if (count(array_diff($template_entities[$type], $loaded_ids)) > 0) {
-        $GLOBALS['display']['msg'] .= display_warn_msg($GLOBALS['l_template_entities_loading_warning']);
-        break;
-      }
-    }
-  }
-  
   $possible_owners = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );

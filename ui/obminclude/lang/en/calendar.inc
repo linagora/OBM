@@ -117,8 +117,7 @@ $l_no_template = "No template found.";
 $l_export_templates = "Export all templates";
 $l_import_template = "Import template";
 $l_copy_of = "Copy of";
-$l_template_entities_loading_warning = "Some template elements could not be loaded";
-$l_template_entities_access_warning = "You're not allowed to access some template elements";
+$l_template_entities_access_warning = "You're not allowed to access some template elements or they may have been deleted";
 $l_delete_template = "Delete template ?";
 
 $l_insert = "Insert the event";
