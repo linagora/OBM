@@ -780,6 +780,11 @@ function run_query_calendar_insert_event_data($calendar) {
     $event_duration = $dateend->diffTimestamp($datebegin);
   }
   if($repeat_kind == 'weekly') {
+    if($repeat_days == '0000000' || !$repeat_days) {
+      $repeat_days = array('0','0','0','0','0','0','0',);
+      $repeat_days[$datebegin->getWeekday()] = 1;
+      $repeat_days = implode('', $repeat_days);
+    }
     $days = str_split($repeat_days);
     $event_day = $datebegin->getWeekday();
     if($days[$event_day] != 1) {

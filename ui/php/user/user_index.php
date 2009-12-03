@@ -170,6 +170,7 @@ if ($action == 'ext_get_ids') {
           set_update_state();
           $params['user_id'] = $cid;
           $display['msg'] .= display_ok_msg("$l_user : $l_insert_ok");
+          $display['msg'] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
           $display['detail'] = dis_user_consult($params);
         } else {
           $display['msg'] .= display_err_msg("$l_user : $l_insert_error");
