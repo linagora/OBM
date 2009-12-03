@@ -24,7 +24,7 @@ sub new {
 
     require OBM::Parameters::common;
     if( !$OBM::Parameters::common::obmModules->{'contact'} ) {
-        $self->_log( 'module OBM-Contact désactivé, mise à jour annulée', 0 );
+        $self->_log( 'module OBM-Contact désactivé, mise à jour annulée', 2 );
         return undef;
     }
 

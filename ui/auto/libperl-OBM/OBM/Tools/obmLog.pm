@@ -105,11 +105,11 @@ sub _convertLevel {
         }
 
         if( $level == 1 ) {
-            return 'BASIC: ';
+            return 'WARNING: ';
         }
 
         if( $level == 2 ) {
-            return 'ADVANCED: ';
+            return 'INFO: ';
         }
     }
 
