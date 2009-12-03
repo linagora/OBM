@@ -21,6 +21,11 @@ sub new {
 
     my $self = bless { }, $class;
 
+    if( !$OBM::Parameters::common::obmModules->{'mail'} ) {
+        $self->_log( 'module OBM-MAIL désactivé, mise à jour annulée', 0 );
+        return undef;
+    }
+
     if( !defined($parameters) ) {
         $self->_log( 'paramètres d\'initialisation non définis', 0 );
         return undef;
@@ -92,8 +97,8 @@ sub update {
 
     require OBM::Cyrus::cyrusUpdateQuotaUsedEngine;
     $self->_log( 'initialisation du moteur Cyrus de mise à jour du quota utilisé', 2 );
-    my $cyrusUpdateQuotaUsedEngine;
-    if( !($cyrusUpdateQuotaUsedEngine = OBM::Cyrus::cyrusUpdateQuotaUsedEngine->new()) ) {
+    my $cyrusUpdateQuotaUsedEngine = OBM::Cyrus::cyrusUpdateQuotaUsedEngine->new();
+    if( !ref($cyrusUpdateQuotaUsedEngine) ) {
         $self->_log( 'problème à l\'initialisation du moteur Cyrus de mise à jour du quota utilisé', 0 );
         return 1;
     }

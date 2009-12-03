@@ -59,18 +59,17 @@ sub run {
 
     if( defined($updateBdQuotaUse) ) {
         $errorCode = $updateBdQuotaUse->update();
-    }else {
-        $self->_log( 'problème à l\'initialisation du cyrus quota used updater', 0 );
-        $errorCode = 1;
+
+        if( $errorCode ) {
+            $self->_log( 'échec de la mise à jour du quota Cyrus utilisé', 0 );
+        }else {
+            $self->_log( 'mise à jour du quota Cyrus utilisé avec succés', -1 );
+        }
+    
+        return $errorCode;
     }
 
-    if( $errorCode ) {
-        $self->_log( 'échec de la mise à jour du quota Cyrus utilisé', 0 );
-    }else {
-        $self->_log( 'mise à jour du quota Cyrus utilisé avec succés', -1 );
-    }
-
-    return $errorCode;
+    return 1;
 }
 
 
@@ -87,7 +86,7 @@ sub _getParameter {
 
     # Check 'domain-id' parameter
     if( !$$parameters{'domain-id'} ) {
-            $self->_log( 'paramètre --domain-id non indiqué, traitement de tous les domaines', 0 );
+        $self->_log( 'paramètre --domain-id non indiqué, traitement de tous les domaines', 2);
     }else {
         if( $$parameters{'domain-id'} !~ /$regexp_id/ ) {
             $self->_log( 'paramètre --domain-id incorrect', 0 );

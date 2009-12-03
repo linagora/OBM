@@ -23,7 +23,7 @@ sub new {
 
     require OBM::Parameters::common;
     if( !$OBM::Parameters::common::obmModules->{'mail'} ) {
-        $self->_log( 'module OBM-MAIL désactivé, moteur non démarré', 3 );
+        $self->_log( 'module OBM-MAIL désactivé, moteur non démarré', 2 );
         return '0 but true';
     }
 
