@@ -153,6 +153,7 @@ $l_image_size_error = "The photo image max size is 96px x 96px and must not exce
 $l_err_delegation_target_outside_domain = "The delegation target must be in the domain delegation !";
 $l_err_delegation_target_outside_target = "The delegation target must be in your target !";
 $l_err_delegation_target_profile = "This profile does not support delegation target !";
+$l_err_profile = "This  profile does not exist";
 $l_user_import_row_cols_error = "Invalid row. Incorrect columns number !";
 $l_batch_no_user_error = "No selected users for batch processing";
 $l_add_users = "Add users";

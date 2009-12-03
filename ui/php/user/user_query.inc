@@ -1681,6 +1681,12 @@ function check_user_data_form($p_id, &$user) {
     }
   }
 
+  if(!isset($profiles[$profile])) {
+    $err['msg'] = $GLOBALS['l_err_profile'];
+    $err['field'] = 'profile';
+    return false;
+  }
+
   if ($action == 'update') {
     $u = get_user_info($id);
     $domain_id = $u['domain_id'];

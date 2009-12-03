@@ -130,6 +130,7 @@ $l_image_size_error = "La photo ne doit pas dépasser 96px x 96px et avoir un po
 $l_err_delegation_target_outside_domain = "La délégation d'administration doit être dans la délégation de l'entité !";
 $l_err_delegation_target_outside_target = "La délégation d'administration doit être dans votre cible de délégation !";
 $l_err_delegation_target_profile = "Ce profil d'utilisateur ne peut avoir de délégation d'administration !";
+$l_err_profile = "Ce profil d'utilisateur n'existe pas";
 $l_user_import_row_cols_error = "Ligne invalide. Nombre de colonnes incorrect !";
 $l_batch_no_user_error = "Aucun utilisateur n'est sélectionné pour le traitement par lots";
 $l_phone_error = "Le numéro de téléphone est incorrect";
