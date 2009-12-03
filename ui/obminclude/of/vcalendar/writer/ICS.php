@@ -279,5 +279,12 @@ class Vcalendar_Writer_ICS {
       $this->buffer .= $this->parseProperty($this->parseName($name).$this->parseTZIDedDate($value, Of_Date::ICS_DATETIME))."\r\n";
     }
   }
+
+  function writeXObmAlert($name, $values) {
+    foreach($values as $value ) {
+      $property = $this->parseProperty($this->parseName($name).';'.$this->parseName('x-obm-id').'='.$value['user'].':'.$value['duration']);
+      $this->buffer .= $property."\r\n";       
+    }
+  }
 }
 ?>

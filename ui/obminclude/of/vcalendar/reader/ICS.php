@@ -241,10 +241,12 @@ class Vcalendar_Reader_ICS {
       if ($date->error() == Of_Date::ERR_INVALID_DATE) { // Bad timezone
         $date = new Of_Date(null, 'GMT');
       }
-    } else {
+    } elseif($time) {
       $date = new Of_Date(null, 'GMT');
+    } else {
+      $date = new Of_Date(null);
     }
-    $date->setYear($year)->setMonth($month)->setDay($day);
+    $date->setYear($year)->setMonth($month)->setDay($day)->setHour(0)->setMinute(0)->setSecond(0);
 
     if($time !== null) {
       $date->setHour($hour)->setMinute($minute)->setSecond($second);
@@ -548,6 +550,15 @@ class Vcalendar_Reader_ICS {
     $text = htmlspecialchars($text);
     $text = stripcslashes($text);
     return $text;    
+  }
+
+  function parseXObmAlert($duration, $options) {
+    $alert = array();
+    if(!is_null($options['x-obm-id'])) {
+      if(Vcalendar_Utils::entityExist($options['x-obm-id'], 'user')) $alert['user'] = $options['x-obm-id'];
+    }
+    $alert['duration'] = $duration;
+    return $alert;
   }
 }
 ?>

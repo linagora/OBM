@@ -49,6 +49,12 @@ class Vcalendar_Element_Vevent extends Vcalendar_Element {
     }
   }
     
+  function setXObmAlert($value) {
+    $name = 'x-obm-alert'; 
+    if(!is_array($this->$name)) $this->$name = array();
+    array_push($this->$name,$value);
+  }
+
   function isAllDay() {
     if($this->get('x-obm-all-day') == 1) {
       return true;

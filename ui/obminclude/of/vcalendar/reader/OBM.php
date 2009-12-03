@@ -16,25 +16,33 @@ class Vcalendar_Reader_OBM {
 
   var $eventSets = array();
   
-  function Vcalendar_Reader_OBM($entities,$ids = NULL, $startTime = NULL, $endTime = NULL) {
+  function Vcalendar_Reader_OBM($entities,$ids = array(), $startTime = NULL, $endTime = NULL) {
+    $this->db = new DB_OBM;
     $this->entities = $entities;
-    if(!is_null($ids)) {
+    if(!empty($ids)) {
       $this->readSet($ids);
+    } else {
+      $ids = array();
     }
     if(!is_null($startTime) && !is_null($endTime)) {
-      $this->readPeriod($startTime,$endTime);
+      $ids = array_merge($ids,$this->readPeriod($startTime,$endTime));
     }
+    $this->alerts = $this->readEventsAlerts($ids);
   }
 
   function readPeriod($startTime, $endTime) {
     $noRepeatEvent = run_query_calendar_no_repeat_events($startTime,$endTime,$this->entities,NULL);
     $repeatEvent = run_query_calendar_repeat_events($startTime,$endTime,$this->entities,NULL);
+    $ids = array();
     while($noRepeatEvent->next_record()) {
+      $ids[] = $noRepeatEvent->f('event_id');
       $this->eventSets[] = $noRepeatEvent->Record;
     }
     while($repeatEvent->next_record()) {
+      $ids[] = $repeatEvent->f('event_id');
       $this->eventSets[] = $repeatEvent->Record;
     }
+    return $ids;
   }
    
   function readSet($events) {
@@ -43,7 +51,19 @@ class Vcalendar_Reader_OBM {
       $this->eventSets[] = $set->Record;
     }
   }
-  
+
+  function readEventsAlerts($events) {
+    if(empty($events)) {
+      return array();
+    }
+    $query = 'SELECT eventalert_duration, eventalert_user_id, eventalert_event_id FROM EventAlert WHERE eventalert_event_id IN ('.implode(',', $events).') and eventalert_duration > 0';
+    $this->db->query($query);
+    while($this->db->next_record()) {
+      $alerts[$this->db->f('eventalert_event_id')][] = array('user' => $this->db->f('eventalert_user_id'), 'duration' => $this->db->f('eventalert_duration'));
+    }
+    return $alerts;
+  }
+
   /**
    * @return Vcalendar
    */
@@ -114,6 +134,11 @@ class Vcalendar_Reader_OBM {
     $vevent->set('location', $data['event_location']);
     $vevent->set('categories', array($data['eventcategory1_label']));
     $vevent->set('x-obm-color', $data['event_color']);
+    if(!empty($this->alerts[$data['event_id']])) {
+      foreach($this->alerts[$data['event_id']] as $alert) {
+        $vevent->set('x-obm-alert', $alert);
+      }
+    }
     $vevent->set('uid', $data['event_ext_id']);
     if(!is_null($data['event_repeatkind']) && $data['event_repeatkind'] != 'none') {
       $vevent->set('rrule',$this->parseRrule($data));

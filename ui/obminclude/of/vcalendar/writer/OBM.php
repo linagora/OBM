@@ -53,6 +53,7 @@ class Vcalendar_Writer_OBM {
       } else {
         // FIXME WHAT TO DO??
         $this->updateAttendees($eventData->f('event_id'),$vevent);
+        $this->updateAlerts($vevent->get('x-obm-alert'), $id, $GLOBALS['obm']['uid']);
       }
     }
   }
@@ -188,6 +189,7 @@ class Vcalendar_Writer_OBM {
     }
     $id = run_query_calendar_add_event($data['event'], $data['entities']);
     $this->updateStates($data['states'], $id);
+    $this->updateAlerts($vevent->get('x-obm-alert'), $id);
   }
 
   function updateStates($states, $id) {
@@ -197,6 +199,14 @@ class Vcalendar_Writer_OBM {
           run_query_calendar_update_occurrence_state($id,$entity,$entityId,$state, true, ($this->rights === true));
         }
       }
+    }
+  }
+
+  function updateAlerts($alerts, $id, $filter = null) {
+    if(is_array($alerts))
+    foreach($alerts as $alert) {
+      if(!$filter || $filter != $alert['user'])
+        run_query_calendar_event_alert_insert($id, $alert['user'], $alert['duration']);
     }
   }
 
@@ -217,6 +227,8 @@ class Vcalendar_Writer_OBM {
     $data['event']['calendar_id'] = $id;
     run_query_calendar_event_update($data['event'], $data['entities'], $id, true);
     $this->updateStates($data['states'], $id);
+    $alert = $vevent->get('x-obm-alert');
+    $this->updateAlerts($alert, $id);
   }
 
   function & getOBMEvent(&$vevent) {
@@ -310,8 +322,6 @@ class Vcalendar_Writer_OBM {
             $index = date('w', strtotime($day)); // - date('w', strtotime($GLOBALS['ccalendar_weekstart']));
             $days[$index] = '1';
           }
-        } else {
-          $days[0] = '1';
         }
         $event['repeat_days'] = $days;
         break;
