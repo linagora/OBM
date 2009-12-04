@@ -346,9 +346,6 @@ CREATE TABLE opush_sync_mail (
 
 
 
--- ----------------------------------------------------------------------------
--- Write that the 2.2->2.3 is completed
-UPDATE ObmInfo SET obminfo_value='2.3.0' WHERE obminfo_name='db_version';
 
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'people', 'userobm_direction', 11, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'people', 'userobm_service', 12, 1);
@@ -377,3 +374,6 @@ DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_property_key='last_pub
 INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(RAND()*NOW())), 24, 0);
 UPDATE Event SET event_ext_id = CONCAT((select obminfo_value from ObmInfo where obminfo_name = 'prod_id'),MD5(FLOOR(RAND()*NOW())),MD5(FLOOR(RAND()*NOW())),MD5(FLOOR(RAND()*NOW())),MD5(FLOOR(RAND()*NOW())),MD5(FLOOR(RAND()*NOW()))) WHERE event_ext_id IS NULL OR event_ext_id = '';
 
+-- ----------------------------------------------------------------------------
+-- Write that the 2.2->2.3 is completed
+UPDATE ObmInfo SET obminfo_value='2.3.0' WHERE obminfo_name='db_version';

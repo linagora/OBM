@@ -1212,3 +1212,58 @@ END
 CREATE TRIGGER addressbook_created BEFORE INSERT ON addressbook FOR EACH ROW EXECUTE PROCEDURE on_addressbook_create();
 CREATE TRIGGER addressbook_changed BEFORE UPDATE ON addressbook FOR EACH ROW EXECUTE PROCEDURE on_addressbook_change();
 
+UPDATE plannedtask SET plannedtask_timecreate=NOW() WHERE plannedtask_timecreate IS NULL;
+ALTER TABLE plannedtask ALTER COLUMN plannedtask_timecreate SET DEFAULT NOW();
+
+CREATE OR REPLACE FUNCTION on_plannedtask_change() RETURNS trigger AS '
+BEGIN
+new.plannedtask_timeupdate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION on_plannedtask_create() RETURNS trigger AS '
+BEGIN
+new.plannedtask_timecreate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER plannedtask_created BEFORE INSERT ON plannedtask FOR EACH ROW EXECUTE PROCEDURE on_plannedtask_create();
+CREATE TRIGGER plannedtask_changed BEFORE UPDATE ON plannedtask FOR EACH ROW EXECUTE PROCEDURE on_plannedtask_change();
+
+UPDATE eventtemplate SET eventtemplate_timecreate=NOW() WHERE eventtemplate_timecreate IS NULL;
+ALTER TABLE eventtemplate ALTER COLUMN eventtemplate_timecreate SET DEFAULT NOW();
+
+CREATE OR REPLACE FUNCTION on_eventtemplate_change() RETURNS trigger AS '
+BEGIN
+new.eventtemplate_timeupdate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION on_eventtemplate_create() RETURNS trigger AS '
+BEGIN
+new.eventtemplate_timecreate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER eventtemplate_created BEFORE INSERT ON eventtemplate FOR EACH ROW EXECUTE PROCEDURE on_eventtemplate_create();
+CREATE TRIGGER eventtemplate_changed BEFORE UPDATE ON eventtemplate FOR EACH ROW EXECUTE PROCEDURE on_eventtemplate_change();
+
+
+UPDATE tasktypegroup SET tasktypegroup_timecreate=NOW() WHERE tasktypegroup_timecreate IS NULL;
+ALTER TABLE tasktypegroup ALTER COLUMN tasktypegroup_timecreate SET DEFAULT NOW();
+
+CREATE OR REPLACE FUNCTION on_tasktypegroup_change() RETURNS trigger AS '
+BEGIN
+new.tasktypegroup_timeupdate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION on_tasktypegroup_create() RETURNS trigger AS '
+BEGIN
+new.tasktypegroup_timecreate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER tasktypegroup_created BEFORE INSERT ON tasktypegroup FOR EACH ROW EXECUTE PROCEDURE on_tasktypegroup_create();
+CREATE TRIGGER tasktypegroup_changed BEFORE UPDATE ON tasktypegroup FOR EACH ROW EXECUTE PROCEDURE on_tasktypegroup_change();
+

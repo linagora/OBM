@@ -437,11 +437,6 @@ CREATE TABLE opush_sync_mail (
 );
 
 
--- -----------------------------------------------------------------------------
-
-
--- Write that the 2.2->2.3 is completed
-UPDATE ObmInfo SET obminfo_value='2.3.0' WHERE obminfo_name='db_version';
 
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'people', 'userobm_direction', 11, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'people', 'userobm_service', 12, 1);
@@ -470,3 +465,81 @@ DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_property_key='last_pub
 INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text), 24);
 UPDATE Event SET event_ext_id = (select obminfo_value from obminfo where obminfo_name = 'prod_id') || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text) || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text) || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text) || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text) || MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text)
 WHERE event_ext_id IS NULL OR event_ext_id = '';
+
+
+UPDATE addressbook SET timecreate=NOW() WHERE timecreate IS NULL;
+ALTER TABLE addressbook ALTER COLUMN timecreate SET DEFAULT NOW();
+
+CREATE OR REPLACE FUNCTION on_addressbook_change() RETURNS trigger AS '
+BEGIN
+new.timeupdate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION on_addressbook_create() RETURNS trigger AS '
+BEGIN
+new.timecreate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER addressbook_created BEFORE INSERT ON addressbook FOR EACH ROW EXECUTE PROCEDURE on_addressbook_create();
+CREATE TRIGGER addressbook_changed BEFORE UPDATE ON addressbook FOR EACH ROW EXECUTE PROCEDURE on_addressbook_change();
+
+UPDATE plannedtask SET plannedtask_timecreate=NOW() WHERE plannedtask_timecreate IS NULL;
+ALTER TABLE plannedtask ALTER COLUMN plannedtask_timecreate SET DEFAULT NOW();
+
+CREATE OR REPLACE FUNCTION on_plannedtask_change() RETURNS trigger AS '
+BEGIN
+new.plannedtask_timeupdate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION on_plannedtask_create() RETURNS trigger AS '
+BEGIN
+new.plannedtask_timecreate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER plannedtask_created BEFORE INSERT ON plannedtask FOR EACH ROW EXECUTE PROCEDURE on_plannedtask_create();
+CREATE TRIGGER plannedtask_changed BEFORE UPDATE ON plannedtask FOR EACH ROW EXECUTE PROCEDURE on_plannedtask_change();
+
+UPDATE eventtemplate SET eventtemplate_timecreate=NOW() WHERE eventtemplate_timecreate IS NULL;
+ALTER TABLE eventtemplate ALTER COLUMN eventtemplate_timecreate SET DEFAULT NOW();
+
+CREATE OR REPLACE FUNCTION on_eventtemplate_change() RETURNS trigger AS '
+BEGIN
+new.eventtemplate_timeupdate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION on_eventtemplate_create() RETURNS trigger AS '
+BEGIN
+new.eventtemplate_timecreate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER eventtemplate_created BEFORE INSERT ON eventtemplate FOR EACH ROW EXECUTE PROCEDURE on_eventtemplate_create();
+CREATE TRIGGER eventtemplate_changed BEFORE UPDATE ON eventtemplate FOR EACH ROW EXECUTE PROCEDURE on_eventtemplate_change();
+
+
+UPDATE tasktypegroup SET tasktypegroup_timecreate=NOW() WHERE tasktypegroup_timecreate IS NULL;
+ALTER TABLE tasktypegroup ALTER COLUMN tasktypegroup_timecreate SET DEFAULT NOW();
+
+CREATE OR REPLACE FUNCTION on_tasktypegroup_change() RETURNS trigger AS '
+BEGIN
+new.tasktypegroup_timeupdate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION on_tasktypegroup_create() RETURNS trigger AS '
+BEGIN
+new.tasktypegroup_timecreate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER tasktypegroup_created BEFORE INSERT ON tasktypegroup FOR EACH ROW EXECUTE PROCEDURE on_tasktypegroup_create();
+CREATE TRIGGER tasktypegroup_changed BEFORE UPDATE ON tasktypegroup FOR EACH ROW EXECUTE PROCEDURE on_tasktypegroup_change();
+
+-- -----------------------------------------------------------------------------
+-- Write that the 2.2->2.3 is completed
+UPDATE ObmInfo SET obminfo_value='2.3.0' WHERE obminfo_name='db_version';
