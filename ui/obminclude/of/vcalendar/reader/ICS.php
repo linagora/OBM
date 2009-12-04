@@ -236,7 +236,7 @@ class Vcalendar_Reader_ICS {
 
     $date = new Of_Date();
 
-    if(isset($options['TZID']) && !preg_match('/^[^ZT]*Z$/',$value)) {
+    if(isset($options['TZID']) && !preg_match('/^[^Z]*Z$/',$value)) {
       $date = new Of_Date(null, $options['TZID']);
       if ($date->error() == Of_Date::ERR_INVALID_DATE) { // Bad timezone
         $date = new Of_Date(null, 'GMT');
