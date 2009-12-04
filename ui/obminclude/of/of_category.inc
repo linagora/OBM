@@ -1656,7 +1656,29 @@ function of_userdata_query_search($uentity, $params, $table='') {
   return $ret;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// User Data search query execution
+// Parameters:
+//   - $entity : user category for this entity
+//   - $params : array with parameters
+//   - $table : tablename of entity if different
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_join_query($uentity) {
+  global $cgp_user;
 
+  $entity = strtolower($uentity);
+  $entitytablefield = strtolower($entity).'entity';
+
+  // User defined categories
+  if (is_array($cgp_user[$entity]['category'])) {
+    $join .= "LEFT JOIN CategoryLink ON ${entitytablefield}_entity_id=categorylink_entity_id";
+    //foreach($cgp_user[$entity]['category'] as $cat_name => $one_cat) {
+    //  $tlink = "${cat_name}_link";
+    //}
+  }
+
+  return $join;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // User Data update query execution
 // Parameters:

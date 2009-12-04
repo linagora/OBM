@@ -241,6 +241,7 @@ class OBM_Contact implements OBM_ISearchable {
     $fields['assistant'] = array('contact_assistant' => 'text');
     $fields['spouse'] = array('contact_spouse' => 'text');
     $fields['category'] = array('contact_category' => 'text');
+    $fields['category_id'] = array('categorylink_category_id' => 'integer');
     $fields['service'] = array('contact_service' => 'text');
     $fields['suffix'] = array('contact_suffix' => 'text');
     $fields['aka'] = array('contact_aka' => 'text');
@@ -799,7 +800,7 @@ class OBM_Contact implements OBM_ISearchable {
     if ($limit)
       $sql_limit = sql_limit($db_type, $limit, $offset);
     $contacts = array();
-
+    $join = of_userdata_join_query('Contact');
     $query = "SELECT contact_id,
       contact_lastname,
       contact_firstname,
@@ -855,6 +856,7 @@ class OBM_Contact implements OBM_ISearchable {
          LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id
          LEFT JOIN Event as an ON contact_anniversary_id = an.event_id
          LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
+         $join
     WHERE {$where}
     GROUP BY contact_id,
       contact_lastname,
