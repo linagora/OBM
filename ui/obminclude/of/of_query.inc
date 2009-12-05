@@ -72,6 +72,18 @@ function sql_parse_int($int) {
 
 
 /**
+ * Return an number if $num is numeric (can be a float) else return 0
+ * 
+ * @param mixed $num
+ * @access public
+ * @return void
+ */
+function sql_parse_num($num) {
+  return (is_numeric($num))?(float)$num:0;
+}
+
+
+/**
  * Return a formatted and checked text from text
  * 
  * @param mixed $text

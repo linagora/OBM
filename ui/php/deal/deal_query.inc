@@ -504,8 +504,9 @@ function run_query_deal_update($deal) {
   $tech = sql_parse_id($deal['tech']);
   $source_id = sql_parse_id($deal['source_id']);
   $source = $deal['source'];
-  $amount = ($deal['amount'] ? "'".$deal['amount']."'" : 'null');
-  $margin = ($deal['margin'] ? "'".$deal['margin']."'" : 'null');
+  $amount = sql_parse_num($deal['amount']);
+  $margin = sql_parse_num($deal['margin']);
+  $margin = ($margin ? "'".$margin."'" : 'null');
   $commission = ($deal['commission'] ? "'".$deal['commission']."'" : '0');
   if (($deal['hitrate'] != '')
       && ($deal['hitrate'] >= 0) && ($deal['hitrate'] <= 100)) {
