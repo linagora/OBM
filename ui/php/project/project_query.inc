@@ -927,7 +927,6 @@ function run_query_project_memberlist_insert($params) {
            projectuser_projecttask_id,
            projectuser_timecreate,
            projectuser_usercreate,
-           projectuser_projectedtime,
            projectuser_manager
           )
         VALUES
@@ -936,7 +935,6 @@ function run_query_project_memberlist_insert($params) {
           null,
           '".date('Y-m-d H:i:s')."',
           $obm[uid],
-          0,
           0)";
 
       display_debug_msg($query, $cdg_sql, 'run_query_project_memberlist_insert(3)');
@@ -1281,7 +1279,7 @@ function run_query_project_advance_update($params) {
 	}
 
 	$query = "	
-        INSERT into ProjectUser 
+        INSERT INTO ProjectUser 
           (projectuser_user_id,
            projectuser_project_id,
            projectuser_projecttask_id,
