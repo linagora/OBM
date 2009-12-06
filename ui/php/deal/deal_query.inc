@@ -59,7 +59,7 @@ function run_query_deal_search($deal, $all='') {
   }
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
-    $where .= " AND userobm_delegation $like '$delegation%'";
+    $where .= " AND m.userobm_delegation $like '$delegation%'";
   }
   if ($number != '') {
     $where .= " AND deal_number $like '%$number%'";
@@ -197,7 +197,8 @@ function run_query_deal_search($deal, $all='') {
       address_zipcode as deal_company_zipcode,
       tasktype_label,
       dealstatus_label,
-      userobm_lastname as deal_marketingmanager
+      m.userobm_lastname as deal_marketingmanager,
+      t.userobm_lastname as deal_technicalmanager
     FROM Deal
     INNER JOIN DealEntity ON dealentity_deal_id = deal_id
 ";
@@ -211,7 +212,8 @@ function run_query_deal_search($deal, $all='') {
         LEFT JOIN TaskType ON deal_tasktype_id=tasktype_id
         LEFT JOIN DealStatus ON deal_status_id=dealstatus_id
         LEFT JOIN LeadSource ON deal_source_id=leadsource_id
-        LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id
+        LEFT JOIN UserObm AS m ON deal_marketingmanager_id=m.userobm_id
+        LEFT JOIN UserObm AS t ON deal_technicalmanager_id=t.userobm_id
         $join_role
         $join_userdata";
 
