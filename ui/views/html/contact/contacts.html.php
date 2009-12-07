@@ -64,6 +64,6 @@
     | <a href='#' onclick="obm.contact.addressbook.moreContact(<?php echo $offset + 100 ?>); return false;"><?php echo __('Next page'); ?> &gt;&gt;</a>
     <?php } ?>
     </tr>
-    <?php } ?>
   </tfoot>
+  <?php } ?>
 </table>

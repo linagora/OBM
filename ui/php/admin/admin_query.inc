@@ -73,7 +73,7 @@ function run_query_admin_active_user($delay) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $multidomain = sql_multidomain('UserObm');
+  $multidomain = sql_multidomain('userobm');
 
   $timeupdate = sql_date_format($db_type, "activeuserobm_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "activeuserobm_timecreate", "timecreate");

@@ -5002,16 +5002,6 @@ function run_query_calendar_reset($id,$params) {
 }
 
 /**
- * Generates a world-wide unique event id.
- * @access public
- * @return unique id
- */
-function genUniqueExtEventId() {
-  return get_obm_info('product_id').sha1(uniqid()).sha1($GLOBALS['obm']['domain_name']).sha1(mktime()*rand());
-}
-
-
-/**
  * Get events for an entity
  */
 function get_json_entity_events($calendar, $entity_store) {
