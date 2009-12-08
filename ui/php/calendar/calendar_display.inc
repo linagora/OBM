@@ -5721,6 +5721,8 @@ function json_build_html_event($calendar, $current_view, $id) {
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
 
+  $tags = array();
+
   if ($isMultiWeek) {
     $date = $current_view->get_date_range();
     $current = clone $date['begin'];
