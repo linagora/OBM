@@ -7583,9 +7583,10 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
 
         // event header
         $icon_width = count($icons)*$this->icon_size;
-        while($this->getStringWidth($dis_header) > $event->size*$this->col_width -$icon_width) {
-          $dis_header = substr($dis_header, 0, -1); 
-        }
+        // #949 ... WTF ?
+        // while($this->getStringWidth($dis_header) > $event->size*$this->col_width -$icon_width) {
+        //   $dis_header = substr($dis_header, 0, -1); 
+        // }
         $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
         $this->page->drawRectangle($x0,$y1-$this->font_height-2,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
         foreach ($icons as $i => $ico) {
@@ -7608,7 +7609,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
     foreach($this->updated as $date => $column){
       $allday = 0;
       foreach($column as $key => $occurrence){
-  if($occurrence->event->all_day || $this->isOutOfTimeInterval($occurrence)){
+        if($occurrence->event->all_day || $this->isOutOfTimeInterval($occurrence)){
           $allday++;
         }
       }
