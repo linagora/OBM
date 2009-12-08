@@ -227,7 +227,8 @@ class ContactIndexingJob extends CronJob {
         $solr->addDocuments($documents);
 
         // Remove deleted event
-        $query = "SELECT deletedcontact_contact_id FROM DeletedContact WHERE deletedcontact_timestamp > $solr_contact_lastupdate";
+        $query = "SELECT deletedcontact_contact_id FROM DeletedContact 
+          WHERE deletedcontact_timestamp > '$solr_contact_lastupdate'";
         $db->query($query);
         while ($db->next_record()) { 
           $solr->deleteById($db->f('deletedcontact_contact_id'));
