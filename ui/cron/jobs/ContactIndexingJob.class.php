@@ -83,7 +83,7 @@ class ContactIndexingJob extends CronJob {
       $solr_lastcontact = $db->f('obminfo_value');
     }
     $maxid=$solr_lastcontact;
-    $limit = 2000;
+    $limit = 1000;
 
     $this->logger->debug("Execute ContactIndexingJob");
     $this->logger->debug("Last indexed contact : $solr_lastcontact");
@@ -227,13 +227,16 @@ class ContactIndexingJob extends CronJob {
         $solr->addDocuments($documents);
 
         // Remove deleted event
-        $query = "SELECT deletedcontact_contact_id FROM DeletedContact 
-          WHERE deletedcontact_timestamp > '$solr_contact_lastupdate'";
-        $db->query($query);
-        while ($db->next_record()) { 
-          $solr->deleteById($db->f('deletedcontact_contact_id'));
-        }
+        if ($solr_contact_lastupdate) {
+          $d = new Of_Date($solr_contact_lastupdate);
+          $query = "SELECT deletedcontact_contact_id FROM DeletedContact 
+            WHERE deletedcontact_timestamp > '$d'";
 
+          $db->query($query);
+          while ($db->next_record()) { 
+            $solr->deleteById($db->f('deletedcontact_contact_id'));
+          }
+        }
         $this->logger->debug("Solr commit");
         $solr->commit();
         $this->logger->debug("Solr optimize");
