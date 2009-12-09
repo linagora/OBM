@@ -131,11 +131,10 @@ class ContactIndexingJob extends CronJob {
           $query = "$select ORDER BY contact_id LIMIT $limit";
         } else {
           $d = new Of_Date($solr_contact_lastupdate);
-          $query = "$select AND (contact_id > $solr_lastcontact) 
-           OR (contact_timecreate >= '$d' OR contact_timeupdate >= '$d')  
+          $query = "$select AND ((contact_id > $solr_lastcontact) 
+           OR (contact_timecreate >= '$d' OR contact_timeupdate >= '$d'))  
            ORDER BY contact_id LIMIT $limit";
         }
-
         $db->xquery($query);
         $documents = array();
         while($db->next_record()) {
@@ -244,10 +243,10 @@ class ContactIndexingJob extends CronJob {
       } 
 
       if (!$solr_contact_lastupdate) {
-        $q_date = "INSERT INTO ObmInfo VALUES ('solr_contact_lastupdate', '$date')";
+        $q_date = "INSERT INTO ObmInfo VALUES ('solr_contact_lastupdate', NOW())";
         $q_event = "INSERT INTO ObmInfo VALUES ('solr_lastcontact', '$maxid')";
       } else {
-        $q_date = "UPDATE ObmInfo SET obminfo_value='$date' WHERE obminfo_name='solr_contact_lastupdate'";
+        $q_date = "UPDATE ObmInfo SET obminfo_value=NOW() WHERE obminfo_name='solr_contact_lastupdate'";
         $q_event = "UPDATE ObmInfo SET obminfo_value='$maxid' WHERE obminfo_name='solr_lastcontact'";
       }
       $db->query($q_date);
