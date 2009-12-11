@@ -9,6 +9,10 @@ require_once 'obminclude/of/of_search.php';
 class OBM_Contact implements OBM_ISearchable {
 
   public static $fields = array (
+    'timecreate' 	=> array('sql' => 'contact_timecreate', 'sqlkind' => 'text', 'type' => 'text'),
+    'timeupdate' 	=> array('sql' => 'contact_timeupdate', 'sqlkind' => 'text', 'type' => 'text'),
+    'usercreate' 	=> array('sql' => 'contact_usercreate', 'sqlkind' => 'text', 'type' => 'text'),
+    'userupdate' 	=> array('sql' => 'contact_userupdate', 'sqlkind' => 'text', 'type' => 'text'),
     'lastname' 	=> array('sql' => 'contact_lastname', 'sqlkind' => 'text', 'type' => 'text'),
     'firstname'	=> array('sql' => 'contact_firstname', 'sqlkind' => 'text', 'type' => 'text'),
     'mname' 	=> array('sql' => 'contact_mname', 'sqlkind' => 'text', 'type' => 'text'),
@@ -39,6 +43,7 @@ class OBM_Contact implements OBM_ISearchable {
     'im' 	=> array('sql' => 'contact_im', 'sqlkind' => 'text', 'type' => 'text'),
     'website' 	=> array('sql' => 'contact_website', 'sqlkind' => 'text', 'type' => 'text'),
     'archive' 	=> array('sql' => 'contact_archive', 'sqlkind' => 'text', 'type' => 'text'),
+    'collected' 	=> array('sql' => 'contact_archive', 'sqlkind' => 'text', 'type' => 'text'),
     'datasource_id' 	=> array('sql' => 'contact_datasource_id', 'sqlkind' => 'text', 'type' => 'text'),
     'comment' 	=> array('sql' => 'contact_comment', 'sqlkind' => 'text', 'type' => 'text'),
     'comment2' 	=> array('sql' => 'contact_comment2', 'sqlkind' => 'text', 'type' => 'text'),
@@ -48,6 +53,10 @@ class OBM_Contact implements OBM_ISearchable {
   ); 
 
   private  $id;
+  private  $timecreate;
+  private  $timeupdate;
+  private  $usercreate;
+  private  $userupdate;
   private  $entity_id;
 
   private  $lastname;
@@ -81,6 +90,7 @@ class OBM_Contact implements OBM_ISearchable {
   private  $im = array();
   private  $website = array();
   private  $archive;
+  private  $collected;
   private  $datasource_id;
   private  $comment;
   private  $comment2;
@@ -251,12 +261,13 @@ class OBM_Contact implements OBM_ISearchable {
   }
 
   public static function search($pattern, $offset=0, $limit=100) {
-    return OBM_Contact::fetchAll(OBM_Search::buildSearchQuery('OBM_Contact', $pattern), $offset, $limit);
+    return OBM_Contact::fetchAll(
+      OBM_Search::buildSearchQuery('contact', $pattern, $offset, $limit, array('sort' => 'lastname asc, firstname asc')));
   }
   
-  public static function fetchAll($where, $offset=0, $limit=false) {
+  public static function fetchAll($where) {
     $db = new DB_OBM();
-    $contacts = self::fetchDetails($db, $where, $offset, $limit);
+    $contacts = self::fetchDetails($db, $where);
     if (count($contacts) != 0) {
       $contacts = self::fetchCoords($db, $contacts);
       $contacts = self::fetchCategories($db, $contacts);
@@ -329,6 +340,7 @@ class OBM_Contact implements OBM_ISearchable {
     $kind    = sql_parse_id($contact->kind);
     $market_id  = sql_parse_id($contact->market_id);
     $func    = sql_parse_id($contact->function);
+    $contact->addressbook_id = $addressbook->id;
 
     $date = ($contact->date ? "'{$contact->date}'" : 'null');
 
@@ -419,16 +431,99 @@ class OBM_Contact implements OBM_ISearchable {
       self::storeCoords($contact);
       of_userdata_query_update('contact', $contact->id, $data);
     }
+
     OBM_AddressBook::timestamp($addressbook->id);
     
-    return OBM_Contact::get($contact->id);
+    $ret = OBM_Contact::get($contact->id);
+
+    // Indexing Contact
+    self::solrStore($ret);
+
+    return $ret;
+  }
+
+  public function solrStore($contact) {
+
+    $doc = new Apache_Solr_Document();
+
+    $doc->setField('id', $contact->id);
+    $doc->setField('timecreate', $contact->timecreate->format('Y-m-d\TH:i:s\Z'));
+    $doc->setField('timeupdate', $contact->timeupdate->format('Y-m-d\TH:i:s\Z'));
+    $doc->setField('usercreate', $contact->usercreate);
+    $doc->setField('userupdate', $contact->userupdate);
+    $doc->setField('datasource', $contact->datasource_id);
+    $doc->setField('domain', $GLOBALS['obm']['domain_id']);
+    $doc->setField('in', $contact->addressbook);
+    $doc->setField('addressbookId', $contact->addressbook_id);
+    $doc->setField('company', $contact->company);
+    $doc->setField('companyId', $contact->company_id);
+    $doc->setField('lastname', $contact->lastname);
+    $doc->setField('firstname', $contact->firstname);
+    $doc->setField('middlename', $contact->mname);
+    $doc->setField('suffix', $contact->suffix);
+    $doc->setField('aka', $contact->aka);
+    $doc->setField('kind', $contact->kind);
+    //$doc->setField('kind', $db->f('kind_header'));
+    $doc->setField('manager', $contact->manager);
+    $doc->setField('assistant', $contact->assistant);
+    $doc->setField('spouse', $contact->spouse);
+    $doc->setField('birthdayId', $contact->birthday_event);
+    $doc->setField('anniversaryId', $contact->anniversary_event);
+    if($contact->birthday) $doc->setField('birthday', $contact->birthday->format('Y-m-d\TH:i:s\Z'));
+    if($contact->anniversary) $doc->setField('anniversary', $contact->anniversary->format('Y-m-d\TH:i:s\Z'));
+    $doc->setField('category', $contact->category);
+    // $categories = self::fetchCategories($contact);
+    // while($categories->next_record()){
+    //   $doc->setMultiValue('categoryId', $categories->f('category_id'));
+    // }
+    $doc->setField('service', $contact->service);
+    $doc->setField('function', $contact->function);
+    $doc->setField('title', $contact->title);
+    if ($contact->archive) {
+      $doc->setField('is', 'archive');
+    }
+    if ($contact->collected) {
+      $doc->setField('is', 'collected');
+    }
+    if ($contact->mailok) {
+      $doc->setField('is', 'mailing');
+    }        
+    if ($contact->newsletter) {
+      $doc->setField('is', 'newsletter');
+    }
+    if($contact->date) $doc->setField('date', $contact->date->format('Y-m-d\TH:i:s\Z'));
+    $doc->setField('comment', $contact->comment);
+    $doc->setField('comment2', $contact->comment2);
+    $doc->setField('comment3', $contact->comment3);
+    $doc->setField('from', $contact->origin);
+
+    foreach($contact->email as $email) {
+      $doc->setMultiValue('email', $email['address']);
+    }
+
+    foreach($contact->phone as $phone) {
+      $doc->setMultiValue('phone', $phone['number']);
+    }
+
+    foreach($contact->im as $im) {
+      $doc->setMultiValue('jabber', $im['address']);
+    }
+
+    foreach($contact->address as $address) {
+      $doc->setMultiValue('street', $address['street']);
+      $doc->setMultiValue('zipcode', $address['zipcode']);
+      $doc->setMultiValue('expresspostal', $address['expresspostal']);
+      $doc->setMultiValue('town', $address['town']);
+      $doc->setMultiValue('country', $address['country']);
+    }
+
+    OBM_IndexingService::store('contact', array($doc));
   }
   
   public static function store($contact) {
     global $obm, $cgp_show, $cdg_sql;
 
     if (!$contact->id) return false;
-    //else
 
     $now = date('Y-m-d H:i:s');
     $uid = $obm['uid'];
@@ -582,7 +677,10 @@ class OBM_Contact implements OBM_ISearchable {
   
     // After contact deletion to get correct number
     run_query_global_company_contact_number_update($comp_id);
-  
+
+    // Delete index
+    OBM_IndexingService::delete('contact', $contact->id);  
+
     return $retour;
   }
 
@@ -794,14 +892,20 @@ class OBM_Contact implements OBM_ISearchable {
     return implode(";", $csv);
   }
   
-  private static function fetchDetails($db, $where, $offset=0, $limit=false) {
+  private static function fetchDetails($db, $where) {
+    $contacts = array();
+
+    if (!$where) {
+      return $contacts;
+    }
 
     $db_type = $db->type;
-    if ($limit)
-      $sql_limit = sql_limit($db_type, $limit, $offset);
-    $contacts = array();
     $join = of_userdata_join_query('Contact');
     $query = "SELECT contact_id,
+      contact_timecreate,
+      contact_timeupdate,
+      contact_usercreate,
+      contact_userupdate,
       contact_lastname,
       contact_firstname,
       contact_middlename,
@@ -829,6 +933,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_mailing_ok,
       contact_newsletter,
       contact_archive,
+      contact_collected,
       contact_date,
       contact_addressbook_id,
       AddressBook.name,
@@ -843,22 +948,24 @@ class OBM_Contact implements OBM_ISearchable {
       contact_comment3,
       contact_origin
     FROM Contact
-         INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-         INNER JOIN AddressBook ON AddressBook.id = contact_addressbook_id
-         LEFT JOIN UserObm ON userobm_id = contact_marketingmanager_id
-         LEFT JOIN DataSource ON contact_datasource_id = datasource_id
-         LEFT JOIN Phone as HomePhone ON HomePhone.phone_entity_id = contactentity_entity_id 
-         LEFT JOIN Address ON address_entity_id = contactentity_entity_id 
-         LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
-         LEFT JOIN Email ON email_entity_id = contactentity_entity_id 
-         LEFT JOIN Company ON contact_company_id = company_id
-         LEFT JOIN Kind ON kind_id = contact_kind_id
-         LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id
-         LEFT JOIN Event as an ON contact_anniversary_id = an.event_id
-         LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
-         $join
-    WHERE {$where}
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+    INNER JOIN AddressBook ON AddressBook.id = contact_addressbook_id
+    LEFT JOIN UserObm ON userobm_id = contact_marketingmanager_id
+    LEFT JOIN DataSource ON contact_datasource_id = datasource_id
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id 
+    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
+    LEFT JOIN Company ON contact_company_id = company_id
+    LEFT JOIN Kind ON kind_id = contact_kind_id
+    LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id
+    LEFT JOIN Event as an ON contact_anniversary_id = an.event_id
+    LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
+    $join
+    WHERE $where
     GROUP BY contact_id,
+      contact_timecreate,
+      contact_timeupdate,
+      contact_usercreate,
+      contact_userupdate,
       contact_lastname,
       contact_firstname,
       contact_middlename,
@@ -886,6 +993,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_mailing_ok,
       contact_newsletter,
       contact_archive,
+      contact_collected,
       contact_date,
       contact_addressbook_id,
       AddressBook.name,
@@ -899,12 +1007,16 @@ class OBM_Contact implements OBM_ISearchable {
       contact_comment2,
       contact_comment3,
       contact_origin
-    ORDER BY contact_lastname, contact_firstname
-    {$sql_limit}";
+    ORDER BY contact_lastname, contact_firstname";
+
     $db->xquery($query);
     while ($db->next_record()) {
       $contact = new OBM_Contact;
       $contact->id            = $db->f('contact_id');
+      $contact->timecreate    = new Of_Date($db->f('contact_timecreate'));
+      $contact->timeupdate    = new Of_Date($db->f('contact_timeupdate'));
+      $contact->usercreate    = $db->f('contact_usercreate');
+      $contact->userupdate    = $db->f('contact_userupdate');
       $contact->lastname      = $db->f('contact_lastname');
       $contact->firstname     = $db->f('contact_firstname');
       $contact->displayname   = __('%lastname% %firstname%', array('%lastname%' => $db->f('contact_lastname'), '%firstname%' => $db->f('contact_firstname')));
@@ -935,6 +1047,7 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->mailok        = $db->f('contact_mailing_ok');
       $contact->newsletter    = $db->f('contact_newsletter');
       $contact->archive       = $db->f('contact_archive');
+      $contact->collected     = $db->f('contact_collected');
       $contact->datasource_id = $db->f('contact_datasource_id');
       $contact->datasource    = $db->f('datasource_name');
       $contact->comment       = $db->f('contact_comment');

@@ -8,11 +8,11 @@
           <li>
             <img alt="<?php echo __('Addressbook menu')?>" src="<?php echo self::__icon('dropdown') ?>" />
             <ul>
-              <li><a href='<?php echo self::__actionlink('save', array('searchpattern' => 'in:'.$_id))?>'><?php echo __('Save') ?></a></li>
+              <li><a href='<?php echo self::__actionlink('save', array('searchpattern' => 'addressbookId:'.$_id))?>'><?php echo __('Save') ?></a></li>
               <?php if ($_addressbook->write == 1) { ?>
               <li><a href='<?php echo self::__actionlink('import', array('addressbook' => $_id))?>'><?php echo __('Import') ?></a></li>
               <?php } ?>  
-              <li><a href='<?php echo self::__actionlink('export', array('searchpattern' => 'in:'.$_id))?>'><?php echo __('Export') ?></a></li>
+              <li><a href='<?php echo self::__actionlink('export', array('searchpattern' => 'addressbookId:'.$_id))?>'><?php echo __('Export') ?></a></li>
               <?php if (!$_addressbook->isDefault && $_addressbook->admin) { ?>
               <li><a href="" onclick="$('addressbook-<?php echo $_id ?>').getElement('input').show().getNext().hide();return false;" ><?php echo __('Update') ?></a></li>
               <li><a href="" onclick="obm.contact.addressbook.deleteAddressBook(<?php echo $_id ?>, '<?php echo $this->toJs($_addressbook->name) ?>'); return false;" ><?php echo __('Delete') ?></a></li>
@@ -45,7 +45,7 @@
         <input type='hidden' name='addressbook_id' value='<?php echo $_id ?>' />
         <script type='text/javascript'>
           $('addressbook-<?php echo $_id ?>').store('write', <?php echo $_addressbook->write ?>);
-          $('addressbook-<?php echo $_id ?>').store('search', 'in:<?php echo $_id ?> archive:0');
+          $('addressbook-<?php echo $_id ?>').store('search', 'addressbookId:<?php echo $_id ?> -is:archive');
           new Obm.DropDownMenu($('addressbook-<?php echo $_id ?>').getElement('ul'));
         </script>
       </form>
@@ -58,7 +58,7 @@
           <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-archive')); return false;"><?php echo __('Archive'); ?></a>
           <script type='text/javascript'>
             $('addressbook-archive').store('write', 0);
-            $('addressbook-archive').store('search', 'archive:1');
+            $('addressbook-archive').store('search', 'is:archive');
           </script>            
         </div>
       </td>

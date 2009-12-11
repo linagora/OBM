@@ -18,93 +18,52 @@
 */
 ?>
 <?php
+include_once('obminclude/lib/Solr/Service.php');
+include_once('obminclude/of/of_indexingService.inc');
+
 class  OBM_Search {
 
-  /**
-   * The search pattern must be of the form  [word:]word|"string"|(string) *
-   * if the field prefix is not present the pattern will be searched on all fields.
-   * exemple of valid pattern :
-   * field:value value2 field:(value3 value4) field:"value 5" (value5 value6) "value 7"
-   * 
-   *
-   * @param mixed $searchable 
-   * @param mixed $pattern 
-   * @static
-   * @access public
-   * @return void
-   */
-  public static function buildSearchQuery($searchable, $pattern) {
-    $fields = call_user_func(array($searchable,'fieldsMap'));
-    $search = self::parse($pattern, $fields);
-    $query = '1 = 1';
-    foreach($search as $fieldname => $values)  {
-      $conditions = array();
-      foreach($values as $value) {
-        $subconditions = array();
-        if(is_array($fields[$fieldname])) {
-          foreach($fields[$fieldname] as $sql => $type) {
-            $sql = self::buildSql($sql, $type, $value);
-            if($sql) $subconditions[] = $sql;
+  public static function search($core, $pattern, $offset, $limit, $options) {
+    global $obm, $cdg_solr, $display;
+
+    $solr = OBM_IndexingService::connect($core);
+    if ($solr) {
+        try {
+          if ($pattern != "") {
+            $pattern = "$pattern domain:$obm[domain_id]"; 
+          } else {
+            $pattern = "domain:$obm[domain_id]";
           }
-          $conditions[]  =  '('.implode(' OR ', $subconditions).')';
+	      	$response = $solr->search($pattern, $offset, $limit);
+          display_debug_solr($pattern, $cdg_solr, "OBM_Search::search($core)");
+          if($response->response->numFound > 0) {
+            $result = array();
+            foreach ($response->response->docs as $doc) { 
+              array_push($result, $doc->id);
+            }
+          }
+        } catch (Exception $e) {
+          //echo $e->getMessage();
         }
-      }
-//      if(!empty($conditions))
-        $query .= ' AND '.implode(' AND ', $conditions);
+    } else {
+      $display['msg'] = display_err_msg($GLOBALS['l_solr_connection_err']);
     }
-    return "($query)";
+
+    return $result;
   }
 
-  public static function buildSql($sql, $type, $value) {
-    switch($type) {
-    case 'integer' :
-      if(is_numeric($value) || strpos($value, ',') !== false) return "$sql IN ($value)";
-      break;
-    case 'text' :
-      return "$sql #LIKE '%$value%'";
-      break;
-    case 'boolean' :
-      $val = ($value)?'TRUE':'FALSE';
-      return "$sql = ".$val;
-      break;
+
+  public static function buildSearchQuery($core, $pattern, $offset, $limit, $options) {
+
+    $ids = self::search($core, $pattern, $offset, $limit, $options);
+    if (sizeof($ids)>0) {
+      $query = implode(',', $ids);
+      return "${core}_id IN ($query)";
     }
+
     return false;
   }
 
-  public static function parse($pattern, $fields = null) {
-    // Add a delimiter at the end of the string
-    $pattern .= ' ';
-    $searchPattern = array();
-    // Regexp... if you have a problem here, you have two problems...
-    // search for : [word:]word|"string"|(string)
-    // a word 
-    preg_match_all("/(([aA-zZ0-9_]+):)?(([^ \"(]+)|\"([^\"]+)\"|\(([^)]+)\))[^:]/", $pattern, $match );
-    foreach($match[0] as $index => $string) {
-      // If no field present, the pattern must be search on *
-      if($match[2][$index] == '') {
-        $field = '*';
-      } elseif ($fields && !$fields[$match[2][$index]]){
-        $field = '*';
-        $searchPattern[$field][] = $match[2][$index].':';
-      } else {
-        $field = $match[2][$index];
-      }
-      // if value is a single word, field should match field like 'value%'
-      if($match[4][$index] != '') {
-        $searchPattern[$field][] = $match[4][$index];
-      // if value is a string encapsulated by ", field should match field like 'string%'
-      }elseif($match[5][$index] != '') {
-        $searchPattern[$field][] = $match[5][$index];
-      // if value is a string encapsulaed by (), field should match field like 'word1' and field like 'word2'....
-      } elseif($match[6][$index] != '') {
-        $patterns = explode(' ', $match[6][$index]);
-        foreach($patterns as $subPattern) {
-          $searchPattern[$field][] = $subPattern;
-        } 
-      }
-    }
-    return $searchPattern;
-  }
 }
 
 /**

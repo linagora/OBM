@@ -155,7 +155,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 } elseif ($action == 'export') {
 ///////////////////////////////////////////////////////////////////////////////
   $addressbooks = OBM_AddressBook::search();
-  $contacts = $addressbooks->searchContacts($params['searchpattern']."  archive:0");
+  $contacts = $addressbooks->searchContacts($params['searchpattern']."  -is:archive");
   dis_contact_csv_export_all($contacts);
   exit();
 } elseif ($action == 'statistics') {
@@ -291,7 +291,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $addressbooks = OBM_AddressBook::search();
     contact_export_js_labels();
     $addressbook = $addressbooks->getMyContacts();
-    $contacts = $addressbooks->searchContacts("in:$addressbook->id archive:0");
+    $contacts = $addressbooks->searchContacts("addressbookId:$addressbook->id -is:archive");
     $current['addressbook'] = $addressbook->id;
   } elseif ($action == 'consult' || $action == 'detailconsult')  {
   //////////////////////////////////////////////////////////////////////////////
@@ -484,7 +484,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     contact_export_js_labels();
     $template = new OBM_Template('main');
     if(!$current['addressbook']) $current['addressbook'] = $addressbooks->getMyContacts()->id;
-    if(!$contacts) $contacts = $addressbooks->searchContacts("in:$current[addressbook] archive:0"); 
+    if(!$contacts) $contacts = $addressbooks->searchContacts("addressbookId:$current[addressbook] -is:archive"); 
     $template->set('searchpattern', $params['searchpattern']);
     $template->set('contactfilter', $params['contactfilter']);
     $template->set('contacts', $contacts);
@@ -586,13 +586,13 @@ function get_contact_action() {
 
   $actions['contact']['updateContact'] = array (
     'Name'     => $l_header_find,
-    'Url'      => "$path/contact/contact_index.php?action=list",
+    'Url'      => "$path/contact/contact_index.php?action=updateContact",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );  
   $actions['contact']['storeContact'] = array (
     'Name'     => $l_header_find,
-    'Url'      => "$path/contact/contact_index.php?action=list",
+    'Url'      => "$path/contact/contact_index.php?action=storeContact",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );    
@@ -610,7 +610,7 @@ function get_contact_action() {
   );
   $actions['contact']['filterContact'] = array (
     'Name'     => $l_header_find,
-    'Url'      => "$path/contact/contact_index.php?action=list",
+    'Url'      => "$path/contact/contact_index.php?action=filterContact",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
