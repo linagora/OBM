@@ -1281,7 +1281,7 @@ function check_contact_data_form($cid, &$contact) {
   // Contact phone
   if(is_array($phones)) {
     foreach($phones as $i => $phone) {
-      if (($phone['number'] != '') && (preg_match($php_regexp_phone, $phone['number']) == 0)) {
+      if ((trim($phone['number']) != '') && (preg_match($php_regexp_phone, trim($phone['number'])) == 0)) {
         $err['msg'] = $l_j_check_phone;
         OBM_Error::getInstance()->addError('phones['.$i.']', $err['msg']);
       }
@@ -1292,7 +1292,7 @@ function check_contact_data_form($cid, &$contact) {
   if(is_array($emails)) {
     foreach($emails as $i => $email) {
       $email['address'] = stripslashes($email['address']);
-      if (($email['address'] != '') && (preg_match($php_regexp_email, $email['address']) == 0)) {
+      if ((trim($email['address']) != '') && (preg_match($php_regexp_email, trim($email['address'])) == 0)) {
         $err['msg'] = $l_j_check_email;
         OBM_Error::getInstance()->addError('emails['.$i.']', $err['msg']);
       }  
