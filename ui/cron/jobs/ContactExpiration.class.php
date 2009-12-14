@@ -29,17 +29,19 @@ class ContactExpiration extends CronJob {
    */
   var $logger;
   
-  const EXPIRATION_TIME = 0;
-  
+  var $expiration = 0;
+
+
   function mustExecute($date) {
-    if (self::EXPIRATION_TIME == 0) return false;
+    if(isset($GLOBALS['cgp_contact_expiration'])) $this->expiration = $GLOBALS['cgp_contact_expiration'];
+    if ($this->expiration == 0) return false;
     
     $hours = date('G');
     return ($hours == 6);
   }
 
   function execute($date) {
-    $this->logger->debug('Delete contacts where archived since '. self::EXPIRATION_TIME. ' months');
+    $this->logger->debug('Delete contacts where archived since '. $this->expiration. ' months');
     $enable = $this->EachOldArchivedContact($this, 'DeleteContact');
   }
   
@@ -55,7 +57,7 @@ class ContactExpiration extends CronJob {
     $obm_q = new DB_OBM;
     $query = "SELECT contact_id FROM Contact
       WHERE contact_archive = '1'
-        AND #MONTHDIFF(contact_timeupdate,now()) >= ". self::EXPIRATION_TIME;
+        AND #MONTHDIFF(contact_timeupdate,now()) >= ". $this->expiration;
     $this->logger->core($query);
     $obm_q->xquery($query);
     

@@ -158,6 +158,14 @@ if ($params['form_user_pref']) {
     $_SESSION['set_csv_sep'] = $params['csv_sep'];
     update_user_pref($obm['uid'], 'set_csv_sep', $_SESSION['set_csv_sep']);
   }
+  if(is_array($params['custom'])) {
+    foreach($params['custom'] as  $key => $value) {
+      if(strpos($key, 'set_custom') === 0) {
+        $_SESSION[$key] = $value;
+        update_user_pref($obm['uid'], $key, $value);    
+      }
+    }
+  }
 
 }
 
@@ -287,7 +295,9 @@ $theme_dir->close();
 if ($params['form_user_pref']) {
   $display['msg'] .= display_ok_msg("$l_settings : $l_update_ok");
 }
-
+if(function_exists('hook_settings_custom_fields')) {
+  $customFields = hook_settings_custom_fields();
+}
 $display['detail'] .= "
 <!--User preferences current config -->
 
@@ -473,6 +483,7 @@ $display['detail'] .= "
   </tr>  
   </table>
   </fieldset>  
+  $customFields
   <fieldset class=\"buttons\">
     <input name=\"form_user_pref\" type=\"hidden\" value=\"1\" />
     <input name=\"submit\" type=\"submit\" value=\"$l_validate\" />
