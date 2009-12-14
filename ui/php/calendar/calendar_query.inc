@@ -4057,7 +4057,7 @@ function calendar_monthlybyday_repeatition($date,$start,$end,$repeatfrequence,$e
   }
   $position = ceil($date->getDay() / 7);
   $pattern = ($position == 5)? "-1 ".$date->get(Of_Date::WEEKDAY): "+$position ".$date->get(Of_Date::WEEKDAY);
-  while ($current->compareDateIso($end) < 0) {
+  while ($current->compareDateIso($end) <= 0) {
     $current->setDay(1);
     if($position == 5) $current->addMonth(1); else {
       $current->subDay(1);
@@ -4090,7 +4090,7 @@ function calendar_monthlybydate_repeatition($date,$start,$end,$repeatfrequence,$
     }
     $current->setYear($start)->setMonth($start)->subMonth($diff);    
   } 
-  while ($current->compareDateIso($end) < 0) {
+  while ($current->compareDateIso($end) <= 0) {
     $of = &OccurrenceFactory::getInstance();
     $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
     $current->addMonth($repeatfrequence);
@@ -4113,8 +4113,7 @@ function calendar_yearly_repeatition($date,$start,$end,$repeatfrequence,$event,$
     }
     $current->setYear($start)->subYear($diff); 
   } 
-
-  while ($current->compareDateIso($end) < 0) {
+  while ($current->compareDateIso($end) <= 0) {
     $of = &OccurrenceFactory::getInstance();
     $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
     $current->addYear($repeatfrequence);
