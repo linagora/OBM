@@ -3620,7 +3620,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </select>";
 
   // eventcategory select
-  $block_category1 = of_category_dis_entity_form('event', 'category1', $cats1, 'mono', $cat1);
+  $block_category1 = of_category_dis_entity_form('event', 'category1', $cats1, 'mono', $cat1, 'none_f');
 
  // Repetition days
   $week = new Of_Date($ccalendar_weekstart);

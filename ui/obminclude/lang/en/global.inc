@@ -54,6 +54,7 @@ $l_ok = "Ok";
 $l_all = "All";
 $l_all_f = "All";
 $l_none = "None";
+$l_none_f = "---";
 $l_undef = "---";
 $l_without = "Without";
 $l_enabled = "Enabled";

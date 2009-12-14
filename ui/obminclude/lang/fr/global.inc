@@ -58,6 +58,7 @@ $l_ok = "Ok";
 $l_all = "Tout";
 $l_all_f = "Toutes";
 $l_none = "Aucun";
+$l_none_f = "Aucune";
 $l_undef = "---";
 $l_without = "Sans";
 $l_selection = "Sélection";
