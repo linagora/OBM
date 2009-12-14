@@ -110,7 +110,7 @@ class EventAlertCronJob extends CronJob{
                           Of_Date::today()->getOutputDate(), Of_Date::today()->get(Of_Date::TIME_SHORT)
                           ,$GLOBALS['cgp_host']
                        ),
-          "recipents" => array_unique($recipients),
+          "recipients" => array_unique($recipients),
           "owner" => $event->owner
         );
       } 
@@ -119,15 +119,8 @@ class EventAlertCronJob extends CronJob{
     if(is_array($events)) {
       foreach($events as $event_id => $event) {
         $obm["uid"] = $event["owner"];
-
-				//mailer du pauvre
-				$tmpfile = fopen('/tmp/', 'a') ;
-				fwrite($tmpfile, $event["subject"]."\n\n".$event["message"]."\n\n".$event["recipents"]."\n\n") ;
-				fclose($tmpfile) ;
-				//fin mailer du pauvre
-
-        send_mail($event["subject"], $event["message"], $event["recipents"], array(), false);
-        $this->logger->info("Alert sent to ".implode(",",$event["recipents"])." about $event[subject] by $obm[uid]");
+        send_mail($event["subject"], $event["message"], $event["recipients"], array(), false);
+        $this->logger->info("Alert sent to ".implode(",",$event["recipients"])." about $event[subject] by $obm[uid]");
       }
     }    
     $current = clone $date;
