@@ -28,9 +28,11 @@ case "$1" in
         if [ ! -e $daemon_pid ]; then
             $daemon_path
             echo "done."
+            ret=0
         else
             echo "Le fichier PID $daemon_pid existe, le serveur est en cours d'execution."
             echo "failed."
+            ret=0
         fi
         ;;
 
@@ -40,9 +42,11 @@ case "$1" in
             kill -TERM `cat $daemon_pid`
             rm -f $daemon_pid
             echo "done."
+            ret=0
         else
             echo "Le serveur n'est pas en cours d'execution"
             echo "failed."
+            ret=0
         fi
         ;;
 
@@ -59,14 +63,12 @@ case "$1" in
     status)
         if [ -f ${daemon_pid} ] && kill -0 `cat ${daemon_pid}` > /dev/null 2>&1; then
             echo "Le serveur est en cours d'execution avec le PID `cat ${daemon_pid}`"
-            exit 0
+            ret=0
         else
             echo "Le serveur n'est pas en cours d'execution"
-            exit 1;
+            ret=3;
         fi
 
-        # Ne doit jamais être atteinds, retourne le code UNKNOW STATUS
-        exit 4;
         ;;
 
     restart)
@@ -79,4 +81,4 @@ case "$1" in
         ;;
 esac
 
-exit 0
+exit $ret
