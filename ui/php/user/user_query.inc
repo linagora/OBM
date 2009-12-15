@@ -1682,7 +1682,7 @@ function check_user_data_form($p_id, &$user) {
   }
 
   if(!isset($profiles[$profile])) {
-    $err['msg'] = $GLOBALS['l_err_profile'];
+    $err['msg'] = $GLOBALS['l_err_profile']." : $profile";
     $err['field'] = 'profile';
     return false;
   }

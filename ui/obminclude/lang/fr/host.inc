@@ -70,4 +70,4 @@ $l_monitor = 'Supervison';
 
 
 $l_fqdn = 'Nom complet de la machine';
-$l_err_host_fqdn = 'Le nom complet de la machine est incorrct (nommachine.nom.domaine)';
+$l_err_host_fqdn = 'Le nom complet de la machine est incorrect (nommachine.nom.domaine)';
