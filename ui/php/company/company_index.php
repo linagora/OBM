@@ -67,6 +67,7 @@ include("$obminclude/global_pref.inc");
 require('company_display.inc');
 require('company_query.inc');
 require('../contact/contact_query.inc');
+require("$obminclude/of/of_contact.php");
 include("$obminclude/of/of_category.inc");
 require('company_js.inc');
 $extra_js_include[] = 'company.js';
