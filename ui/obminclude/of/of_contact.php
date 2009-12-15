@@ -1056,13 +1056,14 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->origin        = $db->f('contact_origin');
       $contact->addressbook_id= $db->f('contact_addressbook_id');
       $contact->addressbook   = $db->f('name');
-      if ($db->f('contact_date'))
+      if ($db->f('contact_date') && $db->f('contact_date') != '0000-00-00 00:00:00') {
         $contact->date        = new Of_Date($db->f('contact_date'), 'GMT');
-      if ($db->f('contact_birthday')) {
+      }
+      if ($db->f('contact_birthday') && $db->f('contact_birthday') != '0000-00-00 00:00:00') {
         $contact->birthday_event = $db->f('contact_birthday_event');
         $contact->birthday    = new Of_Date($db->f('contact_birthday'), 'GMT');
       }
-      if ($db->f('contact_anniversary')) {
+      if ($db->f('contact_anniversary') && $db->f('contact_anniversary') != '0000-00-00 00:00:00') {
         $contact->anniversary_event = $db->f('contact_anniversary_event');
         $contact->anniversary = new Of_Date($db->f('contact_anniversary'), 'GMT');
       }
