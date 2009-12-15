@@ -844,7 +844,7 @@ function html_company_view_main($co_q, $coords) {
         case 'address' :
           $data = implode('<br />', $datas);
           $template = '<tr><th>%s</th><td>%s</td></tr><tr><td colspan="2">&nbsp;</td></tr>';
-          $map_address = urlencode(implode(' ', $datas));
+          $map_address = urlencode(strip_tags(implode(' ', $datas)));
           foreach ($datas as $k => $v) {
             $datas[$k] = addslashes($v);
           }
