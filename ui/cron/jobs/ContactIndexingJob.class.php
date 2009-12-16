@@ -112,14 +112,14 @@ class ContactIndexingJob extends CronJob {
         $this->logger->info("Solr server for domain $domain : $ip");
 
         $select = "SELECT Contact.*,
-          Addressbook.name as addressbook_name,
+          AddressBook.name as addressbook_name,
           Company.company_name as company_name,
           Kind.*,
           ContactFunction.contactfunction_label,
           e1.event_date as birthday,
           e2.event_date as anniversary
           FROM Contact 
-          LEFT JOIN Addressbook ON contact_addressbook_id=id
+          LEFT JOIN AddressBook ON contact_addressbook_id=id
           LEFT JOIN Company ON contact_company_id=company_id
           LEFT JOIN Kind ON contact_kind_id=kind_id
           LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
