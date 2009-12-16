@@ -49,7 +49,7 @@ if ($action == "validate") {
     $udata = run_query_validate($_REQUEST["ticket"]);
   }
   if(is_array($udata)) {
-    echo "login=".($udata['login'])."&password=".($udata['password']);
+    echo "login=".urlencode($udata['login'])."&password=".urlencode($udata['password']);
   } else {
     echo "invalidOBMTicket";
   }
@@ -59,6 +59,9 @@ if ($action == "validate") {
   if($params['mode'] == 'interactive') {
     echo "ticket=$ticket";
   } else {
+        var_dump($params['service']);
+    var_dump(urldecode($params['service']));
+    exit();
     if(isset($params['service'])) {
 	if (strrpos($params[service], "?") > 0) {
           header("location:$params[service]&ticket=$ticket");
