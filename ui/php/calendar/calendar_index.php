@@ -50,6 +50,8 @@ $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 require('calendar_query.inc');
+require_once("$obminclude/of/of_contact.php");
+
 $params = get_calendar_params();
 // Get user preferences if set for hour display range 
 if (isset($_SESSION['set_cal_first_hour'])) {

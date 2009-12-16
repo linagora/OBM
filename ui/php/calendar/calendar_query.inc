@@ -4289,7 +4289,7 @@ function run_query_insert_others_attendees($calendar) {
         contact_marketingmanager_id,
         contact_archive,
         contact_origin) VALUES (
-          NOW(),
+        NOW(),
         NOW(),
         $uid,
         $uid,
@@ -4316,6 +4316,10 @@ function run_query_insert_others_attendees($calendar) {
       of_userdata_query_update('contact', $id, $calendar);
 
       array_push($ret, $id);
+
+      // solr
+      $c = OBM_Contact::get($id);
+      OBM_Contact::solrStore($c);
     }
   }
   return $ret;
