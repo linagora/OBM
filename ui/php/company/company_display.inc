@@ -103,7 +103,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == 'company_contact_number') {
     $res['name'] = $OD->data_set->f('company_contact_number');
     if (($res['name'] > 0) && $link_ok) {
-      $res['url'] = "$path/contact/contact_index.php?action=search&amp;searchpattern=".urlencode('company_id:'.$OD->data_set->f('company_id'));
+      $res['url'] = "$path/contact/contact_index.php?action=search&amp;searchpattern=".urlencode('companyId:'.$OD->data_set->f('company_id'));
     }
     $res['align'] = 'center';
   }
@@ -468,7 +468,7 @@ function html_company_links($co_q) {
 
   // Contact
   if ($perm->check_module_rights('contact')) {
-    $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;&amp;searchpattern=".urlencode('company_id:'.$id));
+    $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;&amp;searchpattern=".urlencode('companyId:'.$id));
     $url_con_new = url_prepare("$path/contact/contact_index.php?action=updateContact&amp;company_id=$id&amp;market=$market");
     $block_contact = "
 <div class=\"portlet\" id=\"companyContact\">
