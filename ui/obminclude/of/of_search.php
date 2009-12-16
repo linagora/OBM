@@ -34,7 +34,7 @@ class  OBM_Search {
           } else {
             $pattern = "domain:$obm[domain_id]";
           }
-	      	$response = $solr->search($pattern, $offset, $limit);
+	      	$response = $solr->search($pattern, $offset, $limit, $options);
           display_debug_solr($pattern, $cdg_solr, "OBM_Search::search($core)");
           if($response->response->numFound > 0) {
             $result = array();
