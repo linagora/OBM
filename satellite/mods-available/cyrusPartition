@@ -8,9 +8,14 @@
 # Some use different script name to manage Cyrus service
 # Debian Etch and Lenny :
 #cyrusStartupScript = /etc/init.d/cyrus2.2
+# RedHat 5 :
+#cyrusStartupScript = /etc/init.d/cyrus-imapd
 
 # Cyrus partition root directory
+# Debian
 # default: imapdPartitionRoot = /var/spool/cyrus
+# RedHat
+#imapdPartitionRoot = /var/spool/imap
 
 # LDAP root
 # no default
