@@ -33,7 +33,7 @@ $l_clear = "Rompre l'association";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les hôtes correspondants.";
-$l_found = "hôtes trouvés.";
+$l_found = "hôte(s) trouvé(s).";
 $l_no_found = "Aucun hôte ne correspond à ces critères.";
 
 $l_insert_ok = "L'insertion de l'hôte a été correctement effectuée.";
@@ -66,7 +66,7 @@ $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM Sync';
 $l_solr = 'Solr';
 $l_imap_frontend = 'IMAP Frontal';
-$l_monitor = 'Supervison';
+$l_monitor = 'Supervision';
 
 
 $l_fqdn = 'Nom complet de la machine';
