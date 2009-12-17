@@ -5,7 +5,9 @@
 
 # Cyrus init script
 # default: cyrusStartupScript = /etc/init.d/cyrus2.3
-cyrusStartupScript = /etc/init.d/cyrus2.2
+# Some use different script name to manage Cyrus service
+# Debian Etch and Lenny :
+#cyrusStartupScript = /etc/init.d/cyrus2.2
 
 # Cyrus partition root directory
 # default: imapdPartitionRoot = /var/spool/cyrus
