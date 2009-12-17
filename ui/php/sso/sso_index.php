@@ -59,9 +59,6 @@ if ($action == "validate") {
   if($params['mode'] == 'interactive') {
     echo "ticket=$ticket";
   } else {
-        var_dump($params['service']);
-    var_dump(urldecode($params['service']));
-    exit();
     if(isset($params['service'])) {
 	if (strrpos($params[service], "?") > 0) {
           header("location:$params[service]&ticket=$ticket");
