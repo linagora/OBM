@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<schema name="webmail" version="1.1">
+<schema name="webmail" version="1.2">
   <types>
     <fieldtype name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
 
