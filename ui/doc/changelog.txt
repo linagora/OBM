@@ -21,6 +21,7 @@ To do
 2009-12-31 : version 2.3.1
 
   * #560 [Host] label mispelling
+  * #844 [Control] Dashboard information are not separated by domains
 
 2009-10-17 : version 2.3.0
 
