@@ -594,6 +594,9 @@ class OBM_Contact implements OBM_ISearchable {
     }
     OBM_AddressBook::timestamp($contact->addressbook_id);
 
+    // Indexing Contact
+    self::solrStore($contact);
+
     return $contact;
   }
 
