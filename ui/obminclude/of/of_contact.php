@@ -257,12 +257,41 @@ class OBM_Contact implements OBM_ISearchable {
     $fields['aka'] = array('contact_aka' => 'text');
     $fields['sound'] = array('contact_sound' => 'text');
     $fields['function'] = array('contactfunction_label' => 'text');
+    $fields['categoryId'] = array('contact_category' => 'integer');
     return $fields;
   }
 
   public static function search($pattern, $offset=0, $limit=100) {
     return OBM_Contact::fetchAll(
       OBM_Search::buildSearchQuery('contact', $pattern, $offset, $limit, array('sort' => 'lastname asc, firstname asc')));
+  }
+
+  public static function getUserCategory() {
+    global $cgp_user;
+    if (is_array($cgp_user['contact']['category'])) {
+      $i=0;
+      foreach($cgp_user['contact']['category'] as $cat_name => $one_cat) {
+        if ($i==0) $block_user .= "<tr>";
+        $cats = of_category_user_get_ordered($cat_name);
+        $name = "l_${cat_name}";
+        global $$name;
+        $block_user .= "<th>".$$name."</th><td>
+          <select name='categoryId'><option value=''>$GLOBALS[l_none]</option>";
+        foreach($cats as $cat) {
+          $code = '';
+          if ($cat['code'] != '') $code = str_pad($cat['code'] . ' ', 10, '.');
+          $block_user .= "<option value=".$cat['id'].">".$code.$cat['label']."</value>";
+        }
+        $block_user .= "</select></td>";
+        if ($i==2) {
+          $block_user .= "</tr>";
+          $i=0;
+        } else {
+          $i++;
+        }
+      }
+    }
+    return $block_user;
   }
   
   public static function fetchAll($where) {
@@ -472,10 +501,11 @@ class OBM_Contact implements OBM_ISearchable {
     if($contact->birthday) $doc->setField('birthday', $contact->birthday->format('Y-m-d\TH:i:s\Z'));
     if($contact->anniversary) $doc->setField('anniversary', $contact->anniversary->format('Y-m-d\TH:i:s\Z'));
     $doc->setField('category', $contact->category);
-    // $categories = self::fetchCategories($contact);
-    // while($categories->next_record()){
-    //   $doc->setMultiValue('categoryId', $categories->f('category_id'));
-    // }
+    foreach($contact->categories as $category) {
+      foreach($category as $c) {
+        $doc->setMultiValue('categoryId', $c['id']);
+      }
+    }
     $doc->setField('service', $contact->service);
     $doc->setField('function', $contact->function);
     $doc->setField('title', $contact->title);
@@ -1276,7 +1306,8 @@ class OBM_Contact implements OBM_ISearchable {
       ORDER BY contactentity_contact_id, category_category, category_code, category_label";
     $db->xquery($query);        
     while ($db->next_record()) {
-      $contacts[$db->f('contactentity_contact_id')]->categories[$db->f('category_category')][$db->f('category_id')] = array('code' => $db->f('category_code'), 'label' => $db->f('category_label'));
+      $contacts[$db->f('contactentity_contact_id')]->categories[$db->f('category_category')][$db->f('category_id')] = array(
+        'id' => $db->f('category_id'), 'code' => $db->f('category_code'), 'label' => $db->f('category_label'));
     }
     return $contacts;
   }

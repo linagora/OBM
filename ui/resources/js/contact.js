@@ -173,6 +173,11 @@ Obm.Contact.AddressBook = new Class ({
           searchpattern += elem.get('name') + ':(' + elem.get('inputValue') + ') ';
         }
       });
+      form.getElements('select').each(function(elem) {
+        if (elem.get('value') != '') {
+          searchpattern += elem.get('name') + ':(' + elem.get('value') + ') ';
+        }
+      });
       $('searchpattern').set('inputValue',  searchpattern)
       form = $('searchForm');
     }

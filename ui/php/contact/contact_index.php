@@ -493,6 +493,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       $template->set('addressbooks', $addressbooks);
       $template->set('current', $current);
       $template->set('searchfields', OBM_Contact::fieldsMap());
+      $template->set('customFields', OBM_Contact::getUserCategory());
       //FIXME :  Already set in some actions
       $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
       $template->set('template', $subTemplate);    

@@ -43,6 +43,7 @@
               <th><label for="mailokSearch"><?php echo __('Mailing activated') ?></label></th><td>
                 <input type="checkbox" name="is" id="mailokSearch" value="mailing"></td>
             </tr>
+            <?php echo $customFields ?>
           </tbody>
         </table>
         <input type='submit' value='<?php echo __('Search') ?>' />
