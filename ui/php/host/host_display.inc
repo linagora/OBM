@@ -733,9 +733,9 @@ function html_host_form($action, $host_q, $host, $field='') {
   $block_sync
   $block_solr
    <tr>
-     <th class=\"$class[monitor]\">$GLOBALS[l_monitor]</th>
+     <th class=\"$class[monitor]\"><label for=\"cb_monitor\">$GLOBALS[l_monitor]</label></th>
      <td>
-       <input name=\"cb_monitor\" type=\"checkbox\" value=\"1\" $monitor_state>
+       <input id=\"cb_monitor\" name=\"cb_monitor\" type=\"checkbox\" value=\"1\" $monitor_state>
      </td>
    </tr>
   <tr>
