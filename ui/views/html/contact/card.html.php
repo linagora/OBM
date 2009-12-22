@@ -114,7 +114,7 @@
           <dl id='categoriesLayout' class='details'>
             <?php foreach($contact->categories as $_name => $_category) { ?>
             <?php foreach($_category as $_categoryId => $_categoryValue) { ?>
-              <dt><?php echo $GLOBALS['l_'.$_name] ?> : </dt><dd><?php echo $_categoryValue['code'].' '.$_categoryValue['label'] ?></dd>
+              <dt><?php echo $GLOBALS['l_'.$_name] ?> : </dt><dd><?php echo $_categoryValue['label'] ?></dd>
             <?php } ?> 
             <?php } ?>
           </dl>
