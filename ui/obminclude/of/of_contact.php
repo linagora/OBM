@@ -1266,13 +1266,14 @@ class OBM_Contact implements OBM_ISearchable {
       $cpt = array();
       foreach($contact->im as $im) {
         if(trim($im['address']) != '' ) {
-          $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[label]')";
+          $cpt[$im['protocol']]++;          
+          $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[protocol];X-OBM-Ref".$cpt[$im['protocol']]."')";
           display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(IM)');
           $obm_q->query($query);
         }
       }
     }
-  
+
     $query = "DELETE FROM Email WHERE email_entity_id = $id";
     display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(Email)');
     $obm_q->query($query);

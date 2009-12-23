@@ -764,7 +764,8 @@ function run_query_contact_coords_update($id, $contact) {
     $cpt = array();
     foreach($ims as $im) {
       if(trim($im['address']) != '' ) {
-        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[label]')";
+        $cpt[$im['protocol']]++;          
+        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[protocol];X-OBM-Ref".$cpt[$im['protocol']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(IM)');
         $obm_q->query($query);
       }
