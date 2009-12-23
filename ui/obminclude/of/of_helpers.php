@@ -55,6 +55,6 @@ function get_localized_countries_array() {
 }
 
 function get_localized_country($code) {
-  $countries = require_once(dirname(__FILE__)."/../lib/Stato/i18n/data/countries/".SI18n::get_locale().".php");
+  $countries = include(dirname(__FILE__)."/../lib/Stato/i18n/data/countries/".SI18n::get_locale().".php");
   return $countries[$code];
 }
