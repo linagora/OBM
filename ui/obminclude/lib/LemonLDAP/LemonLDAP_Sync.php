@@ -38,14 +38,23 @@
 class LemonLDAP_Sync {
 
 	/**
-	 * Force update instead of verify if there are available updates.
+	 * Force user update instead of verify if there are available updates.
+	 * If this option is true, then updates are force whether or not
+	 * there are available updates.
 	 */
-	var $_forceUpdate = false;
+	private $_forceUserUpdate = false;
+
+	/**
+	 * Force group update in OBM.
+	 * It means that LDAP group is exactly the same as OBM group. If this
+	 * option is false, then it allows OBM to have local groups.
+	 */
+	private $_forceGroupUpdate = false;
 
 	/**
 	 * The LemonLDAP engine.
 	 */
-	var $_engine = null;
+	private $_engine = null;
 
 	/**
 	 * Constructor.
@@ -62,7 +71,8 @@ class LemonLDAP_Sync {
 	function initializeFromConfiguration()
 	{
 		global $lemonldap_config;
-		$this->_forceUpdate = $lemonldap_config['auto_update_force'];
+		$this->_forceUserUpdate = $lemonldap_config['auto_update_force_user'];
+		$this->_forceGroupUpdate = $lemonldap_config['auto_update_force_group'];
 	}
 
 	/**
@@ -120,7 +130,7 @@ class LemonLDAP_Sync {
 	{
 		if (!is_null($user_id) && $user_id !== false)
 		{
-			if ($this->_forceUpdate || $this->_engine->verifyUserData($user_name, $domain_id, $user_id))
+			if ($this->_forceUserUpdate || $this->_engine->verifyUserData($user_name, $domain_id, $user_id))
 				return $this->_engine->updateUser($user_name, $domain_id, $user_id);
 			return $user_id; 
 		}
@@ -133,34 +143,45 @@ class LemonLDAP_Sync {
 	/**
 	 * Manage user groups synchronization.
 	 * Note that group should be update or created, but never deleted. By the
-	 * way, user should be associate with or deassociated from a group.
+	 * way, user should be associate with or deassociated from a group. Note that
+	 * if one group is not correctly created or updated, then this function will
+	 * return false.
 	 * @param $groups All groups send by LemonLDAP.
 	 * @param $user_id The user unique identifier.
 	 * @param $domain_id The domain identifier.
-	 * @return boolean True is the user information is created or updated.
+	 * @return boolean True is the user groups are correctly created or updated.
 	 */
 	function syncUserGroups ($groups, $user_id, $domain_id)
 	{
-		$groups_ldap = $groups;
-
-		if (is_null($groups_ldap) || sizeof($groups_ldap) == 0 || $groups_ldap === false)
+		if (is_null($groups) || $groups === false || !is_array($groups))
+		{
+			return false;
+		}
+		if (!$this->_forceGroupUpdate && sizeof($groups))
+		{
 			return true;
+		}
 
 		//
 		// Update or create groups in OBM.
 		//
+
+		$sync_succeed = true;
+		$groups_ldap = $groups;
 
 		foreach ($groups_ldap as $group_name => $group_data)
 		{
 			$group_id = $this->_engine->isGroupExists($group_name, $domain_id);
 
 			if ($group_id !== false)
-				$this->_engine->updateGroup($group_name, $group_id, $group_data, $user_id, $domain_id);
+				$group_id = $this->_engine->updateGroup($group_name, $group_id, $group_data, $user_id, $domain_id);
 			else
 				$group_id = $this->_engine->addGroup($group_name, $group_data, $user_id, $domain_id);
 
 			if ($group_id !== false)
 				$groups_ldap[$group_name]['group_id'] = $group_id;
+			else
+				$sync_succeed = false;
                 }
 
 		//
@@ -168,30 +189,43 @@ class LemonLDAP_Sync {
 		// in HTTP headers. For all groups that are in HTTP headers but not
 		// in database, the user will be associated. For all groups that are
 		// in database but not in HTTP headers, the user will be disassociated.
+		// If we have only one error during groups synchronization in OBM,
+		// we do not update user information in groups.
 		//
 
 		$groups_db = $this->_engine->getGroups($user_id, $domain_id);
 
 		foreach ($groups_ldap as $group_name => $group_data)
-			if (!array_key_exists($group_name, $groups_db) && ($group_id = $this->_engine->isGroupExists($group_name, $domain_id)) !== false)
-					$this->_engine->addUserInGroup($user_id, $group_id, $domain_id);
+		{
+			if (array_key_exists($group_name, $groups_db))
+				continue;
+			$group_id = $this->_engine->isGroupExists($group_name, $domain_id);
+			if ($group_id !== false && $this->_engine->addUserInGroup($user_id, $group_id, $domain_id) === false)
+			{
+				$this->_engine->debug("Fail to add user $user_id in group $group_id");
+				$sync_succeed = false;
+			}
+		}
 
-		foreach ($groups_db as $group_name => $group_id)
-			if (!array_key_exists($group_name, $groups_ldap))
-				$this->_engine->removeUserFromGroup($user_id, $group_id, $domain_id);
+		if ($sync_succeed && $this->_forceGroupUpdate)
+		{
+			foreach ($groups_db as $group_name => $group_id)
+				if (!array_key_exists($group_name, $groups_ldap))
+					$this->_engine->removeUserFromGroup($user_id, $group_id, $domain_id);
+		}
 
-		return true;
+		return $sync_succeed;
 	}
 
 	/**
 	 * Manage user informations synchronization.
-	 * This function will call syncUserAccountn, syncUserGroups and
+	 * This function will call syncUserAccount, syncUserGroups and
 	 * syncExternalData if necessary.
 	 * @param $user_name The user name used to authentify the user.
 	 * @param $groups All groups send by LemonLDAP in HTTP header.
 	 * @param $user_id The user unique identifier.
 	 * @param $domain_id The domain identifier.
-	 * @return The user identifier.
+	 * @return The user identifier or false.
 	 */
 	function syncUserInfo ($user_name, $groups, $user_id, $domain_id)
 	{
@@ -205,7 +239,7 @@ class LemonLDAP_Sync {
 		else
 		{
 			$this->_engine->debug("manage user account (FAILED)");
-			return;
+			return false;
 		}
 
 		if ($this->syncUserGroups($groups, $user_id_sync, $domain_id) !== false)
@@ -215,8 +249,13 @@ class LemonLDAP_Sync {
 		else
 		{
 			$this->_engine->debug("manage user groups (FAILED)");
-			return;
 		}
+
+		//
+		// Even if groups synchronization does not work, it could have
+		// some synchronization to be done. To see if external synchronization
+		// are correctly performed, see system log.
+		//
 
 		if ($this->_engine->isDataUpdated())
 		{

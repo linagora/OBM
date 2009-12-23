@@ -533,7 +533,7 @@ class LemonLDAP_Engine {
 		$data['user1'] = $user_id;
 		$data['group_id'] = $group_id;
 
-		$c = lmng_run_query_group_usergroup_insert($data, $domain_id);
+		$c = run_query_group_usergroup_insert($data, $domain_id);
 
 		$obm['domain_id'] = $backup['obm_domain_id'];
 		unset($backup);
@@ -741,7 +741,7 @@ class LemonLDAP_Engine {
 
 		$backup['obm_domain_id'] = $obm['domain_id'];
 		$obm['domain_id'] = $domain_id;
-		$grp_q = lmng_run_query_group_detail($group_id);
+		$grp_q = run_query_group_detail($group_id);
 
 		$group = Array();
 		foreach ($this->_sqlMap as $key => $key_obm)
@@ -977,7 +977,7 @@ class LemonLDAP_Engine {
 		$data['user1'] = $user_id;
 		$data['group_id'] = $group_id;
 
-		$c = lmng_run_query_group_usergroup_delete($data, null);
+		$c = run_query_group_usergroup_delete($data, null);
 
 		$obm['domain_id'] = $backup['obm_domain_id'];
 		unset($backup);
@@ -985,6 +985,51 @@ class LemonLDAP_Engine {
 		if ($c > 0)
 			return true;
 		return false;
+	}
+
+	/**
+	 * Set database object to be used.
+	 * @param $database The database object.
+	 */
+	function setDatabase ($database)
+	{
+		$this->_db = $database;
+	}
+
+	/**
+	 * Set debug On/off.
+	 * @param $debug True or False.
+	 */
+	function setDebug ($debug)
+	{
+		$this->_debug = $debug;
+	}
+
+	/**
+	 * Set debug file path.
+	 * @param $file A file path.
+	 */
+	function setDebugFile ($file)
+	{
+		$this->_debugFile = $file;
+	}
+
+	/**
+	 * Set headers.
+	 * @param $headers The HTTP headers.
+	 */
+	function setHeaders ($headers)
+	{
+		$this->_headers = $headers;
+	}
+
+	/**
+	 * Set the map between SQL fields and HTTP headers.
+	 * @param $headersMap The associative array which defines mapping.
+	 */
+	function setHeadersMap ($headersMap)
+	{
+		$this->_headersMap = $headersMap;
 	}
 
 	/**
@@ -1023,6 +1068,7 @@ class LemonLDAP_Engine {
 		{
 			set_update_state();
 			$succeed = $group_id;
+			$this->_updated = true;
 		}
 
 		$obm['uid'] = $backup['obm_uid'];
@@ -1094,51 +1140,6 @@ class LemonLDAP_Engine {
 		unset($backup);
 
 		return $succeed;
-	}
-
-	/**
-	 * Set database object to be used.
-	 * @param $database The database object.
-	 */
-	function setDatabase ($database)
-	{
-	  $this->_db = $database;
-	}
-
-	/**
-	 * Set debug On/off.
-	 * @param $debug True or False.
-	 */
-	function setDebug ($debug)
-	{
-	  $this->_debug = $debug;
- 	}
-
-	/**
-	 * Set debug file path.
-	 * @param $file A file path.
-	 */
-	function setDebugFile ($file)
- 	{
-	  $this->_debugFile = $file;
-	}
-
-	/**
-	 * Set headers.
-	 * @param $headers The HTTP headers.
-	 */
-	function setHeaders ($headers)
-	{
-	  $this->_headers = $headers;
-	}
-
-	/**
-	 * Set the map between SQL fields and HTTP headers.
-	 * @param $headersMap The associative array which defines mapping.
-	 */
-	function setHeadersMap ($headersMap)
-	{
-	  $this->_headersMap = $headersMap;
 	}
 
 	/**

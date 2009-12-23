@@ -164,6 +164,7 @@ class LemonLDAP_Auth extends Auth {
     if ($this->_auto) {
       $sync = new LemonLDAP_Sync($this->_engine);
       $groups = $this->_engine->parseGroupsHeader($this->_groups_header_name);
+      $groups = ($groups !== false ? $groups : Array());
       $user_id = $sync->syncUserInfo($login, $groups, $user_id, $domain_id);
     }
 

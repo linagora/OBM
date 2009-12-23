@@ -53,11 +53,18 @@ foreach ($_files as $index => $file)
 	require_once dirname(__FILE__) . '/' . $file;
 
 // -----------------------------------------------------------------------------
-//  Hack
+//  Dependencies
 // -----------------------------------------------------------------------------
 
-// Hack that provides tools to update internal LDAP directory.
+// Provides tools to synchronize OBM groups.
+require_once dirname(__FILE__) . '/../../../php/group/group_query.inc';
+
+// Provides tools to update internal LDAP directory.
 require_once dirname(__FILE__) . '/../../../php/tools/tools_query.inc';
+
+// -----------------------------------------------------------------------------
+//  Hack
+// -----------------------------------------------------------------------------
 
 // Set $entities, so that we could use incremental updates on OBM LDAP directory
 // grep -R -A70 "entities" php/tools/tools_index.php
