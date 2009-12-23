@@ -197,7 +197,7 @@
               <?php } ?>
             </fieldset>
             <fieldset id="crmLayout" class="details <?php echo (empty($contact->function_id) && empty($contact->market_id) && empty($contact->datasource_id) && empty($contact->kind_id) && empty($contact->mailok) && empty($contact->newsletter))? 'H':'' ?>">
-              <legend><?php echo __('CRM properties') ?></legend>
+              <legend><?php echo __('CRM Fields') ?></legend>
               <span id="datasource" class="formField">
                 <label for="datasourceField"><?php echo __('Datasource') ?> : </label>
                 <?php echo self::__setlist('datasource', $datasources, 'Datasource', $contact->datasource_id, true); ?>
