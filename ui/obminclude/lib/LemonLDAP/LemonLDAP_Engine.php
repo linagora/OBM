@@ -250,15 +250,7 @@ class LemonLDAP_Engine {
 		{
 			$value = $this->getHeaderValue($this->_headersMap[$key]);
 			if (!is_null($value))
-			{
-				// No multi values for any user keys.
-				if (strncmp($key, 'userobm', strlen('userobm')) == 0)
-				{
-					$tab = split(';', $value);
-					$value = $tab[0];
-				}
 				$values[$key_obm] = $value;
-			}
 		}
 
 		return $values;
@@ -642,7 +634,37 @@ class LemonLDAP_Engine {
 	{
 		if (is_null($headerName) || !array_key_exists(strtoupper($headerName), $this->_headers))
 			return null;
-		return $this->_headers[strtoupper($headerName)];
+
+		$key = strtolower(array_search($headerName, $this->_headersMap));
+		$val = array_map(trim, split(';', $this->_headers[strtoupper($headerName)]));
+
+		// No multi values for any user keys, except some exceptions.
+		switch ($key)
+		{
+			case 'userobm_email':
+				// For mail, we have to verify that each domain exists.
+				// If not, the mail is simply not used.
+				$sql_query = 'SELECT domain_name FROM domain WHERE domain_id != 1';
+				$this->_db->query($sql_query);
+				while ($this->_db->next_record())
+				{
+					$domains[] = $this->_db->f('domain_name');
+				}
+				for($i=0; $i < sizeof($val); $i++)
+				{
+					$domain = split('@', $val[$i]);
+					$domain = $domain[1];
+					if (array_search($domain, $domains) === false)
+						unset($val[$i]);
+				}
+				$val = implode("\r\n", $val);
+				break;
+			default:
+				$val = $val[0];
+				break;
+		}
+
+		return $val;
 	}
 
 	/**
@@ -1159,7 +1181,17 @@ class LemonLDAP_Engine {
 			if (strncmp($key, 'group', strlen('group')) == 0)
 				continue;
 			if (array_key_exists($key_obm, $user_data) && strlen($user_data[$key_obm]) > 0)
-				$sql_query_tab[] = $key . ' = \'' . addslashes($user_data[$key_obm]) . '\'';
+			{
+				switch($key)
+				{
+					case 'userobm_email':
+						$sql_query_tab[] = $key . ' = \'' . $user_data[$key_obm] . '\'';
+						break;
+					default:
+						$sql_query_tab[] = $key . ' = \'' . addslashes($user_data[$key_obm]) . '\'';
+						break;
+				}
+			}
 		}
 
 		$sql_query_tab_max = sizeof($sql_query_tab);
