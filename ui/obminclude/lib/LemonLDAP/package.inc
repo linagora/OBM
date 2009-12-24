@@ -30,27 +30,24 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 //
+
 // -----------------------------------------------------------------------------
-//  Define files to load in this package
+//  Load files in this package
 // -----------------------------------------------------------------------------
 
 $_files = Array(
-		'obm/user_query.inc',	    // For dependancies, could not use
-		'obm/of_category.inc',	    // the OBM one because of
-		'obm/group_query.inc',	    // namespace definitions into
-					    // function names.
-		'LemonLDAP_Constants.php',
-		'LemonLDAP_Engine.php',
-		'LemonLDAP_Sync.php',
-		'LemonLDAP_Auth.php',
-	);
-
-// -----------------------------------------------------------------------------
-//  Load
-// -----------------------------------------------------------------------------
+    'obm/user_query.inc',    // For dependancies, could not use
+    'obm/of_category.inc',   // the OBM one because of
+    'obm/group_query.inc',   // namespace definitions into
+                             // function names.
+    'LemonLDAP_Constants.php',
+    'LemonLDAP_Engine.php',
+    'LemonLDAP_Sync.php',
+    'LemonLDAP_Auth.php',
+  );
 
 foreach ($_files as $index => $file)
-	require_once dirname(__FILE__) . '/' . $file;
+  require_once dirname(__FILE__) . '/' . $file;
 
 // -----------------------------------------------------------------------------
 //  Dependencies
