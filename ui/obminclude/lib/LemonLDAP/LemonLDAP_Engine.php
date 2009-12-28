@@ -232,7 +232,7 @@ class LemonLDAP_Engine {
   /**
    * Build user data array from informations found in headers.
    * Most of informations will be retrieved from headers. This array MUST
-   * then be checked then by lmng_check_user_data_form function. Also, all
+   * then be checked then by check_user_data_form function. Also, all
    * array keys do not correspond to SQL field names, but mapping does. So
    * a transformation will be done.
    * @return Array An associative array that could be used directly by OBM.
@@ -389,7 +389,7 @@ class LemonLDAP_Engine {
     if (array_key_exists($this->_sqlMap['userobm_email'], $data))
     {
       $params['mail_server_id'] = 'auto';
-      $params = lmng_get_user_params_mail_server_id($params);
+      $params = get_user_params_mail_server_id($params);
       $data[$this->_sqlMap['userobm_mail_server_id']] = $params['mail_server_id'];
       $data[$this->_sqlMap['userobm_mail_perms']] = 1;
     }
@@ -397,6 +397,16 @@ class LemonLDAP_Engine {
     {
       $data[$this->_sqlMap['userobm_mail_server_id']] = null;
                         $data[$this->_sqlMap['userobm_mail_perms']] = null;
+    }
+
+    if (array_key_exists($this->_sqlMap['userobm_perms'], $data))
+    {
+      if (!array_key_exists('profiles', $data))
+      {
+        $data['profiles'] = Array(
+            $data[$this->_sqlMap['userobm_perms']] => Array(),
+          );
+      }
     }
 
     $obm['domain_id'] = $backup['obm_domain_id'];
@@ -486,11 +496,11 @@ class LemonLDAP_Engine {
     // in the following condition.
     //
 
-    if (!lmng_check_user_data_form('', $params))
+    if (!check_user_data_form('', $params))
       return false ;
 
     $succeed = false;
-    if (($user_id = lmng_run_query_user_insert($params)) > 0)
+    if (($user_id = run_query_user_insert($params)) > 0)
     {
       $params['user_id'] = $user_id;
       set_update_state();
@@ -854,7 +864,7 @@ class LemonLDAP_Engine {
     
     $backup['obm_domain_id'] = $obm['domain_id'];
     $obm['domain_id'] = $domain_id;
-    $usr_q = lmng_run_query_user_detail($user_id);
+    $usr_q = run_query_user_detail($user_id);
     
     $user = Array();
     foreach ($this->_sqlMap as $key => $key_obm)
@@ -1173,8 +1183,8 @@ class LemonLDAP_Engine {
     //
 
     $succeed = false ;
-    if (lmng_check_user_data_form($user_id, $params_db)
-        && lmng_run_query_user_update($user_id, $params_db))
+    if (check_user_data_form($user_id, $params_db)
+        && run_query_user_update($user_id, $params_db))
     {
       $this->_updated = true;
       $succeed = $user_id;

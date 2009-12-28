@@ -38,6 +38,7 @@ define('DEFAULT_USEROBM_HIDDEN', 0);
 define('DEFAULT_USEROBM_ARCHIVE', 0);
 define('DEFAULT_USEROBM_LOCAL', 0);
 define('DEFAULT_USEROBM_STATUS', 'INIT');
+define('DEFAULT_USEROBM_GROUPNAME', 'Utilisateurs');
 define('DEFAULT_AUTH_CLASSNAME', 'OBM_Challenge_Auth');
 define('DEFAULT_AUTOMATE_DIRECTORY', '/usr/share/obm/www/auto');
 define('DEFAULT_LEMONLDAP_VALUES_SEPARATOR', ';');

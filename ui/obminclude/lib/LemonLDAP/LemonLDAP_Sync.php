@@ -166,15 +166,8 @@ class LemonLDAP_Sync {
       return true;
 
     //
-    // OBM do not considere automatic updates of users and groups.
-    // A file is included once here to force the use of redefined
-    // functions.
-    //
-
-    require_once dirname(__FILE__) . '/functions.inc';
-
-    //
-    // Update or create groups in OBM.
+    // Update or create groups in OBM. The primary default group have not to be
+    // managed by this library.
     //
 
     $sync_succeed = true;
@@ -221,8 +214,12 @@ class LemonLDAP_Sync {
     if ($sync_succeed && $this->_forceGroupUpdate)
     {
       foreach ($groups_db as $group_name => $group_id)
+      {
+        if ($group_name == DEFAULT_USEROBM_GROUPNAME)
+          continue;
         if (!array_key_exists($group_name, $groups_ldap))
           $this->_engine->removeUserFromGroup($user_id, $group_id, $domain_id);
+      }
     }
 
     return $sync_succeed;
@@ -240,6 +237,14 @@ class LemonLDAP_Sync {
    */
   function syncUserInfo ($user_name, $groups, $user_id, $domain_id)
   {
+
+    //
+    // OBM do not considere automatic updates of users and groups.
+    // A file is included once here to force the use of redefined
+    // functions.
+    //
+
+    require_once dirname(__FILE__) . '/functions.inc';
 
     $user_id_sync = $this->syncUserAccount($user_name, $user_id, $domain_id);
 

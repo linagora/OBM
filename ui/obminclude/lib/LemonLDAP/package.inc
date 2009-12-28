@@ -36,10 +36,6 @@
 // -----------------------------------------------------------------------------
 
 $_files = Array(
-    'obm/user_query.inc',    // For dependancies, could not use
-    'obm/of_category.inc',   // the OBM one because of
-                             // namespace definitions into
-                             // function names.
     'LemonLDAP_Constants.php',
     'LemonLDAP_Engine.php',
     'LemonLDAP_Sync.php',
@@ -52,6 +48,9 @@ foreach ($_files as $index => $file)
 // -----------------------------------------------------------------------------
 //  Dependencies
 // -----------------------------------------------------------------------------
+
+// Provides tools to synchronize OBM users.
+require_once dirname(__FILE__) . '/../../../php/user/user_query.inc';
 
 // Provides tools to synchronize OBM groups.
 require_once dirname(__FILE__) . '/../../../php/group/group_query.inc';
