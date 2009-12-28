@@ -536,32 +536,6 @@ class LemonLDAP_Engine {
   }
 
   /**
-   * Formate HTTP headers.
-   * Formate retrieved HTTP headers, so that they were conformed with OBM.
-   * @return Array All formated HTTP headers.
-   */
-  function formateHeaders ()
-  {
-    $headers = array();
-    if (is_null($this->_headers) || !is_array($this->_headers))
-    {
-      return $headers;
-    }
-    foreach ($this->_headers as $key => $value)
-    {
-      $key_obm = array_search($key, $this->_headersMap);
-      switch ($key_obm)
-      {
-        case 'userobm_login':
-          $value = strtolower($value);
-          break;
-      }
-      $headers[strtoupper($key)] = $value;
-    }
-    return $headers;
-  }
-
-  /**
    * Print some debug trace.
    * @param $msg The message to trace.
    */
@@ -631,22 +605,41 @@ class LemonLDAP_Engine {
   /**
    * Get a header value from a header name.
    * @param $headerName A value HTTP header name.
+   * @param $format Boolean that indicates if values should be formated
+   *                (default: true).
    * @return String Value corresponding to the HTTP header name, could be null.
    */
-  function getHeaderValue ($headerName = null)
+  function getHeaderValue ($headerName = null, $format = true)
   {
-    if (is_null($headerName) || !array_key_exists(strtoupper($headerName), $this->_headers))
+
+    if (is_null($headerName))
       return null;
 
-    $key = strtolower(array_search($headerName, $this->_headersMap));
-    $val = array_map(trim, split(';', $this->_headers[strtoupper($headerName)]));
+    $headerName = strtoupper($headerName);
 
-    // No multi values for any user keys, except some exceptions.
+    if (!array_key_exists($headerName, $this->_headers))
+      return null;
+
+    if (!$format)
+      return $this->_headers[$headerName];
+
+    $key = strtolower(array_search($headerName, $this->_headersMap));
+    $val = array_map(
+        trim,
+        split(DEFAULT_LEMONLDAP_VALUES_SEPARATOR, $this->_headers[$headerName])
+      );
+
+    //
+    // OBM could not store multivalues headers. So, we disable multivalues for any
+    // user keys. But, we have also some exceptions in format. Here, we format
+    // some attributes.
+    //
     switch ($key)
     {
+
+      // For mail, we have to verify that each domain exists. If not, the mail
+      // is simply not used. Be careful that mails are lower case.
       case 'userobm_email':
-        // For mail, we have to verify that each domain exists.
-        // If not, the mail is simply not used.
         $sql_query = 'SELECT domain_name FROM domain WHERE domain_id != 1';
         $this->_db->query($sql_query);
         while ($this->_db->next_record())
@@ -658,9 +651,20 @@ class LemonLDAP_Engine {
           $domain = split('@', $val[$i]);
           $domain = $domain[1];
           if (array_search($domain, $domains) === false)
+          {
             unset($val[$i]);
+          }
+          else 
+          {
+            $val[$i] = strtolower($val[$i]);
+          }
         }
         $val = implode("\r\n", $val);
+        break;
+
+      // The login is lower case.
+      case 'userobm_login':
+        $val = strtolower($val[0]);
         break;
 
       default:
@@ -958,13 +962,13 @@ class LemonLDAP_Engine {
    */
   function parseGroupsHeader ($headerName)
   {
-    $values = $this->getHeaderValue($headerName);
+    $values = $this->getHeaderValue($headerName, false);
 
     if (is_null($values))
       return false;
 
     $groups = Array();
-    $groups_str = explode(';', $values);
+    $groups_str = explode(DEFAULT_LEMONLDAP_VALUES_SEPARATOR, $values);
     
     foreach ($groups_str as $group_str)
     {

@@ -158,7 +158,6 @@ class LemonLDAP_Sync {
    */
   function syncUserGroups ($groups, $user_id, $domain_id)
   {
-    global $perm;
 
     if (is_null($groups) || $groups === false || !is_array($groups))
       return false;

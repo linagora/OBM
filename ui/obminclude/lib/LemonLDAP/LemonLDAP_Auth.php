@@ -121,6 +121,8 @@ class LemonLDAP_Auth extends Auth {
     if (!$this->sso_checkRequest())
       return false;
 
+    $this->_engine->debug("Headers: " . var_export($this->_engine->getHeaders(), true));
+
     // Check if headers are not found, use normal authentication process.
     // The method auth_validatelogin() corresponding to class defined
     // by the constant DEFAULT_AUTH_CLASSNAME will be automatically called.
@@ -133,14 +135,6 @@ class LemonLDAP_Auth extends Auth {
       $d_auth_object = new $d_auth_class_name ();
       return $d_auth_object->auth_validatelogin();
     }
-
-    //
-    // Formate headers.
-    //
-
-    $this->_engine->debug("Headers: " . var_export($this->_engine->getHeaders(), true));
-    $this->_engine->setHeaders($this->_engine->formateHeaders());
-    $this->_engine->debug("Formated headers: " . var_export($this->_engine->getHeaders(), true));
 
     //
     // First of all, we have to check if the user exists.
