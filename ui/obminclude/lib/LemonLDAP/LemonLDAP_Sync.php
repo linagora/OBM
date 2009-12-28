@@ -158,12 +158,21 @@ class LemonLDAP_Sync {
    */
   function syncUserGroups ($groups, $user_id, $domain_id)
   {
+    global $perm;
 
     if (is_null($groups) || $groups === false || !is_array($groups))
       return false;
 
     if (!$this->_forceGroupUpdate && sizeof($groups))
       return true;
+
+    //
+    // OBM do not considere automatic updates of users and groups.
+    // A file is included once here to force the use of redefined
+    // functions.
+    //
+
+    require_once dirname(__FILE__) . '/functions.inc';
 
     //
     // Update or create groups in OBM.

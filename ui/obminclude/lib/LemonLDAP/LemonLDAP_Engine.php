@@ -415,7 +415,9 @@ class LemonLDAP_Engine {
    */
   function addGroup($group_name, $group_data, $user_id, $domain_id)
   {
-    global $obm;
+    global $obm, $perm;
+
+    $succeed = false ;
 
     $params_db = $this->_setDefaultGroupData($group_data, $domain_id, $user_id);
     $params_db['action'] = INSERT_MODIFICATION_TYPE;
@@ -423,13 +425,14 @@ class LemonLDAP_Engine {
     $backup['obm_uid'] = $obm['uid'];
     $backup['obm_domain_id'] = $obm['domain_id'];
     $backup['globals_module'] = $GLOBALS['module'];
+    $backup['perm'] = $perm;
     $obm['uid'] = $user_id;
     $obm['domain_id'] = $domain_id;
     $GLOBALS['module'] = "group";
+    $perm = new LemonLDAP_Perm();
 
-    $succeed = false ;
-    if (lmng_check_group_data_form($params_db)
-        && ($group_id = lmng_run_query_group_insert($params_db)))
+    if (check_group_data_form($params_db)
+        && ($group_id = run_query_group_insert($params_db)))
     {
       set_update_state();
       $succeed = $group_id;
@@ -438,6 +441,7 @@ class LemonLDAP_Engine {
     $obm['uid'] = $backup['obm_uid'];
     $obm['domain_id'] = $backup['obm_domain_id'];
     $GLOBALS['module'] = $backup['globals_module'];
+    $perm = $backup['perm'];
     unset($backup);
 
     return $succeed;
@@ -1078,7 +1082,9 @@ class LemonLDAP_Engine {
    */
   function updateGroup($group_name, $group_id, $group_data, $user_id, $domain_id)
   {
-    global $obm;
+    global $obm, $perm;
+
+    $succeed = false;
 
     $params_db = $this->getGroupDataFromId($group_id, $domain_id);
     foreach ($params_db as $key => $value)
@@ -1092,14 +1098,14 @@ class LemonLDAP_Engine {
     $backup['obm_uid'] = $obm['uid'];
     $backup['obm_domain_id'] = $obm['domain_id'];
     $backup['globals_module'] = $GLOBALS['module'];
+    $backup['perm'] = $perm;
     $obm['domain_id'] = $domain_id;
     $obm['uid'] = $params_db[$this->_sqlMap['group_usercreate']];
     $GLOBALS['module'] = 'group';
+    $perm = new LemonLDAP_Perm();
 
-    $succeed = false;
-
-    if (lmng_check_group_data_form($params_db)
-        && lmng_run_query_group_update($params_db))
+    if (check_group_data_form($params_db)
+        && run_query_group_update($params_db))
     {
       set_update_state();
       $succeed = $group_id;
@@ -1109,6 +1115,7 @@ class LemonLDAP_Engine {
     $obm['uid'] = $backup['obm_uid'];
     $obm['domain_id'] = $backup['obm_domain_id'];
     $GLOBALS['module'] = $backup['globals_module'];
+    $perm = $backup['perm'];
     unset($backup);
 
     return $succeed;
@@ -1229,6 +1236,25 @@ class LemonLDAP_Engine {
     $this->_updated = $update;
 
     return $update;
+  }
+
+}
+
+/**
+ * Override classical OBM permissions, to enable automatic synchronization
+ * (creations, updates or deletions) during LemonLDAP connection.
+ */
+class LemonLDAP_Perm extends OBM_Perm
+{
+
+  /**
+   * This method is used during group synchronization. It should always
+   * return true so that data are correctly checked.
+   * @return Boolean Always true.
+   */
+  function check_right($module, $right, $profile = false)
+  {
+    return true;
   }
 
 }

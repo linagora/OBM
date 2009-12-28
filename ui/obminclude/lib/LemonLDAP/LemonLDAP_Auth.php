@@ -31,9 +31,6 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 //
-//
-//require_once(dirname(__FILE__) . '/LemonLDAP_Engine.php');
-//
 
 /**
  * LemonLDAP authentication class
@@ -174,6 +171,7 @@ class LemonLDAP_Auth extends Auth {
     $this->_engine->debug('authentication for '
 	      . $this->_engine->getHeaderValue($this->_debug_header_name)
 	      . ' (' . (is_null($user_id) ? 'FAILED' : 'SUCCEED') . ')');
+
     return $user_authenticated;
   }
 

@@ -38,7 +38,7 @@
 $_files = Array(
     'obm/user_query.inc',    // For dependancies, could not use
     'obm/of_category.inc',   // the OBM one because of
-    'obm/group_query.inc',   // namespace definitions into
+                             // namespace definitions into
                              // function names.
     'LemonLDAP_Constants.php',
     'LemonLDAP_Engine.php',
