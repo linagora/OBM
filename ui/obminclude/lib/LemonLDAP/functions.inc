@@ -37,9 +37,12 @@
 // during automatic synchronisation of user account, or user groups.
 //
 
-function of_userdata_query_update($entity, $ent_id, $params, $clear=true)
+if (!function_exists('of_userdata_query_update'))
 {
-  return;
+  function of_userdata_query_update($entity, $ent_id, $params, $clear=true)
+  {
+    return;
+  }
 }
 
 ?>
