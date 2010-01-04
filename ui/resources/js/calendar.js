@@ -1638,9 +1638,9 @@ Obm.CalendarQuickForm = new Class({
     this.location.set('html',evt.event.location);
     this.data.setStyle('display','block');
     if (!this.eventData.all_day) {
-      this.date.set('html',date_begin.format(obm.vars.regexp.dateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dateFormat+' H:i'));
+      this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' H:i'));
     } else {
-      this.date.set('html',date_begin.format(obm.vars.regexp.dateFormat) + ' - ' + date_end.format(obm.vars.regexp.dateFormat));
+      this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat) + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat));
     }
     this.attendees.set('html','');
     if (typeof(evt.event.attendees)=='object'&&(evt.event.attendees instanceof Array)) {
