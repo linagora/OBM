@@ -270,14 +270,29 @@ function sambaHomeCompute() {
 
 function random_password() {
   var mdp = '';
-  var i = 0;
   var length = 10;
-  var allowed_char = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ0123456789[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])';
-  var test = false;
-  while(i<length) {
-    var nb = Math.floor(Math.random() * allowed_char.length);
-    var carac = allowed_char.substring((nb-1), nb);
-    mdp += carac;
+  var i = 0;
+  var charset = new Array();
+  charset[0] = 'abcdefghjkmnpqrstuvwxyz';
+  charset[1] = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  charset[2] = '0123456789';
+  charset[3] = '[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])';
+  var rules = Array();
+  var ruleIndex = Math.floor(Math.random() * 5);
+  rules[ruleIndex] = 2;
+  ruleIndex = Math.floor(Math.random() * 3) + 5;
+  rules[ruleIndex] = 0;
+  ruleIndex = Math.floor(Math.random() * 3) + 8;
+  rules[ruleIndex] = 1;
+
+  while(i <= length ) {
+    var charsetIndex;
+    if(rules[i]) {
+      charsetIndex = rules[i];
+    } else {
+      charsetIndex = Math.floor(Math.random() * 4);
+    }
+    mdp += charset[charsetIndex][Math.floor(Math.random() * charset[charsetIndex].length)];
     i++;
   }
   return mdp;
