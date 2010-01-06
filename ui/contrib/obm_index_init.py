@@ -111,13 +111,13 @@ def index_contact(domain, solr):
 		contact.appendChild(solr_set_field(doc, 'service',       rows[i][26]))
 		contact.appendChild(solr_set_field(doc, 'function',      rows[i][27]))
 		contact.appendChild(solr_set_field(doc, 'title',         rows[i][28]))
-		if rows[i][29]:
+		if sql_is_true(rows[i][29]):
  			contact.appendChild(solr_set_field(doc, 'is', 'archive'))
-		if rows[i][30]:
+		if sql_is_true(rows[i][30]):
 			contact.appendChild(solr_set_field(doc, 'is', 'collected'))
-		if rows[i][31]:
+		if sql_is_true(rows[i][31]):
 			contact.appendChild(solr_set_field(doc, 'is', 'mailing'))
-		if rows[i][32]:
+		if sql_is_true(rows[i][32]):
 			contact.appendChild(solr_set_field(doc, 'is', 'newsletter'))
 
 		# Coords
@@ -211,15 +211,15 @@ def index_event(domain, solr):
 		event.appendChild(solr_set_field(doc, 'description', rows[i][13]))
 		event.appendChild(solr_set_field(doc, 'tag',         rows[i][14]))
 		event.appendChild(solr_set_field(doc, 'tag',         rows[i][15]))
-		if rows[i][16]:
+		if sql_is_true(rows[i][16]):
 			event.appendChild(solr_set_field(doc, 'is', 'allday'))
-		if rows[i][17]:
+		if sql_is_true(rows[i][17]):
 			event.appendChild(solr_set_field(doc, 'is', 'periodic'))
 		if rows[i][18] == 'OPAQUE':
 			event.appendChild(solr_set_field(doc, 'is', 'busy'))
 		elif rows[i][18] == 'FREE':
 			event.appendChild(solr_set_field(doc, 'is', 'free'))
-		if rows[i][19]:
+		if sql_is_true(rows[i][19]):
 			event.appendChild(solr_set_field(doc, 'is', 'private'))
 		event.appendChild(solr_set_field(doc, 'from', rows[i][20]))
 		event.appendChild(solr_set_field(doc, 'owner', rows[i][21]))
@@ -265,6 +265,16 @@ def sql_date_format(field, name):
 	else:
 		print 'ERROR SQL_DATE_FORMAT'
 		exit(1)
+
+
+def sql_is_true(field):
+	if dbtype == 'MYSQL':
+		return (field == '1')
+	elif dbtype == 'PGSQL':
+		return (field == 't')
+	else:
+		print 'ERROR SQL_IS_TRUE'
+		exit(1);
 
 
 def solr_date_format(timestamp):
