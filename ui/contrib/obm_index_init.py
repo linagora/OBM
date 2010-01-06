@@ -270,7 +270,7 @@ def sql_date_format(field, name):
 def sql_is_true(field):
 	if (dbtype == 'MYSQL') and (str(field) == '1'):
 		return True
-	elif (dbtype == 'PGSQL') and (str(field) == 't'):
+	elif (dbtype == 'PGSQL') and field:
 		return True
 	else:
 		return False
