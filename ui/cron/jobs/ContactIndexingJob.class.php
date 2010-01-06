@@ -149,7 +149,7 @@ class ContactIndexingJob extends CronJob {
           $doc->setField('timeupdate', $timeupdate->format('Y-m-d\TH:i:s\Z'));
           $doc->setField('usercreate', $db->f('contact_usercreate'));
           $doc->setField('userupdate', $db->f('contact_userupdate'));
-          $doc->setField('datasource', $db->f('contact_datasource'));
+          $doc->setField('datasource', $db->f('contact_datasource_id'));
           $doc->setField('domain', $db->f('contact_domain_id'));
           $doc->setField('in', $db->f('addressbook_name'));
           $doc->setField('addressbookId', $db->f('contact_addressbook_id'));
