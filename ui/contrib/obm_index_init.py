@@ -213,11 +213,11 @@ def index_event(domain, solr):
 		event.appendChild(solr_set_field(doc, 'tag',         rows[i][15]))
 		if sql_is_true(rows[i][16]):
 			event.appendChild(solr_set_field(doc, 'is', 'allday'))
-		if sql_is_true(rows[i][17]):
+		if rows[i][17] != 'none':
 			event.appendChild(solr_set_field(doc, 'is', 'periodic'))
 		if rows[i][18] == 'OPAQUE':
 			event.appendChild(solr_set_field(doc, 'is', 'busy'))
-		elif rows[i][18] == 'FREE':
+		elif rows[i][18] == 'TRANSPARENT':
 			event.appendChild(solr_set_field(doc, 'is', 'free'))
 		if sql_is_true(rows[i][19]):
 			event.appendChild(solr_set_field(doc, 'is', 'private'))
@@ -268,13 +268,12 @@ def sql_date_format(field, name):
 
 
 def sql_is_true(field):
-	if dbtype == 'MYSQL':
-		return (field == '1')
-	elif dbtype == 'PGSQL':
-		return (field == 't')
+	if (dbtype == 'MYSQL') and (str(field) == '1'):
+		return True
+	elif (dbtype == 'PGSQL') and (str(field) == 't'):
+		return True
 	else:
-		print 'ERROR SQL_IS_TRUE'
-		exit(1);
+		return False
 
 
 def solr_date_format(timestamp):
