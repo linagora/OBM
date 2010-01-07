@@ -133,9 +133,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 ///////////////////////////////////////////////////////////////////////////////
   $addressbooks = OBM_AddressBook::search();
   $contacts = $addressbooks->searchContacts($params['searchpattern']);
-  if (count($contacts) != 0) {
-    dis_contact_vcard_export_all($contacts);
-  }
+  dis_contact_vcard_export_all($contacts);
   exit();
 } elseif ($action == 'vcard_insert') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -481,24 +479,22 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     } 
     exit();    
   } else {
-    if (is_object($addressbook)) {
-      contact_export_js_labels();
-      $template = new OBM_Template('main');
-      if(!$current['addressbook']) $current['addressbook'] = $addressbooks->getMyContacts()->id;
-      if(!$contacts) $contacts = $addressbooks->searchContacts("addressbookId:$current[addressbook] -is:archive"); 
-      $template->set('searchpattern', $params['searchpattern']);
-      $template->set('contactfilter', $params['contactfilter']);
-      $template->set('contacts', $contacts);
-      $template->set('contact', $contact);
-      $template->set('addressbooks', $addressbooks);
-      $template->set('current', $current);
-      $template->set('searchfields', OBM_Contact::fieldsMap());
-      $template->set('customFields', OBM_Contact::getUserCategory());
-      //FIXME :  Already set in some actions
-      $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
-      $template->set('template', $subTemplate);    
-      $display['detail'] = $template->render();
-    }
+    contact_export_js_labels();
+    $template = new OBM_Template('main');
+    if(!$current['addressbook']) $current['addressbook'] = $addressbooks->getMyContacts()->id;
+    if(!$contacts) $contacts = $addressbooks->searchContacts("addressbookId:$current[addressbook] -is:archive"); 
+    $template->set('searchpattern', $params['searchpattern']);
+    $template->set('contactfilter', $params['contactfilter']);
+    $template->set('contacts', $contacts);
+    $template->set('contact', $contact);
+    $template->set('addressbooks', $addressbooks);
+    $template->set('current', $current);
+    $template->set('searchfields', OBM_Contact::fieldsMap());
+    $template->set('customFields', OBM_Contact::getUserCategory());
+    //FIXME :  Already set in some actions
+    $template->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
+    $template->set('template', $subTemplate);    
+    $display['detail'] = $template->render();
   }
 }
 

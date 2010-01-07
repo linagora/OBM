@@ -1950,11 +1950,12 @@ function dis_contact_vcard_export($contact) {
 // Display Export all private contacts to VCards
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_vcard_export_all($contacts) {
-  global $obm;
   
   $vcards = array();
-  foreach ($contacts as $c) {
-    $vcards[] = $c->toVcard()->__toString();
+	if (count($contacts)>0) {
+    foreach ($contacts as $c) {
+      $vcards[] = $c->toVcard()->__toString();
+    }
   }
   header("Content-Type: text/x-vCard");
   header("Content-Disposition: inline; filename=contacts.vcf");
@@ -1968,7 +1969,6 @@ function dis_contact_vcard_export_all($contacts) {
 // Display Export all contacts to CSV
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_csv_export_all($contacts) {
-  global $obm;
   
   $csv = array();
   $f = array();
