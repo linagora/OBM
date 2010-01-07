@@ -2992,7 +2992,6 @@ function dis_user_import_file_run($params) {
     $display['msg'] .= display_err_msg($l_file_error);
     return;
   }
-
   while ( ($row = fgetcsv($fh, 4000, $csv_sep)) ) {
     $num_line++;
     $nb_group_ins = 0;
@@ -3084,6 +3083,7 @@ function dis_user_import_file_run($params) {
     $user['smb_home'] = addslashes($row[$c_smb_home]);
     $user['smb_home_drive'] = addslashes($row[$c_smb_home_drive]);
     $user['smb_logon'] = addslashes($row[$c_smb_logon]);
+    $user['profiles'] = &$params['profiles']; 
 
     if (count($row) != $nb_col) {
       // Row not OK
