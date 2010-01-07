@@ -50,6 +50,8 @@ require("$obminclude/of/of_right.inc"); // needed by call from calendar
 
 // detailconsult can be accessed without user_id (-> display current user)
 if (($action == "detailconsult") && (! $params["user_id"])) $params["user_id"] = $obm["uid"];
+// detailconsult from contact module. Contact module set people_id instead of user_id
+if (($action == "detailconsult") && ($params["people_id"])) $params["user_id"] = $params["people_id"];
 
 get_user_action();
 $perm->check_permissions($module, $action);
