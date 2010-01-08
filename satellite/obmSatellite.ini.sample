@@ -12,6 +12,11 @@
 #ldapServer = ldap://ldap.obm.local
 # TLS/SSL
 #ldapTls = may
+# If not define in this file, get LDAP root DN from '/etc/obm/obm_conf.ini' or,
+# if defined, from '/etc/obm-satellite/obmSatellite.ini'.
+# Use this option only if LDAP root DN differ from '/etc/obm/obm_conf.ini'.
+# Sample syntax: 'dc=linagora,dc=loc'
+#ldapRoot = 
 # Connect LDAP server as (user LDAP DN)
 #ldapLogin =
 # with password

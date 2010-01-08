@@ -130,6 +130,8 @@ sub _loadConfFile {
 
     $iniValue = $cfgFile->val( 'server', 'ldapPassword' );
     $ldapDesc{'ldap_password'} = $iniValue if $iniValue;
+
+    return \%ldapDesc;
 }
 
 
