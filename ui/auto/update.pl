@@ -245,7 +245,11 @@ sub getParameter {
     }
 
     if( defined($parameters->{'domain-id'}) && ($parameters->{'domain-id'} =~ /^[0-9]+$/) ) {
-        $self->_log( 'Mise a jour du domaine \''.$parameters->{'domain-name'}.'\' (ID: '.$parameters->{'domain-id'}.')', -1 );
+        if( defined($parameters->{'domain-name'}) ) {
+            $self->_log( 'Mise a jour du domaine \''.$parameters->{'domain-name'}.'\' (ID: '.$parameters->{'domain-id'}.')', -1 );
+        }else {
+            $self->_log( 'Mise a jour du domaine d\'ID '.$parameters->{'domain-id'}.')', -1 );
+        }
     }else {
         $self->_log( 'Paramétre \'--domain-id\' ou \'--domain-name\' ou \'--domain-global\' manquant ou incorrect', 0 );
         print STDERR 'Paramétre \'--domain-id\' ou \'--domain-name\' ou \'--domain-global\' manquant ou incorrect, vérifiez les fichiers journaux'."\n";
