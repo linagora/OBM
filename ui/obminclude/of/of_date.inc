@@ -164,6 +164,8 @@ class Of_Date extends DateTime {
   
   private $originalTimeZone;
 
+  private $serialized; 
+
   public function __construct($time=null, $timezone=null) {
     self::loadOptions();
     if(is_numeric($time)) {
@@ -1713,5 +1715,14 @@ class Of_Date extends DateTime {
   
   public function getOriginalTimeZone () {
     return $this->originalTimeZone;
+  }
+
+  public function __sleep() {
+    $this->serialized = $this->get(Of_Date::ISO_8601);
+    return array('serialized', 'originalTimeZone', '_error');
+  }
+
+  public function __wakeup() {
+    parent::__construct($this->serialized);
   }
 }
