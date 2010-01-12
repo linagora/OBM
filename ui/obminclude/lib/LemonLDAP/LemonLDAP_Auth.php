@@ -41,12 +41,12 @@ class LemonLDAP_Auth extends Auth {
    * Auto create/update accounts and groups, or not.
    */
   var $_auto = false;
-  
+
   /**
    * LemonLDAP logout URL.
    */
   var $_logout = null;
-  
+
   /**
    * LemonLDAP Server IP.
    */
@@ -56,28 +56,33 @@ class LemonLDAP_Auth extends Auth {
    * Check or not LemonLDAP request.
    */
   var $_server_check = false;
-  
+
   /**
    * Groups header name.
    */
   var $_groups_header_name = null;
-  
+
   /**
    * Specify the header that will be trace in debug file.
    */
   var $_debug_header_name = 'HTTP_OBM_UID';
-  
+
   /**
    * The LemonLDAP engine.
    */
   var $_engine = null;
-  
+
+  /**
+   * Indicates if user is already logged or not.
+   */
+  var $_logged = false;
+
   /**
    * Backward compatibilities.
    * Still used by Auth object.
    */
   var $database_class = 'DB_OBM';
-  
+
   /**
    * Constructor.
    * Initialize internal attribut with parameters found in configuration.
@@ -165,6 +170,16 @@ class LemonLDAP_Auth extends Auth {
     $this->_engine->debug('authentication for '
 	      . $this->_engine->getHeaderValue($this->_debug_header_name)
 	      . ' (' . (is_null($user_id) ? 'FAILED' : 'SUCCEED') . ')');
+
+    //
+    // If $user_id is null, then user is not authenticated. In the case $user_id
+    // is not null, a flag that indicates that user is logged through LemonLDAP
+    // is stored. This flag could be then used to personnalize OBM modules, and
+    // lock some functionnalities (such as changing OBM password).
+    //
+
+    if (!is_null($user_id))
+      $this->_logged = true;
 
     return $user_authenticated;
   }
@@ -259,6 +274,15 @@ class LemonLDAP_Auth extends Auth {
       $succeed = true;
     $this->_engine->debug("$succeed");
     return $succeed;
+  }
+
+  /**
+   * This will tell us if user is logged through SSO or not.
+   * @return boolean
+   */
+  function sso_isLoggedThrough()
+  {
+    return $this->_logged;
   }
 
   /**
