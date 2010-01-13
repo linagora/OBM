@@ -29,23 +29,25 @@ class Vcalendar_Element_Vevent extends Vcalendar_Element {
 
   function setDtstart($value) {
     $this->dtstart = $value;
-    if(isset($this->dtend) && !isset($this->duration)) {
+    if(isset($this->dtend)) {
       $this->set('duration', $this->dtend->diffTimestamp($this->dtstart));
+    } elseif(!isset($this->duration)) {
+      $this->duration = 86400;
     }
   }
 
   function setDtend($value) {
     $this->dtend = $value;
-    if(isset($this->dtstart) && !isset($this->duration)) {
-      $this->set('duration', $this->dtend->diffTimestamp($this->dtstart));
+    if(isset($this->dtstart)) {
+      $this->duration =  $this->dtend->diffTimestamp($this->dtstart);
     }
   }
 
   function setDuration($value) {
     $this->duration = $value;
-    if(isset($this->dtstart) && !isset($this->dtend)) {
+    if(isset($this->dtstart)) {
       $dtend = clone $this->dtstart;
-      $this->set('dtend', $dtend->addSecond($this->duration));
+      $this->dtend = $dtend->addSecond($this->duration);
     }
   }
     

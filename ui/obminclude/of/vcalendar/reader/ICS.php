@@ -234,8 +234,6 @@ class Vcalendar_Reader_ICS {
     preg_match('/.*(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})){0,1}/', $value, $match) ;
     list($all, $year, $month, $day, $time, $hour, $minute, $second) = $match;
 
-    $date = new Of_Date();
-
     if(isset($options['TZID']) && !preg_match('/^[^Z]*Z$/',$value)) {
       $date = new Of_Date(null, $options['TZID']);
       if ($date->error() == Of_Date::ERR_INVALID_DATE) { // Bad timezone
