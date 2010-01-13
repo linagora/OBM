@@ -129,7 +129,7 @@ class Vcalendar_Reader_OBM {
     $vevent->set('summary', $data['event_title']);
     $vevent->set('description', $data['event_description']);
     $vevent->set('class', $this->parsePrivacy($data['event_privacy']));
-    $vevent->set('priority', $this->parsePriority($data['event_priority']));
+    if($data['event_priority']) $vevent->set('priority', $this->parsePriority($data['event_priority']));
     $vevent->set('organizer', $data['event_owner']);
     $vevent->set('location', $data['event_location']);
     $vevent->set('categories', array($data['eventcategory1_label']));
