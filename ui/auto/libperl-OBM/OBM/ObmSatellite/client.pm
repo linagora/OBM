@@ -156,7 +156,7 @@ sub _displayResponse {
         return 1;
     }
 
-    $self->_log( 'requête \''.$url.'\' : '.$response->status_line() );
+    $self->_log( 'requête \''.$url.'\' : '.$response->status_line(), 2 );
     $self->_log( $response->content(), 2 ) if $response->content();
     return 0;
 }
