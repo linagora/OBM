@@ -112,6 +112,7 @@ class LemonLDAP_Sync {
     $obm['uid'] = $backup['uid'];
     unset($backup);
 
+    /*
     $user_data = $this->_engine->getUserDataFromId($user_id, $domain_id);
     $pswd_new = $this->_engine->getHeaderValue($this->_engine->getHeaderName('userobm_password'));
     $pswd_old = $user_data[$this->_engine->_sqlMap['userobm_password']];
@@ -121,6 +122,7 @@ class LemonLDAP_Sync {
       passthru(DEFAULT_AUTOMATE_DIRECTORY . "/changePasswd.pl --login $user_name --domain-id $domain_id --passwd $pswd_new --old-passwd $pswd_old --unix");
       passthru(DEFAULT_AUTOMATE_DIRECTORY . "/changePasswd.pl --login $user_name --domain-id $domain_id --passwd $pswd_new --old-passwd $pswd_old --samba");
     }
+    */
   }
 
   /**
