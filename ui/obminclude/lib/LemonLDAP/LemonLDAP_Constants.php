@@ -31,15 +31,17 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 
-define('INSERT_MODIFICATION_TYPE', 'insert');
-define('UPDATE_MODIFICATION_TYPE', 'update');
+define('DEFAULT_OBM_MODTYPE_INSERT', 'insert');
+define('DEFAULT_OBM_MODTYPE_UPDATE', 'update');
+
 define('DEFAULT_USEROBM_PROFILE', 'user');
 define('DEFAULT_USEROBM_HIDDEN', 0);
 define('DEFAULT_USEROBM_ARCHIVE', 0);
 define('DEFAULT_USEROBM_LOCAL', 0);
 define('DEFAULT_USEROBM_STATUS', 'INIT');
 define('DEFAULT_USEROBM_GROUPNAME', 'Utilisateurs');
-define('DEFAULT_AUTH_CLASSNAME', 'OBM_Challenge_Auth');
+
 define('DEFAULT_LEMONLDAP_VALUES_SEPARATOR', ';');
+define('DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS', 'OBM_Challenge_Auth');
 
 ?>
