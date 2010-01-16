@@ -37,6 +37,7 @@
 
 $_files = Array(
     'LemonLDAP_Constants.php',
+    'LemonLDAP_Logger.php',
     'LemonLDAP_Engine.php',
     'LemonLDAP_Sync.php',
     'LemonLDAP_Auth.php',
