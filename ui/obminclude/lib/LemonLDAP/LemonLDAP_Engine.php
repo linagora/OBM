@@ -430,7 +430,7 @@ class LemonLDAP_Engine {
     $succeed = false ;
 
     $params_db = $this->_setDefaultGroupData($group_data, $domain_id, $user_id);
-    $params_db['action'] = INSERT_MODIFICATION_TYPE;
+    $params_db['action'] = DEFAULT_OBM_MODTYPE_INSERT;
 
     $backup['obm_uid'] = $obm['uid'];
     $backup['obm_domain_id'] = $obm['domain_id'];
@@ -1107,7 +1107,7 @@ class LemonLDAP_Engine {
         $params_db[$key] = $group_data[$key];
     }
     $params_db = $this->_setDefaultGroupData($params_db, $domain_id, $user_id);
-    $params_db['action'] = UPDATE_MODIFICATION_TYPE;
+    $params_db['action'] = DEFAULT_OBM_MODTYPE_UPDATE;
 
     $backup['obm_uid'] = $obm['uid'];
     $backup['obm_domain_id'] = $obm['domain_id'];
@@ -1175,7 +1175,7 @@ class LemonLDAP_Engine {
     }
     $params_db = $this->_setDefaultUserData($params_db, $login, $domain_id);
 
-    $params['action'] = UPDATE_MODIFICATION_TYPE;
+    $params['action'] = DEFAULT_OBM_MODTYPE_UPDATE;
 
     //
     // The above code is taken from php/user/user_index.php, when

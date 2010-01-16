@@ -130,13 +130,13 @@ class LemonLDAP_Auth extends Auth {
 
     // Check if headers are not found, use normal authentication process.
     // The method auth_validatelogin() corresponding to class defined
-    // by the constant DEFAULT_AUTH_CLASSNAME will be automatically called.
+    // by the constant DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS will be automatically called.
     // We can not use auth_preauth function instead, because it does not
     // the job correctly for us.
 
     if (!$this->sso_isValidAuthenticationRequest()) {
       $this->_engine->debug('not a valid authentication request, proceed to auth failover');
-      $d_auth_class_name = DEFAULT_AUTH_CLASSNAME;
+      $d_auth_class_name = DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS;
       $d_auth_object = new $d_auth_class_name ();
       return $d_auth_object->auth_validatelogin();
     }
@@ -193,7 +193,7 @@ class LemonLDAP_Auth extends Auth {
 
     if (!$this->sso_isValidAuthenticationRequest()) {
       $this->_engine->debug('not a valid authentication request, proceed to auth failover');
-      $d_auth_class_name = DEFAULT_AUTH_CLASSNAME;
+      $d_auth_class_name = DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS;
       $d_auth_object = new $d_auth_class_name ();
       if (method_exists($d_auth_object, 'logout'))
 	return $d_auth_object->logout();
