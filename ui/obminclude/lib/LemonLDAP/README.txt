@@ -59,14 +59,24 @@ $lemonldap_config = Array(
     //
     // Activate debug or not.
     // Default: false
+    // !! OBSOLETE !!
     //
     "debug" => true,
 
     //
     // The file where debug informations will be written.
     // Default: "/tmp/obm-lemonldapng.log"
+    // !! OBSOLETE !!
     //
     "debug_filepath" => "/tmp/obm-lemonldapng.log",
+
+    //
+    // Fixe debug level.
+    // Logs will be send to Apache error files.
+    // Values are: DEBUG, INFO, WARN, ERROR or NONE.
+    // Default is: NONE.
+    //
+    "debug_level" => "NONE",
 
     //
     // The HTTP header which identifies a user, to trace login and logout.

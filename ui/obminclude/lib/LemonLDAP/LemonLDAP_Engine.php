@@ -211,16 +211,6 @@ class LemonLDAP_Engine {
   var $_updated = false;
 
   /**
-   * Indicate debug state
-   */
-  var $_debug = false;
-
-  /**
-   * Specify the debug file path.
-   */
-  var $_debug_file = '/tmp/obm-lemonldapng.log';
-
-  /**
    * Constructor.
    * Initialize headers from what are found into the HTTP request.
    */
@@ -543,23 +533,6 @@ class LemonLDAP_Engine {
       return true;
 
     return false;
-  }
-
-  /**
-   * Print some debug trace.
-   * @param $msg The message to trace.
-   */
-  function debug ($msg)
-  {
-    if (!$this->_debug)
-      return;
-    $traces = debug_backtrace(false);
-    $function = $traces[1]['function'];
-    $line = $traces[0]['line'];
-    $now = date("Y-m-d H:i:s");
-    $f = fopen($this->_debug_file, "a+");
-    fputs($f, "[$now] $function:$line - $msg\n");
-    fclose($f);
   }
 
   /**
@@ -1047,24 +1020,6 @@ class LemonLDAP_Engine {
   function setDatabase ($database)
   {
     $this->_db = $database;
-  }
-
-  /**
-   * Set debug On/off.
-   * @param $debug True or False.
-   */
-  function setDebug ($debug)
-  {
-    $this->_debug = $debug;
-  }
-
-  /**
-   * Set debug file path.
-   * @param $file A file path.
-   */
-  function setDebugFile ($file)
-  {
-    $this->_debugFile = $file;
   }
 
   /**

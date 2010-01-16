@@ -73,6 +73,11 @@ class LemonLDAP_Auth extends Auth {
   var $_engine = null;
 
   /**
+   * The LemonLDAP logger.
+   */
+  var $_logger = null;
+
+  /**
    * Indicates if user is already logged or not.
    */
   var $_logged = false;
@@ -90,6 +95,7 @@ class LemonLDAP_Auth extends Auth {
   function __construct ()
   {
     $database = new $this->database_class;
+    $this->_logger = LemonLDAP_Logger::getInstance();
     $this->_engine = new LemonLDAP_Engine();
     $this->_engine->setDatabase($database);
     $this->_initFromConfiguration();
@@ -108,8 +114,6 @@ class LemonLDAP_Auth extends Auth {
     $this->_debug_header_name = $lemonldap_config['debug_header_name'];
     $this->_groups_header_name = $lemonldap_config['group_header_name'];
 
-    $this->_engine->setDebug($lemonldap_config['debug']);
-    $this->_engine->setDebugFile($lemonldap_config['debug_filepath']);
     if (is_array($lemonldap_config['headers_map']))
       $this->_engine->setHeadersMap($lemonldap_config['headers_map']);
   }
@@ -126,7 +130,7 @@ class LemonLDAP_Auth extends Auth {
     if (!$this->sso_checkRequest())
       return false;
 
-    $this->_engine->debug("Headers: " . var_export($this->_engine->getHeaders(), true));
+    $this->_logger->debug("Headers: " . var_export($this->_engine->getHeaders(), true));
 
     // Check if headers are not found, use normal authentication process.
     // The method auth_validatelogin() corresponding to class defined
@@ -135,7 +139,7 @@ class LemonLDAP_Auth extends Auth {
     // the job correctly for us.
 
     if (!$this->sso_isValidAuthenticationRequest()) {
-      $this->_engine->debug('not a valid authentication request, proceed to auth failover');
+      $this->_logger->debug('not a valid authentication request, proceed to auth failover');
       $d_auth_class_name = DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS;
       $d_auth_object = new $d_auth_class_name ();
       return $d_auth_object->auth_validatelogin();
@@ -167,7 +171,7 @@ class LemonLDAP_Auth extends Auth {
     if ((!$user_authenticated = $this->sso_authenticate($user_id, $domain_id)))
       $user_id = null;
 
-    $this->_engine->debug('authentication for '
+    $this->_logger->info('authentication for '
 	      . $this->_engine->getHeaderValue($this->_debug_header_name)
 	      . ' (' . (is_null($user_id) ? 'FAILED' : 'SUCCEED') . ')');
 
@@ -192,7 +196,7 @@ class LemonLDAP_Auth extends Auth {
     global $obm, $lock, $sess;
 
     if (!$this->sso_isValidAuthenticationRequest()) {
-      $this->_engine->debug('not a valid authentication request, proceed to auth failover');
+      $this->_logger->debug('not a valid authentication request, proceed to auth failover');
       $d_auth_class_name = DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS;
       $d_auth_object = new $d_auth_class_name ();
       if (method_exists($d_auth_object, 'logout'))
@@ -208,7 +212,7 @@ class LemonLDAP_Auth extends Auth {
     $this->unauth($nobody == '' ? $this->nobody : $nobody);
     $sess->delete();
 
-    $this->_engine->debug('disconnect ' . $this->_engine->getHeaderValue($this->_debug_header_name));
+    $this->_logger->info('disconnect ' . $this->_engine->getHeaderValue($this->_debug_header_name));
     header('location: ' . $this->_logout);
     exit();
   }
@@ -272,7 +276,7 @@ class LemonLDAP_Auth extends Auth {
     if (($hv !== false && strcasecmp(trim($hv), $this->_server) == 0)
 	|| strcasecmp($_SERVER['REMOTE_ADDR'], $this->_server) == 0)
       $succeed = true;
-    $this->_engine->debug("$succeed");
+    $this->_logger->info($succeed ? "SUCCEED" : "FAILED");
     return $succeed;
   }
 

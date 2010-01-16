@@ -58,11 +58,17 @@ class LemonLDAP_Sync {
   private $_engine = null;
 
   /**
+   * The LemonLDAP logger.
+   */
+  private $_logger = null;
+
+  /**
    * Constructor.
    */
   function __construct ($engine)
   {
     $this->_engine = $engine;
+    $this->_logger = LemonLDAP_Logger::getInstance();
     $this->initializeFromConfiguration();
   }
 
@@ -208,7 +214,7 @@ class LemonLDAP_Sync {
       $group_id = $this->_engine->isGroupExists($group_name, $domain_id);
       if ($group_id !== false && $this->_engine->addUserInGroup($user_id, $group_id, $domain_id) === false)
       {
-        $this->_engine->debug("Fail to add user $user_id in group $group_id");
+        $this->_logger->warn("Fail to add user in group $group_name");
         $sync_succeed = false;
       }
     }
@@ -252,21 +258,21 @@ class LemonLDAP_Sync {
 
     if ($user_id_sync !== false)
     {
-      $this->_engine->debug("manage user account (SUCCEED)");
+      $this->_logger->info("manage user account ($user_name) (SUCCEED)");
     }
     else
     {
-      $this->_engine->debug("manage user account (FAILED)");
+      $this->_logger->error("manage user account ($user_name) (FAILED)");
       return false;
     }
 
     if ($this->syncUserGroups($groups, $user_id_sync, $domain_id) !== false)
     {
-      $this->_engine->debug("manage user groups (SUCCEED)");
+      $this->_logger->info("manage user groups ($user_name) (SUCCEED)");
     }
     else
     {
-      $this->_engine->debug("manage user groups (FAILED)");
+      $this->_logger->error("manage user groups ($user_name) (FAILED)");
     }
 
     //
@@ -277,7 +283,7 @@ class LemonLDAP_Sync {
 
     if ($this->_engine->isDataUpdated())
     {
-      $this->_engine->debug("proceed to external updates");
+      $this->_logger->debug("proceed to external updates for $user_name");
       $this->syncExternalData($user_name, $domain_id, $user_id_sync);
     }
 

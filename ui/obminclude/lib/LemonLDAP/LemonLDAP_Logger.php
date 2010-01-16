@@ -36,10 +36,16 @@
 class LemonLDAP_Logger {
 
   /**
+   * Log file (optinal).
+   * @var string.
+   */
+  private $_file = null;
+
+  /**
    * Log level.
    * @var string
    */
-  private $_level = DEFAULT_LEMONLDAP_LOGLEVEL_NONE;
+  private $_level = 4;
 
   /**
    * Debug levels.
@@ -84,14 +90,21 @@ class LemonLDAP_Logger {
     {
       $levelstr = array_search($level, self::$_levels);
     }
-    if ($this->_level >= $level)
+    if ($this->_level <= $level)
     {
       $traces = debug_backtrace(false);
       $function = $traces[2]['function'];
       $line = $traces[0]['line'];
       $now = date(DEFAULT_LEMONLDAP_LOGFORMAT_DATE);
-      $log = "[$now] $levelstr $function:$line - $msg\n";
-      $f = fopen('php://stderr', 'w');
+      $log = "[$now] [$levelstr] OBM LemonLDAP Connector - $function($line): $msg\n";
+      if (!is_null($this->_file))
+      {
+        $f = fopen($this->_file, "a+");
+      }
+      else
+      {
+        $f = fopen('php://stderr', 'w');
+      }
       fputs($f, "$log");
       fclose($f);
     }
@@ -116,17 +129,22 @@ class LemonLDAP_Logger {
   public function initializeFromConfiguration()
   {
     global $lemonldap_config;
-    if (array_key_exists('log_level', $lemonldap_config) !== false)
-    {
-      $this->setLevel($lemonldap_level['log_level']);
-    }
-    //
-    // For compatibilities. Default is to log in DEBUG mode.
-    //
     if (array_key_exists('debug', $lemonldap_config) !== false
-        && $lemonldap_level['debug'])
+        && $lemonldap_config['debug'])
     {
+      //
+      // For compatibilities. Default is to log in DEBUG mode.
+      //
       $this->setLevel(DEFAULT_LEMONLDAP_LOGLEVEL_DEBUG);
+      if (array_key_exists('debug_filepath', $lemonldap_config) !== false)
+      {
+        $this->_file = $lemonldap_config['debug_filepath'];
+      }
+    }
+    if (array_key_exists('debug_level', $lemonldap_config) !== false)
+    {
+      $this->setLevel($lemonldap_config['debug_level']);
+      unset($this->_file);
     }
   }
 
