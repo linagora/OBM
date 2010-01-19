@@ -7,6 +7,8 @@
 
 UPDATE ObmInfo SET obminfo_value = '2.3.1-pre' WHERE obminfo_name = 'db_version';
 
+ALTER TABLE AddressBook MODIFY COLUMN syncable boolean;
+ALTER TABLE AddressBook MODIFY COLUMN is_default boolean;
 --
 -- Table structure for table `opush_ping_heartbeat`
 --
