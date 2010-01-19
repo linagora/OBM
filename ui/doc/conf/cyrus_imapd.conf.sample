@@ -192,7 +192,10 @@ virtdomains: userid
 #
 #defaultdomain: 
 # Enable this option when migrating from an SingleNameSpace installation
-# IMPORTANT : see LDAP filter into '/etc/saslauthd.conf' too
+# IMPORTANT :
+#    - see LDAP filter into '/etc/saslauthd.conf' too
+#    - set 'virtdomains: userid' into '/etc/imapd.conf' and restart Cyrus
+#      before launching global update
 # ie: migrating a single namespace installation, domain : foo.com
 #     replace '<singleDomainName>' by 'foo.com'
 #defaultdomain: '<singleDomainName>'
