@@ -1,16 +1,16 @@
 [server]
 
 # SSL key file
-#ssl-key-file = /etc/obm-satellite/ssl-key.pem
+#ssl-key-file = /etc/obm/certs/[obm_conf.ini:external-url]_signed.pem
 # SSL cert file
-#ssl-cert-file = /etc/obm-satellite/ssl-cert.pem
+#ssl-cert-file = /etc/obm/certs/[obm_conf.ini:external-url]_signed.pem
 # SSL CA cert
-#ssl-ca-file = /etc/obm-satellite/ca-cert.pem
+#ssl-ca-file = /etc/obm/certs/obm_cert.pem
 
 # LDAP Server description
 # Hostname
 #ldapServer = ldap://ldap.obm.local
-# TLS/SSL
+# TLS/SSL [none|may|encrypt]
 #ldapTls = may
 # If not define in this file, get LDAP root DN from '/etc/obm/obm_conf.ini' or,
 # if defined, from '/etc/obm-satellite/obmSatellite.ini'.
