@@ -32,7 +32,7 @@ include_once("$obminclude/global.inc");
 include_once("Logger.class.php");
 include_once("Cron.class.php");
 
-define("L_LEVEL", L_INFO);
+define("L_LEVEL", L_WARN);
 
 set_error_handler('errorHandler');
 
