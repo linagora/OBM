@@ -19,3 +19,6 @@ unique_opush_ping_heartbeat_col_dev UNIQUE (device_id);
 
 UPDATE ObmInfo SET obminfo_value = '2.3.1' WHERE obminfo_name = 'db_version';
 
+DELETE FROM ObmInfo WHERE obminfo_name = 'solr_contact_lastupdate';
+DELETE FROM ObmInfo WHERE obminfo_name = 'solr_lastcontact';
+
