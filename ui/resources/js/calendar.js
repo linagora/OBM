@@ -6,7 +6,7 @@ Obm.CalendarManager = new Class({
   /**
    * Constructor
    */
-  initialize: function(time) {
+  initialize: function(time, write) {
     this.redraw = new Hash();
     this.redrawAllDay = new Hash();
     this.events = new Hash();
@@ -20,6 +20,7 @@ Obm.CalendarManager = new Class({
     var current = new Obm.DateTime(obm.vars.consts.startTime);
     this.lock = false;
     this.entityEvents = new Array();
+    this.write = write;
 
     // Window height observer 
     new Obm.Observer(window, {onStop:this.resizeGrid, property:'innerHeight'});
@@ -1579,6 +1580,7 @@ Obm.CalendarQuickForm = new Class({
 
     var type = str[0];
     if (type == 'time') {
+      if(!obm.calendarManager.write) return false;
       /* Crappy ie fix*/
       var x = ivent.event.layerX;
       if (!x) x =ivent.event.offsetX;
@@ -1587,9 +1589,11 @@ Obm.CalendarQuickForm = new Class({
       var d = obm.calendarManager.startTime + str[1].toInt() + Math.floor(x/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth.toInt()))*86400;
       this.setDefaultFormValues(d,0, context);
     } else if (type == 'allday') {
+      if(!obm.calendarManager.write) return false;
       var d = obm.calendarManager.startTime + Math.floor($('allday_'+str[1]).style.left.toInt()/obm.vars.consts.cellWidth.toInt())*86400;
       this.setDefaultFormValues(d,1, context);
     } else if (type == 'dayContainer' || type == 'more' ) { // Month view
+      if(!obm.calendarManager.write) return false;
       var d = obm.calendarManager.startTime + str[1].toInt();
       this.setDefaultFormValues(d,1, context);
     } else {
@@ -1618,7 +1622,7 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.formAction = 'quick_update';
     this.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
     
-    if (evt.event.updatable) {
+    if (evt.event.updatable && obm.calendarManager.write) {
       this.form.setStyle('display','block');
       this.deleteButton.setStyle('display','');
       this.editButton.setStyle('display','');
@@ -1724,7 +1728,7 @@ Obm.CalendarQuickForm = new Class({
     }
     this.eventData.entity_id = this.entityView.get('inputValue');
     this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)+'&new_user_id[]='+this.eventData.entity_id;
-    window.location.href = 'calendar_index.php?'+this.gotoURI;
+    window.location.href = obm.vars.consts.calendarUrl+'?'+this.gotoURI;
   }
 });
 
@@ -1808,7 +1812,7 @@ Obm.CalendarView = new Class({
             var option = new Element('option')
               .setProperties({
                 'id':'opt_'+obmbookmark_id,
-                'value': 'calendar_index.php?'+obmbookmark_properties
+                'value': obm.vars.consts.calendarUrl+'?'+obmbookmark_properties
                })
               .set('html',obmbookmark_label);
             sel.adopt(option);

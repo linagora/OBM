@@ -41,7 +41,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
     $block .= dis_calendar_occurency_popup();
     $calendar_function_pdf = $calendar_function."_pdf";
     if (function_exists($calendar_function_pdf)) {
-      $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$date->getURL()."&amp;output_target=print";
+      $display['print_url'] = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=pdf_export_form&amp;date=".$date->getURL()."&amp;output_target=print";
     }
   } else {
     $block .= dis_calendar_month_planning($current_view, $calendar_entity, $writable_entity);
@@ -169,25 +169,25 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
   <div id=\"calendarToolbar\">
 
     <div class=\"SB LF NM\" style=\"margin-left:10px;\">
-      <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=".$date->getURL()."\">
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=agenda&amp;date=".$date->getURL()."\">
       <img title=\"$l_view_agenda_desc\" src=\"$ico_agenda_view\" alt=\"$l_day\"/> 
       </a>
-      <a href=\"$path/calendar/calendar_index.php?cal_view=planning&amp;date=".$date->getURL()."\">
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=planning&amp;date=".$date->getURL()."\">
       <img title=\"$l_view_planning_desc\" src=\"$ico_planning_view\" alt=\"$l_month\" />
       </a>
-      <a href=\"$path/calendar/calendar_index.php?cal_view=list&amp;date=".$date->getURL()."\">
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=list&amp;date=".$date->getURL()."\">
       <img title=\"$l_view_list_desc\" src=\"$ico_list_view\" alt=\"$l_list\" />
       </a>  
     </div>
 
     <div id=\"calendarCalRange\" class=\"SB LF NM\" style=\"margin-left:10px;\">
-      <a href=\"$path/calendar/calendar_index.php?cal_range=day&amp;date=".$date->getURL()."\">
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&amp;date=".$date->getURL()."\">
       <img title=\"$l_view_day_desc\" src=\"$ico_day_view\" alt=\"$l_day\" />
       </a>
-      <a href=\"$path/calendar/calendar_index.php?cal_range=week&amp;date=".$date->getURL()."\">
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&amp;date=".$date->getURL()."\">
       <img title=\"$l_view_week_desc\" src=\"$ico_week_view\" alt=\"$l_week\" />
       </a>
-      <a href=\"$path/calendar/calendar_index.php?cal_range=month&amp;date=".$date->getURL()."\">
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=month&amp;date=".$date->getURL()."\">
       <img title=\"$l_view_month_desc\" src=\"$ico_month_view\" alt=\"$l_month\" />
       </a>
     </div>
@@ -362,7 +362,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     if ($this_group == $c_all) {
       $sel_group = "<option selected=\"selected\">$l_select_group</option>";
     } else {
-      $sel_group = "<option value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_select_group</option>";
+      $sel_group = "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_select_group</option>";
     }
 
     if(is_array($entity_readable['group']))
@@ -376,7 +376,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
         } else {
           $selected_s = '';
         }
-        $sel_group .= "<option value=\"calendar_index.php?date=$iso&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
+        $sel_group .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?date=$iso&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
       }
     }
 
@@ -384,7 +384,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       $g_public_name = get_last_group_text($this_group);
     } 
 
-    $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;filter_entity=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/calendar_index.php')."&amp;ext_target=$l_calendar&amp;iso_date=$iso";
+    $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;filter_entity=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']))."&amp;ext_target=$l_calendar&amp;iso_date=$iso";
     $group_add_button = "
       <a href=\"javascript: return false;\" 
       onclick=\"popup('$url_group', '');
@@ -466,12 +466,12 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   $cats1 = of_category_get_ordered('event', 'category1');
   $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
  
-  $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=\" >$l_today</a>";
+  $dis_go_today = "<a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?date=\" >$l_today</a>";
 
   if($block_user || $block_group || $dis_block_resource) {
     $block_entity = "
     $block_group
-    <form action=\"calendar_index.php\" method=\"get\">
+    <form action=\"".basename($_SERVER['SCRIPT_NAME'])."\" method=\"get\">
     $block_user
     $dis_block_resource
     <fieldset class=\"detail extra\">
@@ -487,9 +487,9 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
 
    if(isset($_SESSION['set_cal_default_view'])) {
      $default_view_url_params = "set_cal_view_id=".$_SESSION['set_cal_default_view'];
-      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a> -";
+      $dis_back_myview = "<a id=\"my_view\" href=\"".basename($_SERVER['SCRIPT_NAME'])."?$default_view_url_params\">$l_back_mono</a> -";
     } else {
-      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a> -";
+      $dis_back_myview = "<a id=\"my_view\" href=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a> -";
     }    
   } 
   $block = "
@@ -545,9 +545,9 @@ function html_calendar_bar_date_selector($current_view) {
     $label = $current->localize(Of_Date::OBM_DATE_WEEK_JUMP).' - '.$end->localize(Of_Date::OBM_DATE_WEEK_JUMP);
     $iso = $current->getURL();
     if ($current->compareWeek($date) == 0) {
-      $sel_week .= "<option value=\"calendar_index.php?cal_range=week&amp;date=$iso\" selected=\"selected\">$label</option>";
+      $sel_week .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&amp;date=$iso\" selected=\"selected\">$label</option>";
     } else {
-      $sel_week .= "<option value=\"calendar_index.php?cal_range=week&amp;date=$iso\">$label</option>";
+      $sel_week .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&amp;date=$iso\">$label</option>";
     }
     $current->addWeek(1);
     $end->addWeek(1);
@@ -560,9 +560,9 @@ function html_calendar_bar_date_selector($current_view) {
     $label = $current->localize(Of_Date::OBM_DATE_MONTH);
     $iso = $current->getURL();
     if ($current->compareMonth($date) == 0) {
-      $sel_month .= "<option value=\"calendar_index.php?cal_range=month&amp;date=$iso\" selected=\"selected\">$label</option>\n";
+      $sel_month .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=month&amp;date=$iso\" selected=\"selected\">$label</option>\n";
     } else {
-      $sel_month .= "<option value=\"calendar_index.php?cal_range=month&amp;date=$iso\">$label</option>\n";
+      $sel_month .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=month&amp;date=$iso\">$label</option>\n";
     }
     $current->addMonth(1);
   }
@@ -595,7 +595,7 @@ function html_calendar_bar_date_selector($current_view) {
     } else {
       $klass = '';
     }
-    $dis_minical .= "<td id='minical_$id' class=\"$klass\" onclick=\"window.location.href='calendar_index.php?cal_range=day&amp;date=$iso'\"
+    $dis_minical .= "<td id='minical_$id' class=\"$klass\" onclick=\"window.location.href='".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&amp;date=$iso'\"
       onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\">
       $day
       </td>";
@@ -607,11 +607,11 @@ function html_calendar_bar_date_selector($current_view) {
   $block = "
   <div class=\"portlet\" id=\"calendarMiniCal\">
     <h1>
-    <a href=\"$path/calendar/calendar_index.php?date=".$current->setDateIso($date)->subYear(1)->getURL()."\">&lt;&lt;</a>
-    <a href=\"$path/calendar/calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getURL()."\">&lt;</a>
+    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subYear(1)->getURL()."\">&lt;&lt;</a>
+    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subMonth(1)->getURL()."\">&lt;</a>
     $label
-    <a href=\"$path/calendar/calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getURL()."\">&gt;</a>
-    <a href=\"$path/calendar/calendar_index.php?date=".$current->setDateIso($date)->addYear(1)->getURL()."\">&gt;&gt;</a>
+    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addMonth(1)->getURL()."\">&gt;</a>
+    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addYear(1)->getURL()."\">&gt;&gt;</a>
     </h1>
     <div>
       <table class=\"miniCalendar\">
@@ -691,7 +691,7 @@ function html_calendar_view_selector($current_view, $my_views) {
     
     $obmbookmarkproperty = "set_cal_view_id=$id";
     $sel_view .= "
-    <option id=\"opt_$id\" value=\"calendar_index.php?new_sel=0&amp;$obmbookmarkproperty\"$style_default$selected>$label</option>";
+    <option id=\"opt_$id\" value=\"".basename($_SERVER['SCRIPT_NAME'])."?new_sel=0&amp;$obmbookmarkproperty\"$style_default$selected>$label</option>";
   }
 
   // Javascript Strings
@@ -708,10 +708,10 @@ function html_calendar_view_selector($current_view, $my_views) {
   <div class=\"portlet\" id=\"calendarSelView\">
     <h1>$l_views</h1>
     <div style=\"margin: 2px;\">
-    <form action=\"calendar_index.php\" method=\"get\">
+    <form action=\"".basename($_SERVER['SCRIPT_NAME'])."\" method=\"get\">
       <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\"
         onchange=\"change_view(this.options[this.selectedIndex].value);\">
-        <option id=\"opt_choix\" value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\" >
+        <option id=\"opt_choix\" value=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\" >
           $l_select_view
         </option>
         $sel_view
@@ -829,17 +829,17 @@ function dis_calendar_navbar($current_view) {
 
   switch($range) {
     case 'day':
-      $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subDay(1)->getURL();
-      $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addDay(1)->getURL();
-      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subWeek(1)->getURL();
-      $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addWeek(1)->getURL();
+      $url_prev = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subDay(1)->getURL();
+      $url_next = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addDay(1)->getURL();
+      $url_far_prev = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subWeek(1)->getURL();
+      $url_far_next = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addWeek(1)->getURL();
       $label = $date->localize(Of_Date::OBM_DATE_DAY);
       break;
     case 'week':
-      $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subWeek(1)->getURL();
-      $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addWeek(1)->getURL();
-      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getURL();
-      $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getURL();
+      $url_prev = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subWeek(1)->getURL();
+      $url_next = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addWeek(1)->getURL();
+      $url_far_prev = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subMonth(1)->getURL();
+      $url_far_next = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addMonth(1)->getURL();
       $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
       $end = clone $date;
       $end->addDay(7);
@@ -859,10 +859,10 @@ function dis_calendar_navbar($current_view) {
       $label = "$label_begin - $label_end";
       break;
     case 'month':
-      $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getURL();
-      $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getURL();
-      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subYear(1)->getURL();
-      $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addYear(1)->getURL();
+      $url_prev = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subMonth(1)->getURL();
+      $url_next = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addMonth(1)->getURL();
+      $url_far_prev = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subYear(1)->getURL();
+      $url_far_next = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addYear(1)->getURL();
       $label = $date->localize(Of_Date::OBM_DATE_MONTH);
       break;
     default:
@@ -955,7 +955,7 @@ function dis_calendar_html_search_form($calendar) {
   $block = "<div id='searchHolder'>
 
     <div id='basicSearch' style='display:$basic;'>
-      <form id='eventSearchForm' action='calendar_index.php' onsubmit='return checkSearchForm();'>
+      <form id='eventSearchForm' action='".basename($_SERVER['SCRIPT_NAME'])."' onsubmit='return checkSearchForm();'>
         <input type='text' id='tf_pattern' name='tf_pattern' value=\"$pattern\" />
         <input type='submit' value='$GLOBALS[l_search]' />
         <input type='hidden' name='searchType' value='basic' />
@@ -970,7 +970,7 @@ function dis_calendar_html_search_form($calendar) {
         <span class='title'>$GLOBALS[l_advanced_search]</span>
       </div>
       <div class='content'>
-      <form id='advancedEventSearchForm' action='calendar_index.php'>
+      <form id='advancedEventSearchForm' action='".basename($_SERVER['SCRIPT_NAME'])."'>
         <table>
         <tr>
           <td>$GLOBALS[l_title]</td>
@@ -1056,7 +1056,7 @@ function dis_calendar_select_template_form($action, $calendar) {
   }
   return "<div style=\"padding-left:1em;padding-right:1em;\">
     <div id=\"templateSelect\" style=\"float:right;\">
-      <form id=\"templateSelectForm\" action=\"calendar_index.php\">
+      <form id=\"templateSelectForm\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
         $GLOBALS[l_create_from_template]
         <select name=\"template_id\">
           <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
@@ -1117,7 +1117,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       $today = "background:#FFFFCC;";
     }
 
-    $week_day_list .= "<td class='dayLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a></td>";
+    $week_day_list .= "<td class='dayLabel'><a href=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&amp;date=$iso\">".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a></td>";
 
     $week_day_event_list .= "
     <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer' style='height:$height%;width:$width%;left:$week_day_left%;$today'>
@@ -1166,7 +1166,8 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
     html_calendar_tag_legend($tags);
   }
-
+  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
+  $GLOBALS['js']['vars']['consts']['calendarDetailconsultURL'] = $path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']).'?action=detailconsult&calendar_id='; 
   $block .= "
   <div id='calendarHeader'>
     <table class='calendarTable'>
@@ -1211,7 +1212,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     obm.vars.consts.calendarView = 'day';
     obm.initialize.chain(function () {
       obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
-      obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
+      obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().", ".((Perm::get_module_rights('calendar') & $GLOBALS['cright_write']) == $GLOBALS['cright_write']?'true':'false').", '".basename($_SERVER['SCRIPT_NAME'])."');
       $dis_event
       obm.calendarManager.redrawGrid();
       obm.calendarManager.redrawAllDayGrid();
@@ -1290,7 +1291,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $week_day_left = $step*$width;
       $week_day_event_list .= "
         <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
-          <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
+          <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&amp;date=$iso\">$day</a></div>
           <div id='allday_$date_iso' class='alldayCell'>
             <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title <img id=\"close_$date_iso\" src=\"$ico_close\"/> </h1>' style='text-align:center;position:absolute;display:none;width:100%;'></div>
           </div>
@@ -1314,6 +1315,8 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     $week_day_list .= "<td class='dayLabel'>".$current->localize(Of_Date::WEEKDAY)."</td>";
     $current->addDay(1);
   }
+  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
+  $GLOBALS['js']['vars']['consts']['calendarDetailconsultURL'] = $path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']).'?action=detailconsult&calendar_id='; 
 
   $block = "
   <div id='calendarHeader'>
@@ -1339,7 +1342,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     $dis_weekbegin_time
     obm.initialize.chain(function () {
       obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
-      obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
+      obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().", ".((Perm::get_module_rights('calendar') & $GLOBALS['cright_write']) == $GLOBALS['cright_write']?'true':'false').", '".basename($_SERVER['SCRIPT_NAME'])."');
       $dis_event
       obm.calendarManager.redrawAllDayGrid();
       obm.calendarManager.forceRedraw = true;
@@ -1478,7 +1481,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
       if ($current->isToday()) $klass="highlight";
       $dis_events .= "
         <tr class=\"$klass\">
-          <td><a href=\"calendar_index.php?cal_range=day&amp;date=".$current->getURL()."\">$label</a></td>
+          <td><a href=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&amp;date=".$current->getURL()."\">$label</a></td>
           <td>";
 
       foreach($occurrence as $k => $v) {
@@ -1670,7 +1673,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
                 <th>$l_items</th><td>$item_list</td>
               </tr>
             </table>
-            <a href=\"calendar_index.php?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>
+            <a href=\"".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>
           ";
         }
         if($event->all_day) {
@@ -1923,22 +1926,22 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
     $description = $current->localize(Of_Date::WEEKDAY_NAME);
     $empty = !$of->periodHaveOccurrences($current);
     $line0 .= "<th>$label</th>\n";
-    $line1 .= "<th><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></th>\n";
+    $line1 .= "<th><a href=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&amp;date=$iso\">$day</a></th>\n";
     if($current->compareWeekday($ccalendar_weekstart) == 0) {
       $week = $current->getWeek();  
-      $line2 .= "<th colspan=\"7\">$l_week <a href=\"calendar_index.php?cal_range=week&amp;date=$iso\">$week</a></th>";
+      $line2 .= "<th colspan=\"7\">$l_week <a href=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&amp;date=$iso\">$week</a></th>";
     }elseif($current->compareDay(1) == 0) {
       $week = $current->getWeek();  
       $span = $current->diffWeekday($ccalendar_weekstart);
-      if ($span >= 3) $line2 .= "<th colspan=\"$span\">$l_week <a href=\"calendar_index.php?cal_range=week&amp;date=$iso\">$week</a></th>";
-      else $line2 .= "<th colspan=\"$span\"><a href=\"calendar_index.php?cal_range=week&amp;date=$iso\">$week</a></th>";
+      if ($span >= 3) $line2 .= "<th colspan=\"$span\">$l_week <a href=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&amp;date=$iso\">$week</a></th>";
+      else $line2 .= "<th colspan=\"$span\"><a href=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&amp;date=$iso\">$week</a></th>";
     }
     foreach ($calendar_entity as $type => $entity) {
       foreach ($entity as $id => $properties) {
         $haveevent = false;
         $line_id = $type.' '.$id;
         if($empty) {
-          $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&date=$iso'\">&nbsp;</td>";
+          $line[$line_id] .= "<td onclick=\"window.location.href='".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&date=$iso'\">&nbsp;</td>";
         } else {
           $today_events = array();
           $day_content = '';
@@ -1985,11 +1988,11 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
                ".implode($today_events)."
                </ul>
               </div>";            
-            $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&date=$iso'\" class=\"eventOwner\"
+            $line[$line_id] .= "<td onclick=\"window.location.href='".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&date=$iso'\" class=\"eventOwner\"
                onmouseover=\"toggleInfo(this,'$id-$day',1); return true;\"
                onmouseout=\"toggleInfo(this,'$id-$day',0); return true;\">$day_content</td>";
           } else {
-            $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&date=$iso'\"></td>";
+            $line[$line_id] .= "<td onclick=\"window.location.href='".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&date=$iso'\"></td>";
           }
         }
       }
@@ -2183,7 +2186,7 @@ function dis_calendar_planning_day_view($date, $end, $calendar_entity, $category
         } else {
           list($entity_type,$entity_id) = each($ress);
           $entity_id = $entity_id[0];          
-          $goto = "calendar_index.php?action=new&amp;tf_date_begin=".$current_time->getURL()."&amp;new_sel=1&duration=3600&amp;new_group=1&amp;group_view=_ALL_&amp;sel_".$entity_type."_id[]=$entity_id";
+          $goto = "".basename($_SERVER['SCRIPT_NAME'])."?action=new&amp;tf_date_begin=".$current_time->getURL()."&amp;new_sel=1&duration=3600&amp;new_group=1&amp;group_view=_ALL_&amp;sel_".$entity_type."_id[]=$entity_id";
           $ressource_occ .= "<td onclick=\"window.location='$goto'\" onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
              onmouseout=\"this.className ='';\" style=\"width:$td_width%;\">&nbsp;</td>";        
         }
@@ -2243,7 +2246,7 @@ function dis_calendar_planning_view($date, $end, $calendar_entity, $category_fil
     $label = $current->localize(Of_Date::WEEKDAY_NAME);
     $iso = $current->getURL();
     $line0 .= "<th>$label</th>\n";
-    $line1 .= "<th><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></th>\n";
+    $line1 .= "<th><a href=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&amp;date=$iso\">$day</a></th>\n";
     $current->addDay(1);
   }
 
@@ -2332,7 +2335,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
 
   $event_data = "
     <li style='$style'>
-    <a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$schedule - $title</a>
+    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$schedule - $title</a>
     </li>";
 
   return $event_data;  
@@ -2390,7 +2393,7 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
     <li style='$style' class='RC'>
     $schedule
     <div>
-      <a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$title</a>
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$title</a>
     </div>
     </li>";
 
@@ -2662,7 +2665,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
   if ($is_exception) {
     $parent_event_id = $event_q->f('event_eventexception_parent_id');
-    $parent_event_url = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=$parent_event_id";
+    $parent_event_url = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$parent_event_id";
     $show_parent_link = "<a href=\"$parent_event_url\" title=\"$GLOBALS[l_parent_event]\">$GLOBALS[l_show_parent_event]</a>";
     $repeat_block = "
     <div class=\"detail infos\">
@@ -2715,7 +2718,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       $exception_child_id = $exception_q->f('eventexception_child_id');
       if ($exception_child_id) {
         $exception_date = new Of_Date($exception_q->f('eventexception_event_date'), 'GMT');
-        $exception_url = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=$exception_child_id";
+        $exception_url = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$exception_child_id";
         $exception_link = "<a href=\"$exception_url\">".$exception_date->getOutputDateTime()."</a>";
         $exception_desc = sprintf($GLOBALS['l_eventexception_moved_to'],$exception_link);
       } else {
@@ -2764,8 +2767,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $DECLINED = '';
         if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id)) {
           $$state = "checked=\"checked\"";
-          $urld = "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
-          $urla = "$path/calendar/calendar_index.php?action=update_alert&calendar_id=$id&user_id=$u_id";
+          $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
+          $urla = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_alert&calendar_id=$id&user_id=$u_id";
           $sel_alert = '';
           foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
             if($alerts[$u_id] == $alert_sec) {
@@ -2809,7 +2812,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         ${'NEEDS-ACTION'} = '';
         $DECLINED = '';
           $$state = "checked=\"checked\"";
-          $urld = "$path/calendar/calendar_index.php?action=update_ext_decision&calendar_id=$id&entity_kind=contact&entity_id=$c_id";
+          $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_ext_decision&calendar_id=$id&entity_kind=contact&entity_id=$c_id";
 
           $dis_contact_list .= "
           <tr>
@@ -2891,7 +2894,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $state = $entity['state'];
         if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
           $$state = "checked=\"checked\"";
-          $url= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
+          $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
           $dis_resource_list .= "
           <tr>
           <td>$label $property[$r_id]</td>
@@ -2952,7 +2955,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $event_entity_id = $event_q->f('event_entity_id');
     foreach ($docs['entity'] as $d_id => $entity) {
       if (!$entity['private'] || in_array($obm['uid'], $entities['user']['ids'])) {
-        $content = "<a href=\"$path/calendar/calendar_index.php?action=download_document&document_id=$d_id&event_id=$id\">$entity[title]</a>";
+        $content = "<a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=download_document&document_id=$d_id&event_id=$id\">$entity[title]</a>";
         if ($event_q->f('event_owner') == $obm['uid'] || $entity['user'] == $obm['uid']) {
           $content = "
             <a onclick=\"detachDocument('$d_id', '$event_entity_id', this);\" id='doc$d_id'>
@@ -2966,7 +2969,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     
   if ($display_documents_form) {
     $dis_document_form = "
-      <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\" action=\"calendar_index.php\">
+      <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
       <fieldset class=\"detail\">
       <legend>Ajouter des documents</legend>
       <table>
@@ -4192,7 +4195,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $block = "
   <form method=\"post\" enctype=\"multipart/form-data\" id=\"new_event_form\" name=\"f_entity\"
    onsubmit=\"if (check_calendar_calendar(this)) return true; else return false;\"
-   action=\"calendar_index.php\">
+   action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
   <fieldset class=\"detail infos\">  
   <legend>$l_module_calendar</legend>
   <table>
@@ -4403,8 +4406,8 @@ function html_calendar_waiting_events($obm_wait) {
     $block .= "
     <tr>
      <td>
-       <a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$obm_wait->f('event_id')."\">".$obm_wait->f('event_title')."</a>
-       <a href=\"$path/calendar/calendar_index.php?action=waiting_events&show_calendar=1&date=$begin\"><img src=\"$GLOBALS[ico_calendar]\" /></a>
+       <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$obm_wait->f('event_id')."\">".$obm_wait->f('event_title')."</a>
+       <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=waiting_events&show_calendar=1&date=$begin\"><img src=\"$GLOBALS[ico_calendar]\" /></a>
      </td>
      <td>$periodic</td> 
      <td>".$obm_wait->f('event_location')."</td>
@@ -4414,7 +4417,7 @@ function html_calendar_waiting_events($obm_wait) {
      <td>".$begin->getOutputDateTime()."</td>
      <td>".$end->getOutputDateTime()."</td>
      <td>
-      <form method=\"get\" action=\"calendar_index.php\">
+      <form method=\"get\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
        <input type=\"hidden\" name=\"calendar_id\" value=\"".$obm_wait->f('event_id')."\" />
        <input type=\"hidden\" name=\"entity_kind\" value=\"$current_entity_entity\" />
@@ -4457,9 +4460,9 @@ function html_calendar_dis_delete($current_view, $event_id) {
   $block = "
    <h1>$l_confirm_delete_all</h1>
    <div class=\"C\">
-    <a href=\"calendar_index.php?action=delete&calendar_id=$event_id\"><img src=\"$ico_validate\" alt=\"[Validate]\"/></a>
+    <a href=\"".basename($_SERVER['SCRIPT_NAME'])."?action=delete&calendar_id=$event_id\"><img src=\"$ico_validate\" alt=\"[Validate]\"/></a>
      $l_confirm
-    <a href=\"calendar_index.php?action=detailconsult&calendar_id=$event_id&date=$iso\"><img src=\"$ico_cancel\" alt=\"[Cancel]\" /></a>
+    <a href=\"".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$event_id&date=$iso\"><img src=\"$ico_cancel\" alt=\"[Cancel]\" /></a>
      $l_cancel
    </div>
   </div>";
@@ -4766,7 +4769,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
   $block = "
   <form method=\"post\" name=\"f_entity\"
    onsubmit=\"if (calendar_check_meeting(this)) return true; else return false;\"
-   action=\"calendar_index.php\">
+   action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
   <fieldset class=\"detail infos\">  
   <legend>$l_header_meeting</legend>
   <table>
@@ -5000,7 +5003,7 @@ function dis_calendar_free_interval($current_view) {
       </div>
 
       <div class='buttons'>
-        <form id='freeBusyFormId' method='POST' action='$GLOBALS[path]/calendar/calendar_index.php'>
+        <form id='freeBusyFormId' method='POST' action='$GLOBALS[path]/calendar/".basename($_SERVER['SCRIPT_NAME'])."'>
           <input class='close readable' id='submitMeeting' type='submit' value='$GLOBALS[l_validate]' />
           <input class='close closeSticky' style='display:none;' id='formClose' type='button' value='$GLOBALS[l_close]' />
           <input type='hidden' name='date_begin'id='date_begin' value='".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."' />
@@ -5326,7 +5329,7 @@ function dis_calendar_templates_list($templates_q) {
   
   $block = "
     <div class=\"detail\">
-      <form style=\"display: inline\" method=\"post\" enctype=\"multipart/form-data\" action=\"$path/calendar/calendar_index.php?action=import_template\">
+      <form style=\"display: inline\" method=\"post\" enctype=\"multipart/form-data\" action=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=import_template\">
         <label for=\"template_file\">$l_import_template :</label>
         <input type=\"file\" name=\"template_file\" size=\"12\" />
         <input type=\"submit\" value=\"Ok\" />
@@ -5339,7 +5342,7 @@ function dis_calendar_templates_list($templates_q) {
   
   $block.= "
     <div class=\"detail admin\">
-    <p><a href=\"$path/calendar/calendar_index.php?action=export_all_templates\">$l_export_templates</a></p>
+    <p><a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=export_all_templates\">$l_export_templates</a></p>
     <table>
       <thead>
         <tr><td>$l_name</td><td>$GLOBALS[l_edit]</td><td>$GLOBALS[l_export]</td><td>$GLOBALS[l_delete]</td><td>$GLOBALS[l_duplicate_template]</td></tr>
@@ -5352,24 +5355,24 @@ function dis_calendar_templates_list($templates_q) {
     $block.= "<tr>
         <td><span class=\"editable\" rel=\"$id\">$name</span></td>
         <td>
-          <a href=\"$path/calendar/calendar_index.php?action=edit_template&template_id=$id\">
+          <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=edit_template&template_id=$id\">
             <img title='$GLOBALS[l_edit]' src=\"$ico_edit\" />
           </a>
         </td>
         <td>
-          <a href=\"$path/calendar/calendar_index.php?action=export_template&template_id=$id\">
+          <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=export_template&template_id=$id\">
             <img title='$GLOBALS[l_export]' src=\"$ico_backup\" />
           </a>
         </td>
         <td>
-          <form id=\"deleteButtonForm$id\" method=\"post\" action=\"$path/calendar/calendar_index.php?action=delete_template&template_id=$id\">
+          <form id=\"deleteButtonForm$id\" method=\"post\" action=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=delete_template&template_id=$id\">
             <div>
               <input type=\"image\" src=\"$ico_delete\" style='border:none;' onclick=\"return confirm('$GLOBALS[l_delete_template]');\" />
             </div>
           </form>
         </td>
         <td>
-          <form id=\"duplicateButtonForm$id\" method=\"post\" action=\"$path/calendar/calendar_index.php?action=duplicate_template&template_id=$id\">
+          <form id=\"duplicateButtonForm$id\" method=\"post\" action=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=duplicate_template&template_id=$id\">
             <div>
               <input type=\"image\" src=\"$ico_add\" style='border:none;' onclick=\"displayTemplateDuplicate(this.form, '$l_copy_of $name'); return false;\" />
             </div>
@@ -5402,7 +5405,7 @@ function dis_calendar_templates_list($templates_q) {
     <script type=\"text/javascript\">
       // WTF ??????
       // obm.initialize.chain(function () {
-      //   new obm.InPlaceEditor('$path/calendar/calendar_index.php?action=set_template_name');
+      //   new obm.InPlaceEditor('$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=set_template_name');
       // });
     </script>";
   
@@ -5493,7 +5496,6 @@ function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null
   } else {
     $calendar_user['user'] = array ($obm['uid'] => 'dummy');
   }
-  
   $reader = new Vcalendar_Reader_OBM($calendar_user,NULL,$start,$end);
   $document = $reader->getDocument();
   $writer = new Vcalendar_Writer_ICS();  
@@ -5517,8 +5519,8 @@ function dis_calendar_reset() {
     
     <div class=\"buttons\">
       <h1>$l_confirm_reset</h1>
-      <a href='$path/calendar/calendar_index.php'>$l_cancel</a>
-      <a href='$path/calendar/calendar_index.php?action=reset&amp;force=1' onclick=\"return confirm('$l_js_confirm_reset');\">$l_confirm</a>
+      <a href='$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."'>$l_cancel</a>
+      <a href='$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=reset&amp;force=1' onclick=\"return confirm('$l_js_confirm_reset');\">$l_confirm</a>
     </div>
     <p class=\"LC\"></p>" ;
 
@@ -5590,7 +5592,7 @@ function dis_icalendar_export($params) {
 
   $block = "
     <form id=\"f_entity\" method=\"post\" name=\"f_entity\" enctype=\"multipart/form-data\"
-      action=\"calendar_index.php\">
+      action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
     <fieldset class=\"detail\">
       <legend></legend>
       <table>
@@ -5624,7 +5626,7 @@ function dis_icalendar_import($params) {
 
   $block = "
     <form method=\"post\" name=\"f_entity\" enctype=\"multipart/form-data\"
-      action=\"calendar_index.php\">
+      action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
     <fieldset class=\"detail extra\">
       <legend></legend>
       <table class=\"detail\">

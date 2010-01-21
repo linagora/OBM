@@ -931,7 +931,6 @@ function display_page(&$display) {
     </div>
     <script type=\"text/javascript\">
       obm.portlets = new Obm.Portlets();
-      obm.popup = new Obm.Popup();
       obm.tip = new Obm.Tip($$('.obmTip'));
     </script>  
     <!-- center zone end -->  
@@ -1062,8 +1061,6 @@ function display_head($p_module, $standard=true) {
   obm.vars.consts.resourcePath = '$resources_path';
   obm.vars.consts.timeZone = '".Of_Date::getOption('timezone')."';
   obm.vars.consts.obmUrl = '$path';
-  obm.vars.consts.calendarUrl = '$path/calendar/calendar_index.php';
-  obm.vars.consts.calendarDetailconsultURL = '$path/calendar/calendar_index.php?action=detailconsult&calendar_id=';
   obm.vars.consts.firstHour = $GLOBALS[ccalendar_first_hour];
   obm.vars.consts.lastHour = $GLOBALS[ccalendar_last_hour];
   obm.vars.labels.monthsShort = $monthShort;
@@ -1094,6 +1091,7 @@ function display_head($p_module, $standard=true) {
 
   <script type=\"text/javascript\">
   //<![CDATA[
+  obm.popup = new Obm.Popup();
   window.onresize= function() {
     while(obm.resize.\$chain && obm.resize.\$chain.length > 0) {
       obm.resize.callChain();

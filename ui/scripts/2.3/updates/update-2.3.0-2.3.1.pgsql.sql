@@ -17,8 +17,7 @@ CREATE TABLE opush_ping_heartbeat (
 ALTER TABLE opush_ping_heartbeat ADD CONSTRAINT
 unique_opush_ping_heartbeat_col_dev UNIQUE (device_id);
 
-UPDATE ObmInfo SET obminfo_value = '2.3.1' WHERE obminfo_name = 'db_version';
-
 DELETE FROM ObmInfo WHERE obminfo_name = 'solr_contact_lastupdate';
 DELETE FROM ObmInfo WHERE obminfo_name = 'solr_lastcontact';
 
+UPDATE ObmInfo SET obminfo_value = '2.3.1' WHERE obminfo_name = 'db_version';
