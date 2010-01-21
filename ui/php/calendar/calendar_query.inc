@@ -1089,7 +1089,8 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
-  $occurrences = calendar_events_model($begin,$end,$cal_entities);
+	$status = array('ACCEPTED', 'NEEDS-ACTION');
+  $occurrences = calendar_events_model($begin,$end,$cal_entities, $status);
   $of = &OccurrenceFactory::getInstance(); 
   if(!$calendar['all_day']) {
     $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $calendar['date_end']);
@@ -1134,7 +1135,8 @@ function quick_check_calendar_conflict($calendar, $entities) {
   $sel_entity_id['resource'] = $entities['resource']['ids'];
 
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
-  $occurrences = calendar_events_model($begin,$end,$cal_entities);
+	$status = array('ACCEPTED', 'NEEDS-ACTION');
+  $occurrences = calendar_events_model($begin,$end,$cal_entities,$status);
   $of = &OccurrenceFactory::getInstance(); 
   if(!$calendar['all_day']) {
     $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $calendar['date_end']);
@@ -5018,7 +5020,7 @@ function get_json_entity_events($calendar, $entity_store) {
     $end->addDay(7);  
 
     $canRead = 0;
-    $status = array('ACCEPTED');
+    $status = array('ACCEPTED', 'NEEDS-ACTION');
     $of = &OccurrenceFactory::getInstance();
     calendar_events_model($date,$end,$entity_store, $status);
     $json_attendees = array();

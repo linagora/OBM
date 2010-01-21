@@ -73,16 +73,24 @@
 }
 
 #calendarNavBar {
-  padding-left: 1em;
-  font-weight: bold;
+  padding-left: 10px;
   padding-top:4px;
-  font-size: 110%;
+}
+
+#calendarNavBar .label {
+  vertical-align:middle;
+  font-weight:bold;
+  font-size:110%;
 }
 
 #calendarNavBar input {
   font-weight: normal;
   font-size: 100%;
   padding: 0;
+}
+
+#calendarNavBar a {
+  font-size: 90%;
 }
 
 .dayColLabel {
@@ -1181,4 +1189,79 @@ h1.hoursTitle{
 .tabSelected {
   background: #4692a9;
   color: #FFF;
+}
+
+/* mini calendar */
+.miniCalendar2 {
+  background-color: #fff;
+  text-align: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right:	auto;
+  border-collapse: collapse;	
+  border-spacing: 0;  
+  color: #636466;
+  color:#4692a9;
+  -moz-user-select:none;
+  -webkit-user-select:none;
+  table-layout:fixed;
+}
+
+.miniCalendar2 thead{
+  background-color:#d2d2d2;
+  color: #666; 
+  font-weight: bold;
+}
+
+.miniCalendar2 .labels{
+  background-color:#d2d2d2;
+  border-bottom: 1px solid #aaa;
+  color: #666;      
+}
+
+.miniCalendar2 tbody {
+  cursor:pointer;
+}
+
+.miniCalendar2 tbody td.hover {
+  background-color: #4692a9!important;
+  color:white!important;
+}
+
+.miniCalendar2 tbody td.weekend {
+  background:#EEE;
+}
+
+.miniCalendar2 tbody td.down {
+  color:#888;
+}
+
+.miniCalendar2 tbody td.today {
+  color:#FFF;
+  background:#97C5D3!important;
+  font-weight:bold;
+}
+
+.miniCalendar2 tbody td.selected {
+  background-color:#4692a9;
+  color:white;
+}
+
+.miniCal {
+  width: 15em;
+  margin: 0;
+  margin-bottom: 2px;
+  border: 1px solid #b3b3b3;
+  overflow: hidden;
+}
+
+.miniCal h1 {
+  font-weight: bold;
+  color: #646567;
+  background-color: #d2d2d2;
+  font-size:100%;
+  text-align: center;
+  margin:0;
+  padding: 2px 4px 0 4px;
+  border-top: 1px solid #fff;
 }

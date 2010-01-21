@@ -39,18 +39,17 @@
 // - rights_admin    -- access rights screen
 // - rights_update   -- Update calendar access rights
 ///////////////////////////////////////////////////////////////////////////////
-
 $path = '..';
 $module = 'calendar';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
-include("$obminclude/global.inc");
+require("$obminclude/global.inc");
 //FIXME
 $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
-include("$obminclude/global_pref.inc");
+require("$obminclude/global_pref.inc");
 require('calendar_query.inc');
-require_once("$obminclude/of/of_contact.php");
+require("$obminclude/of/of_contact.php");
 
 $params = get_calendar_params();
 // Get user preferences if set for hour display range 
@@ -102,9 +101,9 @@ $extra_js_include[] = 'calendar.js';
 $extra_js_include[] = 'colorchooser.js';
 
 require('calendar_display.inc');
-require_once('calendar_js.inc');
+require('calendar_js.inc');
 require("$obminclude/of/of_right.inc");
-require_once("$obminclude/of/of_category.inc");
+require("$obminclude/of/of_category.inc");
 require('calendar_mailer.php');
 require('event_observer.php');
 require('../contact/addressbook.php');
@@ -965,10 +964,14 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   echo dis_calendar_portlet($params);
   exit();
-}
 
-// displayed after, because $params['date'] can be updated by actions
-$display['search'] = dis_calendar_view_bar($current_view, $action, $params);
+///////////////////////////////////////////////////////////////////////////////
+} elseif ($action == 'draw') {
+  echo dis_calendar_draw($current_view, $params['ndays']);
+  // Store current_view in session
+  $_SESSION['cal_current_view'] = serialize($current_view);
+  exit();
+}
 
 $_SESSION['cal_current_view'] = serialize($current_view);
 
@@ -976,6 +979,7 @@ if (!$params['ajax']) {
   $display['head'] = display_head($l_calendar);
   $display['header'] = display_menu($module);
   $display['end'] = display_end();
+  $display['search'] = dis_calendar_view_bar($current_view, $action, $params);
 
 } elseif ($action == 'insert_view') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -1751,7 +1755,12 @@ function get_calendar_action() {
     'Condition'=> array ('None') 
   );
 
-
+  // Refresh 
+  $actions['calendar']['draw'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=draw",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
 }
 
 

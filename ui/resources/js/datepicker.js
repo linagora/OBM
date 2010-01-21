@@ -381,3 +381,138 @@ function datePickerGenerator() {
   });
 }
 
+function miniCal(year, month, view) {
+  var thisDay = new Date();
+
+  if ((month >= 0) && (year > 0)) {
+    thisDay = new Date(year, month, 1);
+  } else {
+    month = thisDay.getMonth();
+    year = thisDay.getFullYear();
+    thisDay.setDate(1);
+  }
+  obm.miniCalendar.currentMonth = month;
+
+  var previousMonth = getDateMonthAndYear(thisDay, -1);
+  var nextMonth = getDateMonthAndYear(thisDay, +1);
+
+  var header = new Element('tr')
+    .adopt(new Element('td').adopt(new Element('a').setProperty('href','javascript: void(0);')
+       .addEvent('click',miniCal.pass([previousMonth.year,previousMonth.month, view]))
+       .appendText("«")))
+    .adopt(new Element('td').setProperty('colspan', '5')
+       .adopt(new Element('a').setProperty('href', 'javascript: obm.calendarManager.showMonth('+thisDay.getMonth()+');')
+       .appendText(obm.vars.labels.months[thisDay.getMonth()] + ' ' + thisDay.getFullYear())))
+    .adopt(new Element('td').adopt(new Element('a').setProperty('href','javascript: void(0);')
+       .addEvent('click',miniCal.pass([nextMonth.year,nextMonth.month, view]))
+       .appendText('»')));
+
+  var labels = new Element('tr').addClass('labels');
+  for(i = 0; i < obm.vars.labels.dayShort.length; i++) {
+    new Element('td').appendText(obm.vars.labels.dayShort[(i + obm.vars.consts.weekStart) % 7]).injectInside(labels);
+  }
+  var content = new Element('tbody');
+  content.addEvent('mousewheel', function(e) {
+    if(e.event.wheelDelta < 0 || e.event.detail > 0) {
+      miniCal(nextMonth.year,nextMonth.month, view);
+    } else {
+      miniCal(previousMonth.year,previousMonth.month, view);
+    }
+    e.stop();
+  });
+  var line = new Element('tr').injectInside(content);
+
+  if (thisDay.getDay() == 0) {
+    thisDay.setDate(thisDay.getDate() - 6);
+  } else {
+    var day = thisDay.getDay();
+    var d = thisDay.getDate();
+    if ((day-obm.vars.consts.weekStart) == 0) {
+      thisDay.setDate(d - 7);
+    } else {
+      thisDay.setDate(d - (day-obm.vars.consts.weekStart));
+    }
+  }
+  var today = new Date();
+  var nlines = 0;
+  do {
+    var dayNum = thisDay.getDate();
+    var d = new Obm.DateTime(thisDay.getTime());
+    var iso = d.format('Y-m-d');
+    var td = new Element('td').setProperty('id', thisDay.getTime()).addClass('minical minical_'+iso);
+    if (thisDay.getMonth() == today.getMonth() && today.getDate() == dayNum && thisDay.getFullYear() == today.getFullYear()) {
+      td.addClass('today');
+    }
+    if (obm.vars.consts.selectedDays.indexOf(iso)>=0) td.addClass('selected');
+    if (thisDay.getMonth() != month) td.addClass('down');
+    if (thisDay.getDay() == 0 || thisDay.getDay() == 6) td.addClass('weekend');
+
+    if (view == 'agenda') {
+      // Agenda view
+      td.addEvent("mouseover",function () {
+        if (obm.calendarManager.customStart) {
+          obm.miniCalendar.clearSelection();      
+          start = Math.min(obm.calendarManager.customStart, this.id/1000);
+          end = Math.max(obm.calendarManager.customStart, this.id/1000);
+          nbdays = Math.ceil((end-start)/86400 +1);
+          current = new Obm.DateTime(start*1000);
+          for(i=0;i<nbdays;i++) {
+            obm.miniCalendar.select(current.format('Y-m-d'));
+            current.setDate(current.getDate()+1);
+          }
+        }
+        this.addClass('hover')
+      });
+      td.addEvent("mouseout",function () {this.removeClass('hover')});
+      td.addEvent('mousedown', function() {
+        obm.calendarManager.customStart=this.id/1000;
+      });
+      td.addEvent('mouseup', function() {
+        if (this.hasClass('selected')) {
+          if (obm.vars.consts.nbDisplayedDays == 1) {
+            obm.vars.consts.nbDisplayedDays = 7;
+            obm.calendarManager.customStart = false;
+            obm.calendarManager.showWeek(this.id/1000);
+          } else {
+            obm.calendarManager.showDay(this.id/1000);
+            obm.calendarManager.customStart = false;
+          }
+        } else {
+          if (obm.vars.consts.nbDisplayedDays == 1) {
+            obm.calendarManager.showDay(this.id/1000);
+            obm.calendarManager.customStart = false;
+          } else {
+            obm.vars.consts.nbDisplayedDays = 7;
+            obm.calendarManager.customStart = false;
+            obm.calendarManager.showWeek(this.id/1000);
+          }
+        }
+      });
+    } else {
+      // Planning & List view
+      td.addEvent('mouseover', function() {this.addClass('hover');});
+      td.addEvent('mouseout',function () {this.removeClass('hover')});
+      td.addEvent('click', function() {
+        var ds = new Obm.DateTime(this.id.toInt());
+        window.location.href = 'calendar_index.php?date='+ds.format('Y-m-d');
+      }); 
+    }
+
+    td.appendText(dayNum).injectInside(line);
+
+    if (thisDay.getDay() == ((obm.vars.consts.weekStart + 6) %7)) {
+      var line = new Element('tr').injectInside(content);
+      nlines++;      
+    }
+    thisDay.setDate(thisDay.getDate() + 1);
+  } while (nlines < 6)
+
+  var table = new Element('table').addClass('miniCalendar2')
+    .adopt(new Element('thead').adopt(header))
+    .adopt(labels).adopt(content);
+
+  $('obmMiniCalendar').innerHTML = '';
+  $('obmMiniCalendar').adopt(table);
+
+  return false;
+}

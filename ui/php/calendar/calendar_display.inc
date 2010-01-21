@@ -29,6 +29,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
+
   $my_views = run_query_calendar_get_my_views();
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view;
   
@@ -140,7 +141,7 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
 
   // TODO: Add "Back to Calendar" button
 
-  $date = $current_view->get_date();
+  $date = $current_view->get_date()->getURL();
   $p_kind = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
 
@@ -165,38 +166,39 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
     $select_template_form = dis_calendar_select_template_form($action, $calendar);
   }
 
+  if ($p_kind == 'agenda') {
+    $day_view = "href='javascript: void(0);' onclick='obm.calendarManager.showDay();'";
+    $week_view = "href='javascript: void(0);' onclick='obm.calendarManager.showWeek();'";
+    $month_view = "href='javascript: void(0);' onclick='obm.calendarManager.showMonth();'";
+  } else {
+    $day_view = "href=\"$path/calendar/calendar_index.php?cal_range=day&amp;date=$date\"";
+    $week_view = "href=\"$path/calendar/calendar_index.php?cal_range=week&amp;date=$date\"";
+    $month_view = "href=\"$path/calendar/calendar_index.php?cal_range=month&amp;date=$date\"";
+  }
+
   $block = "
   <div id=\"calendarToolbar\">
-
     <div class=\"SB LF NM\" style=\"margin-left:10px;\">
-      <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=".$date->getURL()."\">
+      <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=$date\">
       <img title=\"$l_view_agenda_desc\" src=\"$ico_agenda_view\" alt=\"$l_day\"/> 
       </a>
-      <a href=\"$path/calendar/calendar_index.php?cal_view=planning&amp;date=".$date->getURL()."\">
+      <a href=\"$path/calendar/calendar_index.php?cal_view=planning&amp;date=$date\">
       <img title=\"$l_view_planning_desc\" src=\"$ico_planning_view\" alt=\"$l_month\" />
       </a>
-      <a href=\"$path/calendar/calendar_index.php?cal_view=list&amp;date=".$date->getURL()."\">
+      <a href=\"$path/calendar/calendar_index.php?cal_view=list&amp;date=$date\">
       <img title=\"$l_view_list_desc\" src=\"$ico_list_view\" alt=\"$l_list\" />
       </a>  
     </div>
-
     <div id=\"calendarCalRange\" class=\"SB LF NM\" style=\"margin-left:10px;\">
-      <a href=\"$path/calendar/calendar_index.php?cal_range=day&amp;date=".$date->getURL()."\">
-      <img title=\"$l_view_day_desc\" src=\"$ico_day_view\" alt=\"$l_day\" />
-      </a>
-      <a href=\"$path/calendar/calendar_index.php?cal_range=week&amp;date=".$date->getURL()."\">
-      <img title=\"$l_view_week_desc\" src=\"$ico_week_view\" alt=\"$l_week\" />
-      </a>
-      <a href=\"$path/calendar/calendar_index.php?cal_range=month&amp;date=".$date->getURL()."\">
-      <img title=\"$l_view_month_desc\" src=\"$ico_month_view\" alt=\"$l_month\" />
-      </a>
+      <a $day_view><img id='ico_day_view' title=\"$l_view_day_desc\" src=\"$ico_day_view\" alt=\"$l_day\" /></a>
+      <a $week_view><img id='ico_week_view' title=\"$l_view_week_desc\" src=\"$ico_week_view\" alt=\"$l_week\" /></a>
+      <a $month_view><img id='ico_month_view' title=\"$l_view_month_desc\" src=\"$ico_month_view\" alt=\"$l_month\" /></a>
     </div>
     $search_form
     $select_template_form
   </div>
   <p class=\"LC\"></p>
   $navbar 
-
   <script type=\"text/javascript\">
     if(!obm.vars.conf.displayRange) {
       $('calendarCalRange').setStyle('display','none');
@@ -243,12 +245,12 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
   global $output_target;
 
   $output_target = $calendar['output_target'];
-
-  $block = html_calendar_bar_legend($p_view, $calendar_entity, $current_view);
+  $block = html_calendar_minical($current_view);
+  $block .= html_calendar_bar_legend($p_view, $calendar_entity, $current_view);
   if ($action != 'perform_meeting' && $output_target != 'print') {
     $block .= html_calendar_select_calendar_entity($p_view, $current_view, $calendar_entity, $entity_readable);
     $block .= html_calendar_view_selector($current_view, $my_views);
-    $block .= html_calendar_bar_date_selector($current_view);
+    // $block .= html_calendar_bar_date_selector($current_view);
   }
 
   return $block;
@@ -346,7 +348,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity, $current_view) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_select_calendar_entity($new_action, $current_view, $calendar_entity, $entity_readable) {
   global $path, $obm, $c_all, $ccalendar_resource;
-  global $ico_add, $popup_width, $popup_height, $l_today, $ico_add;
+  global $ico_add, $popup_width, $popup_height,$ico_add;
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
   global $l_search_users, $l_search_resources,$l_private_group_members, $l_public_group_members;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
@@ -465,8 +467,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   }
   $cats1 = of_category_get_ordered('event', 'category1');
   $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
- 
-  $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=\" >$l_today</a>";
 
   if($block_user || $block_group || $dis_block_resource) {
     $block_entity = "
@@ -485,11 +485,13 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     </fieldset>
     </form>";
 
-   if(isset($_SESSION['set_cal_default_view'])) {
-     $default_view_url_params = "set_cal_view_id=".$_SESSION['set_cal_default_view'];
-      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a> -";
+    if(isset($_SESSION['set_cal_default_view'])) {
+      $default_view_url_params = "set_cal_view_id=".$_SESSION['set_cal_default_view'];
+      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a>";
     } else {
-      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a> -";
+      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a>";
+     // FIXME
+     // $dis_back_myview = "<a href='javascript: void(0)' onclick='obm.calendarManager.backToMyView()'>$l_back_mono</a>";
     }    
   } 
   $block = "
@@ -506,7 +508,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     $block_entity
     <div class='C'>
     $dis_back_myview
-    $dis_go_today
     </div>
    </div>
   </div>
@@ -520,6 +521,38 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     </script>    
 ";
 
+  return $block;
+}
+
+
+/*
+ * Portlet Mini Calendar
+ */
+function html_calendar_minical($current_view) {
+  $date = $current_view->get_date();
+  $view = $current_view->get_cal_view();
+  $m = $date->getMonth()-1;
+  $y = $date->getYear();
+  if ($view != 'agenda') {
+    $js = "obm.miniCalendar.draw($y, $m);";
+    $date_range = $current_view->get_date_range();
+    $begin = clone $date_range['begin'];
+    $end = clone $date_range['end'];
+    while($begin->compare($end) < 0){
+      $id = $begin->getDateIso();
+      $js .= "obm.miniCalendar.select('$id');";
+      $begin->addDay(1);
+    }
+  }
+  $block = "
+  <div class='miniCal' id='obmMiniCalendar'>
+  </div>
+  <script type='text/javascript'>
+    obm.initialize.chain(function () {
+      obm.miniCalendar = new Obm.MiniCalendar(\"$view\");
+      $js
+    });
+  </script>";
   return $block;
 }
 
@@ -599,6 +632,7 @@ function html_calendar_bar_date_selector($current_view) {
       onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\">
       $day
       </td>";
+
     $current->addDay(1);
     if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "</tr>\n";
   } 
@@ -624,7 +658,6 @@ function html_calendar_bar_date_selector($current_view) {
       </table>
     </div>
   </div>
-
   <div class=\"portlet\" id=\"calendarGoTo\">
   <h1>$l_go_to</h1>
   <form action=\"\" class=\"detail\" onsubmit=\"return false;\">
@@ -638,8 +671,7 @@ function html_calendar_bar_date_selector($current_view) {
     </select>
     <input type=\"image\" src=\"$ico_ok\" value=\"$l_go\" onclick=\"window.location=(this.form.actionMonth.options[this.form.actionMonth.selectedIndex].value);return false;\" />
   </form>
-  </div>
-";
+  </div>";
 
   return $block;
 }
@@ -765,7 +797,7 @@ function dis_calendar_day_agenda($current_view, $calendar_entity, $writable_enti
 
   $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, 1);
 
-  return $block;
+  return "<div id='calendarLayout'>$block</div>";
 }
 
 
@@ -778,7 +810,6 @@ function dis_calendar_day_agenda($current_view, $calendar_entity, $writable_enti
  */
 function dis_calendar_week_agenda($current_view, $calendar_entity, $writable_entity) {
 
-
   $display_days = $_SESSION['set_cal_display_days'];
   if (empty($display_days)) $display_days = '1111111';
 
@@ -790,7 +821,7 @@ function dis_calendar_week_agenda($current_view, $calendar_entity, $writable_ent
 
   $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, 7);
 
-  return $block;
+  return "<div id='calendarLayout'>$block</div>";
 }
 
 
@@ -809,8 +840,8 @@ function dis_calendar_month_agenda($current_view, $calendar_entity, $writable_en
   $end = clone $current_view->get_date();
   $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
 
-  $block .= dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, 30);
-  return $block;
+  $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, 30);
+  return "<div id='calendarLayout'>$block</div>";
 }
 
 
@@ -824,25 +855,71 @@ function dis_calendar_month_agenda($current_view, $calendar_entity, $writable_en
 function dis_calendar_navbar($current_view) {
  
   $range = $current_view->get_cal_range();
+  $label = dis_calendar_navbar_label($current_view);
+
+  if ($current_view->get_cal_view() == 'agenda') {
+    $block = "<div id='calendarNavBar'>
+    <a href='javascript: void(0);' onclick='obm.calendarManager.showPrev();'>
+      <img src=\"$GLOBALS[ico_previous]\" alt=\"[$GLOBALS[l_previous]]\" /></a>
+    <a href='javascript: void(0);' onclick='obm.calendarManager.showNext();'>
+      <img src=\"$GLOBALS[ico_next]\" alt=\"[$GLOBALS[l_next]]\" /></a>
+    <a href='javascript: void(0);' 
+      onclick='obm.calendarManager.showToday()'>$GLOBALS[l_today]</a>     
+    <span id='navBarLabel' class='label'>$label</span>
+    </div>";
+  } else {
+    $current = clone $current_view->get_date();
+    $date = clone $current_view->get_date();
+    switch($range) {
+      case 'day':
+        $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subDay(1)->getURL();
+        $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addDay(1)->getURL();
+        $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subWeek(1)->getURL();
+        $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addWeek(1)->getURL();
+        break;
+      case 'week':
+        $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subWeek(1)->getURL();
+        $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addWeek(1)->getURL();
+        $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getURL();
+        $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getURL();
+        break;
+      case 'month':
+        $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getURL();
+        $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getURL();
+        $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subYear(1)->getURL();
+        $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addYear(1)->getURL();
+        break;
+    }
+    $block = "<div id='calendarNavBar'>
+      <a href='$url_prev'><img src=\"$GLOBALS[ico_previous]\" alt=\"[$GLOBALS[l_previous]]\" /></a>     
+      <a href='$url_next'><img src=\"$GLOBALS[ico_next]\" alt=\"[$GLOBALS[l_next]]\" /></a>
+      <a href='calendar_index.php?date='>$GLOBALS[l_today]</a>     
+      <span id='navBarLabel' class='label'>$label</span>
+    </div>";
+  }
+
+  return $block;
+}
+
+
+/**
+ *
+ * display navigation bar label
+ */
+function dis_calendar_navbar_label($current_view,$ndays=7) {
+  $range = $current_view->get_cal_range();
   $current = clone $current_view->get_date();
   $date = clone $current_view->get_date();
+  if ($ndays == 1) $range = 'day';
 
   switch($range) {
     case 'day':
-      $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subDay(1)->getURL();
-      $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addDay(1)->getURL();
-      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subWeek(1)->getURL();
-      $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addWeek(1)->getURL();
       $label = $date->localize(Of_Date::OBM_DATE_DAY);
       break;
     case 'week':
-      $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subWeek(1)->getURL();
-      $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addWeek(1)->getURL();
-      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getURL();
-      $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getURL();
       $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
       $end = clone $date;
-      $end->addDay(7);
+      $end->addDay($ndays);
       if ($date->compareMonth($end) == 0) {
         $label_begin = $date->localize(Of_Date::DAY_SHORT);
         $label_end = $end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK_JUMP);
@@ -859,25 +936,28 @@ function dis_calendar_navbar($current_view) {
       $label = "$label_begin - $label_end";
       break;
     case 'month':
-      $url_prev = "calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getURL();
-      $url_next = "calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getURL();
-      $url_far_prev = "calendar_index.php?date=".$current->setDateIso($date)->subYear(1)->getURL();
-      $url_far_next = "calendar_index.php?date=".$current->setDateIso($date)->addYear(1)->getURL();
       $label = $date->localize(Of_Date::OBM_DATE_MONTH);
       break;
-    default:
+    case 'custom':
+      $end = clone $date;
+      $end->addDay($ndays);
+      if ($date->compareMonth($end) == 0) {
+        $label_begin = $date->localize(Of_Date::DAY_SHORT);
+        $label_end = $end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK_JUMP);
+      } else {
+        $label_begin = $date->localize(Of_Date::OBM_DATE_WEEK_JUMP);
+        $label_end = $end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK_JUMP);
+      }
+      if ($date->compareYear($end) == 0) {
+        $label_end .= " ".$date->localize(Of_Date::YEAR);
+      } else {
+        $label_begin .= " ".$date->localize(Of_Date::YEAR);
+        $label_end .= " ".$end->localize(Of_Date::YEAR);
+      }
+      $label = "$label_begin - $label_end";
       break;
   }
-
-  $block = "<div id='calendarNavBar'>
-    <a href='$url_far_prev'><img src=\"$GLOBALS[ico_far_previous]\" alt=\"[$GLOBALS[l_previous]]\" /></a>     
-    <a href='$url_prev'><img src=\"$GLOBALS[ico_previous]\" alt=\"[$GLOBALS[l_previous]]\" /></a>     
-    <a href='$url_next'><img src=\"$GLOBALS[ico_next]\" alt=\"[$GLOBALS[l_next]]\" /></a>     
-    <a href='$url_far_next'><img src=\"$GLOBALS[ico_far_next]\" alt=\"[$GLOBALS[l_next]]\" /></a>     
-    $label
-  </div>";
-
-  return $block;
+  return $label;
 }
 
 
@@ -1069,6 +1149,47 @@ function dis_calendar_select_template_form($action, $calendar) {
 }
 
 
+function dis_calendar_draw($current_view, $ndays) {
+
+  $date = clone $current_view->get_date();
+  $date->setHour(0)->setMinute(0)->setSecond(0);
+
+  switch($current_view->get_cal_range()) {
+    case 'day':
+      $end = clone $date;
+      $end->addDay(1);
+      break;
+    case 'week':
+      $date->setWeekday($GLOBALS['ccalendar_weekstart']);
+      $end = clone $date;
+      $end->addDay(7);
+      break;
+    case 'month':
+      $end = clone $date;
+      $date->setDay(1)->addDay(1)->subWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+      $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+      break;
+    case 'custom':
+      $end = clone $date;
+      $end->addDay($ndays);
+      if ($ndays == '1') {
+        $current_view->set_cal_range('day');
+      } else {
+        $current_view->set_cal_range('week');
+      }
+      break;
+  }
+
+  $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
+    OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'write')
+  );
+
+  $calendar_entity = $current_view->get_entities();
+
+  return dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, $ndays, true);
+}
+
+
 /**
  * Display the HTML calendar view
  *
@@ -1078,8 +1199,7 @@ function dis_calendar_select_template_form($action, $calendar) {
  * @param Of_Date $date : date begin
  * @param int $display_days: nb days to display 
  */
-function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, $display_days) {
- 
+function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, $display_days, $ajax=false) {
   $GLOBALS['js']['vars']['images']['resize'] = $GLOBALS['ico_resize'];
   $GLOBALS['js']['vars']['images']['periodic'] = $GLOBALS['ico_periodic'];
   $GLOBALS['js']['vars']['images']['meeting'] = $GLOBALS['ico_meeting'];
@@ -1088,13 +1208,15 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $GLOBALS['js']['vars']['images']['extension_left'] = $GLOBALS['ico_extension_left'];
   $GLOBALS['js']['vars']['images']['extension_right'] = $GLOBALS['ico_extension_right'];
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
+  $GLOBALS['js']['vars']['labels']['newEvent'] = phpStringToJsString($GLOBALS['l_header_new_event']);    
 
   if ($display_days > 14) {
-    $block .= dis_calendar_html_month_agenda($current_view, $calendar_entity,$writable_entity, $date, $end);
+    $block .= dis_calendar_html_month_agenda($current_view, $calendar_entity,$writable_entity, $date, $end, $ajax);
     return $block;
   }
 
   $category_filter = $current_view->get_category_filter();
+  $range = $current_view->get_cal_range();
   $week_num = $date->get(Of_Date::WEEK);
   $start_time = $date->getTimestamp();
 
@@ -1107,7 +1229,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   // days header
   while($current->compare($end) < 0) {
     $date_iso = $current->getDateIso();
-    $iso = $current->getURL();
+    $ts = $current->getTimestamp();
     $week_day_left = $step*$width;
     $today = "";
     if ($current->isToday()) {
@@ -1116,30 +1238,30 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
         <div id='todayHourMarker' style='width:$width%;left:$week_day_left%;'></div>";
       $today = "background:#FFFFCC;";
     }
-
-    $week_day_list .= "<td class='dayLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a></td>";
-
+    $week_day_list .= "<td class='dayLabel'>
+      <a href='javascript: void(0)' onclick='obm.calendarManager.showDay($ts)'>".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a>
+    </td>";
     $week_day_event_list .= "
-    <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer' style='height:$height%;width:$width%;left:$week_day_left%;$today'>
+    <div id='dayContainer_".($ts - $start_time)."_$date_iso' class='alldayContainer' style='height:$height%;width:$width%;left:$week_day_left%;$today'>
       <div id='allday_$date_iso' class='alldayCell'></div>
     </div>";
-
     $week_day_col .= "<div id='day_$date_iso' class='dayCol' style='left:$week_day_left%;'></div>";
-    $step++;
     $current->addDay(1);
+    $step++;
   }
 
   // calendar grid
   $current = clone $date;
+  $ts = $current->getTimestamp();
   $current->setHour(0);
+  $current->setMinute(0);
   while($current->compareHour(24) < 0 && $current->compareDateIso($date) == 0) {
-    $id = $current->getTimestamp() - $date->getTimestamp();
+    $id = $current->getTimestamp() - $ts;
 
     $background = "";
     if($current->compareHour($GLOBALS['ccalendar_first_hour']) < 0 || $current->compareHour($GLOBALS['ccalendar_last_hour']) >= 0) {
       $background="background:#EEE;";
     }
-
     if($current->compareMinute(0) == 0) {
       $label = $current->get(Of_Date::TIME_SHORT);
       $week_hour .= "<div class='hourFull' style='$background;height:{$height}px;'>$label</div>";
@@ -1152,20 +1274,31 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     $current->addMinute(60/$_SESSION['set_cal_interval']);
   }
 
+  // Get events
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
-  $tags = array();
+  //$tags = array();
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
-      if($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
+      //if($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
       $dis_event .= dis_calendar_event($occurrence, 'hour', $calendar_entity, $writable_entity);
     }
   }
 
-  $tags = array_unique($tags);
-  if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
-    html_calendar_tag_legend($tags);
+  // $tags = array_unique($tags);
+  // if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
+  //   html_calendar_tag_legend($tags);
+  // }
+
+  $day = "ico_day_view";
+  $week = "ico_week_view";
+  if ($display_days == 1) {
+    $range = 'day';
+    $day = 'ico_day_view_current';
+  } else if ($display_days == 7) {
+    $week = "ico_week_view_current";
   }
+  $label = dis_calendar_navbar_label($current_view, $display_days);
 
   $block .= "
   <div id='calendarHeader'>
@@ -1177,16 +1310,15 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
         $week_day_list
       </tr>
       <tr>
-        <td style='width:3em;text-align:center;'>$week_num</td>
+        <td style='width:3em;text-align:center;'><a href='javascript: void(0)' onclick='obm.calendarManager.showWeek($ts)'>$week_num</a></td>
         <td colspan='$display_days'>
-          <div id='calendarHeaderGrid' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
+          <div id='calendarHeaderGrid' ondblclick='obm.calendarQuickForm.compute(event, \"week\");'>
               $week_day_event_list
           </div>
         </td>
       </tr>
     </table>
   </div>
-
   <div id='calendarBody'>
     <table id='calendarBodyTable' class='calendarTable'>
     <tr>
@@ -1195,7 +1327,9 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       </td><td>
         <div id='calendarGridContainer'>
           $today_marker
-          <div id='calendarGrid' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
+          <div id='calendarGrid'
+            onmousedown='obm.calendarManager.newDummyEvent(event, \"week\");' 
+            ondblclick='obm.calendarQuickForm.compute(event, \"week\");'>
             $week_day_col
             $week_time
           </div>
@@ -1203,29 +1337,48 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       </td>
     </tr>
     </table>
-  </div>
+  </div>";
 
+  $js = "
+  obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
+  obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
+  $dis_event
+  obm.calendarManager.redrawGrid();
+  obm.calendarManager.redrawAllDayGrid();
+  obm.calendarManager.forceRedraw = true;
+  obm.calendarManager.resizeGrid();
+  obm.calendarManager.scrollToFistHour();
+  $('ico_day_view').setProperty('src', '$GLOBALS[$day]');
+  $('ico_week_view').setProperty('src', '$GLOBALS[$week]');
+  $('ico_month_view').setProperty('src', '$GLOBALS[ico_month_view]');
+  ";
+
+  if ($ajax) {
+    return "$block
+      <script type=\"text/javascript\">
+        obm.vars.consts.calendarRange = '$range';
+        obm.vars.consts.cellWidth = '$width';
+        $js
+        $('navBarLabel').innerHTML = '$label';
+      </script>";
+  }
+
+  return "$block
   <script type=\"text/javascript\">
-    obm.vars.consts.cellWidth = $width;
-    obm.vars.consts.nbDisplayedDays = $display_days;
-    obm.vars.consts.calendarView = 'day';
+    obm.vars.consts.calendarRange = '$range';
+    obm.vars.consts.cellWidth = '$width';
+    obm.vars.consts.nbDisplayedDays = '$display_days';
     obm.initialize.chain(function () {
-      obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
-      obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
-      $dis_event
-      obm.calendarManager.redrawGrid();
-      obm.calendarManager.redrawAllDayGrid();
-      obm.calendarManager.forceRedraw = true;
-      obm.calendarManager.resizeGrid();
+      obm.vars.consts.oldDate = new Obm.DateTime($start_time * 1000);
+      $js
+      obm.calendarManager.setObserver();
     });
   </script>";
-
-  return $block;
 }
 
 
-
-function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writable_entity, $date, $end) {
+function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writable_entity, $date, $end,$ajax=false) {
+  $display_days = floor(($end->getTimestamp() - $date->getTimestamp())/86400);
  
   $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED', 'NEEDS-ACTION');
@@ -1241,9 +1394,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   $tags = array();
 
   // calendar grid
-  $weeks_diff = $end->diffWeek($date);
-  if ($weeks_diff<0) $weeks_diff = 53 + $weeks_diff;
-  $weeks = 100/$weeks_diff;
+  $weeks = 100/ceil((($end->getTimestamp() - $date->getTimestamp())/86400)/7);
 
   while($current->compare($end) < 0) {
     $step = 0;
@@ -1287,12 +1438,14 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $tip_title = $current->localize(Of_Date::OBM_DATE_DAY);
       $iso = $current->getURL();
       $date_iso = $current->getDateIso();
+      $ts = $current->getTimestamp();
+      $div_id = ($ts-$start_time)."_$date_iso";
       $week_day_left = $step*$width;
       $week_day_event_list .= "
-        <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
-          <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
+        <div id='dayContainer_$div_id' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
+          <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href='javascript: void(0);' onclick='obm.calendarManager.showDay($ts);'>$day</a></div>
           <div id='allday_$date_iso' class='alldayCell'>
-            <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title <img id=\"close_$date_iso\" src=\"$ico_close\"/> </h1>' style='text-align:center;position:absolute;display:none;width:100%;'></div>
+            <div id='more_$div_id' class='calTip' title='<h1>$tip_title <img id=\"close_$date_iso\" src=\"$ico_close\"/> </h1>' style='text-align:center;position:absolute;display:none;width:100%;'></div>
           </div>
         </div>";
       $step++;
@@ -1315,6 +1468,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     $current->addDay(1);
   }
 
+  $label = dis_calendar_navbar_label($current_view);
   $block = "
   <div id='calendarHeader'>
     <table class='calendarTable'>
@@ -1323,30 +1477,51 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       </tr>
       <tr>
         <td colspan='7'>
-          <div id='calendarHeaderGrid' style='height:200px' ondblclick=\"obm.calendarQuickForm.compute(event, 'week');\">
+          <div id='calendarHeaderGrid' style='height:200px' ondblclick='obm.calendarQuickForm.compute(event, \"week\");'>
             $week_day_event_list
           </div>
         </td>
       </tr>
     </table>
-  </div>
+  </div>";
 
-  <script type=\"text/javascript\">
-    obm.vars.consts.cellWidth = $width;
+  $js = "
+  obm.vars.consts.nbDisplayedDays = '$display_days';
+  obm.vars.consts.currentMonth = new Obm.DateTime(".$current_view->get_date()->getTimestamp()."*1000);
+  obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
+  obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
+  $dis_event
+  obm.calendarManager.redrawAllDayGrid();
+  obm.calendarManager.forceRedraw = true;
+  $('ico_day_view').setProperty('src', '$GLOBALS[ico_day_view]');
+  $('ico_week_view').setProperty('src', '$GLOBALS[ico_week_view]');
+  $('ico_month_view').setProperty('src', '$GLOBALS[ico_month_view_current]');";
+
+  if ($ajax) {
+    return "$block
+      <script type=\"text/javascript\">
+        obm.vars.consts.calendarRange = 'month';
+        obm.vars.consts.cellWidth = '$width';
+        obm.vars.labels.more = '".phpStringToJsString($GLOBALS['l_more'])."';
+        $dis_week_time
+        $dis_weekbegin_time
+        $js
+        $('navBarLabel').innerHTML = '$label';
+      </script>";
+  }
+
+  return "$block
+    <script type=\"text/javascript\">
+    obm.vars.consts.calendarRange = 'month';
+    obm.vars.consts.cellWidth = '$width';
     obm.vars.labels.more = '".phpStringToJsString($GLOBALS['l_more'])."';
-    obm.vars.consts.calendarView = 'month';
     $dis_week_time
     $dis_weekbegin_time
     obm.initialize.chain(function () {
-      obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
-      obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
-      $dis_event
-      obm.calendarManager.redrawAllDayGrid();
-      obm.calendarManager.forceRedraw = true;
+      $js
+      obm.calendarManager.setObserver();
     });
   </script>";
-
-  return $block;
 }
 
 

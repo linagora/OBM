@@ -124,16 +124,16 @@ def index_contact(domain, solr):
 		coords = contact_get_coords(rows[i][0])
 
 		phones = coords['phones']
-		for i in range(len(phones)):
-			contact.appendChild(solr_set_field(doc, 'phone',	phones[i]['number']))
+		for p in range(len(phones)):
+			contact.appendChild(solr_set_field(doc, 'phone',	phones[p]['number']))
 
 		emails = coords['emails']
-		for i in range(len(emails)):
-			contact.appendChild(solr_set_field(doc, 'email',	emails[i]['address']))
+		for e in range(len(emails)):
+			contact.appendChild(solr_set_field(doc, 'email',	emails[e]['address']))
 
 		ims = coords['ims']
-		for i in range(len(ims)):
-			contact.appendChild(solr_set_field(doc, 'jabber',	ims[i]['address']))
+		for l in range(len(ims)):
+			contact.appendChild(solr_set_field(doc, 'jabber',	ims[l]['address']))
 
 		addresses = coords['addresses']
 		for k in range(len(addresses)):
