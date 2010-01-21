@@ -763,7 +763,7 @@ function dis_calendar_day_agenda($current_view, $calendar_entity, $writable_enti
   $end = clone $date;
   $end->addDay(1);
 
-  $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end);
+  $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, 1);
 
   return $block;
 }
@@ -788,7 +788,7 @@ function dis_calendar_week_agenda($current_view, $calendar_entity, $writable_ent
   $end = clone $date;
   $end->addDay(substr_count($display_days, 1));
 
-  $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end);
+  $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, 7);
 
   return $block;
 }
@@ -809,7 +809,7 @@ function dis_calendar_month_agenda($current_view, $calendar_entity, $writable_en
   $end = clone $current_view->get_date();
   $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
 
-  $block .= dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end);
+  $block .= dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, 30);
   return $block;
 }
 
@@ -1078,7 +1078,7 @@ function dis_calendar_select_template_form($action, $calendar) {
  * @param Of_Date $date : date begin
  * @param int $display_days: nb days to display 
  */
-function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end) {
+function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, $display_days) {
  
   $GLOBALS['js']['vars']['images']['resize'] = $GLOBALS['ico_resize'];
   $GLOBALS['js']['vars']['images']['periodic'] = $GLOBALS['ico_periodic'];
@@ -1088,8 +1088,6 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $GLOBALS['js']['vars']['images']['extension_left'] = $GLOBALS['ico_extension_left'];
   $GLOBALS['js']['vars']['images']['extension_right'] = $GLOBALS['ico_extension_right'];
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
-
-  $display_days = ceil(($end->getTimestamp() - $date->getTimestamp())/86400);
 
   if ($display_days > 14) {
     $block .= dis_calendar_html_month_agenda($current_view, $calendar_entity,$writable_entity, $date, $end);
