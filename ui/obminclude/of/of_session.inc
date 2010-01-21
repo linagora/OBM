@@ -296,7 +296,7 @@ class Auth {
     global $obm;
 
     // Check for user supplied automatic login procedure 
-    if ( ($uid = $this->auth_preauth()) !== false ) {
+    if ( $uid = $this->auth_preauth() ) {
       $obm["uid"] = "$uid";
       $this->auth["exp"] = time() + (60 * $this->lifetime);
       $this->auth["refresh"] = time() + (60 * $this->refresh);

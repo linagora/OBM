@@ -591,47 +591,4 @@ class LDAP_Auth extends Auth {
 }
 
 
-class OBM_No_Auth extends Auth {
-
-  var $lifetime       =  86400;
-  var $magic          = 'Simsalabim';  // Challenge seed
-  var $database_class = 'DB_OBM';
-  var $database_table = 'UserObm';
-  var $nobody=true;
-
-  function of_session_dis_login_page() {
-    global $obminclude, $l_obm_title, $obm_version, $module, $path;
-    global $login_action, $obmdb_dbtype, $password_encryption;
-    global $params, $c_singleNameSpace, $c_default_domain;
-
-    $login_page = "$path/../$obminclude/login.inc";
-    include_once($login_page);
-  }
-  
-  function auth_validatelogin() {
-    global $obm, $params;
-    global $c_default_domain, $c_singleNameSpace, $l_error;
-      
-    $obm['login'] = "anonymous"; // provides access for loginform.ihtml
-
-    $obm['profile'] = 'user';
-    $obm['domain_id'] = '1';
-    $obm['delegation'] = '';
-    $obm['delegation_target'] = '';
-    return 0;
-
-  }
-
-  function auth_preauth() {
-    $obm['login'] = "anonymous"; // provides access for loginform.ihtml
-
-    $obm['profile'] = 'user';
-    $obm['domain_id'] = '1';
-    $obm['delegation'] = '';
-    $obm['delegation_target'] = '';
-    return 0;
-
-  }
-}
-
 </script>
