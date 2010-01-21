@@ -21,7 +21,7 @@ sub _loadModules {
     my @modulesEnabled = </etc/obm-satellite/mods-enabled/*>;
     for( my $i=0; $i<=$#modulesEnabled; $i++ ) {
         if( ! -l $modulesEnabled[$i] ) {
-            $self->log( 3, 'Ignoring module \''.$modules[$i].'\'. Must be symlink to ../mods-available files' );
+            $self->log( 3, 'Ignoring module \''.$modulesEnabled[$i].'\'. Must be symlink to ../mods-available files' );
             next;
         }
 
