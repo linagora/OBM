@@ -317,6 +317,10 @@ sub _getHostDomains {
         }
     }
 
+    if( $#domainList < 0 ) {
+        return undef;
+    }
+
     return \@domainList;
 }
 

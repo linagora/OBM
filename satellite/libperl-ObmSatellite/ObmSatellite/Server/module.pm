@@ -134,7 +134,7 @@ sub processHttpRequest {
                 'status' => [ RC_NOT_FOUND.' URL does not exist' ]
                 } ), rootname => 'obmSatellite' );
 
-        $self->log( 3, 'Sending response : '.RC_NOT_FOUND.' - '.$response->content() );
+        $self->log( 0, 'Sending response : '.RC_NOT_FOUND.' - '.$response->content() );
         $httpClient->send_response( $response );
     }
 
