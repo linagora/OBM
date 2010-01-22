@@ -1449,8 +1449,9 @@ function display_last_visited() {
 
   // Last calendar view
   $dis_last .= "
-    <li><a id=\"last_calendar_view\" href=\"javascript:last_visit_calendar_view();\" >
-    <img src=\"$GLOBALS[ico_calendar]\" alt=\"Calendar\" />$GLOBALS[l_module_calendar]</a></li>";
+    <li><a href=\"$GLOBALS[path]/calendar/calendar_index.php\" >
+    <img src=\"$GLOBALS[ico_calendar]\" alt=\"Calendar\" />$GLOBALS[l_module_calendar]</a></li>
+   ";
 
   $block .= "
   <div class=\"portlet\" id=\"lastVisitPortlet\"> 

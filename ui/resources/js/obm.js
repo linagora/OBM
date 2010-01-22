@@ -638,14 +638,6 @@ function change_view(url) {
   window.location=url;
 }
 
-function last_visit_calendar_view() {
-  url = obm.vars.consts.calendarUrl;
-  if (Cookie.read('calendar_view') != null) {
-    url = obm.vars.consts.obmUrl+'/calendar/'+Cookie.read('calendar_view');
-  }
-  window.location=url;
-}
-
 function refreshWaitEvent() {
   new Request.JSON({
         url: obm.vars.consts.obmUrl+'/calendar/calendar_index.php',
