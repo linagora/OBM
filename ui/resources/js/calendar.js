@@ -825,15 +825,17 @@ Obm.CalendarManager = new Class({
   },
 
 
+  /*
+   * Build legend bar and inject it after minicalendar
+   */
   setLegendBar: function(content) {
+    try{
+      $('obmLegend').destroy();
+    } catch(e) {}
     if (content != '') {
       var div = new Element('div').addClass('portlet').setProperty('id', 'obmLegend');
       div.innerHTML = content;
       div.injectAfter($('obmMiniCalendar'));
-    } else {
-      try{
-        $('obmLegend').destroy();
-      } catch(e) {}
     }
   },
 
