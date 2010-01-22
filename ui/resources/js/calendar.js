@@ -279,14 +279,27 @@ Obm.CalendarManager = new Class({
    * Create dummy event (for event creation)
    */
   newDummyEvent: function(evt, context) {
-    var data = this.getDummyEventData(evt);
-    var str = data.str;
-    var ivent = data.ivent;
+    var ivent = new Event(evt);
+    var target = ivent.target;
+    target = $(target);
+    if (target.get('tag') == 'a') {
+      return false;
+    }
+    while(target.id == '') {
+      target = $(target.parentNode);
+    }
+    var str = target.id.split('_');
+    if (str.length <= 1) {
+      return false;
+    }
+    /* Crappy ie fix*/
+    var x = ivent.event.layerX;
+    if (!x) x =ivent.event.offsetX;
     if (evt.type == 'mousedown' && str[0] == 'time') {
       // dummy event data
       var eventData = new Object();
       eventData.time = obm.calendarManager.startTime + str[1].toInt() 
-       + Math.floor(data.x/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth.toInt()))*86400;
+       + Math.floor(x/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth.toInt()))*86400;
       eventData.id = 'dummy';
       eventData.entity = 'dummy';
       eventData.entity_id = 'dummy';
@@ -308,14 +321,13 @@ Obm.CalendarManager = new Class({
       var dummy = new Obm.CalendarInDayEvent(eventData,options);
       dummy.element.id = 'dummy';
       dummy.updatePosition(1, 0, 1, dummy.event.date.format('Y-m-d'));
-      dummy.element.style.height = 0;
+      dummy.element.style.height = 0; // needed for dblclick
       dummy.resize.removeEvents('complete');
       dummy.resize.addEvent('complete', function() {
         obm.calendarManager.scroll.stop();
         obm.calendarQuickForm.setDefaultFormValues(eventData.time,0, context, dummy.event.duration);
         obm.calendarQuickForm.show();    
         obm.calendarQuickForm.form.tf_title.focus();
-        dummy.element.destroy();
       });
       dummy.resizeHandler.fireEvent('mousedown', ivent);
     }
@@ -323,30 +335,12 @@ Obm.CalendarManager = new Class({
   },
 
 
-  getDummyEventData: function(evt) {
-    var ivent = new Event(evt);
-    var target = ivent.target;
-    target = $(target);
-    if (target.get('tag') == 'a') {
-      return false;
-    }
-    while(target.id == '') {
-      target = $(target.parentNode);
-    }
-    var str = target.id.split('_');
-    if (str.length <= 1) {
-      return false;
-    }
-    /* Crappy ie fix*/
-    var x = ivent.event.layerX;
-    if (!x) x =ivent.event.offsetX;
-
-    var ret = new Object();
-    ret.x = x;
-    ret.str = str;
-    ret.ivent = ivent;
-
-    return ret;
+  /*
+   * Destroy temp dummy div
+   */
+  destroyDummy: function() {
+    if ($('dummy'))
+      $('dummy').destroy();
   },
 
 
@@ -903,6 +897,7 @@ Obm.CalendarManager = new Class({
     }    
     var events = response.eventsData;
     if (response.error == 0) {
+      obm.calendarManager.destroyDummy();
       showOkMessage(response.message);
       if (response.day == 1) {
         obm.calendarManager.newDayEvent(events[0].event,events[0].options);
@@ -1695,6 +1690,12 @@ Obm.CalendarPopupManager = new Class({
   initialize: function() {
     this.evt = null;
     this.chain = new Chain();
+
+    // Close popup and redraw event
+    $('popup_form_close').addEvent('click', function() {
+      obm.calendarManager.destroyDummy();
+    }.bind(this));
+
     // Close popup and redraw event
     $('popup_close').addEvent('click', function() {
       this.cancel();
@@ -1775,6 +1776,7 @@ Obm.CalendarPopupManager = new Class({
   },
 
   cancel: function() {
+    obm.calendarManager.destroyDummy();
     this.chain.clearChain();
     this.removeEvents();
     if (this.evtId) {

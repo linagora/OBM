@@ -3375,7 +3375,7 @@ function dis_calendar_quick_form($calendar_entity) {
   $block = "
     <div id=\"calendarQuickForm\" class=\"obmPopup\">
       <h1>
-      <a href=\"\" class=\"closeSticky\" onclick=\"return false;\">
+      <a href=\"#\" id=\"popup_form_close\" class=\"closeSticky\" onclick=\"return false;\">
       <img src=\"$ico_popup_close\" alt=\"close\" />
       </a>
       <span id=\"calendarQuickFormDate\"></span>
