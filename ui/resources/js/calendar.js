@@ -618,7 +618,7 @@ Obm.CalendarManager = new Class({
    *  Show last week events
    */
   prevWeek: function() {
-   this.current.setDate(this.current.getDate()-7);
+   this.current.setDate(this.current.getDate()-obm.vars.consts.nbDisplayedDays);
    this.refresh();
   },
 
@@ -646,7 +646,7 @@ Obm.CalendarManager = new Class({
    * Show next week events
    */
   nextWeek: function() {
-   this.current.setDate(this.current.getDate()+7);
+   this.current.setDate(this.current.getDate()+obm.vars.consts.nbDisplayedDays);
    this.refresh();
   },
 

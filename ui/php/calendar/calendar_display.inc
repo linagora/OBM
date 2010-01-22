@@ -23,6 +23,10 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   $date = $current_view->get_date();
   $p_view = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
+  if ($p_range == 'custom') {
+    $p_range = 'week';
+    $current_view->set_cal_range('week');
+  }
 
   $calendar_entity = $current_view->get_entities();
 
@@ -810,13 +814,14 @@ function dis_calendar_week_agenda($current_view, $calendar_entity, $writable_ent
   $display_days = $_SESSION['set_cal_display_days'];
   if (empty($display_days)) $display_days = '1111111';
 
+  $ndays = substr_count($display_days, 1);
   $date = clone $current_view->get_date();
   $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
 
   $end = clone $date;
-  $end->addDay(substr_count($display_days, 1));
+  $end->addDay($ndays);
 
-  $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, 7);
+  $block = dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, $ndays);
 
   return "<div id='calendarLayout'>$block</div>";
 }
@@ -1161,7 +1166,7 @@ function dis_calendar_draw($current_view, $ndays) {
     case 'week':
       $date->setWeekday($GLOBALS['ccalendar_weekstart']);
       $end = clone $date;
-      $end->addDay(7);
+      $end->addDay($ndays);
       break;
     case 'month':
       $end = clone $date;
@@ -1171,11 +1176,6 @@ function dis_calendar_draw($current_view, $ndays) {
     case 'custom':
       $end = clone $date;
       $end->addDay($ndays);
-      if ($ndays == '1') {
-        $current_view->set_cal_range('day');
-      } else {
-        $current_view->set_cal_range('week');
-      }
       break;
   }
 
