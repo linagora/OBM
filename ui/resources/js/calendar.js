@@ -713,6 +713,7 @@ Obm.CalendarManager = new Class({
    if (m) {
      this.current.setMonth(m);
    }
+   obm.vars.consts.nbDisplayedDays = 30;
    obm.vars.consts.calendarRange = 'month';
    this.refresh();
   },
