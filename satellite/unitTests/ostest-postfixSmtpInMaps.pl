@@ -31,23 +31,33 @@ if( !defined($client) ) {
     exit 1;
 }
 
+my $errorCode = 0;
+
+my $root = '/postfixsmtpinmaps/host/'.$parameters{'hostname'};
+my @maps = ( 'alias', 'mailbox', 'transport', 'domain' );
+
+for( my $i=0; $i<=$#maps; $i++ ) {
+    print "Generating ".$maps[$i]." postfix maps on '".$parameters{'os-server'}."': ";
+    my $path = $root.'/'.$maps[$i];
+    if( !$client->post( $parameters{'os-server'}, $path ) ) {
+        print '[OK]'."\n";
+    }else {
+        print '[KO]'."\n";
+        $errorCode++;
+    }
+}
+
 print "Generating all postfix maps on '".$parameters{'os-server'}."': ";
-my $path = '/postfixsmtpinmaps/host/'.$parameters{'hostname'};
+my $path = $root;
 if( !$client->post( $parameters{'os-server'}, $path ) ) {
     print '[OK]'."\n";
 }else {
     print '[KO]'."\n";
+    $errorCode++;
 }
 
 
-#package ostestPostfixSmtpInMaps;
-#
-#$VERSION = '1.0';
-#$debug = 1;
-#
-#use OBM::ObmSatellite::client;
-#@ISA = qw( OBM::ObmSatellite::client );
-#
-#use 5.006_001;
-#require Exporter;
-#use strict;
+print "All tests done succefully !\n" if !$errorCode;
+print STDERR $errorCode." fail !\n" if $errorCode;
+
+exit $errorCode;
