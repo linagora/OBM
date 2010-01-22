@@ -863,8 +863,10 @@ function dis_calendar_navbar($current_view) {
       <img src=\"$GLOBALS[ico_previous]\" alt=\"[$GLOBALS[l_previous]]\" /></a>
     <a href='javascript: void(0);' onclick='obm.calendarManager.showNext();'>
       <img src=\"$GLOBALS[ico_next]\" alt=\"[$GLOBALS[l_next]]\" /></a>
-    <a href='javascript: void(0);' 
-      onclick='obm.calendarManager.showToday()'>$GLOBALS[l_today]</a>     
+    <span class='lnk'>
+      <a href='javascript: void(0);' 
+        onclick='obm.calendarManager.showToday()'>$GLOBALS[l_today]</a>
+    </span>
     <span id='navBarLabel' class='label'>$label</span>
     </div>";
   } else {
@@ -893,7 +895,7 @@ function dis_calendar_navbar($current_view) {
     $block = "<div id='calendarNavBar'>
       <a href='$url_prev'><img src=\"$GLOBALS[ico_previous]\" alt=\"[$GLOBALS[l_previous]]\" /></a>     
       <a href='$url_next'><img src=\"$GLOBALS[ico_next]\" alt=\"[$GLOBALS[l_next]]\" /></a>
-      <a href='calendar_index.php?date='>$GLOBALS[l_today]</a>     
+      <span class='lnk'><a href='calendar_index.php?date='>$GLOBALS[l_today]</a></span>     
       <span id='navBarLabel' class='label'>$label</span>
     </div>";
   }
@@ -1208,6 +1210,8 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $GLOBALS['js']['vars']['images']['extension_left'] = $GLOBALS['ico_extension_left'];
   $GLOBALS['js']['vars']['images']['extension_right'] = $GLOBALS['ico_extension_right'];
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
+  $GLOBALS['js']['vars']['consts']['userStyle'] = $current_view->get_class($GLOBALS[obm][uid], 'user'); 
+  $GLOBALS['js']['vars']['consts']['userId'] = $GLOBALS[obm][uid]; 
   $GLOBALS['js']['vars']['labels']['newEvent'] = phpStringToJsString($GLOBALS['l_header_new_event']);    
 
   if ($display_days > 14) {

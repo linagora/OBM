@@ -5660,7 +5660,7 @@ Class CalendarView {
     return $groups['entity'];
   }
 
-  protected function get_class($id,$entity) {
+  public function get_class($id,$entity) {
     $c = $this->classes['by_entity'][$entity][$id];
     if (empty($c))
       $c = $this->generate_class();

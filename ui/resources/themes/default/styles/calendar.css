@@ -77,10 +77,16 @@
   padding-top:4px;
 }
 
-#calendarNavBar .label {
+#calendarNavBar span {
   vertical-align:middle;
+}
+
+#calendarNavBar span.label {
   font-weight:bold;
   font-size:110%;
+}
+
+#calendarNavBar span.lnk {
 }
 
 #calendarNavBar input {

@@ -247,6 +247,9 @@ Obm.CalendarManager = new Class({
    * Set custom class
    */
   setEventsClass: function(entity, id, klass) {
+    if (entity == 'user' && id.toInt() == obm.vars.consts.userId) {
+      obm.vars.consts.userStyle = klass;
+    }
     if (this.entityEvents[entity+'-'+id]) {
       this.entityEvents[entity+'-'+id].each(function(e) {
         e.set('class',klass);
@@ -306,7 +309,7 @@ Obm.CalendarManager = new Class({
       eventData.duration = 3600/obm.vars.consts.timeUnit;
       eventData.title = obm.vars.labels.newEvent;
       eventData.location = '';
-      eventData.klass = 'eventOwner';
+      eventData.klass = obm.vars.consts.userStyle;
       eventData.updatable = true;
       eventData.colors = new Object();
       eventData.colors.event = new Object();
