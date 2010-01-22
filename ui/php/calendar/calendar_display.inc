@@ -216,20 +216,16 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_tag_legend($tags) {
-  global $display, $obm;
 
-  $block = "<div class=\"portlet\">
-    <h1>$GLOBALS[l_tags]</h1>";
-
-  $tags_q = run_query_calendar_get_alltags($obm['uid']);
+  $block = "<h1>$GLOBALS[l_tags]</h1>";
+  $tags_q = run_query_calendar_get_alltags($GLOBALS[obm][uid]);
   while($tags_q->next_record()) {
     if (in_array($tags_q->f('eventtag_id'), $tags)) {
       $block .= "<div class='tagLegend' style='background:".$tags_q->f('eventtag_color')."'>".$tags_q->f('eventtag_label')."</div>";
     }
   }
 
-  $block .= "</div>";
-  $display['features'] = $block.$display['features'];
+  return $block;
 }
 
 
@@ -547,6 +543,7 @@ function html_calendar_minical($current_view) {
   $block = "
   <div class='miniCal' id='obmMiniCalendar'>
   </div>
+  <div id='obmLegend'></div>
   <script type='text/javascript'>
     obm.initialize.chain(function () {
       obm.miniCalendar = new Obm.MiniCalendar(\"$view\");
@@ -1281,18 +1278,18 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   // Get events
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
-  //$tags = array();
+  $tags = array();
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
-      //if($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
+      if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
       $dis_event .= dis_calendar_event($occurrence, 'hour', $calendar_entity, $writable_entity);
     }
   }
 
-  // $tags = array_unique($tags);
-  // if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
-  //   html_calendar_tag_legend($tags);
-  // }
+  $tag_legend = "";
+  if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
+    $tag_legend = html_calendar_tag_legend($tags);
+  }
 
   $day = "ico_day_view";
   $week = "ico_week_view";
@@ -1355,7 +1352,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $('ico_day_view').setProperty('src', '$GLOBALS[$day]');
   $('ico_week_view').setProperty('src', '$GLOBALS[$week]');
   $('ico_month_view').setProperty('src', '$GLOBALS[ico_month_view]');
-  ";
+  obm.calendarManager.setLegendBar('".phpStringToJsString($tag_legend)."');";
 
   if ($ajax) {
     return "$block
@@ -1458,9 +1455,9 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     $week_day_event_list .= "</div>";
 
   }
-  $tags = array_unique($tags);
+  $tag_legend = "";
   if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
-    html_calendar_tag_legend($tags);
+   $tag_legend =  html_calendar_tag_legend($tags);
   }
 
   // days header
@@ -1499,7 +1496,8 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   obm.calendarManager.forceRedraw = true;
   $('ico_day_view').setProperty('src', '$GLOBALS[ico_day_view]');
   $('ico_week_view').setProperty('src', '$GLOBALS[ico_week_view]');
-  $('ico_month_view').setProperty('src', '$GLOBALS[ico_month_view_current]');";
+  $('ico_month_view').setProperty('src', '$GLOBALS[ico_month_view_current]');
+  obm.calendarManager.setLegendBar('".phpStringToJsString($tag_legend)."');";
 
   if ($ajax) {
     return "$block

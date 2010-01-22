@@ -342,8 +342,9 @@ Obm.CalendarManager = new Class({
    * Destroy temp dummy div
    */
   destroyDummy: function() {
-    if ($('dummy'))
+    try {
       $('dummy').destroy();
+    } catch(e) {}
   },
 
 
@@ -821,6 +822,19 @@ Obm.CalendarManager = new Class({
         $('spinner').hide();
       }
     }).get($merge({ajax : 1, action : 'draw'}, data));          
+  },
+
+
+  setLegendBar: function(content) {
+    if (content != '') {
+      var div = new Element('div').addClass('portlet').setProperty('id', 'obmLegend');
+      div.innerHTML = content;
+      div.injectAfter($('obmMiniCalendar'));
+    } else {
+      try{
+        $('obmLegend').destroy();
+      } catch(e) {}
+    }
   },
 
 
