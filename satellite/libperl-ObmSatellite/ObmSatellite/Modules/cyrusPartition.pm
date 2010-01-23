@@ -51,7 +51,7 @@ sub _postMethod {
 
     if( $requestUri !~ /^\/cyruspartition\/([^\/]+)(.*)$/ ) {
         my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$requestUri );
-        $return->[1]->{'help'} = [ $self->getModuleName().' URI must be : /locator/<entity>' ];
+        $return->[1]->{'help'} = [ $self->getModuleName().' URI must be : /cyruspartition/<entity>' ];
         return $return;
     }
 
@@ -75,7 +75,7 @@ sub _hostEntity {
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
         my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
         $return->[1]->{'help'} = [
-            $self->getModuleName().' URI must be : /locator/<entity>/<operation>',
+            $self->getModuleName().' URI must be : /cyruspartition/'.$datas->{'entity'}.'/<operation>',
             '<operation> : [add|del]'
             ];
         return $return;
@@ -104,7 +104,10 @@ sub _addPartition {
     my $regexp = '^\/cyruspartition\/'.$datas->{'entity'}.'\/'.$datas->{'operation'}.'\/([^\/]+)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
         my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
-        $return->[1]->{'help'} = [ 'Locator URI must be : /cyruspartition/'.$datas->{'entity'}.'/<entityId>' ];
+        $return->[1]->{'help'} = [
+            $self->getModuleName().' URI must be : /cyruspartition/'.$datas->{'entity'}.'/'.$datas->{'operation'}.'/<hostName>',
+            '<hostName> : OBM host name with imap role'
+            ];
         return $return;
     }
 
@@ -130,7 +133,10 @@ sub _delPartition {
     my $regexp = '^\/cyruspartition\/'.$datas->{'entity'}.'\/'.$datas->{'operation'}.'\/([^\/]+)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
         my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
-        $return->[1]->{'help'} = [ 'Locator URI must be : /cyruspartition/'.$datas->{'entity'}.'/<entityId>' ];
+        $return->[1]->{'help'} = [
+            $self->getModuleName().' URI must be : /cyruspartition/'.$datas->{'entity'}.'/'.$datas->{'operation'}.'/<hostName>',
+            '<hostName> : OBM host name with imap role'
+            ];
         return $return;
     }
 
