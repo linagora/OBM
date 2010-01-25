@@ -5555,6 +5555,17 @@ Class CalendarView {
     }
   }
 
+  public function add_entity($entity, $id) {
+    switch($entity) {
+    case 'user' :
+      $this->add_user($id);
+      break;
+    case 'ressource' :
+      $this->add_resource($id);
+      break;
+    }
+  }
+
   public function add_user($user_id) {
     global $obm;
     if (!in_array($user_id,$this->users)) {
