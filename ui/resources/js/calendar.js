@@ -6,7 +6,7 @@ Obm.CalendarManager = new Class({
   /**
    * Constructor
    */
-  initialize: function(time) {
+  initialize: function(time, write) {
     this.redraw = new Hash();
     this.redrawAllDay = new Hash();
     this.events = new Hash();
@@ -19,25 +19,32 @@ Obm.CalendarManager = new Class({
     this.entityEvents = new Array();
     this.current = new Obm.DateTime(time*1000);
     var d  = new Obm.DateTime(obm.vars.consts.startTime);
-
-    // Reset minical
-    if (obm.miniCalendar.currentMonth == d.getMonth()) {
-      obm.miniCalendar.clearSelection();
-    } else {
-      obm.miniCalendar.draw(d.getFullYear(), d.getMonth());
-    }
-
+    this.write = write;
     this.popupManager = new Obm.CalendarPopupManager(); 
+
     if (obm.vars.consts.calendarRange != 'month') {
       this.defaultHeight = $('calendarBody').getElement('div').offsetHeight;    
+    }
+    // Reset minical
+    if(obm.miniCalendar) {
+      if (obm.miniCalendar.currentMonth == d.getMonth()) {
+        obm.miniCalendar.clearSelection();
+      } else {
+        obm.miniCalendar.draw(d.getFullYear(), d.getMonth());
+      }
+    }
+
+    if (obm.vars.consts.calendarRange != 'month') {
       for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
         d.setTime(obm.vars.consts.startTime.getTime());
         d.setDate(obm.vars.consts.startTime.getDate() + i);
         var index = d.format('Y-m-d');
         this.eventGrid[index] = new Hash();
-        obm.miniCalendar.select(index);
+        if(obm.miniCalendar) {
+          obm.miniCalendar.select(index);
+        }
       }
-    } else {
+    } else if (obm.miniCalendar) {
       obm.miniCalendar.draw(obm.vars.consts.currentMonth.getFullYear(), obm.vars.consts.currentMonth.getMonth());      
       for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
         d.setTime(obm.vars.consts.startTime.getTime());
@@ -45,7 +52,6 @@ Obm.CalendarManager = new Class({
         obm.miniCalendar.select(d.format('Y-m-d'));
       }
     }
-
     if ($('todayHourMarker')) {
       // Set hourMarker initial position
       this.now = new Date();
@@ -298,7 +304,7 @@ Obm.CalendarManager = new Class({
     /* Crappy ie fix*/
     var x = ivent.event.layerX;
     if (!x) x =ivent.event.offsetX;
-    if (evt.type == 'mousedown' && str[0] == 'time') {
+    if (evt.type == 'mousedown' && str[0] == 'time' && obm.calendarManager.write == 1) {
       // dummy event data
       var eventData = new Object();
       eventData.time = obm.calendarManager.startTime + str[1].toInt() 
@@ -1303,7 +1309,7 @@ Obm.CalendarInDayEvent = new Class({
     this.draw();
     this.setPosition();
     this.switchColor(obm.vars.conf.calendarColor);
-    if (this.event.updatable) this.makeUpdatable();
+    if (this.event.updatable && obm.calendarManager.write) this.makeUpdatable();
   },
 
   
@@ -1323,7 +1329,7 @@ Obm.CalendarInDayEvent = new Class({
     this.dragHandler = new Element('h1').injectInside(dt);     
     this.setTitleIcons();
 
-    if(this.event.updatable) {
+    if(this.event.updatable && obm.calendarManager.write) {
     this.element.setProperty('style','cursor: move;');
     this.resizeHandler = new Element('div')
       .addClass('handle')
@@ -1563,7 +1569,7 @@ Obm.CalendarAllDayEvent = new Class({
 
     this.setTitleIcons();
 
-    if(this.event.updatable) {
+    if(this.event.updatable && obm.calendarManager.write) {
       this.element.setProperty('style','cursor: move;');
     }
 
@@ -1856,6 +1862,7 @@ Obm.CalendarQuickForm = new Class({
 
     var type = str[0];
     if (type == 'time') {
+      if(!obm.calendarManager.write) return false;
       /* Crappy ie fix*/
       var x = ivent.event.layerX;
       if (!x) x =ivent.event.offsetX;
@@ -1864,9 +1871,11 @@ Obm.CalendarQuickForm = new Class({
       var d = obm.calendarManager.startTime + str[1].toInt() + Math.floor(x/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth.toInt()))*86400;
       this.setDefaultFormValues(d,0, context, 3600);
     } else if (type == 'allday') {
+      if(!obm.calendarManager.write) return false;
       var d = obm.calendarManager.startTime + Math.floor($('allday_'+str[1]).style.left.toInt()/obm.vars.consts.cellWidth.toInt())*86400;
       this.setDefaultFormValues(d,1, context, 3600);
     } else if (type == 'dayContainer' || type == 'more' ) { // Month view
+      if(!obm.calendarManager.write) return false;
       var d = obm.calendarManager.startTime + str[1].toInt();
       this.setDefaultFormValues(d,1, context, 3600);
     } else {
@@ -1895,7 +1904,7 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.formAction = 'quick_update';
     this.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
     
-    if (evt.event.updatable) {
+    if (evt.event.updatable && obm.calendarManager.write) {
       this.form.setStyle('display','block');
       this.deleteButton.setStyle('display','');
       this.editButton.setStyle('display','');
@@ -2000,7 +2009,7 @@ Obm.CalendarQuickForm = new Class({
     }
     this.eventData.entity_id = this.entityView.get('inputValue');
     this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)+'&new_user_id[]='+this.eventData.entity_id;
-    window.location.href = 'calendar_index.php?'+this.gotoURI;
+    window.location.href = obm.vars.consts.calendarUrl+'?'+this.gotoURI;
   }
 });
 
@@ -2084,7 +2093,7 @@ Obm.CalendarView = new Class({
             var option = new Element('option')
               .setProperties({
                 'id':'opt_'+obmbookmark_id,
-                'value': 'calendar_index.php?'+obmbookmark_properties
+                'value': obm.vars.consts.calendarUrl+'?'+obmbookmark_properties
                })
               .set('html',obmbookmark_label);
             sel.adopt(option);
