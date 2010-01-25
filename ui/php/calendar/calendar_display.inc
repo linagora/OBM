@@ -75,7 +75,7 @@ function dis_calendar_search_result($calendar, $current_view) {
 
   if ($calendar['searchType'] == 'basic') {
     // Set date_begin == today and date_end == today +3months
-    $begin = new Of_Date();
+    $begin = new Of_Date(0);
     $end = clone $begin;
     $end->addMonth(3);
     $block = "<h1>$GLOBALS[l_basic_search_result] \"".stripslashes($calendar['pattern'])."\"</h1>";
@@ -120,6 +120,9 @@ function dis_calendar_search_result($calendar, $current_view) {
 
     $events = run_query_calendar_solr_query($pattern);
   }
+
+  $GLOBALS[display][search] = dis_calendar_html_search_form($calendar);
+  $GLOBALS[display][search] .= dis_back_to_calendar();
 
   $block .= dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $begin, $end, $events);
 
@@ -8584,7 +8587,7 @@ function dis_calendar_waiting_portlet() {
  */
 function dis_back_to_calendar() {
   $block = "
-  <div id='calendarToolbar' class='backToCalendar'>
+  <div id='backToCalendar'>
     <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php'>$GLOBALS[l_back_to_calendar]</a>
   </div>";
   return $block;

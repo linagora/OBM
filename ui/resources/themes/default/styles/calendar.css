@@ -1272,13 +1272,13 @@ h1.hoursTitle{
   border-top: 1px solid #fff;
 }
 
-.backToCalendar {
+#backToCalendar {
   padding-top: 4px;
   padding-left: 10px;
 }
 
 #templateSelect {
-  padding-top: 4px;
+  padding-top: 10px;
   padding-right: 10px;
   float: right;
 }
