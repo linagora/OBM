@@ -25,6 +25,7 @@ $l_set_display_days = "Calendar displayed days";
 $l_set_cal_interval = "Calendar interval";
 $l_set_cal_first_hour = "Calendar start hour";
 $l_set_cal_last_hour = "Calendar end hour";
+$l_set_cal_alert = "Calendar Alerts (minutes before)";
 $l_set_csv_sep = "CSV Export separator";
 $l_set_debug = "Debugging level";
 $l_send_mail = "Accept meeting invitation emails";
