@@ -74,10 +74,10 @@ function dis_calendar_search_result($calendar, $current_view) {
   $events = null;
 
   if ($calendar['searchType'] == 'basic') {
-    // Set date_begin == today and date_end == today +3months
+    // Set date_begin == 1970-01-01 and date_end == today +12months
     $begin = new Of_Date(0);
-    $end = clone $begin;
-    $end->addMonth(3);
+    $end = new Of_Date();
+    $end->addMonth(12);
     $block = "<h1>$GLOBALS[l_basic_search_result] \"".stripslashes($calendar['pattern'])."\"</h1>";
     $events = run_query_calendar_solr_query(format_name($calendar['pattern'], 1, true));
   } else {
