@@ -321,18 +321,18 @@ Obm.CalendarManager = new Class({
       options.updatable = true;
 
       // dummy event
-      var dummy = new Obm.CalendarInDayEvent(eventData,options);
-      dummy.element.id = 'dummy';
-      dummy.updatePosition(1, 0, 1, dummy.event.date.format('Y-m-d'));
-      dummy.element.style.height = 0; // needed for dblclick
-      dummy.resize.removeEvents('complete');
-      dummy.resize.addEvent('complete', function() {
+      this.dummy = new Obm.CalendarInDayEvent(eventData,options);
+      this.dummy.element.id = 'dummy';
+      this.dummy.updatePosition(1, 0, 1, this.dummy.event.date.format('Y-m-d'));
+      this.dummy.element.style.height = 0; // needed for dblclick
+      this.dummy.resize.removeEvents('complete');
+      this.dummy.resize.addEvent('complete', function() {
         obm.calendarManager.scroll.stop();
-        obm.calendarQuickForm.setDefaultFormValues(eventData.time,0, context, dummy.event.duration);
+        obm.calendarQuickForm.setDefaultFormValues(eventData.time,0, context, obm.calendarManager.dummy.event.duration);
         obm.calendarQuickForm.show();    
         obm.calendarQuickForm.form.tf_title.focus();
       });
-      dummy.resizeHandler.fireEvent('mousedown', ivent);
+      this.dummy.resizeHandler.fireEvent('mousedown', ivent);
     }
     return false;
   },
@@ -1149,13 +1149,18 @@ Obm.CalendarManager = new Class({
 
 
   /**
-   * Add keyboard lister on drag&drop
+   * Add keyboard lister 
+   * Cancel drag&drop, resize, event creation
+   * Close popup creation/confict
    */
-  keyboardListener: function(e, eventId) {
+  keyboardListener: function(e) {
     switch(e.key) {
       case 'esc':
-        obm.calendarManager.cancel(eventId);
-        window.removeEvents('keydown');
+        obm.calendarManager.destroyDummy();
+        obm.calendarManager.dummy.resize.removeEvents('complete');
+        obm.calendarManager.scroll.stop();
+        obm.calendarManager.popupManager.cancel();
+        obm.calendarQuickForm.hide();
         break;
     }
   }
@@ -1415,9 +1420,6 @@ Obm.CalendarInDayEvent = new Class({
       // Enable scroller
       obm.calendarManager.scroll.start();
 
-      // Add listener
-      // window.addEvent('keydown', obm.calendarManager.keyboardListener.bindWithEvent(this, this.element.id));
-
       // Fix mouse position
       this.drag.mouse.pos.x = $('calendarGridContainer').offsetLeft.toInt() + $('calendarBody').offsetLeft.toInt();
 
@@ -1433,9 +1435,6 @@ Obm.CalendarInDayEvent = new Class({
       });
       obm.calendarManager.scroll.stop();
       obm.calendarManager.sendUpdateEvent(this);
-
-      // remove listener
-      // window.removeEvents('keydown');
 
     }.bind(this));
 
@@ -1969,13 +1968,12 @@ Obm.CalendarQuickForm = new Class({
   },
 
   show: function() {
-    //this.popup.setStyle('display','');
     obm.popup.show('calendarQuickForm');
   },
 
   hide: function() {
     obm.popup.hide('calendarQuickForm');
-    //this.popup.setStyle('display','none');
+    obm.popup.hide('calendarConflictPopup');
   },
 
   submit: function(action) {

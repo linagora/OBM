@@ -32,6 +32,8 @@ function run_query_calendar_detail($calendar_id) {
   $query = "SELECT
     event_id,
     event_ext_id,
+    event_userupdate,
+    event_usercreate,
     e.evententity_entity_id AS event_entity_id,
     c.userobm_login AS usercreate,
     u.userobm_login AS userupdate,
@@ -58,6 +60,8 @@ function run_query_calendar_detail($calendar_id) {
     eventtag_color,
     eventtag_label,
     event_endrepeat,
+    event_domain_id,
+    event_origin,
     event_allow_documents,
     event_date,
     $eventexception_sql_if AS event_is_exception,
@@ -290,7 +294,8 @@ function run_query_calendar_touch_event($event_id) {
   $query = "UPDATE Event
     SET event_timeupdate = NOW()
     WHERE event_id $id";
-
+  // SOLR
+  run_query_calendar_solr_store($event_id);
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_touch_event()');
   return $obm_q->query($query);
 }
@@ -701,6 +706,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
     );
     OBM_EventFactory::getInstance()->create($data);
   }
+
   return $event_id;
 }
 
@@ -867,6 +873,9 @@ function run_query_calendar_insert_event_data($calendar) {
       run_query_calendar_event_exception_insert($calendar);
     }
   }
+
+  // SOLR CREATE
+  run_query_calendar_solr_store($id);
 
   return array($id, $eid);
 }
@@ -1441,6 +1450,8 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
       $oldEvent);
   }
 
+  // SOLR UPDATE
+
 }
 
 
@@ -1591,6 +1602,9 @@ function run_query_calendar_update_event_data($calendar) {
     if (!empty($data))
       run_query_delete_one_event_exception($event_id,$data['eventexception_date'],$data['child_id']);
   }
+
+  // SOLR
+  run_query_calendar_solr_store($calendar['calendar_id']);
 }
 
 
@@ -1605,18 +1619,10 @@ function run_query_calendar_quick_event_update($calendar) {
   global $cdg_sql, $obm;
 
   $multidomain = sql_multidomain('event');
-  // $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $title = sql_parse_text($calendar['title']);
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $event_id = sql_parse_id($calendar['calendar_id'], true);
-  // if ($all_day == 'TRUE') {
-  //   $dateend = clone $datebegin;
-  //   $dateend->addSecond($event_duration - 1);
-  //   $dateend->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
-  //   $datebegin->setHour(0)->setMinute(0)->setSecond(0);
-  //   $event_duration = $dateend->diffTimestamp($datebegin);
-  // }
   $all = $calendar['all'];
   if ($all != 1) {
     $event_date = "event_date = '$datebegin',";
@@ -1640,6 +1646,9 @@ function run_query_calendar_quick_event_update($calendar) {
     $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
     OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
   }
+
+  // SOLR
+  run_query_calendar_solr_store($calendar['calendar_id']);
 }
 
 
@@ -1659,11 +1668,6 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $opacity = 'OPAQUE';
   if ($all_day == 'TRUE') {
-    // $dateend = clone $datebegin;
-    // $dateend->addSecond($event_duration - 1);
-    // $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
-    // $datebegin->setHour(0)->setMinute(0)->setSecond(0);
-    // $event_duration = $dateend->diffTimestamp($datebegin);
     $event_duration = "86400";
     $opacity = 'TRANSPARENT';
   }
@@ -1734,6 +1738,10 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     );
     OBM_EventFactory::getInstance()->create($data);
   }
+
+  // SOLR
+  run_query_calendar_solr_store($event_id);
+
   return $event_id;
 }
 
@@ -1889,6 +1897,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     }
   }
 
+  // SOLR
+  run_query_calendar_solr_store($new_id);
+
   return $new_id;
 }
 
@@ -1915,6 +1926,8 @@ function run_query_delete_event_exceptions($event_id) {
     $childs = array();
     while ($obm_q->next_record()) {
       $child_id = $obm_q->f('eventexception_child_id');
+      // SOLR
+      OBM_IndexingService::delete('event', $child_id);
       if (!empty($child_id))
         $childs[] = $child_id;
     }
@@ -1949,6 +1962,8 @@ function run_query_delete_one_event_exception($event_id, $eventexception_date, $
   if (!empty($child_id)) {
     $child_id = sql_parse_id($child_id);
     $query = "DELETE FROM Event WHERE event_id = $child_id";
+    // SOLR
+    OBM_IndexingService::delete('event', $child_id);
     display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
     $obm_q->query($query);
   }
@@ -2769,12 +2784,17 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
   // Send mail
   $event = OBM_EventFactory::getInstance()->getById($event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
+  // SOLR
+  OBM_IndexingService::delete('event', $event_id);
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
   if($force_sendmail || $calendar['send_mail']) {
     OBM_EventFactory::getInstance()->delete($event);
   }
   $obm_q->query($query);
   of_entity_delete('event', $event_id);
+
+  // Solr Delete
+  OBM_IndexingService::delete('event', $event_id);
 }
 
 
@@ -4549,6 +4569,59 @@ function guess_name_from_email($email) {
 
   return array( $first_name, $last_name );
 }
+
+
+/*
+ * Store event in solr
+ * @param event_id
+ */
+function run_query_calendar_solr_store($event_id) {
+  $db = run_query_calendar_detail($event_id);
+
+  $doc = new Apache_Solr_Document();
+  $doc->setField('id', $db->f('event_id'));
+  $timecreate = new Of_Date($db->f('event_timecreate'));
+  $doc->setField('timecreate', $timecreate->format('Y-m-d\TH:i:s\Z'));
+  $timeupdate = new Of_Date($db->f('event_timeupdate'));
+  $doc->setField('timeupdate', $timeupdate->format('Y-m-d\TH:i:s\Z'));
+  $doc->setField('usercreate', $db->f('event_usercreate'));
+  $doc->setField('userupdate', $db->f('event_userupdate'));
+  $doc->setField('domain', $db->f('event_domain_id'));
+  $doc->setField('title', $db->f('event_title'));
+  $doc->setField('location', $db->f('event_location'));
+  $doc->setMultiValue('category', $db->f('event_category1_id'));
+  $doc->setMultiValue('category', $db->f('eventcategory1_label'));
+  $edate = new Of_Date($db->f('event_date'));
+  $doc->setField('date', $edate->format('Y-m-d\TH:i:s\Z'));
+  $doc->setField('duration', $db->f('event_duration'));
+  $doc->setMultiValue('ownerId', $db->f('owner'));
+  $doc->setMultiValue('owner', $db->f('owner_lastname')." ".$db->f('owner_firstname'));
+  $doc->setField('description', $db->f('event_description'));
+  $doc->setMultiValue('tag', $db->f('event_tag_id'));
+  $doc->setMultiValue('tag', $db->f('eventtag_label'));
+  if ($db->f('event_allday')) {
+    $doc->setMultiValue('is', 'allday');
+  }
+  if ($db->f('event_repeatkind') != 'none') {
+    $doc->setMultiValue('is', 'periodic');
+  }
+  if ($db->f('event_opacity') == 'OPAQUE') {
+    $doc->setMultiValue('is', 'busy');
+  } elseif ($db->f('event_opacity') == 'TRANSPARENT') {
+    $doc->setMultiValue('is', 'free');
+  }
+  if ($db->f('event_privacy')) {
+    $doc->setMultiValue('is', 'private');
+  }
+  $doc->setField('from', $db->f('event_origin'));
+  $attendees_q = run_query_get_events_attendee(array($id));
+  while($attendees_q->next_record()) {
+    $doc->setMultiValue('with', $attendees_q->f('eventlink_label'));
+    $doc->setMultiValue('withId', $attendees_q->f('eventlink_entity_id'));
+  }
+  OBM_IndexingService::store('event', array($doc));
+}
+
 
 /**
  * Describe an Event 

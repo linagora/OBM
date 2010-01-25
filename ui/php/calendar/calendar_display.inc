@@ -1373,6 +1373,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       obm.vars.consts.oldDate = new Obm.DateTime($start_time * 1000);
       $js
       obm.calendarManager.setObserver();
+      // window.addEvent('keydown', obm.calendarManager.keyboardListener.bindWithEvent(this));
     });
   </script>";
 }
