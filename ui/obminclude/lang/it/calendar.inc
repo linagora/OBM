@@ -15,6 +15,7 @@ $l_groups = "Gruppi";
 $l_title = "Titolo";
 $l_private_description = "Evento privato. Non è possibile visualizzare i dettagli";
 $l_back_mono = "Torna alla tua impostazione";
+$l_back_to_calendar = "« Torna al calendario";
 $l_high = "Alta";
 $l_low = "Bassa";
 $l_medium = "Normale";

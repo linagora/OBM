@@ -982,7 +982,9 @@ if (!$params['ajax']) {
   $display['head'] = display_head($l_calendar);
   $display['header'] = display_menu($module);
   $display['end'] = display_end();
-  $display['search'] = dis_calendar_view_bar($current_view, $action, $params);
+  if ($display['search'] == '') {
+    $display['search'] = dis_back_to_calendar();
+  }
 
 } elseif ($action == 'insert_view') {
 ///////////////////////////////////////////////////////////////////////////////

@@ -39,6 +39,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   
   $display['features'] = html_calendar_planning_bar($calendar, $current_view, $calendar_entity, $entity_readable, $my_views, $p_view);
   $display['title'] = "<h1 class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"].' '.$GLOBALS["l_range_$p_range"].' </h1>';
+  $display['search'] = dis_calendar_view_bar($current_view, $calendar);
   if (function_exists($calendar_function)) {
     $block = $calendar_function($current_view, $calendar_entity, $writable_entity);
     $block .= dis_calendar_quick_form($calendar_entity);
@@ -133,7 +134,7 @@ function dis_calendar_search_result($calendar, $current_view) {
  * @access public
  * @return void
  */
-function dis_calendar_view_bar($current_view, $action, $calendar) {
+function dis_calendar_view_bar($current_view, $calendar) {
   global $ico_week_view, $ico_day_view, $ico_month_view, $ico_list_view;
   global $ico_week_view_current, $ico_day_view_current, $ico_month_view_current;
   global $ico_agenda_view,  $ico_planning_view, $ico_list_view_current;
@@ -142,8 +143,6 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
   global $l_view_agenda_desc,  $l_view_planning_desc, $l_view_list_desc;
   global $l_view_week_desc, $l_view_day_desc, $l_view_month_desc;
   global $path;
-
-  // TODO: Add "Back to Calendar" button
 
   $date = $current_view->get_date()->getURL();
   $p_kind = $current_view->get_cal_view();
@@ -157,18 +156,8 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
     ${'ico_'.$p_range.'_view'} = ${'ico_'.$p_range.'_view_current'};
   }
 
-  if ($action=='search' || $action == 'index' || $action == 'waiting_events' || $action == 'insert' || $action == 'update') {
-    $search_form = dis_calendar_html_search_form($calendar);
-  }
-
-  if ($action == 'index' || $action == 'waiting_events' || $action == 'insert' || 
-    $action == 'update' || $action == 'delete' || $action == 'reset') {
-    $navbar = dis_calendar_navbar($current_view);
-  }
-
-  if ($action == 'new' || $action == 'new_meeting' || $action == 'save_as_template') {
-    $select_template_form = dis_calendar_select_template_form($action, $calendar);
-  }
+  $search_form = dis_calendar_html_search_form($calendar);
+  $navbar = dis_calendar_navbar($current_view);
 
   if ($p_kind == 'agenda') {
     $day_view = "href='javascript: void(0);' onclick='obm.calendarManager.showDay();'";
@@ -199,7 +188,6 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
       <a $month_view><img id='ico_month_view' title=\"$l_view_month_desc\" src=\"$ico_month_view\" alt=\"$l_month\" /></a>
     </div>
     $search_form
-    $select_template_form
   </div>
   <p class=\"LC\"></p>
   $navbar 
@@ -1138,8 +1126,8 @@ function dis_calendar_select_template_form($action, $calendar) {
     }
     $select.= "<option value=\"$id\" $selected>$name</option>";
   }
-  return "<div style=\"padding-left:1em;padding-right:1em;\">
-    <div id=\"templateSelect\" style=\"float:right;\">
+  return "
+    <div id=\"templateSelect\">
       <form id=\"templateSelectForm\" action=\"calendar_index.php\">
         $GLOBALS[l_create_from_template]
         <select name=\"template_id\">
@@ -1149,7 +1137,7 @@ function dis_calendar_select_template_form($action, $calendar) {
         <input type=\"hidden\" name=\"action\" value=\"$action\" />
         <input type=\"submit\" value=\"$GLOBALS[l_ok]\" />
       </form>
-    </div></div>";
+    </div>";
 }
 
 
@@ -3341,6 +3329,9 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
   $cats1 = of_category_get_ordered('event', 'category1');
 
   $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view);
+
+  $GLOBALS[display][search] = dis_calendar_select_template_form($action, $calendar);
+  $GLOBALS[display][search] .= dis_back_to_calendar();
 
   return $block;
 }
@@ -8585,6 +8576,18 @@ function dis_calendar_waiting_portlet() {
    </table>";
 
   return "$block";
+}
+
+
+/*
+ * Back to calendar link
+ */
+function dis_back_to_calendar() {
+  $block = "
+  <div id='calendarToolbar' class='backToCalendar'>
+    <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php'>$GLOBALS[l_back_to_calendar]</a>
+  </div>";
+  return $block;
 }
 
 ?>

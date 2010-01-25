@@ -101,6 +101,7 @@ $l_conflicts = "Conflit(s) rencontré(s)";
 $l_date = "Date";
 $l_user = "Utilisateur";
 $l_back_mono = "Revenir à ma vue";
+$l_back_to_calendar = "« Revenir au calendrier";
 $l_edit = "Modifier";
 $l_edit_full = "Compléter";
 

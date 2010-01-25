@@ -92,6 +92,7 @@ $l_conflicts = "Conflict(e) înregistrat(e)";
 $l_date = "Dată";
 $l_user = "Utilizator";
 $l_back_mono = "Reveniți la tema personală";
+$l_back_to_calendar = "« Reveniți la calendar";
 $l_edit = "Modificați";
 $l_edit_full = "Completați";
 $l_collapse_all = "Reduceți tot";

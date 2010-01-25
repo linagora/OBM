@@ -189,6 +189,7 @@ $l_freebusy_check_availability = "Prüfen Sie die Verfügbarkeit von Teilnehmern
 $l_expand_all = "alle ausklappen";
 $l_resources_all_freebusy = "Alle Ressourcen sind frei";
 $l_back_mono = "Zurück an meiner Ansicht";
+$l_back_to_calendar = "« Zurück zum Kalender";
 $l_private_description = "Diese Veranstaltung ist persönlich. Unmöglich die Details zu sehen.";
 $l_delete_occurrence = "Löschen der Fall";
 $l_alerts = "Alarme";

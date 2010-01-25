@@ -21,6 +21,7 @@ $l_title = "Title";
 $l_location = "Location";
 $l_private_description = "This is a private event, you cannot see the details";
 $l_back_mono = "Back to your own view";
+$l_back_to_calendar = "« Back to calendar";
 $l_free_resources = "Free resources";
 $l_go = "Go";
 $l_high = "High";
