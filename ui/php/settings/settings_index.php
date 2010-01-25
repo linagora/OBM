@@ -153,7 +153,10 @@ if ($params['form_user_pref']) {
     }
     update_user_pref($obm['uid'], 'set_cal_last_hour', $_SESSION['set_cal_last_hour'], 1);
   }
-
+  if ($params['cal_alert'] != '') {
+      $_SESSION['set_cal_alert'] = $params['cal_alert'];
+      update_user_pref($obm['uid'], 'set_cal_alert', $_SESSION['set_cal_alert'], 1);
+  }
   if ($params['csv_sep'] != '') {
     $_SESSION['set_csv_sep'] = $params['csv_sep'];
     update_user_pref($obm['uid'], 'set_csv_sep', $_SESSION['set_csv_sep']);
@@ -402,6 +405,19 @@ $display['detail'] .= " /></td>
       $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
     }
   }
+
+  $selected_alert = $_SESSION['set_cal_alert'];
+  $dis_alert = "<select name=\"cal_alert\">
+        <option value=\"$c_none\">$l_none</option>";
+  foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
+    $dis_alert .= "<option value=\"$alert_sec\"";
+    if ($selected_alert == $alert_sec) {
+      $dis_alert .= " selected=\"selected\"";
+    }
+    $dis_alert .= ">$alert_label</option>";
+  }
+  $dis_alert .= '</select>';
+
   $dis_hour_e .= "</select>";    
   $display['detail'] .= "
   <tr id='settings_displayDays'>
@@ -424,11 +440,14 @@ $display['detail'] .= " /></td>
   <tr id='settings_calendarFirstHour'>
     <th>$l_set_cal_first_hour</th>
     <td>$dis_hour_b</td>
-
   </tr>
   <tr id='settings_calendarLastHour'>
     <th>$l_set_cal_last_hour</th>
     <td>$dis_hour_e</td>
+    </tr>
+  <tr id='settings_calendarAlert'>
+    <th>$l_set_cal_alert</th>
+    <td>$dis_alert</td>
   </tr>
 ";
 }

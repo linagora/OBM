@@ -5142,6 +5142,7 @@ Class CalendarView {
   protected $users;
   protected $resources;
   protected $classes;
+  protected $ndays;
 
   /**
    * CalendarView constructor
@@ -5266,6 +5267,32 @@ Class CalendarView {
   public function get_date() {
     return $this->date;
   }
+  
+  /**
+   *  return date for new event, new meeting
+   *
+   *  @access public
+   *  @return Of_Date
+   */
+  public function get_day() {
+    $day = $this->get_date();
+    $today_date = Of_Date::today();
+    $date_range = $this->get_date_range();
+
+    if ($this->cal_range == "week" && !$day->diffWeek($today_date)) {
+      $day = $today_date; 
+    } else if ($this->cal_range == "month" && !$day->diffMonth($today_date)) {
+      $day = $today_date; 
+    } else if ($this->cal_range == "custom" && $date_range['begin'] < $today_date && $today_date < $date_range['end']) {
+      $day = $today_date;
+    }
+
+    if(!$day->isToday()){
+      $day = $date_range['begin'];
+    }
+
+    return $day;
+  }
 
   /**
    * true if current view is the default one
@@ -5309,6 +5336,9 @@ Class CalendarView {
       $begin->setDay(1)->addDay(1)->subWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
       $end = clone $begin;
       $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+    } else if ($this->cal_range == "custom") {
+      $end = clone $begin;
+      $end->addDay($this->ndays);
     }
 
     return array('begin' => $begin, 'end' => $end);
@@ -5399,8 +5429,9 @@ Class CalendarView {
     $this->date = $date;
   }
 
-  public function set_cal_range($cal_range = null) {
+  public function set_cal_range($cal_range = null,$ndays = null) {
     $this->cal_range = (empty($cal_range) ? 'week' : $cal_range);
+    $this->ndays = (empty($ndays) ? 7 : $ndays);
   }
 
   public function set_cal_view($cal_view = null) {

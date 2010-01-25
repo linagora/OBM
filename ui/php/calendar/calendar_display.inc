@@ -2944,8 +2944,13 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           $urld = "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
           $urla = "$path/calendar/calendar_index.php?action=update_alert&calendar_id=$id&user_id=$u_id";
           $sel_alert = '';
+          if(is_null($alerts[$u_id])){
+            $selected_alert = $_SESSION['set_cal_alert'];
+          } else {
+            $selected_alert = $alerts[$u_id];
+          }
           foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
-            if($alerts[$u_id] == $alert_sec) {
+            if($selected_alert == $alert_sec) {
               $sel_alert .= "<option value=\"$alert_sec\" selected=\"selected\">$alert_label</option>";
             } else {
               $sel_alert .= "<option value=\"$alert_sec\">$alert_label</option>";
@@ -3679,7 +3684,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['repeatfrequency'])) { $repeatfrequency = $calendar['repeatfrequency']; }  
   if (isset($calendar['item'])) { $item = $calendar['item']; } 
   if (!is_object($event_q)) {$begin = $calendar['date_begin']; }
-  if (!isset($begin)) {$begin = new Of_Date(); $begin->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);}
+  //if (!isset($begin)) {$begin = new Of_Date(); $begin->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);}
+  if (!isset($begin)) {$begin = $current_view->get_day(); $begin->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);}
   if (!is_object($event_q)) {$end = $calendar['date_end']; }
   if (!isset($end)) {$end = clone $begin; $end->setHour($ccalendar_first_hour + 1);}
   if (isset($calendar['privacy'])) { $privacy = $calendar['privacy']; }
@@ -4351,6 +4357,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
 
   // Alerts
+  if(is_null($selected_alert)){
+    $selected_alert = $_SESSION['set_cal_alert'];
+  }
   $sel_alert = "<select name=\"sel_alert\">
         <option value=\"$c_none\">$l_none</option>";
   foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
@@ -4636,7 +4645,7 @@ function html_calendar_dis_delete($current_view, $event_id) {
    <div class=\"C\">
     <a href=\"calendar_index.php?action=delete&calendar_id=$event_id\"><img src=\"$ico_validate\" alt=\"[Validate]\"/></a>
      $l_confirm
-    <a href=\"calendar_index.php?action=detailconsult&calendar_id=$event_id&date=$iso\"><img src=\"$ico_cancel\" alt=\"[Cancel]\" /></a>
+    <a href=\"calendar_index.php?action=detailconsult&calendar_id=$event_id\"><img src=\"$ico_cancel\" alt=\"[Cancel]\" /></a>
      $l_cancel
    </div>
   </div>";
@@ -4659,7 +4668,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
   global $l_groups,$l_resources,$l_module_resourcegroup, $l_module_calendar;
   global $l_resources_one_freebusy,$l_resources_all_freebusy,$l_resource_group_search;
 
-  $date = $current_view->get_date();
+  $date = $current_view->get_day();
   $hourbegin = $calendar['time_duration'];
   $minbegin = $calendar['min_duration'];
   if (($hourbegin == '') || ($hourbegin <= 0)) {

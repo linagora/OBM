@@ -46,6 +46,10 @@ if ($obminclude == '') $obminclude = 'obminclude';
 require("$obminclude/global.inc");
 //FIXME
 $params = get_global_params('Entity');
+if((isset($params['date']) && !empty($params['date'])) ||
+    ($params['action'] == 'waiting_events' || $params['action'] == 'index')){
+  $set_date = true;
+}
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 require("$obminclude/global_pref.inc");
 require('calendar_query.inc');
@@ -84,12 +88,12 @@ if (isset($params['cal_view'])) {
   $current_view->set_cal_view($params['cal_view']);
 }
 if (isset($params['cal_range'])) {
-  $current_view->set_cal_range($params['cal_range']);
+  $current_view->set_cal_range($params['cal_range'],$params['ndays']);
 }
 if (isset($params['group_view']) && ($params['group_view']!=$current_view->get_group())) {
   $current_view->set_group($params['group_view']);
 }
-if (isset($params['date']) && !empty($params['date'])) {
+if ($set_date || !isset($_SESSION['cal_current_view'])) {
   $current_view->set_date($params['date']);
 }
 
@@ -400,7 +404,6 @@ if ($action == 'search') {
         }
 
         $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
-        $current_view->set_date($params["date_begin"]);
         $display['detail'] = dis_calendar_calendar_view($params, $current_view);
       }
     } else {
@@ -1368,7 +1371,7 @@ function get_calendar_action() {
   // Detail Consult
   $actions['calendar']['detailconsult'] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=$id&amp;date=".$date->getURL(),
+    'Url'      => "$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=$id",
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
   );
@@ -1376,7 +1379,7 @@ function get_calendar_action() {
   // Detail Update
   $actions['calendar']['detailupdate'] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id&amp;date=".$date->getURL(),
+    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult','update_alert','update_decision', 'update_ext_decision') 
   );
@@ -1384,7 +1387,7 @@ function get_calendar_action() {
   // Duplicate
   $actions['calendar']['duplicate'] = array (
     'Name'     => $l_header_duplicate,
-    'Url'      => "$path/calendar/calendar_index.php?action=duplicate&amp;calendar_id=$id&amp;date=".$date->getURL(),
+    'Url'      => "$path/calendar/calendar_index.php?action=duplicate&amp;calendar_id=$id",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
   );
@@ -1392,14 +1395,14 @@ function get_calendar_action() {
   // Check Delete
   $actions['calendar']['check_delete'] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/calendar/calendar_index.php?action=check_delete&amp;calendar_id=$id&amp;date=".$date->getURL(),
+    'Url'      => "$path/calendar/calendar_index.php?action=check_delete&amp;calendar_id=$id",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult')
   );
 
   // Delete
   $actions['calendar']['delete'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=delete&amp;calendar_id=$id&amp;date=".$date->getURL(),
+    'Url'      => "$path/calendar/calendar_index.php?action=delete&amp;calendar_id=$id",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
   );
