@@ -4576,7 +4576,37 @@ function guess_name_from_email($email) {
  * @param event_id
  */
 function run_query_calendar_solr_store($event_id) {
-  $db = run_query_calendar_detail($event_id);
+  $query = "SELECT 
+      event_id,
+      event_timeupdate,
+      event_timecreate,
+      event_usercreate,
+      event_userupdate,
+      event_domain_id,
+      event_title,
+      event_location,
+      event_date,
+      event_duration,
+      eventcategory1_id, 
+      eventcategory1_label, 
+      event_owner,
+      event_description,
+      eventtag_id,
+      eventtag_label,
+      event_allday,
+      event_repeatkind,
+      event_opacity,
+      event_privacy,
+      event_origin,
+      #CONCAT(userobm_lastname, ' ', userobm_firstname) as owner 
+    FROM Event
+    LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+    LEFT JOIN EventTag ON eventtag_id = event_tag_id
+    INNER JOIN UserObm ON userobm_id = event_owner
+    WHERE event_id='$event_id'";
+  $db = new DB_OBM;
+  $db->xquery($query);
+  $db->next_record();
 
   $doc = new Apache_Solr_Document();
   $doc->setField('id', $db->f('event_id'));
@@ -4614,7 +4644,7 @@ function run_query_calendar_solr_store($event_id) {
     $doc->setMultiValue('is', 'private');
   }
   $doc->setField('from', $db->f('event_origin'));
-  $attendees_q = run_query_get_events_attendee(array($id));
+  $attendees_q = run_query_get_events_attendee(array($event_id));
   while($attendees_q->next_record()) {
     $doc->setMultiValue('with', $attendees_q->f('eventlink_label'));
     $doc->setMultiValue('withId', $attendees_q->f('eventlink_entity_id'));
