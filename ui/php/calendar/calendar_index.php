@@ -46,8 +46,7 @@ if ($obminclude == '') $obminclude = 'obminclude';
 require("$obminclude/global.inc");
 //FIXME
 $params = get_global_params('Entity');
-if((isset($params['date']) && !empty($params['date'])) ||
-    ($params['action'] == 'waiting_events' || $params['action'] == 'index')){
+if(isset($params['date']) && !empty($params['date'])) {
   $set_date = true;
 }
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));

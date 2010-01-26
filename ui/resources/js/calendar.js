@@ -1183,7 +1183,11 @@ Obm.CalendarManager = new Class({
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,
+      onRequest: function() {
+        $('spinner').show();
+      },
       onComplete : function() {
+        $('spinner').hide();
       }  
     }).post($merge({ajax : 1, action : 'async_indexing'}, eventData));
   }
