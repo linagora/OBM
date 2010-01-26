@@ -1293,8 +1293,8 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   }
   $label = dis_calendar_navbar_label($current_view, $display_days);
 
-  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
-  $GLOBALS['js']['vars']['consts']['calendarDetailconsultURL'] = $path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']).'?action=detailconsult&calendar_id='; 
+  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
+  $GLOBALS['js']['vars']['consts']['calendarDetailconsultURL'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']).'?action=detailconsult&calendar_id='; 
 
   $block .= "
   <div id='calendarHeader'>
@@ -1464,8 +1464,8 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     $week_day_list .= "<td class='dayLabel'>".$current->localize(Of_Date::WEEKDAY)."</td>";
     $current->addDay(1);
   }
-  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
-  $GLOBALS['js']['vars']['consts']['calendarDetailconsultURL'] = $path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']).'?action=detailconsult&calendar_id='; 
+  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
+  $GLOBALS['js']['vars']['consts']['calendarDetailconsultURL'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']).'?action=detailconsult&calendar_id='; 
 
   $label = dis_calendar_navbar_label($current_view);
   $block = "
