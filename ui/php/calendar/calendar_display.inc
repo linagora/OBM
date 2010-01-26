@@ -92,25 +92,25 @@ function dis_calendar_search_result($calendar, $current_view) {
     $end->addDay(1);
 
     if (isset($calendar['title']) && $calendar['title'] != '') {
-      $pattern = "title:".format_name($calendar['title'], 1, true);
+      $pattern = "title:(".format_name($calendar['title'], 1, true).')';
     }    
     if (isset($calendar['location']) && $calendar['location'] != '') {
-      $pattern .= " location:".format_name($calendar['location'], 1, true);
+      $pattern .= " location:(".format_name($calendar['location'], 1, true).')';
     }    
     if (isset($calendar['desc']) && $calendar['desc'] != '') {
-      $pattern .= " description:".format_name($calendar['desc'], 1, true);
+      $pattern .= " description:(".format_name($calendar['desc'], 1, true).')';
     }   
     if (isset($calendar['owner']) && $calendar['owner'] != '') {
-      $pattern .= " owner:".format_name($calendar['owner'], 1, true);
+      $pattern .= " owner:(".format_name($calendar['owner'], 1, true).')';
     }   
     if (isset($calendar['attendees']) && $calendar['attendees'] != '') {
-      $pattern .= " with:".format_name($calendar['attendees'], 1, true);
+      $pattern .= " with:(".format_name($calendar['attendees'], 1, true).')';
     }   
     if (isset($calendar['tag']) && $calendar['tag'] != '') {
-      $pattern .= " tag:$calendar[tag]";
+      $pattern .= " tag:($calendar[tag])";
     }
     if (isset($calendar['category']) && $calendar['category'] != $GLOBALS['c_all']) {
-      $pattern .= " category:$calendar[category]";
+      $pattern .= " category:($calendar[category])";
     }
 
     // doesn't work with repeated events
@@ -121,7 +121,7 @@ function dis_calendar_search_result($calendar, $current_view) {
     $events = run_query_calendar_solr_query($pattern);
   }
 
-  $GLOBALS[display][search] = dis_calendar_html_search_form($calendar);
+  $GLOBALS[display][search] = dis_calendar_html_search_form($calendar, $pattern);
   $GLOBALS[display][search] .= dis_back_to_calendar();
 
   $block .= dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $begin, $end, $events);
@@ -960,10 +960,11 @@ function dis_calendar_navbar_label($current_view,$ndays=7) {
  * Event search form
  * Basic and advanced form
  */
-function dis_calendar_html_search_form($calendar) {
+function dis_calendar_html_search_form($calendar, $p="") {
   global $obm;
 
   $pattern = stripslashes($calendar['pattern']);
+  if (!empty($p)) $pattern = $p;
   $title = stripslashes($calendar['title']);
   $owner = stripslashes($calendar['owner']);
   $location = stripslashes($calendar['location']);
