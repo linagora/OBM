@@ -1646,9 +1646,6 @@ function run_query_calendar_quick_event_update($calendar) {
     $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
     OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
   }
-
-  // SOLR
-  run_query_calendar_solr_store($calendar['calendar_id']);
 }
 
 
@@ -1738,9 +1735,6 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     );
     OBM_EventFactory::getInstance()->create($data);
   }
-
-  // SOLR
-  run_query_calendar_solr_store($event_id);
 
   return $event_id;
 }

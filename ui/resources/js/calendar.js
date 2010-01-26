@@ -929,7 +929,7 @@ Obm.CalendarManager = new Class({
       } else {
         obm.calendarManager.newEvent(events[0].event,events[0].options);
       }
-
+      obm.calendarManager.eventIndexing(events[0].event.id);
     } else {
       showErrorMessage(response.message);
     }
@@ -1038,6 +1038,8 @@ Obm.CalendarManager = new Class({
       response.events.each(function(evt) {
         eval(evt);
       });
+
+      obm.calendarManager.eventIndexing(response.eventId);
 
       showOkMessage(response.message);
 
@@ -1169,6 +1171,21 @@ Obm.CalendarManager = new Class({
         obm.calendarQuickForm.hide();
         break;
     }
+  },
+
+
+  /*
+   * Store event in solr
+   */
+  eventIndexing: function(id) {
+    var eventData = new Object();
+    eventData.id = id;
+    new Request.JSON({
+      url: obm.vars.consts.calendarUrl,
+      secure : false,
+      onComplete : function() {
+      }  
+    }).post($merge({ajax : 1, action : 'async_indexing'}, eventData));
   }
 
 });

@@ -974,6 +974,11 @@ if ($action == 'search') {
   // Store current_view in session
   $_SESSION['cal_current_view'] = serialize($current_view);
   exit();
+
+} elseif ($action == 'async_indexing') {
+///////////////////////////////////////////////////////////////////////////////
+  run_query_calendar_solr_store($params['id']);
+  exit();
 }
 
 $_SESSION['cal_current_view'] = serialize($current_view);
@@ -1763,6 +1768,13 @@ function get_calendar_action() {
   // Refresh 
   $actions['calendar']['draw'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=draw",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+  // Async indexing 
+  $actions['calendar']['async_indexing'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=async_indexing",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
