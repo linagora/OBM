@@ -5239,6 +5239,7 @@ Class CalendarView {
   protected $users;
   protected $resources;
   protected $classes;
+  protected $entity_id_entity;
   protected $ndays;
 
   /**
@@ -5254,6 +5255,8 @@ Class CalendarView {
     $this->set_cal_view($data['cal_view']);
     $this->set_category($data['category']);
     $this->remove_all();
+    $this->entity_id_entity=$data['entity_id_entity'];
+    $this->load_color_entity();
     $this->set_group($data['group']);
     $this->set_users($data['users']);
     if (is_array($data['user_classes'])) {
@@ -5297,7 +5300,7 @@ Class CalendarView {
 
       if (in_array($property,array('users','resources'))) {
         $data[$property] = explode(',',$value);
-      } elseif (in_array($property,array('user_classes','resource_classes'))) {
+      } elseif (in_array($property,array('user_classes','resource_classes','entity_id_entity'))) {
         $data[$property] = unserialize($value);
       } else {
         $data[$property] = $value;
@@ -5591,17 +5594,18 @@ Class CalendarView {
   }
 
   public function add_user($user_id) {
-    global $obm;
     if (!in_array($user_id,$this->users)) {
       $this->users[] = $user_id;
-      $this->set_class('user',$user_id,($user_id==$obm['uid'] ? 'eventOwner' : $this->generate_class()));
+      $class = $this->get_entity_class('user',$user_id);
+      $this->set_class('user',$user_id,$class);
     }
   }
 
   public function add_resource($resource_id) {
     if (!in_array($resource_id,$this->resources)) {
       $this->resources[] = $resource_id;
-      $this->set_class('resource',$resource_id,$this->generate_class());
+      $class = $this->get_entity_class('resource',$resource_id);
+      $this->set_class('resource',$resource_id,$class);
     }
   }
 
@@ -5612,7 +5616,7 @@ Class CalendarView {
     if (($user_id==$obm['uid']) && (empty($class))) {
       $class='eventOwner';
     } elseif (empty($class)) {
-      $class=$this->generate_class();
+      $class=$this->get_entity_class('user',$user_id);
     }
     $this->set_class('user',$user_id,$class);
   }
@@ -5622,13 +5626,14 @@ Class CalendarView {
     if (!in_array($resource_id,$this->resources))
       return;
     if (empty($class)) {
-      $class=$this->generate_class();
+      $class = $this->get_entity_class('resource',$resource_id);
     }
     $this->set_class('resource',$resource_id,$class);
   }
 
   public function set_entity_class($entity, $entity_id, $class = null) {
     call_user_func(array($this,"set_{$entity}_class"),$entity_id, $class);
+    $this->save_color_entity($entity,$entity_id,$class);
   }
 
   public function remove_user($user_id) {
@@ -5670,7 +5675,41 @@ Class CalendarView {
   public function save() {
     return $this->insert();
   }
+  
+  public function save_color_entity($entity,$entity_id,$class) {
+    $entity_id = of_entity_get($entity,$entity_id);
+    $id_class = strtok($class,"eventOwner");
+    if($id_class == ""){
+      $id_class = "NULL";
+    }
+    $update = $this->update_color_entity($entity_id,$id_class);
+    if(!$update){
+      $this->insert_color_entity($entity_id,$id_class);
+    }
+    return $update;
+  }
 
+  public function load_color_entity(){
+    $this->color_entity = $this->select_color_entity();
+  }
+
+  protected function get_entity_class($entity,$id){
+    global $obm;
+    if(isset($this->entity_id_entity[$entity][$id])){
+      $entity_id = $this->entity_id_entity[$entity][$id];
+    } else {
+      $entity_id = of_entity_get($entity,$id);
+      $this->entity_id_entity[$entity][$id] = $entity_id;
+    }
+    if(isset($this->color_entity[$entity_id])){
+      $class ="eventOwner{$this->color_entity[$entity_id]}";
+    }
+    if(!isset($class)){
+      $class = (($entity=='user' && $id==$obm['uid']) ? 'eventOwner' : $this->generate_class());
+    }
+    return $class;
+  }
+  
   public function delete() {
     global $cdg_sql, $obm;
 
@@ -5719,6 +5758,9 @@ Class CalendarView {
       $calendar_bookmarkproperties['resources'] = implode(',', $this->resources);
       $calendar_bookmarkproperties['resource_classes'] = serialize($this->classes['by_entity']['resource']);
     }
+    if (!empty($this->entity_id_entity)) {
+      $calendar_bookmarkproperties['entity_id_entity'] = serialize($this->entity_id_entity);
+    }
 
     $user_id = sql_parse_id($obm['uid']);
     // Insert ObmBookmark
@@ -5746,6 +5788,63 @@ Class CalendarView {
       display_debug_msg($query, $cdg_sql, 'CalendarView::insert()');
       $obm_q->query($query);
     }
+  }
+
+  protected function select_color_entity(){
+    global $obm, $cdg_sql;
+
+    $obm_q = new DB_OBM;
+
+    $user_id = sql_parse_id($obm['uid']);
+
+    $query = "SELECT entity_id, eventowner
+      FROM calendarcolor
+      WHERE user_id = $user_id
+      ";
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql, 'CalendarView::select_color_entity()');
+    while($obm_q->next_record()){
+      $entity_id = $obm_q->f("entity_id");
+      $entity[$entity_id] = $obm_q->f("eventowner");
+    }
+    return $entity;
+  }
+
+  protected function insert_color_entity($entity_id,$id_class){
+    global $obm, $cdg_sql;
+
+    $obm_q = new DB_OBM;
+
+    $user_id = sql_parse_id($obm['uid']);
+    // Insert color calendar entity
+    $query = "INSERT INTO calendarcolor(
+      user_id,
+      entity_id,
+      eventowner
+    ) VALUES (
+      $user_id,
+      $entity_id,
+      $id_class
+    )";
+    display_debug_msg($query, $cdg_sql, 'CalendarView::insert_color_entity()');
+    $obm_q->query($query);
+  }
+
+  protected function update_color_entity($entity_id,$id_class){
+    global $obm, $cdg_sql;
+
+    $obm_q = new DB_OBM;
+
+    $user_id = sql_parse_id($obm['uid']);
+    // Update color calendar entity
+    $query = "UPDATE calendarcolor
+      SET eventowner = $id_class
+      WHERE user_id = $user_id
+      AND entity_id = $entity_id
+    ";
+    display_debug_msg($query, $cdg_sql, 'CalendarView::update_color_entity()');
+    $obm_q->query($query);
+    return $obm_q->affected_rows();
   }
 
   protected function get_users_data($nb_max) {
@@ -5802,7 +5901,7 @@ Class CalendarView {
   public function get_class($id,$entity) {
     $c = $this->classes['by_entity'][$entity][$id];
     if (empty($c))
-      $c = $this->generate_class();
+      $c = $this->get_entity_class();
     return $c;
   }
 

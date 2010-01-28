@@ -255,7 +255,7 @@ function html_mailshare_consult($mailshare_q) {
   $display['title'] = $name;
 
   $block = "
-  <div class=\"detail extra\">
+  <div class=\"detail extra\" style=\"overflow:hidden\">
   <h1>$l_mailshare</h1>
 
   <table>

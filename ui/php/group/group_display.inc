@@ -619,7 +619,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $display['title'] = $name;
 
   $block .= "
-  <div class=\"detail infos\">
+  <div class=\"detail infos\" style=\"overflow:hidden\">
     <h1>$l_group</h1>
 
     <table>

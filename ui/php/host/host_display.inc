@@ -490,7 +490,7 @@ function html_host_consult($host_q) {
 
 
   $block = "
-    <div class=\"detail extras\">
+    <div class=\"detail extras\" style=\"overflow:hidden\">
     <h1>$l_module_host</h1>
 
     <table>

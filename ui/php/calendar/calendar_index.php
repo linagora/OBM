@@ -1067,7 +1067,6 @@ if (!$params['ajax']) {
   json_ok_msg("$l_view : $l_insert_ok");
   echo "({".$display['json'].",$msg})";
   exit();
-
 }
 display_page($display);
 

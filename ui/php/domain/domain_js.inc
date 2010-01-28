@@ -50,8 +50,17 @@ function show_hide_add_button() {
   }
 }
 
+function show_domain_spinner() {
+  $('buttons').hide();
+  $('domain_spinner').show();
+}
+
 function confirm_del(form) {
-  return confirm('$l_domain_confirm_delete');
+  var rep = confirm('$l_domain_confirm_delete');
+  if(rep){
+    show_domain_spinner();
+  }
+  return true;
 }
 
 

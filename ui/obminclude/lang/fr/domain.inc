@@ -33,6 +33,7 @@ $l_no_found = "Aucun domaine trouvé !";
 $l_label_error = "label invalide!";
 $l_name_error = "Le nom de domaine est invalide!";
 $l_can_delete = "Le domaine peut être supprimé.";
+$l_warn_delete = "ATTENTION : Le domaine n'est pas vide.";
 $l_cant_delete = "Le domaine ne peut pas être supprimé !";
 $l_cant_add_domain_single = "Impossible de créer un nouveau domaine, OBM est configuré en mode mono domaine (singleNameSpace) ! Attention, le passage en multi-domaine nécessite une intervention système importante.";
 
@@ -57,7 +58,7 @@ $l_alias_user_used = "Impossible de modifier ou supprimer des alias utilisés da
 
 // JavaScript Messages
 $l_fill_title = "Vous devez renseigner le Label avant de valider.";
-$l_domain_confirm_delete = "ATTENTION : Vous allez supprimer un profil : Cette opération est irréversible.\\nVoulez-vous continuer ?";
+$l_domain_confirm_delete = "ATTENTION : Vous allez supprimer un domaine : Cette opération est irréversible.\\nVoulez-vous continuer ?";
 $l_mailserver = "Serveur de mail";
 
 $l_mailserver_warn = 'Vous devez créer un hôte de ce type';

@@ -439,7 +439,7 @@ function html_resource_consult($obm_q) {
   $block_delegation = of_delegation_dis_block_consult($delegation);
 
   $block = "
-  <div class=\"detail extra\">
+  <div class=\"detail extra\" style=\"overflow:hidden\">
   <h1>$l_resource</h1>
     <table>
     <tr>

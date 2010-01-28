@@ -932,9 +932,10 @@ function dis_domain_mailserver_select($role, $sel_id='', $domain_id='') {
 // Display the domain delete validation screen
 // Parameters:
 //   - $p_id : domain id
+//   - $warn_delete : entity link on domain
 ///////////////////////////////////////////////////////////////////////////////
-function dis_domain_can_delete($p_id) {
-  global $l_can_delete, $l_back, $l_delete;
+function dis_domain_can_delete($p_id,$warn_delete) {
+  global $l_can_delete, $l_back, $l_delete, $l_warn_delete;
   global $path, $display, $l_domain;
 
   $url = url_prepare('domain_index.php');
@@ -948,13 +949,19 @@ function dis_domain_can_delete($p_id) {
   $infos_q = run_query_domain_detail($p_id);
   $title = $infos_q->f('domain_label');
   $display['title'] = $title;
-  $display['msg'] .= display_ok_msg($l_can_delete);
+  if($warn_delete)
+    $display['msg'] .= display_warn_msg($l_warn_delete);
+  else
+    $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
   <form action=\"$path/domain/domain_index.php\" method=\"post\" onsubmit=\"return confirm_del(this)\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"domain_id\" value=\"$p_id\" />
-    <div class=\"buttons\">
+    <div id='domain_spinner' style='display:none;' 'class=\"C\">
+      <img src='$GLOBALS[ico_spinner]' />
+    </div>
+    <div id='buttons' class=\"buttons\">
       $dis_delete
       $dis_back
     </div>

@@ -1042,7 +1042,7 @@ function html_user_consult($obm_q) {
   $display['title'] = "$fname $lname";
 
   $block = "
-<div class=\"detail infos\">
+<div class=\"detail infos\" style=\"overflow:hidden\">
   <h1>$l_user</h1>
  
   <table>
@@ -2182,7 +2182,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     <tr class='$delegation_class' id='delegationTargetBlock'>
       <th class=\"$class[delegation_target]\">$l_delegation_target</th>
       <td>
-      <input id='delegationTargetField' name=\"tf_delegation_target\" size=\"32\" maxlength=\"64\" value=\"$delegation_target\" />
+      <input id='delegationTargetField' name=\"tf_delegation_target\" size=\"32\" maxlength=\"256\" value=\"$delegation_target\" />
       <script type='text/javascript'>
         $('delegationField').addEvent('keyup' , function () {
           $('delegationTargetField').value = $('delegationField').value;

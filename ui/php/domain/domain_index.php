@@ -143,28 +143,24 @@ if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_domain_can_delete($params['domain_id'])) {
     $display['msg'] .= display_info_msg($ok_msg, false);
-    $display['detail'] = dis_domain_can_delete($params['domain_id']);
+    $warn_delete = false;
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
-    $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $display['detail'] = dis_domain_consult($params);
+    $warn_delete = true;
+    //$display['msg'] .= display_warn_msg($l_cant_delete, false);
+    //$display['detail'] = dis_domain_consult($params);
   }
+  $display['detail'] = dis_domain_can_delete($params['domain_id'],$warn_delete);
 
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_domain_can_delete($params['domain_id'])) {
-    $retour = run_query_domain_delete($params['domain_id']);
-    if ($retour) {
-      $display['msg'] .= display_ok_msg($l_delete_ok);
-    } else {
-      $display['msg'] .= display_err_msg($l_delete_error);
-    }
-    $display['search'] = html_domain_search_form($params);
+  $retour = run_query_domain_delete($params['domain_id']);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg($l_delete_ok);
   } else {
-    $display['msg'] .= display_warn_msg($err['msg'], false);
-    $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $display['detail'] = dis_domain_consult($params);
+    $display['msg'] .= display_err_msg($l_delete_error);
   }
+  $display['search'] = html_domain_search_form($params);
 }
 
 
