@@ -151,8 +151,9 @@ class LemonLDAP_Auth extends Auth {
     //
 
     $header = $this->_engine->getHeaderName('userobm_login');
-    $login = $this->_engine->getHeaderValue($header);
-    $domain_id = $this->_engine->getDomainID($login);
+    $username = $this->_engine->getHeaderValue($header);
+    $login = $this->_engine->getUserLogin($username);
+    $domain_id = $this->_engine->getDomainID($username);
     $user_id = $this->_engine->isUserExists($login, $domain_id);
 
     //

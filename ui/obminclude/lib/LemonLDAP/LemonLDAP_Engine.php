@@ -556,7 +556,7 @@ class LemonLDAP_Engine {
       list($login, $domain) = split('@', $login);
       $domain = addslashes($domain);
 
-      $sql_query = 'SELECT domain_id FROM domain WHERE domain_name = ' . $domain;
+      $sql_query = 'SELECT domain_id FROM domain WHERE domain_name = \'' . $domain . '\'';
       $this->_db->query($sql_query);
 
       while ($this->_db->next_record() && is_null($domain_id))
@@ -883,6 +883,19 @@ class LemonLDAP_Engine {
     unset($backup);
 
     return $user;
+  }
+
+  /**
+   * Return the user login.
+   * This function returns the login of the user, even if the username
+   * passed in parameter does not contain domain.
+   * @param $username An OBM username like login@domain.
+   * @return string Return the login part of the complete username.
+   */
+  public static function getUserLogin ($username)
+  {
+    $_tmp = split('@', $username);
+    return $_tmp[0];
   }
 
   /**
