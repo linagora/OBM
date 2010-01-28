@@ -75,6 +75,11 @@ sub _driverConnectHook {
             $dbHandler->do('SET NAMES utf8');
             last SWITCH;
         }
+
+        if( $self->{'dbType'} eq 'pgsql' ) {
+            $dbHandler->{'pg_enable_utf8'} = 1;
+            last SWITCH;
+        }
     }
 
     return 0;
