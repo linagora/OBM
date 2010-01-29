@@ -3,7 +3,7 @@ UPDATE ObmInfo SET obminfo_value='2.3.x->2.4.0' WHERE obminfo_name='db_version';
 -- -----------------------------------------------------------------------------
 
 
--- FIXME: put upgrades here
+
 --
 -- Table structure for `calendarcolor`
 --
@@ -85,8 +85,106 @@ ALTER TABLE obmbookmarkproperty
 ALTER obmbookmarkproperty_value TYPE character varying(256);
 
 
+
+--
+-- Table structure for table `userpattern`
+--
+CREATE TABLE userpattern (
+  id          integer NOT NULL,
+  domain_id   integer NOT NULL,
+  timeupdate  timestamp without time zone,
+  timecreate  timestamp without time zone,
+  userupdate  integer default NULL,
+  usercreate  integer default NULL,
+  title       varchar(255) NOT NULL,
+  description text default NULL
+);
+
+--
+-- Table structure for table `userpattern_property`
+--
+CREATE TABLE userpattern_property (
+  userpattern_id integer NOT NULL,
+  attribute      varchar(255) NOT NULL,
+  value          text default NULL
+);
+
+--
+-- userpattern id sequence
+--
+CREATE SEQUENCE userpattern_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE userpattern_id_seq OWNED BY userpattern.id;
+ALTER TABLE userpattern ALTER COLUMN id SET DEFAULT nextval('userpattern_id_seq'::regclass);
+
+--
+-- userpattern indexes
+--
+ALTER TABLE ONLY userpattern
+    ADD CONSTRAINT userpattern_pkey PRIMARY KEY (id);
+CREATE INDEX userpattern_domain_id_domain_id_fkey ON userpattern (domain_id);
+CREATE INDEX userpattern_userupdate_userobm_id_fkey ON userpattern (userupdate);
+CREATE INDEX userpattern_usercreate_userobm_id_fkey ON userpattern (usercreate);
+
+--
+-- userpattern fkey
+--
+ALTER TABLE ONLY userpattern
+    ADD CONSTRAINT userpattern_domain_id_domain_id_fkey FOREIGN KEY (domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY userpattern
+    ADD CONSTRAINT userpattern_userupdate_userobm_id_fkey FOREIGN KEY (userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY userpattern
+    ADD CONSTRAINT userpattern_usercreate_userobm_id_fkey FOREIGN KEY (usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
+-- userpattern_property indexes
+--
+ALTER TABLE ONLY userpattern_property
+    ADD CONSTRAINT userpattern_property_pkey PRIMARY KEY (userpattern_id,attribute);
+CREATE INDEX userpattern_property_userpattern_id_userpattern_id_fkey ON userpattern_property (userpattern_id);
+
+--
+-- userpattern_property fkey
+--
+ALTER TABLE ONLY userpattern_property
+    ADD CONSTRAINT userpattern_property_userpattern_id_userpattern_id_fkey FOREIGN KEY (userpattern_id) REFERENCES userpattern(userpattern_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Display Prefs
+--
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'userpattern','title',1,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'userpattern','description',2,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'userpattern','timecreate',3,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'userpattern','timeupdate',4,1);
+
+
+--
+-- Triggers
+--
+CREATE OR REPLACE FUNCTION on_userpattern_change() RETURNS trigger AS '
+BEGIN
+new.timeupdate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION on_userpattern_create() RETURNS trigger AS '
+BEGIN
+new.timecreate := current_timestamp;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER userpattern_created BEFORE INSERT ON userpattern FOR EACH ROW EXECUTE PROCEDURE on_userpattern_create();
+CREATE TRIGGER userpattern_changed BEFORE UPDATE ON userpattern FOR EACH ROW EXECUTE PROCEDURE on_userpattern_change();
+
+
+
 -- -----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
-
 
