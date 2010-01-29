@@ -1022,17 +1022,15 @@ Obm.CalendarManager = new Class({
       }
 
       // Delete serie events
-      if (obm.vars.consts.calendarRange != 'month') {
-        $$('div.evt_'+response.eventId).each(function(e) {
-          var evt = obm.calendarManager.events.get(e.id);
-          try {
-            obm.calendarManager.unregister(evt);
-          } catch (e) {}
-          obm.calendarManager.events.erase(evt.element.id);
-          evt.element.destroy();
-          delete evt;
-        });
-      }
+      $$('div.evt_'+response.eventId).each(function(e) {
+        var evt = obm.calendarManager.events.get(e.id);
+        try {
+          obm.calendarManager.unregister(evt);
+        } catch (e) {}
+        obm.calendarManager.events.erase(evt.element.id);
+        evt.element.destroy();
+        delete evt;
+      });
 
       // Draw updated event
       response.events.each(function(evt) {
