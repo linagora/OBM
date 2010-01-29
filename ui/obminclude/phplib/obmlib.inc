@@ -591,4 +591,86 @@ class LDAP_Auth extends Auth {
 }
 
 
+class OBM_No_Auth extends Auth {
+
+  var $lifetime       =  1;
+  var $magic          = 'Simsalabim';  // Challenge seed
+  var $database_class = 'DB_OBM';
+  var $database_table = 'UserObm';
+  var $nobody         = true;
+
+  function of_session_dis_login_page() {
+    global $obminclude, $l_obm_title, $obm_version, $module, $path;
+    global $login_action, $obmdb_dbtype, $password_encryption;
+    global $params, $c_singleNameSpace, $c_default_domain;
+
+    $login_page = "$path/../$obminclude/login.inc";
+    include_once($login_page);
+  }
+  
+  function auth_validatelogin() {
+    global $obm, $params;
+    global $c_default_domain, $c_singleNameSpace, $l_error;
+      
+    $GLOBALS['profiles']['external']['module']['default'] = $GLOBALS['perm_user'];
+    $GLOBALS['profiles']['external']['section']['default'] = $GLOBALS['perm_user'];
+    $obm['login'] = "anonymous"; // provides access for loginform.ihtml
+
+    $obm['profile'] = 'user';
+    $obm['domain_id'] = '1';
+    $obm['delegation'] = '';
+    $obm['delegation_target'] = '';
+    return 0;
+
+  }
+
+  function auth_preauth() {
+    $class = $this->database_class;
+    $this->db = new $class;    
+    if($_REQUEST['externalToken']) {
+      $token = $_REQUEST['externalToken'];
+    } elseif($_SESSION['externalToken']) {
+      $token = $_SESSION['externalToken'];
+    } else {
+      return false;
+    }
+    $GLOBALS['profiles']['__external']['module']['default'] = 0;
+    $GLOBALS['profiles']['__external']['section']['default'] = 0;
+    $this->db->query("SELECT * FROM token WHERE token='$token'");
+    if($this->db->nf() > 0) {      
+      $GLOBALS['obm']['profile'] = '__external';
+      $_SESSION['externalToken'] = $token;
+      $GLOBALS['obm']['login'] = $token;
+      while($this->db->next_record()) {
+        if(isset($GLOBALS['token'][$this->db->f('property')])) {
+          if(!is_array($GLOBALS['token'][$this->db->f('property')])) {
+            $GLOBALS['token'][$this->db->f('property')] = array($GLOBALS['token'][$this->db->f('property')]);
+          }
+           array_push($GLOBALS['token'][$this->db->f('property')], $this->db->f('value'));
+        } else {
+          $GLOBALS['token'][$this->db->f('property')] = $this->db->f('value');
+        }
+      }
+      if(isset($GLOBALS['token']['domain'])) $GLOBALS['obm']['domain_id'] = $GLOBALS['token']['domain']; else return false;
+      if(isset($GLOBALS['token']['delegation'])) $GLOBALS['obm']['delegation'] = $GLOBALS['token']['delegation']; else return false;
+      if(isset($GLOBALS['token']['delegation'])) $GLOBALS['obm']['delegation_target'] = $GLOBALS['token']['domain']; else $GLOBALS['obm']['delegation_target'] = $GLOBALS['token']['delegation'];
+      if(isset($GLOBALS['token']['uid'])) $uid = $GLOBALS['token']['uid']; else $uid = 0;
+      if(isset($GLOBALS['token']['readAccess'])) {
+        if(!is_array($GLOBALS['token']['readAccess'])) $GLOBALS['token']['readAccess'] = array($GLOBALS['token']['readAccess']);
+        foreach($GLOBALS['token']['readAccess'] as $module) {
+          $GLOBALS['profiles']['__external']['module'][$module] = $GLOBALS['perm_user'];
+        }
+      }
+      if(isset($GLOBALS['token']['writeAccess'])) {
+        if(!is_array($GLOBALS['token']['writeAccess'])) $GLOBALS['token']['writeAccess'] = array($GLOBALS['token']['writeAccess']);
+        foreach($GLOBALS['token']['writeAccess'] as $module) {
+          $GLOBALS['profiles']['__external']['module'][$module] = $GLOBALS['perm_editor'];
+        }
+      }
+      return $uid;
+    }
+    return false;
+  }
+}
+
 </script>

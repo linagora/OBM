@@ -157,7 +157,7 @@ class Session {
     }
 
     // Set headers
-    header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+    header("Expires: " . gmdate("D, d M Y H:i:s") . " GMT");
     header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
     header("Cache-Control: no-cache");
     header("Cache-Control: post-check=0, pre-check=0");
@@ -234,7 +234,6 @@ class Auth {
 
     // Check current login state
     $uid = $this->is_authenticated();
-
     // User not logged => display login page ----------------------------------
     if ($uid == false) {
 
@@ -296,9 +295,9 @@ class Auth {
     global $obm;
 
     // Check for user supplied automatic login procedure 
-    if ( $uid = $this->auth_preauth() ) {
+    if ( ($uid = $this->auth_preauth()) !== false ) {
       $obm["uid"] = "$uid";
-      $this->auth["exp"] = time() + (60 * $this->lifetime);
+      $this->auth["exp"] = time() + $this->lifetime;
       $this->auth["refresh"] = time() + (60 * $this->refresh);
       return true;
     }
@@ -380,7 +379,7 @@ class Perm {
   function Perm () {
     global $profiles, $obm, $perm_admin, $perm_user;
 
-	$profiles = get_all_profiles();
+    $profiles = get_all_profiles();
 
     if (! isset($profiles["admin"])) {
       $profiles["admin"] = array (

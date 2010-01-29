@@ -532,7 +532,7 @@ class OBM_Acl {
     if ($public) {
       $clauses['public'] = "entityright_consumer_id IS NULL";
     }
-		$clauses['action'] = self::getActionClause($action);
+    $clauses['action'] = self::getActionClause($action);
     if (count($clauses) != 0) {
       return 'WHERE '.implode(' AND ', $clauses);
     }
@@ -540,13 +540,13 @@ class OBM_Acl {
   }
   
   private static function getActionClause($action) {
-		if($action === null) {
-			$clause = array();
-			foreach(self::$actions as $action) {
-				$clause[] = self::getActionClause($action);
-			}
-			return '('.implode(' OR ', $clause).')';
-		}
+    if($action === null) {
+      $clause = array();
+      foreach(self::$actions as $action) {
+        $clause[] = self::getActionClause($action);
+      }
+      return '('.implode(' OR ', $clause).')';
+    }
     if (!in_array($action, self::$actions)) {
       throw new Exception("Unknown action: $action");
     }
@@ -701,7 +701,10 @@ class OBM_Acl {
         if(!is_array($entityId)) $entityId = array($entityId);
         $subset = 'AND userobm_id IN ('.implode(',', $entityId).')';
       }      
-      return "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId} $subset";
+      if($userId !== 0 && $userId !== '0') {
+        $implicit = "AND userobm_id = {$userId} ";
+      }
+      return "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE 1=1 $implicit $subset";
     }
   }
 
@@ -717,7 +720,7 @@ class OBM_Acl {
     $function = 'has'.ucfirst($entityType).'Credential';
     if(method_exists('OBM_Acl', $function)) {
       return self::$function($userId, $entityId);
-    } elseif(!$entityId || $entityId == $userId || (is_array($entityId) && in_array($userId, $entityId))) {
+    } elseif(!$entityId || $entityId == $userId || $userId === '0' || $userId === 0 || (is_array($entityId) && in_array($userId, $entityId))) {
       return array($userId);
     }
     return array();

@@ -3179,7 +3179,7 @@ function check_user_defined_rules() {
   global $err, $rules, $params;
   include_once('obminclude/of/of_error.php');
   $return = true;
-
+  
   if (is_array($rules)) {
     foreach($rules as $field => $field_rules) {
       /* Normalize rules */
@@ -3255,9 +3255,8 @@ if ( !function_exists('sys_get_temp_dir') ) {
  **/
 function get_all_profiles($cached = true) {
   global $cdg_sql, $obm, $c_profile_properties;
-  
+  $profiles = is_array($GLOBALS['profiles'])?$GLOBALS['profiles']:array();
   if(!isset($_SESSION['profiles']) || !$cached) {
-    $profiles = array();
     $multidomain = sql_multidomain('profile');
     $obm_q = new DB_OBM;
     $query = "SELECT * FROM Profile LEFT JOIN Domain ON profile_domain_id = domain_id WHERE 1=1 $multidomain OR domain_global = TRUE";
@@ -3309,7 +3308,7 @@ function get_all_profiles($cached = true) {
     }  
     $_SESSION['profiles'] = $profiles;
   } else {
-    $profiles = $_SESSION['profiles'];
+    $profiles = array_merge($_SESSION['profiles'], $profiles);
     $GLOBALS['cgp_default_right'] = $_SESSION['cgp_default_right'];
   }
   return $profiles;    
