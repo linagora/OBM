@@ -583,7 +583,7 @@ function html_host_form($action, $host_q, $host, $field='') {
       $samba = 1;
     }
   }
-
+  $domain_id = $obm['domain_id'];
   // If parameters have been given, they supercede the default action value
   if (isset($host['host_id'])) { $id = $host['host_id']; }
   if (isset($host['name'])) { $name = stripslashes($host['name']); }
