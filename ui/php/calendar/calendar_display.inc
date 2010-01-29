@@ -147,7 +147,6 @@ function dis_calendar_view_bar($current_view, $calendar) {
   global $l_view_week_desc, $l_view_day_desc, $l_view_month_desc;
   global $path;
 
-  $date = $current_view->get_date()->getURL();
   $p_kind = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
 
@@ -167,21 +166,21 @@ function dis_calendar_view_bar($current_view, $calendar) {
     $week_view = "href='javascript: void(0);' onclick='obm.calendarManager.showWeek();'";
     $month_view = "href='javascript: void(0);' onclick='obm.calendarManager.showMonth();'";
   } else {
-    $day_view = "href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&amp;date=$date\"";
-    $week_view = "href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&amp;date=$date\"";
-    $month_view = "href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=month&amp;date=$date\"";
+    $day_view = "href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day\"";
+    $week_view = "href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week\"";
+    $month_view = "href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=month\"";
   }
 
   $block = "
   <div id=\"calendarToolbar\">
     <div class=\"SB LF NM\" style=\"margin-left:10px;\">
-      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=agenda&amp;date=$date\">
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=agenda\">
       <img title=\"$l_view_agenda_desc\" src=\"$ico_agenda_view\" alt=\"$l_day\"/> 
       </a>
-      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=planning&amp;date=$date\">
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=planning\">
       <img title=\"$l_view_planning_desc\" src=\"$ico_planning_view\" alt=\"$l_month\" />
       </a>
-      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=list&amp;date=$date\">
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=list\">
       <img title=\"$l_view_list_desc\" src=\"$ico_list_view\" alt=\"$l_list\" />
       </a>  
     </div>
