@@ -5257,8 +5257,8 @@ Class CalendarView {
     $this->remove_all();
     $this->entity_id_entity=$data['entity_id_entity'];
     $this->load_color_entity();
-    $this->set_group($data['group']);
     $this->set_users($data['users']);
+    $this->set_group($data['group']);
     if (is_array($data['user_classes'])) {
       foreach($data['user_classes'] as $user => $class) {
         $this->set_user_class($user,$class);
@@ -5901,7 +5901,7 @@ Class CalendarView {
   public function get_class($id,$entity) {
     $c = $this->classes['by_entity'][$entity][$id];
     if (empty($c))
-      $c = $this->get_entity_class();
+      $c = $this->get_entity_class($entity,$id);
     return $c;
   }
 
