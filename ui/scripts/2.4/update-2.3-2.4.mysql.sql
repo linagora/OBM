@@ -4,12 +4,6 @@ UPDATE ObmInfo SET obminfo_value='2.3.x->2.4.0' WHERE obminfo_name='db_version';
 
 
 -- FIXME: put upgrades here
-
-
--- ----------------------------------------------------------------------------
--- Write that the 2.3->2.4 is completed
-UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
-
 --
 -- Table structure for `calendarcolor`
 --
@@ -80,5 +74,11 @@ MODIFY `userobm_delegation_target` varchar(256) default '';
 ALTER TABLE SyncedAddressbook ENGINE = INNODB DEFAULT CHARSET=utf8;
 ALTER TABLE SyncedAddressbook ADD CONSTRAINT `syncedaddressbook_user_id_userobm_id_fkey` FOREIGN KEY (user_id) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE SyncedAddressbook ADD CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES AddressBook (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------------------------------------------------------
+-- Write that the 2.3->2.4 is completed
+UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
+
+
 
 

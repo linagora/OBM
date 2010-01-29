@@ -4,12 +4,6 @@ UPDATE ObmInfo SET obminfo_value='2.3.x->2.4.0' WHERE obminfo_name='db_version';
 
 
 -- FIXME: put upgrades here
-
-
--- -----------------------------------------------------------------------------
--- Write that the 2.3->2.4 is completed
-UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
-
 --
 -- Table structure for `calendarcolor`
 --
@@ -89,3 +83,10 @@ ALTER userobm_delegation_target TYPE character varying(256);
 --
 ALTER TABLE obmbookmarkproperty
 ALTER obmbookmarkproperty_value TYPE character varying(256);
+
+
+-- -----------------------------------------------------------------------------
+-- Write that the 2.3->2.4 is completed
+UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
+
+
