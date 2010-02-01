@@ -65,7 +65,7 @@ $entities = array(
     'prefix'  => 'userobm',
     'exclude' => array('domain_id' => 1, 'timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1, 
                        'local' => 1, 'timelastaccess' => 1, 'nb_login_failed' => 1, 'delegation_target' => 1, 
-                       'calendar_version' => 1, 'nomade_datebegin' => 1, 'nomade_dateend' => 1, 'vacation_datebegin' => 1,
+                       'calendar_version' => 1, 'vacation_datebegin' => 1,
                        'vacation_dateend' => 1),
     'rules'   => array("status" => "VALID"),
     'display' => array('firstname', 'lastname', 'email'),

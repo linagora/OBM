@@ -315,8 +315,6 @@ class ReportFactory {
     U.userobm_nomade_perms,
     U.userobm_nomade_enable,
     U.userobm_nomade_local_copy,
-    U.userobm_nomade_datebegin,
-    U.userobm_nomade_dateend,
     U.userobm_email_nomade,
     U.userobm_vacation_enable,
     U.userobm_vacation_datebegin,
@@ -403,8 +401,6 @@ class ReportFactory {
     U.userobm_nomade_perms,
     U.userobm_nomade_enable,
     U.userobm_nomade_local_copy,
-    U.userobm_nomade_datebegin,
-    U.userobm_nomade_dateend,
     U.userobm_email_nomade,
     U.userobm_vacation_enable,
     U.userobm_vacation_datebegin,
@@ -498,8 +494,6 @@ class ReportFactory {
     $record->nomade_perms        = $obm_q->f('userobm_nomade_perms');
     $record->nomade_enable       = $obm_q->f('userobm_nomade_enable');
     $record->nomade_local_copy   = $obm_q->f('userobm_nomade_local_copy');
-    $record->nomade_datebegin    = $obm_q->f('userobm_nomade_datebegin');
-    $record->nomade_dateend      = $obm_q->f('userobm_nomade_dateend');
     $record->email_nomade        = $obm_q->f('userobm_email_nomade');
     $record->vacation_enable     = $obm_q->f('userobm_vacation_enable');
     $record->vacation_datebegin  = $obm_q->f('userobm_vacation_datebegin');

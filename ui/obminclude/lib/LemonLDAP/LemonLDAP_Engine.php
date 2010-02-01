@@ -105,8 +105,6 @@ class LemonLDAP_Engine {
       // ---- Unused values ? ----
       //'userobm_ext_id'              => ,
       //'userobm_system'              => ,
-      //'userobm_nomade_datebegin'    => ,
-      //'userobm_nomade_dateend'      => ,
       //'userobm_location'            => ,
       //'userobm_education'           => ,
     );
@@ -175,8 +173,6 @@ class LemonLDAP_Engine {
       // ---- Unused values ? ----
       //'userobm_ext_id'              => ,
       //'userobm_system'              => ,
-      //'userobm_nomade_datebegin'    => ,
-      //'userobm_nomade_dateend'      => ,
       //'userobm_location'            => ,
       //'userobm_education'           => ,
       'group_id'                      => 'group_id',

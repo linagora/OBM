@@ -91,8 +91,6 @@ class User {
   private $nomade_perms;
   private $nomade_enable;
   private $nomade_local_copy;
-  private $nomade_datebegin;
-  private $nomade_dateend;
   private $email_nomade;
   private $vacation_enable;
   private $vacation_datebegin;
