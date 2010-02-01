@@ -50,8 +50,6 @@ sub update {
                     SET     userobm_nomade_perms = (SELECT userobm_nomade_perms FROM UserObm WHERE userobm_id='.$entity->getId().'),
                             userobm_nomade_enable = (SELECT userobm_nomade_enable FROM UserObm WHERE userobm_id='.$entity->getId().'),
                             userobm_nomade_local_copy = (SELECT userobm_nomade_local_copy FROM UserObm WHERE userobm_id='.$entity->getId().'),
-                            userobm_nomade_datebegin = (SELECT userobm_nomade_datebegin FROM UserObm WHERE userobm_id='.$entity->getId().'),
-                            userobm_nomade_dateend = (SELECT userobm_nomade_dateend FROM UserObm WHERE userobm_id='.$entity->getId().'),
                             userobm_email_nomade = (SELECT userobm_email_nomade FROM UserObm WHERE userobm_id='.$entity->getId().'),
                             userobm_vacation_enable = (SELECT userobm_vacation_enable FROM UserObm WHERE userobm_id='.$entity->getId().'),
                             userobm_vacation_datebegin = (SELECT userobm_vacation_datebegin FROM UserObm WHERE userobm_id='.$entity->getId().'),
