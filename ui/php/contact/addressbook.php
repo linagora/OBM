@@ -88,7 +88,7 @@ class OBM_AddressBook implements OBM_ISearchable {
 
   public function getContacts($pattern='', $offset=0, $limit=100) {
     $pattern .= ' addressbookId:'.$this->id;
-    return OBM_Contact::search($pattern, $limit, $offset);
+    return OBM_Contact::search($pattern, $offset, $limit);
   }
 
   public function addContact($fields) {
