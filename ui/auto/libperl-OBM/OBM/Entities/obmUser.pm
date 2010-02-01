@@ -210,15 +210,18 @@ sub _init {
     # User jpeg
     if( $userDesc->{'userobm_photo_id'} ) {
         my @jpeg;
-        my $pathJpeg = substr $userDesc->{'userobm_photo_id'}, -1 ,1;
+        my $pathJpeg = substr( $userDesc->{'userobm_photo_id'}, -1 ,1 );
 
         $pathJpeg = $OBM::Parameters::common::documentRoot.$OBM::Parameters::common::documentDefaultPath.$pathJpeg.'/'.$userDesc->{'userobm_photo_id'};
-        open (JPEG, $pathJpeg) or
-            $self->_log( 'fichier jpeg '.$pathJpeg.' de '.$self->getDescription().' introuvable', 2 );
-        @jpeg = <JPEG>;
-        close JPEG;
+        if( -f $pathJpeg && -r $pathJpeg ) {
+            open( JPEG, $pathJpeg );
+            @jpeg = <JPEG>;
+            close JPEG;
 
-        $userDesc->{'userobm_photo'} = join( '', @jpeg );
+            $userDesc->{'userobm_photo'} = join( '', @jpeg );
+        }else {
+            $self->_log( 'fichier jpeg '.$pathJpeg.' de '.$self->getDescription().' introuvable', 2 );
+        }
     }
 
     # User accout expiration date
