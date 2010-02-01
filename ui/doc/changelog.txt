@@ -1,55 +1,82 @@
 <!-- $Id:$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.0 - 2009-12-17
+version 2.3.1 - 2010-02-01
 
-To do
-
- how to detect duplicate ?
- tenir compte contacts prives dans les listes (liste privee =>+ contact prives)!
-
- param global pour recherche prefixees ou non par %
- templates : pour personnaliser vues !
- responsable de ressource ? processus quand reservation d'une res sans les droits
- calendarcategory1 => calendarcategory : partout (code + lang + bd) [pas urgent]
- publication : category de contact en dur (pourrait etre generique sur toutes)
- displaypref : group_user, group_group encore actualite ?
- admin delegue : doc + optimisation (x fois get_group_info()), check_group_update_rights
- projectclosing : reutiliser requete project_statlog ??
- usergroup : agir lorsqu'archivage d'un user ?
-
-2009-12-31 : version 2.3.1
+2010-01-24 : version 2.3.1
 
   * #560 [Host] label mispelling
   * #844 [Control] Dashboard information are not separated by domains
+  * #943 [Host] WONTFIX Stats not displayed Munin conf lacks apache Alias /stats
+  * #970 [Company] error in company creation
+  * #1000 ldapRoot syntax in obmSatellite configuration
+  * #1001 [Auto] Perl warning message
+  * #1013 [Auto] Bad log level on obmSatellite Postfix map generation contact
+  * #1016 change init cyrus script in obm-satellite
+  * #1031 obm should depend on obm-solr
+  * #1032 purge solr data on 2.3.0 to 2.3.2 upgrade
+  * #1033 no configuration of solr for contacts
+  * #1034 Upgrade OBM obm-sync.xml funambol.xml
 
-2009-10-17 : version 2.3.0
+2009-12-17 : version 2.3.0
 
   * All changes and fixes up to 2.2.14
   * Add munin framework integration for stats and allow stats for hosts
-  * Automate: fix update by delegation
-  * #310 fax, desc, categories criteria not ok in people module for user+contact
+  * #219 Mapping definition between LDAP and OBM
   * #330 obmSatellite.cf is not handled by debconf
-  * #412 Calendar: Private Events : list of attendees are visible
-  * #434 [project] Impossible to set a participant as project manager
-  * #449 Account : pb on "solde"
-  * #450 Account : pb on "calculate solde"
-  * #502 Contact: No test for express postal length 
-  * #507 Invoice: region filter fix on dashboard
-  * #513 It must be possible to suppress the export buttons from people list
---  * #390 IE Only: End date listbox disappear after specific use of free-busy
-  * #516 pb with postfix map when adding a contact to a group
-  * #518 French label for "New Event" should be "Nouvel Evt"
-  * #531 Can't change page on result of contact search
-  * #537 MySQL errors when we try to order display fields
-  * #547 Not possible to change fields displayed in a search result (mysql)
-  * #549 Member list is empty in project search
-  * #554 Document creation from Project or other module do not link the document
-  * #556 Project consult displays all the users as members
-  * #520 Better log message on applying ACL on mailbox or mailshare before creation
+  * #337 Please use uid (event_ext_id) compatible with exchange uid spec
+  * #440 Add privacy column in results from contact search
+  * #512 create lenny packages for cyrus 2.3
+  * #536 More search fields for users , people and groups
+  * #538 Add Samba and delegation infos in CSV import for users and groups
+  * #544 [WONTFIX] Provide automatic groups, based on delegation
+  * #588 obm-caldav server must use DB to find obm-sync server
+  * #601 Merge missing from 2.2.9 to trunk
+  * #609 Event exception support with parent_id
+  * #649 add obm-sync client
+  * #659 [Contact] addressbook handling
+  * #673 create o-push package
+  * #674 create caldav package
+  * #680 Move contact rights code to the 2.3 addressbook model
+  * #684 On click send button should be disabled
+  * #685 PDA authorization management
+  * #686 Attached documents to events
+  * #687 Free/busy status in agenda
+  * #688 Permanent display of the waiting events count
+  * #689 ICS export and purge of calendars
+  * #690 Event templates
+  * #691 Color selection for the displayed calendars
+  * #692 Color tags for events
+  * #693 Event search
+  * #694 ICS Invitations only work from source folder, not from a search result
+  * #699 create obm-locator Debian package
+  * #700 create obm-locator rpm package
+  * #703 Add UI to define which user profiles can create public entities
   * #727 [Deal] Add the ability to duplicate a deal
+  * #738 contact avec un phone Number contenant '+'
+  * #755 JUnit test triggers exception on server but still succeeds
+  * #761 [Calendar] Autocomplete box enhancement
+  * #777 [WONTFIX] create etch packages for cyrus 2.3
+  * #778 create obm-satellite new package
   * #783 New Planning module
-  * LDAP attribute mapping
+  * #784 Write the TaskTypeGroup management in the planning module
+  * #789 Domain module search when no domain created
+  * #805 Delegated mobile devices administration rights
+  * #808 update apache configuration to support opush
+  * #834 planning tables fail to create on pg
+  * #847 Delegation update fail
   * #857 [Translation] Romanian obm-ui translation
   * #858 [Translation] Italian obm-ui translation
   * #859 [Translation] Deutsch obm-ui translation
+  * #863 default attendees on quick event
+  * #864 Calendar export ICS
+  * #865 Calendar export ICS
+  * #880 SQL error when putting a long string in "Genre" field
+  * #882 Apache2 conf file contains rules which are applied on all defined vhost
+  * #892 Don't send vacation message on SPAM or mailist mails
+  * #899 [MiniG] attachment consultation on IE8
+  * #902 Domain containing a dash "-" aren't well managed by the update.pl
+  * #903 [Users] Add delegation modification in batch processing
+  * #906 handling of "cedex" field in LDAP
+  * #907 Upgrade from 2.2 to 2.3 need to update global domain to add system user
+  * #944 [Contact] auto collected contact from minig display a bad date
