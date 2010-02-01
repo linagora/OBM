@@ -158,8 +158,6 @@ $lemonldap_config = Array(
        // ---- Unused values ? ----
        "userobm_ext_id"                => "HTTP_OBM_SERIALNUMBER",
        //"userobm_system"              => ,
-       //"userobm_nomade_datebegin"    => ,
-       //"userobm_nomade_dateend"      => ,
        //"userobm_location"            => ,
        //"userobm_education"           => ,
      ),
