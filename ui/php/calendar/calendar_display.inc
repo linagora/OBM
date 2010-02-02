@@ -5063,8 +5063,11 @@ function dis_calendar_free_interval($current_view, $calendar) {
         $ocs = $of->getPeriodOccurrences($d, $e, array('user' => array($id)));
         if ($ocs != null) {
           array_push($busy_time_slots, $slots);
-          $is_busy = true;        
-          $u[$id] .= "<td class='timeSlot'><div class='haveEvent'></div></td>";
+          $tip = html_freebusy_tip($ocs);
+          $is_busy = true;
+          $td_id = "user_".$id."_".$d->getTimestamp();
+          $u[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
+          $js_tips .= "obm.tip.add($('$td_id'));";
         } else {
           $u[$id] .= "<td class='timeSlot'></td>";
         }
@@ -5075,19 +5078,24 @@ function dis_calendar_free_interval($current_view, $calendar) {
         $ocs = $of->getPeriodOccurrences($d, $e, array('resource' => array($id)));
         if ($ocs != null) {
           array_push($busy_time_slots, $slots);
+          $tip = html_freebusy_tip($ocs);
+          $td_id = "res_".$id."_".$d->getTimestamp();
           $is_busy = true;        
-          $r[$id] .= "<td class='timeSlot'><div class='haveEvent'></div></td>";
+          $r[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
+          $js_tips .= "obm.tip.add($('$td_id'));";          
         } else {
           $r[$id] .= "<td class='timeSlot'></td>";
         }
       }
 
-      if (is_array($contacts))
-      foreach($contacts as $contact) {
-        if (true) {
-          $c[$contact] .= "<td class='timeSlotNoCalendar'></td>";
-        }  else {
-          $c[$contact] .= "<td class='timeSlotNoCalendar'></td>";
+      // TODO: Freebusy URL
+      if (is_array($contacts)) {
+        foreach($contacts as $contact) {
+          if (true) {
+            $c[$contact] .= "<td class='timeSlotNoCalendar'></td>";
+          }  else {
+            $c[$contact] .= "<td class='timeSlotNoCalendar'></td>";
+          }
         }
       }
 
@@ -5361,7 +5369,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
 		obm.calendarFreeBusy.entities.sel_group_id = $js_entities_group;
 		obm.calendarFreeBusy.entities.sel_contact_id = $js_entities_contact;
 		obm.calendarFreeBusy.entities.others_attendees = $js_entities_others_attendees;
-
+    $js_tips
     new obm.AutoComplete.ExtSearch(
       function() { return \$('freeBusySearchSource').value+'&action=ext_search&ajax=1'; },
       'dummy', 'freeBusyUserSearch',
@@ -5394,6 +5402,35 @@ function html_freebusy_header() {
 
 }
 
+
+/*
+ * Build freebusy tip 
+ */
+function html_freebusy_tip($ocs) {
+  $tip = '<table>';
+  foreach($ocs as $oc) {
+    if ($oc->event->isMeeting()) $title .= "<img src='$GLOBALS[ico_meeting_alt]'/>";
+    if ($oc->event->isPrivate()) $title .= "<img src='$GLOBALS[ico_private_alt]'/>";
+    if ($oc->event->isPeriodic()) $title .= "<img src='$GLOBALS[ico_periodic_alt]'/>";
+    if ($oc->event->isAllDay()) {
+      $title .= "<img src='$GLOBALS[ico_allday_alt]'/>";
+      $time = $GLOBALS['l_all_day'];
+    } else {
+      $end = clone $oc->date;
+      $end->addTimestamp($oc->event->duration);
+      $time = $oc->date->format(Of_Date::TIME_SHORT)." - ".$end->format(Of_Date::TIME_SHORT);
+    }
+    if ($oc->event->isPrivate() && (is_null($oc->event->attendee['user'][$GLOBALS[obm][uid]]) && $oc->event->owner != $GLOBALS[obm][uid])) {
+      $title .= $GLOBALS[l_private]; 
+    } else {
+      $title .= $oc->event->title;
+    }
+    $tip .= "<tr><td class='B'>$time</td></tr>";
+    $tip .= "<tr><td>&nbsp;&nbsp;$title</td></tr>";
+  }
+  $tip .= '</table>';
+  return $tip;
+}
 
 /**
  * dis_calendar_right_dis_admin
