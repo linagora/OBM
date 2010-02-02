@@ -1,0 +1,116 @@
+#!/bin/bash
+#
+### BEGIN INIT INFO
+# Provides: obm-caldav
+# Required-Start: $syslog $network
+# Required-Stop: $syslog $network
+# Default-Start: 2 3 4 5
+# Default-Stop: S 0 1 6
+# Short-Description: Caldav Server.
+# Description: init system for obm-caldav. Starts the equinox server
+#              process with caldav plugins deployed.
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export JAVA_HOME=/usr/lib/jvm/java-6-sun
+test -d /usr/lib/jvm/java-1.6.0-openjdk && {
+  JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
+}
+test -d /usr/lib/jvm/java-openjdk && {
+  JAVA_HOME=/usr/lib/jvm/java-openjdk
+}
+
+
+test -f $JAVA_HOME/bin/java || {
+    echo "JDK not found in JAVA_HOME: $JAVA_HOME"
+    exit 1
+}
+
+if [ -r /etc/default/locale ]; then
+  . /etc/default/locale
+  export LANG
+fi
+if [ -r /etc/sysconfig/i18n ]; then
+  . /etc/sysconfig/i18n
+  export LANG
+fi
+
+product_name="Caldav"
+
+product_pid=/var/run/obm-caldav.pid
+product_home=/usr/share/obm-caldav
+product_bin=obm-caldav
+product_logs=/var/log/obm-caldav/obm-caldav.log
+jps=$JAVA_HOME/bin/jps
+
+product_running() {
+    test -f ${product_pid} || return 1
+    supposed_pid=`cat ${product_pid}`
+    ret=`$jps |grep -q ${product_pid}`
+    return $ret
+}
+
+start_product() {
+    product_running && {
+	echo "OBM ${product_name} Server already running."
+	ret=0
+        return $ret
+    }
+
+    ${product_home}/${product_bin} 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null &
+    new_pid=$!
+    echo $new_pid > $product_pid 
+    echo "OBM ${product_name} Server started: `cat ${product_pid}`"
+    ret=0
+}
+
+stop_product() {
+    product_running || {
+	echo "OBM ${product_name} Server not running."
+        ret=0
+	return $ret
+    }
+    if [ -f /sbin/start-stop-daemon ]; then
+      start-stop-daemon --stop --quiet --oknodo --pidfile ${product_pid}
+    else
+      kill `cat ${product_pid}`
+    fi
+    echo -n "Waiting for OBM ${product_name} Server shutdown."
+    while product_running; do
+    echo -n "."
+    sleep 0.5
+    done
+    rm -f ${product_pid}
+    echo ""
+    ret=0
+}
+
+status_product() {
+  product_running && {
+    echo "${product_name} is running."
+    ret=0
+    return $ret
+  }
+  echo "${product_name} is not running"
+  ret=3
+}
+
+case "$1" in
+    start)
+        start_product
+
+        ;;
+    
+    stop)
+        stop_product
+        ;;
+    status)
+      status_product
+      ;;
+    restart)
+        stop_product
+        start_product
+      ;;
+esac
+
+exit 0
