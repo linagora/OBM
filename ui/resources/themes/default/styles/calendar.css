@@ -316,13 +316,39 @@
   overflow:hidden;
 }
 
+.event dl.transparent {
+  background-image: url('../images/hatch.gif');
+  background-repeat: repeat-y;
+}
+
+.event dt.transparent h1 {
+  background-image: url('../images/hatch.gif');
+  background-repeat: repeat-y;
+}
+
 .event dt {
   white-space: nowrap;
 }
 
 .event dd {
   margin: 0;
-  margin-left: 1px;
+  margin-left: 2px;
+}
+
+.event dd.transparent {
+  margin: 0;
+  margin-left: 10px;
+}
+
+.event dt.alldayTransparent {
+  background-image: url('../images/hatch.gif');
+  background-repeat: repeat-y;
+  margin: 0;
+}
+
+.event dt.alldayTransparent h1 {
+  margin: 0;
+  margin: 8px;
 }
 
 .event span {

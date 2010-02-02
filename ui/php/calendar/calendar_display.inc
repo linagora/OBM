@@ -1979,6 +1979,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $eventColor = get_color_data($event->color);
 
   $ed[] = "id:$id";
+  $ed[] = "opacity:'$event->opacity'";
   $ed[] = "entity:'$entity'";
   $ed[] = "entity_id:$entity_id"; 
   $ed[] = "duration:$duration";

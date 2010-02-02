@@ -88,7 +88,6 @@ Obm.CalendarManager = new Class({
    */ 
   updateHourMarker: function() {
     $('todayHourMarker').style.top = (this.now.getHours()*3600 + this.now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
-    // $('hourMarker').style.top = (this.now.getHours()*3600 + this.now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
   },
 
 
@@ -1339,11 +1338,12 @@ Obm.CalendarInDayEvent = new Class({
     var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
     serieClass = 'evt_'+this.event.id;
     this.element = new Element('div').addClass('event '+serieClass)
-                                     .setProperties({'id':id,'title':this.event.title});
-
-    this.content = new Element('dl').addClass(this.event.klass).setOpacity(this.getOpacity()).injectInside(this.element);
-    var dt = new Element('dt').injectInside(this.content);
-    var dd = new Element('dd').injectInside(this.content);
+                                     .setProperties({'id':id,'title':this.event.title}); 
+    var opacity = '';
+    if (this.event.opacity == 'TRANSPARENT') opacity = 'transparent'; 
+    this.content = new Element('dl').addClass(this.event.klass+' '+opacity).setOpacity(this.getOpacity()).injectInside(this.element);
+    var dt = new Element('dt').addClass(opacity).injectInside(this.content);
+    var dd = new Element('dd').addClass(opacity).injectInside(this.content);
 
     this.dragHandler = new Element('h1').injectInside(dt);     
     this.setTitleIcons();
@@ -1575,10 +1575,11 @@ Obm.CalendarAllDayEvent = new Class({
 
     this.element = new Element('div').addClass('event '+extClass+' '+serieClass)
                                      .setProperties({'id':id,'title':this.event.title});
-
+    var opacity = '';
+    if (this.event.opacity == 'TRANSPARENT') opacity = 'alldayTransparent'; 
     this.content = new Element('dl').addClass(this.event.klass+' allDay').setOpacity(this.getOpacity()).injectInside(this.element);
-    var dt = new Element('dt').injectInside(this.content);
-    var dd = new Element('dd').injectInside(this.content);
+    var dt = new Element('dt').addClass(opacity).injectInside(this.content);
+    var dd = new Element('dd').addClass(opacity).injectInside(this.content);
 
     this.leftExtension = new Element('img').setProperty('src', obm.vars.images.extension_left).
       setStyle('display', 'none').injectInside(dt);
