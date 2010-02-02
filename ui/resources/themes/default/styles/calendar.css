@@ -808,6 +808,11 @@ h1.hoursTitle{
   padding: 0;
 }
 
+.freeBusyContent h2 {
+  text-align:left;
+  margin-left:16em;
+}
+
 .freeBusyForm {
   margin-left: 16em;
   padding: 5px 0px 5px 0px;

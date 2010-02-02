@@ -2922,13 +2922,13 @@ function store_calendar_entities($entities_q) {
       if($j > $ccalendar_max_users) return $entities;
       if ($obm['uid'] == $id) {
         $entities['user'][$id] = array(
-          'name'  => $data['label'],
+          'name'  => $data,
           'class' => 'eventOwner',
           'type'  => 'user',
           'id'    => $id);
       } else {
         $entities['user'][$id] = array(
-          'name'  => $data['label'],
+          'name'  => $data,
           'class' => "eventOwner$i",
           'type'  => 'user',
           'id'    => $id);
@@ -2943,7 +2943,7 @@ function store_calendar_entities($entities_q) {
     foreach ($resources as $id => $data) {
       if($j > $ccalendar_max_users) return $entities;
       $entities['resource'][$id] = array(
-        'name'  => $data['label'],
+        'name'  => $data,
         'class' => "eventOwner$i",
         'image' => ${'ico_calendar_user'.$i},
         'type'  => 'resource',

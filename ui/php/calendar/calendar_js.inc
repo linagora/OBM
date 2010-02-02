@@ -56,57 +56,31 @@ function setAdvancedSearchDate(rd) {
   }
 }
 
-function clearPeriodSelection(period) {
-alert('toto');
-}
-
-/////////////////////////////////////////////////////////////////////////////
-function changePeriod(date) {
-  var entities = new Array();
-  var otherAttendee = new Array();
-  var contacts = new Array();
-  $$('input.currentAttendee').each(function(e) {
-    entities.push(e.value);
-  });
-
-  var otherAttendee = new Array();
-  $$('input.currentOtherAttendee').each(function(e) {
-    otherAttendee.push(e.value);
-  });
-
-  displayFreeBusy(date, $('duration').value/3600, entities, false, otherAttendee);
-}
-
 
 /////////////////////////////////////////////////////////////////////////////
 function performMeeting() {
-  $$('div.freeBusyContent').each(function(e) {
-    e.destroy();
-  });
 
-  var entities = new Array();
+  var data = new Object();
+  data.sel_user_id = new Array();
+  data.sel_resource_id = new Array();
+  data.sel_resource_group_id = new Array();
+  data.sel_group_id = new Array();
+  data.sel_contact_id = new Array();
+  data.date = $('tf_date').value;
+  data.others_attendees = new Array();
+
   $$('div.elementRow').each(function(e) {
     var id = e.id.split('-');
-      var entity = id[1]+'-'+id[2]+'-'+id[3];
-      entities.push(entity);
+    if(id[2] == 'user') data.sel_user_id.push(id[3]);
+    if(id[2] == 'resource') data.sel_resource_id.push(id[3]);
+    if(id[2] == 'group') data.sel_group_id.push(id[3]);
+    if(id[2] == 'resourcegroup') data.sel_resource_group_id.push(id[3]);
+    if(id[2] == 'contact') data.sel_contact_id.push(id[3]);
   });
 
   var duration = parseInt($('sel_time_duration').value, 10)+parseInt($('sel_min_duration').value, 10)/60;
-  displayFreeBusy($('tf_date').value, duration, entities, false, new Array());
-}
 
-
-/////////////////////////////////////////////////////////////////////////////
-function displayFreeBusyConflict(duration, d, ro) {
-  var entities = new Array();
-  $$('div.elementRow').each(function(e) {
-    var id = e.id.split('-');
-    if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id') {
-      var entity = id[1]+'-'+id[2]+'-'+id[3];
-      entities.push(entity);
-    }
-  });
-  displayFreeBusy(d, duration, entities, ro, new Array());
+  display_freebusy(data, duration, false);
 }
 
 
@@ -125,77 +99,85 @@ function checkAvailability() {
     return false;
   }
 
-  var entities = new Array();
+  var data = new Object();
+  data.sel_user_id = new Array();
+  data.sel_resource_id = new Array();
+  data.sel_resource_group_id = new Array();
+  data.sel_group_id = new Array();
+  data.sel_contact_id = new Array();
+  data.date = new Obm.DateTime(begin).format('c');
+  data.others_attendees = new Array();
+
   $$('div.elementRow').each(function(e) {
     var id = e.id.split('-');
-    if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id' || id[0] == 'sel_group_id') {
-      var entity = id[1]+'-'+id[2]+'-'+id[3];
-      entities.push(entity);
-    }
+    if(id[2] == 'user') data.sel_user_id.push(id[3]);
+    if(id[2] == 'resource') data.sel_resource_id.push(id[3]);
+    if(id[2] == 'group') data.sel_group_id.push(id[3]);
+    if(id[2] == 'resourcegroup') data.sel_resource_group_id.push(id[3]);
+    if(id[2] == 'contact') data.sel_contact_id.push(id[3]);
   });
-
-  var otherAttendee = new Array();
+ 
   $$('input.otherAttendee').each(function(e) {
-    if (e.value != '') otherAttendee.push(e.value);
+    if (e.value != '') data.others_attendees.push(e.value);
   });
 
-  if($('sel_attendees_id')) $('sel_attendees_id').set('html','');
-  displayFreeBusy($('tf_date_begin').value, (end-begin)/1000/3600, entities, false, otherAttendee);
+  var duration = (end.getTime() - begin.getTime())/3600000;
+
+  display_freebusy(data, duration, false);
 }
 
 
 /////////////////////////////////////////////////////////////////////////////
-function displayFreeBusy(date_begin, duration, entities, readOnly, otherAttendee) {
-  var q = new Object();
-  q.date = date_begin;
-  q.ajax = 1;
-  q.action = 'perform_meeting';
-  if ($('template_id') != null) {
-    q.template_id = $('template_id').value;
-  }
-  new Request.JSON({
-    url : 'calendar_index.php',
+function displayFreeBusyConflict(duration, date_begin, readOnly) {
+
+  var data = new Object();
+  data.sel_user_id = new Array();
+  data.sel_resource_id = new Array();
+  data.sel_resource_group_id = new Array();
+  data.sel_group_id = new Array();
+  data.sel_contact_id = new Array();
+  data.date = new Obm.DateTime(date_begin*1000).format('c');
+  data.others_attendees = new Array();
+
+  $$('div.elementRow').each(function(e) {
+    var id = e.id.split('-');
+    if(id[2] == 'user') data.sel_user_id.push(id[3]);
+    if(id[2] == 'resource') data.sel_resource_id.push(id[3]);
+    if(id[2] == 'group') data.sel_group_id.push(id[3]);
+    if(id[2] == 'resourcegroup') data.sel_resource_group_id.push(id[3]);
+    if(id[2] == 'contact') data.sel_contact_id.push(id[3]);
+  });
+ 
+  $$('input.otherAttendee').each(function(e) {
+    if (e.value != '') data.others_attendees.push(e.value);
+  });
+
+  display_freebusy(data, duration, readOnly);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+function display_freebusy(data, duration, readOnly) {
+
+  new Request.HTML({
+    url: obm.vars.consts.calendarUrl,
     secure : false,
-    onComplete: function(resp) {
-      if($('fbc')) $('fbc').destroy();
-      $('fbcContainer').innerHTML = resp.html;
-      eval(resp.js);
-      obm.popup.popups.erase('fbc');
-      obm.popup.show('fbc');
-      obm.calendarFreeBusy.buildFreeBusyPanel(duration, readOnly);
-      obm.calendarFreeBusy.addAttendee(entities);
-      var id = 0;
-      otherAttendee.each(function(e) {
-        obm.calendarFreeBusy.addAttendee(['data-others_attendees-'+id], e);
-        id++;
-      });
-      $('fbcContainer').innerHTML = '';
-
+    evalScripts : true,
+    update: $('fbc'),
+    onRequest: function() {
+      $('spinner').show();
+    },
+    onComplete: function() {
+      obm.popup.show('fbcContainer');
+      obm.calendarFreeBusy.buildFreeBusyPanel(duration, readOnly);      
+      $('spinner').hide();
     }
-  }).post(q); 
+  }).get(\$merge({ajax : 1, action : 'perform_meeting'}, data));   
+
 }
 
 
-function add_displayed_attendee(check, attendee, uid, kind) {
-  if (check) {
-    for(var id in attendee) {
-      var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
-      if ($(sel_id) == null) {
-        of_select_add_element(window.document, 'sel_'+kind+'_id', 'data-'+kind+'-'+id, attendee[id]);
-      }
-    }
-  } else {
-    for(var id in attendee) {
-      if (id != uid) {
-        var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
-        if (sel_id != null) {
-          $(sel_id).destroy();
-        }
-      }
-    }
-  }
-}
-
+/////////////////////////////////////////////////////////////////////////////
 function check_calendar_pdf_options() {
   if ($('cal_first_hour')) {
     var hour_begin = parseInt($('cal_first_hour').value);
