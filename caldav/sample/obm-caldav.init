@@ -46,7 +46,7 @@ jps=$JAVA_HOME/bin/jps
 product_running() {
     test -f ${product_pid} || return 1
     supposed_pid=`cat ${product_pid}`
-    ret=`$jps |grep -q ${product_pid}`
+    ret=`$jps |grep -q ${supposed_pid}`
     return $ret
 }
 
