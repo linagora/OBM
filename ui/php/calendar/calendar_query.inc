@@ -1723,7 +1723,7 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     $obm[domain_id],
     '$ext_id'
   )";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_insert_event_data()');
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_event_insert()');
   $obm_q->query($query);
   $event_id = $obm_q->lastid();
   of_entity_insert('event', $event_id);

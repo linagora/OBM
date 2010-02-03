@@ -930,6 +930,7 @@ Obm.CalendarManager = new Class({
       }
       obm.calendarManager.eventIndexing(events[0].event.id);
     } else {
+      obm.calendarManager.destroyDummy();
       showErrorMessage(response.message);
     }
   }, 
@@ -2037,6 +2038,7 @@ Obm.CalendarQuickForm = new Class({
     window.location.href = obm.vars.consts.calendarUrl+'?'+this.gotoURI;
   }
 });
+
 
 Obm.TabbedPane = new Class({
   initialize: function(el) {
