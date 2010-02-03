@@ -30,6 +30,11 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
 
   $calendar_entity = $current_view->get_entities();
 
+  if (sizeof($calendar_entity['user']) == 0 && !is_array($calendar_entity['resource'])) {
+    $current_view->set_users($obm['uid']);
+    $calendar_entity = $current_view->get_entities();
+  }
+
   $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
@@ -1202,6 +1207,8 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
   $GLOBALS['js']['vars']['consts']['userStyle'] = $current_view->get_class($GLOBALS[obm][uid], 'user'); 
   $GLOBALS['js']['vars']['consts']['userId'] = $GLOBALS[obm][uid]; 
+  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
+  $GLOBALS['js']['vars']['consts']['calendarDetailconsultURL'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']).'?action=detailconsult&calendar_id='; 
   $GLOBALS['js']['vars']['labels']['newEvent'] = phpStringToJsString($GLOBALS['l_header_new_event']);    
 
   if ($display_days > 14) {
@@ -1293,9 +1300,6 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     $week = "ico_week_view_current";
   }
   $label = dis_calendar_navbar_label($current_view, $display_days);
-
-  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
-  $GLOBALS['js']['vars']['consts']['calendarDetailconsultURL'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']).'?action=detailconsult&calendar_id='; 
 
   $block .= "
   <div id='calendarHeader'>
