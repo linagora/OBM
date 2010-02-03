@@ -178,7 +178,7 @@ if ($action == 'search') {
   exit();  
 }
 // displayed after, because $params['date'] can be updated by actions
-$display['search'] = dis_calendar_view_bar($current_view, $action, $params);
+$display['search'] = dis_calendar_view_bar($current_view,  $params);
 
 $_SESSION['cal_current_view'] = serialize($current_view);
 
