@@ -6174,6 +6174,7 @@ function json_event_data($id,$calendar,$current_view) {
   $ent_q = run_query_get_events_attendee(array($id));
   $entities = get_calendar_event_entity($id);
   $all_day = ($calendar['all_day'])?1:0;
+  $opacity = $calendar['opacity'];
   $duration = $calendar['duration'];
   $date = $calendar['date_begin'];
   $end = clone $date;
@@ -6199,6 +6200,7 @@ function json_event_data($id,$calendar,$current_view) {
   }
 
   $ed[] = 'id:'.$id;
+  $ed[] = "opacity:'$opacity'";
   $ed[] = 'duration:'.$duration;
   $ed[] = 'time:'.$date->getTimestamp();
   $ed[] = 'all_day:'.$all_day;

@@ -1972,6 +1972,11 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.entity_id = '';
     this.eventData.entity = '';
     this.eventData.all_day = allDay;
+    if (allDay) {
+      this.eventData.opacity = 'TRANSPARENT';
+    } else {
+      this.eventData.opacity = 'OPAQUE';
+    }
     this.eventData.date_begin = date_begin.format('c');
     this.eventData.old_date_begin = this.eventData.date_begin;
     this.eventData.duration = duration;
