@@ -505,8 +505,6 @@ Obm.CalendarManager = new Class({
     var passed = new Hash(); 
 
     this.redrawAllDay.each (function(redraw, columnIndex) {
-      //if(!redraw) return
-
       this.alldayEventGrid[columnIndex].each(function(evt) {
 
         var passedId = evt.element.uid;
@@ -583,7 +581,6 @@ Obm.CalendarManager = new Class({
       });
     }.bind(this));
 
-    //this.redrawAllDay = new Hash();
     updated.each(function(col, i) {
       updated[col].each(function(coords) {
         this.maxHeight = Math.max(this.maxHeight, coords.position);

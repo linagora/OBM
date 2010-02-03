@@ -34,6 +34,9 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
 
+  $entity_readable['group'] = run_query_get_allowed_groups();
+  $entity_readable['group'] = $entity_readable['group']['entity'];
+
   $my_views = run_query_calendar_get_my_views();
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view;
   
@@ -354,7 +357,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     if ($this_group == $c_all) {
       $sel_group = "<option selected=\"selected\">$l_select_group</option>";
     } else {
-      $sel_group = "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_select_group</option>";
+      $sel_group = "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]\">$l_select_group</option>";
     }
 
     if(is_array($entity_readable['group']))
@@ -368,7 +371,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
         } else {
           $selected_s = '';
         }
-        $sel_group .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?date=$iso&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
+        $sel_group .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
       }
     }
 
@@ -479,7 +482,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       $default_view_url_params = "set_cal_view_id=".$_SESSION['set_cal_default_view'];
       $dis_back_myview = "<a id=\"my_view\" href=\"".basename($_SERVER['SCRIPT_NAME'])."?$default_view_url_params\">$l_back_mono</a>";
     } else {
-      $dis_back_myview = "<a id=\"my_view\" href=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a>";
+      $dis_back_myview = "<a id=\"my_view\" href=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]\">$l_back_mono</a>";
      // FIXME
      // $dis_back_myview = "<a href='javascript: void(0)' onclick='obm.calendarManager.backToMyView()'>$l_back_mono</a>";
     }    
