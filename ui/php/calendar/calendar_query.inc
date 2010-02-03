@@ -3412,7 +3412,7 @@ function run_query_calendar_solr_query($pattern) {
 //   - $status          : array of event status to get ('ACCEPTED', 'R', 'W')
 //   - $category_filter : category
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $status, $category_filter='',$events=null) {
+function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $status, $category_filter='',$events=null, $opac=null) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -3437,6 +3437,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       $search_pattern = "AND 0=1";
     }
   }
+
+  if ($opac != null) $where_opacity = " AND event_opacity='$opac' ";
 
   $first = true;
   if (is_array($status)
@@ -3486,6 +3488,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         $left_q 
         INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
+        $where_opacity
         $where_status
         $filter
         AND event_repeatkind = 'none'
@@ -3506,6 +3509,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         $left_q 
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
+        $where_opacity
         $where_status
         $filter
         AND event_repeatkind = 'none'
@@ -3526,6 +3530,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         $left_q 
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
+        $where_opacity
         $where_status
         $filter
         AND event_repeatkind = 'none'
@@ -3550,7 +3555,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
 //   - $calendar_entity : array of entities elements to display
 //   - $status          : array of event status to get ('ACCEPTED', 'R', 'W')
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_repeat_events($start, $end, $calendar_entity, $status, $category_filter='', $events=null) {
+function run_query_calendar_repeat_events($start, $end, $calendar_entity, $status, $category_filter='', $events=null, $opac=null) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -3565,6 +3570,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
   if ($category_filter != '') {
     $filter = " AND eventcategory1_id = '$category_filter' ";
   }
+
+  if ($opac != null) $where_opacity = " AND event_opacity='$opac' ";
 
   $first = true;
   if (is_array($status)
@@ -3629,6 +3636,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $left_q
         INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
+        $where_opacity
         AND event_repeatkind != 'none'
         $where_status
         $filter
@@ -3649,6 +3657,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $left_q
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
+        $where_opacity
         AND event_repeatkind != 'none'
         $where_status
         $filter
@@ -3669,6 +3678,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $left_q
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT' 
+        $where_opacity
         AND event_repeatkind != 'none'
         $where_status
         $filter
@@ -3864,10 +3874,10 @@ function get_one_event_user_alert($event_id, $user_id = null) {
 //   - $end_time        : timestamp of end date
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_events_model($start, $end, $calendar_entity, $status=array('ACCEPTED'), $category_filter='', $unique=false, $events=null) {
+function calendar_events_model($start, $end, $calendar_entity, $status=array('ACCEPTED'), $category_filter='', $unique=false, $events=null, $opac=null) {
 
   // Get all non repeating events and construct occurences & events model
-  $nr_q = run_query_calendar_no_repeat_events($start,$end,$calendar_entity, $status, $category_filter,$events);
+  $nr_q = run_query_calendar_no_repeat_events($start,$end,$calendar_entity, $status, $category_filter,$events, $opac);
   $of = &OccurrenceFactory::getInstance();
   $of->setBegin($start);
   $of->setEnd($end);
@@ -3904,7 +3914,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
   }
 
   // Get all repeating events and construct occurences & events model
-  $r_q = run_query_calendar_repeat_events($start,$end,$calendar_entity, $status, $category_filter,$events);
+  $r_q = run_query_calendar_repeat_events($start,$end,$calendar_entity, $status, $category_filter,$events, $opac);
   while ($r_q->next_record()) {
     $id = $r_q->f('event_id');
     $title = $r_q->f('event_title');

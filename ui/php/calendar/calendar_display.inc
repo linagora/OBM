@@ -4988,17 +4988,6 @@ function dis_calendar_meeting_form($current_view, $calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_free_interval($current_view, $calendar) {
 
-  // $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
-  // $GLOBALS['js']['vars']['labels']['allday'] = phpStringToJsString($GLOBALS['l_all_day']);
-  // $GLOBALS['js']['vars']['labels']['invalidEmail'] = phpStringToJsString($GLOBALS['l_invalid_email']);
-  // $GLOBALS['js']['vars']['images']['ico_user'] = $GLOBALS[ico_user];
-  // $GLOBALS['js']['vars']['images']['ico_resource'] = $GLOBALS[ico_resource];
-  // $GLOBALS['js']['vars']['images']['ico_contact'] = $GLOBALS[ico_contact];
-  // $GLOBALS['js']['vars']['images']['ico_meeting'] = $GLOBALS[ico_meeting_alt];
-  // $GLOBALS['js']['vars']['images']['ico_private'] = $GLOBALS[ico_private_alt];
-  // $GLOBALS['js']['vars']['images']['ico_allday'] = $GLOBALS[ico_allday_alt];
-  // $GLOBALS['js']['vars']['images']['ico_periodic'] = $GLOBALS[ico_periodic_alt];
-
   if ($calendar['date_begin']) {
     $date = clone $calendar['date_begin'];
   } else {
@@ -5027,7 +5016,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
   $ret = get_calendar_entity_label($entities);
   $ret['resourcegroup'] = run_query_resource_resourcegroup($calendar['sel_resource_group_id']);
   $entity_store = store_calendar_entities($ret);
-  calendar_events_model($date,$end, $entity_store, array('ACCEPTED', 'NEEDS-ACTION'));
+  calendar_events_model($date,$end, $entity_store, array('ACCEPTED', 'NEEDS-ACTION'), '', false, null, 'OPAQUE');
   if (!is_array($entity_store['resource'])) $entity_store['resource'] = array();
   if (!is_array($entity_store['resourcegroup'])) $entity_store['resourcegroup'] = array();
   $resources = array_merge($entity_store['resource'], $entity_store['resourcegroup']);
