@@ -6,65 +6,9 @@
 // $Id$
 /////////////////////////////////////////////////////////////////////////////*/
 
-
-
-/* ------------------------------------------------------------------------- */
-/* Calendar common styles */
-/* ------------------------------------------------------------------------- */
-/*
-.calendar {
-  width: 100%;
-  margin-left: auto;
-  margin-right:	auto;
-  background-color: #eee;
-  border: 1px solid #aaa; 
-  border-collapse: collapse;	
-  border-spacing: 0;
-  empty-cells: show;
-}
-
-.calendar tbody td {
-  border-top: 1px dotted #ddd; 
-  border-left: 1px solid #aaa; 
-}
-
-.calendar tbody th {
-  background-color: #eee;
-  border-top: 1px solid #ddd; 
-}
-
-.calendar thead td {
-  text-align: center;
-}
-
-.printableCalendar td, .printableCalendar tr {
-  vertical-align: top;
-  height: 100%;
-}
-
-.printableCalendar tbody td {
-  overflow: visible;
-  margin:0;
-  padding: 0;
-  background-color: #fff;
-}
-
-.printableCalendar thead th  {
-  background-color: #fff;
-  background-image: url('../images/ico_calendar_head_border.png');
-  background-repeat: repeat-x;
-  background-position: bottom;
-  border-left: 1px dotted #ddd; 
-  border-top: 1px solid #ccc;
-  padding-bottom: 9px;
-  text-align: left;
-}
-
 /* ------------------------------------------------------------------------- */
 /* Calendar styles                                                           */
 /* ------------------------------------------------------------------------- */
-
-
 .waitingEventsContainer {
   height: 200px;
   overflow-x:hidden;

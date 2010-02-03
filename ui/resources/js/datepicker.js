@@ -381,6 +381,12 @@ function datePickerGenerator() {
   });
 }
 
+
+
+/*
+ * Mini calendar portlet
+ * 
+ */
 function miniCal(year, month, view) {
   var thisDay = new Date();
 
@@ -461,13 +467,21 @@ function miniCal(year, month, view) {
             current.setDate(current.getDate()+1);
           }
         }
-        this.addClass('hover')
+        this.addClass('hover');
       });
       td.addEvent("mouseout",function () {this.removeClass('hover')});
       td.addEvent('mousedown', function() {
+        document.onselectstart = function() {
+          // see https://www.obm.org/bugzilla/show_bug.cgi?id=1053
+          return false;
+        }
         obm.calendarManager.customStart=this.id/1000;
       });
       td.addEvent('mouseup', function() {
+        document.onselectstart = function() {
+          // see https://www.obm.org/bugzilla/show_bug.cgi?id=1053
+          return true;
+        }
         if (this.hasClass('selected')) {
           if (obm.vars.consts.nbDisplayedDays == 1) {
             obm.vars.consts.nbDisplayedDays = 7;
