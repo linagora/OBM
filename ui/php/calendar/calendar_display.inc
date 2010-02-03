@@ -495,7 +495,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     <fieldset class=\"detail extra\">
     <legend>$l_category_filter</legend>
       $sel_cat1 
-      <input type=\"hidden\" name=\"date\" value=\"".$date->getIso()."\" />
     </fieldset>
     </form>
     $block_entity
@@ -737,7 +736,7 @@ function html_calendar_view_selector($current_view, $my_views) {
     <form action=\"".basename($_SERVER['SCRIPT_NAME'])."\" method=\"get\">
       <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\"
         onchange=\"change_view(this.options[this.selectedIndex].value);\">
-        <option id=\"opt_choix\" value=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\" >
+        <option id=\"opt_choix\" value=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]\" >
           $l_select_view
         </option>
         $sel_view
