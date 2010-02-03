@@ -605,6 +605,7 @@ Obm.CalendarManager = new Class({
         element.style.height = 14*(size+2)+'px';
       });
       $('calendarHeaderGrid').style.height = 14*(size+2)+'px'; // FIXME
+      this.maxHeight=1;
     }
   },
 
