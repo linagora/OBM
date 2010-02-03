@@ -303,6 +303,7 @@
   color: #fff;
   background-color: rgb(102, 140, 217);
   border: 1px solid rgb(41, 82, 163);
+  /*background: -webkit-gradient(linear, left top, right bottom, from(rgb(102, 140, 217)), to(rgb(166, 188, 232)));*/
 }
 .eventOwner h1, li.eventOwner, .eventOwner .handle {
   background-color: rgb(41, 82, 163);
@@ -617,6 +618,11 @@ li.eventOwner19Legend {
 /* ------------------------------------------------------------------------- */
 /* Calendar Quick Form */
 /* ------------------------------------------------------------------------- */
+
+#calendarQuickForm {
+  -webkit-box-shadow: 10px 10px 10px #666;
+  -moz-box-shadow: 10px 10px 10px #666;
+}
 
 #calendarQuickForm form  {
   text-align: left;

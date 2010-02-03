@@ -612,7 +612,7 @@ Obm.CalendarManager = new Class({
    */
   prevMonth: function() {
    obm.vars.consts.currentMonth.setMonth(obm.vars.consts.currentMonth.getMonth() - 1)
-   this.current =obm.vars.consts.currentMonth;
+   this.current.setTime(obm.vars.consts.currentMonth.getTime());
    this.refresh();
   },
 
@@ -640,7 +640,7 @@ Obm.CalendarManager = new Class({
    */
   nextMonth: function() {
    obm.vars.consts.currentMonth.setMonth(obm.vars.consts.currentMonth.getMonth() + 1)
-   this.current =obm.vars.consts.currentMonth;
+   this.current.setTime(obm.vars.consts.currentMonth.getTime());
    this.refresh();
   },
 
@@ -710,9 +710,9 @@ Obm.CalendarManager = new Class({
   /**
    * Show month view
    */
-  showMonth: function(m) {
-   if (m) {
-     this.current.setMonth(m);
+  showMonth: function(t) {
+   if (t) {
+     this.current = new Obm.DateTime(t);
    }
    obm.vars.consts.nbDisplayedDays = 30;
    obm.vars.consts.calendarRange = 'month';

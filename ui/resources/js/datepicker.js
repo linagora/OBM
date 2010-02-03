@@ -407,7 +407,7 @@ function miniCal(year, month, view) {
        .addEvent('click',miniCal.pass([previousMonth.year,previousMonth.month, view]))
        .appendText("«")))
     .adopt(new Element('td').setProperty('colspan', '5')
-       .adopt(new Element('a').setProperty('href', 'javascript: obm.calendarManager.showMonth('+thisDay.getMonth()+');')
+       .adopt(new Element('a').setProperty('href', 'javascript: obm.calendarManager.showMonth('+thisDay.getTime()+');')
        .appendText(obm.vars.labels.months[thisDay.getMonth()] + ' ' + thisDay.getFullYear())))
     .adopt(new Element('td').adopt(new Element('a').setProperty('href','javascript: void(0);')
        .addEvent('click',miniCal.pass([nextMonth.year,nextMonth.month, view]))
