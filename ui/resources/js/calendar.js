@@ -772,6 +772,9 @@ Obm.CalendarManager = new Class({
       },
       onComplete: function() {
         $('spinner').hide();
+      },
+      onFailure: function (response) {
+        Obm.Error.parseStatus(this);
       }
     }).get($merge({ajax : 1, action : 'draw'}, data));    
   },
@@ -825,6 +828,9 @@ Obm.CalendarManager = new Class({
       },
       onComplete: function() {
         $('spinner').hide();
+      },
+      onFailure: function (response) {
+        Obm.Error.parseStatus(this);
       }
     }).get($merge({ajax : 1, action : 'draw'}, data));          
   },
@@ -1186,7 +1192,7 @@ Obm.CalendarManager = new Class({
       },
       onComplete : function() {
         $('spinner').hide();
-      }  
+      }
     }).post($merge({ajax : 1, action : 'async_indexing'}, eventData));
   }
 

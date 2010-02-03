@@ -398,6 +398,22 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       echo OBM_Error::getInstance()->toJson();
       exit();
     } 
+  } elseif ($action == 'moveContact') {
+  ///////////////////////////////////////////////////////////////////////////////
+    $contact = OBM_Contact::get($params['id']);
+    $addressbooks = OBM_AddressBook::search();
+    $destination = $addressbooks[$params['addressbook']];
+    if ($destination && $destination->write) {
+      OBM_Contact::move($contact, $destination);
+      $subTemplate['card'] = new OBM_Template('card');
+    } else {
+      header('HTTP', true, 403);
+      //FIXME : Not compatible with the HTML/Ajax implemetation
+      OBM_Error::getInstance()->addError('rights', __('Permission denied'));
+      echo OBM_Error::getInstance()->toJson();
+      exit();
+    }
+
   } elseif ($action == 'deleteContact') {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
@@ -718,6 +734,14 @@ function get_contact_action() {
 // Contact copy
  $actions['contact']['copyContact']   = array (
     'Url'      => "$path/contact/contact_index.php?action=copyContact",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+                                    		 );
+
+// Contact copy
+ $actions['contact']['moveContact']   = array (
+    'Url'      => "$path/contact/contact_index.php?action=moveContact",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None')

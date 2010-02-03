@@ -13,12 +13,15 @@
             <input onclick="obm.contact.addressbook.updateContact(<?php echo $contact->id ?>);" type='button' value='<?php echo __('Update') ?>' title="<?php echo __('Update contact') ?>" class='updateButton' />
           </li>
           <li>
-            <input onclick='obm.contact.addressbook.deleteContact(<?php echo $contact->id ?>, "<?php echo self::toJs($contact->displayname) ?>");' type='button' value='<?php echo __('Delete') ?>' title="<?php echo __('Delete contact') ?>" class='deleteButton' />
+            <input onclick='obm.contact.addressbook.deleteContact(<?php echo $contact->id ?>, "<?php echo self::toJs($contact->displayname) ?>");' 
+              type='button' value='<?php echo __('Delete') ?>' title="<?php echo __('Delete contact') ?>" class='deleteButton' />
           </li>
           <?php } ?> 
           <li>
             <input type='button' value='<?php echo __('More actions') ?>' title="<?php echo __('More actions') ?>" class='dropDownButton' />
             <ul>
+
+              <!-- Copy contact -->
               <li><?php echo __('Copy') ?>
                 <ul>
                   <?php foreach($addressbooks as $_id => $_addressbook) { ?>
@@ -30,10 +33,26 @@
                   <?php } ?> 
                 </ul>
               </li>
+
+              <!-- Move contact-->
+              <li><?php echo __('Move') ?>
+                <ul>
+                  <?php foreach($addressbooks as $_id => $_addressbook) { ?>
+                  <?php if($_id != $contact->addressbook_id && $_addressbook->write == 1) { ?>
+                  <li>
+                    <a onclick="obm.contact.addressbook.moveContact(<?php echo $contact->id ?>,<?php echo $_id ?>); return false;" href=""><?php echo $_addressbook->displayname ?></a>
+                  </li>
+                  <?php } ?> 
+                  <?php } ?> 
+                </ul>
+              </li>
+
+              <!-- Export -->
               <li>
                 <a href="<?php echo self::__actionlink('vcard', array('contact_id' => $contact->id)) ?>"><?php echo __('Export as Vcard') ?></a>
               </li>
             </ul>
+
           </li>
         </ul>
         <script type='text/javascript'>
@@ -43,6 +62,7 @@
     </tr>
   </thead>
 </table>
+
 <div class='contactPanelContainer' id='informationContainer'>
   <table id="contact-card-<?php echo $contact->id ?>">
     <tbody>

@@ -163,6 +163,10 @@ Obm.Contact.AddressBook = new Class ({
     this.dataRequest.write({ajax:1, action:'copyContact', 'id':contact, 'addressbook':addressbook});
   },
 
+  moveContact: function(contact, addressbook) {
+    this.dataRequest.write({ajax:1, action:'moveContact', 'id':contact, 'addressbook':addressbook});
+  },
+
   searchContact: function(form) {
     $('contactfilter').set('value','');
     this.hideContact();

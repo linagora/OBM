@@ -35,6 +35,7 @@ return array(
   'Contact card' => 'Fiche contact',
   'Contact photo' => 'Photographie',
   'Copy' => 'Copier',
+  'Move' => 'Déplacer',
   'CRM Fields' => 'Informations commerciales',
   'Datasource' => 'Source de données',
   'Date' =>  'Date',
