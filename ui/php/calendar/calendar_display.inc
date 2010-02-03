@@ -26,6 +26,11 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
 
   $calendar_entity = $current_view->get_entities();
 
+  if (sizeof($calendar_entity['user']) == 0 && !is_array($calendar_entity['resource'])) {
+    $current_view->set_users($obm['uid']);
+    $calendar_entity = $current_view->get_entities();
+  }
+
   $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
