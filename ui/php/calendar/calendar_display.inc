@@ -29,6 +29,10 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
+
+  $entity_readable['group'] = run_query_get_allowed_groups();
+  $entity_readable['group'] = $entity_readable['group']['entity'];
+
   $my_views = run_query_calendar_get_my_views();
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view;
   
