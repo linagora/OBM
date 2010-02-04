@@ -2390,11 +2390,18 @@ function dis_deal_dashboard_year_detail($deal) {
       }
     }
 
+    // Total columns
     $dis_tam = number_format($tam, 2, ',', ' ');
     $dis_tma = number_format($tma, 2, ',', ' ');
     $dis_tab = number_format($tab, 2, ',', ' ');
     $dis_tca = number_format($tca, 2, ',', ' ');
     $dis_tcb = number_format($tcb, 2, ',', ' ');
+
+    $month_start = "$year-01-01";
+    $month_end = "$year-12-31";
+    $url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
+
+    $dis_tam = "<a href=\"$path/deal/deal_index.php?action=dashboard_list&amp;sel_manager[]=$u_id&amp;cba_archive=1&amp;sel_region=$region&amp;delegation=$delegation$url_date$url_sel_tt\">$dis_tam</a>";
 
     $dis_amount_row .= "<td class=\"money\">$dis_tam</td>
       </tr>";
