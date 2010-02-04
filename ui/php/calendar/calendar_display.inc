@@ -89,11 +89,20 @@ function dis_calendar_search_result($calendar, $current_view) {
     $block = "<h1>$GLOBALS[l_basic_search_result] \"".stripslashes($calendar['pattern'])."\"</h1>";
     $events = run_query_calendar_solr_query(format_name($calendar['pattern'], 1, true));
   } else {
-    $begin = clone $calendar['date_begin'];
+    if ($calendar['date_begin'] == null) {
+      $begin = new Of_Date();
+    } else {
+      $begin = clone $calendar['date_begin'];
+    }
     $begin->setHour(0);
     $begin->setMinute(0);
     $begin->setSecond(0);
-    $end = clone $calendar['date_end'];
+
+    if ($calendar['date_end'] == null) {
+      $end = new Of_Date();
+    } else {
+      $end = clone $calendar['date_end'];
+    }
     $end->setHour(0);
     $end->setMinute(0);
     $end->setSecond(0);
