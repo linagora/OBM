@@ -18,6 +18,7 @@ get_val password
 P=$VALUE
 get_val db
 DB=$VALUE
+echo "Database : $DB"
 
 mysqldump -u $U -p$P  --default-character-set='UTF8' ${DB} > ${HOME}/migration-backup.sql 
 echo "database backup stored in ${HOME}/migration-backup.sql"

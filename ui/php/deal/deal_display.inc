@@ -43,6 +43,7 @@ $fieldnames['deal_company_name'] = $l_company;
 $fieldnames['deal_company_zipcode'] = $l_postcode;
 $fieldnames['parentdeal_marketing_lastname'] = $l_marketing_manager;
 $fieldnames['parentdeal_technical_lastname'] = $l_technical_manager;
+$fieldnames['parentdeal_archive'] = $l_archive;
 $fieldnames['parentdeal_status'] = $l_status;
 $fieldnames['parentdeal_dateproposal'] = $l_proposal;
 $fieldnames['parentdeal_datealarm'] = $l_alarm;
@@ -101,7 +102,7 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     $res['align'] = 'center';
   }
 
-  else if ($fieldname == 'deal_archive') {
+  else if (($fieldname == 'deal_archive') || ($fieldname == 'parentdeal_archive')) {
     $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
       $res['name'] = 'X';
@@ -3462,15 +3463,17 @@ function dis_deal_parentdeal_consult($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$types,$tts,$status_q,$usr_q) {
   global $display, $path;
-  global $l_parentdeal_deals,$l_label,$l_technical_manager;
-  global $l_parentdeal,$l_proposal,$l_alarm,$l_amount_in,$l_amount_out,$l_potential_balanced,$l_comment,$l_marketing_manager,$l_status;
-  global $l_infos, $l_deal_select_company;
+  global $l_parentdeal, $l_parentdeal_deals,$l_label,$l_technical_manager;
+  global $l_archive,$l_proposal,$l_alarm,$l_amount_in,$l_amount_out;
+  global $l_potential_balanced,$l_comment,$l_marketing_manager,$l_status;
+  global $l_yes, $l_no, $l_infos, $l_deal_select_company;
 
   $parent = $parent_q->f('parentdeal_id');
   $plabel = $parent_q->f('parentdeal_label');
   $pmarket = $parent_q->f('parentdeal_marketingmanager_id');
   $ptech = $parent_q->f('parentdeal_technicalmanager_id');
   $pcomment = nl2br($parent_q->f('parentdeal_comment'));
+  $archive = ($parent_q->f('parentdeal_archive') == 1 ? $l_yes : $l_no);
 
   $pmarket_name = $parent_q->f('lname1') . ' ' . $parent_q->f('fname1');
   $ptech_name = $parent_q->f('lname2') . ' ' . $parent_q->f('fname2');
@@ -3482,52 +3485,63 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $p_potential = get_deal_parent_potential($parent);
 
   $block = "
-     <div class=\"detail infos\">
-      <h1>$l_parentdeal</h1>
-	<table>
-	<tr>
-	  <th>$l_label</th>
-	  <td>$plabel</td>
-	</tr><tr>
-	  <th>$l_marketing_manager</th>
-	  <td>$pmarket_name</td>
-	</tr><tr>
-	  <th>$l_technical_manager</th>
-	  <td>$ptech_name</td>
-	</tr><tr>
-	  <th>$l_proposal</th>
-	  <td>$p_dateproposal</td>
-	</tr>
-	</table>
-	</div>
+  <div class=\"detail infos\">
+    <h1>$l_parentdeal</h1>
+    <table>
+    <tr>
+      <th>$l_label</th>
+      <td>$plabel</td>
+    </tr>
+    <tr>
+      <th>$l_marketing_manager</th>
+      <td>$pmarket_name</td>
+    </tr>
+    <tr>
+      <th>$l_technical_manager</th>
+      <td>$ptech_name</td>
+    </tr>
+    <tr>
+      <th>$l_proposal</th>
+      <td>$p_dateproposal</td>
+    </tr>
+    <tr>
+      <th>$l_archive</th>
+      <td>$archive</td>
+    </tr>
+    </table>
+  </div>
 
-    <div class=\"detail infos\">
-      <h1>$l_infos</h1>
-	<table>
-	<tr>
-	  <th>$l_status :</th>
-	  <td>$p_status</td>
-	</tr><tr>
-	  <th>$l_alarm</th>
-	  <td>$p_datealarm</td>
-	</tr><tr>
-	  <th>$l_amount_out</th>
-	  <td>$p_expense</td>
-	</tr><tr>
-	  <th>$l_amount_in</th>
-	  <td>$p_income</td>
-	</tr><tr>
-	  <th>$l_potential_balanced</th>
-	  <td>$p_potential</td>
-	</tr>
-	</table>
-        </div>
+  <div class=\"detail infos\">
+    <h1>$l_infos</h1>
+    <table>
+    <tr>
+      <th>$l_status :</th>
+      <td>$p_status</td>
+    </tr>
+    <tr>
+      <th>$l_alarm</th>
+      <td>$p_datealarm</td>
+    </tr>
+    <tr>
+      <th>$l_amount_out</th>
+      <td>$p_expense</td>
+    </tr>
+    <tr>
+      <th>$l_amount_in</th>
+      <td>$p_income</td>
+    </tr>
+    <tr>
+      <th>$l_potential_balanced</th>
+      <td>$p_potential</td>
+    </tr>
+    </table>
+  </div>
      
-      <div class=\"detail extra\">
-      <h1>$l_comment</h1>
-	$pcomment
-	</div>
-	";
+  <div class=\"detail extra\">
+    <h1>$l_comment</h1>
+$pcomment
+  </div>
+";
     
   $block .= display_info_msg($l_parentdeal_deals);
 
@@ -3609,7 +3623,7 @@ function dis_deal_parentdeal_form($action, $deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_parentdeal_form($action, $deal_q, $users_c, $users_p, $deal) {
   global $l_update_parent,$l_insert_parent,$l_label,$l_marketing_manager;
-  global $l_parentdeal,$l_technical_manager,$l_comment;
+  global $l_parentdeal,$l_technical_manager,$l_comment, $l_archive;
 
   // if update mode and first time, values are taken from db
   if (($action == 'parent_detailupdate') || ($action == 'parent_delete')) {
@@ -3617,6 +3631,7 @@ function html_deal_parentdeal_form($action, $deal_q, $users_c, $users_p, $deal) 
     $plabel = $deal_q->f('parentdeal_label');
     $pmarket = $deal_q->f('parentdeal_marketingmanager_id');
     $ptech = $deal_q->f('parentdeal_technicalmanager_id');
+    $archive = ($deal_q->f('parentdeal_archive') == 1 ? ' checked' : '');
     $pcomment = $deal_q->f('parentdeal_comment');
   } else {
     // Values are taken from parameters
@@ -3625,7 +3640,9 @@ function html_deal_parentdeal_form($action, $deal_q, $users_c, $users_p, $deal) 
     $pmarket = $deal['pmarket'];
     $ptech = $deal['ptech'];
     $pcomment = stripslashes($deal['pcom']);
-  }  
+  }
+
+  if (isset($deal['parchive'])) { $archive = ($deal['parchive'] == 1 ? 'checked' : ''); }
 
   // Marketing manager select
   $sel_market = "<select name=\"sel_pmarket\">";
@@ -3653,8 +3670,7 @@ function html_deal_parentdeal_form($action, $deal_q, $users_c, $users_p, $deal) 
     $dis_button = "
         <input type=\"hidden\" name=\"action\" value=\"parent_update\" />
         <input type=\"hidden\" name=\"parentdeal_id\" value=\"$parent\" />
-        <input type=\"submit\" value=\"$l_update_parent\" />
-         ";
+        <input type=\"submit\" value=\"$l_update_parent\" />";
   } else {
      $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"parent_insert\" />
@@ -3679,6 +3695,10 @@ function html_deal_parentdeal_form($action, $deal_q, $users_c, $users_p, $deal) 
     </tr><tr>
       <th>$l_technical_manager</th>
       <td>$sel_tech</td>
+    </tr>
+    <tr>
+      <th><label for=\"lbl_arch\">$l_archive</label></th>
+      <td><input type=\"checkbox\" id=\"lbl_arch\" name=\"cba_parchive\" value=\"1\" $archive /></td>
     </tr>
     </table>
   </fieldset>

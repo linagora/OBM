@@ -3,6 +3,8 @@
 # Runs 2.2 to 2.3 schema upgrade
 #
 
+echo "Postgres update shell script"
+
 export LC_ALL=en_US.UTF-8
 
 source `dirname $0`/obm-sh.lib
@@ -14,6 +16,7 @@ get_val password
 P=$VALUE
 get_val db
 DB=$VALUE
+echo "Database : $DB"
 
 export PGPASSWORD=$P
 

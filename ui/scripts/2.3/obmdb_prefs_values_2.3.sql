@@ -179,6 +179,7 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'parentdeal','parentdeal_label',1,2);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'parentdeal','parentdeal_marketing_lastname',2,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'parentdeal','parentdeal_technical_lastname',3,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'parentdeal','parentdeal_archive',4,1);
 
 -- module 'list'
 
