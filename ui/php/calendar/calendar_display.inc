@@ -1997,7 +1997,7 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
             </table>";
           if($haveevent) {
             $hidden_div .= "
-              <div id=\"$id_$day\" class=\"infoPopup\" style=\"border: 1px solid black;\">
+              <div id=\"$id-$day\" class=\"infoPopup\" style=\"border: 1px solid black;\">
               <h1>$description $day</h1>
                <ul>
                ".implode($today_events)."
