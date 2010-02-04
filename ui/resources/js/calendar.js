@@ -52,6 +52,7 @@ Obm.CalendarManager = new Class({
         obm.miniCalendar.select(d.format('Y-m-d'));
       }
     }
+
     if ($('todayHourMarker')) {
       // Set hourMarker initial position
       this.now = new Date();
@@ -1529,12 +1530,11 @@ Obm.CalendarInDayEvent = new Class({
    * Update event time on drag 
    */
   updateTime: function() {
-    var top = this.element.getStyle('top').toFloat();
-    var delta = Math.floor(this.element.getStyle('left').toFloat()/obm.vars.consts.cellWidth);
+    var time = this.element.getStyle('top').toFloat()/obm.calendarManager.defaultHeight * obm.vars.consts.timeUnit;
     this.event.date.setTime(obm.calendarManager.startTime*1000);
-    this.event.date.setDate(this.event.date.getDate() + delta);    
-    this.event.date.setHours(top/obm.calendarManager.defaultHeight * obm.vars.consts.timeUnit/3600);
-    this.event.date.setMinutes((top/obm.calendarManager.defaultHeight * obm.vars.consts.timeUnit)%3600 / 60);
+    this.event.date.setDate(this.event.date.getDate() + Math.floor(this.element.getStyle('left').toFloat()/obm.vars.consts.cellWidth));    
+    this.event.date.setHours(time/3600);
+    this.event.date.setMinutes((time)%3600 / 60);
     this.event.time = Math.floor(this.event.date.getTime() / 1000);
     this.setTitle();
   },
@@ -1548,7 +1548,6 @@ Obm.CalendarInDayEvent = new Class({
     this.event.duration = height * obm.vars.consts.timeUnit;
     this.setTitle();
   }
-
 
 });
 
