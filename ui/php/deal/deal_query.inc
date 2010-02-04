@@ -2459,15 +2459,17 @@ function run_query_deal_parentdeal_update($deal) {
   $plabel = $deal['plabel'];
   $pmarket = sql_parse_id($deal['pmarket']);
   $ptech = sql_parse_id($deal['ptech']);
+  $archive = ($deal['parchive'] == '1' ? '1' : '0');
   $pcomment = $deal['pcom'];
   $multidomain = sql_multidomain('parentdeal');
-	
+
   $query = "UPDATE ParentDeal SET
     parentdeal_timeupdate='". date('Y-m-d H:i:s')."',
     parentdeal_userupdate=".$obm['uid'].",
     parentdeal_label='$plabel',
     parentdeal_marketingmanager_id=$pmarket,
     parentdeal_technicalmanager_id=$ptech,
+    parentdeal_archive='$archive',
     parentdeal_comment='$pcomment'
   WHERE parentdeal_id $pid 
     $multidomain";
