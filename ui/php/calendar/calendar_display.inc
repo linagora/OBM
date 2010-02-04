@@ -853,7 +853,6 @@ function dis_calendar_month_agenda($current_view, $calendar_entity, $writable_en
  */
 function dis_calendar_navbar($current_view) {
  
-  $range = $current_view->get_cal_range();
   $label = dis_calendar_navbar_label($current_view);
 
   if ($current_view->get_cal_view() == 'agenda') {
@@ -871,7 +870,7 @@ function dis_calendar_navbar($current_view) {
   } else {
     $current = clone $current_view->get_date();
     $date = clone $current_view->get_date();
-    switch($range) {
+    switch($current_view->get_cal_range()) {
       case 'day':
         $url_prev = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subDay(1)->getURL();
         $url_next = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addDay(1)->getURL();
@@ -1299,7 +1298,6 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   } else if ($display_days == 7) {
     $week = "ico_week_view_current";
   }
-  $label = dis_calendar_navbar_label($current_view, $display_days);
 
   $block .= "
   <div id='calendarHeader'>
@@ -1355,6 +1353,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   obm.calendarManager.setLegendBar('".phpStringToJsString($tag_legend)."');";
 
   if ($ajax) {
+    $label = dis_calendar_navbar_label($current_view, $display_days);
     return "$block
       <script type=\"text/javascript\">
         obm.vars.consts.calendarRange = '$range';
@@ -1407,6 +1406,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     $dis_week_time .= "obm.vars.consts.weekTime[".$current->getWeek()."] = new Array('".$current->getTimestamp()."','".$endWeek->getTimestamp()."');";
     $dis_weekbegin_time .= "obm.vars.consts.weekBegin.push(".$current->getTimestamp().");";
     $occurrences = $of->getPeriodOccurrences($current,$endWeek);
+
     if (is_array($occurrences)) {
       foreach($occurrences as $occurrence) {
         if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
@@ -1419,14 +1419,16 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
            $occurrence->index = $current;
            $occurrence->left = true;
         }
+
+        // Right extension
         if ($occurrence->end->compare($endWeek) > 0) {
            $occurrence->right = true;
         }
 
-
         $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
       }
     }
+
     while($current->compare($endWeek) < 0) {
       $today = "";
       if ($current->isToday()) {
@@ -1453,6 +1455,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $step++;
       $current->addDay(1);
     }
+
     $week_day_event_list .= "</div>";
 
   }
@@ -1469,10 +1472,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     $week_day_list .= "<td class='dayLabel'>".$current->localize(Of_Date::WEEKDAY)."</td>";
     $current->addDay(1);
   }
-  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
-  $GLOBALS['js']['vars']['consts']['calendarDetailconsultURL'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']).'?action=detailconsult&calendar_id='; 
 
-  $label = dis_calendar_navbar_label($current_view);
   $block = "
   <div id='calendarHeader'>
     <table class='calendarTable'>
@@ -1503,6 +1503,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   obm.calendarManager.setLegendBar('".phpStringToJsString($tag_legend)."');";
 
   if ($ajax) {
+    $label = dis_calendar_navbar_label($current_view);
     return "$block
       <script type=\"text/javascript\">
         obm.vars.consts.calendarRange = 'month';

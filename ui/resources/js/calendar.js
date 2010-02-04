@@ -59,7 +59,6 @@ Obm.CalendarManager = new Class({
       this.updateHourMarkerTimer = this.updateHourMarker.periodical(120000, this);
     }
 
-
     if (obm.vars.consts.calendarRange == 'month') {
       this.tips = new Obm.Tip(null, {fixed:true, click:true}, 'calTip'); 
       this.observer = new Obm.Observer($('calendarHeaderGrid'), {onStop:this.resizeAlldayContainer, property:'offsetHeight'});
@@ -883,7 +882,10 @@ Obm.CalendarManager = new Class({
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,
-      onComplete : function(response) {
+      onFailure: function (response) {
+        Obm.Error.parseStatus(this);
+      },
+      onSuccess : function(response) {
         if (response.conflict) {
           $('popup_force').value = obm.vars.labels.insert_force;
           obm.calendarManager.popupManager.add('calendarConflictPopup');
@@ -957,7 +959,10 @@ Obm.CalendarManager = new Class({
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,
-      onComplete : function(response) {
+      onFailure: function (response) {
+        Obm.Error.parseStatus(this);
+      },
+      onSuccess : function(response) {
         if(response.occUpdate) {
           obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
         }
@@ -1065,7 +1070,10 @@ Obm.CalendarManager = new Class({
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,
-      onComplete : function(response) {
+      onFailure: function (response) {
+        Obm.Error.parseStatus(this);
+      },
+      onSuccess : function(response) {
         if(response.checkDelete) {
           obm.calendarManager.popupManager.add('calendarConfirmDelete');
         }
