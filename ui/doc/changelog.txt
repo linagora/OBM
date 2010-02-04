@@ -1,7 +1,7 @@
 <!-- $Id:$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.2 - 2010-02-01
+version 2.3.2 - 2010-02-04
 
 2010-02-10 : version 2.3.2
 
@@ -12,10 +12,17 @@ version 2.3.2 - 2010-02-01
 
   * #560 [Host] label mispelling
   * #844 [Control] Dashboard information are not separated by domains
+  * #924 [MiniG] tiny bug with mark as read function
   * #943 [Host] WONTFIX Stats not displayed Munin conf lacks apache Alias /stats
+  * #956 [MiniG] Cache corruption
   * #970 [Company] error in company creation
+  * #990 [MiniG] access not allowed on first access to a new mailbox
   * #1000 ldapRoot syntax in obmSatellite configuration
   * #1001 [Auto] Perl warning message
+  * #1003 [MiniG] [PDF export] Fields TO et CC
+  * #1004 [MiniG] Message vizualisation : Message splitted
+  * #1005 [MiniG] Message Selection : All messages behaviour
+  * #1006 [MiniG] Message with empty subject : Answer and forward
   * #1013 [Auto] Bad log level on obmSatellite Postfix map generation contact
   * #1016 change init cyrus script in obm-satellite
   * #1031 obm should depend on obm-solr
@@ -37,8 +44,10 @@ version 2.3.2 - 2010-02-01
   * #538 Add Samba and delegation infos in CSV import for users and groups
   * #544 [WONTFIX] Provide automatic groups, based on delegation
   * #588 obm-caldav server must use DB to find obm-sync server
+  * #598 [MiniG] Long mail composition generates multiple backup copies/drafts
   * #601 Merge missing from 2.2.9 to trunk
   * #609 Event exception support with parent_id
+  * #643 [MiniG] delete drafts and templates
   * #649 add obm-sync client
   * #659 [Contact] addressbook handling
   * #673 create o-push package
@@ -55,6 +64,7 @@ version 2.3.2 - 2010-02-01
   * #692 Color tags for events
   * #693 Event search
   * #694 ICS Invitations only work from source folder, not from a search result
+  * #696 [MiniG] sender name is truncated in mail list
   * #699 create obm-locator Debian package
   * #700 create obm-locator rpm package
   * #703 Add UI to define which user profiles can create public entities
@@ -70,6 +80,9 @@ version 2.3.2 - 2010-02-01
   * #805 Delegated mobile devices administration rights
   * #808 update apache configuration to support opush
   * #834 planning tables fail to create on pg
+  * #835 [MiniG] CC and BCC fields are lost when saving draft or template
+  * #836 [MiniG] Button "Save as template" never disabled
+  * #845 [Minig] Conversation list does not appear after logging
   * #847 Delegation update fail
   * #857 [Translation] Romanian obm-ui translation
   * #858 [Translation] Italian obm-ui translation
@@ -78,6 +91,7 @@ version 2.3.2 - 2010-02-01
   * #864 Calendar export ICS
   * #865 Calendar export ICS
   * #880 SQL error when putting a long string in "Genre" field
+  * #881 [MiniG] problem with drag and drop
   * #882 Apache2 conf file contains rules which are applied on all defined vhost
   * #892 Don't send vacation message on SPAM or mailist mails
   * #899 [MiniG] attachment consultation on IE8
@@ -86,3 +100,4 @@ version 2.3.2 - 2010-02-01
   * #906 handling of "cedex" field in LDAP
   * #907 Upgrade from 2.2 to 2.3 need to update global domain to add system user
   * #944 [Contact] auto collected contact from minig display a bad date
+  * #951 [MiniG] void subject break reply
