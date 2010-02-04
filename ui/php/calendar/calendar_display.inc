@@ -1193,7 +1193,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       </tr>
       <tr>
         <td style='width:3em;text-align:center;'><a href='javascript: void(0)' onclick='obm.calendarManager.showWeek($ts)'>$week_num</a></td>
-        <td colspan='$display_days'>
+        <td colspan='$display_days' style='border-right:1px solid #AAA;'>
           <div id='calendarHeaderGrid' ondblclick='obm.calendarQuickForm.compute(event, \"week\");'>
               $week_day_event_list
           </div>
@@ -4726,8 +4726,8 @@ function dis_calendar_meeting_form($current_view, $calendar) {
       <table>
       $dis_block_resource 
       $dis_block_resource_group
-      <input type='hidden' name='resource_group_search' value='all' />
       </table>
+      <input type='hidden' name='resource_group_search' value='all' />
       </fieldset>";    
   }
   
@@ -4834,12 +4834,10 @@ function dis_calendar_meeting_form($current_view, $calendar) {
   </tr>
   </table>
   </fieldset>   
-    $dis_block_user 
-    $dis_block_resource
+  $dis_block_user 
+  $dis_block_resource
   <fieldset class=\"buttons\">
-    <form onsubmit='return false;'>
-      $dis_button
-    </form>
+    $dis_button
   </fieldset>    
   </form>
   $freebusy
@@ -5462,7 +5460,7 @@ function dis_calendar_admin_index($tags_q) {
       <div id=\"cp_$tagid\" class=\"extColorPicker\">
         <div id=\"cp_back_$tagid\">&nbsp;</div>
       <input type=\"hidden\" id=\"tf_tag_color_$tagid\" value=\"$tagcolor\">
-      <img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" /></a>
+      <img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" />
       </div>
       
       </div>
@@ -5498,7 +5496,7 @@ function dis_calendar_admin_index($tags_q) {
       <div id=\"cp\" class=\"extColorPicker\">
         <div id=\"cp_back\">&nbsp;</div>
       <input type=\"hidden\" name=\"tf_tag_color\" id=\"tf_tag_color\" value=\"#eff0f2\">
-      <img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" /></a>
+      <img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" />
       </div>
       
       </div>
@@ -5795,7 +5793,7 @@ function dis_icalendar_export($params) {
       <td>$l_event_before_date</td>
     </tr>
     <tr>
-      <th></td>
+      <th></th>
       <td><input disabled type=\"text\" name=\"tf_event_before_date\" id=\"tf_event_before_date\" value=\"".$date->getInputDate()."\" class=\"datePicker\" /></td>
     </tr>
     ";
