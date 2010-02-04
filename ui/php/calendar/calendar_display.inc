@@ -130,11 +130,6 @@ function dis_calendar_search_result($calendar, $current_view) {
       $pattern .= " category:($calendar[category])";
     }
 
-    // doesn't work with repeated events
-    // $from = $begin->format('Y-m-d\T00:00:00\Z');
-    // $to = $end->format('Y-m-d\T23:59:59\Z');
-    // $pattern .= " date:[$from TO $to]";
-
     $events = run_query_calendar_solr_query($pattern);
   }
 
@@ -257,7 +252,6 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
   if ($action != 'perform_meeting' && $output_target != 'print') {
     $block .= html_calendar_select_calendar_entity($p_view, $current_view, $calendar_entity, $entity_readable);
     $block .= html_calendar_view_selector($current_view, $my_views);
-    // $block .= html_calendar_bar_date_selector($current_view);
   }
 
   return $block;
@@ -560,126 +554,6 @@ function html_calendar_minical($current_view) {
       $js
     });
   </script>";
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the navigation date selector 
-// Parameters:
-//   - $current_view: current calendar view
-///////////////////////////////////////////////////////////////////////////////
-function html_calendar_bar_date_selector($current_view) {
-  global $ccalendar_weekstart,$ico_ok, $path;
-  global $l_go, $l_go_to, $l_daysofweekfirst;
-  
-  $date = $current_view->get_date();
-  $date_end = clone $date; 
-  $date_end->addMonth(9);
-  // Week Selection
-  $current = clone $date;
-  $current->subMonth(3)->setWeekday($ccalendar_weekstart);
-  $end = clone $current;
-  $end->addDay(6);
-  while ($current->compare($date_end) < 0) {
-    $label = $current->localize(Of_Date::OBM_DATE_WEEK_JUMP).' - '.$end->localize(Of_Date::OBM_DATE_WEEK_JUMP);
-    $iso = $current->getURL();
-    if ($current->compareWeek($date) == 0) {
-      $sel_week .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&amp;date=$iso\" selected=\"selected\">$label</option>";
-    } else {
-      $sel_week .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&amp;date=$iso\">$label</option>";
-    }
-    $current->addWeek(1);
-    $end->addWeek(1);
-  }
-
-  $current = clone $date;
-  $current->subMonth(3);
-  // Month Selection
-  while($current->compare($date_end) < 0) {
-    $label = $current->localize(Of_Date::OBM_DATE_MONTH);
-    $iso = $current->getURL();
-    if ($current->compareMonth($date) == 0) {
-      $sel_month .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=month&amp;date=$iso\" selected=\"selected\">$label</option>\n";
-    } else {
-      $sel_month .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?cal_range=month&amp;date=$iso\">$label</option>\n";
-    }
-    $current->addMonth(1);
-  }
-
-  $current = clone $date;
-  $current->setWeekday($ccalendar_weekstart);
-  $end = clone $current;
-  $end->addDay(6);
-  // Minicalendar Head
-  while($current->compare($end) <= 0) {
-    $day = $current->localize(Of_Date::WEEKDAY_NARROW);
-    $dis_minical_head .= "<td>$day</td>\n";
-    $current->addDay(1);
-  }
-
-  // Minicalendar
-  $current = clone $date;
-  $current->setDay(1)->addDay(1)->subWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
-  $end = clone $date;
-  $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
-  while($current->compare($end) < 0) {
-    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "<tr>\n";
-    $day = $current->get(Of_Date::DAY);
-    $iso = $current->getURL();
-    $id = $current->getDateIso();
-    if ($current->isToday()) {
-      $klass = 'highlight';
-    } elseif ($current->compareMonth($date)!= 0) {
-      $klass = 'downlight';
-    } else {
-      $klass = '';
-    }
-    $dis_minical .= "<td id='minical_$id' class=\"$klass\" onclick=\"window.location.href='".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&amp;date=$iso'\"
-      onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\">
-      $day
-      </td>";
-
-    $current->addDay(1);
-    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "</tr>\n";
-  } 
-  $label = $date->localize(Of_Date::OBM_DATE_MONTH);
-  $current = new Of_Date();
-  $block = "
-  <div class=\"portlet\" id=\"calendarMiniCal\">
-    <h1>
-    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subYear(1)->getURL()."\">&lt;&lt;</a>
-    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->subMonth(1)->getURL()."\">&lt;</a>
-    $label
-    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addMonth(1)->getURL()."\">&gt;</a>
-    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addYear(1)->getURL()."\">&gt;&gt;</a>
-    </h1>
-    <div>
-      <table class=\"miniCalendar\">
-      <thead>
-      <tr>$dis_minical_head</tr>
-      </thead>
-      <tbody>
-      $dis_minical
-      </tbody>
-      </table>
-    </div>
-  </div>
-  <div class=\"portlet\" id=\"calendarGoTo\">
-  <h1>$l_go_to</h1>
-  <form action=\"\" class=\"detail\" onsubmit=\"return false;\">
-    <select name=\"actionWeek\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-    $sel_month
-    </select>
-    <input type=\"image\" src=\"$ico_ok\" value=\"$l_go\" onclick=\"window.location=(this.form.actionWeek.options[this.form.actionWeek.selectedIndex].value);return false;\" />
-    <br />
-    <select name=\"actionMonth\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-    $sel_week
-    </select>
-    <input type=\"image\" src=\"$ico_ok\" value=\"$l_go\" onclick=\"window.location=(this.form.actionMonth.options[this.form.actionMonth.selectedIndex].value);return false;\" />
-  </form>
-  </div>";
-
   return $block;
 }
 
@@ -1710,28 +1584,16 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
           $properties = $event->properties;
           $item_list = '';
 
-
-          // if ($pattern) {
-          //   $values = $pattern;
-          //   if (is_array($pattern)) {
-          //     $values = implode(' ', array_values($pattern));
-          //   }
-          //   $words = explode(' ', $values);
-          //   foreach($words as $w) {
-          //    $title = str_ireplace($w, "<p class='searchPattern'>$w</p>", $title);
-          //   }
-          // }
-
           if ($properties != '') {
-            $item = "<?xml version='1.0' encoding='$charset'?>$properties";
+            $item = "<?xml version='1.0' encoding='$charset' ?".">$properties";
             $xml = parse_item($item);
             if (is_object($xml)) {
               foreach($xml->resource as $key => $value) {
                 if (!empty($value->item)) {
                   if (!empty($value->property_value)) {
-        $block_property = "($value->property_name:$value->property_value)";
+                    $block_property = "($value->property_name:$value->property_value)";
                   } else {
-        $block_property = '';
+                    $block_property = '';
                   }
                   $item_list .= "<strong>$value->res_name</strong> $block_property<br>".
                     nl2br($value->item);
@@ -1956,7 +1818,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $properties = $event->properties;
     if ($properties != '') {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'? >".$properties;
+      $item = "<?xml version='1.0' encoding='$charset' ?".">".$properties;
       $xml = parse_item($item);
       if (is_object($xml)) {
         foreach($xml->resource as $key => $value) {
@@ -2170,7 +2032,7 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
             </table>";
           if($haveevent) {
             $hidden_div .= "
-              <div id=\"$id_$day\" class=\"infoPopup\" style=\"border: 1px solid black;\">
+              <div id=\"$id-$day\" class=\"infoPopup\" style=\"border: 1px solid black;\">
               <h1>$description $day</h1>
                <ul>
                ".implode($today_events)."
@@ -2802,13 +2664,13 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $description = nl2br($event_q->f('event_description'));
     if ($properties != '') {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?>".$properties;
+      $item = "<?xml version='1.0' encoding='$charset' ?".">".$properties;
     } else {
       $item = '';
     }
 
     $block_category1 = of_category_dis_block_consult('event', 'category1', $cats1, 'mono');
-    switch ($priority ) {
+    switch ($priority) {
       case 1 :
         $priority = $l_low;
         break;
@@ -3446,8 +3308,7 @@ function dis_calendar_quick_form($calendar_entity) {
       obm.calendarQuickForm = new Obm.CalendarQuickForm();
       obm.vars.labels.edit = '".phpStringToJsString($l_edit)."';
       obm.vars.labels.edit_full = '".phpStringToJsString($l_edit_full)."';
-    </script>
-";
+    </script>";
 
   return $block;
 }
@@ -3622,7 +3483,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $desc = $event_q->f('event_description');
     if ($properties != '') {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?>$properties";
+      $item = "<?xml version='1.0' encoding='$charset' ?".">$properties";
     } else {
       $item = '';
     }
@@ -3912,8 +3773,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </tr>";
   }
 
-
-
   if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
     $users = $calendar['user_id'];
     foreach($users as $u) {
@@ -4011,7 +3870,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         function() { return \$('userSearchSource').value+'&action=ext_search'; },
         'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
   } else {
-    $block_user = "<fieldset class=\"detail infos H\"><div class='elementRow' id='sel_user_id-data-user-$obm[uid]'><input type='hidden' name='sel_user_id[]' value='data-user-$obm[uid]' />".$users['entity'][$obm['uid']]['label']."</div></fieldset>";
+    $block_user = "<fieldset class=\"detail infos H\">
+      <div class='elementRow' id='sel_user_id-data-user-$obm[uid]'>
+      <input type='hidden' name='sel_user_id[]' value='data-user-$obm[uid]' />".$users['entity'][$obm['uid']]['label']."
+      </div></fieldset>";
   }
 
   // group select
@@ -4129,71 +3991,71 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         }
       }
     } else {
-    if (is_array($res['entity'])) {
-      foreach ($res['entity'] as $r_id => $r_ent) {
-        $r_name = $r_ent['label'];
-        $sel_id = "data-resource-$r_id";
-        $div_id = "sel_resource_id-$sel_id";
-        $list_item = '';
-        $list_item_id = '';
-        $property_value = '';
-        $property_name = '';
-        // Item & Property
-        $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&amp;resource_id=$r_id";
+      if (is_array($res['entity'])) {
+        foreach ($res['entity'] as $r_id => $r_ent) {
+          $r_name = $r_ent['label'];
+          $sel_id = "data-resource-$r_id";
+          $div_id = "sel_resource_id-$sel_id";
+          $list_item = '';
+          $list_item_id = '';
+          $property_value = '';
+          $property_name = '';
+          // Item & Property
+          $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&amp;resource_id=$r_id";
 
-        if ($item != '') {
-            $xml = parse_item($item);
-        }
-        if (is_object($xml) && ($action == 'detailupdate' || $action == 'update'  || $action == 'duplicate' || ($action == 'new' && isset($calendar['template_id'])))) {
-          foreach($xml->resource as $key => $value) {
-            if ($value->res_id == $r_id) {
-              $list_item = $value->item;
-              $list_item_id = $value->item_id;
-              $property_name = $value->property_name;
-              $property_value = $value->property_value;
-            }
+          if ($item != '') {
+              $xml = parse_item($item);
           }
-        } else {
-          $list_item = $t_list_item[$r_id]; 
-          $list_item_id = $t_list_item_id[$r_id]; 
-          $property_name = $t_property_name[$r_id];
-          $property_value = $t_property_value[$r_id];
+          if (is_object($xml) && ($action == 'detailupdate' || $action == 'update'  || $action == 'duplicate' || ($action == 'new' && isset($calendar['template_id'])))) {
+            foreach($xml->resource as $key => $value) {
+              if ($value->res_id == $r_id) {
+                $list_item = $value->item;
+                $list_item_id = $value->item_id;
+                $property_name = $value->property_name;
+                $property_value = $value->property_value;
+              }
+            }
+          } else {
+            $list_item = $t_list_item[$r_id]; 
+            $list_item_id = $t_list_item_id[$r_id]; 
+            $property_name = $t_property_name[$r_id];
+            $property_value = $t_property_value[$r_id];
+          }
+          if ($property_name == '') {
+            $property_name = run_query_calendar_get_resource_property($r_id);
+          }
+          if ($property_value == '') {
+            $property_value = $property_name;
+          }        
+          if (!empty($property_name)) {
+            $block_property = "<div>
+                <input type=\"hidden\" name=\"property-name[$r_id]\" id=\"property-name[$r_id]\" value=\"$property_name\" />
+                <input type=\"text\" name=\"property[$r_id]\" id=\"property[$r_id]\" value=\"$property_value\" 
+                  onclick=\"if (this.value=='$property_name') this.value='';\"/>
+            </div>";
+          } else {
+            $block_property = '';
+          }
+          $dis_sel_resource .= "
+            <div class=\"elementRow\" id=\"$div_id\">
+              <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
+              <img src=\"$ico_delete\" alt=\"[Delete]\" />
+              </a>
+              $r_name
+              <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
+              <div>
+                <a id=\"a[$r_id]\" href=\"javascript: void(0);\" onclick=\"popup('$url_item', '')\"> 
+                $l_items</a><br />
+                <textarea id=\"list-item[$r_id]\" name=\"list-item[$r_id]\" readonly>$list_item</textarea>
+                <input type=\"hidden\" id=\"list-item-id[$r_id]\" name=\"list-item-id[$r_id]\" value=\"$list_item_id\" />
+                <input type=\"hidden\" id=\"res-name[$r_id]\" name=\"res-name[$r_id]\" value=\"$r_name\" />
+                <input type=\"hidden\" id=\"res-id[$r_id]\" name=\"res-id[$r_id]\" value=\"$r_id\" />
+              </div>
+              $block_property
+            </div>";
         }
-        if ($property_name == '') {
-          $property_name = run_query_calendar_get_resource_property($r_id);
-        }
-        if ($property_value == '') {
-          $property_value = $property_name;
-        }        
-        if (!empty($property_name)) {
-          $block_property = "<div>
-              <input type=\"hidden\" name=\"property-name[$r_id]\" id=\"property-name[$r_id]\" value=\"$property_name\" />
-              <input type=\"text\" name=\"property[$r_id]\" id=\"property[$r_id]\" value=\"$property_value\" 
-                onclick=\"if (this.value=='$property_name') this.value='';\"/>
-          </div>";
-        } else {
-          $block_property = '';
-        }
-        $dis_sel_resource .= "
-          <div class=\"elementRow\" id=\"$div_id\">
-            <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
-            <img src=\"$ico_delete\" alt=\"[Delete]\" />
-            </a>
-            $r_name
-            <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
-            <div>
-              <a id=\"a[$r_id]\" href=\"javascript: void(0);\" onclick=\"popup('$url_item', '')\"> 
-              $l_items</a><br />
-              <textarea id=\"list-item[$r_id]\" name=\"list-item[$r_id]\" readonly>$list_item</textarea>
-              <input type=\"hidden\" id=\"list-item-id[$r_id]\" name=\"list-item-id[$r_id]\" value=\"$list_item_id\" />
-              <input type=\"hidden\" id=\"res-name[$r_id]\" name=\"res-name[$r_id]\" value=\"$r_name\" />
-              <input type=\"hidden\" id=\"res-id[$r_id]\" name=\"res-id[$r_id]\" value=\"$r_id\" />
-            </div>
-            $block_property
-          </div>";
       }
     }
-  }
 
     $url = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id&amp;filter_entity=Resource&amp;filter_pattern=access";
     $resource_add_button = "
@@ -4568,16 +4430,16 @@ function html_calendar_waiting_events($obm_wait) {
       <tbody>";
     }
 
-    switch ($obm_wait->f('event_priority') ) {;
+    switch ($obm_wait->f('event_priority') ) {
       case 1 : 
-  $priority = $l_low;
-  break;
+        $priority = $l_low;
+        break;
       case 2 :
-  $priority = $l_medium;
-  break;
+        $priority = $l_medium;
+        break;
       case 3 :
-  $priority = $l_high;
-  break;
+        $priority = $l_high;
+        break;
     }
   
     if ($obm_wait->f('event_repeatkind') != 'none') {
@@ -4643,11 +4505,8 @@ function html_calendar_waiting_events($obm_wait) {
 //   - $event_id
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_dis_delete($current_view, $event_id) {
-  global $obm, $perm, $ico_validate,$ico_cancel,$ico_confirm_mail;
-  global $display, $l_confirm_delete_all,$l_confirm,$l_cancel,$l_confirm_mail;
-  global $l_event_cant_delete, $module, $cright_write_admin;
-
-  $iso = $current_view->get_date()->getURL();
+  global $ico_validate,$ico_cancel;
+  global $l_confirm_delete_all,$l_confirm,$l_cancel;
 
   $block = "
    <h1>$l_confirm_delete_all</h1>
@@ -4787,10 +4646,10 @@ function dis_calendar_meeting_form($current_view, $calendar) {
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $r_ent) {
-  $r_name = $r_ent['label'];
-  $sel_id = "data-resource-$r_id";
-  $div_id = "sel_resource_id-$sel_id";
-  $dis_sel_resource .= "
+        $r_name = $r_ent['label'];
+        $sel_id = "data-resource-$r_id";
+        $div_id = "sel_resource_id-$sel_id";
+        $dis_sel_resource .= "
           <div class=\"elementRow\" id=\"$div_id\">
           <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
           <img src=\"$ico_delete\"  alt=\"[Delete]\" />
@@ -4954,6 +4813,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
 
   $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
   $freebusy = html_freebusy_header();
+
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"post\" name=\"f_entity\"
@@ -5543,8 +5403,7 @@ function html_calendar_ressource_list($groupLabel,$resource_group,$free=false) {
   <h2>$ico $groupLabel</h2>
   <ul class=\"list\">
   $ret
-  </ul>
-";
+  </ul>";
 }
 
 
