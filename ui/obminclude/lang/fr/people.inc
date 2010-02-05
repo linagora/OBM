@@ -73,9 +73,6 @@ $l_exist_error = "Un utilisateur portant ce nom existe déjà !";
 $l_lname_error = "Le nom doit être correctement renseigné !";
 $l_image_type_error = "La photo doit être un fichier de type image (gif, jpeg ou png)";
 $l_image_size_error = "La photo ne doit pas dépasser 96px x 96px et avoir un poids supérieur à 100ko";
-$l_err_delegation_target_outside_domain = "La délégation d'administration doit être dans la délégation de l'entité !";
-$l_err_delegation_target_outside_target = "La délégation d'administration doit être dans votre cible de délégation !";
-$l_err_delegation_target_profile = "Ce profil d'utilisateur ne peut avoir de délégation d'administration !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";

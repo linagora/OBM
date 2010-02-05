@@ -6,54 +6,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-// Modified on 2009-09-09T15:20:48+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:26:54+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:32:27+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:33:01+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:33:22+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:34:51+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:35:35+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:36:55+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:40:08+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:42:23+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:52:14+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:56:15+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:56:54+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:57:59+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:59:20+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:59:34+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T11:07:00+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T11:11:16+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:39:56+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:43:17+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:43:32+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:43:43+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:44:13+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:46:42+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:47:34+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:47:47+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:50:46+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:51:23+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:51:35+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:51:50+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:52:01+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:52:08+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:52:53+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:53:09+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:54:16+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:55:10+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:55:22+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:55:33+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:55:46+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:56:02+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:56:10+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:56:28+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:56:37+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:56:51+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:57:19+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:57:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:57:46+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-17T15:58:16+02:00 using OBMtranslation (0.4.1)
 
 $l_login = "Login";
 $l_password = "Password";
@@ -150,9 +102,6 @@ $l_err_system_samba = "Windows rights cannot be updated for a system user !";
 $l_err_host_already_used_by = "The host is already affected to the user ";
 $l_image_type_error = "The photo must be an image file (gif, jpeg or png)";
 $l_image_size_error = "The photo image max size is 96px x 96px and must not exceed 100 kbytes";
-$l_err_delegation_target_outside_domain = "The delegation target must be in the domain delegation !";
-$l_err_delegation_target_outside_target = "The delegation target must be in your target !";
-$l_err_delegation_target_profile = "This profile does not support delegation target !";
 $l_err_profile = "This  profile does not exist";
 $l_user_import_row_cols_error = "Invalid row. Incorrect columns number !";
 $l_batch_no_user_error = "No selected users for batch processing";

@@ -6,69 +6,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: people.inc 3097 2008-09-22 14:22:46Z benoitc $ //
 ///////////////////////////////////////////////////////////////////////////////
-// Modified on 2009-09-09T15:20:48+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-09T18:15:48+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-09T18:15:51+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-09T18:16:06+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T09:23:19+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T09:38:33+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T09:38:49+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T09:46:51+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:05:17+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:09:45+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:15:10+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:15:25+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:20:18+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:32:21+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:35:21+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:47:13+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:49:11+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:51:27+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:55:31+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T10:57:49+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:00:19+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:07:59+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:09:10+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:09:53+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:16:16+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:17:21+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:17:43+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:18:51+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:19:21+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:22:30+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:22:53+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:23:11+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:24:57+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:27:20+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:28:53+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:30:27+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:41:18+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:50:42+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:52:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:54:32+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:54:39+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:10:09+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:11:18+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:12:38+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:12:50+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:17:45+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:20:54+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:37:22+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:38:13+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:40:10+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:40:51+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:40:58+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:42:49+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:43:42+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:43:52+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:45:30+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:45:46+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:47:57+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:53:54+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:54:13+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:54:43+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T15:00:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T15:01:06+02:00 using OBMtranslation (0.4.1)
 
 $l_login = "Login";
 $l_password = "Password";
@@ -127,9 +64,6 @@ $l_exist_error = "A user with that name already exists !";
 $l_lname_error = "Invalid Name !";
 $l_image_type_error = "The photo must be an image file (gif, jpeg or png)";
 $l_image_size_error = "The photo image max size is 96px x 96px and must not exceed 100 kbytes";
-$l_err_delegation_target_outside_domain = "The delegation target must be in the domain delegation !";
-$l_err_delegation_target_outside_target = "The delegation target must be in your target !";
-$l_err_delegation_target_profile = "This profile does not support delegation target !"; 
 $l_add_users = "Add users";
 $l_fill_login = "You must enter a User ID before submitting."; 
 $l_fill_password = "You must enter the password before submitting.";
