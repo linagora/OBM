@@ -988,6 +988,14 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_calendar_solr_store($params['id']);
   exit();
+} elseif ($action == 'share_calendar') {
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
+    run_query_calendar_update_token($params);
+    $display['msg'] .= display_ok_msg("$l_shares : $l_update_ok");
+  } else {
+    $display['msg'] .= display_warn_msg($l_share_err_auth);
+  }
+  $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
 }
 
 $_SESSION['cal_current_view'] = serialize($current_view);
@@ -1075,6 +1083,11 @@ if (!$params['ajax']) {
   $_SESSION['cal_current_view'] = serialize($current_view);
   json_ok_msg("$l_view : $l_insert_ok");
   echo "({".$display['json'].",$msg})";
+  exit();
+} elseif ($action == 'share_public') {
+  $token = generateUniqueKey();
+  dis_calendar_share_public($token);
+  echo $display['json'];
   exit();
 }
 display_page($display);
@@ -1780,6 +1793,20 @@ function get_calendar_action() {
   // Async indexing 
   $actions['calendar']['async_indexing'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=async_indexing",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+  // Generate public url
+  $actions['calendar']['share_public'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=share_public",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+  // Share calendar
+  $actions['calendar']['share_calendar'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=share_calendar",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );

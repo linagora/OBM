@@ -122,6 +122,14 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   echo '('.$display['json'].')';
   exit();
 
+} elseif ($action == 'ext_search_mail') {
+///////////////////////////////////////////////////////////////////////////////
+  $addressbooks = OBM_AddressBook::search();
+  $contacts = $addressbooks->searchContacts($params['pattern']);
+  json_search_contact($params, $contacts);
+  echo '('.$display['json'].')';
+  exit();
+
 } elseif ($action == 'import') {
 ///////////////////////////////////////////////////////////////////////////////
   if($params['addressbook'] && OBM_AddressBook::get($params['addressbook'])->write == 1) {
@@ -668,6 +676,13 @@ function get_contact_action() {
 // Search
   $actions['contact']['ext_search'] = array (
     'Url'      => "$path/contact/contact_index.php?action=ext_search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+// Search mail
+  $actions['contact']['ext_search_mail'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=ext_search_mail",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );

@@ -604,6 +604,44 @@ function setEventsColors(entity, entity_id, klass) {
   req.send();
 }
 
+
+/////////////////////////////////////////////////////////////////////////////
+function getSharePublicUrl() {
+  var url = \"$cgp_host\";
+  var elem = $('calendar_public_url');
+  if(!elem){
+    var req = new Request({
+      url : '$path/calendar/calendar_index.php',
+      data: 'action=share_public&ajax=1',
+      onSuccess: function (response) {
+        var tr = new Element('tr').setProperty('id','calendar_public_url')
+                                  .adopt(
+            new Element('td').setProperty('colspan','5')
+                            .setProperty('class','O')
+                            .adopt(
+                              new Element('label').appendText(url+'calendar/calendar_render.php?externalToken='+response),
+                              new Element('input').setProperty('type','hidden')
+                                                  .setProperty('value',response)
+                                                  .setProperty('name','sel_accept_public')
+                            )
+            )
+          tr.injectInside($('sel_share_public'));
+        }
+      });
+    req.send();
+  } else {
+    elem.destroy();
+  }
+}
+
+function change_format(current,other){
+  var cb = other;
+  if(cb.checked){
+    cb.checked=false;
+  } else {
+    current.checked=false;
+  }
+}
 ";
 
 ?>

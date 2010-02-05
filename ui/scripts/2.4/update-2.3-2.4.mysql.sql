@@ -121,7 +121,16 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'userpattern','timecreate',3,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'userpattern','timeupdate',4,1);
 
-
+--
+-- Token
+--
+DROP TABLE IF EXISTS `token`;
+CREATE TABLE `token` (
+  `token` varchar(300) NOT NULL, 
+  `property` varchar(255) NOT NULL, 
+  `value` varchar(255) NOT NULL,
+  PRIMARY KEY (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed

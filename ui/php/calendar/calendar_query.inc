@@ -641,6 +641,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
     } else {
       run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'NEEDS-ACTION');
     }
+    run_query_calendar_insert_entity_event_alert($user_id, $event_id);
   }
 
   // Insert Event contacts
@@ -723,7 +724,7 @@ function run_query_calendar_insert_event_data($calendar) {
   if (array_key_exists('ext_id', $calendar)) {
     $ext_id = $calendar['ext_id'];
   } else {
-    $ext_id = genUniqueExtEventId();
+    $ext_id = generateUniqueKey();
   }
   if (!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
     $owner = $obm['uid'];
@@ -915,6 +916,41 @@ function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $
   return $obm_q; 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Insert an occurrence of a event
+// Parameters: 
+//   - $entity : entity type 'user'
+//   - $entity_id :
+//   - $event_id  :
+//   - $state     :
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_insert_entity_event_alert($entity_id, $event_id) {
+  global $cdg_sql, $obm;
+
+  $event_id = $event_id;
+  $entity_id = sql_parse_id($entity_id);
+  $uid = sql_parse_id($obm['uid']);
+  $query = "INSERT INTO EventAlert (
+    eventalert_timeupdate,
+    eventalert_timecreate,
+    eventalert_usercreate,
+    eventalert_event_id,
+    eventalert_user_id,
+    eventalert_duration)
+    SELECT NOW(),
+      NOW(),
+      $uid,
+      $event_id,
+      $entity_id,
+      CAST (userobmpref_value as integer)
+      FROM UserObmPref 
+      WHERE userobmpref_user_id = $entity_id AND userobmpref_option = 'set_cal_alert';";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_entity_event_alert()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q; 
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Get document infos from the document ids array given
 // Parameters:
@@ -1668,7 +1704,7 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     $event_duration = "86400";
     $opacity = 'TRANSPARENT';
   }
-  $ext_id = genUniqueExtEventId();
+  $ext_id = generateUniqueKey();
 
   $obm_q = new DB_OBM;
   $query = "INSERT INTO Event
@@ -1780,7 +1816,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $location = $event_q->f('event_location');
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $datebegin = $calendar['date_begin'];
-    $ext_id = genUniqueExtEventId();
+    $ext_id = generateUniqueKey();
 
     $query = "INSERT INTO Event (
       event_ext_id,
@@ -5230,7 +5266,179 @@ function can_force_resource_conflict($conflicts = array()) {
   return true;
 }
 
+/**
+ * Get all token create for specified entity
+ * return array(mail => array('token','format'))
+ */
+function get_entity_token($entity_id,$entity) {
+  global $cdg_sql;
+  $obm_q = new DB_OBM();
+  $query = "SELECT DISTINCT(t1.token),
+    t3.value as mail,
+    t4.value as format 
+    FROM token as t1 
+    LEFT JOIN token as t2 ON t1.token = t2.token 
+    LEFT JOIN token as t3 ON t1.token = t3.token 
+    LEFT JOIN token as t4 ON t1.token = t4.token 
+    WHERE t1.property='entityId' AND t1.value='$entity_id' 
+    AND t2.property='entity' AND t2.value='$entity'
+    AND t3.property='contact_mail'
+    AND t4.property='format';";
+  display_debug_msg($query, $cdg_sql, 'get_entity_token()');
+  $obm_q->query($query);
+  while($obm_q->next_record()){
+    $mail = $obm_q->f('mail');
+    $format = $obm_q->f('format');
+    $tokens[$mail]['token']=$obm_q->f('token');
+    $tokens[$mail]['format']=$obm_q->f('format');
+  }
+  return $tokens;
+}
 
+/**
+ * Get share contact for entity  
+ */
+function get_calendar_entity_share($id,$entity) {
+  global $obm, $cdg_sql;
+  $uid = $obm['uid'];
+
+  $entity_id = $id;
+  $domain = $obm['domain_id'];
+  
+  $tokens = get_entity_token($entity_id,$entity);
+  $obm_q = new DB_OBM();
+
+  if(isset($tokens['all']) && !is_null($tokens['all'])) {
+    $params['accept_public']=$tokens['all']['token'];
+    unset($tokens['all']);
+  }
+
+  if(isset($tokens) && !is_null($tokens)){
+    foreach($tokens as $mail=>$val) {
+      $token = $val['token'];
+      $query = "SELECT property, value 
+        FROM token 
+        WHERE token='$token';";
+      $obm_q->query($query);
+      while($obm_q->next_record()){
+        $property = $obm_q->f('property');
+        $value = $obm_q->f('value');
+        if($property=='type' && $value=='public'){
+          $params['contact_mail'][$mail]['type_public']=1;
+        } elseif($property=='type' && $value=='private') {
+          $params['contact_mail'][$mail]['type_public']=1;
+          $params['contact_mail'][$mail]['type_private']=1;
+        } elseif($property=='format') {
+          $params['contact_mail'][$mail]['format_'.$value]=1;
+        } else {
+          $params['contact_mail'][$mail][$property]=$value;
+        }
+      }
+
+      $query = "SELECT contact_id FROM Contact
+      INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+      INNER JOIN Email ON email_entity_id = contactentity_entity_id 
+      WHERE /*(contact_privacy = '0' OR contact_usercreate='$uid') AND*/ contact_archive='0' and email_address = '$mail'";
+      display_debug_msg($query, $cdg_sql,"'get_calendar_entity_token($mail)");
+      $obm_q->query($query);    
+      if ($obm_q->next_record()) {
+        $params['contact_mail'][$mail]['id']=$obm_q->f('contact_id');
+      }
+    }
+  }
+  return $params;
+}
+
+function run_query_calendar_update_token($params) {
+  global $obm, $cdg_sql;
+  $uid = $obm['uid'];
+  $delegation = $obm['delegation'];
+  $entity_id = $params['entity_id'];
+  if(isset($params['contact_mail']) && isset($params['contact_ext_mail'])){
+    $contacts = array_merge($params['contact_mail'],$params['contact_ext_mail']);
+  } elseif(isset($params['contact_mail'])) {
+    $contacts = $params['contact_mail'];
+  } elseif(isset($params['contact_ext_mail'])) {
+    $contacts = $params['contact_ext_mail'];
+  }
+  if(isset($params['contact_ext_mail'])){
+    $contacts_ext['others_attendees'] = $params['contact_ext_mail'];
+    run_query_insert_others_attendees($contacts_ext);
+  }
+  $domain = $obm['domain_id'];
+  $entity_type = 'user'/*$params['entity']*/;
+  if(isset($params['type_private'])){
+    $private_access = array_flip($params['type_private']);
+  }
+
+  if(isset($params['format_ics'])){
+    $ics_format = array_flip($params['format_ics']);
+  }
+
+  $readAcces = 'calendar';
+  $public = 'public';
+  $private = 'private';
+  
+  $tokens = get_entity_token($entity_id,$entity_type);
+
+  $obm_q = new DB_OBM();
+
+  if(isset($params['accept_public'])){
+    $tokens['all']['token']=$params['accept_public'];
+    $contacts['all']='all';
+  }
+
+
+  if(!is_null($tokens)){
+    foreach($tokens as $token) {
+      $query = "DELETE FROM token WHERE token='$token[token]';";
+      display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_token(delete)');
+      $obm_q->query($query);
+    }
+  }
+  $entity = get_user_info($entity_id);
+
+  if(isset($contacts)){
+    foreach($contacts as $mail) {
+      if(isset($ics_format[$mail]) && !is_null($ics_format[$mail])){
+        $format = "Ics";
+      } else {
+        $format = "Html";
+      }
+      if(isset($private_access[$mail]) && !is_null($private_access[$mail])) {
+        $type = $private;
+      } else {
+        $type = $public;
+      }
+      if(!isset($tokens[$mail]) || ($format != $tokens[$mail]['format'])) {
+        $tokens[$mail]['token'] = generateUniqueKey();
+        $entity['token']=$tokens[$mail]['token'];
+        $sharemail = new shareCalendarMailer();
+        $sharemail->addRecipient($mail);
+        $sharemail->send("userShare$format",array($entity));
+      }
+      $token = $tokens[$mail]['token'];
+      $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'contact_mail', '$mail');";
+      $obm_q->query($query);
+      $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'domain', '$domain');";
+      $obm_q->query($query);
+      $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'entity', '$entity_type');";
+      $obm_q->query($query);
+      $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'entityId', '$entity_id');";
+      $obm_q->query($query);
+      $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'delegation', '$delegation');";
+      $obm_q->query($query);
+      $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'uid', '$uid');";
+      $obm_q->query($query);
+      $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'readAccess', '$readAcces');";
+      $obm_q->query($query);
+      $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'type', '$type');";
+      $obm_q->query($query);
+      $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'format', '$format');";
+      $obm_q->query($query);
+    }
+  }
+}
 
 /**
  * Describe a calendar View

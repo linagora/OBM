@@ -464,3 +464,17 @@ $l_update_all_occurrences = "Update serie";
 $l_delete_event_occurrence = "Delete recurring event"; 
 $l_update_occurrence_message = "Change only this event or the series ?"; 
 
+//Share calendar
+$l_my_share_calendar = "Share my calendar";
+$l_share_calendar = "Calendar management";
+$l_share_calendar_type = "Share type";
+$l_share_calendar_etat = "Calendar state";
+$l_share_calendar_public = "acces for all";
+$l_share_calendar_private = "acces by contact";
+$l_share_mail_search = "Mail ...";
+$l_user_share_calendar = "Manage calendar for ";
+$l_share_validate = "Validate this share";
+$l_html = "Html";
+$l_share_ics = "Ical";
+$l_share_err_auth = "Insufficient rights to update share calendar !";
+$l_shares = "Share calendar";

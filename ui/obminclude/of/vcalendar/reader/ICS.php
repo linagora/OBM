@@ -218,7 +218,7 @@ class Vcalendar_Reader_ICS {
     if(preg_match('/^OBM-.+@.+$/',$id)) {
       return $this->parseText($id, $options);
     } else {
-      return genUniqueExtEventId();
+      return generateUniqueKey();
     }
   }
 

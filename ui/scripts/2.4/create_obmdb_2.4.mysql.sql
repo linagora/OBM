@@ -3699,3 +3699,14 @@ CREATE TABLE `userpattern_property` (
 -- Obm product ID
 INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(RAND()*NOW())), 24, 0);
 
+--
+-- Token
+--
+DROP TABLE IF EXISTS `token`;
+CREATE TABLE `token` (
+  `token` varchar(300) NOT NULL, 
+  `property` varchar(255) NOT NULL, 
+  `value` varchar(255) NOT NULL,
+  PRIMARY KEY (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

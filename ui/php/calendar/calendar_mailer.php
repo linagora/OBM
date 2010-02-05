@@ -244,3 +244,33 @@ class CalendarMailer extends OBM_Mailer {
     );
   }
 }
+
+class shareCalendarMailer extends OBM_Mailer {
+  protected $module = 'calendar';
+
+  public function addRecipient($mail) {
+    if($mail != 'all')
+      $this->recipients[] = $mail;
+  }
+
+  private function extractEntityDetails($entity, $sender, $prefix = '', $target = null) {
+    return array(
+      'host'             => $GLOBALS['cgp_host'],
+      $prefix.'name'     => $entity['lastname'],
+      $prefix.'firstname'=> $entity['firstname'],
+      $prefix.'token'    => $entity['token']
+    );
+  }
+
+  public function userShareHtml($entity) {
+    $this->from = $this->getSender();
+    $this->subject = __('Partage d\'agenda : %firstname% %name%', array( '%name%' => $entity['lastname'],'%firstname%' => $entity['firstname']));
+    $this->body = $this->extractEntityDetails($entity, $this->from); 
+  }
+
+  public function userShareIcs($entity) {
+    $this->from = $this->getSender();
+    $this->subject = __('Partage d\'agenda : %firstname% %name%', array( '%name%' => $entity['lastname'],'%firstname%' => $entity['firstname']));
+    $this->body = $this->extractEntityDetails($entity, $this->from); 
+  }
+}

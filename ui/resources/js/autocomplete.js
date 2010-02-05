@@ -686,3 +686,201 @@ obm.AutoComplete.ExtSearch = new Class({
   }
 });
 
+obm.AutoComplete.ShareCalendarSearch = new Class({
+  Extends: obm.AutoComplete.Search,
+
+  Implements: Options,   
+
+  options: {
+    chars: 1,                        // min number of chars to type before requesting
+    results: 8,                      // number of results per page
+    delay: 400,                      // delay before the last key pressed and the request
+    mode: 'multiple',                // 'mono' or 'multiple'
+    locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
+    resetable: false,                // only in 'mono' mode : reset field value
+    restriction: null,               // obm needs
+    filter_entity: null,            // obm needs
+    filter_pattern: 'read',            // obm needs
+    fieldText: obm.vars.labels.autocompleteField,          // default text displayed when empty field
+    extension: null,                  // obm needs
+    resultValue: null,		// obm needs
+    name: null,
+    fieldPublic : null,
+    fieldPrivate : null,
+    fieldHtml : null,
+    fieldIcs : null,
+    noresult: false
+  },
+
+ // parse a response of a request and add results to cache
+  parseResponse: function(response) {
+    var present = false; 
+    var email = this.currentValue;
+    response.datas.each(function(data) {
+      var res = new Element('div').setProperty('id','item_'+data.id)
+                                  .adopt(
+                                    new Element('span')
+                                      .setProperty('id','item_'+data.id+'_label')
+                                      .appendText(data.extra)
+                                  );
+      var item_id = res.getProperty('id');
+      var div_id = this.name + '-' +item_id.substr(('item_').length,item_id.length);
+      if ($(div_id)) { res.addClass("selected"); }
+      this.cache.addElement(res);
+      if($type(data.extension)) {
+        res.addEvent('mouseover', function() {this.selectElement(res);}.bindWithEvent(this))
+           .addEvent('mousedown', function() {this.validateResultValue(res,data.extension);}.bindWithEvent(this));
+      } else {
+        res.addEvent('mouseover', function() {this.selectElement(res);}.bindWithEvent(this))
+           .addEvent('mousedown', function() {this.validateResultValue(res);}.bindWithEvent(this));
+      }
+      if(email == data.extra) {
+        this.noresult = true;
+      }
+    }.bind(this));
+    this.totalNbr = response.length;
+    if(!this.noresult){
+      if(check_email(email)){
+        var res2 = new Element('div').setProperty('id','item_ext')
+                                    .adopt(
+                                        new Element('span')
+                                          .setProperty('id','item_ext_label')
+                                          .appendText(email)
+                                        );
+        var item_id = res2.getProperty('id');
+        if(this.present(email)) { res2.addClass("selected");}
+        this.cache.addElement(res2);
+        res2.addEvent('mouseover', function() {this.selectElement(res2);}.bindWithEvent(this))
+           .addEvent('mousedown', function() {this.validateResultValue(res2);}.bindWithEvent(this));
+        this.totalNbr+=1;
+      }
+    }
+    this.view.setElementNb(this.totalNbr);
+  },
+
+
+  present: function(value) {
+    var present = false;
+    var elem = $('sel_accept_contact');
+    var mail_contact = $$(elem.getElementsByTagName('input'));
+    mail_contact.each(function(data) {
+          if(data.value == value){
+            present = true;
+          }
+        });
+    return present;
+  },
+  
+  addResultValue: function(element, extension) {
+    var item_id = element.getProperty('id');
+    var item_extra = element.getProperty('extra');
+    var id = item_id.substr(('item_').length,item_id.length);
+    var entity = this.selectedBox.id;
+    var text = $(item_id+'_label').innerHTML;
+    var tr_id = entity +'-'+ id;
+    if (!this.present(text)) {
+      element.addClass("selected");
+      var result = new Element('tr');
+      result.setProperties({'id': tr_id});
+      result.injectInside(this.selectedBox);
+      if (this.selectedBox.getChildren().length % 2 != 0) {
+        result.addClass('pair');
+      }
+      var contact_mail = new Element('input').setProperty('name','sel_contact_mail[]')
+                                                      .setProperty('type','hidden')
+                                                      .setProperty('id','sel_contact')
+                                                      .setProperty('value',text);
+      if(id == 'ext') {
+        contact_mail.setProperty('name','sel_contact_ext_mail[]');
+        var id = this.selectedBox.getElements('input[id=sel_contact]').length;
+      }
+      var td = new Element('td').setProperty('colspan','2')
+                                .adopt(
+                                   new Element('a').setProperty('href', '#').adopt(
+                                     new Element('img').setProperty('src', obm.vars.images.del)
+                                   ).addEvent('mousedown',
+                                     function() {
+                                       var item = $(item_id);
+                                       if (item) { item.removeClass('selected'); }
+                                       remove_element(tr_id, entity);
+                                     }.bind(this)
+                                   )
+                                  )
+                                .appendText(' ' + text).injectInside(result);
+      contact_mail.injectInside(td);
+      new Element('td').adopt(
+        new Element('input').setProperty('type', 'checkbox')
+                            .setProperty('name','cb_type_public[]')
+                            .setProperty('disabled','disabled')
+                            .setProperty('checked','checked')
+                            .setProperty('value',text),
+        new Element('label').appendText(this.options.fieldPublic),
+        new Element('input').setProperty('type', 'checkbox')
+                            .setProperty('name','cb_type_private[]')
+                            .setProperty('value',text),
+        new Element('label').appendText(this.options.fieldPrivate)
+      ).injectInside(result);
+      new Element('td').adopt(
+        new Element('input').setProperty('type', 'checkbox')
+                            .setProperty('name','cb_format_html[]')
+                            .setProperty('id','cb_format_html'+id)
+                            .setProperty('checked','checked')
+                            .setProperty('value',text)
+                            .addEvent('mouseup',
+                              function() {
+                                var cb = $('cb_format_ics'+id);
+                                if(cb.checked){
+                                  cb.checked=false;
+                                } else {
+                                  $('cb_format_html'+id).checked=false;
+                                }
+                              }
+                            ),
+        new Element('label').appendText(this.options.fieldHtml),
+        new Element('input').setProperty('type', 'checkbox')
+                            .setProperty('name','cb_format_ics[]')
+                            .setProperty('id','cb_format_ics'+id)
+                            .setProperty('value',text)
+                            .addEvent('mouseup',
+                              function() {
+                                var cb = $('cb_format_html'+id);
+                                if(cb.checked){
+                                  cb.checked=false;
+                                } else {
+                                  $('cb_format_ics'+id).checked=false;
+                                }
+                              }
+                            ),
+        new Element('label').appendText(this.options.fieldIcs)
+      ).injectInside(result);
+    } else {
+      this.inputField.blur();
+      this.resetFunc();
+      this.inputField.focus();
+    }
+  },
+  // send a new request to get first results
+  newRequest: function() {
+   if (this.inputField.value.clean().length < this.options.chars) {
+      this.currentValue = this.inputField.value;
+      this.textChangedFunc();
+    } else if (this.inputField.value != this.currentValue && this.inputField.value != this.options.defaultText) {
+      this.currentValue = this.inputField.value;
+      this.textChangedFunc();
+      this.requestId++;
+      new Request.JSON({
+        url : this.getUrl(),
+        secure : false,
+        onFailure:this.onFailure.bindWithEvent(this),
+        onComplete:this.onNewRequestSuccess.bindWithEvent(this,[this.requestId])
+      }).post({
+        pattern:'email:('+this.currentValue+'*)', 
+        limit:(this.options.results*3),
+        filter_pattern: this.options.filter_pattern,
+        filter_entity: this.options.filter_entity,
+        restriction:this.options.restriction,
+        extension:this.options.extension});
+    }
+  }
+});
+

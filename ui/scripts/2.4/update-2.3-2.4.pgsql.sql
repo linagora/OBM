@@ -77,6 +77,12 @@ ALTER TABLE userobm
 ALTER userobm_delegation TYPE character varying(256),
 ALTER userobm_delegation_target TYPE character varying(256);
 
+--
+-- Update p_userobm
+--
+ALTER TABLE p_userobm 
+ALTER userobm_delegation TYPE character varying(256),
+ALTER userobm_delegation_target TYPE character varying(256);
 
 --
 -- Update obmbookmarkproperty
@@ -182,9 +188,20 @@ END
 CREATE TRIGGER userpattern_created BEFORE INSERT ON userpattern FOR EACH ROW EXECUTE PROCEDURE on_userpattern_create();
 CREATE TRIGGER userpattern_changed BEFORE UPDATE ON userpattern FOR EACH ROW EXECUTE PROCEDURE on_userpattern_change();
 
+--
+-- Token
+--
+DROP TABLE IF EXISTS token;
+CREATE TABLE token (
+  token varchar(300) NOT NULL, 
+  property varchar(255) NOT NULL, 
+  value varchar(255) NOT NULL
+);
 
+ALTER TABLE token 
+  ADD CONSTRAINT tokenkey PRIMARY KEY (token);
 
--- -----------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
 

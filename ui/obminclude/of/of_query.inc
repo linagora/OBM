@@ -3615,7 +3615,8 @@ function of_service_property_unique($service, $service_property, $value, $id='')
  * @access public
  * @return unique id
  */
-function genUniqueExtEventId() {
+//function genUniqueExtEventId() {
+function generateUniqueKey() {
   return get_obm_info('product_id').sha1(uniqid()).sha1($GLOBALS['obm']['domain_name']).sha1(mktime()*rand());
 }
 

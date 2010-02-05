@@ -2821,13 +2821,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
           $urla = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_alert&calendar_id=$id&user_id=$u_id";
           $sel_alert = '';
-          if(is_null($alerts[$u_id])){
-            $selected_alert = $_SESSION['set_cal_alert'];
-          } else {
-            $selected_alert = $alerts[$u_id];
-          }
           foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
-            if($selected_alert == $alert_sec) {
+            if($alerts[$u_id] == $alert_sec) {
               $sel_alert .= "<option value=\"$alert_sec\" selected=\"selected\">$alert_label</option>";
             } else {
               $sel_alert .= "<option value=\"$alert_sec\">$alert_label</option>";
@@ -5305,6 +5300,8 @@ function html_freebusy_tip($ocs) {
  */
 function dis_calendar_right_dis_admin($id='') {
   global $obm, $display, $l_rights, $l_calendar, $l_rights_on_my, $l_user_right;
+  global $l_html, $l_ics;
+  global $l_private, $l_public, $l_share_mail_search;
 
   if ($id == '') {
     $id = $obm['uid'];
@@ -5336,6 +5333,9 @@ function dis_calendar_right_dis_admin($id='') {
   foreach($adminEntities as $entity) {
     $dis_admin .= "<li>$entity</li>";
   }
+  
+  $share_calendar = html_share_calendar($id,$name);
+  
   $block .= "<h1>$GLOBALS[l_rights_my_on]</h1>
     <table class=\"spreadSheet\">
     <thead>
@@ -5371,6 +5371,8 @@ function dis_calendar_right_dis_admin($id='') {
     </tr>
     </tbody>
     </table>";
+  
+  $block .= $share_calendar;
 
   return $block;
 }
@@ -6605,6 +6607,164 @@ function check_conflict($column){
   }
 
   return $return;
+}
+
+function html_share_calendar($id,$name){
+  global $l_html, $l_share_ics, $l_public, $l_private, $l_share_mail_search;
+  global $cgp_host, $obm;
+  
+  $entity_type = "user";
+    
+  $params = get_calendar_entity_share($id,$entity_type);
+  if(isset($params['accept_public']) && !is_null($params['accept_public'])){
+    $checked_public = "checked=\"checked\"";
+    $share_public = html_share_public($params['accept_public']);
+  }
+  $share_contact_list = html_share_contact_list($params['contact_mail']); 
+  $js="
+     <script type=\"text/javascript\">
+      new obm.AutoComplete.ShareCalendarSearch('$path/contact/contact_index.php?action=ext_search', 'sel_accept_contact', 'contactSearch', {fieldText: \"$l_share_mail_search\", fieldPublic : \"$l_public\", fieldPrivate : \"$l_private\", fieldHtml : \"$l_html\", fieldIcs : \"$l_share_ics\"}); 
+     </script>
+   ";
+
+  if ($id == $obm['uid']) {
+    $user = "<h1>".$GLOBALS['l_my_share_calendar']."</h1>";
+  } else {
+    $user = "<h1>".$GLOBALS['l_user_share_calendar']." $name</h1>";
+  }
+
+    $block = "
+     <form method=\"post\" name=\"f_mod_share\" action=\"../calendar/calendar_index.php\">
+     $user
+     <div>
+       <table class=\"spreadSheet\">
+         <colgroup class=\"highlight\"/>
+         <tbody>
+         <tr>
+           <th>$GLOBALS[l_share_calendar_public]</th>
+           <th colspan=\"4\">
+             <input id=\"cb_share_public_calendar\" $checked_public onclick=\"getSharePublicUrl()\" type=\"checkbox\">
+           </th>
+         </tr>
+         </tbody>
+         <tbody id=\"sel_share_public\">
+          $share_public
+         </tbody>
+       </table>
+     </div>
+       <table class=\"spreadSheet\">
+         <colgroup class=\"highlight\"/>
+         <thead>
+         <tr>
+           <th colspan=\"2\"><label>$GLOBALS[l_share_calendar]</label></th>
+           <th><label>$GLOBALS[l_share_calendar_type]</label></th>
+           <th><label>$GLOBALS[l_share_calendar_etat]</label></th>
+         </tr>
+         </thead>
+         <tbody'>
+         <tr>
+           <th>$GLOBALS[l_share_calendar_private]</th>
+           <th class=\"autocomplete\" colspan=\"3\">
+             <input id=\"contactSearch\" class=\"downlight\" type=\"text\" autocomplete=\"off\"/>
+             <a id=\"lnk_accept_contact\" onclick=\"return popup('../contact/contact_index.php?action=ext_get_ids&popup=1&ext_element=sel_accept_contact&ext_container=table&filter=__PUBLIC__&sel_privacy=__PUBLIC__');\" href=\"#\">
+               <img alt=\"[Add]\" src=\"/images/themes/default/images/ico_add.gif\"/>
+             </a>
+           </th>
+         </tr>
+         </tbody>
+         <tbody id=\"sel_accept_contact\">
+           $share_contact_list
+         </tbody>
+         <tbody id=\"private_calendar\">
+           
+         </tbody>
+         </table>
+         <fieldset class=\"buttons\">
+           <input type=\"hidden\" name=\"entity_id\" value=\"$id\">
+           <input type=\"hidden\" name=\"action\" value=\"share_calendar\">
+           <input type=\"submit\" value=\"$GLOBALS[l_share_validate]\">
+         </fieldset>
+       </form>
+       $js
+   ";
+  return $block;
+}
+
+function html_share_public($token) {
+  global $cgp_host;
+  if(!is_null($token)){
+    $block = "
+      <tr id=\"calendar_public_url\">
+        <td colspan=\"5\" style=\"overflow:hidden\">
+          ".$cgp_host."calendar/calendar_render.php?externalToken=$token
+          <input type=\"hidden\" value=\"$token\" name=\"sel_accept_public\"/>
+        </td>
+      </tr>
+      ";
+  }
+  return $block;
+}
+
+function html_share_contact_list($mail_contact) {
+  global $l_public, $l_private, $l_html, $l_share_ics;
+  global $ico_delete;
+  $i=1;
+  if(!is_null($mail_contact)){
+    foreach($mail_contact as $mail=>$val) {
+      if( ($i % 2) != 0){
+        $classpair = "class=\"pair\"";
+      } else {
+        $classpair = "";
+      }
+      $token = $val['token'];
+      $type_public = $val['type_public'];
+      $check_public = "";
+      if($type_public) {
+        $check_public = "checked=\"checked\"";
+      }
+      $type_private = $val['type_private'];
+      $check_private = "";
+      if($type_private) {
+        $check_private = "checked=\"checked\"";
+      }
+      $format_ics = $val['format_Ics'];
+      if($format_ics){
+        $icscheck="checked=\"checked\"";
+        $htmlcheck="";
+      } else {
+        $icscheck="";
+        $htmlcheck="checked=\"checked\"";
+      }
+      $sel_id = $mail;
+      $tr_id = 'sel_accept_contact-data-contact-'.$val['id'];
+      $cb_format_html = 'cb_format_html[]';
+      $cb_id_html = 'cb_format_html_'.$val['id'];
+      $cb_format_ics = 'cb_format_ics[]';
+      $cb_id_ics = 'cb_format_ics_'.$val['id'];
+      $id = $val['id'];
+      $block.="<tr id=\"$tr_id\" $classpair>
+                <td colspan=\"2\">
+                  <input name=\"sel_contact_mail[]\" id=\"sel_contact[]\" type=\"hidden\" value=\"$mail\"/>
+                  <a href=\"javascript: remove_element('$tr_id','perms');\"><img src=\"$ico_delete\"></a>
+                  $mail
+                </td>
+                <td>
+                  <input name=\"cb_type_public[]\" $check_public type=\"checkbox\" disabled=\"disabled\" value=\"$mail\"/>
+                  <label>$l_public</label>
+                  <input name=\"cb_type_private[]\" $check_private type=\"checkbox\" value=\"$mail\"/>
+                  <label>$l_private</label>
+                </td>
+                <td>
+                  <input name=\"$cb_format_html\" id=\"$cb_id_html\" $htmlcheck onClick=\"change_format(this,$cb_id_ics)\" type=\"checkbox\" value=\"$mail\"/>
+                  <label>$l_html</label>
+                  <input name=\"$cb_format_ics\" id=\"$cb_id_ics\" $icscheck onClick=\"change_format(this,$cb_id_html)\" type=\"checkbox\" value=\"$mail\"/>
+                  <label>$l_share_ics</label>
+                </td>
+              </tr>";
+      $i++;
+    }
+  }
+  return $block;
 }
 
 /**
@@ -8660,4 +8820,11 @@ function dis_back_to_calendar() {
   return $block;
 }
 
+/**
+ *
+ */
+function dis_calendar_share_public($token) {
+  global $display;
+  $display['json'] = phpStringToJsString($token);
+}
 ?>

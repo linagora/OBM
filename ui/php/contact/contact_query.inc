@@ -1664,7 +1664,7 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
       $duration = 3600*24;
       $label = ${"l_${date}_event_title"};
       $title = str_replace('\'', '\\\'', sprintf($label, $contact_fullastname));
-      $ext_id = genUniqueExtEventId();
+      $ext_id = generateUniqueKey();
 
       $query = "INSERT INTO Event
         (event_timeupdate,

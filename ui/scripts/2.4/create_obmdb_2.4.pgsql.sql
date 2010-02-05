@@ -11593,3 +11593,15 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 -- Obm product ID
 INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(EXTRACT(EPOCH FROM TIMESTAMP 'NOW()')*RANDOM())::text), 24);
 
+--
+-- Token
+--
+DROP TABLE IF EXISTS token;
+CREATE TABLE token (
+  token varchar(300) NOT NULL, 
+  property varchar(255) NOT NULL, 
+  value varchar(255) NOT NULL
+);
+
+ALTER TABLE token 
+  ADD CONSTRAINT pkey PRIMARY KEY (token);

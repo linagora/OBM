@@ -91,6 +91,21 @@ $l_parent_event = "Evènement parent";
 $l_show_parent_event = "Consulter la série à laquelle il était rattaché";
 $l_eventexception_canceled = "annulé";
 $l_eventexception_moved_to = "déplacé vers le %s";
+$l_my_share_calendar = "Partage sur mon agenda";
+$l_share_calendar = "Gestion des agendas";
+$l_share_calendar_type = "Type du partage";
+$l_share_calendar_etat = "Etat de l'agenda";
+$l_share_calendar_delete = "Supression du partage";
+$l_share_calendar_public = "accée à l'agenda pour tous";
+$l_share_calendar_private = "accée à l'agenda par contact";
+$l_share_mail_search = "Saisir un mail ...";
+$l_user_share_calendar = "Partage de l'agenda de ";
+$l_share_validate = "Valider les partages";
+$l_html = "Html";
+$l_share_ics = "Ical";
+$l_share_err_auth = "Droits insuffisants pour exécuter la modification sur le partage d'agenda !";
+$l_shares = "Partage d'agenda";
+
 
 // PDF Options
 $l_display_details = "Afficher les détails";
