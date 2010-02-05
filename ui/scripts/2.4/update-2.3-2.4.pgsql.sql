@@ -47,15 +47,33 @@ ALTER TABLE host
 ALTER host_delegation TYPE character varying(256);
 
 --
+-- Update p_host
+--
+ALTER TABLE p_host
+ALTER host_delegation TYPE character varying(256);
+
+--
 -- Update mailshare
 --
 ALTER TABLE mailshare
 ALTER mailshare_delegation TYPE character varying(256);
 
 --
+-- Update p_mailshare
+--
+ALTER TABLE p_mailshare
+ALTER mailshare_delegation TYPE character varying(256);
+
+--
 -- Update ugroup
 --
 ALTER TABLE ugroup
+ALTER group_delegation TYPE character varying(256);
+
+--
+-- Update p_ugroup
+--
+ALTER TABLE p_ugroup
 ALTER group_delegation TYPE character varying(256);
 
 --

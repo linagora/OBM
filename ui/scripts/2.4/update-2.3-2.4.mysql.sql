@@ -38,15 +38,33 @@ ALTER TABLE Host
 MODIFY `host_delegation` varchar(256) default '';
 
 --
+-- Update P_Host
+--
+ALTER TABLE P_Host
+MODIFY `host_delegation` varchar(256) default '';
+
+--
 -- Update MailShare
 --
 ALTER TABLE MailShare
 MODIFY `mailshare_delegation` varchar(256) default '';
 
 --
+-- Update P_MailShare
+--
+ALTER TABLE P_MailShare
+MODIFY `mailshare_delegation` varchar(256) default '';
+
+--
 -- UGroup
 --
 ALTER TABLE UGroup
+MODIFY `group_delegation` varchar(256) default '';
+
+--
+-- P_UGroup
+--
+ALTER TABLE P_UGroup
 MODIFY `group_delegation` varchar(256) default '';
 
 --
@@ -65,6 +83,13 @@ MODIFY `updatedlinks_delegation` varchar(256) default '';
 -- UserObm
 --
 ALTER TABLE UserObm 
+MODIFY `userobm_delegation` varchar(256) default '',
+MODIFY `userobm_delegation_target` varchar(256) default '';
+
+--
+-- UserObm
+--
+ALTER TABLE P_UserObm 
 MODIFY `userobm_delegation` varchar(256) default '',
 MODIFY `userobm_delegation_target` varchar(256) default '';
 
