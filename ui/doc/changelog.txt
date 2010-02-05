@@ -9,6 +9,7 @@ version 2.3.2 - 2010-02-04
   * #676 create rpm o-push package
   * #989 [Deal] The year detail Deal dashboard lacks links in the total columns
   * #1070 [Deal] ParentDeal can't be archived
+  * #1073 [Translation] User delegation messages are not translated in english
 
 2010-01-24 : version 2.3.1
 

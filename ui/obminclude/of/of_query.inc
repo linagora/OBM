@@ -951,7 +951,7 @@ function of_delegation_check_update_rights($params, $current_delegation, $delega
 
 
 /**
- * of_delegation_check_data 
+ * of_delegation_check_data
  * 
  * @param mixed $delegation 
  * @param mixed $domain_id 

@@ -392,7 +392,7 @@ class OBM_Acl {
   public static function getAllowedEntities($userId, $entityType, $action, $entityId = null, $labelColumn = 'name') {
     $columns = self::getEntityColumns($entityType);
     $additionalJoins = self::getEntityJoin($entityType);
-  
+
     if (self::isSpecialEntity($entityType)) {
       $unions = self::getEntityUnion($userId, $entityType, $entityId);
     } else {

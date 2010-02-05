@@ -1617,9 +1617,7 @@ function check_user_data_form($p_id, &$user) {
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
   global $obm, $cgp_use, $c_imagetype;
   global $c_max_image_size;
-  global $l_err_delegation_target_outside_domain, $l_err_delegation_target_outside_target;
   global $l_err_delegation_outside_domain, $l_err_delegation_outside_target;
-  global $l_err_delegation_target_profile;
 
   // Hook : Pre
   if (function_exists('hook_pre_check_user_data_form')) {
