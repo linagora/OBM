@@ -153,8 +153,7 @@ DROP TABLE IF EXISTS `token`;
 CREATE TABLE `token` (
   `token` varchar(300) NOT NULL, 
   `property` varchar(255) NOT NULL, 
-  `value` varchar(255) NOT NULL,
-  PRIMARY KEY (`token`)
+  `value` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------------------------------------------------------
