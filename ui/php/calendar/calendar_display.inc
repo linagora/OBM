@@ -6252,6 +6252,7 @@ function dis_calendar_pdf_options($current_view) {
     // Week options
     if ($p_range == 'week'){
       $display_days = $_SESSION['set_cal_display_days'];
+      $selected_pagelayout = "selected=\"selected\"";
       if (empty($display_days)) $display_days = '1111111';
 
       $start_week_day = strtotime($ccalendar_weekstart);
@@ -6300,7 +6301,7 @@ function dis_calendar_pdf_options($current_view) {
           <td>
             <select name=\"sel_pagelayout\">
               <option value=\"$c_pagelayout_portrait\">$l_pagelayout_portrait</option>
-              <option value=\"$c_pagelayout_landscape\">$l_pagelayout_landscape</option>
+              <option $selected_pagelayout value=\"$c_pagelayout_landscape\">$l_pagelayout_landscape</option>
             </select>
           </td>
         </tr>
