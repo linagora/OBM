@@ -5337,7 +5337,8 @@ function dis_calendar_right_dis_admin($id='') {
   
   $share_calendar = html_share_calendar($id,$name);
   
-  $block .= "<h1>$GLOBALS[l_rights_my_on]</h1>
+  $block .= "$share_calendar
+    <h1>$GLOBALS[l_rights_my_on]</h1>
     <table class=\"spreadSheet\">
     <thead>
       <tr>
@@ -5373,8 +5374,6 @@ function dis_calendar_right_dis_admin($id='') {
     </tbody>
     </table>";
   
-  $block .= $share_calendar;
-
   return $block;
 }
 
