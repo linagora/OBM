@@ -6612,7 +6612,6 @@ function check_conflict($column){
 
 function html_share_calendar($id,$name){
   global $l_html, $l_share_ics, $l_public, $l_private, $l_share_mail_search;
-  global $cgp_host, $obm;
   
   $entity_type = "user";
     
@@ -6624,22 +6623,22 @@ function html_share_calendar($id,$name){
   $share_contact_list = html_share_contact_list($params['contact_mail']); 
   $js="
      <script type=\"text/javascript\">
-      new obm.AutoComplete.ShareCalendarSearch('$path/contact/contact_index.php?action=ext_search', 'sel_accept_contact', 'contactSearch', {fieldText: \"$l_share_mail_search\", fieldPublic : \"$l_public\", fieldPrivate : \"$l_private\", fieldHtml : \"$l_html\", fieldIcs : \"$l_share_ics\"}); 
+      new obm.AutoComplete.ShareCalendarSearch('$GLOBALS[path]/contact/contact_index.php?action=ext_search', 'sel_accept_contact', 'contactSearch', {fieldText: \"$l_share_mail_search\", fieldPublic : \"$l_public\", fieldPrivate : \"$l_private\", fieldHtml : \"$l_html\", fieldIcs : \"$l_share_ics\"}); 
      </script>
    ";
 
-  if ($id == $obm['uid']) {
+  if ($id == $GLOBALS['obm']['uid']) {
     $user = "<h1>".$GLOBALS['l_my_share_calendar']."</h1>";
   } else {
     $user = "<h1>".$GLOBALS['l_user_share_calendar']." $name</h1>";
   }
 
-    $block = "
-     <form method=\"post\" name=\"f_mod_share\" action=\"../calendar/calendar_index.php\">
+  $block = "
+   <form method=\"post\" name=\"f_mod_share\" action=\"../calendar/calendar_index.php\">
      $user
      <div>
        <table class=\"spreadSheet\">
-         <colgroup class=\"highlight\"/>
+         <colgroup class=\"highlight\"></colgroup>
          <tbody>
          <tr>
            <th>$GLOBALS[l_share_calendar_public]</th>
@@ -6653,41 +6652,40 @@ function html_share_calendar($id,$name){
          </tbody>
        </table>
      </div>
-       <table class=\"spreadSheet\">
-         <colgroup class=\"highlight\"/>
-         <thead>
-         <tr>
-           <th colspan=\"2\"><label>$GLOBALS[l_share_calendar]</label></th>
-           <th><label>$GLOBALS[l_share_calendar_type]</label></th>
-           <th><label>$GLOBALS[l_share_calendar_etat]</label></th>
-         </tr>
-         </thead>
-         <tbody'>
-         <tr>
-           <th>$GLOBALS[l_share_calendar_private]</th>
-           <th class=\"autocomplete\" colspan=\"3\">
-             <input id=\"contactSearch\" class=\"downlight\" type=\"text\" autocomplete=\"off\"/>
-             <a id=\"lnk_accept_contact\" onclick=\"return popup('../contact/contact_index.php?action=ext_get_ids&popup=1&ext_element=sel_accept_contact&ext_container=table&filter=__PUBLIC__&sel_privacy=__PUBLIC__');\" href=\"#\">
-               <img alt=\"[Add]\" src=\"/images/themes/default/images/ico_add.gif\"/>
-             </a>
-           </th>
-         </tr>
-         </tbody>
-         <tbody id=\"sel_accept_contact\">
-           $share_contact_list
-         </tbody>
-         <tbody id=\"private_calendar\">
-           
-         </tbody>
-         </table>
-         <fieldset class=\"buttons\">
-           <input type=\"hidden\" name=\"entity_id\" value=\"$id\">
-           <input type=\"hidden\" name=\"action\" value=\"share_calendar\">
-           <input type=\"submit\" value=\"$GLOBALS[l_share_validate]\">
-         </fieldset>
-       </form>
-       $js
-   ";
+     <table class=\"spreadSheet\">
+       <colgroup class=\"highlight\"></colgroup>
+       <thead>
+       <tr>
+         <th><label>$GLOBALS[l_share_calendar]</label></th>
+         <th><label>$GLOBALS[l_share_calendar_type]</label></th>
+         <th><label>$GLOBALS[l_share_calendar_etat]</label></th>
+       </tr>
+       </thead>
+       <tbody>
+       <tr>
+         <th colspan=\"3\">$GLOBALS[l_share_calendar_private]
+           <input id=\"contactSearch\" class=\"downlight\" type=\"text\" autocomplete=\"off\"/>
+           <a id=\"lnk_accept_contact\" onclick=\"return popup('$GLOBALS[path]/contact/contact_index.php?action=ext_get_ids&popup=1&ext_element=sel_accept_contact&ext_container=table&filter=__PUBLIC__&sel_privacy=__PUBLIC__');\" href=\"#\">
+             <img alt=\"[Add]\" src=\"/images/themes/default/images/ico_add.gif\"/>
+           </a>
+         </th>
+       </tr>
+       </tbody>
+
+       <tbody id=\"sel_accept_contact\">
+         $share_contact_list
+       </tbody>
+
+       <tbody id=\"private_calendar\"></tbody>
+
+     </table>
+     <fieldset class=\"buttons\">
+       <input type=\"hidden\" name=\"entity_id\" value=\"$id\">
+       <input type=\"hidden\" name=\"action\" value=\"share_calendar\">
+       <input type=\"submit\" value=\"$GLOBALS[l_share_validate]\">
+     </fieldset>
+   </form>
+   $js";
   return $block;
 }
 
