@@ -231,23 +231,13 @@ class Vcalendar_Reader_ICS {
    * @return void
    */
   function parseDate($value, $options=array()) {
-    preg_match('/.*(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})){0,1}/', $value, $match) ;
-    list($all, $year, $month, $day, $time, $hour, $minute, $second) = $match;
-
     if(isset($options['TZID']) && !preg_match('/^[^Z]*Z$/',$value)) {
-      $date = new Of_Date(null, $options['TZID']);
+      $date = new Of_Date($value, $options['TZID']);
       if ($date->error() == Of_Date::ERR_INVALID_DATE) { // Bad timezone
-        $date = new Of_Date(null, 'GMT');
+        $date = new Of_Date($value, 'GMT');
       }
-    } elseif($time) {
-      $date = new Of_Date(null, 'GMT');
     } else {
-      $date = new Of_Date(null);
-    }
-    $date->setYear($year)->setMonth($month)->setDay($day)->setHour(0)->setMinute(0)->setSecond(0);
-
-    if($time !== null) {
-      $date->setHour($hour)->setMinute($minute)->setSecond($second);
+      $date = new Of_Date($value, null, false);
     }
 
     return $date;
@@ -260,7 +250,7 @@ class Vcalendar_Reader_ICS {
    * @access public
    * @return void
    */
-  function parseDtstart($value,$options) {
+  function parseDtstart($value,$option) {
     return $this->parseDate($value,$option);
   }
 
@@ -272,7 +262,7 @@ class Vcalendar_Reader_ICS {
    * @access public
    * @return void
    */
-  function parseDtend($value,$options) {
+  function parseDtend($value,$option) {
     return $this->parseDate($value,$option);
   }
 

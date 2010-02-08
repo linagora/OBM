@@ -166,9 +166,9 @@ class Of_Date extends DateTime {
 
   private $serialized; 
 
-  public function __construct($time=null, $timezone=null) {
+  public function __construct($time=null, $timezone=null, $parse=true) {
     self::loadOptions();
-    if(is_numeric($time)) {
+    if(is_numeric($time) && $parse) {
       $time = ceil($time);
       $time = "@$time";
     }
