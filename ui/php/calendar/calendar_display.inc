@@ -773,10 +773,11 @@ function dis_calendar_navbar($current_view) {
         $url_far_next = "".basename($_SERVER['SCRIPT_NAME'])."?date=".$current->setDateIso($date)->addYear(1)->getURL();
         break;
     }
+    $today = new Of_Date();
     $block = "<div id='calendarNavBar'>
       <a href='$url_prev'><img src=\"$GLOBALS[ico_previous]\" alt=\"[$GLOBALS[l_previous]]\" /></a>     
       <a href='$url_next'><img src=\"$GLOBALS[ico_next]\" alt=\"[$GLOBALS[l_next]]\" /></a>
-      <span class='lnk'><a href='".basename($_SERVER['SCRIPT_NAME'])."?date='>$GLOBALS[l_today]</a></span>     
+      <span class='lnk'><a href='".basename($_SERVER['SCRIPT_NAME'])."?date=".$today->getURL()."'>$GLOBALS[l_today]</a></span>     
       <span id='navBarLabel' class='label'>$label</span>
     </div>";
   }
