@@ -490,7 +490,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       $default_view_url_params = "set_cal_view_id=".$_SESSION['set_cal_default_view'];
       $dis_back_myview = "<a id=\"my_view\" href=\"".basename($_SERVER['SCRIPT_NAME'])."?$default_view_url_params\">$l_back_mono</a>";
     } else {
-      $dis_back_myview = "<a id=\"my_view\" href=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]\">$l_back_mono</a>";
+      $dis_back_myview = "<a id=\"my_view\" href=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;set_cal_view_id=0\">$l_back_mono</a>";
      // FIXME
      // $dis_back_myview = "<a href='javascript: void(0)' onclick='obm.calendarManager.backToMyView()'>$l_back_mono</a>";
     }    
