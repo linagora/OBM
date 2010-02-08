@@ -216,9 +216,6 @@ CREATE TABLE token (
   value varchar(255) NOT NULL
 );
 
-ALTER TABLE token 
-  ADD CONSTRAINT tokenkey PRIMARY KEY (token);
-
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';

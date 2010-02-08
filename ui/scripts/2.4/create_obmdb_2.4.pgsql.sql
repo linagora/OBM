@@ -11602,6 +11602,3 @@ CREATE TABLE token (
   property varchar(255) NOT NULL, 
   value varchar(255) NOT NULL
 );
-
-ALTER TABLE token 
-  ADD CONSTRAINT pkey PRIMARY KEY (token);
