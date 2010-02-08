@@ -942,13 +942,13 @@ function run_query_calendar_insert_entity_event_alert($entity_id, $event_id) {
       $uid,
       $event_id,
       $entity_id,
-      CAST (userobmpref_value as integer)
+      #CAST(userobmpref_value,INTEGER)
       FROM UserObmPref 
       WHERE userobmpref_user_id = $entity_id AND userobmpref_option = 'set_cal_alert';";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_entity_event_alert()');
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   return $obm_q; 
 }
 ///////////////////////////////////////////////////////////////////////////////
