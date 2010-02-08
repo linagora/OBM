@@ -126,7 +126,11 @@ Obm.CalendarManager = new Class({
           if (evt.size == 0) evt.size = 1; // very, very crappy fix 
         }
         if (evt.event.right) {
-          var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
+          try {
+            var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
+          } catch (e) {
+            var startWeek = obm.vars.consts.startTime * 1000;
+          }
           evt.size = Math.ceil((startWeek + (86400000 * 7) - evt.event.index*1000)/86400000);
           if (evt.event.left) evt.size = 7; // very, very crappy fix
         }
