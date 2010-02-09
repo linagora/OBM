@@ -792,10 +792,9 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
                                                       .setProperty('value',text);
       if(id == 'ext') {
         contact_mail.setProperty('name','sel_contact_ext_mail[]');
-        var id = this.selectedBox.getElements('input[id=sel_contact]').length;
+        var id = 'ext-'+this.selectedBox.getElements('input[id=sel_contact]').length;
       }
-      var td = new Element('td').setProperty('colspan','2')
-                                .adopt(
+      var td = new Element('td').adopt(
                                    new Element('a').setProperty('href', '#').adopt(
                                      new Element('img').setProperty('src', obm.vars.images.del)
                                    ).addEvent('mousedown',
@@ -809,49 +808,51 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
                                 .appendText(' ' + text).injectInside(result);
       contact_mail.injectInside(td);
       new Element('td').adopt(
-        new Element('input').setProperty('type', 'checkbox')
-                            .setProperty('name','cb_type_public[]')
-                            .setProperty('disabled','disabled')
+        new Element('input').setProperty('type', 'radio')
+                            .setProperty('name','rd_type_'+id)
                             .setProperty('checked','checked')
-                            .setProperty('value',text),
+                            .setProperty('value',text)
+                            .addEvent('mousedown',
+                              function() {
+                                $('type_'+id).setProperty('name','rd_type_public[]');
+                              }
+                            ),
         new Element('label').appendText(this.options.fieldPublic),
-        new Element('input').setProperty('type', 'checkbox')
-                            .setProperty('name','cb_type_private[]')
-                            .setProperty('value',text),
-        new Element('label').appendText(this.options.fieldPrivate)
+        new Element('input').setProperty('type', 'radio')
+                            .setProperty('name','rd_type_'+id)
+                            .setProperty('value',text)
+                            .addEvent('mousedown',
+                              function() {
+                                $('type_'+id).setProperty('name','rd_type_private[]');
+                              }
+                            ),
+        new Element('label').appendText(this.options.fieldPublic+'+'+this.options.fieldPrivate),
+        new Element('input').setProperty('name','rd_type_public[]')
+                            .setProperty('type','hidden')
+                            .setProperty('id','type_'+id)
+                            .setProperty('value',text)
       ).injectInside(result);
       new Element('td').adopt(
-        new Element('input').setProperty('type', 'checkbox')
-                            .setProperty('name','cb_format_html[]')
-                            .setProperty('id','cb_format_html'+id)
-                            .setProperty('checked','checked')
+        new Element('a').setProperty('href', '#').adopt(
+          new Element('img').setProperty('src', obm.vars.images.html),
+          new Element('label').appendText(this.options.fieldHtml)
+        ).addEvent('mousedown',
+          function() {
+            $('format_'+id).setProperty('name','rd_format_html[]');
+          }
+        ),
+        new Element('a').setProperty('href', '#').adopt(
+          new Element('img').setProperty('src', obm.vars.images.ical),
+          new Element('label').appendText(this.options.fieldIcs)
+        ).addEvent('mousedown',
+          function() {
+            $('format_'+id).setProperty('name','rd_format_ics[]');
+          }
+        ),
+        new Element('input').setProperty('name','rd_format_html[]')
+                            .setProperty('type','hidden')
+                            .setProperty('id','format_'+id)
                             .setProperty('value',text)
-                            .addEvent('mouseup',
-                              function() {
-                                var cb = $('cb_format_ics'+id);
-                                if(cb.checked){
-                                  cb.checked=false;
-                                } else {
-                                  $('cb_format_html'+id).checked=false;
-                                }
-                              }
-                            ),
-        new Element('label').appendText(this.options.fieldHtml),
-        new Element('input').setProperty('type', 'checkbox')
-                            .setProperty('name','cb_format_ics[]')
-                            .setProperty('id','cb_format_ics'+id)
-                            .setProperty('value',text)
-                            .addEvent('mouseup',
-                              function() {
-                                var cb = $('cb_format_html'+id);
-                                if(cb.checked){
-                                  cb.checked=false;
-                                } else {
-                                  $('cb_format_ics'+id).checked=false;
-                                }
-                              }
-                            ),
-        new Element('label').appendText(this.options.fieldIcs)
       ).injectInside(result);
     } else {
       this.inputField.blur();

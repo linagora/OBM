@@ -614,32 +614,51 @@ function getSharePublicUrl() {
       url : '$path/calendar/calendar_index.php',
       data: 'action=share_public&ajax=1',
       onSuccess: function (response) {
-        var tr = new Element('tr').setProperty('id','calendar_public_url')
-                                  .adopt(
-            new Element('td').setProperty('colspan','5')
-                            .setProperty('class','O')
-                            .adopt(
-                              new Element('label').appendText(url+'calendar/calendar_render.php?externalToken='+response),
+        var shareurl = new Element('div').setProperty('id','lnk_public_url')
+                                          .adopt(
+                                        new Element('a').appendText(url+'calendar/calendar_render.php?externalToken='+response)
+                                      );
+        $('sel_share_public').adopt(
                               new Element('input').setProperty('type','hidden')
                                                   .setProperty('value',response)
+                                                  .setProperty('id','calendar_public_url')
                                                   .setProperty('name','sel_accept_public')
-                            )
-            )
-          tr.injectInside($('sel_share_public'));
+                              );
+          shareurl.injectInside($('calendarSharePopup'));
         }
       });
     req.send();
   } else {
     elem.destroy();
+    $('lnk_public_url').destroy();
   }
 }
 
-function change_format(current,other){
-  var cb = other;
-  if(cb.checked){
-    cb.checked=false;
-  } else {
-    current.checked=false;
+function change_format(format,id){
+  $('format_'+id).setProperty('name',format);
+}
+function change_type(type,id){
+  $('type_'+id).setProperty('name',type);
+}
+function showSharePopup(action){
+  var url = \"$cgp_host\";
+  var sharecalendar = $('cb_share_public_calendar').checked;
+  if(sharecalendar){
+      var elem = new Element('a');
+    if(action==\"ical\"){
+      url+='calendar/calendar_render.php?action=ics_export&externalToken='+$('calendar_public_url').value;
+      elem.setProperty('href',url)
+          .appendText(url);
+    } else {
+      url+='calendar/calendar_render.php?externalToken='+$('calendar_public_url').value;
+      elem.setProperty('href',url)
+          .appendText(url);
+    }
+    $('lnk_public_url').destroy();
+    var shareurl = new Element('div').setProperty('id','lnk_public_url')
+                                      .adopt(elem);
+    shareurl.injectInside($('calendarSharePopup'));
+    obm.popup.show('calendarSharePopup');
   }
 }
 ";

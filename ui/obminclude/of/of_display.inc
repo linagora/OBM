@@ -975,6 +975,7 @@ function display_head($p_module, $standard=true) {
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
   global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
   global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include, $path, $params;
+  global $ico_html, $ico_ical;
 
   $css = $css_obm;
 
@@ -1055,6 +1056,8 @@ function display_head($p_module, $standard=true) {
   obm.vars.images.update = '$ico_update';
   obm.vars.images.add = '$ico_add';
   obm.vars.images.del = '$ico_delete';
+  obm.vars.images.html = '$ico_html';
+  obm.vars.images.ical = '$ico_ical';
   obm.vars.regexp.dateFormat = '$_SESSION[set_date_upd]';
   obm.vars.regexp.dispDateFormat = '$_SESSION[set_date]';
   obm.vars.consts.popupHeight = '$popup_height';

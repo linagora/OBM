@@ -93,8 +93,8 @@ $l_eventexception_canceled = "annulé";
 $l_eventexception_moved_to = "déplacé vers le %s";
 $l_my_share_calendar = "Partage sur mon agenda";
 $l_share_calendar = "Gestion des agendas";
-$l_share_calendar_type = "Type du partage";
-$l_share_calendar_etat = "Etat de l'agenda";
+$l_share_calendar_type = "Evènement visible";
+$l_share_calendar_etat = "Format de l'agenda";
 $l_share_calendar_delete = "Supression du partage";
 $l_share_calendar_public = "Accès à l'agenda pour tous";
 $l_share_calendar_private = "Accès à l'agenda par contact";
@@ -105,6 +105,7 @@ $l_html = "Html";
 $l_share_ics = "Ical";
 $l_share_err_auth = "Droits insuffisants pour exécuter la modification sur le partage d'agenda !";
 $l_shares = "Partage d'agenda";
+$l_share_public = "Utiliser cette adresse pour partager votre agenda";
 
 
 // PDF Options
