@@ -930,10 +930,15 @@ if ($action == 'search') {
 
 } elseif ($action == 'ics_insert')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $result = run_query_icalendar_insert($params) ;
-  if($result !== false) {
-    $display['msg'] .= display_ok_msg("$result[0] $l_ics_import_ok");
-    $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
+  if (!empty($params[ics_tmp])) {
+    $result = run_query_icalendar_insert($params) ;
+    if($result !== false) {
+      $display['msg'] .= display_ok_msg("$result[0] $l_ics_import_ok");
+      $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
+    } else {
+      $display['msg'] .= display_err_msg("$l_file_format $l_unknown");
+      $display['detail'] .= dis_icalendar_import($params);
+    }
   } else {
     $display['msg'] .= display_err_msg("$l_file_format $l_unknown");
     $display['detail'] .= dis_icalendar_import($params);

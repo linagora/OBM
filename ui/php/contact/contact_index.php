@@ -145,14 +145,19 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   exit();
 } elseif ($action == 'vcard_insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  $addressbook = OBM_AddressBook::get($params['addressbook']);
-  if($addressbook->write) {
-    $ids = run_query_vcard_insert($params, $addressbook);
-  } else {
-    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
-  }
-  if ($ids !== false) {
-    header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
+  if (!empty($params[ics_tmp])) {
+    $addressbook = OBM_AddressBook::get($params['addressbook']);
+    if($addressbook->write) {
+      $ids = run_query_vcard_insert($params, $addressbook);
+    } else {
+      header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
+    }
+    if ($ids !== false) {
+      header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
+    } else {
+      $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
+      $display['detail'] .= dis_vcard_import_form($params['addressbook']);
+    }
   } else {
     $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
     $display['detail'] .= dis_vcard_import_form($params['addressbook']);
