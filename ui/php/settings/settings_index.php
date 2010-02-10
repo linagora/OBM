@@ -489,6 +489,7 @@ $display['detail'] .= "
     <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"date\" value=\"$cda_txt\" $da_txt />$l_da_txt</label></span>
   </td>
   </tr>
+  </table>
   <table id='settings_dateTimezone'>
   <tr>
   <td>$l_timezone</td>

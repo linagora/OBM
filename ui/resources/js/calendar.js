@@ -291,6 +291,9 @@ Obm.CalendarManager = new Class({
    * Create dummy event (for event creation)
    */
   newDummyEvent: function(evt, context) {
+
+    this.destroyDummy();
+
     var ivent = new Event(evt);
     var target = ivent.target;
     target = $(target);
@@ -625,7 +628,7 @@ Obm.CalendarManager = new Class({
    *  Show last week events
    */
   prevWeek: function() {
-   this.current.setDate(this.current.getDate()-obm.vars.consts.nbDisplayedDays.toInt());
+   this.current.setDate(this.current.getDate()-7);
    this.refresh();
   },
 
@@ -653,7 +656,7 @@ Obm.CalendarManager = new Class({
    * Show next week events
    */
   nextWeek: function() {
-   this.current.setDate(this.current.getDate()+obm.vars.consts.nbDisplayedDays.toInt());
+   this.current.setDate(this.current.getDate()+7);
    this.refresh();
   },
 
