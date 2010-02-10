@@ -1171,9 +1171,9 @@ function quick_check_calendar_conflict($calendar, $entities) {
   if ($calendar['opacity'] == 'TRANSPARENT') return false;
 
   $begin = clone $calendar['date_begin'];
-  $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
-  $end->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $begin;
+  $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
   // Event entities
   $sel_entity_id['user'] = $entities['user']['ids'];
@@ -4321,7 +4321,12 @@ function run_query_insert_others_attendees($calendar) {
 
   // Get collected addressbook
   $addressBooks = OBM_AddressBook::search();
+  $ids = array();
+  foreach($addressBooks as $ad) {
+    array_push($ids, $ad->id);
+  }
   $addressbook_id = $addressBooks->getCollectedAddressbook()->id;
+  $in = implode(',', $ids);
 
   foreach($attendees as $email) {
     //// Check if exists
@@ -4329,7 +4334,7 @@ function run_query_insert_others_attendees($calendar) {
     $query = "SELECT contact_id FROM Contact
       INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
         INNER JOIN Email ON email_entity_id = contactentity_entity_id 
-      WHERE /*(contact_privacy = '0' OR contact_usercreate='$uid') AND*/ contact_archive='0' and email_address = '$email'";
+      WHERE (contact_addressbook_id IN ($in) OR contact_usercreate='$uid') AND contact_archive='0' and email_address = '$email'";
     display_debug_msg($query, $cdg_sql,"'run_query_insert_others_attendees($email)");
     $obm_q->query($query);    
 
