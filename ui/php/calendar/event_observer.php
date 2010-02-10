@@ -345,7 +345,8 @@ class OBM_EventAttendee {
   }
 
   public static function cmpState($attendee1, $attendee2) {
-    if($attendee1->id != $attendee2->id) return 1;
+    if($attendee1->id > $attendee2->id) return 1;
+    if($attendee1->id < $attendee2->id) return -1;
     return strcmp($attendee1->state, $attendee2->state);
   }
 }
