@@ -208,9 +208,11 @@ function run_query_todo_insert($todo) {
   $domain_id = sql_parse_id($obm['domain_id']);
 
   $obm_q = new DB_OBM;
+  $ext_id = generateUniqueKey();
 
   if (is_array($users) && (count($users)>0)) {
     $query = "INSERT INTO Event (
+        event_ext_id,
         event_domain_id,
         event_timeupdate,
         event_timecreate,
@@ -223,8 +225,9 @@ function run_query_todo_insert($todo) {
         event_priority,
         event_title,
         event_description, 
-	event_repeatkind)
+        event_repeatkind)
       VALUES (
+        '$ext_id',
         $domain_id,
         NOW(),
         NOW(),
