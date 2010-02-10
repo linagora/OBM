@@ -95,11 +95,9 @@ switch($params['error']) {
 if($error_msg) {
   $display['msg'] = display_err_msg($error_msg);
 }
-
+$date = new Of_Date();
 $display['title'] = "
-<h1 class=\"title\">
-$l_obm_title version $obm_version - " . date('Y-m-d H:i:s') . "
-</h1>";
+<h1 class=\"title\">$l_obm_title version $obm_version - ".$date->getOutputDate()."</h1>";
 
 if ($cgp_show['module']['calendar'] && $perm->check_right('calendar', $cright_read)) { 
   require_once("$path/calendar/calendar_query.inc");
