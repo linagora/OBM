@@ -176,7 +176,7 @@ CREATE INDEX userpattern_property_userpattern_id_userpattern_id_fkey ON userpatt
 -- userpattern_property fkey
 --
 ALTER TABLE ONLY userpattern_property
-    ADD CONSTRAINT userpattern_property_userpattern_id_userpattern_id_fkey FOREIGN KEY (userpattern_id) REFERENCES userpattern(userpattern_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT userpattern_property_userpattern_id_userpattern_id_fkey FOREIGN KEY (userpattern_id) REFERENCES userpattern(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
