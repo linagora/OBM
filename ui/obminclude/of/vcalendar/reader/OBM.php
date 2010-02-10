@@ -177,6 +177,7 @@ class Vcalendar_Reader_OBM {
     } elseif ($priority == 3) {
       return 1;
     }
+    return 5;
   }
 
   function parseAttendee($id, $entity, $state) {
