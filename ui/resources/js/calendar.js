@@ -871,6 +871,7 @@ Obm.CalendarManager = new Class({
     eventData.title = evt.event.title;
     eventData.all_day = evt.event.all_day;
     eventData.periodic = evt.event.periodic;
+    eventData.opacity = evt.event.opacity;
     return eventData;
   },
 

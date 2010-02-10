@@ -1168,12 +1168,12 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 //   - $calendar       : calendar parameters
 ///////////////////////////////////////////////////////////////////////////////
 function quick_check_calendar_conflict($calendar, $entities) {
-  if ($calendar['all_day']) return false;
+  if ($calendar['opacity'] == 'TRANSPARENT') return false;
 
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
-  $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
+  $end->setHour(0)->setMinute(0)->setSecond(0);
 
   // Event entities
   $sel_entity_id['user'] = $entities['user']['ids'];
