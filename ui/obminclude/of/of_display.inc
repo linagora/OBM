@@ -1169,27 +1169,28 @@ function display_menu($module) {
   $wait_event = "<li><a id=\"bannerWaitingEvent\" href='".$path."/calendar/calendar_index.php?action=waiting_events'></a></li>";
 
   $block = "
-<!-- Bandeau -->
-<div id='banner'>
-<a href=\"$path/obm.php\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
-".
-$display['section']
-."
-<ul id='information'>
-<li id='spinner' style='display:none' ><img src='$GLOBALS[ico_spinner]' alt='' /></li>
-$dis_scope
+    <!-- Bandeau -->
+    <div id='banner'>
 
-$wait_event
-<li> $login ($domain)</li>
-<li>$l_profile : $p</li>
-<li><a href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
-$dis_printer
-</ul>
-</div>
-".$display['module']
-;
+    <div style='float:left;'>
+      <a href=\"$path/obm.php\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
+      ".$display['section']."
+    </div>
 
-//&gt;".$modules[$module]['Name'].
+    <div style='float:right;'>
+      <ul id='information'>
+        <li id='spinner' style='display:none' ><img src='$GLOBALS[ico_spinner]' alt='' /></li>
+        $dis_scope
+        $wait_event
+        <li> $login ($domain)</li>
+        <li>$l_profile : $p</li>
+        <li><a href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
+        $dis_printer
+      </ul>
+    </div>
+
+    </div>".$display['module'];
+
   return $block;
 }
 
