@@ -5319,6 +5319,14 @@ function get_calendar_entity_share($id,$entity) {
   }
 
   if(isset($tokens) && !is_null($tokens)){
+
+    $addressBooks = OBM_AddressBook::search();
+    $ids = array();
+    foreach($addressBooks as $ad) {
+      array_push($ids, $ad->id);
+    }
+    $in = implode(',', $ids);
+
     foreach($tokens as $mail=>$val) {
       $token = $val['token'];
       $query = "SELECT property, value 
@@ -5344,7 +5352,8 @@ function get_calendar_entity_share($id,$entity) {
       $query = "SELECT contact_id FROM Contact
       INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
       INNER JOIN Email ON email_entity_id = contactentity_entity_id 
-      WHERE /*(contact_privacy = '0' OR contact_usercreate='$uid') AND*/ contact_archive='0' and email_address = '$mail'";
+      WHERE (contact_addressbook_id in ($in) OR contact_usercreate='$uid') AND contact_archive='0' and email_address = '$mail'";
+
       display_debug_msg($query, $cdg_sql,"'get_calendar_entity_share($mail)");
       $obm_q->query($query);    
       if ($obm_q->next_record()) {
