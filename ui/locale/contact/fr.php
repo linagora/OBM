@@ -23,7 +23,7 @@ return array(
   'Add addressbook' => "Ajouter un carnet d'adresses",
   'Add contact' => 'Ajouter un contact',
   'Add fields' => 'Ajouter des champs', 
-  'Addressbook menu' => "Menu des carnets d'addresses",
+  'Addressbook menu' => "Menu des carnets d'adresses",
   'Addressbook' => "Carnet d'adresses",
   'Also known as' => 'Surnom',
   'Anniversary' => 'Fête',
@@ -61,6 +61,6 @@ return array(
   'Synchronize' => 'Synchroniser',
   'Synchronized' => 'Synchronisé',
   'Update contact' => 'Mettre à jour le contact',
-  'What would you like to name this addressbook ?' => 'Comment voulez-vous nommer ce carnet d\'addresse ?',
+  'What would you like to name this addressbook ?' => 'Comment voulez-vous nommer ce carnet d\'adresses ?',
   'Other categories' => 'Autres catégories'
 );
