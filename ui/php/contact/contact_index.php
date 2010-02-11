@@ -145,7 +145,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   exit();
 } elseif ($action == 'vcard_insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (!empty($params[ics_tmp])) {
+  if (!empty($params[vcard_tmp])) {
     $addressbook = OBM_AddressBook::get($params['addressbook']);
     if($addressbook->write) {
       $ids = run_query_vcard_insert($params, $addressbook);
