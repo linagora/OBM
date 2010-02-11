@@ -152,7 +152,7 @@ $l_vcf_file = "Fichier VCF à importer";
 $l_phone_labels = array ('HOME_VOICE' => 'Téléphone (domicile)', 'WORK_VOICE' => 'Téléphone (bureau)', 'CELL_VOICE' => 'Téléphone portable', 'HOME_FAX' => 'Fax (domicile)','WORK_FAX' => 'Fax (bureau)', 'PAGER' => 'Pager', 'OTHER' => 'Autre téléphone');
 $l_email_labels = array ('INTERNET' => 'Internet', 'OTHER' => 'Autre');
 $l_address_labels = array ('HOME' => 'Domicile', 'WORK' => 'Bureau', 'OTHER' => 'Autre');
-$l_website_labels = array ('URL' => 'Site web', 'BLOG' => 'Log internet', 'OTHER' => 'Autre');
+$l_website_labels = array ('URL' => 'Site web', 'BLOG' => 'Log internet', 'ICAL' => 'Calendrier', 'OTHER' => 'Autre');
 $l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ');
 
 // Error Messages

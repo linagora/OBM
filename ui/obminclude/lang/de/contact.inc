@@ -8,35 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-// Modified on 2009-09-24T17:31:43+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:23:38+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:28:02+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:35:18+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:36:57+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:40:24+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:43:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:45:08+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:45:15+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:47:13+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:48:50+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-08T16:53:55+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T12:03:11+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T12:04:46+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T12:06:07+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T12:07:26+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T12:08:20+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T12:10:39+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T12:17:42+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T12:23:08+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T14:02:48+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T14:06:12+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T14:18:45+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T14:22:03+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T14:30:54+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T14:33:43+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T14:35:18+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T14:37:52+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-10-09T15:15:52+02:00 using OBMtranslation (0.4.1)
 
 $l_contact_name = "Name des Kontakts";
 $l_from_company = "Firma";
@@ -125,7 +96,7 @@ $l_j_check_phone = "Die Telefonnummer ist nicht korrekt.";
 $l_subscription_list = "Abonnements"; 
 $l_category3 = "Kategorie 3"; 
 $l_timecreate = "Erschaffungsdatum"; 
-$l_website_labels = array ( 'URL' => 'Website', 'Blog' => "Onlinetagebuch ',' Other '=>' Andere '); 
+$l_website_labels = array ( 'URL' => 'Website', 'Blog' => "Onlinetagebuch ', 'ICAL' => 'Kalender', 'Other '=>' Andere '); 
 $l_kind_update = "Abändern die Gattung"; 
 $l_category4 = "Kategorie 4"; 
 $l_kind_new = "Neue Gattung"; 

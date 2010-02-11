@@ -127,7 +127,7 @@ $l_vcf_file = "VCF file to import";
 $l_phone_labels = array ('HOME_VOICE' => 'Home phone', 'WORK_VOICE' => 'Work phone', 'CELL_VOICE' => 'Mobile phone', 'HOME_FAX' => 'Home fax', 'WORK_FAX' => 'Work fax', 'PAGER' => 'Pager', 'OTHER' => 'Other phone');
 $l_email_labels = array ('INTERNET' => 'Home', 'OTHER' => 'Other');
 $l_address_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');
-$l_website_labels = array ('URL' => 'Homepage', 'BLOG' => 'Blog', 'OTHER' => 'Other');
+$l_website_labels = array ('URL' => 'Homepage', 'BLOG' => 'Blog',  'ICAL' => 'Calendar', 'OTHER' => 'Other');
 $l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ');
 // Error Messages
 $l_err_length_express_postal = "Field 'EXPRESS POSTAL' has 16 characters max";

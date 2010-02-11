@@ -304,7 +304,7 @@ $l_j_kind_update = "Devi selezionare un genere ed effettuare una modifica prima 
 $l_subscription_list = "Abbonamenti";
 $l_category3 = "categoria 3";
 $l_timecreate = "Data di Creazione";
-$l_website_labels = array ('URL' => 'Sito web', 'BLOG' => 'Log internet', 'OTHER' => 'Altro');
+$l_website_labels = array ('URL' => 'Sito web', 'BLOG' => 'Log internet',  'ICAL' => 'Calendario','OTHER' => 'Altro');
 $l_kind_update = "Modifica Genere";
 $l_category4 = "categoria 4";
 $l_kind_new = "Nuovo Genere";
