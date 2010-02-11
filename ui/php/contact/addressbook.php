@@ -202,6 +202,8 @@ class OBM_AddressBook implements OBM_ISearchable {
       // Delete addressbook
       $query = "DELETE FROM AddressBook WHERE id='$id'";
       $db->query($query);
+      // Delete solr
+      OBM_IndexingService::deleteByQuery('contact', "addressbookId:$id");
     }
   }
 

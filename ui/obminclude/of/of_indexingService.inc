@@ -57,6 +57,15 @@ class OBM_IndexingService {
     }
   }
 
+  public function deleteByQuery($core, $query) {
+    $solr = OBM_IndexingService::connect($core);
+    if ($solr) {
+      $solr->deleteByQuery($query);
+      $solr->commit();
+      $solr->optimize();
+    }
+  }
+
   public function delete($core, $id) {
     $solr = OBM_IndexingService::connect($core);
     if ($solr) {
