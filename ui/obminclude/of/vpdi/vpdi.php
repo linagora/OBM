@@ -136,6 +136,7 @@ class Vpdi {
     $fields = array();
     $lines = explode("\n", $string);
     foreach ($lines as $line) {
+      $line = trim($line);
       if (empty($line)) {
         continue;
       }
