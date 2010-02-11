@@ -207,10 +207,10 @@ function check_calendar_pdf_options() {
 }
 
 
-function sel_public_group(date, element, label) {
+function sel_public_group(element, label) {
   var item_id = element.getProperty('id').split('-');
   var id = item_id[item_id.length - 1];
-  window.location=('calendar_index.php?date='+date+'&group_id='+id+'&new_group=1');
+  window.location=('calendar_index.php?group_id='+id+'&new_group=1');
 }
 
 function display_list_detail(display) {
@@ -225,6 +225,10 @@ function display_list_detail(display) {
   });
 }
 
+function change_view(url) {
+  Cookie.write('calendar_view', url,{path: '/'});
+  window.location=url;
+}
 
 function check_calendar_calendar(form) {
   if (trim(form.tf_title.value) == \"\") {

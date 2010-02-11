@@ -633,11 +633,6 @@ function unSelectAllCb(container) {
   })          
 }
 
-function change_view(url) {
-  Cookie.write('calendar_view', url,{path: '/'});
-  window.location=url;
-}
-
 function refreshWaitEvent() {
   new Request.JSON({
         url: obm.vars.consts.obmUrl+'/calendar/calendar_index.php',

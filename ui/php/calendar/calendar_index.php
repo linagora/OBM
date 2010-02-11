@@ -62,7 +62,7 @@ if (isset($_SESSION['set_cal_first_hour'])) {
 if (isset($_SESSION['set_cal_last_hour'])) {
   $ccalendar_last_hour = $_SESSION['set_cal_last_hour'];
 }
-if(isset($params['set_cal_view_id'])) {
+if(isset($params['set_cal_view_id']) && $params['set_cal_view_id']!=0) {
   $current_view = CalendarView::get_from_id($params['set_cal_view_id']);
 }
 if (!($current_view instanceOf CalendarView) && isset($_SESSION['cal_current_view']) && (is_string($_SESSION['cal_current_view']))) {

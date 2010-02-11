@@ -248,10 +248,10 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
 
   $output_target = $calendar['output_target'];
   $block = html_calendar_minical($current_view);
-  $block .= html_calendar_bar_legend($p_view, $calendar_entity, $current_view);
+  $block .= html_calendar_bar_legend($p_view, $calendar_entity);
   if ($action != 'perform_meeting' && $output_target != 'print') {
     $block .= html_calendar_select_calendar_entity($p_view, $current_view, $calendar_entity, $entity_readable);
-    $block .= html_calendar_view_selector($current_view, $my_views);
+    $block .= html_calendar_view_selector($calendar, $current_view, $my_views);
   }
 
   return $block;
@@ -263,15 +263,12 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
 // Parameters:
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_bar_legend($p_view, $calendar_entity, $current_view) {
-  global $ico_user, $ico_resource, $obm;
-  global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
+function html_calendar_bar_legend($p_view, $calendar_entity) {
+  global $ico_user, $ico_resource, $l_meeting_legend;
   global $l_calendar_displayed, $l_resource_displayed,$c_all,$l_event_color_tt;
-  global $action,$ico_delete,$output_target,$l_color,$l_users,$l_events;
+  global $ico_delete,$output_target,$l_color,$l_users,$l_events;
   global $mono_user;
 
-  $date = $current_view->get_date();
-  $iso = $date->getURL();
   if (count($calendar_entity) == 1 && is_array($calendar_entity['user'])
      && count($calendar_entity['user']) == 1) {
     $colorTemplate = 'event';
@@ -282,13 +279,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity, $current_view) {
     $mono_user = false;
   }
   ${'select_color_'.$colorTemplate} = "selected=\"selected\"";
-  if ($action == 'perform_meeting' || $action == 'perform_res_meeting') {
-    $l_legend = $l_meeting_legend;
-    $dis_legend = "
-    <li class=\"freeBusy\">$l_possible</li>
-    <li class=\"free\">$l_free</li>
-    <li class=\"busy\">$l_occupied</li>";
-  } elseif ( $p_view == 'planning' ) {
+  if ($p_view == 'planning') {
     $script_range = 'obm.vars.conf.displayRange = true;';
     $l_legend = $l_meeting_legend;
     $cats1 = of_category_get_ordered('event', 'category1');
@@ -304,15 +295,13 @@ function html_calendar_bar_legend($p_view, $calendar_entity, $current_view) {
       foreach ($entity as $id => $data) {
         $data_id = "data-$type-$id";
         $dis_legend .= "
-          <li title=\"$tooltip\" class=\"".$data['class']."Legend\"><input class=\"colorChooser\" name=\"class-$type-$id\" type=\"hidden\" /><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
+          <li title=\"$tooltip\" class=\"$data[class]Legend\"><input class=\"colorChooser\" name=\"class-$type-$id\" type=\"hidden\" /><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
           <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
         if ($output_target != 'print') {
           $dis_legend .= "<img src=\"$ico_delete\"
           onclick=\"\$('$data_id').dispose(); $('calendarSelectForm').submit();\" onmouseover=\"this.style.cursor = 'pointer';\"/>";
         }
-        $dis_legend .= " &nbsp;".$data['name']."
-          
-          </li>";
+        $dis_legend .= "&nbsp;$data[name]</li>";
       }
     }
   }
@@ -324,11 +313,10 @@ function html_calendar_bar_legend($p_view, $calendar_entity, $current_view) {
   <script type=\"text/javascript\">
     obm.vars.conf.calendarColor = '$colorTemplate';
     $script_range
-   </script>
+  </script>
   <ul>
     $dis_legend
   </ul>
-  <input type=\"hidden\" name=\"date\" value=\"".$date->getIso()."\" />
   <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
   <input type=\"hidden\" name=\"new_group\" value=\"1\" />
   <input type=\"hidden\" name=\"new_sel\" value=\"1\" />    
@@ -355,8 +343,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
   global $ico_group, $l_calendar, $l_add;
 
-  $date = $current_view->get_date();
-  $iso = $date->getURL();
   $this_group = $current_view->get_group();
   $category_filter = $current_view->get_category();
 
@@ -387,7 +373,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       $g_public_name = get_last_group_text($this_group);
     } 
 
-    $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;filter_entity=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']))."&amp;ext_target=$l_calendar&amp;iso_date=$iso";
+    $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;filter_entity=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']))."&amp;ext_target=$l_calendar";
     $group_add_button = "
       <a href=\"javascript: return false;\" 
       onclick=\"popup('$url_group', '');
@@ -423,7 +409,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       $user_add_button
       </legend>
       <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"user\" autocomplete=\"off\" />
-      <input type=\"hidden\" name=\"date\" value=\"".$date->getIso()."\" />
       <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
       <input type=\"hidden\" name=\"new_group\" value=\"1\" />
       <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
@@ -431,7 +416,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
 
     $user_complete = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {filter_entity:'calendar', filter_pattern:'read', defaultText:'$user_text'});";
     $group_complete = "new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {filter_entity:'calendar', filter_pattern:'read', mode: 'mono',
-        locked: 'true', selectfunction:'sel_public_group(\"$iso\", element, this.inputField.value)'});";
+        locked: 'true', selectfunction:'sel_public_group(element, this.inputField.value)'});";
   }
   // loop through ['user'], ['resource']
   $count = 0;
@@ -566,16 +551,15 @@ function html_calendar_minical($current_view) {
  * @access public
  * @return HTML
 */
-function html_calendar_view_selector($current_view, $my_views) {
+function html_calendar_view_selector($calendar, $current_view, $my_views) {
   global $obm;
   global $l_views, $l_view_label, $l_select, $l_select_view, $l_label_default, $l_delete_default_view, $l_insert_default_view; 
   global $l_view_save, $l_view_delete, $l_validate, $l_fill_view_label;
   global $l_confirm_delete_view, $l_no_sel_view, $l_conflict_view_label, $l_confirm_default_view, $l_no_sel_default_view;
   global $ico_delete, $ico_add, $ico_popup_close;
 
-  $date = $current_view->get_date();
   $view_id = $current_view->get_id();
-  $iso = $date->getURL();
+  if ($calendar['set_cal_view_id'] == 0) $view_id = 0;
   $default_view_id = $_SESSION['set_cal_default_view'];
   $display = 'none';
   if (isset($default_view_id)) {
@@ -622,8 +606,7 @@ function html_calendar_view_selector($current_view, $my_views) {
     <h1>$l_views</h1>
     <div style=\"margin: 2px;\">
     <form action=\"".basename($_SERVER['SCRIPT_NAME'])."\" method=\"get\">
-      <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\"
-        onchange=\"change_view(this.options[this.selectedIndex].value);\">
+      <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\" onchange=\"change_view(this.options[this.selectedIndex].value);\">
         <option id=\"opt_choix\" value=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]\" >
           $l_select_view
         </option>
