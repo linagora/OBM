@@ -626,6 +626,7 @@ class OBM_Contact implements OBM_ISearchable {
 
     // Indexing Contact
     self::solrStore($contact);
+    OBM_IndexingService::commit('contact');
 
     return $contact;
   }
@@ -661,6 +662,7 @@ class OBM_Contact implements OBM_ISearchable {
       ));
     }
     $ret = self::create($data,$addressbook);
+    OBM_IndexingService::commit('contact');
     return $ret;
   }
 
@@ -686,7 +688,8 @@ class OBM_Contact implements OBM_ISearchable {
 
     // Indexing Contact
     self::solrStore($contact);
-
+    OBM_IndexingService::commit('contact');
+    
     return $contact;
   }
 

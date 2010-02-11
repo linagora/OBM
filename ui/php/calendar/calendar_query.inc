@@ -1486,8 +1486,6 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
       $oldEvent);
   }
 
-  // SOLR UPDATE
-
 }
 
 
@@ -1604,6 +1602,9 @@ function run_query_calendar_update_event_data($calendar) {
 
   $event_id = $calendar['calendar_id'];
 
+  // SOLR
+  run_query_calendar_solr_store($event_id);
+
   if ($repeat_kind == 'none') {
     run_query_delete_event_exceptions($event_id);
     return;
@@ -1639,8 +1640,6 @@ function run_query_calendar_update_event_data($calendar) {
       run_query_delete_one_event_exception($event_id,$data['eventexception_date'],$data['child_id']);
   }
 
-  // SOLR
-  run_query_calendar_solr_store($calendar['calendar_id']);
 }
 
 
@@ -4695,6 +4694,7 @@ function run_query_calendar_solr_store($event_id) {
     $doc->setMultiValue('withId', $attendees_q->f('eventlink_entity_id'));
   }
   OBM_IndexingService::store('event', array($doc));
+  OBM_IndexingService::commit('event');
 }
 
 

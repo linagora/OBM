@@ -43,6 +43,15 @@ class OBM_IndexingService {
     $solr = OBM_IndexingService::connect($core);
     if ($solr) {
       $solr->addDocuments($doc);
+      // $solr->commit();
+      // $solr->optimize();
+    }
+  }
+
+
+  public function commit($core) {
+    $solr = OBM_IndexingService::connect($core);
+    if ($solr) {
       $solr->commit();
       $solr->optimize();
     }
