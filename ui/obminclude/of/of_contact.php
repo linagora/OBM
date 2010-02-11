@@ -1520,4 +1520,9 @@ class OBM_Contact implements OBM_ISearchable {
     $obm_q->next_record();
     return $obm_q->f('country_iso3166');
   }
+
+  public function getFreebusyUrl() {
+    var_dump($this->website);
+  }
+
 }

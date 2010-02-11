@@ -1796,7 +1796,7 @@ function run_query_contact_ext_search($contact) {
   $multidomain = sql_multidomain('contact');
 
   $addressbooks = OBM_AddressBook::get($contact['addressbook_id']);
-  $contacts = $addressbooks->getContacts($contact['pattern']);
+  $contacts = $addressbooks->getContacts($contact['pattern']."*");
 
   return $contacts;
 }
