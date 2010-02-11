@@ -792,9 +792,11 @@ class OBM_Contact implements OBM_ISearchable {
       $contact['birthday'] = $vcard->bday->format(Of_date::DATE_ISO);
     }
     foreach ($vcard->addresses as $add) {
+      $location = $add->location[0];
+      if (empty($location)) $location = "OTHER";
       $contact['addresses'][] = array(
         'street' => addslashes($add->street),
-        'label' => strtoupper($add->location[0]),
+        'label' => strtoupper($location),
         'zipcode' => addslashes($add->postalcode),
         'town' => addslashes($add->locality),
         'expresspostal' => addslashes($add->pobox),
@@ -802,26 +804,34 @@ class OBM_Contact implements OBM_ISearchable {
       );
     }
     foreach ($vcard->phones as $ph) {
+      $location = $ph->location[0];
+      if (empty($location)) $location = "OTHER";
       $contact['phones'][] = array(
         'number' => addslashes($ph->value),
-        'label' => strtoupper($ph->location[0])
+        'label' => strtoupper($location)
       );
     }
     foreach ($vcard->emails as $em) {
+      $location = $em->location[0];
+      if (empty($location)) $location = "OTHER";
       $contact['emails'][] = array(
         'address' => $em->value,
-        'label' => strtoupper($em->location[0])
+        'label' => strtoupper($location)
       );
     }
     foreach ($vcard->getFieldsByName('IMPP') as $im) {
+      $protocol = $im->getParam('TYPE');
+      if (empty($protocol)) $protocol = "OTHER";
       $contact['ims'][] = array(
-        'protocol' => $im->getParam('TYPE'),
+        'protocol' => $protocol,
         'address' => addslashes($im->value())
       );
     }
     foreach ($vcard->getFieldsByName('URL') as $www) {
+      $label = $www->getParam('TYPE');
+      if (empty($label)) $label = "OTHER";
       $contact['websites'][] = array(
-        'label' => $www->getParam('TYPE'),
+        'label' => $label,
         'url' => $www->value()
       );
     }

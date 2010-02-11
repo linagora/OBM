@@ -134,7 +134,7 @@ $l_delete_ad = "Ştergeţi";
 $l_mname = "Al doilea prenume"; 
 $l_contacts = "Contactele mele"; 
 $l_no_name = "Fără nume"; 
-$l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ'); 
+$l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ', 'OTHER' => 'Altul'); 
 $l_add_fields = "Adăugaţi câmpurile"; 
 $l_collected_contacts = "Persoane "; 
 $l_desync_ad = "Reziliaţi"; 
