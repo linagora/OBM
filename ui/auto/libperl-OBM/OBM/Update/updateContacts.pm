@@ -2,7 +2,7 @@ package OBM::Update::updateContacts;
 
 $VERSION = '1.0';
 
-use OBM::Entities::systemEntityIdGetter;
+use OBM::Entities::entityIdGetter;
 @ISA = ('OBM::Entities::entityIdGetter');
 
 $debug = 1;
@@ -266,7 +266,7 @@ sub _deleteDomainContacts {
                         WHERE EntityRight.entityright_consumer_id is NULL
                             AND EntityRight.entityright_read=1)
                     OR Contact.contact_archive=1)
-                    AND Contact.contact_domain_id=1';
+                    AND Contact.contact_domain_id='.$domainId;
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {

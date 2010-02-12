@@ -123,7 +123,7 @@ sub _displayHelp {
     print STDERR 'Script permettant de faire une synchronisation des contacts publics d\'OBM dans une branche de l\'annuaire LDAP (ou=contacts par défaut)'."\n\n";
 
     print STDERR 'Veuillez indiquer le critere de mise a jour :'."\n";
-    print STDERR 'Syntaxe: $0 [--global | --incremental]'."\n";
+    print STDERR 'Syntaxe: '.$0.' [--global | --incremental]'."\n";
     print STDERR "\t".'--global : Fait une mise a jour globale des contacts ;'."\n";
     print STDERR "\t".'--incremental : Fait une mise a jour incrementale du domaine (Option par defaut)'."\n";
 
