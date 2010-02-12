@@ -6,26 +6,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: profile.inc 2917 2008-05-31 15:08:08Z pierre $ //
 ///////////////////////////////////////////////////////////////////////////////
-// Modified on 2009-09-09T15:20:48+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:05:15+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:25:18+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:26:54+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:32:27+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:33:01+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:33:22+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:34:51+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:35:35+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:36:55+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:40:08+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:42:23+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:52:14+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:56:15+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:56:54+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:57:59+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:59:20+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T10:59:34+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T11:07:01+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T11:11:16+02:00 using OBMtranslation (0.4.1)
 
 $l_profile_name_error = "Profile name is invalid, please enter from 1 to 64 alphanumerical characters or '_' '.' '-' !";
 $l_profile_name_empty = "You must enter a profile name : from 1 to 64 alphanumerical characters or '_' '.' '-' !";

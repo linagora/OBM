@@ -28,6 +28,7 @@ require_once 'SearchTest.php';
 //require_once 'ReportTest.php';
 //require_once 'UserReportCommandTest.php';
 //require_once 'ReportSenderTest.php';
+//require_once 'UserPatternTest.php';
  
 class AllTests {
   public static function suite() {
@@ -35,6 +36,7 @@ class AllTests {
     //$suite->addTestSuite('UserReportCommandTest');
     //$suite->addTestSuite('ReportTest');
     //$suite->addTestSuite('ReportSenderTest');
+    //$suite->addTestSuite('UserPatternTest');
     $suite->addTestSuite('AclTest');
     $suite->addTestSuite('VpdiTest');
     $suite->addTestSuite('EventTest');

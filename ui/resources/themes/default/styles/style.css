@@ -1720,4 +1720,9 @@ input.updateButton {
   border: 1px solid black;
 }
 
+#templateSelect {
+  padding-top: 10px;
+  padding-right: 10px;
+  float: right;
+}
 

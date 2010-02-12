@@ -88,6 +88,7 @@ $l_group = "Gruppe";
 $l_quota_error = "Die ergriffene Mail-Quoten ist ungültig!";
 $l_host_enable = "Aktiviert auf dem Host";
 $l_download_user_card = "Laden Sie die Benutzer-Kartei herunter";
+$l_create_using_userpattern = "Create using a pattern";//FIXME
 $l_user_delete_himself_error = "Sie können sich nicht selbst löschen !";
 $l_mail_perms_error = "Das interne Nachrichtensystem muss aktiviert werden, um die Mailbox zu genießen !";
 $l_email_exist = "Die E-Mail Adresse wird bereits verwendet !";

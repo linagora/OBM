@@ -70,6 +70,7 @@ $l_group_member = "Membre des groupes";
 $l_password_type = "Chiffrage mdp";
 $l_mailserver_auto = "Automatique";
 $l_download_user_card = 'Télécharger la fiche utilisateur';
+$l_create_using_userpattern = "Créer d'après un modèle";
 
 // Actions
 $l_insert = "Enregistrer l'utilisateur";

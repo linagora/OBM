@@ -1897,7 +1897,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table>
   <tr>
     <th class=\"$class[email_nomade]\">$l_email_nomade</th>
-    <td><input name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\" /></td>
+    <td><input id=\"tf_email_nomade\" name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\" /></td>
   </tr>
   <tr>
     <th class=\"$class[nomade_perms]\"><label for=\"cb_nomade_perms\">$l_perms</label></th>
@@ -2228,10 +2228,38 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
   $display['title'] = $dis_title;
 
+  // User pattern selector
+  if (($action == 'new') || ($action == 'insert')) {
+    $patterns = UserPattern::all();
+  }
+  if (!empty($patterns)) {
+    $choices = "<option value=\"\">---</option>";
+    foreach ($patterns as $id => $pattern) {
+      $choices .= "<option value=\"$id\">$pattern</option>";
+    }
+    $block_userpattern = "<div id=\"templateSelect\">
+      <form id=\"templateSelectForm\" action=\"calendar_index.php\">
+        {$GLOBALS['l_create_using_userpattern']}
+        <select id=\"userpattern_id\" name=\"userpattern_id\">
+          $choices
+        </select>
+      </form>
+    </div>
+    ";
+    $js_userpattern = "<script type='text/javascript'>
+      theUserForm = new Obm.UserPattern.Form({});
+      $('userpattern_id').addEvent('change' , function () {
+        theUserForm.setPattern(this.value);
+      })          
+    </script>
+    ";
+  }
+
   // --- HTML Template --------------------------------------------------------
   $block = "
     $pop_up
     $pop_generate
+  $block_userpattern
   <form id=\"dataUser\" method=\"post\" name=\"f_entity\"
     enctype=\"multipart/form-data\"
     onsubmit=\"return (check_phoneFax_number(this) && check_user(this));\"
@@ -2264,15 +2292,15 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table>
   <tr>
     <th class=\"$class[kind]\">$l_kind</th>
-    <td><input name=\"tf_kind\" size=\"32\" maxlength=\"12\" value=\"$kind\" /></td>
+    <td><input id=\"userKind\" name=\"tf_kind\" size=\"32\" maxlength=\"12\" value=\"$kind\" /></td>
   </tr>
   <tr>
     <th class=\"$class[lastname]\">$l_lastname</th>
-    <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"64\" value=\"$lname\" /></td>
+    <td><input id=\"userLastname\" name=\"tf_lastname\" size=\"32\" maxlength=\"64\" value=\"$lname\" /></td>
   </tr>
   <tr>
     <th class=\"$class[firstname]\">$l_firstname</th>
-    <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"64\" value=\"$fname\" /></td>
+    <td><input id=\"userFirstname\" name=\"tf_firstname\" size=\"32\" maxlength=\"64\" value=\"$fname\" /></td>
   </tr>
   <tr>
     <th class=\"$class[login]\">$l_login</th>
@@ -2303,11 +2331,11 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   $dis_delegation_target
   <tr>
     <th class=\"$class[title]\">$l_title</th>
-    <td><input name=\"tf_title\" size=\"32\" maxlength=\"64\" value=\"$title\" /></td>
+    <td><input id=\"userTitle\" name=\"tf_title\" size=\"32\" maxlength=\"64\" value=\"$title\" /></td>
   </tr>
   <tr>
     <th class=\"$class[datebegin]\">$l_datebegin</th>
-    <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
+    <td><input id=\"userDatebegin\" type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
   </tr>
   <tr>
     <th class=\"$class[noexperie]\"><label for=\"noexperie\">$l_noexperie</label></th>
@@ -2315,7 +2343,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </tr>
   <tr id=\"exp\" style=\"$showexp\">
     <th class=\"$class[dateexp]\">$l_dateexp</th>
-    <td><input type=\"text\" name=\"tf_dateexp\" $disabled value=\"$dateexp\" class=\"datePicker\"/></td>
+    <td><input id=\"userDateexp\" type=\"text\" name=\"tf_dateexp\" $disabled value=\"$dateexp\" class=\"datePicker\"/></td>
   </tr>
   $block_photo
   $block_photo_detail
@@ -2328,59 +2356,59 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table>
   <tr>
     <th class=\"$class[phone]\">$l_phone</th>
-    <td><input name=\"tf_phone\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
+    <td><input id=\"userPhone\" name=\"tf_phone\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
   </tr>
   <tr>
     <th class=\"$class[phone2]\">$l_phone2</th>
-    <td><input name=\"tf_phone2\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
+    <td><input id=\"userPhone2\" name=\"tf_phone2\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
   </tr>
   <tr>
     <th class=\"$class[mobile]\">$l_mphone</th>
-    <td><input name=\"tf_mobile\" size=\"20\" maxlength=\"20\" value=\"$mobile\" /></td>
+    <td><input id=\"userMobile\" name=\"tf_mobile\" size=\"20\" maxlength=\"20\" value=\"$mobile\" /></td>
   </tr>
   <tr>
     <th class=\"$class[fax]\">$l_fax</th>
-    <td><input name=\"tf_fax\" size=\"20\" maxlength=\"20\" value=\"$fax\" /></td>
+    <td><input id=\"userFax\" name=\"tf_fax\" size=\"20\" maxlength=\"20\" value=\"$fax\" /></td>
   </tr>
   <tr>
     <th class=\"$class[fax2]\">$l_fax2</th>
-    <td><input name=\"tf_fax2\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
+    <td><input id=\"userFax2\" name=\"tf_fax2\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
   </tr>
   <tr>
     <th class=\"$class[company]\">$l_company</th>
-    <td><input name=\"tf_company\" size=\"64\" maxlength=\"64\" value=\"$company\" /></td>
+    <td><input id=\"userCompany\" name=\"tf_company\" size=\"64\" maxlength=\"64\" value=\"$company\" /></td>
   </tr>
   <tr>
     <th class=\"$class[direction]\">$l_direction</th>
-    <td><input name=\"tf_direction\" size=\"64\" maxlength=\"64\" value=\"$direction\" /></td>
+    <td><input id=\"userDirection\" name=\"tf_direction\" size=\"64\" maxlength=\"64\" value=\"$direction\" /></td>
   </tr>
   <tr>
     <th class=\"$class[service]\">$l_service</th>
-    <td><input name=\"tf_service\" size=\"64\" maxlength=\"64\" value=\"$service\" /></td>
+    <td><input id=\"userService\" name=\"tf_service\" size=\"64\" maxlength=\"64\" value=\"$service\" /></td>
   </tr>
   <tr>
     <th class=\"$class[address1]\">$l_address 1</th>
-    <td><input name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /></td>
+    <td><input id=\"userAd1\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /></td>
   </tr>
   <tr>
     <th class=\"$class[address2]\">$l_address 2</th>
-    <td><input name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /></td>
+    <td><input id=\"userAd2\" name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /></td>
   </tr>
   <tr>
     <th class=\"$class[address3]\">$l_address 3</th>
-    <td><input name=\"tf_ad3\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad3\" /></td>
+    <td><input id=\"userAd3\" name=\"tf_ad3\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad3\" /></td>
   </tr>
   <tr>
     <th class=\"$class[zip]\">$l_postcode</th>
-    <td><input name=\"tf_zip\" size=\"8\" maxlength=\"8\" value=\"$zip\" /></td>
+    <td><input id=\"userZip\" name=\"tf_zip\" size=\"8\" maxlength=\"8\" value=\"$zip\" /></td>
   </tr>
   <tr>
     <th class=\"$class[town]\">$l_town</th>
-    <td><input name=\"tf_town\" size=\"24\" maxlength=\"24\" value=\"$town\" /></td>
+    <td><input id=\"userTown\" name=\"tf_town\" size=\"24\" maxlength=\"24\" value=\"$town\" /></td>
   </tr>
   <tr>
     <th class=\"$class[expresspostal]\">$l_expresspostal</th>
-    <td><input name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /></td>
+    <td><input id=\"userCdx\" name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /></td>
   </tr>
   </table>
   </fieldset>
@@ -2390,7 +2418,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table>
   <tr>
     <th class=\"$class[desc]\">$l_desc</th>
-    <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
+    <td><input id=\"userDesc\" name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
   </tr>
   </table>
   </fieldset>
@@ -2403,7 +2431,8 @@ $mobile_devices
   <fieldset class=\"buttons\">
   $dis_button
   </fieldset>
-  </form>";
+  </form>
+  $js_userpattern";
 
   return $block;
 }

@@ -77,6 +77,7 @@ $ico_project        = "$theme_path/ico_project.gif";
 $ico_big_project    = "$theme_path/ico_big_project.gif";
 $ico_publication    = "$theme_path/ico_publication.gif";    
 $ico_password       = "$theme_path/ico_password.gif";    
+$ico_userpattern    = "$theme_path/ico_group_edit.png";
 $ico_profile        = "$theme_path/ico_group.gif";
 $ico_ref            = "$theme_path/ico_ref.gif";
 $ico_resource       = "$theme_path/ico_resource.gif";

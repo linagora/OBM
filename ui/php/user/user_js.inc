@@ -312,7 +312,237 @@ function modif_password() {
   } else {
     obm.popup.show('popupModifPassword');
   }
-}
+};
+
+Obm.vars.consts.userPatternUrl = '$path/userpattern/userpattern_index.php';
+
+Obm.UserPattern = {};
+
+Obm.UserPattern.Field = new Class ({
+
+  initialize: function(form,field) {
+    this.form = form;
+    this.field = field;
+    this.field.addEvent('keyup', this.form.autoReload.bindWithEvent(this.form))
+              .addEvent('input', this.form.autoReload.bindWithEvent(this.form))
+              .addEvent('paste', this.form.autoReload.bindWithEvent(this.from));
+  },
+
+  resetValue: function() {
+  },
+
+  setValue: function(value) {
+  },
+
+  getValue: function(value) {
+    return this.field.value;
+  },
+
+  changed: function() {
+    return true;
+  },
+
+  empty: function() {
+    return ((this.field.value==undefined) || (this.field.value==''));
+  }
+
+});
+
+Obm.UserPattern.StringField = new Class ({
+  Extends: Obm.UserPattern.Field,
+
+  initialize: function(form,field) {
+    this.parent(form,field);
+    this.value = field.value;
+    this.originalValue = field.value;
+  },
+
+  resetValue: function() {
+    this.field.value = this.originalValue;
+  },
+
+  setValue: function(value) {
+    this.value = value;
+    this.field.value = value;
+  },
+
+  changed: function() {
+    return (this.value!=this.field.value);
+  }
+
+});
+
+Obm.UserPattern.BooleanField = new Class ({
+  Extends: Obm.UserPattern.Field,
+
+  initialize: function(form,field) {
+    this.parent(form,field);
+    this.checked = field.checked;
+    this.originalChecked = field.checked;
+  },
+
+  resetValue: function() {
+    this.field.checked = this.originalChecked
+  },
+
+  setValue: function(value) {
+    if (((this.field.checked) && (value!=this.field.value)) || ((!this.field.checked) && (value==this.field.value))) {
+      this.field.click();
+      this.checked = this.field.checked;
+    }
+  },
+
+  getValue: function(value) {
+    if (this.field.checked) {
+      return this.field.value;
+    } else {
+      return 0;
+    }
+  },
+
+  changed: function() {
+    return (this.checked!=this.field.checked);
+  },
+
+  empty: function() {
+    return (!this.field.checked);
+  }
+
+});
+
+Obm.UserPattern.PasswordField = new Class ({
+  Extends: Obm.UserPattern.StringField,
+
+  setValue: function(value) {
+    this.parent(value);
+    this.field.type = 'text';
+  }
+
+});
+
+Obm.UserPattern.Form = new Class ({
+  Implements: Options,
+
+  options: {
+    url: Obm.vars.consts.userPatternUrl,
+    delay: 400                      // delay before the last key pressed and the request
+  },
+
+  initialize: function(options) {
+    this.setOptions(options);
+    this.form = $('dataUser');
+    this.userpattern_id = 0;
+    this.request_id = 0;
+    this.fields = {
+      'kind':  new Obm.UserPattern.Field(this,$('userKind')),
+      'lastname': new Obm.UserPattern.Field(this,$('userLastname')),
+      'firstname': new Obm.UserPattern.Field(this,$('userFirstname'))
+    };
+    this.addField('login','userLogin');
+    this.addField('passwd','passwd','PasswordField');
+    this.addField('hidden','cba_hidden','BooleanField');
+    /* this.addField('profil',''); FIXME: profil */
+    this.addField('delegation','delegationField');
+    this.addField('delegation_target','delegationTargetField');
+    this.addField('title','userTitle');
+    this.addField('datebegin','userDatebegin');
+    this.addField('noexperie','noexperie','BooleanField');
+    this.addField('dateexp','userDateexp');
+    this.addField('phone','userPhone');
+    this.addField('phone2','userPhone');
+    this.addField('mobile','userMobile');
+    this.addField('fax','userFax');
+    this.addField('fax2','userFax2');
+    this.addField('company','userCompany');
+    this.addField('direction','userDirection');
+    this.addField('service','userService');
+    this.addField('ad1','userAd1');
+    this.addField('ad2','userAd2');
+    this.addField('ad3','userAd3');
+    this.addField('zip','userZip');
+    this.addField('town','userTown');
+    this.addField('cdx','userCdx');
+    this.addField('desc','userDesc');
+    this.addField('web_perms','cb_web_perms','BooleanField');
+    this.addField('mail_perms','userMailActive','BooleanField');
+    /*this.addField('mail_server_id',''); FIXME: mail_server_id */
+    /*this.addField('email',''); FIXME: mail_server_id */
+    this.addField('mail_quota','tf_mail_quota');
+    this.addField('email_nomade','tf_email_nomade');
+    this.addField('nomade_perms','cb_nomade_perms','BooleanField');
+    this.addField('nomade_enable','cb_nomade_enable','BooleanField');
+    this.addField('nomade_local_copy','cb_nomade_local_copy','BooleanField');
+  },
+
+  addField: function(name,id,type) {
+    if (!type)
+      type = 'StringField';
+    var field = $(id)
+    if (field) {
+      this.fields[name] = new Obm.UserPattern[type](this,field);
+    }
+  },
+
+  setPattern: function(userpattern_id) {
+    this.userpattern_id = userpattern_id;
+    this.loadPattern();
+  },
+
+  loadPattern: function() {
+    if (this.userpattern_id) {
+      var params = {};
+      for (var attr in this.fields) {
+        var field = this.fields[attr];
+        if ((field.changed()) && (!field.empty())) {
+          params[attr] = field.getValue();
+        }
+      }
+      this.request_id++;
+      new Request.JSON({
+        url : this.options.url,
+        secure : false,
+        onSuccess:this.onQuerySuccess.bindWithEvent(this,[this.request_id])
+      }).post({
+        action: 'apply',
+        userpattern_id: this.userpattern_id, 
+        attributes: params
+      });
+    } else {
+      for (var attr in this.fields) {
+        var field = this.fields[attr];
+        if (!field.changed()) {
+          field.resetValue();
+        }
+      }
+    }
+  },
+
+  onQuerySuccess: function(response, response_id) {
+    if (response_id==this.request_id) {
+      if (!response.err) {
+        this.applyPattern(response.attributes);
+      }
+    }
+  },
+
+  autoReload: function() {
+    if (this.fetchDelay) {
+      this.fetchDelay = $clear(this.fetchDelay);
+    }
+    this.fetchDelay = this.loadPattern.delay(this.options.delay,this);
+  },
+
+  applyPattern: function(attributes) {
+    for (var attr in attributes) {
+      var field = this.fields[attr];
+      if (field && ((!field.changed()) || (field.empty()))) {
+        field.setValue(attributes[attr]);
+      }
+    }
+  }
+
+});
+
 
 function get_profile_quota(field) {
   var val = field.options[field.selectedIndex].value;;

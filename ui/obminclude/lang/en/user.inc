@@ -66,6 +66,7 @@ $l_generate_passwd = "Generate";
 $l_edit_users = "Edit users properties";
 $l_do_batch_processing = "Do batch processing";
 $l_download_user_card = 'Download user information';
+$l_create_using_userpattern = "Create using a pattern";
 $l_no_display = "Fill in the search fields and press < Find > to retrieve the users";
 $l_found = "users found";
 $l_no_found = "No user matching the query has been found  !";

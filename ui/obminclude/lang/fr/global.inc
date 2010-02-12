@@ -178,6 +178,7 @@ $l_no_document_added = "Aucun document ajouté";
 $l_last = "Dernier";
 $l_login = "Identifiant";
 $l_logout = "Déconnexion";
+$l_userpattern = "Modèle d'utilisateur";
 $l_profile = "Profil";
 $l_connection_end = "Fin de connexion";
 $l_reconnect = "Cliquer ici pour se reconnecter";
@@ -399,6 +400,7 @@ $l_module_admin = "Connexions";
 $l_module_import = "Import";
 $l_module_backup = "Sauvegarde";
 $l_module_samba = "Serveur Samba (Windows PDC)";
+$l_module_userpattern = "Modèle d'utilisateur";
 $l_module_profile = "Profils utilisateurs";
 
 $l_module_settings = "Configuration";

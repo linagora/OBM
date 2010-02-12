@@ -59,6 +59,7 @@ require_once('../profile/profile_query.inc');
 require_once('user_display.inc');
 require_once('user_query.inc');
 require_once('user_js.inc');
+require_once("$path/../app/default/models/UserPattern.php");
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/of/of_right.inc"); // needed by call from calendar
 

@@ -436,6 +436,13 @@ if ($cgp_show['module']['organizationalchart']) {
 			            'Right'=> $cright_read);
 }
 
+if ($cgp_show['module']['userpattern']) {
+  $modules['userpattern'] = array('Name'  => $l_module_userpattern,
+			      'Ico'   => "$ico_userpattern",
+			      'Url'   => "$path/userpattern/userpattern_index.php",
+			      'Right' => $cright_read);
+}
+
 if ($cgp_show['module']['profile']) {
   $modules['profile'] = array('Name'  => $l_module_profile,
 			      'Ico'   => "$ico_profile",
