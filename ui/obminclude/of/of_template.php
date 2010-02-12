@@ -268,7 +268,7 @@ class OBM_Template {
 
   public static function __getlink($uri, $label=null) {
     if(!$label) $label = $uri;
-    $uri = ((strpos($uri[0],'://') === false)?'http://'.$uri:$uri);
+    $uri = ((strpos($uri,'://') === false)?'http://'.$uri:$uri);
     return '<a href="'.$uri.'" target="__blank">'.$label.'</a>';
   }
 

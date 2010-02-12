@@ -22,9 +22,6 @@ Obm.CalendarManager = new Class({
     this.write = write;
     this.popupManager = new Obm.CalendarPopupManager(); 
 
-    if (obm.vars.consts.calendarRange != 'month') {
-      this.defaultHeight = $('calendarBody').getElement('div').offsetHeight;    
-    }
     // Reset minical
     if(obm.miniCalendar) {
       if (obm.miniCalendar.currentMonth == d.getMonth()) {
@@ -35,6 +32,7 @@ Obm.CalendarManager = new Class({
     }
 
     if (obm.vars.consts.calendarRange != 'month') {
+      this.defaultHeight = $('calendarBody').getElement('div').offsetHeight;    
       for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
         d.setTime(obm.vars.consts.startTime.getTime());
         d.setDate(obm.vars.consts.startTime.getDate() + i);
@@ -394,7 +392,7 @@ Obm.CalendarManager = new Class({
   /*
    * Scroll to user first hour param
    */
-  scrollToFistHour: function() {
+  scrollToFirstHour: function() {
     $('calendarBody').scrollTo(0, obm.vars.consts.firstHour*this.defaultHeight*(3600/obm.vars.consts.timeUnit));
   },
 

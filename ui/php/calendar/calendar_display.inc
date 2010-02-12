@@ -651,8 +651,6 @@ function html_calendar_view_selector($calendar, $current_view, $my_views) {
  */
 function dis_calendar_day_agenda($current_view, $calendar_entity, $writable_entity) {
 
-  $display_days = 1;
-
   $date = clone $current_view->get_date();
   $date->setHour(0)->setMinute(0)->setSecond(0);
 
@@ -775,7 +773,6 @@ function dis_calendar_navbar($current_view) {
  */
 function dis_calendar_navbar_label($current_view,$ndays=7) {
   $range = $current_view->get_cal_range();
-  $current = clone $current_view->get_date();
   $date = clone $current_view->get_date();
   if ($ndays == 1) $range = 'day';
 
@@ -1093,6 +1090,12 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $current = clone $date;
   $step = 0;
 
+  if ($range == 'day') {
+    $day_js = "obm.calendarManager.showWeek";
+  } else {
+    $day_js = "obm.calendarManager.showDay";
+  }
+
   // days header
   while($current->compare($end) < 0) {
     $date_iso = $current->getDateIso();
@@ -1105,8 +1108,9 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
         <div id='todayHourMarker' style='width:$width%;left:$week_day_left%;'></div>";
       $today = "background:#FFFFCC;";
     }
+
     $week_day_list .= "<td class='dayLabel'>
-      <a href='javascript: void(0)' onclick='obm.calendarManager.showDay($ts)'>".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a>
+      <a href='javascript: void(0)' onclick='$day_js($ts);'>".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a>
     </td>";
     $week_day_event_list .= "
     <div id='dayContainer_".($ts - $start_time)."_$date_iso' class='alldayContainer' style='height:$height%;width:$width%;left:$week_day_left%;$today'>
@@ -1122,6 +1126,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $ts = $current->getTimestamp();
   $current->setHour(0);
   $current->setMinute(0);
+  $unit = 60/$_SESSION['set_cal_interval'];
   while($current->compareHour(24) < 0 && $current->compareDateIso($date) == 0) {
     $id = $current->getTimestamp() - $ts;
 
@@ -1138,7 +1143,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       $week_hour .= "<div class='hourPartial' style='$background;height:{$height}px;'></div>";
       $week_time .= "<div id='time_$id' class='hourPartial' style='$background height:{$height}px;'></div>";
     }
-    $current->addMinute(60/$_SESSION['set_cal_interval']);
+    $current->addMinute($unit);
   }
 
   // Get events
@@ -1213,7 +1218,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   obm.calendarManager.redrawAllDayGrid();
   obm.calendarManager.forceRedraw = true;
   obm.calendarManager.resizeGrid();
-  obm.calendarManager.scrollToFistHour();
+  obm.calendarManager.scrollToFirstHour();
   $('ico_day_view').setProperty('src', '$GLOBALS[$day]');
   $('ico_week_view').setProperty('src', '$GLOBALS[$week]');
   $('ico_month_view').setProperty('src', '$GLOBALS[ico_month_view]');
