@@ -49,6 +49,8 @@ sub DESTROY {
 }
 
 
+# Update http://obm.org/doku.php?id=specification:auto:ldapmapping:obmmailshare when
+# adding new value into description
 sub _init {
     my $self = shift;
     my( $mailshareDesc ) = @_;
@@ -164,6 +166,8 @@ sub _init {
 }
 
 
+# Update http://obm.org/doku.php?id=specification:auto:ldapmapping:obmmailshare when
+# adding new value into description
 sub setLinks {
     my $self = shift;
     my( $links ) = @_;

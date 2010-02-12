@@ -64,6 +64,8 @@ sub DESTROY {
 
 
 # Needed
+# Update http://obm.org/doku.php?id=specification:auto:ldapmapping:obmhost when
+# adding new value into description
 sub _init {
     my $self = shift;
     my( $hostDesc ) = @_;
@@ -125,6 +127,8 @@ sub _init {
 }
 
 
+# Update http://obm.org/doku.php?id=specification:auto:ldapmapping:obmhost when
+# adding new value into description
 sub setLinks {
     my $self = shift;
     my( $links ) = @_;

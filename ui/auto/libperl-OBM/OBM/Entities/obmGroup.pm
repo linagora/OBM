@@ -55,6 +55,8 @@ sub DESTROY {
 
 
 # Needed
+# Update http://obm.org/doku.php?id=specification:auto:ldapmapping:obmgroup when
+# adding new value into description
 sub _init {
     my $self = shift;
     my( $groupDesc ) = @_;
@@ -173,6 +175,8 @@ sub _init {
 }
 
 
+# Update http://obm.org/doku.php?id=specification:auto:ldapmapping:obmgroup when
+# adding new value into description
 sub setLinks {
     my $self = shift;
     my( $links ) = @_;

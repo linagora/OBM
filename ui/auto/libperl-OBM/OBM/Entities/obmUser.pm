@@ -64,6 +64,8 @@ sub DESTROY {
 
 
 # Needed
+# Update http://obm.org/doku.php?id=specification:auto:ldapmapping:obmuser when
+# adding new value into description
 sub _init {
     my $self = shift;
     my( $userDesc ) = @_;
@@ -427,6 +429,8 @@ sub _init {
 }
 
 
+# Update http://obm.org/doku.php?id=specification:auto:ldapmapping:obmuser when
+# adding new value into description
 sub setLinks {
     my $self = shift;
     my( $links ) = @_;
