@@ -14,7 +14,9 @@ $c_profile_properties = array(
     'access_restriction' ,
     'access_exceptions' ,
     'admin_realm',
-    'default_right' 
+    'default_right', 
+    'mail_quota_max', 
+    'mail_quota_default' 
 );
 
 $c_perms_admin = 24;
@@ -557,6 +559,14 @@ function check_profile_data_form($params) {
   } else if (!preg_match($php_regexp_profile_name, $params['name'])) {
     $err['msg'] = $l_profile_name_error;
     $err['field'] = 'name';
+    $return = false;
+  }
+
+  $max_quota = $params['property']['mail_quota_max'];
+  $default_quota = $params['property']['mail_quota_default'];
+  if(($max_quota < $default_quota && $max_quota != '0') 
+    || ($max_quota > $default_quota && $default_quota == '0')) {
+    $err['msg'] = $GLOBALS['l_mail_quota_error']." ($GLOBALS[l_max_quota] : $max_quota)";
     $return = false;
   }
 

@@ -25,6 +25,7 @@ $l_name_in_use = "Le nom est déjà attribué à un autre répertoire partagé !
 $l_err_mailshare_name_empty = "Le nom du partage mail doit être renseigné";
 $l_err_mailshare_name_exist = "Le nom du partage mail est déjà utilisé";
 $l_err_mailshare_quota = "Le quota du partage mail est invalide !";
+$l_err_mailshare_quota_max = "Le quota du partage mail est supèrieur au quota max definis dans le domaine !";
 $l_err_mailshare_email = "L'adresse E-mail saisie n'est pas valide !";
 $l_err_mailshare_email_empty = "L'adresse E-mail doit être saisie !";
 $l_err_mailshare_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
@@ -36,3 +37,5 @@ $l_toggle_public_access = "";
 $l_toggle_public_read = "Ceci entrainera que tout le monde pourra  consulter le contenu de ce partage mail. Désirez-vous continuer?";
 $l_toggle_public_write = "Ceci entrainera que tout le monde pourra modifier le contenu de ce partage mail. Désirez-vous continuer?";
 $l_toggle_public_admin = "Ceci entrainera que tout le monde pourra modifier les droits de ce partage mail. Désirez-vous continuer?";
+
+$l_max_quota = "Valeur max";

@@ -503,11 +503,11 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
       $name = $properties_q->f('domainproperty_key');
       $plabel = $GLOBALS["l_$name"];
       if (isset($domain[$name])) { 
-	${$name} = $domain[$name]; 
+	      ${$name} = $domain[$name]; 
       }
       $properties_block .= "
       <tr>
-      <th>$plabel</th>
+      <th><dfn title='".$GLOBALS["l_help_$name"]."' class='helpTooltip'>".$plabel."</dfn></th>
       <td><input type=\"text\" name=\"$name\" value=\"".${$name}."\" /></td>
       </tr>";
     }

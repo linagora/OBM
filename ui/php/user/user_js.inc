@@ -238,7 +238,6 @@ function switch_mail_mode() {
     external.addClass('H');
     internal.removeClass('H');
     internal.injectInside($('userMail'));
-
   } else {
     //$('userMailHome').set('html','');
     //add_email_field(aliasSelectTemplate); 
@@ -314,6 +313,22 @@ function modif_password() {
     obm.popup.show('popupModifPassword');
   }
 }
+
+function get_profile_quota(field) {
+  var val = field.options[field.selectedIndex].value;;
+  new Request.JSON({
+        url: obm.vars.consts.obmUrl+'/user/user_index.php',
+        secure: false,
+        async: true,
+        onComplete: function(response) {
+            var elem = $('tf_mail_quota');
+            if(elem){
+              elem.value = response.quota; 
+            }
+        }
+  }).get({profile_name : val, action : 'profile_quota'});
+}
+
 ";
 
 ?>

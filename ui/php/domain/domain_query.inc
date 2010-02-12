@@ -601,7 +601,7 @@ function run_query_domain_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_domain_data_form($d_id, $domain) {
   global $err, $l_label_error,$l_alias_user_used,$l_name_in_use;
-  global $l_name_error, $cgp_use;
+  global $l_name_error, $cgp_use, $l_mailshares_quota_error, $l_max_quota ;
 
   $label = $domain['label'];
   $alias = trim($domain['alias']);
@@ -629,6 +629,13 @@ function check_domain_data_form($d_id, $domain) {
       $err['msg'] = "$l_alias_user_used : ".implode(', ',$users_aliases);
       return false;
     }
+  }
+  $mailshare_quota_default = $domain['mailshares_quota_default'];
+  $mailshare_quota_max = $domain['mailshares_quota_max'];
+  if (($mailshare_quota_default > $mailshare_quota_max && $mailshare_quota_max != '0')
+    || ($mailshare_quota_default < $mailshare_quota_max && $mailshare_quota_default == '0')) {
+    $err['msg'] = "$l_mailshares_quota_error \n ($l_max_quota : $mailshare_quota_max)";
+    return false;
   }
   if ($cgp_use['service']['samba']) {
     if ($samba['domain'] != '') {

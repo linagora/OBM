@@ -375,6 +375,11 @@ if ($action == 'ext_get_ids') {
   $remove_q = run_query_userobm_mobile_remove_partnership($params);
   echo "({".$display['json']."})";
   exit();
+} else if ($action == 'profile_quota') {
+  $profile_name = $params['profile_name'];
+  $profile_quota = $params['profiles'][$profile_name]['properties']['mail_quota_default'];
+  echo "({quota:".$profile_quota."})";
+  exit();
 }
 
 of_category_user_action_switch($module, $action, $params);
@@ -690,6 +695,13 @@ function get_user_action() {
   // Remove partnership
   $actions['user']['remove_partnership'] = array (
     'Url'	   => "$path/user/user_index.php?action=remove_partnership",
+    'Right'	   => $cright_write_admin,
+    'Condition'=> array('None')
+  );
+
+  // Get profile quota
+  $actions['user']['profile_quota'] = array (
+    'Url'	   => "$path/user/user_index.php?action=profile_quota",
     'Right'	   => $cright_write_admin,
     'Condition'=> array('None')
   );

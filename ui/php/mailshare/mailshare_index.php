@@ -50,6 +50,7 @@ include("$obminclude/global.inc");
 $params = get_mailshare_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
+require('../domain/domain_query.inc');
 require('mailshare_display.inc');
 require('mailshare_query.inc');
 require('mailshare_js.inc');

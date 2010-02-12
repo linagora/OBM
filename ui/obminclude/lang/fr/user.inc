@@ -32,6 +32,7 @@ $l_photo = "Photo";
 $l_delete_userobmphoto = "Supprimer la photo de l'utilisateur";
 
 $l_quota = "Quota";
+$l_max_quota = "Valeur max";
 $l_administration = "Administration";
 $l_serv_mail = "Serveur de mail";
 $l_create_date = "Date d'entrée";
@@ -137,6 +138,7 @@ $l_expresspostal_error = "Cedex est incorrect";
 $l_coord_same_phone_error = "Vous devez saisir des numéros de téléphone différents !";
 $l_coord_same_fax_error = "Vous devez saisir des numéros de fax différents !";
 $l_user_delete_himself_error = "Vous ne pouvez pas vous supprimer vous-même !";
+$l_user_quota_error = "Le quota du mail est supèrieur au quota max definis dans le profile !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";

@@ -14,12 +14,16 @@ $l_mail_servers = "Serveurs de mail";
 $l_sync_servers = "Serveurs de synchronisation";
 $l_solr_servers = "Serveurs d'indexation";
 $l_imap_frontend_servers = "Serveurs IMAP frontaux";
-
+$l_max_quota = "Valeur max";
 $l_update_state = "Etat de mise à jour";
 
 // Mail chooser labels
 $l_mailboxchoice_least_boxes = "gérant le moins de boîtes mail";
 $l_mailboxchoice_least_used_memory = "utilisant le moins d'espace mémoire";
+$l_mailshares_quota_default = "# bals partagées : quota par défaut";
+$l_help_mailshares_quota_default = "Définit la quota par défaut des bals partagées de ce domaine, la valeur 0 correspond à aucun quota.";
+$l_mailshares_quota_max = "# bals partagées : quota maximum";
+$l_help_mailshares_quota_max = "Définit la quota maximum des bals partagées de ce domaine, la valeur 0 correspond à aucun quota.";
 
 // Actions
 $l_insert = "Insérer le domaine";
@@ -36,6 +40,7 @@ $l_can_delete = "Le domaine peut être supprimé.";
 $l_warn_delete = "ATTENTION : Le domaine n'est pas vide.";
 $l_cant_delete = "Le domaine ne peut pas être supprimé !";
 $l_cant_add_domain_single = "Impossible de créer un nouveau domaine, OBM est configuré en mode mono domaine (singleNameSpace) ! Attention, le passage en multi-domaine nécessite une intervention système importante.";
+$l_mailshares_quota_error = "Le quota par défaut ne peux pas être supèrieur au quota maximum";
 
 $l_max_users = "# utilisateurs max";
 $l_max_resources = "# ressources max";

@@ -28,6 +28,7 @@ $l_name_in_use = "Mailshare name already used !";
 $l_err_mailshare_name_empty = "Mailshare name must be filled in"; 
 $l_err_mailshare_name_exist = "Mailshare name already used";
 $l_err_mailshare_quota = "Invalid mailshare quota !";
+$l_err_mailshare_quota_max = "Mailshare quota exceeds maximum quota set in domain !";
 $l_err_mailshare_email = "Invalid mailshare E-mail !";
 $l_err_mailshare_email_empty = "Mailshare E-mail must be filled in !"; 
 $l_err_mailshare_email_exist = "Mailshare E-mail already used !";
@@ -38,3 +39,4 @@ $l_toggle_public_read = "This will allow everybody to read the mailshare. Do you
 $l_toggle_public_write = "This will make this mailshare writable by everybody. Do you want to continue ?"; 
 $l_toggle_public_admin = "This will allow everybody to update this mailshare rights. Do you want to continue ?"; 
 
+$l_max_quota = "Max value";

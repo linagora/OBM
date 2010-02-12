@@ -478,6 +478,7 @@ function check_mailshare_data_form($mailshare) {
   global $php_regexp_email_name, $php_regexp_quota, $l_err_mailshare_email;
   global $l_err_mailshare_email_empty, $l_err_mailshare_email_exist,$cgp_use;
   global $l_err_mailshare_uemail_exist, $l_err_mailshare_quota,$php_regexp_email;
+  global $l_err_mailshare_quota_max, $l_max_quota, $obm;
 
   $id = $mailshare['mailshare_id'];
   $name = strtolower($mailshare['name']);
@@ -526,6 +527,22 @@ function check_mailshare_data_form($mailshare) {
       $err['field'] = 'quota';
       return false;
     }
+  }
+
+  // Get default quota on domain
+  $prop_q = run_query_domain_properties($obm['domain_id']);
+  while($prop_q->next_record()){
+    $name = $prop_q->f('domainproperty_key');
+    $domain_value = $prop_q->f('domainpropertyvalue_value');
+    $domain[$name] = $domain_value;
+  }
+
+  $max_quota = $domain['mailshares_quota_max'];
+  if (($max_quota < $quota && $max_quota != 0) 
+    || ($quota < $max_quota && $quota == 0)) {
+    $err['msg'] = "$l_err_mailshare_quota_max ($l_max_quota : $max_quota)";
+    $err['field'] = 'quota';
+    return false;
   }
 
   // MANDATORY: Email filled

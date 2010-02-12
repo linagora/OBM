@@ -39,6 +39,8 @@ $l_user = "Lecture";
 $l_editor = "Écriture";
 $l_admin = "Administration";
 
+$l_quota_none = "aucun";
+
 $l_modules_right = "Droits sur les modules";
 $l_sections_right = "Affichage des sections";
 $l_default_settings = "Réglages par défauts";
@@ -73,3 +75,10 @@ $l_realm_user = 'Ses propres modifications';
 $l_realm_delegation = 'Les modifications sur sa délégation';
 $l_realm_domain = 'Toutes les modifications du domaine';
 $l_profile_exists= "Ce nom de profile est déjà utilisé";
+$l_mail_quota_max= "Quota maximum pour la boite mail";
+$l_help_mail_quota_max = "Définit la valeur maximum du quota des adresses mails des utilisateurs de ce profil, la valeur 0 correspond à aucune quota.";
+$l_mail_quota_default= "Quota par défaut pour la boite mail";
+$l_help_mail_quota_default = "Définit la valeur par défaut du quota des adresses mails des utilisateurs de ce profil, la valeur 0 correspond à aucun quota.";
+$l_mail_quota_error = "Le quota par défaut ne peux pas être supèrieur au quota maximum";
+$l_max_quota = 'Valeur max';
+

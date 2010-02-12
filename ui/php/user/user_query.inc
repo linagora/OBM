@@ -1610,6 +1610,7 @@ function check_user_data_form($p_id, &$user) {
   global $l_email_empty, $l_mail_perms_error;
   global $l_email_nomad_error, $l_email_nomad_error_loop;
   global $l_vacation_without_mail_perms, $l_empty_vacation_message;
+  global $l_user_quota_error, $l_max_quota;
   global $php_regexp_login;
   global $php_regexp_email, $php_regexp_email_name, $php_regexp_quota;
   global $php_regexp_home, $php_regexp_drive, $l_err_home, $l_err_drive;
@@ -1863,6 +1864,15 @@ function check_user_data_form($p_id, &$user) {
   if ( (trim($email)) && ($mail_quota != '')
        && (! preg_match($php_regexp_quota, $mail_quota))) {
     $err['msg'] = "$mail_quota : $l_quota_error";
+    $err['field'] = 'mail_quota';
+    return false;
+  }
+  
+  // Email quota check with profile max quota
+  $max_quota = $profiles[$profile]['properties']['mail_quota_max'];
+  if(($mail_quota > $max_quota && $max_quota != 0)
+    || ($mail_quota < $max_quota && $mail_quota == 0)) {
+    $err['msg'] = "$l_user_quota_error ($l_max_quota : $max_quota)";
     $err['field'] = 'mail_quota';
     return false;
   }

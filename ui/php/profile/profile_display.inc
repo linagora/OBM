@@ -696,4 +696,32 @@ function dis_profile_display_pref($prefs) {
   return $block;
 }
 
+/**
+ *  Display the quota max for profile
+ *
+ *  
+ */
+function dis_property_mail_quota_max_value($value, $update = false) {
+  if($update) {
+    (!$value)?$value='0':$value=$value;
+    return "<input id=\"property[mail_quota_max]\" name=\"property[mail_quota_max]\" value=\"$value\" />";
+  } else {
+    return ($value == 0)?$GLOBALS['l_quota_none']:$value;
+  }
+}
+
+/**
+ *  Display the quota max for profile
+ *
+ *  
+ */
+function dis_property_mail_quota_default_value($value, $update = false) {
+  if($update) {
+    (!$value)?$value='0':$value=$value;
+    return "<input id=\"property[mail_quota_default]\" name=\"property[mail_quota_default]\" value=\"$value\" />";
+  } else {
+    return ($value == 0)?$GLOBALS['l_quota_none']:$value;
+  }
+}
+
 ?>

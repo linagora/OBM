@@ -54,6 +54,8 @@ INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainprope
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('group_admin','integer', 0);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('group_com','integer', 0);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('group_prod','integer', 0);
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('mailshares_quota_default','integer','0','0');
+INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('mailshares_quota_max','integer','0','0');
 
 -- Fill the initial update_state for each Domain
 INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) SELECT domain_id , 'update_state', 1 From Domain;

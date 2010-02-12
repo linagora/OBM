@@ -14,10 +14,15 @@ $l_mail_servers = "Mail servers";
 $l_sync_servers = "Synchronization servers";
 $l_solr_servers = "Indexing servers";
 $l_imap_frontend_servers = "IMAP frontend servers";
+$l_max_quota = "Max value";
 
 // Mail chooser labels
 $l_mailboxchoice_least_boxes = "having less mailboxes";
 $l_mailboxchoice_least_used_memory = "using less memory";
+$l_mailshares_quota_default = "# mailshares : default quota";
+$l_help_mailshares_quota_default = "Define the default quota for mailshares in this domain, Value 0 is no quota.";
+$l_mailshares_quota_max = "# mailshares : maximum quota";
+$l_help_mailshares_quota_max = "Define the max quota for mailshares in this domain, Value 0 is no quota.";
 $l_insert = "Insert domain"; 
 $l_update = "Update the domain";
 $l_delete = "Delete the Domain";
@@ -79,4 +84,6 @@ $l_samba_domain_used = 'This workgroup name is already in use';
 $l_samba_profile_error = "Invalid profile default path, it should be \\\\computeur\\path\\to\\profile"; 
 $l_samba_home_error = "Invalid user home default path"; 
 $l_samba_drive_error = 'Invalid users home default drive';
+$l_mailshares_quota_error = "Default quota exceeds maximum quota !";
+$l_max_quota = "Max value";
 

@@ -1756,6 +1756,16 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     </td>
   </tr>";
   }
+  
+  if(($action == 'new') && $cgp_use['service']['mail']) {
+    $dis_sel_profile = "
+      <td><select id=\"sel_profile\" name=\"sel_profile\" onchange='showDelegation(this);get_profile_quota(this);'>
+      ";
+  } else {
+    $dis_sel_profile = "
+      <td><select name=\"sel_profile\" onchange='showDelegation(this)'>
+      ";
+  }
 
   // Section Web
   if ($cgp_use['service']['web']) {
@@ -1782,9 +1792,20 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
   if ($cgp_use['service']['mail']) {
     $dis_mail = dis_user_mail_field($domain_id, $email, $class);
-    
+
     // Mail perms checkbox checked values
     $mail_state  = ($mail_perms ? 'checked' : '');
+
+    if($action == 'new') {
+      $mail_quota_default = "
+        <td><input name=\"cb_mail_perms\" type=\"checkbox\" id=\"userMailActive\" onclick=\"switch_mail_mode();get_profile_quota($('sel_profile'));\" value=\"1\" $mail_state /></td>
+        ";
+    } else {
+      $mail_quota_default = "
+        <td><input name=\"cb_mail_perms\" type=\"checkbox\" id=\"userMailActive\" onclick=\"switch_mail_mode();\" value=\"1\" $mail_state /></td>
+        ";
+    }
+
     $mail_ext_state  = ($mail_ext_perms ? 'checked' : '');
     // Mail server can't be changed if set
     if (! $mail_server_host_name) {
@@ -1818,7 +1839,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table>
     <tr>
       <th class=\"$class[mail_perms]\"><label for=\"userMailActive\">$l_mail</label></th>
-      <td><input name=\"cb_mail_perms\" type=\"checkbox\" id=\"userMailActive\" onclick=\"switch_mail_mode();\" value=\"1\" $mail_state /></td>
+      $mail_quota_default
     </tr>          
   </table>
   <table id=\"userInternalMail\" class='$internalKlass'>
@@ -1831,7 +1852,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     </tr>        
     <tr id=\"user_mail\">
     <th class=\"$class[mail_quota]\">$l_quota</th>
-    <td><input name=\"tf_mail_quota\" maxlength=\"6\" size=\"6\" value=\"$mail_quota\" /></td>
+    <td><input id=\"tf_mail_quota\" name=\"tf_mail_quota\" maxlength=\"6\" size=\"6\" value=\"$mail_quota\" /></td>
     </tr>      
   </table>
   <table id=\"userExternalMail\" class='$externalKlass'>
@@ -2273,7 +2294,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   $dis_gid
   <tr>
     <th class=\"$class[profile]\">$l_profile</th>
-    <td><select name=\"sel_profile\" onchange='showDelegation(this);'>
+      $dis_sel_profile 
       $block_profile
       </select>
     </td>
@@ -3408,7 +3429,7 @@ function html_user_batch_form($params) {
   <input type='hidden' name='mail_server_id' value='auto' />";
   
   $mail_quota_block = "
-  <input type=\"text\" name=\"tf_mail_quota\" value=\"$mail_quota\" size=\"6\" maxlength=\"6\" />";
+  <input type=\"text\" id=\"tf_mail_quota\" name=\"tf_mail_quota\" value=\"$mail_quota\" size=\"6\" maxlength=\"6\" />";
   
   $nomade_perms_block = "
   <select name=\"sel_nomade_perms\">

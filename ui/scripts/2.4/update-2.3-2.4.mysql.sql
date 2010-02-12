@@ -156,6 +156,12 @@ CREATE TABLE `token` (
   `value` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Domain Property
+--
+INSERT INTO DomainProperty VALUE ('mailshares_quota_default','integer','0','0');
+INSERT INTO DomainProperty VALUE ('mailshares_quota_max','integer','0','0');
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';

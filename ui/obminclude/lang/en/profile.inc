@@ -89,4 +89,12 @@ $l_realm_domain = "All domain modifications";
 $l_profile_exists= "This profile name is already used";
 $l_access_exceptions = "Access exceptions "; 
 $l_section_enabled = "Section enabled "; 
+$l_mail_quota_max= "Maximum quota email";
+$l_help_mail_quota_max = "Define the max quota for email user with this profil, Value 0 is no quota.";
+$l_mail_quota_default= "Default quota email";
+$l_help_mail_quota_default = "Define the default quota for email user with this profil, Value 0 is no quota.";
+$l_mail_quota_error = "Default quota exceeds maximum quota !";
+$l_quota_none = "none";
+$l_max_quota = 'Max value';
+
 
