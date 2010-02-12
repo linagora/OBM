@@ -863,7 +863,7 @@ class OBM_Contact implements OBM_ISearchable {
       'mailok','newsletter', 'comment');
     foreach ($obmSpecificFields as $field) {
       if (!empty($this->$field)) {
-        $card->addField(new Vpdi_Field("x-obm-{$field}", str_replace("\r\n", "\n", (trim($this->$field)))));        
+        $card->addField(new Vpdi_Field("x-obm-{$field}", str_replace("\r\n", "\n ", (trim($this->$field)))));        
       }
     }
     if (!empty($this->date)) {
