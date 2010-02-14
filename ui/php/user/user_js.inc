@@ -420,6 +420,20 @@ Obm.UserPattern.PasswordField = new Class ({
 
 });
 
+Obm.UserPattern.ChoiceField = new Class ({
+  Extends: Obm.UserPattern.StringField,
+
+  setValue: function(value) {
+    for (i=0; i<this.field.options.length; i++) {
+      if (this.field.options[i].value == value) {
+        this.field.selectedIndex = i;
+        this.value = value;
+      }
+    }
+  }
+
+});
+
 Obm.UserPattern.Form = new Class ({
   Implements: Options,
 
@@ -441,7 +455,7 @@ Obm.UserPattern.Form = new Class ({
     this.addField('login','userLogin');
     this.addField('passwd','passwd','PasswordField');
     this.addField('hidden','cba_hidden','BooleanField');
-    /* this.addField('profil',''); FIXME: profil */
+    this.addField('profile','sel_profile', 'ChoiceField');
     this.addField('delegation','delegationField');
     this.addField('delegation_target','delegationTargetField');
     this.addField('title','userTitle');
@@ -465,8 +479,10 @@ Obm.UserPattern.Form = new Class ({
     this.addField('desc','userDesc');
     this.addField('web_perms','cb_web_perms','BooleanField');
     this.addField('mail_perms','userMailActive','BooleanField');
-    /*this.addField('mail_server_id',''); FIXME: mail_server_id */
-    /*this.addField('email',''); FIXME: mail_server_id */
+/* FIXME: mail_server_id & mail set
+    this.addField('mail_server_id','sel_mail_server_id', 'ChoiceField');
+    this.addField('email','');
+*/
     this.addField('mail_quota','tf_mail_quota');
     this.addField('email_nomade','tf_email_nomade');
     this.addField('nomade_perms','cb_nomade_perms','BooleanField');
@@ -477,7 +493,7 @@ Obm.UserPattern.Form = new Class ({
   addField: function(name,id,type) {
     if (!type)
       type = 'StringField';
-    var field = $(id)
+    var field = $(id);
     if (field) {
       this.fields[name] = new Obm.UserPattern[type](this,field);
     }

@@ -180,6 +180,9 @@ function get_userpattern_params() {
   // Get global params
   $params = get_global_params('userpattern');
 
+  if (isset($params['mail_server_id']))
+    $params['attributes']['mail_server_id'] = $params['mail_server_id'];
+
   // !!! WARNING: cheat anti magic_quotes !!! 
   if (is_array($params['userpattern']))
     array_walk_recursive($params['userpattern'],create_function('&$value,$key','$value=stripslashes($value);'));

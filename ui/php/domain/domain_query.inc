@@ -7,6 +7,8 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
+include_once("$path/../app/default/models/UserPattern.php");
+
 ///////////////////////////////////////////////////////////////////////////////
 // domain query search query execution
 // Parameters:
@@ -183,6 +185,9 @@ function run_query_domain_insert($domain) {
     // Init domain reference data
     run_query_domain_init_data($domain_id);
 
+    // Copy User patterns from global domain to new domain
+    run_query_domain_copy_userpattern($domain_id);
+
     // Create public_contacts address book
     $query = "INSERT INTO AddressBook (
       domain_id,
@@ -305,6 +310,29 @@ function run_query_domain_init_data($id) {
     display_debug_msg($squery, $cdg_sql, 'run_query_domain_init_data()');
     $db->query($squery);
   }
+}
+
+
+/**
+ * Copy all user patterns from global domain to a new domain
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function run_query_domain_copy_userpattern($id) {
+  global $obm;
+
+  if ($obm['domain_global']) {
+    $global_domain_id = $obm['domain_id'];
+    foreach (UserPattern::all($global_domain_id) as $pattern_id => $name) {
+      $pattern = UserPattern::get($pattern_id);
+      $copy = clone $pattern;
+      $copy->set_domain_id($id);
+      $copy->save();
+    }
+  }
+
 }
 
 

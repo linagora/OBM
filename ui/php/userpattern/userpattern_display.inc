@@ -130,7 +130,8 @@ function html_userpattern_consult($pattern) {
   $dateexp = $attributes['dateexp'];
 
   $dis_hidden = $attributes['hidden'] ? $GLOBALS['l_yes'] : $GLOBALS['l_no'];
-  $dis_profile = ''; //FIXME
+  $profile = $attributes['profile'];
+  $dis_profile = isset($GLOBALS["l_perm_$profile"]) ? $GLOBALS["l_perm_$profile"] : $profile;
   $dis_datebegin = (empty($datebegin) || $datebegin[0]=='%') ? $datebegin : of_date_format($datebegin, true);
   if (!$attributes['noexperie']) {
     $dis_dateexp = (empty($dateexp) || $dateexp[0]=='%') ? $dateexp : of_date_format($dateexp, true);
@@ -656,7 +657,7 @@ function html_userpattern_form($action, $params=array(), $pattern=null) {
   </tr>
   <tr>
     <th class=\"$class[profile]\">{$GLOBALS['l_profile']}</th>
-    <td><select name=\"sel_profile\" onchange='showDelegation(this);'><!-- FIXME: profile -->
+    <td><select name=\"attributes[profile]\" onchange='showDelegation(this);'>
       $block_profile
       </select>
     </td>

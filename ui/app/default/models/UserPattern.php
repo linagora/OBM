@@ -9,6 +9,7 @@
  * Model class for user pattern
  * public interface :
  *   __construct($title, $description, $attributes)
+ *   __clone()
  *   __get($key)
  *   get_id()
  *   get_domain_id()
@@ -37,7 +38,7 @@ class UserPattern {
     'login'             => array( 'type'=>'string'  ),
     'passwd'            => array( 'type'=>'password'),
     'hidden'            => array( 'type'=>'boolean' ),
-    'profile'           => array( 'type'=>'choice'  ),
+    'profile'           => array( 'type'=>'string', 'validate_func'=>'validate_profile' ),
     'delegation'        => array( 'type'=>'string'  ),
     'delegation_target' => array( 'type'=>'string'  ),
     'title'             => array( 'type'=>'string'  ),
@@ -61,7 +62,7 @@ class UserPattern {
     'desc'              => array( 'type'=>'string'  ),
     'web_perms'         => array( 'type'=>'boolean' ),
     'mail_perms'        => array( 'type'=>'boolean' ),
-    'mail_server_id'    => array( 'type'=>'choice'  ),
+    'mail_server_id'    => array( 'type'=>'string', 'validate_func'=>'validate_mail_server_id' ),
     'email'             => array( 'type'=>'string', 'validate_func'=>'validate_email' ),
     'mail_quota'        => array( 'type'=>'integer' ),
     'email_nomade'      => array( 'type'=>'string'  ),
@@ -84,6 +85,15 @@ class UserPattern {
     $this->title = trim($title);
     $this->set_description($description);
     $this->set_attributes($attributes);
+  }
+
+  /**
+   * Clone function
+   * @access public
+   **/
+  public function __clone() {
+    $this->id = null;
+    $this->domain_id = $GLOBALS['obm']['domain_id'];
   }
 
   /**
@@ -309,11 +319,24 @@ class UserPattern {
   }
 
   /**
-   * allow to check a choice attribute before to set it
+   * allow to check the profile field attribute before to set it
    * @param  string $attribute
    * @access protected
    **/
-  protected function validate_choice(&$attribute) {
+  protected function validate_profile(&$attribute) {
+    $profiles = array_keys(get_all_profiles(false));
+    if (in_array($attribute,$profiles))
+      return true;
+    $attribute = null;
+    return false;
+  }
+
+  /**
+   * allow to check the mail_server_id field attribute before to set it
+   * @param  string $attribute
+   * @access protected
+   **/
+  protected function validate_mail_server_id(&$attribute) {
     //FIXME
     return true;
   }
@@ -384,11 +407,12 @@ class UserPattern {
   }
 
   /**
-   * Return a list of all user pattern
+   * Return a list of all user patterns
+   * @param  int    $domain_id  get all patterns for this domain (only if we are in the global domain)
    * @access public
-   * @return array         list of id => title
+   * @return array              list of id => title
    **/
-  static public function all() {
+  static public function all($domain_id = null) {
     global $cdg_sql;
 
     $obm_q = new DB_OBM;
@@ -396,6 +420,9 @@ class UserPattern {
     //multidomain
     if (!$GLOBALS['obm']['domain_global']) {
       $domain_id = sql_parse_id($GLOBALS['obm']['domain_id'], true);
+      $where = "(domain_id $domain_id)";
+    } else {
+      $domain_id = sql_parse_id($domain_id, true);
       $where = "(domain_id $domain_id)";
     }
     if (!empty($where))
