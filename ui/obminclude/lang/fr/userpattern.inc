@@ -18,3 +18,4 @@ $l_found = "modèles d'utilisateurs trouvés.";
 $l_no_found = "Aucun modèle d'utilisateur ne correspond à ces critères !";
 $l_id_error = "Impossible de trouver ce modèle d'utilisateur !";
 $l_no_title_error = "Vous devez spécifier un titre pour ce modèle d'utilisateur.";
+$l_invalid_field = "Données invalides dans le champ.";

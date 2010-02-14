@@ -101,9 +101,7 @@ function check_userpattern_data_form($params, &$pattern) {
   } else {
     $pattern = new UserPattern($title,$description);
   }
-  $pattern->set_attributes($params['attributes']);
-
-  return true;
+  return $pattern->set_attributes($params['attributes']);
 }
 
 /**

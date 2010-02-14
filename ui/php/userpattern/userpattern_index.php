@@ -119,7 +119,7 @@ if ($action == 'index' || $action == '') {
       $display["detail"] = dis_userpattern_consult($pattern);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
-      $display["detail"] = dis_userpattern_form($action, $params);
+      $display["detail"] = dis_userpattern_form($action, $params, $pattern);
     }
   } else {
     $display['msg'] .= display_err_msg($err['msg']);

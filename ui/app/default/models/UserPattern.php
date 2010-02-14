@@ -236,7 +236,7 @@ class UserPattern {
       $attribute = null;
       return true;
     }
-    if (preg_match_all('/%(.*?)%/',$pattern,$matches,PREG_PATTERN_ORDER)) {
+    if (preg_match_all('/%(.*?)%/',$attribute,$matches,PREG_PATTERN_ORDER)) {
       $keywords = $matches[0];  //all keywords found in the pattern
       $keywords = array_diff($keywords, UserPattern::$allowed_keywords);
       array_filter($keywords,create_function('$attr','return preg_match(\'/^%today([-+]\d*){0,1}%$/\',$attr);'));
@@ -294,6 +294,10 @@ class UserPattern {
    **/
   protected function validate_date(&$attribute) {
     $attribute = preg_replace('/\s/','',trim($attribute));
+    if ($attribute=='') {
+      $attribute = null;
+      return true;
+    }
     if (preg_match('/^%today([-+]\d*){0,1}%$/',$attribute)) {
       return true;
     }
