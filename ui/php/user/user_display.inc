@@ -1613,6 +1613,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $ad3 = $dom_infos['address3'];
     $zip = $dom_infos['postcode'];
     $town = $dom_infos['town'];
+    $domain_infos['mailshares_quota_default'];
     if ($samba_domain) {
       $smb = get_samba_info();
       $smb_home = $smb['samba_home_def'];
@@ -1862,6 +1863,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     </tr>  
   </table>
   <script type='text/javascript'>
+    obm.vars.consts.domaindefaultquota = '$dom_infos[mailshares_quota_default]';
     var internal = $('userInternalMail');
     var external = $('userExternalMail');
     if($('userMailActive').checked == true) {
