@@ -19,3 +19,4 @@ $l_no_found = "No user pattern found for this criteria !";
 $l_id_error = "Unable to find this user pattern !";
 $l_no_title_error = "You have to set a title for this user pattern.";
 $l_invalid_field = "Invalid data into the field.";
+$l_circular_dependencies = "Circular dependencies between some fields.";

@@ -231,7 +231,53 @@ class UserPattern {
         $GLOBALS['err']['msg'] = $GLOBALS['l_invalid_field'];
         $return = false;
       }
-      //FIXME:vérifier les dépendances circulaires
+    }
+    if ($return) {
+      $return = $this->check_circular_dependencies();
+    }
+    return $return;
+  }
+
+  /**
+   * allow to check a string attribute before to set it
+   * @param  string $attribute
+   * @access protected
+   **/
+  protected function check_circular_dependencies() {
+    $return = true;
+    $level = 0;
+    $dependencies = array();
+    // search for direct dependencies
+    foreach ($this->attributes as $key => $attributes) {
+      if (preg_match_all('/%(.*?)%/',$attributes,$matches,PREG_PATTERN_ORDER)) {
+        foreach ($matches[1] as $keyword) {
+          $dependencies[$key][$keyword] = 1;
+          $level = 1;
+        }
+      }
+    }
+    // search for indirect dependencies
+    for ($i=1;$i<=$level;$i++) {
+      foreach ($dependencies as $key => $depends_on) {
+        foreach ($depends_on as $keyword => $useless) {
+          if (is_array($dependencies[$keyword])) {
+            foreach ($dependencies[$keyword] as $depend => $count) {
+              if (!$dependencies[$key][$depend]) {
+                $dependencies[$key][$depend] = $count+1;
+                if ($count+1 > $level) $level = $level+1;
+              }
+            }
+          }
+        }
+      }
+    }
+    // search for any field depending on itself
+    foreach ($dependencies as $field => $depends_on) {
+      if ($depends_on[$field]) {
+        $GLOBALS['err']['fields'][] = $field;
+        $GLOBALS['err']['msg'] = $GLOBALS['l_circular_dependencies'];
+        $return = false;
+      }
     }
     return $return;
   }
