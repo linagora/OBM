@@ -695,7 +695,7 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
     chars: 1,                        // min number of chars to type before requesting
     results: 8,                      // number of results per page
     delay: 400,                      // delay before the last key pressed and the request
-    mode: 'multiple',                // 'mono' or 'multiple'
+    mode: 'mono',                // 'mono' or 'multiple'
     locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
     resetable: false,                // only in 'mono' mode : reset field value
     restriction: null,               // obm needs
@@ -705,11 +705,13 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
     extension: null,                  // obm needs
     resultValue: null,		// obm needs
     name: null,
-    fieldPublic : null,
-    fieldPrivate : null,
-    fieldHtml : null,
-    fieldIcs : null,
     noresult: false
+  },
+  
+  initialize: function(getUrlFunc, selectedBox, inputField, options) {
+    this.parent(getUrlFunc, selectedBox, inputField, options);
+    this.currentValue = this.options.fieldText;
+    this.inputField.value = this.options.fieldText;
   },
 
  // parse a response of a request and add results to cache
@@ -748,7 +750,6 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
                                           .appendText(email)
                                         );
         var item_id = res2.getProperty('id');
-        if(this.present(email)) { res2.addClass("selected");}
         this.cache.addElement(res2);
         res2.addEvent('mouseover', function() {this.selectElement(res2);}.bindWithEvent(this))
            .addEvent('mousedown', function() {this.validateResultValue(res2);}.bindWithEvent(this));
@@ -758,115 +759,18 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
     this.view.setElementNb(this.totalNbr);
   },
 
-
-  present: function(value) {
-    var present = false;
-    var elem = $('sel_accept_contact');
-    var mail_contact = $$(elem.getElementsByTagName('input'));
-    mail_contact.each(function(data) {
-          if(data.value == value){
-            present = true;
-          }
-        });
-    return present;
-  },
-  
-  addResultValue: function(element, extension) {
-    var item_id = element.getProperty('id');
-    var item_extra = element.getProperty('extra');
-    var id = item_id.substr(('item_').length,item_id.length);
-    var entity = this.selectedBox.id;
-    var text = $(item_id+'_label').innerHTML;
-    var tr_id = entity +'-'+ id;
-    if (!this.present(text)) {
-      element.addClass("selected");
-      var result = new Element('tr');
-      result.setProperties({'id': tr_id});
-      result.injectInside(this.selectedBox);
-      if (this.selectedBox.getChildren().length % 2 != 0) {
-        result.addClass('pair');
-      }
-      var contact_mail = new Element('input').setProperty('name','sel_contact_mail[]')
-                                                      .setProperty('type','hidden')
-                                                      .setProperty('id','sel_contact')
-                                                      .setProperty('value',text);
-      if(id == 'ext') {
-        contact_mail.setProperty('name','sel_contact_ext_mail[]');
-        var id = 'ext-'+this.selectedBox.getElements('input[id=sel_contact]').length;
-      }
-      var td = new Element('td').adopt(
-                                   new Element('a').setProperty('href', '#').adopt(
-                                     new Element('img').setProperty('src', obm.vars.images.del)
-                                   ).addEvent('mousedown',
-                                     function() {
-                                       var item = $(item_id);
-                                       if (item) { item.removeClass('selected'); }
-                                       remove_element(tr_id, entity);
-                                     }.bind(this)
-                                   )
-                                  )
-                                .appendText(' ' + text).injectInside(result);
-      contact_mail.injectInside(td);
-      new Element('td').adopt(
-        new Element('input').setProperty('type', 'radio')
-                            .setProperty('name','rd_type_'+id)
-                            .setProperty('checked','checked')
-                            .setProperty('value',text)
-                            .addEvent('mousedown',
-                              function() {
-                                $('type_'+id).setProperty('name','rd_type_public[]');
-                              }
-                            ),
-        new Element('label').appendText(this.options.fieldPublic),
-        new Element('input').setProperty('type', 'radio')
-                            .setProperty('name','rd_type_'+id)
-                            .setProperty('value',text)
-                            .addEvent('mousedown',
-                              function() {
-                                $('type_'+id).setProperty('name','rd_type_private[]');
-                              }
-                            ),
-        new Element('label').appendText(this.options.fieldPublic+'+'+this.options.fieldPrivate),
-        new Element('input').setProperty('name','rd_type_public[]')
-                            .setProperty('type','hidden')
-                            .setProperty('id','type_'+id)
-                            .setProperty('value',text)
-      ).injectInside(result);
-      new Element('td').adopt(
-        new Element('a').setProperty('href', '#').adopt(
-          new Element('img').setProperty('src', obm.vars.images.html),
-          new Element('label').appendText(this.options.fieldHtml)
-        ).addEvent('mousedown',
-          function() {
-            $('format_'+id).setProperty('name','rd_format_html[]');
-          }
-        ),
-        new Element('a').setProperty('href', '#').adopt(
-          new Element('img').setProperty('src', obm.vars.images.ical),
-          new Element('label').appendText(this.options.fieldIcs)
-        ).addEvent('mousedown',
-          function() {
-            $('format_'+id).setProperty('name','rd_format_ics[]');
-          }
-        ),
-        new Element('input').setProperty('name','rd_format_html[]')
-                            .setProperty('type','hidden')
-                            .setProperty('id','format_'+id)
-                            .setProperty('value',text)
-      ).injectInside(result);
-    } else {
-      this.inputField.blur();
-      this.resetFunc();
-      this.inputField.focus();
-    }
-  },
   // send a new request to get first results
   newRequest: function() {
-   if (this.inputField.value.clean().length < this.options.chars) {
+    if (this.inputField.value.clean().length < this.options.chars) {
       this.currentValue = this.inputField.value;
       this.textChangedFunc();
     } else if (this.inputField.value != this.currentValue && this.inputField.value != this.options.defaultText) {
       this.currentValue = this.inputField.value;
+      if(this.currentValue == '*'){
+        var value = 'email:('+this.currentValue+')';
+      } else {
+        var value = 'email:('+this.currentValue+'*)';
+      }
       this.textChangedFunc();
       this.requestId++;
       new Request.JSON({
@@ -875,7 +779,7 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
         onFailure:this.onFailure.bindWithEvent(this),
         onComplete:this.onNewRequestSuccess.bindWithEvent(this,[this.requestId])
       }).post({
-        pattern:'email:('+this.currentValue+'*)', 
+        pattern:value, 
         limit:(this.options.results*3),
         filter_pattern: this.options.filter_pattern,
         filter_entity: this.options.filter_entity,

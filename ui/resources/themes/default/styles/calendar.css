@@ -948,6 +948,74 @@ input[type="submit"][disabled] {
   margin-top: -10px;
 }
 
+.share td{
+  margin-left: 0.83em;
+  text-align : center;
+}
+
+.share th{
+  margin-left: 0.83em;
+  width : 23%;
+}
+
+.share a{
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
+.share div {
+  text-align : left;
+  font-size : 80%;
+  font-weight : normal;
+}
+
+.SharePopup h2{
+  font-weight: bold; 
+  text-align: left;
+  margin-top: 0.83em;
+  margin-left: 0.83em;
+  margin-right: 0.83em;
+}
+
+.SharePopup div{
+  margin-top: 0.83em;
+  margin-left: 0.83em;
+  margin-bottom: 0.83em;
+  margin-right: 0.83em;
+  overflow: hidden;
+}
+
+.sendPopup {
+  border:0 none;
+  clear:left;
+  padding-top:1em;
+  text-align:center;
+  padding-left:1em;
+  padding-right:1em;
+}
+
+.sendPopup h2{
+  font-weight: bold; 
+  text-align: left;
+  margin-top: 0.83em;
+  margin-left: 0.83em;
+}
+
+.sendPopup input.downlight{
+  background: #F0F0F0;
+}
+
+.sendPopup div.downlight{
+  background: #F0F0F0;
+}
+
+.sendPopup input[type="submit"]{
+  background-color:#509CBC;
+  color:#FFFFFF;
+  font-weight:bold;
+  margin:0 3%;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Extended color picker */
 /* ------------------------------------------------------------------------- */

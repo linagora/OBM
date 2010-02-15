@@ -24,7 +24,7 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2">Vous pouvez accéder à l'agenda OBM de <?php echo "$firstname $name"; ?></td>
+        <td colspan="2"><?php echo "$firstname $name"; ?> vous autorise désormais à consulter son agenda OBM.</td>
     </tr>
     <tr>
         <td style="text-align:right;" colspan="2">

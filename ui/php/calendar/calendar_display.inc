@@ -6584,23 +6584,10 @@ function check_conflict($column){
   return $return;
 }
 
-function html_share_calendar($id,$name){
+function html_share_calendar($id,$name) {
   global $l_html, $l_share_ics, $l_public, $l_private, $l_share_mail_search;
   global $ico_popup_close, $ico_html, $ico_ical; 
   $entity_type = "user";
-    
-  $params = get_calendar_entity_share($id,$entity_type);
-  $share_pop_up = html_share_popup($params['accept_public']); 
-  if(isset($params['accept_public']) && !is_null($params['accept_public'])){
-    $checked_public = "checked=\"checked\"";
-    $share_public = html_share_public($params['accept_public']);
-  }
-  $share_contact_list = html_share_contact_list($params['contact_mail']); 
-  $js="
-     <script type=\"text/javascript\">
-      new obm.AutoComplete.ShareCalendarSearch('$GLOBALS[path]/contact/contact_index.php?action=ext_search_mail', 'sel_accept_contact', 'contactSearch', {fieldText: \"$l_share_mail_search\", fieldPublic : \"$l_public\", fieldPrivate : \"$l_private\", fieldHtml : \"$l_html\", fieldIcs : \"$l_share_ics\"}); 
-     </script>
-   ";
 
   if ($id == $GLOBALS['obm']['uid']) {
     $user = "<h1>".$GLOBALS['l_my_share_calendar']."</h1>";
@@ -6608,59 +6595,69 @@ function html_share_calendar($id,$name){
     $user = "<h1>".$GLOBALS['l_user_share_calendar']." $name</h1>";
   }
 
+  //$params = get_calendar_entity_share($id,$entity_type);
+  $share_pop_up = html_share_popup($params['accept_public']); 
   $block = "
-   <form method=\"post\" name=\"f_mod_share\" action=\"../calendar/calendar_index.php\">
-     $user
-      <table class=\"spreadSheet\">
-        <colgroup class=\"highlight\"></colgroup>
+      <table class=\"spreadSheet share\">
+        <thead>
+          <tr>
+            <th>
+            </th>
+            <th>
+              $l_share_ics
+            </th>
+            <th>
+              $l_html
+            </th>
+            <th>
+            </th>
+          </tr>
+        </thead>
         <tbody>
-        <tr>
-          <th>
-             $GLOBALS[l_share_calendar_public]
-            <input id=\"cb_share_public_calendar\" $checked_public onclick=\"getSharePublicUrl()\" type=\"checkbox\">
-          </th>
-          <th colspan=\"1\">
-            <a href=\"javascript: showSharePopup('html');\"><img src=\"$ico_html\"><label>$l_html</label></a>
-            <a href=\"javascript: showSharePopup('ical');\"><img src=\"$ico_ical\"><label>$l_share_ics</label></a>
-          </th>
-        </tr>
+          <tr>
+            <th>
+              $GLOBALS[l_share_calendar_public]
+              <div class=\"sharedesc\">
+                $GLOBALS[l_desc_share_adresse_public]
+              </div>
+            </th>
+            <td>
+              <a href=\"javascript: getShareUrl('public','Ics');\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('public','Ics');\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+            </td>
+            <td>
+              <a href=\"javascript: getShareUrl('public','Html');\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('public','Html');\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+            </td>
+            <td>
+              <a href=\"javascript: reinitSharePopup('public');\"><label>$GLOBALS[l_share_reinit_public]</label></a>               
+            </td>
+          </tr>
+          <tr>
+            <th>
+              $GLOBALS[l_share_calendar_private]
+              <div class=\"sharedesc\">
+                $GLOBALS[l_desc_share_adresse_private]
+              </div>
+            </th>
+            <td>
+              <a href=\"javascript: getShareUrl('private','Ics');\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('private','Ics');\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+            </td>
+            <td>
+              <a href=\"javascript: getShareUrl('private','Html');\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('private','Html');\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+            </td>
+            <td>
+              <a href=\"javascript: reinitSharePopup('private');\"><label>$GLOBALS[l_share_reinit_private]</label></a>               
+            </td>
+          </tr>
         </tbody>
       </table>
-      <div id=\"sel_share_public\" type=\"hidden\">
-        $share_public
-      </div>
+      <input id=\"share_entity_id\" type=\"hidden\" value=\"$id\"/>
+      <input id=\"share_entity_type\" type=\"hidden\" value=\"$entity_type\"/>
       $share_pop_up
-     <table class=\"spreadSheet\">
-       <colgroup class=\"highlight\"></colgroup>
-       <thead>
-       <tr>
-         <th><label>$GLOBALS[l_share_calendar]</label></th>
-         <th><label>$GLOBALS[l_share_calendar_type]</label></th>
-         <th><label>$GLOBALS[l_share_calendar_etat]</label></th>
-       </tr>
-       </thead>
-       <tbody>
-       <tr>
-         <th colspan=\"3\">$GLOBALS[l_share_calendar_private]
-           <input id=\"contactSearch\" class=\"downlight\" type=\"text\" autocomplete=\"off\"/>
-         </th>
-       </tr>
-       </tbody>
-
-       <tbody id=\"sel_accept_contact\">
-         $share_contact_list
-       </tbody>
-
-       <tbody id=\"private_calendar\"></tbody>
-
-     </table>
-     <fieldset class=\"buttons\">
-       <input type=\"hidden\" name=\"entity_id\" value=\"$id\">
-       <input type=\"hidden\" name=\"action\" value=\"share_calendar\">
-       <input type=\"submit\" value=\"$GLOBALS[l_share_validate]\">
-     </fieldset>
-   </form>
-   $js";
+    ";
   return $block;
 }
 
@@ -6668,104 +6665,12 @@ function html_share_popup($token) {
   global $cgp_host, $ico_popup_close;
   global $l_share_public;
 
-  if($token) {
-    $url = $cgp_host."calendar/calendar_render.php?externalToken=$token";
-    if($action){
-      $url.="&action=ics_export";
-    }
-    $disp_url = "<div id=\"lnk_public_url\">
-                  <a href=\"$url\">$url</a>
-                </div>";
-  }
+  $disp_url = "<div id=\"lnk_public_url\"></div>";
 
   $block = "
-    <div id=\"calendarSharePopup\" class=\"obmPopup\">
-      <h1>
-        <a href=\"#\" id=\"popup_form_close\" class=\"closeSticky\" onclick=\"return false;\">
-          <img src=\"$ico_popup_close\" alt=\"close\" />
-        </a>
-        <span id=\"calendarQuickFormDate\">$GLOBALS[l_share_calendar_public]</span>
-      </h1>
-      <label>$l_share_public</label>
-      <br>
-      $disp_url
+    <div id=\"calendarSharePopup\">
     </div>
   ";
-  return $block;
-}
-
-function html_share_public($token) {
-  global $cgp_host, $ico_popup_close;
-  global $l_share_public;
-
-  $block = "
-    <input id=\"calendar_public_url\" value=\"$token\" type=\"hidden\" name=\"sel_accept_public\" /> 
-  ";
-
-  return $block;
-}
-
-function html_share_contact_list($mail_contact) {
-  global $l_public, $l_private, $l_html, $l_share_ics;
-  global $ico_delete, $ico_ical, $ico_html;
-  $i=1;
-  if(!is_null($mail_contact)){
-    foreach($mail_contact as $mail=>$val) {
-      if( ($i % 2) != 0){
-        $classpair = "class=\"pair\"";
-      } else {
-        $classpair = "";
-      }
-      $token = $val['token'];
-      $type_public = $val['type_public'];
-      $check_public = "";
-      if($type_public) {
-        $check_public = "checked=\"checked\"";
-        $type = 'rd_type_public[]';
-      }
-      $type_private = $val['type_private'];
-      $check_private = "";
-      if($type_private) {
-        $check_private = "checked=\"checked\"";
-        $type = 'rd_type_private[]';
-      }
-      $format_ics = $val['format_Ics'];
-      if($format_ics){
-        $icscheck="checked=\"checked\"";
-        $htmlcheck="";
-        $format = 'rd_format_ics[]';
-      } else {
-        $icscheck="";
-        $htmlcheck="checked=\"checked\"";
-        $format = 'rd_format_html[]';
-      }
-      $sel_id = $mail;
-      $tr_id = 'sel_accept_contact-data-contact-'.$val['id'];
-      $rd_format_html = 'rd_format_html[]';
-      $rd_format_ics = 'rd_format_ics[]';
-      $id = $val['id'];
-      $block.="<tr id=\"$tr_id\" $classpair>
-                <td>
-                  <input name=\"sel_contact_mail[]\" id=\"sel_contact[]\" type=\"hidden\" value=\"$mail\"/>
-                  <a href=\"javascript: remove_element('$tr_id','perms');\"><img src=\"$ico_delete\"></a>
-                  $mail
-                </td>
-                <td>
-                  <input name=\"rd_type_$id\" onClick=\"change_type('rd_type_public[]',$id)\" $check_public type=\"radio\" value=\"$mail\"/>
-                  <label>$l_public</label>
-                  <input name=\"rd_type_$id\" onClick=\"change_type('rd_type_private[]',$id)\" $check_private type=\"radio\" value=\"$mail\"/>
-                  <label>$l_public+$l_private</label>
-                  <input type=\"hidden\" name=\"$type\" id=\"type_$id\" value=\"$mail\"/>
-                </td>
-                <td>
-                  <a href=\"javascript: change_format('$rd_format_html',$id);\"><img src=\"$ico_html\"><label>$l_html</label></a>
-                  <a href=\"javascript: change_format('$rd_format_ics',$id);\"><img src=\"$ico_ical\"><label>$l_share_ics</label></a>
-                  <input type=\"hidden\" name=\"$format\" id=\"format_$id\" value=\"$mail\"/>
-                </td>
-              </tr>";
-      $i++;
-    }
-  }
   return $block;
 }
 
@@ -8827,6 +8732,6 @@ function dis_back_to_calendar() {
  */
 function dis_calendar_share_public($token) {
   global $display;
-  $display['json'] = phpStringToJsString($token);
+  $display['json'] = "token :'".phpStringToJsString($token)."'";
 }
 ?>

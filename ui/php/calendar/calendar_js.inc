@@ -610,60 +610,190 @@ function setEventsColors(entity, entity_id, klass) {
 
 
 /////////////////////////////////////////////////////////////////////////////
-function getSharePublicUrl() {
+function getShareUrl(type,format) {
   var url = \"$cgp_host\";
-  var elem = $('calendar_public_url');
-  if(!elem){
-    var req = new Request({
-      url : '$path/calendar/calendar_index.php',
-      data: 'action=share_public&ajax=1',
-      onSuccess: function (response) {
-        var shareurl = new Element('div').setProperty('id','lnk_public_url')
-                                          .adopt(
-                                        new Element('a').appendText(url+'calendar/calendar_render.php?externalToken='+response)
-                                      );
-        $('sel_share_public').adopt(
-                              new Element('input').setProperty('type','hidden')
-                                                  .setProperty('value',response)
-                                                  .setProperty('id','calendar_public_url')
-                                                  .setProperty('name','sel_accept_public')
-                              );
-          shareurl.injectInside($('calendarSharePopup'));
+  var id = $('share_entity_id');
+  var type_id = $('share_entity_type');
+  new Request.JSON({
+        url: '$path/calendar/calendar_index.php',
+        secure: false,
+        async: true,
+        onComplete: function(response) {
+          if(response.error == 0){
+            showSharePopup(type,format,response.token)        
+          } else {
+            showMessage('error',response.message);
+          }
         }
-      });
-    req.send();
+  }).get({entity_type : type_id.value, entity_id : id.value, type : type, action : 'share', ajax : 1});
+}
+
+function sendUrl(type,format) {
+  var id = $('share_entity_id');
+  var type_id = $('share_entity_type');
+  var mail = $('contactSearch').value;
+  if(check_email(mail)){
+     new Request.JSON({
+        url: '$path/calendar/calendar_index.php',
+        secure: false,
+        async: true,
+        onComplete: function(response) {
+          if(response.error == 0){
+            showMessage('valid',response.message);
+          } else {
+            showMessage('error',response.message);
+          }
+        }
+    }).post({entity_type : type_id.value, entity_id : id.value, type : type, mail:mail, action : 'send_url', format : format, ajax : 1});
   } else {
-    elem.destroy();
-    $('lnk_public_url').destroy();
+    showMessage('error','$GLOBALS[l_invalid_email]');
   }
 }
 
-function change_format(format,id){
-  $('format_'+id).setProperty('name',format);
-}
-function change_type(type,id){
-  $('type_'+id).setProperty('name',type);
-}
-function showSharePopup(action){
+function reinitUrl(type) {
   var url = \"$cgp_host\";
-  var sharecalendar = $('cb_share_public_calendar').checked;
-  if(sharecalendar){
-      var elem = new Element('a');
-    if(action==\"ical\"){
-      url+='calendar/calendar_render.php?action=ics_export&externalToken='+$('calendar_public_url').value;
-      elem.setProperty('href',url)
-          .appendText(url);
-    } else {
-      url+='calendar/calendar_render.php?externalToken='+$('calendar_public_url').value;
-      elem.setProperty('href',url)
-          .appendText(url);
-    }
-    $('lnk_public_url').destroy();
-    var shareurl = new Element('div').setProperty('id','lnk_public_url')
-                                      .adopt(elem);
-    shareurl.injectInside($('calendarSharePopup'));
-    obm.popup.show('calendarSharePopup');
+  var id = $('share_entity_id');
+  var type_id = $('share_entity_type');
+  new Request.JSON({
+        url: '$path/calendar/calendar_index.php',
+        secure: false,
+        async: true,
+        onComplete: function(response) {
+          if(response.error == 0){
+            showMessage('info',response.message);
+          } else {
+            showMessage('error',response.message);
+          }
+        }
+  }).get({entity_type : type_id.value, entity_id : id.value, type : type, action : 'share_reinit', ajax : 1});
+}
+
+function showSharePopup(type,format,token){
+  var url = \"$cgp_host\";
+  var popup = $('sharePopup');
+  if(popup){
+    obm.popup.popups.erase('sharePopup');
   }
+  var elem = new Element('a');
+  if(type=='private'){
+    var text = \"$l_share_calendar_private\";
+  } else {
+    var text = \"$l_share_calendar_public\";
+  }
+  if(format=='Ics'){
+    url+='calendar/calendar_render.php?action=ics_export&externalToken='+token;
+    elem.setProperty('href',url).appendText(url);
+  } else {
+    url+='calendar/calendar_render.php?externalToken='+token;
+    elem.setProperty('href',url).appendText(url);
+  }
+  var shareurl = new Element('div').setProperty('id','lnk_public_url')
+                                      .adopt(elem);
+  var div = new Element('div').setProperty('id','sharePopup')
+                              .setProperty('class','obmPopup SharePopup')
+                              .adopt(
+      new Element('h1').adopt(
+        new Element('a').setProperty('class','closeSticky')
+                        .setProperty('id','popup_form_close')
+                        .setProperty('onclick','return false')
+                        .adopt(
+                          new Element('img').setProperty('src','$ico_popup_close')
+                                            .setProperty('alt','close')
+                          ),
+        new Element('span').appendText(text)
+      ),
+      new Element('h2').appendText('$l_share_public')
+  );
+  shareurl.injectInside(div);
+  div.injectInside($('calendarSharePopup'));
+  obm.popup.show('sharePopup');
+}
+
+function sendSharePopup(type,format){
+  var url = \"$cgp_host\";
+  var popup = $('sharePopup');
+  if(popup){
+    obm.popup.popups.erase('sharePopup');
+  }
+  if(type=='private'){
+    var title = \"$l_send_calendar_private\";
+    var text = \"$l_desc_share_adresse_private\";
+  } else {
+    var title = \"$l_send_calendar_public\";
+    var text = \"$l_desc_share_adresse_public\";
+  }
+  var div = new Element('div').setProperty('id','sharePopup')
+                              .setProperty('class','obmPopup')
+                              .adopt(
+      new Element('h1').adopt(
+        new Element('a').setProperty('class','closeSticky')
+                        .setProperty('id','popup_form_close')
+                        .setProperty('onclick','return false')
+                        .adopt(
+                          new Element('img').setProperty('src','$ico_popup_close')
+                                            .setProperty('alt','close')
+                          ),
+        new Element('span').appendText(title)
+      ),
+      new Element('div').setProperty('id','sel_accept_contact'),
+      new Element('div').setProperty('class','sendPopup')
+                      .adopt(
+        new Element('input').setProperty('id','contactSearch')
+                            .setProperty('type','text')
+                            .setProperty('class','downlight')
+                            .setProperty('autocomplete','off'),
+        new Element('input').setProperty('type','submit')
+                            .setProperty('value','$GLOBALS[l_send]')
+                            .setProperty('class','closeSticky')
+                            .setProperty('onClick','sendUrl(\"'+type+'\",\"'+format+'\")'),
+        new Element('h2').appendText(text)
+      )
+  );
+  div.injectInside($('calendarSharePopup'));
+  new obm.AutoComplete.ShareCalendarSearch('$GLOBALS[path]/contact/contact_index.php?action=ext_search_mail', 'sel_accept_contact', 'contactSearch', {fieldText:\"$GLOBALS[l_share_mail_search]\"}) 
+  obm.popup.show('sharePopup');
+}
+
+function reinitSharePopup(type){
+  var url = \"$cgp_host\";
+  var popup = $('sharePopup');
+  if(popup){
+    obm.popup.popups.erase('sharePopup');
+  }
+  if(type=='private'){
+    var title = \"$GLOBALS[l_reinit_calendar_private]\";
+    var text = \"$GLOBALS[l_desc_reinit_adress_private]\";
+  } else {
+    var title = \"$GLOBALS[l_reinit_calendar_public]\";
+    var text = \"$GLOBALS[l_desc_reinit_adress_public]\";
+  }
+  var div = new Element('div').setProperty('id','sharePopup')
+                              .setProperty('class','obmPopup SharePopup')
+                              .adopt(
+      new Element('h1').adopt(
+        new Element('a').setProperty('class','closeSticky')
+                        .setProperty('id','popup_form_close')
+                        .setProperty('onclick','return false')
+                        .adopt(
+                          new Element('img').setProperty('src','$ico_popup_close')
+                                            .setProperty('alt','close')
+                          ),
+        new Element('span').appendText(title)
+      ),
+      new Element('h2').appendText(text),
+      new Element('div').setProperty('class','buttons')
+                      .adopt(
+        new Element('input').setProperty('type','submit')
+                            .setProperty('value','$GLOBALS[l_validate]')
+                            .setProperty('class','closeSticky')
+                            .setProperty('onClick','reinitUrl(\"'+type+'\")'),
+        new Element('input').setProperty('type','submit')
+                            .setProperty('value','$GLOBALS[l_cancel]')
+                            .setProperty('class','closeSticky')
+      )
+  );
+  div.injectInside($('calendarSharePopup'));
+  obm.popup.show('sharePopup');
 }
 ";
 

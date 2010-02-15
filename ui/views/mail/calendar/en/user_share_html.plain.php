@@ -22,7 +22,7 @@ This email was automatically sent by OBM
 Share Calendar
 ------------------------------------------------------------------
 
-You can acces OBM calendar for <?php echo "$firstname $name"; ?>
+<?php echo "$firstname $name"; ?> now allows you to view their calendar OBM.
 
 :: See calendar : 
   <?php echo $host; ?>calendar/calendar_render.php?externalToken=<?php echo $token; ?>

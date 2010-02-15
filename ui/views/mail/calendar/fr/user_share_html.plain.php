@@ -22,7 +22,7 @@ Message automatique envoyé par OBM
 Partage d'agenda
 ------------------------------------------------------------------
 
-Vous pouvez accéder à l'agenda OBM de <?php echo "$firstname $name"; ?>
+<?php echo "$firstname $name"; ?> vous autorise désormais à consulter son agenda OBM.
 
 :: Pour Consulter : 
   <?php echo $host; ?>calendar/calendar_render.php?externalToken=<?php echo $token; ?>

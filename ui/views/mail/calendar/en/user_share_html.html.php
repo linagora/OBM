@@ -24,7 +24,7 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2">You can acces OBM calendar for <?php echo "$firstname $name"; ?></td>
+        <td colspan="2"><?php echo "$firstname $name"; ?> now allows you to view their calendar OBM.</td>
     </tr>
     <tr>
         <td style="text-align:right;" colspan="2">

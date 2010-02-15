@@ -93,20 +93,27 @@ $l_eventexception_canceled = "annulé";
 $l_eventexception_moved_to = "déplacé vers le %s";
 $l_my_share_calendar = "Partage sur mon agenda";
 $l_share_calendar = "Gestion des agendas";
-$l_share_calendar_type = "Evènement visible";
-$l_share_calendar_etat = "Format de l'agenda";
-$l_share_calendar_delete = "Supression du partage";
-$l_share_calendar_public = "Accès à l'agenda pour tous";
-$l_share_calendar_private = "Accès à l'agenda par contact";
+$l_share_calendar_public = "Adresse de l'agenda public";
+$l_share_calendar_private = "Adresse de l'agenda privée";
 $l_share_mail_search = "Saisir un mail ...";
-$l_user_share_calendar = "Partage de l'agenda de ";
-$l_share_validate = "Valider les partages";
 $l_html = "Html";
 $l_share_ics = "Ical";
 $l_share_err_auth = "Droits insuffisants pour exécuter la modification sur le partage d'agenda !";
-$l_shares = "Partage d'agenda";
-$l_share_public = "Utiliser cette adresse pour partager votre agenda";
-
+$l_share_public = "Utilisez cette adresse pour partager votre agenda";
+$l_share_reinit_private = "réinitialiser les url privées";
+$l_share_reinit_public = "réinitialiser les url publics";
+$l_send_calendar_private = "Envoyer par mail l'url privée";
+$l_send_calendar_public = "Envoyer par mail l'url public";
+$l_reinit_calendar_private = "Réinitialisation des urls privées";
+$l_reinit_calendar_public = "Réinitialisation des urls publics";
+$l_desc_reinit_adress_public = "Les urls public existantes ne seront plus valides. Voulez vous continuez ?";
+$l_desc_reinit_adress_private = "Les urls privées existantes ne seront plus valides. Voulez vous continuez ?";
+$l_desc_share_adresse_public = "Adresse public de votre agenda. Cette adresse permet d'acceder à cette agenda en public.";
+$l_desc_share_adresse_private = "Adresse privée de cet agenda. Attention cette adresse permet d'acceder à cette agenda en privée.";
+$l_send = "send";
+$l_reinit_ok = "réinitialisation des urls réussis";
+$l_share_ok = "partage valide";
+$l_mail_ok = "Email envoyé";
 
 // PDF Options
 $l_display_details = "Afficher les détails";

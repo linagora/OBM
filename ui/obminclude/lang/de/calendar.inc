@@ -331,3 +331,27 @@ $l_show_calendar = "Sehen der Kalender";
 $mj_fill_valid_time_end = "Sie müssen einen gültigen Endzeit geben."; 
 $l_update_occurrence_message = "Ändern Sie nur dieses Ereignis oder die ganze Reihe?"; 
 
+$l_my_share_calendar = "Meinen Kalender";
+$l_share_calendar = "Kalender verwalten";
+$l_share_calendar_public = "Url die öffentliche kalendar";
+$l_share_calendar_private = "Kalender url Policy";
+$l_share_mail_search $ = "Geben Sie eine E-Mail ...";
+$l_html = "HTML";
+$l_share_ics = "iCal";
+$l_share_err_auth = "Unzureichende Rechte für die Änderung auf der Tagesordnung Austausch auszuführen!";
+$l_share_public = "Verwenden Sie diese url in Ihren Kalender";
+$l_share_reinit_private = "reset private url";
+$l_share_reinit_public = "Zurücksetzen des öffentlichen url";
+$l_send_calendar_private = "E-Mail senden beraubte die url";
+$l_send_calendar_public = "Sende eine Mail an öffentlichen url";
+$l_reinit_calendar_private = "Reset urls private";
+$l_reinit_calendar_public = "Reset urls public";
+$l_desc_reinit_adress_public = "Die bestehenden öffentlichen URLs sind nicht mehr gültig. Wollen Sie fortfahren?";
+$l_desc_reinit_adress_private = "Die bestehenden privaten URLs sind nicht mehr gültig. Wollen Sie fortfahren?";
+$l_desc_share_adresse_public = "Url Ihres öffentlichen Kalenders. Diese url kann diesen Kalender den Zugang der Öffentlichkeit."
+$l_desc_share_adresse_private = "Privat-Url dieser Agenda. Notieren Sie sich diese Url ermöglicht den Zugriff auf diese Agenda in private."
+$l_send = "senden";
+$l_reinit_ok = "reset URLs erfolgreich";
+$l_share_ok = "gültig Aktie";
+$l_mail_ok = "E-Mail gesendet";
+

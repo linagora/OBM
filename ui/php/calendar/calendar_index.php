@@ -1089,11 +1089,42 @@ if (!$params['ajax']) {
   json_ok_msg("$l_view : $l_insert_ok");
   echo "({".$display['json'].",$msg})";
   exit();
-} elseif ($action == 'share_public') {
-  $token = generateUniqueKey();
-  dis_calendar_share_public($token);
-  echo $display['json'];
+} elseif ($action == 'share') {
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
+    $token = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);
+    dis_calendar_share_public($token);
+    json_ok_msg("$l_share_calendar : $l_share_ok");
+  } else {
+    json_error_msg("$l_rights : $l_of_right_err_user");
+  }
+  echo "({".$display['json'].",$msg})";
   exit();
+
+} elseif ($action == 'share_reinit') {
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
+    run_query_calendar_delete_token($params['entity_id'],$params['entity_type'],$params['type']);
+    json_ok_msg("$l_share_calendar : $l_reinit_ok");
+  } else {
+    json_error_msg("$l_rights : $l_of_right_err_user");
+  }
+  echo "({".$display['json'].",$msg})";
+  exit();
+
+} elseif ($action == 'send_url') {
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
+    $format = $params['format'];
+    $entity = get_user_info($params['entity_id']);
+    $entity['token'] = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);
+    $sharemail = new shareCalendarMailer();
+    $sharemail->addRecipient($params['mail']);
+    $sharemail->send("userShare$format",array($entity));
+    json_ok_msg("$l_share_calendar : $l_mail_ok");
+  } else {
+    json_error_msg("$l_rights : $l_of_right_err_user");
+  }
+  echo "({".$display['json'].",$msg})";
+  exit();
+
 }
 display_page($display);
 
@@ -1803,15 +1834,22 @@ function get_calendar_action() {
   );
 
   // Generate public url
-  $actions['calendar']['share_public'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=share_public",
+  $actions['calendar']['share'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=share",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
 
   // Share calendar
-  $actions['calendar']['share_calendar'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=share_calendar",
+  $actions['calendar']['share_reinit'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=share_reinit",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+  // Send url calendar
+  $actions['calendar']['send_url'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=send_url&ajax=1",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );

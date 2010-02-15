@@ -22,7 +22,7 @@ Message automatique envoyé par OBM
 Partage d'agenda
 ------------------------------------------------------------------
 
-Vous pouvez importer au format ics l'agenda OBM de <?php echo "$firstname $name"; ?>
+<?php echo "$firstname $name"; ?> vous autorise désormais à importer son agenda OBM.
 
 :: Pour importer : 
   <?php echo $host; ?>calendar/calendar_render.php?action=ics_export&externalToken=<?php echo $token; ?>

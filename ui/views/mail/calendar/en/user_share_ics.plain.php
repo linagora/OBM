@@ -22,7 +22,7 @@ This email was automatically sent by OBM
 Share calendar
 ------------------------------------------------------------------
 
-You can import calendar for <?php echo "$firstname $name"; ?>
+<?php echo "$firstname $name"; ?> now allows you to import their calendar OBM.
 
 :: Import ical : 
   <?php echo $host; ?>calendar/calendar_render.php?action=ics_export&externalToken=<?php echo $token; ?>
