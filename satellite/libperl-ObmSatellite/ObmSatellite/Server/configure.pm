@@ -17,7 +17,6 @@ use constant MAX_PROCESS => 2;
 use constant MAX_REQUEST_PER_PROCESS => 10;
 use constant CONF_DIR => '/etc/obm-satellite';
 use constant LOG_DIR => '/var/log/obm';
-use constant LOG_LEVEL => 2;
 use constant SOCKET_TIMEOUT => 30;
 use constant SSL_PROTOCOL_VERSION => 'SSLv2/3';
 use constant SSL_CERT_DIR => '/etc/obm/certs';
@@ -37,8 +36,6 @@ sub _configure {
 
     $self->{'server'}->{'setsid'} = 1;
 
-#    $self->{'server'}->{'chdir'} = '/tmp';
-#    $self->{'server'}->{'no_close_by_child'} = 1;   # Daemon connot be stopped by childs
     $self->{'server'}->{'max_spare_servers'} = MAX_PROCESS;     # max process
     $self->{'server'}->{'max_requests'} = MAX_REQUEST_PER_PROCESS;    # max queries per process
 
@@ -49,13 +46,12 @@ sub _configure {
 
     # Log
     $self->{'logFile'} = LOG_DIR.'/'.$self->{'server'}->{'name'}.'.log';
-    $self->{'logLevel'} = LOG_LEVEL;
+    $self->{'logLevel'} = $ObmSatellite::Log::log::INFO;
 
     $self->_loadConfFile();
 
     # Initialize log
-    require ObmSatellite::Log::log;
-    $self->{'logger'} = ObmSatellite::Log::log->instance( $self->{'logFile'}, $self->{'logLevel'} );
+    $self->_configureLog();
 
     # Check SSL parameters
     $self->_checkSSL();
@@ -70,13 +66,13 @@ sub _configurePreBind {
     my $self = shift;
 
     if( $self->_startServices( [ 'LDAP' ] ) ) {
-        $self->log( 2, 'Fail to load LDAP service, needed to HTTP basic authentication' );
+        $self->_log( 'Fail to load LDAP service, needed to HTTP basic authentication', 0 );
         exit 1;
     }
 
     # Load modules
     if( $self->_loadModules() ) {
-        $self->log( 2, 'Modules initialization fail' );
+        $self->_log( 'Modules initialization fail', 0 );
         exit 1;
     }
 }
@@ -158,8 +154,8 @@ sub _checkSSL {
     $self->{'server'}->{'socketConf'}->{'SSL_error_trap'} = sub{
         my( $connection, $msg ) = @_;
 
-        $self->log( 0, $msg ) if defined($msg);
-        $self->log( 0, 'Unknow error during HTTPs negociation' ) if !defined($msg);
+        $self->_log( $msg, 1 ) if defined($msg);
+        $self->_log( 'Unknow error during HTTPs negociation', 1 ) if !defined($msg);
         use HTTP::Status;
         my $response = HTTP::Response->new();
         $response->content( 'HTTPs negociation fail. HTTPs required. Check your URL' ) if defined($msg);
@@ -179,7 +175,7 @@ sub _startServices {
     for( my $i=0; $i<=$#{$neededServices}; $i++ ) {
         my $service = $neededServices->[$i];
         if( defined($self->{'services'}->{$service}) ) {
-            $self->log( 4, 'Service '.$service.' already loaded' );
+            $self->_log( 'Service '.$service.' already loaded', 4 );
             next;
         }
 
@@ -190,16 +186,16 @@ sub _startServices {
 
         eval {
             require $servicePath;
-        } or ($self->log( 0, 'Unknow or invalid service \''.$serviceInternalName.'\'' ) && return 1);
+        } or ($self->_log( 'Unknow or invalid service \''.$serviceInternalName.'\'', 1 ) && return 1);
 
         $self->{'services'}->{$service} = $serviceClass->instance( $self->{'server'}->{'conf_file'} );
 
         if( !defined($self->{'services'}->{$service}) ) {
             delete($self->{'services'}->{$service});
-            $self->log( 0, 'unable to initialize needed '.$service.' service' );
+            $self->_log( 'unable to initialize needed '.$service.' service', 1 );
             return 1;
         }else {
-            $self->log( 2, 'needed '.$service.' service initialized' );
+            $self->_log( 'needed '.$service.' service initialized', 3 );
         }
     }
 

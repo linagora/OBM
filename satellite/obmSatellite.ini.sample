@@ -22,8 +22,8 @@
 # with password
 #ldapPassword =
 
-# 0 to 4, 2 as default
-#log-level = 2
+# 0 to 5, 3 as default
+#log-level = 3
 
 # Maximum prefork child
 # max-spare-server =

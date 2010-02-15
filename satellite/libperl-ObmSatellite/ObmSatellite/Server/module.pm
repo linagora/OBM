@@ -21,7 +21,7 @@ sub _loadModules {
     my @modulesEnabled = </etc/obm-satellite/mods-enabled/*>;
     for( my $i=0; $i<=$#modulesEnabled; $i++ ) {
         if( ! -l $modulesEnabled[$i] ) {
-            $self->log( 3, 'Ignoring module \''.$modulesEnabled[$i].'\'. Must be symlink to ../mods-available files' );
+            $self->_log( 'Ignoring module \''.$modulesEnabled[$i].'\'. Must be symlink to ../mods-available files', 2 );
             next;
         }
 
@@ -44,32 +44,32 @@ sub _loadModules {
 
         eval {
             require $modulePath;
-        } or ($self->log( 0, 'Unknow or invalid module \''.$modules[$i].'\'' ) && next);
+        } or ($self->_log( 'Unknow or invalid module \''.$modules[$i].'\'', 1 ) && next);
 
         my $module = $moduleClass->new();
         if( !defined($module) ) {
-            $self->log( 0, 'loading module \''.$modules[$i].'\' failed' );
+            $self->_log( 'loading module \''.$modules[$i].'\' failed', 1 );
             next;
         }
 
         my $neededServices = $module->neededServices();
         if( $self->_startServices( $module->neededServices() ) ) {
-            $self->log( 0, 'starting needed service failed. Loading module \''.$modules[$i].'\' failed' );
+            $self->_log( 'starting needed service failed. Loading module \''.$modules[$i].'\' failed', 1 );
             next;
         }
 
         my $urls = $module->register();
         for( my $i=0; $i<=$#{$urls}; $i++ ) {
-            $self->log( 4, 'Register module '.$module->getModuleName().' for URL '.$urls->[$i] );
+            $self->_log( 'Register module '.$module->getModuleName().' for URL '.$urls->[$i], 4 );
             push( @{$self->{'modules'}->{$urls->[$i]}}, $module );
         }
 
-        $self->log( 2, 'loading module \''.$modules[$i].'\' success' );
+        $self->_log( 'loading module \''.$modules[$i].'\' success', 3 );
     }
 
     my @loadedModules = keys(%{$self->{'modules'}});
     if( $#loadedModules < 0 ) {
-        $self->log( 0, 'No module loaded !' );
+        $self->_log( 'No module loaded !', 0 );
         return 1;
     }
 
@@ -83,7 +83,7 @@ sub processHttpRequest {
     my $modules = $self->{'modules'};
 
     if( ref($modules) ne 'HASH' ) {
-        $self->log( 0, 'No module loaded' );
+        $self->_log( 'No module loaded', 0 );
         return 0;
     }
 
@@ -119,9 +119,9 @@ sub processHttpRequest {
         }
 
         if( defined($responseContent) ) {
-            $self->log( 3, 'Sending response : '.$status.' - '.$responseContent );
+            $self->_log( 'Sending response : '.$status.' - '.$responseContent, 5 );
         }else {
-            $self->log( 3, 'Sending response : '.$status );
+            $self->_log( 'Sending response : '.$status, 5 );
         }
         my $response = HTTP::Response->new( $status );
         $response->content( $responseContent ) if defined($responseContent);
@@ -134,7 +134,7 @@ sub processHttpRequest {
                 'status' => [ RC_NOT_FOUND.' URL does not exist' ]
                 } ), rootname => 'obmSatellite' );
 
-        $self->log( 0, 'Sending response : '.RC_NOT_FOUND.' - '.$response->content() );
+        $self->_log( 'Sending response : '.RC_NOT_FOUND.' - '.$response->content(), 5 );
         $httpClient->send_response( $response );
     }
 
@@ -151,7 +151,7 @@ sub processUriModule {
     my $response = undef;
     my $i = 0;
     while( ($i <= $#{$modules}) && (ref($response) ne 'ARRAY') ) {
-        $self->log( -1, 'Sending request \''.$request->uri->path().'\' to module \''.$modules->[$i]->getModuleName().'\'' );
+        $self->_log( 'Sending request \''.$request->uri->path().'\' to module \''.$modules->[$i]->getModuleName().'\'', 3 );
         $response = $modules->[$i]->processHttpRequest( $request->method(), $request->uri->path(), $request->content() );
 
         if( ref($response) eq 'ARRAY' ) {

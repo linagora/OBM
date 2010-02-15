@@ -7,97 +7,113 @@ $debug = 1;
 use 5.006_001;
 require Exporter;
 use strict;
+use Log::Log4perl;
 
-use base qw( Class::Singleton );
-
-
-sub _new_instance {
-    my $class = shift;
-    my( $logFile, $logLevel ) = @_;
-
-    my $self = bless { }, $class;
-
-    $self->{'logFile'} = $logFile;
-
-    $self->{'logLevel'} = $logLevel;
-    $self->{'logLevel'} = 2 if !defined($self->{'logLevel'});
-    $self->{'logLevel'} = 2 if $self->{'logLevel'} !~ /^[01234]$/;
-
-    $self->_openLog();
-
-    return $self;
-}
+use constant TRACE => 5;
+use constant DEBUG => 4;
+use constant INFO => 3;
+use constant WARN => 2;
+use constant ERROR => 1;
+use constant FATAL => 0;
 
 
-sub _openLog {
+sub _configureLog {
     my $self = shift;
-
-    if( !$self->{'logFile'} ) {
-        $self->{'disabled'};
-    }else {
-        open( _LOG_HDL, '>>'.$self->{'logFile'} ) or die 'Unable to open log file';
-        _LOG_HDL->autoflush(1);
-    }
-}
-
-
-sub DESTROY {
-    my $self = shift;
-
-    close( _LOG_HDL );
-}
-
-
-sub log {
-    my $self = shift;
-    my( $logLevel, $logMessage ) = @_;
-
-    if( $self->{'disabled'} ) {
-        return;
+    
+    my $logger = 'LOGFILE';
+    if( !defined($self->{'logFile'}) ) {
+        $logger = 'SCREEN';
     }
 
-    if( $logLevel <= $self->{'logLevel'} ) {
-        my $level = $self->_convertLevel( $logLevel );
+    my $logLevel = 'INFO';
+    SWITCH: {
+        if( !defined( $self->{'logLevel'} ) ) {
+            last SWITCH;
+        }
 
-        print _LOG_HDL $self->log_time().' ['.$$.']: '.$level.$logMessage;
+        if( $self->{'logLevel'} == TRACE ) {
+            $logLevel = 'TRACE';
+            last SWITCH;
+        }
 
-        if( $logMessage !~ /\n$/ ) {
-            print _LOG_HDL "\n";
+        if( $self->{'logLevel'} == DEBUG ) {
+            $logLevel = 'DEBUG';
+            last SWITCH;
+        }
+
+        if( $self->{'logLevel'} == WARN ) {
+            $logLevel = 'WARN';
+            last SWITCH;
+        }
+
+        if( $self->{'logLevel'} == ERROR ) {
+            $logLevel = 'ERROR';
+            last SWITCH;
+        }
+
+        if( $self->{'logLevel'} == FATAL ) {
+            $logLevel = 'FATAL';
+            last SWITCH;
         }
     }
+
+    my %logConf = (
+        'log4perl.rootLogger' => $logLevel.', '.$logger,
+        'log4perl.appender.LOGFILE' => 'Log::Log4perl::Appender::File',
+        'log4perl.appender.LOGFILE.filename' => $self->{'logFile'},
+        'log4perl.appender.LOGFILE.mode' => 'append',
+        'log4perl.appender.LOGFILE.layout' => 'PatternLayout',
+        'log4perl.appender.LOGFILE.layout.ConversionPattern' => '%d:%r [%P]: %C:%L %p - %m%n',
+        'log4perl.appender.SCREEN' => 'Log::Log4perl::Appender::Screen',
+        'log4perl.appender.SCREEN.stderr' => 0,
+        'log4perl.appender.SCREEN.layout' => 'PatternLayout',
+        'log4perl.appender.SCREEN.layout.ConversionPattern' => '%d:%r [%P]: %C:%L %p - %m%n',
+    );
+
+    Log::Log4perl::init_once( \%logConf );
+    $Log::Log4perl::caller_depth = 1;
+
+    return 0;
 }
 
 
-sub _convertLevel {
+sub _log {
     my $self = shift;
-    my( $level ) = @_;
+    my( $logMessage, $logLevel ) = @_;
+
+    my $log = Log::Log4perl->get_logger(__PACKAGE__);
 
     SWITCH: {
-        if( $level == -1 ) {
-            return '';
+        if( $logLevel == TRACE || $logLevel eq 'TRACE' ) {
+            $log->trace( $logMessage );
+            last SWITCH;
         }
 
-        if( $level == 0 ) {
-            return 'CRITICAL: ';
+        if( $logLevel == DEBUG || $logLevel eq 'DEBUG' ) {
+            $log->debug( $logMessage );
+            last SWITCH;
         }
 
-        if( $level == 1 ) {
-            return 'BASIC: ';
+        if( $logLevel == INFO || $logLevel eq 'INFO' ) {
+            $log->info( $logMessage );
+            last SWITCH;
         }
 
-        if( $level == 2 ) {
-            return 'ADVANCED: ';
+        if( $logLevel == WARN || $logLevel eq 'WARN' ) {
+            $log->warn( $logMessage );
+            last SWITCH;
+        }
+
+        if( $logLevel == ERROR || $logLevel eq 'ERROR' ) {
+            $log->error( $logMessage );
+            last SWITCH;
+        }
+
+        if( $logLevel == FATAL || $logLevel eq 'FATAL' ) {
+            $log->fatal( $logMessage );
+            last SWITCH;
         }
     }
 
-    return 'DEBUG: '
-}
-
-
-### default time format                                                                                                                                      
-sub log_time {                                                                                                                                               
-    my $self = shift;
-    my ($sec,$min,$hour,$day,$mon,$year) = localtime;
-
-    return sprintf("%04d/%02d/%02d-%02d:%02d:%02d", $year+1900, $mon+1, $day, $hour, $min, $sec);
+    return 0;
 }

@@ -32,10 +32,10 @@ sub _initHook {
     my @params = ( 'imapdConfFile', 'cyrusStartupScript', 'imapdPartitionRoot', 'ldapRoot' );
     my $confFileParams = $self->_loadConfFile( \@params );
 
-    $self->log( 3, $self->getModuleName().' module configuration :' );
+    $self->_log( $self->getModuleName().' module configuration :', 4 );
     for( my $i=0; $i<=$#params; $i++ ) {
         $self->{$params[$i]} = $confFileParams->{$params[$i]} if defined($confFileParams->{$params[$i]});
-        $self->log( 3, $params[$i].' : '.$self->{$params[$i]} ) if defined($self->{$params[$i]});
+        $self->_log( $params[$i].' : '.$self->{$params[$i]}, 4 ) if defined($self->{$params[$i]});
     }
 
     return 1;
@@ -157,7 +157,7 @@ sub _updateImapdConf {
     my( $hostname, $domainList ) = @_;
 
     if( !open( FIC, $self->{'imapdConfFile'} ) ) {
-        $self->log( 0, 'Unable to open Cyrus Imapd configuration file' );
+        $self->_log( 'Unable to open Cyrus Imapd configuration file', 1 );
         return $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Unable to open Cyrus Imapd configuration file' );
     }
 
@@ -181,16 +181,16 @@ sub _updateImapdConf {
             $currentPartitions{$partitionName} = $2;
             $currentPartitions{$partitionName} =~ s/^\s+//;
 
-            $self->log( 3, 'Load partition \''.$partitionName.'\', directory \''.$currentPartitions{$partitionName}.'\' from configuration file' );
+            $self->_log( 'Load partition \''.$partitionName.'\', directory \''.$currentPartitions{$partitionName}.'\' from configuration file', 4 );
         }elsif( $file[$i] =~ /^defaultpartition\s*:(.+)$/ ) {
             $defaultPartitionName = $1;
             $defaultPartitionName =~ s/^\s+//;
 
             if( $defaultPartitionName !~ /^[a-zA-Z0-9]+$/ ) {
-                $self->log( 0, 'Invalid default partition name \''.$defaultPartitionName.'\'' );
+                $self->_log( 'Invalid default partition name \''.$defaultPartitionName.'\'', 1 );
                 $defaultPartitionName = undef;
             }else {
-                $self->log( 3, 'Default partition name \''.$defaultPartitionName.'\'' );
+                $self->_log( 'Default partition name \''.$defaultPartitionName.'\'', 3 );
             }
         }else {
             push( @template, $file[$i] );
@@ -207,9 +207,9 @@ sub _updateImapdConf {
     }
 
     if( !defined($defaultPartitionName) ) {
-        $self->log( 0, 'No default partition defined' );
+        $self->_log( 'No default partition defined', 2 );
     }elsif( defined($defaultPartitionName) && !defined($currentPartitions{$defaultPartitionName}) ) {
-        $self->log( 0, 'No default partition defined' );
+        $self->_log( 'No default partition defined', 2 );
         $defaultPartitionName = undef;
     }
 
@@ -223,13 +223,13 @@ sub _updateImapdConf {
 
         if( !exists($currentPartitions{$domainPartitionName}) ) {
             $currentPartitions{$domainPartitionName} = $self->{'imapdPartitionRoot'}.'/'.$domainPartitionName;
-            $self->log( -1, 'Add Cyrus Imapd partition \''.$domainPartitionName.'\', directory \''.$currentPartitions{$domainPartitionName}.'\'' );
+            $self->_log( 'Add Cyrus Imapd partition \''.$domainPartitionName.'\', directory \''.$currentPartitions{$domainPartitionName}.'\'', 3 );
         }
     }
 
-    $self->log( 3, 'Re-write Cyrus Imapd configuration file' );
+    $self->_log( 'Re-write Cyrus Imapd configuration file', 3 );
     if( !open( FIC, '>'.$self->{'imapdConfFile'} ) ) {
-        $self->log( 0, 'Unable to open Cyrus Imapd configuration file' );
+        $self->_log( 'Unable to open Cyrus Imapd configuration file', 1 );
         return $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Unable to open Cyrus Imapd configuration file' );
     }
 
@@ -240,7 +240,7 @@ sub _updateImapdConf {
     if( defined($defaultPartitionName) ) {
         print FIC 'defaultpartition: '.$defaultPartitionName."\n";
     }else {
-        $self->log( 2, '[WARNING] No default partition set. If you wish to set one, add \'defaultpartition\' to \''.$self->{'imapdConfFile'}.'\' configuration file and restart Cyrus services' );
+        $self->_log( 'No default partition set. If you wish to set one, add \'defaultpartition\' to \''.$self->{'imapdConfFile'}.'\' configuration file and restart Cyrus services', 2 );
     }
 
     for( my $i=0; $i<=$#template; $i++ ) {
@@ -259,20 +259,20 @@ sub _restartCyrusService {
     my $self = shift;
 
     my $cmd = $self->{'cyrusStartupScript'}.' stop > /dev/null 2>&1';
-    $self->log( 2, 'Stop Cyrus service '.$cmd );
+    $self->_log( 'Stop Cyrus service '.$cmd, 3 );
     my $ret = 0xffff & system $cmd;
 
     if( $ret ) {
-        $self->log( 0, 'Fail to stop Cyrus service' );
+        $self->_log( 'Fail to stop Cyrus service', 1 );
         return $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Fail to stop Cyrus service' );
     }
 
     $cmd = $self->{'cyrusStartupScript'}.' start > /dev/null 2>&1';
-    $self->log( 2, 'Start Cyrus service '.$cmd );
+    $self->_log( 'Start Cyrus service '.$cmd, 3 );
     $ret = 0xffff & system $cmd;
 
     if( $ret ) {
-        $self->log( 0, 'Fail to start Cyrus service' );
+        $self->_log( 'Fail to start Cyrus service', 1 );
         return $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Fail to start Cyrus service' );
     }
 

@@ -4,13 +4,15 @@ $VERSION = '1.0';
 
 $debug = 1;
 
+use Class::Singleton;
+use ObmSatellite::Log::log;
+@ISA = qw(Class::Singleton ObmSatellite::Log::log);
+
 use 5.006_001;
 require Exporter;
 use strict;
 
-use base qw( Class::Singleton );
 require Config::IniFiles;
-require ObmSatellite::Log::log;
 
 use constant OBM_CONF => '/etc/obm/obm_conf.ini';
 # LDAP server dead time (s)
@@ -27,7 +29,7 @@ sub _new_instance {
     my $ldapDescConfFile = $self->_loadConfFile( $confFile );
 
     if( !defined($ldapDesc) && !defined($ldapDescConfFile) ) {
-        $self->log( 0, 'No LDAP server configuration' );
+        $self->_log( 'No LDAP server configuration', 1 );
         return undef;
     }elsif( defined($ldapDescConfFile) ) {
         while( my( $option, $value ) = each(%{$ldapDescConfFile}) ) {
@@ -61,7 +63,7 @@ sub _new_instance {
         $self->{'ldap_root'} = $ldapDesc->{'ldap_root'};
 
     }else {
-        $self->log( 0, 'ldap_server not defined or incorrect in configuration file' );
+        $self->_log( 'ldap_server not defined or incorrect in configuration file', 1 );
         return undef;
     }
 
@@ -135,19 +137,11 @@ sub _loadConfFile {
 }
 
 
-sub log {
-    my $self = shift;
-
-    my $log = ObmSatellite::Log::log->instance();
-    return $log->log( @_ );
-}
-
-
 sub DESTROY {
     my $self = shift;
 
 
-    $self->log( 4, 'Deleting LDAP server' );
+    $self->_log( 'Deleting LDAP server', 5 );
 
     if( ref( $self->{'ldapServerConn'} ) eq 'Net::LDAP' ) {
         $self->disconnect();
@@ -161,14 +155,14 @@ sub disconnect {
     my $self = shift;
 
     if( ref( $self->{'ldapServerConn'} ) ne 'Net::LDAP' ) {
-        $self->log( 3, 'LDAP not connected' );
+        $self->_log( 'LDAP not connected', 4 );
 
         $self->{'ldapServerConn'} = undef;
         return 0;
     }
 
     if( $self->_ping($self->{'ldapServerConn'}) ) {
-        $self->log( 3, 'Disconnect from LDAP server' );
+        $self->_log( 'Disconnect from LDAP server', 4 );
         # Trying to unbind silently...
         eval{ $self->{'ldapServerConn'}->disconnect() };
 
@@ -176,7 +170,7 @@ sub disconnect {
         return 0;
     }
 
-    $self->log( 3, 'LDAP already disconnected' );
+    $self->_log( 'LDAP already disconnected', 4 );
 
     $self->{'ldapServerConn'} = undef;
     return 0;
@@ -191,11 +185,11 @@ sub getConn {
             $self->_searchAuthenticate();
         }
     }elsif( !$self->_ping($self->{'ldapServerConn'}) ) {
-        $self->log( 4, 'LDAP server ping failed. Try to reconnect...' );
+        $self->_log( 'LDAP server ping failed. Try to reconnect...', 4 );
         $self->{'ldapServerConn'} = undef;
         return $self->getConn();
     }else {
-        $self->log( 4, 'LDAP server connection already established' );
+        $self->_log( 'LDAP server connection already established', 4 );
     }
 
     return $self->{'ldapServerConn'};
@@ -208,11 +202,11 @@ sub _connect {
 
 
     if( $self->getDeadStatus() ) {
-        $self->log( 0, 'LDAP server is disable' );
+        $self->_log( 'LDAP server is disable', 1 );
         return undef;
     }
 
-    $self->log( 3, 'connect LDAP server '.$self->{'ldap_server'}.'...' );
+    $self->_log( 'connect LDAP server '.$self->{'ldap_server'}.'...', 4 );
 
     my @tempo = ( 1, 3, 5, 10, 20, 30 );
     require Net::LDAP;
@@ -222,12 +216,12 @@ sub _connect {
             last;
         }
 
-        $self->log( 0, 'LDAP connection failed. Retry in '.$tempo.'s' );
+        $self->_log( 'LDAP connection failed. Retry in '.$tempo.'s', 2 );
         sleep $tempo;
     }
 
     if( !$ldapServerConn ) {
-        $self->log( 0, 'Can\'t connect LDAP server. Disabling LDAP server' );
+        $self->_log( 'Can\'t connect LDAP server. Disabling LDAP server', 1 );
         $self->_setDeadStatus();
         return undef;
     }
@@ -236,9 +230,9 @@ sub _connect {
     use Net::LDAP qw(LDAP_EXTENSION_START_TLS);
     my $ldapDse = $ldapServerConn->root_dse();
     if( !defined($ldapDse) ) {
-        $self->log( 0, 'Can\'t get LDAP root DSE. Can\'t check for TLS/SSL server support. Check server ACLs' );
+        $self->_log( 'Can\'t get LDAP root DSE. Can\'t check for TLS/SSL server support. Check server ACLs', 1 );
     }elsif( !$ldapDse->supported_extension(LDAP_EXTENSION_START_TLS) ) {
-        $self->log( 0, 'no TLS/SSL LDAP server support' );
+        $self->_log( 'no TLS/SSL LDAP server support', 1 );
         $self->{'ldap_server_tls'} = 'none';
     }
 
@@ -247,15 +241,15 @@ sub _connect {
         my $error = $ldapServerConn->start_tls( verify => 'none' );
 
         if( $error->code() && ($self->{'ldap_server_tls'} eq 'encrypt') ) {
-            $self->log( 0, 'fatal error on start_tls : '.$error->error );
-            $self->log( 0, 'TLS connection needed by configuration.  Disabling LDAP server' );
+            $self->_log( 'fatal error on start_tls : '.$error->error, 1 );
+            $self->_log( 'TLS connection needed by configuration.  Disabling LDAP server', 1 );
             $self->_setDeadStatus();
             return undef;
         }
 
         if( $error->code() && ($self->{'ldap_server_tls'} eq 'may') ) {
-            $self->log( 0, 'fatal error on start_tls : '.$error->error );
-            $self->log( 0, 'TLS not needed, trying to reconnect without TLS' );
+            $self->_log( 'fatal error on start_tls : '.$error->error, 1 );
+            $self->_log( 'TLS not needed, trying to reconnect without TLS', 1 );
             $self->{'ldap_server_tls'} = 'none';
 
             $ldapServerConn = undef;
@@ -263,7 +257,7 @@ sub _connect {
         }
 
         if( !$error->code() ) {
-            $self->log( 3, 'TLS connection established' );
+            $self->_log( 'TLS connection established', 4 );
         }
     }
 
@@ -278,28 +272,28 @@ sub _searchAuthenticate {
     # LDAP authentication
     my $error; 
     if( $self->{'ldap_login'} ) {
-        $self->log( 2, 'Authenticating to LDAP server as user DN '.$self->{'ldap_login'} );
+        $self->_log( 'Authenticating to LDAP server as user DN '.$self->{'ldap_login'}, 3 );
         $error = $self->{'ldapServerConn'}->bind(
             $self->{'ldap_login'},
             password => $self->{'ldap_password'}
         );
     }else {
-        $self->log( 2, 'Authenticating anonymously' );
+        $self->_log( 'Authenticating anonymously', 3 );
         $error = $self->{'ldapServerConn'}->bind();
     }
 
     if( !$error->code ) {
-        $self->log( 2, 'LDAP connection success' );
+        $self->_log( 'LDAP connection success', 3 );
 
     }elsif( $error->code == LDAP_CONFIDENTIALITY_REQUIRED ) {
-        $self->log( 0, 'start_tls needed by LDAP server. Check your configuration' );
-        $self->log( 0, 'disabling LDAP server' );
+        $self->_log( 'start_tls needed by LDAP server. Check your configuration', 1 );
+        $self->_log( 'disabling LDAP server', 1 );
         $self->_setDeadStatus();
         $self->{'ldapServerConn'} = undef;
         return 1;
 
     }elsif( $error->code ) {
-        $self->log( 0, 'fail to authenticate against LDAP server : '.$error->error );
+        $self->_log( 'fail to authenticate against LDAP server : '.$error->error, 1 );
         $self->{'ldapServerConn'} = undef;
         return 1;
     }
@@ -322,17 +316,17 @@ sub checkAuthentication {
 
     my $returnCode = 0;
     if( !$error->code ) {
-        $self->log( 2, 'LDAP authentication success for user '.$dn );
+        $self->_log( 'LDAP authentication success for user '.$dn, 3 );
         $returnCode = 1;
     
     }elsif( $error->code == LDAP_CONFIDENTIALITY_REQUIRED ) {
-        $self->log( 0, 'start_tls needed by LDAP server. Check your configuration' );
-        $self->log( 0, 'disabling LDAP server' );
+        $self->_log( 'start_tls needed by LDAP server. Check your configuration', 1 );
+        $self->_log( 'disabling LDAP server', 1 );
         $self->_setDeadStatus();
         $self->{'ldapServerConn'} = undef;
 
     }else {
-        $self->log( 0, 'LDAP authentication fail for user '.$dn );
+        $self->_log( 'LDAP authentication fail for user '.$dn, 1 );
     }
 
     $self->_searchAuthenticate();

@@ -58,10 +58,10 @@ sub _initHook {
     my @params = ( 'postmapCmd', 'ldapRoot' );
     my $confFileParams = $self->_loadConfFile( \@params );
 
-    $self->log( 3, $self->getModuleName().' module configuration :' );
+    $self->_log( $self->getModuleName().' module configuration :', 4 );
     for( my $i=0; $i<=$#params; $i++ ) {
         $self->{$params[$i]} = $confFileParams->{$params[$i]} if defined($confFileParams->{$params[$i]});
-        $self->log( 3, $params[$i].' : '.$self->{$params[$i]} ) if defined($self->{$params[$i]});
+        $self->_log( $params[$i].' : '.$self->{$params[$i]}, 4 ) if defined($self->{$params[$i]});
     }
 
     return 1;
@@ -128,18 +128,18 @@ sub _generateMaps {
     }
 
     foreach my $map ( @{$datas->{'maps'}} ) {
-        $self->log( 2, 'Generate flat map \''.$map.'\', file '.$self->{$map} );
+        $self->_log( 'Generate flat map \''.$map.'\', file '.$self->{$map}, 3 );
         if( $self->_generateFlatMap( $map, $domainList ) ) {
-            $self->log( 0, 'Fail to generate flat map \''.$map.'\', file '.$self->{$map} );
+            $self->_log( 'Fail to generate flat map \''.$map.'\', file '.$self->{$map}, 1 );
             return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Fail to generate flat map \''.$map.'\', file '.$self->{$map} );
         }
     }
 
     foreach my $map ( @{$datas->{'maps'}} ) {
-        $self->log( 2, 'Generate DB map \''.$map.'\', from file '.$self->{$map} );
+        $self->_log( 'Generate DB map \''.$map.'\', from file '.$self->{$map}, 3 );
 
         if( $self->_generateDbMap( $map ) ) {
-            $self->log( 0, 'Fail to generate DB map \''.$map.'\', from file '.$self->{$map} );
+            $self->_log( 'Fail to generate DB map \''.$map.'\', from file '.$self->{$map}, 1 );
             return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Fail to generate DB map \''.$map.'\', from file '.$self->{$map} );
         }
     }
@@ -172,7 +172,7 @@ sub _generateFlatMap {
     return 1 if !defined($ldapEntries);
 
     if( !open( POSTFIX_MAP, '>'.$self->{$map} ) ) {
-        $self->log( 0, 'Unable to open file '.$self->{$map}.' to write postfix map \''.$map.'\'' );
+        $self->_log( 'Unable to open file '.$self->{$map}.' to write postfix map \''.$map.'\'', 1 );
         return 1;
     }
 
@@ -212,11 +212,11 @@ sub _generateDbMap {
     my( $map ) = @_;
 
     my $cmd = $self->{'postmapCmd'}.' hash:'.$self->{$map};
-    $self->log( 3, 'Exec: '.$cmd );
+    $self->_log( 'Exec: '.$cmd, 4 );
     my $ret = 0xffff & system $cmd;
 
     if( $ret ) {
-        $self->log( 0, 'Command \''.$cmd.'\' return status '.$ret );
+        $self->_log( 'Command \''.$cmd.'\' return status '.$ret, 1 );
         return 1;
     }
 

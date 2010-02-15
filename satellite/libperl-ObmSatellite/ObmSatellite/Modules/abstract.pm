@@ -4,6 +4,9 @@ $VERSION = '1.0';
 
 $debug = 1;
 
+use ObmSatellite::Log::log;
+@ISA = qw(ObmSatellite::Log::log);
+
 use 5.006_001;
 require Exporter;
 use strict;
@@ -49,16 +52,6 @@ sub _initHook {
     my $self = shift;
 
     return 1;
-}
-
-
-sub log {
-    my $self = shift;
-
-    require ObmSatellite::Log::log;
-    my $logger = ObmSatellite::Log::log->instance();
-
-    return $logger->log( @_ );
 }
 
 
@@ -116,10 +109,10 @@ sub _postMethod {
     my $self = shift;
     my( $requestUri, $requestBody ) = @_;
 
-    $self->log( 0, '\'_postMethod\' method not implemented on module '.$self->getModuleName() );
-    $self->log( 4, 'Request method : POST' );
-    $self->log( 4, 'Request URI : '.$requestUri );
-    $self->log( 4, 'Request Body : '.$requestBody );
+    $self->_log( '\'_postMethod\' method not implemented on module '.$self->getModuleName(), 1 );
+    $self->_log( 'Request method : POST', 5 );
+    $self->_log( 'Request URI : '.$requestUri, 5 );
+    $self->_log( 'Request Body : '.$requestBody, 5 );
 
     return $self->_returnStatus( RC_METHOD_NOT_ALLOWED, 'method \'POST\' not allowed on module '.$self->getModuleName() );;
 }
@@ -129,10 +122,10 @@ sub _getMethod {
     my $self = shift;
     my( $requestUri, $requestBody ) = @_;
 
-    $self->log( 0, '\'_getMethod\' method not implemented on module '.$self->getModuleName() );
-    $self->log( 4, 'Request method : GET' );
-    $self->log( 4, 'Request URI : '.$requestUri );
-    $self->log( 4, 'Request Body : '.$requestBody );
+    $self->_log( '\'_getMethod\' method not implemented on module '.$self->getModuleName(), 1 );
+    $self->_log( 'Request method : GET', 5 );
+    $self->_log( 'Request URI : '.$requestUri, 5 );
+    $self->_log( 'Request Body : '.$requestBody, 5 );
 
     return $self->_returnStatus( RC_METHOD_NOT_ALLOWED, 'method \'GET\' not allowed on module '.$self->getModuleName() );
 }
@@ -142,10 +135,10 @@ sub _putMethod {
     my $self = shift;
     my( $requestUri, $requestBody ) = @_;
 
-    $self->log( 0, '\'_putMethod\' method not implemented on module '.$self->getModuleName() );
-    $self->log( 4, 'Request method : PUT' );
-    $self->log( 4, 'Request URI : '.$requestUri );
-    $self->log( 4, 'Request Body : '.$requestBody );
+    $self->_log( '\'_putMethod\' method not implemented on module '.$self->getModuleName(), 0 );
+    $self->_log( 'Request method : PUT', 5 );
+    $self->_log( 'Request URI : '.$requestUri, 5 );
+    $self->_log( 'Request Body : '.$requestBody, 5 );
 
     return $self->_returnStatus( RC_METHOD_NOT_ALLOWED, 'method \'GET\' not allowed on module '.$self->getModuleName() );
 }
@@ -195,24 +188,24 @@ sub _loadConfFile {
     my( $options ) = @_;
 
     if( ref($options) ne 'ARRAY' ) {
-        $self->log( 3, 'Options to load must be an array' );
+        $self->_log( 'Options to load must be an array', 4 );
         return undef;
     }
 
     if( !$self->isEnabled() ) {
-        $self->log( 0, 'Module '.$self->getModuleName().' disabled' );
+        $self->_log( 'Module '.$self->getModuleName().' disabled', 3 );
         return undef;
     }
 
     my $confFile = ENABLED_MODS.'/'.$self->getModuleName();
     if( !( -f $confFile && -r $confFile ) ) {
-        $self->log( 0, 'Unable to read configuration file '.$confFile );
+        $self->_log( 'Unable to read configuration file '.$confFile, 1 );
         return undef;
     }
 
     my @confileStat = stat( $confFile );
     if( $confileStat[7] == 0 ) {
-        $self->log( 0, 'Empty configuration file '.$confFile );
+        $self->_log( 'Empty configuration file '.$confFile, 3 );
         return undef;
     }
 
@@ -220,11 +213,11 @@ sub _loadConfFile {
     if( my $cfgFile = Config::IniFiles->new( -file => $confFile ) ) {
         for( my $i=0; $i<=$#{$options}; $i++ ) {
             my $iniValue = $cfgFile->val( $self->getModuleName(), $options->[$i] );
-            $self->log( 4, 'INI file for module '.$self->getModuleName().': '.$options->[$i].'->'.$iniValue ) if $iniValue;
+            $self->_log( 'INI file for module '.$self->getModuleName().': '.$options->[$i].'->'.$iniValue, 3 ) if $iniValue;
             $params{$options->[$i]} = $iniValue if defined($iniValue);
         }
     }else {
-        $self->log( 0, 'Failed to load configuration file '.$confFile );
+        $self->_log( 'Failed to load configuration file '.$confFile, 1 );
         return undef;
     }
 
@@ -249,11 +242,11 @@ sub _getLdapConn {
 
     eval {
         require ObmSatellite::Services::LDAP;
-    } or ($self->log( 0, 'Unable to load LDAP service' ) && return undef);
+    } or ($self->_log( 'Unable to load LDAP service', 0 ) && return undef);
     my $ldapServer = ObmSatellite::Services::LDAP->instance();
 
     if( !defined($ldapServer) ) {
-        $self->log( 0, 'Unable to load LDAP service' );
+        $self->_log( 'Unable to load LDAP service', 1 );
         return undef;
     }
 
@@ -266,11 +259,11 @@ sub _getLdapRootFromLdapService {
 
     eval {
         require ObmSatellite::Services::LDAP;
-    } or ($self->log( 0, 'Unable to load LDAP service' ) && return undef);
+    } or ($self->_log( 'Unable to load LDAP service', 0 ) && return undef);
     my $ldapServer = ObmSatellite::Services::LDAP->instance();
 
     if( !defined($ldapServer) ) {
-        $self->log( 0, 'Unable to load LDAP service' );
+        $self->_log( 'Unable to load LDAP service', 1 );
         return undef;
     }
 
@@ -282,7 +275,7 @@ sub _getLdapRoot {
     my $self = shift;
 
     $self->{'ldapRoot'} = $self->_getLdapRootFromLdapService() if !$self->{'ldapRoot'};
-    $self->log( 0, 'No ldapRoot defined. Check that your LDAP server configuration define a default LDAP root...' ) if !$self->{'ldapRoot'};
+    $self->_log( 'No ldapRoot defined. Check that your LDAP server configuration define a default LDAP root...', 2 ) if !$self->{'ldapRoot'};
 
     return $self->{'ldapRoot'};
 }
@@ -293,12 +286,12 @@ sub _getHostDomains {
     my( $role, $hostname ) = @_;
 
     if( !defined($role) ) {
-        $self->log( 0, 'Undefined host role' );
+        $self->_log( 'Undefined host role', 4 );
         return undef;
     }
 
     if( !defined($hostname) ) {
-        $self->log( 0, 'Undefined host name' );
+        $self->_log( 'Undefined host name', 4 );
         return undef;
     }
 
@@ -312,7 +305,7 @@ sub _getHostDomains {
     foreach my $entry (@{$ldapEntries}) {
         my $entryDomainList = $entry->get_value( 'obmDomain', asref => 1 );
         for( my $i=0; $i<=$#{$entryDomainList}; $i++ ) {
-            $self->log( 4, 'Host '.$hostname.' linked to domain '.$entryDomainList->[$i] );
+            $self->_log( 'Host '.$hostname.' linked to domain '.$entryDomainList->[$i], 5 );
             push( @domainList, $entryDomainList->[$i] );
         }
     }
@@ -332,13 +325,13 @@ sub _getLdapValues {
     my $ldapConn = $self->_getLdapConn() or return undef;
 
     if( ref($ldapAttributes) ne 'ARRAY' ) {
-        $self->log( 4, 'LDAP attributes must be an ARRAY ref' );
+        $self->_log( 'LDAP attributes must be an ARRAY ref', 4 );
         return undef;
     }
 
     my $ldapRoot = $self->_getLdapRoot();
-    $self->log( 4, 'Search LDAP root \''.$ldapRoot.'\', filter '.$ldapFilter ) if $ldapRoot;
-    $self->log( 4, 'Search default LDAP server root, filter '.$ldapFilter ) if !$ldapRoot;
+    $self->_log( 'Search LDAP root \''.$ldapRoot.'\', filter '.$ldapFilter, 5 ) if $ldapRoot;
+    $self->_log( 'Search default LDAP server root, filter '.$ldapFilter, 5 ) if !$ldapRoot;
 
     my $ldapResult;
     if( $ldapRoot ) {
@@ -357,7 +350,7 @@ sub _getLdapValues {
     }
 
     if( $ldapResult->is_error() ) {
-        $self->log( 0, 'LDAP search fail on error : '.$ldapResult->error() );
+        $self->_log( 'LDAP search fail on error : '.$ldapResult->error(), 1 );
         return undef;
     }
 

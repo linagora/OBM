@@ -7,7 +7,8 @@ $debug = 1;
 use ObmSatellite::Server::configure;
 use ObmSatellite::Server::module;
 use ObmSatellite::Server::processRequest;
-@ISA = qw(ObmSatellite::Server::configure ObmSatellite::Server::module ObmSatellite::Server::processRequest);
+use ObmSatellite::Log::log;
+@ISA = qw(ObmSatellite::Server::configure ObmSatellite::Server::module ObmSatellite::Server::processRequest ObmSatellite::Log::log);
 
 use 5.006_001;
 require Exporter;
@@ -63,7 +64,7 @@ sub _daemonize {
     # If we're the shell-called process, exit back.
     exit if $pid;
 
-    $self->log( -1, 'Parent daemon running (PID: '.$$.')' );
+    $self->_log( 'Parent daemon running (PID: '.$$.')', 3 );
     $self->_writePidFile();
     
     # Now we're a daemonized parent process!
@@ -84,11 +85,11 @@ sub _daemonize {
     # and dying children
     
     $SIG{__WARN__} = sub {
-        $self->log( 4, 'NOTE! '.join(' ', @_));
+        $self->_log( 'NOTE! '.join(' ', @_), 4 );
     };
     
     $SIG{__DIE__} = sub {
-        $self->log( 0, 'FATAL! '.join(' ', @_));
+        $self->_log( 'FATAL! '.join(' ', @_), 0 );
         exit(1);
     };
     
@@ -100,10 +101,10 @@ sub _daemonize {
         my $sig = shift;
         $SIG{$sig} = 'IGNORE';
 
-        $self->log( 3, 'Send SIGTERM to : '.join( ' ', keys(%{$self->{'childrens'}}) ) );
+        $self->_log( 'Send SIGTERM to : '.join( ' ', keys(%{$self->{'childrens'}}) ), 4 );
         kill 'TERM' => keys(%{$self->{'childrens'}});
 
-        $self->log( -1, 'Daemon stopped by '.$sig );
+        $self->_log( 'Daemon stopped by '.$sig, 2 );
 
         unlink($self->{'server'}->{'pid_file'});
         exit;
@@ -129,9 +130,9 @@ sub REAPER {
         my $returnVal = $? >> 8;
 
         if( $returnVal ) {
-            $self->log( 2, 'Child '.$stiff.' terminated abnormaly -- status '.$returnVal );
+            $self->_log( 'Child '.$stiff.' terminated abnormaly -- status '.$returnVal, 1 );
         }else {
-            $self->log( 2, 'Child '.$stiff.' terminated -- status '.$returnVal );
+            $self->_log( 'Child '.$stiff.' terminated -- status '.$returnVal, 3 );
         }
         $self->{'forkedChildren'}--;
         delete $self->{'childrens'}->{$stiff};
@@ -167,13 +168,13 @@ sub _newChildren {
         $self->{'childrens'}->{$pid} = 1;
         $self->{'forkedChildren'}++;
 
-        $self->log( 2, 'new child forked (PID: '.$pid.'), we now have '.$self->{'forkedChildren'}.' child' );
+        $self->_log( 'new child forked (PID: '.$pid.'), we now have '.$self->{'forkedChildren'}.' child', 3 );
         return;
     }
     
     $self->_childSig();
 
-    $self->log( -1, 'child '.$$.' ready to process requests' );
+    $self->_log( 'child '.$$.' ready to process requests', 3 );
 
     $self->process_request();
     exit 0;
@@ -187,7 +188,7 @@ sub _childSig {
         # Any sort of death trigger results in death of all
         my $sig = shift;
         $SIG{$sig} = 'IGNORE';
-        $self->log( -1, 'Daemon stopped by '.$sig );
+        $self->_log( 'Daemon stopped by '.$sig, 3 );
         exit;
     };
     
@@ -209,13 +210,6 @@ sub _stayAlive {
 }
 
 
-sub log {
-    my $self = shift;
-
-    return $self->{'logger'}->log( @_ );
-}
-
-
 sub _bind {
     my $self = shift;
 
@@ -223,26 +217,26 @@ sub _bind {
 
 
     $SIG{__DIE__} = sub {
-        $self->log( 0, 'FATAL! Unable to bind SSL port '.$self->{'server'}->{'socketConf'}->{'LocalPort'});
+        $self->_log( 'FATAL! Unable to bind SSL port '.$self->{'server'}->{'socketConf'}->{'LocalPort'}, 0 );
         exit 10;
     };
     $SIG{__DIE__} = undef;
 
-    $self->log( 3, 'Trying to bind to SSL port '.$self->{'server'}->{'socketConf'}->{'LocalPort'}.' using certificate '.$self->{'server'}->{'socketConf'}->{'SSL_cert_file'}.' (key '.$self->{'server'}->{'socketConf'}->{'SSL_key_file'}.')' );
+    $self->_log( 'Trying to bind to SSL port '.$self->{'server'}->{'socketConf'}->{'LocalPort'}.' using certificate '.$self->{'server'}->{'socketConf'}->{'SSL_cert_file'}.' (key '.$self->{'server'}->{'socketConf'}->{'SSL_key_file'}.')', 3 );
 
-    $self->log( 3, 'CA certificate '.$self->{'server'}->{'socketConf'}->{'SSL_ca_file'} ) if $self->{'server'}->{'socketConf'}->{'SSL_ca_file'};
+    $self->_log( 'CA certificate '.$self->{'server'}->{'socketConf'}->{'SSL_ca_file'}, 3 ) if $self->{'server'}->{'socketConf'}->{'SSL_ca_file'};
 
     eval {
         require HTTP::Daemon::SSL;
-        $self->log( 3, 'use HTTP::Daemon::SSL module' );
+        $self->_log( 'use HTTP::Daemon::SSL module', 5 );
 
         $self->{'server'}->{'socket'} = HTTP::Daemon::SSL->new( %{$self->{'server'}->{'socketConf'}} ) || die 'Unable to create HTTP::Daemon'."\n" ;
     } or eval {
         require ObmSatellite::Server::Daemon::SSL;
-        $self->log( 3, 'Use ObmSatellite::Server::Daemon::SSL module' );
+        $self->_log( 'Use ObmSatellite::Server::Daemon::SSL module', 5 );
 
         $self->{'server'}->{'socket'} = ObmSatellite::Server::Daemon::SSL->new( %{$self->{'server'}->{'socketConf'}} ) || die 'Unable to create HTTP::Daemon'."\n" ;
-    } or ( $self->log( 0, 'Unable to load perl module HTTP::Daemon::SSL or ObmSatellite::Server::Daemon::SSL' ) && exit 10 );
+    } or ( $self->_log( 'Unable to load perl module HTTP::Daemon::SSL or ObmSatellite::Server::Daemon::SSL', 0 ) && exit 10 );
 
 
     $SIG{__DIE__} = $oldSigDie;
@@ -253,7 +247,7 @@ sub _writePidFile {
     my $self = shift;
 
     if( $self->check_pid_file() ) {
-        $self->log( 3, 'Writting PID file \''.$self->{'server'}->{'pid_file'}.'\'' );
+        $self->_log( 'Writting PID file \''.$self->{'server'}->{'pid_file'}.'\'', 4 );
         open( PID_FILE, '>'.$self->{'server'}->{'pid_file'} ) or ( print 'Can\'t write PID file\''.$self->{'server'}->{'pid_file'}.'\'' && exit 1 );
         print PID_FILE $$;
         close( PID_FILE );
@@ -274,7 +268,7 @@ sub check_pid_file {
 
     ### get the currently listed pid
     if( ! open(_PID, $pid_file) ){
-        $self->log( 0, 'Couldn\'t open existant PID file '.$pid_file.' ['.$!.']' );
+        $self->_log( 'Couldn\'t open existant PID file '.$pid_file.' ['.$!.']', 3 );
         print 'Couldn\'t open existant PID file '.$pid_file.' ['.$!.']'."\n";
         exit 2;
     }
@@ -284,7 +278,7 @@ sub check_pid_file {
     if( $_current_pid =~ /^(\d{1,10})/ ) {
         $current_pid = $1;
     }else {
-        $self->log( 0, 'Couldn\'t find pid existing PID file ('.$pid_file.')' );
+        $self->_log( 'Couldn\'t find pid existing PID file ('.$pid_file.')', 2 );
         print 'Couldn\'t find pid existing PID file ('.$pid_file.')'."\n";
         exit 2;
     }
@@ -303,19 +297,19 @@ sub check_pid_file {
     ### running process exists, ouch
     if( $exists ) {
         if( $current_pid == $$ ){
-            $self->log( 0, 'PID file (PID: '.$current_pid.') created by this same process. Doing nothing' );
+            $self->_log( 'PID file (PID: '.$current_pid.') created by this same process. Doing nothing', 2 );
             return 1;
         }else{
-            $self->log( 0, 'PID file (PID: '.$current_pid.') already exists for running process...  aborting' );
+            $self->_log( 'PID file (PID: '.$current_pid.') already exists for running process...  aborting', 0 );
             print 'PID file (PID: '.$current_pid.') already exists for running process...  aborting'."\n";
             exit 2;
         }
     
     ### remove the pid_file
     }else{
-        $self->log( 0, 'PID file already exists ('.$pid_file.'). Overwriting!' );
+        $self->_log( 'PID file already exists ('.$pid_file.'). Overwriting!', 2 );
         if( !unlink $pid_file ) {
-            $self->log( 0, 'Couldn\'t remove PID file \''.$pid_file.'\' ['.$!.']' );
+            $self->_log( 'Couldn\'t remove PID file \''.$pid_file.'\' ['.$!.']', 0 );
             print 'Couldn\'t remove PID file \''.$pid_file.'\' ['.$!.']'."\n";
             exit 1;
         }

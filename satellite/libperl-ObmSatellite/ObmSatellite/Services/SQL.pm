@@ -4,14 +4,16 @@ $VERSION = "1.0";
 
 $debug = 1;
 
+use Class::Singleton;
+use ObmSatellite::Log::log;
+@ISA = qw(Class::Singleton ObmSatellite::Log::log);
+
 use 5.006_001;
 require Exporter;
 use strict;
 
-use base qw( Class::Singleton );
 require DBI;
 require Config::IniFiles;
-require ObmSatellite::Log::log;
 
 use constant OBM_CONF => '/etc/obm/obm_conf.ini';
 
@@ -51,14 +53,6 @@ sub _new_instance {
 }
 
 
-sub log {
-    my $self = shift;
-
-    my $log = ObmSatellite::Log::log->instance();
-    return $log->log( @_ );
-}
-
-
 sub _getDriver {
     my $self = shift;
 
@@ -66,7 +60,7 @@ sub _getDriver {
         if( $self->{'dbType'} eq 'mysql' ) {
             my $moduleInstalled = eval { require DBD::mysql; };
             if( !defined($moduleInstalled) ) {
-                $self->log( 0, 'module DBD::mysql not installed, DB connection fail' );
+                $self->_log( 'module DBD::mysql not installed, DB connection fail', 1 );
                 return 1;
             }
 
@@ -77,7 +71,7 @@ sub _getDriver {
         if( $self->{'dbType'} eq 'pgsql' ) {
             my $moduleInstalled = eval { require DBD::Pg; };
             if( !defined($moduleInstalled) ) {
-                $self->log( 0, 'module DBD::Pg not installed, DB connection fail' );
+                $self->_log( 'module DBD::Pg not installed, DB connection fail', 1 );
                 return 1;
             }
 
@@ -85,7 +79,7 @@ sub _getDriver {
             last SWITCH;
         }
 
-        $self->log( 1, 'unknow DBD driver for database '.$self->{'dbType'} );
+        $self->_log( 'unknow DBD driver for database '.$self->{'dbType'}, 1 );
         return 1;
     }
 
@@ -121,45 +115,45 @@ sub execQuery {
 
 
     if( !defined($query) ) {
-        $self->log( 3, 'SQL request undefined !' );
+        $self->_log( 'SQL request undefined !', 4 );
 
         $$sth = undef;
         return undef;
     }
 
     if( $self->_dbConnect() ) {
-        $self->log( 0, 'DB connection fail' );
+        $self->_log( 'DB connection fail', 1 );
 
         $$sth = undef;
         return undef;
     }
 
-    $self->log( 3, 'request : \''.$query.'\'' );
+    $self->_log( 'request : \''.$query.'\'', 4 );
 
     my $dbHandler = $self->{'dbHandler'};
     $$sth = $dbHandler->prepare( $query );
     my $rv = $$sth->execute();
 
     if( !defined($rv) ) {
-        $self->log( 0, 'failed on SQL request \''.$query.'\'' );
+        $self->_log( 'failed on SQL request \''.$query.'\'', 0 );
         if( defined($$sth) ) {
-            $self->log( 0, $$sth->err().' - '.$$sth->errstr() );
+            $self->_log( $$sth->err().' - '.$$sth->errstr(), 0 );
         }
         return undef;
     }
 
     if( defined($$sth->{NUM_OF_FIELDS}) ) {
         # SELECT SQL request
-        $self->log( 4, '\'SELECT\' request, unknow amount SQL records are selected' );
+        $self->_log( '\'SELECT\' request, unknow amount SQL records are selected', 4 );
         return 0;
     }
 
     if( $rv == -1 ) {
-        $self->log( 4, 'amount SQL records process undefined' );
+        $self->_log( 'amount SQL records process undefined', 4 );
         return 0;
     }
 
-    $self->log( 4, $rv.' SQL records were processed' );
+    $self->_log( $rv.' SQL records were processed', 4 );
 
     return $rv;
 }
@@ -170,7 +164,7 @@ sub quote {
     my( $string ) = @_;
 
     if( $self->_dbConnect() ) {
-        $self->log( 3, 'DB connection fail' );
+        $self->_log( 'DB connection fail', 4 );
 
         return undef;
     }
@@ -178,7 +172,7 @@ sub quote {
     my $dbHandler = $self->{'dbHandler'};
     my $quotedString = $dbHandler->quote($string);
 
-    $self->log( 4, 'string process by DBD : '.$quotedString );
+    $self->_log( 'string process by DBD : '.$quotedString, 4 );
 
     return $quotedString
 }
@@ -189,21 +183,20 @@ sub _dbConnect {
     my $dbHandler = $self->{'dbHandler'};
 
     if( defined($dbHandler) && $dbHandler->ping() ) {
-        $self->log( 4, 'DB already connected' );
+        $self->_log( 'DB already connected', 4 );
         return 0;
     }
 
     if( !defined($self->{'dbDriver'}) && $self->_getDriver() ) {
-        $self->log( 3, 'DBD driver fail, DB connection fail' );
+        $self->_log( 'DBD driver fail, DB connection fail', 1 );
         return 0;
     }
 
-    $self->log( 1, 'connexion a la DB \''.$self->{'dbName'}.'\', en tant que \''.$self->{'dbUser'}.'\'' );
-    $self->log( 1, 'connect DB \''.$self->{'dbName'}.'\', as \''.$self->{'dbUser'}.'\'' );
+    $self->_log( 'connect DB \''.$self->{'dbName'}.'\', as \''.$self->{'dbUser'}.'\'', 4 );
     $dbHandler = DBI->connect( 'dbi:'.$self->{'dbDriver'}.':database='.$self->{'dbName'}.';host='.$self->{'dbHost'}, $self->{'dbUser'}, $self->{'dbPassword'} );
 
     if( !$dbHandler ) {
-        $self->log( 0, 'Failed to connect DB \''.$self->{'dbName'}.'\', as \''.$self->{'dbUser'}.'\'' );
+        $self->_log( 'Failed to connect DB \''.$self->{'dbName'}.'\', as \''.$self->{'dbUser'}.'\'', 1 );
         return 1;
     }
 
@@ -221,11 +214,11 @@ sub _dbDisconnect {
 
     if( defined($dbHandler) && $dbHandler->ping() ) {
         if( !$dbHandler->{'AutoCommit'} ) {
-            $self->log( 2, 'auto-commit disable, rollback any pending request' );
+            $self->_log( 'auto-commit disable, rollback any pending request', 4 );
             $dbHandler->rollback();
         }
 
-        $self->log( 1, 'disconnect DB' );
+        $self->_log( 'disconnect DB', 3 );
         $dbHandler->disconnect();
     }
 

@@ -139,7 +139,7 @@ sub _userImapService {
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 0, 'Failed on get imap service for user '.$datas->{'id'}.' SQL query' );
+        $self->_log( 'Failed on get imap service for user '.$datas->{'id'}.' SQL query', 1 );
         return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Failed on get imap service for user '.$datas->{'id'}.' SQL query' );
     }
 
@@ -186,7 +186,7 @@ sub _mailshareImapService {
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 0, 'Failed on get imap service for user '.$datas->{'id'}.' SQL query' );
+        $self->_log( 'Failed on get imap service for user '.$datas->{'id'}.' SQL query', 1 );
         return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Failed on get imap service for user '.$datas->{'id'}.' SQL query' );
     }
 
@@ -237,7 +237,7 @@ sub _obmSyncService {
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->log( 0, 'Failed on get sync service for user '.$datas->{'id'}.' SQL query' );
+        $self->_log( 'Failed on get sync service for user '.$datas->{'id'}.' SQL query', 1 );
         return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Failed on get sync service for user '.$datas->{'id'}.' SQL query' );
     }
 
