@@ -83,6 +83,7 @@
   <copyField source="firstname" dest="dsf"/>
   <copyField source="aka" dest="dsf"/>
   <copyField source="email" dest="dsf"/>
+  <copyField source="company" dest="dsf"/>
 
   <copyField source="street" dest="address"/>
   <copyField source="town" dest="address"/>
