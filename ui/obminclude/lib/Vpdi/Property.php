@@ -1,6 +1,31 @@
 <?php
+/*
+ +-------------------------------------------------------------------------+
+ |  Copyright (c) 1997-2010 OBM.org project members team                   |
+ |                                                                         |
+ | This program is free software; you can redistribute it and/or           |
+ | modify it under the terms of the GNU General Public License             |
+ | as published by the Free Software Foundation; version 2                 |
+ | of the License.                                                         |
+ |                                                                         |
+ | This program is distributed in the hope that it will be useful,         |
+ | but WITHOUT ANY WARRANTY; without even the implied warranty of          |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           |
+ | GNU General Public License for more details.                            |
+ +-------------------------------------------------------------------------+
+ | http://www.obm.org                                                      |
+ +-------------------------------------------------------------------------+
+*/
 
-class Vpdi_Field {
+/**
+ * Base class for RFC2425 entity properties
+ * 
+ * @package Vpdi
+ * @version $Id:$
+ * @author Raphaël Rougeron <raphael.rougeron@gmail.com> 
+ * @license GPL 2.0
+ */
+class Vpdi_Property {
   
   private $group;
   
@@ -12,8 +37,8 @@ class Vpdi_Field {
   
   public static function decode($line) {
     $parts = Vpdi::decodeLine($line);
-    return new Vpdi_Field($parts['name'], $parts['value'], 
-                          $parts['params'], $parts['group']);
+    return new Vpdi_Property($parts['name'], $parts['value'], 
+                             $parts['params'], $parts['group']);
   }
   
   public function __construct($name, $value, $params = array(), $group = null) {
@@ -33,6 +58,9 @@ class Vpdi_Field {
     foreach ($this->params as $name => $values) {
       if (!is_array($values)) {
         $values = array($values);
+      }
+      if (count($values) === 0) {
+        continue;
       }
       if (strtoupper($name) == 'TYPE' && Vpdi::getConfig('type_values_as_a_parameter_list') == true) {
         $list = array();

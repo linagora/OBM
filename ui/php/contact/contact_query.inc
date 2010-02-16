@@ -1123,9 +1123,10 @@ function run_query_contact_check($cid, $comp_id, $lastname, $firstname) {
 function run_query_vcard_insert($params, $addressbook) {
   $file_content = file_get_contents($params['vcard_tmp']);
   try {
-    $vcards = Vpdi::decode($file_content, 'VCARD');
+    $vcards = Vpdi::decode($file_content, Vpdi::VCARD);
   } catch (Exception $e) {
-    return false;  }
+    return false;
+  }
   $ids = array();
   foreach ($vcards as $vcard) {
     $contact = OBM_Contact::import($vcard);

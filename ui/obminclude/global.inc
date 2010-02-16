@@ -421,6 +421,12 @@ require_once("$obminclude/of/of_date.inc");
 require_once("$obminclude/of/of_template.php");
 require_once("$obminclude/of/of_i18n.php");
 
+// Autoloading
+function __autoload($className) {
+    global $obminclude;
+    require "$obminclude/lib/".str_replace('_', '/', $className).'.php';
+}
+
 // Document root
 if (is_null($ini_array['documentRoot'])) {
     $cdocument_root = "/var/lib/obm/documents";

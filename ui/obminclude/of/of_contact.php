@@ -1,9 +1,5 @@
 <?php
 
-require_once 'vpdi/vpdi.php';
-require_once 'vpdi/field.php';
-require_once 'vpdi/entity.php';
-require_once 'vpdi/vcard.php';
 require_once 'obminclude/of/of_search.php';
 
 class OBM_Contact implements OBM_ISearchable {
@@ -356,8 +352,10 @@ class OBM_Contact implements OBM_ISearchable {
     }
     $date_fields = array('date','birthday','anniversary');
     foreach($date_fields as $field) {
-      $date = of_isodate_convert($data[$field], true);
-      $contact->$field = (!empty($date) ? new Of_Date($date) : null);
+      if (isset($data[$field])) {
+        $date = of_isodate_convert($data[$field], true);
+        $contact->$field = (!empty($date) ? new Of_Date($date) : null);
+      }
     }
     $contact->phone   = is_array($data['phones'])   ? $data['phones']    : array();
     $contact->email   = is_array($data['emails'])   ? $data['emails']    : array();
@@ -453,8 +451,12 @@ class OBM_Contact implements OBM_ISearchable {
 
       // Birthday & Anniversary support
       //FIXME: do it better
-      self::storeAnniversary('birthday', $contact->id, $uid, null, $contact->display_name(), null, $contact->birthday);
-      self::storeAnniversary('anniversary', $contact->id, $uid, null, $contact->display_name(), null, $contact->anniversary);
+      if (!is_null($contact->birthday)) {
+        self::storeAnniversary('birthday', $contact->id, $uid, null, $contact->display_name(), null, $contact->birthday);
+      }
+      if (!is_null($contact->anniversary)) {
+        self::storeAnniversary('anniversary', $contact->id, $uid, null, $contact->display_name(), null, $contact->anniversary);
+      }
 
       //FIXME: do it better
       self::storeCoords($contact);
@@ -787,7 +789,7 @@ class OBM_Contact implements OBM_ISearchable {
     if (!empty($anniversary)) {
       $contact['anniversary'] = $anniversary;
     }
-
+    
     if ($vcard->bday !== null) {
       $contact['birthday'] = $vcard->bday->format(Of_date::DATE_ISO);
     }
@@ -804,34 +806,41 @@ class OBM_Contact implements OBM_ISearchable {
       );
     }
     foreach ($vcard->phones as $ph) {
-      $location = $ph->location[0];
-      if (empty($location)) $location = "OTHER";
+      $labels = array_map('strtoupper', array_merge($ph->location, $ph->capability));
       $contact['phones'][] = array(
         'number' => addslashes($ph->value),
-        'label' => strtoupper($location)
+        'label' => implode(';', $labels)
       );
     }
     foreach ($vcard->emails as $em) {
-      $location = $em->location[0];
-      if (empty($location)) $location = "OTHER";
+      $labels = array_map('strtoupper', array_merge($em->location, array($em->format)));
       $contact['emails'][] = array(
-        'address' => $em->value,
-        'label' => strtoupper($location)
+        'address' => addslashes($em->value),
+        'label' => implode(';', $labels)
       );
     }
-    foreach ($vcard->getFieldsByName('IMPP') as $im) {
-      $protocol = $im->getParam('TYPE');
-      if (empty($protocol)) $protocol = "OTHER";
+    foreach ($vcard->impps as $im) {
+      $url = $im->value;
+      if (strpos($url, ':') !== false) {
+        list($protocol, $address) = explode(':', $url);
+      } else {
+        $protocol = 'im';
+        $address = $url;
+      }
       $contact['ims'][] = array(
-        'protocol' => $protocol,
-        'address' => addslashes($im->value())
+        'protocol' => strtoupper($protocol),
+        'address' => addslashes($address)
       );
     }
-    foreach ($vcard->getFieldsByName('URL') as $www) {
-      $label = $www->getParam('TYPE');
-      if (empty($label)) $label = "OTHER";
+    foreach ($vcard->getPropertiesByName('URL') as $www) {
       $contact['websites'][] = array(
-        'label' => $label,
+        'label' => 'URL',
+        'url' => $www->value()
+      );
+    }
+    foreach ($vcard->getPropertiesByName('X-OBM-BLOG') as $www) {
+      $contact['websites'][] = array(
+        'label' => 'BLOG',
         'url' => $www->value()
       );
     }
@@ -839,58 +848,58 @@ class OBM_Contact implements OBM_ISearchable {
   }
   
   public function toVcard() {
-    $name = new Vpdi_VCard_Name();
+    $name = new Vpdi_Vcard_Name();
     $name->family = $this->lastname;
     $name->given  = $this->firstname;
     if (!empty($this->kind)) {
       $name->prefixes = $this->kind;
     }
     
-    $card = new Vpdi_VCard();
+    $card = new Vpdi_Vcard();
     $card->setName($name);
-    $card->addField(new Vpdi_Field('x-obm-uid', $this->id));
+    $card->addProperty(new Vpdi_Property('x-obm-uid', $this->id));
     
-    $simpleFields = array('function' => 'role', 'title' => 'title');
-    foreach ($simpleFields as $db => $v) {
+    $simpleProps = array('function' => 'role', 'title' => 'title');
+    foreach ($simpleProps as $db => $v) {
       if (!empty($this->$db)) {
-        $card->addField(new Vpdi_Field($v, $this->$db));
+        $card->addProperty(new Vpdi_Property($v, $this->$db));
       }
     }
 
-    // x-obm-* (OBM specific fields)
-    $obmSpecificFields = array('mname','company_id','company','market_id','suffix',
+    // x-obm-* (OBM specific properties)
+    $obmSpecificProps = array('mname','company_id','company','market_id','suffix',
       'aka','sound','manager','assistant','spouse','category','service',
       'mailok','newsletter', 'comment');
-    foreach ($obmSpecificFields as $field) {
-      if (!empty($this->$field)) {
-        $card->addField(new Vpdi_Field("x-obm-{$field}", str_replace("\r\n", "\n ", (trim($this->$field)))));        
+    foreach ($obmSpecificProps as $prop) {
+      if (!empty($this->$prop)) {
+        $card->addProperty(new Vpdi_Property("x-obm-{$prop}", str_replace("\r\n", "\n ", (trim($this->$prop)))));        
       }
     }
     if (!empty($this->date)) {
-      $card->addField(new Vpdi_Field('x-obm-date', $this->date->get(Of_date::DATE_ISO)));
+      $card->addProperty(new Vpdi_Property('x-obm-date', $this->date->get(Of_date::DATE_ISO)));
     }
     if (!empty($this->anniversary)) {
-      $card->addField(new Vpdi_Field('x-obm-anniversary', $this->anniversary->get(Of_date::DATE_ISO)));
+      $card->addProperty(new Vpdi_Property('x-obm-anniversary', $this->anniversary->get(Of_date::DATE_ISO)));
     }
 
-    //$card->addField(new Vpdi_Field('org', $this->company));
+    //$card->addProperty(new Vpdi_Property('org', $this->company));
     
     if (!empty($this->birthday)) {
-      $card->addField(new Vpdi_Field('bday', $this->birthday->get(Of_date::DATE_ISO)));
+      $card->addProperty(new Vpdi_Property('bday', $this->birthday->get(Of_date::DATE_ISO)));
     }
 
     foreach ($this->phone as $phone) {
-      $ph = new Vpdi_VCard_Phone($phone['number']);
+      $ph = new Vpdi_Vcard_Phone($phone['number']);
       $ph->location = $phone['label'];
       $card->addPhone($ph);
     }
     foreach ($this->email as $email) {
-      $em = new Vpdi_VCard_Email($email['address']);
+      $em = new Vpdi_Vcard_Email($email['address']);
       $em->location = $email['label'];
       $card->addEmail($em);
     }
     foreach ($this->address as $address) {
-      $ad = new Vpdi_VCard_Address();
+      $ad = new Vpdi_Vcard_Address();
       $ad->location = $address['label'];
       $ad->street = str_replace("\r", "\n", str_replace("\r\n", "\n", (trim($address['street']))));
       $ad->postalcode = $address['zipcode'];
@@ -899,11 +908,15 @@ class OBM_Contact implements OBM_ISearchable {
       $ad->country = $address['country'];
       $card->addAddress($ad);
     }
-    foreach ($this->im as $im) {
-      $card->addField(new Vpdi_Field('IMPP', $im['address'], array('TYPE' => $im['protocol'])));
+    foreach ($this->im as $impp) {
+      $card->addImpp(new Vpdi_Vcard_Impp(strtolower($impp['protocol']).':'.$impp['address']));
     }
     foreach ($this->website as $www) {
-      $card->addField(new Vpdi_Field('URL', $www['url'], array('TYPE' => $www['label'])));
+      if (in_array('URL', $www['label'])) {
+        $card->addProperty(new Vpdi_Property('url', $www['url']));
+      } elseif (in_array('BLOG', $www['label'])) {
+        $card->addProperty(new Vpdi_Property('x-obm-blog', $www['url']));
+      }
     }
     
     return $card;
