@@ -808,7 +808,7 @@ function dis_user_mail_field($domain_id, $values, $class) {
           $sel_alias .= "<option value='$alias'>$alias</option>";
         } 
       }
-      $sel_alias = "<select name='sel_aliases[]'>
+      $sel_alias = "<select name='attributes[aliases][]'>
         <option value=''>$GLOBALS[l_all_aliases]</option>
         $sel_alias
         </select>";
@@ -828,7 +828,7 @@ function dis_user_mail_field($domain_id, $values, $class) {
     $sel_js .= "aliasSelectTemplate.adopt(new Element('option').setProperty('value','$alias').appendText('$alias'));\n";
   }
   $sel_alias = "
-    <select name=\"sel_aliases[]\">
+    <select name=\"attributes[aliases][]\">
     <option value=\"\">$GLOBALS[l_all_aliases]</option>
     $sel_alias
     </select>";

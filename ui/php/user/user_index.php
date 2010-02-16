@@ -125,7 +125,6 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $extra_js_include[] = 'user.js';
   $display['detail'] = dis_user_consult($params);
 
 } elseif ($action == 'wait') {
@@ -135,7 +134,6 @@ if ($action == 'ext_get_ids') {
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_update_rights($params)) {
-    $extra_js_include[] = 'user.js';
     $display['detail'] = dis_user_form($action, $params);
   } else {
     $display['msg'] .= display_warn_msg($err['msg']);
@@ -144,7 +142,6 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  $extra_js_include[] = 'user.js';
   if (check_user_defined_rules() && check_user_data_form('', $params)) {
 
     // If the context (same user) was confirmed ok, we proceed
@@ -196,7 +193,6 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  $extra_js_include[] = 'user.js';
   if (check_user_defined_rules() && check_user_data_form($params['user_id'], $params)) {
     $retour = run_query_user_update($params['user_id'], $params);
     if ($retour) {
@@ -388,6 +384,7 @@ of_category_user_action_switch($module, $action, $params);
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
+$extra_js_include[] = 'user.js';
 $display['head'] = display_head($l_user);
 if (! $params['popup']) {
   update_user_action();

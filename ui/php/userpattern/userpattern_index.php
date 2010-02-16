@@ -189,6 +189,14 @@ function get_userpattern_params() {
   if (is_array($params['attributes']))
     array_walk_recursive($params['attributes'],create_function('&$value,$key','$value=stripslashes($value);'));
 
+  if (is_array($params['attributes']['aliases'])) {
+    foreach ($params['attributes']['aliases'] as $i => $alias) {
+      if (!empty($alias)) {
+        $params['attributes']['email'][$i] .= "@$alias";
+      }
+    }
+  }
+
   return $params;
 }
 

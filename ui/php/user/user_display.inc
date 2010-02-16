@@ -1859,7 +1859,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table id=\"userExternalMail\" class='$externalKlass'>
     <tr>
       <th class=\"$class[email]\">$l_email</th>
-      <td><input type=\"text\" name=\"ta_email\" $externalEnabled value=\"".((!$mail_state)?$email:'')."\" /></td>
+      <td><input type=\"text\" id=\"externalEmailField\" name=\"ta_email\" $externalEnabled value=\"".((!$mail_state)?$email:'')."\" /></td>
     </tr>  
   </table>
   <script type='text/javascript'>
@@ -1880,7 +1880,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     <table>    
     <tr>
       <th class=\"$class[email]\">$l_email</th>
-      <td><input type=\"text\" name=\"ta_email\" value=\"$email\" /></td>
+      <td><input type=\"text\" id=\"externalEmailField\" name=\"ta_email\" value=\"$email\" /></td>
     </tr>
     </table>
     </fieldset>";
@@ -2249,10 +2249,13 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     </div>
     ";
     $js_userpattern = "<script type='text/javascript'>
-      theUserForm = new Obm.UserPattern.Form({});
+    obm.initialize.chain(function () {
+      Obm.vars.consts.userPatternUrl = '$path/userpattern/userpattern_index.php';
+      theUserForm = new Obm.UserPattern.Form({ url: Obm.vars.consts.userPatternUrl, delay: 400 });
       $('userpattern_id').addEvent('change' , function () {
         theUserForm.setPattern(this.value);
-      })          
+      });
+    })
     </script>
     ";
   }

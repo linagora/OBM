@@ -650,6 +650,10 @@ class UserPattern {
       if (!isset($params[$attr]))
         $this->generate($params, $attr);
     }
+
+    if ($params['mail_perms']) {
+      $params['email'] = explode("\r\n",$params['email']);
+    }
   }
 
   /**
@@ -692,8 +696,6 @@ class UserPattern {
           }
         }
         $replacement[$i] = isset($generated[$keyword]) ? $generated[$keyword] : '';
-        $search[] = "\r"; $replacement[] = '';
-        $search[] = "\n"; $replacement[] = '';
       }
       $generated[$attribute] = str_replace($search,$replacement,$pattern);
     } else {
