@@ -1867,7 +1867,11 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       }
       break;
     case 'hour' :
-      $day = ($all_day) || ($end->compareDateIso($date)!=0 && ($end->getHour()>0 || $end->getMinute()>0 || $end->getSecond()>0));
+      $cend = clone $end;
+      if ($cend->getHour()==0 || $cend->getMinute()==0 || $cend->getSecond()==0) {
+        $cend->subSecond(1);
+      }
+      $day = ($all_day) || ($cend->compareDateIso($date)!=0);
       if ($updatable) {
         $options[] = 'draggable:true';
         $options[] = 'resizable:true';
@@ -1899,13 +1903,9 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $opt = '{'.implode(',',$options).'}';
   $event_data =  '{'.implode(',',$ed).'}';
   if ($day) {
-    $display_events = "
-        obm.calendarManager.newDayEvent($event_data,$opt);
-";
+    $display_events = "obm.calendarManager.newDayEvent($event_data,$opt);";
   } else {
-    $display_events = "
-        obm.calendarManager.newEvent($event_data,$opt);
-";
+    $display_events = "obm.calendarManager.newEvent($event_data,$opt);";
   }
 
   return $display_events;
