@@ -81,7 +81,7 @@ Obm.CalendarManager = new Class({
       if (evt.size == 0) evt.size = 1; // very, very crappy fix 
       if (!evt.event.all_day) {
         var beginDay = new Obm.DateTime(evt.event.time*1000);
-        var endDay = new Obm.DateTime((evt.event.time+evt.event.duration-1)*1000); // -1 => event end at midnight
+        var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
         beginDay.setHours(0);
         beginDay.setMinutes(0);
         beginDay.setSeconds(0);
