@@ -4865,6 +4865,14 @@ function dis_calendar_free_interval($current_view, $calendar) {
   if (!is_array($entity_store['resourcegroup'])) $entity_store['resourcegroup'] = array();
   $resources = array_merge($entity_store['resource'], $entity_store['resourcegroup']);
   $contacts = $calendar['contact_id'];
+  $contacts_fb = array();
+
+  if (is_array($contacts)) {
+    foreach($contacts as $contact_id) {
+      $contact = OBM_Contact::get($contact_id);
+      $contacts_fb[$contact_id] = $contact->getCalendar();
+    }
+  }
 
   // Days headers 
   $current = clone $date;
@@ -4922,14 +4930,18 @@ function dis_calendar_free_interval($current_view, $calendar) {
         }
       }
 
-      // TODO: Freebusy URL
-      if (is_array($contacts)) {
-        foreach($contacts as $contact) {
-          if (true) {
-            $c[$contact] .= "<td class='timeSlotNoCalendar'></td>";
-          }  else {
-            $c[$contact] .= "<td class='timeSlotNoCalendar'></td>";
+      foreach($contacts_fb as $contact => $cal) {
+        if ($cal) {
+          $busy = $cal->getBusyPeriodsWithinInterval($d, $e);
+          if (sizeof($busy) > 0) {
+            array_push($busy_time_slots, $slots);
+            $td_id = "contact_".$contact."_".$d->getTimestamp();
+            $c[$contact] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
+          } else {
+            $c[$contact] .= "<td class='timeSlot'></td>";
           }
+        }  else {
+          $c[$contact] .= "<td class='timeSlotNoCalendar'></td>";
         }
       }
 
@@ -4975,8 +4987,8 @@ function dis_calendar_free_interval($current_view, $calendar) {
     }
   }
 
-  if (is_array($contacts)) {
-    foreach($contacts as $contact) {
+  if (is_array($contacts_fb)) {
+    foreach($contacts_fb as $contact => $cal) {
       $cinfo = get_entity_info($contact, 'contact');
       $form_entities .=  "<input type='hidden' name='new_contact_id[]' value='$contact' />";
       $attendees .= "<div class='elementRow'>

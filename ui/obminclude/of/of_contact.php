@@ -1547,4 +1547,19 @@ class OBM_Contact implements OBM_ISearchable {
     return $obm_q->f('country_iso3166');
   }
 
+
+  public function getCalendar() {
+    if (is_array($this->website)) {
+      foreach($this->website as $website) {
+        if ($website['label'][0] == 'ICAL') {
+          $handle = fopen($website['url'], "r");
+          $d = stream_get_contents($handle);
+          $cal = Vpdi::decodeOne($d);
+          fclose($handle);
+          return $cal;
+        }
+      }
+    }
+    return false;
+  }
 }
