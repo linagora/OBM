@@ -50,9 +50,10 @@ sub _postMethod {
     $datas{'requestUri'} = $requestUri;
 
     if( $requestUri !~ /^\/cyruspartition\/([^\/]+)(.*)$/ ) {
-        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$requestUri ] } );
-        $return->[1]->{'help'} = [ $self->getModuleName().' URI must be : /cyruspartition/<entity>' ];
-        return $return;
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid URI '.$requestUri ],
+            help => [ $self->getModuleName().' URI must be : /cyruspartition/<entity>' ]
+            } );
     }
 
     $datas{'entity'} = $1;
@@ -73,11 +74,10 @@ sub _hostEntity {
 
     my $regexp = '^\/cyruspartition\/'.$datas->{'entity'}.'\/([^\/]+)(.*)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_response( RC_BAD_REQUEST, {
+        return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Invalid URI '.$datas->{'requestUri'} ],
             help => [ $self->getModuleName().' URI must be : /cyruspartition/'.$datas->{'entity'}.'/<operation>'."\n".'[add|del]' ]
             } );
-        return $return;
     }
 
     $datas->{'operation'} = $1;
@@ -102,25 +102,22 @@ sub _addPartition {
 
     my $regexp = '^\/cyruspartition\/'.$datas->{'entity'}.'\/'.$datas->{'operation'}.'\/([^\/]+)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_response( RC_BAD_REQUEST, {
+        return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Invalid URI '.$datas->{'requestUri'} ],
             help => [
                 $self->getModuleName().' URI must be : /cyruspartition/'.$datas->{'entity'}.'/'.$datas->{'operation'}.'/<hostName>'
                 ."\n".'<hostName> : OBM host name with imap role'
             ]
             } );
-        return $return;
     }
 
     $datas->{'hostname'} = $1;
 
     my $domainList = $self->_getHostDomains( 'imapHost', $datas->{'hostname'} );
     if( !defined($domainList) ) {
-        my $return = $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' ] } );
-        return $return;
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' ] } );
     }elsif( $#{$domainList} < 0 ) {
-        my $return = $self->_response( RC_NOT_FOUND, { content => [ 'No domain linked to host '.$datas->{'hostname'}.' as IMAP service' ] } );
-        return $return;
+        return $self->_response( RC_NOT_FOUND, { content => [ 'No domain linked to host '.$datas->{'hostname'}.' as IMAP service' ] } );
     }
 
     return $self->_updateImapdConf($datas->{'hostname'}, $domainList);
@@ -133,20 +130,18 @@ sub _delPartition {
 
     my $regexp = '^\/cyruspartition\/'.$datas->{'entity'}.'\/'.$datas->{'operation'}.'\/([^\/]+)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_response( RC_BAD_REQUEST, {
+        return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Invalid URI '.$datas->{'requestUri'} ],
             help => $self->getModuleName().' URI must be : /cyruspartition/'.$datas->{'entity'}.'/'.$datas->{'operation'}.'/<hostName>'
             ."\n".'<hostName> : OBM host name with imap role'
             } );
-        return $return;
     }
 
     $datas->{'hostname'} = $1;
 
     my $domainList = $self->_getHostDomains( 'imapHost', $datas->{'hostname'} );
     if( !defined($domainList) ) {
-        my $return = $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' ] } );
-        return $return;
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' ] } );
     }
 
     return $self->_updateImapdConf($datas->{'hostname'}, $domainList);
@@ -250,8 +245,10 @@ sub _updateImapdConf {
     close(FIC);
 
     my $return = $self->_restartCyrusService();
-    push( @{$return->[1]->{'status'}}, $self->{'imapdConfFile'}.' Cyrus configuration file update successfully on host '.$hostname );
-    push( @{$return->[1]->{'domain'}}, @{$domainList} );
+    $return->setExtraContent( {
+        info => [ $self->{'imapdConfFile'}.' Cyrus configuration file update successfully on host '.$hostname ],
+        domain => @{$domainList}
+    } );
     return $return;
 }
 
