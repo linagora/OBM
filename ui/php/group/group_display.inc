@@ -35,6 +35,11 @@ if($perm->check_right('group', $cright_read)) {
   $fieldnames['group_user_function'] = $l_function;
   $fieldnames['group_user_phone'] = $l_phone;
   $fieldnames['group_user_email'] = $l_email;
+  $fieldnames['group_contact_lastname'] = $l_lastname;
+  $fieldnames['group_contact_firstname'] = $l_firstname;
+  $fieldnames['group_contact_function'] = $l_function;
+  $fieldnames['group_contact_phone'] = $l_phone;
+  $fieldnames['group_contact_email'] = $l_email;  
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -138,6 +143,24 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
       $res['txt_name'] = $email;
     }
   }
+
+  // For User member lists
+  elseif (($fieldname == 'group_contact_lastname') && $link_ok) {
+    if(!$OD->data_set->f('group_contact_lastname')) {
+      $res['name'] = $GLOBALS['l_displayname_alternative'];;
+    }
+    $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('group_contact_id');
+  }
+
+  else if ($fieldname == 'group_contact_email') {
+    $email = $OD->data_set->f('group_contact_email');
+    if (strcmp($email ,'') != 0) {
+      $res['url'] = "mailto:$email";
+      $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\">$email";
+      $res['txt_name'] = "$email";
+    }
+    
+  }  
 
   return $res;
 }
@@ -369,7 +392,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
       $dis_group->display_link = false;
       $dis_group->data_cb_text = 'X';
       $dis_group->data_idfield = 'group_id';
-      $dis_group->data_cb_name = 'data-g-';
+      $dis_group->data_cb_name = 'data-group-';
     }
 
     $dis_group->data_form_end = "
@@ -444,7 +467,15 @@ function dis_group_consult($group, $uid) {
       $g_q->set_num_rows_total($count);
     }
 
-    $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q);
+    $prefs_c = get_display_pref($uid, 'group_contact');
+    $c_q = run_query_group_contact($group);
+    if ($ctu_sql_limit) {
+      $count = get_query_count("SELECT count(*) FROM contactgroup WHERE group_id=$g_id");
+      $c_q->set_num_rows_total($count);
+    }
+
+
+    $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, $c_q);
   } else {
     $display['msg'] .= display_err_msg($l_err_reference);
   }
@@ -462,15 +493,16 @@ function dis_group_consult($group, $uid) {
 //   - $prefs_g  : group group preference display
 //   - $g_q      : group database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
+function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, $c_q) {
   global $l_yes, $l_no, $ico_mail, $l_undef, $c_undef;
   global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
   global $l_system, $l_local, $l_ext_id, $l_smb, $l_no,$l_yes;
   global $l_visibility, $l_private, $l_public, $l_manager, $l_gid;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
+  global $l_del_contact_sel;
   global $obm, $display, $module, $action, $cright_write;
-  global $cg_gid_smb_user, $cg_gid_smb_admin;
-  global $cgp_use, $cgp_hide,$l_contacts;
+  global $cg_gid_smb_user, $cg_gid_smb_admin, $path;
+  global $cgp_use, $cgp_hide,$l_contacts, $l_no_contact, $l_contact_member;
 
   $id = $group_q->f('group_id');
   $usercreate = $group_q->f('group_usercreate');
@@ -499,19 +531,12 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   }
 
   $dis_email = get_entity_email($email);
-  $dis_contact = get_entity_email($group_q->f('group_contacts'), null, false);
 
   if ($privacy == 0) {
     $dis_email = "<tr>
       <th>$l_email</th>
       <td>$dis_email</td>
       </tr>";
-
-    $dis_contact = "
-    <div class=\"detail infos\">
-      <h1>$l_contacts</h1>
-      $dis_contact
-    </div>";
 
     if (($cgp_use['service']['samba']) && ($samba_domain)) {
       $samba = ($group_q->f('group_samba') == 1 ? $l_yes : $l_no);
@@ -543,8 +568,11 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   }
 
   //  $block_mg = display_info_msg($message);
-  $block_mg .= "<h1>$message</h1>";
+  $block_mg_head = "<h1>$message</h1>";
 
+  $url_mg = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($GLOBALS['l_add_group'])."&amp;ext_action=group_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=".$id."&amp;ext_target=$l_group&amp;child_res=1";
+  $url_mu = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($GLOBALS['l_add_user'])."&amp;ext_action=user_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=".$id."&amp;ext_target=$l_group";
+  $url_mc = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($GLOBALS['l_add_user'])."&amp;ext_action=user_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=".$id."&amp;ext_target=$l_group";
   if ($nb_g != 0) {
     $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
     
@@ -556,15 +584,28 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     if ($update_group) {
       $dis_infos->data_cb_text = 'X';
       $dis_infos->data_idfield = 'child_id';
-      $dis_infos->data_cb_name = 'data-g-';
+      $dis_infos->data_cb_name = 'data-group-';
       $dis_infos->data_cb_field = '';
-      $block_mg .= "<form method=\"get\" action=\"group_index.php\">";
+      $block_mg .= "
+      <form method='POST' action='group_index.php'>
+        <input  type=\"text\" name=\"group_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_group\" autocomplete=\"off\" />
+        <input type=\"hidden\" name=\"groups_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_groupadd\" autocomplete=\"off\" />
+        <input type='submit' value='$GLOBALS[l_add]' />
+        <a href=\"javascript: return false;\" onclick=\"popup('$url_mg','');return false;\">
+        <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
+        </a>
+        <input name='action' type='hidden' value='group_add' /> 
+        <input name='group_id' type='hidden' value='$id' /> 
+      </form>              
+      <form method=\"get\" action=\"group_index.php\">";
     }
 
     $block_mg .= $dis_infos->display('dis_data_group');
 
     if ($update_group) {
-      $block_mg .= "
+      $js .= "
+        new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_groupadd', 'sel_group', {mode:'mono'});";
+      $block_mg .= "  
       <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_del_group_sel\" /> 
         <input type=\"hidden\" name=\"group_id\" value=\"$id\" /> 
@@ -583,7 +624,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   }
 
   //  $block_mu .= display_info_msg($message);
-  $block_mu .= "<h1>$message</h1>";
+  $block_mu_head = "<h1>$message</h1>";
 
   if ($nb_u != 0) {
 
@@ -595,17 +636,30 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     if ($update_group) {
       $dis_infos->data_cb_text = 'X';
       $dis_infos->data_idfield = 'group_user_id';
-      $dis_infos->data_cb_name = 'data-u-';
+      $dis_infos->data_cb_name = 'data-user-';
       $dis_infos->data_cb_field = '';
       // If the group is the default user group, do not display the checkbox
       $dis_infos->data_cb_show = 'gid_diff';
-      $block_mu .= "<form method=\"get\" action=\"group_index.php\">";
+      $block_mu .= "
+      <form method='POST' action='group_index.php'>
+        <input type=\"text\" name=\"user_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_user\" autocomplete=\"off\" />
+        <input type=\"hidden\" name=\"users_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_useradd\" autocomplete=\"off\" />
+        <input type='submit' value='$GLOBALS[l_add]' />
+        <a href=\"javascript: return false;\" onclick=\"popup('$url_mu','');return false;\">
+        <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
+        </a>  
+        <input name='action' type='hidden' value='user_add' /> 
+        <input name='group_id' type='hidden' value='$id' /> 
+      </form>          
+      <form method=\"get\" action=\"group_index.php\">";
     }
 
     $block_mu .= $dis_infos->display('dis_data_group');
 
     if ($update_group) {
-      $block_mu .= "
+      $js .= "
+        new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_useradd', 'sel_user', {mode:'mono'});";
+      $block_mu .= "      
       <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_del_user_sel\" />
         <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
@@ -614,10 +668,62 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       </form>";
     }
   }
-  
+
+  // registered Contact display
+  $nb_c = $c_q->num_rows_total();
+  if ($nb_c == 0) {
+    $message = $l_no_contact;
+  } else {
+    $message = "$nb_c $l_contact_member";
+  }
+
+  if($privacy == 0) {
+    $block_mc_head = "<h1>$message</h1>";
+
+    if ($nb_c != 0) {
+
+      $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
+      $dis_infos = new OBM_DISPLAY('DATA', $prefs_c, 'group', 'group_contact','group_contact');
+      $dis_infos->data_set = $c_q;
+      $dis_infos->data_url = $url;
+      $dis_infos->data_header = 'both';
+      if ($update_group) {
+        $dis_infos->data_cb_text = 'X';
+        $dis_infos->data_idfield = 'group_contact_id';
+        $dis_infos->data_cb_name = 'data-contact-';
+        $dis_infos->data_cb_field = '';
+        // If the group is the default user group, do not display the checkbox
+        $block_mc .= "
+        <form method='POST' action='group_index.php'>
+          <input type=\"text\" name=\"contact_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_contact\" autocomplete=\"off\" />
+          <input type=\"hidden\" name=\"contacts_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_contactadd\" autocomplete=\"off\" />
+          <input type='submit' value='$GLOBALS[l_add]' />
+          <input name='action' type='hidden' value='contact_add' /> 
+          <input name='group_id' type='hidden' value='$id' /> 
+        </form>          
+        <form method=\"get\" action=\"group_index.php\">";
+      }
+
+      $block_mc .= $dis_infos->display('dis_data_group');
+
+      if ($update_group) {
+        $addressbooks = OBM_Addressbook::search();
+        $addressbook = $addressbooks->getPublicAddressbook();
+        $js .= "
+          new obm.AutoComplete.Search('$path/contact/contact_index.php?addressbook_id=".$addressbook->id."&action=ext_search', 'sel_contactadd', 'sel_contact', {mode:'mono', strict:false});";
+        $block_mc .= "      
+        <div class=\"buttons\">
+          <input type=\"submit\" value=\"$l_del_contact_sel\" />
+          <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
+          <input type=\"hidden\" name=\"action\" value=\"contact_del\" />
+        </div>
+        </form>";
+      }
+    }
+  }
+
   $display['detailInfo'] = display_record_info($group_q);
   $display['title'] = $name;
-
   $block .= "
   <div class=\"detail infos\" style=\"overflow:hidden\">
     <h1>$l_group</h1>
@@ -668,13 +774,23 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     </tr>
     </table>
   </div>
-  $dis_contact
   <div class=\"detail extra\">
+  $block_mg_head
   $block_mg
   </div>
   <div class=\"detail extra\">
+  $block_mu_head
   $block_mu
   </div>
+  <div class=\"detail extra\">
+  $block_mc_head
+  $block_mc
+  </div>
+  <script type=\"text/javascript\">
+      obm.initialize.chain(function () {
+        $js
+      });
+    </script>  
 ";
 
   return $block;
@@ -714,7 +830,6 @@ function html_group_form($action, $group_q, $group, $field='') {
     $samba = $group_q->f('group_samba');
     $desc = $group_q->f('group_desc');
     $email = $group_q->f('group_email');
-    $contact = $group_q->f('group_contacts');
     $priv = $group_q->f('privacy');
     $dis_title = $name;
   } elseif ($action == 'new') {
@@ -731,7 +846,6 @@ function html_group_form($action, $group_q, $group, $field='') {
   if (isset($group['desc'])) { $desc = stripslashes($group['desc']); }
   if (isset($group['email'])) { $email = stripslashes($group['email']); }
   if (isset($group['privacy'])) { $priv = stripslashes($group['privacy']); }
-  if (isset($group['contact'])) { $contact = $group['contact']; }
 
   // Mark the error field
   if ($field != '') {
@@ -764,12 +878,6 @@ function html_group_form($action, $group_q, $group, $field='') {
             add_email_field('groupMailHome', 'tf_email', aliasSelectTemplate); 
             show_hide_add_button();
           }
-          if($('contactEmailGroup')) {
-            $('contactEmailGroup').addClass('H');
-            $('groupContactMailHome').set('html','');
-            add_email_field('groupContactMailHome', 'tf_contact'); 
-      
-          }
           if($('sambaGroup')) {
             $('sambaGroup').addClass('H');
             input.form.cb_samba.checked = false;
@@ -778,9 +886,6 @@ function html_group_form($action, $group_q, $group, $field='') {
           if($('emailGroup')) {
             $('emailGroup').removeClass('H')
           }
-          if($('contactEmailGroup')) {
-            $('contactEmailGroup').removeClass('H')
-          }     
           if($('sambaGroup')) {
             $('sambaGroup').removeClass('H');
           }
@@ -808,14 +913,6 @@ function html_group_form($action, $group_q, $group, $field='') {
     }
    if ($cgp_use['service']['mail']) {
      $dis_mail = dis_group_mail_field($email,$class); 
-     $dis_contact = dis_group_contact_mail_field($contact, $class);
-      $block_contact = "
-      <fieldset id=\"contactEmailGroup\" class=\"detail infos $mail_class\">
-      <legend>$l_contacts</legend>
-      <table>
-      $dis_contact
-      </table>
-      </fieldset>";
    } else {
      $dis_mail = "<th>$l_email</th>
       <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>";
@@ -888,7 +985,6 @@ function html_group_form($action, $group_q, $group, $field='') {
   $block_userdata
   </table>
   </fieldset>
-  $block_contact
   ";
 
   if (($action == 'detailupdate') || ($action == 'update')) {
@@ -1360,58 +1456,6 @@ function dis_group_mail_field($values,$class) {
   </th>
   <td id='groupMailHome'>
   $email_block
-  </td>";
-
-  return $email_block;
-}
-
-
-/**
- * Generate email field  
- * 
- * @param mixed $name 
- * @param mixed $values 
- * @access public
- * @return void
- */
-function dis_group_contact_mail_field($values,$class) {
-  if(!empty($values)) {
-    $emails = explode("\r\n",$values);
-  }
-  $count = 0;
-  if(is_array($emails)) {
-    foreach($emails as $key => $mail) {
-      $email_block .= "<div class=\"multiple\">
-        <a onclick=\"remove_element(this.parentNode,'groupContactMailHome'); show_hide_add_button();return false\" href=\"\">
-         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
-        </a>        
-        <input name='tf_contact[]' value=\"$mail\" />
-        </div>";
-      $count ++;
-    }
-  }
-  $email_block .= "
-    <div class=\"multiple\">
-    <a onclick=\"remove_element(this.parentNode,'groupContactMailHome'); show_hide_add_button();return false\" href=\"\">
-     <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
-    </a>        
-    <input name='tf_contact[]' value='' /> 
-    </div>";
-  $add_button = "<a href=\'\' onclick=\"var input = add_email_field('groupContactMailHome', 'tf_contact'); add_contact_autocomplete(input); show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
-  $email_block = "
-  <th class=\"$class[contact]\" id='groupContactMailLabel'>
-  $GLOBALS[l_email]
-  $add_button
-  </th>
-  <td id='groupContactMailHome'>
-  $email_block
-  <script type='text/javascript'>
-    obm.initialize.chain(function () {
-      $('groupContactMailHome').getElements('input').each(function (el) {
-        add_contact_autocomplete(el);
-      });
-    });
-  </script>
   </td>";
 
   return $email_block;

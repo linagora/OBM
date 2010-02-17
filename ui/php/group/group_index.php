@@ -58,6 +58,8 @@ include_once("$obminclude/global_pref.inc");
 require_once('group_display.inc');
 require_once('group_query.inc');
 require_once('group_js.inc');
+require('../contact/addressbook.php');
+require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 
 get_group_action();
@@ -250,6 +252,54 @@ if (($action == 'index') || ($action == '')) {
   }
   $display['detail'] = dis_group_consult($params, $obm['uid']);
 
+} elseif ($action == 'contact_add') {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_group_update_rights($params)) {
+      if($params['contact_nb'] == 0 && $params['contact_add'] != '') {
+      $id = run_query_group_contact_create($params);
+      if($id > 0) {
+        $params['contact_nb'] = 1;
+        $params["contact1"] = $id;
+      }
+    }    
+    if ($params['contact_nb'] > 0) {
+      $nb = run_query_group_contactgroup_insert($params);
+      // Set update state only if updated group is public
+      $g = get_group_info($params['group_id']);
+      if ($g['privacy'] == 0) {
+	set_update_state();
+      }
+      $display['msg'] .= display_ok_msg("$nb $l_contact_added");
+    } else {
+      $display['msg'] .= display_err_msg($l_no_contact_added);
+    }
+
+    
+  } else {
+    $display['msg'] .= display_warn_msg($err['msg']);
+  }
+  $display['detail'] = dis_group_consult($params, $obm['uid']);
+
+} elseif ($action == 'contact_del') {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_group_update_rights($params)) {
+    if ($params['contact_nb'] > 0) {
+      $g = get_group_info($params['group_id']);
+      $nb = run_query_group_contactgroup_delete($params, $g['domain_id']);
+      // Set update state only if updated group is public
+      if ($g['privacy'] == 0) {
+	set_update_state();
+      }
+      $display['msg'] .= display_ok_msg("$nb $l_contact_removed");
+    } else {
+      $display['msg'] .= display_err_msg($l_no_contact_deleted);
+    }
+  } else {
+    $display['msg'] .= display_warn_msg($err['msg']);
+  }
+  $display['detail'] = dis_group_consult($params, $obm['uid']);
+
+
 } elseif ($action == 'group_add') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
@@ -381,20 +431,41 @@ function get_group_params() {
   // Group fields
   if (isset ($params['ext_id'])) $params['group_id'] = trim($params['ext_id']);
     
-  $nb_u = 0;
+  $nb_user = 0;
   $nb_group = 0;
+  $nb_contact = 0;
   foreach ($params as $key => $value) {
-    if (strcmp(substr($key, 0, 7),'data-u-') == 0) {
-      $nb_u++;
-      $u_num = substr($key, 7);
-      $params["user$nb_u"] = $u_num;
-    } elseif (strcmp(substr($key, 0, 7),'data-g-') == 0) {
+    if (strcmp(substr($key, 0, 10),'data-user-') == 0) {
+      $nb_user++;
+      $u_num = substr($key, 10);
+      $params["user$nb_user"] = $u_num;
+    } elseif (strcmp(substr($key, 0, 11),'data-group-') == 0) {
       $nb_group++;
-      $params_num = substr($key, 7);
-      $params["group_$nb_group"] = $params_num;
+      $params_num = substr($key, 11);
+      $params["group$nb_group"] = $params_num;
+    } elseif (strcmp(substr($key, 0, 13),'data-contact-') == 0) {
+      $nb_contact++;
+      $params_num = substr($key, 13);
+      $params["contact$nb_contact"] = $params_num;
     }
   }
-  $params['user_nb'] = $nb_u;
+  if(isset($params['groups_add'])) {
+    $nb_group++;
+    $params_num = substr($params['groups_add'], 11);
+    $params["group$nb_group"] = $params_num;
+  }  
+  if(isset($params['users_add'])) {
+    $nb_user++;
+    $u_num = substr($params['users_add'], 10);
+    $params["user$nb_user"] = $u_num;      
+  }    
+  if(isset($params['contacts_add'])) {
+    $nb_contact++;
+    $c_num = substr($params['contacts_add'], 13);
+    $params["contact$nb_contact"] = $c_num;      
+  }     
+  $params['contact_nb'] = $nb_contact;
+  $params['user_nb'] = $nb_user;
   $params['group_nb'] = $nb_group;
 
   if(is_array($params['email'])) {
@@ -412,16 +483,6 @@ function get_group_params() {
     }
     $params['email'] = implode("\r\n",$email_aliases);
   } 
-  if(is_array($params['contact'])) {
-    $contact_aliases = array();
-    while(!empty($params['contact'])) {
-      $contact = trim(array_shift($params['contact']));
-      if(!empty($contact)) {
-        $contact_aliases[] = $contact;
-      }
-    }
-    $params['contact'] = implode("\r\n",$contact_aliases);
-  }   
   return $params;
 }
 
@@ -473,7 +534,7 @@ function get_group_action() {
     'Url'      => "$path/group/group_index.php?action=detailconsult&amp;group_id=".$params['group_id'],
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update',  'user_add', 'user_del', 'contact_add', 'contact_del','group_add', 'group_del')
                                   );
 
 // Detail Update
@@ -482,7 +543,7 @@ function get_group_action() {
     'Url'      => "$path/group/group_index.php?action=detailupdate&amp;group_id=".$params['group_id'],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
+    'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'contact_add', 'contact_del', 'group_add', 'group_del', 'update')
                                      	   );
 
 // Insert
@@ -507,7 +568,7 @@ function get_group_action() {
     'Url'      => "$path/group/group_index.php?action=check_delete&amp;group_id=".$params['group_id'],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'contact_add', 'contact_del', 'group_add', 'group_del', 'update')
                                      	   );
 
 // Delete
@@ -540,7 +601,7 @@ function get_group_action() {
     'Popup'    => 1,
     'Target'   => $l_group,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update')
+    'Condition'=> array ('detailconsult','user_add','user_del', 'contact_add', 'contact_del', 'group_add','group_del', 'update')
                                     	  );
 
 // Sel user add : Users selection
@@ -551,7 +612,7 @@ function get_group_action() {
     'Popup'    => 1,
     'Target'   => $l_group,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update')
+    'Condition'=> array ('detailconsult','user_add','user_del', 'contact_add', 'contact_del', 'group_add','group_del', 'update')
                                     	  );
 
 // User add
@@ -565,6 +626,22 @@ function get_group_action() {
 // User del
   $actions['group']['user_del'] = array (
     'Url'      => "$path/group/group_index.php?action=user_del",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+                                     );
+
+// User add
+  $actions['group']['contact_add'] = array (
+    'Url'      => "$path/group/group_index.php?action=contact_add",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+                                     );
+
+// User del
+  $actions['group']['contact_del'] = array (
+    'Url'      => "$path/group/group_index.php?action=contact_del",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None')

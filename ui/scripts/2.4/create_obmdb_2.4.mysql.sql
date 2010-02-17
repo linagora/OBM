@@ -15,7 +15,7 @@ CREATE TABLE `Account` (
   `account_userupdate` int(8) default NULL,
   `account_usercreate` int(8) default NULL,
   `account_bank` varchar(60) NOT NULL default '',
-  `account_number` varchar(11) NOT NULL default '0',
+  `account_number` varchar(64) NOT NULL default '0',
   `account_balance` double(15,2) NOT NULL default '0.00',
   `account_today` double(15,2) NOT NULL default '0.00',
   `account_comment` varchar(100) default NULL,
@@ -569,6 +569,38 @@ CREATE TABLE `ContactFunction` (
   CONSTRAINT `contactfunction_usercreate_userobm_id_fkey` FOREIGN KEY (`contactfunction_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `contactfunction_domain_id_domain_id_fkey` FOREIGN KEY (`contactfunction_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `contactfunction_userupdate_userobm_id_fkey` FOREIGN KEY (`contactfunction_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+--
+-- Table structure for table `contactgroup`
+--
+
+DROP TABLE IF EXISTS `contactgroup`;
+CREATE TABLE `contactgroup` (
+  contact_id int(8) NOT NULL,
+  group_id int(8) NOT NULL,
+  PRIMARY KEY  (`contact_id`, `group_id`),
+  KEY `contactgroup_contact_id_contact_id_fkey` (`contact_id`),
+  KEY `contactgroup_group_id_group_id_fkey` (`group_id`),
+  CONSTRAINT `contactgroup_contact_id_contact_id_fkey` FOREIGN KEY (`contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `contactgroup_group_id_group_id_fkey` FOREIGN KEY (`group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+--
+-- Table structure for table `__contactgroup`
+--
+
+DROP TABLE IF EXISTS `__contactgroup`;
+CREATE TABLE `__contactgroup` (
+  contact_id int(8) NOT NULL,
+  group_id int(8) NOT NULL,
+  PRIMARY KEY  (`contact_id`, `group_id`),
+  KEY `__contactgroup_contact_id_contact_id_fkey` (`contact_id`),
+  KEY `__contactgroup_group_id_group_id` (`group_id`),
+  CONSTRAINT `__contactgroup_contact_id_contact_id_fkey` FOREIGN KEY (`contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `__contactgroup_group_id_group_id_fkey` FOREIGN KEY (`group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

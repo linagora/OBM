@@ -34,10 +34,10 @@ class  OBM_Search {
           } else {
             $pattern = "domain:$obm[domain_id]";
           }
-
+          $response = $solr->search($pattern, $offset, $limit, $options);
           // $pattern = strtolower($pattern); => do not work because of solr keyword "OR" and "AND"
           $pattern = preg_replace("/(\w*)\*/e", "strtolower('$1').'*'", $pattern);
-	      	$response = $solr->search($pattern, $offset, $limit, $options);
+          $response = $solr->search($pattern, $offset, $limit, $options);
           display_debug_solr($pattern, $cdg_solr, "OBM_Search::search($core)");
           if($response->response->numFound > 0) {
             $result = array();

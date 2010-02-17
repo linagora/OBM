@@ -1329,10 +1329,12 @@ class OBM_Contact implements OBM_ISearchable {
     $query = "DELETE FROM Email WHERE email_entity_id = $id";
     display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(Email)');
     $obm_q->query($query);
+    if($obm_q->affected_rows() > 0) $updateGroup = true;
   
     if(is_array($contact->email)) {
       $cpt = array();
       foreach($contact->email as $email) {
+        $updateGroup = true;
         if(trim($email['address']) != '' ) {
           if(is_array($email['label'])) {
             array_pop($email['label']);
@@ -1347,6 +1349,10 @@ class OBM_Contact implements OBM_ISearchable {
         }
       }
     }
+    if($updateGroup) {
+      $obm_q->query("UPDATE UGroup SET group_timeupdate = NOW() WHERE group_id IN (SELECT group_id FROM __contactgroup WHERE contact_id = ".$contact->id.")");
+      set_update_state();
+    }    
   }
 
   private static function fetchCategories($db, $contacts) {

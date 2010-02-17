@@ -4600,19 +4600,6 @@ function run_query_insert_other_files($params) {
   return $doc_ids;
 }
 
-function guess_name_from_email($email) {
-  $first_name = '';
-  $last_name  = '';
-
-  if(preg_match('/(.+?)\.(.+?)@/', $email, $match)) {
-    $first_name = ucfirst(strtolower($match[1]));
-    $last_name  = strtoupper($match[2]);
-  } elseif(preg_match('/([^.]+)@/', $email, $match)) {
-    $last_name = ucfirst(strtolower($match[1]));
-  }
-
-  return array( $first_name, $last_name );
-}
 
 
 /*
@@ -6093,7 +6080,7 @@ Class CalendarView {
   public function get_class($id,$entity) {
     $c = $this->classes['by_entity'][$entity][$id];
     if (empty($c))
-      $c = $this->get_entity_class($entity,$id);
+      $c = $this->get_entity_class($entity, $id);
     return $c;
   }
 

@@ -816,6 +816,7 @@ function dis_admin_data_group($action, $mode) {
 
     if ($action == 'data_update') {
       $ret = of_usergroup_update_group_node($id);
+      $ret += of_contactgroup_update_group_node($id);
       if ($ret) {
 	if ($mode == 'txt') {
 	  echo 'OK';

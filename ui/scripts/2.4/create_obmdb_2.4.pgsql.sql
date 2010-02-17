@@ -27,7 +27,7 @@ CREATE TABLE account (
     account_userupdate integer DEFAULT NULL,
     account_usercreate integer DEFAULT NULL,
     account_bank character varying(60) DEFAULT ''::character varying NOT NULL,
-    account_number character varying(11) DEFAULT '0'::character varying NOT NULL,
+    account_number character varying(64) DEFAULT '0'::character varying NOT NULL,
     account_balance numeric(15,2) DEFAULT 0.00 NOT NULL,
     account_today numeric(15,2) DEFAULT 0.00 NOT NULL,
     account_comment character varying(100),
@@ -302,6 +302,23 @@ CREATE TABLE contactfunction (
     contactfunction_label character varying(64)
 );
 
+--
+-- Table structure for table `contactgroup`
+--
+
+CREATE TABLE contactgroup (
+  contact_id integer NOT NULL,
+  group_id integer NOT NULL
+);
+
+--
+-- Table structure for table `__contactgroup`
+--
+
+CREATE TABLE __contactgroup (
+  contact_id integer NOT NULL,
+  group_id integer NOT NULL
+);
 
 --
 -- Name: contactlist; Type: TABLE; Schema: public; Owner: -; Tablespace: 
@@ -6161,8 +6178,25 @@ CREATE INDEX contactlist_contact_id_fkey ON contactlist (contactlist_contact_id)
 --
 -- Name: contactlist_list_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-
 CREATE INDEX contactlist_list_id_fkey ON contactlist (contactlist_list_id);
+--
+-- Name: contactgroup_contact_id_contact_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX contactgroup_contact_id_contact_id_fkey ON contactgroup (contact_id);
+--
+-- Name: contactgroup_group_id_group_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX contactgroup_group_id_group_id_fkey ON contactgroup (group_id);
+--
+-- Name: __contactgroup_contact_id_contact_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX __contactgroup_contact_id_contact_id_fkey ON __contactgroup (contact_id);
+--
+-- Name: __contactgroup_group_id_group_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX __contactgroup_group_id_group_id_fkey ON __contactgroup (group_id);    
+
+
 --
 -- Name: contract_marketmanager_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
@@ -8294,6 +8328,43 @@ ALTER TABLE ONLY contactlist
 ALTER TABLE ONLY contactlist
     ADD CONSTRAINT contactlist_list_id_list_id_fkey FOREIGN KEY (contactlist_list_id) REFERENCES list(list_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+--
+-- Name: contactgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY contactgroup
+    ADD CONSTRAINT contactgroup_pkey PRIMARY KEY (contact_id, group_id);
+
+--
+-- Name: contactgroup_contact_id_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+    
+ALTER TABLE ONLY contactgroup
+    ADD CONSTRAINT contactgroup_contact_id_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Name: contactgroup_group_id_group_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY contactgroup
+    ADD CONSTRAINT contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Name: __contactgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+ALTER TABLE ONLY __contactgroup
+    ADD CONSTRAINT __contactgroup_pkey PRIMARY KEY (contact_id, group_id);
+--
+-- Name: __contactgroup_contact_id_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY __contactgroup
+    ADD CONSTRAINT __contactgroup_contact_id_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Name: __contactgroup_group_id_group_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY contactgroup
+    ADD CONSTRAINT __contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
 -- Name: contract_company_id_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -

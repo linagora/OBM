@@ -15,7 +15,7 @@ CREATE TABLE `Account` (
   `account_userupdate` int(8) default NULL,
   `account_usercreate` int(8) default NULL,
   `account_bank` varchar(60) NOT NULL default '',
-  `account_number` varchar(11) NOT NULL default '0',
+  `account_number` varchar(64) NOT NULL default '0',
   `account_balance` double(15,2) NOT NULL default '0.00',
   `account_today` double(15,2) NOT NULL default '0.00',
   `account_comment` varchar(100) default NULL,

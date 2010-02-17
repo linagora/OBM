@@ -233,10 +233,142 @@ CREATE TABLE token (
 );
 
 --
+-- Table structure for table `contactgroup`
+--
+
+DROP TABLE IF EXISTS contactgroup;
+CREATE TABLE contactgroup (
+  contact_id integer NOT NULL,
+  group_id integer NOT NULL
+);
+
+ALTER TABLE ONLY contactgroup
+    ADD CONSTRAINT contactgroup_pkey PRIMARY KEY (contact_id, group_id);
+
+CREATE INDEX contactgroup_contact_id_contact_id_fkey ON contactgroup (contact_id);
+CREATE INDEX contactgroup_group_id_group_id_fkey ON contactgroup (group_id);
+
+ALTER TABLE ONLY contactgroup
+    ADD CONSTRAINT contactgroup_contact_id_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY contactgroup
+    ADD CONSTRAINT contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+--
+-- Table structure for table `__contactgroup`
+--
+
+DROP TABLE IF EXISTS __contactgroup;
+CREATE TABLE __contactgroup (
+  contact_id integer NOT NULL,
+  group_id integer NOT NULL
+);
+
+ALTER TABLE ONLY __contactgroup
+    ADD CONSTRAINT __contactgroup_pkey PRIMARY KEY (contact_id, group_id);
+
+CREATE INDEX __contactgroup_contact_id_contact_id_fkey ON __contactgroup (contact_id);
+CREATE INDEX __contactgroup_group_id_group_id_fkey ON __contactgroup (group_id);    
+
+
+ALTER TABLE ONLY __contactgroup
+    ADD CONSTRAINT __contactgroup_contact_id_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY contactgroup
+    ADD CONSTRAINT __contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+--
 -- Domain Property
 --
 INSERT INTO DomainProperty VALUES ('mailshares_quota_default','integer','0','0');
 INSERT INTO DomainProperty VALUES ('mailshares_quota_max','integer','0','0');
+
+-- 
+-- Contact group migration
+--
+CREATE TABLE tmp_groupemails (id serial, email  varchar(255),  gid integer);
+
+CREATE TABLE tmp_groupcontacts (id integer, email  varchar(255), gid  integer, cid integer);
+
+CREATE TABLE tmp_contactsgroup ( email  varchar(255), gid  integer, cid integer);
+ 
+INSERT INTO tmp_groupemails (email, gid) SELECT  (regexp_split_to_table(group_contacts, E'\\r\\n')), group_id FROM UGroup WHERE group_contacts != '' AND group_contacts IS NOT NULL ;
+
+INSERT INTO tmp_groupcontacts (id, cid, gid, email) 
+SELECT tmp_groupemails.id, contactentity_contact_id, gid, email 
+FROM ContactEntity 
+INNER JOIN Email ON contactentity_entity_id = email_entity_id 
+INNER JOIN tmp_groupemails ON trim(email) = trim(email_address)
+INNER JOIN UGroup ON group_id = gid
+INNER JOIN Contact ON contact_id = contactentity_contact_id 
+INNER JOIN Addressbook ON Addressbook.id = contact_addressbook_id 
+WHERE Addressbook.domain_id = group_domain_id 
+AND Addressbook.is_default = 1 AND Addressbook.name = 'public_contacts'; 
+
+DELETE FROM tmp_groupemails WHERE id IN (SELECT id FROM tmp_groupcontacts);
+
+INSERT INTO Contact (contact_domain_id, contact_timecreate, contact_usercreate, contact_addressbook_id, contact_lastname, contact_collected, contact_origin)
+SELECT group_domain_id, NOW(), group_usercreate, Addressbook.id, email, true, 'obm-storage-migration-2.4'
+FROM tmp_groupemails
+INNER JOIN UGroup ON group_id = gid
+INNER JOIN Addressbook ON Addressbook.domain_id = group_domain_id 
+WHERE Addressbook.is_default = 1 AND Addressbook.name = 'public_contacts';  
+
+ALTER TABLE ContactEntity DISABLE TRIGGER ALL;
+
+INSERT INTO ContactEntity (contactentity_contact_id, contactentity_entity_id) 
+SELECT contact_id, nextval('entity_entity_id_seq') 
+FROM Contact  
+LEFT JOIN ContactEntity ON contactentity_contact_id = contact_id 
+WHERE contactentity_contact_id IS NULL;
+
+ALTER TABLE Email DISABLE TRIGGER ALL;
+
+INSERT INTO Email (email_entity_id, email_label, email_address) 
+SELECT contactentity_entity_id, 'INTERNET;X-OBM-Ref1', contact_lastname 
+FROM Contact 
+INNER JOIN ContactEntity ON contactentity_contact_id = contact_id 
+LEFT JOIN Entity ON entity_id = contactentity_entity_id 
+WHERE entity_id IS NULL;
+
+INSERT INTO Entity (entity_id , entity_mailing) 
+SELECT contactentity_entity_id, true 
+FROM ContactEntity 
+LEFT JOIN Entity ON contactentity_entity_id = entity_id 
+WHERE entity_id IS NULL ;
+
+ALTER TABLE ContactEntity ENABLE TRIGGER ALL;
+
+ALTER TABLE Email ENABLE TRIGGER ALL;
+
+
+INSERT INTO tmp_groupcontacts (id, cid, gid, email) 
+SELECT id, contactentity_contact_id, gid, email 
+FROM ContactEntity 
+INNER JOIN Email ON contactentity_entity_id = email_entity_id 
+INNER JOIN tmp_groupemails ON trim(email) = trim(email_address);
+
+DELETE FROM tmp_groupemails WHERE id IN (SELECT id FROM tmp_groupcontacts);
+
+INSERT INTO tmp_contactsgroup (email, gid, cid) 
+SELECT email, gid, MAX(cid) 
+FROM tmp_groupcontacts 
+GROUP BY email, gid;
+
+INSERT INTO contactgroup (contact_id, group_id) 
+SELECT cid, gid 
+FROM tmp_contactsgroup;
+
+
+DROP TABLE tmp_groupemails;
+
+DROP TABLE tmp_groupcontacts;
+
+DROP TABLE tmp_contactsgroup;
+
+ALTER TABLE Contact DROP COLUMN contact_privacy;
+
+
+
 
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed

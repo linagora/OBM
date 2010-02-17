@@ -26,7 +26,7 @@ $l_function = "Fonction";
 $l_contacts = "Membres externes";
 
 // Actions
-$l_add = "Ajouter ces groupes";
+$l_add = "Ajouter";
 
 // Messages
 $l_fill_name = "Le nom du groupe doit etre rempli";
@@ -42,21 +42,29 @@ $l_groupname_error = "Le nom du groupe est incorrect !";
 
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les groupes correspondants.";
 $l_no_user = "Il n'y a pas d'utilisateurs membres.";
+$l_no_contact = "Il n'y a pas de membres externes.";
 $l_no_group_group = "Il n'y a pas de groupes membres.";
 $l_found = "groupes trouvés.";
 $l_user_member = "utilisateurs membres";
+$l_contact_member = "membres externes";
 $l_group_member = "groupes membres";
 $l_no_found = "Aucun groupe ne correspond à ces critères !";
 $l_add_user = "Ajouter des utilisateurs";
+$l_add_contact = "Ajouter des membres externes";
 $l_add_group = "Ajouter des groupes (parmi la liste des groupes possibles)";
 $l_del_user_sel = "Enlever ces utilisateurs";
+$l_del_contact_sel = "Enlever ces membres  externes";
 $l_del_group_sel = "Enlever ces groupes";
 $l_user_added = "Utilisateur(s) ajouté(s)";
+$l_contact_added = "Membres(s) externes(s) ajouté(s)";
 $l_user_removed = "Utilisateur(s) enlevé(s)";
+$l_contact_removed = "Membres(s) externes(s) enlevé(s)";
 $l_group_added = "Groupe(s) ajouté(s)";
 $l_group_removed = "Groupe(s) enlevé(s)";
 $l_no_user_added = "Pas d'utilisateurs à ajouter";
+$l_no_contact_added = "Pas de membres externes à ajouter";
 $l_no_user_deleted = "Pas d'utilisateurs à supprimer";
+$l_no_contact_deleted = "Pas de membres externes à supprimer";
 $l_no_group_added = "Pas de groupes à ajouter";
 $l_no_group_deleted = "Pas de groupes à supprimer";
 $l_check_samegroup = "Ces groupes sembles similaires au groupe saisi. Voulez-vous confirmer la création de ce groupe?";

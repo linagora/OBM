@@ -2370,6 +2370,27 @@ function run_query_userobm_active($ids='') {
 }
 
 
+/**
+ * guess_name_from_email 
+ * 
+ * @param mixed $email 
+ * @access public
+ * @return void
+ */
+function guess_name_from_email($email) {
+  $first_name = '';
+  $last_name  = '';
+
+  if(preg_match('/(.+?)\.(.+?)@/', $email, $match)) {
+    $first_name = ucfirst(strtolower($match[1]));
+    $last_name  = strtoupper($match[2]);
+  } elseif(preg_match('/([^.]+)@/', $email, $match)) {
+    $last_name = ucfirst(strtolower($match[1]));
+  }
+
+  return array( $first_name, $last_name );
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Active Userobm query execution : All users not archived
 // Parameters:
@@ -2546,6 +2567,59 @@ function get_all_users_id_from_group($g_id) {
   $users = array_unique($users);
 
   return $users;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the contacts ID list from the given group
+// Recursive search to handle group trees
+// Parameters:
+//   - $group_id : Group id
+// Returns:
+//   array of contact ids
+///////////////////////////////////////////////////////////////////////////////
+function get_all_contacts_id_from_group($g_id) {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $contacts = array();
+  $g_id = sql_parse_id($g_id, true);
+  // Groups members of this group
+  $query = "SELECT groupgroup_child_id as child_id
+    FROM GroupGroup
+    WHERE groupgroup_parent_id $g_id ";
+
+  $obm_q = new DB_OBM; 
+  display_debug_msg($query, $cdg_sql, 'get_all_contacts_id_from_group(1)');
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $child_id = $obm_q->f('child_id');
+    $gcontacts = get_all_contacts_id_from_group($child_id);
+    $contacts = array_merge($contacts, $gcontacts);
+  }
+
+  // Not archived users members of this group
+  $query = "SELECT contact_id
+    FROM contactgroup
+    WHERE group_id $g_id";
+
+  $obm_q = new DB_OBM; 
+  display_debug_msg($query, $cdg_sql, 'get_all_contacts_id_from_group(2)');
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $c_id = $obm_q->f('contact_id');
+    if (! in_array($c_id, $contacts)) {
+      array_push($contacts, $c_id);
+    }
+  }
+  $contacts = array_unique($contacts);
+
+  return $contacts;
 }
 
 
@@ -2803,6 +2877,104 @@ function of_usergroup_update_user_hierarchy($u_id, $is_array=false) {
    
    return $ret;
 }
+
+
+/**
+ * Update one group internal contact mapping
+ * @param $g_id group id
+ * @return false if problem
+ * @access public
+ **/
+function of_contactgroup_update_group_node($g_id) {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $multidomain = sql_multidomain('contact');
+  $contacts_id = get_all_contacts_id_from_group($g_id);
+  $ret = false;
+  $g_id_bis = sql_parse_id($g_id, true);
+  // Delete current internal association
+  $query = "DELETE FROM __contactgroup
+    WHERE group_id $g_id_bis ";
+  display_debug_msg($query, $cdg_sql, 'of_contactgroup_update_group_node(delete)');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  // If group has users, Insert new internal association
+  if (is_array($contacts_id) && count($contacts_id) > 0) {
+    $query = "INSERT INTO __contactgroup (
+      group_id,
+      contact_id
+    ) VALUES (%d,%d)";
+    foreach ($contacts_id as $c_id) {
+      if(is_numeric($g_id) && $g_id > 0 && is_numeric($c_id) && $c_id > 0) {
+        display_debug_msg(sprintf($query,$g_id,$c_id), $cdg_sql, 'of_contactgroup_update_group_node(insert)');
+        $ret = $obm_q->query(sprintf($query,$g_id,$c_id));
+      }
+    }
+  } else {
+    $ret = true;
+  }
+
+  return $ret;
+}
+
+/**
+ * Update internal contact mapping for a group and its top hierarchy
+ * @param $g_id group id
+ * @return false if problem
+ * @access public
+ */
+function of_contactgroup_update_group_hierarchy($g_id) {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $groups = get_all_parent_group_of_group($g_id);
+  $ret = false;
+  foreach ($groups as $group_id) {
+    $ret = of_contactgroup_update_group_node($group_id);
+  }
+
+  return $ret;
+}
+
+
+/**
+ * Delete a contact from _contactgroup.
+ * Beware if used under unchecked circuntances this might
+ * break the UGroup/_contactgroup sync
+ *
+ * @param $g_id group id
+ * @return false if problem
+ * @access public
+ */
+function of_contactgroup_delete_contact_hierarchy($c_id, $is_array=false) {
+  global $cdg_sql;
+  
+  
+  if (! ($c_id > 0) && !$is_array) {
+    return false;
+  }
+  
+  // Delete current internal association
+  if (!$is_array) {
+    $query = "DELETE FROM __contactgroup WHERE contact_id=$c_id";
+  } else {
+    $query = "DELETE FROM __contactgroup WHERE contact_id IN (".implode(', ', $c_id).")";
+  }
+  display_debug_msg($query, $cdg_sql, 'of_contactgroup_delete_contact_hierarchy(delete)');
+  $obm_q = new DB_OBM;
+  $ret = $obm_q->query($query);
+  
+  return $ret;
+}
+
 
 //--- Mail global functions -------------------------------------------------//
 

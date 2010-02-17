@@ -112,7 +112,6 @@ function run_query_group_search($group) {
     group_name,
     group_desc,
     group_email,
-    group_contacts,
     $timecreate,
     $timeupdate,
     A.userobm_login as usercreate,
@@ -141,7 +140,6 @@ function run_query_group_search($group) {
     group_name,
     group_desc,
     group_email,
-    group_contacts,
     timecreate,
     timeupdate,
     usercreate,
@@ -289,7 +287,6 @@ function run_query_group_insert($group) {
   $name = $group['name'];
   $desc = $group['desc'];
   $email = $group['email'];
-  $contact = $group['contact'];
   $priv = sql_parse_int($group['privacy']);
   $domain_id = sql_parse_id($obm['domain_id']);
   if ($priv == 1) {
@@ -316,8 +313,7 @@ function run_query_group_insert($group) {
   group_name
   $q_delegation[field],
   group_desc,
-  group_email,
-  group_contacts
+  group_email
   ) VALUES (
   null,
   NOW(),
@@ -331,8 +327,7 @@ function run_query_group_insert($group) {
   '$name'
   $q_delegation[value],
   '$desc',
-  '$email',
-  '$contact'
+  '$email'
   )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_group_insert()');
@@ -407,7 +402,6 @@ function run_query_group_update($group) {
   $manager = sql_parse_id($group['manager']);
   $priv = sql_parse_int($group['privacy']);
   $multidomain = sql_multidomain('group');
-  $contact = $group['contact'];
   if ($priv == 1) {
     $samba = 0;
     $email = '';
@@ -424,7 +418,6 @@ function run_query_group_update($group) {
     group_name='$name',
     group_desc='$desc',
     group_email='$email',
-    group_contacts = '$contact',
     group_manager_id=$manager
     $q_delegation
   WHERE group_id $id
@@ -502,6 +495,118 @@ function run_query_group_delete($p_id) {
  * @param mixed $group[] : group hash info : keys used : id, user_nb, userX
  * @result number of users inserted
  **/
+function run_query_group_contactgroup_insert($group) {
+  global $obm, $cdg_sql;
+
+  $id = $group['group_id'];
+  $sel_id = sql_parse_id($group['group_id'], true);
+  $ins_id = sql_parse_id($group['group_id']);
+  $cpt = 0;
+  $cpt_ins = 0;
+  while ($cpt < $group['contact_nb']) {
+    $cpt++;
+    $c_id = sql_parse_id($group["contact$cpt"], true);
+    $query = "SELECT * FROM contactgroup
+    WHERE group_id $sel_id
+    AND contact_id $c_id ";
+    display_debug_msg($query, $cdg_sql, 'run_query_group_contactgroup_insert(1)');
+    $test_q = new DB_OBM;
+    $retour = $test_q->query($query);
+
+    // If the entry doesn't already exist, we insert it
+    if ($test_q->num_rows() == 0) {
+      $c_id = sql_parse_id($group["contact$cpt"]);
+      $query = "INSERT INTO contactgroup (
+      group_id,
+      contact_id)
+      VALUES ($ins_id, $c_id)";
+
+      display_debug_msg($query, $cdg_sql, 'run_query_group_contactgroup_insert(2)');
+      $obm_q = new DB_OBM;
+      $retour = $obm_q->query($query);
+      $cpt_ins++;
+    }
+  }
+
+  // Update internal group membership direct mapping
+  if ($cpt_ins > 0) {
+    of_contactgroup_update_group_hierarchy($id);
+  }
+
+  return $cpt_ins;
+}
+
+/**
+ * run_query_group_contact_create 
+ * 
+ * @access public
+ * @return void
+ */
+function run_query_group_contact_create($group) {
+  $email = $group['contact_add'];
+  $addressbooks = OBM_AddressBook::search();
+  $addressbook = $addressbooks->getPublicAddressbook($email);
+  $contacts = $addressbook->getContacts($email);
+  if(!empty($contacts)) {
+    return key($contacts);
+  }
+  if($addressbook->write) {
+    list( $firstname, $lastname ) = guess_name_from_email($email);
+    $data['lastname'] = $lastname;
+    $data['firstname'] = $firstname;
+    $data['emails'][0]['label'] = 'INTERNET';
+    $data['emails'][0]['address'] = $email; 
+    $contact = $addressbook->addContact($data);
+    return $contact->id;
+  }
+  return false;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : UserObmGroup deletion
+// Parameters:
+//   - $group[] : group hash info : keys used : id, contact_nb, contactX
+// Return: number of contacts deleted
+///////////////////////////////////////////////////////////////////////////////
+function run_query_group_contactgroup_delete($group, $domain_id) {
+  global $cdg_sql;
+
+  $g = get_group_info($group['group_id']);
+  $gid = $g['gid'];
+
+  $sql_id = sql_parse_id($group['group_id'], true);
+  $cpt = 0;
+  $cpt_del = 0;
+  while ($cpt < $group['contact_nb']) {
+    $cpt++;
+    $c_id = $group["contact$cpt"];
+    $sql_c_id = sql_parse_id($c_id, true);
+
+    $query = "DELETE FROM contactgroup
+    WHERE group_id $sql_id AND contact_id $sql_c_id ";
+    display_debug_msg($query, $cdg_sql, 'run_query_group_contactgroup_delete()');
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+    if ($retour) {
+      $cpt_del++;
+    }
+  }
+
+  // Update internal group membership direct mapping
+  if ($cpt_del > 0) {
+    of_contactgroup_update_group_hierarchy($group['group_id']);
+  }
+
+  return $cpt_del;
+}
+
+
+
+/**
+ * Query execution : UserObmGroup conditionnal insertion
+ *
+ * @param mixed $group[] : group hash info : keys used : id, user_nb, userX
+ * @result number of users inserted
+ **/
 function run_query_group_usergroup_insert($group) {
   global $obm, $cdg_sql;
 
@@ -543,6 +648,7 @@ function run_query_group_usergroup_insert($group) {
 
   return $cpt_ins;
 }
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -612,8 +718,8 @@ function run_query_group_group_insert($group) {
 
   while ($cpt < $group['group_nb']) {
     $cpt++;
-    $sel_g_id = sql_parse_id($group["group_$cpt"], true);
-    $g_id = sql_parse_id($group["group_$cpt"]);
+    $sel_g_id = sql_parse_id($group["group$cpt"], true);
+    $g_id = sql_parse_id($group["group$cpt"]);
 
     $query = "SELECT group_privacy, groupgroup_child_id FROM
     UGroup
@@ -645,6 +751,7 @@ function run_query_group_group_insert($group) {
   // Update internal group membership direct mapping
   if ($cpt_ins > 0) {
     of_usergroup_update_group_hierarchy($id);
+    of_contactgroup_update_group_hierarchy($id);
   }
 
   return $cpt_ins;
@@ -665,7 +772,7 @@ function run_query_group_group_delete($group) {
   $cpt_del = 0;
   while ($cpt < $group['group_nb']) {
     $cpt++;
-    $g_id = sql_parse_id($group["group_$cpt"], true);
+    $g_id = sql_parse_id($group["group$cpt"], true);
 
     $query = "DELETE FROM GroupGroup
     WHERE groupgroup_parent_id $id
@@ -682,6 +789,7 @@ function run_query_group_group_delete($group) {
   // Update internal group membership direct mapping
   if ($cpt_del > 0) {
     of_usergroup_update_group_hierarchy($group['group_id']);
+    of_contactgroup_update_group_hierarchy($group['group_id']);
   }
 
   return $cpt_del;
@@ -788,6 +896,57 @@ function run_query_group_group($group) {
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'run_query_group_group()');
+  $obm_q->query($query);
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Get the groups members of the given group
+// Parameters:
+//   - $group[] : Group parameters
+///////////////////////////////////////////////////////////////////////////////
+function run_query_group_contact($group) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $limit = sql_limit($db_type,'', '','group_contact');
+
+  $id = sql_parse_id($group['group_id'], true);
+  $entity = $group['entity'];
+  $sql_order_field = $group['sql_order_field'];
+  $sql_order_dir = $group['sql_order_dir'];
+
+  if (($entity == 'group_contact') && (trim($sql_order_field) != '')) {
+    $order = "ORDER BY $sql_order_field $sql_order_dir";
+  } else {
+    $order = 'ORDER BY contact_lastname';
+  }
+
+  $query = "SELECT
+    Contact.contact_id as group_contact_id,
+    Contact.contact_id as id,
+    contact_timeupdate as  group_contact_timeupdate,
+    contact_timecreate as  group_contact_timecreate,
+    contact_userupdate as  group_contact_userupdate,
+    contact_usercreate as  group_contact_usercreate,
+    contact_lastname as  group_contact_lastname,
+    contact_firstname as  group_contact_firstname,
+    phone_number as  group_contact_phone,
+    email_address as  group_contact_email
+    FROM contactgroup 
+    INNER JOIN UGroup ON contactgroup.group_id = UGroup.group_id
+    INNER JOIN Contact ON Contact.contact_id = contactgroup.contact_id
+    INNER JOIN ContactEntity ON contactentity_contact_id = Contact.contact_id
+    LEFT JOIN email ON email_entity_id = contactentity_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
+    LEFT JOIN phone ON phone_entity_id = contactentity_entity_id AND phone_label = 'CELL;VOICE;X-OBM-Ref1'
+  WHERE contactgroup.group_id $id
+  $order
+  $limit";
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'run_query_group_contact()');
   $obm_q->query($query);
   return $obm_q;
 }
@@ -921,7 +1080,7 @@ function run_query_group_group_checking($group) {
 
   $childs_id = array();
   for ($i=1; $i<=$child_nb; $i++) {
-    $childs_id[] = $group["group_$i"];
+    $childs_id[] = $group["group$i"];
   }
 
   $childs_privacy = array();
@@ -936,7 +1095,7 @@ function run_query_group_group_checking($group) {
     for($i=1; $i<=$child_nb; $i++) {
 
       // Check if a child_group is not same as group
-      $child_g_id = $group["group_$i"];
+      $child_g_id = $group["group$i"];
 
       if ($child_g_id != $id) {
 
@@ -1064,7 +1223,6 @@ function check_group_data_form(&$group) {
   $samba = $group['samba'];
   $desc = $group['desc'];
   $email = stripslashes($group['email']);
-  $contact = stripslashes($group['contact']);
   $priv = $group['privacy'];
   $g = get_group_info($id);
   $usercreate = $g['usercreate'];
@@ -1118,18 +1276,6 @@ function check_group_data_form(&$group) {
         $err['msg'] = "$l_email_exist : $mails ";
         $err['field'] = 'email';
         return false;
-      }
-    }
-    if ($contact != '') {
-      $em = strtok($contact, "\r\n");
-      while ($em) {
-        if (!preg_match($php_regexp_email, $em)) {
-          $err['msg'] .= "$em : $l_j_check_email";
-          $err['field'] = 'contact';
-          return false;
-        }
-
-        $em = strtok("\r\n");
       }
     }
   } else {

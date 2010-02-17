@@ -27,7 +27,7 @@ CREATE TABLE account (
     account_userupdate integer DEFAULT NULL,
     account_usercreate integer DEFAULT NULL,
     account_bank character varying(60) DEFAULT ''::character varying NOT NULL,
-    account_number character varying(11) DEFAULT '0'::character varying NOT NULL,
+    account_number character varying(64) DEFAULT '0'::character varying NOT NULL,
     account_balance numeric(15,2) DEFAULT 0.00 NOT NULL,
     account_today numeric(15,2) DEFAULT 0.00 NOT NULL,
     account_comment character varying(100),

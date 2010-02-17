@@ -19,6 +19,7 @@
 ?>
 <?php
 require_once 'obminclude/of/of_search.php';
+require_once 'obminclude/of/of_contact.php';
 
 class OBM_AddressBook implements OBM_ISearchable {
   private $id;
@@ -284,6 +285,13 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
   public function getCollectedAddressbook() {
     foreach($this->addressbooks as $addressbook) {
       if($addressbook->isDefault && $addressbook->name == 'collected_contacts' && $addressbook->owner == $GLOBALS['obm']['uid'])
+        return $addressbook;
+    }
+  }
+
+  public function getPublicAddressbook() {
+    foreach($this->addressbooks as $addressbook) {
+      if($addressbook->isDefault && $addressbook->name == 'public_contacts')
         return $addressbook;
     }
   }

@@ -128,6 +128,7 @@ obm.AutoComplete.Search = new Class({
     fieldText: obm.vars.labels.autocompleteField,          // default text displayed when empty field
     extension: null,                  // obm needs
     resultValue: null,		// obm needs
+    strict: true, // If true, the result must be selected in the resultbox.
     name: null
   },
 
@@ -596,9 +597,11 @@ obm.AutoComplete.Search = new Class({
 
   // reset input and result box
   reset: function() {
-    this.inputField.setProperty('value', this.options.fieldText);
-    this.currentValue = this.inputField.value;
-    this.inputField.addClass('downlight');
+    if(this.inputField.value == '' || this.options.strict) {
+      this.inputField.setProperty('value', this.options.fieldText);
+      this.currentValue = this.inputField.value;
+      this.inputField.addClass('downlight');
+    }
     this.requestId++; // invalidate latest request
     this.totalNbr = 0;
     this.resetResultBox();
