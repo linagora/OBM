@@ -50,7 +50,7 @@ sub _postMethod {
     $datas{'requestUri'} = $requestUri;
 
     if( $requestUri !~ /^\/cyruspartition\/([^\/]+)(.*)$/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$requestUri );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$requestUri ] } );
         $return->[1]->{'help'} = [ $self->getModuleName().' URI must be : /cyruspartition/<entity>' ];
         return $return;
     }
@@ -63,7 +63,7 @@ sub _postMethod {
         }
     }
 
-    return $self->_returnContent( RC_NOT_FOUND, 'Unknow entity \''.$datas{'entity'}.'\'' );
+    return $self->_response( RC_NOT_FOUND, { content => [ 'Unknow entity \''.$datas{'entity'}.'\'' ] } );
 }
 
 
@@ -73,7 +73,7 @@ sub _hostEntity {
 
     my $regexp = '^\/cyruspartition\/'.$datas->{'entity'}.'\/([^\/]+)(.*)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => 'Invalid URI '.$datas->{'requestUri'} ] } );
         $return->[1]->{'help'} = [
             $self->getModuleName().' URI must be : /cyruspartition/'.$datas->{'entity'}.'/<operation>',
             '<operation> : [add|del]'
@@ -93,7 +93,7 @@ sub _hostEntity {
         }
     }
 
-    return $self->_returnContent( RC_NOT_FOUND, 'Unknow operation \''.$datas->{'operation'}.'\'' );
+    return $self->_reponse( RC_NOT_FOUND, { content => [ 'Unknow operation \''.$datas->{'operation'}.'\'' ] } );
 }
 
 
@@ -103,7 +103,7 @@ sub _addPartition {
 
     my $regexp = '^\/cyruspartition\/'.$datas->{'entity'}.'\/'.$datas->{'operation'}.'\/([^\/]+)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$datas->{'requestUri'} ] } );
         $return->[1]->{'help'} = [
             $self->getModuleName().' URI must be : /cyruspartition/'.$datas->{'entity'}.'/'.$datas->{'operation'}.'/<hostName>',
             '<hostName> : OBM host name with imap role'
@@ -115,10 +115,10 @@ sub _addPartition {
 
     my $domainList = $self->_getHostDomains( 'imapHost', $datas->{'hostname'} );
     if( !defined($domainList) ) {
-        my $return = $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' );
+        my $return = $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' ] } );
         return $return;
     }elsif( $#{$domainList} < 0 ) {
-        my $return = $self->_returnStatus( RC_NOT_FOUND, 'No domain linked to host '.$datas->{'hostname'}.' as IMAP service' );
+        my $return = $self->_response( RC_NOT_FOUND, { content => [ 'No domain linked to host '.$datas->{'hostname'}.' as IMAP service' ] } );
         return $return;
     }
 
@@ -132,7 +132,7 @@ sub _delPartition {
 
     my $regexp = '^\/cyruspartition\/'.$datas->{'entity'}.'\/'.$datas->{'operation'}.'\/([^\/]+)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$datas->{'requestUri'} ] } );
         $return->[1]->{'help'} = [
             $self->getModuleName().' URI must be : /cyruspartition/'.$datas->{'entity'}.'/'.$datas->{'operation'}.'/<hostName>',
             '<hostName> : OBM host name with imap role'
@@ -144,7 +144,7 @@ sub _delPartition {
 
     my $domainList = $self->_getHostDomains( 'imapHost', $datas->{'hostname'} );
     if( !defined($domainList) ) {
-        my $return = $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' );
+        my $return = $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' ] } );
         return $return;
     }
 
@@ -158,7 +158,7 @@ sub _updateImapdConf {
 
     if( !open( FIC, $self->{'imapdConfFile'} ) ) {
         $self->_log( 'Unable to open Cyrus Imapd configuration file', 1 );
-        return $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Unable to open Cyrus Imapd configuration file' );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Unable to open Cyrus Imapd configuration file' ] } );
     }
 
 
@@ -230,7 +230,7 @@ sub _updateImapdConf {
     $self->_log( 'Re-write Cyrus Imapd configuration file', 3 );
     if( !open( FIC, '>'.$self->{'imapdConfFile'} ) ) {
         $self->_log( 'Unable to open Cyrus Imapd configuration file', 1 );
-        return $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Unable to open Cyrus Imapd configuration file' );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Unable to open Cyrus Imapd configuration file' ] } );
     }
 
     while( my( $partitionName, $partitionPath ) = each(%currentPartitions) ) {
@@ -264,7 +264,7 @@ sub _restartCyrusService {
 
     if( $ret ) {
         $self->_log( 'Fail to stop Cyrus service', 1 );
-        return $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Fail to stop Cyrus service' );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Fail to stop Cyrus service' ] } );
     }
 
     $cmd = $self->{'cyrusStartupScript'}.' start > /dev/null 2>&1';
@@ -273,11 +273,11 @@ sub _restartCyrusService {
 
     if( $ret ) {
         $self->_log( 'Fail to start Cyrus service', 1 );
-        return $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Fail to start Cyrus service' );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Fail to start Cyrus service' ] } );
     }
 
 
-    return $self->_returnStatus( RC_OK, 'Cyrus service restart successfully' );
+    return $self->_response( RC_OK, { content => [ 'Cyrus service restart successfully' ] } );
 }
 
 

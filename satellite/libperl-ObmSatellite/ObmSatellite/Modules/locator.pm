@@ -33,7 +33,7 @@ sub _getMethod {
     $datas{'requestUri'} = $requestUri;
 
     if( $requestUri !~ /^\/locator\/([^\/]+)(.*)$/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$requestUri );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$requestUri ] } );
         $return->[1]->{'help'} = [ $self->getModuleName().' URI must be : /locator/<entity>' ];
         return $return;
     }
@@ -46,7 +46,7 @@ sub _getMethod {
         }
     }
 
-    return $self->_returnContent( RC_NOT_FOUND, 'Unknow entity \''.$datas{'entity'}.'\'' );
+    return $self->_response( RC_NOT_FOUND, { content => [ 'Unknow entity \''.$datas{'entity'}.'\'' ] } );
 }
 
 
@@ -56,7 +56,7 @@ sub _hostEntity {
 
     my $regexp = '^\/locator\/'.$datas->{'entity'}.'\/([^\/]+)(.*)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$datas->{'requestUri'} ] } );
         $return->[1]->{'help'} = [ 'Locator URI must be : /locator/'.$datas->{'entity'}.'/<service>' ];
         return $return;
     }
@@ -74,7 +74,7 @@ sub _hostEntity {
     }
     
 
-    return $self->_returnContent( RC_NOT_FOUND, 'Unknow service \''.$datas->{'service'}.'\'' );
+    return $self->_response( RC_NOT_FOUND, { content => [ 'Unknow service \''.$datas->{'service'}.'\'' ] } );
 }
 
 
@@ -84,7 +84,7 @@ sub _imapService {
 
     my $regexp = '^\/locator\/'.$datas->{'entity'}.'\/'.$datas->{'service'}.'\/([^\/]+)(.*)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$datas->{'requestUri'} ] } );
         $return->[1]->{'help'} = [ 'Locator URI must be : /locator/'.$datas->{'entity'}.'/'.$datas->{'service'}.'/<entityType>' ];
         return $return;
     }
@@ -101,7 +101,8 @@ sub _imapService {
         }
     }
 
-    return $self->_returnContent( RC_NOT_FOUND, 'Unknow entity type \''.$datas->{'entityType'}.'\'' );
+    return $self->_response( RC_NOT_FOUND, { content => [ 'Unknow entity type
+    \''.$datas->{'entityType'}.'\'' ] } );
 }
 
 
@@ -111,7 +112,7 @@ sub _userImapService {
 
     my $regexp = '^\/locator\/'.$datas->{'entity'}.'\/'.$datas->{'service'}.'\/'.$datas->{'entityType'}.'\/([^\/]+)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$datas->{'requestUri'} ] } );
         $return->[1]->{'help'} = [ 'Locator URI must be : /locator/'.$datas->{'entity'}.'/'.$datas->{'service'}.'/'.$datas->{'entityType'}.'/<entityId>' ];
         return $return;
     }
@@ -119,7 +120,7 @@ sub _userImapService {
     $datas->{'id'} = $1;
 
     if( $datas->{'id'} !~ /^([^@]+)@([^@]+)$/ ) {
-        my $return = $self->_returnContent( RC_BAD_REQUEST, 'Invalid login '.$datas->{'id'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid login '.$datas->{'id'} ] } );
         $return->[1]->{'help'} = [ 'Login must be of the form : login@domain' ];
         return $return;
     }
@@ -140,15 +141,15 @@ sub _userImapService {
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         $self->_log( 'Failed on get imap service for user '.$datas->{'id'}.' SQL query', 1 );
-        return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Failed on get imap service for user '.$datas->{'id'}.' SQL query' );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Failed on get imap service for user '.$datas->{'id'}.' SQL query' ] } );
     }
 
     my $result = $queryResult->fetchall_arrayref({});
     if( $#{$result} == 0 ) {
-        return $self->_returnContent( RC_OK, $result->[0]->{'host_ip'} );
+        return $self->_response( RC_OK, $result->[0]->{'host_ip'} );
     }
 
-    return $self->_returnContent( RC_NOT_FOUND, 'Not found' );
+    return $self->_response( RC_NOT_FOUND );
 }
 
 
@@ -158,7 +159,7 @@ sub _mailshareImapService {
 
     my $regexp = '^\/locator\/'.$datas->{'entity'}.'\/'.$datas->{'service'}.'\/'.$datas->{'entityType'}.'\/([^\/]+)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$datas->{'requestUri'} ] } );
         $return->[1]->{'help'} = [ 'Locator URI must be : /locator/'.$datas->{'entity'}.'/'.$datas->{'service'}.'/'.$datas->{'entityType'}.'/<entityId>' ];
         return $return;
     }
@@ -166,7 +167,7 @@ sub _mailshareImapService {
     $datas->{'id'} = $1;
 
     if( $datas->{'id'} !~ /^([^@]+)@([^@]+)$/ ) {
-        my $return = $self->_returnContent( RC_BAD_REQUEST, 'Invalid mailshare name '.$datas->{'id'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid mailshare name '.$datas->{'id'} ] } );
         $return->[1]->{'help'} = [ 'Mailshare name must be of the form : login@domain' ];
         return $return;
     }
@@ -187,15 +188,15 @@ sub _mailshareImapService {
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         $self->_log( 'Failed on get imap service for user '.$datas->{'id'}.' SQL query', 1 );
-        return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Failed on get imap service for user '.$datas->{'id'}.' SQL query' );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Failed on get imap service for user '.$datas->{'id'}.' SQL query' ] } );
     }
 
     my $result = $queryResult->fetchall_arrayref({});
     if( $#{$result} == 0 ) {
-        return $self->_returnContent( RC_OK, $result->[0]->{'host_ip'} );
+        return $self->_response( RC_OK, $result->[0]->{'host_ip'} );
     }
 
-    return $self->_returnContent( RC_NOT_FOUND, 'Not found' );
+    return $self->_response( RC_NOT_FOUND );
 }
 
 
@@ -205,7 +206,7 @@ sub _obmSyncService {
 
     my $regexp = '^\/locator\/'.$datas->{'entity'}.'\/'.$datas->{'service'}.'\/([^\/]+)\/([^\/]+)$';
     if( $datas->{'requestUri'} !~ /$regexp/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$datas->{'requestUri'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$datas->{'requestUri'} ] } );
         $return->[1]->{'help'} = [ 'Locator URI must be : /locator/'.$datas->{'entity'}.'/'.$datas->{'service'}.'/<serviceProperty>/<entityId>' ];
         return $return;
     }
@@ -214,7 +215,7 @@ sub _obmSyncService {
     $datas->{'id'} = $2;
 
     if( $datas->{'id'} !~ /^([^@]+)@([^@]+)$/ ) {
-        my $return = $self->_returnContent( RC_BAD_REQUEST, 'Invalid ID '.$datas->{'id'} );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid ID '.$datas->{'id'} ] } );
         $return->[1]->{'help'} = [ 'ID must be of the form : login@domain' ];
         return $return;
     }
@@ -238,15 +239,15 @@ sub _obmSyncService {
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         $self->_log( 'Failed on get sync service for user '.$datas->{'id'}.' SQL query', 1 );
-        return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Failed on get sync service for user '.$datas->{'id'}.' SQL query' );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Failed on get sync service for user '.$datas->{'id'}.' SQL query' ] } );
     }
 
     my $result = $queryResult->fetchall_arrayref({});
     if( $#{$result} == 0 ) {
-        return $self->_returnContent( RC_OK, $result->[0]->{'host_ip'} );
+        return $self->_response( RC_OK, $result->[0]->{'host_ip'} );
     }
 
-    return $self->_returnContent( RC_NOT_FOUND, 'Not found' );
+    return $self->_response( RC_NOT_FOUND );
 }
 
 

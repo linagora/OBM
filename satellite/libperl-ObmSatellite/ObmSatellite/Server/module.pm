@@ -9,6 +9,7 @@ require Exporter;
 use strict;
 
 use File::Basename;
+use ObmSatellite::Server::response;
 use HTTP::Status;
 use HTTP::Response;
 use XML::Simple;
@@ -100,42 +101,21 @@ sub processHttpRequest {
     }
 
     if( defined($uriModules) ) {
-        my( $status, $responseContent ) = $self->processUriModule( $uriModules, $request, $httpClient );
+        my $response = $self->processUriModule( $uriModules, $request, $httpClient );
 
-        if( !defined( $status ) ) {
-            $status = RC_INTERNAL_SERVER_ERROR;
-            $responseContent = {
-                'module' => 'obmSatellite',
-                'status' => '500 Internal Server Error'
-                };
+        if( !defined( $response ) ) {
+            $response = ObmSatellite::Server::response->new();
+            $response->setStatus( RC_INTERNAL_SERVER_ERROR );
+            $response->setStatusMessage( RC_INTERNAL_SERVER_ERROR.' Internal Server Error' );
         }
 
-        if( ref($responseContent) ne 'HASH' ) {
-            $responseContent = undef;
-        }elsif( defined($responseContent->{'type'}) && $responseContent->{'type'} eq 'PLAIN' ) {
-            $responseContent = $responseContent->{'content'};
-        }else {
-            $responseContent = XMLout( $responseContent, rootname => 'obmSatellite' );
-        }
-
-        if( defined($responseContent) ) {
-            $self->_log( 'Sending response : '.$status.' - '.$responseContent, 5 );
-        }else {
-            $self->_log( 'Sending response : '.$status, 5 );
-        }
-        my $response = HTTP::Response->new( $status );
-        $response->content( $responseContent ) if defined($responseContent);
-        $httpClient->send_response( $response );
+        $httpClient->send_response( $response->getHttpResponse() );
 
     }else {
-        my $response = HTTP::Response->new( RC_NOT_FOUND );
-        $response->content( XMLout( {
-                'module' => 'obmSatellite',
-                'status' => [ RC_NOT_FOUND.' URL does not exist' ]
-                } ), rootname => 'obmSatellite' );
-
-        $self->_log( 'Sending response : '.RC_NOT_FOUND.' - '.$response->content(), 5 );
-        $httpClient->send_response( $response );
+        my $response = ObmSatellite::Server::response->new();
+        $response->setStatus( RC_NOT_FOUND );
+        $response->setStatusMessage( RC_NOT_FOUND.' URL does not exist' );
+        $httpClient->send_response( $response->getHttpResponse() );
     }
 
 
@@ -154,16 +134,12 @@ sub processUriModule {
         $self->_log( 'Sending request \''.$request->uri->path().'\' to module \''.$modules->[$i]->getModuleName().'\'', 3 );
         $response = $modules->[$i]->processHttpRequest( $request->method(), $request->uri->path(), $request->content() );
 
-        if( ref($response) eq 'ARRAY' ) {
-            $response->[1]->{'module'} = $modules->[$i]->getModuleName();
-        }
-
         $i++;
     }
 
-    if( ref($response) ne 'ARRAY' ) {
+    if( ref($response) ne 'ObmSatellite::Server::response' ) {
         return undef;
     }
 
-    return @{$response};
+    return $response;
 }

@@ -166,6 +166,25 @@ sub _returnStatus {
 }
 
 
+sub _response {
+    my $self = shift;
+    my( $httpCode, $content ) = @_;
+
+    use ObmSatellite::Server::response;
+    my $response = ObmSatellite::Server::response->new( $self->getModuleName() );
+    $response->setStatus( $httpCode );
+    if( defined($content) ) {
+        if( ref( $content ) ) {
+            $response->setExtraContent( $content );
+        }else {
+            $response->setStatusMessage( $content );
+        }
+    }
+
+    return $response;
+}
+
+
 sub _returnContent {
     my $self = shift;
     my( $httpCode, $content ) = @_;

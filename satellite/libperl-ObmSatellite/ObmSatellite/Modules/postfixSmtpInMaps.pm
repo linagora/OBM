@@ -76,7 +76,7 @@ sub _postMethod {
     $datas{'requestUri'} = $requestUri;
 
     if( $requestUri !~ /^\/postfixsmtpinmaps\/host\/([^\/]+)(\/([^\/]+)){0,1}$/ ) {
-        my $return = $self->_returnStatus( RC_BAD_REQUEST, 'Invalid URI '.$requestUri );
+        my $return = $self->_response( RC_BAD_REQUEST, { content => [ 'Invalid URI '.$requestUri ] } );
         $return->[1]->{'help'} = [ $self->getModuleName().' URI must be : /postfixsmtpinmaps/host/<hostname>[/<map>]' ];
         return $return;
     }
@@ -110,7 +110,7 @@ sub _postMethod {
             last SWITCH;
         }
 
-        return $self->_returnContent( RC_NOT_FOUND, 'Unknow Postfix map \''.$datas{'map'}.'\'' );
+        return $self->_response( RC_NOT_FOUND, { content => [ 'Unknow Postfix map \''.$datas{'map'}.'\'' ] } );
     }
 
     return $self->_generateMaps( \%datas );
@@ -123,7 +123,7 @@ sub _generateMaps {
 
     my $domainList = $self->_getHostDomains( 'smtpInHost', $datas->{'hostname'} );
     if( !defined($domainList) ) {
-        my $return = $self->_returnStatus( RC_INTERNAL_SERVER_ERROR, 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' );
+        my $return = $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Can\'t get domain linked to host '.$datas->{'hostname'}.' from LDAP server' ] } );
         return $return;
     }
 
@@ -131,7 +131,7 @@ sub _generateMaps {
         $self->_log( 'Generate flat map \''.$map.'\', file '.$self->{$map}, 3 );
         if( $self->_generateFlatMap( $map, $domainList ) ) {
             $self->_log( 'Fail to generate flat map \''.$map.'\', file '.$self->{$map}, 1 );
-            return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Fail to generate flat map \''.$map.'\', file '.$self->{$map} );
+            return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Fail to generate flat map \''.$map.'\', file '.$self->{$map} ] } );
         }
     }
 
@@ -140,11 +140,11 @@ sub _generateMaps {
 
         if( $self->_generateDbMap( $map ) ) {
             $self->_log( 'Fail to generate DB map \''.$map.'\', from file '.$self->{$map}, 1 );
-            return $self->_returnContent( RC_INTERNAL_SERVER_ERROR, 'Fail to generate DB map \''.$map.'\', from file '.$self->{$map} );
+            return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Fail to generate DB map \''.$map.'\', from file '.$self->{$map} ] } );
         }
     }
 
-    return $self->_returnContent( RC_OK, 'Postfix SMTP-in maps generated successfully' );
+    return $self->_response( RC_OK, { content => [ 'Postfix SMTP-in maps generated successfully' ] } );
 }
 
 
