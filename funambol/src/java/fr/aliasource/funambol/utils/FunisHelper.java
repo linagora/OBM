@@ -18,6 +18,7 @@ public class FunisHelper {
 
 	public static String removeQuotedPrintableFromVCalString(String vcal) {
 		String cleaned = vcal.replace("\r\n", "\n");
+		cleaned = vcal.replace("\n\n", "\n");
 		String[] lines = safeSplit(cleaned, '\n');
 		StringBuffer noQuoted = new StringBuffer(lines.length * 76);
 		boolean quotedMode = false;
