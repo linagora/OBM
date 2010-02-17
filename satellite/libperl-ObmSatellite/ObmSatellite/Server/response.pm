@@ -166,5 +166,5 @@ sub _contentToXML {
     my $self = shift;
 
     use XML::Simple;
-    return XMLout( $self->{'content'}, rootName => ROOTNAME )
+    return XMLout( $self->{'content'}, rootName => ROOTNAME, XMLDecl => 1 )
 }
