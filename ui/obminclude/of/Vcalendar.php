@@ -42,7 +42,7 @@ class Vcalendar {
    * @return Vcalendar_Element
    */
   function & createElement($name) {
-    if(class_exists('Vcalendar_Element_'.ucfirst($name))) {
+    if(class_exists('Vcalendar_Element_'.ucfirst($name), false)) {
       $class = 'Vcalendar_Element_'.ucfirst($name);
       return new $class($this);
     } else {
