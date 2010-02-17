@@ -47,7 +47,9 @@ ALTER TABLE userobm ALTER COLUMN userobm_timecreate SET DEFAULT NOW();
 
 CREATE OR REPLACE FUNCTION on_userobm_change() RETURNS trigger AS '
 BEGIN
-new.userobm_timeupdate := current_timestamp;
+IF new.userobm_timelastacces = old.userobm_timelastaccess THEN
+	new.userobm_timeupdate := current_timestamp;
+END IF;
 RETURN new;
 END
 ' LANGUAGE plpgsql;

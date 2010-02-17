@@ -206,6 +206,22 @@ END
 CREATE TRIGGER userpattern_created BEFORE INSERT ON userpattern FOR EACH ROW EXECUTE PROCEDURE on_userpattern_create();
 CREATE TRIGGER userpattern_changed BEFORE UPDATE ON userpattern FOR EACH ROW EXECUTE PROCEDURE on_userpattern_change();
 
+
+--
+-- Fix trigger userobm_changed
+--
+DROP TRIGGER userobm_changed ON userobm;
+CREATE OR REPLACE FUNCTION on_userobm_change() RETURNS trigger AS '
+BEGIN
+IF new.userobm_timelastacces = old.userobm_timelastaccess THEN
+	new.userobm_timeupdate := current_timestamp;
+END IF;
+RETURN new;
+END
+' LANGUAGE plpgsql;
+CREATE TRIGGER userobm_changed BEFORE UPDATE ON userobm FOR EACH ROW EXECUTE PROCEDURE on_userobm_change();
+
+
 --
 -- Token
 --
