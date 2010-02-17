@@ -1552,11 +1552,14 @@ class OBM_Contact implements OBM_ISearchable {
     if (is_array($this->website)) {
       foreach($this->website as $website) {
         if ($website['label'][0] == 'ICAL') {
-          $handle = fopen($website['url'], "r");
-          $d = stream_get_contents($handle);
-          $cal = Vpdi::decodeOne($d);
-          fclose($handle);
-          return $cal;
+          try {
+            $handle = fopen($website['url'], "r");
+            $d = stream_get_contents($handle);
+            $cal = Vpdi::decodeOne($d);
+            fclose($handle);
+            return $cal;
+          } catch(Exception $e) {
+          }
         }
       }
     }
