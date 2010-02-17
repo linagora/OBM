@@ -55,6 +55,8 @@ sub _initHook {
         }
     };
 
+
+    # Load some options from module configuration file
     my @params = ( 'postmapCmd', 'ldapRoot' );
     my $confFileParams = $self->_loadConfFile( \@params );
 

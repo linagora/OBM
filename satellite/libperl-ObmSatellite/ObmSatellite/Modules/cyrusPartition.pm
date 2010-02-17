@@ -29,6 +29,7 @@ sub _initHook {
     $self->{'imapdPartitionRoot'} = IMAPD_PARTITION_ROOT;
 
 
+    # Load some options from module configuration file
     my @params = ( 'imapdConfFile', 'cyrusStartupScript', 'imapdPartitionRoot', 'ldapRoot' );
     my $confFileParams = $self->_loadConfFile( \@params );
 
@@ -92,7 +93,7 @@ sub _hostEntity {
         }
     }
 
-    return $self->_reponse( RC_NOT_FOUND, { content => [ 'Unknow operation \''.$datas->{'operation'}.'\'' ] } );
+    return $self->_response( RC_NOT_FOUND, { content => [ 'Unknow operation \''.$datas->{'operation'}.'\'' ] } );
 }
 
 
