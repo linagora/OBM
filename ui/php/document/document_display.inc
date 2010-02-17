@@ -292,7 +292,7 @@ function dis_document_consult($document) {
 //   - $co_q   : document database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_consult($doc_q) {
-  global $display ;
+  global $display, $path ;
   global $l_document, $l_size, $l_bytes, $l_title, $l_mimetype, $l_private;
   global $l_author, $l_path, $l_name; 
   global $l_file, $l_consult, $l_insert, $l_update, $l_checkdelete;
@@ -303,15 +303,14 @@ function html_document_consult($doc_q) {
   $author = $doc_q->f("document_author");
   $privacy = ($doc_q->f("document_privacy") == 1 ? $l_yes : $l_no );
   $mimetype = $doc_q->f("documentmimetype_label");
-  $path = $doc_q->f("document_path");
+  $docpath = $doc_q->f("document_path");
   $size = $doc_q->f("document_size");
   $name = $doc_q->f("document_name");
 
   // User defined data
   $block_userdata .= of_userdata_dis_entity_consult("document", $id);
 
-  $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
-  $url = "document_index.php?action=accessfile&amp;document_id=$id&amp;popup=1";
+  $url = "$path/document/document_index.php?action=accessfile&amp;document_id=$id&amp;popup=1";
 
   $dname =  ($name != '') ? "($name)" : ''; 
   $display["title"] = "$title $dname";
@@ -351,7 +350,7 @@ function html_document_consult($doc_q) {
      <td>$mimetype</td>
    </tr><tr>
      <th>$l_path</th>
-     <td>$path</td>
+     <td>$docpath</td>
    </tr>    
    <tr>
      <th>$l_size</th>
@@ -847,7 +846,7 @@ function html_document_mime_form($mime_q) {
 function dis_document_mime_links($document) {
   global $l_mime_link_document, $l_mime_link_document_no;
   global $l_mime_delete, $l_mime_can_delete, $l_mime_cant_delete;
-  global $l_back, $display;
+  global $l_back, $display, $path;
 
   $delete_ok = true;
   $id = $document["mime"];
@@ -928,7 +927,7 @@ function dis_document_display_pref($prefs) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_tree($document, $display_file) {
-  global $l_close;
+  global $l_close, $path;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
   
   $popup = $document["popup"];
@@ -988,7 +987,7 @@ $block.= "
 
 function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
   global $ico_file,$ico_folder_close,$ico_folder;
-  global $ico_folder_empty,$popup, $action;
+  global $ico_folder_empty,$popup, $action, $path;
 
   $directories = $tree[$current_directory][0];
   $files = $tree[$current_directory][1];
