@@ -355,3 +355,5 @@ $l_reinit_ok = "reset URLs erfolgreich";
 $l_share_ok = "gültig Aktie";
 $l_mail_ok = "E-Mail gesendet";
 
+$l_refresh = "Aktualisieren";
+

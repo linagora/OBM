@@ -488,3 +488,5 @@ $l_send = "Send";
 $l_reinit_ok = "reset urls successful";
 $l_share_ok = "valid share";
 $l_mail_ok = "Email sent";
+
+$l_refresh = "Refresh";

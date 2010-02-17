@@ -152,6 +152,7 @@ $l_template_entities_access_warning = "Vous n'avez pas les droits sur certains �
 $l_delete_template = "Supprimer le modèle?";
 
 // actions 
+$l_refresh = "Actualiser";
 $l_meeting_perform = "Rechercher les créneaux libres";
 $l_insert = "Enregistrer l'événement";
 $l_accept = "Accepter";

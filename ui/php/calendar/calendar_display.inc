@@ -730,6 +730,10 @@ function dis_calendar_navbar($current_view) {
         onclick='obm.calendarManager.showToday()'>$GLOBALS[l_today]</a>
     </span>
     <span id='navBarLabel' class='label'>$label</span>
+    <span class='lnk'>
+      <a href='javascript: void(0);' 
+        onclick='obm.calendarManager.refresh()'>$GLOBALS[l_refresh]</a>
+    </span>
     </div>";
   } else {
     $current = clone $current_view->get_date();

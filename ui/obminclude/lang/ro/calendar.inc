@@ -334,3 +334,5 @@ $l_send = "Trimite";
 $l_reinit_ok = "a nu putea suporta URL-uri de succes";
 $l_share_ok = "parts valabil";
 $l_mail_ok = "Email trimis";
+
+$l_refresh = "Actualizaţi"

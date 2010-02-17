@@ -345,3 +345,5 @@ $l_send = "Invia";
 $l_reinit_ok = "Reimposta URL di successo";
 $l_share_ok = "quota valida";
 $l_mail_ok = "Messaggio inviato";
+
+$l_refresh = "Aggiorna";
