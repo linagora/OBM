@@ -247,7 +247,7 @@ sub _updateImapdConf {
     my $return = $self->_restartCyrusService();
     $return->setExtraContent( {
         info => [ $self->{'imapdConfFile'}.' Cyrus configuration file update successfully on host '.$hostname ],
-        domain => @{$domainList}
+        domain => $domainList
     } );
     return $return;
 }
