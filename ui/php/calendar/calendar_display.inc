@@ -922,23 +922,23 @@ function dis_calendar_html_search_form($calendar, $p="") {
       <form id='advancedEventSearchForm' action='".basename($_SERVER['SCRIPT_NAME'])."'>
         <table>
         <tr>
-          <td>$GLOBALS[l_title]</td>
+          <th><label for=\"tf_title\">$GLOBALS[l_title]</label></th>
           <td><input type='text' id='tf_title' name='tf_title' value=\"$title\" /></td>
-          <td>$GLOBALS[l_owner]</td>
+          <th><label for=\"tf_owner\">$GLOBALS[l_owner]</label></th>
           <td><input type='text' id='tf_owner' name='tf_owner' value=\"$owner\" /></td>
-          <td>$GLOBALS[l_location]</td>
+          <th><label for=\"tf_location\">$GLOBALS[l_location]</label></th>
           <td><input type='text' id='tf_location' name='tf_location' value=\"$location\" /></td>
         </tr><tr>
-          <td>$GLOBALS[l_category]</td>
+          <th><label for=\"sel_category\">$GLOBALS[l_category]</label></th>
           <td>$sel_cat1</td>
-          <td>$GLOBALS[l_desc]</td>
+          <th><label for=\"tf_desc\">$GLOBALS[l_desc]</label></th>
           <td><input type='text' id='tf_desc' name='tf_desc' value=\"$desc\" /></td>
-          <td>$GLOBALS[l_attendees]</td>
+          <th><label for=\"tf_attendees\">$GLOBALS[l_attendees]</label></th>
           <td><input type='text' id='tf_attendees' name='tf_attendees' value=\"$attendees\" /></td>
         </tr><tr>
-          <td>$GLOBALS[l_tag]</td>
+          <th><label for=\"sel_tag\">$GLOBALS[l_tag]</label></td>
           <td>$sel_tags</td>
-          <td>$GLOBALS[l_datebegin]</td>
+          <th><label for=\"tf_date_begin\">$GLOBALS[l_datebegin]</label></th>
           <td><input type='text' id='tf_date_begin' name='tf_date_begin' value='".$date_begin->getInputDate()."' class='datePicker' /></td>
           <td>
             <input type='radio' id='rd_today' name='rd_period' value='today' onclick='setAdvancedSearchDate(this);' ". ($period=="today" ? "checked" : "") .">
@@ -951,7 +951,7 @@ function dis_calendar_html_search_form($calendar, $p="") {
         </tr><tr>
           <td></td>
           <td></td>
-          <td>$GLOBALS[l_dateend]</td>
+          <th><label for=\"tf_date_end\">$GLOBALS[l_dateend]</label></th>
           <td><input type='text' id='tf_date_end' name='tf_date_end' value='".$date_end->getInputDate()."' class='datePicker' /></td>
           <td>
             <input type='radio' id='rd_this_week' name='rd_period' value='this_week' onclick='setAdvancedSearchDate(this);' ". ($period=="this_week" ? "checked" : "") .">
