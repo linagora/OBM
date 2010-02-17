@@ -320,6 +320,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       $contact = OBM_Contact::get($params['id']);
     } else {
       $contact = new OBM_Contact();
+      if($cgp_mailing_default) $contact->mailok = 1;
       //FIXME: Make it less 'crappy'
       if($params['company_id'])  {
         $company = get_company_info($params['company_id']);
