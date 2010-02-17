@@ -58,7 +58,7 @@ class Vpdi_Icalendar_Freebusy {
   public function __construct(DateTime $start, DateTime $end) {
     $this->start = $start;
     $this->end = $end;
-    //$this->duration = ;
+    $this->duration = $this->end->format('U') - $this->start->format('U');
     $this->type = self::BUSY;
   }
   
