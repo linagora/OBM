@@ -61,25 +61,15 @@ public class AutoconfService extends HttpServlet {
 
 		DBQueryTool dbqt = new DBQueryTool();
 
-		HashMap<String, String> hostIps = new HashMap<String, String>();
+		HashMap<String, String> servicesHostNames = new HashMap<String, String>();
 		try {
-			hostIps.putAll(dbqt.getDBInformation(login, loadDomain(dbqt, login,
+			servicesHostNames.putAll(dbqt.getDBInformation(login, loadDomain(dbqt, login,
 					domain)));
 		} catch (Exception e) {
 			logger.error("Cannot contact DB:" + e);
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
 		}
-
-		// map host ip with imap host and smtp host
-		String imapMailHost = hostIps.get("imap");
-		String smtpMailHost = hostIps.get("smtp");
-		String ldapHost = ConstantService.getInstance().getStringValue(
-				"ldapHostname");
-		String allowedAtt = ConstantService.getInstance().getStringValue(
-				"allowedAtt");
-		String allowedValue = ConstantService.getInstance().getStringValue(
-				"allowedValue");
 
 		DirectoryConfig dc = new DirectoryConfig(login, ConstantService
 				.getInstance());
@@ -101,8 +91,7 @@ public class AutoconfService extends HttpServlet {
 		TemplateLoader tl = new TemplateLoader(dc.getConfigXml(),
 				ConstantService.getInstance());
 
-		Document doc = tl.applyTemplate(attributeSet, imapMailHost,
-				smtpMailHost, ldapHost, allowedAtt, allowedValue);
+		Document doc = tl.applyTemplate(attributeSet, servicesHostNames);
 
 		if (doc != null && tl.isValidTemplate(doc.getDocumentElement())) {
 			SimpleDateFormat formatter = new SimpleDateFormat(

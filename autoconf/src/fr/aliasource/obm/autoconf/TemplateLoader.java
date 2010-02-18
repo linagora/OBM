@@ -2,9 +2,8 @@ package fr.aliasource.obm.autoconf;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,12 +38,10 @@ public class TemplateLoader {
 	}
 
 	public Document applyTemplate(LDAPAttributeSet attributeSet,
-			String imapMailHost, String smtpMailHost, String ldapHost,
-			String allowedAtt, String allowedValue) throws IOException {
+			HashMap<String, String> servicesHostNames) throws IOException {
 		try {
 			Document doc = DOMUtils.parse(new FileInputStream(configXml));
-			generateXMLConfig(doc, attributeSet, imapMailHost, smtpMailHost,
-					ldapHost, allowedAtt, allowedValue);
+			generateXMLConfig(doc, attributeSet, servicesHostNames);
 			return doc;
 		} catch (Exception e) {
 			logger.error("Invalid config.xml document", e);
@@ -53,17 +50,14 @@ public class TemplateLoader {
 	}
 
 	private void generateXMLConfig(Document doc, LDAPAttributeSet attributeSet,
-			String imapMailHost, String smtpMailHost, String ldapHost,
-			String allowedAtt, String allowedValue) throws IOException {
+			HashMap<String, String> servicesHostNames) throws IOException {
 
 		Element root = doc.getDocumentElement();
-		replaceInNode(attributeSet, imapMailHost, smtpMailHost, ldapHost,
-				allowedAtt, allowedValue, root);
+		replaceInNode(attributeSet, servicesHostNames, root);
 	}
 
 	private void replaceInNode(LDAPAttributeSet attributeSet,
-			String imapMailHost, String smtpMailHost, String ldapHost,
-			String allowedAtt, String allowedValue, Element root) {
+			HashMap<String, String> servicesHostNames, Element root) {
 		NodeList nl = root.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node n = nl.item(i);
@@ -73,15 +67,12 @@ public class TemplateLoader {
 				for (int j = 0; j < atts.getLength(); j++) {
 					Attr at = (Attr) atts.item(j);
 					String oldVal = at.getValue();
-					String val = doAttributeExpansion(attributeSet,
-							imapMailHost, smtpMailHost, ldapHost, allowedAtt,
-							allowedValue, oldVal);
+					String val = doAttributeExpansion(attributeSet, servicesHostNames, oldVal);
 					if (!oldVal.equals(val)) {
 						e.setAttribute(at.getName(), val);
 					}
 				}
-				replaceInNode(attributeSet, imapMailHost, smtpMailHost,
-						ldapHost, allowedAtt, allowedValue, e);
+				replaceInNode(attributeSet, servicesHostNames, e);
 			}
 		}
 	}
@@ -119,36 +110,27 @@ public class TemplateLoader {
 		return ret;
 	}
 
+	private void replaceServiceHostName(String line, String serviceParam, String serviceHostName) {
+		if (serviceHostName != null && !serviceHostName.equals("")) {
+			line = line.replace(serviceParam, serviceHostName);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
 	private String doAttributeExpansion(LDAPAttributeSet attributeSet,
-			String imapMailHost, String smtpMailHost, String ldapHost,
-			String allowedAtt, String allowedValue, String line) {
+			HashMap<String, String> servicesHostNames, String line) {
 		if (attributeSet != null) {
 			Iterator iterator = attributeSet.iterator();
 			while (iterator.hasNext()) {
 				LDAPAttribute att = (LDAPAttribute) iterator.next();
-				if (att.getName().equalsIgnoreCase(allowedAtt)) {
-					List<String> values = Arrays.asList(att
-							.getStringValueArray());
-					if (values.contains(allowedValue)) {
-						line = line.replace("${" + att.getName() + "}", "true");
-					} else {
-						line = line.replace("${" + att.getName() + "}", "false");
-					}
-				} else {
-					line = line.replace("${" + att.getName() + "}", att
+				line = line.replace("${" + att.getName() + "}", att
 							.getStringValue());
-				}
 			}
 		}
-		if (imapMailHost != null) {
-			line = line.replace("${imapMailHost}", imapMailHost);
-		}
-		if (smtpMailHost != null) {
-			line = line.replace("${smtpMailHost}", smtpMailHost);
-		}
-		if (ldapHost != null) {
-			line = line.replace("${ldapHost}", ldapHost);
-		}
+		replaceServiceHostName(line, "${imapMailHost}", servicesHostNames.get("imap_frontend"));
+		replaceServiceHostName(line, "${smtpMailHost}",  servicesHostNames.get("smtp_out"));
+		replaceServiceHostName(line, "${ldapHost}",  servicesHostNames.get("ldap"));
+		replaceServiceHostName(line, "${obmSyncHost}",  servicesHostNames.get("obm_sync"));
 
 		for (Object key : constants.getKeySet()) {
 			String k = (String) key;

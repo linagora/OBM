@@ -1,5 +1,7 @@
 package fr.aliasource.obm.autoconf;
 
+import java.util.HashMap;
+
 import org.w3c.dom.Document;
 
 import com.novell.ldap.LDAPAttributeSet;
@@ -19,8 +21,7 @@ public class TemplateLoaderTests extends AutoconfTestCase {
 		assertNotNull(las);
 
 		try {
-			Document doc = tl.applyTemplate(las, "imapMailhost",
-					"smtpMailHost", "ldapHost", "att", "attvalue");
+			Document doc = tl.applyTemplate(las, new HashMap<String, String>());
 			assertNotNull(doc);
 //			DOMUtils.logDom(doc);
 			System.out.println("valid template: "+tl.isValidTemplate(doc.getDocumentElement()));

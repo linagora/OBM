@@ -38,7 +38,7 @@ public class DBQueryTool {
 		Connection con = null;
 		String query;
 
-		query = " SELECT 'imap' as service_name, host_fqdn "
+		query = " SELECT 'imap_frontend' as service_name, host_fqdn "
 				+ " FROM Domain"
 				+ " INNER JOIN DomainEntity ON domainentity_domain_id = domain_id"
 				+ " INNER JOIN UserObm ON userobm_domain_id = domain_id AND userobm_login = ?"
@@ -51,13 +51,35 @@ public class DBQueryTool {
 				+
 
 				" UNION"
-				+ " SELECT 'smtp' as service_name, host_fqdn "
+				+ " SELECT 'smtp_out' as service_name, host_fqdn "
 				+ " FROM Domain"
 				+ " INNER JOIN DomainEntity ON domainentity_domain_id = domain_id"
 				+ " LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id"
 				+ " LEFT JOIN Host ON CAST(host_id as CHAR) = serviceproperty_value"
 				+ " WHERE serviceproperty_service = 'mail'"
 				+ "   AND serviceproperty_property IN ('smtp_out')"
+				+ "   AND (domain_name = ? OR domain_global = true)"
+				+
+			
+				" UNION"
+				+ " SELECT 'ldap' as service_name, host_fqdn "
+				+ " FROM Domain"
+				+ " INNER JOIN DomainEntity ON domainentity_domain_id = domain_id"
+				+ " LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id"
+				+ " LEFT JOIN Host ON CAST(host_id as CHAR) = serviceproperty_value"
+				+ " WHERE serviceproperty_service = 'ldap'"
+				+ "   AND serviceproperty_property IN ('ldap_main')"
+				+ "   AND (domain_name = ? OR domain_global = true)"
+				+
+				
+				" UNION"
+				+ " SELECT 'obm_sync' as service_name, host_fqdn "
+				+ " FROM Domain"
+				+ " INNER JOIN DomainEntity ON domainentity_domain_id = domain_id"
+				+ " LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id"
+				+ " LEFT JOIN Host ON CAST(host_id as CHAR) = serviceproperty_value"
+				+ " WHERE serviceproperty_service = 'sync'"
+				+ "   AND serviceproperty_property IN ('obm_sync')"
 				+ "   AND (domain_name = ? OR domain_global = true)";
 
 		try {
