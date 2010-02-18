@@ -1,15 +1,35 @@
 <!-- $Id:$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.2 - 2010-02-04
+version 2.3.2 - 2010-02-18
 
-2010-02-10 : version 2.3.2
+2010-02-18 : version 2.3.2
 
   * #390 End date listbox disappear after specific use of free-busy (ie6 only)
-  * #676 create rpm o-push package
+  * #675 [Package] RPM caldav package 
+  * #676 [Package] RPM o-push package
+  * #926 [MiniG] Some files can't be attached
+  * #965 [Calendar] Pb with view on calendar module
   * #989 [Deal] The year detail Deal dashboard lacks links in the total columns
+  * #1009 [Todo] Tasks must have an ext_id 
+  * #1011 [MiniG] IE7 & IE8 PDF output
+  * #1014 [Auto] Caracters encoding error on LDAP DN
+  * #1015 [Host] host creation form should pre-select current domain
+  * #1029 [miniG] Message composition slow display on keys stoke
+  * #1036 [Package] meta-package obm-full 
+  * #1037 [Auto] Bad host role checking
+  * #1041 [MiniG] Editor Paste and Copy
+  * #1042 [MiniG] horizontal scroll in resolution 1152X864 Screen 19"
+  * #1043 [MiniG] Search results : corrupted message indexation in folder
+  * #1044 [Package] tmpwatch to remove on servers with java virtual machines
+  * #1045 [Sso] SQL Missing quotes when LemonLDAP queries domain name in OBM DB
+  * #1046 [Calendar] When editing an event in fast view, the event is duplicated
+  * #1049 [Package] dupplicate of 1036
+  * #1054 [Calendar] Contact search doesn't work
+  * #1062 [MiniG] Paste and Copy : To and CC fields
   * #1070 [Deal] ParentDeal can't be archived
   * #1073 [Translation] User delegation messages are not translated in english
+  * #1091 [Auto] Checking MiniG sieve compatibility
 
 2010-01-24 : version 2.3.1
 
