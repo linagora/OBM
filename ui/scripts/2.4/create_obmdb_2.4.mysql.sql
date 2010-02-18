@@ -578,12 +578,12 @@ CREATE TABLE `ContactFunction` (
 
 DROP TABLE IF EXISTS `contactgroup`;
 CREATE TABLE `contactgroup` (
-  contact_id int(8) NOT NULL,
-  group_id int(8) NOT NULL,
+  `contact_id` int(8) NOT NULL,
+  `group_id` int(8) NOT NULL,
   PRIMARY KEY  (`contact_id`, `group_id`),
   KEY `contactgroup_contact_id_contact_id_fkey` (`contact_id`),
   KEY `contactgroup_group_id_group_id_fkey` (`group_id`),
-  CONSTRAINT `contactgroup_contact_id_contact_id_fkey` FOREIGN KEY (`contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `contactgroup_contact_id_contact_id_fkey` FOREIGN KEY (`contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `contactgroup_group_id_group_id_fkey` FOREIGN KEY (`group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -594,12 +594,12 @@ CREATE TABLE `contactgroup` (
 
 DROP TABLE IF EXISTS `__contactgroup`;
 CREATE TABLE `__contactgroup` (
-  contact_id int(8) NOT NULL,
-  group_id int(8) NOT NULL,
+  `contact_id` int(8) NOT NULL,
+  `group_id` int(8) NOT NULL,
   PRIMARY KEY  (`contact_id`, `group_id`),
   KEY `__contactgroup_contact_id_contact_id_fkey` (`contact_id`),
   KEY `__contactgroup_group_id_group_id` (`group_id`),
-  CONSTRAINT `__contactgroup_contact_id_contact_id_fkey` FOREIGN KEY (`contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `__contactgroup_contact_id_contact_id_fkey` FOREIGN KEY (`contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `__contactgroup_group_id_group_id_fkey` FOREIGN KEY (`group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
