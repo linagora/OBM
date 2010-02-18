@@ -436,3 +436,7 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 #Address .multipleFieldButtons {
   margin-top: 50px;
 }
+
+#websiteLayout dd {
+  overflow:hidden;
+}
