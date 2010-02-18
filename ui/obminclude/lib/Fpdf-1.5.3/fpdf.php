@@ -9,7 +9,7 @@
 * You may use, modify and redistribute this software as you wish.              *
 *******************************************************************************/
 
-if(!class_exists('FPDF'))
+if(!class_exists('FPDF', false))
 {
 define('FPDF_VERSION','1.53');
 
