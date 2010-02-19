@@ -131,8 +131,8 @@ sub processUriModule {
     my $response = undef;
     my $i = 0;
     while( ($i <= $#{$modules}) && (ref($response) ne 'ARRAY') ) {
-        $self->_log( 'Sending request \''.$request->uri->path().'\' to module \''.$modules->[$i]->getModuleName().'\'', 3 );
-        $response = $modules->[$i]->processHttpRequest( $request->method(), $request->uri->path(), $request->content() );
+        $self->_log( 'Sending request \''.$request->uri->path_query().'\' to module \''.$modules->[$i]->getModuleName().'\'', 3 );
+        $response = $modules->[$i]->processHttpRequest( $request->method(), $request->uri->path_query(), $request->content() );
 
         $i++;
     }
