@@ -108,12 +108,13 @@ $l_reinit_calendar_private = "Réinitialisation des urls privées";
 $l_reinit_calendar_public = "Réinitialisation des urls publics";
 $l_desc_reinit_adress_public = "Les urls public existantes ne seront plus valides. Voulez vous continuez ?";
 $l_desc_reinit_adress_private = "Les urls privées existantes ne seront plus valides. Voulez vous continuez ?";
-$l_desc_share_adresse_public = "Adresse public de votre agenda. Cette adresse permet d'acceder à cette agenda en public.";
-$l_desc_share_adresse_private = "Adresse privée de cet agenda. Attention cette adresse permet d'acceder à cette agenda en privée.";
+$l_desc_share_adresse_public = "L'Adresse URL de l'agenda est l'URL publique de votre agenda. Cette adresse permet aux autres utilisateurs de visualiser votre agenda public, de consulter vos événements public via un lecteur de flux.";
+$l_desc_share_adresse_private = "L'adresse URL privée de votre agenda est réservée à un usage personnel. Toutes les informations relatives à votre agenda sont disponibles via vos liens privés.";
 $l_send = "send";
 $l_reinit_ok = "réinitialisation des urls réussis";
 $l_share_ok = "partage valide";
 $l_mail_ok = "Email envoyé";
+$l_more = "En savoir plus";
 
 // PDF Options
 $l_display_details = "Afficher les détails";

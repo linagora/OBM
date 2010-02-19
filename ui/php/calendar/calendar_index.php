@@ -1114,8 +1114,10 @@ if (!$params['ajax']) {
 } elseif ($action == 'send_url') {
   if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
     $format = $params['format'];
+    $params['others_attendees'][]=$params['mail'];
     $entity = get_user_info($params['entity_id']);
     $entity['token'] = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);
+    run_query_insert_others_attendees($params);
     $sharemail = new shareCalendarMailer();
     $sharemail->addRecipient($params['mail']);
     $sharemail->send("userShare$format",array($entity));

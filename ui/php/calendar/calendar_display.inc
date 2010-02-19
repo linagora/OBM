@@ -6634,7 +6634,7 @@ function html_share_calendar($id,$name) {
             <th>
               $GLOBALS[l_share_calendar_public]
               <div class=\"sharedesc\">
-                $GLOBALS[l_desc_share_adresse_public]
+                <a id=\"tooltip_public\" class=\"shareTip\">$GLOBALS[l_more]</a>
               </div>
             </th>
             <td>
@@ -6653,7 +6653,7 @@ function html_share_calendar($id,$name) {
             <th>
               $GLOBALS[l_share_calendar_private]
               <div class=\"sharedesc\">
-                $GLOBALS[l_desc_share_adresse_private]
+                <a id=\"tooltip_private\" class=\"shareTip\">$GLOBALS[l_more]</a>
               </div>
             </th>
             <td>
@@ -6672,6 +6672,12 @@ function html_share_calendar($id,$name) {
       </table>
       <input id=\"share_entity_id\" type=\"hidden\" value=\"$id\"/>
       <input id=\"share_entity_type\" type=\"hidden\" value=\"$entity_type\"/>
+      <script>
+        $('tooltip_public').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_public]</label>\");
+        $('tooltip_private').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_private]</label>\");
+        new Obm.Tip($('tooltip_public'), {fixed:false, click:false}, 'shareTip'); 
+        new Obm.Tip($('tooltip_private'), {fixed:false, click:false}, 'shareTip'); 
+      </script>
       $share_pop_up
     ";
   return $block;

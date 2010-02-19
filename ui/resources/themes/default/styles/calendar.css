@@ -999,6 +999,7 @@ input[type="submit"][disabled] {
   text-align: left;
   margin-top: 0.83em;
   margin-left: 0.83em;
+  max-width : 60em;
 }
 
 .sendPopup input.downlight{
@@ -1014,6 +1015,10 @@ input[type="submit"][disabled] {
   color:#FFFFFF;
   font-weight:bold;
   margin:0 3%;
+}
+
+.shareTip{
+  width :20em;
 }
 
 /* ------------------------------------------------------------------------- */

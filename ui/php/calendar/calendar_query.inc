@@ -5285,21 +5285,17 @@ function can_force_resource_conflict($conflicts = array()) {
 
 /**
  * Get all token create for specified entity
- * return array(mail => array('token','format'))
+ * return array(uid => array(type => token))
  */
 function get_entity_token($entity_id,$entity,$type) {
   global $obm, $cdg_sql;
 
   $domain = $obm['domain_id'];
-  if($type == 'private'){
-    $uid = $obm['uid'];
-  } else {
-    $uid = 0;
-  }
   
   $obm_q = new DB_OBM();
   $query = "SELECT DISTINCT(t1.token),
-    t3.value as type
+    t3.value as type,
+    t4.value as uid
     FROM token as t1 
     LEFT JOIN token as t2 ON t1.token = t2.token 
     LEFT JOIN token as t3 ON t1.token = t3.token 
@@ -5308,13 +5304,14 @@ function get_entity_token($entity_id,$entity,$type) {
     WHERE t1.property='entityId' AND t1.value='$entity_id' 
     AND t2.property='entity' AND t2.value='$entity'
     AND t3.property='type'
-    AND t4.property='uid' AND t4.value='$uid'
+    AND t4.property='uid'
     AND t5.property='domain' AND t5.value='$domain';";
   display_debug_msg($query, $cdg_sql, 'get_entity_token()');
   $obm_q->query($query);
   while($obm_q->next_record()){
     $type = $obm_q->f('type');
-    $tokens[$type]=$obm_q->f('token');
+    $uid = $obm_q->f('uid');
+    $tokens[$uid][$type]=$obm_q->f('token');
   }
   return $tokens;
 }
@@ -5326,50 +5323,19 @@ function get_calendar_entity_share($entity_id,$entity,$type) {
   global $obm, $cdg_sql;
 
   $readAcces = 'calendar';
-
+  if($type == 'private'){
+    $uid = $obm['uid'];
+  } else {
+    $uid = 0;
+  }
   $tokens = get_entity_token($entity_id,$entity,$type);
 
-  if(!isset($tokens[$type])) {
-    $tokens[$type] = generateUniqueKey();
-    run_query_calendar_insert_token($tokens[$type], $mail, $entity, $entity_id, $readAcces, $type, $format);
+  if(!isset($tokens[$uid][$type])) {
+    $tokens[$uid][$type] = generateUniqueKey();
+    run_query_calendar_insert_token($tokens[$uid][$type], $mail, $entity, $entity_id, $readAcces, $type, $format);
   }
   
-  return $tokens[$type];
-}
-
-/**
- * Update Token (share calendar)
- */
-function run_query_calendar_update_token($params) {
-  global $obm, $cdg_sql;
-
-  $entity_id = $params['entity_id'];
-  $entity_type = $params['entity'];
-  (isset($params['type']))?$type = $params['type']:$type='html';
-  $readAcces = 'calendar';
-
-  $tokens = get_entity_token($entity_id,$entity_type);
-
-  $obm_q = new DB_OBM();
-
-  if(isset($tokens) && !is_null($tokens[$type])){
-    $query = "DELETE FROM token WHERE token='$tokens[$type]';";
-    display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_token(delete)');
-    $obm_q->query($query);
-  }
-
-  $entity = get_user_info($entity_id);
-
-  if(!isset($tokens[$type])) {
-    $tokens[$type] = generateUniqueKey();
-    //$sharemail = new shareCalendarMailer();
-    //$sharemail->addRecipient($mail);
-    //$sharemail->send("userShare$format",array($entity));
-  }
-
-  run_query_calendar_insert_token($tokens['type'], $mail, $entity_type, $entity_id, $readAcces, $type, $format);
-
-  return $token;
+  return $tokens[$uid][$type];
 }
 
 function run_query_calendar_insert_token($token, $mail=null, $entity_type, $entity_id ,$readAcces, $type, $format=null) {
@@ -5385,9 +5351,6 @@ function run_query_calendar_insert_token($token, $mail=null, $entity_type, $enti
   
   $obm_q = new DB_OBM();
 
-  //$query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'contact_mail', '$mail');";
-  //display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_token(contact_mail)');
-  //$obm_q->query($query);
   $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'domain', '$domain');";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_token(domain)');
   $obm_q->query($query);
@@ -5409,21 +5372,34 @@ function run_query_calendar_insert_token($token, $mail=null, $entity_type, $enti
   $query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'type', '$type');";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_token(type)');
   $obm_q->query($query);
-  //$query = "INSERT INTO token (token, property, value ) VALUES ('$token', 'format', '$format');";
-  //display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_token(format)');
-  //$obm_q->query($query);
 }
 
+/**
+ *  Delete token for all uid
+ */
 function run_query_calendar_delete_token($entity_id,$entity_type,$type) {
   global $obm, $cdg_sql;
 
+  if($type == 'private'){
+    $uid = $obm['uid'];
+  } else {
+    $uid = 0;
+  }
   $obm_q = new DB_OBM();
 
   $tokens = get_entity_token($entity_id,$entity_type,$type);
-
-  $query = "DELETE FROM token WHERE token='$tokens[$type]';";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_token(delete)');
-  $obm_q->query($query);
+  if($uid != 0){
+    foreach($tokens as $token){
+      $query = "DELETE FROM token WHERE token='$token[$type]';";
+      display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_token(delete)');
+      $obm_q->query($query);
+    }
+  } else {
+    $token = $tokens[$uid][$type];
+    $query = "DELETE FROM token WHERE token='$token';";
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_token(delete)');
+    $obm_q->query($query);
+  }
 }
 
 /**
