@@ -75,6 +75,7 @@ sub _daemonize {
     if( $self->{'server'}->{'setsid'} ) {
         POSIX::setsid();
         close (STDOUT); 
+        open( STDOUT, '/dev/null' );
         close (STDIN);
         close (STDERR);
         open( STDERR, '/dev/null' );
