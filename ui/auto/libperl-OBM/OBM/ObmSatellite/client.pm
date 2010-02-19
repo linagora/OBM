@@ -157,6 +157,7 @@ sub _displayResponse {
     }
 
     $self->_log( 'requête \''.$url.'\' : '.$response->status_line(), 2 );
+    $self->_log( $response->headers_as_string(), 3 ) if $response->headers_as_string();
     $self->_log( $response->content(), 2 ) if $response->content();
     return 0;
 }
