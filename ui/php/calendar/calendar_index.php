@@ -659,7 +659,8 @@ if ($action == 'search') {
   require '../document/document_query.inc';
   require '../document/document_display.inc';
   
-  if (!check_user_attendance($params['event_id'], $obm['uid'])) {
+  if (!check_user_attendance($params['event_id'], $obm['uid']) 
+    || !in_array($params['document_id'], get_calendar_event_document_ids($params['event_id']))) {
     $display['msg'] .= display_err_msg("$l_err_file_access_forbidden");
   } else {
     $doc_q = run_query_document_detail($params['document_id']);

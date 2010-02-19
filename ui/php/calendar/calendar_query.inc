@@ -3160,6 +3160,32 @@ function get_calendar_event_entity($calendar_id) {
   return $entities;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Return ids of documents attached to an event
+// Parameters: 
+//   - $calendar_id
+///////////////////////////////////////////////////////////////////////////////
+function get_calendar_event_document_ids($event_id) {
+  global $cdg_sql;
+
+  $event_id = sql_parse_id($event_id, true);
+  
+  $query = "SELECT 
+    documentlink_document_id AS document_id
+    FROM DocumentLink
+    INNER JOIN EventEntity ON documentlink_entity_id = evententity_entity_id
+    WHERE 
+    evententity_event_id $event_id";
+
+  display_debug_msg($query, $cdg_sql, 'get_calendar_event_document_ids()');
+  $u_q = new DB_OBM;
+  $u_q->query($query);
+  $ids = array();
+  while ($u_q->next_record()) {
+    $ids[] = $u_q->f('document_id');
+  }
+  return $ids;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Calendar Quick Form Data checking and formatting
