@@ -16,7 +16,6 @@ use HTTP::Status;
 use constant ROOTNAME => 'obmSatellite';
 # Response type
 use constant XML => 'text/xml';
-use constant TEXTPLAIN => 'text/plain';
 
 sub new {
     my $class = shift;
@@ -24,7 +23,7 @@ sub new {
 
     my $self = bless { }, $class;
 
-    $self->setXMLResponse();
+    $self->setHttpHeader( 'Content-Type', XML );
     $self->setStatus( RC_INTERNAL_SERVER_ERROR );
     if( !defined($module) ) {
         $self->setModule( 'obmSatellite' );
@@ -38,19 +37,58 @@ sub new {
 }
 
 
-sub setXMLResponse {
+sub setHttpHeader {
     my $self = shift;
+    my( $httpHeader, $value ) = @_;
 
-    $self->{'responseType'} = XML;
+    if( !defined($httpHeader) || $httpHeader !~ /^[a-z_-]+$/i ) {
+        $self->_log( 'Invalid HTTP header name !', 2 );
+        return 0;
+    }
+
+    if( ref($value) && ref($value) ne 'ARRAY' ) {
+        $self->_log( 'Invalid value for HTTP header \''.$httpHeader.'\'', 2 );
+        return 0;
+    }
+
+    SWITCH: {
+        if( !ref( $value ) ) {
+            push( @{$self->{'httpHeaders'}->{$httpHeader}}, $value );
+            last SWITCH;
+        }
+
+        if( ref($value) eq 'ARRAY' ) {
+            push( @{$self->{'httpHeaders'}->{$httpHeader}}, @{$value} );
+            last SWITCH;
+        }
+
+        $self->_log( 'Invalid value for HTTP header \''.$httpHeader.'\'', 2 );
+        return 0;
+    }
+
     return 1;
 }
 
 
-sub setTextPlainResponse {
+sub unsetHttpHeader {
     my $self = shift;
+    my( $httpHeader ) = @_;
 
-    $self->{'responseType'} = TEXTPLAIN;
+    if( !defined($httpHeader) || $httpHeader !~ /^[a-z_-]+$/i ) {
+        $self->_log( 'Invalid HTTP header name !', 2 );
+        return 0;
+    }
+
+    delete( $self->{'httpHeaders'}->{$httpHeader} );
     return 1;
+}
+
+
+sub getHttpHeader {
+    my $self = shift;
+    my( $httpHeader ) = @_;
+
+    return $self->{'httpHeaders'}->{$httpHeader};
 }
 
 
@@ -58,7 +96,13 @@ sub asString {
     my $self = shift;
 
     my $string = "statusCode => ".$self->{'statusCode'}."\n";
+    
     $string .= "responseType => ".$self->{'responseType'}."\n";
+    $string .= "HTTP headers => {\n";
+    while( my( $key, $value ) = each( %{$self->{'httpHeaders'}} ) ) {
+        $string .= $key." => ".$value."\n";
+    }
+    $string .= "}\n";
     $string .= "rootName => \'".$self->{'rootName'}."\'\n";
     $string .= "content {\n";
     $string .= $self->_contentToXML();
@@ -148,6 +192,10 @@ sub getHttpResponse {
     if( !defined($response) ) {
         $self->_log( 'Can\'t generate response !', 0 );
         return undef;
+    }
+
+    while( my( $httpHeader, $value ) = each(%{$self->{'httpHeaders'}}) ) {
+        $response->header( $httpHeader => $value );
     }
 
     $response->content( $self->_contentToXML() );
