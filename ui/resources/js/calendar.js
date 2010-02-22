@@ -153,7 +153,7 @@ Obm.CalendarManager = new Class({
             current.setSeconds(0);
             current.setMilliseconds(0);
             var day = (current.getTime()-obm.vars.consts.startTime.getTime())/1000;
-            var more = $('more_'+day+'_'+index);
+            var more = $('more_'+index);
             if (more) {
               var title = '<a href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title+'</a>';
 	            var color = evt.content.getStyle('backgroundColor');
@@ -286,9 +286,9 @@ Obm.CalendarManager = new Class({
 
 
   /*
-   * Create dummy event (for event creation)
+   * Create in-day dummy event (for event creation)
    */
-  newDummyEvent: function(evt, context) {
+  newDummyEvent: function(evt) {
 
     this.destroyDummy();
 
@@ -338,7 +338,7 @@ Obm.CalendarManager = new Class({
       this.dummy.resize.removeEvents('complete');
       this.dummy.resize.addEvent('complete', function() {
         obm.calendarManager.scroll.stop();
-        obm.calendarQuickForm.setDefaultFormValues(eventData.time,0, context, obm.calendarManager.dummy.event.duration);
+        obm.calendarQuickForm.setDefaultFormValues(eventData.time, 0, obm.calendarManager.dummy.event.duration);
         obm.calendarQuickForm.show();    
         obm.calendarQuickForm.form.tf_title.focus();
       });
@@ -349,12 +349,98 @@ Obm.CalendarManager = new Class({
 
 
   /*
+   * get dummy event data 
+   */
+  dummyPrepare: function(evt) {
+    var ivent = new Event(evt);
+    var target = ivent.target;
+    target = $(target);
+    if (target.get('tag') == 'a') {
+      return false;
+    }
+    while(target.id == '') {
+      target = $(target.parentNode);
+    }
+    var str = target.id.split('_');
+    if (str.length <= 1) {
+      return false;
+    }
+    return str;
+  },
+
+
+  /*
+   * Set allday dummy event selection
+   */
+  newAlldayDummyEventHighlight: function(evt) {
+    if (this.dummy) {
+      var divId = this.dummyPrepare(evt);
+      var start = Math.min(divId[1], this.dummy.downCell[1]);
+      var end = Math.max(divId[1], this.dummy.downCell[1]);
+      if (divId[0] == 'dayContainer') {
+        $$('div.selection').each(function(e) {
+          $(e).removeClass('selection');
+        });
+        for(var i=start;i<=end;i++) {
+          if ($(obm.calendarManager.dayContainers[i])) {
+            $(obm.calendarManager.dayContainers[i]).addClass('selection');
+          }
+        }
+      }
+    }
+  },
+
+
+  /*
+   * Create allday dummy event (for event creation)
+   */
+  newAlldayDummyEvent: function(evt) {
+    var divId = this.dummyPrepare(evt);
+    if (evt.type == 'mousedown' && (divId[0] == 'dayContainer' || divId[0] == 'dayMonthLabel' ||  divId[0] == 'more' ) && obm.calendarManager.write == 1) {
+      if (divId[0] == 'dayMonthLabel') {
+        divId = $(divId.join('_')).parentNode.id.split('_');
+      }
+      if (divId[0] == 'more') {
+        divId = $(divId.join('_')).parentNode.parentNode.id.split('_');
+      }
+
+      this.dummy = new Object();
+      this.dummy.down = obm.calendarManager.startTime + divId[1].toInt()*86400;
+      this.dummy.downCell = divId;
+    } else if (evt.type == 'mouseup' && (divId[0] == 'dayContainer' || divId[0] == 'dayMonthLabel' ||  divId[0] == 'more' ) && obm.calendarManager.write == 1 && this.dummy) {
+      if (divId[0] == 'dayMonthLabel') {
+        divId = $(divId.join('_')).parentNode.id.split('_');
+      }
+      if (divId[0] == 'more') {
+        divId = $(divId.join('_')).parentNode.parentNode.id.split('_');
+      }
+
+      this.dummy.up = obm.calendarManager.startTime + divId[1].toInt()*86400;
+      var begin = Math.min(this.dummy.down, this.dummy.up);
+      var end = Math.max(this.dummy.down, this.dummy.up);
+      this.dummy = null;
+      $$('div.alldayContainer').each(function(e) {
+        e.set('class', 'alldayContainer');
+      });
+      if (begin != end) {
+        obm.calendarQuickForm.setDefaultFormValues(begin, 1, end-begin);
+        obm.calendarQuickForm.show();    
+        obm.calendarQuickForm.form.tf_title.focus();
+      }
+    }
+  },
+
+
+  /*
    * Destroy temp dummy div
    */
   destroyDummy: function() {
     try {
       $('dummy').destroy();
     } catch(e) {}
+    $$('div.alldayContainer').each(function(e) {
+      e.set('class', 'alldayContainer');
+    });
   },
 
 
@@ -417,13 +503,13 @@ Obm.CalendarManager = new Class({
           }
           i++;
         });
-        var more = $('more_'+str[1]+'_'+str[2]);
+        var more = $('more_'+str[2]);
         more.style.top = canBeDisplayed*15+'px';
         more.style.display = '';
         more.set('html','+'+undisplayed+' '+obm.vars.labels.more);
         obm.calendarManager.tips.add(more);
       } else {
-        $('more_'+str[1]+'_'+str[2]).style.display = 'none';
+        $('more_'+str[2]).style.display = 'none';
         if (obm.calendarManager.alldayEventGrid[str[2]]) {
           obm.calendarManager.alldayEventGrid[str[2]].each(function(e) {
             e.element.style.display = '';
@@ -911,7 +997,7 @@ Obm.CalendarManager = new Class({
           new Request.JSON({
             url: obm.vars.consts.calendarUrl,
             secure : false,
-            onComplete : this.receiveCreateEvent
+            onComplete : this.receiveCreateEvent,
           }).post($merge({ajax : 1, action : 'quick_insert'}, eventData));          
         }.bind(this));
         obm.calendarManager.popupManager.show(eventData);
@@ -931,21 +1017,18 @@ Obm.CalendarManager = new Class({
       resp = new Object();
       resp.error = 1;
       resp.message = obm.vars.labels.fatalServerErr;
-    }    
-    var events = response.eventsData;
+    }     
     if (response.error == 0) {
-      obm.calendarManager.destroyDummy();
       showOkMessage(response.message);
-      if (response.day == 1) {
-        obm.calendarManager.newDayEvent(events[0].event,events[0].options);
-      } else {
-        obm.calendarManager.newEvent(events[0].event,events[0].options);
-      }
-      obm.calendarManager.eventIndexing(events[0].event.id);
-    } else {
+      response.event.each(function(e) {
+        eval(e);
+      });
+      obm.calendarManager.eventIndexing(response.id);
       obm.calendarManager.destroyDummy();
+    } else {
       showErrorMessage(response.message);
     }
+
   }, 
 
 
@@ -1883,7 +1966,7 @@ Obm.CalendarQuickForm = new Class({
     new Obm.TabbedPane(this.data);
   },
   
-  compute: function(ivent, context) {
+  compute: function(ivent) {
     var ivent = new Event(ivent);
     var target = ivent.target;
     target = $(target);
@@ -1907,25 +1990,30 @@ Obm.CalendarQuickForm = new Class({
       /* End of crappy ie fix*/
 
       var d = obm.calendarManager.startTime + str[1].toInt() + Math.floor(x/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth.toInt()))*86400;
-      this.setDefaultFormValues(d,0, context, 3600);
+      this.setDefaultFormValues(d,0, 3600);
     } else if (type == 'allday') {
       if(!obm.calendarManager.write) return false;
       var d = obm.calendarManager.startTime + Math.floor($('allday_'+str[1]).style.left.toInt()/obm.vars.consts.cellWidth.toInt())*86400;
-      this.setDefaultFormValues(d,1, context, 3600);
-    } else if (type == 'dayContainer' || type == 'more' ) { // Month view
+      this.setDefaultFormValues(d,1, 3600);
+    } else if (type == 'dayContainer' || type == 'more') { // Month view
       if(!obm.calendarManager.write) return false;
-      var d = obm.calendarManager.startTime + str[1].toInt();
-      this.setDefaultFormValues(d,1, context, 3600);
+      var d = obm.calendarManager.startTime + str[1].toInt()*86400;
+      this.setDefaultFormValues(d,1, 3600);
+    } else if (type == 'dayMonthLabel') {
+      var dayContainer = target.parentNode.id.split('_');
+			if(!obm.calendarManager.write) return false;
+			var d = obm.calendarManager.startTime + dayContainer[1].toInt()*86400;
+			this.setDefaultFormValues(d,1, 3600);
     } else {
       var evt = obm.calendarManager.events.get(target.id);
-      this.setFormValues(evt,context);
+      this.setFormValues(evt);
     }
 
     this.show();    
     this.form.tf_title.focus();
   },
 
-  setFormValues: function(evt, context) {
+  setFormValues: function(evt) {
     var date_begin = new Obm.DateTime(evt.event.time * 1000);
     var date_end = new Obm.DateTime((evt.event.time + evt.event.duration) * 1000);    
     this.form.tf_title.value = evt.event.title;
@@ -1937,7 +2025,6 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.old_date_begin = new Obm.DateTime(evt.event.time * 1000).format('c');
     this.eventData.duration = evt.event.duration;
     this.eventData.periodic = evt.event.periodic;
-    this.eventData.context = context;
     this.eventData.element_id = evt.element.id;
     this.eventData.formAction = 'quick_update';
     this.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
@@ -1964,7 +2051,12 @@ Obm.CalendarQuickForm = new Class({
     if (!this.eventData.all_day) {
       this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' H:i'));
     } else {
-      this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat) + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat));
+      if (evt.event.duration <= 86400) {
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat));
+      } else {
+        var date_end = new Obm.DateTime((evt.event.time + evt.event.duration-1) * 1000);    
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat) + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat));
+      }
     }
     this.attendees.set('html','');
     if (typeof(evt.event.attendees)=='object'&&(evt.event.attendees instanceof Array)) {
@@ -1982,7 +2074,7 @@ Obm.CalendarQuickForm = new Class({
     }
   },
 
-  setDefaultFormValues: function(time, allDay, context, duration) {
+  setDefaultFormValues: function(time, allDay, duration) {
     var date_begin = new Obm.DateTime(time * 1000);
     var date_end = new Obm.DateTime((time + duration) * 1000);  
     this.form.tf_title.value = '';
@@ -1998,7 +2090,9 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.date_begin = date_begin.format('c');
     this.eventData.old_date_begin = this.eventData.date_begin;
     this.eventData.duration = duration;
-    this.eventData.context = context;
+    if (allDay && duration != 3600) {
+      this.eventData.duration+=86400;
+    }
     this.eventData.element_id = '';
     this.eventData.formAction = 'quick_insert';
     this.gotoURI = 'action=new';
@@ -2012,9 +2106,13 @@ Obm.CalendarQuickForm = new Class({
     this.detailButton.setStyle('display','none');
     this.entityList.setStyle('display','block');
     if (!this.eventData.all_day) {
-      this.date.set('html',date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
+      this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' H:i'));
     } else {
-      this.date.set('html',date_begin.format('Y/m/d') + '-' + date_end.format('Y/m/d'));
+      if (this.eventData.duration <= 86400) {
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat));
+      } else {
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat) + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat));
+      }
     }
     this.attendees.set('html','');
   },

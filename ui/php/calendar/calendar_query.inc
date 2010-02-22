@@ -1700,7 +1700,9 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $opacity = 'OPAQUE';
   if ($all_day == 'TRUE') {
-    $event_duration = "86400";
+    if ($event_duration == 3600) {
+      $event_duration = "86400";
+    }
     $opacity = 'TRANSPARENT';
   }
   $ext_id = generateUniqueKey();

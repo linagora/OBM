@@ -936,7 +936,7 @@ function dis_calendar_html_search_form($calendar, $p="") {
           <th><label for=\"tf_attendees\">$GLOBALS[l_attendees]</label></th>
           <td><input type='text' id='tf_attendees' name='tf_attendees' value=\"$attendees\" /></td>
         </tr><tr>
-          <th><label for=\"sel_tag\">$GLOBALS[l_tag]</label></td>
+          <th><label for=\"sel_tag\">$GLOBALS[l_tag]</label></th>
           <td>$sel_tags</td>
           <th><label for=\"tf_date_begin\">$GLOBALS[l_datebegin]</label></th>
           <td><input type='text' id='tf_date_begin' name='tf_date_begin' value='".$date_begin->getInputDate()."' class='datePicker' /></td>
@@ -1101,6 +1101,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   }
 
   // days header
+  $dayContainer = array();
   while($current->compare($end) < 0) {
     $date_iso = $current->getDateIso();
     $ts = $current->getTimestamp();
@@ -1116,8 +1117,10 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     $week_day_list .= "<td class='dayLabel'>
       <a href='javascript: void(0)' onclick='$day_js($ts);'>".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a>
     </td>";
+    $div_id = "dayContainer_{$step}_{$date_iso}";
+    array_push($dayContainer, $div_id); 
     $week_day_event_list .= "
-    <div id='dayContainer_".($ts - $start_time)."_$date_iso' class='alldayContainer' style='height:$height%;width:$width%;left:$week_day_left%;$today'>
+    <div id='$div_id' class='alldayContainer' style='height:$height%;width:$width%;left:$week_day_left%;$today'>
       <div id='allday_$date_iso' class='alldayCell'></div>
     </div>";
     $week_day_col .= "<div id='day_$date_iso' class='dayCol' style='left:$week_day_left%;'></div>";
@@ -1187,7 +1190,11 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       <tr>
         <td style='width:3em;text-align:center;'><a href='javascript: void(0)' onclick='obm.calendarManager.showWeek($ts)'>$week_num</a></td>
         <td colspan='$display_days' style='border-right:1px solid #AAA;'>
-          <div id='calendarHeaderGrid' ondblclick='obm.calendarQuickForm.compute(event, \"week\");'>
+          <div id='calendarHeaderGrid' 
+            onmouseover='if(obm.calendarManager) obm.calendarManager.newAlldayDummyEventHighlight(event);'
+            onmousedown='obm.calendarManager.newAlldayDummyEvent(event);'
+            onmouseup='obm.calendarManager.newAlldayDummyEvent(event);'
+            ondblclick='obm.calendarQuickForm.compute(event);'>
               $week_day_event_list
           </div>
         </td>
@@ -1203,8 +1210,8 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
         <div id='calendarGridContainer'>
           $today_marker
           <div id='calendarGrid'
-            onmousedown='obm.calendarManager.newDummyEvent(event, \"week\");' 
-            ondblclick='obm.calendarQuickForm.compute(event, \"week\");'>
+            onmousedown='obm.calendarManager.newDummyEvent(event);' 
+            ondblclick='obm.calendarQuickForm.compute(event);'>
             $week_day_col
             $week_time
           </div>
@@ -1226,7 +1233,8 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $('ico_day_view').setProperty('src', '$GLOBALS[$day]');
   $('ico_week_view').setProperty('src', '$GLOBALS[$week]');
   $('ico_month_view').setProperty('src', '$GLOBALS[ico_month_view]');
-  obm.calendarManager.setLegendBar('".phpStringToJsString($tag_legend)."');";
+  obm.calendarManager.setLegendBar('".phpStringToJsString($tag_legend)."');
+  obm.calendarManager.dayContainers = ".phpArrayToJsArray($dayContainer).";";
 
   if ($ajax) {
     $label = dis_calendar_navbar_label($current_view, $display_days);
@@ -1273,6 +1281,8 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   // calendar grid
   $weeks = 100/ceil((($end->getTimestamp() - $date->getTimestamp())/86400)/7);
 
+  $d=0;
+  $dayContainer = array();
   while($current->compare($end) < 0) {
     $step = 0;
     $week_day_event_list .= "<div class='monthRow' style='height:$weeks%'>";
@@ -1319,16 +1329,18 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $iso = $current->getURL();
       $date_iso = $current->getDateIso();
       $ts = $current->getTimestamp();
-      $div_id = ($ts-$start_time)."_$date_iso";
+      $div_id = "dayContainer_{$d}_{$date_iso}";
+      array_push($dayContainer, $div_id); 
       $week_day_left = $step*$width;
       $week_day_event_list .= "
-        <div id='dayContainer_$div_id' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
+        <div id='$div_id' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
           <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href='javascript: void(0);' onclick='obm.calendarManager.showDay($ts);'>$day</a></div>
           <div id='allday_$date_iso' class='alldayCell'>
-            <div id='more_$div_id' class='calTip' title='<h1>$tip_title <img id=\"close_$date_iso\" src=\"$ico_close\"/> </h1>' style='text-align:center;position:absolute;display:none;width:100%;'></div>
+            <div id='more_{$date_iso}' class='calTip' title='<h1>$tip_title <img id=\"close_$date_iso\" src=\"$ico_close\"/> </h1>' style='text-align:center;position:absolute;display:none;width:100%;'></div>
           </div>
         </div>";
       $step++;
+      $d++;
       $current->addDay(1);
     }
 
@@ -1357,7 +1369,11 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       </tr>
       <tr>
         <td colspan='7'>
-          <div id='calendarHeaderGrid' style='height:200px' ondblclick='obm.calendarQuickForm.compute(event, \"week\");'>
+          <div id='calendarHeaderGrid' style='height:200px' 
+            onmouseover='if(obm.calendarManager) obm.calendarManager.newAlldayDummyEventHighlight(event);'
+            onmousedown='obm.calendarManager.newAlldayDummyEvent(event);'
+            onmouseup='obm.calendarManager.newAlldayDummyEvent(event);'
+            ondblclick='obm.calendarQuickForm.compute(event);'>
             $week_day_event_list
           </div>
         </td>
@@ -1376,7 +1392,8 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   $('ico_day_view').setProperty('src', '$GLOBALS[ico_day_view]');
   $('ico_week_view').setProperty('src', '$GLOBALS[ico_week_view]');
   $('ico_month_view').setProperty('src', '$GLOBALS[ico_month_view_current]');
-  obm.calendarManager.setLegendBar('".phpStringToJsString($tag_legend)."');";
+  obm.calendarManager.setLegendBar('".phpStringToJsString($tag_legend)."');
+  obm.calendarManager.dayContainers = ".phpArrayToJsArray($dayContainer).";";
 
   if ($ajax) {
     $label = dis_calendar_navbar_label($current_view);
@@ -6010,6 +6027,7 @@ function json_build_html_event($calendar, $current_view, $id) {
 }
 
 
+// TODO: clean  json_insert_event_data && json_delete_event_data
 /**
  * Build a JSON message with all the event data
  * the respone is a table of event objects.
@@ -6018,12 +6036,72 @@ function json_build_html_event($calendar, $current_view, $id) {
  * @access public
  * @return void
  */
-function json_event_data($id,$calendar,$current_view) {
+function json_insert_event_data($id,$calendar,$current_view) {
+ 
+  $duration = $calendar['duration'];
+  $date = $calendar['date_begin'];
+  $end = clone $date;
+  $end->addSecond($duration);
+  $all_day = ($calendar['all_day'])?1:0;
+
+  $calendar_entity = $current_view->get_entities();
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
+  $category_filter = $current_view->get_category_filter();
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
+
+  if ($all_day) {
+    $current = clone $date;
+    $current->setWeekday($GLOBALS[ccalendar_weekstart])->setHour(0)->setMinute(0)->setSecond(0);
+    $of = &OccurrenceFactory::getInstance();
+    while($current->compare($end) < 0) {
+      $endWeek = clone $current;
+      $endWeek->addDay(7);
+      $occurrences = $of->getPeriodOccurrences($current,$endWeek);
+      if (is_array($occurrences)) {
+        foreach($occurrences as $occurrence) {
+          if ($occurrence->event->id == $id) {
+            $occurrence->index = $occurrence->date;
+            $occurrence->left = false;
+            $occurrence->right = false;
+
+            // Left extension
+            if ($occurrence->index->compare($current) < 0) {
+               $occurrence->index = $current;
+               $occurrence->left = true;
+            }
+
+            // Right extension
+            if ($occurrence->end->compare($endWeek) > 0) {
+               $occurrence->right = true;
+            }
+
+            $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
+          }
+        }
+      }
+      $current->addDay(7);
+    }
+  } else {
+    if (is_array($occurrences)) {
+      foreach($occurrences as $occurrence) {
+        if ($occurrence->event->id == $id) {
+          $dis_event = dis_calendar_event($occurrence, 'hour', $calendar_entity, $writable_entity);
+        }
+      }
+    }
+  }
+
+  $GLOBALS['display']['json'] .= "id:$id,";
+  $GLOBALS['display']['json'] .= "event:['".phpStringToJsString($dis_event)."']";
+}
+
+
+function json_delete_event_data($id,$calendar,$current_view) {
+
   global $obm, $display,$ccalendar_first_hour,$ccalendar_last_hour;
   global $ccalendar_max_users;
   global $l_user, $l_resource;
 
-  $context = $calendar['context'];
   $element_id = $calendar['element_id'];
   $ent_q = run_query_get_events_attendee(array($id));
   $entities = get_calendar_event_entity($id);
@@ -6068,23 +6146,6 @@ function json_event_data($id,$calendar,$current_view) {
   $ed[] = "all:$all";
  
   $calendar_entity = $current_view->get_entities();
-  switch($context)  {
-    case 'day' :
-      $options = array(); 
-      break;
-    case 'week' :
-      $options = array();
-      break;
-    case 'month' :
-      $week_duration = 86400*7;
-      $options = array('xUnit:86400',"yUnit:$week_duration",
-                       "context: 'body'");      
-      break;     
-    default :
-      $options = array();
-      break; 
-  }
-
   $updatable[] = "draggable:'true'"; 
   if(!$all_day) {
     $updatable[] = "resizable:'true'"; 
@@ -6093,18 +6154,14 @@ function json_event_data($id,$calendar,$current_view) {
     foreach ($data as $entity_id => $entity_data) {
       if($entities[$entity]['entity'][$entity_id]) {
         $info = $ed;
-        $opt = $options;
         $info[] = "entity:'$entity'";
         $info[] = "entity_id:$entity_id";
         $info[] = "klass:'".$entity_data['class']."'";
         $info[] = "status:'".$entities[$entity]['entity'][$entity_id]['state']."'";
-        if($entity_id = $obm['uid'] && $entity == 'user') {
-          $opt = array_merge($opt,$updatable);
-        }
         if($json != '') {
           $json .= ',';
         }
-        $json .= "{event:{".implode(',',$info)."},options:{".implode(',',$opt)."}}";
+        $json .= "{event:{".implode(',',$info)."}}";
       }
     }
   }

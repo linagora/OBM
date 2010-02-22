@@ -444,7 +444,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'quick_insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_data_quick_form($params) && OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'access' )) {
+  if (check_calendar_data_quick_form($params) && OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'access')) {
     if( OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'write' )) {
       $state = 'ACCEPTED';
     } else {
@@ -452,22 +452,21 @@ if ($action == 'search') {
     }
     $id = run_query_calendar_quick_event_insert($params, $state);
     $params["calendar_id"] = $id;
+    json_insert_event_data($id, $params, $current_view);
     json_ok_msg("$l_event : $l_insert_ok");
-    json_event_data($id, $params, $current_view);
     echo "({".$display['json']."})";
-    exit();
+
   } else {
-    json_error_msg($l_invalid_data . ' : ' . $err['msg']);
-    echo "({".$display['json']."})";
-    exit();
+    echo "<script type=\"text/javascript\">".json_error_msg($l_invalid_data . ' : ' . $err['msg'])."</script>";
   }
+  exit();
 
 } elseif ($action == 'quick_delete') {  
 ///////////////////////////////////////////////////////////////////////////////
   $id = $params['calendar_id'];
   if (check_calendar_access($id)) {
     $eve_q = run_query_calendar_detail($id);
-    json_event_data($id, $params, $current_view);
+    json_delete_event_data($id, $params, $current_view);
     if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {
       run_query_calendar_delete($params,false);
     } else {

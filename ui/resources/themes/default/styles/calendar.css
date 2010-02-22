@@ -16,6 +16,11 @@
   border: 1px solid #CCC;
 }
 
+#calendarLayout {
+  -moz-user-select:none;
+  -webkit-user-select:none;
+}
+
 #calendarNavBar {
   padding-left: 10px;
   padding-top:4px;
@@ -61,6 +66,10 @@
   border-left:1px solid #AAA;
   position:absolute;
   height:100%;
+}
+
+.selection {
+  background-color: #4692a9!important;
 }
 
 .alldayContainer {
