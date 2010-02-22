@@ -367,6 +367,12 @@ if ($action == 'ext_get_ids') {
   echo "({".$display['json']."})";
   exit();
 
+} else if ($action == 'unlink_mobile') {
+///////////////////////////////////////////////////////////////////////////////
+  $remove_q = run_query_userobm_mobile_unlink($params);
+  echo "({".$display['json']."})";
+  exit();
+
 } else if ($action == 'remove_partnership') {
 ///////////////////////////////////////////////////////////////////////////////
   $remove_q = run_query_userobm_mobile_remove_partnership($params);
@@ -703,6 +709,14 @@ function get_user_action() {
     'Right'	   => $cright_write_admin,
     'Condition'=> array('None')
   );
+
+  // Unlink mobile 
+  $actions['user']['unlink_mobile'] = array (
+    'Url'	   => "$path/user/user_index.php?action=unlink_mobile",
+    'Right'	   => $cright_write_admin,
+    'Condition'=> array('None')
+  );
+
 }
 
 

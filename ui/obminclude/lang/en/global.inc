@@ -503,3 +503,6 @@ $l_save = 'Save';
 
 
 $l_displayname_template = '%1$s %2$s';
+
+$l_unlink_mobile = "Delete the mobile device ?";
+

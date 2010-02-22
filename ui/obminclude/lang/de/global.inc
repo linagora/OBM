@@ -486,3 +486,5 @@ $l_next_month = "Nächste Monat";
 $l_duplicate_error = "";
 $l_hide_advanced_search = "";
 
+$l_unlink_mobile = "Löschen das mobile Gerät";
+

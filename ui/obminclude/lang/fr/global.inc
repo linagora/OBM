@@ -587,3 +587,6 @@ $l_timezone = "Fuseau horaire";
 $l_save = 'Sauvegarder';
 
 $l_displayname_template = '%1$s %2$s';
+
+$l_unlink_mobile = "Supprimer le périphérique mobile?";
+

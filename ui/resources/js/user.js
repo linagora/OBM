@@ -34,6 +34,13 @@ Obm.UserMobileDeviceManager = new Class({
     }
   },
 
+  removeMobile: function(id) {
+    if (confirm(obm.vars.labels.unlink)) {
+      var device = this.devices.get(id);
+      device.unlikMobile(id);
+    }
+  },
+
   togglePartnership: function(id) {
     var device = this.devices.get(id);
     if (device.permsDeviceId) {
@@ -95,6 +102,24 @@ Obm.UserMobileDevice = new Class({
           showOkMessage(obm.vars.labels.updateOk);
         }.bind(this)
       }).post($merge({ajax:1, action:'remove_partnership'}, eventData)); 
+    } else {
+      showErrorMessage(obm.vars.labels.permsError);
+    }
+  },
+
+  unlikMobile: function() {
+    if(obm.vars.consts.isSuperman && this.delegation) {
+      var eventData = new Object();
+      eventData.owner = this.owner;
+      eventData.device_id = this.id;
+      new Request.JSON({
+        url : obm.vars.consts.obmUrl+'/user/user_index.php',
+        secure: false,
+        onComplete: function(response) {
+          showOkMessage(obm.vars.labels.updateOk);
+          if ($('mobile_'+this.id)) $('mobile_'+this.id).destroy();
+        }.bind(this)
+      }).post($merge({ajax:1, action:'unlink_mobile'}, eventData));
     } else {
       showErrorMessage(obm.vars.labels.permsError);
     }
