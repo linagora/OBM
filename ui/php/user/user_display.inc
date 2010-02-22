@@ -1210,6 +1210,7 @@ function html_user_mobile_devices($user_id, $type) {
   $perms_error = 'obm.vars.labels.permsError="'.phpStringToJsString($GLOBALS['l_error_permission']).'";';
   $update_ok = 'obm.vars.labels.updateOk="'.phpStringToJsString($GLOBALS['l_update_ok']).'";';
   $update_error = 'obm.vars.labels.updateError="'.phpStringToJsString($GLOBALS['l_update_error']).'";';
+  $unlink = 'obm.vars.labels.unlink="'.phpStringToJsString($GLOBALS['l_unlink_mobile']).'";';
 
   $mobile_devices  = "";
   $opush = false;
@@ -1242,6 +1243,7 @@ function html_user_mobile_devices($user_id, $type) {
         <td>$mobile_type</td>
         <td>$last_sync</td>
         <td><img src='$GLOBALS[ico_search]' onclick='obm.userMobileDeviceManager.showInfo(\"$mobile_id\");'/></td>
+        <td><img src='$GLOBALS[ico_delete]' onclick='obm.userMobileDeviceManager.removeMobile(\"$mobile_id\");'/></td>
       </tr>";
       $userMobileDeviceManager .= "obm.userMobileDeviceManager.addDevice('$mobile_id', '$mobile_owner', '$first_sync', '$last_sync', '$perms_device_id', '$delegation');";
     }
@@ -1271,6 +1273,7 @@ function html_user_mobile_devices($user_id, $type) {
             <td>$GLOBALS[l_type]</td>
             <td>$GLOBALS[l_last_sync]</td>
             <td></td>
+            <td></td>
           </tr>
         </thead> 
         $devices
@@ -1289,6 +1292,7 @@ function html_user_mobile_devices($user_id, $type) {
         $perms_error
         $update_ok
         $update_error
+        $unlink
         obm.vars.labels.addPartnership = '".phpStringToJsString($GLOBALS['l_mobile_add_partnership'])."';
         obm.vars.labels.removePartnership = '".phpStringToJsString($GLOBALS['l_mobile_remove_partnership'])."';
         obm.userMobileDeviceManager = new Obm.UserMobileDeviceManager();
