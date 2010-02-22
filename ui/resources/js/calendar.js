@@ -420,7 +420,7 @@ Obm.CalendarManager = new Class({
       var end = Math.max(this.dummy.down, this.dummy.up);
       this.dummy = null;
       $$('div.alldayContainer').each(function(e) {
-        e.set('class', 'alldayContainer');
+        e.removeClass('selection');
       });
       if (begin != end) {
         obm.calendarQuickForm.setDefaultFormValues(begin, 1, end-begin);
@@ -439,7 +439,7 @@ Obm.CalendarManager = new Class({
       $('dummy').destroy();
     } catch(e) {}
     $$('div.alldayContainer').each(function(e) {
-      e.set('class', 'alldayContainer');
+      e.removeClass('selection');
     });
   },
 
