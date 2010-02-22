@@ -1557,7 +1557,7 @@ class OBM_Contact implements OBM_ISearchable {
   public function getCalendar() {
     if (is_array($this->website)) {
       foreach($this->website as $website) {
-        if ($website['label'][0] == 'ICAL') {
+        if ($website['label'][0] == 'CALURI') {
           $handle = @fopen($website['url'], "r");
           if ($handle) {
             $d = stream_get_contents($handle);

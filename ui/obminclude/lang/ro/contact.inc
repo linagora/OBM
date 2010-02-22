@@ -122,7 +122,7 @@ $l_vcf_file = "Fișier VCF de importat";
 $l_phone_labels = array ('HOME_VOICE' => 'Telefon (domiciliu)', 'WORK_VOICE' => 'Telefon (serviciu)', 'CELL_VOICE' => 'Telefon mobil', 'HOME_FAX' => 'Fax (domiciliu)','WORK_FAX' => 'Fax (serviciu)', 'PAGER' => 'Pager', 'OTHER' => 'Alt telefon');
 $l_email_labels = array ('INTERNET' => 'Internet', 'OTHER' => 'Altul');
 $l_address_labels = array ('HOME' => 'Domiciliu', 'WORK' => 'Serviciu', 'OTHER' => 'Altul');
-$l_website_labels = array ('URL' => 'Web Site ', 'BLOG' => 'Log internet', 'ICAL' => 'Calendar', 'OTHER' => 'Altul');
+$l_website_labels = array ('URL' => 'Web Site ', 'BLOG' => 'Log internet', 'CALURI' => 'Calendar', 'OTHER' => 'Altul');
 $l_err_length_express_postal = "Câmpul 'Cod Poștal' trebuie să conțină maxim 16 caractere.";
 
 // lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00
