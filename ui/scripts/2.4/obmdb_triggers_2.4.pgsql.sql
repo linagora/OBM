@@ -47,7 +47,7 @@ ALTER TABLE userobm ALTER COLUMN userobm_timecreate SET DEFAULT NOW();
 
 CREATE OR REPLACE FUNCTION on_userobm_change() RETURNS trigger AS '
 BEGIN
-IF new.userobm_timelastacces = old.userobm_timelastaccess THEN
+IF new.userobm_timelastaccess = old.userobm_timelastaccess THEN
 	new.userobm_timeupdate := current_timestamp;
 END IF;
 RETURN new;
