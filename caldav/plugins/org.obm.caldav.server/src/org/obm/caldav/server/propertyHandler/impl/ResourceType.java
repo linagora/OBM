@@ -16,7 +16,6 @@
 
 package org.obm.caldav.server.propertyHandler.impl;
 
-
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
@@ -28,30 +27,39 @@ import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Element;
 
 /**
- *  Name:       resourcetype
- *  Purpose:    Specifies the nature of the resource.
- *  Description: The resourcetype property MUST be defined on all DAV
- * 				 compliant resources.  The default value is empty.
- *  
- *  <!ELEMENT resourcetype ANY >
+ * Name: resourcetype Purpose: Specifies the nature of the resource.
+ * Description: The resourcetype property MUST be defined on all DAV compliant
+ * resources. The default value is empty.
+ * 
+ * <!ELEMENT resourcetype ANY >
  * 
  * @author adrienp
- *
+ * 
  */
-public class ResourceType extends DavPropertyHandler implements PropfindPropertyHandler, CalendarQueryPropertyHandler{
+public class ResourceType extends DavPropertyHandler implements
+		PropfindPropertyHandler, CalendarQueryPropertyHandler {
 
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req, IBackend proxy, String url) {
-		Element elem = appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
-		appendElement(elem,"collection", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
-		appendElement(elem,"calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
-		appendElement(elem,"schedule-calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+	public void appendPropertyValue(Element prop, Token t, DavRequest req,
+			IBackend proxy, String url) {
+
+		Element elem = appendElement(prop, "resourcetype",
+				NameSpaceConstant.DAV_NAMESPACE_PREFIX);
+		if (url.toLowerCase().endsWith("/event/")) {
+			appendElement(elem, "collection",
+					NameSpaceConstant.DAV_NAMESPACE_PREFIX);
+			appendElement(elem, "calendar",
+					NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+			appendElement(elem, "schedule-calendar",
+					NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+		}
 	}
 
 	@Override
 	public void appendCalendarQueryPropertyValue(Element prop, IBackend proxy,
 			EventTimeUpdate event) {
-		appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
+		appendElement(prop, "resourcetype",
+				NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 	}
 
 	@Override

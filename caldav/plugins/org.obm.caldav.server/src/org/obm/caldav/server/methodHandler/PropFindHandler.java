@@ -113,7 +113,7 @@ public class PropFindHandler extends DavMethodHandler {
 		Document ret = new PropertyListBuilder().build(t, req,urls, toLoad, toNotImplemented, proxy);
 
 		try {
-			if(logger.isDebugEnabled()){
+			if(logger.isInfoEnabled()){
 				DOMUtils.logDom(ret);
 			}
 			resp.setStatus(207); // multi status webdav

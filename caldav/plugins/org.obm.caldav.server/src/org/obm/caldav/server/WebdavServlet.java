@@ -74,7 +74,7 @@ public class WebdavServlet extends HttpServlet {
 		IBackend backend = null;
 		try {
 			String method = request.getMethod();
-			logger.info("\n[" + method + "] " + request.getRequestURI());
+			logger.info("[" + method + "] " + request.getRequestURI());
 			DavRequest dr = new DavRequest(request);
 
 			Token token = authHandler.doAuth(dr);
