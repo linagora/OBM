@@ -1208,7 +1208,6 @@ Obm.CalendarManager = new Class({
     if (response.error == 0) {
       var str = response.elementId.split('_');
       showOkMessage(response.message);
-
       if (response.isPeriodic && response.all) { 
         $$('div.evt_'+str[1]).each(function(e) {
           var evt = obm.calendarManager.events.get(e.id);
@@ -1232,6 +1231,8 @@ Obm.CalendarManager = new Class({
           }
         }
       }
+      obm.calendarManager.eventIndexing(str[1], 1);
+
     } else {
       showErrorMessage(response.message);
     }
@@ -1277,9 +1278,10 @@ Obm.CalendarManager = new Class({
   /*
    * Store event in solr
    */
-  eventIndexing: function(id) {
+  eventIndexing: function(id, remove) {
     var eventData = new Object();
     eventData.id = id;
+    eventData.remove = remove;
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,

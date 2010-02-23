@@ -628,6 +628,7 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'])) {
     run_query_calendar_delete($params);
+    OBM_IndexingService::delete('event', $params['calendar_id']);
     $display['detail'] = dis_calendar_calendar_view($params, $current_view);
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
@@ -991,9 +992,15 @@ if ($action == 'search') {
 
 } elseif ($action == 'async_indexing') {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_calendar_solr_store($params['id']);
+  if ($params['remove']) {
+    OBM_IndexingService::delete('event', $params['id']);
+  } else {
+    run_query_calendar_solr_store($params['id']);
+  }
   exit();
+
 } elseif ($action == 'share_calendar') {
+///////////////////////////////////////////////////////////////////////////////
   if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
     run_query_calendar_update_token($params);
     $display['msg'] .= display_ok_msg("$l_shares : $l_update_ok");

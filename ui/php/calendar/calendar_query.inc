@@ -2815,17 +2815,13 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
   // Send mail
   $event = OBM_EventFactory::getInstance()->getById($event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
-  // SOLR
-  OBM_IndexingService::delete('event', $event_id);
+
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
   if($force_sendmail || $calendar['send_mail']) {
     OBM_EventFactory::getInstance()->delete($event);
   }
   $obm_q->query($query);
   of_entity_delete('event', $event_id);
-
-  // Solr Delete
-  OBM_IndexingService::delete('event', $event_id);
 }
 
 
