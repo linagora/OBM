@@ -46,7 +46,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view;
   
   $display['features'] = html_calendar_planning_bar($calendar, $current_view, $calendar_entity, $entity_readable, $my_views, $p_view);
-  $display['title'] = "<h1 class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"].' '.$GLOBALS["l_range_$p_range"].' </h1>';
+  $display['title'] = "<h1 id='calendarTitle' class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"].' '.$GLOBALS["l_range_$p_range"].' </h1>';
   $display['search'] = dis_calendar_view_bar($current_view, $calendar);
   if (function_exists($calendar_function)) {
     $block = $calendar_function($current_view, $calendar_entity, $writable_entity);
@@ -1237,13 +1237,16 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   obm.calendarManager.dayContainers = ".phpArrayToJsArray($dayContainer).";";
 
   if ($ajax) {
+    $view = $current_view->get_cal_view();
+    $title = phpStringToJsString("$GLOBALS[l_module_calendar] : ".$GLOBALS["l_view_$view"].' '.$GLOBALS["l_range_$range"]);
     $label = dis_calendar_navbar_label($current_view, $display_days);
     return "$block
       <script type=\"text/javascript\">
         obm.vars.consts.calendarRange = '$range';
         obm.vars.consts.cellWidth = '$width';
+        $('calendarTitle').innerHTML = '$title'
         $js
-        $('navBarLabel').innerHTML = '$label';
+        $('navBarLabel').innerHTML = '".phpStringToJsString($label)."';
       </script>";
   }
 
@@ -1396,6 +1399,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   obm.calendarManager.dayContainers = ".phpArrayToJsArray($dayContainer).";";
 
   if ($ajax) {
+    $title = phpStringToJsString("$GLOBALS[l_module_calendar] : ".$GLOBALS["l_view_agenda"].' '.$GLOBALS["l_range_month"]);
     $label = dis_calendar_navbar_label($current_view);
     return "$block
       <script type=\"text/javascript\">
@@ -1405,7 +1409,8 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
         $dis_week_time
         $dis_weekbegin_time
         $js
-        $('navBarLabel').innerHTML = '$label';
+        $('calendarTitle').innerHTML = '$title';
+        $('navBarLabel').innerHTML = '".phpStringToJsString($label)."';
       </script>";
   }
 
