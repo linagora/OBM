@@ -1,4 +1,10 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# This script will re-index all contacts & events in SOLR.
+#
+# Depends: python-psycopg2 for postgresql or python-mysqldb for mysql.
+
 
 import ConfigParser
 import xml.dom.minidom
