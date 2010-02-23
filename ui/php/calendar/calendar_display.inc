@@ -4895,7 +4895,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
   if (is_array($contacts)) {
     foreach($contacts as $contact_id) {
       $contact = OBM_Contact::get($contact_id);
-      $contacts_fb[$contact_id] = $contact->getCalendar();
+      $contacts_fb[$contact_id] = $contact->getEventsInInterval($date, $end);
     }
   }
 
@@ -4955,10 +4955,15 @@ function dis_calendar_free_interval($current_view, $calendar) {
         }
       }
 
-      foreach($contacts_fb as $contact => $cal) {
-        if ($cal) {
-          $busy = $cal->getBusyPeriodsWithinInterval($d, $e);
-          if (sizeof($busy) > 0) {
+      foreach($contacts_fb as $contact => $evts) {
+        if ($evts) {
+          $busy = false;
+          foreach($evts as $evt) {
+            if (($evt->start >= $d && $evt->start < $e) || ($evt->end > $d && $evt->end <= $e) || ($evt->start <= $d && $evt->end > $d)) {
+              $busy = true;
+            }
+          }
+          if ($busy) {
             array_push($busy_time_slots, $slots);
             $td_id = "contact_".$contact."_".$d->getTimestamp();
             $c[$contact] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
@@ -5013,7 +5018,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
   }
 
   if (is_array($contacts_fb)) {
-    foreach($contacts_fb as $contact => $cal) {
+    foreach($contacts_fb as $contact => $evts) {
       $cinfo = get_entity_info($contact, 'contact');
       $form_entities .=  "<input type='hidden' name='new_contact_id[]' value='$contact' />";
       $attendees .= "<div class='elementRow'>

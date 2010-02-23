@@ -1553,7 +1553,6 @@ class OBM_Contact implements OBM_ISearchable {
     return $obm_q->f('country_iso3166');
   }
 
-
   public function getCalendar() {
     if (is_array($this->website)) {
       foreach($this->website as $website) {
@@ -1570,4 +1569,10 @@ class OBM_Contact implements OBM_ISearchable {
     }
     return false;
   }
+
+  public function getEventsInInterval($begin, $end) {
+    $cal = self::getCalendar();
+    $vfreebusy = $cal->getBusyPeriodsWithinInterval($begin, $end);
+    return $vfreebusy;
+  }  
 }
