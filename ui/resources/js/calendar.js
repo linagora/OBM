@@ -375,6 +375,12 @@ Obm.CalendarManager = new Class({
   newAlldayDummyEventHighlight: function(evt) {
     if (this.dummy) {
       var divId = this.dummyPrepare(evt);
+      if (divId[0] == 'dayMonthLabel') {
+        divId = $(divId.join('_')).parentNode.id.split('_');
+      }
+      if (divId[0] == 'more') {
+        divId = $(divId.join('_')).parentNode.parentNode.id.split('_');
+      }
       var start = Math.min(divId[1], this.dummy.downCell[1]);
       var end = Math.max(divId[1], this.dummy.downCell[1]);
       if (divId[0] == 'dayContainer') {

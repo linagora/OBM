@@ -4511,8 +4511,7 @@ function html_calendar_dis_delete($current_view, $event_id) {
      $l_confirm
     <a href=\"".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$event_id\"><img src=\"$ico_cancel\" alt=\"[Cancel]\" /></a>
      $l_cancel
-   </div>
-  </div>";
+   </div>";
 
   return $block;
 }
