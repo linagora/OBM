@@ -1572,7 +1572,10 @@ class OBM_Contact implements OBM_ISearchable {
 
   public function getEventsInInterval($begin, $end) {
     $cal = self::getCalendar();
-    $vfreebusy = $cal->getBusyPeriodsWithinInterval($begin, $end);
-    return $vfreebusy;
+    if ($cal) {
+      $vfreebusy = $cal->getBusyPeriodsWithinInterval($begin, $end);
+      return $vfreebusy;
+    }
+    return false;
   }  
 }

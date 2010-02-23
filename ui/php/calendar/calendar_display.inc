@@ -4988,14 +4988,15 @@ function dis_calendar_free_interval($current_view, $calendar) {
 
       // Contacts
       foreach($contacts as $contact => $evts) {
-        if ($evts) {
-          $is_busy = false;
+        if (is_array($evts)) {
+          $busy = false;
           foreach($evts as $evt) {
             if (($evt->start >= $d && $evt->start < $e) || ($evt->end > $d && $evt->end <= $e) || ($evt->start <= $d && $evt->end > $d)) {
-              $is_busy = true;
+              $busy = true;
             }
           }
-          if ($is_busy) {
+          if ($busy) {
+            $is_busy = true;
             array_push($busy_time_slots, $slots);
             $td_id = "contact_".$contact."_".$d->getTimestamp();
             $c[$contact] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";

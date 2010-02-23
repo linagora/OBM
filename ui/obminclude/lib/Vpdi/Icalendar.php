@@ -60,9 +60,11 @@ class Vpdi_Icalendar extends Vpdi_Entity {
     }
     $class = self::$innerEntities[$type];
     $comps = array();
-    foreach ($this->components as $c) {
-      if (get_class($c) == $class) {
-        $comps[] = $c;
+    if (is_array($this->components)) {
+      foreach ($this->components as $c) {
+        if (get_class($c) == $class) {
+          $comps[] = $c;
+        }
       }
     }
     return $comps;
