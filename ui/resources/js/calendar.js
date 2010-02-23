@@ -152,7 +152,6 @@ Obm.CalendarManager = new Class({
             current.setMinutes(0);
             current.setSeconds(0);
             current.setMilliseconds(0);
-            var day = (current.getTime()-obm.vars.consts.startTime.getTime())/1000;
             var more = $('more_'+index);
             if (more) {
               var title = '<a href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title+'</a>';
@@ -361,11 +360,17 @@ Obm.CalendarManager = new Class({
     while(target.id == '') {
       target = $(target.parentNode);
     }
-    var str = target.id.split('_');
-    if (str.length <= 1) {
+    var div = target.id.split('_');
+    if (div.length <= 1) {
       return false;
     }
-    return str;
+    if (div[0] == 'dayMonthLabel') {
+      div = $(div.join('_')).parentNode.id.split('_');
+    }
+    if (div[0] == 'more') {
+      div = $(div.join('_')).parentNode.parentNode.id.split('_');
+    }
+    return div;
   },
 
 
@@ -374,16 +379,10 @@ Obm.CalendarManager = new Class({
    */
   newAlldayDummyEventHighlight: function(evt) {
     if (this.dummy) {
-      var divId = this.dummyPrepare(evt);
-      if (divId[0] == 'dayMonthLabel') {
-        divId = $(divId.join('_')).parentNode.id.split('_');
-      }
-      if (divId[0] == 'more') {
-        divId = $(divId.join('_')).parentNode.parentNode.id.split('_');
-      }
-      var start = Math.min(divId[1], this.dummy.downCell[1]);
-      var end = Math.max(divId[1], this.dummy.downCell[1]);
-      if (divId[0] == 'dayContainer') {
+      var div = this.dummyPrepare(evt);
+      var start = Math.min(div[1], this.dummy.downCell[1]);
+      var end = Math.max(div[1], this.dummy.downCell[1]);
+      if (div[0] == 'dayContainer') {
         $$('div.selection').each(function(e) {
           $(e).removeClass('selection');
         });
@@ -401,27 +400,13 @@ Obm.CalendarManager = new Class({
    * Create allday dummy event (for event creation)
    */
   newAlldayDummyEvent: function(evt) {
-    var divId = this.dummyPrepare(evt);
-    if (evt.type == 'mousedown' && (divId[0] == 'dayContainer' || divId[0] == 'dayMonthLabel' ||  divId[0] == 'more' ) && obm.calendarManager.write == 1) {
-      if (divId[0] == 'dayMonthLabel') {
-        divId = $(divId.join('_')).parentNode.id.split('_');
-      }
-      if (divId[0] == 'more') {
-        divId = $(divId.join('_')).parentNode.parentNode.id.split('_');
-      }
-
+    var div = this.dummyPrepare(evt);
+    if (evt.type == 'mousedown' && (div[0] == 'dayContainer' || div[0] == 'dayMonthLabel' ||  div[0] == 'more' ) && obm.calendarManager.write == 1) {
       this.dummy = new Object();
-      this.dummy.down = obm.calendarManager.startTime + divId[1].toInt()*86400;
-      this.dummy.downCell = divId;
-    } else if (evt.type == 'mouseup' && (divId[0] == 'dayContainer' || divId[0] == 'dayMonthLabel' ||  divId[0] == 'more' ) && obm.calendarManager.write == 1 && this.dummy) {
-      if (divId[0] == 'dayMonthLabel') {
-        divId = $(divId.join('_')).parentNode.id.split('_');
-      }
-      if (divId[0] == 'more') {
-        divId = $(divId.join('_')).parentNode.parentNode.id.split('_');
-      }
-
-      this.dummy.up = obm.calendarManager.startTime + divId[1].toInt()*86400;
+      this.dummy.down = obm.calendarManager.startTime + div[1].toInt()*86400;
+      this.dummy.downCell = div;
+    } else if (evt.type == 'mouseup' && (div[0] == 'dayContainer' || div[0] == 'dayMonthLabel' ||  div[0] == 'more' ) && obm.calendarManager.write == 1 && this.dummy) {
+      this.dummy.up = obm.calendarManager.startTime + div[1].toInt()*86400;
       var begin = Math.min(this.dummy.down, this.dummy.up);
       var end = Math.max(this.dummy.down, this.dummy.up);
       this.dummy = null;
@@ -480,6 +465,7 @@ Obm.CalendarManager = new Class({
       
     }
   },
+
 
   /*
    * Scroll to user first hour param
