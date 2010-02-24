@@ -5093,25 +5093,74 @@ function dis_calendar_right_dis_admin($id='') {
     $block = "<h1>$l_user_right $name</h1>";
   }
   $block .= of_right_dis_admin('calendar', $id);
+  $block .= html_rights_on_my_calendar();
 
-  $accessEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access'); 
-  foreach($accessEntities as $entity) {
-    $dis_access .= "<li>$entity</li>";
+  return $block;
+}
+
+function html_rights_on_my_calendar($all=false) {
+
+  $more = "<li><a href='calendar_index.php?action=rights_on_my_calendar'>$GLOBALS[l_display_all]</a></li>";
+  $accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access'); 
+  sort($accessEntities);
+  if (sizeof($accessEntities) > 50 && !$all) {
+    for($i=0;$i<50;$i++) {
+      $dis_access .= "<li>$accessEntities[$i]</li>";
+    }
+    $dis_access .= $more;
+  } else {
+    foreach($accessEntities as $entity) {
+      $dis_access .= "<li>$entity</li>";
+    }
   }
-  $readEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read'); 
-  foreach($readEntities as $entity) {
-    $dis_read .= "<li>$entity</li>";
+
+  $readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read'); 
+  sort($readEntities);
+  if (sizeof($readEntities) > 50 && !$all) {
+    for($i=0;$i<50;$i++) {
+      $dis_read .= "<li>$readEntities[$i]</li>";
+    }
+    $dis_read .= $more;
+  } else {
+    foreach($readEntities as $entity) {
+      $dis_read .= "<li>$entity</li>";
+    }
   }
-  $writeEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write'); 
-  foreach($writeEntities as $entity) {
-    $dis_write .= "<li>$entity</li>";
+  $writeEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'write');
+  sort($writeEntities); 
+  if (sizeof($writeEntities) > 50 && !$all) {
+    for($i=0;$i<50;$i++) {
+      $dis_write .= "<li>$writeEntities[$i]</li>";
+    }
+    $dis_write .= $more;
+  } else {
+    foreach($writeEntities as $entity) {
+      $dis_write .= "<li>$entity</li>";
+    }
   }
-  $adminEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'admin'); 
-  foreach($adminEntities as $entity) {
-    $dis_admin .= "<li>$entity</li>";
+ $adminEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'admin'); 
+  sort($adminEntities);
+  if (sizeof($adminEntities) > 50 && !$all) {
+    for($i=0;$i<50;$i++) {
+      $dis_admin .= "<li>$adminEntities[$i]</li>";
+    }
+    $dis_admin .= $more;
+  } else {
+    foreach($adminEntities as $entity) {
+      $dis_admin .= "<li>$entity</li>";
+    }
   }
-  $block .= "<h1>$GLOBALS[l_rights_my_on]</h1>
-    <table class=\"spreadSheet\">
+  if ($all) {
+    $back = "<form method='GET' action='$GLOBALS[path]/calendar/".basename($_SERVER['SCRIPT_NAME'])."'>
+      <input type='submit' value='$GLOBALS[l_back]'/>
+      <input type='hidden' name='action' value='rights_admin'/>
+    </form>";
+  }
+  
+  $block = "
+    <h1>$GLOBALS[l_rights_my_on]</h1>
+    $back
+    <table class=\"spreadSheet rights\">
     <thead>
       <tr>
         <th>$GLOBALS[l_access_permission]</th>
@@ -5123,24 +5172,16 @@ function dis_calendar_right_dis_admin($id='') {
     <tbody style='vertical-align:top;'>
     <tr>
       <td>
-        <ul>
-          $dis_access
-        </ul>
+        <ul>$dis_access</ul>
       </td>
       <td>
-        <ul>
-          $dis_read
-        </ul>
+        <ul>$dis_read</ul>
       </td>
       <td>
-        <ul>
-          $dis_write
-        </ul>
+        <ul>$dis_write</ul>
       </td>
       <td>
-        <ul>
-          $dis_admin
-        </ul>
+        <ul>$dis_admin</ul>
       </td>
     </tr>
     </tbody>
@@ -5148,7 +5189,6 @@ function dis_calendar_right_dis_admin($id='') {
 
   return $block;
 }
-
 
 /**
  * html_calendar_ressource_list

@@ -1182,3 +1182,13 @@ h1.hoursTitle{
   background: #4692a9;
   color: #FFF;
 }
+
+.rights ul {
+  margin: 0;
+  padding-left:5px;
+  list-style: none;
+}
+
+.rights a {
+  font-weight:bold;
+}

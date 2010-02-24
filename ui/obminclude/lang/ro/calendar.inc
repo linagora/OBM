@@ -309,4 +309,4 @@ $l_template = "Model de eveniment";
 $l_delete_template = "Ştergere model ?";
 $l_attach_documents = "Anexaţi"; 
 $l_update_occurrence_message = "Modificaţi doar această rubrică sau toată seria?"; 
-
+$l_display_all = "Arată toate";

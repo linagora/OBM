@@ -119,6 +119,7 @@ $l_import_template = "Import template";
 $l_copy_of = "Copy of";
 $l_template_entities_access_warning = "You're not allowed to access some template elements or they may have been deleted";
 $l_delete_template = "Delete template ?";
+$l_display_all = "Show all";
 
 $l_insert = "Insert the event";
 $l_update = "Update the event";

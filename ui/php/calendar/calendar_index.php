@@ -675,6 +675,10 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
 
+} elseif ($action == 'rights_on_my_calendar') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = html_rights_on_my_calendar(true); 
+
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
   if (OBM_Acl_Utils::updateRights('calendar', $params['entity_id'], $obm['uid'], $params)) {
@@ -1757,6 +1761,12 @@ function get_calendar_action() {
     'Condition'=> array ('None') 
   );
 
+  // Display rights on my calendar 
+  $actions['calendar']['rights_on_my_calendar'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=rights_on_my_calendar",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
 
 }
 
