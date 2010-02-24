@@ -24,12 +24,18 @@ include_once 'obminclude/lib/Solr/Service.php';
 class OBM_IndexingService {
 
   public static function connect($core) {
-    $solrserver = of_domain_get_domain_solrserver($GLOBALS['obm']['domain_id'], $core);
-    foreach ($solrserver as $s_id => $solrserver_info){
-      foreach ($solrserver_info as $server_info){
-        $solr_ip = $server_info['ip'];
+    if (!isset($_SESSION['solr_ip'] )) {
+      $solrserver = of_domain_get_domain_solrserver($GLOBALS['obm']['domain_id'], $core);
+      foreach ($solrserver as $s_id => $solrserver_info){
+        foreach ($solrserver_info as $server_info){
+          $solr_ip = $server_info['ip'];
+        }
       }
+      $_SESSION['solr_ip'] = $solr_ip;
+    } else {
+      $solr_ip = $_SESSION['solr_ip'];
     }
+
     if ($solr_ip) {
       $solr = new Apache_Solr_Service($solr_ip, '8080', "/solr/$core");
       if ($solr->ping()) {
