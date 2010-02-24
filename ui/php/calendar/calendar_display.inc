@@ -134,7 +134,7 @@ function dis_calendar_search_result($calendar, $current_view) {
   }
 
   $GLOBALS[display][search] = dis_calendar_html_search_form($calendar, $pattern);
-  $GLOBALS[display][search] .= dis_back_to_calendar();
+  $GLOBALS[display][search] .= dis_back_to_calendar($action);
 
   $block .= dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $begin, $end, $events);
 
@@ -3202,7 +3202,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
   $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view);
 
   $GLOBALS[display][search] = dis_calendar_select_template_form($action, $calendar);
-  $GLOBALS[display][search] .= dis_back_to_calendar();
+  $GLOBALS[display][search] .= dis_back_to_calendar($action);
 
   return $block;
 }
@@ -5366,29 +5366,76 @@ function dis_calendar_right_dis_admin($id='') {
     $block = "<h1>$l_user_right $name</h1>";
   }
   $block .= of_right_dis_admin('calendar', $id);
-
-  $accessEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access'); 
-  foreach($accessEntities as $entity) {
-    $dis_access .= "<li>$entity</li>";
-  }
-  $readEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read'); 
-  foreach($readEntities as $entity) {
-    $dis_read .= "<li>$entity</li>";
-  }
-  $writeEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write'); 
-  foreach($writeEntities as $entity) {
-    $dis_write .= "<li>$entity</li>";
-  }
-  $adminEntities = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'admin'); 
-  foreach($adminEntities as $entity) {
-    $dis_admin .= "<li>$entity</li>";
-  }
-  
   $block .= html_share_calendar($id,$name);
+  $block .= html_rights_on_my_calendar();
+
+  return $block;
+}
+
+
+function html_rights_on_my_calendar($all=false) {
+
+  $more = "<li><a href='calendar_index.php?action=rights_on_my_calendar'>$GLOBALS[l_more]</a></li>";
+  $accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access'); 
+  sort($accessEntities);
+  if (sizeof($accessEntities) > 50 && !$all) {
+    for($i=0;$i<50;$i++) {
+      $dis_access .= "<li>$accessEntities[$i]</li>";
+    }
+    $dis_access .= $more;
+  } else {
+    foreach($accessEntities as $entity) {
+      $dis_access .= "<li>$entity</li>";
+    }
+  }
+
+  $readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read'); 
+  sort($readEntities);
+  if (sizeof($readEntities) > 50 && !$all) {
+    for($i=0;$i<50;$i++) {
+      $dis_read .= "<li>$readEntities[$i]</li>";
+    }
+    $dis_read .= $more;
+  } else {
+    foreach($readEntities as $entity) {
+      $dis_read .= "<li>$entity</li>";
+    }
+  }
+  $writeEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'write');
+  sort($writeEntities); 
+  if (sizeof($writeEntities) > 50 && !$all) {
+    for($i=0;$i<50;$i++) {
+      $dis_write .= "<li>$writeEntities[$i]</li>";
+    }
+    $dis_write .= $more;
+  } else {
+    foreach($writeEntities as $entity) {
+      $dis_write .= "<li>$entity</li>";
+    }
+  }
+
+  $adminEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'admin'); 
+  sort($adminEntities);
+  if (sizeof($adminEntities) > 50 && !$all) {
+    for($i=0;$i<50;$i++) {
+      $dis_admin .= "<li>$adminEntities[$i]</li>";
+    }
+    $dis_admin .= $more;
+  } else {
+    foreach($adminEntities as $entity) {
+      $dis_admin .= "<li>$entity</li>";
+    }
+  }
+  if ($all) {
+    $back = "<form method='GET' action='$GLOBALS[path]/calendar/".basename($_SERVER['SCRIPT_NAME'])."'>
+      <input type='submit' value='$GLOBALS[l_back]'/>
+      <input type='hidden' name='action' value='rights_admin'/>
+    </form>";
+  }
   
-  $block .= "
+  $block = "
     <h1>$GLOBALS[l_rights_my_on]</h1>
-    <table class=\"spreadSheet\">
+    <table class=\"spreadSheet rights\">
     <thead>
       <tr>
         <th>$GLOBALS[l_access_permission]</th>
@@ -5400,32 +5447,23 @@ function dis_calendar_right_dis_admin($id='') {
     <tbody style='vertical-align:top;'>
     <tr>
       <td>
-        <ul>
-          $dis_access
-        </ul>
+        <ul>$dis_access</ul>
       </td>
       <td>
-        <ul>
-          $dis_read
-        </ul>
+        <ul>$dis_read</ul>
       </td>
       <td>
-        <ul>
-          $dis_write
-        </ul>
+        <ul>$dis_write</ul>
       </td>
       <td>
-        <ul>
-          $dis_admin
-        </ul>
+        <ul>$dis_admin</ul>
       </td>
     </tr>
     </tbody>
-    </table>";
-  
+    </table>$back";
+
   return $block;
 }
-
 
 /**
  * html_calendar_ressource_list
@@ -8841,11 +8879,18 @@ function dis_calendar_waiting_portlet() {
 /*
  * Back to calendar link
  */
-function dis_back_to_calendar() {
-  $block = "
-  <div id='backToCalendar'>
-    <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php'>$GLOBALS[l_back_to_calendar]</a>
-  </div>";
+function dis_back_to_calendar($action) {
+  if ($action == 'rights_on_my_calendar') {
+    $block = "
+    <div id='backToCalendar'>
+      <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php?action=rights_admin'>« $GLOBALS[l_header_right]</a>
+    </div>";
+  } else {
+    $block = "
+    <div id='backToCalendar'>
+      <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php'>$GLOBALS[l_back_to_calendar]</a>
+    </div>";
+  }
   return $block;
 }
 

@@ -164,7 +164,7 @@ if ($popup) {
     // display_end();
   } elseif ($action == 'ics_export') {
     dis_calendar_export_handle($params);
-  }
+  } 
   exit();
 }
 
@@ -683,6 +683,10 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
 
+} elseif ($action == 'rights_on_my_calendar') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = html_rights_on_my_calendar(true); 
+
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
   if (OBM_Acl_Utils::updateRights('calendar', $params['entity_id'], $obm['uid'], $params)) {
@@ -1017,7 +1021,7 @@ if (!$params['ajax']) {
   $display['header'] = display_menu($module);
   $display['end'] = display_end();
   if ($display['search'] == '') {
-    $display['search'] = dis_back_to_calendar();
+    $display['search'] = dis_back_to_calendar($action);
   }
 
 } elseif ($action == 'insert_view') {
@@ -1859,6 +1863,13 @@ function get_calendar_action() {
   // Send url calendar
   $actions['calendar']['send_url'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=send_url&ajax=1",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+  // Display rights on my calendar 
+  $actions['calendar']['rights_on_my_calendar'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=rights_on_my_calendar",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
