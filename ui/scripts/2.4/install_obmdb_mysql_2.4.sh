@@ -62,3 +62,14 @@ test $? -eq 0 || {
 }
 
 echo "UPDATE UserObmPref set userobmpref_value='$obm_lang' where userobmpref_option='set_lang'" | mysql -u $user -p$pw $db 
+
+
+if [ -d updates ]; then
+  pushd updates
+  for i in `ls -1 *mysql.sql | sed -e 's/update-2.4.//g' | sort -n`; do
+    echo " Insert Update sql file update-2.4.${i}"
+      mysql --default-character-set='UTF8' -u $user -p$pw $db < update-2.3.$i 
+  done
+  popd
+fi
+

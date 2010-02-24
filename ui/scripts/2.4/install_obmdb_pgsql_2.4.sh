@@ -90,4 +90,15 @@ UPDATE UserObmPref SET userobmpref_value='${obm_lang}' WHERE userobmpref_option=
 \q
 EOF
 
+if [ -d updates ]; then
+  pushd updates
+  for i in `ls -1 *pgsql.sql | sed -e 's/update-2.4.//g' | sort -n`; do
+    echo " Insert Update sql file update-2.4.${i}"
+      psql -U ${user} -h ${host} ${db} -f \
+        update-2.3.$i >> /tmp/data_insert.log 2>&1
+    done
+  popd
+fi
+
+
 echo "DONE."
