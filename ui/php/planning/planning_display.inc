@@ -330,7 +330,7 @@ function dis_planning_user_month($obm_q, $params ) {
   <a href=\"$url_next\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
   </h1>";
 
-  $block .= "<table \"planning\">\n";
+  $block .= "<table class=\"planning\">\n";
 
   $d = dis_planning_month_userslines($year,$month,$first_day,$last_day,$params['group_id'],&$array_res,&$planning,&$stats);
 

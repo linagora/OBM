@@ -1368,6 +1368,10 @@ table.planning thead th {
   color: black;
 }
 
+table.planning tbody tr {
+  height: 15px;
+}
+
 table.planningRessource {
   background-color: white;
   border-collapse: collapse;
