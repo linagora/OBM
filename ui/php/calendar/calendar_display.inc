@@ -5426,12 +5426,6 @@ function html_rights_on_my_calendar($all=false) {
       $dis_admin .= "<li>$entity</li>";
     }
   }
-  if ($all) {
-    $back = "<form method='GET' action='$GLOBALS[path]/calendar/".basename($_SERVER['SCRIPT_NAME'])."'>
-      <input type='submit' value='$GLOBALS[l_back]'/>
-      <input type='hidden' name='action' value='rights_admin'/>
-    </form>";
-  }
   
   $block = "
     <h1>$GLOBALS[l_rights_my_on]</h1>
@@ -5460,7 +5454,7 @@ function html_rights_on_my_calendar($all=false) {
       </td>
     </tr>
     </tbody>
-    </table>$back";
+    </table>";
 
   return $block;
 }
