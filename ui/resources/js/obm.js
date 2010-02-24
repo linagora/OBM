@@ -239,7 +239,7 @@ Obm.Tip = new Class({
           this.elementLeave(this, element);
         }
         var elementId = element.id.split('_');
-        $('close_'+elementId[2]).addEvent('click', function() {
+        $('close_'+elementId[1]).addEvent('click', function() {
           this.elementLeave(this, element);
         }.bind(this));
       }.bind(this));

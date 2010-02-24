@@ -5384,9 +5384,9 @@ function dis_calendar_right_dis_admin($id='') {
     $dis_admin .= "<li>$entity</li>";
   }
   
-  $share_calendar = html_share_calendar($id,$name);
+  $block .= html_share_calendar($id,$name);
   
-  $block .= "$share_calendar
+  $block .= "
     <h1>$GLOBALS[l_rights_my_on]</h1>
     <table class=\"spreadSheet\">
     <thead>
@@ -6713,6 +6713,7 @@ function html_share_calendar($id,$name) {
   //$params = get_calendar_entity_share($id,$entity_type);
   $share_pop_up = html_share_popup($params['accept_public']); 
   $block = "
+      $user
       <table class=\"spreadSheet share\">
         <thead>
           <tr>

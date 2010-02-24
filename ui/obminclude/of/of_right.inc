@@ -531,13 +531,7 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   } elseif (OBM_Acl::isSpecialEntity($entityu)) {
     $table_entity = 'UserObm';
     $e_id = 'e.userobm_id';
-    $ctt[0]['type'] = 'field';
-    $ctt[0]['value'] = 'userobm_lastname';
-    $ctt[1]['type'] = 'string';
-    $ctt[1]['value'] = ' ';
-    $ctt[2]['type'] = 'field';
-    $ctt[2]['value'] = 'userobm_firstname';
-    $e_label = sql_string_concat($db_type, $ctt);
+    $e_label = "#CONCAT(userobm_firstname, ' ', userobm_lastname)";
     $u = get_user_info($user_id);
   } else {
     switch($entity) {
