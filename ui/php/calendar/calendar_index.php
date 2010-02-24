@@ -47,6 +47,10 @@ if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc");
 //FIXME
 $params = get_global_params('Entity');
+if(isset($params['date']) && !empty($params['date'])) {
+  $set_date = true;
+}
+
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 require('calendar_query.inc');
@@ -90,7 +94,7 @@ if (isset($params['cal_range'])) {
 if (isset($params['group_view']) && ($params['group_view']!=$current_view->get_group())) {
   $current_view->set_group($params['group_view']);
 }
-if (isset($params['date']) && !empty($params['date'])) {
+if ($set_date || !isset($_SESSION['cal_current_view'])) {
   $current_view->set_date($params['date']);
 }
 
