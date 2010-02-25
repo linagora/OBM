@@ -3212,7 +3212,7 @@ function dis_calendar_quick_form($calendar_entity) {
       }
     }
     if(!isset($uid)) {
-      $entity_view.="<option  id=\"calendarViewEntity$obm[uid] value=\"$obm[uid]\">$u[firstname] $u[lastname]</option>";
+      $entity_view.="<option  id=\"calendarViewEntity$obm[uid]\" value=\"$obm[uid]\">$u[firstname] $u[lastname]</option>";
     }
     $entity_view.="</select>";
     $entity_view.="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
