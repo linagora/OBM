@@ -3205,16 +3205,14 @@ function dis_calendar_quick_form($calendar_entity) {
     $entity_view.="<select id=\"calendarViewEntity\">";
     foreach($calendar_entity['user'] as $user){
       if(OBM_Acl::canAccess($obm['uid'], 'calendar',array($user['id']))) {
-        $selected = "";
         if($obm['uid'] == $user["id"]) {
           $uid = true;
-          $selected = "selected";
         }
-        $entity_view.="<option value=\"$user[id]\" $selected>$user[name]</option>";
+        $entity_view.="<option id=\"calendarViewEntity$user[id]\" value=\"$user[id]\">$user[name]</option>";
       }
     }
     if(!isset($uid)) {
-      $entity_view.="<option value=\"$obm[uid]\">$u[firstname] $u[lastname]</option>";
+      $entity_view.="<option  id=\"calendarViewEntity$obm[uid] value=\"$obm[uid]\">$u[firstname] $u[lastname]</option>";
     }
     $entity_view.="</select>";
     $entity_view.="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
@@ -3288,6 +3286,7 @@ function dis_calendar_quick_form($calendar_entity) {
       obm.calendarQuickForm = new Obm.CalendarQuickForm();
       obm.vars.labels.edit = '".phpStringToJsString($l_edit)."';
       obm.vars.labels.edit_full = '".phpStringToJsString($l_edit_full)."';
+      obm.vars.consts.obm_uid = '$obm[uid]';
     </script>";
 
   return $block;
