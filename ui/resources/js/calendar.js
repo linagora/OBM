@@ -2123,7 +2123,13 @@ Obm.CalendarQuickForm = new Class({
     this.deleteButton.setStyle('display','none');
     this.editButton.setStyle('display','');
     this.detailButton.setStyle('display','none');
-    if(this.entityList) this.entityList.setStyle('display','');
+    if (this.entityList) {
+      this.entityList.setStyle('display','');
+      try {
+      $('calendarViewEntity'+obm.vars.consts.obm_uid).set('selected', 'selected');
+      } catch(e) {}
+    }
+
     if (!this.eventData.all_day) {
       this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' H:i'));
     } else {
