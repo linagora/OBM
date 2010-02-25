@@ -1625,7 +1625,7 @@ Obm.CalendarQuickForm = new Class({
       this.deleteButton.setStyle('display','');
       this.editButton.setStyle('display','');
       this.detailButton.setStyle('display','');
-      this.entityList.setStyle('display','none');
+      if (this.entityList) this.entityList.setStyle('display','none');
       this.editButton.value = obm.vars.labels.edit;
     } else {
       this.form.setStyle('display','none');
@@ -1683,7 +1683,7 @@ Obm.CalendarQuickForm = new Class({
     this.deleteButton.setStyle('display','none');
     this.editButton.setStyle('display','');
     this.detailButton.setStyle('display','none');
-    this.entityList.setStyle('display','block');
+    if (this.entityList) this.entityList.setStyle('display','');
     if (!this.eventData.all_day) {
       this.date.set('html',date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
     } else {
