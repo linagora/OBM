@@ -4604,6 +4604,7 @@ function run_query_insert_other_files($params) {
   $doc_ids = array();
   if (is_array($params['other_files'])) {
     foreach ($params['other_files'] as $document) {
+      $document['name'] = strip_tags($document['name']);
       $document['title'] = $document['name'];
       $document['author'] = $obm['login'];
       $document['mime'] = get_document_auto_mime_type($document);
