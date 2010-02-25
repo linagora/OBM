@@ -8230,32 +8230,29 @@ function html_calendar_documents_form_fieldset($documents = null) {
  * read only
  */
 function dis_calendar_portlet($calendar) {
-  global $css_obm, $css_calendar, $resources_path, $extra_js_include;
+  global $css_obm, $css_calendar, $resources_path;
 
-  foreach($extra_js_include as $js_file) {
-    $js_include .= "<script type=\"text/javascript\" src=\"$resources_path/js/$js_file\" />\n";
-  }
-
-  $block = "<head>
+  $block = "
+    <head>
     <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_obm\" />
     <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_calendar\" />
-    <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js\" /> 
-    </head>
-    <script type='text/javascript'>
-    function selTab(el){
-      var currentLabel = $('lbl_'+el.id);
-      var currentContent = $('content_'+el.id);
-      $$('label.tabLabel').each(function(e){
-        e.set('class', 'tabLabel');
-      });
-      $$('div.tabContent').each(function(e){
-        e.style.display = 'none';
-      });
+    <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js\"></script> 
+    <script type=\"text/javascript\">
+      function selTab(el){
+        var currentLabel = $('lbl_'+el.id);
+        var currentContent = $('content_'+el.id);
+        $$('label.tabLabel').each(function(e){
+          e.set('class', 'tabLabel');
+        });
+        $$('div.tabContent').each(function(e){
+          e.style.display = 'none';
+        });
 
-      currentLabel.set('class', 'tabLabel tabSelected');
-      currentContent.style.display = '';
-    }
+        currentLabel.set('class', 'tabLabel tabSelected');
+        currentContent.style.display = '';
+      }
     </script>
+    </head>
     <body>";
 
   $block .= "
@@ -8264,7 +8261,7 @@ function dis_calendar_portlet($calendar) {
   <input type='radio' name='portlet' id='cb_day' style='display:none;' onclick='selTab(this);'/>
   <label id='lbl_cb_day' for='cb_day' class='tabLabel'>$GLOBALS[l_day]</label>
   <input type='radio' name='portlet' id='cb_week' style='display:none;' onclick='selTab(this);'/>
-  <label id='lbl_cb_week' for='cb_week' class='tabLabel'>$GLOBALS[l_week]</label>
+  <label id='lbl_cb_week' for='cb_week' class='tabLabel tabSelected'>$GLOBALS[l_week]</label>
   <input type='radio' name='portlet' id='cb_month' style='display:none;' onclick='selTab(this);'/>
   <label id='lbl_cb_month' for='cb_month' class='tabLabel'>$GLOBALS[l_month]</label>
   <input type='radio' name='portlet' id='cb_waiting' style='display:none;' onclick='selTab(this);'/>
@@ -8272,7 +8269,7 @@ function dis_calendar_portlet($calendar) {
   </div>";
 
   $block .= "<div class='tabContent' id='content_cb_day' style='display:none;' id='day'>".dis_calendar_day_portlet('day')."</div>";
-  $block .= "<div class='tabContent' id='content_cb_week' style='display:none;' id='week'>".dis_calendar_day_portlet('week')."</div>";
+  $block .= "<div class='tabContent' id='content_cb_week' style='display:block;' id='week'>".dis_calendar_day_portlet('week')."</div>";
   $block .= "<div class='tabContent' id='content_cb_month' style='display:none;' id='month'>".dis_calendar_month_portlet()."</div>";
   $block .= "<div class='tabContent' id='content_cb_waiting' style='display:none;' id='waiting'>".dis_calendar_waiting_portlet()."</div>";
 
