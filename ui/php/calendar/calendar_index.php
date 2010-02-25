@@ -965,9 +965,10 @@ if ($action == 'search') {
     if (check_calendar_access($params['calendar_id'], 'read')) {
       $eve_q = run_query_calendar_detail($params['calendar_id']);
       $entities = get_calendar_event_entity($params['calendar_id']);
-      $conflicts_entities['user'] = $current_view->get_users();
-      $conflicts_entities['group'] = $current_view->get_group();
-      $conflicts_entities['resource'] = $current_view->get_resources();
+      $attendees = run_query_get_events_attendee(array($params['calendar_id'])); 
+      while ($attendees->next_record()) {
+        $conflicts_entities[$attendees->f('eventlink_entity')][] = $attendees->f('eventlink_entity_id');
+      } 
       $conflicts = check_calendar_conflict($params, $conflicts_entities);
       $extra_js_include[] = 'inplaceeditor.js';
       $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
