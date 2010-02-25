@@ -1518,6 +1518,8 @@ form.button-to input {
   background: #FFF;
   display: none;
   width: auto;
+  -webkit-box-shadow: 10px 10px 10px #666;
+  -moz-box-shadow: 10px 10px 10px #666;
 }
 
 .obmPopup h1 {

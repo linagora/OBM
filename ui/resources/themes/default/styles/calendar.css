@@ -627,12 +627,6 @@ li.eventOwner19Legend {
 /* ------------------------------------------------------------------------- */
 /* Calendar Quick Form */
 /* ------------------------------------------------------------------------- */
-
-#calendarQuickForm {
-  -webkit-box-shadow: 10px 10px 10px #666;
-  -moz-box-shadow: 10px 10px 10px #666;
-}
-
 #calendarQuickForm form  {
   text-align: left;
   margin-bottom: 0;

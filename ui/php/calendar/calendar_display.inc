@@ -3222,26 +3222,36 @@ function dis_calendar_quick_form($calendar_entity) {
   global $l_confirm_delete,$l_c_delete, $l_title, $l_category1, $l_desc;
   global $l_location, $l_owner, $l_members, $l_users, $l_carac, $l_items, $l_details;
 
-  $u = get_user_info(); 
-  $entity_view.="<select id=\"calendarViewEntity\">";
-  if(is_array($calendar_entity['user'])){
+  if(is_array($calendar_entity['user']) && sizeof($calendar_entity['user']) > 1){
+    $u = get_user_info(); 
+    $entity_view.="<select id=\"calendarViewEntity\">";
     foreach($calendar_entity['user'] as $user){
       if(OBM_Acl::canAccess($obm['uid'], 'calendar',array($user['id']))) {
-        $entity_view.="<option value=\"$user[id]\">$user[name]</option>";
+        $selected = "";
         if($obm['uid'] == $user["id"]) {
           $uid = true;
+          $selected = "selected";
         }
+        $entity_view.="<option value=\"$user[id]\" $selected>$user[name]</option>";
       }
     }
+    if(!isset($uid)) {
+      $entity_view.="<option value=\"$obm[uid]\">$u[firstname] $u[lastname]</option>";
+    }
+    $entity_view.="</select>";
+    $entity_view.="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+    $calendar_list_entity = "
+      <fieldset id=\"calendarListEntity\">
+        $GLOBALS[l_users] : $entity_view
+      </fieldset>";
+  } else {
+    $user = array_values($calendar_entity['user']);
+    $calendar_list_entity ="<input id=\"calendarViewEntity\" type='hidden' value='".$user[0][id]."' />";
+    $calendar_list_entity .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
   }
 
-  if(!isset($uid)) {
-    $entity_view.="<option value=\"$obm[uid]\">$u[firstname] $u[lastname]</option>";
-  }
 
-  $entity_view.="</select>";
-  $entity_view.="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
-  
+
   $block = "
     <div id=\"calendarQuickForm\" class=\"obmPopup\">
       <h1>
@@ -3258,9 +3268,7 @@ function dis_calendar_quick_form($calendar_entity) {
           <fieldset>
             $l_title : <input type=\"text\" maxlength='255' name=\"tf_title\" /> 
           </fieldset>
-          <fieldset id=\"calendarListEntity\">
-            $l_users : $entity_view
-          </fieldset>
+          $calendar_list_entity
           <fieldset class=\"buttons\"> 
             <input class=\"button closeSticky\" type=\"submit\" value=\"$l_validate\" />
             <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" />

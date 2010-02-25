@@ -269,6 +269,7 @@ Obm.Popup = new Class ({
   
   initialize: function() {
     this.popups = new Hash();
+    this.isOpen = false;
   },
   
   add: function(id, content, buttons) {
@@ -300,12 +301,14 @@ Obm.Popup = new Class ({
       this.popups.set(id, sticky);
       sticky.show();
     }
+    this.isOpen = true;
   },
 
   hide: function(id) {
     if(this.popups.get(id)) {
       this.popups.get(id).hide();
     } 
+    this.isOpen = false;
   }
 
 });

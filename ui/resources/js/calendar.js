@@ -1257,11 +1257,17 @@ Obm.CalendarManager = new Class({
   keyboardListener: function(e) {
     switch(e.key) {
       case 'esc':
-        obm.calendarManager.destroyDummy();
-        obm.calendarManager.dummy.resize.removeEvents('complete');
-        obm.calendarManager.scroll.stop();
-        obm.calendarManager.popupManager.cancel();
-        obm.calendarQuickForm.hide();
+        if (obm.popup.isOpen) {
+          obm.calendarManager.popupManager.cancel();
+          obm.calendarQuickForm.hide();
+        } else if (obm.calendarManager.oldEvent) {
+          var evt = obm.calendarManager.events.get(obm.calendarManager.oldEvent.elementId);
+          evt.resize.fireEvent('cancel');
+          evt.drag.fireEvent('cancel');
+          obm.calendarManager.cancel(obm.calendarManager.oldEvent.elementId);
+        } else if (obm.calendarManager.dummy) {
+          console.log('dummy');
+        }
         break;
     }
   },
@@ -1551,15 +1557,14 @@ Obm.CalendarInDayEvent = new Class({
     }.bind(this));
     this.drag.addEvent('drag', this.updateTime.bind(this));
     this.drag.addEvent('complete', function() {
-      this.element.setOpacity(this.getOpacity());
-      this.element.setStyles({
-        'z-index' : '10' 
-      });
-      obm.calendarManager.scroll.stop();
+      this.updateComplete();
       obm.calendarManager.sendUpdateEvent(this);
 
     }.bind(this));
-
+    this.drag.addEvent('cancel', function() {
+      this.updateComplete();
+      this.drag.stop();
+    }.bind(this));
 
     // Add resize events
     this.resize.addEvent('start', function() {
@@ -1577,13 +1582,25 @@ Obm.CalendarInDayEvent = new Class({
     }.bind(this));
     this.resize.addEvent('drag', this.updateDuration.bind(this));
     this.resize.addEvent('complete', function() {
-      this.element.setOpacity(this.getOpacity());
-      this.element.setStyles({
-        'z-index' : '10' 
-      });
-      obm.calendarManager.scroll.stop();
+      this.updateComplete();
       obm.calendarManager.sendUpdateEvent(this);
     }.bind(this));
+    this.resize.addEvent('cancel', function() {
+      this.updateComplete();
+      this.resize.stop();
+    }.bind(this));
+  },
+
+
+  /*
+   * Complete update drag or resize
+   */
+  updateComplete: function() {
+    this.element.setOpacity(this.getOpacity());
+    this.element.setStyles({
+      'z-index' : '10' 
+    });
+    obm.calendarManager.scroll.stop();
   },
 
 
@@ -1760,12 +1777,20 @@ Obm.CalendarAllDayEvent = new Class({
     }.bind(this));
     this.drag.addEvent('complete', function() {
       this.updateTime();
-      this.element.setOpacity(this.getOpacity());
-      this.element.setStyles({
-        'z-index' : '10' 
-      });
+      this.updateComplete();
       obm.calendarManager.sendUpdateEvent(this);
     }.bind(this));
+  },
+
+  /*
+   * Complete update drag or resize
+   */
+  updateComplete: function() {
+    this.element.setOpacity(this.getOpacity());
+    this.element.setStyles({
+      'z-index' : '10' 
+    });
+    obm.calendarManager.scroll.stop();
   },
 
 
@@ -2028,7 +2053,7 @@ Obm.CalendarQuickForm = new Class({
       this.deleteButton.setStyle('display','');
       this.editButton.setStyle('display','');
       this.detailButton.setStyle('display','');
-      this.entityList.setStyle('display','none');
+      if(this.entityList) this.entityList.setStyle('display','none');
       this.editButton.value = obm.vars.labels.edit;
     } else {
       this.form.setStyle('display','none');
@@ -2098,7 +2123,7 @@ Obm.CalendarQuickForm = new Class({
     this.deleteButton.setStyle('display','none');
     this.editButton.setStyle('display','');
     this.detailButton.setStyle('display','none');
-    this.entityList.setStyle('display','block');
+    if(this.entityList) this.entityList.setStyle('display','');
     if (!this.eventData.all_day) {
       this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' H:i'));
     } else {
