@@ -2632,7 +2632,7 @@ function run_query_calendar_import_template($xml) {
     'contact_ids','resource_ids','group_ids','document_ids');
     
   foreach ($columns as $column) {
-    $value = (string) $xml->{$column};
+    $value = addslashes((string) $xml->{$column});
     $$column = ($value == '') ? 'NULL' : "'$value'";
   }
   
