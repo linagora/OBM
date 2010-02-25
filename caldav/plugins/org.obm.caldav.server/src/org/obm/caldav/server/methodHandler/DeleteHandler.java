@@ -31,15 +31,13 @@ import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.CalDavUtils;
 import org.w3c.dom.Document;
 
-
 /**
- * RFC4918 
- * 	9.6.  DELETE Requirements
+ * RFC4918 9.6. DELETE Requirements
  * 
  * http://tools.ietf.org/html/draft-desruisseaux-caldav-sched-03
  * 
  * @author adrienp
- *
+ * 
  */
 public class DeleteHandler extends DavMethodHandler {
 
@@ -47,10 +45,14 @@ public class DeleteHandler extends DavMethodHandler {
 	public void process(Token token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp) throws ResultBuilderException {
 		try {
-			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
+			//management of inbox  and outbox is not implemented
+			if (!req.getURI().contains("inbox")
+					|| req.getURI().contains("outbox")) {
+				String extId = CalDavUtils.getExtIdFromURL(req.getURI());
 
-			proxy.getCalendarService().removeOrUpdateParticipationState(extId);
-			
+				proxy.getCalendarService().removeOrUpdateParticipationState(
+						extId);
+			}
 			resp.setStatus(HttpServletResponse.SC_OK);
 			resp.setContentLength(0);
 			resp.setDateHeader("Delete", new Date().getTime());
@@ -58,13 +60,15 @@ public class DeleteHandler extends DavMethodHandler {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			resp.setContentLength(0);
 			logger.error(e.getMessage(), e);
-		}catch (AuthorizationException e) {
+		} catch (AuthorizationException e) {
 			resp.setStatus(StatusCodeConstant.SC_MULTI_STATUS);
-			Document ret = new ErreurBuiler().build(token, req, e.getHttpStatusCode());
+			Document ret = new ErreurBuiler().build(token, req, e
+					.getHttpStatusCode());
 			sendDom(ret, resp);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			resp.setStatus(StatusCodeConstant.SC_MULTI_STATUS);
-			Document ret = new ErreurBuiler().build(token, req, StatusCodeConstant.SC_METHOD_FAILURE);
+			Document ret = new ErreurBuiler().build(token, req,
+					StatusCodeConstant.SC_METHOD_FAILURE);
 			sendDom(ret, resp);
 			logger.error("Unable to delete event", e);
 		}
