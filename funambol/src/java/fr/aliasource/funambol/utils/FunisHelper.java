@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  */
 public class FunisHelper {
-	
+
 	@SuppressWarnings("unused")
 	private static final Log logger = LogFactory.getLog(FunisHelper.class);
 
@@ -27,7 +27,7 @@ public class FunisHelper {
 		// concat quoted lines ending with =
 		for (int i = 0; i < lines.length; i++) {
 			String l = lines[i];
-			
+
 			if (l.contains("QUOTED-PRINTABLE")) {
 				quotedMode = true;
 			}
@@ -38,8 +38,12 @@ public class FunisHelper {
 				concatNext = false;
 				quotedMode = false;
 			}
+			if (l.startsWith("DTSTART:") && !noQuoted.toString().endsWith("\n")) {
+				noQuoted.append('\n');
+			}
 			noQuoted.append(l);
-			if (!concatNext && i < lines.length - 1 && !nextLineIsIndented(lines[i+1])) {
+			if (!concatNext && i < lines.length - 1
+					&& !nextLineIsIndented(lines[i + 1])) {
 				noQuoted.append('\n');
 			}
 		}
