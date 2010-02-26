@@ -74,6 +74,7 @@
     <field name="address" type="text" indexed="true" stored="false"  multiValued="true" /> 
     <field name="comment" type="text" indexed="true" stored="false"  multiValued="true" /> 
     <field name="displayname" type="text" indexed="true" stored="false"  multiValued="true" /> 
+    <field name="sortable" type="string" indexed="true" stored="false"  multiValued="false" /> 
 
   </fields>
 
