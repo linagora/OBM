@@ -96,6 +96,7 @@ def index_contact(domain, solr):
 		contact.appendChild(solr_set_field(doc, 'companyId',     rows[i][10]))
 		contact.appendChild(solr_set_field(doc, 'lastname',      rows[i][11]))
 		contact.appendChild(solr_set_field(doc, 'firstname',     rows[i][12]))
+		contact.appendChild(solr_set_field(doc, 'sortable',      rows[i][11]+" "+rows[i][12]))
 		contact.appendChild(solr_set_field(doc, 'middlename',    rows[i][13]))
 		contact.appendChild(solr_set_field(doc, 'suffix',        rows[i][14]))
 		contact.appendChild(solr_set_field(doc, 'aka',           rows[i][15]))

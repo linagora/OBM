@@ -158,6 +158,7 @@ class ContactIndexingJob extends CronJob {
           $doc->setField('lastname', $db->f('contact_lastname'));
           $doc->setField('firstname', $db->f('contact_firstname'));
           $doc->setField('middlename', $db->f('contact_middlename'));
+          $doc->setField('sortable', $db->f('contact_lastname')." ".$db->f('contact_firstname'));
           $doc->setField('suffix', $db->f('contact_suffix'));
           $doc->setField('aka', $db->f('contact_aka'));
           $doc->setField('kind', $db->f('kind_minilabel'));

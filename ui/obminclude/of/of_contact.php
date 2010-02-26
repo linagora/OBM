@@ -259,7 +259,7 @@ class OBM_Contact implements OBM_ISearchable {
 
   public static function search($pattern, $offset=0, $limit=100) {
     return OBM_Contact::fetchAll(
-      OBM_Search::buildSearchQuery('contact', $pattern, $offset, $limit, array('sort' => 'lastname asc, firstname asc')));
+      OBM_Search::buildSearchQuery('contact', $pattern, $offset, $limit, array('sort' => 'sortable asc')));
   }
 
   public static function getUserCategory() {
@@ -491,6 +491,7 @@ class OBM_Contact implements OBM_ISearchable {
     $doc->setField('lastname', $contact->lastname);
     $doc->setField('firstname', $contact->firstname);
     $doc->setField('middlename', $contact->mname);
+    $doc->setField('sortable', $contact->lastname." ".$contact->firstname);
     $doc->setField('suffix', $contact->suffix);
     $doc->setField('aka', $contact->aka);
     $doc->setField('kind', $contact->kind);
