@@ -236,7 +236,8 @@ sub _bind {
         require ObmSatellite::Server::Daemon::SSL;
         $self->_log( 'Use ObmSatellite::Server::Daemon::SSL module', 5 );
 
-        $self->{'server'}->{'socket'} = ObmSatellite::Server::Daemon::SSL->new( %{$self->{'server'}->{'socketConf'}} ) || die 'Unable to create HTTP::Daemon'."\n" ;
+        $self->{'server'}->{'socket'} = ObmSatellite::Server::Daemon::SSL->new(
+        %{$self->{'server'}->{'socketConf'}} ) || die 'Unable to create %ObmSatellite::Server::Daemon::SSL'."\n" ;
     } or eval {
         $self->_log( 'Unable to load perl module HTTP::Daemon::SSL or ObmSatellite::Server::Daemon::SSL', 0 );
         exit 10;
