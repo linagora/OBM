@@ -138,5 +138,6 @@ anyUserAccounts=
 ;
 ;
 ;LemonLDAP authentication with no password check
-lemonLdapIp=
+; ip,ip,...
+lemonLdapIps=
 ; EOF
