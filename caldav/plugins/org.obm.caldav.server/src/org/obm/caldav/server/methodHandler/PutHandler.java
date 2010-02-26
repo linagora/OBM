@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.CalDavUtils;
 
@@ -37,14 +38,22 @@ public class PutHandler extends DavMethodHandler {
 		logger.info("process(req, resp)");
 		try {
 			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
-
+			String parentComp = "";
+			int ls = req.getURI().lastIndexOf("/");
+			if(ls > 0){
+				parentComp = req.getURI().substring(0, ls);
+			} else {
+				parentComp = req.getURI();
+			}
+			
 			String ics = req.getICS();
-			proxy.getCalendarService().updateOrCreateEvent(req.getURI(),ics, extId);
+			DavComponent dav = proxy.getCalendarService().updateOrCreateEvent(parentComp,ics, extId);
 			
 			resp.setStatus(HttpServletResponse.SC_CREATED);
 			resp.setContentLength(0);
 			resp.setDateHeader("Created", new Date().getTime());
-			
+			logger.info("send Etag["+dav.getETag()+"]");
+			resp.addHeader("ETag", dav.getETag());
 		} catch (MalformedURLException e) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			resp.setContentLength(0);

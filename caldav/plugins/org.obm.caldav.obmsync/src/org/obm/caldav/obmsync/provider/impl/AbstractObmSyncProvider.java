@@ -52,7 +52,7 @@ import org.obm.sync.client.calendar.CalendarClient;
 /**
  * 
  * @author adrienp
- *
+ * 
  */
 public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 
@@ -77,7 +77,8 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 	protected abstract AbstractEventSyncClient getClient(String loginAtDomain);
 
 	protected AbstractEventSyncClient getClient(CalDavInfo caldavInfo) {
-		return getClient(caldavInfo.getToken().getUser() + "@" + caldavInfo.getToken().getDomain());
+		return getClient(caldavInfo.getToken().getUser() + "@"
+				+ caldavInfo.getToken().getDomain());
 	}
 
 	public AccessToken login(String username, String password) {
@@ -101,23 +102,27 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 	protected AbstractObmSyncProvider() {
 	}
 
-	public Event getEventFromExtId(CalDavInfo caldavInfo,
-			String extId) throws AuthFault, ServerFault {
+	public Event getEventFromExtId(CalDavInfo caldavInfo, String extId)
+			throws AuthFault, ServerFault {
 		logger.info("search event with " + extId + "from obm-sync");
-		return getClient(caldavInfo).getEventFromExtId(caldavInfo.getToken(), caldavInfo.getCalendar(), extId);
+		return getClient(caldavInfo).getEventFromExtId(caldavInfo.getToken(),
+				caldavInfo.getCalendar(), extId);
 	}
 
 	public Event createEvent(CalDavInfo caldavInfo, Event event)
 			throws AuthFault, ServerFault {
-		String uid = getClient(caldavInfo).createEvent(caldavInfo.getToken(), caldavInfo.getCalendar(), event);
+		String uid = getClient(caldavInfo).createEvent(caldavInfo.getToken(),
+				caldavInfo.getCalendar(), event);
 		event.setUid(uid);
 		return event;
 	}
 
-	public List<Event> createEventsFromICS(CalDavInfo caldavInfo,
-			String ics, String extId) throws Exception {
+	public List<Event> createEventsFromICS(CalDavInfo caldavInfo, String ics,
+			String extId) throws Exception {
 		logger.info("Parse event ics");
-		List<Event> events = getClient(caldavInfo).parseICS(caldavInfo.getToken(), ics);
+		List<Event> events = getClient(caldavInfo).parseICS(
+				caldavInfo.getToken(), ics);
+		List<Event> ret = new LinkedList<Event>();
 		for (Event event : events) {
 			if (event.getDate() == null) {
 				Calendar cal = new GregorianCalendar();
@@ -133,20 +138,25 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			event.addAttendee(getAttendee(caldavInfo.getLoginAtDomain()));
 			fixPrioriryForObm(event);
 			logger.info("Create event with extId " + extId);
-			String uid = getClient(caldavInfo).createEvent(caldavInfo.getToken(), caldavInfo.getCalendar(), event);
-			event.setUid(uid);
+			getClient(caldavInfo).createEvent(
+					caldavInfo.getToken(), caldavInfo.getCalendar(), event);
+			event = getClient(caldavInfo).getEventFromExtId(
+					caldavInfo.getToken(), caldavInfo.getCalendar(),
+					event.getExtId());
+			ret.add(event);
 		}
 
-		return events;
+		return ret;
 	}
 
-	public List<Event> updateEventFromICS(CalDavInfo caldavInfo,
-			String ics, Event eventOrigin) throws Exception {
+	public List<Event> updateEventFromICS(CalDavInfo caldavInfo, String ics,
+			Event eventOrigin) throws Exception {
 		logger.info("update event from ics data");
 		List<Event> ret = new LinkedList<Event>();
 
 		String uid = eventOrigin.getUid();
-		List<Event> events = getClient(caldavInfo).parseICS(caldavInfo.getToken(), ics);
+		List<Event> events = getClient(caldavInfo).parseICS(
+				caldavInfo.getToken(), ics);
 		for (Event event : events) {
 			event.setExtId(eventOrigin.getExtId());
 			event.setUid(uid);
@@ -160,17 +170,18 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				}
 			}
 			fixPrioriryForObm(event);
-			event = getClient(caldavInfo).modifyEvent(caldavInfo.getToken(), caldavInfo.getCalendar(), event, true);
+			event = getClient(caldavInfo).modifyEvent(caldavInfo.getToken(),
+					caldavInfo.getCalendar(), event, true);
 			ret.add(event);
 		}
 		return ret;
 	}
 
-	public List<Event> getAll(CalDavInfo caldavInfo,
-			EventType eventType) throws ServerFault, AuthFault {
+	public List<Event> getAll(CalDavInfo caldavInfo, EventType eventType)
+			throws ServerFault, AuthFault {
 		logger.info("Get all event from obm-sync");
-		List<Event> events = getClient(caldavInfo).getAllEvents(caldavInfo.getToken(), caldavInfo.getCalendar(),
-				eventType);
+		List<Event> events = getClient(caldavInfo).getAllEvents(
+				caldavInfo.getToken(), caldavInfo.getCalendar(), eventType);
 
 		for (Iterator<Event> it = events.iterator(); it.hasNext();) {
 			Event ev = it.next();
@@ -181,17 +192,18 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 		return events;
 	}
 
-	public Map<Event, String> getICSEventsFromExtId(CalDavInfo caldavInfo, Set<String> listUidEvent) throws AuthFault,
-			ServerFault {
+	public Map<Event, String> getICSEventsFromExtId(CalDavInfo caldavInfo,
+			Set<String> listUidEvent) throws AuthFault, ServerFault {
 		Map<Event, String> listICS = new HashMap<Event, String>();
 
 		for (String extId : listUidEvent) {
 			logger.info("Get ics event with extId " + extId + " from obm-sync");
-			Event event = getClient(caldavInfo).getEventFromExtId(caldavInfo.getToken(), caldavInfo.getCalendar(),
-					extId);
+			Event event = getClient(caldavInfo).getEventFromExtId(
+					caldavInfo.getToken(), caldavInfo.getCalendar(), extId);
 			if (event != null) {
 				fixPrioriryForTB(event);
-				listICS.put(event, getClient(caldavInfo).parseEvent(caldavInfo.getToken(), event));
+				listICS.put(event, getClient(caldavInfo).parseEvent(
+						caldavInfo.getToken(), event));
 			} else {
 				event = new Event();
 				event.setExtId(extId);
@@ -202,18 +214,19 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 		return listICS;
 	}
 
-	public void remove(CalDavInfo caldavInfo, Event event)
-			throws AuthFault, ServerFault{
+	public void remove(CalDavInfo caldavInfo, Event event) throws AuthFault,
+			ServerFault {
 		logger.info("delete event with uid " + event.getUid()
 				+ " from obm-sync");
-		getClient(caldavInfo).removeEvent(caldavInfo.getToken(), caldavInfo.getCalendar(), event.getUid());
+		getClient(caldavInfo).removeEvent(caldavInfo.getToken(),
+				caldavInfo.getCalendar(), event.getUid());
 	}
 
-	public void updateParticipationState(CalDavInfo caldavInfo,
-			Event event, String participationState) throws AuthFault,
-			ServerFault {
+	public void updateParticipationState(CalDavInfo caldavInfo, Event event,
+			String participationState) throws AuthFault, ServerFault {
 		for (Attendee att : event.getAttendees()) {
-			if (caldavInfo.getCalendarAtDomain().equalsIgnoreCase(att.getEmail())) {
+			if (caldavInfo.getCalendarAtDomain().equalsIgnoreCase(
+					att.getEmail())) {
 				if (Constants.PARTICIPATION_STATE_ACCEPTED
 						.equals(participationState)) {
 					att.setState(ParticipationState.ACCEPTED);
@@ -226,7 +239,8 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				}
 			}
 		}
-		getClient(caldavInfo).modifyEvent(caldavInfo.getToken(), caldavInfo.getCalendar(), event, true);
+		getClient(caldavInfo).modifyEvent(caldavInfo.getToken(),
+				caldavInfo.getCalendar(), event, true);
 	}
 
 	protected Attendee getAttendee(String email) {
@@ -257,19 +271,21 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 		}
 	}
 
-	public List<EventTimeUpdate> getAllEventTimeUpdate(CalDavInfo caldavInfo, EventType et) throws ServerFault, AuthFault {
+	public List<EventTimeUpdate> getAllEventTimeUpdate(CalDavInfo caldavInfo,
+			EventType et) throws ServerFault, AuthFault {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		cal.setTimeInMillis(0);
-		return getEventTimeUpdateFromIntervalDate(caldavInfo, cal
-				.getTime(), null);
+		return getEventTimeUpdateFromIntervalDate(caldavInfo, cal.getTime(),
+				null);
 	}
 
 	public List<EventTimeUpdate> getEventTimeUpdateFromIntervalDate(
-			CalDavInfo caldavInfo, Date start, Date end)
-			throws ServerFault, AuthFault {
+			CalDavInfo caldavInfo, Date start, Date end) throws ServerFault,
+			AuthFault {
 		List<EventTimeUpdate> events = getClient(caldavInfo)
-				.getEventTimeUpdateNotRefusedFromIntervalDate(caldavInfo.getToken(), caldavInfo.getCalendar(),
-						start, end);
+				.getEventTimeUpdateNotRefusedFromIntervalDate(
+						caldavInfo.getToken(), caldavInfo.getCalendar(), start,
+						end);
 		for (Iterator<EventTimeUpdate> it = events.iterator(); it.hasNext();) {
 			EventTimeUpdate ev = it.next();
 			if (ev.getRecurrenceId() != null) {
@@ -279,31 +295,34 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 		return events;
 	}
 
-	public List<Event> getListEventsFromIntervalDate(CalDavInfo caldavInfo, Date start, Date end) throws AuthFault,
-			ServerFault {
-		return getClient(caldavInfo).getListEventsFromIntervalDate(caldavInfo.getToken(), caldavInfo.getCalendar(),
-				start, end);
+	public List<Event> getListEventsFromIntervalDate(CalDavInfo caldavInfo,
+			Date start, Date end) throws AuthFault, ServerFault {
+		return getClient(caldavInfo).getListEventsFromIntervalDate(
+				caldavInfo.getToken(), caldavInfo.getCalendar(), start, end);
 	}
 
 	public CalendarInfo getRightsOnCalendar(CalDavInfo caldavInfo)
 			throws AuthFault, ServerFault {
-		CalendarInfo[] calInfos = getClient(caldavInfo).listCalendars(caldavInfo.getToken());
-		for(CalendarInfo ci : calInfos){
-			if(ci.getMail().equalsIgnoreCase(caldavInfo.getCalendarAtDomain())){
+		CalendarInfo[] calInfos = getClient(caldavInfo).listCalendars(
+				caldavInfo.getToken());
+		for (CalendarInfo ci : calInfos) {
+			if (ci.getMail().equalsIgnoreCase(caldavInfo.getCalendarAtDomain())) {
 				return ci;
 			}
 		}
 		return null;
 	}
 
-	public Date getLastUpdate(CalDavInfo caldavInfo)
-			throws ServerFault, AuthFault {
-		return getClient(caldavInfo).getLastUpdate(caldavInfo.getToken(), caldavInfo.getCalendar());
+	public Date getLastUpdate(CalDavInfo caldavInfo) throws ServerFault,
+			AuthFault {
+		return getClient(caldavInfo).getLastUpdate(caldavInfo.getToken(),
+				caldavInfo.getCalendar());
 	}
 
 	public FreeBusyRequest getFreeBusyRequest(CalDavInfo caldavInfo, String ics)
 			throws ServerFault, AuthFault {
-		return getClient(caldavInfo).parseICSFreeBusy(caldavInfo.getToken(), ics);
+		return getClient(caldavInfo).parseICSFreeBusy(caldavInfo.getToken(),
+				ics);
 	}
 
 	public List<FreeBusy> getFreeBusy(CalDavInfo caldavInfo, FreeBusyRequest fbr)
@@ -313,6 +332,7 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 
 	public String parseFreeBusyToICS(CalDavInfo caldavInfo, FreeBusy freeBusy)
 			throws ServerFault, AuthFault {
-		return getClient(caldavInfo).parseFreeBusyToICS(caldavInfo.getToken(), freeBusy);
+		return getClient(caldavInfo).parseFreeBusyToICS(caldavInfo.getToken(),
+				freeBusy);
 	}
 }
