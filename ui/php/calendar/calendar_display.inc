@@ -8716,7 +8716,7 @@ function dis_calendar_day_portlet($type) {
     if($display_days[$current->get(Of_Date::WEEKDAY_DIGIT)] == 1) {
       $day = $current->localize(Of_Date::OBM_DATE_WEEK_LIST);
       $iso = $current->getURL();
-      $week_day_list .= "<td>$day</td>\n";tabSelected
+      $week_day_list .= "<td>$day</td>\n";
       $week_day_event_list .= "<th> </th>";
     }
     $current->addDay(1);
