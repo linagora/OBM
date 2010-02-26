@@ -16,6 +16,6 @@
 
 package org.obm.caldav.server.share;
 
-public enum DavComponentName {
+public enum DavComponentType {
 	VCALENDAR,VEVENT,VTODO;
 }

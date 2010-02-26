@@ -18,10 +18,11 @@ package org.obm.caldav.server.propertyHandler;
 
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Element;
 
 public interface PropfindPropertyHandler {
-	void appendPropertyValue(Element prop, Token t, DavRequest req, IBackend proxy, String url);
+	void appendPropertyValue(Element prop, Token t, DavRequest req, IBackend proxy, DavComponent comp);
 	boolean isUsed();
 }

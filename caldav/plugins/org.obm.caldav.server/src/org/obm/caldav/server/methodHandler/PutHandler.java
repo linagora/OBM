@@ -39,7 +39,7 @@ public class PutHandler extends DavMethodHandler {
 			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
 
 			String ics = req.getICS();
-			proxy.getCalendarService().updateOrCreateEvent(ics, extId);
+			proxy.getCalendarService().updateOrCreateEvent(req.getURI(),ics, extId);
 			
 			resp.setStatus(HttpServletResponse.SC_CREATED);
 			resp.setContentLength(0);

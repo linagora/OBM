@@ -16,6 +16,7 @@
 
 package org.obm.caldav.server.resultBuilder;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -23,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
+import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -32,23 +34,23 @@ public class PropertyListBuilder extends ResultBuilder {
 
 	private Log logger = LogFactory.getLog(PropertyListBuilder.class);
 
-	public Document build(Token t, DavRequest req, Set<String> urls,
+	public Document build(Token t, DavRequest req, List<DavComponent> comps,
 			Set<PropfindPropertyHandler> toLoad, Set<Element> notUsed,
 			IBackend proxy) {
 		try {
 
 			Document ret = createMultiStatusDocument();
 			Element r = ret.getDocumentElement();
-			for (String url : urls) {
+			for (DavComponent comp : comps) {
 				Element response = DOMUtils.createElement(r, "D:response");
-				DOMUtils.createElementAndText(response, "D:href", url);
+				DOMUtils.createElementAndText(response, "D:href", comp.getURL());
 
 				if (toLoad.size() > 0) {
 					Element pStat = DOMUtils.createElement(response,
 							"D:propstat");
 					Element p = DOMUtils.createElement(pStat, "D:prop");
 					for (PropfindPropertyHandler dph : toLoad) {
-						dph.appendPropertyValue(p, t, req, proxy, url);
+						dph.appendPropertyValue(p, t, req, proxy, comp);
 					}
 					DOMUtils.createElementAndText(pStat, "D:status",
 							"HTTP/1.1 200 OK");

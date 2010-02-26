@@ -16,15 +16,15 @@
 
 package org.obm.caldav.server.resultBuilder;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
+import org.obm.caldav.server.share.DavComponent;
+import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -63,31 +63,27 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 	// </D:response>
 	// </D:multistatus>
 
-	public Document build(DavRequest req, IBackend proxy,
-			Set<String> properties,
-			Map<String, EventTimeUpdate> listEvents, Set<CalendarQueryPropertyHandler> propertiesValues) {
+	public Document build(DavRequest req, Token t, IBackend proxy,
+			Set<String> properties, List<DavComponent> comps,
+			Set<CalendarQueryPropertyHandler> propertiesValues) {
 		Document doc = null;
 		try {
 			doc = createMultiStatusDocument();
 			Element root = doc.getDocumentElement();
-			for (Entry<String, EventTimeUpdate> entry : listEvents.entrySet()) {
-				EventTimeUpdate event = entry.getValue();
-				if (!entry.getKey().endsWith("/.ics")) {
+			for (DavComponent comp : comps) {
+				if (!comp.getURL().endsWith("/.ics")) {
 					Element response = DOMUtils.createElement(root,
 							"D:response");
-					DOMUtils.createElementAndText(response, "D:href", entry
-							.getKey());
+					DOMUtils.createElementAndText(response, "D:href", comp
+							.getURL());
 					Element pStat = DOMUtils.createElement(response,
 							"D:propstat");
 					Element p = DOMUtils.createElement(pStat, "D:prop");
 					for (CalendarQueryPropertyHandler prop : propertiesValues) {
-						prop.appendCalendarQueryPropertyValue(p, proxy, event);
+						prop.appendPropertyValue(p, t, req, proxy, comp);
 					}
 					Element status = DOMUtils.createElement(pStat, "D:status");
 					status.setTextContent("HTTP/1.1 200 OK");
-				} else {
-					logger.error("extid of the event " + event.getUid()
-							+ " is null");
 				}
 			}
 		} catch (Exception e) {

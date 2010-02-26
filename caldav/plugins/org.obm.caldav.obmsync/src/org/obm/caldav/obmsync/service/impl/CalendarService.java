@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +33,10 @@ import org.obm.caldav.obmsync.provider.impl.ObmSyncEventProvider;
 import org.obm.caldav.obmsync.provider.impl.ObmSyncTodoProvider;
 import org.obm.caldav.server.ICalendarService;
 import org.obm.caldav.server.exception.AuthenticationException;
-import org.obm.caldav.server.share.DavComponentName;
+import org.obm.caldav.server.share.CalendarResource;
+import org.obm.caldav.server.share.CalendarResourceICS;
+import org.obm.caldav.server.share.DavComponent;
+import org.obm.caldav.server.share.DavComponentType;
 import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.utils.Constants;
 import org.obm.sync.auth.AccessToken;
@@ -47,46 +51,53 @@ public class CalendarService implements ICalendarService {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private Map<DavComponentName, ICalendarProvider> providers;
+	private Map<DavComponentType, ICalendarProvider> providers;
 	private CalDavInfo caldavInfo;
 	private CalDavRigth caldavRigth;
 
 	public CalendarService() {
-		this.providers = new HashMap<DavComponentName, ICalendarProvider>();
-		this.providers.put(DavComponentName.VCALENDAR, ObmSyncEventProvider
+		this.providers = new HashMap<DavComponentType, ICalendarProvider>();
+		this.providers.put(DavComponentType.VCALENDAR, ObmSyncEventProvider
 				.getInstance());
-		this.providers.put(DavComponentName.VEVENT, ObmSyncEventProvider
+		this.providers.put(DavComponentType.VEVENT, ObmSyncEventProvider
 				.getInstance());
-		this.providers.put(DavComponentName.VTODO, ObmSyncTodoProvider
+		this.providers.put(DavComponentType.VTODO, ObmSyncTodoProvider
 				.getInstance());
 	}
-
-	public List<Event> updateOrCreateEvent(String ics, String extId)
+	
+	@Override
+	public DavComponent updateOrCreateEvent(String compUrl, String ics, String extId)
 			throws Exception {
 		Event event = getVCalendarProvider().getEventFromExtId(caldavInfo,
 				extId);
 		if (caldavRigth.isWritable()) {
+			List<Event> listEvent;
 			if (event != null) {
-				return getVCalendarProvider().updateEventFromICS(caldavInfo,
+				listEvent = getVCalendarProvider().updateEventFromICS(caldavInfo,
 						ics, event);
 			} else {
-				return getVCalendarProvider().createEventsFromICS(caldavInfo,
+				listEvent = getVCalendarProvider().createEventsFromICS(caldavInfo,
 						ics, extId);
 			}
-		} else {
-			List<Event> ret = new LinkedList<Event>();
-			if (event == null) {
-				ret.add(event);
+			if(listEvent.iterator().hasNext()){
+				return EventConverter.convert(listEvent.iterator().next(), compUrl);
 			}
-			return ret;
 		}
+		return new CalendarResource("", compUrl, new Date(), DavComponentType.VEVENT);
 	}
 
 	@Override
-	public Map<Event, String> getICSFromExtId(Set<String> listExtIdEvent)
+	public List<CalendarResourceICS> getICSFromExtId(String compUrl,Set<String> listExtIdEvent)
 			throws Exception {
-		return getVCalendarProvider().getICSEventsFromExtId(caldavInfo,
+		LinkedList<CalendarResourceICS> ret = new LinkedList<CalendarResourceICS>();
+		Map<Event, String> map = getVCalendarProvider().getICSEventsFromExtId(caldavInfo,
 				listExtIdEvent);
+		for(Entry<Event, String> entry : map.entrySet()){
+			Event e = entry.getKey();
+			String ics = entry.getValue();
+			ret.add(EventConverter.convert(e, compUrl, ics));
+		}
+		return ret;
 	}
 
 	@Override
@@ -105,34 +116,24 @@ public class CalendarService implements ICalendarService {
 		}
 	}
 
-	@Override
-	public String getICSName(Event event) {
-		return event.getExtId() + ".ics";
-	}
+//	@Override
+//	public List<Event> getAll(DavComponentType componant) throws Exception {
+//		return providers.get(componant).getAll(caldavInfo);
+//	}
 
 	@Override
-	public String getICSName(EventTimeUpdate etu) {
-		return etu.getExtId() + ".ics";
-	}
-
-	@Override
-	public List<Event> getAll(DavComponentName componant) throws Exception {
-		return providers.get(componant).getAll(caldavInfo);
-	}
-
-	@Override
-	public List<EventTimeUpdate> getAllLastUpdate(CompFilter cf)
+	public List<DavComponent> getAllLastUpdate(CompFilter cf)
 			throws Exception {
-		return getAllLastUpdate(cf.getName(), cf);
+		return getAllLastUpdate(cf.getDavComponentURL(), cf.getName(), cf);
 	}
 
 	@Override
-	public List<EventTimeUpdate> getAllLastUpdate(DavComponentName componant)
+	public List<DavComponent> getAllLastUpdate(String compUrl, DavComponentType type)
 			throws Exception {
-		return getAllLastUpdate(componant, new CompFilter());
+		return  getAllLastUpdate(compUrl, type, new CompFilter()); 
 	}
 
-	private List<EventTimeUpdate> getAllLastUpdate(DavComponentName componant,
+	private List<DavComponent> getAllLastUpdate(String compUrl,DavComponentType componant,
 			CompFilter cf) throws Exception {
 		if (cf.getTimeRange() != null
 				&& (cf.getTimeRange().getStart() != null || cf.getTimeRange()
@@ -150,21 +151,22 @@ public class CalendarService implements ICalendarService {
 				gc.set(Calendar.YEAR, gc.get(Calendar.YEAR) + 1);
 				end = gc.getTime();
 			}
-
-			return providers.get(componant).getEventTimeUpdateFromIntervalDate(
+			List<EventTimeUpdate> items = providers.get(componant).getEventTimeUpdateFromIntervalDate(
 					caldavInfo, cf.getTimeRange().getStart(), end);
+			return EventConverter.convert(items, compUrl, componant);
 		}
-		return providers.get(componant).getAllEventTimeUpdate(caldavInfo);
+		List<EventTimeUpdate> items = providers.get(componant).getAllEventTimeUpdate(caldavInfo); 
+		return EventConverter.convert(items, compUrl, componant);
 	}
 
 	@Override
 	public boolean getSync(Date lastSync) throws Exception {
-		EventChanges ec = providers.get(DavComponentName.VEVENT).getSync(
+		EventChanges ec = providers.get(DavComponentType.VEVENT).getSync(
 				caldavInfo, lastSync);
 		if (ec.getUpdated().length != 0 || ec.getRemoved().length != 0) {
 			return true;
 		} else {
-			ec = providers.get(DavComponentName.VTODO).getSync(caldavInfo,
+			ec = providers.get(DavComponentType.VTODO).getSync(caldavInfo,
 					lastSync);
 			if (ec.getUpdated().length != 0 || ec.getRemoved().length != 0) {
 				return true;
@@ -173,8 +175,7 @@ public class CalendarService implements ICalendarService {
 		return false;
 	}
 
-	@Override
-	public boolean hasRightsOnCalendar() throws Exception {
+	private boolean hasRightsOnCalendar() throws Exception {
 		if (this.caldavRigth == null) {
 			CalendarInfo ci = getVCalendarProvider().getRightsOnCalendar(
 					caldavInfo);
@@ -190,15 +191,15 @@ public class CalendarService implements ICalendarService {
 		return this.caldavRigth.isReadable() || this.caldavRigth.isWritable();
 	}
 
-	@Override
+//	@Override
 	public String getLastUpdate() throws Exception {
 		return getVCalendarProvider().getLastUpdate(caldavInfo).toString();
 	}
 
 	@Override
-	public void login(String loginAtDomain, String password, String calendar,
+	public boolean login(String loginAtDomain, String password, String calendar,
 			String calendarAtDomain) throws AuthenticationException {
-		AccessToken token = this.providers.get(DavComponentName.VEVENT).login(
+		AccessToken token = this.providers.get(DavComponentType.VEVENT).login(
 				loginAtDomain, password);
 		if (token == null || token.getSessionId() == null
 				|| "".equals(token.getSessionId())) {
@@ -210,7 +211,7 @@ public class CalendarService implements ICalendarService {
 		this.caldavInfo = new CalDavInfo(token, calendar, calendarAtDomain,
 				loginAtDomain);
 		try {
-			hasRightsOnCalendar();
+			return hasRightsOnCalendar();
 		} catch (Exception e) {
 			throw new AuthenticationException();
 		}
@@ -218,7 +219,7 @@ public class CalendarService implements ICalendarService {
 
 	@Override
 	public void logout() {
-		this.providers.get(DavComponentName.VCALENDAR).logout(
+		this.providers.get(DavComponentType.VCALENDAR).logout(
 				caldavInfo.getToken());
 	}
 
@@ -243,6 +244,6 @@ public class CalendarService implements ICalendarService {
 	}
 
 	private ICalendarProvider getVCalendarProvider() {
-		return this.providers.get(DavComponentName.VCALENDAR);
+		return this.providers.get(DavComponentType.VCALENDAR);
 	}
 }

@@ -24,7 +24,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obm.caldav.server.share.DavComponentName;
+import org.obm.caldav.server.share.DavComponentType;
 import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.server.share.filter.Filter;
 import org.obm.caldav.server.share.filter.ParamFilter;
@@ -42,7 +42,7 @@ public class FilterParser {
 
 	private final static String patternUTC = "yyyyMMdd'T'HHmmss'Z'";
 
-	public static Filter parse(Document doc) {
+	public static Filter parse(String componentUrl, Document doc) {
 		Filter filter = null;
 
 		Element root = doc.getDocumentElement();
@@ -52,18 +52,19 @@ public class FilterParser {
 			Element compFilterNodePere = DOMUtils.getUniqueElement(filterNode,
 					"comp-filter",CompFilter.NAMESPACE);
 			if (compFilterNodePere != null) {
-				filter.setCompFilter(parseCompFilter(compFilterNodePere));
+				filter.setCompFilter(parseCompFilter(componentUrl,compFilterNodePere));
 			}
 		}
 		return filter;
 	}
 
-	private static CompFilter parseCompFilter(Element compFilterNode) {
+	private static CompFilter parseCompFilter(String componentUrl, Element compFilterNode) {
 		CompFilter compFilter = null;
 		if (compFilterNode != null) {
 			compFilter = new CompFilter();
+			compFilter.setDavComponentURL(componentUrl);
 			String name = compFilterNode.getAttribute("name");
-			compFilter.setName(DavComponentName.valueOf(name));
+			compFilter.setName(DavComponentType.valueOf(name));
 
 			compFilter.setIsNotDefined(getIsNotDefined(compFilterNode));
 			compFilter.setTimeRange(getTimeRange(compFilterNode));
@@ -72,7 +73,7 @@ public class FilterParser {
 					.getElementsByTagNameNS(Filter.NAMESPACE,"comp-filter");
 			for (int i = 0; i < compFilters.getLength(); i++) {
 				Element cf = (Element) compFilters.item(i);
-				compFilter.addCompFilter(parseCompFilter(cf));
+				compFilter.addCompFilter(parseCompFilter(componentUrl,cf));
 			}
 
 			NodeList propFilters = compFilterNode

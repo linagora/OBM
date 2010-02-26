@@ -49,6 +49,11 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.obm.sync.client.calendar.CalendarClient;
 
+/**
+ * 
+ * @author adrienp
+ *
+ */
 public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 
 	protected static final Log logger = LogFactory

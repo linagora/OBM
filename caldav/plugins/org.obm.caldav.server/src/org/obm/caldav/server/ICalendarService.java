@@ -23,10 +23,10 @@ import java.util.Set;
 
 import org.obm.caldav.server.exception.AuthenticationException;
 import org.obm.caldav.server.exception.AuthorizationException;
-import org.obm.caldav.server.share.DavComponentName;
+import org.obm.caldav.server.share.CalendarResourceICS;
+import org.obm.caldav.server.share.DavComponent;
+import org.obm.caldav.server.share.DavComponentType;
 import org.obm.caldav.server.share.filter.CompFilter;
-import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.EventTimeUpdate;
 
 public interface ICalendarService {
 
@@ -34,36 +34,29 @@ public interface ICalendarService {
 	final static String PARTICIPATION_STATE_DECLINED = "no";
 	final static String PARTICIPATION_STATE_NEEDSACTION = "maybe";
 
-	List<Event> updateOrCreateEvent(String ics, String extId) throws Exception;
-
-	String getICSName(Event event);
-
-	String getICSName(EventTimeUpdate etu);
-
-	List<Event> getAll(DavComponentName componant) throws Exception;
-
-	List<EventTimeUpdate> getAllLastUpdate(DavComponentName componant)
-	throws Exception;
-	
-	List<EventTimeUpdate> getAllLastUpdate(CompFilter cf)
+	DavComponent updateOrCreateEvent(String compUrl, String ics, String extId)
 			throws Exception;
 
-	Map<Event, String> getICSFromExtId(Set<String> listExtIdEvent)
-			throws Exception;
+	List<DavComponent> getAllLastUpdate(String componentUrl,
+			DavComponentType componant) throws Exception;
+
+	List<DavComponent> getAllLastUpdate(CompFilter cf) throws Exception;
+
+	List<CalendarResourceICS> getICSFromExtId(String compUrl,
+			Set<String> listExtIdEvent) throws Exception;
 
 	void removeOrUpdateParticipationState(String extId) throws Exception,
 			AuthorizationException;
 
 	boolean getSync(Date lastSync) throws Exception;
 
-	boolean hasRightsOnCalendar() throws Exception;
-
-	String getLastUpdate() throws Exception;
-
-	void login(String userId, String password, String calendar, String calendarAtDomain) throws AuthenticationException;
+	boolean login(String userId, String password, String calendar,
+			String calendarAtDomain) throws AuthenticationException;
 
 	void logout();
 
-	public Map<String,String> getFreeBuzy(String ics) throws Exception;
+	Map<String, String> getFreeBuzy(String ics) throws Exception;
+	
+	String getLastUpdate() throws Exception;
 
 }

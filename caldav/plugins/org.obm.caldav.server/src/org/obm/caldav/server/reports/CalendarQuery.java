@@ -30,11 +30,11 @@ import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.propertyHandler.impl.GetETag;
 import org.obm.caldav.server.propertyHandler.impl.ResourceType;
 import org.obm.caldav.server.resultBuilder.CalendarQueryResultBuilder;
+import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.server.share.filter.Filter;
 import org.obm.caldav.utils.DOMUtils;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Document;
 
 /**
@@ -70,7 +70,7 @@ public class CalendarQuery extends ReportProvider {
 			HttpServletResponse resp, Set<String> requestPropList) {
 		logger.info("process(" + token.getLoginAtDomain() + ", req, resp)");
 
-		Filter filter = FilterParser.parse(req.getXml());
+		Filter filter = FilterParser.parse(req.getURI(),req.getXml());
 		CompFilter compFilter = filter.getCompFilter();
 
 		Set<CalendarQueryPropertyHandler> propertiesValues = new HashSet<CalendarQueryPropertyHandler>();
@@ -83,21 +83,21 @@ public class CalendarQuery extends ReportProvider {
 				logger.warn("the Property [" + s + "] is not implemented");
 			}
 		}
-		
-		
+
 		try {
 			Document ret = null;
-			Map<String, EventTimeUpdate> events = new HashMap<String, EventTimeUpdate>();
+//			Map<String, EventTimeUpdate> events = new HashMap<String, EventTimeUpdate>();
 			CompFilter cf = compFilter.getCompFilters().get(0);
-			List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdate(cf);
-			for (EventTimeUpdate event : retEvents) {
-				String href = req.getHref()
-						+ proxy.getCalendarService().getICSName(event);
-				events.put(href, event);
-			}
-			ret = new CalendarQueryResultBuilder().build(req, proxy,
-					requestPropList, events, propertiesValues);
-			
+			List<DavComponent> comps = proxy.getCalendarService()
+					.getAllLastUpdate(cf);
+//			for (DavComponent event : comps) {
+//				String href = req.getHref()
+//						+ proxy.getCalendarService().getICSName(event);
+//				events.put(href, event);
+//			}
+			ret = new CalendarQueryResultBuilder().build(req, token, proxy,
+					requestPropList, comps, propertiesValues);
+
 			logger.info(DOMUtils.toString(ret));
 
 			resp.setStatus(207); // multi status webdav

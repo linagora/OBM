@@ -16,8 +16,6 @@
 
 package org.obm.caldav.server.propertyHandler.impl;
 
-import java.util.Date;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IBackend;
@@ -28,9 +26,9 @@ import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
+import org.obm.caldav.server.share.CalendarResourceICS;
+import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.Token;
-import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Element;
 
 /**
@@ -53,37 +51,24 @@ import org.w3c.dom.Element;
 public class GetETag extends DavPropertyHandler implements CalendarQueryPropertyHandler, CalendarMultiGetPropertyHandler,PropfindPropertyHandler {
 
 	protected Log logger = LogFactory.getLog(getClass());
-	
-	@Override	
-	public void appendCalendarQueryPropertyValue(Element prop, IBackend proxy,
-			EventTimeUpdate event) {
-		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
-		appendValue(val, event.getExtId() , event.getTimeUpdate());
-	}
 
 	@Override
 	public void appendCalendarMultiGetPropertyValue(Element prop, IBackend proxy,
-			Event event, String eventIcs) throws AppendPropertyException{
+			CalendarResourceICS ics) throws AppendPropertyException{
 		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
-		appendValue(val, event.getExtId(), event.getTimeUpdate() );
+		val.setTextContent(ics.getETag());
 	}
 	
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IBackend proxy, String url) {
+			IBackend proxy, DavComponent comp) {
 		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
-		appendValue(val,"", new Date());
-	}
-	
-	private void appendValue(Element e, String extId, Date dateupdate){
-		if(dateupdate == null){
-			dateupdate = new Date();
-		}
-		e.setTextContent("\"" + extId + "-" + dateupdate.getTime() + "\"");
+		val.setTextContent(comp.getETag());
 	}
 
 	@Override
 	public boolean isUsed() {
 		return true;
 	}
+
 }

@@ -26,6 +26,7 @@ import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
+import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Element;
 
@@ -74,7 +75,8 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 	}
 	
 	@Override
-	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req, IBackend proxy, String url) {
+	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req,
+			IBackend proxy, DavComponent comp) {
 		Element elem = appendElement(prop, "getctag", NameSpaceConstant.CALENDARSERVER_NAMESPACE_PREFIX); 
 		Date lastChange = lastChangeByUser.get(t.getLoginAtDomain());
 		
@@ -107,4 +109,5 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 	public boolean isUsed() {
 		return true;
 	}
+
 }

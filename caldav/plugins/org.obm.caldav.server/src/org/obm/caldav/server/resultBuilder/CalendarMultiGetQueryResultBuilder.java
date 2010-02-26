@@ -16,16 +16,15 @@
 
 package org.obm.caldav.server.resultBuilder;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.exception.CalDavException;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
+import org.obm.caldav.server.share.CalendarResourceICS;
 import org.obm.caldav.utils.DOMUtils;
-import org.obm.sync.calendar.Event;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -67,28 +66,23 @@ public class CalendarMultiGetQueryResultBuilder extends ResultBuilder {
 
 	public Document build(DavRequest req, IBackend proxy,
 			Set<CalendarMultiGetPropertyHandler> properties,
-			Map<Event, String> listEvents) {
+			List<CalendarResourceICS> listICS) {
 		Document doc = null;
 		try {
 			doc = createMultiStatusDocument();
 			Element root = doc.getDocumentElement();
-			if (listEvents.size() > 0) {
-				for (Entry<Event, String> entry : listEvents.entrySet()) {
+			if (listICS.size() > 0) {
+				for (CalendarResourceICS ics : listICS) {
 					Element response = DOMUtils.createElement(root,
 							"D:response");
-					Event event = entry.getKey();
-					String eventICS = entry.getValue();
-					String href = req.getHref()
-							+ proxy.getCalendarService().getICSName(event);
-
 					try {
-						DOMUtils.createElementAndText(response, "D:href", href);
+						DOMUtils.createElementAndText(response, "D:href", ics.getURL());
 						Element pStat = DOMUtils.createElement(response,
 								"D:propstat");
 						Element p = DOMUtils.createElement(pStat, "D:prop");
 						for (CalendarMultiGetPropertyHandler property : properties) {
 							property.appendCalendarMultiGetPropertyValue(p,
-									proxy, event, eventICS);
+									proxy, ics);
 						}
 						Element status = DOMUtils.createElement(pStat,
 								"D:status");
@@ -99,7 +93,7 @@ public class CalendarMultiGetQueryResultBuilder extends ResultBuilder {
 						for (int i = 0; i < nl.getLength(); i++) {
 							response.removeChild(nl.item(i));
 						}
-						DOMUtils.createElementAndText(response, "D:href", href);
+						DOMUtils.createElementAndText(response, "D:href", ics.getURL());
 						
 						Element status = DOMUtils.createElement(response,
 								"D:status");

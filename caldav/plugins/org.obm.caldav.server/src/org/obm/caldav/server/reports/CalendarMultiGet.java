@@ -19,6 +19,7 @@ package org.obm.caldav.server.reports;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,10 +32,10 @@ import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.impl.CalendarData;
 import org.obm.caldav.server.propertyHandler.impl.GetETag;
 import org.obm.caldav.server.resultBuilder.CalendarMultiGetQueryResultBuilder;
+import org.obm.caldav.server.share.CalendarResourceICS;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.CalDavUtils;
 import org.obm.caldav.utils.DOMUtils;
-import org.obm.sync.calendar.Event;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -103,7 +104,6 @@ public class CalendarMultiGet extends ReportProvider {
 	// <D:status>HTTP/1.1 404 Not Found</D:status>
 	// </D:response>
 	// </D:multistatus>
-
 	@Override
 	public void process(Token token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp, Set<String> requestPropList) {
@@ -124,10 +124,8 @@ public class CalendarMultiGet extends ReportProvider {
 			Element root = req.getXml().getDocumentElement();
 			Set<String> listExtIDEvent = getListExtId(root);
 			
-			Map<Event, String> listICS = proxy.getCalendarService().getICSFromExtId(listExtIDEvent);
+			List<CalendarResourceICS> listICS = proxy.getCalendarService().getICSFromExtId(req.getURI(),listExtIDEvent);
 
-			
-			
 			Document ret = new CalendarMultiGetQueryResultBuilder().build(req, proxy, propertiesValues, listICS);
 			logger.info(DOMUtils.toString(ret));
 			

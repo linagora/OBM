@@ -22,8 +22,9 @@ import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
+import org.obm.caldav.server.share.DavComponent;
+import org.obm.caldav.server.share.DavComponentType;
 import org.obm.caldav.server.share.Token;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Element;
 
 /**
@@ -41,11 +42,11 @@ public class ResourceType extends DavPropertyHandler implements
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IBackend proxy, String url) {
+			IBackend proxy, DavComponent comp) {
 
 		Element elem = appendElement(prop, "resourcetype",
 				NameSpaceConstant.DAV_NAMESPACE_PREFIX);
-		if (url.toLowerCase().endsWith("/event/")) {
+		if (DavComponentType.VCALENDAR.equals(comp.getType())) {
 			appendElement(elem, "collection",
 					NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 			appendElement(elem, "calendar",
@@ -53,13 +54,6 @@ public class ResourceType extends DavPropertyHandler implements
 			appendElement(elem, "schedule-calendar",
 					NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
 		}
-	}
-
-	@Override
-	public void appendCalendarQueryPropertyValue(Element prop, IBackend proxy,
-			EventTimeUpdate event) {
-		appendElement(prop, "resourcetype",
-				NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 	}
 
 	@Override

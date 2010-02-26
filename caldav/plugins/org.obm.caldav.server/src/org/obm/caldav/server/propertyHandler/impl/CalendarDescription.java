@@ -21,6 +21,7 @@ import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
+import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Element;
 
@@ -50,7 +51,7 @@ public class CalendarDescription extends DavPropertyHandler implements
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IBackend proxy, String url) {
+			IBackend proxy, DavComponent comp) {
 		appendElement(prop, "calendar-description",
 				NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent(
 				"Calendar " + t.getCalendarName() + " from OBM-CalDav");

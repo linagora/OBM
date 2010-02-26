@@ -21,6 +21,8 @@ import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
+import org.obm.caldav.server.share.DavComponent;
+import org.obm.caldav.server.share.DavComponentType;
 import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Element;
 
@@ -28,8 +30,8 @@ public class GetContentType extends DavPropertyHandler implements PropfindProper
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IBackend proxy, String url) {
-		if(url.endsWith(".ics")){
+			IBackend proxy, DavComponent comp) {
+		if(DavComponentType.VEVENT.equals(comp.getType()) || DavComponentType.VTODO.equals(comp.getType())){
 			appendElement(prop, "getcontenttype",
 				NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent(
 				"text/calendar");

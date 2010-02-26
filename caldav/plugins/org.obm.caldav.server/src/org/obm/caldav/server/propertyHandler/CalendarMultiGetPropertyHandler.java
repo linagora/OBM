@@ -18,10 +18,10 @@ package org.obm.caldav.server.propertyHandler;
 
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.exception.AppendPropertyException;
-import org.obm.sync.calendar.Event;
+import org.obm.caldav.server.share.CalendarResourceICS;
 import org.w3c.dom.Element;
 
 public interface CalendarMultiGetPropertyHandler {
 	public void appendCalendarMultiGetPropertyValue(Element prop, IBackend proxy,
-			Event event, String eventICS) throws AppendPropertyException;
+			CalendarResourceICS ics) throws AppendPropertyException;
 }

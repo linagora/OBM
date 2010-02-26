@@ -17,8 +17,10 @@
 package org.obm.caldav.server.methodHandler;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,10 +44,11 @@ import org.obm.caldav.server.propertyHandler.impl.ScheduleInboxURL;
 import org.obm.caldav.server.propertyHandler.impl.ScheduleOutboxURL;
 import org.obm.caldav.server.propertyHandler.impl.SupportedCalendarComponentSet;
 import org.obm.caldav.server.resultBuilder.PropertyListBuilder;
-import org.obm.caldav.server.share.DavComponentName;
+import org.obm.caldav.server.share.CalendarComponent;
+import org.obm.caldav.server.share.DavComponent;
+import org.obm.caldav.server.share.DavComponentType;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -99,18 +102,15 @@ public class PropFindHandler extends DavMethodHandler {
 				logger.warn("the Property ["+node.getLocalName()+"] is not used");
 			}
 		}
-		
-		Set<String> urls = new HashSet<String>();
-		urls.add(req.getURI());
+		List<DavComponent> comps = new LinkedList<DavComponent>();
+		CalendarComponent calComp = new CalendarComponent(req.getURI(), new Date());
+		comps.add(calComp);
 		
 		if(toLoad.contains(propertiesHandler.get("getcontenttype"))){
-			List<EventTimeUpdate> events = proxy.getCalendarService().getAllLastUpdate(DavComponentName.VEVENT);
-			for(EventTimeUpdate event : events){
-				urls.add(req.getURI()+proxy.getCalendarService().getICSName(event));
-			}
+			comps.addAll(proxy.getCalendarService().getAllLastUpdate(req.getURI(), DavComponentType.VEVENT));
 		}
 		
-		Document ret = new PropertyListBuilder().build(t, req,urls, toLoad, toNotImplemented, proxy);
+		Document ret = new PropertyListBuilder().build(t, req, comps, toLoad, toNotImplemented, proxy);
 
 		try {
 			if(logger.isInfoEnabled()){

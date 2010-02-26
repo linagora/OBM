@@ -43,8 +43,8 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public void login(Token davToken) throws AuthenticationException {
-		calendarService.login(davToken.getLoginAtDomain(), davToken.getPassword(),davToken.getCalendarName(), davToken.getCalendarNameAtDomain());
+	public boolean login(Token davToken) throws AuthenticationException {
+		return calendarService.login(davToken.getLoginAtDomain(), davToken.getPassword(),davToken.getCalendarName(), davToken.getCalendarNameAtDomain());
 	}
 
 	@Override
@@ -68,9 +68,7 @@ public class OBMBackend implements IBackend {
 		if (t == null) {
 			return false;
 		}
-		this.login(t);
-		
-		boolean hasRightsOnCalendar = calendarService.hasRightsOnCalendar();
+		boolean hasRightsOnCalendar = this.login(t); 
 		this.logout();
 		return hasRightsOnCalendar;
 	}

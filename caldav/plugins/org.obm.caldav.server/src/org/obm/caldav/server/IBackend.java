@@ -22,7 +22,7 @@ public interface IBackend {
 
 	ICalendarService getCalendarService();
 	
-	void login(Token davToken) throws Exception;
+	boolean login(Token davToken) throws Exception;
 
 	void logout();
 	

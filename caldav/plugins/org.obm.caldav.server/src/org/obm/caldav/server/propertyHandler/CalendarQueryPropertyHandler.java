@@ -17,9 +17,11 @@
 package org.obm.caldav.server.propertyHandler;
 
 import org.obm.caldav.server.IBackend;
-import org.obm.sync.calendar.EventTimeUpdate;
+import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.share.DavComponent;
+import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Element;
 
 public interface CalendarQueryPropertyHandler {
-	public abstract void appendCalendarQueryPropertyValue(Element prop, IBackend proxy, EventTimeUpdate event);
+	void appendPropertyValue(Element prop, Token t, DavRequest req, IBackend proxy, DavComponent comp);
 }

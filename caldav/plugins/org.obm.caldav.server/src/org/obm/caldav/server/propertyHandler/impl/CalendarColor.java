@@ -19,6 +19,7 @@ package org.obm.caldav.server.propertyHandler.impl;
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
+import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Element;
 
@@ -26,7 +27,7 @@ public class CalendarColor implements PropfindPropertyHandler {
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
-			IBackend proxy, String url) {
+			IBackend proxy, DavComponent comp) {
 	}
 
 	@Override

@@ -19,7 +19,7 @@ package org.obm.caldav.server.share.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obm.caldav.server.share.DavComponentName;
+import org.obm.caldav.server.share.DavComponentType;
 
 
 
@@ -31,12 +31,10 @@ import org.obm.caldav.server.share.DavComponentName;
  */
 public class CompFilter {
 	
-//	public final static String VCALENDAR = "vcalendar";
-//	public final static String VEVENT = "vevent";
-//	public final static String VTODO = "vtodo";
 	public final static String NAMESPACE = "urn:ietf:params:xml:ns:caldav";
 	
-	private DavComponentName name;
+	private DavComponentType name;
+	private String davComponentURL;
 	private boolean isNotDefined;
 	private TimeRange timeRange;
 	private List<PropFilter> propFilters;
@@ -49,10 +47,13 @@ public class CompFilter {
 		this.compFilters = new ArrayList<CompFilter>();
 	}
 
-	public DavComponentName getName() {
+	public DavComponentType getName() {
 		return name;
 	}
 
+	public String getDavComponentURL() {
+		return davComponentURL;
+	}
 
 	public boolean isNotDefined() {
 		return isNotDefined;
@@ -74,12 +75,13 @@ public class CompFilter {
 	}
 
 
-
-	public void setName(DavComponentName name) {
+	public void setName(DavComponentType name) {
 		this.name = name;
 	}
 
-
+	public void setDavComponentURL(String davComponentURL) {
+		this.davComponentURL = davComponentURL;
+	}
 
 	public void setIsNotDefined(boolean isNotDefined) {
 		this.isNotDefined = isNotDefined;

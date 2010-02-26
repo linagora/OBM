@@ -21,7 +21,7 @@ import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.exception.AppendPropertyException;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
-import org.obm.sync.calendar.Event;
+import org.obm.caldav.server.share.CalendarResourceICS;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
 
@@ -30,14 +30,14 @@ public class CalendarData extends DavPropertyHandler implements
 
 	@Override
 	public void appendCalendarMultiGetPropertyValue(Element prop, IBackend proxy,
-			Event event, String eventIcs) throws AppendPropertyException {
-		if (eventIcs == null || "".equals(eventIcs)) {
+			CalendarResourceICS icsEvent) throws AppendPropertyException {
+		if (icsEvent.getIcs() == null || "".equals(icsEvent.getIcs())) {
 			throw new AppendPropertyException(StatusCodeConstant.SC_NOT_FOUND);
 		}
 		
 		Element val = appendElement(prop, "calendar-data", ""); 
 		CDATASection cdata = prop.getOwnerDocument().createCDATASection(
-				eventIcs);
+				icsEvent.getIcs());
 		val.appendChild(cdata);
 	}
 }
