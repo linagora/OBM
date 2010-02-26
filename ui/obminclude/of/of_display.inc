@@ -863,6 +863,7 @@ class OBM_DISPLAY {
 //   - $display : (by ref) $display hash with each content object
 ///////////////////////////////////////////////////////////////////////////////
 function display_page(&$display) {
+
   // If a theme specif function is provided
   if (function_exists('display_page_theme')) {
     return display_page_theme($display);
@@ -873,6 +874,14 @@ function display_page(&$display) {
   global $l_print,  $params;
 
 
+  if (count($_POST)) {
+    $redirection = $GLOBALS['actions'][$GLOBALS['module']][$params['action']]['Redirection'];
+    if ($redirection && $params['redirection']) {
+      header( "Status: 301 Moved Permanently");
+      header("location: $redirection");
+      die();
+    }
+  }
 
   // If header is null, display only the detail (Popup windows)
   if ($display['header'] == '') {
@@ -937,7 +946,29 @@ function display_page(&$display) {
     <!-- center zone end -->  
     ".$display['end'];
 
+  if (isset($_SESSION['obm_message'])) {
+    echo $_SESSION['obm_message'];
+    unset($_SESSION['obm_message']);
+  }
 }
+
+
+/**
+ *
+ */
+function redirect_ok(&$params, $msg) {
+  $params['redirection'] = true;
+  $_SESSION['obm_message'] = "<script text='language/javascript'>showOkMessage(\"".phpStringToJsString($msg)."\")</script>";
+}
+
+/**
+ *
+ */
+function redirect_err(&$params, $msg) {
+  $params['redirection'] = true;
+  $_SESSION['obm_message'] = "<script text='language/javascript'>showErrorMessage(\"".phpStringToJsString($msg)."\")</script>";
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display : Function that display each page

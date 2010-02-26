@@ -4484,7 +4484,11 @@ function html_calendar_dis_delete($current_view, $event_id) {
   $block = "
    <h1>$l_confirm_delete_all</h1>
    <div class=\"C\">
-    <a href=\"calendar_index.php?action=delete&calendar_id=$event_id\"><img src=\"$ico_validate\" alt=\"[Validate]\"/></a>
+    <form method='POST' id='deleteForm' action='$GLOBALS[path]/calendar/calendar_index.php'>
+      <input type='hidden' name='action' value='delete' />
+      <input type='hidden' name='calendar_id' value='$event_id' />
+    </form>
+    <a href='#' onclick=\"$('deleteForm').submit();\"><img src=\"$ico_validate\" alt=\"[Validate]\"/></a>
      $l_confirm
     <a href=\"calendar_index.php?action=detailconsult&calendar_id=$event_id&date=$iso\"><img src=\"$ico_cancel\" alt=\"[Cancel]\" /></a>
      $l_cancel

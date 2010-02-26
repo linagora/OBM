@@ -294,9 +294,8 @@ if ($action == 'search') {
           // Display calendars
         }
 
-        $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
         $current_view->set_date($params["date_begin"]);
-        $display['detail'] = dis_calendar_calendar_view($params, $current_view);
+        redirect_ok($params, "$l_event: $l_insert_ok");
       }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -404,9 +403,8 @@ if ($action == 'search') {
           // Display calendars
         }
 
-        $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
         $current_view->set_date($params["date_begin"]);
-        $display['detail'] = dis_calendar_calendar_view($params, $current_view);
+        redirect_ok($params, "$l_event: $l_update_ok");
       }
     } else {
       $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -625,7 +623,7 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'])) {
     run_query_calendar_delete($params);
-    $display['detail'] = dis_calendar_calendar_view($params, $current_view);
+    redirect_ok($params, "$l_event: $l_delete_ok");
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
@@ -656,7 +654,7 @@ if ($action == 'search') {
   foreach ($doc_ids as $document_id) {
     run_query_calendar_attach_document($document_id, $event_entity_id);
   }
-  $display['detail'] .= dis_calendar_event_consult($params['calendar_id']);
+  redirect_ok($params, "$l_document: $l_insert_ok");
   
 } elseif ($action == 'download_document') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -1412,6 +1410,7 @@ function get_calendar_action() {
   $actions['calendar']['delete'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=delete&amp;calendar_id=$id&amp;date=".$date->getURL(),
     'Right'    => $cright_write,
+    'Redirection' => "$_SERVER[PHP_SELF]",
     'Condition'=> array ('None')
   );
 
@@ -1419,6 +1418,7 @@ function get_calendar_action() {
   $actions['calendar']['insert'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=insert",
     'Right'    => $cright_write,
+    'Redirection' => "$_SERVER[PHP_SELF]",
     'Condition'=> array ('None') 
   );
 
@@ -1427,6 +1427,7 @@ function get_calendar_action() {
   $actions['calendar']['update'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=update",
     'Right'    => $cright_write,
+    'Redirection' => "$_SERVER[PHP_SELF]",
     'Condition'=> array ('None') 
   );
 
@@ -1694,6 +1695,7 @@ function get_calendar_action() {
   // Attach documents
   $actions['calendar']['attach_documents'] = array (
     'Right'    => $cright_write,
+    'Redirection' => "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=$id", 
     'Condition'=> array ('None')
   );
   
