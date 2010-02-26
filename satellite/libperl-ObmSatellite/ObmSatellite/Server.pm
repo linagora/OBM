@@ -215,12 +215,6 @@ sub _bind {
     my $self = shift;
 
     my $oldSigDie = $SIG{__DIE__};
-
-
-    $SIG{__DIE__} = sub {
-        $self->_log( 'FATAL! Unable to bind SSL port '.$self->{'server'}->{'socketConf'}->{'LocalPort'}, 0 );
-        exit 10;
-    };
     $SIG{__DIE__} = undef;
 
     $self->_log( 'Trying to bind to SSL port '.$self->{'server'}->{'socketConf'}->{'LocalPort'}.' using certificate '.$self->{'server'}->{'socketConf'}->{'SSL_cert_file'}.' (key '.$self->{'server'}->{'socketConf'}->{'SSL_key_file'}.')', 3 );
@@ -231,13 +225,22 @@ sub _bind {
         require HTTP::Daemon::SSL;
         $self->_log( 'use HTTP::Daemon::SSL module', 5 );
 
-        $self->{'server'}->{'socket'} = HTTP::Daemon::SSL->new( %{$self->{'server'}->{'socketConf'}} ) || die 'Unable to create HTTP::Daemon'."\n" ;
+        if( !($self->{'server'}->{'socket'} = HTTP::Daemon::SSL->new( %{$self->{'server'}->{'socketConf'}} )) ) {
+            $self->_log( 'Unable to bind SSL port '.$self->{'server'}->{'socketConf'}->{'LocalPort'}, 0 );
+            exit 10;
+        }
+
+        return 1;
     } or eval {
         require ObmSatellite::Server::Daemon::SSL;
         $self->_log( 'Use ObmSatellite::Server::Daemon::SSL module', 5 );
 
-        $self->{'server'}->{'socket'} = ObmSatellite::Server::Daemon::SSL->new(
-        %{$self->{'server'}->{'socketConf'}} ) || die 'Unable to create %ObmSatellite::Server::Daemon::SSL'."\n" ;
+        if( !($self->{'server'}->{'socket'} = ObmSatellite::Server::Daemon::SSL->new( %{$self->{'server'}->{'socketConf'}} )) ) {
+            $self->_log( 'Unable to bind SSL port '.$self->{'server'}->{'socketConf'}->{'LocalPort'}, 0 );
+            exit 10;
+        }
+
+        return 1;
     } or eval {
         $self->_log( 'Unable to load perl module HTTP::Daemon::SSL or ObmSatellite::Server::Daemon::SSL', 0 );
         exit 10;
