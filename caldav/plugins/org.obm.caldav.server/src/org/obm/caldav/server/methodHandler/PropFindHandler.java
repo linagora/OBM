@@ -52,70 +52,74 @@ import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
 /**
  * http://www.webdav.org/specs/rfc2518.html#METHOD_PROPFIND
+ * 
  * @author adrienp
- *
+ * 
  */
 public class PropFindHandler extends DavMethodHandler {
 
-	private Map<String,PropfindPropertyHandler> propertiesHandler;
-	
+	private Map<String, PropfindPropertyHandler> propertiesHandler;
+
 	public PropFindHandler() {
-		
+
 		propertiesHandler = new HashMap<String, PropfindPropertyHandler>();
 		propertiesHandler.put("owner", new Owner());
 		propertiesHandler.put("getctag", new GetCTag());
 		propertiesHandler.put("getetag", new GetETag());
 		propertiesHandler.put("getcontenttype", new GetContentType());
-		
+
 		propertiesHandler.put("calendar-home-set", new CalendarHomeSet());
-		propertiesHandler.put("calendar-user-address-set", new CalendarUserAddressSet());
+		propertiesHandler.put("calendar-user-address-set",
+				new CalendarUserAddressSet());
 		propertiesHandler.put("schedule-inbox-URL", new ScheduleInboxURL());
 		propertiesHandler.put("schedule-outbox-URL", new ScheduleOutboxURL());
-		
+
 		propertiesHandler.put("displayname", new DisplayName());
-		propertiesHandler.put("calendar-description", new CalendarDescription());
-		propertiesHandler.put("supported-calendar-component-set", new SupportedCalendarComponentSet());
+		propertiesHandler
+				.put("calendar-description", new CalendarDescription());
+		propertiesHandler.put("supported-calendar-component-set",
+				new SupportedCalendarComponentSet());
 		propertiesHandler.put("calendar-color", new CalendarColor());
 		propertiesHandler.put("resourcetype", new ResourceType());
-		
-		
+
 	}
 
-	
-	
 	@Override
-	public void process(Token t, IBackend proxy, DavRequest req, HttpServletResponse resp) throws Exception {
+	public void process(Token t, IBackend proxy, DavRequest req,
+			HttpServletResponse resp) throws Exception {
 		Set<PropfindPropertyHandler> toLoad = new HashSet<PropfindPropertyHandler>();
 		Set<Element> toNotImplemented = new HashSet<Element>();
 		Document doc = req.getXml();
-		
+
 		Set<Element> propsToLoad = getPropList(doc);
 		for (Element node : propsToLoad) {
-			PropfindPropertyHandler dph = propertiesHandler.get(node.getLocalName());
-			if(dph != null && dph.isUsed()){
+			PropfindPropertyHandler dph = propertiesHandler.get(node
+					.getLocalName());
+			if (dph != null && dph.isUsed()) {
 				toLoad.add(dph);
 			} else {
 				toNotImplemented.add(node);
-				logger.warn("the Property ["+node.getLocalName()+"] is not used");
+				logger.warn("the Property [" + node.getLocalName()
+						+ "] is not used");
 			}
 		}
 		List<DavComponent> comps = new LinkedList<DavComponent>();
-		CalendarComponent calComp = new CalendarComponent(req.getURI(), new Date());
+		CalendarComponent calComp = new CalendarComponent(req.getURI(),
+				new Date());
 		comps.add(calComp);
-		
-		if(toLoad.contains(propertiesHandler.get("getcontenttype"))){
-			comps.addAll(proxy.getCalendarService().getAllLastUpdate(req.getURI(), DavComponentType.VEVENT));
+
+		if (toLoad.contains(propertiesHandler.get("getcontenttype"))) {
+			comps.addAll(proxy.getCalendarService().getAllLastUpdate(
+					req.getURI(), DavComponentType.VEVENT));
 		}
-		
-		Document ret = new PropertyListBuilder().build(t, req, comps, toLoad, toNotImplemented, proxy);
+
+		Document ret = new PropertyListBuilder().build(t, req, comps, toLoad,
+				toNotImplemented, proxy);
 
 		try {
-			if(logger.isInfoEnabled()){
-				DOMUtils.logDom(ret);
-			}
+			logger.info(DOMUtils.toString(ret));
 			resp.setStatus(207); // multi status webdav
 			resp.setContentType("text/xml; charset=utf-8");
 			ByteArrayOutputStream out = new ByteArrayOutputStream();

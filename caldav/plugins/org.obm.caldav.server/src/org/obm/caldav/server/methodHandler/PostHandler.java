@@ -49,7 +49,7 @@ public class PostHandler extends DavMethodHandler {
 				.getRecipients(), responseData);
 
 		try {
-			DOMUtils.logDom(ret);
+			logger.info(DOMUtils.toString(ret));
 			resp.setStatus(200); // multi status webdav
 			resp.setContentType("text/xml; charset=utf-8");
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
