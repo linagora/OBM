@@ -610,19 +610,16 @@ function html_host_form($action, $host_q, $host, $field='') {
       <td>$sel_domain_id</td>
     </tr>";
   }
+  // Samba host checkbox checked value
+  $samba_state  = ($samba ? 'checked' : '');
+  $imap_state  = ($imap ? 'checked' : '');
+  $smtp_in_state  = ($smtp_in ? 'checked' : '');
+  $smtp_out_state  = ($smtp_out ? 'checked' : '');
+  $obm_sync_state  = ($obm_sync ? 'checked' : '');
+  $solr_state  = ($solr ? 'checked' : '');
+  $imap_frontend_state  = ($imap_frontend ? 'checked' : '');
+  $monitor_state  = ($monitor ? 'checked' : '');
 
-  //FIXME: read from somewhere else
-  $services_data = array(
-    'imap' => $imap,
-    'smtp_in' => $smtp_in,
-    'smtp_out' => $smtp_out,
-    'imap_frontend' => $imap_frontend,
-    'obm_sync' => $obm_sync,
-    'monitor' => $monitor,
-    'solr' => $solr
-  );
-  $services_form = OBM_Services::getInstance()->hostForm;
-  $services_form->setInitialValues($services_data);
 
   // Mark the error field
   if ($field != '') {
@@ -649,6 +646,47 @@ function html_host_form($action, $host_q, $host, $field='') {
       </td>
     </tr>";
   }
+  if ($cgp_use['service']['mail']) {
+    $block_mail = "
+    <tr>
+      <th class=\"$class[imap]\"><label for=\"cb_imap\">$GLOBALS[l_imap]</label></th>
+      <td>
+        <input id=\"cb_imap\" name=\"cb_imap\" type=\"checkbox\" value=\"1\" $imap_state>
+      </td>
+    </tr><tr>
+      <th class=\"$class[smtp_in]\"><label for=\"cb_smtp_in\">$GLOBALS[l_smtp_in]</label></th>
+      <td>
+        <input id=\"cb_smtp_in\" name=\"cb_smtp_in\" type=\"checkbox\" value=\"1\" $smtp_in_state>
+      </td>
+    </tr><tr>
+      <th class=\"$class[smtp_out]\"><label for=\"cb_smtp_out\">$GLOBALS[l_smtp_out]</label></th>
+      <td>
+        <input id=\"cb_smtp_out\" name=\"cb_smtp_out\" type=\"checkbox\" value=\"1\" $smtp_out_state>
+      </td>
+    </tr><tr>
+      <th class=\"$class[imap_frontend]\"><label for=\"cb_imap_frontend\">$GLOBALS[l_imap_frontend]</label></th>
+      <td>
+        <input id=\"cb_imap_frontend\" name=\"cb_imap_frontend\" type=\"checkbox\" value=\"1\" $imap_frontend_state>
+      </td>
+    </tr>";
+  }
+  if ($cgp_use['service']['sync']) {
+    $block_sync = "
+    <tr>
+      <th class=\"$class[obm_sync]\"><label for=\"cb_obm_sync\">$GLOBALS[l_obm_sync]</label></th>
+      <td>
+        <input id=\"cb_obm_sync\" name=\"cb_obm_sync\" type=\"checkbox\" value=\"1\" $obm_sync_state>
+      </td>
+    </tr>";
+  }
+
+  $block_solr = "
+  <tr>
+    <th class=\"$class[solr]\"><label for=\"cb_solr\">$GLOBALS[l_solr]</label></th>
+    <td>
+      <input id=\"cb_solr\" name=\"cb_solr\" type=\"checkbox\" value=\"1\" $solr_state>
+    </td>
+  </tr>";
 
   $dis_user = "
   <tr>
@@ -668,8 +706,8 @@ function html_host_form($action, $host_q, $host, $field='') {
   $block = "
   <form method=\"get\" name=\"f_host\" action=\"host_index.php\">
 
-  <fieldset class=\"detail infos\">
-  <legend>{$GLOBALS['l_host']}</legend>
+  <fieldset class=\"detail extras\">
+  <legend>$l_module_host</h1>
 
   <table>
   <tr>
@@ -689,7 +727,17 @@ function html_host_form($action, $host_q, $host, $field='') {
     <th class=\"$class[fqdn]\">$l_fqdn</th>
     <td>
       <input name=\"tf_fqdn\" value=\"$fqdn\" /></td>
-  </tr>
+  </tr>  
+  $block_samba
+  $block_mail
+  $block_sync
+  $block_solr
+   <tr>
+     <th class=\"$class[monitor]\"><label for=\"cb_monitor\">$GLOBALS[l_monitor]</label></th>
+     <td>
+       <input id=\"cb_monitor\" name=\"cb_monitor\" type=\"checkbox\" value=\"1\" $monitor_state>
+     </td>
+   </tr>
   <tr>
     <th class=\"$class[desc]\">$l_desc</th>
     <td>
@@ -697,14 +745,6 @@ function html_host_form($action, $host_q, $host, $field='') {
     </td>
   </tr>
 
-  </table>
-  </fieldset>
-
-  <fieldset class=\"detail infos\">
-  <legend>{$GLOBALS['l_services']}</legend>
-  <table>
-  {$services_form->render()}
-  $block_samba
   </table>
   </fieldset>";
 

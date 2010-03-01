@@ -33,9 +33,6 @@ date_default_timezone_set('Europe/Paris');
 $path = array(
   dirname(__FILE__),
   dirname(__FILE__).'/../..',
-  dirname(__FILE__).'/../../lib',
-  dirname(__FILE__).'/../../app',
-  dirname(__FILE__).'/../../app/default/models',
   dirname(__FILE__).'/../../obminclude/of',
   dirname(__FILE__).'/../../obminclude/phplib',
   get_include_path()
@@ -44,14 +41,6 @@ set_include_path(implode(PATH_SEPARATOR, $path));
 
 // Necessary global variable
 $obminclude = dirname(__FILE__).'/../../obminclude';
-
-// Autoloading
-require_once 'OBM/Autoloader.php';
-require_once 'OBM/Autoloader/Standard.php';
-$autoloader = OBM_Autoloader::getInstance();
-$autoloader->autoloaders['OBM'] =  new OBM_Autoloader_Standard();
-$autoloader->autoloaders['Stato'] =  new OBM_Autoloader_Standard();
-$autoloader->autoloaders['*'] = new OBM_Autoloader_Resource();
 
 // Get DB conf and globalize it
 $db_conf = include('conf/db.php');

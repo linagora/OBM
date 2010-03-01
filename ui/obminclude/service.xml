@@ -1,171 +1,134 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <services>
+  <entity type='host'>
+    <!-- Is set if this host have a imap server installed (Cyrus) -->
+    <service key='imap' />
+    <!-- Is set if this host have a smtp server installed (Postfix) and handle incoming mail -->
+    <service key='smtp_in' />
+    <!-- Is set if this host have a smtp server installed (Postfix) and handle outgoing mail -->
+    <service key='smtp_out' />
+    <!-- Is set if this host have a pdc server installed (Samba) -->
+    <service key='samba' />
 
-  <providers>
-    <host>
-      <service name="imap">
-        <label>IMAP</label>
-      </service>
-      <service name="smtp_in">
-        <label>SMTP in</label>
-      </service>
-      <service name="smtp_out">
-        <label>SMTP out</label>
-      </service>
-      <service name="imap_frontend">
-        <label>IMAP frontend</label>
-      </service>
-      <service name="obm_sync">
-        <label>OBM Sync</label>
-      </service>
-      <service name="monitor">
-        <label>Monitoring</label>
-      </service>
-      <service name="solr">
-        <label>Solr</label>
-      </service>
-    </host>
+    <!-- Is set if this host have an obm-sync server installed -->
+    <service key='obm_sync' />
+    <!-- Is set if this host is monitoring by munin -->
+    <service key='monitor' />
+    <!-- Is set if this host has solr server-->
+    <service key='solr' />
+    <!-- Is set if this host has imap frontend server-->
+    <service key='imap_frontend' />
+  </entity>
+  <entity type='domain'>
 
-    <domain>
-      <service name="samba">
-        <label>Windows server</label>
+    <!-- Is set if this domain provide solr service -->
+    <service key='solr'>
+      <property key='event'>
+        <type>id</type>
+        <min>1</min>
+        <max>1</max>
+      </property>
+      <property key='contact'>
+        <type>id</type>
+        <min>1</min>
+        <max>1</max>
+      </property>
+    </service>
 
-        <property name='sid'>
-          <label>Domain SID</label>
-          <type>string</type>
-          <constraint type="required">
-            <error>The Domain SID is required</error>
-          </constraint>
-          <constraint type="regexp">
-            <match>/^S-1-5-21-[0-9]{1,10}-[0-9]{1,10}-[0-9]{1,10}$/</match>
-            <error>Invalid SID, the sid must have the following form : S-1-5-21-XXXXXXXXXX-XXXXXXXXX-XXXXXXXXXX</error>
-          </constraint>
-          <constraint type="unique">
-            <error>This SID is already in use</error>
-          </constraint>
-        </property>
+    <!-- Is set if this domain provide mail sevices (imap, smtp) -->
+    <service key='mail'>
+      <!-- Domain imap frontend host(s) id(s), those host must have the imap service -->
+      <property key='imap_frontend'>
+        <type>id</type>
+        <min>1</min>
+        <max>*</max>
+      </property>
+      <!-- Domain imap host(s) id(s), those host must have the imap service -->
+      <property key='imap'>
+        <type>id</type>
+        <min>1</min>
+        <max>*</max>
+      </property>
+      <!-- Domain smtp_in host(s) id(s), those host must have the smtp_in service -->
+      <property key='smtp_in'>
+        <type>id</type>
+        <min>1</min>
+        <max>*</max>        
+      </property>
+      <!-- Domain smtp_out host(s) id(s), those host must have the smtp_out service -->
+      <property key='smtp_out'>
+        <type>id</type>
+        <min>1</min>
+        <max>*</max>        
+      </property>
+      <!-- Define which hook (refereces by an hook id) will be used to automatically select an default imap server when creating an user -->
+      <property key='imap_autoselect'>
+        <type>int</type>
+        <min>1</min>
+        <max>1</max>        
+      </property>
+    </service>
+    <!-- Is set if this domain provide windows servers sevices (pdc, file, wins...) -->
+    <service key='samba'>
+      <!-- Define the domain sid -->
+      <property key='sid'>
+        <type>string</type>
+        <min>1</min>
+        <max>1</max>        
+      </property>      
+      <!-- Define the domain windows name -->
+      <property key='domain'>
+        <type>string</type>
+        <min>1</min>
+        <max>1</max>        
+      </property>
+      <!-- Define where the users profile informations while be stored -->
+      <property key='profile'>
+        <type>string</type>
+        <min>0</min>
+        <max>1</max>        
+      </property>       
+      <!-- Define the default value for user windows home -->
+      <property key='home'>
+        <type>string</type>
+        <min>0</min>
+        <max>1</max>        
+      </property>        
+      <!-- Define the default value for user windows home drive -->
+      <property key='drive'>
+        <type>string</type>
+        <min>0</min>
+        <max>1</max>        
+      </property>            
+    </service>
 
-        <property name='domain'>
-          <label>Windows domain name</label>
-          <type>string</type>
-          <constraint type="required">
-            <error>The Windows domain name is required</error>
-          </constraint>
-          <constraint type="regexp">
-            <match>/^[aA-zZ0-9!@#$%^&amp;()-_{}.~]{1,15}$/</match>
-            <error>Invalid workgroup name</error>
-          </constraint>
-          <constraint type="unique">
-            <error>This workgroup name is already in use</error>
-          </constraint>
-        </property>
+    <!-- Is set if this domain has an obm-sync server -->
+    <service key='sync'>
+      <!-- Domain obm_sync host(s) id(s), those host must have the obm_sync service -->
+      <property key="obm_sync">
+	<type>id</type>
+	<min>0</min>
+	<max>1</max>
+      </property>
+    </service>
 
-        <property name='profile'>
-          <label>Profile default path</label>
-          <type>string</type>
-          <constraint type="regexp">
-            <match>/^\\\\[a-zA-Z0-9-]{1,15}\\([a-zA-Z0-9_\\.-]{1,48})*$/</match>
-            <error>Invalid profile default path, it should be \\computeur\path\to\profile</error>
-          </constraint>
-        </property>
+  </entity>  
 
-        <property name='home'>
-          <label>User home default path (%u will be replaced by user login)</label>
-          <type>string</type>
-        </property>
-
-        <property name='drive'>
-          <label>User home default drive</label>
-          <type>enum</type>
-          <choices>
-            <choice value="">-</choice>
-            <choice value="A">A:</choice>
-            <choice value="B">B:</choice>
-            <choice value="C">C:</choice>
-            <choice value="D">D:</choice>
-            <choice value="E">E:</choice>
-            <choice value="F">F:</choice>
-            <choice value="G">G:</choice>
-            <choice value="H">H:</choice>
-            <choice value="I">I:</choice>
-            <choice value="J">J:</choice>
-            <choice value="K">K:</choice>
-            <choice value="L">L:</choice>
-            <choice value="M">M:</choice>
-            <choice value="N">N:</choice>
-            <choice value="O">O:</choice>
-            <choice value="P">P:</choice>
-            <choice value="Q">Q:</choice>
-            <choice value="R">R:</choice>
-            <choice value="S">S:</choice>
-            <choice value="T">T:</choice>
-            <choice value="U">U:</choice>
-            <choice value="V">V:</choice>
-            <choice value="W">W:</choice>
-            <choice value="X">X:</choice>
-            <choice value="Y">Y:</choice>
-            <choice value="Z">Z:</choice>
-          </choices>
-          <error>Invalid users home default drive</error>
-        </property>
-      </service>
-    </domain>
-  </providers>
-
-  <consumers>
-    <domain>
-
-      <service name="imap" provided_by="host" multiplicity="*">
-        <label>IMAP servers</label>
-        <property name='imap_autoselect'>
-          <label></label>
-          <type>int</type>
-          <constraint type="required">
-            <error></error>
-          </constraint>
-        </property>
-      </service>
-
-      <service name="imap_frontend" provided_by="host" multiplicity="*">
-        <label>IMAP frontend servers</label>
-      </service>
-
-      <service name="smtp_in" provided_by="host" multiplicity="*">
-        <label>SMTP in servers</label>
-      </service>
-
-      <service name="smtp_out" provided_by="host" multiplicity="*">
-        <label>SMTP out servers</label>
-      </service>
-
-      <service name="obm_sync" provided_by="host" multiplicity="1">
-        <label>OBM Sync server</label>
-      </service>
-
-      <service name="monitor" provided_by="host" multiplicity="1">
-        <label>Munin server (monitoring)</label>
-      </service>
-
-      <service name="solr" provided_by="host" multiplicity="1">
-        <label>Solr indexing server</label>
-      </service>
-
-    </domain>
-    <user>
-
-      <service name="funis">
-        <label>Funis server</label>
-        <property name="sync_days_min">
-          <label>Beginning of the sync interval (eg. 30 for 30 days ago)</label>
-          <type>int</type>
-        </property>
-        <property name="sync_days_max">
-          <label>End of the sync interval (eg. 30 for in 30 days)</label>
-          <type>int</type>
-        </property>
-      </service>
-
-    </user>
-  </consumers>
+  
+  <entity type="user">
+    <service key="funis">
+      <!-- Synchronisation range -->
+      <property key="sync_days_min">
+	<type>int</type>
+	<min>0</min>
+	<max>1</max>
+      </property>
+      <property key="sync_days_max">
+	<type>int</type>
+	<min>0</min>
+	<max>1</max>
+      </property>
+    </service>
+  </entity>
 
 </services>

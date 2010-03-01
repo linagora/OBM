@@ -857,21 +857,10 @@ function check_host_data_form($host) {
   } 
   //ip + fqdn to add host monitor
   if ( $monitor == '1' && ( $fqdn == '' || $ip == '') ){
-    $err['field'] = 'supervision' ;
-    $err['msg'] = "$l_err_host_monitoring";
-    return false;
+	$err['field'] = 'supervision' ;
+	$err['msg'] = "$l_err_host_monitoring";
+	return false;
   }
-
-  // checking services
-  $services_form = OBM_Services::getInstance()->hostForm;
-  if (!$services_form->isValid($host)) {
-    $errors = $services_form->errors;
-    //FIXME: not very smart: get only one of the errors
-    $err['field'] = key($errors);
-    $err['msg'] = current($errors); //FIXME: set fields specific error messages
-    return false;
-  }
-
   return true;
 }
 
