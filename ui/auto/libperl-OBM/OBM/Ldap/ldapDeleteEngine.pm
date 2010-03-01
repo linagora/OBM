@@ -105,7 +105,11 @@ sub _deleteDomainDn {
         }
     }
 
-    $self->_log( $deleteSuccess.'/'.($totalEntries+1).' entités supprimées avec succés, '.$deleteError.' erreurs', 0 );
+    if( $deleteSuccess == ($totalEntries+1) ) {
+        $self->_log( $deleteSuccess.'/'.($totalEntries+1).' entités supprimées avec succés, '.$deleteError.' erreurs', 3 );
+    }else {
+        $self->_log( $deleteSuccess.'/'.($totalEntries+1).' entités supprimées avec succés, '.$deleteError.' erreurs', 1 );
+    }
 
     return $deleteError;
 }
