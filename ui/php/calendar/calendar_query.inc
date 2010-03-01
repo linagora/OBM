@@ -5509,17 +5509,22 @@ Class CalendarView {
       $value = $obm_q->f("obmbookmarkproperty_value");
 
       if (in_array($property,array('users','resources'))) {
-        $data[$property] = explode(',',$value);
+        if ($value != "")
+          $data[$property] = explode(',',$value);
       } elseif (in_array($property,array('user_classes','resource_classes','entity_id_entity'))) {
         $data[$property] = unserialize($value);
       } else {
         $data[$property] = $value;
       }
     }
-    $view = new CalendarView($data);
-    $view->id = $bookmark_id;
 
-    return $view;
+    if($data['user'] == NULL || $data['resources'] == NULL) {
+      $GLOBALS['display']['msg'] .= display_warn_msg($GLOBALS['l_view_invalid']);
+    } else {
+      $view = new CalendarView($data);
+      $view->id = $bookmark_id;
+      return $view;
+    }
   }
 
 

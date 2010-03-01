@@ -105,6 +105,8 @@ $l_unknown = "Unbekannt";
 $l_parent_event = "angehörige Veranstaltung";
 $l_delete_all_occurrences = "Löschen die Reihe";
 $l_view_label = "Ansichtname";
+$l_view_invalid = "Ungültige Ansicht.";
+
 $l_resource_allocated = "zugewiesenen Mittel";
 $l_resource_visible = "Ressourcen";
 $l_err_days_repeat_not_weekly = "Sie können Tage der Wiederholung nur im wöchentlich Wiederholung-Modus geben.";

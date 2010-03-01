@@ -111,6 +111,8 @@ $l_category_filter = "Filtrare per categoria";
 $l_conflict_force = "Forzare lo spostamento";
 $l_view_printable = "Stampabile";
 $l_view_label = "Nome del tema";
+$l_view_invalid = "Invalidp tema.";
+
 $l_resource_allocated = "Risorse allocate";
 $l_resource_visible = "Risorse";
 $l_err_days_repeat_not_weekly = "Puoi indicare i giorni di ripetizione solo in modalità ripetizione mensile";

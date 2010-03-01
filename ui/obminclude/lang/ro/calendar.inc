@@ -136,6 +136,8 @@ $l_delete_default_view = "Ștergeți tema predefinită";
 $l_view_label = "Numele Temei";
 $l_view_save = "Salvați tema";
 $l_view_delete = "Ștergeți tema";
+$l_view_invalid = "Invald tema.";
+
 $l_ics = "Import";
 $l_ics_insert = "Importați";
 $l_ics_file = "Fișier ICS de importat";
