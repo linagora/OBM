@@ -939,8 +939,8 @@ function run_query_group_contact($group) {
     INNER JOIN UGroup ON contactgroup.group_id = UGroup.group_id
     INNER JOIN Contact ON Contact.contact_id = contactgroup.contact_id
     INNER JOIN ContactEntity ON contactentity_contact_id = Contact.contact_id
-    LEFT JOIN email ON email_entity_id = contactentity_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
-    LEFT JOIN phone ON phone_entity_id = contactentity_entity_id AND phone_label = 'CELL;VOICE;X-OBM-Ref1'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
+    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label = 'CELL;VOICE;X-OBM-Ref1'
   WHERE contactgroup.group_id $id
   $order
   $limit";

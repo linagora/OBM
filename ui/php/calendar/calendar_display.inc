@@ -366,9 +366,19 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
           $selected_s = '';
         }
         $sel_group .= "<option value=\"".basename($_SERVER['SCRIPT_NAME'])."?group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
+        $dis_mygroup = true;
       }
     }
-
+    if($dis_mygroup) {
+      $dis_mygroup = "<fieldset class=\"detail extra\">
+      <legend>$l_private_group_members</legend>
+      <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+      $sel_group
+      </select>
+      <div id=\"sel_group\">
+      </div>    
+      </fieldset>";
+    }
     if ($this_group != $c_all && empty($selected_s)) {
       $g_public_name = get_last_group_text($this_group);
     } 
@@ -381,14 +391,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
 
     $block_group = "
     <form name=\"f_entity_group\" action=\"\" onsubmit=\"return false;\">
-    <fieldset class=\"detail extra\">
-    <legend>$l_private_group_members</legend>
-    <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-    $sel_group
-    </select>
-    <div id=\"sel_group\">
-    </div>    
-    </fieldset>
+    $dis_mygroup
     <fieldset class=\"detail extra\">
     <legend>$l_public_group_members $group_add_button</legend>
     <input type=\"text\" name=\"group_name\" value=\"$g_public_name\" id=\"group_name\" autocomplete=\"off\" />
