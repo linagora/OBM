@@ -227,6 +227,11 @@ sasl_auto_transition: no
 # SSL/TLS Options
 #
 
+# Use OBM generated certs for TLS
+tls_cert_file: /etc/obm/certs/obm_cert.pem
+tls_key_file: /etc/obm/certs/obm_cert.pem
+tls_ca_file: /var/lib/obm-ca/cacert.pem
+
 # File containing the global certificate used for ALL services (imap, pop3,
 # lmtp, sieve)
 #tls_cert_file: /etc/ssl/certs/ssl-cert-snakeoil.pem
