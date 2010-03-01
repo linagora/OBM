@@ -2178,7 +2178,7 @@ CREATE TABLE ugroup (
     group_archive smallint DEFAULT 0 NOT NULL,
     group_privacy integer DEFAULT 0,
     group_local integer DEFAULT 1,
-    group_ext_id integer,
+    group_ext_id character varying(255),
     group_samba integer DEFAULT 0,
     group_gid integer,
     group_mailing integer DEFAULT 0,

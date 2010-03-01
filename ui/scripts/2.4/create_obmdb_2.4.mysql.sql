@@ -3184,7 +3184,7 @@ CREATE TABLE `UGroup` (
   `group_archive` int(1) NOT NULL default '0',
   `group_privacy` int(2) default '0',
   `group_local` int(1) default '1',
-  `group_ext_id` varchar(24) default NULL,
+  `group_ext_id` varchar(255) default NULL,
   `group_samba` int(1) default '0',
   `group_gid` int(8) default NULL,
   `group_mailing` int(1) default '0',
