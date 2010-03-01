@@ -1760,7 +1760,7 @@ function html_project_member_form($members_q, $project) {
       $dis_member .= "
       <tr>
       <td>
-       <label><input type=\"checkbox\" name=\"data-u-$m_id\"/>$m_name</label>
+       <label><input type=\"checkbox\" name=\"data-user-$m_id\"/>$m_name</label>
       </td>
       <td>$rd_manager</td>
       </tr>";

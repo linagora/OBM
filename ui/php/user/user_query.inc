@@ -2240,7 +2240,7 @@ function check_batch_processing_data($params) {
   global $php_regexp_quota, $php_regexp_phone, $php_regexp_fax, $php_regexp_zip,$php_regexp_number, $php_regexp_profile_name;
   global $l_phone_error, $l_fax_error, $l_zip_error, $l_expresspostal_error, $l_lname_error;
   
-  $u_id = $params['data-u-id'];
+  $u_id = $params['data-user-id'];
   
   // Check if there are selected users
   if (!isset($u_id)) {
@@ -2368,7 +2368,7 @@ function run_query_user_data_batch($params) {
   $nomade_perms = $params['nomade_perms'];
   $nomade_enable = $params['nomade_enable'];
   $nomade_local_copy = $params['nomade_local_copy'];
-  $u_id = $params['data-u-id'];
+  $u_id = $params['data-user-id'];
   
   $check = array();
   

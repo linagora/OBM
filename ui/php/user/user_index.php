@@ -342,7 +342,7 @@ if ($action == 'ext_get_ids') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_batch_processing_data($params)) {
     $users_id_error = run_query_user_data_batch($params);
-    $users_id = array_diff($params['data-u-id'], $users_id_error);    
+    $users_id = array_diff($params['data-user-id'], $users_id_error);    
     $retour = run_query_batch_processing_update($params, $users_id);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_header_batch : $l_update_ok (".sizeof($users_id).") ");

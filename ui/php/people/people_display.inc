@@ -330,7 +330,7 @@ function html_people_search_list($obm_q, $prefs, $user, $popup) {
     $user_d->display_link = false;
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "id";
-    $user_d->data_cb_name = "data-u-";
+    $user_d->data_cb_name = "data-user-";
     if ($ext_element != "") {
       $user_d->data_cb_name = "";
       $user_d->data_form_head = "

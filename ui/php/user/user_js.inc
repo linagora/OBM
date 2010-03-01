@@ -22,7 +22,7 @@ function fill_ext_form(int_form) {
        if(int_form.elements[i].checked == true) {
 	 ext_size = ext_field.length;
 	 for(j=0; j< ext_size; j++) {
-	   if('data-u-' + ext_field.options[j].value == int_form.elements[i].name) {
+	   if('data-user-' + ext_field.options[j].value == int_form.elements[i].name) {
 	     window.opener.document.$params[ext_widget].options[j].selected =true;
 	   }
 	 }

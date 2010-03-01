@@ -519,7 +519,7 @@ function get_project_params() {
       $tsk_num = substr($key, 10);
       $params["tsk$nb_tsk"] = $tsk_num;
     }
-    else if (strcmp(substr($key, 0, 7),'data-u-') == 0) {
+    else if (strcmp(substr($key, 0, 10),'data-user-') == 0) {
       $nb_mem++;
       $mem_num = substr($key, 7);
       $params["mem$nb_mem"] = $mem_num;

@@ -633,7 +633,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $user_d->display_link = false;
     $user_d->data_cb_text = 'X';
     $user_d->data_idfield = 'userobm_id';
-    $user_d->data_cb_name = 'data-u-';
+    $user_d->data_cb_name = 'data-user-';
     if ($ext_element != '') {
       $user_d->data_cb_name = '';
       $user_d->data_form_head = "
@@ -670,7 +670,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
   } else if ($user['action'] == 'sel_batch_users') {
     $user_d->data_cb_text = 'X';
     $user_d->data_idfield = 'userobm_id';
-    $user_d->data_cb_name = 'data-u-';
+    $user_d->data_cb_name = 'data-user-';
     
     $user_d->data_form_head = "
       <form method=\"post\" action=\"".url_prepare('user_index.php')."\">";
@@ -3493,20 +3493,20 @@ function html_user_batch_form($params) {
   $buttons_block = "
     <input type=\"hidden\" name=\"action\" value=\"batch_processing\" />
   	<input type=\"submit\" value=\"$l_do_batch_processing\" />";
-  if (!isset($params['data-u-id'])) {
+  if (!isset($params['data-user-id'])) {
     foreach ($params as $params_name => $params_value) {
-      if (! preg_match("/^data-u-[0-9]+$/", $params_name)) {
+      if (! preg_match("/^data-user-[0-9]+$/", $params_name)) {
         continue;
       } else if ($params_value == 'on') {
-        $user_id = substr($params_name, strlen('data-u-'));
+        $user_id = substr($params_name, strlen('data-user-'));
         $buttons_block .= "
-        <input type=\"hidden\" name=\"data-u-id"."[]\" value=\"$user_id\" />";
+        <input type=\"hidden\" name=\"data-user-id"."[]\" value=\"$user_id\" />";
       }
     }
   } else {
-    foreach ($params['data-u-id'] as $u_id) {
+    foreach ($params['data-user-id'] as $u_id) {
       $buttons_block .= "
-      <input type=\"hidden\" name=\"data-u-id"."[]\" value=\"$u_id\" />";
+      <input type=\"hidden\" name=\"data-user-id"."[]\" value=\"$u_id\" />";
     }
   }
 

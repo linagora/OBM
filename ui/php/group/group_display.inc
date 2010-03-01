@@ -573,6 +573,25 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, 
   $url_mg = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($GLOBALS['l_add_group'])."&amp;ext_action=group_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=".$id."&amp;ext_target=$l_group&amp;child_res=1";
   $url_mu = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($GLOBALS['l_add_user'])."&amp;ext_action=user_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=".$id."&amp;ext_target=$l_group";
   $url_mc = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($GLOBALS['l_add_user'])."&amp;ext_action=user_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=".$id."&amp;ext_target=$l_group";
+
+  if ($update_group) {
+    $js .= "
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_groupadd', 'sel_group', {mode:'mono'});";
+    $block_mg .= "
+    <form method='POST' action='group_index.php'>
+      <input  type=\"text\" name=\"group_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_group\" autocomplete=\"off\" />
+      <input type=\"hidden\" name=\"groups_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_groupadd\" autocomplete=\"off\" />
+      <input type='submit' value='$GLOBALS[l_add]' />
+      <a href=\"javascript: return false;\" onclick=\"popup('$url_mg','');return false;\">
+      <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
+      </a>
+      <input name='action' type='hidden' value='group_add' /> 
+      <input name='group_id' type='hidden' value='$id' /> 
+    </form>              
+    <form method=\"get\" action=\"group_index.php\">";
+  }
+
+  
   if ($nb_g != 0) {
     $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
     
@@ -586,25 +605,11 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, 
       $dis_infos->data_idfield = 'child_id';
       $dis_infos->data_cb_name = 'data-group-';
       $dis_infos->data_cb_field = '';
-      $block_mg .= "
-      <form method='POST' action='group_index.php'>
-        <input  type=\"text\" name=\"group_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_group\" autocomplete=\"off\" />
-        <input type=\"hidden\" name=\"groups_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_groupadd\" autocomplete=\"off\" />
-        <input type='submit' value='$GLOBALS[l_add]' />
-        <a href=\"javascript: return false;\" onclick=\"popup('$url_mg','');return false;\">
-        <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
-        </a>
-        <input name='action' type='hidden' value='group_add' /> 
-        <input name='group_id' type='hidden' value='$id' /> 
-      </form>              
-      <form method=\"get\" action=\"group_index.php\">";
     }
 
     $block_mg .= $dis_infos->display('dis_data_group');
 
     if ($update_group) {
-      $js .= "
-        new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_groupadd', 'sel_group', {mode:'mono'});";
       $block_mg .= "  
       <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_del_group_sel\" /> 
@@ -626,8 +631,24 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, 
   //  $block_mu .= display_info_msg($message);
   $block_mu_head = "<h1>$message</h1>";
 
-  if ($nb_u != 0) {
+  if ($update_group) {
+    $block_mu .= "
+    <form method='POST' action='group_index.php'>
+      <input type=\"text\" name=\"user_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_user\" autocomplete=\"off\" />
+      <input type=\"hidden\" name=\"users_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_useradd\" autocomplete=\"off\" />
+      <input type='submit' value='$GLOBALS[l_add]' />
+      <a href=\"javascript: return false;\" onclick=\"popup('$url_mu','');return false;\">
+      <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
+      </a>  
+      <input name='action' type='hidden' value='user_add' /> 
+      <input name='group_id' type='hidden' value='$id' /> 
+    </form>          
+    <form method=\"get\" action=\"group_index.php\">";
+    $js .= "
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_useradd', 'sel_user', {mode:'mono'});";
+  }
 
+  if ($nb_u != 0) {
     $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
     $dis_infos = new OBM_DISPLAY('DATA', $prefs_u, 'group', 'group_user','group_user');
     $dis_infos->data_set = $u_q;
@@ -640,25 +661,11 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, 
       $dis_infos->data_cb_field = '';
       // If the group is the default user group, do not display the checkbox
       $dis_infos->data_cb_show = 'gid_diff';
-      $block_mu .= "
-      <form method='POST' action='group_index.php'>
-        <input type=\"text\" name=\"user_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_user\" autocomplete=\"off\" />
-        <input type=\"hidden\" name=\"users_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_useradd\" autocomplete=\"off\" />
-        <input type='submit' value='$GLOBALS[l_add]' />
-        <a href=\"javascript: return false;\" onclick=\"popup('$url_mu','');return false;\">
-        <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
-        </a>  
-        <input name='action' type='hidden' value='user_add' /> 
-        <input name='group_id' type='hidden' value='$id' /> 
-      </form>          
-      <form method=\"get\" action=\"group_index.php\">";
     }
 
     $block_mu .= $dis_infos->display('dis_data_group');
 
     if ($update_group) {
-      $js .= "
-        new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_useradd', 'sel_user', {mode:'mono'});";
       $block_mu .= "      
       <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_del_user_sel\" />
@@ -680,8 +687,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, 
   if($privacy == 0) {
     $block_mc_head = "<h1>$message</h1>";
 
-
-
     if ($update_group) {
       // If the group is the default user group, do not display the checkbox
       $block_mc .= "
@@ -693,6 +698,10 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, 
         <input name='group_id' type='hidden' value='$id' /> 
       </form>          
       <form method=\"get\" action=\"group_index.php\">";
+      $addressbooks = OBM_Addressbook::search();
+      $addressbook = $addressbooks->getPublicAddressbook();
+      $js .= "
+        new obm.AutoComplete.Search('$path/contact/contact_index.php?addressbook_id=".$addressbook->id."&action=ext_search', 'sel_contactadd', 'sel_contact', {mode:'mono', strict:false});";
     }
 
     if ($nb_c != 0) {
@@ -708,20 +717,15 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, 
         $dis_infos->data_cb_field = '';
       }      
       $block_mc .= $dis_infos->display('dis_data_group');
-    }
-
-    if ($update_group) {
-      $addressbooks = OBM_Addressbook::search();
-      $addressbook = $addressbooks->getPublicAddressbook();
-      $js .= "
-        new obm.AutoComplete.Search('$path/contact/contact_index.php?addressbook_id=".$addressbook->id."&action=ext_search', 'sel_contactadd', 'sel_contact', {mode:'mono', strict:false});";
-      $block_mc .= "      
-      <div class=\"buttons\">
-        <input type=\"submit\" value=\"$l_del_contact_sel\" />
-        <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
-        <input type=\"hidden\" name=\"action\" value=\"contact_del\" />
-      </div>
-      </form>";
+      if ($update_group) {
+        $block_mc .= "      
+        <div class=\"buttons\">
+          <input type=\"submit\" value=\"$l_del_contact_sel\" />
+          <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
+          <input type=\"hidden\" name=\"action\" value=\"contact_del\" />
+        </div>
+        </form>";
+      }
     }
   }
 
