@@ -1081,7 +1081,7 @@ function dis_calendar_select_template_form($action, $calendar) {
           <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
           $select
         </select>
-        <input type=\"hidden\" name=\"action\" value=\"$action\" />
+        <input type=\"hidden\" name=\"action\" value=\"new\" />
         <input type=\"submit\" value=\"$GLOBALS[l_ok]\" />
       </form>
     </div></div>";
@@ -3114,12 +3114,13 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     // If new event, add the optionnal new users (here to get the user's infos)
     if ($action == 'new') {
       if (isset($calendar['template_id'])) {
+
         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
-        $users_id = array_merge($users_id, $template_entities['user']);
-        $contacts_id = array_merge($contacts_id, $template_entities['contact']);
-        $res_id = array_merge($res_id, $template_entities['resource']);
-        $groups_id = array_merge($groups_id, $template_entities['group']);
-        $documents_id = array_merge($documents_id, $template_entities['document']);
+        $users_id = $template_entities['user'];
+        $contacts_id = $template_entities['contact'];
+        $res_id = $template_entities['resource'];
+        $groups_id = $template_entities['group'];
+        $documents_id = $template_entities['document'];
       }
       // free-busy ???
       if (is_array($calendar['new_user_id'])) {
