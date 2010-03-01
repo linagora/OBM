@@ -130,7 +130,7 @@ if( !defined($logLevel) || ($logLevel !~ /^[0-9]+$/) ) {
 $facility_log = 'local1';
 
 # Log file
-$logFile = '/var/log/obm/obm.log';
+$logFile = '/var/log/obm/obm-services.log';
 
 # La descrption de l'annuaire LDAP
 $ldapServerId = 0;
