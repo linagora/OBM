@@ -319,12 +319,20 @@ sub _makeEntityEmail {
 
         SWITCH: {
             if( $email[$i] =~ /$OBM::Parameters::regexp::regexp_email/ ) {
-                $emails{$email[$i]} = 1;
+                if( $i == 0 ) {
+                    $emails{$email[$i]} = 1;
+                }else {
+                    $emailsAlias{$email[$i]} = 1;
+                }
                 last SWITCH;
             }
 
             if( $email[$i] =~ /$OBM::Parameters::regexp::regexp_email_left/ ) {
-                $emails{$email[$i].'@'.$mainDomain} = 1;
+                if( $i == 0 ) {
+                    $emails{$email[$i].'@'.$mainDomain} = 1;
+                }else {
+                    $emailsAlias{$email[$i].'@'.$mainDomain} = 1;
+                }
 
                 for( my $j=0; $j<=$#{$domainAlias}; $j++ ) {
                     $emailsAlias{$email[$i].'@'.$domainAlias->[$j]} = 1;
