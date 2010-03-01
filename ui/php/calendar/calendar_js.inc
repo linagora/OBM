@@ -527,7 +527,7 @@ function add_label_autocomplete (el) {
     postData: {action:'tag_search'},
     ajaxOptions: {'secure': false},
     filterSubset: true,
-    minLength: 2,
+    minLength: 0,
     selectFirst: true,
     selectMode: 'type-ahead',
     injectChoice: function(choice) {
