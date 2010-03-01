@@ -57,6 +57,6 @@ public interface ICalendarService {
 
 	Map<String, String> getFreeBuzy(String ics) throws Exception;
 	
-	String getLastUpdate() throws Exception;
+	Date getLastUpdate() throws Exception;
 
 }

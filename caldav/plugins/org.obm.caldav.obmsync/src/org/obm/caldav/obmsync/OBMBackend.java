@@ -75,6 +75,6 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public String getETag() throws Exception {
-		return calendarService.getLastUpdate();
+		return ""+calendarService.getLastUpdate().getTime();
 	}
 }

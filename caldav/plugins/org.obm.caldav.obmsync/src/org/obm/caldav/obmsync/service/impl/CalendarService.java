@@ -192,8 +192,8 @@ public class CalendarService implements ICalendarService {
 	}
 
 //	@Override
-	public String getLastUpdate() throws Exception {
-		return getVCalendarProvider().getLastUpdate(caldavInfo).toString();
+	public Date getLastUpdate() throws Exception {
+		return getVCalendarProvider().getLastUpdate(caldavInfo);
 	}
 
 	@Override
