@@ -83,6 +83,7 @@ $l_to = "la";
 $l_periodic = "Periodic";
 $l_days = "zile";
 $l_more = "mai mult";
+$l_know_more = "stiu mai multe";
 $l_search_my_calendar = "Căutați în agendă";
 $l_basic_search_result = "Rezultatul căutării pentru evenimentele";
 $l_display_details = "Vizualizați detaliile";

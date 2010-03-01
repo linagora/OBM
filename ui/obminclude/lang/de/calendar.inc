@@ -219,6 +219,7 @@ $l_ics_export_ok = "Die Veranstaltungen wurden exportiert.";
 $l_cal_view = "Art von Ansicht";
 $l_opacity = "Verfugbarkeit";
 $l_more = "mehr";
+$l_know_more = "Mehr";
 $l_edit_full = "ausfüllen";
 $l_refuse_insert = "Veranstaltung ablehnen.";
 $l_deny = "&gt;&gt;&gt;&gt;"; 

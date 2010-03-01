@@ -89,6 +89,7 @@ $l_category_filter = "Filter by category";
 $l_events = "Events";
 $l_days = 'days';
 $l_more = 'more';
+$l_know_more = 'Know more';
 $l_display_details = "Display details";
 $l_one_day_per_page = "One day per page";
 $l_display_days = "Display days";

@@ -204,6 +204,7 @@ $l_calendar_not_available = "L'agenda non esiste o non è condivisa.";
 $l_ics_export_ok = "Gli eventi sono stati esportati";
 $l_cal_view = "Modalità di visualizzazione";
 $l_more = "Più";
+$l_know_more = "Saperne di più";
 $l_edit_full = "Completare";
 $l_resource_displayed = "Risorse scelte";
 $l_update_state_mail_subject = "Partecipazione evento su OBM : %s";

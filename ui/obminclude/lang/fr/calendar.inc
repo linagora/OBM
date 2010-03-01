@@ -114,7 +114,7 @@ $l_send = "send";
 $l_reinit_ok = "réinitialisation des urls réussis";
 $l_share_ok = "partage valide";
 $l_mail_ok = "Email envoyé";
-$l_more = "En savoir plus";
+$l_know_more = "En savoir plus";
 
 // PDF Options
 $l_display_details = "Afficher les détails";

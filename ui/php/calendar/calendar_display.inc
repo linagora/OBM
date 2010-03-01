@@ -5385,7 +5385,7 @@ function dis_calendar_right_dis_admin($id='') {
 
 function html_rights_on_my_calendar($all=false) {
 
-  $more = "<li><a href='calendar_index.php?action=rights_on_my_calendar'>$GLOBALS[l_more]</a></li>";
+  $more = "<li><a href='calendar_index.php?action=rights_on_my_calendar'>$GLOBALS[l_know_more]</a></li>";
   $accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access'); 
   sort($accessEntities);
   if (sizeof($accessEntities) > 50 && !$all) {
@@ -6776,7 +6776,7 @@ function html_share_calendar($id,$name) {
             <th>
               $GLOBALS[l_share_calendar_public]
               <div class=\"sharedesc\">
-                <a id=\"tooltip_public\" class=\"shareTip\">$GLOBALS[l_more]</a>
+                <a id=\"tooltip_public\" class=\"shareTip\">$GLOBALS[l_know_more]</a>
               </div>
             </th>
             <td>
@@ -6795,7 +6795,7 @@ function html_share_calendar($id,$name) {
             <th>
               $GLOBALS[l_share_calendar_private]
               <div class=\"sharedesc\">
-                <a id=\"tooltip_private\" class=\"shareTip\">$GLOBALS[l_more]</a>
+                <a id=\"tooltip_private\" class=\"shareTip\">$GLOBALS[l_know_more]</a>
               </div>
             </th>
             <td>
