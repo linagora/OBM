@@ -1030,6 +1030,34 @@ function run_query_calendar_detach_document($document_id, $event_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Detach all documents from an event && delete this documents
+// Parameters: 
+//   - $event_id  :
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_delete_document($event_id) {
+  $event_entity_id = of_entity_get('event', $event_id);
+
+  $obm_q = new DB_OBM;
+  // Get documents ids
+  $query = "SELECT documentlink_document_id FROM DocumentLink 
+    WHERE documentlink_entity_id = $event_entity_id";
+  $obm_q->query($query);
+  while($obm_q->next_record()) {
+  run_query_global_delete_document($obm_q->f("documentlink_document_id"));
+  }
+
+  // Delete linked document
+  $query = "DELETE FROM DocumentLink 
+    WHERE documentlink_entity_id = $event_entity_id";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Perform the export meeting to the vCalendar format
 // Parameters:
 //   - $calendar : calendar hash values
@@ -2811,6 +2839,9 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
       }
     }
   }
+
+  // Delete documents
+  run_query_calendar_delete_document($event_id);
 
   // Send mail
   $event = OBM_EventFactory::getInstance()->getById($event_id);
