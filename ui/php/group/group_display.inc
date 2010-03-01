@@ -680,45 +680,48 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q, $prefs_c, 
   if($privacy == 0) {
     $block_mc_head = "<h1>$message</h1>";
 
-    if ($nb_c != 0) {
 
+
+    if ($update_group) {
+      // If the group is the default user group, do not display the checkbox
+      $block_mc .= "
+      <form method='POST' action='group_index.php'>
+        <input type=\"text\" name=\"contact_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_contact\" autocomplete=\"off\" />
+        <input type=\"hidden\" name=\"contacts_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_contactadd\" autocomplete=\"off\" />
+        <input type='submit' value='$GLOBALS[l_add]' />
+        <input name='action' type='hidden' value='contact_add' /> 
+        <input name='group_id' type='hidden' value='$id' /> 
+      </form>          
+      <form method=\"get\" action=\"group_index.php\">";
+    }
+
+    if ($nb_c != 0) {
       $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
       $dis_infos = new OBM_DISPLAY('DATA', $prefs_c, 'group', 'group_contact','group_contact');
       $dis_infos->data_set = $c_q;
       $dis_infos->data_url = $url;
-      $dis_infos->data_header = 'both';
+      $dis_infos->data_header = 'both';      
       if ($update_group) {
         $dis_infos->data_cb_text = 'X';
         $dis_infos->data_idfield = 'group_contact_id';
         $dis_infos->data_cb_name = 'data-contact-';
         $dis_infos->data_cb_field = '';
-        // If the group is the default user group, do not display the checkbox
-        $block_mc .= "
-        <form method='POST' action='group_index.php'>
-          <input type=\"text\" name=\"contact_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_contact\" autocomplete=\"off\" />
-          <input type=\"hidden\" name=\"contacts_add\" value=\"\" onfocus=\"\" onblur=\"\" id=\"sel_contactadd\" autocomplete=\"off\" />
-          <input type='submit' value='$GLOBALS[l_add]' />
-          <input name='action' type='hidden' value='contact_add' /> 
-          <input name='group_id' type='hidden' value='$id' /> 
-        </form>          
-        <form method=\"get\" action=\"group_index.php\">";
-      }
-
+      }      
       $block_mc .= $dis_infos->display('dis_data_group');
+    }
 
-      if ($update_group) {
-        $addressbooks = OBM_Addressbook::search();
-        $addressbook = $addressbooks->getPublicAddressbook();
-        $js .= "
-          new obm.AutoComplete.Search('$path/contact/contact_index.php?addressbook_id=".$addressbook->id."&action=ext_search', 'sel_contactadd', 'sel_contact', {mode:'mono', strict:false});";
-        $block_mc .= "      
-        <div class=\"buttons\">
-          <input type=\"submit\" value=\"$l_del_contact_sel\" />
-          <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
-          <input type=\"hidden\" name=\"action\" value=\"contact_del\" />
-        </div>
-        </form>";
-      }
+    if ($update_group) {
+      $addressbooks = OBM_Addressbook::search();
+      $addressbook = $addressbooks->getPublicAddressbook();
+      $js .= "
+        new obm.AutoComplete.Search('$path/contact/contact_index.php?addressbook_id=".$addressbook->id."&action=ext_search', 'sel_contactadd', 'sel_contact', {mode:'mono', strict:false});";
+      $block_mc .= "      
+      <div class=\"buttons\">
+        <input type=\"submit\" value=\"$l_del_contact_sel\" />
+        <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
+        <input type=\"hidden\" name=\"action\" value=\"contact_del\" />
+      </div>
+      </form>";
     }
   }
 
