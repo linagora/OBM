@@ -2,13 +2,14 @@ package OBM::DbUpdater::domainUpdater;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -23,7 +24,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -32,7 +33,7 @@ sub update {
     my( $entity ) = @_;
 
     if( ref($entity) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'entité incorrecte, traitement impossible', 3 );
+        $self->_log( 'entité incorrecte, traitement impossible', 0 );
         return 1;
     }
 
@@ -40,12 +41,12 @@ sub update {
     my $dbHandler;
     my $sth;
     if( !($dbHandler = OBM::Tools::obmDbHandler->instance()) ) {
-        $self->_log( 'connexion à la base de données impossible', 3 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 
     if( $self->delete($entity) ) {
-        $self->_log( 'problème à la mise à jour BD du domaine '.$entity->getDescription(), 2 );
+        $self->_log( 'problème à la mise à jour BD du domaine '.$entity->getDescription(), 1 );
         return 1;
     }
 
@@ -72,7 +73,7 @@ sub update {
                   FROM Domain
                   WHERE domain_id='.$entity->getId();
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 1 );
         return 1;
     }
 
@@ -85,7 +86,7 @@ sub update {
                   FROM DomainEntity
                   WHERE domainentity_domain_id='.$entity->getId();
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 1 );
         return 1;
     }
 
@@ -104,7 +105,7 @@ sub update {
                       WHERE domainentity_domain_id='.$entity->getId().'
                     )';
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 1 );
         return 1;
     }
 
@@ -127,7 +128,7 @@ sub update {
                       WHERE domainentity_domain_id='.$entity->getId().'
                     )';
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 1 );
         return 1;
     }
 
@@ -140,7 +141,7 @@ sub delete {
     my( $entity ) = @_;
 
     if( ref($entity) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'entité incorrecte, traitement impossible', 3 );
+        $self->_log( 'entité incorrecte, traitement impossible', 0 );
         return 1;
     }
 
@@ -148,32 +149,32 @@ sub delete {
     my $dbHandler;
     my $sth;
     if( !($dbHandler = OBM::Tools::obmDbHandler->instance()) ) {
-        $self->_log( 'connexion à la base de données impossible', 3 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 
 
     my $query = 'DELETE FROM P_ServiceProperty WHERE serviceproperty_entity_id IN (SELECT domainentity_entity_id FROM P_DomainEntity WHERE domainentity_domain_id='.$entity->getId().')';
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 1 );
         return 1;
     }
 
     $query = 'DELETE FROM P_Service WHERE service_entity_id IN (SELECT domainentity_entity_id FROM P_DomainEntity WHERE domainentity_domain_id='.$entity->getId().')';
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 1 );
         return 1;
     }
 
     $query = 'DELETE FROM P_DomainEntity WHERE domainentity_domain_id='.$entity->getId();
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 1 );
         return 1;
     }
 
     $query = 'DELETE FROM P_Domain WHERE domain_id='.$entity->getId();
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 1 );
         return 1;
     }
 

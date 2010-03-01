@@ -2,13 +2,15 @@ package OBM::entitiesFactory;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::regexp;
 
 
@@ -19,7 +21,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( !defined($domainId) || ref($domainId) || ($domainId !~ /$regexp_id/) ) {
-        $self->_log( 'un et un seul identifiant de domaine doit être indiqué', 3 );
+        $self->_log( 'un et un seul identifiant de domaine doit être indiqué', 0 );
         return undef;
     }
 
@@ -33,7 +35,7 @@ sub new {
 
     $self->{'mode'} = $mode;
     if( $self->_initMode() ) {
-        $self->_log( 'problème à l\'initialisation de la factory', 4 );
+        $self->_log( 'problème à l\'initialisation de la factory', 0 );
         return undef;
     }
 
@@ -46,7 +48,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->_reset();
 }
@@ -55,7 +57,7 @@ sub DESTROY {
 sub _reset {
     my $self = shift;
 
-    $self->_log( 'factory reset', 3 );
+    $self->_log( 'factory reset', 4 );
 
     $self->{'running'} = undef;
     $self->{'domain'} = undef;
@@ -68,12 +70,12 @@ sub _initMode {
     my $self = shift;
 
     if( !defined($self->{'mode'}) ) {
-        $self->_log( 'mode d\'exécution non définit', 3 );
+        $self->_log( 'mode d\'exécution non définit', 1 );
         return 1;
     }
 
     if( ref($self->{'mode'}) ) {
-        $self->_log( 'mode d\'exécution incorrect', 3 );
+        $self->_log( 'mode d\'exécution incorrect', 1 );
         return 1;
     }
 
@@ -99,7 +101,7 @@ sub _initMode {
     }
 
 
-    $self->_log( 'mode d\'exécution \''.$self->{'mode'}.'\' incorrect', 3 );
+    $self->_log( 'mode d\'exécution \''.$self->{'mode'}.'\' incorrect', 0 );
 
     return 1;
 }
@@ -199,7 +201,7 @@ sub loadEntities {
     my( $programmingObj ) = @_;
 
     if( ref($programmingObj) ne 'OBM::EntitiesFactory::factoryProgramming' ) {
-        $self->_log( 'liste d\'entités à charger incorrecte', 3 );
+        $self->_log( 'liste d\'entités à charger incorrecte', 1 );
         return 1;
     }
 
@@ -210,7 +212,7 @@ sub loadEntities {
     }
 
     if( $programmableFactories->addEntities($programmingObj) ) {
-        $self->_log( 'problème lors de la programmation de la factory', 2 );
+        $self->_log( 'problème lors de la programmation de la factory', 0 );
         return 1;
     }
 
@@ -243,7 +245,7 @@ sub _start {
 sub next {
     my $self = shift;
 
-    $self->_log( 'obtention de l\'entité suivante', 2 );
+    $self->_log( 'obtention de l\'entité suivante', 3 );
 
     if( !$self->isRunning() ) {
         if( !$self->_start() ) {
@@ -271,7 +273,7 @@ sub _loadDomains {
     my( $domainFactory, $enqueueDomain ) = @_;
 
     if( !defined($domainFactory) || ref($domainFactory) ne 'OBM::EntitiesFactory::domainFactory' ) {
-        $self->_log( 'problème au chargement de la factory de domaine', 2 );
+        $self->_log( 'problème au chargement de la factory de domaine', 1 );
         return 1;
     }
 

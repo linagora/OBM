@@ -3,8 +3,8 @@ package OBM::ObmSatellite::client;
 $VERSION = '1.0';
 
 use Class::Singleton;
-use OBM::Tools::commonMethods;
-@ISA = ('Class::Singleton', 'OBM::Tools::commonMethods');
+use OBM::Log::log;
+@ISA = ('Class::Singleton', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -28,7 +28,7 @@ sub _new_instance {
     $self->{'obmSatelliteLogin'} = OBM_SATELLITE_LOGIN;
     $self->{'obmSatellitePort'} = OBM_SATELLITE_PORT;
     if( $self->_getLoginPasswd() ) {
-        $self->_log( 'erreur à l\'obtention du mot de passe de l\'utilisateur système '.$self->{'obmSatelliteLogin'}, 0 );
+        $self->_log( 'erreur à l\'obtention du mot de passe de l\'utilisateur système '.$self->{'obmSatelliteLogin'}, 1 );
         return undef;
     }
 
@@ -39,7 +39,7 @@ sub _new_instance {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -50,7 +50,7 @@ sub _getLoginPasswd {
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
     if( !$dbHandler ) {
-        $self->_log( 'connexion à la base de données impossible', 4 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 
@@ -61,7 +61,7 @@ sub _getLoginPasswd {
 
     my $stHandler;
     if( !defined($dbHandler->execQuery( $query, \$stHandler )) ) {
-        $self->_log( 'obtention du mot de passe de l\'utilisateur système '.$self->{'obmSatelliteLogin'}.' impossible', 3 );
+        $self->_log( 'obtention du mot de passe de l\'utilisateur système '.$self->{'obmSatelliteLogin'}.' impossible', 1 );
         return 1;
     }
 
@@ -71,7 +71,7 @@ sub _getLoginPasswd {
     $stHandler->finish();
 
     if( !defined($self->{'obmSatellitePassword'}) ) {
-        $self->_log( 'obtention du mot de passe de l\'utilisateur système '.$self->{'obmSatelliteLogin'}.' impossible', 3 );
+        $self->_log( 'obtention du mot de passe de l\'utilisateur système '.$self->{'obmSatelliteLogin'}.' impossible', 1 );
         return 1;
     }
 
@@ -87,13 +87,13 @@ sub get {
     my $url = $self->_checkUrl( $host, $path );
 
     if( !defined($url) ) {
-        $self->log( 'URL incorrecte', 0 );
+        $self->_log( 'URL incorrecte', 1 );
         return 1;
     }
 
     my $request = HTTP::Request->new( GET => $url );
     if( !$request ) {
-        $self->log( 'erreur à l\'initialisation de la requête', 0 );
+        $self->_log( 'erreur à l\'initialisation de la requête', 1 );
         return 1;
     }
 
@@ -118,13 +118,13 @@ sub post {
     my $url = $self->_checkUrl( $host, $path );
 
     if( !defined($url) ) {
-        $self->log( 'URL incorrecte', 0 );
+        $self->_log( 'URL incorrecte', 1 );
         return 1;
     }
 
     my $request = HTTP::Request->new( POST => $url );
     if( !$request ) {
-        $self->log( 'erreur à l\'initialisation de la requête', 0 );
+        $self->_log( 'erreur à l\'initialisation de la requête', 1 );
         return 1;
     }
 
@@ -151,14 +151,15 @@ sub _displayResponse {
 
 
     if( !$response->is_success() ) {
-        $self->_log( 'Erreur lors de la requête \''.$url.'\' : '.$response->status_line(), 0 );
-        $self->_log( $response->content(), 0 ) if $response->content();
+        $self->_log( 'Erreur lors de la requête \''.$url.'\' : '.$response->status_line(), 1 );
+        $self->_log( $response->content(), 1 ) if $response->content();
         return 1;
     }
 
     $self->_log( 'requête \''.$url.'\' : '.$response->status_line(), 2 );
     $self->_log( $response->headers_as_string(), 3 ) if $response->headers_as_string();
     $self->_log( $response->content(), 2 ) if $response->content();
+
     return 0;
 }
 
@@ -168,7 +169,7 @@ sub _checkUrl {
     my( $host, $path ) = @_;
 
     if( !$host ) {
-        $self->log( 'hote inconnu', 3 );
+        $self->_log( 'hote inconnu', 1 );
         return undef;
     }
 

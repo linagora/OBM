@@ -24,7 +24,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'domaine père incorrect', 3 );
+        $self->_log( 'domaine père incorrect', 1 );
         return undef;
     }
     $self->setParent( $parent );
@@ -44,7 +44,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'parent'} = undef;
 }
@@ -56,7 +56,7 @@ sub _init {
     my( $mailServerDesc ) = @_;
 
     if( !defined($mailServerDesc) || (ref($mailServerDesc) ne 'ARRAY') ) {
-        $self->_log( 'description des serveurs de courriers incorrect', 4 );
+        $self->_log( 'description des serveurs de courriers incorrect', 1 );
         return 1;
     }
 
@@ -173,7 +173,7 @@ sub setParent {
     my( $parent ) = @_;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine parent incorrecte', 3 );
+        $self->_log( 'description du domaine parent incorrecte', 1 );
         return 1;
     }
 
@@ -203,13 +203,13 @@ sub getDnPrefix {
     my @dnPrefixes;
 
     if( !($rootDn = $self->_getParentDn()) ) {
-        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 1 );
         return undef;
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
         push( @dnPrefixes, 'cn='.LDAPDN.','.$rootDn->[$i] );
-        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 4 );
+        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 3 );
     }
 
     return \@dnPrefixes;
@@ -248,12 +248,12 @@ sub createLdapEntry {
     my ( $entryDn, $entry ) = @_;
 
     if( !$entryDn ) {
-        $self->_log( 'DN non défini', 3 );
+        $self->_log( 'DN non défini', 1 );
         return 1;
     }
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 3 );
+        $self->_log( 'entrée LDAP incorrecte', 1 );
         return 1;
     }
 

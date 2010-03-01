@@ -3,19 +3,14 @@ package OBM::Cyrus::cyrusUpdateQuotaUsedEngine;
 $VERSION = '1.0';
 
 use OBM::Cyrus::cyrusEngine;
-@ISA = ('OBM::Cyrus::cyrusEngine');
+use OBM::Log::log;
+@ISA = ('OBM::Cyrus::cyrusEngine', 'OBM::Log::log');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
 
 
 sub _doWork {

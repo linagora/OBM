@@ -18,9 +18,11 @@
 
 package cyrusGetQuotaUse;
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 use strict;
 use OBM::Parameters::regexp;
-use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
@@ -29,13 +31,28 @@ my %parameters;
 my $return = GetOptions( \%parameters, 'domain-id=s', 'help' );
 
 if( !$return ) {
-    cyrusGetQuotaUse->_displayHelp();
-    exit 1;
+    %parameters = undef;
 }
 
-exit cyrusGetQuotaUse->run(\%parameters);
+my $cyrusGetQuotaUse = cyrusGetQuotaUse->new();
+exit $cyrusGetQuotaUse->run(\%parameters);
 
 $| = 1;
+
+
+sub new {
+    my $class = shift;
+    my $self = bless { }, $class;
+
+    $self->_configureLog();
+
+    return $self;
+}
+
+
+sub DESTROY {
+    my $self = shift;
+}
 
 
 # Do work...

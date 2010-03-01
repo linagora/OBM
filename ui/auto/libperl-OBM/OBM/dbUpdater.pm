@@ -2,13 +2,14 @@ package OBM::dbUpdater;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -50,7 +51,7 @@ sub update {
     my $returnCode = 0;
     SWITCH: {
         if( !$entity->getDelete() && !$entity->getBdUpdate() ) {
-            $self->_log( 'l\'entité '.$entity->getDescription().' n\'est pas à mettre à jour en BD', 2 );
+            $self->_log( 'l\'entité '.$entity->getDescription().' n\'est pas à mettre à jour en BD', 3 );
             last SWITCH;
         }
 

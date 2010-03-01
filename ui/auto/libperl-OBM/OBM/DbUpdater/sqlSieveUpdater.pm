@@ -2,16 +2,14 @@ package OBM::DbUpdater::sqlSieveUpdater;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
 
 
 sub new {
@@ -21,7 +19,7 @@ sub new {
 
     require OBM::Tools::obmDbHandler;
     if( !($self->{'dbHandler'} = OBM::Tools::obmDbHandler->instance()) ) {
-        $self->_log( 'connexion à la base de données impossible', 4 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return undef;
     }
 
@@ -35,10 +33,10 @@ sub update {
 
 
     if( !defined($entity) ) {
-        $self->_log( 'entité non définie', 3 );
+        $self->_log( 'entité non définie', 1 );
         return 1;
     }elsif( !ref($entity) ) {
-        $self->_log( 'entité incorrecte', 3 );
+        $self->_log( 'entité incorrecte', 1 );
         return 1;
     }elsif( ref($entity) ne 'OBM::Entities::obmUser' ) {
         $self->_log( 'type d\'entité \''.ref($entity).' non supporté', 0 );
@@ -59,11 +57,11 @@ sub update {
 
     my $sth;
     if( !defined($self->{'dbHandler'}->execQuery( $query, \$sth )) ) {
-        $self->_log( 'échec de mise à jour des informations Sieve en BD', 0 );
+        $self->_log( 'échec de mise à jour des informations Sieve en BD', 1 );
         return 1;
     }
 
-    $self->_log( 'mise à jour de la BD terminée avec succès', 2 );
+    $self->_log( 'mise à jour de la BD terminée avec succès', 1 );
 
     return 0;
 }

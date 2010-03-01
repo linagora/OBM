@@ -2,14 +2,16 @@ package OBM::Ldap::ldapServers;
 
 $VERSION = "1.0";
 
+use Class::Singleton;
+use OBM::Log::log;
+@ISA = ('Class::Singleton', 'OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
 
-use base qw( Class::Singleton );
-use OBM::Tools::commonMethods qw(_log dump);
 require OBM::Parameters::regexp;
 
 
@@ -27,7 +29,7 @@ sub _new_instance {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
     $self->{'servers'} = undef;
 }
 
@@ -37,19 +39,19 @@ sub getLdapServer {
     my( $serverId ) = @_;
 
     if( !defined($serverId) ) {
-        $self->_log( 'identifiant de serveur non défini', 3 );
+        $self->_log( 'identifiant de serveur non défini', 1 );
         return undef;
     }
 
     if( ref($serverId) || ($serverId !~ /$OBM::Parameters::regexp::regexp_server_id/) ) {
-        $self->_log( 'identifiant de serveur incorrect', 3 );
+        $self->_log( 'identifiant de serveur incorrect', 1 );
         return undef;
     }
 
     if( exists($self->{'servers'}->{$serverId}) ) {
-        $self->_log( 'serveur d\'identifiant \''.$serverId.'\' déjà chargé', 3 );
+        $self->_log( 'serveur d\'identifiant \''.$serverId.'\' déjà chargé', 4 );
         if( !defined($self->{'servers'}->{$serverId}) ) {
-            $self->_log( 'serveur d\'identifiant \''.$serverId.'\' non défini', 3 );
+            $self->_log( 'serveur d\'identifiant \''.$serverId.'\' non défini', 1 );
             return undef;
         }
     }elsif( !$self->_loadServer( $serverId ) ) {
@@ -77,13 +79,13 @@ sub _loadServer {
     my $self = shift;
     my( $serverId ) = @_;
 
-    $self->_log( 'chargement du serveur LDAP d\'identifiant \''.$serverId.'\'', 2 );
+    $self->_log( 'chargement du serveur LDAP d\'identifiant \''.$serverId.'\'', 3 );
 
     require OBM::Ldap::ldapServer;
     $self->{'servers'}->{$serverId} = OBM::Ldap::ldapServer->new( $serverId );
 
     if( !defined($self->{'servers'}->{$serverId}) ) {
-        $self->_log( 'serveur d\'identifiant \''.$serverId.'\' non trouvé', 3 );
+        $self->_log( 'serveur d\'identifiant \''.$serverId.'\' non trouvé', 1 );
     }
 
     return $self->{'servers'}->{$serverId};

@@ -22,7 +22,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'domaine père incorrect', 3 );
+        $self->_log( 'domaine père incorrect', 1 );
         return undef;
     }
     $self->setParent( $parent );
@@ -42,7 +42,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'parent'} = undef;
 }
@@ -54,7 +54,7 @@ sub _init {
     my( $contactDesc ) = @_;
 
     if( !defined($contactDesc) || (ref($contactDesc) ne 'HASH') ) {
-        $self->_log( 'description du contact incorrecte', 4 );
+        $self->_log( 'description du contact incorrecte', 1 );
         return 1;
     }
 
@@ -71,13 +71,13 @@ sub _init {
     }
 
     if( !$contactDesc->{'contactCommonName'} ) {
-        $self->_log( 'nom et prénom non renseigné, export LDAP impossible de '.$self->getDescription(), 1 );
+        $self->_log( 'nom et prénom non renseigné, export LDAP impossible de '.$self->getDescription(), 2 );
         return 1;
     }
 
     $self->{'entityDesc'} = $contactDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 3 );
 
     return 0;
 }
@@ -88,7 +88,7 @@ sub setLinks {
     my( $links ) = @_;
 
     if( !defined($links) || ref($links) ne 'HASH' ) {
-        $self->_log( 'pas de liens définis', 3 );
+        $self->_log( 'pas de liens définis', 1 );
         return 0;
     }
 
@@ -314,7 +314,7 @@ sub setParent {
     my( $parent ) = @_;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine parent incorrecte', 3 );
+        $self->_log( 'description du domaine parent incorrecte', 1 );
         return 1;
     }
 
@@ -344,7 +344,7 @@ sub getDnPrefix {
     my @dnPrefixes;
 
     if( !($rootDn = $self->_getParentDn()) ) {
-        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 4 );
         return undef;
     }
 
@@ -387,12 +387,12 @@ sub createLdapEntry {
     my ( $entryDn, $entry ) = @_;
 
     if( !$entryDn ) {
-        $self->_log( 'DN non défini', 3 );
+        $self->_log( 'DN non défini', 1 );
         return 1;
     }
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 3 );
+        $self->_log( 'entrée LDAP incorrecte', 1 );
         return 1;
     }
 

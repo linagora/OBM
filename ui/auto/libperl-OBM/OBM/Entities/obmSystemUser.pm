@@ -22,7 +22,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'domaine père incorrect', 3 );
+        $self->_log( 'domaine père incorrect', 1 );
         return undef;
     }
     $self->setParent( $parent );
@@ -42,7 +42,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'parent'} = undef;
 }
@@ -54,49 +54,49 @@ sub _init {
     my( $systemUserDesc ) = @_;
 
     if( !defined($systemUserDesc) || (ref($systemUserDesc) ne 'HASH') ) {
-        $self->_log( 'description de l\'utilisateur système incorrecte', 4 );
+        $self->_log( 'description de l\'utilisateur système incorrecte', 1 );
         return 1;
     }
 
     # L'Id du l'utilisateur système
     if( !defined($systemUserDesc->{'usersystem_id'}) ) {
-        $self->_log( 'ID de l\'utilisateur système non défini', 3 );
+        $self->_log( 'ID de l\'utilisateur système non défini', 1 );
         return 1;
     }elsif( $systemUserDesc->{'usersystem_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$systemUserDesc->{'usersystem_id'}.'\' incorrect', 4 );
+        $self->_log( 'ID \''.$systemUserDesc->{'usersystem_id'}.'\' incorrect', 1 );
         return 1;
     }
 
     # Le login de l'utilisateur système
     if( !defined($systemUserDesc->{'usersystem_login'}) ) {
-        $self->_log( 'Login de l\'utilisateur système non défini', 3 );
+        $self->_log( 'Login de l\'utilisateur système non défini', 1 );
         return 1;
     }elsif( $systemUserDesc->{'usersystem_login'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
-        $self->_log( 'Login \''.$systemUserDesc->{'usersystem_login'}.'\' incorrect', 4 );
+        $self->_log( 'Login \''.$systemUserDesc->{'usersystem_login'}.'\' incorrect', 1 );
         return 1;
     }
 
     # L'UID de l'utilisateur système
     if( !defined($systemUserDesc->{'usersystem_uid'}) ) {
-        $self->_log( 'UID de l\'utilisateur système non défini', 3 );
+        $self->_log( 'UID de l\'utilisateur système non défini', 1 );
         return 1;
     }elsif( $systemUserDesc->{'usersystem_uid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'UID \''.$systemUserDesc->{'usersystem_uid'}.'\' incorrect', 4 );
+        $self->_log( 'UID \''.$systemUserDesc->{'usersystem_uid'}.'\' incorrect', 1 );
         return 1;
     }
 
     # Le GID de l'utilisateur système
     if( !defined($systemUserDesc->{'usersystem_gid'}) ) {
-        $self->_log( 'GID de l\'utilisateur système non défini', 3 );
+        $self->_log( 'GID de l\'utilisateur système non défini', 1 );
         return 1;
     }elsif( $systemUserDesc->{'usersystem_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'GID \''.$systemUserDesc->{'usersystem_gid'}.'\' incorrect', 4 );
+        $self->_log( 'GID \''.$systemUserDesc->{'usersystem_gid'}.'\' incorrect', 1 );
         return 1;
     }
 
     $self->{'entityDesc'} = $systemUserDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 3 );
 
     return 0;
 }
@@ -165,7 +165,7 @@ sub setParent {
     my( $parent ) = @_;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine parent incorrecte', 3 );
+        $self->_log( 'description du domaine parent incorrecte', 1 );
         return 1;
     }
 
@@ -195,13 +195,13 @@ sub getDnPrefix {
     my @dnPrefixes;
 
     if( !($rootDn = $self->_getParentDn()) ) {
-        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 1 );
         return undef;
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
         push( @dnPrefixes, 'uid='.$self->{'entityDesc'}->{'usersystem_login'}.','.$rootDn->[$i] );
-        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
+        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 3 );
     }
 
     return \@dnPrefixes;
@@ -222,18 +222,18 @@ sub createLdapEntry {
     my( $entryDn, $entry ) = @_;
 
     if( !$entryDn ) {
-        $self->_log( 'DN non défini', 3 );
+        $self->_log( 'DN non défini', 1 );
         return 1;
     }
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 3 );
+        $self->_log( 'entrée LDAP incorrecte', 1 );
         return 1;
     }
 
     my $userPasswd = $self->_convertPasswd( 'PLAIN', $self->{'entityDesc'}->{'usersystem_password'} );
     if( !$userPasswd ) {
-        $self->_log( 'pas de mot de passe défini', 3 );
+        $self->_log( 'pas de mot de passe défini', 1 );
         return 1;
     }
 

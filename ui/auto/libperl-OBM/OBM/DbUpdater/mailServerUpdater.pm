@@ -2,13 +2,14 @@ package OBM::DbUpdater::mailServerUpdater;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -23,7 +24,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -32,7 +33,7 @@ sub update {
     my( $entity ) = @_;
 
     if( ref($entity) ne 'OBM::Entities::obmMailServer' ) {
-        $self->_log( 'entité incorrecte, traitement impossible', 3 );
+        $self->_log( 'entité incorrecte, traitement impossible', 1 );
         return 1;
     }
 
@@ -40,12 +41,12 @@ sub update {
     my $dbHandler;
     my $sth;
     if( !($dbHandler = OBM::Tools::obmDbHandler->instance()) ) {
-        $self->_log( 'connexion à la base de données impossible', 3 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 
     if( $self->_delete($entity) ) {
-        $self->_log( 'problème à la mise à jour BD de '.$entity->getDescription(), 2 );
+        $self->_log( 'problème à la mise à jour BD de '.$entity->getDescription(), 1 );
         return 1;
     }
 
@@ -80,7 +81,7 @@ sub _delete {
     my( $entity ) = @_;
 
     if( ref($entity) ne 'OBM::Entities::obmMailServer' ) {
-        $self->_log( 'entité incorrecte, traitement impossible', 3 );
+        $self->_log( 'entité incorrecte, traitement impossible', 1 );
         return 1;
     }
 
@@ -88,7 +89,7 @@ sub _delete {
     my $dbHandler;
     my $sth;
     if( !($dbHandler = OBM::Tools::obmDbHandler->instance()) ) {
-        $self->_log( 'connexion à la base de données impossible', 3 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 

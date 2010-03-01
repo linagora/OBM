@@ -2,17 +2,15 @@ package OBM::Cyrus::sieveEngine;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
 
-
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
 use Cyrus::SIEVE::managesieve;
 
 use constant MINIGBEGINHEADERS => '# BEGIN MiniG sieve filter header template';
@@ -32,7 +30,7 @@ sub new {
 
     require OBM::Cyrus::cyrusServers;
     if( !($self->{'sieveServers'} = OBM::Cyrus::cyrusServers->instance()) ) {
-        $self->_log( 'initialisation du gestionnaire de serveur Cyrus impossible', 3 );
+        $self->_log( 'initialisation du gestionnaire de serveur Cyrus impossible', 0 );
         return undef;
     }
 
@@ -43,7 +41,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -53,7 +51,7 @@ sub _doWork {
     # Checking entity...
     my $entity = $self->{'currentEntity'};
     if( !defined($self->{'currentEntity'}) ) {
-        $self->_log( 'entite à mettre à jour non défini', 3 );
+        $self->_log( 'entite à mettre à jour non défini', 1 );
         return 1;
     }
 
@@ -71,7 +69,7 @@ sub _doWork {
 
     my $sieveSrvConn = $self->{'currentSieveSrv'}->getSieveServerConn( $entity->getDomainId(), $entity->getMailboxName( 'new' ) );
     if( !defined($sieveSrvConn) ) {
-        $self->_log( 'impossible de se sonnecter au serveur Sieve '.$self->{'currentSieveSrv'}->getDescription(), 2 );
+        $self->_log( 'impossible de se sonnecter au serveur Sieve '.$self->{'currentSieveSrv'}->getDescription(), 1 );
         return 1;
     }
 
@@ -97,39 +95,39 @@ sub _doWork {
 
 
     # Create new sieve script
-    $self->_log( 'création du nouveau script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 2 );
+    $self->_log( 'création du nouveau script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 3 );
     my @newSieveScript;
     if( $self->_updateSieveScript( \@oldSieveScript, \@newSieveScript ) ) {
-        $self->_log( 'problème à la création du script sieve de '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'problème à la création du script sieve de '.$self->{'currentEntity'}->getDescription(), 1 );
         sieve_logout( $sieveSrvConn );
         return 1;
     }
 
 
-    $self->_log( 'suppression du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 2 );
+    $self->_log( 'suppression du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 3 );
     # Disable old Sieve script
     sieve_activate( $sieveSrvConn, '' );
     # Delete old Sieve script
     sieve_delete( $sieveSrvConn, $sieveScriptName );
 
     if( $#newSieveScript >= 0 ) {
-        $self->_log( 'mise a jour du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'mise a jour du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 3 );
 
         if( sieve_put( $sieveSrvConn, $sieveScriptName, join("\n", @newSieveScript) ) ) {
             my $errstr = sieve_get_error( $sieveSrvConn );
             $errstr = 'Sieve - erreur inconnue.' if(!defined($errstr));
-            $self->_log( 'erreur lors de la mise à jour du script Sieve : '.$errstr , 2 );
+            $self->_log( 'erreur lors de la mise à jour du script Sieve : '.$errstr , 1 );
             sieve_logout( $sieveSrvConn );
             return 1;
         }
 
-        $self->_log( 'activation du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'activation du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 3 );
 
         # On active le nouveau script
         if( sieve_activate( $sieveSrvConn, $sieveScriptName ) ) {
             my $errstr = sieve_get_error( $sieveSrvConn );
             $errstr = 'Sieve - erreur inconnue.' if(!defined($errstr));
-            $self->_log( 'probleme lors de l\'activation du script Sieve : '.$errstr, 2 );
+            $self->_log( 'probleme lors de l\'activation du script Sieve : '.$errstr, 1 );
             sieve_logout( $sieveSrvConn );
             return 1;
         }
@@ -179,7 +177,7 @@ sub _updateSieveVacation {
     my $vacationMark = "# OBM2 - Vacation";
 
     if( !defined($self->{'currentEntity'}) ) {
-        $self->_log( 'entite à mettre à jour non défini', 3 );
+        $self->_log( 'entite à mettre à jour non défini', 1 );
         return 1;
     }
 
@@ -198,7 +196,7 @@ sub _updateSieveVacation {
             }
         }
 
-        $self->_log( 'gestion du message d\'absence de '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'gestion du message d\'absence de '.$self->{'currentEntity'}->getDescription(), 3 );
 
         push( @{$newSieveScript}, $vacationMark );
         push( @{$newSieveScript}, $vacationMsg );
@@ -218,12 +216,12 @@ sub _updateSieveNomade {
     my $nomadeMark = "# OBM2 - Nomade";
 
     if( !defined($self->{'currentEntity'}) ) {
-        $self->_log( 'entite à mettre à jour non défini', 3 );
+        $self->_log( 'entite à mettre à jour non défini', 1 );
         return 1;
     }
 
     if( my $nomadeMsg = $self->{'currentEntity'}->getSieveNomade() ) {
-        $self->_log( 'gestion de la redirection de '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'gestion de la redirection de '.$self->{'currentEntity'}->getDescription(), 3 );
 
         push( @{$newSieveScript}, $nomadeMark );
         push( @{$newSieveScript}, $nomadeMsg );
@@ -296,10 +294,10 @@ sub update {
     my( $entity ) = @_;
 
     if( !defined($entity) ) {
-        $self->_log( 'entité non définie', 3 );
+        $self->_log( 'entité non définie', 1 );
         return 1;
     }elsif( !ref($entity) ) {
-        $self->_log( 'entité incorrecte', 3 );
+        $self->_log( 'entité incorrecte', 1 );
         return 1;
     }
     $self->{'currentEntity'} = $entity;
@@ -318,13 +316,13 @@ sub update {
 
     # If entity is archiving, we do nothing and it's not an error
     if( $entity->getArchive() ) {
-        $self->_log( 'pas de gestion de SIEVE pour l\'entité archivée '.$entity->getDescription(), 2 );
+        $self->_log( 'pas de gestion de SIEVE pour l\'entité archivée '.$entity->getDescription(), 3 );
         return 0;
     }
 
     # If entity don't have mail right, we do nothing and it's not an error
     if( !$entity->isMailActive() ) {
-        $self->_log( 'droit mail désactivé pour l\'objet : '.$entity->getDescription().', pas de gestion Sieve', 2 );
+        $self->_log( 'droit mail désactivé pour l\'objet : '.$entity->getDescription().', pas de gestion Sieve', 3 );
         return 0;
     }
 
@@ -338,27 +336,27 @@ sub update {
     # Get user BAL server object
     my $mailServerId = $entity->getMailServerId();
     if( !defined($mailServerId) && $entity->isMailActive() && !$entity->getArchive() ) {
-        $self->_log( 'serveur de courrier IMAP non defini et droit mail actif - erreur', 0 );
+        $self->_log( 'serveur de courrier IMAP non defini et droit mail actif - erreur', 1 );
         return 1;
     }elsif( !defined($mailServerId) && (!$entity->isMailActive() || $entity->getArchive()) ) {
-        $self->_log( 'serveur de courrier IMAP non defini et droit mail inactif - succés', 0 );
+        $self->_log( 'serveur de courrier IMAP non defini et droit mail inactif - succés', 3 );
         return 0;
     }elsif( !defined($mailServerId) ) {
-        $self->_log( 'serveur de courrier IMAP non defini - erreur', 0 );
+        $self->_log( 'serveur de courrier IMAP non defini - erreur', 1 );
         return 1;
     }
 
     # Get Sieve server connection
     $self->{'currentSieveSrv'} = $self->{'sieveServers'}->getEntityCyrusServer( $entity );
     if( !defined($self->{'currentSieveSrv'}) ) {
-        $self->_log( 'serveur de courrier Sieve d\'identifiant \''.$entity->getMailServerId().'\' inconnu - Operation annulée !', 0 );
+        $self->_log( 'serveur de courrier Sieve d\'identifiant \''.$entity->getMailServerId().'\' inconnu - Operation annulée !', 1 );
         return 1;
     }
 
 
     # Do stuff...
     if( $self->_doWork() ) {
-        $self->_log( 'problème de traitement de '.$entity->getDescription().' - Operation annulee !', 0 );
+        $self->_log( 'problème de traitement de '.$entity->getDescription().' - Operation annulee !', 1 );
         return 1;
     }
 

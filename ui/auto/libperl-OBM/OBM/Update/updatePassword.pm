@@ -3,15 +3,14 @@ package OBM::Update::updatePassword;
 $VERSION = '1.0';
 
 use OBM::Entities::systemEntityIdGetter;
-@ISA = ('OBM::Entities::systemEntityIdGetter');
+use OBM::Log::log;
+@ISA = ('OBM::Entities::systemEntityIdGetter', 'OBM::Log::log');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {

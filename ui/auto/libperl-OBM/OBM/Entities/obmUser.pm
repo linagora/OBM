@@ -23,7 +23,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'domaine père incorrect', 3 );
+        $self->_log( 'domaine père incorrect', 1 );
         return undef;
     }
     $self->setParent( $parent );
@@ -57,7 +57,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'parent'} = undef;
 }
@@ -71,28 +71,28 @@ sub _init {
     my( $userDesc ) = @_;
 
     if( !defined($userDesc) || (ref($userDesc) ne 'HASH') ) {
-        $self->_log( 'description de l\'utilisateur incorrecte', 4 );
+        $self->_log( 'description de l\'utilisateur incorrecte', 1 );
         return 1;
     }
 
     # User ID
     if( !defined($userDesc->{'userobm_id'}) ) {
-        $self->_log( 'ID de l\'utilisateur non défini', 0 );
+        $self->_log( 'ID de l\'utilisateur non défini', 1 );
         return 1;
     }elsif( $userDesc->{'userobm_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$userDesc->{'userobm_id'}.'\' incorrect', 0 );
+        $self->_log( 'ID \''.$userDesc->{'userobm_id'}.'\' incorrect', 1 );
         return 1;
     }
 
     # User login
     if( !defined($userDesc->{'userobm_login'}) ) {
-        $self->_log( 'login de l\'utilisateur non défini', 0 );
+        $self->_log( 'login de l\'utilisateur non défini', 1 );
         return 1;
     }
     
     $userDesc->{'userobm_login_new'} = lc($userDesc->{'userobm_login'});
     if( $userDesc->{'userobm_login_new'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
-        $self->_log( 'login de l\'utilisateur \''.$userDesc->{'userobm_login_new'}.'\' incorrect', 0 );
+        $self->_log( 'login de l\'utilisateur \''.$userDesc->{'userobm_login_new'}.'\' incorrect', 1 );
         return 1;
     }
 
@@ -100,7 +100,7 @@ sub _init {
     if( defined($userDesc->{'userobm_login_current'}) ) {
         $userDesc->{'userobm_login_current'} = lc($userDesc->{'userobm_login_current'});
         if( !$userDesc->{'userobm_login_current'} || $userDesc->{'userobm_login_current'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
-            $self->_log( 'login actuel de l\'utilisateur \''.$userDesc->{'userobm_login_current'}.'\' incorrect', 0 );
+            $self->_log( 'login actuel de l\'utilisateur \''.$userDesc->{'userobm_login_current'}.'\' incorrect', 1 );
             return 1;
         }
     }else {
@@ -114,19 +114,19 @@ sub _init {
 
     # User UID
     if( !defined($userDesc->{'userobm_uid'}) ) {
-        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 0 );
+        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 1 );
         return 1;
     }elsif( $userDesc->{'userobm_uid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 0 );
+        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 1 );
         return 1;
     }
 
     # User GID
     if( !defined($userDesc->{'userobm_gid'}) ) {
-        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 0 );
+        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 1 );
         return 1;
     }elsif( $userDesc->{'userobm_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 0 );
+        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 1 );
         return 1;
     }
 
@@ -232,17 +232,17 @@ sub _init {
         my @date_exp = split(/-/,$userDesc->{'userobm_account_dateexp'});
         SWITCH: {
             if( $date_exp[2] < 1 || $date_exp[2] > 31 ) {
-                $self->_log( 'date d\'expiration de '.$userDesc->{'userobm_login'}.' incorrecte. Le jour doit être dans l\'intervale [1..31]. Date non prise en compte.', 0 );
+                $self->_log( 'date d\'expiration de '.$userDesc->{'userobm_login'}.' incorrecte. Le jour doit être dans l\'intervale [1..31]. Date non prise en compte.', 2 );
                 last SWITCH;
             }
 
             if( $date_exp[1] < 1 || $date_exp[1] > 12 ) {
-                $self->_log( 'date d\'expiration de '.$userDesc->{'userobm_login'}.' incorrecte. Le mois doit être dans l\'intervale [1..12]. Date non prise en compte.', 0 );
+                $self->_log( 'date d\'expiration de '.$userDesc->{'userobm_login'}.' incorrecte. Le mois doit être dans l\'intervale [1..12]. Date non prise en compte.', 2 );
                 last SWITCH;
             }
 
             if( $date_exp[0] < 1970 || $date_exp[0] > 2037 ) {
-                $self->_log( 'date d\'expiration de '.$userDesc->{'userobm_login'}.' incorrecte. L\'année doit être dans l\'intervale [1970..2037]. Date non prise en compte.', 0 );
+                $self->_log( 'date d\'expiration de '.$userDesc->{'userobm_login'}.' incorrecte. L\'année doit être dans l\'intervale [1970..2037]. Date non prise en compte.', 2 );
                 last SWITCH;
             }
 
@@ -253,7 +253,9 @@ sub _init {
     # User e-mails
     ( $userDesc->{'userobm_main_email'}, $userDesc->{'userobm_alias_email'} ) = $self->_makeEntityEmail( $userDesc->{'userobm_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') );
     if( !defined($userDesc->{'userobm_main_email'}) ) {
-        $self->_log( 'droit mail de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' annulé, pas d\'adresses mails valides', 2 );
+        if( $userDesc->{'userobm_mail_perms'} ) {
+            $self->_log( 'droit mail de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' annulé, pas d\'adresses mails valides', 2 );
+        }
         $userDesc->{'userobm_mail_perms'} = 0;
         delete($userDesc->{'userobm_main_email'});
         delete($userDesc->{'userobm_alias_email'});
@@ -341,8 +343,8 @@ sub _init {
 
     # Domain SID
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
-    if( !$domainSid ) {
-        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 3 );
+    if( !$domainSid  && $userDesc->{'userobm_samba_perms'} ) {
+        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 1 );
         $self->_log( 'droit samba annulé', 2 );
         $userDesc->{'userobm_samba_perms'} = 0;
     }
@@ -364,14 +366,14 @@ sub _init {
         SWITCH: {
             # User Samba password
             if( $userDesc->{'userobm_password_type'} ne 'PLAIN' ) {
-                $self->_log( 'le mot de passe doit être en \'PLAIN\' pour un utilisateur Samba, droit samba annulé pour \''.$userDesc->{'userobm_login'}.'\'', 2 );
+                $self->_log( 'le mot de passe doit être en \'PLAIN\' pour un utilisateur Samba, droit samba annulé pour \''.$userDesc->{'userobm_login'}.'\'', 1 );
                 $userDesc->{'userobm_samba_perms'} = 0;
                 last SWITCH;
             }
 
             my $error = $self->_getNTLMPasswd( $userDesc->{'userobm_password'}, \$userDesc->{'userobm_samba_lm_password'}, \$userDesc->{'userobm_samba_nt_password'} );
             if( $error ) {
-                $self->_log( 'probleme lors de la generation du mot de passe windows de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\', droit samba annulé', 2 );
+                $self->_log( 'probleme lors de la generation du mot de passe windows de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\', droit samba annulé', 1 );
                 $userDesc->{'userobm_samba_perms'} = 0;
                 last SWITCH;
             }else {
@@ -396,7 +398,7 @@ sub _init {
                 $userDesc->{'userobm_samba_home_drive'} =~ s/\s//g;
                 if( $userDesc->{'userobm_samba_home_drive'} !~ /^[D-Z]$/ ) {
                     delete( $userDesc->{'userobm_samba_home_drive'} );
-                    $self->_log( 'lettre du lecteur windows personnel incorrecte pour l\'utilisateur '.$userDesc->{'userobm_login'} );
+                    $self->_log( 'lettre du lecteur windows personnel incorrecte pour l\'utilisateur '.$userDesc->{'userobm_login'}, 1 );
                 }
             }
 
@@ -423,7 +425,7 @@ sub _init {
 
     $self->{'entityDesc'} = $userDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 3 );
 
     return 0;
 }
@@ -436,7 +438,7 @@ sub setLinks {
     my( $links ) = @_;
 
     if( !defined($links) || ref($links) ne 'HASH' ) {
-        $self->_log( 'pas de liens définis', 3 );
+        $self->_log( 'pas de liens définis', 1 );
         return 0;
     }
 
@@ -491,7 +493,7 @@ sub setParent {
     my( $parent ) = @_;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine parent incorrecte', 3 );
+        $self->_log( 'description du domaine parent incorrecte', 1 );
         return 1;
     }
 
@@ -520,12 +522,12 @@ sub createLdapEntry {
     my ( $entryDn, $entry ) = @_;
 
     if( !$entryDn ) {
-        $self->_log( 'DN non défini', 3 );
+        $self->_log( 'DN non défini', 1 );
         return 1;
     }
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 3 );
+        $self->_log( 'entrée LDAP incorrecte', 1 );
         return 1;
     }
 
@@ -726,13 +728,13 @@ sub getSieveVacation {
 
     # If vacation isn't enable, then no vacation message
     if( !$self->{'entityDesc'}->{'userobm_vacation_enable'} ) {
-        $self->_log( $self->getDescription().' : message d\'absence désactivé', 4 );
+        $self->_log( $self->getDescription().' : message d\'absence désactivé', 3 );
         return undef;
     }
 
     # If no vacation message, then no vacation message...
     if( !$self->{'entityDesc'}->{'userobm_vacation_message'} ) {
-        $self->_log( $self->getDescription().' : message d\'absence vide !', 4 );
+        $self->_log( $self->getDescription().' : message d\'absence vide !', 2 );
         return undef;
     }
 
@@ -741,7 +743,7 @@ sub getSieveVacation {
 
     # If no mail addess, then no vacation message
     if( ($#{$boxEmails} < 0) && ($#{$boxEmailsAlias} < 0) ) {
-        $self->_log( $self->getDescription().' : pas d\'adresses mails défini', 4 );
+        $self->_log( $self->getDescription().' : pas d\'adresses mails défini, message d\'absence désactivé', 2 );
         return undef;
     }
 
@@ -785,19 +787,19 @@ sub getSieveNomade {
 
     # If nomade not available, then no redirection
     if( !$self->{'entityDesc'}->{'userobm_nomade_perms'} ) {
-        $self->_log( $self->getDescription().' : redirection de messagerie non autorisée', 4 );
+        $self->_log( $self->getDescription().' : redirection de messagerie non autorisée', 3 );
         return undef;
     }
 
     # If nomade not enable, then no redirection
     if( !$self->{'entityDesc'}->{'userobm_nomade_enable'} ) {
-        $self->_log( $self->getDescription().' : redirection de messagerie non activée', 4 );
+        $self->_log( $self->getDescription().' : redirection de messagerie non activée', 3 );
         return undef;
     }
 
     # If redirection email is non define, then no redirection
     if( !$self->{'entityDesc'}->{'userobm_email_nomade'} ) {
-        $self->_log( $self->getDescription().' : adresse mail de redirection non définie', 4 );
+        $self->_log( $self->getDescription().' : adresse mail de redirection non définie', 2 );
         return undef;
     }
 
@@ -820,12 +822,12 @@ sub setLdapUnixPasswd {
     my $update = 0;
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 3 );
+        $self->_log( 'entrée LDAP incorrecte', 1 );
         return undef;
     }
 
     if( !$OBM::Parameters::common::obmModules->{'ldap'} ) {
-        $self->_log( 'module Ldap désactivé', 0 );
+        $self->_log( 'module Ldap désactivé', 2 );
         return 0;
     }
 
@@ -833,7 +835,7 @@ sub setLdapUnixPasswd {
         $self->{'entityDesc'}->{'userobm_password'} = $plainPasswd;
         $self->{'entityDesc'}->{'userobm_password_crypt'} = $self->_convertPasswd( 'PLAIN', $self->{'entityDesc'}->{'userobm_password'} );
         if( !$self->{'entityDesc'}->{'userobm_password_crypt'} ) {
-            $self->_log( 'echec de conversion du mot de passe Unix', 3 );
+            $self->_log( 'echec de conversion du mot de passe Unix', 1 );
             return undef;
         }
     }
@@ -857,17 +859,17 @@ sub setLdapSambaPasswd {
     my $update = 0;
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 3 );
+        $self->_log( 'entrée LDAP incorrecte', 1 );
         return undef;
     }
 
     if( !$OBM::Parameters::common::obmModules->{'samba'} ) {
-        $self->_log( 'module Samba désactivé', 0 );
+        $self->_log( 'module Samba désactivé', 2 );
         return 0;
     }
 
     if( !$self->{'entityDesc'}->{'userobm_samba_perms'} ) {
-        $self->_log( $self->getDescription().' n\'a pas le droit samba', 2 );
+        $self->_log( $self->getDescription().' n\'a pas le droit samba', 3 );
         return 0;
     }
 
@@ -875,7 +877,7 @@ sub setLdapSambaPasswd {
     my $ntPasswd;
     if( defined($plainPasswd) ) {
         if( $self->_getNTLMPasswd( $plainPasswd, \$lmPasswd, \$ntPasswd ) ) {
-            $self->_log( 'probleme lors de la generation du mot de passe windows de \''.$self->getDescription().'\', droit samba annulé', 2 );
+            $self->_log( 'probleme lors de la generation du mot de passe windows de \''.$self->getDescription().'\', droit samba annulé', 1 );
             return undef;
         }
     }else {

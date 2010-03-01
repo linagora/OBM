@@ -3,15 +3,14 @@ package OBM::EntitiesFactory::programmableFactories;
 $VERSION = '1.0';
 
 use OBM::EntitiesFactory::factory;
-@ISA = ('OBM::EntitiesFactory::factory');
+use OBM::Log::log;
+@ISA = ('OBM::EntitiesFactory::factory', 'OBM::Log::log');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -21,7 +20,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( !defined($entitiesFactory) || (ref($entitiesFactory) !~ /^OBM::entitiesFactory$/) ) {
-        $self->_log( 'la factory doit être de type \'OBM::entitiesFactory\'', 3 );
+        $self->_log( 'la factory doit être de type \'OBM::entitiesFactory\'', 1 );
         return undef;
     }
 
@@ -34,7 +33,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -43,7 +42,7 @@ sub addEntities {
     my( $programmingObj ) = @_;
 
     if( ref($programmingObj) ne 'OBM::EntitiesFactory::factoryProgramming' ) {
-        $self->_log( 'liste d\'entités à charger incorrecte', 3 );
+        $self->_log( 'liste d\'entités à charger incorrecte', 1 );
         return 1;
     }
 
@@ -56,7 +55,7 @@ sub addEntities {
 
     SWITCH: {
         if( !defined($programmingObj->getEntitiesType()) ) {
-            $self->_log( 'type d\'entité à programmer incorrect', 4 );
+            $self->_log( 'type d\'entité à programmer incorrect', 1 );
             return 1;
         }
 
@@ -85,7 +84,7 @@ sub addEntities {
             last SWITCH;
         }
 
-        $self->_log( 'type d\'entité non supporté', 0 );
+        $self->_log( 'type d\'entité non supporté', 1 );
     }
 
     return 0;
@@ -102,7 +101,7 @@ sub _initHostFactory {
 
         require OBM::EntitiesFactory::hostFactory;
         if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des hôtes', 3 );
+            $self->_log( 'problème au chargement de la factory des hôtes', 1 );
             return 1;
         }
 
@@ -127,7 +126,7 @@ sub _initGroupFactory {
 
         require OBM::EntitiesFactory::groupFactory;
         if( !($entityFactory = OBM::EntitiesFactory::groupFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des groupes', 3 );
+            $self->_log( 'problème au chargement de la factory des groupes', 1 );
             return 1;
         }
 
@@ -152,7 +151,7 @@ sub _initMailshareFactory {
 
         require OBM::EntitiesFactory::mailshareFactory;
         if( !($entityFactory = OBM::EntitiesFactory::mailshareFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des partages de messagerie', 3 );
+            $self->_log( 'problème au chargement de la factory des partages de messagerie', 1 );
             return 1;
         }
 
@@ -177,7 +176,7 @@ sub _initUserFactory {
 
         require OBM::EntitiesFactory::userFactory;
         if( !($entityFactory = OBM::EntitiesFactory::userFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des utilisateurs', 3 );
+            $self->_log( 'problème au chargement de la factory des utilisateurs', 1 );
             return 1;
         }
 
@@ -202,7 +201,7 @@ sub _initContactFactory {
 
         require OBM::EntitiesFactory::contactFactory;
         if( !($entityFactory = OBM::EntitiesFactory::contactFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des contacts', 3 );
+            $self->_log( 'problème au chargement de la factory des contacts', 1 );
             return 1;
         }
 

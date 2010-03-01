@@ -3,16 +3,14 @@ package OBM::Update::updateBdQuotaUse;
 $VERSION = '1.0';
 
 use OBM::Entities::systemEntityIdGetter;
-@ISA = ('OBM::Entities::systemEntityIdGetter');
+use OBM::Log::log;
+@ISA = ('OBM::Entities::systemEntityIdGetter', 'OBM::Log::log');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -57,12 +55,12 @@ sub _getEntities {
         require OBM::EntitiesFactory::factoryProgramming;
         my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
         if( !defined($programmingObj) ) {
-            $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+            $self->_log( 'probleme lors de la programmation de la factory d\'entités', 1 );
             $errorCode = 1;
             next;
         }
         if( $programmingObj->setEntitiesType( 'USER' ) || $programmingObj->setUpdateType( 'SYSTEM_ENTITY' ) || $programmingObj->setEntitiesIds( $userIdList ) ) {
-            $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+            $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 1 );
             $errorCode = 1;
             next;
         }
@@ -70,12 +68,12 @@ sub _getEntities {
         require OBM::entitiesFactory;
         my $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLEWITHOUTDOMAIN', $domainId );
         if( !defined($entitiesFactory) ) {
-            $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+            $self->_log( 'probleme lors de la programmation de la factory d\'entités', 1 );
             $errorCode = 1;
             next;
         }
         if( $entitiesFactory->loadEntities($programmingObj) ) {
-            $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+            $self->_log( 'probleme lors de la programmation de la factory d\'entités', 1 );
             $errorCode = 1;
             next;
         }
@@ -96,7 +94,7 @@ sub update {
     }
 
     require OBM::Cyrus::cyrusUpdateQuotaUsedEngine;
-    $self->_log( 'initialisation du moteur Cyrus de mise à jour du quota utilisé', 2 );
+    $self->_log( 'initialisation du moteur Cyrus de mise à jour du quota utilisé', 3 );
     my $cyrusUpdateQuotaUsedEngine = OBM::Cyrus::cyrusUpdateQuotaUsedEngine->new();
     if( !ref($cyrusUpdateQuotaUsedEngine) ) {
         $self->_log( 'problème à l\'initialisation du moteur Cyrus de mise à jour du quota utilisé', 0 );
@@ -104,7 +102,7 @@ sub update {
     }
 
     require OBM::DbUpdater::sqlQuotaUsedUpdater;
-    $self->_log( 'initialisation du moteur de mise à jour BD du quota utilisé', 2 );
+    $self->_log( 'initialisation du moteur de mise à jour BD du quota utilisé', 3 );
     my $sqlQuotaUsedUpdater;
     if( !($sqlQuotaUsedUpdater = OBM::DbUpdater::sqlQuotaUsedUpdater->new()) ) {
         $self->_log( 'problème à l\'initialisation du moteur de mise à jour BD du quota utilisé', 0 );
@@ -114,7 +112,7 @@ sub update {
     my $errorCode = 0;
     while( my $entityFactory = pop(@{$self->{'entitiesFactory'}}) ) {
         while( my $entity = $entityFactory->next() ) {
-            $self->_log( 'obtention du quota utilisé de '.$entity->getDescription(), 1 );
+            $self->_log( 'obtention du quota utilisé de '.$entity->getDescription(), 3 );
 
             if( $cyrusUpdateQuotaUsedEngine->update( $entity ) ) {
                 $self->_log( 'problème lors de l\'obtention du quota Cyrus utilisé de '.$entity->getDescription(), 0 );
@@ -122,7 +120,7 @@ sub update {
                 next;
             }
 
-            $self->_log( 'mise à jour en BD du quota utilisé de '.$entity->getDescription(), 1 );
+            $self->_log( 'mise à jour en BD du quota utilisé de '.$entity->getDescription(), 3 );
 
             if( $sqlQuotaUsedUpdater->update( $entity ) ) {
                 $self->_log( 'problème lors de la mise à jour en BD du quota utilisé de '.$entity->getDescription(), 0 );

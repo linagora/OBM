@@ -19,9 +19,11 @@
 
 package updateCyrusAcl;
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 use strict;
 use OBM::Parameters::regexp;
-use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
@@ -30,11 +32,11 @@ my %parameters;
 my $return = GetOptions( \%parameters, 'type=s', 'name=s', 'domain-id=s', 'help' );
 
 if( !$return ) {
-    updateCyrusAcl->_displayHelp();
-    exit 1;
+    %parameters = undef;
 }
 
-exit updateCyrusAcl->run(\%parameters);
+my $updateCyrusAcl = updateCyrusAcl->new();
+exit $updateCyrusAcl->run(\%parameters);
 
 $| = 1;
 
@@ -42,6 +44,8 @@ $| = 1;
 sub run {
     my $self = shift;
     my( $parameters ) = @_;
+
+    $self->_configureLog();
 
     if( !defined($parameters) ) {
         $parameters->{'help'} = 1;

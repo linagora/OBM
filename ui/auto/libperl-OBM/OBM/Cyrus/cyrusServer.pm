@@ -3,7 +3,8 @@ package OBM::Cyrus::cyrusServer;
 $VERSION = '1.0';
 
 use OBM::Tools::obmServer;
-@ISA = ('OBM::Tools::obmServer');
+use OBM::Log::log;
+@ISA = ('OBM::Tools::obmServer', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -28,7 +29,7 @@ sub new {
     $self->{'serverType'} = 'Cyrus IMAP';
 
     if( $self->_getServerDesc() ) {
-        $self->_log( 'problème lors de l\'initialisation du serveur '.$self->{'serverType'}, 1 );
+        $self->_log( 'problème lors de l\'initialisation du serveur '.$self->{'serverType'}, 0 );
         return undef;
     }
 
@@ -39,7 +40,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     eval{ $self->{'ServerConn'} = undef; };
 }
@@ -49,12 +50,12 @@ sub _getServerDesc {
     my $self = shift;
 
     if( !defined($self->{'serverId'}) ) {
-        $self->_log( 'identifiant de serveur non défini', 3 );
+        $self->_log( 'identifiant de serveur non défini', 0 );
         return 1;
     }
 
     if( ref($self->{'serverId'}) || ($self->{'serverId'} !~ /$OBM::Parameters::regexp::regexp_server_id/) ) {
-        $self->_log( 'identifiant de serveur incorrect', 3 );
+        $self->_log( 'identifiant de serveur incorrect', 0 );
         return 1;
     }
 
@@ -62,7 +63,7 @@ sub _getServerDesc {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
-    $self->_log( 'obtention du mot de passe de l\'utilisateur IMAP', 1 );
+    $self->_log( 'obtention du mot de passe de l\'utilisateur IMAP', 4 );
     my $query = 'SELECT     host.*,
                             usersystem.usersystem_login AS cyrus_login,
                             usersystem.usersystem_password AS cyrus_password,
@@ -75,7 +76,7 @@ sub _getServerDesc {
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'obtention du serveur IMAP impossible', 1 );
+        $self->_log( 'obtention du serveur IMAP impossible', 0 );
         return 1;
     }
 
@@ -113,7 +114,7 @@ sub _getServerDesc {
         push( @{$self->{'domainsId'}}, $srvDesc->{'mailserver_for_domain_id'} );
     }
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 4 );
     $self->_log( 'administrateur du serveur IMAP \''.$self->{'serverDesc'}->{'cyrus_login'}.'\', \''.$self->{'serverDesc'}->{'cyrus_password'}.'\'', 4 );
 
     return 0;
@@ -130,7 +131,7 @@ sub getConn {
         return undef;
     }
 
-    $self->_log( 'Obtention de la connexion IMAP à '.$self->getDescription(), 3 );
+    $self->_log( 'Obtention de la connexion IMAP à '.$self->getDescription(), 4 );
     return $self->{'ServerConn'};
 }
 
@@ -139,20 +140,20 @@ sub _connect {
     my $self = shift;
 
     if( $self->getDeadStatus() ) {
-        $self->_log( $self->getDescription().' est désactivé', 0 );
+        $self->_log( $self->getDescription().' est désactivé', 2 );
         return 1;
     }
 
     if( $self->_ping() ) {
-        $self->_log( 'connexion déjà établie au '.$self->getDescription(), 4 );
+        $self->_log( 'connexion déjà établie au '.$self->getDescription(), 5 );
         return 0;
     }
 
-    $self->_log( 'connexion au '.$self->getDescription(), 2 );
+    $self->_log( 'connexion au '.$self->getDescription(), 3 );
 
     eval {
         local $SIG{ALRM} = sub {
-            $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 1 );
+            $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 2 );
             delete($self->{'ServerConn'});
             die 'alarm'."\n";
         };
@@ -164,19 +165,19 @@ sub _connect {
 
     my @tempo = ( 1, 3, 5, 10, 20 );
     while( !$self->{'ServerConn'} ) {
-        $self->_log( 'échec de connexion au '.$self->getDescription(), 1 ) if (defined($@) && ($@ ne 'alarm'."\n"));
+        $self->_log( 'échec de connexion au '.$self->getDescription(), 2 ) if (defined($@) && ($@ ne 'alarm'."\n"));
 
         my $tempo = shift(@tempo);
         if( !defined($tempo) ) {
             last;
         }
 
-        $self->_log( 'prochaine tentative dans '.$tempo.'s', 1 );
+        $self->_log( 'prochaine tentative dans '.$tempo.'s', 3 );
         sleep $tempo;
 
         eval {
             local $SIG{ALRM} = sub {
-                $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 1 );
+                $self->_log( 'échec de connexion au '.$self->getDescription().' - le serveur n\'a pas répondu', 2 );
                 delete($self->{'ServerConn'});
                 die 'alarm'."\n";
             };
@@ -194,14 +195,14 @@ sub _connect {
         return 1;
     }
 
-    $self->_log( 'authentification en tant que \''.$self->{'serverDesc'}->{'cyrus_login'}.'\' au '.$self->getDescription(), 2 );
+    $self->_log( 'authentification en tant que \''.$self->{'serverDesc'}->{'cyrus_login'}.'\' au '.$self->getDescription(), 3 );
 
     if( !$self->{'ServerConn'}->authenticate( -user=>$self->{'serverDesc'}->{'cyrus_login'}, -password=>$self->{'serverDesc'}->{'cyrus_password'}, -mechanism=>'login') ) {
         $self->_log( 'échec d\'authentification au '.$self->getDescription(), 0 );
         return 1;
     }
 
-    $self->_log( 'connexion au '.$self->getDescription().' établie', 2 );
+    $self->_log( 'connexion au '.$self->getDescription().' établie', 3 );
 
     return 0;
 }
@@ -228,10 +229,10 @@ sub _checkDomainId {
     my( $domainId ) = @_;
 
     if( !defined($domainId) ) {
-        $self->_log( 'ID du domaine non défini', 3 );
+        $self->_log( 'ID du domaine non défini', 1 );
         return 1;
     }elsif( $domainId !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$domainId.'\' incorrect', 4 );
+        $self->_log( 'ID \''.$domainId.'\' incorrect', 1 );
         return 1;
     }elsif( $self->_isDisable($domainId) ) {
         return 1;
@@ -272,7 +273,7 @@ sub updateCyrusPartitions {
     my( $domainId ) = @_;
 
     if( $self->getDeadStatus() ) {
-        $self->_log( $self->getDescription().' est désactivé', 0 );
+        $self->_log( $self->getDescription().' est désactivé', 1 );
         return 1;
     }
 
@@ -302,10 +303,10 @@ sub _setDisable {
     my( $domainId ) = @_;
 
     if( !defined($domainId) ) {
-        $self->_log( 'ID du domaine non défini', 3 );
+        $self->_log( 'ID du domaine non défini', 1 );
         return 0;
     }elsif( $domainId !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$domainId.'\' incorrect', 4 );
+        $self->_log( 'ID \''.$domainId.'\' incorrect', 1 );
         return 0;
     }
 
@@ -320,10 +321,10 @@ sub _isDisable {
     my( $domainId ) = @_;
 
     if( !defined($domainId) ) {
-        $self->_log( 'ID du domaine non défini', 3 );
+        $self->_log( 'ID du domaine non défini', 1 );
         return 0;
     }elsif( $domainId !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$domainId.'\' incorrect', 4 );
+        $self->_log( 'ID \''.$domainId.'\' incorrect', 1 );
         return 0;
     }
 
@@ -351,14 +352,14 @@ sub getSieveServerConn {
     }
 
     if( !defined($login) ) {
-        $self->_log( 'pas d\'identifiant de connexion indiqué', 3 );
+        $self->_log( 'pas d\'identifiant de connexion indiqué', 1 );
         return undef;
     }
 
     # Replace '@' char by '%' for authentication domain separator
     $login =~ s/@/%/;
 
-    $self->_log( 'connexion au '.$self->getDescription().' en tant que \''.$self->{'serverDesc'}->{'cyrus_login'}.'\' pour le compte de \''.$login.'\'', 2 );
+    $self->_log( 'connexion au '.$self->getDescription().' en tant que \''.$self->{'serverDesc'}->{'cyrus_login'}.'\' pour le compte de \''.$login.'\'', 3 );
 
     use Cyrus::SIEVE::managesieve;
     my $sieveSrvConn = sieve_get_handle( $self->{'serverDesc'}->{'host_ip'}, sub{return $login}, sub{return $self->{'serverDesc'}->{'cyrus_login'}}, sub{return $self->{'serverDesc'}->{'cyrus_password'}}, sub{return undef} );
@@ -368,7 +369,7 @@ sub getSieveServerConn {
         return undef;
     }
 
-    $self->_log( 'Obtention de la connexion Sieve à '.$self->getDescription(), 2 );
+    $self->_log( 'Obtention de la connexion Sieve à '.$self->getDescription(), 3 );
     return $sieveSrvConn;
 }
 
@@ -381,15 +382,14 @@ package OBM::Cyrus::cyrusAdmin;
 use strict;
 
 use Cyrus::IMAP::Admin;
-our @ISA = qw(Cyrus::IMAP::Admin);
-
-use OBM::Tools::commonMethods qw(_log dump);
+use OBM::Log::log;
+our @ISA = ('Cyrus::IMAP::Admin', 'OBM::Log::log');
 
 
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 

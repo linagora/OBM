@@ -3,15 +3,14 @@ package OBM::EntitiesFactory::factoryProgramming;
 $VERSION = '1.0';
 
 use OBM::EntitiesFactory::factory;
-@ISA = ('OBM::EntitiesFactory::factory');
+use OBM::Log::log;
+@ISA = ('OBM::EntitiesFactory::factory', 'OBM::Log::log');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -26,7 +25,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -50,31 +49,31 @@ sub setEntitiesType {
 
     SWITCH: {
         if( $type eq 'USER' ) {
-            $self->_log( 'initialisation d\'un programmateur d\'entité de type utilisateur', 3 );
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type utilisateur', 4 );
             $self->{'entityType'} = $type;
             last SWITCH;
         }
 
         if( $type eq 'MAILSHARE' ) {
-            $self->_log( 'initialisation d\'un programmateur d\'entité de type partage messagerie', 3 );
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type partage messagerie', 4 );
             $self->{'entityType'} = $type;
             last SWITCH;
         }
 
         if( $type eq 'CONTACT' ) {
-            $self->_log( 'initialisation d\'un programmateur d\'entité de type contacts', 3 );
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type contacts', 4 );
             $self->{'entityType'} = $type;
             last SWITCH;
         }
 
         if( $type eq 'GROUP' ) {
-            $self->_log( 'initialisation d\'un programmateur d\'entité de type groupe', 3 );
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type groupe', 4 );
             $self->{'entityType'} = $type;
             last SWITCH;
         }
 
         if( $type eq 'HOST' ) {
-            $self->_log( 'initialisation d\'un programmateur d\'entité de type hôte', 3 );
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type hôte', 4 );
             $self->{'entityType'} = $type;
             last SWITCH;
         }
@@ -121,7 +120,7 @@ sub setEntitiesIds {
     my( $entitiesId ) = @_;
 
     if( ref($entitiesId) ne 'ARRAY' ) {
-        $self->_log( 'listes d\'identifiant incorrecte', 4 );
+        $self->_log( 'listes d\'identifiant incorrecte', 1 );
         return 1;
     }
 

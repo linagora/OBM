@@ -19,8 +19,10 @@
 
 package update;
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 use strict;
-use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
@@ -29,12 +31,23 @@ my %parameters;
 my $return = GetOptions( \%parameters, 'user=s', 'domain=s', 'domain-id=s', 'domain-global', 'domain-name=s', 'delegation=s', 'global', 'incremental', 'entity', 'delete', 'help' );
 
 if( !$return ) {
-    undef %parameters;
+    %parameters = undef;
 }
 
-exit update->run(\%parameters);
+my $update = update->new();
+exit $update->run(\%parameters);
 
 $|=1;
+
+
+sub new {
+    my $class = shift;
+    my $self = bless { }, $class;
+
+    $self->_configureLog();
+
+    return $self;
+}
 
 
 sub run {

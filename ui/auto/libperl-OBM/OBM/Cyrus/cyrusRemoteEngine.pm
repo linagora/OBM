@@ -2,19 +2,15 @@ package OBM::Cyrus::cyrusRemoteEngine;
 
 $VERSION = '1.0';
 
+use Class::Singleton;
+use OBM::Log::log;
+@ISA = ('Class::Singleton', 'OBM::Log::log' );
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use base qw( Class::Singleton );
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
-require Sys::Syslog;
-use Net::Telnet;
 
 
 sub _new_instance {

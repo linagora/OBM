@@ -3,7 +3,8 @@ package OBM::EntitiesFactory::domainFactory;
 $VERSION = '1.0';
 
 use OBM::EntitiesFactory::factory;
-@ISA = ('OBM::EntitiesFactory::factory');
+use OBM::Log::log;
+@ISA = ('OBM::EntitiesFactory::factory', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -11,10 +12,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
 use OBM::Parameters::regexp;
 
 
@@ -30,12 +27,12 @@ sub new {
     }
 
     if( !defined($domainId) ) {
-        $self->_log( 'identifiant de domaine non défini', 3 );
+        $self->_log( 'identifiant de domaine non défini', 1 );
         return undef;
     }
     
     if( ref($domainId) || ($domainId !~ /$regexp_id/) ) {
-        $self->_log( 'identifiant de domaine \''.$self->{'domainId'}.'\' incorrect', 3 );
+        $self->_log( 'identifiant de domaine \''.$self->{'domainId'}.'\' incorrect', 1 );
         return undef;
     }
 
@@ -52,22 +49,22 @@ sub new {
 sub _start {
     my $self = shift;
 
-    $self->_log( 'debut de traitement', 2 );
+    $self->_log( 'debut de traitement', 3 );
 
     my $domain;
     if( !($domain = $self->_getDomain()) ) {
-        $self->_log( 'problème à l\'obtention du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
+        $self->_log( 'problème à l\'obtention du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 1 );
         return 0;
     }
 
     if( !$domain->isGlobal && !$self->_getParentDomain( $domain ) ) {
-        $self->_log( 'problème à l\'obtention des domaines pères du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
+        $self->_log( 'problème à l\'obtention des domaines pères du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 1 );
         return 0;
     }
 
     if( !$domain->isGlobal && !$domain->getParent() ) {
-        $self->_log( 'problème lors du chargement du domaine père de '.$domain->getDescription(), 0 );
-        $self->_log( 'le domaine père (global) doit être créé dans le système avant de pouvoir créer '.$domain->getDescription(), 1 );
+        $self->_log( 'problème lors du chargement du domaine père de '.$domain->getDescription(), 1 );
+        $self->_log( 'le domaine père (global) doit être créé dans le système avant de pouvoir créer '.$domain->getDescription(), 2 );
         return 0;
     }
 
@@ -80,7 +77,7 @@ sub _start {
 sub next {
     my $self = shift;
 
-    $self->_log( 'obtention de l\'entité suivante', 2 );
+    $self->_log( 'obtention de l\'entité suivante', 3 );
 
     if( !$self->isRunning() ) {
         if( !$self->_start() ) {
@@ -98,13 +95,13 @@ sub next {
 sub _getDomain {
     my $self = shift;
 
-    $self->_log( 'obtention du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 2 );
+    $self->_log( 'obtention du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
     if( !$dbHandler ) {
-        $self->_log( 'connexion à la base de données impossible', 4 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return undef;
     }
 
@@ -134,7 +131,7 @@ sub _getDomain {
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $queryDomain, \$sth ) ) ) {
-        $self->_log( 'chargement des domaines depuis la BD impossible', 3 );
+        $self->_log( 'chargement des domaines depuis la BD impossible', 1 );
         return undef;
     }
 
@@ -152,10 +149,10 @@ sub _getDomain {
     }
 
     if( $#{$self->{'domains'}} > 0 ) {
-        $self->_log( 'obtention de plusieurs domaines d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
+        $self->_log( 'obtention de plusieurs domaines d\'identifiant \''.$self->{'domainId'}.'\'', 1 );
         return undef;
     }elsif( $#{$self->{'domains'}} < 0 ) {
-        $self->_log( 'domaine d\'identifiant \''.$self->{'domainId'}.'\' non trouvé', 2 );
+        $self->_log( 'domaine d\'identifiant \''.$self->{'domainId'}.'\' non trouvé', 1 );
         return undef;
     }
 
@@ -167,13 +164,13 @@ sub _getParentDomain {
     my $self = shift;
     my( $childDomain ) = @_;
 
-    $self->_log( 'obtention du domain global', 2 );
+    $self->_log( 'obtention du domain global', 3 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
     if( !$dbHandler ) {
-        $self->_log( 'connexion à la base de données impossible', 4 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 0;
     }
 
@@ -195,7 +192,7 @@ sub _getParentDomain {
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $queryDomain, \$sth ) ) ) {
-        $self->_log( 'chargement des domaines depuis la BD impossible', 3 );
+        $self->_log( 'chargement des domaines depuis la BD impossible', 1 );
         return 0;
     }
 
@@ -204,7 +201,7 @@ sub _getParentDomain {
         my $current = OBM::Entities::obmDomain->new( $domaindesc );
 
         if( $childDomain->setParent($current) ) {
-            $self->_log( 'père de '.$current->getDescription().' incorrect', 4 );
+            $self->_log( 'père de '.$current->getDescription().' incorrect', 1 );
             return 0;
         }
 

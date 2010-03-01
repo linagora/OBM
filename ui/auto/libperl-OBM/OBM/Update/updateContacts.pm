@@ -3,7 +3,8 @@ package OBM::Update::updateContacts;
 $VERSION = '1.0';
 
 use OBM::Entities::entityIdGetter;
-@ISA = ('OBM::Entities::entityIdGetter');
+use OBM::Log::log;
+@ISA = ('OBM::Entities::entityIdGetter', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -11,7 +12,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::regexp;
 
 
@@ -24,12 +24,12 @@ sub new {
 
     require OBM::Parameters::common;
     if( !$OBM::Parameters::common::obmModules->{'contact'} ) {
-        $self->_log( 'module OBM-Contact désactivé, mise à jour annulée', 2 );
+        $self->_log( 'module OBM-Contact désactivé, mise à jour annulée', 1 );
         return undef;
     }
 
     if( !defined($parameters) ) {
-        $self->_log( 'paramètres d\'initialisation non définis', 0 );
+        $self->_log( 'paramètres d\'initialisation non définis', 1 );
         return undef;
     }
 
@@ -48,7 +48,7 @@ sub new {
 
     require OBM::Ldap::ldapServers;
     if( !($self->{'ldapservers'} = OBM::Ldap::ldapServers->instance()) ) {
-        $self->_log( 'initialisation du gestionnaire de serveur LDAP impossible', 3 );
+        $self->_log( 'initialisation du gestionnaire de serveur LDAP impossible', 1 );
         return undef;
     }
 
@@ -59,7 +59,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'entitiesFactories'} = undef;
 }
@@ -74,12 +74,12 @@ sub update {
     }
 
     if( $self->_initEngines() ) {
-        $self->_log( 'problème a l\'initialisation des moteurs de mises à jour', 3 );
+        $self->_log( 'problème a l\'initialisation des moteurs de mises à jour', 1 );
         return 1;
     }
 
     if( $self->_initFactories( $domainIdList ) ) {
-        $self->_log( 'problème a l\'initialisation des factories d\'entités', 3 );
+        $self->_log( 'problème a l\'initialisation des factories d\'entités', 1 );
         return 1;
     }
 
@@ -106,13 +106,13 @@ sub _initEngines {
     my $self = shift;
 
     require OBM::Ldap::ldapEngine;
-    $self->_log( 'initialisation du moteur LDAP', 2 );
+    $self->_log( 'initialisation du moteur LDAP', 3 );
     $self->{'engines'}->{'ldapEngine'} = OBM::Ldap::ldapEngine->new();
     if( !defined($self->{'engines'}->{'ldapEngine'}) ) {
         $self->_log( 'erreur à l\'initialisation du moteur LDAP', 1 );
         return 1;
     }elsif( !ref($self->{'ldapEngine'}) ) {
-        $self->_log( 'moteur LDAP non démarré', 3 );
+        $self->_log( 'moteur LDAP non démarré', 4 );
         $self->{'ldapEngine'} = undef;
     }
 
@@ -125,24 +125,24 @@ sub _programEntitiesFactory {
     my( $factoryProgramming, $domainId ) = @_;
 
     if( ref($factoryProgramming) ne 'OBM::EntitiesFactory::factoryProgramming' ) {
-        $self->_log( 'programmeur de factory incorrect', 3 );
+        $self->_log( 'programmeur de factory incorrect', 1 );
         return 1;
     }
 
     if( defined($domainId) && $domainId !~ /$regexp_id/ ) {
-        $self->_log( 'Id de domain incorrect', 3 );
+        $self->_log( 'Id de domain incorrect', 1 );
         return 1;
     }
 
     if( defined($domainId) ) {
         my $entitiesFactory = $self->{'entitiesFactories'}->{$domainId};
         if( !defined($entitiesFactory) ) {
-            $self->_log( 'factory du domaine d\'ID '.$domainId.' incorrecte', 3 );
+            $self->_log( 'factory du domaine d\'ID '.$domainId.' incorrecte', 1 );
             return 1;
         }
 
         if( $entitiesFactory->loadEntities($factoryProgramming) ) {
-            $self->_log( 'problème lors de la programmation de la factory du domaine d\'ID '.$domainId, 3 );
+            $self->_log( 'problème lors de la programmation de la factory du domaine d\'ID '.$domainId, 1 );
             return 1;
         }
     }else {
@@ -150,7 +150,7 @@ sub _programEntitiesFactory {
 
         for( my $i=0; $i<=$#entitiesFactories; $i++ ) {
             if( $entitiesFactories[$i]->loadEntities($factoryProgramming) ) {
-                $self->_log( 'problème lors de la programmation de la factory du domaine d\'ID '.$domainId, 3 );
+                $self->_log( 'problème lors de la programmation de la factory du domaine d\'ID '.$domainId, 1 );
                 return 1;
             }
         }
@@ -166,11 +166,11 @@ sub _initFactories {
 
     for( my $i=0; $i<=$#{$domainIdList}; $i++ ) {
         require OBM::entitiesFactory;
-        $self->_log( 'initialisation de l\'entity factory pour le domaine '.$domainIdList->[$i], 2 );
+        $self->_log( 'initialisation de l\'entity factory pour le domaine '.$domainIdList->[$i], 3 );
 
         my $entitiesFactory;
         if( !( $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLEWITHOUTDOMAIN', $domainIdList->[$i], undef, undef ) ) ) {
-            $self->_log( 'echec de l\'initialisation de l\'entity factory pour le domaine d\'ID '.$domainIdList->[$i], 0 );
+            $self->_log( 'echec de l\'initialisation de l\'entity factory pour le domaine d\'ID '.$domainIdList->[$i], 1 );
             return 1;
         }
 
@@ -185,15 +185,15 @@ sub _updateUpdatedDomainContacts {
     my $self = shift;
     my( $domainId ) = @_;
 
-    $self->_log( 'Programmation de la suppression des contacts qui ne sont plus publics', 2 );
+    $self->_log( 'Programmation de la suppression des contacts qui ne sont plus publics', 3 );
     if( $self->_deleteDomainContacts( $domainId ) ) {
-        $self->_log( 'Erreur à la programmation de la suppression des contacts qui ne sont plus publics', 0 );
+        $self->_log( 'Erreur à la programmation de la suppression des contacts qui ne sont plus publics', 1 );
         return 1;
     }
 
-    $self->_log( 'Programmation de la mise à jour des contacts publics', 2 );
+    $self->_log( 'Programmation de la mise à jour des contacts publics', 3 );
     if( $self->_updateDomainContacts( $domainId ) ) {
-        $self->_log( 'Erreur à la programmation de la mise à jour des contacts publics', 0 );
+        $self->_log( 'Erreur à la programmation de la mise à jour des contacts publics', 1 );
         return 1;
     }
 
@@ -208,7 +208,7 @@ sub _deleteDeletedContact {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( 'connection à la base de données incorrecte !', 0 );
+        $self->_log( 'connection à la base de données incorrecte !', 1 );
         return 1;
     }
 
@@ -252,7 +252,7 @@ sub _deleteDomainContacts {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( 'connection à la base de données incorrecte !', 0 );
+        $self->_log( 'connection à la base de données incorrecte !', 1 );
         return 1;
     }
 
@@ -283,16 +283,16 @@ sub _deleteDomainContacts {
     require OBM::EntitiesFactory::factoryProgramming;
     my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
     if( !defined($programmingObj) ) {
-        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 1 );
         return 1;
     }
     if( $programmingObj->setEntitiesType( 'CONTACT' ) || $programmingObj->setUpdateType( 'DELETE' ) || $programmingObj->setEntitiesIds( \@contactIds )) {
-        $self->_log( 'problème lors de l\'initialisation du programmateur de f actory', 4 );
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 1 );
         return 1;
     }
 
     if( $self->_programEntitiesFactory( $programmingObj, $domainId ) ) {
-        $self->_log( 'probleme lors de la programmation  des contacts supprimés', 3 );
+        $self->_log( 'probleme lors de la programmation  des contacts supprimés', 1 );
         return 1;
     }
 
@@ -308,7 +308,7 @@ sub _updateDomainContacts {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( 'connection à la base de données incorrecte !', 0 );
+        $self->_log( 'connection à la base de données incorrecte !', 1 );
         return 1;
     }
 
@@ -340,16 +340,16 @@ sub _updateDomainContacts {
     require OBM::EntitiesFactory::factoryProgramming;
     my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
     if( !defined($programmingObj) ) {
-        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 1 );
         return 1;
     }
     if( $programmingObj->setEntitiesType( 'CONTACT' ) || $programmingObj->setUpdateType( 'UPDATE_ENTITY' ) || $programmingObj->setEntitiesIds( \@contactIds )) {
-        $self->_log( 'problème lors de l\'initialisation du programmateur de f actory', 4 );
+        $self->_log( 'problème lors de l\'initialisation du programmateur de f actory', 1 );
         return 1;
     }
 
     if( $self->_programEntitiesFactory( $programmingObj, $domainId ) ) {
-        $self->_log( 'probleme lors de la programmation  des contacts supprimés', 3 );
+        $self->_log( 'probleme lors de la programmation  des contacts supprimés', 1 );
         return 1;
     }
 
@@ -367,7 +367,7 @@ sub _doUpdate {
             next;
         }
 
-        $self->_log( 'traitement des contacts du domaine d\'ID '.$domainId, 2 );
+        $self->_log( 'traitement des contacts du domaine d\'ID '.$domainId, 3 );
 
         while( my $entity = $entitiesFactory->next() ) {
             for( my $i=0; $i<=$#engines; $i++ ) {

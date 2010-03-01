@@ -21,7 +21,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'domaine père incorrect', 3 );
+        $self->_log( 'domaine père incorrect', 1 );
         return undef;
     }
     $self->setParent( $parent );
@@ -43,7 +43,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'parent'} = undef;
 }
@@ -56,28 +56,28 @@ sub _init {
     my( $mailshareDesc ) = @_;
 
     if( !defined($mailshareDesc) || (ref($mailshareDesc) ne 'HASH') ) {
-        $self->_log( 'description du mailshare incorrect', 4 );
+        $self->_log( 'description du mailshare incorrect', 1 );
         return 1;
     }
 
     # L'ID du mailshare
     if( !defined($mailshareDesc->{'mailshare_id'}) ) {
-        $self->_log( 'ID du mailshare non défini', 0 );
+        $self->_log( 'ID du mailshare non défini', 1 );
         return 1;
     }elsif( $mailshareDesc->{'mailshare_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$mailshareDesc->{'mailshare_id'}.'\' incorrect', 0 );
+        $self->_log( 'ID \''.$mailshareDesc->{'mailshare_id'}.'\' incorrect', 1 );
         return 1;
     }
 
     # Le nom du mailshare
     if( !defined($mailshareDesc->{'mailshare_name'}) ) {
-        $self->_log( 'Nom du mailshare non défini', 0 );
+        $self->_log( 'Nom du mailshare non défini', 1 );
         return 1;
     }
     
     $mailshareDesc->{'mailshare_name_new'} = lc($mailshareDesc->{'mailshare_name'});
     if( $mailshareDesc->{'mailshare_name_new'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
-        $self->_log( 'Nom du mailshare \''.$mailshareDesc->{'mailshare_name'}.'\' incorrect', 0 );
+        $self->_log( 'Nom du mailshare \''.$mailshareDesc->{'mailshare_name'}.'\' incorrect', 1 );
         return 1;
     }
 
@@ -85,7 +85,7 @@ sub _init {
     if( defined($mailshareDesc->{'mailshare_name_current'}) ) {
         $mailshareDesc->{'mailshare_name_current'} = lc($mailshareDesc->{'mailshare_name_current'});
         if( !$mailshareDesc->{'mailshare_name_current'} || $mailshareDesc->{'mailshare_name_current'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
-            $self->_log( 'Nom actuel du mailshare \''.$mailshareDesc->{'mailshare_name_current'}.'\' incorrect', 0 );
+            $self->_log( 'Nom actuel du mailshare \''.$mailshareDesc->{'mailshare_name_current'}.'\' incorrect', 1 );
             return 1;
         }
     }else {
@@ -101,7 +101,9 @@ sub _init {
         require OBM::Cyrus::cyrusServers;
         my $cyrusSrvList = OBM::Cyrus::cyrusServers->instance();
         if( !(my $cyrusHostName = $cyrusSrvList->getCyrusServerIp( $mailshareDesc->{'mailshare_mail_server_id'}, $mailshareDesc->{'mailshare_domain_id'} ) ) ) {
-            $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.' annulé, serveur inconnu', 2 );
+            if( $mailshareDesc->{'mailshare_mail_perms'} ) {
+                $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.' annulé, serveur inconnu', 2 );
+            }
             $mailshareDesc->{'mailshare_mail_perms'} = 0;
             $mailshareDesc->{'mailshare_mailperms_access'} = 'REJECT';
             last SWITCH;
@@ -114,7 +116,7 @@ sub _init {
 
         ( $mailshareDesc->{'mailshare_main_email'}, $mailshareDesc->{'mailshare_alias_email'} ) = $self->_makeEntityEmail( $mailshareDesc->{'mailshare_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') );
         if( !defined($mailshareDesc->{'mailshare_main_email'}) ) {
-            $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.'annulé, pas d\'adresses mails valides', 2 );
+            $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.' annulé, pas d\'adresses mails valides', 2 );
             $mailshareDesc->{'mailshare_mail_perms'} = 0;
             delete($mailshareDesc->{'mailshare_main_email'});
             delete($mailshareDesc->{'mailshare_alias_email'});
@@ -160,7 +162,7 @@ sub _init {
 
     $self->{'entityDesc'} = $mailshareDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 3 );
 
     return 0;
 }
@@ -173,7 +175,7 @@ sub setLinks {
     my( $links ) = @_;
 
     if( !defined($links) || ref($links) ne 'HASH' ) {
-        $self->_log( 'pas de liens définis', 3 );
+        $self->_log( 'pas de liens définis', 1 );
         return 0;
     }
 
@@ -241,7 +243,7 @@ sub setParent {
     my( $parent ) = @_;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine parent incorrecte', 3 );
+        $self->_log( 'description du domaine parent incorrecte', 1 );
         return 1;
     }
 
@@ -269,12 +271,12 @@ sub createLdapEntry {
     my ( $entryDn, $entry ) = @_;
 
     if( !$entryDn ) {
-        $self->_log( 'DN non défini', 3 );
+        $self->_log( 'DN non défini', 1 );
         return 1;
     }
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 3 );
+        $self->_log( 'entrée LDAP incorrecte', 1 );
         return 1;
     }
 

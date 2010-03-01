@@ -2,9 +2,9 @@ package OBM::Ldap::ldapMapping;
 
 $VERSION = '1.0';
 
-use OBM::Tools::commonMethods;
 use Class::Singleton;
-@ISA = ('Class::Singleton', 'OBM::Tools::commonMethods');
+use OBM::Log::log;
+@ISA = ('Class::Singleton', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -27,7 +27,7 @@ sub _new_instance {
 
     require XML::Simple;
     my $xmlParser = XML::Simple->new( ForceArray => [ 'entity', 'objectclass', 'map' ] );
-    $self->_log( 'chargement du fichier XML de description de l\'annuaire LDAP \''.$self->{'xmlFile'}.'\'', 2 );
+    $self->_log( 'chargement du fichier XML de description de l\'annuaire LDAP \''.$self->{'xmlFile'}.'\'', 3 );
     $self->{'xml'} = $xmlParser->XMLin( $self->{'xmlFile'} );
 
     if( !defined($self->{'xml'}) ) {
@@ -42,7 +42,7 @@ sub _new_instance {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -52,13 +52,13 @@ sub getObjectClass {
     my $entityType = ref($entity);
 
     if( !defined($self->{'xml'}->{'entity'}->{$entityType}) ) {
-        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 3 );
+        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 1 );
         return undef;
     }
 
     my $objectClassDesc = $self->{'xml'}->{'entity'}->{$entityType}->{'objectclass'};
     if( !defined($objectClassDesc) || (ref($objectClassDesc) ne 'HASH') ) {
-        $self->_log( 'pas d\'objectclass définis pour les entités de type \''.$entityType.'\'', 3 );
+        $self->_log( 'pas d\'objectclass définis pour les entités de type \''.$entityType.'\'', 1 );
         return undef;
     }
 
@@ -114,19 +114,19 @@ sub getRdn {
     my $entityType = ref($entity);
 
     if( !defined($self->{'xml'}->{'entity'}->{$entityType}) ) {
-        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 3 );
+        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 1 );
         return undef;
     }
 
     my $ldapEntityDesc = $self->{'xml'}->{'entity'}->{$entityType};
     if( !defined($ldapEntityDesc->{'rdn'}) ) {
-        $self->_log( 'pas de RDN défini pour l\'entité de type \''.$entityType.'\'', 0 );
+        $self->_log( 'pas de RDN défini pour l\'entité de type \''.$entityType.'\'', 1 );
         return undef;
     }
 
     my $attrsMapping = $ldapEntityDesc->{'map'};
     if( !defined($attrsMapping) || (ref($attrsMapping) ne 'ARRAY') ) {
-        $self->_log( 'mapping des attributs LDAP non définis ou incorrect, vérifiez le fichier XML', 0 );
+        $self->_log( 'mapping des attributs LDAP non définis ou incorrect, vérifiez le fichier XML', 1 );
         return undef;
     }
 
@@ -137,7 +137,7 @@ sub getRdn {
         }
     }
 
-    $self->_log( 'mapping de l\'attribut LDAP \''.$ldapEntityDesc->{'rdn'}->{'ldap'}->{'name'}.'\', constituant le RDN de l\'entité de type \''.$entityType.'\', non défini', 0 );
+    $self->_log( 'mapping de l\'attribut LDAP \''.$ldapEntityDesc->{'rdn'}->{'ldap'}->{'name'}.'\', constituant le RDN de l\'entité de type \''.$entityType.'\', non défini', 1 );
     return undef;
 }
 
@@ -148,13 +148,13 @@ sub getCurrentRdn {
     my $entityType = ref($entity);
 
     if( !defined($self->{'xml'}->{'entity'}->{$entityType}) ) {
-        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 3 );
+        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 1 );
         return undef;
     }
 
     my $ldapEntityDesc = $self->{'xml'}->{'entity'}->{$entityType};
     if( !defined($ldapEntityDesc->{'rdn'}) ) {
-        $self->_log( 'pas de RDN défini pour l\'entité de type \''.$entityType.'\'', 0 );
+        $self->_log( 'pas de RDN défini pour l\'entité de type \''.$entityType.'\'', 1 );
         return undef;
     }
 
@@ -168,7 +168,7 @@ sub getAllAttrsMapping {
     my $entityType = ref($entity);
 
     if( !defined($self->{'xml'}->{'entity'}->{$entityType}) ) {
-        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 3 );
+        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 1 );
         return undef;
     }
 
@@ -207,7 +207,7 @@ sub getAttrsMapping {
     my $entityType = ref($entity);
 
     if( !defined($self->{'xml'}->{'entity'}->{$entityType}) ) {
-        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 3 );
+        $self->_log( 'entité de type \''.$entityType.'\' inconnue', 1 );
         return undef;
     }
 

@@ -2,13 +2,15 @@ package OBM::EntitiesFactory::factory;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(_log dump);
 require OBM::Parameters::regexp;
 
 
@@ -20,7 +22,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->_reset();
 }
@@ -29,7 +31,7 @@ sub DESTROY {
 sub _reset {
     my $self = shift;
 
-    $self->_log( 'factory reset', 3 );
+    $self->_log( 'factory reset', 4 );
 
     $self->{'running'} = undef;
     $self->{'currentEntity'} = undef;
@@ -43,10 +45,10 @@ sub _reset {
 sub _start {
     my $self = shift;
 
-    $self->_log( 'debut de traitement', 2 );
+    $self->_log( 'debut de traitement', 4 );
 
     if( $self->_loadEntities() ) {
-        $self->_log( 'problème lors du chargement des entités par la factory \''.ref($self).'\' du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
+        $self->_log( 'problème lors du chargement des entités par la factory \''.ref($self).'\' du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 1 );
         return 0;
     }
 
@@ -87,17 +89,17 @@ sub _checkSource {
     my $self = shift;
 
     if( !defined($self->{'source'}) ) {
-        $self->_log( 'source de données indéfini', 3 );
+        $self->_log( 'source de données indéfini', 1 );
         return 0;
     }
 
     if( ref($self->{'source'}) ) {
-        $self->_log( 'source de données incorrecte', 3 );
+        $self->_log( 'source de données incorrecte', 1 );
         return 0;
     }
 
     if( $self->{'source'} !~ /^(WORK|SYSTEM)$/ ) {
-        $self->_log( 'source de données \''.$self->{'source'}.'\' incorrecte', 3 );
+        $self->_log( 'source de données \''.$self->{'source'}.'\' incorrecte', 1 );
         return 0;
     }
 
@@ -118,17 +120,17 @@ sub _checkUpdateType {
     my $self = shift;
 
     if( !defined($self->{'updateType'}) ) {
-        $self->_log( 'type de mise à jour indéfini', 3 );
+        $self->_log( 'type de mise à jour indéfini', 1 );
         return 0;
     }
 
     if( ref($self->{'updateType'}) ) {
-        $self->_log( 'type de mise à jour incorrecte', 3 );
+        $self->_log( 'type de mise à jour incorrecte', 1 );
         return 0;
     }
 
     if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY|UPDATE_LINKS|SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS|DELETE)$/ ) {
-        $self->_log( 'type de mise à jour \''.$self->{'updateType'}.'\' incorrecte', 3 );
+        $self->_log( 'type de mise à jour \''.$self->{'updateType'}.'\' incorrecte', 1 );
         return 0;
     }
 
@@ -147,7 +149,7 @@ sub _getEntityRight {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( 'connexion à la base de données impossible', 4 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return undef;
     }
 
@@ -334,7 +336,7 @@ sub _enqueueLinkedEntitiesFactory {
     my( $factoryProgramming ) = @_;
 
     if( ref($factoryProgramming) ne 'OBM::EntitiesFactory::factoryProgramming' ) {
-        $self->_log( 'linked entities factory programmateur incorrect', 4 );
+        $self->_log( 'linked entities factory programmateur incorrect', 1 );
         return 1;
     }
 
@@ -342,13 +344,13 @@ sub _enqueueLinkedEntitiesFactory {
         require OBM::entitiesFactory;
         $self->{'linkedEntitiesFactory'} = OBM::entitiesFactory->new( 'PROGRAMMABLEWITHOUTDOMAIN', $self->{'currentEntity'}->getDomainId() );
         if( !defined($self->{'linkedEntitiesFactory'}) ) {
-            $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+            $self->_log( 'probleme lors de la programmation de la factory d\'entités', 1 );
             return 1;
         }
     }
 
     if( $self->{'linkedEntitiesFactory'}->loadEntities($factoryProgramming) ) {
-        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 1 );
         return 1;
     }
 

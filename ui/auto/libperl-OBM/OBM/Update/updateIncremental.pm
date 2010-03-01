@@ -3,7 +3,8 @@ package OBM::Update::updateIncremental;
 $VERSION = '1.0';
 
 use OBM::Update::update;
-@ISA = ('OBM::Update::update');
+use OBM::Log::log;
+@ISA = ('OBM::Update::update', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -11,8 +12,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-
-use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::regexp;
 
 

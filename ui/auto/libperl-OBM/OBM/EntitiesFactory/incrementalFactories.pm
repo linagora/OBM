@@ -3,15 +3,14 @@ package OBM::EntitiesFactory::incrementalFactories;
 $VERSION = '1.0';
 
 use OBM::EntitiesFactory::factory;
-@ISA = ('OBM::EntitiesFactory::factory');
+use OBM::Log::log;
+@ISA = ('OBM::EntitiesFactory::factory', 'OBM::Log::log');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -21,19 +20,19 @@ sub new {
     my $self = bless { }, $class;
 
     if( !defined($entitiesFactory) || (ref($entitiesFactory) !~ /^OBM::entitiesFactory$/) ) {
-        $self->_log( 'la factory doit être de type \'OBM::entitiesFactory\'', 3 );
+        $self->_log( 'la factory doit être de type \'OBM::entitiesFactory\'', 1 );
         return undef;
     }
 
     $self->{'entitiesFactory'} = $entitiesFactory;
 
     if( $self->_initDeleteFactory() ) {
-        $self->_log( 'problème à l\'initialisation des factory des entités supprimées', 0 );
+        $self->_log( 'problème à l\'initialisation des factory des entités supprimées', 1 );
         return undef;
     }
 
     if( $self->_initUpdateFactory() ) {
-        $self->_log( 'problème à l\'initialisation des factory', 0 );
+        $self->_log( 'problème à l\'initialisation des factory', 1 );
         return undef;
     }
 
@@ -44,7 +43,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -72,14 +71,14 @@ sub _initDeleteFactory {
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 'chargement des hôtes à supprimer depuis la BD impossible', 3 );
+        $self->_log( 'chargement des hôtes à supprimer depuis la BD impossible', 1 );
         return 1;
     }
 
     my $idByType;
     while( my $deletedDesc = $queryResult->fetchrow_hashref() ) {
         if( !defined($deletedDesc->{'deleted_table'}) ) {
-            $self->_log( 'table de l\'entité à supprimer d\'ID '.$deletedDesc->{'deleted_id'}.' non définie, traitement impossible', 0 );
+            $self->_log( 'table de l\'entité à supprimer d\'ID '.$deletedDesc->{'deleted_id'}.' non définie, traitement impossible', 1 );
             next;
         }
 
@@ -91,7 +90,7 @@ sub _initDeleteFactory {
         SWITCH: {
             if( lc($entityType) eq 'host' ) {
                 if( $self->_initHostFactory( $entitiesIds ) ) {
-                    $self->_log( 'problème au chargement des hôtes à supprimer', 0 );
+                    $self->_log( 'problème au chargement des hôtes à supprimer', 1 );
                     return 1;
                 }
 
@@ -100,7 +99,7 @@ sub _initDeleteFactory {
 
             if( lc($entityType) eq 'ugroup' ) {
                 if( $self->_initGroupFactory( $entitiesIds ) ) {
-                    $self->_log( 'problème au chargement des groupes à supprimer', 0 );
+                    $self->_log( 'problème au chargement des groupes à supprimer', 1 );
                     return 1;
                 }
 
@@ -109,7 +108,7 @@ sub _initDeleteFactory {
 
             if( lc($entityType) eq 'mailshare' ) {
                 if( $self->_initMailshareFactory( $entitiesIds ) ) {
-                    $self->_log( 'problème au chargement des partages de messagerie à supprimer', 0 );
+                    $self->_log( 'problème au chargement des partages de messagerie à supprimer', 1 );
                     return 1;
                 }
 
@@ -118,7 +117,7 @@ sub _initDeleteFactory {
 
             if( lc($entityType) eq 'userobm' ) {
                 if( $self->_initUserFactory( $entitiesIds ) ) {
-                    $self->_log( 'problème au chargement des utilisateurs à supprimer', 0 );
+                    $self->_log( 'problème au chargement des utilisateurs à supprimer', 1 );
                     return 1;
                 }
 
@@ -145,7 +144,7 @@ sub _initHostFactory {
 
         require OBM::EntitiesFactory::hostFactory;
         if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des hôtes', 3 );
+            $self->_log( 'problème au chargement de la factory des hôtes', 1 );
             return 1;
         }
 
@@ -171,7 +170,7 @@ sub _initGroupFactory {
 
         require OBM::EntitiesFactory::groupFactory;
         if( !($entityFactory = OBM::EntitiesFactory::groupFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des groupes', 3 );
+            $self->_log( 'problème au chargement de la factory des groupes', 1 );
             return 1;
         }
 
@@ -197,7 +196,7 @@ sub _initMailshareFactory {
 
         require OBM::EntitiesFactory::mailshareFactory;
         if( !($entityFactory = OBM::EntitiesFactory::mailshareFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des partages de messagerie', 3 );
+            $self->_log( 'problème au chargement de la factory des partages de messagerie', 1 );
             return 1;
         }
 
@@ -223,7 +222,7 @@ sub _initUserFactory {
 
         require OBM::EntitiesFactory::userFactory;
         if( !($entityFactory = OBM::EntitiesFactory::userFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des utilisateurs', 3 );
+            $self->_log( 'problème au chargement de la factory des utilisateurs', 1 );
             return 1;
         }
 
@@ -243,7 +242,7 @@ sub _initUpdateFactory {
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
     if( !$dbHandler ) {
-        $self->_log( 'connexion à la base de données impossible', 4 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 
@@ -265,14 +264,14 @@ sub _initUpdateFactory {
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 'chargement des entités à mettre à jour depuis la BD impossible', 3 );
+        $self->_log( 'chargement des entités à mettre à jour depuis la BD impossible', 1 );
         return 1;
     }
 
     my $idByUpdateType;
     while( my $updateDesc = $queryResult->fetchrow_hashref() ) {
         if( !defined($updateDesc->{'updated_table'}) ) {
-            $self->_log( 'table de l\'entité à mettre à jour d\'ID '.$updateDesc->{'updated_id'}.' non définie, traitement impossible', 0 );
+            $self->_log( 'table de l\'entité à mettre à jour d\'ID '.$updateDesc->{'updated_id'}.' non définie, traitement impossible', 1 );
             next;
         }
 
@@ -290,7 +289,7 @@ sub _initUpdateFactory {
             SWITCH: {
                 if( lc($entityType) eq 'host' ) {
                     if( $self->_initHostFactory( $entitiesIds ) ) {
-                        $self->_log( 'problème au chargement des hôtes à mettre à jour', 0 );
+                        $self->_log( 'problème au chargement des hôtes à mettre à jour', 1 );
                         return 1;
                     }
 
@@ -299,7 +298,7 @@ sub _initUpdateFactory {
 
                 if( lc($entityType) eq 'ugroup' ) {
                     if( $self->_initGroupFactory( $entitiesIds ) ) {
-                        $self->_log( 'problème au chargement des groupes à mettre à jour', 0 );
+                        $self->_log( 'problème au chargement des groupes à mettre à jour', 1 );
                         return 1;
                     }
 
@@ -308,7 +307,7 @@ sub _initUpdateFactory {
 
                 if( lc($entityType) eq 'mailshare' ) {
                     if( $self->_initMailshareFactory( $entitiesIds ) ) {
-                        $self->_log( 'problème au chargement des partages de messagerie à mettre à jour', 0 );
+                        $self->_log( 'problème au chargement des partages de messagerie à mettre à jour', 1 );
                         return 1;
                     }
 
@@ -317,7 +316,7 @@ sub _initUpdateFactory {
 
                 if( lc($entityType) eq 'userobm' ) {
                     if( $self->_initUserFactory( $entitiesIds ) ) {
-                        $self->_log( 'problème au chargement des utilisateurs à mettre à jour', 0 );
+                        $self->_log( 'problème au chargement des utilisateurs à mettre à jour', 1 );
                         return 1;
                     }
 
@@ -351,7 +350,7 @@ sub _initUpdateFactory {
     my $idByType;
     while( my $updatedlinksDesc = $queryResult->fetchrow_hashref() ) {
         if( !defined($updatedlinksDesc->{'updatedlinks_table'}) ) {
-            $self->_log( 'table de l\'entité dont les liens sont à mettre à jour d\'ID '.$updatedlinksDesc->{'updatedlinks_id'}.' non définie, traitement impossible', 0 );
+            $self->_log( 'table de l\'entité dont les liens sont à mettre à jour d\'ID '.$updatedlinksDesc->{'updatedlinks_id'}.' non définie, traitement impossible', 1 );
             next;
         }
 
@@ -363,7 +362,7 @@ sub _initUpdateFactory {
         SWITCH: {
             if( lc($entityType) eq 'host' ) {
                 if( $self->_initHostFactory( $entitiesIds ) ) {
-                    $self->_log( 'problème au chargement des hôtes à mettre à jour', 0 );
+                    $self->_log( 'problème au chargement des hôtes à mettre à jour', 1 );
                     return 1;
                 }
 
@@ -372,7 +371,7 @@ sub _initUpdateFactory {
 
             if( lc($entityType) eq 'ugroup' ) {
                 if( $self->_initGroupFactory( $entitiesIds ) ) {
-                    $self->_log( 'problème au chargement des groupes à mettre à jour', 0 );
+                    $self->_log( 'problème au chargement des groupes à mettre à jour', 1 );
                     return 1;
                 }
 
@@ -381,7 +380,7 @@ sub _initUpdateFactory {
 
             if( lc($entityType) eq 'mailshare' ) {
                 if( $self->_initMailshareFactory( $entitiesIds ) ) {
-                    $self->_log( 'problème au chargement des partages de messagerie à mettre à jour', 0 );
+                    $self->_log( 'problème au chargement des partages de messagerie à mettre à jour', 1 );
                     return 1;
                 }
 
@@ -390,7 +389,7 @@ sub _initUpdateFactory {
 
             if( lc($entityType) eq 'userobm' ) {
                 if( $self->_initUserFactory( $entitiesIds ) ) {
-                    $self->_log( 'problème au chargement des utilisateurs à mettre à jour', 0 );
+                    $self->_log( 'problème au chargement des utilisateurs à mettre à jour', 1 );
                     return 1;
                 }
 

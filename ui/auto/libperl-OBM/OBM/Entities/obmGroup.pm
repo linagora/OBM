@@ -22,7 +22,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'domaine père incorrect', 3 );
+        $self->_log( 'domaine père incorrect', 1 );
         return undef;
     }
     $self->setParent( $parent );
@@ -48,7 +48,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'parent'} = undef;
 }
@@ -62,28 +62,28 @@ sub _init {
     my( $groupDesc ) = @_;
 
     if( !defined($groupDesc) || (ref($groupDesc) ne 'HASH') ) {
-        $self->_log( 'description du groupe incorrect', 4 );
+        $self->_log( 'description du groupe incorrect', 1 );
         return 1;
     }
 
     # L'ID du groupe
     if( !defined($groupDesc->{'group_id'}) ) {
-        $self->_log( 'ID du groupe non défini', 0 );
+        $self->_log( 'ID du groupe non défini', 1 );
         return 1;
     }elsif( $groupDesc->{'group_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$groupDesc->{'group_id'}.'\' incorrect', 0 );
+        $self->_log( 'ID \''.$groupDesc->{'group_id'}.'\' incorrect', 1 );
         return 1;
     }
 
     # Le nom du groupe
     if( !defined($groupDesc->{'group_name'}) ) {
-        $self->_log( 'Nom du groupe non défini', 0 );
+        $self->_log( 'Nom du groupe non défini', 1 );
         return 1;
     }
     
     $groupDesc->{'group_name_new'} = $groupDesc->{'group_name'};
     if( $groupDesc->{'group_name_new'} !~ /$OBM::Parameters::regexp::regexp_groupname/ ) {
-        $self->_log( 'Nom du groupe \''.$groupDesc->{'group_name'}.'\' incorrect', 0 );
+        $self->_log( 'Nom du groupe \''.$groupDesc->{'group_name'}.'\' incorrect', 1 );
         return 1;
     }
 
@@ -91,7 +91,7 @@ sub _init {
     if( defined($groupDesc->{'group_name_current'}) ) {
         $groupDesc->{'group_name_current'} = $groupDesc->{'group_name_current'};
         if( !$groupDesc->{'group_name_current'} || $groupDesc->{'group_name_current'} !~ /$OBM::Parameters::regexp::regexp_groupname/ ) {
-            $self->_log( 'Nom actuel du groupe \''.$groupDesc->{'group_name_current'}.'\' incorrect', 4 );
+            $self->_log( 'Nom actuel du groupe \''.$groupDesc->{'group_name_current'}.'\' incorrect', 1 );
             return 1;
         }
     }else {
@@ -100,16 +100,19 @@ sub _init {
 
     # Le GID du groupe
     if( !defined($groupDesc->{'group_gid'}) ) {
-        $self->_log( 'GID du groupe \''.$groupDesc->{'group_name'}.'\' non défini', 0 );
+        $self->_log( 'GID du groupe \''.$groupDesc->{'group_name'}.'\' non défini', 1 );
         return 1;
     }elsif( $groupDesc->{'group_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'GID \''.$groupDesc->{'group_gid'}.'\' incorrect', 0 );
+        $self->_log( 'GID \''.$groupDesc->{'group_gid'}.'\' incorrect', 1 );
         return 1;
     }
 
     # Le droit de messagerie
     ( $groupDesc->{'group_main_email'}, $groupDesc->{'group_alias_email'} ) = $self->_makeEntityEmail( $groupDesc->{'group_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') );
     if( !defined($groupDesc->{'group_main_email'}) ) {
+        if( $groupDesc->{'group_mailperms'} ) {
+            $self->_log( 'droit mail du groupe \''.$groupDesc->{'group_name'}.'\' annulé, pas d\'adresses mails valides', 2 );
+        }
         $groupDesc->{'group_mailperms_access'} = 'REJECT';
         delete($groupDesc->{'group_main_email'});
         delete($groupDesc->{'group_alias_email'});
@@ -129,13 +132,13 @@ sub _init {
             if( $lcExternalContact =~ /$OBM::Parameters::regexp::regexp_email/ ) {
                 $externelContacts{$lcExternalContact} = undef;
             }else {
-                $self->_log( 'adresse mail du contact externe \''.$externelContacts[$i].'\' incorrecte', 2 );
+                $self->_log( 'adresse mail du contact externe \''.$externelContacts[$i].'\' incorrecte', 1 );
                 $return++;
             }
         }
 
         if( $return ) {
-            $self->_log( $return.' contacts externes ont une adresse mail invalide', 0 );
+            $self->_log( $return.' contacts externes ont une adresse mail invalide', 1 );
             return 1;
         }
         @{$groupDesc->{'group_contacts_list'}} = keys(%externelContacts);
@@ -148,8 +151,8 @@ sub _init {
     # Le SID du domaine
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
     if( !$domainSid ) {
-        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 3 );
-        $self->_log( 'droit samba annulé', 2 );
+        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 1 );
+        $self->_log( 'droit samba annulé', 3 );
         $groupDesc->{'group_samba'} = 0;
     }
 
@@ -169,7 +172,7 @@ sub _init {
 
     $self->{'entityDesc'} = $groupDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 3 );
 
     return 0;
 }
@@ -182,7 +185,7 @@ sub setLinks {
     my( $links ) = @_;
 
     if( !defined($links) || ref($links) ne 'ARRAY' ) {
-        $self->_log( 'pas de liens définis', 3 );
+        $self->_log( 'pas de liens définis', 1 );
         return 0;
     }
 
@@ -253,7 +256,7 @@ sub setParent {
     my( $parent ) = @_;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine parent incorrecte', 3 );
+        $self->_log( 'description du domaine parent incorrecte', 1 );
         return 1;
     }
 
@@ -281,12 +284,12 @@ sub createLdapEntry {
     my ( $entryDn, $entry ) = @_;
 
     if( !$entryDn ) {
-        $self->_log( 'DN non défini', 3 );
+        $self->_log( 'DN non défini', 1 );
         return 1;
     }
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 3 );
+        $self->_log( 'entrée LDAP incorrecte', 1 );
         return 1;
     }
 
@@ -388,7 +391,7 @@ sub setRemovedMembers {
     my( $removedMembers ) = @_;
 
     if( ref($removedMembers) ne 'ARRAY' ) {
-        $self->_log( 'liste des utilisateurs supprimés incorrecte', 3 );
+        $self->_log( 'liste des utilisateurs supprimés incorrecte', 1 );
         $self->{'entityDesc'}->{'group_removed_users_id'} = [];
         return 0;
     }

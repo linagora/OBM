@@ -11,7 +11,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($Bin $logLevel $logFile $facility_log $sieveSrv $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db $dbType);
@@ -122,12 +122,15 @@ if( !defined( $documentDefaultPath ) ) {
 $logLevel = $cfgFile->val( 'automate', 'logLevel' );
 if( !defined($logLevel) || ($logLevel !~ /^[0-9]+$/) ) {
     $logLevel = 2;
-}elsif( $logLevel > 4 ) {
-    $logLevel = 4;
+}elsif( $logLevel > 5 ) {
+    $logLevel = 5;
 }elsif( $logLevel < 0 ) {
     $logLevel = 0;
 }
 $facility_log = 'local1';
+
+# Log file
+$logFile = '/var/log/obm/obm.log';
 
 # La descrption de l'annuaire LDAP
 $ldapServerId = 0;

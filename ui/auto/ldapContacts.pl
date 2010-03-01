@@ -23,9 +23,11 @@
 
 package ldapContacts;
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 use strict;
 use OBM::Parameters::regexp;
-use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
@@ -34,13 +36,23 @@ my %parameters;
 my $return = GetOptions( \%parameters, 'global', 'incremental', 'help' );
 
 if( !$return ) {
-    ldapContacts->_displayHelp();
-    exit 1;
+    %parameters = undef;
 }
 
-exit ldapContacts->run(\%parameters);
+my $ldapContacts = ldapContacts->new();
+exit $ldapContacts->run(\%parameters);
 
 $| = 1;
+
+
+sub new {
+    my $class = shift;
+    my $self = bless { }, $class;
+
+    $self->_configureLog();
+
+    return $self;
+}
 
 
 sub run {
@@ -64,9 +76,9 @@ sub run {
         my $errorCode = $updateContacts->update();
 
         if( $errorCode ) {
-            $self->_log( 'échec de mise à jour des contacts', 0 );
+            $self->_log( 'échec de mise à jour des contacts', 1 );
         }else {
-            $self->_log( 'mise à jour des contacts avec succés', -1 );
+            $self->_log( 'mise à jour des contacts avec succés', 3 );
         }
 
         return $errorCode;
@@ -93,20 +105,20 @@ sub _getParameter {
         }
         
         if( exists($parameters->{'incremental'}) ) {
-            $self->_log( 'Mise a jour incrementale', 2 );
+            $self->_log( 'Mise a jour incrementale', 3 );
             $parameters->{'incremental'} = 1;
             $parameters->{'global'} = 0;
             last SWITCH;
         }
         
         if( exists($parameters->{'global'}) ) {
-            $self->_log( 'Mise a jour globale', 2 );
+            $self->_log( 'Mise a jour globale', 3 );
             $parameters->{'incremental'} = 0;
             $parameters->{'global'} = 1;
             last SWITCH;
         }
 
-        $self->_log( 'Mise a jour globale', 2 );
+        $self->_log( 'Mise a jour globale', 3 );
         $parameters->{'incremental'} = 0;
         $parameters->{'global'} = 1;
     }

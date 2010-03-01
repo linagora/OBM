@@ -2,17 +2,15 @@ package OBM::Cyrus::cyrusEngine;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
 
-
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
 use Cyrus::IMAP::Admin;
 
 
@@ -29,7 +27,7 @@ sub new {
 
     require OBM::Cyrus::cyrusServers;
     if( !($self->{'cyrusServers'} = OBM::Cyrus::cyrusServers->instance()) ) {
-        $self->_log( 'initialisation du gestionnaire de serveur Cyrus impossible', 3 );
+        $self->_log( 'initialisation du gestionnaire de serveur Cyrus impossible', 0 );
         return undef;
     }
 
@@ -54,7 +52,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'rightDefinition'} = undef;
     $self->{'cyrusServers'} = undef;
@@ -74,30 +72,30 @@ sub _doWork {
     my %srvBalDesc;
     my $isExist = $self->isMailboxExist( \%srvBalDesc, $entity->getMailboxPrefix(), $entity->getMailboxName('new') );
     if( !defined($isExist) ) {
-        $self->_log( 'probleme lors de l\'obtention des informations de la boite sur le serveur Cyrus', 2 );
+        $self->_log( 'probleme lors de l\'obtention des informations de la boite sur le serveur Cyrus', 1 );
         return 1;
 
     }elsif( $isExist && $entity->getDelete() ) {
         # On la supprime
         if( $self->_deleteBox() ) {
-            $self->_log( 'echec lors de la suppression de la boite', 2 );
+            $self->_log( 'echec lors de la suppression de la boite', 1 );
             return 1;
         }
 
     }elsif( !$isExist && $entity->getDelete() ) {
-        $self->_log( 'boite deja supprimee', 2 );
+        $self->_log( 'boite deja supprimee', 3 );
 
     }elsif( $isExist && !$entity->getDelete() ) {
         # On met à jour
         if( $self->_updateMailbox() ) {
-            $self->_log( 'echec lors de la MAJ de la boite', 2 );
+            $self->_log( 'echec lors de la MAJ de la boite', 1 );
             return 1;
         }
 
     }elsif( !$isExist && !$entity->getDelete() ) {
         # On la crée
         if( $self->_createMailbox() ) {
-            $self->_log( 'echec lors de la creation/renommage de la boite', 2 );
+            $self->_log( 'echec lors de la creation/renommage de la boite', 1 );
             return 1;
         }
 
@@ -113,10 +111,10 @@ sub update {
 
 
     if( !defined($entity) ) {
-        $self->_log( 'entité non définie', 3 );
+        $self->_log( 'entité non définie', 1 );
         return 1;
     }elsif( !ref($entity) ) {
-        $self->_log( 'entité incorrecte', 3 );
+        $self->_log( 'entité incorrecte', 1 );
         return 1;
     }
     $self->{'currentEntity'} = $entity;
@@ -131,21 +129,21 @@ sub update {
     # Get user BAL server Id
     my $mailserverId = $entity->getMailServerId();
     if( !defined($mailserverId) ) {
-        $self->_log( 'serveur de courrier IMAP non defini - erreur', 2 );
+        $self->_log( 'serveur de courrier IMAP non defini - erreur', 1 );
         return 1;
     }
 
     # Get Cyrus server connection
     $self->{'currentCyrusSrv'} = $self->{'cyrusServers'}->getEntityCyrusServer( $entity );
     if( !defined($self->{'currentCyrusSrv'}) ) {
-        $self->_log( 'serveur de courrier IMAP d\'identifiant \''.$entity->getMailServerId().'\' inconnu - Operation annulee !', 2 );
+        $self->_log( 'serveur de courrier IMAP d\'identifiant \''.$entity->getMailServerId().'\' inconnu - Operation annulee !', 1 );
         return 1;
     }
 
     # Do stuff...
     my $returnCode = $self->_doWork();
     if( $returnCode ) {
-        $self->_log( 'probleme de traitement de '.$entity->getDescription().' - Operation annulee !', 2 );
+        $self->_log( 'probleme de traitement de '.$entity->getDescription().' - Operation annulee !', 1 );
     }
 
     return $returnCode;
@@ -157,10 +155,10 @@ sub updateAcl {
     my( $entity ) = @_;
 
     if( !defined($entity) ) {
-        $self->_log( 'entité non définie', 3 );
+        $self->_log( 'entité non définie', 1 );
         return 1;
     }elsif( !ref($entity) ) {
-        $self->_log( 'entité incorrecte', 3 );
+        $self->_log( 'entité incorrecte', 1 );
         return 1;
     }
     $self->{'currentEntity'} = $entity;
@@ -174,14 +172,14 @@ sub updateAcl {
     # Récupération de la description du serveur de la boîte à traiter
     my $mailserverId = $entity->getMailServerId();
     if( !defined($mailserverId) ) {
-        $self->_log( 'serveur de courrier IMAP non defini - Operation annulee', 2 );
+        $self->_log( 'serveur de courrier IMAP non defini - Operation annulee', 1 );
         return 0;
     }
 
     # Get Cyrus server connection
     $self->{'currentCyrusSrv'} = $self->{'cyrusServers'}->getEntityCyrusServer( $entity );
     if( !defined($self->{'currentCyrusSrv'}) ) {
-        $self->_log( 'problème avec le serveur de courrier IMAP d\'identifiant \''.$entity->getMailServerId().'\' - Operation annulee !', 2 );
+        $self->_log( 'problème avec le serveur de courrier IMAP d\'identifiant \''.$entity->getMailServerId().'\' - Operation annulee !', 1 );
         return 1;
     }
 
@@ -210,7 +208,7 @@ sub isMailboxExist {
 
     my @mailBox = $cyrusSrv->listmailbox( $mailboxName, $mailboxPrefix );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus lors de la recherche de la BAL : '.$cyrusSrv->error(), 2 );
+        $self->_log( 'erreur Cyrus lors de la recherche de la BAL : '.$cyrusSrv->error(), 1 );
         return undef;
     }
 
@@ -257,7 +255,7 @@ sub getMailboxQuota {
 
     my @quotaDesc = $cyrusSrv->listquotaroot( $mailboxPrefix.$mailboxName );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention du quota maximum : '.$cyrusSrv->error(), 0 );
+        $self->_log( 'erreur Cyrus a l\'obtention du quota maximum : '.$cyrusSrv->error(), 1 );
         return undef;
     }
 
@@ -290,7 +288,7 @@ sub getMailboxQuotaUse {
 
     my @quotaDesc = $cyrusSrv->listquotaroot( $mailboxPrefix.$mailboxName );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention du quota utilise : '.$cyrusSrv->error(), 0 );
+        $self->_log( 'erreur Cyrus a l\'obtention du quota utilise : '.$cyrusSrv->error(), 1 );
         return undef;
     }
 
@@ -328,7 +326,7 @@ sub _imapSetMailboxQuota {
     }
 
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus au positionnement du quota utilisé : '.$cyrusSrv->error(), 0 );
+        $self->_log( 'erreur Cyrus au positionnement du quota utilisé : '.$cyrusSrv->error(), 1 );
         return 1;
     }
 
@@ -357,7 +355,7 @@ sub _imapGetMailboxAcls {
     my %boxAclList = $cyrusSrv->listacl( $boxPrefix.$boxName );
     my $boxRight;
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention des ACLs : '.$cyrusSrv->error(), 2 );
+        $self->_log( 'erreur Cyrus a l\'obtention des ACLs : '.$cyrusSrv->error(), 1 );
         return undef;
 
     }else {
@@ -431,14 +429,14 @@ sub _imapSetMailboxAcls {
     my $boxPattern = $boxPrefix.$boxName;
     my @boxStruct = $cyrusSrv->listmailbox( $boxPattern, '' );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 0 );
+        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 1 );
         return 1;
     }
 
     $boxPattern =~ s/(@.*)$/\/*$1/;
     push( @boxStruct, $cyrusSrv->listmailbox( $boxPattern, '' ) );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention de la structure de la BAL : '.$cyrusSrv->error(), 2 );
+        $self->_log( 'erreur Cyrus a l\'obtention de la structure de la BAL : '.$cyrusSrv->error(), 1 );
         return 1;
     }
 
@@ -514,11 +512,11 @@ sub _deleteBox {
         push( @boxStruct, $cyrusSrv->listmailbox( $boxSubfolders, '' ) );
     }
 
-    $self->_log( 'suppression de la boite de '.$entity->getDescription(), 2 );
+    $self->_log( 'suppression de la boite de '.$entity->getDescription(), 3 );
     for( my $i=0; $i<=$#boxStruct; $i++ ) {
         require OBM::Parameters::common;
         if( $self->_imapSetMailboxAcl( $boxStruct[$i][0], $OBM::Parameters::common::cyrusAdminLogin, 'admin' ) ) {
-            $self->_log( 'erreur au positionnement des ACLs nécessaires à la suppression de '.$entity->getDescription(), 0 );
+            $self->_log( 'erreur au positionnement des ACLs nécessaires à la suppression de '.$entity->getDescription(), 1 );
             return 1;
         }
     
@@ -526,7 +524,7 @@ sub _deleteBox {
         $cyrusSrv->delete($boxStruct[$i][0]);
     
         if( $cyrusSrv->error() ) {
-            $self->_log( 'erreur Cyrus a la suppression de '.$entity->getDescription().' : '.$cyrusSrv->error(), 0 );
+            $self->_log( 'erreur Cyrus a la suppression de '.$entity->getDescription().' : '.$cyrusSrv->error(), 1 );
             return 1;
         }
     }
@@ -565,9 +563,9 @@ sub _createMailbox {
 
         # On renomme la BAL
         if( !defined( $boxPartition ) ) {
-            $self->_log( 'renommage de la boite \''.$currentBoxName.'\' vers \''.$newBoxName.'\' sur la partition Cyrus par defaut, du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 2 );
+            $self->_log( 'renommage de la boite \''.$currentBoxName.'\' vers \''.$newBoxName.'\' sur la partition Cyrus par defaut, du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 3 );
         }else {
-            $self->_log( 'renommage de la boite \''.$currentBoxName.'\' vers \''.$newBoxName.'\' sur la partition Cyrus \''.$boxPartition.'\', du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 2 );
+            $self->_log( 'renommage de la boite \''.$currentBoxName.'\' vers \''.$newBoxName.'\' sur la partition Cyrus \''.$boxPartition.'\', du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 3 );
         }
 
         $cyrusSrv->rename( $boxPrefix.$currentBoxName, $boxPrefix.$newBoxName, $boxPartition );
@@ -576,20 +574,20 @@ sub _createMailbox {
         $action = 'create';
 
         if( !$entity->isMailActive() ) {
-            $self->_log( 'l\'entité '.$entity->getDescription().' n\'a pas le droit mail, BAL non créée', 2 );
+            $self->_log( 'l\'entité '.$entity->getDescription().' n\'a pas le droit mail, BAL non créée', 3 );
             return 0;
         }
 
         if( $entity->getArchive() ) {
-            $self->_log( 'l\'entité '.$entity->getDescription().' est archivée, BAL non créée', 2 );
+            $self->_log( 'l\'entité '.$entity->getDescription().' est archivée, BAL non créée', 3 );
             return 0;
         }
 
         # Création de la boîte
         if( !defined( $boxPartition ) ) {
-            $self->_log( 'creation de la boite \''.$newBoxName.'\' sur la partition Cyrus par defaut, du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 2 );
+            $self->_log( 'creation de la boite \''.$newBoxName.'\' sur la partition Cyrus par defaut, du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 3 );
         }else {
-            $self->_log( 'creation de la boite \''.$newBoxName.'\' sur la partition Cyrus \''.$boxPartition.'\', du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 2 );
+            $self->_log( 'creation de la boite \''.$newBoxName.'\' sur la partition Cyrus \''.$boxPartition.'\', du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 3 );
         }
 
         $cyrusSrv->create( $boxPrefix.$newBoxName, $boxPartition );
@@ -605,11 +603,11 @@ sub _createMailbox {
         }
 
         if( $action eq 'rename' ) {
-            $self->_log( 'erreur Cyrus au renommage de la BAL : '.$cyrusSrv->error(), 2 );
+            $self->_log( 'erreur Cyrus au renommage de la BAL : '.$cyrusSrv->error(), 1 );
         }elsif( $action eq 'create' ) {
-            $self->_log( 'erreur Cyrus a la creation de la BAL : '.$cyrusSrv->error(), 2 );
+            $self->_log( 'erreur Cyrus a la creation de la BAL : '.$cyrusSrv->error(), 1 );
         }else {
-            $self->_log( 'erreur Cyrus : '.$cyrusSrv->error(), 2 );
+            $self->_log( 'erreur Cyrus : '.$cyrusSrv->error(), 1 );
         }
             
         return 1;
@@ -657,10 +655,10 @@ sub _createMailboxDefaultFolders {
         $cyrusSrv->create( $boxPrefix.$folder, $boxPartition );
 
         if( $cyrusSrv->error() ) {
-            $self->_log( 'erreur lors de la creation du repertoire \''.$folder.'\'', 2 );
+            $self->_log( 'erreur lors de la creation du repertoire \''.$folder.'\'', 1 );
             $folderError++;
         }else {
-            $self->_log( 'creation du repertoire \''.$folder.'\' reussie', 2 );
+            $self->_log( 'creation du repertoire \''.$folder.'\' reussie', 3 );
         }
     }
 
@@ -681,7 +679,7 @@ sub _updateMailbox {
     }
 
 
-    $self->_log( 'MAJ de la boite de '.$entity->getDescription(), 2 );
+    $self->_log( 'MAJ de la boite de '.$entity->getDescription(), 3 );
 
     # Uniquement si l'entité doit être mise à jour
     if( $entity->getUpdateEntity() ) {
@@ -731,7 +729,7 @@ sub _imapSetMailboxAcl {
 
     $cyrusSrvConn->setaclmailbox( $boxName, $boxRightUser => $imapRight );
     if( $cyrusSrvConn->error() ) {
-        $self->_log( 'erreur Cyrus au positionnement des ACLs de la BAL \''.$boxName.'\' : '.$cyrusSrvConn->error(), 0 );
+        $self->_log( 'erreur Cyrus au positionnement des ACLs de la BAL \''.$boxName.'\' : '.$cyrusSrvConn->error(), 1 );
         return 1;
     }
 

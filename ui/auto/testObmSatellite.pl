@@ -19,11 +19,12 @@
 
 package testObmSatellite;
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 use strict;
-use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
-
 
 use Getopt::Long;
 my %parameters;
@@ -42,6 +43,8 @@ $|=1;
 sub new {
     my $class = shift;
     my $self = bless { }, $class;
+
+    $self->_configureLog();
 
     return $self;
 }
@@ -149,8 +152,7 @@ sub getParameter {
         print STDERR "\t".'smtpInConf: permet de régénérer les tables Postfix des serveurs SMTP-in'."\n";
         print STDERR "\t".'smtpOutConf: permet de régénérer les tables Postfix des serveurs SMTP-out'."\n";
         print STDERR "\t".'cyrusPartitionsAdd: permet d\'ajouter les partitions Cyrus manquantes - Provoque un redémarrage du/des services Cyrus !'."\n";
-        print STDERR "\t".'cyrusPartitionsDel: permet de supprimer les partitions Cyrus
-        non déclarées - Provoque un redémarrage du/des services Cyrus !'."\n\n";
+        print STDERR "\t".'cyrusPartitionsDel: permet de supprimer les partitions Cyrus non déclarées - Provoque un redémarrage du/des services Cyrus !'."\n\n";
         return 0;
     }
 

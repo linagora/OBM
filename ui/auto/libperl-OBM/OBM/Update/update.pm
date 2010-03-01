@@ -1,15 +1,15 @@
 package OBM::Update::update;
 
-
 $VERSION = '1.0';
+
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -23,7 +23,7 @@ sub update {
     return 1 if $self->_updatePreInit();
 
     require OBM::dbUpdater;
-    $self->_log( 'initialisation du BD updater', 2 );
+    $self->_log( 'initialisation du BD updater', 4 );
     if( !($self->{'dbUpdater'} = OBM::dbUpdater->new()) ) {
         $self->_log( 'echec de l\'initialisation du BD updater', 0 );
         return 1;
@@ -32,49 +32,49 @@ sub update {
     return 1 if $self->_updateInitFactory();
 
     require OBM::Postfix::smtpInEngine;
-    $self->_log( 'initialisation du SMTP-in maps updater', 2 );
+    $self->_log( 'initialisation du SMTP-in maps updater', 4 );
     if( !($self->{'smtpInEngine'} = OBM::Postfix::smtpInEngine->new()) ) {
         $self->_log( 'echec de l\'initialisation du SMTP-in maps updater', 0 );
         return 1;
     }
 
     require OBM::Ldap::ldapEngine;
-    $self->_log( 'initialisation du moteur LDAP', 2 );
+    $self->_log( 'initialisation du moteur LDAP', 4 );
     $self->{'ldapEngine'} = OBM::Ldap::ldapEngine->new();
     if( !defined($self->{'ldapEngine'}) ) {
-        $self->_log( 'erreur à l\'initialisation du moteur LDAP', 1 );
+        $self->_log( 'erreur à l\'initialisation du moteur LDAP', 0 );
         return 1
     }elsif( !ref($self->{'ldapEngine'}) ) {
-        $self->_log( 'moteur LDAP non démarré', 3 );
+        $self->_log( 'moteur LDAP non démarré', 4 );
         $self->{'ldapEngine'} = undef;
     }
 
     require OBM::Cyrus::cyrusEngine;
-    $self->_log( 'initialisation du moteur Cyrus', 2 );
+    $self->_log( 'initialisation du moteur Cyrus', 4 );
     $self->{'cyrusEngine'} = OBM::Cyrus::cyrusEngine->new();
     if( !defined($self->{'cyrusEngine'}) ) {
-        $self->_log( 'erreur à l\'initialisation du moteur Cyrus', 1 );
+        $self->_log( 'erreur à l\'initialisation du moteur Cyrus', 0 );
         return 1
     }elsif( !ref($self->{'cyrusEngine'}) ) {
-        $self->_log( 'moteur Cyrus non démarré', 3 );
+        $self->_log( 'moteur Cyrus non démarré', 4 );
         $self->{'cyrusEngine'} = undef;
     }
 
     require OBM::Cyrus::sieveEngine;
-    $self->_log( 'initialisation du moteur Sieve', 2 );
+    $self->_log( 'initialisation du moteur Sieve', 4 );
     $self->{'sieveEngine'} = OBM::Cyrus::sieveEngine->new();
     if( !defined($self->{'sieveEngine'}) ) {
-        $self->_log( 'erreur à l\'initialisation du moteur Sieve', 1 );
+        $self->_log( 'erreur à l\'initialisation du moteur Sieve', 0 );
         return 1
     }elsif( !ref($self->{'sieveEngine'}) ) {
-        $self->_log( 'moteur Sieve non démarré', 3 );
+        $self->_log( 'moteur Sieve non démarré', 4 );
         $self->{'sieveEngine'} = undef;
     }
 
 
     while( my $entity = $self->{'entitiesFactory'}->next() ) {
         my $error = 0;
-        $self->_log( 'traitement de '.$entity->getDescription(), 1 );
+        $self->_log( 'traitement de '.$entity->getDescription(), 3 );
 
         if( !$error && defined($self->{'ldapEngine'}) ) {
             if($self->{'ldapEngine'}->update($entity)) {
@@ -102,7 +102,6 @@ sub update {
         }else {
             if( ref($entity) eq 'OBM::Entities::obmDomain' ) {
                 $self->_log( 'problème à la mise à jour de '.$entity->getDescription(), 0 );
-                $self->_log( 'erreur fatale', 0 );
                 return 1;
             }
         }
@@ -111,7 +110,7 @@ sub update {
             $self->_log( 'problème à la mise à jour BD de l\'entité '.$entity->getDescription(), 1 );
             $entity->unsetUpdated();
         }else {
-            $self->_log( 'entité '.$entity->getDescription().' mise à jour en BD', 1 );
+            $self->_log( 'entité '.$entity->getDescription().' mise à jour en BD', 3 );
         }
 
         $self->_updateEntityEndProcess($entity);

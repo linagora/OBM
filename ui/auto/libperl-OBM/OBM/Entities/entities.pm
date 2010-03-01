@@ -2,12 +2,12 @@ package OBM::Entities::entities;
 
 $VERSION = '1.0';
 
-use OBM::Tools::commonMethods;
+use OBM::Log::log;
 use OBM::Ldap::utils;
 use OBM::Samba::utils;
 use OBM::Password::passwd;
 use OBM::Entities::Interfaces::entitiesSmtpIn;
-@ISA = ('OBM::Tools::commonMethods', 'OBM::Ldap::utils', 'OBM::Samba::utils', 'OBM::Password::passwd', 'OBM::Entities::Interfaces::entitiesSmtpIn');
+@ISA = ('OBM::Log::log', 'OBM::Ldap::utils', 'OBM::Samba::utils', 'OBM::Password::passwd', 'OBM::Entities::Interfaces::entitiesSmtpIn');
 
 $debug = 1;
 
@@ -27,7 +27,7 @@ sub _init {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'parent'} = undef;
 }
@@ -82,7 +82,7 @@ sub setParent {
     my( $parent ) = @_;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine parent incorrecte', 3 );
+        $self->_log( 'description du domaine parent incorrecte', 0 );
         return 1;
     }
 
@@ -204,7 +204,7 @@ sub getDnPrefix {
     my @dnPrefixes;
 
     if( !($rootDn = $self->_getParentDn()) ) {
-        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 0 );
         return undef;
     }
 
@@ -212,7 +212,7 @@ sub getDnPrefix {
     my $ldapMapping = OBM::Ldap::ldapMapping->instance();
     my $rdnMapping = $ldapMapping->getRdn($self);
     if( !defined($rdnMapping) ) {
-        $self->_log( 'mapping du RDN de l\'entité '.$self->getDescription().' incorrect', 2 );
+        $self->_log( 'mapping du RDN de l\'entité '.$self->getDescription().' incorrect', 0 );
         return undef;
     }
 
@@ -234,7 +234,7 @@ sub getCurrentDnPrefix {
     my @dnPrefixes;
 
     if( !($rootDn = $self->_getParentDn()) ) {
-        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 0 );
         return undef;
     }
 
@@ -242,7 +242,7 @@ sub getCurrentDnPrefix {
     my $ldapMapping = OBM::Ldap::ldapMapping->instance();
     my $rdnMapping = $ldapMapping->getCurrentRdn($self);
     if( !defined($rdnMapping) ) {
-        $self->_log( 'mapping du RDN de l\'entité '.$self->getDescription().' incorrect', 2 );
+        $self->_log( 'mapping du RDN de l\'entité '.$self->getDescription().' incorrect', 0 );
         return undef;
     }
 
@@ -298,17 +298,17 @@ sub _makeEntityEmail {
     my %emailsAlias;
 
     if( !$mailAddress ) {
-        $self->_log( 'pas d\'adresses mails définis', 3 );
+        $self->_log( 'pas d\'adresses mails définis', 4 );
         return (undef, undef);
     }
 
     if( !$mainDomain ) {
-        $self->_log( 'pas de domaine principal défini', 3 );
+        $self->_log( 'pas de domaine principal défini', 2 );
         return (undef, undef);
     }
 
     if( ref($domainAlias) ne 'ARRAY' ) {
-        $self->_log( 'pas d\'alias de domaine définis', 3 );
+        $self->_log( 'pas d\'alias de domaine définis', 2 );
         $domainAlias = undef;
     }
 

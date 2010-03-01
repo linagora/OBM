@@ -3,7 +3,8 @@ package OBM::EntitiesFactory::mailServerFactory;
 $VERSION = '1.0';
 
 use OBM::EntitiesFactory::factory;
-@ISA = ('OBM::EntitiesFactory::factory');
+use OBM::Log::log;
+@ISA = ('OBM::EntitiesFactory::factory', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -11,10 +12,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
 use OBM::Parameters::regexp;
 
 
@@ -30,19 +27,19 @@ sub new {
     }
 
     if( !defined($parentDomain) ) {
-        $self->_log( 'description du domaine père indéfini', 3 );
+        $self->_log( 'description du domaine père indéfini', 1 );
         return undef;
     }
 
     if( ref($parentDomain) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine père incorrecte', 3 );
+        $self->_log( 'description du domaine père incorrecte', 1 );
         return undef;
     }
     $self->{'parentDomain'} = $parentDomain;
     
     $self->{'domainId'} = $parentDomain->getId();
     if( ref($self->{'domainId'}) || ($self->{'domainId'} !~ /$regexp_id/) ) {
-        $self->_log( 'identifiant de domaine \''.$self->{'domainId'}.'\' incorrect', 3 );
+        $self->_log( 'identifiant de domaine \''.$self->{'domainId'}.'\' incorrect', 1 );
         return undef;
     }
 
@@ -58,7 +55,7 @@ sub new {
 sub next {
     my $self = shift;
 
-    $self->_log( 'obtention de l\'entité suivante', 2 );
+    $self->_log( 'obtention de l\'entité suivante', 4 );
 
     if( !$self->isRunning() ) {
         if( !$self->_start() ) {
@@ -73,7 +70,7 @@ sub next {
             SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
                     if( $self->_loadMailServerLinks() ) {
-                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
                         return undef;
                     }
 
@@ -92,7 +89,7 @@ sub next {
 
                 if( $self->{'updateType'} eq 'UPDATE_LINKS' ) {
                     if( $self->_loadMailServerLinks() ) {
-                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
                         return undef;
                     }
 
@@ -101,7 +98,7 @@ sub next {
                     last SWITCH;
                 }
 
-                $self->_log( 'type de mise à jour inconnu \''.$self->{'updateType'}.'\'', 0 );
+                $self->_log( 'type de mise à jour inconnu \''.$self->{'updateType'}.'\'', 3 );
                 return undef;
             }
 
@@ -119,13 +116,13 @@ sub next {
 sub _loadEntities {
     my $self = shift;
 
-    $self->_log( 'chargement de la configuration des serveurs de courriers du domaine '.$self->{'parentDomain'}->getDescription().'\'', 2 );
+    $self->_log( 'chargement de la configuration des serveurs de courriers du domaine '.$self->{'parentDomain'}->getDescription().'\'', 3 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
     if( !$dbHandler ) {
-        $self->_log( 'connexion à la base de données impossible', 4 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 
@@ -147,7 +144,7 @@ sub _loadEntities {
                  WHERE host_id='.$dbHandler->castAsInteger('serviceproperty_value').' AND serviceproperty_service=\'mail\'';
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'entitiesDescList'} )) ) {
-        $self->_log( 'chargement de la configuration des serveurs de courriers depuis la BD impossible', 3 );
+        $self->_log( 'chargement de la configuration des serveurs de courriers depuis la BD impossible', 1 );
         return 1;
     }
 

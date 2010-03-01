@@ -2,8 +2,10 @@ package OBM::Cyrus::cyrusServers;
 
 $VERSION = '1.0';
 
+use Class::Singleton;
 use OBM::Tools::obmServersList;
-@ISA = ('OBM::Tools::obmServersList', 'Class::Singleton');
+use OBM::Log::log;
+@ISA = ('Class::Singleton', 'OBM::Tools::obmServersList', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -27,7 +29,7 @@ sub _loadServer {
     my $self = shift;
     my( $serverId ) = @_;
 
-    $self->_log( 'chargement du serveur IMAP d\'identifiant \''.$serverId.'\'', 2 );
+    $self->_log( 'chargement du serveur IMAP d\'identifiant \''.$serverId.'\'', 3 );
 
     require OBM::Cyrus::cyrusServer;
     $self->{'servers'}->{$serverId} = OBM::Cyrus::cyrusServer->new( $serverId );

@@ -4,18 +4,14 @@ $VERSION = '1.0';
 
 use OBM::Ldap::ldapEngine;
 use OBM::Ldap::utils;
-@ISA = ('OBM::Ldap::ldapEngine', 'OBM::Ldap::utils');
+use OBM::Log::log;
+@ISA = ('OBM::Ldap::ldapEngine', 'OBM::Ldap::utils', 'OBM::Log::log');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
 
 
 sub update {

@@ -2,13 +2,14 @@ package OBM::DbUpdater::hostUpdater;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -23,7 +24,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -32,7 +33,7 @@ sub update {
     my( $entity ) = @_;
 
     if( ref($entity) ne 'OBM::Entities::obmHost' ) {
-        $self->_log( 'entité incorrecte, traitement impossible', 3 );
+        $self->_log( 'entité incorrecte, traitement impossible', 0 );
         return 1;
     }
 
@@ -40,12 +41,12 @@ sub update {
     my $dbHandler;
     my $sth;
     if( !($dbHandler = OBM::Tools::obmDbHandler->instance()) ) {
-        $self->_log( 'connexion à la base de données impossible', 3 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 
     if( $self->_delete($entity) ) {
-        $self->_log( 'problème à la mise à jour BD de l\hôte '.$entity->getDescription(), 2 );
+        $self->_log( 'problème à la mise à jour BD de l\hôte '.$entity->getDescription(), 1 );
         return 1;
     }
 
@@ -81,7 +82,7 @@ sub update {
                       FROM Host
                       WHERE host_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
             return 1;
         }
 
@@ -93,7 +94,7 @@ sub update {
                    FROM HostEntity
                    WHERE hostentity_host_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
             return 1;
         }
     }
@@ -113,7 +114,7 @@ sub update {
                       WHERE hostentity_host_id='.$entity->getId().'
                     )';
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
             return 1;
         }
     }
@@ -141,7 +142,7 @@ sub _delete {
     my( $entity ) = @_;
 
     if( ref($entity) ne 'OBM::Entities::obmHost' ) {
-        $self->_log( 'entité incorrecte, traitement impossible', 3 );
+        $self->_log( 'entité incorrecte, traitement impossible', 0 );
         return 1;
     }
 
@@ -149,7 +150,7 @@ sub _delete {
     my $dbHandler;
     my $sth;
     if( !($dbHandler = OBM::Tools::obmDbHandler->instance()) ) {
-        $self->_log( 'connexion à la base de données impossible', 3 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 
@@ -161,7 +162,7 @@ sub _delete {
                                     FROM P_HostEntity
                                     WHERE hostentity_host_id='.$entity->getId().')';
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );
             return 1;
         }
     }
@@ -169,13 +170,13 @@ sub _delete {
     if( $entity->getDelete() || $entity->getUpdateEntity() ) {
         my $query = 'DELETE FROM P_HostEntity WHERE hostentity_host_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );
             return 1;
         }
 
         $query = 'DELETE FROM P_Host WHERE host_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );
             return 1;
         }
     }

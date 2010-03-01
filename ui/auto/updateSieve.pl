@@ -19,9 +19,11 @@
 
 package updateSieve;
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 use strict;
 use OBM::Parameters::regexp;
-use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
@@ -42,6 +44,8 @@ $| = 1;
 sub run {
     my $self = shift;
     my( $parameters ) = @_;
+
+    $self->_configureLog();
 
     if( !defined($parameters) ) {
         $parameters->{'help'} = 1;

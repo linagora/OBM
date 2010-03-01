@@ -4,7 +4,8 @@ $VERSION = '1.0';
 
 use OBM::Update::update;
 use OBM::Entities::entityIdGetter;
-@ISA = ('OBM::Update::update', 'OBM::Entities::entityIdGetter');
+use OBM::Log::log;
+@ISA = ('OBM::Update::update', 'OBM::Entities::entityIdGetter', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -12,8 +13,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-
-use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::regexp;
 
 

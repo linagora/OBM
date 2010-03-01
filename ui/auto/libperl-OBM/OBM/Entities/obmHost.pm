@@ -23,7 +23,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'domaine père incorrect', 3 );
+        $self->_log( 'domaine père incorrect', 1 );
         return undef;
     }
     $self->setParent( $parent );
@@ -57,7 +57,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'parent'} = undef;
 }
@@ -71,16 +71,16 @@ sub _init {
     my( $hostDesc ) = @_;
 
     if( !defined($hostDesc) || (ref($hostDesc) ne 'HASH') ) {
-        $self->_log( 'description de l\'hôte incorrect', 4 );
+        $self->_log( 'description de l\'hôte incorrect', 1 );
         return 1;
     }
 
     # L'ID de l'hôte
     if( !defined($hostDesc->{'host_id'}) ) {
-        $self->_log( 'ID de l\'hôte non défini', 0 );
+        $self->_log( 'ID de l\'hôte non défini', 1 );
         return 1;
     }elsif( $hostDesc->{'host_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$hostDesc->{'host_id'}.'\' incorrect', 0 );
+        $self->_log( 'ID \''.$hostDesc->{'host_id'}.'\' incorrect', 1 );
         return 1;
     }
 
@@ -89,13 +89,13 @@ sub _init {
 
     # Le nom de l'hôte
     if( !defined($hostDesc->{'host_name'}) ) {
-        $self->_log( 'nom de l\'hôte non défini', 0 );
+        $self->_log( 'nom de l\'hôte non défini', 1 );
         return 1;
     }
     
     $hostDesc->{'host_name_new'} = lc($hostDesc->{'host_name'});
     if( $hostDesc->{'host_name_new'} !~ /$OBM::Parameters::regexp::regexp_hostname/ ) {
-        $self->_log( 'nom de l\'hôte \''.$hostDesc->{'host_name'}.'\' incorrect', 0 );
+        $self->_log( 'nom de l\'hôte \''.$hostDesc->{'host_name'}.'\' incorrect', 1 );
         return 1;
     }
 
@@ -103,7 +103,7 @@ sub _init {
     if( defined($hostDesc->{'host_name_current'}) ) {
         $hostDesc->{'host_name_current'} = lc($hostDesc->{'host_name_current'});
         if( !$hostDesc->{'host_name_current'} || $hostDesc->{'host_name_current'} !~ /$OBM::Parameters::regexp::regexp_hostname/ ) {
-            $self->_log( 'nom actuel de l\'hôte \''.$hostDesc->{'host_name_current'}.'\' incorrect', 0 );
+            $self->_log( 'nom actuel de l\'hôte \''.$hostDesc->{'host_name_current'}.'\' incorrect', 1 );
             return 1;
         }
     }
@@ -121,7 +121,7 @@ sub _init {
 
     $self->{'entityDesc'} = $hostDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 3 );
 
     return 0;
 }
@@ -143,7 +143,7 @@ sub setLinks {
     # Le SID du domaine
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
     if( !$domainSid ) {
-        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 3 );
+        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 1 );
         if( $hostDesc->{'host_samba'} ) {
             $self->_log( 'droit samba annulé', 2 );
             $hostDesc->{'host_samba'} = 0;
@@ -161,7 +161,7 @@ sub setLinks {
 
 
         if( $self->_getNTLMPasswd( $hostDesc->{'host_name_new'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
-            $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
+            $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 1 );
             if( $hostDesc->{'host_samba'} ) {
                 $self->_log( 'droit samba annulé', 2 );
                 $hostDesc->{'host_samba'} = 0;
@@ -218,7 +218,7 @@ sub setParent {
     my( $parent ) = @_;
 
     if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine parent incorrecte', 3 );
+        $self->_log( 'description du domaine parent incorrecte', 1 );
         return 1;
     }
 
@@ -246,12 +246,12 @@ sub createLdapEntry {
     my ( $entryDn, $entry ) = @_;
 
     if( !$entryDn ) {
-        $self->_log( 'DN non défini', 3 );
+        $self->_log( 'DN non défini', 1 );
         return 1;
     }
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 3 );
+        $self->_log( 'entrée LDAP incorrecte', 1 );
         return 1;
     }
 

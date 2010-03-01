@@ -2,13 +2,14 @@ package OBM::Postfix::smtpInEngine;
 
 $VERSION = '1.0';
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -33,7 +34,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 }
 
 
@@ -42,10 +43,10 @@ sub update {
     my( $entity ) = @_;
 
     if( !defined($entity) ) {
-        $self->_log( 'entité non définie', 0 );
+        $self->_log( 'entité non définie', 1 );
         return 1;
     }elsif( !ref($entity) ) {
-        $self->_log( 'entité incorrecte', 0 );
+        $self->_log( 'entité incorrecte', 1 );
         return 1;
     }
 
@@ -59,7 +60,7 @@ sub update {
 
     # If entity is not updated (but only links)
     if( !$entity->smtpInUpdateMap() ) {
-        $self->_log( 'entité '.$entity->getDescription().' mise à jour mais pas d\'impact sur les maps postfix', 1 );
+        $self->_log( 'entité '.$entity->getDescription().' mise à jour mais pas d\'impact sur les maps postfix', 3 );
         return 0;
     }
 
@@ -75,7 +76,7 @@ sub updateByDomainId {
     my( $ids ) = @_;
 
     if( ref($ids) ne 'ARRAY' ) {
-        $self->_log( 'listes d\'identifiant de domaines incorrecte', 3 );
+        $self->_log( 'listes d\'identifiant de domaines incorrecte', 1 );
         return 1;
     }
 
@@ -97,22 +98,22 @@ sub updateMaps {
 
     if( $#{$self->{'entitiesUpdateErrorDesc'}} >= 0 ) {
         $self->_log( 'au moins une entité nécessitant la régénération des maps SMTP-in est en erreur de traitement', 0 );
-        $self->_log( 'génération des maps SMTP-in annulée', 0 );
+        $self->_log( 'génération des maps SMTP-in annulée', 1 );
 
         for( my $i=0; $i<=$#{$self->{'entitiesUpdateErrorDesc'}}; $i++ ) {
-            $self->_log( 'erreur: '.$self->{'entitiesUpdateErrorDesc'}->[$i], 0 );
+            $self->_log( 'erreur: '.$self->{'entitiesUpdateErrorDesc'}->[$i], 1 );
         }
 
         return 1;
     }
 
     if( !$self->{'entitiesUpdate'} ) {
-        $self->_log( 'pas d\'entité mise à jour, nécessitant la régénération des maps SMTP-in', 2);
+        $self->_log( 'pas d\'entité mise à jour, nécessitant la régénération des maps SMTP-in', 3 );
         return 0;
     }
 
     if( $self->_updateSmtpInMaps() ) {
-        $self->_log( 'problème à la mise à jour des maps SMTP-in', 0 );
+        $self->_log( 'problème à la mise à jour des maps SMTP-in', 1 );
         return 2;
     }
 
@@ -156,13 +157,13 @@ sub _updateSmtpInMaps {
         my $srv = OBM::Postfix::smtpInServer->new( $srvDesc );
 
         if( !defined($srv) ) {
-            $self->_log( 'problème d\'initialisation d\'un serveur SMTP-in', 0 );
+            $self->_log( 'problème d\'initialisation d\'un serveur SMTP-in', 1 );
             $sth->finish();
             return 1;
         }
 
         if( $srv->update() ) {
-            $self->_log( 'problème à la mise à jour d\'un serveur SMTP-in', 0 );
+            $self->_log( 'problème à la mise à jour d\'un serveur SMTP-in', 1 );
             $sth->finish();
             return 1;
         }

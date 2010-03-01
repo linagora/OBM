@@ -51,25 +51,25 @@ sub _init {
     my( $domainDesc ) = @_;
 
     if( !defined($domainDesc) || (ref($domainDesc) ne 'HASH') ) {
-        $self->_log( 'description de domaine incorrecte', 4 );
+        $self->_log( 'description de domaine incorrecte', 1 );
         return 1;
     }
 
     # L'Id du domaine
     if( !defined($domainDesc->{'domain_id'}) ) {
-        $self->_log( 'ID du domaine non défini', 3 );
+        $self->_log( 'ID du domaine non défini', 1 );
         return 1;
     }elsif( $domainDesc->{'domain_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$domainDesc->{'domain_id'}.'\' incorrect', 4 );
+        $self->_log( 'ID \''.$domainDesc->{'domain_id'}.'\' incorrect', 1 );
         return 1;
     }
 
     # Le nom du domaine
     if( !defined($domainDesc->{'domain_name'}) ) {
-        $self->_log( 'nom de domaine - domaine principal de messagerie - non défini', 3 );
+        $self->_log( 'nom de domaine principal de messagerie non défini', 1 );
         return 1;
     }elsif( $domainDesc->{'domain_name'} !~ /$OBM::Parameters::regexp::regexp_domain/ ) {
-        $self->_log( 'nom de domaine \''.$domainDesc->{'domain_name'}.'\' incorrect', 4 );
+        $self->_log( 'nom de domaine \''.$domainDesc->{'domain_name'}.'\' incorrect', 1 );
         return 1;
     }
 
@@ -80,7 +80,7 @@ sub _init {
         my @aliases = split( /\r\n/, $domainAlias );
         for( my $i=0; $i<=$#aliases; $i++ ) {
             if( $aliases[$i] !~ /$OBM::Parameters::regexp::regexp_domain/ ) {
-                $self->_log( 'alias de domaine \''.$aliases[$i].'\' incorrect', 4 );
+                $self->_log( 'alias de domaine \''.$aliases[$i].'\' incorrect', 1 );
             }else {
                 push( @{$domainDesc->{'domain_alias'}}, $aliases[$i] );
             }
@@ -92,7 +92,7 @@ sub _init {
 
     $self->{'entityDesc'} = $domainDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 3 );
 
     return 0;
 }
@@ -190,7 +190,7 @@ sub getDnPrefix {
     my @dnPrefixes;
 
     if( !($rootDn = $self->_getRootDnPrefix()) ) {
-        $self->_log( 'DN de la racine du domaine non déterminée', 3 );
+        $self->_log( 'DN de la racine du domaine non déterminée', 1 );
         return undef;
     }
 

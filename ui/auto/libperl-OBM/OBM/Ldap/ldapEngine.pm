@@ -3,8 +3,8 @@ package OBM::Ldap::ldapEngine;
 $VERSION = '1.0';
 
 use OBM::Ldap::utils;
-use OBM::Tools::commonMethods;
-@ISA = ('OBM::Ldap::utils', 'OBM::Tools::commonMethods');
+use OBM::Log::log;
+@ISA = ('OBM::Ldap::utils', 'OBM::Log::log');
 
 $debug = 1;
 
@@ -30,14 +30,14 @@ sub new {
 
     require OBM::Ldap::ldapServers;
     if( !($self->{'ldapservers'} = OBM::Ldap::ldapServers->instance()) ) {
-        $self->_log( 'initialisation du gestionnaire de serveur LDAP impossible', 3 );
+        $self->_log( 'initialisation du gestionnaire de serveur LDAP impossible', 0 );
         return undef;
     }
 
     $self->{'currentEntity'} = undef;
     $self->{'objectclassDesc'} = undef;
 
-    $self->_log( 'démarrage du moteur LDAP', 4 );
+    $self->_log( 'démarrage du moteur LDAP', 3 );
 
     return $self;
 }
@@ -46,7 +46,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     $self->{'ldapservers'} = undef;
     $self->{'currentEntity'} = undef;
@@ -60,10 +60,10 @@ sub update {
 
 
     if( !defined($entity) ) {
-        $self->_log( 'entité non définie', 3 );
+        $self->_log( 'entité non définie', 1 );
         return 1;
     }elsif( !ref($entity) ) {
-        $self->_log( 'entité incorrecte', 3 );
+        $self->_log( 'entité incorrecte', 1 );
         return 1;
     }
     $self->{'currentEntity'} = $entity;
@@ -120,10 +120,10 @@ sub update {
 
             if( defined($currentLdapEntity) && $toDelete ) {
                 # Suppression du DN actuel
-                $self->_log( 'supression de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 2 );
+                $self->_log( 'supression de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 3 );
 
                 if( $self->_deleteEntity( $currentLdapEntity ) ) {
-                    $self->( 'echec de suppression de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 3 );
+                    $self->_log( 'echec de suppression de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 1 );
                     return $errorCode;
                 }
 
@@ -132,7 +132,7 @@ sub update {
 
             if( !defined($currentLdapEntity) && !defined($updateLdapEntity) && $toDelete ) {
                 # DN à supprimer et non existant dans l'annuaire
-                $self->_log( 'DN \''.$currentEntityDNs->[$i].'\' non présent dans l\'annuaire, suppression déjà effectuée', 2 );
+                $self->_log( 'DN \''.$currentEntityDNs->[$i].'\' non présent dans l\'annuaire, suppression déjà effectuée', 3 );
 
                 last SWITCH;
             }
@@ -140,7 +140,7 @@ sub update {
             if( !defined($currentLdapEntity) && !defined($updateLdapEntity) && !$toDelete ) {
                 # Création de l'entité de nouveau DN
                 if( $self->_createEntity( $updateEntityDNs->[$i] ) ) {
-                    $self->_log( 'echec de création du DN \''.$updateEntityDNs->[$i].'\'', 3 );
+                    $self->_log( 'echec de création du DN \''.$updateEntityDNs->[$i].'\'', 1 );
                     return $errorCode;
                 }
 
@@ -150,12 +150,12 @@ sub update {
             if( defined($currentLdapEntity) && !$toDelete ) {
                 # Mise à jour de l'entité de DN actuel
                 if( $self->_updateEntity($currentLdapEntity) ) {
-                    $self->_log( 'echec de mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 3 );
+                    $self->_log( 'echec de mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 1 );
                     return $errorCode;
                 }
 
                 if( $self->_updateEntityDn($currentEntityDNs->[$i], $updateEntityDNs->[$i], $currentLdapEntity) ) {
-                    $self->_log( 'echec de mise à jour du DN de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 3 );
+                    $self->_log( 'echec de mise à jour du DN de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 1 );
                     return $errorCode;
                 }
 
@@ -165,7 +165,7 @@ sub update {
             if( defined($updateLdapEntity) && !$toDelete ) {
                 # Mise à jour de l'entité de nouveau DN
                 if( $self->_updateEntity($currentLdapEntity) ) {
-                    $self->_log( 'echec de mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$updateEntityDNs->[$i], 3 );
+                    $self->_log( 'echec de mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$updateEntityDNs->[$i], 1 );
                     return $errorCode;
                 }
 
@@ -187,14 +187,14 @@ sub _searchLdapEntityByDN {
     my( $entityDn ) = @_;
 
     if( !$entityDn ) {
-        $self->_log( 'DN a chercher non défini ou incorrect', 3 );
+        $self->_log( 'DN a chercher non défini ou incorrect', 1 );
         return undef;
     }
 
     # Get LDAP server conn for this entity
     my $ldapServerConn;
     if( !($ldapServerConn = $self->{'ldapservers'}->getLdapServerConn($self->{'currentEntity'}->getLdapServerId())) ) {
-        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 1 );
         return 2;
     }
 
@@ -212,7 +212,7 @@ sub _searchLdapEntityByDN {
         # une erreur
         return undef;
     }elsif( $result->is_error() ) {
-        $self->_log( 'problème lors de la recherche LDAP \''.$result->code.'\', '.$result->error, 3 );
+        $self->_log( 'problème lors de la recherche LDAP \''.$result->code.'\', '.$result->error, 1 );
         return 0;
     }
 
@@ -231,7 +231,7 @@ sub _ldapUpdateEntity {
     # Get LDAP server conn for this entity
     my $ldapServerConn;
     if( !($ldapServerConn = $self->{'ldapservers'}->getLdapServerConn($self->{'currentEntity'}->getLdapServerId())) ) {
-        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 1 );
         return 2;
     }
 
@@ -239,7 +239,7 @@ sub _ldapUpdateEntity {
     my $result = $entry->update( $ldapServerConn );
 
     if( $result->is_error() ) {
-        $self->_log( 'erreur LDAP à la mise à jour du DN '.$entry->dn().', '.$result->code().' - '.$result->error(), 0 );
+        $self->_log( 'erreur LDAP à la mise à jour du DN '.$entry->dn().', '.$result->code().' - '.$result->error(), 1 );
 
         if( $result->code() == 32 ) {
             $self->_log( 'l\'objet père du DN '.$entry->dn().' n\'existe pas', 1 );
@@ -257,22 +257,22 @@ sub _createEntity {
     my( $entityDn ) = @_;
 
     if( !$entityDn ) {
-        $self->_log( 'DN de l\'entité a créer incorrect', 3 );
+        $self->_log( 'DN de l\'entité a créer incorrect', 1 );
         return 1;
     }
 
     if( !ref($self->{'currentEntity'}) ) {
-        $self->_log( 'entité à mettre à jour incorrecte', 3 );
+        $self->_log( 'entité à mettre à jour incorrecte', 1 );
         return 1;
     }
 
 
-    $self->_log( 'création du DN \''.$entityDn.'\'', 2 );
+    $self->_log( 'création du DN \''.$entityDn.'\'', 3 );
 
     require Net::LDAP::Entry;
     my $entry = Net::LDAP::Entry->new();
     if( $self->{'currentEntity'}->createLdapEntry($entityDn, $entry) ) {
-        $self->_log( 'problème à la création de l\'entrée LDAP de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'problème à la création de l\'entrée LDAP de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
         return 1;
     }
 
@@ -287,23 +287,23 @@ sub _updateEntity {
     my( $entry ) = @_;
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorecte', 3 );
+        $self->_log( 'entrée LDAP incorecte', 0 );
         return 1;
     }
 
     if( !ref($self->{'currentEntity'}) ) {
-        $self->_log( 'entité à mettre à jour incorrecte', 3 );
+        $self->_log( 'entité à mettre à jour incorrecte', 1 );
         return 1;
     }
 
     # Obtention de la description des classes d'objets LDAP
     if( $self->_getObjectclassDesc( $entry ) ) {
-        $self->_log( 'problème à l\'obtention de la description des classes LDAP', 3 );
+        $self->_log( 'problème à l\'obtention de la description des classes LDAP', 1 );
         return 1;
     }
 
     if( $self->{'currentEntity'}->updateLdapEntry( $entry, $self->{'objectclassDesc'} ) ) {
-        $self->_log( 'mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$entry->dn(), 2 );
+        $self->_log( 'mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$entry->dn(), 3 );
         return $self->_ldapUpdateEntity( $entry );
     }
 
@@ -317,12 +317,12 @@ sub _updateEntityDn {
     my( $currentDn, $newDn, $entry ) = @_;
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorecte', 3 );
+        $self->_log( 'entrée LDAP incorecte', 0 );
         return 1;
     }
 
     if( ref($currentDn) || ref($newDn) || !$currentDn || !$newDn ) {
-        $self->_log( 'DN de '.$self->{'currentEntity'}->getDescription().' incorrects', 3 );
+        $self->_log( 'DN de '.$self->{'currentEntity'}->getDescription().' incorrects', 1 );
         return 1;
     }
 
@@ -335,7 +335,7 @@ sub _updateEntityDn {
     my( $attr, $value ) = split( '=', $newRdn[0] );
     
     if( !$self->_modifyAttr( $value, $entry, $attr ) ) {
-        $self->_log( 'problème à la mise à jour du DN de '.$self->{'currentEntity'}->getDescription(), 3 );
+        $self->_log( 'problème à la mise à jour du DN de '.$self->{'currentEntity'}->getDescription(), 1 );
         return 1;
     }
     
@@ -343,11 +343,11 @@ sub _updateEntityDn {
     $entry->replace( deleteoldrdn => $currentDn );
     $entry->changetype( 'moddn' );
     if( $self->_ldapUpdateEntity( $entry ) ) {
-        $self->_log( 'problème à la mise à jour du DN de '.$self->{'currentEntity'}->getDescription().', DN '.$entry->dn(), 3 );
+        $self->_log( 'problème à la mise à jour du DN de '.$self->{'currentEntity'}->getDescription().', DN '.$entry->dn(), 1 );
         return 1;
     }
 
-    $self->_log( 'mise à jour du DN de '.$self->{'currentEntity'}->getDescription().', nouveau DN '.$newDn, 2 );
+    $self->_log( 'mise à jour du DN de '.$self->{'currentEntity'}->getDescription().', nouveau DN '.$newDn, 3 );
     return 0;
 }
 
@@ -357,14 +357,14 @@ sub _deleteEntity {
     my ( $entry ) = @_;
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorecte', 3 );
+        $self->_log( 'entrée LDAP incorecte', 0 );
         return 1;
     }
 
     # Get LDAP server conn for this entity
     my $ldapServerConn;
     if( !($ldapServerConn = $self->{'ldapservers'}->getLdapServerConn($self->{'currentEntity'}->getLdapServerId())) ) {
-        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 1 );
         return 1;
     }
 
@@ -372,9 +372,9 @@ sub _deleteEntity {
     my $result = $ldapServerConn->delete( $dn );
 
     if( $result->is_error() ) {
-        $self->_log( 'erreur LDAP à la suppression de '.$self->{'currentEntity'}->getDescription().', DN '.$dn.' : '.$result->code().' - '.$result->error(), 0 );
+        $self->_log( 'erreur LDAP à la suppression de '.$self->{'currentEntity'}->getDescription().', DN '.$dn.' : '.$result->code().' - '.$result->error(), 1 );
     }else {
-        $self->_log( 'suppression de l\'entité de '.$self->{'currentEntity'}->getDescription().', DN '.$dn, 2 );
+        $self->_log( 'suppression de l\'entité de '.$self->{'currentEntity'}->getDescription().', DN '.$dn, 3 );
     }
 
     return $result->code();
@@ -391,7 +391,7 @@ sub _getObjectclassDesc {
     # Get LDAP server conn for this entity
     my $ldapServerConn;
     if( !($ldapServerConn = $self->{'ldapservers'}->getLdapServerConn($self->{'currentEntity'}->getLdapServerId())) ) {
-        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 2 );
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 1 );
         return 1;
     }
 

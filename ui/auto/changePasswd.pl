@@ -18,9 +18,11 @@
 
 package changePasswd;
 
+use OBM::Log::log;
+@ISA = ('OBM::Log::log');
+
 use strict;
 use OBM::Parameters::regexp;
-use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
@@ -29,13 +31,23 @@ my %parameters;
 my $return = GetOptions( \%parameters, 'login=s', 'domain-id=s', 'passwd=s', 'old-passwd=s', 'unix', 'samba', 'sql', 'interactiv', 'no-old', 'help' );
 
 if( !$return ) {
-    updateCyrusAcl->_displayHelp();
-    exit 1;
+    %parameters = undef;
 }
 
-exit changePasswd->run(\%parameters);
+my $changePasswd = changePasswd->new();
+exit $changePasswd->run(\%parameters);
 
 $| = 1;
+
+
+sub new {
+    my $class = shift;
+    my $self = bless { }, $class;
+
+    $self->_configureLog();
+
+    return $self;
+}
 
 
 sub run {

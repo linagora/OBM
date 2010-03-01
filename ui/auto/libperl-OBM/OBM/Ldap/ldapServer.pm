@@ -3,16 +3,14 @@ package OBM::Ldap::ldapServer;
 $VERSION = '1.0';
 
 use OBM::Tools::obmServer;
-@ISA = ('OBM::Tools::obmServer');
-
+use OBM::Log::log;
+@ISA = ('OBM::Tools::obmServer', 'OBM::Log::log');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -38,11 +36,11 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    $self->_log( 'suppression de l\'objet', 4 );
+    $self->_log( 'suppression de l\'objet', 5 );
 
     if( ref( $self->{'ldapServerConn'} ) eq 'Net::LDAP' ) {
         # Trying to unbind silently...
-        eval{ $self->{'ldapServerConn'}->unbind(); };
+        eval{ $self->{'ldapServerConn'}->disconnect(); };
     }else {
         undef $self->{'ldapServerConn'};
     }
@@ -53,12 +51,12 @@ sub _getServerDesc {
     my $self = shift;
 
     if( !defined($self->{'serverId'}) ) {
-        $self->_log( 'identifiant de serveur non défini', 3 );
+        $self->_log( 'identifiant de serveur non défini', 1 );
         return 1;
     }
 
     if( ref($self->{'serverId'}) || ($self->{'serverId'} !~ /$OBM::Parameters::regexp::regexp_server_id/) ) {
-        $self->_log( 'identifiant de serveur incorrect', 3 );
+        $self->_log( 'identifiant de serveur incorrect', 1 );
         return 1;
     }
 
@@ -91,12 +89,12 @@ sub _getServerDesc {
     }
 
     if( !(( $self->{'ldap_admin_password'} ) = $sth->fetchrow_array()) ) {
-        $self->_log( 'pas de mot de passe pour l\'utilisateur LDAP defini en BD', 0 );
+        $self->_log( 'pas de mot de passe pour l\'utilisateur LDAP defini en BD', 1 );
         $self->{'ldap_admin_password'} = '';
     }
     $sth->finish();
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 3 );
     $self->_log( 'mot de passe de l\'utilisateur LDAP \''.$self->{'ldap_admin_password'}.'\'', 4 );
 
     return 0;
@@ -126,13 +124,13 @@ sub _getAdminDn {
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'chargement du domain global depuis la BD impossible', 4 );
+        $self->_log( 'chargement du domain global depuis la BD impossible', 1 );
         return undef;
     }
 
     my $globalDomain;
     if( !($globalDomain = $sth->fetchrow_hashref()) ) {
-        $self->_log( 'domaine global non défini', 4 );
+        $self->_log( 'domaine global non défini', 1 );
         return undef;
     }
 
@@ -141,13 +139,13 @@ sub _getAdminDn {
     $sth->finish();
 
 
-    $self->_log( 'obtention de l\'utilisateur système \''.$self->{'ldap_admin_login'}.'\'', 4 );
+    $self->_log( 'obtention de l\'utilisateur système \''.$self->{'ldap_admin_login'}.'\'', 3 );
     $query = 'SELECT *
               FROM UserSystem
               WHERE usersystem_login=\''.$self->{'ldap_admin_login'}.'\'';
 
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'chargement de l\'utilisateur système \''.$self->{'ldap_admin_login'}.'\'', 4 );
+        $self->_log( 'chargement de l\'utilisateur système \''.$self->{'ldap_admin_login'}.'\'', 3 );
         return undef;
     }
 
@@ -160,10 +158,10 @@ sub _getAdminDn {
     }
 
     if( $#{$systemUser} > 0 ) {
-        $self->_log( 'obtention de plusieurs utilisateurs système \''.$self->{'ldap_admin_login'}.'\'', 1 );
+        $self->_log( 'obtention de plusieurs utilisateurs système \''.$self->{'ldap_admin_login'}.'\'', 3 );
         return undef;
     }elsif( $#{$systemUser} < 0 ) {
-        $self->_log( 'utilisateurs système \''.$self->{'ldap_admin_login'}.'\' non trouvé', 0 );
+        $self->_log( 'utilisateurs système \''.$self->{'ldap_admin_login'}.'\' non trouvé', 1 );
         return undef;
     }
 
@@ -185,16 +183,16 @@ sub _connect {
     my $self = shift;
 
     if( $self->getDeadStatus() ) {
-        $self->_log( $self->getDescription().' est désactivé', 0 );
+        $self->_log( $self->getDescription().' est désactivé', 2 );
         return 1;
     }
 
     if( ref( $self->{'ldapServerConn'} ) eq 'Net::LDAP' ) {
-        $self->_log( 'connexion déjà établie à '.$self->getDescription(), 3 );
+        $self->_log( 'connexion déjà établie à '.$self->getDescription(), 4 );
         return 0;
     }
 
-    $self->_log( 'connexion au '.$self->getDescription(), 2 );
+    $self->_log( 'connexion au '.$self->getDescription(), 3 );
 
     my @tempo = ( 1, 3, 5, 10, 20 );
     require Net::LDAP;
@@ -206,12 +204,12 @@ sub _connect {
             last;
         }
 
-        $self->_log( 'prochaine tentative dans '.$tempo.'s', 1 );
+        $self->_log( 'prochaine tentative dans '.$tempo.'s', 3 );
         sleep $tempo;
     }
 
     if( !$self->{'ldapServerConn'} ) {
-        $self->_log( $self->getDescription().' désactivé car injoignable ', 0 );
+        $self->_log( $self->getDescription().' désactivé car injoignable ', 2 );
         $self->_setDeadStatus();
         return 1;
     }
@@ -219,11 +217,11 @@ sub _connect {
     use Net::LDAP qw(LDAP_EXTENSION_START_TLS);
     my $ldapDse = $self->{'ldapServerConn'}->root_dse();
     if( !defined($ldapDse) ) {
-        $self->_log( 'impossible d\'interroger le root DSE de '.$self->getDescription().'. Vérifiez vos ACLs', 0 );
-        $self->_log( 'impossible de vérifier que '.$self->getDescription().' a été compilé avec le support du TLS/SSL', 0 );
+        $self->_log( 'impossible d\'interroger le root DSE de '.$self->getDescription().'. Vérifiez vos ACLs', 1 );
+        $self->_log( 'impossible de vérifier que '.$self->getDescription().' a été compilé avec le support du TLS/SSL', 1 );
 
     }elsif( !$ldapDse->supported_extension(LDAP_EXTENSION_START_TLS) ) {
-        $self->_log( 'le serveur LDAP n\'a pas été compilé avec le support du TLS/SSL !', 3 );
+        $self->_log( 'le serveur LDAP n\'a pas été compilé avec le support du TLS/SSL !', 2 );
         $self->{'ldapTls'} = 'none';
     }
 
@@ -233,15 +231,15 @@ sub _connect {
 
         if( $error->code() && ($self->{'ldapTls'} eq 'encrypt') ) {
             $self->_log( 'erreur fatale au start TLS : '.$error->error, 0 );
-            $self->_log( 'l\'automate (\'ldapTls\'='.$self->{'ldapTls'}.') nécessite une connexion TLS', 0 );
-            $self->_log( $self->getDescription().' désactivé', 0 );
+            $self->_log( 'l\'automate (\'ldapTls\'='.$self->{'ldapTls'}.') nécessite une connexion TLS', 3 );
+            $self->_log( $self->getDescription().' désactivé', 2 );
             $self->_setDeadStatus();
             return 1;
         }
 
         if( $error->code() && ($self->{'ldapTls'} eq 'may') ) {
-            $self->_log( 'erreur au start TLS : '.$error->error, 0 );
-            $self->_log( 'TLS facultatif (\'ldapTls='.$self->{'ldapTls'}.'\'), re-connexion sans TLS', 0 );
+            $self->_log( 'erreur au start TLS : '.$error->error, 1 );
+            $self->_log( 'TLS facultatif (\'ldapTls='.$self->{'ldapTls'}.'\'), re-connexion sans TLS', 3 );
             $self->{'ldapTls'} = 'none';
 
             $self->{'ldapServerConn'} = undef;
@@ -262,32 +260,32 @@ sub _connect {
         $ldapPassword = $self->{'ldap_user_password'};
     }
 
-    $self->_log( 'authentification en tant que \''.$ldapLogin.'\' au '.$self->getDescription(), 2 );
+    $self->_log( 'authentification en tant que \''.$ldapLogin.'\' au '.$self->getDescription(), 3 );
 
     my $error;
     for( my $i=0; $i<=$#{$ldapDnLogin}; $i++ ) {
-        $self->_log( 'connexion avec le DN : '.$ldapDnLogin->[$i], 2 );
+        $self->_log( 'connexion avec le DN : '.$ldapDnLogin->[$i], 3 );
         $error = $self->{'ldapServerConn'}->bind(
            $ldapDnLogin->[$i],
            password => $ldapPassword
         );
 
         if( !$error->code ) {
-            $self->_log( 'connexion à l\'annuaire LDAP établie', 2 );
+            $self->_log( 'connexion à l\'annuaire LDAP établie', 3 );
             last;
         }elsif( $error->code == LDAP_CONFIDENTIALITY_REQUIRED ) {
             $self->_log( 'erreur fatale : start TLS nécessaire pour le serveur LDAP '.$self->getDescription(), 0 );
-            $self->_log( 'l\'automate n\'a pas droit de faire du TLS (\'ldapTls\'='.$self->{'ldapTls'}.')', 0 );
-            $self->_log( $self->getDescription().' désactivé', 0 );
+            $self->_log( 'l\'automate n\'a pas droit de faire du TLS (\'ldapTls\'='.$self->{'ldapTls'}.')', 3 );
+            $self->_log( $self->getDescription().' désactivé', 2 );
             $self->_setDeadStatus();
             return 1;
         }elsif( $error->code ) {
-            $self->_log( 'echec de l\'authentification : '.$error->error, 0 );
+            $self->_log( 'echec de l\'authentification : '.$error->error, 1 );
         }
     }
 
     if(( $error->code ) && ( $error->code ne LDAP_CONFIDENTIALITY_REQUIRED )) {
-        $self->_log( 'echec de l\'authentification : '.$error->error, 0 );
+        $self->_log( 'echec de l\'authentification : '.$error->error, 1 );
         $self->{'ldapServerConn'} = undef;
     }
 
