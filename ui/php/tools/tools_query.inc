@@ -382,16 +382,18 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=fals
       }
     }   
   }
-  $rules['link'] = $rules['update'];
 
-  if (is_array($metadata['link']['rules'])) {
-    foreach($metadata['link']['rules'] as $field => $value) {
-      if (is_array($value)) {
-        $rules['link'][] ="Link.$field IN ('".implode("','", $value)."')";
-      } else {
-        $rules['link'][] ="Link.$field = '$value'";
-      }
-    }   
+  foreach($metadata['links'] as $linkName => $link) {
+    $rules['links'][$linkName] = $rules['update'];
+    if (is_array($link['rules'])) {
+      foreach($link['rules'] as $field => $value) {
+        if (is_array($value)) {
+          $rules['links'][$linkName] [] ="Link.$field IN ('".implode("','", $value)."')";
+        } else {
+          $rules['links'][$linkName] [] ="Link.$field = '$value'";
+        }
+      }   
+    }
   }
   if ($update) {
     $userdata = array('uid' =>  $obm['uid'], 'delegation' => $obm['delegation_target'], 'domain' => $domain );
@@ -511,65 +513,68 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   }
   $return['diff'] += $return['deleted'];
   
-  if(!isset($metadata['link'])) {
+  if(!isset($metadata['links'])) {
     return $return;
   }
   /**
    * PERFORM UPDATED LINKS 
    */
-  $diff = array();
-  $join = array();
-  $fields = $obm_qm->metadata($metadata['link']['table'], false);
-  foreach ($fields as $field) {
-    if(strpos(strtolower($field['flags']),'primary') === false) {
-      $diff[] = "Production.$field[name] != Link.$field[name]";
-        $diff[] = "(Production.$field[name] IS NULL AND Link.$field[name] IS NOT NULL)";
-        $diff[] = "(Production.$field[name] IS NOT NULL AND Link.$field[name] IS NULL)";
-    } else {
-      $diff[] = "Production.$field[name] IS NULL";
-      $diff[] = "Link.$field[name] IS NULL";
-      $join[] = "Link.$field[name] = Production.$field[name]";
+  
+  $return['links'] = 0;
+  foreach($metadata['links'] as $linkName => $link) {
+    $diff = array();
+    $join = array();
+    $fields = $obm_qm->metadata($link['table'], false);
+    foreach ($fields as $field) {
+      if(strpos(strtolower($field['flags']),'primary') === false) {
+        $diff[] = "Production.$field[name] != Link.$field[name]";
+          $diff[] = "(Production.$field[name] IS NULL AND Link.$field[name] IS NOT NULL)";
+          $diff[] = "(Production.$field[name] IS NOT NULL AND Link.$field[name] IS NULL)";
+      } else {
+        $diff[] = "Production.$field[name] IS NULL";
+        $diff[] = "Link.$field[name] IS NULL";
+        $join[] = "Link.$field[name] = Production.$field[name]";
+      }
     }
+    if($link['join']) {
+      $linkJoin = 'LEFT JOIN '.$link['join']['table'].' ON '.$link['join']['table'].'.'.$link['join']['id'] .' = %s.'.$link['join']['joinId'];
+      $linkId = $link['join']['table'].'.'.$link['id'];
+      $productionJoin = 'LEFT JOIN P_'.$link['join']['table'].' ON P_'.$link['join']['table'].'.'.$link['join']['id'] .' = %s.'.$link['join']['joinId'];
+      $productionId = 'P_'.$link['join']['table'].'.'.$link['id'];
+    } else {
+      $linkId = 'Link.'.$link['id'];
+      $productionId =  'Link'.'.'.$link['id'];
+    }
+
+
+
+    // Union to get all changes ! (eg: links that have been deleted)
+    $query = "
+      SELECT count(distinct $linkId) as links 
+        FROM ".$link['table']." as Link 
+        ".sprintf($linkJoin, 'Link')."
+        JOIN $metadata[table] as Current ON $primaries[current] = $linkId
+        LEFT JOIN P_".$link['table']." as Production ON ".implode(' AND ', $join)."
+        ".sprintf($productionJoin, 'Production')."
+        WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['links'][$linkName]).")
+    UNION
+        SELECT count(distinct $productionId) as links 
+        FROM P_".$link['table']." as Link 
+        ".sprintf($productionJoin, 'Link')."
+        JOIN $metadata[table] as Current ON $primaries[current] = $productionId
+        LEFT JOIN ".$link['table']." as Production ON ".implode(' AND ', $join)."
+        ".sprintf($linkJoin, 'Production')."
+        WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['links'][$linkName]).")";
+
+    display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links,'.$link['table'].','.$metadata['table'].')');
+    $obm_qm->query($query);
+    $obm_qm->next_record();
+    $return['links'] += $obm_qm->f('links');
+    // Add Union result (bi directionnal => 2 results)
+    $obm_qm->next_record();
+    $return['links'] += $obm_qm->f('links');
+    $return['diff'] += $return['links'];
   }
-  if($metadata['link']['join']) {
-    $linkJoin = 'LEFT JOIN '.$metadata['link']['join']['table'].' ON '.$metadata['link']['join']['table'].'.'.$metadata['link']['join']['id'] .' = %s.'.$metadata['link']['join']['joinId'];
-    $linkId = $metadata['link']['join']['table'].'.'.$metadata['link']['id'];
-    $productionJoin = 'LEFT JOIN P_'.$metadata['link']['join']['table'].' ON P_'.$metadata['link']['join']['table'].'.'.$metadata['link']['join']['id'] .' = %s.'.$metadata['link']['join']['joinId'];
-    $productionId = 'P_'.$metadata['link']['join']['table'].'.'.$metadata['link']['id'];
-  } else {
-    $linkId = 'Link.'.$metadata['link']['id'];
-    $productionId =  'Link'.'.'.$metadata['link']['id'];
-  }
-
-
-
-  // Union to get all changes ! (eg: links that have been deleted)
-  $query = "
-    SELECT count(distinct $linkId) as links 
-      FROM ".$metadata['link']['table']." as Link 
-      ".sprintf($linkJoin, 'Link')."
-      JOIN $metadata[table] as Current ON $primaries[current] = $linkId
-      LEFT JOIN P_".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
-      ".sprintf($productionJoin, 'Production')."
-      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
-  UNION
-      SELECT count(distinct $productionId) as links 
-      FROM P_".$metadata['link']['table']." as Link 
-      ".sprintf($productionJoin, 'Link')."
-      JOIN $metadata[table] as Current ON $primaries[current] = $productionId
-      LEFT JOIN ".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
-      ".sprintf($linkJoin, 'Production')."
-      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links,'.$metadata['link']['table'].','.$metadata['table'].')');
-  $obm_qm->query($query);
-  $obm_qm->next_record();
-  $return['links'] = $obm_qm->f('links');
-  // Add Union result (bi directionnal => 2 results)
-  $obm_qm->next_record();
-  $return['links'] += $obm_qm->f('links');
-  $return['diff'] += $return['links'];
-
   return $return;
 }
 
@@ -703,75 +708,81 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
   $obm_qm->query($query);
   $return += $obm_qm->affected_rows();
   
-  if(!isset($metadata['link'])) {
+  if(!isset($metadata['links'])) {
     return $return;
   }
-  $diff = array();
-  $join = array();
-  $fields = $obm_qm->metadata($metadata['link']['table'], false);
-  foreach ($fields as $field) {
-    if(strpos(strtolower($field['flags']),'primary') === false) {
-      $diff[] = "(Production.$field[name] != Link.$field[name])";
-      $diff[] = "(Production.$field[name] IS NULL AND Link.$field[name] IS NOT NULL)";
-      $diff[] = "(Production.$field[name] IS NOT NULL AND Link.$field[name] IS NULL)";
-    } else {
-      $diff[] = "Production.$field[name] IS NULL";
-      $diff[] = "Link.$field[name] IS NULL";
-      $join[] = "Link.$field[name] = Production.$field[name]";
+
+  /**
+   * PERFORM UPDATED LINKS 
+   */
+  foreach($metadata['links'] as $linkName => $link) {
+    $diff = array();
+    $join = array();
+    $fields = $obm_qm->metadata($link['table'], false);
+    foreach ($fields as $field) {
+      if(strpos(strtolower($field['flags']),'primary') === false) {
+        $diff[] = "(Production.$field[name] != Link.$field[name])";
+        $diff[] = "(Production.$field[name] IS NULL AND Link.$field[name] IS NOT NULL)";
+        $diff[] = "(Production.$field[name] IS NOT NULL AND Link.$field[name] IS NULL)";
+      } else {
+        $diff[] = "Production.$field[name] IS NULL";
+        $diff[] = "Link.$field[name] IS NULL";
+        $join[] = "Link.$field[name] = Production.$field[name]";
+      }
     }
+
+    if($link['join']) {
+      $linkJoin = 'LEFT JOIN '.$link['join']['table'].' ON '.$link['join']['table'].'.'.$link['join']['id'] .' = %s.'.$link['join']['joinId'];
+      $linkId = $link['join']['table'].'.'.$link['id'];
+      $productionJoin = 'LEFT JOIN P_'.$link['join']['table'].' ON P_'.$link['join']['table'].'.'.$link['join']['id'] .' = %s.'.$link['join']['joinId'];
+      $productionId = 'P_'.$link['join']['table'].'.'.$link['id'];
+    } else {
+      $linkId = 'Link.'.$link['id'];
+      $productionId =  'Link'.'.'.$link['id'];
+    }
+
+    $query = "
+      INSERT INTO Updatedlinks (
+          updatedlinks_domain_id,
+          updatedlinks_user_id,
+          updatedlinks_delegation,
+          updatedlinks_table,
+          updatedlinks_entity,
+          updatedlinks_entity_id            
+        )
+        SELECT 
+          $userdata[domain],
+          $userdata[uid],
+          '$userdata[delegation]',
+          '$metadata[table]',
+          '$metadata[prefix]',
+          $linkId
+        FROM ".$link['table']." as Link 
+          ".sprintf($linkJoin, 'Link')."
+          JOIN $metadata[table] as Current ON $primaries[current] = $linkId
+          LEFT JOIN P_".$link['table']." as Production ON ".implode(' AND ', $join)."
+          ".sprintf($productionJoin, 'Production')."
+        WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['links'][$linkName]).")
+        UNION
+        SELECT 
+          $userdata[domain],
+          $userdata[uid],
+          '$userdata[delegation]',
+          '$metadata[table]',
+          '$metadata[prefix]',
+          $productionId
+        FROM P_".$link['table']." as Link 
+          ".sprintf($productionJoin, 'Link')."
+          JOIN $metadata[table] as Current ON $primaries[current] = $productionId
+          LEFT JOIN ".$link['table']." as Production ON ".implode(' AND ', $join)."
+          ".sprintf($linkJoin, 'Production')."
+        WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['links'][$linkName]).")";
+
+    display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links)');
+    $obm_qm->query($query);
+    $obm_qm->next_record();
+    $return += $obm_qm->affected_rows();
   }
-
-  if($metadata['link']['join']) {
-    $linkJoin = 'LEFT JOIN '.$metadata['link']['join']['table'].' ON '.$metadata['link']['join']['table'].'.'.$metadata['link']['join']['id'] .' = %s.'.$metadata['link']['join']['joinId'];
-    $linkId = $metadata['link']['join']['table'].'.'.$metadata['link']['id'];
-    $productionJoin = 'LEFT JOIN P_'.$metadata['link']['join']['table'].' ON P_'.$metadata['link']['join']['table'].'.'.$metadata['link']['join']['id'] .' = %s.'.$metadata['link']['join']['joinId'];
-    $productionId = 'P_'.$metadata['link']['join']['table'].'.'.$metadata['link']['id'];
-  } else {
-    $linkId = 'Link.'.$metadata['link']['id'];
-    $productionId =  'Link'.'.'.$metadata['link']['id'];
-  }
-
-  $query = "
-    INSERT INTO Updatedlinks (
-        updatedlinks_domain_id,
-        updatedlinks_user_id,
-        updatedlinks_delegation,
-        updatedlinks_table,
-        updatedlinks_entity,
-        updatedlinks_entity_id            
-      )
-      SELECT 
-        $userdata[domain],
-        $userdata[uid],
-        '$userdata[delegation]',
-        '$metadata[table]',
-        '$metadata[prefix]',
-        $linkId
-      FROM ".$metadata['link']['table']." as Link 
-        ".sprintf($linkJoin, 'Link')."
-        JOIN $metadata[table] as Current ON $primaries[current] = $linkId
-        LEFT JOIN P_".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
-        ".sprintf($productionJoin, 'Production')."
-      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
-      UNION
-      SELECT 
-        $userdata[domain],
-        $userdata[uid],
-        '$userdata[delegation]',
-        '$metadata[table]',
-        '$metadata[prefix]',
-        $productionId
-      FROM P_".$metadata['link']['table']." as Link 
-        ".sprintf($productionJoin, 'Link')."
-        JOIN $metadata[table] as Current ON $primaries[current] = $productionId
-        LEFT JOIN ".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
-        ".sprintf($linkJoin, 'Production')."
-      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links)');
-  $obm_qm->query($query);
-  $obm_qm->next_record();
-  $return += $obm_qm->affected_rows();
 
   return $return;
 }

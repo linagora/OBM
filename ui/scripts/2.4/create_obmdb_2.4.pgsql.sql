@@ -312,10 +312,10 @@ CREATE TABLE contactgroup (
 );
 
 --
--- Table structure for table `__contactgroup`
+-- Table structure for table `_contactgroup`
 --
 
-CREATE TABLE __contactgroup (
+CREATE TABLE _contactgroup (
   contact_id integer NOT NULL,
   group_id integer NOT NULL
 );
@@ -6188,13 +6188,13 @@ CREATE INDEX contactgroup_contact_id_contact_id_fkey ON contactgroup (contact_id
 --
 CREATE INDEX contactgroup_group_id_group_id_fkey ON contactgroup (group_id);
 --
--- Name: __contactgroup_contact_id_contact_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+-- Name: _contactgroup_contact_id_contact_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-CREATE INDEX __contactgroup_contact_id_contact_id_fkey ON __contactgroup (contact_id);
+CREATE INDEX _contactgroup_contact_id_contact_id_fkey ON _contactgroup (contact_id);
 --
--- Name: __contactgroup_group_id_group_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+-- Name: _contactgroup_group_id_group_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-CREATE INDEX __contactgroup_group_id_group_id_fkey ON __contactgroup (group_id);    
+CREATE INDEX _contactgroup_group_id_group_id_fkey ON _contactgroup (group_id);    
 
 
 --
@@ -8350,21 +8350,21 @@ ALTER TABLE ONLY contactgroup
     ADD CONSTRAINT contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
--- Name: __contactgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: _contactgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
-ALTER TABLE ONLY __contactgroup
-    ADD CONSTRAINT __contactgroup_pkey PRIMARY KEY (contact_id, group_id);
+ALTER TABLE ONLY _contactgroup
+    ADD CONSTRAINT _contactgroup_pkey PRIMARY KEY (contact_id, group_id);
 --
--- Name: __contactgroup_contact_id_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: _contactgroup_contact_id_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-ALTER TABLE ONLY __contactgroup
-    ADD CONSTRAINT __contactgroup_contact_id_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY _contactgroup
+    ADD CONSTRAINT _contactgroup_contact_id_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
--- Name: __contactgroup_group_id_group_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: _contactgroup_group_id_group_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
-ALTER TABLE ONLY contactgroup
-    ADD CONSTRAINT __contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY _contactgroup
+    ADD CONSTRAINT _contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
 -- Name: contract_company_id_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -

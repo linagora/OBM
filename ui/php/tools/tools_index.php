@@ -53,14 +53,16 @@ $extra_css[] = $css_tools;
 $entities = array(
   'user' => array(
     'table'   => 'UserObm', 
-    'link'    => array(
-      'table' => 'EntityRight', 
-      'join' => array (
-        'table' => 'MailboxEntity',
-        'id' => 'mailboxentity_entity_id',
-        'joinId' => 'entityright_entity_id'
-      ),      
-      'id' => 'mailboxentity_mailbox_id'
+    'links'    => array(
+      'rights' => array(
+        'table' => 'EntityRight', 
+        'join'  => array (
+          'table'  => 'MailboxEntity',
+          'id'     => 'mailboxentity_entity_id',
+          'joinId' => 'entityright_entity_id'
+        ),      
+        'id' => 'mailboxentity_mailbox_id'
+      )
     ),
     'prefix'  => 'userobm',
     'exclude' => array('domain_id' => 1, 'timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1, 
@@ -73,10 +75,16 @@ $entities = array(
   ),
   'group' => array(
     'table'   => 'UGroup',
-    'link'    => array(
-      'table' => 'of_usergroup', 
-      'id' => 'of_usergroup_group_id'
-    ),
+    'links'    => array(
+      'user' =>array(
+        'table' => 'of_usergroup', 
+        'id' => 'of_usergroup_group_id'
+      ),
+      'contact' =>array(
+        'table' => '_contactgroup', 
+        'id' => 'group_id'
+      )      
+     ),
     'prefix'  => 'group', 
     'exclude' => array('domain_id' => 1, 'timecreate' => 1, 'usercreate' => 1, 'timeupdate' => 1, 
                         'privacy' => 1,'usercreate' => 1),
@@ -86,15 +94,17 @@ $entities = array(
   ),
   'host' => array(
     'table'   => 'Host',
-    'link'    => array(
-      'table' => 'Service',
-      'join' => array (
-        'table' => 'HostEntity',
-        'id' => 'hostentity_entity_id',
-        'joinId' => 'service_entity_id'
+    'links'    => array(
+      'service' => array (
+        'table' => 'Service',
+        'join' => array (
+          'table' => 'HostEntity',
+          'id' => 'hostentity_entity_id',
+          'joinId' => 'service_entity_id'
+        ),
+        'id' => 'hostentity_host_id',
+        'rules' => array('service_service' => array('smtp_in', 'smtp_out', 'imap', 'samba'))
       ),
-      'id' => 'hostentity_host_id',
-      'rules' => array('service_service' => array('smtp_in', 'smtp_out', 'imap', 'samba'))
     ),
     'prefix'  => 'host',
     'exclude' => array('timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1),
@@ -104,14 +114,16 @@ $entities = array(
   ),
   'mailshare' => array(
     'table'   => 'MailShare',
-    'link'    => array(
-      'table' => 'EntityRight', 
-      'join' => array (
-        'table' => 'MailshareEntity',
-        'id' => 'mailshareentity_entity_id',
-        'joinId' => 'entityright_entity_id'
-      ),      
-      'id' => 'mailshareentity_mailshare_id'      
+    'links'    => array(
+      'rights' => array(
+        'table' => 'EntityRight', 
+        'join' => array (
+          'table' => 'MailshareEntity',
+          'id' => 'mailshareentity_entity_id',
+          'joinId' => 'entityright_entity_id'
+        ),      
+        'id' => 'mailshareentity_mailshare_id'      
+      )
     ),    
     'prefix'  => 'mailshare',
     'exclude' => array('timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1),

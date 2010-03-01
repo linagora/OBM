@@ -253,26 +253,26 @@ ALTER TABLE ONLY contactgroup
 ALTER TABLE ONLY contactgroup
     ADD CONSTRAINT contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
 --
--- Table structure for table `__contactgroup`
+-- Table structure for table `_contactgroup`
 --
 
-DROP TABLE IF EXISTS __contactgroup;
-CREATE TABLE __contactgroup (
+DROP TABLE IF EXISTS _contactgroup;
+CREATE TABLE _contactgroup (
   contact_id integer NOT NULL,
   group_id integer NOT NULL
 );
 
-ALTER TABLE ONLY __contactgroup
-    ADD CONSTRAINT __contactgroup_pkey PRIMARY KEY (contact_id, group_id);
+ALTER TABLE ONLY _contactgroup
+    ADD CONSTRAINT _contactgroup_pkey PRIMARY KEY (contact_id, group_id);
 
-CREATE INDEX __contactgroup_contact_id_contact_id_fkey ON __contactgroup (contact_id);
-CREATE INDEX __contactgroup_group_id_group_id_fkey ON __contactgroup (group_id);    
+CREATE INDEX _contactgroup_contact_id_contact_id_fkey ON _contactgroup (contact_id);
+CREATE INDEX _contactgroup_group_id_group_id_fkey ON _contactgroup (group_id);    
 
 
-ALTER TABLE ONLY __contactgroup
-    ADD CONSTRAINT __contactgroup_contact_id_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY _contactgroup
+    ADD CONSTRAINT _contactgroup_contact_id_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY contactgroup
-    ADD CONSTRAINT __contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT _contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 

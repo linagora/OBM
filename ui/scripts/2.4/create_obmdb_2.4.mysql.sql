@@ -589,18 +589,18 @@ CREATE TABLE `contactgroup` (
 
 
 --
--- Table structure for table `__contactgroup`
+-- Table structure for table `_contactgroup`
 --
 
-DROP TABLE IF EXISTS `__contactgroup`;
-CREATE TABLE `__contactgroup` (
+DROP TABLE IF EXISTS `_contactgroup`;
+CREATE TABLE `_contactgroup` (
   `contact_id` int(8) NOT NULL,
   `group_id` int(8) NOT NULL,
   PRIMARY KEY  (`contact_id`, `group_id`),
-  KEY `__contactgroup_contact_id_contact_id_fkey` (`contact_id`),
-  KEY `__contactgroup_group_id_group_id` (`group_id`),
-  CONSTRAINT `__contactgroup_contact_id_contact_id_fkey` FOREIGN KEY (`contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `__contactgroup_group_id_group_id_fkey` FOREIGN KEY (`group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `_contactgroup_contact_id_contact_id_fkey` (`contact_id`),
+  KEY `_contactgroup_group_id_group_id` (`group_id`),
+  CONSTRAINT `_contactgroup_contact_id_contact_id_fkey` FOREIGN KEY (`contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `_contactgroup_group_id_group_id_fkey` FOREIGN KEY (`group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

@@ -2897,7 +2897,7 @@ function of_contactgroup_update_group_node($g_id) {
   $ret = false;
   $g_id_bis = sql_parse_id($g_id, true);
   // Delete current internal association
-  $query = "DELETE FROM __contactgroup
+  $query = "DELETE FROM _contactgroup
     WHERE group_id $g_id_bis ";
   display_debug_msg($query, $cdg_sql, 'of_contactgroup_update_group_node(delete)');
   $obm_q = new DB_OBM;
@@ -2905,7 +2905,7 @@ function of_contactgroup_update_group_node($g_id) {
 
   // If group has users, Insert new internal association
   if (is_array($contacts_id) && count($contacts_id) > 0) {
-    $query = "INSERT INTO __contactgroup (
+    $query = "INSERT INTO _contactgroup (
       group_id,
       contact_id
     ) VALUES (%d,%d)";
@@ -2964,9 +2964,9 @@ function of_contactgroup_delete_contact_hierarchy($c_id, $is_array=false) {
   
   // Delete current internal association
   if (!$is_array) {
-    $query = "DELETE FROM __contactgroup WHERE contact_id=$c_id";
+    $query = "DELETE FROM _contactgroup WHERE contact_id=$c_id";
   } else {
-    $query = "DELETE FROM __contactgroup WHERE contact_id IN (".implode(', ', $c_id).")";
+    $query = "DELETE FROM _contactgroup WHERE contact_id IN (".implode(', ', $c_id).")";
   }
   display_debug_msg($query, $cdg_sql, 'of_contactgroup_delete_contact_hierarchy(delete)');
   $obm_q = new DB_OBM;

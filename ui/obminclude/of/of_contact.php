@@ -1351,7 +1351,7 @@ class OBM_Contact implements OBM_ISearchable {
       }
     }
     if($updateGroup) {
-      $obm_q->query("UPDATE UGroup SET group_timeupdate = NOW() WHERE group_id IN (SELECT group_id FROM __contactgroup WHERE contact_id = ".$contact->id.")");
+      $obm_q->query("UPDATE UGroup SET group_timeupdate = NOW() WHERE group_id IN (SELECT group_id FROM _contactgroup WHERE contact_id = ".$contact->id.")");
       set_update_state();
     }    
   }
