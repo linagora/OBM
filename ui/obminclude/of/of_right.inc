@@ -537,7 +537,7 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
     $ctt[1]['value'] = ' ';
     $ctt[2]['type'] = 'field';
     $ctt[2]['value'] = 'userobm_firstname';
-    $e_label = sql_string_concat($db_type, $ctt);
+    $e_label = sql_string_concat($db->type, $ctt);
     $u = get_user_info($user_id);
   } else {
     switch($entity) {
