@@ -707,7 +707,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   <form method=\"get\" name=\"f_host\" action=\"host_index.php\">
 
   <fieldset class=\"detail extras\">
-  <legend>$l_module_host</h1>
+  <legend>$l_module_host</legend>
 
   <table>
   <tr>
