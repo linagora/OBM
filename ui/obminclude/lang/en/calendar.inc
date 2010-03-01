@@ -103,6 +103,8 @@ $l_delete_default_view = "Delete default view";
 $l_view_label = "View label";
 $l_view_save = "Save view";
 $l_view_delete = "Delete view";
+$l_view_invalid = "Invalid view. No users or resources";
+
 $l_first_hour = "Starting hour";
 $l_last_hour = "End Hour";
 $l_save_as_template = "Save as template";

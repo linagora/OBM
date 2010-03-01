@@ -164,6 +164,7 @@ $l_delete_default_view = "Suppression vue par défaut";
 $l_view_label = "Nom de la vue";
 $l_view_save = "Mémoriser la vue";
 $l_view_delete = "Supprimer la vue";
+$l_view_invalid = "La vue est invalide. Elle ne comporte aucun utilisateur et aucune ressource";
 
 $l_ics = "Import" ;
 $l_ics_insert = "Importer" ;
