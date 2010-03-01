@@ -2926,7 +2926,7 @@ function run_query_userobm_mobile_unlink($user) {
   $owner = $user['owner'];
   $device_id = $user['device_id'];
 
-  $query = "DELETE FROM opush_device WHERE owner='$owner' AND id='$device_id';";
+  $query = "DELETE FROM opush_device WHERE owner='$owner' AND id='$device_id'";
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
