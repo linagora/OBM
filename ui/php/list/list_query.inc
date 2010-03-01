@@ -541,7 +541,6 @@ function run_query_list_contacts_list($list, $entity='') {
       ph1.phone_number as contact_phone,
       email_address,
       contact_comment,
-      contact_privacy,
       company_id,
       company_name,
       ad2.address_street AS company_street,
@@ -1549,7 +1548,10 @@ function make_list_query_from_criteria($list) {
 
   $from = " Contact LEFT JOIN Company ON contact_company_id=company_id
     INNER JOIN ContactEntity ON contact_id = contactentity_contact_id
-    LEFT JOIN Address as ad1 ON contactentity_entity_id=ad1.address_entity_id AND ad1.address_label = 'WORK;X-OBM-Ref1'
+    JOIN AddressBook AS ab ON contact_addressbook_id=ab.id
+    JOIN AddressbookEntity AS abe ON ab.id=abe.addressbookentity_addressbook_id
+    LEFT JOIN EntityRight ON entityright_entity_id=abe.addressbookentity_entity_id AND entityright_consumer_id IS NULL
+    LEFT JOIN Address AS ad1 ON contactentity_entity_id=ad1.address_entity_id AND ad1.address_label = 'WORK;X-OBM-Ref1'
     LEFT JOIN Country as ctry1 ON ad1.address_country=ctry1.country_iso3166 AND ctry1.country_lang='$lang'
     LEFT JOIN Phone as WorkPhone ON WorkPhone.phone_entity_id = contactentity_entity_id AND WorkPhone.phone_label = 'WORK;VOICE;X-OBM-Ref1'
     LEFT JOIN Phone as MobilePhone ON MobilePhone.phone_entity_id = contactentity_entity_id  AND MobilePhone.phone_label = 'CELL;VOICE;X-OBM-Ref1'
@@ -1855,11 +1857,11 @@ function make_list_query_from_criteria($list) {
     $where = " (contact_archive != '1') AND ($where) ";
   }
 
-  // Handle the privacy
+  // Allow only contacts from public (read wise) address books
   if ($privacy == $c_private) {
-    $where = " (contact_privacy = 0 or contact_usercreate = $obm[uid]) AND ($where) ";
+    $where = " (entityright_read=1) AND ($where)";
   } else {
-    $where = " (contact_privacy = 0) AND ($where) ";
+    $where = " (entityright_read=1) AND ($where)";
   }
 
   // If any (not in insert mode), add statics contacts to the query
