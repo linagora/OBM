@@ -421,11 +421,16 @@ require_once("$obminclude/of/of_date.inc");
 require_once("$obminclude/of/of_template.php");
 require_once("$obminclude/of/of_i18n.php");
 
+set_include_path(get_include_path().":../$path/$obminclude/lib");
+set_include_path(get_include_path().":../$path/lib:../$path/app:../$path/app/default/models");
+
 // Autoloading
-function __autoload($className) {
-    global $obminclude;
-    require "$obminclude/lib/".str_replace('_', '/', $className).'.php';
-}
+require_once 'OBM/Autoloader.php';
+require_once 'OBM/Autoloader/Standard.php';
+$autoloader = OBM_Autoloader::getInstance();
+$autoloader->autoloaders['OBM'] =  new OBM_Autoloader_Standard();
+$autoloader->autoloaders['Stato'] =  new OBM_Autoloader_Standard();
+$autoloader->autoloaders['*'] = new OBM_Autoloader_Resource();
 
 // Document root
 if (is_null($ini_array['documentRoot'])) {
@@ -763,7 +768,6 @@ if ($path == '') {
     $path = '..';
 }
 
-set_include_path(get_include_path().":../$path/$obminclude/lib");
 //those functions must be defined before the global_query and global display
 //includes.
 ///////////////////////////////////////////////////////////////////////////////
