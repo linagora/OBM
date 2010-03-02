@@ -1850,6 +1850,15 @@ function check_user_data_form($p_id, &$user) {
 	}
       }
     }
+ 
+   // Email quota check with profile max quota
+   $max_quota = $profiles[$profile]['properties']['mail_quota_max'];
+   if(($mail_quota > $max_quota && $max_quota != 0)
+     || ($mail_quota < $max_quota && $mail_quota == 0)) {
+     $err['msg'] = "$l_user_quota_error ($l_max_quota : $max_quota)";
+     $err['field'] = 'mail_quota';
+     return false;
+   }
 
   } else {
     // OBM-Mail disabled, email must be full (user@domain)
@@ -1867,16 +1876,7 @@ function check_user_data_form($p_id, &$user) {
     $err['field'] = 'mail_quota';
     return false;
   }
-  
-  // Email quota check with profile max quota
-  $max_quota = $profiles[$profile]['properties']['mail_quota_max'];
-  if(($mail_quota > $max_quota && $max_quota != 0)
-    || ($mail_quota < $max_quota && $mail_quota == 0)) {
-    $err['msg'] = "$l_user_quota_error ($l_max_quota : $max_quota)";
-    $err['field'] = 'mail_quota';
-    return false;
-  }
-  
+   
   // Email Nomad perms
   if (($nomade_perms) && (!$mail_perms)) {
     $err['msg'] = $l_nomade_without_mail_perms;
