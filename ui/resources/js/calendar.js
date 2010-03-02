@@ -426,6 +426,7 @@ Obm.CalendarManager = new Class({
    * Destroy temp dummy div
    */
   destroyDummy: function() {
+    this.dummy = null;
     try {
       $('dummy').destroy();
     } catch(e) {}
