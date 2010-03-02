@@ -300,4 +300,4 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.8
     NAME 'obmContact'
     DESC 'OBM contacts description'
     SUP top AUXILIARY
-    MAY ( obmDomain $ obmUID $ URL $ workUrl $ company ) )
+    MAY ( obmDomain $ obmUID $ URL $ workUrl $ company $ mailAlias ) )

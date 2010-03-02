@@ -229,14 +229,20 @@ sub _setEmail {
     my $entityDesc = $self->{'entityDesc'};
 
     for( my $i=0; $i<=$#{$emailLinks}; $i++ ) {
+        my $mainAddress = 0;
         my $currentEmail = $emailLinks->[$i];
 
-        $entityDesc->{'email'}->{$currentEmail->{'email_address'}} = 1;
+        if( !$mainAddress && $currentEmail->{'email_label'} =~ /^INTERNET;X-OBM-Ref1$/ ) {
+            $entityDesc->{'mail'} = $currentEmail->{'email_address'};
+            $mainAddress++;
+        }else {
+            $entityDesc->{'mailAlias'}->{$currentEmail->{'email_address'}} = 1;
+        }
     }
 
-    if( defined($entityDesc->{'email'}) ) {
-        my @emails = keys(%{$entityDesc->{'email'}});
-        $entityDesc->{'email'} = \@emails;
+    if( defined($entityDesc->{'mailAlias'}) ) {
+        my @emails = keys(%{$entityDesc->{'mailAlias'}});
+        $entityDesc->{'mailAlias'} = \@emails;
     }
 
     return 0;
@@ -436,7 +442,8 @@ sub createLdapEntry {
     $self->_modifyAttr( $self->{'entityDesc'}->{'address'}->{'work'}->{'town'}, $entry, 'l' );
     $self->_modifyAttr( $self->{'entityDesc'}->{'address'}->{'prefered'}, $entry, 'registeredAddress' );
 
-    $self->_modifyAttr( $self->{'entityDesc'}->{'email'}, $entry, 'mail' );
+    $self->_modifyAttr( $self->{'entityDesc'}->{'mail'}, $entry, 'mail' );
+    $self->_modifyAttr( $self->{'entityDesc'}->{'mailAlias'}, $entry, 'mailAlias' );
 
     $self->_modifyAttr( $self->{'entityDesc'}->{'website'}, $entry, 'URL' );
     $self->_modifyAttr( $self->{'entityDesc'}->{'website'}, $entry, 'workUrl' );
@@ -563,7 +570,11 @@ sub updateLdapEntry {
             $update = 1;
         }
     
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'email'}, $entry, 'mail' ) ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'mail'}, $entry, 'mail' ) ) {
+            $update = 1;
+        }
+    
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'mailAlias'}, $entry, 'mailAlias' ) ) {
             $update = 1;
         }
     
