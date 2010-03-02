@@ -511,7 +511,7 @@ sub updateLdapEntry {
                 $update = 1;
             }
         }elsif($self->{'entityDesc'}->{'contact_company'}) {
-            if( $self->_modifyAttr( $self->{'entityDesc'}->{'contact_company'}, $entry, 'organizationName' ) ) {
+            if( $self->_modifyAttr( $self->{'entityDesc'}->{'contact_company'}, $entry, 'o' ) ) {
                 $update = 1;
             }
 
