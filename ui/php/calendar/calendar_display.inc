@@ -4962,16 +4962,18 @@ function dis_calendar_free_interval($current_view, $calendar) {
               $busy = true;
             }
           } 
-        }
-        if ($busy) {
-          $is_busy = true;
-          array_push($busy_time_slots, $slots);
-          $tip = html_freebusy_tip($tips);
-          $td_id = "user_".$id."_".$d->getTimestamp();
-          $u[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
-          $js_tips .= "obm.tip.add($('$td_id'));";
+          if ($busy) {
+            $is_busy = true;
+            array_push($busy_time_slots, $slots);
+            $tip = html_freebusy_tip($tips);
+            $td_id = "user_".$id."_".$d->getTimestamp();
+            $u[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
+            $js_tips .= "obm.tip.add($('$td_id'));";
+          } else {
+            $u[$id] .= "<td class='timeSlot'></td>";
+          }
         } else {
-          $u[$id] .= "<td class='timeSlot'></td>";
+          $u[$id] .= "<td class='timeSlotNoCalendar'></td>";
         }
       }
 
@@ -4986,17 +4988,20 @@ function dis_calendar_free_interval($current_view, $calendar) {
               $busy = true;
             }
           } 
-        }
-        if ($busy) {
-          $is_busy = true;
-          array_push($busy_time_slots, $slots);
-          $tip = html_freebusy_tip($tips);
-          $td_id = "res_".$id."_".$d->getTimestamp();
-          $r[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
-          $js_tips .= "obm.tip.add($('$td_id'));";
+          if ($busy) {
+            $is_busy = true;
+            array_push($busy_time_slots, $slots);
+            $tip = html_freebusy_tip($tips);
+            $td_id = "res_".$id."_".$d->getTimestamp();
+            $r[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
+            $js_tips .= "obm.tip.add($('$td_id'));";
+          } else {
+            $r[$id] .= "<td class='timeSlot'></td>";
+          }
         } else {
-          $r[$id] .= "<td class='timeSlot'></td>";
+          $r[$id] .= "<td class='timeSlotNoCalendar'></td>";
         }
+
       }
 
       // Contacts
