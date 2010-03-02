@@ -1,4 +1,4 @@
-/var/log/obm/obm-services.log {
+/var/log/obm-services/obm-services.log {
     weekly
     rotate 4
     compress
