@@ -1145,15 +1145,15 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       $background="background:#EEE;";
     }
     if($current->compareMinute(0) == 0) {
-      $label = "<span class='hourLabel'>".$current->get('H')."</span><span class='minuteLabel'>".$current->get('i')."<span>";
-      $week_hour .= "<div class='hourFull' style='$background;height:{$height}px;'>$label</div>";
+      $label = "<span class='hourLabel'>".$current->get('H')."</span><span class='minuteLabel'>".$current->get('i')."</span>";
+      $week_hour .= "<div class='hourFull' style='$background height:{$height}px;'>$label</div>";
       $week_time .= "<div id='time_$id' class='hourFull' style='$background height:{$height}px;'></div>";
     } else {
       $label = "";
-      if ($current->compareMinute(30) == 0 && $_SESSION['set_cal_interval']==4) {
-        $label = "<span class='hourLabel'></span><span class='minuteLabel'>".$current->get('i')."<span>";
+      if ($current->compareMinute(30) == 0 && $_SESSION['set_cal_interval'] == 4) {
+        $label = "<span class='hourLabel'></span><span class='minuteLabel'>".$current->get('i')."</span>";
       }
-      $week_hour .= "<div class='hourPartial' style='$background;height:{$height}px;width:50%;margin-left:50%;'>$label</div>";
+      $week_hour .= "<div class='hourPartial' style='$background height:{$height}px;width:50%;margin-left:50%;'>$label</div>";
       $week_time .= "<div id='time_$id' class='hourPartial' style='$background height:{$height}px;'></div>";
     }
     $current->addMinute($unit);
@@ -1341,11 +1341,13 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $div_id = "dayContainer_{$d}_{$date_iso}";
       array_push($dayContainer, $div_id); 
       $week_day_left = $step*$width;
+      $more_title = "<h1>$tip_title <img id=\"close_$date_iso\" src=\"$ico_close\"/> </h1>";
       $week_day_event_list .= "
         <div id='$div_id' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
           <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href='javascript: void(0);' onclick='obm.calendarManager.showDay($ts);'>$day</a></div>
           <div id='allday_$date_iso' class='alldayCell'>
-            <div id='more_{$date_iso}' class='calTip' title='<h1>$tip_title <img id=\"close_$date_iso\" src=\"$ico_close\"/> </h1>' style='text-align:center;position:absolute;display:none;width:100%;'></div>
+            <div id='more_{$date_iso}' class='calTip' title='$more_title' 
+              style='text-align:center;position:absolute;display:none;width:100%;'></div>
           </div>
         </div>";
       $step++;
