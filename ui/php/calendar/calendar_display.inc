@@ -4973,7 +4973,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
             $u[$id] .= "<td class='timeSlot'></td>";
           }
         } else {
-          $u[$id] .= "<td class='timeSlotNoCalendar'></td>";
+          $u[$id] .= "<td class='timeSlotNoCalendar' title=\"$GLOBALS[l_calendar_not_available]\"></td>";
         }
       }
 
@@ -4999,7 +4999,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
             $r[$id] .= "<td class='timeSlot'></td>";
           }
         } else {
-          $r[$id] .= "<td class='timeSlotNoCalendar'></td>";
+          $r[$id] .= "<td class='timeSlotNoCalendar' title=\"$GLOBALS[l_calendar_not_available]\"></td>";
         }
 
       }
@@ -5022,7 +5022,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
             $c[$contact] .= "<td class='timeSlot'></td>";
           }
         }  else {
-          $c[$contact] .= "<td class='timeSlotNoCalendar'></td>";
+          $c[$contact] .= "<td class='timeSlotNoCalendar' title=\"$GLOBALS[l_calendar_not_available]\"></td>";
         }
       }
 
