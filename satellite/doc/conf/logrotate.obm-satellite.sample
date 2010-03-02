@@ -1,4 +1,4 @@
-/var/log/obm/obmSatellite.log {
+/var/log/obm-satellite/obmSatellite.log {
     weekly
     rotate 4
     compress
