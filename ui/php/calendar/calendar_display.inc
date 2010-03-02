@@ -1145,12 +1145,15 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       $background="background:#EEE;";
     }
     if($current->compareMinute(0) == 0) {
-      $label = $current->get(Of_Date::TIME_SHORT);
+      $label = "<span class='hourLabel'>".$current->get('H')."</span><span class='minuteLabel'>".$current->get('i')."<span>";
       $week_hour .= "<div class='hourFull' style='$background;height:{$height}px;'>$label</div>";
       $week_time .= "<div id='time_$id' class='hourFull' style='$background height:{$height}px;'></div>";
     } else {
-      $label = '';
-      $week_hour .= "<div class='hourPartial' style='$background;height:{$height}px;'></div>";
+      $label = "";
+      if ($current->compareMinute(30) == 0 && $_SESSION['set_cal_interval']==4) {
+        $label = "<span class='hourLabel'></span><span class='minuteLabel'>".$current->get('i')."<span>";
+      }
+      $week_hour .= "<div class='hourPartial' style='$background;height:{$height}px;width:50%;margin-left:50%;'>$label</div>";
       $week_time .= "<div id='time_$id' class='hourPartial' style='$background height:{$height}px;'></div>";
     }
     $current->addMinute($unit);
@@ -1187,11 +1190,11 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       <colgroup style='background:#EFF0F2;text-align:right;'></colgroup>
       <colgroup></colgroup>
       <tr>
-        <td style='width:3em;'></td>
+        <td class='hourPanel'></td>
         $week_day_list
       </tr>
       <tr>
-        <td style='width:3em;text-align:center;'><a href='javascript: void(0)' onclick='obm.calendarManager.showWeek($ts)'>$week_num</a></td>
+        <td class='hourPanel' style='text-align:center;'><a href='javascript: void(0)' onclick='obm.calendarManager.showWeek($ts)'>$week_num</a></td>
         <td colspan='$display_days' style='border-right:1px solid #AAA;'>
           <div id='calendarHeaderGrid' 
             onmouseover='if(obm.calendarManager) obm.calendarManager.newAlldayDummyEventHighlight(event);'
@@ -1207,7 +1210,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   <div id='calendarBody'>
     <table id='calendarBodyTable' class='calendarTable'>
     <tr>
-      <td style='background:#EFF0F2;width:3em;'>
+      <td style='background:#EFF0F2;' class='hourPanel'>
           $week_hour
       </td><td>
         <div id='calendarGridContainer'>

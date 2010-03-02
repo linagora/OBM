@@ -94,13 +94,29 @@
   padding-right: 4px;
 }
 
+.hourPanel {
+  width: 4.5em;
+}
+
+.hourLabel {
+  font-weight:bold;
+  font-size: 150%;
+  padding-right: 8px;
+}
+
+.minuteLabel {
+  vertical-align:top;
+}
+
+
 .hourFull {
   border-top:1px solid #CCC;
-  text-align:center;
+  text-align:right;
 }
 
 .hourPartial {
   border-top:1px dotted #CCC;
+  text-align:right;
 }
 
 #today {
