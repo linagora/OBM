@@ -36,8 +36,6 @@ $user_lang_file = "$obminclude/lang/".strtolower(get_lang()).'/user.inc';
 if (file_exists("$path/../".$user_lang_file)) include_once("$user_lang_file");
 include("$obminclude/global_pref.inc");
 
-$extra_js_include[] = 'userpattern.js';
-
 require('userpattern_display.inc');
 require('userpattern_query.inc');
 require('userpattern_js.inc');
