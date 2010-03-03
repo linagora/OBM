@@ -706,7 +706,11 @@ $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 $php_regexp_percent = "/^100$|^(\d{0,2})$/"; // 0-100
 $php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}-[0-9]{1,2}.[0-9]{1,2}(.[0-9]{1,2})?.dump$/";
 
-$php_regexp_password = "/^[-\$\\\&~#{([|_`^@);\]+=}%!:\/\.,?<>\"\w0-9]{4,12}$/";
+if($cgp_use['service']['samba']) {
+  $php_regexp_password = "/^[-\$\\\&~#{([|_`^@);\]+=}%!:\/\.,?<>\"\w0-9]{4,12}$/";
+} else {
+  $php_regexp_password = "/^[-\$\\\&~#{([|_`^@);\]+=}%!:\/\.,?<>\"\w0-9]{4,20}$/";
+}
 
 $php_regexp_groupname = "/^[\w0-9]([\w0-9-._ ]{0,252}[\w0-9]){0,1}$/"; // group name
 $php_regexp_hostname = "/^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$/"; // host

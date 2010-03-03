@@ -77,8 +77,13 @@ $l_link_timetask = "The user is referenced on project in time management";
 $l_link_timetask_no = "The user is not referenced on projects in time management";
 $l_login_error = "Invalid login! It must not be empty or containing special characters ";
 $l_login_in_use = "This login is already used !";
-$l_password_empty = "You must enter a valid password - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
-$l_password_error = "The password is not valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
+if($GLOBALS['cgp_use']['service']['samba']) {
+  $l_password_empty = "You must enter a valid password - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
+  $l_password_error = "The password is not valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
+} else {
+  $l_password_empty = "You must enter a valid password - between 4 and 20 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
+  $l_password_error = "The password is not valid - between 4 and 20 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
+}
 $l_profile_privilege_error = "Insufficient privileges to update this profile level !";
 $l_last_admin_error = "The last admin profile cannot be updated !";
 $l_mail_perms_error = "The mail must be activated to allow external email !";
