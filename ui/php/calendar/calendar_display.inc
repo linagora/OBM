@@ -3210,7 +3210,10 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
 
   $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view);
 
-  $GLOBALS[display][search] = dis_calendar_select_template_form($action, $calendar);
+  if ($action == 'new' || $action == 'new_meeting' || $action == 'save_as_template') {
+    $GLOBALS[display][search] = dis_calendar_select_template_form($action, $calendar);
+  }
+
   $GLOBALS[display][search] .= dis_back_to_calendar($action);
 
   return $block;
