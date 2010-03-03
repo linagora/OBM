@@ -421,8 +421,12 @@ require_once("$obminclude/of/of_date.inc");
 require_once("$obminclude/of/of_template.php");
 require_once("$obminclude/of/of_i18n.php");
 
-set_include_path(get_include_path().":../$path/$obminclude/lib");
-set_include_path(get_include_path().":../$path/lib:../$path/app:../$path/app/default/models");
+if (!$path) {
+  $path = pathinfo(__FILE__);
+  $path = $path['dirname'];
+}
+set_include_path(get_include_path().":$path/../$obminclude/lib");
+set_include_path(get_include_path().":$path/../lib:$path/../app:$path/../app/default/models");
 
 // Autoloading
 require_once 'OBM/Autoloader.php';
