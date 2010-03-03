@@ -267,6 +267,13 @@ function run_query_user_search($user) {
     $join_userdata = $userdata['join'];
   }
 
+  // User custom fields
+  $custom = $GLOBALS['customFields']->buildQuery();
+  if ($custom != '') {
+    $where .= $custom['where'];
+    $join_custom = $custom['join'];
+  }
+
   if ((trim($where) != '') || (trim($where_filter_entity) != '')) {
     $whereq = " WHERE $where $where_filter_entity $multidomain";
   } else {
@@ -292,7 +299,7 @@ function run_query_user_search($user) {
     $join_grp
     $join_host
     $join_userdata
-    ";
+    $join_custom";
 
 
   // ORDER construction
@@ -310,7 +317,7 @@ function run_query_user_search($user) {
     $orderq
     $limit";
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm INNER JOIN UserEntity ON userentity_user_id = userobm_id $join_grp $join_host $join_userdata $join_domain $whereq");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm INNER JOIN UserEntity ON userentity_user_id = userobm_id $join_grp $join_host $join_userdata $join_custom $join_domain $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -722,6 +729,7 @@ function run_query_user_insert($user) {
     run_query_user_addressbook_insert($id, $domain_id);
     $user['entity_id'] = $id;
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
+    $GLOBALS['customFields']->insert($id);
     $entity_id = of_entity_insert('calendar', $id);    
     $entity_id = of_entity_insert('mailbox', $id);    
     OBM_Acl::setDefaultPublicRights('mailbox', $id);
@@ -1149,6 +1157,7 @@ function run_query_user_update($u_id, $user) {
   }
 
   if ($retour) {
+    $GLOBALS['customFields']->insert($u_id);
     $ret = of_userdata_query_update('user', $u_id, $user);
   }
 
@@ -1169,6 +1178,7 @@ function run_query_user_delete($p_id) {
   global $cdg_sql, $obm, $c_use_connectors;
 
   $multidomain = sql_multidomain('userobm');
+  $GLOBALS['customFields']->delete($p_id);
   of_entity_delete($GLOBALS['module'], $p_id);
   of_entity_delete('mailbox', $p_id);
   of_entity_delete('calendar', $p_id);
@@ -2010,7 +2020,7 @@ function check_user_data_form($p_id, &$user) {
   if (!check_user_phone_fax($user)) {
     return false;
   }
-  
+
   return true;
 }
 

@@ -374,6 +374,7 @@ function html_user_search_form($user) {
 
   // User defined data
   $block_userdata .= of_userdata_dis_search('user', $user);
+  $block_userfields = $GLOBALS['customFields']->buildSearchForm();
 
   if ($popup) {
     $ext_action = $user['ext_action'];
@@ -494,7 +495,8 @@ $dis_delegation";
   }
   if($display_pref['userobm_login']['status'] != 0) {
     $block .= "
-$block_userdata";
+     $block_userdata
+     $block_userfields";
   }
   if($display_pref['userobm_delegation_target']['status'] != 0) {
     $block .= "
@@ -612,7 +614,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
 
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('user', $user);
-
+  $url_userfields = $GLOBALS['customFields']->buildSearchUrl();
   if ($popup) {
     $ext_action = $user['ext_action'];
     $ext_url = $user['ext_url'];
@@ -625,7 +627,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;ext_container=$ext_container";
   }
 
-  $url = url_prepare("user_index.php?action=$action&amp;tf_login=$login&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext");
+  $url = url_prepare("user_index.php?action=$action&amp;tf_login=$login&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext$url_userfields");
 
   $user_d = new OBM_DISPLAY('DATA', $prefs, 'user');
   if ($popup) {
@@ -852,6 +854,7 @@ function html_user_consult($obm_q) {
 
   // User defined data
   $block_userdata .= of_userdata_dis_entity_consult('user', $id);
+  $block_userfields = $GLOBALS['customFields']->buildConsultDetail($id);
 
   // Liste des groupes de l'utilisateur
   $g_q = run_query_user_user_group($id);
@@ -1108,6 +1111,7 @@ function html_user_consult($obm_q) {
     <th>$l_photo</th>
     <td>$block_photo</td>
   </tr>
+  $block_userfields
 </table>
 </div>
 
@@ -1187,7 +1191,6 @@ function html_user_consult($obm_q) {
   </table>
 </div>
 $block_userdata
-
 $web_section
 $mail_section
 $nomad_section
@@ -1702,6 +1705,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   if (isset($vacation["auto_enable"])) {$auto_enable = $vacation["auto_enable"]; }
 
   $block_userdata = of_userdata_dis_entity_form('user', $id, $user);
+
   if ($auto_enable) {
     $schedule_enable = "checked=\"checked\"";
   } else {
@@ -1712,6 +1716,11 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   // Mark the error field
   if ($field != '') {
     $class[$field] = 'error';
+  }
+  if ($id) {
+    $block_userfields = $GLOBALS['customFields']->buildEntityForm($class, $id);
+  } else {
+    $block_userfields = $GLOBALS['customFields']->buildEntityForm($class);
   }
 
   // Default exp is hidden
@@ -2356,7 +2365,8 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </tr>
   $block_photo
   $block_photo_detail
-  $block_userdata 
+  $block_userdata
+  $block_userfields
   </table>
   </fieldset>
 
