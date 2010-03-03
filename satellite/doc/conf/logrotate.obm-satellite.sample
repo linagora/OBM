@@ -3,6 +3,6 @@
     rotate 4
     compress
     delaycompress
-    create 644 root root
+    create 640 root root
     missingok
 }
