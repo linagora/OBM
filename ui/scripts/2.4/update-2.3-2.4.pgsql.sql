@@ -310,7 +310,7 @@ INNER JOIN UGroup ON group_id = gid
 INNER JOIN Contact ON contact_id = contactentity_contact_id 
 INNER JOIN Addressbook ON Addressbook.id = contact_addressbook_id 
 WHERE Addressbook.domain_id = group_domain_id 
-AND Addressbook.is_default = 1 AND Addressbook.name = 'public_contacts'; 
+AND Addressbook.is_default = TRUE AND Addressbook.name = 'public_contacts'; 
 
 DELETE FROM tmp_groupemails WHERE id IN (SELECT id FROM tmp_groupcontacts);
 
@@ -319,7 +319,7 @@ SELECT group_domain_id, NOW(), group_usercreate, Addressbook.id, email, true, 'o
 FROM tmp_groupemails
 INNER JOIN UGroup ON group_id = gid
 INNER JOIN Addressbook ON Addressbook.domain_id = group_domain_id 
-WHERE Addressbook.is_default = 1 AND Addressbook.name = 'public_contacts';  
+WHERE Addressbook.is_default = TRUE AND Addressbook.name = 'public_contacts';  
 
 ALTER TABLE ContactEntity DISABLE TRIGGER ALL;
 
