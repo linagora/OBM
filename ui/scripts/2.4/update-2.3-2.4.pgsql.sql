@@ -368,6 +368,37 @@ DROP TABLE tmp_contactsgroup;
 ALTER TABLE Contact DROP COLUMN contact_privacy;
 
 
+--
+-- Table structure for table `field`
+--
+DROP TABLE IF EXISTS field;
+CREATE TABLE field (
+  id            integer NOT NULL,
+  entity_id     integer NOT NULL,
+  field         varchar(255),
+  value         text
+);
+
+--
+-- Name: field_field_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+CREATE SEQUENCE field_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE field_id_seq OWNED BY field.id;
+ALTER TABLE field ALTER COLUMN id SET DEFAULT nextval('field_id_seq'::regclass);
+
+--
+-- field fkey
+--
+ALTER TABLE ONLY field
+    ADD CONSTRAINT field_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES Entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
 
 
 ------------------------------------------------------------------------

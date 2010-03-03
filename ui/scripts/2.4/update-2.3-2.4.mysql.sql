@@ -194,6 +194,21 @@ CREATE TABLE `_contactgroup` (
 INSERT INTO DomainProperty VALUES ('mailshares_quota_default','integer','0','0');
 INSERT INTO DomainProperty VALUES ('mailshares_quota_max','integer','0','0');
 
+--
+-- Table structure for table `field`
+--
+DROP TABLE IF EXISTS `field`;
+CREATE TABLE `field` (
+  `id`        int(8) NOT NULL auto_increment,
+  `entity_id` int(8) NOT NULL,
+  `field`      varchar(255),
+  `value`     text,
+  PRIMARY KEY (`id`),
+  KEY `field_entity_id_fkey` (`entity_id`),
+  CONSTRAINT `field_entity_id_fkey` FOREIGN KEY (`entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';

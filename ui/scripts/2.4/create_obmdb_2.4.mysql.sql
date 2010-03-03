@@ -3727,6 +3727,22 @@ CREATE TABLE `userpattern_property` (
   CONSTRAINT `userpattern_property_userpattern_id_userpattern_id_fkey` FOREIGN KEY (`userpattern_id`) REFERENCES `userpattern` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+--
+-- Table structure for table `field`
+--
+DROP TABLE IF EXISTS `field`;
+CREATE TABLE `field` (
+  `id`        int(8) NOT NULL auto_increment,
+  `entity_id` int(8) NOT NULL,
+  `field`      varchar(255),
+  `value`     text,
+  PRIMARY KEY (`id`),
+  KEY `field_entity_id_fkey` (`entity_id`),
+  CONSTRAINT `field_entity_id_fkey` FOREIGN KEY (`entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
 -- ----------------------------------------------------------------------------
 -- Obm product ID
 INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(RAND()*NOW())), 24, 0);
