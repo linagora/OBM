@@ -1155,12 +1155,14 @@ function search_user_by_name($lastname, $firstname) {
 function check_calendar_conflict($calendar, $sel_entity_id) {
 
   if ($calendar['opacity'] == 'TRANSPARENT') return false;
+  $access_entity = 
+    OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read');
 
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
-
+  $sel_entity_id[user] = array_intersect(array_keys($access_entity), $sel_entity_id['user']);
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
 	$status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($begin,$end,$cal_entities, $status);
