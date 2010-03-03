@@ -36,7 +36,8 @@ sub new {
         'updateLinks' => [
             'group_users',
             'group_mailboxes',
-            'group_samba_users'
+            'group_samba_users',
+            'group_contacts_list'
         ]
     };
 
@@ -122,32 +123,6 @@ sub _init {
         $groupDesc->{'group_mailperms'} = 1;
     }
 
-    # External contacts
-    if( $groupDesc->{'group_contacts'} ) {
-        my @externelContacts = split( /\r\n/, $groupDesc->{'group_contacts'} );
-        my %externelContacts;
-        my $return = 0;
-        for( my $i=0; $i<=$#externelContacts; $i++ ) {
-            my $lcExternalContact = lc($externelContacts[$i]);
-            if( $lcExternalContact =~ /$OBM::Parameters::regexp::regexp_email/ ) {
-                $externelContacts{$lcExternalContact} = undef;
-            }else {
-                $self->_log( 'adresse mail du contact externe \''.$externelContacts[$i].'\' incorrecte', 1 );
-                $return++;
-            }
-        }
-
-        if( $return ) {
-            $self->_log( $return.' contacts externes ont une adresse mail invalide', 1 );
-            return 1;
-        }
-        @{$groupDesc->{'group_contacts_list'}} = keys(%externelContacts);
-
-        if( $#{$groupDesc->{'group_contacts_list'}} < 0 ) {
-            delete($groupDesc->{'group_contacts_list'});
-        }
-    }
-
     # Le SID du domaine
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
     if( !$domainSid ) {
@@ -184,26 +159,38 @@ sub setLinks {
     my $self = shift;
     my( $links ) = @_;
 
-    if( !defined($links) || ref($links) ne 'ARRAY' ) {
+    if( !defined($links) || ref($links) ne 'HASH' ) {
         $self->_log( 'pas de liens définis', 1 );
         return 0;
     }
 
-    for( my $i=0; $i<=$#{$links}; $i++ ) {
-        my $current = $links->[$i];
-
-        push( @{$self->{'entityDesc'}->{'group_users'}}, $current->{'userobm_login'} );
-
-        if( $self->{'entityDesc'}->{'group_mailperms'} ) {
-            if( $current->{'userobm_mail_perms'} ) {
-                push( @{$self->{'entityDesc'}->{'group_mailboxes'}}, $current->{'userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name') );
+    if( ref($links->{'members'}) eq 'ARRAY' ) {
+        my $members = $links->{'members'};
+    
+        for( my $i=0; $i<=$#{$members}; $i++ ) {
+            my $current = $members->[$i];
+    
+            push( @{$self->{'entityDesc'}->{'group_users'}}, $current->{'userobm_login'} );
+    
+            if( $self->{'entityDesc'}->{'group_mailperms'} ) {
+                if( $current->{'userobm_mail_perms'} ) {
+                    push( @{$self->{'entityDesc'}->{'group_mailboxes'}}, $current->{'userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name') );
+                }
+            }
+    
+            if( $self->{'entityDesc'}->{'group_samba'} ) {
+                if( $current->{'userobm_samba_perms'} ) {
+                    push( @{$self->{'entityDesc'}->{'group_samba_users'}}, $self->_getUserSID( $self->{'parent'}->getDesc('samba_sid'), $current->{'userobm_uid'} ) );
+                }
             }
         }
+    }
 
-        if( $self->{'entityDesc'}->{'group_samba'} ) {
-            if( $current->{'userobm_samba_perms'} ) {
-                push( @{$self->{'entityDesc'}->{'group_samba_users'}}, $self->_getUserSID( $self->{'parent'}->getDesc('samba_sid'), $current->{'userobm_uid'} ) );
-            }
+    if( ref($links->{'contacts'}) eq 'ARRAY' ) {
+        my $contacts = $links->{'contacts'};
+
+        for( my $i=0; $i<=$#{$contacts}; $i++ ) {
+            push( @{$self->{'entityDesc'}->{'group_contacts_list'}}, $contacts->[$i]->{'contact_email_address'} );
         }
     }
 

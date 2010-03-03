@@ -187,6 +187,14 @@ CREATE TABLE `_contactgroup` (
   CONSTRAINT `_contactgroup_group_id_group_id_fkey` FOREIGN KEY (`group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Table structure for table `_contactgroup`
+--
+
+DROP TABLE IF EXISTS `P__contactgroup`;
+CREATE TABLE `P__contactgroup` (LIKE `_contactgroup`);
+INSERT INTO P__contactgroup SELECT * FROM _contactgroup;
+
 
 --
 -- Domain Property

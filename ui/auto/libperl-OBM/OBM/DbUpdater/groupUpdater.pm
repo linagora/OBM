@@ -113,6 +113,7 @@ sub update {
     }
 
     if( !$entity->getDelete() && $entity->getUpdateLinks() ) {
+        # Group members
         $query = 'INSERT INTO P_of_usergroup
                     (   of_usergroup_group_id,
                         of_usergroup_user_id
@@ -120,6 +121,20 @@ sub update {
                                 of_usergroup_user_id
                       FROM of_usergroup
                       WHERE of_usergroup_group_id='.$entity->getId();
+
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour des liens '.$entity->getDescription(), 1 );
+            return 1;
+        }
+
+        # Group contacts
+        $query = 'INSERT INTO P__contactgroup
+                    (   contact_id,
+                        group_id
+                    ) SELECT    contact_id,
+                                group_id
+                      FROM _contactgroup
+                      WHERE group_id='.$entity->getId();
 
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour des liens '.$entity->getDescription(), 1 );
@@ -166,6 +181,12 @@ sub _delete {
     my $query;
     if( $entity->getDelete() || $entity->getUpdateLinks() ) {
         $query = 'DELETE FROM P_of_usergroup WHERE of_usergroup_group_id='.$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD de liens '.$entity->getDescription(), 1 );
+            return 1;
+        }
+
+        $query = 'DELETE FROM P__contactgroup WHERE group_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD de liens '.$entity->getDescription(), 1 );
             return 1;

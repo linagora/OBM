@@ -252,6 +252,7 @@ ALTER TABLE ONLY contactgroup
     ADD CONSTRAINT contactgroup_contact_id_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY contactgroup
     ADD CONSTRAINT contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
 --
 -- Table structure for table `_contactgroup`
 --
@@ -274,6 +275,13 @@ ALTER TABLE ONLY _contactgroup
 ALTER TABLE ONLY contactgroup
     ADD CONSTRAINT _contactgroup_group_id_group_id_fkey FOREIGN KEY (group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+--
+-- Table structure for table `P__contactgroup`
+--
+
+DROP TABLE IF EXISTS P__contactgroup;
+CREATE TABLE P__contactgroup (LIKE _contactgroup);
+INSERT INTO P__contactgroup SELECT * FROM _contactgroup;
 
 
 --

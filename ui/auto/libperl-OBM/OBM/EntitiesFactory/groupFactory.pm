@@ -92,19 +92,8 @@ sub next {
     }
 
     while( defined($self->{'entitiesDescList'}) && (my $groupDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
-        $self->_log( 'obtention des groupes enfants', 4 );
-        $groupDesc->{'child_group_ids'} = $self->_getChildGroupIds( [$groupDesc->{'group_id'}] );
-
-        $self->_log( 'obtention des contacts externes des groupes enfants', 4 );
-        if( my $childExternalContacts = $self->_getChildContacts( $groupDesc->{'child_group_ids'} ) ) {
-            $groupDesc->{'group_contacts'} .= "\r\n" if $groupDesc->{'group_contacts'};
-            $groupDesc->{'group_contacts'} .= $childExternalContacts;
-
-            $groupDesc->{'group_contacts_current'} .= "\r\n" if $groupDesc->{'group_contacts_current'};
-            $groupDesc->{'group_contacts_current'} .= $childExternalContacts;
-        }
-
         require OBM::Entities::obmGroup;
+
         if( !(my $current = OBM::Entities::obmGroup->new( $self->{'parentDomain'}, $groupDesc )) ) {
             next;
         }else {
@@ -239,14 +228,65 @@ sub _loadEntities {
 sub _loadGroupLinks {
     my $self = shift;
 
-    $self->_log( 'chargement des liens de '.$self->{'currentEntity'}->getDescription(), 3 );;
+    $self->{'currentEntity'}->setLinks( {
+        members => $self->_loadGroupMembers(),
+        contacts => $self->_loadGroupContacts()
+        } );
+
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
     if( !$dbHandler ) {
         $self->_log( 'connexion à la base de données impossible', 1 );
-        return 1;
+        return undef;
+    }
+
+    my $groupLinksTable = 'of_usergroup';
+    if( $self->{'updateType'} =~ /^(SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS)$/ ) {
+        $groupLinksTable = 'P_'.$groupLinksTable;
+    }
+
+    my $entityId = $self->{'currentEntity'}->getId();
+
+    # Needed to know all removed members
+    # Needed to update members on group 512
+    my $query = 'SELECT DISTINCT(of_usergroup_user_id)
+              FROM P_of_usergroup
+              WHERE of_usergroup_group_id='.$entityId.'
+              AND of_usergroup_user_id NOT IN
+                (SELECT DISTINCT(of_usergroup_user_id)
+                 FROM '.$groupLinksTable.'
+                 WHERE of_usergroup_group_id='.$entityId.')';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'obtention des IDs des membres supprimés impossible', 1 );
+        return undef;
+    }
+
+    my @removedMemberIds;
+    while( my $removeMemberId = $queryResult->fetchrow_hashref() ) {
+        push( @removedMemberIds, $removeMemberId->{'of_usergroup_user_id'} );
+    }
+
+    $self->{'currentEntity'}->setRemovedMembers( \@removedMemberIds );
+
+    return 0;
+}
+
+
+sub _loadGroupMembers {
+    my $self = shift;
+
+    $self->_log( 'chargement des membres de '.$self->{'currentEntity'}->getDescription(), 3 );
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 1 );
+        return undef;
     }
 
     my $groupLinksTable = 'of_usergroup';
@@ -272,37 +312,67 @@ sub _loadGroupLinks {
     my $groupLinks;
     if( !defined($dbHandler->execQuery( $query, \$groupLinks )) ) {
         $self->_log( 'chargement des liens de '.$self->{'currentEntity'}->getDescription().' depuis la BD impossible', 1 );
-        return 1;
-    }
-
-    $self->{'currentEntity'}->setLinks( $groupLinks->fetchall_arrayref({}) );
-
-
-    # Needed to know all removed members
-    # Needed to update members on group 512
-    $query = 'SELECT DISTINCT(of_usergroup_user_id)
-              FROM P_of_usergroup
-              WHERE of_usergroup_group_id='.$entityId.'
-              AND of_usergroup_user_id NOT IN
-                (SELECT DISTINCT(of_usergroup_user_id)
-                 FROM '.$groupLinksTable.'
-                 WHERE of_usergroup_group_id='.$entityId.')';
-
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 'obtention des IDs des membres supprimés impossible', 1 );
         return undef;
     }
 
-    my @removedMemberIds;
-    while( my $removeMemberId = $queryResult->fetchrow_hashref() ) {
-        push( @removedMemberIds, $removeMemberId->{'of_usergroup_user_id'} );
+    my $result = $groupLinks->fetchall_arrayref({});
+
+    if( $#$result < 0 ) {
+        return undef;
     }
 
-    $self->{'currentEntity'}->setRemovedMembers( \@removedMemberIds );
-
-    return 0;
+    return $result;
 }
+
+
+sub _loadGroupContacts {
+    my $self = shift;
+
+    $self->_log( 'chargement des contacts de '.$self->{'currentEntity'}->getDescription(), 3 );
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 1 );
+        return undef;
+    }
+
+    my $contactTable = 'Contact';
+    my $contactGroupTable = '_contactgroup';
+    my $contactEntityTable = 'ContactEntity';
+    my $emailTable = 'Email';
+    if( $self->{'updateType'} =~ /^(SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS)$/ ) {
+        $contactGroupTable = 'P_'.$contactGroupTable;
+    }
+
+    my $entityId = $self->{'currentEntity'}->getId();
+
+    my $query = 'SELECT email.email_address AS contact_email_address
+                 FROM '.$contactTable.' contact
+                 INNER JOIN '.$contactGroupTable.' contactgroup
+                    ON contactgroup.contact_id=contact.contact_id
+                INNER JOIN '.$contactEntityTable.' contactentity
+                    ON contactentity.contactentity_contact_id=contact.contact_id
+                INNER JOIN '.$emailTable.' email ON email.email_entity_id=contactentity.contactentity_entity_id
+                WHERE contactgroup.group_id='.$entityId.'
+                AND email.email_label=\'INTERNET;X-OBM-Ref1\'';
+
+    my $groupLinks;
+    if( !defined($dbHandler->execQuery( $query, \$groupLinks )) ) {
+        $self->_log( 'chargement des liens de '.$self->{'currentEntity'}->getDescription().' depuis la BD impossible', 1 );
+        return undef;
+    }
+
+    my $result = $groupLinks->fetchall_arrayref({});
+
+    if( $#$result < 0 ) {
+        return undef;
+    }
+
+    return $result;
+}
+
 
 sub _getVirtualGroups {
 	
