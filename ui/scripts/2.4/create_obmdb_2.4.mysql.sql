@@ -3757,3 +3757,4 @@ CREATE TABLE `token` (
   `value` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `P__contactgroup` (LIKE `_contactgroup`);

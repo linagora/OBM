@@ -11703,3 +11703,5 @@ CREATE TABLE token (
   property varchar(255) NOT NULL, 
   value varchar(255) NOT NULL
 );
+
+CREATE TABLE P__contactgroup (LIKE _contactgroup);
