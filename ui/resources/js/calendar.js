@@ -1791,7 +1791,6 @@ Obm.CalendarAllDayEvent = new Class({
     this.element.setStyles({
       'z-index' : '10' 
     });
-    obm.calendarManager.scroll.stop();
   },
 
 
