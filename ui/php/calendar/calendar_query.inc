@@ -4442,6 +4442,7 @@ function run_query_insert_others_attendees($calendar) {
       // solr
       $c = OBM_Contact::get($id);
       OBM_Contact::solrStore($c);
+      OBM_IndexingService::commit('contact');
     }
   }
   return $ret;

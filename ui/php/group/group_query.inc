@@ -557,6 +557,7 @@ function run_query_group_contact_create($group) {
     $data['emails'][0]['label'] = 'INTERNET';
     $data['emails'][0]['address'] = $email; 
     $contact = $addressbook->addContact($data);
+    OBM_IndexingService::commit('contact');
     return $contact->id;
   }
   return false;
