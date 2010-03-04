@@ -332,12 +332,7 @@ Obm.UserPattern.Form = new Class ({
         attributes: params
       });
     } else {
-      for (var attr in this.fields) {
-        var field = this.fields[attr];
-        if (!field.changed()) {
-          field.resetValue();
-        }
-      }
+      this.resetForm();
     }
   },
 
@@ -356,50 +351,62 @@ Obm.UserPattern.Form = new Class ({
     this.fetchDelay = this.loadPattern.delay(this.options.delay,this);
   },
 
-  applyPattern: function(attributes) {
-    for (var attr in attributes) {
+  resetForm: function() {
+    for (var attr in this.fields) {
       var field = this.fields[attr];
-      if (field && ((!field.changed()) || (field.empty()))) {
-        field.setValue(attributes[attr]);
+      if (!field.changed()) {
+        field.resetValue();
       }
     }
-    /* mail block specific */
-    if (this.fields['mail_perms'].getValue()==0) {
-      if (attributes['email']) {
-        $('externalEmailField').value = attributes['email'];
-      }
-    } else {
-      if (attributes['mail_server_id']) {
-        var field = $('sel_mail_server_id');
-        for (var i=0; i<field.options.length; i++) {
-          if (field.options[i].value == attributes['mail_server_id']) {
-            field.selectedIndex = i;
-          }
+  },
+
+  applyPattern: function(attributes) {
+    this.resetForm();
+    if (attributes) {
+      for (var attr in attributes) {
+        var field = this.fields[attr];
+        if (field && ((!field.changed()) || (field.empty()))) {
+          field.setValue(attributes[attr]);
         }
       }
-      if (attributes['email']) {
-        var mails = attributes['email'];
-        var mail_fields = $$('td#userMailHome input');
-        var count = mails.length;
-        for (var i=mail_fields.length; i<mails.length; i++) {
-          add_email_field(aliasSelectTemplate);
-          show_hide_add_button();
+      /* mail block specific */
+      if (this.fields['mail_perms'].getValue()==0) {
+        if (attributes['email']) {
+          $('externalEmailField').value = attributes['email'];
         }
-        mail_fields = $$('td#userMailHome input');
-        var alias_fields = $$('td#userMailHome select');
-        for (var i=0; i<mails.length; i++) {
-          var tmp = mails[i].split("@");
-          mail_fields[i].value = tmp[0];
-          for (var j=0; j<alias_fields[i].options.length; j++) {
-            if (alias_fields[i].options[j].value == tmp[1]) {
-              alias_fields[i].selectedIndex = j;
+      } else {
+        if (attributes['mail_server_id']) {
+          var field = $('sel_mail_server_id');
+          for (var i=0; i<field.options.length; i++) {
+            if (field.options[i].value == attributes['mail_server_id']) {
+              field.selectedIndex = i;
             }
           }
         }
-        /* $('externalEmailField').value = attributes['email']; */
-      }
-      if (attributes['mail_quota']) {
-        $('tf_mail_quota').value = attributes['mail_quota'];
+        if (attributes['email']) {
+          var mails = attributes['email'];
+          var mail_fields = $$('td#userMailHome input');
+          var count = mails.length;
+          for (var i=mail_fields.length; i<mails.length; i++) {
+            add_email_field(aliasSelectTemplate);
+            show_hide_add_button();
+          }
+          mail_fields = $$('td#userMailHome input');
+          var alias_fields = $$('td#userMailHome select');
+          for (var i=0; i<mails.length; i++) {
+            var tmp = mails[i].split("@");
+            mail_fields[i].value = tmp[0];
+            for (var j=0; j<alias_fields[i].options.length; j++) {
+              if (alias_fields[i].options[j].value == tmp[1]) {
+                alias_fields[i].selectedIndex = j;
+              }
+            }
+          }
+          /* $('externalEmailField').value = attributes['email']; */
+        }
+        if (attributes['mail_quota']) {
+          $('tf_mail_quota').value = attributes['mail_quota'];
+        }
       }
     }
   }
