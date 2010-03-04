@@ -65,7 +65,7 @@ documentDefaultPath="/"
 ; Automate specific parameters
 ;
 ; Log level
-logLevel = 2
+logLevel = 3
 ;
 ; LDAP server address
 ldapServer = ldap://localhost
