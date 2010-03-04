@@ -32,7 +32,11 @@ sub _configureLog {
         }
 
         if( $self->{'logLevel'} == TRACE ) {
-            $logLevel = 'TRACE';
+            if( $Log::Log4perl::VERSION < 1.13 ) {
+                $logLevel = 'DEBUG';
+            }else {
+                $logLevel = 'TRACE';
+            }
             last SWITCH;
         }
 
