@@ -317,7 +317,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
     if (isset($params['id'])) {
-      $contact = OBM_Contact::get($params['id']);
+      $contact = OBM_Contact::get($params['id'], null, false);
     } else {
       $contact = new OBM_Contact();
       if($cgp_mailing_default) $contact->mailok = 1;
