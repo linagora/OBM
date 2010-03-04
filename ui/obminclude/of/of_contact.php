@@ -169,12 +169,12 @@ class OBM_Contact implements OBM_ISearchable {
     return $return;
   }
 
-  public static function get($id, $domain = null) {
+  public static function get($id, $domain = null, $inherit=true) {
     $where = "contact_id = '{$id}'";
     if ($domain !== null) {
       $where.= " AND (contact_domain_id='{$domain}')";
     }
-    $contacts = self::fetchAll($where);
+    $contacts = self::fetchAll($where, $inherit);
     return array_pop($contacts);
   }
 
@@ -290,11 +290,11 @@ class OBM_Contact implements OBM_ISearchable {
     return $block_user;
   }
   
-  public static function fetchAll($where) {
+  public static function fetchAll($where, $inherit=true) {
     $db = new DB_OBM();
     $contacts = self::fetchDetails($db, $where);
     if (count($contacts) != 0) {
-      $contacts = self::fetchCoords($db, $contacts);
+      $contacts = self::fetchCoords($db, $contacts, $inherit);
       $contacts = self::fetchCategories($db, $contacts);
     }
     return $contacts;
@@ -1158,28 +1158,60 @@ class OBM_Contact implements OBM_ISearchable {
     return $contacts;
   }
 
-  private static function fetchCoords($db, $contacts) {
+  private static function fetchCoords($db, $contacts, $inherit=true) {
     $contact_ids = implode(',', array_keys($contacts));
+
+    /*
+     * PHONE NUMBER
+     */
     $query = "SELECT contactentity_contact_id AS contact_id, phone_label, phone_number FROM Phone 
               INNER JOIN ContactEntity ON phone_entity_id = contactentity_entity_id 
               WHERE contactentity_contact_id IN ({$contact_ids})  ";
+    // Company phone number
+    if ($inherit) {
+      $query .= " UNION 
+        SELECT contact_id, 'COMPANY;PHONE' as phone_label, phone_number
+        FROM Phone 
+          INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id 
+          INNER JOIN Contact ON contact_company_id = companyentity_company_id
+        WHERE contact_id IN ({$contact_ids})";
+    }
     $query.= "ORDER BY phone_label";
+
     $db->xquery($query);        
     while ($db->next_record()) {
       $label = (explode(';', $db->f('phone_label')));
       $contacts[$db->f('contact_id')]->phone[] = array('label' => $label, 'number' => $db->f('phone_number'));
     }
-    
+
+
+    /*
+     * EMAIL 
+     */
     $query = "SELECT contactentity_contact_id AS contact_id, email_label, email_address FROM Email 
               INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id 
               WHERE contactentity_contact_id IN ({$contact_ids})  ";
+    // Company email
+    if ($inherit) {
+      $query .= " UNION 
+        SELECT contact_id, 'COMPANY;EMAIL' as email_label, email_address
+        FROM Email 
+          INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id 
+          INNER JOIN Contact ON contact_company_id = companyentity_company_id
+        WHERE contact_id IN ({$contact_ids})";
+    }
     $query.= "ORDER BY email_label";
+
     $db->xquery($query);        
     while ($db->next_record()) {
       $label = (explode(';', $db->f('email_label')));
       $contacts[$db->f('contact_id')]->email[] = array('label' => $label, 'address' => $db->f('email_address'));
     }
     
+
+    /*
+     * ADDRESSES
+     */
     $lang = get_lang();
     $query = "SELECT contactentity_contact_id AS contact_id, address_label, address_street, address_zipcode, address_expresspostal, 
               address_town, address_country, country_name, country_iso3166
@@ -1187,7 +1219,20 @@ class OBM_Contact implements OBM_ISearchable {
               INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id 
               LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' 
               WHERE contactentity_contact_id IN ({$contact_ids})  ";
+    // Company addresses
+    if ($inherit) {
+      $query .= " UNION
+        SELECT contact_id, 'COMPANY;ADDRESS' as address_label, address_street, address_zipcode, address_expresspostal,
+          address_town, address_country, country_name, country_iso3166
+        FROM Address
+          INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
+          INNER JOIN Contact ON contact_company_id = companyentity_company_id
+          LEFT JOIN Country ON country_iso3166 = address_country
+            AND country_lang = '$lang'
+        WHERE contact_id IN ({$contact_ids})";
+    }
     $query.= "ORDER BY address_label";
+
     $db->xquery($query);        
     while ($db->next_record()) {
       $label = (explode(';',$db->f('address_label')));
@@ -1198,6 +1243,10 @@ class OBM_Contact implements OBM_ISearchable {
         'country' => $db->f('country_name'), 'country_iso3166' => $db->f('country_iso3166'));
     }
     
+
+    /*
+     * IM
+     */
     $query = "SELECT contactentity_contact_id AS contact_id, IM.* FROM IM 
               INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id 
               WHERE  contactentity_contact_id IN ({$contact_ids})";
@@ -1206,10 +1255,24 @@ class OBM_Contact implements OBM_ISearchable {
       $contacts[$db->f('contact_id')]->im[] = array('protocol' => $db->f('im_protocol'),'address' => $db->f('im_address'));
     }
     
+
+    /*
+     * WEBSITES
+     */
     $query = "SELECT contactentity_contact_id AS contact_id, website_label, website_url FROM Website 
               INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id 
               WHERE contactentity_contact_id IN ({$contact_ids}) ";
+    // Company website
+    if ($inherit) {
+      $query .= " UNION 
+        SELECT contact_id, 'COMPANY;WEBSITE' as website_label, website_url
+        FROM Website
+          INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
+          INNER JOIN Contact ON contact_company_id = companyentity_company_id
+        WHERE contact_id IN ({$contact_ids})";
+    }
     $query .= "ORDER BY website_label";
+
     $db->xquery($query);        
     while ($db->next_record()) {
       $label = (explode(';', $db->f('website_label')));
@@ -1541,6 +1604,8 @@ class OBM_Contact implements OBM_ISearchable {
     else $label = array($label);
     if($translate && $GLOBALS['l_'.strtolower($kind).'_labels'][implode('_',$label)]) {
       return $GLOBALS['l_'.strtolower($kind).'_labels'][implode('_',$label)];
+    } else if($GLOBALS['l_'.strtolower(implode('_',$label))] != "") {
+      return $GLOBALS['l_'.strtolower(implode('_',$label))];
     } else {
       return implode($separator,$label);
     }
