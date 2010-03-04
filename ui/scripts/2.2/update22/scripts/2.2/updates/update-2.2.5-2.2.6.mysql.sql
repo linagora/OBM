@@ -6,8 +6,6 @@
 -- /////////////////////////////////////////////////////////////////////////////
 
 
--- contact query optimization
-CREATE INDEX contact_privacy_key ON Contact (contact_privacy);
 
 -- contact collected data type fix
 ALTER TABLE Contact MODIFY COLUMN contact_collected BOOLEAN DEFAULT FALSE;
@@ -27,3 +25,6 @@ INSERT INTO DisplayPref (display_user_id, display_entity, display_fieldname, dis
 
 -- update userobm_delegation target according to the new delegation management
 UPDATE UserObm SET userobm_delegation_target = userobm_delegation WHERE userobm_delegation_target = '';
+
+-- contact query optimization
+CREATE INDEX contact_privacy_key ON Contact (contact_privacy);
