@@ -215,7 +215,9 @@ sub _bind {
     my $self = shift;
 
     my $oldSigDie = $SIG{__DIE__};
-    $SIG{__DIE__} = undef;
+    $SIG{__DIE__} = sub {
+        $self->_log( join(' ', @_), 4 );
+    };
 
     $self->_log( 'Trying to bind to SSL port '.$self->{'server'}->{'socketConf'}->{'LocalPort'}.' using certificate '.$self->{'server'}->{'socketConf'}->{'SSL_cert_file'}.' (key '.$self->{'server'}->{'socketConf'}->{'SSL_key_file'}.')', 3 );
 

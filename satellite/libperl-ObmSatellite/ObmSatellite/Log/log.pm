@@ -85,7 +85,12 @@ sub _log {
 
     SWITCH: {
         if( $logLevel == TRACE || $logLevel eq 'TRACE' ) {
-            $log->trace( $logMessage );
+            if( $Log::Log4perl::VERSION < 1.13 ) {
+                $log->debug( $logMessage );
+            }else {
+                $log->trace( $logMessage );
+            }
+
             last SWITCH;
         }
 
