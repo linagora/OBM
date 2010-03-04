@@ -287,7 +287,7 @@ sub _update {
             last SWITCH;
         }
 
-        $self->_log( 'entité de type inconnu, pas de traitements effectués', 1 );
+        $self->_log( 'entité de type inconnu, pas de traitements effectués', 4 );
     }
 
     return $returnCode;

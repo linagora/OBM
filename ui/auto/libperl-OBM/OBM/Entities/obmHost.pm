@@ -143,7 +143,7 @@ sub setLinks {
     # Le SID du domaine
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
     if( !$domainSid ) {
-        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 1 );
+        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 4 );
         if( $hostDesc->{'host_samba'} ) {
             $self->_log( 'droit samba annulé', 2 );
             $hostDesc->{'host_samba'} = 0;

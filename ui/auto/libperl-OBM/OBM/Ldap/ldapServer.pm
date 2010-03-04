@@ -221,7 +221,7 @@ sub _connect {
         $self->_log( 'impossible de vérifier que '.$self->getDescription().' a été compilé avec le support du TLS/SSL', 1 );
 
     }elsif( !$ldapDse->supported_extension(LDAP_EXTENSION_START_TLS) ) {
-        $self->_log( 'le serveur LDAP n\'a pas été compilé avec le support du TLS/SSL !', 2 );
+        $self->_log( 'le serveur LDAP n\'a pas le support du TLS/SSL activé !', 2 );
         $self->{'ldapTls'} = 'none';
     }
 
