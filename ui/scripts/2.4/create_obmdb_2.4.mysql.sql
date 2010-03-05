@@ -3070,7 +3070,7 @@ CREATE TABLE `SyncedAddressbook` (
   KEY `syncedaddressbook_user_id_user_id_fkey` (`user_id`),
   KEY `syncedaddressbook_addressbook_id_addressbook_id_fkey` (`addressbook_id`),
   CONSTRAINT `syncedaddressbook_user_id_userobm_id_fkey` FOREIGN KEY (user_id) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook (id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES `AddressBook` (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
