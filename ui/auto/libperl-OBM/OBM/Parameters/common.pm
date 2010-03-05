@@ -75,22 +75,6 @@ $dbName = $cfgFile->val( 'global', 'db' );
 $dbHost = $cfgFile->val( 'global', 'host' );
 $dbType = lc( $cfgFile->val( 'global', 'dbtype' ));
 
-# Conversion du nom du type de BD utilisée en driver DBI associé
-SWITCH: {
-    if( $dbType eq 'mysql' ) {
-        $dbDriver = 'mysql';
-        last SWITCH;
-    }
-
-    if( $dbType eq 'pgsql' ) {
-        $dbDriver = 'Pg';
-        last SWITCH;
-    }
-}
-
-# Construction de la chaîne DBI de connexion à la BD
-$db = 'dbi:'.$dbDriver.':database=$dbName;host='.$dbHost;
-
 # La racine du backup
 $backupRoot = $cfgFile->val( 'global', 'backupRoot' );
 if( !defined( $backupRoot ) ) {

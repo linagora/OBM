@@ -26,6 +26,9 @@ sub _new_instance {
     $self->{'dbName'} = $OBM::Parameters::common::dbName;
     $self->{'dbType'} = $OBM::Parameters::common::dbType;
     $self->{'dbDriver'} = undef;
+    if( $self->_getDriver() ) {
+        return undef;
+    }
     $self->{'dbUser'} = $OBM::Parameters::common::userDb;
     $self->{'dbPassword'} = $OBM::Parameters::common::userPasswd;
 
@@ -59,7 +62,7 @@ sub _getDriver {
             last SWITCH;
         }
 
-        $self->_log( 'driver pour les SGBD de type \''.$self->{'dbType'}.'\' inconnu', 0 );
+        $self->_log( 'driver pour le SGBD de type \''.$self->{'dbType'}.'\' inconnu', 0 );
         return 1;
     }
 
@@ -170,11 +173,6 @@ sub _dbConnect {
 
     if( defined($dbHandler) && $dbHandler->ping() ) {
         $self->_log( 'connexion a la BD deja etablie', 5 );
-        return 0;
-    }
-
-    if( !defined($self->{'dbDriver'}) && $self->_getDriver() ) {
-        $self->_log( 'problème de driver SGBD, connexion BD impossible', 0 );
         return 0;
     }
 
