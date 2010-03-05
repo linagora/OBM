@@ -19,7 +19,7 @@ $l_update_state = "Etat de mise à jour";
 
 // Mail chooser labels
 $l_mailboxchoice_least_boxes = "gérant le moins de boîtes mail";
-$l_mailboxchoice_least_used_memory = "utilisant le moins d'espace mémoire";
+$l_mailboxchoice_least_used_disk = "utilisant le moins d'espace disque";
 $l_mailshares_quota_default = "# bals partagées : quota par défaut";
 $l_help_mailshares_quota_default = "Définit la quota par défaut des bals partagées de ce domaine, la valeur 0 correspond à aucun quota.";
 $l_mailshares_quota_max = "# bals partagées : quota maximum";

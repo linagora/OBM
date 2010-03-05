@@ -23,7 +23,7 @@ $c_mailchooser_hooks = array(
   array(
     'id'            => 2,
     'hook_function' => 'least_used_memory_example',
-    'name'          => $l_mailboxchoice_least_used_memory
+    'name'          => $l_mailboxchoice_least_used_disk
   ),
 */
 );

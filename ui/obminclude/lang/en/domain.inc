@@ -18,7 +18,7 @@ $l_max_quota = "Max value";
 
 // Mail chooser labels
 $l_mailboxchoice_least_boxes = "having less mailboxes";
-$l_mailboxchoice_least_used_memory = "using less memory";
+$l_mailboxchoice_least_used_disk = "using less disk space";
 $l_mailshares_quota_default = "# mailshares : default quota";
 $l_help_mailshares_quota_default = "Define the default quota for mailshares in this domain, Value 0 is no quota.";
 $l_mailshares_quota_max = "# mailshares : maximum quota";

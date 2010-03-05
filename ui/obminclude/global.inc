@@ -303,7 +303,7 @@ $c_mailchooser_global_hooks = array(
   array(
     'id'            => 98,
     'hook_function' => 'least_used_memory',
-    'name'          => 'l_mailboxchoice_least_used_memory',
+    'name'          => 'l_mailboxchoice_least_used_disk',
   ),
   array(
     'id'            => 99,
