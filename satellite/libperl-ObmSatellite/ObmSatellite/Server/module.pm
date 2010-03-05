@@ -41,11 +41,13 @@ sub _loadModules {
         my $moduleClass = 'ObmSatellite::Modules::'.$moduleInternalName;
 
         # Disable SIGDIE handler to load only valid modules without fatal error
-        local $SIG{__DIE__} = undef;
+        local $SIG{__DIE__} = sub {
+            $self->_log( 'Unknow or invalid module \''.$modules[$i].'\' '.join( ' ', @_ ), 1 );
+        };
 
         eval {
             require $modulePath;
-        } or ($self->_log( 'Unknow or invalid module \''.$modules[$i].'\'', 1 ) && next);
+        } or next;
 
         my $module = $moduleClass->new();
         if( !defined($module) ) {
