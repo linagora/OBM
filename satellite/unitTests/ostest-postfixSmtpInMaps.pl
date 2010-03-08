@@ -24,8 +24,19 @@ SWITCH: {
     }
 }
 
-use OBM::ObmSatellite::client;
-my $client = OBM::ObmSatellite::client->instance();
+use File::Basename;
+my $modulePath = dirname($0);
+
+if( $modulePath !~ /^([\.-_a-zA-Z0-9])$/ ) {
+    print STDERR "unable to find needed perl modules !\n";
+    exit 10;
+}
+$modulePath = $1;
+
+my $clientModulePath = $modulePath.'/lib/client.pm';
+require $clientModulePath;
+
+my $client = lib::client->instance();
 if( !defined($client) ) {
     print STDERR "[Error] Unable to initialize 'OBM::ObmSatellite::client'\n";
     exit 1;
