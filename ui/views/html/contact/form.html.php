@@ -259,7 +259,7 @@
               <input type='hidden' name='id' value='<?php echo $contact->id ?>'  />
               <input type='hidden' name='addressbook' value='<?php echo $contact->addressbook_id ?>' />
               <input type='submit' value='<?php echo __('Save') ?>' />
-              <input type='button' value='<?php echo __('Cancel') ?>' onclick="obm.contact.addressbook.consultContact('<?php echo $contact->id ?>');" />
+              <input type='button' value='<?php echo __('Cancel') ?>' onclick="if(confirm('<?php echo self::toJs(__('Are you sure you want to stop editing this contact? Unsaved changes will be lost.')) ?>')) obm.contact.addressbook.consultContact('<?php echo $contact->id ?>');" />
             </p>
           </form>
         </td>
