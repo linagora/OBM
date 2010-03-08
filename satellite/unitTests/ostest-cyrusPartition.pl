@@ -7,6 +7,15 @@ use Getopt::Long;
 my %parameters;
 my $return = GetOptions( \%parameters, 'os-server=s', 'hostname=s' );
 
+use File::Basename;
+my $modulePath = dirname($0);
+
+if( $modulePath !~ /^([\.-_a-zA-Z0-9])$/ ) {
+    print STDERR "unable to find needed perl modules !\n";
+    exit 10;
+}
+$modulePath = $1;
+require $modulePath.'/lib/common.pm';
 
 sub help {
     print STDERR "Usage: \n";
@@ -24,16 +33,7 @@ SWITCH: {
     }
 }
 
-use File::Basename;
-my $modulePath = dirname($0);
-
-if( $modulePath !~ /^([\.-_a-zA-Z0-9])$/ ) {
-    print STDERR "unable to find needed perl modules !\n";
-    exit 10;
-}
-$modulePath = $1;
-
-my $clientModulePath = $modulePath.'/lib/client.pm';
+my $clientModulePath = 'lib/client.pm';
 require $clientModulePath;
 
 my $client = lib::client->instance();

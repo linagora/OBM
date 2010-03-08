@@ -12,7 +12,7 @@ require Exporter;
 use strict;
 
 require DBI;
-require OBM::Parameters::common;
+require 'lib/common.pm';
 
 
 sub _new_instance {
@@ -21,15 +21,15 @@ sub _new_instance {
     my $self = bless { }, $class;
 
     $self->{'dbHandler'} = undef;
-    $self->{'dbHost'} = $OBM::Parameters::common::dbHost;
-    $self->{'dbName'} = $OBM::Parameters::common::dbName;
-    $self->{'dbType'} = $OBM::Parameters::common::dbType;
+    $self->{'dbHost'} = $lib::common::dbHost;
+    $self->{'dbName'} = $lib::common::dbName;
+    $self->{'dbType'} = $lib::common::dbType;
     $self->{'dbDriver'} = undef;
     if( $self->_getDriver() ) {
         return undef;
     }
-    $self->{'dbUser'} = $OBM::Parameters::common::userDb;
-    $self->{'dbPassword'} = $OBM::Parameters::common::userPasswd;
+    $self->{'dbUser'} = $lib::common::userDb;
+    $self->{'dbPassword'} = $lib::common::userPasswd;
 
     return $self;
 }
