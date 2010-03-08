@@ -60,6 +60,9 @@ class OBM_Autoloader_Resource {
     if(is_readable('models/'.$classPath)) {
       return $classPath;
     }
+    if(is_readable(dirname(__FILE__).'/../../../obminclude/lib/'.$classPath)) {
+      return 'obminclude/lib/'.$classPath;
+    }
     return false;
   }
 }
