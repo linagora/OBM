@@ -50,14 +50,18 @@ foreach ($_files as $index => $file)
 //  Dependencies
 // -----------------------------------------------------------------------------
 
+//
+// The following libraries are loaded dynamicaly by the LemonLDAP_Engine object.
+// This will prevent OBM to crash when user access to some modules. See the
+// private method named _loadOBMLibraries() into LemonLDAP_Engine.php.
+// They are commented just for informations. DO NOT UNCOMMENT THEM !
+//
 // Provides tools to synchronize OBM users.
-require_once dirname(__FILE__) . '/../../../php/user/user_query.inc';
-
+//require_once dirname(__FILE__) . '/../../../php/user/user_query.inc';
 // Provides tools to synchronize OBM groups.
-require_once dirname(__FILE__) . '/../../../php/group/group_query.inc';
-
+//require_once dirname(__FILE__) . '/../../../php/group/group_query.inc';
 // Provides tools to update internal LDAP directory.
-require_once dirname(__FILE__) . '/../../../php/tools/tools_query.inc';
+//require_once dirname(__FILE__) . '/../../../php/tools/tools_query.inc';
 
 // -----------------------------------------------------------------------------
 //  Hack
