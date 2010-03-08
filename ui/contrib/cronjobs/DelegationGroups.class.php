@@ -131,6 +131,7 @@ class DelegationGroups extends CronJob {
     ''
     )";
     $this->logger->core($query);
+    $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
     $id = $obm_q->lastid();
     if ($id > 0) {
