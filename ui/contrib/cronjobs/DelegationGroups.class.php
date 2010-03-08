@@ -51,7 +51,7 @@ class DelegationGroups extends CronJob {
         $parent_id = $this->getDelegationGroup($domain_id, $parent);
         $this->associatesDelegationGroups($parent_id, $group_id);
       }
-      //FIXME: recalcul de la table of_usergroup
+      of_usergroup_update_group_node($group_id);
       //FIXME: appeller l'automate sur ce groupe ??
     }
   }
