@@ -85,6 +85,10 @@ sub _log {
     my $self = shift;
     my( $logMessage, $logLevel ) = @_;
 
+    if( !Log::Log4perl->initialized() ) {
+        return 1;
+    }
+
     my $log = Log::Log4perl->get_logger(__PACKAGE__);
 
     SWITCH: {
