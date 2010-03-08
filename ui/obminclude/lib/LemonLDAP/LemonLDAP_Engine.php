@@ -213,6 +213,7 @@ class LemonLDAP_Engine {
   function __construct ()
   {
     $this->_headers = $this->_parseHeaders();
+    $this->_loadOBMLibraries();
   }
 
   /**
@@ -247,6 +248,19 @@ class LemonLDAP_Engine {
     if (is_null($this->_db) || is_null($this->_headersMap))
       return false;
     return true;
+  }
+
+  /**
+   * Load some internal OBM libraries.
+   */
+  function _loadOBMLibraries ()
+  {
+    // Provides tools to synchronize OBM users.
+    require_once dirname(__FILE__) . '/../../../php/user/user_query.inc';
+    // Provides tools to synchronize OBM groups.
+    require_once dirname(__FILE__) . '/../../../php/group/group_query.inc';
+    // Provides tools to update internal LDAP directory.
+    require_once dirname(__FILE__) . '/../../../php/tools/tools_query.inc';
   }
 
   /**
