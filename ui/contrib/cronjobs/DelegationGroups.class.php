@@ -41,8 +41,10 @@ class DelegationGroups extends CronJob {
   }
 
   protected function processDomain($domain_id) {
+    global $cmd_update;
     $delegations = $this->buildDelegationsList($domain_id);
 
+    $groups = array();
     foreach ($delegations as $delegation => $parent) {
       $group_id = $this->getDelegationGroup($domain_id, $delegation);
       $this->purgeGroupMembers($group_id);
@@ -52,8 +54,14 @@ class DelegationGroups extends CronJob {
         $this->associatesDelegationGroups($parent_id, $group_id);
       }
       of_usergroup_update_group_node($group_id);
-      //FIXME: appeller l'automate sur ce groupe ??
+      array_push($groups, "group:$group_id");
     }
+
+    // automate
+    if (sizeof($groups) > 1) {
+      exec("echo '".implode($groups, '\\')."' | $cmd_update --domain-id $domain_id --entity");
+    }
+
   }
 
   protected function delegationGroupName($delegation) {
