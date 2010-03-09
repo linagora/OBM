@@ -10,7 +10,7 @@ my $return = GetOptions( \%parameters, 'os-server=s', 'hostname=s' );
 use File::Basename;
 my $modulePath = dirname($0);
 
-if( $modulePath !~ /^([\.-_a-zA-Z0-9])$/ ) {
+if( $modulePath !~ /^([\/\.-_a-zA-Z0-9]+)$/ ) {
     print STDERR "unable to find needed perl modules !\n";
     exit 10;
 }
