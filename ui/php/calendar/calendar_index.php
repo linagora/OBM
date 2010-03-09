@@ -1100,6 +1100,7 @@ if (!$params['ajax']) {
   echo "({".$display['json'].",$msg})";
   exit();
 } elseif ($action == 'share') {
+///////////////////////////////////////////////////////////////////////////////
   if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
     $token = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);
     dis_calendar_share_public($token);
@@ -1111,6 +1112,7 @@ if (!$params['ajax']) {
   exit();
 
 } elseif ($action == 'share_reinit') {
+///////////////////////////////////////////////////////////////////////////////
   if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
     run_query_calendar_delete_token($params['entity_id'],$params['entity_type'],$params['type']);
     json_ok_msg("$l_share_calendar : $l_reinit_ok");
@@ -1121,6 +1123,7 @@ if (!$params['ajax']) {
   exit();
 
 } elseif ($action == 'send_url') {
+///////////////////////////////////////////////////////////////////////////////
   if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
     $format = $params['format'];
     $params['others_attendees'][]=$params['mail'];

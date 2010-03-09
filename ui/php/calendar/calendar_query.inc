@@ -5364,7 +5364,7 @@ function get_calendar_entity_share($entity_id,$entity,$type) {
   $tokens = get_entity_token($entity_id,$entity,$type);
 
   if(!isset($tokens[$uid][$type])) {
-    $tokens[$uid][$type] = generateUniqueKey();
+    $tokens[$uid][$type] = generateUniqueKey(false);
     run_query_calendar_insert_token($tokens[$uid][$type], $mail, $entity, $entity_id, $readAcces, $type, $format);
   }
   

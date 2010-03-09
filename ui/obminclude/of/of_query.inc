@@ -3789,8 +3789,12 @@ function of_service_property_unique($service, $service_property, $value, $id='')
  * @return unique id
  */
 //function genUniqueExtEventId() {
-function generateUniqueKey() {
-  return get_obm_info('product_id').sha1(uniqid()).sha1($GLOBALS['obm']['domain_name']).sha1(mktime()*rand());
+function generateUniqueKey($universal=true) {
+  if($universal) {
+    return get_obm_info('product_id').sha1(uniqid()).sha1($GLOBALS['obm']['domain_name']).sha1(mktime()*rand());
+
+  }
+  return uniqid();
 }
 
 ?>
