@@ -1,5 +1,6 @@
 package org.obm.caldav.obmsync.service.impl;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,8 +46,12 @@ public class EventConverter {
 	
 	public static CalendarResource convert(Event e, String compUrl) {
 		DavComponentType type = getType(e.getType());
+		Date lastUp = e.getTimeUpdate();
+		if(lastUp == null){
+			lastUp = e.getTimeCreate();
+		}
 		return new CalendarResource(e.getExtId(), compUrl,
-				e.getTimeUpdate(), type);
+				lastUp, type);
 	}
 
 	/**
