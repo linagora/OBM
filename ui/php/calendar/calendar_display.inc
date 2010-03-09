@@ -3278,7 +3278,7 @@ function dis_calendar_quick_form($calendar_entity) {
           </fieldset>
           $calendar_list_entity
           <fieldset class=\"buttons\"> 
-            <input class=\"button closeSticky\" type=\"submit\" value=\"$l_validate\" />
+            <input class=\"closeSticky\" type=\"submit\" value=\"$l_validate\" />
             <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" />
             <input type=\"button\" id=\"calendarQuickFormDetail\" onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value=\"$l_details\" />
             <input type=\"button\" class=\"closeSticky\" id=\"calendarQuickFormDelete\" 
@@ -3396,8 +3396,8 @@ function dis_calendar_occurency_popup() {
       <div class=\"content\">
         <h2>$GLOBALS[l_delete_event_message]</h2>
          <fieldset class=\"buttons\"> 
-          <input type=\"button\" id=\"popup_delete\" class=\"closeSticky\" value=\"$GLOBALS[l_delete]\" /><br/>
-          <input type=\"button\" id=\"popup_cancel_delete\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+          <input type=\"button\" id=\"popup_delete\" class=\"closeSticky\" value=\"$GLOBALS[l_yes]\" />
+          <input type=\"button\" id=\"popup_cancel_delete\" class=\"closeSticky\" value=\"$GLOBALS[l_no]\" />
          </fieldset>
       </div>
     </div>

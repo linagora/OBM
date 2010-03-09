@@ -678,10 +678,6 @@ li.eventOwner19Legend {
 #calendarQuickForm fieldset input{
   width: 18em;
 }
-#calendarQuickForm fieldset input.button{
-  width: 6em;
-}
-
 
 #calendarQuickForm .buttons input{
   width: auto;
