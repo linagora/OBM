@@ -54,7 +54,9 @@ sub _getServerDesc {
         return 1;
     }
 
-    if( ref($self->{'serverId'}) || ($self->{'serverId'} !~ /$OBM::Parameters::regexp::regexp_server_id/) ) {
+    if( ref($self->{'serverId'})
+        || ($self->{'serverId'} !~ /$OBM::Parameters::regexp::regexp_server_id/)
+    ) {
         $self->_log( 'identifiant de serveur incorrect', 0 );
         return 1;
     }
@@ -99,13 +101,17 @@ sub _getServerDesc {
         return 1;
     }
 
-    if( !defined($self->{'serverDesc'}->{'host_name'}) ) {
-        $self->_log( 'nom d\'hôte du serveur non défini', 0 );
+    if( !defined($self->{'serverDesc'}->{'host_name'})
+        || ($self->{'serverDesc'}->{'host_name'} !~ /$regexp_hostname/)
+    ) {
+        $self->_log( 'nom d\'hôte du serveur non défini ou incorrect', 0 );
         return 1;
     }
 
-    if( !defined($self->{'serverDesc'}->{'host_ip'}) ) {
-        $self->_log( 'ip d\'hôte du serveur non défini', 0 );
+    if( !defined($self->{'serverDesc'}->{'host_ip'})
+        || ($self->{'serverDesc'}->{'host_ip'} !~ /$regexp_ip/)
+    ) {
+        $self->_log( 'ip d\'hôte du serveur non défini ou incorrecte', 0 );
         return 1;
     }
 
