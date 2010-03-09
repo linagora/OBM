@@ -57,7 +57,13 @@ class DelegationGroups extends CronJob {
   }
 
   protected function delegationGroupName($delegation) {
-    return $delegation; //FIXME: déterminer le nom du groupe
+    include("obminclude/lang/".$GLOBALS[ini_array][lang]."/global.inc");
+    if ($delegation == "/") {
+      $name = $l_all;
+    } else {
+      $name = "$l_all.$delegation";
+    }
+    return $name;
   }
 
   protected function associatesDelegationGroups($parent_id, $child_id) {
