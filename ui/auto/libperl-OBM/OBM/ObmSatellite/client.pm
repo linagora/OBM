@@ -145,6 +145,40 @@ sub post {
 }
 
 
+sub put {
+    my $self = shift;
+    my( $host, $path, $content ) = @_;
+
+    my $url = $self->_checkUrl( $host, $path );
+
+    if( !defined($url) ) {
+        $self->_log( 'URL incorrecte', 1 );
+        return 1;
+    }
+
+    my $request = HTTP::Request->new( PUT => $url );
+    if( !$request ) {
+        $self->_log( 'erreur à l\'initialisation de la requête', 1 );
+        return 1;
+    }
+
+    # Adding content to request
+    $request->content( $content ) if defined($content);
+
+    # Add authentication headers
+    $request->authorization_basic( $self->{'obmSatelliteLogin'}, $self->{'obmSatellitePassword'} );
+
+    my $ua = LWP::UserAgent->new();
+    if( !$ua ) {
+        $self->_log( 'erreur à l\'initialisation du navigateur LWP::UserAgent', 0 );
+        return 1;
+    }
+
+    my $response = $ua->request($request);
+    return $self->_displayResponse( $url, $response );
+}
+
+
 sub _displayResponse {
     my $self = shift;
     my( $url, $response ) = @_;
