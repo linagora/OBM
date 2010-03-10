@@ -38,8 +38,14 @@
     <field name="description" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="tag" type="text" indexed="true" stored="false" multiValued="true" /> 
     <field name="with" type="text" indexed="true" stored="false" multiValued="true" /> <!-- Attendees label, email --> 
+
+    <!-- unused -->
     <field name="withId" type="integer" indexed="true" stored="false" multiValued="true" /> 
+
+    <!-- allday, free, busy, periodic -->
     <field name="is" type="text" indexed="true" stored="false" multiValued="true" />
+
+    <!-- unused -->
     <field name="state" type="text" indexed="true" stored="false" multiValued="false" />
     <field name="from" type="string" indexed="true" stored="false" multiValued="false" /> 
   </fields>
