@@ -3010,7 +3010,7 @@ function get_calendar_event_info($id,$attendees=true) {
   $multidomain = sql_multidomain('event');
   $query = "SELECT *, $event_date_l FROM Event 
     $a_sql
-    WHERE event_id = $id 
+    WHERE event_id ".sql_parse_id($id, true)."
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_calendar_event_info()');

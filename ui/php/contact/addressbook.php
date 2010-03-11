@@ -45,6 +45,7 @@ class OBM_AddressBook implements OBM_ISearchable {
     else $this->admin = $admin;
     $this->isDefault = $is_default;
     $this->owner = $owner;
+    $this->syncable = TRUE;
     if ($this->name == 'public_contacts' && $this->isDefault) $this->syncable = FALSE;
     if($this->name == 'contacts' && $this->isDefault && $this->owner == $GLOBALS['obm']['uid']) $this->syncable = FALSE;
     $this->synced = $synced;
@@ -102,7 +103,7 @@ class OBM_AddressBook implements OBM_ISearchable {
 
   public static function search($searchPattern=null) {
     if($searchPattern !== null) {
-      $query = " AND AddressBook.id=$searchPattern";
+      $query = " AND AddressBook.id= #INT($searchPattern)";
     }
     $db = new DB_OBM;
     $addressBooks = array();

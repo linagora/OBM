@@ -113,7 +113,8 @@ class DB_Sql {
     if (!$this->connect()) {
       return 0; /* we already complained in connect() about that. */
     }
-
+    
+    $Query_String = self::xParser($Query_String);
     $this->obm_query = $Query_String;
 
     # New query, discard previous result.
@@ -412,8 +413,8 @@ class DB_Sql {
     return $query;
   }
 
+  // TODO: DEPRECATED
   function xquery($query, $hide_error='') {
-    $query = self::xParser($query);
     $this->query($query, $hide_error);
   }
   
@@ -555,5 +556,13 @@ class DB_Sql {
     }
     return "CAST($data as $type)"; 
   }  
+
+  static function ID($args) {
+    return (is_numeric($int))?(int)$int:'NULL'; 
+  }
+
+  static function INT($args) {
+    return (is_numeric($int))?(int)$int:0;
+  }
 }
 ?>

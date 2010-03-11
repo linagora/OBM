@@ -58,9 +58,21 @@ function sql_parse_id($id, $select=false, $not=false) {
   }
 }
 
-
 /**
- * Return an int if $int is numeric elser return 0
+ * Return an int if id is numeric elser return NULL 
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function sql_implode_id($separator, $ids) {
+    foreach($ids as $key => $id) {
+      $ids[$key] = (is_numeric($id) && $id > 0)? (int)$id:'NULL';
+    }
+    return implode($separator, $ids);
+}
+/**
+ * Return an int if $int is numeric else return 0
  * 
  * @param mixed $int 
  * @access public
@@ -3400,7 +3412,7 @@ function of_entity_subquery($entity, $id = NULL, $not = false) {
     $query = '(SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity)';
   } elseif (is_array($id)) {
     if ($not) $NOT = 'NOT';
-    $id = implode(',', $id);
+    $id = sql_implode_id(',', $id);
     $query = '(SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id '.$NOT.' IN ('.$id.'))';
   } else {
     $id = sql_parse_id($id, true, $not);

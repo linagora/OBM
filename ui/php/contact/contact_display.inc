@@ -232,6 +232,7 @@ function dis_contact_search_form($contact='') {
   $GLOBALS['js']['vars']['labels']['addressExpressPostal'] = $GLOBALS['l_expresspostal']; 
   $GLOBALS['js']['vars']['labels']['addressCountry'] = $GLOBALS['l_country'];
   $GLOBALS['js']['vars']['labels']['countries']['none'] = '---';
+  $ctry_q = run_query_global_country_for_lang();
   while($ctry_q->next_record()) {
     $GLOBALS['js']['vars']['labels']['countries'][$ctry_q->f('country_iso3166')] = $ctry_q->f('country_name');
   }  
@@ -243,8 +244,8 @@ function dis_contact_search_form($contact='') {
   }
   $funcs = of_category_get_ordered('contact', 'function');
   $dsrc_q = run_query_global_datasource();
-//  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q);
-  $block = html_contact($contact['contact_id']);
+  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q);
+//  $block = html_contact($contact['contact_id']);
   return $block;
 }
 

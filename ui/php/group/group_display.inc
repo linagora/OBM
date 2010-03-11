@@ -432,7 +432,7 @@ function dis_group_consult($group, $uid) {
       $join = "LEFT JOIN UserObm ON userobm_id=userobmgroup_userobm_id";
       $where_user_not_archive = "AND userobm_archive != 1";
       $query = "SELECT count(*) FROM UserObmGroup $join
-      	WHERE userobmgroup_group_id=$g_id $where_user_not_archive";
+      	WHERE userobmgroup_group_id=#INT($g_id) $where_user_not_archive";
       $count = get_query_count($query);
       $u_q->set_num_rows_total($count);
     }
@@ -440,7 +440,7 @@ function dis_group_consult($group, $uid) {
     $prefs_g = get_display_pref($uid, 'group_group');
     $g_q = run_query_group_group($group);
     if ($ctu_sql_limit) {
-      $count = get_query_count("SELECT count(*) FROM GroupGroup WHERE groupgroup_parent_id=$g_id");
+      $count = get_query_count("SELECT count(*) FROM GroupGroup WHERE groupgroup_parent_id=#INT($g_id)");
       $g_q->set_num_rows_total($count);
     }
 

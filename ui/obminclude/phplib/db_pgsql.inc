@@ -86,6 +86,7 @@ class DB_Sql {
     $this->connect();
 
     // Store the query string - PB Aliacom
+    $Query_String = self::xParser($Query_String);    
     $this->obm_query = $Query_String;
     
     if ($this->Debug)
@@ -332,8 +333,9 @@ class DB_Sql {
     return $query;
   }
 
+  // DEPRECATED
   function xquery($query, $hide_error='') {
-    $query = self::xParser($query);
+    //$query = self::xParser($query);
     $this->query($query, $hide_error);
   }
 
@@ -496,5 +498,18 @@ class DB_Sql {
     return "CAST($data as $type)"; 
   }
 
+  
+  /**
+   * INT 
+   * 
+   * @param mixed $args 
+   * @static
+   * @access public
+   * @return void
+   */
+  static function INT($args) {
+    $int = current($args);
+    return (is_numeric($int))?(int)$int:'NULL';
+  }
 }
 ?>
