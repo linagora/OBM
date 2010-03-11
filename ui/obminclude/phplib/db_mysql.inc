@@ -557,12 +557,17 @@ class DB_Sql {
     return "CAST($data as $type)"; 
   }  
 
-  static function ID($args) {
-    return (is_numeric($int))?(int)$int:'NULL'; 
-  }
-
+   /**
+   * INT 
+   * 
+   * @param mixed $args 
+   * @static
+   * @access public
+   * @return void
+   */
   static function INT($args) {
-    return (is_numeric($int))?(int)$int:0;
+    $int = current($args);
+    return (is_numeric($int))?(int)$int:'NULL';
   }
 }
 ?>
