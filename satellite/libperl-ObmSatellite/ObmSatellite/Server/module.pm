@@ -12,7 +12,6 @@ use File::Basename;
 use ObmSatellite::Server::response;
 use HTTP::Status;
 use HTTP::Response;
-use XML::Simple;
 
 
 sub _loadModules {

@@ -19,7 +19,7 @@ require $modulePath.'/lib/common.pm';
 
 sub help {
     print STDERR "Usage: \n";
-    print STDERR "\t$0 --os-server <obmSatelliteServer> --hostname <OBM-smtpInRole-HostName>\n";
+    print STDERR "\t$0 --os-server <obmSatelliteServer> --hostname <OBM-imapRole-HostName>\n";
     exit 1;
 }
 

@@ -376,3 +376,32 @@ sub _getLdapValues {
     my @results = $ldapResult->entries();
     return \@results;
 }
+
+
+sub _xmlContent {
+    my $self = shift;
+    my( $requestBody ) = @_;
+
+    local $SIG{__DIE__} = sub {
+        $self->_log( join( ' ', @_ ), 0 );
+    };
+
+    if( !$requestBody ) {
+        return undef;
+    }
+
+    use XML::Simple;
+    my $xmlContent = undef;
+    eval {
+        $xmlContent = XMLin( $requestBody );
+    };
+
+    if( !$xmlContent ) {
+        return undef;
+    }
+
+    use Data::Dumper;
+    $self->_log( Dumper($xmlContent), 5 );
+
+    return $xmlContent;
+}

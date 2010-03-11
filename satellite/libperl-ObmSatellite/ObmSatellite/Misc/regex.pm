@@ -9,58 +9,58 @@ require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT_regex = qw(
-    REGEX_ID
-    REGEX_DOMAIN
-    REGEX_EMAIL
-    REGEX_EMAIL_LEFT
-    REGEX_EMAIL_RIGHT
-    REGEX_ROOTLDAP
-    REGEX_LOGIN
-    REGEX_PASSWD
-    REGEX_IP
-    REGEX_SERVER_ID
-    REGEX_UID
-    REGEX_HOSTNAME
-    REGEX_GROUPNAME
-    REGEX_MAILSHARE_NAME
+    $REGEX_ID
+    $REGEX_DOMAIN
+    $REGEX_EMAIL
+    $REGEX_EMAIL_LEFT
+    $REGEX_EMAIL_RIGHT
+    $REGEX_ROOTLDAP
+    $REGEX_LOGIN
+    $REGEX_PASSWD
+    $REGEX_IP
+    $REGEX_SERVER_ID
+    $REGEX_UID
+    $REGEX_HOSTNAME
+    $REGEX_GROUPNAME
+    $REGEX_MAILSHARE_NAME
     );
 @EXPORT = (@EXPORT_regex);
 
 
 # Regexp generic
-use constant REGEX_ID => '^[0-9]+$';
+$REGEX_ID = '^[0-9]+$';
 
 # Domain regexp
-use constant REGEX_DOMAIN => '^([a-z0-9-]+\.)+[a-z]{2,6}$';
+$REGEX_DOMAIN = '^([a-z0-9-]+\.)+[a-z]{2,6}$';
 
 # Email
-use constant REGEX_EMAIL => '^[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$';
-use constant REGEX_EMAIL_LEFT => '^[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*$';
-use constant REGEX_EMAIL_RIGHT => REGEX_DOMAIN
+$REGEX_EMAIL = '^[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$';
+$REGEX_EMAIL_LEFT = '^[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*$';
+$REGEX_EMAIL_RIGHT = REGEX_DOMAIN;
 
 # LDAP root
-use constant REGEX_ROOTLDAP => "^dc=(.+),dc=.+\$";
+$REGEX_ROOTLDAP = "^dc=(.+),dc=.+\$";
 
 # Login regexp
-use constant REGEX_LOGIN => "^([a-z0-9][a-z0-9-._]{1,31})\$";
+$REGEX_LOGIN = "^([a-z0-9][a-z0-9-._]{1,31})\$";
 
 # Passwd regexp
-use constant REGEX_PASSWD => '^[-\$\\\&~#\{\(\[\|_`\^@\);\]+=\}%!:\/\.,?<>"\w0-9]{4,12}$';
+$REGEX_PASSWD = '^[-\$\\\&~#\{\(\[\|_`\^@\);\]+=\}%!:\/\.,?<>"\w0-9]{4,12}$';
 
 # Les adresses IP
-use constant REGEX_IP => '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$';
+$REGEX_IP = '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$';
 
 # Server regexp
-use constant REGEX_SERVER_ID => '^[0-9]+$';
+$REGEX_SERVER_ID = '^[0-9]+$';
 
 # User regexp
-use constant REGEX_UID => '^[0-9]+$';
+$REGEX_UID = '^[0-9]+$';
 
 # Host
-use constant REGEX_HOSTNAME => '^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$';
+$REGEX_HOSTNAME = '^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$';
 
 # Group
-use constant REGEX_GROUPNAME => '^[\W\w0-9]([\W\w0-9-._ ]{0,252}[\W\w0-9]){0,1}$';
+$REGEX_GROUPNAME = '^[\W\w0-9]([\W\w0-9-._ ]{0,252}[\W\w0-9]){0,1}$';
 
 # Mailshare
-use constant REGEX_MAILSHARE_NAME => '^[a-z0-9][a-z0-9-._]{0,30}[a-z0-9]$';
+$REGEX_MAILSHARE_NAME = '^[a-z0-9][a-z0-9-._]{0,30}[a-z0-9]$';

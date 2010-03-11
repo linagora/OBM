@@ -12,8 +12,8 @@ use ObmSatellite::Modules::abstract;
 use strict;
 
 use HTTP::Status;
+use ObmSatellite::Misc::constant;
 
-use constant IMAPD_CONF_FILE => '/etc/imapd.conf';
 use constant CYRUS_STARTUP_SCRIPT => '/etc/init.d/cyrus2.3';
 use constant IMAPD_PARTITION_ROOT => '/var/spool/cyrus';
 
@@ -297,6 +297,9 @@ This module is XML/HTTP REST compliant.
 =over 4
 
 =item B<POST /cyruspartition/host/add>/<obmHostName> : add needed Cyrus Imapd
+partitions on host I<obmHostName>. Restart Cyrus service
+
+=item B<POST /cyruspartition/host/del>/<obmHostName> : del Cyrus Imapd
 partitions on host I<obmHostName>. Restart Cyrus service
 
 =over 4

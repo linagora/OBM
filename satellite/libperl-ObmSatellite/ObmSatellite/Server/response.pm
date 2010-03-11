@@ -214,5 +214,7 @@ sub _contentToXML {
     my $self = shift;
 
     use XML::Simple;
-    return XMLout( $self->{'content'}, rootName => ROOTNAME, XMLDecl => 1 )
+    return XMLout( $self->{'content'},
+                rootName => ROOTNAME,
+                XMLDecl => "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>" )
 }
