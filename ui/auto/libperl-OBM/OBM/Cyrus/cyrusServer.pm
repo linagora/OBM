@@ -102,14 +102,14 @@ sub _getServerDesc {
     }
 
     if( !defined($self->{'serverDesc'}->{'host_name'})
-        || ($self->{'serverDesc'}->{'host_name'} !~ /$regexp_hostname/)
+        || ($self->{'serverDesc'}->{'host_name'} !~ /$OBM::Parameters::regexp::regexp_hostname/)
     ) {
         $self->_log( 'nom d\'hôte du serveur non défini ou incorrect', 0 );
         return 1;
     }
 
     if( !defined($self->{'serverDesc'}->{'host_ip'})
-        || ($self->{'serverDesc'}->{'host_ip'} !~ /$regexp_ip/)
+        || ($self->{'serverDesc'}->{'host_ip'} !~ /$OBM::Parameters::regexp::regexp_ip/)
     ) {
         $self->_log( 'ip d\'hôte du serveur non défini ou incorrecte', 0 );
         return 1;
