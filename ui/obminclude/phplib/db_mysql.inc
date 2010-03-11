@@ -113,10 +113,12 @@ class DB_Sql {
     if (!$this->connect()) {
       return 0; /* we already complained in connect() about that. */
     }
+    
+    $Query_String = self::xParser($Query_String);
+    $Query_String =  self::xParser($Query_String); 
 
+    // Store the query string - PB Aliacom
     $this->obm_query = $Query_String;
-
-    # New query, discard previous result.
     if ($this->Query_ID) {
       $this->free();
     }
@@ -412,8 +414,8 @@ class DB_Sql {
     return $query;
   }
 
+  // TODO: DEPRECATED
   function xquery($query, $hide_error='') {
-    $query = self::xParser($query);
     $this->query($query, $hide_error);
   }
   
@@ -555,5 +557,18 @@ class DB_Sql {
     }
     return "CAST($data as $type)"; 
   }  
+
+    /**
+   * INT 
+   * 
+   * @param mixed $args 
+   * @static
+   * @access public
+   * @return void
+   */
+  static function INT($args) {
+    $int = current($args);
+    return (is_numeric($int))?(int)$int:'NULL';
+  }
 }
 ?>

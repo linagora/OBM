@@ -35,14 +35,14 @@ function run_query_profile_details($id) {
 
   $multidomain = sql_multidomain('profile');
   $obm_q = new DB_OBM;
-  $query = "SELECT * FROM Profile WHERE profile_id = $id $multidomain";
+  $query = "SELECT * FROM Profile WHERE profile_id = #INT($id) $multidomain";
   $obm_q->query($query);
   $obm_q->next_record();
   $profile['profile_id'] = $id;
   $profile['name'] = $obm_q->f('profile_name');
   $query = "SELECT * FROM Profile 
     INNER JOIN ProfileModule ON profilemodule_profile_id = profile_id
-    WHERE profile_id = $id $multidomain";
+    WHERE profile_id = #INT($id) $multidomain";
   $obm_q->query($query);
   $profile['module'] = array();
   while($obm_q->next_record()) {
@@ -50,7 +50,7 @@ function run_query_profile_details($id) {
   }
   $query = "SELECT * FROM Profile 
     INNER JOIN ProfileSection ON profilesection_profile_id = profile_id
-    WHERE profile_id = $id $multidomain";
+    WHERE profile_id = #INT($id) $multidomain";
   $obm_q->query($query);
   $profile['section'] = array();
   while($obm_q->next_record()) {
@@ -58,7 +58,7 @@ function run_query_profile_details($id) {
   }  
   $query = "SELECT * FROM Profile
     INNER JOIN ProfileProperty ON profileproperty_profile_id = profile_id
-    WHERE profile_id = $id $multidomain";
+    WHERE profile_id = #INT($id) $multidomain";
   $obm_q->query($query);
   $profile['property'] = array();
   foreach($c_profile_properties as $property) {
@@ -87,18 +87,17 @@ function run_query_profile_update ($params) {
   global $obm, $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $domain_id = sql_parse_id($obm['domain_id']);
   $profile_multidomain = sql_multidomain('profile'); 
 
-  $uid = sql_parse_id($obm['uid']);
+  $uid = $obm['uid'];
 
   $name = $params['name'];
   $id = $params['profile_id'];
 
   $query = "UPDATE Profile SET
     profile_timeupdate = NOW(),
-    profile_userupdate = $uid
-    WHERE profile_id = $id
+    profile_userupdate = #INT($uid)
+    WHERE profile_id = #INT($id)
     $profile_multidomain
   ";
   display_debug_msg($query, $cdg_sql, 'run_query_profile_update(0)');
@@ -119,13 +118,12 @@ function run_query_profile_replace_dataset($params) {
 
   $obm_q = new DB_OBM;
 
-  $domain_id = sql_parse_id($obm['domain_id']);
+  $domain_id = $obm['domain_id'];
   $profile_multidomain = sql_multidomain('profile'); 
 
-  $uid = sql_parse_id($obm['uid']);
   
   $id = $params['profile_id'];
-  $query = "DELETE FROM ProfileModule WHERE profilemodule_profile_id = $id";
+  $query = "DELETE FROM ProfileModule WHERE profilemodule_profile_id = #INT($id)";
   display_debug_msg($query, $cdg_sql, 'run_query_profile_replace_dataset(0)');
   $obm_q->query($query);
   if(is_array($params['module'])) {
@@ -133,12 +131,12 @@ function run_query_profile_replace_dataset($params) {
       $query = "INSERT INTO ProfileModule 
         (profilemodule_domain_id, profilemodule_profile_id, profilemodule_module_name, profilemodule_right)
         VALUES 
-        ($domain_id, $id, '$module', $right)
+        (#INT($domain_id), #INT($id), '$module', #INT($right))
         ";
         $obm_q->query($query);
     }
   }
-  $query = "DELETE FROM ProfileSection WHERE profilesection_profile_id = $id";
+  $query = "DELETE FROM ProfileSection WHERE profilesection_profile_id = #INT($id)";
   display_debug_msg($query, $cdg_sql, 'run_query_profile_replace_dataset(0)');
   $obm_q->query($query);
   if(is_array($params['section'])) {
@@ -147,13 +145,13 @@ function run_query_profile_replace_dataset($params) {
       $query = "INSERT INTO ProfileSection 
         (profilesection_domain_id, profilesection_profile_id, profilesection_section_name, profilesection_show)
         VALUES 
-        ($domain_id, $id, '$section', $show)
+        (#INT($domain_id), #INT($id), '$section', #INT($show))
         ";
         $obm_q->query($query);
     }
   }
 
-  $query = "DELETE FROM ProfileProperty WHERE profileproperty_profile_id = $id";
+  $query = "DELETE FROM ProfileProperty WHERE profileproperty_profile_id = #INT($id)";
   display_debug_msg($query, $cdg_sql, 'run_query_profile_replace_dataset(0)');
   $obm_q->query($query);
   
@@ -166,7 +164,7 @@ function run_query_profile_replace_dataset($params) {
       $query = "INSERT INTO ProfileProperty
         (profileproperty_profile_id, profileproperty_name, profileproperty_value)
         VALUES 
-        ($id, '$property', '$value')
+        (#INT($id), '$property', '$value')
         ";
         $obm_q->query($query);      
     }
@@ -187,8 +185,8 @@ function run_query_profile_insert ($params) {
 
   $obm_q = new DB_OBM;
 
-  $uid = sql_parse_id($obm['uid']);
-  $domain_id = sql_parse_id( $obm['domain_id']);
+  $uid = $obm['uid'];
+  $domain_id = $obm['domain_id'];
 
   $query = "INSERT INTO Profile (
     profile_timeupdate,
@@ -200,9 +198,9 @@ function run_query_profile_insert ($params) {
   ) VALUES (
     NOW(),
     NOW(),
-    $uid,
-    $uid,
-    $domain_id,
+    #INT($uid),
+    #INT($uid),
+    #INT($domain_id),
     '$params[name]'
   )";
 
@@ -234,7 +232,7 @@ function run_query_profile_delete($profile_id) {
 
   // Delete Profile
   of_entity_delete($GLOBALS['module'], $profile_id);
-  $query = "DELETE FROM Profile WHERE profile_id=$profile_id";
+  $query = "DELETE FROM Profile WHERE profile_id=#INT($profile_id)";
   display_debug_msg($query, $cdg_sql, "run_query_profile_delete($profile_id)");
   $ret = $obm_q->query($query);
 
@@ -346,16 +344,16 @@ function run_query_profilesection_list ($profile_id) {
 function run_query_profilemodule_insert ($profile_id, $module_name, $right_value) {
   global $obm, $cdg_sql;
 
-  $domain_id = sql_parse_id( $obm['domain_id']);
+  $domain_id = $obm['domain_id'];
   $obm_q = new DB_OBM;
 
   $query = "INSERT INTO ProfileModule (profilemodule_module_name,
     profilemodule_domain_id,
     profilemodule_profile_id,
     profilemodule_right) VALUES ('$module_name',
-    $domain_id,
-    $profile_id,
-    $right_value
+    #INT($domain_id),
+    #INT($profile_id),
+    #INT($right_value)
   )";
   display_debug_msg($query, $cdg_sql, 'run_query_profilemodule_insert()');
 
@@ -375,9 +373,9 @@ function run_query_profilemodule_update ($profile_id, $module_name, $right_value
   $profilemodule_multidomain = sql_multidomain('profilemodule'); 
   $obm_q = new DB_OBM;
 
-  $query = "UPDATE ProfileModule SET profilemodule_right = $right_value
+  $query = "UPDATE ProfileModule SET profilemodule_right = #INT($right_value)
     WHERE profilemodule_module_name = '$module_name'
-    AND profilemodule_profile_id = '$profile_id'
+    AND profilemodule_profile_id = #INT($profile_id)
     $profilemodule_multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_profilemodule_update()');
@@ -401,7 +399,7 @@ function run_query_profilemodule_delete ($profile_id, $module_name = NULL) {
     $where = " WHERE profilemodule_module_name = '$module_name'
       AND profilemodule_profile_id = '$profile_id'";
   } else {
-    $where = " WHERE profilemodule_profile_id = '$profile_id'";
+    $where = " WHERE profilemodule_profile_id = #INT($profile_id)";
   }
 
   $query = "DELETE FROM ProfileModule
@@ -423,16 +421,16 @@ function run_query_profilemodule_delete ($profile_id, $module_name = NULL) {
 function run_query_profilesection_insert ($profile_id, $section_name, $show_value) {
   global $obm, $cdg_sql;
 
-  $domain_id = sql_parse_id( $obm['domain_id']);
+  $domain_id = $obm['domain_id'];
   $obm_q = new DB_OBM;
 
   $query = "INSERT INTO ProfileSection (profilesection_section_name,
     profilesection_domain_id,
     profilesection_profile_id,
     profilesection_show) VALUES ('$section_name',
-    $domain_id,
-    $profile_id,
-    $show_value
+    #INT($domain_id),
+    #INT($profile_id),
+    #INT($show_value)
   )";
   display_debug_msg($query, $cdg_sql, 'run_query_profilesection_insert()');
 
@@ -455,7 +453,7 @@ function run_query_profilesection_delete ($profile_id, $section_name = NULL) {
     $where = " WHERE profilesection_section_name = '$section_name'
       AND profilesection_profile_id = '$profile_id'";
   } else {
-    $where = " WHERE profilesection_profile_id = '$profile_id'";
+    $where = " WHERE profilesection_profile_id = #INT($profile_id)";
   }
 
   $query = "DELETE FROM ProfileSection
@@ -473,7 +471,7 @@ function run_query_profileproperties_delete($profile_id) {
   $obm_q = new DB_OBM;
 
   $query = "DELETE FROM ProfilePropertyValue
-    WHERE profilepropertyvalue_profile_id = $profile_id";
+    WHERE profilepropertyvalue_profile_id = #INT($profile_id)";
 
   display_debug_msg($query, $cdg_sql, 'run_query_profileproperties_delete()');
 
@@ -493,7 +491,7 @@ function run_query_profileproperty_list ($profile_id = NULL) {
     $val = 'profilepropertyvalue_property_value,';
     $join = " LEFT JOIN ProfilePropertyValue
       ON profileproperty_id = profilepropertyvalue_property_id
-      AND profilepropertyvalue_profile_id = '$profile_id'";
+      AND profilepropertyvalue_profile_id = #INT($profile_id)";
   }
   $query = "SELECT
     $val
@@ -522,11 +520,11 @@ function run_query_profileproperty_list ($profile_id = NULL) {
 function run_query_profile_exist($name, $id) {
   global $obm;
   if($id) {
-    $update = "AND profile_id != $id";
+    $update = "AND profile_id != #INT($id)";
   }
   $query = "
     SELECT * FROM Profile INNER JOIN Domain ON  domain_id = profile_domain_id
-    WHERE profile_name = '$name' and (domain_global = TRUE OR domain_id = $obm[domain_id])
+    WHERE profile_name = '$name' and (domain_global = TRUE OR domain_id = #INT($obm[domain_id]))
     $update";
   display_debug_msg($query, $cdg_sql, 'run_query_profileproperty_list()');
   $obm_q = new DB_OBM;
@@ -587,7 +585,7 @@ function check_can_delete_profile($profile_id) {
 
   $query = "SELECT count(userobm_perms) as count
     FROM UserObm
-    WHERE userobm_perms = (SELECT profile_name FROM Profile WHERE profile_id=$profile_id)";
+    WHERE userobm_perms = (SELECT profile_name FROM Profile WHERE profile_id=#INT($profile_id))";
 
   $obm_q = new DB_OBM;
 
@@ -661,7 +659,7 @@ function internal_profile_joinselect ($params, $sql_ext = null, $displayed_debug
   $where = '';
 
   if (!empty($params['profile_id']))
-    $where .= ' AND profile_id = '. sql_parse_id($params['profile_id']);
+    $where .= " AND profile_id = #INT($params[profile_id])";
 
   $query = "SELECT 
     profile_id,
@@ -698,7 +696,7 @@ function internal_profile_select ($params, $displayed_debug_msg = 'internal_prof
   $multidomain = sql_multidomain('profile');
 
   if (!empty($params['profile_id']))
-    $where .= ' AND profile_id = '. sql_parse_id($params['profile_id']);
+    $where .= " AND profile_id = #INT($params[profile_id])";
   if (!empty($params['name']))
     $where .= " AND profile_name #LIKE '$params[name]%'";
 
