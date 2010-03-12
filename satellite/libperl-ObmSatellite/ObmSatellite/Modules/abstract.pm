@@ -84,6 +84,10 @@ sub processHttpRequest {
     my $self = shift;
     my( $requestMethod, $requestUri, $requestBody ) = @_;
 
+    $self->_log( 'Request method : '.$requestMethod, 4 );
+    $self->_log( 'Request URI : '.$requestUri, 4 );
+    $self->_log( 'Request content : '.$requestBody, 4 );
+
     SWITCH: {
         if( uc($requestMethod) eq 'POST' ) {
             return $self->_postMethod( $requestUri, $requestBody );

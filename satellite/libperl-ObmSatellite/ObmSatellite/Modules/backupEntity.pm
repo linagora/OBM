@@ -13,6 +13,7 @@ use strict;
 
 use File::Path;
 use File::Copy;
+use File::Find;
 
 use HTTP::Status;
 use ObmSatellite::Misc::constant;
@@ -60,7 +61,6 @@ sub _putMethod {
     }
     $data{'entity'} = $1;
 
-    $self->_log( $requestBody, 0 );
     if( !($data{'requestContent'} = $self->_xmlContent( $requestBody )) ) {
         return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Invalid request content' ],
@@ -81,13 +81,14 @@ sub _putMethod {
             last SWITCH;
         }
 
-        $response = $self->_response( RC_NOT_FOUND, {
+        return $self->_response( RC_NOT_FOUND, {
             content => [ 'Unknow entity \''.$data{'entity'}.'\'' ]
             } );
-        last SWITCH;
     }
 
     $self->_removeTmpArchive( \%data );
+    $self->_removeBackupBackupFile( \%data );
+    $self->_purgeOldBackupFile( \%data );
 
     if( !$response ) {
         $self->_log( 'Backup entity '.$data{'login'}.'@'.$data{'realm'}.' successfully', 3 );
@@ -132,7 +133,11 @@ sub _mailshareEntity {
         return $return;
     }
 
-    return $self->_response( RC_OK );
+    if( my $return = $self->_createMailshareArchive( $data ) ) {
+        return $return;
+    }
+
+    return undef;
 }
 
 
@@ -392,14 +397,29 @@ sub _createUserArchive {
 
     my $result = $self->_writeArchive( $data );
 
-    $self->_removeBackupBackupFile( $data );
-    $self->_purgeOldBackupFile( $data );
+    return $self->_writeArchive( $data );
+}
 
-    if( $result ) {
+
+sub _createMailshareArchive {
+    my $self = shift;
+    my( $data ) = @_;
+
+    $self->_log( 'Beginning backup for mailshare '.$data->{'login'}.'@'.$data->{'realm'}, 3 );
+
+    if( my $result = $self->_prepareTmpArchive( $data ) ) {
         return $result;
     }
 
-    return undef;
+    if( $self->_addUserMailshare( $data ) ) {
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Can\'t add mailbox file to archive' ]
+            } );
+    }
+
+    my $result = $self->_writeArchive( $data );
+
+    return $self->_writeArchive( $data );
 }
 
 
@@ -597,6 +617,55 @@ sub _addUserMailbox {
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
             content => [ 'Can\'t create mailbox backup link '.$backupLink.' to '.$mailboxRoot ]
             } );
+    }
+
+    return undef;
+}
+
+
+sub _addUserMailshare {
+    my $self = shift;
+    my( $data ) = @_;
+
+    if( my $result = $self->_getCyrusPartitionPath( $data ) ) {
+        return $result;
+    }
+
+    my $mailboxRoot = $data->{'cyrusPartitionPath'}.'/domain';
+    $mailboxRoot .= eval {
+            $data->{'realm'} =~ /^(\w)/;
+            my $partitionTree = '/'.$1.'/'.$data->{'realm'};
+        };
+
+    my %mailboxTree;
+    find( {
+            wanted => sub {
+                my $path = $_;
+                if( $path =~ /^($mailboxRoot\/(\w)\/$data->{'login'})$/ ) {
+                    $mailboxTree{$2} = $1;
+                    $self->_log( $path, 5 );
+                }
+            },
+            no_chdir  => 1
+        }, $mailboxRoot );
+
+    my $backupLink = $data->{'tmpBackupPath'}.'/'.$data->{'login'}.'@'.$data->{'realm'}.'/mailbox';
+    while( ( my $letter, $mailboxRoot ) = each(%mailboxTree) ) {
+        my $currentBackupLink = $backupLink.'/'.$letter;
+
+        if( $self->_mkdir( $currentBackupLink ) ) {
+            return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                content => [ 'Can\'t create \''.$currentBackupLink.'\'' ]
+                } );
+        }
+
+        $currentBackupLink .= '/'.$data->{'login'};
+
+        if( $self->_mkSymlink( $mailboxRoot, $currentBackupLink ) ) {
+            return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                content => [ 'Can\'t create mailbox backup link '.$currentBackupLink.' to '.$mailboxRoot ]
+                } );
+        }
     }
 
     return undef;
