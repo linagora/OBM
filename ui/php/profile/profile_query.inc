@@ -143,7 +143,7 @@ function run_query_profile_replace_dataset($params) {
       $query = "INSERT INTO ProfileSection 
         (profilesection_domain_id, profilesection_profile_id, profilesection_section_name, profilesection_show)
         VALUES 
-        (#INT($domain_id), #INT($id), '$section', #INT($show))
+        (#INT($domain_id), #INT($id), '$section', $show)
         ";
         $obm_q->query($query);
     }
@@ -428,7 +428,7 @@ function run_query_profilesection_insert ($profile_id, $section_name, $show_valu
     profilesection_show) VALUES ('$section_name',
     #INT($domain_id),
     #INT($profile_id),
-    #INT($show_value)
+    $show_value
   )";
   display_debug_msg($query, $cdg_sql, 'run_query_profilesection_insert()');
 
