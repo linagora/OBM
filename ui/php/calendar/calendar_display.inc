@@ -5025,7 +5025,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
             $is_busy = true;
             array_push($busy_time_slots, $slots);
             $td_id = "contact_".$contact."_".$d->getTimestamp();
-            $c[$contact] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
+            $c[$contact] .= "<td class='timeSlot' id='$td_id' title=\"$GLOBALS[l_occupied]\"><div class='haveEvent'></div></td>";
           } else {
             $c[$contact] .= "<td class='timeSlot'></td>";
           }
