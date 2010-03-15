@@ -39,7 +39,7 @@
     <field name="manager" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="assistant" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="spouse" type="text" indexed="true" stored="false" multiValued="false" /> 
-    <field name="category" type="text" indexed="true" stored="false" multiValued="true" /> 
+    <field name="category" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="categoryId" type="integer" indexed="true" stored="false" multiValued="true" />
     <field name="service" type="text" indexed="true" stored="false" multiValued="false" /> 
     <field name="function" type="text" indexed="true" stored="false" multiValued="false" /> 
