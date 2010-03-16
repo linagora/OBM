@@ -3064,6 +3064,7 @@ function dis_user_import_file_run($params) {
   while ( ($row = fgetcsv($fh, 4000, $csv_sep)) ) {
     $num_line++;
     $nb_group_ins = 0;
+    $user = array();
     $user['user_id'] = 0;
     $user['kind'] = addslashes(trim($row[$c_kind]));
     $user['lastname'] = addslashes(trim($row[$c_lastname]));
