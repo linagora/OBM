@@ -3993,7 +3993,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $event_start->subSecond($duration)->setHour($date)->setMinute($date)->setSecond($date);
     $event_end = ($end->compare($endrepeat) > 0)? clone $endrepeat: clone $end; 
     $event_end->setTimezone($tz);
-    $event_end->setHour($date)->setMinute($date)->setSecond($date)->addSecond($duration);
+    $event_end->setHour($date)->setMinute($date)->setSecond($date)->addSecond(1);
     if ($addOcc) {
       switch ($repeatkind) {
       case 'daily' :
