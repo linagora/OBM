@@ -61,9 +61,13 @@ public class EventConverter {
 	 */
 	public static CalendarResourceICS convert(Event e, String compUrl,
 			String ics) {
+		Date lastUp = e.getTimeUpdate();
+		if(lastUp == null){
+			lastUp = e.getTimeCreate();
+		}
 		DavComponentType type = getType(e.getType());
 		return new CalendarResourceICS(e.getExtId(), compUrl,
-				e.getTimeUpdate(), type, ics);
+				lastUp, type, ics);
 	}
 
 	private static DavComponentType getType(EventType type) {
