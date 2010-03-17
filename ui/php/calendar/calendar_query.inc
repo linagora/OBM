@@ -5771,32 +5771,37 @@ Class CalendarView {
   }
 
   public function set_users($user_ids) {
-    if (empty($user_ids))
-      $user_ids = array();
-    if (!is_array($user_ids))
-      $user_ids = array($user_ids);
-    $to_add = array_diff($user_ids,$this->users);
-    $to_remove = array_diff($this->users,$user_ids);
-    foreach ($to_remove as $user_id) {
-      $this->remove_user($user_id);
-    }
-    foreach ($to_add as $user_id) {
-      $this->add_user($user_id);
-    }
+    $this->set_entities($user_ids, 'user');
   }
 
   public function set_resources($resource_ids) {
-    if (empty($resource_ids))
-      $resource_ids = array();
-    if (!is_array($resource_ids))
-      $resource_ids = array($resource_ids);
-    $to_add = array_diff($resource_ids,$this->resources);
-    $to_remove = array_diff($this->resources,$resource_ids);
-    foreach ($to_remove as $resource_id) {
-      $this->remove_resource($resource_id);
+    $this->set_entities($resource_ids, 'resource');
+  }
+
+  private function set_entities($ids, $entity) {
+    switch($entity) {
+      case 'user':
+        $thisEntities = $this->users;
+        $removeEntity = "remove_user";
+        $addEntity = "add_user";
+        break;
+      case 'resource':
+        $thisEntities = $this->resources;
+        $removeEntity = "remove_resource";
+        $addEntity = "add_resource";
+        break;
     }
-    foreach ($to_add as $resource_id) {
-      $this->add_resource($resource_id);
+    if (empty($ids))
+      $ids = array();
+    if (!is_array($ids))
+      $ids = array($ids);
+    $to_add = array_diff($ids,$thisEntities);
+    $to_remove = array_diff($thisEntities,$ids);
+    foreach ($to_remove as $id) {
+      $this->$removeEntity($id);
+    }
+    foreach ($to_add as $id) {
+      $this->$addEntity($id);
     }
   }
 

@@ -118,21 +118,10 @@ page_close();
 
 OBM_EventFactory::getInstance()->attach(new OBM_EventMailObserver());
 
-// If user selection present we override session content
-if ($params['new_sel']) {
-  if ( ($action != 'insert') && ($action != 'update') ) {
-    $current_view->set_users($params['sel_user_id']);
-  }
+if ($params['new_sel'] && (($action != 'insert') && ($action != 'update'))) {
+  $current_view->set_users($params['sel_user_id']);
+  $current_view->set_resources($params['sel_resource_id']);
 }
-
-// If resources selection present we override session content
-if ($params['new_sel']) {
-  if ( ($action != 'insert') && ($action != 'update') ) {
-    $current_view->set_resources($params['sel_resource_id']);
-  }
-}
-
-// If group selection present we override session content
 
 // If no user or resource selected, we select the connected user
 $users = $current_view->get_users();
