@@ -26,10 +26,15 @@ use ObmSatellite::Misc::regex;
 
 use constant OBM_BACKUP_ROOT => '/var/backup/obm';
 
+sub _setUri {
+    my $self = shift;
+
+    return [ '/backupentity' ];
+}
+
 sub _initHook {
     my $self = shift;
 
-    $self->{'uri'} = [ '/backupentity' ];
     $self->{'neededServices'} = [ 'LDAP' ];
 
     $self->{'backupRoot'} = OBM_BACKUP_ROOT;

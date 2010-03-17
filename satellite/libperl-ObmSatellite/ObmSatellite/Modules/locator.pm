@@ -14,11 +14,15 @@ use strict;
 use HTTP::Status;
 require ObmSatellite::Services::SQL;
 
+sub _setUri {
+    my $self = shift;
+
+    return [ '/locator' ];
+}
 
 sub _initHook {
     my $self = shift;
 
-    $self->{'uri'} = [ '/locator' ];
     $self->{'neededServices'} = [ 'SQL' ];
 
     return 1;

@@ -37,14 +37,25 @@ sub _init {
 
     ref($self) =~ /::([^:]+)$/;
     $self->{'name'} = $1;
-    $self->{'uri'} = [];
     $self->{'neededServices'} = [];
+
+    $self->{'uri'} = $self->_setUri();    
+    if( ref($self->{'uri'}) ne 'ARRAY' ) {
+        return 0;
+    }
 
     if( !$self->_initHook() ) {
         return 0;
     }
 
     return 1;
+}
+
+
+sub _setUri {
+    my $self = shift;
+
+    return undef;
 }
 
 

@@ -19,11 +19,15 @@ use constant ALIAS_MAP => '/etc/postfix/virtual_alias';
 use constant TRANSPORT_MAP => '/etc/postfix/transport';
 use constant DOMAIN_MAP => '/etc/postfix/virtual_domains';
 
+sub _setUri {
+    my $self = shift;
+
+    return [ '/postfixsmtpinmaps' ];
+}
 
 sub _initHook {
     my $self = shift;
 
-    $self->{'uri'} = [ '/postfixsmtpinmaps' ];
     $self->{'neededServices'} = [ 'LDAP' ];
 
     $self->{'postmapCmd'} = POSTMAP_CMD;

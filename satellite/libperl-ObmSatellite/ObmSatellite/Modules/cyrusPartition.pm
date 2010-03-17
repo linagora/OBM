@@ -17,11 +17,15 @@ use ObmSatellite::Misc::constant;
 use constant CYRUS_STARTUP_SCRIPT => '/etc/init.d/cyrus2.3';
 use constant IMAPD_PARTITION_ROOT => '/var/spool/cyrus';
 
+sub _setUri {
+    my $self = shift;
+
+    return [ '/cyruspartition' ];
+}
 
 sub _initHook {
     my $self = shift;
 
-    $self->{'uri'} = [ '/cyruspartition' ];
     $self->{'neededServices'} = [ 'LDAP' ];
 
     $self->{'imapdConfFile'} = IMAPD_CONF_FILE;
