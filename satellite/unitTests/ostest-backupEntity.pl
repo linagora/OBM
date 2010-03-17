@@ -115,6 +115,16 @@ if( $client->put( $parameters{'os-server'}, $path, genInvalidContent() ) ) {
 }
 
 
+print 'Backup entity \''.$parameters{'entity-type'}.'\', login \''.$parameters{'entity-login'}.'\' on '.$parameters{'os-server'}.'\' without content: ';
+$path = $root;
+if( !$client->put( $parameters{'os-server'}, $path, undef ) ) {
+    print '[OK]'."\n";
+}else {
+    print '[KO]'."\n";
+    $errorCode++;
+}
+
+
 print "All tests done succefully !\n" if !$errorCode;
 print STDERR $errorCode." fail !\n" if $errorCode;
 

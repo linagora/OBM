@@ -391,7 +391,7 @@ sub _xmlContent {
     };
 
     if( !$requestBody ) {
-        return undef;
+        return {};
     }
 
     use XML::Simple;

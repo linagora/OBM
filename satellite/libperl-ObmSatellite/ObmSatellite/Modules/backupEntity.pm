@@ -11,6 +11,11 @@ use ObmSatellite::Modules::abstract;
 @ISA = qw(ObmSatellite::Modules::abstract);
 use strict;
 
+eval {
+    require ObmSatellite::Modules::BackupEntity::user;
+    require ObmSatellite::Modules::BackupEntity::mailshare;
+};
+
 use File::Path;
 use File::Copy;
 use File::Find;
@@ -53,31 +58,22 @@ sub _putMethod {
     my %data;
 
     $data{'requestUri'} = $requestUri;
-    if( $requestUri !~ /^\/backupentity\/([^\/]+)(.*)$/ ) {
+    if( $requestUri !~ /^\/backupentity\/([^\/]+)\/([^\/]+)$/ ) {
         return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Invalid URI '.$requestUri ],
-            help => [ $self->getModuleName().' URI must be : /backupentity/<entity>' ]
+            help => [ $self->getModuleName().' URI must be : /backupentity/<entity>/<login>@<realm>' ]
             } );
     }
-    $data{'entity'} = $1;
 
-    if( !($data{'requestContent'} = $self->_xmlContent( $requestBody )) ) {
-        return $self->_response( RC_BAD_REQUEST, {
-            content => [ 'Invalid request content' ],
-            help => [ $self->getModuleName().' request content must use XML form' ]
-            } );
-    }
-    
-
-    my $response;
+    my $entity = $1;
     SWITCH: {
-        if( $data{'entity'} eq 'user' ) {
-            $response = $self->_userEntity( \%data );
+        if( $entity eq 'user' ) {
+            $entity = ObmSatellite::Modules::BackupEntity::user->new( $2 );
             last SWITCH;
         }
 
-        if( $data{'entity'} eq 'mailshare' ) {
-            $response = $self->_mailshareEntity( \%data );
+        if( $entity eq 'mailshare' ) {
+            $entity = ObmSatellite::Modules::BackupEntity::mailshare->new( $2 );
             last SWITCH;
         }
 
@@ -86,104 +82,68 @@ sub _putMethod {
             } );
     }
 
-    $self->_removeTmpArchive( \%data );
-    $self->_removeBackupBackupFile( \%data );
-    $self->_purgeOldBackupFile( \%data );
+    if( !defined($entity) ) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid login '.$requestUri ],
+            help => [ $self->getModuleName().' URI must be : /backupentity/'.$entity.'/<login>@<realm>' ]
+            } );
+    }
+
+    if( my $result = $self->_isEntityDefined( $entity ) ) {
+        return $result;
+    }
+
+    if( !( $entity->setContent($self->_xmlContent( $requestBody )) ) ) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid request content' ],
+            help => [ $self->getModuleName().' request content must use XML form' ]
+            } );
+    }
+
+
+    my $response = $self->_backupEntity( $entity );
+    
+
+    $self->_removeTmpArchive( $entity );
+    $self->_removeBackupBackupFile( $entity );
+    $self->_purgeOldBackupFile( $entity );
 
     if( !$response ) {
-        $self->_log( 'Backup '.$data{'login'}.'@'.$data{'realm'}.' successfully', 3 );
+        $self->_log( 'Backup '.$entity->getLogin().'@'.$entity->getRealm().' successfully', 3 );
         $response = $self->_response( RC_OK );
     }else {
-        $self->_log( 'Fail to backup '.$data{'login'}.'@'.$data{'realm'}, 1 );
+        $self->_log( 'Fail to backup '.$entity->getLogin().'@'.$entity->getRealm(), 1 );
     }
 
     return $response;
 }
 
 
-sub _userEntity {
+sub _backupEntity {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    if( my $return = $self->_getEntityLogin( $data ) ) {
+    if( my $return = $self->_setBackupName( $entity ) ) {
         return $return;
     }
 
-    if( my $return = $self->_getBackupName( $data ) ) {
-        return $return;
-    }
-
-    if( my $return = $self->_createUserArchive( $data ) ) {
-        return $return;
-    }
-
-    return undef;
-}
-
-
-sub _mailshareEntity {
-    my $self = shift;
-    my( $data ) = @_;
-
-    if( my $return = $self->_getEntityLogin( $data ) ) {
-        return $return;
-    }
-
-    if( my $return = $self->_getBackupName( $data ) ) {
-        return $return;
-    }
-
-    if( my $return = $self->_createMailshareArchive( $data ) ) {
-        return $return;
-    }
-
-    return undef;
-}
-
-
-sub _getEntityLogin {
-    my $self = shift;
-    my( $data ) = @_;
-
-    my $regexp = '^\/backupentity\/'.$data->{'entity'}.'\/([^\/]+)(.*)$';
-    if( $data->{'requestUri'} !~ /$regexp/ ) {
-        return $self->_response( RC_BAD_REQUEST, {
-            content => [ 'Invalid URI '.$data->{'requestUri'} ],
-            help => [ $self->getModuleName().' URI must be : /backupentity/'.$data->{'entity'}.'/<login>@<realm>' ]
-            } );
-    }
-
-    my $fullLogin = $1;
-    ($data->{'login'}, $data->{'realm'}) = split( '@', $fullLogin );
-    if( $data->{'login'} !~ /$REGEX_LOGIN/ || $data->{'realm'} !~ /$REGEX_DOMAIN/ ) {
-        return $self->_response( RC_BAD_REQUEST, {
-            content => [ 'Invalid login '.$data->{'requestUri'} ],
-            help => [ $self->getModuleName().' URI must be : /backupentity/'.$data->{'entity'}.'/<login>@<realm>' ]
-            } );
-    }
-
-    return $self->_isEntityDefined( $data );
+    return $self->_createArchive( $entity );
 }
 
 
 sub _isEntityDefined {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    my $ldapFilter;
-    if( $data->{'entity'} eq 'user' ) {
-        $ldapFilter = '(&(uid='.$data->{'login'}.')(obmDomain='.$data->{'realm'}.'))';
-    }elsif( $data->{'entity'} eq 'mailshare' ) {
-        $ldapFilter = '(&(cn='.$data->{'login'}.')(obmDomain='.$data->{'realm'}.'))';
-    }
+    my $ldapFilter = $entity->getLdapFilter();
 
-    my $entity = $self->_getLdapValues(
+    my $ldapEntity = $self->_getLdapValues(
         $ldapFilter,
         [] );
 
-    if( $#{$entity} != 0 ) {
+    if( $#{$ldapEntity} != 0 ) {
         return $self->_response( RC_BAD_REQUEST, {
-            content => [ 'Entity '.$data->{'login'}.'@'.$data->{'realm'}.' doesn\'t exist in LDAP' ],
+            content => [ 'Entity '.$entity->getLogin().'@'.$entity->getRealm().' doesn\'t exist in LDAP' ],
             } );
     }
 
@@ -191,22 +151,23 @@ sub _isEntityDefined {
 }
 
 
-sub _getBackupName {
+sub _setBackupName {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    $data->{'backupPath'} = $self->{'backupRoot'}.'/'.$data->{'realm'};
+    my $backupPath = $self->{'backupRoot'}.'/'.$entity->getRealm();
 
-    if( ! -d $data->{'backupPath'} ) {
-        if( $self->_mkdir( $data->{'backupPath'} ) ) {
+    if( ! -d $backupPath ) {
+        if( $self->_mkdir( $backupPath ) ) {
             return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-                content => [ 'Can\'t create \''.$data->{'backupPath'}.'\'' ]
+                content => [ 'Can\'t create \''.$backupPath.'\'' ]
                 } );
         }
     }
+    $entity->setBackupPath( $backupPath );
 
     my @dateTime = localtime(time);
-    $data->{'backupName'} = $data->{'login'}.'_-_'.eval {
+    my $backupName = $entity->getLogin().'_-_'.eval {
         return 1900+$dateTime[5];
     }.eval {
         $dateTime[4]+=1;
@@ -222,9 +183,11 @@ sub _getBackupName {
             return $dateTime[3];
         }
     }.'.tar.gz';
+    $entity->setBackupName( $backupName );
 
-    $self->_log( 'Backup path : '.$data->{'backupPath'}, 4 );
-    $self->_log( 'Backup name : '.$data->{'backupName'}, 4 );
+
+    $self->_log( 'Backup path : '.$entity->getBackupPath(), 4 );
+    $self->_log( 'Backup name : '.$entity->getBackupName(), 4 );
 
     return undef;
 }
@@ -232,9 +195,9 @@ sub _getBackupName {
 
 sub _backupBackupFile {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    my $backupFullPath = $data->{'backupPath'}.'/'.$data->{'backupName'};
+    my $backupFullPath = $entity->getBackupPath().'/'.$entity->getBackupName();
     my $backupFullPathBackup = $backupFullPath.'.backup';
 
     if( -e $backupFullPathBackup ) {
@@ -261,9 +224,9 @@ sub _backupBackupFile {
 
 sub _removeBackupBackupFile {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    my $backupFullPath = $data->{'backupPath'}.'/'.$data->{'backupName'};
+    my $backupFullPath = $entity->getBackupPath().'/'.$entity->getBackupName();
     my $backupFullPathBackup = $backupFullPath.'.backup';
 
     if( -e $backupFullPathBackup ) {
@@ -283,9 +246,9 @@ sub _removeBackupBackupFile {
 
 sub _restoreBackupBackupFile {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    my $backupFullPath = $data->{'backupPath'}.'/'.$data->{'backupName'};
+    my $backupFullPath = $self->getBackupPath().'/'.$self->getBackupName();
     my $backupFullPathBackup = $backupFullPath.'.backup';
 
     if( -e $backupFullPathBackup ) {
@@ -305,11 +268,11 @@ sub _restoreBackupBackupFile {
 
 sub _purgeOldBackupFile {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    my $backupName = $data->{'login'}.'_-_';
+    my $backupName = $entity->getLogin().'_-_';
 
-    opendir( DIR, $data->{'backupPath'} );
+    opendir( DIR, $entity->getBackupPath() );
     my @userBackup = grep( /^$backupName/, readdir(DIR) );
     close(DIR);
 
@@ -317,9 +280,9 @@ sub _purgeOldBackupFile {
         $userBackup[$i] =~ /^(.+)$/;
         $userBackup[$i] = $1;
 
-        if( $userBackup[$i] ne $data->{'backupName'} ) {
+        if( $userBackup[$i] ne $entity->getBackupName() ) {
             $self->_log( 'Remove old backup file '.$userBackup[$i], 5 );
-            unlink( $data->{'backupPath'}.'/'.$userBackup[$i] );
+            unlink( $entity->getBackupPath().'/'.$userBackup[$i] );
         }
     }
 }
@@ -327,16 +290,16 @@ sub _purgeOldBackupFile {
 
 sub _writeArchive {
     my $self = shift;
-    my( $data, $files ) = @_;
+    my( $entity ) = @_;
 
-    my $backupFullPath = $data->{'backupPath'}.'/'.$data->{'backupName'};
+    my $backupFullPath = $entity->getBackupPath().'/'.$entity->getBackupName();
     my $backupFullPathBackup = $backupFullPath.'.backup';
 
-    if( my $result = $self->_backupBackupFile( $data ) ) {
+    if( my $result = $self->_backupBackupFile( $entity ) ) {
         return $result;
     }
 
-    my $cmd = $self->{'tarCmd'}.' --ignore-failed-read -C '.$data->{'tmpBackupPath'}.' -czhf '.$backupFullPath.' . > /dev/null 2>&1';
+    my $cmd = $self->{'tarCmd'}.' --ignore-failed-read -C '.$entity->getTmpBackupPath().' -czhf '.$backupFullPath.' . > /dev/null 2>&1';
 
     $self->_log( 'Executing '.$cmd, 4 );
     if( my $returnCode = 0xffff & system( $cmd ) ) {
@@ -344,7 +307,7 @@ sub _writeArchive {
             content => [ 'Can\'t write backup archive '.$backupFullPath ]
             };
 
-        my $result = $self->_restoreBackupBackupFile( $data );
+        my $result = $self->_restoreBackupBackupFile( $entity );
         SWITCH: {
             if( $result == 1 ) {
                 push( @{$content->{'content'}}, 'No backuped backup file found' );
@@ -367,59 +330,35 @@ sub _writeArchive {
 }
 
 
-sub _createUserArchive {
+sub _createArchive {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    $self->_log( 'Beginning backup for user '.$data->{'login'}.'@'.$data->{'realm'}, 3 );
+    $self->_log( 'Beginning backup for '.$entity->getLogin().'@'.$entity->getRealm(), 3 );
 
-    if( my $result = $self->_prepareTmpArchive( $data ) ) {
+    if( my $result = $self->_prepareTmpArchive( $entity ) ) {
         return $result;
     }
 
-    if( $self->_addIcs( $data ) ) {
+    if( $self->_addIcs( $entity ) ) {
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
             content => [ 'Can\'t add ICS file to archive' ]
             } );
     }
 
-    if( $self->_addVcard( $data ) ) {
+    if( $self->_addVcard( $entity ) ) {
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
             content => [ 'Can\'t add VCARD file to archive' ]
             } );
     }
 
-    if( $self->_addUserMailbox( $data ) ) {
+    if( $self->_addMailbox( $entity ) ) {
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
             content => [ 'Can\'t add mailbox file to archive' ]
             } );
     }
 
-    my $result = $self->_writeArchive( $data );
-
-    return $self->_writeArchive( $data );
-}
-
-
-sub _createMailshareArchive {
-    my $self = shift;
-    my( $data ) = @_;
-
-    $self->_log( 'Beginning backup for mailshare '.$data->{'login'}.'@'.$data->{'realm'}, 3 );
-
-    if( my $result = $self->_prepareTmpArchive( $data ) ) {
-        return $result;
-    }
-
-    if( $self->_addUserMailshare( $data ) ) {
-        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Can\'t add mailbox file to archive' ]
-            } );
-    }
-
-    my $result = $self->_writeArchive( $data );
-
-    return $self->_writeArchive( $data );
+    return $self->_writeArchive( $entity );
 }
 
 
@@ -504,11 +443,11 @@ sub _mkSymlink {
 
 sub _removeTmpArchive {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    if( $self->_rmdir( $data->{'tmpBackupPath'} ) ) {
+    if( $self->_rmdir( $entity->getTmpBackupPath() ) ) {
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Fail to remove '.$data->{'tmpBackupPath'} ]
+            content => [ 'Fail to remove '.$entity->getTmpBackupPath() ]
             } );
     }
 
@@ -518,28 +457,26 @@ sub _removeTmpArchive {
 
 sub _prepareTmpArchive {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    $data->{'tmpBackupPath'} = $self->{'tmpDir'}.'/'.$self->getModuleName().'_-_'.$data->{'realm'}.'_-_'.$data->{'login'};
-    $self->_log( 'Temporary backup path: '.$data->{'tmpBackupPath'}, 4 );
+    $entity->setTmpBackupPath( $self->{'tmpDir'}.'/'.$self->getModuleName().'_-_'.$entity->getRealm().'_-_'.$entity->getLogin() );
+    $self->_log( 'Temporary backup path: '.$entity->getTmpBackupPath(), 4 );
 
-    if( ($data->{'entity'} eq 'user')
-        && $self->_mkdir( $data->{'tmpBackupPath'}.'/'.$data->{'login'}.'@'.$data->{'realm'}.'/ics' ) ) {
+    if( $entity->getTmpIcsPath() && $self->_mkdir( $entity->getTmpIcsPath() ) ) {
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Fail to create '.$data->{'tmpBackupPath'} ]
+            content => [ 'Fail to create '.$entity->getTmpIcsPath() ]
             } );
     }
 
-    if( ($data->{'entity'} eq 'user')
-        && $self->_mkdir( $data->{'tmpBackupPath'}.'/'.$data->{'login'}.'@'.$data->{'realm'}.'/vcard' ) ) {
+    if( $entity->getTmpVcardPath() && $self->_mkdir( $entity->getTmpVcardPath() ) ) {
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Fail to create '.$data->{'tmpBackupPath'} ]
+            content => [ 'Fail to create '.$entity->getTmpVcardPath() ]
             } );
     }
 
-    if( $self->_mkdir( $data->{'tmpBackupPath'}.'/'.$data->{'login'}.'@'.$data->{'realm'}.'/mailbox' ) ) {
+    if( $entity->getTmpMailboxPath() && $self->_mkdir( $entity->getTmpMailboxPath() ) ) {
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Fail to create '.$data->{'tmpBackupPath'} ]
+            content => [ 'Fail to create '.$entity->getTmpMailboxPath() ]
             } );
     }
 
@@ -549,16 +486,20 @@ sub _prepareTmpArchive {
 
 sub _addIcs {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
+
+    if( !$entity->getIcs() ) {
+        return undef;
+    }
 
     if( !open( FIC,
             '>:encoding(UTF-8)',
-            $data->{'tmpBackupPath'}.'/'.$data->{'login'}.'@'.$data->{'realm'}.'/ics/calendarExport.ics' ) ) {
+            $entity->getTmpIcsFile() ) ) {
         $self->_log( $!, 1 );
         return 1;
     }
 
-    print FIC $data->{'requestContent'}->{'calendar'};
+    print FIC $entity->getIcs();
     close(FIC);
 
     return 0;
@@ -567,103 +508,49 @@ sub _addIcs {
 
 sub _addVcard {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
+
+    if( !$entity->getVcard() ) {
+        return undef;
+    }
 
     if( !open( FIC,
             '>:encoding(UTF-8)',
-            $data->{'tmpBackupPath'}.'/'.$data->{'login'}.'@'.$data->{'realm'}.'/vcard/privateContacts.csv' ) ) {
+            $entity->getTmpVcardFile() ) ) {
         $self->_log( $!, 1 );
         return 1;
     }
 
-    print FIC $data->{'requestContent'}->{'privateContact'};
+    print FIC $entity->getVcard();
     close(FIC);
 
     return 0;
 }
 
 
-sub _addUserMailbox {
+sub _addMailbox {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    if( my $result = $self->_getCyrusPartitionPath( $data ) ) {
+    if( my $result = $self->_getCyrusPartitionPath( $entity ) ) {
         return $result;
     }
 
-    my $mailboxRoot = $data->{'cyrusPartitionPath'}.'/domain';
-    $mailboxRoot .= eval {
-            $data->{'realm'} =~ /^(\w)/;
-            my $partitionTree = '/'.$1.'/'.$data->{'realm'};
+    my $mailboxRoot = $entity->getCyrusMailboxRoots();
+    for( my $i=0; $i<=$#{$mailboxRoot}; $i++ ) {
+        my $linkRoot = $mailboxRoot->[$i]->{'backup'};
+        $linkRoot =~ /^(.+)\/[^\/]+$/;
+        $linkRoot = $1;
 
-            $data->{'login'} =~ /^(\w)/;
-            return $partitionTree.'/'.$1.'/user/'.$data->{'login'};
-        };
-
-    my $backupLink = $data->{'tmpBackupPath'}.'/'.$data->{'login'}.'@'.$data->{'realm'}.'/mailbox'.eval {
-            $data->{'login'} =~ /^(\w)/;
-            return '/'.$1;
-        };
-
-    if( $self->_mkdir( $backupLink ) ) {
-        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Can\'t create \''.$backupLink.'\'' ]
-            } );
-    }
-
-    $backupLink .= '/'.$data->{'login'};
-
-    if( $self->_mkSymlink( $mailboxRoot, $backupLink ) ) {
-        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Can\'t create mailbox backup link '.$backupLink.' to '.$mailboxRoot ]
-            } );
-    }
-
-    return undef;
-}
-
-
-sub _addUserMailshare {
-    my $self = shift;
-    my( $data ) = @_;
-
-    if( my $result = $self->_getCyrusPartitionPath( $data ) ) {
-        return $result;
-    }
-
-    my $mailboxRoot = $data->{'cyrusPartitionPath'}.'/domain';
-    $mailboxRoot .= eval {
-            $data->{'realm'} =~ /^(\w)/;
-            my $partitionTree = '/'.$1.'/'.$data->{'realm'};
-        };
-
-    my %mailboxTree;
-    find( {
-            wanted => sub {
-                my $path = $_;
-                if( $path =~ /^($mailboxRoot\/(\w)\/$data->{'login'})$/ ) {
-                    $mailboxTree{$2} = $1;
-                    $self->_log( $path, 5 );
-                }
-            },
-            no_chdir  => 1
-        }, $mailboxRoot );
-
-    my $backupLink = $data->{'tmpBackupPath'}.'/'.$data->{'login'}.'@'.$data->{'realm'}.'/mailbox';
-    while( ( my $letter, $mailboxRoot ) = each(%mailboxTree) ) {
-        my $currentBackupLink = $backupLink.'/'.$letter;
-
-        if( $self->_mkdir( $currentBackupLink ) ) {
+        if( $self->_mkdir( $linkRoot ) ) {
             return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-                content => [ 'Can\'t create \''.$currentBackupLink.'\'' ]
+                content => [ 'Can\'t create \''.$linkRoot.'\'' ]
                 } );
         }
 
-        $currentBackupLink .= '/'.$data->{'login'};
-
-        if( $self->_mkSymlink( $mailboxRoot, $currentBackupLink ) ) {
+        if( $self->_mkSymlink( $mailboxRoot->[$i]->{'cyrus'}, $mailboxRoot->[$i]->{'backup'} ) ) {
             return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-                content => [ 'Can\'t create mailbox backup link '.$currentBackupLink.' to '.$mailboxRoot ]
+                content => [ 'Can\'t create mailbox backup link '.$mailboxRoot->[$i]->{'backup'}.' to '.$mailboxRoot->[$i]->{'cyrus'} ]
                 } );
         }
     }
@@ -674,9 +561,9 @@ sub _addUserMailshare {
 
 sub _getCyrusPartitionPath {
     my $self = shift;
-    my( $data ) = @_;
+    my( $entity ) = @_;
 
-    my $imapPartitionName = $data->{'realm'};
+    my $imapPartitionName = $entity->getRealm();
     $imapPartitionName =~ s/[\.-]/_/g;
     $imapPartitionName = 'partition-'.$imapPartitionName;
     $self->_log( 'Cyrus partition name : \''.$imapPartitionName.'\'', 5 );
@@ -688,23 +575,25 @@ sub _getCyrusPartitionPath {
             } );
     }
 
-    delete($data->{'cyrusPartitionPath'});
-    while( !$data->{'cyrusPartitionPath'} && (my $line = <FIC>) ) {
+    my $cyrusPartitionPath;
+    while( !$cyrusPartitionPath && (my $line = <FIC>) ) {
         if( $line =~ /^$imapPartitionName:(\s)*([^\s]+)$/ ) {
-            $data->{'cyrusPartitionPath'} = $2;
+            $cyrusPartitionPath = $2;
         }
     }
 
     close(FIC);
 
-    if( !$data->{'cyrusPartitionPath'} ) {
+    if( !$cyrusPartitionPath ) {
         $self->_log( 'Can\'t find partition path for cyrus parition', 1 );
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
             content => [ 'Can\'t find partition path for cyrus parition' ]
             } );
     }
 
-    $self->_log( 'Cyrus partition path : \''.$data->{'cyrusPartitionPath'}.'\'', 5 );
+    $entity->setCyrusPartitionPath( $cyrusPartitionPath );
+
+    $self->_log( 'Cyrus partition path : \''.$entity->getCyrusPartitionPath().'\'', 5 );
 
     return undef;
 }
