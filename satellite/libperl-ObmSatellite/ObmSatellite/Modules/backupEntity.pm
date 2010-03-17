@@ -91,10 +91,10 @@ sub _putMethod {
     $self->_purgeOldBackupFile( \%data );
 
     if( !$response ) {
-        $self->_log( 'Backup entity '.$data{'login'}.'@'.$data{'realm'}.' successfully', 3 );
+        $self->_log( 'Backup '.$data{'login'}.'@'.$data{'realm'}.' successfully', 3 );
         $response = $self->_response( RC_OK );
     }else {
-        $self->_log( 'Fail to backup entity '.$data{'login'}.'@'.$data{'realm'}, 1 );
+        $self->_log( 'Fail to backup '.$data{'login'}.'@'.$data{'realm'}, 1 );
     }
 
     return $response;
