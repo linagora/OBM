@@ -5782,13 +5782,9 @@ Class CalendarView {
     switch($entity) {
       case 'user':
         $thisEntities = $this->users;
-        $removeEntity = "remove_user";
-        $addEntity = "add_user";
         break;
       case 'resource':
         $thisEntities = $this->resources;
-        $removeEntity = "remove_resource";
-        $addEntity = "add_resource";
         break;
     }
     if (empty($ids))
@@ -5798,10 +5794,10 @@ Class CalendarView {
     $to_add = array_diff($ids,$thisEntities);
     $to_remove = array_diff($thisEntities,$ids);
     foreach ($to_remove as $id) {
-      $this->$removeEntity($id);
+      $this->remove_entity($entity, $id);
     }
     foreach ($to_add as $id) {
-      $this->$addEntity($id);
+      $this->add_entity($entity, $id);
     }
   }
 
@@ -5810,8 +5806,19 @@ Class CalendarView {
     case 'user' :
       $this->add_user($id);
       break;
-    case 'ressource' :
+    case 'resource' :
       $this->add_resource($id);
+      break;
+    }
+  }
+
+  public function remove_entity($entity, $id) {
+    switch($entity) {
+    case 'user' :
+      $this->remove_user($id);
+      break;
+    case 'resource' :
+      $this->remove_resource($id);
       break;
     }
   }
