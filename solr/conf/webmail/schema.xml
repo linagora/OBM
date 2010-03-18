@@ -62,6 +62,8 @@
     <field name="date" type="date" indexed="true" stored="false" 
            multiValued="false" />
 
+    <field name="data" type="string" indexed="false" stored="true" multiValued="false"/>
+
   </fields>
 
   <copyField source="subject" dest="content"/>
