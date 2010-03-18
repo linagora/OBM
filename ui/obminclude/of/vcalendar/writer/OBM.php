@@ -80,10 +80,12 @@ class Vcalendar_Writer_OBM {
   }
 
   function getEventById($id) {
-    $eventData = run_query_calendar_detail($id);
-    if($eventData->nf() == 0) {
+    $query = "SELECT event_id as id FROM Event WHERE event_ext_id = '$id'";
+    $this->db->query($query);
+    if($this->db->nf() == 0) {
       return null;
     }
+    $eventData = run_query_calendar_detail($this->db->f('id'));
     return $eventData;    
   }
 
@@ -246,10 +248,7 @@ class Vcalendar_Writer_OBM {
     if(is_null($id)) {
       return NULL;
     }
-    if(preg_match('/^OBM-.+@.+$/',$id)) {
-      return $id;
-    }
-    return NULL;
+    return $id;
   }
 
   function addAttendee($id, &$vevent) {
