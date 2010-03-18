@@ -46,5 +46,19 @@ class Vcalendar_Utils {
     $db->query($query);
     return $db->next_record();
   }  
+
+  static function privatizeEvent($vevent) {
+    if($vevent->private) {
+      $vevent->reset('summary');
+      $vevent->set('summary', $GLOBALS['l_private']);
+      $vevent->reset('description');
+      $vevent->set('description', $GLOBALS['l_private']);
+      $vevent->reset('location');
+      $vevent->set('location', $GLOBALS['l_private']);
+      $vevent->reset('categories');
+      $vevent->set('categories', array($GLOBALS['l_private']));
+    }
+    return $vevent;
+  }
 }
 

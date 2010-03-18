@@ -16,6 +16,8 @@ class Vcalendar_Element {
 
   var $children = array();
 
+  public $private = true;
+
   /**
    * Vcalendar_Element
    *
@@ -27,6 +29,7 @@ class Vcalendar_Element {
   function Vcalendar_Element(&$document, $name) {
     $this->document = &$document;
     $this->name = $name;
+    $this->private;
   }
 
 
@@ -62,6 +65,18 @@ class Vcalendar_Element {
     } else {
       $this->setProperty($name, $value);
     }
+  }
+  /**
+   * set
+   *
+   * @param mixed $name
+   * @param mixed $values
+   * @param mixed $options
+   * @access public
+   * @return void
+   */
+  function reset($name) {
+    unset($this->$name);
   }
 
   function setProperty($name,$value) {

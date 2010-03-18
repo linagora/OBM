@@ -96,6 +96,9 @@ class Vcalendar_Reader_OBM {
 
       }    
     }
+    foreach($this->vevents as $id => $vevent) {
+      VCalendar_Utils::privatizeEvent($this->vevents[$id]);
+    }
     return $this->document;
   }
 
@@ -110,6 +113,8 @@ class Vcalendar_Reader_OBM {
 
   function & addVevent(&$data) {
     $vevent = &$this->document->createElement('vevent');
+    $vevent->private = ($vevent->private && $data['event_privacy']);
+    $vevent->private = ($vevent->private && ($GLOBALS['obm']['uid'] != $data['event_owner']));
     $created = $this->parseDate($data['timecreate']);
     $created->setOriginalTimeZone($data['event_timezone']);
     $vevent->set('created', $created);
@@ -155,6 +160,7 @@ class Vcalendar_Reader_OBM {
   }
   
   function addAttendee(&$vevent, &$data) {
+   $vevent->private = ($vevent->private && ($GLOBALS['obm']['uid'] != $data['eventlink_entity_id']));
    $vevent->set('attendee',$this->parseAttendee($data['eventlink_entity_id'], $data['eventlink_entity'], $data['eventlink_state']));
   }
   

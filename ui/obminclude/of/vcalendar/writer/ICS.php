@@ -23,6 +23,7 @@ class Vcalendar_Writer_ICS {
     unset($properties['name']);
     unset($properties['document']);
     unset($properties['children']);
+    unset($properties['private']);
     foreach ($properties as $name => $value) {
       $this->writeProperty($name, $value);
     }
@@ -46,6 +47,7 @@ class Vcalendar_Writer_ICS {
     unset($properties['name']);
     unset($properties['document']);
     unset($properties['children']);
+    unset($properties['private']);
     unset($properties['dtend']);
     foreach ($properties as $name => $value) {
       $this->writeProperty($name, $value);
