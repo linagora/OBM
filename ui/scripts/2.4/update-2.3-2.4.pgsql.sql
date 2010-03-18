@@ -93,7 +93,8 @@ ALTER updatedlinks_delegation TYPE character varying(256);
 --
 ALTER TABLE userobm 
 ALTER userobm_delegation TYPE character varying(256),
-ALTER userobm_delegation_target TYPE character varying(256);
+ALTER userobm_delegation_target TYPE character varying(256),
+ALTER userobm_login TYPE character varying(64);
 
 --
 -- Update p_userobm

@@ -84,7 +84,8 @@ MODIFY `updatedlinks_delegation` varchar(256) default '';
 --
 ALTER TABLE UserObm 
 MODIFY `userobm_delegation` varchar(256) default '',
-MODIFY `userobm_delegation_target` varchar(256) default '';
+MODIFY `userobm_delegation_target` varchar(256) default '',
+MODIFY `userobm_login` varchar(64);
 
 --
 -- UserObm
