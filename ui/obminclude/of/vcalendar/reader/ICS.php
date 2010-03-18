@@ -215,7 +215,7 @@ class Vcalendar_Reader_ICS {
    * @return The id or a new one if $id is invalid
    */
   function parseUid($id, $options=array()) {
-    if(trim($id) == '') 
+    if(trim($id) == '') {
       $id = genUniqueExtEventId();
     }
     return $id;
