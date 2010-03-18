@@ -194,7 +194,7 @@ class Vcalendar_Writer_ICS {
       $nb_days = (int) ($seconds / 86400);
       if($nb_days > 1) {
         $dtend = clone $this->parsed_event->get('dtstart');
-        $dtend->addSecond($seconds)->subDay(1);
+        $dtend->addSecond($seconds);
         $this->writeDtend('dtend', $dtend);
       }
     } else {

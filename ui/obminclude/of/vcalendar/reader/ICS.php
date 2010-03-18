@@ -215,11 +215,10 @@ class Vcalendar_Reader_ICS {
    * @return The id or a new one if $id is invalid
    */
   function parseUid($id, $options=array()) {
-    if(preg_match('/^OBM-.+@.+$/',$id)) {
-      return $this->parseText($id, $options);
-    } else {
-      return generateUniqueKey();
+    if(trim($id) == '') {
+      $id = genUniqueExtEventId();
     }
+    return $id;
   }
 
   /**
