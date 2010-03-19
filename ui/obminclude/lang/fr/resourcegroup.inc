@@ -17,7 +17,7 @@ $l_resource_display = "Options d'affichage des listes de ressources";
 $l_resourcegroup = "Groupe de ressources";
 $l_resourcegroups = "Groupe de ressources";
 
-// Resources 
+// Ressources 
 $l_qty = "Quantité";
 
 // Actions
@@ -34,7 +34,7 @@ $l_warn_delete = "ressources enregistrées dans ce groupe";
 $l_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
 
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les groupes de ressources correspondants.";
-$l_no_resource = "Il n'y a pas de resources membres.";
+$l_no_resource = "Il n'y a pas de ressources membres.";
 $l_no_resourcegroup_resourcegroup = "Il n'y a pas de groupes membres.";
 $l_found = "groupes trouvés.";
 $l_resource_member = "ressources membres.";
@@ -48,7 +48,7 @@ $l_resource_added = "Ressource(s) ajoutée(s)";
 $l_resource_removed = "Ressource(s) enlevée(s)";
 $l_resourcegroup_added = "Groupe(s) ajouté(s)";
 $l_resourcegroup_removed = "Groupe(s) enlevé(s)";
-$l_no_resource_added = "Pas de resources à ajouter";
+$l_no_resource_added = "Pas de ressources à ajouter";
 $l_no_resource_deleted = "Pas de ressources à supprimer";
 $l_no_resourcegroup_added = "Pas de groupes à ajouter";
 $l_no_resourcegroup_deleted = "Pas de groupes à supprimer";
