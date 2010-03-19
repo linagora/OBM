@@ -1,0 +1,11 @@
+[backupEntity]
+
+os-server = 127.0.0.1
+
+user-login = test01@aliasource.fr
+mailshare-name = mailshare00@aliasource.fr
+
+test-backup-entity = true
+test-backup-entity-invalid-request-content = true
+test-backup-entity-no-request-content = true
+test-list-available-backup = true

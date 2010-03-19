@@ -12,7 +12,6 @@ require Exporter;
 use strict;
 
 require DBI;
-require 'lib/common.pm';
 
 
 sub _new_instance {

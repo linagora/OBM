@@ -3,10 +3,6 @@
 use strict;
 
 
-use Getopt::Long;
-my %parameters;
-my $return = GetOptions( \%parameters, 'os-server=s', 'entity-type=s', 'entity-login=s' );
-
 use File::Basename;
 my $modulePath = dirname($0);
 
@@ -17,9 +13,14 @@ if( $modulePath !~ /^([\/\.-_a-zA-Z0-9]+)$/ ) {
 $modulePath = $1;
 require $modulePath.'/lib/common.pm';
 
+my %parameters;
+if( &lib::common::getIniParms( 'backupEntity', \%parameters ) ) {
+    print STDERR "Fail to load parameters from INI file !\n";
+    exit 1;
+}
+
 sub help {
-    print STDERR "Usage: \n";
-    print STDERR "\t$0 --os-server <obmSatelliteServer> --entity-type <OBM-entity-type> --entity-login <OBM-entity-login>\n";
+    print STDERR "You need to complete 'backupEntity' section in 'unitTests.ini' file !\n";
     exit 1;
 }
 
@@ -69,17 +70,22 @@ END:VCALENDAR';
     return XMLout( $xml, rootName => 'obmSatellite', XMLDecl => "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>" );
 }
 
+my %entityType;
 SWITCH: {
     if( !$parameters{'os-server'} ) {
         help();
     }
 
-    if( !$parameters{'entity-type'} ) {
+    if( !$parameters{'user-login'} && !$parameters{'mailshare-name'} ) {
         help();
     }
 
-    if( !$parameters{'entity-login'} ) {
-        help();
+    if( $parameters{'user-login'} ) {
+        $entityType{'user'} = $parameters{'user-login'};
+    }
+
+    if( $parameters{'mailshare-name'} ) {
+        $entityType{'mailshare'} = $parameters{'mailshare-name'};
     }
 }
 
@@ -94,44 +100,55 @@ if( !defined($client) ) {
 
 my $errorCode = 0;
 
-my $root = '/backupentity/'.$parameters{'entity-type'}.'/'.$parameters{'entity-login'};
-
-print 'Backup entity \''.$parameters{'entity-type'}.'\', login \''.$parameters{'entity-login'}.'\' on '.$parameters{'os-server'}.'\': ';
-my $path = $root;
-if( !$client->put( $parameters{'os-server'}, $path, genContent() ) ) {
-    print '[OK]'."\n";
-}else {
-    print '[KO]'."\n";
-    $errorCode++;
-}
-
-print 'Backup entity \''.$parameters{'entity-type'}.'\', login \''.$parameters{'entity-login'}.'\' on '.$parameters{'os-server'}.'\' with invalid content: ';
-$path = $root;
-if( $client->put( $parameters{'os-server'}, $path, genInvalidContent() ) ) {
-    print '[OK]'."\n";
-}else {
-    print '[KO]'."\n";
-    $errorCode++;
-}
-
-
-print 'Backup entity \''.$parameters{'entity-type'}.'\', login \''.$parameters{'entity-login'}.'\' on '.$parameters{'os-server'}.'\' without content: ';
-$path = $root;
-if( !$client->put( $parameters{'os-server'}, $path, undef ) ) {
-    print '[OK]'."\n";
-}else {
-    print '[KO]'."\n";
-    $errorCode++;
-}
-
-
-print 'Get available entity backup for \''.$parameters{'entity-type'}.'\', login \''.$parameters{'entity-login'}.'\' on '.$parameters{'os-server'}.'\': ';
-$path = '/availablebackup/user/test01@aliasource.fr';
-if( !$client->get( $parameters{'os-server'}, $path, undef ) ) {
-    print '[OK]'."\n";
-}else {
-    print '[KO]'."\n";
-    $errorCode++;
+while( my($entityType, $entityLogin) = each(%entityType) ) {
+    my $root = '/backupentity/'.$entityType.'/'.$entityLogin;
+    my $path;
+    
+    if( $parameters{'test-backup-entity'} ) {
+        print 'Backup entity \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\': ';
+        my $path = $root;
+        if( !$client->put( $parameters{'os-server'}, $path, genContent() ) ) {
+            print '[OK]'."\n";
+        }else {
+            print '[KO]'."\n";
+            $errorCode++;
+        }
+    }
+    
+    if( $parameters{'test-backup-entity-invalid-request-content'} ) {
+        print 'Backup entity \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\' with invalid content: ';
+        $path = $root;
+        if( $client->put( $parameters{'os-server'}, $path, genInvalidContent() ) ) {
+            print '[OK]'."\n";
+        }else {
+            print '[KO]'."\n";
+            $errorCode++;
+        }
+    }
+    
+    
+    if( $parameters{'test-backup-entity-no-request-content'} ) {
+        print 'Backup entity \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\' without content: ';
+        $path = $root;
+        if( !$client->put( $parameters{'os-server'}, $path, undef ) ) {
+            print '[OK]'."\n";
+        }else {
+            print '[KO]'."\n";
+            $errorCode++;
+        }
+    }
+    
+    
+    if( $parameters{'test-list-available-backup'} ) {
+        print 'Get available entity backup for \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\': ';
+        $path = '/availablebackup/user/test01@aliasource.fr';
+        if( !$client->get( $parameters{'os-server'}, $path, undef ) ) {
+            print '[OK]'."\n";
+        }else {
+            print '[KO]'."\n";
+            $errorCode++;
+        }
+    }
 }
 
 

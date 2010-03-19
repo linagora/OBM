@@ -223,6 +223,14 @@ sub _getMethod {
 #        return $result;
 #    }
 #
+#    if( !( $entity->setContent($self->_xmlContent( $requestBody )) ) ) {
+#        return $self->_response( RC_BAD_REQUEST, {
+#            content => [ 'Invalid request content' ],
+#            help => [ $self->getModuleName().' request content must use XML form' ]
+#            } );
+#    }
+#
+#
 #    $self->_log( $entity.' \''.$datas.'\'', 0 );
 #}
 
