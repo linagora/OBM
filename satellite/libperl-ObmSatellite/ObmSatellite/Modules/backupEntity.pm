@@ -29,7 +29,7 @@ use constant OBM_BACKUP_ROOT => '/var/backup/obm';
 sub _setUri {
     my $self = shift;
 
-    return [ '/backupentity' ];
+    return [ '/backupentity', '/restoreentity', '/availablebackup' ];
 }
 
 sub _initHook {
@@ -60,10 +60,8 @@ sub _initHook {
 sub _putMethod {
     my $self = shift;
     my( $requestUri, $requestBody ) = @_;
-    my %data;
 
-    $data{'requestUri'} = $requestUri;
-    if( $requestUri !~ /^\/backupentity\/([^\/]+)\/([^\/]+)$/ ) {
+    if( $requestUri !~ /^\/backupentity\/(user|mailshare)\/([^\/]+)$/ ) {
         return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Invalid URI '.$requestUri ],
             help => [ $self->getModuleName().' URI must be : /backupentity/<entity>/<login>@<realm>' ]
@@ -83,7 +81,7 @@ sub _putMethod {
         }
 
         return $self->_response( RC_NOT_FOUND, {
-            content => [ 'Unknow entity \''.$data{'entity'}.'\'' ]
+            content => [ 'Unknow entity \''.$entity.'\'' ]
             } );
     }
 
@@ -106,7 +104,11 @@ sub _putMethod {
     }
 
 
-    my $response = $self->_backupEntity( $entity );
+    if( my $return = $self->_setBackupRoot( $entity ) ) {
+        return $return;
+    }
+
+    my $response = $self->_createArchive( $entity );
     
 
     $self->_removeTmpArchive( $entity );
@@ -115,7 +117,9 @@ sub _putMethod {
 
     if( !$response ) {
         $self->_log( 'Backup '.$entity->getLogin().'@'.$entity->getRealm().' successfully', 3 );
-        $response = $self->_response( RC_OK );
+        $response = $self->_response( RC_OK, {
+            content => [ 'Backup '.$entity->getLogin().'@'.$entity->getRealm().' successfully' ]
+            } );
     }else {
         $self->_log( 'Fail to backup '.$entity->getLogin().'@'.$entity->getRealm(), 1 );
     }
@@ -124,16 +128,103 @@ sub _putMethod {
 }
 
 
-sub _backupEntity {
+sub _getMethod {
     my $self = shift;
-    my( $entity ) = @_;
+    my( $requestUri, $requestBody ) = @_;
 
-    if( my $return = $self->_setBackupName( $entity ) ) {
-        return $return;
+    if( $requestUri !~ /^\/availablebackup\/(user|mailshare)\/([^\/]+)$/ ) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid URI '.$requestUri ],
+            help => [ $self->getModuleName().' URI must be : /restoreentity/<entity>/<login>@<realm>' ]
+            } );
     }
 
-    return $self->_createArchive( $entity );
+    my $entity = $1;
+    SWITCH: {
+        if( $entity eq 'user' ) {
+            $entity = ObmSatellite::Modules::BackupEntity::user->new( $2 );
+            last SWITCH;
+        }
+
+        if( $entity eq 'mailshare' ) {
+            $entity = ObmSatellite::Modules::BackupEntity::mailshare->new( $2 );
+            last SWITCH;
+        }
+
+        return $self->_response( RC_NOT_FOUND, {
+            content => [ 'Unknow entity \''.$entity.'\'' ]
+            } );
+    }
+
+    if( !defined($entity) ) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid login '.$requestUri ],
+            help => [ $self->getModuleName().' URI must be : /backupentity/'.$entity.'/<login>@<realm>' ]
+            } );
+    }
+
+    if( my $result = $self->_isEntityDefined( $entity ) ) {
+        return $result;
+    }
+
+    my $availableBackupFile = $self->_getAvailableBackupFile( $entity );
+
+    if( ref($availableBackupFile) ne 'ARRAY' ) {
+        return $availableBackupFile;
+    }
+
+    return $self->_response( RC_OK, {
+        backupFile => $availableBackupFile
+    } );
 }
+
+
+#sub _postMethod {
+#    my $self = shift;
+#    my( $requestUri, $requestBody ) = @_;
+#
+#    if( $requestUri !~ /^\/restoreentity\/(user|mailshare)\/([^\/]+)(\/(mailbox|contact|calendar)){0,1}$/ ) {
+#        return $self->_response( RC_BAD_REQUEST, {
+#            content => [ 'Invalid URI '.$requestUri ],
+#            help => [ $self->getModuleName().' URI must be : /restoreentity/<entity>/<login>@<realm>[/[mailbox|contact|calendar]]' ]
+#            } );
+#    }
+#
+#    my $entity = $1;
+#    my $datas = $4;
+#    if( !defined($datas) ) {
+#        $datas = 'all'
+#    }
+#
+#    SWITCH: {
+#        if( $entity eq 'user' ) {
+#            $entity = ObmSatellite::Modules::BackupEntity::user->new( $2 );
+#            last SWITCH;
+#        }
+#
+#        if( $entity eq 'mailshare' ) {
+#            $entity = ObmSatellite::Modules::BackupEntity::mailshare->new( $2 );
+#            last SWITCH;
+#        }
+#
+#        return $self->_response( RC_NOT_FOUND, {
+#            content => [ 'Unknow entity \''.$entity.'\'' ]
+#            } );
+#    }
+#
+#    if( !defined($entity) ) {
+#        return $self->_response( RC_BAD_REQUEST, {
+#            content => [ 'Invalid login '.$requestUri ],
+#            help => [ $self->getModuleName().' URI must be : /backupentity/'.$entity.'/<login>@<realm>' ]
+#            } );
+#    }
+#
+#    if( my $result = $self->_isEntityDefined( $entity ) ) {
+#        return $result;
+#    }
+#
+#    $self->_log( $entity.' \''.$datas.'\'', 0 );
+#}
 
 
 sub _isEntityDefined {
@@ -156,40 +247,19 @@ sub _isEntityDefined {
 }
 
 
-sub _setBackupName {
+sub _setBackupRoot {
     my $self = shift;
     my( $entity ) = @_;
 
-    my $backupPath = $self->{'backupRoot'}.'/'.$entity->getRealm();
+    $entity->setBackupRoot( $self->{'backupRoot'} );
 
-    if( ! -d $backupPath ) {
-        if( $self->_mkdir( $backupPath ) ) {
+    if( ! -d $entity->getBackupPath() ) {
+        if( $self->_mkdir( $entity->getBackupPath() ) ) {
             return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-                content => [ 'Can\'t create \''.$backupPath.'\'' ]
+                content => [ 'Can\'t create \''.$entity->getBackupPath().'\'' ]
                 } );
         }
     }
-    $entity->setBackupPath( $backupPath );
-
-    my @dateTime = localtime(time);
-    my $backupName = $entity->getLogin().'_-_'.eval {
-        return 1900+$dateTime[5];
-    }.eval {
-        $dateTime[4]+=1;
-        if($dateTime[4]<10) {
-            return "0".$dateTime[4];
-        }else{
-            return $dateTime[4];
-        }
-    }.eval {
-        if ($dateTime[3]<10) {
-            return "0".$dateTime[3];
-        }else {
-            return $dateTime[3];
-        }
-    }.'.tar.gz';
-    $entity->setBackupName( $backupName );
-
 
     $self->_log( 'Backup path : '.$entity->getBackupPath(), 4 );
     $self->_log( 'Backup name : '.$entity->getBackupName(), 4 );
@@ -275,7 +345,7 @@ sub _purgeOldBackupFile {
     my $self = shift;
     my( $entity ) = @_;
 
-    my $backupName = $entity->getLogin().'_-_';
+    my $backupName = $entity->getBackupNamePrefix();
 
     opendir( DIR, $entity->getBackupPath() );
     my @userBackup = grep( /^$backupName/, readdir(DIR) );
@@ -601,6 +671,31 @@ sub _getCyrusPartitionPath {
     $self->_log( 'Cyrus partition path : \''.$entity->getCyrusPartitionPath().'\'', 5 );
 
     return undef;
+}
+
+
+sub _getAvailableBackupFile {
+    my $self = shift;
+    my( $entity ) = @_;
+
+    $entity->setBackupRoot( $self->{'backupRoot'} );
+
+    if( ! -d $entity->getBackupPath() ) {
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Backup path '.$entity->getBackupPath().' doesn\'t exist or isn\'t a directory' ]
+            } );
+    }
+
+    my $backupNamePrefix = $entity->getBackupNamePrefix();
+
+    opendir( DIR, $entity->getBackupPath() ) or return $self->_response(
+        RC_INTERNAL_SERVER_ERROR, {
+        content => [ 'Can\'t open backup path '.$entity->getBackupPath() ]
+        } );
+    my @availableBackup = grep( /^$backupNamePrefix/, readdir(DIR) );
+    close(DIR);
+
+    return \@availableBackup;
 }
 
 

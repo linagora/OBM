@@ -72,18 +72,26 @@ sub _setEntityContent {
 }
 
 
-sub setBackupPath {
+sub setBackupRoot {
     my $self = shift;
-    my( $backupPath ) = @_;
+    my( $backupRoot ) = @_;
 
-    $self->{'backupPath'} = $backupPath;
+    $self->{'backupRoot'} = $backupRoot;
+}
+
+
+sub getBackupRoot {
+    my $self = shift;
+    my( $backupRoot ) = @_;
+
+    return $self->{'backupRoot'};
 }
 
 
 sub getBackupPath {
     my $self = shift;
 
-    return $self->{'backupPath'};
+    return $self->getBackupRoot().'/'.$self->getRealm();
 }
 
 
@@ -98,7 +106,43 @@ sub setBackupName {
 sub getBackupName {
     my $self = shift;
 
+    if( !defined($self->{'backupName'}) ) {
+        $self->_getGenericBackupName();
+    }
+
     return $self->{'backupName'};
+}
+
+
+sub _getGenericBackupName {
+    my $self = shift;
+
+    my @dateTime = localtime(time);
+    my $backupName = $self->getBackupNamePrefix().eval {
+        return 1900+$dateTime[5];
+    }.eval {
+        $dateTime[4]+=1;
+        if($dateTime[4]<10) {
+            return "0".$dateTime[4];
+        }else{
+            return $dateTime[4];
+        }
+    }.eval {
+        if ($dateTime[3]<10) {
+            return "0".$dateTime[3];
+        }else {
+            return $dateTime[3];
+        }
+    }.'.tar.gz';
+
+    $self->setBackupName( $backupName );
+}
+
+
+sub getBackupNamePrefix {
+    my $self = shift;
+
+    return $self->getEntityType().'_-_'.$self->getLogin().'_-_';
 }
 
 
@@ -199,4 +243,17 @@ sub getCyrusMailboxRoots {
     my $self = shift;
 
     return [];
+}
+
+
+sub getEntityType {
+    my $self = shift;
+
+    my $entityType = ref($self);
+    $entityType = eval {
+        my @parts = split( '::', $entityType );
+        return $parts[$#parts];
+    };
+
+    return $entityType;
 }

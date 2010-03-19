@@ -125,6 +125,16 @@ if( !$client->put( $parameters{'os-server'}, $path, undef ) ) {
 }
 
 
+print 'Get available entity backup for \''.$parameters{'entity-type'}.'\', login \''.$parameters{'entity-login'}.'\' on '.$parameters{'os-server'}.'\': ';
+$path = '/availablebackup/user/test01@aliasource.fr';
+if( !$client->get( $parameters{'os-server'}, $path, undef ) ) {
+    print '[OK]'."\n";
+}else {
+    print '[KO]'."\n";
+    $errorCode++;
+}
+
+
 print "All tests done succefully !\n" if !$errorCode;
 print STDERR $errorCode." fail !\n" if $errorCode;
 
