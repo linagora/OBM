@@ -124,7 +124,7 @@ sub _postMethod {
     my $self = shift;
     my( $requestUri, $requestBody ) = @_;
 
-    $self->_log( '\'_postMethod\' method not implemented on module '.$self->getModuleName(), 1 );
+    $self->_log( '\'_postMethod\' method not implemented on module '.$self->getModuleName(), 0 );
     $self->_log( 'Request method : POST', 5 );
     $self->_log( 'Request URI : '.$requestUri, 5 );
     $self->_log( 'Request Body : '.$requestBody, 5 );
@@ -137,7 +137,7 @@ sub _getMethod {
     my $self = shift;
     my( $requestUri, $requestBody ) = @_;
 
-    $self->_log( '\'_getMethod\' method not implemented on module '.$self->getModuleName(), 1 );
+    $self->_log( '\'_getMethod\' method not implemented on module '.$self->getModuleName(), 0 );
     $self->_log( 'Request method : GET', 5 );
     $self->_log( 'Request URI : '.$requestUri, 5 );
     $self->_log( 'Request Body : '.$requestBody, 5 );
