@@ -237,7 +237,7 @@ function html_calendar_tag_legend($tags) {
   $block = "<div class=\"portlet\">
     <h1>$GLOBALS[l_tags]</h1>";
 
-  $tags_q = run_query_calendar_get_alltags($obm['uid']);
+  $tags_q = run_query_calendar_get_alltags();
   while($tags_q->next_record()) {
     if (in_array($tags_q->f('eventtag_id'), $tags)) {
       $block .= "<div class='tagLegend' style='background:".$tags_q->f('eventtag_color')."'>".$tags_q->f('eventtag_label')."</div>";
