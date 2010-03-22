@@ -4501,13 +4501,16 @@ function run_query_calendar_create_or_update_tag(&$calendar) {
 // Parameters:
 //   - $obmUserId : int obmuser identifier
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_get_alltags($obmUserId,$tag_id=null) {
+function run_query_calendar_get_alltags($obmUserId=null,$tag_id=null) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM ;
-  
+  if ($obmUserId) {
+    $uid = sql_parse_id($obmUserId);
+    $where = " WHERE eventtag_user_id='$uid'";
+  }
   if ($tag_id) $where = "AND eventtag_id=$tag_id";
-  $query = "SELECT * FROM EventTag WHERE eventtag_user_id = $obmUserId $where 
+  $query = "SELECT * FROM EventTag $where 
     ORDER BY eventtag_label";
   $obm_q->query($query) ;
   display_debug_msg($query, $cdg_sql,"run_query_calendar_get_alltags()");
