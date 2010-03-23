@@ -231,8 +231,7 @@ sub createLdapEntry {
         return 1;
     }
 
-    my $userPasswd = $self->_convertPasswd( 'PLAIN', $self->{'entityDesc'}->{'usersystem_password'} );
-    if( !$userPasswd ) {
+    if( !$self->{'entityDesc'}->{'usersystem_password'} ) {
         $self->_log( 'pas de mot de passe défini', 1 );
         return 1;
     }
@@ -273,7 +272,7 @@ sub createLdapEntry {
         homeDirectory => $homeDirectory,
         cn => $cn,
         sn => $sn,
-        userpassword => $userPasswd,
+        userpassword => $self->{'entityDesc'}->{'usersystem_password'},
         loginShell => '/bin/bash'
     );
 
@@ -295,9 +294,8 @@ sub updateLdapEntry {
         return $update;
     }
 
-    my $userPasswd = $self->_convertPasswd( 'PLAIN', $self->{'entityDesc'}->{'usersystem_password'} );
-    if( $userPasswd ) {
-        if( $self->_modifyAttr( $userPasswd, $entry, 'userpassword' ) ) {
+    if( $self->{'entityDesc'}->{'usersystem_password'} ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'usersystem_password'}, $entry, 'userpassword' ) ) {
             $update = 1;
         }
     }

@@ -190,11 +190,16 @@ access to filter=(hiddenUser=TRUE)
 # by the entry owning it if they are authenticated.
 # Others should not be able to see it, except the
 # admin entry below
+access to dn.sub="ou=sysusers,dc=local"
+    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
+    by * none
+
 access to attrs=userPassword,shadowLastChange
 	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
     by anonymous auth
     by self write
     by * none
+
 
 # Ensure read access to the base for things like
 # supportedSASLMechanisms.  Without this you may
