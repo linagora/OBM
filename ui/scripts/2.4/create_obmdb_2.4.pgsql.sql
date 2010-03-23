@@ -670,6 +670,7 @@ CREATE TYPE vcomponent AS ENUM (
 CREATE TABLE deletedevent (
     deletedevent_id integer NOT NULL,
     deletedevent_event_id  integer,
+    deletedevent_event_ext_id	character varying(300) DEFAULT ''::character varying,
     deletedevent_user_id   integer,
     deletedevent_origin    varchar(255) NOT NULL,
     deletedevent_type      vcomponent DEFAULT 'VEVENT'::vcomponent,

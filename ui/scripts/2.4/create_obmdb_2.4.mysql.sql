@@ -1077,6 +1077,7 @@ DROP TABLE IF EXISTS `DeletedEvent`;
 CREATE TABLE `DeletedEvent` (
   `deletedevent_id` int(8) NOT NULL auto_increment,
   `deletedevent_event_id` int(8) default NULL,
+  `deletedevent_event_ext_id`	varchar(300) default '',
   `deletedevent_user_id` int(8) default NULL,
   `deletedevent_origin` varchar(255) NOT NULL,
   `deletedevent_type` enum('VEVENT','VTODO','VJOURNAL','VFREEBUSY') default 'VEVENT',

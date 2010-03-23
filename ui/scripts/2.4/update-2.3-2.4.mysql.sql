@@ -203,6 +203,7 @@ INSERT INTO P__contactgroup SELECT * FROM _contactgroup;
 INSERT INTO DomainProperty VALUES ('mailshares_quota_default','integer','0','0');
 INSERT INTO DomainProperty VALUES ('mailshares_quota_max','integer','0','0');
 
+
 --
 -- Table structure for table `field`
 --
@@ -217,6 +218,11 @@ CREATE TABLE `field` (
   CONSTRAINT `field_entity_id_fkey` FOREIGN KEY (`entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+-- 
+-- deleted_event_ext_id
+--
+ALTER TABLE `DeletedEvent` ADD COLUMN `deletedevent_event_ext_id`	varchar(300) default '' AFTER deletedevent_event_id;
 
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
