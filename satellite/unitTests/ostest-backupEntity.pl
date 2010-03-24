@@ -4,6 +4,7 @@ use strict;
 
 
 use File::Basename;
+use XML::Simple;
 my $modulePath = dirname($0);
 
 if( $modulePath !~ /^([\/\.-_a-zA-Z0-9]+)$/ ) {
@@ -112,6 +113,10 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
         }else {
             print '[KO]'."\n";
             $errorCode++;
+
+            my $response = $client->getResponse();
+            my $xmlContent = XMLin( $response->content() );
+            print $xmlContent->{'content'}."\n";
         }
     }
     
@@ -123,6 +128,10 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
         }else {
             print '[KO]'."\n";
             $errorCode++;
+
+            my $response = $client->getResponse();
+            my $xmlContent = XMLin( $response->content() );
+            print $xmlContent->{'content'}."\n";
         }
     }
     
@@ -135,15 +144,153 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
         }else {
             print '[KO]'."\n";
             $errorCode++;
+
+            my $response = $client->getResponse();
+            my $xmlContent = XMLin( $response->content() );
+            print $xmlContent->{'content'}."\n";
         }
     }
     
     
     if( $parameters{'test-list-available-backup'} ) {
         print 'Get available entity backup for \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\': ';
-        $path = '/availablebackup/user/test01@aliasource.fr';
+        $path = '/availablebackup/'.$entityType.'/'.$entityLogin;
         if( !$client->get( $parameters{'os-server'}, $path, undef ) ) {
             print '[OK]'."\n";
+        }else {
+            print '[KO]'."\n";
+            $errorCode++;
+
+            my $response = $client->getResponse();
+            my $xmlContent = XMLin( $response->content() );
+            print $xmlContent->{'content'}."\n";
+        }
+    }
+
+    if( $parameters{'test-restore-invalid-file'} ) {
+        print 'Restore invalid \'user_-_test01_-_20091122.tar.gz\' backup file for entity \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\': ';
+
+        $path = '/restoreentity/'.$entityType.'/'.$entityLogin;
+        if( $client->post( $parameters{'os-server'},
+                            $path, 
+                            '<obmSatellite module="backupEntity">
+                            <backupFile>user_-_test01_-_20091122.tar.gz</backupFile>
+                            </obmSatellite>' ) ) {
+            print '[OK]'."\n";
+
+            my $response = $client->getResponse();
+            my $xmlContent = XMLin( $response->content() );
+            print $xmlContent->{'content'}."\n";
+
+        }else {
+            print '[KO]'."\n";
+            $errorCode++;
+
+            my $response = $client->getResponse();
+            my $xmlContent = XMLin( $response->content() );
+            print $xmlContent->{'content'}."\n";
+        }
+    }
+
+
+    if( $parameters{'test-restore-ics'} ) {
+        $path = '/availablebackup/'.$entityType.'/'.$entityLogin;
+
+        if( !$client->get( $parameters{'os-server'}, $path, undef ) ) {
+            my $response = $client->getResponse();
+            my $xmlContent = XMLin( $response->content() );
+
+            if( !$xmlContent->{'backupFile'} ) {
+                print '[KO]'."\n";
+                $errorCode++;
+
+                my $response = $client->getResponse();
+                my $xmlContent = XMLin( $response->content() );
+                print $xmlContent->{'content'}."\n";
+            }else {
+                print 'Restore calendar from \''.$xmlContent->{'backupFile'}.'\' backup for entity \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\': ';
+                $path = '/restoreentity/'.$entityType.'/'.$entityLogin.'/calendar';
+                if( !$client->post( $parameters{'os-server'},
+                                    $path, 
+                                    '<obmSatellite module="backupEntity">
+                                    <backupFile>'.$xmlContent->{'backupFile'}.'</backupFile>
+                                    </obmSatellite>' ) ) {
+                    print '[OK]'."\n";
+                }else {
+                    print '[KO]'."\n";
+                    $errorCode++;
+                }
+            }
+        }else {
+            print '[KO]'."\n";
+            $errorCode++;
+        }
+    }
+
+
+    if( $parameters{'test-restore-vcard'} ) {
+        $path = '/availablebackup/'.$entityType.'/'.$entityLogin;
+
+        if( !$client->get( $parameters{'os-server'}, $path, undef ) ) {
+            my $response = $client->getResponse();
+            my $xmlContent = XMLin( $response->content() );
+
+            if( !$xmlContent->{'backupFile'} ) {
+                print '[KO]'."\n";
+                $errorCode++;
+
+                my $response = $client->getResponse();
+                my $xmlContent = XMLin( $response->content() );
+                print $xmlContent->{'content'}."\n";
+            }else {
+                print 'Restore contact from \''.$xmlContent->{'backupFile'}.'\' backup for entity \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\': ';
+                $path = '/restoreentity/'.$entityType.'/'.$entityLogin.'/contact';
+                if( !$client->post( $parameters{'os-server'},
+                                    $path, 
+                                    '<obmSatellite module="backupEntity">
+                                    <backupFile>'.$xmlContent->{'backupFile'}.'</backupFile>
+                                    </obmSatellite>' ) ) {
+                    print '[OK]'."\n";
+                }else {
+                    print '[KO]'."\n";
+                    $errorCode++;
+                }
+            }
+        }else {
+            print '[KO]'."\n";
+            $errorCode++;
+        }
+    }
+
+
+    if( $parameters{'test-restore-mailbox'} ) {
+        $path = '/availablebackup/'.$entityType.'/'.$entityLogin;
+
+        if( !$client->get( $parameters{'os-server'}, $path, undef ) ) {
+            my $response = $client->getResponse();
+            my $xmlContent = XMLin( $response->content() );
+
+            if( !$xmlContent->{'backupFile'} ) {
+                print '[KO]'."\n";
+                $errorCode++;
+
+                my $response = $client->getResponse();
+                my $xmlContent = XMLin( $response->content() );
+                print $xmlContent->{'content'}."\n";
+            }else {
+                print 'Restore mailbox from \''.$xmlContent->{'backupFile'}.'\' backup for entity \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\': ';
+                $path = '/restoreentity/'.$entityType.'/'.$entityLogin.'/mailbox';
+                if( !$client->post( $parameters{'os-server'},
+                                    $path, 
+                                    '<obmSatellite module="backupEntity">
+                                    <backupFile>'.$xmlContent->{'backupFile'}.'</backupFile>
+                                    </obmSatellite>' ) ) {
+                    print '[OK]'."\n";
+                }else {
+                    print '[KO]'."\n";
+                    $errorCode++;
+                }
+            }
         }else {
             print '[KO]'."\n";
             $errorCode++;
@@ -152,7 +299,7 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
 }
 
 
-print "All tests done succefully !\n" if !$errorCode;
+print "All tests done successfully !\n" if !$errorCode;
 print STDERR $errorCode." fail !\n" if $errorCode;
 
 exit $errorCode;

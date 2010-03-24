@@ -170,13 +170,20 @@ sub _displayResponse {
     my $self = shift;
     my( $url, $response ) = @_;
 
+    $self->{'response'} = $response;
 
     if( !$response->is_success() ) {
         return 1;
     }
 
-
     return 0;
+}
+
+
+sub getResponse {
+    my $self = shift;
+
+    return $self->{'response'};
 }
 
 

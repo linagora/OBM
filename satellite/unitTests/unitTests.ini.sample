@@ -2,10 +2,25 @@
 
 os-server = 127.0.0.1
 
+# User entity login
 user-login = test01@aliasource.fr
+# Mailshare entity name
 mailshare-name = mailshare00@aliasource.fr
 
+# Backup entity
 test-backup-entity = true
+# Backup entity with invalid request content (not XML)
 test-backup-entity-invalid-request-content = true
+# Backup entity with no request content (no ICS and no VCARD)
 test-backup-entity-no-request-content = true
+# Get available backup file list
 test-list-available-backup = true
+# Restore entity with invalid file name in request content (not
+# exist/readable/...)
+test-restore-invalid-file = true
+# Resore ICS only
+test-restore-ics = true
+# Resore VCARD only
+test-restore-vcard = true
+# Resore mailbox only
+test-restore-mailbox = true
