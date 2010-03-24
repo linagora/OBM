@@ -19,13 +19,13 @@ export PGPASSWORD=$P
 
 #test redhat instalation"
 if [ -d "/var/lib/pgsql" ]; then
-  postrges_dir="/var/lib/pgsql"
+  postgres_dir="/var/lib/pgsql"
 else
-  postrges_dir="/var/lib/postgresql"
+  postgres_dir="/var/lib/postgresql"
 fi
 
 
-su - postgres -c "pg_dump --file=${postgres_dir}migration.sql --format=p \
+su - postgres -c "pg_dump --file=${postgres_dir}/migration.sql --format=p \
 --encoding=UTF-8 \
 ${DB} >/dev/null"
 success=$?
