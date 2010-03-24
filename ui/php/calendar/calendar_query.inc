@@ -5368,7 +5368,6 @@ Class CalendarView {
         $data[$property] = $value;
       }
     }
-var_dump($bookmark_id);
     if($data['users'] == NULL && $data['resources'] == NULL) {
       $GLOBALS['display']['msg'] .= display_warn_msg($GLOBALS['l_view_invalid']);
     } else {
