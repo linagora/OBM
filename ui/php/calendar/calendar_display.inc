@@ -3227,6 +3227,27 @@ function dis_calendar_quick_form($calendar_entity) {
     $calendar_list_entity .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
   }
 
+  // Template
+  $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
+  if ($templates_q->nf() > 0) {
+    $eventtemplate_title = array();
+    array_push($eventtemplate_title, "");
+    while ($templates_q->next_record()) {
+      $id = $templates_q->f('eventtemplate_id');
+      $name = $templates_q->f('eventtemplate_name');
+      array_push($eventtemplate_title, phpStringToJsString($templates_q->f('eventtemplate_title')));
+      $select.= "<option value=\"$id\">$name</option>";
+    }
+
+    $block_template = "
+    $GLOBALS[l_template]:
+    <select id='template_id' name='template_id' onchange='setQuickTitle();'>
+      <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
+      $select
+    </select>";
+    $js_templatetitle = phpArrayToJsArray($eventtemplate_title);
+  }
+
   $block = "
     <div id=\"calendarQuickForm\" class=\"obmPopup\">
       <h1>
@@ -3241,7 +3262,8 @@ function dis_calendar_quick_form($calendar_entity) {
      <div class=\"content\">
         <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
           <fieldset>
-            $l_title : <input type=\"text\" maxlength='255' name=\"tf_title\" /> 
+            $l_title: <input type=\"text\" maxlength='255' name=\"tf_title\" id=\"tf_quick_title\" /> 
+            <span id='sel_template'><br/>$block_template</span>
           </fieldset>
           $calendar_list_entity
           <fieldset class=\"buttons\"> 
@@ -3288,6 +3310,7 @@ function dis_calendar_quick_form($calendar_entity) {
       obm.vars.labels.edit = '".phpStringToJsString($l_edit)."';
       obm.vars.labels.edit_full = '".phpStringToJsString($l_edit_full)."';
       obm.vars.consts.obm_uid = '$obm[uid]';
+      obm.vars.consts.template_title = $js_templatetitle ;
     </script>";
 
   return $block;
@@ -5844,6 +5867,69 @@ function json_build_html_event($calendar, $current_view, $id) {
 }
 
 
+function json_insert_event_data($id,$calendar,$current_view) {
+ 
+  $duration = $calendar['duration'];
+  // $date = $calendar['date_begin'];
+  // $end = clone $date;
+  // $end->addSecond($duration);
+  $all_day = ($calendar['all_day'])?1:0;
+
+  $date_range = $current_view->get_date_range();
+  $date = clone $date_range['begin'];
+  $end = clone $date_range['end'];
+
+  $calendar_entity = $current_view->get_entities();
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
+  $category_filter = $current_view->get_category_filter();
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
+
+  if ($all_day) {
+    $current = clone $date;
+    $current->setWeekday($GLOBALS[ccalendar_weekstart])->setHour(0)->setMinute(0)->setSecond(0);
+    $of = &OccurrenceFactory::getInstance();
+    while($current->compare($end) < 0) {
+      $endWeek = clone $current;
+      $endWeek->addDay(7);
+      $occurrences = $of->getPeriodOccurrences($current,$endWeek);
+      if (is_array($occurrences)) {
+        foreach($occurrences as $occurrence) {
+          if ($occurrence->event->id == $id) {
+            $occurrence->index = $occurrence->date;
+            $occurrence->left = false;
+            $occurrence->right = false;
+
+            // Left extension
+            if ($occurrence->index->compare($current) < 0) {
+               $occurrence->index = $current;
+               $occurrence->left = true;
+            }
+
+            // Right extension
+            if ($occurrence->end->compare($endWeek) > 0) {
+               $occurrence->right = true;
+            }
+
+            $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
+          }
+        }
+      }
+      $current->addDay(7);
+    }
+  } else {
+    if (is_array($occurrences)) {
+      foreach($occurrences as $occurrence) {
+        if ($occurrence->event->id == $id) {
+          $dis_event .= dis_calendar_event($occurrence, 'hour', $calendar_entity, $writable_entity);
+        }
+      }
+    }
+  }
+
+  $GLOBALS['display']['json'] .= "id:$id,";
+  $GLOBALS['display']['json'] .= "event:['".phpStringToJsString($dis_event)."']";
+}
+
 /**
  * Build a JSON message with all the event data
  * the respone is a table of event objects.
@@ -5863,6 +5949,8 @@ function json_event_data($id,$calendar,$current_view) {
   $entities = get_calendar_event_entity($id);
   $all_day = ($calendar['all_day'])?1:0;
   $duration = $calendar['duration'];
+  $location = $calendar['location'];
+  $desc = $calendar['description'];
   $date = $calendar['date_begin'];
   $end = clone $date;
   $end->addSecond($duration);
@@ -5893,8 +5981,8 @@ function json_event_data($id,$calendar,$current_view) {
   $ed[] = "title:'$title'";
   $ed[] = "attendees:[".implode(',',$attendees)."]";
   $ed[] = 'updatable:true';
-  $ed[] = "description:''";
-  $ed[] = "location:''";
+  $ed[] = "description:'$desc'";
+  $ed[] = "location:'$location'";
   $ed[] = "category:''";
   $ed[] = "colors:{}";
   $ed[] = "all:$all";

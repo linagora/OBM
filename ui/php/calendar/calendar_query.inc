@@ -1156,6 +1156,13 @@ function quick_check_calendar_conflict($calendar, $entities) {
 
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
+  if ($calendar['template_id'] > 0) {
+    $t = run_query_calendar_get_template($calendar['template_id']);
+    $q = $t[0]; 
+    $all_day = ($q->f("event_allday"))?'TRUE':'FALSE';
+    $end = clone $calendar['date_begin'];
+    $calendar['date_end'] = $end->addTimestamp($q->f('event_duration'));
+  }
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
@@ -1678,7 +1685,7 @@ function run_query_calendar_quick_event_update($calendar) {
  * @access public
  * @return void
  */
-function run_query_calendar_quick_event_insert($calendar,$state) {
+function run_query_calendar_quick_event_insert(&$calendar,$state) {
   global $cdg_sql, $obm;
 
   $title = sql_parse_text($calendar['title']);
@@ -1687,14 +1694,57 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $opacity = 'OPAQUE';
   if ($all_day == 'TRUE') {
-    // $dateend = clone $datebegin;
-    // $dateend->addSecond($event_duration - 1);
-    // $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
-    // $datebegin->setHour(0)->setMinute(0)->setSecond(0);
-    // $event_duration = $dateend->diffTimestamp($datebegin);
     $event_duration = "86400";
     $opacity = 'TRANSPARENT';
   }
+  $event_privacy = 0;
+  $event_priority = 2;
+  $event_repeatkind = 'none';
+  $event_repeatfrequence = 1;
+  $event_endrepeat = 'NOW()';
+  $event_category1_id = "NULL,";
+  $event_tag_id = "NULL";
+  if ($calendar['template_id'] > 0) {
+    $t = run_query_calendar_get_template($calendar['template_id']);
+    $q = $t[0]; 
+    $attendees = $t[1];
+    $event_duration = $q->f('event_duration');
+    $calendar['duration'] = $event_duration;
+    $all_day = ($q->f("event_allday"))?'TRUE':'FALSE';
+    if ($all_day === 'TRUE') {
+      $datebegin->setHour(0)->setMinute(0)->setSecond(0);
+      $calendar['all_day'] = 1;
+    }
+    $event_location = $q->f("event_location");
+    $calendar['location'] = $event_location; 
+    $event_privacy = $q->f("event_privacy");
+    $event_description = $q->f("event_description");
+    $calendar['description'] = $event_description; 
+    $event_priority = $q->f("event_priority");
+    $event_repeatkind = $q->f("event_repeatkind");
+    $event_repeatdays = $q->f("event_repeatdays");
+    $event_tag_id = $q->f("event_tag_id") ? $q->f("event_tag_id") : "NULL";
+    $event_repeatfrequence = $q->f("event_repeatfrequence");
+    $event_endrepeat = $q->f("event_endrepeat") ? "'".$q->f("event_endrepeat")."'" : "NULL" ;
+    $event_category1_id = $q->f("event_category1_id") ? $q->f("event_category1_id")."," : "NULL,";
+    $event_properties = $q->f("event_properties");
+
+    $user = $attendees['user'];
+    $resource = $attendees['resource'];
+    $contact = $attendees['contact'];
+    $groups = $attendees['group'];
+    if (is_array($groups)) {
+      $user_group_array = array();
+      foreach($groups as $group_id) {
+        $user_group_array = array_merge($user_group_array, of_usergroup_get_group_users($group_id));
+      }
+      $user = array_merge($user,$user_group_array);
+      $user = array_unique($user);
+    }
+    $document = $attendees['document'];
+
+  }
+
   $ext_id = genUniqueExtEventId();
 
   $obm_q = new DB_OBM;
@@ -1722,7 +1772,8 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     event_category1_id,
     event_priority,
     event_domain_id,
-    event_ext_id
+    event_ext_id,
+    event_tag_id
   )
   VALUES (
     NOW(),
@@ -1737,24 +1788,66 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     '$event_duration',
     $all_day,
     '$opacity',
-    '',
-    '',
-    0,
-    'none',
-    1,
-    'NOW()',
-    '',
-    '',
-    NULL,
-    2,
+    '$event_description',
+    '$event_properties',
+    $event_privacy,
+    '$event_repeatkind',
+    $event_repeatfrequence,
+    $event_endrepeat,
+    '$event_repeatdays',
+    '$event_location',
+    $event_category1_id
+    $event_priority,
     $obm[domain_id],
-    '$ext_id'
+    '$ext_id',
+    $event_tag_id
   )";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_insert_event_data()');
   $obm_q->query($query);
   $event_id = $obm_q->lastid();
   of_entity_insert('event', $event_id);
-  run_query_calendar_insert_entity_event('user', $calendar['entity_id'], $event_id, $state);
+
+  // User
+  if (is_array($user)) {
+    foreach ($user as $user_id) {
+      if ($user_id == $obm['uid'] || OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
+        run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'ACCEPTED');
+      } else {
+        run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'NEEDS-ACTION');
+      }
+    }
+  } else {
+    run_query_calendar_insert_entity_event('user', $calendar['entity_id'], $event_id, $state);
+  }
+
+  // Contact
+  if (is_array($contact)) {
+    $contact = array_unique($contact);
+    foreach ($contact as $contact_id) {
+      run_query_calendar_insert_entity_event('contact', $contact_id, $event_id, 'NEEDS-ACTION');
+    }
+  }
+
+  // Resource
+  if (is_array($resource)) {
+    $resource = array_unique($resource);
+    foreach ($resource as $res_id) {
+      if (OBM_Acl::canWrite($obm['uid'], 'resource', $res_id)) {
+        run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'ACCEPTED');
+      } else {
+        run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
+      }
+    }
+  }
+
+  // Document
+  if (is_array($document)) {
+    $document = array_unique($document);
+    foreach ($document as $document_id) {
+      run_query_calendar_attach_document($document_id, $event_entity_id);
+    }
+  }
+
   if ($calendar['send_mail']) {
     // Send mail
     $data = array (
@@ -2299,7 +2392,8 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
 function run_query_calendar_get_alltemplates($user_id) {
   global $cdg_sql;
   
-  $query = "SELECT eventtemplate_id, eventtemplate_name FROM EventTemplate 
+  $query = "
+    SELECT eventtemplate_id, eventtemplate_name, eventtemplate_title FROM EventTemplate 
     WHERE eventtemplate_usercreate = $user_id 
     ORDER BY eventtemplate_name";
   
@@ -3236,6 +3330,12 @@ function check_calendar_data_quick_form($calendar) {
   $datebegin = $calendar['date_begin'];
   $duration = $calendar['duration'];
   $all_day = $calendar['all_day'];
+  if ($calendar['template_id'] > 0) {
+    $t = run_query_calendar_get_template($calendar['template_id']);
+    $q = $t[0]; 
+    $duration = $q->f('event_duration');
+    $all_day = ($q->f("event_allday"))?'TRUE':'FALSE';
+  }
   if (trim($title) == '') {
     $err['msg'] = $l_fill_title;
     return false;

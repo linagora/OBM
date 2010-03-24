@@ -678,13 +678,9 @@ Obm.CalendarManager = new Class({
     var events = response.eventsData;
     if (response.error == 0) {
       showOkMessage(response.message);
-
-      if (response.day == 1) {
-        obm.calendarManager.newDayEvent(events[0].event,events[0].options);
-      } else {
-        obm.calendarManager.newEvent(events[0].event,events[0].options);
-      }
-
+      response.event.each(function(e) {
+        eval(e);
+      });
     } else {
       showErrorMessage(response.message);
     }
@@ -1580,6 +1576,7 @@ Obm.CalendarQuickForm = new Class({
     }
 
     var type = str[0];
+    $('sel_template').style.display ='';
     if (type == 'time') {
       /* Crappy ie fix*/
       var x = ivent.event.layerX;
@@ -1596,6 +1593,7 @@ Obm.CalendarQuickForm = new Class({
       this.setDefaultFormValues(d,1, context);
     } else {
       var evt = obm.calendarManager.events.get(target.id);
+      $('sel_template').style.display ='none';
       this.setFormValues(evt,context);
     }
 
@@ -1712,6 +1710,9 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.entity_id = this.entityView.get('inputValue');
     this.eventData.entity_kind = this.entityKind.value;
     this.eventData.send_mail = null;
+    if ($chk($('template_id'))) {
+      this.eventData.template_id = $('template_id').value;
+    }
     action = action || this.eventData.formAction;
     if (action == 'quick_insert') {
       obm.calendarManager.sendCreateEvent(this.eventData);
@@ -1731,6 +1732,9 @@ Obm.CalendarQuickForm = new Class({
     }
     this.eventData.entity_id = this.entityView.get('inputValue');
     this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)+'&new_user_id[]='+this.eventData.entity_id;
+    if($('template_id').value > 0) {
+      this.gotoURI += '&template_id='+$('template_id').value;
+    }
     window.location.href = 'calendar_index.php?'+this.gotoURI;
   }
 });

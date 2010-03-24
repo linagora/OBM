@@ -446,8 +446,8 @@ if ($action == 'search') {
     }
     $id = run_query_calendar_quick_event_insert($params, $state);
     $params["calendar_id"] = $id;
+    json_insert_event_data($id, $params, $current_view);
     json_ok_msg("$l_event : $l_insert_ok");
-    json_event_data($id, $params, $current_view);
     echo "({".$display['json']."})";
     exit();
   } else {

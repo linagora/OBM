@@ -56,8 +56,8 @@ function setAdvancedSearchDate(rd) {
   }
 }
 
-function clearPeriodSelection(period) {
-alert('toto');
+function setQuickTitle() {
+  $('tf_quick_title').value = obm.vars.consts.template_title[$('template_id').selectedIndex];
 }
 
 /////////////////////////////////////////////////////////////////////////////
