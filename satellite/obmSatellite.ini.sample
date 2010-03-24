@@ -18,9 +18,9 @@
 # Sample syntax: 'dc=linagora,dc=loc'
 #ldapRoot = 
 # Connect LDAP server as (user LDAP DN)
-#ldapLogin =
+ldapLogin = uid=obmsatellite,ou=sysusers,dc=local
 # with password
-#ldapPassword =
+ldapPassword = mG4_Zdnh
 
 # 0 to 5, 3 as default
 #log-level = 3
