@@ -3,7 +3,6 @@ package ObmSatellite::Modules::BackupEntity::mailshare;
 $VERSION = '1.0';
 
 $debug = 1;
-
 use 5.006_001;
 
 use ObmSatellite::Modules::BackupEntity::entities;
@@ -27,7 +26,11 @@ sub getCyrusMailboxRoots {
     $mailboxRoot .= eval {
             my $realm = $self->getRealm();
             $realm =~ /^(\w)/;
-            my $partitionTree = '/'.$1.'/'.$realm;
+            my $firstLetter = lc($1);
+            if( $firstLetter !~ /^[a-z]$/i ) {
+                $firstLetter = 'q';
+            }
+            my $partitionTree = '/'.$firstLetter.'/'.$realm;
         };
 
     my $backupLink = $self->getTmpMailboxPath();
@@ -47,4 +50,11 @@ sub getCyrusMailboxRoots {
         }, $mailboxRoot );
 
     return \@mailboxTree;
+}
+
+
+sub getMailboxFolderRestore {
+    my $self = shift;
+
+    return $self->getLogin().'/'..'@'.$self->getRealm();
 }

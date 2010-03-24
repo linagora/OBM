@@ -3,9 +3,10 @@ package ObmSatellite::Modules::BackupEntity::entities;
 $VERSION = '1.0';
 
 $debug = 1;
-
 use 5.006_001;
 
+use ObmSatellite::Log::log;
+@ISA = qw(ObmSatellite::Log::log);
 use strict;
 
 use ObmSatellite::Misc::regex;
@@ -72,6 +73,13 @@ sub _setEntityContent {
 }
 
 
+sub getEntityContent {
+    my $self = shift;
+
+    return undef;
+}
+
+
 sub setBackupRoot {
     my $self = shift;
     my( $backupRoot ) = @_;
@@ -83,6 +91,10 @@ sub setBackupRoot {
 sub getBackupRoot {
     my $self = shift;
     my( $backupRoot ) = @_;
+
+    if( !defined($self->{'backupRoot'}) ) {
+        $self->_log( 'Undefined backupRoot', 2 );
+    }
 
     return $self->{'backupRoot'};
 }
@@ -117,14 +129,24 @@ sub getBackupName {
 sub _getGenericBackupName {
     my $self = shift;
 
+    my $backupName = $self->getBackupNamePrefix().$self->_getStringDate().'.tar.gz';
+
+    $self->setBackupName( $backupName );
+}
+
+
+sub _getStringDate {
+    my $self = shift;
+
     my @dateTime = localtime(time);
-    my $backupName = $self->getBackupNamePrefix().eval {
+
+    return eval {
         return 1900+$dateTime[5];
     }.eval {
         $dateTime[4]+=1;
         if($dateTime[4]<10) {
             return "0".$dateTime[4];
-        }else{
+        }else {
             return $dateTime[4];
         }
     }.eval {
@@ -133,9 +155,19 @@ sub _getGenericBackupName {
         }else {
             return $dateTime[3];
         }
-    }.'.tar.gz';
-
-    $self->setBackupName( $backupName );
+    }.'-'.eval {
+        if ($dateTime[2]<10) {
+            return '0'.$dateTime[2];
+        }else {
+            return $dateTime[2];
+        }
+    }.eval {
+        if ($dateTime[1]<10) {
+            return '0'.$dateTime[1];
+        }else {
+            return $dateTime[1];
+        }
+    }
 }
 
 
@@ -210,6 +242,20 @@ sub getTmpVcardFile {
 }
 
 
+sub getIcsFileName {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub getVcardFileName {
+    my $self = shift;
+
+    return undef;
+}
+
+
 sub getIcs {
     my $self = shift;
 
@@ -221,6 +267,29 @@ sub getVcard {
     my $self = shift;
 
     return undef;
+}
+
+
+sub setIcs {
+    my $self = shift;
+    my( $ics ) = @_;
+}
+
+
+sub setVcard {
+    my $self = shift;
+    my( $vcard ) = @_;
+}
+
+
+sub getBackupFileName {
+    my $self = shift;
+
+    if( !$self->{'backupName'} ) {
+        return undef;
+    }
+
+    return $self->getBackupPath().'/'.$self->{'backupName'};
 }
 
 
@@ -256,4 +325,40 @@ sub getEntityType {
     };
 
     return $entityType;
+}
+
+
+sub getArchiveRoot {
+    my $self = shift;
+
+    return './'.$self->getLogin().'@'.$self->getRealm();
+}
+
+
+sub getArchiveIcsPath {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub getArchiveVcardPath {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub getArchiveMailboxPath {
+    my $self = shift;
+
+    return $self->getArchiveRoot().'/mailbox';
+}
+
+
+# Get Cyrus mailbox name to restore backup
+sub getMailboxFolderRestore {
+    my $self = shift;
+
+    return undef;
 }

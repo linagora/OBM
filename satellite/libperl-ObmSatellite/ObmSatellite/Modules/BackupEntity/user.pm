@@ -3,7 +3,6 @@ package ObmSatellite::Modules::BackupEntity::user;
 $VERSION = '1.0';
 
 $debug = 1;
-
 use 5.006_001;
 
 use ObmSatellite::Modules::BackupEntity::entities;
@@ -15,10 +14,25 @@ sub _setEntityContent {
     my $self = shift;
     my( $content ) = @_;
 
-    $self->{'privateContact'} = $content->{'privateContact'};
-    $self->{'calendar'} = $content->{'calendar'};
+    if( (ref($content->{'calendar'}) eq 'ARRAY') && (defined($content->{'calendar'}->[0])) ) {
+        $self->setIcs( $content->{'calendar'}->[0] );
+    }
+
+    if( (ref($content->{'privateContact'}) eq 'ARRAY') && (defined($content->{'privateContact'}->[0])) ) {
+        $self->setVcard( $content->{'privateContact'}->[0] );
+    }
 
     return 1;
+}
+
+
+sub getEntityContent {
+    my $self = shift;
+
+    return {
+        calendar => [ $self->getIcs() ],
+        privateContact => [ $self->getVcard() ]
+    };
 }
 
 
@@ -46,14 +60,28 @@ sub getTmpVcardPath {
 sub getTmpIcsFile {
     my $self = shift;
 
-    return $self->getTmpIcsPath().'/calendarExport.ics';
+    return $self->getTmpIcsPath().'/'.$self->getIcsFileName();
 }
 
 
 sub getTmpVcardFile {
     my $self = shift;
 
-    return $self->getTmpVcardPath().'/privateContacts.csv';
+    return $self->getTmpVcardPath().'/'.$self->getVcardFileName();
+}
+
+
+sub getIcsFileName {
+    my $self = shift;
+
+    return 'calendarExport.ics';
+}
+
+
+sub getVcardFileName {
+    my $self = shift;
+
+    return 'privateContacts.csv';
 }
 
 
@@ -79,6 +107,22 @@ sub getVcard {
 }
 
 
+sub setIcs {
+    my $self = shift;
+    my( $ics ) = @_;
+
+    $self->{'calendar'} = $ics;
+}
+
+
+sub setVcard {
+    my $self = shift;
+    my( $vcard ) = @_;
+
+    $self->{'privateContact'} = $vcard;
+}
+
+
 sub getCyrusMailboxRoots {
     my $self = shift;
 
@@ -86,11 +130,19 @@ sub getCyrusMailboxRoots {
     $mailboxRoot .= eval {
             my $realm = $self->getRealm();
             $realm =~ /^(\w)/;
-            my $partitionTree = '/'.$1.'/'.$realm;
+            my $firstLetter = lc($1);
+            if( $firstLetter =~ /^[a-z]$/i ) {
+                $firstLetter = 'q';
+            }
+            my $partitionTree = '/'.$firstLetter.'/'.$realm;
 
             my $login = $self->getLogin();
             $login =~ /^(\w)/;
-            return $partitionTree.'/'.$1.'/user/'.$login;
+            $firstLetter = lc($1);
+            if( $firstLetter =~ /^[a-z]$/i ) {
+                $firstLetter = 'q';
+            }
+            return $partitionTree.'/'.$firstLetter.'/user/'.$login;
         };
 
     my $backupLink = $self->getTmpMailboxPath();
@@ -104,4 +156,18 @@ sub getCyrusMailboxRoots {
         cyrus => $mailboxRoot,
         backup => $backupLink
         } ];
+}
+
+
+sub getArchiveIcsPath {
+    my $self = shift;
+
+    return $self->getArchiveRoot().'/ics';
+}
+
+
+sub getArchiveVcardPath {
+    my $self = shift;
+
+    return $self->getArchiveRoot().'/vcard';
 }

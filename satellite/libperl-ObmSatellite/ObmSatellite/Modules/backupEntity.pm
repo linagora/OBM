@@ -5,7 +5,6 @@ $VERSION = '1.0';
 $debug = 1;
 
 use 5.006_001;
-require Exporter;
 
 use ObmSatellite::Modules::abstract;
 @ISA = qw(ObmSatellite::Modules::abstract);
@@ -35,7 +34,7 @@ sub _setUri {
 sub _initHook {
     my $self = shift;
 
-    $self->{'neededServices'} = [ 'LDAP' ];
+    $self->{'neededServices'} = [ 'LDAP', 'CYRUS' ];
 
     $self->{'backupRoot'} = OBM_BACKUP_ROOT;
     $self->{'imapdConfFile'} = IMAPD_CONF_FILE;
@@ -179,60 +178,73 @@ sub _getMethod {
 }
 
 
-#sub _postMethod {
-#    my $self = shift;
-#    my( $requestUri, $requestBody ) = @_;
-#
-#    if( $requestUri !~ /^\/restoreentity\/(user|mailshare)\/([^\/]+)(\/(mailbox|contact|calendar)){0,1}$/ ) {
-#        return $self->_response( RC_BAD_REQUEST, {
-#            content => [ 'Invalid URI '.$requestUri ],
-#            help => [ $self->getModuleName().' URI must be : /restoreentity/<entity>/<login>@<realm>[/[mailbox|contact|calendar]]' ]
-#            } );
-#    }
-#
-#    my $entity = $1;
-#    my $datas = $4;
-#    if( !defined($datas) ) {
-#        $datas = 'all'
-#    }
-#
-#    SWITCH: {
-#        if( $entity eq 'user' ) {
-#            $entity = ObmSatellite::Modules::BackupEntity::user->new( $2 );
-#            last SWITCH;
-#        }
-#
-#        if( $entity eq 'mailshare' ) {
-#            $entity = ObmSatellite::Modules::BackupEntity::mailshare->new( $2 );
-#            last SWITCH;
-#        }
-#
-#        return $self->_response( RC_NOT_FOUND, {
-#            content => [ 'Unknow entity \''.$entity.'\'' ]
-#            } );
-#    }
-#
-#    if( !defined($entity) ) {
-#        return $self->_response( RC_BAD_REQUEST, {
-#            content => [ 'Invalid login '.$requestUri ],
-#            help => [ $self->getModuleName().' URI must be : /backupentity/'.$entity.'/<login>@<realm>' ]
-#            } );
-#    }
-#
-#    if( my $result = $self->_isEntityDefined( $entity ) ) {
-#        return $result;
-#    }
-#
-#    if( !( $entity->setContent($self->_xmlContent( $requestBody )) ) ) {
-#        return $self->_response( RC_BAD_REQUEST, {
-#            content => [ 'Invalid request content' ],
-#            help => [ $self->getModuleName().' request content must use XML form' ]
-#            } );
-#    }
-#
-#
-#    $self->_log( $entity.' \''.$datas.'\'', 0 );
-#}
+sub _postMethod {
+    my $self = shift;
+    my( $requestUri, $requestBody ) = @_;
+
+    if( $requestUri !~ /^\/restoreentity\/(user|mailshare)\/([^\/]+)(\/(mailbox|contact|calendar)){0,1}$/ ) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid URI '.$requestUri ],
+            help => [ $self->getModuleName().' URI must be : /restoreentity/<entity>/<login>@<realm>[/[mailbox|contact|calendar]]' ]
+            } );
+    }
+
+    my $entity = $1;
+    my $data = $4;
+
+    SWITCH: {
+        if( $entity eq 'user' ) {
+            $entity = ObmSatellite::Modules::BackupEntity::user->new( $2 );
+            last SWITCH;
+        }
+
+        if( $entity eq 'mailshare' ) {
+            $entity = ObmSatellite::Modules::BackupEntity::mailshare->new( $2 );
+            last SWITCH;
+        }
+
+        return $self->_response( RC_NOT_FOUND, {
+            content => [ 'Unknow entity \''.$entity.'\'' ]
+            } );
+    }
+
+    if( !defined($entity) ) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid login '.$requestUri ],
+            help => [ $self->getModuleName().' URI must be : /restoreentity/'.$entity.'/<login>@<realm>[/[mailbox|contact|calendar]]' ]
+            } );
+    }
+
+    if( my $result = $self->_isEntityDefined( $entity ) ) {
+        return $result;
+    }
+
+    if( my $content = $self->_xmlContent( $requestBody ) ) {
+        if( (ref($content->{'backupFile'}) eq 'ARRAY') && defined( $content->{'backupFile'}->[0] ) ) {
+            $entity->setBackupName( $content->{'backupFile'}->[0] );
+        }else {
+            return $self->_response( RC_BAD_REQUEST, {
+                content => [ 'Invalid request content' ],
+                help => [ $self->getModuleName().' restore request content must have \'backupFile\' element' ]
+                } );
+        }
+    }else {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid request content' ],
+            help => [ $self->getModuleName().' restore request content must use XML form' ]
+            } );
+    }
+
+    if( my $return = $self->_setBackupRoot( $entity ) ) {
+        return $return;
+    }
+
+    my $response = $self->_restoreArchive( $entity, $data );
+
+    $self->_removeTmpArchive( $entity );
+
+    return $response;
+}
 
 
 sub _isEntityDefined {
@@ -375,7 +387,7 @@ sub _writeArchive {
     my $self = shift;
     my( $entity ) = @_;
 
-    my $backupFullPath = $entity->getBackupPath().'/'.$entity->getBackupName();
+    my $backupFullPath = $entity->getBackupFileName();
     my $backupFullPathBackup = $backupFullPath.'.backup';
 
     if( my $result = $self->_backupBackupFile( $entity ) ) {
@@ -383,8 +395,8 @@ sub _writeArchive {
     }
 
     my $cmd = $self->{'tarCmd'}.' --ignore-failed-read -C '.$entity->getTmpBackupPath().' -czhf '.$backupFullPath.' . > /dev/null 2>&1';
-
     $self->_log( 'Executing '.$cmd, 4 );
+
     if( my $returnCode = 0xffff & system( $cmd ) ) {
         my $content = {
             content => [ 'Can\'t write backup archive '.$backupFullPath ]
@@ -542,7 +554,14 @@ sub _prepareTmpArchive {
     my $self = shift;
     my( $entity ) = @_;
 
-    $entity->setTmpBackupPath( $self->{'tmpDir'}.'/'.$self->getModuleName().'_-_'.$entity->getRealm().'_-_'.$entity->getLogin() );
+    $entity->setTmpBackupPath( $self->{'tmpDir'}.'/'.$entity->getEntityType().'_-_'.$entity->getRealm().'_-_'.$entity->getLogin() );
+    if( -e $entity->getTmpBackupPath() ) {
+        $self->_log( $entity->getTmpBackupPath().' already exist !', 1 );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                    content => [ $entity->getTmpBackupPath().' already exist !' ]
+                    } );
+    }
+
     $self->_log( 'Temporary backup path: '.$entity->getTmpBackupPath(), 4 );
 
     if( $entity->getTmpIcsPath() && $self->_mkdir( $entity->getTmpIcsPath() ) ) {
@@ -582,6 +601,7 @@ sub _addIcs {
         return 1;
     }
 
+    $self->_log( 'Writing ICS file '.$entity->getTmpIcsFile(), 5 );
     print FIC $entity->getIcs();
     close(FIC);
 
@@ -604,6 +624,7 @@ sub _addVcard {
         return 1;
     }
 
+    $self->_log( 'Writing VCARD file '.$entity->getTmpVcardFile(), 5 );
     print FIC $entity->getVcard();
     close(FIC);
 
@@ -704,6 +725,136 @@ sub _getAvailableBackupFile {
     close(DIR);
 
     return \@availableBackup;
+}
+
+
+sub _restoreArchive {
+    my $self = shift;
+    my( $entity, $restoreData ) = @_;
+
+    if( !defined($restoreData) || ($restoreData !~ /^(mailbox|contact|calendar)$/) ) {
+        $restoreData = 'all';
+    }
+
+    if( my $result = $self->_prepareTmpArchive( $entity ) ) {
+        return $result;
+    }
+
+    if( my $result = $self->_getFilesFromArchive( $entity, $restoreData ) ) {
+        return $result;
+    }
+
+    return $self->_response( RC_OK, $entity->getEntityContent() );
+}
+
+
+sub _getFilesFromArchive {
+    my $self = shift;
+    my( $entity, $restoreData ) = @_;
+
+    my $entityArchive = $entity->getBackupFileName();
+    if( !(-f $entityArchive) || !(-r $entityArchive) ) {
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Entity archive \''.$entityArchive.'\' doesn\'t exist or isn\'t readable' ]
+            } );
+    }
+
+    if( my $result = $self->_getIcsVcardFromArchive( $entity, $restoreData ) ) {
+        return $result;
+    }
+
+    if( my $result = $self->_restoreMailbox( $entity, $restoreData ) ) {
+        return $result;
+    }
+
+    return undef;
+}
+
+
+sub _getIcsVcardFromArchive {
+    my $self = shift;
+    my( $entity, $restoreData ) = @_;
+
+    my @extractedFiles;
+    if( $restoreData =~ /^(all|calendar)$/ ) {
+        if( defined($entity->getArchiveIcsPath()) ) {
+            push( @extractedFiles, $entity->getArchiveIcsPath() );
+        }
+    }
+
+    if( $restoreData =~ /^(all|contact)$/ ) {
+        if( defined($entity->getArchiveVcardPath()) ) {
+            push( @extractedFiles, $entity->getArchiveVcardPath() );
+        }
+    }
+
+    if( $#extractedFiles < 0 ) {
+        return undef;
+    }
+
+    my $cmd = $self->{'tarCmd'}.' -C '.$entity->getTmpBackupPath().' -xzf '.$entity->getBackupFileName().' '.join( ' ', @extractedFiles).' > /dev/null 2>&1';
+    $self->_log( 'Executing '.$cmd, 4 );
+
+    if( my $returnCode = 0xffff & system( $cmd ) ) {
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                    content => [ 'Can\'t extract files from backup archive '.$entity->getTmpBackupPath() ]
+                    } );
+    }
+
+    if( $restoreData =~ /^(all|calendar)$/ ) {
+        if( (-e $entity->getTmpIcsFile()) && !(-f $entity->getTmpIcsFile()) ) {
+            return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                        content => [ 'Can\'t load extracted ICS file from '.$entity->getTmpIcsFile() ]
+                        } );
+        }
+
+        open( FIC, $entity->getTmpIcsFile() );
+        my @ics = <FIC>;
+        close(FIC);
+
+        $entity->setIcs( join( '', @ics ) );
+    }
+
+    if( $restoreData =~ /^(all|contact)$/ ) {
+        if( (-e $entity->getTmpVcardFile()) && !(-f $entity->getTmpVcardFile()) ) {
+            return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                        content => [ 'Can\'t load extracted ICS file from '.$entity->getTmpVcardFile() ]
+                        } );
+        }
+
+        open( FIC, $entity->getTmpVcardFile() );
+        my @ics = <FIC>;
+        close(FIC);
+
+        $entity->setVcard( join( '', @ics ) );
+    }
+
+    return undef;
+}
+
+
+sub _restoreMailbox {
+    my $self = shift;
+    my( $entity, $restoreData ) = @_;
+
+    if( $restoreData !~ /^(all|mailbox)$/ ) {
+        return undef;
+    }
+
+    if( my $result = $self->_createRestoreMailboxFolder( $entity ) ) {
+        return $result;
+    }
+
+    return undef;
+}
+
+
+sub _createRestoreMailboxFolder {
+    my $self = shift;
+    my( $entity ) = @_;
+
+#    $self->_log( ref($self->_getCyrusConn()), 0 );
+    return undef;
 }
 
 

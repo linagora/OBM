@@ -8,7 +8,6 @@ use ObmSatellite::Log::log;
 @ISA = qw(ObmSatellite::Log::log);
 
 use 5.006_001;
-require Exporter;
 use strict;
 
 eval {
@@ -247,7 +246,7 @@ sub _loadConfFile {
     if( my $cfgFile = Config::IniFiles->new( -file => $confFile ) ) {
         for( my $i=0; $i<=$#{$options}; $i++ ) {
             my $iniValue = $cfgFile->val( $self->getModuleName(), $options->[$i] );
-            $self->_log( 'INI file for module '.$self->getModuleName().': '.$options->[$i].'->'.$iniValue, 3 ) if $iniValue;
+            $self->_log( 'INI file for module '.$self->getModuleName().': '.$options->[$i].'->'.$iniValue, 4 ) if $iniValue;
             $params{$options->[$i]} = $iniValue if defined($iniValue);
         }
     }else {
@@ -408,7 +407,7 @@ sub _xmlContent {
     use XML::Simple;
     my $xmlContent = undef;
     eval {
-        $xmlContent = XMLin( $requestBody );
+        $xmlContent = XMLin( $requestBody, ForceArray => 1 );
     };
 
     if( !$xmlContent ) {
@@ -419,4 +418,21 @@ sub _xmlContent {
     $self->_log( Dumper($xmlContent), 5 );
 
     return $xmlContent;
+}
+
+
+sub _getCyrusConn {
+    my $self = shift;
+
+    eval {
+        require ObmSatellite::Services::CYRUS;
+    } or ($self->_log( 'Unable to load CYRUS service', 0 ) && return undef);
+    my $cyrusServer = ObmSatellite::Services::CYRUS->instance();
+
+    if( !defined($cyrusServer) ) {
+        $self->_log( 'Unable to load CYRUS service', 1 );
+        return undef;
+    }
+
+    return $cyrusServer->getConn();
 }
