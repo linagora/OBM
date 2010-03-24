@@ -71,6 +71,13 @@ sub _new_instance {
 }
 
 
+sub getDescription {
+    my $self = shift;
+
+    return 'LDAP server \''.$self->{'ldap_server'}.'\'';
+}
+
+
 sub _loadObmConf {
     my $self = shift;
     my %ldapDesc;
@@ -206,7 +213,7 @@ sub _connect {
         return undef;
     }
 
-    $self->_log( 'connect LDAP server '.$self->{'ldap_server'}.'...', 4 );
+    $self->_log( 'connect to '.$self->getDescription().' '.$self->{'ldap_server'}.'...', 4 );
 
     my @tempo = ( 1, 3, 5, 10, 20, 30 );
     require Net::LDAP;
@@ -221,7 +228,7 @@ sub _connect {
     }
 
     if( !$ldapServerConn ) {
-        $self->_log( 'Can\'t connect LDAP server. Disabling LDAP server', 1 );
+        $self->_log( 'Can\'t connect to '.$self->getDescription().'. Disabling LDAP server', 1 );
         $self->_setDeadStatus();
         return undef;
     }
@@ -242,7 +249,7 @@ sub _connect {
 
         if( $error->code() && ($self->{'ldap_server_tls'} eq 'encrypt') ) {
             $self->_log( 'fatal error on start_tls : '.$error->error, 1 );
-            $self->_log( 'TLS connection needed by configuration.  Disabling LDAP server', 1 );
+            $self->_log( 'TLS connection needed by configuration. Disabling LDAP server', 1 );
             $self->_setDeadStatus();
             return undef;
         }
@@ -272,7 +279,7 @@ sub _searchAuthenticate {
     # LDAP authentication
     my $error; 
     if( $self->{'ldap_login'} ) {
-        $self->_log( 'Authenticating to LDAP server as user DN '.$self->{'ldap_login'}, 3 );
+        $self->_log( 'Authenticating to '.$self->getDescription().' as user DN '.$self->{'ldap_login'}, 3 );
         $error = $self->{'ldapServerConn'}->bind(
             $self->{'ldap_login'},
             password => $self->{'ldap_password'}
