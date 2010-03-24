@@ -205,16 +205,27 @@ sub getHttpResponse {
     }else {
         $self->_log( 'Sending response : '.$self->{'statusCode'}.' - '.$response->content(), 4 );
     }
-
+    
     return $response;
 }
 
 
 sub _contentToXML {
     my $self = shift;
-
+    
     use XML::Simple;
     return XMLout( $self->{'content'},
-                rootName => ROOTNAME,
-                XMLDecl => "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>" )
+            rootName => ROOTNAME,
+            XMLDecl => "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>" )
+}
+
+
+sub isError {
+    my $self = shift;
+
+    if( !defined($self->{'statusCode'}) ) {
+        return undef;
+    }
+
+    return is_error($self->{'statusCode'});
 }
