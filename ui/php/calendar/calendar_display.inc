@@ -1099,15 +1099,6 @@ function dis_calendar_select_template_form($action, $calendar) {
  */
 function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, $display_days) {
  
-  $GLOBALS['js']['vars']['images']['resize'] = $GLOBALS['ico_resize'];
-  $GLOBALS['js']['vars']['images']['periodic'] = $GLOBALS['ico_periodic'];
-  $GLOBALS['js']['vars']['images']['meeting'] = $GLOBALS['ico_meeting'];
-  $GLOBALS['js']['vars']['images']['private'] = $GLOBALS['ico_private'];
-  $GLOBALS['js']['vars']['images']['all_day'] = $GLOBALS['ico_allday'];
-  $GLOBALS['js']['vars']['images']['extension_left'] = $GLOBALS['ico_extension_left'];
-  $GLOBALS['js']['vars']['images']['extension_right'] = $GLOBALS['ico_extension_right'];
-  $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
-
   if ($display_days > 14) {
     $block .= dis_calendar_html_month_agenda($current_view, $calendar_entity,$writable_entity, $date, $end);
     return $block;
@@ -1136,7 +1127,9 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       $today = "background:#FFFFCC;";
     }
 
-    $week_day_list .= "<td class='dayLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a></td>";
+    $lbl = "<a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a>";
+    if ($GLOBALS['action'] == 'portlet') $lbl = $current->localize(Of_Date::OBM_DATE_WEEK_LIST);
+    $week_day_list .= "<td class='dayLabel'>$lbl</td>";
 
     $week_day_event_list .= "
     <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer' style='height:$height%;width:$width%;left:$week_day_left%;$today'>
@@ -1228,6 +1221,14 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     obm.vars.consts.cellWidth = $width;
     obm.vars.consts.nbDisplayedDays = $display_days;
     obm.vars.consts.calendarView = 'day';
+    obm.vars.consts.resize = '".phpStringToJsString($GLOBALS['ico_resize'])."';
+    obm.vars.consts.periodic = '".phpStringToJsString($GLOBALS['ico_periodic'])."';
+    obm.vars.consts.meeting = '".phpStringToJsString($GLOBALS['ico_meeting'])."';
+    obm.vars.consts.private = '".phpStringToJsString($GLOBALS['ico_private'])."';
+    obm.vars.consts.all_day = '".phpStringToJsString($GLOBALS['ico_allday'])."';
+    obm.vars.consts.extension_left = '".phpStringToJsString($GLOBALS['ico_extension_left'])."';
+    obm.vars.consts.extension_right = '".phpStringToJsString($GLOBALS['ico_extension_right'])."';
+    obm.vars.consts.timeUnit = '".(3600/$_SESSION['set_cal_interval'])."';  
     obm.initialize.chain(function () {
       obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
@@ -1289,7 +1290,6 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
            $occurrence->right = true;
         }
 
-
         $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
       }
     }
@@ -1307,9 +1307,12 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $iso = $current->getURL();
       $date_iso = $current->getDateIso();
       $week_day_left = $step*$width;
+      $lbl = "<a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a>";
+      if ($GLOBALS['action'] == 'portlet') $lbl = $day;
+
       $week_day_event_list .= "
         <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
-          <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
+          <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'>$lbl</div>
           <div id='allday_$date_iso' class='alldayCell'>
             <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title <img id=\"close_$date_iso\" src=\"$ico_close\"/> </h1>' style='text-align:center;position:absolute;display:none;width:100%;'></div>
           </div>
@@ -1356,6 +1359,14 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     obm.vars.consts.calendarView = 'month';
     $dis_week_time
     $dis_weekbegin_time
+    obm.vars.consts.resize = '".phpStringToJsString($GLOBALS['ico_resize'])."';
+    obm.vars.consts.periodic = '".phpStringToJsString($GLOBALS['ico_periodic'])."';
+    obm.vars.consts.meeting = '".phpStringToJsString($GLOBALS['ico_meeting'])."';
+    obm.vars.consts.private = '".phpStringToJsString($GLOBALS['ico_private'])."';
+    obm.vars.consts.all_day = '".phpStringToJsString($GLOBALS['ico_allday'])."';
+    obm.vars.consts.extension_left = '".phpStringToJsString($GLOBALS['ico_extension_left'])."';
+    obm.vars.consts.extension_right = '".phpStringToJsString($GLOBALS['ico_extension_right'])."';
+    obm.vars.consts.timeUnit = '".(3600/$_SESSION['set_cal_interval'])."';  
     obm.initialize.chain(function () {
       obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
@@ -1756,7 +1767,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   global $obm, $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_private;
   global $l_user, $l_contact, $l_resource, $l_private;
-  global $output_target;
+  global $output_target, $action;
 
   $event = $occurrence->event;
   $owner = $event->owner;
@@ -1767,7 +1778,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $ed[] = 'updatable:true';
   }
   
-  if ($output_target == 'print') {
+  if ($output_target == 'print' || $action == 'portlet') {
     $updatable =  false;
     $ed[] = 'updatable:false';
   }
@@ -8318,228 +8329,22 @@ function html_calendar_documents_form_fieldset($documents = null) {
 }
 
 
-/*
- * Calendar portlet view
- * read only
- */
-function dis_calendar_portlet($calendar) {
-  global $css_obm, $css_calendar, $resources_path;
-
-  $block = "
-    <head>
-    <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_obm\" />
-    <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_calendar\" />
-    <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js\"></script> 
-    <script type=\"text/javascript\">
-      function selTab(el){
-        var currentLabel = $('lbl_'+el.id);
-        var currentContent = $('content_'+el.id);
-        $$('label.tabLabel').each(function(e){
-          e.set('class', 'tabLabel');
-        });
-        $$('div.tabContent').each(function(e){
-          e.style.display = 'none';
-        });
-
-        currentLabel.set('class', 'tabLabel tabSelected');
-        currentContent.style.display = '';
-      }
-    </script>
-    </head>
-    <body>";
-
-  $block .= "
-  <div class='calendarPortlet'>
-  <div class='tab'>
-  <input type='radio' name='portlet' id='cb_day' style='display:none;' onclick='selTab(this);'/>
-  <label id='lbl_cb_day' for='cb_day' class='tabLabel'>$GLOBALS[l_day]</label>
-  <input type='radio' name='portlet' id='cb_week' style='display:none;' onclick='selTab(this);'/>
-  <label id='lbl_cb_week' for='cb_week' class='tabLabel tabSelected'>$GLOBALS[l_week]</label>
-  <input type='radio' name='portlet' id='cb_month' style='display:none;' onclick='selTab(this);'/>
-  <label id='lbl_cb_month' for='cb_month' class='tabLabel'>$GLOBALS[l_month]</label>
-  <input type='radio' name='portlet' id='cb_waiting' style='display:none;' onclick='selTab(this);'/>
-  <label id='lbl_cb_waiting' for='cb_waiting' class='tabLabel'>$GLOBALS[l_waiting_events]</label>
-  </div>";
-
-  $block .= "<div class='tabContent' id='content_cb_day' style='display:none;' id='day'>".dis_calendar_day_portlet('day')."</div>";
-  $block .= "<div class='tabContent' id='content_cb_week' style='display:block;' id='week'>".dis_calendar_day_portlet('week')."</div>";
-  $block .= "<div class='tabContent' id='content_cb_month' style='display:none;' id='month'>".dis_calendar_month_portlet()."</div>";
-  $block .= "<div class='tabContent' id='content_cb_waiting' style='display:none;' id='waiting'>".dis_calendar_waiting_portlet()."</div>";
-
-  $block .= "</div></body>";
-
-  return $block;
-}
-
-
-function dis_calendar_day_portlet($type) {
-  global $obm, $ccalendar_weekstart, $ccalendar_first_hour, $ccalendar_last_hour;
-
-  if (empty($display_days)) $display_days = '1111111';
-  $display_days = str_split($display_days);
-
-  if ($type == 'week') {
-    $date = new Of_Date();
-    $date->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
-    $end = clone $date;
-    $end->addDay(7);
-  } else {
-    $date = new Of_Date();
-    $date->setHour(0)->setMinute(0)->setSecond(0);
-    $end = clone $date;
-    $end->addDay(1);
-  }
-
-  $status = array('ACCEPTED');
-  $calendar_entity['user'] = array($obm['uid'] => array('dummy'));
-
-  calendar_events_model($date,$end,$calendar_entity, $status);
-  $of = &OccurrenceFactory::getInstance();
-  $current = clone $date;
-  while($current->compare($end) < 0) {
-    if($display_days[$current->get(Of_Date::WEEKDAY_DIGIT)] == 1) {
-      $day = $current->localize(Of_Date::OBM_DATE_WEEK_LIST);
-      $iso = $current->getURL();
-      $week_day_list .= "<td>$day</td>\n";
-      $week_day_event_list .= "<th> </th>";
-    }
-    $current->addDay(1);
-  }
-  $current->setHour($ccalendar_first_hour);
-  // Week Calendar content
-  while ($current->compareHour($ccalendar_last_hour) < 0 && $current->compareDateIso($end) <= 0) {
-    $current->setDateIso($date);
-    if($current->compareMinute(0) == 0) $label = $current->get(Of_Date::TIME_SHORT);
-    else $label = '';
-    $week_cal .= "<tr><th>$label</th>";
-    while($current->compareDateIso($end) != 0) {
-      if($display_days[$current->get(Of_Date::WEEKDAY_DIGIT)] == 1) {
-        $end_slot = clone $current;
-        $end_slot->addHour(1);
-        if ($ocs = $of->getPeriodOccurrences($current,$end_slot, 
-        array('user' => array($obm['uid'], 'resource' => null)))) {
-          $title = "";
-          foreach($ocs as $oc) {
-            $title .= $oc->event->title."\n";
-          }
-          $klass = 'hyperlight';
-          $d = "id=\"".$current->getTimestamp()."\" class=\"$klass\" title=\"$title\"";
-        } else {
-          $klass = '';
-          $d = '';
-        }    
-        $week_cal .= "<td $d onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\"></td>";
-      }
-      $current->addDay(1);
-    }
-    $current->addHour(1);
-    if($current->compareMinute(0) == 0) $week_cal .= "</tr>\n";
-  }
-
-  $block = "<table class=\"miniCalendar week\">
-    <colgroup style='width:1em;'></colgroup>
-    <colgroup></colgroup>
-    <thead>
-    <tr>
-    <td id=\"calendarHourCol\">".$date->get(Of_Date::WEEK)."</td>
-    $week_day_list
-    </tr>
-    <tr id=\"calendarHead\">
-    <td> </td>
-    $week_day_event_list
-    </tr>    
-    </thead>
-    <tbody id=\"calendarBody\">
-    $week_cal</tbody>
-  </table>";
-
-  return $block;
-}
-
-
-function dis_calendar_month_portlet() {
-  global $ccalendar_weekstart, $ccalendar_first_hour;
-  global $obm;
-
-  $date = new Of_Date();
-  $start = clone $date;
-  $start->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
-  $end = clone $start;
-  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1)->setHour(0)->setMinute(0)->setSecond(0);
-  $calendar_entity['user'] = array($obm['uid'] => array('dummy'));
-  
-  calendar_events_model($start,$end, $calendar_entity);
-  $of = &OccurrenceFactory::getInstance();
-  
-  // Minicalendar
-  $current = clone $start;
-  $current->setHour(0)->setMinute(0)->setSecond(0);
-  while($current->compare($end) < 0) {
-    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "<tr>\n";
-    $end_slot = clone $current;
-    $day = $current->get(Of_Date::DAY);
-    $iso = $current->getURL();
-    $ocs = $of->getPeriodOccurrences($current, $end_slot->addDay(1), array('user' => array($obm['uid'], 'resource' => null)));
-    $title = "";
-    if ($ocs) {
-      $klass = 'hyperlight';
-      foreach($ocs as $oc) {
-        $title .= $oc->event->title."\n";
-      }
-      $title = "title=\"$title\"";
-    } else {
-      $klass = '';
-    }    
-    if ($current->isToday()) {
-      $klass .= ' highlight';
-    } elseif ($current->compareMonth($date)!= 0) {
-      $klass .= ' downlight';
-    }
-    $dis_minical .= "<td class=\"$klass\" onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\" $title >$day</td>";
-    $current->addDay(1);
-    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "</tr>\n";
-  } 
-  
-  $current = clone $start;
-  $current->setWeekday($ccalendar_weekstart);
-  $end = clone $current;
-  $end->addDay(6);
-  // Minicalendar Head
-  while($current->compare($end) <= 0) {
-    $day = $current->localize(Of_Date::WEEKDAY_NARROW);
-    $dis_minical_head .= "<td>$day</td>\n";
-    $current->addDay(1);
-  }
-  $block = "
-   <table class=\"miniCalendar\" >
-   <thead>
-   <tr>$dis_minical_head</tr>
-   </thead>
-   <tbody>
-   $dis_minical
-   </tbody>
-   </table>";
-  
-  return $block;
-
-}
-
-
 function dis_calendar_waiting_portlet() {
   $data = run_query_calendar_waiting_events();
   while ($data->next_record()) {
     $evt = $data->Record;
     $evt_begin = new Of_Date($evt['event_date'], 'GMT');
+    $id = $evt['event_id'];
     $evt_end = clone $evt_begin;
     $evt_end->addSecond($evt['event_duration']);
+    $url = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$id";
     $dis_waiting .= "<tr>
-      <td>$evt[event_title]</td>
+      <td><a href='$url' target='_blank'>$evt[event_title]</a></td>
       <td>$evt[entity_label]</td>
       <td>".$evt_begin->getOutputDateTime()."</td>
       <td>".$evt_end->getOutputDateTime()."</td>
     </tr>"; 
   }
-
   $block="
    <table class=\"miniCalendar\" >
    <thead>
@@ -8554,8 +8359,142 @@ function dis_calendar_waiting_portlet() {
    $dis_waiting
    </tbody>
    </table>";
-
-  return "$block";
+  return $block;
 }
+
+
+function dis_calendar_task_portlet() {
+  $data = run_query_get_todos();
+  while ($data->next_record()) {
+    $id = $data->f('event_id');
+    $title = $data->f('event_title');
+    $priority = $data->f('event_priority');
+    $percent = $data->f('eventlink_percent');
+    $deadline = new Of_Date($data->f('event_deadline'));
+    $url = $GLOBALS['path']."/todo/todo_index.php?action=detailconsult&amp;todo_id=$id";
+
+    $now = new Of_Date();
+    $now->setHour(0)->setMinute(0)->setSecond(0);
+    $late = "";
+    $status = $deadline->compare($now);
+    if ($status == -1) {
+      $style = "color:red;font-weight:bold;";
+    } else if ($status == 0) {
+      $style = "color:orange;";
+    } else {
+      $style = "color:green;";
+    }
+
+    $dis_task .= "<tr>
+      <td><a href='$url' target='_blank'>$title</a></td>
+      <td>$priority</td>
+      <td>$percent %</td>
+      <td style='$style'>".$deadline->getOutputDate()."$evt[entity_label]</td>
+    </tr>"; 
+  }
+  $block="
+   <table class=\"miniCalendar\" >
+   <thead>
+   <tr>
+     <td>$GLOBALS[l_title]</td>
+     <td>$GLOBALS[l_priority]</td>
+     <td>$GLOBALS[l_header_advance]</td>
+     <td>$GLOBALS[l_date]</td>
+    </tr>
+   </thead>
+   <tbody>
+   $dis_task
+   </tbody>
+   </table>";
+  return $block;
+
+}
+
+function dis_portlet_navbar($calendar, $current_view) {
+ 
+  $range = $current_view->get_cal_range();
+  $current = clone $current_view->get_date();
+  $date = clone $current_view->get_date();
+
+  switch($range) {
+    case 'day':
+      $url_prev = "calendar_index.php?cal_range=day&amp;list=1&amp;date=".$current->setDateIso($date)->subDay(1)->getURL();
+      $url_next = "calendar_index.php?cal_range=day&amp;list=1&amp;date=".$current->setDateIso($date)->addDay(1)->getURL();
+      $label = $date->localize(Of_Date::OBM_DATE_DAY);
+      $day = "tabSelected";
+      $obm_url = "$GLOBALS[path]/calendar/calendar_index.php?cal_range=day&amp;cal_view=list";
+      break;
+    case 'week':
+      $url_prev = "calendar_index.php?cal_range=week&amp;date=".$current->setDateIso($date)->subWeek(1)->getURL();
+      $url_next = "calendar_index.php?cal_range=week&amp;date=".$current->setDateIso($date)->addWeek(1)->getURL();
+      $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+      $end = clone $date;
+      $end->addDay(7);
+      if ($date->compareMonth($end) == 0) {
+        $label_begin = $date->localize(Of_Date::DAY_SHORT);
+        $label_end = $end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK_JUMP);
+      } else {
+        $label_begin = $date->localize(Of_Date::OBM_DATE_WEEK_JUMP);
+        $label_end = $end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK_JUMP);
+      }
+      if ($date->compareYear($end) == 0) {
+        $label_end .= " ".$date->localize(Of_Date::YEAR);
+      } else {
+        $label_begin .= " ".$date->localize(Of_Date::YEAR);
+        $label_end .= " ".$end->localize(Of_Date::YEAR);
+      }
+      $label = "$label_begin - $label_end";
+      $week = "tabSelected";
+      $obm_url = "$GLOBALS[path]/calendar/calendar_index.php?cal_range=week";
+      break;
+    case 'month':
+      $url_prev = "calendar_index.php?cal_range=month&amp;date=".$current->setDateIso($date)->subMonth(1)->getURL();
+      $url_next = "calendar_index.php?cal_range=month&amp;date=".$current->setDateIso($date)->addMonth(1)->getURL();
+      $label = $date->localize(Of_Date::OBM_DATE_MONTH);
+      $month = "tabSelected";
+      $obm_url = "$GLOBALS[path]/calendar/calendar_index.php?cal_range=month";
+      break;
+    default:
+      break;
+  }
+  $portlet_action = "&amp;action=portlet";
+  $nav = "<div id='calendarNavBar'>
+    <a href='$url_prev$portlet_action'><input type='button' value='«' /></a>     
+    <a href='$url_next$portlet_action'><input type='button' value='»' /></a>     
+    <span style='font-size:90%;'>$label</span>
+  </div>";
+
+  if (isset($calendar['waiting'])) {
+    $obm_url = "$GLOBALS[path]/calendar/calendar_index.php?action=waiting_events";
+    $nav = "";
+    $day = "";
+    $week = "";
+    $month = "";
+    $waiting = "tabSelected";
+  }
+  if (isset($calendar['task'])) {
+    $obm_url = "$GLOBALS[path]/todo/todo_index.php";
+    $nav = "";
+    $day = "";
+    $week = "";
+    $month = "";
+    $waiting = "";
+    $task = "tabSelected";
+  }
+
+  $block = "
+  <div class='tab'>
+    <div style='float:right;padding-right:10px;'><a target='_blank' href='$obm_url'>»OBM</a></div>
+    <label id='lbl_cb_day' class='tabLabel $day'><a href='calendar_index.php?action=portlet&amp;list=1&cal_range=day&cal_view=list'>$GLOBALS[l_day]</a></label>
+    <label id='lbl_cb_week' class='tabLabel $week'><a href='calendar_index.php?action=portlet&amp;cal_range=week&cal_view=agenda'>$GLOBALS[l_week]</a></label>
+    <label id='lbl_cb_month' class='tabLabel $month'><a href='calendar_index.php?action=portlet&amp;cal_range=month&cal_view=agenda'>$GLOBALS[l_month]</a></label>
+    <label id='lbl_cb_waiting' class='tabLabel $waiting'><a href='calendar_index.php?action=portlet&amp;waiting=1'>$GLOBALS[l_waiting_events]</a></label>
+    <label id='lbl_cb_task' class='tabLabel $task'><a href='calendar_index.php?action=portlet&amp;task=1'>$GLOBALS[l_task]</a></label>
+  </div>
+  $nav";
+
+  return $block;
+}
+
 
 ?>

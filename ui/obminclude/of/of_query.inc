@@ -3058,6 +3058,32 @@ function run_query_get_sender() {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Get user todos 
+///////////////////////////////////////////////////////////////////////////////
+
+function run_query_get_todos() {
+
+  $uid = sql_parse_id($GLOBALS['obm']['uid'], true);
+  $query = "SELECT
+      event_id,
+      event_title,
+      event_priority,
+      eventlink_percent,
+      #ADDSECONDS(event_date, event_duration) as event_deadline
+    FROM EventLink
+      INNER JOIN Event on eventlink_event_id=event_id
+      INNER JOIN UserEntity on eventlink_entity_id=userentity_entity_id
+    WHERE event_type='VTODO'
+      AND userentity_user_id $uid
+      AND eventlink_percent < 100
+    ORDER BY event_deadline ASC";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+
+}
 
 //--- Others global functions -----------------------------------------------//
 
