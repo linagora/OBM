@@ -167,6 +167,12 @@ sub _getStringDate {
         }else {
             return $dateTime[1];
         }
+    }.eval {
+        if ($dateTime[0]<10) {
+            return '0'.$dateTime[0];
+        }else {
+            return $dateTime[0];
+        }
     }
 }
 
@@ -356,8 +362,47 @@ sub getArchiveMailboxPath {
 }
 
 
-# Get Cyrus mailbox name to restore backup
-sub getMailboxFolderRestore {
+# Get Cyrus mailbox prefix
+sub getMailboxPrefix {
+    my $self = shift;
+
+    return '';
+}
+
+
+# Get Cyrus mailbox folder restauration name
+sub getRestoreFolder {
+    my $self = shift;
+    my( $new ) = @_;
+
+    if( $new || !$self->{'folderRestore'} ) {
+        $self->{'folderRestore'} = '_'.$self->getLogin().'-'.$self->_getStringDate();
+        $self->_log( 'mailbox restore folder: '.$self->{'folderRestore'}, 5 );
+    }
+
+    return $self->{'folderRestore'};
+}
+
+
+# Get Cyrus mailbox restauration name
+sub getMailboxRestoreFolder {
+    my $self = shift;
+    my( $new ) = @_;
+
+    return $self->getLogin().'/'.$self->getRestoreFolder($new).'@'.$self->getRealm();
+}
+
+
+# Get Cyrus mailbox path corresponding to Cyrus mailbox restauration name
+sub getMailboxRestorePath {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# How many directory needed to strip on backup archive to get mailbox root
+sub getRestoreMailboxArchiveStrip {
     my $self = shift;
 
     return undef;

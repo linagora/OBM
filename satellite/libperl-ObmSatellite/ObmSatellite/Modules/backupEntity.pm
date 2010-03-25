@@ -24,6 +24,10 @@ use ObmSatellite::Misc::constant;
 use ObmSatellite::Misc::regex;
 
 use constant OBM_BACKUP_ROOT => '/var/backup/obm';
+use constant RECONSTRUCT_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
+use constant RECONSTRUCT_CMD => 'reconstruct';
+use constant QUOTA_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
+use constant QUOTA_CMD => 'quota';
 
 sub _setUri {
     my $self = shift;
@@ -239,7 +243,7 @@ sub _postMethod {
         return $return;
     }
 
-    my $response = $self->_restoreArchive( $entity, $data );
+    my $response = $self->_restoreFromArchive( $entity, $data );
 
     $self->_removeTmpArchive( $entity );
 
@@ -397,9 +401,10 @@ sub _writeArchive {
     my $cmd = $self->{'tarCmd'}.' --ignore-failed-read -C '.$entity->getTmpBackupPath().' -czhf '.$backupFullPath.' . > /dev/null 2>&1';
     $self->_log( 'Executing '.$cmd, 4 );
 
-    if( my $returnCode = 0xffff & system( $cmd ) ) {
+    if( my $returnCode = system( $cmd ) ) {
+        $returnCode = ($returnCode >> 8) & 0xffff;
         my $content = {
-            content => [ 'Can\'t write backup archive '.$backupFullPath ]
+            content => [ 'Can\'t write backup archive '.$backupFullPath.' - Error: '.$returnCode ]
             };
 
         my $result = $self->_restoreBackupBackupFile( $entity );
@@ -728,7 +733,7 @@ sub _getAvailableBackupFile {
 }
 
 
-sub _restoreArchive {
+sub _restoreFromArchive {
     my $self = shift;
     my( $entity, $restoreData ) = @_;
 
@@ -758,6 +763,8 @@ sub _getFilesFromArchive {
             content => [ 'Entity archive \''.$entityArchive.'\' doesn\'t exist or isn\'t readable' ]
             } );
     }
+
+    $self->_log( 'Beginning \''.$restoreData.'\' restore for '.$entity->getLogin().'@'.$entity->getRealm(), 3 );
 
     if( my $result = $self->_getIcsVcardFromArchive( $entity, $restoreData ) ) {
         return $result;
@@ -795,9 +802,10 @@ sub _getIcsVcardFromArchive {
     my $cmd = $self->{'tarCmd'}.' -C '.$entity->getTmpBackupPath().' -xzf '.$entity->getBackupFileName().' '.join( ' ', @extractedFiles).' > /dev/null 2>&1';
     $self->_log( 'Executing '.$cmd, 4 );
 
-    if( my $returnCode = 0xffff & system( $cmd ) ) {
+    if( my $returnCode = system( $cmd ) ) {
+        $returnCode = ($returnCode >> 8) & 0xffff;
         return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-                    content => [ 'Can\'t extract files from backup archive '.$entity->getTmpBackupPath() ]
+                    content => [ 'Can\'t extract files from backup archive '.$entity->getTmpBackupPath().' - Error: '.$returnCode ]
                     } );
     }
 
@@ -841,6 +849,10 @@ sub _restoreMailbox {
         return undef;
     }
 
+    if( my $result = $self->_getCyrusPartitionPath( $entity ) ) {
+        return $result;
+    }
+
     if( my $result = $self->_createRestoreMailboxFolder( $entity ) ) {
         return $result;
     }
@@ -851,9 +863,99 @@ sub _restoreMailbox {
 
 sub _createRestoreMailboxFolder {
     my $self = shift;
-    my( $entity ) = @_;
+    my( $entity, $retry ) = @_;
 
-#    $self->_log( ref($self->_getCyrusConn()), 0 );
+    if( !defined($retry) ) {
+        $retry = 0;
+    }
+
+    my $cyrusConn = $self->_getCyrusConn();
+    if( !defined( $cyrusConn ) ) {
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Can\'t connect to Cyrus service' ]
+            } );
+    }
+
+    my @mailBox = $cyrusConn->listmailbox( $entity->getMailboxRestoreFolder(), $entity->getMailboxPrefix() );
+    if( $cyrusConn->error() ) {
+        $self->_log( 'Cyrus error: '.$cyrusConn->error(), 0 );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Cyrus error: '.$cyrusConn->error() ]
+            } );
+    }
+
+    # If mailbox already exist, retry with another mailbox name
+    if( ($#mailBox >= 0) && ($retry < 5) ) {
+        return $self->_createRestoreMailboxFolder($entity, $retry++);
+    }
+
+    if( $retry >= 5 ) {
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Can\'t find a valid mailbox folder to restore data' ]
+            } );
+    }
+
+
+    # Creating restore mailbox
+    $self->_log( 'Create mailbox: '.$entity->getMailboxPrefix().$entity->getMailboxRestoreFolder(), 4 );
+
+    $cyrusConn->create( $entity->getMailboxPrefix().$entity->getMailboxRestoreFolder() );
+    if( $cyrusConn->error() ) {
+        $self->_log( 'Fail to create mailbox \''.$entity->getMailboxPrefix().$entity->getMailboxRestoreFolder().'\': '.$cyrusConn->error() );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Fail to create mailbox \''.$entity->getMailboxPrefix().$entity->getMailboxRestoreFolder().'\': '.$cyrusConn->error() ]
+            } );
+    }
+
+
+    # Restore mailbox content
+    my $cmd = $self->{'tarCmd'}.' --strip '.$entity->getRestoreMailboxArchiveStrip().' -C '.$entity->getMailboxRestorePath().' -xzf '.$entity->getBackupFileName().' '.$entity->getArchiveMailboxPath().' > /dev/null 2>&1';
+    $self->_log( 'Executing '.$cmd, 4 );
+
+    if( my $returnCode = system( $cmd ) ) {
+        $returnCode = ($returnCode >> 8) & 0xffff;
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                    content => [ 'Can\'t extract files from backup archive '.$entity->getTmpBackupPath().' - Error: '.$returnCode ]
+                    } );
+    }
+
+    my $contentUid = (stat($entity->getMailboxRestorePath()))[4];
+    my $contentGid = (stat($entity->getMailboxRestorePath()))[5];
+    my $mailboxRestorePath = $entity->getMailboxRestorePath();
+    find( {
+            wanted => sub {
+                my $path = $_;
+                if( $path =~ /^($mailboxRestorePath\/(.+\/)*(cyrus\..+|[0-9]+\.))$/ ) {
+                    chown( $contentUid, $contentGid, $1 );
+                    chmod( 0600, $1 );
+                }
+            },
+            no_chdir  => 1
+        }, $entity->getMailboxRestorePath() );
+
+    my $reconstructMailbox = $entity->getMailboxPrefix().$entity->getMailboxRestoreFolder();
+    $reconstructMailbox =~ s/^(.+)@/$1\*@/;
+    $cmd = 'su -l -c \'PATH="'.RECONSTRUCT_PATH.'" '.RECONSTRUCT_CMD.' -r -f -x '.$reconstructMailbox.'\' cyrus';
+    $self->_log( 'Executing '.$cmd, 4 );
+
+    if( my $returnCode = system($cmd) ) {
+        $returnCode = ($returnCode >> 8) & 0xffff;
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                    content => [ 'Can\'t reconstruct restore mailbox \''.$reconstructMailbox.'\' - Error: '.$returnCode ]
+                    } );
+    }
+
+    $cmd = 'su -l -c \'PATH="'.QUOTA_PATH.'" '.QUOTA_CMD.' -d '.$entity->getRealm().' '.$entity->getMailboxPrefix().$entity->getLogin().'\' cyrus';
+    $self->_log( 'Executing '.$cmd, 4 );
+
+    if( my $returnCode = system($cmd) ) {
+        $returnCode = ($returnCode >> 8) & 0xffff;
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                    content => [ 'Can\'t refresh quota for '.$entity->getLogin().'@'.$entity->getRealm().' - Error: '.$returnCode ]
+                    } );
+    }
+
+ 
     return undef;
 }
 

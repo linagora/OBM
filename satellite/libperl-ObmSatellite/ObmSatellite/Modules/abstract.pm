@@ -54,6 +54,7 @@ sub _init {
 sub _setUri {
     my $self = shift;
 
+    $self->_log( 'Method \'setUri\' must be defined by module '.$self->getModuleName(), 0 );
     return undef;
 }
 

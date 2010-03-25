@@ -19,7 +19,7 @@ sub getLdapFilter {
 }
 
 
-sub getCyrusMailboxRoots {
+sub _getMailboxesRoot {
     my $self = shift;
 
     my $mailboxRoot = $self->getCyrusPartitionPath().'/domain';
@@ -32,6 +32,15 @@ sub getCyrusMailboxRoots {
             }
             my $partitionTree = '/'.$firstLetter.'/'.$realm;
         };
+
+    return $mailboxRoot;
+}
+
+
+sub getCyrusMailboxRoots {
+    my $self = shift;
+
+    my $mailboxRoot = $self->_getMailboxesRoot();
 
     my $backupLink = $self->getTmpMailboxPath();
     my @mailboxTree;
@@ -53,8 +62,17 @@ sub getCyrusMailboxRoots {
 }
 
 
-sub getMailboxFolderRestore {
+sub getMailboxRestorePath {
     my $self = shift;
 
-    return $self->getLogin().'/'..'@'.$self->getRealm();
+    return $self->_getMailboxesRoot().'/q/'.$self->getLogin().'/'.$self->getRestoreFolder();
+
+    return undef;
+}
+
+
+sub getRestoreMailboxArchiveStrip {
+    my $self = shift;
+
+    return 5;
 }

@@ -123,7 +123,7 @@ sub setVcard {
 }
 
 
-sub getCyrusMailboxRoots {
+sub _getMailboxRoot {
     my $self = shift;
 
     my $mailboxRoot = $self->getCyrusPartitionPath().'/domain';
@@ -131,7 +131,7 @@ sub getCyrusMailboxRoots {
             my $realm = $self->getRealm();
             $realm =~ /^(\w)/;
             my $firstLetter = lc($1);
-            if( $firstLetter =~ /^[a-z]$/i ) {
+            if( $firstLetter !~ /^[a-z]$/i ) {
                 $firstLetter = 'q';
             }
             my $partitionTree = '/'.$firstLetter.'/'.$realm;
@@ -139,11 +139,20 @@ sub getCyrusMailboxRoots {
             my $login = $self->getLogin();
             $login =~ /^(\w)/;
             $firstLetter = lc($1);
-            if( $firstLetter =~ /^[a-z]$/i ) {
+            if( $firstLetter !~ /^[a-z]$/i ) {
                 $firstLetter = 'q';
             }
             return $partitionTree.'/'.$firstLetter.'/user/'.$login;
         };
+
+    return $mailboxRoot;
+}
+
+
+sub getCyrusMailboxRoots {
+    my $self = shift;
+
+    my $mailboxRoot = $self->_getMailboxRoot();
 
     my $backupLink = $self->getTmpMailboxPath();
     $backupLink .= eval {
@@ -170,4 +179,28 @@ sub getArchiveVcardPath {
     my $self = shift;
 
     return $self->getArchiveRoot().'/vcard';
+}
+
+
+sub getMailboxPrefix {
+    my $self = shift;
+
+    return 'user/';
+}
+
+
+sub getMailboxRestorePath {
+    my $self = shift;
+
+    my $mailboxRestorePath = $self->_getMailboxRoot();
+
+
+    return $self->_getMailboxRoot().'/'.$self->getRestoreFolder();
+}
+
+
+sub getRestoreMailboxArchiveStrip {
+    my $self = shift;
+
+    return 6;
 }
