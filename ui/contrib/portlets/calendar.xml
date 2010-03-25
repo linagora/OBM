@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+ <ModulePrefs title="OBM" description="OBM" height="300" />
+ <UserPref name="defaultView" display_name="Vue par défaut" default_value="1" datatype="enum" >
+  <EnumValue value="0" display_value="Jour" />
+  <EnumValue value="1" display_value="Semaine" />
+  <EnumValue value="2" display_value="Mois"/>
+  <EnumValue value="3" display_value="En attente"/>
+  <EnumValue value="4" display_value="Tâches"/>
+ </UserPref> 
+ <Content type="html" view="home" ><![CDATA[
+<script type="text/javascript">
+  var pref;
+  var src = "OBM/calendar/calendar_index.php?action=portlet";
+  function init() {
+    pref = new _IG_Prefs(__MODULE_ID__);
+    var view = pref.getString("defaultView");
+    var frame = _gel('frameObm');
+    switch(view) {
+      case "0":
+        frame.src = src+"&list=1&cal_range=day&cal_view=list";
+      break;
+      case "1":
+        frame.src = src+"&cal_range=week&cal_view=agenda";
+      break;
+      case "2":
+        frame.src = src+"&cal_range=month&cal_view=agenda";
+      break;
+      case "3":
+        frame.src = src+"&waiting=1";
+      break;
+      case "4":
+        frame.src = src+"&task=1";
+      break;
+      default:
+        frame.src = src+"&cal_range=week&cal_view=agenda";
+      break;
+    }
+  }
+  _IG_RegisterOnloadHandler(init);
+</script>
+<iframe id="frameObm" width="100%" height="300px" src="" />
+]]>
+</Content>
+</Module>
