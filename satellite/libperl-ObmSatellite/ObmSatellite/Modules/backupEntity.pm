@@ -95,7 +95,7 @@ sub _putMethod {
             } );
     }
 
-    if( my $result = $self->_isEntityDefined( $entity ) ) {
+    if( my $result = $self->_isEntityExist( $entity ) ) {
         return $result;
     }
 
@@ -116,7 +116,7 @@ sub _putMethod {
 
     $self->_removeTmpArchive( $entity );
     $self->_removeBackupBackupFile( $entity );
-    $self->_purgeOldBackupFile( $entity );
+    $self->_purgeOldBackupFiles( $entity );
 
     if( !$response ) {
         $self->_log( 'Backup '.$entity->getLogin().'@'.$entity->getRealm().' successfully', 3 );
@@ -166,7 +166,7 @@ sub _getMethod {
             } );
     }
 
-    if( my $result = $self->_isEntityDefined( $entity ) ) {
+    if( my $result = $self->_isEntityExist( $entity ) ) {
         return $result;
     }
 
@@ -219,7 +219,7 @@ sub _postMethod {
             } );
     }
 
-    if( my $result = $self->_isEntityDefined( $entity ) ) {
+    if( my $result = $self->_isEntityExist( $entity ) ) {
         return $result;
     }
 
@@ -251,7 +251,7 @@ sub _postMethod {
 }
 
 
-sub _isEntityDefined {
+sub _isEntityExist {
     my $self = shift;
     my( $entity ) = @_;
 
@@ -264,6 +264,36 @@ sub _isEntityDefined {
     if( $#{$ldapEntity} != 0 ) {
         return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Entity '.$entity->getLogin().'@'.$entity->getRealm().' doesn\'t exist in LDAP' ],
+            } );
+    }
+
+    return undef;
+}
+
+
+sub _isEntityMailboxDefined {
+    my $self = shift;
+    my( $entity ) = @_;
+
+    my $cyrusConn = $self->_getCyrusConn();
+    if( !defined( $cyrusConn ) ) {
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Can\'t connect to Cyrus service' ]
+            } );
+    }
+
+    my @mailBox = $cyrusConn->listmailbox( $entity->getLogin().'@'.$entity->getRealm(), $entity->getMailboxPrefix() );
+    if( $cyrusConn->error() ) {
+        $self->_log( 'Cyrus error: '.$cyrusConn->error(), 0 );
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Cyrus error: '.$cyrusConn->error() ]
+            } );
+    }
+
+    # Mailbox exist 
+    if( $#mailBox != 0 ) {
+        return $self->_response( RC_OK, {
+            content => [ 'Mailbox '.$entity->getMailboxPrefix().$entity->getLogin().'@'.$entity->getRealm().' doesn\'t exist !' ]
             } );
     }
 
@@ -365,7 +395,7 @@ sub _restoreBackupBackupFile {
 }
 
 
-sub _purgeOldBackupFile {
+sub _purgeOldBackupFiles {
     my $self = shift;
     my( $entity ) = @_;
 
@@ -641,6 +671,16 @@ sub _addMailbox {
     my $self = shift;
     my( $entity ) = @_;
 
+    if( my $result = $self->_isEntityMailboxDefined($entity) ) {
+        if( $result->isError() ) {
+            return $result;
+        }
+
+        $self->_log( 'Mailbox \''.$entity->getLogin().'@'.$entity->getRealm().'\'isn\'t backuped', 4 );
+        $self->_log( $result->asString(), 5 );
+        return undef;
+    }
+
     if( my $result = $self->_getCyrusPartitionPath( $entity ) ) {
         return $result;
     }
@@ -865,8 +905,18 @@ sub _createRestoreMailboxFolder {
     my $self = shift;
     my( $entity, $retry ) = @_;
 
-    if( !defined($retry) ) {
+    if( !$retry ) {
         $retry = 0;
+
+        if( my $result = $self->_isEntityMailboxDefined($entity) ) {
+            if( $result->isError() ) {
+                return $result;
+            }
+    
+            $self->_log( 'Mailbox \''.$entity->getLogin().'@'.$entity->getRealm().'\' isn\'t restored', 4 );
+            $self->_log( $result->asString(), 5 );
+            return undef;
+        }
     }
 
     my $cyrusConn = $self->_getCyrusConn();

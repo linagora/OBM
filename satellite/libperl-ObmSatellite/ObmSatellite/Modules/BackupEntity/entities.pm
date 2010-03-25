@@ -377,7 +377,7 @@ sub getRestoreFolder {
 
     if( $new || !$self->{'folderRestore'} ) {
         $self->{'folderRestore'} = '_'.$self->getLogin().'-'.$self->_getStringDate();
-        $self->_log( 'mailbox restore folder: '.$self->{'folderRestore'}, 5 );
+        $self->_log( 'generate mailbox restore folder name: '.$self->{'folderRestore'}, 4 );
     }
 
     return $self->{'folderRestore'};

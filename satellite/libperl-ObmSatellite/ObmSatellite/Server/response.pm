@@ -97,13 +97,12 @@ sub asString {
 
     my $string = "statusCode => ".$self->{'statusCode'}."\n";
     
-    $string .= "responseType => ".$self->{'responseType'}."\n";
     $string .= "HTTP headers => {\n";
     while( my( $key, $value ) = each( %{$self->{'httpHeaders'}} ) ) {
-        $string .= $key." => ".$value."\n";
+        $string .= $key." => ".join(',', @{$value})."\n";
     }
     $string .= "}\n";
-    $string .= "rootName => \'".$self->{'rootName'}."\'\n";
+    $string .= "rootName => \'".ROOTNAME."\'\n";
     $string .= "content {\n";
     $string .= $self->_contentToXML();
     $string .= "}\n";
