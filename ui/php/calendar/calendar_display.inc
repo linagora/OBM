@@ -3256,7 +3256,7 @@ function dis_calendar_quick_form($calendar_entity) {
       <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
       $select
     </select>";
-    $js_templatetitle = phpArrayToJsArray($eventtemplate_title);
+    $js_templatetitle = "obm.vars.consts.template_title = ".phpArrayToJsArray($eventtemplate_title);
   }
 
   $block = "
@@ -3321,7 +3321,7 @@ function dis_calendar_quick_form($calendar_entity) {
       obm.vars.labels.edit = '".phpStringToJsString($l_edit)."';
       obm.vars.labels.edit_full = '".phpStringToJsString($l_edit_full)."';
       obm.vars.consts.obm_uid = '$obm[uid]';
-      obm.vars.consts.template_title = $js_templatetitle ;
+      $js_templatetitle
     </script>";
 
   return $block;
