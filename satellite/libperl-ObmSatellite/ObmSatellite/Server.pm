@@ -108,7 +108,7 @@ sub _daemonize {
         $self->_log( 'Daemon stopped by '.$sig, 2 );
 
         unlink($self->{'server'}->{'pid_file'});
-        exit;
+        exit(0);
     };
     
     # We'll handle our child reaper in a separate sub
@@ -130,11 +130,8 @@ sub REAPER {
     while (($stiff = waitpid(-1, WNOHANG)) > 0) {
         my $returnVal = $? >> 8;
 
-        if( $returnVal ) {
-            $self->_log( 'Child '.$stiff.' terminated abnormaly -- status '.$returnVal, 1 );
-        }else {
-            $self->_log( 'Child '.$stiff.' terminated -- status '.$returnVal, 3 );
-        }
+        $self->_log( 'Child '.$stiff.' terminated', 3 );
+
         $self->{'forkedChildren'}--;
         delete $self->{'childrens'}->{$stiff};
 
@@ -178,7 +175,8 @@ sub _newChildren {
     $self->_log( 'child '.$$.' ready to process requests', 3 );
 
     $self->process_request();
-    exit 0;
+
+    exit(0);
 }
 
 
@@ -190,7 +188,7 @@ sub _childSig {
         my $sig = shift;
         $SIG{$sig} = 'IGNORE';
         $self->_log( 'Daemon stopped by '.$sig, 3 );
-        exit;
+        exit(1);
     };
     
     # We'll handle our child reaper in a separate sub
