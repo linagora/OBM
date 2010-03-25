@@ -155,12 +155,11 @@ sub _getLdapValues {
         return [];
     }
 
-    # Needed, don't really know why (workaround singleton and multi-process) but
-    # if don't disconnect from LDAP here, obmSatellite daemon fail to check
-    # HTTP request authentication hearder randomly
+    my @results = $ldapResult->entries();
+
+    # Explicit disconnect LDAP service before obmSatellite daemon fork
     $ldapServer->disconnect();
 
-    my @results = $ldapResult->entries();
     return \@results;
 }
 
@@ -258,15 +257,7 @@ No server response', 2 );
 
     $self->_log( 'Connection established to '.$self->getDescription(), 3 );
 
-    return $self->{'cyruscyrusServerConn'};
-}
-
-
-sub _connect {
-    my $self = shift;
-    my $cyrusServerConn;
-
-    return $cyrusServerConn;
+    return $self->{'cyrusServerConn'};
 }
 
 
@@ -341,16 +332,10 @@ sub DESTROY {
 sub authenticate {
     my $self = shift;
     
-#    local $SIG{__WARN__} = sub {};
-
-#    open (OLDERR, ">&STDERR");
-#    close(STDERR);
     my $returnCode = eval{
             close(STDERR);
             return $self->SUPER::authenticate(@_);
         };
-#    open(STDERR, ">&OLDERR");
-#    close(OLDERR);
     
     return $returnCode;
 }
