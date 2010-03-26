@@ -7,7 +7,7 @@ version 2.3.3 - 2010-03-26
 
   * #994 [Calendar] Label autocompletion improvement
   * #1007 difference between field types in Ugroup table in Mysql and POstgresql
-  * #1071 unsufficient memory allocated for PHP in CLI mode (for cron)
+  * #1071 insufficient memory allocated for PHP in CLI mode (for cron)
   * #1096 [Document] Directory link relative path failure
   * #1097 [Contact] cgp_mailing_default not used anymore
   * #1099 JS freeze when displaying calendar rights with a lot of calendars
