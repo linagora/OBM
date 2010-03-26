@@ -1,7 +1,28 @@
 <!-- $Id:$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.2 - 2010-02-18
+version 2.3.3 - 2010-03-26
+
+2010-03-18 : version 2.3.3
+
+  * #994 [Calendar] Label autocompletion improvement
+  * #1007 difference between field types in Ugroup table in Mysql and POstgresql
+  * #1071 unsufficient memory allocated for PHP in CLI mode (for cron)
+  * #1096 [Document] Directory link relative path failure
+  * #1097 [Contact] cgp_mailing_default not used anymore
+  * #1099 JS freeze when displaying calendar rights with a lot of calendars
+  * #1104 [User] Need a way to unlink a phone from a user
+  * #1108 [Contact] display company phone and postal address into contact
+  * #1109 [Contact] add warning popup when cancel on "modify contact"
+  * #1110 [contact] add search on company in simple search engine
+  * #1115 [Calendar] "Create from model" must be disabled on event update
+  * #1123 Manage rights for other user
+  * #1131 opush purge doesn't work
+  * #1139 LDAP public contact
+  * #1153 iPhone synchro delete events' confidentiality
+  * #1159 [Contact] Can't synchronise a shared 'My contacts'
+  * #1160 minor spelling fixes requested in the text in french language
+  * #1174 [Calendar] Event repeating after end repeat
 
 2010-02-18 : version 2.3.2
 
