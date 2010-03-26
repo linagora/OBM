@@ -12,6 +12,15 @@ use strict;
 use File::Find;
 
 
+sub getEntityContent {
+    my $self = shift;
+
+    return {
+        mailbox => [ $self->{'folderRestore'} ]
+    };
+}
+
+
 sub getLdapFilter {
     my $self = shift;
 

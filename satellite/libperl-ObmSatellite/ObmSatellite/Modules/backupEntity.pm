@@ -176,6 +176,7 @@ sub _getMethod {
         return $availableBackupFile;
     }
 
+    $self->_log( 'Getting available backup file for '.$entity->getLogin().'@'.$entity->getRealm().' successfully', 3 );
     return $self->_response( RC_OK, {
         backupFile => $availableBackupFile
     } );
@@ -814,6 +815,7 @@ sub _getFilesFromArchive {
         return $result;
     }
 
+    $self->_log( 'Restore \''.$restoreData.'\' for '.$entity->getLogin().'@'.$entity->getRealm().' successfully', 3 );
     return undef;
 }
 

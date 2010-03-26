@@ -31,7 +31,8 @@ sub getEntityContent {
 
     return {
         calendar => [ $self->getIcs() ],
-        privateContact => [ $self->getVcard() ]
+        privateContact => [ $self->getVcard() ],
+        mailbox => [ $self->{'folderRestore'} ]
     };
 }
 
