@@ -1551,18 +1551,6 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
           $properties = $event->properties;
           $item_list = '';
 
-
-          // if ($pattern) {
-          //   $values = $pattern;
-          //   if (is_array($pattern)) {
-          //     $values = implode(' ', array_values($pattern));
-          //   }
-          //   $words = explode(' ', $values);
-          //   foreach($words as $w) {
-          //    $title = str_ireplace($w, "<p class='searchPattern'>$w</p>", $title);
-          //   }
-          // }
-
           if ($properties != '') {
             $item = "<?xml version='1.0' encoding='$charset'?>$properties";
             $xml = parse_item($item);
@@ -1656,20 +1644,6 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
     slides[$j].toggle();
        });
         ";
-        // if ($pattern) {
-        //     $values = $pattern;
-        //     if (is_array($pattern)) {
-        //       $values = implode(' ', array_values($pattern));
-        //     }
-        //     $words = explode(' ', $values);
-        //   foreach($words as $w) {
-        //    $dis_attendees = str_ireplace($w, "<p class='searchPattern'>$w</p>", $dis_attendees);
-        //    $dis_owner = str_ireplace($w, "<p class='searchPattern'>$w</p>", $dis_owner);
-        //    $location = str_ireplace($w, "<p class='searchPattern'>$w</p>", $location);
-        //    $description = str_ireplace($w, "<p class='searchPattern'>$w</p>", $description);
-        //    $category = str_ireplace($w, "<p class='searchPattern'>$w</p>", $category);
-        //   }
-        // }
         if($category) $dis_category = "<tr><th>$l_category</th><td>$category</td></tr>";
         else $dis_category = '';
         if($single) $dis_attendees = '';
