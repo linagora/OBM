@@ -407,11 +407,14 @@ ALTER TABLE field ALTER COLUMN id SET DEFAULT nextval('field_id_seq'::regclass);
 ALTER TABLE ONLY field
     ADD CONSTRAINT field_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES Entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+--
+-- Resource group delegation
+--
+ALTER TABLE RGroup ADD COLUMN rgroup_delegation varchar(255) default '';
 -- 
 -- deleted_event_ext_id
 --
-ALTER TABLE deletedevent
-		ADD COLUMN deletedevent_event_ext_id	character varying(300) DEFAULT ''::character varying;
+ALTER TABLE deletedevent ADD COLUMN deletedevent_event_ext_id character varying(300) DEFAULT ''::character varying;
 
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed

@@ -376,35 +376,41 @@ function run_query_todo_update($todo) {
 // Parameters:
 //   - $parms : correponding to page parameters
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_todo_delete($parms) {
+function run_query_todo_delete($params) {
   global $cdg_sql, $c_use_connectors, $obm;
 
   $uid = $obm['uid'];
   $multidomain = sql_multidomain('event');
 
-  foreach($parms as $key => $val) {
+  $obm_q = new DB_OBM;
+  foreach($params as $key => $val) {
     $id_todo = strstr($key,'_');
 
     if ($id_todo != '') {
       $id_todo = substr($id_todo, 1);
       $sel_id = sql_parse_id($id_todo, true); 
       if ($val == 'on') {
-        $query = "DELETE FROM Event WHERE event_type='VTODO' AND event_id $sel_id $multidomain";
-	display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(1)');
-        $obm_q = new DB_OBM;
+        $query = "SELECT event_ext_id FROM Event WHERE event_type = 'VTODO' AND  event_id $sel_id";
+	display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(0)');
         $obm_q->query($query);
-
+        $obm_q->next_record();
+        $ext_id = $obm_q->f('event_ext_id');
+        $query = "DELETE FROM Event WHERE event_type='VTODO' AND event_id $sel_id $multidomain";
+        $obm_q->query($query);
+	display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(1)');
 	// If connectors in use
 	if ($c_use_connectors) {
           $ins_id = sql_parse_id($id_todo);
 	  $query = "INSERT INTO DeletedEvent (
                       deletedevent_event_id,
+                      deletedevent_event_ext_id,
                       deletedevent_user_id,
                       deletedevent_origin,
                       deletedevent_type,
                       deletedevent_timestamp)
             VALUES (
                       $ins_id,
+                      '$ext_id',
                       $uid,
                       '$GLOBALS[c_origin_web]',
                       'VTODO',
@@ -429,10 +435,14 @@ function run_query_todo_delete_unique($t_id) {
   $uid = $obm['uid'];
   $multidomain = sql_multidomain('event');
   $id = sql_parse_id($t_id, true);
-  $query = "DELETE FROM Event WHERE event_type='VTODO' AND event_id $id $multidomain";
-  
-  display_debug_msg($query, $cdg_sql, 'run_query_todo_delete_unique(1)');
   $obm_q = new DB_OBM;
+  $query = "SELECT event_ext_id FROM Event WHERE event_type = 'VTODO' AND  event_id $id";
+  display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(0)');
+  $obm_q->query($query);  
+  $obm_q->next_record();
+  $ext_id = $obm_q->f('event_ext_id');
+  $query = "DELETE FROM Event WHERE event_type='VTODO' AND event_id $id $multidomain";
+  display_debug_msg($query, $cdg_sql, 'run_query_todo_delete_unique(1)');
   $ret = $obm_q->query($query);
 
   // If connectors in use
@@ -440,12 +450,14 @@ function run_query_todo_delete_unique($t_id) {
     $id = sql_parse_id($t_id);
     $query = "INSERT INTO DeletedEvent (
                       deletedevent_event_id,
+                      deletedevent_event_ext_id,
                       deletedevent_user_id,
                       deletedevent_origin,
                       deletedevent_type,
                       deletedevent_timestamp)
             VALUES (
                       $id,
+                      '$ext_id',
                       $uid,
                       '$GLOBALS[c_origin_web]',
                       'VTODO',

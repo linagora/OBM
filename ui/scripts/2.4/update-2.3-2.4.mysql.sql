@@ -218,11 +218,15 @@ CREATE TABLE `field` (
   CONSTRAINT `field_entity_id_fkey` FOREIGN KEY (`entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Resource group delegation
+--
+ALTER TABLE RGroup ADD COLUMN rgroup_delegation varchar(255) default '';
 
 -- 
 -- deleted_event_ext_id
 --
-ALTER TABLE `DeletedEvent` ADD COLUMN `deletedevent_event_ext_id`	varchar(300) default '' AFTER deletedevent_event_id;
+ALTER TABLE `DeletedEvent` ADD COLUMN `deletedevent_event_ext_id` varchar(300) default '' AFTER deletedevent_event_id;
 
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed

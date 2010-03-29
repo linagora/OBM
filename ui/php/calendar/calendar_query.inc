@@ -1404,12 +1404,14 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
       foreach($removed_users as $u_id) {
         $query = "INSERT INTO DeletedEvent (
           deletedevent_event_id,
+          deletedevent_event_ext_id,
           deletedevent_user_id,
           deletedevent_origin,
           deletedevent_type,
           deletedevent_timestamp)
           VALUES (
             $event_id,
+            '".$oldEvent->uid."',
             $u_id,
             '$GLOBALS[c_origin_web]',
             'VEVENT',
@@ -2819,6 +2821,7 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
   $title = $obm_q->f('event_title');
   $is_exception = $obm_q->f('event_is_exception');
 
+  $event = OBM_EventFactory::getInstance()->getById($event_id);
   // If connectors in use
   if ($c_use_connectors) {
 
@@ -2834,8 +2837,8 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
       $users = array();
       while ($obm_q->next_record()) {
         // We note the event deletion
-        $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_origin, deletedevent_type, deletedevent_timestamp)
-          VALUES ($event_id, ".$obm_q->f('userentity_user_id').",'$GLOBALS[c_origin_web]', 'VEVENT', NOW())";
+        $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_event_ext_id, deletedevent_user_id, deletedevent_origin, deletedevent_type, deletedevent_timestamp)
+          VALUES ($event_id, '".$event->uid."', ".$obm_q->f('userentity_user_id').",'$GLOBALS[c_origin_web]', 'VEVENT', NOW())";
         display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
         $retour = $obm_qm->query($query);
       }
@@ -2846,7 +2849,6 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
   run_query_calendar_delete_document($event_id);
 
   // Send mail
-  $event = OBM_EventFactory::getInstance()->getById($event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');

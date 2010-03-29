@@ -1077,7 +1077,7 @@ DROP TABLE IF EXISTS `DeletedEvent`;
 CREATE TABLE `DeletedEvent` (
   `deletedevent_id` int(8) NOT NULL auto_increment,
   `deletedevent_event_id` int(8) default NULL,
-  `deletedevent_event_ext_id`	varchar(300) default '',
+  `deletedevent_event_ext_id` varchar(300) default '',
   `deletedevent_user_id` int(8) default NULL,
   `deletedevent_origin` varchar(255) NOT NULL,
   `deletedevent_type` enum('VEVENT','VTODO','VJOURNAL','VFREEBUSY') default 'VEVENT',
@@ -2792,6 +2792,7 @@ CREATE TABLE `RGroup` (
   `rgroup_usercreate` int(8) default NULL,
   `rgroup_privacy` int(2) default '0',
   `rgroup_name` varchar(32) NOT NULL,
+  `rgroup_delegation` varchar(256) default '',
   `rgroup_desc` varchar(128) default NULL,
   PRIMARY KEY  (`rgroup_id`),
   KEY `rgroup_domain_id_domain_id_fkey` (`rgroup_domain_id`),

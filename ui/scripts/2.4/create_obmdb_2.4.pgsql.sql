@@ -2038,6 +2038,7 @@ CREATE TABLE rgroup (
     rgroup_usercreate integer DEFAULT NULL,
     rgroup_privacy integer DEFAULT 0,
     rgroup_name character varying(32) NOT NULL,
+    resource_delegation varchar(256) DEFAULT '',
     rgroup_desc character varying(128)
 );
 
