@@ -1111,7 +1111,7 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 
   if ($calendar['opacity'] == 'TRANSPARENT') return false;
   $access_entity = 
-    OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read');
+    OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access');
 
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
