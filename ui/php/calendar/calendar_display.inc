@@ -1389,14 +1389,14 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
  * @access public
  * @return void
  */
-function dis_calendar_day_list($current_view, $calendar_entity, $writable_entity) {
+function dis_calendar_day_list($current_view, $calendar_entity, $writable_entity, $portlet=false) {
   global $ccalendar_weekstart, $ccalendar_first_hour, $ccalendar_last_hour;
 
   $date = clone $current_view->get_date();
   $date->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(1);
-  $block = dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end);
+  $block = dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end, null, $portlet);
 
   return $block;
 }
@@ -1450,7 +1450,7 @@ function dis_calendar_month_list($current_view, $calendar_entity, $writable_enti
  * @param mixed $calendar_entity 
  * @return event list HTML code
  */
-function dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end, $events=null) {
+function dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end, $events=null, $portlet=false) {
   global $obm;
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
   global $l_desc, $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
@@ -1488,6 +1488,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
   $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true,$events);
   $today_mark = false;
   $charset = mb_internal_encoding();
+  if ($portlet) $target = "target=\"_blank\"";
 
   // Sort occurrences by date (cause repeat and no repeat events)
   if (is_array($occurrences)) {
@@ -1508,7 +1509,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
       if ($current->isToday()) $klass="highlight";
       $dis_events .= "
         <tr class=\"$klass\">
-          <td><a href=\"calendar_index.php?cal_range=day&amp;date=".$current->getURL()."\">$label</a></td>
+          <td><a $target href=\"calendar_index.php?cal_range=day&amp;date=".$current->getURL()."\">$label</a></td>
           <td>";
 
       foreach($occurrence as $k => $v) {
@@ -1700,7 +1701,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
                 <th>$l_items</th><td>$item_list</td>
               </tr>
             </table>
-            <a href=\"calendar_index.php?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>
+            <a $target href=\"calendar_index.php?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>
           ";
         }
         if($event->all_day) {

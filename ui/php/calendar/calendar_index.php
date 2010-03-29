@@ -982,7 +982,7 @@ if ($action == 'search') {
     $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
       OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
     );
-    $display['detail'] = dis_calendar_day_list($current_view, $calendar_entity, $writable_entity);
+    $display['detail'] = dis_calendar_day_list($current_view, $calendar_entity, $writable_entity, true);
   } else if (isset($params['waiting'])) {
     $display['detail'] = dis_calendar_waiting_portlet();
   } else if (isset($params['task'])) {
