@@ -679,7 +679,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'rights_on_my_calendar') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = html_rights_on_my_calendar(true); 
+  $display['detail'] = html_rights_on_my_calendar(); 
 
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////

@@ -322,4 +322,4 @@ $l_import_template = "Importa un modello";
 $l_template = "Modello di evento"; 
 $l_attach_documents = "Allegare"; 
 $l_update_occurrence_message = "Vuoi modificare solo questa occorenza o tutta la fila?"; 
-$l_display_all = "Visualizzare tutte le";
+$l_display_more = "Visualizzare tutte le";

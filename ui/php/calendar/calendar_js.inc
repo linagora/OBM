@@ -60,6 +60,106 @@ function setQuickTitle() {
   $('tf_quick_title').value = obm.vars.consts.template_title[$('template_id').selectedIndex];
 }
 
+function showNextRights(right, elem) {
+  switch(right) {
+    case 'access':
+      users = obm.vars.consts.accessEntities;
+      start = obm.vars.consts.accessOffset;
+      el = $('moreAccess');
+      container = $('accessRight');
+      obm.vars.consts.accessOffset +=obm.vars.consts.rightLimit;
+      end = obm.vars.consts.accessOffset;
+      break;
+    case 'read':
+      users = obm.vars.consts.readEntities;
+      start = obm.vars.consts.readOffset;
+      el = $('moreRead');
+      container = $('readRight');
+      obm.vars.consts.readOffset +=obm.vars.consts.rightLimit;
+      end = obm.vars.consts.readOffset;
+      break;
+    case 'write':
+      users = obm.vars.consts.writeEntities;
+      start = obm.vars.consts.writeOffset;
+      el = $('moreWrite');
+      container = $('writeRight');
+      obm.vars.consts.writeOffset +=obm.vars.consts.rightLimit;
+      end = obm.vars.consts.writeOffset;
+      break;
+    case 'admin':
+      users = obm.vars.consts.adminEntities;
+      start = obm.vars.consts.adminOffset;
+      el = $('moreAdmin');
+      container = $('adminRight');
+      obm.vars.consts.adminOffset +=obm.vars.consts.rightLimit;
+      end = obm.vars.consts.adminOffset;
+      break;
+  }
+
+  container.empty();
+  for(i=start;i<end;i++) {
+    if (\$chk(users[i])) {
+      li = new Element('li');
+      li.innerHTML = users[i];
+      container.adopt(li);
+    } else {
+      // el.style.display='none';
+    }
+  }
+}
+
+function showPrevRights(right, elem) {
+  switch(right) {
+    case 'access':
+      users = obm.vars.consts.accessEntities;
+      start = obm.vars.consts.accessOffset-obm.vars.consts.rightLimit*2;
+      if (start < 0) start = 0;
+      el = $('moreAccess');
+      container = $('accessRight');
+      end = start + obm.vars.consts.rightLimit;
+      obm.vars.consts.accessOffset = end;
+      break;
+    case 'read':
+      users = obm.vars.consts.readEntities;
+      start = obm.vars.consts.readOffset-obm.vars.consts.rightLimit*2;
+      if (start < 0) start = 0;
+      el = $('moreRead');
+      container = $('readRight');
+      end = start + obm.vars.consts.rightLimit;
+      obm.vars.consts.readOffset = end;
+      break;
+    case 'write':
+      users = obm.vars.consts.writeEntities;
+      start = obm.vars.consts.writeOffset-obm.vars.consts.rightLimit*2;
+      if (start < 0) start = 0;
+      el = $('moreWrite');
+      container = $('writeRight');
+      end = start + obm.vars.consts.rightLimit;
+      obm.vars.consts.writeOffset = end;
+      break;
+    case 'admin':
+      users = obm.vars.consts.adminEntities;
+      start = obm.vars.consts.adminOffset-obm.vars.consts.rightLimit*2;
+      if (start < 0) start = 0;
+      el = $('moreWrite');
+      container = $('adminRight');
+      end = start + obm.vars.consts.rightLimit;
+      obm.vars.consts.adminOffset = end;
+      break;
+  }
+
+  container.empty();
+  for(i=start;i<end;i++) {
+    if (\$chk(users[i])) {
+      li = new Element('li');
+      li.innerHTML = users[i];
+      container.adopt(li);
+    } else {
+      // el.style.display='none';
+    }
+  }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 function changePeriod(date) {
   var entities = new Array();

@@ -5117,69 +5117,74 @@ function dis_calendar_right_dis_admin($id='') {
   return $block;
 }
 
-function html_rights_on_my_calendar($all=false) {
+function html_rights_on_my_calendar() {
 
-  $more = "<li><a href='calendar_index.php?action=rights_on_my_calendar'>$GLOBALS[l_display_all]</a></li>";
+  $more = "<li><a href='calendar_index.php?action=rights_on_my_calendar'>$GLOBALS[l_display_more]</a></li>";
+  $limit = 50;
+
   $accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access'); 
   sort($accessEntities);
-  if (sizeof($accessEntities) > 50 && !$all) {
-    for($i=0;$i<50;$i++) {
+  $js_accessEntities = phpArrayToJsArray($accessEntities);
+  if (sizeof($accessEntities) > $limit) {
+    for($i=0;$i<$limit;$i++) {
       $dis_access .= "<li>$accessEntities[$i]</li>";
     }
-    $dis_access .= $more;
+    $nav_access = "<a id='moreAccess' href='#' onclick='showPrevRights(\"access\", this);'> << $GLOBALS[l_previous]</a>";
+    $nav_access .= "<a style='float:right;margin-right:2px;'id='moreAccess' href='#' onclick='showNextRights(\"access\", this);'>$GLOBALS[l_next] >> </a>";
   } else {
-    foreach($accessEntities as $entity) {
-      $dis_access .= "<li>$entity</li>";
+    foreach($accessEntities as $u) {
+      $dis_access .= "<li>$u</li>";
     }
   }
 
   $readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read'); 
   sort($readEntities);
-  if (sizeof($readEntities) > 50 && !$all) {
-    for($i=0;$i<50;$i++) {
+  $js_readEntities = phpArrayToJsArray($readEntities);
+  if (sizeof($readEntities) > $limit) {
+    for($i=0;$i<$limit;$i++) {
       $dis_read .= "<li>$readEntities[$i]</li>";
     }
-    $dis_read .= $more;
+    $nav_read = "<a id='moreAccess' href='#' onclick='showPrevRights(\"read\", this);'> << $GLOBALS[l_previous]</a>";
+    $nav_read .= "<a style='float:right;margin-right:2px;'id='moreAccess' href='#' onclick='showNextRights(\"read\", this);'>$GLOBALS[l_next] >> </a>";
+
   } else {
-    foreach($readEntities as $entity) {
-      $dis_read .= "<li>$entity</li>";
+    foreach($readEntities as $u) {
+      $dis_read .= "<li>$u</li>";
     }
   }
+
   $writeEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'write');
   sort($writeEntities); 
-  if (sizeof($writeEntities) > 50 && !$all) {
-    for($i=0;$i<50;$i++) {
+  $js_writeEntities = phpArrayToJsArray($writeEntities);
+  if (sizeof($writeEntities) > $limit) {
+    for($i=0;$i<$limit;$i++) {
       $dis_write .= "<li>$writeEntities[$i]</li>";
     }
-    $dis_write .= $more;
+    $dis_write .= "<li><a id='moreWrite' href='#' onclick='showMoreRights(\"write\", this);'>$GLOBALS[l_display_more]</a></li>";
   } else {
-    foreach($writeEntities as $entity) {
-      $dis_write .= "<li>$entity</li>";
+    foreach($writeEntities as $u) {
+      $dis_write .= "<li>$u</li>";
     }
   }
- $adminEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'admin'); 
+
+  $adminEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'admin'); 
   sort($adminEntities);
-  if (sizeof($adminEntities) > 50 && !$all) {
-    for($i=0;$i<50;$i++) {
+  $js_adminEntities = phpArrayToJsArray($adminEntities);
+  if (sizeof($adminEntities) > $limit) {
+    for($i=0;$i<$limit;$i++) {
       $dis_admin .= "<li>$adminEntities[$i]</li>";
     }
-    $dis_admin .= $more;
+    $dis_admin .= "<li><a id='moreAdmin' href='#' onclick='showMoreRights(\"admin\", this);'>$GLOBALS[l_display_more]</a></li>";
   } else {
-    foreach($adminEntities as $entity) {
-      $dis_admin .= "<li>$entity</li>";
+    foreach($adminEntities as $u) {
+      $dis_admin .= "<li>$u</li>";
     }
   }
-  if ($all) {
-    $back = "<form method='GET' action='$GLOBALS[path]/calendar/".basename($_SERVER['SCRIPT_NAME'])."'>
-      <input type='submit' value='$GLOBALS[l_back]'/>
-      <input type='hidden' name='action' value='rights_admin'/>
-    </form>";
-  }
-  
+
   $block = "
     <h1>$GLOBALS[l_rights_my_on]</h1>
     $back
-    <table class=\"spreadSheet rights\">
+    <table class=\"spreadSheet rights\" style='table-layout:fixed;'>
     <thead>
       <tr>
         <th>$GLOBALS[l_access_permission]</th>
@@ -5191,20 +5196,41 @@ function html_rights_on_my_calendar($all=false) {
     <tbody style='vertical-align:top;'>
     <tr>
       <td>
-        <ul>$dis_access</ul>
+        <div style='overflow-y:scroll;height:150px;'>
+          <ul id='accessRight'>$dis_access</ul>
+          $nav_access
+        </div>
       </td>
       <td>
-        <ul>$dis_read</ul>
+        <div style='overflow-y:scroll;height:150px;'>
+          <ul id='readRight'>$dis_read</ul>
+           $nav_read
+        </div>
       </td>
       <td>
-        <ul>$dis_write</ul>
+        <div style='overflow-y:scroll;height:150px;'>
+          <ul id='writeRight'>$dis_write</ul>
+        </div>
       </td>
       <td>
-        <ul>$dis_admin</ul>
+        <div style='overflow-y:scroll;height:150px;'>
+          <ul id='adminRight'>$dis_admin</ul>
+        </div>
       </td>
     </tr>
     </tbody>
-    </table>";
+    </table>
+    <script type=\"text/javascript\">
+      obm.vars.consts.accessEntities = $js_accessEntities;
+      obm.vars.consts.readEntities = $js_readEntities;
+      obm.vars.consts.writeEntities = $js_writeEntities;
+      obm.vars.consts.adminEntities = $js_adminEntities;
+      obm.vars.consts.accessOffset = $limit;
+      obm.vars.consts.readOffset = $limit;
+      obm.vars.consts.writeOffset = $limit;
+      obm.vars.consts.adminOffset = $limit;
+      obm.vars.consts.rightLimit = $limit;
+    </script>";
 
   return $block;
 }

@@ -91,7 +91,7 @@ $l_parent_event = "Evènement parent";
 $l_show_parent_event = "Consulter la série à laquelle il était rattaché";
 $l_eventexception_canceled = "annulé";
 $l_eventexception_moved_to = "déplacé vers le %s";
-$l_display_all = "Afficher tout";
+$l_display_more = "Afficher plus";
 
 // PDF Options
 $l_display_details = "Afficher les détails";
