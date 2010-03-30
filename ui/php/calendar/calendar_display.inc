@@ -5437,7 +5437,7 @@ function dis_calendar_my_rights() {
   $readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read'); 
   sort($readEntities);
   $js_readEntities = phpArrayToJsArray($readEntities);
-  $dis_read = dis_calendar_my_rights_detail($readEntities, 50, 'read');
+  $dis_read = dis_calendar_my_rights_detail($readEntities, $limit, 'read');
 
   $writeEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'write');
   sort($writeEntities);

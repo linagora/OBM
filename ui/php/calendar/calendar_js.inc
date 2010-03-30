@@ -105,10 +105,7 @@ function showPrevRights(right, elem) {
     case 'access':
       users = obm.vars.consts.accessEntities;
       start = obm.vars.consts.accessOffset-obm.vars.consts.rightLimit*2;
-      if (start <= 0) {
-        elem.style.display = 'none';
-        start = 0;
-      }
+      if (start < 0) start = 0;
       container = $('accessRight');
       end = start + obm.vars.consts.rightLimit;
       obm.vars.consts.accessOffset = end;
@@ -146,6 +143,7 @@ function showPrevRights(right, elem) {
       container.adopt(li);
     }
   }
+  if (start <= 0) elem.style.display = 'none';
   $(right+'Next').style.display = '';
 }
 
