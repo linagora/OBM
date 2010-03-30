@@ -1577,6 +1577,9 @@ Obm.CalendarQuickForm = new Class({
 
     var type = str[0];
     $('sel_template').style.display ='';
+    if ($chk($('template_id'))) {
+      $('template_id').selectedIndex = 0;
+    }
     if (type == 'time') {
       /* Crappy ie fix*/
       var x = ivent.event.layerX;

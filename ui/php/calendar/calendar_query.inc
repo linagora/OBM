@@ -1715,10 +1715,10 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
       $datebegin->setHour(0)->setMinute(0)->setSecond(0);
       $calendar['all_day'] = 1;
     }
-    $event_location = $q->f("event_location");
+    $event_location = addslashes($q->f("event_location"));
     $calendar['location'] = $event_location; 
     $event_privacy = $q->f("event_privacy");
-    $event_description = $q->f("event_description");
+    $event_description = addslashes($q->f("event_description"));
     $calendar['description'] = $event_description; 
     $event_priority = $q->f("event_priority");
     $event_repeatkind = $q->f("event_repeatkind");
