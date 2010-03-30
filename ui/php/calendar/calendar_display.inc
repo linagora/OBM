@@ -5415,69 +5415,43 @@ function dis_calendar_right_dis_admin($id='') {
   }
   $block .= of_right_dis_admin('calendar', $id);
   $block .= html_share_calendar($id,$name);
-  $block .= html_rights_on_my_calendar();
+  $block .= dis_calendar_my_rights();
 
   return $block;
 }
 
 
-function html_rights_on_my_calendar($all=false) {
+/*
+ * dis_calendar_my_rights
+ * @return html
+ */ 
+function dis_calendar_my_rights() {
 
-  $more = "<li><a href='calendar_index.php?action=rights_on_my_calendar'>$GLOBALS[l_know_more]</a></li>";
+  $limit = 50;
+
   $accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access'); 
   sort($accessEntities);
-  if (sizeof($accessEntities) > 50 && !$all) {
-    for($i=0;$i<50;$i++) {
-      $dis_access .= "<li>$accessEntities[$i]</li>";
-    }
-    $dis_access .= $more;
-  } else {
-    foreach($accessEntities as $entity) {
-      $dis_access .= "<li>$entity</li>";
-    }
-  }
+  $js_accessEntities = phpArrayToJsArray($accessEntities);
+  $dis_access = dis_calendar_my_rights_detail($accessEntities, $limit, 'access');
 
   $readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read'); 
   sort($readEntities);
-  if (sizeof($readEntities) > 50 && !$all) {
-    for($i=0;$i<50;$i++) {
-      $dis_read .= "<li>$readEntities[$i]</li>";
-    }
-    $dis_read .= $more;
-  } else {
-    foreach($readEntities as $entity) {
-      $dis_read .= "<li>$entity</li>";
-    }
-  }
+  $js_readEntities = phpArrayToJsArray($readEntities);
+  $dis_read = dis_calendar_my_rights_detail($readEntities, 50, 'read');
+
   $writeEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'write');
-  sort($writeEntities); 
-  if (sizeof($writeEntities) > 50 && !$all) {
-    for($i=0;$i<50;$i++) {
-      $dis_write .= "<li>$writeEntities[$i]</li>";
-    }
-    $dis_write .= $more;
-  } else {
-    foreach($writeEntities as $entity) {
-      $dis_write .= "<li>$entity</li>";
-    }
-  }
+  sort($writeEntities);
+  $js_writeEntities = phpArrayToJsArray($writeEntities);
+  $dis_write = dis_calendar_my_rights_detail($writeEntities, $limit, 'write');
 
   $adminEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'admin'); 
   sort($adminEntities);
-  if (sizeof($adminEntities) > 50 && !$all) {
-    for($i=0;$i<50;$i++) {
-      $dis_admin .= "<li>$adminEntities[$i]</li>";
-    }
-    $dis_admin .= $more;
-  } else {
-    foreach($adminEntities as $entity) {
-      $dis_admin .= "<li>$entity</li>";
-    }
-  }
+  $js_adminEntities = phpArrayToJsArray($adminEntities);
+  $dis_admin = dis_calendar_my_rights_detail($adminEntities, $limit, 'admin');
   
   $block = "
-    <h1>$GLOBALS[l_rights_my_on]</h1>
-    <table class=\"spreadSheet rights\">
+  <h1>$GLOBALS[l_rights_my_on]</h1>
+  <table class='spreadSheet rights'>
     <thead>
       <tr>
         <th>$GLOBALS[l_access_permission]</th>
@@ -5487,25 +5461,65 @@ function html_rights_on_my_calendar($all=false) {
       </tr>
     </thead>
     <tbody style='vertical-align:top;'>
-    <tr>
-      <td>
-        <ul>$dis_access</ul>
-      </td>
-      <td>
-        <ul>$dis_read</ul>
-      </td>
-      <td>
-        <ul>$dis_write</ul>
-      </td>
-      <td>
-        <ul>$dis_admin</ul>
-      </td>
-    </tr>
+      <tr>
+        <td>
+          $dis_access
+        </td>
+        <td>
+          $dis_read
+        </td>
+        <td>
+          $dis_write
+        </td>
+        <td>
+          $dis_admin
+        </td>
+      </tr>
     </tbody>
-    </table>";
+  </table>
+  <script type=\"text/javascript\">
+    obm.vars.consts.accessEntities = $js_accessEntities;
+    obm.vars.consts.readEntities = $js_readEntities;
+    obm.vars.consts.writeEntities = $js_writeEntities;
+    obm.vars.consts.adminEntities = $js_adminEntities;
+    obm.vars.consts.accessOffset = $limit;
+    obm.vars.consts.readOffset = $limit;
+    obm.vars.consts.writeOffset = $limit;
+    obm.vars.consts.adminOffset = $limit;
+    obm.vars.consts.rightLimit = $limit;
+  </script>";
 
   return $block;
 }
+
+
+/*
+ * dis_calendar_my_rights_detail
+ * @return html
+ */ 
+function dis_calendar_my_rights_detail($entities, $limit, $right) {
+  if (sizeof($entities) > $limit) {
+    for($i=0;$i<$limit;$i++) {
+      $list .= "<li>$entities[$i]</li>";
+    }
+    $nav = "
+      <a href='#' id='{$right}Prev' style='display:none;' onclick='showPrevRights(\"$right\", this);'>« $GLOBALS[l_previous]</a>
+      <a href='#' id='{$right}Next' style='float:right;margin-right:2px;' onclick='showNextRights(\"$right\", this);'>$GLOBALS[l_next] »</a>";
+  } else {
+    foreach($entities as $entity) {
+      $list .= "<li>$entity</li>";
+    }
+  }
+  $container = $right."Right";
+  $ret = "
+  <div style='overflow-y:scroll;height:300px;'>
+    <ul id='$container'>$list</ul>
+    $nav
+  </div>";
+
+  return $ret;
+}
+
 
 /**
  * html_calendar_ressource_list
@@ -8960,17 +8974,10 @@ function dis_calendar_waiting_portlet() {
  * Back to calendar link
  */
 function dis_back_to_calendar($action) {
-  if ($action == 'rights_on_my_calendar') {
-    $block = "
-    <div id='backToCalendar'>
-      <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php?action=rights_admin'>« $GLOBALS[l_header_right]</a>
-    </div>";
-  } else {
-    $block = "
-    <div id='backToCalendar'>
-      <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php'>$GLOBALS[l_back_to_calendar]</a>
-    </div>";
-  }
+  $block = "
+  <div id='backToCalendar'>
+    <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php'>$GLOBALS[l_back_to_calendar]</a>
+  </div>";
   return $block;
 }
 

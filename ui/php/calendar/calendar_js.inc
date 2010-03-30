@@ -56,6 +56,100 @@ function setAdvancedSearchDate(rd) {
   }
 }
 
+function showNextRights(right, elem) {
+  switch(right) {
+    case 'access':
+      users = obm.vars.consts.accessEntities;
+      start = obm.vars.consts.accessOffset;
+      container = $('accessRight');
+      obm.vars.consts.accessOffset +=obm.vars.consts.rightLimit;
+      end = obm.vars.consts.accessOffset;
+      break;
+    case 'read':
+      users = obm.vars.consts.readEntities;
+      start = obm.vars.consts.readOffset;
+      container = $('readRight');
+      obm.vars.consts.readOffset +=obm.vars.consts.rightLimit;
+      end = obm.vars.consts.readOffset;
+      break;
+    case 'write':
+      users = obm.vars.consts.writeEntities;
+      start = obm.vars.consts.writeOffset;
+      container = $('writeRight');
+      obm.vars.consts.writeOffset +=obm.vars.consts.rightLimit;
+      end = obm.vars.consts.writeOffset;
+      break;
+    case 'admin':
+      users = obm.vars.consts.adminEntities;
+      start = obm.vars.consts.adminOffset;
+      container = $('adminRight');
+      obm.vars.consts.adminOffset +=obm.vars.consts.rightLimit;
+      end = obm.vars.consts.adminOffset;
+      break;
+  }
+  container.empty();
+  for(i=start;i<end;i++) {
+    if (\$chk(users[i])) {
+      li = new Element('li');
+      li.innerHTML = users[i];
+      container.adopt(li);
+    } else {
+      elem.style.display = 'none';
+    }
+  }
+  $(right+'Prev').style.display = '';
+}
+
+function showPrevRights(right, elem) {
+  switch(right) {
+    case 'access':
+      users = obm.vars.consts.accessEntities;
+      start = obm.vars.consts.accessOffset-obm.vars.consts.rightLimit*2;
+      if (start <= 0) {
+        elem.style.display = 'none';
+        start = 0;
+      }
+      container = $('accessRight');
+      end = start + obm.vars.consts.rightLimit;
+      obm.vars.consts.accessOffset = end;
+      break;
+    case 'read':
+      users = obm.vars.consts.readEntities;
+      start = obm.vars.consts.readOffset-obm.vars.consts.rightLimit*2;
+      if (start < 0) start = 0;
+      container = $('readRight');
+      end = start + obm.vars.consts.rightLimit;
+      obm.vars.consts.readOffset = end;
+      break;
+    case 'write':
+      users = obm.vars.consts.writeEntities;
+      start = obm.vars.consts.writeOffset-obm.vars.consts.rightLimit*2;
+      if (start < 0) start = 0;
+      container = $('writeRight');
+      end = start + obm.vars.consts.rightLimit;
+      obm.vars.consts.writeOffset = end;
+      break;
+    case 'admin':
+      users = obm.vars.consts.adminEntities;
+      start = obm.vars.consts.adminOffset-obm.vars.consts.rightLimit*2;
+      if (start < 0) start = 0;
+      container = $('adminRight');
+      end = start + obm.vars.consts.rightLimit;
+      obm.vars.consts.adminOffset = end;
+      break;
+  }
+  container.empty();
+  for(i=start;i<end;i++) {
+    if (\$chk(users[i])) {
+      li = new Element('li');
+      li.innerHTML = users[i];
+      container.adopt(li);
+    }
+  }
+  $(right+'Next').style.display = '';
+}
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 function performMeeting() {
@@ -803,11 +897,11 @@ function reinitSharePopup(type){
       new Element('div').setProperty('class','buttons')
                       .adopt(
         new Element('input').setProperty('type','submit')
-                            .setProperty('value','$GLOBALS[l_validate]')
+                            .setProperty('value','$GLOBALS[l_yes]')
                             .setProperty('class','closeSticky')
                             .setProperty('onClick','reinitUrl(\"'+type+'\")'),
         new Element('input').setProperty('type','submit')
-                            .setProperty('value','$GLOBALS[l_cancel]')
+                            .setProperty('value','$GLOBALS[l_no]')
                             .setProperty('class','closeSticky')
       )
   );

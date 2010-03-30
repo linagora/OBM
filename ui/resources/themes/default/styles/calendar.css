@@ -1346,6 +1346,10 @@ h1.hoursTitle{
   padding-left: 10px;
 }
 
+.rights {
+  table-layout:fixed;
+}
+
 .rights ul {
   margin: 0;
   padding-left:5px;
