@@ -202,8 +202,7 @@ sub _loadEntities {
     }
 
     my $query = 'SELECT '.$groupTablePrefix.'UGroup.*,
-                        current.group_name as group_name_current,
-                        current.group_contacts as group_contacts_current
+                        current.group_name as group_name_current
                  FROM '.$groupTablePrefix.'UGroup
                  LEFT JOIN P_UGroup current ON current.group_id='.$groupTablePrefix.'UGroup.group_id
                  WHERE '.$groupTablePrefix.'UGroup.group_domain_id='.$self->{'domainId'}.'
@@ -396,8 +395,6 @@ sub _getVirtualGroups {
         'group_id' => '0',
         'group_local' => '1',
         'group_gid' => '515',
-		'group_contacts' => undef,
-        'group_contacts_current' => undef,
         'group_domain_id' => '2' };
 	 
 }
@@ -447,50 +444,6 @@ sub _getChildGroupIds {
 
     @childIds = keys(%childIds);
     return \@childIds;
-}
-
-
-sub _getChildContacts {
-    my $self = shift;
-    my( $groupChildIds ) = @_;
-
-    if( ref($groupChildIds) ne 'ARRAY' ) {
-        $self->_log( 'liste d\'identifiants pères incorrecte', 1 );
-        return undef;
-    }
-
-    if( $#$groupChildIds < 0 ) {
-        return undef;
-    }
-
-    require OBM::Tools::obmDbHandler;
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-
-    if( !$dbHandler ) {
-        $self->_log( 'connexion à la base de données impossible', 1 );
-        return undef;
-    }
-
-    my $query = 'SELECT group_contacts
-                 FROM P_UGroup
-                 WHERE group_id IN ('.join( ',', @{$groupChildIds} ).')
-                 ORDER BY group_id';
-
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 'obtention des contacts externes des groupes fils impossible', 1 );
-        return undef;
-    }
-
-    my $childExternalContacts;
-    while( my $groupChild = $queryResult->fetchrow_hashref() ) {
-        if( $groupChild->{'group_contacts'} ) {
-            $childExternalContacts .= "\r\n" if $childExternalContacts;
-            $childExternalContacts .= $groupChild->{'group_contacts'};
-        }
-    }
-
-    return $childExternalContacts;
 }
 
 

@@ -71,8 +71,7 @@ sub update {
                         group_manager_id,
                         group_name,
                         group_desc,
-                        group_email,
-                        group_contacts
+                        group_email
                     ) SELECT    group_id,
                                 group_domain_id,
                                 group_timecreate,
@@ -90,8 +89,7 @@ sub update {
                                 group_manager_id,
                                 group_name,
                                 group_desc,
-                                group_email,
-                                group_contacts
+                                group_email
                       FROM UGroup
                       WHERE group_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {

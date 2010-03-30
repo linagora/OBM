@@ -358,11 +358,6 @@ sub updateLinkedEntities {
     my $self = shift;
     my( $updateType ) = @_;
 
-    if( $self->{'entityDesc'}->{'group_contacts'} ne $self->{'entityDesc'}->{'group_contacts_current'} ) {
-        $self->_log( 'changement des contacts externes de '.$self->getDescription().', les groupes parents doivent être mis à jour', 3 );
-        return 1;
-    }
-
     if( ($updateType =~ /^(UPDATE_ALL|UPDATE_LINKS)$/) && ($self->{'entityDesc'}->{'group_gid'} == 512) ) {
         $self->_log( 'les membres de '.$self->getDescription().' ont été mis à jour, ils doivent être mis à jour', 3 );
         return 1;
