@@ -701,9 +701,9 @@ if ($action == 'search') {
   if (check_tag_form($params)) {
     $retour = run_query_tag_update($obm['uid'], $params);
     if ($retour) {
-      $display['msg'] .= display_ok_msg("Tag : $l_update_ok");
+      $display['msg'] .= display_ok_msg("$l_tag : $l_update_ok");
     } else {
-      $display['msg'] .= display_err_msg("Tag : $l_update_error");
+      $display['msg'] .= display_err_msg("$l_tag : $l_update_error");
     }
   }
   else {
@@ -720,9 +720,9 @@ if ($action == 'search') {
   if (check_tag_form($params)) {
     $retour = run_query_tag_insert($obm['uid'], $params);
     if ($retour) {
-      $display['msg'] .= display_ok_msg("Tag : $l_insert_ok");
+      $display['msg'] .= display_ok_msg("$l_tag : $l_insert_ok");
     } else {
-      $display['msg'] .= display_err_msg("Tag : $l_insert_error");
+      $display['msg'] .= display_err_msg("$l_tag : $l_insert_error");
     }
   }
   else {
@@ -738,9 +738,9 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_tag_delete($obm['uid'], $params);
   if ($retour) {
-    $display['msg'] .= display_ok_msg("Tag : $l_delete_ok");
+    $display['msg'] .= display_ok_msg("$l_tag : $l_delete_ok");
   } else {
-    $display['msg'] .= display_err_msg("Tag : $l_delete_error");
+    $display['msg'] .= display_err_msg("$l_tag : $l_delete_error");
   }
   $extra_js_include[] = 'inplaceeditor.js';
   $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
