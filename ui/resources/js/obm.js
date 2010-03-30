@@ -660,3 +660,11 @@ function refreshWaitEvent() {
         }
   }).get({ajax : 1,action : 'get_json_waiting_events'});
 }
+
+//used by calendar to go through webkit's bug #18994 (https://bugs.webkit.org/show_bug.cgi?id=18994)
+String.prototype.toFloat = function(){
+  var value = this;
+  value = value.replace(',','.');
+  return parseFloat(value);
+};
+
