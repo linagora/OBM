@@ -4608,10 +4608,10 @@ function run_query_calendar_get_alltags($obmUserId=null,$tag_id=null) {
   $obm_q = new DB_OBM ;
   if ($obmUserId) {
     $uid = sql_parse_id($obmUserId);
-    $where = " WHERE eventtag_user_id='$uid'";
+    $where = " AND eventtag_user_id='$uid'";
   }
-  if ($tag_id) $where = "AND eventtag_id=$tag_id";
-  $query = "SELECT * FROM EventTag $where 
+  if ($tag_id) $where = " AND eventtag_id=$tag_id";
+  $query = "SELECT * FROM EventTag WHERE 1=1 $where 
     ORDER BY eventtag_label";
   $obm_q->query($query) ;
   display_debug_msg($query, $cdg_sql,"run_query_calendar_get_alltags()");
