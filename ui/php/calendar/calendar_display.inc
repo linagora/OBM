@@ -5119,72 +5119,31 @@ function dis_calendar_right_dis_admin($id='') {
 
 function html_rights_on_my_calendar() {
 
-  $more = "<li><a href='calendar_index.php?action=rights_on_my_calendar'>$GLOBALS[l_display_more]</a></li>";
   $limit = 50;
 
   $accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access'); 
   sort($accessEntities);
   $js_accessEntities = phpArrayToJsArray($accessEntities);
-  if (sizeof($accessEntities) > $limit) {
-    for($i=0;$i<$limit;$i++) {
-      $dis_access .= "<li>$accessEntities[$i]</li>";
-    }
-    $nav_access = "<a id='moreAccess' href='#' onclick='showPrevRights(\"access\", this);'> << $GLOBALS[l_previous]</a>";
-    $nav_access .= "<a style='float:right;margin-right:2px;'id='moreAccess' href='#' onclick='showNextRights(\"access\", this);'>$GLOBALS[l_next] >> </a>";
-  } else {
-    foreach($accessEntities as $u) {
-      $dis_access .= "<li>$u</li>";
-    }
-  }
+  $dis_access = dis_calendar_my_rights_detail($accessEntities, $limit, 'access');
 
   $readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read'); 
   sort($readEntities);
   $js_readEntities = phpArrayToJsArray($readEntities);
-  if (sizeof($readEntities) > $limit) {
-    for($i=0;$i<$limit;$i++) {
-      $dis_read .= "<li>$readEntities[$i]</li>";
-    }
-    $nav_read = "<a id='moreAccess' href='#' onclick='showPrevRights(\"read\", this);'> << $GLOBALS[l_previous]</a>";
-    $nav_read .= "<a style='float:right;margin-right:2px;'id='moreAccess' href='#' onclick='showNextRights(\"read\", this);'>$GLOBALS[l_next] >> </a>";
-
-  } else {
-    foreach($readEntities as $u) {
-      $dis_read .= "<li>$u</li>";
-    }
-  }
+  $dis_read = dis_calendar_my_rights_detail($readEntities, $limit, 'read');
 
   $writeEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'write');
-  sort($writeEntities); 
+  sort($writeEntities);
   $js_writeEntities = phpArrayToJsArray($writeEntities);
-  if (sizeof($writeEntities) > $limit) {
-    for($i=0;$i<$limit;$i++) {
-      $dis_write .= "<li>$writeEntities[$i]</li>";
-    }
-    $dis_write .= "<li><a id='moreWrite' href='#' onclick='showMoreRights(\"write\", this);'>$GLOBALS[l_display_more]</a></li>";
-  } else {
-    foreach($writeEntities as $u) {
-      $dis_write .= "<li>$u</li>";
-    }
-  }
+  $dis_write = dis_calendar_my_rights_detail($writeEntities, $limit, 'write');
 
   $adminEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'admin'); 
   sort($adminEntities);
   $js_adminEntities = phpArrayToJsArray($adminEntities);
-  if (sizeof($adminEntities) > $limit) {
-    for($i=0;$i<$limit;$i++) {
-      $dis_admin .= "<li>$adminEntities[$i]</li>";
-    }
-    $dis_admin .= "<li><a id='moreAdmin' href='#' onclick='showMoreRights(\"admin\", this);'>$GLOBALS[l_display_more]</a></li>";
-  } else {
-    foreach($adminEntities as $u) {
-      $dis_admin .= "<li>$u</li>";
-    }
-  }
-
+  $dis_admin = dis_calendar_my_rights_detail($adminEntities, $limit, 'admin');
+  
   $block = "
-    <h1>$GLOBALS[l_rights_my_on]</h1>
-    $back
-    <table class=\"spreadSheet rights\" style='table-layout:fixed;'>
+  <h1>$GLOBALS[l_rights_my_on]</h1>
+  <table class='spreadSheet rights'>
     <thead>
       <tr>
         <th>$GLOBALS[l_access_permission]</th>
@@ -5194,46 +5153,64 @@ function html_rights_on_my_calendar() {
       </tr>
     </thead>
     <tbody style='vertical-align:top;'>
-    <tr>
-      <td>
-        <div style='overflow-y:scroll;height:150px;'>
-          <ul id='accessRight'>$dis_access</ul>
-          $nav_access
-        </div>
-      </td>
-      <td>
-        <div style='overflow-y:scroll;height:150px;'>
-          <ul id='readRight'>$dis_read</ul>
-           $nav_read
-        </div>
-      </td>
-      <td>
-        <div style='overflow-y:scroll;height:150px;'>
-          <ul id='writeRight'>$dis_write</ul>
-        </div>
-      </td>
-      <td>
-        <div style='overflow-y:scroll;height:150px;'>
-          <ul id='adminRight'>$dis_admin</ul>
-        </div>
-      </td>
-    </tr>
+      <tr>
+        <td>
+          $dis_access
+        </td>
+        <td>
+          $dis_read
+        </td>
+        <td>
+          $dis_write
+        </td>
+        <td>
+          $dis_admin
+        </td>
+      </tr>
     </tbody>
-    </table>
-    <script type=\"text/javascript\">
-      obm.vars.consts.accessEntities = $js_accessEntities;
-      obm.vars.consts.readEntities = $js_readEntities;
-      obm.vars.consts.writeEntities = $js_writeEntities;
-      obm.vars.consts.adminEntities = $js_adminEntities;
-      obm.vars.consts.accessOffset = $limit;
-      obm.vars.consts.readOffset = $limit;
-      obm.vars.consts.writeOffset = $limit;
-      obm.vars.consts.adminOffset = $limit;
-      obm.vars.consts.rightLimit = $limit;
-    </script>";
+  </table>
+  <script type=\"text/javascript\">
+    obm.vars.consts.accessEntities = $js_accessEntities;
+    obm.vars.consts.readEntities = $js_readEntities;
+    obm.vars.consts.writeEntities = $js_writeEntities;
+    obm.vars.consts.adminEntities = $js_adminEntities;
+    obm.vars.consts.accessOffset = $limit;
+    obm.vars.consts.readOffset = $limit;
+    obm.vars.consts.writeOffset = $limit;
+    obm.vars.consts.adminOffset = $limit;
+    obm.vars.consts.rightLimit = $limit;
+  </script>";
 
   return $block;
 }
+
+/*
+ * dis_calendar_my_rights_detail
+ * @return html
+ */ 
+function dis_calendar_my_rights_detail($entities, $limit, $right) {
+  if (sizeof($entities) > $limit) {
+    for($i=0;$i<$limit;$i++) {
+      $list .= "<li>$entities[$i]</li>";
+    }
+    $nav = "
+      <a href='#' id='{$right}Prev' style='display:none;' onclick='showPrevRights(\"$right\", this);'>« $GLOBALS[l_previous]</a>
+      <a href='#' id='{$right}Next' style='float:right;margin-right:2px;' onclick='showNextRights(\"$right\", this);'>$GLOBALS[l_next] »</a>";
+  } else {
+    foreach($entities as $entity) {
+      $list .= "<li>$entity</li>";
+    }
+  }
+  $container = $right."Right";
+  $ret = "
+  <div style='overflow-y:scroll;height:300px;'>
+    <ul id='$container'>$list</ul>
+    $nav
+  </div>";
+
+  return $ret;
+}
+
 
 /**
  * html_calendar_ressource_list
