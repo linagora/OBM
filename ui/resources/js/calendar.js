@@ -2001,6 +2001,10 @@ Obm.CalendarQuickForm = new Class({
     }
 
     var type = str[0];
+    $('sel_template').style.display ='';
+    if ($chk($('template_id'))) {
+      $('template_id').selectedIndex = 0;
+    }
     if (type == 'time') {
       if(!obm.calendarManager.write) return false;
       /* Crappy ie fix*/
@@ -2024,6 +2028,7 @@ Obm.CalendarQuickForm = new Class({
 			var d = obm.calendarManager.startTime + dayContainer[1].toInt()*86400;
 			this.setDefaultFormValues(d,1, 3600);
     } else {
+      $('sel_template').style.display ='none';
       var evt = obm.calendarManager.events.get(target.id);
       this.setFormValues(evt);
     }
@@ -2142,6 +2147,10 @@ Obm.CalendarQuickForm = new Class({
     this.attendees.set('html','');
   },
 
+  setQuickTitle: function() {
+    $('tf_quick_title').value = obm.vars.consts.template_title[$('template_id').selectedIndex];
+  },
+
   show: function() {
     obm.popup.show('calendarQuickForm');
   },
@@ -2156,6 +2165,9 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.entity_id = this.entityView.get('inputValue');
     this.eventData.entity_kind = this.entityKind.value;
     this.eventData.send_mail = null;
+    if ($chk($('template_id'))) {
+      this.eventData.template_id = $('template_id').value;
+    }
     action = action || this.eventData.formAction;
     if (action == 'quick_insert') {
       obm.calendarManager.sendCreateEvent(this.eventData);
@@ -2175,6 +2187,9 @@ Obm.CalendarQuickForm = new Class({
     }
     this.eventData.entity_id = this.entityView.get('inputValue');
     this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)+'&new_user_id[]='+this.eventData.entity_id;
+    if($('template_id').value > 0) {
+      this.gotoURI += '&template_id='+$('template_id').value;
+    }
     window.location.href = obm.vars.consts.calendarUrl+'?'+this.gotoURI;
   }
 });

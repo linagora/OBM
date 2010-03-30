@@ -3230,97 +3230,119 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
  * @return HTML
  */
 function dis_calendar_quick_form($calendar_entity) {
-  global $obm,$ico_popup_close,$popup_queue,$l_validate, $l_edit, $l_edit_full;
-  global $l_confirm_delete,$l_c_delete, $l_title, $l_category1, $l_desc;
-  global $l_location, $l_owner, $l_members, $l_users, $l_carac, $l_items, $l_details;
+
+  $user_id = $GLOBALS[obm][uid];
 
   if(is_array($calendar_entity['user']) && sizeof($calendar_entity['user']) > 1){
     $u = get_user_info(); 
     $entity_view.="<select id=\"calendarViewEntity\">";
     foreach($calendar_entity['user'] as $user){
-      if(OBM_Acl::canAccess($obm['uid'], 'calendar',array($user['id']))) {
-        if($obm['uid'] == $user["id"]) {
+      if(OBM_Acl::canAccess($user_id, 'calendar',array($user['id']))) {
+        if($user_id == $user["id"]) {
           $uid = true;
         }
-        $entity_view.="<option id=\"calendarViewEntity$user[id]\" value=\"$user[id]\">$user[name]</option>";
+        $entity_view.="<option id='calendarViewEntity$user[id]' value='$user[id]'>$user[name]</option>";
       }
     }
     if(!isset($uid)) {
-      $entity_view.="<option id=\"calendarViewEntity$obm[uid]\" value=\"$obm[uid]\">$u[firstname] $u[lastname]</option>";
+      $entity_view.="<option id='calendarViewEntity$user_id' value='$user_id'>$u[firstname] $u[lastname]</option>";
     }
     $entity_view.="</select>";
-    $entity_view.="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+    $entity_view.="<input id='calendarKindEntity' type='hidden' value='user' />";
     $calendar_list_entity = "
-      <fieldset id=\"calendarListEntity\">
+      <fieldset id='calendarListEntity'>
         $GLOBALS[l_users] : $entity_view
       </fieldset>";
   } else {
     $user = array_values($calendar_entity['user']);
-    $calendar_list_entity ="<input id=\"calendarViewEntity\" type='hidden' value='".$user[0][id]."' />";
-    $calendar_list_entity .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+    $calendar_list_entity ="<input id='calendarViewEntity' type='hidden' value='".$user[0][id]."' />";
+    $calendar_list_entity .="<input id='calendarKindEntity' type='hidden' value='user' />";
   }
 
+  // template form
+  $templates_q = run_query_calendar_get_alltemplates($user_id);
+  $eventtemplate_title = array();
+  if ($templates_q->nf() > 0) {
+    array_push($eventtemplate_title, "");
+    while ($templates_q->next_record()) {
+      $id = $templates_q->f('eventtemplate_id');
+      $name = $templates_q->f('eventtemplate_name');
+      array_push($eventtemplate_title, phpStringToJsString($templates_q->f('eventtemplate_title')));
+      $select.= "<option value=\"$id\">$name</option>";
+    }
+
+    $block_template = "
+    $GLOBALS[l_template]:
+    <select id='template_id' name='template_id' onchange='obm.calendarQuickForm.setQuickTitle();'>
+      <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
+      $select
+    </select>";
+  }
+  $js_templatetitle = phpArrayToJsArray($eventtemplate_title);
+
   $block = "
-    <div id=\"calendarQuickForm\" class=\"obmPopup\">
+    <div id='calendarQuickForm' class='obmPopup'>
       <h1>
-      <a href=\"#\" id=\"popup_form_close\" class=\"closeSticky\" onclick=\"return false;\">
-      <img src=\"$ico_popup_close\" alt=\"close\" />
+      <a href='#' id='popup_form_close' class='closeSticky' onclick='return false;'>
+      <img src='$GLOBALS[ico_popup_close]' alt='close' />
       </a>
-      <span id=\"calendarQuickFormDate\"></span>
+      <span id='calendarQuickFormDate'></span>
       </h1>
       <h2>
-      <a id=\"calendarQuickFormTitle\" href=\"\" onclick=\"obm.calendarQuickForm.goTo('detailconsult'); return false\"></a>
+      <a id='calendarQuickFormTitle' href='#' onclick=\"obm.calendarQuickForm.goTo('detailconsult'); return false\"></a>
       </h2> 
-     <div class=\"content\">
-        <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
+     <div class='content'>
+        <form id='calendarQuickFormStore' onsubmit='obm.calendarQuickForm.submit();return false;'>
           <fieldset>
-            $l_title : <input type=\"text\" maxlength='255' name=\"tf_title\" /> 
+            $GLOBALS[l_title]: <input type='text' id='tf_quick_title' maxlength='255' name='tf_title' /> 
+            <span id='sel_template'><br/>$block_template</span>
           </fieldset>
           $calendar_list_entity
-          <fieldset class=\"buttons\"> 
-            <input class=\"closeSticky\" type=\"submit\" value=\"$l_validate\" />
-            <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" />
-            <input type=\"button\" id=\"calendarQuickFormDetail\" onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value=\"$l_details\" />
-            <input type=\"button\" class=\"closeSticky\" id=\"calendarQuickFormDelete\" 
-              onclick=\"obm.calendarQuickForm.submit('quick_delete');\" value=\"$l_c_delete\" />
+          <fieldset class='buttons'> 
+            <input class='closeSticky' type='submit' value='$GLOBALS[l_validate]' />
+            <input type='button' id='calendarQuickFormEdit' onclick='obm.calendarQuickForm.goTo();' />
+            <input type='button' id='calendarQuickFormDetail' onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value='$GLOBALS[l_details]' />
+            <input type='button' class='closeSticky' id='calendarQuickFormDelete' 
+              onclick=\"obm.calendarQuickForm.submit('quick_delete');\" value='$GLOBALS[l_c_delete]' />
           </fieldset>
         </form>
-        <div id=\"calendarQuickFormData\">
-          <div id=\"calendarQuickFormAttendees\">
-            <h3>$l_members</h3>
+        <div id='calendarQuickFormData'>
+          <div id='calendarQuickFormAttendees'>
+            <h3>$GLOBALS[l_members]</h3>
           </div>
           <div>
-            <h3>$l_carac</h3>
+            <h3>$GLOBALS[l_carac]</h3>
             <table>
             <tr>
-            <th>$l_owner</th>
-            <td id=\"calendarQuickFormOwner\"></td>
+            <th>$GLOBALS[l_owner]</th>
+            <td id='calendarQuickFormOwner'></td>
             </tr>
             <tr>
-            <th>$l_location</th>
-            <td id=\"calendarQuickFormLocation\"></td>
+            <th>$GLOBALS[l_location]</th>
+            <td id='calendarQuickFormLocation'></td>
             </tr>
             <tr>
-            <th>$l_category1</th>
-            <td id=\"calendarQuickFormCategory\"></td>
+            <th>$GLOBALS[l_category1]</th>
+            <td id='calendarQuickFormCategory'></td>
             </tr>
             </table>
           </div>
           <div>
-            <h3>$l_desc</h3>
-            <p id=\"calendarQuickFormDescription\"></p>
+            <h3>$GLOBALS[l_desc]</h3>
+            <p id='calendarQuickFormDescription'></p>
           </div>
-          <div id=\"calendarQuickFormItem\">
-            <h3>$l_items</h3>
+          <div id='calendarQuickFormItem'>
+            <h3>$GLOBALS[l_items]</h3>
           </div>
       </div>
     </div>
     </div>
     <script type=\"text/javascript\">
       obm.calendarQuickForm = new Obm.CalendarQuickForm();
-      obm.vars.labels.edit = '".phpStringToJsString($l_edit)."';
-      obm.vars.labels.edit_full = '".phpStringToJsString($l_edit_full)."';
-      obm.vars.consts.obm_uid = '$obm[uid]';
+      obm.vars.labels.edit = '".phpStringToJsString($GLOBALS[l_edit])."';
+      obm.vars.labels.edit_full = '".phpStringToJsString($GLOBALS[l_edit_full])."';
+      obm.vars.consts.obm_uid = '$user_id';
+      obm.vars.consts.template_title = $js_templatetitle;
     </script>";
 
   return $block;
@@ -6139,10 +6161,10 @@ function json_build_html_event($calendar, $current_view, $id) {
 function json_insert_event_data($id,$calendar,$current_view) {
  
   $duration = $calendar['duration'];
-  $date = $calendar['date_begin'];
-  $end = clone $date;
-  $end->addSecond($duration);
   $all_day = ($calendar['all_day'])?1:0;
+  $date_range = $current_view->get_date_range();
+  $date = clone $date_range['begin'];
+  $end = clone $date_range['end'];
 
   $calendar_entity = $current_view->get_entities();
   $status = array('ACCEPTED', 'NEEDS-ACTION');
@@ -6185,7 +6207,7 @@ function json_insert_event_data($id,$calendar,$current_view) {
     if (is_array($occurrences)) {
       foreach($occurrences as $occurrence) {
         if ($occurrence->event->id == $id) {
-          $dis_event = dis_calendar_event($occurrence, 'hour', $calendar_entity, $writable_entity);
+          $dis_event .= dis_calendar_event($occurrence, 'hour', $calendar_entity, $writable_entity);
         }
       }
     }
