@@ -584,7 +584,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_suffix='".addslashes($contact->suffix)."',
       contact_aka='".addslashes($contact->aka)."',
       contact_sound='".addslashes($contact->sound)."',
-      contact_manager='{$contact->manager}',
+      contact_manager='".addslashes($contact->manager)."',
       contact_assistant='".addslashes($contact->assistant)."',
       contact_spouse='".addslashes($contact->spouse)."',
       contact_category='".addslashes($contact->category)."',
@@ -1287,10 +1287,10 @@ class OBM_Contact implements OBM_ISearchable {
             address_label
           ) VALUES (
             $id, 
-            '$address[street]',
-            '$address[zipcode]',
-            '$address[town]',
-            '$address[expresspostal]',
+            '".addslashes($address[street])."',
+            '".addslashes($address[zipcode])."',
+            '".addslashes($address[town])."',
+            '".addslashes($address[expresspostal])."',
             '$address[country_iso3166]',
             '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
           )";
@@ -1315,7 +1315,7 @@ class OBM_Contact implements OBM_ISearchable {
             $website['label'] = str_replace('_', ';', $website['label']);
           }              
           $cpt[$website['label']]++;
-          $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
+          $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '".addslashes($website[url])."', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
           display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(website)');
           $obm_q->query($query);
         }
@@ -1331,7 +1331,7 @@ class OBM_Contact implements OBM_ISearchable {
       foreach($contact->im as $im) {
         if(trim($im['address']) != '' ) {
           $cpt[$im['protocol']]++;          
-          $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[protocol];X-OBM-Ref".$cpt[$im['protocol']]."')";
+          $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '".addslashes($im[address])."', '$im[protocol]', '$im[protocol];X-OBM-Ref".$cpt[$im['protocol']]."')";
           display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(IM)');
           $obm_q->query($query);
         }
