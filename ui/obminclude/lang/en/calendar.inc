@@ -493,3 +493,8 @@ $l_share_ok = "valid share";
 $l_mail_ok = "Email sent";
 
 $l_refresh = "Refresh";
+
+$l_fontSize = "Text size";
+$l_fontSize_small = "Small";
+$l_fontSize_medium = "Medium";
+$l_fontSize_big = "Large";

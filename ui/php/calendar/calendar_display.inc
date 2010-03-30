@@ -55,7 +55,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
     $block .= dis_calendar_occurency_popup();
     $calendar_function_pdf = $calendar_function."_pdf";
     if (function_exists($calendar_function_pdf)) {
-      $display['print_url'] = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=pdf_export_form&amp;date=".$date->getURL()."&amp;output_target=print";
+      $display['print_url'] = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=pdf_export_form&amp;output_target=print";
     }
   } else {
     $block .= dis_calendar_month_planning($current_view, $calendar_entity, $writable_entity);
@@ -6367,7 +6367,8 @@ function dis_calendar_pdf_options($current_view) {
   global $ccalendar_first_hour, $ccalendar_last_hour, $ccalendar_weekstart;
   global $l_first_hour, $l_last_hour, $l_daysofweekshort, $l_display_details;
   global $l_one_day_per_page, $l_display_days ;
-
+  global $l_fontSize, $l_fontSize_small, $l_fontSize_medium, $l_fontSize_big;
+ 
   $date = $current_view->get_date();
   $p_view = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
@@ -6470,6 +6471,16 @@ function dis_calendar_pdf_options($current_view) {
             <select name=\"sel_pagelayout\">
               <option value=\"$c_pagelayout_portrait\">$l_pagelayout_portrait</option>
               <option $selected_pagelayout value=\"$c_pagelayout_landscape\">$l_pagelayout_landscape</option>
+              </select>
+          </td>
+        </tr>
+        <tr>
+          <th>$l_fontSize</th>
+          <td>
+            <select name=\"sel_fontSize\">
+              <option value=\"6\">$l_fontSize_small</option>
+              <option value=\"8\">$l_fontSize_medium</option>
+              <option value=\"10\">$l_fontSize_big</option>
             </select>
           </td>
         </tr>
@@ -7127,9 +7138,12 @@ Class CalendarPdf{
     $this->calendar_y1 = $this->content_y1 - 2*$this->margin; 
 
     // Style
+    $font_size = intval($calendar['fontSize']);
+
     $this->font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
-    $this->font_size = 6;
-    $this->font_height = 1.25 * 6;
+    $this->font_size = ($font_size>=6 && $font_size<=12) ? $font_size : 6;
+    $this->font_height = ($this->font->getLineHeight()/$this->font->getUnitsPerEm()) * $this->font_size;
+    $this->line_gap = ($this->font->getLineGap()/$this->font->getUnitsPerEm()) * $this->font_height;
     $this->class = array(
       "eventOwner" => array("title" => "#2952A3", "background" => "#668CD9"),
       "eventOwner0" => array("title" => "#A32929", "background" => "#D86666"),
@@ -7207,14 +7221,14 @@ Class CalendarPdf{
     $this->page->drawText(
       "$l_calendar $this->display_date",
       $this->content_x0+90,
-      $this->content_y1,
+      $this->content_y1+$this->line_gap,
       'UTF-8');
 
     // Editor
     $this->page->drawText(
       $this->editor,
       $this->content_x0+90,
-      $this->content_y1-$this->font_height,
+      $this->content_y1-$this->font_height+$this->line_gap,
       'UTF 8');
 
     // Date creation
@@ -7222,7 +7236,7 @@ Class CalendarPdf{
     $this->page->drawText(
       $today->getOutputDateTime(),
       $this->content_x0+90,
-      $this->content_y1-2*$this->font_height,
+      $this->content_y1-2*$this->font_height+$this->line_gap,
       'UTF-8');
 
     // Category
@@ -7236,7 +7250,7 @@ Class CalendarPdf{
     $this->page->drawText(
       $display_category,
       $this->content_x0+90,
-      $this->content_y1-3*$this->font_height,
+      $this->content_y1-3*$this->font_height+$this->line_gap,
       'UTF-8');
   }
 
@@ -7248,16 +7262,16 @@ Class CalendarPdf{
     $i=0;
     foreach($this->calendar_entity as $users) {
       foreach($users as $user){
-        $username = $user["name"];
+        $username = $this->truncateToWidth($user["name"],$x1-($x0+4));
         $class = $this->class[$user["class"]];
         $this->page->setFillColor(new Zend_Pdf_Color_Html($class["title"]));
         $x0 = $this->content_x0 +$i;
         $y0 = $this->content_y0;
         $x1 = $x0 + 90;
         $y1 = $y0 + $this->font_height;
-        $this->page->drawRectangle($x0+2 , $y0-1, $x1, $y1+1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $this->page->drawRectangle($x0+2 , $y0, $x1, $y1+2,Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
-        $this->page->drawText($username, $x0+4, $y0, 'UTF-8');
+        $this->page->drawText($username, $x0+4, $y0+$this->line_gap, 'UTF-8');
         $i+=90;
       }
     }
@@ -7291,7 +7305,7 @@ Class CalendarPdf{
     foreach($this->pdf->pages as $index => $page) {
       $cur = $index+1;
       $this->pdf->pages[$index]->setFillColor(new Zend_Pdf_Color_Html('#3D3D3D'));
-      $this->pdf->pages[$index]->drawText("$cur/$total", $this->content_x1, $this->content_y0, 'UTF-8');
+      $this->pdf->pages[$index]->drawText("$cur/$total", $this->content_x1, $this->content_y0+$this->line_gap, 'UTF-8');
     }
   }
 
@@ -7333,6 +7347,30 @@ Class CalendarPdf{
     $stringWidth = (array_sum($widths) / $this->font->getUnitsPerEm()) * $this->font_size;
 
     return $stringWidth;
+  }
+
+  /**
+   * Return the string truncated to the correct width
+   */
+  function truncateToWidth($string, $max_width) {
+    $drawingString = iconv('UTF-8', 'UTF-16BE//IGNORE', $string);
+    $characters = array();
+    $stringLength = strlen($drawingString);
+    for ($i = 0; $i < $stringLength; $i++) {
+      $characters[] = (ord($drawingString[$i++]) << 8) | ord($drawingString[$i]);
+    }
+    $glyphs = $this->font->glyphNumbersForCharacters($characters);
+    $widths = $this->font->widthsForGlyphs($glyphs);
+
+    $width = 0;
+    $unitsPerEm = $this->font->getUnitsPerEm();
+    for ($i = 0; ($i < $stringLength) && ($width < $max_width); $i++) {
+      $width += ($widths[$i] / $unitsPerEm) * $this->font_size;
+    }
+    if ($width > $max_width)
+      $i--;
+
+    return substr($string,0,$i);
   }
   
   function cutLongWords ($string, $max_width, $depth = 0) {
@@ -7444,7 +7482,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
       $this->page->drawText(
         $day,
         $this->calendar_x0+$i*$this->col_width+$this->col_width/2-($this->getStringWidth($day)/2),
-        $this->calendar_y1+$this->font_height+2,
+        $this->calendar_y1+$this->font_height+$this->line_gap,
         'UTF-8');
       $i++;
       $current->addDay(1);
@@ -7507,7 +7545,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
         $this->page->drawText(
           $week_num,
           $this->content_x0, 
-          $this->calendar_y1-$this->current_y+$this->col_height-($this->col_height/2),
+          $this->calendar_y1-$this->current_y+$this->col_height-($this->col_height/2)+$this->line_gap,
           'UTF-8');
         $w++;
 
@@ -7536,7 +7574,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
       $this->page->drawText(
         $day,
         $this->calendar_x0+$i*$this->col_width + 2,
-        $this->calendar_y1-$this->current_y+$this->col_height,
+        $this->calendar_y1-$this->current_y+$this->col_height+$this->line_gap,
         'UTF-8');
 
       $i++;
@@ -7704,12 +7742,12 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
 
       foreach ($icons as $i => $ico) {
         $x = $x0 + $i*$this->icon_size;
-        $y = $y0 - $this->font_height;
+        $y = $y0 - ($this->font_height + $this->icon_size)/2;
         $this->page->drawImage($ico, $x, $y, $x + $this->icon_size, $y + $this->icon_size);
       }
       $this->page->drawText($title,
         $this->calendar_x0+$day*$this->col_width+1 + $icon_width, 
-        $y0-$this->font_height+1, 'UTF-8');
+        $y0-$this->font_height+$this->line_gap, 'UTF-8');
       $cur++;
     }
   }
@@ -8025,18 +8063,16 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         }
 
         $icon_width = count($icons)*$this->icon_size;
-        while($this->getStringWidth($title) > $x1-$x0 -$icon_width) {
-          $title = substr($title, 0, -1); 
-        }
+        $title = $this->truncateToWidth($title,$x1-$x0 -$icon_width);
         $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
         $this->page->drawRectangle($x0, $y0, $x1, $y1, Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
         foreach ($icons as $i => $ico) {
           $x = $x0 + $i*$this->icon_size;
-          $y = $y0 - $this->font_height;
+          $y = $y0 - ($this->font_height + $this->icon_size)/2;
           $this->page->drawImage($ico, $x, $y, $x + $this->icon_size, $y + $this->icon_size);
         }
-        $this->page->drawText($title, $x0+1 +$icon_width, $y1+1, 'UTF-8');
+        $this->page->drawText($title, $x0+1 +$icon_width, $y1+$this->line_gap, 'UTF-8');
         $this->current_out_event++;
 
       } else {
@@ -8058,10 +8094,11 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         if($end > $this->calendar_last_hour) $end = $this->calendar_last_hour;
 
         $y1 = $this->calendar_y1-$this->allday_height-($begin - $this->calendar_first_hour)*$this->col_height;
-        $y0 = $y1-($end-$begin)*$this->col_height;
+        $height = ($end-$begin)*$this->col_height;
+        $y0 = $y1-$height;
 
         $event_body = '';
-        if ($event->event->duration < 2700) {
+        if ($height < $this->font_height*2) {
           $dis_header = "$date $title";
           $dis_title = "";
         } else {
@@ -8102,15 +8139,16 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         // while($this->getStringWidth($dis_header) > $event->size*$this->col_width -$icon_width) {
         //   $dis_header = substr($dis_header, 0, -1); 
         // }
+        $dis_header = $this->truncateToWidth($dis_header,$event->size*$this->col_width -$icon_width);
         $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
-        $this->page->drawRectangle($x0,$y1-$this->font_height-2,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $this->page->drawRectangle($x0,$y1-$this->font_height,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $y = $y1 - ($this->font_height + $this->icon_size)/2;
         foreach ($icons as $i => $ico) {
           $x = $x0 + $i*$this->icon_size;
-          $y = $y1 - $this->font_height -1;
           $this->page->drawImage($ico, $x, $y, $x + $this->icon_size, $y + $this->icon_size);
         }
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
-        $this->page->drawText($dis_header, $x0+1 +$icon_width, $y1-$this->font_height, 'UTF-8');
+        $this->page->drawText($dis_header, $x0+1 +$icon_width, $y1-$this->font_height+$this->line_gap, 'UTF-8');
       }
 
     }
@@ -8305,8 +8343,8 @@ Class CalendarPdfList Extends CalendarPdf{
       Zend_Pdf_Page::SHAPE_DRAW_FILL);
 
     $this->page->setFillColor(new Zend_Pdf_Color_Html("#3D3D3D"));
-    $this->page->drawText($l_date, $this->content_x0+2, $this->calendar_y1+1, 'UTF-8');
-    $this->page->drawText($l_event, $this->content_x0+150, $this->calendar_y1+1, 'UTF-8');
+    $this->page->drawText($l_date, $this->content_x0+2, $this->calendar_y1+$this->line_gap, 'UTF-8');
+    $this->page->drawText($l_event, $this->content_x0+150, $this->calendar_y1+$this->line_gap, 'UTF-8');
 
     $this->current_y = $this->calendar_y1-$this->font_height-1;
 
@@ -8518,7 +8556,7 @@ Class CalendarPdfList Extends CalendarPdf{
         $stub->setFillColor(new Zend_Pdf_Color_Html("#B3B3B3"));
         $stub->setX(170);
         $desc_y1 = $stub->getY();
-        $stub->setY($y0_bar + $this->font_height);
+        $stub->setY($y0_bar + $this->font_height - $this->line_gap);
         $stub->insertRectangle($bar_idx, 3, $desc_y1 - $y0_bar, Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $stub->setY($desc_y1);
       }

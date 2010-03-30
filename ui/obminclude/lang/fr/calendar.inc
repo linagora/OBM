@@ -364,3 +364,8 @@ $l_tags = "Libellés" ;
 $l_tag_management = "Gestion des Libellés" ;
 $l_tag_fill_label = "Vous devez saisir un label." ;
 $l_tag_fill_color = "Vous devez choisir une couleur." ;
+
+$l_fontSize = "Taille du texte";
+$l_fontSize_small = "Petite";
+$l_fontSize_medium = "Moyenne";
+$l_fontSize_big = "Grande";
