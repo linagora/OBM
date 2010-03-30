@@ -1813,7 +1813,7 @@ Obm.CalendarAllDayEvent = new Class({
       this.element.style.top = this.element.style.top.toFloat()+$('dayMonthLabel_'+col).getHeight()+'px';
     }
     this.element.style.width = obm.vars.consts.cellWidth*size+'%';
-    this.element.style.left = alldayColumn.getParent().getStyle('left');
+    this.element.style.left = alldayColumn.getParent().getStyle('left').toFloat()+'%';
   },
 
 
