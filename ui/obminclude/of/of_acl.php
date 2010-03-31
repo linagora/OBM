@@ -488,13 +488,16 @@ class OBM_Acl {
   
   private static function getPublicAclQuery($columns, $entityType, $entityId = null, $action = null, $additionalJoins = '') {
     $entityJoinTable = self::getEntityJoinTable($entityType);
+    if($additionalJoins === '') $joinTable = self::getEntityJoin($entityType);
     $publicWhere = self::getAclQueryWhere($entityType, $entityId, null, $action, true);
+    $publicWhere .= ' AND '.self::getEntityMultidomain($entityType);
     if (is_array($columns)) {
       $columns = implode(',', $columns);
     }
     return "SELECT {$columns}
             FROM EntityRight
             INNER JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
+	    $joinTable
             {$additionalJoins} {$publicWhere}";
   }
   
@@ -669,6 +672,29 @@ class OBM_Acl {
   public static function getAddressbookColumns() {
     return array('AllowedEntity.id as id', 'AllowedEntity.name as label');
   }
+
+
+  public static function getEntityMultidomain($entityType) {
+    $function = 'get'.ucfirst($entityType).'Multidomain';
+    if(method_exists('OBM_Acl', $function)) {
+      return self::$function($entityType); 
+    } else {
+      return "AllowedEntity.{$entityType}_domain_id = ".$GLOBALS['obm']['domain_id'];
+    }
+  }
+
+  public static function getCalendarMultidomain() {
+    return "AllowedEntity.userobm_domain_id = ".$GLOBALS['obm']['domain_id'];
+  }
+
+  public static function getAddressbookMultidomain() {
+    return "AllowedEntity.domain_id = ".$GLOBALS['obm']['domain_id'];
+  }
+
+  public static function getMailboxMultidomain() {
+    return "AllowedEntity.userobm_domain_id = ".$GLOBALS['obm']['domain_id'];
+  }
+
 
   public static function getEntityJoin($entityType) {
     $function = 'get'.ucfirst($entityType).'Join';
