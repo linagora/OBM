@@ -483,8 +483,8 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   }
   $cats1 = of_category_get_ordered('event', 'category1');
   $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
- 
-  $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=\" >$l_today</a>";
+  $today_date = new Of_Date(); 
+  $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=".$today_date->getURL()."\" >$l_today</a>";
 
   if($block_user || $block_group || $dis_block_resource) {
     $block_entity = "
