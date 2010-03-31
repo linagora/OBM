@@ -2187,8 +2187,10 @@ Obm.CalendarQuickForm = new Class({
     }
     this.eventData.entity_id = this.entityView.get('inputValue');
     this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)+'&new_user_id[]='+this.eventData.entity_id;
-    if($('template_id').value > 0) {
-      this.gotoURI += '&template_id='+$('template_id').value;
+    if ($chk($('template_id'))) {
+      if($('template_id').value > 0) {
+        this.gotoURI += '&template_id='+$('template_id').value;
+      }
     }
     window.location.href = obm.vars.consts.calendarUrl+'?'+this.gotoURI;
   }
