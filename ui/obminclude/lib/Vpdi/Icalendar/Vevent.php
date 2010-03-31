@@ -142,7 +142,7 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
 
   public function getUid() {
     if (($uid = $this->getProperty('UID')) === null) {
-      return 0;
+      return "ext-".sha1(uniqid());
     }
     return Vpdi::decodeText($uid->value());
   }

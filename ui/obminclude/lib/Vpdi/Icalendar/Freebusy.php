@@ -71,7 +71,7 @@ class Vpdi_Icalendar_Freebusy {
   }
 
   public function getUid() {
-    return "ext-0";
+    return "ext-".sha1(uniqid());
   }
 
   public function getSummary() {
