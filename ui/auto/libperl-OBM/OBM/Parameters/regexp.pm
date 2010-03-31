@@ -6,6 +6,7 @@
 package OBM::Parameters::regexp;
 
 require Exporter;
+require OBM::Parameters::common;
 
 
 @ISA = qw(Exporter);
@@ -43,10 +44,16 @@ $regexp_email_right = $regexp_domain;
 $regexp_rootLdap = "^dc=(.+),dc=.+\$";
 
 # Login regexp
-$regexp_login = "^([a-z0-9][a-z0-9-._]{1,31})\$";
+$regexp_login = "^([a-z0-9][a-z0-9-._]{1,64})\$";
+if( $OBM::Parameters::common::obmModules->{'samba'} ) {
+    $regexp_login = "^([a-z0-9][a-z0-9-._]{1,31})\$";
+}
 
 # Passwd regexp
-$regexp_passwd = '^[-\$\\\&~#\{\(\[\|_`\^@\);\]+=\}%!:\/\.,?<>"\w0-9]{4,12}$';
+$regexp_passwd = '^[-\$\\\&~#\{\(\[\|_`\^@\);\]+=\}%!:\/\.,?<>"\w0-9]{4,20}$';
+if( $OBM::Parameters::common::obmModules->{'samba'} ) {
+    $regexp_passwd = '^[-\$\\\&~#\{\(\[\|_`\^@\);\]+=\}%!:\/\.,?<>"\w0-9]{4,12}$';
+}
 
 # Les adresses IP
 $regexp_ip = '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$';
