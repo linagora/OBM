@@ -132,7 +132,35 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
     }
     return (int) Vpdi::decodeText($seq->value());
   }
-  
+
+  public function getSummary() {
+    if (($sum = $this->getProperty('SUMMARY')) === null) {
+      return 0;
+    }
+    return Vpdi::decodeText($sum->value());
+  }
+
+  public function getUid() {
+    if (($uid = $this->getProperty('UID')) === null) {
+      return 0;
+    }
+    return Vpdi::decodeText($uid->value());
+  }
+
+  public function getDescription() {
+    if (($desc = $this->getProperty('DESCRIPTION')) === null) {
+      return "";
+    }
+    return Vpdi::decodeText($desc->value());
+  }
+
+  public function getLocation() {
+    if (($loc = $this->getProperty('LOCATION')) === null) {
+      return "";
+    }
+    return Vpdi::decodeText($loc->value());
+  }
+
   public function setSequence($seq) {
     $this->addProperty(new Vpdi_Property('SEQUENCE', Vpdi::encodeText($seq)));
   }
@@ -140,8 +168,20 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
   public function isTransparent() {
     return $this->getValue('TRANSP') == 'TRANSPARENT';
   }
+
+  public function isPrivate() {
+    return ($this->getValue('CLASS') == "PRIVATE");
+  }
   
   public function setAsTransparent() {
     $this->setProperty('TRANSP', 'TRANSPARENT');
+  }
+
+  public function getDuration() {
+    $value = $this->getProperty('duration');
+    if(preg_match('/\s*P((\d*)D)?(T((\d)*H)?((\d*)M)?((\d*)S)?)?((\d*)W)?$/',$value,$match)) {
+      $duration = 86400 * $match[2] + 3600 * $match[5] + 60 * $match[7] + $match[9] +604800 * $match[11] ;
+    } 
+    return $duration;
   }
 }

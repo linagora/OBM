@@ -30,7 +30,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
 
   $calendar_entity = $current_view->get_entities();
 
-  if (sizeof($calendar_entity['user']) == 0 && !is_array($calendar_entity['resource'])) {
+  if ($current_view->entities_count() == 0) {
     $current_view->set_users($obm['uid']);
     $calendar_entity = $current_view->get_entities();
   }
@@ -264,7 +264,7 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
 //   - $calendar_entity : array of entities elements to display
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_bar_legend($p_view, $calendar_entity) {
-  global $ico_user, $ico_resource, $l_meeting_legend;
+  global $ico_user, $ico_resource, $l_meeting_legend, $ico_contact;
   global $l_calendar_displayed, $l_resource_displayed,$c_all,$l_event_color_tt;
   global $ico_delete,$output_target,$l_color,$l_users,$l_events;
   global $mono_user;
@@ -339,7 +339,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   global $path, $obm, $c_all, $ccalendar_resource;
   global $ico_add, $popup_width, $popup_height,$ico_add;
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
-  global $l_search_users, $l_search_resources,$l_private_group_members, $l_public_group_members;
+  global $l_private_group_members, $l_public_group_members;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
   global $ico_group, $l_calendar, $l_add;
 
@@ -399,7 +399,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     </fieldset>
     </form>";
 
-    $user_text = phpStringToJsString($l_search_users);
     $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;filter_entity=calendar";
     $user_add_button = "
       <a href=\"javascript: return false;\" 
@@ -417,7 +416,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
     </fieldset>";
 
-    $user_complete = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {filter_entity:'calendar', filter_pattern:'read', defaultText:'$user_text'});";
+    $user_complete = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {filter_entity:'calendar', filter_pattern:'read'});";
     $group_complete = "new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {filter_entity:'calendar', filter_pattern:'read', mode: 'mono',
         locked: 'true', selectfunction:'sel_public_group(element, this.inputField.value)'});";
   }
@@ -434,16 +433,14 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     }
   }
 
-
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'],'resource','read')) {
-    $resource_text = phpStringToJsString($l_search_resources);
     $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;filter_entity=Resource";
     $resource_add_button = "    
       <a href=\"javascript: return false;\"
       onclick=\"popup('$url_resource','');
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" /> </a>";
-    $dis_block_resource = "
+    $block_resource = "
     <fieldset class=\"detail extra\">
     <legend>
       $l_resources
@@ -452,17 +449,27 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
     </fieldset>";
 
-    $resource_complete = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {filter_entity:'Resource', defaultText:'$resource_text'});";
+    $resource_complete = "
+      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {filter_entity:'Resource'});";
   }
   $cats1 = of_category_get_ordered('event', 'category1');
   $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
 
-  if($block_user || $block_group || $dis_block_resource) {
+  // Contacts
+  $block_contact = "<fieldset class='detail extra'>
+      <legend>$GLOBALS[l_contacts]</legend>
+      <input type='text' name='' value='' id='contactSearch' autocomplete='off' />
+    </fieldset>";
+  $contact_complete = "
+    new obm.AutoComplete.Search('$GLOBALS[path]/contact/contact_index.php?action=ext_search_mail', 'sel_ent', 'contactSearch')";
+
+  if($block_user || $block_group || $block_resource) {
     $block_entity = "
     $block_group
     <form action=\"".basename($_SERVER['SCRIPT_NAME'])."\" method=\"get\">
     $block_user
-    $dis_block_resource
+    $block_resource
+    $block_contact
     <fieldset class=\"detail extra\">
     <legend>$l_add</legend>
     </fieldset>
@@ -483,8 +490,22 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
      // $dis_back_myview = "<a href='javascript: void(0)' onclick='obm.calendarManager.backToMyView()'>$l_back_mono</a>";
     }    
   } 
+
+  $block_entities = "
+  <div id='calendarEntities'>
+    <div>
+      <img src='$GLOBALS[ico_user]'/>
+    </div>
+    <div>
+      <img src='$GLOBALS[ico_group]'/>
+    </div>
+    <div>
+      <img src='$GLOBALS[ico_contact]'/>
+    </div>
+  </div>";
+
   $block = "
-    <div class=\"portlet\" id=\"calendarSelection\">
+  <div class=\"portlet\" id=\"calendarSelection\">
     <h1>$l_selection</h1>
     <div>
     <form action=\"\">
@@ -502,12 +523,13 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   <script type=\"text/javascript\">
     obm.vars.images.update = '$ico_group';
     obm.initialize.chain(function () {
+      // new Obm.TabbedPane($('calendarEntities'));
       $user_complete
       $group_complete
       $resource_complete
+      $contact_complete
     });
-    </script>    
-";
+  </script>";
 
   return $block;
 }
@@ -555,34 +577,31 @@ function html_calendar_minical($current_view) {
  * @return HTML
 */
 function html_calendar_view_selector($calendar, $current_view, $my_views) {
-  global $obm;
-  global $l_views, $l_view_label, $l_select, $l_select_view, $l_label_default, $l_delete_default_view, $l_insert_default_view; 
-  global $l_view_save, $l_view_delete, $l_validate, $l_fill_view_label;
-  global $l_confirm_delete_view, $l_no_sel_view, $l_conflict_view_label, $l_confirm_default_view, $l_no_sel_default_view;
-  global $ico_delete, $ico_add, $ico_popup_close;
+
+  $uid = $GLOBALS['obm']['uid'];
 
   $view_id = $current_view->get_id();
   if ($calendar['set_cal_view_id'] == 0) $view_id = 0;
   $default_view_id = $_SESSION['set_cal_default_view'];
   $display = 'none';
   if (isset($default_view_id)) {
-    $default_view = $l_delete_default_view;
+    $default_view = $GLOBALS['l_delete_default_view'];
     $display = 'inline';
   } 
   while($my_views->next_record()) {
     $id = $my_views->f('obmbookmark_id');
     $label = $my_views->f('obmbookmark_label');
     if ($id == $view_id) {
-      $selected = " selected=\"selected\"";
+      $selected = " selected='selected'";
       if ($id != $default_view_id) {
-        $default_view = $l_insert_default_view;
+        $default_view = $GLOBALS[l_insert_default_view];
         $display = 'inline';
         $style_default = '';
       } else {
-        $style_default = " default=\"default\"";
+        $style_default = " default='default'";
       }
     } elseif ($id == $default_view_id) {
-      $style_default = " default=\"default\"";
+      $style_default = " default='default'";
       $selected = '';
     } else {
       $selected = '';
@@ -591,44 +610,44 @@ function html_calendar_view_selector($calendar, $current_view, $my_views) {
     
     $obmbookmarkproperty = "set_cal_view_id=$id";
     $sel_view .= "
-    <option id=\"opt_$id\" value=\"".basename($_SERVER['SCRIPT_NAME'])."?new_sel=0&amp;$obmbookmarkproperty\"$style_default$selected>$label</option>";
+    <option id='opt_$id' value=\"".basename($_SERVER['SCRIPT_NAME'])."?new_sel=0&amp;$obmbookmarkproperty\"$style_default$selected>$label</option>";
   }
 
   // Javascript Strings
-  $l_js_confirm_delete_view = phpStringToJsString($l_confirm_delete_view);
-  $l_js_delete_default_view = phpStringToJsString($l_delete_default_view);
-  $l_js_insert_default_view = phpStringToJsString($l_insert_default_view);
-  $l_js_no_sel_view = phpStringToJsString($l_no_sel_view);
-  $l_js_no_sel_default_view = phpStringToJsString($l_no_sel_default_view);
-  $l_js_conflict_view_label = phpStringToJsString($l_conflict_view_label);
-  $l_js_view_save = phpStringToJsString($l_view_save);
-  $l_js_confirm_default_view = phpStringToJsString($l_confirm_default_view);
+  $l_js_confirm_delete_view = phpStringToJsString($GLOBALS['l_confirm_delete_view']);
+  $l_js_delete_default_view = phpStringToJsString($GLOBALS['l_delete_default_view']);
+  $l_js_insert_default_view = phpStringToJsString($GLOBALS['l_insert_default_view']);
+  $l_js_no_sel_view = phpStringToJsString($GLOBALS['l_no_sel_view']);
+  $l_js_no_sel_default_view = phpStringToJsString($GLOBALS['l_no_sel_default_view']);
+  $l_js_conflict_view_label = phpStringToJsString($GLOBALS['l_conflict_view_label']);
+  $l_js_view_save = phpStringToJsString($GLOBALS['l_view_save']);
+  $l_js_confirm_default_view = phpStringToJsString($GLOBALS['l_confirm_default_view']);
 
   $block = "
-  <div class=\"portlet\" id=\"calendarSelView\">
-    <h1>$l_views</h1>
-    <div style=\"margin: 2px;\">
-    <form action=\"".basename($_SERVER['SCRIPT_NAME'])."\" method=\"get\">
-      <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\" onchange=\"change_view(this.options[this.selectedIndex].value);\">
-        <option id=\"opt_choix\" value=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]\" >
-          $l_select_view
+  <div class='portlet' id='calendarSelView'>
+    <h1>$GLOBALS[l_views]</h1>
+    <div style='margin: 2px;'>
+    <form action=\"".basename($_SERVER['SCRIPT_NAME'])."\" method='get'>
+      <select id='sel_view' name='sel_view' style='width:12em;' onchange='change_view(this.options[this.selectedIndex].value);'>
+        <option id='opt_choix' value=\"".basename($_SERVER['SCRIPT_NAME'])."?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$GLOBALS[c_all]&amp;sel_user_id[]=$uid&amp;set_cal_view_id=0\" >
+          $GLOBALS[l_select_view]
         </option>
         $sel_view
       </select>
-      <input type=\"hidden\" id=\"view_id\" name=\"view_id\" value=\"$view_id\" />
-      <input type=\"hidden\" id=\"default_view_id\" name=\"default_view_id\" value=\"$default_view_id\" />
-      <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.remove();return false;\">
-        <img src=\"$ico_delete\" alt=\"[$l_view_delete]\"/>
+      <input type='hidden' id='view_id' name='view_id' value='$view_id' />
+      <input type='hidden' id='default_view_id' name='default_view_id' value='$default_view_id' />
+      <a href='javascript:void(0);' onclick='obm.calendarView.remove();return false;'>
+        <img src='$GLOBALS[ico_delete]' alt='$GLOBALS[l_view_delete]' title='$GLOBALS[l_view_delete]' />
       </a>
-      <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.show();return false;\">
-        <img src=\"$ico_add\" alt=\"[$l_view_save]\"/>
+      <a href='javascript:void(0);' onclick='obm.calendarView.show();return false;'>
+        <img src='$GLOBALS[ico_add]' alt='$GLOBALS[l_view_save]' title='$GLOBALS[l_view_save]' />
       </a>
-      <a href=\"javascript:void(0);\" id=\"default\" name=\"default\" onclick=\"obm.calendarView.default_view();return false;\" style=\"display: $display;\">$default_view</a>
+      <a href='javascript:void(0);' id='default' name='default' onclick='obm.calendarView.default_view();return false;' style='display: $display;'>$default_view</a>
     </form>
 
     </div>
   </div>
-  <script type=\"text/javascript\">
+  <script type='text/javascript'>
     obm.vars.labels.delete_view = '$l_js_confirm_delete_view';
     obm.vars.labels.delete_default_view = '$l_js_delete_default_view';
     obm.vars.labels.insert_default_view = '$l_js_insert_default_view';
@@ -638,7 +657,6 @@ function html_calendar_view_selector($calendar, $current_view, $my_views) {
     obm.vars.labels.save_view = '$l_js_view_save';
     obm.vars.labels.default_view = '$l_js_confirm_default_view';
     obm.calendarView = new Obm.CalendarView();
-
   </script>";
 
   return $block;
@@ -1087,7 +1105,6 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   }
 
   $category_filter = $current_view->get_category_filter();
-  $range = $current_view->get_cal_range();
   $week_num = $date->get(Of_Date::WEEK);
   $start_time = $date->getTimestamp();
 
@@ -1096,7 +1113,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $today_marker = "";
   $current = clone $date;
   $step = 0;
-
+  $range = $current_view->get_cal_range();
   if ($range == 'day') {
     $day_js = "obm.calendarManager.showWeek";
   } else {
@@ -1139,7 +1156,6 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $unit = 60/$_SESSION['set_cal_interval'];
   while($current->compareHour(24) < 0 && $current->compareDateIso($date) == 0) {
     $id = $current->getTimestamp() - $ts;
-
     $background = "";
     if($current->compareHour($GLOBALS['ccalendar_first_hour']) < 0 || $current->compareHour($GLOBALS['ccalendar_last_hour']) >= 0) {
       $background="background:#EEE;";
@@ -1171,7 +1187,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   }
 
   $tag_legend = "";
-  if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
+  if (sizeof($tags) > 0 && $current_view->entities_count() == 1) {
     $tag_legend = html_calendar_tag_legend($tags);
   }
 
@@ -1335,7 +1351,6 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       }
       $day = $current->localize(Of_Date::OBM_DATE_WEEK_JUMP);
       $tip_title = $current->localize(Of_Date::OBM_DATE_DAY);
-      $iso = $current->getURL();
       $date_iso = $current->getDateIso();
       $ts = $current->getTimestamp();
       $div_id = "dayContainer_{$d}_{$date_iso}";
@@ -1354,12 +1369,11 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $d++;
       $current->addDay(1);
     }
-
     $week_day_event_list .= "</div>";
-
   }
+
   $tag_legend = "";
-  if (sizeof($tags) > 0 && sizeof($calendar_entity['user'])+sizeof($calendar_entity['resource']) == 1) {
+  if (sizeof($tags) > 0 && $current_view->entities_count() == 1) {
    $tag_legend =  html_calendar_tag_legend($tags);
   }
 
@@ -1865,7 +1879,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $opacity = strtolower($occurrence->event->opacity);
   $eventColor = get_color_data($event->color);
 
-  $ed[] = "id:$id";
+  $ed[] = "id:'$id'";
   $ed[] = "opacity:'$event->opacity'";
   $ed[] = "entity:'$entity'";
   $ed[] = "entity_id:$entity_id"; 
@@ -3289,7 +3303,8 @@ function dis_calendar_quick_form($calendar_entity) {
       <span id='calendarQuickFormDate'></span>
       </h1>
       <h2>
-      <a id='calendarQuickFormTitle' href='#' onclick=\"obm.calendarQuickForm.goTo('detailconsult'); return false\"></a>
+      <b id='extEventTitle'></b>
+      <a id='calendarQuickFormTitle' href='#' onclick=\"obm.calendarQuickForm.goTo('detailconsult'); return false;\"></a>
       </h2> 
      <div class='content'>
         <form id='calendarQuickFormStore' onsubmit='obm.calendarQuickForm.submit();return false;'>
@@ -3787,7 +3802,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
   }
 
-  if (sizeof($users['entity']) > 1) {
+  if ($current_view->users_count()+$current_view->contacts_count() > 1) {
     $u = array();
     foreach($users['entity'] as $id => $user) {
       $name = phpStringToJsString($user["label"]);
@@ -4589,10 +4604,12 @@ function dis_calendar_meeting_form($current_view, $calendar) {
     $users_id = $template_entities['user'];
     $res_id = $template_entities['resource'];
     $groups_id = $template_entities['group'];
+    $contacts_id = $template_entities['contact'];
   } else {
     $users_id = $current_view->get_users();
     $res_id = $current_view->get_resources();
     $group = $current_view->get_group();
+    $contacts_id = $current_view->get_contacts();
     $groups_id = ( (empty($group) || $group==$GLOBALS['c_all']) ? array($group) : array() );
   }
   
@@ -4607,7 +4624,13 @@ function dis_calendar_meeting_form($current_view, $calendar) {
   } else {
     $res = array();
   }
-  
+
+  if (count($contacts_id) > 0) {
+    $contacts = get_contact_from_ids($contacts_id, false);
+  } else {
+    $contacts = array();
+  }
+
   if (count($groups_id) > 0) {
 //    $groups = get_calendar_group_from_ids($groups_id);
   } else {
@@ -4640,6 +4663,22 @@ function dis_calendar_meeting_form($current_view, $calendar) {
       $u_name
       <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
       </div>";
+    }
+  }
+
+  // contact select
+  if (is_array($contacts['entity'])) {
+    foreach ($contacts['entity'] as $u_id => $u_ent) {
+      $u_name = $u_ent['label'];
+      $sel_id = "data-contact-$u_id";
+      $div_id = "sel_user_id-$sel_id";
+      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+      <img src=\"$ico_delete\" alt=\"[Delete]\" />
+      </a>
+      $u_name
+      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+      </div> ";
     }
   }
 

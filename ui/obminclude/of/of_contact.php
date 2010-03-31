@@ -1623,13 +1623,29 @@ class OBM_Contact implements OBM_ISearchable {
     if (is_array($this->website)) {
       foreach($this->website as $website) {
         if ($website['label'][0] == 'CALURI') {
-          $handle = @fopen($website['url'], "r");
-          if ($handle) {
-            $d = stream_get_contents($handle);
-            $cal = Vpdi::decodeOne($d);
-            fclose($handle);
+          $url = $website['url'];
+          $file = "/tmp/".str_replace("/", "_", $url);
+          $now = new Of_Date();
+          if (file_exists($file) && ($now->getTimestamp() - filectime($file)) < 1800) {
+            // get ics from stored file
+            $f = fopen($file, 'r');
+            $d = stream_get_contents($f);
+            fclose($f);
+          } else {
+            // get ics from url
+            $handle = @fopen($url, "r");
+            if ($handle) {
+              $d = stream_get_contents($handle);
+              fclose($handle);
+
+              // store ics file in filesystem
+              $f = fopen($file, 'w');
+              fwrite($f, $d);
+              fclose($f);
+
+            }
           }
-          return $cal;
+          return Vpdi::decodeOne($d);
         }
       }
     }

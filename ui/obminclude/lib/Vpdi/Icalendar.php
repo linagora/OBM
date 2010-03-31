@@ -72,13 +72,19 @@ class Vpdi_Icalendar extends Vpdi_Entity {
   
   public function getBusyPeriods() {
     $periods = array();
-    foreach ($this->getComponents(Vpdi_Icalendar_Component::VFREEBUSY) as $vfb) {
-      $fbs = $vfb->getFreebusys();
-      // Google Calendar hack !!! (no FREEBUSY property, but multiple VFREEBUSY components instead)
-      if (count($fbs) == 0) {
-        $periods[] = new Vpdi_Icalendar_Freebusy($vfb->dtstart, $vfb->dtend);
-      } else {
-        $periods = array_merge($periods, $fbs);
+    if (count($this->getComponents(Vpdi_Icalendar_Component::VFREEBUSY)) > 0) {
+      foreach ($this->getComponents(Vpdi_Icalendar_Component::VFREEBUSY) as $vfb) {
+        $fbs = $vfb->getFreebusys();
+        // Google Calendar hack !!! (no FREEBUSY property, but multiple VFREEBUSY components instead)
+        if (count($fbs) == 0) {
+          $periods[] = new Vpdi_Icalendar_Freebusy($vfb->dtstart, $vfb->dtend);
+        } else {
+          $periods = array_merge($periods, $fbs);
+        }
+      }
+    } else if (count($this->getComponents(Vpdi_Icalendar_Component::VEVENT)) > 0) {
+      foreach($this->getComponents(Vpdi_Icalendar_Component::VEVENT) as $vevent) {
+        $periods[] = new Vpdi_Icalendar_Event($vevent);
       }
     }
     return $periods;

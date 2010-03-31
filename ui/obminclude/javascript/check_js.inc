@@ -65,7 +65,7 @@ function check_money(field){
 //   - name : element id (or name)
 ///////////////////////////////////////////////////////////////////////////////
 function get_elem(doc, name) {
-  return doc.getElementById(name);
+  return $(name);
 }
 
 

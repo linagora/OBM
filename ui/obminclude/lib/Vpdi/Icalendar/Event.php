@@ -18,68 +18,45 @@
 */
 
 /**
- * Represents a freebusy period
+ * Represents an ics event
  * 
  * @package Vpdi
  * @version $Id:$
- * @author Raphaël Rougeron <raphael.rougeron@gmail.com> 
+ * @author David Phan <david.phan@aliasource.fr> 
  * @license GPL 2.0
  */
-  
-class Vpdi_Icalendar_Freebusy {
-  
-  const FREE = 'FREE';
-  
-  const BUSY = 'BUSY';
-  
-  const BUSY_UNAVAILABLE = 'BUSY-UNAVAILABLE';
-  
-  const BUSY_TENTATIVE = 'BUSY-TENTATIVE';
-  
-  public $start;
-  
-  public $end;
-  
-  public $duration;
-  
-  public $type;
 
-  public static function decode(Vpdi_Property $FREEBUSY) {
-    $fbs = array();
-    $periods = Vpdi::decodeTextList($FREEBUSY->value());
-    foreach ($periods as $p) {
-      list($start, $end) = Vpdi::decodePeriod($p);
-      $fbs[] = new Vpdi_Icalendar_Freebusy($start, $end);
+class Vpdi_Icalendar_Event {
+
+  public $evt;
+  public $start;
+  public $end;
+  public $duration;
+
+  public function __construct($vevent) {
+    $this->evt = $vevent;
+    $this->start = $vevent->getDtstart();
+    $this->end = $vevent->getDtend();
+    $this->duration = $vevent->getDuration();
+    if ($this->end == null) {
+      $_dtend =  new Of_Date($this->start->format('U') + $this->duration);
+      $this->end = new DateTime($_dtend->getIso());
     }
-    if (count($fbs) == 1) return $fbs[0];
-    return $fbs;
-  }
-  
-  public function __construct(DateTime $start, DateTime $end) {
-    $this->start = $start;
-    $this->end = $end;
-    $this->duration = $this->end->format('U') - $this->start->format('U');
-    $this->type = self::BUSY;
-  }
-  
-  public function __toString() {
-    return $this->encode()->__toString();
-  }
-  
-  public function encode() {
-    return new Vpdi_Property('FREEBUSY', Vpdi::encodePeriod($this->start, $this->end), array('FBTYPE' => $this->type));
+    if ($this->duration == null) {
+      $this->duration = $this->end->format('U') - $this->start->format('U');
+    }
   }
 
   public function getUid() {
-    return "ext-0";
+    return "ext-".$this->evt->getUid();
   }
 
   public function getSummary() {
-    return __("Busy");
+    return $this->evt->getSummary();
   }
 
   public function getDescription() {
-    return __("Busy");
+    return $this->evt->getDescription();
   }
 
   public function getDuration() {
@@ -87,19 +64,22 @@ class Vpdi_Icalendar_Freebusy {
   }
 
   public function getLocation() {
-    return "";
+    return $this->evt->getLocation();
   }
 
   public function getTransparency() {
+    if ($this->evt->isTransparent()) {
+      return "TRANSPARENT";
+    }
     return "OPAQUE";
   }
 
   public function getPartStat() {
-    return "ACCEPTED";
+    return "ACCEPTED"; // FIXME
   }
 
   public function getCategory() {
-    return "";
+    return $this->evt->getCategories();
   }
 
   public function isAllDay() {
@@ -107,6 +87,9 @@ class Vpdi_Icalendar_Freebusy {
   }
 
   public function isPrivate() {
-    return false;
+    return $this->evt->isPrivate();
   }
 }
+
+
+?>

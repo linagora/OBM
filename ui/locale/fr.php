@@ -78,5 +78,6 @@ return array(
   'Zip code' => 'Code postal',
   'Street' => 'Rue',
   'Express postal' => 'Cedex',
-  'Function' => 'Fonction'
+  'Function' => 'Fonction',
+  'Busy' => 'Occupé'
 );

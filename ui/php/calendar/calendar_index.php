@@ -121,6 +121,7 @@ OBM_EventFactory::getInstance()->attach(new OBM_EventMailObserver());
 if ($params['new_sel'] && (($action != 'insert') && ($action != 'update'))) {
   $current_view->set_users($params['sel_user_id']);
   $current_view->set_resources($params['sel_resource_id']);
+  $current_view->set_contacts($params['sel_contact_id']);
 }
 
 // If no user or resource selected, we select the connected user
@@ -213,12 +214,14 @@ if ($action == 'search') {
   if (is_array($params['sel_user_id']) || is_array($params['sel_resource_id'])) {
     $entities = array(
       'user' => $params['sel_user_id'],
-      'resource' => $params['sel_resource_id']
+      'resource' => $params['sel_resource_id'],
+      'contact' => $params['sel_contact_id']
     );
   } else {
     $entities = array(
       'user' => $current_view->get_users(),
-      'resource' => $current_view->get_resources()
+      'resource' => $current_view->get_resources(),
+      'contact' => $current_view->get_contacts()
     );
   }
   $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);

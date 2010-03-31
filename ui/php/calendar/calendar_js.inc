@@ -272,13 +272,13 @@ function add_displayed_attendee(check, attendee, uid, kind) {
   if (check) {
     for(var id in attendee) {
       var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
-      if ($(sel_id) == null) {
+      if (!\$chk($(sel_id))) {
         of_select_add_element(window.document, 'sel_'+kind+'_id', 'data-'+kind+'-'+id, attendee[id]);
       }
     }
   } else {
     for(var id in attendee) {
-      if (id != uid) {
+      if ((kind == 'user' && id != uid) || kind != 'user') {
         var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
         if (sel_id != null) {
           $(sel_id).destroy();

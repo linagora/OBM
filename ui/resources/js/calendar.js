@@ -1408,6 +1408,10 @@ Obm.CalendarEvent = new Class({
       this.content.setStyle('backgroundColor','');
       this.dragHandler.setStyle('backgroundColor','');
     }
+  },
+
+  isExternal: function() {
+    return this.event.id.split('-')[0] == "ext";
   }
 
 });
@@ -1431,7 +1435,7 @@ Obm.CalendarInDayEvent = new Class({
     this.draw();
     this.setPosition();
     this.switchColor(obm.vars.conf.calendarColor);
-    if (this.event.updatable && obm.calendarManager.write) this.makeUpdatable();
+    if (this.event.updatable && obm.calendarManager.write && !this.isExternal()) this.makeUpdatable();
   },
 
   
@@ -1452,7 +1456,7 @@ Obm.CalendarInDayEvent = new Class({
     this.dragHandler = new Element('h1').injectInside(dt);     
     this.setTitleIcons();
 
-    if(this.event.updatable && obm.calendarManager.write) {
+    if(this.event.updatable && obm.calendarManager.write && !this.isExternal()) {
     this.element.setProperty('style','cursor: move;');
     this.resizeHandler = new Element('div')
       .addClass('handle')
@@ -1461,27 +1465,30 @@ Obm.CalendarInDayEvent = new Class({
 
     this.titleContainer = new Element('span').injectInside(dd);
     this.locationContainer = new Element('span').injectInside(dd);
-    this.timeContainer = new Element('a')
-       .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
-       .injectInside(this.dragHandler);
+    if (this.isExternal()) {
+      this.timeContainer = new Element('span').injectInside(this.dragHandler);
+    } else {
+      this.timeContainer = new Element('a')
+         .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
+         .injectInside(this.dragHandler);
 
-    this.linkContainer = this.timeContainer;
-    this.linkContainer.addEvent('mousedown', function (evt) {
-      this.linkContainer.addEvent('mouseup', 
-        function (evt) {
-          this.linkContainer.addEvent('click',
-            function(evt) {
-              if (obm.calendarManager.lock) {
-                evt.preventDefault();
-                this.linkContainer.removeEvents('click');
-                this.linkContainer.removeEvents('mouseup');
-              }
-            }.bind(this)
-          );
-        }.bind(this)
-      )
-    }.bind(this));       
-
+      this.linkContainer = this.timeContainer;
+      this.linkContainer.addEvent('mousedown', function (evt) {
+        this.linkContainer.addEvent('mouseup', 
+          function (evt) {
+            this.linkContainer.addEvent('click',
+              function(evt) {
+                if (obm.calendarManager.lock) {
+                  evt.preventDefault();
+                  this.linkContainer.removeEvents('click');
+                  this.linkContainer.removeEvents('mouseup');
+                }
+              }.bind(this)
+            );
+          }.bind(this)
+        )
+      }.bind(this));       
+    }
     this.setTitle();
 
     this.element.injectInside($('calendarGrid'));
@@ -1670,7 +1677,7 @@ Obm.CalendarAllDayEvent = new Class({
     this.event.date =  new Obm.DateTime(this.event.time * 1000);
     this.draw();
     this.switchColor(obm.vars.conf.calendarColor);
-    if (this.event.updatable) this.makeUpdatable();
+    if (this.event.updatable && obm.calendarManager.write && !this.isExternal()) this.makeUpdatable();
   },
 
   
@@ -1702,31 +1709,35 @@ Obm.CalendarAllDayEvent = new Class({
 
     this.setTitleIcons();
 
-    if(this.event.updatable && obm.calendarManager.write) {
+    if(this.event.updatable && obm.calendarManager.write && !this.isExternal()) {
       this.element.setProperty('style','cursor: move;');
     }
 
-    this.titleContainer = new Element('a')
-       .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
-       .injectInside(this.dragHandler);
 
-    this.linkContainer = this.titleContainer;
-    this.linkContainer.addEvent('mousedown', function (evt) {
-      this.linkContainer.addEvent('mouseup', 
-        function (evt) {
-          this.linkContainer.addEvent('click',
-            function(evt) {
-              if (obm.calendarManager.lock) {
-                evt.preventDefault();
-                this.linkContainer.removeEvents('click');
-                this.linkContainer.removeEvents('mouseup');
-              }
-            }.bind(this)
-          );
-        }.bind(this)
-      )
-    }.bind(this));       
+    if (this.isExternal()) {
+      this.titleContainer = new Element('span').injectInside(this.dragHandler);
+    } else {
+      this.titleContainer = new Element('a')
+         .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
+         .injectInside(this.dragHandler);
 
+      this.linkContainer = this.titleContainer;
+      this.linkContainer.addEvent('mousedown', function (evt) {
+        this.linkContainer.addEvent('mouseup', 
+          function (evt) {
+            this.linkContainer.addEvent('click',
+              function(evt) {
+                if (obm.calendarManager.lock) {
+                  evt.preventDefault();
+                  this.linkContainer.removeEvents('click');
+                  this.linkContainer.removeEvents('mouseup');
+                }
+              }.bind(this)
+            );
+          }.bind(this)
+        )
+      }.bind(this));       
+    }
     this.setTitle();
 
     this.element.injectInside($('calendarHeaderGrid'));
@@ -2053,17 +2064,26 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.formAction = 'quick_update';
     this.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
     
-    if (evt.event.updatable && obm.calendarManager.write) {
+    if (evt.event.updatable && obm.calendarManager.write && !evt.isExternal()) {
       this.form.setStyle('display','block');
       this.deleteButton.setStyle('display','');
       this.editButton.setStyle('display','');
       this.detailButton.setStyle('display','');
+      this.title.setStyle('display', 'none');
+      $('extEventTitle').setStyle('display', 'none');
       if(this.entityList) this.entityList.setStyle('display','none');
       this.editButton.value = obm.vars.labels.edit;
     } else {
       this.form.setStyle('display','none');
-      this.title.set('html',evt.event.title);
-      this.title.setStyle('display','block');
+      if (evt.isExternal()) {
+        $('extEventTitle').set('html', evt.event.title);
+        this.title.setStyle('display','none');
+        $('extEventTitle').setStyle('display', '');
+      } else {
+        this.title.set('html',evt.event.title);
+        this.title.setStyle('display','');
+        $('extEventTitle').setStyle('display', 'none');
+      }
     }
 
     this.description.set('html',evt.event.description);
@@ -2125,6 +2145,7 @@ Obm.CalendarQuickForm = new Class({
     this.form.setStyle('display','block');
     this.data.setStyle('display','none');
     this.title.setStyle('display','none');
+    $('extEventTitle').setStyle('display', 'none');
     this.deleteButton.setStyle('display','none');
     this.editButton.setStyle('display','');
     this.detailButton.setStyle('display','none');
@@ -2186,7 +2207,10 @@ Obm.CalendarQuickForm = new Class({
       this.gotoURI += '&action='+action;
     }
     this.eventData.entity_id = this.entityView.get('inputValue');
-    this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)+'&new_user_id[]='+this.eventData.entity_id;
+    this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='
+      +encodeURIComponent(this.eventData.date_begin)+'&duration='
+      +this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)
+      +'&new_user_id[]='+this.eventData.entity_id;
     if ($chk($('template_id'))) {
       if($('template_id').value > 0) {
         this.gotoURI += '&template_id='+$('template_id').value;

@@ -4194,6 +4194,22 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $event->addAttendee($entity,$entity_id,$entity_label,$entity_state);
     }
   }
+
+  if (is_array($calendar_entity['contact'])) {
+    foreach($calendar_entity['contact'] as $c) {
+      $contact = OBM_Contact::get($c['id']);
+      $owner_name = $contact->display_name();
+      if (is_array($evts = $contact->getEventsInInterval($start, $end))) {
+        foreach($evts as $e) {
+          $event = new Event($e->getUid(),$e->getDuration(), $e->getSummary(), $e->getLocation(),
+            $e->getCategory(),$e->isPrivate(),$e->getDescription(), null,
+            $e->isAllDay(),'none',$c['id'],$owner_name, null, $e->getTransparency(),null);
+          $of->addOccurrence($event, new Of_Date($e->start->format('U')), "contact", $c['id'], $e->getPartStat());
+        }
+      }
+    }
+  }
+
   return $of->getOccurrences(); 
 }
 
@@ -5555,6 +5571,7 @@ Class CalendarView {
   protected $group;
   protected $users;
   protected $resources;
+  protected $contacts;
   protected $classes;
   protected $entity_id_entity;
   protected $ndays;
@@ -5576,6 +5593,7 @@ Class CalendarView {
     $this->load_color_entity();
     $this->set_users($data['users']);
     $this->set_group($data['group']);
+    $this->set_contacts($data['contacts']);
     if (is_array($data['user_classes'])) {
       foreach($data['user_classes'] as $user => $class) {
         $this->set_user_class($user,$class);
@@ -5615,10 +5633,10 @@ Class CalendarView {
       $property = $obm_q->f("obmbookmarkproperty_property");
       $value = $obm_q->f("obmbookmarkproperty_value");
 
-      if (in_array($property,array('users','resources'))) {
+      if (in_array($property,array('users','resources','contacts'))) {
         if ($value != "")
           $data[$property] = explode(',',$value);
-      } elseif (in_array($property,array('user_classes','resource_classes','entity_id_entity'))) {
+      } elseif (in_array($property,array('user_classes','resource_classes','contact_classes', 'entity_id_entity'))) {
         $data[$property] = unserialize($value);
       } else {
         $data[$property] = $value;
@@ -5822,6 +5840,14 @@ Class CalendarView {
     return count($this->resources);
   }
 
+  public function get_contacts() {
+    return $this->contacts;
+  }
+
+  public function contacts_count() {
+    return count($this->contacts);
+  }
+
   public function get_entities() {
     global $ccalendar_max_users;
     $remaining_count = $ccalendar_max_users;
@@ -5835,12 +5861,15 @@ Class CalendarView {
       $entities['resource'] = $this->get_resources_data($remaining_count);
       $remaining_count = $remaining_count - count($entities['resource']);
     }
-
+    if (count($this->contacts)>0) {
+      $entities['contact'] = $this->get_contacts_data($remaining_count);
+      $remaining_count = $remaining_count - count($entities['contact']);
+    }
     return $entities;
   }
 
   public function entities_count() {
-    return count($this->users) + count($this->resources);
+    return count($this->users) + count($this->resources) + $this->contacts_count();
   }
 
   public function set_label($label) {
@@ -5882,19 +5911,25 @@ Class CalendarView {
     $this->set_entities($resource_ids, 'resource');
   }
 
+  public function set_contacts($contact_ids) {
+    $this->set_entities($contact_ids, 'contact');
+  }
+
   private function set_entities($ids, $entity) {
     switch($entity) {
       case 'user':
-        $thisEntities = $this->users;
+        $thisEntities = &$this->users;
         break;
       case 'resource':
-        $thisEntities = $this->resources;
+        $thisEntities = &$this->resources;
+        break;
+      case 'contact':
+        $thisEntities = &$this->contacts;
         break;
     }
-    if (empty($ids))
-      $ids = array();
-    if (!is_array($ids))
-      $ids = array($ids);
+    if (empty($ids)) $ids = array();
+    if (!is_array($ids)) $ids = array($ids);
+    if (!is_array($thisEntities)) $thisEntities = array();
     $to_add = array_diff($ids,$thisEntities);
     $to_remove = array_diff($thisEntities,$ids);
     foreach ($to_remove as $id) {
@@ -5913,6 +5948,9 @@ Class CalendarView {
     case 'resource' :
       $this->add_resource($id);
       break;
+    case 'contact':
+      $this->add_contact($id);
+      break;
     }
   }
 
@@ -5923,6 +5961,9 @@ Class CalendarView {
       break;
     case 'resource' :
       $this->remove_resource($id);
+      break;
+    case 'contact' :
+      $this->remove_contact($id);
       break;
     }
   }
@@ -5940,6 +5981,14 @@ Class CalendarView {
       $this->resources[] = $resource_id;
       $class = $this->get_entity_class('resource',$resource_id);
       $this->set_class('resource',$resource_id,$class);
+    }
+  }
+
+  public function add_contact($contact_id) {
+    if (!in_array($contact_id,$this->contacts)) {
+      $this->contacts[] = $contact_id;
+      $class = $this->get_entity_class('contact',$contact_id);
+      $this->set_class('contact',$contact_id,$class);
     }
   }
 
@@ -5984,10 +6033,18 @@ Class CalendarView {
       $this->remove_class('resource',$resource_id);
   }
 
+  public function remove_contact($contact_id) {
+    $old_count = count($this->contacts);
+    $this->contacts = array_diff($this->contacts,array($contact_id));
+    if (count($this->contacts)<$old_count)
+      $this->remove_class('contact',$contact_id);
+  }
+
   public function remove_all() {
     $this->group = $GLOBALS['c_all'];
     $this->users = array();
     $this->resources = array();
+    $this->contacts = array();
     $this->init_classes();
   }
 
@@ -5995,7 +6052,8 @@ Class CalendarView {
       $this->classes = array(
       'by_entity' => array(
         'user' => array(),
-        'resource' => array()
+        'resource' => array(),
+        'contact' => array()
       ),
       'by_class' => array(
         'eventOwner' => 0
@@ -6094,6 +6152,10 @@ Class CalendarView {
     }
     if (!empty($this->entity_id_entity)) {
       $calendar_bookmarkproperties['entity_id_entity'] = serialize($this->entity_id_entity);
+    }
+    if (!empty($this->contacts)) {
+      $calendar_bookmarkproperties['contacts'] = implode(',', $this->contacts);
+      $calendar_bookmarkproperties['contact_classes'] = serialize($this->classes['by_entity']['contact']);
     }
 
     $user_id = sql_parse_id($obm['uid']);
@@ -6222,6 +6284,24 @@ Class CalendarView {
         );
         $nb_max--;
       }
+    } 
+
+    return $data;
+  }
+
+  protected function get_contacts_data($nb_max) {
+    global $cdg_sql, $obm;
+
+    // Preserve the resources order
+    $data = array();
+    foreach ($this->contacts as $id) {
+      $contact = OBM_Contact::get($id);
+      $data[$id] = array(
+        'name'  => $contact->display_name(),
+        'class' => $this->get_class($id,'contact'),
+        'type'  => 'contact',
+        'id'    => $id
+      );
     } 
 
     return $data;
