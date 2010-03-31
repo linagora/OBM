@@ -253,35 +253,6 @@ sub setParent {
 }
 
 
-sub createLdapEntry {
-    my $self = shift;
-    my ( $entryDn, $entry ) = @_;
-
-    if( !$entryDn ) {
-        $self->_log( 'DN non défini', 1 );
-        return 1;
-    }
-
-    if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorrecte', 1 );
-        return 1;
-    }
-
-    $entry->add( objectClass => $self->_getLdapObjectclass() );
-
-    require OBM::Ldap::ldapMapping;
-    my $ldapMapping = OBM::Ldap::ldapMapping->instance();
-
-    my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self );
-    for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
-        $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} );
-    }
-
-
-    return 0;
-}
-
-
 sub updateLdapEntry {
     my $self = shift;
     my( $entry, $objectclassDesc ) = @_;
