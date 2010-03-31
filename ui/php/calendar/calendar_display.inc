@@ -265,7 +265,7 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
   $block = html_calendar_bar_legend($p_view, $calendar_entity, $current_view);
   if ($action != 'perform_meeting' && $output_target != 'print') {
     $block .= html_calendar_select_calendar_entity($p_view, $current_view, $calendar_entity, $entity_readable);
-    $block .= html_calendar_view_selector($current_view, $my_views);
+    $block .= html_calendar_view_selector($calendar, $current_view, $my_views);
     $block .= html_calendar_bar_date_selector($current_view);
   }
 
@@ -671,7 +671,7 @@ function html_calendar_bar_date_selector($current_view) {
  * @access public
  * @return HTML
 */
-function html_calendar_view_selector($current_view, $my_views) {
+function html_calendar_view_selector($calendar, $current_view, $my_views) {
   global $obm;
   global $l_views, $l_view_label, $l_select, $l_select_view, $l_label_default, $l_delete_default_view, $l_insert_default_view; 
   global $l_view_save, $l_view_delete, $l_validate, $l_fill_view_label;
@@ -680,6 +680,7 @@ function html_calendar_view_selector($current_view, $my_views) {
 
   $date = $current_view->get_date();
   $view_id = $current_view->get_id();
+  if ($calendar['set_cal_view_id'] == 0) $view_id = 0;
   $iso = $date->getURL();
   $default_view_id = $_SESSION['set_cal_default_view'];
   $display = 'none';
@@ -729,7 +730,7 @@ function html_calendar_view_selector($current_view, $my_views) {
     <form action=\"calendar_index.php\" method=\"get\">
       <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\"
         onchange=\"change_view(this.options[this.selectedIndex].value);\">
-        <option id=\"opt_choix\" value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\" >
+        <option id=\"opt_choix\" value=\"calendar_index.php?sel_category_filter=&amp;new_sel=1&amp;new_group=1&amp;group_view=$GLOBALS[c_all]&amp;sel_user_id[]=$obm[uid]&amp;set_cal_view_id=0\" >
           $l_select_view
         </option>
         $sel_view
