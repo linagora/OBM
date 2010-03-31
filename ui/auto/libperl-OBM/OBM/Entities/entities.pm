@@ -95,7 +95,13 @@ sub setParent {
 sub _getParentDn {
     my $self = shift;
 
-    return undef;
+    my $parentDn = undef;
+
+    if( defined($self->{'parent'}) ) {
+        $parentDn = $self->{'parent'}->getDnPrefix($self);
+    }
+
+    return $parentDn;
 }
 
 

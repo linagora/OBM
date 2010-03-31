@@ -228,19 +228,6 @@ sub setParent {
 }
 
 
-# Needed by : LdapEngine
-sub _getParentDn {
-    my $self = shift;
-    my $parentDn = undef;
-
-    if( defined($self->{'parent'}) ) {
-        $parentDn = $self->{'parent'}->getDnPrefix($self);
-    }
-
-    return $parentDn;
-}
-
-
 sub createLdapEntry {
     my $self = shift;
     my ( $entryDn, $entry ) = @_;
