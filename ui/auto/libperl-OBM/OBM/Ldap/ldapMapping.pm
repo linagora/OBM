@@ -111,7 +111,11 @@ sub getObjectClass {
 sub getRdn {
     my $self = shift;
     my( $entity ) = @_;
-    my $entityType = ref($entity);
+
+    my $entityType = $entity;
+    if( ref($entity) ) {
+        $entityType = ref($entity);
+    }
 
     if( !defined($self->{'xml'}->{'entity'}->{$entityType}) ) {
         $self->_log( 'entité de type \''.$entityType.'\' inconnue', 1 );

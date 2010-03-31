@@ -35,6 +35,7 @@ sub new {
     $self->{'ldapMappingScope'} = {
         'updateLinks' => [
             'group_users',
+            'group_users_dn',
             'group_mailboxes',
             'group_samba_users',
             'group_contacts_list'
@@ -171,7 +172,7 @@ sub setLinks {
             my $current = $members->[$i];
     
             push( @{$self->{'entityDesc'}->{'group_users'}}, $current->{'userobm_login'} );
-    
+
             if( $self->{'entityDesc'}->{'group_mailperms'} ) {
                 if( $current->{'userobm_mail_perms'} ) {
                     push( @{$self->{'entityDesc'}->{'group_mailboxes'}}, $current->{'userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name') );
@@ -184,6 +185,11 @@ sub setLinks {
                 }
             }
         }
+
+        if( !$self->_getGroupUsersDn() ) {
+            return 1;
+        }
+    
     }
 
     if( ref($links->{'contacts'}) eq 'ARRAY' ) {
@@ -350,6 +356,44 @@ sub getRemovedMembersId {
 
 sub smtpInUpdateMap {
     my $self = shift;
+
+    return 1;
+}
+
+
+sub _getGroupUsersDn {
+    my $self = shift;
+
+    if( !defined($self->{'entityDesc'}->{'group_users'}) ) {
+        $self->_log( 'Pas de membres dans le groupe '.$self->getDescription(), 4 );
+        return 1;
+    }
+
+    if( ref($self->{'entityDesc'}->{'group_users'}) ne 'ARRAY' ) {
+        $self->_log( 'Listes des membres du groupe invalide', 0 );
+        return 0;
+    }
+
+    my $userRootDn = $self->{'parent'}->getDnPrefix( 'OBM::Entities::obmUser' );
+    if( !defined($userRootDn) || !defined($userRootDn->[0]) ) {
+        $self->_log( 'Pas de root DN associé aux entités de type \'OBM::Entities::obmUser\'', 0 );
+        return 0;
+    }
+
+    require OBM::Ldap::ldapMapping;
+    my $ldapMapping = OBM::Ldap::ldapMapping->instance();
+    my $rdnMapping = $ldapMapping->getRdn('OBM::Entities::obmUser');
+    if( !defined($rdnMapping) ) {
+        $self->_log( 'mapping du RDN de l\'entité '.$self->getDescription().' incorrect', 0 );
+        return 0;
+    }
+
+    for( my $i=0; $i<=$#{$self->{'entityDesc'}->{'group_users'}}; $i++ ) {
+        my $userLogin = $self->{'entityDesc'}->{'group_users'}->[$i];
+
+        $self->_log( $rdnMapping->{'ldap'}->{'name'}.'='.$userLogin.','.$userRootDn->[0], 0);
+        push( @{$self->{'entityDesc'}->{'group_users_dn'}}, $rdnMapping->{'ldap'}->{'name'}.'='.$userLogin.','.$userRootDn->[0] );
+    }
 
     return 1;
 }

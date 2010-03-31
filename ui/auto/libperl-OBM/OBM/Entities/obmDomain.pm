@@ -189,6 +189,11 @@ sub getDnPrefix {
     my $rootDn;
     my @dnPrefixes;
 
+    my $entityName = $entity;
+    if( ref($entity) ) {
+        $entityName = ref($entity);
+    }
+
     if( !($rootDn = $self->_getRootDnPrefix()) ) {
         $self->_log( 'DN de la racine du domaine non déterminée', 1 );
         return undef;
@@ -199,37 +204,37 @@ sub getDnPrefix {
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }
 
-    if( !defined( $entity ) || ref($entity) eq 'OBM::Entities::obmSystemUser' ) {
+    if( !defined( $entity ) || $entityName eq 'OBM::Entities::obmSystemUser' ) {
         push( @dnPrefixes, 'ou=sysusers,'.$rootDn );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }
 
-    if( !defined( $entity ) || ref($entity) eq 'OBM::Entities::obmHost' ) {
+    if( !defined( $entity ) || $entityName eq 'OBM::Entities::obmHost' ) {
         push( @dnPrefixes, 'ou=hosts,'.$rootDn );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }
 
-    if( (!defined( $entity ) || ref($entity) eq 'OBM::Entities::obmUser') && !$self->isGlobal() ) {
+    if( (!defined( $entity ) || $entityName eq 'OBM::Entities::obmUser') && !$self->isGlobal() ) {
         push( @dnPrefixes, 'ou=users,'.$rootDn );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }
 
-    if( (!defined( $entity ) || ref($entity) eq 'OBM::Entities::obmGroup') && !$self->isGlobal() ) {
+    if( (!defined( $entity ) || $entityName eq 'OBM::Entities::obmGroup') && !$self->isGlobal() ) {
         push( @dnPrefixes, 'ou=groups,'.$rootDn );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }
 
-    if( (!defined( $entity ) || ref($entity) eq 'OBM::Entities::obmMailshare') && !$self->isGlobal() ) {
+    if( (!defined( $entity ) || $entityName eq 'OBM::Entities::obmMailshare') && !$self->isGlobal() ) {
         push( @dnPrefixes, 'ou=mailShare,'.$rootDn );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }
 
-    if( (!defined( $entity ) || ref($entity) eq 'OBM::Entities::obmMailServer') && !$self->isGlobal() ) {
+    if( (!defined( $entity ) || $entityName eq 'OBM::Entities::obmMailServer') && !$self->isGlobal() ) {
         push( @dnPrefixes, 'ou=servicesConfiguration,'.$rootDn );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }
 
-    if( (!defined( $entity ) || ref($entity) eq 'OBM::Entities::obmContact') && !$self->isGlobal() ) {
+    if( (!defined( $entity ) || $entityName eq 'OBM::Entities::obmContact') && !$self->isGlobal() ) {
         push( @dnPrefixes, 'ou=contacts,'.$rootDn );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }

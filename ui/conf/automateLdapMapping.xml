@@ -247,6 +247,10 @@
             <desc name='group_users'/>
         </map>
         <map>
+            <ldap name='member'/>
+            <desc name='group_users_dn'/>
+        </map>
+        <map>
             <ldap name='mailBox'/>
             <desc name='group_mailboxes'/>
         </map>
