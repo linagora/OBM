@@ -170,6 +170,10 @@ sub _getMethod {
         return $result;
     }
 
+    if( my $return = $self->_setBackupRoot( $entity ) ) {
+        return $return;
+    }
+
     my $availableBackupFile = $self->_getAvailableBackupFile( $entity );
 
     if( ref($availableBackupFile) ne 'ARRAY' ) {
@@ -752,14 +756,6 @@ sub _getCyrusPartitionPath {
 sub _getAvailableBackupFile {
     my $self = shift;
     my( $entity ) = @_;
-
-    $entity->setBackupRoot( $self->{'backupRoot'} );
-
-    if( ! -d $entity->getBackupPath() ) {
-        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Backup path '.$entity->getBackupPath().' doesn\'t exist or isn\'t a directory' ]
-            } );
-    }
 
     my $backupNamePrefix = $entity->getBackupNamePrefix();
 
