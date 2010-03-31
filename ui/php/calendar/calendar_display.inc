@@ -9009,11 +9009,13 @@ function dis_calendar_waiting_portlet() {
  * Back to calendar link
  */
 function dis_back_to_calendar($action) {
-  $block = "
-  <div id='backToCalendar'>
-    <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php'>$GLOBALS[l_back_to_calendar]</a>
-  </div>";
-  return $block;
+  if ($action != 'pdf_export_form') {
+    $block = "
+    <div id='backToCalendar'>
+      <a class='B' href='$GLOBALS[path]/calendar/calendar_index.php'>$GLOBALS[l_back_to_calendar]</a>
+    </div>";
+    return $block;
+  }
 }
 
 /**
