@@ -447,7 +447,7 @@ $l_ics_export_ok = "The events have been exported.";
 $l_tag = "Tag";
 $l_documents = "Documents";
 $l_all_calendar = "All calendar";
-$l_basic_search_result = "Search result for events";
+$l_search_result = "Search result";
 $l_delete_event = "Delete appointment from my calendar";
 $l_tag_fill_label = "You have to insert a tag.";
 

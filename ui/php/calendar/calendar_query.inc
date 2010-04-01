@@ -4149,15 +4149,30 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
   }
 
   if (is_array($calendar_entity['contact'])) {
+    $search = false;
+    if ($GLOBALS['action'] == 'search') {
+      $calendar = $GLOBALS['params'];
+      $type = $calendar['searchType'];
+      $summary = trim($calendar['title']);
+      $location = trim($calendar['location']);
+      $desc = trim($calendar['desc']);
+      $owner = trim($calendar['owner']);
+      $pattern = trim(strtolower("$calendar[pattern] $summary $owner $location $desc"));
+      $search = true;
+    }
     foreach($calendar_entity['contact'] as $c) {
       $contact = OBM_Contact::get($c['id']);
       $owner_name = $contact->display_name();
       if (is_array($evts = $contact->getEventsInInterval($start, $end))) {
         foreach($evts as $e) {
-          $event = new Event($e->getUid(),$e->getDuration(), $e->getSummary(), $e->getLocation(),
-            $e->getCategory(),$e->isPrivate(),$e->getDescription(), null,
-            $e->isAllDay(),'none',$c['id'],$owner_name, null, $e->getTransparency(),null);
-          $of->addOccurrence($event, new Of_Date($e->start->format('U')), "contact", $c['id'], $e->getPartStat());
+          if (!$search || 
+              ($search  && $type == 'basic' && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern)) || $e->match($pattern)))
+            ) {
+            $event = new Event($e->getUid(),$e->getDuration(), $e->getSummary(), $e->getLocation(),
+              $e->getCategory(),$e->isPrivate(),$e->getDescription(), null,
+              $e->isAllDay(),'none',$c['id'],$owner_name, null, $e->getTransparency(),null);
+            $of->addOccurrence($event, new Of_Date($e->start->format('U')), "contact", $c['id'], $e->getPartStat());
+          }
         }
       }
     }

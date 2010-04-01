@@ -109,4 +109,8 @@ class Vpdi_Icalendar_Freebusy {
   public function isPrivate() {
     return false;
   }
+
+  public function match($pattern) {
+    return $pattern == strtolower(__("Busy"));
+  }
 }

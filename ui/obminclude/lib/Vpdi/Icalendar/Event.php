@@ -89,7 +89,15 @@ class Vpdi_Icalendar_Event {
   public function isPrivate() {
     return $this->evt->isPrivate();
   }
-}
 
+  public function match($pattern) {
+    return (
+      array_intersect(explode(" ", strtolower($this->getSummary())), explode(" ", $pattern)) || 
+      array_intersect(explode(" ", strtolower($this->getLocation())), explode(" ", $pattern)) || 
+      array_intersect(explode(" ", strtolower($this->getDescription())), explode(" ", $pattern))
+      );
+  }
+
+}
 
 ?>

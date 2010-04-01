@@ -75,8 +75,8 @@ function dis_calendar_search_result($calendar, $current_view) {
   global $obm;
 
   $calendar_entity = $current_view->get_entities();
-  $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
-    OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
+  $readable_entity = OBM_Acl_Utils::expandEntitiesArray(
+    OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read')
   );
 
   $events = null;
@@ -86,8 +86,7 @@ function dis_calendar_search_result($calendar, $current_view) {
     $begin = new Of_Date(0);
     $end = new Of_Date();
     $end->addYear(5);
-    $block = "<h1>$GLOBALS[l_basic_search_result] \"".stripslashes($calendar['pattern'])."\"</h1>";
-    $pattern = format_name($calendar['pattern'], 1, true);
+    $pattern = $calendar['pattern'];
   } else {
     if ($calendar['date_begin'] == null) {
       $begin = new Of_Date(0);
@@ -110,19 +109,19 @@ function dis_calendar_search_result($calendar, $current_view) {
     $end->addDay(1);
 
     if (isset($calendar['title']) && $calendar['title'] != '') {
-      $pattern = "title:(".format_name($calendar['title'], 1, true).')';
+      $pattern = "title:(".$calendar['title'].')';
     }    
     if (isset($calendar['location']) && $calendar['location'] != '') {
-      $pattern .= " location:(".format_name($calendar['location'], 1, true).')';
+      $pattern .= " location:(".$calendar['location'].')';
     }    
     if (isset($calendar['desc']) && $calendar['desc'] != '') {
-      $pattern .= " description:(".format_name($calendar['desc'], 1, true).')';
+      $pattern .= " description:(".$calendar['desc'].')';
     }   
     if (isset($calendar['owner']) && $calendar['owner'] != '') {
-      $pattern .= " owner:(".format_name($calendar['owner'], 1, true).')';
+      $pattern .= " owner:(".$calendar['owner'].')';
     }   
     if (isset($calendar['attendees']) && $calendar['attendees'] != '') {
-      $pattern .= " with:(".format_name($calendar['attendees'], 1, true).')';
+      $pattern .= " with:(".$calendar['attendees'].')';
     }   
     if (isset($calendar['tag']) && $calendar['tag'] != '') {
       $pattern .= " tag:($calendar[tag])";
@@ -132,11 +131,12 @@ function dis_calendar_search_result($calendar, $current_view) {
     }
   }
 
-  $events = OBM_Search::search('event', format_name($pattern, 1, true), 0, 10000, array()); 
+  $events = OBM_Search::search('event', $pattern, 0, 10000, array()); 
   $GLOBALS[display][search] = dis_calendar_html_search_form($calendar, $pattern);
   $GLOBALS[display][search] .= dis_back_to_calendar($action);
 
-  $block .= dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $begin, $end, $events);
+  $block = "<h1>$GLOBALS[l_search_result]</h1>";
+  $block .= dis_calendar_list_view($current_view, $calendar_entity, $readable_entity, $begin, $end, $events);
 
   return $block;
 }
