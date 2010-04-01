@@ -146,7 +146,7 @@ function dis_calendar_search_result($calendar, $current_view) {
  * @access public
  * @return void
  */
-function dis_calendar_view_bar($current_view, $action, $calendar) {
+function dis_calendar_view_bar($current_view, $calendar) {
   global $ico_week_view, $ico_day_view, $ico_month_view, $ico_list_view;
   global $ico_week_view_current, $ico_day_view_current, $ico_month_view_current;
   global $ico_agenda_view,  $ico_planning_view, $ico_list_view_current;
@@ -169,6 +169,8 @@ function dis_calendar_view_bar($current_view, $action, $calendar) {
   if ($p_range) {
     ${'ico_'.$p_range.'_view'} = ${'ico_'.$p_range.'_view_current'};
   }
+
+  $action = $calendar['action'];
 
   if ($action=='search' || $action == 'index' || $action == 'waiting_events' || $action == 'insert' || $action == 'update') {
     $search_form = dis_calendar_html_search_form($calendar);

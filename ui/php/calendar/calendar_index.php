@@ -213,6 +213,7 @@ if ($action == 'search') {
       $display['detail'] = html_calendar_waiting_events($obm_wait);
     } else {
       $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+      $params['action'] = "index";
       $display['detail'] = dis_calendar_calendar_view($params, $current_view);
     }
   }
@@ -996,7 +997,7 @@ if ($action == 'search') {
 }
 
 // displayed after, because $params['date'] can be updated by actions
-$display['search'] = dis_calendar_view_bar($current_view, $action, $params);
+$display['search'] = dis_calendar_view_bar($current_view, $params);
 
 $_SESSION['cal_current_view'] = serialize($current_view);
 
