@@ -26,6 +26,7 @@ class  OBM_Search {
   public static function search($core, $pattern, $offset, $limit, $options) {
     global $obm, $cdg_solr, $display;
 
+    $result = array();
     $solr = OBM_IndexingService::connect($core);
     if ($solr) {
         try {
@@ -40,7 +41,6 @@ class  OBM_Search {
           $response = $solr->search($pattern, $offset, $limit, $options);
           display_debug_solr($pattern, $cdg_solr, "OBM_Search::search($core)");
           if($response->response->numFound > 0) {
-            $result = array();
             foreach ($response->response->docs as $doc) { 
               array_push($result, $doc->id);
             }
@@ -51,7 +51,6 @@ class  OBM_Search {
     } else {
       $display['msg'] = display_err_msg($GLOBALS['l_solr_connection_err']);
     }
-
     return $result;
   }
 

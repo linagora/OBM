@@ -3548,53 +3548,6 @@ function calendar_localizeDate($format, $date) {
 }
 
 
-/**
- * Solr Query
- */
-function run_query_calendar_solr_query($pattern) {
-  global $obm, $cdg_solr, $display;
-
-  $events = array();
-  $solrserver = of_domain_get_domain_solrserver($obm['domain_id'], 'event');
-  foreach ($solrserver as $s_id => $solrserver_info){
-    foreach ($solrserver_info as $server_info){
-      $solr_ip = $server_info['ip'];
-    }
-  }
-  if ($solr_ip) {
-    $solr = new Apache_Solr_Service($solr_ip, '8080', '/solr/event' );
-    if ($solr->ping()) {
-      try {
-        if ($pattern != "") {
-          $pattern = "$pattern AND domain:$obm[domain_id]"; 
-        } else {
-          $pattern = "domain:$obm[domain_id]";
-        }
-
-
-	    	$response = $solr->search($pattern,0, 1000000);
-        display_debug_solr($pattern, $cdg_solr, 'run_query_calendar_solr_query()');
-        if($response->response->numFound > 0) {
-          $events = array();
-          foreach ($response->response->docs as $doc) { 
-            array_push($events, $doc->id);
-          }
-        }
-      } catch (Exception $e) {
-        //echo $e->getMessage();
-      }
-    } else {
-      $display['msg'] = display_err_msg($GLOBALS['l_solr_connection_err']);
-    }
-  } else {
-    $display['msg'] = display_err_msg($GLOBALS['l_solr_connection_err']);
-  }
-
-  return $events;
-}
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Return all not rejected events in a week of users or/and groups
 // Parameters:
