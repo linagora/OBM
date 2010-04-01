@@ -13,10 +13,13 @@ use strict;
 eval {
     require Config::IniFiles;
 } or die 'Config::IniFiles perl module needed !'."\n";
+
 use HTTP::Status;
+use ObmSatellite::Misc::regex;
 
 use constant ENABLED_MODS => '/etc/obm-satellite/mods-enabled';
 use constant AVAILABLE_MODS => '/etc/obm-satellite/mods-available';
+use constant DEFAULT_OBM_LANG => 'en';
 
 
 sub new {
@@ -436,4 +439,33 @@ sub _getCyrusConn {
     }
 
     return $cyrusServer->getConn();
+}
+
+
+sub _getDefaultObmLang {
+    my $self = shift;
+    my( $realm ) = @_;
+
+    if( !defined($realm) || ($realm !~ /$REGEX_REALM/) ) {
+        $self->_log( 'Using default language \''.DEFAULT_OBM_LANG.'\'', 4 );
+        return DEFAULT_OBM_LANG;
+    }
+
+    my $ldapDefaultObmLang = $self->_getLdapValues(
+            '(&(cn=obmSettings)(obmDomain='.$realm.'))',
+            [ 'obmLang' ]
+            );
+
+    if( !defined($ldapDefaultObmLang) ) {
+        $self->_log( 'Error on default language LDAP search, using default \''.DEFAULT_OBM_LANG.'\'', 2 );
+        return DEFAULT_OBM_LANG;
+    }
+
+    if( $#{$ldapDefaultObmLang} != 0 ) {
+        $self->_log( 'Using default language \''.DEFAULT_OBM_LANG.'\'', 4 );
+        return DEFAULT_OBM_LANG;
+    }
+
+    $self->_log( 'Using language \''.$ldapDefaultObmLang->[0]->get_value('obmLang').'\'', 4 );
+    return $ldapDefaultObmLang->[0]->get_value('obmLang');
 }

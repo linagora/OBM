@@ -13,11 +13,14 @@ use strict;
 eval {
     require ObmSatellite::Modules::BackupEntity::user;
     require ObmSatellite::Modules::BackupEntity::mailshare;
+    require MIME::Lite;
 };
 
 use File::Path;
 use File::Copy;
 use File::Find;
+
+use Encode qw/encode decode/;
 
 use HTTP::Status;
 use ObmSatellite::Misc::constant;
@@ -28,6 +31,7 @@ use constant RECONSTRUCT_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
 use constant RECONSTRUCT_CMD => 'reconstruct';
 use constant QUOTA_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
 use constant QUOTA_CMD => 'quota';
+use constant MAIL_REPORT_RECIPIENT => 'x-obm-backup';
 
 sub _setUri {
     my $self = shift;
@@ -99,7 +103,10 @@ sub _putMethod {
         return $result;
     }
 
-    if( !( $entity->setContent($self->_xmlContent( $requestBody )) ) ) {
+    my $xmlContent;
+    if( !($xmlContent = $self->_xmlContent($requestBody))
+        || !($entity->setContent($xmlContent))
+    ) {
         return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Invalid request content' ],
             help => [ $self->getModuleName().' request content must use XML form' ]
@@ -126,6 +133,8 @@ sub _putMethod {
     }else {
         $self->_log( 'Fail to backup '.$entity->getLogin().'@'.$entity->getRealm(), 1 );
     }
+
+    $self->_getMailBackupReport($entity, $xmlContent->{'option'}, $response);
 
     return $response;
 }
@@ -1005,6 +1014,117 @@ sub _createRestoreMailboxFolder {
 
  
     return undef;
+}
+
+
+sub _getMailBackupReport {
+    my $self = shift;
+    my( $entity, $options, $response ) = @_;
+
+    my $language = $self->_getDefaultObmLang( $entity->getRealm() );
+
+    my $mail = {};
+
+    my $title = 'Backup report';
+    my $entityType = $entity->getEntityType();
+    my $success = eval {
+        if($response->isError()) {
+            return 'FAIL';
+        }
+
+        return 'SUCCESS';
+    };
+
+    SWITCH: {
+        if($language eq 'fr') {
+            $title = 'Rapport de sauvegarde';
+            $entityType = eval {
+                my $type = $entity->getEntityType();
+
+                if($type eq 'user') {
+                    return 'utilisateur';
+                }elsif($type eq 'mailshare') {
+                    return 'partage de messagerie';
+                }
+
+                return 'type inconnu';
+            };
+            $success = eval {
+                if($response->isError()) {
+                    return 'Échec';
+                }
+
+                return 'Succés';
+            };
+
+            last SWITCH;
+        }
+    }
+
+    $mail->{'subject'} = $title.' - '.$entityType.' '
+        .$entity->getLogin().'@'.$entity->getRealm().': '.$success;
+    $mail->{'content'} = $response->getContentValue('content');
+
+    return $self->_sendMailReport($mail, $entity, $options);
+}
+
+
+sub _sendMailReport {
+    my $self = shift;
+    my( $mailContent, $entity, $options ) = @_;
+
+    if( !defined($mailContent) || (ref($mailContent) ne 'HASH') ) {
+        $self->_log( 'Empty or invalid mail report - no mail report send', 2 );
+        return 1;
+    }
+
+    my $mailReportRecipient = MAIL_REPORT_RECIPIENT.'@'.$entity->getRealm();
+    my $mailReportCcRecipient = [];
+
+    if( defined($options) && (ref($options) eq 'HASH') ) {
+        if( ref($options->{'report'}) eq 'HASH' ) {
+            if( defined($options->{'report'}->{'sendMail'}) && (lc($options->{'report'}->{'sendMail'}) eq 'false') ) {
+                $self->_log( 'No mail report', 4 );
+                return 1;
+            }
+    
+            if( defined($options->{'report'}->{'email'}) && (ref($options->{'report'}->{'email'} eq 'ARRAY')) ) {
+                for( my $i=0; $i<=$#{$options->{'report'}->{'email'}}; $i++ ) {
+                    if( $options->{'report'}->{'email'}->[$i] =~ /^($REGEX_EMAIL)$/ ) {
+                        push( @{$mailReportCcRecipient}, $1 );
+                    }
+                }
+            }
+        }
+    }
+
+    my $msg = MIME::Lite->new(
+        From    => $mailReportRecipient,
+        To      => $mailReportRecipient,
+        Subject => encode( 'MIME-Q', $mailContent->{'subject'} ),
+        Type    => 'multipart/related'
+        );
+    $msg->attr( 'Content-Type.charset' => 'UTF-8' );
+
+    if($#{$mailReportCcRecipient} >= 0) {
+        $msg->add( 'cc', $mailReportCcRecipient )
+    }
+
+    $msg->attach(
+        Type    => 'text/plain; charset=UTF-8',
+        Data    => join( '\n', @{$mailContent->{'content'}} )
+        );
+    
+    $self->_log( $msg->as_string(), 5 );
+    $msg->send( 'smtp', 'localhost' );
+
+    if( !$msg->last_send_successful() ) {
+        $self->_log( 'Sending mail report fail', 1 );
+        return 1;
+    }
+    
+    $self->_log( 'Sending mail report success', 3 );
+    return 0;
 }
 
 

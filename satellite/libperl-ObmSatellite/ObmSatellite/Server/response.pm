@@ -169,6 +169,18 @@ sub setExtraContent {
 }
 
 
+sub getContentValue {
+    my $self = shift;
+    my($content) = @_;
+
+    if( ref($content) || !$content ) {
+        return undef;
+    }
+
+    return $self->{'content'}->{$content};
+}
+
+
 sub setModule {
     my $self = shift;
     my( $module ) = @_;

@@ -16,6 +16,7 @@ require Exporter;
     $REGEX_EMAIL_RIGHT
     $REGEX_ROOTLDAP
     $REGEX_LOGIN
+    $REGEX_REALM
     $REGEX_PASSWD
     $REGEX_IP
     $REGEX_SERVER_ID
@@ -36,13 +37,16 @@ $REGEX_DOMAIN = '^([a-z0-9-]+\.)+[a-z]{2,6}$';
 # Email
 $REGEX_EMAIL = '^[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$';
 $REGEX_EMAIL_LEFT = '^[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*$';
-$REGEX_EMAIL_RIGHT = REGEX_DOMAIN;
+$REGEX_EMAIL_RIGHT = $REGEX_DOMAIN;
 
 # LDAP root
 $REGEX_ROOTLDAP = "^dc=(.+),dc=.+\$";
 
 # Login regexp
 $REGEX_LOGIN = "^([a-z0-9][a-z0-9-._]{1,31})\$";
+
+# Realm regexp
+$REGEX_REALM = $REGEX_DOMAIN;
 
 # Passwd regexp
 $REGEX_PASSWD = '^[-\$\\\&~#\{\(\[\|_`\^@\);\]+=\}%!:\/\.,?<>"\w0-9]{4,12}$';
