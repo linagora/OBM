@@ -304,7 +304,7 @@ sub update {
 
     # If entity don't have Sieve dependancy, we do nothing and it's not an error
     if( !$entity->isSieveAvailable() ) {
-        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Sieve', 3 );
+        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Sieve', 4 );
         return 0;
     }
 

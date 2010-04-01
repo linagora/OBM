@@ -290,6 +290,14 @@ sub _initUpdateFactory {
         }
 
         $entitiesFactory->enqueueFactory( $entityFactory );
+
+        require OBM::EntitiesFactory::obmSettingsFactory;
+        if( !($entityFactory = OBM::EntitiesFactory::obmSettingsFactory->new( 'UPDATE_ALL', $entitiesFactory->{'domain'} )) ) {
+            $self->_log( 'problème au chargement de la factory de configuration d\'OBM', 1 );
+            return 1;
+        }
+
+        $entitiesFactory->enqueueFactory( $entityFactory );
     }
 
     require OBM::EntitiesFactory::hostFactory;

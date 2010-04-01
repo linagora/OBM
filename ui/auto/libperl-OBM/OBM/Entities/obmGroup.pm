@@ -391,7 +391,6 @@ sub _getGroupUsersDn {
     for( my $i=0; $i<=$#{$self->{'entityDesc'}->{'group_users'}}; $i++ ) {
         my $userLogin = $self->{'entityDesc'}->{'group_users'}->[$i];
 
-        $self->_log( $rdnMapping->{'ldap'}->{'name'}.'='.$userLogin.','.$userRootDn->[0], 0);
         push( @{$self->{'entityDesc'}->{'group_users_dn'}}, $rdnMapping->{'ldap'}->{'name'}.'='.$userLogin.','.$userRootDn->[0] );
     }
 

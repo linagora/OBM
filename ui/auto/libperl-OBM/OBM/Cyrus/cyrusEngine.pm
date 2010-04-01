@@ -121,7 +121,7 @@ sub update {
 
     # If entity don't have Cyrus dependancy, we do nothing and it's not an error
     if( !$entity->isMailAvailable() || !$entity->isMailActive() || $entity->getArchive() ) {
-        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Cyrus', 3 );
+        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Cyrus', 4 );
         return 0;
     }
 

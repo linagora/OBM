@@ -559,3 +559,10 @@ sub updateLinkedEntities {
 
     return 0;
 }
+
+
+sub smtpInUpdateMap {
+    my $self = shift;
+
+    return 0;
+}
