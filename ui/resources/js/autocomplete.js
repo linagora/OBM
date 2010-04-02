@@ -686,6 +686,10 @@ obm.AutoComplete.ExtSearch = new Class({
   initialize: function(getUrlFunc, selectedBox, inputField, options) {
     this.parent('', selectedBox, inputField, options);
     this.getUrl = getUrlFunc;
+  },
+
+  setSelectedBox: function(selectedBox) {
+    this.selectedBox = $(selectedBox);
   }
 });
 

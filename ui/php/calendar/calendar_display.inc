@@ -3814,49 +3814,43 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
     $users_js = "{".implode(",", $u)."}";
 
+    $c = array();
+    if (is_array($contacts['entity'] )) {
+      foreach($contacts['entity'] as $id => $contact) {
+        $name = phpStringToJsString($contact["label"]);
+        array_push($c,  "'$id' : '$name'");
+      }
+    }
+    $contact_js = "{".implode(",", $c)."}";
+
     if ( $add_displayed_users ) {
       $add_displayed_users_checked = "checked=\"checked\"";
     }
     $block_add_displayed_users = "<tr>
       <th>
-      <label for=\"cba_add_displayed_users\">$GLOBALS[l_add_displayed_users]</label>
+      <label for='cba_add_displayed_users'> $GLOBALS[l_add_displayed_users]</label>
       </th>
       <td>
-        <input type=\"checkbox\" id=\"cba_add_displayed_users\" value=\"1\" $add_displayed_users_checked name=\"cba_add_displayed_users\" onclick=\"add_displayed_attendee(this.checked, $users_js, $uid, 'user')\"/>
+        <input type='checkbox' id='cba_add_displayed_users' value='1' $add_displayed_users_checked 
+          name='cba_add_displayed_users' 
+          onclick=\"add_displayed_attendee(this.checked, $users_js, $uid, 'user', 'sel_user_id'); 
+          add_displayed_attendee(this.checked, $contact_js, $uid, 'contact', 'sel_contact_id'); \"/>
       </td>
       </tr>";
   }
 
-  if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
-    $users = $calendar['user_id'];
-    foreach($users as $u) {
-      $id = explode("-", $u);
-      if ($id[1] == 'contact') {
-        $infos = get_contact_info($id[2]);
-        $u_name = $infos['firstname']." ".$infos['lastname'];
-        $sel_id = $u;
-        $div_id = "sel_user_id-$sel_id";
-        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-        <img src=\"$ico_delete\" alt=\"[Delete]\" />
-        </a>
-        $u_name
-        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-        </div>";
-      }
-    }
-  } else {
+  if (($action == 'detailupdate' || isset($calendar['new_meeting']) && $calendar['new_meeting']==1) || $action != 'new') {
     if (is_array($contacts['entity'])) {
       foreach ($contacts['entity'] as $u_id => $u_ent) {
         $u_name = $u_ent['label'];
         $sel_id = "data-contact-$u_id";
-        $div_id = "sel_user_id-$sel_id";
-        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+        $div_id = "sel_contact_id-$sel_id";
+        $dis_sel_contact .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_contact_id');\">
         <img src=\"$ico_delete\" alt=\"[Delete]\" />
         </a>
         $u_name
-        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+        <input value=\"$sel_id\" name=\"sel_contact_id[]\" type=\"hidden\" />
         </div> ";
       }
     }
@@ -3900,18 +3894,21 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $l_users / $GLOBALS[l_contacts]
       </th>
       <td class=\"autocompleteField\">
-      <select id=\"userSearchSource\" class=\"autocompleteSource\" name=\"\" style=\"float: right;\">
+      <select id=\"userSearchSource\" class=\"autocompleteSource\" name=\"\" style=\"float: right;\" onchange=\"set_autocomplete_container(this.value);\">
         <option value=\"$path/user/user_index.php?from=calendar\">$GLOBALS[l_users]</option>
         <optgroup label=\"$GLOBALS[l_addressbook]\">
           $addressbook_options
         </optgroup>
       </select>
       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
+      <input type='hidden' id='userSearchContainer' value='sel_user_id'/>
       </td>
       </tr>
       <tr>
-      <th>&nbsp;</th>    
-      <td id=\"sel_user_id\" class=\"autocompleteResult\">$dis_sel_user</td>
+        <th>&nbsp;</th>    
+        <td class='autocompleteResult'><span class='legend'>$GLOBALS[l_user]</span>
+        <div id='sel_user_id'>$dis_sel_user</div><span class='legend'>$GLOBALS[l_contact]</span><div id='sel_contact_id'>$dis_sel_contact</div>
+        </td>
       </tr>
       <tr>
       $dis_others_attendees
@@ -3920,7 +3917,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </table>
       </fieldset>
       <p class=\"LC\"></p>";
-      $user_complete = "new obm.AutoComplete.ExtSearch(
+      $user_complete = "obm.vars.consts.autocomplete_ext = new obm.AutoComplete.ExtSearch(
         function() { return \$('userSearchSource').value+'&action=ext_search'; },
         'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
   } else {
@@ -4300,10 +4297,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-  <form method=\"post\" enctype=\"multipart/form-data\" id=\"new_event_form\" name=\"f_entity\"
-   onsubmit=\"if (check_calendar_calendar(this)) return true; else return false;\"
-   action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
-  <fieldset class=\"detail infos\">  
+  <form method='post' enctype='multipart/form-data' id='new_event_form' name='f_entity'
+   onsubmit='return check_calendar_calendar(this);' action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
+  <fieldset class='detail infos'>  
   <legend>$l_module_calendar</legend>
   <table>
   <tr>

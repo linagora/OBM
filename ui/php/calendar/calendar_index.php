@@ -1260,6 +1260,22 @@ function get_calendar_params() {
     }
   }
 
+  // sel_contact_id can be filled by sel_contact_id or sel_ent (see below)
+  if (is_array($params['contact_id'])) {
+    while (list($key, $value) = each($params['contact_id'])) {
+      // sel_user_id contains select infos (data-user-$id)
+      if (strcmp(substr($value, 0, 13),'data-contact-') == 0) {
+        $data = explode('-', $value);
+        $id = $data[2];
+        $params['sel_contact_id'][] = $id;
+      } else {
+        // direct id
+        $params['sel_contact_id'][] = $value;
+      }
+    }
+  }
+
+
   // sel_resource_id can be filled by sel_resource_id or sel_ent (see below)
   if (is_array($params['resource_id'])) {
     while (list($key, $value) = each($params['resource_id']) ) {

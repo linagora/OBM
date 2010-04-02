@@ -268,23 +268,30 @@ function display_freebusy(data, duration, readOnly) {
 
 }
 
-function add_displayed_attendee(check, attendee, uid, kind) {
+function add_displayed_attendee(check, attendee, uid, kind, container) {
   if (check) {
     for(var id in attendee) {
-      var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
+      var sel_id = container+'-data-'+kind+'-'+id;
       if (!\$chk($(sel_id))) {
-        of_select_add_element(window.document, 'sel_'+kind+'_id', 'data-'+kind+'-'+id, attendee[id]);
+        of_select_add_element(window.document, container, 'data-'+kind+'-'+id, attendee[id]);
       }
     }
   } else {
     for(var id in attendee) {
       if ((kind == 'user' && id != uid) || kind != 'user') {
-        var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
+        var sel_id = container+'-data-'+kind+'-'+id;
         if (sel_id != null) {
           $(sel_id).destroy();
         }
       }
     }
+  }
+}
+
+function set_autocomplete_container(entity) {
+  obm.vars.consts.autocomplete_ext.setSelectedBox('sel_user_id');
+  if (entity.match('contact_index.php')) {
+    obm.vars.consts.autocomplete_ext.setSelectedBox('sel_contact_id');
   }
 }
 
