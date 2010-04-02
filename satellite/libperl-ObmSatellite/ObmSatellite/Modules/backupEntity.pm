@@ -14,6 +14,7 @@ eval {
     require ObmSatellite::Modules::BackupEntity::user;
     require ObmSatellite::Modules::BackupEntity::mailshare;
     require MIME::Lite;
+    require MIME::Base64;
 };
 
 use File::Path;
@@ -1161,7 +1162,7 @@ sub _sendMailReport {
     my $msg = MIME::Lite->new(
         From    => $mailReportRecipient,
         To      => $mailReportRecipient,
-        Subject => encode( 'MIME-Q', $mailContent->{'subject'} ),
+        Subject => '=?UTF-8?B?'.&MIME::Base64::encode_base64($mailContent->{'subject'}, '').'?=',
         Type    => 'multipart/related'
         );
     $msg->attr( 'Content-Type.charset' => 'UTF-8' );
