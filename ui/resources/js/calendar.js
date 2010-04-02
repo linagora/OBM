@@ -343,7 +343,7 @@ Obm.CalendarManager = new Class({
           allday = 1;
         }
         obm.calendarManager.scroll.stop();
-        obm.calendarQuickForm.setDefaultFormValues(eventData.time, 1, duration);
+        obm.calendarQuickForm.setDefaultFormValues(eventData.time, allday, duration);
         obm.calendarQuickForm.show();    
         obm.calendarQuickForm.form.tf_title.focus();
       });
