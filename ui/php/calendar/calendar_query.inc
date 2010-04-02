@@ -4172,8 +4172,8 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       if (is_array($evts = $contact->getEventsInInterval($start, $end))) {
         foreach($evts as $e) {
           if (!$search || 
-              ($search  && (empty($pattern_owner) || !empty($pattern_owner) && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern_owner)))) 
-                && $e->match($pattern, $type))) {
+              ($search  && $type == 'advanced' && ((empty($pattern_owner) || !empty($pattern_owner) && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern_owner)))) && $e->match($pattern, $type))) || 
+              ($search  && $type == 'basic' && ((empty($pattern_owner) || !empty($pattern_owner) && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern_owner)))) || $e->match($pattern, $type)))) {
             $event = new Event($e->getUid(),$e->getDuration(), $e->getSummary(), $e->getLocation(),
               $e->getCategory(),$e->isPrivate(),$e->getDescription(), null,
               $e->isAllDay(),'none',$c['id'],$owner_name, null, $e->getTransparency(),null);
