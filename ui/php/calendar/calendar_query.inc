@@ -1703,6 +1703,7 @@ function run_query_calendar_quick_event_update($calendar) {
     $event_date = "event_date = '$datebegin',";
   }
   $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
+  $all_day = ($calendar["all_day"])?'TRUE':'FALSE';
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
@@ -1710,7 +1711,8 @@ function run_query_calendar_quick_event_update($calendar) {
       event_title = '$title',
       $event_date
       event_origin = '$GLOBALS[c_origin_ajax]',
-      event_duration = '$event_duration'
+      event_duration = '$event_duration',
+      event_allday = $all_day
       WHERE
       event_id $event_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');

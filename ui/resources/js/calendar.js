@@ -336,8 +336,14 @@ Obm.CalendarManager = new Class({
       this.dummy.element.style.height = 0; // needed for dblclick
       this.dummy.resize.removeEvents('complete');
       this.dummy.resize.addEvent('complete', function() {
+        var duration = obm.calendarManager.dummy.event.duration;
+        var allday = 0;
+        if (duration == 86400) {
+          duration = 3600;
+          allday = 1;
+        }
         obm.calendarManager.scroll.stop();
-        obm.calendarQuickForm.setDefaultFormValues(eventData.time, 0, obm.calendarManager.dummy.event.duration);
+        obm.calendarQuickForm.setDefaultFormValues(eventData.time, 1, duration);
         obm.calendarQuickForm.show();    
         obm.calendarQuickForm.form.tf_title.focus();
       });
@@ -948,6 +954,10 @@ Obm.CalendarManager = new Class({
     eventData.title = evt.event.title;
     eventData.all_day = evt.event.all_day;
     eventData.periodic = evt.event.periodic;
+    if (eventData.duration == 86400) {
+      eventData.duration = 3600;
+      eventData.all_day = 1;
+    }
     eventData.opacity = evt.event.opacity;
     return eventData;
   },
