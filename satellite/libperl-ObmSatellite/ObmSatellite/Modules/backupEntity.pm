@@ -134,7 +134,7 @@ sub _putMethod {
         $self->_log( 'Fail to backup '.$entity->getLogin().'@'.$entity->getRealm(), 1 );
     }
 
-    $self->_getMailBackupReport($entity, $xmlContent->{'option'}, $response);
+    $self->_getMailBackupReport($entity, $xmlContent->{'options'}, $response);
 
     return $response;
 }
@@ -237,9 +237,10 @@ sub _postMethod {
         return $result;
     }
 
-    if( my $content = $self->_xmlContent( $requestBody ) ) {
-        if( (ref($content->{'backupFile'}) eq 'ARRAY') && defined( $content->{'backupFile'}->[0] ) ) {
-            $entity->setBackupName( $content->{'backupFile'}->[0] );
+    my $xmlContent = $self->_xmlContent($requestBody);
+    if($xmlContent) {
+        if( (ref($xmlContent->{'backupFile'}) eq 'ARRAY') && defined( $xmlContent->{'backupFile'}->[0] ) ) {
+            $entity->setBackupName( $xmlContent->{'backupFile'}->[0] );
         }else {
             return $self->_response( RC_BAD_REQUEST, {
                 content => [ 'Invalid request content' ],
@@ -260,6 +261,7 @@ sub _postMethod {
     my $response = $self->_restoreFromArchive( $entity, $data );
 
     $self->_removeTmpArchive( $entity );
+    $self->_getMailRestoreReport($entity, $xmlContent->{'options'}, $response);
 
     return $response;
 }
@@ -1063,7 +1065,65 @@ sub _getMailBackupReport {
 
     $mail->{'subject'} = $title.' - '.$entityType.' '
         .$entity->getLogin().'@'.$entity->getRealm().': '.$success;
-    $mail->{'content'} = $response->getContentValue('content');
+    $mail->{'content'} = [];
+    if( my $content = $response->getContentValue('content') ) {
+        push( @{$mail->{'content'}}, @{$content} );
+    }
+
+    return $self->_sendMailReport($mail, $entity, $options);
+}
+
+
+sub _getMailRestoreReport {
+    my $self = shift;
+    my( $entity, $options, $response ) = @_;
+
+    my $language = $self->_getDefaultObmLang( $entity->getRealm() );
+
+    my $mail = {};
+
+    my $title = 'Restore report';
+    my $entityType = $entity->getEntityType();
+    my $success = eval {
+        if($response->isError()) {
+            return 'FAIL';
+        }
+
+        return 'SUCCESS';
+    };
+
+    SWITCH: {
+        if($language eq 'fr') {
+            $title = 'Rapport de restauration';
+            $entityType = eval {
+                my $type = $entity->getEntityType();
+
+                if($type eq 'user') {
+                    return 'utilisateur';
+                }elsif($type eq 'mailshare') {
+                    return 'partage de messagerie';
+                }
+
+                return 'type inconnu';
+            };
+            $success = eval {
+                if($response->isError()) {
+                    return 'Échec';
+                }
+
+                return 'Succés';
+            };
+
+            last SWITCH;
+        }
+    }
+
+    $mail->{'subject'} = $title.' - '.$entityType.' '
+        .$entity->getLogin().'@'.$entity->getRealm().': '.$success;
+    $mail->{'content'} = [];
+    if( my $content = $response->getContentValue('content') ) {
+        push( @{$mail->{'content'}}, @{$content} );
+    }
 
     return $self->_sendMailReport($mail, $entity, $options);
 }
