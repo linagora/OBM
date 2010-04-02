@@ -6214,7 +6214,7 @@ function json_build_html_event($calendar, $current_view, $id) {
 function json_insert_event_data($id,$calendar,$current_view) {
  
   $duration = $calendar['duration'];
-  $all_day = ($calendar['all_day'])?1:0;
+  $all_day = ($calendar['all_day'])?true:false;
   $date_range = $current_view->get_date_range();
   $date = clone $date_range['begin'];
   $end = clone $date_range['end'];
@@ -6223,17 +6223,16 @@ function json_insert_event_data($id,$calendar,$current_view) {
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $category_filter = $current_view->get_category_filter();
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
+  $of = &OccurrenceFactory::getInstance();
 
   if ($all_day) {
     $current = clone $date;
-    $current->setWeekday($GLOBALS[ccalendar_weekstart])->setHour(0)->setMinute(0)->setSecond(0);
-    $of = &OccurrenceFactory::getInstance();
     while($current->compare($end) < 0) {
       $endWeek = clone $current;
       $endWeek->addDay(7);
-      $occurrences = $of->getPeriodOccurrences($current,$endWeek);
-      if (is_array($occurrences)) {
-        foreach($occurrences as $occurrence) {
+      $ocs = $of->getPeriodOccurrences($current,$endWeek);
+      if (is_array($ocs)) {
+        foreach($ocs as $occurrence) {
           if ($occurrence->event->id == $id) {
             $occurrence->index = $occurrence->date;
             $occurrence->left = false;
