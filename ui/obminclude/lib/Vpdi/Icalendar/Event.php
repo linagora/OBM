@@ -90,12 +90,33 @@ class Vpdi_Icalendar_Event {
     return $this->evt->isPrivate();
   }
 
-  public function match($pattern) {
-    return (
-      array_intersect(explode(" ", strtolower($this->getSummary())), explode(" ", $pattern)) || 
-      array_intersect(explode(" ", strtolower($this->getLocation())), explode(" ", $pattern)) || 
-      array_intersect(explode(" ", strtolower($this->getDescription())), explode(" ", $pattern))
-      );
+  public function match($pattern, $type) {
+    if ($type == "basic") {
+      $p = explode(" ", $pattern);
+      return (
+        array_intersect(explode(" ", strtolower($this->getSummary())), $p) || 
+        array_intersect(explode(" ", strtolower($this->getLocation())), $p) || 
+        array_intersect(explode(" ", strtolower($this->getDescription())), $p)
+        );
+    } elseif ($type == "advanced") {
+      $r = true; 
+      $summary = strtolower($pattern['summary']);
+      if (!empty($summary)) {
+        $r = $r && array_intersect(explode(" ", strtolower($this->getSummary())), explode(" ", $summary));
+      }
+
+      $location = strtolower($pattern['location']);
+      if (!empty($location)) {
+        $r = $r && array_intersect(explode(" ", strtolower($this->getLocation())), explode(" ", $location));
+      }
+
+      $desc = strtolower($pattern['desc']);
+      if (!empty($desc)) {
+        $r = $r && array_intersect(explode(" ", strtolower($this->getDescription())), explode(" ", $desc));
+      }
+
+      return $r;
+    }
   }
 
 }

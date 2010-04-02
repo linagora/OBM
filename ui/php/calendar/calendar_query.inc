@@ -4157,7 +4157,13 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $location = trim($calendar['location']);
       $desc = trim($calendar['desc']);
       $owner = trim($calendar['owner']);
-      $pattern = trim(strtolower("$calendar[pattern] $summary $owner $location $desc"));
+      if ($type == 'basic') {
+        $pattern = trim(strtolower("$calendar[pattern] $summary $owner $location $desc"));
+        $pattern_owner = $pattern;
+      } else if ($type == 'advanced') {
+        $pattern = array('summary' => $summary, 'location' => $location, 'desc' => $desc);
+        $pattern_owner = $owner;
+      }
       $search = true;
     }
     foreach($calendar_entity['contact'] as $c) {
@@ -4166,8 +4172,8 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       if (is_array($evts = $contact->getEventsInInterval($start, $end))) {
         foreach($evts as $e) {
           if (!$search || 
-              ($search  && $type == 'basic' && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern)) || $e->match($pattern)))
-            ) {
+              ($search  && (empty($pattern_owner) || !empty($pattern_owner) && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern_owner)))) 
+                && $e->match($pattern, $type))) {
             $event = new Event($e->getUid(),$e->getDuration(), $e->getSummary(), $e->getLocation(),
               $e->getCategory(),$e->isPrivate(),$e->getDescription(), null,
               $e->isAllDay(),'none',$c['id'],$owner_name, null, $e->getTransparency(),null);

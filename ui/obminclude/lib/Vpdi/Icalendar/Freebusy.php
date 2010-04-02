@@ -110,7 +110,28 @@ class Vpdi_Icalendar_Freebusy {
     return false;
   }
 
-  public function match($pattern) {
-    return $pattern == strtolower(__("Busy"));
+  public function match($pattern, $type) {
+    if ($type == 'basic') {
+      return in_array(strtolower(__("Busy")), explode(" ", strtolower($pattern)));
+    }
+    if ($type == 'advanced') {
+      $r = true;
+      $summary = strtolower($pattern['summary']);
+      if (!empty($summary)) {
+        $r = $r && in_array(strtolower($this->getSummary()), explode(" ", $summary));
+      }
+
+      $location = strtolower($pattern['location']);
+      if (!empty($location)) {
+        $r = $r && in_array(strtolower($this->getLocation()), explode(" ", $location));
+      }
+
+      $desc = strtolower($pattern['desc']);
+      if (!empty($desc)) {
+        $r = $r && in_array(strtolower($this->getDescription()), explode(" ", $desc));
+      }
+
+      return $r;
+    }
   }
 }
