@@ -3561,6 +3561,13 @@ DROP TABLE IF EXISTS `P_of_usergroup`;
 CREATE TABLE `P_of_usergroup` (LIKE `of_usergroup`);
 
 --
+-- Table structure for table `P_CategoryLink`
+--
+
+DROP TABLE IF EXISTS `P_CategoryLink`;
+CREATE TABLE `P_CategoryLink` (LIKE `CategoryLink`);
+
+--
 -- OPush tables
 --
 

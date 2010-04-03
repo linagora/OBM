@@ -248,7 +248,7 @@ sub updateLdapEntry {
         }
 
         # OBM domain language
-        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'obmLang'}, $entry, 'obmLang' ) ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'obmLang'}, $entry, 'obmLang' ) ) {
             $update = 1;
         }
 

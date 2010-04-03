@@ -78,10 +78,20 @@ sub next {
 }
 
 
+# Select all entities that must be processed
 sub _loadEntities {
     my $self = shift;
 
     return 0;
+}
+
+
+# Load current entity extended descriptions (categories...)
+sub _loadCurrentEntityCategories {
+    my $self = shift;
+    my( $entityDbName ) = @_;
+
+    return 1;
 }
 
 

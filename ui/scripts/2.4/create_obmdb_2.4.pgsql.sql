@@ -11384,7 +11384,6 @@ CREATE INDEX taskevent_event_id_fkey ON taskevent (taskevent_event_id);
 --
 
 CREATE TABLE P_Domain (LIKE Domain);
-INSERT INTO P_Domain SELECT * FROM Domain;
 
 
 --
@@ -11392,7 +11391,6 @@ INSERT INTO P_Domain SELECT * FROM Domain;
 --
 
 CREATE TABLE P_DomainEntity (LIKE DomainEntity);
-INSERT INTO P_DomainEntity SELECT * FROM DomainEntity;
 
 
 --
@@ -11400,7 +11398,6 @@ INSERT INTO P_DomainEntity SELECT * FROM DomainEntity;
 --
 
 CREATE TABLE P_EntityRight (LIKE EntityRight);
-INSERT INTO P_EntityRight SELECT * FROM EntityRight;
  
 
 --
@@ -11408,7 +11405,6 @@ INSERT INTO P_EntityRight SELECT * FROM EntityRight;
 --
 
 CREATE TABLE P_GroupEntity (LIKE GroupEntity);
-INSERT INTO P_GroupEntity SELECT * FROM GroupEntity;
 
 
 --
@@ -11416,14 +11412,12 @@ INSERT INTO P_GroupEntity SELECT * FROM GroupEntity;
 --
 
 CREATE TABLE P_Host (LIKE Host);
-INSERT INTO P_Host SELECT * FROM Host;
 
 --
 -- Table structure for table P_HostEntity
 --
 
 CREATE TABLE P_HostEntity (LIKE HostEntity);
-INSERT INTO P_HostEntity SELECT * FROM HostEntity;
 
 
 --
@@ -11431,7 +11425,6 @@ INSERT INTO P_HostEntity SELECT * FROM HostEntity;
 --
 
 CREATE TABLE P_MailShare (LIKE MailShare);
-INSERT INTO P_MailShare SELECT * FROM MailShare;
 
 
 --
@@ -11439,7 +11432,6 @@ INSERT INTO P_MailShare SELECT * FROM MailShare;
 --
 
 CREATE TABLE P_MailshareEntity (LIKE MailshareEntity);
-INSERT INTO P_MailshareEntity SELECT * FROM MailshareEntity;
 
 
 --
@@ -11447,7 +11439,6 @@ INSERT INTO P_MailshareEntity SELECT * FROM MailshareEntity;
 --
 
 CREATE TABLE P_MailboxEntity (LIKE MailboxEntity);
-INSERT INTO P_MailboxEntity SELECT * FROM MailboxEntity;
 
 
 --
@@ -11455,7 +11446,6 @@ INSERT INTO P_MailboxEntity SELECT * FROM MailboxEntity;
 --
 
 CREATE TABLE P_Service (LIKE Service);
-INSERT INTO P_Service SELECT * FROM Service;
 
 
 --
@@ -11463,7 +11453,6 @@ INSERT INTO P_Service SELECT * FROM Service;
 --
 
 CREATE TABLE P_ServiceProperty (LIKE ServiceProperty);
-INSERT INTO P_ServiceProperty SELECT * FROM ServiceProperty;
 
 
 --
@@ -11471,7 +11460,6 @@ INSERT INTO P_ServiceProperty SELECT * FROM ServiceProperty;
 --
 
 CREATE TABLE P_UGroup (LIKE UGroup);
-INSERT INTO P_UGroup SELECT * FROM UGroup;
 
 
 --
@@ -11479,7 +11467,6 @@ INSERT INTO P_UGroup SELECT * FROM UGroup;
 --
 
 CREATE TABLE P_UserEntity (LIKE UserEntity);
-INSERT INTO P_UserEntity SELECT * FROM UserEntity;
 
 
 --
@@ -11487,7 +11474,6 @@ INSERT INTO P_UserEntity SELECT * FROM UserEntity;
 --
 
 CREATE TABLE P_UserObm (LIKE UserObm);
-INSERT INTO P_UserObm SELECT * FROM UserObm;
 
 
 --
@@ -11495,7 +11481,14 @@ INSERT INTO P_UserObm SELECT * FROM UserObm;
 --
 
 CREATE TABLE P_of_usergroup (LIKE of_usergroup);
-INSERT INTO P_of_usergroup SELECT * FROM of_usergroup;
+
+
+--
+-- Table structure for table P_CategoryLink
+--
+
+CREATE TABLE P_CategoryLink (LIKE CategoryLink);
+INSERT INTO P_CategoryLink SELECT * FROM CategoryLink;
 
 
 --

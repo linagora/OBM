@@ -100,6 +100,11 @@ sub next {
             $self->{'currentEntity'} = $current;
 
             SWITCH: {
+                if( !$self->_loadCurrentEntityCategories() ) {
+                    $self->_log( 'problème au chargement des informations complémentaires de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
+                    next;
+                }
+
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
                     if( $self->_loadGroupLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
@@ -221,6 +226,51 @@ sub _loadEntities {
     }
 
     return 0;
+}
+
+
+sub _loadCurrentEntityCategories {
+    my $self = shift;
+
+    $self->_log( 'chargement des informations complémentaires de l\'entité '.$self->{'currentEntity'}->getDescription(), 3 );
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connexion à la base de données impossible', 1 );
+        return 0;
+    }
+
+    my $tablePrefix = '';
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
+        $tablePrefix = 'P_';
+    }
+
+    my $query = 'SELECT Category.category_label,
+                        Category.category_category
+                 FROM '.$tablePrefix.'CategoryLink
+                 INNER JOIN Category
+                    ON '.$tablePrefix.'CategoryLink.categorylink_category_id = Category.category_id
+                 INNER JOIN '.$tablePrefix.'GroupEntity
+                    ON '.$tablePrefix.'GroupEntity.groupentity_entity_id = '.$tablePrefix.'CategoryLink.categorylink_entity_id
+                 WHERE '.$tablePrefix.'GroupEntity.groupentity_group_id = '.$self->{'currentEntity'}->getId();
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return 0;
+    }
+
+    my %entityCategories;
+    while( my($categoryValue, $categoryName) = $queryResult->fetchrow_array() ) {
+        $entityCategories{$categoryName}->{$categoryValue} = 1;
+    }
+
+    while( my($key, $value) = each(%entityCategories) ) {
+        my @keys = keys(%{$value});
+        $entityCategories{$key} = \@keys;
+    }
+
+    return $self->{'currentEntity'}->setCategories(\%entityCategories);
 }
 
 

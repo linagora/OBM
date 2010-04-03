@@ -282,7 +282,14 @@ ALTER TABLE ONLY contactgroup
 
 DROP TABLE IF EXISTS P__contactgroup;
 CREATE TABLE P__contactgroup (LIKE _contactgroup);
-INSERT INTO P__contactgroup SELECT * FROM _contactgroup;
+
+
+--
+-- Table structure for table `P_CategoryLink`
+--
+
+DROP TABLE IF EXISTS P_CategoryLink;
+CREATE TABLE P_CategoryLink (LIKE CategoryLink);
 
 
 --

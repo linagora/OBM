@@ -213,7 +213,22 @@ sub update {
                                 userentity_user_id
                       FROM UserEntity
                       WHERE userentity_user_id='.$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
+            return 1;
+        }
 
+        $query = 'INSERT INTO P_CategoryLink
+                    (   categorylink_category_id,
+                        categorylink_entity_id,
+                        categorylink_category
+                    ) SELECT    categorylink_category_id,
+                                categorylink_entity_id,
+                                categorylink_category
+                      FROM CategoryLink
+                      WHERE categorylink_entity_id=(SELECT userentity_entity_id
+                                                    FROM UserEntity
+                                                    WHERE userentity_user_id = '.$entity->getId().')';
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
             return 1;
@@ -314,6 +329,15 @@ sub _delete {
     }
 
     if( $entity->getDelete() || $entity->getUpdateEntity() ) {
+        $query = 'DELETE FROM P_CategoryLink
+                    WHERE categorylink_entity_id=(SELECT userentity_entity_id
+                                                    FROM UserEntity
+                                                    WHERE userentity_user_id = '.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );
+            return 1;
+        }
+
         $query = 'DELETE FROM P_UserEntity WHERE userentity_user_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );

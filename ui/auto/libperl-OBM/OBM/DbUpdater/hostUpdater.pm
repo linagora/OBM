@@ -97,6 +97,22 @@ sub update {
             $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
             return 1;
         }
+
+        $query = 'INSERT INTO P_CategoryLink
+                    (   categorylink_category_id,
+                        categorylink_entity_id,
+                        categorylink_category
+                    ) SELECT    categorylink_category_id,
+                                categorylink_entity_id,
+                                categorylink_category
+                      FROM CategoryLink
+                      WHERE categorylink_entity_id=(SELECT hostentity_entity_id
+                                                    FROM HostEntity
+                                                    WHERE hostentity_host_id = '.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
+            return 1;
+        }
     }
 
     if( !$entity->getDelete() && $entity->getUpdateLinks() ) {
@@ -168,7 +184,16 @@ sub _delete {
     }
 
     if( $entity->getDelete() || $entity->getUpdateEntity() ) {
-        my $query = 'DELETE FROM P_HostEntity WHERE hostentity_host_id='.$entity->getId();
+        my $query = 'DELETE FROM P_CategoryLink
+                    WHERE categorylink_entity_id=(SELECT hostentity_entity_id
+                                                    FROM HostEntity
+                                                    WHERE hostentity_host_id = '.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );
+            return 1;
+        }
+
+        $query = 'DELETE FROM P_HostEntity WHERE hostentity_host_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );
             return 1;

@@ -117,7 +117,7 @@ sub execQuery {
         return undef;
     }
 
-    $self->_log( 'requete a executer : \''.$query.'\'', 5 );
+    $self->_log( 'requete a executer : \''.$query.'\'', 4 );
 
     my $dbHandler = $self->{'dbHandler'};
     $$sth = $dbHandler->prepare( $query );
@@ -133,16 +133,16 @@ sub execQuery {
 
     if( defined($$sth->{NUM_OF_FIELDS}) ) {
         # SELECT SQL request
-        $self->_log( 'requete de type \'SELECT\', nombre de tuples affectes par la requete non defini', 4 );
+        $self->_log( 'requete de type \'SELECT\', nombre de tuples affectes par la requete non defini', 5 );
         return 0;
     }
 
     if( $rv == -1 ) {
-        $self->_log( 'nombre de tuples affectes par la requete non defini', 4 );
+        $self->_log( 'nombre de tuples affectes par la requete non defini', 5 );
         return 0;
     }
 
-    $self->_log( $rv.' tuple(s) affecte(s) par la requete', 4 );
+    $self->_log( $rv.' tuple(s) affecte(s) par la requete', 5 );
 
     return $rv;
 }

@@ -566,3 +566,38 @@ sub smtpInUpdateMap {
 
     return 0;
 }
+
+
+# Needed to add entity categories to the entity description.
+# Categories can be used on ldapMapping using it's category name.
+# WARNING: if category is multi-valued, check that corresponding LDAP
+# attribute is multi-valued in ldapMapping XML configuration file too !
+#
+#  - entityCategories : hash reference. Keys are categories name, values is
+#    a category values array reference
+sub setCategories {
+    my $self = shift;
+    my( $entityCategories ) = @_;
+
+    if( ref($entityCategories) ne 'HASH' ) {
+        $self->_log( 'Parametre \'entityCategories\' invalide. Doit être une référence à un HASH', 4 );
+        return 0;
+    }
+
+    while( my($categoryName, $categoryValues) = each(%{$entityCategories}) ) {
+        if( ref($categoryValues) ne 'ARRAY' ) {
+            $self->_log( 'Valeurs incorrectes pour la catégorie \''.$categoryName.'\'', 2 );
+            next;
+        }
+
+        if( exists($self->{'entityDesc'}->{$categoryName}) ) {
+            $self->_log( 'Le nom de la catégorie \''.$categoryName.'\' est déjà utilisé dans la description de '.$self->getDescription(), 2 );
+            next;
+        }
+
+        $self->_log( 'Definition de la catégorie \''.$categoryName.'\'', 5 );
+        $self->{'entityDesc'}->{$categoryName} = $categoryValues;
+    }
+
+    return 1;
+}

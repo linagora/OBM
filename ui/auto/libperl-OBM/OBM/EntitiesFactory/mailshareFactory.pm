@@ -75,10 +75,13 @@ sub next {
 
     while( defined($self->{'entitiesDescList'}) && (my $mailshareDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
         require OBM::Entities::obmMailshare;
-        if( !(my $current = OBM::Entities::obmMailshare->new( $self->{'parentDomain'}, $mailshareDesc )) ) {
+        if( !($self->{'currentEntity'} = OBM::Entities::obmMailshare->new( $self->{'parentDomain'}, $mailshareDesc )) ) {
             next;
         }else {
-            $self->{'currentEntity'} = $current;
+            if( !$self->_loadCurrentEntityCategories() ) {
+                $self->_log( 'problème au chargement des informations complémentaires de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
+                next;
+            }
 
             SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
@@ -199,6 +202,51 @@ sub _loadEntities {
     }
 
     return 0;
+}
+
+
+sub _loadCurrentEntityCategories {
+    my $self = shift;
+
+    $self->_log( 'chargement des informations complémentaires de l\'entité '.$self->{'currentEntity'}->getDescription(), 3 );
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connexion à la base de données impossible', 1 );
+        return 0;
+    }
+
+    my $tablePrefix = '';
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
+        $tablePrefix = 'P_';
+    }
+
+    my $query = 'SELECT Category.category_label,
+                        Category.category_category
+                 FROM '.$tablePrefix.'CategoryLink
+                 INNER JOIN Category
+                    ON '.$tablePrefix.'CategoryLink.categorylink_category_id = Category.category_id
+                 INNER JOIN '.$tablePrefix.'MailshareEntity
+                    ON '.$tablePrefix.'MailshareEntity.mailshareentity_entity_id = '.$tablePrefix.'CategoryLink.categorylink_entity_id
+                 WHERE '.$tablePrefix.'MailshareEntity.mailshareentity_mailshare_id = '.$self->{'currentEntity'}->getId();
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return 0;
+    }
+
+    my %entityCategories;
+    while( my($categoryValue, $categoryName) = $queryResult->fetchrow_array() ) {
+        $entityCategories{$categoryName}->{$categoryValue} = 1;
+    }
+
+    while( my($key, $value) = each(%entityCategories) ) {
+        my @keys = keys(%{$value});
+        $entityCategories{$key} = \@keys;
+    }
+
+    return $self->{'currentEntity'}->setCategories(\%entityCategories);
 }
 
 
