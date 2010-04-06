@@ -119,6 +119,15 @@
   text-align:right;
 }
 
+.todayLabel {
+  background-color:#97C5D3;
+}
+
+.todayLabel a {
+  color:#FFF;
+  font-weight:bold;
+}
+
 #today {
   background:#FFFFCC;
   height:100%;
