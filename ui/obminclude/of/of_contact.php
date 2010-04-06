@@ -48,52 +48,52 @@ class OBM_Contact implements OBM_ISearchable {
     'addressbook' 	=> array('sql' => 'contact_addressbook', 'sqlkind' => 'text', 'type' => 'text')
   ); 
 
-  private  $id;
-  private  $timecreate;
-  private  $timeupdate;
-  private  $usercreate;
-  private  $userupdate;
-  private  $entity_id;
+  private $id;
+  private $timecreate;
+  private $timeupdate;
+  private $usercreate;
+  private $userupdate;
+  private $entity_id;
 
-  private  $lastname;
-  private  $firstname;
-  private  $mname;//middlename
-  private  $kind;
-  private  $title;
-  private  $function;
-  private  $categories = array();
-  private  $company_id;
-  private  $company;
-  private  $market_id;//marketingmanager_id
-  private  $suffix;
-  private  $aka;
-  private  $sound;
-  private  $manager;
-  private  $assistant;
-  private  $spouse;
-  private  $category;
-  private  $service;
-  private  $mailok;//mailing_ok
-  private  $newsletter;
-  private  $date;
-  private  $birthday;
-  private  $birthday_event;
-  private  $anniversary;
-  private  $anniversary_event;
-  private  $phone = array();
-  private  $email = array();
-  private  $address = array();
-  private  $im = array();
-  private  $website = array();
-  private  $archive;
-  private  $collected;
-  private  $datasource_id;
-  private  $comment;
-  private  $comment2;
-  private  $comment3;
-  private  $origin;
-  private  $addressbook_id;
-  private  $addressbook;
+  private $lastname;
+  private $firstname;
+  private $mname;//middlename
+  private $kind;
+  private $title;
+  private $function;
+  private $categories = array();
+  private $company_id;
+  private $company;
+  private $market_id;//marketingmanager_id
+  private $suffix;
+  private $aka;
+  private $sound;
+  private $manager;
+  private $assistant;
+  private $spouse;
+  private $category;
+  private $service;
+  private $mailok;//mailing_ok
+  private $newsletter;
+  private $date;
+  private $birthday;
+  private $birthday_event;
+  private $anniversary;
+  private $anniversary_event;
+  private $phone = array();
+  private $email = array();
+  private $address = array();
+  private $im = array();
+  private $website = array();
+  private $archive;
+  private $collected;
+  private $datasource_id;
+  private $comment;
+  private $comment2;
+  private $comment3;
+  private $origin;
+  private $addressbook_id;
+  private $addressbook;
  
   private static $kinds = null;
 
@@ -1660,4 +1660,15 @@ class OBM_Contact implements OBM_ISearchable {
     }
     return false;
   }  
+
+  public function hasCalUri() {
+    if (is_array($this->website)) {
+      foreach($this->website as $website) {
+        if ($website['label'][0] == 'CALURI') {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }
