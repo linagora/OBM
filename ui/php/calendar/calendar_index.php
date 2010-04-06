@@ -971,7 +971,22 @@ if ($action == 'search') {
 
 } elseif ($action == 'portlet') {
 ///////////////////////////////////////////////////////////////////////////////
-  echo dis_calendar_portlet($params);
+  $display['head'] = display_head($l_calendar);
+  if (isset($params['list'])) {
+    $calendar_entity = $current_view->get_entities();
+    $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
+      OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
+    );
+    $display['detail'] = dis_calendar_day_list($current_view, $calendar_entity, $writable_entity);
+  } else if (isset($params['waiting'])) {
+    $display['detail'] = dis_calendar_waiting_portlet();
+  } else if (isset($params['task'])) {
+    $display['detail'] = dis_calendar_task_portlet();
+  }else {
+    $display['detail'] = dis_calendar_calendar_view($params, $current_view);
+  }
+  $display['title'] = dis_portlet_navbar($params, $current_view);
+  display_page($display);
   exit();
 
 ///////////////////////////////////////////////////////////////////////////////

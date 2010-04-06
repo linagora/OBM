@@ -153,13 +153,15 @@ Obm.CalendarManager = new Class({
             current.setSeconds(0);
             current.setMilliseconds(0);
             var more = $('more_'+index);
+            var target = "";
+            if (obm.vars.consts.action == 'portlet') target = "target='_blank'";
             if (more) {
-              var title = '<a href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title+'</a>';
+              var title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title+'</a>';
 	            var color = evt.content.getStyle('backgroundColor');
               if (evt.event.colors.event && evt.event.colors.event.body) color = evt.event.colors.event.body;
               var style = 'style="color:'+color+'"';
               if (evt.event.all_day) {
-                title = '<a href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'>'+evt.event.title+'</a>';
+                title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'>'+evt.event.title+'</a>';
                 color = "#fff";
                 klass='class="moreEvent '+evt.event.klass+'"';
                 style = 'style="background:'+evt.event.colors.event+'; color:'+color+'" '+klass ;
@@ -1478,9 +1480,9 @@ Obm.CalendarInDayEvent = new Class({
     if (this.isExternal()) {
       this.timeContainer = new Element('span').injectInside(this.dragHandler);
     } else {
-      this.timeContainer = new Element('a')
-         .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
-         .injectInside(this.dragHandler);
+      this.timeContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id);
+      if (obm.vars.consts.action == 'portlet') this.timeContainer.setProperty('target', '_blank');
+      this.timeContainer.injectInside(this.dragHandler);
 
       this.linkContainer = this.timeContainer;
       this.linkContainer.addEvent('mousedown', function (evt) {
@@ -1727,9 +1729,9 @@ Obm.CalendarAllDayEvent = new Class({
     if (this.isExternal()) {
       this.titleContainer = new Element('span').injectInside(this.dragHandler);
     } else {
-      this.titleContainer = new Element('a')
-         .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
-         .injectInside(this.dragHandler);
+      this.titleContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id);
+      if (obm.vars.consts.action == 'portlet') this.titleContainer.setProperty('target', '_blank');
+      this.titleContainer.injectInside(this.dragHandler);
 
       this.linkContainer = this.titleContainer;
       this.linkContainer.addEvent('mousedown', function (evt) {

@@ -1249,21 +1249,27 @@ h1.hoursTitle{
 }
 
 .tab {
-  border-bottom:1px solid black;
+  border-bottom:1px solid #666;
   padding-top: 2px;
 }
 
 .tab label {
-  padding-left: 2px;
-  padding-right: 2px;
-  border: 1px solid black;
+  padding-left: 4px;
+  padding-right: 4px;
+  border: 1px solid #666;
   font-weight: bold;
   cursor: pointer;
+  -moz-border-radius: 4px 4px 0px 0px;
+  -webkit-border-radius: 4px 4px 0px 0px;
+  border-radius: 4px 4px 0px 0px;
 }
 
 .tabSelected {
   background: #4692a9;
-  color: #FFF;
+}
+
+.tab .tabSelected a{
+   color: #FFF;
 }
 
 /* mini calendar */
