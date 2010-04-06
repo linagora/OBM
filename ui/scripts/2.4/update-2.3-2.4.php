@@ -35,7 +35,7 @@ class GroupContactUpdate extends UpdateObject {
     foreach($groups as $gid => $group) {
       $this->storeGroupContacts($gid, $group);
     }
-    $query = "ALTER TABLE UGroup DROP COLUMN group_contacts":
+    $query = "ALTER TABLE UGroup DROP COLUMN group_contacts";
     $result = $this->query($query);
     $result->free();
   }
