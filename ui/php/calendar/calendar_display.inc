@@ -1232,6 +1232,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     obm.vars.consts.extension_left = '".phpStringToJsString($GLOBALS['ico_extension_left'])."';
     obm.vars.consts.extension_right = '".phpStringToJsString($GLOBALS['ico_extension_right'])."';
     obm.vars.consts.timeUnit = '".(3600/$_SESSION['set_cal_interval'])."';  
+    obm.vars.consts.action = '".$GLOBALS['action']."';
     obm.initialize.chain(function () {
       obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
@@ -1370,6 +1371,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     obm.vars.consts.extension_left = '".phpStringToJsString($GLOBALS['ico_extension_left'])."';
     obm.vars.consts.extension_right = '".phpStringToJsString($GLOBALS['ico_extension_right'])."';
     obm.vars.consts.timeUnit = '".(3600/$_SESSION['set_cal_interval'])."';  
+    obm.vars.consts.action = '".$GLOBALS['action']."';
     obm.initialize.chain(function () {
       obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
