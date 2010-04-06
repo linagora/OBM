@@ -297,15 +297,17 @@ function html_calendar_bar_legend($p_view, $calendar_entity) {
       foreach ($entity as $id => $data) {
         $data_id = "data-$type-$id";
         $warn = "";
+        $class = "class='colorChooser'";
         if ($type == 'contact') {
           $contact = OBM_Contact::get($id);
           if (!$contact->hasCalUri()) {
-            $warn = "<img src='$GLOBALS[ico_warning]' title=\"$GLOBALS[l_calendar_not_available]\" />";
+            $warn = "<span class='NW' style='float:right'><img src='$GLOBALS[ico_warning]' title=\"$GLOBALS[l_calendar_not_available]\" /></span>";
+            $class = "";
           }
         }
 
         $dis_legend .= "
-          <li title=\"$tooltip\" class=\"$data[class]Legend\"><input class=\"colorChooser\" name=\"class-$type-$id\" type=\"hidden\" /><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
+          <li title=\"$tooltip\" class=\"$data[class]Legend\"><input $class name=\"class-$type-$id\" type=\"hidden\" /><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
           <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
         if ($output_target != 'print') {
           $dis_legend .= "<img src=\"$ico_delete\"
