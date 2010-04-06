@@ -1,7 +1,7 @@
 [backupEntity]
 
 # Backup temporary directory, used to prepare archive
-# default: /tmp
+# default: /var/tmp
 
 # Cyrus IMAPd configuration file
 # default: imapdConfFile = /etc/imapd.conf
