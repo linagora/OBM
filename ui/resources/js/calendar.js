@@ -2105,7 +2105,11 @@ Obm.CalendarQuickForm = new Class({
     this.location.set('html',evt.event.location);
     this.data.setStyle('display','block');
     if (!this.eventData.all_day) {
-      this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' H:i'));
+      if (date_begin.format('Ymd') == date_end.format('Ymd')) {
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat) + ', ' + date_begin.format('H:i')+' - '+date_end.format('H:i'));
+      } else {
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' H:i'));
+      }
     } else {
       if (evt.event.duration <= 86400) {
         this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat));
