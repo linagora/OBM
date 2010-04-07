@@ -1224,13 +1224,13 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     obm.vars.consts.cellWidth = $width;
     obm.vars.consts.nbDisplayedDays = $display_days;
     obm.vars.consts.calendarView = 'day';
-    obm.vars.consts.resize = '".phpStringToJsString($GLOBALS['ico_resize'])."';
-    obm.vars.consts.periodic = '".phpStringToJsString($GLOBALS['ico_periodic'])."';
-    obm.vars.consts.meeting = '".phpStringToJsString($GLOBALS['ico_meeting'])."';
-    obm.vars.consts.private = '".phpStringToJsString($GLOBALS['ico_private'])."';
-    obm.vars.consts.all_day = '".phpStringToJsString($GLOBALS['ico_allday'])."';
-    obm.vars.consts.extension_left = '".phpStringToJsString($GLOBALS['ico_extension_left'])."';
-    obm.vars.consts.extension_right = '".phpStringToJsString($GLOBALS['ico_extension_right'])."';
+    obm.vars.images.resize = '$GLOBALS[ico_resize]';
+    obm.vars.images.periodic = '$GLOBALS[ico_periodic]';
+    obm.vars.images.meeting = '$GLOBALS[ico_meeting]';
+    obm.vars.images.private = '$GLOBALS[ico_private]';
+    obm.vars.images.all_day = '$GLOBALS[ico_allday]';
+    obm.vars.images.extension_left = '$GLOBALS[ico_extension_left]';
+    obm.vars.images.extension_right = '$GLOBALS[ico_extension_right]';
     obm.vars.consts.timeUnit = '".(3600/$_SESSION['set_cal_interval'])."';  
     obm.vars.consts.action = '".$GLOBALS['action']."';
     obm.initialize.chain(function () {
@@ -1363,13 +1363,13 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     obm.vars.consts.calendarView = 'month';
     $dis_week_time
     $dis_weekbegin_time
-    obm.vars.consts.resize = '".phpStringToJsString($GLOBALS['ico_resize'])."';
-    obm.vars.consts.periodic = '".phpStringToJsString($GLOBALS['ico_periodic'])."';
-    obm.vars.consts.meeting = '".phpStringToJsString($GLOBALS['ico_meeting'])."';
-    obm.vars.consts.private = '".phpStringToJsString($GLOBALS['ico_private'])."';
-    obm.vars.consts.all_day = '".phpStringToJsString($GLOBALS['ico_allday'])."';
-    obm.vars.consts.extension_left = '".phpStringToJsString($GLOBALS['ico_extension_left'])."';
-    obm.vars.consts.extension_right = '".phpStringToJsString($GLOBALS['ico_extension_right'])."';
+    obm.vars.images.resize = '$GLOBALS[ico_resize]';
+    obm.vars.images.periodic = '$GLOBALS[ico_periodic]';
+    obm.vars.images.meeting = '$GLOBALS[ico_meeting]';
+    obm.vars.images.private = '$GLOBALS[ico_private]';
+    obm.vars.images.all_day = '$GLOBALS[ico_allday]';
+    obm.vars.images.extension_left = '$GLOBALS[ico_extension_left]';
+    obm.vars.images.extension_right = '$GLOBALS[ico_extension_right]';
     obm.vars.consts.timeUnit = '".(3600/$_SESSION['set_cal_interval'])."';  
     obm.vars.consts.action = '".$GLOBALS['action']."';
     obm.initialize.chain(function () {
