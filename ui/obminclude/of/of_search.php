@@ -67,6 +67,27 @@ class  OBM_Search {
     return false;
   }
 
+  public static function count($core, $pattern) {
+    global $obm;
+
+    $solr = OBM_IndexingService::connect($core);
+    if ($solr) {
+      try {
+        if ($pattern != "") {
+          $pattern = "$pattern domain:$obm[domain_id]"; 
+        } else {
+          $pattern = "domain:$obm[domain_id]";
+        }
+        $pattern = preg_replace("/(\w*)\*/e", "strtolower('$1').'*'", $pattern);
+        $response = $solr->search($pattern);
+        return $response->response->numFound;
+      } catch(Exception $e) {
+      }
+
+      return 0;
+    }      
+  }
+
 }
 
 /**
