@@ -1130,18 +1130,16 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     $ts = $current->getTimestamp();
     $week_day_left = $step*$width;
     $today = "";
-    $class = "";
     if ($current->isToday()) {
       $hour_marker = "<div id='hourMarker'></div>";
       $today_marker = "<div id='today' style='width:$width%;left:$week_day_left%;'></div>
         <div id='todayHourMarker' style='width:$width%;left:$week_day_left%;'></div>";
       $today = "background:#FFFFCC;";
-      $class = "todayLabel";
     }
     if ($action == 'portlet') {
       $week_day_list .= "<td class='dayLabel'>".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</td>";
     } else {
-      $week_day_list .= "<td class='dayLabel $class '>
+      $week_day_list .= "<td class='dayLabel'>
         <a href='javascript: void(0)' onclick='$day_js($ts);'>".$current->localize(Of_Date::OBM_DATE_WEEK_LIST)."</a>
       </td>";
     }
