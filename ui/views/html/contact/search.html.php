@@ -4,6 +4,7 @@
       <input type='text' id='searchpattern' name='searchpattern' value='<?php echo $searchpattern ?>' />
       <input type='submit' value='<?php echo __('Search') ?>' />
       <input type='hidden' name='action' value='search' />
+      <input type='hidden' name='updateCount' value='true' />
       <a href="#" onclick="$$('#advancedSearch','#basicSearch').toggle();"><?php echo __('Advanced search') ?></a>
     </form>
   </div>

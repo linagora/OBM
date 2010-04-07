@@ -257,6 +257,11 @@ class OBM_AddressBook implements OBM_ISearchable {
   public function __toString() {
     return $this->__get('displayname');
   }
+
+  public function countContacts($pattern='') {
+    if ($pattern == '') $pattern = '-is:archive addressbookId:'.$this->id;
+    return OBM_Search::count('contact', $pattern);
+  }
 }
 
 

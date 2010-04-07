@@ -204,11 +204,11 @@ Obm.Contact.AddressBook = new Class ({
     this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value'), offset: offset});
   },
 
-  selectAddressBook: function(elem) {
+  selectAddressBook: function(elem, updateCount) {
     if(!elem.hasClass('current')) {
       this.hideContact();
       $('contactfilter').set('value','');
-      this.contactRequest.get({ajax : 1, action : 'search', searchpattern : elem.retrieve('search')}); 
+      this.contactRequest.get({ajax : 1, action : 'search', searchpattern : elem.retrieve('search'), 'updateCount':updateCount}); 
       $('addressBookGrid').getElements('td.current').removeClass('current');
       elem.addClass('current');
       this.addressbook = elem;

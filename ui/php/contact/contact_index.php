@@ -381,6 +381,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
           $contact = $addressbook->addContact($params);
         }
         OBM_IndexingService::commit('contact');
+        echo dis_update_addressbook_count($addressbook);
         $subTemplate['card'] = new OBM_Template('card');
       } else {
         header('HTTP', true, 400);
@@ -406,6 +407,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $destination = $addressbooks[$params['addressbook']];
     if ($source->read && $destination && $destination->write) {
       OBM_Contact::copy($contact, $destination);
+      echo dis_update_addressbook_count($destination);
       $subTemplate['card'] = new OBM_Template('card');
     } else {
       header('HTTP', true, 403);
@@ -418,9 +420,12 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   ///////////////////////////////////////////////////////////////////////////////
     $contact = OBM_Contact::get($params['id']);
     $addressbooks = OBM_AddressBook::search();
+    $source = $addressbooks[$contact->addressbook_id];
     $destination = $addressbooks[$params['addressbook']];
     if ($destination && $destination->write) {
       OBM_Contact::move($contact, $destination);
+      echo dis_update_addressbook_count($source);
+      echo dis_update_addressbook_count($destination);
       $subTemplate['card'] = new OBM_Template('card');
     } else {
       header('HTTP', true, 403);
@@ -443,7 +448,10 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       } else {
         $contact->archive = 1;
         OBM_Contact::store($contact);
+        echo dis_update_addressbook_count($addressbook);
       }
+      // Update "archive" addressbook
+      echo dis_update_addressbook_count(null, 'is:archive', 'archive');
       $contacts = $addressbooks->searchContacts($params['searchpattern']);
       $subTemplate['contacts'] = new OBM_Template('contacts');
       $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
@@ -461,6 +469,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if($params['addressbook']) $current['addressbook'] = $params['addressbook'];
     else $current['addressbook'] = 'search';
     $contacts = $addressbooks->searchContacts($params['searchpattern'].' '.$pattern, $params['offset']);
+    if ($params['updateCount']) echo dis_update_addressbook_count(null, $params['searchpattern'].' '.$pattern, 'search');
     $subTemplate['contacts'] = new OBM_Template('contacts');
     $subTemplate['contacts']->set('offset', $params['offset']);
     $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));

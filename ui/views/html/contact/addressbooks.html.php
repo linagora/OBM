@@ -49,23 +49,25 @@
           new Obm.DropDownMenu($('addressbook-<?php echo $_id ?>').getElement('ul'));
         </script>
       </form>
+      <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_<?php echo $_id;?>'><?php echo $_addressbook->countContacts(); ?></span><?php echo " ".__('contact(s)'); ?></span>
       </td>
     </tr>
     <?php  } ?>
     <tr>
       <td class="<?php echo ('archive' == $current['addressbook'])? 'current':'' ?>" id='addressbook-archive'>
-        <div>
+        <form>
           <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-archive')); return false;"><?php echo __('Archive'); ?></a>
           <script type='text/javascript'>
             $('addressbook-archive').store('write', 0);
             $('addressbook-archive').store('search', 'is:archive');
           </script>            
-        </div>
+        </form>
+        <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_archive'><?php echo $_addressbook->countContacts('is:archive'); ?></span><?php echo " ".__('contact(s)'); ?></span>
       </td>
     </tr>
     <tr style="<?php echo ('search' == $current['addressbook'])? '':'display:none;' ?>">
       <td class="<?php echo ('search' == $current['addressbook'])? 'current':'' ?>" id="addressbook-search">
-        <div>
+        <form>
           <ul class="dropDownMenu addressBookMenu" >
             <li>
               <img onclick='setSearchFolderLinks();' alt="<?php echo __('Addressbook menu')?>" src="<?php echo self::__icon('dropdown') ?>" />
@@ -75,7 +77,7 @@
               </ul> 
             </li>
           </ul>
-          <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-search')); return false;"><?php echo __('Search results') ?></a>
+          <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-search'), true); return false;"><?php echo __('Search results') ?></a>
           <script type='text/javascript'>
             $('addressbook-search').store('write', 0);
             $('addressbook-search').store('search', '<?php $search ?>');
@@ -86,7 +88,8 @@
               $('exportSearchFolder').href = 'contact_index.php?action=export&searchpattern='+pattern;
             }
           </script>                  
-        </div>
+        </form>
+        <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_search'><?php echo $_addressbook->countContacts(); ?></span><?php echo " ".__('contact(s)'); ?></span>
       </td>
     </tr>
   </tbody>
