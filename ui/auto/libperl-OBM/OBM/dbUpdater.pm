@@ -315,6 +315,11 @@ sub _update {
             last SWITCH;
         }
 
+        if( ref($self->{'entity'}) eq 'OBM::Entities::obmSystemUser' ) {
+            $self->_log( 'pas de mise à jour BD pour '.$self->{'entity'}->getDescription(), 5 );
+            $returnCode = 0;
+        }
+
         $self->_log( 'entité de type inconnu, pas de traitements effectués', 1 );
     }
 
