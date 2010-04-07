@@ -2914,7 +2914,6 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
 
   $obm_q = new DB_OBM;
   $event_id =  $calendar['calendar_id'];
-  $mail = $calendar['mail'];
 
   $users_array = get_calendar_event_users_info($event_id);
   $obm_q = run_query_calendar_detail($event_id);
@@ -2953,7 +2952,7 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
   $query = "DELETE FROM Event WHERE event_id = $event_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
-  if($force_sendmail || $calendar['send_mail']) {
+  if($force_sendmail || (isset($calendar['send_mail']) && $calendar['send_mail'] == 1)) {
     OBM_EventFactory::getInstance()->delete($event);
   }
   $obm_q->query($query);

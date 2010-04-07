@@ -4614,20 +4614,24 @@ function html_calendar_waiting_events($obm_wait) {
 //   - $event_id
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_dis_delete($current_view, $event_id) {
-  global $ico_validate,$ico_cancel;
-  global $l_confirm_delete_all,$l_confirm,$l_cancel;
+  $ent_q = run_query_get_events_attendee(array($event_id));
+
+  if ($ent_q->nf() > 1) {
+    $mail = "<input id='send_mail' name='send_mail' value='1' type='checkbox' ><label for='send_mail'>$GLOBALS[l_sendamail]</label>";
+  }
 
   $block = "
-   <h1>$l_confirm_delete_all</h1>
+   <h1>$GLOBALS[l_confirm_delete_all]</h1>
    <div class=\"C\">
     <form method='POST' id='deleteForm' action='$GLOBALS[path]/calendar/calendar_index.php'>
       <input type='hidden' name='action' value='delete' />
       <input type='hidden' name='calendar_id' value='$event_id' />
+      $mail
     </form>
-    <a href='#' onclick=\"$('deleteForm').submit();\"><img src=\"$ico_validate\" alt=\"[Validate]\"/></a>
-     $l_confirm
-    <a href=\"".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$event_id\"><img src=\"$ico_cancel\" alt=\"[Cancel]\" /></a>
-     $l_cancel
+    <a href='#' onclick=\"$('deleteForm').submit();\"><img src=\"$GLOBALS[ico_validate]\" alt=\"[Validate]\"/></a>
+     $GLOBALS[l_yes]
+    <a href=\"".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$event_id\"><img src=\"$GLOBALS[ico_cancel]\" alt=\"[Cancel]\" /></a>
+     $GLOBALS[l_no]
    </div>";
 
   return $block;
