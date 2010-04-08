@@ -3987,19 +3987,20 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       if (is_array($template_res_id)) {
         $resources = get_calendar_resource_from_ids($template_res_id);
         $res = $resources['entity'];
-        foreach($res as $id => $res) {
-          $infos = get_resource_info($id[2]);
-          $u_name = $res['label'];
-          $sel_id = "data-resource-$id";
-          $div_id = "sel_resource_id-$sel_id";
-          $dis_sel_resource .= "<div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
-          <img src=\"$ico_delete\" alt=\"[Delete]\" />
-          </a>
-          $u_name
-          <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
-          </div>";
-
+        if(is_array($res)) {
+          foreach($res as $id => $res) {
+            $infos = get_resource_info($id[2]);
+            $u_name = $res['label'];
+            $sel_id = "data-resource-$id";
+            $div_id = "sel_resource_id-$sel_id";
+            $dis_sel_resource .= "<div class=\"elementRow\" id=\"$div_id\">
+            <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
+            <img src=\"$ico_delete\" alt=\"[Delete]\" />
+            </a>
+            $u_name
+            <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
+            </div>";
+          }
         }
       } 
     } else if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
