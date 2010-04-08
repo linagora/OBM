@@ -158,6 +158,7 @@ $cmail_incident = '';
 // Document : constants
 $default_path = '/Default';                  // Default directory
 $default_mime = 'application/octet-stream';  // Default Mime Type
+$c_quota_private_document = 20;
 
 // Group : is a new group private by default
 $cgroup_private_default = true;

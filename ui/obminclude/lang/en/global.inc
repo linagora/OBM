@@ -98,6 +98,7 @@ $l_file_error = "The file is not available (or not filled) !";
 $l_size = "Size";
 $l_email = "Email";
 $l_quota = "Quota";
+$l_overquota = "Over quota";
 $l_invalid_data = "Invalid Data";
 $l_invalid_email = "Invalid Email";
 $l_insert_ok = "Insertion successful";

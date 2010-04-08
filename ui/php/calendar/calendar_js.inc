@@ -557,16 +557,22 @@ function add_email_field() {
 }
 
 function add_file_field() {
-
   var fileHome = $('calendarFileHome');
   // Create the div
   var div = new Element('div').addClass('multiple');
   div.adopt(new Element('a').addEvent('click', function () {
-              remove_element(this.parentNode,'calendarFileHome');
-            }).adopt(new Element('img').setProperty('src','$ico_delete')));
+    remove_element(this.parentNode,'calendarFileHome');
+    obm.vars.consts.nbdocs++;
+    $('addFileButton').style.display = '';    
+  }).adopt(new Element('img').setProperty('src','$ico_delete')));
   fileHome.adopt(div);
   div.appendText(' ').adopt(new Element('input').addClass('otherFile').setProperty('name','fi_other_files[]').setProperty('type','file').setProperty('size',7));
-  
+
+  obm.vars.consts.nbdocs--;
+  if (obm.vars.consts.nbdocs <= 0) {
+    obm.vars.consts.nbdocs=0;
+    $('addFileButton').style.display = 'none';
+  }
 }
 
 function submitWaiting(form) {
