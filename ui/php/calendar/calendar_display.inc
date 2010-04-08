@@ -1557,7 +1557,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
           $item_list = '';
 
           if ($properties != '') {
-            $item = "<?xml version='1.0' encoding='$charset'?>$properties";
+            $item = "<?xml version='1.0' encoding='$charset'?".">$properties";
             $xml = parse_item($item);
             if (is_object($xml)) {
               foreach($xml->resource as $key => $value) {
@@ -2624,7 +2624,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $description = nl2br($event_q->f('event_description'));
     if ($properties != '') {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?>".$properties;
+      $item = "<?xml version='1.0' encoding='$charset'?".">".$properties;
     } else {
       $item = '';
     }
@@ -3105,13 +3105,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     // If new event, add the optionnal new users (here to get the user's infos)
     if ($action == 'new') {
       if (isset($calendar['template_id'])) {
-
-        list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
-        $users_id = $template_entities['user'];
-        $contacts_id = $template_entities['contact'];
-        $res_id = $template_entities['resource'];
-        $groups_id = $template_entities['group'];
-        $documents_id = $template_entities['document'];
+         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
       }
       // free-busy ???
       if (is_array($calendar['new_user_id'])) {
@@ -3477,7 +3471,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $desc = $event_q->f('event_description');
     if ($properties != '') {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?>$properties";
+      $item = "<?xml version='1.0' encoding='$charset'?".">$properties";
     } else {
       $item = '';
     }
@@ -3687,9 +3681,19 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
      </td>
     </tr>";
 
-  if ($action == 'new' && !isset($calendar['new_meeting']) && !isset($calendar['template_id'])) {
+  if (isset($calendar['template_id'])) {
+    list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
+    $template_users_id = $template_entities['user'];
+    $template_contacts_id = $template_entities['contact'];
+    $template_res_id = $template_entities['resource'];
+    $template_groups_id = $template_entities['group'];
+    $template_documents_id = $template_entities['document'];
+  }
+
+  if ($action == 'new' && !isset($calendar['new_meeting'])) {
     // If one new user is given in parameters, pre-select it
     $displayed_users = $current_view->get_users();
+    if (is_array($template_users_id)) $displayed_users = array_unique(array_merge($displayed_users, $template_users_id));
     if (is_array($calendar['new_user_id']) && count($calendar['new_user_id']) == 1) {
       $u_id = $calendar['new_user_id'][0];
     } else if (is_array($displayed_users) && count($displayed_users)==1) {
@@ -3699,16 +3703,32 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       // Else auto-select the connected user
       $u_id = "$uid";
     }
-    $u_name = ($users['entity'][$u_id]['label']);
-    $sel_id = "data-user-$u_id";
-    $div_id = "sel_user_id-$sel_id";
-    $dis_sel_user = "<div class=\"elementRow\" id=\"$div_id\">
-      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-      <img src=\"$ico_delete\" alt=\"[Delete]\" />
-      </a>
-      $u_name
-      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-      </div>";
+    if (is_array($template_users_id)) {
+      $users_entity = get_userobm_from_ids(array_unique($template_users_id));
+      $users_entity = $users_entity['entity'];
+      foreach($users_entity as $id => $user) {
+        $sel_id = "data-user-$id";
+        $div_id = "sel_user_id-$sel_id";
+        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+          <img src=\"$ico_delete\" alt=\"[Delete]\" />
+          </a>
+          $user[label]
+          <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+          </div>";
+      }
+    } else {
+      $u_name = ($users['entity'][$u_id]['label']);
+      $sel_id = "data-user-$u_id";
+      $div_id = "sel_user_id-$sel_id";
+      $dis_sel_user = "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+        <img src=\"$ico_delete\" alt=\"[Delete]\" />
+        </a>
+        $u_name
+        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+        </div>";
+    }
   } else if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
     $users = $calendar['user_id'];
     foreach($users as $u) {
@@ -3744,10 +3764,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       }
     }
   }
-
-  if (sizeof($users['entity']) > 1) {
+  $users_entity = $users['entity'];
+  if (sizeof($users_entity) > 1) {
     $u = array();
-    foreach($users['entity'] as $id => $user) {
+    foreach($users_entity as $id => $user) {
       $name = phpStringToJsString($user["label"]);
       array_push($u, "'$id' : '$name'");
     }
@@ -3761,7 +3781,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <label for=\"cba_add_displayed_users\">$GLOBALS[l_add_displayed_users]</label>
       </th>
       <td>
-        <input type=\"checkbox\" id=\"cba_add_displayed_users\" value=\"1\" $add_displayed_users_checked name=\"cba_add_displayed_users\" onclick=\"add_displayed_attendee(this.checked, $users_js, $uid, 'user')\"/>
+        <input type=\"checkbox\" id=\"cba_add_displayed_users\" value=\"1\" $add_displayed_users_checked 
+         name=\"cba_add_displayed_users\" onclick=\"add_displayed_attendee(this.checked, $users_js, $uid, 'user')\"/>
       </td>
       </tr>";
   }
@@ -3942,7 +3963,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
     // resource select
-    if ($action == 'new' && !isset($calendar['new_meeting']) && !isset($calendar['template_id'])) {
+    if ($action == 'new' && !isset($calendar['new_meeting'])) {
       if (is_array($res['entity']) && sizeof($res['entity']) >= 1) {
         $u = array();
         foreach($res['entity'] as $id => $res) {
@@ -3963,6 +3984,24 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
           </td>
           </tr>";
       }
+      if (is_array($template_res_id)) {
+        $resources = get_calendar_resource_from_ids($template_res_id);
+        $res = $resources['entity'];
+        foreach($res as $id => $res) {
+          $infos = get_resource_info($id[2]);
+          $u_name = $res['label'];
+          $sel_id = "data-resource-$id";
+          $div_id = "sel_resource_id-$sel_id";
+          $dis_sel_resource .= "<div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
+          <img src=\"$ico_delete\" alt=\"[Delete]\" />
+          </a>
+          $u_name
+          <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
+          </div>";
+
+        }
+      } 
     } else if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
       $res = $calendar['resource_id'];
       if (is_array($res)) {
