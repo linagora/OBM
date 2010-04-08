@@ -98,6 +98,7 @@ $l_file_error = "Fișierul nu a fost găsit (sau nu a fost introdus)!";
 $l_size = "Mărime";
 $l_email = "Email";
 $l_quota = "Cotă";
+$l_overquota = "Over quota";
 $l_ip = "IP";
 $l_role = "Rol";
 $l_invalid_data = "Date invalide";

@@ -532,6 +532,24 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
   $url1 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=false"; 
   $url2 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=true"; 
 
+  // Private block
+  $nb_private = run_query_global_document_quota($obm["uid"]);
+  $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy />";
+  if ($GLOBALS['action'] == 'new') {
+    if ($nb_private >= $GLOBALS['c_quota_private_document']) {
+      $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy disabled/><span class='legend warning'>$GLOBALS[l_overquota]</span>";
+    } else {
+      $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy />";
+    }
+  } else if ($GLOBALS['action'] == 'detailupdate') {
+    if ($privacy || $nb_private < $GLOBALS['c_quota_private_document']) {
+      $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy />";
+    } else {
+      $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy disabled/><span class='legend warning'>$GLOBALS[l_overquota]</span>";
+    }
+  }
+  
+
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\"
@@ -550,7 +568,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
       <td><input type=\"text\" id=\"tf_author\" name=\"tf_author\" value=\"$author\" size=\"50\"/ /></td>
     </tr><tr>
       <th><label for=\"cba_privacy\">$l_private</label></th>
-      <td><input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy /></td> 
+      <td>$block_private</td> 
     </tr>
     $block_userdata
     </table>

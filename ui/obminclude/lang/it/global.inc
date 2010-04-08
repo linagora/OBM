@@ -69,6 +69,7 @@ $l_file_format = "Firmato file";
 $l_file_format = "File";
 $l_email = "E-mail";
 $l_quota = "Quota";
+$l_overquota = "Over quota";
 $l_invalid_data = "Dati non validi";
 $l_insert_ok = "Inserimento OK";
 $l_insert_error = "Inserimento fallito!";

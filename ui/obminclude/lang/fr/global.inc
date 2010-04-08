@@ -103,6 +103,7 @@ $l_file_error = "Le fichier est introuvable (ou non saisi) !";
 $l_size = "Taille";
 $l_email = "Email";
 $l_quota = "Quota";
+$l_overquota = "Quota dépassé";
 $l_ip = "IP";
 $l_role = "Rôle";
 $l_invalid_data = "Données invalides";

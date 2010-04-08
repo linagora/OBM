@@ -457,6 +457,7 @@ $l_member = "Mitglieder";
 $l_new = "Erschaffen"; 
 $l_stats = "Statistiken"; 
 $l_quota = "Quota"; 
+$l_overquota = "Over quota";
 $l_fill_priority = "Sie mÃ¼ssen PrioritÃ¤t ausfÃ¼llen."; 
 $l_more_fields = "Weitere Optionen"; 
 $l_invalid_date_day = "ungÃ¼ltige Tag"; 

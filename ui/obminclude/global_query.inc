@@ -531,6 +531,25 @@ function run_query_global_document_nb($id,$entity) {
   return $obm_q->f('nb');
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : number of user's private docs 
+// Parameters:
+//   - $id     : user id
+// Return:
+//   - $nb : document number
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_document_quota($user_id) {
+
+  $id = sql_parse_id($user_id, true);
+  $query = "SELECT count(*) as nb FROM Document WHERE document_privacy=1 AND document_usercreate $id";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $GLOBALS[cdg_sql], 'run_query_global_document_quota()');
+  $obm_q->next_record();
+
+  return $obm_q->f('nb');
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // query execution : Insert document linked with a entity
