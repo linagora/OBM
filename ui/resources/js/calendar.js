@@ -156,7 +156,7 @@ Obm.CalendarManager = new Class({
             var target = "";
             if (obm.vars.consts.action == 'portlet') target = "target='_blank'";
             if (more) {
-              var title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title+'</a>';
+              var title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title+'</a>';
 	            var color = evt.content.getStyle('backgroundColor');
               if (evt.event.colors.event && evt.event.colors.event.body) color = evt.event.colors.event.body;
               var style = 'style="color:'+color+'"';
@@ -1517,12 +1517,12 @@ Obm.CalendarInDayEvent = new Class({
     }
     var title = this.event.title + ' ';
     if (this.event.duration <= obm.vars.consts.timeUnit) {
-      var time = this.event.date.format("H:i") + ' ' + title; 
+      var time = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' ' + title; 
       var title = '';
       this.locationContainer.set('html', '');
     } else {
       var end =  new Obm.DateTime((this.event.time+this.event.duration) * 1000);
-      var time = this.event.date.format("H:i") + ' - ' + end.format("H:i");
+      var time = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' - ' + end.format(obm.vars.regexp.dispTimeFormat);
       this.locationContainer.set('html',location);
     }
 
@@ -1761,7 +1761,7 @@ Obm.CalendarAllDayEvent = new Class({
    */
   setTitle: function() {
     var title = this.event.title;
-    var time = this.event.date.format("H:i") + ' ' + title; 
+    var time = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' ' + title; 
     if (this.event.all_day) {
       time = title;
     }
@@ -2106,9 +2106,9 @@ Obm.CalendarQuickForm = new Class({
     this.data.setStyle('display','block');
     if (!this.eventData.all_day) {
       if (date_begin.format('Ymd') == date_end.format('Ymd')) {
-        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat) + ', ' + date_begin.format('H:i')+' - '+date_end.format('H:i'));
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat) + ', ' + date_begin.format(obm.vars.regexp.dispTimeFormat)+' - '+date_end.format(obm.vars.regexp.dispTimeFormat));
       } else {
-        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' H:i'));
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' '+obm.vars.regexp.dispTimeFormat) + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' '+obm.vars.regexp.dispTimeFormat));
       }
     } else {
       if (evt.event.duration <= 86400) {
@@ -2173,7 +2173,11 @@ Obm.CalendarQuickForm = new Class({
     }
 
     if (!this.eventData.all_day) {
-      this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' H:i') + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' H:i'));
+      if (date_begin.format('Ymd') == date_end.format('Ymd')) {
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat) + ', ' + date_begin.format(obm.vars.regexp.dispTimeFormat)+' - '+date_end.format(obm.vars.regexp.dispTimeFormat));
+      } else {
+        this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' '+obm.vars.regexp.dispTimeFormat) + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' '+obm.vars.regexp.dispTimeFormat));
+      }
     } else {
       if (this.eventData.duration <= 86400) {
         this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat));

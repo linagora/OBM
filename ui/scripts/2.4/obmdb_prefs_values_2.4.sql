@@ -76,6 +76,8 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Todo sort order
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_todo','event_priority');
 
+-- Time format 
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timeformat','24H');
 
 -- -----------------------------------------------------------------------------
 -- Default values for the table 'DisplayPref'

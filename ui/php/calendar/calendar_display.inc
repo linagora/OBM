@@ -1167,13 +1167,17 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       $background="background:#EEE;";
     }
     if($current->compareMinute(0) == 0) {
-      $label = "<span class='hourLabel'>".$current->get('H')."</span><span class='minuteLabel'>".$current->get('i')."</span>";
+      if (Of_Date::getOption('timeformat') == '12H') {
+        $label = "<span class='hourLabel' style='padding-right:2px;'>".$current->getOutputHour()."</span>";
+      } else {
+        $label = "<span class='hourLabel'>".$current->getOutputHour()."</span><span class='minuteLabel'>".$current->getMinute()."</span>";
+      }
       $week_hour .= "<div class='hourFull' style='$background height:{$height}px;'>$label</div>";
       $week_time .= "<div id='time_$id' class='hourFull' style='$background height:{$height}px;'></div>";
     } else {
       $label = "";
       if ($current->compareMinute(30) == 0 && $_SESSION['set_cal_interval'] == 4) {
-        $label = "<span class='hourLabel'></span><span class='minuteLabel'>".$current->get('i')."</span>";
+        $label = "<span class='hourLabel'></span><span class='minuteLabel'>".$current->getMinute()."</span>";
       }
       $week_hour .= "<div class='hourPartial' style='$background height:{$height}px;width:50%;margin-left:50%;'>$label</div>";
       $week_time .= "<div id='time_$id' class='hourPartial' style='$background height:{$height}px;'></div>";

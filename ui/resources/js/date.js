@@ -295,7 +295,7 @@ Obm.DateTime = new Class({
       return ;
     var d = this;
 
-    return pattern.replace(/(Y|m|d|H|i|s|c|O)/gi,
+    return pattern.replace(/(Y|m|d|H|i|s|c|O|g|a)/gi,
       function($1) {
         switch ($1.toLowerCase()) {
         case 'y':   return d.getFullYear();
@@ -306,6 +306,8 @@ Obm.DateTime = new Class({
         case 's':   return d.getSeconds().pad(2,'0');
         case 'c':   return d.format('y-m-dTh:i:s O');
         case 'o':   return d.getTimezone();
+        case 'g':   return d.getHours() % 12 || 12;
+        case 'a':   return d.getHours() < 12 ? 'am' : 'pm';
       }
     });
   },

@@ -1091,6 +1091,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.images.ical = '$ico_ical';
   obm.vars.regexp.dateFormat = '$_SESSION[set_date_upd]';
   obm.vars.regexp.dispDateFormat = '$_SESSION[set_date]';
+  obm.vars.regexp.dispTimeFormat = '".Of_Date::getTimeFormat()."';
   obm.vars.consts.popupHeight = '$popup_height';
   obm.vars.consts.popupWidth = '$popup_width';
   obm.vars.consts.weekStart = $c_week_first_day;

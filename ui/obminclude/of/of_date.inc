@@ -40,7 +40,8 @@ class Of_Date extends DateTime {
   const LEAPYEAR       = 'L';              // L - is leapyear ?, 0-1
 
   // time formats
-  const MERIDIEM       = 'A';              // A,a - AM/PM - locale aware, AM/PM
+  const MERIDIEM       = 'A';              // A - AM/PM - locale aware, AM/PM
+  const MERIDIEM_LOWERCASE = 'a';          // a - am/pm - locale aware, am/pm
   const SWATCH         = 'B';              // B - Swatch Internet Time
 
   const HOUR           = 'H';              // H - 2 digit hour, leading zeros, 00-23
@@ -79,9 +80,13 @@ class Of_Date extends DateTime {
   const DATE_SHORT     = 'd.m.y';          // --- short date, locale aware
   const DATE_ISO       = 'Y-m-d';          // --- short date, locale aware
   const TIMES          = 'H:i:s';          // --- standard time, locale aware
+  const TIMES_AM       = 'g:i:sa';          // --- standard time, locale aware
   const TIME_LONG      = 'H:i:s T';        // --- long time, locale aware
+  const TIME_LONG_AM   = 'g:i:sa T';        // --- long time, locale aware
   const TIME_MEDIUM    = 'H:i:s';          // --- medium time, locale aware
+  const TIME_MEDIUM_AM = 'g:i:sa';          // --- medium time, locale aware
   const TIME_SHORT     = 'H:i';            // --- short time, locale aware
+  const TIME_SHORT_AM  = 'g:ia';            // --- short time, locale aware
   const ATOM           = 'c';              // --- DATE_ATOM
   const COOKIE         = 'l, d-M-y H:i:s e';// --- DATE_COOKIE
   const RFC_822        = 'D, d M y H:i:s O';// --- DATE_RFC822
@@ -202,6 +207,7 @@ class Of_Date extends DateTime {
       if(isset($_SESSION['set_date'])) self::setOption('outputdate',$_SESSION['set_date']);
       if(isset($_SESSION['set_date_upd'])) self::setOption('inputdate',$_SESSION['set_date_upd']);
       if(isset($_SESSION['set_timezone'])) self::setOption('timezone',$_SESSION['set_timezone']);
+      if(isset($_SESSION['set_timeformat'])) self::setOption('timeformat',$_SESSION['set_timeformat']);
       self::$_loaded = true;
     }
   }
@@ -322,8 +328,22 @@ class Of_Date extends DateTime {
    * @return void
    */
   public function getOutputDateTime() {
+    if (self::$_options['timeformat'] == '12H') return $this->get(self::$_options['outputdate'].' '.self::TIME_SHORT_AM);
     return $this->get(self::$_options['outputdate'].' '.self::TIME_SHORT);
   }
+
+
+  /**
+   * Get the date time formated with the outputdatetime option
+   * 
+   * @access public
+   * @return void
+   */
+  public function getOutputHour() {
+    if (self::$_options['timeformat'] == '12H') return $this->format(self::HOUR_SHORT_AM.self::MERIDIEM_LOWERCASE);
+    return $this->format(self::HOUR);
+  }
+
 
   /**
    * Get the date formated with the outputdate option
@@ -364,6 +384,16 @@ class Of_Date extends DateTime {
    */
   public function getURL() {
     return urlencode($this->format(self::ISO_8601));
+  }
+
+  /**
+   * Returns the time format .
+   *
+   * @return string  Time format
+   */
+  public function getTimeFormat() {
+    if (self::$_options['timeformat'] == '12H') return self::TIME_SHORT_AM;
+    return self::TIME_SHORT;
   }
 
   /**

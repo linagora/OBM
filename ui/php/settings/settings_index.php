@@ -16,8 +16,7 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
-?>
-<?php
+
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : settings_index.php                                           //
 //     - Desc : Settings (Language, themes,...) management index file        //
@@ -104,6 +103,12 @@ if ($params['form_user_pref']) {
     $_SESSION['set_timezone'] = $params['timezone'];
     Of_Date::setOption('timezone',$params['timezone']);
     update_user_pref($obm['uid'], 'set_timezone', $_SESSION['set_timezone']);
+  }
+
+  if ($params['timeformat'] != '') {
+    $_SESSION['set_timeformat'] = $params['timeformat'];
+    Of_Date::setOption('timeformat',$params['timeformat']);
+    update_user_pref($obm['uid'], 'set_timeformat', $_SESSION['set_timeformat']);
   }
 
   if ($params['commentorder'] != '') {
@@ -460,6 +465,14 @@ foreach($timezone_identifiers as $tz) {
     $timezones .= "<option value='$tz'>$tz</option>";
   }
 }
+
+${'_'.Of_Date::getOption('timeformat')} = "selected='selected'";
+$sel_timeformat = "
+  <select name='timeformat'>
+    <option value='12H' $_12H>1:00pm</option>
+    <option value='24H' $_24H>13:00</option>
+  </select>";
+
 $display['detail'] .= "
   <tr id='settings_csvSeparator'>
   <th>$l_set_csv_sep</th>
@@ -501,6 +514,11 @@ $display['detail'] .= "
   <td>
   </td>
   </tr>  
+  <tr>
+    <td>$l_timeformat</td>
+    <td>$sel_timeformat</td>
+    <td></td>
+  </tr>
   </table>
   </fieldset>  
   $customFields
