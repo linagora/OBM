@@ -1176,8 +1176,12 @@ sub _sendMailReport {
         Data    => join( '\n', @{$mailContent->{'content'}} )
         );
     
-    $self->_log( $msg->as_string(), 5 );
-    $msg->send( 'smtp', 'localhost' );
+    eval {
+        local $SIG{__DIE__} = sub {};
+    
+        $self->_log( $msg->as_string(), 5 );
+        $msg->send( 'smtp', 'localhost' );
+    };
 
     if( !$msg->last_send_successful() ) {
         $self->_log( 'Sending mail report fail', 1 );
