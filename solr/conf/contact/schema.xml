@@ -9,6 +9,7 @@
 	      <filter class="solr.LowerCaseFilterFactory"/>
 	      <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
 	      <filter class="solr.ISOLatin1AccentFilterFactory" />
+        <filter class="solr.WordDelimiterFilterFactory" />
       </analyzer>
     </fieldType>
     <fieldType name="date" class="solr.DateField"/>
