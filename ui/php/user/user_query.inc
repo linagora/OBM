@@ -367,7 +367,7 @@ function run_query_user_ext_search($user) {
   $obm_q->xquery($query);
   $rows =  array();
   while($obm_q->next_record()) {
-    $rows[$obm_q->f("userobm_lastname")." ".$obm_q->f("userobm_firstname")] = $obm_q->Record;
+    $rows[$obm_q->f("userobm_lastname")." ".$obm_q->f("userobm_firstname"). " ".$obm_q->f('userobm_id')] = $obm_q->Record;
   }
   $resultsCount = $obm_q->num_rows();
   ksort($rows);
