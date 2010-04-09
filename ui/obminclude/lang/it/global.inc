@@ -333,6 +333,7 @@ $l_cv = "Curriculum";
 $l_date_inconsistency = "Incoerenza dati ";
 $l_header_convert_deal = "Convertire un Affare";
 $l_timezone = "Fuso orario";
+$l_timeformat = "Formato della data";
 $l_header_man_task = "Operazioni";
 $l_c_checkdelete = "Verifica o elimina";
 $l_section_dic = "Dizionario";

@@ -500,6 +500,7 @@ $l_dg_solr = "Solr";
 
 $l_all_aliases = "All aliases";
 $l_timezone = "Timezone";
+$l_timeformat = "Date format";
 $l_save = 'Save';
 
 

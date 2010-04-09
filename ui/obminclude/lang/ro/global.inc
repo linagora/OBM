@@ -476,6 +476,7 @@ $l_dg_sql = "SQL";
 $l_dg_exe = "Exec";
 $l_all_aliases = "Toate alias-urile";
 $l_timezone = "Fus orar";
+$l_timeformat = "Data de formatul";
 
 // lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00
 $l_ok = "Ok"; 

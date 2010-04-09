@@ -309,6 +309,7 @@ $l_day = "Tag";
 $l_date_inconsistency = "Datum InkohÃ¤renz";
 $l_header_convert_deal = "konvertieren in VertrÃ¤ge";
 $l_timezone = "Zeitzone";
+$l_timeformat = "Datumsformat";
 $l_c_checkdelete = "BestÃ¤tigen oder lÃ¶schen";
 $l_section_dic = "Wortbuch";
 $l_error_delegation = "Sie haben nicht die Delegation fÃ¼r dieses Ziel.";
