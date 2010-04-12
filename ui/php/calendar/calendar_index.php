@@ -288,8 +288,8 @@ if ($action == 'search') {
 
         $current_view->set_date($params["date_begin"]);
         $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$event_id";
-        $detail = "<a class='B' href='$detailurl'>(".phpStringToJsString($GLOBALS[l_details]).")</a>";
-        redirect_ok($params, "$l_event: $l_insert_ok $detail");
+        $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
+        redirect_ok($params, "$l_event: $l_insert_ok - $detail");
       }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -401,8 +401,8 @@ if ($action == 'search') {
           // Display calendars
         }
         $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$params["calendar_id"];
-        $detail = "<a class='B' href='$detailurl'>(".phpStringToJsString($GLOBALS[l_details]).")</a>";
-        redirect_ok($params, "$l_event: $l_update_ok $detail");
+        $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
+        redirect_ok($params, "$l_event: $l_update_ok - $detail");
       }
     } else {
       $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -427,8 +427,8 @@ if ($action == 'search') {
       }
       json_build_html_event($params, $current_view, $id);
       $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$id";
-      $detail = "<a class='B' href='$detailurl'>(".phpStringToJsString($GLOBALS[l_details]).")</a>";
-      json_ok_msg("$l_event : $l_update_ok $detail");
+      $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
+      json_ok_msg("$l_event : $l_update_ok - $detail");
       echo "({".$display['json']."})";
       exit();
     } else {
@@ -449,8 +449,8 @@ if ($action == 'search') {
     $params["calendar_id"] = $id;
     json_insert_event_data($id, $params, $current_view);
     $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$id";
-    $detail = "<a class='B' href='$detailurl'>(".phpStringToJsString($GLOBALS[l_details]).")</a>";
-    json_ok_msg("$l_event : $l_insert_ok $detail");
+    $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
+    json_ok_msg("$l_event : $l_insert_ok - $detail");
     echo "({".$display['json']."})";
 
   } else {
