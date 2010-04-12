@@ -5078,6 +5078,16 @@ function dis_calendar_free_interval($current_view, $calendar) {
   if (!is_array($entity_store['resource'])) $entity_store['resource'] = array();
   if (!is_array($entity_store['resourcegroup'])) $entity_store['resourcegroup'] = array();
   $entities_resources = array_merge($entity_store['resource'], $entity_store['resourcegroup']);
+  $user_readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read'); 
+  $user_readEntities_id = array_keys($user_readEntities);
+  $user_accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access'); 
+  $user_accessEntities_id = array_keys($user_accessEntities);
+
+  $res_readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'resource', 'read'); 
+  $res_readEntities_id = array_keys($res_readEntities);
+  $res_accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'resource', 'access'); 
+  $res_accessEntities_id = array_keys($res_accessEntities);
+
 
   $contacts = array();
   if (is_array($calendar['contact_id'])) {
@@ -5091,6 +5101,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
   if (is_array($entity_store['user'])) {
     foreach($entity_store['user'] as $user) {
       $users[$user[id]] = $of->getPeriodOccurrences($date, $end, array('user' => array($user[id])));
+      if (!is_array($users[$user[id]]) && in_array($user[id], $user_accessEntities_id)) $users[$user[id]] = array();
     }
   }
 
@@ -5098,6 +5109,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
   if (is_array($entities_resources)) {
     foreach($entities_resources as $res) {
       $resources[$res[id]] = $of->getPeriodOccurrences($date, $end, array('resource' => array($res[id])));
+      if (!is_array($resources[$res[id]]) && in_array($res[id], $res_accessEntities_id)) $resources[$res[id]] = array();
     }
   }
 
@@ -5141,7 +5153,11 @@ function dis_calendar_free_interval($current_view, $calendar) {
           if ($busy) {
             $is_busy = true;
             array_push($busy_time_slots, $slots);
-            $tip = html_freebusy_tip($tips);
+            if (in_array($id, $user_readEntities_id)) {
+              $tip = html_freebusy_tip($tips);
+            } else {
+              $tip = $GLOBALS['l_occupied'];
+            }
             $td_id = "user_".$id."_".$d->getTimestamp();
             $u[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
             $js_tips .= "obm.tip.add($('$td_id'));";
@@ -5167,7 +5183,11 @@ function dis_calendar_free_interval($current_view, $calendar) {
           if ($busy) {
             $is_busy = true;
             array_push($busy_time_slots, $slots);
-            $tip = html_freebusy_tip($tips);
+            if (in_array($id, $res_readEntities_id)) {
+              $tip = html_freebusy_tip($tips);
+            } else {
+              $tip = $GLOBALS['l_occupied'];
+            }
             $td_id = "res_".$id."_".$d->getTimestamp();
             $r[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
             $js_tips .= "obm.tip.add($('$td_id'));";
