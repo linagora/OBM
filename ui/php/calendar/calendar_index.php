@@ -222,6 +222,7 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_js_include[] = 'inplaceeditor.js';
   $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+  $extra_js_include[] = 'freebusy.js';
   $extra_css[] = $css_ext_color_picker ;
   if (is_array($params['sel_user_id']) || is_array($params['sel_resource_id'])) {
     $entities = array(
@@ -262,6 +263,7 @@ if ($action == 'search') {
         }
         $extra_js_include[] = 'inplaceeditor.js';
         $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+        $extra_js_include[] = 'freebusy.js';
         $extra_css[] = $css_ext_color_picker ;
         $display['detail'] .= html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
@@ -304,6 +306,7 @@ if ($action == 'search') {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
     $extra_js_include[] = 'inplaceeditor.js';
     $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_js_include[] = 'freebusy.js';
     $extra_css[] = $css_ext_color_picker ;
     $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
   }
@@ -321,6 +324,7 @@ if ($action == 'search') {
   if ($params['calendar_id'] > 0) {  
     $extra_js_include[] = 'inplaceeditor.js';
     $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_js_include[] = 'freebusy.js';
     $extra_css[] = $css_ext_color_picker ;
     if (check_calendar_access($params['calendar_id'], 'read')) {
       $eve_q = run_query_calendar_detail($params['calendar_id']);
@@ -339,6 +343,7 @@ if ($action == 'search') {
   if ($params['calendar_id'] > 0) {  
     $extra_js_include[] = 'inplaceeditor.js';
     $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_js_include[] = 'freebusy.js';
     $extra_css[] = $css_ext_color_picker ;
     $eve_q = run_query_calendar_detail($params['calendar_id']);
     $entities = get_calendar_event_entity($params['calendar_id']);
@@ -377,6 +382,7 @@ if ($action == 'search') {
         }
         $extra_js_include[] = 'inplaceeditor.js';
         $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+        $extra_js_include[] = 'freebusy.js';
         $extra_css[] = $css_ext_color_picker ;
         $display['detail'] = html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_update_error");
@@ -415,6 +421,7 @@ if ($action == 'search') {
       $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
       $extra_js_include[] = 'inplaceeditor.js';
       $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+      $extra_js_include[] = 'freebusy.js';
       $extra_css[] = $css_ext_color_picker ;
       $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
     }
@@ -701,6 +708,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'new_meeting')  {
 ///////////////////////////////////////////////////////////////////////////////
+  $extra_js_include[] = 'freebusy.js';
   $display['detail'] = dis_calendar_meeting_form($current_view, $params);
 
 } elseif ($action == 'admin')  {
@@ -783,6 +791,7 @@ if ($action == 'search') {
   }
   $extra_js_include[] = 'inplaceeditor.js';
   $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+  $extra_js_include[] = 'freebusy.js';
   $extra_css[] = $css_ext_color_picker ;
   $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
   
@@ -973,6 +982,7 @@ if ($action == 'search') {
       $conflicts = check_calendar_conflict($params, $conflicts_entities);
       $extra_js_include[] = 'inplaceeditor.js';
       $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+      $extra_js_include[] = 'freebusy.js';
       $extra_css[] = $css_ext_color_picker ;
       $display['detail'] = html_calendar_dis_conflict($params, $conflicts) ;
       $display['detail'] .= dis_calendar_event_form($action, $params, $eve_q, $entities, $current_view);
@@ -1080,8 +1090,7 @@ if (!$params['ajax']) {
 
 } elseif ($action == 'perform_meeting')  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_calendar_free_interval($current_view);
-  echo "({".$display['json']."})";
+  echo dis_calendar_free_interval($current_view, $params);
   exit();
 
 } elseif ($action == 'set_entity_class')  {
