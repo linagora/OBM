@@ -70,6 +70,8 @@ sub _configureLog {
         'log4perl.appender.LOGFILE.mode' => 'append',
         'log4perl.appender.LOGFILE.layout' => 'PatternLayout',
         'log4perl.appender.LOGFILE.layout.ConversionPattern' => '%d:%r [%P]: %C:%L %p - %m%n',
+        'log4perl.appender.LOGFILE.umask' => 0002,
+        'log4perl.appender.LOGFILE.utf8' => 1,
         'log4perl.appender.SCREEN' => 'Log::Log4perl::Appender::Screen',
         'log4perl.appender.SCREEN.stderr' => 0,
         'log4perl.appender.SCREEN.layout' => 'PatternLayout',
