@@ -371,7 +371,6 @@ function run_query_user_ext_search($user) {
       $multidomain
     LIMIT $limit OFFSET $first_row";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
-  echo(DB_Sql::xParser($query));
   $obm_q->xquery($query);
   $rows =  array();
   while($obm_q->next_record()) {
