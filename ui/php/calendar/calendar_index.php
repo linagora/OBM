@@ -296,7 +296,9 @@ if ($action == 'search') {
         }
 
         $current_view->set_date($params["date_begin"]);
-        redirect_ok($params, "$l_event: $l_insert_ok");
+        $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$event_id";
+        $detail = "<a class='B' href='$detailurl'>(".phpStringToJsString($GLOBALS[l_details]).")</a>";
+        redirect_ok($params, "$l_event: $l_insert_ok $detail");
       }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -405,7 +407,9 @@ if ($action == 'search') {
         }
 
         $current_view->set_date($params["date_begin"]);
-        redirect_ok($params, "$l_event: $l_update_ok");
+        $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$params["calendar_id"];
+        $detail = "<a class='B' href='$detailurl'>(".phpStringToJsString($GLOBALS[l_details]).")</a>";
+        redirect_ok($params, "$l_event: $l_update_ok $detail");
       }
     } else {
       $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -428,7 +432,9 @@ if ($action == 'search') {
         $id = run_query_calendar_event_exception_insert($params,$eve_q);
       }
       json_build_html_event($params, $current_view, $id);
-      json_ok_msg("$l_event : $l_update_ok");
+      $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$id";
+      $detail = "<a class='B' href='$detailurl'>(".phpStringToJsString($GLOBALS[l_details]).")</a>";
+      json_ok_msg("$l_event : $l_update_ok $detail");
       echo "({".$display['json']."})";
       exit();
     } else {
@@ -448,7 +454,9 @@ if ($action == 'search') {
     $id = run_query_calendar_quick_event_insert($params, $state);
     $params["calendar_id"] = $id;
     json_insert_event_data($id, $params, $current_view);
-    json_ok_msg("$l_event : $l_insert_ok");
+    $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$id";
+    $detail = "<a class='B' href='$detailurl'>(".phpStringToJsString($GLOBALS[l_details]).")</a>";
+    json_ok_msg("$l_event : $l_insert_ok $detail");
     echo "({".$display['json']."})";
     exit();
   } else {
