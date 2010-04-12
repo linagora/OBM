@@ -174,7 +174,7 @@ sub DESTROY {
 sub disconnect {
     my $self = shift;
 
-    $self->_log( 'Disconnect from '.$self->getDesciption() );
+    $self->_log( 'Disconnect from '.$self->getDesciptrion() );
     eval{ $self->{'ServerConn'} = undef; };
 }
 
@@ -199,10 +199,11 @@ sub getConn {
         return $self->{'cyruscyrusServerConn'};
     }
 
+    $self->_log( 'Authenticate to '.$self->getDescription().' as \''.$self->{'cyrus_admin'}.'\', password \''.$self->{'cyrus_admin_password'}.'\'', 4 );
+
     eval {
         local $SIG{ALRM} = sub {
-            $self->_log( 'Fail to connect to '.$self->getDescription().' - No
-server response', 2 );
+            $self->_log( 'Fail to connect to '.$self->getDescription().' - No server response', 2 );
             delete($self->{'cyrusServerConn'});
             die 'alarm'."\n";
         };
@@ -226,8 +227,7 @@ server response', 2 );
 
         eval {
             local $SIG{ALRM} = sub {
-                $self->_log( 'Fail to connect to '.$self->getDescription().' -
-No server response', 2 );
+                $self->_log( 'Fail to connect to '.$self->getDescription().' - No server response', 2 );
                 delete($self->{'cyrusServerConn'});
                 die 'alarm'."\n";
             };
