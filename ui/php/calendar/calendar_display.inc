@@ -5397,37 +5397,6 @@ function html_freebusy_tip($ocs) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * dis_calendar_right_dis_admin
  * Display calendar rights admin form

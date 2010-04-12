@@ -558,7 +558,7 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   if($pattern !== false) $where .= "AND $e_label #LIKE '%$pattern%'";
 
   if (!(Perm::get_module_rights($entity) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin']) {
-    $where_filter_entity = " AND $e_id IN (".OBM_Acl::getAclSubselect($entity.'entity_'.$entity.'_id', $entity, null, $obm['uid'], $filter_pattern).")";
+    $where_filter_entity = " AND $e_id IN (".OBM_Acl::getAclSubselect($entity.'entity_'.$entity.'_id', $entity, null, $obm['uid'], 'admin').")";
   }    
 
 
