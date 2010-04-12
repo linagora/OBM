@@ -560,9 +560,9 @@ function showMessage(klass, message) {
   content.setStyle('display','block');
   new Element('p').addClass('message')
                   .addClass(klass)
-                  .appendText(message)
+                  .set('html', message)
                   .injectInside(content);
-  setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, 1500);
+  setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, 3000);
 }
 
 function overListBoxFix(overObject, forceDisplay) {
