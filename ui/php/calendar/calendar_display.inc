@@ -3240,10 +3240,10 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
       }
 
       // Entities from Freebusy
-      if (is_array($calendar['new_user_id'])) $users_id = array_merge($calendar['new_user_id'], $users_id);
-      if (is_array($calendar['new_group_id'])) $groups_id = array_merge($calendar['new_group_id'], $groups_id);
-      if (is_array($calendar['new_resource_id'])) $res_id = array_merge($calendar['new_resource_id'], $res_id);
-      if (is_array($calendar['new_contact_id'])) $contacts_id = array_merge($calendar['new_contact_id'], $contacts_id);
+      if (is_array($calendar['new_user_id'])) $users_id = $calendar['new_user_id'];
+      if (is_array($calendar['new_group_id'])) $groups_id = $calendar['new_group_id'];
+      if (is_array($calendar['new_resource_id'])) $res_id = $calendar['new_resource_id'];
+      if (is_array($calendar['new_contact_id'])) $contacts_id = $calendar['new_contact_id'];
 
       if (!isset($calendar['new_meeting'])) { 
        $users_id[] = $obm['uid'];
