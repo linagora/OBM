@@ -15,6 +15,7 @@ $fieldnames["rgroup_name"] = $l_name;
 $fieldnames["rgroup_privacy"] = $l_private;
 $fieldnames["rgroup_desc"] = $l_desc;
 $fieldnames["rgroup_nb_resource"] = $l_nb_resource;
+$fieldnames['rgroup_delegation'] = $l_delegation;
 $fieldnames["usercreate"] = $l_creator;
 $fieldnames["userupdate"] = $l_updater;
 $fieldnames["timecreate"] = $l_date_creation;
@@ -116,12 +117,14 @@ function html_resourcegroup_search_form ($group) {
   $resource = stripslashes($group["resource"]);
   $privacy = $group["privacy"];
   $desc = stripslashes($group['desc']);
+  $delegation = stripslashes($group['delegation']);
 
   $sel_privacy = dis_privacy_search_select($privacy);
 
   // --- HTML Page display ----------------------------------------------------
 
   $display_pref = get_display_pref($obm['uid'],'resourcegroup');
+  $dis_delegation = of_delegation_dis_search_form($delegation);
   
   $block = "
   <form method=\"get\" name=\"f_search\" action=\"".url_prepare("resourcegroup_index.php")."\" class=\"search\">
@@ -136,6 +139,11 @@ function html_resourcegroup_search_form ($group) {
       $sel_privacy
     </label>
     ";
+
+    
+  if ($display_pref['rgroup_delegation']['status'] != 0) {
+    $block .= $dis_delegation;
+  }
 
   if ($display_pref['rgroup_desc']['status'] != 0) {
     $block .= "
@@ -218,9 +226,10 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
   }
 
   $name = urlencode(stripslashes($group["name"]));
+  $delegation = urlencode(stripslashes($group['delegation']));
   $resource = urlencode(stripslashes($group["resource"]));
 
-  $url = url_prepare("resourcegroup_index.php?action=search&amp;tf_name=$namet&amp;tf_resource=$resource$url_ext");
+  $url = url_prepare("resourcegroup_index.php?action=search&amp;tf_name=$namet&amp;tf_delegation=$delegation&amp;tf_resource=$resource$url_ext");
   
   $dis_group = new OBM_DISPLAY("DATA", $pref_q, "resourcegroup");
   if ($popup) {
@@ -281,6 +290,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
   if ($action == "detailupdate") {
     $id = $group_q->f("rgroup_id");
     $usercreate = $group_q->f("rgroup_usercreate");
+    $delegation = $group_q->f('rgroup_delegation');    
     $name = $group_q->f("rgroup_name");
     $desc = $group_q->f("rgroup_desc");
     $priv = $group_q->f("privacy");
@@ -296,6 +306,9 @@ function html_resourcegroup_form($action, $group_q, $group) {
   if (isset($group["name"])) { $name = stripslashes($group["name"]); }
   if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
   if (isset($group["privacy"])) { $priv = stripslashes($group["privacy"]); }
+  if (isset($group['delegation'])) { $delegation = stripslashes($group['delegation']); }
+
+  $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
   // If new group or group update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
@@ -331,6 +344,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
     <td><input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr>
   $dis_private
+  $block_delegation
   </table>
   </fieldset>
   
@@ -415,10 +429,12 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
   $timecreate = $group_q->f("timecreate");
   $timeupdate = $group_q->f("timeupdate");
   $name = $group_q->f("rgroup_name");
+  $delegation = $group_q->f('rgroup_delegation');
   $desc = $group_q->f("rgroup_desc");
 
   $display["detailInfo"] = display_record_info($group_q);
   $display["title"] = $name;
+  $block_delegation = of_delegation_dis_block_consult($delegation);
 
   $block = "
   <div class=\"detail extra\">
@@ -429,6 +445,7 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
       <th>$l_name</th>
       <td>$name</td>
     </tr>
+    $block_delegation
     </table>
   </div>
   <div class=\"detail extra\">
@@ -570,6 +587,7 @@ function dis_resourcegroup_warn_insert($id, $g_q, $group) {
   global $display, $l_check_sameresourcegroup, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
+  $delegation = $group['delegation'];
   $name = $group["name"];
   $desc = $group["desc"];
 
@@ -595,6 +613,7 @@ function dis_resourcegroup_warn_insert($id, $g_q, $group) {
       <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
       <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
       <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+      <input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />
       <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
       </form>
       <form name=\"form_back\" method=\"get\"

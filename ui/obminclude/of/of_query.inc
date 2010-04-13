@@ -2528,6 +2528,33 @@ function get_resource_info($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return the resource infos
+// Parameters:
+//   - $id : resource id
+///////////////////////////////////////////////////////////////////////////////
+function get_resourcegroup_info($id) {
+  global $cdg_sql;
+
+  if ($id == '') {
+    return false;
+  }
+  $multidomain = sql_multidomain('resourcegroup');
+  $id = sql_parse_id($id, true);
+  $query = "SELECT * FROM RGroup WHERE resourcegroup_id $id $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'get_resourcegroup_info()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  $r['domain_id'] = $obm_q->f('resourcegroup_domain_id');
+  $r['usercreate'] = $obm_q->f('resourcegroup_usercreate');
+  $r['name'] = $obm_q->f('resourcegroup_name');
+  $r['delegation'] = $obm_q->f('resourcegroup_delegation');
+  return $r;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the users ID list from the given group
 // Recursive search to handle group trees
 // Parameters:

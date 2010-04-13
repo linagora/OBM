@@ -20,6 +20,7 @@ function run_query_resourcegroup_search($group) {
   
   $name = sql_search_text_parse($group["name"]);
   $resource = sql_search_text_parse($group["resource"]);
+  $delegation = sql_search_text_parse($group['delegation']);
   $privacy = $group["privacy"];
   $sql_order_field = $group["sql_order_field"];
   $sql_order_dir = $group["sql_order_dir"];
@@ -40,7 +41,10 @@ function run_query_resourcegroup_search($group) {
   } elseif ($privacy == $c_private) { 
     $where .= " AND rgroup_privacy = 1";
   }
-
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != '') {
+    $where .= " AND rgroup_delegation $like '$delegation%'";
+  }
   if ($resource != '') {
     $join_resource = "
       LEFT JOIN ResourceGroup as D ON rgroup_id=D.ResourceGroup_rgroup_id
@@ -66,6 +70,7 @@ function run_query_resourcegroup_search($group) {
       rgroup_domain_id,
       rgroup_privacy,
       rgroup_name,
+      rgroup_delegation,
       rgroup_desc,
       $timecreate,
       $timeupdate,
@@ -82,6 +87,7 @@ function run_query_resourcegroup_search($group) {
       rgroup_id,
       rgroup_domain_id,
       rgroup_privacy,
+      rgroup_delegation,
       rgroup_name,
       rgroup_desc,
       timecreate,
@@ -163,6 +169,7 @@ function run_query_resourcegroup_search_possible_children($group) {
   $id = sql_parse_id($group["ext_id"], true, true);
   $name = $group["name"];
   $resource = $group["resource"];
+  $delegation = sql_search_text_parse($group['delegation']);  
   $sql_order_field = $group["sql_order_field"];
   $sql_order_dir = $group["sql_order_dir"];
   $multidomain = sql_multidomain("rgroup");
@@ -183,6 +190,10 @@ function run_query_resourcegroup_search_possible_children($group) {
   if ($resource != '') {
     $where .= " and C.resource_name $like '$resource%'";
   }
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != '') {
+    $where .= " AND rgroup_delegation $like '$delegation%'";
+  }  
   while (list ($key, $g_id) = each($parents)) {
     $g_id = sql_parse_id($g_id, true, true);
     $where .= " and rgroup_id $g_id ";
@@ -260,6 +271,7 @@ function run_query_resourcegroup_insert($group) {
   $desc = $group["desc"];
   $priv = sql_parse_int($group["privacy"]);
   $domain_id = sql_parse_id($obm["domain_id"]);
+  $q_delegation = of_delegation_query_insert_clauses('rgroup_delegation', stripslashes($group['delegation']));
 	
   $query = "INSERT INTO RGroup (
     rgroup_timeupdate,
@@ -268,7 +280,8 @@ function run_query_resourcegroup_insert($group) {
     rgroup_usercreate,
     rgroup_domain_id,
     rgroup_privacy,
-    rgroup_name,
+    rgroup_name
+    $q_delegation[field],
     rgroup_desc
   ) values (
     null,
@@ -277,7 +290,8 @@ function run_query_resourcegroup_insert($group) {
     $obm[uid],
     $domain_id,
     $priv,
-    '$name',
+    '$name'
+    $q_delegation[value],
     '$desc'
   )";
 
@@ -340,6 +354,8 @@ function run_query_resourcegroup_update($group) {
   $desc = $group["desc"];
   $priv = sql_parse_int($group["privacy"]);
   $multidomain = sql_multidomain("rgroup");
+  $q_delegation = of_delegation_query_update_clause('rgroup_delegation', stripslashes($group['delegation']));
+
   
   $query = "UPDATE RGroup set
     rgroup_timeupdate=NOW(),
@@ -347,6 +363,7 @@ function run_query_resourcegroup_update($group) {
     rgroup_privacy=$priv,
     rgroup_name='$name',
     rgroup_desc='$desc'
+    $q_delegation
   WHERE rgroup_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_update()");
@@ -870,5 +887,37 @@ function get_json_resource_group($id) {
   $display['json'] = "resources:[".implode(",", $data)."]";
 
 }
+
+/*
+ * Group specific rights checking (eg : public group needs write_admin)
+ * Parameters:
+ * @param $params : parameters values
+ * @param $g[]    : current group values
+ * @return true if OK, else false
+ */
+function check_resourcegroup_update_rights($params, $g='') {
+
+  $id = $params['resourcegroup_id'];
+  if ($id > 0) {
+    // Get current group info if not given
+    if (! is_array($g)) {
+      $r = get_resourcegroup_info($id);
+    }
+
+    // Check delegation update right
+    if (! of_delegation_check_update_rights($params, $r['delegation'])) {
+      $GLOBALS['err']['msg'] .= $GLOBALS['l_error_delegation'];
+      return false;
+    }
+
+    // Check update right is set
+    if (!$GLOBALS['perm']->check_right('resourcegroup', $GLOBALS['actions']['resourcegroup']['update']['Right'])) {
+      $GLOBALS['err']['msg'] .= $GLOBALS['l_error_permission'];
+      return false;
+    }
+  }
+  return true;
+}
+
 
 ?>

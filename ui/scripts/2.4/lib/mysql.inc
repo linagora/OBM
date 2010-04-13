@@ -82,12 +82,6 @@ class DB {
     return $this->link;
   }
 
-  /* public: discard the query result */
-  function free() {
-      @mysql_free_result($this->queryId);
-      $this->queryId = 0;
-  }
-
   function query($Query_String, $hide_error="") {
     if ($Query_String == "")
       return 0;

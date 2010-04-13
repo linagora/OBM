@@ -114,7 +114,6 @@ class DB_Sql {
       return 0; /* we already complained in connect() about that. */
     }
     
-    $Query_String = self::xParser($Query_String);
     $Query_String =  self::xParser($Query_String); 
 
     // Store the query string - PB Aliacom

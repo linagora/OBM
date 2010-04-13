@@ -84,8 +84,6 @@ class DB_Sql {
       return 0;
 
     $this->connect();
-    $Query_String =  self::xParser($Query_String); 
-
 
     // Store the query string - PB Aliacom
     $Query_String = self::xParser($Query_String);    
