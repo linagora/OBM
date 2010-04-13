@@ -2661,7 +2661,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   $end = clone $begin;
   $end->addSecond($event_q->f('event_duration'));
   if ($all_day) {
-    $dis_all_day = "<tr><th>$l_all_day</th><td></td></tr>";
+    $dis_all_day = "<tr><th>$l_all_day</th><td>$GLOBALS[l_yes]</td></tr>";
     $end->subSecond(1);
     $begin = $begin->getOutputDate();
     $end = $end->getOutputDate();
