@@ -3193,9 +3193,15 @@ function dis_calendar_quick_form($calendar_entity) {
         $GLOBALS[l_users] : $entity_view
       </fieldset>";
   } else {
-    $user = array_values($calendar_entity['user']);
-    $calendar_list_entity ="<input id=\"calendarViewEntity\" type='hidden' value='".$user[0][id]."' />";
-    $calendar_list_entity .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+    if (is_array($calendar_entity['user'])) {
+      $user = array_values($calendar_entity['user']);
+      $calendar_list_entity ="<input id=\"calendarViewEntity\" type='hidden' value='".$user[0][id]."' />";
+      $calendar_list_entity .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+    } else {
+      $txt = $GLOBALS['l_create_in_mine'];
+      $calendar_list_entity ="<input id=\"calendarViewEntity\" type='hidden' value='".$GLOBALS['obm']['uid']."' />";
+      $calendar_list_entity .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+    }
   }
 
   // Template
@@ -3233,6 +3239,7 @@ function dis_calendar_quick_form($calendar_entity) {
      <div class=\"content\">
         <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
           <fieldset>
+            $txt<br/>
             $l_title: <input type=\"text\" maxlength='255' name=\"tf_title\" id=\"tf_quick_title\" /> 
             <span id='sel_template'><br/>$block_template</span>
           </fieldset>

@@ -85,6 +85,7 @@ $l_periodic = "Périodique";
 $l_days = 'jours';
 $l_more = 'de plus';
 $l_search_my_calendar = "Rechercher dans mon agenda";
+$l_create_in_mine = "Nouvel événement dans mon agenda";
 $l_basic_search_result = "Résultat de recherche pour les événements à venir";
 $l_event_is_exception = "Cette évènement a été modifié et ne fait plus partie d'une série";
 $l_parent_event = "Evènement parent";
