@@ -77,15 +77,16 @@ function dis_calendar_search_result($calendar, $current_view) {
   $events = null;
 
   if ($calendar['searchType'] == 'basic') {
-    // Set date_begin == today and date_end == today +3months
-    $begin = new Of_Date();
-    $end = clone $begin;
-    $end->addMonth(3);
+    // Set date_begin == 1970-01-01 and date_end == today +5 years
+    $begin = new Of_Date(0);
+    $begin = new Of_Date(0);
+    $end = new Of_Date();
+    $end->addYear(5);
     $block = "<h1>$GLOBALS[l_basic_search_result] \"".stripslashes($calendar['pattern'])."\"</h1>";
     $events = run_query_calendar_solr_query(format_name($calendar['pattern'], 1, true));
   } else {
     if ($calendar['date_begin'] == null) {
-      $begin = new Of_Date();
+      $begin = new Of_Date(0);
     } else {
       $begin = clone $calendar['date_begin'];
     }
@@ -95,6 +96,7 @@ function dis_calendar_search_result($calendar, $current_view) {
 
     if ($calendar['date_end'] == null) {
       $end = new Of_Date();
+      $end->addYear(5);
     } else {
       $end = clone $calendar['date_end'];
     }
@@ -124,12 +126,6 @@ function dis_calendar_search_result($calendar, $current_view) {
     if (isset($calendar['category']) && $calendar['category'] != $GLOBALS['c_all']) {
       $pattern .= " category:$calendar[category]";
     }
-
-    // doesn't work with repeated events
-    // $from = $begin->format('Y-m-d\T00:00:00\Z');
-    // $to = $end->format('Y-m-d\T23:59:59\Z');
-    // $pattern .= " date:[$from TO $to]";
-
     $events = run_query_calendar_solr_query($pattern);
   }
 
@@ -959,11 +955,19 @@ function dis_calendar_html_search_form($calendar) {
   $GLOBALS['js']['vars']['consts']['next_month_end'] = $this_next_month_d->addMonth(1)->subDay(1)->getInputDate();
 
   $date_begin = $calendar['date_begin'];
-  if (!$date_begin) $date_begin = new Of_Date();
+  if (!$date_begin) {
+    $tf_date_begin = "";
+  } else {
+    $tf_date_begin = $date_begin->getInputDate();
+  }
   $date_end = $calendar['date_end'];
-  if (!$date_end) $date_end = new Of_Date();
-
+  if (!$date_end) {
+    $tf_date_end = "";
+  } else {
+    $tf_date_end = $date_end->getInputDate();
+  }
   // Tag selection
+
   $tags_q = run_query_calendar_get_alltags($obm['uid']);
   $sel_tags = "<select id='sel_tag' name='sel_tag'>
     <option value='".$GLOBALS['cnone']."'>$GLOBALS[l_none]</option>";
@@ -1012,7 +1016,7 @@ function dis_calendar_html_search_form($calendar) {
           <td>$GLOBALS[l_tag]</td>
           <td>$sel_tags</td>
           <td>$GLOBALS[l_datebegin]</td>
-          <td><input type='text' id='tf_date_begin' name='tf_date_begin' value='".$date_begin->getInputDate()."' class='datePicker' /></td>
+          <td><input type='text' id='tf_date_begin' name='tf_date_begin' value='$tf_date_begin' class='datePicker' /></td>
           <td>
             <input type='radio' id='rd_today' name='rd_period' value='today' onclick='setAdvancedSearchDate(this);' ". ($period=="today" ? "checked" : "") .">
             <label for='rd_today'>$GLOBALS[l_today]</label>
@@ -1025,7 +1029,7 @@ function dis_calendar_html_search_form($calendar) {
           <td></td>
           <td></td>
           <td>$GLOBALS[l_dateend]</td>
-          <td><input type='text' id='tf_date_end' name='tf_date_end' value='".$date_end->getInputDate()."' class='datePicker' /></td>
+          <td><input type='text' id='tf_date_end' name='tf_date_end' value='$tf_date_end' class='datePicker' /></td>
           <td>
             <input type='radio' id='rd_this_week' name='rd_period' value='this_week' onclick='setAdvancedSearchDate(this);' ". ($period=="this_week" ? "checked" : "") .">
             <label for='rd_this_week'>$GLOBALS[l_this_week]</label>
