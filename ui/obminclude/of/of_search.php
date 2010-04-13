@@ -35,7 +35,6 @@ class  OBM_Search {
           } else {
             $pattern = "domain:$obm[domain_id]";
           }
-          $response = $solr->search($pattern, $offset, $limit, $options);
           // $pattern = strtolower($pattern); => do not work because of solr keyword "OR" and "AND"
           $pattern = preg_replace("/(\w*)\*/e", "strtolower('$1').'*'", $pattern);
           $response = $solr->search($pattern, $offset, $limit, $options);
