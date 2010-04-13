@@ -442,6 +442,7 @@ $l_allow_documents = "Allow participants to attach documents";
 $l_tag_fill_color = "You have to choose a colour.";
 $l_delete_meeting = "Delete meetings from my calendar";
 $l_search_my_calendar = "Search in my calendar";
+$l_create_in_mine = "New event in my calendar";
 $l_confirm_delete_export = "The events from your calendar are going to be deleted, this process cannot be cancelled, do you want to continue? ";
 $l_ics_export_ok = "The events have been exported.";
 $l_tag = "Tag";

@@ -85,6 +85,7 @@ $l_days = "zile";
 $l_more = "mai mult";
 $l_know_more = "stiu mai multe";
 $l_search_my_calendar = "Căutați în agendă";
+$l_create_in_mine = "Nou eveniment în calendarul meu";
 $l_search_result = "Rezultatul căutării";
 $l_display_details = "Vizualizați detaliile";
 $l_one_day_per_page = "O zi pe pagină";

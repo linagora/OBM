@@ -165,6 +165,7 @@ $l_eventexception_moved_to = "an %s verschoben";
 $l_view_agenda_desc = "Kalendar Ansicht, diese Ansicht ist editierbar.";
 $l_err_days_repeat = "Sie müssen den Tag der Wiederholung angeben.";
 $l_search_my_calendar = "Schauen Sie in meinen Agenda";
+$l_create_in_mine = "Neue Veranstaltung in meinen Kalender";
 $l_rights_on_my = "Rechte auf meinem Agenda";
 $l_alert_mail_body = 
 "Automatische Nachricht von OBM

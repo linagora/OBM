@@ -162,6 +162,7 @@ $l_delete_meeting = "Eliminare le riunioni della mia agenda";
 $l_view_agenda_desc = "Tema calendario, questo tema non può essere editata";
 $l_err_days_repeat = "Devi specificare dei giorni di ripetizione";
 $l_search_my_calendar = "Cerca nella mia agenda";
+$l_create_in_mine = "Nuovo evento nel mio calendario";
 $l_rights_on_my = "Permessi sulla mia agenda";
 $l_alert_mail_body = 
 "Messaggio automatico inviato da OBM
