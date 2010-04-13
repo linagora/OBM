@@ -343,13 +343,15 @@ function run_query_user_ext_search($user) {
   if(isset($user['first_row'])) $first_row = $user['first_row'] - 1;
   else $first_row = 0;
 
-  if ($filter_entity == 'calendar') {
-    $where_filter_entity = ' INNER JOIN ('.OBM_Acl::getAclSubselect('calendarentity_calendar_id', 'calendar', null, $obm['uid'], $filter_pattern).') as Rights ON Rights.calendarentity_calendar_id = userobm_id';
-  }
   $patterns = explode(' ', $pattern);
   foreach ($patterns as $pattern) {
     $userpattern .= "AND (userobm_lastname #LIKE '%$pattern%' OR userobm_firstname #LIKE '%$pattern%' OR userobm_email #LIKE  '%$pattern%' )";
   }
+  if ($filter_entity == 'calendar') {
+    $where_filter_entity = ' INNER JOIN ('.OBM_Acl::getAclSubselect('calendarentity_calendar_id', 'calendar', null, $obm['uid'], $filter_pattern).') as Rights ON Rights.calendarentity_calendar_id = userobm_id';
+    $union = " UNION SELECT userobm_id, userobm_lastname, userobm_firstname, userobm_hidden, userobm_email FROM UserObm WHERE userobm_id='$obm[uid]' $userpattern";
+  }
+
   $query = "SELECT 
       userobm_id,
       userobm_lastname,
@@ -362,7 +364,7 @@ function run_query_user_ext_search($user) {
       1 = 1 $userpattern 
       AND userobm_archive = 0
       $multidomain
-    LIMIT $limit OFFSET $first_row";
+    LIMIT $limit OFFSET $first_row $union";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->xquery($query);
   $rows =  array();
