@@ -1642,7 +1642,8 @@ class OBM_Contact implements OBM_ISearchable {
               $f = fopen($file, 'w');
               fwrite($f, $d);
               fclose($f);
-
+            } else {
+              return false;
             }
           }
           return Vpdi::decodeOne($d);
@@ -1665,7 +1666,9 @@ class OBM_Contact implements OBM_ISearchable {
     if (is_array($this->website)) {
       foreach($this->website as $website) {
         if ($website['label'][0] == 'CALURI') {
-          return true;
+          $url = $website['url'];
+          $handle = @fopen($url, "r");
+          return $handle;
         }
       }
     }
