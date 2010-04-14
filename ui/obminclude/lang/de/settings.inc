@@ -39,6 +39,7 @@ $l_co_chro = "Chronologisch";
 $l_co_rev = "Invers";
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";
+$l_set_public_fb = "";
 
 // lines below have been created with OBMtranslation (0.4.1) on 2009-09-24T17:31:43+02:00
 $l_set_display_days = ""; 
@@ -52,4 +53,4 @@ $l_with_weekend = "";
 $l_set_csv_sep = ""; 
 $l_deadline = ""; 
 $l_set_todo = ""; 
-
+$l_set_public_fb = "Veröffentlichen ihre Verfügbarkeit";

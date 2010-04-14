@@ -76,3 +76,4 @@ $l_with_weekend = "Week-end incluso";
 $l_deadline = "Scadenza";
 $l_set_todo = "Ordine visualizzazione operazioni"; 
 
+$l_set_public_fb = "Pubblicizzare la sua disponibilità";
