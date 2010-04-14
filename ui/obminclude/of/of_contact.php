@@ -774,21 +774,30 @@ class OBM_Contact implements OBM_ISearchable {
       );
     }
     foreach ($vcard->phones as $ph) {
+      $labels = array_map('strtoupper', array_merge($ph->location, $ph->capability));
       $contact['phones'][] = array(
         'number' => addslashes($ph->value),
-        'label' => strtoupper($ph->location[0])
+        'label' => implode(';', $labels)
       );
     }
     foreach ($vcard->emails as $em) {
+      $labels = array_map('strtoupper', array_merge($em->location, array($em->format)));
       $contact['emails'][] = array(
-        'address' => $em->value,
-        'label' => strtoupper($em->location[0])
+        'address' => addslashes($em->value),
+        'label' => 'INTERNET' 
       );
     }
     foreach ($vcard->getFieldsByName('IMPP') as $im) {
+      $url = $im->value;
+      if (strpos($url, ':') !== false) {
+        list($protocol, $address) = explode(':', $url);
+      } else {
+        $protocol = 'im';
+        $address = $url;
+      }
       $contact['ims'][] = array(
-        'protocol' => $im->getParam('TYPE'),
-        'address' => addslashes($im->value())
+        'protocol' => strtoupper($protocol),
+        'address' => addslashes($address)
       );
     }
     foreach ($vcard->getFieldsByName('URL') as $www) {
