@@ -878,6 +878,9 @@ class LemonLDAP_Engine {
         case 'userobm_vacation_message':
           $value = stripslashes($usr_q->f($key));
           break;
+        case 'userobm_samba_home':
+          $value = addslashes($usr_q->f($key));
+          break;
         case 'userobm_samba_home_drive':
           $value = trim($usr_q->f($key));
           break;
