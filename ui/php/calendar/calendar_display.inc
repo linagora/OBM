@@ -3700,19 +3700,21 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       // Else auto-select the connected user
       $u_id = "$uid";
     }
-    if (is_array($template_users_id)) {
+    if (is_array($template_users_id) && isset($calendar['template_id']) && $calendar['template_id'] > 0) {
       $users_entity = get_userobm_from_ids(array_unique($template_users_id));
       $users_entity = $users_entity['entity'];
-      foreach($users_entity as $id => $user) {
-        $sel_id = "data-user-$id";
-        $div_id = "sel_user_id-$sel_id";
-        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-          <img src=\"$ico_delete\" alt=\"[Delete]\" />
-          </a>
-          $user[label]
-          <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-          </div>";
+      if (is_array($users_entity)) {
+        foreach($users_entity as $id => $user) {
+          $sel_id = "data-user-$id";
+          $div_id = "sel_user_id-$sel_id";
+          $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+            <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+            <img src=\"$ico_delete\" alt=\"[Delete]\" />
+            </a>
+            $user[label]
+            <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+            </div>";
+        }
       }
     } else {
       $u_name = ($users['entity'][$u_id]['label']);
