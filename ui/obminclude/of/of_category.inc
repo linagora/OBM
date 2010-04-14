@@ -1759,7 +1759,7 @@ function of_category_user_action_switch($module, $action, $params) {
     }
     $func = "dis_${module}_admin_index";
     $display['detail'] .= @$func();
-
+    return true;
   } elseif ($action == 'category_update') {
     $retour = of_category_user_query_update($params); 
     if ($retour) {
@@ -1769,10 +1769,10 @@ function of_category_user_action_switch($module, $action, $params) {
     }
     $func = "dis_${module}_admin_index";
     $display['detail'] .= @$func();
-
+    return true;
   } elseif ($action == 'category_checklink') {
     $display['detail'] .= of_category_user_dis_links($params);
-
+    return true;
   } elseif ($action == 'category_delete') {
     $retour = of_category_user_query_delete($params); 
     if ($retour) {
@@ -1782,17 +1782,18 @@ function of_category_user_action_switch($module, $action, $params) {
     }
     $func = "dis_${module}_admin_index";
     $display['detail'] .= @$func();
-
+    return true;
   } elseif ($action == 'ext_get_category_ids') {
     $extra_css = 'category.css';
     $display['detail'] = of_category_user_dis_tree($module, $params['category'], $params, $action);
-
+    return true;
   } elseif ( ($action == 'ext_get_category_code')
 	     || ($action == 'ext_get_category_codes') ) {
     $extra_css = 'category.css';
     $display['detail'] = of_category_user_dis_tree($module, $params['category'], $params, $action);
+    return true;
   }
-
+  return false;
 }
 
 
