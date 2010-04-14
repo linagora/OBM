@@ -2437,7 +2437,7 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $time_begin = $datebegin->getHour();
   $min_begin = $datebegin->getMinute();
   $duration = ($dateend->getTimestamp() - $datebegin->getTimestamp())/3600;
-  $d = $datebegin->getOutputDate();
+  $d = $datebegin->getTimestamp();
 
   $entity_id = $calendar['entity_id'];
   $entity_kind = $calendar['entity_kind'];

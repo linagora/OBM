@@ -197,7 +197,7 @@ function performMeeting() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-function displayFreeBusyConflict(duration, d, ro) {
+function displayFreeBusyConflict(duration, date_begin, readOnly) {
 
   var data = new Object();
   data.sel_user_id = new Array();
