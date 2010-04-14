@@ -32,7 +32,7 @@
 
 #calendarNavBar span.label {
   font-weight:bold;
-  font-size:110%;
+  font-size:130%;
 }
 
 #calendarNavBar span.lnk {
@@ -45,7 +45,7 @@
 }
 
 #calendarNavBar a {
-  font-size: 90%;
+  /* font-size: 90%; */
 }
 
 .dayColLabel {
