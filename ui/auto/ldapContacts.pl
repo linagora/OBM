@@ -29,6 +29,13 @@ use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
+# Lock process to disallow multi-run
+use Fcntl qw(:flock);
+if( !flock(DATA, LOCK_EX|LOCK_NB) ) {
+    print STDERR $0." already running\n";
+    exit 0;
+}
+
 use Getopt::Long;
 my %parameters;
 my $return = GetOptions( \%parameters, 'global', 'incremental', 'help' );
@@ -129,6 +136,10 @@ sub _displayHelp {
 
     return 0;
 }
+
+
+# Needed to lock process
+__DATA__
 
 
 #

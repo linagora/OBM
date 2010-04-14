@@ -71,13 +71,13 @@ sub _init {
     }
 
     if( !$contactDesc->{'contactCommonName'} ) {
-        $self->_log( 'nom et prénom non renseigné, export LDAP impossible de '.$self->getDescription(), 1 );
+        $self->_log( 'nom et prénom non renseigné, export LDAP impossible ID:'.$contactDesc->{'contact_id'}, 1 );
         return 1;
     }
 
     $self->{'entityDesc'} = $contactDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 2 );
 
     return 0;
 }

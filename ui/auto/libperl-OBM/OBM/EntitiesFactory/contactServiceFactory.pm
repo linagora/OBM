@@ -1,4 +1,4 @@
-package OBM::EntitiesFactory::mailServerFactory;
+package OBM::EntitiesFactory::contactServiceFactory;
 
 $VERSION = '1.0';
 
@@ -67,12 +67,12 @@ sub next {
         }
     }
 
-    if( defined($self->{'entitiesDescList'}) && (my $mailServerDesc = $self->{'entitiesDescList'}->fetchall_arrayref({})) ) {
-        require OBM::Entities::obmMailServer;
-        if( $self->{'currentEntity'} = OBM::Entities::obmMailServer->new( $self->{'parentDomain'}, $mailServerDesc ) ) {
+    if( defined($self->{'entitiesDescList'}) && (my $contactServiceDesc = shift(@{$self->{'entitiesDescList'}})) ) {
+        require OBM::Entities::obmContactService;
+        if( $self->{'currentEntity'} = OBM::Entities::obmContactService->new( $self->{'parentDomain'}, $contactServiceDesc ) ) {
             SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
-                    if( $self->_loadMailServerLinks() ) {
+                    if( $self->_loadContactServiceLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
                         return undef;
                     }
@@ -91,7 +91,7 @@ sub next {
                 }
 
                 if( $self->{'updateType'} eq 'UPDATE_LINKS' ) {
-                    if( $self->_loadMailServerLinks() ) {
+                    if( $self->_loadContactServiceLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
                         return undef;
                     }
@@ -119,43 +119,39 @@ sub next {
 sub _loadEntities {
     my $self = shift;
 
-    $self->_log( 'chargement de la configuration des serveurs de courriers du domaine '.$self->{'parentDomain'}->getDescription().'\'', 2 );
+    $self->_log( 'chargement de la configuration du service contact du domaine '.$self->{'parentDomain'}->getDescription().'\'', 2 );
 
-    require OBM::Tools::obmDbHandler;
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-
-    if( !$dbHandler ) {
-        $self->_log( 'connexion à la base de données impossible', 4 );
-        return 1;
-    }
-
-    my $hostTable = 'Host';
-    my $domainEntity = 'DomainEntity';
-    my $serviceProperty = 'ServiceProperty';
-    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
-        $hostTable = 'P_'.$hostTable;
-        $domainEntity = 'P_'.$domainEntity;
-        $serviceProperty = 'P_'.$serviceProperty;
-    }
-
-    my $query = 'SELECT host_id as server_id,
-                        host_name as server_name,
-                        serviceproperty_property as server_role
-                 FROM '.$hostTable.'
-                 INNER JOIN DomainEntity ON domainentity_domain_id='.$self->{'domainId'}.'
-                 INNER JOIN ServiceProperty ON serviceproperty_entity_id=domainentity_entity_id
-                 WHERE host_id='.$dbHandler->castAsInteger('serviceproperty_value').' AND serviceproperty_service=\'mail\'';
-
-    if( !defined($dbHandler->execQuery( $query, \$self->{'entitiesDescList'} )) ) {
-        $self->_log( 'chargement de la configuration des serveurs de courriers depuis la BD impossible', 3 );
-        return 1;
-    }
+    my @dateTime = localtime(time);
+    push( @{$self->{'entitiesDescList'}}, {
+        currentDate => eval {
+                return 1900+$dateTime[5];
+            }.'-'.eval {
+                $dateTime[4]+=1;
+                if($dateTime[4]<10) {
+                    return '0'.$dateTime[4];
+                }else {
+                    return $dateTime[4];
+                }
+            }.'-'.eval {
+                if($dateTime[3]<10) {
+                    return '0'.$dateTime[3];
+                }else {
+                    return $dateTime[3];
+                }
+            }.' '.eval {
+                if($dateTime[2]<10) {
+                    return '0'.$dateTime[2].':00:00';
+                }else {
+                    return $dateTime[2].':00:00';
+                }
+            }
+        } );
 
     return 0;
 }
 
 
-sub _loadMailServerLinks {
+sub _loadContactServiceLinks {
     my $self = shift;
 
     return 0;

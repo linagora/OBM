@@ -92,7 +92,7 @@ sub _init {
 
     $self->{'entityDesc'} = $domainDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 2 );
 
     return 0;
 }
@@ -231,6 +231,11 @@ sub getDnPrefix {
 
     if( (!defined( $entity ) || ref($entity) eq 'OBM::Entities::obmContact') && !$self->isGlobal() ) {
         push( @dnPrefixes, 'ou=contacts,'.$rootDn );
+        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
+    }
+
+    if( (!defined( $entity ) || ref($entity) eq 'OBM::Entities::obmContactService') && !$self->isGlobal() ) {
+        push( @dnPrefixes, 'ou=servicesConfiguration,'.$rootDn );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }
 

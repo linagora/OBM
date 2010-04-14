@@ -116,7 +116,7 @@ sub _deleteLdapContacts {
     my $entity = $self->{'currentEntity'};
 
     require OBM::Entities::obmContact;
-    my $currentEntityDNs = $entity->getDnPrefix( OBM::Entities::obmContact->new( $entity ) );
+    my $currentEntityDNs = $entity->getDnPrefix(OBM::Entities::obmContact->new($entity));
 
     # Get LDAP server conn for this entity
     my $ldapServerConn;
@@ -146,4 +146,48 @@ sub _deleteLdapContacts {
     }
 
     return 0;
+}
+
+
+sub getLastUpdateDate {
+    my $self = shift;
+    my($entity) = @_;
+    my $ldapServers = $self->{'ldapservers'};
+
+    # Get LDAP server conn for this entity
+    my $ldapServerConn;
+    if( !($ldapServerConn = $ldapServers->getLdapServerConn($entity->getLdapServerId())) ) {
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$entity->getDescription(), 2 );
+        return undef;
+    }
+
+    $self->_log( 'obtention de la configuration du service contact', 3 );
+    my $dn = $entity->getDnPrefix();
+
+    my $result = $ldapServerConn->search(
+        base => $dn->[0],
+        scope => 'base',
+        filter => '(objectclass=obmContactService)',
+        attrs => ['lastUpdate']
+    );
+
+    if( ($result->code != 32) && ($result->is_error()) ) {
+        $self->_log( 'problème lors de la recherche LDAP \''.$result->code.'\', '.$result->error, 1 );
+        return undef;
+    }
+
+
+    my @ldapEntries = $result->entries();
+    if($#ldapEntries != 0) {
+        $self->_log( 'pas de date de dernière mise à jour. Mise à jour globale', 2 );
+        return undef;
+    }
+
+    my $lastUpdate = $ldapEntries[0]->get_value('lastUpdate', asref => 1);
+    if($#$lastUpdate != 0) {
+        $self->_log( 'date de dernière mise à jour incorrecte. Mise à jour globale', 2 );
+        return undef;
+    }
+
+    return $lastUpdate->[0];
 }

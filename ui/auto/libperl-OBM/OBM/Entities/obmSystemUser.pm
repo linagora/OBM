@@ -96,7 +96,7 @@ sub _init {
 
     $self->{'entityDesc'} = $systemUserDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+    $self->_log( 'chargement : '.$self->getDescription(), 2 );
 
     return 0;
 }

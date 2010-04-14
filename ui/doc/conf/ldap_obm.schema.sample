@@ -290,7 +290,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.23
 
 # Attribute: company
 # Contact company name to MS Outlook compatibility
-attributetype ( 1.3.6.1.4.1.25469.1.1.1.24 NAME ( 'company' )
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.24
+    NAME 'company'
     DESC 'RFC2256: organization this object belongs to'
     SUP name )
 
@@ -301,3 +302,22 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.8
     DESC 'OBM contacts description'
     SUP top AUXILIARY
     MAY ( obmDomain $ obmUID $ URL $ workUrl $ company ) )
+
+# Attribute: lastUpdate
+# Last update time
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.25
+    NAME 'lastUpdate'
+    DESC 'Last update time'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{25} )
+
+# Object: obmContactService
+# Mail servers configuration options to an OBM domain
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.10
+    NAME 'obmContactService'
+    DESC 'LDAP public contacts publication configuration'
+    SUP top STRUCTURAL
+    MUST ( cn )
+    MAY ( lastUpdate $ obmDomain ) )
+

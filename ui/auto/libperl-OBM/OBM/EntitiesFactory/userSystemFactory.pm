@@ -50,7 +50,7 @@ sub new {
 sub next {
     my $self = shift;
 
-    $self->_log( 'obtention de l\'entité suivante', 2 );
+    $self->_log( 'obtention de l\'entité suivante', 3 );
 
     if( !$self->isRunning() ) {
         if( !$self->_start() ) {
