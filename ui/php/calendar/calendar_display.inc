@@ -6106,8 +6106,8 @@ function json_build_html_event($calendar, $current_view, $id) {
   $calendar_entity = $current_view->get_entities();
   $category_filter = $current_view->get_category_filter();
   $unit = "hour";
-  if ($current_view->get_cal_range() == "month") $unit = "day";
-  $isMultiWeek = true;
+  if ($current_view->get_cal_range() == "month" || $calendar['all_day'] == 1) $unit = "day";
+  $isMultiWeek = false;
   $current_view->set_date($calendar['date_begin']);
   if ($calendar['periodic'] && $current_view->get_cal_range() == "week") {
     $date = $current_view->get_date_range();
@@ -6139,7 +6139,6 @@ function json_build_html_event($calendar, $current_view, $id) {
       if (is_array($occurrences)) {
         foreach($occurrences as $occurrence) {
           if ($occurrence->event->id == $id) {
-            if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
             $occurrence->index = $occurrence->date;
             $occurrence->left = false;
             $occurrence->right = false;
@@ -6152,7 +6151,7 @@ function json_build_html_event($calendar, $current_view, $id) {
             if ($occurrence->end->compare($endWeek) > 0) {
                $occurrence->right = true;
             }
-            $dis_events[] = "'".phpStringToJsString(dis_calendar_event($occurrence, $unit, $calendar_entity, $writable_entity))."'";
+            $dis_events[] = "'".phpStringToJsString(dis_calendar_event($occurrence, "day", $calendar_entity, $writable_entity))."'";
           }
         }
       }
@@ -6165,7 +6164,6 @@ function json_build_html_event($calendar, $current_view, $id) {
     if (is_array($occurrences)) {
       foreach($occurrences as $occurrence) {
         if ($occurrence->event->id == $id) {
-          if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
           $occurrence->index = $occurrence->date;
           $dis_events[] = "'".phpStringToJsString(dis_calendar_event($occurrence, $unit, $calendar_entity, $writable_entity))."'";
         }

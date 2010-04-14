@@ -409,82 +409,82 @@ Obm.CalendarManager = new Class({
     var passed = new Hash(); 
 
     this.redrawAllDay.each (function(redraw, columnIndex) {
-      //if(!redraw) return
+      if (this.alldayEventGrid[columnIndex]) {
+        this.alldayEventGrid[columnIndex].each(function(evt) {
 
-      this.alldayEventGrid[columnIndex].each(function(evt) {
+          var passedId = evt.element.uid;
+          if (!passed.get(passedId)) {
 
-        var passedId = evt.element.uid;
-        if (!passed.get(passedId)) {
+            var end = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
+            var begin = evt.event.date.getTime(); 
+            var current = new Obm.DateTime(evt.event.time*1000);
 
-          var end = new Obm.DateTime((evt.event.time+evt.event.duration)*1000);
-          var begin = evt.event.date.getTime(); 
-          var current = new Obm.DateTime(evt.event.time*1000);
+            // Extensions
+            if (obm.vars.consts.calendarView == 'month') {
+              var weeks = obm.calendarManager.getEventWeeks(evt);
+              var start = weeks[0];
 
-          // Extensions
-          if (obm.vars.consts.calendarView == 'month') {
-            var weeks = obm.calendarManager.getEventWeeks(evt);
-            var start = weeks[0];
+              if (evt.event.left) {
+                oldBegin = begin
+                begin = evt.event.index*1000;
+                var current = new Obm.DateTime(begin);
+                columnIndex = current.format('Y-m-d');
+                evt.leftExtension.setStyle('display', '');
+              }
 
-            if (evt.event.left) {
-              oldBegin = begin
-              begin = evt.event.index*1000;
-              var current = new Obm.DateTime(begin);
-              columnIndex = current.format('Y-m-d');
-              evt.leftExtension.setStyle('display', '');
+              if (evt.event.right) {
+                evt.rightExtension.setStyle('display', '');
+              }
+
+            } else {
+
+              if (begin < obm.calendarManager.startTime*1000) {
+                begin = obm.calendarManager.startTime*1000; 
+                current = new Obm.DateTime(begin);
+                columnIndex = current.format('Y-m-d');
+                evt.size = Math.ceil((end.getTime() - begin)/86400000);
+                evt.leftExtension.setStyle('display', '');
+              }
+              if ((evt.event.date+evt.event.duration*1000) > obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays)) {
+                evt.size = Math.ceil((obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays) - begin)/86400000);
+                evt.rightExtension.setStyle('display', '');
+              }
+
             }
 
-            if (evt.event.right) {
-              evt.rightExtension.setStyle('display', '');
+            var coords = {'position': position, 'size': evt.size,  'column': columnIndex, 'occurrence': evt};
+            var currentTime = current.getTime();
+
+            for(var i=0;i<evt.size;i++) {
+              current.setTime(currentTime);
+              current.setDate(current.getDate()+i);
+              var index = current.format('Y-m-d');
+              if (!updated[index]) {
+                updated.push(index);
+                updated[index] = new Array();
+              }
+              updated[index].push(coords);
             }
 
-          } else {
+            updated[columnIndex].each(function(e) {
+              if (!usedPosition[columnIndex]) {
+                usedPosition.push(columnIndex);
+                usedPosition[columnIndex] = new Hash();
+              }
+              usedPosition[columnIndex].set(e.position, true);
+            });
 
-            if (begin < obm.calendarManager.startTime*1000) {
-              begin = obm.calendarManager.startTime*1000; 
-              current = new Obm.DateTime(begin);
-              columnIndex = current.format('Y-m-d');
-              evt.size = Math.ceil((end.getTime() - begin)/86400000);
-              evt.leftExtension.setStyle('display', '');
-            }
-            if ((evt.event.date+evt.event.duration*1000) > obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays)) {
-              evt.size = Math.ceil((obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays) - begin)/86400000);
-              evt.rightExtension.setStyle('display', '');
+            var position = 0;
+            while(usedPosition[columnIndex].get(position)) {
+              position++;
             }
 
+            coords.position = position;
+            passed.set(passedId, true);
           }
 
-          var coords = {'position': position, 'size': evt.size,  'column': columnIndex, 'occurrence': evt};
-          var currentTime = current.getTime();
-
-          for(var i=0;i<evt.size;i++) {
-            current.setTime(currentTime);
-            current.setDate(current.getDate()+i);
-            var index = current.format('Y-m-d');
-            if (!updated[index]) {
-              updated.push(index);
-              updated[index] = new Array();
-            }
-            updated[index].push(coords);
-          }
-
-          updated[columnIndex].each(function(e) {
-            if (!usedPosition[columnIndex]) {
-              usedPosition.push(columnIndex);
-              usedPosition[columnIndex] = new Hash();
-            }
-            usedPosition[columnIndex].set(e.position, true);
-          });
-
-          var position = 0;
-          while(usedPosition[columnIndex].get(position)) {
-            position++;
-          }
-
-          coords.position = position;
-          passed.set(passedId, true);
-        }
-
-      });
+        });
+      }
     }.bind(this));
 
     //this.redrawAllDay = new Hash();
