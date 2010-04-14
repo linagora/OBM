@@ -155,7 +155,9 @@ foreach ($cgp_show['section'] as $sec => $value) {
       }else{
         $lang = get_lang();
         $lang = strtolower($lang);
-        $cgp_show['section']['webmail']['url'] = $cgp_show['section']['webmail']['url']."/WebmailUI.".$lang.".html";
+        if(preg_match("/.*minig$/",$cgp_show['section']['webmail']['url']))
+          $cgp_show['section']['webmail']['url'] = $cgp_show['section']['webmail']['url']."/WebmailUI.".$lang.".html";
+
       }
     }
     $sections[$sec] = array('Name' => ${"l_section_$sec"},
