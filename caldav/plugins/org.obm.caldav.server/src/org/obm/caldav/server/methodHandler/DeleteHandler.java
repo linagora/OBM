@@ -45,8 +45,13 @@ public class DeleteHandler extends DavMethodHandler {
 	public void process(Token token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp) throws ResultBuilderException {
 		try {
-			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
-			proxy.getCalendarService().removeOrUpdateParticipationState(extId);
+			// management of inbox and outbox is not implemented
+			if (!req.getURI().contains("inbox")
+					&& !req.getURI().contains("outbox")) {
+				String extId = CalDavUtils.getExtIdFromURL(req.getURI());
+				proxy.getCalendarService().removeOrUpdateParticipationState(
+						extId);
+			}
 			resp.setStatus(HttpServletResponse.SC_OK);
 			resp.setContentLength(0);
 			resp.setDateHeader("Delete", new Date().getTime());
