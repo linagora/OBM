@@ -637,7 +637,7 @@ if ($action == 'search') {
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'])) {
-    run_query_calendar_delete($params);
+    run_query_calendar_delete($params, false);
     redirect_ok($params, "$l_event: $l_delete_ok");
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
