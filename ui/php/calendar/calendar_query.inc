@@ -1602,7 +1602,7 @@ function run_query_calendar_update_event_data($calendar) {
   $exceptions_q = run_query_get_events_exception(array($event_id));
   while ($exceptions_q->next_record()) {
     $eventexception_date = $exceptions_q->f('eventexception_date');
-    $date = new Of_Date($eventexception_date);
+    $date = new Of_Date($eventexception_date, "GMT");
     $iso_date = $date->format(Of_Date::DATE_ISO);
     $old_exceptions[$iso_date] = array(
       'eventexception_date' => $eventexception_date,
