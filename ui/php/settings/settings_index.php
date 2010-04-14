@@ -159,10 +159,13 @@ if ($params['form_user_pref']) {
     update_user_pref($obm['uid'], 'set_csv_sep', $_SESSION['set_csv_sep']);
   }
 
-  if ($params['public_fb'] != '') {
+  if ($params['public_fb'] == 'yes') {
     $_SESSION['set_public_fb'] = $params['public_fb'];
     update_user_pref($obm['uid'], 'set_public_fb', $params['public_fb']);    
-  }  
+  } else {
+    $_SESSION['set_public_fb'] = 'no';
+    update_user_pref($obm['uid'], 'set_public_fb', 'no');   
+  }
 
   if(is_array($params['custom'])) {
     foreach($params['custom'] as  $key => $value) {
@@ -440,7 +443,7 @@ $display['detail'] .= " /></td>
   </tr>
   <tr id='settings_calendarLastHour'>
     <th>$GLOBALS[l_set_public_fb]</th>
-    <td><input type='checkbox' name='public_fb' value='1' ".(($_SESSION['set_public_fb'] == 1)?"checked='checked'":"")." /></td>
+    <td><input type='checkbox' name='public_fb' value='yes' ".(($_SESSION['set_public_fb'] == 'yes')?"checked='checked'":"")." /></td>
   </tr>  
 ";
 }
