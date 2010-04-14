@@ -144,7 +144,7 @@ sub _checkUpdateType {
         return 0;
     }
 
-    $self->_log( 'type de mise à jour \''.$self->{'updateType'}.'\'', 3 );
+    $self->_log( 'type de mise à jour \''.$self->{'updateType'}.'\'', 5 );
     return 1;
 }
 

@@ -244,6 +244,11 @@ sub getDnPrefix {
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
     }
 
+    if( (!defined( $entity ) || ref($entity) eq 'OBM::Entities::obmContactService') && !$self->isGlobal() ) {
+        push( @dnPrefixes, 'ou=servicesConfiguration,'.$rootDn );
+        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$#dnPrefixes], 4 );
+    }
+
     return \@dnPrefixes;
 }
 

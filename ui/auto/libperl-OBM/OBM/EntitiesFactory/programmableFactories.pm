@@ -84,7 +84,12 @@ sub addEntities {
             last SWITCH;
         }
 
-        $self->_log( 'type d\'entité non supporté', 1 );
+        if( $programmingObj->getEntitiesType() eq 'CONTACT_SERVICE' ) {
+            $self->_initContactServiceFactory();
+            last SWITCH;
+        }
+
+        $self->_log( 'type d\'entité non supporté', 0 );
     }
 
     return 0;
@@ -207,4 +212,19 @@ sub _initContactFactory {
 
         $entitiesFactory->enqueueFactory( $entityFactory );
     }
+}
+
+
+sub _initContactServiceFactory {
+    my $self = shift;
+    my $entityFactory;
+    my $entitiesFactory = $self->{'entitiesFactory'};
+
+    require OBM::EntitiesFactory::contactServiceFactory;
+    if( !($entityFactory = OBM::EntitiesFactory::contactServiceFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'} )) ) {
+        $self->_log( 'problème au chargement de la factory du service contact', 1 );
+        return 1;
+    }
+
+    $entitiesFactory->enqueueFactory( $entityFactory );
 }

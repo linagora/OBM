@@ -38,14 +38,6 @@ sub new {
     $self->{'incremental'} = $parameters->{'incremental'};
     $self->{'global'} = $parameters->{'global'};
 
-    if( $self->{'global'} ) {
-        $self->{'timestamp'} = 0;
-    }
-
-    if( $self->{'incremental'} ) {
-        $self->{'timestamp'} = 0;
-    }
-
     require OBM::Ldap::ldapServers;
     if( !($self->{'ldapservers'} = OBM::Ldap::ldapServers->instance()) ) {
         $self->_log( 'initialisation du gestionnaire de serveur LDAP impossible', 1 );
@@ -85,6 +77,8 @@ sub update {
 
 
     for( my $i=0; $i<=$#{$domainIdList}; $i++ ) {
+        $self->_setDomainLastUpdateDate( $domainIdList->[$i] );
+
         if( $self->_updateUpdatedDomainContacts( $domainIdList->[$i] ) ) {
             delete( $self->{'entitiesFactories'}->{$domainIdList->[$i]} );
         }
@@ -92,10 +86,17 @@ sub update {
         if( $self->_deleteDeletedContact( $domainIdList->[$i] ) ) {
             return 1;
         }
-    }
 
-    if( $self->_doUpdate() ) {
-        return 1;
+        if( $self->_doUpdate() ) {
+            return 1;
+        }
+
+        $self->_log( 'Mise à jour de la configuration du service LDAP', 2 );
+        my @engines = values(%{$self->{'engines'}}); 
+        for( my $i=0; $i<=$#engines; $i++ ) {
+            $engines[$i]->update( $self->{'newContactService'} );
+        }
+        delete( $self->{'entitiesFactories'}->{$domainIdList->[$i]} );
     }
 
     return 0;
@@ -216,7 +217,7 @@ sub _deleteDeletedContact {
                  FROM ContactEntity
                  INNER JOIN Contact
                     ON contactentity_contact_id = contact_id
-                    AND contact_domain_id = '.$domainId;
+                 WHERE contact_domain_id = '.$domainId;
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
@@ -321,8 +322,8 @@ sub _updateDomainContacts {
                         AND EntityRight.entityright_read=1
                         AND Contact.contact_archive=0
                         AND Contact.contact_domain_id='.$domainId;
-    if( $self->{'timestamp'} ) {
-        $query .= ' AND unix_timestamp(contact_timeupdate) > \''.$self->{'timestamp'}.'\'';
+    if( $self->{'domainLastUpdateTime'} ) {
+        $query .= ' AND contact_timeupdate > \''.$self->{'domainLastUpdateTime'}.'\'';
     }
 
     my $queryResult;
@@ -373,6 +374,53 @@ sub _doUpdate {
             for( my $i=0; $i<=$#engines; $i++ ) {
                 $engines[$i]->update( $entity );
             }
+        }
+    }
+
+    return 0;
+}
+
+
+sub _setDomainLastUpdateDate {
+    my $self = shift;
+    my( $domainId ) = @_;
+
+    require OBM::EntitiesFactory::factoryProgramming;
+    my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
+    if( !defined($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return 1;
+    }
+    if($programmingObj->setEntitiesType( 'CONTACT_SERVICE' ) || $programmingObj->setUpdateType( 'UPDATE_ENTITY' )) {
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        return 1;
+    }
+
+    if( $self->_programEntitiesFactory( $programmingObj, $domainId ) ) {
+        $self->_log( 'probleme lors de la programmation des contacts supprimés', 3 );
+        return 1;
+    }
+
+    my $entitiesFactory = $self->{'entitiesFactories'}->{$domainId};
+    $self->{'newContactService'} = $entitiesFactory->next(); 
+
+
+    if( $self->{'global'} ) {
+        $self->{'domainLastUpdateTime'} = undef;
+    }
+
+    if( $self->{'incremental'} ) {
+        require OBM::Ldap::ldapContactEngine;
+        my $ldapContactEngine = OBM::Ldap::ldapContactEngine->new();
+        if( !$ldapContactEngine ) {
+            $self->_log( 'impossible d\'obtenir la date de dernière mise à jour. Mise à jour globale.', 2 );
+            return 0;
+        }
+
+        $self->{'domainLastUpdateTime'} = $ldapContactEngine->getLastUpdateDate($self->{'newContactService'});
+
+        if( defined($self->{'domainLastUpdateTime'}) ) {
+            $self->_log( 'date de dernière mise à jour : '.$self->{'domainLastUpdateTime'}, 3 );
         }
     }
 

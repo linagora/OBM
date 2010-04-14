@@ -321,3 +321,21 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.9
     SUP top STRUCTURAL
     MUST ( cn )
     MAY ( obmDomain $ obmLang ) )
+
+# Attribute: lastUpdate
+# Last update time
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.26
+    NAME 'lastUpdate'
+    DESC 'Last update time'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{25} )
+
+# Object: obmContactService
+# Mail servers configuration options to an OBM domain
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.10
+    NAME 'obmContactService'
+    DESC 'LDAP public contacts publication configuration'
+    SUP top STRUCTURAL
+    MUST ( cn )
+    MAY ( lastUpdate $ obmDomain ) )

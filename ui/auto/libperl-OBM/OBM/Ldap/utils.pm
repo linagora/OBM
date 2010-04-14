@@ -8,6 +8,7 @@ $debug = 1;
 use 5.006_001;
 require Exporter;
 use strict;
+use utf8;
 
 
 sub _modifyAttr {
@@ -42,7 +43,11 @@ sub _modifyAttr {
             
     }else {
         # La valeur de l'attribut doit être mise à jour
-        if( $ldapEntry->get_value($attr) ne $newValue ){
+        my $ldapVal = $ldapEntry->get_value($attr);
+        utf8::upgrade($ldapVal);
+        utf8::encode($newValue);
+        
+        if( $ldapVal ne $newValue ){
             $self->_log( 'mise à jour de l\'attribut LDAP \''.$attr.'\', avec la valeur \''.$newValue.'\'', 4 );
             $ldapEntry->replace( $attr => $newValue );
                     
@@ -110,7 +115,13 @@ sub _modifyAttrList {
             my @userDescSort = sort( @{$newValues} );
 
             my $i = 0;
-            while( ($i<=$#ldapValuesSort) && ($ldapValuesSort[$i] eq $userDescSort[$i]) ) {
+            while($i<=$#ldapValuesSort) {
+                utf8::upgrade($ldapValuesSort[$i]);
+                utf8::encode($userDescSort[$i]);
+                if($ldapValuesSort[$i] ne $userDescSort[$i]) {
+                    last;
+                }
+
                 $i++;
             }
 

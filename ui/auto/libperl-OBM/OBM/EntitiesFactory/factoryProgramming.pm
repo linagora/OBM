@@ -78,6 +78,12 @@ sub setEntitiesType {
             last SWITCH;
         }
 
+        if( $type eq 'CONTACT_SERVICE' ) {
+            $self->_log( 'initialisation d\'un programmateur d\'entité de type configuration du service contacts', 3 );
+            $self->{'entityType'} = $type;
+            last SWITCH;
+        }
+
         $self->_log( 'type d\'entité inconnu \''.$type.'\'', 3 );
         return 1;
     }

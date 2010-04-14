@@ -153,7 +153,7 @@ sub _loadContacts {
         $query .= ' AND Contact.contact_id IN ('.join( ', ', @{$self->{'ids'}}).')';
     }
 
-    $query .= ' ORDER BY Contact.contact_lastname';
+#    $query .= ' ORDER BY Contact.contact_lastname';
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'entitiesDescList'} )) ) {
         $self->_log( 'chargement des contacts depuis la BD impossible', 1 );

@@ -77,7 +77,7 @@ sub _start {
 sub next {
     my $self = shift;
 
-    $self->_log( 'obtention de l\'entité suivante', 3 );
+    $self->_log( 'obtention de l\'entité suivante', 4 );
 
     if( !$self->isRunning() ) {
         if( !$self->_start() ) {
