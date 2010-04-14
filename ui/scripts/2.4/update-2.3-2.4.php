@@ -41,7 +41,7 @@ class GroupContactUpdate extends UpdateObject {
   }
 
   private function getAddressBooks() {
-    $query = "SELECT Addressbook.id, Addressbook.domain_id FROM Addressbook WHERE Addressbook.name = 'public_contacts' AND Addressbook.is_default = TRUE";
+    $query = "SELECT AddressBook.id, AddressBook.domain_id FROM AddressBook WHERE AddressBook.name = 'public_contacts' AND AddressBook.is_default = TRUE";
     $result = $this->query($query);
     $addressbooks = array();
     while($result->next_record()) {

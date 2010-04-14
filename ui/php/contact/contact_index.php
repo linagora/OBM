@@ -297,7 +297,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   if ($params['contact_id'] > 0) {
     $display['detail'] = dis_contact_consult($params);
   }
-} else {
+} elseif (!of_category_user_action_switch($module, $action, $params)) {
   if ($action == 'index' || $action == '') {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
@@ -539,7 +539,6 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   }
 }
 
-of_category_user_action_switch($module, $action, $params);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
