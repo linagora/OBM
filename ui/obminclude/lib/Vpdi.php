@@ -77,8 +77,12 @@ class Vpdi {
    * @return mixed
    */
   public static function decodeOne($string, $expected_profile = null) {
-    $entities = self::decode($string, $expected_profile);
-    return $entities[0];
+    try {
+      $entities = self::decode($string, $expected_profile);
+      return $entities[0];
+    } catch (Exception $e) {
+      return false;
+    }
   }
   
   /**
