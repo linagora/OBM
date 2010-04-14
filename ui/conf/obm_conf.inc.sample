@@ -81,6 +81,9 @@ $csearch_advanced_default = false;
 // Contact : is mailing enabled by default for a new contact
 $cgp_mailing_default = true;
 
+// Calendar: display my rights panel
+$c_calendar_display_my_rights = false;
+
 // Calendar : show public groups
 $ccalendar_public_groups = true;
 

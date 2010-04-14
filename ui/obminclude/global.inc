@@ -100,6 +100,9 @@ $cgp_mailing_default = true;
 // Contact : is a new contact private by default
 $ccontact_private_default = false;
 
+// Calendar: display my rights panel
+$c_calendar_display_my_rights = false;
+
 // Calendar : show public groups
 $ccalendar_public_groups = true;
 

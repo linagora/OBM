@@ -5432,7 +5432,7 @@ function dis_calendar_right_dis_admin($id='') {
     $block = "<h1>$l_user_right $name</h1>";
   }
   $block .= of_right_dis_admin('calendar', $id);
-  $block .= html_rights_on_my_calendar();
+  if ($GLOBALS['c_calendar_display_my_rights']) $block .= html_rights_on_my_calendar();
 
   return $block;
 }
