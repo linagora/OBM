@@ -3833,7 +3833,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       // Else auto-select the connected user
       $u_id = "$uid";
     }
-    if (is_array($template_users_id)) {
+    if (is_array($template_users_id) && isset($calendar['template_id']) && $calendar['template_id'] > 0) {
       $users_entity = get_userobm_from_ids(array_unique($template_users_id));
       $users_entity = $users_entity['entity'];
       foreach($users_entity as $id => $user) {
