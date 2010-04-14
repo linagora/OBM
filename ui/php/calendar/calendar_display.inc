@@ -205,7 +205,7 @@ function dis_calendar_view_bar($current_view, $calendar) {
 
   $block = "
   <div id=\"calendarToolbar\">
-    <div class=\"SB LF NM\" style=\"margin-left:10px;\">
+    <div class=\"LF NM\" style=\"margin-left:10px;\">
       <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_view=agenda\">
       <img title=\"$l_view_agenda_desc\" src=\"$ico_agenda_view\" alt=\"$l_day\"/> 
       </a>
@@ -216,7 +216,7 @@ function dis_calendar_view_bar($current_view, $calendar) {
       <img title=\"$l_view_list_desc\" src=\"$ico_list_view\" alt=\"$l_list\" />
       </a>  
     </div>
-    <div id=\"calendarCalRange\" class=\"SB LF NM\" style=\"margin-left:10px;\">
+    <div id=\"calendarCalRange\" class=\"LF NM\" style=\"margin-left:10px;\">
       <a $day_view><img id='ico_day_view' title=\"$l_view_day_desc\" src=\"$ico_day_view\" alt=\"$l_day\" /></a>
       <a $week_view><img id='ico_week_view' title=\"$l_view_week_desc\" src=\"$ico_week_view\" alt=\"$l_week\" /></a>
       <a $month_view><img id='ico_month_view' title=\"$l_view_month_desc\" src=\"$ico_month_view\" alt=\"$l_month\" /></a>
