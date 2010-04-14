@@ -5586,7 +5586,7 @@ function dis_calendar_right_dis_admin($id='') {
   }
   $block .= of_right_dis_admin('calendar', $id);
   $block .= html_share_calendar($id,$name);
-  $block .= dis_calendar_my_rights();
+  if ($GLOBALS['c_calendar_display_my_rights']) $block .= html_calendar_my_rights();
 
   return $block;
 }
@@ -5596,7 +5596,7 @@ function dis_calendar_right_dis_admin($id='') {
  * dis_calendar_my_rights
  * @return html
  */ 
-function dis_calendar_my_rights() {
+function html_calendar_my_rights() {
 
   $limit = 50;
 
