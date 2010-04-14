@@ -166,6 +166,12 @@ if ($params['form_user_pref']) {
     $_SESSION['set_csv_sep'] = $params['csv_sep'];
     update_user_pref($obm['uid'], 'set_csv_sep', $_SESSION['set_csv_sep']);
   }
+
+  if ($params['public_fb'] != '') {
+    $_SESSION['set_public_fb'] = $params['public_fb'];
+    update_user_pref($obm['uid'], 'set_public_fb', $params['public_fb']);    
+  }  
+
   if(is_array($params['custom'])) {
     foreach($params['custom'] as  $key => $value) {
       if(strpos($key, 'set_custom') === 0) {
@@ -424,6 +430,8 @@ $display['detail'] .= " /></td>
   $dis_alert .= '</select>';
 
   $dis_hour_e .= "</select>";    
+
+
   $display['detail'] .= "
   <tr id='settings_displayDays'>
     <th>$l_set_display_days</th>
@@ -454,6 +462,10 @@ $display['detail'] .= " /></td>
     <th>$l_set_cal_alert</th>
     <td>$dis_alert</td>
   </tr>
+  <tr id='settings_calendarLastHour'>
+    <th>$GLOBALS[l_set_public_fb]</th>
+    <td><input type='checkbox' name='public_fb' value='1' ".(($_SESSION['set_public_fb'] == 1)?"checked='checked'":"")." /></td>
+  </tr>  
 ";
 }
 

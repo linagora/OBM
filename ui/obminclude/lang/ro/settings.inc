@@ -86,3 +86,4 @@ $l_csvd_tab = "tabulator";
 $l_with_weekend = "Week-end inclus";
 $l_without_weekend = "Week-end exclus";
 
+$l_set_public_fb = "Promoveze disponibilitatea acestuia";

@@ -79,6 +79,9 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Time format 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timeformat','24H');
 
+-- Public free busy
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_public_fb','0');
+
 -- -----------------------------------------------------------------------------
 -- Default values for the table 'DisplayPref'
 -- user NULL represent default values (affected to new users for ex:)

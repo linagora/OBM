@@ -55,3 +55,4 @@ $l_csvd_sc = ";";
 $l_csvd_tab = "tab";
 $l_with_weekend = "Avec week-end";
 $l_without_weekend = "Sans week-end";
+$l_set_public_fb = "Rendre public vos disponibilités";
