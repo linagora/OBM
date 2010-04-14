@@ -25,6 +25,7 @@ def index_contact(domain, solr):
 	global doc
 	print "INFO: Contact indexing for domain "+str(domain)
 	cur = ds.cursor()
+	cur.execute("SET NAMES UTF8");
 	cur.execute("""SELECT contact_id,
 		"""+sql_date_format("contact_timecreate", "timecreate")+""",
 		"""+sql_date_format("contact_timeupdate", "timeupdate")+""",
@@ -169,6 +170,7 @@ def index_contact(domain, solr):
 def index_event(domain, solr):
 	print "INFO: Event indexing for domain "+str(domain)
 	cur = ds.cursor()
+	cur.execute("SET NAMES UTF8");
 	cur.execute("""SELECT 
 		event_id,
 		"""+sql_date_format("event_timeupdate", "timeupdate")+""",
