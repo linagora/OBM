@@ -623,7 +623,7 @@ if ($action == 'search') {
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'])) {
-    run_query_calendar_delete($params);
+    run_query_calendar_delete($params, false);
     OBM_IndexingService::delete('event', $params['calendar_id']);
     redirect_ok($params, "$l_event: $l_delete_ok");
   } else {
