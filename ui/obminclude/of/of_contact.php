@@ -276,7 +276,7 @@ class OBM_Contact implements OBM_ISearchable {
         foreach($cats as $cat) {
           $code = '';
           if ($cat['code'] != '') $code = str_pad($cat['code'] . ' ', 10, '.');
-          $block_user .= "<option value=".$cat['id'].">".$code.$cat['label']."</value>";
+          $block_user .= "<option value=".$cat['id'].">".$code.$cat['label']."</option>";
         }
         $block_user .= "</select></td>";
         if ($i==2) {
