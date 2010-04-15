@@ -243,6 +243,7 @@ sub getTmpIcsFile {
 
 sub getTmpVcardFile {
     my $self = shift;
+    my($addressBookName) = @_;
 
     return undef;
 }
@@ -257,6 +258,7 @@ sub getIcsFileName {
 
 sub getVcardFileName {
     my $self = shift;
+    my($addressBookName) = @_;
 
     return undef;
 }
@@ -269,8 +271,16 @@ sub getIcs {
 }
 
 
+sub getVcards {
+    my $self = shift;
+
+    return undef;
+}
+
+
 sub getVcard {
     my $self = shift;
+    my($name) = @_;
 
     return undef;
 }
@@ -282,9 +292,15 @@ sub setIcs {
 }
 
 
+sub setVcards {
+    my $self = shift;
+    my( $addressBooks ) = @_;
+}
+
+
 sub setVcard {
     my $self = shift;
-    my( $vcard ) = @_;
+    my( $addressBookName, $vcard ) = @_;
 }
 
 

@@ -14,12 +14,12 @@ sub _setEntityContent {
     my $self = shift;
     my( $content ) = @_;
 
-    if( (ref($content->{'calendar'}) eq 'ARRAY') && (defined($content->{'calendar'}->[0])) ) {
-        $self->setIcs( $content->{'calendar'}->[0] );
+    if( !ref($content->{'calendar'}) && (defined($content->{'calendar'})) ) {
+        $self->setIcs( $content->{'calendar'} );
     }
 
-    if( (ref($content->{'privateContact'}) eq 'ARRAY') && (defined($content->{'privateContact'}->[0])) ) {
-        $self->setVcard( $content->{'privateContact'}->[0] );
+    if( ref($content->{'privateContact'}) eq 'HASH' ) {
+        $self->setVcards( $content->{'privateContact'}->{'addressBook'} );
     }
 
     return 1;
@@ -29,11 +29,23 @@ sub _setEntityContent {
 sub getEntityContent {
     my $self = shift;
 
-    return {
+    my $content = {
         calendar => [ $self->getIcs() ],
-        privateContact => [ $self->getVcard() ],
+        privateContact => {},
         mailbox => [ $self->{'folderRestore'} ]
     };
+
+    my $addressBooks = $self->getVcards();
+    while(my($addressBookName, $addressBookContent) = each(%{$addressBooks})) {
+        push( @{$content->{'privateContact'}->{'addressBook'}},
+            {
+                $addressBookName => {
+                    content => $addressBookContent
+                }
+            });
+    }
+
+    return $content;
 }
 
 
@@ -67,8 +79,9 @@ sub getTmpIcsFile {
 
 sub getTmpVcardFile {
     my $self = shift;
+    my($addressBookName) = @_;
 
-    return $self->getTmpVcardPath().'/'.$self->getVcardFileName();
+    return $self->getTmpVcardPath().'/'.$self->getVcardFileName($addressBookName);
 }
 
 
@@ -81,8 +94,9 @@ sub getIcsFileName {
 
 sub getVcardFileName {
     my $self = shift;
+    my($addressBookName) = @_;
 
-    return 'privateContacts.csv';
+    return $addressBookName.'.vcf';
 }
 
 
@@ -97,14 +111,26 @@ sub getIcs {
 }
 
 
-sub getVcard {
+sub getVcards {
     my $self = shift;
 
-    if( !$self->{'privateContact'} ) {
+    if(ref($self->{'privateContact'}) ne 'HASH') {
         return undef;
     }
 
     return $self->{'privateContact'};
+}
+
+
+sub getVcard {
+    my $self = shift;
+    my($name) = @_;
+
+    if(!$self->{'privateContact'}->{$name}) {
+        return undef;
+    }
+
+    return $self->{'privateContact'}->{$name};
 }
 
 
@@ -116,11 +142,21 @@ sub setIcs {
 }
 
 
+sub setVcards {
+    my $self = shift;
+    my( $addressBooks ) = @_;
+
+    if(ref($addressBooks) eq 'HASH') {
+        $self->{'privateContact'} = $addressBooks;
+    }
+}
+
+
 sub setVcard {
     my $self = shift;
-    my( $vcard ) = @_;
+    my( $addressBookName, $vcard ) = @_;
 
-    $self->{'privateContact'} = $vcard;
+    $self->{'privateContact'}->{$addressBookName} = $vcard;
 }
 
 

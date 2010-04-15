@@ -30,7 +30,8 @@ sub genInvalidContent {
 }
 
 sub genContent {
-    my $xml->{'calendar'}->[0] = 'BEGIN:VCALENDAR
+    my $xml = '<obmSatellite name="unitTest">
+<calendar>
 PRODID:-//Aliasource Groupe LINAGORA//OBM Calendar 2.4.0-rc//FR
 CALSCALE:GREGORIAN
 X-OBM-TIME:1268220521
@@ -57,18 +58,32 @@ ATTENDEE;CUTYPE=INDIVIDUAL;CN=Test 01 User;PARTSTAT=ACCEPTED;X-OBM-ID=6:MA
  ILTO:test01@aliasource.fr
 DTSTAMP:20100310T112841Z
 END:VEVENT
-END:VCALENDAR';
-
-    $xml->{'privateContact'}->[0] = 'Display name;Display name;Company;Address;Mobile phone;Work phone;E-Mail
+END:VCALENDAR
+</calendar>
+<privateContact>
+    <addressBook name="book1">
+Display name;Display name;Company;Address;Mobile phone;Work phone;E-Mail
 "Bronski ";"";"    ";"";"";"bronski@gmail.fr"
 "Contact 00";"";"16, rue des prés 31000  Toulouse ";"";"";"pouet@gmail.fr"
 "Rabbit Roger";"MaSociete";" 31520  MaVille ";"";"";"info@mydomain.fr"
-"Tutu ";"";"    ";"";"";"tutu@yahoo.net"';
+"Tutu ";"";"    ";"";"";"tutu@yahoo.net"
+    </addressBook>
+    <addressBook name="space book">
+Display name;Display name;Company;Address;Mobile phone;Work phone;E-Mail
+"Bronski ";"";"    ";"";"";"bronski@gmail.fr"
+"Contact 00";"";"16, rue des prés 31000  Toulouse ";"";"";"pouet@gmail.fr"
+"Tutu ";"";"    ";"";"";"tutu@yahoo.net"
+    </addressBook>
+    <addressBook name="spacebook">
+Display name;Display name;Company;Address;Mobile phone;Work phone;E-Mail
+"Bronski ";"";"    ";"";"";"bronski@gmail.fr"
+"Contact 00";"";"16, rue des prés 31000  Toulouse ";"";"";"pouet@gmail.fr"
+"Tutu ";"";"    ";"";"";"tutu@yahoo.net"
+    </addressBook>
+</privateContact>
+</obmSatellite>';
 
-    $xml->{'module'} = 'backupEntity';
-
-    use XML::Simple;
-    return XMLout( $xml, rootName => 'obmSatellite', XMLDecl => "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>" );
+    return $xml;
 }
 
 my %entityType;

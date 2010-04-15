@@ -411,7 +411,7 @@ sub _xmlContent {
     use XML::Simple;
     my $xmlContent = undef;
     eval {
-        $xmlContent = XMLin( $requestBody, ForceArray => 1 );
+        $xmlContent = XMLin( $requestBody );
     };
 
     if( !$xmlContent ) {

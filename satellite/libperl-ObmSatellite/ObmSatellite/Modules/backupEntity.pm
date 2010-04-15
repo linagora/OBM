@@ -240,8 +240,8 @@ sub _postMethod {
 
     my $xmlContent = $self->_xmlContent($requestBody);
     if($xmlContent) {
-        if( (ref($xmlContent->{'backupFile'}) eq 'ARRAY') && defined( $xmlContent->{'backupFile'}->[0] ) ) {
-            $entity->setBackupName( $xmlContent->{'backupFile'}->[0] );
+        if(!ref($xmlContent->{'backupFile'})) {
+            $entity->setBackupName( $xmlContent->{'backupFile'} );
         }else {
             return $self->_response( RC_BAD_REQUEST, {
                 content => [ 'Invalid request content' ],
@@ -665,20 +665,23 @@ sub _addVcard {
     my $self = shift;
     my( $entity ) = @_;
 
-    if( !$entity->getVcard() ) {
+    my $addressBooks;
+    if( !($addressBooks = $entity->getVcards()) ) {
         return undef;
     }
 
-    if( !open( FIC,
-            '>:encoding(UTF-8)',
-            $entity->getTmpVcardFile() ) ) {
-        $self->_log( $!, 1 );
-        return 1;
+    while( my($addressBookName, $addressBookContent) = each(%{$addressBooks}) ) {
+        if( !open(FIC,
+                '>:encoding(UTF-8)',
+                $entity->getTmpVcardFile($addressBookName)) ) {
+            $self->_log( $!, 1 );
+            return 1;
+        }
+    
+        $self->_log( 'Writing VCARD file '.$entity->getTmpVcardFile($addressBookName), 5 );
+        print FIC $addressBookContent->{'content'};
+        close(FIC);
     }
-
-    $self->_log( 'Writing VCARD file '.$entity->getTmpVcardFile(), 5 );
-    print FIC $entity->getVcard();
-    close(FIC);
 
     return 0;
 }
@@ -693,7 +696,7 @@ sub _addMailbox {
             return $result;
         }
 
-        $self->_log( 'Mailbox \''.$entity->getLogin().'@'.$entity->getRealm().'\'isn\'t backuped', 4 );
+        $self->_log( 'Mailbox \''.$entity->getLogin().'@'.$entity->getRealm().'\' isn\'t backuped', 4 );
         $self->_log( $result->asString(), 5 );
         return undef;
     }
@@ -874,17 +877,27 @@ sub _getIcsVcardFromArchive {
     }
 
     if( $restoreData =~ /^(all|contact)$/ ) {
-        if( (-e $entity->getTmpVcardFile()) && !(-f $entity->getTmpVcardFile()) ) {
+        if(!(-d $entity->getTmpVcardPath())) {
             return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-                        content => [ 'Can\'t load extracted ICS file from '.$entity->getTmpVcardFile() ]
+                        content => [ 'Can\'t open VCARD directory '.$entity->getTmpVcardPath() ]
                         } );
         }
 
-        open( FIC, $entity->getTmpVcardFile() );
-        my @ics = <FIC>;
-        close(FIC);
+        my $dh;
+        opendir($dh, $entity->getTmpVcardPath());
+        my @files = grep { /\.vcf$/ && -f $entity->getTmpVcardPath().'/'.$_ } readdir($dh);
+        closedir($dh);
 
-        $entity->setVcard( join( '', @ics ) );
+        for(my $i=0; $i<=$#files; $i++) {
+            my $addressBookName = $files[$i];
+            $addressBookName =~ s/\.vcf$//;
+
+            open( FIC, $entity->getTmpVcardFile($addressBookName));
+            my @vcard = <FIC>;
+            close(FIC);
+
+            $entity->setVcard($addressBookName, join('', @vcard));
+        }
     }
 
     return undef;
