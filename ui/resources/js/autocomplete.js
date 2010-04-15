@@ -351,7 +351,7 @@ obm.AutoComplete.Search = new Class({
           onComplete:this.onCacheRequestSuccess.bindWithEvent(this)
         }).post({
           pattern:this.currentValue,
-           first_row: this.cache.getSize,
+           first_row: this.cache.getSize(),
             limit:requestNbr,
             filter_pattern: this.options.filter_pattern,
             filter_entity: this.options.filter_entity,

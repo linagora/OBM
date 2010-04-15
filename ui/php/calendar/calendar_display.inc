@@ -4758,7 +4758,6 @@ function dis_calendar_meeting_form($current_view, $calendar) {
       <table>
       $dis_block_resource 
       $dis_block_resource_group
-      <input type='hidden' name='resource_group_search' value='all' />
       </table>
       </fieldset>";    
       //  <tr><th>$l_resource_group_search</th><td>
@@ -4873,6 +4872,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
   </fieldset>   
     $dis_block_user 
     $dis_block_resource
+    <input type='hidden' name='resource_group_search' value='all' />
   <fieldset class=\"buttons\">
     $dis_button
   </fieldset>    
