@@ -30,8 +30,32 @@ sub genInvalidContent {
 }
 
 sub genContent {
-    my $xml = '<obmSatellite name="unitTest">
-<calendar>
+    my($parameters) = @_;
+
+    my $xml = '<obmSatellite name="unitTest">';
+
+    if($parameters{'send-report'}) {
+        my @recipients = split(/,/, $parameters{'send-report'});
+        $xml .= '
+<options>
+  <report sendMail="true">';
+
+        for(my $i=0; $i<=$#recipients; $i++) {
+            $xml .= '
+  <email>'.$recipients[$i].'</email>';
+        }
+
+        $xml .= '
+  </report>
+</options>';
+    }else {
+         $xml .= '
+<options>
+  <report sendMail="false"/>
+</options>';
+    }
+
+    $xml .= '<calendar>
 PRODID:-//Aliasource Groupe LINAGORA//OBM Calendar 2.4.0-rc//FR
 CALSCALE:GREGORIAN
 X-OBM-TIME:1268220521
@@ -123,7 +147,7 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
     if( $parameters{'test-backup-entity'} ) {
         print 'Backup entity \''.$entityType.'\', login \''.$entityLogin.'\' on '.$parameters{'os-server'}.'\': ';
         my $path = $root;
-        if( !$client->put( $parameters{'os-server'}, $path, genContent() ) ) {
+        if( !$client->put( $parameters{'os-server'}, $path, genContent(\%parameters) ) ) {
             print '[OK]'."\n";
         }else {
             print '[KO]'."\n";

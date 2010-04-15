@@ -398,7 +398,9 @@ sub _getLdapValues {
 
 sub _xmlContent {
     my $self = shift;
-    my( $requestBody ) = @_;
+    my $requestBody = shift;
+    my @xmlInOpts = @_;
+#    my( $requestBody, $xmlInOpts ) = @_;
 
     local $SIG{__DIE__} = sub {
         $self->_log( join( ' ', @_ ), 0 );
@@ -411,7 +413,7 @@ sub _xmlContent {
     use XML::Simple;
     my $xmlContent = undef;
     eval {
-        $xmlContent = XMLin( $requestBody );
+        $xmlContent = XMLin( $requestBody, @xmlInOpts );
     };
 
     if( !$xmlContent ) {

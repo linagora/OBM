@@ -6,6 +6,8 @@ os-server = 127.0.0.1
 user-login = test01@aliasource.fr
 # Mailshare entity name
 mailshare-name = mailshare00@aliasource.fr
+# Send report copy to this emails too (separated by comma, no mail send if empty)
+send-report = 
 
 # Backup entity
 test-backup-entity = true

@@ -105,7 +105,7 @@ sub _putMethod {
     }
 
     my $xmlContent;
-    if( !($xmlContent = $self->_xmlContent($requestBody))
+    if( !($xmlContent = $self->_xmlContent($requestBody, ForceArray => ['addressBook', 'email']))
         || !($entity->setContent($xmlContent))
     ) {
         return $self->_response( RC_BAD_REQUEST, {
@@ -238,7 +238,7 @@ sub _postMethod {
         return $result;
     }
 
-    my $xmlContent = $self->_xmlContent($requestBody);
+    my $xmlContent = $self->_xmlContent($requestBody, ForceArray => ['email']);
     if($xmlContent) {
         if(!ref($xmlContent->{'backupFile'})) {
             $entity->setBackupName( $xmlContent->{'backupFile'} );
@@ -1162,9 +1162,11 @@ sub _sendMailReport {
                 return 1;
             }
     
-            if( defined($options->{'report'}->{'email'}) && (ref($options->{'report'}->{'email'} eq 'ARRAY')) ) {
+            $self->_log( 'Sending report to: '.$mailReportRecipient, 5 );
+            if( defined($options->{'report'}->{'email'}) && (ref($options->{'report'}->{'email'}) eq 'ARRAY') ) {
                 for( my $i=0; $i<=$#{$options->{'report'}->{'email'}}; $i++ ) {
                     if( $options->{'report'}->{'email'}->[$i] =~ /^($REGEX_EMAIL)$/ ) {
+                        $self->_log( 'Sending report copy to: '.$1, 5 );
                         push( @{$mailReportCcRecipient}, $1 );
                     }
                 }
