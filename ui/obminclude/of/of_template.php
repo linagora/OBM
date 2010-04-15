@@ -342,4 +342,15 @@ class OBM_Template {
     $websiteIndex++;
     return $return;
   }
+
+
+  public static function __setAddressbookSearchField($addessbooks) {
+    $select = "<select id='addressbookSearch' name='addressbookId'>
+      <option value=''>---</option>";
+    foreach($addessbooks as $ad) {
+      $select .= "<option value='$ad->id'>$ad->displayname</option>";
+    }
+    $select .= "</select>";
+    return $select;
+  }
 }

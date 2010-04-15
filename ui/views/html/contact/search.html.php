@@ -31,7 +31,7 @@
             <tr>
               <th><label for="emailSearch"><?php echo __('Email') ?></label></th><td><input  title="Email" id="emailSearch" name="email" value="" type="text"></td>
               <th><label for="phoneSearch"><?php echo __('Phone') ?></label></th><td><input  title="Phone" id="phoneSearch" name="phone" value="" type="text"></td>
-              <th><label for="addressbookSearch"><?php echo __('Addressbook') ?></label></th><td><input  title="Addressbook" id="addressbookSearch" name="in" value="" type="text"></td>
+              <th><label for="addressbookSearch"><?php echo __('Addressbook') ?></label></th><td><?php echo self::__setAddressbookSearchField($addressbooks); ?></td>
             </tr>
             <tr>
               <th><label for="countrySearch"><?php echo __('Country') ?></label></th><td><input  title="Country" id="countrySearch" name="country" value="" type="text"></td>
