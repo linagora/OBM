@@ -16,8 +16,7 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
-?>
-<?php
+
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_index.php                                            //
 //     - Desc : Company Index File                                           //
@@ -67,9 +66,11 @@ include("$obminclude/global_pref.inc");
 require('company_display.inc');
 require('company_query.inc');
 require('../contact/contact_query.inc');
-require("$obminclude/of/of_contact.php");
+require('../contact/addressbook.php');
 include("$obminclude/of/of_category.inc");
+require("$obminclude/of/of_right.inc");
 require('company_js.inc');
+
 $extra_js_include[] = 'company.js';
 
 get_company_action();
@@ -173,6 +174,12 @@ if ($action == 'ext_get_id') {
   if (check_user_defined_rules() && check_company_data_form($params['company_id'], $params)) {
     $retour = run_query_company_update($params['company_id'], $params);
     if ($retour) {
+      $addressbooks = OBM_AddressBook::search();
+      $contacts = $addressbooks->searchContacts("companyId:$params[company_id]");
+      foreach($contacts as $contact) {
+        OBM_Contact::solrStore($contact);
+      }
+      OBM_IndexingService::commit('contact');
       $display['msg'] .= display_ok_msg("$l_company : $l_update_ok");
     } else {
       $display['msg'] .= display_err_msg("$l_company : $l_update_error");
