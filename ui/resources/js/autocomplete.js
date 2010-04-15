@@ -207,13 +207,13 @@ obm.AutoComplete.Search = new Class({
     //FIXME Name of those 3 vars
     this.previousResultsBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(-this.options.results);}.bindWithEvent(this))
                                           .addEvent('mouseup', function() {this.inputField.focus();}.bindWithEvent(this))
-                                          .setStyle('display', 'none')
+                                          .setStyles({'display':'none','cursor':'pointer' })
                                           .injectInside(this.infos)
                                           .set('html','&lt;&lt;&lt;');
     this.infoText = new Element('span').injectInside(this.infos);
     this.nextResultsBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(this.options.results);}.bindWithEvent(this))
                                       .addEvent('mouseup', function() {this.inputField.focus();}.bindWithEvent(this))
-                                      .setStyle('display', 'none')
+                                      .setStyles({'display':'none','cursor':'pointer' })
                                       .injectInside(this.infos)
                                       .set('html','&gt;&gt;&gt;');
 
