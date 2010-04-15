@@ -5366,7 +5366,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
   $addressbooks = OBM_Addressbook::search();
   foreach($addressbooks as $id => $addressbook) {
     $addressbook_options .= "
-      <option value='$GLOBALS[path]/contact/contact_index.php?from=calendar&amp;addressbook_id=".$addressbook->id."'>".phpStringToJsString($addressbook->displayname)."</option>";
+      <option value='$GLOBALS[path]/contact/contact_index.php?from=calendar&amp;addressbook_id=$addressbook->id'>$addressbook->displayname</option>";
   }
 
   $block = "
@@ -5404,7 +5404,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
           <td class='autocompleteField'>
           <select id='freeBusySearchSource' class='autocompleteSource' name='' style='float: right;'>
             <option value='$GLOBALS[path]/user/user_index.php?from=calendar'>$GLOBALS[l_users]</option>
-            <optgroup label='$GLOBALS[l_addressbook]'>
+            <optgroup label=\"$GLOBALS[l_addressbook]\">
               $addressbook_options
             </optgroup>
           </select>
