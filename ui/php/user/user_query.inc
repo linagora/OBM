@@ -372,7 +372,8 @@ function run_query_user_ext_search($user) {
       1 = 1 $userpattern 
       AND userobm_archive = 0
       $multidomain
-    LIMIT $limit OFFSET $first_row $union";
+    $union
+    LIMIT $limit OFFSET $first_row ";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->xquery($query);
   $rows =  array();
