@@ -433,6 +433,7 @@ $l_header_country = "Country";
 $l_header_datasource = "Data Source";
 $l_header_tasktype = "Task Type";
 $l_header_region = "Regions";
+$l_header_backup_restore = "Backup/Restore";
 $l_header_year = "Year";
 $l_header_day = "Day";
 $l_header_week = "Week";
@@ -507,4 +508,11 @@ $l_save = 'Save';
 $l_displayname_template = '%1$s %2$s';
 
 $l_unlink_mobile = "Delete the mobile device ?";
+
+//backup
+$l_new_backup = "New backup";
+$l_do_backup = "Backup !";
+$l_available_backups = "Available backups";
+$l_service_get_ftp_backups = "Get available archives from the FTP server";
+
 

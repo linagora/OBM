@@ -63,6 +63,10 @@ require_once("$path/../app/default/models/UserPattern.php");
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/of/of_right.inc"); // needed by call from calendar
 
+// lang file include for backup
+$lang = strtolower(get_lang());
+include_once("obminclude/lang/$lang/backup.inc");
+
 // detailconsult can be accessed without user_id (-> display current user)
 if (($action == 'detailconsult') && (! $params['user_id'])) $params['user_id'] = $obm['uid'];
 
@@ -269,6 +273,46 @@ if ($action == 'ext_get_ids') {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
     $display['detail'] = dis_user_consult($params);
+  }
+
+} elseif ($action == 'backup') {
+///////////////////////////////////////////////////////////////////////////////
+  try {
+    $backup = new Backup('user', $params['user_id']);
+    $dis_form = true;
+
+    if (!empty($params['execute'])) {
+      $options = array();
+      $backup->doBackup($options);
+      $display['msg'] .= display_ok_msg($l_backup_complete);
+    }
+  } catch (Exception $e) {
+    $display['msg'] .= display_err_msg($e->getMessage());
+  }
+
+  if ($dis_form) {
+    $display['detail'] = dis_user_backup_form($backup, $params);
+  }
+
+} elseif ($action == 'restore') {
+///////////////////////////////////////////////////////////////////////////////
+  try {
+    $backup = new Backup('user', $params['user_id']);
+    $dis_form = true;
+
+    if (!empty($params['execute'])) {
+      $filename = $params['filename'];
+      $method = $params['method'];
+      $options = array();
+      $backup->doRestore($filename, $method, $options);
+      $display['msg'] .= display_ok_msg($l_restore_complete);
+    }
+  } catch (Exception $e) {
+    $display['msg'] .= display_err_msg($e->getMessage());
+  }
+
+  if ($dis_form) {
+    $display['detail'] = dis_user_backup_form($backup, $params);
   }
 
 } elseif ($action == 'group_consult') {
@@ -484,7 +528,7 @@ function get_user_action() {
     'Url'      => "$path/user/user_index.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('all')
-                                    );
+  );
 
 // Get Ids
   $actions['user']['ext_get_ids'] = array (
@@ -492,7 +536,7 @@ function get_user_action() {
     'Right'    => $cright_none,
     'Condition'=> array ('none'),
     'popup' => 1
-                                    );
+  );
                                     
 // Get Ids
   $actions['user']['ext_get_id'] = array (
@@ -500,15 +544,15 @@ function get_user_action() {
     'Right'    => $cright_none,
     'Condition'=> array ('none'),
     'popup' => 1
-                                    );
+  );
 
 // New
   $actions['user']['new'] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display','dispref_display','dispref_level', 'delete')
-                                  );
+    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display','dispref_display','dispref_level', 'delete', 'backup', 'restore')
+  );
 
 // Wait
   $actions['user']['wait'] = array (
@@ -516,14 +560,15 @@ function get_user_action() {
    'Url'      => "$path/user/user_index.php?action=wait",
    'Right'    => $cright_read_admin,
    'Condition'=> array ('all')
-                                  );
+  );
 
 // Search
   $actions['user']['search'] = array (
     'Url'      => "$path/user/user_index.php?action=search",
     'Right'    => $cright_none,
     'Condition'=> array ('None')
-                                  );
+  );
+
 // Search
   $actions['user']['ext_search'] = array (
     'Url'      => "$path/user/user_index.php?action=ext_search",
@@ -536,86 +581,105 @@ function get_user_action() {
     'Url'      => "$path/user/user_index.php?action=search",
     'Right'    => $cright_none,
     'Condition'=> array ('None')
-                                  );
+  );
+
 // Detail Consult
   $actions['user']['detailconsult'] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/user/user_index.php?action=detailconsult&amp;user_id=".$params['user_id'],
     'Right'    => $cright_read_admin,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'group_consult', 'group_update')
-                                  );
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'group_consult', 'group_update', 'backup', 'restore')
+  );
 
 // Detail Update
   $actions['user']['detailupdate'] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/user/user_index.php?action=detailupdate&amp;user_id=".$params['user_id'],
      'Right'    => $cright_write_admin,
-     'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update')
-                                     	   );
+     'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update', 'backup', 'restore')
+  );
 
 // Insert
   $actions['user']['insert'] = array (
     'Url'      => "$path/user/user_index.php?action=insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
-                                     );
+  );
 
 // Update
   $actions['user']['update'] = array (
     'Url'      => "$path/user/user_index.php?action=update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
-                                     );
+  );
+
 // Update
   $actions['user']['pdf'] = array (
     'Url'      => "$path/user/user_index.php?action=pdf",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
-                                     );
+  );
+
 // Valid
   $actions['user']['valid'] = array (
     'Url'      => "$path/user/user_index.php?action=valid",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
-                                     );
+  );
 
 // Group Consult
   $actions['user']['group_consult'] = array (
     'Name'     => $l_header_upd_group,
     'Url'      => "$path/user/user_index.php?action=group_consult&amp;user_id=".$params['user_id'],
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update')
-                                     );
+    'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update', 'backup', 'restore')
+  );
 
 // Group Update
   $actions['user']['group_update'] = array (
     'Url'      => "$path/user/user_index.php?action=group_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
-                                     );
+  );
 
 // Reset
   $actions['user']['reset'] = array (
     'Name'     => $l_header_reset,
     'Url'      => "$path/user/user_index.php?action=reset&amp;user_id=".$params['user_id'],
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult', 'group_consult', 'group_update') 
-                                    );
+    'Condition'=> array ('detailconsult', 'group_consult', 'group_update', 'backup', 'restore') 
+  );
 
 // Check Delete
   $actions['user']['check_delete'] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/user/user_index.php?action=check_delete&amp;user_id=".$params['user_id'],
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update') 
-                                     	   );
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update', 'backup', 'restore') 
+  );
 
 // Delete
   $actions['user']['delete'] = array (
     'Url'      => "$path/user/user_index.php?action=delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
-                                     );
+  );
+
+// Backup
+  $actions['user']['backup'] = array (
+    'Name'     => $GLOBALS['l_header_backup_restore'],
+    'Url'      => "$path/user/user_index.php?action=backup&amp;user_id=".$params['user_id'],
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update','check_delete', 'backup', 'restore') 
+  );
+
+// Backup
+  $actions['user']['restore'] = array (
+    'Name'     => $GLOBALS['l_header_backup_restore'],
+    'Url'      => "$path/user/user_index.php?action=restore&amp;user_id=".$params['user_id'],
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+  );
 
 // Display
   $actions['user']['display'] = array (
@@ -623,20 +687,21 @@ function get_user_action() {
     'Url'      => "$path/user/user_index.php?action=display",
     'Right'    => $cright_read,
     'Condition'=> array ('all')
-                                      	 );
+  );
 
 // Display
   $actions['user']['dispref_display'] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
-                                      	 );
+  );
+
 // Display
   $actions['user']['dispref_level'] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
-                                      	 );
+  );
 
 // Import
   $actions['user']['import'] = array (
@@ -644,14 +709,14 @@ function get_user_action() {
     'Url'      => "$path/user/user_index.php?action=import",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
-                                                 );
+  );
 
 // Import file
   $actions['user']['import_file'] = array (
     'Url'      => "$path/user/user_index.php?action=import_file",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
-                                                 );
+  );
 
 // Admin
   $actions['user']['admin'] = array (
@@ -659,7 +724,7 @@ function get_user_action() {
     'Url'      => "$path/user/user_index.php?action=admin",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('all')
-                                                 );
+  );
 
 // Search Batch user : Users selection
   $actions['user']['search_batch_user'] = array (
@@ -667,21 +732,21 @@ function get_user_action() {
     'Url'      => "$path/user/user_index.php?action=search_batch_user&amp;next_action=sel_batch_users",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
-                                                 );
+  );
 
 // Choose batch values
   $actions['user']['sel_batch_users'] = array (
     'Url'      => "$path/user/user_index.php?action=sel_batch_users",
     'Right'    => $cright_write_admin,
     'Condition'=> array('None')
-    );
+  );
 
 // Edit batch values
   $actions['user']['edit_batch_values'] = array (
     'Url'      => "$path/user/user_index.php?action=edit_batch_values",
     'Right'    => $cright_write_admin,
     'Condition'=> array('None')
-    );
+  );
 
 // Batch processing
   $actions['user']['batch_processing'] = array (
@@ -746,11 +811,21 @@ function update_user_action() {
       // Group Consult
       $actions['user']['group_consult']['Url'] = "$path/user/user_index.php?action=group_consult&amp;user_id=$id";
       $actions['user']['group_consult']['Condition'][] = 'insert';
+
+      // Backup
+      $actions['user']['backup']['Url'] = "$path/user/user_index.php?action=backup&amp;user_id=$id";
+      $actions['user']['backup']['Condition'][] = 'insert';
+
+      // Backup
+      $actions['user']['restore']['Url'] = "$path/user/user_index.php?action=restore&amp;user_id=$id";
+      $actions['user']['restore']['Condition'][] = 'insert';
     } else {
       $actions['user']['group_consult']['Condition'] = array('None');
       $actions['user']['check_delete']['Condition'] = array('None');
       $actions['user']['detailupdate']['Condition'] = array('None');
       $actions['user']['detailconsult']['Condition'] = array('None');
+      $actions['user']['backup']['Condition'] = array('None');
+      $actions['user']['restore']['Condition'] = array('None');
     }
   }
 

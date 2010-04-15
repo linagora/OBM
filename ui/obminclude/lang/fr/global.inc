@@ -482,6 +482,7 @@ $l_header_country = "Pays";
 $l_header_datasource = "Source de données";
 $l_header_tasktype = "Type de tâche";
 $l_header_region = "Régions";
+$l_header_backup_restore = "Sauvegarder/Restaurer";
 
 $l_header_day = "Jour";
 $l_header_week = "Semaine";
@@ -591,4 +592,11 @@ $l_save = 'Sauvegarder';
 $l_displayname_template = '%1$s %2$s';
 
 $l_unlink_mobile = "Supprimer le périphérique mobile?";
+
+//backup
+$l_new_backup = "Nouvelle sauvegarde";
+$l_do_backup = "Effectuer le sauvegarde !";
+$l_available_backups = "Sauvegardes disponibles";
+$l_service_get_ftp_backups = "Récupération des archives disponibles sur le serveur FTP";
+
 

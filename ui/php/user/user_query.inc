@@ -417,6 +417,7 @@ function run_query_user_detail($p_id) {
       domain_name,
       ms.host_name as mailserver_hostname,
       ms.host_id as mailserver_id,
+      ms.host_ip as mailserver_ip,
       Host.host_name
     FROM UserObm
          LEFT JOIN UserObm as c ON UserObm.userobm_usercreate=c.userobm_id
@@ -2942,6 +2943,23 @@ function run_query_userobm_mobile_unlink($user) {
   $query = "DELETE FROM opush_device WHERE owner='$owner' AND id='$device_id'";
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+}
+
+
+/**
+ * Check that user hasn't pending changes since last automate update
+ */
+function check_user_can_backup($user_id) {
+
+  $id = sql_parse_id($user_id, true);
+  $query = "SELECT u.userobm_id
+    FROM P_UserObm p
+    INNER JOIN UserObm u ON p.userobm_id=u.userobm_id AND p.userobm_email=u.userobm_email
+    WHERE u.userobm_id $id";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return ($obm_q->num_rows()==1);
 }
 
 ?>

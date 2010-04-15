@@ -665,6 +665,14 @@ input.box {
   cursor: pointer;
 }
 
+.spreadSheet div.buttons {
+  padding : 0.5em;
+}
+
+.spreadSheet div.buttons input {
+  margin: 0 3px;
+}
+
 .buttonTo input {
   background-color: transparent;
   background-repeat: no-repeat;

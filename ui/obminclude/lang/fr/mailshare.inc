@@ -39,3 +39,4 @@ $l_toggle_public_write = "Ceci entrainera que tout le monde pourra modifier le c
 $l_toggle_public_admin = "Ceci entrainera que tout le monde pourra modifier les droits de ce partage mail. Désirez-vous continuer?";
 
 $l_max_quota = "Valeur max";
+

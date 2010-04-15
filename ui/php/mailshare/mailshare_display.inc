@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : mailshare_display.php                                        //
 //         - Desc : Mailshare Display File                                   //
@@ -662,4 +662,82 @@ function dis_mailshare_mail_field($values) {
   return $email_block;
 }
 
-</script>
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the mailshare backup and restore form
+///////////////////////////////////////////////////////////////////////////////
+function dis_mailshare_backup_form($backup, $params) {
+  $mailshare_id = $params['mailshare_id'];
+  $url = url_prepare('mailshare_index.php');
+
+  //New backup form
+  if (check_mailshare_can_backup($mailshare_id)) {
+    $dis_new_backup = "
+    <form method=\"post\" action=\"$url\">
+      <input type=\"hidden\" name=\"action\" value=\"backup\" />
+      <input type=\"hidden\" name=\"execute\" value=\"1\" />
+      <input type=\"hidden\" name=\"mailshare_id\" value=\"$mailshare_id\">
+
+      <fieldset class=\"buttons\">
+        <input type=\"submit\" name=\"submit\" value=\"{$GLOBALS['l_do_backup']}\" />
+      </fielset>
+    </form>";
+  } else {
+    $dis_new_backup = "<p>{$GLOBALS['l_cant_backup_pending_modifications']}</p>";
+  }
+
+  try {
+    $backups = $backup->availableBackups();
+    foreach ($backups as $record) {
+      $date = new Of_Date($record['datetime']);
+      $dis_date = $date->getOutputDateTime();
+      $dis_buttons .= "
+      <form method=\"post\" action=\"$url\">
+        <input type=\"hidden\" name=\"action\" value=\"restore\" />
+        <input type=\"hidden\" name=\"execute\" value=\"1\" />
+        <input type=\"hidden\" name=\"filename\" value=\"{$record['filename']}\">
+        <input type=\"hidden\" name=\"mailshare_id\" value=\"$mailshare_id\">
+        <input type=\"submit\" name=\"submit\" value=\"{$GLOBALS['l_restore_mailbox']}\" />
+      </form>";
+      $dis_backups .= "<tr><td>$dis_date</td><td>{$record['filename']}</td><td><div class=\"buttons\">$dis_buttons</div></td></tr>";
+    }
+
+    if (!empty($dis_backups)) {
+      $dis_backups = "
+        <table class=\"spreadSheet\">
+          <thead><tr><th>{$GLOBALS['l_date']}</th><th>{$GLOBALS['l_file']}</th><th>{$GLOBALS['l_restore']}</th></tr></thead>
+          <tbody>$dis_backups</tbody>
+        </table>";
+    }
+
+  } catch (Exception $e) {
+    $display['msg'] .= display_err_msg($e->getMessage());
+  }
+
+  if (empty($dis_backups)) {
+    $dis_backups = "<p>{$GLOBALS['l_no_backup_available']}</p>";
+  }
+
+
+  //FTP backups
+  $dis_ftp_backups = "
+  ";
+
+  $block = "
+    <div class=\"detail extra\">
+      <h1>{$GLOBALS['l_new_backup']}</h1>
+      $dis_new_backup
+    </div>
+    <div class=\"detail extra\">
+      <h1>{$GLOBALS['l_available_backups']}</h1>
+      $dis_backups
+    </div>
+    <div class=\"detail extra\">
+      <h1>{$GLOBALS['l_service_get_ftp_backups']}</h1>
+      $dis_ftp_backups
+    </div>
+  ";
+
+  return $block;
+}
+

@@ -56,6 +56,10 @@ require('mailshare_query.inc');
 require('mailshare_js.inc');
 require("$obminclude/of/of_right.inc");
 
+// lang file include for backup
+$lang = strtolower(get_lang());
+include_once("obminclude/lang/$lang/backup.inc");
+
 if ($action == '') $action = 'index';
 get_mailshare_action();
 $perm->check_permissions($module, $action);
@@ -209,6 +213,46 @@ if ($action == 'ext_get_id') {
   }
   $display['detail'] = dis_mailshare_right_dis_admin($params['entity_id']);
 
+} elseif ($action == 'backup') {
+///////////////////////////////////////////////////////////////////////////////
+  try {
+    $backup = new Backup('mailshare', $params['mailshare_id']);
+    $dis_form = true;
+
+    if (!empty($params['execute'])) {
+      $options = array();
+      $backup->doBackup($options);
+      $display['msg'] .= display_ok_msg($l_backup_complete);
+    }
+  } catch (Exception $e) {
+    $display['msg'] .= display_err_msg($e->getMessage());
+  }
+
+  if ($dis_form) {
+    $display['detail'] = dis_mailshare_backup_form($backup, $params);
+  }
+
+} elseif ($action == 'restore') {
+///////////////////////////////////////////////////////////////////////////////
+  try {
+    $backup = new Backup('mailshare', $params['mailshare_id']);
+    $dis_form = true;
+
+    if (!empty($params['execute'])) {
+      $filename = $params['filename'];
+      $method = $params['method'];
+      $options = array();
+      $backup->doRestore($filename, $method, $options);
+      $display['msg'] .= display_ok_msg($l_restore_complete);
+    }
+  } catch (Exception $e) {
+    $display['msg'] .= display_err_msg($e->getMessage());
+  }
+
+  if ($dis_form) {
+    $display['detail'] = dis_mailshare_backup_form($backup, $params);
+  }
+
 } else if ($action == 'display') {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($obm['uid'], 'mailshare', 1);
@@ -292,81 +336,97 @@ function get_mailshare_action() {
     'Url'      => "$path/mailshare/mailshare_index.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
-                                    );
+  );
 
 // Search
   $actions['mailshare']['search'] = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None')
-                                  );
+  );
 
 // New
   $actions['mailshare']['new'] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/mailshare/mailshare_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','admin', 'showlist','detailconsult','delete','display')
-                                  );
+    'Condition'=> array ('search','index','admin', 'showlist','detailconsult','delete','display','backup','restore')
+  );
 
 // Detail Consult
   $actions['mailshare']['detailconsult'] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/mailshare/mailshare_index.php?action=detailconsult&amp;mailshare_id=".$params['mailshare_id'],
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'showlist', 'update', 'rights_admin', 'rights_update') 
-                                  );
+    'Condition'=> array ('detailupdate', 'showlist', 'update', 'rights_admin', 'rights_update','backup','restore') 
+  );
 
 // Detail Update
   $actions['mailshare']['detailupdate'] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/mailshare/mailshare_index.php?action=detailupdate&amp;mailshare_id=".$params['mailshare_id'],
      'Right'    => $cright_write,
-     'Condition'=> array ('detailconsult', 'showlist', 'update') 
-                                     	   );
+     'Condition'=> array ('detailconsult', 'showlist', 'update','backup','restore') 
+  );
 					   
 // Insert
   $actions['mailshare']['insert'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
-                                     );
+  );
 
 // Update
   $actions['mailshare']['update'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
-                                     );
+  );
 
 // Check Delete
   $actions['mailshare']['check_delete'] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/mailshare/mailshare_index.php?action=check_delete&amp;mailshare_id=".$params['mailshare_id'],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'showlist', 'showlist', 'update', 'detailupdate') 
-                                     	   );
+    'Condition'=> array ('detailconsult', 'showlist', 'showlist', 'update', 'detailupdate','backup','restore') 
+  );
 
 // Delete
   $actions['mailshare']['delete'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=delete",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
-                                     );
+  );
 
 // Rights Admin.
   $actions['mailshare']['rights_admin'] = array (
     'Name'     => $l_header_right,
     'Url'      => "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=".$params['mailshare_id'],
     'Right'    => $cright_read,
-    'Condition'=> array ('detailconsult','update','rights_update','rights_admin')
-                                     );
+    'Condition'=> array ('detailconsult','update','rights_update','rights_admin','backup','restore')
+  );
 
 // Rights Update
   $actions['mailshare']['rights_update'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=rights_update&amp;entity_id=".$params['mailshare_id'],
     'Right'    => $cright_read,
     'Condition'=> array ('None')
-                                     );
+  );
+
+// Backup
+  $actions['mailshare']['backup'] = array (
+    'Name'     => $GLOBALS['l_header_backup_restore'],
+    'Url'      => "$path/mailshare/mailshare_index.php?action=backup&amp;mailshare_id=".$params['mailshare_id'],
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('detailconsult', 'update', 'detailupdate','rights_update','rights_admin')
+  );
+
+// Restore
+  $actions['mailshare']['restore'] = array (
+    'Name'     => $GLOBALS['l_header_backup_restore'],
+    'Url'      => "$path/mailshare/mailshare_index.php?action=restore&amp;mailshare_id=".$params['mailshare_id'],
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+  );
 
 // Display
   $actions['mailshare']['display'] = array (
@@ -374,26 +434,28 @@ function get_mailshare_action() {
     'Url'      => "$path/mailshare/mailshare_index.php?action=display",
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
-                                      	 );
+  );
+
 // Dispay Prefs
   $actions['mailshare']['dispref_display'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
-                                      	 );
+  );
+
 // Display
   $actions['mailshare']['dispref_level'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
-                                      	 );
+  );
 
 // External call
   $actions['mailshare']['ext_get_id'] = array (
     'Url'      => "$path/mailshare/mailshare_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
-                                      	 );
+  );
 }
 
 
@@ -420,6 +482,11 @@ function update_mailshare_action() {
       // Rights admin
       $actions['mailshare']['rights_admin']['Url'] = "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=$id";
       $actions['mailshare']['rights_admin']['Condition'][] = 'insert';
+
+      // Backup
+      $actions['mailshare']['backup']['Url'] = "$path/mailshare/mailshare_index.php?action=backup&amp;mailshare_id=$id";
+      $actions['mailshare']['backup']['Condition'][] = 'insert';
+
     } else {
       // Detail Update
       $actions['mailshare']['detailupdate']['Condition'] = array('None');
@@ -427,6 +494,8 @@ function update_mailshare_action() {
       $actions['mailshare']['check_delete']['Condition'] = array('None');
       // Rights admin
       $actions['mailshare']['rights_admin']['Condition'] = array('None');
+      // Backup
+      $actions['mailshare']['backup']['Condition'] = array('None');
     }
   }
 }

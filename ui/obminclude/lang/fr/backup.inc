@@ -33,3 +33,18 @@ $l_err_unknown_db = "Type de base de données inconnu !";
 $l_delete = "Supprimer";
 $l_insert = "Créér la sauvegarde";
 $l_restore = "Restaurer";
+
+//backup
+$l_restore_mailbox = "Boîte aux lettres";
+$l_restore_calendar = "Agenda";
+$l_restore_contact = "Contacts";
+$l_restore_all = "Tout";
+$l_backup_complete = "La sauvegarde a été effectuée avec succès.";
+$l_restore_complete = "La restauration a été effectuée avec succès.";
+$l_no_backup_available = "Aucune sauvegarde disponible !";
+$l_err_cant_backup = "Une erreur est survenue et la sauvegarde n'a pas été effectuée !";
+$l_err_cant_restore = "Une erreur est survenue et la restauration a échoué !";
+$l_err_cant_get_availablebackup = "Impossible de récupérer la liste des sauvegardes disponibles !";
+$l_cant_backup_pending_modifications = "Impossible d'effectuer une sauvegarde. L'entité a des modifications en attente, veuillez utiliser l'outil de mise à jour système pour les valider.";
+$l_err_obm_satellite_usersystem = "Echec de connexion à obm-satellite : Impossible de récupérer l'utilisateur système utilisé.";
+

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : mailshare_query.inc                                          //
 //     - Desc : mailshare query File                                         //
@@ -101,6 +101,7 @@ function run_query_mailshare_detail($id) {
   $id = sql_parse_id($id, true);
   $query = "SELECT *,
       host_name as mailserver_hostname,
+      host_ip as mailserver_ip,
       $timecreate,
       $timeupdate,
       c.userobm_login as usercreate,
@@ -631,4 +632,20 @@ function update_mailshare_acl($name, $domain_id) {
     return true;
 }
 
-</script>
+
+/**
+ * Check that mailshare hasn't pending changes since last automate update
+ */
+function check_mailshare_can_backup($mailshare_id) {
+
+  $id = sql_parse_id($mailshare_id, true);
+  $query = "SELECT m.mailshare_id
+    FROM P_MailShare p
+    INNER JOIN MailShare m ON p.mailshare_id=m.mailshare_id AND p.mailshare_email=m.mailshare_email
+    WHERE m.mailshare_id $id";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return ($obm_q->num_rows()==1);
+}
+
