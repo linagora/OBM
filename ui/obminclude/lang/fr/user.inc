@@ -89,7 +89,7 @@ $l_do_batch_processing = "Lancer le traitement par lots";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des utilisateurs correspondants.";
-$l_found = "utilisateurs trouvés.";
+$l_found = "utilisateur(s) trouvé(s).";
 $l_no_found = "Aucun utilisateur ne correspond à ces critères !";
 $l_reset_ok = "Les préférences de l'utilisateur ont été remises aux valeurs par défaut";
 $l_can_delete = "L'utilisateur peut être supprimé.";
