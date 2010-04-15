@@ -24,6 +24,10 @@ class SMail extends SMimeEntity
     
     protected $from;
     
+    protected $sender;
+    
+    protected $return_path;
+    
     protected $recipients;
     
     public function __construct(DateTime $date = null, $charset = 'UTF-8')
@@ -63,6 +67,17 @@ class SMail extends SMimeEntity
     {
         $this->from = $adress;
         $this->add_recipient('From', $adress, $name);
+    }
+    
+    public function set_return_path($adress)
+    {
+        $this->return_path = $adress;
+    }
+    
+    public function set_sender($adress)
+    {
+        $this->sender = $adress;
+        $this->add_header('Sender', $adress);
     }
     
     public function set_subject($text)
@@ -172,6 +187,11 @@ class SMail extends SMimeEntity
         return $this->get_header('From');
     }
     
+    public function get_sender()
+    {
+        return $this->get_header('Sender');
+    }
+    
     public function get_cc()
     {
         return $this->get_header('Cc');
@@ -189,6 +209,11 @@ class SMail extends SMimeEntity
     
     public function get_return_path()
     {
+        if (isset($this->return_path)) return $this->return_path;
+        if (isset($this->sender)) return $this->sender;
+        if (!isset($this->from))
+            throw new SMailException('From: recipient is not specified');
+            
         return $this->from;
     }
     
