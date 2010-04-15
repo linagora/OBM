@@ -383,7 +383,12 @@ def contact_get_coords(contact_id):
 	phones = []
 	cur.execute("""SELECT contactentity_contact_id AS contact_id, phone_label, phone_number FROM Phone 
       INNER JOIN ContactEntity ON phone_entity_id = contactentity_entity_id 
-      WHERE contactentity_contact_id='"""+str(contact_id)+"""' ORDER BY phone_label""")
+      WHERE contactentity_contact_id='"""+str(contact_id)+"""' UNION 
+      SELECT contact_id, 'COMPANY;PHONE' as phone_label, phone_number
+      FROM Phone 
+      INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id 
+      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      WHERE contact_id='"""+str(contact_id)+"""' ORDER BY phone_label""")
 	rows = cur.fetchall()
 	for i in range(len(rows)):
 		phones.append({'label':str(rows[i][1]), 'number':str(rows[i][2])})
@@ -391,7 +396,12 @@ def contact_get_coords(contact_id):
 	emails = []
 	cur.execute("""SELECT contactentity_contact_id AS contact_id, email_label, email_address FROM Email 
       INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id 
-      WHERE contactentity_contact_id='"""+str(contact_id)+"""' ORDER BY email_label""")
+      WHERE contactentity_contact_id='"""+str(contact_id)+"""' UNION 
+      SELECT contact_id, 'COMPANY;EMAIL' as email_label, email_address
+      FROM Email 
+      INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id 
+      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      WHERE contact_id='"""+str(contact_id)+"""' ORDER BY email_label""")
 	rows = cur.fetchall()
 	for i in range(len(rows)):
 		emails.append({'label':str(rows[i][1]), 'address':str(rows[i][2])})
@@ -410,7 +420,15 @@ def contact_get_coords(contact_id):
       FROM Address 
       INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id 
       LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='"""+str(lang)+"""' 
-      WHERE contactentity_contact_id='"""+str(contact_id)+"""' ORDER BY address_label""")
+      WHERE contactentity_contact_id='"""+str(contact_id)+"""' UNION
+      SELECT contact_id, 'COMPANY;ADDRESS' as address_label, address_street, address_zipcode, address_expresspostal,
+        address_town, address_country, country_name, country_iso3166
+      FROM Address
+      INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
+      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      LEFT JOIN Country ON country_iso3166 = address_country
+      AND country_lang = '"""+str(lang)+"""'
+      WHERE contact_id='"""+str(contact_id)+"""' ORDER BY address_label""")
 	rows = cur.fetchall()
 	for i in range(len(rows)):
 		addresses.append({'label':str(rows[i][1]), 'street':str(rows[i][2]), 'zipcode':str(rows[i][3]), 
