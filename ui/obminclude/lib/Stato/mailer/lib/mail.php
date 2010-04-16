@@ -48,36 +48,36 @@ class SMail extends SMimeEntity
         return $transport->send($this);
     }
     
-    public function add_to($adress, $name = null)
+    public function add_to($address, $name = null)
     {
-        $this->add_recipient('To', $adress, $name);
+        $this->add_recipient('To', $address, $name);
     }
     
-    public function add_cc($adress, $name = null)
+    public function add_cc($address, $name = null)
     {
-        $this->add_recipient('Cc', $adress, $name);
+        $this->add_recipient('Cc', $address, $name);
     }
     
-    public function add_bcc($adress, $name = null)
+    public function add_bcc($address, $name = null)
     {
-        $this->add_recipient('Bcc', $adress, $name);
+        $this->add_recipient('Bcc', $address, $name);
     }
     
-    public function set_from($adress, $name = null)
+    public function set_from($address, $name = null)
     {
-        $this->from = $adress;
-        $this->add_recipient('From', $adress, $name);
+        $this->from = $address;
+        $this->add_recipient('From', $address, $name);
     }
     
-    public function set_return_path($adress)
+    public function set_return_path($address)
     {
-        $this->return_path = $adress;
+        $this->return_path = $address;
     }
     
-    public function set_sender($adress)
+    public function set_sender($address)
     {
-        $this->sender = $adress;
-        $this->add_header('Sender', $adress);
+        $this->sender = $address;
+        $this->add_header('Sender', $address);
     }
     
     public function set_subject($text)
