@@ -9,6 +9,8 @@
 import ConfigParser
 import xml.dom.minidom
 import httplib
+import socket
+import time
 from datetime import datetime
 
 def fetch_solr_servers():
@@ -16,7 +18,8 @@ def fetch_solr_servers():
 	cur = ds.cursor()
 	cur.execute("""SELECT serviceproperty_property,
 		domain_id,
-		host_ip
+		host_ip,
+		domain_name
 		FROM Domain
 		INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
 		LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id
@@ -27,9 +30,9 @@ def fetch_solr_servers():
 	return rows
 
 
-def index_contact(domain, solr):
+def index_contact(domain, domain_name, solr):
 	global doc
-	print "INFO: Contact indexing for domain "+str(domain)
+	print "INFO: Contact indexing for domain "+str(domain_name)
 	cur = ds.cursor()
 	if dbtype == 'MYSQL':
 		cur.execute("SET NAMES UTF8");
@@ -174,8 +177,8 @@ def index_contact(domain, solr):
 	solr_commit(solr, 'contact')
 
 
-def index_event(domain, solr):
-	print "INFO: Event indexing for domain "+str(domain)
+def index_event(domain, domain_name, solr):
+	print "INFO: Event indexing for domain "+str(domain_name)
 	cur = ds.cursor()
 	if dbtype == 'MYSQL':
 		cur.execute("SET NAMES UTF8");
@@ -314,6 +317,19 @@ def solr_add_document(doc,solr, entity):
 	con = httplib.HTTPConnection(solr, 8080)
 	con.request("POST", "/solr/"+entity+"/update", doc.toxml())
 
+def solr_ping(domain_name, solr):
+	for i in range(0, 10):
+		try:
+			con = httplib.HTTPConnection(solr, 8080)
+			con.request("POST", "/solr/admin/ping")
+			print "INFO: Connect to solr "+solr+" for domain "+domain_name
+			return True
+		except socket.error:
+			print "INFO: Attempt to connect solr "+solr+" for domain "+domain_name
+		time.sleep(1);
+	print "ERROR: Failed to connect solr "+solr+" for domain "+domain_name
+	return False;
+
 
 def solr_commit(solr, entity):
 	print "INFO: Solr commit"
@@ -440,11 +456,11 @@ def contact_get_coords(contact_id):
 	return coords
 
 
-def init_obm_index(domain, solr, entity):
+def init_obm_index(domain, domain_name, solr, entity):
 	if entity == "contact":
-		index_contact(domain, solr)
+		index_contact(domain, domain_name, solr)
 	elif entity == "event":
-		index_event(domain, solr)
+		index_event(domain, domain_name, solr)
 	else:
 		print "ERROR: Unrecognised entity: "+entity
 
@@ -477,6 +493,8 @@ for i in range(len(solr_servers)):
 	entity = solr_servers[i][0]
 	domain = solr_servers[i][1]
 	solr = solr_servers[i][2]
-	init_obm_index(domain, solr, entity)
+	domain_name = solr_servers[i][3]
+	if solr_ping(domain_name, solr):
+		init_obm_index(domain, domain_name, solr, entity)
 
 ds.close()
