@@ -338,4 +338,8 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
   public function valid() {
    return current($this->addressbooks); 
   }
+
+  public function getAddressbooks() {
+    return $this->addressbooks;
+  }
 }
