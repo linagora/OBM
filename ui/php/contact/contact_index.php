@@ -422,7 +422,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
         echo dis_update_addressbook_count($addressbook);
       }
       // Update "archive" addressbook
-      echo dis_update_addressbook_count(null, 'is:archive', 'archive');
+      echo dis_update_addressbook_count(null, 'is:archive addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks())).')', 'archive');
       $contacts = $addressbooks->searchContacts($params['searchpattern']);
       $subTemplate['contacts'] = new OBM_Template('contacts');
       $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  

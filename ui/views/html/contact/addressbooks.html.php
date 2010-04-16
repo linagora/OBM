@@ -62,7 +62,8 @@
             $('addressbook-archive').store('search', 'is:archive');
           </script>            
         </form>
-        <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_archive'><?php echo $_addressbook->countContacts('is:archive'); ?></span><?php echo " ".__('contact(s)'); ?></span>
+        <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_archive'>
+          <?php echo $_addressbook->countContacts('is:archive addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks())).')'); ?></span><?php echo " ".__('contact(s)'); ?></span>
       </td>
     </tr>
     <tr style="<?php echo ('search' == $current['addressbook'])? '':'display:none;' ?>">
