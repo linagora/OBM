@@ -469,7 +469,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if($params['addressbook']) $current['addressbook'] = $params['addressbook'];
     else $current['addressbook'] = 'search';
     $contacts = $addressbooks->searchContacts($params['searchpattern'].' '.$pattern, $params['offset']);
-    if ($params['updateCount']) echo dis_update_addressbook_count(null, $params['searchpattern'].' '.$pattern, 'search');
+    if ($params['updateCount']) echo dis_update_addressbook_count(null, $params['searchpattern'].' '.$pattern.' addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks())).')', 'search');
     $subTemplate['contacts'] = new OBM_Template('contacts');
     $subTemplate['contacts']->set('offset', $params['offset']);
     $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
