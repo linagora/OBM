@@ -90,7 +90,10 @@ def index_contact(domain, domain_name, solr):
 		contact = doc.createElement('doc')
 		contact.appendChild(solr_set_field(doc, 'id',            rows[i][0]))
 		contact.appendChild(solr_set_field(doc, 'timecreate',    solr_date_format(rows[i][1])))
-		contact.appendChild(solr_set_field(doc, 'timeupdate',    solr_date_format(rows[i][2])))
+		if rows[i][2] != None:
+			contact.appendChild(solr_set_field(doc, 
+							   'timeupdate', 
+							   solr_date_format(rows[i][2])))
 		contact.appendChild(solr_set_field(doc, 'usercreate',    rows[i][3]))
 		contact.appendChild(solr_set_field(doc, 'userupdate',    rows[i][4]))
 		contact.appendChild(solr_set_field(doc, 'datasource',    rows[i][5]))
