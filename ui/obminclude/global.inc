@@ -328,7 +328,6 @@ $cgp_show['section']['user']['url'] = "$path/settings/settings_index.php";
 $cgp_show['section']['admin']['url'] = "$path/admin/admin_index.php?mode=html";
 $cgp_show['section']['dic']['url'] = "$path/admin_ref/admin_ref_index.php?mode=html";
 $cgp_show['section']['my']['url'] = "$path/settings/settings_index.php";
-$cgp_show['section']['webmail']['url'] = "$path/minig";
 
 // modules
 $cgp_show['module']['company'] = 'com';
@@ -342,6 +341,7 @@ $cgp_show['module']['calendar'] = 'gw';
 $cgp_show['module']['contact'] = 'gw';
 $cgp_show['module']['todo'] = 'gw';
 $cgp_show['module']['document'] = 'gw';
+$cgp_show['module']['webmail'] = 'gw';
 $cgp_show['module']['time'] = 'prod';
 $cgp_show['module']['project'] = 'prod';
 $cgp_show['module']['planning'] = 'prod';

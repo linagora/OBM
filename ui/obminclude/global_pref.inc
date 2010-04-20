@@ -147,19 +147,6 @@ foreach ($cgp_show['section'] as $sec => $value) {
     if ($sec_right == '') {
       $sec_right = $cright_read;
     }
-    if ($sec == 'webmail'){
-      $u = get_user_info($obm['uid']);
-      $mail_perms = $u['mail_perms'];
-      if ($mail_perms == '0') {
-        $cgp_show['section']['webmail'] = false;
-      }else{
-        $lang = get_lang();
-        $lang = strtolower($lang);
-        if(preg_match("/.*minig$/",$cgp_show['section']['webmail']['url']))
-          $cgp_show['section']['webmail']['url'] = $cgp_show['section']['webmail']['url']."/WebmailUI.".$lang.".html";
-
-      }
-    }
     $sections[$sec] = array('Name' => ${"l_section_$sec"},
                            'Url'  => $cgp_show['section'][$sec]['url'],
                            'Target'  => $cgp_show['section'][$sec]['target'],
@@ -170,6 +157,7 @@ foreach ($cgp_show['section'] as $sec => $value) {
 ///////////////////////////////////////////////////////////////////////////////
 // Modules definition
 ///////////////////////////////////////////////////////////////////////////////
+$u = get_user_info($obm['uid']);
 if ($cgp_show['module']['company']) {
   $modules['company'] = array('Name'=> $l_module_company,
    			     'Ico' => "$ico_company",
@@ -459,11 +447,11 @@ if ($cgp_show['module']['organizationalchart']) {
 			            'Right'=> $cright_read);
 }
 
-if ($cgp_show['module']['webmail']) {
-#  $modules['webmail'] = array('Name'=> $l_webmail,
-#                                    'Ico' => "$ico_webmail",
-#                                    'Url' => "$path/webmail/webmail_index.php",
-#			            'Right'=> $cright_read);
+if ($cgp_show['module']['webmail'] && $u['mail_perms'] == 1) {
+  $modules['webmail'] = array('Name'=> $l_module_webmail,
+                                    'Ico' => "$ico_webmail",
+                                    'Url' => "$path/minig/WebmailUI.".strtolower(get_lang()).".html",
+			            'Right'=> $cright_read);
 }
 
 if ($cgp_show['module']['device']) {
