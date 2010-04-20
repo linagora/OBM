@@ -26,6 +26,18 @@ if (($params["ext_widget"] != "") || ($params["ext_widget_text"] != "")) {
   }";
 }
 
-
+$extra_js .= "
+function on_backup_ftp_click() {
+  if ($('cb_backup_ftp').checked) {
+    $('row_backup_ftp_login').style.display = '';
+    $('row_backup_ftp_password').style.display = '';
+    $('row_backup_ftp_root').style.display = '';
+  } else {
+    $('row_backup_ftp_login').style.display = 'none';
+    $('row_backup_ftp_password').style.display = 'none';
+    $('row_backup_ftp_root').style.display = 'none';
+  }
+}
+";
 
 </script>

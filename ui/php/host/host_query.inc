@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : host_query.inc                                               //
 //     - Desc : host query File                                              //
@@ -32,6 +32,7 @@ function run_query_host_search($host) {
   $imap_frontend = $host['imap_frontend'];
   $monitor = $host['monitor'];
   $imap = $host['imap'];
+  $backup_ftp = $host['backup_ftp'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -75,6 +76,9 @@ function run_query_host_search($host) {
   if ($imap != '') {
     $where .= ' AND imap.service_id IS NOT NULL';
   }
+  if ($backup_ftp != '') {
+    $where .= ' AND backup_ftp.service_id IS NOT NULL';
+  }
   $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
@@ -91,7 +95,8 @@ function run_query_host_search($host) {
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as solr ON solr.service_service = 'solr' AND solr.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id"; 
+      LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as backup_ftp ON backup_ftp.service_service = 'backup_ftp' AND backup_ftp.service_entity_id = hostentity_entity_id";
 
   $multidomain = sql_multidomain('host');
   $query = "SELECT DISTINCT Host.*,
@@ -102,6 +107,7 @@ function run_query_host_search($host) {
       obm_sync.service_id as host_obm_sync,
       solr.service_id as host_solr,
       monitor.service_id as host_monitor,
+      backup_ftp.service_id as host_backup_ftp,
       host_id as id,
       $timecreate,
       $timeupdate,
@@ -144,6 +150,7 @@ function run_query_host_detail($id) {
   $multidomain = sql_multidomain('host');
   $id = sql_parse_id($id, true);
   $query = "SELECT *,
+      hostentity_entity_id as host_entity_id,
       samba.service_id as host_samba,
       imap.service_id as host_imap,
       smtp_in.service_id as host_smtp_in,
@@ -152,6 +159,7 @@ function run_query_host_detail($id) {
       solr.service_id as host_solr,
       imap_frontend.service_id as host_imap_frontend,
       monitor.service_id as host_monitor,
+      backup_ftp.service_id as host_backup_ftp,
       $timecreate,
       $timeupdate,
       uo.userobm_id as userobm_id,
@@ -171,6 +179,7 @@ function run_query_host_detail($id) {
       LEFT JOIN Service as solr ON solr.service_service = 'solr' AND solr.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as backup_ftp ON backup_ftp.service_service = 'backup_ftp' AND backup_ftp.service_entity_id = hostentity_entity_id
       LEFT JOIN Domain ON host_domain_id = domain_id
     WHERE host_id $id 
       $multidomain";
@@ -203,6 +212,7 @@ function run_query_host_insert($host) {
   $imap_frontend = sql_parse_int($host['imap_frontend']);
   $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
+  $backup_ftp = sql_parse_int($host['backup_ftp']);
   $list = $host['web_list'];
   $desc = $host['desc'];
 
@@ -278,6 +288,12 @@ function run_query_host_insert($host) {
   if($imap > 0) {
     of_service_insert('imap', $entity_id); 
   }
+  if($backup_ftp > 0) {
+    of_service_insert('backup_ftp', $entity_id); 
+    of_service_property_insert('backup_ftp', 'login', $entity_id, $host['backup_ftp_login']);
+    of_service_property_insert('backup_ftp', 'password', $entity_id, $host['backup_ftp_password']);
+    of_service_property_insert('backup_ftp', 'root', $entity_id, $host['backup_ftp_root']);
+  }
   if ($retour && $user_id != 0) {
 
     $host_id = sql_parse_id($id);
@@ -323,6 +339,7 @@ function run_query_host_update($host) {
   $imap_frontend = sql_parse_int($host['imap_frontend']);
   $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
+  $backup_ftp = sql_parse_int($host['backup_ftp']);
   $desc = $host['desc'];
   $multidomain = sql_multidomain('host');
 
@@ -386,6 +403,15 @@ function run_query_host_update($host) {
       of_service_insert('imap', $entity_id); 
     } else {
       of_service_delete('imap', $entity_id); 
+    }
+    of_service_property_delete_all('backup_ftp', $entity_id);
+    if($backup_ftp > 0) {
+      of_service_insert('backup_ftp', $entity_id);
+      of_service_property_insert('backup_ftp', 'login', $entity_id, $host['backup_ftp_login']);
+      of_service_property_insert('backup_ftp', 'password', $entity_id, $host['backup_ftp_password']);
+      of_service_property_insert('backup_ftp', 'root', $entity_id, $host['backup_ftp_root']);
+    } else {
+      of_service_delete('backup_ftp', $entity_id); 
     }
     // Suppression de l'ancien lien user=>host
     $query = "UPDATE UserObm 
@@ -497,7 +523,8 @@ function get_host_info($id) {
       solr.service_id as host_solr,
       obm_sync.service_id as host_obm_sync,
       imap_frontend.service_id as host_imap_frontend,
-      monitor.service_id as host_monitor
+      monitor.service_id as host_monitor,
+      backup_ftp.service_id as host_backup_ftp
     FROM Host
       INNER JOIN HostEntity ON hostentity_host_id = host_id
       LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
@@ -508,6 +535,7 @@ function get_host_info($id) {
       LEFT JOIN Service as solr ON solr.service_service = 'solr' AND solr.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as backup_ftp ON backup_ftp.service_service = 'backup_ftp' AND backup_ftp.service_entity_id = hostentity_entity_id
     WHERE host_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_info()');
@@ -527,6 +555,7 @@ function get_host_info($id) {
   $h['imap_frontend'] = $obm_q->f('host_imap_frontend');
   $h['monitor'] = $obm_q->f('host_monitor');
   $h['imap'] = $obm_q->f('host_imap');
+  $h['backup_ftp'] = $obm_q->f('host_backup_ftp');
   $h['desc'] = $obm_q->f('host_description');
 
   return $h;
@@ -776,7 +805,25 @@ function check_host_data_form($host) {
   $web_list = $host['web_list'];
   $web_all = $host['web_all'];
   $monitor = $host['monitor'];
+  $backup_ftp = $host['backup_ftp'];
 
+  if (!empty($backup_ftp)) {
+    if (empty($host['backup_ftp_login'])) {
+      $err['msg'] = $GLOBALS['l_err_host_backup_ftp_login_empty'];
+      $err['field'] = 'backup_ftp_login';
+      return false;
+    }
+    if (empty($host['backup_ftp_password'])) {
+      $err['msg'] = $GLOBALS['l_err_host_backup_ftp_password_empty'];
+      $err['field'] = 'backup_ftp_password';
+      return false;
+    }
+    if (empty($host['backup_ftp_root'])) {
+      $err['msg'] = $GLOBALS['l_err_host_backup_ftp_root_empty'];
+      $err['field'] = 'backup_ftp_root';
+      return false;
+    }
+  }
 
   if ($id > 0) {
     $h = get_host_info($id);
@@ -896,4 +943,3 @@ function get_host_graph_list($host_fqdn) {
   }
 }
 
-</script>

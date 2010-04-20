@@ -71,3 +71,12 @@ $l_monitor = 'Supervision';
 
 $l_fqdn = 'Nom complet de la machine';
 $l_err_host_fqdn = 'Le nom complet de la machine est incorrect (nommachine.nom.domaine)';
+
+$l_backup_ftp = 'FTP de sauvegarde';
+$l_backup_ftp_login = 'FTP de sauvegarde: Identifiant';
+$l_backup_ftp_password = 'FTP de sauvegarde: Mot de passe';
+$l_backup_ftp_root = 'FTP de sauvegarde: Chemin par défaut';
+$l_err_host_backup_ftp_login_empty = 'L\'identifiant de connexion au serveur FTP doit être renseigné';
+$l_err_host_backup_ftp_password_empty = 'Le mot de passe de connexion au serveur FTP doit être renseigné';
+$l_err_host_backup_ftp_root_empty = 'Le chemin par défaut de connexion au service FTP doit être renseigné';
+

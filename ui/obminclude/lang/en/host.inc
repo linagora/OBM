@@ -6,12 +6,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: host.inc 2072 2007-09-13 23:49:27Z pierre $
 ///////////////////////////////////////////////////////////////////////////////
-// Modified on 2009-09-10T15:14:07+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:23:26+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:34:10+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:43:06+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:44:26+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T16:32:41+02:00 using OBMtranslation (0.4.1)
 
 $l_smb = "Windows";
 $l_smb_only = "Windows Only.";
@@ -63,4 +57,12 @@ $l_solr = 'Solr';
 $l_monitor = 'Monitoring';
 $l_fqdn = 'Fully qualified name';
 $l_err_host_fqdn = 'The fully qualified name is not well formed (computername.domaine.name)';
+
+$l_backup_ftp = 'Backup FTP';
+$l_backup_ftp_login = 'Backup FTP: Login';
+$l_backup_ftp_password = 'Backup FTP: Password';
+$l_backup_ftp_root = 'Backup FTP: Root path';
+$l_err_host_backup_ftp_login_empty = 'The login used to connect to the FTP service must be filled in';
+$l_err_host_backup_ftp_password_empty = 'The password used to connect to the FTP service must be filled in';
+$l_err_host_backup_ftp_root_empty = 'The root path used to connect to the FTP service must be filled in';
 

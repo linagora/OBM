@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : host_display.php                                             //
 //     - Desc : Host Display File                                            //
@@ -159,6 +159,7 @@ function html_host_search_form($host) {
   $imap = ($host['imap'] == '1' ? "checked = \"checked\"" : '');
   $monitor = ($host['monitor'] == '1' ? "checked = \"checked\"" : '');
   $imap_frontend = ($host['imap_frontend'] == '1' ? "checked = \"checked\"" : '');
+  $backup_ftp = ($host['backup_ftp'] == '1' ? "checked = \"checked\"" : '');
 
 
   $dis_delegation = of_delegation_dis_search_form($delegation);
@@ -198,6 +199,11 @@ function html_host_search_form($host) {
     <input type=\"checkbox\" name=\"cb_solr\" value=\"1\" $solr />
   </label>";
 
+  $block_backup_ftp = "
+  <label>$GLOBALS[l_backup_ftp]<br />
+    <input type=\"checkbox\" name=\"cb_backup_ftp\" value=\"1\" $backup_ftp />
+  </label>";
+
   $block = "
     <form method=\"get\" name=\"f_search\" class=\"search\" action=\"".url_prepare("host_index.php")."\">
     <div class=\"search\">
@@ -212,6 +218,7 @@ function html_host_search_form($host) {
       $block_mail
       $block_sync
       $block_solr
+      $block_backup_ftp
       <label>$GLOBALS[l_monitor]<br />
         <input type=\"checkbox\" name=\"cb_monitor\" value=\"1\" $monitor />
       </label>
@@ -356,6 +363,7 @@ function html_host_consult($host_q) {
   }
 
   $id = $host_q->f('host_id');
+  $entity_id = $host_q->f('host_entity_id');
   $delegation = $host_q->f('host_delegation');
   $samba = $host_q->f('host_samba');
   $imap = $host_q->f('host_imap');
@@ -365,6 +373,7 @@ function html_host_consult($host_q) {
   $imap_frontend = $host_q->f('host_imap_frontend');
   $smtp_in = $host_q->f('host_smtp_in');
   $monitor = $host_q->f('host_monitor');
+  $backup_ftp = $host_q->f('host_backup_ftp');
   $name = $host_q->f('host_name');
   $desc = $host_q->f('host_description');
   $ip = $host_q->f('host_ip');
@@ -372,6 +381,11 @@ function html_host_consult($host_q) {
   $user_id = $host_q->f('userobm_id');
   $user_login = $host_q->f('userobm_login');
   $domain_name = ($host_q->f('domain_name') != '' ? $host_q->f('domain_name') : 'GLOBAL');
+
+  $backup_ftp_properties = of_service_properties('backup_ftp',$entity_id);
+  $backup_ftp_login = $backup_ftp_properties['login'];
+  $backup_ftp_password = $backup_ftp_properties['password'];
+  $backup_ftp_root = $backup_ftp_properties['root'];
 
   $dis_user =   
     "<tr>
@@ -388,6 +402,38 @@ function html_host_consult($host_q) {
   if ($solr) $solr = $l_yes; else $solr = $l_no;
   if ($imap_frontend) $imap_frontend = $l_yes; else $imap_frontend = $l_no;
   if ($monitor) $monitor = $l_yes; else $monitor = $l_no;
+  if ($backup_ftp) {
+    $backup_ftp = $l_yes;
+    $block_backup_ftp = "
+    <tr>
+      <th>$GLOBALS[l_backup_ftp]</th>
+      <td>$backup_ftp</td>
+    </tr>";
+    $block_backup_ftp .= "
+    <tr>
+      <th>$GLOBALS[l_backup_ftp_login]</th>
+      <td>$backup_ftp_login</td>
+    </tr>";
+    //Do not display the password on consult form
+    //$block_backup_ftp .= "
+    //<tr>
+    //  <th>$GLOBALS[l_backup_ftp_password]</th>
+    //  <td>$backup_ftp_password</td>
+    //</tr>";
+    $block_backup_ftp .= "
+    <tr>
+      <th>$GLOBALS[l_backup_ftp_root]</th>
+      <td>$backup_ftp_root</td>
+    </tr>";
+
+  } else {
+    $backup_ftp = $l_no;
+    $block_backup_ftp = "
+    <tr>
+      <th>$GLOBALS[l_backup_ftp]</th>
+      <td>$backup_ftp</td>
+    </tr>";
+  }
   if ($user_login == '') {
     $dis_user = $l_not_assigned;
   } else {
@@ -520,6 +566,7 @@ function html_host_consult($host_q) {
     $block_mail
     $block_sync
     $block_solr
+    $block_backup_ftp
     <tr>
       <th>$GLOBALS[l_monitor]</th>
       <td>$monitor</td>
@@ -561,6 +608,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   // if update mode and first time, values are taken from db
   if ($action == 'detailupdate') {
     $id = $host_q->f('host_id');
+    $entity_id = $host_q->f('host_entity_id');
     $name = $host_q->f('host_name');
     $delegation = $host_q->f('host_delegation');
     $ip = $host_q->f('host_ip');
@@ -573,10 +621,16 @@ function html_host_form($action, $host_q, $host, $field='') {
     $solr = $host_q->f('host_solr');
     $imap_frontend = $host_q->f('host_imap_frontend');
     $monitor = $host_q->f('host_monitor');
+    $backup_ftp = $host_q->f('host_backup_ftp');
     $desc = $host_q->f('host_description');
     $u_login = $host_q->f('userobm_login');
     $u_id = $host_q->f('userobm_id');
     $dis_title = $name;
+
+    $backup_ftp_properties = of_service_properties('backup_ftp',$entity_id);
+    $backup_ftp_login = $backup_ftp_properties['login'];
+    $backup_ftp_password = $backup_ftp_properties['password'];
+    $backup_ftp_root = $backup_ftp_properties['root'];
   } else if ($action == 'new') {
     // If windows domain, default check the windows checkbox
     if ($samba_domain) {
@@ -598,8 +652,14 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['solr'])) { $solr = $host['solr']; }
   if (isset($host['imap_frontend'])) { $imap_frontend = $host['imap_frontend']; }
   if (isset($host['monitor'])) { $monitor = $host['monitor']; }
+  if (isset($host['backup_ftp'])) { $backup_ftp = $host['backup_ftp']; }
+  if (isset($host['backup_ftp_login'])) { $backup_ftp_login = $host['backup_ftp_login']; }
+  if (isset($host['backup_ftp_password'])) { $backup_ftp_password = $host['backup_ftp_password']; }
+  if (isset($host['backup_ftp_root'])) { $backup_ftp_root = $host['backup_ftp_root']; }
   if (isset($host['desc'])) { $desc = stripslashes($host['desc']); }
   if (isset($host['domain_id'])) { $domain_id = $host['domain_id']; }
+
+  if (empty($backup_ftp_root)) $backup_ftp_root = '/';
 
   // Domain (can't be updated, so only on insert)
   if (($action == 'new' || $action == 'insert')
@@ -619,7 +679,12 @@ function html_host_form($action, $host_q, $host, $field='') {
   $solr_state  = ($solr ? 'checked' : '');
   $imap_frontend_state  = ($imap_frontend ? 'checked' : '');
   $monitor_state  = ($monitor ? 'checked' : '');
+  $backup_ftp_state  = ($backup_ftp ? 'checked' : '');
 
+  $display_backup_ftp_data = '';
+  if ($backup_ftp_state=='') {
+    $display_backup_ftp_data = 'style="display: none;"';
+  }
 
   // Mark the error field
   if ($field != '') {
@@ -688,6 +753,32 @@ function html_host_form($action, $host_q, $host, $field='') {
     </td>
   </tr>";
 
+  $block_backup_ftp = "
+  <tr>
+    <th class=\"$class[backup_ftp]\"><label for=\"cb_backup_ftp\">$GLOBALS[l_backup_ftp]</label></th>
+    <td>
+      <input id=\"cb_backup_ftp\" name=\"cb_backup_ftp\" type=\"checkbox\" value=\"1\" $backup_ftp_state onClick=\"on_backup_ftp_click();\" />
+    </td>
+  </tr>
+  <tr id=\"row_backup_ftp_login\" $display_backup_ftp_data>
+    <th class=\"$class[backup_ftp_login]\"><label for=\"tf_backup_ftp_login\">$GLOBALS[l_backup_ftp_login]</label></th>
+    <td>
+      <input id=\"tf_backup_ftp_login\" name=\"tf_backup_ftp_login\" value=\"$backup_ftp_login\" />
+    </td>
+  </tr>
+  <tr id=\"row_backup_ftp_password\" $display_backup_ftp_data>
+    <th class=\"$class[backup_ftp_password]\"><label for=\"tf_backup_ftp_password\">$GLOBALS[l_backup_ftp_password]</label></th>
+    <td>
+      <input id=\"tf_backup_ftp_password\" name=\"tf_backup_ftp_password\" type=\"password\" value=\"$backup_ftp_password\" />
+    </td>
+  </tr>
+  <tr id=\"row_backup_ftp_root\" $display_backup_ftp_data>
+    <th class=\"$class[backup_ftp_root]\"><label for=\"tf_backup_ftp_root\">$GLOBALS[l_backup_ftp_root]</label></th>
+    <td>
+      <input id=\"tf_backup_ftp_root\" name=\"tf_backup_ftp_root\" value=\"$backup_ftp_root\" />
+    </td>
+  </tr>";
+
   $dis_user = "
   <tr>
   <th class=\"$class[user]\">
@@ -732,6 +823,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   $block_mail
   $block_sync
   $block_solr
+  $block_backup_ftp
    <tr>
      <th class=\"$class[monitor]\"><label for=\"cb_monitor\">$GLOBALS[l_monitor]</label></th>
      <td>
@@ -908,4 +1000,3 @@ function dis_host_warn_insert($id, $h_q, $host) {
   return $block;
 }
 
-</script>

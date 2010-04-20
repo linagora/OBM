@@ -3743,6 +3743,34 @@ function of_service_delete($service, $id) {
 
 
 /**
+ * of_service_properties 
+ * 
+ * @param mixed $service 
+ * @param mixed $id 
+ * @access public
+ * @return array of property => value
+ */
+function of_service_properties($service, $id) {
+  global $cdg_sql;
+
+  $id = sql_parse_id($id, true);
+  $obm_q = new DB_OBM;
+  $query = "SELECT serviceproperty_property, serviceproperty_value FROM ServiceProperty
+    WHERE serviceproperty_service = '$service' AND serviceproperty_entity_id $id";
+  display_debug_msg($query, $cdg_sql, 'of_service_properties()');
+  $obm_q->query($query);
+
+  $properties = array();
+
+  while($obm_q->next_record()) {
+    $properties[$obm_q->f('serviceproperty_property')] = $obm_q->f('serviceproperty_value');
+  }
+
+  return $properties;
+}
+
+
+/**
  * of_service_property_insert 
  * 
  * @param mixed $service_property 
