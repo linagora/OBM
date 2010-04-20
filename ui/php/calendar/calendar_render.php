@@ -48,7 +48,7 @@ include("$obminclude/global.inc");
 //FIXME
 $params = get_global_params('Entity');
 $cgp_cookie_name = 'OBM_Public_Session';
-page_open(array('sess' => 'OBM_Session', 'auth' => 'OBM_No_Auth', 'perm' => 'OBM_Perm'));
+page_open(array('sess' => 'OBM_Session', 'auth' => 'OBM_Token_Auth', 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 require('calendar_query.inc');
 require_once("$obminclude/of/of_contact.php");
