@@ -3916,8 +3916,13 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   if ($current_view->users_count()+$current_view->contacts_count() > 1) {
     $u = array();
-    foreach($users['entity'] as $id => $user) {
-      $name = phpStringToJsString($user["label"]);
+    
+   $users_entity = get_userobm_from_ids($current_view->get_users());
+   $users_ids = $users_entity[ids];
+   $jsid = $obm['uid'];
+   if (isset($calendar[new_user_id][0])) $jsid = $calendar[new_user_id][0];
+    foreach($users_ids as $id) {
+      $name = phpStringToJsString($users_entity["entity"][$id]["label"]);
       array_push($u, "'$id' : '$name'");
     }
     $users_js = "{".implode(",", $u)."}";
@@ -3941,7 +3946,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <td>
         <input type='checkbox' id='cba_add_displayed_users' value='1' $add_displayed_users_checked 
           name='cba_add_displayed_users' 
-          onclick=\"add_displayed_attendee(this.checked, $users_js, $uid, 'user', 'sel_user_id'); 
+          onclick=\"add_displayed_attendee(this.checked, $users_js, $jsid, 'user', 'sel_user_id'); 
           add_displayed_attendee(this.checked, $contact_js, $uid, 'contact', 'sel_contact_id'); \"/>
       </td>
       </tr>";
