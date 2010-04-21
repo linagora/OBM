@@ -92,3 +92,8 @@ $l_samba_domain_used = 'Ce nom de domaine est déjà utilisé par un autre domai
 $l_samba_profile_error = 'Chemin par défaut du profil invalide, il doit être de la forme \\\\machine\\chemin\profile';
 $l_samba_home_error = 'Chemin par défaut des dossiers utilisateurs invalide';
 $l_samba_drive_error = 'Lecteur par défaut des dossiers utilisateurs invalide';
+
+$l_backup_ftp_servers = 'Serveurs FTP de dépôt des sauvegardes';
+$l_header_select_backupftpserver = 'Sélection du serveur FTP';
+$l_backupftpserver_warn = 'Vous devez créer un hôte de ce type';
+

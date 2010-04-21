@@ -87,3 +87,7 @@ $l_samba_drive_error = 'Invalid users home default drive';
 $l_mailshares_quota_error = "Default quota exceeds maximum quota !";
 $l_max_quota = "Max value";
 
+$l_backup_ftp_servers = 'Backup storage FTP servers'
+$l_header_select_backupftpserver = 'Select FTP server';
+$l_backupftpserver_warn = "You have to create an host of this kind first";
+
