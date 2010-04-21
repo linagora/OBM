@@ -11,6 +11,7 @@ use strict;
 use HTTP::Status;
 
 use constant PASSWORD_LIFE_TIME => 120;
+use constant SOCKET_TIMEOUT => 30;
 
 
 sub process_request {
@@ -20,14 +21,18 @@ sub process_request {
     while( $processedRequest < $self->{'server'}->{'max_requests'} ) {
         my $httpRequest;
 
+        # Setting socket timeout
+        $self->{'server'}->{'socket'}->timeout(SOCKET_TIMEOUT);
         # Accept a connection from HTTP::Daemon
         my $connection = $self->{'server'}->{'socket'}->accept() or next;
+        # Remove socket timeout before getting request
+        $connection->timeout(0);
 
         $self->_log( 'Connect from: '.$connection->peerhost(), 3 );
         
         # Get the request
         while( ($processedRequest < $self->{'server'}->{'max_requests'}) && ($httpRequest = $connection->get_request()) ) {
-            if( ref($httpRequest) ne 'HTTP::Request' ) {
+            if(ref($httpRequest) ne 'HTTP::Request') {
                 $self->_log( 'Invalid request', 0 );
                 $connection->send_error(RC_BAD_REQUEST);
                 next;
