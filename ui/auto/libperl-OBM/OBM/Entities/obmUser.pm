@@ -108,8 +108,6 @@ sub _init {
     }
 
 
-    $self->_log( '--->'.$userDesc->{'userobm_login_new'}, 0 );
-
     # Archive flag
     if( $userDesc->{'userobm_archive'} ) {
         $self->setArchive();

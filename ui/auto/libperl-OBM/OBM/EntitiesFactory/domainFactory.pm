@@ -186,7 +186,7 @@ sub _getParentDomain {
                                 domain_global,
                                 domain_label,
                                 domain_description,
-                                \'OBM_GLOBAL_DOMAIN_NAME\',
+                                \''.OBM_GLOBAL_DOMAIN_NAME.'\' as domain_name,
                                 domain_alias,
                                 sid.serviceproperty_value as samba_sid
                         FROM '.$domainTable.'
