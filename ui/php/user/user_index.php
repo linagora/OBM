@@ -63,9 +63,6 @@ require_once("$path/../app/default/models/UserPattern.php");
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/of/of_right.inc"); // needed by call from calendar
 
-// lang file include for backup
-$lang = strtolower(get_lang());
-include_once("obminclude/lang/$lang/backup.inc");
 
 // detailconsult can be accessed without user_id (-> display current user)
 if (($action == 'detailconsult') && (! $params['user_id'])) $params['user_id'] = $obm['uid'];
@@ -277,6 +274,9 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'backup') {
 ///////////////////////////////////////////////////////////////////////////////
+  // lang file include for backup
+  $lang = strtolower(get_lang());
+  include_once("obminclude/lang/$lang/backup.inc");
   try {
     $backup = new Backup('user', $params['user_id']);
     $dis_form = true;
@@ -296,6 +296,10 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'restore') {
 ///////////////////////////////////////////////////////////////////////////////
+  // lang file include for backup
+  $lang = strtolower(get_lang());
+  include_once("obminclude/lang/$lang/backup.inc");
+  include_once("obminclude/lang/$lang/contact.inc");
   try {
     $backup = new Backup('user', $params['user_id']);
     $dis_form = true;

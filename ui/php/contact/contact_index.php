@@ -154,7 +154,6 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     }
     if ($ids !== false) {
       header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
-      OBM_IndexingService::commit('contact');
     } else {
       $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
       $display['detail'] .= dis_vcard_import_form($params['addressbook']);

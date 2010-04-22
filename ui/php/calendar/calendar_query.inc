@@ -3624,6 +3624,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     LEFT JOIN EventTag ON event_tag_id = eventtag_id 
     INNER JOIN EventLink ON event_id = eventlink_event_id";
 
+
   if (is_array($calendar_entity['user'])
     && (count($calendar_entity['user']) > 0) ) {
       $select[] =  "SELECT
@@ -3701,7 +3702,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
 //   - $calendar_entity : array of entities elements to display
 //   - $status          : array of event status to get ('ACCEPTED', 'R', 'W')
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_repeat_events($start, $end, $calendar_entity, $status, $category_filter='', $events=null, $opac=null) {
+function run_query_calendar_repeat_events($start, $end, $calendar_entity, $status, $category_filter='', $events=null, $opac=null, $no_birthday=false) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -3772,6 +3773,13 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     INNER JOIN UserObm ON event_owner = userobm_id
     INNER JOIN EventLink ON event_id = eventlink_event_id";
 
+  if ($no_birthday) {
+    $left_q .= "
+      LEFT JOIN Contact birthday ON birthday.contact_birthday_id = event_id
+      LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id";
+    $where_no_birthday = " AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL ";
+  }
+
   if (is_array($calendar_entity['user'])
     && (count($calendar_entity['user']) > 0) ) {
       $select[] =  "SELECT
@@ -3782,6 +3790,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $left_q
         INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
+        $where_no_birthday
         $where_opacity
         AND event_repeatkind != 'none'
         $where_status
@@ -3803,6 +3812,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $left_q
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT'
+        $where_no_birthday
         $where_opacity
         AND event_repeatkind != 'none'
         $where_status
@@ -3824,6 +3834,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         $left_q
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
         WHERE event_type='VEVENT' 
+        $where_no_birthday
         $where_opacity
         AND event_repeatkind != 'none'
         $where_status
@@ -5260,13 +5271,19 @@ function run_query_calendar_reset($id,$params) {
   $query = "SELECT event_id FROM Event
     INNER JOIN EventLink ON event_id = eventlink_event_id
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+    LEFT JOIN Contact birthday ON birthday.contact_birthday_id = event_id
+    LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id
     WHERE (event_type='VEVENT' AND event_owner = $id AND userentity_user_id = $id AND event_date < '$date')
+      AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL
     GROUP BY event_id HAVING COUNT(*) = 1
     UNION
     SELECT event_id FROM Event
     INNER JOIN EventLink ON event_id = eventlink_event_id
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+    LEFT JOIN Contact birthday ON birthday.contact_birthday_id = event_id
+    LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id
     WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") AND event_date < '$date'
+      AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL
     GROUP BY event_id HAVING COUNT(*) = 1";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(1)');
   $obm_q->query($query);
@@ -5279,7 +5296,13 @@ function run_query_calendar_reset($id,$params) {
 
   if(!is_null($meeting)){
     # Refuse all other events
-    $query = "SELECT eventlink_event_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id INNER JOIN Event ON event_id = eventlink_event_id WHERE userentity_user_id = $id 
+    $query = "SELECT eventlink_event_id FROM EventLink
+      INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+      INNER JOIN Event ON event_id = eventlink_event_id
+      LEFT JOIN Contact birthday ON birthday.contact_birthday_id = event_id
+      LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id
+      WHERE userentity_user_id = $id 
+      AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL
       AND eventlink_state != 'DECLINED' AND event_date < '$date'";
     display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(2)');
     $obm_q->query($query);

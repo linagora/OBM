@@ -23,6 +23,7 @@
  */
 class OBM_Satellite_RestoreEntity extends OBM_Satellite_Query {
   public static $restoreData = array('mailbox','calendar','contact','all');
+  protected $data;
 
   /**
    * build the url to query from the given arguments
@@ -34,6 +35,7 @@ class OBM_Satellite_RestoreEntity extends OBM_Satellite_Query {
    **/
   protected function buildUrl($args) {
     extract($args);   //create $host, $entity, $login, $realm and $data
+    $this->data = $data;
     $port = OBM_Satellite_ICredentials::$port;
     if (!empty($data) && $data!='all')
       return "https://{$host}:{$port}/restoreentity/{$entity}/{$login}@{$realm}/{$data}";
@@ -101,15 +103,41 @@ class OBM_Satellite_RestoreEntity extends OBM_Satellite_Query {
     $sxml = new SimpleXMLElement($xml);
     $return = array();
 
-    $calendar = $sxml->calendar;
-    if ($calendar)
-      $return['calendar'] = (string)$calendar;
+    if (empty($this->data) || $this->data=='all' || $this->data=='calendar') {
+      $calendar = $sxml->calendar;
+      if ($calendar) {
+        $return['calendar'] = $this->putToTmpFile((string)$calendar);
+      }
+    }
 
-    $privateContact = $sxml->privateContact;
-    if ($privateContact)
-      $return['privateContact'] = (string)$privateContact;
+    if (empty($this->data) || $this->data=='all' || $this->data=='contact') {
+      $privateContact = $sxml->privateContact;
+      if ($privateContact) {
+        $return['privateContact'] = array();
+        foreach ($privateContact->addressBook as $addBook) {
+          $addBookName = (string)$addBook['name'];
+          $return['privateContact'][$addBookName] = $this->putToTmpFile((string)$addBook);
+        }
+      }
+    }
 
     return $return;
+  }
+
+  /**
+   * Put the given string into a new tempfile and return the file descriptor or false if string is empty
+   * @param string $s
+   * @access protected
+   * @return int       file descriptor
+   **/
+  protected function putToTmpFile($s) {
+    $strlen = strlen($s);
+    if (!$strlen)
+      return false;
+    $temp = tmpfile();
+    for ($length=0; $length<$strlen; $length+=fwrite($temp, substr($s,$length)));
+    rewind($temp);
+    return $temp;
   }
 
 }

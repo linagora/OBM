@@ -29,12 +29,16 @@ class Vcalendar_Reader_ICS {
   /**
    * Constructor
    *
-   * @param string $file ICS file name
+   * @param string $file ICS file name or file descriptor
    * @access public
    * @return void
    */
   function Vcalendar_Reader_ICS($file) {
-    $this->handle = fopen($file, 'r');
+    if (is_string($file)) {
+      $this->handle = fopen($file, 'r');
+    } else {
+      $this->handle = $file;
+    }
     $this->attribute = array('name' => '', 'options' => array(), 'value' => array());
     $this->cns = array();
     $this->mails = array();

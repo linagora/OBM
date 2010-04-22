@@ -262,6 +262,29 @@ class OBM_AddressBook implements OBM_ISearchable {
     if ($pattern == '') $pattern = '-is:archive addressbookId:'.$this->id;
     return OBM_Search::count('contact', $pattern);
   }
+
+  public function toVcard($pattern='', $offset=0) {
+    $vcards = array();
+    $pattern .= ' addressbookId:('.$this->id.')';
+    $contacts = OBM_Contact::search($pattern, $offset);
+    if (is_array($contacts)) {
+      foreach ($contacts as $c) {
+        $vcards[] = $c->toVcard()->__toString();
+      }
+    }
+    return implode("\n", $vcards);
+  }
+
+  public function reset() {
+    if ($this->name!='public_contacts' && $this->admin) {
+      $db = new DB_OBM;
+      // Delete contacts
+      $query = "DELETE FROM Contact WHERE contact_addressbook_id='$this->id'";
+      $db->query($query);
+      // Delete solr
+      OBM_IndexingService::deleteByQuery('contact', "addressbookId:$this->id");
+    }
+  }
 }
 
 

@@ -1121,7 +1121,11 @@ function run_query_contact_check($cid, $comp_id, $lastname, $firstname) {
 //   - $params : form values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_vcard_insert($params, $addressbook) {
-  $file_content = file_get_contents($params['vcard_tmp']);
+  if ($params['vcard_tmp']) {
+    $file_content = file_get_contents($params['vcard_tmp']);
+  } else {
+    $file_content = stream_get_contents($params['vcard_fd']);
+  }
   try {
     $vcards = Vpdi::decode($file_content, Vpdi::VCARD);
   } catch (Exception $e) {
@@ -1145,6 +1149,7 @@ function run_query_vcard_insert($params, $addressbook) {
   if (count($ids) != count($vcards)) {
     return false;
   }
+  OBM_IndexingService::commit('contact');
   return $ids;
 }
 

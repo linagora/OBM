@@ -32,7 +32,7 @@ class Vcalendar_Reader_OBM {
 
   function readPeriod($startTime, $endTime) {
     $noRepeatEvent = run_query_calendar_no_repeat_events($startTime,$endTime,$this->entities,NULL);
-    $repeatEvent = run_query_calendar_repeat_events($startTime,$endTime,$this->entities,NULL);
+    $repeatEvent = run_query_calendar_repeat_events($startTime,$endTime,$this->entities,NULL,'',null,null,true);
     $ids = array();
     while($noRepeatEvent->next_record()) {
       $ids[] = $noRepeatEvent->f('event_id');

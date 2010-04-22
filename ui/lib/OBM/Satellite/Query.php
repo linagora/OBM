@@ -46,16 +46,20 @@ abstract class OBM_Satellite_Query {
     // mandatory options
     $options[CURLOPT_RETURNTRANSFER] = TRUE;
     $options[CURLOPT_HEADER] = FALSE;
+    $options[CURLOPT_FORBID_REUSE] = TRUE;
+    $options[CURLOPT_HTTPHEADER] = array('Expect: ');
+
+    $retour = curl_setopt_array($this->request, $options);
+    if ($retour===FALSE)
+      throw new Exception('Invalid query options');
 
     // query body
     $body = $this->buildBody($data);
-    $retour = curl_setopt_array($this->request, $options);
-
-    if (($retour!==FALSE) && !empty($body)) {
+    if ($body) {
       $retour = curl_setopt($this->request, CURLOPT_POSTFIELDS, $body);
     }
     if ($retour===FALSE)
-      throw new Exception('Invalid query options');
+      throw new Exception('Invalid query body');
   }
 
   /**
@@ -68,11 +72,6 @@ abstract class OBM_Satellite_Query {
     $body = curl_exec($this->request);
     $code = curl_getinfo($this->request, CURLINFO_HTTP_CODE);
     curl_close($this->request);
-
-    if ($code==100) { //Why do I fucking get a 100 response code ??
-      $code=200; //FIXME: why am I here ?
-    }
-
     if ($body===FALSE)
       throw new Exception('Unexpected response');
 
@@ -80,7 +79,7 @@ abstract class OBM_Satellite_Query {
       return $this->parseResponse($body);
     }
 
-    if (($code >= 400) && ($code <= 500)) {
+    if ($code >= 400) {
       $error = $this->parseError($body);
       throw new Exception("$code: $error");
     }

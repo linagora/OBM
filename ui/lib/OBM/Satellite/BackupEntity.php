@@ -83,8 +83,13 @@ class OBM_Satellite_BackupEntity extends OBM_Satellite_Query {
       $sxml->addChild('calendar',$data['calendar']);
 
     //privateContacts
-    if (isset($data['privateContact']))
-      $sxml->addChild('privateContact',$data['privateContact']);
+    if (isset($data['privateContact'])) {
+      $privateContact = $sxml->addChild('privateContact');
+      foreach ($data['privateContact'] as $addBookName => $addBook) {
+        $xmlAddressBook = $privateContact->addChild('addressBook',$addBook);
+        $xmlAddressBook->addAttribute('name', $addBookName);
+      }
+    }
 
     return $sxml->asXML();
   }

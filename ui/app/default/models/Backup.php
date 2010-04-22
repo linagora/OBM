@@ -77,6 +77,8 @@ class Backup {
    * @access public
    */
   public function doRestore($filename, $method, $options = array()) {
+    $restoreFunc = 'restore'.ucfirst($this->details['entity']);
+
     $url_args = $this->details;
     $url_args['data'] = in_array($method, OBM_Satellite_RestoreEntity::$restoreData) ? $method : null;
 
@@ -89,7 +91,7 @@ class Backup {
     $data = array_merge($data,$options);
     try {
       $query = new OBM_Satellite_RestoreEntity($this->auth, $url_args, $data);
-      return $query->execute();
+      $this->$restoreFunc($query->execute(),$method);
     } catch (Exception $e) {
       throw new Exception($GLOBALS['l_err_cant_restore'].' ('.$e->getMessage().')');
     }
@@ -136,12 +138,32 @@ class Backup {
     $data = array();
 
     //getting calendar to backup
-    $data['calendar'] = get_user_vcalendar_export($this->details['id']);
+    $data['calendar'] = $this->user_vcalendar_export($this->details['id']);
 
     //getting contacts to backup
-    $data['privateContact'] = get_user_contacts_export($this->details['id']);
+    $data['privateContact'] = $this->user_contacts_export($this->details['id']);
 
     return $data;
+  }
+
+  /**
+   * used to restore user data
+   * @param  array     $data
+   * @access protected
+   */
+  protected function restoreUser($data,$method='') {
+
+    //calendar data to restore
+    if ($data['calendar']) {
+      if (empty($method) || $method=='all' || $method=='calendar')
+        $this->user_vcalendar_import($data['calendar'], $this->details['id']);
+    }
+
+    //contacts data to restore
+    if (is_array($data['privateContact'])) {
+      if (empty($method) || $method=='all' || $method=='contact')
+        $this->user_contacts_import($data['privateContact'], $this->details['id']);
+    }
   }
 
   /**
@@ -185,51 +207,126 @@ class Backup {
   protected function mailshareData() {
     return array();
   }
-}
 
-
-//FIXME: :'( snif
-/**
- * Perform the export of the calendar to the vCalendar format
- */
-function get_user_vcalendar_export($user_id) {
-  $date = new Of_date();
-  $start = clone $date;
-  $start = $start->subYear(100);
-  $end = clone $date;
-  $end->addYear(100);
-  $calendar_user['user'] = array($user_id => 'dummy');
-
-  include_once('php/calendar/calendar_query.inc'); // FIXME: :'( snif
-  include_once('obminclude/of/vcalendar/writer/ICS.php');
-  include_once('obminclude/of/vcalendar/reader/OBM.php');
-
-  $reader = new Vcalendar_Reader_OBM($calendar_user,NULL,$start,$end);
-  $document = $reader->getDocument();
-  $writer = new Vcalendar_Writer_ICS();
-  $writer->writeDocument($document);
-  return $writer->buffer;
-}
-
-/**
- * Perform the export of user contacts to the vcard format
- */
-function get_user_contacts_export($user_id) {
-  $vcards = '';
-
-  include_once('php/contact/addressbook.php'); // FIXME: :'( snif
-
-  $remember_uid = $GLOBALS['obm']['uid']; // FIXME: :'( snif
-  $GLOBALS['obm']['uid'] = $user_id; // FIXME: :'( snif
-
-  $addressbooks = OBM_AddressBook::search();
-  $contacts = $addressbooks->searchContacts($params['searchpattern']);
-  if (count($contacts)>0) {
-    foreach ($contacts as $c) {
-      $vcards .= $c->toVcard()->__toString();
-    }
+  /**
+   * used to restore mailshare data
+   * @param  array     $data
+   * @access protected
+   */
+  protected function restoreMailshare($data,$method='') {
   }
-  $GLOBALS['obm']['uid'] = $remember_uid; // FIXME: :'( snif
-  return $vcards;
+
+
+
+
+  /**
+   * Perform the export of the calendar to the vCalendar format
+   */
+  private function user_vcalendar_export($user_id) {
+    $date = new Of_date();
+    $start = clone $date;
+    $start = $start->subYear(100);
+    $end = clone $date;
+    $end->addYear(100);
+    $calendar_user['user'] = array($user_id => 'dummy');
+
+    include_once('php/calendar/calendar_query.inc');
+    include_once('obminclude/of/vcalendar/writer/ICS.php');
+    include_once('obminclude/of/vcalendar/reader/OBM.php');
+
+    $reader = new Vcalendar_Reader_OBM($calendar_user,NULL,$start,$end);
+    $document = $reader->getDocument();
+    $writer = new Vcalendar_Writer_ICS();
+    $writer->writeDocument($document);
+    return $writer->buffer;
+  }
+
+  /**
+   * Perform the import of the vcalendar
+   */
+  private function user_vcalendar_import($fd,$user_id) {
+    include_once('php/calendar/calendar_query.inc');
+    include_once('php/calendar/event_observer.php');
+    include_once('obminclude/lib/Solr/Document.php');
+    include_once('obminclude/of/of_indexingService.inc');
+    include_once('obminclude/of/vcalendar/Utils.php');
+    include_once('obminclude/of/vcalendar/writer/OBM.php');
+    include_once('obminclude/of/vcalendar/reader/ICS.php');
+
+    $remember_uid = $GLOBALS['obm']['uid'];
+    $GLOBALS['obm']['uid'] = $user_id; // some kind of sudo $user_id
+
+    //reset calendar
+    run_query_calendar_reset($user_id,array('delete_meeting' => true));
+
+    //restore calendar
+    $reader = new Vcalendar_Reader_ICS($fd);
+    $document = $reader->getDocument();
+    $writer = new Vcalendar_Writer_OBM(true);  
+    $writer->writeDocument($document);
+
+    $GLOBALS['obm']['uid'] = $remember_uid;
+  }
+
+  /**
+   * Perform the export of user contacts to the vcard format
+   */
+  private function user_contacts_export($user_id) {
+    $vcards = array();
+
+    include_once('php/contact/addressbook.php');
+
+    $remember_uid = $GLOBALS['obm']['uid'];
+    $GLOBALS['obm']['uid'] = $user_id; // some kind of sudo $user_id
+
+    $addressbooks = OBM_AddressBook::search();
+    foreach ($addressbooks as $addressbook) {
+      if ($addressbook->name!='public_contacts') { // I'd better filter this addressbook on search
+        $vcards[$addressbook->name] = $addressbook->toVcard();
+      }
+    }
+
+    $GLOBALS['obm']['uid'] = $remember_uid;
+
+    return $vcards;
+  }
+
+  /**
+   * Perform the import of the contacts
+   */
+  function user_contacts_import($vcf_contacts,$user_id) {
+    include_once('php/contact/addressbook.php');
+    include_once('php/contact/contact_query.inc');
+
+    $remember_uid = $GLOBALS['obm']['uid'];
+    $GLOBALS['obm']['uid'] = $user_id; // some kind of sudo $user_id
+
+    $addressbooks = OBM_AddressBook::search();
+    $addressBookByName = array();
+    foreach ($addressbooks as $addressbook) {
+      if ($addressbook->name!='public_contacts') { // I'd better filter this addressbook on search
+        if ($addressbook->isDefault || isset($vcf_contacts[$addressbook->name])) {
+          $addressbook->reset();
+          $addressBookByName[$addressbook->name] = $addressbook;
+        } else {
+          OBM_AddressBook::delete(array('addressbook_id' => $addressbook->id));
+        }
+      }
+    }
+
+    foreach ($vcf_contacts as $addBookName => $fd) {
+      if (isset($addressBookByName[$addBookName])) {
+        $addressbook = $addressBookByName[$addBookName];
+      } else {
+        $addressbook = OBM_AddressBook::create(array('name' => $addBookName));
+      }
+      if($fd && $addressbook->write) {
+        $ids = run_query_vcard_insert(array('vcard_fd' => $fd), $addressbook);
+      }
+    }
+
+    $GLOBALS['obm']['uid'] = $remember_uid;
+  }
+
 }
 
