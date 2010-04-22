@@ -8,6 +8,8 @@ user-login = test01@aliasource.fr
 mailshare-name = mailshare00@aliasource.fr
 # Send report copy to this emails too (separated by comma, no mail send if empty)
 send-report = 
+# Push archive on domain FTP backup (default: false)
+push-ftp = true
 
 # Backup entity
 test-backup-entity = true

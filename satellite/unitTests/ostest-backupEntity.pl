@@ -32,12 +32,12 @@ sub genInvalidContent {
 sub genContent {
     my($parameters) = @_;
 
-    my $xml = '<obmSatellite name="unitTest">';
+    my $xml = '<obmSatellite name="unitTest">
+<options>';
 
     if($parameters{'send-report'}) {
         my @recipients = split(/,/, $parameters{'send-report'});
         $xml .= '
-<options>
   <report sendMail="true">';
 
         for(my $i=0; $i<=$#recipients; $i++) {
@@ -46,14 +46,19 @@ sub genContent {
         }
 
         $xml .= '
-  </report>
-</options>';
+  </report>';
     }else {
          $xml .= '
-<options>
-  <report sendMail="false"/>
-</options>';
+  <report sendMail="false"/>';
     }
+
+    if($parameters{'push-ftp'}) {
+        $xml .= '<ftp push="true"/>';
+    }else {
+        $xml .= '<ftp push="false"/>';
+    }
+
+    $xml .= '</options>';
 
     $xml .= '<calendar>
 PRODID:-//Aliasource Groupe LINAGORA//OBM Calendar 2.4.0-rc//FR
@@ -152,11 +157,10 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
         }else {
             print '[KO]'."\n";
             $errorCode++;
-
-            my $response = $client->getResponse();
-            my $xmlContent = XMLin( $response->content() );
-            print $xmlContent->{'content'}."\n";
         }
+
+        my $response = $client->getResponse();
+        print $response->content()."\n";
     }
     
     if( $parameters{'test-backup-entity-invalid-request-content'} ) {
@@ -167,11 +171,10 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
         }else {
             print '[KO]'."\n";
             $errorCode++;
-
-            my $response = $client->getResponse();
-            my $xmlContent = XMLin( $response->content() );
-            print $xmlContent->{'content'}."\n";
         }
+
+        my $response = $client->getResponse();
+        print $response->content()."\n";
     }
     
     
@@ -183,11 +186,10 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
         }else {
             print '[KO]'."\n";
             $errorCode++;
-
-            my $response = $client->getResponse();
-            my $xmlContent = XMLin( $response->content() );
-            print $xmlContent->{'content'}."\n";
         }
+
+        my $response = $client->getResponse();
+        print $response->content()."\n";
     }
     
     
@@ -199,11 +201,10 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
         }else {
             print '[KO]'."\n";
             $errorCode++;
-
-            my $response = $client->getResponse();
-            my $xmlContent = XMLin( $response->content() );
-            print $xmlContent->{'content'}."\n";
         }
+
+        my $response = $client->getResponse();
+        print $response->content()."\n";
     }
 
     if( $parameters{'test-restore-invalid-file'} ) {

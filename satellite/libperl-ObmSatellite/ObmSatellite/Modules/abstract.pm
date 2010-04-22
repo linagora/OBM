@@ -400,7 +400,6 @@ sub _xmlContent {
     my $self = shift;
     my $requestBody = shift;
     my @xmlInOpts = @_;
-#    my( $requestBody, $xmlInOpts ) = @_;
 
     local $SIG{__DIE__} = sub {
         $self->_log( join( ' ', @_ ), 0 );

@@ -92,6 +92,10 @@ sub _log {
     my $log = Log::Log4perl->get_logger(__PACKAGE__);
 
     SWITCH: {
+        if(!defined($logLevel)) {
+            $logLevel = 'FATAL';
+        }
+
         if( $logLevel == TRACE || $logLevel eq 'TRACE' ) {
             if( $Log::Log4perl::VERSION < 1.13 ) {
                 $log->debug( $logMessage );
@@ -122,7 +126,7 @@ sub _log {
             last SWITCH;
         }
 
-        if( $logLevel == FATAL || $logLevel eq 'FATAL' ) {
+        if($logLevel == FATAL || $logLevel eq 'FATAL' ) {
             $log->fatal( $logMessage );
             last SWITCH;
         }

@@ -15,6 +15,7 @@ eval {
     require ObmSatellite::Modules::BackupEntity::mailshare;
     require MIME::Lite;
     require MIME::Base64;
+    require Net::FTP;
 };
 
 use File::Path;
@@ -33,12 +34,15 @@ use constant RECONSTRUCT_CMD => 'reconstruct';
 use constant QUOTA_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
 use constant QUOTA_CMD => 'quota';
 use constant MAIL_REPORT_RECIPIENT => 'x-obm-backup';
+use constant BACKUP_FTP_TIMEOUT => 10;
+
 
 sub _setUri {
     my $self = shift;
 
     return [ '/backupentity', '/restoreentity', '/availablebackup' ];
 }
+
 
 sub _initHook {
     my $self = shift;
@@ -131,11 +135,13 @@ sub _putMethod {
         $response = $self->_response( RC_OK, {
             content => [ 'Backup '.$entity->getLogin().'@'.$entity->getRealm().' successfully' ]
             } );
+
+        $self->_pushFtp($entity, $xmlContent->{'options'}, $response);
     }else {
         $self->_log( 'Fail to backup '.$entity->getLogin().'@'.$entity->getRealm(), 1 );
     }
 
-    $self->_getMailBackupReport($entity, $xmlContent->{'options'}, $response);
+    $self->_sendMailBackupReport($entity, $xmlContent->{'options'}, $response);
 
     return $response;
 }
@@ -262,7 +268,7 @@ sub _postMethod {
     my $response = $self->_restoreFromArchive( $entity, $data );
 
     $self->_removeTmpArchive( $entity );
-    $self->_getMailRestoreReport($entity, $xmlContent->{'options'}, $response);
+    $self->_sendMailRestoreReport($entity, $xmlContent->{'options'}, $response);
 
     return $response;
 }
@@ -278,9 +284,15 @@ sub _isEntityExist {
         $ldapFilter,
         [] );
 
+    if(!defined($ldapEntity)) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Fail to contact LDAP server. Contact system administrators' ]
+            } );
+    }
+
     if( $#{$ldapEntity} != 0 ) {
         return $self->_response( RC_BAD_REQUEST, {
-            content => [ 'Entity '.$entity->getLogin().'@'.$entity->getRealm().' doesn\'t exist in LDAP' ],
+            content => [ 'Entity '.$entity->getLogin().'@'.$entity->getRealm().' doesn\'t exist in LDAP' ]
             } );
     }
 
@@ -1033,7 +1045,7 @@ sub _createRestoreMailboxFolder {
 }
 
 
-sub _getMailBackupReport {
+sub _sendMailBackupReport {
     my $self = shift;
     my( $entity, $options, $response ) = @_;
 
@@ -1082,13 +1094,23 @@ sub _getMailBackupReport {
     $mail->{'content'} = [];
     if( my $content = $response->getContentValue('content') ) {
         push( @{$mail->{'content'}}, @{$content} );
+
+        $self->_log('popoop');
+        $content = $response->getContentValue('pushFtp');
+        if(ref($content) eq 'HASH') {
+            if($content->{'success'} eq 'true') {
+                push(@{$mail->{'content'}}, 'FTP upload: success - '.$content->{'content'});
+            }else {
+                push(@{$mail->{'content'}}, 'FTP upload: fail - '.$content->{'content'});
+            }
+        }
     }
 
     return $self->_sendMailReport($mail, $entity, $options);
 }
 
 
-sub _getMailRestoreReport {
+sub _sendMailRestoreReport {
     my $self = shift;
     my( $entity, $options, $response ) = @_;
 
@@ -1188,7 +1210,7 @@ sub _sendMailReport {
 
     $msg->attach(
         Type    => 'text/plain; charset=UTF-8',
-        Data    => join( '\n', @{$mailContent->{'content'}} )
+        Data    => join( "\n", @{$mailContent->{'content'}} )
         );
     
     eval {
@@ -1205,6 +1227,248 @@ sub _sendMailReport {
     
     $self->_log( 'Sending mail report success', 3 );
     return 0;
+}
+
+
+sub _pushFtp {
+    my $self = shift;
+    my ($entity, $options, $response) = @_;
+
+    if(lc($options->{'ftp'}->{'push'}) eq 'false') {
+        $self->_log('No push FTP asked', 3);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'No push FTP asked',
+                success => 'true'
+            }
+        });
+        return 0;
+    }
+
+    # Getting FTP backup server name for entity's OBM domain
+    my $ftpHostName = $self->_getFtpBackupHost($entity, $response);
+
+    # Getting FTP backup host informations
+    my $ftpConn = $self->_getFtpBackupConn($entity, $response, $ftpHostName);
+    if(!defined($ftpConn)) {
+        return 1;
+    }
+
+    $self->_log('Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\'', 3);
+    my $error = $ftpConn->put($entity->getBackupFileName(), $entity->getBackupName());
+    if(!$error) {
+        my $errorMsg = 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+        $self->_log($errorMsg, 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => $errorMsg,
+                success => 'false'
+            }
+        });
+        $ftpConn->quit();
+        return 1;
+    }
+
+    $ftpConn->quit();
+
+    $response->setExtraContent({
+        pushFtp => {
+            content => 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' success',
+            success => 'true'
+        }
+    });
+    return 0;
+}
+
+
+sub _getFtpBackupHost {
+    my $self = shift;
+    my($entity, $response) = @_;
+
+    my $ldapEntity = $self->_getLdapValues(
+        '(&(objectClass=obmBackup)(obmDomain='.$entity->getRealm().'))',
+        ['ftpHost'] );
+
+    if(!defined($ldapEntity)) {
+        $self->_log('Fail to contact LDAP server. Contact system administrators', 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'Fail to contact LDAP server. Contact system administrators',
+                success => 'false'
+            }
+        });
+        return undef;
+    }
+
+    if($#{$ldapEntity} < 0) {
+        $self->_log('No backup FTP server linked to OBM domaine \''.$entity->getRealm().'\'', 3);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'No backup FTP server linked to OBM domaine \''.$entity->getRealm().'\'',
+                success => 'true'
+            }
+        });
+        return undef;
+    }elsif($#{$ldapEntity} > 0) {
+        $self->_log('More than one FTP server linked to OBM domaine \''.$entity->getRealm().'\'', 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'More than one FTP server linked to OBM domaine \''.$entity->getRealm().'\'',
+                success => 'false'
+            }
+        });
+        return undef;
+    }
+
+    my $ftpHostName = $ldapEntity->[0]->get_value('ftpHost');
+    if(!$ftpHostName) {
+        $self->_log('No backup FTP server linked to OBM domaine \''.$entity->getRealm().'\'', 3);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'No backup FTP server linked to OBM domaine \''.$entity->getRealm().'\'',
+                success => 'true'
+            }
+        });
+        return undef;
+    }
+
+    return $ftpHostName;
+}
+
+
+sub _getFtpBackupConn {
+    my $self = shift;
+    my($entity, $response, $obmBackupFtpHostname) = @_;
+    
+    my $ldapEntity = $self->_getLdapValues(
+        '(&(objectClass=obmHost)(cn='.$obmBackupFtpHostname.')(|(obmDomain='.$entity->getRealm().')(obmDomain='.OBM_GLOBAL_DOMAIN_NAME.')))',
+        ['ipHostNumber', 'ftpLogin', 'ftpPassword', 'ftpRoot']
+        );
+
+    if(!defined($ldapEntity)) {
+        $self->_log('Fail to contact LDAP server. Contact system administrators', 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'Fail to contact LDAP server. Contact system administrators',
+                success => 'false'
+            }
+        });
+        return undef;
+    }
+
+    if($#{$ldapEntity} < 0) {
+        $self->_log('FTP backup server \''.$obmBackupFtpHostname.'\' not found in LDAP', 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'FTP backup server \''.$obmBackupFtpHostname.'\' not found in LDAP',
+                success => 'false'
+            }
+        });
+        return undef;
+    }elsif($#{$ldapEntity} > 0) {
+        $self->_log('More than one host named \''.$obmBackupFtpHostname.'\' found in LDAP', 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'More than one host named \''.$obmBackupFtpHostname.'\' found in LDAP',
+                success => 'false'
+            }
+        });
+        return undef;
+    }
+
+    my $ftpHostIp = $ldapEntity->[0]->get_value('ipHostNumber');
+    if(!defined($ftpHostIp) || ref($ftpHostIp) || ($ftpHostIp !~ /$REGEX_IP/)) {
+        $self->_log('Invalid IP address \''.$ftpHostIp.'\' for FTP backup server named \''.$obmBackupFtpHostname.'\'', 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'Invalid IP address for FTP backup server named \''.$obmBackupFtpHostname.'\'',
+                success => 'false'
+            }
+        });
+        return undef;
+    }
+
+    my $ftpHostLogin = $ldapEntity->[0]->get_value('ftpLogin');
+    if(!defined($ftpHostLogin) || ref($ftpHostLogin) || ($ftpHostLogin !~ /$REGEX_LOGIN/)) {
+        $self->_log('Invalid login \''.$ftpHostLogin.'\' for FTP backup server named \''.$obmBackupFtpHostname.'\'', 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'Invalid login for FTP backup server named \''.$obmBackupFtpHostname.'\'',
+                success => 'false'
+            }
+        });
+        return undef;
+    }
+
+    my $ftpHostPassword = $ldapEntity->[0]->get_value('ftpPassword');
+    if(ref($ftpHostPassword)) {
+        $ftpHostPassword = undef;
+    }
+
+    my $ftpHostRoot = $ldapEntity->[0]->get_value('ftpRoot');
+
+    return $self->_getFtpConn($response, $obmBackupFtpHostname, $ftpHostIp, $ftpHostLogin, $ftpHostPassword, $ftpHostRoot);
+}
+
+
+sub _getFtpConn {
+    my $self = shift;
+    my($response, $obmBackupFtpHostname, $ftpHostIp, $ftpHostLogin, $ftpHostPassword, $ftpHostRoot) = @_;
+
+    my $ftpConn = Net::FTP->new( $ftpHostIp, Timeout => BACKUP_FTP_TIMEOUT );
+    if( !defined($ftpConn) ) {
+        $self->_log('Fail to contact backup FTP server \''.$ftpHostIp.'\'', 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => 'Fail to contact backup FTP server \''.$obmBackupFtpHostname.'\'',
+                success => 'false'
+            }
+        });
+        return undef;
+    }
+
+    my $error = $ftpConn->login($ftpHostLogin, $ftpHostPassword);
+    if(!$error) {
+        my $errorMsg = 'Backup FTP server \''.$obmBackupFtpHostname.'\' fail: '.$ftpConn->message();
+        $self->_log($errorMsg, 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => $errorMsg,
+                success => 'false'
+            }
+        });
+        return undef;
+    }
+
+    $error = $ftpConn->binary();
+    if(!$error) {
+        my $errorMsg = 'Backup FTP server \''.$obmBackupFtpHostname.'\' setup fail: '.$ftpConn->message();
+        $self->_log($errorMsg, 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => $errorMsg,
+                success => 'false'
+            }
+        });
+        return undef;
+    }
+
+    if($ftpHostRoot) {
+        $error = $ftpConn->cwd($ftpHostRoot);
+        if(!$error) {
+            my $errorMsg = 'Backup FTP server \''.$obmBackupFtpHostname.'\' setup fail: '.$ftpConn->message();
+            $self->_log($errorMsg, 1);
+            $response->setExtraContent({
+                pushFtp => {
+                    content => $errorMsg,
+                    success => 'false'
+                }
+            });
+            return undef;
+        }
+    }
+
+    return $ftpConn;
 }
 
 
