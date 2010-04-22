@@ -14,6 +14,8 @@ use strict;
 
 use OBM::Parameters::regexp;
 
+use constant OBM_GLOBAL_DOMAIN_NAME => 'obm-global.virt';
+
 
 sub new {
     my $class = shift;
@@ -136,6 +138,9 @@ sub _getDomain {
     }
 
     while( my $domaindesc = $sth->fetchrow_hashref() ) {
+        if($domaindesc->{'domain_global'}) {
+            $domaindesc->{'domain_name'} = OBM_GLOBAL_DOMAIN_NAME;
+        }
         require OBM::Entities::obmDomain;
         my $domainEntity = OBM::Entities::obmDomain->new( $domaindesc );
 
@@ -181,7 +186,7 @@ sub _getParentDomain {
                                 domain_global,
                                 domain_label,
                                 domain_description,
-                                domain_name,
+                                \'OBM_GLOBAL_DOMAIN_NAME\',
                                 domain_alias,
                                 sid.serviceproperty_value as samba_sid
                         FROM '.$domainTable.'
