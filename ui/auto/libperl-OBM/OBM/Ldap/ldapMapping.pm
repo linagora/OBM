@@ -168,7 +168,7 @@ sub getCurrentRdn {
 
 sub getAllAttrsMapping {
     my $self = shift;
-    my( $entity, $exception ) = @_;
+    my( $entity, $exception, $withoutRdn ) = @_;
     my $entityType = ref($entity);
 
     if( !defined($self->{'xml'}->{'entity'}->{$entityType}) ) {
@@ -190,6 +190,10 @@ sub getAllAttrsMapping {
     for( my $i=0; $i<=$#{$ldapEntityDesc->{'map'}}; $i++ ) {
         my $map = $ldapEntityDesc->{'map'}->[$i];
         my $desc = lc($map->{'desc'}->{'name'});
+
+        if($withoutRdn && ($map->{'ldap'}->{'name'} eq $ldapEntityDesc->{'rdn'}->{'ldap'}->{'name'})) {
+            next;
+        }
         
         my $j = 0;
         while( ($j<=$#{$exception}) && ($desc ne lc($exception->[$j])) ) {

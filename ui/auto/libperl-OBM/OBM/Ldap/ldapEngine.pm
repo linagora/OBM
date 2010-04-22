@@ -287,7 +287,7 @@ sub _updateEntity {
     my( $entry ) = @_;
 
     if( ref($entry) ne 'Net::LDAP::Entry' ) {
-        $self->_log( 'entrée LDAP incorecte', 0 );
+        $self->_log( 'entrée LDAP incorrecte', 3 );
         return 1;
     }
 

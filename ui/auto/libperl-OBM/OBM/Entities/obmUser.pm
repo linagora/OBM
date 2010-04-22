@@ -107,6 +107,9 @@ sub _init {
         $userDesc->{'userobm_login_current'} = $userDesc->{'userobm_login_new'};
     }
 
+
+    $self->_log( '--->'.$userDesc->{'userobm_login_new'}, 0 );
+
     # Archive flag
     if( $userDesc->{'userobm_archive'} ) {
         $self->setArchive();
@@ -562,7 +565,8 @@ sub updateLdapEntry {
 
         my @exceptions;
         push( @exceptions, @{$self->{'ldapMappingScope'}->{'updateEnableSamba'}}, @{$self->{'ldapMappingScope'}->{'updateSambaPasswd'}}, @{$self->{'ldapMappingScope'}->{'updateUnixPasswd'}}, @{$self->{'ldapMappingScope'}->{'updateLinks'}});
-        my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self, \@exceptions );
+        # Don't update RDN attribute. Done by ldapEngine.
+        my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self, \@exceptions, 1 );
 
         for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
             if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
