@@ -174,7 +174,7 @@ sub DESTROY {
 sub disconnect {
     my $self = shift;
 
-    $self->_log( 'Disconnect from '.$self->getDesciptrion() );
+    $self->_log( 'Disconnect from '.$self->getDescription(), 4 );
     eval{ $self->{'ServerConn'} = undef; };
 }
 

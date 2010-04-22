@@ -19,7 +19,8 @@ use constant CONF_DIR => '/etc/obm-satellite';
 use constant LOG_DIR => '/var/log/obm-satellite';
 use constant SOCKET_TIMEOUT => 30;
 use constant SSL_PROTOCOL_VERSION => 'SSLv2/3';
-use constant SSL_CERT_DIR => '/etc/obm/certs';
+use constant SSL_OBM_CERT => '/etc/obm/certs/obm-cert.pem';
+use constant SSL_CA_CERT => '/var/lib/obm-ca/cacert.pem';
 use constant PID_DIR => '/var/run/obm';
 use constant HTTP_AUTHENTICATION_VALID_USER => 'obmsatelliterequest';
 use constant HTTP_AUTHENTICATION_LDAP_FILTER => '(&(uid=%u)(objectclass=obmSystemUser))';
@@ -127,9 +128,9 @@ sub _configureSSL {
     $self->{'server'}->{'socketConf'}->{'Timeout'} = SOCKET_TIMEOUT;
     $self->{'server'}->{'socketConf'}->{'Listen'} = 1;
     $self->{'server'}->{'socketConf'}->{'ReuseAddr'} = 'TRUE';
-    $self->{'server'}->{'socketConf'}->{'SSL_key_file'} = SSL_CERT_DIR.'/'.$externalUrl.'_signed.pem';
-    $self->{'server'}->{'socketConf'}->{'SSL_cert_file'} = SSL_CERT_DIR.'/'.$externalUrl.'_signed.pem';
-    $self->{'server'}->{'socketConf'}->{'SSL_ca_file'} = SSL_CERT_DIR.'/obm_cert.pem';
+    $self->{'server'}->{'socketConf'}->{'SSL_key_file'} = SSL_OBM_CERT;
+    $self->{'server'}->{'socketConf'}->{'SSL_cert_file'} = SSL_OBM_CERT;
+    $self->{'server'}->{'socketConf'}->{'SSL_ca_file'} = SSL_CA_CERT;
     $self->{'server'}->{'socketConf'}->{'SSL_version'} = SSL_PROTOCOL_VERSION;
 }
 

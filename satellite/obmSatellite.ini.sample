@@ -1,11 +1,11 @@
 [server]
 
 # SSL key file
-#ssl-key-file = /etc/obm/certs/[obm_conf.ini:external-url]_signed.pem
+#ssl-key-file = /etc/obm/certs/obm_cert.pem 
 # SSL cert file
-#ssl-cert-file = /etc/obm/certs/[obm_conf.ini:external-url]_signed.pem
+#ssl-cert-file = /etc/obm/certs/obm_cert.pem 
 # SSL CA cert
-#ssl-ca-file = /etc/obm/certs/obm_cert.pem
+#ssl-ca-file = /var/lib/obm-ca/cacert.pem 
 
 # LDAP Server description
 # Hostname
