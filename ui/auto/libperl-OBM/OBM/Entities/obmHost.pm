@@ -303,7 +303,8 @@ sub updateLdapEntry {
     if( $self->getUpdateEntity() ) {
         my @exceptions;
         push( @exceptions, @{$self->{'ldapMappingScope'}->{'updateLinks'}}, @{$self->{'ldapMappingScope'}->{'updateSambaPasswd'}} );
-        my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self, \@exceptions );
+        # Don't update RDN attribute. Done by ldapEngine.
+        my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self, \@exceptions, 1 );
 
         for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
             if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
