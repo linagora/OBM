@@ -79,7 +79,11 @@ sub next {
             next;
         }else {
             if( !$self->_loadCurrentEntityCategories() ) {
-                $self->_log( 'problème au chargement des informations complémentaires de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
+                $self->_log( 'problème au chargement des informations de catégories de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
+                next;
+            }
+            if( !$self->_loadCurrentEntityServiceProperty() ) {
+                $self->_log( 'problème au chargement des informations des propriétés de service de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
                 next;
             }
 
@@ -177,7 +181,7 @@ sub _loadEntities {
 sub _loadCurrentEntityCategories {
     my $self = shift;
 
-    $self->_log( 'chargement des informations complémentaires de l\'entité '.$self->{'currentEntity'}->getDescription(), 3 );
+    $self->_log( 'chargement des informations de catégories de l\'entité '.$self->{'currentEntity'}->getDescription(), 3 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -215,7 +219,50 @@ sub _loadCurrentEntityCategories {
         $entityCategories{$key} = \@keys;
     }
 
-    return $self->{'currentEntity'}->setCategories(\%entityCategories);
+    return $self->{'currentEntity'}->setExtraDescription(\%entityCategories);
+}
+
+
+sub _loadCurrentEntityServiceProperty {
+    my $self = shift;
+
+    $self->_log( 'chargement des propriétés de services de l\'entité '.$self->{'currentEntity'}->getDescription(), 3 );
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connexion à la base de données impossible', 1 );
+        return 0;
+    }
+
+    my $tablePrefix = '';
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
+        $tablePrefix = 'P_';
+    }
+
+    my $query = 'SELECT serviceproperty_service,
+                        serviceproperty_property,
+                        serviceproperty_value
+                 FROM '.$tablePrefix.'ServiceProperty
+                 INNER JOIN '.$tablePrefix.'HostEntity ON hostentity_entity_id=serviceproperty_entity_id
+                 WHERE hostentity_host_id='.$self->{'currentEntity'}->getId();
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return 0;
+    }
+
+    my %entityServiceProperties;
+    while( my($servicePropertyPrefix, $servicePropertyName, $servicePropertyValue) = $queryResult->fetchrow_array() ) {
+        $entityServiceProperties{$servicePropertyPrefix.'_'.$servicePropertyName}->{$servicePropertyValue} = 1;
+    }
+
+    while( my($key, $values) = each(%entityServiceProperties) ) {
+        my @keys = keys(%{$values});
+        $entityServiceProperties{$key} = \@keys;
+    }
+
+    return $self->{'currentEntity'}->setExtraDescription(\%entityServiceProperties);
 }
 
 

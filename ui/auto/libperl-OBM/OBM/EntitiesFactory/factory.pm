@@ -89,7 +89,13 @@ sub _loadEntities {
 # Load current entity extended descriptions (categories...)
 sub _loadCurrentEntityCategories {
     my $self = shift;
-    my( $entityDbName ) = @_;
+
+    return 1;
+}
+
+
+sub _loadCurrentEntityServiceProperty {
+    my $self = shift;
 
     return 1;
 }

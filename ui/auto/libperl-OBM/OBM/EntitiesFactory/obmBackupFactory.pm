@@ -1,4 +1,4 @@
-package OBM::EntitiesFactory::obmSettingsFactory;
+package OBM::EntitiesFactory::obmBackupFactory;
 
 $VERSION = '1.0';
 
@@ -64,9 +64,9 @@ sub next {
         }
     }
 
-    while( defined($self->{'entitiesDescList'}) && (my $obmSettingsDesc = $self->{'entitiesDescList'}->fetchall_arrayref({})) ) {
-        require OBM::Entities::obmObmSettings;
-        if( $self->{'currentEntity'} = OBM::Entities::obmObmSettings->new( $self->{'parentDomain'}, $obmSettingsDesc ) ) {
+    while( defined($self->{'entitiesDescList'}) && (my $obmBackupDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
+        require OBM::Entities::obmObmBackup;
+        if( $self->{'currentEntity'} = OBM::Entities::obmObmBackup->new( $self->{'parentDomain'}, $obmBackupDesc ) ) {
             $self->_log( 'mise à jour de l\'entité et des liens, '.$self->{'currentEntity'}->getDescription(), 3 );
             $self->{'currentEntity'}->setUpdateEntity();
             $self->{'currentEntity'}->setUpdateLinks();
@@ -85,7 +85,7 @@ sub next {
 sub _loadEntities {
     my $self = shift;
 
-    $self->_log( 'chargement de la configuration OBM du domaine '.$self->{'parentDomain'}->getDescription().'\'', 3 );
+    $self->_log( 'chargement de la description du service backup du domaine '.$self->{'parentDomain'}->getDescription().'\'', 3 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -95,14 +95,22 @@ sub _loadEntities {
         return 1;
     }
 
-    my $query = 'SELECT \'lang\' as \'setting\',
-                        userobmpref_value as \'value\'
-                 FROM UserObmPref
-                 WHERE userobmpref_user_id is null
-                    AND userobmpref_option=\'set_lang\'';
+    my $tablePrefix = '';
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
+        $tablePrefix = 'P_';
+    }
+
+    my $query = 'SELECT host_id,
+                        host_name,
+                        host_ip
+                 FROM '.$tablePrefix.'Host
+                 INNER JOIN '.$tablePrefix.'DomainEntity ON domainentity_domain_id='.$self->{'domainId'}.'
+                 INNER JOIN '.$tablePrefix.'ServiceProperty ON serviceproperty_entity_id=domainentity_entity_id
+                 WHERE host_id=serviceproperty_value
+                    AND serviceproperty_service=\'backup\'';
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'entitiesDescList'} )) ) {
-        $self->_log( 'chargement de la configuration OBM depuis la BD impossible', 1 );
+        $self->_log( 'chargement de la description du service backup depuis la BD impossible', 1 );
         return 1;
     }
 

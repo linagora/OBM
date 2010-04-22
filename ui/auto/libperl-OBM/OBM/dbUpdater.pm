@@ -146,6 +146,20 @@ sub _delete {
             last SWITCH;
         }
 
+        if( ref($self->{'entity'}) eq 'OBM::Entities::obmObmBackup' ) {
+            require OBM::DbUpdater::obmBackupUpdater;
+            my $obmBackupUpdater;
+            if( !($obmBackupUpdater = OBM::DbUpdater::obmBackupUpdater->new()) ) {
+                $returnCode = 1;
+                last SWITCH;
+            }
+
+            $self->_log( 'suppression BD '.$self->{'entity'}->getDescription(), 3 );
+            $returnCode = $obmBackupUpdater->delete( $self->{'entity'} );
+
+            last SWITCH;
+        }
+
         if( ref($self->{'entity'}) eq 'OBM::Entities::obmHost' ) {
             require OBM::DbUpdater::hostUpdater;
             my $hostUpdater;
@@ -252,6 +266,20 @@ sub _update {
 
             $self->_log( 'mise à jour BD '.$self->{'entity'}->getDescription(), 3);
             $returnCode = $obmSettingsUpdater->update( $self->{'entity'} );
+
+            last SWITCH;
+        }
+
+        if( ref($self->{'entity'}) eq 'OBM::Entities::obmObmBackup' ) {
+            require OBM::DbUpdater::obmBackupUpdater;
+            my $obmBackupUpdater;
+            if( !($obmBackupUpdater = OBM::DbUpdater::obmBackupUpdater->new()) ) {
+                $returnCode = 1;
+                last SWITCH;
+            }
+
+            $self->_log( 'mise à jour BD '.$self->{'entity'}->getDescription(), 3);
+            $returnCode = $obmBackupUpdater->update( $self->{'entity'} );
 
             last SWITCH;
         }

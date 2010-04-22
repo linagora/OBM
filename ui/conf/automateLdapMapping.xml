@@ -324,6 +324,18 @@
             <ldap name='sambaNTPassword'/>
             <desc name='host_nt_passwd'/>
         </map>
+        <map>
+            <ldap name='ftpLogin'/>
+            <desc name='backup_ftp_login'/>
+        </map>
+        <map>
+            <ldap name='ftpPassword'/>
+            <desc name='backup_ftp_password'/>
+        </map>
+        <map>
+            <ldap name='ftpRoot'/>
+            <desc name='backup_ftp_root'/>
+        </map>
     </entity>
     <entity name='OBM::Entities::obmMailshare'>
         <objectclass name='obmMailShare'/>

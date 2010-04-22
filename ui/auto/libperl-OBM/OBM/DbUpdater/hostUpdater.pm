@@ -113,6 +113,26 @@ sub update {
             $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
             return 1;
         }
+
+        $query = 'INSERT INTO P_ServiceProperty
+                    (   serviceproperty_id,
+                        serviceproperty_service,
+                        serviceproperty_property,
+                        serviceproperty_entity_id,
+                        serviceproperty_value
+                    ) SELECT    serviceproperty_id,
+                                serviceproperty_service,
+                                serviceproperty_property,
+                                serviceproperty_entity_id,
+                                serviceproperty_value
+                      FROM ServiceProperty
+                      WHERE serviceproperty_entity_id=(SELECT hostentity_entity_id
+                                                    FROM HostEntity
+                                                    WHERE hostentity_host_id = '.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
+            return 1;
+        }
     }
 
     if( !$entity->getDelete() && $entity->getUpdateLinks() ) {
@@ -186,6 +206,15 @@ sub _delete {
     if( $entity->getDelete() || $entity->getUpdateEntity() ) {
         my $query = 'DELETE FROM P_CategoryLink
                     WHERE categorylink_entity_id=(SELECT hostentity_entity_id
+                                                    FROM HostEntity
+                                                    WHERE hostentity_host_id = '.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );
+            return 1;
+        }
+
+        $query = 'DELETE FROM P_ServiceProperty
+                    WHERE serviceproperty_entity_id=(SELECT hostentity_entity_id
                                                     FROM HostEntity
                                                     WHERE hostentity_host_id = '.$entity->getId().')';
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {

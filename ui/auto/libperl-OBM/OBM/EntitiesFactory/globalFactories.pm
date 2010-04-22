@@ -298,7 +298,15 @@ sub _initUpdateFactory {
         }
 
         $entitiesFactory->enqueueFactory( $entityFactory );
-    }
+
+        require OBM::EntitiesFactory::obmBackupFactory;
+        if( !($entityFactory = OBM::EntitiesFactory::obmBackupFactory->new( 'UPDATE_ALL', $entitiesFactory->{'domain'} )) ) {
+            $self->_log( 'problème au chargement de la factory du service backup d\'OBM', 1 );
+            return 1;
+        }
+
+        $entitiesFactory->enqueueFactory( $entityFactory );
+}
 
     require OBM::EntitiesFactory::hostFactory;
     if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( 'UPDATE_ALL', $entitiesFactory->{'domain'} )) ) {

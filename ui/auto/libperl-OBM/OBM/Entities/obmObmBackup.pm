@@ -1,4 +1,4 @@
-package OBM::Entities::obmObmSettings;
+package OBM::Entities::obmObmBackup;
 
 $VERSION = '1.0';
 
@@ -13,13 +13,13 @@ use strict;
 
 use OBM::Parameters::common;
 
-use constant LDAPDN => 'obmSettings';
+use constant LDAPDN => 'obmBackup';
 
 
 # Needed
 sub new {
     my $class = shift;
-    my( $parent, $obmSettingsDesc ) = @_;
+    my( $parent, $obmBackupDesc ) = @_;
 
     my $self = bless { }, $class;
 
@@ -29,12 +29,12 @@ sub new {
     }
     $self->setParent( $parent );
 
-    if( $self->_init( $obmSettingsDesc ) ) {
-        $self->_log( 'problème lors de l\'initialisation de la configuration des serveurs de courriers', 1 );
+    if( $self->_init( $obmBackupDesc ) ) {
+        $self->_log( 'problème lors de l\'initialisation de la configuration du service backup', 1 );
         return undef;
     }
 
-    $self->{'objectclass'} = [ 'obmSettings' ];
+    $self->{'objectclass'} = [ 'obmBackup' ];
 
     return $self;
 }
@@ -53,22 +53,14 @@ sub DESTROY {
 # Needed
 sub _init {
     my $self = shift;
-    my( $obmSettingsDesc ) = @_;
+    my( $obmBackupDesc ) = @_;
 
-    if( !defined($obmSettingsDesc) || (ref($obmSettingsDesc) ne 'ARRAY') ) {
-        $self->_log( 'description des serveurs de courriers incorrect', 1 );
+    if( !defined($obmBackupDesc) || (ref($obmBackupDesc) ne 'HASH') ) {
+        $self->_log( 'description du service de backup incorrecte', 1 );
         return 1;
     }
 
-    for( my $i=0; $i<=$#{$obmSettingsDesc}; $i++ ) {
-        if( $obmSettingsDesc->[$i]->{'setting'} eq 'lang' ) {
-            $self->{'entityDesc'}->{'obmLang'} = $obmSettingsDesc->[$i]->{'value'};
-        }
-    }
-
-    if( !$self->{'entityDesc'}->{'obmLang'} ) {
-        $self->{'entityDesc'}->{'obmLang'} = 'en';
-    }
+    $self->{'entityDesc'}->{'ftpHost'} = $obmBackupDesc->{'host_name'};
 
     return 0;
 }
@@ -203,8 +195,8 @@ sub createLdapEntry {
     );
 
     # OBM domain language
-    if( $self->{'entityDesc'}->{'obmLang'} ) {
-        $entry->add( obmLang => $self->{'entityDesc'}->{'obmLang'} );
+    if( $self->{'entityDesc'}->{'ftpHost'} ) {
+        $entry->add( ftpHost => $self->{'entityDesc'}->{'ftpHost'} );
     }
 
     # OBM domain
@@ -248,7 +240,7 @@ sub updateLdapEntry {
         }
 
         # OBM domain language
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'obmLang'}, $entry, 'obmLang' ) ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'ftpHost'}, $entry, 'ftpHost' ) ) {
             $update = 1;
         }
 

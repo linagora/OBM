@@ -568,35 +568,35 @@ sub smtpInUpdateMap {
 }
 
 
-# Needed to add entity categories to the entity description.
-# Categories can be used on ldapMapping using it's category name.
-# WARNING: if category is multi-valued, check that corresponding LDAP
+# Needed to add entity extra description to the entity description.
+# Extra description can be used on ldapMapping using it's category name.
+# WARNING: if extra description is multi-valued, check that corresponding LDAP
 # attribute is multi-valued in ldapMapping XML configuration file too !
 #
-#  - entityCategories : hash reference. Keys are categories name, values is
-#    a category values array reference
-sub setCategories {
+#  - extraDescription : hash reference. Keys are extra description name, values is
+#    an extra description values array reference
+sub setExtraDescription {
     my $self = shift;
-    my( $entityCategories ) = @_;
+    my( $extraDescription ) = @_;
 
-    if( ref($entityCategories) ne 'HASH' ) {
-        $self->_log( 'Parametre \'entityCategories\' invalide. Doit être une référence à un HASH', 4 );
+    if( ref($extraDescription) ne 'HASH' ) {
+        $self->_log( 'Parametre \'extraDescription\' invalide. Doit être une référence à un HASH', 4 );
         return 0;
     }
 
-    while( my($categoryName, $categoryValues) = each(%{$entityCategories}) ) {
-        if( ref($categoryValues) ne 'ARRAY' ) {
-            $self->_log( 'Valeurs incorrectes pour la catégorie \''.$categoryName.'\'', 2 );
+    while( my($extraDescriptionName, $extraDescriptionValues) = each(%{$extraDescription}) ) {
+        if( ref($extraDescriptionValues) ne 'ARRAY' ) {
+            $self->_log( 'Valeurs incorrectes pour la catégorie \''.$extraDescriptionName.'\'', 2 );
             next;
         }
 
-        if( exists($self->{'entityDesc'}->{$categoryName}) ) {
-            $self->_log( 'Le nom de la catégorie \''.$categoryName.'\' est déjà utilisé dans la description de '.$self->getDescription(), 2 );
+        if( exists($self->{'entityDesc'}->{$extraDescriptionName}) ) {
+            $self->_log( 'Le nom de la catégorie \''.$extraDescriptionName.'\' est déjà utilisé dans la description de '.$self->getDescription(), 2 );
             next;
         }
 
-        $self->_log( 'Definition de la catégorie \''.$categoryName.'\'', 5 );
-        $self->{'entityDesc'}->{$categoryName} = $categoryValues;
+        $self->_log( 'Definition de la catégorie \''.$extraDescriptionName.'\'', 5 );
+        $self->{'entityDesc'}->{$extraDescriptionName} = $extraDescriptionValues;
     }
 
     return 1;

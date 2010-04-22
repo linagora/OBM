@@ -159,6 +159,34 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.3
     MUST ( cn )
     MAY ( mailBox $ mailBoxServer $ mail $ description $ mailAlias $ mailAccess $ obmDomain ) )
 
+# Attribute: ftpLogin
+# FTP server login
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.27
+    NAME 'ftpLogin'
+    DESC 'FTP server login account'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Attribut: ftpPassword
+# FTP server password
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.28
+    NAME 'ftpPassword'
+    DESC 'FTP server password account'
+    EQUALITY octetStringMatch
+    SINGLE-VALUE
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{128} )
+
+# Attribut: ftpRoot
+# FTP server directory which is use as FTP root
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.29
+    NAME 'ftpRoot'
+    DESC 'FTP server directory which is use as FTP root'
+    EQUALITY caseExactIA5Match
+    SINGLE-VALUE
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
 # Object: obmHost
 # Extend OBM host LDAP description
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
@@ -166,7 +194,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
     DESC 'OBM special hosts description'
     SUP top AUXILIARY
     MUST cn
-    MAY ( obmDomain $ ipHostNumber ) )
+    MAY ( obmDomain $ ipHostNumber $ ftpLogin $ ftpPassword $ ftpRoot ) )
 
 # Attribute: myDestination
 # Mail domain to an OBM domain
@@ -313,8 +341,8 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.8
     SUP top AUXILIARY
     MAY ( obmDomain $ obmUID $ URL $ workUrl $ company $ mailAlias ) )
 
-# Object:
-# OBM settings
+# Object: obmSettings
+# Used to store some OBM settings
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.9
     NAME 'obmSettings'
     DESC 'OBM settings'
@@ -329,13 +357,32 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.26
     DESC 'Last update time'
     EQUALITY caseIgnoreMatch
     SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{25} )
 
 # Object: obmContactService
-# Mail servers configuration options to an OBM domain
+# OBM contact service configuration
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.10
     NAME 'obmContactService'
-    DESC 'LDAP public contacts publication configuration'
+    DESC 'OBM LDAP public contacts publication configuration'
     SUP top STRUCTURAL
     MUST ( cn )
     MAY ( lastUpdate $ obmDomain ) )
+
+# Attribute: ftpHost
+# FTP servers to an OBM domain
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.30 
+        NAME 'ftpHost'
+        DESC 'FTP Hosts for domain'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Object: obmBackupService
+# OBM backup service configuration
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.11
+    NAME 'obmBackup'
+    DESC 'OBM backup service configuration'
+    SUP top STRUCTURAL
+    MUST ( cn )
+    MAY ( ftpHost $ obmDomain ) )

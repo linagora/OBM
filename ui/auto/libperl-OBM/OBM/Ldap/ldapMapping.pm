@@ -62,19 +62,10 @@ sub getObjectClass {
         return undef;
     }
 
-    # lower case keys
-    while( my( $key, $values ) = each(%{$objectClassDesc}) ) {
-        my $lcKey = lc($key);
-        if( $lcKey ne $key ) {
-            $objectClassDesc->{$lcKey} = $values;
-            delete($objectClassDesc->{$key});
-        }
-    }
-
     # add objectclass from LDAP entry
     if( defined($currentObjectClass) && (ref($currentObjectClass) eq 'ARRAY') ) {
         for( my $i=0; $i<=$#{$currentObjectClass}; $i++ ) {
-            if( !exists($objectClassDesc->{lc($currentObjectClass->[$i])}) ) {
+            if( !exists($objectClassDesc->{$currentObjectClass->[$i]}) ) {
                 $objectClassDesc->{$currentObjectClass->[$i]} = undef;
             }
         }
