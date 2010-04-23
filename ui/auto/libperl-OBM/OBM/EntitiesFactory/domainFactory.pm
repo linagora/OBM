@@ -14,7 +14,7 @@ use strict;
 
 use OBM::Parameters::regexp;
 
-use constant OBM_GLOBAL_DOMAIN_NAME => 'obm-global.virt';
+use constant OBM_GLOBAL_DOMAIN_NAME => 'global.virt';
 
 
 sub new {
