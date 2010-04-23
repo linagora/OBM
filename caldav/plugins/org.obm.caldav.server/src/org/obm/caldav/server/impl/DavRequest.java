@@ -41,16 +41,14 @@ public class DavRequest {
 	private String calendarName;
 	private HttpServletRequest req;
 
-	@SuppressWarnings("unchecked")
 	public DavRequest(HttpServletRequest req) throws CalDavException {
 		this.req = req;
-		Enumeration headerNames = req.getHeaderNames();
-		while (headerNames.hasMoreElements()) {
-			String hn = (String) headerNames.nextElement();
-			String val = req.getHeader(hn);
-			logger.info(hn + ": " + val);
-		}
-
+//		Enumeration headerNames = req.getHeaderNames();
+//		while (headerNames.hasMoreElements()) {
+//			String hn = (String) headerNames.nextElement();
+//			String val = req.getHeader(hn);
+//			logger.info(hn + ": " + val);
+//		}
 		initRequest();
 	}
 
