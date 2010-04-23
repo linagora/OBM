@@ -109,15 +109,15 @@ class Backup {
     $id = sql_parse_id($user_id, true);	
 
     $query = "SELECT
-        userobm_id as 'id',
-        userobm_login as 'login',
-        'user' as 'entity',
-        domain_name as 'realm',
-        ms.host_ip as 'host'
+        userobm_id as id,
+        userobm_login as login,
+        'user' as entity,
+        domain_name as realm,
+        ms.host_ip as host
       FROM UserObm
       LEFT JOIN Domain on userobm_domain_id=domain_id
       LEFT JOIN Host ms on userobm_mail_server_id=ms.host_id
-      WHERE userobm_id $id 
+      WHERE userobm_id $id
         $multidomain";
     display_debug_msg($query, $GLOBALS['cdg_sql'], 'Backup::userDetails()');
     $obm_q->query($query);
@@ -178,11 +178,11 @@ class Backup {
     $id = sql_parse_id($mailshare_id, true);	
 
     $query = "SELECT
-        mailshare_id as 'id',
-        mailshare_name as 'login',
-        'mailshare' as 'entity',
-        domain_name as 'realm',
-        ms.host_ip as 'host'
+        mailshare_id as id,
+        mailshare_name as login,
+        'mailshare' as entity,
+        domain_name as realm,
+        ms.host_ip as host
       FROM MailShare
       LEFT JOIN Domain on mailshare_domain_id=domain_id
       LEFT JOIN Host ms on mailshare_mail_server_id=ms.host_id
