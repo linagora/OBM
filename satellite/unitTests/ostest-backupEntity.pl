@@ -336,6 +336,41 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
             $errorCode++;
         }
     }
+
+
+    if( $parameters{'test-retrieve-backup'} ) {
+        print 'Retrieve backup for entity \''.$entityType.'\', login \''.$entityLogin.'\' from backup FTP server: ';
+        $path = '/retrievebackup/'.$entityType.'/'.$entityLogin;
+
+        my $xml = '<obmSatellite name="unitTest">
+<options>';
+        if($parameters{'send-report'}) {
+            my @recipients = split(/,/, $parameters{'send-report'});
+            $xml .= '
+<report sendMail="true">';
+    
+            for(my $i=0; $i<=$#recipients; $i++) {
+                $xml .= '
+<email>'.$recipients[$i].'</email>';
+            }
+            $xml .= '</report>';
+        }
+    
+        $xml .= '</options></obmSatellite>';
+
+        if( !$client->post( $parameters{'os-server'},
+                            $path,
+                            $xml ) ) {
+            print '[OK]'."\n";
+        }else {
+            print '[KO]'."\n";
+            $errorCode++;
+        }
+
+        my $response = $client->getResponse();
+        print $response->content()."\n";
+    }
+    
 }
 
 

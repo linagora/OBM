@@ -28,3 +28,5 @@ test-restore-ics = true
 test-restore-vcard = true
 # Resore mailbox only
 test-restore-mailbox = true
+# Retrieve backup from backup FTP server
+test-retrieve-backup = false

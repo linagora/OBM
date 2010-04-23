@@ -180,7 +180,8 @@ sub _getStringDate {
 sub getBackupNamePrefix {
     my $self = shift;
 
-    return $self->getEntityType().'_-_'.$self->getLogin().'_-_';
+    return
+    $self->getEntityType().'_-_'.$self->getLogin().'_-_'.$self->getRealm().'_-_';
 }
 
 

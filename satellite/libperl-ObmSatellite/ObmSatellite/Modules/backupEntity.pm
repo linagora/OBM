@@ -40,7 +40,7 @@ use constant BACKUP_FTP_TIMEOUT => 10;
 sub _setUri {
     my $self = shift;
 
-    return [ '/backupentity', '/restoreentity', '/availablebackup' ];
+    return [ '/backupentity', '/restoreentity', '/availablebackup', '/retrievebackup' ];
 }
 
 
@@ -136,7 +136,7 @@ sub _putMethod {
             content => [ 'Backup '.$entity->getLogin().'@'.$entity->getRealm().' successfully' ]
             } );
 
-        $self->_pushFtp($entity, $xmlContent->{'options'}, $response);
+        $self->_pushFtpBackup($entity, $xmlContent->{'options'}, $response);
     }else {
         $self->_log( 'Fail to backup '.$entity->getLogin().'@'.$entity->getRealm(), 1 );
     }
@@ -207,6 +207,24 @@ sub _postMethod {
     my $self = shift;
     my( $requestUri, $requestBody ) = @_;
 
+    if($requestUri =~ /^\/restoreentity/) {
+        return $self->_postMethodRestoreEntity($requestUri, $requestBody);
+    }
+
+    if($requestUri =~ /^\/retrievebackup/) {
+        return $self->_postMethodRetrieveBackup($requestUri, $requestBody);
+    }
+
+    return $self->_response( RC_BAD_REQUEST, {
+        content => [ 'Invalid URI '.$requestUri ]
+        } );
+}
+
+
+sub _postMethodRestoreEntity {
+    my $self = shift;
+    my($requestUri, $requestBody) = @_;
+
     if( $requestUri !~ /^\/restoreentity\/(user|mailshare)\/([^\/]+)(\/(mailbox|contact|calendar)){0,1}$/ ) {
         return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Invalid URI '.$requestUri ],
@@ -269,6 +287,65 @@ sub _postMethod {
 
     $self->_removeTmpArchive( $entity );
     $self->_sendMailRestoreReport($entity, $xmlContent->{'options'}, $response);
+
+    return $response;
+}
+
+
+sub _postMethodRetrieveBackup {
+    my $self = shift;
+    my($requestUri, $requestBody) = @_;
+
+    if( $requestUri !~ /^\/retrievebackup\/(user|mailshare)\/([^\/]+)$/ ) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid URI '.$requestUri ],
+            help => [ $self->getModuleName().' URI must be : /retrievebackup/<entity>/<login>@<realm>[/[mailbox|contact|calendar]]' ]
+            } );
+    }
+
+    my $entity = $1;
+
+    SWITCH: {
+        if( $entity eq 'user' ) {
+            $entity = ObmSatellite::Modules::BackupEntity::user->new( $2 );
+            last SWITCH;
+        }
+
+        if( $entity eq 'mailshare' ) {
+            $entity = ObmSatellite::Modules::BackupEntity::mailshare->new( $2 );
+            last SWITCH;
+        }
+
+        return $self->_response( RC_NOT_FOUND, {
+            content => [ 'Unknow entity \''.$entity.'\'' ]
+            } );
+    }
+
+    if( !defined($entity) ) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [ 'Invalid login '.$requestUri ],
+            help => [ $self->getModuleName().' URI must be : /retrievebackup/'.$entity.'/<login>@<realm>' ]
+            } );
+    }
+
+    if( my $result = $self->_isEntityExist( $entity ) ) {
+        return $result;
+    }
+
+    my $xmlContent = $self->_xmlContent($requestBody, ForceArray => ['email']);
+
+    if( my $return = $self->_setBackupRoot( $entity ) ) {
+        return $return;
+    }
+
+    my $response = $self->_response(RC_OK);
+
+    $self->_getFtpBackup($entity, $response);
+
+    my $pushFtp = $response->getContentValue('pushFtp');
+    if($pushFtp->{'success'} eq 'false') {
+        $response->setStatus(RC_INTERNAL_SERVER_ERROR,);
+    }
 
     return $response;
 }
@@ -1230,7 +1307,7 @@ sub _sendMailReport {
 }
 
 
-sub _pushFtp {
+sub _pushFtpBackup {
     my $self = shift;
     my ($entity, $options, $response) = @_;
 
@@ -1247,6 +1324,9 @@ sub _pushFtp {
 
     # Getting FTP backup server name for entity's OBM domain
     my $ftpHostName = $self->_getFtpBackupHost($entity, $response);
+    if(!defined($ftpHostName)) {
+        return 1;
+    }
 
     # Getting FTP backup host informations
     my $ftpConn = $self->_getFtpBackupConn($entity, $response, $ftpHostName);
@@ -1277,6 +1357,7 @@ sub _pushFtp {
             success => 'true'
         }
     });
+
     return 0;
 }
 
@@ -1469,6 +1550,84 @@ sub _getFtpConn {
     }
 
     return $ftpConn;
+}
+
+
+sub _getFtpBackup {
+    my $self = shift;
+    my($entity, $response) = @_;
+
+    # Getting FTP backup server name for entity's OBM domain
+    my $ftpHostName = $self->_getFtpBackupHost($entity, $response);
+    if(!defined($ftpHostName)) {
+        return 1;
+    }
+
+    # Getting FTP backup host informations
+    my $ftpConn = $self->_getFtpBackupConn($entity, $response, $ftpHostName);
+    if(!defined($ftpConn)) {
+        return 1;
+    }
+
+    $self->_log('Downloading '.$entity->getLogin().'@'.$entity->getRealm().' backup file from backup FTP server \''.$ftpHostName.'\'', 3);
+    my $fileList = $ftpConn->ls( $entity->getBackupNamePrefix().'*' );
+    if( !$fileList || (ref($fileList) ne 'ARRAY') ) {
+        my $errorMsg = 'Downloading '.$entity->getLogin().'@'.$entity->getRealm().' backup file from backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+        $self->_log($errorMsg, 1);
+        $response->setExtraContent({
+            pushFtp => {
+                content => $errorMsg,
+                success => 'false'
+            }
+        });
+        $ftpConn->quit();
+        return 1;
+    }
+
+    my $nbFailed = 0;
+    my @downloadMsgs;
+    for( my $i=0; $i<=$#{$fileList}; $i++ ) {
+        if(-f $entity->getBackupPath().'/'.$fileList->[$i]) {
+            my $errorMsg = 'Backup \''.$fileList->[$i].'\' already exist, skip download';
+            push(@downloadMsgs, $errorMsg);
+            next;
+        }
+
+        # Retrieve backup archive
+        my $error = $ftpConn->get( $fileList->[$i], $entity->getBackupPath().'/'.$fileList->[$i] );
+
+        my $errorMsg;
+        if(!$error) {
+            $errorMsg = 'Download \''.$fileList->[$i].'\' from backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+            $self->_log($errorMsg, 1);
+
+            $nbFailed++;
+        }else {
+            $errorMsg = 'Download \''.$fileList->[$i].'\' from backup FTP server \''.$ftpHostName.'\' success';
+            $self->_log($errorMsg, 4);
+        }
+
+        push(@downloadMsgs, $errorMsg);
+    }
+
+    $ftpConn->quit();
+    my $success = 'true';
+    if($nbFailed == $#downloadMsgs+1) {
+        $success = 'false';
+    }
+
+    $response->setExtraContent({
+        pushFtp => {
+            content => join("\n", @downloadMsgs),
+            success => $success
+        }
+    });
+
+    if($success eq 'false') {
+        return 1;
+    }
+
+    return 0;
 }
 
 
