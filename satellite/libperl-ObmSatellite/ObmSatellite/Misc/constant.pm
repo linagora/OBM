@@ -22,4 +22,4 @@ use constant TMP_DIR => '/var/tmp';
 
 use constant OBM_TAR_COMMAND => '/bin/tar';
 
-use constant OBM_GLOBAL_DOMAIN_NAME => 'obm-global.virt';
+use constant OBM_GLOBAL_DOMAIN_NAME => 'global.virt';
