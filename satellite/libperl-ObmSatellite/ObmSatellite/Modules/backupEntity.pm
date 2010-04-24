@@ -344,9 +344,17 @@ sub _postMethodRetrieveBackup {
 
     my $pushFtp = $response->getContentValue('pushFtp');
     if($pushFtp->{'success'} eq 'false') {
-        $response->setStatus(RC_INTERNAL_SERVER_ERROR,);
+        $response->setStatus(RC_INTERNAL_SERVER_ERROR);
+        $response->setExtraContent({
+            content => ['Fail to download '.$entity->getLogin().'@'.$entity->getRealm().' backup archive from backup FTP serveur']
+        });
+    }else {
+        $response->setExtraContent({
+            content => ['Download '.$entity->getLogin().'@'.$entity->getRealm().' backup archive from backup FTP serveur success']
+        });
     }
 
+    $self->_sendRetrieveReport($entity, $xmlContent->{'options'}, $response);
     return $response;
 }
 
@@ -1172,7 +1180,6 @@ sub _sendMailBackupReport {
     if( my $content = $response->getContentValue('content') ) {
         push( @{$mail->{'content'}}, @{$content} );
 
-        $self->_log('popoop');
         $content = $response->getContentValue('pushFtp');
         if(ref($content) eq 'HASH') {
             if($content->{'success'} eq 'true') {
@@ -1236,6 +1243,70 @@ sub _sendMailRestoreReport {
     $mail->{'content'} = [];
     if( my $content = $response->getContentValue('content') ) {
         push( @{$mail->{'content'}}, @{$content} );
+    }
+
+    return $self->_sendMailReport($mail, $entity, $options);
+}
+
+
+sub _sendRetrieveReport {
+    my $self = shift;
+    my( $entity, $options, $response ) = @_;
+
+    my $language = $self->_getDefaultObmLang($entity->getRealm());
+
+    my $mail = {};
+
+    my $title = 'Retrieve backup archives from FTP backup server report';
+    my $entityType = $entity->getEntityType();
+    my $success = eval {
+        if($response->isError()) {
+            return 'FAIL';
+        }
+
+        return 'SUCCESS';
+    };
+
+    SWITCH: {
+        if($language eq 'fr') {
+            $title = 'Rapport de récupération des archives depuis le serveur FTP';
+            $entityType = eval {
+                my $type = $entity->getEntityType();
+
+                if($type eq 'user') {
+                    return 'utilisateur';
+                }elsif($type eq 'mailshare') {
+                    return 'partage de messagerie';
+                }
+
+                return 'type inconnu';
+            };
+            $success = eval {
+                if($response->isError()) {
+                    return 'Échec';
+                }
+
+                return 'Succés';
+            };
+
+            last SWITCH;
+        }
+    }
+
+    $mail->{'subject'} = $title.' - '.$entityType.' '
+        .$entity->getLogin().'@'.$entity->getRealm().': '.$success;
+    $mail->{'content'} = [];
+    if( my $content = $response->getContentValue('content') ) {
+        push( @{$mail->{'content'}}, @{$content} );
+
+        $content = $response->getContentValue('pushFtp');
+        if(ref($content) eq 'HASH') {
+            if($content->{'success'} eq 'true') {
+                push(@{$mail->{'content'}}, 'FTP download: success'."\n".$content->{'content'});
+            }else {
+                push(@{$mail->{'content'}}, 'FTP download: fail - '.$content->{'content'});
+            }
+        }
     }
 
     return $self->_sendMailReport($mail, $entity, $options);
