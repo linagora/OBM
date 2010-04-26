@@ -182,10 +182,11 @@ access to filter=(hiddenUser=TRUE)
     by anonymous auth
     by self write
     by * none
-# END Common ACLs
 
+access to filter=(objectClass=obmHost) attrs=ftpPassword
+    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
+    by * none
 
-# BEGIN without SAMBA ACLs
 # The userPassword by default can be changed
 # by the entry owning it if they are authenticated.
 # Others should not be able to see it, except the
@@ -194,11 +195,10 @@ access to dn.sub="ou=sysusers,dc=local" attrs=userPassword,shadowLastChange
     by dn="uid=obmsatellite,ou=sysusers,dc=local" read
     by anonymous auth
     by * none
+# END Common ACLs
 
-access to filter=(objectClass=obmHost) attrs=ftpPassword
-    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
-    by * none
 
+# BEGIN without SAMBA ACLs
 access to attrs=userPassword,shadowLastChange
 	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
     by anonymous auth
@@ -239,11 +239,6 @@ access to *
 ## by the entry owning it if they are authenticated.
 ## Others should not be able to see it, except the
 ## admin entry below
-#access to dn.sub="ou=sysusers,dc=local" attrs=userPassword,shadowLastChange
-#    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
-#    by anonymous auth
-#    by * none
-#
 #access to attrs=userPassword,shadowLastChange
 #    by anonymous auth
 #    by self write
