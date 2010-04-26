@@ -3768,7 +3768,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $users_ids = $users_entity[ids];
   $jsid = $obm['uid'];
   if (isset($calendar[new_user_id][0])) $jsid = $calendar[new_user_id][0];
-  if (sizeof($users_entity) > 1) {
+  if (sizeof($users_ids) > 1) {
     $u = array();
     foreach($users_ids as $id) {
       $name = phpStringToJsString($users_entity["entity"][$id]["label"]);
