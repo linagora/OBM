@@ -21,7 +21,7 @@
  * Class used to authenticate with obm-satellite
  */
 class Backup {
-  protected $auth;
+  static protected $auth;
   protected $details;
 
   /**
@@ -29,10 +29,12 @@ class Backup {
    * @access public
    **/
   public function __construct($entity,$entity_id) {
-    try {
-      $this->auth = new SatelliteAuth();
-    } catch (Exception $e) {
-      throw new Exception($GLOBALS['l_err_obm_satellite_usersystem']);
+    if (!isset(Backup::$auth)) {
+      try {
+        Backup::$auth = new SatelliteAuth('obmsatelliterequest');
+      } catch (Exception $e) {
+        throw new Exception($GLOBALS['l_err_obm_satellite_usersystem']);
+      }
     }
     $detailsFunc = $entity.'Details';
     $this->$detailsFunc($entity_id);
@@ -44,7 +46,7 @@ class Backup {
    * return array
    */
   public function availableBackups() {
-    $query = new OBM_Satellite_AvailableBackup($this->auth, $this->details, array());
+    $query = new OBM_Satellite_AvailableBackup(Backup::$auth, $this->details, array());
     return $query->execute();
   }
 
@@ -62,7 +64,7 @@ class Backup {
     );
     $data = array_merge($this->$dataFunc(),$data,$options);
     try {
-      $query = new OBM_Satellite_BackupEntity($this->auth, $this->details, $data);
+      $query = new OBM_Satellite_BackupEntity(Backup::$auth, $this->details, $data);
       return $query->execute();
     } catch (Exception $e) {
       throw new Exception($GLOBALS['l_err_cant_backup'].' ('.$e->getMessage().')');
@@ -90,7 +92,7 @@ class Backup {
     );
     $data = array_merge($data,$options);
     try {
-      $query = new OBM_Satellite_RestoreEntity($this->auth, $url_args, $data);
+      $query = new OBM_Satellite_RestoreEntity(Backup::$auth, $url_args, $data);
       $this->$restoreFunc($query->execute(),$method);
     } catch (Exception $e) {
       throw new Exception($GLOBALS['l_err_cant_restore'].' ('.$e->getMessage().')');
@@ -238,6 +240,7 @@ class Backup {
     $document = $reader->getDocument();
     $writer = new Vcalendar_Writer_ICS();
     $writer->writeDocument($document);
+    $document->destroy();
     return $writer->buffer;
   }
 
@@ -264,6 +267,7 @@ class Backup {
     $document = $reader->getDocument();
     $writer = new Vcalendar_Writer_OBM(true);  
     $writer->writeDocument($document);
+    $document->destroy();
 
     $GLOBALS['obm']['uid'] = $remember_uid;
   }

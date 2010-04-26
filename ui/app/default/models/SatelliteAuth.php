@@ -26,10 +26,12 @@ class SatelliteAuth extends OBM_Satellite_ICredentials {
    * standard constructor
    * @access public
    **/
-  public function __construct() {
+  public function __construct($user='') {
     global $cdg_sql;
 
-    $user = 'obmsatelliterequest';
+    if (empty($user)) {
+      $user = 'obmsatelliterequest';
+    }
     $obm_q = new DB_OBM;
     $query = "SELECT usersystem_password as password FROM UserSystem WHERE usersystem_login='$user'";
     display_debug_msg($query, $cdg_sql, "SatelliteCredentials::__construct()");

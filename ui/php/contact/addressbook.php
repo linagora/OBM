@@ -265,7 +265,7 @@ class OBM_AddressBook implements OBM_ISearchable {
 
   public function toVcard($pattern='', $offset=0) {
     $vcards = array();
-    $pattern .= ' addressbookId:('.$this->id.')';
+    $pattern .= ' -is:archive addressbookId:('.$this->id.')';
     $contacts = OBM_Contact::search($pattern, $offset);
     if (is_array($contacts)) {
       foreach ($contacts as $c) {
