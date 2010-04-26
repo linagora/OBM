@@ -195,6 +195,10 @@ access to dn.sub="ou=sysusers,dc=local" attrs=userPassword,shadowLastChange
     by anonymous auth
     by * none
 
+access to filter=(objectClass=obmHost) attrs=ftpPassword
+    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
+    by * none
+
 access to attrs=userPassword,shadowLastChange
 	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
     by anonymous auth
