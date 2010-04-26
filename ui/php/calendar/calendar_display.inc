@@ -3982,7 +3982,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $l_owner
     </th>
     <td>
-    <select name=\"sel_owner\">";  
+    <select name='sel_owner' id='sel_owner'>";  
   foreach ($possible_owners as $o) {
     $block_owner .= "
       <option value=\"$o[id]\" ".($o['id']==$owner ? "selected=\"selected\"" : "").">$o[label]</option>";
@@ -5491,6 +5491,8 @@ function dis_calendar_free_interval($current_view, $calendar) {
         <input type='hidden' name='time_begin' id='time_begin' value='' />
         <input type='hidden' name='min_begin' id='min_begin' value='' />
         <input type='hidden' name='new_meeting' value='1'>
+        <input type='hidden' id='fb_title' name='tf_title' value=''>
+        <input type='hidden' id='fb_owner' name='owner' value=''>
         <input type='hidden' name='template_id' value='$_POST[template_id]'>
         $form_entities
         <input type='hidden' id='freebusy_action' name='action' value='new'>

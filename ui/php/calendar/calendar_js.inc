@@ -262,6 +262,8 @@ function display_freebusy(data, duration, readOnly) {
     onComplete: function() {
       obm.popup.show('fbcContainer');
       obm.calendarFreeBusy.buildFreeBusyPanel(duration, readOnly);      
+      if (\$chk($('tf_title'))) $('fb_title').value = $('tf_title').value;
+      if (\$chk($('sel_owner'))) $('fb_owner').value = $('sel_owner').value;
       $('spinner').hide();
     }
   }).get(\$merge({ajax : 1, action : 'perform_meeting'}, data));   
