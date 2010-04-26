@@ -5095,16 +5095,16 @@ function dis_calendar_free_interval($current_view, $calendar) {
   $entities['user'] = is_array($calendar['sel_user_id']) ? $calendar['sel_user_id'] : array();
   $entities['group'] = $params['sel_group_id'];
   $entities['user'] = run_query_calendar_merge_groups($calendar['group_id'],$entities['user']);
-  if (!is_array($entities['user']) || count($entities['user'])==0)
-    $entities['user'] = array($obm['uid']);
-
   $entities['resource'] = is_array($calendar['sel_resource_id']) ? $calendar['sel_resource_id'] : array();
+  if ((!is_array($entities['user']) || count($entities['user'])==0) && (!is_array($entities['resource']) || count($entities['resource']) == 0) ) $entities['user'] = array($GLOBALS['obm']['uid']);
+
   $ret = get_calendar_entity_label($entities);
   $ret['resourcegroup'] = run_query_resource_resourcegroup($calendar['sel_resource_group_id']);
   $entity_store = store_calendar_entities($ret);
   calendar_events_model($date,$end, $entity_store, array('ACCEPTED', 'NEEDS-ACTION'), '', false, null, 'OPAQUE');
   if (!is_array($entity_store['resource'])) $entity_store['resource'] = array();
   if (!is_array($entity_store['resourcegroup'])) $entity_store['resourcegroup'] = array();
+
   $entities_resources = array_merge($entity_store['resource'], $entity_store['resourcegroup']);
   $user_readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read'); 
   $user_readEntities_id = array_keys($user_readEntities);
@@ -5115,7 +5115,6 @@ function dis_calendar_free_interval($current_view, $calendar) {
   $res_readEntities_id = array_keys($res_readEntities);
   $res_accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'resource', 'access'); 
   $res_accessEntities_id = array_keys($res_accessEntities);
-
 
   $contacts = array();
   if (is_array($calendar['contact_id'])) {
@@ -5277,14 +5276,16 @@ function dis_calendar_free_interval($current_view, $calendar) {
   }
 
   // Attendees panel
-  foreach($entity_store[user] as $user) {
-    $id = $user[id];
-    $name = $user[name];
-    $attendees .= "<div class='elementRow'>
-      <img src='$GLOBALS[ico_user]'/>
-      <img src='$GLOBALS[ico_delete]' class='readable' onclick='obm.calendarFreeBusy.removeAttendee(\"data-user-$id\")'/>
-      $name
-      </div>";
+  if (is_array($entity_store[user])) {
+    foreach($entity_store[user] as $user) {
+      $id = $user[id];
+      $name = $user[name];
+      $attendees .= "<div class='elementRow'>
+        <img src='$GLOBALS[ico_user]'/>
+        <img src='$GLOBALS[ico_delete]' class='readable' onclick='obm.calendarFreeBusy.removeAttendee(\"data-user-$id\")'/>
+        $name
+        </div>";
+    }
   }
   if (is_array($u)) {
     foreach($u as $e) {
@@ -5516,12 +5517,12 @@ function dis_calendar_free_interval($current_view, $calendar) {
     obm.calendarFreeBusy = new Obm.CalendarFreeBusy($js_time_slots, $unit, '$GLOBALS[ccalendar_first_hour]');
     obm.calendarFreeBusy.busySlots = $js_busy_time_slots;
     obm.calendarFreeBusy.entities = new Array(); 
-		obm.calendarFreeBusy.entities.sel_user_id = $js_entities_user;
-		obm.calendarFreeBusy.entities.sel_resource_id = $js_entities_resource;
-		obm.calendarFreeBusy.entities.sel_resource_group_id = $js_entities_resourcegroup;
-		obm.calendarFreeBusy.entities.sel_group_id = $js_entities_group;
-		obm.calendarFreeBusy.entities.sel_contact_id = $js_entities_contact;
-		obm.calendarFreeBusy.entities.others_attendees = $js_entities_others_attendees;
+    obm.calendarFreeBusy.entities.sel_user_id = $js_entities_user;
+    obm.calendarFreeBusy.entities.sel_resource_id = $js_entities_resource;
+    obm.calendarFreeBusy.entities.sel_resource_group_id = $js_entities_resourcegroup;
+    obm.calendarFreeBusy.entities.sel_group_id = $js_entities_group;
+    obm.calendarFreeBusy.entities.sel_contact_id = $js_entities_contact;
+    obm.calendarFreeBusy.entities.others_attendees = $js_entities_others_attendees;
     $js_tips
     new obm.AutoComplete.ExtSearch(
       function() { return \$('freeBusySearchSource').value+'&action=ext_search&ajax=1'; },
