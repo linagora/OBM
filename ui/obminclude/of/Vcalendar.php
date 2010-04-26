@@ -35,6 +35,17 @@ class Vcalendar {
   }
 
   /**
+   * Call this to destroy the element
+   * Break the circular dependency so the garbage collector can do its job.
+   *
+   * @access public
+   * @return void
+   */
+  function destroy() {
+    $this->vcalendar = null;
+  }
+
+  /**
    * Create a new ICS element 
    * 
    * @param string $name kind of element
