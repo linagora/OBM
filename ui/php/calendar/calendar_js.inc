@@ -239,6 +239,8 @@ function display_freebusy(data, duration, readOnly) {
     onComplete: function() {
       obm.popup.show('fbcContainer');
       obm.calendarFreeBusy.buildFreeBusyPanel(duration, readOnly);      
+      if (\$chk($('tf_title'))) $('fb_title').value = $('tf_title').value;
+      if (\$chk($('sel_owner'))) $('fb_owner').value = $('sel_owner').value;
       $('spinner').hide();
     }
   }).get(\$merge({ajax : 1, action : 'perform_meeting'}, data));   
@@ -247,6 +249,7 @@ function display_freebusy(data, duration, readOnly) {
 
 /////////////////////////////////////////////////////////////////////////////
 function checkAvailability() {
+
   var begin = getFieldDate($('tf_date_begin').value, false);
   begin.setHours(parseInt($('sel_time_begin').value, 10));
   begin.setMinutes(parseInt($('sel_min_begin').value, 10));
