@@ -7038,12 +7038,12 @@ function html_share_calendar($id,$name) {
               </div>
             </th>
             <td>
-              <a href=\"javascript: getShareUrl('public','Ics');\"><img src=\"$GLOBALS[ico_ref]\"></a>
-              <a href=\"javascript: sendSharePopup('public','Ics');\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+              <a href=\"javascript: getShareUrl('public','Ics');\" title=\"$GLOBALS[l_share_calendar_public]\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('public','Ics');\" title=\"$GLOBALS[l_send_calendar_public]\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
             </td>
             <td>
-              <a href=\"javascript: getShareUrl('public','Html');\"><img src=\"$GLOBALS[ico_ref]\"></a>
-              <a href=\"javascript: sendSharePopup('public','Html');\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+              <a href=\"javascript: getShareUrl('public','Html');\" title=\"$GLOBALS[l_share_calendar_public]\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('public','Html');\" title=\"$GLOBALS[l_send_calendar_public]\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
             </td>
             <td>
               <a href=\"javascript: reinitSharePopup('public');\"><label>$GLOBALS[l_share_reinit_public]</label></a>               
@@ -7057,12 +7057,12 @@ function html_share_calendar($id,$name) {
               </div>
             </th>
             <td>
-              <a href=\"javascript: getShareUrl('private','Ics');\"><img src=\"$GLOBALS[ico_ref]\"></a>
-              <a href=\"javascript: sendSharePopup('private','Ics');\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+              <a href=\"javascript: getShareUrl('private','Ics');\" title=\"$GLOBALS[l_share_calendar_private]\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('private','Ics');\" title=\"$GLOBALS[l_send_calendar_private]\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
             </td>
             <td>
-              <a href=\"javascript: getShareUrl('private','Html');\"><img src=\"$GLOBALS[ico_ref]\"></a>
-              <a href=\"javascript: sendSharePopup('private','Html');\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+              <a href=\"javascript: getShareUrl('private','Html');\" title=\"$GLOBALS[l_share_calendar_private]\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('private','Html');\" title=\"$GLOBALS[l_send_calendar_private]\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
             </td>
             <td>
               <a href=\"javascript: reinitSharePopup('private');\"><label>$GLOBALS[l_share_reinit_private]</label></a>               
