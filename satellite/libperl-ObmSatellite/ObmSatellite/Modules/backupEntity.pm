@@ -28,7 +28,7 @@ use HTTP::Status;
 use ObmSatellite::Misc::constant;
 use ObmSatellite::Misc::regex;
 
-use constant OBM_BACKUP_ROOT => '/var/backup/obm';
+use constant OBM_BACKUP_ROOT => '/var/backups/obm';
 use constant RECONSTRUCT_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
 use constant RECONSTRUCT_CMD => 'reconstruct';
 use constant QUOTA_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
