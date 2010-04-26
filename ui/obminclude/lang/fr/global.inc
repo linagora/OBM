@@ -595,7 +595,7 @@ $l_unlink_mobile = "Supprimer le périphérique mobile?";
 
 //backup
 $l_new_backup = "Nouvelle sauvegarde";
-$l_do_backup = "Effectuer le sauvegarde !";
+$l_do_backup = "Effectuer la sauvegarde";
 $l_available_backups = "Sauvegardes disponibles";
 $l_service_get_ftp_backups = "Récupération des archives disponibles sur le serveur FTP";
 
