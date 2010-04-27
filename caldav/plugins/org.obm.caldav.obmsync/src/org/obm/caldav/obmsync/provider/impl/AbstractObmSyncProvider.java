@@ -133,13 +133,21 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				cal.set(Calendar.MILLISECOND, 0);
 				event.setDate(cal.getTime());
 			}
-
 			event.setExtId(extId);
-			event.addAttendee(getAttendee(caldavInfo.getLoginAtDomain()));
+			boolean find = false;
+			for (Attendee att : event.getAttendees()) {
+				if (caldavInfo.getLoginAtDomain().equals(att.getEmail())) {
+					find = true;
+					break;
+				}
+			}
+			if (!find) {
+				event.addAttendee(getAttendee(caldavInfo.getLoginAtDomain()));
+			}
 			fixPrioriryForObm(event);
 			logger.info("Create event with extId " + extId);
-			getClient(caldavInfo).createEvent(
-					caldavInfo.getToken(), caldavInfo.getCalendar(), event);
+			getClient(caldavInfo).createEvent(caldavInfo.getToken(),
+					caldavInfo.getCalendar(), event);
 			event = getClient(caldavInfo).getEventFromExtId(
 					caldavInfo.getToken(), caldavInfo.getCalendar(),
 					event.getExtId());
