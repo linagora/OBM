@@ -136,6 +136,9 @@ $cgroup_private_default = true;
 // default taxes values
 $cdefault_tax = array ('TVA 19,6' => 1.196, 'TVA 5,5' => 1.055, 'Pas de TVA' => 1);
 
+//syslog log files root
+$clog_root = '/var/log';
+
 // default Right values; -1 = do not display
 $cgp_default_right = array (
   'resource' => array (
