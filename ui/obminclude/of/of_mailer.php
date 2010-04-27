@@ -62,6 +62,12 @@ class OBM_Mailer extends SMailer {
       return false;
     }
   }
+
+  public function prepare($method_name, $args) {
+    $mail = parent::prepare($method_name, $args);
+    $mail->set_return_path($this->return_path);
+    return $mail;
+  }
   
   protected function get_template_path($template_name) {
     $possible_paths = array(
@@ -100,6 +106,32 @@ class OBM_Mailer extends SMailer {
     if(!$email) $email = $this->getEntityEmail('noreply');
     return array($email, sprintf($GLOBALS['l_displayname_template'], $db->f('userobm_firstname'), $db->f('userobm_lastname')));
   }
+
+
+  /**
+   * Get event owner email address
+   */
+  protected function getOwner($event) {
+    global $obm, $cdg_sql;
+
+    $owner_label = $event->owner->label;
+    $owner_id = sql_parse_id($event->owner->id, true);
+    $query = "SELECT 
+    userobm_email, userobm_lastname, userobm_firstname, domain_name
+    FROM UserObm
+    INNER JOIN Domain ON userobm_domain_id = domain_id
+    WHERE userobm_id $owner_id";
+
+    display_debug_msg($query, $cdg_sql, 'run_query_get_sender()');
+    $db = new DB_OBM;
+    $db->query($query);
+    $db->next_record();
+    
+    $email = $this->getEntityEmail($db->f('userobm_email'), $db->f('domain_name'));
+    if(!$email) $email = $this->getEntityEmail('noreply');
+    return $email;
+  }
+
   
   /**
    * Get recipients email addresses

@@ -23,6 +23,8 @@ class CalendarMailer extends OBM_Mailer {
   protected $module = 'calendar';
   
   protected $attachIcs = true;
+
+  protected $return_path;
   
   public function __construct() {
     parent::__construct();
@@ -32,7 +34,8 @@ class CalendarMailer extends OBM_Mailer {
   protected function eventInvitation($event, $attendees) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
-    $this->subject = __('New event on OBM: %title%', array('%title%' => $event->title));
+    $this->return_path = $this->getOwner($event);
+    $this->subject = __('%sender%, New event on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     if ($this->attachIcs) {
       $this->parts[] = array(
@@ -49,7 +52,8 @@ class CalendarMailer extends OBM_Mailer {
   protected function eventCancel($event, $attendees) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
-    $this->subject = __('Event cancelled on OBM: %title%', array('%title%' => $event->title));
+    $this->return_path = $this->getOwner($event);
+    $this->subject = __('%sender%, Event cancelled on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     if ($this->attachIcs) {
       $this->parts[] = array(
@@ -66,7 +70,8 @@ class CalendarMailer extends OBM_Mailer {
   protected function eventUpdate($event, $oldEvent, $attendees) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
-    $this->subject = __('Event updated on OBM: %title%', array('%title%' => $event->title));
+    $this->return_path = $this->getOwner($event);
+    $this->subject = __('%sender%, Event updated on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     if ($this->attachIcs) {
