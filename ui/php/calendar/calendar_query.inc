@@ -1163,7 +1163,8 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
   $sel_entity_id[user] = array_intersect(array_keys($read_entity), $sel_entity_id['user']);
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
-	$status = array('ACCEPTED', 'NEEDS-ACTION');
+  if (sizeof($cal_entities) == 0) return false; // user doesn't have read permission on attendees
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($begin,$end,$cal_entities, $status);
   $of = &OccurrenceFactory::getInstance(); 
   if(!$calendar['all_day']) {
