@@ -5915,10 +5915,11 @@ function dis_calendar_templates_list($templates_q) {
   
   $block = "
     <div class=\"detail\">
-      <form style=\"display: inline\" method=\"post\" enctype=\"multipart/form-data\" action=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=import_template\">
+      <form style=\"display: inline\" method=\"post\" enctype=\"multipart/form-data\" >
         <label for=\"template_file\">$l_import_template :</label>
         <input type=\"file\" name=\"template_file\" size=\"12\" />
-        <input type=\"submit\" value=\"Ok\" />
+        <input type='hidden' name='action' value='import_template' />
+        <input type=\"submit\" value=\"$GLOBALS[l_ok]\" />
       </form>
     </div>";
   
