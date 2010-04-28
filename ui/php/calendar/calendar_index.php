@@ -862,21 +862,18 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   if ($_FILES['template_file']['tmp_name']) {
     $xml = simplexml_load_file($_FILES['template_file']['tmp_name']);
-    
     $retour = run_query_calendar_import_template($xml);
     if ($retour) {
-      $display['msg'] .= display_ok_msg("$l_template : $l_import_ok");
+       redirect_ok($params, "$l_template : $l_import_ok");
     } else {
       $display['msg'] .= display_err_msg("$l_template : $l_import_error");
     }
-    $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
-    $display['detail'] = dis_calendar_templates_list($templates_q);
   } else {
     $display['msg'] .= display_err_msg("$l_template : $l_file_error");
-    $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
-    $display['detail'] = dis_calendar_templates_list($templates_q);
   }
-  
+  $templates_q = run_query_calendar_get_alltemplates($obm['uid']);
+  $display['detail'] = dis_calendar_templates_list($templates_q);
+
 } elseif ($action == 'delete_template')  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_calendar_delete_template($params['template_id']);
@@ -1784,6 +1781,7 @@ function get_calendar_action() {
   // Import templates
   $actions['calendar']['import_template'] = array (
     'Right'    => $cright_write,
+    'Redirection' => "$path/calendar/calendar_index.php?action=list_templates", 
     'Condition'=> array ('None') 
   );
   
