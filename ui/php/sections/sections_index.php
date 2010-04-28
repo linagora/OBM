@@ -39,6 +39,7 @@ require("$obminclude/global_pref.inc");
 
 $module = ($_GET['module'])?$_GET['module']:'webmail';
 $section = $cgp_show['module'][$module];
+echo "<style type='text/css' src='$GLOBALS[css_obm]'></style>";
 if ($_GET["action"] == 'gw_links') {
   echo display_modules($section, $module);
 } else if ($_GET["action"] == 'sections_html') {

@@ -1312,10 +1312,7 @@ function display_modules($section, $module) {
   $section_link = array_keys($cgp_show['module'],$section);
   if (is_array($section_link)) {
     $id = $section.'Items';
-    $block .= "
-      <div class='module' id='section-$section-items-wrapper'>
-      <ul id='section-$section-items'>
-";
+    $block .= "<div class='module' id='section-$section-items-wrapper'><ul id='section-$section-items'>";
     foreach ($section_link as $mod) {
       $module_name = $modules[$mod]['Name'];
       $module_tooltip = $modules[$mod]['Tooltip'];
@@ -1334,12 +1331,12 @@ function display_modules($section, $module) {
         if ($fico) {
           $ico = $modules[$mod]['Ico'];
           if ($ico) {
-            $block .= "<a$target href='".$modules[$mod]['Url']."' class='ico' title='$module_tooltip'><img src='$ico' alt='$module_name' /></a> ";
+            $block .= "<a$target href='".$modules[$mod]['Url']."' class='ico' title='$module_tooltip'><img src='$ico' alt='$module_name' /></a>";
           }
         }
         $block .= "<a$target href='".$modules[$mod]['Url']."' title='$module_tooltip'>";
         if ($ftext) $block .= $module_name;
-        $block .= "</a></li>\n";
+        $block .= "</a></li>";
       }
     }
     $block .= '</ul></div>';
