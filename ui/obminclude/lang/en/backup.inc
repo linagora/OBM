@@ -41,3 +41,10 @@ $l_err_cant_get_availablebackup = "Unable to get the list of available backups !
 $l_cant_backup_pending_modifications = "Unable to do backup. The entity have pending modifications, please use system configuration tools to validate it";
 $l_err_obm_satellite_usersystem = "Connexion to obm-satellite fail : Can't get the system user to use.";
 
+$l_push_backup_ftp_failed = "The backup hasn't been added on the FTP server";
+$l_retrieve_from_ftp = "Retrieve backups";
+$l_retrieve_from_ftp_success = "All available backups on the FTP server has been retrieved";
+$l_no_backup_ftp_specified = "No FTP server specified for the domain.";
+$l_retrieve_from_backup_ftp = "Click on the button bellow to retrieve all available backups for '%s', available on the domain FTP server.";
+$l_unable_to_retrieve_backup = "Unable to retrieve archived backups from the FTP server";
+

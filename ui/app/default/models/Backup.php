@@ -51,6 +51,26 @@ class Backup {
   }
 
   /**
+   * Retrieve the avaible backups on the FTP
+   * @access public
+   * return array
+   */
+  public function retrieveBackups($options = array()) {
+    try {
+    $data = array(
+      'report' => true,
+      'sendMail' => true,
+      'email' => array()
+    );
+    $data = array_merge($data,$options);
+    $query = new OBM_Satellite_RetrieveBackup(Backup::$auth, $this->details, $data);
+    return $query->execute();
+    } catch (Exception $e) {
+      throw new Exception($GLOBALS['l_unable_to_retrieve_backup'].' ('.$e->getMessage().')');
+    }
+  }
+
+  /**
    * Backup the current entity
    * @param array $options
    * @access public

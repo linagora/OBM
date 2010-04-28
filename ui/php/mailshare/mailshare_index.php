@@ -219,10 +219,16 @@ if ($action == 'ext_get_id') {
     $backup = new Backup('mailshare', $params['mailshare_id']);
     $dis_form = true;
 
-    if (!empty($params['execute'])) {
-      $options = array();
-      $backup->doBackup($options);
+    $options = array();
+    if (!empty($params['retrieveAll'])) {
+      $backup->retrieveBackups($options);
+      $display['msg'] .= display_ok_msg($l_retrieve_from_ftp_success);
+    } elseif (!empty($params['execute'])) {
+      $result = $backup->doBackup($options);
       $display['msg'] .= display_ok_msg($l_backup_complete);
+      if (!$result['pushFtp']['success']) {
+        $display['msg'] .= display_warn_msg($l_push_backup_ftp_failed.' ('.$result['pushFtp']['msg'].')');
+      }
     }
   } catch (Exception $e) {
     $display['msg'] .= display_err_msg($e->getMessage());

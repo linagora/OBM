@@ -2739,6 +2739,7 @@ function dis_user_can_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_backup_form($backup, $params) {
   $user_id = $params['user_id'];
+  $obm_q = run_query_user_detail($user_id);
   $url = url_prepare('user_index.php');
 
   //New backup form
@@ -2762,6 +2763,7 @@ function dis_user_backup_form($backup, $params) {
     foreach ($backups as $record) {
       $date = new Of_Date($record['datetime']);
       $dis_date = $date->getOutputDateTime();
+      $dis_buttons = '';
       foreach (OBM_Satellite_RestoreEntity::$restoreData as $method) {
         $dis_buttons .= "
         <form method=\"post\" action=\"$url\">
@@ -2792,9 +2794,26 @@ function dis_user_backup_form($backup, $params) {
     $dis_backups = "<p>{$GLOBALS['l_no_backup_available']}</p>";
   }
 
-  //FTP backups
-  $dis_ftp_backups = "
-  ";
+  $backupftpservers = of_domain_get_domain_backupftpserver($obm_q->f('userobm_domain_id'));
+  if (!empty($backupftpservers)) {
+    //FTP backups
+    $ftp_desc = sprintf($GLOBALS['l_retrieve_from_backup_ftp'],$obm_q->f('userobm_login').'@'.$obm_q->f('domain_name'));
+    $dis_ftp_backups = "
+      <form method=\"post\" action=\"$url\">
+        <input type=\"hidden\" name=\"action\" value=\"backup\" />
+        <input type=\"hidden\" name=\"retrieveAll\" value=\"1\" />
+        <input type=\"hidden\" name=\"user_id\" value=\"$user_id\">
+
+        <p>$ftp_desc</p>
+
+        <fieldset class=\"buttons\">
+          <input type=\"submit\" name=\"submit\" value=\"{$GLOBALS['l_retrieve_from_ftp']}\" />
+        </fieldset>
+      </form>";
+  } else {
+    $dis_ftp_backups = "
+      <p>{$GLOBALS['l_no_backup_ftp_specified']}</p>";
+  }
 
   $block = "
     <div class=\"detail extra\">

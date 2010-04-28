@@ -668,6 +668,7 @@ function dis_mailshare_mail_field($values) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_mailshare_backup_form($backup, $params) {
   $mailshare_id = $params['mailshare_id'];
+  $obm_q = run_query_mailshare_detail($mailshare_id);
   $url = url_prepare('mailshare_index.php');
 
   //New backup form
@@ -718,10 +719,26 @@ function dis_mailshare_backup_form($backup, $params) {
     $dis_backups = "<p>{$GLOBALS['l_no_backup_available']}</p>";
   }
 
+  $backupftpservers = of_domain_get_domain_backupftpserver($obm_q->f('mailshare_domain_id'));
+  if (!empty($backupftpservers)) {
+    //FTP backups
+    $ftp_desc = sprintf($GLOBALS['l_retrieve_from_backup_ftp'],$obm_q->f('mailshare_login').'@'.$obm_q->f('domain_name'));
+    $dis_ftp_backups = "
+      <form method=\"post\" action=\"$url\">
+        <input type=\"hidden\" name=\"action\" value=\"backup\" />
+        <input type=\"hidden\" name=\"retrieveAll\" value=\"1\" />
+        <input type=\"hidden\" name=\"mailshare_id\" value=\"$mailshare_id\">
 
-  //FTP backups
-  $dis_ftp_backups = "
-  ";
+        <p>$ftp_desc</p>
+
+        <fieldset class=\"buttons\">
+          <input type=\"submit\" name=\"submit\" value=\"{$GLOBALS['l_retrieve_from_ftp']}\" />
+        </fieldset>
+      </form>";
+  } else {
+    $dis_ftp_backups = "
+      <p>{$GLOBALS['l_no_backup_ftp_specified']}</p>";
+  }
 
   $block = "
     <div class=\"detail extra\">

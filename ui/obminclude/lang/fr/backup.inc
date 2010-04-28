@@ -48,3 +48,10 @@ $l_err_cant_get_availablebackup = "Impossible de récupérer la liste des sauveg
 $l_cant_backup_pending_modifications = "Impossible d'effectuer une sauvegarde. L'entité a des modifications en attente, veuillez utiliser l'outil de mise à jour système pour les valider.";
 $l_err_obm_satellite_usersystem = "Echec de connexion à obm-satellite : Impossible de récupérer l'utilisateur système utilisé.";
 
+$l_push_backup_ftp_failed = "La sauvegarde n'a pas été ajoutée au serveur FTP";
+$l_retrieve_from_ftp = "Récupérer les archives";
+$l_retrieve_from_ftp_success = "Les archives disponibles sur le serveur FTP ont été récupérées";
+$l_no_backup_ftp_specified = "Aucun serveur FTP n'a été spécifié pour le domaine.";
+$l_retrieve_from_backup_ftp = "Cliquez sur le bouton ci-dessous pour récupérer toutes les archives pour '%s', disponibles sur le serveur FTP du domaine.";
+$l_unable_to_retrieve_backup = "Impossible de récupérer les sauvegardes archivées sur le serveur FTP";
+

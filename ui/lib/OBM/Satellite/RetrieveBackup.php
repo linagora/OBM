@@ -19,20 +19,23 @@
 
 /*
  * Class used to query the BackupEntity module of obm-satellite
- * call the backupentity command
+ * call the restoreentity command
  */
-class OBM_Satellite_BackupEntity extends OBM_Satellite_Query {
+class OBM_Satellite_RetrieveBackup extends OBM_Satellite_Query {
+  protected $data;
 
   /**
    * build the url to query from the given arguments
-   * @param  array     $args   (used keys: host, entity, login, realm)
+   * none specified to restore all
+   * @param  array     $args   (used keys: host, entity, login, realm, data)
    * @access protected
    * @return string
    **/
   protected function buildUrl($args) {
     extract($args);   //create $host, $entity, $login and $realm
+    $this->data = $data;
     $port = OBM_Satellite_ICredentials::$port;
-    return "https://{$host}:{$port}/backupentity/{$entity}/{$login}@{$realm}";
+    return "https://{$host}:{$port}/retrievebackup/{$entity}/{$login}@{$realm}";
   }
 
   /**
@@ -41,12 +44,12 @@ class OBM_Satellite_BackupEntity extends OBM_Satellite_Query {
    * @access protected
    **/
   protected function addHeaders(&$options) {
-    $options[CURLOPT_CUSTOMREQUEST] = 'PUT';
+    $options[CURLOPT_POST] = TRUE;
   }
 
   /**
    * Prepare the query with the given data
-   * @param  array     $data   (used keys: report, sendMail, email, calendar, privateContact)
+   * @param  array     $data   (used keys: report, sendMail, email)
    * @access protected
    * @return string    the query body or null if no body
    **/
@@ -78,19 +81,6 @@ class OBM_Satellite_BackupEntity extends OBM_Satellite_Query {
       }
     }
 
-    //calendar
-    if (isset($data['calendar']))
-      $sxml->addChild('calendar',$data['calendar']);
-
-    //privateContacts
-    if (isset($data['privateContact'])) {
-      $privateContact = $sxml->addChild('privateContact');
-      foreach ($data['privateContact'] as $addBookName => $addBook) {
-        $xmlAddressBook = $privateContact->addChild('addressBook',$addBook);
-        $xmlAddressBook->addAttribute('name', $addBookName);
-      }
-    }
-
     return $sxml->asXML();
   }
 
@@ -102,13 +92,7 @@ class OBM_Satellite_BackupEntity extends OBM_Satellite_Query {
    **/
   protected function parseResponse($xml) {
     $sxml = new SimpleXMLElement($xml);
-    return array(
-      'content' => (string)$sxml->content,
-      'pushFtp' => array(
-        'success' => ( ((string)$sxml->pushFtp['success']) != 'false'),
-        'msg' => (string)$sxml->pushFtp
-      )
-    );
+    return $sxml->content;
   }
 
 }
