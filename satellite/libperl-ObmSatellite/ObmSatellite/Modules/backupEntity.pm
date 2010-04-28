@@ -1457,7 +1457,7 @@ sub _getFtpBackupHost {
         $response->setExtraContent({
             pushFtp => {
                 content => 'No backup FTP server linked to OBM domaine \''.$entity->getRealm().'\'',
-                success => 'true'
+                success => 'false'
             }
         });
         return undef;
@@ -1478,7 +1478,7 @@ sub _getFtpBackupHost {
         $response->setExtraContent({
             pushFtp => {
                 content => 'No backup FTP server linked to OBM domaine \''.$entity->getRealm().'\'',
-                success => 'true'
+                success => 'false'
             }
         });
         return undef;
