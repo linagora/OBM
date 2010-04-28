@@ -277,13 +277,8 @@ if ($action == 'search') {
           $display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
         }
 
-        if ($params['show_attendees_calendar']) {
-          // Display attendees
-          $current_view->set_users($params['sel_user_id']);
-          $current_view->set_resources($params['sel_resource_id']);
-        } else {
-          // Display calendars
-        }
+        if ($params['show_user_calendar']) $current_view->set_users($params['sel_user_id']);
+        if ($params['show_resource_calendar'])  $current_view->set_resources($params['sel_resource_id']);
 
         $current_view->set_date($params["date_begin"]);
         $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$event_id";
@@ -392,13 +387,8 @@ if ($action == 'search') {
         }
         run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
 
-        if ($params['show_attendees_calendar']) {
-          // Display attendees
-          $current_view->set_users($params['sel_user_id']);
-          $current_view->set_resources($params['sel_resource_id']);
-        } else {
-          // Display calendars
-        }
+        if ($params['show_user_calendar']) $current_view->set_users($params['sel_user_id']);
+        if ($params['show_resource_calendar'])  $current_view->set_resources($params['sel_resource_id']);
         $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$params["calendar_id"];
         $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
         redirect_ok($params, "$l_event: $l_update_ok - $detail");
