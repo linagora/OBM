@@ -35,7 +35,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('%sender%, New event on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
+    $this->subject = __('New event created by %sender% on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     if ($this->attachIcs) {
       $this->parts[] = array(
@@ -53,7 +53,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('%sender%, Event cancelled on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
+    $this->subject = __('Event cancelled by %sender% on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     if ($this->attachIcs) {
       $this->parts[] = array(
@@ -71,7 +71,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('%sender%, Event updated on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
+    $this->subject = __('Event updated by %sender% on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     if ($this->attachIcs) {
