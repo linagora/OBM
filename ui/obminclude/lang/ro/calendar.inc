@@ -9,8 +9,9 @@
 $l_attendees = "Participanți";
 $l_others_attendees = "Alți participanți";
 $l_add_displayed_users = "Adăugați utilizatorii ale căror agende sunt afișate";
-$l_add_displayed_resources = "Adăugați resursele ale căror agende sunt afișate";
-$l_show_attendees_calendar = "Vizualizați calendarul participanților după validare";
+$l_add_dresourceresources = "Adăugați resursele ale căror agende sunt afișate";
+$l_show_user_calendar = "Vizualizați calendarul utilizatori după validare";
+$l_show_resource_calendar = "Vizualizați calendarul resurse după validare";
 $l_users = "Utilizatori";
 $l_owner = "Organizator";
 $l_resources = "Resurse";

@@ -3567,7 +3567,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['property'])) { $t_property_value = $calendar['property']; }
   if (isset($calendar['others_attendees'])) { $others_attendees = $calendar['others_attendees']; }
   if (isset($calendar['add_displayed_users'])) { $add_displayed_users = $calendar['add_displayed_users']; }
-  if (isset($calendar['show_attendees_calendar'])) { $show_attendees_calendar = ($calendar['show_attendees_calendar'] == 1 ? 'checked' : ''); }
+  if (isset($calendar['show_user_calendar'])) { $show_user_calendar = ($calendar['show_user_calendar'] == 1 ? 'checked' : ''); }
+  if (isset($calendar['show_resource_calendar'])) { $show_resource_calendar = ($calendar['show_resource_calendar'] == 1 ? 'checked' : ''); }
   if (isset($calendar['attendees_notification'])) { $attendees_notification = ($calendar['attendees_notification'] == 1 ? 'checked' : ''); }
   if (isset($calendar['alert'])) {
     // handle only one entry for now
@@ -3671,10 +3672,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $all_day_checked = "checked=\"checked\"";
   }
 
-  $dis_show_attendees_calendar = "<tr>
-   <th><label for=\"cba_show_attendees_calendar\">$GLOBALS[l_show_attendees_calendar]</label></th>
+  $dis_show_user_calendar = "<tr>
+   <th><label for=\"cba_show_user_calendar\">$GLOBALS[l_show_user_calendar]</label></th>
     <td>
-     <input type=\"checkbox\" id=\"cba_show_attendees_calendar\" value=\"1\" $show_attendees_calendar name=\"cba_show_attendees_calendar\" />
+     <input type=\"checkbox\" id=\"cba_show_user_calendar\" value=\"1\" $show_user_calendar name=\"cba_show_user_calendar\" />
      </td>
     </tr>";
 
@@ -3881,7 +3882,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <tr>
       $dis_others_attendees
       </tr>
-      $dis_show_attendees_calendar
+      $dis_show_user_calendar
       </table>
       </fieldset>
       <p class=\"LC\"></p>";
@@ -3965,6 +3966,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $document_complete = "new obm.AutoComplete.Search('$path/document/document_index.php?action=ext_search', 'sel_document_id', 'documentSearch');";
   
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
+
+    $dis_show_resource_calendar = "<tr>
+     <th><label for=\"cba_show_resource_calendar\">$GLOBALS[l_show_resource_calendar]</label></th>
+      <td>
+       <input type=\"checkbox\" id=\"cba_show_resource_calendar\" value=\"1\" $show_resource_calendar name=\"cba_show_resource_calendar\" />
+       </td>
+      </tr>";
+
+
     // resource select
     if ($action == 'new' && !isset($calendar['new_meeting'])) {
       if (is_array($res['entity']) && sizeof($res['entity']) >= 1) {
@@ -4114,11 +4124,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
        <input type=\"text\" name=\"\" value=\"\" id=\"resourceSearch\" autocomplete=\"off\" />
      </td>
     </tr>
-
     <tr>
     <th>&nbsp;</th>    
     <td id=\"sel_resource_id\">$dis_sel_resource</td>
     </tr>
+    $dis_show_resource_calendar
     </table>
     </fieldset>";
     $resource_complete = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&form=event', 'sel_resource_id', 'resourceSearch',{filter_entity:'Resource', filter_pattern:'access'});";
