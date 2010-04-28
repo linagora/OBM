@@ -898,7 +898,12 @@ sub _restoreFromArchive {
         return $result;
     }
 
-    return $self->_response( RC_OK, $entity->getEntityContent() );
+    my $response = $self->_response(RC_OK, $entity->getEntityContent());
+    $response->setExtraContent({
+        content => ['Restoring '.$entity->getEntityType().' '.$entity->getLogin().'@'.$entity->getRealm().' '.$restoreData.' data successfully']
+    });
+
+    return $response;
 }
 
 
