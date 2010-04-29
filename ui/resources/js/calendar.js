@@ -1715,10 +1715,10 @@ Obm.CalendarAllDayEvent = new Class({
     var dt = new Element('dt').addClass(opacity).injectInside(this.content);
     var dd = new Element('dd').addClass(opacity).injectInside(this.content);
 
-    this.leftExtension = new Element('img').setProperty('src', obm.vars.images.extension_left).
-      setStyle('display', 'none').injectInside(dt);
     this.rightExtension = new Element('img').setProperty('src', obm.vars.images.extension_right).
       setStyles({'display':'none', 'float':'right'}).injectInside(dt);
+    this.leftExtension = new Element('img').setProperty('src', obm.vars.images.extension_left).
+      setStyle('display', 'none').injectInside(dt);
     this.dragHandler = new Element('h1').addClass('allDay').injectInside(dt);     
 
     this.setTitleIcons();
