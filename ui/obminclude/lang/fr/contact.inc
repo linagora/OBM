@@ -53,6 +53,10 @@ $l_assistant = 'Assistant';
 $l_spouse = 'Conjoint';
 $l_synchronisation = "Abonnement";
 
+// $l_toggle_public_access = "Ceci entrainera que tout le monde pourra inviter cette personne à un rendez-vous. Désirez-vous continuer?";
+$l_toggle_public_read = "Ceci entrainera que tout le monde pourra voir ce carnet d'adresses. Désirez-vous continuer?";
+$l_toggle_public_write = "Ceci entrainera que tout le monde pourra modifier ce carnet d'adresses. Désirez-vous continuer?";
+$l_toggle_public_admin = "Ceci entrainera que tout le monde pourra modifier les droits de ce carnet d'adresses. Désirez-vous continuer?";
 
 // Address books
 $l_contacts = "Mes contacts";

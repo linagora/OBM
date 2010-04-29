@@ -72,6 +72,12 @@ $l_sync_contact = "PDA synchronisation";
 $l_sync = "Subscirbe for synchronisation";
 $l_desync = "Unsubscribe for synchronisation";
 
+// $l_toggle_public_access = "This will allow everybody to invite this user to a meeting. Do you want to continue ?";
+$l_toggle_public_read = "This will make the addressbook readable by everybody. Do you want to continue ?";
+$l_toggle_public_write = "This will allow everybody to update this addressbook. Do you want to continue ?";
+$l_toggle_public_admin = "This will allow everybody to update this addressbook rights. Do you want to continue ?";
+
+
 // Address books
 $l_sync_ad = "Subscribe";
 $l_desync_ad = "Unsubscribe";
