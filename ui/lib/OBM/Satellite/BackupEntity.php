@@ -46,7 +46,7 @@ class OBM_Satellite_BackupEntity extends OBM_Satellite_Query {
 
   /**
    * Prepare the query with the given data
-   * @param  array     $data   (used keys: report, sendMail, email, calendar, privateContact)
+   * @param  array     $data   (used keys: noFtp, report, sendMail, email, calendar, privateContact)
    * @access protected
    * @return string    the query body or null if no body
    **/
@@ -57,6 +57,12 @@ class OBM_Satellite_BackupEntity extends OBM_Satellite_Query {
       </options>
     </obmSatellite>';
     $sxml = new SimpleXMLElement($template);
+
+    //noFtp
+    if ($data['noFtp']) {
+      $ftp = $sxml->options->addChild('ftp');
+      $ftp->addAttribute('push','false');
+    }
 
     //report
     if ($data['report']) {

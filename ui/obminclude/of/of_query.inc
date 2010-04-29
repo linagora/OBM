@@ -3081,6 +3081,26 @@ function of_contactgroup_delete_contact_hierarchy($c_id, $is_array=false) {
 //  - $h_file     : Attachments (array of ('name'=> '', 'type=''))
 ///////////////////////////////////////////////////////////////////////////////
 function send_mail($subject, $message, $recipients, $r_addr, $setting='set_mail', $force='', $h_file='') {
+  $send_q = run_query_get_sender();
+  $sender = get_entity_email($send_q->f('userobm_email'), $send_q->f('domain_name'));
+  return send_mail_from($subject, $message, $sender, $recipients, $r_addr, $setting, $force, $h_file);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Send a Mail to an user set in mime format (one attachment)
+// If recipient list is empty, no mail is sent
+// Parameters:
+//  - $subject    : mail subject
+//  - $message    : mail content
+//  - $sender     : mail from
+//  - $recipients : Id Recipients array
+//  - $r_addr     : adresses array to add to recipients
+//  - $setting    : recipient setting to check (set_mail, set_mail_participant)
+//  - $force      : Mail should be forced (all user even with no set_mail)
+//  - $h_file     : Attachments (array of ('name'=> '', 'type=''))
+///////////////////////////////////////////////////////////////////////////////
+function send_mail_from($subject, $message, $sender, $recipients, $r_addr, $setting='set_mail', $force='', $h_file='') {
   global $cgp_mail_enabled;
   global $obm_version, $cgp_use; 
 
@@ -3093,7 +3113,6 @@ function send_mail($subject, $message, $recipients, $r_addr, $setting='set_mail'
     return 0;
   }
 
-  $send_q = run_query_get_sender();
   $reci_q = run_query_get_recipients($recipients, $setting, $force);
 
 
@@ -3127,8 +3146,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $setting='set_mail'
   // Headers
   $boundary = '--' . md5( uniqid('myboundary') );
 
-  $headers .= 'From: ';
-  $headers .= get_entity_email($send_q->f('userobm_email'), $send_q->f('domain_name'))."\n";
+  $headers .= 'From: '.$sender."\n";
 
   // If attachements are provided
   $headers.= "MIME-Version: 1.0\n"; 
