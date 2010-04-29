@@ -274,7 +274,7 @@ class Vcalendar_Writer_ICS {
    */
   function writeBoundDate($name, $value) {
     if($this->parsed_event->isAllDay()) {
-      $this->buffer .= $this->parseProperty($this->parseName($name).$this->parseTZIDedDate($value, Of_Date::ICS_DATE))."\r\n";
+      $this->buffer .= $this->parseProperty($this->parseName($name).';'.$this->parseName('value').'=DATE'.$this->parseTZIDedDate($value, Of_Date::ICS_DATE))."\r\n";
     } else {
       $this->buffer .= $this->parseProperty($this->parseName($name).$this->parseTZIDedDate($value, Of_Date::ICS_DATETIME))."\r\n";
     }
