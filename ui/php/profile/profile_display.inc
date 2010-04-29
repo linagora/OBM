@@ -559,7 +559,7 @@ function dis_property_admin_realm_value($value, $update=false) {
  * @return void
  */
 function dis_property_default_right($value, $update = false) {
-  $modules = array('calendar', 'mailbox', 'mailshare', 'resource');
+  $modules = array('calendar', 'mailbox', 'mailshare', 'resource', 'addressbook');
   $rights = array('access', 'read', 'write');
   if($update) {
     $i=0;

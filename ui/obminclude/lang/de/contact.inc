@@ -9,6 +9,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
+
 $l_contact_name = "Name des Kontakts";
 $l_from_company = "Firma";
 $l_lastname = "Nachname";
