@@ -106,8 +106,6 @@ sub _init {
     }
 
 
-    $self->_log( '--->'.$userDesc->{'userobm_login_new'}, 0 );
-
     # Archive flag
     if( $userDesc->{'userobm_archive'} ) {
         $self->setArchive();
@@ -223,7 +221,7 @@ sub _init {
 
             $userDesc->{'userobm_photo'} = join( '', @jpeg );
         }else {
-            $self->_log( 'fichier jpeg '.$pathJpeg.' de '.$self->getDescription().' introuvable', 2 );
+            $self->_log( 'fichier jpeg '.$pathJpeg.' de '.$userDesc->{'userobm_login'}.' introuvable', 2 );
         }
     }
 
