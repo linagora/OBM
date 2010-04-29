@@ -388,6 +388,7 @@ if ($cgp_use['service']['mail']) {
 }
 $cgp_show['module']['profile'] = 'admin';
 $cgp_show['module']['userpattern'] = 'admin';
+$cgp_show['module']['log'] = 'admin';
 
 if (!$cgp_use['service']['ldap']) {
   $cgp_show['module']['tools'] = false;

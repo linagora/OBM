@@ -232,6 +232,9 @@ $cgp_show['module']['incident'] = false;
 $cgp_show['module']['invoice'] = false;
 $cgp_show['module']['payment'] = false;
 $cgp_show['module']['account'] = false;
+// Can be enabled only if localhost is the only SMTP-in server for all of OBM
+// domain
+$cgp_show['module']['log'] = false;
 
 // --- fields ---
 // References fields

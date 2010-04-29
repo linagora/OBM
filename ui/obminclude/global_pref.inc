@@ -262,6 +262,12 @@ if ($cgp_show['module']['campaign']) {
                                   'Url' => "$path/campaign/campaign_index.php",
                                   'Right'=> $cright_read);
 }
+if ($cgp_show['module']['log']) {
+  $modules['log'] = array('Name'=> $l_module_log,
+                                  'Ico' => "$ico_list",
+                                  'Url' => "$path/log/log_index.php",
+                                  'Right'=> $cright_read);
+}
 
 $modules['admin_code'] = array('Name'=> $l_module_admin_code,
                   'Ico' => "$ico_code",

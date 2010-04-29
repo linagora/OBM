@@ -367,6 +367,7 @@ $l_module_statistic    = "Statistiques";
 $l_module_domain = "Domaines";
 $l_module_campaign = "Campagne";
 $l_module_report = "Rapport";
+$l_module_log    = "Logs";
 
 $l_module_time = "Gestion des temps";
 $l_module_project = "Projets";

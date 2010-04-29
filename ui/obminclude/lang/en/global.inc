@@ -376,6 +376,7 @@ $l_module_mailbox = "Mailbox";
 $l_module_webmail = "Webmail";
 $l_module_device = "Mobile devices";
 $l_module_admin_device = "Mobile devices management";
+$l_module_log    = "Logs";
 
 $l_header_admin = "Administration";
 $l_header_import = "Import";
