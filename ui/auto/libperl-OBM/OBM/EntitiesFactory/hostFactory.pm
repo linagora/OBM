@@ -82,6 +82,10 @@ sub next {
             next;
         }else {
             $self->{'currentEntity'} = $current;
+            if( $self->_getSambaServiceState() ) {
+                $self->_log( 'probleme au chargement du status Samba de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
+                next;
+            }
 
             SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
@@ -177,6 +181,15 @@ sub _loadHostLinks {
     my $self = shift;
 
     $self->_log( 'chargement des liens de '.$self->{'currentEntity'}->getDescription(), 2 );
+
+    return $self->_getSambaServiceState();
+}
+
+
+sub _getSambaServiceState {
+    my $self = shift;
+
+    $self->_log( 'obtention du status Samba de '.$self->{'currentEntity'}->getDescription(), 3 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
