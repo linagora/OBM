@@ -826,6 +826,10 @@ if ($action == 'search') {
 } elseif ($action == 'export_all_templates')  {
 ///////////////////////////////////////////////////////////////////////////////
   $xml = xml_calendar_export_templates();
+  // if there is only one template, the previous function returns an array
+  if (is_array($xml)) {
+    list(, $xml) = $xml;
+  }
   header('Content-Type: text/xml');
   header('Content-Disposition: attachment; filename="event_templates.xml"');
   echo $xml->flush();
