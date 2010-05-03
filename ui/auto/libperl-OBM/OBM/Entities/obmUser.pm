@@ -756,16 +756,23 @@ sub getSieveNomade {
         return undef;
     }
 
-    # If redirection email is non define, then no redirection
-    if( !$self->{'entityDesc'}->{'userobm_email_nomade'} ) {
+    # If redirection email isn't defined, then no redirection
+    my @nomadeEmails = split(/\r\n/, $self->{'entityDesc'}->{'userobm_email_nomade'});
+    my @validNomadeEmails;
+    my $nomadeMsg;
+    for( my $i=0; $i<=$#nomadeEmails; $i++ ) {
+        if( $nomadeEmails[$i] =~ /$OBM::Parameters::regexp::regexp_email/) {
+            $nomadeMsg .= 'redirect "'.$nomadeEmails[$i].'";'."\n";
+        }
+    }
+    if(!$nomadeMsg) {
         $self->_log( $self->getDescription().' : adresse mail de redirection non définie', 2 );
         return undef;
     }
 
-    my $nomadeMsg = 'redirect "'.$self->{'entityDesc'}->{'userobm_email_nomade'}.'";';
 
     if( !$self->{'entityDesc'}->{'userobm_nomade_local_copy'} ) {
-        $nomadeMsg .= "\n".'discard;';
+        $nomadeMsg .= 'discard;';
         $nomadeMsg .= "\n".'stop;';
     }else {
         $nomadeMsg .= 'keep;';
