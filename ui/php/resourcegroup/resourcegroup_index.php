@@ -531,7 +531,7 @@ function update_resourcegroup_action() {
       // User does not have update rights
       $actions['resourcegroup']['detailupdate']['Condition'] = array('None');
       $actions['resourcegroup']['check_delete']['Condition'] = array('None');
-      $actions['resourcegroup']['sel_resourcegroup_add']['Condition'] = array('None');
+      $actions['resourcegroup']['sel_resource_add']['Condition'] = array('None');
       $actions['resourcegroup']['sel_resourcegroup_add']['Condition'] = array('None');
     }    
     // Detail Consult

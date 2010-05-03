@@ -2588,19 +2588,19 @@ function get_resourcegroup_info($id) {
   if ($id == '') {
     return false;
   }
-  $multidomain = sql_multidomain('resourcegroup');
+  $multidomain = sql_multidomain('rgroup');
   $id = sql_parse_id($id, true);
-  $query = "SELECT * FROM RGroup WHERE resourcegroup_id $id $multidomain";
+  $query = "SELECT * FROM RGroup WHERE rgroup_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_resourcegroup_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
-  $r['domain_id'] = $obm_q->f('resourcegroup_domain_id');
-  $r['usercreate'] = $obm_q->f('resourcegroup_usercreate');
-  $r['name'] = $obm_q->f('resourcegroup_name');
-  $r['delegation'] = $obm_q->f('resourcegroup_delegation');
+  $r['domain_id'] = $obm_q->f('rgroup_domain_id');
+  $r['usercreate'] = $obm_q->f('rgroup_usercreate');
+  $r['name'] = $obm_q->f('rgroup_name');
+  $r['delegation'] = $obm_q->f('rgroup_delegation');
   return $r;
 }
 

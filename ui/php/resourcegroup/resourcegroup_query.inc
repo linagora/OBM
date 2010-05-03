@@ -662,31 +662,31 @@ function get_resourcegroup_nb_resource($id) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Return the group infos
-// Parameters:
-//   - $id : group id
-///////////////////////////////////////////////////////////////////////////////
-function get_resourcegroup_info($id) {
-  global $cdg_sql, $ctype_resource;
-
-  if ($id == "") {
-    return false;
-  }
-  $multidomain = sql_multidomain("rgroup");
-  $id = sql_parse_id($id, true);	
-  $query = "SELECT * FROM RGroup WHERE rgroup_id $id $multidomain";
-
-  display_debug_msg($query, $cdg_sql, "get_resourcegroup_info()");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $g["usercreate"] = $obm_q->f("rgroup_usercreate");
-  $g["name"] = $obm_q->f("rgroup_name");
-  $g["privacy"] = $obm_q->f("rgroup_privacy");
-
-  return $g;
-}
+/////////////////////////////////////////////////////////////////////////////////
+//// Return the group infos
+//// Parameters:
+////   - $id : group id
+/////////////////////////////////////////////////////////////////////////////////
+//function get_resourcegroup_info($id) {
+//  global $cdg_sql, $ctype_resource;
+//
+//  if ($id == "") {
+//    return false;
+//  }
+//  $multidomain = sql_multidomain("rgroup");
+//  $id = sql_parse_id($id, true);	
+//  $query = "SELECT * FROM RGroup WHERE rgroup_id $id $multidomain";
+//
+//  display_debug_msg($query, $cdg_sql, "get_resourcegroup_info()");
+//  $obm_q = new DB_OBM;
+//  $obm_q->query($query);
+//  $obm_q->next_record();
+//  $g["usercreate"] = $obm_q->f("rgroup_usercreate");
+//  $g["name"] = $obm_q->f("rgroup_name");
+//  $g["privacy"] = $obm_q->f("rgroup_privacy");
+//
+//  return $g;
+//}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -806,7 +806,7 @@ function check_resourcegroup_context($id, $group) {
 //     keys used : name, desc
 ///////////////////////////////////////////////////////////////////////////////
 function check_resourcegroup_data_form($group) {
-  global $err, $l_fill_name, $l_group_exists;
+  global $err, $l_fill_name, $l_group_exists, $l_error_delegation;
 
   $id = $group["resourcegroup_id"];
   $name = $group["name"];
@@ -817,6 +817,11 @@ function check_resourcegroup_data_form($group) {
   // MANDATORY: Group name not empty
   if (trim($name) == "") {
     $err["msg"] = $l_fill_name;
+    return false;
+  }
+    // Check delegation update right
+  if (! of_delegation_check_update_rights($group, $lgroup['delegation'])) {
+    $err['msg'] .= $l_error_delegation;
     return false;
   }
 
@@ -892,18 +897,19 @@ function get_json_resource_group($id) {
  * Group specific rights checking (eg : public group needs write_admin)
  * Parameters:
  * @param $params : parameters values
- * @param $g[]    : current group values
+ * @param $rg[]    : current group values
  * @return true if OK, else false
  */
-function check_resourcegroup_update_rights($params, $g='') {
+function check_resourcegroup_update_rights($params, $rg='') {
 
   $id = $params['resourcegroup_id'];
   if ($id > 0) {
     // Get current group info if not given
-    if (! is_array($g)) {
+    if (! is_array($rg)) {
       $r = get_resourcegroup_info($id);
     }
 
+    //
     // Check delegation update right
     if (! of_delegation_check_update_rights($params, $r['delegation'])) {
       $GLOBALS['err']['msg'] .= $GLOBALS['l_error_delegation'];
