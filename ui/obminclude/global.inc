@@ -336,7 +336,7 @@ $cgp_show['module']['deal'] = 'com';
 //$cgp_show['module']['list'] = 'com';
 $cgp_show['module']['publication'] = 'com';
 $cgp_show['module']['statistic'] = 'com';
-$cgp_show['module']['cv'] = 'false';
+$cgp_show['module']['cv'] = false;
 $cgp_show['module']['calendar'] = 'gw';
 $cgp_show['module']['contact'] = 'gw';
 $cgp_show['module']['todo'] = 'gw';
@@ -388,7 +388,7 @@ if ($cgp_use['service']['mail']) {
 }
 $cgp_show['module']['profile'] = 'admin';
 $cgp_show['module']['userpattern'] = 'admin';
-$cgp_show['module']['log'] = 'admin';
+$cgp_show['module']['log'] = false;
 
 if (!$cgp_use['service']['ldap']) {
   $cgp_show['module']['tools'] = false;

@@ -3597,7 +3597,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_save_as_template, $l_save_template;
   global $l_tag ;
   global $c_none ;
-
   $repeatfrequency = 1;
   $uid = $obm['uid']; 
   $tagcolor = "#eff0f2" ; // backcolor by default
@@ -3844,10 +3843,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     // If one new user is given in parameters, pre-select it
     $displayed_users = $current_view->get_users();
     if (is_array($calendar['new_user_id']) && count($calendar['new_user_id']) == 1) {
-      $u_id = $calendar['new_user_id'][0];
+      $u_id = current($calendar['new_user_id']);
     } else if (is_array($displayed_users) && count($displayed_users)==1) {
       // Else if calendar displayed was only one user, pre-select him
-      $u_id = $displayed_users[0];
+      $u_id = current($displayed_users);
     } else {
       // Else auto-select the connected user
       $u_id = "$uid";
