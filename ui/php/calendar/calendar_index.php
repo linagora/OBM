@@ -491,6 +491,7 @@ if ($action == 'search') {
   } else {
     $json[] = 'occUpdate:true';
   }
+  $json[] = 'mail:true';
   echo "({".implode(',',$json)."})";
   exit();
 
