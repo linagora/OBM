@@ -11515,8 +11515,6 @@ CREATE TABLE opush_sync_state (
        device_id	INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
        last_sync	TIMESTAMP NOT NULL
 );
-ALTER TABLE ONLY opush_sync_state ADD CONSTRAINT 
-unique_opush_col_dev UNIQUE (collection_id, device_id);
 
 CREATE TABLE opush_sec_policy (
        id				SERIAL PRIMARY KEY,

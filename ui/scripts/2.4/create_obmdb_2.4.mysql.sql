@@ -3619,8 +3619,6 @@ CREATE TABLE `opush_sync_state` (
         CONSTRAINT `opush_sync_state_collection_id_opush_folder_mapping_id_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE,
         CONSTRAINT `opush_sync_state_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-ALTER TABLE `opush_sync_state` ADD CONSTRAINT
-unique_opush_col_dev UNIQUE (`collection_id`, `device_id`);
 
 
 --
