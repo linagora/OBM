@@ -2218,8 +2218,10 @@ Obm.CalendarQuickForm = new Class({
       obm.calendarManager.sendDeleteEvent(this.eventData); 
     } else {
       var evt = obm.calendarManager.events.get(this.eventData.element_id);
-      evt.event.title = this.eventData.title;
-      obm.calendarManager.sendUpdateEvent(evt, true);
+      if (evt.event.title != this.eventData.title)  {
+        evt.event.title = this.eventData.title;
+        obm.calendarManager.sendUpdateEvent(evt, true);
+      }
     }
     this.hide();
   },
