@@ -130,7 +130,7 @@ class ContactIndexingJob extends CronJob {
         if (!$solr_contact_lastupdate) {
           $query = "$select ORDER BY contact_id LIMIT $limit";
         } else {
-          $d = new Of_Date($solr_contact_lastupdate);
+          $d = new Of_Date($solr_contact_lastupdate, 'GMT');
           $query = "$select AND ((contact_id > $solr_lastcontact) 
            OR (contact_timecreate >= '$d' OR contact_timeupdate >= '$d'))  
            ORDER BY contact_id LIMIT $limit";
@@ -181,16 +181,16 @@ class ContactIndexingJob extends CronJob {
           $doc->setField('function', $db->f('contactfunction_label'));
           $doc->setField('title', $db->f('contact_title'));
           if ($db->f('contact_archive')) {
-            $doc->setField('is', 'archive');
+            $doc->setMultiValue('is', 'archive');
           }
           if ($db->f('contact_collected')) {
-            $doc->setField('is', 'collected');
+            $doc->setMultiValue('is', 'collected');
           }
           if ($db->f('contact_mailing_ok')) {
-            $doc->setField('is', 'mailing');
+            $doc->setMultiValue('is', 'mailing');
           }        
           if ($db->f('contact_newsletter')) {
-            $doc->setField('is', 'newsletter');
+            $doc->setMultiValue('is', 'newsletter');
           }
           $date = new Of_Date($db->f('contact_date'));
           $doc->setField('date', $date->format('Y-m-d\TH:i:s\Z'));
@@ -228,7 +228,7 @@ class ContactIndexingJob extends CronJob {
 
         // Remove deleted event
         if ($solr_contact_lastupdate) {
-          $d = new Of_Date($solr_contact_lastupdate);
+          $d = new Of_Date($solr_contact_lastupdate, 'GMT');
           $query = "SELECT deletedcontact_contact_id FROM DeletedContact 
             WHERE deletedcontact_timestamp > '$d'";
 
