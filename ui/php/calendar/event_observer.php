@@ -801,7 +801,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
     foreach ($recipients as $resource) {
       $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resource->id));
       if (!in_array($GLOBALS['obm']['uid'], $resourceOwners) && count($resourceOwners) > 0) {
-        $this->mailer->sendResourceReservation($new, $resourceOwners);
+        $this->mailer->sendResourceReservation($new, $resourceOwners, $resource);
       }
     }      
   }
@@ -819,7 +819,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
     foreach ($recipients as $resource) {
       $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resource->id));
       if (!in_array($GLOBALS['obm']['uid'], $resourceOwners) && count($resourceOwners) > 0) {
-        $this->mailer->sendResourceCancel($old, $resourceOwners);
+        $this->mailer->sendResourceCancel($old, $resourceOwners, $resource);
       }
     }       
   }

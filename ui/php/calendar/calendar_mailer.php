@@ -16,7 +16,7 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
-?><?php
+
 require("$obminclude/of/of_mailer.php");
 
 class CalendarMailer extends OBM_Mailer {
@@ -97,10 +97,10 @@ class CalendarMailer extends OBM_Mailer {
   /////////////////////////////////////////////////////////////////////////////
   // RESOURCE
   /////////////////////////////////////////////////////////////////////////////
-  protected function resourceReservation($event, $resourceOwners) {
+  protected function resourceReservation($event, $resourceOwners, $resource) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($resourceOwners);
-    $this->subject = __('New resource reservation on OBM: %title%', array('%title%' => $event->title));
+    $this->subject = __('Resource %resource% reservation on OBM: %title%', array('%resource%' => $resource->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
   }
 
@@ -111,10 +111,10 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = $this->extractEventDetails($event, $this->from);
   }
   
-  protected function resourceUpdate($event, $oldEvent, $resourceOwners) {
+  protected function resourceUpdate($event, $oldEvent, $resourceOwners, $resource) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($resourceOwners);
-    $this->subject = __('Resource reservation updated on OBM: %title%', array('%title%' => $event->title));
+    $this->subject = __('Resource %resource% reservation updated on OBM: %title%', array('%resource%' => $resource->label, '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
   }
