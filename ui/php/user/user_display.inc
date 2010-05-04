@@ -811,7 +811,7 @@ function html_user_consult($obm_q) {
   $mail_server_id = $obm_q->f('userobm_mail_server_id');
   $mail_server_host_name = $obm_q->f('mailserver_hostname');
   $mail_quota = $obm_q->f('userobm_mail_quota');
-  $email_nomade = $obm_q->f('userobm_email_nomade');
+  $email_nomade = str_replace("\r\n","<br/>",$obm_q->f('userobm_email_nomade'));
   $nomade_perms = $obm_q->f('userobm_nomade_perms');
   $nomade_enable = $obm_q->f('userobm_nomade_enable');
   $nomade_local_copy = $obm_q->f('userobm_nomade_local_copy');
@@ -1905,15 +1905,14 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     if ($nomade_enable) $nomade_enable_c = ' checked';
     if ($nomade_local_copy) $nomade_local_copy_c = ' checked';
 
+    $nomade_mail_block = dis_user_nomade_mail_field($email_nomade,$class);
+
     $nomad_section = "
   <fieldset class=\"detail infos\">
   <legend>$l_nomade</legend>
 
   <table>
-  <tr>
-    <th class=\"$class[email_nomade]\">$l_email_nomade</th>
-    <td><input id=\"tf_email_nomade\" name=\"tf_email_nomade\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\" /></td>
-  </tr>
+  $nomade_mail_block
   <tr>
     <th class=\"$class[nomade_perms]\"><label for=\"cb_nomade_perms\">$l_perms</label></th>
     <td><input id=\"cb_nomade_perms\" name=\"cb_nomade_perms\" type=\"checkbox\" value=\"1\" $nomade_perms_c /></td>
@@ -3518,6 +3517,56 @@ function dis_user_mail_field($domain_id, $values, $class) {
   $add_button
   </th>
   <td id='userMailHome'>
+  $email_block
+  </td>
+  ";
+
+  return $email_block;
+}
+
+/**
+ * Generate external email field 
+ * 
+ * @param mixed $name 
+ * @param mixed $values 
+ * @access public
+ * @return void
+ */
+function dis_user_nomade_mail_field($emails, $class) {
+
+  if(!empty($emails) && !is_array($emails)) {
+    $emails = explode("\r\n",$emails);
+  }
+
+  $count = 0;
+  if(is_array($emails)) {
+    foreach($emails as $key => $email) {
+      $email_block .= "<div class=\"multiple\">
+        <a onclick=\"remove_element(this.parentNode,'nomadeMailHome');return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>
+        <input class='emailNomade' name='tf_email_nomade[]' value=\"$email\" />
+        </div>";
+      $count ++;
+    }
+  }
+
+  $email_block .= "
+    <div class=\"multiple\">
+    <a onclick=\"remove_element(this.parentNode,'nomadeMailHome');return false\" href=\"\">
+     <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+    </a>
+    <input class='emailNomade' name='tf_email_nomade[]' value='' />
+    </div>
+    ";  
+  $add_button = "<a id='addMailButton' href='' onclick=\"add_nomade_email_field();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+
+  $email_block = "
+  <th class=\"$class[email_nomade]\" id='nomadeMailLabel'>
+  $GLOBALS[l_email_nomade]
+  $add_button
+  </th>
+  <td id='nomadeMailHome'>
   $email_block
   </td>
   ";

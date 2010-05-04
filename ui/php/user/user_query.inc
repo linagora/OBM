@@ -1672,7 +1672,7 @@ function check_user_data_form($p_id, &$user) {
   $nomade_local_copy = $user['nomade_local_copy'];
   $vacation_enable = $user['vacation_enable'];
   $vacation_message = stripslashes($user['vacation_message']);
-  $email_nomade = $user['email_nomade'];
+  $email_nomade = stripslashes($user['email_nomade']);
   $smb_perms = $user['smb_perms'];
   $smb_home = trim(stripslashes($user['smb_home']));
   $smb_home_drive = $user['smb_home_drive'];
@@ -1785,6 +1785,66 @@ function check_user_data_form($p_id, &$user) {
     return false;
   }
 
+  // Email Nomad perms
+  if (($nomade_perms) && (!$mail_perms)) {
+    $err['msg'] = $l_nomade_without_mail_perms;
+    $err['field'] = 'nomade_perms';
+    return false;
+  }
+
+  // Email Nomad perms
+  if (($nomade_enable) && (!$nomade_perms)) {
+    $err['msg'] = $l_nomade_perms_error;
+    $err['field'] = 'nomade_perms';
+    return false;
+  }
+
+  // User nomad email not null if active
+  if ( ($email_nomade == '')
+       && ($nomade_enable) ) {
+    $err['msg'] = "$l_email_nomad_error";
+    $err['field'] = 'email_nomade';
+    return false;
+  }
+
+  // User nomad email
+  if ($email_nomade != '') {
+    $emails_nomade = array();
+    $em = strtok(strtolower($email_nomade),"\r\n");
+    while ($em) {
+
+      if (!preg_match($php_regexp_email, $em)) {
+        $err['msg'] = "$em : $l_email_error";
+        $err['field'] = 'email_nomade';
+        return false;
+      }
+
+      if (in_array($em, $emails_nomade)) {
+        $err['msg'] = "$l_email_nomade : $l_uemail_exist : $em";
+        $err['field'] = 'email_nomade';
+        return false;
+      }
+      $emails_nomade[] = $em;
+
+      $em = strtok("\r\n");
+    }
+
+    $used = get_email_used($emails_nomade, $id);
+    if (!empty($used)) {
+      $err['msg'] = "$l_email_nomade : $l_email_exist : $used ";
+      $err['field'] = 'email_nomade';
+      return false;
+    }
+  }
+
+  // User nomade local copy only if autorized and activated
+  if ( ($nomade_local_copy) && ((! $nomade_perms) || (! $nomade_enable)) )
+  {
+    $err['msg'] = $l_nomade_local_copy_error;
+    $err['field'] = 'nomade_local_copy';
+    return false;
+  }
+
   // If external mail access is granted, internal access should be too
   if ($mail_ext_perms && !($mail_perms)) {
     $err['msg'] = "$l_mail_perms_error";
@@ -1813,7 +1873,7 @@ function check_user_data_form($p_id, &$user) {
       $um = array();
 
       // All email addresses given are valid and not already used
-      $em = strtok($email, "\r\n");
+      $em = strtok(strtolower($email), "\r\n");
       while ($em) {
 
         if (! preg_match($php_regexp_email_name, $em) && !preg_match($php_regexp_email, $em)) {
@@ -1848,7 +1908,7 @@ function check_user_data_form($p_id, &$user) {
 
       foreach ($um as $one_email) {
 	if (strpos($one_email, '@')) {
-	  if (strcasecmp($one_email, $email_nomade) == 0) {
+	  if (in_array($one_email, $emails_nomade)) {
 	    $err['msg'] = "$l_email_nomad_error_loop";
 	    $err['field'] = 'email_nomade';
 	    return false;
@@ -1856,7 +1916,7 @@ function check_user_data_form($p_id, &$user) {
 	} else {
 	  // email name (@ left side), check with all domain aliases
 	  foreach ($domain_aliases as $one_dom) {
-	    if (strcasecmp($one_email.'@'.$one_dom, $email_nomade) == 0) {
+	    if (in_array($one_email.'@'.$one_dom, $emails_nomade)) {
 	      $err['msg'] = "$l_email_nomad_error_loop";
 	      $err['field'] = 'email_nomade';
 	      return false;
@@ -1889,44 +1949,6 @@ function check_user_data_form($p_id, &$user) {
        && (! preg_match($php_regexp_quota, $mail_quota))) {
     $err['msg'] = "$mail_quota : $l_quota_error";
     $err['field'] = 'mail_quota';
-    return false;
-  }
-   
-  // Email Nomad perms
-  if (($nomade_perms) && (!$mail_perms)) {
-    $err['msg'] = $l_nomade_without_mail_perms;
-    $err['field'] = 'nomade_perms';
-    return false;
-  }
-
-  // Email Nomad perms
-  if (($nomade_enable) && (!$nomade_perms)) {
-    $err['msg'] = $l_nomade_perms_error;
-    $err['field'] = 'nomade_perms';
-    return false;
-  }
-
-  // User nomad email not null if active
-  if ( ($email_nomade == '')
-       && ($nomade_enable) ) {
-    $err['msg'] = "$l_email_nomad_error";
-    $err['field'] = 'email_nomade';
-    return false;
-  }
-
-  // User nomad email
-  if ( ($email_nomade != '')
-       && (! preg_match($php_regexp_email, $email_nomade))) {
-    $err['msg'] = "$email_nomade : $l_email_error";
-    $err['field'] = 'email_nomade';
-    return false;
-  }
-
-  // User nomade local copy only if autorized and activated
-  if ( ($nomade_local_copy) && ((! $nomade_perms) || (! $nomade_enable)) )
-  {
-    $err['msg'] = $l_nomade_local_copy_error;
-    $err['field'] = 'nomade_local_copy';
     return false;
   }
 

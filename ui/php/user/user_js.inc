@@ -143,6 +143,19 @@ function add_email_field(template) {
   
 }
 
+function add_nomade_email_field() {
+
+  var mailHome = $('nomadeMailHome');
+  // Create the div
+  var div = new Element('div').addClass('multiple');
+  div.adopt(new Element('a').addEvent('click', function () {
+              remove_element(this.parentNode,'nomadeMailHome');
+            }).adopt(new Element('img').setProperty('src','$ico_delete')));
+  mailHome.adopt(div);
+  div.appendText(' ').adopt(new Element('input').addClass('emailNomade').setProperty('name','tf_email_nomade[]').setProperty('type','text'));
+  
+}
+
 function show_hide_add_button() {
   var button = $('addMailButton'); 
   var parent = $('userMailHome');

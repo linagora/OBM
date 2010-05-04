@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : mailforward_js.inc                                          //
 //     - Desc  : Mailforward javascript functions File                       //
@@ -28,6 +28,19 @@ if (($params["ext_widget"] != "") || ($params["ext_widget_text"] != "")) {
 
 $extra_js .= "
 
+function add_nomade_email_field() {
+
+  var mailHome = $('nomadeMailHome');
+  // Create the div
+  var div = new Element('div').addClass('multiple');
+  div.adopt(new Element('a').addEvent('click', function () {
+              remove_element(this.parentNode,'nomadeMailHome');
+            }).adopt(new Element('img').setProperty('src','$ico_delete')));
+  mailHome.adopt(div);
+  div.appendText(' ').adopt(new Element('input').addClass('emailNomade').setProperty('name','tf_email_nomade[]').setProperty('type','text'));
+  
+}
+
 // Check form data for mailforward
 function check_mailforward(form) {
 	var errMsg = '';
@@ -52,6 +65,3 @@ function check_mailforward(form) {
 	return ret;
 }
 ";  
-
-
-</script>

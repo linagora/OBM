@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : mailforward_query.inc                                        //
 //     - Desc : Mail Forwarding query & db File                              //
@@ -138,12 +138,12 @@ function exec_change_alias($usr_q, $forward) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_mailforward_data_form($usr_q, $forward) {
   global $l_nomade_not_allowed, $l_err_email, $l_email_nomad_error_loop;
-  global $php_regexp_email, $l_err_nomade_local_copy;
+  global $php_regexp_email, $l_err_nomade_local_copy, $l_email_nomad_exist;
   global $err, $action;
 
   $email = $usr_q->f('userobm_email');
   $nomade_perms = $usr_q->f('userobm_nomade_perms');
-  $email_nomade = $forward['email_nomade'];
+  $email_nomade = stripslashes($forward['email_nomade']);
   $nomade_enable = $forward['nomade_enable'];
   $nomade_local_copy = $forward['nomade_local_copy'];
   
@@ -160,12 +160,34 @@ function check_mailforward_data_form($usr_q, $forward) {
     return false;
   }
 
-  // Email nomade : correct if filled
-  if ( (trim($email_nomade) != '')
-       && (preg_match($php_regexp_email, $email_nomade) == false) ) {
-    $err['msg'] = "$email_nomade : $l_err_email";
-    $err['field'] = 'email_nomade';
-    return false;
+  // User nomad email
+  if ($email_nomade != '') {
+    $emails_nomade = array();
+    $em = strtok(strtolower($email_nomade),"\r\n");
+    while ($em) {
+
+      if (!preg_match($php_regexp_email, $em)) {
+        $err['msg'] = "$em : $l_email_error";
+        $err['field'] = 'email_nomade';
+        return false;
+      }
+
+      if (in_array($em, $emails_nomade)) {
+        $err['msg'] = "$l_email_nomade : $l_uemail_exist : $em";
+        $err['field'] = 'email_nomade';
+        return false;
+      }
+      $emails_nomade[] = $em;
+
+      $em = strtok("\r\n");
+    }
+
+    $used = get_email_used($emails_nomade, $id);
+    if (!empty($used)) {
+      $err['msg'] = "$l_email_nomad_exist : $used ";
+      $err['field'] = 'email_nomade';
+      return false;
+    }
   }
 
   // User nomade local copy only if autorized and activated
@@ -193,7 +215,7 @@ function check_mailforward_data_form($usr_q, $forward) {
 
     foreach ($user_emails as $one_email) {
       if (strpos($one_email, '@')) {
-	if (strcasecmp($one_email, $email_nomade) == 0) {
+	if (in_array($one_email, $emails_nomade)) {
 	  $err['msg'] = "$l_email_nomad_error_loop";
 	  $err['field'] = 'email_nomade';
 	  return false;
@@ -201,7 +223,7 @@ function check_mailforward_data_form($usr_q, $forward) {
       } else {
 	// email name (@ left side), check with all domain aliases
 	foreach ($domain_aliases as $one_dom) {
-	  if (strcasecmp($one_email.'@'.$one_dom, $email_nomade) == 0) {
+	  if (in_array($one_email.'@'.$one_dom, $emails_nomade)) {
 	    $err['msg'] = "$l_email_nomad_error_loop";
 	    $err['field'] = 'email_nomade';
 	    return false;
@@ -213,6 +235,3 @@ function check_mailforward_data_form($usr_q, $forward) {
   
   return true;
 }
-
-
-</script>

@@ -497,6 +497,18 @@ function get_user_params() {
     $params['vacation_dateend']->setHour($params["time_end"])->setMinute($params["min_end"])->setSecond(0);
   } 
 
+  if (is_array($params['email_nomade'])) {
+    $email_aliases = array();
+    while(!empty($params['email_nomade'])) {
+      $email = trim(array_shift($params['email_nomade']));
+      if(!empty($email)) {
+        $email_aliases[] = $email;
+      }
+    }
+
+    $params['email_nomade'] = implode("\r\n", $email_aliases);
+  }
+
   if (is_array($params['email'])) {
     $email_aliases = array();
     while(!empty($params['email'])) {

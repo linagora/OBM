@@ -109,6 +109,18 @@ function get_forward_params() {
   // Get global params
   $params = get_global_params('mailforward');
 
+  if (is_array($params['email_nomade'])) {
+    $email_aliases = array();
+    while(!empty($params['email_nomade'])) {
+      $email = trim(array_shift($params['email_nomade']));
+      if(!empty($email)) {
+        $email_aliases[] = $email;
+      }
+    }
+
+    $params['email_nomade'] = implode("\r\n", $email_aliases);
+  }
+
   return $params;
 }
 
