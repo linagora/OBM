@@ -29,7 +29,7 @@ public class DirectoryConfig {
 		ldapAtts = cs.getStringValue("ldapAtts").split(",");
 		ldapFilter = "(" + cs.getStringValue("ldapFilter") + "=" + loginWithoutDomain + ")";
 		logger.info("ldap filter: "+ldapFilter);
-		configXml = cs.getStringValue("configXml");
+		configXml = "/usr/share/obm-autoconf/config.xml";
 	}
 
 	public int getLdapPort() {
