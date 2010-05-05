@@ -89,6 +89,7 @@ public class DBQueryTool {
 			ps.setString(1, login);
 			ps.setString(2, domainName);
 			ps.setString(3, domainName);
+			ps.setString(4, domainName);
 			rs = ps.executeQuery();
 
 			while (rs.next()) {

@@ -129,7 +129,7 @@ public class TemplateLoader {
 		}
 		replaceServiceHostName(line, "${imapMailHost}", servicesHostNames.get("imap_frontend"));
 		replaceServiceHostName(line, "${smtpMailHost}",  servicesHostNames.get("smtp_out"));
-		replaceServiceHostName(line, "${ldapHost}",  servicesHostNames.get("ldap"));
+		replaceServiceHostName(line, "${ldapHost}",  ConstantService.getInstance().getStringValue("ldapServer"));
 		replaceServiceHostName(line, "${obmSyncHost}",  servicesHostNames.get("obm_sync"));
 
 		for (Object key : constants.getKeySet()) {
