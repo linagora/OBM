@@ -201,6 +201,10 @@ $c_max_user_alias = 0;
 $c_max_domain_alias = 0;
 $c_max_mailshare_alias = 0;
 $c_max_group_alias = 1;
+
+// Max user nomade mail
+$c_max_email_nomade = 1;
+
 // Access restriction
 
 //---------------------------------------------------------------------------//

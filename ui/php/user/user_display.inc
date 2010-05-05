@@ -3542,7 +3542,7 @@ function dis_user_nomade_mail_field($emails, $class) {
   if(is_array($emails)) {
     foreach($emails as $key => $email) {
       $email_block .= "<div class=\"multiple\">
-        <a onclick=\"remove_element(this.parentNode,'nomadeMailHome');return false\" href=\"\">
+        <a onclick=\"remove_element(this.parentNode,'nomadeMailHome');show_hide_nomade_add_button();return false\" href=\"\">
          <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
         </a>
         <input class='emailNomade' name='tf_email_nomade[]' value=\"$email\" />
@@ -3551,15 +3551,20 @@ function dis_user_nomade_mail_field($emails, $class) {
     }
   }
 
-  $email_block .= "
+  if ($GLOBALS['c_max_email_nomade'] ==0 || $count < $GLOBALS['c_max_email_nomade']) {
+    $email_block .= "
     <div class=\"multiple\">
-    <a onclick=\"remove_element(this.parentNode,'nomadeMailHome');return false\" href=\"\">
+    <a onclick=\"remove_element(this.parentNode,'nomadeMailHome');show_hide_nomade_add_button();return false\" href=\"\">
      <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
     </a>
     <input class='emailNomade' name='tf_email_nomade[]' value='' />
     </div>
     ";  
-  $add_button = "<a id='addMailButton' href='' onclick=\"add_nomade_email_field();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+    $count++;
+  }
+  if ($GLOBALS['c_max_email_nomade'] ==0 || $count < $GLOBALS['c_max_email_nomade']) {
+    $add_button = "<a id='addMailNomadeButton' href='' onclick=\"add_nomade_email_field();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+  }
 
   $email_block = "
   <th class=\"$class[email_nomade]\" id='nomadeMailLabel'>

@@ -144,16 +144,32 @@ function add_email_field(template) {
 }
 
 function add_nomade_email_field() {
-
   var mailHome = $('nomadeMailHome');
   // Create the div
   var div = new Element('div').addClass('multiple');
   div.adopt(new Element('a').addEvent('click', function () {
               remove_element(this.parentNode,'nomadeMailHome');
+              show_hide_nomade_add_button();
             }).adopt(new Element('img').setProperty('src','$ico_delete')));
   mailHome.adopt(div);
   div.appendText(' ').adopt(new Element('input').addClass('emailNomade').setProperty('name','tf_email_nomade[]').setProperty('type','text'));
   
+}
+
+function show_hide_nomade_add_button() {
+  var button = $('addMailNomadeButton'); 
+  var parent = $('nomadeMailHome');
+  var childs = parent.getChildren();
+  if($GLOBALS[c_max_email_nomade] > 0) {
+    if(childs.length >= $GLOBALS[c_max_email_nomade] && button) {
+      button.dispose();
+   } else if(childs.length < $GLOBALS[c_max_email_nomade] && !button) {
+      $('nomadeMailLabel').adopt((new Element('a').addEvent('click', function () {
+                add_nomade_email_field();
+                show_hide_nomade_add_button();
+              }).setProperty('id','addMailNomadeButton').adopt(new Element('img').setProperty('src','$ico_add'))));     
+    }
+  }
 }
 
 function show_hide_add_button() {
