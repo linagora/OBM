@@ -471,13 +471,28 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   if(isset($params['calendar_id']) && $params['calendar_id'] != '') {
     $event_q = run_query_calendar_detail($params['calendar_id']);
+    $entities = get_calendar_event_entity($params['calendar_id']);
+  } else {
+    $entities['user']['ids'][] = $params['entity_id'];
+    $entities['resource']['ids'] = array();
   }
+  $resourceNotification = false;
+  if (is_array($entities['resource']['ids'])) {
+    foreach($entities['resource']['ids'] as $r_id) {
+      if (!OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) $resourceNotification = true;
+    }
+  }
+
   if ((!$event_q) || ($event_q->f('event_repeatkind')=='none')) {
     $json[] = 'occUpdate:false';
   } else {
     $json[] = 'occUpdate:true';
   }
-  $json[] = 'mail:true';
+  if ($entities['user']['ids'] == array($obm['uid']) && !$resourceNotification ) {
+    $json[] = 'mail:false';
+  } else {
+    $json[] = 'mail:true';
+  }
   echo "({".implode(',',$json)."})";
   exit();
 
@@ -490,13 +505,19 @@ if ($action == 'search') {
     $entities['user']['ids'][] = $params['entity_id'];
     $entities['resource']['ids'] = array();
   }
+  $resourceNotification = false;
+  if (is_array($entities['resource']['ids'])) {
+    foreach($entities['resource']['ids'] as $r_id) {
+      if (!OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) $resourceNotification = true;
+    }
+  }
   $conflicts = quick_check_calendar_conflict($params, $entities);
   if ((!$event_q) || ($event_q->f('event_repeatkind')=='none') || !($params['date_begin']->equals($params['old_date_begin']))) {
     $json[] = 'occUpdate:false';
   } else {
     $json[] = 'occUpdate:true';
   }
-  if ($entities['user']['ids'] == array($obm['uid'])) {
+  if ($entities['user']['ids'] == array($obm['uid']) && !$resourceNotification ) {
     $json[] = 'mail:false';
   } else {
     $json[] = 'mail:true';
@@ -519,6 +540,12 @@ if ($action == 'search') {
     $entities['user']['ids'][] = $params['entity_id'];
     $entities['resource']['ids'] = array();
   }
+  $resourceNotification = false;
+  if (is_array($entities['resource']['ids'])) {
+    foreach($entities['resource']['ids'] as $r_id) {
+      if (!OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) $resourceNotification = true;
+    }
+  }
   if ((!$event_q) || ($event_q->f('event_repeatkind')=='none')) {
     $json[] = 'occDelete:false';
     $json[] = 'checkDelete:true';
@@ -526,7 +553,7 @@ if ($action == 'search') {
     $json[] = 'occDelete:true';
     $json[] = 'checkDelete:false';
   }
-  if ($entities['user']['ids'] == array($obm['uid'])) {
+  if ($entities['user']['ids'] == array($obm['uid']) && !$resourceNotification ) {
     $json[] = 'mail:false';
   } else {
     $json[] = 'mail:true';
