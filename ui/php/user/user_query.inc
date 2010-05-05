@@ -1828,13 +1828,6 @@ function check_user_data_form($p_id, &$user) {
 
       $em = strtok("\r\n");
     }
-
-    $used = get_email_used($emails_nomade, $id);
-    if (!empty($used)) {
-      $err['msg'] = "$l_email_nomade : $l_email_exist : $used ";
-      $err['field'] = 'email_nomade';
-      return false;
-    }
   }
 
   // User nomade local copy only if autorized and activated
