@@ -327,15 +327,14 @@ function add_displayed_attendee(check, attendee, uid, kind) {
       var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
       if ($(sel_id) == null) {
         of_select_add_element(window.document, 'sel_'+kind+'_id', 'data-'+kind+'-'+id, attendee[id]);
+        $(sel_id).addClass('x-obm-display-add')
       }
     }
   } else {
     for(var id in attendee) {
-      if (id != uid) {
-        var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
-        if (sel_id != null) {
-          $(sel_id).destroy();
-        }
+      var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
+      if ($(sel_id) != null && $(sel_id).hasClass('x-obm-display-add')) {
+        $(sel_id).destroy();
       }
     }
   }
