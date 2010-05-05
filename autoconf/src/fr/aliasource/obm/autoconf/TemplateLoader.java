@@ -110,10 +110,11 @@ public class TemplateLoader {
 		return ret;
 	}
 
-	private void replaceServiceHostName(String line, String serviceParam, String serviceHostName) {
+	private String replaceServiceHostName(String line, String serviceParam, String serviceHostName) {
 		if (serviceHostName != null && !serviceHostName.equals("")) {
 			line = line.replace(serviceParam, serviceHostName);
 		}
+		return line;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -127,10 +128,10 @@ public class TemplateLoader {
 							.getStringValue());
 			}
 		}
-		replaceServiceHostName(line, "${imapMailHost}", servicesHostNames.get("imap_frontend"));
-		replaceServiceHostName(line, "${smtpMailHost}",  servicesHostNames.get("smtp_out"));
-		replaceServiceHostName(line, "${ldapHost}", constants.getStringValue("ldapServer"));
-		replaceServiceHostName(line, "${obmSyncHost}",  servicesHostNames.get("obm_sync"));
+		line = replaceServiceHostName(line, "${imapMailHost}", servicesHostNames.get("imap_frontend"));
+		line = replaceServiceHostName(line, "${smtpMailHost}",  servicesHostNames.get("smtp_out"));
+		line = replaceServiceHostName(line, "${ldapHost}", constants.getStringValue("ldapServer"));
+		line = replaceServiceHostName(line, "${obmSyncHost}",  servicesHostNames.get("obm_sync"));
 
 		for (Object key : constants.getKeySet()) {
 			String k = (String) key;
