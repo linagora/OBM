@@ -43,19 +43,20 @@ public class DavRequest {
 
 	public DavRequest(HttpServletRequest req) throws CalDavException {
 		this.req = req;
-//		Enumeration headerNames = req.getHeaderNames();
-//		while (headerNames.hasMoreElements()) {
-//			String hn = (String) headerNames.nextElement();
-//			String val = req.getHeader(hn);
-//			logger.info(hn + ": " + val);
-//		}
+		// Enumeration headerNames = req.getHeaderNames();
+		// while (headerNames.hasMoreElements()) {
+		// String hn = (String) headerNames.nextElement();
+		// String val = req.getHeader(hn);
+		// logger.info(hn + ": " + val);
+		// }
 		initRequest();
 	}
 
 	private void initRequest() throws CalDavException {
 
-		if (req.getHeader("Content-Type") != null){
-			if(req.getContentType().contains("text/xml")) {
+		if (req.getHeader("Content-Type") != null) {
+			if (req.getContentType().contains("text/xml")
+					|| req.getContentType().contains("application/xml")) {
 				try {
 					InputStream in = req.getInputStream();
 					xml = DOMUtils.parse(in);
@@ -63,7 +64,7 @@ public class DavRequest {
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 				}
-			} else if(req.getContentType().contains("text/calendar")) {
+			} else if (req.getContentType().contains("text/calendar")) {
 				try {
 					InputStream in = req.getInputStream();
 					ics = FileUtils.streamString(in, false);
@@ -97,7 +98,7 @@ public class DavRequest {
 	public Document getXml() {
 		return xml;
 	}
-	
+
 	public String getICS() {
 		return ics;
 	}
@@ -113,7 +114,7 @@ public class DavRequest {
 	public String getCalendarName() {
 		return this.calendarName;
 	}
-	
+
 	public String getMethod() {
 		return req.getMethod();
 	}
@@ -125,12 +126,12 @@ public class DavRequest {
 	public String getQueryString() {
 		return req.getQueryString();
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public Set<String> getRecipients(){
+	public Set<String> getRecipients() {
 		Set<String> recipients = new HashSet<String>();
 		Enumeration headerNames = req.getHeaders("Recipient");
-		while(headerNames.hasMoreElements()){
+		while (headerNames.hasMoreElements()) {
 			String recipient = (String) headerNames.nextElement();
 			recipients.add(recipient);
 		}

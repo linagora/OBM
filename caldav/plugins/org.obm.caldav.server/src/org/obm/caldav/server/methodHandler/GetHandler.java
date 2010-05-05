@@ -16,12 +16,16 @@
 
 package org.obm.caldav.server.methodHandler;
 
-
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IBackend;
+import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.share.CalendarResourceICS;
 import org.obm.caldav.server.share.Token;
 
 
@@ -41,6 +45,27 @@ public class GetHandler extends DavMethodHandler {
 	public void process(Token token, IBackend backend, DavRequest req,
 			HttpServletResponse resp) throws Exception {
 		logger.info("process(req, resp)");
+		if(req.getURI().endsWith(".ics")){
+			int ids = req.getURI().lastIndexOf("/");
+			String eventName = req.getURI().substring(ids+1);
+			int idp = eventName.indexOf(".");
+			eventName = eventName.substring(0,idp);
+			String compUrl = req.getURI().substring(0,ids);
+			logger.info("Try to get event["+eventName+"] in component "+compUrl);
+			Set<String> l = new HashSet<String>();
+			l.add(eventName);
+			List<CalendarResourceICS> crs = backend.getCalendarService().getICSFromExtId(compUrl, l);
+			if(crs.iterator().hasNext()){
+				CalendarResourceICS ics = crs.iterator().next(); 
+				logger.info("Send:"+ics.getIcs());
+				resp.getOutputStream().write(ics.getIcs().getBytes());
+				resp.setHeader("ETag", ics.getETag());
+				resp.setContentType("text/calendar");
+				resp.setContentLength(ics.getIcs().getBytes().length);
+			} else {
+				resp.sendError(StatusCodeConstant.SC_NOT_FOUND);
+			}
+		}
 //		List<Event> event = proxy.getCalendarService().getAll(DavComponent.VEVENT);
 //		Event ev = event.get(0);
 //		Set<String> l = new HashSet<String>();
@@ -48,7 +73,6 @@ public class GetHandler extends DavMethodHandler {
 //		Map<Event,String>  e = proxy.getCalendarService().getICSFromExtId(l);
 //		String ics = e.values().iterator().next();
 //		resp.getOutputStream().write(ics.getBytes());
-		backend.getETag();
 		//throw new CalDavException(StatusCodeConstant.SC_NOT_ALLOWED);
 	}
 
