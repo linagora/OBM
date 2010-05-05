@@ -838,7 +838,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
       foreach ($recipients as $resource) {
         $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resource->id));
         if (!in_array($GLOBALS['obm']['uid'], $resourceOwners) && count($resourceOwners) > 0) {
-          $this->mailer->sendResourceUpdate($new, $old, $resourceOwners);
+          $this->mailer->sendResourceUpdate($new, $old, $resourceOwners, $resource);
         }
       }         
     }
