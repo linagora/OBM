@@ -45,7 +45,7 @@ public class DBQueryTool {
 				+ " LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id"
 				+ " LEFT JOIN Host ON CAST(host_id as CHAR) = serviceproperty_value"
 				+ " WHERE serviceproperty_service = 'mail'"
-				+ "   AND serviceproperty_property IN ('imap')"
+				+ "   AND serviceproperty_property IN ('imap_frontend')"
 				+ "   AND (domain_name = ? OR domain_global = true)"
 				+ "   AND userobm_mail_server_id = host_id"
 				+
