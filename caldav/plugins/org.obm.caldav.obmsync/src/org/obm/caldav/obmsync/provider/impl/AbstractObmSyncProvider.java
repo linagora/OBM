@@ -134,16 +134,8 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				event.setDate(cal.getTime());
 			}
 			event.setExtId(extId);
-			boolean find = false;
-			for (Attendee att : event.getAttendees()) {
-				if (caldavInfo.getLoginAtDomain().equals(att.getEmail())) {
-					find = true;
-					break;
-				}
-			}
-			if (!find) {
-				event.addAttendee(getAttendee(caldavInfo.getLoginAtDomain()));
-			}
+			
+			addAttendee(caldavInfo,event);
 			fixPrioriryForObm(event);
 			logger.info("Create event with extId " + extId);
 			getClient(caldavInfo).createEvent(caldavInfo.getToken(),
@@ -177,12 +169,26 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 					}
 				}
 			}
+			addAttendee(caldavInfo, event);
 			fixPrioriryForObm(event);
 			event = getClient(caldavInfo).modifyEvent(caldavInfo.getToken(),
 					caldavInfo.getCalendar(), event, true);
 			ret.add(event);
 		}
 		return ret;
+	}
+	
+	private void addAttendee(CalDavInfo caldavInfo, Event event) {
+		boolean find = false;
+		for (Attendee att : event.getAttendees()) {
+			if (caldavInfo.getLoginAtDomain().equals(att.getEmail())) {
+				find = true;
+				break;
+			}
+		}
+		if (!find) {
+			event.addAttendee(getAttendee(caldavInfo.getLoginAtDomain()));
+		}
 	}
 
 	public List<Event> getAll(CalDavInfo caldavInfo, EventType eventType)
