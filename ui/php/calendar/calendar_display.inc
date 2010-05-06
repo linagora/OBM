@@ -4944,15 +4944,6 @@ function dis_calendar_free_interval($current_view, $calendar) {
   if (!is_array($entity_store['resourcegroup'])) $entity_store['resourcegroup'] = array();
 
   $entities_resources = array_merge($entity_store['resource'], $entity_store['resourcegroup']);
-  $user_readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read'); 
-  $user_readEntities_id = array_keys($user_readEntities);
-  $user_accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access'); 
-  $user_accessEntities_id = array_keys($user_accessEntities);
-
-  $res_readEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'resource', 'read'); 
-  $res_readEntities_id = array_keys($res_readEntities);
-  $res_accessEntities = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'resource', 'access'); 
-  $res_accessEntities_id = array_keys($res_accessEntities);
 
   $contacts = array();
   if (is_array($calendar['contact_id'])) {
@@ -4963,18 +4954,20 @@ function dis_calendar_free_interval($current_view, $calendar) {
   }
 
   $users = array();
-  if (is_array($entity_store['user'])) {
-    foreach($entity_store['user'] as $user) {
-      $users[$user[id]] = $of->getPeriodOccurrences($date, $end, array('user' => array($user[id])));
-      if (!is_array($users[$user[id]]) && in_array($user[id], $user_accessEntities_id)) $users[$user[id]] = array();
+  if (!empty($entity_store['user'])) {
+    $userReadableList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'read',array_keys($entity_store['user']));
+    $accessList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'access',array_keys($entity_store['user']));
+    foreach($accessList as $id => $user) {
+      $users[$id] = (array)$of->getPeriodOccurrences($date, $end, array('user' => array($id)));
     }
   }
 
   $resources = array();
-  if (is_array($entities_resources)) {
-    foreach($entities_resources as $res) {
-      $resources[$res[id]] = $of->getPeriodOccurrences($date, $end, array('resource' => array($res[id])));
-      if (!is_array($resources[$res[id]]) && in_array($res[id], $res_accessEntities_id)) $resources[$res[id]] = array();
+  if (!empty($entities_resources)) {
+    $accessList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'resource', 'access', array_keys($entities_resources));
+    $resourceReadableList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'resource', 'read',array_keys($entities_resources));
+    foreach($accessList as $id => $resource) {
+      $resources[$id] = (array)$of->getPeriodOccurrences($date, $end, array('resource' => array($id)));
     }
   }
 
@@ -5005,12 +4998,14 @@ function dis_calendar_free_interval($current_view, $calendar) {
       $e->addSecond($time_unit_sec);
 
       // Users
-      foreach($users as $id => $ocs) {
+      foreach($users as $id => &$ocs) {
         $busy = false;
         $tips = array();
         if (is_array($ocs)) {
-          foreach($ocs as $oc) {
-            if (($oc->date >= $d && $oc->date < $e) || ($oc->end > $d && $oc->end <= $e) || ($oc->date <= $d && $oc->end > $d)) {
+          foreach($ocs as $index => $oc) {
+            if($oc->date->compare($e) >= 0) break;
+            if($oc->end->compare($d) <= 0 || $oc->event->opacity == 'TRANSPARENT') unset($ocs[$index]);
+            elseif ($oc->date->compare($e) < 0 && $oc->end->compare($d) > 0) {
               array_push($tips, $oc);
               $busy = true;
             }
@@ -5018,7 +5013,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
           if ($busy) {
             $is_busy = true;
             array_push($busy_time_slots, $slots);
-            if (in_array($id, $user_readEntities_id)) {
+            if (isset($userReadableList[$id])) {
               $tip = html_freebusy_tip($tips);
             } else {
               $tip = $GLOBALS['l_occupied'];
@@ -5035,12 +5030,14 @@ function dis_calendar_free_interval($current_view, $calendar) {
       }
 
       // Resources
-      foreach($resources as $id => $ocs) {
+      foreach($resources as $id => &$ocs) {
         $busy = false;
         $tips = array();
         if (is_array($ocs)) {
-          foreach($ocs as $oc) {
-            if (($oc->date >= $d && $oc->date < $e) || ($oc->end > $d && $oc->end <= $e) || ($oc->date <= $d && $oc->end > $d)) {
+          foreach($ocs as $index => $oc) {
+            if($oc->date->compare($e) >= 0) break;
+            if($oc->end->compare($d) <= 0 || $oc->event->opacity == 'TRANSPARENT') unset($ocs[$index]);
+            elseif ($oc->date->compare($e) < 0 && $oc->end->compare($d) > 0) {
               array_push($tips, $oc);
               $busy = true;
             }
@@ -5048,7 +5045,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
           if ($busy) {
             $is_busy = true;
             array_push($busy_time_slots, $slots);
-            if (in_array($id, $res_readEntities_id)) {
+            if ($resourceReadableList[$id]) {
               $tip = html_freebusy_tip($tips);
             } else {
               $tip = $GLOBALS['l_occupied'];
@@ -5070,7 +5067,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
         if (is_array($evts)) {
           $busy = false;
           foreach($evts as $evt) {
-            if (($evt->start >= $d && $evt->start < $e) || ($evt->end > $d && $evt->end <= $e) || ($evt->start <= $d && $evt->end > $d)) {
+            if ($evt->start->compare($e) < 0 && $$evt->end->compare($d) > 0) {
               $busy = true;
             }
           }
