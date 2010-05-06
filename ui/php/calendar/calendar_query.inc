@@ -1110,13 +1110,12 @@ function search_user_by_name($lastname, $firstname) {
 function check_calendar_conflict($calendar, $sel_entity_id) {
 
   if ($calendar['opacity'] == 'TRANSPARENT') return false;
-  $read_entity = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read');
 
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
-  $sel_entity_id[user] = array_intersect(array_keys($read_entity), $sel_entity_id['user']);
+  $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read', $sel_entity_id['user']));
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   if (sizeof($cal_entities) == 0) return false; // user doesn't have read permission on attendees
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
@@ -1153,7 +1152,6 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function quick_check_calendar_conflict($calendar, $entities) {
   if ($calendar['all_day']) return false;
-  $read_entity = OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read');
 
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
@@ -1168,7 +1166,7 @@ function quick_check_calendar_conflict($calendar, $entities) {
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
   // Event entities
-  $sel_entity_id['user'] = array_intersect(array_keys($read_entity), $entities['user']['ids']);
+  $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read', $entities['user']['ids']));
   $sel_entity_id['resource'] = $entities['resource']['ids'];
 
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
