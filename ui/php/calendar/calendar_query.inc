@@ -5232,7 +5232,7 @@ Class OccurrenceFactory {
  * @return void
  */
 function occurrenceDateSort($occA, $occB) {
-  if ($occA->date < $occB->date) {
+  if ($occA->date->compare($occB->date) < 0 ){
     return -1;
   } else {
     return 1;
