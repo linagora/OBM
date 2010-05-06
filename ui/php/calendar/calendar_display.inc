@@ -96,7 +96,7 @@ function dis_calendar_search_result($calendar, $current_view) {
 
   $calendar_entity = $current_view->get_entities();
   $readable_entity = OBM_Acl_Utils::expandEntitiesArray(
-    OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read')
+    OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $current_view->get_users())
   );
 
   $events = null;
@@ -2570,8 +2570,8 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
   global $l_private, $obm;
 
-  $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read'));
-  $readable['resource'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read'));
+  $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $calendar['sel_user_id']));
+  $readable['resource'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read', $calendar['sel_resource_id']));
 
   $datebegin = clone $calendar["date_begin"];
   $dateend = clone $calendar["date_end"];
