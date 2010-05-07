@@ -156,8 +156,12 @@ Obm.CalendarManager = new Class({
             var target = "";
             if (obm.vars.consts.action == 'portlet') target = "target='_blank'";
             if (more) {
-              var title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title+'</a>';
-	            var color = evt.content.getStyle('backgroundColor');
+              if (evt.isExternal()) {
+                var title = '<b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title;
+              } else {
+                var title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title+'</a>';
+              }
+	      var color = evt.content.getStyle('backgroundColor');
               if (evt.event.colors.event && evt.event.colors.event.body) color = evt.event.colors.event.body;
               var style = 'style="color:'+color+'"';
               if (evt.event.all_day) {
