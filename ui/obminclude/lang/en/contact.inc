@@ -135,6 +135,10 @@ $l_email_labels = array ('INTERNET' => 'Home', 'OTHER' => 'Other');
 $l_address_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');
 $l_website_labels = array ('URL' => 'Homepage', 'BLOG' => 'Blog', 'OTHER' => 'Other');
 $l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ');
+$l_company_phone_labels = array ('COMPANY_WORK_VOICE' => 'Company\'s phone', 'COMPANY_CELL_VOICE' => 'Company\'s mobile', 'COMPANY_WORK_FAX' => 'Company\'s fax', 'COMPANY_OTHER' => 'Company\'s other phone');
+$l_company_email_labels = array ('COMPANY_INTERNET' => 'Company\'s mail', 'COMPANY_OTHER' => 'Company\'s other');
+$l_company_address_labels = array ('COMPANY_HQ' => 'Company\'s headquarters', 'COMPANY_OTHER' => 'Company\'s other');
+$l_company_website_labels = array ('COMPANY_URL' => 'Company\'s website', 'COMPANY_OTHER' => 'Company\'s other');
 // Error Messages
 $l_err_length_express_postal = "Field 'EXPRESS POSTAL' has 16 characters max";
 $l_err_length_express_postal = "Field 'ZIP CODE' has 14 characters max";

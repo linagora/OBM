@@ -1127,7 +1127,7 @@ class OBM_Contact implements OBM_ISearchable {
     // Company phone number
     if ($inherit) {
       $query .= " UNION 
-        SELECT contact_id, 'COMPANY;PHONE' as phone_label, phone_number
+        SELECT contact_id, #CONCAT('COMPANY;', phone_label) as phone_label, phone_number
         FROM Phone 
           INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id 
           INNER JOIN Contact ON contact_company_id = companyentity_company_id
@@ -1151,7 +1151,7 @@ class OBM_Contact implements OBM_ISearchable {
     // Company email
     if ($inherit) {
       $query .= " UNION 
-        SELECT contact_id, 'COMPANY;EMAIL' as email_label, email_address
+        SELECT contact_id, #CONCAT('COMPANY;', email_label) as email_label, email_address
         FROM Email 
           INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id 
           INNER JOIN Contact ON contact_company_id = companyentity_company_id
@@ -1179,7 +1179,7 @@ class OBM_Contact implements OBM_ISearchable {
     // Company addresses
     if ($inherit) {
       $query .= " UNION
-        SELECT contact_id, 'COMPANY;ADDRESS' as address_label, address_street, address_zipcode, address_expresspostal,
+        SELECT contact_id, #CONCAT('COMPANY;', address_label) as address_label, address_street, address_zipcode, address_expresspostal,
           address_town, address_country, country_name, country_iso3166
         FROM Address
           INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
@@ -1222,7 +1222,7 @@ class OBM_Contact implements OBM_ISearchable {
     // Company website
     if ($inherit) {
       $query .= " UNION 
-        SELECT contact_id, 'COMPANY;WEBSITE' as website_label, website_url
+        SELECT contact_id, CONCAT('COMPANY;', website_label) as website_label, website_url
         FROM Website
           INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
           INNER JOIN Contact ON contact_company_id = companyentity_company_id
@@ -1555,8 +1555,8 @@ class OBM_Contact implements OBM_ISearchable {
     else $label = array($label);
     if($translate && $GLOBALS['l_'.strtolower($kind).'_labels'][implode('_',$label)]) {
       return $GLOBALS['l_'.strtolower($kind).'_labels'][implode('_',$label)];
-    } else if($GLOBALS['l_'.strtolower(implode('_',$label))] != "") {
-      return $GLOBALS['l_'.strtolower(implode('_',$label))];
+    } elseif($translate && $GLOBALS['l_company_'.strtolower($kind).'_labels'][implode('_',$label)]) {
+      return $GLOBALS['l_company_'.strtolower($kind).'_labels'][implode('_',$label)];
     } else {
       return implode($separator,$label);
     }
