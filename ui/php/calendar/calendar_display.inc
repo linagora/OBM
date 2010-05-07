@@ -173,7 +173,7 @@ function dis_calendar_view_bar($current_view, $calendar) {
   }
 
   if ($action == 'index' || $action == 'waiting_events' || $action == 'insert' || 
-    $action == 'update' || $action == 'delete' || $action == 'reset') {
+    $action == 'update' || $action == 'delete' || $action == 'reset' || $action == 'ics_insert') {
     $navbar = dis_calendar_navbar($current_view);
   }
 
