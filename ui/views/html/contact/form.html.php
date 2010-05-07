@@ -68,6 +68,17 @@
         <td>
           <form id='contactForm' name='contactForm' action='#' method='post' onsubmit="obm.contact.addressbook.storeContact($(this), '<?php echo $contact->id?>'); return false;">
             <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>" />
+            <select class='addressbookSelector'name='addressbook'>
+              <?php foreach($addressbooks as $_id => $_addressbook ) { ?>
+                <?php if ($_addressbook->write == 1) ?>
+                <?php if ($_addressbook->id == $contact->addressbook_id) { ?>
+                <option selected='selected' value='<?php echo $_addressbook->id ?>' ><?php echo $_addressbook->displayname ?></option>
+                <?php } else { ?>
+                <option value='<?php echo $_addressbook->id ?>' ><?php echo $_addressbook->displayname ?></option>
+                <?php }?>
+              <?php } ?>
+            </select>
+            <br />
             <fieldset class="head">
               <span id="kindField" class="<?php echo (empty($contact->mname) && empty($contact->suffix) && empty($contact->kind_id)?'H':'') ?>">
                 <?php echo self::__setlist('kind', $kinds, 'Kind', $contact->kind_id, true) ?>
@@ -257,7 +268,6 @@
             <p class='LC C'>
               <input type='hidden' name='action' value='storeContact'  />
               <input type='hidden' name='id' value='<?php echo $contact->id ?>'  />
-              <input type='hidden' name='addressbook' value='<?php echo $contact->addressbook_id ?>' />
               <input type='submit' value='<?php echo __('Save') ?>' />
               <input type='button' value='<?php echo __('Cancel') ?>' onclick="if(confirm('<?php echo self::toJs(__('Are you sure you want to stop editing this contact? Unsaved changes will be lost.')) ?>')) obm.contact.addressbook.consultContact('<?php echo $contact->id ?>');" />
             </p>

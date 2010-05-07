@@ -440,3 +440,9 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 #websiteLayout dd {
   overflow:hidden;
 }
+
+#informationGrid select.addressbookSelector {
+  margin-left: 2px;
+  margin-bottom: 1px;
+  width: 20em;
+}
