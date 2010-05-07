@@ -436,3 +436,10 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 #Address .multipleFieldButtons {
   margin-top: 50px;
 }
+
+
+#informationGrid select.addressbookSelector {
+  margin-left: 2px;
+  margin-bottom: 1px;
+  width: 20em;
+}

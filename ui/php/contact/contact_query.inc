@@ -507,6 +507,7 @@ function run_query_contact_update($contact) {
   }
   // In case company module not used, to avoid postgres error
   $comp_id = sql_parse_id($comp_id);
+  $addressbook= sql_parse_id($contact['addressbook']);
   $dsrc = sql_parse_id($contact['datasource']);
   $company = $contact['company'];
   $kind = sql_parse_id($contact['kind']);
@@ -572,6 +573,7 @@ function run_query_contact_update($contact) {
     contact_timeupdate='".date('Y-m-d H:i:s')."',
     contact_userupdate='".$obm['uid']."',
     contact_datasource_id=$dsrc,
+    contact_addressbook_id=$addressbook,
     contact_company_id=$comp_id,
     contact_company='$company',
     contact_kind_id=$kind,
