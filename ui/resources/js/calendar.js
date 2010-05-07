@@ -39,7 +39,6 @@ Obm.CalendarManager = new Class({
 
     if ($('todayHourMarker')) {
       // Set hourMarker initial position
-      this.now = new Date();
       this.updateHourMarker();
       this.updateHourMarker.periodical(120000, this);
     }
@@ -64,8 +63,8 @@ Obm.CalendarManager = new Class({
    * Update hour marker (left panel & in-day) 
    */ 
   updateHourMarker: function() {
-    $('todayHourMarker').style.top = (this.now.getHours()*3600 + this.now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
-    // $('hourMarker').style.top = (this.now.getHours()*3600 + this.now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
+    var d = new Date();
+    $('todayHourMarker').style.top = (d.getHours()*3600 + d.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
   },
 
 
