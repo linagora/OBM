@@ -752,6 +752,7 @@ function run_query_calendar_insert_event_data($calendar) {
   
   if ($calendar['allow_documents'] != 1) $allow_documents = 0; else $allow_documents = 1; 
   $opacity = $calendar['opacity'];
+  if (!isset($opacity)) $opacity = "OPAQUE";
   $property_name = $calendar['property-name'];
   if (is_array($res_name)) {
     foreach($res_name as $key=>$res) {
