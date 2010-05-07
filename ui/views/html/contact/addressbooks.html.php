@@ -1,6 +1,7 @@
 <table>  
   <tbody>
     <?php foreach($addressbooks as $_id => $_addressbook ) { ?>
+    <?php if(!$_addressbook->read) continue; ?>
     <tr>
     <td class="<?php echo ($_id == $current['addressbook'])? 'current':'' ?>" id="addressbook-<?php echo $_id ?>" >
       <form onsubmit="obm.contact.addressbook.storeAddressBook(this);return false;">
