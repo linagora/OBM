@@ -524,9 +524,9 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   //}
   //return OBM_Acl::getAllowedEntities($user_id, $entity, 'admin');
   if ($entity=='addressbook') {
-    $table_entity = 'AddressBook';
+    $table_entity = '(SELECT * FROM AddressBook LEFT JOIN UserObm ON userobm_id = owner)';
     $e_id = "e.id";
-    $e_label = "e.name";
+    $e_label = "#CONCAT(e.name,' [',userobm_lastname,' ',userobm_firstname,']')";
     $multidomain = ' AND domain_id = '.$GLOBALS['obm']['domain_id'];
   } elseif (OBM_Acl::isSpecialEntity($entityu)) {
     $table_entity = 'UserObm';
