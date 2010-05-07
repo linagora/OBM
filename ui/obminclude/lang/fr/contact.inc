@@ -158,7 +158,10 @@ $l_email_labels = array ('INTERNET' => 'Internet', 'OTHER' => 'Autre');
 $l_address_labels = array ('HOME' => 'Domicile', 'WORK' => 'Bureau', 'OTHER' => 'Autre');
 $l_website_labels = array ('URL' => 'Site web', 'BLOG' => 'Log internet', 'CALURI' => 'Calendrier', 'OTHER' => 'Autre');
 $l_im_labels = array('XMPP' => 'Jabber', 'X_GTALK' => 'Google Talk', 'AIM' => 'AIM', 'YMSGR' => 'Yahoo', 'MSN' => 'MSN', 'X_ICQ' => 'ICQ', 'OTHER' => 'Autre');
-
+$l_company_phone_labels = array ('COMPANY_WORK_VOICE' => 'Téléphone société', 'COMPANY_CELL_VOICE' => 'Portable société', 'COMPANY_WORK_FAX' => 'Fax société', 'COMPANY_OTHER' => 'Autre téléphone société');
+$l_company_email_labels = array ('COMPANY_INTERNET' => 'Courriel société', 'COMPANY_OTHER' => 'Autre société');
+$l_company_address_labels = array ('COMPANY_HQ' => 'Siège société', 'COMPANY_OTHER' => 'Autre société');
+$l_company_website_labels = array ('COMPANY_URL' => 'Site web société', 'COMPANY_OTHER' => 'Autre société');
 // Error Messages
 $l_err_length_express_postal = "Le champs 'CEDEX' doit etre au maximum de 16 charactères.";
 $l_err_length_zipcode = "Le champs 'Code postal' doit etre au maximum de 14 charactères.";

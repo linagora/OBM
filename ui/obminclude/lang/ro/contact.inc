@@ -123,6 +123,10 @@ $l_phone_labels = array ('HOME_VOICE' => 'Telefon (domiciliu)', 'WORK_VOICE' => 
 $l_email_labels = array ('INTERNET' => 'Internet', 'OTHER' => 'Altul');
 $l_address_labels = array ('HOME' => 'Domiciliu', 'WORK' => 'Serviciu', 'OTHER' => 'Altul');
 $l_website_labels = array ('URL' => 'Web Site ', 'BLOG' => 'Log internet', 'CALURI' => 'Calendar', 'OTHER' => 'Altul');
+$l_company_phone_labels = array ('COMPANY_WORK_VOICE' => 'Firma telefon', 'COMPANY_CELL_VOICE' => 'Firma telefon mobil', 'COMPANY_WORK_FAX' => 'Firma fax', 'COMPANY_OTHER' => 'Firma alt telefon');
+$l_company_email_labels = array ('COMPANY_INTERNET' => 'Firma internet', 'COMPANY_OTHER' => 'Firma altul');
+$l_company_address_labels = array ('COMPANY_HQ' => 'Firma sediu', 'COMPANY_OTHER' => 'Firma altul');
+$l_company_website_labels = array ('COMPANY_URL' => 'Firma website', 'COMPANY_OTHER' => 'Firma altul');
 $l_err_length_express_postal = "Câmpul 'Cod Poștal' trebuie să conțină maxim 16 caractere.";
 
 // lines below have been created with OBMtranslation (0.4.1) on 2009-10-27T18:15:57+01:00

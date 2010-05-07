@@ -93,7 +93,7 @@ $l_j_select_company = "You have to select a company !";
 $l_j_naf_create = "You have to enter a NAF code to create it !";
 $l_company_display = "Display options for companies lists";
 $l_phone_labels = array ('WORK_VOICE' => 'Phone', 'CELL_VOICE' => 'Mobile phone', 'WORK_FAX' => 'Fax', 'OTHER' => 'Other phone');
-$l_email_labels = array ('INTERNET' => 'Home', 'OTHER' => 'Other');
+$l_email_labels = array ('INTERNET' => 'email', 'OTHER' => 'Other');
 $l_address_labels = array ('HQ' => 'Headquarters', 'OTHER' => 'Other');
 $l_website_labels = array ('URL' => 'Website', 'OTHER' => 'Other');
 $l_j_naf_update = "You have to select a NAF code and to update before validating.";
