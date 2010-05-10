@@ -1462,7 +1462,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   }
 
   $block = "
-  <div id='calendarHeader'>
+  <div id='calendarHeader' style='padding:0;'>
     <table class='calendarTable'>
       <tr class=''>
         $week_day_list
@@ -1531,6 +1531,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     obm.initialize.chain(function () {
       $js
       obm.calendarManager.setObserver();
+      // window.addEvent('keydown', obm.calendarManager.keyboardListener.bindWithEvent(this));
     });
   </script>";
 }

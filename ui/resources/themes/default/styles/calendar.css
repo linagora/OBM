@@ -160,7 +160,7 @@
 }
 
 #calendarBody {
-  border:1px solid #AAAAAA;
+  border:1px solid #AAA;
   overflow-y:scroll;
   overflow-x:hidden;
   position:relative;

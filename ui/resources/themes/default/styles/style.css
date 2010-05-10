@@ -483,6 +483,7 @@ form {
   color: #338195;
   text-align: left;
   margin-bottom: 0;
+  margin-top: 0;
 }
 
 #ajaxMessage {
