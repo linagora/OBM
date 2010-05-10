@@ -243,13 +243,7 @@ form {
 }
 
 #information {
-  list-style: none;
-  display: inline;
-  text-align: left;
-  line-height: 1ex;
-  right: 2px;
   margin:0;
-  padding:0;
 }
 
 #information li {
