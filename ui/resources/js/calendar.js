@@ -2063,7 +2063,10 @@ Obm.CalendarQuickForm = new Class({
     }
 
     this.show();    
-    this.form.tf_title.focus();
+    try {
+      this.form.tf_title.focus();
+    } catch(e) {
+    }
   },
 
   setFormValues: function(evt) {
