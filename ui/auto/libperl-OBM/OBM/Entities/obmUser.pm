@@ -337,7 +337,7 @@ sub _init {
         $userDesc->{'userobm_hidden_access'} = 'FALSE';
     }
 
-    # OBM Domain & domain alias
+    # OBM Domain
     if( defined($self->{'parent'}) ) {
         $userDesc->{'userobm_obm_domain'} = $self->{'parent'}->getDesc('domain_name');
     }
@@ -345,10 +345,8 @@ sub _init {
     # OBM Domain alias
     my $domainAlias = $self->{'parent'}->getDesc('domain_alias');
     for(my $i=0; $i<=$#$domainAlias; $i++) {
-        $userDesc->{'userobm_obm_domain_alias_'.{$i+1}} = $domainAlias->[$i];
+        $userDesc->{'userobm_obm_domain_alias_'.($i+1)} = $domainAlias->[$i];
     }
-
-    print $userDesc->{'userobm_obm_domain_alias_1'}."\n";
 
     # Domain SID
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
@@ -562,7 +560,12 @@ sub updateLdapEntry {
                 # ...and 'updateEnableSamba' scope...
                 my $attrsMapping = $ldapMapping->getAttrsMapping( $self, $self->{'ldapMappingScope'}->{'updateEnableSamba'} );
                 for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
-                    if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
+                    my $ldapValue = $self->getDesc($attrsMapping->[$i]->{'desc'}->{'name'});
+                    if(!defined($ldapValue) && defined($attrsMapping->[$i]->{'desc'}->{'default'})) {
+                        $ldapValue = $attrsMapping->[$i]->{'desc'}->{'default'};
+                    }
+
+                    if( $self->_modifyAttr($ldapValue, $entry, $attrsMapping->[$i]->{'ldap'}->{'name'}) ) {
                         $update = 1;
                     }
                 }
@@ -575,7 +578,12 @@ sub updateLdapEntry {
         my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self, \@exceptions, 1 );
 
         for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
-            if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
+            my $ldapValue = $self->getDesc($attrsMapping->[$i]->{'desc'}->{'name'});
+            if(!defined($ldapValue) && defined($attrsMapping->[$i]->{'desc'}->{'default'})) {
+                $ldapValue = $attrsMapping->[$i]->{'desc'}->{'default'};
+            }
+
+            if( $self->_modifyAttr($ldapValue, $entry, $attrsMapping->[$i]->{'ldap'}->{'name'}) ) {
                 $update = 1;
             }
         }
@@ -818,7 +826,12 @@ sub setLdapUnixPasswd {
     my $ldapMapping = OBM::Ldap::ldapMapping->instance();
     my $attrsMapping = $ldapMapping->getAttrsMapping( $self, $self->{'ldapMappingScope'}->{'updateUnixPasswd'} );
     for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
-        if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
+        my $ldapValue = $self->getDesc($attrsMapping->[$i]->{'desc'}->{'name'});
+        if(!defined($ldapValue) && defined($attrsMapping->[$i]->{'desc'}->{'default'})) {
+            $ldapValue = $attrsMapping->[$i]->{'desc'}->{'default'};
+        }
+
+        if( $self->_modifyAttr($ldapValue, $entry, $attrsMapping->[$i]->{'ldap'}->{'name'}) ) {
             $update = 1;
         }
     }
@@ -863,7 +876,12 @@ sub setLdapSambaPasswd {
     my $ldapMapping = OBM::Ldap::ldapMapping->instance();
     my $attrsMapping = $ldapMapping->getAttrsMapping( $self, $self->{'ldapMappingScope'}->{'updateSambaPasswd'} );
     for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
-        if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
+        my $ldapValue = $self->getDesc($attrsMapping->[$i]->{'desc'}->{'name'});
+        if(!defined($ldapValue) && defined($attrsMapping->[$i]->{'desc'}->{'default'})) {
+            $ldapValue = $attrsMapping->[$i]->{'desc'}->{'default'};
+        }
+
+        if( $self->_modifyAttr($ldapValue, $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
             $update = 1;
         }
     }

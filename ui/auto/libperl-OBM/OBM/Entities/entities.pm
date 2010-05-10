@@ -304,7 +304,11 @@ sub createLdapEntry {
 
     my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self );
     for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
-        $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} );
+        my $ldapValue = $self->getDesc($attrsMapping->[$i]->{'desc'}->{'name'});
+        if(!defined($ldapValue) && defined($attrsMapping->[$i]->{'desc'}->{'default'})) {
+            $ldapValue = $attrsMapping->[$i]->{'desc'}->{'default'};
+        }
+        $self->_modifyAttr($ldapValue, $entry, $attrsMapping->[$i]->{'ldap'}->{'name'});
     }
 
 
