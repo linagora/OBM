@@ -487,9 +487,8 @@ form {
   font-size: 170%;
   font-weight: bold;
   color: #338195;
-  border-bottom-width: 2px;
   text-align: left;
-  margin: 0;
+  margin-bottom: 0;
 }
 
 #ajaxMessage {
