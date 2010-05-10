@@ -337,10 +337,18 @@ sub _init {
         $userDesc->{'userobm_hidden_access'} = 'FALSE';
     }
 
-    # OBM Domain
+    # OBM Domain & domain alias
     if( defined($self->{'parent'}) ) {
         $userDesc->{'userobm_obm_domain'} = $self->{'parent'}->getDesc('domain_name');
     }
+
+    # OBM Domain alias
+    my $domainAlias = $self->{'parent'}->getDesc('domain_alias');
+    for(my $i=0; $i<=$#$domainAlias; $i++) {
+        $userDesc->{'userobm_obm_domain_alias_'.{$i+1}} = $domainAlias->[$i];
+    }
+
+    print $userDesc->{'userobm_obm_domain_alias_1'}."\n";
 
     # Domain SID
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
