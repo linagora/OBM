@@ -418,7 +418,9 @@ function miniCal(year, month, view) {
     new Element('td').appendText(obm.vars.labels.dayShort[(i + obm.vars.consts.weekStart) % 7]).injectInside(labels);
   }
   var content = new Element('tbody');
-  content.addEvent('mousewheel', function(e) {
+  var mousewheel = 'mousewheel';
+  if (Obm.Browsers.Engines.gecko()) mousewheel = 'DOMMouseScroll';
+  content.addEvent(mousewheel, function(e) {
     if(e.event.wheelDelta < 0 || e.event.detail > 0) {
       miniCal(nextMonth.year,nextMonth.month, view);
     } else {

@@ -658,3 +658,20 @@ String.prototype.toFloat = function(){
   return parseFloat(value);
 };
 
+// mootools 1.2.4 browsers
+Obm.Browsers = $merge({
+  Engines: {
+    presto: function(){
+      return (!window.opera) ? false : ((arguments.callee.caller) ? 960 : ((document.getElementsByClassName) ? 950 : 925));
+    },
+    trident: function(){
+      return (!window.ActiveXObject) ? false : ((window.XMLHttpRequest) ? ((document.querySelectorAll) ? 6 : 5) : 4);
+    },
+    webkit: function(){
+      return (navigator.taintEnabled) ? false : ((Browser.Features.xpath) ? ((Browser.Features.query) ? 525 : 420) : 419);
+    },
+    gecko: function(){
+      return (!document.getBoxObjectFor && window.mozInnerScreenX == null) ? false : ((document.getElementsByClassName) ? 19 : 18);
+    }
+  }
+});
