@@ -762,6 +762,9 @@ function dis_invoice_detail($inv_q) {
   global $l_date, $l_label, $l_number, $l_inout, $l_supplier, $l_client;
   global $l_archive, $l_status, $l_comment, $l_invoice, $l_credit_memo;
   global $l_expiration_date, $l_payment_date;
+  global $l_bank, $l_model;
+  global $l_export_to_odf;
+  global $l_reminder;
   global $l_yes, $l_no;
 
   $label = $inv_q->f('invoice_label');
@@ -797,6 +800,60 @@ function dis_invoice_detail($inv_q) {
     $url_proj = url_prepare("$path/project/project_index.php?action=detailconsult&amp;project_id=$project_id");
     $project_new_link = "<a href=\"$url_proj\"><img src=\"$ico_project\" alt=\"\" /></a>";
   }
+
+  $qaccount = run_query_invoice_account($inv_q->f('invoice_id'));
+  $accounts = "<option value=\"0\">-- $l_bank</option>";
+  while ($qaccount->next_record()) {
+    $accounts .= "<option value=\"{$qaccount->f('account_id')}\">{$qaccount->f('account_label')}</option>\n";
+  }
+  
+  $odf_models = glob('model_*.odt');
+  $odf_models_opts = "<option value=\"0\">-- {$l_model}</option>\n";
+  foreach ($odf_models as $odf_model) {
+    if (preg_match("/model_(.*).odt/", $odf_model, $odf_model_name)) {
+      $odf_models_opts .= "<option value=\"{$odf_model}\">{$odf_model_name[1]}</option>\n";
+    }
+  }
+
+  $export_form = '
+       <form action="invoice_index.php?action=detailconsult&invoice_id=' . $inv_q->f('invoice_id') . '" method="post">
+         <select name="sel_account" class="width_auto">
+         ' . $accounts . '
+         </select>
+         <select name="sel_odf_model" class="width_auto">
+         ' . $odf_models_opts . '
+         </select>
+         <input name="export_odf" type="submit" value="ok" class="width_auto" />
+       </form>
+  ';
+
+
+$odf_relance = glob('relance_*.odt');
+
+list( $year_o, $month_o, $day_o ) = split( ',', date('Y,n,j', strtotime($inv_q->f('invoice_expiration_date'))));
+list( $year_c, $month_c, $day_c ) = split( ',', date('Y,n,j'));
+
+$duration =  (mktime(0,0,0, $month_c, $day_c, $year_c) - mktime(0,0,0, $month_o, $day_o, $year_o));
+
+$duration_day = (int) ( $duration / (60 * 60 * 24));
+
+
+$reminder_form ="";
+$label_r="";
+
+if($inv_q->f('invoice_status_id')=='1' && $duration_day > 15){
+	
+	$label_r = $l_reminder;
+
+	$reminder_form ='<form action="invoice_index.php?action=reminder&invoice_id=' . $inv_q->f('invoice_id') . '"  method="post"><input name="relance_odf" type="submit" value="Relance 1" class="width_auto" />';
+  
+	}
+	
+
+if($inv_q->f('invoice_status_id')=='1' && $duration_day > 45){
+	$reminder_form .= ' <input name="relance2_odf" type="submit" value="Relance 2" class="width_auto" />
+        </form>';
+	}
 
   $block .= "
  <div class=\"detail infos\">
@@ -866,6 +923,14 @@ function dis_invoice_detail($inv_q) {
     <tr>
       <th>$l_amount_ttc</th>
       <td>$ttc</td>
+    </tr>
+    <tr>
+      <th>$l_export_to_odf :</th>
+      <td>$export_form</td>
+    </tr>
+<tr>
+      <th>$label_r</th>
+      <td>$reminder_form</td>
     </tr>
     </table>
   </div>
@@ -1880,5 +1945,62 @@ function dis_invoice_display_pref($prefs) {
   return $block;
 }
 
+function dis_invoice_all_reminder($inv_q) {
 
+	global $l_company,$l_expiration;
+	$block="<table class=\"spreadSheet\">
+<tr><th>$l_company</th>
+<th>Nombre de relances</th>
+<th>$l_expiration</th></tr>";
+
+	while($inv_q->next_record()) {
+		list( $year_o, $month_o, $day_o ) = split( ',', date('Y,n,j', strtotime($inv_q->f('expiration_date'))));
+		$date_expiration=date('d/m/y',mktime(0,0,0, $month_o, $day_o, $year_o));
+	
+		$block.='<tr><td>'.$inv_q->f('company_name').'</td>
+		     <td><a href=invoice_index.php?action=reminder_company&amp;company_id='.$inv_q->f('company_id').'>'.$inv_q->f('nb_relance').' relance(s)</a></td> 
+		     <td>'.$date_expiration.'</td>  </tr>';
+
+	}
+	return $block;
+}
+
+function dis_invoice_reminder_company($inv_q) {
+
+	$i=0;
+	$info = array($i=>array());
+
+	while($inv_q->next_record()) {
+	
+		list( $year_o, $month_o, $day_o ) = split( ',', date('Y,n,j', strtotime($inv_q->f('invoice_expiration_date'))));
+		list( $year_c, $month_c, $day_c ) = split( ',', date('Y,n,j'));
+		$duration =  (mktime(0,0,0, $month_c, $day_c, $year_c) - mktime(0,0,0, $month_o, $day_o, $year_o));
+		$duration_day = (int) ( $duration / (60 * 60 * 24));
+
+		$info[$i]['invoice_number']=$inv_q->f('invoice_number');
+        $info[$i]['invoice_id']=$inv_q->f('invoice_id');
+		$info[$i]['invoice_date']=$inv_q->f('invoice_date');
+		$info[$i]['invoice_expiration_date']=$inv_q->f('invoice_expiration_date');
+		$info[$i]['invoice_amount_ttc']=$inv_q->f('invoice_amount_ttc');
+		$info[$i]['invoice_label']=$inv_q->f('invoice_label');
+		$info[$i]['invoice_comment']=$inv_q->f('invoice_comment');
+		$info[$i]['company_name']=$inv_q->f('company_name');
+		$info[$i]['company_id']=$inv_q->f('company_id');
+		$info[$i]['company_comment']=$inv_q->f('company_comment');
+	
+		$i++;
+		if($duration_day > 45)
+		$type_odf = 2;
+      	else
+		$type_odf = 1;	
+	} 
+
+ 	if($type_odf==1)
+	$odf = new ODF('relance_1_multi.odt');
+	else
+	$odf = new ODF('relance_2_multi.odt');
+	
+	$res = $odf->export_reminder_by_company($info);
+	return "";
+}
 ?>

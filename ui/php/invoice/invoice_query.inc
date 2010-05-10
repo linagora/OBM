@@ -968,5 +968,153 @@ function check_can_delete_invoice($p_id) {
   return $delete_ok;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// Parameters:
+//   - $p_id : invoice id
+// Returns:
+//
+///////////////////////////////////////////////////////////////////////////////
+function run_query_invoice_account($p_id) {
+  $obm_q = new DB_OBM;
+
+  $query = 'SELECT account_id, account_label FROM Account';
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+function get_invoice_export_infos($id, $account) {
+  $obm_q = new DB_OBM;
+
+  $query = '
+    SELECT    invoice_label, 
+	          invoice_amount_ttc,
+              account_number,
+              account_bank,
+              account_comment,
+              invoice_number,
+              invoice_date,
+              invoice_amount_ht,
+              invoice_comment,
+              project_shortname,
+              invoice_expiration_date,
+              company_name,
+              tasktype_label as dealtype_label,
+              contact_company,
+              contact_service,
+              contact_lastname,
+              contact_firstname,
+              address_street as contact_address1,
+              \'\' as contact_address2,
+              address_zipcode as contact_zipcode,
+              address_town as contact_town,
+              address_expresspostal as contact_expresspostal  
+    FROM      Account,
+              Invoice
+    LEFT JOIN Project   ON project_id      = invoice_project_id
+    LEFT JOIN TaskType  ON project_tasktype_id = tasktype_id
+    LEFT JOIN Company   ON company_id      = invoice_company_id,
+              Deal
+    LEFT JOIN Contact   ON contact_id      = deal_contact2_id
+    LEFT JOIN ContactEntity on contactentity_contact_id=deal_contact2_id
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id 
+    WHERE     invoice_id = ' . $id . '
+    AND       account_id = ' . $account . '
+    AND       deal_id    = invoice_deal_id';
+
+    $obm_q->query($query);
+    $obm_q->next_record();
+
+    return $obm_q;
+}
+function get_invoice_export_reminder_infos($id) {
+  $obm_q = new DB_OBM;
+
+  $query = '
+    SELECT    invoice_label, 
+	      invoice_amount_ttc,
+	      account_number,
+              account_bank,
+              account_comment,
+              invoice_number,
+              invoice_date,
+              invoice_amount_ht,
+              invoice_comment,
+              project_shortname,
+              invoice_expiration_date,
+              company_name,
+              tasktype_label as dealtype_label,
+              contact_company,
+              contact_service,
+              contact_lastname,
+              contact_firstname,
+              address_street as contact_address1,
+              \'\' as contact_address2,
+              address_zipcode as contact_zipcode,
+              address_town as contact_town,
+              address_expresspostal as contact_expresspostal  
+    FROM      Account,
+              Invoice
+    LEFT JOIN Project   ON project_id      = invoice_project_id
+    LEFT JOIN TaskType  ON project_tasktype_id = tasktype_id
+    LEFT JOIN Company   ON company_id      = invoice_company_id,
+              Deal
+    LEFT JOIN Contact   ON contact_id      = deal_contact2_id
+    LEFT JOIN ContactEntity on contactentity_contact_id=deal_contact2_id
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id 
+    WHERE     invoice_id = ' . $id . '';
+	
+    $obm_q->query($query);
+    $obm_q->next_record();
+
+    return $obm_q;
+
+}
+
+function all_reminder() {
+
+	$obm_q = new DB_OBM;
+	$query='
+	SELECT distinct(company_name),company_id,invoice_id,invoice_number,count(invoice_expiration_date)as nb_relance, MIN(invoice_expiration_date) as expiration_date
+	from Company, Invoice
+	where invoice_company_id = company_id
+	and invoice_status_id = 1
+	and DATEDIFF(current_date,invoice_expiration_date) > 15
+	group by company_name';
+	
+    	$obm_q->query($query);
+    
+    	return $obm_q;
+	
+}
+
+function reminder_by_company($company_id) {
+
+	$obm_q = new DB_OBM;
+	$query='
+	select  distinct(invoice_id),
+		company_name,
+		company_id, 
+		invoice_expiration_date, 
+		invoice_number, 
+		invoice_date,
+		company_comment, 
+		invoice_label,
+		invoice_amount_ttc,
+		invoice_comment
+	from Company, Invoice,Contact
+	where invoice_company_id = company_id
+        and contact_company_id = company_id
+	and invoice_status_id = 1
+	and DATEDIFF(current_date,invoice_expiration_date) > 15
+	and company_id ='.$company_id.'
+	order by invoice_expiration_date desc';
+	
+    $obm_q->query($query);
+    
+    return $obm_q;
+	
+}
 
 ?>

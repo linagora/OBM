@@ -55,6 +55,7 @@ require('invoice_query.inc');
 require_once('invoice_js.inc');
 require_once("$obminclude/of/of_select.inc");
 require_once("$obminclude/of/of_category.inc");
+require_once("$obminclude/lib/ODF/odf.inc");
 
 get_invoice_action();
 $perm->check_permissions($module, $action);
@@ -99,7 +100,43 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
+  if (isset($params['export_odf']) && isset($params['invoice_id']))
+  {
+	if ($params['account'] == 0) {
+	  $display['msg'] .= display_err_msg($l_odf_choose_bank);
+	} elseif ($params['odf_model'] === "0") {
+	  $display['msg'] .= display_err_msg($l_odf_choose_model);
+	} else {
+	  $inv_q = get_invoice_export_infos($params['invoice_id'], $params['account']);
+	  $odf = new ODF($params['odf_model']);
+	  $res = $odf->export($inv_q);
+	  if ($res !== true)
+		$display['msg'] .= display_err_msg($res);
+	}
+  }
   $display['detail'] = dis_invoice_consult($params);
+	
+}elseif ($action =='reminder'){
+	
+	if (isset($params['relance_odf']) && isset($params['invoice_id']))
+        {	
+	  $inv_q = get_invoice_export_reminder_infos($params['invoice_id']);
+		
+	  $odf = new ODF('relance_1.odt');
+	  $res = $odf->export_reminder($inv_q);
+	  if ($res !== true){
+		$display['msg'] .= display_err_msg($res);
+	}
+
+       }else{
+	 $inv_q = get_invoice_export_reminder_infos($params['invoice_id']);
+	  $odf = new ODF('relance_2.odt');
+	  $res = $odf->export_reminder($inv_q);
+	  if ($res !== true){
+		$display['msg'] .= display_err_msg($res);
+	}
+       }
+	$display['detail'] = dis_invoice_consult($params);
 
 } elseif ($action == 'detailupdate') { 
 ///////////////////////////////////////////////////////////////////////////////
@@ -190,6 +227,16 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $prefs = get_display_pref($obm['uid'], 'invoice', 1);
   $display['detail'] = dis_invoice_display_pref($prefs);
   
+}elseif($action == 'all_reminder'){
+  $req = all_reminder();
+
+  $display['detail'] = dis_invoice_all_reminder($req);
+
+}else if($action == 'reminder_company'){
+
+ $inv_q = reminder_by_company($params['company_id']);
+ $display['detail'] = dis_invoice_reminder_company($inv_q);
+
 } else if ($action == 'dispref_display') {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($params);
@@ -295,6 +342,12 @@ function get_invoice_action() {
     'Condition'=> array ('detailconsult', 'detailupdate', 'duplicate', 'update')
                                    );
 
+	$actions['invoice']['reminder'] = array (
+	'Name'     => $GLOBALS['l_reminder'],
+	'URL'      => "$path/invoice/invoice_index.php?action=reminder&amp;invoice_id=".$params['invoice_id'],
+	'Right'	   => $cright_read,
+	'Condition'=> array ('detailconsult', 'detailupdate', 'duplicate', 'update'));
+
 // Duplicate
   $actions['invoice']['duplicate'] = array (
     'Name'     => $l_header_duplicate,
@@ -348,6 +401,18 @@ function get_invoice_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('all')
                                         );
+// all_reminder
+  $actions['invoice']['all_reminder'] = array (
+    'Name'     => 'Relances',
+    'Url'      => "$path/invoice/invoice_index.php?action=all_reminder",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all'));
+
+// reminder_company
+ $actions['invoice']['reminder_company'] = array (
+    'Url'      => "$path/invoice/invoice_index.php?action=reminder_company&amp;company_id=".$params['company_id'],
+    'Right'    => $cright_read,
+    'Condition'=> array ('None'));
 
 // Display Preferences
   $actions['invoice']['dispref_display'] = array (
@@ -385,6 +450,7 @@ function update_invoice_action() {
   global $params, $actions, $path;
 
   $id = $params['invoice_id'];
+  $idc = $params['company_id'];
   if ($id > 0) {
     // Detail Consult
     $actions['invoice']['detailconsult']['Url'] = "$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$id";
@@ -401,6 +467,11 @@ function update_invoice_action() {
     // Check Delete
     $actions['invoice']['check_delete']['Url'] = "$path/invoice/invoice_index.php?action=check_delete&amp;invoice_id=$id";
     $actions['invoice']['check_delete']['Condition'][] = 'insert';
+	
+     //reminder_company
+    $actions['invoice']['reminder_company']['Url'] = "$path/invoice/invoice_index.php?action=reminder_company&amp;company_id=$idc";
+    $actions['invoice']['reminder_company']['Condition'][] = 'insert';
+
   }
 }
 

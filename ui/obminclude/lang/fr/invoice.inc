@@ -26,6 +26,9 @@ $l_compute_tax = "Calculer le montant TTC";
 $l_include_archive = "Inclure les archives";
 $l_amount_remaining = "Restant du";
 $l_select_invoice = "Sélectionner la facture";
+$l_bank = "Banque";
+$l_model = "Modèle";
+$l_reminder = "Relance";
 
 // Invoice status
 $l_invoicestatus_tocreate = 'A Créer';
@@ -66,6 +69,7 @@ $l_del_payment = "Remove paiement";
 $l_del_payment_chosen = "Delete chosen paiements";
 $l_payments_todel = "Paiements associés à cette facture" ;
 $l_invoice_mod = "Modifier la Facture";
+$l_export_to_odf = "Exporter au format ODF";
 
 // Messages 
 $l_no_display = "Remplissez les critères de recherche et appuyez sur <Chercher> pour lancer la recherche";
@@ -112,3 +116,9 @@ $l_invoice_display = "Options d'affichage pour les listes de Factures";
 $default_invoice_numbering = "Y"; // we use only year
 
 $l_j_select_invoice = "Vous devez sélectionner une facture !";
+
+// ODF export error messages
+$l_odf_load_err = "OBM a rencontré un problème lors du chargement du fichier.";
+$l_odf_save_err = "OBM a rencontré un problème lors de la sauvegarde du fichier.";
+$l_odf_choose_bank = "Veuillez choisir une banque afin d'exporter cette facture.";
+$l_odf_choose_model = "Veuillez choisir un modèle afin d'exporter cette facture.";
