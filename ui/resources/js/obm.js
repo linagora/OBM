@@ -239,9 +239,11 @@ Obm.Tip = new Class({
           this.elementLeave(this, element);
         }
         var elementId = element.id.split('_');
-        $('close_'+elementId[2]).addEvent('click', function() {
-          this.elementLeave(this, element);
-        }.bind(this));
+        if ($chk($('close_'+elementId[2]))) {
+          $('close_'+elementId[2]).addEvent('click', function() {
+            this.elementLeave(this, element);
+          }.bind(this));
+        }
       }.bind(this));
     } else {
       var enter = element.retrieve('tip:enter', this.elementEnter.bindWithEvent(this, element));
