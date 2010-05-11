@@ -1265,7 +1265,7 @@ class OBM_Contact implements OBM_ISearchable {
     // Company website
     if ($inherit) {
       $query .= " UNION 
-        SELECT contact_id, CONCAT('COMPANY;', website_label) as website_label, website_url
+        SELECT contact_id, #CONCAT('COMPANY;', website_label) as website_label, website_url
         FROM Website
           INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
           INNER JOIN Contact ON contact_company_id = companyentity_company_id
