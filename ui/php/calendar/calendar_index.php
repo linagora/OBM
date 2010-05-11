@@ -199,8 +199,9 @@ if ($action == 'search') {
       $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
       $display['detail'] = html_calendar_waiting_events($obm_wait);
     } else {
-      $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
-      $display['detail'] = dis_calendar_calendar_view($params, $current_view);
+      redirect_ok($params, "$l_event: $l_update_ok");
+      // $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+      // $display['detail'] = dis_calendar_calendar_view($params, $current_view);
     }
   }
 
@@ -1471,6 +1472,7 @@ function get_calendar_action() {
   $actions['calendar']['decision'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=decision",
     'Right'    => $cright_read,
+    'Redirection' => "$_SERVER[PHP_SELF]",
     'Condition'=> array ('None') 
   );
 
