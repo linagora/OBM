@@ -2233,6 +2233,7 @@ Obm.CalendarQuickForm = new Class({
       }
       this.hide();
     } else {
+      obm.calendarManager.destroyDummy();
       showErrorMessage(obm.vars.labels.fill_title); 
     }
   },
