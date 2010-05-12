@@ -1,8 +1,47 @@
 <!-- $Id:$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.3 - 2010-03-26
+version 2.3.4 - 2010-04-14
 
+2010-04-14 : version 2.3.4
+
+  * #757 Exception seen on production logs
+  * #830 update-2.2-2.3 does not succeed with a fat database
+  * #995 pb with obm-webmail using from obm-ui
+  * #1175 [Calendar] ICS import wrong handle of uid
+  * #1180 The notes field under Windows Mobile 6.1 isn't synchronised
+  * #1182 [opush] Opush package doesn't replace obm-opush
+  * #1204 "Back to your own view" link in Calendar is not working
+  * #1206 The today link on calendar does'nt function
+  * #1208 Quota per user for document attachment
+  * #1209 [Sync] User's freebusy url Public access must be enabled by the user
+  * #1212 opush has a new config file
+  * #1215 [UI] User's freebusy url Public access must be enabled by the user
+  * #1219 [Calendar] Postgres error when clicking on "Back to your own view"
+  * #1223 [Calendar] Optimize rights screen
+  * #1224 [Auto] ldapContact.pl is broken with lots of contacts
+  * #1227 [Calendar] Autocompletion bug with homonyme
+  * #1228 [Calendar] Link to the created event in the creation flash message
+  * #1232 [Contact] Vcard import doesn't work with obm vcard export
+  * #1233 [Document] Access right to a document through the event isn't verfied
+  * #1234 [General] Browser back is not possible after post
+  * #1236 [Calendar] Deleting event does not delete attachement
+  * #1237 [Calendar] Quick form for conflict management add wrong attendee
+  * #1240 [Calendar] bubble creation of an event: list of users
+  * #1241 [Calendar] Display the calendar without weekend
+  * #1242 [Calendar] Importing a model
+  * #1243 [Calendar] Labels of other users break obm.popup
+  * #1244 [Calendar] bubble creation of an event: list of models
+  * #1245 [Calendar] SQL error on deleting the organizer among the participants
+  * #1246 [Calendar] Displaying access permissions leads to browser error
+  * #1247 [Calendar] Changing the date of a recurring appointment
+  * #1248 [Calendar] Review of my calendar after removing
+  * #1249 [Calendar] SQL error on deleting a calendar display
+  * #1250 [Calendar] It is possible to see the rights of any calendar
+  * #1252 [Calendar] Notification of deletion of an event
+  * #1253 [Calendar] Conflict shouldn't raise without the read perms
+  * #1255 [Contact] Error on category update
+ 
 2010-03-18 : version 2.3.3
 
   * #994 [Calendar] Label autocompletion improvement
