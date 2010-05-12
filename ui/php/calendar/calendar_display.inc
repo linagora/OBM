@@ -3291,6 +3291,7 @@ function dis_calendar_quick_form($calendar_entity) {
       obm.calendarQuickForm = new Obm.CalendarQuickForm();
       obm.vars.labels.edit = '".phpStringToJsString($l_edit)."';
       obm.vars.labels.edit_full = '".phpStringToJsString($l_edit_full)."';
+      obm.vars.labels.fill_title = '".phpStringToJsString($GLOBALS['l_fill_title'])."';
       obm.vars.consts.obm_uid = '$obm[uid]';
       $js_templatetitle
     </script>";

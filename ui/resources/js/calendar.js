@@ -1715,26 +1715,30 @@ Obm.CalendarQuickForm = new Class({
   },
 
   submit: function(action) {
-    this.eventData.title = this.form.tf_title.value;
-    this.eventData.entity_id = this.entityView.get('inputValue');
-    this.eventData.entity_kind = this.entityKind.value;
-    this.eventData.send_mail = null;
-    if ($chk($('template_id'))) {
-      this.eventData.template_id = $('template_id').value;
-    }
-    action = action || this.eventData.formAction;
-    if (action == 'quick_insert') {
-      obm.calendarManager.sendCreateEvent(this.eventData);
-    } else if (action == 'quick_delete') {
-      obm.calendarManager.sendDeleteEvent(this.eventData); 
-    } else {
-      var evt = obm.calendarManager.events.get(this.eventData.element_id);
-      if (evt.event.title != this.eventData.title) {
-        evt.event.title = this.eventData.title;
-        obm.calendarManager.sendUpdateEvent(evt, true);
+    if (this.form.tf_title.value != '') {
+      this.eventData.title = this.form.tf_title.value;
+      this.eventData.entity_id = this.entityView.get('inputValue');
+      this.eventData.entity_kind = this.entityKind.value;
+      this.eventData.send_mail = null;
+      if ($chk($('template_id'))) {
+        this.eventData.template_id = $('template_id').value;
       }
+      action = action || this.eventData.formAction;
+      if (action == 'quick_insert') {
+        obm.calendarManager.sendCreateEvent(this.eventData);
+      } else if (action == 'quick_delete') {
+        obm.calendarManager.sendDeleteEvent(this.eventData); 
+      } else {
+        var evt = obm.calendarManager.events.get(this.eventData.element_id);
+        if (evt.event.title != this.eventData.title) {
+          evt.event.title = this.eventData.title;
+          obm.calendarManager.sendUpdateEvent(evt, true);
+        }
+      }
+      this.hide();
+    } else {
+      showErrorMessage(obm.vars.labels.fill_title); 
     }
-    this.hide();
   },
 
   goTo: function(action) {
