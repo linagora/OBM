@@ -1,7 +1,15 @@
 <!-- $Id:$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.4 - 2010-04-19
+version 2.3.6 - 2010-04-28
+
+2010-04-28 : version 2.3.6
+
+  * #1260 [Contact] Pb running obm_init_index.py with contacts created by minig
+  * #1262 [calendar] Pre-registration
+  * #1263 [Group] Rename OBM entity fail
+  * #1272 [Calendar] Free/Busy Behavior
+  * #1302 [Calendar] unchecking "Add displayed users" never remove current user
 
 2010-04-19 : version 2.3.5
 
