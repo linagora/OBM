@@ -1,7 +1,16 @@
 <!-- $Id:$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.4 - 2010-04-14
+version 2.3.4 - 2010-04-19
+
+2010-04-19 : version 2.3.5
+
+  * #1221 [Contact] Company coords are not indexed
+  * #1238 [Calendar] Split "Show attendees calendar after event creation" checkbox into user / resource
+  * #1254 [Calendar] Event creator info in Mail notifications
+  * #1257 [General Display] Display bug
+  * #1258 [Calendar] Autocomplete offset
+  * #1259 [Contact] Contact archive addressbook wrong count
 
 2010-04-14 : version 2.3.4
 
