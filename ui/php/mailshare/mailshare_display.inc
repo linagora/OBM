@@ -319,9 +319,9 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field='') {
     // Get default quota on domain
     $prop_q = run_query_domain_properties($obm['domain_id']);
     while($prop_q->next_record()){
-      $name = $prop_q->f('domainproperty_key');
+      $pname = $prop_q->f('domainproperty_key');
       $domain_value = $prop_q->f('domainpropertyvalue_value');
-      $domain[$name] = $domain_value;
+      $domain[$pname] = $domain_value;
     }
     if (isset($domain['mailshares_quota_default'])) { $quota = $domain['mailshares_quota_default']; }
   }

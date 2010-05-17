@@ -405,6 +405,7 @@ $cgp_show['module']['admin_device'] = 'admin';
 
 // Specific user data
 $cgp_user = array();
+$clog_root = '/var/log';
 
 // Default preferences data
 $set_lang_default = $ini_array['lang'];
