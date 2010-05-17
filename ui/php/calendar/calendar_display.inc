@@ -5252,7 +5252,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
         if (is_array($evts)) {
           $busy = false;
           foreach($evts as $evt) {
-            if ($evt->start->compare($e) < 0 && $evt->end->compare($d) > 0) {
+            if ($evt->start->compare($e) < 0 && $evt->end->compare($d) > 0 && $evt->getTransparency() == 'OPAQUE') {
               $busy = true;
             }
           }

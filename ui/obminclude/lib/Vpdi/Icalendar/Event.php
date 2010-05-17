@@ -38,12 +38,12 @@ class Vpdi_Icalendar_Event {
     $this->start = $vevent->getDtstart();
     $this->end = $vevent->getDtend();
     $this->duration = $vevent->getDuration();
-    if ($this->end == null) {
-      $this->end =  new Of_Date($this->start->format('U') + $this->duration);
+    if(isset($this->end)) {
+      $this->duration = $this->end->diffTimestamp($this->start);
+    } elseif(!isset($this->duration)) {
+      $this->duration = 86400;
     }
-    if ($this->duration == null) {
-      $this->duration = $this->end->format('U') - $this->start->format('U');
-    }
+    $this->end = new Of_Date($this->start->format('U') + $this->duration);
   }
 
   public function getUid() {
