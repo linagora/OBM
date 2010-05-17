@@ -1324,7 +1324,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     obm.vars.images.extension_right = '$GLOBALS[ico_extension_right]';
     obm.vars.consts.timeUnit = (3600/$_SESSION[set_cal_interval]);    
     obm.vars.consts.userStyle = '".$current_view->get_class($GLOBALS[obm][uid], 'user')."'; 
-    obm.vars.consts.userId = '$GLOBALS[obm][uid]';
+    obm.vars.consts.userId = '".$GLOBALS['obm']['uid']."';
     obm.vars.consts.calendarUrl = '".$GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME'])."';
     obm.vars.consts.calendarDetailconsultURL = '".$GLOBALS[path]."/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id='; 
     obm.vars.consts.action = '".$GLOBALS['action']."';
