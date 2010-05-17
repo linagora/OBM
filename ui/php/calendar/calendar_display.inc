@@ -4304,20 +4304,31 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $dis_privacy = "<input type=\"checkbox\" id=\"cba_privacy\" value=\"1\" name=\"cba_privacy\" />";
   }
 
-  $dis_hour_b = "<select id=\"sel_time_begin\" name=\"sel_time_begin\" style=\"width:4em;\">";
-  $dis_hour_e = "<select id=\"sel_time_end\" name=\"sel_time_end\" style=\"width:4em;\">";
-  for ($i=0; $i<24; $i++) {
-    $hour =  str_pad($i, 2, '0', STR_PAD_LEFT); 
-    if ($begin->compareHour($i) == 0) {
+  $hour_size = "4em";
+  if ($_SESSION['set_timeformat'] == "12H") $hour_size = "5em";
+  $dis_hour_b = "<select id='sel_time_begin' name='sel_time_begin' style='width:$hour_size;'>";
+  $dis_hour_e = "<select id='sel_time_end' name='sel_time_end' style='width:$hour_size;'>";
+  $cur_hour_b = new Of_Date();
+  $cur_hour_b->setHour(0);
+  $cur_hour_b->setMinute(0);
+  $cur_hour_b->setSecond(0);
+  $cur_hour_e = clone $cur_hour_b;
+  $cur_hour_e->addDay(1);
+
+  while($cur_hour_b->compare($cur_hour_e) < 1) {
+    $hour = $cur_hour_b->getOutputHour();
+    if ($begin->compareHour($cur_hour_b) == 0) {
       $dis_hour_b .= "<option value=\"$hour\" selected=\"selected\">$hour</option>";
     } else {
       $dis_hour_b .= "<option value=\"$hour\">$hour</option>";
     }
-    if ($end->compareHour($i) == 0) {
-      $dis_hour_e .= "<option value=\"$hour\" selected=\"selected\">$hour</option>";
-    } else {
-      $dis_hour_e .= "<option value=\"$hour\">$hour</option>";
-    }    
+   if ($end->compareHour($cur_hour_b) == 0) {
+     $dis_hour_e .= "<option value=\"$hour\" selected=\"selected\">$hour</option>";
+   } else {
+     $dis_hour_e .= "<option value=\"$hour\">$hour</option>";
+   }    
+
+    $cur_hour_b->addHour(1);
   }
   $dis_hour_b .= '</select>';  
   $dis_hour_e .= '</select>';  
