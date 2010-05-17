@@ -121,6 +121,9 @@ $c_working_days = array(0,1,1,1,1,1,0);
 // Generic E-mail for Incident module
 //$cmail_incident = 'support@mydomain';
 
+// Mail redirection to multiple addresses
+// $c_max_email_nomade = 1;
+
 // Time : activity report logo
 $cimage_logo = 'linagora.jpg';
 
