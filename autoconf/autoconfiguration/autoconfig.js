@@ -582,17 +582,17 @@ function _importCertificates(aConfigurationData) {
     if ( !certificateContent ) {
       continue;
     }
-    if ( configurationXML == "failed" ) {
+    if ( certificateContent == "failed" ) {
       _logToFile(LOG_ERROR, "Impossible de télécharger le certificat '" + certificate.@src + "'.\n");
       continue;
     }
     
-    if ( configurationXML == "error" ) {
+    if ( certificateContent == "error" ) {
       _logToFile(LOG_ERROR, "Erreur lors du téléchargement du certificat '" + certificate.@src + "'.\n");
       continue;
     }
     
-    if ( configurationXML == "" ) {
+    if ( certificateContent == "" ) {
       _logToFile(LOG_DEBUG, "Le certificat " + certificate.@src + " est vide.\n");
       continue;
     }
