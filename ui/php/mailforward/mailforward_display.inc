@@ -191,7 +191,7 @@ function dis_mailforward_mail_field($emails, $class) {
     $count++;
   }
   if ($GLOBALS['c_max_email_nomade'] ==0 || $count < $GLOBALS['c_max_email_nomade']) {
-    $add_button = "<a id='addMailNomadeButton' href='' onclick=\"add_nomade_email_field();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+    $add_button = "<a id='addMailNomadeButton' href='' onclick=\"add_nomade_email_field();show_hide_nomade_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
   }
 
   $email_block = "

@@ -181,13 +181,6 @@ function check_mailforward_data_form($usr_q, $forward) {
 
       $em = strtok("\r\n");
     }
-
-    $used = get_email_used($emails_nomade, $id);
-    if (!empty($used)) {
-      $err['msg'] = "$l_email_nomad_exist : $used ";
-      $err['field'] = 'email_nomade';
-      return false;
-    }
   }
 
   // User nomade local copy only if autorized and activated
