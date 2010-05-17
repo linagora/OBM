@@ -373,7 +373,7 @@ class Vpdi {
    * @return DateTime
    */
   public static function decodeDate($value) {
-    $date = new DateTime($value);
+    $date = new Of_Date($value);
     return $date;
   }
   

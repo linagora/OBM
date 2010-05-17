@@ -39,8 +39,7 @@ class Vpdi_Icalendar_Event {
     $this->end = $vevent->getDtend();
     $this->duration = $vevent->getDuration();
     if ($this->end == null) {
-      $_dtend =  new Of_Date($this->start->format('U') + $this->duration);
-      $this->end = new DateTime($_dtend->getIso());
+      $this->end =  new Of_Date($this->start->format('U') + $this->duration);
     }
     if ($this->duration == null) {
       $this->duration = $this->end->format('U') - $this->start->format('U');
