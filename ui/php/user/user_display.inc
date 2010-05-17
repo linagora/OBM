@@ -265,8 +265,7 @@ function html_batch_user_search_form($user) {
       </select>
     </label>
     <label>$l_exp<br />
-      <input type=\"text\" name=\"tf_exp\" size=\"16\" maxlength=\"32\"
-      value=\"$exp\" />
+      <input type=\"text\" name=\"tf_exp\" size=\"16\"  maxlength=\"32\" value=\"$exp\" />
     </label>";
     $block .= "
     <label>$l_profile<br />
@@ -1731,9 +1730,9 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
   // login (can't be updated, so only on insert)
   if (($action == 'new') || ($action == 'insert')) {
-    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' maxlength=\"32\" value=\"$login\" />";
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' value=\"$login\" />";
   } else {
-    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' maxlength=\"32\" value=\"$login\" />
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' value=\"$login\" />
                   <input type=\"hidden\" name=\"tf_old_login\" value=\"$old_login\" />";
   }
 
