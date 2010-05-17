@@ -337,6 +337,11 @@ ALTER TABLE RGroup ADD COLUMN rgroup_delegation varchar(255) default '';
 --
 ALTER TABLE deletedevent ADD COLUMN deletedevent_event_ext_id character varying(300) DEFAULT ''::character varying;
 
+--
+-- update category_code length to 20
+--
+ALTER TABLE Category ALTER COLUMN category_code TYPE character varying(20);
+
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';

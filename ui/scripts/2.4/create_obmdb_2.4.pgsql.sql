@@ -127,7 +127,7 @@ CREATE TABLE category (
     category_userupdate integer DEFAULT NULL,
     category_usercreate integer DEFAULT NULL,
     category_category character varying(24) DEFAULT ''::character varying NOT NULL,
-    category_code character varying(10) DEFAULT ''::character varying NOT NULL,
+    category_code character varying(20) DEFAULT ''::character varying NOT NULL,
     category_label character varying(100) DEFAULT ''::character varying NOT NULL
 );
 
