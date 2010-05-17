@@ -1666,9 +1666,7 @@ class OBM_Contact implements OBM_ISearchable {
     if (is_array($this->website)) {
       foreach($this->website as $website) {
         if ($website['label'][0] == 'CALURI') {
-          $url = $website['url'];
-          $handle = @fopen($url, "r");
-          return $handle;
+          return true;
         }
       }
     }
