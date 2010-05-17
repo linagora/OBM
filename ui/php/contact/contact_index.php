@@ -16,8 +16,7 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
-?>
-<?php
+
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contact_index.php                                            //
 //     - Desc : Contact Index File                                           //
@@ -373,13 +372,16 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if ($addressbook && $addressbook->write) {
       if (check_user_defined_rules() && check_contact_data_form('', $params)) {
         if(isset($params['id'])) {
+          $c = OBM_Contact::get($params['id']);
           $retour = run_query_contact_update($params);
+          OBM_IndexingService::commit('contact');          
           $contact = OBM_Contact::get($params['id']);
           update_last_visit('contact', $params['id'], $action);    
+          echo dis_update_addressbook_count($addressbooks[$c->addressbook_id]);       
         } else {
           $contact = $addressbook->addContact($params);
+          OBM_IndexingService::commit('contact');
         }
-        OBM_IndexingService::commit('contact');
         echo dis_update_addressbook_count($addressbook);
         $subTemplate['card'] = new OBM_Template('card');
       } else {
