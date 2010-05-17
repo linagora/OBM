@@ -745,9 +745,6 @@ $php_regexp_samba_drive = '/^[D-Z]?$/';
 
 
 
-// Login
-$php_regexp_login = "/^[a-z0-9][a-z0-9-._]{1,31}$/";
-
 // Email
 $php_regexp_domain = "/^([a-z0-9-]+\.)+[a-z]{2,6}$/"; // Domain
 $php_regexp_email_name = "/^[a-zA-Z0-9!#\$%&\'*+\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#\$%&\'*+\/=?^_`{|}~-]+)*$/";
