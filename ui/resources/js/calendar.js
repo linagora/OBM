@@ -918,6 +918,7 @@ Obm.CalendarManager = new Class({
       url: obm.vars.consts.calendarUrl,
       secure : false,
       evalScripts : true,
+      async: false,
       update: $('calendarLayout'),
       onRequest: function() {
         $('spinner').show();
