@@ -82,7 +82,7 @@ class Vpdi_Icalendar_Event {
   }
 
   public function isAllDay() {
-    return ($this->duration >= 84600 || $this->end->format('d') != $this->start->format('d'));
+    return ($this->duration >= 84600);
   }
 
   public function isPrivate() {

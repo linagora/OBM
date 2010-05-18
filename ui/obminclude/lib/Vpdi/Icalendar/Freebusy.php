@@ -56,8 +56,8 @@ class Vpdi_Icalendar_Freebusy {
   }
   
   public function __construct(DateTime $start, DateTime $end) {
-    $this->start = new Of_Date($start);
-    $this->end = new Of_Date($end);
+    $this->start = new Of_Date($start, 'GMT');
+    $this->end = new Of_Date($end, 'GMT');
     $this->duration = $this->end->format('U') - $this->start->format('U');
     $this->type = self::BUSY;
   }
@@ -103,7 +103,7 @@ class Vpdi_Icalendar_Freebusy {
   }
 
   public function isAllDay() {
-    return ($this->duration >= 84600 || $this->end->format('d') != $this->start->format('d'));
+    return ($this->duration >= 84600);
   }
 
   public function isPrivate() {
