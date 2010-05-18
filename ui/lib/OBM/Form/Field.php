@@ -59,19 +59,19 @@ class OBM_Form_Field extends Stato_Webflow_Forms_Form {
 
   private function buildTextForm($field, $value) {
     $f = new Stato_Webflow_Forms_CharField();
-    return $f->render("tf_custom_$field", $value);
+    return $f->render("tf_custom_$field", $value, array('id' => "tf_custom_$field"));
   }
 
 
   private function buildTextareaForm($field, $value) {
     $f = new Stato_Webflow_Forms_TextField();
-    return $f->render("tf_custom_$field", $value);
+    return $f->render("tf_custom_$field", $value, array('id' => "tf_custom_$field"));
   }
 
 
   private function buildBooleanForm($field, $value) {
     $f = new Stato_Webflow_Forms_BooleanField();
-    return $f->render("tf_custom_$field", $value);
+    return $f->render("tf_custom_$field", $value, array('id' => "tf_custom_$field"));
   }
 
   public function buildSearchForm() {
