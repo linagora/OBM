@@ -373,7 +373,7 @@ function html_user_search_form($user) {
 
   // User defined data
   $block_userdata .= of_userdata_dis_search('user', $user);
-  $block_userfields = $GLOBALS['customFields']->buildSearchForm();
+  $block_userfields = $GLOBALS['customFields']->buildSearchForm($user);
 
   if ($popup) {
     $ext_action = $user['ext_action'];
@@ -613,7 +613,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
 
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('user', $user);
-  $url_userfields = $GLOBALS['customFields']->buildSearchUrl();
+  $url_userfields = $GLOBALS['customFields']->buildSearchUrl($user);
   if ($popup) {
     $ext_action = $user['ext_action'];
     $ext_url = $user['ext_url'];
@@ -1717,9 +1717,9 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $class[$field] = 'error';
   }
   if ($id) {
-    $block_userfields = $GLOBALS['customFields']->buildEntityForm($class, $id);
+    $block_userfields = $GLOBALS['customFields']->buildEntityForm($class, $id, $user);
   } else {
-    $block_userfields = $GLOBALS['customFields']->buildEntityForm($class);
+    $block_userfields = $GLOBALS['customFields']->buildEntityForm($class, null, $user);
   }
 
   // Default exp is hidden
@@ -2259,10 +2259,21 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
       </form>
     </div>
     ";
+    if (is_array($GLOBALS['cgp_user']['user']['field'])) {
+      foreach ($GLOBALS['cgp_user']['user']['field'] as $fieldname => $properties) {
+        $extrafields_userpattern_js .= "theUserForm.addField('$fieldname','tf_custom_$fieldname');\n";
+      }
+    }
+    if (is_array($GLOBALS['cgp_user']['user']['category'])) {
+      foreach ($GLOBALS['cgp_user']['user']['category'] as $fieldname => $properties) {
+        $extrafields_userpattern_js .= "theUserForm.addField('$fieldname','sel_$fieldname','ChoiceField');\n";
+      }
+    }
     $js_userpattern = "<script type='text/javascript'>
     obm.initialize.chain(function () {
       Obm.vars.consts.userPatternUrl = '$path/userpattern/userpattern_index.php';
       theUserForm = new Obm.UserPattern.Form({ url: Obm.vars.consts.userPatternUrl, delay: 400 });
+      $extrafields_userpattern_js
       $('userpattern_id').addEvent('change' , function () {
         theUserForm.setPattern(this.value);
       });

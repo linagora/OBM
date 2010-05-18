@@ -181,11 +181,24 @@ function get_userpattern_params() {
   if (isset($params['mail_server_id']))
     $params['attributes']['mail_server_id'] = $params['mail_server_id'];
 
+  if (is_array($GLOBALS['cgp_user']['user']['field'])) {
+    foreach ($GLOBALS['cgp_user']['user']['field'] as $fieldname => $properties) {
+      if (isset($params["custom_$fieldname"])) $params['attributes'][$fieldname] = $params["custom_$fieldname"];
+    }
+  }
+  if (is_array($GLOBALS['cgp_user']['user']['category'])) {
+    foreach ($GLOBALS['cgp_user']['user']['category'] as $fieldname => $properties) {
+      if (isset($params[$fieldname])) $params['attributes'][$fieldname] = $params[$fieldname];
+    }
+  }
+
   // !!! WARNING: cheat anti magic_quotes !!! 
-  if (is_array($params['userpattern']))
-    array_walk_recursive($params['userpattern'],create_function('&$value,$key','$value=stripslashes($value);'));
-  if (is_array($params['attributes']))
-    array_walk_recursive($params['attributes'],create_function('&$value,$key','$value=stripslashes($value);'));
+  if (get_magic_quotes_gpc()) {
+    if (is_array($params['userpattern']))
+      array_walk_recursive($params['userpattern'],create_function('&$value,$key','$value=stripslashes($value);'));
+    if (is_array($params['attributes']))
+      array_walk_recursive($params['attributes'],create_function('&$value,$key','$value=stripslashes($value);'));
+  }
 
   if (is_array($params['attributes']['aliases'])) {
     foreach ($params['attributes']['aliases'] as $i => $alias) {

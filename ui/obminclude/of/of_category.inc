@@ -2035,7 +2035,7 @@ function of_category_user_dis_entity_form($entity, $cat, $cats, $mode='multi', $
   $block_cat = "
     <tr>
       <th>$link ${$l_cat} :</th>    
-      <td id=\"sel_${cat}\">$sel_cat</td>
+      <td id=\"td_sel_${cat}\">$sel_cat</td>
     </tr>";
 
   return $block_cat;

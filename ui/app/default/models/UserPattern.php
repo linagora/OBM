@@ -62,16 +62,20 @@ class UserPattern {
     'desc'              => array( 'type'=>'string'  ),
     'web_perms'         => array( 'type'=>'boolean' ),
     'mail_perms'        => array( 'type'=>'boolean' ),
-    'mail_server_id'    => array( 'type'=>'string', 'validate_func'=>'validate_mail_server_id' ),
+    'mail_server_id'    => array( 'type'=>'integer', 'validate_func'=>'validate_mail_server_id' ),
     'email'             => array( 'type'=>'string', 'validate_func'=>'validate_email' ),
     'mail_quota'        => array( 'type'=>'integer' ),
     'email_nomade'      => array( 'type'=>'string'  ),
     'nomade_perms'      => array( 'type'=>'boolean' ),
     'nomade_enable'     => array( 'type'=>'boolean' ),
     'nomade_local_copy' => array( 'type'=>'boolean' )
+    //extra attributes are read from $GLOBALS['cgp_user']['user']['category'] and $GLOBALS['cgp_user']['user']['field']
   );
 
   static $allowed_keywords = array( '%kind%', '%lastname%', '%firstname%', '%login%', '%profile%', '%delegation%', '%delegation_target%', '%title%', '%phone%', '%phone2%', '%mobile%', '%fax%', '%fax2%', '%company%', '%direction%', '%service%', '%ad1%', '%ad2%', '%ad3%', '%zip%', '%town%', '%cdx%', '%desc%', '%today%', '%domain%' );
+  //extra keywords are read from $GLOBALS['cgp_user']['user']['field']
+
+  static $initialized = false;
 
   /**
    * Standard user pattern constructor
@@ -178,7 +182,7 @@ class UserPattern {
       $this->$setter($value);
     } else {
       $this->set_attributes(array($key=>$value));
-      //will only work if $key is present in UserPattern::$allowed_attributes
+      //will only work if $key is present in self::$allowed_attributes
     }
   }
 
@@ -217,14 +221,14 @@ class UserPattern {
    **/
   public function set_attributes($attributes = array()) {
     $return = true;
-    $attributes = array_intersect_key($attributes,UserPattern::$allowed_attributes);
+    $attributes = array_intersect_key($attributes,self::$allowed_attributes);
     foreach ($attributes as $key => $value) {
-      $validation_func = UserPattern::$allowed_attributes[$key]['validate_func'];
+      $validation_func = self::$allowed_attributes[$key]['validate_func'];
       if (empty($validation_func)) {
-        $attribute_type = UserPattern::$allowed_attributes[$key]['type'];
+        $attribute_type = self::$allowed_attributes[$key]['type'];
         $validation_func = "validate_{$attribute_type}";
       }
-      if ($this->$validation_func($value)) {
+      if ($this->$validation_func($value, $key)) {
         $this->attributes[$key] = $value;
       } else {
         $GLOBALS['err']['fields'][] = $key;
@@ -284,17 +288,19 @@ class UserPattern {
 
   /**
    * allow to check a string attribute before to set it
+   * @param  string $value
    * @param  string $attribute
    * @access protected
+   * @return boolean
    **/
-  protected function validate_string(&$attribute) {
-    if ($attribute=='') {
-      $attribute = null;
+  protected function validate_string(&$value,$attribute) {
+    if ($value=='') {
+      $value = null;
       return true;
     }
-    if (preg_match_all('/%(.*?)%/',$attribute,$matches,PREG_PATTERN_ORDER)) {
+    if (preg_match_all('/%(.*?)%/',$value,$matches,PREG_PATTERN_ORDER)) {
       $keywords = $matches[0];  //all keywords found in the pattern
-      $keywords = array_diff($keywords, UserPattern::$allowed_keywords);
+      $keywords = array_diff($keywords, self::$allowed_keywords);
       array_filter($keywords,create_function('$attr','return preg_match(\'/^%today([-+]\d*){0,1}%$/\',$attr);'));
       if (!empty($keywords)) {
         return false;
@@ -306,14 +312,16 @@ class UserPattern {
 
   /**
    * allow to check a password attribute before to set it
+   * @param  string $value
    * @param  string $attribute
    * @access protected
+   * @return boolean
    **/
-  protected function validate_password(&$attribute) {
-    if ($attribute==='%random%')
+  protected function validate_password(&$value,$attribute) {
+    if ($value==='%random%')
       return true;
-    if ($attribute=='') {
-      $attribute = null;
+    if ($value=='') {
+      $value = null;
       return true;
     }
     return false;
@@ -321,80 +329,112 @@ class UserPattern {
 
   /**
    * allow to check an integer attribute before to set it
+   * @param  string $value
    * @param  int    $attribute
    * @access protected
+   * @return boolean
    **/
-  protected function validate_integer(&$attribute) {
-    $attribute = trim($attribute);
-    if (is_null($attribute) || $attribute=='')
-      $attribute = null;
+  protected function validate_integer(&$value,$attribute) {
+    $value = trim($value);
+    if (is_null($value) || $value=='')
+      $value = null;
     else
-      $attribute = intval($attribute);
+      $value = intval($value);
     return true;
   }
 
   /**
    * allow to check a boolean attribute before to set it
+   * @param  string $value
    * @param  int    $attribute
    * @access protected
+   * @return boolean
    **/
-  protected function validate_boolean(&$attribute) {
-    $attribute = intval($attribute);
+  protected function validate_boolean(&$value,$attribute) {
+    $value = intval($value);
     return true;
   }
 
   /**
    * allow to check a date attribute before to set it
+   * @param  string $value
    * @param  string $attribute
    * @access protected
+   * @return boolean
    **/
-  protected function validate_date(&$attribute) {
-    $attribute = preg_replace('/\s/','',trim($attribute));
-    if ($attribute=='') {
-      $attribute = null;
+  protected function validate_date(&$value,$attribute) {
+    $value = preg_replace('/\s/','',trim($value));
+    if ($value=='') {
+      $value = null;
       return true;
     }
-    if (preg_match('/^%today([-+]\d*){0,1}%$/',$attribute)) {
+    if (preg_match('/^%today([-+]\d*){0,1}%$/',$value)) {
       return true;
     }
-    if ($attribute = of_isodate_convert($datebegin,true,true)) {
+    if ($value = of_isodate_convert($datebegin,true,true)) {
       return true;
     }
-    $attribute = null;
+    $value = null;
     return false;
   }
 
   /**
-   * allow to check the profile field attribute before to set it
+   * allow to check any category attribute before to set it
+   * @param  string $value
    * @param  string $attribute
    * @access protected
+   * @return boolean
    **/
-  protected function validate_profile(&$attribute) {
+  protected function validate_category(&$value,$attribute) {
+    //FIXME: would be better to check...
+    return true;
+  }
+
+  /**
+   * allow to check the profile field attribute before to set it
+   * @param  string $value
+   * @param  string $attribute
+   * @access protected
+   * @return boolean
+   **/
+  protected function validate_profile(&$value,&$attribute) {
     $profiles = array_keys(get_all_profiles(false));
-    if (in_array($attribute,$profiles))
+    if (in_array($value,$profiles))
       return true;
-    $attribute = null;
+    $value = null;
     return false;
   }
 
   /**
    * allow to check the mail_server_id field attribute before to set it
+   * @param  string $value
    * @param  string $attribute
    * @access protected
+   * @return boolean
    **/
-  protected function validate_mail_server_id(&$attribute) {
-    //FIXME
+  protected function validate_mail_server_id(&$value,$attribute) {
+    //FIXME: would be better to check...
     return true;
   }
 
   /**
    * allow to check the email field attribute before to set it
+   * @param  string $value
    * @param  string $attribute
    * @access protected
+   * @return boolean
    **/
-  protected function validate_email(&$attribute) {
-    if (is_array($attribute))
-      $attribute = implode("\r\n",$attribute);
+  protected function validate_email(&$value,$attribute) {
+    if (is_array($value)) {
+      $mails = array();
+      foreach ($value as $email) {
+        $email = trim($email);
+        if (!empty($email)) {
+          $mails[] = $email;
+        }
+      }
+      $value = implode("\r\n",$mails);
+    }
     return true;
   }
 
@@ -663,7 +703,7 @@ class UserPattern {
    * @access protected
    **/
   protected function generate(&$generated, $attribute) {
-    $meta_attribute = UserPattern::$allowed_attributes[$attribute];
+    $meta_attribute = self::$allowed_attributes[$attribute];
     if (!empty($meta_attribute) && !empty($this->attributes[$attribute])) {
       $type = $meta_attribute['type'];
       $generate_func = "generate_{$type}";
@@ -780,12 +820,12 @@ class UserPattern {
   }
 
   /**
-   * Generate a choice attribute and it's potential dependencies
+   * Generate a category attribute and it's potential dependencies
    * @param  array  $generated    array of all generated attributes
    * @param  string $attribute    the name of the attribute to generate
    * @access protected
    **/
-  protected function generate_choice(&$generated, $attribute) {
+  protected function generate_category(&$generated, $attribute) {
     $pattern = $this->attributes[$attribute];
     $generated[$attribute] = $pattern;
   }
@@ -809,5 +849,86 @@ class UserPattern {
     }
   }
 
+  /**
+   * Load extra attributes and keywords from $GLOBALS['cgp_user']['user']['field'] and $GLOBALS['cgp_user']['user']['category']
+   * @access public
+   **/
+  public static function init() {
+    if (self::$initialized)
+      return;
+    self::$initialized = true;
+
+    $extra_fields = $GLOBALS['cgp_user']['user']['field'];
+    if (is_array($extra_fields)) {
+      foreach ($extra_fields as $fieldname => $properties) {
+        if (!isset(self::$allowed_attributes[$fieldname])) {
+          $type = ($properties['type']=='text' || $properties['type']=='textarea') ? 'string' : $properties['type'];
+          if (!in_array($type, array('boolean','date','integer','password','string'))) {
+            $type = 'string';
+          }
+          self::$allowed_attributes[$fieldname] = array( 'type' => $type );
+          if (($type=='string') && !in_array("%{$fieldname}%",self::$allowed_keywords)) {
+            self::$allowed_keywords[] = "%{$fieldname}%";
+          }
+        }
+      }
+    }
+
+    $extra_categories = $GLOBALS['cgp_user']['user']['category'];
+    if (is_array($extra_categories)) {
+      foreach ($extra_categories as $fieldname => $properties) {
+        if (!isset(self::$allowed_attributes[$fieldname])) {
+          self::$allowed_attributes[$fieldname] = array( 'type' => 'category' );
+          //categories can't be used as keywords
+        }
+      }
+    }
+  }
+
+  /**
+   * Get keywords list
+   * @param  string  $attribute    the name of the attribute to generate
+   * @param  string  $pattern      optional filter pattern
+   * @param  boolean $field_empty  false is the field if not empty
+   * @access public
+   * @return array
+   **/
+  public static function keywords($attribute, $pattern='', $field_empty=true) {
+    $attr = self::$allowed_attributes[$attribute];
+    if (empty($attr))
+      return array();
+    //else
+    $type = $attr['type'];
+
+    if ($type=='string') {
+      $keywords = self::$allowed_keywords;
+      $keywords[] = '%today+';
+      $keywords[] = '%today-';
+
+    } elseif ($type=='password') {
+      if ($field_empty) {
+        $keywords = array('%random%');
+      }
+
+    } elseif ($type=='date') {
+      if ($field_empty) {
+        $keywords = array('%today%','%today+','%today-');
+      }
+
+    } else {
+      return array();
+    }
+
+    if (!empty($pattern)) {
+      $len = strlen($pattern);
+      $keywords = array_filter($keywords,create_function('$keyword',"return substr(\$keyword,0,$len)=='$pattern';"));
+    }
+
+    sort($keywords);
+    return $keywords;
+  }
+
 }
+
+UserPattern::init();
 

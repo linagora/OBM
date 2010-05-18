@@ -401,6 +401,24 @@ function html_userpattern_form($action, $params=array(), $pattern=null) {
     }
   }
 
+  $extrafields = array();
+  if (is_array($GLOBALS['cgp_user']['user']['field'])) {
+    foreach ($GLOBALS['cgp_user']['user']['field'] as $fieldname => $properties) {
+      $extrafields[$fieldname] = $attributes[$fieldname];
+      if (isset($userpattern[$fieldname])) $extrafields[$fieldname] = $userpattern[$fieldname];
+    }
+  }
+  if (is_array($GLOBALS['cgp_user']['user']['category'])) {
+    foreach ($GLOBALS['cgp_user']['user']['category'] as $fieldname => $properties) {
+      $extrafields[$fieldname] = $attributes[$fieldname];
+      if (isset($userpattern[$fieldname])) $extrafields[$fieldname] = $userpattern[$fieldname];
+    }
+  }
+  $block_userdata = of_userdata_dis_entity_form('user', null, $extrafields);
+
+  $customFields = new OBM_Form_Field('user','');
+  $block_userfields = $customFields->buildEntityForm($class, null, $extrafields);
+
   // Default exp is hidden
   if (empty($dateexp))	{
     $showexp='display:none';
@@ -680,6 +698,8 @@ function html_userpattern_form($action, $params=array(), $pattern=null) {
     <th class=\"$class[dateexp]\">{$GLOBALS['l_dateexp']}</th>
     <td><input type=\"text\" name=\"attributes[dateexp]\" $disabled value=\"$dateexp\" class=\"datePicker\"/></td>
   </tr>
+  $block_userdata
+  $block_userfields
   </table>
   </fieldset>
 
