@@ -136,6 +136,6 @@ class Vpdi_Icalendar_Freebusy {
   }
 
   public function getRrule() {
-    return $this->evt->getRrule();
+    // return $this->evt->getRrule();
   }
 }
