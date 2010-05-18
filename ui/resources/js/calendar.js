@@ -1722,9 +1722,11 @@ Obm.CalendarAllDayEvent = new Class({
 
     this.rightExtension = new Element('img').setProperty('src', obm.vars.images.extension_right).
       setStyles({'display':'none', 'float':'right'}).injectInside(dt);
-    this.leftExtension = new Element('img').setProperty('src', obm.vars.images.extension_left).
-      setStyle('display', 'none').injectInside(dt);
+
     this.dragHandler = new Element('h1').addClass('allDay').injectInside(dt);     
+
+    this.leftExtension = new Element('img').setProperty('src', obm.vars.images.extension_left).
+      setStyle('display', 'none').injectInside(this.dragHandler);
 
     this.setTitleIcons();
 
