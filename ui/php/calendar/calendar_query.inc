@@ -4192,7 +4192,41 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
               $e->getCategory(),$e->isPrivate(),$e->getDescription(), null,
               $e->isAllDay(),'none',$c['id'],$owner_name, null, $e->getTransparency(),null);
             $event->addAttendee('contact',$c['id'],$owner_name, $e->getPartStat());
-            $of->addOccurrence($event, new Of_Date($e->start->format('U')), "contact", $c['id'], $e->getPartStat());
+            $date = clone $e->start;
+            if ($rrule = $e->getRrule()) {
+              // Repeat events
+              $event_start = clone $date;
+              $event_start->setHour(0)->setMinute(0)->setSecond(0);
+              $event_end = ($rrule['until'] != null && $end->compare($rrule['until']) > 0)? clone $rrule['until']: clone $end; 
+              $event_end->setHour(0)->setMinute(0)->setSecond(0)->addSecond(1);
+              switch($rrule['freq']) {
+                case 'daily' :
+                  calendar_daily_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  break;
+                case 'weekly' :
+                  calendar_weekly_repeatition($date, $event_start,$event_end, $rrule['repeat_days'], $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  break;
+                case 'monthlybyday' :
+                  $stored = calendar_monthlybyday_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  break;
+                case 'monthlybydate' :
+                  $stored = calendar_monthlybydate_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  break;
+                case 'yearly' :
+                  $stored = calendar_yearly_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  break;
+              }
+              // Remove exceptions
+              if (is_array($exdates = $rrule['exdates'])) {
+                foreach($exdates as $exdate) {
+                  if ($exdate->compare($end) < 0 && $exdate->compare($start) > 0) { 
+                    $of->removeOccurrences($e->getUid(), $exdate);
+                  }
+                }
+              } 
+            } else {
+              $of->addOccurrence($event, $date, "contact", $c['id'], $e->getPartStat());
+            }
           }
         }
       }

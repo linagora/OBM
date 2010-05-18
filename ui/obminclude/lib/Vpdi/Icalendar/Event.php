@@ -118,6 +118,10 @@ class Vpdi_Icalendar_Event {
     }
   }
 
+  public function getRrule() {
+    return $this->evt->getRrule();
+  }
+
 }
 
 ?>

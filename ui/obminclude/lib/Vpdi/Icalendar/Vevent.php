@@ -28,7 +28,10 @@
 class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
   
   protected $profile = 'VEVENT';
-  
+  private $frequency = array("secondly","minutely","hourly","daily","weekly","monthly","yearly");
+  private $repeat = array("bysecond","byminute","byhour","byday","bymonthday","byyearday","byweekno","bymonth","bysetpos","wkst");
+  private $weekDays = array('su' => 'sunday', 'mo' => 'monday', 'tu' => 'tuesday', 'we' => 'wednesday', 'th' => 'thursday' , 'fr' => 'friday', 'sa' => 'saturday');
+
   public function getDtstart() {
     return $this->getDateTime('dtstart');
   }
@@ -183,5 +186,64 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
       $duration = 86400 * $match[2] + 3600 * $match[5] + 60 * $match[7] + $match[9] +604800 * $match[11] ;
     } 
     return $duration;
+  }
+
+  public function getRrule() {
+    if (($rrule = $this->getProperty('RRULE')) === null) {
+      return null;
+    }
+    $data = Vpdi::decodeTextList($rrule->value(), ';');
+    foreach($data as $d) {
+      list($name, $value) = explode('=', $d);
+      $name = strtolower($name);
+      $property[$name]=$value;
+    }
+    $freq = strtolower($property['freq']);
+    if (!in_array($freq, $this->frequency)) return null;
+
+    $return = array();
+
+    switch ($freq)  {
+      case 'weekly':
+        $days = '0000000';
+        if(!is_null($property['byday'])) {
+          $byday = Vpdi::decodeTextList($property['byday']);
+          foreach($byday as $day) {
+            $index = date('w', strtotime($this->weekDays[strtolower($day)]));
+            $days[$index] = '1';
+          }
+        }
+        $return['repeat_days'] = $days;
+        break;
+      case 'monthly' :
+        if(!is_null($property['byday'])) {
+          $freq = 'monthlybyday';
+        } else {
+          $freq = 'monthlybydate';
+        }
+        break;
+    }
+
+    $return['freq'] = $freq;
+    if(is_numeric($property['interval'])) {
+      $return['interval'] = $property['interval'];
+    } else {
+      $return['interval'] = 1;
+    }
+
+    if(!is_null($property['count'])) {
+      $return['count'] = $property['count'];
+    } elseif(!is_null($property['until'])) {
+      $return['until'] = Vpdi::decodeDate($property['until']);
+    }
+
+    // Exceptions
+    $return['exdates'] = null;
+    if (($exdates = $this->getPropertiesByName('EXDATE')) != null) {
+      foreach($exdates as $exdate) {
+        $return['exdates'][] = new Of_Date($exdate->value());
+      } 
+    }
+    return $return;
   }
 }
