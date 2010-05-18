@@ -184,14 +184,19 @@ sub _loadEntities {
     }
 
     my $mailshareTablePrefix = '';
+    my $hostTablePrefix = '';
     if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
         $mailshareTablePrefix = 'P_';
+        $hostTablePrefix = 'P_';
     }
 
     my $query = 'SELECT '.$mailshareTablePrefix.'MailShare.*,
+                        '.$hostTablePrefix.'Host.host_ip as mailshare_mail_server_ip,
+                        '.$hostTablePrefix.'Host.host_fqdn as mailshare_mail_server_fqdn,
                         current.mailshare_name as mailshare_name_current
                  FROM '.$mailshareTablePrefix.'MailShare
                  LEFT JOIN P_MailShare current ON current.mailshare_id='.$mailshareTablePrefix.'MailShare.mailshare_id
+                 INNER JOIN '.$hostTablePrefix.'Host ON '.$hostTablePrefix.'Host.host_id = '.$mailshareTablePrefix.'MailShare.mailshare_mail_server_id
                  WHERE '.$mailshareTablePrefix.'MailShare.mailshare_domain_id='.$self->{'domainId'};
 
     if( $self->{'ids'} ) {

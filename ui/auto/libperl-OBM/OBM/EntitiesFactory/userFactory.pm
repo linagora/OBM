@@ -191,8 +191,10 @@ sub _loadEntities {
     }
 
     my $userTablePrefix = '';
+    my $hostTablePrefix = '';
     if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
         $userTablePrefix = 'P_';
+        $hostTablePrefix = 'P_';
     }
 
     my $query = 'SELECT '.$userTablePrefix.'UserObm.*,
@@ -200,6 +202,8 @@ sub _loadEntities {
                         current.userobm_archive as user_obm_archive_current,
                         current.userobm_samba_perms as userobm_samba_perms_current,
                         current.userobm_mail_perms as userobm_mail_perms_current,
+                        '.$hostTablePrefix.'Host.host_ip as userobm_mail_server_ip,
+                        '.$hostTablePrefix.'Host.host_fqdn as userobm_mail_server_fqdn,
                         group_gid
                  FROM '.$userTablePrefix.'UserObm
                  LEFT JOIN P_UserObm current ON current.userobm_id='.$userTablePrefix.'UserObm.userobm_id
@@ -207,6 +211,7 @@ sub _loadEntities {
                             FROM UGroup
                             INNER JOIN of_usergroup ON of_usergroup_group_id = group_id WHERE group_gid = 512) AS grp
                                 ON grp.of_usergroup_user_id = '.$userTablePrefix.'UserObm.userobm_id
+                 INNER JOIN '.$hostTablePrefix.'Host ON '.$hostTablePrefix.'Host.host_id = '.$userTablePrefix.'UserObm.userobm_mail_server_id
                  WHERE '.$userTablePrefix.'UserObm.userobm_domain_id='.$self->{'domainId'}.'
                  AND '.$userTablePrefix.'UserObm.userobm_status=\'VALID\'';
 
