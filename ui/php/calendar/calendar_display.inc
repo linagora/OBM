@@ -5547,7 +5547,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
     new obm.AutoComplete.ExtSearch(
       function() { return \$('freeBusySearchSource').value+'&action=ext_search&ajax=1'; },
       'dummy', 'freeBusyUserSearch',
-      {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});
+      {filter_entity:'calendar', filter_pattern:'access', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});
     new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'dummy', 'freeBusyResourceSearch',
       {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});
   </script>";
