@@ -43,6 +43,7 @@ $l_date_repeatend = "Fin de répétition";
 $l_carac = "Propriétés";
 $l_force = "Forcer l'insertion de l'événement";
 $l_force_disabled = "(impossible car une ressource est en jeu)";
+$l_overbooking_not_allowed = "La surréservation de ressource n'est pas autorisée";
 $l_everybody = "Tout le monde";
 $l_everyresources = "Toutes les ressources";
 $l_all_day = "Toute la journée";
