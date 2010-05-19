@@ -11670,6 +11670,9 @@ CREATE SEQUENCE field_id_seq
 ALTER SEQUENCE field_id_seq OWNED BY field.id;
 ALTER TABLE field ALTER COLUMN id SET DEFAULT nextval('field_id_seq'::regclass);
 
+ALTER TABLE ONLY field 
+    ADD CONSTRAINT field_id_pkey PRIMARY KEY (id);
+
 --
 -- field fkey
 --
