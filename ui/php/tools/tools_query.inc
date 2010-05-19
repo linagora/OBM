@@ -395,6 +395,20 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=fals
       }   
     }
   }
+
+  if(is_array($metadata['properties']))
+  foreach($metadata['properties'] as $propertyName => $property) {
+    $rules['properties'][$propertyName] = $rules['update'];
+    if (is_array($property['rules'])) {
+      foreach($property['rules'] as $field => $value) {
+        if (is_array($value)) {
+          $rules['properties'][$propertyName] [] ="Link.$field IN ('".implode("','", $value)."')";
+        } else {
+          $rules['properties'][$propertyName] [] ="Link.$field = '$value'";
+        }
+      }   
+    }
+  }  
   if ($update) {
     $userdata = array('uid' =>  $obm['uid'], 'delegation' => $obm['delegation_target'], 'domain' => $domain );
     $return = run_query_tools_set_scope($metadata, $rules,$userdata);
@@ -440,6 +454,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
    * PERFORM UPDATED ENTITIES 
    */
   
+  $return['updated_entities'] = array();
   $fields = $obm_qm->metadata($metadata['table'], false);
   foreach ($fields as $field) {
     if(strpos(strtolower($field['flags']),'primary') === false) {
@@ -468,7 +483,9 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   
   $return['updated'] = 0;
   while ($obm_qm->next_record()) {
-    $return['updated_entities'][] = get_record_representation($metadata, $obm_qm);
+    $datas = get_record_representation($metadata, $obm_qm);
+    $return['updated_entities'][] = $datas;
+    $updatedids[$datas['id']] = true;
     $return['updated']++;
   }
   $return['diff'] += $return['updated'];
@@ -575,6 +592,72 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
     $return['links'] += $obm_qm->f('links');
     $return['diff'] += $return['links'];
   }
+
+  /**
+   * PERFORM UPDATED PROPERTIES 
+   */
+
+  if(is_array($metadata['properties'])) 
+  foreach($metadata['properties'] as $propertyName => $property) {
+    $diff = array();
+    $join = array();
+    $fields = $obm_qm->metadata($property['table'], false);
+    foreach ($fields as $field) {
+      if(strpos(strtolower($field['flags']),'primary') === false) {
+        $diff[] = "Production.$field[name] != Property.$field[name]";
+          $diff[] = "(Production.$field[name] IS NULL AND Property.$field[name] IS NOT NULL)";
+          $diff[] = "(Production.$field[name] IS NOT NULL AND Property.$field[name] IS NULL)";
+      } else {
+        $diff[] = "Production.$field[name] IS NULL";
+        $diff[] = "Property.$field[name] IS NULL";
+        $join[] = "Property.$field[name] = Production.$field[name]";
+      }
+    }
+    if($property['join']) {
+      $propertyJoin = 'LEFT JOIN '.$property['join']['table'].' ON '.$property['join']['table'].'.'.$property['join']['id'] .' = %s.'.$property['join']['joinId'];
+      $propertyId = $property['join']['table'].'.'.$property['id'];
+      $productionJoin = 'LEFT JOIN P_'.$property['join']['table'].' ON P_'.$property['join']['table'].'.'.$property['join']['id'] .' = %s.'.$property['join']['joinId'];
+      $productionId = 'P_'.$property['join']['table'].'.'.$property['id'];
+    } else {
+      $propertyId = 'Property.'.$property['id'];
+      $productionId =  'Property'.'.'.$property['id'];
+    }
+
+
+
+    // Union to get all changes ! (eg: properties that have been deleted)
+    $query = "
+      SELECT $current_columns 
+        FROM ".$property['table']." as Property 
+        ".sprintf($propertyJoin, 'Property')."
+        JOIN $metadata[table] as Current ON $primaries[current] = $propertyId
+        LEFT JOIN P_".$property['table']." as Production ON ".implode(' AND ', $join)."
+        ".sprintf($productionJoin, 'Production')."
+        WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['properties'][$propertyName]).")
+    UNION
+        SELECT $current_columns
+        FROM P_".$property['table']." as Property 
+        ".sprintf($productionJoin, 'Property')."
+        JOIN $metadata[table] as Current ON $primaries[current] = $productionId
+        LEFT JOIN ".$property['table']." as Production ON ".implode(' AND ', $join)."
+        ".sprintf($propertyJoin, 'Production')."
+        WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['properties'][$propertyName]).")";
+
+    display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(properties,'.$property['table'].','.$metadata['table'].')');
+    $obm_qm->query($query);
+    // Add Union result (bi directionnal => 2 results)
+    $count = count($return['updated_entities']);
+    while ($obm_qm->next_record()) {
+      $datas = get_record_representation($metadata, $obm_qm);
+      if(!$updatedids[$datas['id']]) {
+        $updatedids[$datas['id']] = true;
+        $return['updated_entities'][] = $datas;
+      }
+    }    
+    $return['diff'] += count($return['updated_entities']) - $count; 
+    $return['updated'] += count($return['updated_entities']) - $count; 
+  }
+  
   return $return;
 }
 
@@ -783,6 +866,80 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
     $obm_qm->next_record();
     $return += $obm_qm->affected_rows();
   }
+
+
+  /**
+   * PERFORM UPDATED PROPERTIES 
+   */
+  foreach($metadata['properties'] as $propertyName => $property) {
+    $diff = array();
+    $join = array();
+    $fields = $obm_qm->metadata($property['table'], false);
+    foreach ($fields as $field) {
+      if(strpos(strtolower($field['flags']),'primary') === false) {
+        $diff[] = "(Production.$field[name] != Property.$field[name])";
+        $diff[] = "(Production.$field[name] IS NULL AND Property.$field[name] IS NOT NULL)";
+        $diff[] = "(Production.$field[name] IS NOT NULL AND Property.$field[name] IS NULL)";
+      } else {
+        $diff[] = "Production.$field[name] IS NULL";
+        $diff[] = "Property.$field[name] IS NULL";
+        $join[] = "Property.$field[name] = Production.$field[name]";
+      }
+    }
+
+    if($property['join']) {
+      $propertyJoin = 'LEFT JOIN '.$property['join']['table'].' ON '.$property['join']['table'].'.'.$property['join']['id'] .' = %s.'.$property['join']['joinId'];
+      $propertyId = $property['join']['table'].'.'.$property['id'];
+      $productionJoin = 'LEFT JOIN P_'.$property['join']['table'].' ON P_'.$property['join']['table'].'.'.$property['join']['id'] .' = %s.'.$property['join']['joinId'];
+      $productionId = 'P_'.$property['join']['table'].'.'.$property['id'];
+    } else {
+      $propertyId = 'Property.'.$property['id'];
+      $productionId =  'Property'.'.'.$property['id'];
+    }
+
+    $query = "
+    INSERT INTO Updated (
+        updated_domain_id,
+        updated_user_id,
+        updated_delegation,
+        updated_table,
+        updated_entity_id,
+        updated_type
+    ) SELECT 
+      $userdata[domain],
+      $userdata[uid],
+      '$userdata[delegation]',
+      '$metadata[table]',
+      $primaries[current], 
+      'U'      
+      FROM ".$property['table']." as Property 
+        ".sprintf($propertyJoin, 'Property')."
+        JOIN $metadata[table] as Current ON $primaries[current] = $propertyId
+        LEFT JOIN P_".$property['table']." as Production ON ".implode(' AND ', $join)."
+        ".sprintf($productionJoin, 'Production')."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['properties'][$propertyName]).")
+      UNION
+      SELECT 
+      $userdata[domain],
+      $userdata[uid],
+      '$userdata[delegation]',
+      '$metadata[table]',
+      $primaries[current], 
+      'U'          
+      FROM P_".$property['table']." as Property 
+        ".sprintf($productionJoin, 'Property')."
+        JOIN $metadata[table] as Current ON $primaries[current] = $productionId
+        LEFT JOIN ".$property['table']." as Production ON ".implode(' AND ', $join)."
+        ".sprintf($propertyJoin, 'Production')."
+      WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['properties'][$propertyName]).")";
+
+    display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(properties)');
+    $obm_qm->query($query);
+    $obm_qm->next_record();
+    $return += $obm_qm->affected_rows();
+  }
+exit();
+  
 
   return $return;
 }

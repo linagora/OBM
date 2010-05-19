@@ -69,6 +69,26 @@ $entities = array(
                        'local' => 1, 'timelastaccess' => 1, 'nb_login_failed' => 1, 'delegation_target' => 1, 
                        'calendar_version' => 1, 'vacation_datebegin' => 1,
                        'vacation_dateend' => 1),
+    'properties' => array (
+      'categories' => array (
+        'table' => 'CategoryLink',
+        'join'  => array (
+          'table'  => 'UserEntity',
+          'id'     => 'userentity_entity_id',
+          'joinId' => 'categorylink_entity_id'
+        ),
+        'id' => 'userentity_user_id'
+      ),
+      'fields' => array (
+        'table' => 'field',
+        'join'  => array (
+          'table'  => 'UserEntity',
+          'id'     => 'userentity_entity_id',
+          'joinId' => 'entity_id'
+        ),
+        'id' => 'userentity_user_id'
+      ),
+    ),
     'rules'   => array("status" => "VALID"),
     'display' => array('firstname', 'lastname', 'email'),
     'display_format' => '%s %s <%s>'
