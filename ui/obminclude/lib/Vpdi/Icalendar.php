@@ -90,7 +90,7 @@ class Vpdi_Icalendar extends Vpdi_Entity {
     return $periods;
   }
   
-  public function getBusyPeriodsWithinInterval(DateTime $start, DateTime $end) {
+  public function getBusyPeriodsWithinInterval(Of_Date $start, Of_Date $end) {
     $periods = array();
     foreach ($this->getBusyPeriods() as $k => $p) {
       if ($rrule = $p->getRrule()) {

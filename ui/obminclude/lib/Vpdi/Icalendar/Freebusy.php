@@ -55,9 +55,9 @@ class Vpdi_Icalendar_Freebusy {
     return $fbs;
   }
   
-  public function __construct(DateTime $start, DateTime $end) {
-    $this->start = new Of_Date($start, 'GMT');
-    $this->end = new Of_Date($end, 'GMT');
+  public function __construct(Of_Date $start, Of_Date $end) {
+    $this->start = clone $start;
+    $this->end = clone $end;
     $this->duration = $this->end->diffTimestamp($this->start);
     $this->type = self::BUSY;
   }
