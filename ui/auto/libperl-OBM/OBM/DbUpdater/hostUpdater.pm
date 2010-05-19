@@ -114,6 +114,24 @@ sub update {
             return 1;
         }
 
+        $query = 'INSERT INTO P_field
+                    (   id,
+                        entity_id,
+                        field,
+                        value
+                    ) SELECT    id,
+                                entity_id,
+                                field,
+                                value
+                      FROM field
+                      WHERE entity_id=(SELECT hostentity_entity_id
+                                                    FROM HostEntity
+                                                    WHERE hostentity_host_id = '.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
+            return 1;
+        }
+
         $query = 'INSERT INTO P_ServiceProperty
                     (   serviceproperty_id,
                         serviceproperty_service,

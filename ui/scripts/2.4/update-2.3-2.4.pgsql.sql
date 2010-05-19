@@ -309,6 +309,15 @@ CREATE TABLE field (
   value         text
 );
 
+
+--
+-- Table structure for table `P_field`
+--
+
+DROP TABLE IF EXISTS P_field;
+CREATE TABLE P_field (LIKE field);
+
+
 --
 -- Name: field_field_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --

@@ -87,6 +87,10 @@ sub next {
                 $self->_log( 'problème au chargement des informations de catégories de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
                 next;
             }
+            if( !$self->_loadCurrentEntityFields() ) {
+                $self->_log( 'problème au chargement des informations des champs spécifiques de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
+                next;
+            }
             if( !$self->_loadCurrentEntityServiceProperty() ) {
                 $self->_log( 'problème au chargement des informations de catégories de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
                 next;
@@ -247,7 +251,7 @@ sub _loadCurrentEntityCategories {
         $tablePrefix = 'P_';
     }
 
-    my $query = 'SELECT Category.category_label,
+    my $query = 'SELECT Category.category_code,
                         Category.category_category
                  FROM '.$tablePrefix.'CategoryLink
                  INNER JOIN Category
@@ -272,6 +276,49 @@ sub _loadCurrentEntityCategories {
     }
 
     return $self->{'currentEntity'}->setExtraDescription(\%entityCategories);
+}
+
+
+sub _loadCurrentEntityFields {
+    my $self = shift;
+
+    $self->_log( 'chargement des informations des champs spécifiques de l\'entité '.$self->{'currentEntity'}->getDescription(), 3 );
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connexion à la base de données impossible', 1 );
+        return 0;
+    }
+
+    my $tablePrefix = '';
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
+        $tablePrefix = 'P_';
+    }
+
+    my $query = 'SELECT field.field,
+                        field.value
+                 FROM '.$tablePrefix.'field
+                 INNER JOIN '.$tablePrefix.'UserEntity
+                    ON '.$tablePrefix.'UserEntity.userentity_entity_id = '.$tablePrefix.'field.entity_id
+                 WHERE '.$tablePrefix.'UserEntity.userentity_user_id = '.$self->{'currentEntity'}->getId();
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return 0;
+    }
+
+    my %entityFields;
+    while( my($fieldName, $fieldValue) = $queryResult->fetchrow_array() ) {
+        $entityFields{$fieldName}->{$fieldValue} = 1;
+    }
+
+    while( my($key, $value) = each(%entityFields) ) {
+        my @keys = keys(%{$value});
+        $entityFields{$key} = \@keys;
+    }
+
+    return $self->{'currentEntity'}->setExtraDescription(\%entityFields);
 }
 
 

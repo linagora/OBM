@@ -3750,6 +3750,13 @@ CREATE TABLE `field` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- Table structure for table `P_field`
+--
+
+DROP TABLE IF EXISTS `P_field`;
+CREATE TABLE `P_field` (LIKE `field`);
+
+--
 -- ----------------------------------------------------------------------------
 -- Obm product ID
 INSERT INTO ObmInfo SELECT 'product_id', LPAD(MD5(FLOOR(RAND()*NOW())), 24, 0);

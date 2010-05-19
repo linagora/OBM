@@ -233,6 +233,24 @@ sub update {
             $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
             return 1;
         }
+
+        $query = 'INSERT INTO P_field
+                    (   id,
+                        entity_id,
+                        field,
+                        value
+                    ) SELECT    id,
+                                entity_id,
+                                field,
+                                value
+                      FROM field
+                      WHERE entity_id=(SELECT userentity_entity_id
+                                                    FROM UserEntity
+                                                    WHERE userentity_user_id = '.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 1 );
+            return 1;
+        }
     }
 
     if( !$entity->getDelete() && $entity->getUpdateLinks() ) {

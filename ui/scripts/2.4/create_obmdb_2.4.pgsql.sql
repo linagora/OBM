@@ -11653,6 +11653,11 @@ CREATE TABLE field (
 );
 
 --
+-- Table structure for table P_field
+--
+CREATE TABLE P_field (LIKE field);
+
+--
 -- Name: field_field_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 CREATE SEQUENCE field_id_seq

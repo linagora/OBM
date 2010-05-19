@@ -189,7 +189,7 @@ CREATE TABLE `_contactgroup` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `_contactgroup`
+-- Table structure for table `P__contactgroup`
 --
 
 DROP TABLE IF EXISTS `P__contactgroup`;
@@ -224,6 +224,13 @@ CREATE TABLE `field` (
   KEY `field_entity_id_fkey` (`entity_id`),
   CONSTRAINT `field_entity_id_fkey` FOREIGN KEY (`entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_field`
+--
+
+DROP TABLE IF EXISTS `P_field`;
+CREATE TABLE `P_field` (LIKE `field`);
 
 --
 -- Resource group delegation
