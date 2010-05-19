@@ -419,6 +419,8 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id']) && 
     check_calendar_data_quick_form($params)) {
+    $conflicts = check_calendar_conflict($params, null);
+    if(!$conflicts || can_force_resource_conflict($conflicts)) {
       $id = $params['calendar_id'];
       $eve_q = run_query_calendar_detail($id);
       run_query_quick_attendee_update($params,$eve_q);
@@ -434,10 +436,15 @@ if ($action == 'search') {
       echo "({".$display['json']."})";
       exit();
     } else {
-      json_error_msg($l_invalid_data . " : " . $err['msg']);
+      json_error_msg($l_overbooking_not_allowed);
       echo "({".$display['json']."})";
       exit();
     }
+  } else {
+    json_error_msg($l_invalid_data . " : " . $err['msg']);
+    echo "({".$display['json']."})";
+    exit();
+  }
 
 } elseif ($action == 'quick_insert') {
 ///////////////////////////////////////////////////////////////////////////////

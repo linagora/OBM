@@ -1111,7 +1111,12 @@ function search_user_by_name($lastname, $firstname) {
 function check_calendar_conflict($calendar, $sel_entity_id) {
 
   if ($calendar['opacity'] == 'TRANSPARENT') return false;
-
+  if(!$sel_entity_id && $calendar['calendar_id']) {
+    $entities = get_calendar_event_entity($calendar['calendar_id']) ;
+    foreach($entities as $entity => $data) {
+      $sel_entity_id[$entity] = $data['ids'];
+    }
+  }
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 

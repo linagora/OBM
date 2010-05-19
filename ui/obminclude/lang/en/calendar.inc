@@ -140,6 +140,7 @@ $l_cancel_insert = "Wait...";
 $l_calendar_select_group = "Select groups.";
 $l_force = "Force event insertion";
 $l_force_disabled = "(impossible because of a conflictual resource)";
+$l_overbooking_not_allowed = "Resource overbooking is not allowed";
 $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free time slots";
 $l_owner_notification = "Notify event owner";
