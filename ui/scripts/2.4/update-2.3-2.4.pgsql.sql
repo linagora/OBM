@@ -340,7 +340,7 @@ ALTER TABLE ONLY field
 --
 -- Resource group delegation
 --
-ALTER TABLE RGroup ADD COLUMN rgroup_delegation varchar(255) default '';
+ALTER TABLE RGroup ADD COLUMN rgroup_delegation varchar(256) default '';
 -- 
 -- deleted_event_ext_id
 --
