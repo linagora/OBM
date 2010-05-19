@@ -1154,7 +1154,7 @@ Obm.CalendarManager = new Class({
 
     } else {
       showErrorMessage(response.message);
-      // TODO: redraw event
+      obm.calendarManager.cancel(obm.calendarManager.oldEvent.elementId);
     }
     obm.calendarManager.lock = false;
   },
