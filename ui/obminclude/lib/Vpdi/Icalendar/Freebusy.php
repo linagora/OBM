@@ -58,7 +58,7 @@ class Vpdi_Icalendar_Freebusy {
   public function __construct(DateTime $start, DateTime $end) {
     $this->start = new Of_Date($start, 'GMT');
     $this->end = new Of_Date($end, 'GMT');
-    $this->duration = $this->end->format('U') - $this->start->format('U');
+    $this->duration = $this->end->diffTimestamp($this->start);
     $this->type = self::BUSY;
   }
   
@@ -136,6 +136,6 @@ class Vpdi_Icalendar_Freebusy {
   }
 
   public function getRrule() {
-    // return $this->evt->getRrule();
+    return false;
   }
 }
