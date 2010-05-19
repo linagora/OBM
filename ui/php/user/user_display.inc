@@ -2261,7 +2261,11 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     ";
     if (is_array($GLOBALS['cgp_user']['user']['field'])) {
       foreach ($GLOBALS['cgp_user']['user']['field'] as $fieldname => $properties) {
-        $extrafields_userpattern_js .= "theUserForm.addField('$fieldname','tf_custom_$fieldname');\n";
+        if ($properties['type']=='text' || $properties['type']=='textarea') {
+          $extrafields_userpattern_js .= "theUserForm.addField('$fieldname','tf_custom_$fieldname');\n";
+        } elseif ($properties['type']=='boolean') {
+          $extrafields_userpattern_js .= "theUserForm.addField('$fieldname','tf_custom_$fieldname','BooleanField');\n";
+        }
       }
     }
     if (is_array($GLOBALS['cgp_user']['user']['category'])) {

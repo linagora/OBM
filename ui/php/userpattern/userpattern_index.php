@@ -183,7 +183,7 @@ function get_userpattern_params() {
 
   if (is_array($GLOBALS['cgp_user']['user']['field'])) {
     foreach ($GLOBALS['cgp_user']['user']['field'] as $fieldname => $properties) {
-      if (isset($params["custom_$fieldname"])) $params['attributes'][$fieldname] = $params["custom_$fieldname"];
+      if (isset($params[$fieldname])) $params['attributes'][$fieldname] = $params[$fieldname];
     }
   }
   if (is_array($GLOBALS['cgp_user']['user']['category'])) {
