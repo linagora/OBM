@@ -137,9 +137,10 @@ Obm.UserPattern.Field = new Class ({
   initialize: function(form,field) {
     this.form = form;
     this.field = field;
-    this.field.addEvent('keyup', this.form.autoReload.bindWithEvent(this.form))
-              .addEvent('input', this.form.autoReload.bindWithEvent(this.form))
-              .addEvent('paste', this.form.autoReload.bindWithEvent(this.from));
+    this.field.addEvent('keyup', this.reloadPattern.bindWithEvent(this))
+              .addEvent('input', this.reloadPattern.bindWithEvent(this))
+              .addEvent('paste', this.reloadPattern.bindWithEvent(this));
+    this.lastReloadValue = this.getValue();
   },
 
   resetValue: function() {
@@ -148,7 +149,7 @@ Obm.UserPattern.Field = new Class ({
   setValue: function(value) {
   },
 
-  getValue: function(value) {
+  getValue: function() {
     return this.field.value;
   },
 
@@ -158,6 +159,13 @@ Obm.UserPattern.Field = new Class ({
 
   empty: function() {
     return ((this.field.value==undefined) || (this.field.value==''));
+  },
+
+  reloadPattern: function() {
+    if (this.lastReloadValue != this.getValue()) {
+      this.lastReloadValue = this.getValue();
+      this.form.autoReload();
+    }
   }
 
 });
@@ -206,7 +214,7 @@ Obm.UserPattern.BooleanField = new Class ({
     }
   },
 
-  getValue: function(value) {
+  getValue: function() {
     if (this.field.checked) {
       return this.field.value;
     } else {
