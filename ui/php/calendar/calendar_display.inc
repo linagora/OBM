@@ -443,7 +443,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"user\" autocomplete=\"off\" />
       <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
       <input type=\"hidden\" name=\"new_group\" value=\"1\" />
-      <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
     </fieldset>";
 
     $user_complete = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {filter_entity:'calendar', filter_pattern:'read'});";
@@ -507,6 +506,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   </div>
   <fieldset class=\"buttons\">
   <input type=\"submit\" value=\"$l_validate\" />
+  <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
   </fieldset>
   </form>";
 
