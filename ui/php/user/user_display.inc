@@ -1730,9 +1730,9 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
   // login (can't be updated, so only on insert)
   if (($action == 'new') || ($action == 'insert')) {
-    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' value=\"$login\" />";
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' autocomplete=\"off\" value=\"$login\" />";
   } else {
-    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' value=\"$login\" />
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' autocomplete=\"off\" value=\"$login\" />
                   <input type=\"hidden\" name=\"tf_old_login\" value=\"$old_login\" />";
   }
 
@@ -2339,7 +2339,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </tr>
   <tr>
     <th class=\"$class[password]\">$l_password</th>
-    <td><input id=\"passwd\" type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" />
+    <td><input id=\"passwd\" type=\"password\" name=\"tf_passwd\" autocomplete=\"off\" size=\"24\" maxlength=\"32\" value=\"$passwd\" />
         <button type=\"button\" onclick=\"modif_password()\">$l_generate_passwd</button>
     </td>
   </tr>
