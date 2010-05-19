@@ -3969,4 +3969,13 @@ function generateUniqueKey($universal=true) {
   return uniqid();
 }
 
-?>
+function get_domain_property($domain, $property) {
+  $query = "SELECT domainpropertyvalue_value FROM DomainPropertyValue 
+    WHERE domainpropertyvalue_property_key = '$property' AND domainpropertyvalue_domain_id = '$domain'";
+  $obm_q = new DB_OBM;  
+  display_debug_msg($query, $cdg_sql, 'get_domain_property()');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q->f('domainpropertyvalue_value');
+
+}
