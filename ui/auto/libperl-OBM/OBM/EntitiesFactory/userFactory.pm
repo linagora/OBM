@@ -215,7 +215,7 @@ sub _loadEntities {
                             FROM UGroup
                             INNER JOIN of_usergroup ON of_usergroup_group_id = group_id WHERE group_gid = 512) AS grp
                                 ON grp.of_usergroup_user_id = '.$userTablePrefix.'UserObm.userobm_id
-                 INNER JOIN '.$hostTablePrefix.'Host ON '.$hostTablePrefix.'Host.host_id = '.$userTablePrefix.'UserObm.userobm_mail_server_id
+                 LEFT JOIN '.$hostTablePrefix.'Host ON '.$hostTablePrefix.'Host.host_id = '.$userTablePrefix.'UserObm.userobm_mail_server_id
                  WHERE '.$userTablePrefix.'UserObm.userobm_domain_id='.$self->{'domainId'}.'
                  AND '.$userTablePrefix.'UserObm.userobm_status=\'VALID\'';
 
