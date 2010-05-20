@@ -106,7 +106,8 @@ sub _loadEntities {
                  FROM '.$tablePrefix.'Host
                  INNER JOIN '.$tablePrefix.'DomainEntity ON domainentity_domain_id='.$self->{'domainId'}.'
                  INNER JOIN '.$tablePrefix.'ServiceProperty ON serviceproperty_entity_id=domainentity_entity_id
-                 WHERE host_id=serviceproperty_value
+                 WHERE
+                 host_id='.$dbHandler->castAsInteger('serviceproperty_value').'
                     AND serviceproperty_service=\'backup\'';
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'entitiesDescList'} )) ) {
