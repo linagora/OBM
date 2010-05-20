@@ -386,7 +386,7 @@ sub _deleteEntity {
 sub _getObjectclassDesc {
     my $self = shift;
     my( $ldapEntry ) = @_;
-    my $objectclassDesc = $self->{'objectclassDesc'};
+    $self->{'objectclassDesc'} = undef;
 
     # Get LDAP server conn for this entity
     my $ldapServerConn;
@@ -400,7 +400,7 @@ sub _getObjectclassDesc {
 
 
     for( my $i=0; $i<=$#$objectObjectclass; $i++ ) {
-        if( !exists($objectclassDesc->{$objectObjectclass->[$i]}) ) {
+        if( !exists($self->{'objectclassDesc'}->{$objectObjectclass->[$i]}) ) {
             # On construit une table de hachage :
             #   - clé : nom du schéma LDAP ;
             #   - valeur : référence à un tableau contenant une référence à un
@@ -409,14 +409,13 @@ sub _getObjectclassDesc {
             #   syntax)
     
             my $ldapSchema = $ldapServerConn->schema;
-            @{$objectclassDesc->{lc($objectObjectclass->[$i])}} = $ldapSchema->must($objectObjectclass->[$i]);
-            push( @{$objectclassDesc->{lc($objectObjectclass->[$i])}}, $ldapSchema->may($objectObjectclass->[$i]) );
+            my @mustAttrs = $ldapSchema->must($objectObjectclass->[$i]);
+            push(@{$self->{'objectclassDesc'}->{$objectObjectclass->[$i]}}, @mustAttrs);
 
-            $self->{'objectclassDesc'} = $objectclassDesc;
+            my @mayAttrs = $ldapSchema->may($objectObjectclass->[$i]);
+            push(@{$self->{'objectclassDesc'}->{$objectObjectclass->[$i]}}, @mayAttrs);
         }
     }
 
     return 0;
 }
-
-

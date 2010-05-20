@@ -216,6 +216,10 @@ sub _delete {
             last SWITCH;
         }
 
+        if( ref($self->{'entity'}) eq 'OBM::Entities::obmSystemUser' ) {
+            last SWITCH;
+        }
+
         $self->_log( 'entité de type inconnu, pas de traitements effectués', 1 );
     }
 

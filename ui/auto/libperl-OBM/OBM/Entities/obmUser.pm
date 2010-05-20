@@ -534,7 +534,7 @@ sub updateLdapEntry {
             my $deleteAttrs = $self->_diffObjectclassAttrs($deletedObjectclass, $currentObjectclass, $objectclassDesc);
 
             for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
-                if( $self->_modifyAttr( undef, $entry, $deleteAttrs->[$i]  ) ) {
+                if( $self->_modifyAttr( undef, $entry, $deleteAttrs->[$i] ) ) {
                     $update = 1;
                 }
             }
