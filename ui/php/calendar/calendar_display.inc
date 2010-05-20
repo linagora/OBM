@@ -318,7 +318,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity) {
         $class = "class='colorChooser'";
         if ($type == 'contact') {
           $contact = OBM_Contact::get($id);
-          if (!$contact->hasCalUri()) {
+          if (!$contact->getCalendar()) {
             $warn = "<span class='NW' style='float:right'><img src='$GLOBALS[ico_warning]' title=\"$GLOBALS[l_calendar_not_available]\" /></span>";
             $class = "";
           }

@@ -1662,14 +1662,4 @@ class OBM_Contact implements OBM_ISearchable {
     return false;
   }  
 
-  public function hasCalUri() {
-    if (is_array($this->website)) {
-      foreach($this->website as $website) {
-        if ($website['label'][0] == 'CALURI') {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
 }
