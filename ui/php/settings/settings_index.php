@@ -441,9 +441,9 @@ $display['detail'] .= " /></td>
     <th>$l_set_cal_last_hour</th>
     <td>$dis_hour_e</td>
   </tr>
-  <tr id='settings_calendarLastHour'>
-    <th>$GLOBALS[l_set_public_fb]</th>
-    <td><input type='checkbox' name='public_fb' value='yes' ".(($_SESSION['set_public_fb'] == 'yes')?"checked='checked'":"")." /></td>
+  <tr id='settings_calendarPublicFb'>
+    <th><label for='public_fb'>$GLOBALS[l_set_public_fb]</label></th>
+    <td><input type='checkbox' name='public_fb' id='public_fb' value='yes' ".(($_SESSION['set_public_fb'] == 'yes')?"checked='checked'":"")." /></td>
   </tr>  
 ";
 }
