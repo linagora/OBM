@@ -95,8 +95,8 @@ sub _loadEntities {
         return 1;
     }
 
-    my $query = 'SELECT \'lang\' as \'setting\',
-                        userobmpref_value as \'value\'
+    my $query = 'SELECT \'lang\' as setting,
+                        userobmpref_value as value
                  FROM UserObmPref
                  WHERE userobmpref_user_id is null
                     AND userobmpref_option=\'set_lang\'';
