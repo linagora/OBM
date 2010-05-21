@@ -82,7 +82,7 @@ class ContactExpiration extends CronJob {
     
     $obm_q = new DB_OBM;
     
-    $query = "SELECT contact_company_id, contact_birthday_id, contact_usercreate FROM Contact
+    $query = "SELECT contact_company_id, contact_birthday_id, contact_usercreate, contact_addressbook_id FROM Contact
       WHERE contact_id $sql_id";
     $this->logger->core($query);
     $obm_q->query($query);
