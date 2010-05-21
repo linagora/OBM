@@ -582,42 +582,29 @@ function run_query_domain_delete($p_id) {
 
   $obm_q = new DB_OBM;
   $p_id = sql_parse_id($p_id, true);
-  $i = 0;
+
   foreach($array_entity as $entity => $val){
     $low_entity = strtolower($entity);
-    $query = "DELETE FROM Entity
-      LEFT JOIN {$entity}Entity AS ee ON entity_id = ee.{$low_entity}entity_entity_id
-      LEFT JOIN $val AS e ON ee.{$low_entity}entity_{$low_entity}_id = e.{$low_entity}_id
-      WHERE e.{$low_entity}_domain_id $p_id;
-      ";
-    display_debug_msg($query, $cdg_sql, "run_query_domain_delete_$i()");
-    $retour = $obm_q->query($query);
-    $i++;
+    $query = "DELETE FROM Entity 
+      WHERE entity_id IN (SELECT {$low_entity}entity_entity_id FROM {$entity}Entity LEFT JOIN $val ON {$low_entity}entity_{$low_entity}_id ={$low_entity}_id WHERE {$low_entity}_domain_id $p_id)";
+    display_debug_msg($query, $cdg_sql, "run_query_domain_delete($entity)");
+    $obm_q->query($query);
   }
 
   foreach($array_user_entity as $entity => $val){
     $low_entity = strtolower($entity);
     $query = "DELETE FROM Entity
-      LEFT JOIN {$entity}Entity AS ee ON entity_id = ee.{$low_entity}entity_entity_id
-      LEFT JOIN $val AS e ON ee.{$low_entity}entity_{$low_entity}_id = e.userobm_id
-      WHERE e.userobm_domain_id $p_id;
-      ";
-    display_debug_msg($query, $cdg_sql, "run_query_domain_delete_$i()");
-    $retour = $obm_q->query($query);
-    $i++;
+      WHERE entity_id IN (SELECT {$low_entity}entity_entity_id FROM {$entity}Entity LEFT JOIN $val ON {$low_entity}entity_{$low_entity}_id=userobm_id WHERE userobm_domain_id $p_id)";
+    display_debug_msg($query, $cdg_sql, "run_query_domain_delete($entity)");
+    $obm_q->query($query);
   }
 
-  $query = "DELETE FROM Entity
-    LEFT JOIN AddressbookEntity AS ee ON entity_id = ee.addressbookentity_entity_id
-    LEFT JOIN AddressBook AS e ON ee.addressbookentity_addressbook_id = e.id
-    WHERE e.domain_id $p_id;
-    ";
-  display_debug_msg($query, $cdg_sql, "run_query_domain_delete_$i()");
-  $retour = $obm_q->query($query);
-  $i++;
+  $query = "DELETE FROM Entity WHERE entity_id IN (SELECT addressbookentity_entity_id FROM AddressbookEntity LEFT JOIN AddressBook as a ON addressbookentity_addressbook_id = a.id WHERE a.domain_id $p_id)";
+  display_debug_msg($query, $cdg_sql, "run_query_domain_delete(Addressbook)");
+  $obm_q->query($query);
 
   $query = "DELETE FROM Domain WHERE domain_id $p_id ";
-  display_debug_msg($query, $cdg_sql, "run_query_domain_delete_$i()");
+  display_debug_msg($query, $cdg_sql, "run_query_domain_delete(Domain)");
   $retour = $obm_q->query($query);
 
   if($retour){
