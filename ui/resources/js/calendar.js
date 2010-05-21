@@ -785,6 +785,8 @@ Obm.CalendarManager = new Class({
   showDay: function(day) {
    if (day) {
      this.current = new Obm.DateTime(day*1000);
+   } else {
+     this.current = null;
    }
    obm.vars.consts.calendarRange = 'day';
    obm.vars.consts.nbDisplayedDays =  1;
@@ -798,6 +800,8 @@ Obm.CalendarManager = new Class({
   showWeek: function(day) {
    if (day) {
      this.current = new Obm.DateTime(day*1000);
+   } else {
+     this.current = null;
    }
    obm.vars.consts.calendarRange = 'week';
    obm.vars.consts.nbDisplayedDays =  7;
@@ -811,6 +815,8 @@ Obm.CalendarManager = new Class({
   showMonth: function(t) {
    if (t) {
      this.current = new Obm.DateTime(t);
+   } else {
+     this.current = null;
    }
    obm.vars.consts.nbDisplayedDays = 30;
    obm.vars.consts.calendarRange = 'month';
@@ -910,7 +916,7 @@ Obm.CalendarManager = new Class({
       data.cal_range = 'custom';
       obm.vars.consts.nbDisplayedDays = data.ndays;
     } else {
-      data.date = this.current.format('c');
+      if (this.current) data.date = this.current.format('c');
       data.cal_range = obm.vars.consts.calendarRange;
       data.ndays = obm.vars.consts.nbDisplayedDays;
     }
