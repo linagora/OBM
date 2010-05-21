@@ -27,7 +27,7 @@ version 2.3.7 - 2010-05-21
   * #1299 [Calendar] Event details must be readable in the free-busy interface
   * #1307 [Sync] collected flag is not read/sent on the wire
   * #1308 [Contact] Admin rights shows the addressbook in your addressbook list
-  * #1309 [Contact] right management do not display the owner of the addressbook in the select
+  * #1309 [Contact] right management addressbook owner not displayed in select
   * #1310 [Calendar] ICS import does not set a default value for opacity
   * #1316 [Freebusy] repeat events handling
 
