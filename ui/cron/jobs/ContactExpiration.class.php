@@ -82,14 +82,13 @@ class ContactExpiration extends CronJob {
     
     $obm_q = new DB_OBM;
     
-    $query = "SELECT contact_company_id, contact_birthday_id, contact_usercreate, contact_privacy FROM Contact
+    $query = "SELECT contact_company_id, contact_birthday_id, contact_usercreate FROM Contact
       WHERE contact_id $sql_id";
     $this->logger->core($query);
     $obm_q->query($query);
     $obm_q->next_record();
     $comp_id = $obm_q->f('contact_company_id');
     $birthday_id = $obm_q->f('contact_birthday_id');
-    $privacy = $obm_q->f('contact_privacy');
     $uid = $obm_q->f('contact_usercreate');
     $ad = $obm_q->f('contact_addressbook_id');
     
@@ -120,7 +119,7 @@ class ContactExpiration extends CronJob {
     
     // If connectors in use
     
-    if ($c_use_connectors && $privacy == 1) {
+    if ($c_use_connectors) {
       $query = "INSERT INTO
         DeletedContact (deletedcontact_contact_id, deletedcontact_addressbook_id, deletedcontact_timestamp, deletedcontact_origin)
         VALUES ($c_id, $ad, NOW(), '$GLOBALS[c_origin_cron]')";
