@@ -219,6 +219,15 @@ sub _delete {
             return 1;
         }
 
+        $query = 'DELETE FROM P_field
+                    WHERE entity_id=(SELECT mailshareentity_entity_id
+                                                    FROM MailshareEntity
+                                                    WHERE mailshareentity_mailshare_id = '.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );
+            return 1;
+        }
+
         $query = 'DELETE FROM P_MailshareEntity WHERE mailshareentity_mailshare_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 1 );
