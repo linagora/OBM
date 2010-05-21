@@ -340,14 +340,14 @@ Obm.Drag = new Class ({
 
     // Set correct width to initialize limit
     if (this.options.initialWidth) {
-      this.element.style.width = this.options.initialWidth;
+      this.element.style.width = this.options.initialWidth.toFloat();
     }
 
     this.parent(event);
 
     // Reset element width
     if (this.options.initialWidth) {
-      this.element.style.width = width;
+      this.element.style.width = width.toFloat();
     }
 
     this.pixelUnitSize = new Object();
