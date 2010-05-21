@@ -21,7 +21,6 @@ require_once dirname(__FILE__).'/TestsHelper.php';
 require_once dirname(__FILE__).'/../../obminclude/lang/fr/report.inc';
 
 require_once 'AclTest.php';
-require_once 'VpdiTest.php';
 require_once 'EventTest.php';
 require_once 'EventMailObserverTest.php';
 require_once 'SearchTest.php';
@@ -38,7 +37,6 @@ class AllTests {
     //$suite->addTestSuite('ReportSenderTest');
     //$suite->addTestSuite('UserPatternTest');
     $suite->addTestSuite('AclTest');
-    $suite->addTestSuite('VpdiTest');
     $suite->addTestSuite('EventTest');
     $suite->addTestSuite('EventMailObserverTest');
     $suite->addTestSuite('SearchTest');
