@@ -585,7 +585,7 @@ function run_query_domain_delete($p_id) {
   $i = 0;
   foreach($array_entity as $entity => $val){
     $low_entity = strtolower($entity);
-    $query = "DELETE Entity FROM Entity
+    $query = "DELETE FROM Entity
       LEFT JOIN {$entity}Entity AS ee ON entity_id = ee.{$low_entity}entity_entity_id
       LEFT JOIN $val AS e ON ee.{$low_entity}entity_{$low_entity}_id = e.{$low_entity}_id
       WHERE e.{$low_entity}_domain_id $p_id;
@@ -597,7 +597,7 @@ function run_query_domain_delete($p_id) {
 
   foreach($array_user_entity as $entity => $val){
     $low_entity = strtolower($entity);
-    $query = "DELETE Entity FROM Entity
+    $query = "DELETE FROM Entity
       LEFT JOIN {$entity}Entity AS ee ON entity_id = ee.{$low_entity}entity_entity_id
       LEFT JOIN $val AS e ON ee.{$low_entity}entity_{$low_entity}_id = e.userobm_id
       WHERE e.userobm_domain_id $p_id;
@@ -607,7 +607,7 @@ function run_query_domain_delete($p_id) {
     $i++;
   }
 
-  $query = "DELETE Entity FROM Entity
+  $query = "DELETE FROM Entity
     LEFT JOIN AddressbookEntity AS ee ON entity_id = ee.addressbookentity_entity_id
     LEFT JOIN AddressBook AS e ON ee.addressbookentity_addressbook_id = e.id
     WHERE e.domain_id $p_id;
