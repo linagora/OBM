@@ -222,12 +222,16 @@ Obm.Tip = new Class({
     return this;
   },
 
-  add: function(element) {
-    try {
-      element_title = eval(element.get('title')); 
-      content = element_title.content;
-    } catch (ee) {
-      content = element.get('title');
+  add: function(element, content) {
+    if (content) {
+      element.set('title', content);
+    } else {
+      try {
+        element_title = eval(element.get('title')); 
+        content = element_title.content;
+      } catch (ee) {
+        content = element.get('title');
+      }
     }
     var title = element.retrieve('tip:title', content);
     var text = element.retrieve('tip:text', element.get('rel') || element.get('href'));
