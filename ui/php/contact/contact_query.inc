@@ -650,7 +650,7 @@ function run_query_contact_update($contact) {
   if ($retour) {
     $ret = of_userdata_query_update('contact', $id, $contact);
     $entityid = of_entity_get('contact', $id);
-    run_query_contact_coords_update($entityid, $contact);
+    run_query_contact_coords_update($entityid, $contact, $id);
 
     // Hook : Post
     if (function_exists('hook_post_run_query_contact_update')) {
@@ -677,7 +677,7 @@ function run_query_contact_update($contact) {
  * @access public
  * @return void
  */
-function run_query_contact_coords_update($id, $contact) {
+function run_query_contact_coords_update($id, $contact,$contactId) {
   global $cdg_sql;
 
   $phones = $contact['phones'];
@@ -777,7 +777,7 @@ function run_query_contact_coords_update($id, $contact) {
   $query = "DELETE FROM Email WHERE email_entity_id = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
   $obm_q->query($query);
-
+  if($obm_q->affected_rows() > 0) $updateGroup = true;
   if(is_array($emails)) {
     $cpt = array();
     foreach($emails as $email) {
@@ -790,6 +790,12 @@ function run_query_contact_coords_update($id, $contact) {
       }
     }
   }
+  if($updateGroup && $contactId != NULL) {
+    $obm_q->query("UPDATE UGroup SET group_timeupdate = NOW() WHERE group_id IN (SELECT group_id FROM _contactgroup WHERE contact_id = ".$contactId.")");
+    var_dump($obm_q->affected_rows());
+    if($obm_q->affected_rows() > 0) set_update_state();
+  }     
+  
 }
 
 
