@@ -954,57 +954,6 @@ exit();
  * @access public
  * @return void
  */
-function run_query_tools_set_group_scope(&$userdata) {
-  global $obm, $cdg_sql;
-
-  $obm_qm = new DB_OBM;
-  $db_type = $obm_qm->type;
-  $like = sql_casei_like($db_type); 
-
-  $query = "SELECT UGroup.group_id FROM UGroup LEFT JOIN P_UGroup ON P_UGroup.group_id = UGroup.group_id 
-    WHERE P_UGroup.group_contacts != UGroup.group_contacts 
-    OR (P_UGroup.group_contacts IS NULL AND UGroup.group_contacts IS NOT NULL) 
-    OR  (UGroup.group_contacts IS NULL AND P_UGroup.group_contacts IS NOT NULL)";
-  display_debug_msg($query, $cdg_sql, 'run_query_tools_set_group_scope()');
-  $obm_qm->query($query);
-  while($obm_qm->next_record()) {
-    $group_id = $obm_qm->f('group_id');
-    $parents = get_all_parent_group_of_group($group_id);
-    if(count($parents) > 0) {
-      $query = "
-        INSERT INTO Updated (
-          updated_domain_id,
-          updated_user_id,
-          updated_delegation,
-          updated_table,
-          updated_entity_id,
-          updated_type
-      ) SELECT 
-        $userdata[domain],
-        $userdata[uid],
-        '$userdata[delegation]',
-        'UGroup',
-        group_id,
-        'U'
-        FROM UGroup LEFT JOIN Updated ON group_id = updated_entity_id AND updated_table = 'UGroup'
-        WHERE group_id IN (".implode(',',$parents).") AND updated_entity_id IS NULL ";
-      display_debug_msg($query, $cdg_sql, 'run_query_tools_set_group_scope()');
-      $obm_qm->query($query);
-      
-    }
-
-  }
-}
-
-/**
- *
- * FIXME : Bypass automate limitation on performing dependance update
- * 
- * @param mixed $userdata 
- * @param mixed $rules 
- * @access public
- * @return void
- */
 function run_query_tools_set_user_scope(&$userdata) {
   global $obm, $cdg_sql;
 
@@ -1091,7 +1040,6 @@ function store_update_data($params) {
   //FIXME : This is a hack to bypass an automate limitation
   $userdata = array('uid' =>  $obm['uid'], 'delegation' => $obm['delegation_target'], 'domain' => $domain_id );
   run_query_tools_set_user_scope($userdata);
-  run_query_tools_set_group_scope($userdata);
 
   return $has_update;
 }
