@@ -397,18 +397,20 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=fals
   }
 
   if(is_array($metadata['properties']))
-  foreach($metadata['properties'] as $propertyName => $property) {
-    $rules['properties'][$propertyName] = $rules['update'];
-    if (is_array($property['rules'])) {
-      foreach($property['rules'] as $field => $value) {
-        if (is_array($value)) {
-          $rules['properties'][$propertyName] [] ="Link.$field IN ('".implode("','", $value)."')";
-        } else {
-          $rules['properties'][$propertyName] [] ="Link.$field = '$value'";
-        }
-      }   
-    }
-  }  
+    foreach($metadata['properties'] as $propertyName => $property) {
+      $rules['properties'][$propertyName] = $rules['update'];
+      if (is_array($property['rules'])) {
+        foreach($property['rules'] as $field => $value) {
+          if (is_array($value)) {
+            $rules['properties'][$propertyName] [] ="Link.$field IN ('".implode("','", $value)."')";
+          } else {
+            $rules['properties'][$propertyName] [] ="Link.$field = '$value'";
+          }
+        }   
+      }
+    }  
+  else 
+    $metadata['properties'] = array();
   if ($update) {
     $userdata = array('uid' =>  $obm['uid'], 'delegation' => $obm['delegation_target'], 'domain' => $domain );
     $return = run_query_tools_set_scope($metadata, $rules,$userdata);
