@@ -132,9 +132,9 @@ function html_userpattern_consult($pattern) {
   $dis_hidden = $attributes['hidden'] ? $GLOBALS['l_yes'] : $GLOBALS['l_no'];
   $profile = $attributes['profile'];
   $dis_profile = isset($GLOBALS["l_perm_$profile"]) ? $GLOBALS["l_perm_$profile"] : $profile;
-  $dis_datebegin = (empty($datebegin) || $datebegin[0]=='%') ? $datebegin : of_date_format($datebegin, true);
+  $dis_datebegin = (empty($datebegin) || $datebegin[0]=='%') ? $datebegin : of_date_upd_format($datebegin, true);
   if (!$attributes['noexperie']) {
-    $dis_dateexp = (empty($dateexp) || $dateexp[0]=='%') ? $dateexp : of_date_format($dateexp, true);
+    $dis_dateexp = (empty($dateexp) || $dateexp[0]=='%') ? $dateexp : of_date_upd_format($dateexp, true);
     $dis_dateexp_row = "<tr>
       <th>{$GLOBALS['l_dateexp']}</th>
       <td>$dis_dateexp</td>

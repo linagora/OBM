@@ -371,7 +371,7 @@ class UserPattern {
     if (preg_match('/^%today([-+]\d*){0,1}%$/',$value)) {
       return true;
     }
-    if ($value = of_isodate_convert($datebegin,true,true)) {
+    if ($value = of_isodate_convert($value,true,true)) {
       return true;
     }
     $value = null;
