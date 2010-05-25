@@ -409,8 +409,7 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=fals
         }   
       }
     }  
-  else 
-    $metadata['properties'] = array();
+  else $metadata['properties'] = array();
   if ($update) {
     $userdata = array('uid' =>  $obm['uid'], 'delegation' => $obm['delegation_target'], 'domain' => $domain );
     $return = run_query_tools_set_scope($metadata, $rules,$userdata);
@@ -940,8 +939,6 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
     $obm_qm->next_record();
     $return += $obm_qm->affected_rows();
   }
-exit();
-  
 
   return $return;
 }
