@@ -1870,9 +1870,11 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
       } else {
         run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'NEEDS-ACTION');
       }
+      run_query_calendar_insert_entity_event_alert($user_id, $event_id);
     }
   } else {
     run_query_calendar_insert_entity_event('user', $calendar['entity_id'], $event_id, $state);
+    run_query_calendar_insert_entity_event_alert($calendar['entity_id'], $event_id);
   }
 
   // Contact
