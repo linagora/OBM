@@ -5204,8 +5204,8 @@ function dis_calendar_free_interval($current_view, $calendar) {
               $tip = $GLOBALS['l_occupied'];
             }
             $td_id = "user_".$id."_".$d->getTimestamp();
-            $u[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
-            $js_tips .= "obm.tip.add($('$td_id'));";
+            $u[$id] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
+            $js_tips .= "obm.tip.add($('$td_id'), \"$tip\");";
           } else {
             $u[$id] .= "<td class='timeSlot'></td>";
           }
@@ -5236,8 +5236,8 @@ function dis_calendar_free_interval($current_view, $calendar) {
               $tip = $GLOBALS['l_occupied'];
             }
             $td_id = "res_".$id."_".$d->getTimestamp();
-            $r[$id] .= "<td class='timeSlot' id='$td_id' title=\"$tip\"><div class='haveEvent'></div></td>";
-            $js_tips .= "obm.tip.add($('$td_id'));";
+            $r[$id] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
+            $js_tips .= "obm.tip.add($('$td_id'), \"$tip\");";
           } else {
             $r[$id] .= "<td class='timeSlot'></td>";
           }
