@@ -22,6 +22,7 @@ include_once('CronJob.class.php');
 
 global $obminclude; 
 require_once("$obminclude/of/of_category.inc");
+require_once("$obminclude/of/of_indexingService.inc");
 
 class ContactExpiration extends CronJob {
   /**
@@ -129,6 +130,9 @@ class ContactExpiration extends CronJob {
     
     // After contact deletion to get correct number
     run_query_global_company_contact_number_update($comp_id);
+
+    // Delete index
+    OBM_IndexingService::delete('contact', $c_id);  
   }
 }
 ?>
