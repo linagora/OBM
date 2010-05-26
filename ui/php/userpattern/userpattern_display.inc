@@ -293,7 +293,7 @@ function html_userpattern_consult($pattern) {
     <td>{$attributes['phone']}</td>
   </tr>
   <tr>
-    <th>{$GLOBALS['l_phone2']}</th>
+    <th>{$GLOBALS['l_phone']} 2</th>
     <td>{$attributes['phone2']}</td>
   </tr>
   <tr>
@@ -305,7 +305,7 @@ function html_userpattern_consult($pattern) {
     <td>{$attributes['fax']}</td>
   </tr>
   <tr>
-    <th>{$GLOBALS['l_fax2']}</th>
+    <th>{$GLOBALS['l_fax']} 2</th>
     <td>{$attributes['fax2']}</td>
   </tr>
   <tr>
@@ -792,7 +792,7 @@ function html_userpattern_form($action, $params=array(), $pattern=null) {
     <td><input name=\"attributes[phone]\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
   </tr>
   <tr>
-    <th class=\"$class[phone2]\">{$GLOBALS['l_phone2']}</th>
+    <th class=\"$class[phone2]\">{$GLOBALS['l_phone']} 2</th>
     <td><input name=\"attributes[phone2]\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
   </tr>
   <tr>
@@ -804,7 +804,7 @@ function html_userpattern_form($action, $params=array(), $pattern=null) {
     <td><input name=\"attributes[fax]\" size=\"20\" maxlength=\"20\" value=\"$fax\" /></td>
   </tr>
   <tr>
-    <th class=\"$class[fax2]\">{$GLOBALS['l_fax2']}</th>
+    <th class=\"$class[fax2]\">{$GLOBALS['l_fax']} 2</th>
     <td><input name=\"attributes[fax2]\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
   </tr>
   <tr>
