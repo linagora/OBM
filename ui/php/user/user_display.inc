@@ -3581,14 +3581,13 @@ function dis_user_nomade_mail_field($emails, $class) {
   }
 
   $email_block = "
-  <th class=\"$class[email_nomade]\" id='nomadeMailLabel'>
+  <tr><th class=\"$class[email_nomade]\" id='nomadeMailLabel'>
   $GLOBALS[l_email_nomade]
   $add_button
   </th>
   <td id='nomadeMailHome'>
   $email_block
-  </td>
-  ";
+  </td></tr>";
 
   return $email_block;
 }
