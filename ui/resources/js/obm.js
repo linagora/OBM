@@ -287,7 +287,7 @@ Obm.Popup = new Class ({
     } else {
       var content = $(id);
     }
-    var sticky = new StickyWinModal({content: content, modalOptions :{hideOnClick:false,
+    var sticky = new StickyWinModal({content: content, modalOptions :{hideOnClick:true,
         modalStyle:{
         'background-color':'#eee',
         'opacity':.6}}});
@@ -296,16 +296,16 @@ Obm.Popup = new Class ({
 
   show: function(id) {
     if(this.popups.get(id)) {
-      this.popups.get(id).show();
+      sticky = this.popups.get(id);
     } else {
       $(id).setStyle('display','block');
-      var sticky = new StickyWinModal({content: $(id), modalOptions :{hideOnClick:false,
+      var sticky = new StickyWinModal({content: $(id), modalOptions :{hideOnClick:true,
         modalStyle:{
         'background-color':'#eee',
         'opacity':.6}}});
       this.popups.set(id, sticky);
-      sticky.show();
     }
+    sticky.show();
   },
 
   hide: function(id) {
