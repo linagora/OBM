@@ -408,6 +408,7 @@ if ($action == 'ext_get_ids') {
         check_users_error_data($params, $users_id_error);
         $display['msg'] .= display_warn_msg($err['msg'], false);
       }
+      $display['search'] = html_user_search_form($params);
     } else {
       $display['msg'] .= display_err_msg("$l_header_batch : $l_update_error");
       $display['detail'] = html_user_batch_form($params);
