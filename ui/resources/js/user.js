@@ -284,7 +284,7 @@ Obm.UserPattern.Form = new Class ({
     this.addField('noexperie','noexperie','BooleanField');
     this.addField('dateexp','userDateexp');
     this.addField('phone','userPhone');
-    this.addField('phone2','userPhone');
+    this.addField('phone2','userPhone2');
     this.addField('mobile','userMobile');
     this.addField('fax','userFax');
     this.addField('fax2','userFax2');
