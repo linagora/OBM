@@ -1121,7 +1121,9 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
-  $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read', $sel_entity_id['user']));
+  if (!empty($sel_entity_id['user'])) {
+    $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'read', $sel_entity_id['user']));
+  }
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   if (sizeof($cal_entities) == 0) return false; // user doesn't have read permission on attendees
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
