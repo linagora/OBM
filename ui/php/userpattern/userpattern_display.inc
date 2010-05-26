@@ -176,7 +176,10 @@ function html_userpattern_consult($pattern) {
     <tr>
       <th>$GLOBALS[l_mail_server]</th>
       <td>";
-      if ($mail_server_id) {
+      if ($mail_server_id == "auto") {
+        $mail_section .= $GLOBALS['l_mailserver_auto'];
+      } else if ($mail_server_id && is_numeric($mail_server_id)) {
+        $mail_server_host_name = get_last_host_text($mail_server_id);
         $mail_section .= "<a href=\"$GLOBALS[path]/host/host_index.php?action=detailconsult&host_id=".$mail_server_id."\">".$mail_server_host_name."</a>";
       } else {
         $mail_section .= '-';
