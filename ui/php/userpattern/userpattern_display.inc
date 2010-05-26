@@ -206,6 +206,36 @@ function html_userpattern_consult($pattern) {
     </div>";
   }
 
+  $email_nomade = $attributes['email_nomade'];
+  $nomade_perms = $attributes['nomade_perms'] == 1 ? $GLOBALS['l_yes'] : $GLOBALS['l_no'];
+  $nomade_enable = $attributes['nomade_enable'] == 1 ? $GLOBALS['l_yes'] : $GLOBALS['l_no'];
+  $nomade_local_copy = $attributes['nomade_local_copy'] == 1 ? $GLOBALS['l_yes'] : $GLOBALS['l_no'];
+  if ($cgp_use['service']['mail_nomad']) {
+    $nomad_section = "
+    <div class=\"detail infos\">
+    <h1>$GLOBALS[l_nomade]</h1>
+
+    <table>
+    <tr>
+      <th>$GLOBALS[l_email_nomade]</th>
+      <td>$email_nomade</td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_perms]</th>
+      <td>$nomade_perms</td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_enabled]</th>
+      <td>$nomade_enable</td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_local_copy]</th>
+      <td>$nomade_local_copy</td>
+    </tr>
+    </table>
+    </div>";
+  }
+
   $block = "
 <div class=\"detail extra\" style=\"overflow:hidden\">
   <h1>{$GLOBALS['l_userpattern']}</h1>
