@@ -1174,7 +1174,9 @@ function quick_check_calendar_conflict($calendar, $entities) {
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
   // Event entities
-  $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read', $entities['user']['ids']));
+  if (!empty($sel_entity_id['user'])) {
+    $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read', $entities['user']['ids']));
+  }
   $sel_entity_id['resource'] = $entities['resource']['ids'];
 
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
