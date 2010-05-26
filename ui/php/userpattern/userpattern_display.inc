@@ -157,6 +157,54 @@ function html_userpattern_consult($pattern) {
       <td>$delegation</td>
     </tr>";
   }
+  $mail_state = $attributes['mail_perms']==1 ? $GLOBALS['l_enabled'] : $GLOBALS['l_disabled'];
+  $mail_server_id = $attributes['mail_server_id'];
+  $mail_quota = $attributes['mail_quota'];
+  $email = $attributes['email'];
+
+  // Mail
+  if ($cgp_use['service']['mail']) {
+    $mail_section = "
+    <div class=\"detail infos\">
+    <h1>$GLOBALS[l_mail]</h1>
+
+    <table>
+    <tr>
+      <th>$GLOBALS[l_mail]</th>
+      <td>$mail_state</td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_mail_server]</th>
+      <td>";
+      if ($mail_server_id) {
+        $mail_section .= "<a href=\"$GLOBALS[path]/host/host_index.php?action=detailconsult&host_id=".$mail_server_id."\">".$mail_server_host_name."</a>";
+      } else {
+        $mail_section .= '-';
+      }
+      $mail_section .= "</td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_email]</th>
+      <td>$email </td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_quota]</th>
+      <td>$mail_quota</td>
+    </tr>
+    </table>
+    </div>";
+  } else {
+    $mail_section = "
+    <div class=\"detail infos\">
+    <h1>$GLOBALS[l_mail]</h1>
+    <table>
+    <tr>
+      <th>$GLOBALS[l_email]</th>
+      <td>$email</td>
+    </tr>
+    </table>
+    </div>";
+  }
 
   $block = "
 <div class=\"detail extra\" style=\"overflow:hidden\">
