@@ -792,7 +792,6 @@ function run_query_contact_coords_update($id, $contact,$contactId) {
   }
   if($updateGroup && $contactId != NULL) {
     $obm_q->query("UPDATE UGroup SET group_timeupdate = NOW() WHERE group_id IN (SELECT group_id FROM _contactgroup WHERE contact_id = ".$contactId.")");
-    var_dump($obm_q->affected_rows());
     if($obm_q->affected_rows() > 0) set_update_state();
   }     
   
