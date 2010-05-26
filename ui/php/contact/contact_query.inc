@@ -677,7 +677,7 @@ function run_query_contact_update($contact) {
  * @access public
  * @return void
  */
-function run_query_contact_coords_update($id, $contact,$contactId) {
+function run_query_contact_coords_update($id, $contact,$contactId=NULL) {
   global $cdg_sql;
 
   $phones = $contact['phones'];
