@@ -308,13 +308,6 @@ class OBM_Contact implements OBM_ISearchable {
     $domain_id = sql_parse_id($obm['domain_id']);
 
     $data['aka'] = trim($data['aka']);
-    // If aka is empty we auto fill it
-    if ($aka == '') {
-      $auto_aka = format_name($data['lastname'], 0, true, true);
-      if ($auto_aka != $data['lastname']) {
-        $data['aka'] = $auto_aka;
-      }
-    }
     $data['sound'] = phonetic_key($data['lastname']);
     $add_comment = $data['add_comment'];
     if ($add_comment != '') {

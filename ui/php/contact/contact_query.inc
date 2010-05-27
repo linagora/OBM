@@ -517,13 +517,6 @@ function run_query_contact_update($contact) {
   $mname = $contact['mname'];
   $suffix = $contact['suffix'];
   $aka = trim($contact['aka']);
-  // If aka is empty we auto fill it
-  if ($aka == '') {
-    $auto_aka = format_name($lastname, 0, true, true);
-    if ($auto_aka != $lastname) {
-      $aka = $auto_aka;
-    }
-  }
   $sound = phonetic_key($lastname);
   $service = $contact['service'];
   $func = sql_parse_id($contact['function']);
