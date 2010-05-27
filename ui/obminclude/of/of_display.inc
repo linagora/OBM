@@ -1421,7 +1421,7 @@ function display_last_visited() {
   if (function_exists('display_last_visited_theme')) {
     return display_last_visited_theme();
   }
-  global $obm, $cdg_sql, $path, $cgp_show, $last_v, $l_last_visit, $modules;
+  global $obm, $cdg_sql, $path, $cgp_show, $last_v, $l_last_visit, $modules, $perm;
 
   $uid = $obm['uid'];
 
@@ -1480,10 +1480,11 @@ function display_last_visited() {
   }
 
   // Last calendar view
-  $dis_last .= "
-    <li><a href=\"$GLOBALS[path]/calendar/calendar_index.php\" >
-    <img src=\"$GLOBALS[ico_calendar]\" alt=\"Calendar\" />$GLOBALS[l_module_calendar]</a></li>
-   ";
+  if ($perm->get_module_rights("calendar")) {
+    $dis_last .= "
+      <li><a href=\"$GLOBALS[path]/calendar/calendar_index.php\" >
+      <img src=\"$GLOBALS[ico_calendar]\" alt=\"Calendar\" />$GLOBALS[l_module_calendar]</a></li>";
+  }
 
   $block .= "
   <div class=\"portlet\" id=\"lastVisitPortlet\"> 
