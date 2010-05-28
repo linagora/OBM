@@ -386,6 +386,7 @@ class LemonLDAP_Engine {
     // settings could not be already setted.
     //
 
+    // If email is set, must have a valid mail server.
     if (array_key_exists($this->_sqlMap['userobm_email'], $data))
     {
       $params['mail_server_id'] = 'auto';
@@ -396,9 +397,10 @@ class LemonLDAP_Engine {
     else
     {
       $data[$this->_sqlMap['userobm_mail_server_id']] = null;
-                        $data[$this->_sqlMap['userobm_mail_perms']] = null;
+      $data[$this->_sqlMap['userobm_mail_perms']] = null;
     }
 
+    // Force profile to null (no need here).
     if (array_key_exists($this->_sqlMap['userobm_perms'], $data))
     {
       if (!array_key_exists('profiles', $data))
@@ -407,6 +409,12 @@ class LemonLDAP_Engine {
             $data[$this->_sqlMap['userobm_perms']] => Array(),
           );
       }
+    }
+
+    // User login should be just its username (no more @domain extension).
+    if (array_key_exists($this->_sqlMap['userobm_login'], $data))
+    {
+      $data[$this->_sqlMap['userobm_login']] = $login;
     }
 
     $obm['domain_id'] = $backup['obm_domain_id'];
@@ -466,6 +474,7 @@ class LemonLDAP_Engine {
   function addUser($login, $domain_id)
   {
     global $obm;
+    $success = false;
 
     //
     // Some internal functions used
@@ -497,9 +506,10 @@ class LemonLDAP_Engine {
     //
 
     if (!check_user_data_form('', $params))
-      return false ;
+    {
+      return false;
+    }
 
-    $succeed = false;
     if (($user_id = run_query_user_insert($params)) > 0)
     {
       $params['user_id'] = $user_id;
