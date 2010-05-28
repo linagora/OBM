@@ -337,6 +337,8 @@ class LemonLDAP_Engine {
    */
   function _setDefaultUserData ($data, $login, $domain_id)
   {
+    global $obm, $cgp_use;
+
     if (!is_array($data))
       return false;
 
@@ -387,7 +389,8 @@ class LemonLDAP_Engine {
     //
 
     // If email is set, must have a valid mail server.
-    if (array_key_exists($this->_sqlMap['userobm_email'], $data))
+    if ( $cgp_use['service']['mail']
+      && array_key_exists($this->_sqlMap['userobm_email'], $data))
     {
       $params['mail_server_id'] = 'auto';
       $params = get_user_params_mail_server_id($params);
