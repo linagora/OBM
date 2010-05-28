@@ -475,6 +475,11 @@ function run_query_deal_insert($deal) {
     deal_send_mail($deal);
   }
 
+  // Hook : Post
+  if (function_exists('hook_post_run_query_deal_insert')) {
+    hook_post_run_query_deal_insert($deal,$d_id);
+  }
+
   return $d_id;
 }
 
@@ -589,6 +594,11 @@ function run_query_deal_update($deal) {
   // If mail comment activated, send the updates by mail
   if (($mail_comment != '') && ($mail_comment != "$l_no")) {
     deal_send_mail($deal);
+  }
+
+  // Hook : Post
+  if (function_exists('hook_post_run_query_deal_update')) {
+    hook_post_run_query_deal_update($deal,$deal);
   }
 
   return $retour;

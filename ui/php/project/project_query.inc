@@ -513,6 +513,11 @@ function run_query_project_insert($params) {
     }
   }
 
+  // Hook : Post
+  if (function_exists('hook_post_run_query_project_insert')) {
+    hook_post_run_query_project_insert($params,$pid);
+  }
+
   return $pid;
 }
 
@@ -572,6 +577,11 @@ function run_query_project_update($pid, $params) {
   display_debug_msg($query, $cdg_sql, 'run_query_project_update');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+
+  // Hook : Post
+  if (function_exists('hook_post_run_query_project_update')) {
+    hook_post_run_query_project_update($params);
+  }
 
   return $obm_q;
 }
