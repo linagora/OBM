@@ -337,7 +337,7 @@ class LemonLDAP_Engine {
    */
   function _setDefaultUserData ($data, $login, $domain_id)
   {
-    global $obm, $cgp_use;
+    global $obm;
 
     if (!is_array($data))
       return false;
@@ -579,7 +579,7 @@ class LemonLDAP_Engine {
       list($login, $domain) = split('@', $login);
       $domain = addslashes($domain);
 
-      $sql_query = 'SELECT domain_id FROM Domain WHERE domain_name = \'' . $domain . '\'';
+      $sql_query = 'SELECT domain_id FROM domain WHERE domain_name = \'' . $domain . '\'';
       $this->_db->query($sql_query);
 
       while ($this->_db->next_record() && is_null($domain_id))
@@ -646,7 +646,7 @@ class LemonLDAP_Engine {
       // For mail, we have to verify that each domain exists. If not, the mail
       // is simply not used. Be careful that mails are lower case.
       case 'userobm_email':
-        $sql_query = 'SELECT domain_name FROM Domain WHERE domain_id != 1';
+        $sql_query = 'SELECT domain_name FROM domain WHERE domain_id != 1';
         $this->_db->query($sql_query);
         while ($this->_db->next_record())
         {

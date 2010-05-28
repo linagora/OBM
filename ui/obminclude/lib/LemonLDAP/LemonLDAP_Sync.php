@@ -39,9 +39,16 @@
 class LemonLDAP_Sync {
 
   /**
+   * Indicates if the synchronization engine is enabled or not.
+   * @var boolean
+   */
+  private $_isEnabled = false;
+
+  /**
    * Force user update instead of verify if there are available updates.
    * If this option is true, then updates are force whether or not
    * there are available updates.
+   * @var boolean
    */
   private $_forceUserUpdate = false;
 
@@ -49,23 +56,26 @@ class LemonLDAP_Sync {
    * Force group update in OBM.
    * It means that LDAP group is exactly the same as OBM group. If this
    * option is false, then it allows OBM to have local groups.
+   * @var boolean
    */
   private $_forceGroupUpdate = false;
 
   /**
    * The LemonLDAP engine.
+   * @var LemonLDAP_Engine
    */
   private $_engine = null;
 
   /**
    * The LemonLDAP logger.
+   * @var LemonLDAP_Logger
    */
   private $_logger = null;
 
   /**
    * Constructor.
    */
-  function __construct ($engine)
+  public function __construct ($engine)
   {
     $this->_engine = $engine;
     $this->_logger = LemonLDAP_Logger::getInstance();
@@ -73,17 +83,45 @@ class LemonLDAP_Sync {
   }
 
   /**
+   * Enable the synchronization.
+   * @param $activate Enable or not.
+   */
+  public function enable ($activate = true)
+  {
+    $this->_isEnabled = $activate;
+  }
+
+  /**
    * Initiliaze internal parameters from configuration.
    */
-  function initializeFromConfiguration()
+  public function initializeFromConfiguration ($config = null)
   {
     global $lemonldap_config;
+    if (is_null($config))
+    {
+      $config = $lemonldap_config;
+    }
+    if (array_key_exists('auto_update', $config) !== false)
+    {
+      $this->_isEnabled = $config['auto_update'];
+    }
+    if (array_key_exists('auto_update_force_user', $config) !== false)
+    {
+      $this->_forceUserUpdate = $config['auto_update_force_user'];
+    }
+    if (array_key_exists('auto_update_force_group', $config) !== false)
+    {
+      $this->_forceGroupUpdate = $config['auto_update_force_group'];
+    }
+  }
 
-    if (array_key_exists('auto_update_force_user', $lemonldap_config) !== false)
-      $this->_forceUserUpdate = $lemonldap_config['auto_update_force_user'];
-
-    if (array_key_exists('auto_update_force_group', $lemonldap_config) !== false)
-      $this->_forceGroupUpdate = $lemonldap_config['auto_update_force_group'];
+  /**
+   * Is this synchronization object enabled or not ?
+   * @return boolean
+   */
+  public function isEnabled ()
+  {
+    return $this->_isEnabled;
   }
 
   /**
@@ -94,13 +132,19 @@ class LemonLDAP_Sync {
    * @param $domain_id
    * @param $user_id
    */
-  function syncExternalData ($user_name, $domain_id, $user_id)
+  public function syncExternalData ($user_name, $domain_id, $user_id)
   {
+    global $obm, $entities;
+
     //
     // $entities is defined into the file package.inc.php, from
     // this LemonLDAP library. It is temporary.
     //
-    global $obm, $entities;
+
+    if (!$this->isEnabled())
+    {
+      return false;
+    }
 
     $params['domain_id'] = $domain_id;
     $params['update_type'] = 'incremental';
@@ -139,13 +183,23 @@ class LemonLDAP_Sync {
    * @param $domain_id The domain identifier.
    * @return int The user identifier if the user is created or updated, or false.
    */
-  function syncUserAccount ($user_name, $user_id, $domain_id)
+  public function syncUserAccount ($user_name, $user_id, $domain_id)
   {
+    if (!$this->isEnabled())
+    {
+      return false;
+    }
     if (!is_null($user_id) && $user_id !== false)
     {
-      if ($this->_forceUserUpdate || $this->_engine->verifyUserData($user_name, $domain_id, $user_id))
-        return $this->_engine->updateUser($user_name, $domain_id, $user_id);
-      return $user_id; 
+      if (!$this->_forceUserUpdate)
+      {
+        return $user_id;
+      }
+      if (!$this->_engine->verifyUserData($user_name, $domain_id, $user_id))
+      {
+        return $user_id;
+      }
+      return $this->_engine->updateUser($user_name, $domain_id, $user_id);
     }
     else
     {
@@ -164,14 +218,20 @@ class LemonLDAP_Sync {
    * @param $domain_id The domain identifier.
    * @return boolean True is the user groups are correctly created or updated.
    */
-  function syncUserGroups ($groups, $user_id, $domain_id)
+  public function syncUserGroups ($groups, $user_id, $domain_id)
   {
-
-    if (is_null($groups) || $groups === false || !is_array($groups))
+    if (!$this->isEnabled())
+    {
       return false;
-
+    }
+    if (is_null($groups) || $groups === false || !is_array($groups))
+    {
+      return false;
+    }
     if (!$this->_forceGroupUpdate && sizeof($groups))
+    {
       return true;
+    }
 
     //
     // Update or create groups in OBM. The primary default group have not to be
@@ -184,16 +244,22 @@ class LemonLDAP_Sync {
     foreach ($groups_ldap as $group_name => $group_data)
     {
       $group_id = $this->_engine->isGroupExists($group_name, $domain_id);
-
       if ($group_id !== false)
+      {
         $group_id = $this->_engine->updateGroup($group_name, $group_id, $group_data, $user_id, $domain_id);
+      }
       else
+      {
         $group_id = $this->_engine->addGroup($group_name, $group_data, $user_id, $domain_id);
-
+      }
       if ($group_id !== false)
+      {
         $groups_ldap[$group_name]['group_id'] = $group_id;
+      }
       else
+      {
         $sync_succeed = false;
+      }
     }
 
     //
@@ -243,8 +309,12 @@ class LemonLDAP_Sync {
    * @param $domain_id The domain identifier.
    * @return The user identifier or false.
    */
-  function syncUserInfo ($user_name, $groups, $user_id, $domain_id)
+  public function syncUserInfo ($user_name, $groups, $user_id, $domain_id)
   {
+    if (!$this->isEnabled())
+    {
+      return false;
+    }
 
     //
     // OBM do not considere automatic updates of users and groups.
