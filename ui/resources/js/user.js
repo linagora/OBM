@@ -256,6 +256,80 @@ Obm.UserPattern.ChoiceField = new Class ({
 
 });
 
+/* very specific field */
+Obm.UserPattern.NomadeField = new Class ({
+  Extends: Obm.UserPattern.Field,
+
+  initialize: function(form) {
+    this.form = form;
+    this.value = [];
+    var mail_fields = $$('td#nomadeMailHome input');
+    for (var i=0; i<mail_fields.length; i++) {
+      this.value[this.value.length] = mail_fields[i].value;
+    }
+    if ((this.value==undefined) || (this.value=='') || (this.value.join('-')=='')) {
+      this.value = [''];
+    }
+    this.originalValue = this.value;
+    this.lastReloadValue = this.value;
+  },
+
+  resetValue: function() {
+    var fields = $$('td#nomadeMailHome div');
+    for (var i=0; i<fields.length; i++) {
+      remove_element(fields[i],'nomadeMailHome');
+      show_hide_nomade_add_button();
+    }
+    for (var i=0; i<this.originalValue.length; i++) {
+      add_nomade_email_field(aliasSelectTemplate);
+      show_hide_nomade_add_button();
+    }
+    var mail_fields = $$('td#nomadeMailHome input');
+    for (var i=0; i<this.originalValue.length; i++) {
+      mail_fields[i].value = this.originalValue[i];
+    }
+  },
+
+  setValue: function(value) {
+    if ((value==undefined) || (value=='') || (value.join('-')=='')) {
+      value = [''];
+    }
+    this.value = value;
+    var fields = $$('td#nomadeMailHome div');
+    for (var i=0; i<fields.length; i++) {
+      remove_element(fields[i],'nomadeMailHome');
+      show_hide_nomade_add_button();
+    }
+    for (var i=0; i<value.length; i++) {
+      add_nomade_email_field(aliasSelectTemplate);
+      show_hide_nomade_add_button();
+    }
+    var mail_fields = $$('td#nomadeMailHome input');
+    for (var i=0; i<value.length; i++) {
+      mail_fields[i].value = value[i];
+    }
+  },
+
+  getValue: function() {
+    var value = [];
+    var mail_fields = $$('td#nomadeMailHome input');
+    for (var i=0; i<mail_fields.length; i++) {
+      value[value.length] = mail_fields[i].value;
+    }
+    return value;
+  },
+
+  changed: function() {
+    console.log(this.value.join('-'),this.getValue().join('-'),this.value.join('-')!=this.getValue().join('-'));
+    return (this.value.join('-')!=this.getValue().join('-'));
+  },
+
+  empty: function() {
+    return (this.getValue().join('-')=='');
+  }
+
+});
+
 Obm.UserPattern.Form = new Class ({
   Implements: Options,
 
@@ -300,10 +374,12 @@ Obm.UserPattern.Form = new Class ({
     this.addField('desc','userDesc');
     this.addField('web_perms','cb_web_perms','BooleanField');
     this.addField('mail_perms','userMailActive','BooleanField');
-    this.addField('email_nomade','tf_email_nomade');
-    this.addField('nomade_perms','cb_nomade_perms','BooleanField');
-    this.addField('nomade_enable','cb_nomade_enable','BooleanField');
-    this.addField('nomade_local_copy','cb_nomade_local_copy','BooleanField');
+    if ($('nomadeMailHome')) {
+      this.addField('nomade_perms','cb_nomade_perms','BooleanField');
+      this.addField('nomade_enable','cb_nomade_enable','BooleanField');
+      this.addField('nomade_local_copy','cb_nomade_local_copy','BooleanField');
+      this.fields['email_nomade'] = new Obm.UserPattern.NomadeField(this);
+    }
   },
 
   addField: function(name,id,type) {
@@ -313,6 +389,10 @@ Obm.UserPattern.Form = new Class ({
     if (field) {
       this.fields[name] = new Obm.UserPattern[type](this,field);
     }
+  },
+
+  getField: function(name) {
+    return this.fields[name];
   },
 
   setPattern: function(userpattern_id) {
@@ -410,7 +490,6 @@ Obm.UserPattern.Form = new Class ({
               }
             }
           }
-          /* $('externalEmailField').value = attributes['email']; */
         }
         if (attributes['mail_quota']) {
           $('tf_mail_quota').value = attributes['mail_quota'];

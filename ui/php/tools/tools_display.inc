@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : tools_display.inc                                            //
 //     - Desc : Tools Display functions File                                 //
@@ -295,4 +295,3 @@ function html_tools_javascript($domain_id, $realm) {
     </script>";
 }
 
-</script>

@@ -65,7 +65,7 @@ class UserPattern {
     'mail_server_id'    => array( 'type'=>'integer', 'validate_func'=>'validate_mail_server_id' ),
     'email'             => array( 'type'=>'string', 'validate_func'=>'validate_email' ),
     'mail_quota'        => array( 'type'=>'integer' ),
-    'email_nomade'      => array( 'type'=>'string'  ),
+    'email_nomade'      => array( 'type'=>'string', 'validate_func'=>'validate_email' ),
     'nomade_perms'      => array( 'type'=>'boolean' ),
     'nomade_enable'     => array( 'type'=>'boolean' ),
     'nomade_local_copy' => array( 'type'=>'boolean' )
@@ -694,6 +694,7 @@ class UserPattern {
     if ($params['mail_perms']) {
       $params['email'] = explode("\r\n",$params['email']);
     }
+    $params['email_nomade'] = explode("\r\n",$params['email_nomade']);
   }
 
   /**

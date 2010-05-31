@@ -661,15 +661,13 @@ function html_userpattern_form($action, $params=array(), $pattern=null) {
     if ($nomade_enable) $nomade_enable_c = ' checked';
     if ($nomade_local_copy) $nomade_local_copy_c = ' checked';
 
+    $nomade_mail_block = dis_user_nomade_mail_field($email_nomade,$class);
     $nomad_section = "
   <fieldset class=\"detail infos\">
   <legend>{$GLOBALS['l_nomade']}</legend>
 
   <table>
-  <tr>
-    <th class=\"$class[email_nomade]\">{$GLOBALS['l_email_nomade']}</th>
-    <td><input name=\"attributes[email_nomade]\" maxlength=\"64\" size=\"32\" value=\"$email_nomade\" /></td>
-  </tr>
+  $nomade_mail_block
   <tr>
     <th class=\"$class[nomade_perms]\"><label for=\"cb_nomade_perms\">{$GLOBALS['l_perms']}</label></th>
     <td><input id=\"cb_nomade_perms\" name=\"attributes[nomade_perms]\" type=\"checkbox\" value=\"1\" $nomade_perms_c /></td>
@@ -962,6 +960,61 @@ function dis_user_mail_field($domain_id, $values, $class) {
   $email_block
   </td>
   ";
+
+  return $email_block;
+}
+
+
+/**
+ * Generate external email field 
+ * 
+ * @param mixed $name 
+ * @param mixed $values 
+ * @access public
+ * @return void
+ */
+function dis_user_nomade_mail_field($emails, $class) {
+
+  if(!empty($emails) && !is_array($emails)) {
+    $emails = explode("\r\n",$emails);
+  }
+
+  $count = 0;
+  if(is_array($emails)) {
+    foreach($emails as $key => $email) {
+      $email_block .= "<div class=\"multiple\">
+        <a onclick=\"remove_element(this.parentNode,'nomadeMailHome');show_hide_nomade_add_button();return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>
+        <input class='emailNomade' name='attributes[email_nomade][]' value=\"$email\" />
+        </div>";
+      $count ++;
+    }
+  }
+
+  if ($GLOBALS['c_max_email_nomade'] ==0 || $count < $GLOBALS['c_max_email_nomade']) {
+    $email_block .= "
+    <div class=\"multiple\">
+    <a onclick=\"remove_element(this.parentNode,'nomadeMailHome');show_hide_nomade_add_button();return false\" href=\"\">
+     <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+    </a>
+    <input class='emailNomade' name='attributes[email_nomade][]' value='' />
+    </div>
+    ";  
+    $count++;
+  }
+  if ($GLOBALS['c_max_email_nomade'] ==0 || $count < $GLOBALS['c_max_email_nomade']) {
+    $add_button = "<a id='addMailNomadeButton' href='' onclick=\"add_nomade_email_field();show_hide_nomade_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+  }
+
+  $email_block = "
+  <tr><th class=\"$class[email_nomade]\" id='nomadeMailLabel'>
+  $GLOBALS[l_email_nomade]
+  $add_button
+  </th>
+  <td id='nomadeMailHome'>
+  $email_block
+  </td></tr>";
 
   return $email_block;
 }

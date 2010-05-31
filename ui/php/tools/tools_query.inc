@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : tools_query.inc                                              //
 //     - Desc : Tools query file                                             //
@@ -1100,4 +1100,3 @@ function run_query_tools_init_progress() {
   return $obm_q->f('progress');
   
 }
-</script>
