@@ -16,8 +16,7 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
-?>
-<script language="php">
+
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : account_query.inc                                            //
 //     - Desc : account query File                                           //
@@ -344,4 +343,4 @@ function update_account_action() {
   }
 }
 
-</script>
+?>
