@@ -337,7 +337,7 @@ class LemonLDAP_Engine {
    */
   function _setDefaultUserData ($data, $login, $domain_id)
   {
-    global $obm;
+    global $obm, $cgp_use;
 
     if (!is_array($data))
       return false;
@@ -559,36 +559,33 @@ class LemonLDAP_Engine {
   }
 
   /**
-   * Get domain identifier from a login that match the pattern
-   * username@domain. If the domain is not found into the database, then
-   * it is the default that will be used.
-   * @param $login A username.
-   * @return int A domain identifier.
+   * Get domain identifier from a domain name.
+   * If the domain is not found into the database, then it is the default that
+   * will be used.
+   * @param $domain A domain name.
+   * @return int The corresponding domain identifier.
    */
-  function getDomainID ($login = null)
+  public function getDomainID ($domain = null)
   {
     global $c_default_domain, $c_singleNameSpace;
-
     if (!$this->_checkInternalObjects())
-      return false;
-
-    $domain_id = null;
-
-    if (!$c_singleNameSpace && !is_null($login) && strpos($login,"@") !== false)
     {
-      list($login, $domain) = split('@', $login);
-      $domain = addslashes($domain);
-
-      $sql_query = 'SELECT domain_id FROM domain WHERE domain_name = \'' . $domain . '\'';
-      $this->_db->query($sql_query);
-
-      while ($this->_db->next_record() && is_null($domain_id))
-        $domain_id = $this->_db->f('domain_id');
+      return false;
     }
-
+    $domain_id = null;
+    if (!is_null($domain) && !$c_singleNameSpace)
+    {
+      $this->_db->query('SELECT domain_id FROM domain WHERE domain_name = \''
+          . addslashes($domain) . '\'');
+      while ($this->_db->next_record() && is_null($domain_id))
+      {
+        $domain_id = $this->_db->f('domain_id');
+      }
+    }
     if (is_null($domain_id))
+    {
       return $c_default_domain;
-
+    }
     return $domain_id;
   }
 
@@ -912,14 +909,42 @@ class LemonLDAP_Engine {
   }
 
   /**
+   * Return the user domain.
+   * This function returns the domain of the user.
+   * @param $username An OBM usernam like login@domain.
+   * @return string Return the domain part of the complete username, null if
+   *                not found.
+   */
+  public function getUserDomain ($username = null)
+  {
+    if (is_null($username))
+    {
+      $header = $this->getHeaderName('userobm_login');
+      $username = $this->getHeaderValue($header);
+    }
+    $_tmp = split('@', $username);
+    $domain = null;
+    if (sizeof($_tmp) > 1)
+    {
+      $domain = $_tmp[1];
+    }
+    return $domain;
+  }
+
+  /**
    * Return the user login.
    * This function returns the login of the user, even if the username
    * passed in parameter does not contain domain.
    * @param $username An OBM username like login@domain.
    * @return string Return the login part of the complete username.
    */
-  public static function getUserLogin ($username)
+  public function getUserLogin ($username = null)
   {
+    if (is_null($username))
+    {
+      $header = $this->getHeaderName('userobm_login');
+      $username = $this->getHeaderValue($header);
+    }
     $_tmp = split('@', $username);
     return $_tmp[0];
   }

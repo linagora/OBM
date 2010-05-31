@@ -79,12 +79,6 @@ $lemonldap_config = Array(
     "debug_level" => "NONE",
 
     //
-    // The HTTP header which identifies a user, to trace login and logout.
-    // Default: "HTTP_OBM_UID"
-    //
-    "debug_header_name" => "HTTP_OBM_UID",
-
-    //
     // The HTTP header which contains LDAP groups. Each groups are
     // separated by the character ';'.
     // Default: "HTTP_OBM_GROUPS"

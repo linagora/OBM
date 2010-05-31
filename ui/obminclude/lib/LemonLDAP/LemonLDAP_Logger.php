@@ -96,7 +96,7 @@ class LemonLDAP_Logger {
       $function = $traces[2]['function'];
       $line = $traces[0]['line'];
       $now = date(DEFAULT_LEMONLDAP_LOGFORMAT_DATE);
-      $log = "[$now] [$levelstr] OBM LemonLDAP Connector - $function($line): $msg\n";
+      $log = "[$now] [$levelstr] OBM Lemonldap Connector - $function($line) - $msg\n";
       if (!is_null($this->_file))
       {
         $f = fopen($this->_file, "a+");

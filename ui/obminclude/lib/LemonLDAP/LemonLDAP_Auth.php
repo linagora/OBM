@@ -56,18 +56,6 @@ class LemonLDAP_Auth extends Auth {
   private $_server_check = false;
 
   /**
-   * Groups header name.
-   * @var String
-   */
-  private $_groups_header_name = 'HTTP_OBM_GROUPS';
-
-  /**
-   * Specify the header that will be trace in debug file.
-   * @var String
-   */
-  private $_debug_header_name = 'HTTP_OBM_UID';
-
-  /**
    * The LemonLDAP engine.
    * @var LemonLDAP_Engine
    */
@@ -127,14 +115,6 @@ class LemonLDAP_Auth extends Auth {
     {
       $this->_server_check = $config['server_ip_server_check'];
     }
-    if (array_key_exists('debug_header_name', $config) !== false)
-    {
-      $this->_debug_header_name = $config['debug_header_name'];
-    }
-    if (array_key_exists('group_header_name', $config) !== false)
-    {
-      $this->_groups_header_name = $config['group_header_name'];
-    }
     if (array_key_exists('headers_map', $config) !== false)
     {
       if (is_array($config['headers_map']))
@@ -152,80 +132,83 @@ class LemonLDAP_Auth extends Auth {
   public function auth_validatelogin ()
   {
     global $obm;
-    
-    $this->_logger->debug("Headers: "
-        . var_export($this->_engine->getHeaders(), true));
-
-    // Check if headers are not found, use normal authentication process.
+    //
+    // First of all, we have to check if headers are set.
+    //
+    $user   = $this->_engine->getUserLogin();
+    $domain = $this->_engine->getUserDomain();
+    //
+    // If headers are not found, use normal authentication process.
     // The method auth_validatelogin() corresponding to class defined
-    // by the constant DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS will be automatically called.
-    // We can not use auth_preauth function instead, because it does not
-    // the job correctly for us.
-
-    if (!$this->sso_isValidAuthenticationRequest()) {
-      $this->_logger->debug('not a valid authentication request, proceed to auth failover');
+    // by the constant DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS will be
+    // automatically called. We can not use auth_preauth function instead,
+    // because it does not the job correctly for us.
+    //
+    if (strlen($user) == 0)
+    {
+      $this->_logger->debug('Proceed to non-SSO authentication');
       $d_auth_class_name = DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS;
       $d_auth_object = new $d_auth_class_name ();
       return $d_auth_object->auth_validatelogin();
     }
-    if (!$this->sso_checkRequest())
+    //
+    // Trace SSO Headers, and check if the request is correct.
+    //
+    //
+    $this->_logger->debug("Headers: "
+        . var_export($this->_engine->getHeaders(), true));
+    if (!$this->checkLemonldapRequest())
     {
+      $this->_logger->warn('Not a valid Lemonldap request, stop authentication');
       return false;
     }
-
     //
-    // First of all, we have to check if the user exists.
-    // OBM stores login in lowercase. Groups are also retrieved here.
+    // Search for ID corresponding to the user and the domain. If the user
+    // does not exists, user_id will be false.
     //
-
-    $header = $this->_engine->getHeaderName('userobm_login');
-    $username = $this->_engine->getHeaderValue($header);
-    $login = $this->_engine->getUserLogin($username);
-    $domain_id = $this->_engine->getDomainID($username);
-    $user_id = $this->_engine->isUserExists($login, $domain_id);
-    $groups = $this->_engine->parseGroupsHeader($this->_groups_header_name);
-
+    $domain_id = $this->_engine->getDomainID($domain);
+    $user_id   = $this->_engine->isUserExists($user, $domain_id);
+    $user_id   = $user_id !== false ? $user_id : null;
     //
-    // Then, we try to update/create the account. If this operation failed we
-    // can not do anything else. If not it is not necessary for the user to be
-    // authenticated so that its groups informations will be updated too.
-    // If the synchronization tool can synchronize, then we do sync operations.
+    // Then, we try to update/create the account, only if the synchronization
+    // is allowed. The synchronization could be failed, and the function could
+    // return false. In this case, it means that there is something wrong
+    // during the synchronization.
     //
-
     $sync = new LemonLDAP_Sync($this->_engine);
-    if ($sync->isEnabled()) {
-      $user_id = $sync->syncUserInfo(
-          $login,
-          $groups !== false ? $groups : Array(),
-          $user_id,
-          $domain_id
-        );
-    }
-
-    // Now, authenticate the user.
-
-    if (!$user_authenticated = $this->sso_authenticate($user_id, $domain_id))
+    if ($sync->isEnabled())
     {
-      $user_id = null;
+      $user_id_sync = $sync->syncUser($user_id, $domain_id, $user, $domain);
+      if ($user_id_sync !== false)
+      {
+        $user_id = $user_id_sync;
+      }
     }
-
-    $this->_logger->info('authentication for '
-        . $this->_engine->getHeaderValue($this->_debug_header_name)
-        . ' (' . (is_null($user_id) ? 'FAILED' : 'SUCCEED') . ')');
-
     //
-    // If $user_id is null, then user is not authenticated. In the case $user_id
-    // is not null, a flag that indicates that user is logged through LemonLDAP
-    // is stored. This flag could be then used to personnalize OBM modules, and
-    // lock some functionnalities (such as changing OBM password).
+    // The synchronization task have to return the user_id: the one
+    // created or the one found during an update. Even if the synchronization
+    // fails, we authenticate the user.
+    // A flag that indicates that user is logged through LemonLDAP is stored.
+    // This flag could be then used to personnalize OBM modules, and lock some
+    // functionnalities (such as changing OBM password).
     //
-
-    if (!is_null($user_id))
+    $user_auth = false;
+    $user_data = $this->_engine->getUserDataFromId($user_id, $domain_id);
+    if (is_array($user_data) && array_key_exists('user_id', $user_data))
     {
-      $this->_logged = true;
+      if (global_unfreeze_user($user_data['user_id']))
+      {
+        $obm['login'] = $user_data['login'];
+        $obm['profile'] = $user_data['profile'];
+        $obm['domain_id'] = $domain_id;
+        $obm['delegation'] = $user_data['delegation_target'];
+        $user_auth = $user_data['user_id'];
+        $this->_logged = true;
+      }
     }
-
-    return $user_authenticated;
+    $this->_logger->info("authentication for $user@$domain: "
+        . ($this->_logged ? "SUCCEED" : "FAILED"));
+    return $user_auth;
   }
 
   /**
@@ -234,10 +217,19 @@ class LemonLDAP_Auth extends Auth {
   public function logout ($nobody = '')
   {
     global $obm, $sess;
-
-    if (!$this->sso_isValidAuthenticationRequest())
+    //
+    // First of all, we have to check if headers are set.
+    //
+    $user   = $this->_engine->getUserLogin();
+    $domain = $this->_engine->getUserDomain();
+    //
+    // If headers are not found, use normal logout process.
+    // The method logout() corresponding to class defined by the constant
+    // DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS will be automatically called.
+    //
+    if (strlen($user) == 0)
     {
-      $this->_logger->debug('not a valid authentication request, proceed to auth failover');
+      $this->_logger->debug('Proceed to non-SSO logout');
       $d_auth_class_name = DEFAULT_LEMONLDAP_SECONDARY_AUTHCLASS;
       $d_auth_object = new $d_auth_class_name ();
       if (method_exists($d_auth_object, 'logout'))
@@ -246,7 +238,10 @@ class LemonLDAP_Auth extends Auth {
       }
       return;
     }
-
+    //
+    // The logout process consist in disconnecting the user from OBM, and
+    // then redirecting it to the Lemonldap logout URL.
+    //
     $login = $_SESSION['obm']['uid'];
     $sess->delete();
     $_SESSION['obm'] = '';
@@ -254,55 +249,18 @@ class LemonLDAP_Auth extends Auth {
     unset($this->auth['uname']);
     $this->unauth($nobody == '' ? $this->nobody : $nobody);
     $sess->delete();
-
-    $this->_logger->info('disconnect '
-        . $this->_engine->getHeaderValue($this->_debug_header_name));
-
+    $this->_logger->info('disconnect ' . $user);
     header('location: ' . $this->_logout_url);
     exit();
   }
 
   /**
-   * Display login page.
-   * For LemonLDAP authentication process, we display a blank page. ???
+   * Display login page, for second authentication mechanism.
    */
   public function of_session_dis_login_page ()
   {
-    global $obminclude, $l_obm_title, $obm_version, $module, $path;
-    global $login_action;
-    global $params, $c_singleNameSpace, $c_default_domain;
-
-    $login_page = $path.'/../'.$obminclude.'/login.inc';
-    include($login_page);
-  }
-
-  /**
-   * Authenticate user
-   * @param $user_id The user unique identifier.
-   * @param $domain_id The domain identifier.
-   * @return int The user identifier, or false.
-   */
-  public function sso_authenticate ($user_id, $domain_id)
-  {
-    global $obm;
-
-    $data = $this->_engine->getUserDataFromId($user_id, $domain_id);
-
-    if (!is_array($data) || !array_key_exists('user_id', $data))
-    {
-      return false;
-    }
-
-    if (global_unfreeze_user($data['user_id']))
-    {
-      $obm['login'] = $data['login'];
-      $obm['profile'] = $data['profile'];
-      $obm['domain_id'] = $domain_id;
-      $obm['delegation'] = $data['delegation_target'];
-      return $data['user_id'];
-    }
-
-    return false;
+    global $obminclude, $path;
+    include $path . '/../' . $obminclude . '/login.inc';
   }
 
   /**
@@ -311,7 +269,7 @@ class LemonLDAP_Auth extends Auth {
    * If not, then if $_SERVER['REMOTE_ADDR'] matches to $_server_ip.
    * @return boolean
    */
-  public function sso_checkRequest ()
+  public function checkLemonldapRequest ()
   {
     if (!$this->_server_check)
     {
@@ -333,26 +291,9 @@ class LemonLDAP_Auth extends Auth {
    * This will tell us if user is logged through SSO or not.
    * @return boolean
    */
-  public function sso_isLoggedThrough()
+  public function isLoggedThroughLemonldap ()
   {
     return $this->_logged;
-  }
-
-  /**
-   * This will tell us if we could use headers to authenticate a user.
-   * The obligatory header correspond to the key userobm_login.
-   */
-  public function sso_isValidAuthenticationRequest ()
-  {
-    $header = $this->_engine->getHeaderName('userobm_login');
-    $login = $this->_engine->getHeaderValue($header);
-
-    if (!is_null($login))
-    {
-      return true;
-    }
-
-    return false;
   }
 
 }
