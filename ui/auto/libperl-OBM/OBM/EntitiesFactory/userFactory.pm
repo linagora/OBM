@@ -296,8 +296,8 @@ sub _loadCurrentEntityFields {
         $tablePrefix = 'P_';
     }
 
-    my $query = 'SELECT field.field,
-                        field.value
+    my $query = 'SELECT '.$tablePrefix.'field.field,
+                        '.$tablePrefix.'field.value
                  FROM '.$tablePrefix.'field
                  INNER JOIN '.$tablePrefix.'UserEntity
                     ON '.$tablePrefix.'UserEntity.userentity_entity_id = '.$tablePrefix.'field.entity_id
