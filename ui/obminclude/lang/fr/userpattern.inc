@@ -20,3 +20,16 @@ $l_id_error = "Impossible de trouver ce modèle d'utilisateur !";
 $l_no_title_error = "Vous devez spécifier un titre pour ce modèle d'utilisateur.";
 $l_invalid_field = "Données invalides dans le champ.";
 $l_circular_dependencies = "Dépendences circulaires entre certains champs.";
+
+$l_userpattern_string_help = "Liste des mot-clefs utilisables dans les champs texte :";
+$l_userpattern_date_help = "Liste des mot-clefs utilisables dans les champs date (Vous pouvez aussi saisir une date au format habituel) :";
+$l_userpattern_today_plus_help = "Dans x jours";
+$l_userpattern_today_minus_help = "Il y a x jours";
+
+$l_mobile = $l_mphone;
+$l_ad1 = "$l_address 1";
+$l_ad2 = "$l_address 2";
+$l_ad3 = "$l_address 3";
+$l_cdx = $l_expresspostal;
+$l_zip = $l_postcode;
+

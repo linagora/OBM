@@ -894,12 +894,24 @@ class UserPattern {
    * @access public
    * @return array
    **/
-  public static function keywords($attribute, $pattern='', $field_empty=true) {
+  public static function keywordsFor($attribute, $pattern='', $field_empty=true) {
     $attr = self::$allowed_attributes[$attribute];
     if (empty($attr))
       return array();
     //else
     $type = $attr['type'];
+    return self::keywords($type, $pattern, $field_empty);
+  }
+
+  /**
+   * Get keywords list
+   * @param  string  $type           the type of the attribute to generate
+   * @param  string  $pattern        optional filter pattern
+   * @param  boolean $field_empty    false is the field if not empty
+   * @access public
+   * @return array
+   **/
+  public static function keywords($type, $pattern='', $field_empty=true) {
 
     if ($type=='string') {
       $keywords = self::$allowed_keywords;
@@ -928,7 +940,6 @@ class UserPattern {
     sort($keywords);
     return $keywords;
   }
-
 }
 
 UserPattern::init();

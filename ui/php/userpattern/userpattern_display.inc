@@ -860,8 +860,51 @@ $nomad_section
   <fieldset class=\"buttons\">
   $dis_button
   </fieldset>
+
+  <fieldset class=\"help\">
+  <legend>{$GLOBALS['l_help']}</legend>
+  ".html_userpattern_help()."
+  </fieldset>
   </form>
     ";
+
+  return $block;
+}
+
+/**
+ * Display: User Pattern create form
+ * @return string                   html code
+ **/
+function html_userpattern_help() {
+
+  foreach (array('string','date') as $type) {
+    $block .= "<p>{$GLOBALS["l_userpattern_{$type}_help"]}</p>";
+    $block .= "<table style=\"width: 100%;\">";
+    $newline = 1;
+    foreach (UserPattern::keywords($type) as $keyword) {
+
+      if ($keyword=='%today+') {
+        $keyword = '%today+x%';
+        $description = $GLOBALS['l_userpattern_today_plus_help'];
+      } elseif ($keyword=='%today-') {
+        $keyword = '%today-x%';
+        $description = $GLOBALS['l_userpattern_today_minus_help'];
+      } else {
+        $attribute = substr($keyword,1,-1);
+        $description = $GLOBALS["l_{$attribute}"];
+      }
+
+      $help_text = "<th style=\"width:10%;text-align:right;\">$keyword</th><td style=\"width:40%;\">$description</td>";
+      if ($newline)
+        $block .= "<tr>$help_text";
+      else
+        $block .= "$help_text</tr>";
+      $newline = 1-$newline;
+    }
+    if (!$newline)
+      $block .= "<th style=\"width:10%;text-align:right;\"></th><td style=\"width:40%;\"></td></tr>";
+    $block .= "</table>";
+  }
 
   return $block;
 }
