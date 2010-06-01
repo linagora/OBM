@@ -1696,7 +1696,7 @@ DELETE FROM Contact WHERE contact_domain_id NOT IN (SELECT domain_id FROM Domain
 ALTER TABLE Contact ADD CONSTRAINT contact_domain_id_domain_id_fkey FOREIGN KEY (contact_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from contact_company_id to company_id
-DELETE FROM Contact WHERE contact_company_id NOT IN (SELECT company_id FROM Company) AND contact_company_id IS NOT NULL;
+UPDATE Contact SET contact_company_id = NULL WHERE contact_company_id NOT IN (SELECT company_id FROM Company) AND contact_company_id IS NOT NULL;
 ALTER TABLE Contact ADD CONSTRAINT contact_company_id_company_id_fkey FOREIGN KEY (contact_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from contact_userupdate to userobm_id
