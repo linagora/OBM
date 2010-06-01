@@ -17,6 +17,7 @@ $l_no_found = "Aucune sauvegarde ne correspond à ces critères !";
 $l_restore_ok = "La restauration de la sauvegarde a été correctement effectuée.";
 $l_restore_error = "La restauration de la sauvegarde a échoué !";
 
+$l_err_backup_no_mail = "Cette entité ne peut être sauvegardée, car sa messagerie est désactivée.";
 $l_create_backup_error = "Erreur lors de la création du fichier de sauvegarde";
 $l_delete_file_error = "La suppression du fichier de sauvegarde a échoué !";
 $l_err_backup_name = "Le nom du fichier de sauvegarde n'est pas correct";

@@ -171,7 +171,7 @@ class SatelliteBackup extends CronJob {
     $obm_q = new DB_OBM;
     $query = "SELECT userobm_id, userobm_login
       FROM UserObm
-      WHERE userobm_archive=0 AND userobm_domain_id=$domain_id";
+      WHERE userobm_archive=0 AND userobm_domain_id=$domain_id AND userobm_mail_perms=1";
     $this->logger->core($query);
     $obm_q->query($query);
 

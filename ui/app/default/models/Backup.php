@@ -135,6 +135,7 @@ class Backup {
         userobm_login as login,
         'user' as entity,
         domain_name as realm,
+        userobm_mail_perms as mail_enabled,
         ms.host_ip as host
       FROM UserObm
       LEFT JOIN Domain on userobm_domain_id=domain_id
@@ -146,6 +147,11 @@ class Backup {
 
     if (!$obm_q->next_record()) {
       throw new Exception($GLOBALS['l_err_reference']);
+    }
+
+    $mail_enabled = $obm_q->f('mail_enabled');
+    if (empty($mail_enabled)) {
+      throw new Exception($GLOBALS['l_err_backup_no_mail']);
     }
 
     $this->details = $obm_q->Record;
