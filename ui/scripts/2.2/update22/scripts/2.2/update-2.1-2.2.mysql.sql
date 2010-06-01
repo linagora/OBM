@@ -1674,7 +1674,7 @@ UPDATE CompanyType SET companytype_usercreate = NULL WHERE companytype_usercreat
 DELETE FROM Contact WHERE contact_domain_id NOT IN (SELECT domain_id FROM Domain) AND contact_domain_id IS NOT NULL;
 
 -- Foreign key from contact_company_id to company_id
-DELETE FROM Contact WHERE contact_company_id NOT IN (SELECT company_id FROM Company) AND contact_company_id IS NOT NULL;
+UPDATE Contact SET contact_company_id = NULL WHERE contact_company_id NOT IN (SELECT company_id FROM Company) AND contact_company_id IS NOT NULL;
 
 -- Foreign key from contact_userupdate to userobm_id
 UPDATE Contact SET contact_userupdate = NULL WHERE contact_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND contact_userupdate IS NOT NULL;
