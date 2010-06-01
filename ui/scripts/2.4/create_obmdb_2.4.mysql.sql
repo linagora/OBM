@@ -3237,7 +3237,7 @@ CREATE TABLE `Updatedlinks` (
   `updatedlinks_id` int(8) NOT NULL auto_increment,
   `updatedlinks_domain_id` int(8) default NULL,
   `updatedlinks_user_id` int(8) default NULL,
-  `updatedlinks_delegation` varchar(256) default NULL,
+  `updatedlinks_delegation` varchar(256) default '',
   `updatedlinks_table` varchar(32) default NULL,
   `updatedlinks_entity` varchar(32) default NULL,
   `updatedlinks_entity_id` int(8) default NULL,

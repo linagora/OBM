@@ -2216,7 +2216,7 @@ CREATE TABLE updatedlinks (
     updatedlinks_id integer NOT NULL,
     updatedlinks_domain_id integer,
     updatedlinks_user_id integer,
-    updatedlinks_delegation character varying(256),
+    updatedlinks_delegation character varying(256) DEFAULT ''::character varying,
     updatedlinks_table character varying(32),
     updatedlinks_entity character varying(32),
     updatedlinks_entity_id integer
