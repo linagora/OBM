@@ -5878,4 +5878,16 @@ Class CalendarView {
   }
 }
 
+function run_query_calendar_no_mail($users) {
+  $obm_q = new DB_OBM;
+  foreach($users as $u_id) {
+    $query = "SELECT userobmpref_value FROM UserObmPref WHERE  userobmpref_option = 'set_mail' AND ( userobmpref_user_id = $u_id OR ( userobmpref_user_id IS NULL AND userobmpref_option  NOT IN ( SELECT userobmpref_option FROM UserObmPref WHERE userobmpref_user_id = $u_id AND userobmpref_option = 'set_mail') ) )";
+    $obm_q->query($query);
+    $obm_q->next_record();
+    if($obm_q->f('userobmpref_value') == 'yes') {
+      return false;
+    }
+  }
+  return true;
+}
 ?>

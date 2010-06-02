@@ -3660,4 +3660,9 @@ function genUniqueExtEventId() {
   return get_obm_info('product_id').sha1(uniqid()).sha1($GLOBALS['obm']['domain_name']).sha1(mktime()*rand());
 }
 
+function splitwords($string) {
+  $mask = "/\p{L}[\p{L}\p{Mn}\x{2019}]*/u";
+  preg_match_all($mask, $string, $matches);
+  return $matches[0];
+}
 ?>

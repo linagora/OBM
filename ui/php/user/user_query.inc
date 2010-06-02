@@ -343,13 +343,17 @@ function run_query_user_ext_search($user) {
   if(isset($user['first_row'])) $first_row = $user['first_row'] - 1;
   else $first_row = 0;
 
-  $patterns = explode(' ', $pattern);
+  $patterns = splitwords($pattern);
   foreach ($patterns as $pattern) {
-    $userpattern .= "AND (userobm_lastname #LIKE '%$pattern%' OR userobm_firstname #LIKE '%$pattern%' OR userobm_email #LIKE  '%$pattern%' )";
+    $userpattern[]= "pattern #LIKE '$pattern%' ";
   }
   if ($filter_entity == 'calendar') {
-    $where_filter_entity = ' INNER JOIN ('.OBM_Acl::getAclSubselect('calendarentity_calendar_id', 'calendar', null, $obm['uid'], $filter_pattern).') as Rights ON Rights.calendarentity_calendar_id = userobm_id';
-    $union = " UNION SELECT userobm_id, userobm_lastname, userobm_firstname, userobm_hidden, userobm_email FROM UserObm WHERE userobm_id='$obm[uid]' $userpattern";
+    $userEntities = OBM_Acl::getUserEntities($obm['uid']);
+    $filterJoin = '
+      INNER JOIN CalendarEntity ON calendarentity_calendar_id = userobm_id
+      INNER JOIN EntityRight ON calendarentity_entity_id = entityright_entity_id
+      ';
+    $filterWhere = 'AND entityright_'.$filter_pattern.' = 1 AND (entityright_consumer_id IN ('.implode(',',$userEntities).') OR entityright_consumer_id IS NULL)';
   }
 
   $query = "SELECT 
@@ -359,12 +363,13 @@ function run_query_user_ext_search($user) {
       userobm_hidden,
       userobm_email
     FROM UserObm
-    $where_filter_entity
+    INNER JOIN (SELECT id FROM _userpattern WHERE ".implode('OR',$userpattern)." GROUP BY id having count(*) >= ".count($patterns)." ) as pattern ON id  = userobm_id
+    $filterJoin
     WHERE
-      1 = 1 $userpattern 
+      1 = 1  
+      $filterWhere
       AND userobm_archive = 0
       $multidomain
-    $union
     LIMIT $limit OFFSET $first_row ";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->xquery($query);
