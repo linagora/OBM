@@ -4193,13 +4193,20 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $contact = OBM_Contact::get($c['id']);
       $owner_name = $contact->display_name();
       if (is_array($evts = $contact->getEventsInInterval($start, $end))) {
+        $extra_exceptions = array();
         foreach($evts as $e) {
           if (!$search || 
               ($search  && $type == 'advanced' && ((empty($pattern_owner) || !empty($pattern_owner) && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern_owner)))) 
                 && $e->match($pattern, $type))) || 
               ($search  && $type == 'basic' && ((empty($pattern_owner) || !empty($pattern_owner) && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern_owner)))) 
                 || $e->match($pattern, $type)))) {
-            $event = new Event($e->getUid(),$e->getDuration(), $e->getSummary(), $e->getLocation(),
+            $uid = $e->getUid();
+            $recurrence_id = $e->evt->getRecurrenceId();
+            if ($recurrence_id) {
+              $extra_exceptions[] = array('uid' => $e->getUid(), 'date' => $recurrence_id);
+              $uid = $uid.'-'.count($extra_exceptions);
+            }
+            $event = new Event($uid,$e->getDuration(), $e->getSummary(), $e->getLocation(),
               $e->getCategory(),$e->isPrivate(),$e->getDescription(), null,
               $e->isAllDay(),'none',$c['id'],$owner_name, null, $e->getTransparency(),null);
             $event->addAttendee('contact',$c['id'],$owner_name, $e->getPartStat());
@@ -4239,6 +4246,9 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
               $of->addOccurrence($event, $date, "contact", $c['id'], $e->getPartStat());
             }
           }
+        }
+        foreach ($extra_exceptions as $e) {
+          $of->removeOccurrences($e['uid'], $e['date']);
         }
       }
     }

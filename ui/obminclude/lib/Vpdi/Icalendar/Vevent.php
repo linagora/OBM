@@ -188,6 +188,10 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
     return $duration;
   }
 
+  public function getRecurrenceId() {
+    return $this->getDateTime('RECURRENCE-ID');
+  }
+
   public function getRrule() {
     if (($rrule = $this->getProperty('RRULE')) === null) {
       return null;
