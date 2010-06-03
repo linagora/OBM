@@ -126,7 +126,7 @@ sub _init {
 
     # Le SID du domaine
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
-    if( !$domainSid ) {
+    if( !$domainSid && $groupDesc->{'group_samba'} ) {
         $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 1 );
         $self->_log( 'droit samba annulé', 3 );
         $groupDesc->{'group_samba'} = 0;
