@@ -344,8 +344,10 @@ function run_query_user_ext_search($user) {
   else $first_row = 0;
 
   $patterns = splitwords($pattern);
-  foreach ($patterns as $pattern) {
-    $userpattern[]= "pattern #LIKE '$pattern%' ";
+  foreach ($patterns as $index => $pattern) {
+    $pattern = strtolower($pattern);
+    $innerpattern .= " INNER JOIN _userpattern  p$index ON p$index.id  = userobm_id ";
+    $wherepattern .= " AND p$index.pattern #LIKE '$pattern%'";
   }
   if ($filter_entity == 'calendar') {
     $userEntities = OBM_Acl::getUserEntities($obm['uid']);
@@ -357,16 +359,18 @@ function run_query_user_ext_search($user) {
   }
 
   $query = "SELECT 
+      DISTINCT
       userobm_id,
       userobm_lastname,
       userobm_firstname,
       userobm_hidden,
       userobm_email
     FROM UserObm
-    INNER JOIN (SELECT id FROM _userpattern WHERE ".implode('OR',$userpattern)." GROUP BY id having count(*) >= ".count($patterns)." ) as pattern ON id  = userobm_id
+    $innerpattern
     $filterJoin
     WHERE
       1 = 1  
+      $wherepattern
       $filterWhere
       AND userobm_archive = 0
       $multidomain
@@ -728,6 +732,7 @@ function run_query_user_insert($user) {
   if ($id > 0) {
     // Insert Address book
     run_query_user_addressbook_insert($id, $domain_id);
+    of_index_update('user', $id);
     $user['entity_id'] = $id;
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $entity_id = of_entity_insert('calendar', $id);    
@@ -1157,6 +1162,7 @@ function run_query_user_update($u_id, $user) {
   }
 
   if ($retour) {
+    $ret = of_index_update('user', $u_id);
     $ret = of_userdata_query_update('user', $u_id, $user);
   }
 
