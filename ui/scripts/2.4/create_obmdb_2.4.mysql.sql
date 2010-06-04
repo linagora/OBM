@@ -3358,6 +3358,17 @@ CREATE TABLE `UserObm` (
   CONSTRAINT `userobm_userupdate_userobm_id_fkey` FOREIGN KEY (`userobm_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+--
+-- Table structure for table `_userpattern`
+--
+CREATE TABLE _userpattern (
+  id integer NOT NULL, 
+  pattern varchar(255),
+  KEY (`pattern`),
+  CONSTRAINT `_userpattern_id_fkey` FOREIGN KEY (`id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- Table structure for table `UserObmGroup`
 --

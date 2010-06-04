@@ -2323,6 +2323,13 @@ CREATE TABLE userobm (
   userobm_photo_id integer
 );
 
+--
+-- Name: _userpattern; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+CREATE TABLE _userpattern (
+  id integer, 
+  pattern varchar(255)
+);
 
 --
 -- Name: userobm_sessionlog; Type: TABLE; Schema: public; Owner: -; Tablespace: 
@@ -7866,6 +7873,16 @@ CREATE INDEX userobm_usercreate_fkey ON userobm (userobm_usercreate);
 
 CREATE INDEX userobm_userupdate_fkey ON userobm (userobm_userupdate);
 --
+-- Name: _userpattern_pattern_idx Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX _userpattern_pattern_idx ON _userpattern (pattern);
+--
+-- Name: _userpattern_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX _userpattern_id_fkey ON _userpattern (id);
+
+--
 -- Name: userobmgroup_userobm_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
@@ -7885,6 +7902,7 @@ CREATE INDEX userobmpref_user_id_fkey ON userobmpref (userobmpref_user_id);
 --
 
 CREATE INDEX userobm_sessionlog_userobm_id_fkey ON userobm_sessionlog (userobm_sessionlog_userobm_id);
+
 --
 -- Name: website_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
@@ -11088,6 +11106,12 @@ ALTER TABLE ONLY userobm
 ALTER TABLE ONLY userobm
     ADD CONSTRAINT userobm_userupdate_userobm_id_fkey FOREIGN KEY (userobm_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
+--
+-- Name: _userpattern_id_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY _userpattern
+    ADD CONSTRAINT _userpattern_id_userobm_id_fkey FOREIGN KEY (id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
 -- Name: userobmgroup_group_id_group_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
