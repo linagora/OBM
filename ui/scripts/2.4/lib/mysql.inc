@@ -44,6 +44,7 @@ class DB {
 
   public function free() {
     $this->object->free($this->id);
+    $this->queryId = null;
   }
 
   public function setId($id) {

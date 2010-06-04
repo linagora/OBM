@@ -118,7 +118,7 @@ obm.AutoComplete.Search = new Class({
   options: {
     chars: 1,                        // min number of chars to type before requesting
     results: 8,                      // number of results per page
-    delay: 400,                      // delay before the last key pressed and the request
+    delay: 300,                      // delay before the last key pressed and the request
     mode: 'multiple',                // 'mono' or 'multiple'
     locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
     resetable: false,                // only in 'mono' mode : reset field value

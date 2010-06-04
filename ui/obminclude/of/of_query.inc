@@ -3979,3 +3979,41 @@ function get_domain_property($domain, $property) {
   return $obm_q->f('domainpropertyvalue_value');
 
 }
+function splitwords($string) {
+  $mask = "/\p{L}[\p{L}\p{Mn}\x{2019}0-9]*/u";
+  preg_match_all($mask, $string, $matches);
+  if($callback !== null) {
+    $matches[0] = array_map($callback,$matches[0]);
+  }
+  return $matches[0];
+}
+
+function of_index_update($entity, $id=null) {
+  if($id !== null) {
+    $id = (array)$id;
+    $wherePattern = 'WHERE id IN ('.implode(',', $id).')';
+    $whereUser = 'WHERE userobm_id IN ('.implode(',', $id).')';
+  }
+  $obm_q = new DB_OBM;
+  $obm_q2 = new DB_OBM;
+  $query = 'DELETE FROM _userpattern '.$wherePattern;
+  $obm_q->query($query);
+  $query = 'SELECT userobm_id, userobm_lastname, userobm_firstname, userobm_login, userobm_email FROM UserObm '.$whereUser;
+  $obm_q->query($query);
+  while($obm_q->next_record()) {
+    $words = array();
+    $mails = $obm_q->f('userobm_email');
+    $words = explode("\r\n",$mails);
+    $words = array_merge($words, splitwords($obm_q->f('userobm_lastname')),'strtolower');
+    $words = array_merge($words, splitwords($obm_q->f('userobm_firstname')),'strtolower');
+    $words = array_merge($words, splitwords($obm_q->f('userobm_login')),'strtolower');
+    $words = array_unique($words);
+    foreach($words as $word) {
+      if(trim($word) != '') {
+        $query = "INSERT INTO _userpattern VALUES(".$obm_q->f('userobm_id').", '".trim($word)."')";
+        $obm_q2->query($query);
+      }
+    }
+  }  
+}
+?>

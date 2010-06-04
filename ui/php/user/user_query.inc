@@ -350,29 +350,38 @@ function run_query_user_ext_search($user) {
   if(isset($user['first_row'])) $first_row = $user['first_row'] - 1;
   else $first_row = 0;
 
-  $patterns = explode(' ', $pattern);
-  foreach ($patterns as $pattern) {
-    $userpattern .= "AND (userobm_lastname #LIKE '%$pattern%' OR userobm_firstname #LIKE '%$pattern%' OR userobm_email #LIKE  '%$pattern%' )";
+  $patterns = splitwords($pattern);
+  foreach ($patterns as $index => $pattern) {
+    $pattern = strtolower($pattern);
+    $innerpattern .= " INNER JOIN _userpattern  p$index ON p$index.id  = userobm_id ";
+    $wherepattern .= " AND p$index.pattern #LIKE '$pattern%'";
   }
 
   if ($filter_entity == 'calendar') {
-    $where_filter_entity = ' INNER JOIN ('.OBM_Acl::getAclSubselect('calendarentity_calendar_id', 'calendar', null, $obm['uid'], $filter_pattern).') as Rights ON Rights.calendarentity_calendar_id = userobm_id';
-    $union = " UNION SELECT userobm_id, userobm_lastname, userobm_firstname, userobm_hidden, userobm_email FROM UserObm WHERE userobm_id='$obm[uid]' $userpattern";
+    $userEntities = OBM_Acl::getUserEntities($obm['uid']);
+    $filterJoin = '
+      INNER JOIN CalendarEntity ON calendarentity_calendar_id = userobm_id
+      INNER JOIN EntityRight ON calendarentity_entity_id = entityright_entity_id
+      ';
+    $filterWhere = 'AND entityright_'.$filter_pattern.' = 1 AND (entityright_consumer_id IN ('.implode(',',$userEntities).') OR entityright_consumer_id IS NULL)';
   }
 
   $query = "SELECT 
+      DISTINCT
       userobm_id,
       userobm_lastname,
       userobm_firstname,
       userobm_hidden,
       userobm_email
     FROM UserObm
-    $where_filter_entity
+    $innerpattern
+    $filterJoin
     WHERE
-      1 = 1 $userpattern 
+      1 = 1  
+      $wherepattern
+      $filterWhere
       AND userobm_archive = 0
       $multidomain
-    $union
     LIMIT $limit OFFSET $first_row ";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->xquery($query);
@@ -732,6 +741,7 @@ function run_query_user_insert($user) {
   if ($id > 0) {
     // Insert Address book
     run_query_user_addressbook_insert($id, $domain_id);
+    of_index_update('user', $id);
     $user['entity_id'] = $id;
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $GLOBALS['customFields']->insert($id, $user);
@@ -1163,6 +1173,7 @@ function run_query_user_update($u_id, $user) {
 
   if ($retour) {
     $GLOBALS['customFields']->insert($u_id, $user);
+    $ret = of_index_update('user', $u_id);
     $ret = of_userdata_query_update('user', $u_id, $user);
   }
 

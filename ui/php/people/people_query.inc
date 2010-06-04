@@ -587,6 +587,7 @@ function run_query_people_insert($people){
     OBM_Acl::setDefaultPublicRights('mailbox', $id);
     OBM_Acl::setDefaultPublicRights('calendar', $id);
     $ret = of_userdata_query_update('user', $id, $user);
+    of_index_update('user', $id);
   }
 
   return $id;
@@ -663,6 +664,7 @@ function run_query_people_update($p_id, $people) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
+    of_index_update('user', $id);
     $ret = of_userdata_query_update('user', $p_id, $people);
   }
 

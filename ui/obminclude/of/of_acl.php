@@ -63,7 +63,7 @@ class OBM_Acl {
    */
   public static function initialize() {
     self::$db = new DB_OBM();
-    self::$cache = array();
+    self::$cache = array('entities' => array(), 'acl' => array());
     self::$actions = array(self::ACCESS, self::READ, self::WRITE, self::ADMIN);
   }
 
@@ -765,6 +765,24 @@ class OBM_Acl {
     }
     return $idSet;
   }
+
+  /**
+   * Get all entityId that if set in the consumer field, give rights to an user 
+   * 
+   * @static
+   * @access public
+   * @return void
+   */
+  public static function getUserEntities($id) {
+    if(!isset(self::$cache['entities'][$id])) {
+      self::$db->query('SELECT userentity_entity_id as entity_id FROM UserEntity WHERE userentity_user_id = '.$id.' 
+        UNION SELECT groupentity_entity_id as entity_id FROM GroupEntity INNER JOIN of_usergroup ON of_usergroup_group_id = groupentity_group_id WHERE of_usergroup_user_id = '.$id);
+      while(self::$db->next_record()) {
+        self::$cache['entities'][$id][] = self::$db->f('entity_id');
+      }
+    }
+    return self::$cache['entities'][$id];
+  }  
 
   private static function log($sql, $methodCall) {
     global $cdg_sql;
