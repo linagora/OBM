@@ -8033,7 +8033,15 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $event_body = '';
         if ($event->event->duration < 2700) {
           $dis_header = "$date $title";
-          $dis_title = "";
+          if (!$privatized_event) {
+            if (!empty($event->event->location)) {
+              $dis_header .= ' ('. $event->event->location. ')';
+            }
+            
+            if ($this->showdetails && !empty($event->event->description)) {
+              $dis_header .= " : ". $event->event->description;
+            }
+          }          
         } else {
           $dis_header = $date;
           $event_body = $title;
@@ -8048,7 +8056,8 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
             }
           }
         }
-
+        $dis_header = html_entity_decode($dis_header, ENT_COMPAT,'UTF-8');
+        $event_body = html_entity_decode($event_body, ENT_COMPAT,'UTF-8');
         // event title
         $this->page->setLineColor(new Zend_Pdf_Color_Html($title_color));
         $this->page->setFillColor(new Zend_Pdf_Color_Html($bg_color));
