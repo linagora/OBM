@@ -178,6 +178,8 @@ function dis_admin_data($action, $mode, $module) {
     dis_admin_data_document($action, $mode);
   } else if ($module == 'group') {
     dis_admin_data_group($action, $mode);
+  } else if ($module == 'user') {
+    dis_admin_data_user($mode);
   } else {
     echo 'No data inconsistency to check here... bye.';
   }
@@ -854,6 +856,43 @@ function dis_admin_data_group($action, $mode) {
       </thead>
       </table>
       </div>";
+  }
+}
+
+
+
+/**
+ * Display and update internal user index
+ * @param $mode : 'txt' or 'html'
+**/
+function dis_admin_data_user($mode) {
+  global $debug, $c_all;
+
+  // Get the public group list
+  if ($mode == 'txt') {
+    echo "
+------------------------------------------------------------------------------
+*** Updating user index 
+------------------------------------------------------------------------------
+";
+  } else {
+    if ($action == 'data_update') {
+      $update = "<th>Update</th>";
+    } else {
+      $update = '';
+    }
+    echo "<h1>Updating user index</h1>";
+  }
+  of_index_update('user');
+
+  if ($mode == 'txt') {
+    echo "
+------------------------------------------------------------------------------
+***  User index updated
+------------------------------------------------------------------------------
+";
+  } else {
+    echo "<h1>Updating user index</h1>";
   }
 }
 

@@ -48,7 +48,7 @@ require("$path/document/document_query.inc");
 include("$obminclude/of/of_category.inc");
 
 $target_modules = array ('company', 'deal', 'list', 'document');
-$target_upd_modules = array ('company', 'deal', 'list', 'group');
+$target_upd_modules = array ('company', 'deal', 'list', 'group','user');
 $acts = array ('help', 'index', 'data_show', 'data_update', 'sound_aka_update');
 
 ///////////////////////////////////////////////////////////////////////////////
