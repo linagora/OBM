@@ -3685,9 +3685,9 @@ function of_index_update($entity, $id=null) {
     $words = array();
     $mails = $obm_q->f('userobm_email');
     $words = explode("\r\n",$mails);
-    $words = array_merge($words, splitwords($obm_q->f('userobm_lastname')),'strtolower');
-    $words = array_merge($words, splitwords($obm_q->f('userobm_firstname')),'strtolower');
-    $words = array_merge($words, splitwords($obm_q->f('userobm_login')),'strtolower');
+    $words = array_merge($words, splitwords($obm_q->f('userobm_lastname'),'strtolower'));
+    $words = array_merge($words, splitwords($obm_q->f('userobm_firstname'),'strtolower'));
+    $words = array_merge($words, splitwords($obm_q->f('userobm_login'),'strtolower'));
     $words = array_unique($words);
     foreach($words as $word) {
       if(trim($word) != '') {
