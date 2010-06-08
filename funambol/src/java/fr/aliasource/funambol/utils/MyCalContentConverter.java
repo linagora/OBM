@@ -1156,7 +1156,7 @@ public class MyCalContentConverter extends VCalendarConverter {
 	private List getExDates(String exdate) {
 		// we sometime receive "2010032 3T150751Z"
 		String d = exdate;
-		if (exdate != null && exdate.length() == "2010032 3T150751Z".length()) {
+		if (exdate != null) {
 			d = d.replace(" ", "");
 		}
 		
