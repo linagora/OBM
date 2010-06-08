@@ -5698,8 +5698,7 @@ Class CalendarView {
         $data[$property] = $value;
       }
     }
-
-    if($data['users'] == NULL && $data['resources'] == NULL) {
+    if($data['group'] == NULL && $data['users'] == NULL && $data['resources'] == NULL) {
       $GLOBALS['display']['msg'] .= display_warn_msg($GLOBALS['l_view_invalid']);
     } else {
       $view = new CalendarView($data);
