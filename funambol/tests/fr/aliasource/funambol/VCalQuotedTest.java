@@ -43,6 +43,15 @@ public class VCalQuotedTest extends TestCase {
 		VCalendar xv = parser.XVCalendar();
 		assertNotNull(xv);
 	}
+	
+	public void testParsingTest1() throws IOException, ParseException {
+		String vcal = readTestFile("test1.vcal");
+		vcal = processVCal(vcal);
+		XVCalendarParser parser = new XVCalendarParser(new ByteArrayInputStream(vcal.getBytes()));
+		VCalendar xv = parser.XVCalendar();
+		assertNotNull(xv);
+	}
+	
 	public void testParsingSGA() throws IOException, ParseException {
 		String vcal = readTestFile("sga.vcal");
 		vcal = processVCal(vcal);

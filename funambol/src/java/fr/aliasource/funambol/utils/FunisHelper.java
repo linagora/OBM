@@ -38,7 +38,8 @@ public class FunisHelper {
 				concatNext = false;
 				quotedMode = false;
 			}
-			if (l.startsWith("DTSTART:") && !noQuoted.toString().endsWith("\n")) {
+			if ((l.startsWith("DTSTART:") || l.startsWith("DESCRIPTION"))
+					&& !noQuoted.toString().endsWith("\n")) {
 				noQuoted.append('\n');
 			}
 			noQuoted.append(l);
@@ -48,7 +49,8 @@ public class FunisHelper {
 			}
 		}
 
-		return noQuoted.toString();
+		String noq = noQuoted.toString();
+		return noq;
 	}
 
 	private static boolean nextLineIsIndented(String l) {
