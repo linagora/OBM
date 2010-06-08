@@ -562,6 +562,9 @@ class LDAP_Auth extends Auth {
     if(!$login) {
       return false;
     }
+    if(!trim($password) == '') {
+      return false;
+    }
     $auth_ldap_attribute = array("dn", "uid");
     $auth_ldap_sizelimit = 1;
     $auth_ldap_filter = str_replace('%u', $login, $auth_ldap_filter);
