@@ -891,7 +891,7 @@ function dis_admin_data_user($mode) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<h1>Updating user index</h1>";
+    echo "<h1>User index updated</h1>";
   }
 }
 
