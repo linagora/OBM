@@ -89,14 +89,14 @@ class Cron {
   function parseJobs($jobsPath) {
     $jobsFile = dir($jobsPath);
     while (false !== ($jobFile = $jobsFile->read())) {
-      if(is_file($jobsPath.$jobFile) && Cron::isCronJob($jobFile)) {
+      if((is_file($jobsPath.$jobFile) || is_link($jobsPath.$jobFile)) && Cron::isCronJob($jobFile)) {
         $klass = Cron::getCronJobClass($jobFile);
         $this->logger->debug("$klass registred");
         include_once($jobsPath.$jobFile);
         $this->jobs[] = new $klass;
       }
     }
-    $jobsFile->close();    
+    $jobsFile->close();
   }
 
   /**

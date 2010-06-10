@@ -21,7 +21,7 @@
 
 $path = pathinfo(__FILE__);
 $path = $path['dirname'];
-$includePath = realpath("$path/..");
+$includePath = realpath("$path/jobs").":".realpath("$path/..");
 $jobsPath = "$path/jobs/";
 
 ini_set('error_reporting', E_ALL & ~E_NOTICE);
