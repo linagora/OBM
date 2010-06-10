@@ -103,12 +103,12 @@ class GroupContactUpdate extends UpdateObject {
     $query = "INSERT INTO Email (email_entity_id,email_label,email_address) VALUES ($entityId, 'INTERNET;X-OBM-Ref1', '$mail')";
     $result = $this->query($query);
     $result->free();
-    echo "-- Inserting new contact from mail $mail : $lastname, $firstname with $id \n";
+    echo "-- Inserting new contact from mail $mail : $lastname, $firstname with id : $id \n";
     return $id;
   }
 
   private function storeGroupContacts($id, $contacts) {
-    echo "- Storing ".count($contacts)." from group $id \n";
+    echo "- Storing ".count($contacts)." contacts into group $id \n";
     if(empty($contacts)) return;
     $query = "
       INSERT INTO contactgroup (contact_id, group_id)
@@ -119,7 +119,7 @@ class GroupContactUpdate extends UpdateObject {
   }
 
   private function updateGroupHierarchy($id) {
-    echo "-- Updating hierarchy form $id\n";
+    echo "-- Updating hierarchy for group $id\n";
     $query = "DELETE FROM _contactgroup WHERE group_id = $id";
     $result = $this->query($query);
     $result->free();

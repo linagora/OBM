@@ -93,7 +93,7 @@ class DB {
     $Query_String = self::xParser($Query_String);
 
     if ($this->queryId) {
-      $this->free();
+      $this->queryId = null;
     }
 
     $this->queryId = @mysql_query($Query_String,$this->link);
