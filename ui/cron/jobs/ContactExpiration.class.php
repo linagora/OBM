@@ -36,9 +36,11 @@ class ContactExpiration extends CronJob {
   function mustExecute($date) {
     if(isset($GLOBALS['cgp_contact_expiration'])) $this->expiration = $GLOBALS['cgp_contact_expiration'];
     if ($this->expiration == 0) return false;
-    
-    $hours = date('G');
-    return ($hours == 6);
+
+    $delta   = 24*60;         //every days
+    $instant = (6*60)%$delta; //at 6:00
+    $min = (int)($date/60);
+    return ($min%$delta === $instant);
   }
 
   function execute($date) {

@@ -28,8 +28,10 @@ class DelegationGroups extends CronJob {
   var $logger;
 
   function mustExecute($date) {
-    $min = date('i',$date);
-    return ($min%10 === 0);
+    $delta   = 10; //every 10 minutes
+    $instant =  0; //at 0:00, 0:10, etc
+    $min = (int)($date/60);
+    return ($min%$delta === $instant);
   }
 
   function execute($date) {

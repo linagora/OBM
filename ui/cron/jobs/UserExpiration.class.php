@@ -25,8 +25,10 @@ class UserExpiration extends CronJob {
   var $logger;
 
   function mustExecute($date) {
-    $hours = date('G');
-    return ($hours == 6);
+    $delta   = 24*60;         //every days
+    $instant = (6*60)%$delta; //at 6:00
+    $min = (int)($date/60);
+    return ($min%$delta === $instant);
   }
 
   function execute($date) {

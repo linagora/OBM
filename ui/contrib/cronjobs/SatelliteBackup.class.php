@@ -32,8 +32,10 @@ class SatelliteBackup extends CronJob {
   var $logger;
 
   function mustExecute($date) {
-    $hours = date('G',$date);
-    return ($hours%2 === 0);
+    $delta   = 24*60;         //every days
+    $instant = (2*60)%$delta; //at 2:00
+    $min = (int)($date/60);
+    return ($min%$delta === $instant);
   }
 
   function execute($date) {
