@@ -6109,6 +6109,7 @@ function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null
   $document = $reader->getDocument();
   $writer = new Vcalendar_Writer_ICS();  
   $writer->writeDocument($document);
+  $document->destroy();
   header('Content-Type: text/x-vCalendar');
   header('Content-Disposition: inline; filename=ObmCalendar.ics');
   header('Cache-Control: maxage=3600'); 
