@@ -1031,6 +1031,7 @@ function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $res
   $document = $reader->getDocument();
   $writer = new Vcalendar_Writer_ICS();  
   $writer->writeDocument($document);
+  $document->destroy();
 
   $fd_dest = fopen ($filename,'w');
 
@@ -1068,6 +1069,7 @@ function run_query_icalendar_insert($params, $force = false) {
   $writer = new Vcalendar_Writer_OBM($force);  
   $writer->writeDocument($document);
   $nb_processed_event = count($document->getVevents());
+  $document->destroy();
 
   return array($nb_processed_event);
 }

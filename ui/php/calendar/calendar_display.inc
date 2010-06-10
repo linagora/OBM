@@ -438,7 +438,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"user\" autocomplete=\"off\" />
       <input type=\"hidden\" name=\"date\" value=\"".$date->getIso()."\" />
       <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
-      <input type=\"hidden\" name=\"new_group\" value=\"1\" />
     </fieldset>";
 
     $user_complete = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {filter_entity:'calendar', filter_pattern:'read', defaultText:'$user_text'});";
@@ -487,6 +486,8 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     $block_entity = "
     $block_group
     <form action=\"calendar_index.php\" method=\"get\">
+    <input type=\"hidden\" name=\"new_group\" value=\"1\" />
+    <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
     $block_user
     $dis_block_resource
     <fieldset class=\"detail extra\">
@@ -5921,6 +5922,7 @@ function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null
   $document = $reader->getDocument();
   $writer = new Vcalendar_Writer_ICS();  
   $writer->writeDocument($document);
+  $document->destroy();
   header('Content-Type: text/x-vCalendar');
   header('Content-Disposition: inline; filename=ObmCalendar.ics');
   header('Cache-Control: maxage=3600'); 
