@@ -23,7 +23,7 @@ class GroupContactUpdate extends UpdateObject {
       $words = array_unique($words);
       foreach($words as $word) {
         if(trim($word) != '') {
-          $query = "INSERT INTO _userpattern VALUES(".$result->f('userobm_id').", '".trim($word)."')";
+          $query = "INSERT INTO _userpattern VALUES(".$result->f('userobm_id').", '".addslashes(trim($word))."')";
           $result2 = $this->query($query);
           $result2->free();
         }
