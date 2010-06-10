@@ -77,4 +77,6 @@ $l_mail_quota_error = "Default quota exceeds maximum quota !";
 $l_quota_none = "none";
 $l_max_quota = 'Max value';
 
-
+$l_profile_public_access="Public access";
+$l_profile_public_read="Public read";
+$l_profile_public_write="Public write";

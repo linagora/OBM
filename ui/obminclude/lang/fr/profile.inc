@@ -83,3 +83,7 @@ $l_mail_quota_error = "Le quota par défaut ne peux pas être supèrieur au quot
 $l_max_quota = 'Valeur max';
 
 $l_profile_exists= "Ce nom de profil est déjà utilisé";
+
+$l_profile_public_access="Accès public";
+$l_profile_public_read="Lecture publique";
+$l_profile_public_write="Écriture publique";

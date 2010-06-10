@@ -559,6 +559,8 @@ function dis_property_admin_realm_value($value, $update=false) {
  * @return void
  */
 function dis_property_default_right($value, $update = false) {
+  global $l_profile_public_access, $l_profile_public_read, $l_profile_public_write;
+
   $modules = array('calendar', 'mailbox', 'mailshare', 'resource', 'addressbook');
   $rights = array('access', 'read', 'write');
   if($update) {
@@ -596,7 +598,7 @@ function dis_property_default_right($value, $update = false) {
     }
     return "<table class='spreadSheet'>
       <thead>
-      <tr><th></th><th>Accès publique</th><th>Lecture publique</th><th>Ecriture publique</th></tr>
+      <tr><th></th><th>".$l_profile_public_access."</th><th>".$l_profile_public_read."</th><th>".$l_profile_public_write."</th></tr>
       </thead>
       <tbody>
       $table
@@ -629,7 +631,7 @@ function dis_property_default_right($value, $update = false) {
     }
     return "<table class='spreadSheet'>
       <thead>
-      <tr><th></th><th>Accès publique</th><th>Lecture publique</th><th>Ecriture publique</th></tr>
+      <tr><th></th><th>".$l_profile_public_access."</th><th>".$l_profile_public_read."</th><th>".$l_profile_public_write."</th></tr>
       </thead>
       <tbody>
       $table
