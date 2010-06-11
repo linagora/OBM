@@ -1208,12 +1208,6 @@ function check_contact_update_rights($params, $c='') {
 
   if ($id > 0) {
 
-    // Check update right is set
-    if (! $perm->check_right('contact', $actions['contact']['update']['Right'])) {
-      $err['msg'] .= $l_error_permission;
-      return false;
-    }
-
     // XXXXX Check addressbook write_access ?
     $contact = OBM_Contact::get($id);
     $addressbook = OBM_AddressBook::get($contact->addressbook_id);
@@ -1328,51 +1322,6 @@ function check_can_delete_contact($p_id) {
   if (function_exists('hook_pre_check_can_delete_contact')) {
     if (! hook_pre_check_can_delete_contact($p_id)) {
       return false;
-    }
-  }
-
-  // XXXXX Check addressbook write_access ?
-
-  // Links from deals
-  if ($cgp_show['module']['deal']) {
-    $nb = get_global_linked_deal_nb($p_id, 'contact1', true, 'contact2');
-    if ($nb > 0) {
-      $delete_ok = false;
-      $err['msg'] .= "$l_link_deal";
-    } else {
-      $ok_msg .= "$l_link_deal_no";
-    }
-  }
-
-  // Links from lists
-  if ($cgp_show['module']['list']) {
-    $nb = get_linked_contact_list_nb($p_id);
-    if ($nb > 0) {
-      $delete_ok = false;
-      $err['msg'] .= "<br />$l_link_list";
-    } else {
-      $ok_msg .= "<br />$l_link_list_no";
-    }
-  }
-
-  // Links from Contract
-  if ($cgp_show['module']['contract']) {
-    $nb = get_global_linked_contract_nb($p_id, 'contact1', true, 'contact2');
-    if ($nb > 0) {
-      $delete_ok = false;
-      $err['msg'] .= "<br />$l_link_contract";
-    } else {
-      $ok_msg .= "<br />$l_link_contract_no";
-    }
-  }
-  if ($cgp_show['module']['publication']) {
-    // Links from Publications (Subscriptions)
-    $nb = get_linked_contact_publication_nb($p_id);
-    if ($nb > 0) {
-      $delete_ok = false;
-      $err['msg'] .= "<br />$l_link_publication";
-    } else {
-      $ok_msg .= "<br />$l_link_publication_no";
     }
   }
   return $delete_ok;

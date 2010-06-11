@@ -4967,6 +4967,13 @@ function dis_calendar_free_interval($current_view, $calendar) {
   }
 
   $resources = array();
+  if(is_array($entities_resources)) {
+    foreach($entities_resources as $index => $data) {
+      $resources[$data['id']] = $data;
+    }
+  }
+  $entities_resources = $resources;
+  $resources = array();
   if (!empty($entities_resources)) {
     $accessList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'resource', 'access', array_keys($entities_resources));
     $resourceReadableList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'resource', 'read',array_keys($entities_resources));
