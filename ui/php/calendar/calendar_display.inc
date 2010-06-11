@@ -3676,7 +3676,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if ($event_q=='') { $is_exception = $calendar['is_exception']; }
   // If parameters have been given, they supercede the default action value
   if (isset($calendar['calendar_id'])) { $id = $calendar['calendar_id']; }
-  if (isset($calendar['title'])) { $title = stripslashes($calendar['title']); }
+  if (isset($calendar['title'])) { $title = stripslashes(str_replace('"',"'",$calendar['title'])); }
   if (isset($calendar['location'])) { $location = stripslashes($calendar['location']); }
   if (isset($calendar['category1'])) { $cat1 = $calendar['category1']; }
   if (isset($calendar['owner'])) {$owner = $calendar['owner'];} elseif(!$owner) {$owner = $uid;}
