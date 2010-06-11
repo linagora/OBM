@@ -344,7 +344,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $addressbook = $addressbooks[$contact->addressbook_id];
     $current['addressbook'] = $addressbook->id;
     $current['contact'] = $contact->id;
-    if ($addressbook && $addressbook->write) {
+    if ($addressbook && $addressbook->write && check_contact_update_rights($params)) {
       $subTemplate['card'] = new OBM_Template('form');
       $subTemplate['card']->set('categories', of_category_user_get_all('contact'));
       $subTemplate['card']->set('functions', run_query_contact_get_functions());
@@ -369,7 +369,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $current['addressbook'] = $addressbook->id;
     $current['contact'] = $params['id'];
     
-    if ($addressbook && $addressbook->write) {
+    if ($addressbook && $addressbook->write && (check_contact_update_rights($params))) {
       if (check_user_defined_rules() && check_contact_data_form('', $params)) {
         if(isset($params['id'])) {
           $c = OBM_Contact::get($params['id']);
@@ -443,7 +443,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $contact = OBM_Contact::get($params['id']);
     $current['addressbook'] = $addressbook->id;
     $addressbook = $addressbooks[$contact->addressbook_id];
-    if ($addressbook && $addressbook->write) {
+    if ($addressbook && $addressbook->write && check_can_delete_contact($params['id'])) {
       if($contact->archive) {
         OBM_Contact::delete($contact);
       } else {
