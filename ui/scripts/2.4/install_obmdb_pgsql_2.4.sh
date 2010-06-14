@@ -92,11 +92,19 @@ EOF
 
 if [ -d updates ]; then
   pushd updates
-  for i in `ls -1 *pgsql.sql | sed -e 's/update-2.4.//g' | sort -n`; do
-    echo " Insert Update sql file update-2.4.${i}"
-      psql -U ${user} -h ${host} ${db} -f \
-        update-2.3.$i >> /tmp/data_insert.log 2>&1
-    done
+  for i in `ls -v1 *pgsql.sql`; do
+    echo " Insert Update sql file ${i}"
+    phpfile=`echo $i | sed 's/pgsql.sql/pre.php/g'`
+    if test -f "$phpfile"; then
+      $PHP "$phpfile"
+    fi    
+    psql -U ${user} -h ${host} ${db} -f \
+      $i >> /tmp/data_insert.log 2>&1
+    phpfile=`echo $i | sed 's/pgsql.sql/post.php/g'`
+    if test -f "$phpfile"; then
+      $PHP "$phpfile"
+    fi      
+  done
   popd
 fi
 

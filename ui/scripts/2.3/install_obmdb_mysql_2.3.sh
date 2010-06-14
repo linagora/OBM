@@ -64,8 +64,16 @@ test $? -eq 0 || {
 echo "UPDATE UserObmPref set userobmpref_value='$obm_lang' where userobmpref_option='set_lang'" | mysql -u $user -p$pw $db
 
 pushd updates
-for i in `ls -1 *mysql.sql | sed -e 's/update-2.3.//g' | sort -n`; do
-  echo " Insert Update sql file update-2.3.${i}"
-  mysql --default-character-set='UTF8' -u $user -p$pw $db < update-2.3.$i 
+for i in `ls -v1 *mysql.sql`; do
+  echo " Insert Update sql file ${i}"
+  phpfile=`echo $i | sed 's/mysql.sql/pre.php/g'`
+  if test -f "$phpfile"; then
+    $PHP "$phpfile"
+  fi  
+  mysql --default-character-set='UTF8' -u $user -p$pw $db < $i
+  phpfile=`echo $i | sed 's/mysql.sql/post.php/g'`
+  if test -f "$phpfile"; then
+    $PHP "$phpfile"
+  fi
 done
 popd

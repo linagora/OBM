@@ -29,6 +29,8 @@ echo "install lang = $OBM_LANG"
 
 
 
+locate_php_interp
+
 echo "*** Document repository creation"
 ./install_document_2.4.sh
 
