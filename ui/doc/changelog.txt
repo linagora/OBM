@@ -1,13 +1,21 @@
 <!-- $Id:$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.7 - 2010-05-21
-2010-05-21 : version 2.3.8
+version 2.3.8 - 2010-06-14
+
+2010-06-30 : version 2.3.9
 
   * #658 [Sync] OPush needs to be production proof for 2.3.0
   * #1171 [Package] install breaks on sid 
-  * #1211 [Calendar] search only displays event with users from the last view
-  * #1269 [Contact] Can't choose primary coords
+
+2010-06-14 : version 2.3.8
+
+  * #1117 [Calendar] Can't dismiss event creation popup with "escape"shortcut
+  * #1278 [Sync] Synchonization error
+  * #1327 [Calendar] error on inserting an event with only resources
+  * #1332 [SSO] LemonLDAP must not sync user mailserver when obm-mail is false
+  * #1333 [LDAP] Added aliases store in wrong LDAP attribute
+  * #1335 [Calendar] views created with only an user group are broken
 
 2010-05-21 : version 2.3.7
 
