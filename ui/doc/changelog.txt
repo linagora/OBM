@@ -30,6 +30,7 @@ version 2.3.7 - 2010-05-21
   * #1309 [Contact] right management addressbook owner not displayed in select
   * #1310 [Calendar] ICS import does not set a default value for opacity
   * #1316 [Freebusy] repeat events handling
+  * #1326 [sso] LemonLDAP Connector - user account sync fails in syncUserInfo
 
 2010-04-28 : version 2.3.6
 
