@@ -35,7 +35,7 @@ function run_query_planning_month($time) {
   $query = "
     SELECT
       plannedtask_id,
-      concat(project_name,' - ',company_name) as label,
+      #CONCAT(project_name,' - ',company_name) as label,
       project_shortname as shortname,
       project_id as id,
       project_tasktype_id as tasktype_id,
@@ -93,7 +93,7 @@ function run_query_plannedtask_projects($user,$project=null)
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('project');
 
-  $query = "SELECT project_id,project_name,company_name
+  $query = "SELECT distinct project_id,project_name,company_name
     FROM Project
     JOIN ProjectUser on project_id=projectuser_project_id
     LEFT JOIN Company on project_company_id=company_id
@@ -103,7 +103,6 @@ function run_query_plannedtask_projects($user,$project=null)
   if($project)
   $query.=" OR project_id=$project";
   $query.="
-    group by project_id
     ORDER BY project_name";
   display_debug_msg($query, $cdg_sql, 'run_query_plannedtask_projects()');
   $obm_q->query($query) ;
@@ -120,9 +119,10 @@ function run_query_planning_groups() {
 
   $query = "SELECT group_id,group_name
     FROM UGroup
-    WHERE (group_privacy='O' or (group_privacy='1' and group_usercreate=".$obm['uid'].") )
-    AND group_id in (".implode(",",$cplanning_groups).")
-    order by group_name";
+    WHERE (group_privacy='0' or (group_privacy='1' and group_usercreate=".$obm['uid'].") )";
+  if(is_array($cplanning_groups))
+  $query.= " AND group_id in (".implode(",",$cplanning_groups).")";
+  $query.= " order by group_name";
   display_debug_msg($query, $cdg_sql, 'run_query_planning_groups()');
   $obm_q = new DB_OBM;
 
@@ -321,7 +321,6 @@ function separate_week_items($datebegin,$dateend)
   if($d1)
   add_week_item($result,$d1,$d);
 
-//var_dump($result); die("DBG!");
   return $result;
 }
 
@@ -338,7 +337,7 @@ function run_query_plannedtask_insert($plannedtask) {
   $id = $plannedtask['id'];
   $project = $plannedtask['project']!=0?"'".$plannedtask['project']."'":'null';
   $task = $plannedtask['task']!=0?"'".$plannedtask['task']."'":'null';
-  $overrun = $plannedtask['overrun'];
+  $overrun = ($plannedtask['overrun']=='1'?'TRUE':'FALSE');
   $comment = $plannedtask['comment'];
   $user = $plannedtask['user'];
   $datebegin = of_isodate_convert($plannedtask['datebegin']);
@@ -375,7 +374,7 @@ function run_query_plannedtask_insert($plannedtask) {
     '$domain_id',
     $project,
     $task,
-    '$overrun',
+    $overrun,
     '$comment',
     '$user',
     '$datebegin',
@@ -403,7 +402,7 @@ function run_query_plannedtask_update($plannedtask) {
   $id = $plannedtask['id'];
   $project = $plannedtask['project']!=0?$plannedtask['project']:'null';
   $task = $plannedtask['task']!=0?$plannedtask['task']:'null';
-  $overrun = $plannedtask['overrun'];
+  $overrun = ($plannedtask['overrun']=='1'?'TRUE':'FALSE');
   $comment = $plannedtask['comment'];
   $user = $plannedtask['user'];
   $datebegin = of_isodate_convert($plannedtask['datebegin']);
@@ -417,7 +416,7 @@ function run_query_plannedtask_update($plannedtask) {
     plannedtask_userupdate='$obm[uid]',
     plannedtask_project_id=$project,
     plannedtask_tasktype_id=$task,
-    plannedtask_overrun='$overrun',
+    plannedtask_overrun=$overrun,
     plannedtask_comment='$comment',
     plannedtask_user_id='$user',
     plannedtask_datebegin='$datebegin',
@@ -560,12 +559,10 @@ function check_plannedtask_data_form($plannedtask,&$conflict_id) {
 function get_planning_groups($group_ids)
 {
   // Coutournement du bug sur la perte de groupe sélectionné (valeur =-1)
-  // TODO : corriger ce bug
   if($group_ids==-1) 
-  $group_ids = get_planning_default_displayed_groups();
+  $group_ids = array();
 
   pt_assert(is_array($group_ids),__FILE__,__LINE__,"get_planning_groups",'quiet',$group_ids);
- 
   $groups = array();
   foreach($group_ids as $g_id)
   {
