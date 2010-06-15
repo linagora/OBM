@@ -42,6 +42,14 @@ define("S_DISPO_NINTERCO_NNFACT_NRD_NDEP",27);
 //   - $plarams[] : parameters hash
 ///////////////////////////////////////////////////////////////////////////////
 function dis_planning_view($params) {
+
+  if(count($params['group_id'])==0)
+  {
+    global $display,$l_err_planning_no_group_selected;
+    $display['msg'] .= display_warn_msg($l_err_planning_no_group_selected);
+    return "";
+  }
+
   $obm_q = run_query_planning_month($params);
   $block = dis_planning_user_month($obm_q, $params);
 
@@ -282,19 +290,16 @@ function dis_planning_user_month($obm_q, $params ) {
        si après-midi (2) => cas en bas mais sans rowspan
     */
 
-    // Matin
-    if($period==1)
-    $planning[$u_id][$day][1]["rowspan"]=1;
-    // Après-midi
-    else if($period==2)
-    $planning[$u_id][$day][2]["rowspan"]=1;
+    // Matin ou aprem
+    if($period=='MORNING' || $period=='AFTERNOON')
+    $planning[$u_id][$day][$period]["rowspan"]=1;
     // Journée complete
     else
     {
-      $period=1;
-      $planning[$u_id][$day][1]["rowspan"]=2;
+      $period='MORNING';
+      $planning[$u_id][$day]['MORNING']["rowspan"]=2;
       $skip = $dayend-$day;
-      $planning[$u_id][$day][2] = $skip;  // cellules vides, à sauter (car colspan)
+      $planning[$u_id][$day]['AFTERNOON'] = $skip;  // cellules vides, à sauter (car colspan)
     } 
 
     $planning[$u_id][$day][$period]["type"] = $type;
@@ -330,7 +335,7 @@ function dis_planning_user_month($obm_q, $params ) {
   <a href=\"$url_next\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
   </h1>";
 
-  $block .= "<table \"planning\">\n";
+  $block .= "<table class=\"planning\">\n";
 
   $d = dis_planning_month_userslines($year,$month,$first_day,$last_day,$params['group_id'],&$array_res,&$planning,&$stats);
 
@@ -406,9 +411,9 @@ function dis_planning_month_userslines($year,$month,$first_day,$last_day,$group_
       }
 
       $user_planning = $planning[$u_id];
-      for($period=1;$period<=2;$period++)
+      foreach(array('MORNING','AFTERNOON') as $period)
       {
-        if($period==1)
+        if($period=='MORNING')
         {
           $block.= "<tr><td rowspan=\"2\" style=\"color:#aaaaaa\">".($i+1)."</td>";
           $block .= "<td rowspan=\"2\">$user_name</td>";
@@ -420,7 +425,7 @@ function dis_planning_month_userslines($year,$month,$first_day,$last_day,$group_
           // C'est un week-end (samedi+dimanche)
           if($array_res[$day]['dow']==6 )
           {
-            if($period==1)
+            if($period=='MORNING')
             {
               $s = 2;
               $r = 2;
@@ -461,9 +466,7 @@ function dis_planning_month_userslines($year,$month,$first_day,$last_day,$group_
             $mdatebegin = "$year-$month-".sprintf("%02d",$day);
             $s = 1;
             $r = 1; //$user_planning[$day][$period]["rowspan"];
-            //$block.= html_plannedtask_cell($s,$r,"white","$day|$period","action=new&amp;datebegin=$mdatebegin&amp;user=$u_id&period=$period");
-            //$block.= html_plannedtask_cell($s,$r,"white","D","action=new&amp;datebegin=$mdatebegin&amp;user=$u_id&period=$period");
-            $block.= html_plannedtask_cell($s,$r,"white","_","action=new&amp;datebegin=$mdatebegin&amp;user=$u_id&period=0".($j>0?"&line=$j":""));
+            $block.= html_plannedtask_cell($s,$r,"white","_","action=new&amp;datebegin=$mdatebegin&amp;user=$u_id&period=ALLDAY".($j>0?"&line=$j":""));
             $type=S_INTERCONTRAT;
             inc_stats(&$stats,$day,$s,$r,$type);
           }
@@ -662,7 +665,7 @@ function html_plannedtask_consult($plannedtask_q) {
   global $cgp_use, $l_domain, $l_insert, $l_update, $l_delete, $l_back,$l_web_list;
   global $l_module_planning, $l_begin, $l_end, $l_project;
   global $l_tasktype, $l_overrun, $l_comment, $l_user;
-  global $period, $morning, $afternoon, $entireday;
+  global $period, $l_plannedtask_periods;
   global $l_activity, $l_header_man_affect;
   global $display, $obm;
   
@@ -720,14 +723,8 @@ function html_plannedtask_consult($plannedtask_q) {
   }
   $sel_task .= '</select>';
 
-  // TODO : globaliser et internationnaliser cette chaine
-  $plannedtask_periods = array (
-    1 => $l_morning,
-    2 => $l_afternoon,
-    0 => $l_entireday
-  );
   $sel_period = "<select name=\"sel_period\">";
-  foreach($plannedtask_periods as $p => $l) {
+  foreach($l_plannedtask_periods as $p => $l) {
     $sel_period .= "<option value=\"$p\"";
     if ($period == $p) $sel_period .= " selected = \"selected\""; 
     $sel_period .= ">$l</option>\n";
@@ -863,7 +860,7 @@ function get_plannedtask_string($plannedtask_id)
 function html_plannedtask_form($action, $plannedtask_q, $plannedtask, $field='', $conflict_id=null) {
   global $cgp_use, $l_domain, $l_insert, $l_update, $l_delete, $l_back,$l_web_list;
   global $l_module_planning, $l_begin, $l_end, $l_project, $l_tt, $l_overrun, $l_comment, $l_user;
-  global $l_period, $l_morning, $l_afternoon, $l_entireday;
+  global $l_period, $l_plannedtask_periods;
   global $l_activity, $l_header_man_affect, $l_err_plannedtask_event_in_conflit;
   global $display, $obm;
   
@@ -894,8 +891,8 @@ function html_plannedtask_form($action, $plannedtask_q, $plannedtask, $field='',
   if (isset($plannedtask['overrun'])) { $overrun = $plannedtask['overrun']; }
   if (isset($plannedtask['comment'])) { $comment = $plannedtask['comment']; }
 
-  if (!$dateend) { $dateend = $datebegin; }
-
+  if(!$dateend) $dateend = $datebegin;
+  if(!$period) $period='ALLDAY';
   // overrun checkbox checked value
   $overrun_state  = ($overrun ? 'checked' : '');
 
@@ -946,14 +943,8 @@ function html_plannedtask_form($action, $plannedtask_q, $plannedtask, $field='',
   }
   $sel_task .= '</select>';
 
-  // TODO : globaliser et internationnaliser cette chaine
-  $plannedtask_periods = array (
-    1 => $l_morning,
-    2 => $l_afternoon,
-    0 => $l_entireday
-  );
   $sel_period = "<select name=\"sel_period\">";
-  foreach($plannedtask_periods as $p => $l) {
+  foreach($l_plannedtask_periods as $p => $l) {
     $sel_period .= "<option value=\"$p\"";
     if ($period == $p) $sel_period .= " selected = \"selected\""; 
     $sel_period .= ">$l</option>\n";
@@ -1093,7 +1084,7 @@ function html_tasktypegroup_select($tasktype_id,$tasktypegroup_sel,$tasktypegrou
 //   - $ttg_q : DBO : TaskType Group list
 ///////////////////////////////////////////////////////////////////////////////
 function html_planning_admin_form($ttg_q,$tasktypegroups) {
-  global $l_label, $l_code, $l_bgcolor,$l_fgcolor ;
+  global $l_label, $l_code, $l_bgcolor, $l_fgcolor ;
   global $l_tasktypegroup_insert, $l_tasktypegroup_update;
   global $l_tasktypegroup_manage,$l_status_exist,$l_status_new,$l_c_new;
   global $l_type_label,$l_order,$ico_delete,$ico_ok;

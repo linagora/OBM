@@ -198,7 +198,7 @@ function get_planning_params() {
 ///////////////////////////////////////////////////////////////////////////////
 function update_planning_session_params() {
   global $params, $obm;
-  global $cplanning_groups;
+  global $cplanning_groups,$cplanning_default_group;
   
   // We retrieve the selected groups if any
   if (isset ($params['group_id']))
@@ -210,25 +210,19 @@ function update_planning_session_params() {
     $group_ids = get_one_user_pref($obm['uid'],'last_planning');
     if(isset($group_ids))
     $params['group_id'] = explode(',',$group_ids[$obm['uid']]['value']);
+    elseif(isset($cplanning_default_group))
+    $params['group_id'] = array($cplanning_default_group);
     else
-    $params['group_id'] = get_planning_default_displayed_groups();
+    $params['group_id'] = array();
   }
 
   // define the group list if unset in the configuration
   if(!is_array($cplanning_groups))
-  $cplanning_groups = array($obm['group_prod']);
+  {
+    if($obm['group_id']>0)
+    $cplanning_groups = array($obm['group_prod']);
+  }
 }
-
-function get_planning_default_displayed_groups()
-{
-  global $cplanning_default_group ,$obm;
-  // Use the default planning group if defined in configuration
-  if(isset($cplanning_default_group))
-  return array($cplanning_default_group);
-  // Otherwise, use the production system group defined for the domain
-  else
-  return array($obm['group_prod']);
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Planning Action 
