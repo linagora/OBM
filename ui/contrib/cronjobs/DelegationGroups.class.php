@@ -55,8 +55,11 @@ class DelegationGroups extends CronJob {
         $parent_id = $this->getDelegationGroup($domain_id, $parent);
         $this->associatesDelegationGroups($parent_id, $group_id);
       }
+      $groups[$group_id] = "group:$group_id";
+    }
+
+    foreach ($groups as $group_id => $ignore) {
       of_usergroup_update_group_node($group_id);
-      array_push($groups, "group:$group_id");
     }
 
     // automate
@@ -69,9 +72,9 @@ class DelegationGroups extends CronJob {
   protected function delegationGroupName($delegation) {
     include("obminclude/lang/".$GLOBALS[ini_array][lang]."/global.inc");
     if ($delegation == "/") {
-      $name = $l_all;
+      $name = "Tous";
     } else {
-      $name = "$l_all.$delegation";
+      $name = "Tous .$delegation";
     }
     return $name;
   }
