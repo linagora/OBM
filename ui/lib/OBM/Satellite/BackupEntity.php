@@ -88,7 +88,6 @@ $this->login = $login;
     //calendar
     if (isset($data['calendar']))
       $sxml->addChild('calendar',base64_encode($data['calendar']));
-file_put_contents("/tmp/{$this->login}.ics",$data['calendar']);
 
     //privateContacts
     if (isset($data['privateContact'])) {
@@ -99,7 +98,6 @@ file_put_contents("/tmp/{$this->login}.ics",$data['calendar']);
       }
     }
 
-file_put_contents("/tmp/{$this->login}.xml",$sxml->asXML());
     return $sxml->asXML();
   }
 
