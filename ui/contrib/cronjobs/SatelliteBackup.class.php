@@ -47,6 +47,7 @@ class SatelliteBackup extends CronJob {
   }
 
   protected function processDomain($domain_id, $domain_name) {
+    global $obminclude;
     include("$obminclude/lang/en/backup.inc");
 
     $this->logger->debug("Processing users and mailshares of domain $domain_name (id: $domain_id)");
