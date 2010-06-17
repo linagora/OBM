@@ -205,7 +205,7 @@ sub getParameter {
                     $self->_log( 'Trop de parametres de mise a jour precise', 0 );
                     die;
                 }else{
-                    $self->_log( 'Uniquement les mises a jour de l\'utilisateur d\'identifiant \''.$parameters->{'user'}.'\'', 0 );
+                    $self->_log( 'Uniquement les mises a jour de l\'utilisateur d\'identifiant \''.$parameters->{'user'}.'\'', 2 );
                 }
         
             }elsif( exists($parameters->{'delegation'}) ) {
@@ -213,7 +213,7 @@ sub getParameter {
                     $self->_log( 'Trop de parametres de mise a jour precise', 0 );
                     die;
                 }else {
-                    $self->_log( 'Uniquement les mises a jour de la delegation \''.$parameters->{'delegation'}.'\'', 0 );
+                    $self->_log( 'Uniquement les mises a jour de la delegation \''.$parameters->{'delegation'}.'\'', 2 );
                 }
             }
 
