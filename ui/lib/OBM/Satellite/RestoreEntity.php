@@ -106,7 +106,7 @@ class OBM_Satellite_RestoreEntity extends OBM_Satellite_Query {
     if (empty($this->data) || $this->data=='all' || $this->data=='calendar') {
       $calendar = $sxml->calendar;
       if ($calendar) {
-        $return['calendar'] = $this->putToTmpFile((string)$calendar);
+        $return['calendar'] = $this->putToTmpFile(base64_decode((string)$calendar));
       }
     }
 
@@ -116,7 +116,7 @@ class OBM_Satellite_RestoreEntity extends OBM_Satellite_Query {
         $return['privateContact'] = array();
         foreach ($privateContact->addressBook as $addBook) {
           $addBookName = (string)$addBook['name'];
-          $return['privateContact'][$addBookName] = $this->putToTmpFile((string)$addBook);
+          $return['privateContact'][$addBookName] = $this->putToTmpFile(base64_decode((string)$addBook));
         }
       }
     }

@@ -32,6 +32,7 @@ class OBM_Satellite_BackupEntity extends OBM_Satellite_Query {
   protected function buildUrl($args) {
     extract($args);   //create $host, $entity, $login and $realm
     $port = OBM_Satellite_ICredentials::$port;
+$this->login = $login;
     return "https://{$host}:{$port}/backupentity/{$entity}/{$login}@{$realm}";
   }
 
@@ -86,17 +87,19 @@ class OBM_Satellite_BackupEntity extends OBM_Satellite_Query {
 
     //calendar
     if (isset($data['calendar']))
-      $sxml->addChild('calendar',$data['calendar']);
+      $sxml->addChild('calendar',base64_encode($data['calendar']));
+file_put_contents("/tmp/{$this->login}.ics",$data['calendar']);
 
     //privateContacts
     if (isset($data['privateContact'])) {
       $privateContact = $sxml->addChild('privateContact');
       foreach ($data['privateContact'] as $addBookName => $addBook) {
-        $xmlAddressBook = $privateContact->addChild('addressBook',$addBook);
+        $xmlAddressBook = $privateContact->addChild('addressBook',base64_encode($addBook));
         $xmlAddressBook->addAttribute('name', $addBookName);
       }
     }
 
+file_put_contents("/tmp/{$this->login}.xml",$sxml->asXML());
     return $sxml->asXML();
   }
 
