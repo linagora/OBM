@@ -773,11 +773,14 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
       this.textChangedFunc();
     } else if (this.inputField.value != this.currentValue && this.inputField.value != this.options.defaultText) {
       this.currentValue = this.inputField.value;
+      /*
       if(this.currentValue == '*'){
         var value = 'email:('+this.currentValue+')';
       } else {
         var value = 'email:('+this.currentValue+'*)';
       }
+      */
+      var value = this.currentValue;
       this.textChangedFunc();
       this.requestId++;
       new Request.JSON({

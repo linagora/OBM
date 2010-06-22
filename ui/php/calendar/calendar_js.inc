@@ -799,6 +799,7 @@ function showSharePopup(type,format,token){
   var popup = $('sharePopup');
   if(popup){
     obm.popup.popups.erase('sharePopup');
+    popup.getParent().dispose().destroy();
   }
   var elem = new Element('a');
   if(type=='private'){
@@ -840,6 +841,7 @@ function sendSharePopup(type,format){
   var popup = $('sharePopup');
   if(popup){
     obm.popup.popups.erase('sharePopup');
+    popup.getParent().dispose().destroy();
   }
   if(type=='private'){
     var title = \"$l_send_calendar_private\";
@@ -885,6 +887,7 @@ function reinitSharePopup(type){
   var popup = $('sharePopup');
   if(popup){
     obm.popup.popups.erase('sharePopup');
+    popup.getParent().dispose().destroy();
   }
   if(type=='private'){
     var title = \"$GLOBALS[l_reinit_calendar_private]\";
