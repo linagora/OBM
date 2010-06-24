@@ -43,7 +43,7 @@ $REGEX_EMAIL_RIGHT = $REGEX_DOMAIN;
 $REGEX_ROOTLDAP = "^dc=(.+),dc=.+\$";
 
 # Login regexp
-$REGEX_LOGIN = "^([a-z0-9][a-z0-9-._]{1,64})\$";
+$REGEX_LOGIN = "^([a-z0-9][a-z0-9-._]{0,63})\$";
 
 # Realm regexp
 $REGEX_REALM = $REGEX_DOMAIN;
@@ -67,4 +67,4 @@ $REGEX_HOSTNAME = '^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$';
 $REGEX_GROUPNAME = '^[\W\w0-9]([\W\w0-9-._ ]{0,252}[\W\w0-9]){0,1}$';
 
 # Mailshare
-$REGEX_MAILSHARE_NAME = '^[a-z0-9][a-z0-9-._]{0,30}[a-z0-9]$';
+$REGEX_MAILSHARE_NAME = $REGEX_LOGIN;
