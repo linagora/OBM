@@ -80,27 +80,28 @@ sub _putMethod {
             } );
     }
 
-    my $entity = $1;
+    my $entityType = $1;
+    my $entity = undef;
     SWITCH: {
-        if( $entity eq 'user' ) {
+        if( $entityType eq 'user' ) {
             $entity = ObmSatellite::Modules::BackupEntity::user->new( $2 );
             last SWITCH;
         }
 
-        if( $entity eq 'mailshare' ) {
+        if( $entityType eq 'mailshare' ) {
             $entity = ObmSatellite::Modules::BackupEntity::mailshare->new( $2 );
             last SWITCH;
         }
 
         return $self->_response( RC_NOT_FOUND, {
-            content => [ 'Unknow entity \''.$entity.'\'' ]
+            content => [ 'Unknow entity \''.$entityType.'\'' ]
             } );
     }
 
     if( !defined($entity) ) {
         return $self->_response( RC_BAD_REQUEST, {
             content => [ 'Invalid login '.$requestUri ],
-            help => [ $self->getModuleName().' URI must be : /backupentity/'.$entity.'/<login>@<realm>' ]
+            help => [ $self->getModuleName().' URI must be : /backupentity/'.$entityType.'/<login>@<realm>' ]
             } );
     }
 

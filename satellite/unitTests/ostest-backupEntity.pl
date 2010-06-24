@@ -262,7 +262,8 @@ while( my($entityType, $entityLogin) = each(%entityType) ) {
                 }
             }
         }else {
-            print '[KO]'."\n";
+            print 'Restore calendar for entity \''.$entityType.'\', login \''.$entityLogin.'\' [KO]'."\n";
+            print 'No backup found'."\n";
             $errorCode++;
         }
     }
