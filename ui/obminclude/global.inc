@@ -722,10 +722,10 @@ $php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}-[0-9]{1,2}.[0-9]{1,2}(.[0-9]{1,2
 
 if($cgp_use['service']['samba']) {
   $php_regexp_password = "/^[-\$\\\&~#{([|_`^@);\]+=}%!:\/\.,?<>\"\w0-9]{4,12}$/";
-  $php_regexp_login = "/^[a-z0-9][a-z0-9-._]{1,31}$/";
+  $php_regexp_login = "/^[a-z0-9][a-z0-9-._]{0,31}$/";
 } else {
   $php_regexp_password = "/^[-\$\\\&~#{([|_`^@);\]+=}%!:\/\.,?<>\"\w0-9]{4,20}$/";
-  $php_regexp_login = "/^[a-z0-9][a-z0-9-._]{1,64}$/";
+  $php_regexp_login = "/^[a-z0-9][a-z0-9-._]{0,63}$/";
 }
 
 $php_regexp_groupname = "/^[\w0-9]([\w0-9-._ ]{0,252}[\w0-9]){0,1}$/"; // group name
