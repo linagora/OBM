@@ -107,7 +107,7 @@ class CalendarMailer extends OBM_Mailer {
   protected function resourceCancel($event, $resourceOwners) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($resourceOwners);
-    $this->subject = __('Event cancelled on OBM: %title%', array('%title%' => $event->title));
+    $this->subject = __('Resource reservation cancelled on OBM: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
   }
   
