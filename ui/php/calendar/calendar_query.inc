@@ -5341,7 +5341,7 @@ function run_query_calendar_reset($id,$params) {
     LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id
     WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") AND event_date < '$date'
       AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL
-    GROUP BY event_id HAVING COUNT(*) = 1";
+    GROUP BY event_id HAVING COUNT(*) = 1 AND MAX(userentity_user_id) = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(1)');
   $obm_q->query($query);
 
