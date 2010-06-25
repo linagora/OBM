@@ -2573,8 +2573,14 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
 
   if (!empty($calendar['sel_user_id'])) {
     $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $calendar['sel_user_id']));
+  } else {
+    $readable['user'] = array();
   }
-  $readable['resource'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read', $calendar['sel_resource_id']));
+  if (!empty($calendar['sel_user_id'])) {
+    $readable['resource'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read', $calendar['sel_resource_id']));
+  } else {
+    $readable['ressource'] = array();
+  }
 
   $datebegin = clone $calendar["date_begin"];
   $dateend = clone $calendar["date_end"];
