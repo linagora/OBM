@@ -84,7 +84,7 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
     if(property_exists($this, $property)) {
       return $this->$property;
     } else {
-      throw new InvalidArgumentException($property.' property is not supported');
+      throw new InvalidArgumentException('The '.$property.' property is not supported');
     }
   }
 
@@ -646,6 +646,8 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function send($old, $new, $attendees, $attendeesState=null) {
+    if(!$this->mustBeSent($old, $new)) 
+      return false;
     foreach($attendees as $state => $attendeesList) {
       foreach($attendeesList as $kind => $recipients) {
         if(count($recipients) > 0) {
@@ -665,6 +667,34 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
       }
     }
   }
+
+  /**
+    * Tell if the mail must be sent or not.
+    *  For exemple a mail will not be sent if the concerned event is in
+    *  the past.
+   */
+  private function mustBeSent($old, $new) {
+    $today = Of_Date::today();
+    $willBeSent = false;
+    if(isset($new) && $new instanceof OBM_Event) {
+      if($new->date_end->compare($today) > 0) {
+        $willBeSent = true;
+      }
+      if($new->repeat_kind != 'none' && $new->repeat_end->compare($today) > 0) {
+        $willBeSent = true;
+      }
+    }
+    if(isset($old) && $old instanceof OBM_Event) {
+      if($old->date_end->compare($today) > 0) {
+        $willBeSent = true;
+      }
+      if($old->repeat_kind != 'none' && $old->repeat_end->compare($today) > 0) {
+        $willBeSent = true;
+      }
+    }
+    return $willBeSent;
+  }
+
 
   /**
    * Send notification for user event participation 
