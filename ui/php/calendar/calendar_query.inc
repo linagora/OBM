@@ -5148,7 +5148,7 @@ function run_query_calendar_reset($id,$params) {
     INNER JOIN EventLink ON event_id = eventlink_event_id
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") AND event_date < '$date'
-    GROUP BY event_id HAVING COUNT(*) = 1";
+    GROUP BY event_id HAVING COUNT(*) = 1 AND MAX(eventlink_entity_id) = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(1)');
   $obm_q->query($query);
 
