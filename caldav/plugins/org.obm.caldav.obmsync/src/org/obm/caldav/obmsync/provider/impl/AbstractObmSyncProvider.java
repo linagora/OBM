@@ -134,9 +134,8 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				event.setDate(cal.getTime());
 			}
 			event.setExtId(extId);
-			
-			addAttendee(caldavInfo,event);
-			fixPrioriryForObm(event);
+
+			addAttendee(caldavInfo, event);
 			logger.info("Create event with extId " + extId);
 			getClient(caldavInfo).createEvent(caldavInfo.getToken(),
 					caldavInfo.getCalendar(), event);
@@ -170,14 +169,13 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				}
 			}
 			addAttendee(caldavInfo, event);
-			fixPrioriryForObm(event);
 			event = getClient(caldavInfo).modifyEvent(caldavInfo.getToken(),
 					caldavInfo.getCalendar(), event, true);
 			ret.add(event);
 		}
 		return ret;
 	}
-	
+
 	private void addAttendee(CalDavInfo caldavInfo, Event event) {
 		boolean find = false;
 		for (Attendee att : event.getAttendees()) {
@@ -187,7 +185,11 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			}
 		}
 		if (!find) {
-			event.addAttendee(getAttendee(caldavInfo.getLoginAtDomain()));
+			Attendee att = new Attendee();
+			att.setEmail(caldavInfo.getLoginAtDomain());
+			att.setRequired(ParticipationRole.OPT);
+			att.setState(ParticipationState.ACCEPTED);
+			event.addAttendee(att);
 		}
 	}
 
@@ -215,7 +217,7 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			Event event = getClient(caldavInfo).getEventFromExtId(
 					caldavInfo.getToken(), caldavInfo.getCalendar(), extId);
 			if (event != null) {
-				fixPrioriryForTB(event);
+				// fixPrioriryForTB(event);
 				listICS.put(event, getClient(caldavInfo).parseEvent(
 						caldavInfo.getToken(), event));
 			} else {
@@ -257,34 +259,6 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 				caldavInfo.getCalendar(), event, true);
 	}
 
-	protected Attendee getAttendee(String email) {
-		Attendee att = new Attendee();
-		att.setEmail(email);
-		att.setRequired(ParticipationRole.OPT);
-		att.setState(ParticipationState.ACCEPTED);
-		return att;
-	}
-
-	private void fixPrioriryForObm(Event event) {
-		if (event.getPriority() >= 6) {
-			event.setPriority(1);
-		} else if (event.getPriority() >= 3 && event.getPriority() < 6) {
-			event.setPriority(2);
-		} else if (event.getPriority() >= 1 && event.getPriority() < 3) {
-			event.setPriority(3);
-		}
-	}
-
-	private void fixPrioriryForTB(Event event) {
-		if (event.getPriority() == 1) {
-			event.setPriority(9);
-		} else if (event.getPriority() == 2) {
-			event.setPriority(5);
-		} else if (event.getPriority() == 3) {
-			event.setPriority(1);
-		}
-	}
-
 	public List<EventTimeUpdate> getAllEventTimeUpdate(CalDavInfo caldavInfo,
 			EventType et) throws ServerFault, AuthFault {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -309,12 +283,6 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 		return events;
 	}
 
-	public List<Event> getListEventsFromIntervalDate(CalDavInfo caldavInfo,
-			Date start, Date end) throws AuthFault, ServerFault {
-		return getClient(caldavInfo).getListEventsFromIntervalDate(
-				caldavInfo.getToken(), caldavInfo.getCalendar(), start, end);
-	}
-
 	public CalendarInfo getRightsOnCalendar(CalDavInfo caldavInfo)
 			throws AuthFault, ServerFault {
 		CalendarInfo[] calInfos = getClient(caldavInfo).listCalendars(
@@ -325,6 +293,12 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 			}
 		}
 		return null;
+	}
+
+	public List<Event> getListEventsFromIntervalDate(CalDavInfo caldavInfo,
+			Date start, Date end) throws AuthFault, ServerFault {
+		return getClient(caldavInfo).getListEventsFromIntervalDate(
+				caldavInfo.getToken(), caldavInfo.getCalendar(), start, end);
 	}
 
 	public Date getLastUpdate(CalDavInfo caldavInfo) throws ServerFault,
