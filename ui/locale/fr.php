@@ -29,6 +29,7 @@ return array(
   'Event updated by %sender% on OBM: %title%' => 'Mise à jour d\'un événement par %sender% sur OBM : %title%',
   'New resource reservation on OBM: %title%' => 'Nouvelle réservation de ressource sur OBM : %title%',
   'Resource reservation updated on OBM: %title%' => 'Mise à jour d\'une réservation de ressource sur OBM : %title%',
+  'Resource reservation cancelled on OBM: %title%' => 'Annulation d\'une réservation de ressource sur OBM : %title%',
   'New resource reservation on OBM: %title%' => 'Nouvelle réservation de ressource sur OBM : %title%',
   'Exploitation report : %name%' => 'Rapport d\'exploitation : %name%',
   '%displayname% validation confirmation' => 'Confirmation de la validation de l\'utilisateur %displayname%',
