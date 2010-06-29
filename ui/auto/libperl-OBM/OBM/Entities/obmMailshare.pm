@@ -102,7 +102,7 @@ sub _init {
         my $cyrusSrvList = OBM::Cyrus::cyrusServers->instance();
         if( !(my $cyrusHostName = $cyrusSrvList->getCyrusServerIp( $mailshareDesc->{'mailshare_mail_server_id'}, $mailshareDesc->{'mailshare_domain_id'} ) ) ) {
             if( $mailshareDesc->{'mailshare_mail_perms'} ) {
-                $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.' annulé, serveur inconnu', 2 );
+                $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.' annulé, serveur Cyrus inconnu', 2 );
             }
             $mailshareDesc->{'mailshare_mail_perms'} = 0;
             $mailshareDesc->{'mailshare_mailperms_access'} = 'REJECT';
@@ -110,21 +110,20 @@ sub _init {
 
         }else {
             $mailshareDesc->{'mailshare_mailperms_access'} = 'PERMIT';
-
             $mailshareDesc->{'mailshare_mail_server'} = 'lmtp:'.$cyrusHostName.':24';
+            $mailshareDesc->{'mailshare_mail_perms'} = 1;
         }
 
         ( $mailshareDesc->{'mailshare_main_email'}, $mailshareDesc->{'mailshare_alias_email'} ) = $self->_makeEntityEmail( $mailshareDesc->{'mailshare_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') );
         if( !defined($mailshareDesc->{'mailshare_main_email'}) ) {
             $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.' annulé, pas d\'adresses mails valides', 2 );
-            $mailshareDesc->{'mailshare_mail_perms'} = 0;
+            $mailshareDesc->{'mailshare_mail_perms'} = 1;
+            $mailshareDesc->{'mailshare_mailperms_access'} = 'REJECT';
             delete($mailshareDesc->{'mailshare_main_email'});
             delete($mailshareDesc->{'mailshare_alias_email'});
 
             last SWITCH;
         }
-
-        $mailshareDesc->{'mailshare_mail_perms'} = 1;
     }
 
     # LDAP BAL destination
