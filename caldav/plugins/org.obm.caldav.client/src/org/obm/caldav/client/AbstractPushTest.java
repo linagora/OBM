@@ -201,6 +201,11 @@ public abstract class AbstractPushTest extends TestCase {
 				return props.getProperty(key);
 			} catch (IOException e) {
 				return null;
+			} finally {
+				try {
+					is.close();
+				} catch (IOException e) {
+				}
 			}
 		} else {
 			return null;
