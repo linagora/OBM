@@ -2052,7 +2052,7 @@ function run_query_delete_event_exceptions($event_id) {
     }
 
     if (!empty($childs)) {
-      $query = "DELETE FROM Event WHERE id IN (".implode(',',$childs).")";
+      $query = "DELETE FROM Event WHERE event_id IN (".implode(',',$childs).")";
       display_debug_msg($query, $cdg_sql, 'run_query_delete_event_exceptions(1)');
       $obm_q->query($query);
     }
