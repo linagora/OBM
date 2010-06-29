@@ -23,7 +23,7 @@ import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.share.DavComponent;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -63,7 +63,7 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 	// </D:response>
 	// </D:multistatus>
 
-	public Document build(DavRequest req, Token t, IBackend proxy,
+	public Document build(DavRequest req, CalDavToken t, IBackend proxy,
 			Set<String> properties, List<DavComponent> comps,
 			Set<CalendarQueryPropertyHandler> propertiesValues) {
 		Document doc = null;

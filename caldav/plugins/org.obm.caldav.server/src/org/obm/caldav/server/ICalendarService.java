@@ -21,8 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.obm.caldav.server.exception.AuthenticationException;
 import org.obm.caldav.server.exception.AuthorizationException;
+import org.obm.caldav.server.share.CalDavRigth;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.server.share.CalendarResourceICS;
 import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.DavComponentType;
@@ -34,29 +35,28 @@ public interface ICalendarService {
 	final static String PARTICIPATION_STATE_DECLINED = "no";
 	final static String PARTICIPATION_STATE_NEEDSACTION = "maybe";
 
-	DavComponent updateOrCreateEvent(String compUrl, String ics, String extId)
-			throws Exception;
+	DavComponent updateOrCreateEvent(CalDavToken token, String compUrl,
+			String ics, String extId) throws Exception;
 
-	List<DavComponent> getAllLastUpdate(String componentUrl,
-			DavComponentType componant) throws Exception;
+	List<CalendarResourceICS> getICSFromExtId(CalDavToken token,
+			String compUrl, Set<String> listExtIdEvent) throws Exception;
 
-	List<DavComponent> getAllLastUpdate(CompFilter cf) throws Exception;
-
-	List<CalendarResourceICS> getICSFromExtId(String compUrl,
-			Set<String> listExtIdEvent) throws Exception;
-
-	void removeOrUpdateParticipationState(String extId) throws Exception,
+	void remove(CalDavToken token, String extId) throws Exception,
 			AuthorizationException;
 
-	boolean getSync(Date lastSync) throws Exception;
+	List<DavComponent> getAllLastUpdate(CalDavToken token, CompFilter cf)
+			throws Exception;
 
-	boolean login(String userId, String password, String calendar,
-			String calendarAtDomain) throws AuthenticationException;
+	List<DavComponent> getAllLastUpdate(CalDavToken token, String componentUrl,
+			DavComponentType componant) throws Exception;
 
-	void logout();
+	boolean getSync(CalDavToken token, Date lastSync) throws Exception;
 
-	Map<String, String> getFreeBuzy(String ics) throws Exception;
-	
-	Date getLastUpdate() throws Exception;
+	Date getLastUpdate(CalDavToken token) throws Exception;
+
+	Map<String, String> getFreeBusy(CalDavToken token, String ics)
+			throws Exception;
+
+	CalDavRigth hasRightsOnCalendar(CalDavToken token) throws Exception;
 
 }

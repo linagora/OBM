@@ -33,13 +33,18 @@ import org.obm.caldav.server.propertyHandler.impl.CalendarData;
 import org.obm.caldav.server.propertyHandler.impl.GetETag;
 import org.obm.caldav.server.resultBuilder.CalendarMultiGetQueryResultBuilder;
 import org.obm.caldav.server.share.CalendarResourceICS;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.CalDavUtils;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+/**
+ * 
+ * @author adrienp
+ *
+ */
 public class CalendarMultiGet extends ReportProvider {
 
 	private Map<String, CalendarMultiGetPropertyHandler> properties;
@@ -105,7 +110,7 @@ public class CalendarMultiGet extends ReportProvider {
 	// </D:response>
 	// </D:multistatus>
 	@Override
-	public void process(Token token, IBackend proxy, DavRequest req,
+	public void process(CalDavToken token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp, Set<String> requestPropList) {
 		logger.info("process(" + token.getLoginAtDomain() + ", req, resp)");
 
@@ -123,12 +128,14 @@ public class CalendarMultiGet extends ReportProvider {
 		try {
 			Element root = req.getXml().getDocumentElement();
 			Set<String> listExtIDEvent = getListExtId(root);
-			
-			List<CalendarResourceICS> listICS = proxy.getCalendarService().getICSFromExtId(req.getURI(),listExtIDEvent);
 
-			Document ret = new CalendarMultiGetQueryResultBuilder().build(req, proxy, propertiesValues, listICS);
+			List<CalendarResourceICS> listICS = proxy.getCalendarService()
+					.getICSFromExtId(token, req.getURI(), listExtIDEvent);
+
+			Document ret = new CalendarMultiGetQueryResultBuilder().build(req,
+					proxy, propertiesValues, listICS);
 			logger.info(DOMUtils.toString(ret));
-			
+
 			resp.setStatus(207); // multi status webdav
 			resp.setContentType("text/xml; charset=utf-8");
 			DOMUtils.serialise(ret, resp.getOutputStream());
@@ -137,12 +144,13 @@ public class CalendarMultiGet extends ReportProvider {
 		}
 	}
 
-	private Set<String> getListExtId(Element root){
+	private Set<String> getListExtId(Element root) {
 		Set<String> listExtIDEvent = new HashSet<String>();
-		if(root!= null){
-			NodeList dl = root.getElementsByTagNameNS(NameSpaceConstant.DAV_NAMESPACE, "href");
-			for(int i = 0; i<dl.getLength(); i++ ){
-				Element dhref = (Element)dl.item(i);
+		if (root != null) {
+			NodeList dl = root.getElementsByTagNameNS(
+					NameSpaceConstant.DAV_NAMESPACE, "href");
+			for (int i = 0; i < dl.getLength(); i++) {
+				Element dhref = (Element) dl.item(i);
 				String hrefContent = dhref.getTextContent();
 				try {
 					String extid = CalDavUtils.getExtIdFromURL(hrefContent);

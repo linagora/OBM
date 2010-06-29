@@ -16,7 +16,7 @@
 
 package org.obm.caldav.server.share;
 
-public class Token {
+public class CalDavToken {
 
 	private String login;
 	private String domain;
@@ -25,7 +25,7 @@ public class Token {
 	private String calendarName;
 	private String calendarNameAtDomain;
 
-	public Token(String loginAtDomain, String password, String calendarName) {
+	public CalDavToken(String loginAtDomain, String password, String calendarName) {
 		super();
 		this.loginAtDomain = loginAtDomain;
 		if(loginAtDomain.contains("@")){

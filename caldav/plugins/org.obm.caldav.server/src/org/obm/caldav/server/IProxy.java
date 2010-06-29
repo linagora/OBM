@@ -16,15 +16,15 @@
 
 package org.obm.caldav.server;
 
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 
 public interface IProxy {
 
 	ICalendarService getCalendarService();
 
-	boolean validateToken(Token token) throws Exception;
+	boolean validateToken(CalDavToken token) throws Exception;
 
-	void login(Token token);
+	void login(CalDavToken token);
 
 	void logout();
 	

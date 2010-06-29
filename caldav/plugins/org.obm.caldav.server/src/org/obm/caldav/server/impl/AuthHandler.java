@@ -20,16 +20,16 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.Base64;
 
 public class AuthHandler {
 
 	private final Log logger = LogFactory.getLog(AuthHandler.class);
 
-	public Token doAuth(DavRequest request) {
+	public CalDavToken doAuth(DavRequest request) {
 		String authHeader = request.getHeader("Authorization");
-		Token t = null;
+		CalDavToken t = null;
 		if (authHeader != null) {
 			StringTokenizer st = new StringTokenizer(authHeader);
 			if (st.hasMoreTokens()) {
@@ -44,7 +44,7 @@ public class AuthHandler {
 						logger.info("userId "+userId);
 						String loginAtDomain = getLoginAtDomain(userId);
 						String password = userPass.substring(p + 1);
-						t = new Token(loginAtDomain, password, request.getCalendarName());
+						t = new CalDavToken(loginAtDomain, password, request.getCalendarName());
 					}
 				}
 			}

@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 
 public abstract class ReportProvider {
 
@@ -34,6 +34,6 @@ public abstract class ReportProvider {
 		
 	}
 	
-	public abstract void process(Token token, IBackend proxy, DavRequest req, HttpServletResponse resp, Set<String> propList);
+	public abstract void process(CalDavToken token, IBackend proxy, DavRequest req, HttpServletResponse resp, Set<String> propList);
 
 }

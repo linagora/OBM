@@ -29,7 +29,7 @@ import org.obm.caldav.server.reports.CalendarMultiGet;
 import org.obm.caldav.server.reports.CalendarQuery;
 import org.obm.caldav.server.reports.PrincipalPropertySearch;
 import org.obm.caldav.server.reports.ReportProvider;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -46,7 +46,7 @@ public class ReportHandler extends DavMethodHandler {
 	}
 
 	@Override
-	public void process(Token token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
+	public void process(CalDavToken token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
 		Document d = req.getXml();
 		Element r = d.getDocumentElement();

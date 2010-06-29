@@ -24,18 +24,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.resultBuilder.ScheduleResponseBuilder;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 
+/**
+ * 
+ * @author adrienp
+ *
+ */
 public class PostHandler extends DavMethodHandler {
 
 	@Override
-	public void process(Token token, IBackend bakend, DavRequest req,
+	public void process(CalDavToken token, IBackend bakend, DavRequest req,
 			HttpServletResponse resp) throws Exception {
 		logger.info("process(req, resp)");
 		Map<String, String> responseData = bakend.getCalendarService()
-				.getFreeBuzy(req.getICS());
+				.getFreeBusy(token, req.getICS());
 		String freeBusyFind = "";
 		if (responseData.keySet().size() > 0) {
 			for (String mail : responseData.keySet()) {

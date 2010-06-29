@@ -27,7 +27,7 @@ import org.obm.caldav.server.exception.AuthorizationException;
 import org.obm.caldav.server.exception.ResultBuilderException;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.resultBuilder.ErreurBuiler;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.CalDavUtils;
 import org.w3c.dom.Document;
 
@@ -42,14 +42,14 @@ import org.w3c.dom.Document;
 public class DeleteHandler extends DavMethodHandler {
 
 	@Override
-	public void process(Token token, IBackend proxy, DavRequest req,
+	public void process(CalDavToken token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp) throws ResultBuilderException {
 		try {
 			// management of inbox and outbox is not implemented
 			if (!req.getURI().contains("inbox")
 					&& !req.getURI().contains("outbox")) {
 				String extId = CalDavUtils.getExtIdFromURL(req.getURI());
-				proxy.getCalendarService().removeOrUpdateParticipationState(
+				proxy.getCalendarService().remove(token,
 						extId);
 			}
 			resp.setStatus(HttpServletResponse.SC_OK);

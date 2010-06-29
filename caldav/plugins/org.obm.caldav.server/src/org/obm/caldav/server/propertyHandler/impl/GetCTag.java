@@ -27,7 +27,7 @@ import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.DavComponent;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.w3c.dom.Element;
 
 /**
@@ -75,7 +75,7 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 	}
 	
 	@Override
-	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req,
+	public synchronized void appendPropertyValue(Element prop, CalDavToken t, DavRequest req,
 			IBackend proxy, DavComponent comp) {
 		Element elem = appendElement(prop, "getctag", NameSpaceConstant.CALENDARSERVER_NAMESPACE_PREFIX); 
 		Date lastChange = lastChangeByUser.get(t.getLoginAtDomain());
@@ -85,7 +85,7 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 			
 		} else {
 			try {
-				boolean change = proxy.getCalendarService().getSync(lastChange);
+				boolean change = proxy.getCalendarService().getSync(t, lastChange);
 				if(change) {
 					lastChange = new Date();
 				} else {
@@ -101,7 +101,7 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 		lastChangeByUser.put(t.getLoginAtDomain(), lastChange);
 	}
 	
-	private String getCTagValue(Token t, Date lastSync){
+	private String getCTagValue(CalDavToken t, Date lastSync){
 		return t.getLoginAtDomain()+"-"+lastSync.getTime();
 	}
 

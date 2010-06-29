@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
 public class PrincipalPropertySearch extends ReportProvider {
 
 	@Override
-	public void process(Token token, IBackend proxy, DavRequest req,
+	public void process(CalDavToken token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp, Set<String> propList) {
 		logger.info("process(" + token.getLoginAtDomain() + ", req, resp)");
 		Document doc = req.getXml();

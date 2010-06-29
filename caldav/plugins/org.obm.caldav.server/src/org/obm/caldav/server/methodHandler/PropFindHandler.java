@@ -47,7 +47,7 @@ import org.obm.caldav.server.resultBuilder.PropertyListBuilder;
 import org.obm.caldav.server.share.CalendarComponent;
 import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.DavComponentType;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -87,7 +87,7 @@ public class PropFindHandler extends DavMethodHandler {
 	}
 
 	@Override
-	public void process(Token t, IBackend proxy, DavRequest req,
+	public void process(CalDavToken t, IBackend proxy, DavRequest req,
 			HttpServletResponse resp) throws Exception {
 		Set<PropfindPropertyHandler> toLoad = new HashSet<PropfindPropertyHandler>();
 		Set<Element> toNotImplemented = new HashSet<Element>();
@@ -111,7 +111,7 @@ public class PropFindHandler extends DavMethodHandler {
 		comps.add(calComp);
 
 		if (toLoad.contains(propertiesHandler.get("getcontenttype"))) {
-			comps.addAll(proxy.getCalendarService().getAllLastUpdate(
+			comps.addAll(proxy.getCalendarService().getAllLastUpdate(t,
 					req.getURI(), DavComponentType.VEVENT));
 		}
 

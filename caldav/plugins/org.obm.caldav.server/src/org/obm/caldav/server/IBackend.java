@@ -16,16 +16,14 @@
 
 package org.obm.caldav.server;
 
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 
 public interface IBackend {
 
 	ICalendarService getCalendarService();
 	
-	boolean login(Token davToken) throws Exception;
-
-	void logout();
+	String getETag(CalDavToken t) throws Exception ;
 	
-	String getETag() throws Exception ;
+	Boolean validateToken(CalDavToken t) throws Exception;
 
 }

@@ -28,7 +28,7 @@ import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.exception.ResultBuilderException;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,7 +58,7 @@ public abstract class DavMethodHandler {
 		return toLoad;
 	}
 
-	public abstract void process(Token token,IBackend proxy, DavRequest req, HttpServletResponse resp) throws Exception;
+	public abstract void process(CalDavToken token,IBackend proxy, DavRequest req, HttpServletResponse resp) throws Exception;
 	
 	public void sendDom(Document doc, HttpServletResponse resp) throws ResultBuilderException{
 		resp.setContentType("text/xml; charset=utf-8");

@@ -26,7 +26,7 @@ import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.CalendarResourceICS;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 
 
 /**
@@ -42,7 +42,7 @@ import org.obm.caldav.server.share.Token;
 public class GetHandler extends DavMethodHandler {
 
 	@Override
-	public void process(Token token, IBackend backend, DavRequest req,
+	public void process(CalDavToken token, IBackend backend, DavRequest req,
 			HttpServletResponse resp) throws Exception {
 		logger.info("process(req, resp)");
 		if(req.getURI().endsWith(".ics")){
@@ -54,7 +54,7 @@ public class GetHandler extends DavMethodHandler {
 			logger.info("Try to get event["+eventName+"] in component "+compUrl);
 			Set<String> l = new HashSet<String>();
 			l.add(eventName);
-			List<CalendarResourceICS> crs = backend.getCalendarService().getICSFromExtId(compUrl, l);
+			List<CalendarResourceICS> crs = backend.getCalendarService().getICSFromExtId(token,compUrl, l);
 			if(crs.iterator().hasNext()){
 				CalendarResourceICS ics = crs.iterator().next(); 
 				logger.info("Send:"+ics.getIcs());

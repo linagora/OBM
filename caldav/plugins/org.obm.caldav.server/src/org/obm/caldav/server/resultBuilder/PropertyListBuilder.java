@@ -25,7 +25,7 @@ import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.DavComponent;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,7 +34,7 @@ public class PropertyListBuilder extends ResultBuilder {
 
 	private Log logger = LogFactory.getLog(PropertyListBuilder.class);
 
-	public Document build(Token t, DavRequest req, List<DavComponent> comps,
+	public Document build(CalDavToken t, DavRequest req, List<DavComponent> comps,
 			Set<PropfindPropertyHandler> toLoad, Set<Element> notUsed,
 			IBackend proxy) {
 		try {

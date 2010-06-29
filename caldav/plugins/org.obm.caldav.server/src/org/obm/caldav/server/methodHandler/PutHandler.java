@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.DavComponent;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.CalDavUtils;
 
 
@@ -34,7 +34,7 @@ public class PutHandler extends DavMethodHandler {
 	}
 
 	@Override
-	public void process(Token token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
+	public void process(CalDavToken token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
 		try {
 			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
@@ -47,7 +47,7 @@ public class PutHandler extends DavMethodHandler {
 			}
 			
 			String ics = req.getICS();
-			DavComponent dav = proxy.getCalendarService().updateOrCreateEvent(parentComp,ics, extId);
+			DavComponent dav = proxy.getCalendarService().updateOrCreateEvent(token,parentComp,ics, extId);
 			
 			resp.setStatus(HttpServletResponse.SC_CREATED);
 			resp.setContentLength(0);

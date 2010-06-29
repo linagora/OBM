@@ -22,7 +22,7 @@ import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.exception.CalDavException;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 
 public class LockHandler extends DavMethodHandler {
 
@@ -30,7 +30,7 @@ public class LockHandler extends DavMethodHandler {
 	}
 
 	@Override
-	public void process(Token t, IBackend proxy, DavRequest req, HttpServletResponse resp) throws CalDavException {
+	public void process(CalDavToken t, IBackend proxy, DavRequest req, HttpServletResponse resp) throws CalDavException {
 		logger.info("process(req, resp)");
 		throw new CalDavException(StatusCodeConstant.SC_NOT_IMPLEMENTED);
 	}

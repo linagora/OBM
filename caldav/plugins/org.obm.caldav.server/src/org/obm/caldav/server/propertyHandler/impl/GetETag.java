@@ -28,7 +28,7 @@ import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.CalendarResourceICS;
 import org.obm.caldav.server.share.DavComponent;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.w3c.dom.Element;
 
 /**
@@ -60,7 +60,7 @@ public class GetETag extends DavPropertyHandler implements CalendarQueryProperty
 	}
 	
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req,
+	public void appendPropertyValue(Element prop, CalDavToken t, DavRequest req,
 			IBackend proxy, DavComponent comp) {
 		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		val.setTextContent(comp.getETag());

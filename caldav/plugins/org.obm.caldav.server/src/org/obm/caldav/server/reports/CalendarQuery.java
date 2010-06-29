@@ -31,7 +31,7 @@ import org.obm.caldav.server.propertyHandler.impl.GetETag;
 import org.obm.caldav.server.propertyHandler.impl.ResourceType;
 import org.obm.caldav.server.resultBuilder.CalendarQueryResultBuilder;
 import org.obm.caldav.server.share.DavComponent;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.server.share.filter.Filter;
 import org.obm.caldav.utils.DOMUtils;
@@ -66,7 +66,7 @@ public class CalendarQuery extends ReportProvider {
 	// </filter>
 	// </calendar-query>
 	@Override
-	public void process(Token token, IBackend proxy, DavRequest req,
+	public void process(CalDavToken token, IBackend proxy, DavRequest req,
 			HttpServletResponse resp, Set<String> requestPropList) {
 		logger.info("process(" + token.getLoginAtDomain() + ", req, resp)");
 
@@ -89,7 +89,7 @@ public class CalendarQuery extends ReportProvider {
 //			Map<String, EventTimeUpdate> events = new HashMap<String, EventTimeUpdate>();
 			CompFilter cf = compFilter.getCompFilters().get(0);
 			List<DavComponent> comps = proxy.getCalendarService()
-					.getAllLastUpdate(cf);
+					.getAllLastUpdate(token, cf);
 //			for (DavComponent event : comps) {
 //				String href = req.getHref()
 //						+ proxy.getCalendarService().getICSName(event);

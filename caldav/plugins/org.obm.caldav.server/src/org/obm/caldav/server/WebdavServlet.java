@@ -46,7 +46,7 @@ import org.obm.caldav.server.methodHandler.PropPatchHandler;
 import org.obm.caldav.server.methodHandler.PutHandler;
 import org.obm.caldav.server.methodHandler.ReportHandler;
 import org.obm.caldav.server.methodHandler.UnlockHandler;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.RunnableExtensionLoader;
 
 /**
@@ -72,12 +72,13 @@ public class WebdavServlet extends HttpServlet {
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		IBackend backend = null;
+		CalDavToken token = null;
 		try {
 			String method = request.getMethod();
 			logger.info("[" + method + "] " + request.getRequestURI());
 			DavRequest dr = new DavRequest(request);
 
-			Token token = authHandler.doAuth(dr);
+			token = authHandler.doAuth(dr);
 			backend = performAuthentification(dr, response, token);
 			if (backend == null) {
 				return;
@@ -85,7 +86,6 @@ public class WebdavServlet extends HttpServlet {
 
 			DavMethodHandler handler = handlers.get(method.toLowerCase());
 			if (handler != null) {
-				backend.login(token);
 				handler.process(token, backend, dr, response);
 
 			} else {
@@ -100,29 +100,29 @@ public class WebdavServlet extends HttpServlet {
 			response.sendError(StatusCodeConstant.SC_INTERNAL_SERVER_ERROR);
 			logger.error(e.getMessage(), e);
 		} finally {
-			appendHearder(response, backend);
-			if (backend != null) {
-				backend.logout();
-			}
+			appendHearder(token,response, backend);
 		}
 	}
 
 	private IBackend performAuthentification(DavRequest dr,
-			HttpServletResponse response, Token token) {
+			HttpServletResponse response, CalDavToken token) {
 		IBackend backend = null;
+		Boolean isValidate = Boolean.FALSE;
 		try {
 			backend = getBackend(token);
+			isValidate = backend.validateToken(token);
 		} catch (AuthenticationException auth) {
 			logger.error(auth.getMessage());
-		}catch (Exception e) {
-			logger.error(e.getMessage(),e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
-		
-		if (backend == null) {
+
+		if (backend == null || !isValidate) {
 			String uri = dr.getMethod() + " " + dr.getRequestURI() + " "
 					+ dr.getQueryString();
 			logger.info("invalid auth, sending http 401 (uri: " + uri + ")");
-			String s = "Basic realm=\"Obm CalDav for calendar "+ dr.getCalendarName() +"\"";
+			String s = "Basic realm=\"Obm CalDav for calendar "
+					+ dr.getCalendarName() + "\"";
 			response.setHeader("WWW-Authenticate", s);
 
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -130,7 +130,8 @@ public class WebdavServlet extends HttpServlet {
 		return backend;
 	}
 
-	private void appendHearder(HttpServletResponse response, IBackend proxy) {
+	private void appendHearder(CalDavToken token, HttpServletResponse response,
+			IBackend proxy) {
 		// head[Content-Length] => 147
 		// head[Date] => Wed, 29 Jul 2009 11:29:03 GMT
 		// head[Expires] => Wed, 29 Jul 2009 11:29:03 GMT
@@ -141,13 +142,12 @@ public class WebdavServlet extends HttpServlet {
 		response
 				.addHeader("Allow",
 						"OPTIONS, PROPFIND, HEAD, GET, REPORT, PROPPATCH, PUT, DELETE, POST");
-		response
-				.addHeader("DAV",
-						"1, calendar-access, calendar-schedule, calendar-proxy");
+		response.addHeader("DAV",
+				"1, calendar-access, calendar-schedule, calendar-proxy");
 		response.addHeader("Cache-Control", "private, max-age=0");
-		if (proxy != null) {
+		if (proxy != null && token != null) {
 			try {
-				response.setHeader("ETag", "\""+proxy.getETag()+"\"");
+				response.setHeader("ETag", "\"" + proxy.getETag(token) + "\"");
 			} catch (Exception e) {
 			}
 		}
@@ -167,7 +167,7 @@ public class WebdavServlet extends HttpServlet {
 		}
 	}
 
-	private IBackend getBackend(Token token) throws Exception {
+	private IBackend getBackend(CalDavToken token) throws Exception {
 		return this.backendFactory.loadBackend(token);
 	}
 

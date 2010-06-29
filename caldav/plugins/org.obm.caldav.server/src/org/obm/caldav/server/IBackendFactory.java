@@ -16,11 +16,11 @@
 
 package org.obm.caldav.server;
 
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 
 
 public interface IBackendFactory {
 
-	IBackend loadBackend(Token token) throws Exception;
+	IBackend loadBackend(CalDavToken token) throws Exception;
 
 }

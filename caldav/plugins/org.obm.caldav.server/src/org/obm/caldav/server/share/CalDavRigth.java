@@ -14,7 +14,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.obmsync.service.impl;
+package org.obm.caldav.server.share;
 
 public class CalDavRigth {
 	private Boolean isReadable;

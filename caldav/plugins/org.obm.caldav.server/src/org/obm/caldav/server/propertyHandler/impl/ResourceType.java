@@ -24,7 +24,7 @@ import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.DavComponent;
 import org.obm.caldav.server.share.DavComponentType;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.w3c.dom.Element;
 
 /**
@@ -41,7 +41,7 @@ public class ResourceType extends DavPropertyHandler implements
 		PropfindPropertyHandler, CalendarQueryPropertyHandler {
 
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req,
+	public void appendPropertyValue(Element prop, CalDavToken t, DavRequest req,
 			IBackend proxy, DavComponent comp) {
 
 		Element elem = appendElement(prop, "resourcetype",

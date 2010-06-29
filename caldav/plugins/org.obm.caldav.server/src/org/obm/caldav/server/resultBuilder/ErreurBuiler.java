@@ -18,7 +18,7 @@ package org.obm.caldav.server.resultBuilder;
 
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,7 +43,7 @@ public class ErreurBuiler extends ResultBuilder {
 	// </d:response>
 	// </d:multistatus>
 
-	public Document build(Token token, DavRequest req, int code) {
+	public Document build(CalDavToken token, DavRequest req, int code) {
 		Document doc = null;
 		try {
 			doc = createMultiStatusDocument();

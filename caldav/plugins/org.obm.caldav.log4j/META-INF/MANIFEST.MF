@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: org.obm.caldav.Log4j
-Bundle-SymbolicName: org.obm.caldav.log4j
+Bundle-SymbolicName: org.obm.caldav.log4j;singleton:=true
 Bundle-Version: 1.0.0
 Fragment-Host: org.apache.commons.logging;bundle-version="1.0.4"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

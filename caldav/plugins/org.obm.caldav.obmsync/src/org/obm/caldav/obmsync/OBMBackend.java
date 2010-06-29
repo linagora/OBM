@@ -23,14 +23,16 @@ import org.obm.caldav.obmsync.service.impl.CalendarService;
 import org.obm.caldav.server.ICalendarService;
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.exception.AuthenticationException;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavRigth;
+import org.obm.caldav.server.share.CalDavToken;
 
 public class OBMBackend implements IBackend {
 
-	private ICalendarService calendarService;
+	@SuppressWarnings("unused")
 	private Log logger = LogFactory.getLog(getClass());
+	private ICalendarService calendarService;
 
-	public OBMBackend(Token davToken) throws Exception {
+	public OBMBackend(CalDavToken davToken) throws Exception {
 		initService();
 		boolean isValid = validateToken(davToken);
 		if(!isValid){
@@ -43,20 +45,6 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public boolean login(Token davToken) throws AuthenticationException {
-		return calendarService.login(davToken.getLoginAtDomain(), davToken.getPassword(),davToken.getCalendarName(), davToken.getCalendarNameAtDomain());
-	}
-
-	@Override
-	public void logout() {
-		try {
-			calendarService.logout();
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-		}
-	}
-
-	@Override
 	public ICalendarService getCalendarService() {
 		if (this.calendarService == null) {
 			throw new RuntimeException("You must be logged");
@@ -64,17 +52,17 @@ public class OBMBackend implements IBackend {
 		return calendarService;
 	}
 
-	private boolean validateToken(Token t) throws Exception {
+	public Boolean validateToken(CalDavToken t) throws Exception {
 		if (t == null) {
 			return false;
 		}
-		boolean hasRightsOnCalendar = this.login(t); 
-		this.logout();
-		return hasRightsOnCalendar;
+		CalDavRigth rigth = calendarService.hasRightsOnCalendar(t);
+		return rigth.isReadable();
+		
 	}
 
 	@Override
-	public String getETag() throws Exception {
-		return ""+calendarService.getLastUpdate().getTime();
+	public String getETag(CalDavToken t) throws Exception {
+		return ""+calendarService.getLastUpdate(t).getTime();
 	}
 }

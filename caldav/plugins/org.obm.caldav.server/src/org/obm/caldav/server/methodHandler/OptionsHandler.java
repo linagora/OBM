@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IBackend;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.share.Token;
+import org.obm.caldav.server.share.CalDavToken;
 
 public class OptionsHandler extends DavMethodHandler {
 
@@ -28,7 +28,7 @@ public class OptionsHandler extends DavMethodHandler {
 	}
 
 	@Override
-	public void process(Token token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
+	public void process(CalDavToken token, IBackend proxy, DavRequest req, HttpServletResponse resp) {
 		resp.setStatus(HttpServletResponse.SC_OK);
 //		resp.addHeader("DAV", "1, calendar-access, calendar-schedule");
 //		resp.addHeader("Allow", "OPTIONS, PROPFIND, HEAD, GET, REPORT, PROPPATCH, PUT, DELETE, POST");
