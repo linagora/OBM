@@ -414,6 +414,9 @@ sub _init {
         }
     }else {
         $userDesc->{'userobm_samba_perms'} = 0;
+    }
+
+    if(!$userDesc->{'userobm_samba_perms'}) {
         delete( $userDesc->{'userobm_samba_home_drive'} );
         delete( $userDesc->{'userobm_samba_home'} );
         delete( $userDesc->{'userobm_samba_logon_script'} );

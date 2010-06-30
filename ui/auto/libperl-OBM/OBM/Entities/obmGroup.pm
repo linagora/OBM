@@ -365,7 +365,10 @@ sub updateLinkedEntities {
     my $self = shift;
     my( $updateType ) = @_;
 
-    if( $self->{'entityDesc'}->{'group_contacts'} ne $self->{'entityDesc'}->{'group_contacts_current'} ) {
+    if((!defined($self->{'entityDesc'}->{'group_contacts'}) && defined($self->{'entityDesc'}->{'group_contacts_current'}))
+        || (defined($self->{'entityDesc'}->{'group_contacts'}) && !defined($self->{'entityDesc'}->{'group_contacts_current'}))
+        || (defined($self->{'entityDesc'}->{'group_contacts'}) && defined($self->{'entityDesc'}->{'group_contacts_current'}) && $self->{'entityDesc'}->{'group_contacts'} ne $self->{'entityDesc'}->{'group_contacts_current'})
+    ) {
         $self->_log( 'changement des contacts externes de '.$self->getDescription().', les groupes parents doivent être mis à jour', 3 );
         return 1;
     }
