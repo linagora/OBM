@@ -94,7 +94,9 @@ sub execQuery {
     my $self = shift;
     my( $query, $sth ) = @_;
 
-    local $SIG{__DIE__} = undef;
+    local $SIG{__DIE__} = sub {
+        $self->_log( join( ' ', @_ ), 1 );
+    };
 
     if( !defined($query) ) {
         $self->_log( 'requete SQL non definie !', 3 );
