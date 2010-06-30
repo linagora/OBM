@@ -233,6 +233,30 @@ class LemonLDAP_Auth extends Auth {
   }
 
   /**
+   * Main method called by OBM to launch authentication process.
+   * A flag is stored into user session, to prevent from infinite loop
+   * due to infinite redirection via HTTP header location.
+   */
+  function start ()
+  {
+    global $obm, $auth;
+    // The following function stops itself, when user is not logged in.
+    // In this case, authentication form should be display instead.
+    parent::start();
+    // Here, user is logged in.
+    if (!isset($_SESSION['lemonldap_auth']))
+    { 
+      $_SESSION['lemonldap_auth'] = true;
+      $url_proto  = 'http' . (strcasecmp($_SERVER["HTTPS"], 'on') == 0 ? 's' : '') . '://';
+      $url_domain = $_SERVER["HTTP_HOST"];
+      $url_query  = $_SERVER["REQUEST_URI"];
+      $url        = $url_proto . $url_domain . $url_query;
+      header('location: ' . $url);
+    }
+    return true;
+  }
+
+  /**
    * Authenticate user
    * @param $user_id The user unique identifier.
    * @param $domain_id The domain identifier.
