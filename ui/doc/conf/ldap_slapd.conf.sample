@@ -137,20 +137,26 @@ checkpoint                    1024      30
 
 # BEGIN index definition
 # Database Index
-index           uidNumber,gidNumber     eq
-index           default                 sub
+index           default                 pres
+index           uidNumber,gidNumber     eq,pres
+index           loginShell              eq,pres
+index           objectClass             pres,eq
 # Mail
 index           mailBox                 eq
 index           mailAccess              eq
+index           mailBoxServer           eq
+index           mail,mailAlias          eq,pres,sub
+# Group
+index           member                  eq,pres
+index           memberUid               eq,pres
 # Without Samba
 index           cn,sn,uid               pres,sub,eq
-index           objectClass eq
 # With Samba
 #index           cn,sn,uid,displayName   pres,sub,eq
-#index           sambaSID                eq
-#index           sambaPrimaryGroupSID    eq
+#index           sambaSID                eq,pres
+#index           sambaPrimaryGroupSID    eq,pres
+#index           sambaSIDList            eq,pres
 #index           sambaDomainName         eq
-#index           objectClass             pres,eq
 
 ## Index pour SyncRepl MASTER
 #index           entryCSN,entryUUID      eq
