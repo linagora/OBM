@@ -5149,8 +5149,10 @@ function dis_calendar_free_interval($current_view, $calendar) {
   if (!empty($entity_store['user'])) {
     $userReadableList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'read',array_keys($entity_store['user']));
     $accessList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'access',array_keys($entity_store['user']));
-    foreach($accessList as $id => $user) {
-      $users[$id] = (array)$of->getPeriodOccurrences($date, $end, array('user' => array($id)));
+    foreach(array_keys($entity_store['user']) as $id) {
+      if(isset($accessList[$id])) {
+        $users[$id] = (array)$of->getPeriodOccurrences($date, $end, array('user' => array($id)));
+      }
     }
   }
   
@@ -5166,11 +5168,12 @@ function dis_calendar_free_interval($current_view, $calendar) {
   if (!empty($entities_resources)) {
     $accessList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'resource', 'access', array_keys($entities_resources));
     $resourceReadableList = OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'resource', 'read',array_keys($entities_resources));
-    foreach($accessList as $id => $resource) {
-      $resources[$id] = (array)$of->getPeriodOccurrences($date, $end, array('resource' => array($id)));
+    foreach(array_keys($entities_resources) as $id) {
+      if(isset($accessList[$id])) {
+        $resources[$id] = (array)$of->getPeriodOccurrences($date, $end, array('resource' => array($id)));
+      }
     }
   }
-
   // Days headers 
   $current = clone $date;
   $colspan = ($GLOBALS['ccalendar_last_hour'] - $GLOBALS['ccalendar_first_hour']) * $unit;
