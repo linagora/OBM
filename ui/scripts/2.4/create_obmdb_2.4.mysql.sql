@@ -1444,7 +1444,6 @@ CREATE TABLE `EventException` (
   KEY `eventexception_parent_id_event_id_fkey` (`eventexception_parent_id`),
   KEY `eventexception_child_id_event_id_fkey` (`eventexception_child_id`),
   KEY `eventexception_userupdate_userobm_id_fkey` (`eventexception_userupdate`),
-  KEY `eventexception_userupdate_userobm_id_fkey` (`eventexception_userupdate`),
   CONSTRAINT `eventexception_usercreate_userobm_id_fkey` FOREIGN KEY (`eventexception_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `eventexception_parent_id_event_id_fkey` FOREIGN KEY (`eventexception_parent_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `eventexception_child_id_event_id_fkey` FOREIGN KEY (`eventexception_child_id`) REFERENCES `Event` (`event_id`) ON DELETE SET NULL ON UPDATE CASCADE,
