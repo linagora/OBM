@@ -109,8 +109,8 @@ public class PropFindHandler extends DavMethodHandler {
 		CalendarComponent calComp = new CalendarComponent(req.getURI(),
 				new Date());
 		comps.add(calComp);
-
-		if (toLoad.contains(propertiesHandler.get("getcontenttype"))) {
+		
+		if (toLoad.contains(propertiesHandler.get("getcontenttype")) && !req.getURI().contains("inbox")) {
 			comps.addAll(proxy.getCalendarService().getAllLastUpdate(t,
 					req.getURI(), DavComponentType.VEVENT));
 		}

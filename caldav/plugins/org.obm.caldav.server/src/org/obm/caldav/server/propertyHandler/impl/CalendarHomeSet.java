@@ -63,10 +63,10 @@ public class CalendarHomeSet extends DavPropertyHandler implements
 			IBackend proxy, DavComponent comp) {
 		Element elem = appendElement(prop, "calendar-home-set",
 				NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
-//		appendElement(elem, "href", NameSpaceConstant.DAV_NAMESPACE_PREFIX)
-//				.setTextContent("/" + t.getLoginAtDomain() + "/events/");
 		appendElement(elem, "href", NameSpaceConstant.DAV_NAMESPACE_PREFIX)
-		.setTextContent("/" + t.getLoginAtDomain() + "/");
+				.setTextContent("/" + t.getLoginAtDomain() + "/events/");
+//		appendElement(elem, "href", NameSpaceConstant.DAV_NAMESPACE_PREFIX)
+//		.setTextContent("/" + t.getLoginAtDomain() + "/");
 
 	}
 

@@ -45,7 +45,6 @@ public class PutHandler extends DavMethodHandler {
 			} else {
 				parentComp = req.getURI();
 			}
-			
 			String ics = req.getICS();
 			DavComponent dav = proxy.getCalendarService().updateOrCreateEvent(token,parentComp,ics, extId);
 			
