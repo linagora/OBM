@@ -47,31 +47,32 @@ public class ObmSyncProviderFactory {
 
 	protected ObmSyncProviderFactory() {
 	}
-	
-	public AbstractEventSyncClient getClient(DavComponentType type, String loginAtDomain) {
-		try {
-			switch (type) {
-			case VTODO:
-				return new TodoClient(getObmSyncUrl(type,loginAtDomain));
-			case VEVENT:
-			case VCALENDAR:
-				return new CalendarClient(getObmSyncUrl(type,loginAtDomain));
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+
+	public AbstractEventSyncClient getClient(DavComponentType type,
+			String loginAtDomain) throws Exception {
+		switch (type) {
+		case VTODO:
+			return new TodoClient(getObmSyncUrl(type, loginAtDomain));
+		case VEVENT:
+		case VCALENDAR:
+			return new CalendarClient(getObmSyncUrl(type, loginAtDomain));
 		}
 		return null;
 	}
 
-	protected String getObmSyncUrl(DavComponentType type, String loginAtDomain) {
+	protected String getObmSyncUrl(DavComponentType type, String loginAtDomain)
+			throws Exception {
 		if (urlSync == null) {
 			LocatorClient lc = new LocatorClient();
 			String serverName = lc.locateHost("sync/obm_sync", loginAtDomain);
 			if (serverName == null || "".equals(serverName)) {
-				return null;
+				logger
+						.error("Problem with obm locator: Unable to retrieve the address obm-sync");
+				throw new Exception(
+						"Problem with obm locator: Unable to retrieve the address obm-sync");
 			}
 			urlSync = "http://" + serverName + ":8080/obm-sync/services";
-			logger.info("locator returned the following url: " + urlSync);
+
 		}
 		return urlSync;
 	}
