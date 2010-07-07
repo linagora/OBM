@@ -664,7 +664,7 @@ function run_query_people_update($p_id, $people) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    of_index_update('user', $id);
+    of_index_update('user', $p_id);
     $ret = of_userdata_query_update('user', $p_id, $people);
   }
 
