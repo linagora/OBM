@@ -18,6 +18,7 @@ require HTTP::Request;
 
 use constant OBM_SATELLITE_LOGIN => 'obmsatelliterequest';
 use constant OBM_SATELLITE_PORT => 30000;
+use constant OBM_SATELLITE_CONNECTION_TIMEOUT => 30;
 
 
 sub _new_instance {
@@ -106,7 +107,18 @@ sub get {
         return 1;
     }
 
-    my $response = $ua->request($request);
+    my $response;
+    eval {
+        local $SIG{ALRM} = sub {
+            $self->_log('échec de connexion à l\'hote '.$host, 0);
+            die 'connection timeout'."\n";
+        };
+
+        alarm OBM_SATELLITE_CONNECTION_TIMEOUT;
+        $response = $ua->request($request);
+        alarm 0;
+    };
+
     return $self->_displayResponse( $url, $response );
 }
 
@@ -140,7 +152,18 @@ sub post {
         return 1;
     }
 
-    my $response = $ua->request($request);
+    my $response;
+    eval {
+        local $SIG{ALRM} = sub {
+            $self->_log('échec de connexion à l\'hote '.$host, 0);
+            die 'connection timeout'."\n";
+        };
+
+        alarm OBM_SATELLITE_CONNECTION_TIMEOUT;
+        $response = $ua->request($request);
+        alarm 0;
+    };
+
     return $self->_displayResponse( $url, $response );
 }
 
@@ -174,7 +197,19 @@ sub put {
         return 1;
     }
 
-    my $response = $ua->request($request);
+    my $response;
+    eval {
+        local $SIG{ALRM} = sub {
+            $self->_log('échec de connexion à l\'hote '.$host, 0);
+            $response = undef;
+            die 'connection timeout'."\n";
+        };
+
+        alarm OBM_SATELLITE_CONNECTION_TIMEOUT;
+        $response = $ua->request($request);
+        alarm 0;
+    };
+
     return $self->_displayResponse( $url, $response );
 }
 
