@@ -903,27 +903,29 @@ function run_query_people_get_admin($delegation) {
   display_debug_msg($query, $cdg_sql, 'run_query_people_get_admin(0)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  $profile = array();
+  $profiles = array();
   while($obm_q->next_record()) {
     if($obm_q->f('userperms') !== NULL) {
-      if(intval($obm_q->f('userperms')) & $GLOBALS['cright_write_admin'] == $GLOBALS['cright_write_admin'] ) {
+      if((intval($obm_q->f('userperms')) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin'] ) {
+        echo "HERE";
         $profiles[] = $obm_q->f('profile_name');
       }
     } else {
-      if(intval($obm_q->f('defaultperms')) & $GLOBALS['cright_write_admin'] == $GLOBALS['cright_write_admin'] ) {
+      if((intval($obm_q->f('defaultperms')) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin'] ) {
         $profiles[] = $obm_q->f('profile_name');
       }
     }
+    var_dump($profiles);
   }
   $admins = array();
   if(count($profiles) > 0) {
     $query = "SELECT userobm_id, userobm_delegation_target FROM UserObm 
       WHERE '$delegation' #LIKE #CONCAT(userobm_delegation_target ,'%') AND userobm_perms IN ('".implode("','", $profiles)."') $multidomain
-      ORDER BY userobm_delegation DESC";
+      ORDER BY userobm_delegation_target DESC";
     $obm_q->xquery($query);
     while($obm_q->next_record()) {
-      if(!$minDelegation) $minDelegation = $obm_q->f('userobm_delegation_target');
-      elseif ($obm_q->f('userobm_delegation_target') != $minDelegation) break;
+      if(!$minDelegation) $minDelegation = strtolower($obm_q->f('userobm_delegation_target'));
+      elseif (strtolower($obm_q->f('userobm_delegation_target')) != $minDelegation) break;
       if($minDelegation == '') return array();
       $admins[] = $obm_q->f('userobm_id');
     }
