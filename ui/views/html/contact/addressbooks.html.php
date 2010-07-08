@@ -60,11 +60,11 @@
           <a href='' onclick="obm.contact.addressbook.selectAddressBook($('addressbook-archive')); return false;"><?php echo __('Archive'); ?></a>
           <script type='text/javascript'>
             $('addressbook-archive').store('write', 0);
-            $('addressbook-archive').store('search', 'is:archive');
+            $('addressbook-archive').store('search', 'is:archive addressbookId:( <?php echo implode(' OR ',array_keys($addressbooks->getAddressbooks('read'))); ?>)');
           </script>            
         </form>
         <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_archive'>
-          <?php echo $_addressbook->countContacts('is:archive addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks())).')'); ?></span><?php echo " ".__('contact(s)'); ?></span>
+          <?php echo $_addressbook->countContacts('is:archive addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks('read'))).')'); ?></span><?php echo " ".__('contact(s)'); ?></span>
       </td>
     </tr>
     <tr style="<?php echo ('search' == $current['addressbook'])? '':'display:none;' ?>">
