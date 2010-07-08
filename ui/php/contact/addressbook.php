@@ -330,7 +330,16 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
    return current($this->addressbooks); 
   }
 
-  public function getAddressbooks() {
-    return $this->addressbooks;
+  public function getAddressbooks($right=NULL) {
+    if($right === NULL) {
+      return $this->addressbooks;
+    } else {
+      $addressbooks = array();
+      foreach($this->addressbooks as $addressbook) {
+        if($addressbook->$right == 1)
+          $addressbooks[$addressbook->id] = $addressbook;
+      }      
+      return $addressbooks;
+    }
   }
 }
