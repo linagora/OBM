@@ -2863,7 +2863,6 @@ function run_query_userobm_get_devices($user_id) {
     opush_sync_perms.policy 
     FROM opush_device 
     LEFT JOIN opush_sync_state f ON f.device_id=opush_device.id
-    LEFT JOIN opush_sync_state l ON l.device_id=opush_device.id
     LEFT JOIN opush_sync_perms ON opush_sync_perms.device_id = opush_device.id
     WHERE opush_device.owner='$user_id'
     GROUP BY opush_device.id, opush_device.owner, opush_device.identifier,opush_device.type,opush_sync_perms.device_id, opush_sync_perms.policy
