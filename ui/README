@@ -1,6 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Vers  : 0.6.0                                                       //
-//     - File  : README                                                      //
+// OBM - Vers  : 2.4.0                                                       //
 //     - Desc  : First file to read. Basic infos on OBM.                     //
 // 2000-01-09 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
@@ -8,7 +7,53 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-This file is not valid anymore.
-Visit the doc/html folder for current information.
+What is it?
+-----------
 
-All the OBM docs are in the doc folder.
+OBM is a collaborative messaging platform.
+
+The Latest Versions
+-------------------
+
+Details of the latest version can be found on the OBM website http://obm.org/.
+
+Documentation
+-------------
+
+The documentation available as of the date of this release is included in the /docs/ directory. The most up-to-date documentation can be found at http://obm.org/
+
+Installation
+------------
+
+Please see the file called doc/INSTALL
+
+Changelog
+---------
+
+Please see the file doc/changelog.txt
+
+Licensing
+---------
+
+Please see the file called LICENSE
+
+Contacts
+--------
+
+  o If you want to be informed about new code releases, bug fixes, security
+    fixes, general news and information about the OBM server subscribe to the
+    obm mailing list as described under <http://obm.org>
+
+  o If you want freely available support for running OBM please join the OBM
+    user community by subscribing to Users Mailing List at <http://obm.org> or
+    the following Channel on IRC : #obm
+
+  o If you want commercial support for running OBM please contact
+    our team at <http://www.obm.org/team>
+
+  o If you have a concrete bug report for OBM please go to the
+    OBM Bugzilla and submit your report:
+    <https://www.obm.org/bugzilla/>
+
+  o If you want to participate in actively developing OBM please
+    subscribe to the obm mailing list as described at <http://obm.org>
