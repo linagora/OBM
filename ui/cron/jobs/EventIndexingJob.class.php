@@ -235,14 +235,17 @@ class EventIndexingJob extends CronJob {
 
         $solr->addDocuments($documents);
         
-        // Remove deleted event
-        $query = "SELECT deletedevent_event_id FROM DeletedEvent
-          LEFT JOIN Event ON deletedevent_event_id = event_id
-          LEFT JOIN UserObm ON deletedevent_user_id = userobm_id
-          WHERE userobm_domain_id='$domain' AND event_id IS NULL";
-        $db->query($query);
-        while ($db->next_record()) { 
-          $solr->deleteById($db->f('deletedevent_event_id'));
+        if ($solr_lastupdate) {
+          // Remove deleted event
+          $query = "SELECT deletedevent_event_id FROM DeletedEvent
+            LEFT JOIN Event ON deletedevent_event_id = event_id
+            LEFT JOIN UserObm ON deletedevent_user_id = userobm_id
+            WHERE userobm_domain_id='$domain' AND event_id IS NULL
+            AND deletedevent_timestamp > '$d'";
+          $db->query($query);
+          while ($db->next_record()) { 
+            $solr->deleteById($db->f('deletedevent_event_id'));
+          }
         }
 
         $this->logger->debug("Solr commit");
