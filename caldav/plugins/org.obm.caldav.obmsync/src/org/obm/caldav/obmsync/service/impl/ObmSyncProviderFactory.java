@@ -16,6 +16,9 @@
 
 package org.obm.caldav.obmsync.service.impl;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.share.DavComponentType;
@@ -36,6 +39,8 @@ public class ObmSyncProviderFactory {
 
 	protected String urlSync;
 
+	private HttpClient hc;
+
 	private static ObmSyncProviderFactory instance;
 
 	public static ObmSyncProviderFactory getInstance() {
@@ -46,16 +51,25 @@ public class ObmSyncProviderFactory {
 	}
 
 	protected ObmSyncProviderFactory() {
+		MultiThreadedHttpConnectionManager mtConMan = new MultiThreadedHttpConnectionManager();
+		HttpClient ret = new HttpClient(mtConMan);
+		HttpConnectionManagerParams mp = ret.getHttpConnectionManager()
+				.getParams();
+		
+		mp.setDefaultMaxConnectionsPerHost(10);
+		mp.setMaxTotalConnections(20);
+
+		this.hc = ret;
 	}
 
 	public AbstractEventSyncClient getClient(DavComponentType type,
 			String loginAtDomain) throws Exception {
 		switch (type) {
 		case VTODO:
-			return new TodoClient(getObmSyncUrl(type, loginAtDomain));
+			return new TodoClient(getObmSyncUrl(type, loginAtDomain), hc);
 		case VEVENT:
 		case VCALENDAR:
-			return new CalendarClient(getObmSyncUrl(type, loginAtDomain));
+			return new CalendarClient(getObmSyncUrl(type, loginAtDomain), hc);
 		}
 		return null;
 	}
