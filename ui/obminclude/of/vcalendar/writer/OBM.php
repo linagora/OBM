@@ -348,7 +348,7 @@ class Vcalendar_Writer_OBM {
       $event['repeat_end'] = $rrule['until'];
     }elseif(!is_null($rrule['count'])) {
       $countFactor = ceil($countFactor * ($rrule['count'] - 1));
-      $event['repeat_end'] = strtotime("+$countFactor $countUnit", strtotime($vevent->get('dtstart')));
+      $event['repeat_end'] = new Of_Date(strtotime("+$countFactor $countUnit", strtotime($vevent->get('dtstart'))));      
     }else {
       $event['repeat_end'] = NULL;
     }
