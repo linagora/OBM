@@ -702,7 +702,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function sendEventStateUpdateMail($new, $user) {
-    if($new->get('id') != $user->get('id')) {
+    if($new->get('owner')->get('id') != $user->get('id')) {
       $this->mailer->sendEventStateUpdate($new, $user);
     }
   }

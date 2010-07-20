@@ -4564,7 +4564,7 @@ function html_calendar_dis_delete($current_view, $event_id) {
     <form method='POST' id='deleteForm' action='$GLOBALS[path]/calendar/calendar_index.php'>
       <input type='hidden' name='action' value='delete' />
       <input type='hidden' name='calendar_id' value='$event_id' />";
-  if ($ent_q->nf() > 1) {
+  if ($ent_q->nf() > 1 || ($ent_q->next_record() &&  $ent_q->f('eventlink_entity') == 'user' && $ent_q->f('eventlink_entity_id') != $GLOBALS['obm']['uid'])) {
     $block .= "<input id='send_mail' name='send_mail' value='1' type='checkbox' ><label for='send_mail'>$GLOBALS[l_sendamail]</label>";
   }
   $block .="

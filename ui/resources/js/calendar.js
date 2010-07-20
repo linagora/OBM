@@ -136,17 +136,15 @@ Obm.CalendarManager = new Class({
             var target = '';
             if (obm.vars.consts.action == 'portlet') target = "target='_blank'";
             if (more) {
-              var title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title+'</a>';
-	            var color = evt.content.getStyle('backgroundColor');
-              if (evt.event.colors.event && evt.event.colors.event.body) color = evt.event.colors.event.body;
-              var style = 'style="color:'+color+'"';
               if (evt.event.all_day) {
                 title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'>'+evt.event.title+'</a>';
-                color = "#fff";
-                klass='class="moreEvent '+evt.event.klass+'"';
-                style = 'style="background:'+evt.event.colors.event+'; color:'+color+'" '+klass ;
+              } else {
+                title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title+'</a>';
               }
-              more.set('title', more.get('title')+'<div '+style+'>'+ title+'</div>');
+              color = "#fff";
+              klass='class="moreEvent '+evt.event.klass+'"';
+              style = 'style="background:'+evt.event.colors.event+'; color:'+color+'" '+klass ;
+              more.set('title', more.get('title')+'<div '+style+'>'+ title+'</div>');            
             }
           }
 
