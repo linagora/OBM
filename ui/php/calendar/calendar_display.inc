@@ -4720,7 +4720,7 @@ function html_calendar_waiting_events($obm_wait) {
 function html_calendar_dis_delete($current_view, $event_id) {
   $ent_q = run_query_get_events_attendee(array($event_id));
 
-  if ($ent_q->nf() > 1) {
+  if ($ent_q->nf() > 1 || ($ent_q->next_record() &&  $ent_q->f('eventlink_entity') == 'user' && $ent_q->f('eventlink_entity_id') != $GLOBALS['obm']['uid'])) {
     $mail = "<input id='send_mail' name='send_mail' value='1' type='checkbox' ><label for='send_mail'>$GLOBALS[l_sendamail]</label>";
   }
 
@@ -6182,7 +6182,7 @@ function dis_icalendar_export($params) {
 
   $dis_checkbox = "
     <tr>
-      <th><input type=\"checkbox\" id=\"cb_delete_event\" onClick=\"disable('cb_delete_meeting')\" name=\"cb_delete_event\" /></th>
+      <th><input type=\"checkbox\" id=\"cb_delete_event\" onClick=\"$('cb_delete_meeting').checked = false; disable('cb_delete_meeting')\" name=\"cb_delete_event\" /></th>
       <td><label for=\"cb_delete_event\">$l_delete_event</label></td>
     </tr>
     <tr>

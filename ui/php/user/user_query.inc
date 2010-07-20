@@ -363,7 +363,7 @@ function run_query_user_ext_search($user) {
       INNER JOIN CalendarEntity ON calendarentity_calendar_id = userobm_id
       INNER JOIN EntityRight ON calendarentity_entity_id = entityright_entity_id
       ';
-    $filterWhere = 'AND entityright_'.$filter_pattern.' = 1 AND (entityright_consumer_id IN ('.implode(',',$userEntities).') OR entityright_consumer_id IS NULL)';
+    $filterWhere = 'AND ( entityright_'.$filter_pattern.' = 1 AND (entityright_consumer_id IN ('.implode(',',$userEntities).') OR entityright_consumer_id IS NULL) OR userobm_id = '.$obm['uid'].')';    
   }
 
   $query = "SELECT 
@@ -389,7 +389,7 @@ function run_query_user_ext_search($user) {
   while($obm_q->next_record()) {
     $rows[$obm_q->f("userobm_lastname")." ".$obm_q->f("userobm_firstname"). " ".$obm_q->f('userobm_id')] = $obm_q->Record;
   }
-  $resultsCount = $obm_q->num_rows();
+  $resultsCount = count($rows);
   ksort($rows);
   return array('length' => $resultsCount, 'datas' => $rows);
 }
