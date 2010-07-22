@@ -143,7 +143,7 @@ public class WebdavServlet extends HttpServlet {
 				.addHeader("Allow",
 						"OPTIONS, PROPFIND, HEAD, GET, REPORT, PROPPATCH, PUT, DELETE, POST");
 		response.addHeader("DAV",
-				"1, calendar-access, calendar-schedule, calendar-proxy, calendar-auto-schedule");
+				"1, calendar-access, calendar-schedule, calendar-proxy");
 		response.addHeader("Cache-Control", "private, max-age=0");
 		if (proxy != null && token != null) {
 			try {
