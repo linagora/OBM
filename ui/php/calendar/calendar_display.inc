@@ -5382,9 +5382,9 @@ function dis_calendar_free_interval($current_view, $calendar) {
     new obm.AutoComplete.ExtSearch(
       function() { return \$('freeBusySearchSource').value+'&action=ext_search&ajax=1'; },
       'dummy', 'freeBusyUserSearch',
-      {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});
+      {filter_entity:'calendar', filter_pattern:'access', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});
     new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'dummy', 'freeBusyResourceSearch',
-      {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});
+      {filter_entity:'calendar', filter_pattern:'access', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});
   </script>";
   
   return $block;
@@ -5995,7 +5995,7 @@ function dis_icalendar_export($params) {
 
   $dis_checkbox = "
     <tr>
-      <th><input type=\"checkbox\" id=\"cb_delete_event\" onClick=\"disable('cb_delete_meeting')\" name=\"cb_delete_event\" /></th>
+      <th><input type=\"checkbox\" id=\"cb_delete_event\" onClick=\"$('cb_delete_meeting').checked=false; disable('cb_delete_meeting')\" name=\"cb_delete_event\" /></th>
       <td><label for=\"cb_delete_event\">$l_delete_event</label></td>
     </tr>
     <tr>
