@@ -100,6 +100,10 @@ $cgp_mailing_default = true;
 // Contact : is a new contact private by default
 $ccontact_private_default = false;
 
+// Contact : archived contact expiration time (in month), 0 to disable
+// a contact archived since more than $cgp_contact_expiration month is deleted by the cron ContactExpiration
+$cgp_contact_expiration = 0;
+
 // Calendar: display my rights panel
 $c_calendar_display_my_rights = false;
 
