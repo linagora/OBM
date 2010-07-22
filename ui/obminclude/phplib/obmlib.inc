@@ -548,7 +548,7 @@ class LDAP_Auth extends Auth {
     if(!$login) {
       return false;
     }
-    if(!trim($password) == '') {
+    if(trim($password) == '') {
       return false;
     }
     $auth_ldap_attribute = array("dn", "uid");
