@@ -128,6 +128,17 @@ sub next {
                 }
 
                 if( $self->{'updateType'} eq 'UPDATE_ENTITY' ) {
+                    # In some case, even if scope indicate that only
+                    # UPDATE_ENTITY is needed, entity links must be updated
+                    if($self->{'currentEntity'}->getForceLoadEntityLinks()) {
+                        if($self->_loadGroupLinks()) {
+                            $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                            next;
+                        }else {
+                            $self->{'currentEntity'}->setUpdateLinks();
+                        }
+                    }
+
                     $self->_log( 'mise à jour de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
                     $self->{'currentEntity'}->setUpdateEntity();
                     last SWITCH;
@@ -217,7 +228,8 @@ sub _loadEntities {
 
     my $query = 'SELECT '.$groupTablePrefix.'UGroup.*,
                         current.group_name as group_name_current,
-                        current.group_contacts as group_contacts_current
+                        current.group_contacts as group_contacts_current,
+                        current.group_email as group_email_current
                  FROM '.$groupTablePrefix.'UGroup
                  LEFT JOIN P_UGroup current ON current.group_id='.$groupTablePrefix.'UGroup.group_id
                  WHERE '.$groupTablePrefix.'UGroup.group_domain_id='.$self->{'domainId'}.'

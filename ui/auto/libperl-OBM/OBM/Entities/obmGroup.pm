@@ -117,6 +117,17 @@ sub _init {
         $groupDesc->{'group_mailperms'} = 1;
     }
 
+    # Is mail right was updated ?
+    my $groupMailpermCurrent = 0;
+    my($currentGroupMainEmail, $currentGroupAliasEmail) = $self->_makeEntityEmail($groupDesc->{'group_email_current'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') );
+    if(defined($currentGroupMainEmail)) {
+        $groupMailpermCurrent = 1;
+    }
+
+    if($groupDesc->{'group_mailperms'} != $groupMailpermCurrent) {
+        $self->setForceLoadEntityLinks();
+    }
+
     # External contacts
     if( $groupDesc->{'group_contacts'} ) {
         my @externelContacts = split( /\r\n/, $groupDesc->{'group_contacts'} );

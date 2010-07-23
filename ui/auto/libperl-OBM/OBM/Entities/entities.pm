@@ -367,6 +367,26 @@ sub getUpdateEntity {
 }
 
 
+# Set force links update flag
+sub setForceLoadEntityLinks {
+    my $self = shift;
+
+    $self->{'forceLoadEntityLinks'} = 1;
+}
+
+
+# Get force links update flag
+sub getForceLoadEntityLinks {
+    my $self = shift;
+
+    if(!$self->{'forceLoadEntityLinks'}) {
+        return 0;
+    }
+
+    return 1;
+}
+
+
 # Update entity links
 sub setUpdateLinks {
     my $self = shift;
