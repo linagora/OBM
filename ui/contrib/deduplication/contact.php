@@ -1,17 +1,17 @@
 <?php
 #
-# Copy in [path to obm root]/php
 # contact.php --dry : do not delete in database
 # contact.php --wet : delete in database
 # contact.php --[wet|dry] -u ID : Execute the script for the user with id ID
 # Does not work for the public contact.
 #
 #
-$path = ".";
+$path = "..";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 $includePath = realpath("$path/..");
 set_include_path(".:$includePath");
+ini_set('error_reporting',E_ALL & ~E_NOTICE);
 include("$obminclude/global.inc");
 
 $options = getopt('dryu:wet');
