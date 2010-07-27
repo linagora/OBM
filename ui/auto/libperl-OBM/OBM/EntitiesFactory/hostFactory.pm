@@ -262,7 +262,9 @@ sub _loadCurrentEntityFields {
 
     my %entityFields;
     while( my($fieldName, $fieldValue) = $queryResult->fetchrow_array() ) {
-        $entityFields{$fieldName}->{$fieldValue} = 1;
+        if($fieldValue) {
+            $entityFields{$fieldName}->{$fieldValue} = 1;
+        }
     }
 
     while( my($key, $value) = each(%entityFields) ) {
