@@ -568,23 +568,27 @@ function dis_invoice_portal() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_my_portal() {
   global $uid, $ico_big_settings, $path, $cgp_show, $perm, $cright_read;
-  global $l_section_my, $l_module_settings;
+  global $l_section_my, $l_module_settings, $cright_write;
 
-  $my = array ('password', 'mailforward', 'vacation', 'mailbox');
+  $my = array (
+    'settings'    => array("$path/settings/settings_index.php",       $GLOBALS['l_module_settings'],    $cright_read),
+    'password'    => array("$path/password/password_index.php",       $GLOBALS['l_module_password'],    $cright_read),
+    'mailforward' => array("$path/mailforward/mailforward_index.php", $GLOBALS['l_module_mailforward'], $cright_read),
+    'vacation'    => array("$path/vacation/vacation_index.php",       $GLOBALS['l_module_vacation'],    $cright_read),
+    'mailbox'     => array("$path/mailbox/mailbox_index.php",         $GLOBALS['l_module_mailbox'],     $cright_read),
+    'calendar'    => array("$path/calendar/calendar_index.php?action=rights_admin", $GLOBALS['l_my_calendar_share'], $cright_write)
+  );
 
-  foreach ($my as $mod) {
-    if ($cgp_show['module']["$mod"] && $perm->check_right("$mod", $cright_read)) { 
-      $l_mod = "l_module_$mod";
-      global $$l_mod;
-      $dis_my .= "
-   <a class=\"link\" href=\"$path/$mod/${mod}_index.php\">${$l_mod}</a><br />";
+  foreach ($my as $mod => $params) {
+    list($url, $title, $perms) = $params;
+    if ($cgp_show['module']["$mod"] && $perm->check_right("$mod", $perms)) {
+      $dis_my .= "\n<a class=\"link\" href=\"$url\">$title</a><br />";
     }
   }
 
   $block = "
   <div class=\"summaryBox\"> 
   <h1><img src=\"$ico_big_settings\" alt=\"$l_section_my\" />$l_section_my</h1>
-  <a class=\"link\" href=\"$path/settings/settings_index.php\">$l_module_settings</a><br />
   $dis_my
   </div>";
 

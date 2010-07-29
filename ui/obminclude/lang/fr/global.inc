@@ -600,4 +600,5 @@ $l_do_backup = "Effectuer la sauvegarde";
 $l_available_backups = "Sauvegardes disponibles";
 $l_service_get_ftp_backups = "Récupération des archives disponibles sur le serveur FTP";
 
+$l_my_calendar_share = "Partage de mon agenda";
 

@@ -490,3 +490,5 @@ $l_hide_advanced_search = "";
 
 $l_unlink_mobile = "Löschen das mobile Gerät";
 
+$l_my_calendar_share = "Sharing meinem Kalender";
+

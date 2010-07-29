@@ -516,4 +516,5 @@ $l_do_backup = "Backup !";
 $l_available_backups = "Available backups";
 $l_service_get_ftp_backups = "Get available archives from the FTP server";
 
+$l_my_calendar_share = "Sharing my calendar";
 

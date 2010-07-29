@@ -504,3 +504,6 @@ $l_solr_connection_err = "Eroare înregistrată în timpul conexiunii la serveru
 $l_duplicate_error = "Eroare copie"; 
 
 $l_unlink_mobile = "Scoateţi dispozitivul mobil";
+
+$l_my_calendar_share = "Partajarea calendarului meu";
+

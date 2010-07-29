@@ -504,3 +504,5 @@ $l_duplicate_error = "Errore copia";
 
 $l_unlink_mobile = "Elimina il dispositivo mobile";
 
+$l_my_calendar_share = "Condividere il mio calendario";
+
