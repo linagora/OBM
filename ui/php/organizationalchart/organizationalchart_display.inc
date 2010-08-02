@@ -483,7 +483,7 @@ function dis_organizationalchart_consult_chart($node_q, $output) {
   if (is_array($users)) {
     uasort($users, 'sort_node_detail');
     foreach ($users as $user_id => $one_user) {
-      $userobm_url = "$GLOBALS[path]/user/user_index.php?action=detailconsult&amp;user_id=$user_id";
+      $userobm_url = "$GLOBALS[path]/people/people_index.php?action=detailconsult&amp;user_id=$user_id";
       $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
       $is_manager = $one_user['manager'];
       $item_id = "item-${level}-${user_id}";
