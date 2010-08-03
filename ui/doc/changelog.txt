@@ -1,12 +1,25 @@
 <!-- $Id:$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.8 - 2010-06-14
+version 2.3.9 - 2010-07-02
 
-2010-06-30 : version 2.3.9
+2010-07-02 : version 2.3.10
 
   * #658 [Sync] OPush needs to be production proof for 2.3.0
   * #1171 [Package] install breaks on sid 
+
+2010-07-02 : version 2.3.9
+
+  * #887 [sso] LemonLDAP should not use anymore its own OBM libraries
+  * #1340 [Planning] Postgresql Support
+  * #1351 [Calendar] Email should not be sent for past events
+  * #1352 [Calendar] Resource reservation cancel notification is not translated
+  * #1353 [Calendar] Conflict management screen throw an error
+  * #1354 Making obm-locator Heartbeat compliant
+  * #1356 Making obm-tomcat init script Heartbeat compliant
+  * #1357 Making obm-caldav init script Heartbeat compliant
+  * #1358 DB upgrade not possible if the DB is remote
+  * #1360 [Calendar] Free/Busy - Line are messed up
 
 2010-06-14 : version 2.3.8
 
