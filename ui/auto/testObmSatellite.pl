@@ -81,6 +81,7 @@ sub run {
                 if( $self->smtpInConf() ) {
                     $self->_log( 'probleme lors de la mise à jour des maps des SMTP entrants', 0 );
                     print STDERR 'probleme lors de la mise à jour des maps des SMTP entrants'."\n";
+                    return 1;
                 }else {
                     $self->_log( 'Mise a jour des maps de SMTP entrants réussie', 2 );
                     print STDERR 'Mise a jour des maps de SMTP entrants réussie'."\n";
@@ -92,6 +93,7 @@ sub run {
                 if( $self->cyrusPartitionConf() ) {
                     $self->_log( 'probleme lors de la mise à jour des partitions cyrus', 0 );
                     print STDERR 'probleme lors de la mise à jour des partitions cyrus'."\n";
+                    return 1;
                 }else {
                     $self->_log( 'Mise a jour des partition Cyrus réussi', 2 );
                     print STDERR 'Mise a jour des partition Cyrus réussi'."\n";

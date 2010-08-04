@@ -25,10 +25,17 @@ sub _new_instance {
         return undef;
     }
 
+    if(!open(XML, "<:utf8", $self->{'xmlFile'})) {
+        $self->_log('Erreur fatale: le fichier XML de description de l\'annuaire LDAP \''.$self->{'xmlFile'}.'\' ne peut pas être lu', 0);
+        return undef;
+    }
+    my @xmlFile = <XML>;
+    close(XML);
+
     require XML::Simple;
     my $xmlParser = XML::Simple->new( ForceArray => [ 'entity', 'objectclass', 'map' ] );
     $self->_log( 'chargement du fichier XML de description de l\'annuaire LDAP \''.$self->{'xmlFile'}.'\'', 3 );
-    $self->{'xml'} = $xmlParser->XMLin( $self->{'xmlFile'} );
+    $self->{'xml'} = $xmlParser->XMLin(join('', @xmlFile));
 
     if( !defined($self->{'xml'}) ) {
         $self->_log( 'Erreur fatale: échec du chargement du fichier XML de description de l\'annuaire LDAP \''.$self->{'xmlFile'}.'\'', 0 );
