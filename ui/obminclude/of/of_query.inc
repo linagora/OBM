@@ -3396,10 +3396,19 @@ function of_entity_delete($entity,$id) {
   } else {
     $id = sql_parse_id($id);
   }  
-  $query = 'DELETE FROM Entity WHERE entity_id IN (SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id IN ('.$id.'))';
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, 'of_entity_delete()');
-  $obm_q->query($query);
+  $query_select = 'SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id IN ('.$id.')';
+  display_debug_msg($query_select, $cdg_sql, 'of_entity_delete()');
+  $obm_q->query($query_select);
+  while($obm_q->next_record()){
+    $entity_id[]=$obm_q->f($entity.'entity_entity_id');
+  }
+  if(is_array($entity_id)){
+    $entity_id = implode(',',$entity_id);
+    $query = 'DELETE FROM Entity WHERE entity_id IN ('.$entity_id.')';
+    display_debug_msg($query, $cdg_sql, 'of_entity_delete()');
+    $obm_q->query($query);
+  }
 }
 
 
