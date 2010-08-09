@@ -13,7 +13,7 @@ $l_user_pref_reset = "Mise à jour de toutes les préférences utilisateurs avec
 $l_user_pref_update_one = "Mise à jour de la valeur par défaut de la préférence";
 
 // Titles
-$l_execute = "Exécute action";
+$l_execute = "Exécuter l'action";
 $l_help = "Aide";
 
 // Messages (+ javascript)
