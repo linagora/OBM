@@ -1,17 +1,29 @@
 <?php
 /*
  +-------------------------------------------------------------------------+
- |  Copyright (c) 1997-2009 OBM.org project members team                   |
+ | Copyright © LINAGORA 2010                                               |
  |                                                                         |
- | This program is free software; you can redistribute it and/or           |
- | modify it under the terms of the GNU General Public License             |
- | as published by the Free Software Foundation; version 2                 |
- | of the License.                                                         |
+ | This file is part of OBM. OBM includes and uses many components working |
+ | together as a complete end-to-end solution: Groupware, messaging        |
+ | server, CRM,  LDAP, project, smartphones and PDA synchronization        |
  |                                                                         |
- | This program is distributed in the hope that it will be useful,         |
+ | OBM is free software; you can redistribute it and/or                    |
+ | modify it under the terms of the GNU Affero General Public License      |
+ | as published by the Free Software Foundation; version 3 of the License. |
+ |                                                                         |
+ | There are special exceptions to the terms and conditions of the         |
+ | licenses as they are applied to this software. View the full text of    | 
+ | the exception in file LICENSE.txt in the directory of this software     |
+ | distribution.                                                           |
+ |                                                                         |
+ | OBM is distributed in the hope that it will be useful,                  |
  | but WITHOUT ANY WARRANTY; without even the implied warranty of          |
  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           |
- | GNU General Public License for more details.                            |
+ | License.txt for more details.                                           |
+ |                                                                         |
+ | You should have received a copy of the GNU Affero General Public        |
+ |  License  with this file. If not, see :                                 |
+ | <http://www.fsf.org/licensing/licenses/agpl-3.0.html>                   |
  +-------------------------------------------------------------------------+
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
