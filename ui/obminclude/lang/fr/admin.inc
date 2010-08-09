@@ -22,6 +22,8 @@ $l_last_access = "Dernier accès";
 $l_nb_connec = "Nombre de hits";
 $l_last_page = "Dernière page consultée";
 $l_user_ip = "IP";
+$l_clear_passive_session = "Sessions utilisateurs passives";
+$l_passive_session = "Sessions passives";
 
 // Titles
 $l_admin = "Admin";
@@ -29,3 +31,5 @@ $l_admin_lang = "Admin Langue";
 
 // Actions
 $l_help = "Aide";
+$l_action = "Action";
+$l_clear_sess = "Nettoyer sessions";
