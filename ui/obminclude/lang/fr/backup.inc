@@ -32,7 +32,7 @@ $l_err_unknown_db = "Type de base de données inconnu !";
 
 // Actions
 $l_delete = "Supprimer";
-$l_insert = "Créér la sauvegarde";
+$l_insert = "Créer la sauvegarde";
 $l_restore = "Restaurer";
 
 //backup

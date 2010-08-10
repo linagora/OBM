@@ -56,10 +56,6 @@ require('mailshare_query.inc');
 require('mailshare_js.inc');
 require("$obminclude/of/of_right.inc");
 
-// lang file include for backup
-$lang = strtolower(get_lang());
-include_once("obminclude/lang/$lang/backup.inc");
-
 if ($action == '') $action = 'index';
 get_mailshare_action();
 $perm->check_permissions($module, $action);
