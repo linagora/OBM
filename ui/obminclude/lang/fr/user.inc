@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_login = "Identifiant";
+$l_gid = "Groupe principal";
 $l_password = "Mot de passe";
 $l_password_update = "Modification mot de passe";
 $l_lastaccess = "Dernier accès";
