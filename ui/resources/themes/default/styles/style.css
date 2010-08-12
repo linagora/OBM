@@ -607,9 +607,14 @@ input.box {
   width: auto;
 }
 
+.multiple .emailNomade {
+  width: 90%;
+}
+
 .multiple input, .multiple select {
   width: auto;
 }
+
 .extra {
   clear: left;
 }
