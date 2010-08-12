@@ -12,7 +12,7 @@ $l_bytes = "octets";
 
 // Message
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des sauvegardes correspondantes.";
-$l_found = "sauvegarde(s) trouvée(s)";
+$l_backup_found = "sauvegarde(s) trouvée(s)";
 $l_no_found = "Aucune sauvegarde ne correspond à ces critères !";
 $l_restore_ok = "La restauration de la sauvegarde a été correctement effectuée.";
 $l_restore_error = "La restauration de la sauvegarde a échoué !";

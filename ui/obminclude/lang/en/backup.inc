@@ -9,7 +9,7 @@
 
 $l_bytes = "bytes";
 $l_no_display = "Fill in the search fields and press < Find > to retrieve the backup";
-$l_found = "backup found";
+$l_backup_found = "backup found";
 $l_no_found = "No backup matching the query has been found!"; 
 $l_restore_ok = "The backup has been restored successfully.";
 $l_restore_error = "The backup restoration has failed !";

@@ -100,7 +100,7 @@ function dis_backup_search_list($backup) {
 //   - $nb_files : nb backup files
 ///////////////////////////////////////////////////////////////////////////////
 function html_backup_search_list($files, $nb_files) {
-  global $display, $path, $l_found, $l_file, $l_date, $l_size, $l_version;
+  global $display, $path, $l_backup_found, $l_file, $l_date, $l_size, $l_version;
   global $l_bytes, $l_restore, $l_delete;
 
   foreach ($files as $file => $one_file) {
@@ -121,7 +121,7 @@ function html_backup_search_list($files, $nb_files) {
       </tr>";
   }
 
-  $display['msg'] .= display_info_msg("$nb_files $l_found");
+  $display['msg'] .= display_info_msg("$nb_files $l_backup_found");
 
   $block = "
   <div class=\"result\">

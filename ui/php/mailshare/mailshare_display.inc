@@ -172,7 +172,7 @@ function dis_mailshare_search_list($mailshare) {
 //     keys used  : name, ip, popup
 ///////////////////////////////////////////////////////////////////////////////
 function html_mailshare_search_list($obm_q, $pref_q, $nb_mailshare, $mailshare) {
-  global $display, $l_found, $l_close, $module;
+  global $display, $l_mailshare_found, $l_close, $module;
 
   $popup = $mailshare['popup'];
 
@@ -210,7 +210,7 @@ function html_mailshare_search_list($obm_q, $pref_q, $nb_mailshare, $mailshare) 
   $dis_mailshare->data_header = 'both';
 
   // --- HTML Template --------------------------------------------------------
-  $display['msg'] .= display_ok_msg("$nb_mailshare $l_found");
+  $display['msg'] .= display_ok_msg("$nb_mailshare $l_mailshare_found");
   $block .= $dis_mailshare->display('dis_data_mailshare');
 
   return $block;
