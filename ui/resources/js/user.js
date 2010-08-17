@@ -320,7 +320,6 @@ Obm.UserPattern.NomadeField = new Class ({
   },
 
   changed: function() {
-    console.log(this.value.join('-'),this.getValue().join('-'),this.value.join('-')!=this.getValue().join('-'));
     return (this.value.join('-')!=this.getValue().join('-'));
   },
 
