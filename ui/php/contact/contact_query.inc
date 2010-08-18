@@ -1750,8 +1750,13 @@ function run_query_contact_ext_search($contact) {
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('contact');
 
-  $addressbooks = OBM_AddressBook::get($contact['addressbook_id']);
-  $contacts = $addressbooks->getContacts($contact['pattern']."*");
+  if (is_null($addressbook_id)) {
+    $addressbooks = OBM_AddressBook::search();
+    $contacts = $addressbooks->searchContacts($contact['pattern']."*");
+  } else {
+    $addressbooks = OBM_AddressBook::get($contact['addressbook_id']);
+    $contacts = $addressbooks->getContacts($contact['pattern']."*");
+  }
 
   return $contacts;
 }

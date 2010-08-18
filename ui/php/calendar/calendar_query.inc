@@ -781,6 +781,10 @@ function run_query_calendar_insert_event_data($calendar) {
   }
   $properties = "<extended_desc>$properties</extended_desc>";
   if($all_day == 'TRUE') {
+    //FIXME: all following could be simplified with
+    // if ($mod = $event_duration % 86400)
+    //     $event_duration += 86400 - $mod;
+    // $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $dateend = clone $datebegin;
     $dateend->addSecond($event_duration - 1);
     $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
