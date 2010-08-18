@@ -69,10 +69,15 @@ if ($action == 'logout') {
   exit;
 } elseif($action == 'ext_get_entities') {
 
-  $entities = searchWritablesEntities($params['entity'], $obm['uid'], $params['pattern'], true);
+  $entity = strtolower($params['entity']);
+  $entities = searchWritablesEntities($entity, $obm['uid'], $params['pattern'], true);
   $users = array();
-  foreach($entities as $id => $entity) {
-    $users[] = "{id:'$id', label:'$entity', extra:''}";
+  foreach($entities as $id => $data) {
+    $label = $data['label'];
+    $extra = $data['extra'];
+    if (OBM_Acl::isSpecialEntity($entity))
+      $extra = phpStringToJsString(get_entity_email($extra));
+    $users[] = "{id:'$id', label:'$label', extra:'{$extra}'}";
   }
   $display['json'] = "{length:".count($entities).", datas:[".implode(',',$users)."]}";  
   echo $display['json'];

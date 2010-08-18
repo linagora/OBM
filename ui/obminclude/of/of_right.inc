@@ -514,6 +514,7 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   $ent_array = array();
   $id_array = array();
 
+  $e_extra = "''";
   $entity = strtolower($entityu);
   //$query =  "SELECT ".OBM_Acl::getEntityColumns($entity)." FROM (".OBM_Acl::getAclSubselect('', $entityType, $entityId = null, $userId = null, $action = null).")" as AllowedEntity WHERE id IN (".OBM_Acl::getAclSubselect('', $entityType, $entityId = null, $userId = null, $action = null).")"
   //while ($db->next_record()) {
@@ -531,7 +532,8 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   } elseif (OBM_Acl::isSpecialEntity($entityu)) {
     $table_entity = 'UserObm';
     $e_id = 'e.userobm_id';
-    $e_label = "#CONCAT(userobm_firstname, ' ', userobm_lastname)";
+    $e_label = "#CONCAT(userobm_lastname, ' ', userobm_firstname)";
+    $e_extra = 'userobm_email';
     $u = get_user_info($user_id);
   } else {
     switch($entity) {
@@ -556,7 +558,7 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
   }    
 
 
-  $query = "SELECT $e_id AS id, $e_label AS label, '$entity' as entityright_entity FROM $table_entity AS e WHERE 1=1 $where $where_filter_entity $multidomain $sqllimit";
+  $query = "SELECT $e_id AS id, $e_label AS label, $e_extra as extra, '$entity' as entityright_entity FROM $table_entity AS e WHERE 1=1 $where $where_filter_entity $multidomain $sqllimit";
   // END - superman has all rights on entities
 
   display_debug_msg($query, $cdg_sql, 'of_right_entity_for_user()');
@@ -567,8 +569,9 @@ function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = 
     $id = $db->f('id');
     if ( ($ids_set == '') || ( (is_array($ids_set)) && (in_array($id, $ids_set)) ) ) {
       $label = $db->f('label');
+      $extra = $db->f('extra');
       $id_array[] = $id;
-      $ret_array[$id] = $label;
+      $ret_array[$id] = array('label' => $label, 'extra' => $extra);
     }
   }
   
