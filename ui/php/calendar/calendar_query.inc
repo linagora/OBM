@@ -2922,6 +2922,45 @@ function check_calendar_access($id, $right = 'write') {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if the event can be accessed using the token
+// Parameters:
+//   - $id : event id
+// Returns:
+//   true if the event can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_calendar_access_by_token($id, $right = 'read') {
+  global $l_event_cant_delete, $obm, $delete_ok, $err, $l_insufficient_permission, $l_err_reference;
+
+  $uid = $GLOBALS['token']['uid'];
+  if ((!$uid) && ($GLOBALS['token']['entity']=='user')) {
+    $uid = $GLOBALS['token']['entityId'];
+  }
+
+  if (($right == 'write') || ($right == 'admin')) {
+    $err['msg'] = $l_insufficient_permission;
+    return false;
+  }
+  if ((!$id) || (!$uid)) {
+    $err['msg'] = $l_err_reference;
+    return false;
+  }
+  $e = get_calendar_event_info($id);
+  if(!$e) {
+    $err['msg'] = $l_err_reference;    
+    return false;
+  }
+  if ($e['owner'] == $uid) {
+    return true;
+  }
+  if(is_array($e['attendees']['user']) && in_array($uid, $e['attendees']['user'])) {
+    return true;
+  }
+  $err['msg'] = $l_insufficient_permission;
+  return false;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Delete all events of a evenements, and the event
 // Parameters: 
 //   - $calendar : calendar infos hash
