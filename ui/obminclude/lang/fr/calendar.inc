@@ -24,7 +24,7 @@ $l_documents = "Documents";
 $l_other_files = "Autres fichiers";
 $l_allow_documents = "Autoriser les participants à attacher des documents";
 $l_details = "Consulter";
-$l_private_description = "Cet événement est personnel. Impossible de voir le détail.";
+$l_private_description = "Cet évènement est personnel. Impossible de voir le détail.";
 $l_high = "Haute";
 $l_low = "Basse";
 $l_medium = "Normale";
@@ -41,7 +41,7 @@ $l_rights_on_my = "Droits sur mon agenda";
 $l_rights_my_on = "Mes droits sur les agendas";
 $l_date_repeatend = "Fin de répétition";
 $l_carac = "Propriétés";
-$l_force = "Forcer l'insertion de l'événement";
+$l_force = "Forcer l'insertion de l'évènement";
 $l_force_disabled = "(impossible car une ressource est en jeu)";
 $l_overbooking_not_allowed = "La surréservation de ressource n'est pas autorisée";
 $l_everybody = "Tout le monde";
@@ -49,7 +49,7 @@ $l_everyresources = "Toutes les ressources";
 $l_all_day = "Toute la journée";
 $l_begin = "Début";
 $l_end = "Fin";
-$l_link_events = " événements liés à cette catégorie.";
+$l_link_events = " évènements liés à cette catégorie.";
 $l_waiting_events = "Rendez-vous en attente";
 $l_free = "Libre mais restreint";
 $l_opacity = "Disponibilité";
@@ -87,7 +87,7 @@ $l_periodic = "Périodique";
 $l_days = 'jours';
 $l_more = 'de plus';
 $l_search_my_calendar = "Rechercher dans mon agenda";
-$l_create_in_mine = "Nouvel événement dans mon agenda";
+$l_create_in_mine = "Nouvel évènement dans mon agenda";
 $l_search_result = "Résultat de recherche";
 $l_event_is_exception = "Cette évènement a été modifié et ne fait plus partie d'une série";
 $l_parent_event = "Evènement parent";
@@ -111,7 +111,7 @@ $l_reinit_calendar_private = "Réinitialisation des urls privées";
 $l_reinit_calendar_public = "Réinitialisation des urls publics";
 $l_desc_reinit_adress_public = "Les urls public existantes ne seront plus valides. Voulez vous continuez ?";
 $l_desc_reinit_adress_private = "Les urls privées existantes ne seront plus valides. Voulez vous continuez ?";
-$l_desc_share_adresse_public = "L'Adresse URL de l'agenda est l'URL publique de votre agenda. Cette adresse permet aux autres utilisateurs de visualiser votre agenda public, de consulter vos événements public via un navigateur web.";
+$l_desc_share_adresse_public = "L'Adresse URL de l'agenda est l'URL publique de votre agenda. Cette adresse permet aux autres utilisateurs de visualiser votre agenda public, de consulter vos évènements public via un navigateur web.";
 $l_desc_share_adresse_private = "L'adresse URL privée de votre agenda est réservée à un usage personnel. Toutes les informations relatives à votre agenda sont disponibles via vos liens privés.";
 $l_send = "Envoyer";
 $l_reinit_ok = "réinitialisation des urls réussis";
@@ -158,7 +158,7 @@ $l_delete_template = "Supprimer le modèle?";
 // actions 
 $l_refresh = "Actualiser";
 $l_meeting_perform = "Rechercher les créneaux libres";
-$l_insert = "Enregistrer l'événement";
+$l_insert = "Enregistrer l'évènement";
 $l_accept = "Accepter";
 $l_reject = "Refuser";
 $l_select = "Sélectionner";
@@ -166,9 +166,9 @@ $l_repeat_update = "Mettre à jour toutes les répétitions à venir";
 $l_go_to = "Aller à";
 $l_refuse = "Refuser";
 $l_state = "Participation";
-$l_change_state = "Votre participation à l'événement";
+$l_change_state = "Votre participation à l'évènement";
 $l_force_insert = "Forcer l'insertion";
-$l_refuse_insert = "Refuser l'événement";
+$l_refuse_insert = "Refuser l'évènement";
 $l_cancel_insert = "Ne rien faire";
 $l_too_much_user = "Vous ne pouvez sélectionner au maximum que six utilisateurs";
 $l_too_much_resource = "Vous ne pouvez sélectionner au maximum que six ressources";
@@ -205,7 +205,7 @@ $l_event_before_date = "Uniquement les évènements antérieurs au : ";
 $l_delete_event = "Supprimer les rendez-vous de mon agenda";
 $l_delete_meeting = "Supprimer les réunions de mon agenda";
 $l_ics_export_ok = "Les évènements ont été exportés.";
-$l_confirm_delete_export = "Les événements de votre agenda vont maintenant être supprimés, cette opération ne pourra pas être annulée, voulez-vous continuer?";
+$l_confirm_delete_export = "Les évènements de votre agenda vont maintenant être supprimés, cette opération ne pourra pas être annulée, voulez-vous continuer?";
 $l_purge_popup_title = "Purge de votre agenda";
 
 $l_cal_view = "Type d'affichage";
@@ -213,30 +213,30 @@ $l_cal_range = "Période d'affichage";
 $l_view_agenda = "Calendrier";
 $l_view_planning = "Planning";
 $l_view_printable = "Imprimable";
-$l_view_list = "Liste des événements";
+$l_view_list = "Liste des évènements";
 $l_range_day = "sur un jour";
 $l_range_week = "sur une semaine";
 $l_range_month = "sur un mois";
 $l_view_agenda_desc = "Vue calendrier, cette vue est éditable";
 $l_view_printable_desc = "Vue imprimable du calendrier, cette vue n'est pas éditable";
 $l_view_planning_desc = "Vue planning du calendrier, cette vue n'est pas éditable";
-$l_view_list_desc = "Liste des événements, cette vue n'est pas éditable";
-$l_view_week_desc = "Voir les événements sur une semaine";
-$l_view_day_desc = "Voir les événements sur un jour";
-$l_view_month_desc = "Voir les événements sur un mois";
+$l_view_list_desc = "Liste des évènements, cette vue n'est pas éditable";
+$l_view_week_desc = "Voir les évènements sur une semaine";
+$l_view_day_desc = "Voir les évènements sur un jour";
+$l_view_month_desc = "Voir les évènements sur un mois";
 
 
 // Messages
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";
 $l_select_pdf_day = "Vous devez sélectionner un jour";
-$l_confirm_delete_all = "Cette opération va supprimer toutes les occurences de cet événement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
-$l_confirm_delete = "Cette opération va supprimer cette occurence de l'événement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
+$l_confirm_delete_all = "Cette opération va supprimer toutes les occurences de cet évènement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
+$l_confirm_delete = "Cette opération va supprimer cette occurence de l'évènement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
 $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour ";
 $l_fill_title = "Veuillez remplir le champ [ $l_title ]";
 $l_fill_dateend = "Veuillez remplir le champ [ $l_dateend ]";
 $l_fill_datebegin = "Veuillez remplir le champ [ $l_datebegin ]";
-$l_warn_date_past = "La date de début de l'événement est dans le passé";
+$l_warn_date_past = "La date de début de l'évènement est dans le passé";
 $l_warn_file_upload = "Certains fichiers n'ont pu être téléchargés";
 $l_err_file_access_forbidden = "Vous n'avez pas la permission d'accéder à ce document";
 $l_err_no_calendar_selected = "Aucun agenda séléctionné";
@@ -246,11 +246,11 @@ $l_err_end_repeat2 = "La durée maximum d'une répétition est de 1 an";
 $l_err_end_repeat3 = "La durée maximum d'une répétition est de 10 ans lorsque la répétition est de type annuelle.";
 $l_err_days_repeat = "Vous devez spécifier des jours de répétitions.";
 $l_err_days_repeat_not_weekly = "Vous ne pouvez préciser des jours de répétition qu'en mode de répétition hebdomadaire.";
-$l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de répétition doit au moins être de 7 jours supérieure à celle de fin d'événement.";
-$l_err_monthly_dateend_repeat = "La date de fin de répétition mensuelle doit être au moins de 1 mois supérieure à la date de fin de l'événement.";
-$l_err_yearly_dateend_repeat = "La date de fin de répétition annuelle doit être au moins de 1 an supérieure à la date de fin de l'événement.";
+$l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de répétition doit au moins être de 7 jours supérieure à celle de fin d'évènement.";
+$l_err_monthly_dateend_repeat = "La date de fin de répétition mensuelle doit être au moins de 1 mois supérieure à la date de fin de l'évènement.";
+$l_err_yearly_dateend_repeat = "La date de fin de répétition annuelle doit être au moins de 1 an supérieure à la date de fin de l'évènement.";
 $l_err_repeatfrequency = "La fréquence est invalide";
-$l_event_cant_delete = "Vous ne pouvez supprimer que vos événements !";
+$l_event_cant_delete = "Vous ne pouvez supprimer que vos évènements !";
 
 $l_fill_view_label = "Vous devez spécifier le nom de la vue avant de valider";
 $l_confirm_delete_view = "Etes-vous sûr de vouloir supprimer cette vue ?";
@@ -270,27 +270,27 @@ $l_authorize = "&lt;&lt;&lt;&lt;";
 $l_deny = "&gt;&gt;&gt;&gt;";
 
 //MAIL
-$l_add_event_mail_head = "Nouvel événement dans Obm : ";
-$l_update_event_mail_head = "Modification événement : ";
-$l_delete_event_mail_head = "Suppression événement : ";
+$l_add_event_mail_head = "Nouvel évènement dans Obm : ";
+$l_update_event_mail_head = "Modification évènement : ";
+$l_delete_event_mail_head = "Suppression évènement : ";
 
-$l_add_event_mail_subject = "Nouvel événement sur Obm : ";
-$l_update_event_mail_subject = "Modification événement sur Obm : ";
-$l_delete_event_mail_subject = "Suppression événement sur Obm : ";
+$l_add_event_mail_subject = "Nouvel évènement sur Obm : ";
+$l_update_event_mail_subject = "Modification évènement sur Obm : ";
+$l_delete_event_mail_subject = "Suppression évènement sur Obm : ";
 
 $l_update_event_mail_body = "\nAu lieu de :";
 $l_delete_event_mail_body = "Il aurait du avoir lieu : ";
 $l_confirm_mail = "Confirmer+forcer l'envoi de mail";
 
-$l_add_event_mail_subject = "Nouvel événement sur OBM : %s";
-$l_update_event_mail_subject = "Modification événement sur OBM : %s";
-$l_delete_event_mail_subject = "Suppression événement sur OBM : %s";
-$l_delete_exception_mail_subject = "Modification événement sur OBM : %s";
-$l_add_exception_mail_subject = "Modification événement sur OBM : %s";
-$l_update_state_mail_subject = "Participation à l'événement sur OBM : %s";
+$l_add_event_mail_subject = "Nouvel évènement sur OBM : %s";
+$l_update_event_mail_subject = "Modification évènement sur OBM : %s";
+$l_delete_event_mail_subject = "Suppression évènement sur OBM : %s";
+$l_delete_exception_mail_subject = "Modification évènement sur OBM : %s";
+$l_add_exception_mail_subject = "Modification évènement sur OBM : %s";
+$l_update_state_mail_subject = "Participation à l'évènement sur OBM : %s";
 $l_alert_mail_subject = "Événement imminent : %s";
 
-$l_event_color_tt = "Les couleurs utilisées sont celles définies lors de la création des événements.";
+$l_event_color_tt = "Les couleurs utilisées sont celles définies lors de la création des évènements.";
 
 
 $l_resource_group_search = "La plage est considérée libre si";
@@ -312,9 +312,9 @@ $l_alert_mail_body =
 RENDEZ-VOUS IMMINENT
 ------------------------------------------------------------------
 
-L'événement %s aura lieu de %s à %s soit dans %s minutes (lieu : %s).
+L'évènement %s aura lieu de %s à %s soit dans %s minutes (lieu : %s).
 
-:: Pour plus de détails sur l'événement : 
+:: Pour plus de détails sur l'évènement : 
 %s
 
 -------------------------------------------------------------------
@@ -328,17 +328,17 @@ $l_resource_displayed = "Ressources choisies";
 $l_resource_allocated = "Ressources allouées";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_interval_null = "La durée ne peux pas être nulle";
-$mj_fill_title_event = "\\n Vous devez saisir un titre pour l'événement.";
+$mj_fill_title_event = "\\n Vous devez saisir un titre pour l'évènement.";
 $mj_fill_time_begin = "\\n Vous devez saisir une heure de début.";
 $mj_fill_time_end = "\\n Vous devez saisir une heure de fin.";
 $mj_fill_valid_time_begin = "\\n Vous devez saisir une heure de début valide.";
 $mj_fill_valid_time_end = "\\n Vous devez saisir une heure de fin valide.";
-$mj_delete_confirm = "Confirmer la suppression de l'événement ?";
+$mj_delete_confirm = "Confirmer la suppression de l'évènement ?";
 $mj_invalid_day = "Ce jour n'existe pas pour le mois sélectionné.";
 $mj_date_incompatibility = "La date de fin ne peut être antérieure a la date de début.";
 $mj_repeat_date_incompatibility = "La date de fin de répétition ne peut être antérieure a la date de début."; 
-$mj_event_delete_confirm = "Confirmer la suppression de l'événement ?"; 
-$mj_event_delete_all_confirm = "Confirmer la suppression de l'événement et de toutes ses répétitions ?"; 
+$mj_event_delete_confirm = "Confirmer la suppression de l'évènement ?"; 
+$mj_event_delete_all_confirm = "Confirmer la suppression de l'évènement et de toutes ses répétitions ?"; 
 $l_confirm_reset = 'Cette opération videra complétement votre calendrier et annulera votre participation à toutes les réunions où vous avez été convié.Êtes-vous sûr de vouloir poursuivre ?';
 $l_js_confirm_reset = 'Cette opération ne pourras être annulée, voulez-vous poursuivre ?';
 
