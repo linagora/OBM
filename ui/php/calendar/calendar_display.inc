@@ -6782,6 +6782,7 @@ function dis_calendar_month_agenda_pdf($calendar, $current_view, $calendar_entit
 
   $date = clone $current_view->get_date();
   $date->setDay(1)->addDay(1)->subWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $date_timestamp = $date->getTimestamp();
   $end = clone $current_view->get_date();
   $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $category_filter = $current_view->get_category_filter();
@@ -6792,6 +6793,10 @@ function dis_calendar_month_agenda_pdf($calendar, $current_view, $calendar_entit
     $c = clone $occurrence->date;
     $c->setHour(0)->setMinute(0)->setSecond(0);
     $id = $c->getTimestamp();
+    if ($id < $date_timestamp) {
+      $id = $date_timestamp;
+      $occurrence->date->set($date, Of_Date::TIMESTAMP);
+    }
     if(!is_array($updated[$id])) $updated[$id] = array();
     array_push($updated[$id], $occurrence);
   }
