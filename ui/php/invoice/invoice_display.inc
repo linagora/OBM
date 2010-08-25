@@ -441,7 +441,8 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
     $ext_url = $invoice['ext_url'];
     $ext_id = $invoice['ext_id'];
     $ext_target = $invoice['ext_target'];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
+    $ext_type = $invoice['ext_type'];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_type=$ext_type";
   }
 
   $label = urlencode($invoice['label']);
