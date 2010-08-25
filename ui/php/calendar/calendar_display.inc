@@ -4312,6 +4312,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $dis_privacy = "<input type=\"checkbox\" id=\"cba_privacy\" value=\"1\" name=\"cba_privacy\" />";
   }
 
+  // the following code is perhaps a little complicated to just do a 0 to 23 loop !!!
   $hour_size = "4em";
   if ($_SESSION['set_timeformat'] == "12H") $hour_size = "5em";
   $dis_hour_b = "<select id='sel_time_begin' name='sel_time_begin' style='width:$hour_size;'>";
@@ -4323,7 +4324,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $cur_hour_e = clone $cur_hour_b;
   $cur_hour_e->addDay(1);
 
-  while($cur_hour_b->compare($cur_hour_e) < 1) {
+  while($cur_hour_b->compare($cur_hour_e) < 0) {
     $hour = $cur_hour_b->getOutputHour();
     if ($begin->compareHour($cur_hour_b) == 0) {
       $dis_hour_b .= "<option value=\"$hour\" selected=\"selected\">$hour</option>";
@@ -4340,7 +4341,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   $dis_hour_b .= '</select>';  
   $dis_hour_e .= '</select>';  
+  // end of the crapy complicated code
 
+  // the following code is perhaps a little complicated to just do a 0 to 59 loop (with varying pad) !!!
   $dis_min_b = "<select id=\"sel_min_begin\" name=\"sel_min_begin\" style=\"width:4em;\">";
   $dis_min_e = "<select id=\"sel_min_end\" name=\"sel_min_end\" style=\"width:4em;\">";
   $step = 60 / $ccalendar_hour_fraction;
@@ -4359,6 +4362,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   $dis_min_b .= '</select>';
   $dis_min_e .= '</select>';
+  // end of the crapy complicated code
 
   $display['title'] = "$dis_title";
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[5]";
