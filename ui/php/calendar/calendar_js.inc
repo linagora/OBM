@@ -669,6 +669,7 @@ function disable(id){
   } else {
     elem.disabled=true;
   }
+  return true;
 }
 
 function submitResetExportForm(){

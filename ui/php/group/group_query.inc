@@ -1491,19 +1491,6 @@ function run_query_group_ext_search($group) {
   }
 
   $query = "SELECT
-  count(*) as resultscount
-  FROM UGroup
-  WHERE
-  group_name $like '$pattern%'
-  $where_privacy
-  $multidomain
-  $where_restriction";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_group_ext_search()');
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $resultsCount = $obm_q->f('resultscount');
-  $query = "SELECT
     group_id,
     group_name,
     group_desc
@@ -1514,10 +1501,11 @@ function run_query_group_ext_search($group) {
     $multidomain
     $where_restriction
   ORDER BY group_name
-  LIMIT $limit OFFSET $first_row";
+  LIMIT 24 OFFSET 0";
 
   display_debug_msg($query, $cdg_sql, 'run_query_group_ext_search()');
   $obm_q->query($query);
+  $resultsCount = $obm_q->nf();
 
   return array('length' => $resultsCount, 'datas' => $obm_q);
 }
