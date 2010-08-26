@@ -423,7 +423,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $addressbooks = OBM_AddressBook::search();
     $source = $addressbooks[$contact->addressbook_id];
     $destination = $addressbooks[$params['addressbook']];
-    if ($destination && $destination->write) {
+    if ($source && $source->read && $source->write && $destination && $destination->write) {
       OBM_Contact::move($contact, $destination);
       echo dis_update_addressbook_count($source);
       echo dis_update_addressbook_count($destination);
