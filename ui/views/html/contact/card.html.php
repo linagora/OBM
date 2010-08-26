@@ -35,6 +35,7 @@
               </li>
 
               <!-- Move contact-->
+              <?php if($addressbooks[$contact->addressbook_id]->write) { ?>
               <li><?php echo __('Move') ?>
                 <ul>
                   <?php foreach($addressbooks as $_id => $_addressbook) { ?>
@@ -46,6 +47,7 @@
                   <?php } ?> 
                 </ul>
               </li>
+              <?php } ?> 
 
               <!-- Export -->
               <li>
