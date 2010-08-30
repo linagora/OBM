@@ -467,7 +467,9 @@ class Vcalendar_Reader_ICS {
       $this->mails[$entity][$attendee['mail']] = NULL;
       $mail = "OR mail like '%".addslashes($attendee['mail'])."%' ";
     }
-
+    if(!$mail && !$cn) {
+      return NULL;
+    }
     $entityTable = $this->buildEntityQuery($entity, $db);
     if(is_null($entityTable)) {
       return NULL;
