@@ -1,8 +1,8 @@
 <?php
 #
-# contact.php --dry : do not delete in database
-# contact.php --wet : delete in database
-# contact.php --[wet|dry] -u ID : Execute the script for the user with id ID
+# contact.php -dry : do not delete in database
+# contact.php -wet : delete in database
+# contact.php -[wet|dry] -u ID : Execute the script for the user with id ID
 # Does not work for the public contact.
 #
 #
@@ -22,7 +22,7 @@ elseif(isset($options['d']) || isset($options['r']) || isset($options['y'])) {
   echo "Unknown options \n";
   exit();
 }elseif(!isset($options['w']) || !isset($options['e']) || !isset($options['t'])) {
-  echo "--wet do delete --dry for dry run. You must specified one of this two options\n";
+  echo "-wet do delete -dry for dry run. You must specified one of this two options\n";
   exit();
 }
 
