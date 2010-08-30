@@ -889,8 +889,7 @@ function display_page(&$display) {
       $display['title'] .
       $display['msg'] . 
       "<div id=\"mainContent\">
-      <div id=\"ajaxMessage\"></div>
-      &nbsp;".
+      <div id=\"ajaxMessage\"></div>".
       $display['search'] .
       $display['detail']." 
        <p class=\"LC\"></p>
@@ -930,7 +929,7 @@ function display_page(&$display) {
       echo  
         "<div id=\"mainContent\">
          <div id=\"ajaxMessage\"></div>
-        &nbsp;".
+        ".
       $display['search'] .
       $display['detail'] . "
       <p class=\"LC\"></p>
@@ -1087,6 +1086,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.images.del = '$ico_delete';
   obm.vars.regexp.dateFormat = '$_SESSION[set_date_upd]';
   obm.vars.regexp.dispDateFormat = '$_SESSION[set_date]';
+  obm.vars.regexp.dispTimeFormat = 'H:i';
   obm.vars.consts.popupHeight = '$popup_height';
   obm.vars.consts.popupWidth = '$popup_width';
   obm.vars.consts.weekStart = $c_week_first_day;
