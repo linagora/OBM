@@ -891,8 +891,7 @@ function display_page(&$display) {
       $display['msg'] . 
       "
       <div id=\"mainContent\">
-      <div id=\"ajaxMessage\"></div>
-      &nbsp;".
+      <div id=\"ajaxMessage\"></div>".
       $display['search'] .
       $display['detail']." 
        <p class=\"LC\"></p>
@@ -932,7 +931,7 @@ function display_page(&$display) {
       echo  
         "<div id=\"mainContent\">
          <div id=\"ajaxMessage\"></div>
-        &nbsp;".
+        ".
       $display['search'] .
       $display['detail'] . "
       <p class=\"LC\"></p>
