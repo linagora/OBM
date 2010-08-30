@@ -68,7 +68,6 @@ function run_query_admin_device_search($device) {
     opush_sync_perms.policy 
     FROM opush_device 
     LEFT JOIN opush_sync_state f ON f.device_id=opush_device.id
-    LEFT JOIN opush_sync_state l ON l.device_id=opush_device.id
     LEFT JOIN opush_sync_perms ON opush_sync_perms.device_id = opush_device.id
     LEFT JOIN UserObm ON userobm_id = opush_device.owner
     $where_clause
