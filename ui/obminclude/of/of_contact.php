@@ -866,7 +866,7 @@ class OBM_Contact implements OBM_ISearchable {
       'mailok','newsletter', 'comment');
     foreach ($obmSpecificProps as $prop) {
       if (!empty($this->$prop)) {
-        $card->addProperty(new Vpdi_Property("x-obm-{$prop}", str_replace("\r\n", "\n ", (trim($this->$prop)))));        
+        $card->addProperty(new Vpdi_Property("x-obm-{$prop}", str_replace("\r\n", '\n', (trim($this->$prop)))));        
       }
     }
     if (!empty($this->date)) {
