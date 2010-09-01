@@ -475,7 +475,7 @@ function run_query_incident_update($incident) {
     $add_duration = $incident['add_duration'];
     $duration = $duration + $add_duration;
   }
-  $inc_info = get_incident_info($id);
+  $inc_info = get_incident_info($incident['incident_id']);
   if($inc_info['owner'] != $incident['owner']) {
     $owner_changed = true;
   }
