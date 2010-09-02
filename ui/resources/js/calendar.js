@@ -1016,7 +1016,7 @@ Obm.CalendarManager = new Class({
           new Request.JSON({
             url: obm.vars.consts.calendarUrl,
             secure : false,
-            onComplete : this.receiveCreateEvent,
+            onComplete : this.receiveCreateEvent
           }).post($merge({ajax : 1, action : 'quick_insert'}, eventData));          
         }.bind(this));
         obm.calendarManager.popupManager.show(eventData);
