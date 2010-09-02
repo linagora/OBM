@@ -76,7 +76,7 @@ sub _getServerDesc {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
-    $self->_log( 'obtention du mot de passe de l\'utilisateur LDAP', 3 );
+    $self->_log( 'obtention du mot de passe de l\'utilisateur LDAP', 4 );
     my $query = 'SELECT usersystem.usersystem_password as ldap_admin_password
                     FROM UserSystem usersystem
                     WHERE usersystem.usersystem_login=\''.$self->{'ldap_admin_login'}.'\'
@@ -94,7 +94,7 @@ sub _getServerDesc {
     }
     $sth->finish();
 
-    $self->_log( 'chargement : '.$self->getDescription(), 3 );
+    $self->_log( 'chargement : '.$self->getDescription(), 4 );
     $self->_log( 'mot de passe de l\'utilisateur LDAP \''.$self->{'ldap_admin_password'}.'\'', 4 );
 
     return 0;
@@ -111,7 +111,7 @@ sub _getAdminDn {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
-    $self->_log( 'obtention du domaine global', 3 );
+    $self->_log( 'obtention du domaine global', 4 );
     my $query = 'SELECT domain_id,
                         domain_global,
                         domain_label,
@@ -139,7 +139,7 @@ sub _getAdminDn {
     $sth->finish();
 
 
-    $self->_log( 'obtention de l\'utilisateur système \''.$self->{'ldap_admin_login'}.'\'', 3 );
+    $self->_log( 'obtention de l\'utilisateur système \''.$self->{'ldap_admin_login'}.'\'', 4 );
     $query = 'SELECT *
               FROM UserSystem
               WHERE usersystem_login=\''.$self->{'ldap_admin_login'}.'\'';
@@ -260,7 +260,7 @@ sub _connect {
         $ldapPassword = $self->{'ldap_user_password'};
     }
 
-    $self->_log( 'authentification en tant que \''.$ldapLogin.'\' au '.$self->getDescription(), 3 );
+    $self->_log('authentification en tant que \''.$ldapLogin.'\' au '.$self->getDescription(), 4);
 
     my $error;
     for( my $i=0; $i<=$#{$ldapDnLogin}; $i++ ) {
@@ -271,7 +271,7 @@ sub _connect {
         );
 
         if( !$error->code ) {
-            $self->_log( 'connexion à l\'annuaire LDAP établie', 3 );
+            $self->_log( 'connexion à l\'annuaire LDAP établie', 4 );
             last;
         }elsif( $error->code == LDAP_CONFIDENTIALITY_REQUIRED ) {
             $self->_log( 'erreur fatale : start TLS nécessaire pour le serveur LDAP '.$self->getDescription(), 0 );

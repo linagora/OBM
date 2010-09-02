@@ -208,7 +208,7 @@ sub _connect {
         return 1;
     }
 
-    $self->_log( 'connexion au '.$self->getDescription().' établie', 3 );
+    $self->_log( 'connexion au '.$self->getDescription().' établie', 4 );
 
     return 0;
 }

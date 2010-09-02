@@ -89,9 +89,9 @@ sub _updateInitFactory {
     my $self = shift;
 
     require OBM::entitiesFactory;
-    $self->_log( 'initialisation de l\'entity factory', 3 );
+    $self->_log( 'initialisation de l\'entity factory', 4 );
     if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'GLOBAL', $self->{'domainId'} )) ) {
-        $self->_log( 'echec de l\'initialisation de l\'entity factory', 1 );
+        $self->_log( 'echec de l\'initialisation de l\'entity factory', 0 );
         return 1;
     }
 

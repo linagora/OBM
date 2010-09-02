@@ -51,7 +51,7 @@ sub new {
 sub _start {
     my $self = shift;
 
-    $self->_log( 'debut de traitement', 3 );
+    $self->_log( 'debut de traitement', 4 );
 
     my $domain;
     if( !($domain = $self->_getDomain()) ) {

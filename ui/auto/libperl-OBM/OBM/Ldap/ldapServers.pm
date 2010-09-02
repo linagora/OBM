@@ -79,7 +79,7 @@ sub _loadServer {
     my $self = shift;
     my( $serverId ) = @_;
 
-    $self->_log( 'chargement du serveur LDAP d\'identifiant \''.$serverId.'\'', 3 );
+    $self->_log( 'chargement du serveur LDAP d\'identifiant \''.$serverId.'\'', 4 );
 
     require OBM::Ldap::ldapServer;
     $self->{'servers'}->{$serverId} = OBM::Ldap::ldapServer->new( $serverId );

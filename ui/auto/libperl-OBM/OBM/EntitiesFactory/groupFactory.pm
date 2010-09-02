@@ -210,7 +210,7 @@ sub next {
 sub _loadEntities {
     my $self = shift;
 
-    $self->_log( 'chargement des groupes du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
+    $self->_log( 'chargement des groupes du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 4 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -254,7 +254,7 @@ sub _loadEntities {
 sub _loadCurrentEntityCategories {
     my $self = shift;
 
-    $self->_log( 'chargement des informations de catégories de l\'entité '.$self->{'currentEntity'}->getDescription(), 3 );
+    $self->_log( 'chargement des informations de catégories de l\'entité '.$self->{'currentEntity'}->getDescription(), 4 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -299,7 +299,7 @@ sub _loadCurrentEntityCategories {
 sub _loadCurrentEntityFields {
     my $self = shift;
 
-    $self->_log( 'chargement des informations des champs spécifiques de l\'entité '.$self->{'currentEntity'}->getDescription(), 3 );
+    $self->_log( 'chargement des informations des champs spécifiques de l\'entité '.$self->{'currentEntity'}->getDescription(), 4 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -344,7 +344,7 @@ sub _loadCurrentEntityFields {
 sub _loadCurrentEntityServiceProperty {
     my $self = shift;
 
-    $self->_log( 'chargement des propriétés de services de l\'entité '.$self->{'currentEntity'}->getDescription(), 3 );
+    $self->_log( 'chargement des propriétés de services de l\'entité '.$self->{'currentEntity'}->getDescription(), 4 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();

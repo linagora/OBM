@@ -188,7 +188,7 @@ sub getDnPrefix {
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
         push( @dnPrefixes, 'uid='.$self->{'entityDesc'}->{'usersystem_login'}.','.$rootDn->[$i] );
-        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 3 );
+        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
     return \@dnPrefixes;

@@ -221,13 +221,14 @@ sub _displayResponse {
 
     if( !$response->is_success() ) {
         $self->_log( 'Erreur lors de la requête \''.$url.'\' : '.$response->status_line(), 1 );
+        $self->_log( $response->headers_as_string(), 4 ) if $response->headers_as_string();
         $self->_log( $response->content(), 1 ) if $response->content();
         return 1;
     }
 
-    $self->_log( 'requête \''.$url.'\' : '.$response->status_line(), 2 );
+    $self->_log( 'requête \''.$url.'\' : '.$response->status_line(), 3 );
     $self->_log( $response->headers_as_string(), 4 ) if $response->headers_as_string();
-    $self->_log( $response->content(), 2 ) if $response->content();
+    $self->_log( $response->content(), 4 ) if $response->content();
 
     return 0;
 }

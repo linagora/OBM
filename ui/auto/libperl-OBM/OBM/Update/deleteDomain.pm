@@ -44,21 +44,21 @@ sub update {
     my $self = shift;
 
     require OBM::Postfix::smtpInEngine;
-    $self->_log( 'initialisation du SMTP-in maps updater', 2 );
+    $self->_log( 'initialisation du SMTP-in maps updater', 4 );
     if( !($self->{'smtpInEngine'} = OBM::Postfix::smtpInEngine->new()) ) {
         $self->_log( 'echec de l\'initialisation du SMTP-in maps updater', 0 );
         return 1;
     }
 
     require OBM::entitiesFactory;
-    $self->_log( 'initialisation de l\'entity factory', 2 );
+    $self->_log( 'initialisation de l\'entity factory', 4 );
     if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'PROGRAMMABLE', $self->{'domainId'} )) ) {
         $self->_log( 'echec de l\'initialisation de l\'entity factory', 0 );
         return 1;
     }
 
     require OBM::Ldap::ldapDeleteEngine;
-    $self->_log( 'initialisation du moteur LDAP', 2 );
+    $self->_log( 'initialisation du moteur LDAP', 4 );
     $self->{'ldapEngine'} = OBM::Ldap::ldapDeleteEngine->new();
     if( !defined($self->{'ldapEngine'}) ) {
         $self->_log( 'erreur à l\'initialisation du moteur LDAP', 1 );
@@ -69,7 +69,7 @@ sub update {
     }
 
     require OBM::Cyrus::cyrusDeleteEngine;
-    $self->_log( 'initialisation du moteur Cyrus', 2 );
+    $self->_log( 'initialisation du moteur Cyrus', 4 );
     $self->{'cyrusEngine'} = OBM::Cyrus::cyrusDeleteEngine->new();
     if( !defined($self->{'cyrusEngine'}) ) {
         $self->_log( 'erreur à l\'initialisation du moteur Cyrus', 1 );
@@ -81,7 +81,7 @@ sub update {
 
     my $error = 0;
     while( my $entity = $self->{'entitiesFactory'}->next() ) {
-        $self->_log( 'suppression de '.$entity->getDescription(), 1 );
+        $self->_log( 'suppression de '.$entity->getDescription(), 3 );
 
         if( !$error && defined($self->{'ldapEngine'}) ) {
             if($self->{'ldapEngine'}->update($entity)) {
@@ -104,7 +104,7 @@ sub update {
         }
 
         if( !$error && $self->_purgeDbProdDatas($entity) ) {
-            $self->_log( 'problème lors du nettoyage des données de production de la BD OBM', 0 );
+            $self->_log( 'problème lors du nettoyage des données de production de la BD OBM', 1 );
             $error = 1;
         }
     }
@@ -121,7 +121,7 @@ sub _purgeDbProdDatas {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !$dbHandler ) {
-        $self->_log( 'connexion à la base de données impossible', 4 );
+        $self->_log( 'connexion à la base de données impossible', 1 );
         return 1;
     }
 

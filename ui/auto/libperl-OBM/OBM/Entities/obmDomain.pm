@@ -92,7 +92,7 @@ sub _init {
 
     $self->{'entityDesc'} = $domainDesc;
 
-    $self->_log( 'chargement : '.$self->getDescription(), 3 );
+    $self->_log( 'chargement : '.$self->getDescription(), 4 );
 
     return 0;
 }

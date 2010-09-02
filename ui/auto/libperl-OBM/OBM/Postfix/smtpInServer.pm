@@ -49,7 +49,7 @@ sub _init {
         $self->_log( 'pas d\'adresse IP ou de nom d\'hôte associé, traitement impossible', 0 );
         return 1;
     }elsif( defined($serverDesc->{'host_ip'}) ) {
-        $self->_log( 'contact de l\'hote sur son adresse IP '.$serverDesc->{'host_ip'}, 3 );
+        $self->_log( 'contact de l\'hote sur son adresse IP '.$serverDesc->{'host_ip'}, 4 );
         $self->_log( 'si l\'IP est définie en BD, elle est utilisée en priorité', 4 );
 
         $self->{'network_name'} = $serverDesc->{'host_ip'};

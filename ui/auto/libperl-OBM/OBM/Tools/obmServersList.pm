@@ -53,7 +53,7 @@ sub _checkServerIds {
             push( @{$self->{'serversList'}}, $self->{'servers'}->{$serverId} );
         }
     }else {
-        $self->_log( 'serveur d\'identifiant \''.$serverId.'\' déjà chargé', 3 );
+        $self->_log( 'serveur d\'identifiant \''.$serverId.'\' déjà chargé', 4 );
     }
 
     return 0;

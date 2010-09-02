@@ -55,7 +55,7 @@ sub getEntityCyrusServer {
         return undef;
     }
 
-    $self->_log( 'obtention du serveur '.$self->{'servers'}->{$entity->getMailServerId()}->getDescription(), 3 );
+    $self->_log( 'obtention du serveur '.$self->{'servers'}->{$entity->getMailServerId()}->getDescription(), 4 );
 
     return $self->{'servers'}->{$entity->getMailServerId()};
 }

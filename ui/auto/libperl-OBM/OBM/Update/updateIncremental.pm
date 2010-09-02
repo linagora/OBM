@@ -88,9 +88,9 @@ sub _updatePreInit {
     my $self = shift;
 
     require OBM::incrementalTableUpdater;
-    $self->_log( 'initialisation de l\'incrémental table updater', 2 );
+    $self->_log( 'initialisation de l\'incrémental table updater', 4 );
     if( !($self->{'incrementalTableUpdater'} = OBM::incrementalTableUpdater->new( $self->{'domainId'}, $self->{'user'}, $self->{'delegation'} )) ) {
-        $self->_log( 'echec de l\'initialisation de l\'incrémental table updater', 2 );
+        $self->_log( 'echec de l\'initialisation de l\'incrémental table updater', 0 );
         return 1;
     }
 
@@ -102,7 +102,7 @@ sub _updateInitFactory {
     my $self = shift;
 
     require OBM::entitiesFactory;
-    $self->_log( 'initialisation de l\'entity factory', 2 );
+    $self->_log( 'initialisation de l\'entity factory', 4 );
     if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'INCREMENTAL', $self->{'domainId'}, $self->{'user'}, $self->{'delegation'} )) ) {
         $self->_log( 'echec de l\'initialisation de l\'entity factory', 0 );
         return 1;

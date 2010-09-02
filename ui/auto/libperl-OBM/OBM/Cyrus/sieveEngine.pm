@@ -104,14 +104,14 @@ sub _doWork {
     }
 
 
-    $self->_log( 'suppression du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 3 );
+    $self->_log( 'suppression du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 4 );
     # Disable old Sieve script
     sieve_activate( $sieveSrvConn, '' );
     # Delete old Sieve script
     sieve_delete( $sieveSrvConn, $sieveScriptName );
 
     if( $#newSieveScript >= 0 ) {
-        $self->_log( 'mise a jour du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 3 );
+        $self->_log( 'mise a jour du script Sieve \''.$sieveScriptName.'\' de '.$self->{'currentEntity'}->getDescription(), 4 );
 
         if( sieve_put( $sieveSrvConn, $sieveScriptName, join("\n", @newSieveScript) ) ) {
             my $errstr = sieve_get_error( $sieveSrvConn );
@@ -221,7 +221,7 @@ sub _updateSieveNomade {
     }
 
     if( my $nomadeMsg = $self->{'currentEntity'}->getSieveNomade() ) {
-        $self->_log( 'gestion de la redirection de '.$self->{'currentEntity'}->getDescription(), 3 );
+        $self->_log( 'gestion de la redirection de '.$self->{'currentEntity'}->getDescription(), 4 );
 
         push( @{$newSieveScript}, $nomadeMark );
         push( @{$newSieveScript}, $nomadeMsg );

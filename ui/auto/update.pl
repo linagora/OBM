@@ -222,7 +222,7 @@ sub getParameter {
 
 
         if( $parameters->{'entity'} ) {
-            $self->_log( 'Lit les entités à mettre à jour depuis l\'entrée standard', 2 );
+            $self->_log( 'Lit les entités à mettre à jour depuis l\'entrée standard', 3 );
             @{$parameters->{'updateEntityList'}} = <STDIN>;
             last SWITCH;
         }
@@ -231,7 +231,7 @@ sub getParameter {
 
     SWITCH: {
         if( $parameters->{'domain-id'} ) {
-            $self->_log( 'Obtention du nom du domaine d\'ID \''.$parameters->{'domain-id'}.'\'', 3 );
+            $self->_log( 'Obtention du nom du domaine d\'ID \''.$parameters->{'domain-id'}.'\'', 5 );
             $parameters->{'domain-name'} = $self->_getIdDomainName( $parameters->{'domain-id'}, $parameters->{'delete'} );
             last SWITCH;
         }
@@ -239,19 +239,19 @@ sub getParameter {
         # --domain is deprecated from OBM 2.3 and may be remove on OBM 2.4
         if( $parameters->{'domain'} ) {
             $parameters->{'domain-id'} = $parameters->{'domain'};
-            $self->_log( 'Obtention du nom du domaine d\'ID \''.$parameters->{'domain-id'}.'\'', 3 );
+            $self->_log( 'Obtention du nom du domaine d\'ID \''.$parameters->{'domain-id'}.'\'', 5 );
             $parameters->{'domain-name'} = $self->_getIdDomainName( $parameters->{'domain-id'}, $parameters->{'delete'} );
             last SWITCH;
         }
 
         if( exists($parameters->{'domain-global'}) ) {
-            $self->_log( 'Obtention de l\'ID du domaine global', 3 );
+            $self->_log( 'Obtention de l\'ID du domaine global', 5 );
             ( $parameters->{'domain-id'}, $parameters->{'domain-name'} ) = $self->_getGlobalDomainId( $parameters->{'delete'} );
             last SWITCH;
         }
 
         if( $parameters->{'domain-name'} ) {
-            $self->_log( 'Obtention de l\'ID du domaine \''.$parameters->{'domain-name'}.'\'', 3 );
+            $self->_log( 'Obtention de l\'ID du domaine \''.$parameters->{'domain-name'}.'\'', 5 );
             $parameters->{'domain-id'} = $self->_getNameDomainId( $parameters->{'domain-name'}, $parameters->{'delete'} );
             last SWITCH;
         }
@@ -259,9 +259,9 @@ sub getParameter {
 
     if( defined($parameters->{'domain-id'}) && ($parameters->{'domain-id'} =~ /^[0-9]+$/) ) {
         if( defined($parameters->{'domain-name'}) ) {
-            $self->_log( 'Mise a jour du domaine \''.$parameters->{'domain-name'}.'\' (ID: '.$parameters->{'domain-id'}.')', -1 );
+            $self->_log( 'Mise a jour du domaine \''.$parameters->{'domain-name'}.'\' (ID: '.$parameters->{'domain-id'}.')', 3);
         }else {
-            $self->_log( 'Mise a jour du domaine d\'ID '.$parameters->{'domain-id'}.')', -1 );
+            $self->_log( 'Mise a jour du domaine d\'ID '.$parameters->{'domain-id'}, 3 );
         }
     }else {
         $self->_log( 'Paramétre \'--domain-id\' ou \'--domain-name\' ou \'--domain-global\' manquant ou incorrect', 0 );

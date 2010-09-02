@@ -66,12 +66,12 @@ sub update {
     }
 
     if( $self->_initEngines() ) {
-        $self->_log( 'problème a l\'initialisation des moteurs de mises à jour', 1 );
+        $self->_log( 'problème a l\'initialisation des moteurs de mises à jour', 0 );
         return 1;
     }
 
     if( $self->_initFactories( $domainIdList ) ) {
-        $self->_log( 'problème a l\'initialisation des factories d\'entités', 1 );
+        $self->_log( 'problème a l\'initialisation des factories d\'entités', 0 );
         return 1;
     }
 
@@ -107,10 +107,10 @@ sub _initEngines {
     my $self = shift;
 
     require OBM::Ldap::ldapEngine;
-    $self->_log( 'initialisation du moteur LDAP', 3 );
+    $self->_log( 'initialisation du moteur LDAP', 4 );
     $self->{'engines'}->{'ldapEngine'} = OBM::Ldap::ldapEngine->new();
     if( !defined($self->{'engines'}->{'ldapEngine'}) ) {
-        $self->_log( 'erreur à l\'initialisation du moteur LDAP', 1 );
+        $self->_log( 'erreur à l\'initialisation du moteur LDAP', 0 );
         return 1;
     }elsif( !ref($self->{'ldapEngine'}) ) {
         $self->_log( 'moteur LDAP non démarré', 4 );
@@ -167,11 +167,11 @@ sub _initFactories {
 
     for( my $i=0; $i<=$#{$domainIdList}; $i++ ) {
         require OBM::entitiesFactory;
-        $self->_log( 'initialisation de l\'entity factory pour le domaine '.$domainIdList->[$i], 3 );
+        $self->_log( 'initialisation de l\'entity factory pour le domaine '.$domainIdList->[$i], 4 );
 
         my $entitiesFactory;
         if( !( $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLEWITHOUTDOMAIN', $domainIdList->[$i], undef, undef ) ) ) {
-            $self->_log( 'echec de l\'initialisation de l\'entity factory pour le domaine d\'ID '.$domainIdList->[$i], 1 );
+            $self->_log( 'echec de l\'initialisation de l\'entity factory pour le domaine d\'ID '.$domainIdList->[$i], 0 );
             return 1;
         }
 
@@ -288,7 +288,7 @@ sub _deleteDomainContacts {
         return 1;
     }
     if( $programmingObj->setEntitiesType( 'CONTACT' ) || $programmingObj->setUpdateType( 'DELETE' ) || $programmingObj->setEntitiesIds( \@contactIds )) {
-        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 1 );
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 0 );
         return 1;
     }
 
@@ -345,12 +345,12 @@ sub _updateDomainContacts {
         return 1;
     }
     if( $programmingObj->setEntitiesType( 'CONTACT' ) || $programmingObj->setUpdateType( 'UPDATE_ENTITY' ) || $programmingObj->setEntitiesIds( \@contactIds )) {
-        $self->_log( 'problème lors de l\'initialisation du programmateur de f actory', 1 );
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 1 );
         return 1;
     }
 
     if( $self->_programEntitiesFactory( $programmingObj, $domainId ) ) {
-        $self->_log( 'probleme lors de la programmation  des contacts supprimés', 1 );
+        $self->_log( 'probleme lors de la programmation des contacts supprimés', 1 );
         return 1;
     }
 
@@ -388,16 +388,16 @@ sub _setDomainLastUpdateDate {
     require OBM::EntitiesFactory::factoryProgramming;
     my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
     if( !defined($programmingObj) ) {
-        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 0 );
         return 1;
     }
     if($programmingObj->setEntitiesType( 'CONTACT_SERVICE' ) || $programmingObj->setUpdateType( 'UPDATE_ENTITY' )) {
-        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 0 );
         return 1;
     }
 
     if( $self->_programEntitiesFactory( $programmingObj, $domainId ) ) {
-        $self->_log( 'probleme lors de la programmation des contacts supprimés', 3 );
+        $self->_log( 'probleme lors de la programmation des contacts supprimés', 0 );
         return 1;
     }
 
