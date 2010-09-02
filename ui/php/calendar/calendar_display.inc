@@ -106,7 +106,7 @@ function dis_calendar_search_result($calendar, $current_view) {
     $begin = new Of_Date(0);
     $end = new Of_Date();
     $end->addYear(5);
-    $pattern = $calendar['pattern'].'*';
+    $pattern = $calendar['pattern'];
   } else {
     if ($calendar['date_begin'] == null) {
       $begin = new Of_Date(0);
