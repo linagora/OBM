@@ -91,7 +91,7 @@ sub update {
             return 1;
         }
 
-        $self->_log( 'Mise à jour de la configuration du service LDAP', 2 );
+        $self->_log( 'Mise à jour de la configuration du service LDAP', 3 );
         my @engines = values(%{$self->{'engines'}}); 
         for( my $i=0; $i<=$#engines; $i++ ) {
             $engines[$i]->update( $self->{'newContactService'} );

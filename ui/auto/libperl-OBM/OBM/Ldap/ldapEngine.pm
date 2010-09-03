@@ -132,7 +132,7 @@ sub update {
 
             if( !defined($currentLdapEntity) && !defined($updateLdapEntity) && $toDelete ) {
                 # DN à supprimer et non existant dans l'annuaire
-                $self->_log( 'DN \''.$currentEntityDNs->[$i].'\' non présent dans l\'annuaire, suppression déjà effectuée', 3 );
+                $self->_log( 'DN \''.$currentEntityDNs->[$i].'\' non présent dans l\'annuaire, suppression déjà effectuée', 4 );
 
                 last SWITCH;
             }
@@ -199,7 +199,7 @@ sub _searchLdapEntityByDN {
     }
 
     
-    $self->_log( 'Recherche du DN \''.$entityDn.'\'', 3 );
+    $self->_log( 'Recherche du DN \''.$entityDn.'\'', 4 );
 
     my $result = $ldapServerConn->search(
         base => $entityDn,

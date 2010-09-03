@@ -131,7 +131,7 @@ sub next {
 sub _loadContacts {
     my $self = shift;
 
-    $self->_log( 'chargement des contacts du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
+    $self->_log( 'chargement des contacts du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 4 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();

@@ -84,11 +84,11 @@ sub _getLdapContacts {
     # Get LDAP server conn for this entity
     my $ldapServerConn;
     if( !($ldapServerConn = $ldapServers->getLdapServerConn($entity->getLdapServerId())) ) {
-        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$entity->getDescription(), 2 );
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$entity->getDescription(), 1 );
         return 1;
     }
 
-    $self->_log( 'obtention des entités de la branche LDAP \''.$currentEntityDNs->[0].'\'', 3 );
+    $self->_log( 'obtention des entités de la branche LDAP \''.$currentEntityDNs->[0].'\'', 4 );
 
     my $result = $ldapServerConn->search(
         base => $currentEntityDNs->[0],
@@ -98,7 +98,7 @@ sub _getLdapContacts {
     );
 
     if( ($result->code != 32) && ($result->is_error()) ) {
-        $self->_log( 'problème lors de la recherche LDAP \''.$result->code.'\', '.$result->error, 3 );
+        $self->_log( 'problème lors de la recherche LDAP \''.$result->code.'\', '.$result->error, 1 );
         return 0;
     }
 
@@ -110,6 +110,7 @@ sub _getLdapContacts {
 }
 
 
+# Delete LDAP contact whose aren't in OBM DB
 sub _deleteLdapContacts {
     my $self = shift;
     my $ldapServers = $self->{'ldapservers'};
@@ -121,11 +122,11 @@ sub _deleteLdapContacts {
     # Get LDAP server conn for this entity
     my $ldapServerConn;
     if( !($ldapServerConn = $ldapServers->getLdapServerConn($entity->getLdapServerId())) ) {
-        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$entity->getDescription(), 2 );
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$entity->getDescription(), 1 );
         return 1;
     }
 
-    $self->_log( 'suppression des entités de la branche \''.$currentEntityDNs->[0].'\' non présentes en BD', 3 );
+    $self->_log( 'suppression des entités de la branche \''.$currentEntityDNs->[0].'\' non présentes en BD', 4 );
 
     my $ldapEntities = $self->{'ldapEntries'};
     my $dbEntities = $self->{'dbEntitiesId'};
@@ -138,9 +139,9 @@ sub _deleteLdapContacts {
             my $result = $ldapServerConn->delete( $ldapEntity->dn() );
 
             if( $result->is_error() ) {
-                $self->_log( 'erreur LDAP à la suppression de l\'entité d\'ID OBM \''.$obmUid.'\', DN '.$ldapEntity->dn().' : '.$result->code().' - '.$result->error(), 0 );
+                $self->_log('erreur LDAP à la suppression de l\'entité d\'ID OBM \''.$obmUid.'\', DN '.$ldapEntity->dn().' : '.$result->code().' - '.$result->error(), 1);
             }else {
-                $self->_log( 'suppression de l\'entité d\'ID OBM \''.$obmUid.'\', DN '.$ldapEntity->dn(), 2 );
+                $self->_log('suppression de l\'entité d\'ID OBM \''.$obmUid.'\', DN '.$ldapEntity->dn(), 3);
             }
         }
     }
@@ -161,7 +162,7 @@ sub getLastUpdateDate {
         return undef;
     }
 
-    $self->_log( 'obtention de la configuration du service contact', 3 );
+    $self->_log( 'obtention de la configuration du service contact', 4 );
     my $dn = $entity->getDnPrefix();
 
     my $result = $ldapServerConn->search(
