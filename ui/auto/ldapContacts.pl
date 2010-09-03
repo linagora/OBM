@@ -31,6 +31,28 @@ use OBM::Parameters::regexp;
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
+if(-e "/tmp/ldapContact.pid") {
+    open (L, '/tmp/ldapContact.pid');
+    my $pid=<L>;
+    close L;
+    
+    if($pid =~ /^(\d+)$/) {
+        $pid = $1;
+
+        my $stat=kill(0, $pid);
+        chomp $stat;
+        chomp $pid;
+        if ($stat and $pid) {
+            print "ldapContacts.pl already running (pid: $pid)\n";
+            exit 1;
+        }
+    }
+}
+open (L, '>/tmp/ldapContact.pid');
+print L "$$\n";
+close L;
+
+
 use Getopt::Long;
 my %parameters;
 my $return = GetOptions( \%parameters, 'global', 'incremental', 'help' );
