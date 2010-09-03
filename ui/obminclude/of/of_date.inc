@@ -1717,6 +1717,29 @@ class Of_Date extends DateTime {
     return $this->originalTimeZone;
   }
 
+  public static function secondToString($seconds) {
+
+    if(!is_numeric($seconds)) {
+      return null;
+    }
+    $units = array(
+      $GLOBALS["l_week"]   => 7*24*3600,
+      $GLOBALS["l_day"]    =>   24*3600,
+      $GLOBALS["l_hour"]   =>      3600,
+      $GLOBALS["l_minute"] =>        60,
+      $GLOBALS["l_second"] =>         1
+    );    
+    $string = "";
+    foreach ( $units as $name => $divisor ) {
+      if ( $quot = intval($seconds / $divisor) ) {
+        $string .= "$quot $name";
+        $string .= (abs($quot) > 1 ? "s" : "") . ", ";
+        $seconds -= $quot * $divisor;
+      }
+    }
+    return substr($string, 0, -2);     
+  }
+
   public function __sleep() {
     $this->serialized = $this->get(Of_Date::ISO_8601);
     return array('serialized', 'originalTimeZone', '_error');

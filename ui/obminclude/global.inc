@@ -115,7 +115,17 @@ if ($phpversion >= 5) {
 }
 
 // calendar alert values (seconds => label or minutes displayed)
-$ccalendar_alerts = array ('300' => '5', '600' => '10', '900' => '15', '1800' => '30');
+$ccalendar_alerts = array (
+  '300'  => '',
+  '600'  => '',
+  '900'  => '',
+  '1800' => '',
+  '3600' => '',
+  '7200' => '',
+  '18000'=> '',
+  '86400'=> '',
+  '172800' => '',
+  '604800' => '');
 
 // Calendar : First day of the week (+2h to fix a DST php bug)
 //$ccalendar_weekstart = 'monday + 2 hours';

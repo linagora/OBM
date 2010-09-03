@@ -115,6 +115,14 @@ $l_today_date = "Date du jour";
 $l_first_hour = "Heure de début";
 $l_last_hour = "Heure de fin";
 
+$l_first_hour = "Heure de début";
+$l_last_hour = "Heure de fin";
+$l_second = 'seconde';
+$l_minute = 'minute';
+$l_hour = 'heure';
+$l_day = 'jour';
+$l_week = 'semaine';
+
 // Templates
 $l_save_as_template = "Enregistrer comme modèle";
 $l_save_template = "Enregistrer le modèle";

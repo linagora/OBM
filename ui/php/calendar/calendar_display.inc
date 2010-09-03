@@ -2791,11 +2791,16 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         ${'NEEDS-ACTION'} = '';
         $DECLINED = '';
         if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id)) {
+          $user_alert = $ccalendar_alerts;
+          if($alerts[$u_id] && !($user_alert[$alerts[$u_id]])) {
+            $user_alert[$alerts[$u_id]] = Of_Date::secondToString($alerts[$u_id]);
+          }
           $$state = "checked=\"checked\"";
           $urld = "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
           $urla = "$path/calendar/calendar_index.php?action=update_alert&calendar_id=$id&user_id=$u_id";
           $sel_alert = '';
-          foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
+          foreach ($user_alert as $alert_sec => $alert_label) {
+            if(!$alert_label) $alert_label = Of_Date::secondToString($alert_sec);
             if($alerts[$u_id] == $alert_sec) {
               $sel_alert .= "<option value=\"$alert_sec\" selected=\"selected\">$alert_label</option>";
             } else {
@@ -4280,7 +4285,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   // Alerts
   $sel_alert = "<select name=\"sel_alert\">
         <option value=\"$c_none\">$l_none</option>";
-  foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
+  $user_alert = $ccalendar_alerts;
+  if($selected_alert && !($user_alert[$selected_alert])) {
+    $user_alert[$selected_alert] = Of_Date::secondToString($selected_alert);
+  }  
+  foreach ($user_alert as $alert_sec => $alert_label) {
+    if(!$alert_label) $alert_label = Of_Date::secondToString($alert_sec);
     $sel_alert .= "<option value=\"$alert_sec\"";
     if ($selected_alert == $alert_sec) {
       $sel_alert .= " selected=\"selected\"";

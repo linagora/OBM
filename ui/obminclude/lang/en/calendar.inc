@@ -8,6 +8,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Modified on 2009-11-12T18:44:51+01:00 using OBMtranslation (0.5a)
 
+$l_second = 'second';
+$l_minute = 'minute';
+$l_hour = 'hour';
+$l_day = 'day';
+$l_week = 'week';
+
 $l_attendees = "Attendees";
 $l_others_attendees = "Other attendees";
 $l_add_displayed_users = "Add displayed users";
