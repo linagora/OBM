@@ -563,7 +563,7 @@ function run_query_contact_update($contact) {
   }
   $sql_id = sql_parse_id($id, true);
   $query = "UPDATE Contact SET
-    contact_timeupdate='".date('Y-m-d H:i:s')."',
+    contact_timeupdate=NOW(),
     contact_userupdate='".$obm['uid']."',
     contact_datasource_id=$dsrc,
     contact_addressbook_id=$addressbook,
