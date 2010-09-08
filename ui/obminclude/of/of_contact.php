@@ -549,7 +549,6 @@ class OBM_Contact implements OBM_ISearchable {
 
     if (!$contact->id) return false;
 
-    $now = date('Y-m-d H:i:s');
     $uid = $obm['uid'];
     $multidomain = sql_multidomain('contact');
 
@@ -564,7 +563,7 @@ class OBM_Contact implements OBM_ISearchable {
 
     $sql_id = sql_parse_id($contact->id, true);
     $query = "UPDATE Contact SET
-      contact_timeupdate='{$now}',
+      contact_timeupdate=NOW(),
       contact_userupdate='{$uid}',
       contact_datasource_id=$dsrc,
       contact_company_id=$comp_id,
