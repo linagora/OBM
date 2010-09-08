@@ -87,6 +87,7 @@ $l_meeting_legend = "Legend";
 $l_selection = "Selection";
 $l_task = "Task";
 $l_category_filter = "Filter by category";
+$l_cat_none = "None";
 $l_events = "Events";
 $l_days = 'days';
 $l_more = 'more';

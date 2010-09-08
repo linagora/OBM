@@ -710,98 +710,6 @@ li.eventOwner19Legend {
   border-bottom: 1px solid #358399;
 }
 
-/* Planning list view */
-.eventList td {
-  vertical-align: top;
-}
-
-.eventDetail {
-  margin-left: 4em;
-  margin-bottom: 1em;
-  padding-left: 1em;
-  border-left: 4px solid #B3B3B3;
-}
-
-.eventDetail table {
-  border-spacing:0;
-}
-
-.eventDetail tbody th {
-  border-bottom: 1px solid #B3B3B3;
-  border-right: none;
-  border-top: none;
-  border-left: none;
-  background-color: transparent;
-}
-
-.eventDetail tbody td {
-  border-bottom: 1px solid #B3B3B3;
-  border-right: none;
-  border-left: none;
-  text-align: left;
-}
-
-table.planning td {
-  vertical-align: top;
-  padding: 0;
-  font-size: 120%;
-}
-
-table.planning tbody th {
-  text-align: left;
-}
-
-table.planning ul {
-  padding: 0;
-  padding-left: 15px;
-  margin: 0;
-  list-style: disc;
-}
-
-table.planning li {
-  padding: 0;
-  margin: 0;
-}
-
-table.planningRessource a {
-  color:#FFFFFF;
-}
-
-table.planningRessource td {
-  vertical-align: top;
-  padding: 0;
-  font-size: 90%;
-}
-
-table.planningRessource ul {
-  padding: 0;
-  padding-left: 15px;
-  margin: 0;
-  list-style: disc;
-}
-
-table.planningRessource li {
-  padding: 0;
-  margin: 0;
-}
-
-table.planningRessource thead div {
-  clip: rect(auto,auto,auto,auto);
-  overflow: hidden;
-}
-
-h1.hoursTitle{
-  margin:0;
-  border-left: 1px solid black;
-  border-bottom: 1px solid black;
-  font-size: 90%;
-  font-weight: bold;
-  padding: 2px;
-  color:white;
-  width:40%;
-}
-
-
 /* OBM 2.2 FreeBusy */
 
 .freeBusyContent {
@@ -1198,18 +1106,27 @@ table.planning tbody th {
 
 table.planning ul {
   padding: 0;
-  padding-left: 15px;
   margin: 0;
-  list-style: disc;
+  list-style: none;
 }
 
 table.planning li {
-  padding: 0;
-  margin: 0;
+  padding: 4px;
+  margin: 2px;
+  font-size: 11px;
+  height: 4em;
+}
+
+table.planning a {
+  color: #FFFFFF;
 }
 
 table.planningRessource a {
-  color:#FFFFFF;
+  color: #636466;
+}
+
+table.planningRessource th {
+  background-color:#EEEEEE;
 }
 
 table.planningRessource td {
@@ -1220,9 +1137,9 @@ table.planningRessource td {
 
 table.planningRessource ul {
   padding: 0;
-  padding-left: 15px;
+  padding-left: 4px;
   margin: 0;
-  list-style: disc;
+  list-style: none;
 }
 
 table.planningRessource li {
@@ -1235,10 +1152,13 @@ table.planningRessource thead div {
   overflow: hidden;
 }
 
+tbody td.asEvent{
+  background-color:#DBDBDB;
+  border-bottom:none;
+}
+
 h1.hoursTitle{
   margin:0;
-  border-left: 1px solid black;
-  border-bottom: 1px solid black;
   font-size: 90%;
   font-weight: bold;
   padding: 2px;

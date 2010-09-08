@@ -1430,8 +1430,7 @@ table.planningRessource thead th {
 }
 
 table.planningRessource tbody a  {
-  color: white;
-  font-style: italic;
+  color: #636466;
 }
 /* ------------------------------------------------------------------------- */ 
 /* Color Picker */

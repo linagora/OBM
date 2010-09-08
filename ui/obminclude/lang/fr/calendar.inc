@@ -81,6 +81,7 @@ $l_yearly = "annuelle";
 $l_yearly_unit = "Tous les %s ans";
 $l_task = "Tache";
 $l_category_filter = "Filtrer par catégorie";
+$l_cat_none = "Aucune";
 $l_from = "du";
 $l_to = "au";
 $l_periodic = "Périodique";

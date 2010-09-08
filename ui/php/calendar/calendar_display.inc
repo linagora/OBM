@@ -308,6 +308,8 @@ function html_calendar_bar_legend($p_view, $calendar_entity) {
     foreach($cats1 as $key => $cat_info) {
       $dis_legend .= "<li style=\"color:#fff;background-color:rgb($colors[$key])\">$cat_info[label]</li>";
     }
+    # Adding legend color for event without category
+    $dis_legend .= "<li style=\"color:#fff;background-color: rgb(99, 100, 102)\">{$GLOBALS['l_cat_none']}</li>";
   } else {
     $script_range = 'obm.vars.conf.displayRange = true;';
     $l_legend = $l_calendar_displayed;
@@ -2331,7 +2333,7 @@ function dis_calendar_planning_day_view($date, $end, $calendar_entity, $category
       foreach($entity_occ as $ress){
         $occurrences = $of->getPeriodOccurrences($current_time,$end_event,$ress);
         if(is_array($occurrences)) {
-          $ressource_occ .= "<td style=\"width:$td_width%;\" class='$ress[class]' ><ul>";
+          $ressource_occ .= "<td class=\"asEvent\" style=\"width:$td_width%;\" class='$ress[class]' ><ul>";
           foreach($occurrences as $occurrence) {
             $event_id=$occurrence->event->id;
             $entity_type=$occurrence->entity;
@@ -2481,7 +2483,12 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
   $entity_id = $occurrence->id;
   $entity = $occurrence->entity;
 
-  $style = "color:rgb(".$cats_color[$occurrence->event->category1].")";  
+  if(isset($cats_color[$occurrence->event->category1])){
+    $style = "background-color:rgb(".$cats_color[$occurrence->event->category1].")";
+  } else {
+    $style = "background-color:rgb(99, 100, 102)";
+  }
+
   if($occurrence->event->all_day) {
     $schedule = $l_all_day; 
   } else {
@@ -2528,9 +2535,14 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
   $end=clone($occurrence->date);
   $end->addSecond($occurrence->event->duration);
 
-  $style = "color:rgb(".$cats_color[$occurrence->event->category1].")";  
+  if(isset($cats_color[$occurrence->event->category1])){
+    $style = "background-color:rgb(".$cats_color[$occurrence->event->category1].")";
+  } else {
+    $style = "background-color:rgb(99, 100, 102)";
+  }
+
   if($occurrence->event->all_day) {
-    $schedule = "<h1 class='RF hoursTitle'>$l_all_day</h1>"; 
+    $schedule = "<h1 style='$style' class='RF hoursTitle'>$l_all_day</h1>"; 
   } else {
     if($occurrence->date->compareDateIso($date) != 0) {
       $schedule_start = $occurrence->date->get(Of_Date::DAY).'/'.$occurrence->date->get(Of_Date::MONTH);
@@ -2543,13 +2555,13 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
       $schedule_end = $end->get(Of_Date::TIME_SHORT);
     }
     $schedule = "
-      <h1 class='RF hoursTitle'>$schedule_start<br/>$schedule_end</h1>  
+      <h1 style='$style' class='RF hoursTitle'>$schedule_start<br/>$schedule_end</h1>  
 ";
   }
 
 
   $event_data = "
-    <li style='$style' class='RC'>
+    <li class='RC'>
     $schedule
     <div>
       <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$title</a>
