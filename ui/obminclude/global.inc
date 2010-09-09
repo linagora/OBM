@@ -116,6 +116,7 @@ if ($phpversion >= 5) {
 
 // calendar alert values (seconds => label or minutes displayed)
 $ccalendar_alerts = array (
+  '60'   => '',
   '300'  => '',
   '600'  => '',
   '900'  => '',
@@ -123,6 +124,7 @@ $ccalendar_alerts = array (
   '3600' => '',
   '7200' => '',
   '18000'=> '',
+  '43200'=> '',
   '86400'=> '',
   '172800' => '',
   '604800' => '');
