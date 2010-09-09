@@ -512,7 +512,7 @@ function dis_payment_invoice($params) {
 //   - $params[] : payment values
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_invoice($amounts, $params) {
-  global $display,  $l_update, $l_delete_invoice, $l_no_invoice;
+  global $path, $display,  $l_update, $l_delete_invoice, $l_no_invoice;
   global $l_payment, $l_invoice, $l_company, $l_received, $l_emitted;
   global $l_comment, $l_number, $l_amount, $l_date, $l_label, $l_already_paid;
   global $l_total, $l_invoice_list;
