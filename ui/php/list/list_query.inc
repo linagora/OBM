@@ -852,7 +852,7 @@ function check_list_data($id, $list) {
     display_debug_msg("explain $query", $cdg_sql, 'check_list_data()');
     $obm_q = new DB_OBM;
     // 1 indicate to PHPLIB not to report the error if any
-    $ret = $obm_q->query("explain $query", 1);
+    $ret = @$obm_q->query("explain $query", 1);
     if (substr($ret, 0,4) == 'obm:') {
       $err['msg'] = "$l_invalid_query : " . substr($ret,4);
       return false;
