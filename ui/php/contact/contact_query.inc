@@ -248,6 +248,7 @@ function run_query_contact_search($contact) {
     kind_header,
     kind_lang,
     contact_marketingmanager_id,
+    #CONCAT(contact_firstname,' ',contact_lastname) as contact_displayname,
     contact_lastname,
     contact_firstname,
     contact_aka,
