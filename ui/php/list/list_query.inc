@@ -1078,7 +1078,7 @@ function get_list_dynamic_company_nb($dynquery) {
 
     } else {
       // The query is a standard query (no sub-query)
-      if (preg_match('/(FROM (.*))( ORDER BY|GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
+      if (preg_match('/(FROM (.*))\s*(ORDER BY|GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
 	$query_c = "SELECT count(distinct(company_id)) as nb ". $matches[1];
       } else {
 	return 0;
@@ -1094,6 +1094,7 @@ function get_list_dynamic_company_nb($dynquery) {
 
   display_debug_msg($query_c, $cdg_sql, 'get_list_dynamic_company_nb()');
   $obm_q = new DB_OBM;
+
   $obm_q->query($query_c);
   $obm_q->next_record();
   return $obm_q->f('nb');
