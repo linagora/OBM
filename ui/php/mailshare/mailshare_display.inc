@@ -101,9 +101,6 @@ function html_mailshare_search_form($mailshare) {
   $name = stripslashes($mailshare['name']);
   $delegation = stripslashes($mailshare['delegation']);
   $quota = stripslashes($mailshare['quota']);
-  if ( $quota == '' ) {
-    $quota = 0;
-  }
   $email = stripslashes($mailshare['email']);
   $desc = stripslashes($mailshare['description']);
 
