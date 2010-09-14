@@ -47,10 +47,26 @@ function button_to($label, $url, $btn_class = false, $confirm_msg = false)
       </form>";
 }
 
+function wd_remove_accents($str, $charset='utf-8')
+{
+    $str = htmlentities($str, ENT_NOQUOTES, $charset);
+
+    $str = preg_replace('#\&([A-za-z])(?:acute|cedil|circ|grave|ring|tilde|uml)\;#', '\1', $str);
+    $str = preg_replace('#\&([A-za-z]{2})(?:lig)\;#', '\1', $str); // pour les ligatures e.g. '&oelig;'
+    $str = preg_replace('#\&[^;]+\;#', '', $str); // supprime les autres caractères
+
+    return $str;
+}
+
+// Case insensitive sort, correct acute letters sort
+function wd_unaccent_compare_ci($a, $b)
+{
+    return strcmp(strtolower(wd_remove_accents($a)), strtolower(wd_remove_accents($b)));
+}
 
 function get_localized_countries_array() {
   $countries = include(dirname(__FILE__)."/../lib/Stato/i18n/data/countries/".SI18n::get_locale().".php");
-  if (is_array($countries)) asort($countries);
+  if (is_array($countries)) usort($countries, 'wd_unaccent_compare_ci');
   return $countries;
 }
 
