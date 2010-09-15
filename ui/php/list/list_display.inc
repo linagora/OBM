@@ -81,7 +81,11 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
       $res['url'] = "list_index.php?action=detailconsult&amp;list_id=".$OD->data_set->f('list_id');
     }    
   }
-  
+    
+  else if ($fieldname == 'function_label') {
+    $res['name'] = $OD->data_set->f('contactfunction_label');
+  }
+
   else if ($fieldname == 'list_nb_contact') {
     $res['name'] = $OD->data_set->f('list_static_nb'). ' / ' .$OD->data_set->f('list_query_nb');
     $res['align'] = 'center';
@@ -132,15 +136,15 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
       }
       if ($OD->data_set->f('contact_zipcode') != '') {
 	$res['name'] .= $OD->data_set->f('contact_zipcode')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_zipcode');
+	$res['txt_name'] .= $OD->data_set->f('contact_zipcode') . ' ';
       }
       if ($OD->data_set->f('contact_town') != '') {
 	$res['name'] .= $OD->data_set->f('contact_town')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_town');
+	$res['txt_name'] .= $OD->data_set->f('contact_town') . ' ';
       }
       if ($OD->data_set->f('contact_expresspostal') != '') {
 	$res['name'] .= $OD->data_set->f('contact_expresspostal')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_expresspostal');
+	$res['txt_name'] .= $OD->data_set->f('contact_expresspostal') . ' ';
       }
       if ($OD->data_set->f('contact_country') != '') {
 	$res['name'] .= $OD->data_set->f('contact_country')."<br />\n";
@@ -154,15 +158,15 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
       }
       if ($OD->data_set->f('company_zipcode') != '') {
 	$res['name'] .= $OD->data_set->f('company_zipcode')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_zipcode');
+	$res['txt_name'] .= $OD->data_set->f('company_zipcode') . ' ';
       }
       if ($OD->data_set->f('company_town') != '') {
 	$res['name'] .= $OD->data_set->f('company_town')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_town');
+	$res['txt_name'] .= $OD->data_set->f('company_town') . ' ';
       }
       if ($OD->data_set->f('company_expresspostal') != '') {
 	$res['name'] .= $OD->data_set->f('company_expresspostal')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_expresspostal');
+	$res['txt_name'] .= $OD->data_set->f('company_expresspostal') . ' ';
       }
       if ($OD->data_set->f('company_country') != '') {
 	$res['name'] .= $OD->data_set->f('company_country')."<br />\n";
