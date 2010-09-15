@@ -245,6 +245,10 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if ($fieldname == 'contact_email') {
+    $res['name'] .= $OD->data_set->f('email_address');
+  }
+
   else if ($fieldname == 'contact_phone') {
     // If a contact phone is present we get it
     if ($OD->data_set->f('contact_phone') != '') {
