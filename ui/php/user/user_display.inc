@@ -136,11 +136,11 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == 'userobm_nomade') {
     $nomade_perms = $OD->data_set->f('userobm_nomade_perms');
     $nomade_enable = $OD->data_set->f('userobm_nomade_enable');
-    $email_nomade = $OD->data_set->f('userobm_email_nomade');
+    $email_nomade = nl2br($OD->data_set->f('userobm_email_nomade'));
 
     if ($nomade_perms) {
       if ($nomade_enable) {
-	$res['name'] = $l_enabled;
+	$res['name'] = $email_nomade;
       } else {
 	$res['name'] = $l_perms;
       }
