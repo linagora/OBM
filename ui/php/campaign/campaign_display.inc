@@ -304,8 +304,8 @@ function dis_campaign_consult ($params) {
   $i = 0;
   foreach ($targets as $target) {
     $module_entity = strtolower($lang['l_campaignentity'][$target['entity']]);
-    $block_targets .= "<tr". ($i % 2 == 0 ? " class=\"pair\">":''). "
-      <td class=\"C\"><input type=\"checkbox\" name=\"data-target-$target[entity_id]\"></td>
+    $block_targets .= "<tr". ($i % 2 == 0 ? " class=\"pair\"":''). ">
+      <td class=\"C\"><input type=\"checkbox\" name=\"data-target-$target[entity_id]\" /></td>
       <td class=\"C\">". $lang['l_campaignentity'][$target['entity']]. "</td>
       <td class=\"C\"><a href=\"../$module_entity/${module_entity}_index.php?action=detailconsult&${module_entity}_id=$target[source_id]\">$target[label]</a></td><tr>";
     $i += 1;
