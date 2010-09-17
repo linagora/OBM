@@ -81,7 +81,7 @@ require('list_js.inc');
 if ($action == 'ext_get_id') {
   $display['search'] = dis_list_search_form($params);
   if ($_SESSION['set_display'] == 'yes') {
-    $display['detail'] = dis_list_search_list($params, $popup);
+    $display['result'] = dis_list_search_list($params, $popup);
   } else {
     $display['msg'] .= display_ok_msg($l_no_display);
   }
@@ -271,7 +271,7 @@ else if ($action == 'new_criterion') {
 } else if ($action == 'ext_get_ids') {
   $display['search'] = dis_list_search_form($params);
   if ($_SESSION['set_display'] == 'yes') {
-    $display['detail'] = dis_list_search_list($params, $popup);
+    $display['result'] = dis_list_search_list($params, $popup);
   } else {
     $display['msg'] .= display_ok_msg($l_no_display);
   }

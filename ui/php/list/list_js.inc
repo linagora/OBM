@@ -20,7 +20,7 @@ function check_get_id_url(p_url, valeur) {
     alert (\"$l_j_select_list\");
     return false;
   } else {
-    new_url = p_url + valeur;
+    new_url = p_url + '&data-list-' + valeur + '=1';
     window.opener.location.href=new_url;
     window.close();
     return true;

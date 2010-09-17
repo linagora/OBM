@@ -75,7 +75,9 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ($OD->display_ext == 'get_id') {
       $res['url'] = 'javascript:check_get_id('.$OD->data_set->f('list_id').",'".addslashes($OD->data_set->f('list_name'))."');";
     } else if ($OD->display_ext == 'get_id_url') {
-      $ext_url = $params['ext_url'];
+      $ext_id = $params['ext_id'];
+      $ext_action = $params['ext_action'];
+      $ext_url = $params['ext_url']."?action=$ext_action&ext_id=$ext_id";
       $res['url'] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f('list_id').");";
     } elseif($link_ok) {
       $res['url'] = "list_index.php?action=detailconsult&amp;list_id=".$OD->data_set->f('list_id');
