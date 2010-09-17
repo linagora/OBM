@@ -303,7 +303,7 @@ function dis_campaign_consult ($params) {
   $block_targets = '';
   $i = 0;
   foreach ($targets as $target) {
-    $module_entity = strtolower($lang['l_campaignentity'][$target['entity']]);
+    $module_entity = strtolower($target['entity']);
     $block_targets .= "<tr". ($i % 2 == 0 ? " class=\"pair\"":''). ">
       <td class=\"C\"><input type=\"checkbox\" name=\"data-target-$target[entity_id]\" /></td>
       <td class=\"C\">". $lang['l_campaignentity'][$target['entity']]. "</td>
