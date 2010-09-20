@@ -3254,6 +3254,15 @@ function check_user_defined_rules() {
           }
         }
       }
+      if (is_array($field_rules['check'])) {
+        foreach($field_rules['check'] as $callback) {
+          if (!$callback($value)) {
+            $err['field'] = $field;
+            OBM_Error::getInstance()->addError($field, $err['msg']);
+            $return = false;
+          }
+        }
+      }
       $params[$field] = $value;
     }
   }

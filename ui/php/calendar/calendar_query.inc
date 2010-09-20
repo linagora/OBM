@@ -1703,10 +1703,14 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
-  $opacity = 'OPAQUE';
+  $default_opacity = 'OPAQUE';
   if ($all_day == 'TRUE') {
     $event_duration = "86400";
-    $opacity = 'TRANSPARENT';
+    $default_opacity = 'TRANSPARENT';
+  }
+  $opacity = $calendar['opacity'];
+  if (!in_array($opacity, array('OPAQUE','TRANSPARENT'))) {
+    $opacity = $default_opacity;
   }
   $event_privacy = 0;
   $event_priority = 2;
