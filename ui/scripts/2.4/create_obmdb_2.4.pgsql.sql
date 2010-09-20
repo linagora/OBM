@@ -11231,7 +11231,7 @@ CREATE TABLE campaign (
   campaign_parent integer DEFAULT NULL,
   campaign_child_order integer DEFAULT NULL,
   CONSTRAINT campaign_parent_fkey FOREIGN KEY (campaign_parent) REFERENCES campaign (campaign_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT campaign_email_fkey FOREIGN KEY (campaign_email) REFERENCES Document (document_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT campaign_email_fkey FOREIGN KEY (campaign_email) REFERENCES Document (document_id) ON DELETE SET NULL ON UPDATE CASCADE,
   PRIMARY KEY (campaign_id)
 );
 
