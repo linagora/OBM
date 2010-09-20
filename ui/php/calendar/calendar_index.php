@@ -242,7 +242,7 @@ if ($action == 'search') {
   }
   $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
   
-  if (check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
+  if (check_user_defined_rules() && check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
 
     $conflicts = check_calendar_conflict($params, $entities);
     if ( $conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts)) ) {
@@ -353,7 +353,7 @@ if ($action == 'search') {
   }
   $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
 
-  if (check_calendar_access($params["calendar_id"]) && 
+  if (check_user_defined_rules() && check_calendar_access($params["calendar_id"]) && 
     check_calendar_data_form($params)) {
       $c = get_calendar_event_info($params['calendar_id'],false); 
       $conflicts = check_calendar_conflict($params, $entities);
@@ -405,7 +405,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'quick_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_access($params['calendar_id']) && 
+  if (check_user_defined_rules() && check_calendar_access($params['calendar_id']) && 
     check_calendar_data_quick_form($params)) {
     $conflicts = check_calendar_conflict($params, null);
     if(!$conflicts || can_force_resource_conflict($conflicts)) {
@@ -436,7 +436,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'quick_insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_data_quick_form($params) && OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'access')) {
+  if (check_user_defined_rules() && check_calendar_data_quick_form($params) && OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'access')) {
     if( OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'write' )) {
       $state = 'ACCEPTED';
     } else {
