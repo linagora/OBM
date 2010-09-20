@@ -1367,16 +1367,30 @@ sub _sendMailReport {
         Data    => join( "\n", @{$mailContent->{'content'}} )
         );
     
-    eval {
-        local $SIG{__DIE__} = sub {};
+    if( $MIME::Lite::VERSION >= 3.025 ) {
+        eval {
+            local $SIG{__DIE__} = sub {};
+        
+            $self->_log( $msg->as_string(), 5 );
+            $msg->send( 'smtp', 'localhost' );
+        };
     
-        $self->_log( $msg->as_string(), 5 );
-        $msg->send( 'smtp', 'localhost' );
-    };
+        if( !$msg->last_send_successful() ) {
+            $self->_log( 'Sending mail report fail', 1 );
+            return 1;
+        }
+    }else {
+        my $mailSend = eval {
+            local $SIG{__DIE__} = sub {};
 
-    if( !$msg->last_send_successful() ) {
-        $self->_log( 'Sending mail report fail', 1 );
-        return 1;
+            $self->_log( $msg->as_string(), 5 );
+            return $msg->send( 'smtp', 'localhost' );
+        };
+
+        if(!$mailSend) {
+    		$self->_log( 'Sending mail report fail', 1 );
+    		return 1;
+        }
     }
     
     $self->_log( 'Sending mail report success', 3 );
