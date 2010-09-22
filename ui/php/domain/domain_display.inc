@@ -242,42 +242,40 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
     }
   }
   
-  if ($cgp_use['service']['sync']) {
     // Domain syncservers
     // Get the domain syncservers
-    $block_s = '';
-    if (is_array($syncservers)) {
-      foreach ($syncservers as $s_id => $syncserver_info) {
-	      // $mailserver_info is an array of info rows about this mail server
-	      foreach ($syncserver_info as $server_info) {
-	        $name = $server_info['name'];
-	        $ip = $server_info['ip'];
-	        $role = $server_info['role'];
-	        $block_s .= "
-              <tr>
-              <td>$name</td>
-              <td>$ip</td>
-              <td>$role</td>
-              </tr>";
-	      }
-      }
-      if ($block_s != '') {
-	      $block_sync = "
-            <div class=\"detail infos\">
-            <h1>$l_sync_servers</h1>
-
-            <table class=\"spreadSheet\">
-            <thead>
+  $block_s = '';
+  if (is_array($syncservers)) {
+    foreach ($syncservers as $s_id => $syncserver_info) {
+            // $mailserver_info is an array of info rows about this mail server
+            foreach ($syncserver_info as $server_info) {
+              $name = $server_info['name'];
+              $ip = $server_info['ip'];
+              $role = $server_info['role'];
+              $block_s .= "
             <tr>
-              <th>$l_host</th>
-              <th>$l_ip</th>
-              <th>$l_role</th>
-            </tr>
-            </thead>
-            $block_s
-            </table>
-            </div>";
-      }
+            <td>$name</td>
+            <td>$ip</td>
+            <td>$role</td>
+            </tr>";
+            }
+    }
+    if ($block_s != '') {
+            $block_sync = "
+          <div class=\"detail infos\">
+          <h1>$l_sync_servers</h1>
+
+          <table class=\"spreadSheet\">
+          <thead>
+          <tr>
+            <th>$l_host</th>
+            <th>$l_ip</th>
+            <th>$l_role</th>
+          </tr>
+          </thead>
+          $block_s
+          </table>
+          </div>";
     }
   }
 
@@ -629,16 +627,9 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
           </div>";
       }
     }
-    $serversynclist = get_domain_syncservers($id);
-    if (is_array($obm_sync)) {
-      foreach($obm_sync as $obm_sync_id) {
-        $obm_sync_sel = $obm_sync_id;
-      }
-    }
     $imap_list = '<option value="">---</option>';
     $smtp_in_list = '<option value="">---</option>';
     $smtp_out_list = '<option value="">---</option>';
-    $obm_sync_list = '<option value="">---</option>';
     foreach($serverlist as $host_id => $serverinfos) {
       if ($serverinfos['imap'] > 0) {
         $have_imap = true;
@@ -651,16 +642,6 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
       if ($serverinfos['smtp_out'] > 0) {
         $have_smtp_out = true;
         $smtp_out_list .= "<option value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_smtp_out])</option>";
-      }  
-    }
-    foreach($serversynclist as $host_id => $serverinfos) {
-      if ($serverinfos['obm_sync'] > 0) {
-        $have_obm_sync = true;
-        if(isset($obm_sync_sel) && $obm_sync_sel == $host_id){
-          $obm_sync_list .= "<option selected='selected' value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_obm_sync])</option>";
-        } else {
-          $obm_sync_list .= "<option value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_obm_sync])</option>";
-        }
       }  
     }
     if ($have_imap) {
@@ -738,34 +719,11 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
           <legend class='warning'>$GLOBALS[l_smtp_out] $l_mailserver : $GLOBALS[l_mailserver_warn]</legend>
         </fieldset>";
     }
-    if ($have_obm_sync) {
-      $dis_obm_sync = "
-        <fieldset class=\"detail infos\">
-          <legend>$GLOBALS[l_obm_sync] $l_syncserver</legend>
-        <table>
-        <tr>
-        <th>$GLOBALS[l_header_select_syncserver]</th>
-        <td id='obm_syncServer'>
-          <div class=\"multiple\">
-          <select name='sel_obm_sync[]'>$obm_sync_list</select> 
-          </div>              
-        </td>
-        </tr>
-        </table>
-        </fieldset>";
-    } else {
-      $dis_obm_sync = "
-        <fieldset class=\"detail infos\">
-          <legend class='warning'>$GLOBALS[l_obm_sync] $l_mailserver : $GLOBALS[l_syncserver_warn]</legend>
-        </fieldset>";
-    }
-
 
     $dis_mailserver = "
     $dis_imap
     $dis_smtp_in
-    $dis_smtp_out
-    $dis_obm_sync";
+    $dis_smtp_out";
     $dis_alias = "
      <fieldset class=\"detail infos\">
     <legend>$l_alias</legend>
@@ -813,6 +771,43 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
       </fieldset>
       ";
   }
+
+  $syncservers = get_domain_syncservers($id);
+  if (is_array($obm_sync)) {
+    foreach($solr as $obm_sync_id) {
+      $obm_sync_sel = $obm_sync_id;
+    }
+  }
+  if (sizeof($syncservers) > 0) {
+    foreach($syncservers as $host_id => $serverinfos) {
+      $selected = '';
+      if(isset($obm_sync_sel) && $obm_sync_sel == $host_id) $selected = "selected='selected'";        
+      $obm_sync_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
+    }
+    $dis_obm_sync = "<fieldset class=\"detail infos\">
+      <legend>$GLOBALS[l_obm_sync]</legend>
+        <table>
+        <tr>
+        <th>$GLOBALS[l_header_select_syncserver]</th>
+        <td id='obm_syncServer'>
+          <div class=\"multiple\">
+          <select name='sel_obm_sync[]'>
+            <option value=''>---</option>
+            $obm_sync_list
+          </select> 
+          </div>              
+        </td>
+        </tr>
+        </table>
+    </fieldset>";
+  } else {
+    $dis_obm_sync = "
+      <fieldset class=\"detail infos\">
+        <legend class='warning'>$GLOBALS[l_obm_sync] : $GLOBALS[l_syncserver_warn]</legend>
+      </fieldset>";
+  } 
+
+
 
   $solrservers = get_domain_solrservers($id);
   if (is_array($solr)) {
@@ -955,6 +950,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
     $dis_imap_frontend
     $dis_backup_ftp
     $dis_samba
+    $dis_obm_sync
     $dis_solr
     $properties_block
     <fieldset class=\"buttons\">

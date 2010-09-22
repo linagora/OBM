@@ -187,12 +187,11 @@ function html_host_search_form($host) {
       <input type=\"checkbox\" name=\"cb_imap_frontend\" value=\"1\" $imap_frontend />
     </label>";
   }
-  if ($cgp_use['service']['sync']) {
-    $block_sync = "
-    <label>$GLOBALS[l_obm_sync]<br />
-      <input type=\"checkbox\" name=\"cb_obm_sync\" value=\"1\" $obm_sync />
-    </label>";
-  }
+    
+  $block_sync = "
+  <label>$GLOBALS[l_obm_sync]<br />
+    <input type=\"checkbox\" name=\"cb_obm_sync\" value=\"1\" $obm_sync />
+  </label>";
 
   $block_solr = "
   <label>$GLOBALS[l_solr]<br />
@@ -476,14 +475,11 @@ function html_host_consult($host_q) {
       ";    
   }
 
-  if ($cgp_use['service']['sync']) {
-    $block_sync = "
-    <tr>
-      <th>$GLOBALS[l_obm_sync]</th>
-      <td>$obm_sync</td>
-    </tr>
-      ";    
-  }
+  $block_sync = "
+  <tr>
+    <th>$GLOBALS[l_obm_sync]</th>
+    <td>$obm_sync</td>
+  </tr>";    
 
   $block_solr = "
   <tr>
@@ -735,15 +731,14 @@ function html_host_form($action, $host_q, $host, $field='') {
       </td>
     </tr>";
   }
-  if ($cgp_use['service']['sync']) {
-    $block_sync = "
-    <tr>
-      <th class=\"$class[obm_sync]\"><label for=\"cb_obm_sync\">$GLOBALS[l_obm_sync]</label></th>
-      <td>
-        <input id=\"cb_obm_sync\" name=\"cb_obm_sync\" type=\"checkbox\" value=\"1\" $obm_sync_state>
-      </td>
-    </tr>";
-  }
+    
+  $block_sync = "
+  <tr>
+    <th class=\"$class[obm_sync]\"><label for=\"cb_obm_sync\">$GLOBALS[l_obm_sync]</label></th>
+    <td>
+      <input id=\"cb_obm_sync\" name=\"cb_obm_sync\" type=\"checkbox\" value=\"1\" $obm_sync_state>
+    </td>
+  </tr>";
 
   $block_solr = "
   <tr>
