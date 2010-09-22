@@ -1662,7 +1662,7 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
         '',
         NULL,
         '2',
-        '0',
+        1,
         '$duration',
         'yearly',
         '1',
