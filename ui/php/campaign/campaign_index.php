@@ -272,10 +272,10 @@ if (false) {
   $prefs = get_display_pref($obm["uid"], 'campaign', 1);
   $display['detail'] = dis_campaign_display_pref($prefs);
 
-} else if ($action == 'monitor') {
-  ///////////////////////////////////////////////////////////////////////////////
-  run_query_campaign_import_sent_emails();
-  $display['detail'] = dis_campaign_monitor($params);
+//} else if ($action == 'monitor') {
+//  ///////////////////////////////////////////////////////////////////////////////
+//  run_query_campaign_import_sent_emails();
+//  $display['detail'] = dis_campaign_monitor($params);
 
 } else if ($action == 'test_module_admin') {
   ///////////////////////////////////////////////////////////////////////////////
@@ -450,29 +450,30 @@ function get_campaign_action() {
     'Condition'=> array ('detailconsult') 
   );
 
-  $actions['campaign']['add_user_target'] = array (
-    'Name'     => "$lang[l_add] $lang[l_userss]",
-    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title="
-    .urlencode($lang['l_add_users'])."&amp;ext_action=add_user_target&amp;ext_url="
-    .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id=".$params['campaign_id']
-    ."&amp;ext_target=Users",
-    'Popup'    => 1,
-    'Target'   => $lang['l_users'],
-    'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
-  );
-
-  $actions['campaign']['add_group_target'] = array (
-    'Name'     => "$lang[l_add] $lang[l_groupss]",
-    'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title="
-    .urlencode($lang['l_add_groups'])."&amp;ext_action=add_group_target&amp;ext_url="
-    .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id=".$params['campaign_id']
-    ."&amp;ext_target=Groups",
-    'Popup'    => 1,
-    'Target'   => $lang['l_groups'],
-    'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
-  );
+// TODO: disabled because the sendCampaign.pl script doesn't care about
+//  $actions['campaign']['add_user_target'] = array (
+//    'Name'     => "$lang[l_add] $lang[l_userss]",
+//    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title="
+//    .urlencode($lang['l_add_users'])."&amp;ext_action=add_user_target&amp;ext_url="
+//    .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id=".$params['campaign_id']
+//    ."&amp;ext_target=Users",
+//    'Popup'    => 1,
+//    'Target'   => $lang['l_users'],
+//    'Right'    => $cright_write,
+//    'Condition'=> array ('detailconsult') 
+//  );
+//
+//  $actions['campaign']['add_group_target'] = array (
+//    'Name'     => "$lang[l_add] $lang[l_groupss]",
+//    'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title="
+//    .urlencode($lang['l_add_groups'])."&amp;ext_action=add_group_target&amp;ext_url="
+//    .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id=".$params['campaign_id']
+//    ."&amp;ext_target=Groups",
+//    'Popup'    => 1,
+//    'Target'   => $lang['l_groups'],
+//    'Right'    => $cright_write,
+//    'Condition'=> array ('detailconsult') 
+//  );
 
   $actions['campaign']['new_subcampaign'] = array (
     'Name'     => "$lang[l_header_new] $lang[l_subcampaign]", 
@@ -517,13 +518,13 @@ function get_campaign_action() {
 
   // TODO in developement
 
-  $actions['campaign']['monitor'] = array (
-    'Name'     => 'Monitor', //$lang['l_monitor'], 
-    'Url'      => "${campaign_index}?action=monitor&amp;campaign_id=$params[campaign_id]",
-    'Right'    => $cright_read,
-    //'Condition'=> array ('none') ,
-    'Condition'=> array ('detailconsult'),
-  );
+//  $actions['campaign']['monitor'] = array (
+//    'Name'     => 'Monitor', //$lang['l_monitor'], 
+//    'Url'      => "${campaign_index}?action=monitor&amp;campaign_id=$params[campaign_id]",
+//    'Right'    => $cright_read,
+//    //'Condition'=> array ('none') ,
+//    'Condition'=> array ('detailconsult'),
+//  );
 
 
   if (isset($params['campaign_id'])) {

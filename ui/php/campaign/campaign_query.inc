@@ -685,7 +685,7 @@ function run_query_campaign_import_sent_emails () {
   $query = "SELECT CampaignPushTarget.*,
     campaignmailcontent_refext_id as campaign_id
     FROM CampaignPushTarget
-    JOIN CampaignMailContent ON campaignpushtarget_mailcontent_id = campaignmailcontent_id
+    INNER JOIN CampaignMailContent ON campaignpushtarget_mailcontent_id = campaignmailcontent_id
     WHERE
     campaignpushtarget_status != '$c_campaign_mailtarget_status[in_queue]'";
 
