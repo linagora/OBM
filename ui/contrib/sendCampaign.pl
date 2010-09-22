@@ -310,8 +310,8 @@ sub importAddress {
     my $sth = shift;
 
     # Filtre les eventuelles caracteres parasites avant et apres
-    $address =~ s/^[ ,\t"]+//;
-    $address =~ s/[ ,\t"]+$//;
+    $address =~ s/^[ ,\t\r\n"]+//;
+    $address =~ s/[ ,\t\r\n"]+$//;
 
     return if $address eq '';
 
@@ -411,17 +411,14 @@ sub importAddressesList {
     FROM ContactList
       INNER JOIN Contact ON contactlist_contact_id=contact_id
       INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-      LEFT JOIN Email ON contactentity_entity_id=email_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
-      LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
-      LEFT JOIN CompanyEntity ON companyentity_company_id = company_id
-      LEFT JOIN ContactFunction ON Contact.contact_function_id = contactfunction_id
-      LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
-    WHERE contactlist_list_id = $listId";
+      INNER JOIN Email ON contactentity_entity_id=email_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
+      INNER JOIN ListEntity ON listentity_list_id = contactlist_list_id
+    WHERE listentity_entity_id = $listId";
     chomp($dyn_query);
     if (!$dyn_query) {
       $query = $static_query;
     } else {
-      $query = "$static_query UNION $dyn_query"
+      $query = "$static_query UNION $dyn_query";
     }
     $self->_log( "Importation des adresses : requete \"$query\"", 3 );
 
