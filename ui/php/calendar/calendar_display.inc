@@ -4286,7 +4286,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $sel_alert = "<select name=\"sel_alert\">
         <option value=\"$c_none\">$l_none</option>";
   $user_alert = $ccalendar_alerts;
-  if($selected_alert && !($user_alert[$selected_alert])) {
+  if($selected_alert && ($selected_alert!= $c_none) && !($user_alert[$selected_alert])) {
     $user_alert[$selected_alert] = Of_Date::secondToString($selected_alert);
   }  
   foreach ($user_alert as $alert_sec => $alert_label) {
