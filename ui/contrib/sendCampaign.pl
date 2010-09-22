@@ -279,7 +279,7 @@ sub campaignImport {
     $self->loadMailContent($campaignId,$mailContentId);
 
     # Importation des addresses dans CampaignPushTarget
-    $query = "select campaigntarget_entity_id from CampaignTarget INNER JOIN ListEntity ON listentity_entity_id = campaigntarget_entity_id where campaigntarget_campaign_id=$campaignId";
+    $query = "select distinct campaigntarget_entity_id from CampaignTarget INNER JOIN ListEntity ON listentity_entity_id = campaigntarget_entity_id where campaigntarget_campaign_id=$campaignId";
     if( !defined($dbHandler->execQuery( $query, \$queryResult ) ) ) {
         exit 1;
     }
@@ -365,18 +365,18 @@ sub importAddressesList {
     my $mailContentId = shift;
     my $sth = shift;
 
-    my $query = "select list_query from List join ListEntity on listentity_list_id=list_id where listentity_entity_id=$listId";
+    my $query = "select list_query from List inner join ListEntity on listentity_list_id=list_id where listentity_entity_id=$listId";
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult ) ) ) {
         exit 1;
     }
 
-    ($query) = $queryResult->fetchrow_array();
-    if(!defined($query)) {
+    my ($dyn_query) = $queryResult->fetchrow_array();
+    if(!defined($dyn_query)) {
         $self->_log( "L'entité $listId n'est pas une liste ou elle n'a pas été trouvée", 3 );
         return 1;
     }
-    $query = "SELECT distinct
+    my $static_query = "SELECT distinct
       contactlist_contact_id as id,
       contactlist_contact_id as contact_id,
       contact_lastname,
@@ -416,8 +416,13 @@ sub importAddressesList {
       LEFT JOIN CompanyEntity ON companyentity_company_id = company_id
       LEFT JOIN ContactFunction ON Contact.contact_function_id = contactfunction_id
       LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
-    WHERE contactlist_list_id = $listId
-    UNION ".$query;
+    WHERE contactlist_list_id = $listId";
+    chomp($dyn_query);
+    if (!$dyn_query) {
+      $query = $static_query;
+    } else {
+      $query = "$static_query UNION $dyn_query"
+    }
     $self->_log( "Importation des adresses : requete \"$query\"", 3 );
 
     # Execution réel de la requete
