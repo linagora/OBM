@@ -171,7 +171,6 @@ class ReportFactory {
     group_name,
     group_desc,
     group_email,
-    group_contacts,
     count(usergroup.of_usergroup_user_id) AS group_nb_user
     FROM UGroup
     INNER JOIN Domain ON domain_id = group_domain_id
@@ -200,8 +199,7 @@ class ReportFactory {
     group_manager_id,
     group_name,
     group_desc,
-    group_email,
-    group_contacts";
+    group_email";
 
     return $query;
   }
@@ -237,7 +235,6 @@ class ReportFactory {
     $record->name             = $obm_q->f('group_name');
     $record->desc             = $obm_q->f('group_desc');
     $record->email            = $obm_q->f('group_email');
-    $record->contacts         = $obm_q->f('group_contacts');
     $record->nb_user          = $obm_q->f('group_nb_user');
     return $record;
   }

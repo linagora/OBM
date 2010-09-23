@@ -38,6 +38,10 @@ class GroupContactUpdate extends UpdateObject {
     $query = "ALTER TABLE UGroup DROP COLUMN group_contacts";
     $result = $this->query($query);
     $result->free();
+
+    $query = "ALTER TABLE P_UGroup DROP COLUMN group_contacts";
+    $result = $this->query($query);
+    $result->free();
   }
 
   private function getAddressBooks() {

@@ -3197,7 +3197,6 @@ CREATE TABLE `UGroup` (
   `group_name` varchar(255) NOT NULL,
   `group_desc` varchar(128) default NULL,
   `group_email` varchar(128) default NULL,
-  `group_contacts` text,
   PRIMARY KEY  (`group_id`),
   UNIQUE KEY `group_gid` (`group_gid`, `group_domain_id`),
   KEY `group_domain_id_domain_id_fkey` (`group_domain_id`),

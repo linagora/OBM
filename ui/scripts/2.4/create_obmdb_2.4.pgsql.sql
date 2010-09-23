@@ -2188,8 +2188,7 @@ CREATE TABLE ugroup (
     group_manager_id integer,
     group_name character varying(255) NOT NULL,
     group_desc character varying(128),
-    group_email character varying(128),
-    group_contacts text
+    group_email character varying(128)
 );
 
 

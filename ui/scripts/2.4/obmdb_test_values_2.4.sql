@@ -149,45 +149,45 @@ INSERT INTO UserEntity (userentity_entity_id, userentity_user_id) SELECT MAX(ent
 DELETE FROM UGroup;
 
 -- Admin Group
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1000, 'Admin', 'Admin', '', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1000, 'Admin', 'Admin', '');
 INSERT INTO Entity (entity_mailing) VALUES (TRUE);
 INSERT INTO GroupEntity (groupentity_entity_id, groupentity_group_id) SELECT MAX(entity_id), MAX(group_id) FROM UGroup, Entity;
 
 -- Commercial Group
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1001, 'Commercial', 'Commercial', '', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1001, 'Commercial', 'Commercial', '');
 INSERT INTO Entity (entity_mailing) VALUES (TRUE);
 INSERT INTO GroupEntity (groupentity_entity_id, groupentity_group_id) SELECT MAX(entity_id), MAX(group_id) FROM UGroup, Entity;
 
 -- Production Group
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1002, 'Production', 'Production', '', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1002, 'Production', 'Production', '');
 INSERT INTO Entity (entity_mailing) VALUES (TRUE);
 INSERT INTO GroupEntity (groupentity_entity_id, groupentity_group_id) SELECT MAX(entity_id), MAX(group_id) FROM UGroup, Entity;
 
 -- Group test without e-mail
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1003, 'grpTest00', 'Groupe de test 00', '', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1003, 'grpTest00', 'Groupe de test 00', '');
 INSERT INTO Entity (entity_mailing) VALUES (TRUE);
 INSERT INTO GroupEntity (groupentity_entity_id, groupentity_group_id) SELECT MAX(entity_id), MAX(group_id) FROM UGroup, Entity;
 
 -- Groupe de test AVEC e-mail
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1004, 'grpTest01', 'Groupe de test 01 avec e-mail', 'grpTest01', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 0, 0, 1, NULL, 0, 1004, 'grpTest01', 'Groupe de test 01 avec e-mail', 'grpTest01');
 
 -- 'Administrateurs du domaine' Group
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 512, 'Administrateurs du domaine', 'Groupe des administrateurs du domaine et d''OBM', '', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email) VALUES (1, 1, 0, 0, NULL, 1, 512, 'Administrateurs du domaine', 'Groupe des administrateurs du domaine et d''OBM', '');
 INSERT INTO Entity (entity_mailing) VALUES (TRUE);
 INSERT INTO GroupEntity (groupentity_entity_id, groupentity_group_id) SELECT MAX(entity_id), MAX(group_id) FROM UGroup, Entity;
 
 -- 'Utilisateurs du domaine' Group
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 513, 'Utilisateurs du domaine', 'Groupe des utilisateurs du domaine Samba', '', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email) VALUES (1, 1, 0, 0, NULL, 1, 513, 'Utilisateurs du domaine', 'Groupe des utilisateurs du domaine Samba', '');
 INSERT INTO Entity (entity_mailing) VALUES (TRUE);
 INSERT INTO GroupEntity (groupentity_entity_id, groupentity_group_id) SELECT MAX(entity_id), MAX(group_id) FROM UGroup, Entity;
 
 -- 'Invités du domaine' Group
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 514, 'Invités du domaine', 'Groupe des invités du domaine Samba', '', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email) VALUES (1, 1, 0, 0, NULL, 1, 514, 'Invités du domaine', 'Groupe des invités du domaine Samba', '');
 INSERT INTO Entity (entity_mailing) VALUES (TRUE);
 INSERT INTO GroupEntity (groupentity_entity_id, groupentity_group_id) SELECT MAX(entity_id), MAX(group_id) FROM UGroup, Entity;
 
 -- "Hôtes du domaine' Group
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 515, 'Hôtes du domaine', 'Groupe des hôtes du domaine Samba', '', NULL);
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email) VALUES (1, 1, 0, 0, NULL, 1, 515, 'Hôtes du domaine', 'Groupe des hôtes du domaine Samba', '');
 INSERT INTO Entity (entity_mailing) VALUES (TRUE);
 INSERT INTO GroupEntity (groupentity_entity_id, groupentity_group_id) SELECT MAX(entity_id), MAX(group_id) FROM UGroup, Entity;
 
