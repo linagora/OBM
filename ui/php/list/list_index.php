@@ -370,11 +370,14 @@ function get_list_params() {
 
   $nb_con = 0;
   $nb_list = 0;
+  $params['static_con'] = array();
   foreach($_REQUEST as $key => $value ) {
     if (strcmp(substr($key, 0, 6),'cb_con') == 0) {
-      $nb_con++;
-      $con_num = substr($key, 6);
-      $params["con$nb_con"] = $con_num;
+      $con_num = intval(substr($key, 6));
+      if ($con_num > 0) {
+        $nb_con++;
+        $params['static_con'][] = $con_num;
+      }
     }
   }
   $params['con_nb'] = $nb_con;

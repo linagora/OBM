@@ -557,7 +557,7 @@ class OBM_DISPLAY {
     $content = "<div>
       $cb_links
       <script type=\"text/javascript\">
-        function exportResultSet_$this_entity(firstRow,nbRows) {
+        function exportResultSet_{$this_entity}_{$this_name}(firstRow,nbRows) {
           form = new Element('form');
           form.setProperties({action:'$export_url', method:'POST'});
           form.adopt(new Element('input').setProperties({type:'hidden', name:'action', value:'export_page'}));
@@ -576,8 +576,8 @@ class OBM_DISPLAY {
 
     if ($module != 'people') {
       $content .="
-        <a href=\"#\" onclick=\"return exportResultSet_$this_entity('$first_row','$export_rows');\" >$l_export</a>      
-        <a href=\"#\" onclick=\"return exportResultSet_$this_entity('0','$nb_rows');\" >$l_export_all</a>";
+        <a href=\"#\" onclick=\"return exportResultSet_{$this_entity}_{$this_name}('$first_row','$export_rows');\" >$l_export</a>      
+        <a href=\"#\" onclick=\"return exportResultSet_{$this_entity}_{$this_name}('0','$nb_rows');\" >$l_export_all</a>";
     } 
 
     $content .= "$l_entries $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";

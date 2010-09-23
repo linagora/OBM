@@ -392,9 +392,32 @@ function run_query_list_delete($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query execution : Return the static contacts id list
+// Parameters:
+//   - $id : list id
+// Return: number of contact inserted
+///////////////////////////////////////////////////////////////////////////////
+function run_query_list_contactlist_array($id) {
+  global $cdg_sql;
+
+  $list = array();
+  $sql_id = sql_parse_id($id, true);
+  $query = "SELECT contactlist_contact_id FROM ContactList WHERE contactlist_list_id $sql_id";
+  display_debug_msg($query, $cdg_sql,'run_query_list_contactlist_list()');
+  $obm_q = new DB_OBM;
+  if ($obm_q->query($query)) {
+    while ($obm_q->next_record()) {
+      $list[] = $obm_q->f('contactlist_contact_id');
+    }
+  }
+  return $list;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : ContactList conditionnal insertion
 // Parameters:
-//   - $list[] : list hash info : keys used : id, con_nb, conX
+//   - $list[] : list hash info : keys used : id, con_nb, static_con (array)
 // Return: number of contact inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_contactlist_insert($list) {
@@ -413,31 +436,18 @@ function run_query_list_contactlist_insert($list) {
     return -1;
   }
 
-  $cpt = 0;
   $cpt_ins = 0;
-  while ($cpt < $list['con_nb']) {
-    $cpt++;
-    $con_id = sql_parse_id($list["con$cpt"], true);
-
-    $query = "SELECT * FROM ContactList
-      WHERE contactlist_list_id $id 
-        AND contactlist_contact_id $con_id ";
-    display_debug_msg($query, $cdg_sql,'run_query_list_contactlist_insert(2)');
-    $test_q = new DB_OBM;
-    $retour = $test_q->query($query);
-    
-    // If the entry doesn't already exist, we insert it
-    if ($test_q->num_rows() == 0) {
-      $con_id = sql_parse_id($list["con$cpt"]);
+  if ($list['con_nb'] > 0) {
+    $existing = run_query_list_contactlist_array($list['list_id']);
+    $to_insert = array_diff($list['static_con'], $existing);
+    foreach ($to_insert as $con_id) {
+      $sql_id = sql_parse_id($con_id);
       $query = "INSERT INTO ContactList (contactlist_list_id,
-        contactlist_contact_id) VALUES ($ins_id, $con_id)";
-
+        contactlist_contact_id) VALUES ($ins_id, $sql_id)";
       display_debug_msg($query, $cdg_sql,'run_query_list_contactlist_insert(3)');
-      $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
-
-      $cpt_ins++;
     }
+    $cpt_ins = count($to_insert);
   }
 
   return $cpt_ins;
@@ -447,25 +457,23 @@ function run_query_list_contactlist_insert($list) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : ContactList deletion
 // Parameters:
-//   - $list[] : list hash info : keys used : id, con_nb, conX
+//   - $list[] : list hash info : keys used : id, con_nb, static_con (array)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_contactlist_delete($list) {
   global $cdg_sql;
 
-  $id = sql_parse_id($list['list_id'], true);
-  $cpt = 0;
   $cpt_del = 0;
-  while ($cpt < $list['con_nb']) {
-    $cpt++;
-    $con_id = sql_parse_id($list["con$cpt"], true);
+  if ($list['con_nb'] > 0) {
+    $id = sql_parse_id($list['list_id'], true);
+    $con_ids = sql_implode_id(',', $list['static_con']);
 
     $query = "DELETE FROM ContactList
-      WHERE contactlist_list_id $id AND contactlist_contact_id $con_id ";
+      WHERE contactlist_list_id $id AND contactlist_contact_id IN ($con_ids) ";
     display_debug_msg($query, $cdg_sql, 'run_query_list_contactlist_delete()');
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
     if ($retour) {
-      $cpt_del++;
+      $cpt_del = $obm_q->affected_rows();
     }
   }
 
@@ -550,13 +558,13 @@ function run_query_list_contacts_list($list, $entity='') {
       ctry2.country_name AS company_country,
       $if_country AS country_name
     FROM ContactList
-      LEFT JOIN Contact ON contactlist_contact_id=contact_id
+      INNER JOIN Contact ON contactlist_contact_id=contact_id
       INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
       LEFT JOIN Address as ad1 ON contactentity_entity_id=ad1.address_entity_id AND ad1.address_label = 'WORK;X-OBM-Ref1'
       LEFT JOIN Country as ctry1 ON ad1.address_country=ctry1.country_iso3166
            AND ctry1.country_lang='$lang'
       LEFT JOIN Phone AS ph1 ON contactentity_entity_id=ph1.phone_entity_id
-      LEFT JOIN Email ON contactentity_entity_id=email_entity_id
+      LEFT JOIN Email ON contactentity_entity_id=email_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
       LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
       LEFT JOIN CompanyEntity ON companyentity_company_id = company_id
       LEFT JOIN Address as ad2 ON companyentity_entity_id=ad2.address_entity_id AND ad2.address_label = 'HQ;X-OBM-Ref1'
