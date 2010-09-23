@@ -1731,9 +1731,9 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
   // login (can't be updated, so only on insert)
   if (($action == 'new') || ($action == 'insert')) {
-    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' autocomplete=\"off\" value=\"$login\" />";
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id=\"userLogin\" autocomplete=\"off\" value=\"$login\" />";
   } else {
-    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' autocomplete=\"off\" value=\"$login\" />
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id=\"userLogin\" autocomplete=\"off\" value=\"$login\" />
                   <input type=\"hidden\" name=\"tf_old_login\" value=\"$old_login\" />";
   }
 
@@ -2328,11 +2328,11 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </tr>
   <tr>
     <th class=\"$class[lastname]\">$l_lastname</th>
-    <td><input id=\"userLastname\" name=\"tf_lastname\" size=\"32\" maxlength=\"64\" value=\"$lname\" /></td>
+    <td><input id=\"userLastname\" name=\"tf_lastname\" size=\"32\" maxlength=\"64\" autocomplete=\"off\" value=\"$lname\" /></td>
   </tr>
   <tr>
     <th class=\"$class[firstname]\">$l_firstname</th>
-    <td><input id=\"userFirstname\" name=\"tf_firstname\" size=\"32\" maxlength=\"64\" value=\"$fname\" /></td>
+    <td><input id=\"userFirstname\" name=\"tf_firstname\" size=\"32\" maxlength=\"64\" autocomplete=\"off\" value=\"$fname\" /></td>
   </tr>
   <tr>
     <th class=\"$class[login]\">$l_login</th>
