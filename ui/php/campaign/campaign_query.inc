@@ -173,7 +173,9 @@ function run_query_campaign_update ($params, $col_names_to_update) {
     $params['fi_email']['campaign_id'] = $id;
     $mime_id = run_query_campaign_get_type_by_ext($_FILES['fi_email']['type']);
     $params['fi_email']['type'] = ($mime_id ? $mime_id : '0');    
-    $mquery[] = "campaign_email = '". run_query_global_insert_document($params['fi_email'], $id, 'campaign'). "'";
+    $document_id = run_query_global_insert_document($params['fi_email'], $id, 'campaign');
+    $d_id = sql_parse_id($document_id);
+    $mquery[] = "campaign_email = $d_id";
     // echo  "campaign_email = '". run_query_global_insert_document($params['fi_email'], $id, 'campaign'). "'";;
   }
 
@@ -683,7 +685,7 @@ function run_query_campaign_import_sent_emails () {
   $query = "SELECT CampaignPushTarget.*,
     campaignmailcontent_refext_id as campaign_id
     FROM CampaignPushTarget
-    JOIN CampaignMailContent ON campaignpushtarget_mailcontent_id = campaignmailcontent_id
+    INNER JOIN CampaignMailContent ON campaignpushtarget_mailcontent_id = campaignmailcontent_id
     WHERE
     campaignpushtarget_status != '$c_campaign_mailtarget_status[in_queue]'";
 
