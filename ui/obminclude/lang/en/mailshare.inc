@@ -50,8 +50,8 @@ $l_cant_delete = "The backup cannot be deleted !";
 $l_can_create = "The backup can be created.";
 $l_cant_create = "The backup cannot be created !"; 
 $l_err_unknown_db = "Unknown database Type !";
-$l_delete = "Delete backup";
-$l_insert = "Create backup";
+$l_delete = "Delete";
+$l_insert = "Create";
 $l_restore = "Restore";
 
 $l_restore_mailbox = "Mailbox";
