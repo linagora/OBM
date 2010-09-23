@@ -852,7 +852,7 @@ function check_list_data($id, $list) {
     display_debug_msg("explain $query", $cdg_sql, 'check_list_data()');
     $obm_q = new DB_OBM;
     // 1 indicate to PHPLIB not to report the error if any
-    $ret = $obm_q->query("explain $query", 1);
+    $ret = @$obm_q->query("explain $query", 1);
     if (substr($ret, 0,4) == 'obm:') {
       $err['msg'] = "$l_invalid_query : " . substr($ret,4);
       return false;
@@ -1078,7 +1078,7 @@ function get_list_dynamic_company_nb($dynquery) {
 
     } else {
       // The query is a standard query (no sub-query)
-      if (preg_match('/(FROM (.*))( ORDER BY|GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
+      if (preg_match('/(FROM (.*))\s*(ORDER BY|GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
 	$query_c = "SELECT count(distinct(company_id)) as nb ". $matches[1];
       } else {
 	return 0;
@@ -1094,6 +1094,7 @@ function get_list_dynamic_company_nb($dynquery) {
 
   display_debug_msg($query_c, $cdg_sql, 'get_list_dynamic_company_nb()');
   $obm_q = new DB_OBM;
+
   $obm_q->query($query_c);
   $obm_q->next_record();
   return $obm_q->f('nb');
@@ -1548,8 +1549,7 @@ function make_list_query_from_criteria($list) {
 
   $from = " Contact LEFT JOIN Company ON contact_company_id=company_id
     INNER JOIN ContactEntity ON contact_id = contactentity_contact_id
-    JOIN AddressBook AS ab ON contact_addressbook_id=ab.id
-    JOIN AddressbookEntity AS abe ON ab.id=abe.addressbookentity_addressbook_id
+    INNER JOIN AddressbookEntity AS abe ON contact_addressbook_id=abe.addressbookentity_addressbook_id
     LEFT JOIN EntityRight ON entityright_entity_id=abe.addressbookentity_entity_id AND entityright_consumer_id IS NULL
     LEFT JOIN Address AS ad1 ON contactentity_entity_id=ad1.address_entity_id AND ad1.address_label = 'WORK;X-OBM-Ref1'
     LEFT JOIN Country as ctry1 ON ad1.address_country=ctry1.country_iso3166 AND ctry1.country_lang='$lang'
@@ -1558,7 +1558,7 @@ function make_list_query_from_criteria($list) {
     LEFT JOIN Phone as FaxPhone ON FaxPhone.phone_entity_id = contactentity_entity_id  AND FaxPhone.phone_label = 'WORK;FAX;X-OBM-Ref1'
     LEFT JOIN Phone as HomePhone ON HomePhone.phone_entity_id = contactentity_entity_id  AND HomePhone.phone_label = 'HOME;VOICE;X-OBM-Ref1'
     LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
-    INNER JOIN CompanyEntity ON company_id = companyentity_company_id
+    LEFT JOIN CompanyEntity ON company_id = companyentity_company_id
     LEFT JOIN Address as ad2 ON companyentity_entity_id=ad2.address_entity_id AND ad2.address_label = 'HQ;X-OBM-Ref1'
     LEFT JOIN Country as ctry2 ON ad2.address_country=ctry2.country_iso3166 AND ctry2.country_lang='$lang'
     LEFT JOIN Kind ON contact_kind_id = kind_id
@@ -1858,11 +1858,7 @@ function make_list_query_from_criteria($list) {
   }
 
   // Allow only contacts from public (read wise) address books
-  if ($privacy == $c_private) {
-    $where = " (entityright_read=1) AND ($where)";
-  } else {
-    $where = " (entityright_read=1) AND ($where)";
-  }
+  $where = " (entityright_read=1) AND ($where)";
 
   // If any (not in insert mode), add statics contacts to the query
   if ($id > 0) {

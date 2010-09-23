@@ -50,7 +50,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   $ext_url = $params['ext_url'];
 
     //  if (($fieldname == 'contact_lastname') && $link_ok) {
-  if ($fieldname == 'contact_displayname') {
+  if ($fieldname == 'displayname') {
      $displayname = $OD->data_set->f('contact_firstname').' '.$OD->data_set->f('contact_lastname');
     if(trim($displayname) == '') {
       $displayname = $GLOBALS['l_displayname_alternative'];
@@ -66,7 +66,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   }
 
   //  if (($fieldname == 'contact_lastname') && $link_ok) {
-  if ($fieldname == 'contact_lastname') {
+  if ($fieldname == 'lastname') {
     if(trim($OD->data_set->f('contact_lastname')) == '') {
       $contact_lastname = '-';
       $res['align'] = 'center';
@@ -93,7 +93,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if (($fieldname == 'company_name') && $link_ok) {
+  else if (($fieldname == 'name') && $link_ok) {
     if ($cgp_show['module']['company']) {
       $res['url'] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f('contact_company_id');
     } else {
@@ -101,7 +101,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }      
   }
 
-  else if ($fieldname == 'contact_archive') {
+  else if ($fieldname == 'archive') {
     $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
       $res['name'] = 'X';
@@ -111,7 +111,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if (($fieldname == 'contact_mailing_ok')
+  else if (($fieldname == 'mailing_ok')
 	   || ($fieldname == 'contact_newsletter')) {
     $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
@@ -122,7 +122,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if ($fieldname == 'email_address') {
+  else if ($fieldname == 'email') {
     $email = $OD->data_set->f('email_address');
     if (strcmp($email,'') != 0) {
       $res['url'] = "mailto:$email";
@@ -131,7 +131,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if ($fieldname == 'contact_address') {
+  else if ($fieldname == 'address') {
     if ($OD->data_set->f('contact_service') != '') {
       $res['name'] .= $OD->data_set->f('contact_service')."<br />\n";
       $res['txt_name'] .= $OD->data_set->f('contact_service') . ' ';
@@ -158,17 +158,21 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if ($fieldname == 'contact_service') {
+  else if ($fieldname == 'company') {
+    $res['name'].= $OD->data_set->f('company_name');
+  }
+
+  else if ($fieldname == 'service') {
     $res['name'].= $OD->data_set->f('contact_service');
   }
 
-  else if ($fieldname == 'country_name') {
+  else if ($fieldname == 'country') {
     if ($OD->data_set->f('country_name') != '') {
       $res['name'] .= $OD->data_set->f('country_name');
     }
   }
 
-  else if ($fieldname == 'contact_date') {
+  else if ($fieldname == 'date') {
     if ($show_date) {
       $date = $OD->data_set->f('contact_date');
       $res['name'] = ($date) ? of_date_format($date) : ' ';
