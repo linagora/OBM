@@ -74,7 +74,7 @@ class DelegationGroups extends CronJob {
     if ($delegation == "/") {
       $name = "Tous";
     } else {
-      $name = "Tous .$delegation";
+      $name = "Tous ".$delegation;
     }
     return $name;
   }
