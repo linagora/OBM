@@ -48,14 +48,14 @@ class DelegationGroups extends CronJob {
 
     $groups = array();
     foreach ($delegations as $delegation => $parent) {
-      $group_id = $this->getDelegationGroup($domain_id, $delegation);
+      list($group_id, $group_name) = $this->getDelegationGroup($domain_id, $delegation);
       $this->purgeGroupMembers($group_id);
       $this->populateGroup($domain_id, $group_id, $delegation);
       if ($parent) {
-        $parent_id = $this->getDelegationGroup($domain_id, $parent);
+        list($parent_id, $parent_name) = $this->getDelegationGroup($domain_id, $parent);
         $this->associatesDelegationGroups($parent_id, $group_id);
       }
-      $groups[$group_id] = "group:$group_id";
+      $groups[$group_id] = "group:$group_name";
     }
 
     foreach ($groups as $group_id => $ignore) {
@@ -110,11 +110,11 @@ class DelegationGroups extends CronJob {
   protected function getDelegationGroup($domain_id, $delegation) {
     $groupName = $this->delegationGroupName($delegation);
     $obm_q = new DB_OBM;
-    $query = "SELECT group_id FROM UGroup WHERE group_domain_id=$domain_id AND group_name='$groupName'";
+    $query = "SELECT group_id, group_name FROM UGroup WHERE group_domain_id=$domain_id AND group_name='$groupName'";
     $this->logger->core($query);
     $obm_q->query($query);
     if ($obm_q->next_record()) {
-      return $obm_q->f('group_id');
+      return array($obm_q->f('group_id'), $obm_q->f('group_name'));
     }
 
     // The group does not exists, we create !
@@ -156,7 +156,7 @@ class DelegationGroups extends CronJob {
     if ($id > 0) {
       $entity_id = of_entity_insert('group', $id);  
     }
-    return $id;    
+    return array($id, $groupName);
   }
 
   protected function buildDelegationsList($domain_id) {
