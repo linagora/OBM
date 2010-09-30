@@ -182,6 +182,30 @@ class DelegationGroups extends CronJob {
         $parent = $delegation;
       }
     }
+
+    $obm_q = new DB_OBM;
+    $query = "SELECT domainpropertyvalue_value FROM DomainPropertyValue WHERE domainpropertyvalue_property_key='delegation' AND domainpropertyvalue_domain_id=".$domain_id;
+    $this->logger->core($query);
+    $obm_q->query($query);
+
+    if($obm_q->next_record()) {
+        $main_delegation = $obm_q->f('domainpropertyvalue_value');
+    }
+
+    // Remove ending '/' on main delegation
+    $main_delegation = preg_replace('/\/$/', '', $main_delegation);
+    foreach ($delegations as $current => $value) {
+        if(strcmp($separator, $current)==0) {
+            continue;
+        }
+
+        if(strcmp($main_delegation, $current)>0) {
+            unset($delegations[$current]);
+        }elseif(strcmp($main_delegation, $current)==0) {
+            $delegations[$current] = $separator;
+        }
+    }
+
     return $delegations;
   }
 
