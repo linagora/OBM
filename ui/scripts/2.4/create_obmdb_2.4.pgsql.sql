@@ -11570,6 +11570,16 @@ CREATE TABLE opush_ping_heartbeat (
 ALTER TABLE opush_ping_heartbeat ADD CONSTRAINT
 unique_opush_ping_heartbeat_col_dev UNIQUE (device_id);
 
+CREATE TABLE opush_invitation_mapping (
+        mail_collection_id INTEGER REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
+        mail_uid INTEGER,
+        event_collection_id INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
+        event_uid VARCHAR(300),
+        status VARCHAR(20),
+        dtstamp timestamp without time zone,
+        sync_key VARCHAR(64) REFERENCES opush_sync_state(sync_key) ON DELETE CASCADE
+);
+
 
 --
 -- Table structure for `calendarcolor`
