@@ -152,6 +152,43 @@ Obm.CalendarFreeBusy = new Class({
 
     // Scroll to the right position
     this.initPosition();
+    
+    if ($('new_event_form')) {
+      var qstring = $('new_event_form').toQueryString().split("&");
+      
+      qstring.each(function(e) {
+        var input = e.split("=");
+        if (input[0] != 'action' && 
+            input[0] != 'tf_date_begin' && 
+            input[0]!= 'tf_date_end' && 
+            input[0]!= 'sel_time_begin' && 
+            input[0]!= 'sel_min_begin' && 
+            input[0]!= 'sel_time_end' && 
+            input[0]!= 'sel_min_end' && 
+            input[0]!= 'sel_user_id[]' && 
+            input[0]!= 'sel_resource_id[]' &&
+            input[0] != 'tf_others_attendees[]') {
+          var name = input[0];
+          var value = input[1];
+          var hidden = new Element('input').setProperties({
+            'type':'hidden',
+            'name':name,
+            'value':decodeURIComponent(value)
+          });
+          hidden.injectInside($('freeBusyFormId'));
+        }
+        if (input[0] == 'action') {
+          if (input[1] == 'update') {
+          $('freebusy_action').value = 'detailupdate';
+          }
+        } 
+      });
+      input = null;
+      qstring = null;
+      name = null;
+      value = null;
+      hidden = null;
+    }
 
     $('external_contact').addEvent('keypress', function(e) {
       switch(e.key) {

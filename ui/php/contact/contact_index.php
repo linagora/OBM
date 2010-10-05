@@ -139,7 +139,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 } elseif ($action == 'save') {
 ///////////////////////////////////////////////////////////////////////////////
   $addressbooks = OBM_AddressBook::search();
-  $contacts = $addressbooks->searchContacts($params['searchpattern']);
+  $contacts = $addressbooks->exportContacts($params['searchpattern']);
   dis_contact_vcard_export_all($contacts);
   exit();
 } elseif ($action == 'vcard_insert') {
@@ -165,7 +165,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 } elseif ($action == 'export') {
 ///////////////////////////////////////////////////////////////////////////////
   $addressbooks = OBM_AddressBook::search();
-  $contacts = $addressbooks->searchContacts($params['searchpattern']."  -is:archive");
+  $contacts = $addressbooks->exportContacts($params['searchpattern']."  -is:archive");
   dis_contact_csv_export_all($contacts);
   exit();
 } elseif ($action == 'statistics') {

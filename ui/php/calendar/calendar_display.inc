@@ -3265,6 +3265,15 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     $documents = $entities['document'];
     $exception_q = run_query_get_one_event_exception($calendar['calendar_id']);
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
+  
+    // Entities from Freebusy
+    if (isset($calendar['new_meeting']) && $calendar['new_meeting'] == 1) {
+      $users = (is_array($calendar['new_user_id'])) ? get_userobm_from_ids($calendar['new_user_id']) : array();
+      $groups = (is_array($calendar['new_group_id'])) ? get_calendar_group_from_ids($calendar['new_group_id']) : array();
+      $resources = (is_array($calendar['new_resource_id'])) ? get_calendar_resource_from_ids($calendar['new_resource_id']) : array();
+      $contacts = (is_array($calendar['new_contact_id'])) ? get_contact_from_ids($calendar['new_contact_id'], false) : array();
+    }
+    
   } else {
     $users_id = is_array($entities['user']) ? $entities['user'] : array();
     $contacts_id = is_array($entities['contact']) ? $entities['contact'] : array();
@@ -3274,10 +3283,16 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
 
     // If new event, add the optionnal new users (here to get the user's infos)
     if ($action == 'new') {
+      
       if (isset($calendar['template_id'])) {
         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
+        $users_id = array_merge($users_id, $template_entities['user']);
+        $contacts_id = array_merge($contacts_id, $template_entities['contact']);
+        $res_id = array_merge($res_id, $template_entities['resource']);
+        $groups_id = array_merge($groups_id, $template_entities['group']);
+        $documents_id = array_merge($documents_id, $template_entities['document']);
       }
-
+      
       // Entities from Freebusy
       if (is_array($calendar['new_user_id'])) $users_id = $calendar['new_user_id'];
       if (is_array($calendar['new_group_id'])) $groups_id = $calendar['new_group_id'];
@@ -3289,31 +3304,11 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
       }
     }
 
-    if (count($users_id) > 0) {
-      $users = get_userobm_from_ids($users_id);
-    } else {
-      $users = array();
-    }
-    if (count($contacts_id) > 0) {
-      $contacts = get_contact_from_ids($contacts_id, false);
-    } else {
-      $contacts = array();
-    }
-    if (count($res_id) > 0) {
-      $resources = get_calendar_resource_from_ids($res_id);
-    } else {
-      $resources = array();
-    }
-    if (count($groups_id) > 0) {
-      $groups = get_calendar_group_from_ids($groups_id);
-    } else {
-      $groups = array();
-    }
-    if (count($documents_id) > 0) {
-      $documents = get_calendar_document_from_ids($documents_id);
-    } else {
-      $documents = array();
-    }
+    $users = (count($users_id) > 0) ? get_userobm_from_ids($users_id) : array();
+    $contacts = (count($contacts_id) > 0) ? get_contact_from_ids($contacts_id, false) : array();
+    $resources = (count($res_id) > 0) ? get_calendar_resource_from_ids($res_id) : array();
+    $groups = (count($groups_id) > 0) ? get_calendar_group_from_ids($groups_id) : array();
+    $documents = (count($documents_id) > 0) ? get_calendar_document_from_ids($documents_id) : array();
   }
   
   $possible_owners = OBM_Acl_Utils::expandEntitiesArray(
@@ -3900,24 +3895,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         </div>";
     }
 
-  } else if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
-    $users = $calendar['user_id'];
-    foreach($users as $u) {
-      $id = explode("-", $u);
-      if ($id[1] == 'user') {
-        $infos = get_user_info($id[2]);
-        $u_name = $infos['firstname']." ".$infos['lastname'];
-        $sel_id = $u;
-        $div_id = "sel_user_id-$sel_id";
-        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-        <img src=\"$ico_delete\" alt=\"[Delete]\" />
-        </a>
-        $u_name
-        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-        </div>";
-      }
-    }
   } else {
     // user select
     if (is_array($users['entity'])) {
@@ -4454,12 +4431,14 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
 
   // Alerts
-  if(is_null($selected_alert)){
-    $selected_alert = $_SESSION['set_cal_alert'];
-  }
   $sel_alert = "<select name=\"sel_alert\">
         <option value=\"$c_none\">$l_none</option>";
-  foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
+  $user_alert = $ccalendar_alerts;
+  if($selected_alert && ($selected_alert!= $c_none) && !($user_alert[$selected_alert])) {
+    $user_alert[$selected_alert] = Of_Date::secondToString($selected_alert);
+  }  
+  foreach ($user_alert as $alert_sec => $alert_label) {
+    if(!$alert_label) $alert_label = Of_Date::secondToString($alert_sec);
     $sel_alert .= "<option value=\"$alert_sec\"";
     if ($selected_alert == $alert_sec) {
       $sel_alert .= " selected=\"selected\"";

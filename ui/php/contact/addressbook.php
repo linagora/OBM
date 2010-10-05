@@ -297,11 +297,15 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
   public function __construct($addressbooks) {
     $this->addressbooks = $addressbooks;
   }
+  
+  public function exportContacts($pattern, $offset=0, $limit=100000) {
+    return $this->searchContacts($pattern, $offset, $limit);
+  }
 
-  public function searchContacts($pattern, $offset=0) {
+  public function searchContacts($pattern, $offset=0, $limit=100) {
     if(!empty($this->addressbooks)) {
       $pattern .= ' addressbookId:('.implode(' OR ',array_keys($this->addressbooks)).')';
-      return OBM_Contact::search($pattern, $offset);
+      return OBM_Contact::search($pattern, $offset, $limit);
     }
   }
 
