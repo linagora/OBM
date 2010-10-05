@@ -235,7 +235,11 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
     $resource_d->data_cb_text = 'X';
     $resource_d->data_idfield = 'resource_id';
     $resource_d->data_cb_name = 'data-r-';
-    if ($ext_widget != '') {
+    if ($ext_element == "sel_attendees_id") {
+      $resource_d->data_cb_name = "";
+      $resource_d->data_form_head = "
+      <form onsubmit=\"addFreeBusyEntities(this); return false;\">";
+    } elseif ($ext_widget != '') {
       $resource_d->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
     } elseif ($ext_element != '')  {
@@ -245,12 +249,6 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
     } else {
       $resource_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
-    }
-
-    if ($ext_element == "sel_attendees_id") {
-      $resource_d->data_cb_name = "";
-      $resource_d->data_form_head = "
-      <form onsubmit=\"addFreeBusyEntities(this); return false;\">";
     }
 
     $resource_d->data_form_end = "

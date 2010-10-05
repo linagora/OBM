@@ -226,11 +226,12 @@ Obm.CalendarFreeBusy = new Class({
    * Add an attendee
    */
   addAttendee: function(attendee) {
+    attendee = ''+attendee; //ensure attendee is a string
     var a = attendee.split('-');
     if (a[1] == 'user') obm.calendarFreeBusy.entities.sel_user_id.push(a[2]);
-    if (a[1] == 'resource') obm.calendarFreeBusy.entities.sel_resource_id.push(a[2]);
-    if (a[1] == 'contact') obm.calendarFreeBusy.entities.sel_contact_id.push(a[2]);
-    if (a[1] == 'others_attendees') obm.calendarFreeBusy.entities.others_attendees.push(a[2]);
+    else if (a[1] == 'resource') obm.calendarFreeBusy.entities.sel_resource_id.push(a[2]);
+    else if (a[1] == 'contact') obm.calendarFreeBusy.entities.sel_contact_id.push(a[2]);
+    else if (a[1] == 'others_attendees') obm.calendarFreeBusy.entities.others_attendees.push(a[2]);
     this.refresh();
   },
 
