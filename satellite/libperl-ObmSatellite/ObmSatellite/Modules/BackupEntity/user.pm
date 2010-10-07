@@ -179,6 +179,8 @@ sub _getMailboxRoot {
             if( $firstLetter !~ /^[a-z]$/i ) {
                 $firstLetter = 'q';
             }
+            $login =~ s/\./^/g;
+
             return $partitionTree.'/'.$firstLetter.'/user/'.$login;
         };
 
@@ -194,6 +196,7 @@ sub getCyrusMailboxRoots {
     my $backupLink = $self->getTmpMailboxPath();
     $backupLink .= eval {
             my $login = $self->getLogin();
+            $login =~ s/\./^/g;
             $login =~ /^(\w)/;
             return '/'.$1.'/user/'.$login;
         };

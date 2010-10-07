@@ -57,6 +57,7 @@ sub getCyrusMailboxRoots {
             wanted => sub {
                 my $path = $_;
                 my $login = $self->getLogin();
+                $login =~ s/\./^/g;
                 if( $path =~ /^($mailboxRoot\/(\w)\/$login)$/ ) {
                     push( @mailboxTree, {
                         cyrus => $1,
