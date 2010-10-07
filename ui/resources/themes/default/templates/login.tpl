@@ -31,20 +31,20 @@
     <h1>$l_obm_title $obm_version</h1>
     <img src="$img_home" alt="OBM $obm_version" />
     <p class="error"></p>
-    <form name="loginform" method="post" action="$login_action">
+    <form name="loginform" id="loginForm" method="post" action="$login_action">
       <fieldset class="detail">
         <legend class="error" >$error</legend>
         <table>
         <tr>
-          <th>$l_login </th>
-          <td><input type="text" name="login" value="$login" /></td>
+          <th><label for="loginField">$l_login</label></th>
+          <td><input id="loginField" type="text" name="login" value="$login" /></td>
         </tr>
         <tr>
-          <th>$l_password </th>
-          <td><input type="password" name="password" value="" /></td>
+          <th><label for="passwordField">$l_password</label></th>
+          <td><input id="passwordField" type="password" name="password" value="" /></td>
         </tr>
         <tr>
-          <th>$domain </th>
+          <th><label for="sel_domain_id">$domain</label></th>
           <td>$sel_domain</td>
         </tr>        
         </table>
