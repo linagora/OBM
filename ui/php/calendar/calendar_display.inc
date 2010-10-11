@@ -2112,6 +2112,9 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
             foreach ($occurrences as $occurrence) {
               $event = &$occurrence->event;
               $category = $event->category1;
+              if(!is_string($category) || !isset($cats_color[$category])){
+                $category = '';
+              }
               $location = $event->location;
               if($event->all_day) {
                 $ad = ": $l_all_day";
@@ -2483,7 +2486,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
   $entity_id = $occurrence->id;
   $entity = $occurrence->entity;
 
-  if(isset($cats_color[$occurrence->event->category1])){
+  if(is_string($occurrence->event->category1) && isset($cats_color[$occurrence->event->category1])){
     $style = "background-color:rgb(".$cats_color[$occurrence->event->category1].")";
   } else {
     $style = "background-color:rgb(99, 100, 102)";
@@ -2535,7 +2538,7 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
   $end=clone($occurrence->date);
   $end->addSecond($occurrence->event->duration);
 
-  if(isset($cats_color[$occurrence->event->category1])){
+  if(is_string($occurrence->event->category1) && isset($cats_color[$occurrence->event->category1])){
     $style = "background-color:rgb(".$cats_color[$occurrence->event->category1].")";
   } else {
     $style = "background-color:rgb(99, 100, 102)";
