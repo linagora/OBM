@@ -164,7 +164,7 @@ sub update {
 
             if( defined($updateLdapEntity) && !$toDelete ) {
                 # Mise à jour de l'entité de nouveau DN
-                if( $self->_updateEntity($currentLdapEntity) ) {
+                if( $self->_updateEntity($updateLdapEntity) ) {
                     $self->_log( 'echec de mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$updateEntityDNs->[$i], 1 );
                     return $errorCode;
                 }
