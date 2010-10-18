@@ -16,6 +16,10 @@
   border: 1px solid #CCC;
 }
 
+#calendarSelection legend {
+  color: #368397;
+}
+
 #calendarLayout {
   -moz-user-select:none;
   -webkit-user-select:none;
