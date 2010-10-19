@@ -155,7 +155,7 @@
 
 #calendarHeader {
   margin-bottom:8px;
-  padding-right:15px;
+  padding-right:16px;
   position:relative;
 }
 
@@ -169,6 +169,25 @@
   overflow-x:hidden;
   position:relative;
 }
+
+/* VERY COMPLEX CALENDAR HACK FOR IE, I'LL BE FURIOUS IF SOMEONE TOUCH IT ! */
+/* BEGIN ie 6, ie 7 HACK FOR CALENDAR */
+#calendarToolbar {
+  /margin-right: -1px;
+}
+#calendarLayout {
+  /padding-right: 18px;
+}
+#calendarHeader {
+  /margin-right: -1px;
+  /padding-right: 0px;
+}
+#calendarBody {
+  /width: 100%;
+  /padding-right: 17px;
+  /margin-right: -18px;
+}
+/* END ie 6, ie 7 HACK FOR CALENDAR */
 
 .calendarTable {
   width:100%;

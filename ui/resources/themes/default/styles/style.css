@@ -221,8 +221,8 @@ form {
 
 #mainContent {
   background-color: #eff0f2;
-  padding-bottom: 5px; 
-  padding-top: 0;
+  padding: 0 0 5px; 
+  margin: 0;
 }
 /* ------------------------------------------------------------------------- */
 /* Banner */
@@ -382,6 +382,7 @@ form {
   margin: 0;
   line-height: 1.6em;
   padding: 0;
+  /margin-right: -1px;
   color: #368397;  
   border: 1px solid #358399;
   border-left: 0;
