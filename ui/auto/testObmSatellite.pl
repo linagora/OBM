@@ -203,12 +203,12 @@ sub cyrusPartitionConf {
         return 1;
     }
 
+    my $dbHandler = $self->{'dbHandler'};
     my $query = 'SELECT host.host_id
                     FROM Host host
-                    INNER JOIN ServiceProperty ON CAST(serviceproperty_value AS UNSIGNED)=host_id AND serviceproperty_service=\'mail\' AND serviceproperty_property=\'imap\'';
+                    INNER JOIN ServiceProperty ON '.$dbHandler->castAsInteger('serviceproperty_value').'=host_id AND serviceproperty_service=\'mail\' AND serviceproperty_property=\'imap\'';
 
     my $sth;
-    my $dbHandler = $self->{'dbHandler'};
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
         $self->_log( 'chargement des Ids de erveur IMAP depuis la BD impossible', 3 );
         return 1;
