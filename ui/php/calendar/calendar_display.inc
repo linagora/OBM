@@ -5151,6 +5151,10 @@ function dis_calendar_free_interval($current_view, $calendar) {
       if(isset($accessList[$id])) {
         $users[$id] = (array)$of->getPeriodOccurrences($date, $end, array('user' => array($id)));
       }
+      else
+      {
+		$users[$id] = false;
+	  } 
     }
   }
   
