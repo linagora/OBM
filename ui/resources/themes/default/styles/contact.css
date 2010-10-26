@@ -163,7 +163,7 @@
 }
 
 #dataGrid.expanded #dataContainer {
-  width: auto;
+  width: 100%;
 }
 
 #dataGrid.shrinked td {
@@ -426,8 +426,8 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 }
 
 .contactPanelHeader td.filler {
-  width: 15px
-}
+  width: 15px;
+  -width: 0px;
 
 .contactPanelContainer table td, .contactPanelContainer table th {
   overflow-x : hidden;
