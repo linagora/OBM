@@ -125,6 +125,8 @@ class DelegationGroups extends CronJob {
     $groupName = $this->delegationGroupName($delegation);
     $gid = sql_parse_int(get_first_group_free_gid());
     $q_delegation = of_delegation_query_insert_clauses('group_delegation', $delegation);
+    $group_email = preg_replace('/\//g', '-', $q_delegation[value]);
+
 
     $query = "INSERT INTO UGroup (
     group_timeupdate,
@@ -136,6 +138,7 @@ class DelegationGroups extends CronJob {
     group_gid,
     group_name
     $q_delegation[field],
+    group_email,
     group_desc
     ) VALUES (
     null,
@@ -145,8 +148,9 @@ class DelegationGroups extends CronJob {
     $domain_id,
     0,
     $gid,
-    '$groupName'
+    '$groupName',
     $q_delegation[value],
+    '$group_email',
     ''
     )";
     $this->logger->core($query);
