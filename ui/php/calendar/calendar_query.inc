@@ -124,6 +124,22 @@ function get_calendar_user_name($users='') {
   return $names;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Return all the name and first name of contacts
+// Parameters: 
+//   - $contacts : users id array, the event is assigned to 
+///////////////////////////////////////////////////////////////////////////////
+function get_calendar_contact_name($contacts='') {
+  $names = array();
+  foreach ($contacts as $id) {
+	$contact = OBM_Contact::get($id); 
+	$c = $contact->display_name(); 
+    $names[$id] = $c;
+  } 
+  return $names;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the label of resources
@@ -203,7 +219,10 @@ function get_calendar_entity_label($entities) {
     && (count($entities['resource']) > 0)) {
       $ret['resource'] = get_calendar_resource_label($entities['resource']);
     }
-
+  if ((is_array($entities['contact']))
+    && (count($entities['contact']) > 0)) {
+      $ret['contact'] = get_calendar_contact_name($entities['contact']);
+    }
   return $ret;
 }
 
@@ -3130,7 +3149,7 @@ function get_calendar_group_from_ids($groups) {
 ///////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed entities.
 // Parameters :
-//  - $entities_array : hashed array of userobm and resource DBO
+//  - $entities_array : hashed array of userobm and resource DBO and contact
 ///////////////////////////////////////////////////////////////////////////////
 function store_calendar_entities($entities_q) {
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
@@ -3194,7 +3213,23 @@ function store_calendar_entities($entities_q) {
       $i++;
       $i = $i%20;
     }
-  }  
+  }
+  $contacts = $entities_q['contact'];
+  if (is_array($contacts)) {
+    foreach ($contacts as $id => $data) {
+      if($j > $ccalendar_max_users) return $entities;
+      $entities['contact'][$id] = array(
+        'name'  => $data,
+        'class' => "eventOwner",
+        'image' => ${'ico_calendar_user'.$i},
+        'type'  => 'contact',
+        'id'    => $id
+      );
+      $i++;
+      $j++;
+      $i = $i%20;
+    }
+  }
 
   return $entities;
 }
@@ -4254,6 +4289,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
             $event = new Event($uid,$e->getDuration(), $e->getSummary(), $e->getLocation(),
               $e->getCategory(),$e->isPrivate(),$e->getDescription(), null,
               $e->isAllDay(),'none',$c['id'],$owner_name, null, $e->getTransparency(),null);
+
             $event->addAttendee('contact',$c['id'],$owner_name, $e->getPartStat());
             $date = clone $e->start;
             if ($rrule = $e->getRrule()) {

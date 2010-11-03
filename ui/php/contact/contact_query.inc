@@ -193,7 +193,7 @@ function run_query_contact_search($contact) {
   if ($archive != '1') {
     $where .= ' AND contact_archive=0';
   } elseif ($cgp_archive_only) {
-    $where .= ' AND contact_archive=1';
+    $where .= ' AND contact_archive=0';
   }
 
   // User defined data

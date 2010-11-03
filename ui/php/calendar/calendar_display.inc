@@ -5124,6 +5124,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
   $entities['group'] = $params['sel_group_id'];
   $entities['user'] = run_query_calendar_merge_groups($calendar['group_id'],$entities['user']);
   $entities['resource'] = is_array($calendar['sel_resource_id']) ? $calendar['sel_resource_id'] : array();
+  $entities['contact'] = is_array($calendar['contact_id']) ? $calendar['contact_id'] : array(); //add for occurences on freebusy
   if ((!is_array($entities['user']) || count($entities['user'])==0) && (!is_array($entities['resource']) || count($entities['resource']) == 0) ) $entities['user'] = array($GLOBALS['obm']['uid']);
 
   $ret = get_calendar_entity_label($entities);
@@ -5134,14 +5135,18 @@ function dis_calendar_free_interval($current_view, $calendar) {
   if (!is_array($entity_store['resourcegroup'])) $entity_store['resourcegroup'] = array();
 
   $entities_resources = array_merge($entity_store['resource'], $entity_store['resourcegroup']);
-
   $contacts = array();
-  if (is_array($calendar['contact_id'])) {
+  if (!empty($entity_store['contact'])){
+	  foreach(array_keys($entity_store['contact']) as $id) {
+		$contacts[$id] = (array)$of->getPeriodOccurrences($date, $end, array('contact' => array($id)));	
+      }
+  }
+ /* if (is_array($calendar['contact_id'])) {
     foreach($calendar['contact_id'] as $contact_id) {
       $contact = OBM_Contact::get($contact_id);
       $contacts[$contact_id] = $contact->getEventsInInterval($date, $end);
     }
-  }
+  }*/
 
   $users = array();
   if (!empty($entity_store['user'])) {
@@ -5268,7 +5273,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
       }
 
       // Contacts
-      foreach($contacts as $contact => $evts) {
+   /*   foreach($contacts as $contact => $evts) {
         if (is_array($evts)) {
           $busy = false;
           foreach($evts as $evt) {
@@ -5287,7 +5292,37 @@ function dis_calendar_free_interval($current_view, $calendar) {
         }  else {
           $c[$contact] .= "<td class='timeSlotNoCalendar' title=\"$GLOBALS[l_calendar_not_available]\"></td>";
         }
-      }
+      }*/
+		foreach($contacts as $id => &$ocs) {		
+			$busy = false;
+			$tips = array();
+			if (is_array($ocs)) {
+			  foreach($ocs as $index => $oc) {
+				if($oc->date->compare($e) >= 0) break;
+				if($oc->end->compare($d) <= 0) unset($ocs[$index]);
+				elseif ($oc->date->compare($e) < 0 && $oc->end->compare($d) > 0 && $oc->event->isOpaque()) {
+				  array_push($tips, $oc);
+				  $busy = true;
+				}
+			  } 
+			  if ($busy) {
+				$is_busy = true;
+				array_push($busy_time_slots, $slots);
+				$tip = $GLOBALS['l_occupied'];
+				
+				$td_id = "contact_".$id."_".$d->getTimestamp();
+				$c[$id] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
+				$js_tips .= "obm.tip.add($('$td_id'), \"$tip\");";
+			  } else {
+				$c[$id] .= "<td class='timeSlot'></td>";
+			  }
+			} else {
+			  $c[$id] .= "<td class='timeSlotNoCalendar' title=\"$GLOBALS[l_calendar_not_available]\"></td>";
+			}
+		  }
+      
+      
+      
 
       // "all attendees" bar
       if ($is_busy) {
