@@ -1136,10 +1136,12 @@ function run_query_icalendar_insert($params, $force = false) {
   $document = $reader->getDocument();
   $writer = new Vcalendar_Writer_OBM($force);  
   $writer->writeDocument($document);
-  $nb_processed_event = count($document->getVevents());
+  $nb_wrong_event = $writer->event_error;
+  $nb_processed_event = count($document->getVevents()) - $nb_wrong_event;
+  
   $document->destroy();
 
-  return array($nb_processed_event);
+  return array($nb_processed_event, $nb_wrong_event);
 }
 
 

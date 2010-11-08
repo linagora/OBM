@@ -958,6 +958,8 @@ if ($action == 'search') {
     $result = run_query_icalendar_insert($params) ;
     if($result !== false) {
       $display['msg'] .= display_ok_msg("$result[0] $l_ics_import_ok");
+       if ($result[1] != 0) 
+      $display['msg'] .= display_warn_msg("$result[1] $l_ics_import_nok");
       $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
     } else {
       $display['msg'] .= display_err_msg("$l_file_format $l_unknown");
