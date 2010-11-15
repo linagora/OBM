@@ -441,7 +441,7 @@ class OBM_Acl {
     }
   }
   
-  private static function setConsumerRights($consumerType, $consumerId, $entityType, $entityId, $rights) {
+  public static function setConsumerRights($consumerType, $consumerId, $entityType, $entityId, $rights) {
     $rights = self::normalizeRightsArray($rights);
     $realEntityId = self::getEntityId($entityType, $entityId);
     if ($consumerType == 'user' && $consumerId === null) {

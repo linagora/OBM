@@ -48,6 +48,7 @@ $l_add_section_enabled = "Add specific settings for a section";
 $l_default_right = "Default status of the public checkbox right in right management screens";
 $l_checked = 'Checked';
 $l_unchecked = 'Unchecked';
+$l_checked_disabled = 'Checked disabled';
 $l_level = "Level";
 $l_help_level = "A user with this profile will not be allowed to modify users with a profile having a lesser level than his"; 
 $l_level_managepeers = "Manage same level users";

@@ -3606,19 +3606,20 @@ function get_all_profiles($cached = true) {
       if($obm_q->f('profileproperty_name') == 'admin_realm' || $obm_q->f('profileproperty_name') == 'access_exceptions') {
         $profiles[$obm_q->f('profile_name')]['properties'][$obm_q->f('profileproperty_name')] = explode(',', $value);
       } elseif($obm_q->f('profileproperty_name') == 'default_right') {
-        if($obm_q->f('profile_name') == $obm['profile']) {
-          $value = explode(',', $value);
-          $modules = array('calendar', 'mailbox', 'mailshare', 'resource', 'addressbook');
-          $rights = array('access', 'read', 'write');        
-          $i =0;
-          foreach($modules as $module) {
-            foreach($rights as $right) {
+        $value = explode(',', $value);
+        $modules = array('calendar', 'mailbox', 'mailshare', 'resource', 'addressbook');
+        $rights = array('access', 'read', 'write');        
+        $i =0;
+        foreach($modules as $module) {
+          foreach($rights as $right) {
+            if($obm_q->f('profile_name') == $obm['profile']) {
               $GLOBALS['cgp_default_right'][$module]['public'][$right] =  $value[$i];
-              $i++;
             }
+	    $profiles[$obm_q->f('profile_name')]['properties']['default_right'][$module]['public'][$right] =  $value[$i];
+            $i++;
           }
-          $_SESSION['cgp_default_right'] = $GLOBALS['cgp_default_right'];
         }
+        $_SESSION['cgp_default_right'] = $GLOBALS['cgp_default_right'];
       } else {
         $profiles[$obm_q->f('profile_name')]['properties'][$obm_q->f('profileproperty_name')] = $value;
       }

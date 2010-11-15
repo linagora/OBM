@@ -747,8 +747,8 @@ function run_query_user_insert($user) {
     $GLOBALS['customFields']->insert($id, $user);
     $entity_id = of_entity_insert('calendar', $id);    
     $entity_id = of_entity_insert('mailbox', $id);    
-    OBM_Acl::setDefaultPublicRights('mailbox', $id);
-    OBM_Acl::setDefaultPublicRights('calendar', $id);
+    run_query_user_set_default_rights($id, $profile, 'mailbox');
+    run_query_user_set_default_rights($id, $profile, 'calendar');
     $ret = of_userdata_query_update('user', $id, $user);
     // Insert user's photo
     if (isset($user['file_tmp']) && $user['file_tmp'] != '') {
@@ -771,8 +771,32 @@ function run_query_user_insert($user) {
 
   return $id;
 }
+/**
+ * @see OBM_Acl::setDefaultPublicRights
+ * Use the newly created user profile instead of the currently connected user profile.
+ *
+ *
+ */
+function run_query_user_set_default_rights($id, $profile, $module) {
 
+    $confRights = $GLOBALS['profiles'][$profile]['properties']['default_right'][$module]['public'];
+    $rights = array();
+    if ($confRights['write'] == -2)
+		$rights['write'] = 1;
+	else
+		$rights['write']  = ($confRights['write']  == -1) ? 0 : $confRights['write'];
 
+    if ($confRights['read'] == -2)
+		$rights['read'] = 1;
+	else
+		$rights['read']   = ($confRights['read']   == -1) ? 0 : $confRights['read'];
+	
+	if ($confRights['access'] == -2)
+		$rights['access'] = 1;
+	else
+		$rights['access'] = ($confRights['access'] == -1) ? 0 : $confRights['access'];
+    OBM_Acl::setConsumerRights('user', null, $module, $id, $rights);
+}
 /**
  * Insert default address book
  * address_book type:

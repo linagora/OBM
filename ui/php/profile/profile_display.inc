@@ -568,18 +568,22 @@ function dis_property_default_right($value, $update = false) {
     foreach($modules as $module) {
       $select = '';
       foreach($rights as $right) {
-        if($value[$i]) $current = $value[$i];
+        if($value[$i]) $current = $value[$i]; 
         else $current = 0;
         $i++;        
         $checked = '';
         $unchecked = '';
         $disabled = '';
+        $checked_disabled = '';
         switch($current) {
           case 1 :
             $checked = "selected='selected'";
             break;
           case -1:
             $disabled = "selected='selected'";
+            break;
+          case -2:
+            $checked_disabled = "selected='selected'";
             break;
           case 0 :
           default :
@@ -590,6 +594,7 @@ function dis_property_default_right($value, $update = false) {
           <option $unchecked value='0'>$GLOBALS[l_unchecked]</option>
           <option $checked value='1'>$GLOBALS[l_checked]</option>
           <option $disabled value='-1'>$GLOBALS[l_disabled]</option>
+          <option $checked_disabled value='-2'>$GLOBALS[l_checked_disabled]</option>
           </select>
           </td>";    
 
@@ -619,6 +624,9 @@ function dis_property_default_right($value, $update = false) {
             break;
           case -1:
             $label = $GLOBALS['l_disabled'];
+            break;
+          case -2:
+            $label = $GLOBALS['l_checked_disabled'];
             break;
           case 0 :
           default :
