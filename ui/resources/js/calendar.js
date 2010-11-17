@@ -1492,7 +1492,10 @@ Obm.CalendarInDayEvent = new Class({
     this.titleContainer = new Element('span').injectInside(dd);
     this.locationContainer = new Element('span').injectInside(dd);
     if (this.isExternal()) {
-      this.timeContainer = new Element('span').injectInside(this.dragHandler);
+	  this.timeContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultExtURL+this.event.id+'&contact_id='+this.event.entity_id );
+     /* this.timeContainer = new Element('span').injectInside(this.dragHandler);*/
+      this.timeContainer.injectInside(this.dragHandler);
+
     } else {
       this.timeContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id);
       if (obm.vars.consts.action == 'portlet') this.timeContainer.setProperty('target', '_blank');

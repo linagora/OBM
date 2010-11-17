@@ -1328,6 +1328,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     obm.vars.consts.userStyle = '".$current_view->get_class($GLOBALS[obm][uid], 'user')."'; 
     obm.vars.consts.userId = '".$GLOBALS['obm']['uid']."';
     obm.vars.consts.calendarUrl = '".$GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME'])."';
+    obm.vars.consts.calendarDetailconsultExtURL = '".$GLOBALS[path]."/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsultExt&calendar_id='; 
     obm.vars.consts.calendarDetailconsultURL = '".$GLOBALS[path]."/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id='; 
     obm.vars.consts.action = '".$GLOBALS['action']."';
     obm.initialize.chain(function () {
@@ -2757,6 +2758,36 @@ function dis_calendar_event_consult($id) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display External Event Consultation
+// Parameters:
+//   - $id : event id
+//	 - $contact_id : contact id
+///////////////////////////////////////////////////////////////////////////////
+function dis_calendar_event_consult_ext($contact_id, $id) {
+  global $display, $l_err_reference;
+	
+  if ($id) 	
+  {
+	  $contact = OBM_Contact::get($contact_id);
+	  $contact_calendar = $contact->getCalendar();
+	  $events = $contact_calendar->getComponents();
+	  foreach ($events as $event) {
+		  if  ($event->getUid() == substr($id,4)) //remove 'ext-' to compare
+			$event_q = new Vpdi_Icalendar_Event($event);
+	  }
+	  $attendees =  $event_q->getAttendees();
+	  /*$exception_q = run_query_get_one_event_exception($id);
+      $alerts = get_one_event_user_alert($id);
+      $display['detailInfo'] = display_record_info($eve_q);*/
+	  $block = html_calendar_event_consult_ext($event_q, "", $attendees, "");
+	  // $block = html_calendar_event_consult($eve_q, $exception_q, $entities, $alerts);
+  } else {
+	  $display['msg'] .= display_err_msg($l_err_reference);
+  }
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // XHTML : Display Calendar Event Consult
 // Parameters:
 //   - $event_q  : event_query result
@@ -3253,6 +3284,353 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
   return $block;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML : Display External Calendar Event Consult 
+// Parameters:
+//   - $event  : event object
+//   - $attendees : event's attendees objects
+//   - $alerts   : TODO
+//   - $exception_q : TODO
+///////////////////////////////////////////////////////////////////////////////
+function html_calendar_event_consult_ext($event, $exception_q, $attendees, $alerts) {
+  global $obm, $display, $cgp_show, $ccalendar_weekstart, $ccalendar_resource;
+  global $l_users, $l_resources, $l_title, $l_location, $l_priority,$l_private;
+  global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week,$l_desc,$l_high;
+  global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_state, $l_user;
+  global $l_change_state,$l_groups,$l_all_day,$l_every,$l_owner;
+  global $l_opacity, $l_opacity_free, $l_opacity_busy;
+  global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_none, $c_none; 
+  global $l_wait, $l_exception, $l_yes, $l_no, $path;
+  global $l_carac,$l_module_calendar, $l_items, $ccalendar_alerts;
+  global $l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
+  global $l_documents,$l_attach_documents,$l_title,$l_name;
+  global $l_accepted, $l_needs_action, $l_declined;
+  global $ico_add, $ico_delete, $ico_spinner;
+
+  $id = $event->getUid();
+ //FIXME $is_exception = $event_q->f('event_is_exception');
+  
+  if (!$event->isPrivate()) {
+
+    $title = $event->getSummary();
+    $location = $event->getLocation();
+  //FIXME  $cats1 = of_category_get_entitycategories('event', 'category1', $id, 'mono');
+    $owner = $event->getOrganizer()->cn;
+    $owner_lastname = $owner;
+    $priority = $event->getPriority(); 
+
+  //  $block_category1 = of_category_dis_block_consult('event', 'category1', $cats1, 'mono');
+    switch ($priority) {
+      case 1 :
+        $priority = $l_low;
+        break;
+      case 2 :
+        $priority = $l_medium;
+        break;
+      case 3 :
+        $priority = $l_high;
+        break;
+    }
+    $display['title'] = $title;
+  } else {
+    $title = $l_private; 
+    $location = $l_private;
+    $priority = $l_private;
+    $description = $l_private;
+    $priority = $l_private;
+    $display['title'] = $l_private;
+
+  }
+  $all_day = $event->isAllDay();
+  $begin = new Of_Date($event->getDtstart(), 'GMT');
+  $end = clone $begin;
+  $end->addSecond($event->getDuration());
+  if ($all_day) {
+    $dis_all_day = "<tr><th>$l_all_day</th><td>$GLOBALS[l_yes]</td></tr>";
+    $end->subSecond(1);
+    $begin = $begin->getOutputDate();
+    $end = $end->getOutputDate();
+  } else {
+    $begin = $begin->getOutputDateTime();
+    $end = $end->getOutputDateTime();
+  }     
+  $privacy = $event->isPrivate() == 1? $l_yes : $l_no;
+  
+  if($event->getTransparency() == "OPAQUE"){
+    $opacity = $l_opacity_busy;
+  } else {
+    $opacity = $l_opacity_free;
+  }
+
+ /* FIXME if ($is_exception) {
+    $parent_event_id = $event_q->f('event_eventexception_parent_id');
+    $parent_event_url = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$parent_event_id";
+    $show_parent_link = "<a href=\"$parent_event_url\" title=\"$GLOBALS[l_parent_event]\">$GLOBALS[l_show_parent_event]</a>";
+    $repeat_block = "
+    <div class=\"detail infos\">
+     <h1>$l_repeat</h1>
+     <table>   
+      <tr>    
+       <th>$GLOBALS[l_exception] :</th> 
+       <td>$GLOBALS[l_event_is_exception]</td>
+      </tr>
+      <tr>    
+       <th>$GLOBALS[l_parent_event] :</th> 
+       <td>$show_parent_link</td>
+      </tr>
+     </table>
+    </div>";
+
+  } else */
+
+  if ($repeats=$event->getRrule()) {
+    $kind = $GLOBALS['l_'.$repeats['freq']];
+    $kind_unit = $GLOBALS['l_'.$repeats['freq'].'_unit'];
+    $repeat_days = $repeats['interval']; 
+    if ($repeats['until'] != '') {
+      $repeat_end = new Of_Date($repeats['until'], 'GMT');
+      $repeat_end = $repeat_end->getOutputDate();
+    } else {
+      $repeat_end = $GLOBALS['l_no_end_repeat'];
+    }
+    if($repeats['interval'] == 1 ) {
+      $repeatfrequency = sprintf($kind_unit,'');
+    } else {
+      $repeatfrequency = sprintf($kind_unit, $repeats['interval']);
+    }
+
+    if($repeats['freq'] == 'weekly') {
+      $date = new Of_Date();
+      $days = str_split($repeat_days);
+      foreach($days as $i => $repeat) {
+        if($repeat == 1) $dis_repeat_days .= $date->setWeekday($i)->localize(Of_Date::WEEKDAY_NAME).' ';
+      }
+      $dis_repeat_days = "
+      <tr>
+       <th>$l_repeatdays :</th>
+       <td>$dis_repeat_days</td>
+      </tr>";
+    }
+
+    // Exception
+    $block_exception_detail = '';
+    
+    $repeat_block = "
+    <div class=\"detail infos\">
+     <h1>$l_repeat</h1>
+     <table>   
+      <tr>    
+       <th>$l_repeatkind :</th> 
+       <td>$kind</td>
+      </tr>
+      <tr>    
+       <th>$l_repeatfrequency :</th> 
+       <td>$repeatfrequency</td>
+      </tr>
+      <tr>    
+       <th>$l_date_repeatend :</th> 
+       <td>$repeat_end</td>
+      </tr>
+      $dis_repeat_days
+     </table>
+     </div>";
+  } 
+
+  $ie6_radio_fix = "style='border:none; padding:0;margin:0;width:auto;'";
+
+  if (!$event->isPrivate()) {
+	foreach ($attendees as $attendee) {
+        $label = $attendee->cn;
+        $state = $attendee->partstat;
+        $ACCEPTED = 'class="disabled"';
+        ${'NEEDS-ACTION'} = 'class="disabled"';
+        $DECLINED = 'class="disabled"';
+        $$state = "";
+          
+          $dis_contact_list .= "
+          <tr>
+          <td>$label</td>
+          <td class=\"C\">
+          <label><span $ACCEPTED >$l_accepted</span></label>
+          <label><span ${'NEEDS-ACTION'} >$l_needs_action</span></label>
+          <label><span $DECLINED >$l_declined</span></label>
+          </td>
+          </tr>";
+          $$state = '';
+      }
+    }
+
+  if ($dis_contact_list != "") {
+   $dis_contacts_block ="  <div class=\"detail infos\">
+    <h1>$GLOBALS[l_contacts]</h1>
+    <table  class=\"spreadSheet\">
+    <thead>
+    <tr>
+    <td>$GLOBALS[l_contacts]</td><td>$GLOBALS[l_state]</td>
+    </tr>
+    </thead>
+    $dis_contact_list
+    </table>
+    </div>";
+  }
+
+  // FIX ME display resources
+  /* if ($ccalendar_resource) {
+    // item
+    if ($item != '') {
+      $xml = parse_item($item);
+      if (is_object($xml)) {
+        foreach($xml->resource as $key => $value) {
+          if ($value->property_name) {
+            $property["$value->res_id"] = "($value->property_name : $value->property_value)";
+          } else {
+            $property["$value->res_id"] = '';
+          }
+          if (!empty($value->item)) {
+            $dis_item_list .= "
+            <tr>
+              <th>$value->res_name :</th>
+              <td>".nl2br($value->item)."</td>
+            </tr>";
+          }
+        }
+        $dis_item_list = "<div class=\"detail infos\">
+        <h1>$l_items</h1>
+        <table>
+          $dis_item_list
+        </table>
+        </div>";        
+      }
+    }
+
+   $res = $entities['resource'];
+    if (is_array($res['entity'])) {
+      foreach ($res['entity'] as $r_id => $entity) {
+        $label = '';
+
+        $label .= $entity['label'];
+        $state = $entity['state'];
+        if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
+          $$state = "checked=\"checked\"";
+          $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
+          $dis_resource_list .= "
+          <tr>
+          <td>$label $property[$r_id]</td>
+          <td class=\"C\">
+          <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"ACCEPTED\" onclick=\"window.location='$url&rd_decision_event=ACCEPTED'\" />$l_accepted
+          <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$url&rd_decision_event=NEEDS-ACTION'\" />$l_needs_action
+          <input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$url&rd_decision_event=DECLINED'\" />$l_declined
+          </td>
+          </tr>";
+          $$state = '';
+        } else {
+        
+          $admins = OBM_Acl::getEntityWriters('resource', $r_id);
+          if (is_array($admins)) {
+            $emails = array();
+            foreach($admins as $admin) {
+              $user = get_user_info($admin['id'], 'user'); 
+              if ($user['email'] != '') {
+                array_push($emails, $user['email']);
+              }
+            }
+            if (sizeof($emails) > 0) {
+              $label = "<a href='mailto:".implode(',', $emails)."'><img src='$GLOBALS[ico_mail]' />$entity[label]</a> ";
+            }
+          }          
+          $ACCEPTED = 'class="disabled"';
+          ${'NEEDS-ACTION'} = 'class="disabled"';
+          $DECLINED = 'class="disabled"';
+          $$state = '';
+          $dis_resource_list .= "<tr><td>$label</td><td class=\"C\">
+          <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_accepted</span>
+          <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_needs_action</span>
+          <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_declined</span>
+            </td></tr>";          
+        }
+      }
+      $dis_resource_block = "
+        <div class=\"detail infos\">
+        <h1>$l_resources</h1>
+        <table class=\"spreadSheet\">
+        <thead>
+        <tr>
+        <td>$l_resources</td><td>$l_state</td>
+        </tr>
+        </thead>
+        $dis_resource_list
+        </table>
+        </div>";
+    }
+  }*/
+
+  // --- HTML Template --------------------------------------------------------
+  $block = "
+  <div class=\"detail infos\">
+  <h1>$l_module_calendar</h1>
+  <table>
+  <tr>
+    <th>$l_title :</th>
+    <td>$title</td>
+  </tr>
+  <tr>
+    <th>$l_owner :</th>
+    <td>$owner_lastname $owner_firstname</td>
+  </tr>
+  <tr>
+    <th>$l_location :</th>
+    <td>$location</td>
+  </tr>
+
+  $block_category1
+  </table>
+  </div>
+
+  <div class=\"detail infos\">
+  <h1>$l_carac</h1>
+  <table>
+     <tr>
+      <th>$l_private :</th>
+      <td>$privacy</td>
+    </tr>
+   $dis_all_day
+    <tr>
+     <th>$l_datebegin :</th>
+     <td>$begin</td>
+    </tr>
+    <tr>
+     <th>$l_dateend :</th>
+     <td>$end</td>
+    </tr>
+    <tr>
+     <th>$l_priority :</th>
+     <td>$priority</td>
+    </tr>
+    <tr>
+      <th>$l_opacity :</th>
+      <td>$opacity</td>
+    </tr>
+   </table>
+   </div>
+  $repeat_block
+  $dis_users_block
+
+  <p class=\"LC\"></p>
+  $dis_contacts_block
+  $dis_resource_block
+  $dis_item_list
+
+  <div class=\"detail extra\">
+  <h1>$l_desc</h1>
+  $description
+  </div>
+  $dis_decision_radio";
+
+  return $block;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

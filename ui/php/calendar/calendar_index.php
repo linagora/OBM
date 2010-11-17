@@ -303,7 +303,16 @@ if ($action == 'search') {
     $display['msg'] .= display_err_msg($err['msg']);
   }
 
-} elseif ($action == 'detailupdate') {
+} elseif ($action == 'detailconsultExt') {
+///////////////////////////////////////////////////////////////////////////////
+  //FIXME check access right to the external calendar
+ // if (check_calendar_access($params['calendar_id'], 'read')) {
+    $display['detail'] = dis_calendar_event_consult_ext($params['contact_id'], $params['calendar_id']);
+  /*} else {
+    $display['msg'] .= display_err_msg($err['msg']);
+  }*/
+
+}elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params['calendar_id'] > 0) {  
     $extra_js_include[] = 'inplaceeditor.js';
@@ -1505,6 +1514,14 @@ function get_calendar_action() {
     'Url'      => "$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=$id",
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
+  );
+  
+  // Detail Consult External Event
+  $actions['calendar']['detailconsultExt'] = array (
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/calendar/calendar_index.php?action=detailconsultExt&amp;calendar_id=$id",
+    'Right'    => $cright_read,
+    'Condition'=> array ('detailconsult') 
   );
 
   // Detail Update

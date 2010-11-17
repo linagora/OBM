@@ -53,9 +53,21 @@ class Vpdi_Icalendar_Event {
   public function getSummary() {
     return $this->evt->getSummary();
   }
+  
+  public function getAttendees() {
+    return $this->evt->getAttendees();
+  }
+  
+  public function getPriority() {
+	  return $this->evt->getPriority();
+  }
 
   public function getDescription() {
     return $this->evt->getDescription();
+  }
+  
+  public function getDtstart() {
+	return $this->evt->getDtstart();
   }
 
   public function getDuration() {
@@ -79,6 +91,10 @@ class Vpdi_Icalendar_Event {
 
   public function getCategory() {
     return $this->evt->getCategories();
+  }
+  
+  public function getOrganizer() {
+    return $this->evt->getOrganizer();
   }
 
   public function isAllDay() {
