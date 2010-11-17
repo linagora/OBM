@@ -4274,27 +4274,33 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     foreach($calendar_entity['contact'] as $c) {
       $contact = OBM_Contact::get($c['id']);
       $owner_name = $contact->display_name();
-      if (is_array($evts = $contact->getEventsInInterval($start, $end))) {
+      if (is_array($vevents = $contact->getEventsInInterval($start, $end))) {
         $extra_exceptions = array();
-        foreach($evts as $e) {
+        foreach($vevents as $vevent) {
           if (!$search || 
               ($search  && $type == 'advanced' && ((empty($pattern_owner) || !empty($pattern_owner) && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern_owner)))) 
-                && $e->match($pattern, $type))) || 
+                && $vevent->match($pattern, $type))) || 
               ($search  && $type == 'basic' && ((empty($pattern_owner) || !empty($pattern_owner) && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern_owner)))) 
-                || $e->match($pattern, $type)))) {
-            $uid = $e->getUid();
-            $recurrence_id = $e->evt->getRecurrenceId();
+                || $vevent->match($pattern, $type)))) {
+            $uid = $vevent->getUid();
+            $recurrence_id = $vevent->evt->getRecurrenceId();
             if ($recurrence_id) {
-              $extra_exceptions[] = array('uid' => $e->getUid(), 'date' => $recurrence_id);
+              $extra_exceptions[] = array('uid' => $vevent->getUid(), 'date' => $recurrence_id);
               $uid = $uid.'-'.count($extra_exceptions);
             }
-            $event = new Event($uid,$e->getDuration(), $e->getSummary(), $e->getLocation(),
-              $e->getCategory(),$e->isPrivate(),$e->getDescription(), null,
-              $e->isAllDay(),'none',$c['id'],$owner_name, null, $e->getTransparency(),null);
-
-            $event->addAttendee('contact',$c['id'],$owner_name, $e->getPartStat());
-            $date = clone $e->start;
-            if ($rrule = $e->getRrule()) {
+            $event = new Event($uid,$vevent->getDuration(), $vevent->getSummary(), $vevent->getLocation(),
+              $vevent->getCategory(),$vevent->isPrivate(),$vevent->getDescription(), null,
+              $vevent->isAllDay(),'none',$c['id'],$owner_name, null, $vevent->getTransparency(),null);
+            $attendees = $vevent->evt->getAttendees();
+            $partstat = 'ACCEPTED';
+            foreach($attendees as $attendee) {
+              if(trim(strtolower($attendee->cn)) == trim(strtolower($c['name']))) {
+                $partstat = $attendee->partstat;
+              }
+            }
+            $event->addAttendee('contact',$c['id'],$owner_name, $partstat);
+            $date = clone $vevent->start;
+            if ($rrule = $vevent->getRrule()) {
               // Repeat events
               $event_start = clone $date;
               $event_start->setHour(0)->setMinute(0)->setSecond(0);
@@ -4302,31 +4308,31 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
               $event_end->setHour(0)->setMinute(0)->setSecond(0)->addSecond(1);
               switch($rrule['freq']) {
                 case 'daily' :
-                  calendar_daily_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  calendar_daily_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $partstat);
                   break;
                 case 'weekly' :
-                  calendar_weekly_repeatition($date, $event_start,$event_end, $rrule['repeat_days'], $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  calendar_weekly_repeatition($date, $event_start,$event_end, $rrule['repeat_days'], $rrule['interval'], $event, $c['id'], "contact", $partstat);
                   break;
                 case 'monthlybyday' :
-                  $stored = calendar_monthlybyday_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  $stored = calendar_monthlybyday_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $partstat);
                   break;
                 case 'monthlybydate' :
-                  $stored = calendar_monthlybydate_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  $stored = calendar_monthlybydate_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $partstat);
                   break;
                 case 'yearly' :
-                  $stored = calendar_yearly_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $e->getPartStat());
+                  $stored = calendar_yearly_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $partstat);
                   break;
               }
               // Remove exceptions
               if (is_array($exdates = $rrule['exdates'])) {
                 foreach($exdates as $exdate) {
                   if ($exdate->compare($end) < 0 && $exdate->compare($start) > 0) { 
-                    $of->removeOccurrences($e->getUid(), $exdate);
+                    $of->removeOccurrences($vevent->getUid(), $exdate);
                   }
                 }
               } 
             } else {
-              $of->addOccurrence($event, $date, "contact", $c['id'], $e->getPartStat());
+              $of->addOccurrence($event, $date, "contact", $c['id'], $partstat);
             }
           }
         }

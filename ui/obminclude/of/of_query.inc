@@ -2235,19 +2235,22 @@ function get_user_info($id='') {
     domain_name,
     $datebegin
     FROM UserObm
-    LEFT JOIN Domain ON userobm_domain_id = domain_id      
+    INNER JOIN Domain ON userobm_domain_id = domain_id      
     WHERE userobm_id $id ";
 
   display_debug_msg($query, $cdg_sql, 'get_user_info()');
   $obm_q->query($query);
   $obm_q->next_record();
+  $match = array();
   if (is_array($obm_q->Record)) {
     foreach ($obm_q->Record as $key => $user) {
-      $small_key = str_replace('userobm_', '', $key);
-      if ($small_key == 'email' ) {
+      if(!isset($match[$key])) {
+        $match[$key] = str_replace('userobm_', '', $key);
+      }
+      if ($match[$key] == 'email' ) {
         $user = get_entity_email($user, $obm_q->f('domain_name'));
       }      
-      $u[$small_key] = $user;
+      $u[$match[$key]] = $user;
     }
   }  
   $u['datebegin'] = array();

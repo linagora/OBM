@@ -2949,11 +2949,16 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         ${'NEEDS-ACTION'} = '';
         $DECLINED = '';
         if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id)) {
+          $user_alert = $ccalendar_alerts;
+          if($alerts[$u_id] && !($user_alert[$alerts[$u_id]])) {
+            $user_alert[$alerts[$u_id]] = Of_Date::secondToString($alerts[$u_id]);
+          }
           $$state = "checked=\"checked\"";
           $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
           $urla = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_alert&calendar_id=$id&user_id=$u_id";
           $sel_alert = '';
-          foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
+          foreach ($user_alert as $alert_sec => $alert_label) {
+            if(!$alert_label) $alert_label = Of_Date::secondToString($alert_sec);
             if($alerts[$u_id] == $alert_sec) {
               $sel_alert .= "<option value=\"$alert_sec\" selected=\"selected\">$alert_label</option>";
             } else {

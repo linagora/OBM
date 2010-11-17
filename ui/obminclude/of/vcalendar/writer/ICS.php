@@ -8,8 +8,14 @@ class Vcalendar_Writer_ICS {
 
   var $buffer;
 
+  var $attendees;
+
+  var $noreply;
+
   function Vcalendar_Writer_ICS() {
     $this->buffer = '';
+    $this->attendees = array('user' => array(), 'resource' => array(), 'contact' => array(), 'group' => array());
+    $this->noreply = get_entity_email('noreply'); 
   }
 
   /**
@@ -104,7 +110,7 @@ class Vcalendar_Writer_ICS {
     $userInfo = get_user_info($value);
     $params[] = $this->parseName('x-obm-id').'='.$value;
     $params[] = 'CN='.$this->parseText($userInfo['firstname'].' '.$userInfo['lastname']);
-    if(!$userInfo['email']) $userInfo['email'] = get_entity_email('noreply'); 
+    if(!$userInfo['email']) $userInfo['email'] = $this->noreply ; 
     $value =  'MAILTO:'.$this->parseText($userInfo['email']);
     $property = $this->parseProperty($this->parseName($name).';'.implode(';',$params).':'.$value);
     $this->buffer .= $property."\r\n";      
@@ -122,27 +128,37 @@ class Vcalendar_Writer_ICS {
       } else {
         $partstat = 'NEEDS-ACTION';
       }
+
       switch($attendee['entity']) {
       case 'user' :
-        $userInfo = get_user_info($attendee['id']);
-        if(!$userInfo['email']) $userInfo['email'] = get_entity_email('noreply'); 
+        if(!$this->attendees['user'][$attendee['id']]) {
+          $this->attendees['user'][$attendee['id']] = get_user_info($attendee['id']);
+        }
+        $userInfo = $this->attendees['user'][$attendee['id']];
+        if(!$userInfo['email']) $userInfo['email'] = $this->noreply ; 
         $value =  'MAILTO:'.$this->parseText($userInfo['email']);
         $params[] = 'CUTYPE=INDIVIDUAL';
         $params[] = 'CN='.$this->parseText($userInfo['firstname'].' '.$userInfo['lastname']);
         $params[] = 'PARTSTAT='.$partstat;
         $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
         break;
-      case 'resource' :          
-        $resourceInfo = get_entity_info($attendee['id'],'resource');
-        $value =  'MAILTO:'.$this->parseText(get_entity_email('noreply'));
+      case 'resource' :   
+        if(!$this->attendees['resource'][$attendee['id']]) {
+          $this->attendees['resource'][$attendee['id']] = get_entity_info($attendee['id'],'resource');
+        }
+        $resourceInfo = $this->attendees['resource'][$attendee['id']];
+        $value =  'MAILTO:'.$this->parseText($this->noreply );
         $params[] = 'CUTYPE=RESOURCE';
         $params[] = 'CN='.$this->parseText($resourceInfo['label']);          
         $params[] = 'PARTSTAT='.$partstat;
         $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
         break;
       case 'group' :
-        $groupInfo = get_group_info($attendee ['id']);
-        if(!$groupInfo['email']) $groupInfo['email'] = get_entity_email('noreply'); 
+        if(!$this->attendees['group'][$attendee['id']]) {
+          $this->attendees['group'][$attendee['id']] = get_group_info($attendee ['id']);
+        }
+        $groupInfo = $this->attendees['contact'][$attendee['id']];        
+        if(!$groupInfo['email']) $groupInfo['email'] = $this->noreply ; 
         $value = 'MAILTO:'.$this->parseText($groupInfo['email']);
         $params[] = 'CUTYPE=GROUP';
         $params[] = 'CN='.$this->parseText($groupInfo['name']);
@@ -150,15 +166,18 @@ class Vcalendar_Writer_ICS {
         $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
         break;
       case 'task' :
-        $mail =  'MAILTO:'.$this->parseText(get_entity_email('noreply'));
+        $mail =  'MAILTO:'.$this->parseText($this->noreply );
         $params[] = 'CUTYPE=X-TASK';          
         $params[] = 'PARTSTAT=ACCEPTED';
         $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
         break;
       case 'contact' :
-        $contactInfo = get_contact_from_ids(array($attendee['id']));
+        if(!$this->attendees['contact'][$attendee['id']]) {
+          $this->attendees['contact'][$attendee['id']] = get_contact_from_ids(array($attendee['id']));
+        }
+        $contactInfo = $this->attendees['contact'][$attendee['id']];          
         $params[] = 'CUTYPE=INDIVIDUAL';
-        if(!$contactInfo['entity'][ $attendee['id'] ]['email_address'])$contactInfo['entity'][ $attendee['id'] ]['email_address'] = get_entity_email('noreply');
+        if(!$contactInfo['entity'][ $attendee['id'] ]['email_address'])$contactInfo['entity'][ $attendee['id'] ]['email_address'] = $this->noreply ;
         $value = 'MAILTO:'.$this->parseText($contactInfo['entity'][ $attendee['id'] ]['email_address']);
         break;
 

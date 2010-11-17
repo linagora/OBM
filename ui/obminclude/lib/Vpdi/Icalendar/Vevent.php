@@ -182,7 +182,7 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
 
   public function getDuration() {
     $value = $this->getProperty('duration');
-    if(preg_match('/\s*P((\d*)D)?(T((\d)*H)?((\d*)M)?((\d*)S)?)?((\d*)W)?$/',$value,$match)) {
+    if(preg_match('/\s*P((\d*)D)?(T((\d*)H)?((\d*)M)?((\d*)S)?)?((\d*)W)?$/',$value,$match)) {
       $duration = 86400 * $match[2] + 3600 * $match[5] + 60 * $match[7] + $match[9] +604800 * $match[11] ;
     } 
     return $duration;

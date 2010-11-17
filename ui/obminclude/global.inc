@@ -133,6 +133,7 @@ $ccalendar_alerts = array (
   '172800' => '',
   '604800' => '');
 
+
 // Calendar : First day of the week (+2h to fix a DST php bug)
 //$ccalendar_weekstart = 'monday + 2 hours';
 // Calendar max user displayed in the calendar

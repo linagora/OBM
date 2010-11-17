@@ -8,6 +8,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Modified on 2009-11-12T18:44:51+01:00 using OBMtranslation (0.5a)
 
+$l_second = 'second';
+$l_minute = 'minute';
+$l_hour = 'hour';
+$l_day = 'day';
+$l_week = 'week';
+
 $l_attendees = "Attendees";
 $l_others_attendees = "Other attendees";
 $l_add_displayed_users = "Add displayed users";
@@ -125,6 +131,12 @@ $l_import_template = "Import template";
 $l_copy_of = "Copy of";
 $l_template_entities_access_warning = "You're not allowed to access some template elements or they may have been deleted";
 $l_delete_template = "Delete template ?";
+
+$l_hour = 'hour';
+$l_hours = 'hours';
+$l_day = 'day';
+$l_days = 'days';
+$l_week = 'week';
 
 $l_insert = "Insert the event";
 $l_update = "Update the event";
