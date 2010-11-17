@@ -69,7 +69,7 @@ class DelegationGroups extends CronJob {
 
   }
 
-  protected function delegationGroupName($delegation) {
+  public function delegationGroupName($delegation) {
     include("obminclude/lang/".$GLOBALS[ini_array][lang]."/global.inc");
     if ($delegation == "/") {
       $name = "Tous";
@@ -125,8 +125,7 @@ class DelegationGroups extends CronJob {
     $groupName = $this->delegationGroupName($delegation);
     $gid = sql_parse_int(get_first_group_free_gid());
     $q_delegation = of_delegation_query_insert_clauses('group_delegation', $delegation);
-    $group_email = preg_replace('/\//g', '-', $q_delegation[value]);
-
+    $group_email = preg_replace('/\//', '-', $q_delegation[value]);
 
     $query = "INSERT INTO UGroup (
     group_timeupdate,
@@ -148,9 +147,9 @@ class DelegationGroups extends CronJob {
     $domain_id,
     0,
     $gid,
-    '$groupName',
-    $q_delegation[value],
-    '$group_email',
+    '$groupName'
+    $q_delegation[value]
+    $group_email,
     ''
     )";
     $this->logger->core($query);
