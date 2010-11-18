@@ -2587,7 +2587,6 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   global $l_title, $l_location, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
   global $l_private, $obm;
-
   if (!empty($calendar['sel_user_id'])) {
     $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $calendar['sel_user_id']));
   } else {
@@ -3644,7 +3643,6 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_event_form($action, $calendar, $event_q, $entities, $current_view) {
   global $obm;
-
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') ) {
     $users = $entities['user'];
     $resources = $entities['resource'];
