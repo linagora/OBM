@@ -295,7 +295,7 @@
 }
 
 .phones th {
-  width: 15em;
+  width: 17em;
 }
 
 
@@ -453,5 +453,5 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 
 
 #informationGrid .phones th select{
-  width: 13em;
+  width: 15em;
 }

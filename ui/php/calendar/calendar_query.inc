@@ -4356,7 +4356,7 @@ function calendar_daily_repeatition($date,$start,$end,$repeatfrequence,$event,$e
 
   $current = clone $date;
   if ($current->compare($start) < 0) {
-    $diff = - ceil($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
+    $diff = - round($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
     if ($diff > 0) {
       $diff = ($diff % $repeatfrequence);
     }     
@@ -4381,7 +4381,7 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
   $current = clone $date;
   $current->setWeekday($ccalendar_weekstart);
   if ($current->compare($start) < 0) {
-    $diff = - ceil($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
+    $diff = - round($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
     if ($diff > 0) {
       $diff = ($diff % (($repeatfrequence) * 7));
     }     
