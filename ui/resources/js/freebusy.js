@@ -35,7 +35,7 @@ Obm.CalendarFreeBusy = new Class({
   buildFreeBusyPanel: function(duration, readOnly) {
     this.duration = duration;
     $('duration').value = this.duration*3600;
-    this.meeting_slots = this.ts.indexOf(''+(obm.vars.consts.begin_timestamp+this.duration*3600))-this.ts.indexOf(''+obm.vars.consts.begin_timestamp);
+    this.meeting_slots = Math.ceil(this.duration*this.unit)//this.ts.indexOf(''+(obm.vars.consts.begin_timestamp+this.duration*3600))-this.ts.indexOf(''+obm.vars.consts.begin_timestamp);
 
     // /!\ meeting width must be set BEFORE slider 
     if (Browser.Engine.trident) {
@@ -62,10 +62,7 @@ Obm.CalendarFreeBusy = new Class({
         $('min_begin').value = date_begin.format('i');
 
         var date_begin_ts = this.ts[this.currentPosition]*1000;
-        var date_end = new Obm.DateTime(this.ts[this.currentPosition+this.meeting_slots]*1000);
-        if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
-          date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
-        }
+        var date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
       }.bind(this)
 
     });
@@ -116,10 +113,7 @@ Obm.CalendarFreeBusy = new Class({
         }.bind(this),
         onComplete:function() {
           var date_begin_ts = this.ts[this.currentPosition]*1000;
-          var date_end = new Obm.DateTime(this.ts[this.currentPosition+this.meeting_slots]*1000);
-          if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
-            date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
-          }
+          var date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000)
           this.duration = (date_end.getTime() - date_begin_ts)/3600000;
           $('duration').value = this.duration*3600;
           
@@ -292,10 +286,7 @@ Obm.CalendarFreeBusy = new Class({
   displayMeetingInfo: function() {
     var date_begin_ts = this.ts[this.currentPosition]*1000;
     $('meeting_start').innerHTML = new Obm.DateTime(date_begin_ts).format(obm.vars.regexp.dateFormat + ' h:i');
-    var date_end = new Obm.DateTime(this.ts[this.currentPosition+this.meeting_slots]*1000);
-    if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
-      date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
-    }
+    var date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000)
     $('meeting_end').innerHTML = date_end.format(obm.vars.regexp.dateFormat + ' h:i');
   },
 
