@@ -48,6 +48,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
 
   $calendar_entity = $current_view->get_entities();
 
+  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS['path'].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
   if ($current_view->entities_count() == 0) {
     $current_view->set_users($obm['uid']);
     $calendar_entity = $current_view->get_entities();
