@@ -294,6 +294,10 @@
   width: 100%;
 }
 
+.phones th {
+  width: 15em;
+}
+
 
 #informationGrid fieldset.details {
   margin: 3px 0 0 15px;
@@ -445,4 +449,9 @@ table.contactPanelHeader th, .contactPanelContainer table td {
   margin-left: 2px;
   margin-bottom: 1px;
   width: 20em;
+}
+
+
+#informationGrid .phones th select{
+  width: 13em;
 }
