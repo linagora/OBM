@@ -73,7 +73,8 @@ def index_contact(domain, domain_name, solr):
 		contact_comment,
 		contact_comment2,
 		contact_comment3,
-		contact_origin
+		contact_origin,
+		contact_company
 		FROM Contact 
 		LEFT JOIN AddressBook ON contact_addressbook_id=id
 		LEFT JOIN Company ON contact_company_id=company_id
@@ -100,7 +101,10 @@ def index_contact(domain, domain_name, solr):
 		contact.appendChild(solr_set_field(doc, 'domain',        rows[i][6]))
 		contact.appendChild(solr_set_field(doc, 'in',            rows[i][7]))
 		contact.appendChild(solr_set_field(doc, 'addressbookId', rows[i][8]))
-		contact.appendChild(solr_set_field(doc, 'company',       rows[i][9]))
+                if rows[i][9] == None:
+		        contact.appendChild(solr_set_field(doc, 'company',       rows[i][38]))
+                else:
+		        contact.appendChild(solr_set_field(doc, 'company',       rows[i][9]))
 		contact.appendChild(solr_set_field(doc, 'companyId',     rows[i][10]))
 		contact.appendChild(solr_set_field(doc, 'lastname',      rows[i][11]))
 		contact.appendChild(solr_set_field(doc, 'firstname',     rows[i][12]))
