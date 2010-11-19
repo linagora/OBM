@@ -1418,7 +1418,21 @@ function global_freeze_user($params) {
   global $cdg_sql, $c_nb_login_failed, $c_frozen_duration, $c_login_interval;
 
   $login = $params['login'];
-  $domain = sql_parse_id($params['domain'], true);
+  $domain = $params['domain_id'];
+  if(!$c_singleNameSpace) {
+    if(strpos($login,"@") !== false) {
+      list($login, $domain) = split("@",$login);
+      $domain_query = "domain_name";
+    } else {
+      $domain_query = "userobm_domain_id";
+    }
+
+    // if no domain set, set the default domain
+    if ((! isset($domain)) || ($domain == "")) {
+      $domain = "$c_default_domain";
+    }
+    $where_domain = "AND $domain_query = '$domain'";
+  }
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -1429,19 +1443,19 @@ function global_freeze_user($params) {
     $lastaccess,
     userobm_nb_login_failed
     FROM UserObm WHERE userobm_login='$login'
-    AND userobm_domain_id $domain 
+    $where_domain
     AND userobm_archive=0";
   $obm_q->query($query);
   $obm_q->next_record();
   $uid = $obm_q->f('userobm_id');
   $timelastaccess = $obm_q->f('timelastaccess');
   $nb_login_failed = $obm_q->f('userobm_nb_login_failed');
- 
   $now = mktime();
-
   if (!empty($uid)) {
     // user is freeze and frozen time is outdated
     $uid = sql_parse_id($uid, true);
+    var_dump("$nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration");
+    var_dump("$nb_login_failed < $c_nb_login_failed && $now > $timelastaccess + $c_login_interval");
     if ( ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration) ||
          ($nb_login_failed < $c_nb_login_failed && $now > $timelastaccess + $c_login_interval) ) {
       $query = "UPDATE UserObm SET
@@ -1492,7 +1506,9 @@ function global_unfreeze_user($uid) {
     $nb_login_failed = $obm_q->f('userobm_nb_login_failed');
 
     $now = mktime();
-    if (($nb_login_failed < $c_nb_login_failed) || ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration)) {
+    var_dump("$nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration");
+    if (($nb_login_failed < $c_nb_login_failed) || 
+        ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration)) {
       $query = "UPDATE UserObm SET
         userobm_nb_login_failed='0',
         userobm_timelastaccess=NOW()
