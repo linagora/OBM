@@ -8426,10 +8426,10 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
   }
 
   function is_multi_days_event($occurrence) { 
-    $day_begin = $occurrence->date;
+    $multiday_limit = clone ($occurrence->date);
+    $multiday_limit->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
     $day_end = $occurrence->end;
-    if ($day_begin->getDay() != $day_end->getDay() 
-      && ($day_end->get(Of_Date::TIME_SHORT) != "00:00" || $occurrence->event->isAllDay())) {
+    if($day_end->getTimestamp() > $multiday_limit->getTimestamp()) {
       return true;
     }
 
