@@ -73,9 +73,9 @@ Obm.CalendarFreeBusy = new Class({
     this.slider.element.addEvent('mousedown', function(event) {
       var dir = this.range < 0 ? -1 : 1;
       if (IE4) {
-        var position = event.page[this.slider.axis] + (-this.slider.element.getLeft()-$('calendarFreeBusyScroll').scrollLeft) - this.slider.half;
+        var position = event.page[this.slider.axis] + (-this.slider.element.getLeft()-$('calendarFreeBusyScroll').scrollLeft);
       } else {
-        var position = event.page[this.slider.axis] - this.slider.element.getPosition()[this.slider.axis] - this.slider.half;
+        var position = event.page[this.slider.axis] - this.slider.element.getPosition()[this.slider.axis];
       }
       position = position.limit(-this.slider.options.offset, this.slider.full -this.slider.options.offset);
       this.slider.step = Math.round(this.slider.min + dir * this.slider.toStep(position));
