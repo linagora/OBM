@@ -34,6 +34,7 @@ location : <?php echo $location; ?>
 
 author   : <?php echo $auteur; ?>
 
+attendee(s)   : <?php echo $attendees; ?>
 
 :: To accept this appointment : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=ACCEPTED

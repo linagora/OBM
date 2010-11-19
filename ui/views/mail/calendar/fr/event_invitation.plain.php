@@ -34,6 +34,8 @@ lieu   : <?php echo $location; ?>
 
 auteur : <?php echo $auteur; ?>
 
+participant(s) : <?php echo $attendees; ?>
+
 
 :: Pour accepter : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=ACCEPTED

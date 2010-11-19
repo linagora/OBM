@@ -41,4 +41,7 @@
     <tr>
         <td style="text-align:right;padding-right:1em;">Author</td><td style="font-weight:bold;"><?php echo $auteur; ?></td>
     </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Attendee(s)</td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
+    </tr>
 </table>

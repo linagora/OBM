@@ -42,6 +42,9 @@
         <td style="text-align:right;padding-right:1em;">Author</td><td style="font-weight:bold;"><?php echo $auteur; ?></td>
     </tr>
     <tr>
+        <td style="text-align:right;padding-right:1em;">Attendee(s)</td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
+    </tr>
+    <tr>
         <td style="text-align:right;" colspan="2">
           <a href="<?php echo $host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=ACCEPTED">Accept</a>
           <a href="<?php echo $host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=DECLINED">Decliner</a>

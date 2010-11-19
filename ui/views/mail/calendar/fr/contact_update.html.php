@@ -42,4 +42,7 @@ a été modifié :</td>
     <tr>
         <td style="text-align:right;padding-right:1em;">Organisateur</td><td style="font-weight:bold;"><?php echo $auteur; ?></td>
     </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Participant(s)</td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
+    </tr>
 </table>

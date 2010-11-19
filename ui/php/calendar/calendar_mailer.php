@@ -236,6 +236,21 @@ class CalendarMailer extends OBM_Mailer {
   }
   
   private function extractEventDetails($event, $sender, $prefix = '', $target = null) {
+	$contacts = $event->contact;
+	foreach ($contacts as $contact) {
+		$attendees[] = $contact->label;
+	}
+	$users = $event->user;
+	foreach ($users as $user) {
+		$attendees[] = $user->label;
+	}
+	$i = 0;
+	while ($i<10 && $attendees[$i]) {
+		$list_attendees .= $attendees[$i].', ';
+		$i++;
+	} 
+	$list_attendees[strlen($list_attendees)-2] = '';
+	if ($i == 10) $list_attendees .= '...'; 
     return array(
       'host'             => $GLOBALS['cgp_host'],
       $prefix.'id'       => $event->id,
@@ -245,9 +260,11 @@ class CalendarMailer extends OBM_Mailer {
       $prefix.'location' => $event->location,
       $prefix.'auteur'   => $event->owner->label,
       $prefix.'target'   => $target->label,
-      $prefix.'targetState' => __($target->state)
+      $prefix.'targetState' => __($target->state),
+      $prefix.'attendees' => $list_attendees
     );
   }
+
 }
 
 class shareCalendarMailer extends OBM_Mailer {

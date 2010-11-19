@@ -26,6 +26,6 @@
     <tr>
         <td colspan="2">
 The appointment <?php echo $title; ?>, initially scheduled from <?php echo $old_start; ?> to <?php echo $old_end; ?>, (location : <?php echo $old_location; ?>),
-was updated and will take place from <?php echo $start; ?> to <?php echo $end; ?>, (location : <?php echo $location; ?>). </td>
+was updated and will take place from <?php echo $start; ?> to <?php echo $end; ?>, (location : <?php echo $location; ?>, attendee(s) : <?php echo $attendees; ?>). </td>
     </tr>
 </table>

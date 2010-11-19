@@ -34,3 +34,4 @@ location : <?php echo $location; ?>
 
 author   : <?php echo $auteur; ?>
 
+attendee(s)   : <?php echo $attendees; ?>
