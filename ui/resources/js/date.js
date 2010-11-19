@@ -343,6 +343,9 @@ Obm.TimeZoneParser = new Class ({
   getTimeZoneOffset: function(time) {
     var ok = false;
     var i = this.lastIndex;
+    if (isNaN(time)) {
+		throw "Invalid date time";
+	}
     time = time/1000;
     while(!ok) {
       if(! this.offsets[i]['from'] || this.offsets[i]['from'] <= time) {
