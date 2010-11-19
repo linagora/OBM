@@ -1454,8 +1454,6 @@ function global_freeze_user($params) {
   if (!empty($uid)) {
     // user is freeze and frozen time is outdated
     $uid = sql_parse_id($uid, true);
-    var_dump("$nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration");
-    var_dump("$nb_login_failed < $c_nb_login_failed && $now > $timelastaccess + $c_login_interval");
     if ( ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration) ||
          ($nb_login_failed < $c_nb_login_failed && $now > $timelastaccess + $c_login_interval) ) {
       $query = "UPDATE UserObm SET
@@ -1506,7 +1504,6 @@ function global_unfreeze_user($uid) {
     $nb_login_failed = $obm_q->f('userobm_nb_login_failed');
 
     $now = mktime();
-    var_dump("$nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration");
     if (($nb_login_failed < $c_nb_login_failed) || 
         ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration)) {
       $query = "UPDATE UserObm SET
