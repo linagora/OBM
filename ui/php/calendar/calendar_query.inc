@@ -5399,15 +5399,11 @@ function run_query_calendar_reset($id,$params) {
   $writable = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write'));
 
   $meeting = $params['delete_meeting'];
-  $export = $params['export'];
-  $date = $params['event_before_date'];
+  $export = $params['export']; 
 
-  if(is_null($date)){
-    $date = new Of_date();
-  }
-
-  if($export != 'date'){
-    $date->addYear(100);
+  if($export == 'date'){
+	$date = $params['event_before_date'];
+	$filter =  "AND event_date < '$date' AND (event_repeatkind = 'none' OR event_endrepeat < '$date')";
   }
 
   # Delete all events where the user is the owner and an attendee and all events where the owner
@@ -5417,7 +5413,7 @@ function run_query_calendar_reset($id,$params) {
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     LEFT JOIN Contact birthday ON birthday.contact_birthday_id = event_id
     LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id
-    WHERE (event_type='VEVENT' AND event_owner = $id AND userentity_user_id = $id AND event_date < '$date')
+    WHERE (event_type='VEVENT' AND event_owner = $id AND userentity_user_id = $id $filter)
       AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL
     GROUP BY event_id HAVING COUNT(*) = 1
     UNION
@@ -5426,7 +5422,7 @@ function run_query_calendar_reset($id,$params) {
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     LEFT JOIN Contact birthday ON birthday.contact_birthday_id = event_id
     LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id
-    WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") AND event_date < '$date'
+    WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") $filter
       AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL
     GROUP BY event_id HAVING COUNT(*) = 1 AND MAX(userentity_user_id) = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(1)');
@@ -5447,7 +5443,7 @@ function run_query_calendar_reset($id,$params) {
       LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id
       WHERE userentity_user_id = $id 
       AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL
-      AND eventlink_state != 'DECLINED' AND event_date < '$date'";
+      AND eventlink_state != 'DECLINED' $filter";
     display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(2)');
     $obm_q->query($query);
     while($obm_q->next_record()) {
