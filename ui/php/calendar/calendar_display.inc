@@ -1636,6 +1636,14 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
      $sel_res_id[$key] = $val['class'];
     }
   }
+  
+  $sel_contact = $calendar_entity['contact'];
+  $sel_contact_id = array();
+  if (is_array($sel_contact)) {
+    while(list($key, $val) = each($sel_contact)) {
+     $sel_contact_id[$key] = $val['class'];
+    }
+  }
 
   foreach ($calendar_entity as $type => $entity) {
     foreach ($entity as $id => $data) {
@@ -1764,7 +1772,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
         if (is_array($attendee['contact'])) {
           foreach($attendee['contact'] as $at_id => $at_name) {
             $single = false;
-            if (array_key_exists($at_id, $sel_user_id)) {
+            if (array_key_exists($at_id, $sel_contact_id)) {
               $dis_people .= "$separator$at_name";
               $separator = ', ';
             }
