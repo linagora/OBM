@@ -408,7 +408,7 @@ select {
 /*Overflow in grid*/
 
 .contactPanelContainer {
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden;
 }
 
@@ -431,7 +431,8 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 
 .contactPanelHeader td.filler {
   width: 15px;
-  -width: 0px;
+  /width: 0px;
+}  
 
 .contactPanelContainer table td, .contactPanelContainer table th {
   overflow-x : hidden;
