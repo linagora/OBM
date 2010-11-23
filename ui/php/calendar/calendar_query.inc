@@ -6020,6 +6020,10 @@ Class CalendarView {
     $this->date = $date;
   }
 
+  public function get_ndays() {
+    return $this->ndays;
+  }
+
   public function set_cal_range($cal_range = null,$ndays = null) {
     $this->cal_range = (empty($cal_range) ? 'week' : $cal_range);
     $this->ndays = (empty($ndays) ? 7 : $ndays);

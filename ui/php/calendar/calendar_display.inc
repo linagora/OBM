@@ -7236,6 +7236,63 @@ function dis_calendar_month_agenda_pdf($calendar, $current_view, $calendar_entit
 
 
 /**
+ * Calendar Custom PDF
+ * view agenda
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_custom_agenda_pdf($calendar, $current_view, $calendar_entity) {
+  global $ccalendar_first_hour, $ccalendar_last_hour, $ccalendar_weekstart;
+  if($current_view->get_ndays() > 14) {
+    dis_calendar_month_agenda_pdf($calendar, $current_view, $calendar_entity);
+  } else {
+    $range  = $current_view->get_date_range();
+    $date = $range['begin'];
+    $end = $range['end'];
+    
+    $status = array('ACCEPTED', 'NEEDS-ACTION');
+    $category_filter = $current_view->get_category_filter();
+
+    $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
+
+    while($date->compare($end) < 0) {
+      $columns[$date->getTimestamp()] = array();
+      $date->addDay(1);
+    }
+
+    $time_unit = 60 / $_SESSION['set_cal_interval']; 
+
+    // events per columns
+    foreach($occurrences as $occurrence) {
+      $iso = clone $occurrence->date;
+      $iso->setHour(0)->setMinute(0)->setSecond(0);
+      if($occurrence->event->all_day == 1) {
+        $columns[$iso->getTimestamp()]['allday'][] = $occurrence;
+      } else {
+        $begin = clone $occurrence->date;
+        $begin->setMinute($begin->getMinute() - ($begin->getMinute()%$time_unit))->setSecond(0);
+        while($begin->compare($occurrence->end->getTimestamp()) < 0) {
+          $columns[$iso->getTimestamp()][$begin->getIso()][] = $occurrence;
+          $begin->addMinute($time_unit);
+        }
+      }
+    }
+
+    $updated = array();
+    foreach($columns as $date => $column){
+      $updated[$date] = check_conflict($column);
+    }
+    $pdf = new CalendarPdfDayAgenda($current_view, 'custom', $updated, $calendar_entity, $calendar);
+    $pdf->drawCalendar();
+    $pdf->download();
+  }
+}
+
+
+
+/**
  * Calendar Week PDF
  * view agenda
  * 
@@ -8516,10 +8573,16 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
           unset($this->updated[$col_date]);
         }
       }
-    } else { 
+    } elseif ($this->range == 'day') { 
       $end = clone $date;
       $end->addDay(1);
       $this->display_date = $date->localize(Of_Date::OBM_DATE_DAY);
+    } elseif ($this->range == 'custom') {
+      $range = $current_view->get_date_range();
+      $begin = $range['begin'];
+      $end = $range['end'];
+      $this->display_date = $begin->localize(Of_Date::OBM_DATE_WEEK).' - '
+        .$end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK);
     }
 
     $this->week_num = $date->get(Of_Date::WEEK); 
@@ -8544,7 +8607,10 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
 
     } elseif ($this->range == "day") {
       $this->nbcol = 1;
+    } elseif ($this->range == 'custom') {
+      $this->nbcol = $current_view->get_ndays(); 
     }
+
 
     $this->col_width = ($this->calendar_x1 - $this->calendar_x0)/$this->nbcol;
     $this->col_height = ($this->calendar_y1-$this->calendar_y0-$this->allday_height)/$this->calendar_nb_hours;

@@ -915,7 +915,6 @@ function run_query_people_get_admin($delegation) {
         $profiles[] = $obm_q->f('profile_name');
       }
     }
-    var_dump($profiles);
   }
   $admins = array();
   if(count($profiles) > 0) {
