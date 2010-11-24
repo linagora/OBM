@@ -149,8 +149,8 @@ class DelegationGroups extends CronJob {
     0,
     $gid,
     '$groupName'
-    $q_delegation[value]
-    $group_email,
+    $q_delegation[value],
+    '$group_email',
     ''
     )";
     $this->logger->core($query);
