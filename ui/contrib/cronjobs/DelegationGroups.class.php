@@ -200,13 +200,14 @@ class DelegationGroups extends CronJob {
     $main_delegation = preg_replace('/\/$/', '', $main_delegation);
     foreach ($delegations as $current => $value) {
         if(strcmp($separator, $current)==0) {
+	    unset($delegations[$current]);
             continue;
         }
 
         if(strcmp($main_delegation, $current)>0) {
             unset($delegations[$current]);
         }elseif(strcmp($main_delegation, $current)==0) {
-            $delegations[$current] = $separator;
+            $delegations[$current] = false;
         }
     }
 
