@@ -2112,6 +2112,7 @@ function mbStringToArray ($str) {
 
 function mb_chunk_split($str, $len, $glue) {
   if (empty($str)) return false;
+  mb_internal_encoding('UTF-8');  
   $array = mbStringToArray ($str);
   $n = -1;
   $new = '';
