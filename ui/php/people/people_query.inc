@@ -187,7 +187,7 @@ function run_query_people_search($people) {
 
   // User defined data
   // UserObm
-  $userdata_userobm = of_userdata_query_search('people', $people, 'UserObm');
+  $userdata_userobm = of_userdata_query_search('User', $people, 'UserObm');
   if ($userdata_userobm['where'] != '') {
     if (trim($where_userobm) != '') $where_userobm .= ' AND ';
     $where_userobm .= $userdata_userobm['where'];
@@ -237,6 +237,7 @@ function run_query_people_search($people) {
     'user' as type
   FROM UserObm 
     INNER JOIN Domain ON userobm_domain_id = domain_id
+    INNER JOIN UserEntity ON userentity_user_id = userobm_id
     $join_userdata_userobm";
 
   $select_contact = "select distinct contact_lastname as userobm_lastname,
@@ -282,7 +283,7 @@ function run_query_people_search($people) {
   $query = "$query_userobm $query_contact $orderq $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm INNER JOIN Domain ON domain_id = userobm_domain_id $join_userdata_userobm $whereq_userobm");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm INNER JOIN Domain ON domain_id = userobm_domain_id INNER JOIN UserEntity ON userentity_user_id = userobm_id $join_userdata_userobm $whereq_userobm");
     if ($show_contact) {
       $count += get_query_count("SELECT count(distinct contact_id) FROM Contact $join_userdata_contact $join_contact $whereq_contact");
     }
