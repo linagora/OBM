@@ -245,6 +245,16 @@ Obm.UserPattern.PasswordField = new Class ({
 Obm.UserPattern.ChoiceField = new Class ({
   Extends: Obm.UserPattern.StringField,
 
+  initialize: function(form,field) {
+    this.parent(form,field);
+    this.value = field.options[this.field.selectedIndex].value;
+    this.originalValue = this.value;
+  },
+
+  resetValue: function() {
+    this.setValue(this.originalValue);
+  },
+
   setValue: function(value) {
     for (var i=0; i<this.field.options.length; i++) {
       if (this.field.options[i].value == value) {
@@ -252,6 +262,10 @@ Obm.UserPattern.ChoiceField = new Class ({
         this.value = value;
       }
     }
+  },
+
+  changed: function() {
+    return (this.value != this.field.options[this.field.selectedIndex].value);
   }
 
 });
