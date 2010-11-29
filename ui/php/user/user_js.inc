@@ -345,28 +345,21 @@ function modif_password() {
 
 function get_profile_quota(field) {
   var val = field.options[field.selectedIndex].value;
-  if($('templateSelect')){
-    var pattern_id = theUserForm.userpattern_id;
-  } else {
-    var pattern_id = 0;
-  }
-  if(pattern_id == '0') {
-    new Request.JSON({
-          url: obm.vars.consts.obmUrl+'/user/user_index.php',
-          secure: false,
-          async: true,
-          onComplete: function(response) {
-              var elem = $('tf_mail_quota');
-              if(elem){
-                if(response.quota != '') {
-                  elem.value = response.quota; 
-                } else {
-                  elem.value = obm.vars.consts.domaindefaultquota;
-                }
+  new Request.JSON({
+        url: obm.vars.consts.obmUrl+'/user/user_index.php',
+        secure: false,
+        async: true,
+        onComplete: function(response) {
+            var elem = $('tf_mail_quota');
+            if(elem){
+              if(response.quota != '') {
+                elem.value = response.quota; 
+              } else {
+                elem.value = obm.vars.consts.domaindefaultquota;
               }
-          }
-    }).get({profile_name : val, action : 'profile_quota'});
-  }
+            }
+        }
+  }).get({profile_name : val, action : 'profile_quota'});
 }
 
 ";
