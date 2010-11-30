@@ -244,13 +244,12 @@ class CalendarMailer extends OBM_Mailer {
 	foreach ($users as $user) {
 		$attendees[] = $user->label;
 	}
-	$i = 0;
-	while ($i<10 && $attendees[$i]) {
-		$list_attendees .= $attendees[$i].', ';
-		$i++;
-	} 
-	$list_attendees[strlen($list_attendees)-2] = '';
-	if ($i == 10) $list_attendees .= '...'; 
+	$list_attendees = array_slice($attendees, 0, 9);
+    if(count($attendees) >= count($list_attendees)) {
+        $suffix = '...';
+    }
+    $list_attendees = implode(', ', $list_attendees).$suffix;
+
     return array(
       'host'             => $GLOBALS['cgp_host'],
       $prefix.'id'       => $event->id,
