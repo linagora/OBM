@@ -1762,7 +1762,7 @@ class Of_Date extends DateTime {
     $string = "";
     foreach ( $units as $name => $divisor ) {
       if ( $quot = intval($seconds / $divisor) ) {
-        $string .= "$quot $name";
+        $string .= "$quot ".strtolower($name);
         $string .= (abs($quot) > 1 ? "s" : "") . ", ";
         $seconds -= $quot * $divisor;
       }

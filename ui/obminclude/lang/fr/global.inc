@@ -322,6 +322,8 @@ $l_gid_smb_user = "Utilisateurs du domaine";
 $l_gid_smb_guest = "Invités du domaine";
 
 // Days and months
+$l_second = 'Seconde';
+$l_minute = 'Minute';
 $l_day = "Jour";
 $l_days = "Jours";
 $l_week = "Semaine";

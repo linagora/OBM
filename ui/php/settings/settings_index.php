@@ -422,8 +422,9 @@ $display['detail'] .= " /></td>
 
   $selected_alert = $_SESSION['set_cal_alert'];
   $dis_alert = "<select name=\"cal_alert\">
-        <option value=\"$c_none\">$l_none</option>";
+        <option value=\"$c_none\">$l_none</option>";      
   foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
+	if(!$alert_label) $alert_label = Of_Date::secondToString($alert_sec);  
     $dis_alert .= "<option value=\"$alert_sec\"";
     if ($selected_alert == $alert_sec) {
       $dis_alert .= " selected=\"selected\"";
