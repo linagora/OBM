@@ -218,7 +218,7 @@ class Auth {
   ##
   function start() {
     $cl = $this->cancel_login;
-    global $obm, $$cl, $lifetime;
+    global $obm, $$cl, $lifetime, $action, $sess;
 
     //echo "<br>***AUTH-start - obm_uid=$obm[uid]";
 
@@ -238,10 +238,23 @@ class Auth {
     if ($uid == false) {
 
       $this->unauth();
+      if ($action == "logout") {
+        $sess->delete();
+        header("location: $GLOBALS[path]/obm.php");
+        exit();  
+      }
+
       $this->of_session_login_init();    
 
       // User come from the login page : is trying to login -------------------
     } else if ($uid == "form") {
+      if ($action == "logout") {
+        $this->unauth();
+        $sess->delete();
+        header("location: $GLOBALS[path]/obm.php");
+        exit();  
+      }
+
 
       if ($$cl) {
 	// If $$cl is set, delete all auth info
