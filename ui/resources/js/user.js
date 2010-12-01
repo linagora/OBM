@@ -180,7 +180,7 @@ Obm.UserPattern.StringField = new Class ({
   },
 
   resetValue: function() {
-    this.field.value = this.originalValue;
+	this.setValue(this.originalValue); 
   },
 
   setValue: function(value) {
@@ -204,7 +204,7 @@ Obm.UserPattern.BooleanField = new Class ({
   },
 
   resetValue: function() {
-    this.field.checked = this.originalChecked
+    this.setValue(this.originalChecked);
   },
 
   setValue: function(value) {
@@ -227,6 +227,7 @@ Obm.UserPattern.BooleanField = new Class ({
   },
 
   empty: function() {
+	return false;
     return (!this.field.checked);
   }
 
@@ -465,10 +466,11 @@ Obm.UserPattern.Form = new Class ({
     this.resetForm();
     if (attributes) {
       for (var attr in attributes) {
-        var field = this.fields[attr];
-        if (field && ((!field.changed()) || (field.empty()))) {
-          field.setValue(attributes[attr]);
-        }
+          var field = this.fields[attr];
+	 /* console.log(field.field.name, field.changed(), field.originalValue, "'" + field.field.value + '"', "'" + field.value + "'" );*/
+          if (field && ((!field.changed()) || (field.empty()))) {
+            field.setValue(attributes[attr]);
+          }
       }
       /* mail block specific */
       if (this.fields['mail_perms'].getValue()==0) {
