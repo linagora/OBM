@@ -1770,8 +1770,8 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     </td>
   </tr>";
   }
-  
-  if(($action == 'new') && $cgp_use['service']['mail']) {
+
+  if(($action == 'new' || $mail_quota === NULL) && $cgp_use['service']['mail']) {
     $dis_sel_profile = "
       <td><select id=\"sel_profile\" name=\"sel_profile\" onchange='showDelegation(this);get_profile_quota(this);'>
       ";
