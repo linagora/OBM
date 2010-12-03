@@ -1746,17 +1746,16 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
 function run_query_contact_ext_search($contact) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $pattern = $contact['pattern'];
+  $pattern = '('.$contact['pattern']."* OR "."email:".$contact['pattern']."*)";
   $addressbook_id = $contact['addressbook_id'];
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('contact');
-
   if (is_null($addressbook_id)) {
     $addressbooks = OBM_AddressBook::search();
-    $contacts = $addressbooks->searchContacts($contact['pattern']."*");
+    $contacts = $addressbooks->searchContacts($pattern);
   } else {
     $addressbooks = OBM_AddressBook::get($contact['addressbook_id']);
-    $contacts = $addressbooks->getContacts($contact['pattern']."*");
+    $contacts = $addressbooks->getContacts($pattern);
   }
 
   return $contacts;

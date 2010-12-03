@@ -123,8 +123,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'ext_search_mail') {
 ///////////////////////////////////////////////////////////////////////////////
-  $addressbooks = OBM_AddressBook::search();
-  $contacts = $addressbooks->searchContacts($params['pattern']."*");
+  $contacts = run_query_contact_ext_search($params);
   json_search_contact($params, $contacts);
   echo '('.$display['json'].')';
   exit();
