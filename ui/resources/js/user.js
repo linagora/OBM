@@ -177,15 +177,24 @@ Obm.UserPattern.StringField = new Class ({
     this.parent(form,field);
     this.value = field.value;
     this.originalValue = field.value;
+    this.lock = false;
   },
 
   resetValue: function() {
+	this.lock = true;
 	this.setValue(this.originalValue); 
+	this.lock = false;
   },
 
   setValue: function(value) {
     this.value = value;
     this.field.value = value;
+    if(!this.lock) {
+      if(this.field.onchange) {
+	    this.field.onchange();
+	  }
+	  this.field.fireEvent('change');    
+    }
   },
 
   changed: function() {
@@ -201,16 +210,25 @@ Obm.UserPattern.BooleanField = new Class ({
     this.parent(form,field);
     this.checked = field.checked;
     this.originalChecked = field.checked;
+    this.lock = false;
   },
 
   resetValue: function() {
+	this.lock = true;
     this.setValue(this.originalChecked);
+    this.lock = false;
   },
 
   setValue: function(value) {
     if (((this.field.checked) && (value!=this.field.value)) || ((!this.field.checked) && (value==this.field.value))) {
-      this.field.click();
       this.checked = this.field.checked;
+      if(!this.lock) {
+        if(this.field.onchange) {
+		  this.field.onchange();
+	    }
+	    this.field.click();
+	    this.field.fireEvent('change');
+	  }
     }
   },
 
@@ -250,10 +268,13 @@ Obm.UserPattern.ChoiceField = new Class ({
     this.parent(form,field);
     this.value = field.options[this.field.selectedIndex].value;
     this.originalValue = this.value;
+    this.lock = false;
   },
 
   resetValue: function() {
+	this.lock = true;
     this.setValue(this.originalValue);
+    this.lock = false;
   },
 
   setValue: function(value) {
@@ -261,6 +282,12 @@ Obm.UserPattern.ChoiceField = new Class ({
       if (this.field.options[i].value == value) {
         this.field.selectedIndex = i;
         this.value = value;
+        if(!this.lock) {
+		  if(this.field.onchange) {
+		    this.field.onchange();
+		  }
+		  this.field.fireEvent('change');
+		}
       }
     }
   },

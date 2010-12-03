@@ -3488,7 +3488,6 @@ function check_user_defined_rules() {
   global $err, $rules, $params;
   include_once('obminclude/of/of_error.php');
   $return = true;
-  
   if (is_array($rules)) {
     foreach($rules as $field => $field_rules) {
       /* Normalize rules */

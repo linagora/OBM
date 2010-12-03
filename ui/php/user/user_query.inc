@@ -1669,7 +1669,7 @@ function check_user_data_form($p_id, &$user) {
   global $obm, $cgp_use, $c_imagetype;
   global $c_max_image_size;
   global $l_err_delegation_outside_domain, $l_err_delegation_outside_target;
-
+  
   // Hook : Pre
   if (function_exists('hook_pre_check_user_data_form')) {
     if (! hook_pre_check_user_data_form($p_id, $user)) {

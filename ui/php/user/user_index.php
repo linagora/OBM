@@ -144,6 +144,7 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
+
   if (check_user_defined_rules() && check_user_data_form('', $params)) {
 
     // If the context (same user) was confirmed ok, we proceed

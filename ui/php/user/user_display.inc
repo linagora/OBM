@@ -2307,7 +2307,6 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
         $('delegationTargetBlock').removeClass('H');
       } else {
         $('delegationTargetBlock').addClass('H');
-        $('delegationTargetField').value = '';
       }
     }
     function showExpiration()	{
