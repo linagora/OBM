@@ -4273,6 +4273,9 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     }
     foreach($calendar_entity['contact'] as $c) {
       $contact = OBM_Contact::get($c['id']);
+      foreach($contact->email as $email) {
+        $emails[] = 'mailto:'.trim(strtolower($email['address']));
+      }
       $owner_name = $contact->display_name();
       if (is_array($vevents = $contact->getEventsInInterval($start, $end))) {
         $extra_exceptions = array();
@@ -4296,6 +4299,11 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
             foreach($attendees as $attendee) {
               if(trim(strtolower($attendee->cn)) == trim(strtolower($c['name']))) {
                 $partstat = $attendee->partstat;
+                break;
+              }
+              if(in_array(trim(strtolower($attendee->uri)), $emails)) {
+                $partstat = $attendee->partstat;
+                break;
               }
             }
             $event->addAttendee('contact',$c['id'],$owner_name, $partstat);
