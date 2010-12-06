@@ -1007,7 +1007,8 @@ Obm.CalendarManager = new Class({
         }
         obm.calendarManager.popupManager.addEvent('conflict', function() {
           eventData = $merge({action : 'insert'}, eventData);  
-          window.location=obm.vars.consts.calendarUrl + '?' +Hash.toQueryString(eventData)+'&repeat_kind=none&duration=3600&sel_user_id[]=data-user-'+eventData.entity_id;
+          if(!eventData.duration) eventData.duration = 3600;
+          window.location=obm.vars.consts.calendarUrl + '?' +Hash.toQueryString(eventData)+'&repeat_kind=none&sel_user_id[]=data-user-'+eventData.entity_id;
         });
         obm.calendarManager.popupManager.addEvent('mail', function () {
           eventData.send_mail = true;
