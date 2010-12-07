@@ -95,6 +95,10 @@ sub next {
                 $self->_log( 'problème au chargement des informations de catégories de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
                 next;
             }
+            if( !$self->_loadCurrentEntityGroups() ) {
+                $self->_log( 'problème au chargement des informations des groupes de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
+                next;
+            }
 
             SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
@@ -712,4 +716,45 @@ sub _loadLinkedMailshares {
     }
 
     return $programmingObj;
+}
+
+
+sub _loadCurrentEntityGroups {
+    my $self = shift;
+
+    $self->_log( 'chargement des informations des groupes de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connexion à la base de données impossible', 1 );
+        return 0;
+    }
+
+    my $tablePrefix = '';
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
+        $tablePrefix = 'P_';
+    }
+
+    my $query = 'SELECT group_name
+                 FROM '.$tablePrefix.'UGroup
+                 INNER JOIN '.$tablePrefix.'of_usergroup
+                    ON of_usergroup_group_id = group_id
+                 WHERE of_usergroup_user_id = '.$self->{'currentEntity'}->getId();
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return 0;
+    }
+
+    my %entityGroups;
+    while( my($groupName) = $queryResult->fetchrow_array() ) {
+        $entityGroups{$groupName} = 1;
+    }
+
+    my %entityGroupList;
+    my @groupList = keys(%entityGroups);
+    $entityGroupList{'userobm_group_list'} = \@groupList;
+
+    return $self->{'currentEntity'}->setExtraDescription(\%entityGroupList);
 }
