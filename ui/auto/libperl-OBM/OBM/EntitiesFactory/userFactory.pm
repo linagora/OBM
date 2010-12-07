@@ -722,7 +722,8 @@ sub _loadLinkedMailshares {
 sub _loadCurrentEntityGroups {
     my $self = shift;
 
-    $self->_log( 'chargement des informations des groupes de l\'entité '.$self->{'currentEntity'}->getDescription(), 1 );
+    $self->_log( 'chargement des informations des groupes de l\'entité
+    '.$self->{'currentEntity'}->getDescription(), R41 );
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
