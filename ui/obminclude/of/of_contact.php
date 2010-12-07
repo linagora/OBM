@@ -1618,7 +1618,7 @@ class OBM_Contact implements OBM_ISearchable {
           $url = $website['url'];
           $file = "/tmp/".str_replace("/", "_", $url);
           $now = new Of_Date();
-          if (file_exists($file) && ($now->getTimestamp() - filectime($file)) < 1800) {
+          if (file_exists($file) && ($now->getTimestamp() - filectime($file)) < 900) {
             // get ics from stored file
             $f = fopen($file, 'r');
             $d = stream_get_contents($f);
