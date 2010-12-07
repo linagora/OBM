@@ -345,6 +345,7 @@ function modif_password() {
 
 function get_profile_quota(field) {
   var val = field.options[field.selectedIndex].value;
+  var userpattern = this.theUserForm.userpattern_id;
   new Request.JSON({
         url: obm.vars.consts.obmUrl+'/user/user_index.php',
         secure: false,
@@ -359,7 +360,7 @@ function get_profile_quota(field) {
               }
             }
         }
-  }).get({profile_name : val, action : 'profile_quota'});
+  }).get({profile_name : val, action : 'profile_quota', user_pattern : userpattern});
 }
 
 ";

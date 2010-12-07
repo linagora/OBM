@@ -436,8 +436,19 @@ if ($action == 'ext_get_ids') {
   echo "({".$display['json']."})";
   exit();
 } else if ($action == 'profile_quota') {
+///////////////////////////////////////////////////////////////////////////////
   $profile_name = $params['profile_name'];
-  $profile_quota = $params['profiles'][$profile_name]['properties']['mail_quota_default'];
+  if ($params['user_pattern']) {
+	$pattern = UserPattern::get($params['user_pattern']);
+	if ($pattern->__get('profile') == $profile_name) {
+		$user_pattern_quota = $pattern->__get('mail_quota');
+		$profile_quota = (!empty($user_pattern_quota)) ? $user_pattern_quota : $params['profiles'][$profile_name]['properties']['mail_quota_default'];
+	} else {
+		$profile_quota = $params['profiles'][$profile_name]['properties']['mail_quota_default'];
+	}
+  } else {	
+	$profile_quota = $params['profiles'][$profile_name]['properties']['mail_quota_default'];
+  }
   echo "({quota:".$profile_quota."})";
   exit();
 }

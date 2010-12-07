@@ -494,7 +494,6 @@ Obm.UserPattern.Form = new Class ({
     if (attributes) {
       for (var attr in attributes) {
           var field = this.fields[attr];
-	 /* console.log(field.field.name, field.changed(), field.originalValue, "'" + field.field.value + '"', "'" + field.value + "'" );*/
           if (field && ((!field.changed()) || (field.empty()))) {
             field.setValue(attributes[attr]);
           }
@@ -532,9 +531,6 @@ Obm.UserPattern.Form = new Class ({
               }
             }
           }
-        }
-        if (attributes['mail_quota']) {
-          $('tf_mail_quota').value = attributes['mail_quota'];
         }
       }
     }
