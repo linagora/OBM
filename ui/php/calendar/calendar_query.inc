@@ -4615,13 +4615,12 @@ function run_query_calendar_get_my_views() {
   return $obm_q;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Insert others attendees as private contacts
+// Collects a new contact : used for other attendees or shared calendars
 // Parameters:
 //   - $attendees : hashed attendees email
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert_others_attendees($calendar) {
+function run_query_collect_contact($email, $lastname = null, $firstname = null) {
   global $obm, $cdg_sql;
 
   $uid = sql_parse_id($obm['uid']);
@@ -4630,9 +4629,7 @@ function run_query_insert_others_attendees($calendar) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-  $attendees = $calendar['others_attendees'];
-  $ret = array();
-
+  
   // Get collected addressbook
   $addressBooks = OBM_AddressBook::search();
   $ids = array();
@@ -4641,71 +4638,106 @@ function run_query_insert_others_attendees($calendar) {
   }
   $addressbook_id = $addressBooks->getCollectedAddressbook()->id;
   $in = implode(',', $ids);
+  
+  //// Check if exists
+  // XXXXXX Migrate the access right to the Addressbook
+  $query = "SELECT contact_id FROM Contact
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+    INNER JOIN Email ON email_entity_id = contactentity_entity_id 
+    WHERE (contact_addressbook_id IN ($in) OR contact_usercreate='$uid') AND contact_archive='0' and email_address = '$email'";
+  display_debug_msg($query, $cdg_sql,"'run_query_collect_contact($email)");
+  $obm_q->query($query);    
 
-  foreach($attendees as $email) {
-    //// Check if exists
-    // XXXXXX Migrate the access right to the Addressbook
-    $query = "SELECT contact_id FROM Contact
-      INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-        INNER JOIN Email ON email_entity_id = contactentity_entity_id 
-      WHERE (contact_addressbook_id IN ($in) OR contact_usercreate='$uid') AND contact_archive='0' and email_address = '$email'";
-    display_debug_msg($query, $cdg_sql,"'run_query_insert_others_attendees($email)");
-    $obm_q->query($query);    
+  if ($obm_q->next_record()) {
+    return $obm_q->f('contact_id');
+  }
+  
+  if (is_null($lastname) && is_null($firstname)) {
+    list($firstname, $lastname) = guess_name_from_email($email);
+  }
+  // Insert contact
+  $query = "INSERT INTO Contact (contact_timeupdate,
+    contact_timecreate,
+    contact_userupdate,
+    contact_usercreate,
+    contact_domain_id,
+    contact_lastname,
+    contact_firstname,
+    contact_addressbook_id,
+    contact_marketingmanager_id,
+    contact_archive,
+    contact_origin) VALUES (
+    NOW(),
+    NOW(),
+    $uid,
+    $uid,
+    $domain_id,
+    '$lastname',
+    '$firstname',
+    '$addressbook_id',
+    '$uid',
+    '0',
+    '$GLOBALS[c_origin_web]')";
 
-    if ($obm_q->next_record()) {
-      if(!in_array($obm_q->f('contact_id'), $ret)) {
-        array_push($ret, $obm_q->f('contact_id'));
-      }
-    } else {
-      list( $first_name, $last_name ) = guess_name_from_email($email);
-      // Insert contact
-      $query = "INSERT INTO Contact (contact_timeupdate,
-        contact_timecreate,
-        contact_userupdate,
-        contact_usercreate,
-        contact_domain_id,
-        contact_lastname,
-        contact_firstname,
-        contact_addressbook_id,
-        contact_marketingmanager_id,
-        contact_archive,
-        contact_origin) VALUES (
-        NOW(),
-        NOW(),
-        $uid,
-        $uid,
-        $domain_id,
-        '$last_name',
-        '$first_name',
-        '$addressbook_id',
-        '$uid',
-        '0',
-        '$GLOBALS[c_origin_web]')";
+  display_debug_msg($query, $cdg_sql,"'run_query_collect_contact($email)");
+  $obm_q->query($query);
 
-      display_debug_msg($query, $cdg_sql,"'run_query_insert_others_attendees($email)");
-      $obm_q->query($query);
+  // Get contact_id & entity_id
+  $id = $obm_q->lastid();
+  $entityid = of_entity_insert('contact', $id);
 
-      // Get contact_id & entity_id
-      $id = $obm_q->lastid();
-      $entityid = of_entity_insert('contact',$id);
+  $query = "INSERT INTO Email (email_entity_id, email_address, email_label) 
+    VALUES ($entityid, '$email', 'INTERNET;X-OBM-Ref1')";
+  display_debug_msg($query, $cdg_sql,"'run_query_insert_others_attendees($email)");
+  $obm_q->query($query);
+  
+  // solr
+  $c = OBM_Contact::get($id);
+  OBM_Contact::solrStore($c);
+  OBM_IndexingService::commit('contact');
+    
+  return $id;
+}
 
-      $query = "INSERT INTO Email (email_entity_id, email_address, email_label) 
-        VALUES ($entityid, '$email', 'INTERNET;X-OBM-Ref1')";
-      display_debug_msg($query, $cdg_sql,"'run_query_insert_others_attendees($email)");
-      $obm_q->query($query);
+///////////////////////////////////////////////////////////////////////////////
+// Adds shared calendar with contact info
+///////////////////////////////////////////////////////////////////////////////
+function run_query_add_contact_shared_calendar($params) {
+  global $obm, $cdg_sql;
+  
+  $email = $params['email'];
+  $url = $params['url'];
+  $lastname = isset($params['lastname']) ? $params['lastname'] : null;
+  $firstname = isset($params['firstname']) ? $params['firstname'] : null;
+  
+  $id = run_query_collect_contact($email, $lastname, $firstname);
+  $entityid = of_entity_insert('contact', $id);
+  
+  $obm_q = new DB_OBM;
+  $query = "DELETE FROM Website WHERE website_entity_id = $entityid";
+  display_debug_msg($query, $cdg_sql, 'run_query_add_contact_shared_calendar()');
+  $obm_q->query($query);
+  $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($entityid, '$url', 'CALURI;X-OBM-Ref1')";
+  display_debug_msg($query, $cdg_sql, 'run_query_add_contact_shared_calendar()');
+  $obm_q->query($query);
+  
+  return $id;
+}
 
-      of_userdata_query_update('contact', $id, $calendar);
+///////////////////////////////////////////////////////////////////////////////
+// Insert others attendees as private contacts
+///////////////////////////////////////////////////////////////////////////////
+function run_query_insert_others_attendees($calendar) {
+  $attendees = $calendar['others_attendees'];
+  $ret = array();
 
+  foreach ($attendees as $email) {
+    $id = run_query_collect_contact($email);
+    if (!in_array($id, $ret)) {
       array_push($ret, $id);
-
-      // solr
-      $c = OBM_Contact::get($id);
-      OBM_Contact::solrStore($c);
-      OBM_IndexingService::commit('contact');
     }
   }
   return $ret;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////

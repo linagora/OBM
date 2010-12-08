@@ -952,6 +952,17 @@ function display_page(&$display) {
   }
 }
 
+/**
+ *
+ */
+function redirect_to($url, $msg = null) {
+  if (!is_null($msg)) {
+    $_SESSION['obm_message'] = "<script text='language/javascript'>showOkMessage(\"".phpStringToJsString($msg)."\")</script>";
+  }
+  header( "Status: 301 Moved Permanently");
+  header("location: $url");
+  die();
+}
 
 /**
  *

@@ -157,8 +157,6 @@ if ($popup) {
   exit();
 }
 
-
-
 if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   include_once('obminclude/lib/Solr/Service.php');
@@ -1058,6 +1056,23 @@ if ($action == 'search') {
     $display['msg'] .= display_warn_msg($l_share_err_auth);
   }
   $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
+  
+} elseif ($action == 'add_shared_calendar') {
+///////////////////////////////////////////////////////////////////////////////
+  $url_parts = parse_url($params['shared_calendar_url']);
+  $url_params = array();
+  if (isset($url_parts['query'])) {
+    parse_str($url_parts['query'], $url_params);
+  }
+  $url_params['url'] = $params['shared_calendar_url'];
+  if (isset($url_params['email'])) {
+    $displayed_contacts = $current_view->get_contacts();
+    $displayed_contacts[] = run_query_add_contact_shared_calendar($url_params);
+    $current_view->set_contacts($displayed_contacts);
+    redirect_ok($params, "$l_add_shared_calendar_ok");
+  } else {
+    redirect_to("$path/contact/contact_index.php?action=updateContact");
+  }
 }
 
 $_SESSION['cal_current_view'] = serialize($current_view);
@@ -1188,8 +1203,8 @@ if (!$params['ajax']) {
   exit();
 
 }
-display_page($display);
 
+display_page($display);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $params hash, Calendar parameters transmited
@@ -1944,6 +1959,14 @@ function get_calendar_action() {
     'Url'      => "$path/calendar/calendar_index.php?action=send_url&ajax=1",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
+  );
+  
+  // Add shared calendar
+  $actions['calendar']['add_shared_calendar'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=add_shared_calendar",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None'),
+    'Redirection' => "$_SERVER[PHP_SELF]"
   );
 
 }

@@ -9,6 +9,7 @@
 
 $l_attendees = "Participants";
 $l_others_attendees = "Autres participants";
+$l_add_shared_calendar = "Ajouter un agenda distant";
 $l_add_displayed_users = "Ajouter les utilisateurs dont les agendas sont affichés";
 $l_add_displayed_resources = "Ajouter les ressources dont les agendas sont affichés";
 $l_show_user_calendar = "Afficher le calendrier des participants après validation";
@@ -117,6 +118,7 @@ $l_desc_share_adresse_private = "L'adresse URL privée de votre agenda est rése
 $l_send = "Envoyer";
 $l_reinit_ok = "réinitialisation des urls réussis";
 $l_share_ok = "partage valide";
+$l_add_shared_calendar_ok = "Agenda partagé ajouté. Le contact correspondant a été créé.";
 $l_mail_ok = "Email envoyé";
 $l_know_more = "En savoir plus";
 

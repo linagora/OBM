@@ -279,6 +279,7 @@ class shareCalendarMailer extends OBM_Mailer {
       'host'             => $GLOBALS['cgp_host'],
       $prefix.'name'     => $entity['lastname'],
       $prefix.'firstname'=> $entity['firstname'],
+      $prefix.'email'    => $entity['email'],
       $prefix.'token'    => $entity['token']
     );
   }

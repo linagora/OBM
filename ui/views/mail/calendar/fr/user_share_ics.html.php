@@ -28,7 +28,7 @@
     </tr>
     <tr>
         <td style="text-align:right;" colspan="2">
-          <a href="<?php echo $host; ?>calendar/calendar_render.php?action=ics_export&externalToken=<?php echo $token; ?>">Ical</a>
+          <a href="<?php echo $host; ?>calendar/calendar_render.php?action=ics_export&externalToken=<?php echo $token; ?>&lastname=<?php echo urlencode($name); ?>&firstname=<?php echo urlencode($firstname); ?>&email=<?php echo urlencode($email); ?>">Ical</a>
         </td>
     </tr>
 </table>

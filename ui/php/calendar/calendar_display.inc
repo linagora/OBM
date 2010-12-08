@@ -374,7 +374,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
   global $l_private_group_members, $l_public_group_members;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
-  global $ico_group, $l_calendar, $l_add;
+  global $ico_group, $l_calendar, $l_add, $l_add_shared_calendar;
 
   $this_group = $current_view->get_group();
   $category_filter = $current_view->get_category();
@@ -501,9 +501,6 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   $block_user
   $block_resource
   $block_contact
-  <fieldset class=\"detail extra\">
-  <legend>$l_add</legend>
-  </fieldset>
   $sel_ent
   <div id=\"sel_ent\">
   </div>
@@ -532,6 +529,31 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       <img src='$GLOBALS[ico_contact]'/>
     </div>
   </div>";
+  
+  $link_add_shared_calendar = "
+  <div class='C'>
+    <a href='#' onclick='obm.popup.show(\"addSharedCalendar\");'>$l_add_shared_calendar</a>
+  </div>";
+  
+  $popup_add_shared_calendar = "
+  <div id='addSharedCalendar' class='obmPopup'>
+      <h1>
+      <a href='#' id='popup_form_close' class='closeSticky' onclick='return false;'>
+      <img src='$GLOBALS[ico_popup_close]' alt='close' />
+      </a>
+      $l_add_shared_calendar
+      </h1>
+     <div>
+      <form action='$path/calendar/calendar_index.php?action=add_shared_calendar' method='post'>
+        <fieldset style='padding: 10px; border:0;'>
+          URL : <input type='text' id='tf_shared_calendar_url' name='tf_shared_calendar_url' size='80' />
+        </fieldset>
+        <fieldset class='buttons'>
+          <input class='closeSticky' type='submit' value='Valider' />
+        </fieldset>
+      </form>
+     </div>
+  </div>";
 
   $block = "
   <div class=\"portlet\" id=\"calendarSelection\">
@@ -547,6 +569,10 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     <div class='C'>
     $dis_back_myview
     </div>
+    <fieldset class=\"detail extra\">
+    <legend>$l_add</legend>
+    $link_add_shared_calendar
+    </fieldset>
    </div>
   </div>
   <script type=\"text/javascript\">
@@ -558,7 +584,8 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       $resource_complete
       $contact_complete
     });
-  </script>";
+  </script>
+  $popup_add_shared_calendar";
 
   return $block;
 }

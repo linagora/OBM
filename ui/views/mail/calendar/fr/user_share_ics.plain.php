@@ -25,4 +25,4 @@ Partage d'agenda
 <?php echo "$firstname $name"; ?> vous autorise désormais à importer son agenda OBM.
 
 :: Pour importer : 
-  <?php echo $host; ?>calendar/calendar_render.php?action=ics_export&externalToken=<?php echo $token; ?>
+  <?php echo $host; ?>calendar/calendar_render.php?action=ics_export&externalToken=<?php echo $token; ?>&lastname=<?php echo urlencode($name); ?>&firstname=<?php echo urlencode($firstname); ?>&email=<?php echo urlencode($email); ?>

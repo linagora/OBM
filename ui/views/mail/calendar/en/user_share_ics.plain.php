@@ -25,4 +25,4 @@ Share calendar
 <?php echo "$firstname $name"; ?> now allows you to import their calendar OBM.
 
 :: Import ical : 
-  <?php echo $host; ?>calendar/calendar_render.php?action=ics_export&externalToken=<?php echo $token; ?>
+  <?php echo $host; ?>calendar/calendar_render.php?action=ics_export&externalToken=<?php echo $token; ?>&lastname=<?php echo urlencode($name); ?>&firstname=<?php echo urlencode($firstname); ?>&email=<?php echo urlencode($email); ?>

@@ -16,6 +16,7 @@ $l_week = 'week';
 
 $l_attendees = "Attendees";
 $l_others_attendees = "Other attendees";
+$l_add_shared_calendar = "Add shared calendar";
 $l_add_displayed_users = "Add displayed users";
 $l_add_displayed_resources = "Add displayed resources";
 $l_show_user_calendar = "Show attendees calendars after event creation";
@@ -508,6 +509,7 @@ $l_send = "Send";
 $l_reinit_ok = "reset urls successful";
 $l_share_ok = "valid share";
 $l_mail_ok = "Email sent";
+$l_add_shared_calendar_ok = "Shared calendar added. A corresponding contact has been created.";
 
 $l_refresh = "Refresh";
 
