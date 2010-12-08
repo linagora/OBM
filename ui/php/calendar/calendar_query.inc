@@ -4273,6 +4273,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     }
     foreach($calendar_entity['contact'] as $c) {
       $contact = OBM_Contact::get($c['id']);
+      $emails = array();
       foreach($contact->email as $email) {
         $emails[] = 'mailto:'.trim(strtolower($email['address']));
       }
