@@ -3992,7 +3992,7 @@ function get_domain_property($domain, $property) {
 
 }
 function splitwords($string) {
-  $mask = "/\p{L}[\p{L}\p{Mn}\x{2019}0-9]*/u";
+  $mask = "/[\p{L}0-9][\p{L}\p{Mn}\x{2019}0-9]*/u";
   preg_match_all($mask, $string, $matches);
   if($callback !== null) {
     $matches[0] = array_map($callback,$matches[0]);
