@@ -49,6 +49,11 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   $calendar_entity = $current_view->get_entities();
 
   $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS['path'].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
+  $display_days = $_SESSION['set_cal_display_days'];
+  if (empty($display_days)) $display_days = '1111111';
+
+  $ndays = substr_count($display_days, 1);
+  $GLOBALS['js']['vars']['consts']['daysByWeek'] = $ndays;
   if ($current_view->entities_count() == 0) {
     $current_view->set_users($obm['uid']);
     $calendar_entity = $current_view->get_entities();
@@ -1249,12 +1254,16 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     $tag_legend = html_calendar_tag_legend($tags);
   }
 
+  $ndays = $_SESSION['set_cal_display_days'];
+  if (empty($ndays)) $ndays = '1111111';
+
+  $ndays = substr_count($ndays, 1);
   $day = "ico_day_view";
   $week = "ico_week_view";
   if ($display_days == 1) {
     $range = 'day';
     $day = 'ico_day_view_current';
-  } else if ($display_days == 7) {
+  } else if ($display_days == $ndays) {
     $week = "ico_week_view_current";
   }
 

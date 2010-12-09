@@ -805,7 +805,7 @@ Obm.CalendarManager = new Class({
      this.current = null;
    }
    obm.vars.consts.calendarRange = 'week';
-   obm.vars.consts.nbDisplayedDays =  7;
+   obm.vars.consts.nbDisplayedDays =  obm.vars.consts.daysByWeek;
    this.refresh();
   },
 
@@ -921,6 +921,7 @@ Obm.CalendarManager = new Class({
       data.cal_range = obm.vars.consts.calendarRange;
       data.ndays = obm.vars.consts.nbDisplayedDays;
     }
+         
     new Request.HTML({
       url: obm.vars.consts.calendarUrl,
       secure : false,
