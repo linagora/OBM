@@ -1746,7 +1746,7 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
 function run_query_contact_ext_search($contact) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $pattern = '('.$contact['pattern']."* OR "."email:".$contact['pattern']."*)";
+  $pattern = '('.$contact['pattern']."* OR "."email:".$contact['pattern']."*) AND -is:archive ";
   $addressbook_id = $contact['addressbook_id'];
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('contact');
