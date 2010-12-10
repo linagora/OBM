@@ -708,7 +708,7 @@ function run_query_contact_coords_update($id, $contact,$contactId=NULL) {
         $address['country_iso3166'] = OBM_Contact::getCountryIso3166($address['country']);
       }      
       if(trim($address['street']) != '' || trim($address['country_iso3166']) != ''  || trim($address['zipcode']) != ''
-         || trim($address['expresspostal']) != '') {
+         || trim($address['expresspostal']) != '' || trim($address['town']) != '') {
         if(trim($address['country']) == 'none') $address['country'] = '';
         $address['label'] = str_replace('_', ';', $address['label']);
         $cpt[$address['label']]++;
