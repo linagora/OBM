@@ -90,7 +90,8 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public function getContacts($pattern='', $offset=0, $limit=100) {
-    $pattern .= ' addressbookId:'.$this->id;
+    if(trim($pattern)) $pattern = "($pattern) AND addressbookId:".$this->id;
+    else $pattern = 'addressbookId:'.$this->id;
     return OBM_Contact::search($pattern, $offset, $limit);
   }
 
@@ -259,7 +260,8 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public function countContacts($pattern='') {
-    if ($pattern == '') $pattern = '-is:archive addressbookId:'.$this->id;
+    if(trim($pattern)) $pattern = "($pattern) AND addressbookId:".$this->id;
+    else $pattern = '-is:archive addressbookId:'.$this->id;
     return OBM_Search::count('contact', $pattern);
   }
 
@@ -304,7 +306,8 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
 
   public function searchContacts($pattern, $offset=0, $limit=100) {
     if(!empty($this->addressbooks)) {
-      $pattern .= ' addressbookId:('.implode(' OR ',array_keys($this->addressbooks)).')';
+      if(trim($pattern)) $pattern = "($pattern) AND addressbookId:(".implode(" OR ",array_keys($this->addressbooks)).")";
+      else $pattern = 'addressbookId:('.implode(' OR ',array_keys($this->addressbooks)).')';
       return OBM_Contact::search($pattern, $offset, $limit);
     }
   }
