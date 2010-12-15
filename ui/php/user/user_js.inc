@@ -301,10 +301,10 @@ function random_password() {
   var length = 10;
   var i = 0;
   var charset = new Array();
-  charset[0] = 'abcdefghjkmnpqrstuvwxyz';
-  charset[1] = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-  charset[2] = '0123456789';
-  charset[3] = '[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])';
+  charset[0] = new Array('a','b','c','d','e','f','g','h','j','k','m','n','p','q','r','s','t','u','v','w','x','y','z');
+  charset[1] = new Array('A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z');
+  charset[2] = new Array('0','1','2','3','4','5','6','7','8','9');
+  charset[3] = new Array('[','-','&','~','#','{','(','[','|','`','_','^','@',')',']','=','+','}','$','%','>',',','?',';','.',':','!','/',']');
   var rules = Array();
   var ruleIndex = Math.floor(Math.random() * 5);
   rules[ruleIndex] = 2;
@@ -328,10 +328,9 @@ function random_password() {
 
 function generate_passwd() {
   var mdp = random_password();
-  var father = $('passwd').getParent();
-  var input = new Element('input').setProperties($('passwd').getProperties('name', 'size', 'maxlength'));
+  var input = new Element('input', {name: $('passwd').name}).setProperties($('passwd').getProperties('size', 'maxlength'));
   $('passwd').dispose();
-  input.setProperties({'type': 'text', 'id' : 'passwd', 'value' : mdp}).injectTop(father);
+  input.setProperties({'type': 'text', 'id' : 'passwd', 'value' : mdp}).inject($('td_passwd'), 'top');
 }
 
 function modif_password() {

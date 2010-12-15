@@ -1651,7 +1651,8 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   if (isset($user['archive'])) { $archive = ($user['archive'] == '1' ? 'checked' : ''); }
   if (isset($user['hidden'])) { $hidden = ($user['hidden'] == '1' ? 'checked' : ''); }
   if (isset($user['photo_id'])) { $photo_id = $user['photo_id']; }
-
+  if (isset($user['userpattern_id'])) { $userpattern_id = $user['userpattern_id']; }
+  
   // wait people
   if (isset($user['status']) && $action != 'detailupdate') { $status = $user['status']; }
 
@@ -2249,16 +2250,17 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   if (!empty($patterns)) {
     $choices = "<option value=\"\">---</option>";
     foreach ($patterns as $id => $pattern) {
-      $choices .= "<option value=\"$id\">$pattern</option>";
+      $selected = '';
+      if ($id == $user['userpattern_id']) { $selected = 'selected'; }
+      $choices .= "<option value=\"$id\" $selected>$pattern</option>";
     }
     $block_userpattern = "<div id=\"templateSelect\">
-      <form id=\"templateSelectForm\" action=\"calendar_index.php\">
+              
         {$GLOBALS['l_create_using_userpattern']}
         <select id=\"userpattern_id\" name=\"userpattern_id\">
           $choices
         </select>
-      </form>
-    </div>
+         </div>
     ";
     if (is_array($GLOBALS['cgp_user']['user']['field'])) {
       foreach ($GLOBALS['cgp_user']['user']['field'] as $fieldname => $properties) {
@@ -2291,11 +2293,11 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   $block = "
     $pop_up
     $pop_generate
-  $block_userpattern
   <form id=\"dataUser\" method=\"post\" name=\"f_entity\"
     enctype=\"multipart/form-data\"
     onsubmit=\"return (check_phoneFax_number(this) && check_user(this));\"
     action=\"" . url_prepare('user_index.php') . "\">
+   $block_userpattern
   <fieldset class=\"detail infos\">
   <legend>$l_user</legend>
   <script type='text/javascript'>
@@ -2339,7 +2341,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </tr>
   <tr>
     <th class=\"$class[password]\">$l_password</th>
-    <td><input id=\"passwd\" type=\"password\" name=\"tf_passwd\" autocomplete=\"off\" size=\"24\" maxlength=\"32\" value=\"$passwd\" />
+    <td id=\"td_passwd\"><input id=\"passwd\" type=\"password\" name=\"tf_passwd\" autocomplete=\"off\" size=\"24\" maxlength=\"32\" value=\"$passwd\" />
         <button type=\"button\" onclick=\"modif_password()\">$l_generate_passwd</button>
     </td>
   </tr>

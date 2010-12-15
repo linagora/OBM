@@ -256,7 +256,14 @@ Obm.UserPattern.PasswordField = new Class ({
 
   setValue: function(value) {
     this.parent(value);
-    this.field.type = 'text';
+    this.field = $(this.field.id);
+    this.field
+    var father = this.field.getParent();
+    var input = new Element('input', {name: this.field.name}).setProperties(this.field.getProperties('size', 'maxlength'));
+    var name = this.field.name;
+    this.field.dispose();
+    input.setProperties({'type': 'text', 'id' : 'passwd', 'value' : this.field.value, 'name' : name}).injectTop(father);
+    this.field = input;
   }
 
 });
@@ -499,35 +506,37 @@ Obm.UserPattern.Form = new Class ({
           }
       }
       /* mail block specific */
-      if (this.fields['mail_perms'].getValue()==0) {
-        if (attributes['email']) {
-          $('externalEmailField').value = attributes['email'];
-        }
-      } else {
-        if (attributes['mail_server_id']) {
-          var field = $('sel_mail_server_id');
-          for (var i=0; i<field.options.length; i++) {
-            if (field.options[i].value == attributes['mail_server_id']) {
-              field.selectedIndex = i;
+      if (typeof this.fields['mail_perms']!= "undefined") {
+        if (this.fields['mail_perms'].getValue()==0) {
+          if (attributes['email']) {
+            $('externalEmailField').value = attributes['email'];
+          }
+        } else {
+          if (attributes['mail_server_id']) {
+            var field = $('sel_mail_server_id');
+            for (var i=0; i<field.options.length; i++) {
+              if (field.options[i].value == attributes['mail_server_id']) {
+                field.selectedIndex = i;
+              }
             }
           }
-        }
-        if (attributes['email']) {
-          var mails = attributes['email'];
-          var mail_fields = $$('td#userMailHome input');
-          var count = mails.length;
-          for (var i=mail_fields.length; i<mails.length; i++) {
-            add_email_field(aliasSelectTemplate);
-            show_hide_add_button();
-          }
-          mail_fields = $$('td#userMailHome input');
-          var alias_fields = $$('td#userMailHome select');
-          for (var i=0; i<mails.length; i++) {
-            var tmp = mails[i].split("@");
-            mail_fields[i].value = tmp[0];
-            for (var j=0; j<alias_fields[i].options.length; j++) {
-              if (alias_fields[i].options[j].value == tmp[1]) {
-                alias_fields[i].selectedIndex = j;
+          if (attributes['email']) {
+            var mails = attributes['email'];
+            var mail_fields = $$('td#userMailHome input');
+            var count = mails.length;
+            for (var i=mail_fields.length; i<mails.length; i++) {
+              add_email_field(aliasSelectTemplate);
+              show_hide_add_button();
+            }
+            mail_fields = $$('td#userMailHome input');
+            var alias_fields = $$('td#userMailHome select');
+            for (var i=0; i<mails.length; i++) {
+              var tmp = mails[i].split("@");
+              mail_fields[i].value = tmp[0];
+              for (var j=0; j<alias_fields[i].options.length; j++) {
+                if (alias_fields[i].options[j].value == tmp[1]) {
+                  alias_fields[i].selectedIndex = j;
+                }
               }
             }
           }
