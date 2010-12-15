@@ -260,8 +260,8 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public function countContacts($pattern='') {
-    if(trim($pattern)) $pattern = "($pattern) AND addressbookId:".$this->id;
-    else $pattern = '-is:archive addressbookId:'.$this->id;
+    if(trim($pattern)) $pattern = "($pattern)";
+    else $pattern = '-is:archive';
     return OBM_Search::count('contact', $pattern);
   }
 
