@@ -174,7 +174,14 @@ Obm.Contact.AddressBook = new Class ({
       var searchpattern='';
       form.getElements('input').each(function (elem) {
         if(elem.get('type') != 'submit' && elem.get('type') != 'button' && elem.get('inputValue') != '') {
-          searchpattern += elem.get('name') + ':(' + elem.get('inputValue') + ') ';
+          if(elem.get('type') != 'radio' || elem.get('checked') != false) {
+            if(elem.get('inputValue').match(/^\s*NOT\s*.*/)) {
+              searchpattern += '-' + elem.get('name') + ':(' + elem.get('inputValue').replace('NOT','').trim() + ') ';
+            } else {
+              searchpattern += elem.get('name') + ':(' + elem.get('inputValue') + ') ';
+            }
+            console.log(elem.get('name'), elem.get('inputValue'), elem.get('id'));
+          }
         }
       });
       form.getElements('select').each(function(elem) {
@@ -193,6 +200,7 @@ Obm.Contact.AddressBook = new Class ({
     $('addressbook-search').set('class', 'current');
     $('addressbook-search').store('search',$('searchpattern').value)
   },
+
 
   filterContact: function(form) {
     this.hideContact();

@@ -296,18 +296,25 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
 
   private $offset = 0;
 
+  private $queryFilter;
+
   public function __construct($addressbooks) {
     $this->addressbooks = $addressbooks;
+    $this->setQueryFilter();
   }
-  
+
+  private function setQueryFilter() {
+    $this->queryFilter = "addressbookId:(".implode(" OR ",array_keys($this->addressbooks)).")";
+  } 
+
   public function exportContacts($pattern, $offset=0, $limit=100000) {
     return $this->searchContacts($pattern, $offset, $limit);
   }
 
   public function searchContacts($pattern, $offset=0, $limit=100) {
     if(!empty($this->addressbooks)) {
-      if(trim($pattern)) $pattern = "($pattern) AND addressbookId:(".implode(" OR ",array_keys($this->addressbooks)).")";
-      else $pattern = 'addressbookId:('.implode(' OR ',array_keys($this->addressbooks)).')';
+      if(trim($pattern)) $pattern = "($pattern ".$this->queryFilter.") AND ".$this->queryFilter;
+      else $pattern = $this->queryFilter;
       return OBM_Contact::search($pattern, $offset, $limit);
     }
   }
@@ -334,7 +341,8 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
   }
 
   public function offsetSet($offset, $value) {
-    $this->$addressbooks[$offset] = $value;
+    $this->addressbooks[$offset] = $value;
+    $this->setQueryFilter();
   }
 
   public function offsetExists($offset) {
@@ -343,6 +351,7 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
 
   public function offsetUnset($offset) {
     unset($this->addressbooks[$offset]);
+    $this->setQueryFilter();
   }
 
   public function offsetGet($offset) {

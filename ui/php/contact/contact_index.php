@@ -466,9 +466,6 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
     //management of archive param  according to global configuration
-    if (strpos($params['searchpattern'],'is:(archive)') !== false) {
-    if (!$cgp_archive_only) $params['searchpattern'] = str_replace('is:(archive)', " ", $params['searchpattern']);
-    } else  $pattern = ' -is:(archive) '; 
     if($params['contactfilter']) $pattern .= 'displayname:'.$params['contactfilter'];
     if($params['addressbook']) $current['addressbook'] = $params['addressbook'];
     else $current['addressbook'] = 'search';

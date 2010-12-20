@@ -28,6 +28,7 @@ return array(
   'Also known as' => 'Surnom',
   'Anniversary' => 'Fête',
   'Are you sure you want to stop editing this contact? Unsaved changes will be lost.' => 'Voulez-vous vraiment interrompre la modification de ce contact ? Les modifications non enregistrées seront perdues.',
+  'Include archived' => 'Inclure les contacts archivés',
   'Birthday' => 'Anniversaire',
   'Category' => 'Categorie',
   'Close the window' => 'Fermer la fenêtre',

@@ -20,8 +20,21 @@
             <tr>            
               <th><label for="displaynameSearch"><?php echo __('Displayname') ?></label></th><td><input  title="Displayname" id="displaynameSearch" name="displayname" value="" type="text"></td>
               <th><label for="companySearch"><?php echo __('Company') ?></label></th><td><input  title="Company" id="companySearch" name="company" value="" type="text"></td>
-              <th><label for="archiveSearch"><?php echo __('Archived') ?></label></th><td>
-                <input type="checkbox" name="is" id="archiveSearch" value="archive"></td>
+              <th>
+              <?php if($GLOBALS['cgp_archive_only']) { ?>
+                <label for="archiveSearch"><?php echo __('Archived') ?></label>
+              <?php } else { ?>
+                <label for="archiveSearch"><?php echo __('Include archived') ?></label>
+              <?php } ?>
+              </th>
+              <td>
+                <input type="radio" name="is" id="defaultArchivedForm" value="NOT archive"><?php echo __('No') ?>
+                <?php if($GLOBALS['cgp_archive_only']) { ?>
+                <input type="radio" name="is" id="archiveSearch" value="archive"><?php echo __('Yes') ?>
+                <?php } else { ?>
+                <input type="radio" name="is" id="archiveSearch" value=""><?php echo __('Yes') ?>
+                <?php } ?>
+              </td>
             </tr>
             <tr>   
               <th><label for="lastnameSearch"><?php echo __('Lastname') ?></label></th><td><input  title="Lastname" id="lastnameSearch" name="lastname" value="" type="text"></td>
