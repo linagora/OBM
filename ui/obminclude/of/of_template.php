@@ -220,7 +220,7 @@ class OBM_Template {
 
   public static function __getentitylink($value, $id, $module) {
     if($GLOBALS['perm']->check_module_rights($module)) {
-      return '<a href='.$GLOBALS['path'].'/'.$module.'/'.$module.'_index.php?action=detailconsult&amp;'.$module.'_id='.$id.'>'.$value.'</a>';
+      return '<a href="'.$GLOBALS['path'].'/'.$module.'/'.$module.'_index.php?action=detailconsult&amp;'.$module.'_id='.$id.'">'.$value.'</a>';
     } else {
       return $value;
     }

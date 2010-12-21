@@ -376,12 +376,10 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
           OBM_IndexingService::commit('contact');          
           $contact = OBM_Contact::get($params['id']);
           update_last_visit('contact', $params['id'], $action);    
-          echo dis_update_addressbook_count($addressbooks[$c->addressbook_id]);       
         } else {
           $contact = $addressbook->addContact($params);
           OBM_IndexingService::commit('contact');
         }
-        echo dis_update_addressbook_count($addressbook);
         $subTemplate['card'] = new OBM_Template('card');
       } else {
         header('HTTP', true, 400);
@@ -407,7 +405,6 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $destination = $addressbooks[$params['addressbook']];
     if ($source->read && $destination && $destination->write) {
       OBM_Contact::copy($contact, $destination);
-      echo dis_update_addressbook_count($destination);
       $subTemplate['card'] = new OBM_Template('card');
     } else {
       header('HTTP', true, 403);
@@ -424,8 +421,6 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $destination = $addressbooks[$params['addressbook']];
     if ($source && $source->read && $source->write && $destination && $destination->write) {
       OBM_Contact::move($contact, $destination);
-      echo dis_update_addressbook_count($source);
-      echo dis_update_addressbook_count($destination);
       $subTemplate['card'] = new OBM_Template('card');
     } else {
       header('HTTP', true, 403);
@@ -448,10 +443,8 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       } else {
         $contact->archive = 1;
         OBM_Contact::store($contact);
-        echo dis_update_addressbook_count($addressbook);
       }
       // Update "archive" addressbook
-      echo dis_update_addressbook_count(null, 'is:archive addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks('read'))).')', 'archive');
       $contacts = $addressbooks->searchContacts($params['searchpattern']);
       $subTemplate['contacts'] = new OBM_Template('contacts');
       $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
@@ -470,10 +463,21 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if($params['addressbook']) $current['addressbook'] = $params['addressbook'];
     else $current['addressbook'] = 'search';
     $contacts = $addressbooks->searchContacts($params['searchpattern'].' '.$pattern, $params['offset']);
-    if ($params['updateCount']) echo dis_update_addressbook_count(null, $params['searchpattern'].' '.$pattern.' addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks())).')', 'search');
+    if ($params['updateCount']) echo dis_update_addressbook_count($addressbooks, $params['searchpattern'].' '.$pattern.' addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks())).')', 'search');
     $subTemplate['contacts'] = new OBM_Template('contacts');
     $subTemplate['contacts']->set('offset', $params['offset']);
     $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
+  } elseif ($action == 'countContact') {
+  ///////////////////////////////////////////////////////////////////////////////
+    if(isset($params['searchpattern'])) {
+      $count = $addressbooks->countContact($params['searchpattern']);
+      echo $count;
+      exit(0);
+    } else {
+      $addressbooks = OBM_AddressBook::search();
+      $subTemplate['addressbooks'] = new OBM_Template('addressbooks');
+    }
+    //FIXME Erreur de droit
   } elseif ($action == 'filterContact') {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
@@ -680,8 +684,11 @@ function get_contact_action() {
     'Condition'=> array ('None') 
   );  
 
-
-
+  $actions['contact']['countContact'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=countContact",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );  
 
 // Search
   $actions['contact']['search'] = array (

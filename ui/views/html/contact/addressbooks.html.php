@@ -50,7 +50,7 @@
           new Obm.DropDownMenu($('addressbook-<?php echo $_id ?>').getElement('ul'));
         </script>
       </form>
-      <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_<?php echo $_id;?>'><?php echo $_addressbook->countContacts(); ?></span><?php echo " ".__('contact(s)'); ?></span>
+      <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_<?php echo $_id;?>'><?php echo $addressbooks->countContacts('addressbookId:'. $_id .' -is:archive'); ?></span><?php echo " ".__('contact(s)'); ?></span>
       </td>
     </tr>
     <?php  } ?>
@@ -64,7 +64,7 @@
           </script>            
         </form>
         <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_archive'>
-          <?php echo $_addressbook->countContacts('is:archive addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks('read'))).')'); ?></span><?php echo " ".__('contact(s)'); ?></span>
+          <?php echo $addressbooks->countContacts('is:archive addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks('read'))).')'); ?></span><?php echo " ".__('contact(s)'); ?></span>
       </td>
     </tr>
     <tr style="<?php echo ('search' == $current['addressbook'])? '':'display:none;' ?>">

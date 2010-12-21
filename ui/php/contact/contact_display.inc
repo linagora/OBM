@@ -2121,14 +2121,9 @@ function dis_addressbook_right_dis_admin($addressbook) {
 }
 
 
-function dis_update_addressbook_count($p, $pattern='', $id='') {
+function dis_update_addressbook_count($addressbooks, $pattern, $id='') {
 
-  if ($p instanceof OBM_AddressBook) {
-    $count = $p->countContacts(); 
-    $id = $p->id;
-  } else {
-    $count = OBM_AddressBook::countContacts($pattern);
-  }
+  $count = $addressbooks->countContacts($pattern);
   $js =  "<script language=\"text/javascript\"> $('count_addressbook_$id').innerHTML = '$count' </script>";
   return $js;
 }

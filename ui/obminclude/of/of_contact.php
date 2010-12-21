@@ -257,6 +257,10 @@ class OBM_Contact implements OBM_ISearchable {
     return $fields;
   }
 
+  public static function count($pattern) {
+    return OBM_Search::count('contact', $pattern);
+  }
+
   public static function search($pattern, $offset=0, $limit=100) {
     return OBM_Contact::fetchAll(
       OBM_Search::buildSearchQuery('contact', $pattern, $offset, $limit, array('sort' => 'sortable asc')));

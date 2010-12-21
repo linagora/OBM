@@ -33,6 +33,7 @@ class OBM_AddressBook implements OBM_ISearchable {
   private $admin;
   private $syncable;
   private $synced;
+  private $queryFilter;
 
   public function __construct($id, $name, $is_default, $owner, $syncable, $synced, $access, $read, $write, $admin) {
     $this->id = $id;
@@ -51,6 +52,7 @@ class OBM_AddressBook implements OBM_ISearchable {
     if ($this->name == 'contacts' && $this->isDefault && $this->owner == $GLOBALS['obm']['uid']) $this->syncable = FALSE;
     $this->synced = $synced;
     $this->db = new DB_OBM;
+    $this->setQueryFilter();
   }
 
   public function __set($property, $value) {
@@ -79,6 +81,10 @@ class OBM_AddressBook implements OBM_ISearchable {
     return;
   }
 
+  private function setQueryFilter() {
+    $this->queryFilter = "addressbookId:(".$this->id.")";
+  } 
+
   public static function fieldsMap() {
     $fields['*'] = array('AddressBook.name' => 'text');
     $fields['name'] = array('AddressBook.name' => 'text');
@@ -90,8 +96,8 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public function getContacts($pattern='', $offset=0, $limit=100) {
-    if(trim($pattern)) $pattern = "($pattern) AND addressbookId:".$this->id;
-    else $pattern = 'addressbookId:'.$this->id;
+    if(trim($pattern)) $pattern = "($pattern ".$this->queryFilter.") AND ".$this->queryFilter;
+    else $pattern = $this->queryFilter;
     return OBM_Contact::search($pattern, $offset, $limit);
   }
 
@@ -260,7 +266,7 @@ class OBM_AddressBook implements OBM_ISearchable {
   }
 
   public function countContacts($pattern='') {
-    if(trim($pattern)) $pattern = "($pattern)";
+    if(trim($pattern)) $pattern = "$pattern ";
     else $pattern = '-is:archive';
     return OBM_Search::count('contact', $pattern);
   }
@@ -316,6 +322,14 @@ class OBM_AddressBookArray implements ArrayAccess, Iterator {
       if(trim($pattern)) $pattern = "($pattern ".$this->queryFilter.") AND ".$this->queryFilter;
       else $pattern = $this->queryFilter;
       return OBM_Contact::search($pattern, $offset, $limit);
+    }
+  }
+
+  public function countContacts($pattern) {
+    if(!empty($this->addressbooks)) {
+      if(trim($pattern)) $pattern = "($pattern ".$this->queryFilter.") AND ".$this->queryFilter;
+      else $pattern = $this->queryFilter;
+      return OBM_Contact::count($pattern, $offset, $limit);
     }
   }
 

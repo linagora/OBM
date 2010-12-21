@@ -28,12 +28,12 @@
               <?php } ?>
               </th>
               <td>
-                <input type="radio" name="is" id="defaultArchivedForm" value="NOT archive"><?php echo __('No') ?>
                 <?php if($GLOBALS['cgp_archive_only']) { ?>
                 <input type="radio" name="is" id="archiveSearch" value="archive"><?php echo __('Yes') ?>
                 <?php } else { ?>
                 <input type="radio" name="is" id="archiveSearch" value=""><?php echo __('Yes') ?>
                 <?php } ?>
+                <input type="radio" name="is" id="defaultArchivedForm" value="NOT archive" checked ><?php echo __('No') ?>
               </td>
             </tr>
             <tr>   

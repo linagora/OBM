@@ -25,6 +25,7 @@ Obm.Contact.AddressBook = new Class ({
         $('spinner').hide();
         this.addressbook = $(this.addressbook.get('id'));
         if(!this.addressbook)  this.selectAddressBook($(this.mycontacts));
+        if(this.addressbook)  this.selectAddressBook($(this.addressbook));
       }.bind(this),
       onRequest: $('spinner').show.bind($('spinner')),
       onFailure: function (response) {
@@ -58,6 +59,7 @@ Obm.Contact.AddressBook = new Class ({
 
     this.dataRequest.write = function (options) {
       this.dataRequest.addEvent('success', this.refreshContact.bind(this));
+      this.dataRequest.addEvent('success', this.refreshAddressBooks.bind(this));
       this.dataRequest.post(options);
     }.bind(this);
 
@@ -115,6 +117,10 @@ Obm.Contact.AddressBook = new Class ({
     this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')}); 
   },
 
+  refreshAddressBooks: function() {
+    this.addressBookRequest.get({ajax : 1, action : 'countContact'}); 
+  },
+
   consultContact: function(id) {
     if(id) {
       this.dataRequest.read({ajax : 1, action : 'consult', id : id}); 
@@ -154,7 +160,7 @@ Obm.Contact.AddressBook = new Class ({
       //this.addressBookRequest.addEvent('success', function() {
       //  showOkMessage(obm.vars.labels.deleteOk);
       //});      
-      this.contactRequest.post({ajax:1, action:'deleteContact', 'id':id, searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')});
+      this.dataRequest.write({ajax:1, action:'deleteContact', 'id':id, searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')});
       this.hideContact();
     }
   },
@@ -180,7 +186,6 @@ Obm.Contact.AddressBook = new Class ({
             } else {
               searchpattern += elem.get('name') + ':(' + elem.get('inputValue') + ') ';
             }
-            console.log(elem.get('name'), elem.get('inputValue'), elem.get('id'));
           }
         }
       });
