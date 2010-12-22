@@ -740,7 +740,7 @@ sub _loadCurrentEntityGroups {
                  FROM '.$tablePrefix.'UGroup
                  INNER JOIN '.$tablePrefix.'of_usergroup
                     ON of_usergroup_group_id = group_id
-                 WHERE of_usergroup_user_id = '.$self->{'currentEntity'}->getId();
+                 WHERE of_usergroup_user_id = '.$self->{'currentEntity'}->getId().' AND group_privacy = 0';
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {

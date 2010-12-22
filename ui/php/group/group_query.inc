@@ -989,17 +989,18 @@ function get_group_name_exists($name, $id='') {
     $where_id = "and group_id $id ";
   }
 
-  $multidomain = sql_multidomain('group');
-
+  $multidomain = sql_multidomain('group'); 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
   $query = "SELECT group_id, group_name
   FROM UGroup
-  WHERE group_name='$name'
+  WHERE group_name $like '$name'
   AND (group_privacy=0 OR group_usercreate=$obm[uid])
   $where_id
   $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_group_name_exists()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
