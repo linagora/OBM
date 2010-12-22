@@ -1544,8 +1544,13 @@ Obm.CalendarInDayEvent = new Class({
       var time = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' - ' + end.format(obm.vars.regexp.dispTimeFormat);
       this.locationContainer.set('html',location);
     }
+    
+    // Workaround : HTML entities aren't converted to actual symbols in a JS-inserted "title" attribute
+    var tmpTa = document.createElement("textarea"); 
+    tmpTa.innerHTML = this.event.title.replace("&quot;", '"');
+    var decodedTitle = tmpTa.value; 
 
-    this.element.setProperty('title', this.event.title + ' ' + location);
+    this.element.setProperty('title', decodedTitle + ' ' + location);
     this.timeContainer.set('html',time);
     this.titleContainer.set('html',title);
   },
@@ -1786,8 +1791,13 @@ Obm.CalendarAllDayEvent = new Class({
     if (this.event.all_day) {
       time = title;
     }
+    
+    // Workaround : HTML entities aren't converted to actual symbols in a JS-inserted "title" attribute
+    var tmpTa = document.createElement("textarea"); 
+    tmpTa.innerHTML = this.event.title.replace("&quot;", '"');
+    var decodedTitle = tmpTa.value;
 
-    this.element.setProperty('title', this.event.title);
+    this.element.setProperty('title', decodedTitle);
     this.titleContainer.set('html',time);
   },
 
