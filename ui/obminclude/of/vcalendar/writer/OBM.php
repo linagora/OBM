@@ -17,7 +17,7 @@ class Vcalendar_Writer_OBM {
   var $repeat = array('byday','bymonthday','byyearday','byweekno','bymonth','bysetpos','wkst');
 
   var $rights;
-  
+
   var $event_error = 0; //count wrong events (without start date for example). These events are not saved.
 
   function Vcalendar_Writer_OBM($force=false) {
@@ -35,27 +35,40 @@ class Vcalendar_Writer_OBM {
     for($i=0; $i < count($vevents); $i++ ) {
       $this->writeVevent($vevents[$i]);
     }
-    $valarms = &$document->getValarms();
-    for($i=0; $i < count($valarms); $i++) {
-      $this->writeValarm($valarms[$i]);
-    }
-
   }
 
   function writeVevent(&$vevent) {
     $eventData = $this->getOBMEvent($vevent);
 
     if(is_null($eventData)) {
-      $this->insertEvent($vevent);
-
+      $id = $this->insertEvent($vevent);
     } else {
-
+      $id = $eventData->f('event_id');
       if($this->haveAccess($eventData->f('event_owner'))) {
-        $this->updateEvent($eventData->f('event_id'), $vevent);
+        $this->updateEvent($id, $vevent);
       } else {
         // FIXME WHAT TO DO??
-        $this->updateAttendees($eventData->f('event_id'),$vevent);
+        $this->updateAttendees($id,$vevent);
         $this->updateAlerts($vevent->get('x-obm-alert'), $id, $GLOBALS['obm']['uid']);
+      }
+    }
+    $valarms = &$vevent->getElementByName('valarm');
+    for($i=0; $i < count($valarms); $i++) {
+      $this->insertValarm($valarms[$i], $vevent, $id);
+    }
+  }
+
+  function insertValarm(&$valarm, &$vevent, $id) {
+    if(is_numeric($id)) {
+      $attendees = $valarm->get('attendee');
+      if(isset($attendees['id'])) {
+        $attendees = array($attendees);
+      }
+      $ts = $vevent->get('dtstart')->diffTimestamp($valarm->get('trigger'));
+      foreach($attendees as $attendee) {
+        if($attendee['entity'] == 'user' && $this->haveAccess($attendee['id'])) {
+          $this->updateAlerts(array(array('user' => $attendee['id'], 'duration' => $ts)), $id);
+        }
       }
     }
   }
@@ -64,25 +77,24 @@ class Vcalendar_Writer_OBM {
     $eventData = NULL;
     $start = $vevent->get('dtstart');
     $summary = $vevent->get('summary');
-    if (isset($start) && isset($summary))
-	{
-		if($this->lazyRead) {
-		  if(($organizer = $vevent->get('organizer'))) {
-			$owner = "OR event_owner ".sql_parse_id($organizer, true)."";
-		  }
-		  $query = "SELECT event_id as id
-		  FROM Event WHERE event_title =  '".addslashes($vevent->get('summary'))."'
-		  AND event_date = '".$vevent->get('dtstart')."' AND
-		  (event_owner ".sql_parse_id($GLOBALS['obm']['uid'], true)." $owner)";
-		  $this->db->query($query);
-		  if($this->db->nf() > 0) {
-			$this->db->next_record();
-			$eventData = $this->getEventById($this->db->f('id'));
-		  }
-		} else {
-		  //TODO Hard working query.
-		}
-	}
+    if (isset($start) && isset($summary)) {
+      if($this->lazyRead) {
+        if(($organizer = $vevent->get('organizer'))) {
+          $owner = "OR event_owner ".sql_parse_id($organizer, true)."";
+        }
+        $query = "SELECT event_id as id
+          FROM Event WHERE event_title =  '".addslashes($vevent->get('summary'))."'
+          AND event_date = '".$vevent->get('dtstart')."' AND
+          (event_owner ".sql_parse_id($GLOBALS['obm']['uid'], true)." $owner)";
+        $this->db->query($query);
+        if($this->db->nf() > 0) {
+          $this->db->next_record();
+          $eventData = $this->getEventById($this->db->f('id'));
+        }
+      } else {
+        //TODO Hard working query.
+      }
+    }
     return $eventData;
   }
 
@@ -104,6 +116,7 @@ class Vcalendar_Writer_OBM {
     $eventData = $this->getEventById($this->db->f('id'));
     return $eventData;    
   }
+
   /**
    * @param Vcalendar_Element $vevent
    */
@@ -133,92 +146,87 @@ class Vcalendar_Writer_OBM {
     $event['date_begin'] = $dtstart;
 
     // if no startdate, we consider that it's not an event and we don't insert it
-    if (!is_null($dtstart))
-    {
-   		if ($dtstart->getOriginalTimeZone())
-      	$event['timezone'] = $dtstart->getOriginalTimeZone();
-      
-		$event['date_end'] = $vevent->get('dtend');
-		$event['event_duration'] = $vevent->get('duration');
-		$event['duration'] = $vevent->get('duration');
-		$event['opacity'] = $vevent->get('transp');
-		
-		$event['date_exception'] = array();
-		$exdates = $vevent->get('exdate');
-		
-		$dates_exception = array();
-		
-		if (is_array($exdates))
-		foreach($exdates as $exdate) {
-		  if (is_array($exdate)) {
-			foreach($exdate as $exdate2) {
-			  $dates_exception[] = $exdate2;
-			}
-		  } else {
-			$dates_exception[] = $exdate;
-		  }
-		}
-		
-		$event['date_exception'] = $dates_exception;
-		
-		// BEGIN one exception for each day
-		
-		foreach ($dates_exception as $k => $v) {
-		  $dates_exception[$k] = $v->get(Of_Date::DATE_ISO);
-		}
-		
-		$dates_exception = array_unique($dates_exception);
-		
-		foreach ($dates_exception as $k => $v) {
-		  $date = new Of_Date($v);
-		  $dates_exception[$k] = $date->setHour($dtstart->getHour())->setMinute($dtstart->getMinute())->setSecond($dtstart->getSecond());
-		}
-		
-		$event['date_exception'] = $dates_exception;
-		
-		// END one exception for each day
-		
-		$event['description'] = addslashes($vevent->get('description'));
-		$event['location'] = addslashes($vevent->get('location'));
-		$event['category1'] = $this->parseCategories($vevent->get('categories'));
-		$event['priority'] = $this->parsePriority($vevent->get('priority'));
-		$event['privacy'] = $this->parsePrivacy($vevent->get('class')) ;
-		$event = array_merge($event, $this->parseRrule($vevent->get('rrule'), $vevent));
-		$event['all_day'] = $vevent->isAllDay();
-		$event['color'] = $vevent->get('x-obm-color');
-		$event['properties'] = $vevent->get('x-obm-properties');
-		return array('event' => $event, 'entities' => $entities, 'states' => $states);
-	}
-	else {
-		return null;
-	}
+    if (!is_null($dtstart)){
+      if ($dtstart->getOriginalTimeZone())
+        $event['timezone'] = $dtstart->getOriginalTimeZone();
+
+      $event['date_end'] = $vevent->get('dtend');
+      $event['event_duration'] = $vevent->get('duration');
+      $event['duration'] = $vevent->get('duration');
+      $event['opacity'] = $vevent->get('transp');
+
+      $event['date_exception'] = array();
+      $exdates = $vevent->get('exdate');
+
+      $dates_exception = array();
+
+      if (is_array($exdates))
+        foreach($exdates as $exdate) {
+          if (is_array($exdate)) {
+            foreach($exdate as $exdate2) {
+              $dates_exception[] = $exdate2;
+            }
+          } else {
+            $dates_exception[] = $exdate;
+          }
+        }
+
+      $event['date_exception'] = $dates_exception;
+
+      // BEGIN one exception for each day
+
+      foreach ($dates_exception as $k => $v) {
+        $dates_exception[$k] = $v->get(Of_Date::DATE_ISO);
+      }
+
+      $dates_exception = array_unique($dates_exception);
+
+      foreach ($dates_exception as $k => $v) {
+        $date = new Of_Date($v);
+        $dates_exception[$k] = $date->setHour($dtstart->getHour())->setMinute($dtstart->getMinute())->setSecond($dtstart->getSecond());
+      }
+
+      $event['date_exception'] = $dates_exception;
+
+      // END one exception for each day
+
+      $event['description'] = addslashes($vevent->get('description'));
+      $event['location'] = addslashes($vevent->get('location'));
+      $event['category1'] = $this->parseCategories($vevent->get('categories'));
+      $event['priority'] = $this->parsePriority($vevent->get('priority'));
+      $event['privacy'] = $this->parsePrivacy($vevent->get('class')) ;
+      $event = array_merge($event, $this->parseRrule($vevent->get('rrule'), $vevent));
+      $event['all_day'] = $vevent->isAllDay();
+      $event['color'] = $vevent->get('x-obm-color');
+      $event['properties'] = $vevent->get('x-obm-properties');
+      return array('event' => $event, 'entities' => $entities, 'states' => $states);
+    }
+    else {
+      return null;
+    }
   }
 
   function createUnknownContact(&$attendee) {
     if(is_array($attendee['id']) && $attendee['entity'] == 'contact') {
       list( $id ) = run_query_insert_others_attendees(
-                     array( 'others_attendees' => array($attendee['id']['email']) ));
+          array( 'others_attendees' => array($attendee['id']['email']) ));
       $attendee['id'] = $id;
     }
   }
 
-  function parseAttendee() {
-    
-  }
-  
   function insertEvent(&$vevent) {
     $data = $this->parseEventData($vevent);
-    if (!is_null($data))
-    {
-		if(!$this->haveAccess($data['event']['owner'])) {
-		  $data['event']['owner'] = $GLOBALS['obm']['uid'];
-		}
-		$id = run_query_calendar_add_event($data['event'], $data['entities']);
-		$this->updateStates($data['states'], $id);
-		$this->updateAlerts($vevent->get('x-obm-alert'), $id);
-	} else {
-		$this->event_error ++;
-	}
+    if (!is_null($data)){
+      if(!$this->haveAccess($data['event']['owner'])) {
+        $data['event']['owner'] = $GLOBALS['obm']['uid'];
+      }
+      $id = run_query_calendar_add_event($data['event'], $data['entities']);
+      $this->updateStates($data['states'], $id);
+      $this->updateAlerts($vevent->get('x-obm-alert'), $id);
+    } else {
+      $this->event_error ++;
+    }
+    return $id;
   }
 
   function updateStates($states, $id) {
@@ -233,17 +241,17 @@ class Vcalendar_Writer_OBM {
 
   function updateAlerts($alerts, $id, $filter = null) {
     if(is_array($alerts))
-    foreach($alerts as $alert) {
-      if(!$filter || $filter != $alert['user'])
-        run_query_calendar_event_alert_insert($id, $alert['user'], $alert['duration']);
-    }
+      foreach($alerts as $alert) {
+        if(!$filter || $filter != $alert['user'])
+          run_query_calendar_event_alert_insert($id, $alert['user'], $alert['duration']);
+      }
   }
 
   function updateAttendees($id, &$vevent) {
     $data = $this->parseEventData($vevent);
     $this->updateStates($data['states'], $id);
   }
-  
+
   function updateEvent($id, &$vevent) {
 
     $data = $this->parseEventData($vevent);
@@ -284,8 +292,8 @@ class Vcalendar_Writer_OBM {
     }
     $name = addslashes(array_shift($categories));
     $query = "SELECT eventcategory1_id as id FROM EventCategory1 WHERE
-                     eventcategory1_label = '$name' AND 
-                     eventcategory1_domain_id ".sql_parse_id($GLOBALS['obm']['domain_id'], true);
+      eventcategory1_label = '$name' AND 
+      eventcategory1_domain_id ".sql_parse_id($GLOBALS['obm']['domain_id'], true);
     $this->db->query($query);
     if($this->db->next_record()) {
       return $this->db->f('id');
@@ -328,19 +336,21 @@ class Vcalendar_Writer_OBM {
     }
     $event['repeatfrequency'] = $rrule['interval'];
     $countFactor = $rrule['interval'];
-    $event['repeat_kind'] = $rrule['kind'];
     switch ($rrule['kind'])  {
-      case 'daily' :
-        $countUnit = 'day';
-        break;
       case 'yearly' :
         $countUnit = 'year';
-        break;
+        break;    
+      case 'daily' :
+        if(is_null($rrule['byday'])) {
+          $countUnit = 'day';
+          break;
+        }
+        $rrule['kind'] = 'weekly';
       case 'weekly' :
-        $countUnit = 'week';
+        $countUnit = 'day';
         $days = '0000000';
         if(!is_null($rrule['byday'])) {
-          $countFactor = $countFactor / count($rrule['byday']);
+          $countFactor = $countFactor / count($rrule['byday']) * 7;
           foreach($rrule['byday'] as $day) {
             $index = date('w', strtotime($day)); // - date('w', strtotime($GLOBALS['ccalendar_weekstart']));
             $days[$index] = '1';
@@ -363,11 +373,14 @@ class Vcalendar_Writer_OBM {
         $countUnit = 'month';
         break;        
     }
+    $event['repeat_kind'] = $rrule['kind'];
     if(!is_null($rrule['until'])) {
       $event['repeat_end'] = $rrule['until'];
     }elseif(!is_null($rrule['count'])) {
       $countFactor = ceil($countFactor * ($rrule['count'] - 1));
-      $event['repeat_end'] = new Of_Date(strtotime("+$countFactor $countUnit", strtotime($vevent->get('dtstart'))));      
+      $repeatEnd = clone $vevent->get('dtstart');
+      $repeatEnd->custom("+$countFactor $countUnit");
+      $event['repeat_end'] = $repeatEnd;      
     }else {
       $event['repeat_end'] = NULL;
     }
@@ -379,10 +392,6 @@ class Vcalendar_Writer_OBM {
       return true;
     }
     return false;
-  }
-   
-  function writeValarm(&$valarm) {
-
   }
 
 }

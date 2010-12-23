@@ -269,6 +269,10 @@ class Vcalendar_Reader_ICS {
     return $this->parseDate($value,$option);
   }
 
+  function parseTrigger($value,$option) {
+    return $this->parseDate($value,$option);
+  }  
+
   function parseCategories($value, $options) {
     return explode(',',$this->parseText($value,$options));
   }
@@ -463,13 +467,14 @@ class Vcalendar_Reader_ICS {
     global $cdg_sql;
 
     $db = new DB_OBM;
+    $db_type = $obm_q->type;
     if(!is_null($attendee['cn'])) {
       $this->cns[$entity][$attendee['cn']] = NULL;
       $cn = "OR cn = '".addslashes($attendee['cn'])."'";
     }
     if(!is_null($attendee['mail'])) {
       $this->mails[$entity][$attendee['mail']] = NULL;
-      $mail = "OR mail like '%".addslashes($attendee['mail'])."%' ";
+      $mail = "OR mail #LIKE '%".addslashes($attendee['mail'])."%' ";
     }
     if(!$mail && !$cn) {
       return NULL;
@@ -483,10 +488,10 @@ class Vcalendar_Reader_ICS {
               AND domain_id '.sql_parse_id($GLOBALS['obm']['domain_id'], true).'
               GROUP BY id, mail, cn';
     display_debug_msg($query, $cdg_sql, 'getOBMId');
-    $db->query($query);
+    $db->xquery($query);
     while($db->next_record()) {
       if((!is_null($attendee['cn']) && strtolower($db->f('cn')) == $attendee['cn']) ||
-         preg_match_all('/^('.($attendee['mail']).'|'.$attendee['email'].')\r?$/m',$db->f('mail'),$results)) { 
+         preg_match_all('/^('.($attendee['mail']).'|'.$attendee['email'].')\r?$/mi',$db->f('mail'),$results)) { 
         $this->cns[strtolower($db->f('cn'))][$entity] = $db->f('id');
         $emails = get_entity_email($db->f('mail'),null,true,null);
         foreach($emails as $email) {

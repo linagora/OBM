@@ -1333,7 +1333,7 @@ CREATE TABLE `Event` (
   `event_timezone` varchar(255) default 'GMT',
   `event_opacity` enum('OPAQUE','TRANSPARENT') default 'OPAQUE',
   `event_title` varchar(255) default NULL,
-  `event_location` varchar(100) default NULL,
+  `event_location` varchar(255) default NULL,
   `event_category1_id` int(8) default NULL,
   `event_priority` int(2) default NULL,
   `event_privacy` int(2) NOT NULL default '0',

@@ -878,7 +878,7 @@ CREATE TABLE event (
     event_timezone character varying(255) DEFAULT 'GMT'::character varying,
     event_opacity vopacity DEFAULT 'OPAQUE'::vopacity,
     event_title character varying(255) DEFAULT NULL::character varying,
-    event_location character varying(100) DEFAULT NULL::character varying,
+    event_location character varying(255) DEFAULT NULL::character varying,
     event_category1_id integer,
     event_priority integer,
     event_privacy integer,
