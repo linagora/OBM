@@ -679,17 +679,24 @@ if ($action == 'search') {
 } elseif ($action == 'attach_documents') {
 ///////////////////////////////////////////////////////////////////////////////
   $doc_ids = isset($params['sel_document_id']) ? $params['sel_document_id'] : array();
-  $event_entity_id = of_entity_get('event', $params['calendar_id']);
+  $existent_doc_ids = get_calendar_event_document_ids($params['calendar_id']);
+  $already_attached_doc_ids = array_intersect($doc_ids, $existent_doc_ids);
+  $doc_ids = array_diff($doc_ids, $existent_doc_ids);
   $other_files = run_query_insert_other_files($params);
   if (!$other_files) {
     $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
   } else {
     $doc_ids = array_merge($doc_ids, $other_files);
   }
+  $event_entity_id = of_entity_get('event', $params['calendar_id']);
   foreach ($doc_ids as $document_id) {
     run_query_calendar_attach_document($document_id, $event_entity_id);
   }
-  redirect_ok($params, "$l_document: $l_insert_ok");
+  if (count($already_attached_doc_ids) != 0) {
+    redirect_err($params, $l_warn_already_attached);
+  } else {
+    redirect_ok($params, "$l_document: $l_insert_ok");
+  }
   
 } elseif ($action == 'download_document') {
 ///////////////////////////////////////////////////////////////////////////////
