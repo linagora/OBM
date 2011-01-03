@@ -72,7 +72,12 @@ class OBM_AddressBook implements OBM_ISearchable {
             return $GLOBALS["l_{$this->name}"]." ($owner[label])";
           }
         } else {
-          return $this->name;
+          if ($this->owner == $GLOBALS['obm']['uid'] || $this->name == 'public_contacts') {
+            return $this->name;
+          } else {
+            $owner = get_entity_info($this->owner, 'user');
+            return $this->name." ($owner[label])";
+          }
         }
       } else {
         return $this->$property;
