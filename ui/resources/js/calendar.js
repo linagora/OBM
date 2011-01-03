@@ -2223,7 +2223,9 @@ Obm.CalendarQuickForm = new Class({
   },
 
   setQuickTitle: function() {
-    $('tf_quick_title').value = obm.vars.consts.template_title[$('template_id').selectedIndex];
+    if ($('tf_quick_title').value == '') {
+      $('tf_quick_title').value = obm.vars.consts.template_title[$('template_id').selectedIndex];
+    }
   },
 
   show: function() {
