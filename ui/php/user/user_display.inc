@@ -1638,6 +1638,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   if (isset($user['old_login'])) { $old_login = $user['old_login']; }
   if (isset($user['passwd'])) { $passwd = $user['passwd']; }
   if (isset($user['profile'])) { $profile = $user['profile']; }
+  if (isset($user['profiles'])) { $profiles = $user['profiles']; }
   if (isset($user['kind'])) { $kind = $user['kind']; }
   if (isset($user['lastname'])) { $lname = stripslashes($user['lastname']); }
   if (isset($user['firstname'])) { $fname = stripslashes($user['firstname']); }
@@ -2190,6 +2191,8 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     'people' => $GLOBALS['cright_write'],
     'group' => $GLOBALS['cright_write_admin'],
     'mailshare' => $GLOBALS['cright_write']);
+  $level = $profiles[$obm['profile']]['properties']['level'];
+  $managepeers = $profiles[$obm['profile']]['properties']['level_managepeers'];
   foreach ($user['profiles'] as $k_profile => $one_profile) {
     $selected = '';
     foreach($delegation_modules as $mdl => $rgt) {
@@ -2206,11 +2209,17 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     if (!isset($delegation_class) && $profile == $k_profile){
       $delegation_class = 'H';
       $selected = ' selected';
-    } 
-
-    $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
-    $block_profile .= "<option value=\"$k_profile\"$selected>$dis_profile</option>";
-
+    }
+    if (isset($profiles[$k_profile]['properties']['level'])) {
+      if (($profiles[$k_profile]['properties']['level'] > $level)
+    	|| (($profiles[$k_profile]['properties']['level'] == $level) && ($managepeers))) {
+        $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
+        $block_profile .= "<option value=\"$k_profile\"$selected>$dis_profile</option>";
+      }
+    } else {
+      $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
+      $block_profile .= "<option value=\"$k_profile\"$selected>$dis_profile</option>";
+    }
   }
   if ($cgp_use['property']['delegation']) {
     if (!isset($delegation_target)) $delegation_target = $obm['delegation_target'];
