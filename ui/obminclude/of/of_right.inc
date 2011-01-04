@@ -163,7 +163,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           <input style=\"$style_access\" type=\"checkbox\" name=\"cb_accept_access[]\" value=\"$sel_id\" $checked_access $disabled_access/>
         </td>
         <td class=\"cell_perms_read\">
-          <input style=\"$style_read\" type=\"checkbox\" name=\"cb_accept_read[]\" value=\"$sel_id\" $checked_read $disabled_read/>
+          <input style=\"$style_read\" type=\"checkbox\" name=\"cb_accept_read[]\" onclick=\"apply_checked_access(this, '$tr_id')\" onchange=\"apply_checked_access(this, '$tr_id')\" value=\"$sel_id\" $checked_read $disabled_read/>
         </td>
         <td class=\"cell_perms_write\">
           <input style=\"$style_write\" type=\"checkbox\" name=\"cb_accept_write[]\" onclick=\"apply_checked_read(this, '$tr_id')\" onchange=\"apply_checked_read(this, '$tr_id')\" value=\"$sel_id\" $checked_write $disabled_write/>
@@ -179,7 +179,8 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
 	if($cgp_default_right[$entity]['public']['read'] == -2) {
 		$block_consumer_read_public = "
 		  <span id=\"cb_read_public\">
-		  <input onclick=\"togglePrivacy(this,'cell_perms_read');\"
+		  <input onclick=\"if(togglePrivacy(this,'cell_perms_read')) apply_checked_access(this, 'public_perms') ;\"
+		  onchange=\"apply_checked_access(this, 'public_perms');\" 
 		  name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked disabled=\"disabled\" />
 		  </span>
 		  <input type=\"hidden\" name=\"cb_read_public\" value=\"1\" /> ";
@@ -187,7 +188,8 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
 	} else {
 		$block_consumer_read_public = "
 		  <span id=\"cb_read_public\">
-		  <input onclick=\"togglePrivacy(this,'cell_perms_read');\"
+		  <input onclick=\"if(togglePrivacy(this,'cell_perms_read')) apply_checked_access(this, 'public_perms');\"		
+		  onchange=\"apply_checked_access(this, 'public_perms');\" 
 		  name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
 		  </span>";
 		$publicClass = '';
@@ -355,6 +357,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
               var cb_read = td_element.getElement('input');
               if (cb_read !== false && cb_read.getProperty('type') == 'checkbox') {
                 cb_read.checked = true;
+		apply_checked_access(formElement, tr_id) ;
               }
             }
           }
@@ -363,7 +366,33 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
         var cb_public_read = $('cb_read_public').getElement('input');
         if (cb_public_read !== false && cb_public_read.getProperty('type') == 'checkbox') {
           cb_public_read.checked = true;
+	  apply_checked_access(formElement, tr_id) ;
           togglePrivacy(cb_public_read,'cell_perms_read',true);
+        }
+      }
+    }
+
+    function apply_checked_access(formElement, tr_id) {
+    
+      if (tr_id != 'public_perms') {
+        var td_elements = $(tr_id).getChildren();
+        
+        if (formElement.checked) {
+          for (var i=0; i<td_elements.length; i++) {
+            var td_element = td_elements[i];
+            if (td_element.hasClass('cell_perms_access')) {
+              var cb_access = td_element.getElement('input');
+              if (cb_access !== false && cb_access.getProperty('type') == 'checkbox') {
+                cb_access.checked = true;
+              }
+            }
+          }
+        }
+      } else if (formElement.checked) {
+        var cb_public_access = $('cb_access_public').getElement('input');
+        if (cb_public_access !== false && cb_public_access.getProperty('type') == 'checkbox') {
+          cb_public_access.checked = true;
+          togglePrivacy(cb_public_access,'cell_perms_access',true);
         }
       }
     }
@@ -485,6 +514,8 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
                               .setProperty('name', accept_read+'[]')
                               .setProperty('value', id)
                               .setProperty('disabled', accept_read_disabled)
+			      .setProperty('onclick', 'apply_checked_access(this, \''+tr_id+'\')')
+                              .setProperty('onchange', 'apply_checked_access(this, \''+tr_id+'\')')
         ).setStyle('visibility', accept_read_style).injectInside(result);
 
         new Element('td').addClass('cell_perms_write').adopt(

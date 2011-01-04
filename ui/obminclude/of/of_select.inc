@@ -165,6 +165,9 @@ function of_select_add_element_table(target, element_name, sel_id, fieldLabel) {
     cb_read.value = sel_id;
     cb_read.disabled = accept_read_disabled;
     cb_read.style.visibility = accept_read_style;
+    cb_read.setProperty('onchange', 'apply_checked_access(this, \''+element_name+'-'+sel_id+'\')');
+    cb_read.setProperty('onclick', 'apply_checked_access(this, \''+element_name+'-'+sel_id+'\')');
+
     
     // Create the write perm checkbox
     var cb_write_public = $(target.getElementById('cb_write_public'));
