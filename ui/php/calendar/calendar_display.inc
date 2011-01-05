@@ -969,13 +969,21 @@ function dis_calendar_html_search_form($calendar, $p="") {
 
   $date_begin = $calendar['date_begin'];
   if (!$date_begin) {
-    $tf_date_begin = "";
+    if (!$today_d) {
+      $tf_date_begin = "";
+    } else {
+      $tf_date_begin = $today_d->getInputDate();
+    }
   } else {
     $tf_date_begin = $date_begin->getInputDate();
   }
   $date_end = $calendar['date_end'];
   if (!$date_end) {
-    $tf_date_end = "";
+    if (!$today_d) {
+      $tf_date_end = "";
+    } else {
+      $tf_date_end = $today_d->getInputDate();
+    }
   } else {
     $tf_date_end = $date_end->getInputDate();
   }
