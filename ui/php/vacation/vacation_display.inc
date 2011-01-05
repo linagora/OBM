@@ -134,7 +134,8 @@ function html_vacation_form($usr_q, $vacation, $field='') {
   }
   // hour begin
   $dis_hour_b = "<select $schedule_disabled name=\"sel_time_begin\" style=\"width:4em;\">";
-  for ($i=$ccalendar_first_hour; $i<$ccalendar_last_hour; $i++) {
+  //for ($i=$ccalendar_first_hour; $i<$ccalendar_last_hour; $i++) {
+  for ($i=0; $i<24; $i++) {
     $current_hour = substr("0$i",-2,2); 
     if ($current_hour == $vacation_datebegin->getHour()) {
       $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
