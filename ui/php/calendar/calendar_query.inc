@@ -5002,7 +5002,7 @@ function run_query_calendar_solr_store($event_id) {
   $doc->setField('domain', $db->f('event_domain_id'));
   $doc->setField('title', $db->f('event_title'));
   $doc->setField('location', $db->f('event_location'));
-  $doc->setMultiValue('category', $db->f('event_category1_id'));
+  $doc->setMultiValue('category', $db->f('eventcategory1_id'));
   $doc->setMultiValue('category', $db->f('eventcategory1_label'));
   $edate = new Of_Date($db->f('event_date'));
   $doc->setField('date', $edate->format('Y-m-d\TH:i:s\Z'));
@@ -5010,7 +5010,7 @@ function run_query_calendar_solr_store($event_id) {
   $doc->setMultiValue('ownerId', $db->f('owner'));
   $doc->setMultiValue('owner', $db->f('owner_lastname')." ".$db->f('owner_firstname'));
   $doc->setField('description', $db->f('event_description'));
-  $doc->setMultiValue('tag', $db->f('event_tag_id'));
+  $doc->setMultiValue('tag', $db->f('eventtag_id'));
   $doc->setMultiValue('tag', $db->f('eventtag_label'));
   if ($db->f('event_allday')) {
     $doc->setMultiValue('is', 'allday');
