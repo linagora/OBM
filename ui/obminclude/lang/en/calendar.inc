@@ -193,6 +193,7 @@ $l_err_weekly_repeat = "For weekly repetition, the end of the repetition must be
 $l_err_monthly_dateend_repeat = "Monthly repetition date end must be at least one month later than the event date end.";
 $l_err_yearly_dateend_repeat = "Yearly repetition date end must be at least one year later than the event date end.";
 $l_err_repeatfrequency = "Frequency is invalid";
+$l_err_template_xml_import = "The XML file is not well-formed !";
 $l_event_cant_delete = "You can only delete your own events!";
 $l_fill_view_label = "You have to fill in the [$l_view_label] field";
 $l_confirm_delete_view = "Do you really want to delete this view?";

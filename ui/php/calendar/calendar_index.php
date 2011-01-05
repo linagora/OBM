@@ -888,12 +888,17 @@ if ($action == 'search') {
 } elseif ($action == 'import_template')  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($_FILES['template_file']['tmp_name']) {
+    libxml_use_internal_errors(true);
     $xml = simplexml_load_file($_FILES['template_file']['tmp_name']);
-    $retour = run_query_calendar_import_template($xml);
-    if ($retour) {
-      redirect_ok($params, "$l_template : $l_import_ok");
+    if (!$xml) {
+      $display['msg'] .= display_err_msg("$l_template : $l_err_template_xml_import");
     } else {
-      $display['msg'] .= display_err_msg("$l_template : $l_import_error");
+      $retour = run_query_calendar_import_template($xml);
+      if ($retour) {
+        redirect_ok($params, "$l_template : $l_import_ok");
+      } else {
+        $display['msg'] .= display_err_msg("$l_template : $l_import_error");
+      }
     }
   } else {
     $display['msg'] .= display_err_msg("$l_template : $l_file_error");

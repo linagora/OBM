@@ -268,6 +268,7 @@ $l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de r
 $l_err_monthly_dateend_repeat = "La date de fin de répétition mensuelle doit être au moins de 1 mois supérieure à la date de fin de l'évènement.";
 $l_err_yearly_dateend_repeat = "La date de fin de répétition annuelle doit être au moins de 1 an supérieure à la date de fin de l'évènement.";
 $l_err_repeatfrequency = "La fréquence est invalide";
+$l_err_template_xml_import = "Le fichier XML est mal formé !";
 $l_event_cant_delete = "Vous ne pouvez supprimer que vos évènements !";
 
 $l_fill_view_label = "Vous devez spécifier le nom de la vue avant de valider";
