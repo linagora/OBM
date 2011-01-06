@@ -1571,6 +1571,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
     obm.vars.consts.userStyle = '".$current_view->get_class($GLOBALS[obm][uid], 'user')."'; 
     obm.vars.consts.userId = '$GLOBALS[obm][uid]';
     obm.vars.consts.calendarUrl = '".$GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME'])."';
+    obm.vars.consts.calendarDetailconsultExtURL = '".$GLOBALS[path]."/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsultExt&calendar_id='; 
     obm.vars.consts.calendarDetailconsultURL = '".$GLOBALS[path]."/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id='; 
     obm.vars.consts.action = '".$GLOBALS['action']."';
     obm.vars.labels.more = '".phpStringToJsString($GLOBALS['l_more'])."';
@@ -1888,8 +1889,12 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
               <tr>
                 <th>$l_items</th><td>$item_list</td>
               </tr>
-            </table>
-            <a $target href=\"".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>";
+            </table>";
+          if ($event->isExternal()) {
+            $event_details .= "<a $target href=\"".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsultExt&amp;calendar_id=$ev_id&amp;contact_id=$event->owner\"><img src=\"$ico_search\" title=\"[Info]\"/></a>";
+          } else {
+            $event_details .= "<a $target href=\"".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>";
+          }
         }
         if($event->all_day) {
           if($end->subSecond(1)->compareDateIso($date) != 0) {
@@ -2555,12 +2560,17 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
       $schedule = $occurrence->date->get(Of_Date::TIME_SHORT);
     }
   }
-
-  $event_data = "
-    <li style='$style'>
-    <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$schedule - $title</a>
-    </li>";
-
+  if ($occurrence->event->isExternal()) {
+    $event_data = "
+      <li style='$style'>
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsultExt&amp;calendar_id=".$occurrence->event->id."&amp;contact_id=".$occurrence->event->owner."\">$schedule - $title</a>
+      </li>";
+  } else {
+    $event_data = "
+      <li style='$style'>
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$schedule - $title</a>
+      </li>";
+  }
   return $event_data;  
 }
 
@@ -2620,9 +2630,14 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
   $event_data = "
     <li class='RC'>
     $schedule
-    <div>
-      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$title</a>
-    </div>
+    <div>";
+  if ($occurrence->event->isExternal()) {
+     $event_data .= "<a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsultExt&amp;calendar_id=".$occurrence->event->id."&amp;contact_id=".$occurrence->event->owner."\">$title</a>";
+
+  } else { 
+     $event_data .= "<a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$title</a>";
+  }
+  $event_data .= "</div>
     </li>";
 
   return $event_data;  

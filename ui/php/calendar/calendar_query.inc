@@ -4294,7 +4294,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
             }
             $event = new Event($uid,$vevent->getDuration(), $vevent->getSummary(), $vevent->getLocation(),
               $vevent->getCategory(),$vevent->isPrivate(),$vevent->getDescription(), null,
-              $vevent->isAllDay(),'none',$c['id'],$owner_name, null, $vevent->getTransparency(),null);
+              $vevent->isAllDay(),'none',$c['id'],$owner_name, null, $vevent->getTransparency(),null,true);
             $attendees = $vevent->evt->getAttendees();
             $partstat = 'ACCEPTED';
             foreach($attendees as $attendee) {
@@ -5060,6 +5060,7 @@ Class Event {
   var $color;
   var $tag ;
   var $timezone;
+  var $external;
 
   /**
    * Event 
@@ -5080,7 +5081,7 @@ Class Event {
    * @access public
    * @return void
    */
-  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color,$opacity,$tag) {
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color,$opacity,$tag,$external=false) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
@@ -5097,6 +5098,7 @@ Class Event {
     $this->color = $color;
     $this->opacity = $opacity;
     $this->tag = $tag;
+    $this->external = $external;
   }
 
   /**
@@ -5132,6 +5134,10 @@ Class Event {
 
   function isPrivate() {
     return ($this->privacy == 1);
+  }
+
+  function isExternal() {
+    return ($this->external);
   }
 
   function isAllDay() {

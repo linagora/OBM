@@ -1548,7 +1548,7 @@ function get_calendar_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/calendar/calendar_index.php?action=detailconsultExt&amp;calendar_id=$id",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailconsultExt') 
+    'Condition'=> array ('None') 
   );
 
   // Detail Update

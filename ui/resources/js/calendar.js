@@ -154,20 +154,22 @@ Obm.CalendarManager = new Class({
             current.setMilliseconds(0);
             var more = $('more_'+index);
             var target = "";
+            var title = "";
             if (obm.vars.consts.action == 'portlet') target = "target='_blank'";
             if (more) {
-              if (evt.isExternal()) {
-                var title = '<b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title;
-              } else {
-                
-              }
               if (evt.event.colors.event && evt.event.colors.event.body) color = evt.event.colors.event.body;
-              if (evt.isExternal()) {
-                var title = '<b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title;
-              } else if (evt.event.all_day) {
-                title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'>'+evt.event.title+'</a>';
+              if (evt.event.all_day) {
+                if (evt.isExternal()) {
+                  title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultExtURL+evt.event.id+'&contact_id='+evt.event.entity_id+'>'+evt.event.title+'</a>';
+                } else {
+                  title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'>'+evt.event.title+'</a>';
+                }
               } else {
-                title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title+'</a>';
+                if (evt.isExternal()){
+                  title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultExtURL+evt.event.id+'&contact_id='+evt.event.entity_id+'><b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title+'</a>';
+                } else {
+                  title = '<a '+target+' href='+obm.vars.consts.calendarDetailconsultURL+evt.event.id+'><b>'+evt.event.date.format(obm.vars.regexp.dispTimeFormat)+'</b> - '+evt.event.title+'</a>';
+                }
               }
               color = "#fff";
               klass='class="moreEvent '+evt.event.klass+'"';
@@ -595,7 +597,7 @@ Obm.CalendarManager = new Class({
 
 
   /**
-   * Redraw all-day grid (top position & size)
+   * Redraw all-day grid (top posttion & size)
    */
   redrawAllDayGrid: function() {
     var updated = new Array();
@@ -1497,7 +1499,6 @@ Obm.CalendarInDayEvent = new Class({
 	  this.timeContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultExtURL+this.event.id+'&contact_id='+this.event.entity_id );
      /* this.timeContainer = new Element('span').injectInside(this.dragHandler);*/
       this.timeContainer.injectInside(this.dragHandler);
-
     } else {
       this.timeContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id);
       if (obm.vars.consts.action == 'portlet') this.timeContainer.setProperty('target', '_blank');
@@ -1753,12 +1754,14 @@ Obm.CalendarAllDayEvent = new Class({
 
 
     if (this.isExternal()) {
-      this.titleContainer = new Element('span').injectInside(this.dragHandler);
+      this.titleContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultExtURL+this.event.id+'&contact_id='+this.event.entity_id );
+      /*this.titleContainer = new Element('span').injectInside(this.dragHandler);*/
+      this.titleContainer.injectInside(this.dragHandler);
     } else {
       this.titleContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id);
       if (obm.vars.consts.action == 'portlet') this.titleContainer.setProperty('target', '_blank');
       this.titleContainer.injectInside(this.dragHandler);
-
+    
       this.linkContainer = this.titleContainer;
       this.linkContainer.addEvent('mousedown', function (evt) {
         this.linkContainer.addEvent('mouseup', 
