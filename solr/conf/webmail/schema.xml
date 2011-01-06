@@ -12,6 +12,7 @@
 		catenateWords="0" catenateNumbers="0" 
 		catenateAll="0" splitOnCaseChange="1"/>
 	<filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.ASCIIFoldingFilterFactory"/>
 	<!--
 	    <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
 	-->
