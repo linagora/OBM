@@ -325,7 +325,7 @@ function run_query_host_insert($host) {
  * @return true is update OK
  */
 function run_query_host_update($host) {
-  global $obm, $cdg_sql;
+  global $obm, $cdg_sql, $cmd_update_ftp_entity;
 
   $id = sql_parse_id($host['host_id'], true);
   $name = $host['name'];
@@ -410,6 +410,18 @@ function run_query_host_update($host) {
       of_service_property_insert('backup_ftp', 'login', $entity_id, $host['backup_ftp_login']);
       of_service_property_insert('backup_ftp', 'password', $entity_id, $host['backup_ftp_password']);
       of_service_property_insert('backup_ftp', 'root', $entity_id, $host['backup_ftp_root']);
+	  // get domain id of host
+      $query = "SELECT host_domain_id 
+                FROM Host 
+                WHERE host_id $id";
+      $retour = $obm_q->query($query);
+      $obm_q->next_record();
+      $domain_id = $obm_q->f('host_domain_id');
+      if ($domain_id) {
+         $cmd = 'echo "host:'.$name.'" | '.$cmd_update_ftp_entity.' '.$domain_id ;
+         display_debug_msg($cmd, $cdg_exe, 'run_query_host_update()');
+         exec($cmd) ;
+      }
     } else {
       of_service_delete('backup_ftp', $entity_id); 
     }

@@ -489,6 +489,7 @@ $cmd_mailforward = "$path/../auto/updateSieve.pl";
 $cmd_vacation = "$path/../auto/updateSieve.pl";
 $cmd_ldap_passwd = "$path/../auto/changePasswd.pl";
 $cmd_update_bal_acl = "$path/../auto/updateCyrusAcl.pl";
+$cmd_update_ftp_entity = "$path/../auto/update.pl --entity --domain-id";
 
 $section = $cgp_show['module'][$module];
 
