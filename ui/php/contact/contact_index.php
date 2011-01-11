@@ -462,6 +462,9 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if($params['contactfilter']) $pattern .= 'displayname:'.$params['contactfilter'];
     if($params['addressbook']) $current['addressbook'] = $params['addressbook'];
     else $current['addressbook'] = 'search';
+    if(function_exists('user_modify_contact_search_pattern')) {
+      $params['searchpattern'] = user_modify_contact_search_pattern($params['searchpattern'].' '.$pattern);
+    }
     $contacts = $addressbooks->searchContacts($params['searchpattern'].' '.$pattern, $params['offset']);
     if ($params['updateCount']) echo dis_update_addressbook_count($addressbooks, $params['searchpattern'].' '.$pattern.' addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks())).')', 'search');
     $subTemplate['contacts'] = new OBM_Template('contacts');
@@ -470,6 +473,9 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   } elseif ($action == 'countContact') {
   ///////////////////////////////////////////////////////////////////////////////
     if(isset($params['searchpattern'])) {
+      if(function_exists('user_modify_contact_search_pattern')) {
+        $params['searchpattern'] = user_modify_contact_search_pattern($params['searchpattern']);
+      }
       $count = $addressbooks->countContact($params['searchpattern']);
       echo $count;
       exit(0);
@@ -480,6 +486,9 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     //FIXME Erreur de droit
   } elseif ($action == 'filterContact') {
   ///////////////////////////////////////////////////////////////////////////////
+    if(function_exists('user_modify_contact_search_pattern')) {
+        $params['searchpattern'] = user_modify_contact_search_pattern($params['searchpattern']);
+      }
     $addressbooks = OBM_AddressBook::search();
     if($params['contactfilter']) $pattern = 'displayname:'.$params['contactfilter'];
     $contacts = $addressbooks->searchContacts($params['searchpattern'].' '.$pattern);
