@@ -897,7 +897,7 @@ if ($action == 'search') {
       if ($retour) {
         redirect_ok($params, "$l_template : $l_import_ok");
       } else {
-        $display['msg'] .= display_err_msg("$l_template : $l_import_error");
+        $display['msg'] .= display_err_msg("$l_template : $l_err_template_xml_import");
       }
     }
   } else {

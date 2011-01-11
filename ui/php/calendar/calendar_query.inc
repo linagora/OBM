@@ -2790,11 +2790,16 @@ function run_query_calendar_import_template($xml) {
   global $obm, $cdg_sql;
   
   if ($xml->getName() == 'event_templates') {
-    $retour = true;
     foreach ($xml->event_template as $template) {
-      $retour = run_query_calendar_import_template($template);
+      if (!run_query_calendar_import_template($template)) {
+        return false;
+      }
     }
-    return $retour;
+    return true;
+  }
+  
+  if (!$xml instanceof SimpleXMLElement || $xml->getName() != 'event_template') {
+    return false;
   }
   
   $columns = array('name','title','owner','date','description','location',
@@ -2807,7 +2812,9 @@ function run_query_calendar_import_template($xml) {
     $$column = ($value == '') ? 'NULL' : "'$value'";
   }
   
-  $properties = $xml->properties->extended_desc->asXML();
+  if (!is_null($xml->properties->extended_desc)) {
+    $properties = $xml->properties->extended_desc->asXML();
+  }
   
   $entities = array();
   foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
