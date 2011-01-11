@@ -361,9 +361,9 @@ class Vcalendar_Writer_OBM {
       case 'monthly' :
         $countUnit = 'month';
         if(!is_null($rrule['byday'])) {
-          $event['repeat_kind'] = 'monthlybyday';
+          $rrule['kind'] = 'monthlybyday';
         } else {
-          $event['repeat_kind'] = 'monthlybydate';
+          $rrule['kind'] = 'monthlybydate';
         }
         break;
       case 'monthlybyday' :
