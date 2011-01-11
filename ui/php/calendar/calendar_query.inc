@@ -820,11 +820,12 @@ function run_query_calendar_insert_event_data($calendar) {
     $event_day = $datebegin->getWeekday();
     if($days[$event_day] != 1) {
       for($i = ($event_day +1)%7; $i != $event_day; $i = ($i+1)%7) {
+        $datebegin->addDay(1);
         if($days[$i] == 1) {
           $datebegin->setWeekday($i);
           break;
-        } 
-      }      
+        }
+      }
     } 
   } else {
     $repeat_days = '0000000';
