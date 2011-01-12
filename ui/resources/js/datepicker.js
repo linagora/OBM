@@ -484,23 +484,25 @@ function miniCal(year, month, view) {
           // see https://www.obm.org/bugzilla/show_bug.cgi?id=1053
           return true;
         }
-        if (this.hasClass('selected')) {
-          if (obm.vars.consts.nbDisplayedDays == 1) {
-            obm.vars.consts.nbDisplayedDays = 7;
-            obm.calendarManager.customStart = false;
-            obm.calendarManager.showWeek(this.id/1000);
+        if (obm.calendarManager.customStart) {
+          if (this.hasClass('selected')) {
+            if (obm.vars.consts.nbDisplayedDays == 1) {
+              obm.vars.consts.nbDisplayedDays = 7;
+              obm.calendarManager.customStart = false;
+              obm.calendarManager.showWeek(this.id/1000);
+            } else {
+              obm.calendarManager.showDay(this.id/1000);
+              obm.calendarManager.customStart = false;
+            }
           } else {
-            obm.calendarManager.showDay(this.id/1000);
-            obm.calendarManager.customStart = false;
-          }
-        } else {
-          if (obm.vars.consts.nbDisplayedDays == 1) {
-            obm.calendarManager.showDay(this.id/1000);
-            obm.calendarManager.customStart = false;
-          } else {
-            obm.vars.consts.nbDisplayedDays = 7;
-            obm.calendarManager.customStart = false;
-            obm.calendarManager.showWeek(this.id/1000);
+            if (obm.vars.consts.nbDisplayedDays == 1) {
+              obm.calendarManager.showDay(this.id/1000);
+              obm.calendarManager.customStart = false;
+            } else {
+              obm.vars.consts.nbDisplayedDays = 7;
+              obm.calendarManager.customStart = false;
+              obm.calendarManager.showWeek(this.id/1000);
+            }
           }
         }
       });
@@ -529,6 +531,9 @@ function miniCal(year, month, view) {
 
   $('obmMiniCalendar').innerHTML = '';
   $('obmMiniCalendar').adopt(table);
+  $('obmMiniCalendar').addEvent('mouseenter', function () {
+      obm.calendarManager.customStart = false;
+    }); 
   $('obmMiniCalendar').addEvent('mouseleave', function () {
       if (obm.calendarManager.customStart) {
         obm.miniCalendar.clearSelection(); 
