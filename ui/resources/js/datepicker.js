@@ -529,6 +529,11 @@ function miniCal(year, month, view) {
 
   $('obmMiniCalendar').innerHTML = '';
   $('obmMiniCalendar').adopt(table);
+  $('obmMiniCalendar').addEvent('mouseleave', function () {
+      if (obm.calendarManager.customStart) {
+        obm.miniCalendar.clearSelection(); 
+        obm.calendarManager.customStart = false;
+      }});  
 
   return false;
 }
