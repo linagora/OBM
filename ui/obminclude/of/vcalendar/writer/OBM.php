@@ -107,11 +107,43 @@ class Vcalendar_Writer_OBM {
   }
 
   function getEventByExtId($id) {
-    $query = "SELECT event_id as id FROM Event WHERE event_ext_id = '$id'";
+    $query = "SELECT event_id as id, event_owner FROM Event WHERE event_ext_id = '$id'";
     $this->db->query($query);
     if($this->db->nf() == 0) {
       return null;
     }
+    if($this->db->nf() > 1){
+      // Returns event owned by user if exists
+      while($this->db->next_record()){
+        if(($this->db->f('event_owner') == $GLOBALS['obm']['uid'])){
+          $eventData = $this->getEventById($this->db->f('id'));
+          return $eventData;
+        }
+
+      }
+      
+      // Returns event where user is an attendee if exists
+      $this->db->seek(0);
+      while($this->db->next_record()){
+        $eventAttendees = $this->getEventAttendees($this->db->f('id'));
+        if(is_array($eventAttendees) && in_array($GLOBALS['obm']['uid'], array_keys($eventAttendees))){
+          $eventData = $this->getEventById($this->db->f('id'));
+          return $eventData;
+        }
+      }
+
+      // Returns event where user has rights
+      $this->db->seek(0);
+      while($this->db->next_record()){
+        if($this->haveAccess($this->db->f('event_owner'))){
+          $eventData = $this->getEventById($this->db->f('id'));
+          return $eventData;
+        }
+      }
+      
+      $this->db->seek(0);
+    }
+
     $this->db->next_record();
     $eventData = $this->getEventById($this->db->f('id'));
     return $eventData;    
@@ -153,7 +185,7 @@ class Vcalendar_Writer_OBM {
       $event['date_end'] = $vevent->get('dtend');
       $event['event_duration'] = $vevent->get('duration');
       $event['duration'] = $vevent->get('duration');
-      $event['opacity'] = $vevent->get('transp');
+      $event['opacity'] = $vevent->get('transp') ? $vevent->get('transp') : "OPAQUE";
 
       $event['date_exception'] = array();
       $exdates = $vevent->get('exdate');
@@ -392,6 +424,25 @@ class Vcalendar_Writer_OBM {
       return true;
     }
     return false;
+  }
+
+  function getEventAttendees($eventId){
+    $db = new DB_OBM;
+    $query =  "SELECT     userobm.*
+               FROM       event
+               INNER JOIN eventlink ON event.event_id = eventlink.eventlink_event_id
+               INNER JOIN userentity ON eventlink.eventlink_entity_id = userentity.userentity_entity_id
+               INNER JOIN userobm ON userentity.userentity_user_id = userobm.userobm_id
+               WHERE      event_id = '".$eventId."'";
+    $db->query($query);
+    if($db->nf() == 0)
+      return null;
+    
+    $attendees = array();
+    while($db->next_record()){
+      $attendees[$db->f("userobm_id")] = $this->db->Record;
+    }
+    return $attendees;
   }
 
 }
