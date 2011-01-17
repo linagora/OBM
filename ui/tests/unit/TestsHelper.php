@@ -229,7 +229,7 @@ class OBM_Database_CsvDataSet extends PHPUnit_Extensions_Database_DataSet_CsvDat
     if($csvFile == null) {
       $csvFile = dirname(__FILE__).'/db_data/'.$tableName.'.csv';
     }
-    parent::addTable($tableName, $csvFile);
+    parent::addTable(strtolower($tableName), $csvFile);
   }
 
   protected function createIterator($reverse = FALSE) {

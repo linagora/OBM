@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/TestsHelper.php';
 require_once 'php/calendar/calendar_query.inc';
 require_once 'of_date.inc';
 require_once 'obmlib.inc';
+require_once 'EventMailObserverTest.php';
+require_once 'vcalendar/writer/OBM.php';
 
 /**
  * FIXME Currently EventFactory does not handle database... pretty useless isn't it?
@@ -39,7 +41,7 @@ class EventTest extends OBM_Database_TestCase {
 
   protected function getDataSet() {
     $csvDataSet = new OBM_Database_CsvDataSet(';');
-    $csvDataSet->addTable('Entity');    
+    $csvDataSet->addTable('Entity');
     $csvDataSet->addTable('Domain');
     $csvDataSet->addTable('DomainEntity');
     $csvDataSet->addTable('UserObm');
@@ -54,7 +56,9 @@ class EventTest extends OBM_Database_TestCase {
     $csvDataSet->addTable('EventLink');
     $csvDataSet->addTable('EventException');
     $csvDataSet->addTable('of_usergroup');
-    $csvDataSet->addTable('EntityRight');    
+    $csvDataSet->addTable('EntityRight');
+    $csvDataSet->addTable('CalendarEntity');
+    $csvDataSet->addTable('EventEntity');
     return $csvDataSet;
   }
 
@@ -204,6 +208,49 @@ class EventTest extends OBM_Database_TestCase {
 
 
   public function testModifyPartStat() {
+  }
+
+
+  /*
+   * Test that getEventByExtId method of Vcalendar_Writer_OBM returns in the order :
+   * - The first event if there is only one event with the same ext id
+   * - The event with the given ext id and owned by the current user if exists
+   * - The event with the given ext id and where current user is an attendee
+   * - The event with the given ext id and where current user has write rights on the event's owner calendar
+   * - The first event if several events with the same ext_id exists but user isn't owner or attendee and hasn't got write rights
+   */
+  public function testVcalendarGetSingleEventByExtId(){
+    // lmartin should get the event he owns (the 4)
+    $GLOBALS['obm']['uid'] = 9;
+    $GLOBALS['obm']['domain_id'] = 3;
+    OBM_Acl::initialize();
+    $writerOBM = new Vcalendar_Writer_OBM();
+    $eventData = $writerOBM->getEventByExtId("double");
+    $this->assertEquals(4, $eventData->Record["event_id"]);
+
+    // ytouzet should get the event he has rights on (the 4)
+    $GLOBALS['obm']['uid'] = 10;
+    $writerOBM = new Vcalendar_Writer_OBM();
+    $eventData = $writerOBM->getEventByExtId("double");
+    $this->assertEquals(4, $eventData->Record["event_id"]);
+
+    // adupont should get the event which he participates (the 3)
+    $GLOBALS['obm']['uid'] = 8;
+    $writerOBM = new Vcalendar_Writer_OBM();
+    $eventData = $writerOBM->getEventByExtId("double");
+    $this->assertEquals(3, $eventData->Record["event_id"]);
+
+    // someone without write rights, not owner nor participant should get the first event with "double" ext_id
+    $GLOBALS['obm']['uid'] = 11;
+    $writerOBM = new Vcalendar_Writer_OBM();
+    $eventData = $writerOBM->getEventByExtId("double");
+    $this->assertEquals(2, $eventData->Record["event_id"]);
+
+    // With a single event matching an ext id, getEventByExtId should return this single event
+    $GLOBALS['obm']['uid'] = 9;
+    $writerOBM = new Vcalendar_Writer_OBM();
+    $eventData = $writerOBM->getEventByExtId("single");
+    $this->assertEquals(5, $eventData->Record["event_id"]);
   }
 
 }
