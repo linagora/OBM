@@ -20,9 +20,9 @@ $l_update_state = "Etat de mise à jour";
 // Mail chooser labels
 $l_mailboxchoice_least_boxes = "gérant le moins de boîtes mail";
 $l_mailboxchoice_least_used_disk = "utilisant le moins d'espace disque";
-$l_mailshares_quota_default = "# bals partagées : quota par défaut";
+$l_mailshares_quota_default = "Dossiers partagés : quota par défaut";
 $l_help_mailshares_quota_default = "Définit la quota par défaut des bals partagées de ce domaine, la valeur 0 correspond à aucun quota.";
-$l_mailshares_quota_max = "# bals partagées : quota maximum";
+$l_mailshares_quota_max = "Dossiers partagés : quota maximum";
 $l_help_mailshares_quota_max = "Définit la quota maximum des bals partagées de ce domaine, la valeur 0 correspond à aucun quota.";
 
 // Actions
@@ -44,7 +44,7 @@ $l_mailshares_quota_error = "Le quota par défaut ne peux pas être supèrieur a
 
 $l_max_users = "# utilisateurs max";
 $l_max_resources = "# ressources max";
-$l_max_mailshares = "# bals partagées max";
+$l_max_mailshares = "# dossiers partagés max";
 $l_mail_quota = "Quota mail";
 $l_address1 = "$l_address 1";
 $l_address2 = "$l_address 2";
