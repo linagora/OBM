@@ -9462,31 +9462,26 @@ function html_calendar_template_name_popup() {
  * @return string
  */
 function html_calendar_file_block() {
-  $nb_private = run_query_global_document_quota($GLOBALS["obm"]["uid"]);
-  if ($nb_private < $GLOBALS['c_quota_private_document']) {
-    $nbdocs = $GLOBALS['c_quota_private_document'] - $nb_private;
-    $GLOBALS['js']['vars']['consts']['nbdocs'] = $nbdocs-1;
-    $style = "";
-    if ($nbdocs <= 1) {
-      $style = "style='display:none;'";
-    }
-    return "<th class='' id='calendarFileBlock'>
-      $GLOBALS[l_other_files]
-      <a id='addFileButton' href='#' $style onclick=\"add_file_field();return false;\">
-        <img src=\"$GLOBALS[ico_add]\" alt=\"[Add file field]\" />
-      </a>
-    </th>
-    <td id='calendarFileHome'>
-      <div class=\"multiple\">
-        <a onclick=\"remove_element(this.parentNode,'calendarFileHome');obm.vars.consts.nbdocs++;$('addFileButton').style.display = '';return false\" href=\"\">
-         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
-        </a>        
-        <input type=\"file\" size=\"7\" class=\"otherFile\" name=\"fi_other_files[]\" />  
-      </div>
-    </td>";
-  } else {
-    return "<th>$GLOBALS[l_other_files]</th><td><span class='warning legend'>$GLOBALS[l_overquota]</span></td>";
+  $nbdocs = $GLOBALS['c_quota_private_document'] - $nb_private;
+  $GLOBALS['js']['vars']['consts']['nbdocs'] = $nbdocs-1;
+  $style = "";
+  if ($nbdocs <= 1) {
+    $style = "style='display:none;'";
   }
+  return "<th class='' id='calendarFileBlock'>
+    $GLOBALS[l_other_files]
+    <a id='addFileButton' href='#' $style onclick=\"add_file_field();return false;\">
+      <img src=\"$GLOBALS[ico_add]\" alt=\"[Add file field]\" />
+    </a>
+  </th>
+  <td id='calendarFileHome'>
+    <div class=\"multiple\">
+      <a onclick=\"remove_element(this.parentNode,'calendarFileHome');obm.vars.consts.nbdocs++;$('addFileButton').style.display = '';return false\" href=\"\">
+       <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+      </a>        
+      <input type=\"file\" size=\"7\" class=\"otherFile\" name=\"fi_other_files[]\" />  
+    </div>
+  </td>";
 }
 
 /**

@@ -7,6 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
+class OverQuotaDocumentException extends Exception {}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Document search query execution
@@ -34,8 +35,12 @@ function run_query_document_search($document) {
   $timecreate = sql_date_format($db_type, "document_timecreate", "timecreate");
   $timeupdate = sql_date_format($db_type, "document_timeupdate", "timeupdate");
   $multidomain = sql_multidomain("document");
-	
-  $where .= sql_obm_entity_privacy("document");
+  
+  if (!isset($document["private"]) || $document["private"] == 1) {
+    $where .= "(document_privacy = '1' AND document_usercreate = '$obm[uid]')";
+  } else {
+    $where .= sql_obm_entity_privacy("document");
+  }
   $where .= " AND document_kind != $cdoc_kind_dir";
 
   if (($entity != "") && ($entity != "document")) {
@@ -220,6 +225,10 @@ function run_query_document_insert(&$document) {
   $url = $document["url"];
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
   $entity = $document["entity"];
+  
+  if ($privacy != 0) {
+    check_document_user_quota($size, $uid);
+  }
 
   if ($size == "") $size = 0;
   
@@ -281,10 +290,10 @@ function run_query_document_insert(&$document) {
     // We create the document on disk
     if ($kind == $cdoc_kind_file) {
       if (! run_query_document_create_file($document)) {
-	$err["msg"] = $l_create_file_error;
-	// If error, we delete The document infos to keep bd and rep on sync
-	run_query_document_delete($doc_id);
-	return false;
+        $err["msg"] = $l_create_file_error;
+        // If error, we delete The document infos to keep bd and rep on sync
+        run_query_document_delete($doc_id);
+        return false;
       }
     }
 
@@ -1116,6 +1125,39 @@ function check_document_can_delete($p_id) {
   return $delete_ok;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Check user quota when uploading a new private document
+// Parameters:
+//   - $size : size of the newly uploaded document
+//   - $u_id : user ID
+// Throws an exception if the user is over quota
+///////////////////////////////////////////////////////////////////////////////
+function check_document_user_quota($size, $u_id) {
+  global $c_quota_private_document;
+  
+  if ($c_quota_private_document == 0) return;
+  
+  $user_quota = run_query_document_user_quota($u_id);
+  if ($user_quota + $size > $c_quota_private_document) {
+    throw new OverQuotaDocumentException();
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Retrieve user quota
+///////////////////////////////////////////////////////////////////////////////
+function run_query_document_user_quota($u_id) {
+  global $cdg_sql;
+  
+  $query = "SELECT SUM(document_size) AS sum_size FROM Document WHERE 
+  document_usercreate = '$u_id' AND 
+  document_privacy = 1";
+  display_debug_msg($query, $cdg_sql, 'run_query_document_user_quota()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q->f('sum_size');
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if a directory can be deleted

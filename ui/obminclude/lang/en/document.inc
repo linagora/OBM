@@ -59,6 +59,7 @@ $l_title = "Title";
 $l_updatetime = "Update time";
 $l_document_display = "Display options for document lists";
 $l_bytes = "bytes";
+$l_private = "Private";
 $l_header_new_dir = "New directory";
 $l_dir = "Directory";
 $l_add_dir = "Create directory";
@@ -123,4 +124,6 @@ $l_invalid_file = "Incorrect file";
 $l_invalid_existing_file = "The path is not a valid file";
 $l_error_dir = "Invalid directory. Verify the path and name.";
 $l_size = "Size";
-
+$l_over_quota_error = "Adding this document would exceed your allocated quota ! To add this document, some private documents must be deleted.";
+$l_quota_msg = "You are currently using %s (%s) of the %s dedicated to your private documents";
+$l_filesize_units = array('Byte','KB','MB','GB','TB','PB');

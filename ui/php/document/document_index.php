@@ -90,6 +90,7 @@ elseif ($action == "ext_get_ids") {
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_document_search_form($params);
+  $display["msg"] .= dis_document_quota();
   if ($_SESSION['set_display'] == "yes") {
     $display["result"] = dis_document_search_list($params);
   } else {
@@ -146,13 +147,18 @@ elseif ($action == "ext_get_ids") {
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_document_data_form("", $params)) {
-    $params["document_id"] = run_query_document_insert($params);
-    if ($params["document_id"]) {
-      update_last_visit("document", $params["document_id"], $action);
-      $display["msg"] .= display_ok_msg("$l_document : $l_insert_ok");
-      $display["detail"] = dis_document_consult($params);
-    } else {
-      $display["msg"] .= display_err_msg("$l_document : $l_insert_error $err[msg]");
+    try {
+      $params["document_id"] = run_query_document_insert($params);
+      if ($params["document_id"]) {
+        update_last_visit("document", $params["document_id"], $action);
+        $display["msg"] .= display_ok_msg("$l_document : $l_insert_ok");
+        $display["detail"] = dis_document_consult($params);
+      } else {
+        $display["msg"] .= display_err_msg("$l_document : $l_insert_error $err[msg]");
+        $display["detail"] = dis_document_form($action, $params, "");
+      }
+    } catch (OverQuotaDocumentException $e) {
+      $display["msg"] .= display_err_msg("$l_document : $l_over_quota_error");
       $display["detail"] = dis_document_form($action, $params, "");
     }
   // Form data are not valid

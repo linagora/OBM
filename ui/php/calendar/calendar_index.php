@@ -241,48 +241,56 @@ if ($action == 'search') {
   $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
   
   if (check_user_defined_rules() && check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
+    try {
+      $conflicts = check_calendar_conflict($params, $entities);
+      if ( $conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts)) ) {
+          if ($conflicts && !can_force_resource_conflict($conflicts)) {
+            $params['force_disabled'] = 1;
+            $params['force'] = 0;
+          }
+          $extra_js_include[] = 'inplaceeditor.js';
+          $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+          $extra_js_include[] = 'freebusy.js';
+          $extra_css[] = $css_ext_color_picker ;
+          $display['detail'] .= html_calendar_dis_conflict($params,$conflicts) ;
+          $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
+          $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
+        } else {
+          // Insert "others attendees" as private contacts
+          if ($params['others_attendees'] != "") {
+            $others_attendees = run_query_insert_others_attendees($params);
+            $entities['contact'] = array_merge($entities['contact'], $others_attendees);
+          }
+          // Insert "other files" as private documents
+          if (count($params['other_files']) > 0) {
+            $other_files = run_query_insert_other_files($params);
+            if (!$other_files) {
+              $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
+            } else {
+              $entities['document'] = array_merge($entities['document'], $other_files);
+            }
+          }
+          $event_id = run_query_calendar_add_event($params, $entities);
+          $params["calendar_id"] = $event_id;
+          if ($params['date_begin']->compare(Of_Date::today()) <= 0) {
+            $display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
+          }
 
-    $conflicts = check_calendar_conflict($params, $entities);
-    if ( $conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts)) ) {
-        if ($conflicts && !can_force_resource_conflict($conflicts)) {
-          $params['force_disabled'] = 1;
-          $params['force'] = 0;
+          if ($params['show_user_calendar']) $current_view->set_users($params['sel_user_id']);
+          if ($params['show_resource_calendar'])  $current_view->set_resources($params['sel_resource_id']);
+
+          $current_view->set_date($params["date_begin"]);
+          $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$event_id";
+          $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
+          redirect_ok($params, "$l_event: $l_insert_ok - $detail");
         }
+      } catch (OverQuotaDocumentException $e) {
         $extra_js_include[] = 'inplaceeditor.js';
         $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
         $extra_js_include[] = 'freebusy.js';
         $extra_css[] = $css_ext_color_picker ;
-        $display['detail'] .= html_calendar_dis_conflict($params,$conflicts) ;
-        $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
+        $display['msg'] .= display_err_msg("$l_event : $l_over_quota_error");
         $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
-      } else {
-        // Insert "others attendees" as private contacts
-        if ($params['others_attendees'] != "") {
-          $others_attendees = run_query_insert_others_attendees($params);
-          $entities['contact'] = array_merge($entities['contact'], $others_attendees);
-        }
-        // Insert "other files" as private documents
-        if (count($params['other_files']) > 0) {
-          $other_files = run_query_insert_other_files($params);
-          if (!$other_files) {
-            $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
-          } else {
-            $entities['document'] = array_merge($entities['document'], $other_files);
-          }
-        }
-        $event_id = run_query_calendar_add_event($params, $entities);
-        $params["calendar_id"] = $event_id;
-        if ($params['date_begin']->compare(Of_Date::today()) <= 0) {
-          $display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
-        }
-
-        if ($params['show_user_calendar']) $current_view->set_users($params['sel_user_id']);
-        if ($params['show_resource_calendar'])  $current_view->set_resources($params['sel_resource_id']);
-
-        $current_view->set_date($params["date_begin"]);
-        $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$event_id";
-        $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
-        redirect_ok($params, "$l_event: $l_insert_ok - $detail");
       }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -360,8 +368,8 @@ if ($action == 'search') {
   }
   $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
 
-  if (check_user_defined_rules() && check_calendar_access($params["calendar_id"]) && 
-    check_calendar_data_form($params)) {
+  if (check_user_defined_rules() && check_calendar_access($params["calendar_id"]) && check_calendar_data_form($params)) {
+    try {
       $c = get_calendar_event_info($params['calendar_id'],false); 
       $conflicts = check_calendar_conflict($params, $entities);
       if ($conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts))
@@ -401,14 +409,22 @@ if ($action == 'search') {
         $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
         redirect_ok($params, "$l_event: $l_update_ok - $detail");
       }
-    } else {
-      $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    } catch (OverQuotaDocumentException $e) {
       $extra_js_include[] = 'inplaceeditor.js';
       $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
       $extra_js_include[] = 'freebusy.js';
       $extra_css[] = $css_ext_color_picker ;
-      $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
+      $display['msg'] .= display_err_msg("$l_event : $l_over_quota_error");
+      $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
     }
+  } else {
+    $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $extra_js_include[] = 'inplaceeditor.js';
+    $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_js_include[] = 'freebusy.js';
+    $extra_css[] = $css_ext_color_picker ;
+    $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
+  }
 
 } elseif ($action == 'quick_update') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -678,24 +694,28 @@ if ($action == 'search') {
   
 } elseif ($action == 'attach_documents') {
 ///////////////////////////////////////////////////////////////////////////////
-  $doc_ids = isset($params['sel_document_id']) ? $params['sel_document_id'] : array();
-  $existent_doc_ids = get_calendar_event_document_ids($params['calendar_id']);
-  $already_attached_doc_ids = array_intersect($doc_ids, $existent_doc_ids);
-  $doc_ids = array_diff($doc_ids, $existent_doc_ids);
-  $other_files = run_query_insert_other_files($params);
-  if (!$other_files) {
-    $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
-  } else {
-    $doc_ids = array_merge($doc_ids, $other_files);
-  }
-  $event_entity_id = of_entity_get('event', $params['calendar_id']);
-  foreach ($doc_ids as $document_id) {
-    run_query_calendar_attach_document($document_id, $event_entity_id);
-  }
-  if (count($already_attached_doc_ids) != 0) {
-    redirect_err($params, $l_warn_already_attached);
-  } else {
-    redirect_ok($params, "$l_document: $l_insert_ok");
+  try {
+    $doc_ids = isset($params['sel_document_id']) ? $params['sel_document_id'] : array();
+    $existent_doc_ids = get_calendar_event_document_ids($params['calendar_id']);
+    $already_attached_doc_ids = array_intersect($doc_ids, $existent_doc_ids);
+    $doc_ids = array_diff($doc_ids, $existent_doc_ids);
+    $other_files = run_query_insert_other_files($params);
+    if (!$other_files) {
+      $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
+    } else {
+      $doc_ids = array_merge($doc_ids, $other_files);
+    }
+    $event_entity_id = of_entity_get('event', $params['calendar_id']);
+    foreach ($doc_ids as $document_id) {
+      run_query_calendar_attach_document($document_id, $event_entity_id);
+    }
+    if (count($already_attached_doc_ids) != 0) {
+      redirect_err($params, $l_warn_already_attached);
+    } else {
+      redirect_ok($params, "$l_document: $l_insert_ok");
+    }
+  } catch (OverQuotaDocumentException $e) {
+    redirect_err($params, $l_over_quota_error);
   }
   
 } elseif ($action == 'download_document') {

@@ -23,6 +23,7 @@ $l_updatetime = "Dernière modification";
 $l_document_display = "Options d'affichage des listes de documents";
 $l_size = "Taille";
 $l_bytes = "octets";
+$l_private = "Privé";
 $l_header_new_dir = "Nouveau répertoire";
 $l_dir = "Répertoire";
 $l_add_dir = "Créer le répertoire";
@@ -70,6 +71,9 @@ $l_browse = "Parcourir";
 $l_have_link = "Ce document est lié à divers éléments d'obm";
 $l_have_no_link = "Ce document n'est lié à aucun éléments";
 $l_no_document = "Document introuvable";
+$l_quota_msg = "Vous utilisez actuellement %s (%s) de l'espace de %s dédié à vos documents privés";
+$l_over_quota_error = "Ajouter ce document vous ferait dépasser votre quota ! Supprimez quelques documents privés pour pouvoir ajouter celui-ci.";
+$l_filesize_units = array('Octets','Ko','Mo','Go','To','Po');
 
 // Actions
 $l_checkdelete = "Vérifier ou Supprimer le document";

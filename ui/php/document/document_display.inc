@@ -22,6 +22,38 @@ $fieldnames["documentmimetype_label"] = $l_mimetype;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display user quota message
+///////////////////////////////////////////////////////////////////////////////
+function dis_document_quota() {
+  global $obm, $c_quota_private_document, $l_quota_msg;
+  
+  if ($c_quota_private_document == 0) return;
+  
+  $user_quota = run_query_document_user_quota($obm['uid']);
+  $percent = round(($user_quota * 100) / $c_quota_private_document);
+  $msg = sprintf($l_quota_msg, dis_filesize($user_quota), $percent.'%', dis_filesize($c_quota_private_document));
+  if ($percent > 80) {
+    return display_warn_msg($msg);
+  }
+  return display_ok_msg($msg);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Process a user-friendly file size
+///////////////////////////////////////////////////////////////////////////////
+function dis_filesize($filesize) {
+    global $l_filesize_units;
+    
+    $decr = 1024; 
+    $step = 0;
+    while (($filesize / $decr) > 0.9) {
+        $filesize = $filesize / $decr;
+        $step++;
+    } 
+    return round($filesize, 2).' '.$l_filesize_units[$step];
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Document specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
@@ -67,7 +99,7 @@ function dis_document_search_form($document="") {
 //   - $mime_q   : mime type list
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_search_form ($document, $mime_q) {
-  global $display, $l_title, $l_mimetype, $l_name;
+  global $display, $l_title, $l_mimetype, $l_name, $l_private;
   global $c_all, $l_all, $l_find, $l_author, $l_document_add; 
 
   $title = stripslashes($document["title"]);
@@ -75,6 +107,9 @@ function html_document_search_form ($document, $mime_q) {
   $mime = $document["mime"];
   $name = stripslashes($document["name"]);
   $popup = $document["popup"];
+  if ($document["private"] !== 0) {
+    $private = 'checked="checked"';
+  }
 
   // User defined data
   $block_userdata .= of_userdata_dis_search("document", $document);
@@ -124,6 +159,12 @@ function html_document_search_form ($document, $mime_q) {
     </label>
     <label>$l_mimetype<br />
       $sel_mime
+    </label>
+    <label>
+      &nbsp;<br />
+      <input type=\"hidden\" name=\"cba_private\" value=\"0\" />
+      <input type=\"checkbox\" name=\"cba_private\" value=\"1\" $private/>
+      $l_private 
     </label>
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
@@ -533,22 +574,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
   $url2 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=true"; 
 
   // Private block
-  $nb_private = run_query_global_document_quota($obm["uid"]);
   $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy />";
-  if ($GLOBALS['action'] == 'new') {
-    if ($nb_private >= $GLOBALS['c_quota_private_document']) {
-      $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy disabled/><span class='legend warning'>$GLOBALS[l_overquota]</span>";
-    } else {
-      $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy />";
-    }
-  } else if ($GLOBALS['action'] == 'detailupdate') {
-    if ($privacy || $nb_private < $GLOBALS['c_quota_private_document']) {
-      $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy />";
-    } else {
-      $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy disabled/><span class='legend warning'>$GLOBALS[l_overquota]</span>";
-    }
-  }
-  
 
   // --- HTML Template --------------------------------------------------------
   $block = "
