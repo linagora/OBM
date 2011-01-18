@@ -249,7 +249,7 @@ class CalendarMailer extends OBM_Mailer {
         $suffix = '...';
     }
     $list_attendees = implode(', ', $list_attendees).$suffix;
-print_r($event->owner);die();
+
     return array(
       'host'             => $GLOBALS['cgp_host'],
       $prefix.'id'       => $event->id,
