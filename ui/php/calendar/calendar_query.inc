@@ -695,10 +695,8 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
     }
   }
 
-  // Insert My alert if set
-  if (($calendar['alert']) > 0) {
-    run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
-  }
+  // Insert my own alert
+  run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
 
   $calendar['calendar_id'] = $event_id;
   if ($calendar['attendees_notification']) {

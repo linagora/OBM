@@ -4197,7 +4197,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     } else {
       $selected_alert = $calendar['alert'];
     }
+  } else {
+    if (isset($_SESSION['set_cal_alert'])) {
+      $selected_alert = $_SESSION['set_cal_alert'];
+    }
   }
+  
   if ($tagid == '') {
     $tagid = $c_none ;
     $tagcolor = "#eff0f2" ;
