@@ -5,6 +5,7 @@
       <input type='submit' value='<?php echo __('Search') ?>' />
       <input type='hidden' name='action' value='search' />
       <input type='hidden' name='updateCount' value='true' />
+      <input type='hidden' id='archive' name='archive' value='-is:archive' />
       <a href="#" onclick="$$('#advancedSearch','#basicSearch').toggle();"><?php echo __('Advanced search') ?></a>
     </form>
   </div>

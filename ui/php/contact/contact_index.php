@@ -461,12 +461,14 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     //management of archive param  according to global configuration
     if($params['contactfilter']) $pattern .= 'displayname:'.$params['contactfilter'];
     if($params['addressbook']) $current['addressbook'] = $params['addressbook'];
+    if($params['archive']) $pattern .= ' '.$params['archive'].' ';
     else $current['addressbook'] = 'search';
+    $patternstring = $params['searchpattern'].' '.$pattern;
     if(function_exists('user_modify_contact_search_pattern')) {
-      $params['searchpattern'] = user_modify_contact_search_pattern($params['searchpattern'].' '.$pattern);
+      $patternstring = user_modify_contact_search_pattern($patternstring);
     }
-    $contacts = $addressbooks->searchContacts($params['searchpattern'].' '.$pattern, $params['offset']);
-    if ($params['updateCount']) echo dis_update_addressbook_count($addressbooks, $params['searchpattern'].' '.$pattern.' addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks())).')', 'search');
+    $contacts = $addressbooks->searchContacts($patternstring, $params['offset']);
+    if ($params['updateCount']) echo dis_update_addressbook_count($addressbooks, $patternstring.' addressbookId:('.implode(' OR ', array_keys($addressbooks->getAddressbooks())).')', 'search');
     $subTemplate['contacts'] = new OBM_Template('contacts');
     $subTemplate['contacts']->set('offset', $params['offset']);
     $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));
