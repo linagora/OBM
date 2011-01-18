@@ -5136,7 +5136,7 @@ function html_calendar_waiting_events($obm_wait) {
      <td>".$begin->getOutputDateTime()."</td>
      <td>".$end->getOutputDateTime()."</td>
      <td>
-      <form method=\"get\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
+      <form method=\"post\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
        <input type=\"hidden\" name=\"calendar_id\" value=\"".$obm_wait->f('event_id')."\" />
        <input type=\"hidden\" name=\"entity_kind\" value=\"$current_entity_entity\" />
