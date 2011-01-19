@@ -113,6 +113,17 @@ class OBM_AddressBook implements OBM_ISearchable {
   public static function get($pattern) {
     return self::search($pattern)->current();
   }
+  
+  public static function writable() {
+    $addressBooks = self::search();
+    $writable = array();
+    foreach ($addressBooks as $id => $book) {
+      if ($book->write == 1) {
+        $writable[$id] = $book;
+      }
+    }
+    return new OBM_AddressBookArray($writable);
+  }
 
   public static function search($searchPattern=null) {
     if($searchPattern !== null) {

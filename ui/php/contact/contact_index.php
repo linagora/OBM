@@ -321,7 +321,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     }
   } elseif ($action == 'updateContact')  {
   ///////////////////////////////////////////////////////////////////////////////
-    $addressbooks = OBM_AddressBook::search();
+    $addressbooks = OBM_AddressBook::writable();
     if (isset($params['id'])) {
       $contact = OBM_Contact::get($params['id'], null, false);
     } else {
