@@ -502,10 +502,15 @@ Obm.UserPattern.Form = new Class ({
       for (var attr in attributes) {
           var field = this.fields[attr];
           if (field && ((!field.changed()) || (field.empty()))) {
-            field.setValue(attributes[attr]);
-          }
+            if (attr == 'login' ) {
+              field.setValue(attributes[attr].replace(/(\s+)/g,'-'));
+            } else {
+              field.setValue(attributes[attr]);
+            }
+          } 
       }
       /* mail block specific */
+     
       if (typeof this.fields['mail_perms']!= "undefined") {
         if (this.fields['mail_perms'].getValue()==0) {
           if (attributes['email']) {
@@ -532,6 +537,7 @@ Obm.UserPattern.Form = new Class ({
             var alias_fields = $$('td#userMailHome select');
             for (var i=0; i<mails.length; i++) {
               var tmp = mails[i].split("@");
+              tmp[0] = tmp[0].replace(/(\s+)/g,'-');
               mail_fields[i].value = tmp[0];
               for (var j=0; j<alias_fields[i].options.length; j++) {
                 if (alias_fields[i].options[j].value == tmp[1]) {
@@ -541,7 +547,7 @@ Obm.UserPattern.Form = new Class ({
             }
           }
         }
-      }
+      } 
     }
   }
 
