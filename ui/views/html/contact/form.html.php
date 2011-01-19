@@ -70,12 +70,13 @@
             <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>" />
             <select class='addressbookSelector'name='addressbook'>
               <?php foreach($addressbooks as $_id => $_addressbook ) { ?>
-                <?php if ($_addressbook->write == 1) ?>
-                <?php if ($_addressbook->id == $contact->addressbook_id) { ?>
-                <option selected='selected' value='<?php echo $_addressbook->id ?>' ><?php echo $_addressbook->displayname ?></option>
-                <?php } else { ?>
-                <option value='<?php echo $_addressbook->id ?>' ><?php echo $_addressbook->displayname ?></option>
-                <?php }?>
+                <?php if ($_addressbook->isWritable()) { ?>
+                  <?php if ($_addressbook->id == $contact->addressbook_id) { ?>
+                  <option selected='selected' value='<?php echo $_addressbook->id ?>' ><?php echo $_addressbook->displayname ?></option>
+                  <?php } else { ?>
+                  <option value='<?php echo $_addressbook->id ?>' ><?php echo $_addressbook->displayname ?></option>
+                  <?php }?>
+                <?php } ?>
               <?php } ?>
             </select>
             <br />

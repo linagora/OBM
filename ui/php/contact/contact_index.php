@@ -321,7 +321,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     }
   } elseif ($action == 'updateContact')  {
   ///////////////////////////////////////////////////////////////////////////////
-    $addressbooks = OBM_AddressBook::writable();
+    $addressbooks = OBM_AddressBook::search();
     if (isset($params['id'])) {
       $contact = OBM_Contact::get($params['id'], null, false);
     } else {
@@ -722,14 +722,6 @@ function get_contact_action() {
     'Condition'=> array ('None') 
   );
 
-// New
-  $actions['contact']['new'] = array (
-    'Name'     => $l_header_new,
-    'Url'      => "$path/contact/contact_index.php?action=new",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-                                     );
-                                     
 // Import VCard
   $actions['contact']['import'] = array (
     'Name'     => $l_header_import,

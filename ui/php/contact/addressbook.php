@@ -118,7 +118,7 @@ class OBM_AddressBook implements OBM_ISearchable {
     $addressBooks = self::search();
     $writable = array();
     foreach ($addressBooks as $id => $book) {
-      if ($book->write == 1) {
+      if ($book->isWritable()) {
         $writable[$id] = $book;
       }
     }
@@ -308,6 +308,10 @@ class OBM_AddressBook implements OBM_ISearchable {
       // Delete solr
       OBM_IndexingService::deleteByQuery('contact', "addressbookId:$this->id");
     }
+  }
+  
+  public function isWritable() {
+    return $this->write == 1;
   }
 }
 
