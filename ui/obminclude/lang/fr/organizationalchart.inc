@@ -25,7 +25,7 @@ $l_svg_export = "Export SVG";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des organigrammes correspondants.";
-$l_found = "organigrammes trouvés.";
+$l_found = "organigramme(s) trouvé(s).";
 $l_no_found = "Aucun organigramme ne correspond à ces critères !";
 $l_can_delete = "L'organigramme peut être supprimé.";
 $l_cant_delete = "L'organigramme ne peut être supprimé !";
