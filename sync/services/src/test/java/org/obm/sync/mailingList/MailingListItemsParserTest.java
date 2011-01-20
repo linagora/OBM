@@ -1,26 +1,20 @@
 package org.obm.sync.mailingList;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
-
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.TestCase;
 
 import org.obm.sync.utils.DOMUtils;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 public class MailingListItemsParserTest extends TestCase {
 
 	private MailingListItemsParser parser;
 
-	public void testParseMailingList(String parameter) throws SAXException,
-			IOException, ParserConfigurationException,
-			FactoryConfigurationError {
-	}
+//	public void testParseMailingList(String parameter) throws
+//			FactoryConfigurationError {
+//	}
 
 	@Override
 	protected void setUp() throws Exception {

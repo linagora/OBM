@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,8 +24,7 @@ public class MailingListItemsParser extends AbstractItemsParser {
 			.getLog(MailingListItemsParser.class);
 
 	public MailingList parseMailingList(String parameter) throws SAXException,
-			IOException, ParserConfigurationException,
-			FactoryConfigurationError {
+			IOException, FactoryConfigurationError {
 		Document doc = DOMUtils.parse(new ByteArrayInputStream(parameter
 				.getBytes()));
 
@@ -49,8 +47,8 @@ public class MailingListItemsParser extends AbstractItemsParser {
 
 	public MailingList parseMailingList(Element root) {
 		Element mlEle = root;
-		if(!mlEle.getTagName().equalsIgnoreCase("mailingList")){
-			mlEle = DOMUtils.getUniqueElement(root, "mailingList");	
+		if (!mlEle.getTagName().equalsIgnoreCase("mailingList")) {
+			mlEle = DOMUtils.getUniqueElement(root, "mailingList");
 		}
 		MailingList ml = new MailingList();
 		String id = mlEle.getAttribute("id");
@@ -58,6 +56,7 @@ public class MailingListItemsParser extends AbstractItemsParser {
 			try {
 				ml.setId(Integer.valueOf(id));
 			} catch (NumberFormatException e) {
+				//DO NOTHING
 			}
 		}
 		ml.setName(mlEle.getAttribute("name"));
@@ -66,9 +65,9 @@ public class MailingListItemsParser extends AbstractItemsParser {
 	}
 
 	private List<MLEmail> parseEmails(Element uniqueElement) {
-		String[] attrs = {"id", "label", "address" };
-		String[][] values = DOMUtils
-				.getAttributes(uniqueElement, "email", attrs);
+		String[] attrs = { "id", "label", "address" };
+		String[][] values = DOMUtils.getAttributes(uniqueElement, "email",
+				attrs);
 		List<MLEmail> ret = new ArrayList<MLEmail>(values.length);
 		for (String[] p : values) {
 			MLEmail e = new MLEmail(p[1], p[2]);
@@ -77,6 +76,7 @@ public class MailingListItemsParser extends AbstractItemsParser {
 				try {
 					e.setId(Integer.valueOf(id));
 				} catch (NumberFormatException x) {
+					//DO NOTHING
 				}
 			}
 			ret.add(e);
@@ -86,15 +86,15 @@ public class MailingListItemsParser extends AbstractItemsParser {
 
 	public List<MLEmail> parseMailingListEmails(String mailingListEmails) {
 		try {
-			Document doc = DOMUtils.parse(new ByteArrayInputStream(mailingListEmails
-					.getBytes()));
+			Document doc = DOMUtils.parse(new ByteArrayInputStream(
+					mailingListEmails.getBytes()));
 			return parseEmails(doc.getDocumentElement());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return new ArrayList<MLEmail>(0);
 	}
-	
+
 	public List<MLEmail> parseMailingListEmails(Document doc) {
 		return parseEmails(doc.getDocumentElement());
 	}
