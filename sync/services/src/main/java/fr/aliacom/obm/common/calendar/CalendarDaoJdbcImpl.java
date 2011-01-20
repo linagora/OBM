@@ -60,6 +60,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.items.EventChanges;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -220,7 +221,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event createEvent(AccessToken editor, Event ev, Boolean useObmUser) {
+	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser) {
 		logger.info("create with token " + editor.getSessionId() + " from "
 				+ editor.getOrigin() + " for " + editor.getEmail());
 
@@ -229,7 +230,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		try {
 			ut.begin();
 			con = obmHelper.getConnection();
-			createEvent(con, editor, ev, useObmUser);
+			createEvent(con, editor, calendar, ev, useObmUser);
 
 			ut.commit();
 		} catch (Throwable e) {
@@ -242,10 +243,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event createEvent(Connection con, AccessToken editor, Event ev,
+	public Event createEvent(Connection con, AccessToken editor, String calendar, Event ev,
 			Boolean useObmUser) throws SQLException {
 		Integer ownerId = null;
-		if (ev.getOwnerEmail() != null && ev.getOwnerEmail() != "") {
+		if (Strings.isNullOrEmpty(ev.getOwnerEmail())) {
 			logger.info("try to create with specified owner:"
 					+ ev.getOwnerEmail());
 			ownerId = userDao.userIdFromEmailQuery(con, ev.getOwnerEmail());
@@ -295,11 +296,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				id);
 		ev.setEntityId(le.getEntityId());
 
-		insertAttendees(editor, id, con, ev.getAttendees(), useObmUser);
+		insertAttendees(editor, calendar, ev, con, ev.getAttendees(), useObmUser);
 
 		insertExceptions(editor, ev, con, id);
 		if (ev.getRecurrence() != null) {
-			insertEventExceptions(editor, ev.getRecurrence()
+			insertEventExceptions(editor, calendar, ev.getRecurrence()
 					.getEventExceptions(), con, id, useObmUser);
 		}
 		Integer a = ev.getAlert();
@@ -317,7 +318,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ev;
 	}
 
-	private List<Event> insertEventExceptions(AccessToken editor,
+	private List<Event> insertEventExceptions(AccessToken editor, String calendar,
 			List<Event> eventException, Connection con, int id, Boolean useObmUser)
 			throws SQLException {
 		List<Event> newEvExcepts = new LinkedList<Event>();
@@ -326,7 +327,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			Map<Integer, Date> eventsEx = new HashMap<Integer, Date>();
 
 			for (Event evExcept : eventException) {
-				created = createEvent(con, editor, evExcept, useObmUser);
+				created = createEvent(con, editor, calendar, evExcept, useObmUser);
 				newEvExcepts.add(created);
 				eventsEx.put(created.getDatabaseId(),
 						evExcept.getRecurrenceId());
@@ -492,6 +493,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return result;
 	}
 
+	@Override
 	public Event findEvent(AccessToken token, int uid) {
 		String ev = "SELECT "
 				+ EVENT_SELECT_FIELDS
@@ -539,6 +541,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 
+	@Override
 	public List<String> findEventTwinKeys(String calendar, Event event,
 			ObmDomain domain) {
 
@@ -608,6 +611,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 
+	@Override
 	public List<String> findRefusedEventsKeys(ObmUser calendarUser, Date d) {
 		List<Integer> result = new LinkedList<Integer>();
 		Connection con = null;
@@ -673,6 +677,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return rs.getInt("eventlink_percent");
 	}
 
+	@Override
 	public List<FreeBusy> getFreeBusy(FreeBusyRequest fbr) {
 
 		String fb = "SELECT e.event_id, e.event_date, e.event_duration, event_allday"
@@ -820,6 +825,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 
+	@Override
 	public EventChanges getSync(AccessToken token, ObmUser calendarUser,
 			Date lastSync, EventType typeFilter, boolean onEventDate) {
 		EventChanges ret = new EventChanges();
@@ -1082,6 +1088,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return l;
 	}
 
+	@Override
 	public List<CalendarInfo> listCalendars(ObmUser user) throws FindException {
 		Set<CalendarInfo> rights = new HashSet<CalendarInfo>();
 		CalendarInfo myself = new CalendarInfo();
@@ -1275,6 +1282,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
+	@Override
 	public int markEventAsUpdated(int databaseId) {
 		Connection con = null;
 		PreparedStatement st = null;
@@ -1307,7 +1315,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event modifyEvent(AccessToken at, Event ev,
+	public Event modifyEvent(AccessToken at, String calendar, Event ev,
 			boolean onlyUpdateMyself, boolean updateAttendees, Boolean useObmUser) {
 
 		logger.info("should modify event with title " + ev.getTitle()
@@ -1319,7 +1327,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		try {
 			ut.begin();
 			con = obmHelper.getConnection();
-			modifyEvent(con, at, ev, onlyUpdateMyself, updateAttendees, useObmUser);
+			modifyEvent(con, at, calendar, ev, onlyUpdateMyself, updateAttendees, useObmUser);
 			ut.commit();
 		} catch (Throwable se) {
 			obmHelper.rollback(ut);
@@ -1334,7 +1342,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public void modifyEvent(Connection con, AccessToken at, Event ev,
+	public void modifyEvent(Connection con, AccessToken at, String calendar, Event ev, 
 			boolean onlyUpdateMyself, boolean updateAttendees, Boolean useObmUser)
 			throws SQLException {
 		Event old = findEvent(at, Integer.valueOf(ev.getUid()));
@@ -1362,7 +1370,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 
 			if (updateAttendees) {
-				updateAttendees(at, con, ev, onlyUpdateMyself,useObmUser);
+				updateAttendees(at, con, calendar, ev, onlyUpdateMyself,useObmUser);
 				if (onlyUpdateMyself) {
 					markUpdated(con, ev.getDatabaseId());
 				}
@@ -1377,7 +1385,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					for (Event event : ev.getRecurrence().getEventExceptions()) {
 						event.setDatabaseId(0);
 					}
-					insertEventExceptions(at, ev.getRecurrence()
+					insertEventExceptions(at, calendar, ev.getRecurrence()
 							.getEventExceptions(), con, ev.getDatabaseId(), useObmUser);
 				}
 			}
@@ -1524,6 +1532,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
+	@Override
 	public Event removeEvent(AccessToken token, int eventId, EventType eventType) {
 		Event event = null;
 		Connection con = null;
@@ -1588,7 +1597,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ev;
 	}
 
-	private void insertAttendees(AccessToken editor, int id, Connection con,
+	private void insertAttendees(AccessToken editor, String calendar, Event ev, Connection con,
 			List<Attendee> attendees, boolean useObmUser) throws SQLException {
 		String attQ = "INSERT INTO EventLink (" + ATT_INSERT_FIELDS
 				+ ") VALUES (" + "?, " + // event_id
@@ -1602,15 +1611,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 			ps = con.prepareStatement(attQ);
+			Integer userIdCalender = userDao.userEntityFromEmailQuery(con, calendar);
 			for (Attendee at : attendees) {
-				Integer entityId = null;
-				if (useObmUser) {
-					entityId = userDao.userEntityFromEmailQuery(con,
-							at.getEmail());
-					if (entityId == null) {
-						logger.info("user with email " + at.getEmail()
-								+ " not found. Checking contacts.");
-					}
+				Integer entityId = userDao.userEntityFromEmailQuery(con,
+						at.getEmail());
+				if(!useObmUser && !userIdCalender.equals(entityId)){
+					entityId = null;
+					logger.info("user with email " + at.getEmail()
+							+ " not found. Checking contacts.");
 				}
 				if (entityId == null) {
 					entityId = userDao.contactEntityFromEmailQuery(con,
@@ -1628,7 +1636,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					entityId = c.getEntityId();
 				}
 
-				ps.setInt(1, id);
+				ps.setInt(1, ev.getDatabaseId());
 				ps.setInt(2, entityId);
 				ps.setObject(3, at.getState()
 						.getJdbcObject(obmHelper.getType()));
@@ -1646,7 +1654,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private void updateAttendees(AccessToken updater, Connection con, Event ev,
+	private void updateAttendees(AccessToken updater, Connection con, String calendar, Event ev,
 			boolean onlyUpdateMyself, Boolean useObmUser) throws SQLException {
 		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=? "
 				+ "where eventlink_event_id=? AND "
@@ -1710,7 +1718,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		if (!onlyUpdateMyself) {
 			logger.info("event modification needs to add " + toInsert.size()
 					+ " attendees.");
-			insertAttendees(updater, ev.getDatabaseId(), con, toInsert, useObmUser);
+			insertAttendees(updater, calendar, ev, con, toInsert, useObmUser);
 		}
 
 		if (onlyUpdateMyself) {
@@ -1798,6 +1806,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	}
 
+	@Override
 	public Event findEventByExtId(AccessToken token, ObmUser calendar,
 			String extId) {
 		String ev = "SELECT "
@@ -1810,7 +1819,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN EventEntity ON evententity_event_id=event_id "
 				+ "INNER JOIN EventLink link ON link.eventlink_event_id=e.event_id "
 				+ "INNER JOIN UserEntity ON userentity_entity_id=eventlink_entity_id "
-				+ "INNER JOIN UserObm ON userobm_id=userentity_user_id"
+				+ "INNER JOIN UserObm ON userobm_id=userentity_user_id "
 				+ "WHERE e.event_ext_id=? " 
 				+ "AND userobm_login=?";
 
@@ -1850,6 +1859,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 
+	@Override
 	public List<Event> findListEventsFromIntervalDate(AccessToken token,
 			ObmUser calendarUser, Date start, Date end, EventType typeFilter) {
 		String ev = "SELECT "
@@ -1909,6 +1919,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 
+	@Override
 	public List<Event> findAllEvents(AccessToken token, ObmUser calendarUser,
 			EventType typeFilter) {
 		String ev = "SELECT "
@@ -1967,6 +1978,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 
+	@Override
 	public List<EventParticipationState> getEventParticipationStateWithAlertFromIntervalDate(
 			AccessToken token, ObmUser calendarUser, Date start, Date end,
 			EventType typeFilter) {
@@ -2036,6 +2048,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return e;
 	}
 
+	@Override
 	public List<EventTimeUpdate> getEventTimeUpdateNotRefusedFromIntervalDate(
 			AccessToken token, ObmUser calendarUser, Date start, Date end,
 			EventType typeFilter) {
@@ -2094,6 +2107,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 
+	@Override
 	public Date findLastUpdate(AccessToken token, String calendar) {
 		String ev = "SELECT MAX(event_timeupdate), MAX(event_timecreate) "
 				+ " FROM Event e "
@@ -2160,6 +2174,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return er;
 	}
 
+	@Override
 	public Event removeEventByExtId(AccessToken token, ObmUser calendar,
 			String extId) {
 		Event event = null;

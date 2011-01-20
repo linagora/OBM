@@ -83,6 +83,7 @@ public class CalendarBindingImpl implements ICalendar {
 		this.helper = helper;
 	}
 
+	@Override
 	public CalendarInfo[] listCalendars(AccessToken token) throws ServerFault,
 			AuthFault {
 		try {
@@ -221,6 +222,7 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
+	@Override
 	public Event modifyEvent(AccessToken token, String calendar, Event event,
 			boolean updateAttendees) throws AuthFault, ServerFault {
 
@@ -246,9 +248,9 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 
 			if(isInternalEvent(event)){
-				return modifyInternalEvent(token, before, event, onlyUpdateMyself, updateAttendees);
+				return modifyInternalEvent(token, calendar, before, event, onlyUpdateMyself, updateAttendees);
 			} else {
-				return modifyExternalEvent(token, event, onlyUpdateMyself, updateAttendees);
+				return modifyExternalEvent(token, calendar, event, onlyUpdateMyself, updateAttendees);
 			}
 
 		} catch (Throwable e) {
@@ -258,10 +260,10 @@ public class CalendarBindingImpl implements ICalendar {
 
 	}
 	
-	private Event modifyInternalEvent(AccessToken token, Event before,  Event event, boolean onlyUpdateMyself,
+	private Event modifyInternalEvent(AccessToken token, String calendar, Event before,  Event event, boolean onlyUpdateMyself,
 			boolean updateAttendees) {
 
-			Event after = calendarService.modifyEvent(token, event,
+			Event after = calendarService.modifyEvent(token, calendar, event,
 					onlyUpdateMyself, updateAttendees, true);
 
 			if (after != null && !onlyUpdateMyself) {
@@ -274,10 +276,10 @@ public class CalendarBindingImpl implements ICalendar {
 			return after;
 	}
 
-	private Event modifyExternalEvent(AccessToken token,
+	private Event modifyExternalEvent(AccessToken token, String calendar, 
 			Event event, boolean onlyUpdateMyself, boolean updateAttendees) {
 		
-			Event after = calendarService.modifyEvent(token, event,
+			Event after = calendarService.modifyEvent(token,  calendar, event,
 					onlyUpdateMyself, updateAttendees, false);
 			if (after != null && !onlyUpdateMyself) {
 				logger.info(LogUtils.prefix(token) + "Calendar : event["
@@ -286,6 +288,7 @@ public class CalendarBindingImpl implements ICalendar {
 			return after;
 	}
 
+	@Override
 	public String createEvent(AccessToken token, String calendar, Event event)
 			throws AuthFault, ServerFault {
 
@@ -329,9 +332,9 @@ public class CalendarBindingImpl implements ICalendar {
 
 			Event ev = null;
 			if (isInternalEvent(event)) {
-				ev = createInternalEvent(token, event);
+				ev = createInternalEvent(token, calendar, event);
 			} else {
-				ev = createExternalEvent(token, event);
+				ev = createExternalEvent(token, calendar, event);
 			}
 
 			return (String.valueOf(ev.getDatabaseId()));
@@ -341,15 +344,15 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private Event createExternalEvent(AccessToken token, Event event) {
-		Event ev = calendarService.createEvent(token, event, false);
+	private Event createExternalEvent(AccessToken token, String calendar, Event event) {
+		Event ev = calendarService.createEvent(token, calendar, event, false);
 		logger.info(LogUtils.prefix(token) + "Calendar : external event["
 				+ ev.getTitle() + "] created");
 		return ev;
 	}
 
-	private Event createInternalEvent(AccessToken token, Event event) {
-		Event ev = calendarService.createEvent(token, event, false);
+	private Event createInternalEvent(AccessToken token, String calendar, Event event) {
+		Event ev = calendarService.createEvent(token, calendar, event, false);
 		eventChangeHandler.create(ev, settingsDao.getUserLanguage(token));
 		logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");
@@ -410,6 +413,9 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			int uid = Integer.valueOf(eventId);
 			Event evt = calendarService.findEvent(token, uid);
+			if(evt == null){
+				return null;
+			}
 			String owner = evt.getOwner();
 			if (owner == null) {
 				logger.info(LogUtils.prefix(token)

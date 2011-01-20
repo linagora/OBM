@@ -402,14 +402,14 @@ public class ContactDao {
 			logger.info("date != null");
 			if (dateId == 0) {
 				logger.info("eventId == null");
-				Event e = calendarDao.createEvent(con, at,
+				Event e = calendarDao.createEvent(con, at, at.getUserWithDomain(),
 						getEvent(at, displayName(c), date), true);
 				return e.getDatabaseId();
 			}
 			logger.info("eventId != null");
 			Event e = calendarDao.findEvent(at, dateId);
 			e.setDate(date);
-			calendarDao.modifyEvent(con, at, e, false, false, true);
+			calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false, false, true);
 			return e.getDatabaseId();
 		}
 		logger.info("date == null");
