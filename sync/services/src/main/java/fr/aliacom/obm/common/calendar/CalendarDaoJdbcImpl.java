@@ -1611,20 +1611,20 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 			ps = con.prepareStatement(attQ);
-			Integer userIdCalender = userDao.userEntityFromEmailQuery(con, calendar);
+			Integer userEntityCalender = userDao.userEntityFromEmailQuery(con, calendar);
 			for (Attendee at : attendees) {
-				Integer userId = userDao.userEntityFromEmailQuery(con,
+				Integer userEntity  = userDao.userEntityFromEmailQuery(con,
 						at.getEmail());
-				if(!useObmUser && !userIdCalender.equals(userId)){
-					userId = null;
+				if(!useObmUser && !userEntityCalender.equals(userEntity)){
+					userEntity = null;
 					logger.info("user with email " + at.getEmail()
 							+ " not found. Checking contacts.");
 				}
-				if (userId == null) {
-					userId = userDao.contactEntityFromEmailQuery(con,
+				if (userEntity == null) {
+					userEntity = userDao.contactEntityFromEmailQuery(con,
 							at.getEmail());
 				}
-				if (userId == null) {
+				if (userEntity == null) {
 					logger.info("Attendee " + at.getEmail()
 							+ " not found in OBM, will create a contact");
 					Contact c = new Contact();
@@ -1633,11 +1633,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					c.addEmail("INTERNET;X-OBM-Ref1", new Email(at.getEmail()));
 					c.setCollected(true);
 					c = contactDao.createContact(con, editor, c);
-					userId = c.getEntityId();
+					userEntity = c.getEntityId();
 				}
 
 				ps.setInt(1, ev.getDatabaseId());
-				ps.setInt(2, userId);
+				ps.setInt(2, userEntity);
 				ps.setObject(3, at.getState()
 						.getJdbcObject(obmHelper.getType()));
 				ps.setObject(4,
@@ -1663,26 +1663,27 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "UNION SELECT contactentity_entity_id from ContactEntity where contactentity_entity_id=?)";
 
 		PreparedStatement ps = null;
-		int[] updatedAttendees;
-		List<Attendee> mightInsert = new LinkedList<Attendee>();
 		List<Attendee> toInsert = new LinkedList<Attendee>();
 
 		try {
 			ps = con.prepareStatement(q);
-			Integer userIdCalender = userDao.userEntityFromEmailQuery(con, calendar);
+			Integer userEntityCalender = userDao.userEntityFromEmailQuery(con, calendar);
 			for (Attendee at : ev.getAttendees()) {
-				Integer userId = userDao.userEntityFromEmailQuery(con,
+				Integer userEntity = userDao.userEntityFromEmailQuery(con,
 						at.getEmail());
-				if(!useObmUser && !userIdCalender.equals(userId)){
-					userId = null;
+				logger.info("////////////////////////////");
+				logger.info(userEntity);
+				logger.info("////////////////////////////");
+				if(!useObmUser && !userEntityCalender.equals(userEntity)){
+					userEntity = null;
 					logger.info("user with email " + at.getEmail()
 							+ " not found. Checking contacts.");
 				}
-				if (userId == null) {
-					userId = userDao.contactEntityFromEmailQuery(con,
+				if (userEntity == null) {
+					userEntity = userDao.contactEntityFromEmailQuery(con,
 							at.getEmail());
 				}
-				if (userId == null) {
+				if (userEntity == null) {
 					logger.info("skipping attendee update for email "
 							+ at.getEmail() + ". Will add as contact");
 					toInsert.add(at);
@@ -1697,27 +1698,18 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				ps.setInt(idx++, updater.getObmId());
 				ps.setInt(idx++, at.getPercent());
 				ps.setInt(idx++, ev.getDatabaseId());
-				ps.setInt(idx++, userId);
-				ps.setInt(idx++, userId);
+				ps.setInt(idx++, userEntity);
+				ps.setInt(idx++, userEntity);
 				if (!onlyUpdateMyself
 						|| (onlyUpdateMyself && updater.getEmail().equals(
 								at.getEmail()))) {
 					ps.addBatch();
-					mightInsert.add(at);
 				}
 			}
-			updatedAttendees = ps.executeBatch();
-
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 
-		for (int i = 0; i < updatedAttendees.length; i++) {
-			if (updatedAttendees[i] == 0) {
-				Attendee at = mightInsert.get(i);
-				toInsert.add(at);
-			}
-		}
 		if (!onlyUpdateMyself) {
 			logger.info("event modification needs to add " + toInsert.size()
 					+ " attendees.");

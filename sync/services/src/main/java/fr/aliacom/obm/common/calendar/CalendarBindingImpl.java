@@ -282,7 +282,7 @@ public class CalendarBindingImpl implements ICalendar {
 			Event after = calendarService.modifyEvent(token,  calendar, event,
 					onlyUpdateMyself, updateAttendees, false);
 			if (after != null && !onlyUpdateMyself) {
-				logger.info(LogUtils.prefix(token) + "Calendar : event["
+				logger.info(LogUtils.prefix(token) + "Calendar : External event["
 						+ after.getTitle() + "] modified");
 			}
 			return after;
