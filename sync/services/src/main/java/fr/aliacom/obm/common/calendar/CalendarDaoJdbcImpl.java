@@ -246,7 +246,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	public Event createEvent(Connection con, AccessToken editor, String calendar, Event ev,
 			Boolean useObmUser) throws SQLException {
 		Integer ownerId = null;
-		if (Strings.isNullOrEmpty(ev.getOwnerEmail())) {
+		if (!Strings.isNullOrEmpty(ev.getOwnerEmail())) {
 			logger.info("try to create with specified owner:"
 					+ ev.getOwnerEmail());
 			ownerId = userDao.userIdFromEmailQuery(con, ev.getOwnerEmail());

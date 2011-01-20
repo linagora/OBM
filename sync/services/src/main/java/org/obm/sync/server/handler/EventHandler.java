@@ -205,16 +205,25 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendFreeBusyRequest(freeBusy);
 	}
 
+	private String getCalendar(AccessToken accessToken, ParametersSource params) {
+		String calendar = params.getParameter("calendar");
+		if (calendar.contains("@")) {
+			return calendar;
+		} else {
+			return calendar + "@" + accessToken.getDomain();
+		}
+	}
+	
 	private String getLastUpdate(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws ServerFault, AuthFault {
-		Date d = binding.getLastUpdate(at, params.getParameter("calendar"));
+		Date d = binding.getLastUpdate(at, getCalendar(at, params));
 		return responder.sendLong(d.getTime());
 	}
 
 	private String getEventTimeUpdateNotRefusedFromIntervalDate(
 			AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, AuthFault {
-		String calendar = params.getParameter("calendar");
+		String calendar = getCalendar(at, params);
 		Date start = DateHelper.asDate(params.getParameter("start"));
 		Date end = null;
 		if (StringUtils.isNotEmpty("end")) {
@@ -231,7 +240,7 @@ public class EventHandler extends SecureSyncHandler {
 			throws ServerFault, AuthFault {
 		List<EventParticipationState> e = 
 			binding.getEventParticipationStateWithAlertFromIntervalDate(at,
-				params.getParameter("calendar"), 
+				getCalendar(at, params), 
 				DateHelper.asDate(params.getParameter("start")),
 				DateHelper.asDate(params.getParameter("end")));
 
@@ -266,7 +275,7 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws AuthFault, ServerFault {
 			List<Event> e = 
-				binding.getAllEvents(at, params.getParameter("calendar"), 
+				binding.getAllEvents(at, getCalendar(at, params), 
 						EventType.valueOf(params.getParameter("eventType")));
 			return responder.sendListEvent(e);
 	}
@@ -275,7 +284,7 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws AuthFault, ServerFault {
 		List<Event> e = binding.getListEventsFromIntervalDate(at, 
-				params.getParameter("calendar"), 
+				getCalendar(at, params), 
 				DateHelper.asDate(params.getParameter("start")), 
 				DateHelper.asDate(params.getParameter("end")));
 
@@ -284,7 +293,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getEventObmIdFromExtId(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		Integer id = binding.getEventObmIdFromExtId(at, 
-				params.getParameter("calendar"), params.getParameter("extId"));
+				getCalendar(at, params), params.getParameter("extId"));
 		if (id != null) {
 			return responder.sendInt(id);
 		}
@@ -295,7 +304,7 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws ServerFault {
 		Event e = binding.getEventFromExtId(at, 
-				params.getParameter("calendar"), params.getParameter("extId"));
+				getCalendar(at, params), params.getParameter("extId"));
 		if (e != null) {
 			return responder.sendEvent(e);
 		}
@@ -315,14 +324,14 @@ public class EventHandler extends SecureSyncHandler {
 	private String getRefusedKeys(AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault {
 		KeyList ret = binding.getRefusedKeys(at, 
-				params.getParameter("calendar"), 
+				getCalendar(at, params), 
 				DateHelper.asDate(params.getParameter("since")));
 		return responder.sendKeyList(ret);
 	}
 
 	private String getEventTwinKeys(AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
-		KeyList kl = binding.getEventTwinKeys(at, params.getParameter("calendar"), getEvent(params));
+		KeyList kl = binding.getEventTwinKeys(at, getCalendar(at, params), getEvent(params));
 		return responder.sendKeyList(kl);
 	}
 
@@ -334,7 +343,7 @@ public class EventHandler extends SecureSyncHandler {
 	private String getEventFromId(AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault {
 		Event e = binding.getEventFromId(at, 
-				params.getParameter("calendar"), 
+				getCalendar(at, params), 
 				params.getParameter("id"));
 		if (e != null) {
 			return responder.sendEvent(e);
@@ -345,7 +354,7 @@ public class EventHandler extends SecureSyncHandler {
 	private String createEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
-		String ev = binding.createEvent(at,	params.getParameter("calendar"), getEvent(params));
+		String ev = binding.createEvent(at,	getCalendar(at, params), getEvent(params));
 		return responder.sendString(ev);
 	}
 	
@@ -366,7 +375,7 @@ public class EventHandler extends SecureSyncHandler {
 	private String modifyEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
-		Event ev = binding.modifyEvent(at, params.getParameter("calendar"),
+		Event ev = binding.modifyEvent(at, getCalendar(at, params),
 				getEvent(params), Boolean.valueOf(params.getParameter("updateAttendees")));
 		if (ev != null) {
 			return responder.sendEvent(ev);
@@ -377,7 +386,7 @@ public class EventHandler extends SecureSyncHandler {
 	private String removeEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault {
-		Event ev = binding.removeEvent(at, params.getParameter("calendar"),
+		Event ev = binding.removeEvent(at, getCalendar(at, params),
 				params.getParameter("id"));
 		if (ev != null) {
 			return responder.sendEvent(ev);
@@ -389,7 +398,7 @@ public class EventHandler extends SecureSyncHandler {
 	private String removeEventByExtId(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault {
-		Event ev = binding.removeEventByExtId(at, params.getParameter("calendar"),
+		Event ev = binding.removeEventByExtId(at, getCalendar(at, params),
 				params.getParameter("extId"));
 		if (ev != null) {
 			return responder.sendEvent(ev);
@@ -402,7 +411,7 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault {
 		EventChanges ret = binding.getSyncEventDate(at, 
-				params.getParameter("calendar"), 
+				getCalendar(at, params), 
 				DateHelper.asDate(params.getParameter("lastSync")));
 		return responder.sendCalendarChanges(ret);
 	}
@@ -411,7 +420,7 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws AuthFault, ServerFault {
 			EventChanges ret = binding.getSync(at, 
-					params.getParameter("calendar"), 
+					getCalendar(at, params), 
 					DateHelper.asDate(params.getParameter("lastSync")));
 			return responder.sendCalendarChanges(ret);
 	}
@@ -419,15 +428,15 @@ public class EventHandler extends SecureSyncHandler {
 	private String isWritableCalendar(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault {
-		boolean ret = binding.isWritableCalendar(at, params.getParameter("calendar"));
+		boolean ret = binding.isWritableCalendar(at, getCalendar(at, params));
 		logger.info("isWritable(" + at.getEmail() + ", "
-				+ params.getParameter("calendar") + ") => " + ret);
+				+ getCalendar(at, params) + ") => " + ret);
 		return responder.sendBoolean(ret);
 	}
 	
 	private String changeParticipationState(AccessToken at,
 			ParametersSource params, XmlResponder responder) throws ServerFault {
-		boolean success = binding.changeParticipationState(at, params.getParameter("calendar"),
+		boolean success = binding.changeParticipationState(at, getCalendar(at, params),
 				params.getParameter("extId"),
 				ParticipationState.getValueOf(params.getParameter("state")));
 		return responder.sendBoolean(success);
