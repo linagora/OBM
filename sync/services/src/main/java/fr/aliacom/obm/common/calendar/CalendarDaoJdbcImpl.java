@@ -1671,9 +1671,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			for (Attendee at : ev.getAttendees()) {
 				Integer userEntity = userDao.userEntityFromEmailQuery(con,
 						at.getEmail());
-				logger.info("////////////////////////////");
-				logger.info(userEntity);
-				logger.info("////////////////////////////");
 				if(!useObmUser && !userEntityCalender.equals(userEntity)){
 					userEntity = null;
 					logger.info("user with email " + at.getEmail()
