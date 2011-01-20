@@ -1613,18 +1613,18 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(attQ);
 			Integer userIdCalender = userDao.userEntityFromEmailQuery(con, calendar);
 			for (Attendee at : attendees) {
-				Integer entityId = userDao.userEntityFromEmailQuery(con,
+				Integer userId = userDao.userEntityFromEmailQuery(con,
 						at.getEmail());
-				if(!useObmUser && !userIdCalender.equals(entityId)){
-					entityId = null;
+				if(!useObmUser && !userIdCalender.equals(userId)){
+					userId = null;
 					logger.info("user with email " + at.getEmail()
 							+ " not found. Checking contacts.");
 				}
-				if (entityId == null) {
-					entityId = userDao.contactEntityFromEmailQuery(con,
+				if (userId == null) {
+					userId = userDao.contactEntityFromEmailQuery(con,
 							at.getEmail());
 				}
-				if (entityId == null) {
+				if (userId == null) {
 					logger.info("Attendee " + at.getEmail()
 							+ " not found in OBM, will create a contact");
 					Contact c = new Contact();
@@ -1633,11 +1633,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					c.addEmail("INTERNET;X-OBM-Ref1", new Email(at.getEmail()));
 					c.setCollected(true);
 					c = contactDao.createContact(con, editor, c);
-					entityId = c.getEntityId();
+					userId = c.getEntityId();
 				}
 
 				ps.setInt(1, ev.getDatabaseId());
-				ps.setInt(2, entityId);
+				ps.setInt(2, userId);
 				ps.setObject(3, at.getState()
 						.getJdbcObject(obmHelper.getType()));
 				ps.setObject(4,
@@ -1669,11 +1669,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 			ps = con.prepareStatement(q);
+			Integer userIdCalender = userDao.userEntityFromEmailQuery(con, calendar);
 			for (Attendee at : ev.getAttendees()) {
-				Integer userId = null;
-				if(useObmUser){
-				userId = userDao.userIdFromEmailQuery(con,
+				Integer userId = userDao.userEntityFromEmailQuery(con,
 						at.getEmail());
+				if(!useObmUser && !userIdCalender.equals(userId)){
+					userId = null;
+					logger.info("user with email " + at.getEmail()
+							+ " not found. Checking contacts.");
 				}
 				if (userId == null) {
 					userId = userDao.contactEntityFromEmailQuery(con,
