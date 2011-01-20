@@ -211,7 +211,6 @@ class CalendarMailer extends OBM_Mailer {
     }
   }
 
-
   /**
    * Perform the export meeting to the vCalendar format
    */
@@ -236,15 +235,15 @@ class CalendarMailer extends OBM_Mailer {
   }
   
   private function extractEventDetails($event, $sender, $prefix = '', $target = null) {
-	$contacts = $event->contact;
-	foreach ($contacts as $contact) {
-		$attendees[] = $contact->label;
-	}
-	$users = $event->user;
-	foreach ($users as $user) {
-		$attendees[] = $user->label;
-	}
-	$list_attendees = array_slice($attendees, 0, 9);
+    $contacts = $event->contact;
+    foreach ($contacts as $contact) {
+      $attendees[] = $contact->label;
+    }
+    $users = $event->user;
+    foreach ($users as $user) {
+      $attendees[] = $user->label;
+    }
+    $list_attendees = array_slice($attendees, 0, 9);
     if(count($attendees) >= count($list_attendees)) {
         $suffix = '...';
     }
@@ -267,32 +266,88 @@ class CalendarMailer extends OBM_Mailer {
 }
 
 class shareCalendarMailer extends OBM_Mailer {
+  
   protected $module = 'calendar';
+  
+  protected $attachVcard = true;
 
   public function addRecipient($mail) {
     if($mail != 'all')
       $this->recipients[] = $mail;
   }
 
-  private function extractEntityDetails($entity, $sender, $prefix = '', $target = null) {
-    return array(
-      'host'             => $GLOBALS['cgp_host'],
-      $prefix.'name'     => $entity['lastname'],
-      $prefix.'firstname'=> $entity['firstname'],
-      $prefix.'email'    => $entity['email'],
-      $prefix.'token'    => $entity['token']
-    );
+  public function userShareHtml($user) {
+    $this->from = $this->getSender();
+    $this->subject = __('Partage d\'agenda : %firstname% %name%', 
+      array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
+    $this->body = array('user' => $user, 'url' => $this->getHtmlCalUri($user)); 
   }
 
-  public function userShareHtml($entity) {
+  public function userShareIcs($user) {
     $this->from = $this->getSender();
-    $this->subject = __('Partage d\'agenda : %firstname% %name%', array( '%name%' => $entity['lastname'],'%firstname%' => $entity['firstname']));
-    $this->body = $this->extractEntityDetails($entity, $this->from); 
+    $this->subject = __('Partage d\'agenda : %firstname% %name%', 
+      array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
+    $this->body = array('user' => $user, 'url' => $this->getCalUri($user));
+    
+    if ($this->attachVcard) {
+      $this->attachments[] = array(
+        'content' => (string) $this->generateVcard($user), 
+        'filename' => 'contact.vcf', 'content_type' => 'text/x-vcard'
+      );
+    }
   }
-
-  public function userShareIcs($entity) {
-    $this->from = $this->getSender();
-    $this->subject = __('Partage d\'agenda : %firstname% %name%', array( '%name%' => $entity['lastname'],'%firstname%' => $entity['firstname']));
-    $this->body = $this->extractEntityDetails($entity, $this->from); 
+  
+  private function generateVcard($user) {
+    $card = new Vpdi_Vcard();
+    
+    $name = new Vpdi_Vcard_Name();
+    $name->family = $user['lastname'];
+    $name->given  = $user['firstname'];
+    //$name->fullname =  ;
+    $card->setName($name);
+    
+    $add = new Vpdi_Vcard_Address();
+    $add->street = $user['address1'];
+    $add->extended = $user['address2'];
+    $add->locality = $user['town'];
+    $add->postalcode = $user['zipcode'];
+    $add->pobox = $user['expresspostal'];
+    //$add->country = 'FRANCE';
+    $add->location[] = 'work';
+    $card->addAddress($add);
+    
+    if (!empty($user['phone'])) {
+      $phone = new Vpdi_Vcard_Phone($user['phone']);
+      $phone->location[] = 'work';
+      $card->addPhone($phone);
+    }
+    
+    if (!empty($user['mobile'])) {
+      $mobile = new Vpdi_Vcard_Phone($user['mobile']);
+      $mobile->location[] = 'cell';
+      $card->addPhone($mobile);
+    }
+    
+    if (!empty($user['email'])) {
+      $email = new Vpdi_Vcard_Email($user['email']);
+      $email->location[] = 'work';
+      $card->addEmail($email);
+    }
+    
+    $card[] = new Vpdi_Property('caluri', $this->getCalUri($user));
+    
+    return $card;
+  }
+  
+  private function getCalUri($user) {
+    return $GLOBALS['cgp_host'].'calendar/calendar_render.php?action=ics_export'
+      .'&externalToken='.$user['token']
+      .'&lastname='.urlencode($user['lastname'])
+      .'&firstname='.urlencode($user['firstname'])
+      .'&email='.urlencode($user['email']);
+  }
+  
+  private function getHtmlCalUri($user) {
+    return $GLOBALS['cgp_host'].'calendar/calendar_render.php?externalToken='.$user['token'];
   }
 }
