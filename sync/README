@@ -1,0 +1,11 @@
+**OBM-SYNC README FILE**
+
+Synchronisation server for OBM.
+
+Install instructions are in docs folder.
+
+LDAP Authentification :
+
+ - default auth uses the UserObm table.
+ - obm-sync switches to ldap auth when the file /etc/obm/ldap-auth.xml exists
+ - a sample configuration is in ldap-auth.xml.sample
