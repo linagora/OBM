@@ -1466,6 +1466,7 @@ CREATE TABLE `EventLink` (
   `eventlink_state` enum('NEEDS-ACTION','ACCEPTED','DECLINED','TENTATIVE','DELEGATED','COMPLETED','IN-PROGRESS') default 'NEEDS-ACTION',
   `eventlink_required` enum('CHAIR','REQ','OPT','NON') default 'REQ',
   `eventlink_percent` int(3) default '0',
+  `eventlink_is_organizer` tinyint(1) default 0,
   PRIMARY KEY  (`eventlink_event_id`,`eventlink_entity_id`),
   KEY `eventlink_userupdate_userobm_id_fkey` (`eventlink_userupdate`),
   KEY `eventlink_usercreate_userobm_id_fkey` (`eventlink_usercreate`),

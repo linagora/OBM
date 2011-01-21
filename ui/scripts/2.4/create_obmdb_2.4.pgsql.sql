@@ -996,7 +996,8 @@ CREATE TABLE eventlink (
     eventlink_entity_id integer NOT NULL,
     eventlink_state vpartstat DEFAULT 'NEEDS-ACTION'::vpartstat,
     eventlink_required vrole DEFAULT 'REQ'::vrole,
-    eventlink_percent double precision DEFAULT 0
+    eventlink_percent double precision DEFAULT 0,
+    eventlink_percent boolean eventlink_is_organizer DEFAULT 0
 );
 
 

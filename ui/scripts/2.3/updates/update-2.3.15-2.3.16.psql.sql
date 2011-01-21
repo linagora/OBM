@@ -1,5 +1,7 @@
 UPDATE ObmInfo SET obminfo_value = '2.3.16-pre' WHERE obminfo_name = 'db_version';
 
+ALTER TABLE EventLink ADD eventlink_is_organizer boolean default false;
+
 --
 -- Name: mailinglist; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --

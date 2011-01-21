@@ -1,4 +1,7 @@
 UPDATE ObmInfo SET obminfo_value = '2.3.16-pre' WHERE obminfo_name = 'db_version';
+
+ALTER TABLE EventLink ADD eventlink_is_organizer tinyint(1) default 0;
+
 DROP TABLE IF EXISTS `MailingList`;
 CREATE TABLE `MailingList` (
   `mailinglist_id` int(8) NOT NULL auto_increment,
