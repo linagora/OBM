@@ -841,12 +841,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
 				+ "WHERE e.event_type=? AND ue.userentity_user_id=? ";
 
-		// dirty hack to disable need-action to opush & tbird
-		if (token.getOrigin().contains("push")
-				|| token.getOrigin().contains("thunderbird")) {
-			fetchIds += " AND att.eventlink_state != 'NEEDS-ACTION' ";
-		}
-
+		
 		if (lastSync != null) {
 			fetchIds += " AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? ";
 			if (onEventDate) {
