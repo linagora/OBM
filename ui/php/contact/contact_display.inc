@@ -2084,6 +2084,18 @@ function json_search_contact($contact ,$results) {
   $display['json'] = "{length:".sizeof($results).", datas:[".implode(',',$contacts)."]}";
 }
 
+function json_get_kind($results) {
+  global $display;
+  $kinds = array();
+  if (is_array($results)) {
+    foreach($results as $kind_id=>$kind_minilabel) {
+      $kinds[] = "{id:'$kind_id', label : '".phpStringToJsString($kind_minilabel)."', extra:''}";
+    }
+  }
+  $display['json'] = "{length:".sizeof($results).", datas:[".implode(',',$kinds)."]}";
+}
+
+
 function json_sync_contact($err, $act) {
   global $display, $l_sync, $l_desync;
   global $l_synchronisation, $l_update_ok, $l_update_error;

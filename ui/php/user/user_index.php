@@ -62,6 +62,7 @@ require_once('user_js.inc');
 require_once("$path/../app/default/models/UserPattern.php");
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/of/of_right.inc"); // needed by call from calendar
+require_once("$obminclude/of/of_contact.php");
 
 
 // detailconsult can be accessed without user_id (-> display current user)

@@ -2334,7 +2334,8 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table>
   <tr>
     <th class=\"$class[kind]\">$l_kind</th>
-    <td><input id=\"userKind\" name=\"tf_kind\" size=\"32\" maxlength=\"12\" value=\"$kind\" /></td>
+    <td><input id=\"userKind\" name=\"tf_kind\" size=\"32\" maxlength=\"12\" value=\"$kind\" autocomplete =\"off\"/>
+    </td>
   </tr>
   <tr>
     <th class=\"$class[lastname]\">$l_lastname</th>
@@ -2475,6 +2476,11 @@ $mobile_devices
   $dis_button
   </fieldset>
   </form>
+  <script type='text/javascript'>
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$GLOBALS[path]/contact/contact_index.php?action=ext_get_kind', 'userKind', 'userKind',{mode: 'mono', strict:false});
+      })
+  </script>
   $js_userpattern";
 
   return $block;

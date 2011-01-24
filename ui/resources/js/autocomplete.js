@@ -153,8 +153,11 @@ obm.AutoComplete.Search = new Class({
       // 'mono' mode functions
       this.validateResultValue = this.setResultValue;
       this.resetFunc = this.monoModeReset;
-      this.textChangedFunc = function() { this.unvalidateSelection(); this.resetResultBox(); };
-
+      if (this.options.strict) {
+        this.textChangedFunc = function() { this.unvalidateSelection(); this.resetResultBox(); };
+      } else {
+        this.textChangedFunc = function() {this.resetResultBox();};
+      }
       // 'mono' mode initializations 
       if (this.selectedBox.value != '')
         this.currentValue = this.inputField.value;

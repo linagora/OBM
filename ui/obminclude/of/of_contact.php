@@ -1583,6 +1583,17 @@ class OBM_Contact implements OBM_ISearchable {
     }
     return array_search($kind, self::$kinds);
   }
+
+  public static function fetchKindHeaders() {
+    $kinds = array();
+    $query = "SELECT kind_id, kind_header FROM Kind";
+    $db = new DB_OBM();
+    $db->xquery($query);        
+    while ($db->next_record()) {
+      $kinds[$db->f('kind_id')] = $db->f('kind_header');
+    }
+    return $kinds;
+  }
   
   private static function fetchKinds() {
     $kinds = array();
