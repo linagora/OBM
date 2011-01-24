@@ -48,6 +48,8 @@ class OBM_Acl {
 
   private static $actions;
 
+  private static $authorizedRights = array(-2, -1, 0, 1);
+
   /**
    * These entity types have no related table (i.e. one entity per user)
    */
@@ -597,7 +599,7 @@ class OBM_Acl {
 
       if (is_bool($value)) {
         $value = ($value) ? 1 : 0;
-      } elseif ($value != 1 && $value != 0 && $value != -1 && $value != -2) {
+      } elseif ( !in_array($value, self::$authorizedRights) ) {
 	throw new Exception("Forbidden value for $action action: $value");
       }
       $rights[$action] = $value;
