@@ -60,7 +60,6 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.items.EventChanges;
 
-import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -221,7 +220,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser) {
+	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser)throws FindException {
 		logger.info("create with token " + editor.getSessionId() + " from "
 				+ editor.getOrigin() + " for " + editor.getEmail());
 
@@ -244,17 +243,16 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public Event createEvent(Connection con, AccessToken editor, String calendar, Event ev,
-			Boolean useObmUser) throws SQLException {
+			Boolean useObmUser) throws SQLException, FindException {
 		Integer ownerId = null;
-		if (!Strings.isNullOrEmpty(ev.getOwnerEmail())) {
-			logger.info("try to create with specified owner:"
-					+ ev.getOwnerEmail());
-			ownerId = userDao.userIdFromEmailQuery(con, ev.getOwnerEmail());
+		logger.info("try to create with calendar owner:"
+				+ calendar);
+		ownerId = userDao.userIdFromEmailQuery(con, calendar);
+		if(ownerId == null){
+			throw new FindException("Error finding user["+calendar+"]");
 		}
-		if (ownerId == null) {
-			logger.info("owner not found or not specified : creating with editor as owner ");
-			ownerId = editor.getObmId();
-		}
+		
+		
 		String evQ = "INSERT INTO Event (" + EVENT_INSERT_FIELDS
 				+ ") values ( " + ownerId + ",  " +
 				// event_owner
@@ -320,7 +318,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private List<Event> insertEventExceptions(AccessToken editor, String calendar,
 			List<Event> eventException, Connection con, int id, Boolean useObmUser)
-			throws SQLException {
+			throws SQLException, FindException {
 		List<Event> newEvExcepts = new LinkedList<Event>();
 		if (eventException != null) {
 			Event created = null;
@@ -841,7 +839,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
 				+ "WHERE e.event_type=? AND ue.userentity_user_id=? ";
 
-		
+		// dirty hack to disable need-action to opush & tbird
+		if (token.getOrigin().contains("push")) {
+			fetchIds += " AND att.eventlink_state != 'NEEDS-ACTION' ";
+		}
+
 		if (lastSync != null) {
 			fetchIds += " AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? ";
 			if (onEventDate) {
@@ -1339,7 +1341,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	@Override
 	public void modifyEvent(Connection con, AccessToken at, String calendar, Event ev, 
 			boolean onlyUpdateMyself, boolean updateAttendees, Boolean useObmUser)
-			throws SQLException {
+			throws SQLException, FindException {
 		Event old = findEvent(at, Integer.valueOf(ev.getUid()));
 		if (old == null) {
 			return;

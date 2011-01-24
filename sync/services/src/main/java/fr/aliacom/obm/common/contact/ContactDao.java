@@ -70,6 +70,7 @@ import org.obm.sync.solr.SolrHelper.Factory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.utils.LinkedEntity;
 import fr.aliacom.obm.utils.ObmHelper;
@@ -376,7 +377,7 @@ public class ContactDao {
 	}
 
 	private Integer createOrUpdateDate(AccessToken at, Connection con,
-			Contact c, Date date, String dateField) throws SQLException {
+			Contact c, Date date, String dateField) throws SQLException, FindException {
 		int dateId = 0;
 		if (c.getUid() != null && c.getUid().intValue() != 0) {
 			logger.info("c.getUid != null");

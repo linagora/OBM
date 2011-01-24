@@ -261,8 +261,8 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private Event modifyInternalEvent(AccessToken token, String calendar, Event before,  Event event, boolean onlyUpdateMyself,
-			boolean updateAttendees) {
-
+			boolean updateAttendees) throws ServerFault {
+		try{
 			Event after = calendarService.modifyEvent(token, calendar, event,
 					onlyUpdateMyself, updateAttendees, true);
 
@@ -274,11 +274,15 @@ public class CalendarBindingImpl implements ICalendar {
 					settingsDao.getUserLanguage(token));
 
 			return after;
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}
 	}
 
 	private Event modifyExternalEvent(AccessToken token, String calendar, 
-			Event event, boolean onlyUpdateMyself, boolean updateAttendees) {
-		
+			Event event, boolean onlyUpdateMyself, boolean updateAttendees) throws ServerFault {
+		try {
 			Event after = calendarService.modifyEvent(token,  calendar, event,
 					onlyUpdateMyself, updateAttendees, false);
 			if (after != null && !onlyUpdateMyself) {
@@ -286,6 +290,10 @@ public class CalendarBindingImpl implements ICalendar {
 						+ after.getTitle() + "] modified");
 			}
 			return after;
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}
 	}
 
 	@Override
@@ -344,19 +352,29 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private Event createExternalEvent(AccessToken token, String calendar, Event event) {
+	private Event createExternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {
+		try{
 		Event ev = calendarService.createEvent(token, calendar, event, false);
 		logger.info(LogUtils.prefix(token) + "Calendar : external event["
 				+ ev.getTitle() + "] created");
 		return ev;
+	    } catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}
 	}
 
-	private Event createInternalEvent(AccessToken token, String calendar, Event event) {
-		Event ev = calendarService.createEvent(token, calendar, event, true);
-		eventChangeHandler.create(ev, settingsDao.getUserLanguage(token));
-		logger.info(LogUtils.prefix(token) + "Calendar : internal event["
+	private Event createInternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {
+		try{
+			Event ev = calendarService.createEvent(token, calendar, event, true);
+			eventChangeHandler.create(ev, settingsDao.getUserLanguage(token));
+			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");
-		return ev;
+			return ev;
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}
 	}
 
 	@Override

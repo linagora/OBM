@@ -22,7 +22,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public interface CalendarDao {
 
-	Event createEvent(AccessToken at, String calendar, Event event, Boolean useObmUser);
+	Event createEvent(AccessToken at, String calendar, Event event, Boolean useObmUser) throws FindException;
 
 	List<Event> findAllEvents(AccessToken token, ObmUser calendarUser, EventType typeFilter);
 
@@ -56,17 +56,17 @@ public interface CalendarDao {
 
 	int markEventAsUpdated(int databaseId) throws FindException;
 
-	Event modifyEvent(AccessToken at, String calendar, Event event, boolean onlyUpdateMyself, boolean updateAttendees, Boolean useObmUser);
+	Event modifyEvent(AccessToken at, String calendar, Event event, boolean onlyUpdateMyself, boolean updateAttendees, Boolean useObmUser) throws FindException;
 
 	Event removeEvent(AccessToken token, int eventId, EventType eventType);
 
 	Event removeEventByExtId(AccessToken token, ObmUser calendar, String eventExtId);
 
-	Event createEvent(Connection con, AccessToken editor, String calendar, Event ev, Boolean useObmUser) throws SQLException;
+	Event createEvent(Connection con, AccessToken editor, String calendar, Event ev, Boolean useObmUser) throws SQLException, FindException;
 
 	void modifyEvent(Connection con, AccessToken at,  String calendar, Event ev,
 			boolean onlyUpdateMyself, boolean updateAttendees, Boolean useObmUser)
-			throws SQLException;
+			throws SQLException, FindException;
 
 	Event removeEvent(Connection con, AccessToken token, int uid, EventType et);
 
