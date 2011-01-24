@@ -146,9 +146,6 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 
   // For User member lists
   elseif (($fieldname == 'group_contact_lastname') && $link_ok) {
-    if(!$OD->data_set->f('group_contact_lastname')) {
-      $res['name'] = $GLOBALS['l_displayname_alternative'];;
-    }
     $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('group_contact_id');
   }
 
