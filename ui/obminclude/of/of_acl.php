@@ -597,7 +597,7 @@ class OBM_Acl {
 
       if (is_bool($value)) {
         $value = ($value) ? 1 : 0;
-      } elseif ($value != 1 && $value != 0) {
+      } elseif ($value != 1 && $value != 0 && $value != -1 && $value != -2) {
 	throw new Exception("Forbidden value for $action action: $value");
       }
       $rights[$action] = $value;
