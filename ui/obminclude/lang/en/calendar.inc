@@ -22,6 +22,7 @@ $l_add_displayed_resources = "Add displayed resources";
 $l_show_user_calendar = "Show attendees calendars after event creation";
 $l_show_resource_calendar = "Show resources calendars after event creation";
 $l_users = "Users";
+$l_calendar = "Calendar";
 $l_owner = "Organizer";
 $l_resources = "Resources";
 $l_groups = "Groups";

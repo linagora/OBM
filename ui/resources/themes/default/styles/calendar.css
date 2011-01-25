@@ -716,6 +716,15 @@ li.eventOwner19Legend {
   margin: 0 0.5em;
 }
 
+#calendarQuickForm table {
+  width: 80%;
+}
+
+#calendarQuickForm table th {
+  text-align: right;
+  padding-right: 10px;
+}
+
 #calendarQuickFormData {
   margin:0;
   padding: 0 0 5px 0;

@@ -1774,6 +1774,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   $title = sql_parse_text($calendar['title']);
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
+  $owner = $calendar['entity_id'];
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $opacity = 'OPAQUE';
   if ($all_day == 'TRUE') {
@@ -1867,7 +1868,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
     $obm[uid],
     'VEVENT',
     '$GLOBALS[c_origin_ajax]',
-    $obm[uid],
+    $owner,
     '".Of_Date::getOption('timezone')."', 
     '$title', 
     '$datebegin',     

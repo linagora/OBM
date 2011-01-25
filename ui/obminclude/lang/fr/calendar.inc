@@ -15,6 +15,7 @@ $l_add_displayed_resources = "Ajouter les ressources dont les agendas sont affic
 $l_show_user_calendar = "Afficher le calendrier des participants après validation";
 $l_show_resource_calendar = "Afficher le calendrier des ressources après validation";
 $l_users = "Utilisateurs";
+$l_calendar = "Agenda";
 $l_owner = "Organisateur";
 $l_resources = "Ressources";
 $l_free_resources = "Resources libres : ";

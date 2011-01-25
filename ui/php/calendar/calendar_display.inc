@@ -3810,19 +3810,18 @@ function dis_calendar_quick_form($calendar_entity) {
     }
     $entity_view.="</select>";
     $entity_view.="<input id='calendarKindEntity' type='hidden' value='user' />";
-    $calendar_list_entity = "
-      <fieldset id='calendarListEntity'>
-        $GLOBALS[l_users] : $entity_view
-      </fieldset>";
+    $calendar_list = "
+      <th>$GLOBALS[l_calendar]:</th>
+      <td>$entity_view</td>";
   } else {
     if (is_array($calendar_entity['user'])) {
       $user = array_values($calendar_entity['user']);
-      $calendar_list_entity ="<input id=\"calendarViewEntity\" type='hidden' value='".$user[0][id]."' />";
-      $calendar_list_entity .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+      $calendar_inputs ="<input id=\"calendarViewEntity\" type='hidden' value='".$user[0][id]."' />";
+      $calendar_inputs .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
     } else {
       $txt = $GLOBALS['l_create_in_mine'];
-      $calendar_list_entity ="<input id=\"calendarViewEntity\" type='hidden' value='".$GLOBALS['obm']['uid']."' />";
-      $calendar_list_entity .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+      $calendar_inputs ="<input id=\"calendarViewEntity\" type='hidden' value='".$GLOBALS['obm']['uid']."' />";
+      $calendar_inputs .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
     }
   }
 
@@ -3839,11 +3838,11 @@ function dis_calendar_quick_form($calendar_entity) {
     }
 
     $block_template = "
-    $GLOBALS[l_template]:
-    <select id='template_id' name='template_id' onchange='obm.calendarQuickForm.setQuickTitle();'>
-      <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
-      $select
-    </select>";
+      <th>$GLOBALS[l_template]:</th>
+      <td><select id='template_id' name='template_id' onchange='setQuickTitle();'>
+        <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
+        $select
+      </select></td>";
   }
   $js_templatetitle = phpArrayToJsArray($eventtemplate_title);
 
@@ -3861,12 +3860,20 @@ function dis_calendar_quick_form($calendar_entity) {
       </h2> 
      <div class='content'>
         <form id='calendarQuickFormStore' onsubmit='obm.calendarQuickForm.submit();return false;'>
-          <fieldset>
-            $txt<br/>
-            $GLOBALS[l_title]: <input type='text' id='tf_quick_title' maxlength='255' name='tf_title' /> 
-            <span id='sel_template'><br/>$block_template</span>
-          </fieldset>
-          $calendar_list_entity
+          $txt
+          <table style='width: 90%'>
+            <tr>
+              <th>$GLOBALS[l_title]:</th>
+              <td><input type=\"text\" maxlength='255' name=\"tf_title\" id=\"tf_quick_title\" /></td>
+            </tr>
+            <tr id='sel_template'>
+              $block_template
+            </tr>
+            <tr id=\"calendarListEntity\">
+              $calendar_list
+            </tr>
+          </table>
+          $calendar_inputs
           <fieldset class='buttons'> 
             <input class='closeSticky' type='submit' value='$GLOBALS[l_validate]' />
             <input type='button' id='calendarQuickFormEdit' onclick='obm.calendarQuickForm.goTo();' />
@@ -6900,7 +6907,8 @@ function json_build_html_event($calendar, $current_view, $id) {
  * @return void
  */
 function json_insert_event_data($id,$calendar,$current_view) {
- 
+  global $obm;
+  
   $duration = $calendar['duration'];
   $all_day = ($calendar['all_day'])?true:false;
   $date_range = $current_view->get_date_range();
@@ -6908,6 +6916,9 @@ function json_insert_event_data($id,$calendar,$current_view) {
   $end = clone $date_range['end'];
 
   $calendar_entity = $current_view->get_entities();
+  $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
+    OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
+  );
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $category_filter = $current_view->get_category_filter();
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
