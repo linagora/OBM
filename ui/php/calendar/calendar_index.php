@@ -811,8 +811,13 @@ if ($action == 'search') {
 } elseif ($action == 'save_as_template') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_form($params)) {
-    $params['template_id'] = run_query_calendar_create_or_update_event_template($params);
-    $display['msg'] .= display_ok_msg("$l_template : $l_insert_ok");
+    if(run_query_check_exists_template_by_name($params['template_name'])){
+       $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $l_event_templates_already_exists);
+    }
+    else{
+      $params['template_id'] = run_query_calendar_create_or_update_event_template($params);
+      $display['msg'] .= display_ok_msg("$l_template : $l_insert_ok");
+    }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
   }

@@ -100,6 +100,7 @@ $l_email = "Email";
 $l_quota = "Quota";
 $l_overquota = "Over quota";
 $l_invalid_data = "Invalid Data";
+$l_event_templates_already_exists = "An event template with the same name already exists";
 $l_invalid_email = "Invalid Email";
 $l_insert_ok = "Insertion successful";
 $l_insert_error = "Insertion Error";

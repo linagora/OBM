@@ -1774,7 +1774,6 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   $title = sql_parse_text($calendar['title']);
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
-  $owner = $calendar['entity_id'];
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $opacity = 'OPAQUE';
   if ($all_day == 'TRUE') {
@@ -1868,7 +1867,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
     $obm[uid],
     'VEVENT',
     '$GLOBALS[c_origin_ajax]',
-    $owner,
+    $obm[uid],
     '".Of_Date::getOption('timezone')."', 
     '$title', 
     '$datebegin',     
@@ -2476,6 +2475,25 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   }
   
   return $id;
+}
+
+/**
+ * Checks if an event template exists or not
+ *
+ * @param   <string>  $templateName template name to check for existence
+ * @return  <bool>    True if exists, false otherwise
+ */
+function run_query_check_exists_template_by_name($templateName){
+  global $cdg_sql;
+
+  $query = "SELECT eventtemplate_id 
+            FROM EventTemplate
+            WHERE eventtemplate_name = '".mysql_real_escape_string($templateName)."'";
+  display_debug_msg($query, $cdg_sql, 'run_query_check_exists_template_by_name()');
+  
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return ($obm_q->num_rows() > 0);
 }
 
 /**

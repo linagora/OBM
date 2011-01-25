@@ -107,6 +107,7 @@ $l_overquota = "Quota dépassé";
 $l_ip = "IP";
 $l_role = "Rôle";
 $l_invalid_data = "Données invalides";
+$l_event_templates_already_exists = "Un modèle d'évènement de même nom existe déjà";
 $l_invalid_email = "Email invalide";
 $l_insert_ok = "Insertion réussie";
 $l_insert_error = "Erreur à l'insertion";
