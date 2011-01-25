@@ -2478,7 +2478,7 @@ $mobile_devices
   </form>
   <script type='text/javascript'>
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$GLOBALS[path]/contact/contact_index.php?action=ext_get_kind', 'userKind', 'userKind',{mode: 'mono', strict:false});
+      new obm.AutoComplete.Search('$GLOBALS[path]/contact/contact_index.php?action=ext_get_kind', 'userKind', 'userKind',{mode: 'mono', strict:false, fieldText: '', chars: 0});
       })
   </script>
   $js_userpattern";
