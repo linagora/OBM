@@ -4311,95 +4311,45 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
      </td>
     </tr>";
 
-  if (isset($calendar['template_id'])) {
-    list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
-    $template_users_id = $template_entities['user'];
-    $template_contacts_id = $template_entities['contact'];
-    $template_res_id = $template_entities['resource'];
-    $template_groups_id = $template_entities['group'];
-    $template_documents_id = $template_entities['document'];
-  }
-
-  if ($action == 'new' && !isset($calendar['new_meeting'])) {
-    // If one new user is given in parameters, pre-select it
-    $displayed_users = $current_view->get_users();
-    if (is_array($calendar['new_user_id']) && count($calendar['new_user_id']) == 1) {
-      $u_id = current($calendar['new_user_id']);
-    } else if (is_array($displayed_users) && count($displayed_users)==1) {
-      // Else if calendar displayed was only one user, pre-select him
-      $u_id = current($displayed_users);
-    } else {
-      // Else auto-select the connected user
-      $u_id = "$uid";
-    }
-    if (is_array($template_users_id) && isset($calendar['template_id']) && $calendar['template_id'] > 0) {
-      $users_entity = get_userobm_from_ids(array_unique($template_users_id));
-      $users_entity = $users_entity['entity'];
-      foreach($users_entity as $id => $user) {
-        $sel_id = "data-user-$id";
-        $div_id = "sel_user_id-$sel_id";
-        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-          <img src=\"$ico_delete\" alt=\"[Delete]\" />
-          </a>
-          $user[label]
-          <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-          </div>";
-      }
-    } else {
-      $u_name = ($users['entity'][$u_id]['label']);
+  // user select
+  if (is_array($users['entity'])) {
+    foreach ($users['entity'] as $u_id => $u_ent) {
+      $u_name = $u_ent['label'];
       $sel_id = "data-user-$u_id";
       $div_id = "sel_user_id-$sel_id";
-      $dis_sel_user = "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-        <img src=\"$ico_delete\" alt=\"[Delete]\" />
-        </a>
-        $u_name
-        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-        </div>";
-    }
-
-  } else {
-    // user select
-    if (is_array($users['entity'])) {
-      foreach ($users['entity'] as $u_id => $u_ent) {
-        $u_name = $u_ent['label'];
-        $sel_id = "data-user-$u_id";
-        $div_id = "sel_user_id-$sel_id";
-        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-        <img src=\"$ico_delete\" alt=\"[Delete]\" />
-        </a>
-        $u_name
-        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-        </div>";
-      }
+      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+      <img src=\"$ico_delete\" alt=\"[Delete]\" />
+      </a>
+      $u_name
+      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+      </div>";
     }
   }
 
-  if ($current_view->users_count()+$current_view->contacts_count() > 1) {
-    $u = array();
+  if ($current_view->users_count() + $current_view->contacts_count() > 1) {
     
-   $users_entity = get_userobm_from_ids($current_view->get_users());
-   $users_ids = $users_entity[ids];
-   $jsid = $obm['uid'];
-   if (isset($calendar[new_user_id][0])) $jsid = $calendar[new_user_id][0];
-    foreach($users_ids as $id) {
-      $name = phpStringToJsString($users_entity["entity"][$id]["label"]);
-      array_push($u, "'$id' : '$name'");
+    $u = array();
+    if ($current_view->users_count() > 0) {
+      $displayed_users = get_userobm_from_ids($current_view->get_users());
+      foreach($displayed_users['entity'] as $id => $entity) {
+        $name = phpStringToJsString($entity['label']);
+        array_push($u, "'$id' : '$name'");
+      }
     }
     $users_js = "{".implode(",", $u)."}";
 
     $c = array();
-    if (is_array($contacts['entity'] )) {
-      foreach($contacts['entity'] as $id => $contact) {
-        $name = phpStringToJsString($contact["label"]);
-        array_push($c,  "'$id' : '$name'");
+    if ($current_view->contacts_count() > 0) {
+      $displayed_contacts = get_contact_from_ids($current_view->get_contacts(), false);
+      foreach($displayed_contacts['entity'] as $id => $entity) {
+        $name = phpStringToJsString($entity['label']);
+        array_push($c, "'$id' : '$name'");
       }
     }
     $contact_js = "{".implode(",", $c)."}";
 
-    if ( $add_displayed_users ) {
+    if ($add_displayed_users) {
       $add_displayed_users_checked = "checked=\"checked\"";
     }
     $block_add_displayed_users = "<tr>
@@ -4409,26 +4359,24 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <td>
         <input type='checkbox' id='cba_add_displayed_users' value='1' $add_displayed_users_checked 
           name='cba_add_displayed_users' 
-          onclick=\"add_displayed_attendee(this.checked, $users_js, $jsid, 'user', 'sel_user_id'); 
+          onclick=\"add_displayed_attendee(this.checked, $users_js, $uid, 'user', 'sel_user_id'); 
           add_displayed_attendee(this.checked, $contact_js, $uid, 'contact', 'sel_contact_id'); \"/>
       </td>
       </tr>";
   }
 
-  if (($action == 'detailupdate' || isset($calendar['new_meeting']) && $calendar['new_meeting']==1) || $action != 'new') {
-    if (is_array($contacts['entity'])) {
-      foreach ($contacts['entity'] as $u_id => $u_ent) {
-        $u_name = $u_ent['label'];
-        $sel_id = "data-contact-$u_id";
-        $div_id = "sel_contact_id-$sel_id";
-        $dis_sel_contact .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_contact_id');\">
-        <img src=\"$ico_delete\" alt=\"[Delete]\" />
-        </a>
-        $u_name
-        <input value=\"$sel_id\" name=\"sel_contact_id[]\" type=\"hidden\" />
-        </div> ";
-      }
+  if (is_array($contacts['entity'])) {
+    foreach ($contacts['entity'] as $u_id => $u_ent) {
+      $u_name = $u_ent['label'];
+      $sel_id = "data-contact-$u_id";
+      $div_id = "sel_contact_id-$sel_id";
+      $dis_sel_contact .= "<div class=\"elementRow\" id=\"$div_id\">
+      <a href=\"javascript: remove_element('$div_id','sel_contact_id');\">
+      <img src=\"$ico_delete\" alt=\"[Delete]\" />
+      </a>
+      $u_name
+      <input value=\"$sel_id\" name=\"sel_contact_id[]\" type=\"hidden\" />
+      </div> ";
     }
   }
 
