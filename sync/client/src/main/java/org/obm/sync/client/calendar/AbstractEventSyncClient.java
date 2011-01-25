@@ -406,14 +406,4 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		checkServerError(doc);
 		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
-	
-	@Override
-	public boolean isInternalEvent(AccessToken token, Event event) throws ServerFault {
-		Map<String, String> params = initParams(token);
-		params.put("event", ciw.getEventString(event));
-		Document doc = execute(type + "/isInternalEvent", params);
-		checkServerError(doc);
-		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
-	}
-
 }

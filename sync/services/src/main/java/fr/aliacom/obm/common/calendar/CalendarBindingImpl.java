@@ -137,18 +137,6 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new FindException("Calendar not exist or not valid");
 		}
 		return user;
-		
-	}
-
-	/**
-	 * Returns an ObmUser if the calendar@domainName has an email and is not
-	 * archived
-	 */
-	private ObmUser getObmUser(String email) throws FindException {
-		Iterable<String> it = Splitter.on('@').omitEmptyStrings().split(email);
-		String username = Iterables.get(it, 0, null);
-		String domainName = Iterables.get(it, 1, null);
-		return getCalendarOwner(username, domainName);
 	}
 
 	@Override
@@ -237,7 +225,11 @@ public class CalendarBindingImpl implements ICalendar {
 			int uid = Integer.valueOf(event.getUid());
 			// only modify if owner or write right on owner
 			Event before = calendarService.findEvent(token, uid);
-
+			if (before == null) {
+				logger.warn(LogUtils.prefix(token)
+						+ "Event["+uid+"] doesn't exist in database: : doing nothing");
+				return null;
+			}
 			if (before != null && before.getOwner() != null
 					&& !helper.canWriteOnCalendar(token, before.getOwner())) {
 				logger.info(LogUtils.prefix(token) + "Calendar : "
@@ -247,7 +239,7 @@ public class CalendarBindingImpl implements ICalendar {
 				onlyUpdateMyself = true;
 			}
 
-			if(isInternalEvent(event)){
+			if(before.isInternalEvent()){
 				return modifyInternalEvent(token, calendar, before, event, onlyUpdateMyself, updateAttendees);
 			} else {
 				return modifyExternalEvent(token, calendar, event, onlyUpdateMyself, updateAttendees);
@@ -337,14 +329,12 @@ public class CalendarBindingImpl implements ICalendar {
 				logger.info(LogUtils.prefix(token) + message);
 				throw new ServerFault(message);
 			}
-
 			Event ev = null;
-			if (isInternalEvent(event)) {
+			if (event.isInternalEvent()) {
 				ev = createInternalEvent(token, calendar, event);
 			} else {
 				ev = createExternalEvent(token, calendar, event);
 			}
-
 			return (String.valueOf(ev.getDatabaseId()));
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -761,22 +751,5 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 		}
 		throw new ServerFault("user has no write rights on calendar " + calendar);
-	}
-
-	@Override
-	public boolean isInternalEvent(AccessToken token, Event event) throws ServerFault {
-		return isInternalEvent(event);
-	}
-
-	/**
-	 * @return true if the event owner is an obmuser
-	 */
-	private boolean isInternalEvent(Event event) {
-		try {
-			return getObmUser(event.getOwnerEmail()) != null;
-		} catch (FindException e) {
-			return false;
-		}
-
 	}
 }

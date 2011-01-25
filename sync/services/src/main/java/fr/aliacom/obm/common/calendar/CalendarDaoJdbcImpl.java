@@ -26,6 +26,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +61,8 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.items.EventChanges;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -71,6 +74,7 @@ import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.utils.Helper;
 import fr.aliacom.obm.utils.Ical4jHelper;
 import fr.aliacom.obm.utils.LinkedEntity;
+import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
 
 /**
@@ -166,7 +170,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "contact_lastname as userobm_lastname, contactentity_contact_id as userentity_user_id ";
 
 	private static final String ATT_INSERT_FIELDS = "eventlink_event_id, eventlink_entity_id, "
-			+ "eventlink_state, eventlink_required, eventlink_percent, eventlink_usercreate";
+			+ "eventlink_state, eventlink_required, eventlink_percent, eventlink_usercreate, eventlink_is_organizer";
 
 	private static final String EXCEPS_FIELDS = "event_id, eventexception_date";
 
@@ -412,7 +416,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			cal.setTimeInMillis(evrs.getTimestamp("recurrence_id").getTime());
 			e.setRecurrenceId(cal.getTime());
 		}
-
+		e.setInternalEvent(EventUtils.isInternalEvent(e));
 		return e;
 	}
 
@@ -1141,7 +1145,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		if (eventById.isEmpty()) {
 			return;
 		}
-		String attAlerts = "SELECT "
+		String attUserAlerts = "SELECT "
 				+ ATT_AND_ALERT_FIELDS
 				+ " FROM EventLink att "
 				+ "LEFT JOIN EventAlert ON eventlink_event_id=eventalert_event_id "
@@ -1149,8 +1153,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN UserObm ON userobm_id=userentity_user_id "
 				+ "WHERE eventlink_event_id IN (" + evIdList + ")";
 
-		attAlerts = attAlerts // add contact attendees
-				+ " UNION SELECT "
+		String attContactAlerts = "SELECT "
 				+ CONTACT_AND_ALERT_FIELDS
 				+ " FROM EventLink att "
 				+ "INNER JOIN ContactEntity ON att.eventlink_entity_id=contactentity_entity_id "
@@ -1165,33 +1168,72 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			ps = con.prepareStatement(attAlerts);
+			//obm user
+			ps = con.prepareStatement(attUserAlerts);
 			rs = ps.executeQuery();
-			while (rs.next()) {
-				Event e = eventById.get(rs.getInt(1));
-				Attendee att = new Attendee();
-				att.setDisplayName(getAttendeeDisplayName(rs));
-				att.setEmail(getAttendeeEmail(rs, domainName));
-				att.setState(getAttendeeState(rs));
-				att.setRequired(getAttendeeRequired(rs));
-				att.setPercent(getAttendeePercent(rs));
-				e.addAttendee(att);
-				if (token != null) {
-					int userId = rs.getInt("userentity_user_id");
-					if (token.getObmId() == userId) {
-						int alert = rs.getInt("eventalert_duration");
-						if (!rs.wasNull() && alert >= 0) {
-							e.setAlert(alert);
-						}
-					}
-				}
-			}
+			Multimap<Integer, AttendeeAlert> attsUsersByEvent = getUserAttendeesByEventIdFromCursor(rs, domainName);
+			appendAttendeeToEvent(eventById, attsUsersByEvent);
+			//contact			
+			ps = con.prepareStatement(attContactAlerts);
+			rs = ps.executeQuery();
+			Multimap<Integer, AttendeeAlert> attsContactsByEvent = getContactAttendeesByEventIdFromCursor(rs, domainName);
+			appendAttendeeToEvent(eventById, attsContactsByEvent);
+			
+			appendEventToAlert(token, eventById, attsUsersByEvent);
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-
+	}
+	
+	private void appendEventToAlert(AccessToken token, Map<Integer, Event> eventById, Multimap<Integer, AttendeeAlert> userAttendeesByEventId){
+		if (token != null) {
+			for(Event event : eventById.values()){
+				int alert = 0;
+				for(AttendeeAlert att : userAttendeesByEventId.get(event.getDatabaseId())){
+					if (token.getObmId() == att.getEntityId()) {
+						if (att.getAlert() >= 0) {
+							alert = att.getAlert();
+						}
+					}
+				}
+				event.setAlert(alert);
+			}
+		}
+	}
+	
+	private Multimap<Integer, AttendeeAlert> getUserAttendeesByEventIdFromCursor(ResultSet rs, String domainName) throws SQLException{
+		return getAttendeesByEventIdFromCursor(rs, domainName, true);
+	}
+	
+	private Multimap<Integer, AttendeeAlert> getContactAttendeesByEventIdFromCursor(ResultSet rs, String domainName) throws SQLException{
+		return getAttendeesByEventIdFromCursor(rs, domainName, false);
+	}
+	
+	private Multimap<Integer, AttendeeAlert> getAttendeesByEventIdFromCursor(ResultSet rs, String domainName, boolean isObmUser) throws SQLException{
+		Multimap<Integer, AttendeeAlert> attsByEvent = ArrayListMultimap.create();
+		while (rs.next()) {
+			Integer eventId = rs.getInt(1);
+			AttendeeAlert att = new AttendeeAlert();
+			att.setObmUser(isObmUser);
+			att.setDisplayName(getAttendeeDisplayName(rs));
+			att.setEmail(getAttendeeEmail(rs, domainName));
+			att.setState(getAttendeeState(rs));
+			att.setRequired(getAttendeeRequired(rs));
+			att.setPercent(getAttendeePercent(rs));
+			att.setEntityId(rs.getInt("userentity_user_id"));
+			att.setEntityId(rs.getInt("eventalert_duration"));
+			attsByEvent.put(eventId, att);
+		}
+		return attsByEvent;
+	}
+	
+	private void appendAttendeeToEvent(Map<Integer, Event> eventById, Multimap<Integer, AttendeeAlert> attendeesByEventId){
+		for(Event event : eventById.values()){
+			Collection<AttendeeAlert> atts = attendeesByEventId.get(event.getDatabaseId());
+			event.addAttendees(atts);
+		}
 	}
 
 	private void loadEventExceptions(AccessToken token,
@@ -1602,10 +1644,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				"?, " + // state
 				"?, " + // required
 				"?," + // percent
-				"?" + // user_create
+				"?," + // user_create
+				"?" + // is_organizer
 				")";
 		PreparedStatement ps = null;
-
 		try {
 			ps = con.prepareStatement(attQ);
 			Integer userEntityCalender = userDao.userEntityFromEmailQuery(con, calendar);
@@ -1632,7 +1674,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					c = contactDao.createContact(con, editor, c);
 					userEntity = c.getEntityId();
 				}
-
 				ps.setInt(1, ev.getDatabaseId());
 				ps.setInt(2, userEntity);
 				ps.setObject(3, at.getState()
@@ -1641,9 +1682,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						at.getRequired().getJdbcObject(obmHelper.getType()));
 				ps.setInt(5, at.getPercent());
 				ps.setInt(6, editor.getObmId());
-
+				ps.setBoolean(7, at.isOrganizer());
 				ps.addBatch();
-				logger.info("Adding attendee " + at.getEmail());
+				logger.info(LogUtils.prefix(editor) + "Adding " + at.getEmail() + ( at.isOrganizer() ? " as organizer" : " as attendee"));
 			}
 			ps.executeBatch();
 		} finally {
@@ -1656,9 +1697,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=? "
 				+ "where eventlink_event_id=? AND "
 				+ "eventlink_entity_id IN "
-				+ "(select userentity_entity_id from UserEntity where userentity_user_id=?  "
+				+ "(select userentity_entity_id from UserEntity where userentity_entity_id=?  "
 				+ "UNION SELECT contactentity_entity_id from ContactEntity where contactentity_entity_id=?)";
-
 		PreparedStatement ps = null;
 		List<Attendee> toInsert = new LinkedList<Attendee>();
 
@@ -1700,6 +1740,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					ps.addBatch();
 				}
 			}
+			ps.executeBatch();
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
@@ -2280,4 +2321,5 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(null, ps, null);
 		}
 	}
+
 }

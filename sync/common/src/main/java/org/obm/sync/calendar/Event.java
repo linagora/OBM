@@ -1,6 +1,7 @@
 package org.obm.sync.calendar;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +40,8 @@ public class Event {
 	private String timezoneName;
 
 	private Date recurrenceId;
-
+	private boolean internalEvent;
+	
 	public Event() {
 		attendees = new LinkedList<Attendee>();
 		type = EventType.VEVENT;
@@ -85,6 +87,13 @@ public class Event {
 		return attendees;
 	}
 
+	public void addAttendees(Collection<? extends Attendee> attendees) {
+		if(this.attendees == null){
+			this.attendees = new LinkedList<Attendee>(); 
+		}
+		this.attendees.addAll(attendees);
+	}
+	
 	public void setAttendees(List<Attendee> attendees) {
 		this.attendees = attendees;
 	}
@@ -253,7 +262,7 @@ public class Event {
 		Event event = new Event();
 		event.setAlert(alert);
 		event.setAllday(allday);
-		event.setAttendees(new LinkedList<Attendee>(attendees));
+		event.addAttendees(new LinkedList<Attendee>(attendees));
 		event.setCategory(category);
 		event.setCompletion(completion);
 		event.setDatabaseId(databaseId);
@@ -275,6 +284,7 @@ public class Event {
 		event.setType(type);
 		event.setUid(uid);
 		event.setRecurrenceId(recurrenceId);
+		event.setInternalEvent(internalEvent);
 		return event;
 	}
 
@@ -323,6 +333,14 @@ public class Event {
 		calendar.add(Calendar.SECOND, getDuration());
 		Date end = calendar.getTime();
 		return end;
+	}
+
+	public boolean isInternalEvent() {
+		return internalEvent;
+	}
+
+	public void setInternalEvent(boolean internalEvent) {
+		this.internalEvent = internalEvent;
 	}
 
 }

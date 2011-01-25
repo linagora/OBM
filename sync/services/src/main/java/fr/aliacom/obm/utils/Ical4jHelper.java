@@ -1074,7 +1074,7 @@ public class Ical4jHelper {
 				emails.put(att.getEmail(), att);
 			}
 		}
-		event.setAttendees(new ArrayList<Attendee>(emails.values()));
+		event.addAttendees(new ArrayList<Attendee>(emails.values()));
 	}
 
 	public static Calendar initCalandar() {

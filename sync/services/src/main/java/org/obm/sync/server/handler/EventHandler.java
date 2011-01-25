@@ -163,18 +163,10 @@ public class EventHandler extends SecureSyncHandler {
 			return parseFreeBusyToICS(at, params, responder);
 		} else if (method.equals("changeParticipationState")) {
 			return changeParticipationState(at, params, responder);
-		} else if (method.equals("isInternalEvent")) {
-			return isInternalEvent(at, params, responder);
 		} else {
 			logger.error(LogUtils.prefix(at) + "cannot handle method '" + method + "'");
 			return "";
 		}
-	}
-
-	private String isInternalEvent(AccessToken at, ParametersSource params,
-			XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError, ServerFault {
-		Boolean isIE = binding.isInternalEvent(at,getEvent(params));
-		return responder.sendBoolean(isIE);
 	}
 
 	private String parseFreeBusyToICS(

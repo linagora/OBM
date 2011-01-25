@@ -63,6 +63,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		e.setAttribute("type", ev.getType().toString());
 		e.setAttribute("allDay", "" + ev.isAllday());
 		e.setAttribute("id", ev.getUid());
+		e.setAttribute("isInternal", ""+ev.isInternalEvent());
 		if (ev.getTimeUpdate() != null) {
 			createIfNotNull(e, "timeupdate", ""
 					+ DateHelper.asString(ev.getTimeUpdate()));
@@ -144,6 +145,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 	private Element appendAttendee(Element atts, Attendee a) {
 		Element at = DOMUtils.createElement(atts, "attendee");
 		at.setAttribute("displayName", a.getDisplayName());
+		at.setAttribute("isOrganizer", ""+a.isOrganizer());
 		at.setAttribute("email", a.getEmail());
 		at.setAttribute("state", (a.getState() != null ? a.getState()
 				.toString() : ParticipationState.NEEDSACTION.toString()));

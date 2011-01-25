@@ -7,6 +7,8 @@ public class Attendee {
 	private ParticipationRole required;
 	private String displayName;
 	private int percent;
+	private boolean organizer;
+	private boolean obmUser;
 
 	public ParticipationState getState() {
 		return state;
@@ -47,7 +49,23 @@ public class Attendee {
 	public void setPercent(int percent) {
 		this.percent = percent;
 	}
+	
+	public Boolean isOrganizer() {
+		return organizer;
+	}
 
+	public void setOrganizer(boolean organizer) {
+		this.organizer = organizer;
+	}
+	
+	public boolean isObmUser() {
+		return obmUser;
+	}
+
+	public void setObmUser(boolean obmUser) {
+		this.obmUser = obmUser;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof Attendee) {

@@ -35,6 +35,7 @@ private CalendarItemsWriter writer;
 	@Test
 	public void testGetEventString() {
 		Event ev = new Event();
+		ev.setInternalEvent(true);
 		Calendar cal = new GregorianCalendar();
 		cal.setTimeInMillis(1295258400000L);
 		ev.setDate(cal.getTime());
@@ -49,6 +50,7 @@ private CalendarItemsWriter writer;
 		at.setEmail("john@do.fr");
 		at.setState(ParticipationState.NEEDSACTION);
 		at.setRequired(ParticipationRole.CHAIR);
+		at.setOrganizer(true);
 		la.add(at);
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase");
@@ -71,7 +73,7 @@ private CalendarItemsWriter writer;
 		String eventS = writer.getEventString(ev);
 		
 		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" id=\"\" isInternal=\"true\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
 		"<opacity>OPAQUE</opacity>" +
 		"<title>fake rdv</title>" +
@@ -84,8 +86,8 @@ private CalendarItemsWriter writer;
 		"<priority>0</priority>" +
 		"<privacy>0</privacy>" +
 		"<attendees>" +
-		"<attendee displayName=\"John Do\" email=\"john@do.fr\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>" +
-		"<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>" +
+		"<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"true\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>" +
+		"<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>" +
 		"</attendees><recurrence days=\"\" freq=\"1\" kind=\"daily\">" +
 		"<exceptions>" +
 		"<exception>1295258400000</exception>" +
@@ -93,7 +95,6 @@ private CalendarItemsWriter writer;
 		"</exceptions><eventExceptions/>" +
 		"</recurrence>" +
 		"</event>";
-		
 		Assert.assertEquals(xmlExpected, eventS);
 	}
 	
@@ -139,7 +140,7 @@ private CalendarItemsWriter writer;
 		writer.appendEvent(root, ev);
 		
 		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" id=\"\" isInternal=\"false\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
 		"<opacity>OPAQUE</opacity>" +
 		"<title>fake rdv</title>" +
@@ -152,8 +153,8 @@ private CalendarItemsWriter writer;
 		"<priority>0</priority>" +
 		"<privacy>0</privacy>" +
 		"<attendees>" +
-		"<attendee displayName=\"John Do\" email=\"john@do.fr\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>" +
-		"<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>" +
+		"<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"false\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>" +
+		"<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>" +
 		"</attendees><recurrence days=\"\" freq=\"1\" kind=\"daily\">" +
 		"<exceptions>" +
 		"<exception>1295258400000</exception>" +

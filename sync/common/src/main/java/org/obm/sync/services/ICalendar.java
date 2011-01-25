@@ -217,9 +217,4 @@ public interface ICalendar {
 	 */
 	public boolean changeParticipationState(AccessToken token, String calendar, String extId, ParticipationState participationState) throws ServerFault;
 	
-	/**
-	 * @param event
-	 * @return true if the event owner is an obmuser
-	 */
-	public boolean isInternalEvent(AccessToken token, Event event) throws ServerFault, AuthFault ; 
 }
