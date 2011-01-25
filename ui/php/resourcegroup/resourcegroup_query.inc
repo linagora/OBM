@@ -819,8 +819,13 @@ function check_resourcegroup_data_form($group) {
     $err["msg"] = $l_fill_name;
     return false;
   }
-    // Check delegation update right
-  if (! of_delegation_check_update_rights($group, $lgroup['delegation'])) {
+
+  $groupDelegation =  $group["resourcegroup_id"] ?
+                      $lgroup['delegation'] :
+                      $group['delegation'];
+  
+  // Check delegation update right
+  if (! of_delegation_check_update_rights($group, $groupDelegation)) {
     $err['msg'] .= $l_error_delegation;
     return false;
   }
