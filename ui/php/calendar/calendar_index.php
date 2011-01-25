@@ -209,7 +209,19 @@ if ($action == 'search') {
   $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
   $extra_js_include[] = 'freebusy.js';
   $extra_css[] = $css_ext_color_picker ;
-  
+  if (is_array($params['sel_user_id']) || is_array($params['sel_resource_id'])) {
+    $entities = array(
+      'user' => $params['sel_user_id'],
+      'resource' => $params['sel_resource_id'],
+      'contact' => $params['sel_contact_id']
+    );
+  } else {
+    $entities = array(
+      'user' => $current_view->get_users(),
+      'resource' => $current_view->get_resources(),
+      'contact' => $current_view->get_contacts()
+    );
+  }
   $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
 
 } elseif ($action == 'insert') {
