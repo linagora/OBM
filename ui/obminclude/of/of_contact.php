@@ -1584,9 +1584,12 @@ class OBM_Contact implements OBM_ISearchable {
     return array_search($kind, self::$kinds);
   }
 
-  public static function fetchKindHeaders() {
+  public static function fetchKindHeaders($language = null) {
     $kinds = array();
     $query = "SELECT kind_id, kind_header FROM Kind";
+    if(!is_null($language)){
+      $query .=  " WHERE kind_lang = '".$language."'";
+    }
     $db = new DB_OBM();
     $db->xquery($query);        
     while ($db->next_record()) {

@@ -441,10 +441,13 @@ function run_query_contact_company($c_id) {
 // Contact: Kind select query execution
 // Returns : DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_kind() {
+function run_query_contact_kind($language = null) {
   global $cdg_sql;
-
   $multidomain = sql_multidomain('kind');
+
+  $languageCondition = is_null($language) ?
+                       '' : 
+                       ' AND kind_lang = "'.$language.'"';
 
   $query = "SELECT kind_id,
     kind_minilabel,
@@ -453,7 +456,7 @@ function run_query_contact_kind() {
     kind_default
     FROM Kind
     WHERE 1=1
-    $multidomain
+    $multidomain $languageCondition
     ORDER BY kind_lang, kind_minilabel, kind_header";
 
   display_debug_msg($query, $cdg_sql, 'run_query_contact_kind()');
@@ -1816,8 +1819,8 @@ function run_query_contact_get_markets($id) {
 // Contact: Kind select query execution
 // Returns : DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_get_kinds() {
-  $db = run_query_contact_kind();
+function run_query_contact_get_kinds($language = null) {
+  $db = run_query_contact_kind($language);
   $kinds = array();
   while($db->next_record()) {
     $kinds[$db->f('kind_id')] = $db->f('kind_header');

@@ -130,7 +130,8 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'ext_get_kind') {
 ///////////////////////////////////////////////////////////////////////////////
-  $kinds = run_query_contact_get_kinds(); 
+  $language = get_lang();
+  $kinds = run_query_contact_get_kinds($language);
   json_get_kind($kinds);
   echo '('.$display['json'].')';
   exit();
