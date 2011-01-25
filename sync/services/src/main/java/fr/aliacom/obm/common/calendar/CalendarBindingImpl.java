@@ -230,7 +230,7 @@ public class CalendarBindingImpl implements ICalendar {
 						+ "Event["+uid+"] doesn't exist in database: : doing nothing");
 				return null;
 			}
-			if (before != null && before.getOwner() != null
+			if (before.getOwner() != null
 					&& !helper.canWriteOnCalendar(token, before.getOwner())) {
 				logger.info(LogUtils.prefix(token) + "Calendar : "
 						+ token.getUser() + " cannot modify event["
