@@ -2489,7 +2489,7 @@ function run_query_check_exists_template_by_name($templateName){
 
   $query = "SELECT eventtemplate_id 
             FROM EventTemplate
-            WHERE eventtemplate_name = '".mysql_real_escape_string($templateName)."'";
+            WHERE eventtemplate_name = '".$templateName."'";
   display_debug_msg($query, $cdg_sql, 'run_query_check_exists_template_by_name()');
   
   $obm_q = new DB_OBM;
