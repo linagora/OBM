@@ -186,9 +186,8 @@ if ($action == 'search') {
     $display['detail'] .= html_calendar_conflict_form($params);
     $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
   } else {
-    $params['conflicts'] = $conflicts;
     if (check_calendar_participation_decision($params)) {
-      $conflict = run_query_calendar_insert_decision($params);
+      run_query_calendar_insert_decision($params);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
     }
@@ -198,8 +197,6 @@ if ($action == 'search') {
       $display['detail'] = html_calendar_waiting_events($obm_wait);
     } else {
       redirect_ok($params, "$l_event: $l_update_ok");
-      // $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
-      // $display['detail'] = dis_calendar_calendar_view($params, $current_view);
     }
   }
 

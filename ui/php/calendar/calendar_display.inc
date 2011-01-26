@@ -2778,12 +2778,14 @@ function html_calendar_conflict_form($calendar) {
   global $l_force_insert, $l_refuse_insert, $l_cancel_insert;
   
   $event_id = $calendar['calendar_id']; 
-  $user_id = $calendar['user_id'];
+  $entity_id = $calendar['entity_id'];
+  $entity_kind = $calendar['entity_kind'];
   $dis_form = "
   <form name=\"f_conflict\" method=\"post\">
    <input type=\"hidden\" name=\"calendar_id\" value=\"$event_id\" />
    <input type=\"hidden\" name=\"action\" value=\"decision\" />
-   <input type=\"hidden\" name=\"user_id\" value=\"$user_id\" />
+   <input type=\"hidden\" name=\"entity_id\" value=\"$entity_id\" />
+   <input type=\"hidden\" name=\"entity_kind\" value=\"$entity_kind\" />
    <input type=\"hidden\" name=\"cba_force\" value=\"1\" />
    <input type=\"hidden\" name=\"rd_decision_event\" value=\"\" />
    <input type=\"hidden\" id=\"owner_notification\" name=\"owner_notification\" value=\"true\" />

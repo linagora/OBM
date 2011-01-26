@@ -333,7 +333,7 @@ function run_query_calendar_insert_decision($calendar) {
   $state = $calendar['decision_event'];
   $owner_notification = $calendar['owner_notification'];
 
-  run_query_calendar_update_occurrence_state($event_id,$entity,$entity_id,$state, $owner_notification);
+  run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id, $state, $owner_notification, true);
 }
 
 
@@ -344,7 +344,7 @@ function run_query_calendar_insert_decision($calendar) {
 //   - $user_id  : User id
 //   - $state    : New state to set (ACCEPTED, NEEDS-ACTION or DECLINED)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $owner_notification = true, $force = false) {
+function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id, $state, $owner_notification = true, $force = false) {
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
 
@@ -1832,8 +1832,6 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
 
   }
 
-
-
   $ext_id = generateUniqueKey();
 
   $obm_q = new DB_OBM;
@@ -1892,7 +1890,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   $obm_q->query($query);
   $event_id = $obm_q->lastid();
   of_entity_insert('event', $event_id);
-
+  
   // User
   if (is_array($user)) {
     foreach ($user as $user_id) {
