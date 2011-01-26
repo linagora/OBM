@@ -31,8 +31,9 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookItemsParser;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
-import org.obm.sync.items.ContactChanges;
-import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.AddressBookChangesResponse;
+import org.obm.sync.items.ContactChangesResponse;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.server.ParametersSource;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.services.IAddressBook;
@@ -89,6 +90,16 @@ public class AddressBookHandler extends SecureSyncHandler {
 			searchContactInGroup(token, params, responder);
 		} else if ("getFolderSync".equals(method)) {
 			getFolderSync(token, params, responder);
+		} else if ("getAddressBookSync".equals(method)) {
+			getAddressBookSync(token, params, responder);
+		} else if ("createContactInBook".equals(method)) {
+			createContactInBook(token, params, responder);
+		} else if ("getContactInBook".equals(method)) {
+			getContactInBook(token, params, responder);
+		} else if ("modifyContactInBook".equals(method)) {
+			modifyContactInBook(token, params, responder);
+		} else if ("removeContactInBook".equals(method)) {
+			removeContactInBook(token, params, responder);
 		} else {
 			responder.sendError("Cannot handle method '" + method + "'");
 		}
@@ -97,7 +108,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 
 	private void getFolderSync(AccessToken at, ParametersSource params, XmlResponder responder) throws Exception {
 		Date lastSync = getLastSyncFromParams(params);
-		FolderChanges fc = binding.getFolderSync(at, lastSync);
+		FolderChangesResponse fc = binding.getFolderSync(at, lastSync);
 		responder.sendFolderChanges(fc);
 	}
 
@@ -155,7 +166,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 
 	private void getSync(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault {
 		Date lastSync = getLastSyncFromParams(params);
-		ContactChanges cc = binding.getSync(at, type(params), lastSync);
+		ContactChangesResponse cc = binding.getSync(at, type(params), lastSync);
 		responder.sendContactChanges(cc);
 	}
 
@@ -206,6 +217,51 @@ public class AddressBookHandler extends SecureSyncHandler {
 			}
 		}
 		throw new RuntimeException("book with uid " + uid + " not found");
+	}
+
+	private Integer getBookId(ParametersSource params) {
+		return Integer.valueOf(p(params, "bookId"));
+	}
+	
+	private void removeContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault {
+		Contact ret = binding.removeContactInBook(token, getBookId(params), p(params, "id"));
+		if (ret != null) {
+			responder.sendContact(ret);
+		} else {
+			responder.sendError("contact did not exist");
+		}
+	}
+
+	private void modifyContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
+		Contact contact = getContactFromParams(params);
+		Contact ret = binding.modifyContactInBook(token, getBookId(params), contact);
+		responder.sendContact(ret);		
+	}
+
+	private void getContactInBook(AccessToken token, ParametersSource params,
+			XmlResponder responder) throws AuthFault, ServerFault {
+		
+		String contactId = p(params, "id");
+		Contact ret = binding.getContactInBook(token, getBookId(params), contactId);
+		if (ret != null) {
+			responder.sendContact(ret);
+		} else {
+			responder.sendError("contact with id " + contactId + " not found.");
+		}
+	}
+
+	private void createContactInBook(AccessToken token,
+			ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError, AuthFault, ServerFault {
+		Contact contact = getContactFromParams(params);
+		Contact ret = binding.createContactInBook(token, getBookId(params), contact);
+		responder.sendContact(ret);		
+	}
+
+	private void getAddressBookSync(AccessToken token, ParametersSource params,
+			XmlResponder responder) throws AuthFault, ServerFault {
+		Date lastSync = getLastSyncFromParams(params);
+		AddressBookChangesResponse response = binding.getAddressBookSync(token, lastSync);
+		responder.sendAddressBookChanges(response);	
 	}
 	
 }

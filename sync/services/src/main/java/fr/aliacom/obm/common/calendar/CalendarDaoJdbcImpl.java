@@ -1671,7 +1671,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					c.setFirstname("");
 					c.addEmail("INTERNET;X-OBM-Ref1", new Email(at.getEmail()));
 					c.setCollected(true);
-					c = contactDao.createContact(con, editor, c);
+					c = contactDao.createContact(editor, con, c);
 					userEntity = c.getEntityId();
 				}
 				ps.setInt(1, ev.getDatabaseId());

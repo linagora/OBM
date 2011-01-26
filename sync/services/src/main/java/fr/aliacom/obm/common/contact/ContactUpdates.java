@@ -17,36 +17,38 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import java.util.Date;
-import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import org.obm.sync.book.Contact;
 
-public class ContactUpdates extends LinkedList<Contact> {
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
-	private static final long serialVersionUID = -61848546135095989L;
-	private Date lastSync;
+public class ContactUpdates {
 
-	private LinkedList<Integer> archived;
-
+	private Set<Integer> archived;
+	private List<Contact> contacts;
+	
 	public ContactUpdates() {
-		archived = new LinkedList<Integer>();
+		archived = ImmutableSet.of();
+		contacts = ImmutableList.of();
 	}
-
-	public Date getLastSync() {
-		return lastSync;
-	}
-
-	public void setLastSync(Date lastSync) {
-		this.lastSync = lastSync;
-	}
-
-	public LinkedList<Integer> getArchived() {
+	
+	public Set<Integer> getArchived() {
 		return archived;
 	}
 
-	public void addArchived(Contact c) {
-		archived.add(c.getUid());
+	public void setArchived(Set<Integer> archivedContactIds) {
+		this.archived = archivedContactIds;
 	}
-
+	
+	public List<Contact> getContacts() {
+		return contacts;
+	}
+	
+	public void setContacts(List<Contact> contacts) {
+		this.contacts = contacts;
+	}
+	
 }

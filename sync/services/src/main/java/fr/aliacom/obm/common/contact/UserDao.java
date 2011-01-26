@@ -22,8 +22,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -55,7 +57,7 @@ public class UserDao {
 		ContactUpdates cu = new ContactUpdates();
 
 		String q = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, "
-				+ "userobm_email, userentity_entity_id, now() as last_sync, domain_name "
+				+ "userobm_email, userentity_entity_id, domain_name "
 				+ "from UserObm "
 				+ "INNER JOIN UserEntity on userobm_id=userentity_user_id "
 				+ "INNER JOIN Domain on userobm_domain_id=domain_id "
@@ -71,6 +73,7 @@ public class UserDao {
 		ResultSet rs = null;
 
 		try {
+			List<Contact> contacts = new ArrayList<Contact>();
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 			if (timestamp != null) {
@@ -78,25 +81,20 @@ public class UserDao {
 				ps.setTimestamp(2, new Timestamp(timestamp.getTime()));
 			}
 			rs = ps.executeQuery();
-			boolean setLastSync = true;
 			while (rs.next()) {
-				if (setLastSync) {
-					setLastSync = false;
-					cu.setLastSync(rs.getTimestamp("last_sync"));
-				}
-				cu.add(loadUser(rs));
+				contacts.add(loadUser(rs));
 			}
 			rs.close();
 			rs = null;
-			if (setLastSync) {
-				cu.setLastSync(obmHelper.selectNow(con));
-			}
+			
+			cu.setContacts(contacts);
+			
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-		logger.info("returning " + cu.size() + " updated user(s)");
+		logger.info("returning " + cu.getContacts().size() + " updated user(s)");
 
 		return cu;
 	}

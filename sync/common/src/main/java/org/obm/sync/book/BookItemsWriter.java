@@ -4,8 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
 import org.obm.sync.items.AbstractItemsWriter;
+import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
@@ -13,9 +16,6 @@ import org.w3c.dom.Element;
 
 /**
  * Serializes address book items to XML
- * 
- * @author tom
- * 
  */
 public class BookItemsWriter extends AbstractItemsWriter {
 
@@ -72,6 +72,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 
 		c.setAttribute("uid", Integer.toString(book.getUid()));
 		c.setAttribute("name", book.getName());
+		c.setAttribute("readonly", String.valueOf(book.isReadOnly()));
 	}
 
 	
@@ -132,33 +133,36 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	public Document writeChanges(ContactChanges cc) {
+	public Document writeChanges(ContactChangesResponse cc) {
 		Document doc = null;
 		try {
 			doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/contact-changes.xsd",
 					"contact-changes");
 			Element root = doc.getDocumentElement();
-			root
-					.setAttribute("lastSync", DateHelper.asString(cc
-							.getLastSync()));
+			root.setAttribute("lastSync", DateHelper.asString(cc.getLastSync()));
 
-			Element removed = DOMUtils.createElement(root, "removed");
-			for (int eid : cc.getRemoved()) {
-				Element e = DOMUtils.createElement(removed, "contact");
-				e.setAttribute("uid", "" + eid);
-			}
-
-			Element updated = DOMUtils.createElement(root, "updated");
-			for (Contact ev : cc.getUpdated()) {
-				appendContact(updated, ev);
-			}
+			createContactChanges(cc.getChanges(), root);
 
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 
 		return doc;
+	}
+
+	private void createContactChanges(ContactChanges cc, Element root) {
+		
+		Element removed = DOMUtils.createElement(root, "removed");
+		for (int eid : cc.getRemoved()) {
+			Element e = DOMUtils.createElement(removed, "contact");
+			e.setAttribute("uid", "" + eid);
+		}
+
+		Element updated = DOMUtils.createElement(root, "updated");
+		for (Contact ev : cc.getUpdated()) {
+			appendContact(updated, ev);
+		}
 	}
 
 	public String getContactAsString(Contact contact) {
@@ -175,33 +179,35 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		return out.toString();
 	}
 
-	public Document writeFolderChanges(FolderChanges fc) {
+	public Document writeFolderChanges(FolderChangesResponse fc) {
 		Document doc = null;
 		try {
 			doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/folder-changes.xsd",
 					"folder-changes");
 			Element root = doc.getDocumentElement();
-			root
-					.setAttribute("lastSync", DateHelper.asString(fc
-							.getLastSync()));
+			root.setAttribute("lastSync", DateHelper.asString(fc.getLastSync()));
 
-			Element removed = DOMUtils.createElement(root, "removed");
-			for (int eid : fc.getRemoved()) {
-				Element e = DOMUtils.createElement(removed, "folder");
-				e.setAttribute("uid", "" + eid);
-			}
-
-			Element updated = DOMUtils.createElement(root, "updated");
-			for (Folder ev : fc.getUpdated()) {
-				appendFolder(updated, ev);
-			}
+			createFolderChanges(fc.getFolderChanges(), root);
 
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 
 		return doc;
+	}
+
+	private void createFolderChanges(FolderChanges fc, Element root) {
+		Element removed = DOMUtils.createElement(root, "removed");
+		for (int eid : fc.getRemoved()) {
+			Element e = DOMUtils.createElement(removed, "folder");
+			e.setAttribute("uid", "" + eid);
+		}
+
+		Element updated = DOMUtils.createElement(root, "updated");
+		for (Folder ev : fc.getUpdated()) {
+			appendFolder(updated, ev);
+		}
 	}
 
 	public void appendFolder(Element root, Folder folder) {
@@ -215,6 +221,27 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 
 		createIfNotNull(f, "name", folder.getName());
+	}
+
+	public Document writeAddressBookChanges(AddressBookChangesResponse response) {
+		Document doc = null;
+		try {
+			doc = DOMUtils.createDoc(
+					"http://www.obm.org/xsd/sync/folder-changes.xsd",
+					"addressbook-changes");
+			Element root = doc.getDocumentElement();
+			root.setAttribute("lastSync", DateHelper.asString(response.getLastSync()));
+
+			Element addressbooks = DOMUtils.createElement(root, "addressbooks");
+			createFolderChanges(response.getBooksChanges(), addressbooks);
+			Element contacts = DOMUtils.createElement(root, "contacts");
+			createContactChanges(response.getContactChanges(), contacts);
+
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+		}
+
+		return doc;
 	}
 
 }

@@ -17,23 +17,26 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import java.util.Date;
-import java.util.LinkedList;
+import java.util.List;
 
 import org.obm.sync.book.Folder;
 
-public class FolderUpdates extends LinkedList<Folder> {
+import com.google.common.collect.ImmutableList;
 
-	private static final long serialVersionUID = 7718948732382753332L;
+public class FolderUpdates {
 
-	private Date lastSync;
-
-	public Date getLastSync() {
-		return lastSync;
+	private List<Folder> folders;
+	
+	public FolderUpdates() {
+		folders = ImmutableList.of();
 	}
-
-	public void setLastSync(Date lastSync) {
-		this.lastSync = lastSync;
+	
+	public List<Folder> getFolders() {
+		return folders;
 	}
-
+	
+	public void setFolders(List<Folder> folders) {
+		this.folders = folders;
+	}
+	
 }

@@ -41,9 +41,10 @@ import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
-import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.AddressBookChangesResponse;
+import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.EventChanges;
-import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
 import org.obm.sync.mailingList.MailingListItemsWriter;
@@ -222,13 +223,12 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendContactChanges(ContactChanges cc) {
+	public String sendContactChanges(ContactChangesResponse cc) {
 		return sendDom(biw.writeChanges(cc));
 	}
 
 	public String sendCategories(List<Category> ret) {
 		String res = "";
-		// TODO Auto-generated method stub
 		try {
 			Document doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/categories.xsd", "categories");
@@ -342,7 +342,7 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendFolderChanges(FolderChanges fc) {
+	public String sendFolderChanges(FolderChangesResponse fc) {
 		return sendDom(biw.writeFolderChanges(fc));
 	}
 
@@ -431,6 +431,10 @@ public class XmlResponder {
 			logger.error(ex.getMessage(), ex);
 		}
 		return res;
+	}
+
+	public void sendAddressBookChanges(AddressBookChangesResponse response) {
+		sendDom(biw.writeAddressBookChanges(response));
 	}
 
 }

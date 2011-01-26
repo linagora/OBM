@@ -20,9 +20,9 @@ package fr.aliacom.obm.common.contact;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import javax.transaction.UserTransaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,10 +33,14 @@ import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
+import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.services.IAddressBook;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -93,7 +97,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	@Override
-	public ContactChanges getSync(AccessToken token, BookType book, Date d)
+	public ContactChangesResponse getSync(AccessToken token, BookType book, Date d)
 			throws AuthFault, ServerFault {
 		try {
 			logger.info(LogUtils.prefix(token) + "AddressBook : getSync()");
@@ -102,29 +106,77 @@ public class AddressBookBindingImpl implements IAddressBook {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault("error find contacts ");
 		}
-
 	}
 
-	private ContactChanges getSync(BookType book, Date timestamp, AccessToken token) {
-		ContactUpdates updated = new ContactUpdates();
-		Set<Integer> todelete = new HashSet<Integer>();
-
-		if (book == BookType.users) {
-			updated = userDao.findUpdatedUsers(timestamp, token);
-			todelete = userDao.findRemovalCandidates(timestamp, token);
-		} else {
-			ContactUpdates cu = contactDao.findUpdatedContacts(timestamp, token);
-			updated.addAll(cu);
-			updated.setLastSync(cu.getLastSync());
-			todelete.addAll(contactDao.findRemovalCandidates(timestamp, token));
-			todelete.addAll(cu.getArchived());
+	@Override
+	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date timestamp)
+			throws AuthFault, ServerFault {
+		try {
+			logger.info(LogUtils.prefix(token) + "AddressBook : getAddressBookSync()");
+			return getSync(token, timestamp);
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault("error synchronizing contacts ");
 		}
-		ContactChanges sync = new ContactChanges();
-		sync.setLastSync(updated.getLastSync());
-		sync.setUpdated(updated);
-		sync.setRemoved(todelete);
+	}
 
-		return sync;
+	
+	private AddressBookChangesResponse getSync(AccessToken token, Date timestamp) throws Throwable {
+		UserTransaction ut = obmHelper.getUserTransaction();
+		AddressBookChangesResponse response = new AddressBookChangesResponse();
+
+		try {
+			ut.begin();
+			response.setContactChanges(getContactsChanges(token, timestamp));
+			response.setBooksChanges(getFolderChanges(token, timestamp));
+			response.setLastSync(obmHelper.selectNow(obmHelper.getConnection()));
+			ut.commit();
+		} catch (Throwable t) {
+			ut.rollback();
+			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
+			throw t;
+		}
+		
+		return response;
+	}
+
+	private ContactChanges getUsersChanges(AccessToken token, Date timestamp) {
+		ContactChanges changes = new ContactChanges();
+		changes.setUpdated(userDao.findUpdatedUsers(timestamp, token).getContacts());
+		changes.setRemoved(userDao.findRemovalCandidates(timestamp, token));
+		return changes;
+	}
+	
+	private ContactChanges getContactsChanges(AccessToken token, Date timestamp) {
+		ContactChanges changes = new ContactChanges();
+		ContactUpdates updates = contactDao.findUpdatedContacts(timestamp, token);
+		changes.setUpdated(updates.getContacts());
+		changes.setRemoved(
+				Sets.union(updates.getArchived(), 
+						contactDao.findRemovalCandidates(timestamp, token)));
+		return changes;
+	}
+	
+	private ContactChangesResponse getSync(BookType book, Date timestamp, AccessToken token) throws Throwable {
+		UserTransaction ut = obmHelper.getUserTransaction();
+		ContactChangesResponse response = new ContactChangesResponse();
+
+		try {
+			ut.begin();
+			if (book == BookType.users) {
+				response.setChanges(getUsersChanges(token, timestamp));
+			} else {
+				response.setChanges(getContactsChanges(token, timestamp));
+			}
+			response.setLastSync(obmHelper.selectNow(obmHelper.getConnection()));
+			ut.commit();
+		} catch (Throwable t) {
+			ut.rollback();
+			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
+			throw t;
+		}
+		
+		return response;
 	}
 	
 	@Override
@@ -292,13 +344,12 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
-	public FolderChanges getFolderSync(AccessToken token, Date d)
+	public FolderChangesResponse getFolderSync(AccessToken token, Date d)
 			throws AuthFault, ServerFault {
 
 		try {
 			logger.info(LogUtils.prefix(token) + "AddressBook : getFolderSync(" + d + ")");
-			FolderChanges sync = getFolderSync(d, token);
-
+			FolderChangesResponse sync = getFolderSync(d, token);
 			return sync;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -306,21 +357,28 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 
-	private FolderChanges getFolderSync(Date timestamp, AccessToken token) {
-		FolderUpdates updated = new FolderUpdates();
-		Set<Integer> todelete = new HashSet<Integer>();
+	private FolderChangesResponse getFolderSync(Date timestamp, AccessToken token) throws Throwable {
+		UserTransaction ut = obmHelper.getUserTransaction();
+		
+		try {
+			ut.begin();
+			FolderChangesResponse response = new FolderChangesResponse();
+			response.setFolderChanges(getFolderChanges(token, timestamp));
+			response.setLastSync(obmHelper.selectNow(obmHelper.getConnection()));
+			ut.commit();
+			return response;
+		} catch (Throwable t) {
+			ut.rollback();
+			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
+			throw t;
+		}
+	}
 
-		FolderUpdates fu = contactDao.findUpdatedFolders(timestamp, token);
-		updated.addAll(fu);
-		updated.setLastSync(fu.getLastSync());
-		todelete.addAll(contactDao.findRemovedFolders(timestamp, token));
-
-		FolderChanges sync = new FolderChanges();
-		sync.setLastSync(updated.getLastSync());
-		sync.setUpdated(updated);
-		sync.setRemoved(todelete);
-
-		return sync;
+	private FolderChanges getFolderChanges(AccessToken token, Date timestamp) {
+		FolderChanges changes = new FolderChanges();
+		changes.setUpdated(contactDao.findUpdatedFolders(timestamp, token));
+		changes.setRemoved(contactDao.findRemovedFolders(timestamp, token));
+		return changes;
 	}
 	
 	@Override
@@ -333,5 +391,44 @@ public class AddressBookBindingImpl implements IAddressBook {
 			throw new ServerFault(e.getMessage());
 		}
 	}
+
+	@Override
+	public Contact createContactInBook(AccessToken token, int addressBookId,
+			Contact contact) throws AuthFault, ServerFault {
+		try {
+			Contact c = contactDao.createContactInAddressBook(token, contact, addressBookId);
+			
+			logger.info(LogUtils.prefix(token) + "AddressBook : contact["
+					+ c.getFirstname() + " " + c.getLastname() + "] created");
+			return c;
+
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}
+	}
 	
+	
+	@Override
+	public Contact modifyContactInBook(AccessToken token, int addressBookId,
+			Contact contact) throws AuthFault, ServerFault {
+		try  {
+			return modifyContact(token, contact);
+		} catch (SQLException e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}
+	}
+	
+	@Override
+	public Contact removeContactInBook(AccessToken token, int addressBookId,
+			String uid) throws AuthFault, ServerFault {
+		return removeContact(token, BookType.contacts, uid);
+	}
+	
+	@Override
+	public Contact getContactInBook(AccessToken token, int addressBookId,
+			String id) throws AuthFault, ServerFault {
+		return getContactFromId(token, BookType.contacts, id);
+	}
 }

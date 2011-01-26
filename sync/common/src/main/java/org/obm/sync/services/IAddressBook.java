@@ -10,8 +10,9 @@ import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
-import org.obm.sync.items.FolderChanges;
-import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.AddressBookChangesResponse;
+import org.obm.sync.items.ContactChangesResponse;
+import org.obm.sync.items.FolderChangesResponse;
 
 public interface IAddressBook {
 
@@ -35,15 +36,30 @@ public interface IAddressBook {
 	/**
 	 * get a list of updated and removed contacts sync given date for a given BookType
 	 */
-	public ContactChanges getSync(AccessToken token, BookType book, Date date)
+	public ContactChangesResponse getSync(AccessToken token, BookType book, Date date)
 			throws AuthFault, ServerFault;
+
+	
+	/**
+	 * get a list of updated and removed addressbooks since given date, including addressbooks content
+	 */
+	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date date)
+			throws AuthFault, ServerFault;
+
+	
+	/**
+	 * Create the given contact into given book if book is writable
+	 */
+	public Contact createContact(AccessToken token, BookType book, Contact contact) 
+		throws AuthFault, ServerFault;
 
 	/**
 	 * Create the given contact into given book if book is writable
 	 */
-	public Contact createContact(AccessToken token, BookType book,
-			Contact contact) throws AuthFault, ServerFault;
+	public Contact createContactInBook(AccessToken token, int addressBookId, Contact contact) 
+		throws AuthFault, ServerFault;
 
+	
 	/**
 	 * try to create the given contact : if it finds a similar contact,
 	 * no contact will be created, but the first similar contact will be return
@@ -60,11 +76,23 @@ public interface IAddressBook {
 			Contact contact) throws AuthFault, ServerFault;
 
 	/**
+	 * modify existing contact with data provided if possible.
+	 */
+	public Contact modifyContactInBook(AccessToken token, int addressBookId,
+			Contact contact) throws AuthFault, ServerFault;
+
+	/**
 	 * remove the contact with specified uid 
 	 */
 	public Contact removeContact(AccessToken token, BookType book, String uid)
 			throws AuthFault, ServerFault;
 
+	/**
+	 * remove the contact with specified uid 
+	 */
+	public Contact removeContactInBook(AccessToken token, int addressBookId, String uid)
+			throws AuthFault, ServerFault;
+	
 	/**
 	 * Search contacts using a solr query
 	 */
@@ -79,7 +107,12 @@ public interface IAddressBook {
 	public Contact getContactFromId(AccessToken token, BookType book, String id)
 			throws AuthFault, ServerFault;
 
-	
+	/**
+	 * Retrieve a contact by its uid
+	 */
+	public Contact getContactInBook(AccessToken token, int addressBookId, String id)
+			throws AuthFault, ServerFault;
+
 	/**
 	 * Search contact similar to the given one.
 	 */
@@ -89,7 +122,7 @@ public interface IAddressBook {
 	/**
 	 * Get the list of folders that changed or were deleted since given date.
 	 */
-	public FolderChanges getFolderSync(AccessToken token, Date lastSync)
+	public FolderChangesResponse getFolderSync(AccessToken token, Date lastSync)
 			throws AuthFault, ServerFault;
 
 	/**

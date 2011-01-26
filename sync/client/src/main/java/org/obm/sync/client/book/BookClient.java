@@ -14,8 +14,9 @@ import org.obm.sync.book.BookItemsWriter;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.items.ContactChanges;
-import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.AddressBookChangesResponse;
+import org.obm.sync.items.ContactChangesResponse;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.services.IAddressBook;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
@@ -77,7 +78,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public ContactChanges getSync(AccessToken token, BookType book,
+	public ContactChangesResponse getSync(AccessToken token, BookType book,
 			Date lastSync) throws AuthFault, ServerFault {
 		Map<String, String> params = initParams(token);
 		params.put("book", book.toString());
@@ -164,7 +165,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 	
 	@Override
-	public FolderChanges getFolderSync(AccessToken token, Date lastSync)
+	public FolderChangesResponse getFolderSync(AccessToken token, Date lastSync)
 			throws AuthFault, ServerFault {
 		Map<String, String> params = initParams(token);
 		if (lastSync != null) {
@@ -175,6 +176,63 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 		Document doc = execute("/book/getFolderSync", params);
 
-		return respParser.parseFolderChanges(doc);
+		return respParser.parseFolderChangesResponse(doc);
+	}
+	
+	@Override
+	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date lastSync) throws AuthFault, ServerFault {
+		Map<String, String> params = initParams(token);
+		if (lastSync != null) {
+			params.put("lastSync", DateHelper.asString(lastSync));
+		} else {
+			params.put("lastSync", "0");
+		}
+
+		Document doc = execute("/book/getAddressBookSync", params);
+
+		return respParser.parseAddressBookChanges(doc);
+	}
+	
+	@Override
+	public Contact createContactInBook(AccessToken token, int addressBookId,
+			Contact contact) throws AuthFault, ServerFault {
+		Map<String, String> params = initParams(token);
+		params.put("bookId", String.valueOf(addressBookId));
+		params.put("contact", biw.getContactAsString(contact));
+		Document doc = execute("/book/createContactInBook", params);
+		return respParser.parseContact(doc.getDocumentElement());
+	}
+	
+	@Override
+	public Contact getContactInBook(AccessToken token, int addressBookId, String id) throws AuthFault, ServerFault {
+		Map<String, String> params = initParams(token);
+		params.put("bookId", String.valueOf(addressBookId));
+		params.put("id", id);
+		Document doc = execute("/book/getContactInBook", params);
+		try {
+			checkServerError(doc);
+			return respParser.parseContact(doc.getDocumentElement());
+		} catch (ServerFault se) {
+			return null;
+		}
+	}
+	
+	@Override
+	public Contact modifyContactInBook(AccessToken token, int addressBookId, Contact contact) throws AuthFault, ServerFault {
+		Map<String, String> params = initParams(token);
+		params.put("bookId", String.valueOf(addressBookId));
+		String ct = biw.getContactAsString(contact);
+		params.put("contact", ct);
+		Document doc = execute("/book/modifyContactInBook", params);
+		return respParser.parseContact(doc.getDocumentElement());
+	}
+	
+	@Override
+	public Contact removeContactInBook(AccessToken token, int addressBookId, String uid) throws AuthFault, ServerFault {
+		Map<String, String> params = initParams(token);
+		params.put("bookId", String.valueOf(addressBookId));
+		params.put("id", uid);
+		Document doc = execute("/book/removeContactInBook", params);
+		return respParser.parseContact(doc.getDocumentElement());
 	}
 }

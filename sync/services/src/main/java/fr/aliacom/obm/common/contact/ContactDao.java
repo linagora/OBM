@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.transaction.UserTransaction;
 
@@ -139,6 +140,9 @@ public class ContactDao {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
+			List<Contact> contacts = new ArrayList<Contact>();
+			Set<Integer> archivedContactIds = new TreeSet<Integer>();
+			
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 
@@ -153,28 +157,20 @@ public class ContactDao {
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			rs = ps.executeQuery();
-			boolean setLastSync = true;
+
 			Map<Integer, Contact> entityContact = new HashMap<Integer, Contact>();
 			while (rs.next()) {
-				if (setLastSync) {
-					setLastSync = false;
-					upd.setLastSync(rs.getTimestamp("last_sync"));
-				}
 				boolean archived = rs.getBoolean("contact_archive");
 				Contact c = contactFromCursor(rs);
 				if (!archived) {
 					entityContact.put(c.getEntityId(), c);
-					upd.add(c);
+					contacts.add(c);
 				} else {
-					upd.addArchived(c);
+					archivedContactIds.add(c.getUid());
 				}
 			}
 			rs.close();
 			rs = null;
-
-			if (setLastSync) {
-				upd.setLastSync(obmHelper.selectNow(con));
-			}
 
 			if (!entityContact.isEmpty()) {
 				loadPhones(con, entityContact);
@@ -186,14 +182,17 @@ public class ContactDao {
 				loadAnniversary(con, entityContact);
 			}
 
+			upd.setArchived(archivedContactIds);
+			upd.setContacts(contacts);
+			
+			logger.info("returning " + upd.getContacts().size() + " contact(s) updated");
+			logger.info("returning " + upd.getArchived().size() + " contact(s) archived");
+			
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-
-		logger.info("returning " + upd.size() + " contact(s) updated");
-		logger.info("returning " + upd.getArchived().size() + " contact(s) archived");
 		
 		return upd;
 	}
@@ -290,7 +289,7 @@ public class ContactDao {
 		return c;
 	}
 
-	public Contact createContact(Connection con, AccessToken at, Contact c) {
+	private Contact createContactInAddressBook(Connection con, AccessToken at, Contact c, int addressBookId) {
 		try {
 			Integer anniversaryId = createOrUpdateDate(at, con, c, c
 					.getAnniversary(), ANNIVERSARY_FIELD);
@@ -300,7 +299,7 @@ public class ContactDao {
 					c.getBirthday(), BIRTHDAY_FIELD);
 			c.setBirthdayId(birthdayId);
 
-			int contactId = insertIntoContact(con, at, c);
+			int contactId = insertIntoContact(con, at, c, addressBookId);
 			LinkedEntity le = obmHelper.linkEntity(con, "ContactEntity",
 					"contact_id", contactId);
 			int entityId = le.getEntityId();
@@ -324,7 +323,7 @@ public class ContactDao {
 		try {
 			ut.begin();
 			con = obmHelper.getConnection();
-			createContact(con, at, c);
+			createContact(at, con, c);
 			ut.commit();
 		} catch (Throwable e) {
 			obmHelper.rollback(ut);
@@ -335,6 +334,30 @@ public class ContactDao {
 		return c;
 	}
 
+
+	public Contact createContact(AccessToken at, Connection con, Contact c)
+			throws SQLException {
+		int addressbookId = chooseAddressBookFromContact(con, at, c);
+		return createContactInAddressBook(con, at, c, addressbookId);
+	}
+
+	public Contact createContactInAddressBook(AccessToken at, Contact c, int addressbookId) {
+		Connection con = null;
+		UserTransaction ut = obmHelper.getUserTransaction();
+		try {
+			ut.begin();
+			con = obmHelper.getConnection();
+			c = createContactInAddressBook(con, at, c, addressbookId);
+			ut.commit();
+		} catch (Throwable e) {
+			obmHelper.rollback(ut);
+			logger.error(e.getMessage(), e);
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
+		return c;
+	}
+	
 	private Event getEvent(AccessToken token, String displayName, Date startDate) {
 
 		Calendar cal = Calendar.getInstance();
@@ -573,13 +596,12 @@ public class ContactDao {
 
 	}
 
-	private int insertIntoContact(Connection con, AccessToken at, Contact c)
-			throws SQLException {
+	private int chooseAddressBookFromContact(Connection con, AccessToken at, Contact c) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			ps = con
-					.prepareStatement("SELECT id from AddressBook WHERE name=? AND owner=? AND is_default");
+			ps = con.prepareStatement(
+				"SELECT id from AddressBook WHERE name=? AND owner=? AND is_default");
 			if (c.isCollected()) {
 				ps.setString(1, "collected_contacts");
 			} else {
@@ -590,11 +612,16 @@ public class ContactDao {
 			rs = ps.executeQuery();
 			rs.next();
 
-			Integer folderId = rs.getInt(1);
-
-			rs.close();
-			ps.close();
-			ps = null;
+			return rs.getInt(1);
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
+	}
+	
+	private int insertIntoContact(Connection con, AccessToken at, Contact c, int addressBookId)
+			throws SQLException {
+		PreparedStatement ps = null;
+		try {
 
 			ps = con
 					.prepareStatement("INSERT INTO Contact "
@@ -633,7 +660,7 @@ public class ContactDao {
 			ps.setString(idx++, c.getAssistant());
 
 			ps.setBoolean(idx++, c.isCollected());
-			ps.setInt(idx++, folderId);
+			ps.setInt(idx++, addressBookId);
 
 			ps.executeUpdate();
 
@@ -1266,7 +1293,7 @@ public class ContactDao {
 			ps.setInt(idx++, at.getObmId());
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ret.add(new AddressBook(rs.getString(2), rs.getInt(1)));
+				ret.add(new AddressBook(rs.getString(2), rs.getInt(1), false));
 			}
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
@@ -1410,10 +1437,10 @@ public class ContactDao {
 		return new ArrayList<Contact>();
 	}
 	
-	public FolderUpdates findUpdatedFolders(Date timestamp, AccessToken at) {
+	public List<Folder> findUpdatedFolders(Date timestamp, AccessToken at) {
 		String q = "SELECT "
 				+ FOLDER_SELECT_FIELDS
-				+ ", now() as last_sync FROM AddressBook a "
+				+ " FROM AddressBook a "
 				+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id="
 				+ at.getObmId()
 				+ ") "
@@ -1422,7 +1449,7 @@ public class ContactDao {
 
 		int idx = 1;
 
-		FolderUpdates upd = new FolderUpdates();
+		List<Folder> folders = new ArrayList<Folder>();
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1434,23 +1461,14 @@ public class ContactDao {
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			rs = ps.executeQuery();
-			boolean setLastSync = true;
 			while (rs.next()) {
-				if (setLastSync) {
-					setLastSync = false;
-					upd.setLastSync(rs.getTimestamp("last_sync"));
-				}
 				Folder f = new Folder();
 				f.setUid(rs.getInt(1));
 				f.setName(rs.getString(2));
-				upd.add(f);
+				folders.add(f);
 			}
 			rs.close();
 			rs = null;
-
-			if (setLastSync) {
-				upd.setLastSync(obmHelper.selectNow(con));
-			}
 
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
@@ -1458,9 +1476,9 @@ public class ContactDao {
 			obmHelper.cleanup(con, ps, rs);
 		}
 
-		logger.info("returning " + upd.size() + " folder(s) updated");
+		logger.info("returning " + folders.size() + " folder(s) updated");
 
-		return upd;
+		return folders;
 	}
 
 	public Set<Integer> findRemovedFolders(Date d, AccessToken at) {
@@ -1490,7 +1508,7 @@ public class ContactDao {
 			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				l.add(new Integer(rs.getInt(1)));
+				l.add(rs.getInt(1));
 			}
 
 			logger.info("Returning " + l.size() + " folder(s) deleted");

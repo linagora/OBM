@@ -13,8 +13,11 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.items.AbstractItemsParser;
+import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
@@ -141,12 +144,18 @@ public class BookItemsParser extends AbstractItemsParser {
 	/**
 	 * Parse the contact changes document returned by the getSync call
 	 */
-	public ContactChanges parseChanges(Document doc) {
-		ContactChanges changes = new ContactChanges();
+	public ContactChangesResponse parseChanges(Document doc) {
+		ContactChangesResponse changes = new ContactChangesResponse();
 		Element root = doc.getDocumentElement();
 		Date lastSync = DateHelper.asDate(root.getAttribute("lastSync"));
 		changes.setLastSync(lastSync);
+		changes.setChanges(parseContactChanges(root));
+		return changes;
+	}
 
+	private ContactChanges parseContactChanges(Element root) {
+		ContactChanges contactChanges = new ContactChanges();
+		
 		Element removed = DOMUtils.getUniqueElement(root, "removed");
 		Element updated = DOMUtils.getUniqueElement(root, "updated");
 
@@ -156,7 +165,7 @@ public class BookItemsParser extends AbstractItemsParser {
 			Element e = (Element) rmed.item(i);
 			removedIds.add(Integer.parseInt(e.getAttribute("uid")));
 		}
-		changes.setRemoved(removedIds);
+		contactChanges.setRemoved(removedIds);
 
 		NodeList upd = updated.getElementsByTagName("contact");
 		List<Contact> updatedEvents = new ArrayList<Contact>(
@@ -166,11 +175,10 @@ public class BookItemsParser extends AbstractItemsParser {
 			Contact ev = parseContact(e);
 			updatedEvents.add(ev);
 		}
-		changes.setUpdated(updatedEvents);
-
-		return changes;
+		contactChanges.setUpdated(updatedEvents);
+		return contactChanges;
 	}
-
+	
 	public List<AddressBook> parseListAddressBook(Document doc) {
 		Element documentElement = doc.getDocumentElement();
 		List<AddressBook> ret = new LinkedList<AddressBook>();
@@ -195,12 +203,18 @@ public class BookItemsParser extends AbstractItemsParser {
 		return ret;
 	}
 
-	public FolderChanges parseFolderChanges(Document doc) {
-		FolderChanges changes = new FolderChanges();
+	public FolderChangesResponse parseFolderChangesResponse(Document doc) {
+		FolderChangesResponse changes = new FolderChangesResponse();
 		Element root = doc.getDocumentElement();
 		Date lastSync = DateHelper.asDate(root.getAttribute("lastSync"));
 		changes.setLastSync(lastSync);
+		changes.setFolderChanges(parseFolderChanges(root));
+		return changes;
+	}
 
+	private FolderChanges parseFolderChanges(Element root) {
+		FolderChanges folderChanges = new FolderChanges();
+		
 		Element removed = DOMUtils.getUniqueElement(root, "removed");
 		Element updated = DOMUtils.getUniqueElement(root, "updated");
 
@@ -210,7 +224,7 @@ public class BookItemsParser extends AbstractItemsParser {
 			Element e = (Element) rmed.item(i);
 			removedIds.add(Integer.parseInt(e.getAttribute("uid")));
 		}
-		changes.setRemoved(removedIds);
+		folderChanges.setRemoved(removedIds);
 
 		NodeList upd = updated.getElementsByTagName("folder");
 		List<Folder> updatedFolders = new ArrayList<Folder>(upd.getLength() + 1);
@@ -219,11 +233,10 @@ public class BookItemsParser extends AbstractItemsParser {
 			Folder f = parseFolder(e);
 			updatedFolders.add(f);
 		}
-		changes.setUpdated(updatedFolders);
-
-		return changes;
+		folderChanges.setUpdated(updatedFolders);
+		return folderChanges;
 	}
-
+	
 	private Folder parseFolder(Element root) {
 		Folder f = new Folder();
 
@@ -240,4 +253,15 @@ public class BookItemsParser extends AbstractItemsParser {
 		Element root = doc.getDocumentElement();
 		return parseFolder(root);
 	}
+
+	public AddressBookChangesResponse parseAddressBookChanges(Document doc) {
+		AddressBookChangesResponse response = new AddressBookChangesResponse();
+		Element root = doc.getDocumentElement();
+		Date lastSync = DateHelper.asDate(root.getAttribute("lastSync"));
+		response.setLastSync(lastSync);
+		response.setBooksChanges(parseFolderChanges(DOMUtils.getUniqueElement(root, "addressbooks")));
+		response.setContactChanges(parseContactChanges(DOMUtils.getUniqueElement(root, "contacts")));
+		return response;
+	}
+	
 }
