@@ -29,6 +29,7 @@ import org.junit.internal.matchers.StringContains;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 
@@ -43,6 +44,12 @@ import fr.aliacom.obm.services.constant.ConstantService;
 public class EventChangeMailerTest {
 
 	public abstract static class Common {
+		
+		protected AccessToken getMockAccessToken(){
+			AccessToken at = new AccessToken(1, 1, "unitTest");
+			at.setDomain("test.tlse.lng");
+			return at;
+		}
 
 		protected MailService defineMailServiceExpectations(
 				List<InternetAddress> expectedRecipients,
@@ -171,6 +178,7 @@ public class EventChangeMailerTest {
 			Assert.assertThat(applicationIcs.getContent(), IsInstanceOf.instanceOf(SharedByteArrayInputStream.class));
 			SharedByteArrayInputStream stream = (SharedByteArrayInputStream) applicationIcs.getContent();
 			String decodedString = IOUtils.toString(stream, Charsets.US_ASCII.displayName());
+			System.err.println(decodedString);
 			checkStringContains(decodedString, getExpectedIcsStrings());
 		}
 
@@ -206,7 +214,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyNewUsers(event.getAttendees(), event, Locale.FRENCH);
+			eventChangeMailer.notifyNewUsers(getMockAccessToken(), event.getAttendees(), event, Locale.FRENCH);
 		}
 		
 		@Test
@@ -262,7 +270,8 @@ public class EventChangeMailerTest {
 					"DURATION:PT45M",
 					"SUMMARY:Sprint planning OBM",
 					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
-					"UID:f1514f44bf39311568d64072c1fec10f47fe"
+					"UID:f1514f44bf39311568d64072c1fec10f47fe",
+					"X-OBM-DOMAIN:test.tlse.lng"
 			};
 		}
 		
@@ -289,7 +298,7 @@ public class EventChangeMailerTest {
 			Event after = before.clone();
 			after.setDate(date(2010, 10, 8, 12, 00));
 			after.setDuration(3600);
-			eventChangeMailer.notifyUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH);
+			eventChangeMailer.notifyUpdateUsers(getMockAccessToken(), before.getAttendees(), before, after, Locale.FRENCH);
 		}
 		
 		@Override
@@ -318,7 +327,8 @@ public class EventChangeMailerTest {
 					"DURATION:PT1H",
 					"SUMMARY:Sprint planning OBM",
 					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
-					"UID:f1514f44bf39311568d64072c1fec10f47fe"
+					"UID:f1514f44bf39311568d64072c1fec10f47fe",
+					"X-OBM-DOMAIN:test.tlse.lng"
 				};
 		}
 		
@@ -369,7 +379,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyRemovedUsers(event.getAttendees(), event, Locale.FRENCH);
+			eventChangeMailer.notifyRemovedUsers(getMockAccessToken(), event.getAttendees(), event, Locale.FRENCH);
 		}
 		
 		@Override
@@ -395,7 +405,8 @@ public class EventChangeMailerTest {
 					"DTSTART:20101108T100000Z",
 					"SUMMARY:Sprint planning OBM",
 					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
-					"UID:f1514f44bf39311568d64072c1fec10f47fe"
+					"UID:f1514f44bf39311568d64072c1fec10f47fe",
+					"X-OBM-DOMAIN:test.tlse.lng"
 				};
 		}
 		

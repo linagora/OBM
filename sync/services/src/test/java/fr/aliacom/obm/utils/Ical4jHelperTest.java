@@ -56,6 +56,12 @@ import org.obm.sync.calendar.RecurrenceKind;
 
 public class Ical4jHelperTest {
 
+	protected AccessToken getMockAccessToken(){
+		AccessToken at = new AccessToken(1, 1, "unitTest");
+		at.setDomain("test.tlse.lng");
+		return at;
+	}
+	
 	protected Event getTestEvent() {
 		Event ev = new Event();
 
@@ -117,7 +123,7 @@ public class Ical4jHelperTest {
 		List<Event> l = new LinkedList<Event>();
 		l.add(event1);
 		l.add(event2);
-		String ics = Ical4jHelper.parseEvents(l);
+		String ics = Ical4jHelper.parseEvents(getMockAccessToken(), l);
 		assertNotNull(ics);
 		assertNotSame("", ics);
 	}

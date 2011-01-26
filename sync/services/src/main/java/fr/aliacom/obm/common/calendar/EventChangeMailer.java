@@ -14,6 +14,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.obm.sync.Messages;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 
@@ -55,7 +56,7 @@ public class EventChangeMailer {
 		session = Session.getDefaultInstance(new Properties());
 	}
 	
-	public void notifyNewUsers(Collection<Attendee> attendee, Event event, Locale locale) throws NotificationException {
+	public void notifyNewUsers(AccessToken at, Collection<Attendee> attendee, Event event, Locale locale) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -64,7 +65,7 @@ public class EventChangeMailer {
 						newUserTitle(event.getOwner(), event.getTitle(), locale), 
 						newUserBodyTxt(event, locale),
 						newUserBodyHtml(event, locale),
-						newUserIcs(event), "REQUEST");
+						newUserIcs(at, event), "REQUEST");
 			sendNotificationMessageToAttendee(attendee, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -75,7 +76,7 @@ public class EventChangeMailer {
 		}
 	}
 
-	public void notifyRemovedUsers(Collection<Attendee> attendees, Event event, Locale locale) throws NotificationException {
+	public void notifyRemovedUsers(AccessToken at, Collection<Attendee> attendees, Event event, Locale locale) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -84,7 +85,7 @@ public class EventChangeMailer {
 						removedUserTitle(event.getOwner(), event.getTitle(), locale), 
 						removedUserBodyTxt(event, locale),
 						removedUserBodyHtml(event, locale), 
-						removedUserIcs(event), "CANCEL");
+						removedUserIcs(at, event), "CANCEL");
 			sendNotificationMessageToAttendee(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -95,7 +96,7 @@ public class EventChangeMailer {
 		}
 	}
 
-	public void notifyUpdateUsers(Collection<Attendee> attendees, Event previous, Event current, Locale locale) throws NotificationException {
+	public void notifyUpdateUsers(AccessToken at, Collection<Attendee> attendees, Event previous, Event current, Locale locale) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -104,7 +105,7 @@ public class EventChangeMailer {
 						updateUserTitle(current.getOwner(), current.getTitle(), locale), 
 						updateUserBodyTxt(previous, current, locale),
 						updateUserBodyHtml(previous, current, locale), 
-						updateUserIcs(current), "REQUEST");
+						updateUserIcs(at, current), "REQUEST");
 			sendNotificationMessageToAttendee(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -216,12 +217,12 @@ public class EventChangeMailer {
 		return datamodel;
 	}
 	
-	private String newUserIcs(Event event) {
-		return Ical4jHelper.buildIcsInvitationRequest(event);
+	private String newUserIcs(AccessToken at, Event event) {
+		return Ical4jHelper.buildIcsInvitationRequest(at, event);
 	}
 
-	private String removedUserIcs(Event event) {
-		return Ical4jHelper.buildIcsInvitationCancel(event);
+	private String removedUserIcs(AccessToken at, Event event) {
+		return Ical4jHelper.buildIcsInvitationCancel(at, event);
 	}
 
 	private String removedUserTitle(String owner, String title, Locale locale) {
@@ -232,8 +233,8 @@ public class EventChangeMailer {
 		return new Messages(locale).updatedEventTitle(owner, title);
 	}
 
-	private String updateUserIcs(Event current) {
-		return Ical4jHelper.buildIcsInvitationRequest(current);
+	private String updateUserIcs(AccessToken at, Event current) {
+		return Ical4jHelper.buildIcsInvitationRequest(at, current);
 	}
 
 	/* package */ void setMailService(MailService mailService) {

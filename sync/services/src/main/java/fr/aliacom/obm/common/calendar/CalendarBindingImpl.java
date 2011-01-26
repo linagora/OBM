@@ -160,7 +160,7 @@ public class CalendarBindingImpl implements ICalendar {
 					ev = calendarService.removeEvent(token, uid, ev.getType());
 					logger.info(LogUtils.prefix(token) + "Calendar : event["
 							+ uid + "] removed");
-					eventChangeHandler.delete(ev,
+					eventChangeHandler.delete(token, ev,
 							settingsDao.getUserLanguage(token));
 					return ev;
 				}
@@ -202,7 +202,7 @@ public class CalendarBindingImpl implements ICalendar {
 			ev = calendarService.removeEventByExtId(token, calendarUser, extId);
 			logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
 
-			eventChangeHandler.delete(ev, settingsDao.getUserLanguage(token));
+			eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
 			return ev;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -262,7 +262,7 @@ public class CalendarBindingImpl implements ICalendar {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 						+ after.getTitle() + "] modified");
 			}
-			eventChangeHandler.update(before, after,
+			eventChangeHandler.update(token, before, after,
 					settingsDao.getUserLanguage(token));
 
 			return after;
@@ -357,7 +357,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event createInternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {
 		try{
 			Event ev = calendarService.createEvent(token, calendar, event, true);
-			eventChangeHandler.create(ev, settingsDao.getUserLanguage(token));
+			eventChangeHandler.create(token, ev, settingsDao.getUserLanguage(token));
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");
 			return ev;
@@ -590,7 +590,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	public String parseEvents(AccessToken token, List<Event> events)
 			throws ServerFault, AuthFault {
-		return Ical4jHelper.parseEvents(events);
+		return Ical4jHelper.parseEvents(token, events);
 	}
 
 	@Override

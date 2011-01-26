@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.easymock.EasyMock;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 
@@ -18,7 +19,13 @@ public abstract class AbstractEventChangeHandlerTest {
 	public AbstractEventChangeHandlerTest() {
 		super();
 	}
-
+	
+	protected AccessToken getMockAccessToken(){
+		AccessToken at = new AccessToken(1, 1, "unitTest");
+		at.setDomain("test.tlse.lng");
+		return at;
+	}
+	
 	protected abstract void processEvent(EventChangeHandler eventChangeHandler, Event event) throws NotificationException;
 	
 	public void testDefaultEvent() {

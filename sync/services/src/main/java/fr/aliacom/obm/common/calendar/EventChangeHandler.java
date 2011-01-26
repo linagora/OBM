@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 
@@ -28,37 +29,37 @@ public class EventChangeHandler {
 		this.eventChangeMailer = eventChangeMailer;
 	}
 	
-	public void create(final Event event, Locale locale) throws NotificationException {
+	public void create(final AccessToken at, final Event event, Locale locale) throws NotificationException {
 		if (eventCreationInvolveNotification(event)) {
 			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
 			if (!attendees.isEmpty()) {
-				eventChangeMailer.notifyNewUsers(attendees, event, locale);
+				eventChangeMailer.notifyNewUsers(at, attendees, event, locale);
 			}
 		}
 	}
 
-	public void update(final Event previous, final Event current, Locale locale) throws NotificationException {
+	public void update(final AccessToken at, final Event previous, final Event current, Locale locale) throws NotificationException {
 		Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = 
 			computeNotificationGroups(previous, current);
 		Set<Attendee> removedUsers = attendeeGroups.get(AttendeeStateValue.Old);
 		if (!removedUsers.isEmpty()) {
-			eventChangeMailer.notifyRemovedUsers(removedUsers, current, locale);
+			eventChangeMailer.notifyRemovedUsers(at, removedUsers, current, locale);
 		}
 		Set<Attendee> addedUsers = attendeeGroups.get(AttendeeStateValue.New);
 		if (!addedUsers.isEmpty()) {
-			eventChangeMailer.notifyNewUsers(addedUsers, current, locale);
+			eventChangeMailer.notifyNewUsers(at, addedUsers, current, locale);
 		}
 		Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
 		if (!currentUsers.isEmpty()) {
-			eventChangeMailer.notifyUpdateUsers(currentUsers, previous, current, locale);
+			eventChangeMailer.notifyUpdateUsers(at, currentUsers, previous, current, locale);
 		}
 	}
 	
- 	public void delete(final Event event, Locale locale) throws NotificationException {
+ 	public void delete(final AccessToken at, final Event event, Locale locale) throws NotificationException {
  		if (eventDeletionInvolveNotification(event)) {
  			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
  			if (!attendees.isEmpty()) {
- 				eventChangeMailer.notifyRemovedUsers(attendees, event, locale);
+ 				eventChangeMailer.notifyRemovedUsers(at, attendees, event, locale);
  			}
  		}
  	}

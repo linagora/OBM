@@ -87,6 +87,7 @@ import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
+import net.fortuna.ical4j.model.property.XProperty;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -407,12 +408,12 @@ public class Ical4jHelper {
 
 	}
 
-	public static String parseEvents(List<Event> listEvent) {
+	public static String parseEvents(AccessToken token, List<Event> listEvent) {
 
 		Calendar calendar = initCalandar();
 
 		for (Event event : listEvent) {
-			VEvent vEvent = getVEvent(event);
+			VEvent vEvent = getVEvent(token, event);
 			calendar.getComponents().add(vEvent);
 		}
 		return calendar.toString();
@@ -421,7 +422,7 @@ public class Ical4jHelper {
 	public static String parseEvent(Event event, AccessToken token) {
 		
 		if (EventType.VEVENT.equals(event.getType())) {
-			Calendar c = buildVEvent(event);
+			Calendar c = buildVEvent(token, event);
 			return c.toString();
 		} else if (EventType.VTODO.equals(event.getType())) {
 			Calendar c = buildVTodo(event, token);
@@ -443,20 +444,20 @@ public class Ical4jHelper {
 		return calendar;
 	}
 
-	private static Calendar buildVEvent(Event event) {
+	private static Calendar buildVEvent(AccessToken at, Event event) {
 		Calendar calendar = initCalandar();
-		VEvent vEvent = getVEvent(event);
+		VEvent vEvent = getVEvent(at, event);
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = getVEvent(ee, event.getExtId(), event);
+				VEvent eventExt = getVEvent(null, ee, event.getExtId(), event);
 				calendar.getComponents().add(eventExt);
 			}
 		}
 		return calendar;
 	}
 
-	private static VEvent buildIcsInvitationVEvent(Event event) {
+	private static VEvent buildIcsInvitationVEvent(AccessToken token, Event event) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 		appendUidToICS(prop, event, null);
@@ -476,16 +477,19 @@ public class Ical4jHelper {
 		appendVAlarmToICS(vEvent.getAlarms(), event);
 		appendRecurenceIdToICS(prop, event);
 		appendXMozLastAck(prop);
+		if(token != null){
+			appendXObmDomain(token, prop);
+		}
 		return vEvent;
 	}
 	
-	public static String buildIcsInvitationRequest(Event event) {
+	public static String buildIcsInvitationRequest(AccessToken at, Event event) {
 		Calendar calendar = initCalandar();
-		VEvent vEvent = buildIcsInvitationVEvent(event);
+		VEvent vEvent = buildIcsInvitationVEvent(at, event);
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = buildIcsInvitationVEvent(ee);
+				VEvent eventExt = buildIcsInvitationVEvent(null, ee);
 				appendUidToICS(eventExt.getProperties(), ee, event.getExtId());
 				calendar.getComponents().add(eventExt);
 			}
@@ -498,17 +502,17 @@ public class Ical4jHelper {
 		prop.add(new Duration(new Dur(event.getDate(), event.getEndDate())));
 	}
 
-	public static String buildIcsInvitationCancel(Event event) {
-		Calendar calendar = buildVEvent(event);
+	public static String buildIcsInvitationCancel(AccessToken at, Event event) {
+		Calendar calendar = buildVEvent(at, event);
 		calendar.getProperties().add(Method.CANCEL);
 		return calendar.toString();
 	}
 	
-	public static VEvent getVEvent(Event event) {
-		return getVEvent(event, null, null);
+	public static VEvent getVEvent(AccessToken at, Event event) {
+		return getVEvent(at, event, null, null);
 	}
 
-	public static VEvent getVEvent(Event event, String parentExtID, Event parent) {
+	public static VEvent getVEvent(AccessToken at, Event event, String parentExtID, Event parent) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 
@@ -533,7 +537,9 @@ public class Ical4jHelper {
 		appendVAlarmToICS(vEvent.getAlarms(), event);
 		appendRecurenceIdToICS(prop, event);
 		appendXMozLastAck(prop);
-
+		if(at != null){
+			appendXObmDomain(at, prop);
+		}
 		return vEvent;
 	}
 
@@ -582,6 +588,11 @@ public class Ical4jHelper {
 			private static final long serialVersionUID = -1511914339279939574L;
 		};
 		p.setDate(new DateTime(cal.getTime()));
+		prop.add(p);
+	}
+	
+	private static void appendXObmDomain(AccessToken at, PropertyList prop) {
+		XProperty p = new XProperty("X-OBM-DOMAIN", at.getDomain());
 		prop.add(p);
 	}
 

@@ -41,14 +41,15 @@ public class CalendarItemsParserTest {
 		"<privacy>0</privacy>" +
 		"<attendees>" +
 		"<attendee displayName=\"John Do\" email=\"john@do.fr\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\" isOrganizer=\"true\"/>" +
-		"<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>" +
+		"<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\" isOrganizer=\"false\"/>" +
+		"<attendee displayName=\"noIn TheDatabase2\" email=\"notin2@mydb.com\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>" +
 		"</attendees><recurrence days=\"\" freq=\"1\" kind=\"daily\">" +
 		"<exceptions>" +
 		"<exception>1295258400000</exception>" +
 		"</exceptions><eventExceptions/>" +
 		"</recurrence>" +
 		"</event>";
-		
+		System.err.println(xml);
 		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
 		Event ev = parser.parseEvent(doc.getDocumentElement());
 
@@ -76,6 +77,13 @@ public class CalendarItemsParserTest {
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase");
 		at.setEmail("notin@mydb.com");
+		at.setState(ParticipationState.ACCEPTED);
+		at.setRequired(ParticipationRole.OPT);
+		Assert.assertTrue(ev.getAttendees().contains(at));
+		
+		at = new Attendee();
+		at.setDisplayName("noIn TheDatabase2");
+		at.setEmail("notin2@mydb.com");
 		at.setState(ParticipationState.ACCEPTED);
 		at.setRequired(ParticipationRole.OPT);
 		Assert.assertTrue(ev.getAttendees().contains(at));

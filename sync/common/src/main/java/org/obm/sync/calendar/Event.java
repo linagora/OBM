@@ -11,6 +11,7 @@ public class Event {
 	private static final long serialVersionUID = 1L;
 
 	private String title;
+	private String domain;
 	private String description;
 	private String uid;
 	private String extId;
@@ -343,4 +344,12 @@ public class Event {
 		this.internalEvent = internalEvent;
 	}
 
+	public String getDomain() {
+		return domain;
+	}
+
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+	
 }
