@@ -62,7 +62,8 @@ public class BookItemsParser extends AbstractItemsParser {
 		c.setAssistant(s(root, "assistant"));
 		c.setManager(s(root, "manager"));
 		c.setSpouse(s(root, "spouse"));
-
+		c.setFolderId(i(root, "addressbookid"));
+		
 		String bday = s(root, "birthday");
 		if (bday != null && bday.length() > 0) {
 			c.setBirthday(DateHelper.asDate(bday));
