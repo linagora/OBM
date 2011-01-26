@@ -109,6 +109,7 @@ import com.google.common.collect.ImmutableList;
 public class Ical4jHelper {
 
 	private static final int SECONDS_IN_DAY = 43200000;
+	private static final String XOBMDOMAIN = "X-OBM-DOMAIN";
 	private static Log logger = LogFactory.getLog(Ical4jHelper.class);
 
 	public static FreeBusyRequest parseICSFreeBusy(String ics) 
@@ -160,10 +161,10 @@ public class Ical4jHelper {
 				if (Component.VEVENT.equals(typeCalendar)) {
 					VEvent vEvent = (VEvent) comp;
 					if (vEvent.getRecurrenceId() == null) {
-						Event event = getEvent(vEvent);
+						Event event = getEvent(token, vEvent);
 						mapEvents.put(event.getExtId(), event);
 					} else {
-						Event eexcep = getEvent(vEvent);
+						Event eexcep = getEvent(token, vEvent);
 						Event event = mapEvents.get(eexcep.getExtId());
 
 						if (event != null) {
@@ -176,10 +177,10 @@ public class Ical4jHelper {
 				} else if (Component.VTODO.equals(typeCalendar)) {
 					VToDo vTodo = (VToDo) comp;
 					if (vTodo.getRecurrenceId() == null) {
-						Event event = getEvent(vTodo, token);
+						Event event = getEvent(token, vTodo);
 						mapEvents.put(event.getExtId(), event);
 					} else {
-						Event eexcep = getEvent(vTodo, token);
+						Event eexcep = getEvent(token, vTodo);
 						Event event = mapEvents.get(eexcep.getExtId());
 
 						if (event != null) {
@@ -193,7 +194,7 @@ public class Ical4jHelper {
 		return mapEvents;
 	}
 
-	public static Event getEvent(VEvent vEvent) {
+	public static Event getEvent(AccessToken at, VEvent vEvent) {
 		Event event = new Event();
 		event.setType(EventType.VEVENT);
 		appendSummary(event, vEvent.getSummary());
@@ -213,11 +214,11 @@ public class Ical4jHelper {
 		appendRecurence(event, vEvent);
 		appendAlert(event, vEvent.getAlarms());
 		appendOpacity(event, vEvent.getTransparency(), event.isAllday());
-
+		appendIsInternal(at, event, vEvent.getProperty(XOBMDOMAIN));
 		return event;
 	}
 
-	public static Event getEvent(VToDo vTodo, AccessToken token) {
+	public static Event getEvent(AccessToken at, VToDo vTodo) {
 		Event event = new Event();
 		event.setType(EventType.VTODO);
 		appendSummary(event, vTodo.getSummary());
@@ -236,13 +237,22 @@ public class Ical4jHelper {
 		appendAttendees(event, vTodo);
 		appendRecurence(event, vTodo);
 		appendAlert(event, vTodo.getAlarms());
-		appendPercent(event, vTodo.getPercentComplete(), token.getEmail());
-		appendStatus(event, vTodo.getStatus(), token.getEmail());
+		appendPercent(event, vTodo.getPercentComplete(), at.getEmail());
+		appendStatus(event, vTodo.getStatus(), at.getEmail());
 		appendOpacity(event,
 				(Transp) vTodo.getProperties().getProperty(Property.TRANSP),
 				event.isAllday());
-
+		appendIsInternal(at, event, vTodo.getProperty(XOBMDOMAIN));
 		return event;
+	}
+	
+	private static void appendIsInternal(AccessToken at, Event event, Property obmDomain) {
+		boolean eventIsInternal = false;
+		if(obmDomain != null){
+			eventIsInternal = at.getDomain().equals(obmDomain.getValue());
+		}
+		event.setInternalEvent(eventIsInternal);
+		
 	}
 
 	private static void appendOpacity(Event event, Transp transp,
@@ -592,7 +602,7 @@ public class Ical4jHelper {
 	}
 	
 	private static void appendXObmDomain(AccessToken at, PropertyList prop) {
-		XProperty p = new XProperty("X-OBM-DOMAIN", at.getDomain());
+		XProperty p = new XProperty(XOBMDOMAIN, at.getDomain());
 		prop.add(p);
 	}
 
