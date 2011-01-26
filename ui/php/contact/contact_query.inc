@@ -447,7 +447,7 @@ function run_query_contact_kind($language = null) {
 
   $languageCondition = is_null($language) ?
                        '' : 
-                       ' AND kind_lang = "'.$language.'"';
+                       ' AND kind_lang = \''.$language.'\'';
 
   $query = "SELECT kind_id,
     kind_minilabel,
