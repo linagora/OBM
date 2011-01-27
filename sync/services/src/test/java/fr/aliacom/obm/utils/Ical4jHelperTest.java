@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateTime;
@@ -56,12 +57,12 @@ import org.obm.sync.calendar.RecurrenceKind;
 
 public class Ical4jHelperTest {
 
-	protected AccessToken getMockAccessToken(){
+	protected AccessToken getMockAccessToken() {
 		AccessToken at = new AccessToken(1, 1, "unitTest");
 		at.setDomain("test.tlse.lng");
 		return at;
 	}
-	
+
 	protected Event getTestEvent() {
 		Event ev = new Event();
 
@@ -149,8 +150,8 @@ public class Ical4jHelperTest {
 		er.setEnd(null);
 		event1.setRecurrence(er);
 
-		Recur recur = Ical4jHelper.getRecur(event1.getRecurrence(), event1
-				.getDate());
+		Recur recur = Ical4jHelper.getRecur(event1.getRecurrence(),
+				event1.getDate());
 		assertTrue(recur.getDayList().contains(WeekDay.MO));
 		assertTrue(recur.getDayList().contains(WeekDay.TU));
 		assertTrue(recur.getDayList().contains(WeekDay.WE));
@@ -244,15 +245,10 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testGetOwner() {
+	public void testGetOwner() throws URISyntaxException {
 		Organizer orga = new Organizer();
-		try {
-			orga.getParameters().add(new Cn("Adrien Poupard"));
-			orga.setValue("mailto:" + "adrien@zz.com");
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		orga.getParameters().add(new Cn("Adrien Poupard"));
+		orga.setValue("mailto:" + "adrien@zz.com");
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
 		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
@@ -260,14 +256,9 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testGetOwner1() {
+	public void testGetOwner1() throws URISyntaxException {
 		Organizer orga = new Organizer();
-		try {
-			orga.setValue("mailto:" + "adrien@zz.com");
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		orga.setValue("mailto:" + "adrien@zz.com");
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
 		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
@@ -288,104 +279,112 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testGetRecurence() {
+	public void testGetRecurence() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("getRecurence.ics");
 		CalendarBuilder builder = new CalendarBuilder();
-		net.fortuna.ical4j.model.Calendar calendar = null;
-		try {
-			calendar = builder.build(icsStream);
-			ComponentList vEvents = Ical4jHelper.getComponents(calendar, Component.VEVENT);
-			VEvent vEvent = (VEvent) vEvents.get(0);
-			Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
-			EventRecurrence er = event.getRecurrence();
-			assertNotNull(er);
-			assertEquals(1, er.getFrequence());
-			assertEquals("0111110", er.getDays());
-			assertEquals(RecurrenceKind.weekly, er.getKind());
-			assertEquals(1, er.getExceptions().length);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		EventRecurrence er = event.getRecurrence();
+		assertNotNull(er);
+		assertEquals(1, er.getFrequence());
+		assertEquals("0111110", er.getDays());
+		assertEquals(RecurrenceKind.weekly, er.getKind());
+		assertEquals(1, er.getExceptions().length);
 	}
 
 	@Test
-	public void testGetAttendees() {
+	public void testGetAttendees() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("attendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
-		try {
-			net.fortuna.ical4j.model.Calendar calendar = builder
-					.build(icsStream);
-			ComponentList vEvents = Ical4jHelper.getComponents(calendar,
-					Component.VEVENT);
-			VEvent vEvent = (VEvent) vEvents.get(0);
-			Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
-			assertEquals(3, event.getAttendees().size());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertEquals(3, event.getAttendees().size());
 
 	}
 
 	@Test
-	public void testIsInternal() {
+	public void testIsInternal() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventInternal.ics");
 		CalendarBuilder builder = new CalendarBuilder();
-		try {
-			net.fortuna.ical4j.model.Calendar calendar = builder
-					.build(icsStream);
-			ComponentList vEvents = Ical4jHelper.getComponents(calendar,
-					Component.VEVENT);
-			VEvent vEvent = (VEvent) vEvents.get(0);
-			Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
-			assertTrue(event.isInternalEvent());
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertTrue(event.isInternalEvent());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
 	}
-	
+
 	@Test
-	public void testIsExternalObm() {
+	public void testCreated() throws IOException, ParserException {
+		InputStream icsStream = getStreamICS("eventComplet.ics");
+		CalendarBuilder builder = new CalendarBuilder();
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertEquals(1244470973000L, event.getTimeCreate().getTime());
+	}
+
+	@Test
+	public void testLastModified() throws IOException, ParserException {
+		InputStream icsStream = getStreamICS("eventComplet.ics");
+		CalendarBuilder builder = new CalendarBuilder();
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertEquals(1244470995000L, event.getTimeUpdate().getTime());
+
+	}
+
+	@Test
+	public void testLastModifiedNull() throws IOException, ParserException {
+		InputStream icsStream = getStreamICS("eventNewComplet.ics");
+		CalendarBuilder builder = new CalendarBuilder();
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertNull(event.getTimeUpdate());
+
+	}
+
+	@Test
+	public void testIsExternalObm() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventExternalObm.ics");
 		CalendarBuilder builder = new CalendarBuilder();
-		try {
-			net.fortuna.ical4j.model.Calendar calendar = builder
-					.build(icsStream);
-			ComponentList vEvents = Ical4jHelper.getComponents(calendar,
-					Component.VEVENT);
-			VEvent vEvent = (VEvent) vEvents.get(0);
-			Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
-			assertFalse(event.isInternalEvent());
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertFalse(event.isInternalEvent());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
 	}
-	
+
 	@Test
-	public void testIsExternal() {
+	public void testIsExternal() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventExternal.ics");
 		CalendarBuilder builder = new CalendarBuilder();
-		try {
-			net.fortuna.ical4j.model.Calendar calendar = builder
-					.build(icsStream);
-			ComponentList vEvents = Ical4jHelper.getComponents(calendar,
-					Component.VEVENT);
-			VEvent vEvent = (VEvent) vEvents.get(0);
-			Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
-			assertFalse(event.isInternalEvent());
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertFalse(event.isInternalEvent());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
 	}
-	
+
 	@Test
 	public void testGetExDate() {
 		Event event = new Event();
@@ -436,8 +435,8 @@ public class Ical4jHelperTest {
 		Event event = new Event();
 		event.setOwner("Adrien Poupard");
 		event.setOwnerEmail("adrien@zz.com");
-		Organizer orga = Ical4jHelper.getOrganizer(event.getOwner(), event
-				.getOwnerEmail());
+		Organizer orga = Ical4jHelper.getOrganizer(event.getOwner(),
+				event.getOwnerEmail());
 		assertEquals("mailto:adrien@zz.com", orga.getValue());
 		assertEquals("Adrien Poupard", orga.getParameter(Parameter.CN)
 				.getValue());
@@ -464,8 +463,8 @@ public class Ical4jHelperTest {
 		cal.set(Calendar.MILLISECOND, 0);
 		event.setDate(cal.getTime());
 		event.setDuration(3600);
-		DtEnd dtend = Ical4jHelper.getDtEnd(event.getDate(), event
-				.getDuration(), false);
+		DtEnd dtend = Ical4jHelper.getDtEnd(event.getDate(),
+				event.getDuration(), false);
 		assertEquals(cal.getTime().getTime() + 3600000, dtend.getDate()
 				.getTime());
 	}
@@ -476,8 +475,8 @@ public class Ical4jHelperTest {
 		Calendar cal = new GregorianCalendar();
 		cal.set(Calendar.MILLISECOND, 0);
 		event.setDate(cal.getTime());
-		DtStart dtstart = Ical4jHelper.getDtStart(event.getDate(), event
-				.isAllday());
+		DtStart dtstart = Ical4jHelper.getDtStart(event.getDate(),
+				event.isAllday());
 		assertEquals(cal.getTime().getTime(), dtstart.getDate().getTime());
 	}
 
@@ -554,17 +553,11 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testParserAttendee() throws IOException {
+	public void testParserAttendee() throws IOException, ParserException {
 		String ics = IOUtils.toString(getStreamICS("bugGn.ics"));
-		try {
-			AccessToken token = new AccessToken(0, 0, null);
-			List<Event> event = Ical4jHelper.parseICSEvent(ics, token);
-			assertEquals(event.size(), 1);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-
+		AccessToken token = new AccessToken(0, 0, null);
+		List<Event> event = Ical4jHelper.parseICSEvent(ics, token);
+		assertEquals(event.size(), 1);
 	}
 
 	public InputStream getStreamICS(String filename) {

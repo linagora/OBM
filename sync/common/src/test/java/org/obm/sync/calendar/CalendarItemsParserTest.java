@@ -99,6 +99,8 @@ public class CalendarItemsParserTest {
 	public void testParseExternalEvent() throws SAXException, IOException, FactoryConfigurationError {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<timeupdate>1292580000000</timeupdate>" +
+		"<timecreate>1289988000000</timecreate>" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
 		"<opacity>OPAQUE</opacity>" +
 		"<title>fake rdv</title>" +
@@ -156,6 +158,9 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals(1, ev.getRecurrence().getFrequence());
 		Assert.assertEquals(ev.getDate(), ev.getRecurrence().getExceptions()[0]);
 		Assert.assertNull(ev.getRecurrence().getEnd());
+		
+		Assert.assertEquals(1289988000000L,ev.getTimeCreate().getTime());
+		Assert.assertEquals(1292580000000L,ev.getTimeUpdate().getTime());
 	}
 
 }

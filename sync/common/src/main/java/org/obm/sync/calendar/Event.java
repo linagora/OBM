@@ -286,6 +286,8 @@ public class Event {
 		event.setUid(uid);
 		event.setRecurrenceId(recurrenceId);
 		event.setInternalEvent(internalEvent);
+		event.setTimeCreate(timeCreate);
+		event.setTimeUpdate(timeUpdate);
 		return event;
 	}
 

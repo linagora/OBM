@@ -108,6 +108,8 @@ public class EventChangeMailerTest {
 
 		protected Event buildTestEvent() {
 			Event event = new Event();
+			event.setTimeCreate(new Date(1244470973000L));
+			event.setTimeUpdate(new Date(1244470995000L));
 			event.addAttendee(createAttendee("Ronan LANORE", "rlanore@linagora.com"));
 			event.addAttendee(createAttendee("Guillaume ALAUX", "galaux@linagora.com"));
 			event.addAttendee(createAttendee("Matthieu BAECHLER", "mbaechler@linagora.com"));
@@ -271,10 +273,11 @@ public class EventChangeMailerTest {
 					"SUMMARY:Sprint planning OBM",
 					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
 					"UID:f1514f44bf39311568d64072c1fec10f47fe",
-					"X-OBM-DOMAIN:test.tlse.lng"
+					"X-OBM-DOMAIN:test.tlse.lng",
+					"CREATED:20090608T142253Z",
+					"LAST-MODIFIED:20090608T142315Z"
 			};
 		}
-		
 		@Override
 		protected List<InternetAddress> getExpectedRecipients() throws AddressException {
 			return createAddressList(
@@ -328,7 +331,9 @@ public class EventChangeMailerTest {
 					"SUMMARY:Sprint planning OBM",
 					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
 					"UID:f1514f44bf39311568d64072c1fec10f47fe",
-					"X-OBM-DOMAIN:test.tlse.lng"
+					"X-OBM-DOMAIN:test.tlse.lng",
+					"CREATED:20090608T142253Z",
+					"LAST-MODIFIED:20090608T142315Z"
 				};
 		}
 		
@@ -406,7 +411,9 @@ public class EventChangeMailerTest {
 					"SUMMARY:Sprint planning OBM",
 					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
 					"UID:f1514f44bf39311568d64072c1fec10f47fe",
-					"X-OBM-DOMAIN:test.tlse.lng"
+					"X-OBM-DOMAIN:test.tlse.lng",
+					"CREATED:20090608T142253Z",
+					"LAST-MODIFIED:20090608T142315Z"
 				};
 		}
 		

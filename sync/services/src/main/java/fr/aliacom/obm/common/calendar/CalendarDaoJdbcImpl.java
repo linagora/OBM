@@ -160,12 +160,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "eventlink_state, "
 			+ "eventlink_required, "
 			+ "eventlink_percent, "
+			+ "eventlink_is_organizer, "
 			+ "eventalert_duration, userobm_email, userobm_firstname, userobm_lastname, userentity_user_id ";
 
 	private static final String CONTACT_AND_ALERT_FIELDS = "eventlink_event_id, "
 			+ "eventlink_state, "
 			+ "eventlink_required, "
 			+ "eventlink_percent, "
+			+ "eventlink_is_organizer, "
 			+ "0 as eventalert_duration, email_address as userobm_email, contact_firstname as userobm_firstname, "
 			+ "contact_lastname as userobm_lastname, contactentity_contact_id as userentity_user_id ";
 
@@ -678,7 +680,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	private int getAttendeePercent(ResultSet rs) throws SQLException {
 		return rs.getInt("eventlink_percent");
 	}
-
+	
+	private boolean getAttendeeOrganizer(ResultSet rs) throws SQLException {
+		return rs.getBoolean("eventlink_is_organizer");
+	}
+	
 	@Override
 	public List<FreeBusy> getFreeBusy(FreeBusyRequest fbr) {
 
@@ -1222,6 +1228,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			att.setState(getAttendeeState(rs));
 			att.setRequired(getAttendeeRequired(rs));
 			att.setPercent(getAttendeePercent(rs));
+			att.setOrganizer(getAttendeeOrganizer(rs));
 			att.setEntityId(rs.getInt("userentity_user_id"));
 			att.setEntityId(rs.getInt("eventalert_duration"));
 			attsByEvent.put(eventId, att);
@@ -2304,7 +2311,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Integer userId = calendarOwner.getUid();
 
 		try {
-
 			ps = con.prepareStatement(q);		
 
 			int idx = 1;
@@ -2316,7 +2322,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.execute();
 			//FIXME check that update change an entry in db
 			return true;
-			
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}

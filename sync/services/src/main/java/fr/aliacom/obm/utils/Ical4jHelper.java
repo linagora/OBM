@@ -66,6 +66,7 @@ import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Categories;
 import net.fortuna.ical4j.model.property.Clazz;
+import net.fortuna.ical4j.model.property.Created;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -73,6 +74,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Due;
 import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.ExDate;
+import net.fortuna.ical4j.model.property.LastModified;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.Organizer;
@@ -215,8 +217,12 @@ public class Ical4jHelper {
 		appendAlert(event, vEvent.getAlarms());
 		appendOpacity(event, vEvent.getTransparency(), event.isAllday());
 		appendIsInternal(at, event, vEvent.getProperty(XOBMDOMAIN));
+		
+		appendCreated(event, vEvent.getCreated());
+		appendLastModified(event, vEvent.getLastModified());
 		return event;
 	}
+
 
 	public static Event getEvent(AccessToken at, VToDo vTodo) {
 		Event event = new Event();
@@ -243,7 +249,23 @@ public class Ical4jHelper {
 				(Transp) vTodo.getProperties().getProperty(Property.TRANSP),
 				event.isAllday());
 		appendIsInternal(at, event, vTodo.getProperty(XOBMDOMAIN));
+		
+		appendCreated(event, vTodo.getCreated());
+		appendLastModified(event, vTodo.getLastModified());
 		return event;
+	}
+	
+	private static void appendLastModified(Event event,
+			LastModified lastModified) {
+		if (lastModified != null) {
+			event.setTimeUpdate(lastModified.getDate());
+		}
+	}
+
+	private static void appendCreated(Event event, Created created) {
+		if (created != null) {
+			event.setTimeCreate(created.getDate());
+		}
 	}
 	
 	private static void appendIsInternal(AccessToken at, Event event, Property obmDomain) {
@@ -471,6 +493,8 @@ public class Ical4jHelper {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 		appendUidToICS(prop, event, null);
+		appendCreated(prop, event);
+		appendLastModified(prop, event);
 		appendAttendeeToICS(prop, event);
 		appendCategoryToICS(prop, event);
 		appendDtStartToICS(prop, event);
@@ -527,6 +551,8 @@ public class Ical4jHelper {
 		PropertyList prop = vEvent.getProperties();
 
 		appendUidToICS(prop, event, parentExtID);
+		appendCreated(prop, event);
+		appendLastModified(prop, event);
 		appendAttendeeToICS(prop, event);
 		appendCategoryToICS(prop, event);
 		appendDtStartToICS(prop, event);
@@ -563,6 +589,8 @@ public class Ical4jHelper {
 		PropertyList prop = vTodo.getProperties();
 
 		appendUidToICS(prop, event, parentExtID);
+		appendCreated(prop, event);
+		appendLastModified(prop, event);
 		appendAttendeeToICS(prop, event);
 		appendCategoryToICS(prop, event);
 		appendDtStartToICS(prop, event);
@@ -722,6 +750,18 @@ public class Ical4jHelper {
 				event.isAllday());
 		if (dtEnd != null) {
 			prop.add(dtEnd);
+		}
+	}
+	
+	private static void appendLastModified(PropertyList prop, Event event) {
+		if(event.getTimeUpdate() != null){
+			prop.add(new LastModified(new DateTime(event.getTimeUpdate().getTime())));
+		}
+	}
+
+	private static void appendCreated(PropertyList prop, Event event) {
+		if(event.getTimeCreate() != null){
+			prop.add(new Created(new DateTime(event.getTimeCreate().getTime())));
 		}
 	}
 

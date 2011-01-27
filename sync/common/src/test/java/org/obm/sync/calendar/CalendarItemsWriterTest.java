@@ -39,6 +39,12 @@ private CalendarItemsWriter writer;
 		Calendar cal = new GregorianCalendar();
 		cal.setTimeInMillis(1295258400000L);
 		ev.setDate(cal.getTime());
+		cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
+		ev.setTimeUpdate(cal.getTime());
+		
+		cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
+		ev.setTimeCreate(cal.getTime());
+		
 		ev.setExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149");
 		ev.setTitle("fake rdv");
 		ev.setOwner("john@do.fr");
@@ -74,6 +80,8 @@ private CalendarItemsWriter writer;
 		
 		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 		"<event allDay=\"false\" id=\"\" isInternal=\"true\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<timeupdate>1292580000000</timeupdate>" +
+		"<timecreate>1289988000000</timecreate>"+
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
 		"<opacity>OPAQUE</opacity>" +
 		"<title>fake rdv</title>" +
@@ -91,7 +99,7 @@ private CalendarItemsWriter writer;
 		"</attendees><recurrence days=\"\" freq=\"1\" kind=\"daily\">" +
 		"<exceptions>" +
 		"<exception>1295258400000</exception>" +
-		"<exception>1297936800000</exception>" +
+		"<exception>1292580000000</exception>" +
 		"</exceptions><eventExceptions/>" +
 		"</recurrence>" +
 		"</event>";

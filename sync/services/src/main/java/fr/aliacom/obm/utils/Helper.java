@@ -55,7 +55,7 @@ public class Helper {
 		dateFormatUTC = new SimpleDateFormat(DATE_UTC_PATTERN);
 		dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
-
+	
 	public String constructEmailFromList(String listofmail, String domain) {
 
 		String[] lemail = null;
