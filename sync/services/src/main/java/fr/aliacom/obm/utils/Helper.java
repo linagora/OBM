@@ -35,6 +35,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -48,12 +49,21 @@ public class Helper {
 
 	private final SimpleDateFormat dateFormatUTC;
 	private final ObmHelper obmHelper;
-
+	
 	@Inject
-	private Helper(ObmHelper obmHelper) {
+	protected Helper(ObmHelper obmHelper) {
 		this.obmHelper = obmHelper;
 		dateFormatUTC = new SimpleDateFormat(DATE_UTC_PATTERN);
 		dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+	}
+
+	public String getLoginFromEmail(String email) {
+		String username = "";
+		if(email != null){
+			Iterable<String> it = Splitter.on('@').omitEmptyStrings().split(email);
+			username = Iterables.get(it, 0, "");
+		}
+		return username;
 	}
 	
 	public String constructEmailFromList(String listofmail, String domain) {
@@ -110,7 +120,8 @@ public class Helper {
 	 */
 	public boolean canWriteOnCalendar(AccessToken writer, String targetCalendar) {
 		// implicit right
-		if (checkImplicitRights(writer, targetCalendar)) {
+		String calendarLogin = getLoginFromEmail(targetCalendar);
+		if (checkImplicitRights(writer, calendarLogin)) {
 			return true;
 		}
 		// special account : root account
@@ -159,10 +170,10 @@ public class Helper {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 			ps.setInt(1, writer.getObmId());
-			ps.setString(2, targetCalendar);
-			ps.setString(3, targetCalendar);
+			ps.setString(2, calendarLogin);
+			ps.setString(3, calendarLogin);
 			ps.setInt(4, writer.getObmId());
-			ps.setString(5, targetCalendar);
+			ps.setString(5, calendarLogin);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ret = ret || rs.getBoolean(1);
@@ -182,8 +193,9 @@ public class Helper {
 	 */
 	public boolean canReadCalendar(AccessToken writer,
 			String targetCalendar) {
+		String calendarLogin = getLoginFromEmail(targetCalendar);
 		// implicit right
-		if (checkImplicitRights(writer, targetCalendar)) {
+		if (checkImplicitRights(writer, calendarLogin)) {
 			return true;
 		}
 		// special account : root account
@@ -232,10 +244,10 @@ public class Helper {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 			ps.setInt(1, writer.getObmId());
-			ps.setString(2, targetCalendar);
-			ps.setString(3, targetCalendar);
+			ps.setString(2, calendarLogin);
+			ps.setString(3, calendarLogin);
 			ps.setInt(4, writer.getObmId());
-			ps.setString(5, targetCalendar);
+			ps.setString(5, calendarLogin);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ret = ret || rs.getBoolean(1);
