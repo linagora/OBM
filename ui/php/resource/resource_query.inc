@@ -81,7 +81,7 @@ function run_query_resource_search($resource) {
 
   // If a quantity sup has been specified, get it
   if ($qtysup != '') {
-    $qtysup = sql_parse_int($qtyinf);
+    $qtysup = sql_parse_int($qtysup);
     $where .= " AND resource_qty<='$qtysup'";   
   }
 
