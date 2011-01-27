@@ -44,7 +44,9 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		createIfNotNull(c, "manager", contact.getManager());
 		createIfNotNull(c, "assistant", contact.getAssistant());
 		createIfNotNull(c, "spouse", contact.getSpouse());
-		createIfNotNull(c, "addressbookid", String.valueOf(contact.getFolderId()));
+		if(contact.getFolderId() != null){
+			createIfNotNull(c, "addressbookid", String.valueOf(contact.getFolderId()));
+		}
 		
 		String bday = null;
 		if (contact.getBirthday() != null) {
