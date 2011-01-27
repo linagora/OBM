@@ -54,8 +54,8 @@ public class CalendarItemsParser extends AbstractItemsParser {
 	public Event parseEvent(Element e) {
 		Event ev = new Event();
 		ev.setUid(e.getAttribute("id"));
-		ev.setInternalEvent(e.hasAttribute("isInternal") ? "true".equals(e
-				.getAttribute("isInternal")) : false);
+		ev.setInternalEvent(e.hasAttribute("isInternal") ? !"false".equals(e
+				.getAttribute("isInternal")) : true);
 		ev.setAllday(e.hasAttribute("allDay") ? "true".equals(e
 				.getAttribute("allDay")) : false);
 		ev.setType(EventType.valueOf(e.getAttribute("type")));
@@ -82,8 +82,6 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		ev.setAlert(i(e, "alert"));
 		ev.setTimeUpdate(d(e, "timeupdate"));
 		ev.setTimeCreate(d(e, "timecreate"));
-		
-		
 
 		parseAttendees(ev, e);
 
