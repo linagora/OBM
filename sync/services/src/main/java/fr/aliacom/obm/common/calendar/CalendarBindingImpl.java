@@ -223,12 +223,14 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			boolean onlyUpdateMyself = false;
 
-			int uid = Integer.valueOf(event.getUid());
-			// only modify if owner or write right on owner
-			Event before = calendarService.findEvent(token, uid);
+			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
+			Event before = loadCurrentEvent(token, calendarUser, event);
+
+
 			if (before == null) {
 				logger.warn(LogUtils.prefix(token)
-						+ "Event["+uid+"] doesn't exist in database: : doing nothing");
+						+ "Event[uid:"+ event.getUid() + "extId:" + event.getExtId() +
+						"] doesn't exist in database: : doing nothing");
 				return null;
 			}
 			if (before.getOwner() != null
@@ -244,7 +246,7 @@ public class CalendarBindingImpl implements ICalendar {
 				}
 				return event;
 				//TODO cleanup onlyUpdateMyself on dao
-//				onlyUpdateMyself = true;
+				//onlyUpdateMyself = true;
 			} else{
 				if(before.isInternalEvent()){
 					return modifyInternalEvent(token, calendar, before, event, onlyUpdateMyself, updateAttendees);
@@ -260,6 +262,15 @@ public class CalendarBindingImpl implements ICalendar {
 
 	}
 	
+	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) {
+		if (Strings.isNullOrEmpty(event.getUid())) {
+			return calendarService.findEventByExtId(token, calendarUser, event.getExtId());
+		} else {
+			int uid = Integer.valueOf(event.getUid());
+			return calendarService.findEvent(token, uid);
+		}
+	}
+
 	private Event modifyInternalEvent(AccessToken token, String calendar, Event before,  Event event, boolean onlyUpdateMyself,
 			boolean updateAttendees) throws ServerFault {
 		try{
