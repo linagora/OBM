@@ -133,7 +133,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "event_completed, "
 			+ "event_url, "
 			+ "event_description, now() as last_sync, event_domain_id, evententity_entity_id, "
-			+ "userobm_login, " + "domain_name";
+			+ "o.userobm_login as owner, " + "domain_name";
 
 	private static final String EVENT_INSERT_FIELDS = "event_owner, "
 			+ "event_ext_id, "
@@ -410,8 +410,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setRecurrence(er);
 
 		e.setEntityId(evrs.getInt("evententity_entity_id"));
-		e.setOwner(evrs.getString("userobm_login"));
-		e.setOwnerEmail(evrs.getString("userobm_login") + "@"
+		e.setOwner(evrs.getString("owner"));
+		e.setOwnerEmail(evrs.getString("owner") + "@"
 				+ evrs.getString("domain_name"));
 
 		if (evrs.getTimestamp("recurrence_id") != null) {
@@ -506,7 +506,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "
 				+ "INNER JOIN Domain ON event_domain_id=domain_id "
 				+ "INNER JOIN EventEntity ON evententity_event_id=event_id "
-				+ "INNER JOIN UserObm ON e.event_owner=userobm_id "
+				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
 				+ "WHERE event_id=? ";
 
 		PreparedStatement evps = null;
@@ -920,7 +920,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					+ ", eventexception_date as recurrence_id "
 					+ " FROM Event e "
 					+ "INNER JOIN EventEntity ON e.event_id=evententity_event_id "
-					+ "INNER JOIN UserObm ON e.event_owner=userobm_id "
+					+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
 					+ "INNER JOIN Domain ON e.event_domain_id=domain_id "
 					+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
 					+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "
@@ -1259,7 +1259,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
 				+ "INNER JOIN Domain ON event_domain_id=domain_id "
 				+ "INNER JOIN EventEntity ON evententity_event_id=event_id "
-				+ "INNER JOIN UserObm ON e.event_owner=userobm_id "
+				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
 				+ "INNER JOIN EventException ON e.event_id = eventexception_child_id "
 				+ "WHERE eventexception_parent_id IN (" + evIdList + ") ";
 
@@ -1863,9 +1863,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN EventEntity ON evententity_event_id=event_id "
 				+ "INNER JOIN EventLink link ON link.eventlink_event_id=e.event_id "
 				+ "INNER JOIN UserEntity ON userentity_entity_id=eventlink_entity_id "
-				+ "INNER JOIN UserObm ON userobm_id=userentity_user_id "
+				+ "INNER JOIN UserObm u ON u.userobm_id=userentity_user_id "
+				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
 				+ "WHERE e.event_ext_id=? " 
-				+ "AND userobm_login=?";
+				+ "AND u.userobm_login=?";
 
 		PreparedStatement evps = null;
 		ResultSet evrs = null;
@@ -1913,7 +1914,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
 				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
 				+ "INNER JOIN EventEntity ON e.event_id=evententity_event_id "
-				+ "INNER JOIN UserObm ON e.event_owner=userobm_id "
+				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
 				+ "INNER JOIN Domain ON e.event_domain_id=domain_id "
 				+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
 				+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "
@@ -1973,7 +1974,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
 				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
 				+ "INNER JOIN EventEntity ON e.event_id=evententity_event_id "
-				+ "INNER JOIN UserObm ON e.event_owner=userobm_id "
+				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
 				+ "INNER JOIN Domain ON e.event_domain_id=domain_id "
 				+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
 				+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "
