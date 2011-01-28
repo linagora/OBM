@@ -1961,6 +1961,10 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   global $l_user, $l_contact, $l_resource, $l_private;
   global $output_target, $action;
 
+  if($occurrence->entity_state == "DECLINED"){
+    return null;
+  }
+
   $event = $occurrence->event;
   $owner = $event->owner;
   $owner_name = phpStringToJsString($event->owner_name);
