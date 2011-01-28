@@ -28,6 +28,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
+import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventParticipationState;
@@ -235,14 +236,21 @@ public class CalendarBindingImpl implements ICalendar {
 				logger.info(LogUtils.prefix(token) + "Calendar : "
 						+ token.getUser() + " cannot modify event["
 						+ before.getTitle() + "] because not owner"
-						+ " or no write right on owner " + before.getOwner());
-				onlyUpdateMyself = true;
-			}
-
-			if(before.isInternalEvent()){
-				return modifyInternalEvent(token, calendar, before, event, onlyUpdateMyself, updateAttendees);
-			} else {
-				return modifyExternalEvent(token, calendar, event, onlyUpdateMyself, updateAttendees);
+						+ " or no write right on owner " + before.getOwner()+". ParticipationState will be updated.");
+				for(Attendee att : before.getAttendees()){
+					if(token.getEmail().equalsIgnoreCase(att.getEmail())){
+						changeParticipationState(token, calendar, event.getExtId(), att.getState());
+					}
+				}
+				return event;
+				//TODO cleanup onlyUpdateMyself on dao
+//				onlyUpdateMyself = true;
+			} else{
+				if(before.isInternalEvent()){
+					return modifyInternalEvent(token, calendar, before, event, onlyUpdateMyself, updateAttendees);
+				} else {
+					return modifyExternalEvent(token, calendar, event, onlyUpdateMyself, updateAttendees);
+				}
 			}
 
 		} catch (Throwable e) {
@@ -745,7 +753,11 @@ public class CalendarBindingImpl implements ICalendar {
 		if (helper.canWriteOnCalendar(token, calendar)) {
 			try {
 				ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
-				return calendarService.changeParticipationState(token, calendarOwner, extId, participationState);
+				boolean changed = calendarService.changeParticipationState(token, calendarOwner, extId, participationState);
+				Event newEvent = calendarService.findEventByExtId(token, calendarOwner, extId);
+				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
+						settingsDao.getUserLanguage(token));
+				return changed;
 			} catch (FindException e) {
 				throw new ServerFault("no user found with calendar " + calendar);
 			}

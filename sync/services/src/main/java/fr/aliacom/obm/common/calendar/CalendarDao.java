@@ -69,7 +69,7 @@ public interface CalendarDao {
 			throws SQLException, FindException;
 
 	Event removeEvent(Connection con, AccessToken token, int uid, EventType et);
-
+	
 	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, String extId, ParticipationState participationState);
 
 }

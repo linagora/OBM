@@ -17,13 +17,16 @@ import org.obm.sync.Messages;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.ParticipationState;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ConstantService;
 import fr.aliacom.obm.utils.Ical4jHelper;
 import freemarker.template.Configuration;
@@ -116,6 +119,30 @@ public class EventChangeMailer {
 		}
 	}
 	
+	public void notifyUpdateParticipationState(Event event, ObmUser attendeeUpdated, ParticipationState newState, Locale locale) {
+		try {
+			EventMail mail = 
+				new EventMail(
+						extractSenderAddress(attendeeUpdated),
+						event.getAttendees(), 
+						updateParticipationStateTitle(event.getTitle(), locale), 
+						updateParticipationStateBodyTxt(event, attendeeUpdated, newState, locale),
+						updateParticipationStateBodyHtml(event, attendeeUpdated, newState, locale));
+			sendNotificationMessageToOwner(event, mail);
+		} catch (UnsupportedEncodingException e) {
+			throw new NotificationException(e);
+		} catch (IOException e) {
+			throw new NotificationException(e);
+		} catch (TemplateException e) {
+			throw new NotificationException(e);
+		}
+	}
+
+	private InternetAddress extractSenderAddress(ObmUser at)
+			throws UnsupportedEncodingException {
+		return new InternetAddress(at.getEmailAtDomain(), at.getDisplayName());
+	}
+	
 	private InternetAddress extractSenderAddress(Event event)
 			throws UnsupportedEncodingException {
 		return new InternetAddress(event.getOwnerEmail(), event.getOwner());
@@ -131,17 +158,46 @@ public class EventChangeMailer {
 	
 	private void sendNotificationMessageToAttendee(Collection<Attendee> attendees, EventMail mail) throws NotificationException {
 		try {
-			MimeMessage mimeMail = mail.buildMimeMail(session);
-			mailService.sendMessage(session, convertAttendeesToAddresses(attendees), mimeMail);
+			List<InternetAddress> adds = convertAttendeesToAddresses(attendees);
+			sendNotificationMessage(mail, adds);
 		} catch (MessagingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
 			throw new NotificationException(e);
 		}
 	}
+	
+	private void sendNotificationMessageToOwner(Event event, EventMail mail) {
+		try {
+			InternetAddress address = new InternetAddress(event.getOwnerEmail());
+			sendNotificationMessage(mail, ImmutableList.of(address));
+		} catch (MessagingException e) {
+			throw new NotificationException(e);
+		} catch (IOException e) {
+			throw new NotificationException(e);
+		}
+		
+	}
+	
+	private void sendNotificationMessage(EventMail mail, List<InternetAddress>  addresses) throws MessagingException, IOException{
+		MimeMessage mimeMail = mail.buildMimeMail(session);
+		mailService.sendMessage(session, addresses, mimeMail);
+	}
+	
+	private String participationState(ParticipationState state, Locale locale){
+		if(ParticipationState.ACCEPTED.equals(state)){
+			return new Messages(locale).participationStateAccepted();
+		} else {
+			return new Messages(locale).participationStateDeclined();
+		}
+	}
 
 	private String newUserTitle(String owner, String title, Locale locale) {
 		return new Messages(locale).newEventTitle(owner, title);
+	}
+	
+	private String updateParticipationStateTitle(String title, Locale locale) {
+		return new Messages(locale).updateParticipationStateTitle(title);
 	}
 	
 	private String newUserBodyTxt(Event event, Locale locale) throws IOException, TemplateException {
@@ -151,6 +207,17 @@ public class EventChangeMailer {
 	private String newUserBodyHtml(Event event, Locale locale) throws IOException, TemplateException {
 		return applyEventOnTemplate("EventInvitationHtml.tpl", event, locale);
 	}
+	
+	private String updateParticipationStateBodyTxt(Event event,
+			ObmUser attendeeUpdated, ParticipationState newState, Locale locale) throws IOException, TemplateException {
+		return applyUpdateParticipationStateOnTemplate("ParticipationStateChangePlain.tpl", event, attendeeUpdated, newState, locale);
+	}
+	
+	private String updateParticipationStateBodyHtml(Event event,
+			ObmUser attendeeUpdated, ParticipationState newState, Locale locale) throws IOException, TemplateException {
+		return applyUpdateParticipationStateOnTemplate("ParticipationStateChangeHtml.tpl", event, attendeeUpdated, newState, locale);
+	}
+	
 
 	private String removedUserBodyTxt(Event event, Locale locale) throws IOException, TemplateException {
 		return applyEventOnTemplate("EventCancelPlain.tpl", event, locale);
@@ -183,6 +250,13 @@ public class EventChangeMailer {
 		ImmutableMap<Object, Object> datamodel = defineTechnicalData(builder, event).build();
 		Template template = cfg.getTemplate(templateName, locale);
 		return applyTemplate(datamodel, template);
+	}
+	
+	private String applyUpdateParticipationStateOnTemplate(String templateName,
+			Event event, ObmUser attendeeUpdated, ParticipationState newState,  Locale locale) throws IOException, TemplateException {
+		Builder<Object, Object> builder = buildUpdateParticipationStateDatamodel(event, attendeeUpdated, participationState(newState, locale));
+		Template template = cfg.getTemplate(templateName, locale);
+		return applyTemplate(builder.build(), template);
 	}
 
 	private Builder<Object, Object> defineTechnicalData(Builder<Object, Object> builder, Event event) {
@@ -217,6 +291,16 @@ public class EventChangeMailer {
 		return datamodel;
 	}
 	
+	private Builder<Object, Object> buildUpdateParticipationStateDatamodel(
+			Event event, ObmUser attendeeUpdated, String state) {
+				Builder<Object, Object> datamodel = ImmutableMap.builder()
+			.put("user", attendeeUpdated.getDisplayName())
+			.put("participationState", state)
+			.put("subject", Strings.nullToEmpty(event.getTitle()))
+			.put("start", new SimpleDate(event.getDate(), TemplateDateModel.DATETIME));
+		return datamodel;
+	}
+	
 	private String newUserIcs(AccessToken at, Event event) {
 		return Ical4jHelper.buildIcsInvitationRequest(at, event);
 	}
@@ -240,5 +324,5 @@ public class EventChangeMailer {
 	/* package */ void setMailService(MailService mailService) {
 		this.mailService = mailService;
 	}
-	
+
 }

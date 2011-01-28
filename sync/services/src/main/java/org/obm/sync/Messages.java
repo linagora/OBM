@@ -34,5 +34,17 @@ public class Messages {
 	public String updatedEventTitle(String owner, String title) {
 		return getString("UpdatedEventTitle", owner, title);
 	}
+
+	public String updateParticipationStateTitle(String title) {
+		return getString("UpdateParticipationStateTitle", title);
+	}
+
+	public String participationStateAccepted() {
+		return getString("ParticipationStateAccepted");
+	}
+	public String participationStateDeclined() {
+		return getString("ParticipationStateDeclined");
+	}
+
 	
 }

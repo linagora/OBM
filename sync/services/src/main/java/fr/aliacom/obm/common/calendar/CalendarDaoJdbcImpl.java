@@ -1230,7 +1230,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			att.setPercent(getAttendeePercent(rs));
 			att.setOrganizer(getAttendeeOrganizer(rs));
 			att.setEntityId(rs.getInt("userentity_user_id"));
-			att.setEntityId(rs.getInt("eventalert_duration"));
+			att.setAlert(rs.getInt("eventalert_duration"));
 			attsByEvent.put(eventId, att);
 		}
 		return attsByEvent;
@@ -2326,5 +2326,4 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(null, ps, null);
 		}
 	}
-
 }

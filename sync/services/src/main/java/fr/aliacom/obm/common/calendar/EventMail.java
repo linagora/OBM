@@ -32,6 +32,12 @@ public class EventMail {
 	private final String icsMethod;
 	
 	public EventMail(Address from, List<Attendee> recipients, String subject,
+			String bodyTxt, String bodyHtml) {
+		this(from, recipients,subject,bodyTxt,bodyHtml, null, null);
+	}
+	
+	
+	public EventMail(Address from, List<Attendee> recipients, String subject,
 			String bodyTxt, String bodyHtml, String icsContent, String icsMethod) {
 				this.from = from;
 				this.recipients = recipients;
@@ -47,7 +53,11 @@ public class EventMail {
 		message.setFrom(from);
 		message.setRecipients(RecipientType.TO, getRecipients());
 		message.setSubject(subject);
-		message.setContent(buildParts());
+		if(icsContent != null){
+			message.setContent(buildParts());
+		} else {
+			message.setContent(buildAlternativePart());
+		}
 		return message;
 	}
 	
@@ -61,7 +71,9 @@ public class EventMail {
 	
 	private MimeMultipart buildParts() throws MessagingException, IOException {
 		MimeMultipart mainPart = new MimeMultipart("mixed");
-		mainPart.addBodyPart(buildAlternativePart());
+		MimeBodyPart mimeBodyPart = new MimeBodyPart();
+		mimeBodyPart.setContent(buildAlternativePart());
+		mainPart.addBodyPart(mimeBodyPart);
 		mainPart.addBodyPart(createIcsPart());
 		return mainPart;
 	}
@@ -75,14 +87,14 @@ public class EventMail {
 		return part;
 	}
 
-	private BodyPart buildAlternativePart() throws MessagingException {
-		MimeBodyPart mimeBodyPart = new MimeBodyPart();
+	private MimeMultipart buildAlternativePart() throws MessagingException {
 		MimeMultipart alternativePart = new MimeMultipart("alternative");
 		alternativePart.addBodyPart(createTextPart());
 		alternativePart.addBodyPart(createHtmlPart());
-		alternativePart.addBodyPart(createCalendarPart());
-		mimeBodyPart.setContent(alternativePart);
-		return mimeBodyPart;
+		if(icsContent != null){
+			alternativePart.addBodyPart(createCalendarPart());
+		}
+		return alternativePart;
 	}
 	
 	private BodyPart createCalendarPart() throws MessagingException {

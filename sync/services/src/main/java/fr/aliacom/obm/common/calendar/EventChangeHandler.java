@@ -9,6 +9,7 @@ import java.util.Set;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.ParticipationState;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -19,6 +20,7 @@ import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.calendar.EventChangeMailer.NotificationException;
+import fr.aliacom.obm.common.user.ObmUser;
 
 public class EventChangeHandler {
 
@@ -102,6 +104,16 @@ public class EventChangeHandler {
 
 	private static enum AttendeeStateValue {
 		New, Current, Old;
+	}
+
+	public void updateParticipationState(
+			Event event, ObmUser attendeeUpdated, ParticipationState state,
+			Locale locale) {
+		if(ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)){
+			if (event.getOwnerEmail().equalsIgnoreCase(attendeeUpdated.getEmailAtDomain())) {
+				eventChangeMailer.notifyUpdateParticipationState(event, attendeeUpdated, state, locale);
+			}
+		}
 	}
 	
 }

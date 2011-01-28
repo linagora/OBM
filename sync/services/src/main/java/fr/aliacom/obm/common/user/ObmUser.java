@@ -167,6 +167,10 @@ public class ObmUser {
 	public String getEmail() {
 		return email;
 	}
+	
+	public String getEmailAtDomain() {
+		return email + "@" + domain.getName();
+	}
 
 	public void setEmail(String email) {
 		this.email = email;
@@ -242,5 +246,9 @@ public class ObmUser {
 
 	public void setPublicFreeBusy(boolean publicFreeBusy) {
 		this.publicFreeBusy = publicFreeBusy;
+	}
+	
+	public String getDisplayName(){
+		return firstName + " " + lastName; 
 	}
 }
