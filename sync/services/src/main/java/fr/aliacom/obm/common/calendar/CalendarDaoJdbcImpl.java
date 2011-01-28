@@ -418,7 +418,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			cal.setTimeInMillis(evrs.getTimestamp("recurrence_id").getTime());
 			e.setRecurrenceId(cal.getTime());
 		}
-		e.setInternalEvent(EventUtils.isInternalEvent(e));
 		return e;
 	}
 
@@ -1147,8 +1146,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private void loadAttendeesAndAlerts(AccessToken token,
-			Map<Integer, Event> eventById, String evIdList, String domainName) {
-		if (eventById.isEmpty()) {
+			Map<Integer, Event> eventsById, String evIdList, String domainName) {
+		if (eventsById.isEmpty()) {
 			return;
 		}
 		String attUserAlerts = "SELECT "
@@ -1178,20 +1177,28 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(attUserAlerts);
 			rs = ps.executeQuery();
 			Multimap<Integer, AttendeeAlert> attsUsersByEvent = getUserAttendeesByEventIdFromCursor(rs, domainName);
-			appendAttendeeToEvent(eventById, attsUsersByEvent);
+			appendAttendeeToEvent(eventsById, attsUsersByEvent);
 			//contact			
 			ps = con.prepareStatement(attContactAlerts);
 			rs = ps.executeQuery();
 			Multimap<Integer, AttendeeAlert> attsContactsByEvent = getContactAttendeesByEventIdFromCursor(rs, domainName);
-			appendAttendeeToEvent(eventById, attsContactsByEvent);
+			appendAttendeeToEvent(eventsById, attsContactsByEvent);
 			
-			appendEventToAlert(token, eventById, attsUsersByEvent);
+			appendEventToAlert(token, eventsById, attsUsersByEvent);
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
+		defineEventsInternalStatus(eventsById.values());
 	}
+	
+	private void defineEventsInternalStatus(Collection<Event> events) {
+		for (Event evt: events) {
+			evt.setInternalEvent(EventUtils.isInternalEvent(evt));
+		}
+	}
+
 	
 	private void appendEventToAlert(AccessToken token, Map<Integer, Event> eventById, Multimap<Integer, AttendeeAlert> userAttendeesByEventId){
 		if (token != null) {
