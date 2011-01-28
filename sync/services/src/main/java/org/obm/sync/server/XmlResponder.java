@@ -102,7 +102,7 @@ public class XmlResponder {
 			v.setAttribute("major", version.getMajor());
 			v.setAttribute("minor", version.getMinor());
 			v.setAttribute("release", version.getRelease());
-
+			DOMUtils.createElementAndText(root, "domain", at.getDomain());
 			res = sendDom(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
