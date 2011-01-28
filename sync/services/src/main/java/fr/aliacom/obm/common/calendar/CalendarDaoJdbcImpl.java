@@ -854,7 +854,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 
 		if (lastSync != null) {
-			fetchIds += " AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? ";
+			fetchIds += " AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? OR att.eventlink_timeupdate >= ?";
 			if (onEventDate) {
 				fetchIds += " OR e.event_date >= ? OR event_repeatkind != 'none'";
 			}
@@ -876,6 +876,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
 			evps.setObject(idx++, calendarUser.getUid());
 			if (lastSync != null) {
+				evps.setTimestamp(idx++, new Timestamp(lastSync.getTime()));
 				evps.setTimestamp(idx++, new Timestamp(lastSync.getTime()));
 				evps.setTimestamp(idx++, new Timestamp(lastSync.getTime()));
 				if (onEventDate) {
@@ -1333,25 +1334,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-	}
-
-	@Override
-	public int markEventAsUpdated(int databaseId) {
-		Connection con = null;
-		PreparedStatement st = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
-		try {
-			ut.begin();
-			con = obmHelper.getConnection();
-			markUpdated(con, databaseId);
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
-		} finally {
-			obmHelper.cleanup(con, st, null);
-		}
-		return databaseId;
 	}
 
 	private int markUpdated(Connection con, int databaseId) throws SQLException {

@@ -54,8 +54,6 @@ public interface CalendarDao {
 
 	List<CalendarInfo> listCalendars(ObmUser user) throws FindException;
 
-	int markEventAsUpdated(int databaseId) throws FindException;
-
 	Event modifyEvent(AccessToken at, String calendar, Event event, boolean onlyUpdateMyself, boolean updateAttendees, Boolean useObmUser) throws FindException;
 
 	Event removeEvent(AccessToken token, int eventId, EventType eventType);
