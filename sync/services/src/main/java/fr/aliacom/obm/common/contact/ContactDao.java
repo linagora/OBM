@@ -84,6 +84,9 @@ public class ContactDao {
 
 	private static final Log logger = LogFactory.getLog(ContactDao.class);
 
+	private static final String DEFAULT_ADDRESS_BOOK_NAME = "contacts";
+	private static final String COLLECTED_ADDRESS_BOOK_NAME = "collected_contacts";
+	
 	private static final String ANNIVERSARY_FIELD = "contact_anniversary_id";
 	private static final String BIRTHDAY_FIELD = "contact_birthday_id";
 
@@ -603,9 +606,9 @@ public class ContactDao {
 			ps = con.prepareStatement(
 				"SELECT id from AddressBook WHERE name=? AND owner=? AND is_default");
 			if (c.isCollected()) {
-				ps.setString(1, "collected_contacts");
+				ps.setString(1, COLLECTED_ADDRESS_BOOK_NAME);
 			} else {
-				ps.setString(1, "contacts");
+				ps.setString(1, DEFAULT_ADDRESS_BOOK_NAME);
 			}
 			ps.setInt(2, at.getObmId());
 
@@ -1444,7 +1447,7 @@ public class ContactDao {
 				+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id="
 				+ at.getObmId()
 				+ ") "
-				+ "WHERE a.syncable AND "
+				+ "WHERE (a.syncable OR a.name=?) AND "
 				+ "(a.timeupdate >= ? OR a.timecreate >= ? OR s.timestamp >= ?)";
 
 		int idx = 1;
@@ -1456,7 +1459,7 @@ public class ContactDao {
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
-
+			ps.setString(idx++, DEFAULT_ADDRESS_BOOK_NAME);
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
@@ -1492,7 +1495,7 @@ public class ContactDao {
 		if (d != null) {
 			q += " AND timestamp >= ? ";
 		}
-		q += " UNION SELECT id FROM AddressBook WHERE NOT syncable"
+		q += " UNION SELECT id FROM AddressBook WHERE NOT syncable AND NOT name=?"
 				+ " AND owner=" + at.getObmId();
 		if (d != null) {
 			q += " AND timeupdate >= ?";
@@ -1504,7 +1507,8 @@ public class ContactDao {
 
 			if (d != null) {
 				ps.setTimestamp(1, new Timestamp(d.getTime()));
-				ps.setTimestamp(2, new Timestamp(d.getTime()));
+				ps.setString(2, DEFAULT_ADDRESS_BOOK_NAME);
+				ps.setTimestamp(3, new Timestamp(d.getTime()));
 			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
