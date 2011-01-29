@@ -119,11 +119,11 @@ public class EventChangeMailer {
 		}
 	}
 	
-	public void notifyUpdateParticipationState(Event event, ObmUser attendeeUpdated, ParticipationState newState, Locale locale) {
+	public void notifyUpdateParticipationState(Event event, Attendee organizer, ObmUser attendeeUpdated, ParticipationState newState, Locale locale) {
 		try {
 			EventMail mail = 
 				new EventMail(
-						extractSenderAddress(attendeeUpdated),
+						extractSenderAddress(organizer),
 						event.getAttendees(), 
 						updateParticipationStateTitle(event.getTitle(), locale), 
 						updateParticipationStateBodyTxt(event, attendeeUpdated, newState, locale),
@@ -138,9 +138,9 @@ public class EventChangeMailer {
 		}
 	}
 
-	private InternetAddress extractSenderAddress(ObmUser at)
+	private InternetAddress extractSenderAddress(Attendee at)
 			throws UnsupportedEncodingException {
-		return new InternetAddress(at.getEmailAtDomain(), at.getDisplayName());
+		return new InternetAddress(at.getEmail(), at.getDisplayName());
 	}
 	
 	private InternetAddress extractSenderAddress(Event event)

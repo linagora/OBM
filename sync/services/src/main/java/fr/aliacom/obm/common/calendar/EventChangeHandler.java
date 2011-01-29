@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -107,13 +108,27 @@ public class EventChangeHandler {
 	}
 
 	public void updateParticipationState(
-			Event event, ObmUser attendeeUpdated, ParticipationState state,
+			Event event, ObmUser calendarOwner, ParticipationState state,
 			Locale locale) {
-		if(ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)){
-			if (event.getOwnerEmail().equalsIgnoreCase(attendeeUpdated.getEmailAtDomain())) {
-				eventChangeMailer.notifyUpdateParticipationState(event, attendeeUpdated, state, locale);
+		if( ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)){
+			Attendee organizer = findOrganizer(event);
+			if (organizer != null
+					&& !StringUtils.isEmpty(organizer.getEmail())
+					&& !ParticipationState.DECLINED
+							.equals(organizer.getState()) && !organizer.getEmail().equalsIgnoreCase(event.getOwnerEmail())) {
+				eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale);
 			}
 		}
+		
+	}
+
+	private Attendee findOrganizer(Event event) {
+		for(Attendee att : event.getAttendees()){
+			if(att.isOrganizer()){
+				return  att;
+			}
+		}
+		return null;
 	}
 	
 }
