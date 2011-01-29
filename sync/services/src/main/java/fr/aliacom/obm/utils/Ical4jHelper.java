@@ -223,7 +223,6 @@ public class Ical4jHelper {
 		return event;
 	}
 
-
 	public static Event getEvent(AccessToken at, VToDo vTodo) {
 		Event event = new Event();
 		event.setType(EventType.VTODO);
@@ -1096,9 +1095,9 @@ public class Ical4jHelper {
 		event.setRecurrence(er);
 	}
 
-	public static void appendAttendees(Event event, Component comp) {
+	public static void appendAttendees(Event event, Component vEvent) {
 		Map<String, Attendee> emails = new HashMap<String, Attendee>();
-		for (Property prop : getProperties(comp, Property.ATTENDEE)) {
+		for (Property prop : getProperties(vEvent, Property.ATTENDEE)) {
 			Attendee att = new Attendee();
 			Parameter param = prop.getParameter(Parameter.CN);
 			if (param != null) {
@@ -1135,7 +1134,46 @@ public class Ical4jHelper {
 				emails.put(att.getEmail(), att);
 			}
 		}
+		appendOrganizer(emails, vEvent);
 		event.addAttendees(new ArrayList<Attendee>(emails.values()));
+	}
+
+	private static void appendOrganizer(Map<String, Attendee> emails,
+			Component vEvent) {
+		Property prop = vEvent.getProperty(Property.ORGANIZER);
+		if(prop != null){
+			Organizer orga = (Organizer) prop;
+			if(orga.getValue() != null){
+				String email = removeMailto(orga);
+				
+				Attendee organizer = emails.get(email);
+				if(organizer != null){
+					organizer.setOrganizer(true);
+				} else {
+					organizer = new Attendee();
+					organizer.setEmail(email);
+					Parameter cnParam = orga.getParameter(Parameter.CN);
+					if(cnParam != null){
+						Cn cn = (Cn) cnParam;
+						organizer.setDisplayName(cn.getValue());
+					}
+					organizer.setRequired(ParticipationRole.REQ);
+					organizer.setState(ParticipationState.ACCEPTED);
+					organizer.setOrganizer(true);
+					emails.put(organizer.getEmail(), organizer);
+				}
+			}
+		}
+	}
+
+	private static String removeMailto(Organizer orga) {
+		String ret = orga.getValue();
+		int mailIndex = ret.toLowerCase().indexOf("mailto:");
+		if (mailIndex != -1) {
+			ret = orga.getValue().substring(
+					mailIndex + "mailto:".length());
+		}
+		return ret;
 	}
 
 	public static Calendar initCalandar() {

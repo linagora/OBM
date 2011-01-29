@@ -295,6 +295,7 @@ public class Ical4jHelperTest {
 		assertEquals(1, er.getExceptions().length);
 	}
 
+	
 	@Test
 	public void testGetAttendees() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("attendee.ics");
@@ -305,9 +306,51 @@ public class Ical4jHelperTest {
 		VEvent vEvent = (VEvent) vEvents.get(0);
 		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
 		assertEquals(3, event.getAttendees().size());
-
 	}
 
+
+	@Test
+	@SuppressWarnings("null")
+	public void testOrganizerInAttendess() throws IOException, ParserException {
+		InputStream icsStream = getStreamICS("organizerInAttendee.ics");
+		CalendarBuilder builder = new CalendarBuilder();
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Attendee organizer = null;
+		for(Attendee att : event.getAttendees()){
+			if(att.isOrganizer()){
+				organizer = att;
+			}
+		}
+		assertNotNull(organizer);
+		assertEquals("adrien@zz.com", organizer.getEmail());
+		assertTrue(organizer.isOrganizer());
+	}
+	
+	@Test
+	@SuppressWarnings("null")
+	public void testOrganizerNotInAttendess() throws IOException, ParserException {
+		InputStream icsStream = getStreamICS("organizerNotInAttendee.ics");
+		CalendarBuilder builder = new CalendarBuilder();
+		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
+		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+				Component.VEVENT);
+		VEvent vEvent = (VEvent) vEvents.get(0);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Attendee organizer = null;
+		for(Attendee att : event.getAttendees()){
+			if(att.isOrganizer()){
+				organizer = att;
+			}
+		}
+		assertNotNull(organizer);
+		assertEquals("adrien@zz.com", organizer.getEmail());
+		assertTrue(organizer.isOrganizer());
+	}
+	
 	@Test
 	public void testIsInternal() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventInternal.ics");
