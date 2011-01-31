@@ -2293,7 +2293,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		String q = "UPDATE EventLink " 
 			+ "SET eventlink_state=?, eventlink_userupdate=? "
 			+ "WHERE eventlink_event_id="
-			+ "( SELECT event.event_id FROM Event WHERE event.event_ext_id=? ) AND "
+			+ "( SELECT event_id FROM Event WHERE event_ext_id=? ) AND "
 			+ "eventlink_entity_id IN "
 			+ "( SELECT userentity_entity_id FROM UserEntity WHERE userentity_user_id=? )";
 		
