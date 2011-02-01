@@ -100,10 +100,17 @@ public class AddressBookHandler extends SecureSyncHandler {
 			modifyContactInBook(token, params, responder);
 		} else if ("removeContactInBook".equals(method)) {
 			removeContactInBook(token, params, responder);
+		} else if ("unsubscribeBook".equals(method)) {
+			unsubscribeBook(token, params, responder);
 		} else {
 			responder.sendError("Cannot handle method '" + method + "'");
 		}
+	}
 
+	private void unsubscribeBook(AccessToken token, ParametersSource params,
+			XmlResponder responder) throws AuthFault, ServerFault {
+		boolean ret = binding.unsubscribeBook(token, getBookId(params));
+		responder.sendBoolean(ret);
 	}
 
 	private void getFolderSync(AccessToken at, ParametersSource params, XmlResponder responder) throws Exception {

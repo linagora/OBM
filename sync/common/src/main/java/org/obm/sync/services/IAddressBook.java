@@ -130,5 +130,8 @@ public interface IAddressBook {
 	 */
 	List<Contact> searchContactInGroup(AccessToken token, AddressBook group,
 			String query, int limit) throws AuthFault, ServerFault;
+
+
+	boolean unsubscribeBook(AccessToken token, Integer bookId) throws AuthFault, ServerFault;
 	
 }

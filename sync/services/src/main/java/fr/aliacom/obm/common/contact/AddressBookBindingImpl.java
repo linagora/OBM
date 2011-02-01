@@ -431,4 +431,14 @@ public class AddressBookBindingImpl implements IAddressBook {
 			String id) throws AuthFault, ServerFault {
 		return getContactFromId(token, BookType.contacts, id);
 	}
+
+	@Override
+	public boolean unsubscribeBook(AccessToken token, Integer addressBookId) throws AuthFault, ServerFault {
+		try {
+			return contactDao.unsubscribeBook(token, addressBookId);
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}
+	}
 }

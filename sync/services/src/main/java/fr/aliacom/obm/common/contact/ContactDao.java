@@ -1545,4 +1545,26 @@ public class ContactDao {
 		}
 		return databaseId;
 	}
+
+	public boolean unsubscribeBook(AccessToken at, Integer addressBookId) {
+		int modif = 0; 
+		Connection con = null;
+		PreparedStatement st = null;
+		UserTransaction ut = obmHelper.getUserTransaction();
+		try {
+			ut.begin();
+			con = obmHelper.getConnection();
+			st = con.prepareStatement("delete from SyncedAddressbook WHERE addressbook_id=? AND user_id=?");
+			st.setInt(1, addressBookId);
+			st.setInt(2, at.getObmId());
+			modif = st.executeUpdate();
+			ut.commit();
+		} catch (Throwable se) {
+			obmHelper.rollback(ut);
+			logger.error(se.getMessage(), se);
+		} finally {
+			obmHelper.cleanup(con, st, null);
+		}
+		return modif>0;
+	}
 }

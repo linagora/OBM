@@ -18,6 +18,7 @@ import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.services.IAddressBook;
+import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 
@@ -234,5 +235,15 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		params.put("id", uid);
 		Document doc = execute("/book/removeContactInBook", params);
 		return respParser.parseContact(doc.getDocumentElement());
+	}
+
+	@Override
+	public boolean unsubscribeBook(AccessToken token, Integer addressBookId)
+			throws AuthFault, ServerFault {
+		Map<String, String> params = initParams(token);
+		params.put("bookId", String.valueOf(addressBookId));
+		Document doc = execute("/book/unsubscribeBook", params);
+		return "true".equalsIgnoreCase(DOMUtils.getElementText(doc
+				.getDocumentElement(), "value"));
 	}
 }
