@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -25,6 +27,8 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class EventChangeHandler {
 
+	private static final Log logger = LogFactory
+	.getLog(EventChangeHandler.class);
 	private EventChangeMailer eventChangeMailer;
 
 	@Inject
@@ -106,20 +110,22 @@ public class EventChangeHandler {
 	private static enum AttendeeStateValue {
 		New, Current, Old;
 	}
-
+	
 	public void updateParticipationState(
 			Event event, ObmUser calendarOwner, ParticipationState state,
 			Locale locale) {
+		
 		if( ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)){
 			Attendee organizer = findOrganizer(event);
-			if (organizer != null
-					&& !StringUtils.isEmpty(organizer.getEmail())
-					&& !ParticipationState.DECLINED
-							.equals(organizer.getState()) && !organizer.getEmail().equalsIgnoreCase(event.getOwnerEmail())) {
-				eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale);
+			if (organizer != null) {
+				if(!ParticipationState.DECLINED.equals(organizer.getState())&& !StringUtils.isEmpty(organizer.getEmail()) 
+						&& !organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain())){
+					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale);
+				} 
+			} else {
+				logger.error("Can't find organizer, email won't send");
 			}
 		}
-		
 	}
 
 	private Attendee findOrganizer(Event event) {

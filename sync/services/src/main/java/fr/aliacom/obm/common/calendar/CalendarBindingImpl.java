@@ -239,8 +239,8 @@ public class CalendarBindingImpl implements ICalendar {
 						+ token.getUser() + " cannot modify event["
 						+ before.getTitle() + "] because not owner"
 						+ " or no write right on owner " + before.getOwner()+". ParticipationState will be updated.");
-				for(Attendee att : before.getAttendees()){
-					if(token.getEmail().equalsIgnoreCase(att.getEmail())){
+				for(Attendee att : event.getAttendees()){
+					if(calendar.equalsIgnoreCase(att.getEmail())){
 						changeParticipationState(token, calendar, event.getExtId(), att.getState());
 					}
 				}

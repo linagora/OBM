@@ -121,14 +121,15 @@ public class EventChangeMailer {
 	
 	public void notifyUpdateParticipationState(Event event, Attendee organizer, ObmUser attendeeUpdated, ParticipationState newState, Locale locale) {
 		try {
+			
 			EventMail mail = 
 				new EventMail(
-						extractSenderAddress(organizer),
+						extractSenderAddress(attendeeUpdated),
 						event.getAttendees(), 
 						updateParticipationStateTitle(event.getTitle(), locale), 
 						updateParticipationStateBodyTxt(event, attendeeUpdated, newState, locale),
 						updateParticipationStateBodyHtml(event, attendeeUpdated, newState, locale));
-			sendNotificationMessageToOwner(event, mail);
+			sendNotificationMessageToOrganizer(organizer, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -138,9 +139,9 @@ public class EventChangeMailer {
 		}
 	}
 
-	private InternetAddress extractSenderAddress(Attendee at)
-			throws UnsupportedEncodingException {
-		return new InternetAddress(at.getEmail(), at.getDisplayName());
+	private InternetAddress extractSenderAddress(ObmUser user)
+	throws UnsupportedEncodingException {
+		return new InternetAddress(user.getEmailAtDomain(), user.getDisplayName());
 	}
 	
 	private InternetAddress extractSenderAddress(Event event)
@@ -151,10 +152,16 @@ public class EventChangeMailer {
 	private List<InternetAddress> convertAttendeesToAddresses(Collection<Attendee> attendees) throws UnsupportedEncodingException {
 		List<InternetAddress> internetAddresses = Lists.newArrayList();
 		for (Attendee at: attendees) {
-			internetAddresses.add(new InternetAddress(at.getEmail(), at.getDisplayName()));
+			internetAddresses.add(convertAttendeeToAddresse(at));
 		}
 		return internetAddresses;
 	}
+	
+	private InternetAddress convertAttendeeToAddresse(Attendee attendee) throws UnsupportedEncodingException {
+		return new InternetAddress(attendee.getEmail(), attendee.getDisplayName());
+	}
+	
+	
 	
 	private void sendNotificationMessageToAttendee(Collection<Attendee> attendees, EventMail mail) throws NotificationException {
 		try {
@@ -167,18 +174,17 @@ public class EventChangeMailer {
 		}
 	}
 	
-	private void sendNotificationMessageToOwner(Event event, EventMail mail) {
+	private void sendNotificationMessageToOrganizer(Attendee organizer, EventMail mail) throws NotificationException {
 		try {
-			InternetAddress address = new InternetAddress(event.getOwnerEmail());
-			sendNotificationMessage(mail, ImmutableList.of(address));
+			InternetAddress adds = convertAttendeeToAddresse(organizer);
+			sendNotificationMessage(mail, ImmutableList.of(adds));
 		} catch (MessagingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
 			throw new NotificationException(e);
 		}
-		
 	}
-	
+
 	private void sendNotificationMessage(EventMail mail, List<InternetAddress>  addresses) throws MessagingException, IOException{
 		MimeMessage mimeMail = mail.buildMimeMail(session);
 		mailService.sendMessage(session, addresses, mimeMail);

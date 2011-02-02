@@ -93,15 +93,12 @@ public class SettingDao {
 			if (domain != null) {
 				ps.setString(idx++, domain);
 			}
-			logger.info("login: " + user);
 			ps.setString(idx++, user);
 			if (domain != null) {
 				ps.setString(idx++, domain);
 			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				logger.info("[" + user + "] adding pref " + rs.getString(1)
-						+ " : " + rs.getString(2));
 				data.put(rs.getString(1), rs.getString(2));
 			}
 		} catch (SQLException se) {

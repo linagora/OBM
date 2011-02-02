@@ -1696,6 +1696,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "(select userentity_entity_id from UserEntity where userentity_entity_id=?  "
 				+ "UNION SELECT contactentity_entity_id from ContactEntity where contactentity_entity_id=?)";
 		PreparedStatement ps = null;
+		int[] updatedAttendees;
+		List<Attendee> mightInsert = new LinkedList<Attendee>();
 		List<Attendee> toInsert = new LinkedList<Attendee>();
 
 		try {
@@ -1734,13 +1736,21 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						|| (onlyUpdateMyself && updater.getEmail().equals(
 								at.getEmail()))) {
 					ps.addBatch();
+					mightInsert.add(at);
 				}
 			}
-			ps.executeBatch();
+			updatedAttendees = ps.executeBatch();
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 
+		for (int i = 0; i < updatedAttendees.length; i++) {
+			if (updatedAttendees[i] == 0) {
+				Attendee at = mightInsert.get(i);
+				toInsert.add(at);
+			}
+		}
+		
 		if (!onlyUpdateMyself) {
 			logger.info("event modification needs to add " + toInsert.size()
 					+ " attendees.");
