@@ -88,8 +88,15 @@ class Cron {
    */
   function parseJobs($jobsPath) {
     $jobsFile = dir($jobsPath);
+    $jobsToExecute = false;
+
+    if(file_exists($jobsPath."../jobsToExecute.ini"))
+      $jobsToExecute = parse_ini_file($jobsPath."../jobsToExecute.ini");
+
     while (false !== ($jobFile = $jobsFile->read())) {
-      if((is_file($jobsPath.$jobFile) || is_link($jobsPath.$jobFile)) && Cron::isCronJob($jobFile)) {
+      if(     (is_file($jobsPath.$jobFile) || is_link($jobsPath.$jobFile))
+          &&  Cron::isCronJob($jobFile)
+          &&  (!$jobsToExecute || in_array($jobFile, $jobsToExecute["jobs"]))) {
         $klass = Cron::getCronJobClass($jobFile);
         $this->logger->debug("$klass registred");
         include_once($jobsPath.$jobFile);
