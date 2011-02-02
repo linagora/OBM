@@ -82,13 +82,13 @@ return array(
   'Function' => 'Fonction',
   'Busy' => 'Occupé',
   "error when processing user %login%@%domain_name% (id: %user_id%)" => "Une erreur s'est produite lors de la sauvegarde de l'utilisateur %login%@%domain_name% (id: %user_id%)",
-  "error when processing mailshare %mailshare_name%@%domain_name% (id: %user_id%)" => "Une erreur s'est produite lors de la sauvegarde du mailshare %mailshare_name%@%domain_name% (id: %user_id%)",
+  "error when processing mailshare %mailshare_name%@%domain_name% (id: %user_id%)" => "Une erreur s'est produite lors de la sauvegarde de la boite partagée %mailshare_name%@%domain_name% (id: %user_id%)",
   "%count% users backuped successfully" => "%count% utilisateurs sauvegardés avec succès",
   "%count% errors on users" => "%count% erreurs sur les sauvegardes des asutilisateurs",
-  "%count% mailshares backuped successfully" => "%count% mailshares sauvegardés avec succès",
-  "%count% errors on mailshares" => "%count% erreurs sur les sauvegardes de mailshares",
+  "%count% mailshares backuped successfully" => "%count% boites partagées sauvegardés avec succès",
+  "%count% errors on mailshares" => "%count% erreurs sur les sauvegardes de boites partagées",
   "%count% ftp errors" => "%count% erreurs ftp",
   "FTP push has been disabled after %count% errors" => "Le push ftp a été désactivé après %count% erreurs",
-  "backup of users and mailshares of domain %domain_name% completed with %count% errors" => "Sauvegarde des utilisateurs et des mailshares du domaine %domain_name% terminée avec %count% erreurs",
-  "backup of users and mailshares of domain %domain_name% completed successfully" => "Sauvegarde des utilisateurs et des mailshares du domaine %domain_name% terminée avec succès"
+  "backup of users and mailshares of domain %domain_name% completed with %count% errors" => "Sauvegarde des utilisateurs et des boites partagées du domaine %domain_name% terminée avec %count% erreurs",
+  "backup of users and mailshares of domain %domain_name% completed successfully" => "Sauvegarde des utilisateurs et des boites partagées du domaine %domain_name% terminée avec succès"
 );
