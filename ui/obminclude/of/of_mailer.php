@@ -92,7 +92,8 @@ class OBM_Mailer extends SMailer {
 
     $uid = sql_parse_id($obm['uid'], true);
     $query = "SELECT 
-    userobm_email, userobm_lastname, userobm_firstname, domain_name
+    userobm_email, userobm_lastname, userobm_firstname, userobm_direction,
+    userobm_service, domain_name
     FROM UserObm
     INNER JOIN Domain ON userobm_domain_id = domain_id
     WHERE userobm_id $uid ";
@@ -104,7 +105,7 @@ class OBM_Mailer extends SMailer {
     
     $email = $this->getEntityEmail($db->f('userobm_email'), $db->f('domain_name'));
     if(!$email) $email = $this->getEntityEmail('noreply');
-    return array($email, sprintf($GLOBALS['l_displayname_template'], $db->f('userobm_firstname'), $db->f('userobm_lastname')));
+    return array($email, rtrim(sprintf($GLOBALS['l_displayname_template'], $db->f('userobm_firstname'), $db->f('userobm_lastname'), $db->f('userobm_direction'), $db->f('userobm_service'))));
   }
 
 

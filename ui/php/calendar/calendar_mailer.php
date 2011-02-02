@@ -35,7 +35,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('New event created by %sender% on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
+    $this->subject = __('New event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     if ($this->attachIcs) {
       $this->parts[] = array(
@@ -53,7 +53,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('Event cancelled by %sender% on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
+    $this->subject = __('Event cancelled by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     if ($this->attachIcs) {
       $this->parts[] = array(
@@ -71,7 +71,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('Event updated by %sender% on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
+    $this->subject = __('Event updated by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     if ($this->attachIcs) {
@@ -89,7 +89,7 @@ class CalendarMailer extends OBM_Mailer {
   protected function eventStateUpdate($event, $user) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients(array($event->owner), 'set_mail_participation');
-    $this->subject = __('Participation updated on OBM: %title%', array('%title%' => $event->title));
+    $this->subject = __('Participation updated: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from, '', $user);
   }
 
@@ -100,21 +100,21 @@ class CalendarMailer extends OBM_Mailer {
   protected function resourceReservation($event, $resourceOwners, $resource) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($resourceOwners);
-    $this->subject = __('Resource %resource% reservation on OBM: %title%', array('%resource%' => $resource->label, '%title%' => $event->title));
+    $this->subject = __('Resource %resource% reservation: %title%', array('%resource%' => $resource->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
   }
 
   protected function resourceCancel($event, $resourceOwners) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($resourceOwners);
-    $this->subject = __('Resource %resource% reservation cancelled on OBM: %title%', array('%title%' => $event->title));
+    $this->subject = __('Resource %resource% reservation cancelled: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
   }
   
   protected function resourceUpdate($event, $oldEvent, $resourceOwners, $resource) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($resourceOwners);
-    $this->subject = __('Resource %resource% reservation updated on OBM: %title%', array('%resource%' => $resource->label, '%title%' => $event->title));
+    $this->subject = __('Resource %resource% reservation updated: %title%', array('%resource%' => $resource->label, '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
   }
@@ -122,7 +122,7 @@ class CalendarMailer extends OBM_Mailer {
   protected function resourceStateUpdate($event, $res) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients(array($event->owner), 'set_mail_participation');
-    $this->subject = __('Resource participation updated on OBM: %title%', array('%title%' => $event->title));
+    $this->subject = __('Resource participation updated: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from, '', $res);
   }
 
@@ -142,7 +142,7 @@ class CalendarMailer extends OBM_Mailer {
       }
     }
     $this->recipients = $recips;
-    $this->subject = __('New event created by %sender% on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
+    $this->subject = __('New event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     if ($this->attachIcs) {
       $this->parts[] = array(
@@ -169,7 +169,7 @@ class CalendarMailer extends OBM_Mailer {
       }
     }
     $this->recipients = $recips;
-    $this->subject = __('Event cancelled by %sender% on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
+    $this->subject = __('Event cancelled by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     if ($this->attachIcs) {
       $this->parts[] = array(
@@ -196,7 +196,7 @@ class CalendarMailer extends OBM_Mailer {
       }
     }
     $this->recipients = $recips;
-    $this->subject = __('Event updated by %sender% on OBM: %title%', array('%sender%'=>$this->from[1], '%title%' => $event->title));
+    $this->subject = __('Event updated by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     if ($this->attachIcs) {
