@@ -765,11 +765,17 @@ public class CalendarBindingImpl implements ICalendar {
 			String extId, ParticipationState participationState) throws ServerFault {
 		if (helper.canWriteOnCalendar(token, calendar)) {
 			try {
+				//We should handle all this in a transaction, but we don't, so
+				//when event is not found, we just don't send change event
 				ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
 				boolean changed = calendarService.changeParticipationState(token, calendarOwner, extId, participationState);
 				Event newEvent = calendarService.findEventByExtId(token, calendarOwner, extId);
+				if (newEvent != null) {
 				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
 						settingsDao.getUserLanguage(token));
+				} else {
+					logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
+				}
 				return changed;
 			} catch (FindException e) {
 				throw new ServerFault("no user found with calendar " + calendar);
