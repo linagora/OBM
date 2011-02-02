@@ -1208,10 +1208,13 @@ function dis_document_file($doc_q) {
     if(file_exists($disk_fullname))$handle = fopen ($disk_fullname, "r");
     if($handle) {
       header("Content-Type: $mime");
-      header("Content-Disposition: inline; filename=".addslashes(str_replace(" ", "_", $name)));
+      if (isset($GLOBALS['c_document_display_inline']) && $GLOBALS['c_document_display_inline'] === true) {
+        header("Content-Disposition: inline; filename=".addslashes(str_replace(" ", "_", $name)));
+      } else {
+        header("Content-Disposition: attachment; filename=".addslashes(str_replace(" ", "_", $name)));
+      }
       header("Cache-Control: maxage=3600");
-      header("Pragma: public");      
-      
+      header("Pragma: public");
       
       while ( !feof($handle) ) {
         echo fread($handle, 4096);

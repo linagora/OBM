@@ -130,8 +130,11 @@ $cimage_logo = 'linagora.jpg';
 // Document : $cdocument_root and $default_path are deprecated
 // see obm_conf.ini
 
-// Document: user quota
-$c_quota_private_document = 20;
+// Document: user quota for all private documents (in bytes, O = no quota)
+$c_quota_private_document = 104857600;
+
+// Document: whether to force download or not
+$c_document_display_inline = false;
 
 // Group : is a new group private by default
 $cgroup_private_default = true;
