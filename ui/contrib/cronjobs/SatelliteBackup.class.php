@@ -30,7 +30,7 @@ class SatelliteBackup extends CronJob {
    * @var Logger
    */
   var $logger;
-
+  
   function mustExecute($date) {
     $delta   = 24*60;         //every days
     $instant = (2*60)%$delta; //at 2:00
@@ -89,7 +89,14 @@ class SatelliteBackup extends CronJob {
         $this->logger->debug("User $login (id: $user_id) backup finished");
       } catch (Exception $e) {
         $errors['users']++;
-        $mailBody .= "error when processing user $login@$domain_name (id: $user_id)"."\n";
+        $mailBody .=
+        __("error when processing user %login%@%domain_name% (id: %user_id%)\n",
+            array(
+                   "login"=>$login,
+                   "domain_name"=>$domain_name,
+                   "user_id"=>$user_id
+                 )
+        )."\n";
         $this->logger->error("error when processing user $login@$domain_name (id: $user_id)");
         $mailBody .= $e->getMessage()."\n";
         $this->logger->error($e->getMessage());
@@ -119,31 +126,57 @@ class SatelliteBackup extends CronJob {
         $this->logger->debug("Mailshare $mailshare_name (id: $mailshare_id) backup finished");
       } catch (Exception $e) {
         $errors['mailshares']++;
-        $mailBody .= "error when processing mailshare $mailshare_name@$domain_name (id: $mailshare_id)";
+        $mailBody .=
+        __("error when processing mailshare %mailshare_name%@%domain_name% (id: %user_id%)",
+            array(
+                   "mailshare_name" =>  $mailshare_name,
+                   "domain_name"    =>  $domain_name,
+                   "user_id"        =>  $mailshare_id
+                 )
+        )."\n";
         $this->logger->error("error when processing mailshare $mailshare_name@$domain_name (id: $mailshare_id)");
         $mailBody .= $e->getMessage();
         $this->logger->error($e->getMessage());
       }
     }
 
-    $mailIntro = ($count['users']-$errors['users'])." users backuped successfully\n";
+    $mailIntro = __("%count% users backuped successfully",
+                    array("count" => $count['users']-$errors['users'])
+                 )."\n";
     if ($errors['users'] > 0) {
-      $mailIntro .= $errors['users']." errors on users\n";
+      $mailIntro .= __("%count% errors on users",
+                       array("count" => $errors['users'])
+                    )."\n";
     }
-    $mailIntro .= ($count['mailshares']-$errors['mailshares'])." mailshares backuped successfully\n";
+    $mailIntro .= __("%count% mailshares backuped successfully",
+                     array("count" => $count['mailshares']-$errors['mailshares'])
+                  )."\n";
     if ($errors['mailshares'] > 0) {
-      $mailIntro .= $errors['mailshares']." errors on mailshares\n";
+      $mailIntro .= __("%count% errors on mailshares",
+                       array("count" => $errors['mailshares'])
+                    )."\n";
     }
     if ($errors['ftp'] >= MAX_FTP_ERRORS) {
-      $mailIntro .= $errors['ftp']." ftp errors\n";
-      $mailIntro .= "FTP push has been disabled after ".MAX_FTP_ERRORS." errors\n";
+      $mailIntro .= __("%count% ftp errors",
+                       array("count" => $errors['ftp'])
+                    )."\n";
+      $mailIntro .= __("FTP push has been disabled after %count% errors",
+                       array("count" => MAX_FTP_ERRORS)
+                    )."\n";
     }
 
     $totalErrors = array_sum($errors);
     if ($totalErrors > 0) {
-      $mailSubject = "backup of users and mailshares of domain $domain_name completed with $totalErrors errors";
+      $mailSubject = __("backup of users and mailshares of domain %domain_name% completed with %count% errors",
+                           array(
+                               "%domain_name%"=>  $domain_name,
+                               "count"        =>  $totalErrors
+                           )
+                     );
     } else {
-      $mailSubject = "backup of users and mailshares of domain $domain_name completed successfully";
+      $mailSubject = __("backup of users and mailshares of domain %domain_name% completed successfully",
+                         array("%domain_name%" => $domain_name)
+                     );
     }
 
     $mailTo = "x-obm-backup@$domain_name";

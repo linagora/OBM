@@ -38,6 +38,8 @@ set_error_handler('errorHandler');
 
 date_default_timezone_set('GMT');
 
+SI18n::set_default_locale($set_lang_default);
+
 $cron = new Cron($jobsPath);
 $cron->process();
 ?>
