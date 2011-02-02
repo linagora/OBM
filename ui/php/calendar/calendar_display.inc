@@ -3723,7 +3723,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     $documents = $entities['document'];
     $exception_q = run_query_get_one_event_exception($calendar['calendar_id']);
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
-  
+ 
     // Entities from Freebusy
     if (isset($calendar['new_meeting']) && $calendar['new_meeting'] == 1) {
       $users = (is_array($calendar['new_user_id'])) ? get_userobm_from_ids($calendar['new_user_id']) : array();
@@ -3741,7 +3741,6 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
 
     // If new event, add the optionnal new users (here to get the user's infos)
     if ($action == 'new') {
-      
       if (isset($calendar['template_id'])) {
         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
         $users_id = array_merge($users_id, $template_entities['user']);
@@ -3758,7 +3757,8 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
       if (is_array($calendar['new_contact_id'])) $contacts_id = $calendar['new_contact_id'];
 
       if (!isset($calendar['new_meeting'])) { 
-       $users_id[] = $obm['uid'];
+       //$users_id[] = $obm['uid'];
+       $users_id = array($obm['uid']);
       }
     }
 
