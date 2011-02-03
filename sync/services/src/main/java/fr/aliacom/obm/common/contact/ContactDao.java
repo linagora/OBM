@@ -1442,7 +1442,7 @@ public class ContactDao {
 		String q = "SELECT a.id, a.name, userobm_lastname, userobm_firstname"
 				+ " FROM AddressBook a "
 				+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?) "
-				+ " INNER JOIN UserObm ON (user_id=userobm_id) "
+				+ " INNER JOIN UserObm ON (owner=userobm_id) "
 				+ "WHERE (a.syncable OR a.name=?) AND "
 				+ "(a.timeupdate >= ? OR a.timecreate >= ? OR s.timestamp >= ?)";
 
