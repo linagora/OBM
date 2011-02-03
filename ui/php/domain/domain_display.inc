@@ -882,26 +882,35 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
 
 
   $backup_ftp_servers = get_domain_backupftpservers($id);
-  if (is_array($backup_ftp)) {
-    foreach($backup_ftp as $backup_ftp_id) {
-      $backup_ftp_sel = $backup_ftp_id;
-    }
-  }
   if (sizeof($backup_ftp_servers) > 0) {
+    if (is_array($backup_ftp)) {
+      foreach($backup_ftp as $backup_ftp_id) {
+        //$backup_ftp_sel = $backup_ftp_id;
+        $backup_ftp_list .= "
+          <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'ftp_server');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a>        
+          ".$backup_ftp_servers[$backup_ftp_id]['name']."<input type=\"hidden\" name=\"sel_backup_ftp[]\" value=\"$backup_ftp_id\" />  
+          </div>";
+      }
+    }
+    $backup_ftp_servers_list = '<option value="">---</option>';
     foreach($backup_ftp_servers as $host_id => $serverinfos) {
-      $selected = '';
-      if(isset($backup_ftp_sel) && $backup_ftp_sel == $host_id) $selected = "selected='selected'";        
-      $backup_ftp_servers_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
+      $backup_ftp_servers_list .= "<option value=\"$host_id\">$serverinfos[name]</option>";
     }
     $dis_backup_ftp = "<fieldset class=\"detail infos\">
       <legend>$GLOBALS[l_backup_ftp_servers]</legend>
         <table>
         <tr>
-        <th>$GLOBALS[l_header_select_backupftpserver]</th>
+        <th>$GLOBALS[l_header_select_backupftpserver]<a href=\'\' onclick=\"copyField($('ftp_server').getLast(), $('ftp_server'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add ftpserver]\" /></a></th>
         <td id='obm_backupFtpServer'>
+          $backup_ftp_list
           <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'ftp_server');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a> 
           <select name='sel_backup_ftp[]'>
-            <option value=''>---</option>
             $backup_ftp_servers_list
           </select> 
           </div>              
