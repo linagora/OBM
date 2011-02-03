@@ -1456,10 +1456,22 @@ sub _pushFtpBackup {
 sub _getFtpBackupHost {
     my $self = shift;
     my($entity, $response) = @_;
+    # get delegation value of entity in ldap
+    my $ldapEntityEntity = $self->_getLdapValues($entity->getLdapFilter(),['delegation']) ;
+    my $entityDelegation = $ldapEntityEntity->[0]->get_value('delegation');
 
-    my $ldapEntity = $self->_getLdapValues(
-        '(&(objectClass=obmBackup)(obmDomain='.$entity->getRealm().'))',
-        ['ftpHost'] );
+    # if entityDelegation aren't defined search ftp of obm domain 
+    my $ldapEntity = undef ;
+    if ( !defined($entityDelegation) ) {
+        $ldapEntity = $self->_getLdapValues(
+            '(&(objectClass=obmBackup)(obmDomain='.$entity->getRealm().'))',
+            ['ftpHost'] );
+    }
+    else {
+        $ldapEntity = $self->_getLdapValues(
+            '(&(objectClass=obmHost)(obmDomain='.$entity->getRealm().')
+                (delegation='.$entityDelegation.'))',['cn'] ) ;
+    }
 
     if(!defined($ldapEntity)) {
         $self->_log('Fail to contact LDAP server. Contact system administrators', 1);
@@ -1492,7 +1504,14 @@ sub _getFtpBackupHost {
         return undef;
     }
 
-    my $ftpHostName = $ldapEntity->[0]->get_value('ftpHost');
+    my $ftpHostName = undef ;
+    if ( !defined($entityDelegation) ) {
+        $ftpHostName = $ldapEntity->[0]->get_value('ftpHost');
+    }
+    else {
+        $ftpHostName = $ldapEntity->[0]->get_value('cn');
+    }
+
     if(!$ftpHostName) {
         $self->_log('No backup FTP server linked to OBM domaine \''.$entity->getRealm().'\'', 3);
         $response->setExtraContent({
