@@ -1444,9 +1444,7 @@ public class ContactDao {
 		String q = "SELECT "
 				+ FOLDER_SELECT_FIELDS
 				+ " FROM AddressBook a "
-				+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id="
-				+ at.getObmId()
-				+ ") "
+				+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?) "
 				+ "WHERE (a.syncable OR a.name=?) AND "
 				+ "(a.timeupdate >= ? OR a.timecreate >= ? OR s.timestamp >= ?)";
 
@@ -1459,6 +1457,7 @@ public class ContactDao {
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
+			ps.setInt(idx++, at.getObmId());
 			ps.setString(idx++, DEFAULT_ADDRESS_BOOK_NAME);
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
@@ -1490,26 +1489,21 @@ public class ContactDao {
 		ResultSet rs = null;
 		Connection con = null;
 
-		String q = "SELECT addressbook_id FROM DeletedAddressbook WHERE user_id="
-				+ at.getObmId();
-		if (d != null) {
-			q += " AND timestamp >= ? ";
-		}
-		q += " UNION SELECT id FROM AddressBook WHERE NOT syncable AND NOT name=?"
-				+ " AND owner=" + at.getObmId();
-		if (d != null) {
-			q += " AND timeupdate >= ?";
-		}
+		String q = 
+			"SELECT addressbook_id FROM DeletedAddressbook WHERE user_id=?  AND timestamp >= ? "
+			+ " UNION "
+			+ "SELECT addressbook_id FROM DeletedSyncedAddressbook WHERE user_id=? AND timestamp >= ?";
 
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 
-			if (d != null) {
-				ps.setTimestamp(1, new Timestamp(d.getTime()));
-				ps.setString(2, DEFAULT_ADDRESS_BOOK_NAME);
-				ps.setTimestamp(3, new Timestamp(d.getTime()));
-			}
+			int idx = 1;
+			ps.setInt(idx++, at.getObmId());
+			ps.setTimestamp(idx++, new Timestamp(d.getTime()));
+			ps.setInt(idx++, at.getObmId());
+			ps.setTimestamp(idx++, new Timestamp(d.getTime()));
+			
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				l.add(rs.getInt(1));
@@ -1547,24 +1541,48 @@ public class ContactDao {
 	}
 
 	public boolean unsubscribeBook(AccessToken at, Integer addressBookId) {
-		int modif = 0; 
-		Connection con = null;
-		PreparedStatement st = null;
+
 		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
 			ut.begin();
+			boolean success = unsubscribeBookQuery(at, addressBookId);
+			if (success) {
+				keepTrackOfDeletedBookSubscription(at, addressBookId);
+			}
+			ut.commit();
+			return success;
+		} catch (Throwable se) {
+			obmHelper.rollback(ut);
+			logger.error(se.getMessage(), se);
+		}
+		return false;
+	}
+	
+	private boolean unsubscribeBookQuery(AccessToken at, int addressBookId) throws SQLException {
+		Connection con = null;
+		PreparedStatement st = null;
+		try {
 			con = obmHelper.getConnection();
 			st = con.prepareStatement("delete from SyncedAddressbook WHERE addressbook_id=? AND user_id=?");
 			st.setInt(1, addressBookId);
 			st.setInt(2, at.getObmId());
-			modif = st.executeUpdate();
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
+			return st.executeUpdate() > 0;
 		} finally {
 			obmHelper.cleanup(con, st, null);
 		}
-		return modif>0;
+	}
+	
+	private boolean keepTrackOfDeletedBookSubscription(AccessToken at, int addressBookId) throws SQLException {
+		Connection con = null;
+		PreparedStatement st = null;
+		try {
+			con = obmHelper.getConnection();
+			st = con.prepareStatement("INSERT INTO DeletedSyncedAddressbook (addressbook_id, user_id) VALUES (?, ?)");
+			st.setInt(1, addressBookId);
+			st.setInt(2, at.getObmId());
+			return st.executeUpdate() > 0;
+		} finally {
+			obmHelper.cleanup(con, st, null);
+		}
 	}
 }
