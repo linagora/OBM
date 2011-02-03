@@ -245,6 +245,7 @@ public class BookItemsParser extends AbstractItemsParser {
 			f.setUid(Integer.parseInt(root.getAttribute("uid")));
 		}
 		f.setName(s(root, "name"));
+		f.setOwnerDisplayName(DOMUtils.getElementTextInChildren(root, "ownerDisplayName"));
 		return f;
 	}
 

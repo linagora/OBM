@@ -3,9 +3,9 @@ package org.obm.sync.book;
 public class Folder {
 
 	private Integer uid;
-
 	private String name;
-
+	private String ownerDisplayName;
+	
 	public Folder() {
 		super();
 	}
@@ -24,6 +24,14 @@ public class Folder {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getOwnerDisplayName() {
+		return ownerDisplayName;
+	}
+	
+	public void setOwnerDisplayName(String ownerDisplayName) {
+		this.ownerDisplayName = ownerDisplayName;
 	}
 
 }

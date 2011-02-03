@@ -224,6 +224,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 
 		createIfNotNull(f, "name", folder.getName());
+		createIfNotNull(f, "ownerDisplayName", folder.getOwnerDisplayName());
 	}
 
 	public Document writeAddressBookChanges(AddressBookChangesResponse response) {

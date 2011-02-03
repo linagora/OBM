@@ -98,8 +98,6 @@ public class ContactDao {
 	private static final String MY_GROUPS_QUERY = "SELECT groupentity_entity_id FROM of_usergroup "
 			+ "INNER JOIN GroupEntity ON of_usergroup_group_id=groupentity_group_id WHERE of_usergroup_user_id=?";
 
-	private static final String FOLDER_SELECT_FIELDS = "id, name";
-
 	private final CalendarDao calendarDao;
 	private final Factory solrHelperFactory;
 	private final ObmHelper obmHelper;
@@ -1441,10 +1439,10 @@ public class ContactDao {
 	}
 	
 	public List<Folder> findUpdatedFolders(Date timestamp, AccessToken at) {
-		String q = "SELECT "
-				+ FOLDER_SELECT_FIELDS
+		String q = "SELECT a.id, a.name, userobm_lastname, userobm_firstname"
 				+ " FROM AddressBook a "
 				+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?) "
+				+ " INNER JOIN UserObm ON (user_id=userobm_id) "
 				+ "WHERE (a.syncable OR a.name=?) AND "
 				+ "(a.timeupdate >= ? OR a.timecreate >= ? OR s.timestamp >= ?)";
 
@@ -1467,6 +1465,9 @@ public class ContactDao {
 				Folder f = new Folder();
 				f.setUid(rs.getInt(1));
 				f.setName(rs.getString(2));
+				String ownerFirstName = rs.getString(3);
+				String ownerLastName = rs.getString(4);
+				f.setOwnerDisplayName(ownerFirstName + " " + ownerLastName);
 				folders.add(f);
 			}
 			rs.close();
