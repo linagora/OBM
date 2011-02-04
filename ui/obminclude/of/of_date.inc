@@ -190,6 +190,7 @@ class Of_Date extends DateTime {
       }
       $this->setTimezone(new DateTimeZone(self::$_options['timezone']));
     } catch (Exception $e) {
+      parent::__construct(date("Y-m-d"),new DateTimeZone(self::$_options['timezone']));
       $this->error =self::ERR_INVALID_DATE;
     }
 

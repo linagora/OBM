@@ -251,3 +251,12 @@ ALTER TABLE `Category` MODIFY COLUMN `category_code` varchar(20) NOT NULL defaul
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
 
+--
+-- possibility to save special informations into an event template :
+-- - the forced insertion state
+-- - the availability of attendees and resources
+-- - the checked state of the show users calendars
+--
+ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_force_insertion` boolean default 0 AFTER eventtemplate_group_ids;
+ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_opacity` enum('OPAQUE','TRANSPARENT') default 'OPAQUE' AFTER eventtemplate_force_insertion;
+ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_user_calendar` boolean default 0 AFTER eventtemplate_opacity;

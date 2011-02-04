@@ -1047,7 +1047,9 @@ CREATE TABLE eventtemplate (
     eventtemplate_contact_ids text default NULL,
     eventtemplate_resource_ids text default NULL,
     eventtemplate_document_ids text default NULL,
-    eventtemplate_group_ids text default NULL
+    eventtemplate_group_ids text default NULL,
+    eventtemplate_force_insertion boolean DEFAULT false,
+    eventtemplate_opacity vopacity DEFAULT 'OPAQUE'::vopacity
 );
 
 

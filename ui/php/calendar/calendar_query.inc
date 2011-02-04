@@ -1890,7 +1890,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   $obm_q->query($query);
   $event_id = $obm_q->lastid();
   of_entity_insert('event', $event_id);
-  
+
   // User
   if (is_array($user)) {
     foreach ($user as $user_id) {
@@ -2281,13 +2281,13 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
  */
 function run_query_calendar_create_or_update_event_template(&$calendar) {
   global $cdg_sql, $obm;
-
   // Insert "others attendees" as private contacts
   if ($calendar['others_attendees'] != "") {
     $others_attendees = run_query_insert_others_attendees($calendar);
     $calendar['sel_contact_id'] = is_array($calendar['sel_contact_id']) 
                               ? array_merge($calendar['sel_contact_id'], $others_attendees)
                               : $others_attendees;
+    $calendar['sel_contact_id'] = array_unique($calendar['sel_contact_id']);
   }
   // Insert "other files" as private documents
   if (is_array($calendar['other_files'])) {
@@ -2319,6 +2319,9 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   $repeatfrequency = $calendar['repeatfrequency'];
   $date_exception = $calendar['date_exception'];
   $allow_documents = ($calendar['allow_documents'] != 1) ? 0 : 1;
+  $force_insertion = $calendar['force'];
+  $opacity = $calendar['opacity'];
+  $show_user_calendar = $calendar['show_user_calendar'];
   
   $user_ids = is_array($calendar['sel_user_id']) ? "'".implode(',', $calendar['sel_user_id'])."'" : 'NULL';
   $contact_ids = is_array($calendar['sel_contact_id']) ? "'".implode(',', $calendar['sel_contact_id'])."'" : 'NULL';
@@ -2401,7 +2404,10 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       eventtemplate_contact_ids = $contact_ids,
       eventtemplate_resource_ids = $resource_ids,
       eventtemplate_group_ids = $group_ids,
-      eventtemplate_document_ids = $document_ids 
+      eventtemplate_document_ids = $document_ids,
+      eventtemplate_force_insertion = $force_insertion,
+      eventtemplate_opacity = '$opacity',
+      eventtemplate_show_user_calendar = $show_user_calendar
       WHERE eventtemplate_id = $template_id";
   } else {
     $query = "INSERT INTO EventTemplate (
@@ -2556,12 +2562,14 @@ function run_query_calendar_get_template($template_id) {
     eventtemplate_endrepeat AS event_endrepeat,
     eventtemplate_allow_documents AS event_allow_documents,
     eventtemplate_alert AS event_alert,
-    eventtemplate_date AS event_date,
     eventtemplate_user_ids AS event_user_ids,
     eventtemplate_contact_ids AS event_contact_ids,
     eventtemplate_resource_ids AS event_resource_ids,
     eventtemplate_group_ids AS event_group_ids,
-    eventtemplate_document_ids AS event_document_ids
+    eventtemplate_document_ids AS event_document_ids,
+    eventtemplate_force_insertion AS event_force_insertion,
+    eventtemplate_opacity AS event_opacity,
+    eventtemplate_show_user_calendar AS event_show_user_calendar
     FROM
     EventTemplate 
     LEFT JOIN EventCategory1 ON eventtemplate_category1_id = eventcategory1_id 

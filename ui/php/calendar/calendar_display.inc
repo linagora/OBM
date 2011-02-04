@@ -1249,7 +1249,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   // Get events
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
-  $tags = array();
+  $tags = array();  
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
       if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
@@ -3723,7 +3723,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     $documents = $entities['document'];
     $exception_q = run_query_get_one_event_exception($calendar['calendar_id']);
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
- 
+  
     // Entities from Freebusy
     if (isset($calendar['new_meeting']) && $calendar['new_meeting'] == 1) {
       $users = (is_array($calendar['new_user_id'])) ? get_userobm_from_ids($calendar['new_user_id']) : array();
@@ -3740,7 +3740,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     $documents_id = is_array($entities['document']) ? $entities['document'] : array();
 
     // If new event, add the optionnal new users (here to get the user's infos)
-    if ($action == 'new') {
+    if ($action == 'new') {      
       if (isset($calendar['template_id'])) {
         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
         $users_id = array_merge($users_id, $template_entities['user']);
@@ -3757,7 +3757,6 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
       if (is_array($calendar['new_contact_id'])) $contacts_id = $calendar['new_contact_id'];
 
       if (!isset($calendar['new_meeting'])) { 
-       //$users_id[] = $obm['uid'];
        $users_id = array($obm['uid']);
       }
     }
@@ -4098,6 +4097,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $priority = $event_q->f('event_priority');
     $properties = $event_q->f('event_properties');
     $desc = $event_q->f('event_description');
+    $force_insertion = $event_q->f('event_force_insertion');
+    if($force_insertion){
+      $calendar['force'] = $force_insertion;
+    }
+    $show_user_calendar = $event_q->f('event_show_user_calendar');
+    if($show_user_calendar){
+      $calendar['show_user_calendar'] = $show_user_calendar;
+    }
+    
     if ($properties != '') {
       $charset = mb_internal_encoding();
       $item = "<?xml version='1.0' encoding='$charset' ?".">$properties";
@@ -6580,8 +6588,8 @@ function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null
   $document->destroy();
   header('Content-Type: text/x-vCalendar');
   header('Content-Disposition: inline; filename=ObmCalendar.ics');
-  header('Cache-Control: maxage=3600'); 
-  header('Pragma: public');  
+  header('Cache-Control: maxage=3600');
+  header('Pragma: public');
   echo $writer->buffer;
 }
 
