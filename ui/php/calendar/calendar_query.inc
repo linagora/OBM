@@ -2405,7 +2405,7 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       eventtemplate_resource_ids = $resource_ids,
       eventtemplate_group_ids = $group_ids,
       eventtemplate_document_ids = $document_ids,
-      eventtemplate_force_insertion = $force_insertion,
+      eventtemplate_force_insertion = '$force_insertion',
       eventtemplate_opacity = '$opacity',
       eventtemplate_show_user_calendar = '$show_user_calendar'
       WHERE eventtemplate_id = $template_id";
