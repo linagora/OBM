@@ -1439,7 +1439,7 @@ public class ContactDao {
 	}
 	
 	public List<Folder> findUpdatedFolders(Date timestamp, AccessToken at) {
-		String q = "SELECT a.id, a.name, userobm_lastname, userobm_firstname"
+		String q = "SELECT a.id, a.name, userobm_id, userobm_lastname, userobm_firstname"
 				+ " FROM AddressBook a "
 				+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?) "
 				+ " INNER JOIN UserObm ON (owner=userobm_id) "
@@ -1455,7 +1455,8 @@ public class ContactDao {
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
-			ps.setInt(idx++, at.getObmId());
+			int userId = at.getObmId();
+			ps.setInt(idx++, userId);
 			ps.setString(idx++, DEFAULT_ADDRESS_BOOK_NAME);
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
@@ -1465,9 +1466,11 @@ public class ContactDao {
 				Folder f = new Folder();
 				f.setUid(rs.getInt(1));
 				f.setName(rs.getString(2));
-				String ownerFirstName = rs.getString(3);
-				String ownerLastName = rs.getString(4);
-				f.setOwnerDisplayName(ownerFirstName + " " + ownerLastName);
+				if (rs.getInt(3) != userId) {
+					String ownerFirstName = rs.getString(4);
+					String ownerLastName = rs.getString(5);
+					f.setOwnerDisplayName(ownerFirstName + " " + ownerLastName);
+				}
 				folders.add(f);
 			}
 			rs.close();
