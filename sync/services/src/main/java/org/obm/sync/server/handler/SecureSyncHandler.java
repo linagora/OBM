@@ -17,6 +17,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;

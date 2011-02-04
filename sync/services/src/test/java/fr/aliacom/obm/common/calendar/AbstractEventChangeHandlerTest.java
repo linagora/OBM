@@ -11,8 +11,9 @@ import org.easymock.EasyMock;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.server.mailer.EventChangeMailer;
+import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 
-import fr.aliacom.obm.common.calendar.EventChangeMailer.NotificationException;
 
 public abstract class AbstractEventChangeHandlerTest {
 

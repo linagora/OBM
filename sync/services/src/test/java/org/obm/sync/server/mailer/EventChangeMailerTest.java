@@ -1,4 +1,4 @@
-package fr.aliacom.obm.common.calendar;
+package org.obm.sync.server.mailer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,11 +32,17 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.server.mailer.EventChangeMailer;
+import org.obm.sync.server.template.ITemplateLoader;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 
+import fr.aliacom.obm.common.MailService;
+import fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools;
 import fr.aliacom.obm.services.constant.ConstantService;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 
 @RunWith(Suite.class)
 @SuiteClasses({EventChangeMailerTest.Creation.class, EventChangeMailerTest.Cancelation.class,
@@ -45,12 +51,34 @@ public class EventChangeMailerTest {
 
 	public abstract static class Common {
 		
-		protected AccessToken getMockAccessToken(){
+		
+		private ITemplateLoader templateLoader;
+		
+		public Common(){
+			templateLoader = new ITemplateLoader() {
+				@Override
+				public Template getTemplate(String templateName, Locale locale)
+						throws IOException {
+					Configuration cfg = new Configuration();
+					cfg.setClassForTemplateLoading(getClass(), "template");
+					return cfg.getTemplate(templateName, locale);
+				}
+			};
+			
+		}
+		
+		protected ITemplateLoader getStubTemplateLoader(){
+			return templateLoader;
+		}
+
+		
+		protected AccessToken getStubAccessToken(){
 			AccessToken at = new AccessToken(1, 1, "unitTest");
 			at.setDomain("test.tlse.lng");
 			return at;
 		}
-
+		
+		
 		protected MailService defineMailServiceExpectations(
 				List<InternetAddress> expectedRecipients,
 				Capture<MimeMessage> capturedMessage) throws MessagingException {
@@ -125,15 +153,14 @@ public class EventChangeMailerTest {
 		}
 
 		protected void test() throws UnsupportedEncodingException, IOException, MessagingException {
-
+			
 			ConstantService constantService = EasyMock.createMock(ConstantService.class);
 			EasyMock.expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
 			Capture<MimeMessage> capturedMessage = new Capture<MimeMessage>();
 			EasyMock.replay(constantService);
 			List<InternetAddress> expectedRecipients = getExpectedRecipients();
 			MailService mailService = defineMailServiceExpectations(expectedRecipients, capturedMessage);
-			EventChangeMailer eventChangeMailer = new EventChangeMailer(mailService, constantService);
-
+			EventChangeMailer eventChangeMailer = new EventChangeMailer(mailService, constantService, getStubTemplateLoader());
 			
 			executeProcess(eventChangeMailer);
 
@@ -216,7 +243,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyNewUsers(getMockAccessToken(), event.getAttendees(), event, Locale.FRENCH);
+			eventChangeMailer.notifyNewUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH);
 		}
 		
 		@Test
@@ -301,7 +328,7 @@ public class EventChangeMailerTest {
 			Event after = before.clone();
 			after.setDate(date(2010, 10, 8, 12, 00));
 			after.setDuration(3600);
-			eventChangeMailer.notifyUpdateUsers(getMockAccessToken(), before.getAttendees(), before, after, Locale.FRENCH);
+			eventChangeMailer.notifyUpdateUsers(getStubAccessToken(), before.getAttendees(), before, after, Locale.FRENCH);
 		}
 		
 		@Override
@@ -384,7 +411,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyRemovedUsers(getMockAccessToken(), event.getAttendees(), event, Locale.FRENCH);
+			eventChangeMailer.notifyRemovedUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH);
 		}
 		
 		@Override

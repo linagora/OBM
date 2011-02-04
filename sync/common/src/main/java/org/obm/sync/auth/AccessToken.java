@@ -149,5 +149,4 @@ public class AccessToken {
 	public String getUserWithDomain() {
 		return user + "@" + domain;
 	}
-	
 }

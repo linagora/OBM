@@ -1,15 +1,12 @@
-package fr.aliacom.obm.common.calendar;
+package org.obm.sync.server.mailer;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -18,6 +15,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.server.template.ITemplateLoader;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -26,37 +24,24 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.MailService;
+import fr.aliacom.obm.common.calendar.EventMail;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ConstantService;
 import fr.aliacom.obm.utils.Ical4jHelper;
-import freemarker.template.Configuration;
 import freemarker.template.SimpleDate;
 import freemarker.template.Template;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateException;
 
-public class EventChangeMailer {
+public class EventChangeMailer extends AbstractMailer{
 
 	private final String baseUrl;
-	private final Configuration cfg;
-	private final Session session;
-	private MailService mailService;
-	
-	public static class NotificationException extends RuntimeException {
-		private static final long serialVersionUID = -7984056189522385977L;
-
-		public NotificationException(Exception e) {
-			super(e);
-		}
-	}
 	
 	@Inject
-	/* package */ EventChangeMailer(MailService mailService, ConstantService constantService) {
-		this.mailService = mailService;
+	/* package */ EventChangeMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader) throws IOException {
+		super(mailService, constantService, templateLoader);
 		this.baseUrl = constantService.getObmUIBaseUrl();
-		cfg = new Configuration();
-		cfg.setClassForTemplateLoading(getClass(), "template");
-		session = Session.getDefaultInstance(new Properties());
 	}
 	
 	public void notifyNewUsers(AccessToken at, Collection<Attendee> attendee, Event event, Locale locale) throws NotificationException {
@@ -246,7 +231,7 @@ public class EventChangeMailer {
 		
 		Builder<Object, Object> builder = buildEventUpdateDatamodel(oldEvent, newEvent);
 		ImmutableMap<Object, Object> datamodel = defineTechnicalData(builder, newEvent).build();
-		Template template = cfg.getTemplate(templateName, locale);
+		Template template = templateLoader.getTemplate(templateName, locale);
 		return applyTemplate(datamodel, template);
 	}
 
@@ -254,14 +239,14 @@ public class EventChangeMailer {
 			throws IOException, TemplateException {
 		Builder<Object, Object> builder = buildEventDatamodel(event);
 		ImmutableMap<Object, Object> datamodel = defineTechnicalData(builder, event).build();
-		Template template = cfg.getTemplate(templateName, locale);
+		Template template = templateLoader.getTemplate(templateName, locale);
 		return applyTemplate(datamodel, template);
 	}
 	
 	private String applyUpdateParticipationStateOnTemplate(String templateName,
 			Event event, ObmUser attendeeUpdated, ParticipationState newState,  Locale locale) throws IOException, TemplateException {
 		Builder<Object, Object> builder = buildUpdateParticipationStateDatamodel(event, attendeeUpdated, participationState(newState, locale));
-		Template template = cfg.getTemplate(templateName, locale);
+		Template template = templateLoader.getTemplate(templateName, locale);
 		return applyTemplate(builder.build(), template);
 	}
 
@@ -269,15 +254,6 @@ public class EventChangeMailer {
 		return builder
 			.put("host", this.baseUrl)
 			.put("calendarId", event.getUid());
-	}
-	
-	private String applyTemplate(ImmutableMap<Object, Object> datamodel, Template template) 
-		throws TemplateException, IOException {
-		
-		StringWriter stringWriter = new StringWriter();
-		template.process(datamodel, stringWriter);
-		stringWriter.flush();
-		return stringWriter.toString();
 	}
 
 	private Builder<Object, Object> buildEventDatamodel(Event event) {

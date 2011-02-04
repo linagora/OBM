@@ -17,14 +17,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.OBMConnectorVersionException;
 import org.obm.sync.login.LoginBindingImpl;
 import org.obm.sync.server.ParametersSource;
 import org.obm.sync.server.XmlResponder;
+import org.obm.sync.server.mailer.ErrorMailer;
 
 import com.google.inject.Inject;
+
+import fr.aliacom.obm.common.setting.SettingDao;
 
 /**
  * Responds to the following urls :
@@ -32,13 +37,19 @@ import com.google.inject.Inject;
  * <code>/login/doLogin?login=xx&password=yy</code>
  */
 public class LoginHandler implements ISyncHandler {
-
+	
 	private Log logger = LogFactory.getLog(getClass());
 	private LoginBindingImpl binding;
-
+	private ErrorMailer errorMailer;
+	private SettingDao settingsDao;
+	private VersionValidator versionValidator;
+	
 	@Inject
-	private LoginHandler(LoginBindingImpl loginBindingImpl) {
+	private LoginHandler(LoginBindingImpl loginBindingImpl, ErrorMailer errorMailer, SettingDao settingsDao, VersionValidator versionValidator) {
 		this.binding = loginBindingImpl;
+		this.errorMailer = errorMailer;
+		this.settingsDao = settingsDao;
+		this.versionValidator = versionValidator;
 	}
 
 	@Override
@@ -61,28 +72,36 @@ public class LoginHandler implements ISyncHandler {
 		binding.logout(params.getParameter("sid"));
 	}
 
-	private void doLogin(ParametersSource params, XmlResponder responder) {
+	private void doLogin(ParametersSource params, XmlResponder responder){
 		String login = params.getParameter("login");
 		String pass = params.getParameter("password");
 		String origin = params.getParameter("origin");
-
-		if (origin == null) {
-			responder.sendError("login refused with null origin");
-			return;
-		}
-
-		if (logger.isDebugEnabled()) {
-			params.dumpHeaders();
-		}
-		
-		AccessToken token = binding.logUserIn(login, pass, origin, 
-				params.getClientIP(), params.getRemoteIP(), 
-				params.getLemonLdapLogin(), params.getLemonLdapDomain());
-		if (token != null) {
-			responder.sendToken(token);
-		} else {
-			responder.sendError("Login failed for user '" + login
+		try{
+			if (origin == null) {
+				responder.sendError("login refused with null origin");
+				return;
+			}
+			if (logger.isDebugEnabled()) {
+				params.dumpHeaders();
+			}
+			AccessToken token = binding.logUserIn(login, pass, origin, 
+					params.getClientIP(), params.getRemoteIP(), 
+					params.getLemonLdapLogin(), params.getLemonLdapDomain());
+			if (token != null) {
+				versionValidator.checkObmConnectorVersion(token);
+				responder.sendToken(token);
+			} else {
+				responder.sendError("Login failed for user '" + login
 					+ "' with password '" + pass + "'");
+			}
+		} catch(OBMConnectorVersionException e){
+			logger.error(e.getToken().getOrigin() +" isn't longer suppored. Mail will be sent.");
+			errorMailer.notifyConnectorVersionError(e.getToken(), e
+					.getRequiredMajor().toString(), e.getRequiredMinor()
+					.toString(), e.getRequiredRelease().toString(), settingsDao
+					.getUserLanguage(e.getToken()));
 		}
 	}
+	
+	
 }

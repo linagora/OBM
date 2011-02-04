@@ -22,6 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.server.mailer.EventChangeMailer;
 
 import com.google.common.collect.ImmutableList;
 

@@ -25,17 +25,21 @@ import javax.naming.ConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.sync.auth.AccessToken;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 /**
- * Configuration service, reading from obm_conf.ini file
+ * Configuration service
  */
 @Singleton
 public class ConstantService {
 
 	private static final Log logger = LogFactory.getLog(ConstantService.class);
+	private static final String DEFAULT_TEMPLATE_FOLDER = "/usr/share/obm-sync/template";
+	private static final String OVERRIDE_TEMPLATE_FOLDER = "/etc/obm-sync/template";
+	private static final String OBM_SYNC_MAILER = "x-obm-sync";
 
 	private Properties props;
 
@@ -74,15 +78,28 @@ public class ConstantService {
 	public String getLocatorUrl() throws ConfigurationException {
 		String locatorHost = getStringValue("host");
 		if (locatorHost == null) {
-			throw new ConfigurationException("Missing host key in configuration");
+			throw new ConfigurationException(
+					"Missing host key in configuration");
 		}
-		return "https://"+ locatorHost + ":8084/";
+		return "https://" + locatorHost + ":8084/";
 	}
-	
+
 	public String getObmUIBaseUrl() {
 		String protocol = getStringValue("external-protocol");
 		String hostname = getStringValue("external-url");
 		String path = getStringValue("obm-prefix");
 		return protocol + "://" + hostname + path;
+	}
+
+	public String getDefaultTemplateFolder() {
+		return DEFAULT_TEMPLATE_FOLDER;
+	}
+
+	public String getOverrideTemplateFolder() {
+		return OVERRIDE_TEMPLATE_FOLDER;
+	}
+
+	public String getObmSyncMailer(AccessToken at) {
+		return OBM_SYNC_MAILER + "@" + at.getDomain();
 	}
 }

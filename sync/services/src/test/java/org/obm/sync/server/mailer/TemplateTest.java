@@ -1,4 +1,4 @@
-package fr.aliacom.obm.common.calendar;
+package org.obm.sync.server.mailer;
 
 import java.io.IOException;
 import java.io.StringWriter;

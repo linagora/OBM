@@ -13,6 +13,8 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
+import org.obm.sync.server.mailer.EventChangeMailer;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -22,7 +24,6 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.calendar.EventChangeMailer.NotificationException;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class EventChangeHandler {

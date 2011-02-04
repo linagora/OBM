@@ -42,8 +42,13 @@ public class Messages {
 	public String participationStateAccepted() {
 		return getString("ParticipationStateAccepted");
 	}
+	
 	public String participationStateDeclined() {
 		return getString("ParticipationStateDeclined");
+	}
+
+	public String connectorVersionErrorTitle() {
+		return getString("ConnectorVersionErrorTitle");
 	}
 
 	

@@ -1,12 +1,12 @@
 package org.obm.sync.utils;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Date;
+
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class DateHelperTest {
+public class DateHelperTest extends TestCase{
 
 	@Test
 	public void testHelper() {

@@ -13,7 +13,7 @@ import org.obm.sync.calendar.ParticipationRole;
 
 public class EventChangeHandlerTestsTools {
 
-	static <T, C extends Collection<T>> C compareCollections(C collection) {
+	public static <T, C extends Collection<T>> C compareCollections(C collection) {
 		return EasyMock.cmp(collection, new Comparator<C>() {
 			public int compare(C o1, C o2) {
 				if (o1.size() != o2.size()) {
