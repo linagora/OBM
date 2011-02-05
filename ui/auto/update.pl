@@ -343,6 +343,11 @@ sub _getNameDomainId {
     my $rowResult = $sth->fetchrow_hashref();
     $sth->finish();
 
+	if (! defined($rowResult->{'domain_id'}) ) {
+        print "Impossible de charger l\'ID du domaine OBM ayant pour domaine de messagerie principal $domainName";
+		return undef ;
+	}
+
     return $rowResult->{'domain_id'};
 }
 
