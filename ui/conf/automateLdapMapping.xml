@@ -273,6 +273,10 @@
             <desc name='host_name_current'/>
         </rdn>
         <map>
+            <ldap name='delegation'/>
+            <desc name='host_delegation'/>
+        </map>
+        <map>
             <ldap name='cn'/>
             <desc name='host_name_new'/>
         </map>
