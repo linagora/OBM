@@ -90,5 +90,7 @@ return array(
   "%count% ftp errors" => "%count% erreurs ftp",
   "FTP push has been disabled after %count% errors" => "Le push ftp a été désactivé après %count% erreurs",
   "backup of users and mailshares of domain %domain_name% completed with %count% errors" => "Sauvegarde des utilisateurs et des boites partagées du domaine %domain_name% terminée avec %count% erreurs",
-  "backup of users and mailshares of domain %domain_name% completed successfully" => "Sauvegarde des utilisateurs et des boites partagées du domaine %domain_name% terminée avec succès"
+  "backup of users and mailshares of delegation %delegation% completed with %count% errors" => "Sauvegarde des utilisateurs et des boites partagées de la delegation %delegation% terminée avec %count% erreurs",
+  "backup of users and mailshares of domain %domain_name% completed successfully" => "Sauvegarde des utilisateurs et des boites partagées du domaine %domain_name% terminée avec succès",
+  "backup of users and mailshares of delegation %delegation% completed successfully" => "Sauvegarde des utilisateurs et des boites partagées de la delegation %delegation% terminée avec succès"
 );
