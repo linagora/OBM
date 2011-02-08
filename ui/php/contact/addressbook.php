@@ -269,12 +269,13 @@ class OBM_AddressBook implements OBM_ISearchable {
     if(!$ad->syncable) return true;
     if ($ad->synced) {
       // Remove synchronized addressbook
-      $query = "DELETE FROM SyncedAddressbook WHERE user_id='$uid' AND addressbook_id='$id'";
+      $db->query("DELETE FROM SyncedAddressbook WHERE user_id='$uid' AND addressbook_id='$id'");
+      $db->query("INSERT INTO DeletedSyncedAddressbook VALUES ($uid, $id, NOW())"); 
     } else {
       // Add synchronized addressbook
-      $query = "INSERT INTO SyncedAddressbook VALUES ($uid, $id, NOW())"; 
+      $db->query("INSERT INTO SyncedAddressbook VALUES ($uid, $id, NOW())");
+      $db->query("DELETE FROM DeletedSyncedAddressbook WHERE user_id='$uid' AND addressbook_id='$id'");
     }
-    $db->query($query);
   }
 
   public function __toString() {
