@@ -6,6 +6,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.obm.sync.server.template.ITemplateLoader;
+import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
+
 import com.google.inject.Binder;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
@@ -41,6 +44,7 @@ public class GuiceServletContextListener implements ServletContextListener {
     			binder.bind(DomainService.class).to(DomainCache.class);
     			binder.bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
     			binder.bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
+    			binder.bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
     		}
     	});
     }
