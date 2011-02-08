@@ -3049,6 +3049,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       foreach ($attendee['entity'] as $u_id => $entity) {
         $label = $entity['label'];
         $state = $entity['state'];
+        $is_organizer = $entity['is_organizer'];
+        
+        if ($is_organizer && $state == 'DECLINED') continue;
+        
         $ACCEPTED = '';
         ${'NEEDS-ACTION'} = '';
         $DECLINED = '';
@@ -4328,6 +4332,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   // user select
   if (is_array($users['entity'])) {
     foreach ($users['entity'] as $u_id => $u_ent) {
+      if (isset($u_ent['state']) && isset($u_ent['is_organizer']) 
+          && $u_ent['state'] == 'DECLINED' && $u_ent['is_organizer'] === true)
+          continue;
+      
       $u_name = $u_ent['label'];
       $sel_id = "data-user-$u_id";
       $div_id = "sel_user_id-$sel_id";
