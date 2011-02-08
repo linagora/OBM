@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.sync.server.mailer.AbstractMailer;
 
 import com.google.inject.Inject;
 
@@ -18,8 +19,7 @@ import freemarker.template.Template;
 public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader{
 	
 
-	private static final Log logger = LogFactory
-		.getLog(CalendarBindingImpl.class);
+	private static final Log logger = LogFactory.getLog(CalendarBindingImpl.class);
 	
 	
 	private ConstantService constantService;
@@ -30,9 +30,9 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader{
 	}
 	
 	
-	private Configuration getDefaultCfg() throws IOException{
+	private Configuration getDefaultCfg() {
 		Configuration externalCfg = new Configuration();
-		externalCfg.setDirectoryForTemplateLoading(new File(constantService.getDefaultTemplateFolder()));
+		externalCfg.setClassForTemplateLoading(AbstractMailer.class, "template");
 		return externalCfg;
 	}
 	
