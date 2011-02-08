@@ -1,4 +1,3 @@
-La synchronisation de votre agenda et de vos contacts n'a pas pu aboutir car la
-version de l'extension "OBM Connector" que vous utilisez est obsolète.
-Merci de contacter votre administrateur afin qu'il vous fournisse une mise à
-jour.
+Due to an incorrect version of the "OBM Connector" add-on used, the synchronisation of your calendar and contacts failed.
+Please contact your administrator and request an update or download it at the following address:
+http://obm.org/mozilla-addons/obm-connector/obm-connector-${version}.xpi .

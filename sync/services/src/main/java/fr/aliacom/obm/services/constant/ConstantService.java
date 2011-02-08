@@ -37,8 +37,8 @@ import com.google.inject.Singleton;
 public class ConstantService {
 
 	private static final Log logger = LogFactory.getLog(ConstantService.class);
-	private static final String DEFAULT_TEMPLATE_FOLDER = "/usr/share/obm-sync/template";
-	private static final String OVERRIDE_TEMPLATE_FOLDER = "/etc/obm-sync/template";
+	private static final String DEFAULT_TEMPLATE_FOLDER = "/usr/share/obm-sync/resources";
+	private static final String OVERRIDE_TEMPLATE_FOLDER = "/etc/obm-sync/resources";
 	private static final String OBM_SYNC_MAILER = "x-obm-sync";
 
 	private Properties props;

@@ -39,7 +39,7 @@ public class EventChangeMailer extends AbstractMailer{
 	private final String baseUrl;
 	
 	@Inject
-	/* package */ EventChangeMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader) throws IOException {
+	/* package */ EventChangeMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader) {
 		super(mailService, constantService, templateLoader);
 		this.baseUrl = constantService.getObmUIBaseUrl();
 	}

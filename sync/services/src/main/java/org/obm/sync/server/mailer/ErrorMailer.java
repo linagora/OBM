@@ -15,7 +15,6 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.server.handler.ErrorMail;
 import org.obm.sync.server.template.ITemplateLoader;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
@@ -26,22 +25,21 @@ import fr.aliacom.obm.services.constant.ConstantService;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-public class ErrorMailer extends AbstractMailer{
+public class ErrorMailer extends AbstractMailer {
 
 	@Inject
-	protected ErrorMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader)
-			throws IOException {
+	protected ErrorMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader) {
 		super(mailService, constantService, templateLoader);
 	}
 	
-	public void notifyConnectorVersionError(AccessToken at, String minMajor, String minMinor, String minRelease, Locale locale) throws NotificationException {
+	public void notifyConnectorVersionError(AccessToken at, String version, Locale locale) throws NotificationException {
 		try {
 			ErrorMail mail = 
 				new ErrorMail(
 						getSystemAddress(at), 
 						convertAccessTokenToAddresse(at), 
 						connectorVersionErrorTitle(locale), 
-						newUserBodyTxt(minMajor, minMinor, minRelease,locale));
+						newUserBodyTxt(version,locale));
 			sendNotificationMessage(mail, ImmutableList.of(convertAccessTokenToAddresse(at)));
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -62,27 +60,24 @@ public class ErrorMailer extends AbstractMailer{
 	}
 	
 	
-	private String newUserBodyTxt(String major, String minor, String release, Locale locale) throws IOException, TemplateException {
-		return applyOBMConnectorVersionOnTemplate("OBMConnectorErrorVersionPlain.tpl", major, minor, release, locale);
+	private String newUserBodyTxt(String version, Locale locale) throws IOException, TemplateException {
+		return applyOBMConnectorVersionOnTemplate("OBMConnectorErrorVersionPlain.tpl", version, locale);
 	}
 	
-	private void sendNotificationMessage(ErrorMail mail, List<InternetAddress>  addresses) throws MessagingException, IOException{
+	private void sendNotificationMessage(ErrorMail mail, List<InternetAddress>  addresses) throws MessagingException {
 		MimeMessage mimeMail = mail.buildMimeMail(session);
 		mailService.sendMessage(session, addresses, mimeMail);
 	}
 	
-	private String applyOBMConnectorVersionOnTemplate(String templateName, String major, String minor, String release, Locale locale)
+	private String applyOBMConnectorVersionOnTemplate(String templateName, String version, Locale locale)
 			throws IOException, TemplateException {
-		Builder<Object, Object> builder = buildOBMConnectorVersionDatamodel(major, minor, release);
+		Builder<Object, Object> builder = buildOBMConnectorVersionDatamodel(version);
 		Template template = templateLoader.getTemplate(templateName, locale);
 		return applyTemplate(builder.build(), template);
 	}
 	
-	private Builder<Object, Object> buildOBMConnectorVersionDatamodel(String major, String minor, String release) {
-		Builder<Object, Object> datamodel = ImmutableMap.builder()
-			.put("major", Strings.nullToEmpty(major))
-			.put("minor", Strings.nullToEmpty(minor))
-			.put("release", Strings.nullToEmpty(release));
+	private Builder<Object, Object> buildOBMConnectorVersionDatamodel(String version) {
+		Builder<Object, Object> datamodel = ImmutableMap.builder().put("version", version);
 		return datamodel;
 	}
 }

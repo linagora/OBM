@@ -2,32 +2,31 @@ package org.obm.sync.auth;
 
 public class ConnectorVersion implements Comparable<ConnectorVersion> {
 
-	private Integer major;
-	private Integer minor;
-	private Integer release;
-	private Integer subRelease;
+	private int major;
+	private int minor;
+	private int release;
+	private int subRelease;
 
-	public ConnectorVersion(Integer major, Integer minor, Integer release,
-			Integer subRelease) {
+	public ConnectorVersion(int major, int minor, int release, int subRelease) {
 		this.major = major;
 		this.minor = minor;
 		this.release = release;
 		this.subRelease = subRelease;
 	}
 
-	public Integer getMajor() {
+	public int getMajor() {
 		return major;
 	}
 
-	public Integer getMinor() {
+	public int getMinor() {
 		return minor;
 	}
 
-	public Integer getRelease() {
+	public int getRelease() {
 		return release;
 	}
 
-	public Integer getSubRelease() {
+	public int getSubRelease() {
 		return subRelease;
 	}
 
@@ -43,5 +42,10 @@ public class ConnectorVersion implements Comparable<ConnectorVersion> {
 			return subRelease > o.subRelease ? 10 : -10;
 		}
 		return 0;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("%d.%d.%d.%d", major, minor, release, subRelease); 
 	}
 }

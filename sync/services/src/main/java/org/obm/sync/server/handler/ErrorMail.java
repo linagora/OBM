@@ -1,7 +1,5 @@
 package org.obm.sync.server.handler;
 
-import java.io.IOException;
-
 import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -24,7 +22,7 @@ public class ErrorMail {
 	}
 	
 	
-	public MimeMessage buildMimeMail(Session session) throws MessagingException, IOException {
+	public MimeMessage buildMimeMail(Session session) throws MessagingException {
 		MimeMessage message = new MimeMessage(session);
 		message.setFrom(from);
 		message.setRecipient(RecipientType.TO, to);

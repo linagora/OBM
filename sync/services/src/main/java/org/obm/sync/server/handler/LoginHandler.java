@@ -96,12 +96,9 @@ public class LoginHandler implements ISyncHandler {
 			}
 		} catch(OBMConnectorVersionException e){
 			logger.error(e.getToken().getOrigin() +" isn't longer suppored. Mail will be sent.");
-			errorMailer.notifyConnectorVersionError(e.getToken(), e
-					.getRequiredMajor().toString(), e.getRequiredMinor()
-					.toString(), e.getRequiredRelease().toString(), settingsDao
-					.getUserLanguage(e.getToken()));
+			errorMailer.notifyConnectorVersionError(e.getToken(),
+					e.getConnectorVersion().toString(),
+					settingsDao.getUserLanguage(e.getToken()));
 		}
 	}
-	
-	
 }

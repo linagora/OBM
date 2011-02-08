@@ -134,9 +134,9 @@ public class ErrorMailerTest {
 			}
 		}
 
-		protected void checkPlainMessage(String plainText) throws IOException, MessagingException {
+		protected void checkPlainMessage(String plainText) {
 			Assert.assertThat(plainText, IsInstanceOf.instanceOf(String.class));
-			String text = (String) plainText;
+			String text = plainText;
 			checkStringContains(text, getExpectedPlainStrings());
 		}
 		
@@ -150,7 +150,7 @@ public class ErrorMailerTest {
 
 		@Override
 		protected void executeProcess(ErrorMailer errorMailer) {
-			errorMailer.notifyConnectorVersionError(getMockAccessToken(), "1", "1", "1", Locale.FRENCH);
+			errorMailer.notifyConnectorVersionError(getMockAccessToken(), "1.1.1", Locale.FRENCH);
 		}
 		
 		@Test

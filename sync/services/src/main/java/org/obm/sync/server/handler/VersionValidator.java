@@ -20,16 +20,11 @@ public class VersionValidator {
 	// thunderbird[ext: 2.4.1.8-rc11, light: 1.0b2]
 	public void checkObmConnectorVersion(AccessToken token)
 			throws OBMConnectorVersionException {
-		if (token.getOrigin() != null
-				&& token.getOrigin().startsWith("thunderbird")) {
-			ConnectorVersion actualVersion = parseConnectorVersionString(token
-					.getOrigin());
+		String origin = token.getOrigin();
+		if (origin != null && origin.startsWith("thunderbird")) {
+			ConnectorVersion actualVersion = parseConnectorVersionString(origin);
 			if (actualVersion.compareTo(obmConnectorRequiredVersion) < 0) {
-				throw new OBMConnectorVersionException(token,
-						obmConnectorRequiredVersion.getMajor(),
-						obmConnectorRequiredVersion.getMinor(),
-						obmConnectorRequiredVersion.getRelease(),
-						obmConnectorRequiredVersion.getSubRelease());
+				throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
 			}
 		}
 	}
@@ -40,34 +35,29 @@ public class VersionValidator {
 		if (extVertion != null) {
 			StringTokenizer token = new StringTokenizer(extVertion, ".");
 			if (token.hasMoreTokens()) {
-				try {
-					Integer major = getNext(token);
-					Integer minor = getNext(token);
-					Integer release = getNext(token);
-					Integer subRelease = 0;
-					// 8-rc11
-					String tokenSubRelease = getNextString(token);
-					token = new StringTokenizer(tokenSubRelease, "-");
-					if (token.hasMoreTokens()) {
-						subRelease = getNext(token);
-					} else {
-						subRelease = getInteger(tokenSubRelease);
-					}
-					return new ConnectorVersion(major, minor, release,
-							subRelease);
-
-				} catch (NumberFormatException e) {
+				int major = getNextInteger(token);
+				int minor = getNextInteger(token);
+				int release = getNextInteger(token);
+				int subRelease = 0;
+				// 8-rc11
+				String tokenSubRelease = getNextString(token);
+				token = new StringTokenizer(tokenSubRelease, "-");
+				if (token.hasMoreTokens()) {
+					subRelease = getNextInteger(token);
+				} else {
+					subRelease = getInteger(tokenSubRelease);
 				}
+				return new ConnectorVersion(major, minor, release, subRelease);
 			}
 		}
 		return new ConnectorVersion(0, 0, 0, 0);
 	}
 
-	private Integer getNext(StringTokenizer token) {
+	private Integer getNextInteger(StringTokenizer token) {
 		return getInteger(getNextString(token));
 	}
 
-	private Integer getInteger(String s) {
+	private int getInteger(String s) {
 		try {
 			return Integer.parseInt(s);
 		} catch (NumberFormatException e) {
@@ -88,8 +78,7 @@ public class VersionValidator {
 		if (indStart >= 0) {
 			int indEnd = origin.indexOf(",", indStart);
 			if (indEnd >= 0) {
-				return origin.substring(indStart + "thunderbird[ext:".length(),
-						indEnd).trim();
+				return origin.substring(indStart + "thunderbird[ext:".length(),	indEnd).trim();
 			}
 		}
 		return null;
