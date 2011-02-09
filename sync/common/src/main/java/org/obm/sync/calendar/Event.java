@@ -318,8 +318,8 @@ public class Event {
 	public boolean isEventInThePast() {
 		Date end = getEndDate();
 		Date now = new Date();
-		if (end.before(now) == true) {
-			if (getRecurrence() != null && getRecurrence().getKind() != RecurrenceKind.none) {
+		if (end != null && end.before(now) == true) {
+			if (getRecurrence() != null && getRecurrence().getEnd() != null && getRecurrence().getKind() != RecurrenceKind.none ) {
 				return getRecurrence().getEnd().before(now);
 			}
 			return true;
