@@ -75,11 +75,11 @@ public class SolrHelper {
 
 		sContact = new CommonsHttpSolrServer("http://"
 				+ lc.getServiceLocation("solr/contact", at.getUser() + "@"
-						+ domain) + ":8080/solr/contact", client);
+						+ at.getDomain()) + ":8080/solr/contact", client);
 
 		sEvent = new CommonsHttpSolrServer("http://"
 				+ lc.getServiceLocation("solr/event", at.getUser() + "@"
-						+ domain) + ":8080/solr/event", client);
+						+ at.getDomain()) + ":8080/solr/event", client);
 	}
 	
 	public CommonsHttpSolrServer getSolrContact(){
