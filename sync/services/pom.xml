@@ -90,7 +90,18 @@
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
 			<version>1.4.1</version>
+			<exclusions>
+			        <exclusion>
+			          <groupId>org.slf4j</groupId>
+		        	  <artifactId>slf4j-api</artifactId>
+			      	</exclusion>
+		      </exclusions>
 		</dependency>
+		<dependency>
+        		<groupId>org.slf4j</groupId>
+		        <artifactId>slf4j-simple</artifactId>
+	        	<version>1.5.8</version>
+	        </dependency> 
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
