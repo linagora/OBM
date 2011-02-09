@@ -348,8 +348,10 @@ ALTER TABLE deletedevent ADD COLUMN deletedevent_event_ext_id character varying(
 
 --
 -- update category_code length to 20
+-- add unicity constraint
 --
 ALTER TABLE Category ALTER COLUMN category_code TYPE character varying(20);
+ALTER TABLE Category ADD CONSTRAINT categorycategory_categorycode_uniquekey UNIQUE (category_category,category_code);
 
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed

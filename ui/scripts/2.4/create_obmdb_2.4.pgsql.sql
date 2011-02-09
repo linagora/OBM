@@ -4729,6 +4729,12 @@ ALTER TABLE ONLY calendarentity
 ALTER TABLE ONLY category
     ADD CONSTRAINT category_pkey PRIMARY KEY (category_id);
 
+--
+-- Name: categorycategory_categorycode_uniquekey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY category
+    ADD CONSTRAINT categorycategory_categorycode_uniquekey UNIQUE (category_category,category_code);
 
 --
 -- Name: categorylink_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
