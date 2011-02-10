@@ -53,7 +53,7 @@ public class SettingHandler extends SecureSyncHandler {
 	@Override
 	public void handle(String method, ParametersSource params, XmlResponder responder)
 		throws Exception {
-		AccessToken at = getToken(params);
+		AccessToken at = getCheckedToken(params);
 		if ("getSettings".equals(method)) {
 			getSettings(at, responder);
 		} else if ("setVacationSettings".equals(method)) {
