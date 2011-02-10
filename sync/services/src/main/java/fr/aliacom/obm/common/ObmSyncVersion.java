@@ -17,6 +17,8 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common;
 
+import java.util.StringTokenizer;
+
 import org.obm.sync.auth.VersionInfo;
 
 // versionning MAJOR.MINOR.RELEASE
@@ -24,15 +26,39 @@ import org.obm.sync.auth.VersionInfo;
 public final class ObmSyncVersion {
 
 	public static final VersionInfo current() {
+		Package p = ObmSyncVersion.class.getPackage();
+		return parseImplementationVersion(p.getImplementationVersion());
+	}
+
+	// 2.3.22-SNAPSHOT
+	private static VersionInfo parseImplementationVersion(
+			String implementationVersion) {
 		VersionInfo version = new VersionInfo();
-		version.setMajor(ObmSyncVersion.MAJOR);
-		version.setMinor(ObmSyncVersion.MINOR);
-		version.setRelease(ObmSyncVersion.RELEASE);
+		StringTokenizer token = new StringTokenizer(implementationVersion, ".");
+		if (token.hasMoreTokens()) {
+			String major = getNextString(token);
+			String minor = getNextString(token);
+			String release = "0";
+			// 22-SNAPSHOT
+			String tokenSubRelease = getNextString(token);
+			token = new StringTokenizer(tokenSubRelease, "-");
+			if (token.hasMoreTokens()) {
+				release = getNextString(token);
+			} else {
+				release = tokenSubRelease;
+			}
+
+			version.setMajor(major);
+			version.setMinor(minor);
+			version.setRelease(release);
+		}
 		return version;
 	}
-	
-	public static final String MAJOR = "2";
-	public static final String MINOR = "3";
-	public static final String RELEASE = "16";
 
+	private static String getNextString(StringTokenizer token) {
+		if (token.hasMoreTokens()) {
+			return token.nextToken();
+		}
+		return "0";
+	}
 }

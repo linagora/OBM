@@ -142,6 +142,11 @@
 				<version>2.1.1</version>
 				<configuration>
 					<archiveClasses>true</archiveClasses>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>

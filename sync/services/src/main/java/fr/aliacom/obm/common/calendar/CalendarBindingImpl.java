@@ -771,7 +771,7 @@ public class CalendarBindingImpl implements ICalendar {
 				boolean changed = calendarService.changeParticipationState(token, calendarOwner, extId, participationState);
 				Event newEvent = calendarService.findEventByExtId(token, calendarOwner, extId);
 				if (newEvent != null) {
-				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
+					eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
 						settingsDao.getUserLanguage(token));
 				} else {
 					logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
