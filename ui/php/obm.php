@@ -183,6 +183,9 @@ function get_obm_params() {
 function dis_logout_detail() {
   global $l_connection_end, $l_reconnect, $l_obm_title, $obm_version, $path, $cgp_host;
   header("location: $path/obm.php");
+  if (function_exists("horde_logout")) {
+    horde_logout() ;
+  }
   $block = "
 <table width=\"100%\">
 <tr>
