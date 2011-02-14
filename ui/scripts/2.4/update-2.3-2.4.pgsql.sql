@@ -2,8 +2,6 @@
 UPDATE ObmInfo SET obminfo_value='2.3.x->2.4.0' WHERE obminfo_name='db_version';
 -- -----------------------------------------------------------------------------
 
-
-
 --
 -- Table structure for `calendarcolor`
 --
@@ -91,11 +89,17 @@ ALTER updatedlinks_delegation TYPE character varying(256);
 --
 -- Update userobm
 --
-ALTER TABLE userobm 
+ALTER TABLE userobm
+ADD COLUMN userobm_commonname varchar(256) default '', 
 ALTER userobm_delegation TYPE character varying(256),
 ALTER userobm_delegation_target TYPE character varying(256),
 ALTER userobm_login TYPE character varying(64);
 
+--
+-- Update contact
+--
+ALTER TABLE contact
+ADD COLUMN contact_commonname varchar(256) default '';
 --
 -- Update p_userobm
 --
