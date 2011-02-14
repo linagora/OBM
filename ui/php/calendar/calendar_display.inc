@@ -3745,6 +3745,12 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
 
     // If new event, add the optionnal new users (here to get the user's infos)
     if ($action == 'new') {      
+      // Entities from Freebusy OR from the calendar select in the quick form popup
+      if (is_array($calendar['new_user_id'])) $users_id = $calendar['new_user_id'];
+      if (is_array($calendar['new_group_id'])) $groups_id = $calendar['new_group_id'];
+      if (is_array($calendar['new_resource_id'])) $res_id = $calendar['new_resource_id'];
+      if (is_array($calendar['new_contact_id'])) $contacts_id = $calendar['new_contact_id'];
+      
       if (isset($calendar['template_id'])) {
         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
         $users_id = array_merge($users_id, $template_entities['user']);
@@ -3752,16 +3758,6 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
         $res_id = array_merge($res_id, $template_entities['resource']);
         $groups_id = array_merge($groups_id, $template_entities['group']);
         $documents_id = array_merge($documents_id, $template_entities['document']);
-      }
-      
-      // Entities from Freebusy
-      if (is_array($calendar['new_user_id'])) $users_id = $calendar['new_user_id'];
-      if (is_array($calendar['new_group_id'])) $groups_id = $calendar['new_group_id'];
-      if (is_array($calendar['new_resource_id'])) $res_id = $calendar['new_resource_id'];
-      if (is_array($calendar['new_contact_id'])) $contacts_id = $calendar['new_contact_id'];
-
-      if (!isset($calendar['new_meeting'])) { 
-       $users_id = array($obm['uid']);
       }
     }
 

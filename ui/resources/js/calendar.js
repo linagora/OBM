@@ -2276,7 +2276,8 @@ Obm.CalendarQuickForm = new Class({
     this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='
       +encodeURIComponent(this.eventData.date_begin)+'&duration='
       +this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)
-      +'&new_user_id[]='+this.eventData.entity_id;
+      +'&new_user_id[]='+this.eventData.entity_id
+      +'&owner='+this.eventData.entity_id;
     if ($chk($('template_id'))) {
       if($('template_id').value > 0) {
         this.gotoURI += '&template_id='+$('template_id').value;
