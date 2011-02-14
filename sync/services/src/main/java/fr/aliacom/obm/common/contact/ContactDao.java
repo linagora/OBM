@@ -40,6 +40,7 @@ import java.util.TreeSet;
 
 import javax.transaction.UserTransaction;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -309,7 +310,7 @@ public class ContactDao {
 			createOrUpdatePhones(con, entityId, c.getPhones());
 			createOrUpdateAddresses(con, entityId, c.getAddresses());
 			createOrUpdateEmails(con, entityId, c.getEmails());
-			createOrUpdateWebsites(con, entityId, c.getWebsites());
+			createOrUpdateWebsites(con, entityId,c, c.getWebsites());
 			createOrUpdateIMIdentifiers(con, entityId, c.getImIdentifiers());
 			c.setUid(contactId);
 		} catch (Throwable se) {
@@ -486,7 +487,7 @@ public class ContactDao {
 		}
 	}
 
-	private void createOrUpdateWebsites(Connection con, int entityId,
+	private void createOrUpdateWebsites(Connection con, int entityId, Contact c,
 			Map<String, Website> websites) throws SQLException {
 		PreparedStatement ps = null;
 		try {
@@ -500,12 +501,22 @@ public class ContactDao {
 			ps = con
 					.prepareStatement("INSERT INTO Website (website_entity_id, website_label, website_url) "
 							+ "VALUES (?, ?, ?)");
-			for (String s : websites.keySet()) {
+			if( !StringUtils.isEmpty(c.getCalUri())){
 				ps.setInt(1, entityId);
-				ps.setString(2, s);
-				ps.setString(3, websites.get(s).getUrl());
+				ps.setString(2, "CALURI;X-OBM-Ref1");
+				ps.setString(3, c.getCalUri());
 				ps.addBatch();
 			}
+			for (String s : websites.keySet()) {
+				if(!s.toLowerCase().startsWith("caluri") || !websites.get(s).getUrl().equals(c.getCalUri())){
+					ps.setInt(1, entityId);
+					ps.setString(2, s);
+					ps.setString(3, websites.get(s).getUrl());
+					ps.addBatch();
+				}
+			}
+			
+			
 			ps.executeBatch();
 		} finally {
 			obmHelper.cleanup(null, ps, null);
@@ -759,7 +770,7 @@ public class ContactDao {
 			createOrUpdateAddresses(con, c.getEntityId(), c.getAddresses());
 			createOrUpdateEmails(con, c.getEntityId(), c.getEmails());
 			createOrUpdatePhones(con, c.getEntityId(), c.getPhones());
-			createOrUpdateWebsites(con, c.getEntityId(), c.getWebsites());
+			createOrUpdateWebsites(con, c.getEntityId(), c, c.getWebsites());
 			createOrUpdateIMIdentifiers(con, c.getEntityId(), c
 					.getImIdentifiers());
 			ut.commit();
@@ -918,8 +929,13 @@ public class ContactDao {
 			rs = st.executeQuery(q);
 			while (rs.next()) {
 				Contact c = entityContact.get(rs.getInt(1));
-				Website w = new Website(rs.getString(3));
-				c.addWebsite(rs.getString(2), w);
+				String label = rs.getString(2);
+				String value = rs.getString(3);
+				if(c.getCalUri() ==  null && label.toLowerCase().startsWith("caluri")){
+					c.setCalUri(value);
+				}
+				Website w = new Website(value);
+				c.addWebsite(label, w);
 			}
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);

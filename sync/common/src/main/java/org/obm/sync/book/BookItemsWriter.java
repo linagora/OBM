@@ -59,7 +59,8 @@ public class BookItemsWriter extends AbstractItemsWriter {
 			anni = DateHelper.asString(contact.getAnniversary());
 		}
 		createIfNotNull(c, "anniversary", anni);
-
+		createIfNotNull(c, "caluri", contact.getCalUri());
+		
 		addPhones(c, contact.getPhones());
 		addAddress(c, contact.getAddresses());
 		addWebsite(c, contact.getWebsites());

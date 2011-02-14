@@ -63,7 +63,7 @@ public class BookItemsParser extends AbstractItemsParser {
 		c.setManager(s(root, "manager"));
 		c.setSpouse(s(root, "spouse"));
 		c.setFolderId(i(root, "addressbookid"));
-		
+		c.setCalUri(s(root, "caluri"));
 		String bday = s(root, "birthday");
 		if (bday != null && bday.length() > 0) {
 			c.setBirthday(DateHelper.asDate(bday));
@@ -73,6 +73,7 @@ public class BookItemsParser extends AbstractItemsParser {
 		if (anniv != null && anniv.length() > 0) {
 			c.setAnniversary(DateHelper.asDate(anniv));
 		}
+		
 
 		parsePhones(c, DOMUtils.getUniqueElement(root, "phones"));
 		parseInstantMessagingIdentifiers(c, DOMUtils.getUniqueElement(root,

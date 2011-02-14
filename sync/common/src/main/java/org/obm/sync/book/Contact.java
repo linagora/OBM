@@ -35,6 +35,8 @@ public class Contact {
 
 	private boolean collected;
 
+	private String calUri;
+	
 	private Map<String, Phone> phones;
 	private Map<String, Website> websites;
 	private Map<String, Email> emails;
@@ -248,6 +250,14 @@ public class Contact {
 
 	public Integer getFolderId() {
 		return folderId;
+	}
+
+	public String getCalUri() {
+		return calUri;
+	}
+
+	public void setCalUri(String calUri) {
+		this.calUri = calUri;
 	}
 
 }

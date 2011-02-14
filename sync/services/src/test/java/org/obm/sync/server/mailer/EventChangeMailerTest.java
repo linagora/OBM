@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
@@ -106,6 +107,7 @@ public class EventChangeMailerTest {
 
 		protected Date date(int year, int month, int day, int hour, int minute) {
 			Calendar calendar = GregorianCalendar.getInstance();
+			calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
 			calendar.set(year, month, day, hour, minute, 0);
 			Date refDate = calendar.getTime();
 			return refDate;
@@ -145,7 +147,7 @@ public class EventChangeMailerTest {
 			event.setTitle("Sprint planning OBM");
 			event.setOwner("Raphael ROUGERON");
 			event.setOwnerEmail("rrougeron@linagora.com");
-			event.setDate(date(2010, 10, 8, 11, 00));
+			event.setDate(date(2010, 10, 8, 10, 00));
 			event.setExtId("f1514f44bf39311568d64072c1fec10f47fe");
 			event.setDuration(2700);
 			event.setUid("1354");
@@ -326,7 +328,7 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event before = buildTestEvent();
 			Event after = before.clone();
-			after.setDate(date(2010, 10, 8, 12, 00));
+			after.setDate(date(2010, 10, 8, 11, 00));
 			after.setDuration(3600);
 			eventChangeMailer.notifyUpdateUsers(getStubAccessToken(), before.getAttendees(), before, after, Locale.FRENCH);
 		}
