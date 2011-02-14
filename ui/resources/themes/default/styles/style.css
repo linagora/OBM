@@ -211,7 +211,7 @@ form {
 
 #mainPanel {
   z-index:100;
-  min-width: 120px;
+  min-width: 800px;
   margin: 0 0px 0px 17.5em;
   padding: 2em 1em 0em;
 /*IE workaround*/
@@ -230,6 +230,7 @@ form {
 
 #banner {
   width: 100%;
+  min-width: 1002px;
   height: 2.3em;
   line-height: 2.3em;
   background-color: #e1e1e1;

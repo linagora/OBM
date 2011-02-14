@@ -25,6 +25,13 @@
   -webkit-user-select:none;
 }
 
+#calendarBody{
+  /* height necessary to display the full calendar (0 -> 24)
+  min-height: 1008px;*/
+  min-height: 330px;
+  overflow-y: none;
+}
+
 #calendarNavBar {
   padding-left: 10px;
   padding-top:4px;
