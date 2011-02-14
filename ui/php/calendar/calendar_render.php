@@ -183,6 +183,7 @@ $display['search'] = dis_calendar_view_bar($current_view,  $params);
 $_SESSION['cal_current_view'] = serialize($current_view);
 
 if (!$params['ajax']) {
+  beautify_title($module, $action);
   $display['head'] = display_head($l_calendar);
   $display['end'] = display_end();
 }

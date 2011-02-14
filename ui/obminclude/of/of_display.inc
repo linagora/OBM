@@ -882,7 +882,7 @@ function display_page(&$display) {
       die();
     }
   }
-
+  
   // If header is null, display only the detail (Popup windows)
   if ($display['header'] == '') {
     echo $display['head'] . 
@@ -1371,19 +1371,7 @@ function display_actions($section, $module) {
   global $modules, $action, $display;
   global $actions, $perm, $display;
 
-  $mod_title = $GLOBALS["l_module_$module"];
-  if(!empty($actions[$module][$action]['Title'])) {
-    $act_title = '- '.$actions[$module][$action]['Title'].' ';
-  } elseif(!empty($actions[$module][$action]['Name'])) {
-    $act_title = '- '.$actions[$module][$action]['Name'].' ';
-  }
-
-
-  if (empty($display['title'])) {
-    $display['title'] = "<h1 class=\"title\">$mod_title $act_title</h1>";
-  } else if ($display['title'] == strip_tags($display['title'])) {
-    $display['title'] = "<h1 class=\"title\">$mod_title $act_title: $display[title]</h1>";
-  } 
+  beautify_title($module, $action);
 
   if (is_array($actions[$module])) {
     $module_right = $perm->get_module_rights($module); 
@@ -1669,6 +1657,26 @@ function display_debug() {
 function display_title($title) { 
 
   return "<div class=\"title\">$title</div>";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// No comment...
+///////////////////////////////////////////////////////////////////////////////
+function beautify_title($module, $action) {
+  global $actions, $display;
+  
+  $mod_title = $GLOBALS["l_module_$module"];
+  if(!empty($actions[$module][$action]['Title'])) {
+    $act_title = '- '.$actions[$module][$action]['Title'].' ';
+  } elseif(!empty($actions[$module][$action]['Name'])) {
+    $act_title = '- '.$actions[$module][$action]['Name'].' ';
+  }
+
+  if (empty($display['title'])) {
+    $display['title'] = "<h1 class=\"title\">$mod_title $act_title</h1>";
+  } else if ($display['title'] == strip_tags($display['title'])) {
+    $display['title'] = "<h1 class=\"title\">$mod_title $act_title: $display[title]</h1>";
+  } 
 }
 
 
