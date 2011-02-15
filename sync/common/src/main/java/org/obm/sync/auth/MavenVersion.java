@@ -1,6 +1,6 @@
 package org.obm.sync.auth;
 
-public class VersionInfo {
+public class MavenVersion {
 	
 	private String major;
 	private String minor;

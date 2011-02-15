@@ -3,9 +3,9 @@ package org.obm.sync.auth;
 public class OBMConnectorVersionException extends Exception {
 
 	private AccessToken token;
-	private ConnectorVersion requiredVersion;
+	private Version requiredVersion;
 	
-	public OBMConnectorVersionException(AccessToken token, ConnectorVersion requiredVersion) {
+	public OBMConnectorVersionException(AccessToken token, Version requiredVersion) {
 		this.token = token;
 		this.requiredVersion = requiredVersion;
 	}
@@ -14,7 +14,7 @@ public class OBMConnectorVersionException extends Exception {
 		return token;
 	}
 
-	public ConnectorVersion getConnectorVersion() {
+	public Version getConnectorVersion() {
 		return requiredVersion;
 	}
 	

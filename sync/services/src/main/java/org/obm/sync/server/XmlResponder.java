@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.VersionInfo;
+import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
@@ -98,7 +98,7 @@ public class XmlResponder {
 			Element root = doc.getDocumentElement();
 			DOMUtils.createElementAndText(root, "sid", at.getSessionId());
 			Element v = DOMUtils.createElement(root, "version");
-			VersionInfo version = at.getVersion();
+			MavenVersion version = at.getVersion();
 			v.setAttribute("major", version.getMajor());
 			v.setAttribute("minor", version.getMinor());
 			v.setAttribute("release", version.getRelease());
