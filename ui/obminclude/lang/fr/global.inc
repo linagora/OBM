@@ -93,6 +93,7 @@ $l_displayname = 'Nom complet';
 $l_displayname_alternative = "[Afficher les informations détaillées]";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
+$l_commonname = "Nom complet";
 $l_title = "Titre";
 $l_label = "Label";
 $l_number = "Numéro";

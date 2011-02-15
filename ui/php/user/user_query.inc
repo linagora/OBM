@@ -28,6 +28,7 @@ function run_query_user_search($user) {
   $login = sql_search_text_parse($user['login']);
   $profile = $user['profile'];
   $domain_id = $user['domain_id'];
+  $cname = sql_search_text_parse($user['commonname']);
   $lname = sql_search_text_parse($user['lastname']);
   $fname = sql_search_text_parse($user['firstname']);
   $delegation = sql_search_text_parse($user['delegation']);
@@ -87,6 +88,12 @@ function run_query_user_search($user) {
      if (trim($where) != '') $where .= ' AND';
      $domain_id = sql_parse_id($domain_id, true);
      $where .= " userobm_domain_id $domain_id ";
+  }
+
+  // If a commonname indication has been specified, get it
+  if (trim($cname) != '') {
+     if (trim($where) != '') $where .= ' AND';
+     $where .= " userobm_commonname #LIKE '$cname%'";
   }
 
   // If a lastname indication has been specified, get it
@@ -369,6 +376,7 @@ function run_query_user_ext_search($user) {
   $query = "SELECT 
       DISTINCT
       userobm_id,
+      userobm_commonname,
       userobm_lastname,
       userobm_firstname,
       userobm_hidden,
@@ -492,6 +500,7 @@ function run_query_user_insert($user) {
   $dateexp = of_isodate_convert($user['dateexp'], true, true);
   $datebegin = ($datebegin ? "'".($datebegin)."'" : 'null');
   $dateexp = ($dateexp ? "'".($dateexp)."'" : 'null');
+  $cname = $user['commonname'];
   $lname = $user['lastname'];
   $fname = $user['firstname'];
   $title = $user['title'];
@@ -655,6 +664,7 @@ function run_query_user_insert($user) {
     userobm_datebegin,
     userobm_account_dateexp,
     userobm_kind,
+    userobm_commonname,
     userobm_lastname,
     userobm_firstname,
     userobm_title,
@@ -699,6 +709,7 @@ function run_query_user_insert($user) {
     $datebegin,
     $dateexp,
     '$kind',
+    '$cname',
     '$lname',
     '$fname',
     '$title',
@@ -911,6 +922,7 @@ function run_query_user_update($u_id, $user) {
   $dateexp = ($dateexp ? "'".($dateexp)."'" : 'null');  
   $hidden = sql_parse_int($user['hidden']);
   $kind = $user['kind'];
+  $cname = $user['commonname'];
   $lname = $user['lastname'];
   $fname = $user['firstname'];
   $title = $user['title'];
@@ -1080,6 +1092,7 @@ function run_query_user_update($u_id, $user) {
     userobm_datebegin = $datebegin,
     userobm_account_dateexp = $dateexp,
     userobm_kind = '$kind',
+    userobm_commonname = '$cname',
     userobm_lastname = '$lname',
     userobm_firstname = '$fname',
     userobm_title = '$title',
@@ -1685,6 +1698,7 @@ function check_user_data_form($p_id, &$user) {
   $profile = $user['profile'];
   $delegation = stripslashes($user['delegation']);
   $delegation_target = stripslashes($user['delegation_target']);
+  $cname = $user['commonname'];
   $lname = $user['lastname'];
   $fname = $user['firstname'];
   $title = $user['title'];

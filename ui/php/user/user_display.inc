@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames['userobm_login'] = $l_login;
+$fieldnames['userobm_commonname'] = $l_commonname;
 $fieldnames['userobm_lastname'] = $l_lastname;
 $fieldnames['userobm_firstname'] = $l_firstname;
 $fieldnames['userobm_email'] = $l_email;
@@ -335,13 +336,14 @@ function html_batch_user_search_form($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
-  global $l_group, $l_phone, $l_desc, $l_find, $l_all, $l_firstname, $l_exp;
+  global $l_group, $l_phone, $l_desc, $l_find, $l_all, $l_firstname, $l_exp, $l_commonname;
   global $l_email, $l_quota, $l_delegation_target, $l_datebegin, $l_mail_server;
   global $display, $c_all, $l_recursive, $obm;
   
   $login = $user['login'];
   $profile = $user['profile'];
   $domain_id = $user['domain_id'];
+  $cname = stripslashes($user['commonname']);
   $lname = stripslashes($user['lastname']);
   $fname = stripslashes($user['firstname']);
   $email = $user['email'];
@@ -440,7 +442,13 @@ function html_user_search_form($user) {
   <input type=\"text\" name=\"tf_firstname\" size=\"16\" maxlength=\"32\" value=\"$fname\" />
 </label>";
   }
-  if ($display_pref['domain_label']['status'] != 0) {
+  if ($display_pref['userobm_commonname']['status'] != 0) {
+    $block .= "
+<label>$l_commonname<br />
+  <input type=\"text\" name=\"tf_commonname\" size=\"16\" maxlength=\"32\" value=\"$cname\" />
+</label>";
+  }
+ if ($display_pref['domain_label']['status'] != 0) {
     $block .= "
 $dis_domain";
   }
@@ -602,6 +610,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
   $login = urlencode($user['login']);
   $lname = urlencode($user['lastname']);
   $fname = urlencode($user['firstname']);
+  $cname = urlencode($user['commonname']);
   $profile = $user['profile'];
   $email = $user['email'];
   $delegation = urlencode($user['delegation']);
@@ -627,7 +636,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;ext_container=$ext_container";
   }
 
-  $url = url_prepare("user_index.php?action=$action&amp;tf_login=$login&amp;tf_phone=$phone&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext$url_userfields");
+  $url = url_prepare("user_index.php?action=$action&amp;tf_login=$login&amp;tf_phone=$phone&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;tf_commonname=$cname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext$url_userfields");
 
   $user_d = new OBM_DISPLAY('DATA', $prefs, 'user');
   if ($popup) {
@@ -727,7 +736,7 @@ function dis_user_consult($user) {
 //   - $obm_q : user database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
-  global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
+  global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname, $l_commonname;
   global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin, $l_dateexp, $l_desc;
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal, $l_title;
   global $l_delegation_target, $l_delegation, $l_direction, $l_service;
@@ -766,6 +775,7 @@ function html_user_consult($obm_q) {
   $kind = $obm_q->f('userobm_kind');
   $lname = $obm_q->f('userobm_lastname');
   $fname = $obm_q->f('userobm_firstname');
+  $cname = $obm_q->f('userobm_commonname');
   $title = $obm_q->f('userobm_title');
   $delegation_target = $obm_q->f('userobm_delegation_target');
   $delegation = $obm_q->f('userobm_delegation');
@@ -1061,6 +1071,10 @@ function html_user_consult($obm_q) {
     <th>$l_firstname</th>
     <td>$fname</td>
   </tr>
+   <tr>
+    <th>$l_commonname</th>
+    <td>$cname</td>
+  </tr> 
   <tr>
     <th>$l_login</th>
     <td>$login</td>
@@ -1495,7 +1509,7 @@ function dis_user_form($action, $user, $field='') {
 //   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($action, $usr_q, $user, $groups, $field='') {
-  global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
+  global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname, $l_commonname;
   global $l_user, $l_title, $l_archive, $l_datebegin, $l_dateexp, $l_noexperie;
   global $l_insert, $l_update, $l_validate;
   global $l_update_valid, $l_change_password_confirm, $l_password_update;
@@ -1541,6 +1555,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $kind = $usr_q->f('userobm_kind');
     $lname = $usr_q->f('userobm_lastname');
     $fname = $usr_q->f('userobm_firstname');
+    $cname = $usr_q->f('userobm_commonname');
     $title = $usr_q->f('userobm_title');
     $delegation_target = $usr_q->f('userobm_delegation_target');
     $delegation = $usr_q->f('userobm_delegation');
@@ -1642,6 +1657,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   if (isset($user['kind'])) { $kind = $user['kind']; }
   if (isset($user['lastname'])) { $lname = stripslashes($user['lastname']); }
   if (isset($user['firstname'])) { $fname = stripslashes($user['firstname']); }
+  if (isset($user['commonname'])) { $cname = stripslashes($user['commonname']); }
   if (isset($user['title'])) { $title = stripslashes($user['title']); }
   if (isset($user['email'])) { $email = stripslashes($user['email']); }
   if (isset($user['datebegin'])) { $datebegin = of_date_upd_format($user['datebegin'],true); }
@@ -2345,6 +2361,10 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     <th class=\"$class[firstname]\">$l_firstname</th>
     <td><input id=\"userFirstname\" name=\"tf_firstname\" size=\"32\" maxlength=\"64\" autocomplete=\"off\" value=\"$fname\" /></td>
   </tr>
+   <tr>
+    <th class=\"$class[commonname]\">$l_commonname</th>
+    <td><input id=\"userCommonname\" name=\"tf_commonname\" size=\"32\" maxlength=\"64\" autocomplete=\"off\" value=\"$cname\" /></td>
+  </tr> 
   <tr>
     <th class=\"$class[login]\">$l_login</th>
     <td>$dis_login</td>
