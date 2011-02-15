@@ -734,7 +734,13 @@ if ($action == 'search') {
 
 } elseif ($action == 'rights_admin') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
+  if(!Obm_Acl::isAllowed($obm['uid'], 'calendar', $params['entity_id'], "admin")){
+    $err['msg'] = $l_insufficient_permission;
+    $display['msg'] .= display_err_msg($err['msg']);
+  }
+  else{
+    $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
+  }
 
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
