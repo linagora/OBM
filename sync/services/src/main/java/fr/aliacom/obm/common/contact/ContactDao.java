@@ -94,7 +94,7 @@ public class ContactDao {
 	private static final String CONTACT_SELECT_FIELDS = "contact_id, contact_firstname, contact_lastname, contactentity_entity_id, "
 			+ "contact_aka, contact_company, contact_title, contact_service, contact_birthday_id, "
 			+ "contact_anniversary_id, contact_middlename, contact_suffix, contact_manager, contact_assistant, contact_spouse, "
-			+ "contact_addressbook_id, contact_comment";
+			+ "contact_addressbook_id, contact_comment, contact_commonname";
 
 	private static final String MY_GROUPS_QUERY = "SELECT groupentity_entity_id FROM of_usergroup "
 			+ "INNER JOIN GroupEntity ON of_usergroup_group_id=groupentity_group_id WHERE of_usergroup_user_id=?";
@@ -287,6 +287,7 @@ public class ContactDao {
 
 		c.setFolderId(rs.getInt(16));
 		c.setComment(rs.getString(17));
+		c.setCommonname(rs.getString(18));
 
 		return c;
 	}
@@ -651,13 +652,14 @@ public class ContactDao {
 
 			ps = con
 					.prepareStatement("INSERT INTO Contact "
-							+ " (contact_firstname, contact_lastname, contact_origin, contact_domain_id, contact_usercreate, "
+							+ " (contact_commonname, contact_firstname, contact_lastname, contact_origin, contact_domain_id, contact_usercreate, "
 							+ "contact_company, contact_aka, contact_service, contact_title, contact_birthday_id, contact_anniversary_id, "
 							+ "contact_timecreate, "
 							+ "contact_suffix, contact_middlename, contact_manager, contact_spouse, contact_assistant, "
 							+ "contact_collected, contact_addressbook_id) "
-							+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), ?, ?, ?, ?, ?, ?, ?) ");
+							+ " VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), ?, ?, ?, ?, ?, ?, ?) ");
 			int idx = 1;
+			ps.setString(idx++, c.getCommonname());
 			ps.setString(idx++, c.getFirstname());
 			ps.setString(idx++, c.getLastname());
 			ps.setString(idx++, at.getOrigin());
@@ -709,7 +711,7 @@ public class ContactDao {
 		}
 
 		String q = "update Contact SET "
-				+ "contact_firstname=?, "
+				+ "contact_commonname=?, contact_firstname=?, "
 				+ "contact_lastname=?, contact_origin=?, contact_userupdate=?, "
 				+ "contact_aka=?, contact_title=?, contact_service=?, contact_company=?, contact_comment=?, "
 				+ "contact_suffix=?, contact_manager=?, contact_middlename=?, contact_assistant=?, contact_spouse=?, contact_anniversary_id=?, contact_birthday_id=? "
@@ -736,6 +738,7 @@ public class ContactDao {
 			ps = con.prepareStatement(q);
 
 			int idx = 1;
+			ps.setString(idx++, c.getCommonname());
 			ps.setString(idx++, c.getFirstname());
 			ps.setString(idx++, c.getLastname());
 			ps.setString(idx++, token.getOrigin());

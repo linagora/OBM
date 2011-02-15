@@ -31,6 +31,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 
 		c.setAttribute("collected", "" + contact.isCollected());
 
+		createIfNotNull(c, "commonname", contact.getCommonname());
 		createIfNotNull(c, "first", contact.getFirstname());
 		createIfNotNull(c, "last", contact.getLastname());
 		createIfNotNull(c, "service", contact.getService());

@@ -57,7 +57,7 @@ public class UserDao {
 		ContactUpdates cu = new ContactUpdates();
 
 		String q = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, "
-				+ "userobm_email, userentity_entity_id, domain_name "
+				+ "userobm_email, userobm_commonname, userentity_entity_id, domain_name "
 				+ "from UserObm "
 				+ "INNER JOIN UserEntity on userobm_id=userentity_user_id "
 				+ "INNER JOIN Domain on userobm_domain_id=domain_id "
@@ -103,6 +103,7 @@ public class UserDao {
 		c.setUid(rs.getInt("userobm_id"));
 		c.setFirstname(rs.getString("userobm_firstname"));
 		c.setLastname(rs.getString("userobm_lastname"));
+		c.setCommonname(rs.getString("userobm_commonname"));
 		c.addEmail("INTERNET;X-OBM-Ref1", new Email(getEmail(rs
 				.getString("userobm_email"), rs.getString("domain_name"))));
 		return c;

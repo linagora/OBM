@@ -49,6 +49,7 @@ public class BookItemsParser extends AbstractItemsParser {
 			c.setCollected(true);
 		}
 		
+		c.setCommonname(s(root, "commonname"));
 		c.setFirstname(s(root, "first"));
 		c.setLastname(s(root, "last"));
 		c.setTitle(s(root, "title"));

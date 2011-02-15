@@ -108,6 +108,7 @@ public class ContactIndexer implements Runnable {
 			f(sid, "addressbookId", rs.getInt("id"));
 			f(sid, "company", rs.getString("contact_company"));
 			f(sid, "companyId", rs.getInt("contact_company_id"));
+			f(sid, "commonname", rs.getString("contact_commonname"));
 			f(sid, "lastname", rs.getString("contact_lastname"));
 			f(sid, "firstname", rs.getString("contact_firstname"));
 			f(sid, "middlename", rs.getString("contact_middlename"));

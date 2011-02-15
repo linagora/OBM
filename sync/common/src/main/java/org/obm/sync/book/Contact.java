@@ -8,6 +8,7 @@ public class Contact {
 
 	private Integer uid;
 
+	private String commonname;
 	private String firstname;
 	private String lastname;
 	private String middlename;
@@ -50,6 +51,14 @@ public class Contact {
 		addresses = new HashMap<String, Address>();
 		imIdentifiers = new HashMap<String, InstantMessagingId>();
 		collected = false;
+	}
+
+	public String getCommonname() {
+		return commonname;
+	}
+
+	public void setCommonname(String commonname) {
+		this.commonname = commonname;
 	}
 
 	public String getFirstname() {
