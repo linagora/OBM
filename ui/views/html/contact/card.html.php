@@ -49,6 +49,13 @@
               </li>
               <?php } ?> 
 
+              <!-- if archived, remove from archives-->
+              <?php if($addressbooks[$contact->addressbook_id]->write && $contact->archive ) { ?>
+              <li>
+                <a href="<?php echo self::__actionlink('removeFromArchive', array('contact_id' => $contact->id)) ?>"><?php echo __('Remove from archive') ?></a>
+              </li>
+              <?php } ?> 
+
               <!-- Export -->
               <li>
                 <a href="<?php echo self::__actionlink('vcard', array('contact_id' => $contact->id)) ?>"><?php echo __('Export as Vcard') ?></a>

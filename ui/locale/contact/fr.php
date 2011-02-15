@@ -38,6 +38,7 @@ return array(
   'Contact photo' => 'Photographie',
   'Copy' => 'Copier',
   'Move' => 'Déplacer',
+  'Remove from archive' => 'Restaurer',
   'CRM Fields' => 'Informations commerciales',
   'Datasource' => 'Source de données',
   'Date' =>  'Date',

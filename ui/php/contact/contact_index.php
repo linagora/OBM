@@ -365,6 +365,26 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       echo OBM_Error::getInstance()->toJson();
       exit();
     }
+   } elseif ($action == 'removeFromArchive')  {
+  ///////////////////////////////////////////////////////////////////////////////
+    $addressbooks = OBM_AddressBook::search();
+    if (isset($params['contact_id'])) {
+      $contact = OBM_Contact::get($params['contact_id'], null, false);
+      $addressbook = $addressbooks[$contact->addressbook_id];
+      if ($addressbook && $addressbook->write && (check_contact_update_rights($params))) {
+        OBM_Contact::removeFromArchive($contact);
+      } else {
+        header('HTTP', true, 403);
+        OBM_Error::getInstance()->addError('rights', __('Permission denied'));
+        echo OBM_Error::getInstance()->toJson();
+        exit();
+      }
+    } else {
+      header('HTTP', true, 403);
+      OBM_Error::getInstance()->addError('rights', __('Permission denied'));
+      echo OBM_Error::getInstance()->toJson();
+      exit();
+    }
   } elseif ($action == 'storeContact') {
   ///////////////////////////////////////////////////////////////////////////////
     $addressbooks = OBM_AddressBook::search();
@@ -653,6 +673,13 @@ function get_contact_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );  
+
+  $actions['contact']['removeFromArchive'] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contact/contact_index.php?action=removeFromArchive",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  ); 
   $actions['contact']['storeContact'] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/contact/contact_index.php?action=storeContact",

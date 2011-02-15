@@ -672,13 +672,40 @@ class OBM_Contact implements OBM_ISearchable {
     $uid = $GLOBALS['obm']['uid'];
     $sql_id = sql_parse_id($contact->id, true);
     $multidomain = sql_multidomain('contact');
+    $archive = 0;
 
     $query = "UPDATE Contact SET
       contact_timeupdate='{$now}',
       contact_userupdate='{$uid}',
-      contact_addressbook_id='{$addressbook->id}'
+      contact_addressbook_id='{$addressbook->id}',
+      contact_archive=$archive
     WHERE contact_id $sql_id $multidomain";
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $contact = OBM_Contact::get($contact->id);
 
+    OBM_AddressBook::timestamp($contact->addressbook_id);
+
+    // Indexing Contact
+    self::solrStore($contact);
+    OBM_IndexingService::commit('contact');
+    
+    return $contact;
+  }
+
+  public static function removeFromArchive($contact) {
+    if (!$contact->id) return false;
+
+    $now = date('Y-m-d H:i:s');
+    $uid = $GLOBALS['obm']['uid'];
+    $sql_id = sql_parse_id($contact->id, true);
+    $multidomain = sql_multidomain('contact');
+    $archive = 0;
+    $query = "UPDATE Contact SET
+      contact_timeupdate='{$now}',
+      contact_userupdate='{$uid}',
+      contact_archive=$archive
+    WHERE contact_id $sql_id $multidomain";
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $contact = OBM_Contact::get($contact->id);
@@ -697,7 +724,6 @@ class OBM_Contact implements OBM_ISearchable {
     if (!$contact->id) return false;
     //else
     $obm_q = new DB_OBM;
-  
     $multidomain = sql_multidomain('contact');
     $sql_id = sql_parse_id($contact->id);
     $comp_id = sql_parse_id($contact->company_id);
