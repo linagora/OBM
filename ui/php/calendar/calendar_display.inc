@@ -2860,6 +2860,15 @@ function dis_calendar_event_consult_ext($contact_id, $id) {
   return $block;
 }
 
+function check_event_details_access() {
+  global $obm;
+  
+  if (isset($GLOBALS['token'])) {
+    return $GLOBALS['token']['type'] == 'private';
+  }
+  return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML : Display Calendar Event Consult
 // Parameters:
@@ -3040,7 +3049,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
   $ie6_radio_fix = "style='border:none; padding:0;margin:0;width:auto;'";
 
-  if ($event_q->f('event_privacy') == 0 || 
+  if (($event_q->f('event_privacy') == 0 && check_event_details_access()) || 
       $event_q->f('event_owner') == $obm['uid'] ||
       in_array($obm['uid'],$entities['user']['ids'])) {
 
@@ -3242,57 +3251,62 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     }
   }
   
-  $display_documents_form = ($event_q->f('event_owner') == $obm['uid'] 
-    || ($allow_documents && in_array($obm['uid'], $entities['user']['ids'])));
+  if (($event_q->f('event_privacy') == 0 && check_event_details_access()) || 
+      $event_q->f('event_owner') == $obm['uid'] ||
+      in_array($obm['uid'],$entities['user']['ids'])) {
   
-  $docs = $entities['document'];
-  if (is_array($docs['entity'])) {
-    $dis_document_list = '';
-    $event_entity_id = $event_q->f('event_entity_id');
-    foreach ($docs['entity'] as $d_id => $entity) {
-      if (!$entity['private'] || in_array($obm['uid'], $entities['user']['ids'])) {
-        $content = "<a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=download_document&document_id=$d_id&event_id=$id\">$entity[title]</a>";
-        if ($event_q->f('event_owner') == $obm['uid'] || $entity['user'] == $obm['uid']) {
-          $content = "
-            <a onclick=\"detachDocument('$d_id', '$event_entity_id', this);\" id='doc$d_id'>
-              <img src=\"$ico_delete\" alt=\"[Delete]\" />
-            </a>".$content;
+    $display_documents_form = !isset($GLOBALS['token']) && ($event_q->f('event_owner') == $obm['uid'] 
+      || ($allow_documents && in_array($obm['uid'], $entities['user']['ids'])));
+    
+    $docs = $entities['document'];
+    if (is_array($docs['entity'])) {
+      $dis_document_list = '';
+      $event_entity_id = $event_q->f('event_entity_id');
+      foreach ($docs['entity'] as $d_id => $entity) {
+        if (!$entity['private'] || in_array($obm['uid'], $entities['user']['ids'])) {
+          $content = "<a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=download_document&document_id=$d_id&event_id=$id\">$entity[title]</a>";
+          if ($event_q->f('event_owner') == $obm['uid'] || $entity['user'] == $obm['uid']) {
+            $content = "
+              <a onclick=\"detachDocument('$d_id', '$event_entity_id', this);\" id='doc$d_id'>
+                <img src=\"$ico_delete\" alt=\"[Delete]\" />
+              </a>".$content;
+          }
+          $dis_document_list.= "<li>$content</li>";
         }
-        $dis_document_list.= "<li>$content</li>";
       }
     }
-  }
-    
-  if ($display_documents_form) {
-    $dis_document_form = "
-      <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
-      <fieldset class=\"detail\">
-      <legend>Ajouter des documents</legend>
-      <table>
-        ".html_calendar_documents_form_fieldset()."
-      </table>
-      <script type=\"text/javascript\">
-        obm.initialize.chain(function () {
-          new obm.AutoComplete.Search('$path/document/document_index.php?action=ext_search', 'sel_document_id', 'documentSearch');
-        });
-      </script>
-      </fieldset>
-      <fieldset class=\"buttons\">
-        <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
-        <input type=\"hidden\" name=\"action\" id=\"action\" value=\"attach_documents\" />
-        <input type=\"submit\" value=\"$l_attach_documents\" />
-      </fieldset>
-      </form>";
-  }
+      
+    if ($display_documents_form) {
+      $dis_document_form = "
+        <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
+        <fieldset class=\"detail\">
+        <legend>Ajouter des documents</legend>
+        <table>
+          ".html_calendar_documents_form_fieldset()."
+        </table>
+        <script type=\"text/javascript\">
+          obm.initialize.chain(function () {
+            new obm.AutoComplete.Search('$path/document/document_index.php?action=ext_search', 'sel_document_id', 'documentSearch');
+          });
+        </script>
+        </fieldset>
+        <fieldset class=\"buttons\">
+          <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
+          <input type=\"hidden\" name=\"action\" id=\"action\" value=\"attach_documents\" />
+          <input type=\"submit\" value=\"$l_attach_documents\" />
+        </fieldset>
+        </form>";
+    }
 
-  $dis_document_block = "
-    <div class=\"detail infos\">
-    <h1>$l_documents</h1>
-    <ul>
-    $dis_document_list
-    </ul>
-    $dis_document_form
-    </div>";
+    $dis_document_block = "
+      <div class=\"detail infos\">
+      <h1>$l_documents</h1>
+      <ul>
+      $dis_document_list
+      </ul>
+      $dis_document_form
+      </div>";
+  }
 
 
   // --- HTML Template --------------------------------------------------------
