@@ -23,12 +23,15 @@ class CalendarMailer extends OBM_Mailer {
   protected $module = 'calendar';
   
   protected $attachIcs = true;
+  
+  protected $icsEncoding = '8bit';
 
   protected $return_path;
   
   public function __construct() {
     parent::__construct();
     $this->attachIcs = $GLOBALS['ccalendar_send_ics'];
+    $this->icsEncoding = $GLOBALS['ccalendar_ics_encoding'];
   }
   
   protected function eventInvitation($event, $attendees) {
@@ -41,7 +44,8 @@ class CalendarMailer extends OBM_Mailer {
       $ics_file = $this->generateIcs($event, "request");
       $this->parts[] = array(
         'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
+        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',
+        'encoding' => $this->icsEncoding
       );
       $this->attachments[] = array(
         'content' => fopen($ics_file, 'r'), 
@@ -60,7 +64,8 @@ class CalendarMailer extends OBM_Mailer {
       $ics_file = $this->generateIcs($event, "cancel");
       $this->parts[] = array(
         'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=CANCEL'
+        'content_type' => 'text/calendar; charset=UTF-8; method=CANCEL',
+        'encoding' => $this->icsEncoding
       );
       $this->attachments[] = array(
         'content' => fopen($ics_file, 'r'), 
@@ -80,7 +85,8 @@ class CalendarMailer extends OBM_Mailer {
       $ics_file = $this->generateIcs($event, "request");
       $this->parts[] = array(
         'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
+        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',
+        'encoding' => $this->icsEncoding
       );
       $this->attachments[] = array(
         'content' => fopen($ics_file, 'r'), 
@@ -151,7 +157,8 @@ class CalendarMailer extends OBM_Mailer {
       $ics_file = $this->generateIcs($event, "request", true);
       $this->parts[] = array(
         'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
+        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',
+        'encoding' => $this->icsEncoding
       );
       $this->attachments[] = array(
         'content' => fopen($ics_file, 'r'), 
@@ -179,7 +186,8 @@ class CalendarMailer extends OBM_Mailer {
       $ics_file = $this->generateIcs($event, "cancel");
       $this->parts[] = array(
         'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=CANCEL'
+        'content_type' => 'text/calendar; charset=UTF-8; method=CANCEL',
+        'encoding' => $this->icsEncoding
       );
       $this->attachments[] = array(
         'content' => fopen($ics_file, 'r'), 
@@ -208,7 +216,8 @@ class CalendarMailer extends OBM_Mailer {
       $ics_file = $this->generateIcs($event, "request", true);
       $this->parts[] = array(
         'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
+        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',
+        'encoding' => $this->icsEncoding
       );
       $this->attachments[] = array(
         'content' => fopen($ics_file, 'r'), 
