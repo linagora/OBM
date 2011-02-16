@@ -2420,24 +2420,24 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   } else {
     $query = "INSERT INTO EventTemplate (
       eventtemplate_name,
-      eventtemplate_timeupdate,                         
-      eventtemplate_timecreate,                         
+      eventtemplate_timeupdate,
+      eventtemplate_timecreate,
       eventtemplate_usercreate,
       eventtemplate_owner,
-      eventtemplate_title, 
-      eventtemplate_date,     
+      eventtemplate_title,
+      eventtemplate_date,
       eventtemplate_description,
       eventtemplate_properties,
-      eventtemplate_location, 
+      eventtemplate_location,
       eventtemplate_category1_id,
       eventtemplate_priority,
-      eventtemplate_privacy, 
+      eventtemplate_privacy,
       eventtemplate_duration,
       eventtemplate_repeatkind,
       eventtemplate_repeatfrequence,
       eventtemplate_repeatdays,
       eventtemplate_allday,
-      eventtemplate_tag_id, 
+      eventtemplate_tag_id,
       eventtemplate_allow_documents,
       eventtemplate_alert,
       eventtemplate_endrepeat,
@@ -2446,7 +2446,10 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       eventtemplate_contact_ids,
       eventtemplate_resource_ids,
       eventtemplate_group_ids,
-      eventtemplate_document_ids)
+      eventtemplate_document_ids,
+      eventtemplate_force_insertion,
+      eventtemplate_opacity,
+      eventtemplate_show_user_calendar)
       VALUES (
       '$name',
       NOW(),
@@ -2475,7 +2478,11 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       $contact_ids,
       $resource_ids,
       $group_ids,
-      $document_ids)";
+      $document_ids,
+      '$force_insertion',
+      '$opacity',
+      '$show_user_calendar')";
+
   }
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_create_or_update_event_template()');
