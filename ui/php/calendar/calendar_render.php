@@ -123,11 +123,10 @@ $params['category_filter'] = $c_all;
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-  if ($action == 'ics_export') {
-    dis_calendar_export_handle($params, $GLOBALS['token']['entity'], $GLOBALS['token']['entityId']);
+if ($action == 'ics_export') {
+  dis_calendar_export_handle($params, $GLOBALS['token']['entity'], $GLOBALS['token']['entityId'], $GLOBALS['token']['type'] == 'private');
   exit();
-  }
-
+}
 
 $GLOBALS['js']['vars']['conf']['displayRange'] = 'true';
 

@@ -3394,6 +3394,7 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
     $title = $event->getSummary();
     $location = $event->getLocation();
   //FIXME  $cats1 = of_category_get_entitycategories('event', 'category1', $id, 'mono');
+    $description = nl2br(preg_replace('@(https?://([-\w\.]+)+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?)@', '<a href="$1">$1</a>', $event->getDescription()));
     $owner = $event->getOrganizer()->cn;
     $owner_lastname = $owner;
     $priority = $event->getPriority(); 
@@ -3519,7 +3520,7 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
 
   if (!$event->isPrivate()) {
 	foreach ($attendees as $attendee) {
-        $label = $attendee->cn;
+        $label = $attendee->cn ? $attendee->cn : str_replace('MAILTO:', '', $attendee->uri);
         $state = $attendee->partstat;
         $ACCEPTED = 'class="disabled"';
         ${'NEEDS-ACTION'} = 'class="disabled"';
@@ -6561,7 +6562,7 @@ function xml_calendar_export_templates($template_id = null) {
 // Parameters:
 //   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null) {
+function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null, $private = false) {
   global $obm, $obm_version, $ccalendar_weekstart;
 
   if($calendar['export'] == "date") {
@@ -6585,8 +6586,9 @@ function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null
   } else {
     $calendar_user['user'] = array ($obm['uid'] => 'dummy');
   }
-  $reader = new Vcalendar_Reader_OBM($calendar_user,NULL,$start,$end);
-  $document = $reader->getDocument();
+  
+  $reader = new Vcalendar_Reader_OBM($calendar_user, NULL, $start, $end);
+  $document = $reader->getDocument('PUBLISH', $private);
   $writer = new Vcalendar_Writer_ICS();  
   $writer->writeDocument($document);
   $document->destroy();

@@ -277,7 +277,7 @@ class Vpdi {
    * @return string
    */
   public static function decodeText($text) {
-    return str_replace(array('\,', '\;', '\n'), array(',', ';', "\n"), $text);
+    return str_replace(array('\,', '\;', '\r\n', '\n'), array(',', ';', "\n", "\n"), $text);
   }
   
   /**
