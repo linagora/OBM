@@ -311,6 +311,8 @@ $l_add_exception_mail_subject = "Modification évènement sur OBM : %s";
 $l_update_state_mail_subject = "Participation à l'évènement sur OBM : %s";
 $l_alert_mail_subject = "Événement imminent : %s";
 
+$l_attachments_mail_body = "Pièces jointes :";
+
 $l_event_color_tt = "Les couleurs utilisées sont celles définies lors de la création des évènements.";
 
 

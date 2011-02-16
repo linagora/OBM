@@ -16,7 +16,7 @@ class Vcalendar_Reader_OBM {
 
   var $eventSets = array();
   
-  function Vcalendar_Reader_OBM($entities,$ids = array(), $startTime = NULL, $endTime = NULL) {
+  function Vcalendar_Reader_OBM($entities, $ids = array(), $startTime = NULL, $endTime = NULL) {
     $this->db = new DB_OBM;
     $this->entities = $entities;
     if(!empty($ids)) {
@@ -67,7 +67,7 @@ class Vcalendar_Reader_OBM {
   /**
    * @return Vcalendar
    */
-  function & getDocument($method='PUBLISH') {
+  function & getDocument($method = 'PUBLISH', $include_attachments = false) {
     $this->document = new Vcalendar();
     $this->setHeaders($method);
     foreach($this->eventSets as $set) {
@@ -81,6 +81,28 @@ class Vcalendar_Reader_OBM {
     while($attendees->next_record()) {
       $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
     }
+    
+    if ($include_attachments) {
+      $rs = run_query_get_events_documents(array_keys($this->vevents));
+      $attachments = array();
+      while($rs->next_record()) {
+        //$this->addDocument($this->vevents[$rs->f('event_id')] , $rs->f('document_id'));
+        $event_id = $rs->f('event_id');
+        $document_id = $rs->f('document_id');
+        if (!array_key_exists($event_id, $attachments)) $attachments[$event_id] = array();
+        $attachments[$event_id][] = $GLOBALS['cgp_host'].'document/document_download.php?externalToken='.get_calendar_entity_share($document_id, 'document', 'private', 'document').'&document_id='.$document_id;
+      }
+      if (count($attachments) != 0) {
+        foreach ($attachments as $id => $links) {
+          $description = $this->vevents[$id]->get('description');
+          $description.= "\r\n\r\n".$GLOBALS['l_attachments_mail_body']."\r\n";
+          $description.= implode("\r\n", $links);
+          $this->vevents[$id]->reset('description');
+          $this->vevents[$id]->set('description', $description);
+        }
+      }
+    }
+    
     if(count($this->vevents) > 0) {
       $exceptions = run_query_get_events_exception(array_keys($this->vevents));
       while($exceptions->next_record()) {
@@ -161,7 +183,11 @@ class Vcalendar_Reader_OBM {
   
   function addAttendee(&$vevent, &$data) {
    $vevent->private = ($vevent->private && ($GLOBALS['obm']['uid'] != $data['eventlink_entity_id']));
-   $vevent->set('attendee',$this->parseAttendee($data['eventlink_entity_id'], $data['eventlink_entity'], $data['eventlink_state']));
+   $vevent->set('attendee', $this->parseAttendee($data['eventlink_entity_id'], $data['eventlink_entity'], $data['eventlink_state']));
+  }
+  
+  function addDocument(&$vevent, $document_id) {
+    $vevent->set('attach', $GLOBALS['cgp_host'].'calendar/calendar_render.php?action=download_document&externalToken='.get_calendar_entity_share($document_id, 'document', 'private').'&document_id='.$document_id);
   }
   
   function addExdate(&$vevent, &$date) {

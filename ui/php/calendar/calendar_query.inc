@@ -656,9 +656,9 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $owner);
   
   // Insert Event documents
-  if (is_array($documents_array)) {
-    $documents_array = array_unique($documents_array);
-    foreach ($documents_array as $document_id) {
+  if (is_array($documents)) {
+    $documents = array_unique($documents);
+    foreach ($documents as $document_id) {
       run_query_calendar_attach_document($document_id, $event_entity_id);
     }
   }
@@ -1007,7 +1007,6 @@ function get_calendar_document_from_ids($documents) {
 function run_query_calendar_attach_document($document_id, $event_id) {
   global $cdg_sql, $obm;
 
-  $event_id = $event_id;
   $document_id = sql_parse_id($document_id);
   $uid = sql_parse_id($obm['uid']);
   $query = "INSERT INTO DocumentLink (
@@ -1290,9 +1289,12 @@ function check_access_entity($calendar_ids, $resource_ids) {
   return $ok;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Check if the user is an event's attendee
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Check if the user is an event's attendee
+ * @param $event_id
+ * @param $user_id
+ * @return bool
+ **/
 function check_user_attendance($event_id, $user_id) {
   $sql = "
     SELECT 1 FROM EventLink 
@@ -1306,13 +1308,24 @@ function check_user_attendance($event_id, $user_id) {
   return $obm_q->num_rows() == 1;
 }
 
-
+/**
+ * Check if a token-auth'd person can download an attached document
+ * @param $document_id
+ * @param $user_id
+ * @return bool
+ **/
+function check_document_access_by_token($document_id, $event_id) {
+  $user_id = get_user_id_by_token();
+  if (!$user_id || !check_user_attendance($event_id, $user_id)) return false;
+  if (!in_array($document_id, get_calendar_event_document_ids($event_id))) return false;
+  return true;
+}
 
 /**
  * Check for participation decision
  * Essentially a hook container to allow specific rules
  * @param $calendar parameters
- * @return  
+ * @return bool
  **/
 function check_calendar_participation_decision($calendar) {
 
@@ -2979,10 +2992,7 @@ function check_calendar_access($id, $right = 'write') {
 function check_calendar_access_by_token($id, $right = 'read') {
   global $l_event_cant_delete, $obm, $delete_ok, $err, $l_insufficient_permission, $l_err_reference;
 
-  $uid = $GLOBALS['token']['uid'];
-  if ((!$uid) && ($GLOBALS['token']['entity']=='user')) {
-    $uid = $GLOBALS['token']['entityId'];
-  }
+  $uid = get_user_id_by_token();
 
   if (($right == 'write') || ($right == 'admin')) {
     $err['msg'] = $l_insufficient_permission;
@@ -3007,6 +3017,16 @@ function check_calendar_access_by_token($id, $right = 'read') {
   return false;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Do you really need a description ?
+///////////////////////////////////////////////////////////////////////////////
+function get_user_id_by_token() {
+  $uid = $GLOBALS['token']['uid'];
+  if ((!$uid) && ($GLOBALS['token']['entity']=='user')) {
+    $uid = $GLOBALS['token']['entityId'];
+  }
+  return $uid;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Delete all events of a evenements, and the event
@@ -4074,6 +4094,34 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
     WHERE eventexception_parent_id IN ($event_list) 
     $start $end";
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_exception()');
+  $obm_q->xquery($query);
+  return $obm_q;
+}
+
+/**
+ * Get all attached documents of an array of events
+ *  
+ * @param array $events 
+ * @access public
+ * @return void
+ */
+function run_query_get_events_documents($events) {
+  global $cdg_sql;
+
+  $event_list = implode(',',$events);
+  if ($event_list == '') {
+    $event_list = '0';
+  }
+  $obm_q = new DB_OBM;
+  $query = "SELECT 
+    evententity_event_id AS event_id,
+    documentlink_document_id AS document_id
+    FROM DocumentLink
+    INNER JOIN EventEntity ON documentlink_entity_id = evententity_entity_id
+    WHERE 
+    evententity_event_id IN ($event_list)";
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_get_events_documents()');
   $obm_q->xquery($query);
   return $obm_q;
 }
@@ -5690,10 +5738,9 @@ function get_entity_token($entity_id,$entity,$type) {
 /**
  * Get share contact for entity  
  */
-function get_calendar_entity_share($entity_id,$entity,$type) {
+function get_calendar_entity_share($entity_id, $entity, $type, $readAcces = 'calendar') {
   global $obm, $cdg_sql;
 
-  $readAcces = 'calendar';
   if($type == 'private'){
     $uid = $obm['uid'];
   } else {

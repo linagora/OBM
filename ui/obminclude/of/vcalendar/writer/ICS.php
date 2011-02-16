@@ -115,12 +115,18 @@ class Vcalendar_Writer_ICS {
     $property = $this->parseProperty($this->parseName($name).';'.implode(';',$params).':'.$value);
     $this->buffer .= $property."\r\n";      
   }
+  
+  function writeAttach($name, $value) {
+    foreach ((array) $value as $uri) {
+      $this->buffer .= $this->parseProperty('ATTACH:'.$uri)."\r\n";
+    }
+  }
 
-  function writeAttendee($name,$value) {
-    if(key_exists('state',$value)) {
+  function writeAttendee($name, $value) {
+    if (key_exists('state', $value)) {
       $value = array($value); 
     }
-    foreach($value as $attendee) {
+    foreach ($value as $attendee) {
       $params = array();
       $value = '';
       if($attendee['state']) {

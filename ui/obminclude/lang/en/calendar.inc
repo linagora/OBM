@@ -228,6 +228,7 @@ $l_confirm_mail = "Confirm+Force notification";
 $l_add_event_mail_subject = "New event on obm";
 $l_update_event_mail_subject = "Updated event on obm";
 $l_delete_event_mail_subject = "Deleted event on obm";
+$l_attachments_mail_body = "Attachments:";
 $l_interval_null = "Duration cannot be null";
 $mj_fill_title_event = "You have to enter a title for the event ";
 $mj_fill_time_begin = "You have to enter a starting hour";

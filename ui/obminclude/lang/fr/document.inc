@@ -74,6 +74,7 @@ $l_no_document = "Document introuvable";
 $l_quota_msg = "Vous utilisez actuellement %s (%s) de l'espace de %s dédié à vos documents privés";
 $l_over_quota_error = "Ajouter ce document vous ferait dépasser votre quota ! Supprimez quelques documents privés pour pouvoir ajouter celui-ci.";
 $l_filesize_units = array('Octets','Ko','Mo','Go','To','Po');
+$l_err_file_access_forbidden = "Vous n'avez pas la permission d'accéder à ce document";
 
 // Actions
 $l_checkdelete = "Vérifier ou Supprimer le document";

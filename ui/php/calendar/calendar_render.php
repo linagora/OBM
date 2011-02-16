@@ -160,6 +160,22 @@ if ($action == 'search') {
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
   }
+  
+} elseif ($action == 'download_document') {
+///////////////////////////////////////////////////////////////////////////////
+  require '../document/document_query.inc';
+  require '../document/document_display.inc';
+  
+  if (!check_document_access_by_token($params['document_id'], $params['event_id'])) {
+    $display['msg'] .= display_err_msg("$l_err_file_access_forbidden");
+  } else {
+    $doc_q = run_query_document_detail($params['document_id']);
+    if ($doc_q->num_rows() == 1) {
+      dis_document_file($doc_q);
+    } else {
+      $display['msg'] .= display_err_msg("$l_no_document !");
+    }
+  }
 
 } elseif ($action == 'pdf_export_form') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -233,13 +249,13 @@ function get_calendar_action() {
   $date = $params['date'];
   // Index
   $actions['calendar']['index'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=index",
+    'Url'      => "$path/calendar/calendar_render.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
 
   $actions['calendar']['search'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=search",
+    'Url'      => "$path/calendar/calendar_render.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
@@ -247,21 +263,27 @@ function get_calendar_action() {
   // Detail Consult
   $actions['calendar']['detailconsult'] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=$id&amp;date=".$date->getURL(),
+    'Url'      => "$path/calendar/calendar_render.php?action=detailconsult&amp;calendar_id=$id&amp;date=".$date->getURL(),
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
+  );
+  
+  $actions['calendar']['download_document'] = array (
+    'Url'      => "$path/calendar/calendar_render.php?action=download_document",
+    'Right'    => $cright_read,
+    'Condition'=> array ('none') 
   );
 
   // Export_ics
   $actions['calendar']['ics_export'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=ics_export&amp;popup=1",
+    'Url'      => "$path/calendar/calendar_render.php?action=ics_export&amp;popup=1",
     'Right'    => $cright_read,
     'Condition'=> array ('none') 
   );
 
   // PDF export options form
   $actions['calendar']['pdf_export_form'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=$date&output_target=print",
+    'Url'      => "$path/calendar/calendar_render.php?action=pdf_export_form&amp;date=$date&output_target=print",
     'Right'    => $cright_read,
     'Popup'    => 1,
     'Condition'=> array("None")
@@ -269,14 +291,14 @@ function get_calendar_action() {
 
   // PDF export
   $actions['calendar']['pdf_export'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=pdf_export",
+    'Url'      => "$path/calendar/calendar_render.php?action=pdf_export",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
   );
   
  // Refresh 
   $actions['calendar']['draw'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=draw",
+    'Url'      => "$path/calendar/calendar_render.php?action=draw",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );

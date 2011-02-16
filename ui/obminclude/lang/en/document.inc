@@ -6,44 +6,6 @@
 //////////////////////////////////////////////////////////////////////////////
 // $Id$
 //////////////////////////////////////////////////////////////////////////////
-// Modified on 2009-09-09T15:20:48+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:54:32+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T11:54:39+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:10:09+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:11:18+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:12:38+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:12:50+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:17:45+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T12:20:54+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T13:49:11+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T13:49:43+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T13:56:27+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T13:57:51+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T13:59:41+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T14:02:29+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T14:20:01+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T14:49:19+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T14:50:15+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T14:58:21+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:01:48+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:04:37+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:12:07+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:14:07+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:23:26+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:34:10+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:43:06+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T15:44:26+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-10T16:32:41+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:43:42+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:43:52+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:45:30+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:45:46+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:47:57+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:53:54+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:54:13+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T14:54:43+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T15:00:36+02:00 using OBMtranslation (0.4.1)
-// Modified on 2009-09-11T15:01:06+02:00 using OBMtranslation (0.4.1)
 
 $l_author = "Author";
 $l_createtime = "Create time";
@@ -127,3 +89,4 @@ $l_size = "Size";
 $l_over_quota_error = "Adding this document would exceed your allocated quota ! To add this document, some private documents must be deleted.";
 $l_quota_msg = "You are currently using %s (%s) of the %s dedicated to your private documents";
 $l_filesize_units = array('Byte','KB','MB','GB','TB','PB');
+$l_err_file_access_forbidden = "You're not allowed to access this document";
