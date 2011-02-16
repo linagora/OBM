@@ -117,7 +117,7 @@ public class VersionValidatorTest{
 		validator.checkObmConnectorVersion(createFakeAccessToken());
 	}
 	
-	@Test(expected=OBMConnectorVersionException.class)
+	@Test
 	public void testCheckObmConnectorVersionEmpty() throws OBMConnectorVersionException {
 		Parser parser = EasyMock.createMock(Parser.class);
 		EasyMock.expect(parser.parse(EasyMock.anyObject(String.class))).andReturn(null);

@@ -26,25 +26,27 @@ public class VersionValidator {
 	public void checkObmConnectorVersion(AccessToken token)
 			throws OBMConnectorVersionException {
 		String origin = token.getOrigin();
-		if (origin != null) {
-			ClientInformations actualVersion = parser.parse(origin);
-			if (actualVersion != null) {
-				Version connectorVersion = actualVersion.getObmConnectorVersion();
-				if (connectorVersion == null || connectorVersion.compareTo(obmConnectorRequiredVersion) < 0) {
-					throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
-				}
-				LightningVersion lightningVersion = actualVersion.getLightningVersion();
-				if (lightningVersion == null) {
-					throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
-				}
-				Integer linagoraVersion = lightningVersion.getLinagoraVersion();
-				if (linagoraVersion == null || linagoraVersion < this.linagoraVersion) {
-					throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
-				}
-				return;
-			}
+		if (origin == null) {
+			//don't filter if origin is null
+			return;
 		}
-		throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
+		ClientInformations actualVersion = parser.parse(origin);
+		if (actualVersion == null) {
+			//don't filter if origin is not parsable
+			return;
+		}
+		Version connectorVersion = actualVersion.getObmConnectorVersion();
+		if (connectorVersion == null || connectorVersion.compareTo(obmConnectorRequiredVersion) < 0) {
+			throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
+		}
+		LightningVersion lightningVersion = actualVersion.getLightningVersion();
+		if (lightningVersion == null) {
+			throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
+		}
+		Integer linagoraVersion = lightningVersion.getLinagoraVersion();
+		if (linagoraVersion == null || linagoraVersion < this.linagoraVersion) {
+			throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
+		}
 	}
 
 }
