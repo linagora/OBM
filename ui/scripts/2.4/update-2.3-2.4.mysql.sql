@@ -253,7 +253,7 @@ ALTER TABLE `DeletedEvent` ADD COLUMN `deletedevent_event_ext_id` varchar(300) d
 -- update category_code length to 20
 -- add unicity constraint
 --
-ALTER TABLE `Category` MODIFY COLUMN `category_code` varchar(20) NOT NULL default '';
+ALTER TABLE `Category` MODIFY COLUMN `category_code` varchar(100) NOT NULL default '';
 ALTER TABLE `Category` ADD CONSTRAINT UNIQUE `categorycategory_categorycode_uniquekey` (`category_category`,`category_code`);
 
 --

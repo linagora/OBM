@@ -305,7 +305,7 @@ CREATE TABLE `Category` (
   `category_userupdate` int(8) default NULL,
   `category_usercreate` int(8) default NULL,
   `category_category` varchar(24) NOT NULL default '',
-  `category_code` varchar(20) NOT NULL default '',
+  `category_code` varchar(100) NOT NULL default '',
   `category_label` varchar(100) NOT NULL default '',
   PRIMARY KEY  (`category_id`),
   KEY `cat_idx_cat` (`category_category`),
