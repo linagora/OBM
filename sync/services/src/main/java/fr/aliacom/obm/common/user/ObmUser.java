@@ -169,6 +169,9 @@ public class ObmUser {
 	}
 	
 	public String getEmailAtDomain() {
+		if(email.contains("@")){
+			return email;
+		}
 		return email + "@" + domain.getName();
 	}
 
