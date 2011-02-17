@@ -11,7 +11,6 @@ import javax.mail.internet.MimeMessage.RecipientType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.ObmSmtpProvider;
-import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 
 import com.google.inject.Inject;
 
@@ -30,6 +29,7 @@ public class MailService {
 		try{
 			message.setRecipients(RecipientType.TO, to.toArray(new InternetAddress[0]));
 			provider.sendEmail(session, message);
+
 		} catch (Throwable e) {
 			logger.error(getErrorLog(to, message), e);
 		}
