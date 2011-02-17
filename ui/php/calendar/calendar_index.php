@@ -1210,7 +1210,10 @@ if (!$params['ajax']) {
   } else {
     json_error_msg("$l_rights : $l_of_right_err_user");
   }
-  echo "({".$display['json'].",$msg})";
+  if(is_null($msg))
+    echo "({".$display['json']."})";
+  else
+    echo "({".$display['json'].",$msg})";
   exit();
 
 } elseif ($action == 'share_reinit') {
