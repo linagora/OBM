@@ -726,7 +726,7 @@ function get_contact_action() {
   );  
   $actions['contact']['setSubscription'] = array (
     'Url'      => "$path/contact/contact_index.php?action=setSubscription",
-    'Right'    => $cright_write,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );  
 
