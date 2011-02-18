@@ -1513,6 +1513,7 @@ function of_userdata_dis_entity_form($entity, $ent_id, $params) {
     foreach($cgp_user[$entity]['category'] as $cat_name => $one_cat) {
       $cats = array();
       $mode = $one_cat['mode'];
+      $no_display_code = $one_cat['no_display_code']; 
       if ($mode == 'mono') {
 	$cats = of_category_user_get_ordered($cat_name, $entity);
 	if ($ent_id > 0) {
@@ -1546,7 +1547,7 @@ function of_userdata_dis_entity_form($entity, $ent_id, $params) {
 	  }
 	}
       }
-      $block_user .= of_category_user_dis_entity_form($entity, $cat_name, $cats, $one_cat['mode'], $cat_id, 'undef');
+      $block_user .= of_category_user_dis_entity_form($entity, $cat_name, $cats, $one_cat['mode'], $cat_id, 'undef', $no_display_code);
     }
   }
 
@@ -1930,7 +1931,7 @@ function of_category_user_dis_search_select($cat, $cats, $cat_id, $first_element
 //   - $first_element : scalar or array : (['all'|'none'])
 //   - $sel_append    : string (eg javascript code) to append at select
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel_append='') {
+function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel_append='', $no_display_code = false) {
 
   if (is_array($first_element)) {
     foreach($first_element as $element) {
@@ -1938,11 +1939,11 @@ function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel
       $c_element = "c_${element}"; 
       global $$l_element, $$c_element;
       if ($$c_element == $cat_id) {
-	$first_option .= "
-	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+	      $first_option .= "
+	      <option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
       } else {
-	$first_option .= "
-	<option value=\"${$c_element}\">${$l_element}</option>";
+	      $first_option .= "
+	      <option value=\"${$c_element}\">${$l_element}</option>";
       }
     }
   } else if ($first_element != '') {
@@ -1951,10 +1952,10 @@ function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel
     global $$l_element, $$c_element;
     if ($$c_element == $cat_id) {
       $first_option .= "
-	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+	    <option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
     } else {
       $first_option .= "
-	<option value=\"${$c_element}\">${$l_element}</option>";
+	    <option value=\"${$c_element}\">${$l_element}</option>";
     }
   }
 
@@ -1965,14 +1966,14 @@ function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel
     $has_code = false;
     foreach ($cats as $one_cat) {
       if ($one_cat['code'] != '') {
-	$has_code = true;
-	break;
+	      $has_code = true;
+	      break;
       }
     }
     foreach ($cats as $one_cat) {
       $c_id = $one_cat['id'];
-      if ($has_code) {
-	$c_code = str_pad($one_cat['code'] . ' ', 10, '.');
+      if ($has_code && !$no_display_code) {
+	      $c_code = str_pad($one_cat['code'] . ' ', 10, '.');
       }
       $c_label = htmlentities($one_cat['label'], ENT_COMPAT, 'UTF-8');
       $sel_cat .= "\n<option value=\"$c_id\"";
@@ -1998,11 +1999,10 @@ function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel
 // Returns
 //   XHTML display of category form part
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_user_dis_entity_form($entity, $cat, $cats, $mode='multi', $cat_id='', $first='') {
+function of_category_user_dis_entity_form($entity, $cat, $cats, $mode='multi', $cat_id='', $first='', $no_display_code = false) {
   global  $ico_add, $ico_delete, $l_none;
-  
   if ($mode == 'mono') {
-    $sel_cat = of_category_user_html_select($cat, $cats, $cat_id, $first);
+    $sel_cat = of_category_user_html_select($cat, $cats, $cat_id, $first,'',$no_display_code);
     $class = 'detailForm';
   } else {
     if (is_array($cats)) {
