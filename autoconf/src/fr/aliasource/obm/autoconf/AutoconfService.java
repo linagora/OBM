@@ -71,7 +71,7 @@ public class AutoconfService extends HttpServlet {
 			return;
 		}
 
-		DirectoryConfig dc = new DirectoryConfig(login, ConstantService
+		DirectoryConfig dc = new DirectoryConfig(login , domain, ConstantService
 				.getInstance());
 		LDAPQueryTool lqt = new LDAPQueryTool(dc);
 		LDAPAttributeSet attributeSet;

@@ -17,17 +17,22 @@ public class DirectoryConfig {
 	private String ldapSearchBase;
 	private String[] ldapAtts;
 	private String ldapFilter;
+	private String searchWithDomain ;
 	private String ldapHost;
 	private String configXml;
 
 	private static final Log logger = LogFactory.getLog(DirectoryConfig.class);
 	
-	public DirectoryConfig(String loginWithoutDomain, ConstantService cs) {
+	public DirectoryConfig(String login, String domain ,ConstantService cs) {
+		searchWithDomain = cs.getStringValue("searchWithDomain");
 		ldapHost = cs.getStringValue("ldapHost");
 		ldapPort = cs.getIntValue("ldapPort");
 		ldapSearchBase = cs.getStringValue("ldapSearchBase");
 		ldapAtts = cs.getStringValue("ldapAtts").split(",");
-		ldapFilter = "(" + cs.getStringValue("ldapFilter") + "=" + loginWithoutDomain + ")";
+		if ( searchWithDomain == "true") {
+			login = login + "@" + domain ;
+		}
+		ldapFilter = "(" + cs.getStringValue("ldapFilter") + "=" + login + ")";
 		logger.info("ldap filter: "+ldapFilter);
 		configXml = "/usr/share/obm-autoconf/config.xml";
 	}
