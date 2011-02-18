@@ -44,7 +44,7 @@ public class EventChangeMailer extends AbstractMailer{
 		this.baseUrl = constantService.getObmUIBaseUrl();
 	}
 	
-	public void notifyNewUsers(AccessToken at, Collection<Attendee> attendee, Event event, Locale locale) throws NotificationException {
+	public void notifyNeedActionNewUsers(AccessToken at, Collection<Attendee> attendee, Event event, Locale locale) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -54,6 +54,25 @@ public class EventChangeMailer extends AbstractMailer{
 						newUserBodyTxt(event, locale),
 						newUserBodyHtml(event, locale),
 						newUserIcs(at, event), "REQUEST");
+			sendNotificationMessageToAttendee(attendee, mail);
+		} catch (UnsupportedEncodingException e) {
+			throw new NotificationException(e);
+		} catch (IOException e) {
+			throw new NotificationException(e);
+		} catch (TemplateException e) {
+			throw new NotificationException(e);
+		}
+	}
+	
+	public void notifyAcceptedNewUsers(Collection<Attendee> attendee, Event event, Locale locale) throws NotificationException {
+		try {
+			EventMail mail = 
+				new EventMail(
+						extractSenderAddress(event), 
+						event.getAttendees(), 
+						newUserTitle(event.getOwner(), event.getTitle(), locale), 
+						newUserBodyTxt(event, locale),
+						newUserBodyHtml(event, locale));
 			sendNotificationMessageToAttendee(attendee, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);

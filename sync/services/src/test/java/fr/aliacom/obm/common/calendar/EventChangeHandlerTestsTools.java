@@ -10,6 +10,7 @@ import org.easymock.EasyMock;
 import org.easymock.LogicalOperator;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.ParticipationState;
 
 public class EventChangeHandlerTestsTools {
 
@@ -49,10 +50,11 @@ public class EventChangeHandlerTestsTools {
 		return cal.getTime();
 	}
 	
-	static Attendee createRequiredAttendee(String email) {
+	static Attendee createRequiredAttendee(String email, ParticipationState state) {
 		Attendee attendee = new Attendee();
 		attendee.setEmail(email);
 		attendee.setRequired(ParticipationRole.REQ);
+		attendee.setState(state);
 		return attendee;
 	}
 

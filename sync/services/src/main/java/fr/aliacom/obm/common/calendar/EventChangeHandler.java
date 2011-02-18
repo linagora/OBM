@@ -19,6 +19,7 @@ import org.obm.sync.server.mailer.EventChangeMailer;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
@@ -40,22 +41,35 @@ public class EventChangeHandler {
 	public void create(final AccessToken at, final Event event, Locale locale) throws NotificationException {
 		if (eventCreationInvolveNotification(event)) {
 			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
-			if (!attendees.isEmpty()) {
-				eventChangeMailer.notifyNewUsers(at, attendees, event, locale);
-			}
+			notifyCreate(at, attendees, event, locale);
 		}
+	}
+	
+	private void notifyCreate(final AccessToken at, Collection<Attendee> attendees, final Event event, Locale locale){
+		Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
+		
+		Set<Attendee> accepted = attendeeGroups.get(ParticipationState.ACCEPTED);
+		if(accepted != null && !accepted.isEmpty()){
+			eventChangeMailer.notifyAcceptedNewUsers(accepted, event, locale);
+		}
+		
+		Set<Attendee> notAccepted = attendeeGroups.get(ParticipationState.NEEDSACTION);
+		if (notAccepted != null && !notAccepted.isEmpty()) {
+			eventChangeMailer.notifyNeedActionNewUsers(at, notAccepted, event, locale);
+		}
+		
 	}
 
 	public void update(final AccessToken at, final Event previous, final Event current, Locale locale) throws NotificationException {
 		Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = 
-			computeNotificationGroups(previous, current);
+			computeUpdateNotificationGroups(previous, current);
 		Set<Attendee> removedUsers = attendeeGroups.get(AttendeeStateValue.Old);
 		if (!removedUsers.isEmpty()) {
 			eventChangeMailer.notifyRemovedUsers(at, removedUsers, current, locale);
 		}
 		Set<Attendee> addedUsers = attendeeGroups.get(AttendeeStateValue.New);
 		if (!addedUsers.isEmpty()) {
-			eventChangeMailer.notifyNewUsers(at, addedUsers, current, locale);
+			notifyCreate(at, addedUsers, current, locale);
 		}
 		Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
 		if (!currentUsers.isEmpty()) {
@@ -66,8 +80,10 @@ public class EventChangeHandler {
  	public void delete(final AccessToken at, final Event event, Locale locale) throws NotificationException {
  		if (eventDeletionInvolveNotification(event)) {
  			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
- 			if (!attendees.isEmpty()) {
- 				eventChangeMailer.notifyRemovedUsers(at, attendees, event, locale);
+ 			Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
+ 			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
+ 			if(notify.size() >0){
+ 				eventChangeMailer.notifyRemovedUsers(at, notify, event, locale);
  			}
  		}
  	}
@@ -93,7 +109,54 @@ public class EventChangeHandler {
 		});
 	}
 	
-	private Map<AttendeeStateValue, ? extends Set<Attendee>> computeNotificationGroups(Event previous, Event current) {
+	private Map<ParticipationState, ? extends Set<Attendee>> computeParticipationStateGroups(Collection<Attendee> attendees) {
+		Set<Attendee> acceptedAttendees = Sets.newLinkedHashSet();
+		Set<Attendee> needActionAttendees = Sets.newLinkedHashSet();
+		Set<Attendee> declinedAttendees = Sets.newLinkedHashSet();
+		
+		Set<Attendee> tentativeAttendees = Sets.newLinkedHashSet();
+		Set<Attendee> delegatedAttendees = Sets.newLinkedHashSet();
+		
+		Set<Attendee> completedAttendees = Sets.newLinkedHashSet();
+		Set<Attendee> inprogressAttendees = Sets.newLinkedHashSet();
+		
+		for(Attendee att : attendees){
+			switch (att.getState()) {
+			case ACCEPTED:
+				acceptedAttendees.add(att);
+				break;
+			case NEEDSACTION:
+				needActionAttendees.add(att);
+				break;
+			case DECLINED:
+				declinedAttendees.add(att);
+				break;
+			case TENTATIVE:
+				tentativeAttendees.add(att);
+				break;
+			case DELEGATED:
+				delegatedAttendees.add(att);
+				break;
+			case COMPLETED:
+				completedAttendees.add(att);
+				break;
+			case INPROGRESS:
+				inprogressAttendees.add(att);
+				break;
+			}
+		}
+		Builder<ParticipationState, Set<Attendee>> ret = ImmutableMap.builder();
+		ret.put(ParticipationState.ACCEPTED, acceptedAttendees);
+		ret.put(ParticipationState.NEEDSACTION, needActionAttendees);
+		ret.put(ParticipationState.DECLINED, declinedAttendees);
+		ret.put(ParticipationState.TENTATIVE, tentativeAttendees);
+		ret.put(ParticipationState.DELEGATED, delegatedAttendees);
+		ret.put(ParticipationState.COMPLETED, completedAttendees);
+		ret.put(ParticipationState.INPROGRESS, inprogressAttendees);
+		return ret.build();
+	}
+	
+	private Map<AttendeeStateValue, ? extends Set<Attendee>> computeUpdateNotificationGroups(Event previous, Event current) {
 		if (previous.isEventInThePast() && current.isEventInThePast()) {
 			return ImmutableMap.of();
 		}

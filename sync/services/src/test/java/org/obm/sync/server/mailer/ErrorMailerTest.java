@@ -69,7 +69,7 @@ public class ErrorMailerTest {
 
 		protected MailService defineMailServiceExpectations(
 				List<InternetAddress> expectedRecipients,
-				Capture<MimeMessage> capturedMessage) throws MessagingException {
+				Capture<MimeMessage> capturedMessage) {
 			
 			MailService mailService = EasyMock.createMock(MailService.class);
 			mailService.sendMessage(
