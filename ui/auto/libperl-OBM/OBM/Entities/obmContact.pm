@@ -58,23 +58,6 @@ sub _init {
         return 1;
     }
 
-    if( $contactDesc->{'contact_firstname'} ) {
-        $contactDesc->{'contactCommonName'} = $contactDesc->{'contact_firstname'};
-    }
-
-    if( $contactDesc->{'contact_lastname'} ) {
-        if( $contactDesc->{'contactCommonName'} ) {
-            $contactDesc->{'contactCommonName'} .= ' ';
-        }
-
-        $contactDesc->{'contactCommonName'} .= $contactDesc->{'contact_lastname'};
-    }
-
-    if( !$contactDesc->{'contactCommonName'} ) {
-        $self->_log( 'nom et prénom non renseigné, export LDAP impossible ID:'.$contactDesc->{'contact_id'}, 1 );
-        return 1;
-    }
-
     $self->{'entityDesc'} = $contactDesc;
 
     $self->_log( 'chargement : '.$self->getDescription(), 4 );
@@ -276,8 +259,8 @@ sub getDescription {
 
     my $description = 'contact';
 
-    if( $entityDesc->{'contactCommonName'} ) {
-        $description .= ' \''.$entityDesc->{'contactCommonName'}.'\'';
+    if( $entityDesc->{'contact_commonname'} ) {
+        $description .= ' \''.$entityDesc->{'contact_commonname'}.'\'';
     }
 
     $description .= ' (ID:'.$entityDesc->{'contact_id'}.')';
@@ -389,13 +372,15 @@ sub createLdapEntry {
         return 1;
     }
 
+    # Set mandatory attribute
+    $self->_mandatoryAttribute() ;
+
     $entry->add(
         objectClass => $self->_getLdapObjectclass(),
-        cn => $self->{'entityDesc'}->{'contactCommonName'},
-        sn => $self->{'entityDesc'}->{'contactCommonName'},
+        cn => $self->{'entityDesc'}->{'contact_commonname'},
+        sn => $self->{'entityDesc'}->{'contact_commonname'},
         obmUID => $self->{'entityDesc'}->{'contactentity_entity_id'}
     );
-
 
     $self->_modifyAttr( $self->{'parent'}->getDesc('domain_name'), $entry, 'obmDomain' );
 
@@ -435,7 +420,6 @@ sub createLdapEntry {
     $self->_modifyAttr( $self->{'entityDesc'}->{'website'}, $entry, 'URL' );
     $self->_modifyAttr( $self->{'entityDesc'}->{'website'}, $entry, 'workUrl' );
 
-
     return 0;
 }
 
@@ -470,6 +454,8 @@ sub updateLdapEntry {
         }
     }
     
+    # Set mandatory attribute
+    $self->_mandatoryAttribute() ;
 
     if( $self->getUpdateEntity() ) {
         if( $self->_modifyAttr( $self->{'parent'}->getDesc('domain_name'), $entry, 'obmDomain' ) ) {
@@ -477,6 +463,10 @@ sub updateLdapEntry {
         }
 
         if( $self->_modifyAttr( $self->{'entityDesc'}->{'contact_firstname'}, $entry, 'givenName' ) ) {
+            $update = 1;
+        }
+
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'contact_commonname'}, $entry, 'cn' ) ) {
             $update = 1;
         }
 
@@ -578,4 +568,50 @@ sub updateLdapEntry {
     }
 
     return $update;
+}
+
+sub _mandatoryAttribute {
+    my $self = shift;
+    my $commonname  = $self->{'entityDesc'}->{'contact_commonname'} ;
+    my $lastname = $self->{'entityDesc'}->{'contact_lastname'} ;
+    my $firstname = $self->{'entityDesc'}->{'contact_firstname'} ;
+    my $email = '' ;
+    if ( $self->{'entityDesc'}->{'mail'} ) {
+        if ( ref($self->{'entityDesc'}->{'mail'}) ne 'ARRAY' ) {
+            $email = $self->{'entityDesc'}->{'mail'} ;
+        }
+        else {
+            $email = $self->{'entityDesc'}->{'mail'}[0] ;
+        }
+    }
+
+    # Si contact_commonname ET contact_lastname ET contact_firstname ET mail NON DEFINI / contact_commonname = empty
+    if ( !$commonname && !$lastname && !$firstname && !$email ) {
+        $self->{'entityDesc'}->{'contact_commonname'} = "empty" ;
+        $self->{'entityDesc'}->{'contact_firstname'} = "empty" ;
+        $self->{'entityDesc'}->{'contact_lastname'} = "empty" ;
+    }
+    if ( !$commonname && !$lastname && !$firstname && $email ) {
+        $self->{'entityDesc'}->{'contact_commonname'} = $email ;
+        if ( $email =~ /(.*)@(.*)/ ) {
+            $self->{'entityDesc'}->{'contact_firstname'} = $1 ;
+            $self->{'entityDesc'}->{'contact_lastname'} = $1 ;
+        } 
+        else {
+            $self->{'entityDesc'}->{'contact_firstname'} = "empty" ;
+            $self->{'entityDesc'}->{'contact_lastname'} = "empty" ;
+        }
+    }
+    if ( !$commonname && $lastname && !$firstname ) {
+        $self->{'entityDesc'}->{'contact_commonname'} = $lastname ;
+        $self->{'entityDesc'}->{'contact_firstname'} = $lastname ;
+    }
+    if ( !$commonname && !$lastname && $firstname ) {
+        $self->{'entityDesc'}->{'contact_commonname'} = $firstname;
+        $self->{'entityDesc'}->{'contact_lastname'} = $firstname ;
+    }
+    if ( !$commonname && $lastname && $firstname ) {
+        $self->{'entityDesc'}->{'contact_commonname'} = $firstname.' '.$lastname;
+    }
+
 }
