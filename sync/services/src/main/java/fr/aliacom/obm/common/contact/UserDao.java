@@ -201,12 +201,11 @@ public class UserDao {
 		return userDomain;
 	}
 
-	public List<Folder> findUpdatedFolders(AccessToken at, Date timestamp) {
+	public List<Folder> findUpdatedFolders(Date timestamp) {
 		if(isFirstSync(timestamp)){
 			Folder f = new Folder();
 			f.setUid(FOLDER_UID);
 			f.setName(FOLDER_NAME);
-			f.setOwnerDisplayName(at.getUser());
 			return ImmutableList.of(f);
 		}
 		
