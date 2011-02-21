@@ -399,7 +399,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		FolderChanges changes = new FolderChanges();
 		
 		List<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
-		updated.addAll(userDao.findUpdatedFolders(timestamp));
+		updated.addAll(userDao.findUpdatedFolders(token, timestamp));
 		changes.setUpdated(updated);
 		
 		changes.setRemoved(contactDao.findRemovedFolders(timestamp, token));

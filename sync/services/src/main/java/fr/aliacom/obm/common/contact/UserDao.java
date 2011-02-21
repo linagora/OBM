@@ -34,6 +34,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
 import org.obm.sync.book.Folder;
+import org.obm.sync.utils.DateHelper;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -200,11 +201,12 @@ public class UserDao {
 		return userDomain;
 	}
 
-	public List<Folder> findUpdatedFolders(Date timestamp) {
-		if(!isFirstSync(timestamp)){
+	public List<Folder> findUpdatedFolders(AccessToken at, Date timestamp) {
+		if(isFirstSync(timestamp)){
 			Folder f = new Folder();
 			f.setUid(FOLDER_UID);
 			f.setName(FOLDER_NAME);
+			f.setOwnerDisplayName(at.getUser());
 			return ImmutableList.of(f);
 		}
 		
@@ -212,7 +214,7 @@ public class UserDao {
 	}
 	
 	private boolean isFirstSync(Date timestamp) {
-		return timestamp == null || new Date(0).equals(timestamp);
+		return timestamp == null || DateHelper.asDate("0").equals(timestamp);
 	}
 
 }
