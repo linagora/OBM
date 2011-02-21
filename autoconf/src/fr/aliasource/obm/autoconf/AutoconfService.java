@@ -70,7 +70,7 @@ public class AutoconfService extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
 		}
-
+		
 		DirectoryConfig dc = new DirectoryConfig(login , domain, ConstantService
 				.getInstance());
 		LDAPQueryTool lqt = new LDAPQueryTool(dc);

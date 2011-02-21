@@ -29,11 +29,11 @@ public class DirectoryConfig {
 		ldapPort = cs.getIntValue("ldapPort");
 		ldapSearchBase = cs.getStringValue("ldapSearchBase");
 		ldapAtts = cs.getStringValue("ldapAtts").split(",");
-		if ( searchWithDomain == "true") {
+		if ( "true".equals(searchWithDomain)) {
+			logger.info("DirectoryConfig : search with domain'");
 			login = login + "@" + domain ;
 		}
 		ldapFilter = "(" + cs.getStringValue("ldapFilter") + "=" + login + ")";
-		logger.info("ldap filter: "+ldapFilter);
 		configXml = "/usr/share/obm-autoconf/config.xml";
 	}
 
