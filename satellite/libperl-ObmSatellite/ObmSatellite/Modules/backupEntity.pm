@@ -440,6 +440,7 @@ sub _setBackupRoot {
 sub _backupBackupFile {
     my $self = shift;
     my( $entity ) = @_;
+	my $language = $self->_getDefaultObmLang( $entity->getRealm() );
 
     my $backupFullPath = $entity->getBackupPath().'/'.$entity->getBackupName();
     my $backupFullPathBackup = $backupFullPath.'.backup';
@@ -447,18 +448,33 @@ sub _backupBackupFile {
     if( -e $backupFullPathBackup ) {
         $self->_log( 'Remove backuped backup file : '.$backupFullPathBackup, 5 );
         if( !unlink( $backupFullPathBackup ) ) {
-            return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-                content => [ 'Can\'t remove backuped backup file : '.$backupFullPathBackup ]
-                } );
+			if ( $language eq 'fr' ) {
+            	return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+               	 content => [ 'Impossible de supprimer le fichier de sauvegarde: '.$backupFullPathBackup ]
+                	} );
+			}
+			else {
+            	return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+               	 content => [ 'Can\'t remove backuped backup file : '.$backupFullPathBackup ]
+                	} );
+			}
         }
     }
     
     if( -e $backupFullPath ) {
         $self->_log( 'Rename '.$backupFullPath.' to '.$backupFullPathBackup, 5 );
         if( !move( $backupFullPath, $backupFullPathBackup ) ) {
-            return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-                content => [ 'Can\'t rename '.$backupFullPath.' to '.$backupFullPathBackup ]
-                } );
+			if ( $language eq 'fr' ) {
+            	return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            	    content => [ 'Impossible de renomer '.$backupFullPath.' en '.$backupFullPathBackup ]
+            	    } );
+			}
+			else {
+            	return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            	    content => [ 'Can\'t rename '.$backupFullPath.' to '.$backupFullPathBackup ]
+            	    } );
+
+			}
         }
     }
 
@@ -535,6 +551,7 @@ sub _purgeOldBackupFiles {
 sub _writeArchive {
     my $self = shift;
     my( $entity ) = @_;
+    my $language = $self->_getDefaultObmLang( $entity->getRealm() );
 
     my $backupFullPath = $entity->getBackupFileName();
     my $backupFullPathBackup = $backupFullPath.'.backup';
@@ -555,16 +572,31 @@ sub _writeArchive {
         my $result = $self->_restoreBackupBackupFile( $entity );
         SWITCH: {
             if( $result == 1 ) {
-                push( @{$content->{'content'}}, 'No backuped backup file found' );
+				if ( $language eq 'fr' ) {
+                	push( @{$content->{'content'}}, 'Aucun fichier de sauvegarde trouvé' );
+				}
+				else {
+                	push( @{$content->{'content'}}, 'No backuped backup file found' );
+				}
                 last SWITCH;
             }
 
             if( $result == 2 ) {
-                push( @{$content->{'content'}}, 'Can\'t move backuped backup file from'.$backupFullPathBackup.' to '.$backupFullPath );
+				if ( $language eq 'fr' ) {
+                	push( @{$content->{'content'}}, 'Impossible de déplacer le fichier de sauvegarde de '.$backupFullPathBackup.' vers '.$backupFullPath );
+				}
+				else {
+                	push( @{$content->{'content'}}, 'Can\'t move backuped backup file from'.$backupFullPathBackup.' to '.$backupFullPath );
+				}
                 last SWITCH;
             }
 
-            push( @{$content->{'content'}}, 'Backuped backup file '.$backupFullPathBackup.' restored to '.$backupFullPath );
+			if ( $language eq 'fr' ) {
+            	push( @{$content->{'content'}}, 'Fichier de sauvegarde '.$backupFullPathBackup.' restauré vers '.$backupFullPath );
+			}
+			else {
+            	push( @{$content->{'content'}}, 'Backuped backup file '.$backupFullPathBackup.' restored to '.$backupFullPath );
+			}
             last SWITCH;
         }
 
@@ -1424,6 +1456,8 @@ sub _pushFtpBackup {
     my $self = shift;
     my ($entity, $options, $response) = @_;
 
+    my $language = $self->_getDefaultObmLang( $entity->getRealm() );
+
     if(lc($options->{'ftp'}->{'push'}) eq 'false') {
         $self->_log('No push FTP asked', 3);
         $response->setExtraContent({
@@ -1450,7 +1484,12 @@ sub _pushFtpBackup {
     $self->_log('Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\'', 3);
     my $error = $ftpConn->put($entity->getBackupFileName(), $entity->getBackupName());
     if(!$error) {
-        my $errorMsg = 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+		if ( $language eq 'fr' ) {
+        	my $errorMsg = 'Transfert du fichier de sauvegarde \''.$entity->getBackupFileName().'\' vers le serveur FTP \''.$ftpHostName.'\' echoué: '.$ftpConn->message();
+		}
+		else {	
+        	my $errorMsg = 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+		}
         $self->_log($errorMsg, 1);
         $response->setExtraContent({
             pushFtp => {
@@ -1464,12 +1503,22 @@ sub _pushFtpBackup {
 
     $ftpConn->quit();
 
-    $response->setExtraContent({
-        pushFtp => {
-            content => 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' success',
-            success => 'true'
-        }
-    });
+	if ( $language eq 'fr' ) {
+    	$response->setExtraContent({
+    	    pushFtp => {
+    	        content => 'Transfert du fichier de sauvegarde \''.$entity->getBackupFileName().'\' vers le serveur FTP \''.$ftpHostName.'\' réussi',
+    	        success => 'true'
+    	    }
+    	});
+	}
+	else {
+    	$response->setExtraContent({
+    	    pushFtp => {
+    	        content => 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' success',
+    	        success => 'true'
+    	    }
+    	});
+	}
 
     return 0;
 }
@@ -1689,6 +1738,7 @@ sub _getFtpConn {
 sub _getFtpBackup {
     my $self = shift;
     my($entity, $response) = @_;
+    my $language = $self->_getDefaultObmLang( $entity->getRealm() );
 
     # Getting FTP backup server name for entity's OBM domain
     my $ftpHostName = $self->_getFtpBackupHost($entity, $response);
@@ -1705,7 +1755,12 @@ sub _getFtpBackup {
     $self->_log('Downloading '.$entity->getLogin().'@'.$entity->getRealm().' backup file from backup FTP server \''.$ftpHostName.'\'', 3);
     my $fileList = $ftpConn->ls( $entity->getBackupNamePrefix().'*' );
     if( !$fileList || (ref($fileList) ne 'ARRAY') ) {
-        my $errorMsg = 'Downloading '.$entity->getLogin().'@'.$entity->getRealm().' backup file from backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+		if ( $language eq 'fr' ) {
+	        my $errorMsg = 'Téléchargement du fichier de sauvegarde de '.$entity->getLogin().'@'.$entity->getRealm().' depuis le serveur FTP \''.$ftpHostName.'\' echoué: '.$ftpConn->message();
+		}
+		else {
+	        my $errorMsg = 'Downloading '.$entity->getLogin().'@'.$entity->getRealm().' backup file from backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+		}
         $self->_log($errorMsg, 1);
         $response->setExtraContent({
             pushFtp => {
