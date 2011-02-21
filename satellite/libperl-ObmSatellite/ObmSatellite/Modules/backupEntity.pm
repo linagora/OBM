@@ -1189,9 +1189,20 @@ sub _sendMailBackupReport {
         $content = $response->getContentValue('pushFtp');
         if(ref($content) eq 'HASH') {
             if($content->{'success'} eq 'true') {
-                push(@{$mail->{'content'}}, 'FTP upload: success - '.$content->{'content'});
-            }else {
-                push(@{$mail->{'content'}}, 'FTP upload: fail - '.$content->{'content'});
+				if ( $language eq 'fr') {
+                	push(@{$mail->{'content'}}, 'Transfert FTP réussi - '.$content->{'content'});
+				}
+				else {
+                	push(@{$mail->{'content'}}, 'FTP upload: success - '.$content->{'content'});
+				}
+            }
+			else {
+				if ( $language eq 'fr') {
+                	push(@{$mail->{'content'}}, 'Transfert FTP échoué - '.$content->{'content'});
+				}
+				else {
+                	push(@{$mail->{'content'}}, 'FTP upload: fail - '.$content->{'content'});
+				}
             }
         }
     }
@@ -1308,9 +1319,20 @@ sub _sendRetrieveReport {
         $content = $response->getContentValue('pushFtp');
         if(ref($content) eq 'HASH') {
             if($content->{'success'} eq 'true') {
-                push(@{$mail->{'content'}}, 'FTP download: success'."\n".$content->{'content'});
-            }else {
-                push(@{$mail->{'content'}}, 'FTP download: fail - '.$content->{'content'});
+				if ( $language eq 'fr') {
+	                push(@{$mail->{'content'}}, 'Téléchargement FTP réussi - '."\n".$content->{'content'});
+				}
+				else {
+	                push(@{$mail->{'content'}}, 'FTP download: success - '."\n".$content->{'content'});
+				}
+            }
+			else {
+				if ( $language eq 'fr') {
+                	push(@{$mail->{'content'}}, 'Téléchargement FTP échoué - '.$content->{'content'});
+				}
+				else {
+                	push(@{$mail->{'content'}}, 'FTP download: fail - '.$content->{'content'});
+				}
             }
         }
     }
@@ -1460,17 +1482,18 @@ sub _getFtpBackupHost {
     my $ldapEntityEntity = $self->_getLdapValues($entity->getLdapFilter(),['delegation']) ;
     my $entityDelegation = $ldapEntityEntity->[0]->get_value('delegation');
 
-    # if entityDelegation aren't defined search ftp of obm domain 
     my $ldapEntity = undef ;
-    if ( !defined($entityDelegation) ) {
-        $ldapEntity = $self->_getLdapValues(
-            '(&(objectClass=obmBackup)(obmDomain='.$entity->getRealm().'))',
-            ['ftpHost'] );
-    }
-    else {
+	if ( defined($entityDelegation))  {
         $ldapEntity = $self->_getLdapValues(
             '(&(objectClass=obmHost)(obmDomain='.$entity->getRealm().')
                 (delegation='.$entityDelegation.'))',['cn'] ) ;
+    }
+    # if entityDelegation aren't defined search ftp of obm domain 
+	# or if entityDelegation are defined but no ftp found
+    if ( !defined($entityDelegation) || !defined($ldapEntity) ) {
+        $ldapEntity = $self->_getLdapValues(
+            '(&(objectClass=obmBackup)(obmDomain='.$entity->getRealm().'))',
+            ['ftpHost'] );
     }
 
     if(!defined($ldapEntity)) {
