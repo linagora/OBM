@@ -130,12 +130,18 @@ sub _putMethod {
     $self->_removeTmpArchive( $entity );
     $self->_removeBackupBackupFile( $entity );
     $self->_purgeOldBackupFiles( $entity );
+	my $language = $self->_getDefaultObmLang( $entity->getRealm() );
 
     if( !$response ) {
         $self->_log( 'Backup '.$entity->getLogin().'@'.$entity->getRealm().' successfully', 3 );
         $response = $self->_response( RC_OK, {
             content => [ 'Backup '.$entity->getLogin().'@'.$entity->getRealm().' successfully' ]
             } );
+		if ( $language eq 'fr' ) {
+       	 $response = $self->_response( RC_OK, {
+       	     content => [ 'Sauvegarde '.$entity->getLogin().'@'.$entity->getRealm().' reussie' ]
+       	     } );
+		}
 
         $self->_pushFtpBackup($entity, $xmlContent->{'options'}, $response);
     }else {
@@ -1484,11 +1490,12 @@ sub _pushFtpBackup {
     $self->_log('Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\'', 3);
     my $error = $ftpConn->put($entity->getBackupFileName(), $entity->getBackupName());
     if(!$error) {
+		my $errorMsg = '' ;
 		if ( $language eq 'fr' ) {
-        	my $errorMsg = 'Transfert du fichier de sauvegarde \''.$entity->getBackupFileName().'\' vers le serveur FTP \''.$ftpHostName.'\' echoué: '.$ftpConn->message();
+        	$errorMsg = 'Transfert du fichier de sauvegarde \''.$entity->getBackupFileName().'\' vers le serveur FTP \''.$ftpHostName.'\' echoué: '.$ftpConn->message();
 		}
 		else {	
-        	my $errorMsg = 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+        	$errorMsg = 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
 		}
         $self->_log($errorMsg, 1);
         $response->setExtraContent({
