@@ -40,18 +40,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->return_path = $this->getOwner($event);
     $this->subject = __('New event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
-    if ($this->attachIcs) {
-      $ics_file = $this->generateIcs($event, "request");
-      $this->parts[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',
-        'encoding' => $this->icsEncoding
-      );
-      $this->attachments[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
-      );
-    }
+    $this->attachIcs($event, "request");
   }
 
   protected function eventCancel($event, $attendees) {
@@ -60,18 +49,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->return_path = $this->getOwner($event);
     $this->subject = __('Event cancelled by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
-    if ($this->attachIcs) {
-      $ics_file = $this->generateIcs($event, "cancel");
-      $this->parts[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=CANCEL',
-        'encoding' => $this->icsEncoding
-      );
-      $this->attachments[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
-      );
-    }
+    $this->attachIcs($event, "cancel");
   }
   
   protected function eventUpdate($event, $oldEvent, $attendees) {
@@ -81,18 +59,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->subject = __('Event updated by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
-    if ($this->attachIcs) {
-      $ics_file = $this->generateIcs($event, "request");
-      $this->parts[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',
-        'encoding' => $this->icsEncoding
-      );
-      $this->attachments[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
-      );      
-    }
+    $this->attachIcs($event, "request");
   }
 
   protected function eventStateUpdate($event, $user) {
@@ -153,18 +120,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->recipients = $recips;
     $this->subject = __('New event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
-    if ($this->attachIcs) {
-      $ics_file = $this->generateIcs($event, "request", true);
-      $this->parts[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',
-        'encoding' => $this->icsEncoding
-      );
-      $this->attachments[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
-      );
-    }
+    $this->attachIcs($event, "request", true);
   }
 
 
@@ -182,18 +138,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->recipients = $recips;
     $this->subject = __('Event cancelled by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
-    if ($this->attachIcs) {
-      $ics_file = $this->generateIcs($event, "cancel");
-      $this->parts[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=CANCEL',
-        'encoding' => $this->icsEncoding
-      );
-      $this->attachments[] = array(
-        'content' => fopen($ics_file, 'r'), 
-        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
-      );
-    }
+    $this->attachIcs($event, "cancel");
   }
 
 
@@ -212,8 +157,12 @@ class CalendarMailer extends OBM_Mailer {
     $this->subject = __('Event updated by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
+    $this->attachIcs($event, "request", true);
+  }
+  
+  protected function attachIcs($event, $method, $include_attachments = false) {
     if ($this->attachIcs) {
-      $ics_file = $this->generateIcs($event, "request", true);
+      $ics_file = $this->generateIcs($event, $method, $include_attachments);
       $this->parts[] = array(
         'content' => fopen($ics_file, 'r'), 
         'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',

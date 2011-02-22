@@ -315,18 +315,6 @@ CREATE TABLE field (
   value         text
 );
 
-
---
--- Table structure for table `P_field`
---
-
-DROP TABLE IF EXISTS P_field;
-CREATE TABLE P_field (LIKE field);
-
-
---
--- Name: field_field_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
 CREATE SEQUENCE field_id_seq
     START WITH 1
     INCREMENT BY 1
@@ -337,11 +325,18 @@ CREATE SEQUENCE field_id_seq
 ALTER SEQUENCE field_id_seq OWNED BY field.id;
 ALTER TABLE field ALTER COLUMN id SET DEFAULT nextval('field_id_seq'::regclass);
 
---
--- field fkey
---
+ALTER TABLE ONLY field
+    ADD CONSTRAINT field_id_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY field
     ADD CONSTRAINT field_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES Entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Table structure for table `P_field`
+--
+
+DROP TABLE IF EXISTS P_field;
+CREATE TABLE P_field (LIKE field);
+
 
 --
 -- Resource group delegation

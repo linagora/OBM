@@ -92,8 +92,7 @@ class OBM_Mailer extends SMailer {
 
     $uid = sql_parse_id($obm['uid'], true);
     $query = "SELECT 
-    userobm_email, userobm_lastname, userobm_firstname, userobm_direction,
-    userobm_service, domain_name
+    userobm_email, userobm_lastname, userobm_firstname, userobm_commonname, domain_name
     FROM UserObm
     INNER JOIN Domain ON userobm_domain_id = domain_id
     WHERE userobm_id $uid ";
@@ -105,7 +104,9 @@ class OBM_Mailer extends SMailer {
     
     $email = $this->getEntityEmail($db->f('userobm_email'), $db->f('domain_name'));
     if(!$email) $email = $this->getEntityEmail('noreply');
-    return array($email, rtrim(sprintf($GLOBALS['l_displayname_template'], $db->f('userobm_firstname'), $db->f('userobm_lastname'), $db->f('userobm_direction'), $db->f('userobm_service'))));
+    $displayname = $db->f('userobm_commonname');
+    if (!$displayname) $displayname = sprintf($GLOBALS['l_displayname_template'], $db->f('userobm_firstname'), $db->f('userobm_lastname'));
+    return array($email, $displayname);
   }
 
 
@@ -118,7 +119,7 @@ class OBM_Mailer extends SMailer {
     $owner_label = $event->owner->label;
     $owner_id = sql_parse_id($event->owner->id, true);
     $query = "SELECT 
-    userobm_email, userobm_lastname, userobm_firstname, domain_name
+    userobm_email, domain_name
     FROM UserObm
     INNER JOIN Domain ON userobm_domain_id = domain_id
     WHERE userobm_id $owner_id";
@@ -174,7 +175,7 @@ class OBM_Mailer extends SMailer {
     }
 
     $query = "SELECT 
-      userobm_email, userobm_lastname, userobm_firstname, domain_name
+      userobm_email, userobm_lastname, userobm_firstname, userobm_commonname, domain_name
       FROM UserObm 
       INNER JOIN Domain on userobm_domain_id = domain_id
       $join
@@ -188,8 +189,10 @@ class OBM_Mailer extends SMailer {
     
     while ($db->next_record()) {
       $email = $this->getEntityEmail($db->f('userobm_email'), $db->f('domain_name'));
+      $displayname = $db->f('userobm_commonname');
+      if (!$displayname) $displayname = sprintf($GLOBALS['l_displayname_template'], $db->f('userobm_firstname'), $db->f('userobm_lastname'));
       if (isset($email) && $email != "") {
-        $recipients[] = array($email, $db->f('userobm_firstname').' '.$db->f('userobm_lastname'));
+        $recipients[] = array($email, $displayname);
       }
     }
 
