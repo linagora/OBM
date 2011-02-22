@@ -1755,11 +1755,12 @@ sub _getFtpBackup {
     $self->_log('Downloading '.$entity->getLogin().'@'.$entity->getRealm().' backup file from backup FTP server \''.$ftpHostName.'\'', 3);
     my $fileList = $ftpConn->ls( $entity->getBackupNamePrefix().'*' );
     if( !$fileList || (ref($fileList) ne 'ARRAY') ) {
+    my $errorMsg;
 		if ( $language eq 'fr' ) {
-	        my $errorMsg = 'Téléchargement du fichier de sauvegarde de '.$entity->getLogin().'@'.$entity->getRealm().' depuis le serveur FTP \''.$ftpHostName.'\' echoué: '.$ftpConn->message();
+	        $errorMsg = 'Téléchargement du fichier de sauvegarde de '.$entity->getLogin().'@'.$entity->getRealm().' depuis le serveur FTP \''.$ftpHostName.'\' echoué: '.$ftpConn->message();
 		}
 		else {
-	        my $errorMsg = 'Downloading '.$entity->getLogin().'@'.$entity->getRealm().' backup file from backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+	        $errorMsg = 'Downloading '.$entity->getLogin().'@'.$entity->getRealm().' backup file from backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
 		}
         $self->_log($errorMsg, 1);
         $response->setExtraContent({
