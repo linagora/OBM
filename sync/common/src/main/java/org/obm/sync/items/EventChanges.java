@@ -10,6 +10,7 @@ public class EventChanges {
 
 	private String[] removed;
 	private Event[] updated;
+	private ParticipationChanges[] participationUpdated;
 	private Date lastSync;
 	private String[] removedExtIds;
 
@@ -48,4 +49,12 @@ public class EventChanges {
 		return removedExtIds;
 	}
 
+	public ParticipationChanges[] getParticipationUpdated() {
+		return participationUpdated;
+	}
+	
+	public void setParticipationUpdated(ParticipationChanges[] participationUpdated) {
+		this.participationUpdated = participationUpdated;
+	}
+	
 }

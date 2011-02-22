@@ -353,5 +353,18 @@ public class Event {
 	public void setDomain(String domain) {
 		this.domain = domain;
 	}
+
+	public boolean modifiedSince(Date reference) {
+		if (reference == null) {
+			return true;
+		}
+		if (timeCreate.after(reference)) {
+			return true;
+		}
+		if (timeUpdate != null && timeUpdate.after(reference)) {
+			return true;
+		}
+		return false;
+	}
 	
 }

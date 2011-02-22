@@ -60,8 +60,11 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.items.EventChanges;
+import org.obm.sync.items.ParticipationChanges;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -846,6 +849,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ " FROM Event e "
 				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
 				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
+				+ "INNER JOIN EventLink attupd ON attupd.eventlink_event_id=e.event_id "
 				+ "WHERE e.event_type=? AND ue.userentity_user_id=? ";
 
 		// dirty hack to disable need-action to opush & tbird
@@ -854,13 +858,15 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 
 		if (lastSync != null) {
-			fetchIds += " AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? OR att.eventlink_timeupdate >= ?";
+			fetchIds += " AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? OR attupd.eventlink_timeupdate >= ?";
 			if (onEventDate) {
 				fetchIds += " OR e.event_date >= ? OR event_repeatkind != 'none'";
 			}
 			fetchIds += ")";
 		}
 
+		fetchIds += " GROUP BY e.event_id, att.eventlink_state, e.event_ext_id";
+		
 		StringBuilder sb = new StringBuilder(fetchIds);
 		SyncRange sr = addSyncRanges(sb, token);
 
@@ -981,12 +987,46 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			loadEventExceptions(token, eventById, evIdList);
 		}
 
+		//sort between update and participation update based on event timestamp
+		sortUpdatedEvents(changedEvent, ret, lastSync);
+		
 		ret.setDeletions(findDeletedEvents(calendarUser, lastSync, typeFilter,
 				declined));
-		ret.setUpdated(changedEvent.toArray(new Event[0]));
+		
 		return ret;
 	}
 
+	private void sortUpdatedEvents(List<Event> changedEvent, EventChanges ret, Date lastSync) {
+		List<Event> updated = new ArrayList<Event>();
+		List<Event> participationChanged = new ArrayList<Event>();
+		
+		for (Event event: changedEvent) {
+			if (event.modifiedSince(lastSync)) {
+				updated.add(event);
+			} else {
+				//means that only participation changed
+				participationChanged.add(event);
+			}
+			
+		}
+		ret.setParticipationUpdated(eventsToParticipationUpdateArray(participationChanged));
+		ret.setUpdated(updated.toArray(new Event[0]));
+	}
+
+	private ParticipationChanges[] eventsToParticipationUpdateArray(List<Event> participationChanged) {
+		return Lists.transform(participationChanged, new Function<Event, ParticipationChanges>() {
+			@Override
+			public ParticipationChanges apply(Event event) {
+				ParticipationChanges participationChanges = new ParticipationChanges(); 
+				participationChanges.setAttendees(event.getAttendees());
+				participationChanges.setEventExtId(event.getExtId());
+				participationChanges.setEventId(event.getDatabaseId());
+				return participationChanges;
+			}
+		}).toArray(new ParticipationChanges[0]);
+	}
+
+	
 	private SyncRange addSyncRanges(StringBuilder sb, AccessToken token) {
 		String min = token.getServiceProperty("funis/sync_days_min");
 		String max = token.getServiceProperty("funis/sync_days_max");
