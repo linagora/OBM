@@ -1776,7 +1776,11 @@ sub _getFtpBackup {
     my @downloadMsgs;
     for( my $i=0; $i<=$#{$fileList}; $i++ ) {
         if(-f $entity->getBackupPath().'/'.$fileList->[$i]) {
-            my $errorMsg = 'Backup \''.$fileList->[$i].'\' already exist, skip download';
+            if ( $language eq 'fr' ) {
+              my $errorMsg = 'La sauvegarde \''.$fileList->[$i].'\' existe déjà, téléchargement non effectué.';
+            } else {
+              my $errorMsg = 'Backup \''.$fileList->[$i].'\' already exist, skip download';
+            }
             push(@downloadMsgs, $errorMsg);
             next;
         }
@@ -1786,13 +1790,21 @@ sub _getFtpBackup {
 
         my $errorMsg;
         if(!$error) {
-            $errorMsg = 'Download \''.$fileList->[$i].'\' from backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+            if ( $language eq 'fr' ) {
+              $errorMsg = 'Le téléchargement \''.$fileList->[$i].'\' depuis le serveur de sauvegarde FTP \''.$ftpHostName.'\' a échoué : '.$ftpConn->message();
+            } else {
+              $errorMsg = 'Download \''.$fileList->[$i].'\' from backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+            }
             $self->_log($errorMsg, 1);
 
             $nbFailed++;
-        }else {
-            $errorMsg = 'Download \''.$fileList->[$i].'\' from backup FTP server \''.$ftpHostName.'\' success';
-            $self->_log($errorMsg, 4);
+        } else {
+            if ( $language eq 'fr' ) {
+              $errorMsg = 'Le téléchargement \''.$fileList->[$i].'\' depuis le serveur de sauvegarde FTP \''.$ftpHostName.'\' a réussi.';
+            } else {
+              $errorMsg = 'Download \''.$fileList->[$i].'\' from backup FTP server \''.$ftpHostName.'\' success';
+            }
+          $self->_log($errorMsg, 4);
         }
 
         push(@downloadMsgs, $errorMsg);
