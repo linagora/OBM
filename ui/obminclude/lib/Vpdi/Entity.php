@@ -147,7 +147,7 @@ class Vpdi_Entity implements ArrayAccess {
   public function getPropertiesByName($name) {
     $properties = array();
     foreach ($this->properties as $property) {
-      if ($property->nameEquals($name)) {
+      if ($property instanceof Vpdi_Property && $property->nameEquals($name)) {
         $properties[] = $property;
       }
     }
