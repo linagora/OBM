@@ -92,8 +92,10 @@ MODIFY `userobm_login` varchar(64);
 -- UserObm
 --
 ALTER TABLE P_UserObm 
+ADD COLUMN userobm_commonname varchar(256) default '',
 MODIFY `userobm_delegation` varchar(256) default '',
-MODIFY `userobm_delegation_target` varchar(256) default '';
+MODIFY `userobm_delegation_target` varchar(256) default '',
+MODIFY `userobm_login` varchar(64);
 
 --
 -- Contact

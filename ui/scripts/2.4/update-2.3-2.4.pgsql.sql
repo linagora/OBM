@@ -104,8 +104,10 @@ ADD COLUMN contact_commonname varchar(256) default '';
 -- Update p_userobm
 --
 ALTER TABLE p_userobm 
+ADD COLUMN userobm_commonname varchar(256) default '', 
 ALTER userobm_delegation TYPE character varying(256),
-ALTER userobm_delegation_target TYPE character varying(256);
+ALTER userobm_delegation_target TYPE character varying(256),
+ALTER userobm_login TYPE character varying(64);
 
 --
 -- Update obmbookmarkproperty
