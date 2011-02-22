@@ -1776,10 +1776,11 @@ sub _getFtpBackup {
     my @downloadMsgs;
     for( my $i=0; $i<=$#{$fileList}; $i++ ) {
         if(-f $entity->getBackupPath().'/'.$fileList->[$i]) {
+            my $errorMsg;
             if ( $language eq 'fr' ) {
-              my $errorMsg = 'La sauvegarde \''.$fileList->[$i].'\' existe déjà, téléchargement non effectué.';
+              $errorMsg = 'La sauvegarde \''.$fileList->[$i].'\' existe déjà, téléchargement non effectué.';
             } else {
-              my $errorMsg = 'Backup \''.$fileList->[$i].'\' already exist, skip download';
+              $errorMsg = 'Backup \''.$fileList->[$i].'\' already exist, skip download';
             }
             push(@downloadMsgs, $errorMsg);
             next;
