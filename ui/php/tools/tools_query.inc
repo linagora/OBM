@@ -546,8 +546,8 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
     foreach ($fields as $field) {
       if(strpos(strtolower($field['flags']),'primary') === false) {
         $diff[] = "Production.$field[name] != Link.$field[name]";
-          $diff[] = "(Production.$field[name] IS NULL AND Link.$field[name] IS NOT NULL)";
-          $diff[] = "(Production.$field[name] IS NOT NULL AND Link.$field[name] IS NULL)";
+        $diff[] = "(Production.$field[name] IS NULL AND Link.$field[name] IS NOT NULL)";
+        $diff[] = "(Production.$field[name] IS NOT NULL AND Link.$field[name] IS NULL)";
       } else {
         $diff[] = "Production.$field[name] IS NULL";
         $diff[] = "Link.$field[name] IS NULL";
@@ -604,7 +604,6 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
     $join = array();
     $fields = $obm_qm->metadata($property['table'], false);
     foreach ($fields as $field) {
-      $join[] = "Property.$field[name] = Production.$field[name]";
       if(strpos(strtolower($field['flags']),'primary') === false) {
         $diff[] = "Production.$field[name] != Property.$field[name]";
         $diff[] = "(Production.$field[name] IS NULL AND Property.$field[name] IS NOT NULL)";
@@ -612,6 +611,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
       } else {
         $diff[] = "Production.$field[name] IS NULL";
         $diff[] = "Property.$field[name] IS NULL";
+        $join[] = "Property.$field[name] = Production.$field[name]";
       }
     }
     if($property['join']) {
