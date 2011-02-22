@@ -1484,11 +1484,12 @@ sub _pushFtpBackup {
     $self->_log('Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\'', 3);
     my $error = $ftpConn->put($entity->getBackupFileName(), $entity->getBackupName());
     if(!$error) {
+		my $errorMsg = '' ;
 		if ( $language eq 'fr' ) {
-        	my $errorMsg = 'Transfert du fichier de sauvegarde \''.$entity->getBackupFileName().'\' vers le serveur FTP \''.$ftpHostName.'\' echoué: '.$ftpConn->message();
+        	$errorMsg = 'Transfert du fichier de sauvegarde \''.$entity->getBackupFileName().'\' vers le serveur FTP \''.$ftpHostName.'\' echoué: '.$ftpConn->message();
 		}
 		else {	
-        	my $errorMsg = 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
+        	$errorMsg = 'Uploading backup file \''.$entity->getBackupFileName().'\' to backup FTP server \''.$ftpHostName.'\' fail: '.$ftpConn->message();
 		}
         $self->_log($errorMsg, 1);
         $response->setExtraContent({
@@ -1677,6 +1678,7 @@ sub _getFtpBackupConn {
 sub _getFtpConn {
     my $self = shift;
     my($response, $obmBackupFtpHostname, $ftpHostIp, $ftpHostLogin, $ftpHostPassword, $ftpHostRoot) = @_;
+    my $language = $self->_getDefaultObmLang( $entity->getRealm() );
 
     my $ftpConn = Net::FTP->new( $ftpHostIp, Timeout => BACKUP_FTP_TIMEOUT );
     if( !defined($ftpConn) ) {
@@ -1693,6 +1695,9 @@ sub _getFtpConn {
     my $error = $ftpConn->login($ftpHostLogin, $ftpHostPassword);
     if(!$error) {
         my $errorMsg = 'Backup FTP server \''.$obmBackupFtpHostname.'\' fail: '.$ftpConn->message();
+		if ( $language eq 'fr' ) {
+        	$errorMsg = 'Erreur sur le serveur FTP \''.$obmBackupFtpHostname.'\' raison: '.$ftpConn->message();
+		}
         $self->_log($errorMsg, 1);
         $response->setExtraContent({
             pushFtp => {
@@ -1706,6 +1711,9 @@ sub _getFtpConn {
     $error = $ftpConn->binary();
     if(!$error) {
         my $errorMsg = 'Backup FTP server \''.$obmBackupFtpHostname.'\' setup fail: '.$ftpConn->message();
+		if ( $language eq 'fr' ) {
+        	$errorMsg = 'Erreur sur le serveur FTP \''.$obmBackupFtpHostname.'\' raison: '.$ftpConn->message();
+		}
         $self->_log($errorMsg, 1);
         $response->setExtraContent({
             pushFtp => {
@@ -1720,6 +1728,9 @@ sub _getFtpConn {
         $error = $ftpConn->cwd($ftpHostRoot);
         if(!$error) {
             my $errorMsg = 'Backup FTP server \''.$obmBackupFtpHostname.'\' setup fail: '.$ftpConn->message();
+			if ( $language eq 'fr' ) {
+        		$errorMsg = 'Erreur sur le serveur FTP \''.$obmBackupFtpHostname.'\' raison: '.$ftpConn->message();
+			}
             $self->_log($errorMsg, 1);
             $response->setExtraContent({
                 pushFtp => {
