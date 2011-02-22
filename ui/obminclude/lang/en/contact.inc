@@ -9,6 +9,7 @@
 
 $l_middlename = 'Middle Name';
 $l_mname = 'Middle Name';
+$l_commonname = 'Common name';
 $l_suffix = 'Suffix';
 $l_market = "Person in charge";
 $l_function = "Function";

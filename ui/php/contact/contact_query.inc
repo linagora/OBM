@@ -31,6 +31,7 @@ function run_query_contact_search($contact) {
   $fuzzy = $contact['fuzzy'];
   $lastname = sql_search_text_parse($contact['lastname']);
   $firstname = sql_search_text_parse($contact['firstname']);
+  $commonname = sql_search_text_parse($contact['commonname']);
   $phone = sql_search_text_parse($contact['phone']);
   $email = sql_search_text_parse($contact['email']);
   $company = sql_search_text_parse($contact['company']);
@@ -107,6 +108,10 @@ function run_query_contact_search($contact) {
   if ($firstname != '') {
     $where .= " AND contact_firstname #LIKE '$firstname%'";
   }
+  // If a commonname has been specified, get it 
+  if ($commonname != '') {
+    $where .= " AND contact_commonname #LIKE '$commonname%'";
+  } 
   // If a phone number has been specified, get it 
   if ($phone != '') {
     $where .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number #LIKE '$phone%')";
@@ -251,6 +256,7 @@ function run_query_contact_search($contact) {
     #CONCAT(contact_firstname,' ',contact_lastname) as contact_displayname,
     contact_lastname,
     contact_firstname,
+    contact_commonname,
     contact_aka,
     contact_function_id,
     contact_title,
@@ -494,7 +500,7 @@ function run_query_contact_remove_rights($contact_id) {
 // Parameters:
 //   - $contact[] : Entry's values
 //     keys used  : id, company_id, kind, lastname, firstname ad1, ad2, ad2, zip, town
-//                : cdx, ctry, func, phone, hphone, mphone, fax, email
+//                : cdx, ctry, func, phone, hphone, mphone, fax, email, commonname
 //                : com, com2, com3
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_update($contact) {
@@ -518,6 +524,7 @@ function run_query_contact_update($contact) {
   $market = sql_parse_id($contact['market']);
   $lastname = $contact['lastname'];
   $firstname = $contact['firstname'];
+  $commonname = $contact['commonname'];
   $mname = $contact['mname'];
   $suffix = $contact['suffix'];
   $aka = trim($contact['aka']);
@@ -577,6 +584,7 @@ function run_query_contact_update($contact) {
     contact_marketingmanager_id=$market,
     contact_lastname='$lastname',
     contact_firstname='$firstname',
+    contact_commonname='$commonname',
     contact_middlename='$mname',
     contact_suffix='$suffix',
     contact_aka='$aka',

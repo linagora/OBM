@@ -11,6 +11,7 @@ class OBM_Contact implements OBM_ISearchable {
     'userupdate' 	=> array('sql' => 'contact_userupdate', 'sqlkind' => 'text', 'type' => 'text'),
     'lastname' 	=> array('sql' => 'contact_lastname', 'sqlkind' => 'text', 'type' => 'text'),
     'firstname'	=> array('sql' => 'contact_firstname', 'sqlkind' => 'text', 'type' => 'text'),
+    'commonname'	=> array('sql' => 'contact_commonname', 'sqlkind' => 'text', 'type' => 'text'),
     'mname' 	=> array('sql' => 'contact_mname', 'sqlkind' => 'text', 'type' => 'text'),
     'kind' 	=> array('sql' => 'contact_kind', 'sqlkind' => 'text', 'type' => 'text'),
     'title' 	=> array('sql' => 'contact_title', 'sqlkind' => 'text', 'type' => 'text'),
@@ -57,6 +58,7 @@ class OBM_Contact implements OBM_ISearchable {
 
   private $lastname;
   private $firstname;
+  private $commonname;
   private $mname;//middlename
   private $kind;
   private $title;
@@ -189,6 +191,7 @@ class OBM_Contact implements OBM_ISearchable {
     $fields['*'] = array(
       'contact_lastname' => 'text',
       'contact_firstname' => 'text',
+      'contact_commonname' => 'text',
       'contact_middlename' => 'text',
       'contact_spouse' => 'text',
       'contact_suffix' => 'text',
@@ -242,6 +245,7 @@ class OBM_Contact implements OBM_ISearchable {
     $fields['zipcode'] = array('address_zipcode' => 'text');
     $fields['lastname'] = array('contact_lastname' => 'text');
     $fields['firstname'] = array('contact_firstname' => 'text');
+    $fields['commonname'] = array('contact_commonname' => 'text');
     $fields['mname'] = array('contact_middlename' => 'text');
     $fields['title'] = array('contact_title' => 'text');
     $fields['assistant'] = array('contact_assistant' => 'text');
@@ -339,7 +343,7 @@ class OBM_Contact implements OBM_ISearchable {
     $contact = new OBM_Contact;
     $contact->lastname  = $data['lastname'];
     $contact->firstname = $data['firstname'];
-    $fields = array('mname','kind','title','function','company_id','company',
+    $fields = array('commonname','mname','kind','title','function','company_id','company',
       'market_id','suffix','aka','sound','manager','assistant','spouse','category',
       'service','mailok','newsletter','archive','comment','comment2','comment3',
       'origin'
@@ -380,6 +384,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_marketingmanager_id,
       contact_lastname,
       contact_firstname,
+      contact_commonname,
       contact_middlename,
       contact_suffix,
       contact_aka,
@@ -413,6 +418,7 @@ class OBM_Contact implements OBM_ISearchable {
       $market_id,
       '{$contact->lastname}',
       '{$contact->firstname}',
+      '{$contact->commonname}',
       '{$contact->mname}',
       '{$contact->suffix}',
       '{$contact->aka}',
@@ -485,6 +491,7 @@ class OBM_Contact implements OBM_ISearchable {
     $doc->setField('addressbookId', $contact->addressbook_id);
     $doc->setField('company', $contact->company);
     $doc->setField('companyId', $contact->company_id);
+    $doc->setField('commonname', $contact->commonname);
     $doc->setField('lastname', $contact->lastname);
     $doc->setField('firstname', $contact->firstname);
     $doc->setField('middlename', $contact->mname);
@@ -578,6 +585,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_marketingmanager_id=$market_id,
       contact_lastname='".addslashes($contact->lastname)."',
       contact_firstname='".addslashes($contact->firstname)."',
+      contact_commonname='".addslashes($contact->commonname)."',
       contact_middlename='".addslashes($contact->mname)."',
       contact_suffix='".addslashes($contact->suffix)."',
       contact_aka='".addslashes($contact->aka)."',
@@ -795,7 +803,7 @@ class OBM_Contact implements OBM_ISearchable {
     }
 
     // x-obm-* (OBM specific fields)
-    $obmSpecificFields = array('mname','company_id','company','market_id','suffix',
+    $obmSpecificFields = array('commonname','mname','company_id','company','market_id','suffix',
       'aka','sound','manager','assistant','spouse','category','service',
       'mailok','newsletter', 'comment');
     foreach ($obmSpecificFields as $field) {
@@ -890,7 +898,7 @@ class OBM_Contact implements OBM_ISearchable {
     }
 
     // x-obm-* (OBM specific properties)
-    $obmSpecificProps = array('mname','company_id','company','market_id','suffix',
+    $obmSpecificProps = array('commonname','mname','company_id','company','market_id','suffix',
       'aka','sound','manager','assistant','spouse','category','service',
       'mailok','newsletter', 'comment');
     foreach ($obmSpecificProps as $prop) {
@@ -1016,6 +1024,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_userupdate,
       contact_lastname,
       contact_firstname,
+      contact_commonname,
       contact_middlename,
       kind_minilabel as contact_kind,
       kind_lang as contact_language,
@@ -1076,6 +1085,7 @@ class OBM_Contact implements OBM_ISearchable {
       contact_userupdate,
       contact_lastname,
       contact_firstname,
+      contact_commonname,
       contact_middlename,
       kind_minilabel,
       kind_lang,
@@ -1127,6 +1137,7 @@ class OBM_Contact implements OBM_ISearchable {
       $contact->userupdate    = $db->f('contact_userupdate');
       $contact->lastname      = $db->f('contact_lastname');
       $contact->firstname     = $db->f('contact_firstname');
+      $contact->commonname     = $db->f('contact_commonname');
       $contact->displayname   = __('%lastname% %firstname%', array('%lastname%' => $db->f('contact_lastname'), '%firstname%' => $db->f('contact_firstname')));
       $contact->mname         = $db->f('contact_middlename');
       $contact->kind_id       = $db->f('contact_kind_id');

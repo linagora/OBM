@@ -36,6 +36,7 @@ class UserPattern {
 
   static $allowed_attributes = array(
     'login'             => array( 'type'=>'string'  ),
+    'commonname'        => array( 'type'=>'string'  ),
     'passwd'            => array( 'type'=>'password'),
     'hidden'            => array( 'type'=>'boolean' ),
     'profile'           => array( 'type'=>'string', 'validate_func'=>'validate_profile' ),

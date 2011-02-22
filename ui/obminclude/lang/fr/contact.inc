@@ -10,6 +10,7 @@
 // Database fields
 $l_middlename = 'Deuxième prénom';
 $l_mname = 'Deuxième prénom';
+$l_commonname = 'Nom complet';
 $l_suffix = 'Suffixe';
 $l_market = "Responsable";
 $l_function = "Fonction";

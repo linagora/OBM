@@ -396,6 +396,7 @@ Obm.UserPattern.Form = new Class ({
     this.addField('lastname','userLastname','Field');
     this.addField('firstname','userFirstname','Field');
     this.addField('login','userLogin');
+    this.addField('commonname','userCommonname');
     this.addField('passwd','passwd','PasswordField');
     this.addField('hidden','cba_hidden','BooleanField');
     this.addField('profile','sel_profile', 'ChoiceField');

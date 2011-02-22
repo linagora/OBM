@@ -30,6 +30,9 @@
               <?php if(empty($contact->title)) { ?>
               <li><a href="" onclick="$('title').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Title') ?></a></li>
               <?php } ?>
+              <?php if(empty($contact->commonname)) { ?>
+              <li><a href="" onclick="$('commonname').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Common name') ?></a></li>
+              <?php } ?>
               <?php if(empty($contact->im)) { ?>
               <li><a  href="" onclick="$('IMLayout').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Instant messaging') ?></a></li>
               <?php } ?>
@@ -101,6 +104,10 @@
               <span id="title" class="formField <?php echo (empty($contact->title)?'H':'') ?>">
                 <label for="titleField"><?php echo __('Title') ?> : </label>
                 <input type="text" name="title" id="titleField" value="<?php echo $contact->title ?>" title="<?php echo __('Title') ?>" />
+              </span>
+              <span id="commonname" class="formField <?php echo (empty($contact->commonname)?'H':'') ?>">
+                <label for="commonnameField"><?php echo __('Common name') ?> : </label>
+                <input type="text" name="commonname" id="commonnameField" value="<?php echo $contact->commonname ?>" title="<?php echo __('Common name') ?>" />
               </span>
               <br />
               <span id="company" class="formField">

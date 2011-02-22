@@ -30,6 +30,8 @@ $fieldnames['email'] = $l_email;
 $fieldnames['archive'] = $l_archive;
 $fieldnames['date'] = $l_date;
 $fieldnames['company'] = $l_company;
+$fieldnames['commonname'] = $l_commonname;
+
 // Calculated fields
 
 
@@ -386,6 +388,7 @@ function html_contact_get_list($contacts, $headers) {
  * @access public
  * @return void
  */
+//TODO check if this function is used somewhere
 function dis_contact_consult2($contact) {
   $addressBooks = OBM_AddressBook::search();
   foreach($addressBooks as $id => $addressBook) {
@@ -599,6 +602,8 @@ function dis_contact_consult2($contact) {
  * @access public
  * @return void
  */
+//TODO check if this function is used somewhere
+
 function dis_contact_form2($params) {
 
   $add = array();
@@ -840,12 +845,13 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $csearch_advanced_default, $l_fuzzy, $l_date, $l_timeupdate;
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_datasource;
   global $l_after, $l_before, $l_mailing_ok_only, $l_newsletter, $l_archive;
-  global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
+  global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email, $l_commonname;
   global $l_visibility;
 
   $addressbook_id = $contact['addressbook_id'];
   $lastname = stripslashes($contact['lastname']);
-  $firstname = stripslashes($contact['firstname']);
+  $firstname = stripslashes($contact['firstname']); 
+  $commonname = stripslashes($contact['commonname']);
   $phone = stripslashes($contact['phone']);
   $company = stripslashes($contact['company']);
   $email = stripslashes($contact['email']);
@@ -987,6 +993,10 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_firstname<br />
       <input type=\"text\" name=\"tf_firstname\" size=\"12\" value=\"$firstname\" />
     </label>
+    <label>$l_commonname<br />
+      <input type=\"text\" name=\"tf_commonname\" size=\"12\" value=\"$commonname\" />
+    </label>
+
     <label>$l_from_company<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
     </label>
@@ -1110,6 +1120,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $mailing_ok_only = $contact['mailing_ok_only'];
   $lastname = urlencode(stripslashes($contact['lastname']));
   $firstname = stripslashes($contact['firstname']);
+  $commonname = stripslashes($contact['commonname']);
   $phone = urlencode(stripslashes($contact['phone']));
   $email = stripslashes($contact['email']);
   $zip = stripslashes($contact['zip']);
@@ -1126,7 +1137,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('contact', $contact);
 
-  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lastname=$lastname&amp;tf_firstname=$firstname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lastname=$lastname&amp;tf_firstname=$firstname&amp;tf_commonname=$commonname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
 
   $dis_contact = new OBM_DISPLAY('DATA', $prefs, 'contact');
   if ($popup) {
@@ -1182,7 +1193,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
 function html_contact_header($co_q, $funcs) {
   global $cgp_show, $cgp_hide, $l_yes, $l_no;
   global $display, $path, $action, $ccontact_simple_kind;
-  global $l_lastname, $l_firstname, $l_middlename, $l_suffix, $l_aka, $l_kind;
+  global $l_lastname, $l_firstname, $l_middlename, $l_suffix, $l_aka, $l_kind, $l_commonname;
   global $l_contact, $l_company, $l_title, $l_market, $l_archive;
   global $l_date, $l_no_date, $l_birthday, $l_anniversary;
   global $l_other_infos, $l_manager, $l_assistant, $l_spouse, $l_category;
@@ -1205,7 +1216,8 @@ function html_contact_header($co_q, $funcs) {
   $title = $co_q->f('contact_title');
   $market = $co_q->f('market_lname') . ' ' . $co_q->f('market_fname');
   $lname = $co_q->f('contact_lastname');
-  $fname = $co_q->f('contact_firstname');
+  $fname = $co_q->f('contact_firstname');  
+  $cname = $co_q->f('contact_commonname');
   $mname = $co_q->f('contact_middlename');
   $suffix = $co_q->f('contact_suffix');
   $aka = $co_q->f('contact_aka');
@@ -1370,6 +1382,10 @@ function html_contact_header($co_q, $funcs) {
     <tr>
       <th>$l_firstname</th>
       <td>$fname</td>
+    </tr>
+    <tr>
+      <th>$l_commonname</th>
+      <td>$cname</td>
     </tr>
     <tr>
       <th>$l_middlename</th>

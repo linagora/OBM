@@ -262,6 +262,10 @@ function html_userpattern_consult($pattern) {
   <tr>
     <th>{$GLOBALS['l_login']}</th>
     <td>{$attributes['login']}</td>
+  </tr>  
+  <tr>
+    <th>{$GLOBALS['l_commonname']}</th>
+    <td>{$attributes['commonname']}</td>
   </tr>
   <tr>
     <th>{$GLOBALS['l_hidden']}</th>
@@ -399,6 +403,7 @@ function html_userpattern_form($action, $params=array(), $pattern=null) {
 
     $attributes = $pattern->attributes;
     $login             = $attributes['login'];
+    $commonname        = $attributes['commonname'];
     $passwd            = $attributes['passwd']=='%random%' ? 'checked="checked"' : '';
     $hidden            = $attributes['hidden'] ? 'checked="checked"' : '';
     $profile           = $attributes['profile'];
@@ -439,6 +444,7 @@ function html_userpattern_form($action, $params=array(), $pattern=null) {
 
   $userpattern = $params['attributes'];
   if (isset($userpattern['login']))             $login             = $userpattern['login'];
+  if (isset($userpattern['commonname']))        $commonname        = $userpattern['commonname'];
   if (isset($userpattern['passwd']))            $passwd            = $userpattern['passwd']=='%random%' ? 'checked="checked"' : '';
   if (isset($userpattern['hidden']))            $hidden            = $userpattern['hidden'] ? 'checked="checked"' : '';
   if (isset($userpattern['profile']))           $profile           = $userpattern['profile'];
@@ -743,6 +749,10 @@ function html_userpattern_form($action, $params=array(), $pattern=null) {
   <tr>
     <th class=\"$class[login]\">{$GLOBALS['l_login']}</th>
     <td><input id=\"\" type=\"text\" name=\"attributes[login]\" value=\"$login\" /></td>
+  </tr>
+  <tr>
+    <th class=\"$class[commonname]\">{$GLOBALS['l_commonname']}</th>
+    <td><input id=\"\" type=\"text\" name=\"attributes[commonname]\" value=\"$commonname\" /></td>
   </tr>
   <tr>
     <th class=\"$class[passwd]\"><label for=\"cb_attributes_password\">{$GLOBALS['l_generate_password']}</label></th>

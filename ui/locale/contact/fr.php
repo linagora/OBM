@@ -49,6 +49,7 @@ return array(
   'Mailing' => 'Accepte les courriels',
   'Manager' => 'Responsable',
   'Marketing manager' => 'Responsable commercial',
+  'Common name' => 'Nom complet',
   'Middle name' => 'Deuxième prénom',
   'More actions' => 'Autres actions',
   'Newsletter' => 'Infolettre',

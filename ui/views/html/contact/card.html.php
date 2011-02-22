@@ -89,6 +89,10 @@
             <?php if(!empty($contact->company)) { ?>
             <br/><h3><?php echo __('Company') ?> : </h3><span><?php if($contact->company_id) echo self::__getentitylink($contact->company, $contact->company_id, 'company'); else echo $contact->company; ?></span>
             <?php } ?>
+            <?php if(!empty($contact->commonname)) { ?>
+            <br/><h3><?php echo __('Common name') ?> : </h3><span><?php echo $contact->commonname ?></span>
+            <?php } ?>
+
           </div>
           <p class="LC"></p>
           <?php if(!empty($contact->address)) { ?>
