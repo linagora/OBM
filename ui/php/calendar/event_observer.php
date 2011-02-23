@@ -732,9 +732,12 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function sendNewUserMail($old, $new, $recipients) {
-    $recipients = array_diff($recipients, array($GLOBALS['obm']['uid']));
-    if (!empty($recipients)) {
-      $this->mailer->sendEventInvitation($new, $recipients);
+    list($invit_recipients, $notice_recipients) = $this->sortObmUsersRecipients($recipients);
+    if (!empty($invit_recipients)) {
+      $this->mailer->sendEventInvitation($new, $invit_recipients);
+    }
+    if (!empty($notice_recipients)) {
+      $this->mailer->sendEventNotice($new, $notice_recipients);
     } 
   }
 
@@ -748,10 +751,13 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function sendOldUserMail($old, $new, $recipients) {
-    $recipients = array_diff($recipients, array($GLOBALS['obm']['uid']));
-    if (!empty($recipients)) {
-      $this->mailer->sendEventCancel($old, $recipients);
-    }       
+    list($invit_recipients, $notice_recipients) = $this->sortObmUsersRecipients($recipients);
+    if (!empty($invit_recipients)) {
+      $this->mailer->sendEventCancel($old, $invit_recipients);
+    }
+    if (!empty($notice_recipients)) {
+      $this->mailer->sendEventCancelNotice($old, $notice_recipients);
+    }      
   }
 
   /**
@@ -764,10 +770,28 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function sendCurrentUserMail($old, $new, $recipients) {
-    $recipients = array_diff($recipients, array($GLOBALS['obm']['uid']));
-    if (!empty($recipients) && $this->hasEventFullyChanged($old, $new)) {
-      $this->mailer->sendEventUpdate($new, $old, $recipients);
+    list($invit_recipients, $notice_recipients) = $this->sortObmUsersRecipients($recipients);
+    if (!empty($invit_recipients) && $this->hasEventFullyChanged($old, $new)) {
+      $this->mailer->sendEventUpdate($new, $old, $invit_recipients);
     }
+    if (!empty($notice_recipients) && $this->hasEventFullyChanged($old, $new)) {
+      $this->mailer->sendEventUpdateNotice($new, $old, $notice_recipients);
+    }
+  }
+  
+  /**
+   * Sort recipients (OBM users) between users requiring an invitation (and an ICS) 
+   * and users requiring a simple notice (because the event owner has write rights on them)
+   * 
+   * @param array $recipients 
+   * @access private
+   * @return array
+   */
+  private function sortObmUsersRecipients($recipients) {
+    $recipients = array_diff($recipients, array($GLOBALS['obm']['uid']));
+    $invit_recipients = array_diff($recipients, array_keys(OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'write')));
+    $notice_recipients = array_diff($recipients, $invit_recipients);
+    return array($invit_recipients, $notice_recipients);
   }
 
   /**

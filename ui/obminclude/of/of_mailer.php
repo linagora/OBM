@@ -195,7 +195,6 @@ class OBM_Mailer extends SMailer {
         $recipients[] = array($email, $displayname);
       }
     }
-
     return $recipients;
   }
   

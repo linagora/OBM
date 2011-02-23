@@ -42,6 +42,14 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = $this->extractEventDetails($event, $this->from);
     $this->attachIcs($event, "request");
   }
+  
+  protected function eventNotice($event, $attendees) {
+    $this->from = $this->getSender();
+    $this->recipients = $this->getRecipients($attendees);
+    $this->return_path = $this->getOwner($event);
+    $this->subject = __('New event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+    $this->body = $this->extractEventDetails($event, $this->from);
+  }
 
   protected function eventCancel($event, $attendees) {
     $this->from = $this->getSender();
@@ -52,6 +60,14 @@ class CalendarMailer extends OBM_Mailer {
     $this->attachIcs($event, "cancel");
   }
   
+  protected function eventCancelNotice($event, $attendees) {
+    $this->from = $this->getSender();
+    $this->recipients = $this->getRecipients($attendees);
+    $this->return_path = $this->getOwner($event);
+    $this->subject = __('Event cancelled by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+    $this->body = $this->extractEventDetails($event, $this->from);
+  }
+  
   protected function eventUpdate($event, $oldEvent, $attendees) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
@@ -60,6 +76,15 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     $this->attachIcs($event, "request");
+  }
+  
+  protected function eventUpdateNotice($event, $oldEvent, $attendees) {
+    $this->from = $this->getSender();
+    $this->recipients = $this->getRecipients($attendees);
+    $this->return_path = $this->getOwner($event);
+    $this->subject = __('Event updated by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+    $this->body = array_merge($this->extractEventDetails($event, $this->from),
+                              $this->extractEventDetails($oldEvent, $this->from, 'old_'));
   }
 
   protected function eventStateUpdate($event, $user) {
