@@ -50,7 +50,7 @@ public class EventChangeMailer extends AbstractMailer{
 				new EventMail(
 						extractSenderAddress(event), 
 						event.getAttendees(), 
-						newUserTitle(event.getOwner(), event.getTitle(), locale), 
+						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale), 
 						newUserBodyTxt(event, locale),
 						newUserBodyHtml(event, locale),
 						newUserIcs(at, event), "REQUEST");
@@ -70,7 +70,7 @@ public class EventChangeMailer extends AbstractMailer{
 				new EventMail(
 						extractSenderAddress(event),
 						event.getAttendees(), 
-						removedUserTitle(event.getOwner(), event.getTitle(), locale), 
+						removedUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale), 
 						removedUserBodyTxt(event, locale),
 						removedUserBodyHtml(event, locale), 
 						removedUserIcs(at, event), "CANCEL");
@@ -90,7 +90,7 @@ public class EventChangeMailer extends AbstractMailer{
 				new EventMail(
 						extractSenderAddress(current),
 						current.getAttendees(), 
-						updateUserTitle(current.getOwner(), current.getTitle(), locale), 
+						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
 						updateUserBodyTxt(previous, current, locale),
 						updateUserBodyHtml(previous, current, locale), 
 						updateUserIcs(at, current), "REQUEST");
@@ -131,7 +131,7 @@ public class EventChangeMailer extends AbstractMailer{
 	
 	private InternetAddress extractSenderAddress(Event event)
 			throws UnsupportedEncodingException {
-		return new InternetAddress(event.getOwnerEmail(), event.getOwner());
+		return new InternetAddress(event.getOwnerEmail(), event.getOwnerDisplayName());
 	}
 
 	private List<InternetAddress> convertAttendeesToAddresses(Collection<Attendee> attendees) throws UnsupportedEncodingException {
@@ -262,7 +262,7 @@ public class EventChangeMailer extends AbstractMailer{
 			.put("end", new SimpleDate(event.getEndDate(), TemplateDateModel.DATETIME))
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
 			.put("location", Strings.nullToEmpty(event.getLocation()))
-			.put("author", Strings.nullToEmpty(event.getOwner()));
+			.put("author", Strings.nullToEmpty(event.getOwnerDisplayName()));
 		return datamodel;
 	}
 	

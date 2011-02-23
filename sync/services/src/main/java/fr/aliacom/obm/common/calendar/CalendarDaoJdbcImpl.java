@@ -62,6 +62,7 @@ import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
+import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -135,7 +136,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "event_completed, "
 			+ "event_url, "
 			+ "event_description, now() as last_sync, event_domain_id, evententity_entity_id, "
-			+ "o.userobm_login as owner, " + "domain_name";
+			+ "o.userobm_login as owner, domain_name, o.userobm_firstname as ownerFirstName, o.userobm_lastname as ownerLastName,  o.userobm_commonname as ownerCommonName";
 
 	private static final String EVENT_INSERT_FIELDS = "event_owner, "
 			+ "event_ext_id, "
@@ -163,7 +164,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "eventlink_required, "
 			+ "eventlink_percent, "
 			+ "eventlink_is_organizer, "
-			+ "eventalert_duration, userobm_email, userobm_firstname, userobm_lastname, userentity_user_id ";
+			+ "eventalert_duration, userobm_email, userobm_firstname, userobm_lastname, userobm_commonname, userentity_user_id ";
 
 	private static final String CONTACT_AND_ALERT_FIELDS = "eventlink_event_id, "
 			+ "eventlink_state, "
@@ -171,7 +172,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "eventlink_percent, "
 			+ "eventlink_is_organizer, "
 			+ "0 as eventalert_duration, email_address as userobm_email, contact_firstname as userobm_firstname, "
-			+ "contact_lastname as userobm_lastname, contactentity_contact_id as userentity_user_id ";
+			+ "contact_lastname as userobm_lastname, contact_commonname as userobm_commonname, contactentity_contact_id as userentity_user_id ";
 
 	private static final String ATT_INSERT_FIELDS = "eventlink_event_id, eventlink_entity_id, "
 			+ "eventlink_state, eventlink_required, eventlink_percent, eventlink_usercreate, eventlink_is_organizer";
@@ -234,14 +235,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser)throws FindException {
 		logger.info("create with token " + editor.getSessionId() + " from "
 				+ editor.getOrigin() + " for " + editor.getEmail());
-
+		Event ret = ev;
 		Connection con = null;
 		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
 			ut.begin();
 			con = obmHelper.getConnection();
-			createEvent(con, editor, calendar, ev, useObmUser);
-
+			ret = createEvent(con, editor, calendar, ev, useObmUser);
 			ut.commit();
 		} catch (Throwable e) {
 			obmHelper.rollback(ut);
@@ -249,7 +249,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
-		return ev;
+		return ret;
 	}
 
 	@Override
@@ -429,12 +429,24 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setOwner(evrs.getString("owner"));
 		e.setOwnerEmail(evrs.getString("owner") + "@"
 				+ evrs.getString("domain_name"));
-
+		e.setOwnerDisplayName(getOwnerDisplayName(evrs));
 		if (evrs.getTimestamp("recurrence_id") != null) {
 			cal.setTimeInMillis(evrs.getTimestamp("recurrence_id").getTime());
 			e.setRecurrenceId(cal.getTime());
 		}
 		return e;
+	}
+	
+	private String getOwnerDisplayName(ResultSet evrs) throws SQLException {
+		String first = evrs.getString("ownerFirstName");
+		String last = evrs.getString("ownerLastName");
+		String common = evrs.getString("ownerCommonName");
+		return getDisplayName(common, first, last);
+	}
+
+	private String getDisplayName(String firstName, String lastName,
+			String commonName) {
+		return DisplayNameUtils.getDisplayName(commonName, firstName, lastName);
 	}
 
 	private int fillEventStatement(PreparedStatement ps, Event ev,
@@ -668,9 +680,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private String getAttendeeDisplayName(ResultSet rs) throws SQLException {
-		String last = rs.getString("userobm_lastname");
 		String first = rs.getString("userobm_firstname");
-		return last + (first != null ? " " + first : "");
+		String last = rs.getString("userobm_lastname");
+		String common = rs.getString("userobm_commonname");
+		return getDisplayName(first, last, common);
 	}
 
 	private String getAttendeeEmail(ResultSet rs, String domainName)
@@ -1254,7 +1267,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		return attsByEvent;
 	}
-	
+
 	private void appendAttendeeToEvent(Map<Integer, Event> eventById, Multimap<Integer, AttendeeAlert> attendeesByEventId){
 		for(Event event : eventById.values()){
 			Collection<AttendeeAlert> atts = attendeesByEventId.get(event.getDatabaseId());

@@ -91,6 +91,7 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
@@ -401,7 +402,8 @@ public class Ical4jHelper {
 			if (mailToIndex != -1) {
 				event.setOwnerEmail(organizer.getValue().substring(
 						mailToIndex + "mailto:".length()));
-				if (event.getOwner() == null || "".equals(event.getOwner())) {
+				
+				if (StringUtils.isEmpty(event.getOwner())) {
 					event.setOwner(organizer.getValue().substring(
 							mailToIndex + "mailto:".length()));
 				}
@@ -724,7 +726,7 @@ public class Ical4jHelper {
 	}
 
 	private static void appendOrganizerToICS(PropertyList prop, Event event) {
-		prop.add(getOrganizer(event.getOwner(), event.getOwnerEmail()));
+		prop.add(getOrganizer(event.getOwnerDisplayName(), event.getOwnerEmail()));
 	}
 
 	private static void appendTranspToICS(PropertyList prop, Event event) {

@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.obm.sync.utils.DisplayNameUtils;
+
 public class Contact {
 
 	private Integer uid;
@@ -267,6 +269,10 @@ public class Contact {
 
 	public void setCalUri(String calUri) {
 		this.calUri = calUri;
+	}
+	
+	public String getDisplayName(){
+		return DisplayNameUtils.getDisplayName(commonname, firstname, lastname);
 	}
 
 }

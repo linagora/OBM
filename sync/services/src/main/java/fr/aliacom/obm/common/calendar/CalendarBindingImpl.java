@@ -378,6 +378,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event createInternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {
 		try{
 			Event ev = calendarService.createEvent(token, calendar, event, true);
+			ev = calendarService.findEvent(token, ev.getDatabaseId());
 			eventChangeHandler.create(token, ev, settingsDao.getUserLanguage(token));
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");

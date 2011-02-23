@@ -18,6 +18,7 @@ public class Event {
 	private int databaseId;
 	private int privacy;
 	private String owner;
+	private String ownerDisplayName;
 	private String ownerEmail;
 	private String location;
 	private Date date;
@@ -275,6 +276,7 @@ public class Event {
 		event.setLocation(location);
 		event.setOpacity(opacity);
 		event.setOwner(owner);
+		event.setOwnerDisplayName(ownerDisplayName);
 		event.setOwnerEmail(ownerEmail);
 		event.setPercent(percent);
 		event.setPriority(priority);
@@ -353,5 +355,13 @@ public class Event {
 	public void setDomain(String domain) {
 		this.domain = domain;
 	}
-	
+
+	public String getOwnerDisplayName() {
+		return ownerDisplayName;
+	}
+
+	public void setOwnerDisplayName(String ownerDisplayName) {
+		this.ownerDisplayName = ownerDisplayName;
+	}
+
 }

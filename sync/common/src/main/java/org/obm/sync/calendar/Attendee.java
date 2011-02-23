@@ -35,7 +35,7 @@ public class Attendee {
 	}
 
 	public String getDisplayName() {
-		return displayName;
+		return displayName ;
 	}
 
 	public void setDisplayName(String displayName) {

@@ -19,12 +19,15 @@ package fr.aliacom.obm.common.user;
 
 import java.util.Date;
 
+import org.obm.sync.utils.DisplayNameUtils;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class ObmUser {
 
 	private int uid;
 	private String login;
+	private String commonName;
 	private String lastName;
 	private String firstName;
 	private String email;
@@ -248,7 +251,15 @@ public class ObmUser {
 		this.publicFreeBusy = publicFreeBusy;
 	}
 	
+	public String getCommonName() {
+		return commonName;
+	}
+
+	public void setCommonName(String commonName) {
+		this.commonName = commonName;
+	}
+
 	public String getDisplayName(){
-		return firstName + " " + lastName; 
+		return DisplayNameUtils.getDisplayName(commonName, firstName, lastName);
 	}
 }

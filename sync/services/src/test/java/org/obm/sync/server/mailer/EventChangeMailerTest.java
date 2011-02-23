@@ -145,7 +145,8 @@ public class EventChangeMailerTest {
 			event.addAttendee(createAttendee("Matthieu BAECHLER", "mbaechler@linagora.com"));
 			event.addAttendee(createAttendee("Blandine DESCAMPS", "blandine.descamps@linagora.com"));
 			event.setTitle("Sprint planning OBM");
-			event.setOwner("Raphael ROUGERON");
+			event.setOwner("raphael");
+			event.setOwnerDisplayName("Raphael ROUGERON");
 			event.setOwnerEmail("rrougeron@linagora.com");
 			event.setDate(date(2010, 10, 8, 10, 00));
 			event.setExtId("f1514f44bf39311568d64072c1fec10f47fe");
@@ -209,7 +210,6 @@ public class EventChangeMailerTest {
 			Assert.assertThat(applicationIcs.getContent(), IsInstanceOf.instanceOf(SharedByteArrayInputStream.class));
 			SharedByteArrayInputStream stream = (SharedByteArrayInputStream) applicationIcs.getContent();
 			String decodedString = IOUtils.toString(stream, Charsets.US_ASCII.displayName());
-			System.err.println(decodedString);
 			checkStringContains(decodedString, getExpectedIcsStrings());
 		}
 

@@ -223,7 +223,7 @@ public class UserDao {
 		ResultSet rs = null;
 
 		ObmUser ret = null;
-		String uq = "SELECT userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value "
+		String uq = "SELECT userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname "
 				+ "FROM UserObm LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
 				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
@@ -242,6 +242,7 @@ public class UserDao {
 				ret.setFirstName(rs.getString(3));
 				ret.setLastName(rs.getString(4));
 				ret.setPublicFreeBusy(computePublicFreeBusy(5, rs));
+				ret.setCommonName(rs.getString("userobm_commonname"));
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -270,7 +271,7 @@ public class UserDao {
 		ResultSet rs = null;
 
 		ObmUser ret = null;
-		String uq = "SELECT userobm_id, userobm_email, userobm_login, defpref.userobmpref_value, userpref.userobmpref_value "
+		String uq = "SELECT userobm_id, userobm_email, userobm_login, defpref.userobmpref_value, userpref.userobmpref_value, userobm_firstname, userobm_lastname,  userobm_commonname "
 				+ "FROM UserObm LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=? "
 				+ "WHERE userobm_id=? ";
@@ -286,6 +287,9 @@ public class UserDao {
 				ret.setEmail(rs.getString(2));
 				ret.setLogin(rs.getString(3));
 				ret.setPublicFreeBusy(computePublicFreeBusy(4, rs));
+				ret.setFirstName(rs.getString("userobm_firstname"));
+				ret.setLastName(rs.getString("userobm_lastname"));
+				ret.setCommonName(rs.getString("userobm_commonname"));
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
