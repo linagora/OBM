@@ -441,7 +441,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		String first = evrs.getString("ownerFirstName");
 		String last = evrs.getString("ownerLastName");
 		String common = evrs.getString("ownerCommonName");
-		return getDisplayName(common, first, last);
+		return getDisplayName(first, last, common);
 	}
 
 	private String getDisplayName(String firstName, String lastName,
