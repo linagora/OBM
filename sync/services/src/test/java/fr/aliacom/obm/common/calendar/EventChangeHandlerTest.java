@@ -299,7 +299,7 @@ public class EventChangeHandlerTest {
 		}
 		
 		@Test
-		public void testDefaultEventDateChangeOneUser() {
+		public void testDefaultEventDateChangeOneNeedActionUser() {
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -311,7 +311,7 @@ public class EventChangeHandlerTest {
 			currentEvent.setDate(longAfter());
 			currentEvent.addAttendee(attendee);
 
-			mailer.notifyUpdateUsers(anyObject(AccessToken.class), compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyNeedActionUpdateUsers(anyObject(AccessToken.class), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent), eq(currentEvent), eq(LOCALE));
 			expectLastCall().once();
 			replay(mailer);
@@ -322,7 +322,30 @@ public class EventChangeHandlerTest {
 		}
 		
 		@Test
-		public void testDefaultEventNoChangeOneUser() {
+		public void testDefaultEventDateChangeOneAcceptedUser() {
+			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
+			
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+			
+			Event previousEvent = new Event();
+			previousEvent.setDate(after());
+			previousEvent.addAttendee(attendee);
+			Event currentEvent = new Event();
+			currentEvent.setDate(longAfter());
+			currentEvent.addAttendee(attendee);
+
+			mailer.notifyAcceptedUpdateUsers(compareCollections(ImmutableList.of(attendee)), 
+					eq(previousEvent), eq(currentEvent), eq(LOCALE));
+			expectLastCall().once();
+			replay(mailer);
+			
+			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+			eventChangeHandler.update(getMockAccessToken(), previousEvent, currentEvent, LOCALE);
+			verify(mailer);
+		}
+		
+		@Test
+		public void testDefaultEventNoChangeOneNeedActionUser() {
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -331,7 +354,7 @@ public class EventChangeHandlerTest {
 			previousEvent.setDate(after());
 			previousEvent.addAttendee(attendee);
 
-			mailer.notifyUpdateUsers(anyObject(AccessToken.class), compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyNeedActionUpdateUsers(anyObject(AccessToken.class), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent) , eq(previousEvent), eq(LOCALE));
 			expectLastCall().once();
 			replay(mailer);
@@ -342,7 +365,27 @@ public class EventChangeHandlerTest {
 		}
 		
 		@Test
-		public void testDefaultEventAddOneUser() {
+		public void testDefaultEventNoChangeOneAcceptedUser() {
+			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
+			
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+			
+			Event previousEvent = new Event();
+			previousEvent.setDate(after());
+			previousEvent.addAttendee(attendee);
+
+			mailer.notifyAcceptedUpdateUsers( compareCollections(ImmutableList.of(attendee)), 
+					eq(previousEvent) , eq(previousEvent), eq(LOCALE));
+			expectLastCall().once();
+			replay(mailer);
+			
+			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+			eventChangeHandler.update(getMockAccessToken(), previousEvent, previousEvent, LOCALE);
+			verify(mailer);
+		}
+		
+		@Test
+		public void testDefaultEventAddOneNeedActionUser() {
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", ParticipationState.NEEDSACTION);
 			
@@ -359,7 +402,7 @@ public class EventChangeHandlerTest {
 			
 			mailer.notifyNeedActionNewUsers(anyObject(AccessToken.class), compareCollections(ImmutableList.of(addedAttendee)), eq(currentEvent), eq(LOCALE));
 			expectLastCall().once();
-			mailer.notifyUpdateUsers(anyObject(AccessToken.class), compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyNeedActionUpdateUsers(anyObject(AccessToken.class), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent) , eq(currentEvent), eq(LOCALE));
 			expectLastCall().once();
 			replay(mailer);
@@ -368,5 +411,34 @@ public class EventChangeHandlerTest {
 			eventChangeHandler.update(getMockAccessToken(), previousEvent, currentEvent, LOCALE);
 			verify(mailer);
 		}
+		
+		@Test
+		public void testDefaultEventAddOneAcceptedUser() {
+			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
+			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", ParticipationState.ACCEPTED);
+			
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+			
+			Event previousEvent = new Event();
+			previousEvent.setDate(after());
+			previousEvent.addAttendee(attendee);
+
+			Event currentEvent = new Event();
+			currentEvent.setDate(after());
+			currentEvent.addAttendee(attendee);
+			currentEvent.addAttendee(addedAttendee);
+			
+			mailer.notifyAcceptedNewUsers(compareCollections(ImmutableList.of(addedAttendee)), eq(currentEvent), eq(LOCALE));
+			expectLastCall().once();
+			mailer.notifyAcceptedUpdateUsers( compareCollections(ImmutableList.of(attendee)), 
+					eq(previousEvent) , eq(currentEvent), eq(LOCALE));
+			expectLastCall().once();
+			replay(mailer);
+			
+			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+			eventChangeHandler.update(getMockAccessToken(), previousEvent, currentEvent, LOCALE);
+			verify(mailer);
+		}	
+	
 	}
 }

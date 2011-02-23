@@ -51,8 +51,8 @@ public class EventChangeMailer extends AbstractMailer{
 						extractSenderAddress(event), 
 						event.getAttendees(), 
 						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale), 
-						newUserBodyTxt(event, locale),
-						newUserBodyHtml(event, locale),
+						inviteNewUserBodyTxt(event, locale),
+						inviteNewUserBodyHtml(event, locale),
 						newUserIcs(at, event), "REQUEST");
 			sendNotificationMessageToAttendee(attendee, mail);
 		} catch (UnsupportedEncodingException e) {
@@ -70,9 +70,9 @@ public class EventChangeMailer extends AbstractMailer{
 				new EventMail(
 						extractSenderAddress(event), 
 						event.getAttendees(), 
-						newUserTitle(event.getOwner(), event.getTitle(), locale), 
-						newUserBodyTxt(event, locale),
-						newUserBodyHtml(event, locale));
+						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale),
+						notifyNewUserBodyTxt(event, locale),
+						notifyNewUserBodyHtml(event, locale));
 			sendNotificationMessageToAttendee(attendee, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -103,16 +103,35 @@ public class EventChangeMailer extends AbstractMailer{
 		}
 	}
 
-	public void notifyUpdateUsers(AccessToken at, Collection<Attendee> attendees, Event previous, Event current, Locale locale) throws NotificationException {
+	public void notifyNeedActionUpdateUsers(AccessToken at, Collection<Attendee> attendees, Event previous, Event current, Locale locale) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
 						extractSenderAddress(current),
 						current.getAttendees(), 
 						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
-						updateUserBodyTxt(previous, current, locale),
-						updateUserBodyHtml(previous, current, locale), 
+						inviteUpdateUserBodyTxt(previous, current, locale),
+						inviteUpdateUserBodyHtml(previous, current, locale), 
 						updateUserIcs(at, current), "REQUEST");
+			sendNotificationMessageToAttendee(attendees, mail);
+		} catch (UnsupportedEncodingException e) {
+			throw new NotificationException(e);
+		} catch (IOException e) {
+			throw new NotificationException(e);
+		} catch (TemplateException e) {
+			throw new NotificationException(e);
+		}
+	}
+	
+	public void notifyAcceptedUpdateUsers(Collection<Attendee> attendees, Event previous, Event current, Locale locale) throws NotificationException {
+		try {
+			EventMail mail = 
+				new EventMail(
+						extractSenderAddress(current),
+						current.getAttendees(), 
+						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
+						notifyUpdateUserBodyTxt(previous, current, locale),
+						notifyUpdateUserBodyHtml(previous, current, locale));
 			sendNotificationMessageToAttendee(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -210,11 +229,19 @@ public class EventChangeMailer extends AbstractMailer{
 		return new Messages(locale).updateParticipationStateTitle(title);
 	}
 	
-	private String newUserBodyTxt(Event event, Locale locale) throws IOException, TemplateException {
+	private String notifyNewUserBodyTxt(Event event, Locale locale) throws IOException, TemplateException {
+		return applyEventOnTemplate("EventNoticePlain.tpl", event, locale);
+	}
+	
+	private String notifyNewUserBodyHtml(Event event, Locale locale) throws IOException, TemplateException {
+		return applyEventOnTemplate("EventNoticeHtml.tpl", event, locale);
+	}
+	
+	private String inviteNewUserBodyTxt(Event event, Locale locale) throws IOException, TemplateException {
 		return applyEventOnTemplate("EventInvitationPlain.tpl", event, locale);
 	}
 	
-	private String newUserBodyHtml(Event event, Locale locale) throws IOException, TemplateException {
+	private String inviteNewUserBodyHtml(Event event, Locale locale) throws IOException, TemplateException {
 		return applyEventOnTemplate("EventInvitationHtml.tpl", event, locale);
 	}
 	
@@ -237,12 +264,20 @@ public class EventChangeMailer extends AbstractMailer{
 		return applyEventOnTemplate("EventCancelHtml.tpl", event, locale);
 	}
 	
-	private String updateUserBodyTxt(Event oldEvent, Event newEvent, Locale locale) throws IOException, TemplateException {
-		return applyEventUpdateOnTemplate("EventUpdatePlain.tpl", oldEvent, newEvent, locale);
+	private String inviteUpdateUserBodyTxt(Event oldEvent, Event newEvent, Locale locale) throws IOException, TemplateException {
+		return applyEventUpdateOnTemplate("EventUpdateInvitationPlain.tpl", oldEvent, newEvent, locale);
 	}
 	
-	private String updateUserBodyHtml(Event oldEvent, Event newEvent, Locale locale) throws IOException, TemplateException {
-		return applyEventUpdateOnTemplate("EventUpdateHtml.tpl", oldEvent, newEvent, locale);
+	private String inviteUpdateUserBodyHtml(Event oldEvent, Event newEvent, Locale locale) throws IOException, TemplateException {
+		return applyEventUpdateOnTemplate("EventUpdateInvitationHtml.tpl", oldEvent, newEvent, locale);
+	}
+	
+	private String notifyUpdateUserBodyTxt(Event oldEvent, Event newEvent, Locale locale) throws IOException, TemplateException {
+		return applyEventUpdateOnTemplate("EventUpdateNoticePlain.tpl", oldEvent, newEvent, locale);
+	}
+	
+	private String notifyUpdateUserBodyHtml(Event oldEvent, Event newEvent, Locale locale) throws IOException, TemplateException {
+		return applyEventUpdateOnTemplate("EventUpdateNoticeHtml.tpl", oldEvent, newEvent, locale);
 	}
 	
 	private String applyEventUpdateOnTemplate(String templateName, Event oldEvent, Event newEvent, Locale locale) 

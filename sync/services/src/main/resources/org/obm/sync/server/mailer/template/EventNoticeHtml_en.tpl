@@ -22,10 +22,13 @@
     <tr>
         <td style="text-align:right;padding-right:1em;">Author</td><td style="font-weight:bold;">${author}</td>
     </tr>
+	<tr>
+    	<td colspan="2">
+      		<strong>NB : </strong>If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this appointment.
+    	</td>
+	</tr>
     <tr>
         <td style="text-align:right;" colspan="2">
-          <a href="${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=ACCEPTED">Accept</a>
-          <a href="${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=DECLINED">Decliner</a>
           <a href="${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}">Details</a>
         </td>
     </tr>
