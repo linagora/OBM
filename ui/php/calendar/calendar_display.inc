@@ -4133,6 +4133,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $end = $end->addSecond($calendar['duration']);
     } else {
       $begin = new Of_Date($event_q->f('event_date'), 'GMT');
+      if (isset($calendar['template_id'])) {
+        $today = new Of_Date(date("Y-m-d"), 'GMT');
+        $begin->setDay($today->getDay());
+        $begin->setMonth($today->getMonth());
+        $begin->setYear($today->getYear());
+      }
       $end = clone $begin;
       $end = $end->addSecond($event_q->f('event_duration'));
     }

@@ -2568,6 +2568,7 @@ function run_query_calendar_get_template($template_id) {
     eventtemplate_privacy AS event_privacy,
     eventtemplate_priority AS event_priority,
     eventtemplate_repeatkind AS event_repeatkind,
+    eventtemplate_date AS event_date,
     eventtemplate_duration AS event_duration,
     eventtemplate_repeatdays AS event_repeatdays,
     eventtemplate_allday AS event_allday,
