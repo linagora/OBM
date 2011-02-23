@@ -55,6 +55,8 @@ import org.obm.sync.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Strings;
+
 public class XmlResponder {
 
 	private HttpServletResponse resp;
@@ -87,7 +89,7 @@ public class XmlResponder {
 	}
 
 	public String sendError(Exception e) {
-		return sendError(e.getMessage());
+		return sendError(Strings.nullToEmpty(e.getMessage()));
 	}
 
 	public String sendToken(AccessToken at) {

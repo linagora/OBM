@@ -192,19 +192,24 @@ public class CalendarBindingImpl implements ICalendar {
 			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
 			// only remove if logged user is owner
 			// or as write right on owner
-			Event ev = calendarService.findEventByExtId(token, calendarUser, extId);
+			final Event ev = calendarService.findEventByExtId(token, calendarUser, extId);
 
-			if (ev != null && ev.getOwner() != null
-					&& !helper.canWriteOnCalendar(token, ev.getOwner())) {
-				logger.info(LogUtils.prefix(token) + "remove not allowed of " + ev.getTitle());
+			if (ev == null) {
+				logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] not removed, it doesn't exist");
+				return ev;
+			} else {
+
+				if (ev.getOwner() != null && !helper.canWriteOnCalendar(token, ev.getOwner())) {
+					logger.info(LogUtils.prefix(token) + "remove not allowed of " + ev.getTitle());
+					return ev;
+				}
+
+				calendarService.removeEventByExtId(token, calendarUser, extId);
+				logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
+
+				eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
 				return ev;
 			}
-
-			ev = calendarService.removeEventByExtId(token, calendarUser, extId);
-			logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
-
-			eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
-			return ev;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
