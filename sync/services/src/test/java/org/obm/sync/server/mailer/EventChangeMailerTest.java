@@ -46,7 +46,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @RunWith(Suite.class)
-@SuiteClasses({EventChangeMailerTest.Creation.class, EventChangeMailerTest.Cancelation.class,
+@SuiteClasses({EventChangeMailerTest.NeedActionCreation.class, EventChangeMailerTest.Cancelation.class,
 	EventChangeMailerTest.Update.class})
 public class EventChangeMailerTest {
 
@@ -155,8 +155,7 @@ public class EventChangeMailerTest {
 			return event;
 		}
 
-		protected void test() throws UnsupportedEncodingException, IOException, MessagingException {
-			
+		private MimeMessage test() throws MessagingException {
 			ConstantService constantService = EasyMock.createMock(ConstantService.class);
 			EasyMock.expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
 			Capture<MimeMessage> capturedMessage = new Capture<MimeMessage>();
@@ -168,9 +167,18 @@ public class EventChangeMailerTest {
 			executeProcess(eventChangeMailer);
 
 			EasyMock.verify(mailService, constantService);
-			MimeMessage mimeMessage = capturedMessage.getValue();
-
+			return  capturedMessage.getValue();
+		}
+		
+		private void testInvitation() throws UnsupportedEncodingException, IOException, MessagingException {
+			MimeMessage mimeMessage = test();
 			InvitationParts parts = checkInvitationStructure(mimeMessage);
+			checkContent(parts);
+		}
+		
+		private void testNotification() throws UnsupportedEncodingException, IOException, MessagingException {
+			MimeMessage mimeMessage = test();
+			InvitationParts parts = checkNotificationStructure(mimeMessage);
 			checkContent(parts);
 		}
 
@@ -194,6 +202,22 @@ public class EventChangeMailerTest {
 			Assert.assertTrue(parts.htmlText.getContentType().startsWith("text/html; charset=UTF-8"));
 			parts.textCalendar = alternative.getBodyPart(2);
 			parts.applicationIcs = mixed.getBodyPart(1);
+			Assert.assertEquals("application/ics; name=meeting.ics", parts.applicationIcs.getContentType());
+			return parts;
+		}
+		
+		protected InvitationParts checkNotificationStructure(MimeMessage mimeMessage) throws UnsupportedEncodingException, IOException, MessagingException {
+			InvitationParts parts = new InvitationParts();
+			parts.rawMessage = getRawMessage(mimeMessage);
+			Assert.assertTrue(mimeMessage.getContentType().startsWith("multipart/alternative"));
+			Assert.assertThat(mimeMessage.getContent(), IsInstanceOf.instanceOf(Multipart.class));
+			Multipart alternative = (Multipart) mimeMessage.getContent();
+			Assert.assertEquals(3, alternative.getCount());
+			parts.plainText = alternative.getBodyPart(0);
+			Assert.assertTrue(parts.plainText.getContentType().startsWith("text/plain; charset=UTF-8"));
+			parts.htmlText = alternative.getBodyPart(1);
+			Assert.assertTrue(parts.htmlText.getContentType().startsWith("text/html; charset=UTF-8"));
+			parts.textCalendar = alternative.getBodyPart(2);
 			Assert.assertEquals("application/ics; name=meeting.ics", parts.applicationIcs.getContentType());
 			return parts;
 		}
@@ -240,17 +264,17 @@ public class EventChangeMailerTest {
 		protected abstract void executeProcess(EventChangeMailer eventChangeMailer);
 	}
 
-	public static class Creation extends Common {
+	public static class NeedActionCreation extends Common {
 
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyNewUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH);
+			eventChangeMailer.notifyNeedActionNewUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH);
 		}
 		
 		@Test
 		public void invitationRequest() throws IOException, MessagingException {
-			super.test();
+			super.testInvitation();
 		}
 
 		@Override
@@ -316,12 +340,75 @@ public class EventChangeMailerTest {
 		}
 
 	}
+	
+	public static class AcceptedCreation extends Common {
+
+		@Override
+		protected void executeProcess(EventChangeMailer eventChangeMailer) {
+			Event event = buildTestEvent();
+			eventChangeMailer.notifyAcceptedNewUsers(event.getAttendees(), event, Locale.FRENCH);
+		}
+		
+		@Test
+		public void invitationRequest() throws IOException, MessagingException {
+			super.testNotification();
+		}
+
+		@Override
+		protected void checkContent(InvitationParts parts) throws IOException, MessagingException {
+			checkStringContains(parts.rawMessage, 
+					"From: Raphael ROUGERON <rrougeron@linagora.com>",
+					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
+					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_ROUGE?=");
+			checkPlainMessage(parts.plainText);
+			checkHtmlMessage(parts.htmlText);
+			Assert.assertEquals("text/calendar; charset=UTF-8; method=REQUEST;", parts.textCalendar.getContentType());
+			checkIcs(parts.textCalendar);
+			checkApplicationIcs(parts.applicationIcs);
+		}
+		
+		@Override
+		protected String[] getExpectedPlainStrings() {
+			return new String[] {
+				"NOUVEAU RENDEZ-VOUS",
+				"du     : 8 nov. 2010 11:00", 
+				"au     : 8 nov. 2010 11:45",
+				"sujet  : Sprint planning OBM", 
+				"lieu   : ","auteur : Raphael ROUGERON"
+			};
+		}
+		
+		@Override
+		protected String[] getExpectedHtmlStrings() {
+			return new String[] {
+				"Invitation à un événement",
+				"Du 8 nov. 2010 11:00", 
+				"Au 8 nov. 2010 11:45", 
+				"Sujet Sprint planning OBM", 
+				"Lieu", 
+				"Organisateur Raphael ROUGERON"
+			};
+		}
+		
+		@Override
+		protected String[] getExpectedIcsStrings() {
+			return new String[] {	};
+		}
+		@Override
+		protected List<InternetAddress> getExpectedRecipients() throws AddressException {
+			return createAddressList(
+					"Ronan LANORE <rlanore@linagora.com>, Guillaume ALAUX " +
+					"<galaux@linagora.com>, Matthieu BAECHLER <mbaechler@linagora.com>, Blandine " +
+					"DESCAMPS <blandine.descamps@linagora.com>");
+		}
+
+	}
 
 	public static class Update extends Common {
 
 		@Test
 		public void invitationUpdate() throws IOException, MessagingException {
-			super.test();
+			super.testInvitation();
 		}
 		
 		@Override
@@ -407,7 +494,7 @@ public class EventChangeMailerTest {
 
 		@Test
 		public void invitationCancel() throws IOException, MessagingException {
-			super.test();
+			super.testInvitation();
 		}
 		
 		@Override

@@ -11,6 +11,7 @@ import org.easymock.EasyMock;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.server.mailer.EventChangeMailer;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 
@@ -57,7 +58,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.setDate(after());
 		String ownerEmail = "user@domain.net";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail));
+		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
 		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
@@ -67,41 +68,101 @@ public abstract class AbstractEventChangeHandlerTest {
 		Event event = new Event();
 		event.setDate(before());
 		event.setOwnerEmail("user@test");
-		event.addAttendee(createRequiredAttendee("attendee1@test"));
+		event.addAttendee(createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED));
 		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
 		EasyMock.replay(mailer);
 		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
-
-	public void testOneAttendee() {
-		Attendee attendeeOne = createRequiredAttendee("attendee1@test");
+	
+	public void testAcceptedAttendee() {
+		Attendee attendeeAccepted = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 		
 		Event event = new Event();
 		event.setDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail));
-		event.addAttendee(attendeeOne);
+		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
+		event.addAttendee(attendeeAccepted);
+
+		EventChangeMailer mailer = expectationAcceptedAttendees(attendeeAccepted);
 		
-		EventChangeMailer mailer = expectationOneAttendee(attendeeOne);
+		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		processEvent(eventChangeHandler, event);
+		EasyMock.verify(mailer);
+	}
+	
+	protected abstract EventChangeMailer expectationAcceptedAttendees(Attendee attendeeAccepted);
+	
+	public void testNeedActionAttendee() {
+		Attendee attendeeNeedAction = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
+		
+		Event event = new Event();
+		event.setDate(after());
+		String ownerEmail = "user@test";
+		event.setOwnerEmail(ownerEmail);
+		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
+		event.addAttendee(attendeeNeedAction);
+
+		EventChangeMailer mailer = expectationNeedActionAttendees(attendeeNeedAction);
+		
+		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		processEvent(eventChangeHandler, event);
+		EasyMock.verify(mailer);
+	}
+	
+	protected abstract EventChangeMailer expectationNeedActionAttendees(Attendee attendeeNeedAction);
+	
+	public void testDeclinedAttendee() {
+		Attendee attendeeDeclined = createRequiredAttendee("attendee1@test", ParticipationState.DECLINED);
+		
+		Event event = new Event();
+		event.setDate(after());
+		String ownerEmail = "user@test";
+		event.setOwnerEmail(ownerEmail);
+		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
+		event.addAttendee(attendeeDeclined);
+
+		EventChangeMailer mailer = expectationDeclinedAttendees(attendeeDeclined);
+		
+		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		processEvent(eventChangeHandler, event);
+		EasyMock.verify(mailer);
+	}
+	
+	protected abstract EventChangeMailer expectationDeclinedAttendees(Attendee attendeeDeclined);
+
+	public void testTwoAttendee() {
+		Attendee attendeeAccepted = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
+		
+		Attendee attendeeNotAccepted = createRequiredAttendee("attendee2@test", ParticipationState.NEEDSACTION);
+		
+		Event event = new Event();
+		event.setDate(after());
+		String ownerEmail = "user@test";
+		event.setOwnerEmail(ownerEmail);
+		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
+		event.addAttendee(attendeeAccepted);
+		event.addAttendee(attendeeNotAccepted);
+		
+		EventChangeMailer mailer = expectationTwoAttendees(attendeeAccepted, attendeeNotAccepted);
 		
 		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
 
-	protected abstract EventChangeMailer expectationOneAttendee(Attendee attendee);
+	protected abstract EventChangeMailer expectationTwoAttendees(Attendee attendeeAccepted, Attendee attendeeNotAccepted);
 
 	public void testSameAttendeeTwice() {
-		Attendee attendeeOne = createRequiredAttendee("attendee1@test");
+		Attendee attendeeOne = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 		
 		Event event = new Event();
 		event.setDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail));
+		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
 		event.addAttendee(attendeeOne);
 		event.addAttendee(attendeeOne);
 		
@@ -114,32 +175,33 @@ public abstract class AbstractEventChangeHandlerTest {
 
 	protected abstract EventChangeMailer expectationSameAttendeeTwice(Attendee attendee);
 
-	private List<Attendee> createRequiredAttendees(String prefix, String suffix, int number) {
+	private List<Attendee> createRequiredAttendees(String prefix, String suffix, ParticipationState state, int start, int number) {
 		ArrayList<Attendee> result = new ArrayList<Attendee>();
 		for (int i = 0; i < number; ++i) {
-			result.add(createRequiredAttendee(prefix + i + suffix));
+			result.add(createRequiredAttendee(prefix + (start + i )+ suffix,state));
 		}
 		return result;
 	}
 	
 	public void testManyAttendees() {
-		int numberOfAttendees = 10;
-		List<Attendee> attendees = createRequiredAttendees("attendee", "@test", numberOfAttendees);
+		List<Attendee> accpetedAttendees = createRequiredAttendees("attendee", "@test", ParticipationState.ACCEPTED,0,  5);
+		List<Attendee> needActionAttendees = createRequiredAttendees("attendee", "@test", ParticipationState.NEEDSACTION, 5, 5);
 		
 		Event event = new Event();
 		event.setDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail));
-		event.setAttendees(attendees);
+		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
+		event.addAttendees(needActionAttendees);
+		event.addAttendees(accpetedAttendees);
 		
-		EventChangeMailer mailer = expectationManyAttendee(attendees);
+		EventChangeMailer mailer = expectationManyAttendee(needActionAttendees, accpetedAttendees);
 		
 		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
 
-	protected abstract EventChangeMailer expectationManyAttendee(List<Attendee> atteendees);
+	protected abstract EventChangeMailer expectationManyAttendee(List<Attendee> needActionAttendees, List<Attendee> accpetedAttendees);
 	
 }
