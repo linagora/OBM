@@ -68,18 +68,34 @@ public class Attendee {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof Attendee) {
-			Attendee other = (Attendee) obj;
-			if (email.equalsIgnoreCase(other.email)) {
-				return true;
-			}
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Attendee other = (Attendee) obj;
+		if (email != null && email.equalsIgnoreCase(other.email)) {
+			return true;
 		}
 		return false;
 	}
 
+	
 	@Override
 	public int hashCode() {
-		return email.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((displayName == null) ? 0 : displayName.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + (obmUser ? 1231 : 1237);
+		result = prime * result + (organizer ? 1231 : 1237);
+		result = prime * result + percent;
+		result = prime * result
+				+ ((required == null) ? 0 : required.hashCode());
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
+		return result;
 	}
 
 }
