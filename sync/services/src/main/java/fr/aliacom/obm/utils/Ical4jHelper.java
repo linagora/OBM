@@ -35,6 +35,7 @@ import java.util.TimeZone;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.data.UnfoldingReader;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
@@ -135,7 +136,7 @@ public class Ical4jHelper {
 		
 		List<Event> ret = new LinkedList<Event>();
 		CalendarBuilder builder = new CalendarBuilder();
-		Calendar calendar = builder.build(new StringReader(ics));
+		Calendar calendar = builder.build(new UnfoldingReader(new StringReader(ics), true));
 
 		if (calendar != null) {
 			ComponentList comps = getComponents(calendar, Component.VEVENT);

@@ -17,10 +17,18 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.fortuna.ical4j.data.ParserException;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,6 +49,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.ICalendar;
+import org.obm.sync.services.ImportICalendarException;
 
 import com.google.common.base.Function;
 import com.google.common.base.Splitter;
@@ -835,4 +844,65 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 		throw new ServerFault("user has no write rights on calendar " + calendar);
 	}
+
+	@Override
+	public void importICalendar(final AccessToken token, final String calendar, final URI ics) 
+		throws ImportICalendarException, AuthFault, ServerFault {
+		
+		final String icsString = getStreamFromUri(ics);
+		final List<Event> events = parseICSEvent(token, icsString);
+		for (final Event event : events) {
+			
+			if (!isAttendeeExistForCalendarOwner(calendar, event.getAttendees())) {
+				addAttendeeForCalendarOwner(token, calendar, event);
+			}
+			
+			createEvent(token, calendar, event);
+		}
+	}
+	
+	private String getStreamFromUri(final URI ics) throws ImportICalendarException {
+		try {
+			final URL url = ics.toURL();
+			final InputStream is = url.openStream();
+			return IOUtils.toString(is);
+		} catch (MalformedURLException e) {
+			throw new ImportICalendarException(e);
+		} catch (IOException e) {
+			throw new ImportICalendarException(e);
+		}
+	}
+
+	private List<Event> parseICSEvent(final AccessToken token, final String icsToString) throws ImportICalendarException {
+		try {
+			return Ical4jHelper.parseICSEvent(icsToString, token);
+		} catch (IOException e) {
+			throw new ImportICalendarException(e);
+		} catch (ParserException e) {
+			throw new ImportICalendarException(e);
+		}
+	}
+	
+	private void addAttendeeForCalendarOwner(final AccessToken token, final String calendar, final Event event) {
+		final ObmDomain obmDomain = new ObmDomain();
+		obmDomain.setName(token.getDomain());
+		obmDomain.setId(token.getDomainId());
+		
+		final ObmUser obmUser = userDao.findUserByLogin(calendar, obmDomain);
+		final Attendee attendee = new Attendee();
+		attendee.setEmail(obmUser.getEmail());
+		
+		event.getAttendees().add(attendee);
+	}
+	
+	private boolean isAttendeeExistForCalendarOwner(final String calendar, final List<Attendee> attendees) {
+		for (final Attendee attendee: attendees) {
+			final ObmUser obmUser = userDao.findUser(attendee.getEmail());
+			if (obmUser.getLogin().equals(calendar)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

@@ -129,15 +129,15 @@ public class XmlResponder {
 	}
 
 	public String sendBoolean(boolean value) {
-		return sendString("" + value);
+		return sendString(String.valueOf(value));
 	}
 
 	public String sendInt(int value) {
-		return sendString("" + value);
+		return sendString(String.valueOf(value));
 	}
 
 	public String sendLong(long value) {
-		return sendString("" + value);
+		return sendString(String.valueOf(value));
 	}
 
 	public String sendString(String value) {

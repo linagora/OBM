@@ -603,13 +603,25 @@ public class Ical4jHelperTest {
 		assertEquals(event.size(), 1);
 	}
 
-	public InputStream getStreamICS(String filename) {
+	private InputStream getStreamICS(String filename) {
 		InputStream in = ClassLoader.getSystemClassLoader()
 				.getResourceAsStream("icsFile/" + filename);
 		if (in == null) {
 			fail("Cannot load " + filename);
 		}
 		return in;
+	}
+	
+	@Test
+	public void testParsingICSFileOf200kio() throws IOException, ParserException {
+		final String ics = IOUtils.toString(getStreamICS("bellemin-calendrierobm.ics"));
+		final AccessToken token = new AccessToken(0, 0, null);
+		
+		final List<Event> events = Ical4jHelper.parseICSEvent(ics, token);
+		for (final Event event: events) {
+			assertNotNull(event.getTitle());
+		}
+		assertEquals(221, events.size());
 	}
 
 }

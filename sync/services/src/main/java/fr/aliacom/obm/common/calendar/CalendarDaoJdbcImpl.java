@@ -61,6 +61,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.items.EventChanges;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
@@ -1676,22 +1677,31 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 				ps.setInt(1, ev.getDatabaseId());
 				ps.setInt(2, userEntity);
-				ps.setObject(3, at.getState()
-						.getJdbcObject(obmHelper.getType()));
-				ps.setObject(4,
-						at.getRequired().getJdbcObject(obmHelper.getType()));
+				ps.setObject(3, getParticipationStateOrDefault(at));
+				ps.setObject(4, getParticipationRoleOrDefault(at));
 				ps.setInt(5, at.getPercent());
 				ps.setInt(6, editor.getObmId());
 				ps.setBoolean(7, at.isOrganizer());
 				ps.addBatch();
 				logger.info(LogUtils.prefix(editor) + "Adding " + at.getEmail() + ( at.isOrganizer() ? " as organizer" : " as attendee"));
 			}
+			
 			ps.executeBatch();
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
+	private ParticipationState getParticipationStateOrDefault(final Attendee at) {
+		final ParticipationState pStat = Objects.firstNonNull(at.getState(), ParticipationState.NEEDSACTION);
+		return (ParticipationState) pStat.getJdbcObject(obmHelper.getType());
+	}
+
+	private ParticipationRole getParticipationRoleOrDefault(final Attendee at) {
+		final ParticipationRole pRole = Objects.firstNonNull(at.getRequired(), ParticipationRole.REQ);
+		return (ParticipationRole) pRole.getJdbcObject(obmHelper.getType());
+	}
+	
 	private void updateAttendees(AccessToken updater, Connection con, String calendar, Event ev,
 			boolean onlyUpdateMyself, Boolean useObmUser) throws SQLException {
 		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=? "

@@ -18,6 +18,8 @@
 package org.obm.sync.server.handler;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +43,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.server.ParametersSource;
 import org.obm.sync.server.XmlResponder;
+import org.obm.sync.services.ImportICalendarException;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
@@ -165,6 +168,8 @@ public class EventHandler extends SecureSyncHandler {
 			return parseFreeBusyToICS(at, params, responder);
 		} else if (method.equals("changeParticipationState")) {
 			return changeParticipationState(at, params, responder);
+		} else if (method.equals("importICalendar")) {
+			return importICalendar(at, params, responder);
 		} else {
 			logger.error(LogUtils.prefix(at) + "cannot handle method '" + method + "'");
 			return "";
@@ -445,4 +450,20 @@ public class EventHandler extends SecureSyncHandler {
 				ParticipationState.getValueOf(params.getParameter("state")));
 		return responder.sendBoolean(success);
 	}
+	
+	private String importICalendar(final AccessToken token, final ParametersSource params, 
+			XmlResponder responder) throws ImportICalendarException, AuthFault, ServerFault {
+	
+		final String calendar = params.getParameter("calendar");
+		URI ics;
+		try {
+			ics = new URI(params.getParameter("ics"));
+		} catch (URISyntaxException e) {
+			throw new ImportICalendarException(e);
+		}
+		
+		binding.importICalendar(token, calendar, ics);
+		return responder.sendBoolean(true);
+	}
+	
 }
