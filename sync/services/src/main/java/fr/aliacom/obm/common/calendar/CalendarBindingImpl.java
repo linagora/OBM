@@ -172,10 +172,12 @@ public class CalendarBindingImpl implements ICalendar {
 			if (owner != null) {
 				if (helper.canWriteOnCalendar(token, owner)) {
 					ev = calendarService.removeEvent(token, uid, ev.getType());
-					logger.info(LogUtils.prefix(token) + "Calendar : event["
-							+ uid + "] removed");
-					eventChangeHandler.delete(token, ev,
-							settingsDao.getUserLanguage(token));
+					logger.info(LogUtils.prefix(token) + "Calendar : event[" + uid + "] removed");
+					if (ev.isInternalEvent()) {
+						eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
+					} else {
+						notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED);
+					}
 					return ev;
 				}
 				if (helper.canReadCalendar(token, owner)) {
@@ -219,8 +221,12 @@ public class CalendarBindingImpl implements ICalendar {
 
 				calendarService.removeEventByExtId(token, calendarUser, extId);
 				logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
-
-				eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
+				
+				if (ev.isInternalEvent()) {
+					eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
+				} else {
+					notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED);
+				}
 				return ev;
 			}
 		} catch (Throwable e) {
@@ -320,6 +326,7 @@ public class CalendarBindingImpl implements ICalendar {
 				logger.info(LogUtils.prefix(token) + "Calendar : External event["
 						+ after.getTitle() + "] modified");
 			}
+			notifyOrganizerForExternalEvent(token, calendar, after);
 			return after;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -383,14 +390,30 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private Event createExternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {
 		try{
-		Event ev = calendarService.createEvent(token, calendar, event, false);
-		logger.info(LogUtils.prefix(token) + "Calendar : external event["
-				+ ev.getTitle() + "] created");
-		return ev;
-	    } catch (Throwable e) {
+			Event ev = calendarService.createEvent(token, calendar, event, false);
+			logger.info(LogUtils.prefix(token) + "Calendar : external event["+ ev.getTitle() + "] created");
+			notifyOrganizerForExternalEvent(token, calendar, ev);
+			return ev;
+		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
+	}
+
+	private void notifyOrganizerForExternalEvent(AccessToken token,
+			String calendar, Event ev, ParticipationState state) throws FindException {
+		logger.info(LogUtils.prefix(token) + 
+				"Calendar : sending participation notification to organizer of event ["+ ev.getTitle() + "]");
+		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
+		eventChangeHandler.updateParticipationState(ev, calendarOwner, state, 
+				settingsDao.getUserLanguage(token));
+	}
+
+	
+	private void notifyOrganizerForExternalEvent(AccessToken token, String calendar, Event ev) throws FindException {
+		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
+		Attendee calendarOwnerAsAttendee = ev.findAttendeeForUser(calendarOwner.getEmailAtDomain());
+		notifyOrganizerForExternalEvent(token, calendar, ev, calendarOwnerAsAttendee.getState());
 	}
 
 	private Event createInternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {

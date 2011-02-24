@@ -14,6 +14,13 @@ public class EventChanges {
 	private Date lastSync;
 	private String[] removedExtIds;
 
+	public EventChanges() {
+		removed = new String[0];
+		updated = new Event[0];
+		participationUpdated = new ParticipationChanges[0];
+		removedExtIds = new String[0];
+	}
+	
 	public String[] getRemoved() {
 		return removed;
 	}
