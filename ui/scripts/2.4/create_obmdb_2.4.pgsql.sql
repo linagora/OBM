@@ -521,7 +521,7 @@ CREATE TABLE deal (
     deal_amount numeric(12,2),
     deal_margin numeric(12,2),
     deal_commission numeric(4,2) DEFAULT 0,
-    deal_hitrate integer DEFAULT 0,
+    deal_hitrate integer DEFAULT 0 NOT NULL,
     deal_status_id integer,
     deal_archive smallint DEFAULT 0 NOT NULL,
     deal_todo character varying(128),

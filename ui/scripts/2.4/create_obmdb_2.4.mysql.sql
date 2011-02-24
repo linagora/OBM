@@ -860,7 +860,7 @@ CREATE TABLE `Deal` (
   `deal_amount` decimal(12,2) default NULL,
   `deal_margin` decimal(12,2) default NULL,
   `deal_commission` decimal(5,2) default '0.00',
-  `deal_hitrate` int(3) default '0',
+  `deal_hitrate` int(3) NOT NULL default '0',
   `deal_status_id` int(2) default NULL,
   `deal_archive` char(1) default '0',
   `deal_todo` varchar(128) default NULL,
