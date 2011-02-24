@@ -376,5 +376,14 @@ public class Event {
 		}
 		return false;
 	}
+
+	public Attendee findAttendeeForUser(String userEmail) {
+		for (Attendee at: attendees) {
+			if (at.getEmail().equalsIgnoreCase(userEmail)) {
+				return at;
+			}
+		}
+		return null;
+	}
 	
 }
