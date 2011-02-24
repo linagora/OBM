@@ -7,6 +7,7 @@ import java.util.List;
 import org.obm.sync.base.Category;
 import org.obm.sync.items.AbstractItemsWriter;
 import org.obm.sync.items.EventChanges;
+import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
@@ -44,11 +45,30 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 			for (Event ev : cc.getUpdated()) {
 				appendEvent(updated, ev);
 			}
-
+			Element participation = DOMUtils.createElement(root, "participation-changes");
+			for (ParticipationChanges changes : cc.getParticipationUpdated()) {
+				appendParticipationChanges(participation, changes);
+			}
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 		return doc;
+	}
+
+	private void appendParticipationChanges(Element parent,	ParticipationChanges changes) {
+		Element participation = DOMUtils.createElement(parent, "participation");
+		participation.setAttribute("id", String.valueOf(changes.getEventId()));
+		participation.setAttribute("extId", changes.getEventExtId());
+		Element attendees = DOMUtils.createElement(participation, "attendees");
+		for (Attendee a: changes.getAttendees()) {
+			appendAttendeeForParticipation(attendees, a);
+		}
+	}
+
+	private void appendAttendeeForParticipation(Element attendees, Attendee a) {
+		Element at = DOMUtils.createElement(attendees, "attendee");
+		at.setAttribute("email", a.getEmail());
+		at.setAttribute("state", (a.getState() != null ? a.getState().toString() : ParticipationState.NEEDSACTION.toString()));
 	}
 
 	public void appendEvent(Element parent, Event ev) {

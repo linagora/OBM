@@ -1,6 +1,7 @@
 package org.obm.sync.calendar;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -85,5 +86,65 @@ public class EventTest {
 		recurrence.setEnd(calendar.getTime());
 		event.setRecurrence(recurrence);
 		Assert.assertFalse(event.isEventInThePast());
+	}
+	
+	@Test
+	public void testEventModifiedNullTimestamp() {
+		Event event = new Event();
+		event.setTimeCreate(new Date());
+		boolean modified = event.modifiedSince(null);
+		Assert.assertEquals(true, modified);
+	}
+	
+	@Test
+	public void testEventModifiedZeroTimestamp() {
+		Event event = new Event();
+		event.setTimeCreate(new Date());
+		boolean modified = event.modifiedSince(new Date(0));
+		Assert.assertEquals(true, modified);
+	}
+	
+	@Test
+	public void testEventModifiedTimestampBeforeCreateTimestamp() {
+		Event event = new Event();
+		Calendar calendar = Calendar.getInstance();
+		event.setTimeCreate(calendar.getTime());
+		calendar.add(Calendar.MONTH, -1);	
+		boolean modified = event.modifiedSince(calendar.getTime());
+		Assert.assertEquals(true, modified);
+	}
+	
+	@Test
+	public void testEventModifiedTimestampAfterCreateTimestampBeforeUpdateTimestamp() {
+		Event event = new Event();
+		Calendar calendar = Calendar.getInstance();
+		event.setTimeCreate(calendar.getTime());
+		calendar.add(Calendar.MONTH, 2);
+		event.setTimeUpdate(calendar.getTime());
+		calendar.add(Calendar.MONTH, -1);
+		boolean modified = event.modifiedSince(calendar.getTime());
+		Assert.assertEquals(true, modified);
+	}
+	
+	@Test
+	public void testEventModifiedTimestampAfterCreateTimestampAfterUpdateTimestamp() {
+		Event event = new Event();
+		Calendar calendar = Calendar.getInstance();
+		event.setTimeCreate(calendar.getTime());
+		calendar.add(Calendar.MONTH, 1);
+		event.setTimeUpdate(calendar.getTime());
+		calendar.add(Calendar.MONTH, 1);
+		boolean modified = event.modifiedSince(calendar.getTime());
+		Assert.assertEquals(false, modified);
+	}
+	
+	@Test
+	public void testEventModifiedTimestampAfterCreateTimestamp() {
+		Event event = new Event();
+		Calendar calendar = Calendar.getInstance();
+		event.setTimeCreate(calendar.getTime());
+		calendar.add(Calendar.MONTH, 1);	
+		boolean modified = event.modifiedSince(calendar.getTime());
+		Assert.assertEquals(false, modified);
 	}
 }

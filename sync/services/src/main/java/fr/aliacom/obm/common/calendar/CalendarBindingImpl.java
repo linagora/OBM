@@ -17,6 +17,7 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,8 +39,10 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.items.EventChanges;
+import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.ICalendar;
 
+import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
@@ -435,6 +438,49 @@ public class CalendarBindingImpl implements ICalendar {
 		return getSync(token, calendar, lastSync, false);
 	}
 
+	@Override
+	public EventChanges getSyncWithSortedChanges(AccessToken token,
+			String calendar, Date lastSync) throws AuthFault, ServerFault {
+
+		EventChanges changes = getSync(token, calendar, lastSync, false);
+		
+		//sort between update and participation update based on event timestamp
+		sortUpdatedEvents(changes, lastSync);
+		
+		return changes;
+	}
+	
+	private void sortUpdatedEvents(EventChanges changes, Date lastSync) {
+		List<Event> updated = new ArrayList<Event>();
+		List<Event> participationChanged = new ArrayList<Event>();
+		
+		for (Event event: changes.getUpdated()) {
+			if (event.modifiedSince(lastSync)) {
+				updated.add(event);
+			} else {
+				//means that only participation changed
+				participationChanged.add(event);
+			}
+			
+		}
+		changes.setParticipationUpdated(eventsToParticipationUpdateArray(participationChanged));
+		changes.setUpdated(updated.toArray(new Event[0]));
+	}
+
+	private ParticipationChanges[] eventsToParticipationUpdateArray(List<Event> participationChanged) {
+		return Lists.transform(participationChanged, new Function<Event, ParticipationChanges>() {
+			@Override
+			public ParticipationChanges apply(Event event) {
+				ParticipationChanges participationChanges = new ParticipationChanges(); 
+				participationChanges.setAttendees(event.getAttendees());
+				participationChanges.setEventExtId(event.getExtId());
+				participationChanges.setEventId(event.getDatabaseId());
+				return participationChanges;
+			}
+		}).toArray(new ParticipationChanges[0]);
+	}
+
+	
 	@Override
 	public EventChanges getSyncEventDate(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault {

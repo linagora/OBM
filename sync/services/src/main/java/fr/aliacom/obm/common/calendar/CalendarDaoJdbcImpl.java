@@ -63,6 +63,7 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
 import org.obm.sync.utils.DisplayNameUtils;
+import org.obm.sync.items.ParticipationChanges;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -870,6 +871,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ " FROM Event e "
 				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
 				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
+				+ "INNER JOIN EventLink attupd ON attupd.eventlink_event_id=e.event_id "
 				+ "WHERE e.event_type=? AND ue.userentity_user_id=? ";
 
 		// dirty hack to disable need-action to opush & tbird
@@ -878,13 +880,15 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 
 		if (lastSync != null) {
-			fetchIds += " AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? OR att.eventlink_timeupdate >= ?";
+			fetchIds += " AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? OR attupd.eventlink_timeupdate >= ?";
 			if (onEventDate) {
 				fetchIds += " OR e.event_date >= ? OR event_repeatkind != 'none'";
 			}
 			fetchIds += ")";
 		}
 
+		fetchIds += " GROUP BY e.event_id, att.eventlink_state, e.event_ext_id";
+		
 		StringBuilder sb = new StringBuilder(fetchIds);
 		SyncRange sr = addSyncRanges(sb, token);
 
@@ -1005,12 +1009,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			loadEventExceptions(token, eventById, evIdList);
 		}
 
+		ret.setUpdated(changedEvent.toArray(new Event[0]));
 		ret.setDeletions(findDeletedEvents(calendarUser, lastSync, typeFilter,
 				declined));
-		ret.setUpdated(changedEvent.toArray(new Event[0]));
+		
 		return ret;
 	}
-
+	
 	private SyncRange addSyncRanges(StringBuilder sb, AccessToken token) {
 		String min = token.getServiceProperty("funis/sync_days_min");
 		String max = token.getServiceProperty("funis/sync_days_max");

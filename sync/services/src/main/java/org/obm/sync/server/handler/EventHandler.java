@@ -108,6 +108,8 @@ public class EventHandler extends SecureSyncHandler {
 		
 		if (method.equals("getSync")) {
 			return getSync(at, params, responder);
+		} else if (method.equals("getSyncWithSortedChanges")) {
+			return getSyncWithSortedChanges(at, params, responder);
 		} else if (method.equals("getSyncEventDate")) {
 			return getSyncEventDate(at, params, responder);
 		} else if (method.equals("removeEvent")) {
@@ -408,6 +410,16 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendCalendarChanges(ret);
 	}
 
+	private String getSyncWithSortedChanges(
+			AccessToken at, ParametersSource params, XmlResponder responder) 
+			throws AuthFault, ServerFault {
+			EventChanges ret = binding.getSyncWithSortedChanges(at, 
+					getCalendar(at, params), 
+					DateHelper.asDate(params.getParameter("lastSync")));
+			return responder.sendCalendarChanges(ret);
+	}
+
+	
 	private String getSync(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws AuthFault, ServerFault {
