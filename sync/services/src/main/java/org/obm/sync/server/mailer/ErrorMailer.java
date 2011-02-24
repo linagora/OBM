@@ -2,8 +2,12 @@ package org.obm.sync.server.mailer;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -18,29 +22,43 @@ import org.obm.sync.server.template.ITemplateLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.services.constant.ConstantService;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
+@Singleton
 public class ErrorMailer extends AbstractMailer {
 
+	private final static int INTERVAL_BETWEEN_NOTIFICATION = 6;
+	private ConcurrentMap<String, Date> lastNotificationDateByUser;
+	
 	@Inject
 	protected ErrorMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader) {
 		super(mailService, constantService, templateLoader);
+		lastNotificationDateByUser = 
+			new MapMaker()
+				.expireAfterWrite(INTERVAL_BETWEEN_NOTIFICATION, TimeUnit.HOURS)
+				.makeMap();
 	}
 	
 	public void notifyConnectorVersionError(AccessToken at, String version, Locale locale) throws NotificationException {
 		try {
-			ErrorMail mail = 
-				new ErrorMail(
-						getSystemAddress(at), 
-						convertAccessTokenToAddresse(at), 
-						connectorVersionErrorTitle(locale), 
-						newUserBodyTxt(version,locale));
-			sendNotificationMessage(mail, ImmutableList.of(convertAccessTokenToAddresse(at)));
+			Date now = new Date();
+			Date lastNotificationDate = lastNotificationDateByUser.putIfAbsent(at.getUserWithDomain(), now);
+			if (isNotificationNeeded(lastNotificationDate, now)) {
+				ErrorMail mail = 
+					new ErrorMail(
+							getSystemAddress(at), 
+							convertAccessTokenToAddresse(at), 
+							connectorVersionErrorTitle(locale), 
+							newUserBodyTxt(version,locale));
+				sendNotificationMessage(mail, ImmutableList.of(convertAccessTokenToAddresse(at)));
+			}
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -52,6 +70,19 @@ public class ErrorMailer extends AbstractMailer {
 		} catch (MessagingException e) {
 			throw new NotificationException(e);
 		}
+	}
+
+	private boolean isNotificationNeeded(Date lastNotificationDate, Date now) {
+		if (lastNotificationDate == null) {
+			return true;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(lastNotificationDate);
+		cal.add(Calendar.HOUR, INTERVAL_BETWEEN_NOTIFICATION);
+		if (cal.getTime().before(now)) {
+			return true;
+		}
+		return false;
 	}
 
 
