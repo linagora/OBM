@@ -62,12 +62,23 @@ public interface ICalendar {
 			throws AuthFault, ServerFault;
 
 	/**
-	 * return every changes made to calendar since lastSync date Logged user
-	 * needs read rights on calendar
+	 * return every changes made to calendar since lastSync date.
+	 * This service treats participation changes as full changes.
+	 * Logged user needs read rights on calendar.
 	 */
 	public EventChanges getSync(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault;
 
+	/**
+	 * return every changes made to calendar since lastSync date.
+	 * This service treats participation changes as special changes
+	 * in order to let client know if the event itself has been modified
+	 * or not.
+	 * Logged user needs read rights on calendar.
+	 */
+	public EventChanges getSyncWithSortedChanges(AccessToken token, String calendar,
+			Date lastSync) throws AuthFault, ServerFault;
+	
 	/**
 	 * return every event in calendar the will happen after start date Logged
 	 * user needs read rights on calendar

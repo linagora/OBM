@@ -95,8 +95,19 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	}
 
 	@Override
+	public EventChanges getSyncWithSortedChanges(AccessToken token,
+			String calendar, Date lastSync) throws AuthFault, ServerFault {
+		return getSync(token, calendar, lastSync, "getSyncWithSortedChanges");
+	}
+	
+	@Override
 	public EventChanges getSync(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault {
+		return getSync(token, calendar, lastSync, "getSync");
+	}
+	
+	private EventChanges getSync(AccessToken token, String calendar,
+			Date lastSync, String methodName) throws ServerFault {
 		if (logger.isDebugEnabled()) {
 			logger.debug("getSync(" + token.getSessionId() + ", " + calendar
 					+ ", " + lastSync + ")");
@@ -110,7 +121,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 			params.put("lastSync", "0");
 		}
 
-		Document doc = execute(type + "/getSync", params);
+		Document doc = execute(type + "/" + methodName, params);
 		checkServerError(doc);
 		return respParser.parseChanges(doc);
 	}
