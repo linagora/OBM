@@ -82,4 +82,11 @@ public class Attendee {
 		return email.hashCode();
 	}
 
+	@Override
+	public String toString() {
+		return "Attendee ["+ email + "]";
+	}
+	
+	
+
 }
