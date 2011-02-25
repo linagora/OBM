@@ -1,9 +1,11 @@
 package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
+import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.before;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.compareCollections;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendee;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.longAfter;
+import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.longBefore;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
@@ -314,6 +316,26 @@ public class EventChangeHandlerTest {
 			mailer.notifyUpdateUsers(anyObject(AccessToken.class), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent), eq(currentEvent), eq(LOCALE));
 			expectLastCall().once();
+			replay(mailer);
+			
+			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+			eventChangeHandler.update(getMockAccessToken(), previousEvent, currentEvent, LOCALE);
+			verify(mailer);
+		}
+		
+		@Test
+		public void testDefaultEventDateChangeOneUserEventInThePast() {
+			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
+			
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+			
+			Event previousEvent = new Event();
+			previousEvent.setDate(longBefore());
+			previousEvent.addAttendee(attendee);
+			Event currentEvent = new Event();
+			currentEvent.setDate(before());
+			currentEvent.addAttendee(attendee);
+
 			replay(mailer);
 			
 			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);

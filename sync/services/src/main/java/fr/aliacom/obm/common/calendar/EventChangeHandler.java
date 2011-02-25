@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
@@ -157,14 +156,18 @@ public class EventChangeHandler {
 	}
 	
 	private Map<AttendeeStateValue, ? extends Set<Attendee>> computeUpdateNotificationGroups(Event previous, Event current) {
-		if (previous.isEventInThePast() && current.isEventInThePast()) {
-			return ImmutableMap.of();
+		Set<Attendee> removedAttendees = ImmutableSet.of();
+		Set<Attendee> newAttendees = ImmutableSet.of();
+		Set<Attendee> stableAttendees = ImmutableSet.of();
+		
+		if (!previous.isEventInThePast() || !current.isEventInThePast()) {
+			ImmutableSet<Attendee> previousAttendees = ImmutableSet.copyOf(filterOwner(previous, previous.getAttendees()));
+			ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(filterOwner(current, current.getAttendees()));
+			removedAttendees = Sets.difference(previousAttendees, currentAttendees);
+			newAttendees = Sets.difference(currentAttendees, previousAttendees);
+			stableAttendees = Sets.intersection(previousAttendees, currentAttendees);
 		}
-		ImmutableSet<Attendee> previousAttendees = ImmutableSet.copyOf(filterOwner(previous, previous.getAttendees()));
-		ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(filterOwner(current, current.getAttendees()));
-		SetView<Attendee> removedAttendees = Sets.difference(previousAttendees, currentAttendees);
-		SetView<Attendee> newAttendees = Sets.difference(currentAttendees, previousAttendees);
-		SetView<Attendee> stableAttendees = Sets.intersection(previousAttendees, currentAttendees);
+		
 		return ImmutableMap.of(
 				AttendeeStateValue.Old, removedAttendees,
 				AttendeeStateValue.Current, stableAttendees,

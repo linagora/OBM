@@ -38,6 +38,12 @@ public class EventChangeHandlerTestsTools {
 		return cal.getTime();
 	}
 
+	static Date longBefore() {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.YEAR, -1);
+		return cal.getTime();
+	}
+	
 	static Date after() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MONTH, 1);
