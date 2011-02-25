@@ -45,7 +45,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 			for (Event ev : cc.getUpdated()) {
 				appendEvent(updated, ev);
 			}
-			Element participation = DOMUtils.createElement(root, "participation-changes");
+			Element participation = DOMUtils.createElement(root, "participationChanges");
 			for (ParticipationChanges changes : cc.getParticipationUpdated()) {
 				appendParticipationChanges(participation, changes);
 			}
