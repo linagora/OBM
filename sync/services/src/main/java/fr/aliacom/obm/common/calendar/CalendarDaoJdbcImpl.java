@@ -1692,14 +1692,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private ParticipationState getParticipationStateOrDefault(final Attendee at) {
+	private Object getParticipationStateOrDefault(final Attendee at) {
 		final ParticipationState pStat = Objects.firstNonNull(at.getState(), ParticipationState.NEEDSACTION);
-		return (ParticipationState) pStat.getJdbcObject(obmHelper.getType());
+		return pStat.getJdbcObject(obmHelper.getType());
 	}
 
-	private ParticipationRole getParticipationRoleOrDefault(final Attendee at) {
+	private Object getParticipationRoleOrDefault(final Attendee at) {
 		final ParticipationRole pRole = Objects.firstNonNull(at.getRequired(), ParticipationRole.REQ);
-		return (ParticipationRole) pRole.getJdbcObject(obmHelper.getType());
+		return pRole.getJdbcObject(obmHelper.getType());
 	}
 	
 	private void updateAttendees(AccessToken updater, Connection con, String calendar, Event ev,
