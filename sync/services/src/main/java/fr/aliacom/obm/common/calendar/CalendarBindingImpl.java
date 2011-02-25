@@ -940,16 +940,24 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private void addAttendeeForCalendarOwner(final AccessToken token, final String calendar, final Event event) {
+	private void addAttendeeForCalendarOwner(final AccessToken token, final String calendar, final Event event) throws ImportICalendarException {
 		final ObmDomain obmDomain = new ObmDomain();
 		obmDomain.setName(token.getDomain());
 		obmDomain.setId(token.getDomainId());
 		
-		final ObmUser obmUser = userDao.findUserByLogin(calendar, obmDomain);
+		final ObmUser obmUser = getCalendarOwnerUser(calendar, obmDomain);
 		final Attendee attendee = new Attendee();
-		attendee.setEmail(obmUser.getEmail());
+		attendee.setEmail(obmUser.getEmailAtDomain());
 		
 		event.getAttendees().add(attendee);
+	}
+
+	private ObmUser getCalendarOwnerUser(final String calendar, final ObmDomain obmDomain) throws ImportICalendarException {
+		final ObmUser obmUser = userDao.findUserByLogin(calendar, obmDomain);
+		if (obmUser == null) {
+			throw new ImportICalendarException("user " + calendar + " not found");
+		}
+		return obmUser;
 	}
 	
 	private boolean isAttendeeExistForCalendarOwner(final String calendar, final List<Attendee> attendees) {
