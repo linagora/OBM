@@ -15,12 +15,7 @@ location : ${location}
 
 author   : ${author}
 
-
-:: To accept this appointment : 
-${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=ACCEPTED
-
-:: To refuse this appointment : 
-${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=DECLINED
+::NB : If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this appointment.
 
 :: More information about this appointment : 
 ${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}

@@ -15,12 +15,7 @@ lieu   : ${location}
 
 auteur : ${author}
 
-
-:: Pour accepter : 
-${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=ACCEPTED
-
-:: Pour refuser : 
-${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=DECLINED
+::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous.
 
 :: Pour plus de détails : 
 ${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}

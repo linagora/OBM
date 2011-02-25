@@ -300,6 +300,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event modifyInternalEvent(AccessToken token, String calendar, Event before,  Event event, boolean onlyUpdateMyself,
 			boolean updateAttendees) throws ServerFault {
 		try{
+			changePartipationStateOnNewWritableCalendar(token, before, event);
 			Event after = calendarService.modifyEvent(token, calendar, event,
 					onlyUpdateMyself, updateAttendees, true);
 
@@ -418,6 +419,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private Event createInternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {
 		try{
+			changePartipationStateOnWritableCalendar(token, event);
 			Event ev = calendarService.createEvent(token, calendar, event, true);
 			eventChangeHandler.create(token, ev, settingsDao.getUserLanguage(token));
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
@@ -428,7 +430,39 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e.getMessage());
 		}
 	}
-
+	
+	private void changePartipationStateOnWritableCalendar(AccessToken token, Event event){
+		for(Attendee att : event.getAttendees()){
+			if(ParticipationState.NEEDSACTION.equals(att.getState()) && !StringUtils.isEmpty(att.getEmail())) {
+				try {
+					acceptePartipationStateIfCanWriteOnCalendar(token, att);
+				} catch (Exception e) {
+					logger.error("Error while checks right on calendar: "+att.getEmail(), e);
+				}
+			}
+		}
+	}
+	
+	private List<Attendee> changePartipationStateOnNewWritableCalendar(AccessToken token,  Event before, Event event) {
+		List<Attendee> newAtt = Lists.newLinkedList();
+		for(Attendee att : event.getAttendees()){
+			if(!before.getAttendees().contains(att)){
+				acceptePartipationStateIfCanWriteOnCalendar(token, att);
+			}
+		}
+		return newAtt;
+	}
+	
+	private void acceptePartipationStateIfCanWriteOnCalendar(AccessToken token, Attendee att){
+		try {
+			if(helper.canWriteOnCalendar(token,  att.getEmail())){
+				att.setState(ParticipationState.ACCEPTED);
+			}
+		} catch (Exception e) {
+			logger.error("Error while checks right on calendar: "+att.getEmail(), e);
+		}
+	}
+	
 	@Override
 	public EventChanges getSync(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault {

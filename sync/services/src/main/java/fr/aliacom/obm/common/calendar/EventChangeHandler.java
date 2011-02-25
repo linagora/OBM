@@ -72,7 +72,18 @@ public class EventChangeHandler {
 		}
 		Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
 		if (!currentUsers.isEmpty()) {
-			eventChangeMailer.notifyUpdateUsers(at, currentUsers, previous, current, locale);
+			Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(currentUsers);
+			
+			Set<Attendee> accepted = atts.get(ParticipationState.ACCEPTED);
+			if(accepted != null && !accepted.isEmpty()){
+				eventChangeMailer.notifyAcceptedUpdateUsers(accepted, previous, current, locale);
+			}
+			
+			Set<Attendee> notAccepted = atts.get(ParticipationState.NEEDSACTION);
+			if (notAccepted != null && !notAccepted.isEmpty()) {
+				eventChangeMailer.notifyNeedActionUpdateUsers(at, notAccepted, previous, current, locale);
+			}
+			
 		}
 	}
 	

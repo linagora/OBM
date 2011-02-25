@@ -24,9 +24,12 @@ a été modifié :</td>
         <td style="text-align:right;padding-right:1em;">Organisateur</td><td style="font-weight:bold;">${new.author}</td>
     </tr>
     <tr>
+		<td colspan="2">
+     		<strong>NB : </strong>Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications.
+    	</td>
+	</tr>
+    <tr>
         <td style="text-align:right;" colspan="2">
-          <a href="${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=ACCEPTED">Accepter</a>
-          <a href="${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=DECLINED">Refuser</a>
           <a href="${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}">Consulter l'agenda</a>
         </td>
     </tr>
