@@ -245,8 +245,6 @@ public class CalendarBindingImpl implements ICalendar {
 			return null;
 		}
 		try {
-			boolean onlyUpdateMyself = false;
-
 			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
 			Event before = loadCurrentEvent(token, calendarUser, event);
 
@@ -263,19 +261,12 @@ public class CalendarBindingImpl implements ICalendar {
 						+ token.getUser() + " cannot modify event["
 						+ before.getTitle() + "] because not owner"
 						+ " or no write right on owner " + before.getOwner()+". ParticipationState will be updated.");
-				for(Attendee att : event.getAttendees()){
-					if(calendar.equalsIgnoreCase(att.getEmail())){
-						changeParticipationState(token, calendar, event.getExtId(), att.getState());
-					}
-				}
 				return event;
-				//TODO cleanup onlyUpdateMyself on dao
-				//onlyUpdateMyself = true;
 			} else{
 				if(before.isInternalEvent()){
-					return modifyInternalEvent(token, calendar, before, event, onlyUpdateMyself, updateAttendees);
+					return modifyInternalEvent(token, calendar, before, event, updateAttendees);
 				} else {
-					return modifyExternalEvent(token, calendar, event, onlyUpdateMyself, updateAttendees);
+					return modifyExternalEvent(token, calendar, event, updateAttendees);
 				}
 			}
 
@@ -297,14 +288,13 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private Event modifyInternalEvent(AccessToken token, String calendar, Event before,  Event event, boolean onlyUpdateMyself,
+	private Event modifyInternalEvent(AccessToken token, String calendar, Event before,  Event event,
 			boolean updateAttendees) throws ServerFault {
 		try{
 			changePartipationStateOnNewWritableCalendar(token, before, event);
-			Event after = calendarService.modifyEvent(token, calendar, event,
-					onlyUpdateMyself, updateAttendees, true);
+			Event after = calendarService.modifyEvent(token, calendar, event, updateAttendees, true);
 
-			if (after != null && !onlyUpdateMyself) {
+			if (after != null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 						+ after.getTitle() + "] modified");
 			}
@@ -319,16 +309,23 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private Event modifyExternalEvent(AccessToken token, String calendar, 
-			Event event, boolean onlyUpdateMyself, boolean updateAttendees) throws ServerFault {
+			Event event, boolean updateAttendees) throws ServerFault {
 		try {
-			Event after = calendarService.modifyEvent(token,  calendar, event,
-					onlyUpdateMyself, updateAttendees, false);
-			if (after != null && !onlyUpdateMyself) {
-				logger.info(LogUtils.prefix(token) + "Calendar : External event["
-						+ after.getTitle() + "] modified");
+			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
+				ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
+				calendarService.removeEventByExtId(token, calendarOwner, event.getExtId());
+				notifyOrganizerForExternalEvent(token, calendar, event);
+				logger.info(LogUtils.prefix(token) + "Calendar : External event[" + event.getTitle() + 
+						"] removed, calendar owner won't attende to it");
+				return event;
+			} else {
+				Event after = calendarService.modifyEvent(token,  calendar, event, updateAttendees, false);
+				if (after != null) {
+					logger.info(LogUtils.prefix(token) + "Calendar : External event[" + after.getTitle() + "] modified");
+				}
+				notifyOrganizerForExternalEvent(token, calendar, after);
+				return after;
 			}
-			notifyOrganizerForExternalEvent(token, calendar, after);
-			return after;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -390,15 +387,29 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private Event createExternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {
-		try{
-			Event ev = calendarService.createEvent(token, calendar, event, false);
-			logger.info(LogUtils.prefix(token) + "Calendar : external event["+ ev.getTitle() + "] created");
-			notifyOrganizerForExternalEvent(token, calendar, ev);
-			return ev;
+		try {
+			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
+				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ event.getTitle() + "] refused, mark event as deleted");
+				calendarService.removeEvent(token, event, event.getType());
+				notifyOrganizerForExternalEvent(token, calendar, event);
+				return event;
+			} else {
+				Event ev = calendarService.createEvent(token, calendar, event, false);
+				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ ev.getTitle() + "] created");
+				notifyOrganizerForExternalEvent(token, calendar, ev);
+				return ev;
+			}
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
+	}
+
+	private boolean isEventDeclinedForCalendarOwner(AccessToken token,
+			String calendar, Event event) throws FindException {
+		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
+		Attendee userAsAttendee = event.findAttendeeForUser(calendarOwner.getEmailAtDomain());
+		return userAsAttendee != null && userAsAttendee.getState() == ParticipationState.DECLINED;
 	}
 
 	private void notifyOrganizerForExternalEvent(AccessToken token,
