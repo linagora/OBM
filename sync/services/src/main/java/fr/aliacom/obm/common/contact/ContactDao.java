@@ -434,7 +434,7 @@ public class ContactDao {
 			logger.info("eventId != null");
 			Event e = calendarDao.findEvent(at, dateId);
 			e.setDate(date);
-			calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false, false, true);
+			calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false, true);
 			return e.getDatabaseId();
 		}
 		logger.info("date == null");

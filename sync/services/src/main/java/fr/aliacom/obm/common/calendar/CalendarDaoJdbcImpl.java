@@ -1356,18 +1356,18 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public Event modifyEvent(AccessToken at, String calendar, Event ev,
-			boolean onlyUpdateMyself, boolean updateAttendees, Boolean useObmUser) {
+			boolean updateAttendees, Boolean useObmUser) {
 
 		logger.info("should modify event with title " + ev.getTitle()
-				+ " date: " + ev.getDate() + " id: " + ev.getDatabaseId()
-				+ " onlyUpdateMyself: " + onlyUpdateMyself);
+				+ " date: " + ev.getDate() + " id: " + ev.getDatabaseId());
+		
 		Connection con = null;
 
 		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
 			ut.begin();
 			con = obmHelper.getConnection();
-			modifyEvent(con, at, calendar, ev, onlyUpdateMyself, updateAttendees, useObmUser);
+			modifyEvent(con, at, calendar, ev, updateAttendees, useObmUser);
 			ut.commit();
 		} catch (Throwable se) {
 			obmHelper.rollback(ut);
@@ -1383,7 +1383,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public void modifyEvent(Connection con, AccessToken at, String calendar, Event ev, 
-			boolean onlyUpdateMyself, boolean updateAttendees, Boolean useObmUser)
+			boolean updateAttendees, Boolean useObmUser)
 			throws SQLException, FindException {
 		Event old = findEvent(at, Integer.valueOf(ev.getUid()));
 		if (old == null) {
@@ -1399,35 +1399,29 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 
-			if (!onlyUpdateMyself) {
-				ps = createEventUpdateStatement(con, at, ev);
-				ps.executeUpdate();
-				ps.close();
-				ps = null;
-				if (updateAttendees) {
-					removeAttendees(con, attendeetoRemove, ev);
-				}
+			ps = createEventUpdateStatement(con, at, ev);
+			ps.executeUpdate();
+			ps.close();
+			ps = null;
+			if (updateAttendees) {
+				removeAttendees(con, attendeetoRemove, ev);
 			}
 
 			if (updateAttendees) {
-				updateAttendees(at, con, calendar, ev, onlyUpdateMyself,useObmUser);
-				if (onlyUpdateMyself) {
-					markUpdated(con, ev.getDatabaseId());
-				}
+				updateAttendees(at, con, calendar, ev, useObmUser);
+				markUpdated(con, ev.getDatabaseId());
 			}
 			updateAlerts(at, con, ev);
 
-			if (!onlyUpdateMyself) {
-				removeAllException(con, ev);
+			removeAllException(con, ev);
 
-				insertExceptions(at, ev, con, ev.getDatabaseId());
-				if (ev.getRecurrence() != null) {
-					for (Event event : ev.getRecurrence().getEventExceptions()) {
-						event.setDatabaseId(0);
-					}
-					insertEventExceptions(at, calendar, ev.getRecurrence()
-							.getEventExceptions(), con, ev.getDatabaseId(), useObmUser);
+			insertExceptions(at, ev, con, ev.getDatabaseId());
+			if (ev.getRecurrence() != null) {
+				for (Event event : ev.getRecurrence().getEventExceptions()) {
+					event.setDatabaseId(0);
 				}
+				insertEventExceptions(at, calendar, ev.getRecurrence()
+						.getEventExceptions(), con, ev.getDatabaseId(), useObmUser);
 			}
 		} finally {
 			obmHelper.cleanup(null, ps, null);
@@ -1573,6 +1567,26 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
+	public Event removeEvent(AccessToken token, Event event, EventType eventType) {
+		Event deletedEvent = null;
+		Connection con = null;
+		UserTransaction ut = obmHelper.getUserTransaction();
+		try {
+			ut.begin();
+			con = obmHelper.getConnection();
+			deletedEvent = removeEvent(con, token, eventType, event);
+			ut.commit();
+		} catch (Throwable se) {
+			obmHelper.rollback(ut);
+			logger.error(se.getMessage(), se);
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
+
+		return deletedEvent;
+	}
+	
+	@Override
 	public Event removeEvent(AccessToken token, int eventId, EventType eventType) {
 		Event event = null;
 		Connection con = null;
@@ -1600,6 +1614,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		if (ev == null) {
 			return null;
 		}
+		return removeEvent(con, token, et, ev);
+	}
+
+	private Event removeEvent(Connection con, AccessToken token, EventType et, Event ev) {
 		PreparedStatement dev = null;
 		try {
 			dev = con
@@ -1703,7 +1721,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 	
 	private void updateAttendees(AccessToken updater, Connection con, String calendar, Event ev,
-			boolean onlyUpdateMyself, Boolean useObmUser) throws SQLException {
+			Boolean useObmUser) throws SQLException {
 		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=? "
 				+ "where eventlink_event_id=? AND "
 				+ "eventlink_entity_id IN "
@@ -1746,12 +1764,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				ps.setInt(idx++, ev.getDatabaseId());
 				ps.setInt(idx++, userEntity);
 				ps.setInt(idx++, userEntity);
-				if (!onlyUpdateMyself
-						|| (onlyUpdateMyself && updater.getEmail().equals(
-								at.getEmail()))) {
-					ps.addBatch();
-					mightInsert.add(at);
-				}
+				ps.addBatch();
+				mightInsert.add(at);
 			}
 			updatedAttendees = ps.executeBatch();
 		} finally {
@@ -1765,23 +1779,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 		}
 		
-		if (!onlyUpdateMyself) {
-			logger.info("event modification needs to add " + toInsert.size()
-					+ " attendees.");
-			insertAttendees(updater, calendar, ev, con, toInsert, useObmUser);
-		}
-
-		if (onlyUpdateMyself) {
-			try {
-				String query = " UPDATE Event SET event_userupdate=? where event_id = ?";
-				ps = con.prepareStatement(query);
-				ps.setInt(1, updater.getObmId());
-				ps.setInt(2, ev.getDatabaseId());
-				ps.executeUpdate();
-			} finally {
-				obmHelper.cleanup(null, ps, null);
-			}
-		}
+		logger.info("event modification needs to add " + toInsert.size() + " attendees.");
+		insertAttendees(updater, calendar, ev, con, toInsert, useObmUser);
 
 		Statement st = null;
 		try {
