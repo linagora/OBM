@@ -1,5 +1,6 @@
 package org.obm.sync.services;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -227,5 +228,13 @@ public interface ICalendar {
 	 * change user of given calendar participation state
 	 */
 	public boolean changeParticipationState(AccessToken token, String calendar, String extId, ParticipationState participationState) throws ServerFault;
+	
+	/**
+	 * Import ics file in calendar's user
+	 * Adding a new attendee (owner) if calendar owner not exist in ics file
+	 * 
+	 * Return ImportICalendarException if import fails or if file not found
+	 */
+	public void importICalendar(AccessToken token, String calendar, URI ics) throws ImportICalendarException, AuthFault, ServerFault; 
 	
 }

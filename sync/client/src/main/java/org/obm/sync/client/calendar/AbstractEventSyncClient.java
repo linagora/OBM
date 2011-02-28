@@ -1,5 +1,6 @@
 package org.obm.sync.client.calendar;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -25,6 +26,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
+import org.obm.sync.services.ImportICalendarException;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
@@ -417,4 +419,17 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		checkServerError(doc);
 		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
+	
+	@Override
+	public void importICalendar(final AccessToken token, final String calendar, final URI ics)
+			throws ImportICalendarException, AuthFault, ServerFault {
+		
+		final Map<String, String> params = initParams(token);
+		params.put("calendar", calendar);
+		params.put("ics", ics.toString());
+		
+		final Document doc = execute(type + "/importICalendar", params);
+		checkServerError(doc);
+	}
+	
 }
