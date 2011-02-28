@@ -260,7 +260,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Integer ownerId = null;
 		logger.info("try to create with calendar owner:"
 				+ calendar);
-		ownerId = userDao.userIdFromEmailQuery(con, calendar);
+		ownerId = userDao.userIdFromEmail(con, calendar, editor.getDomainId());
 		if(ownerId == null){
 			throw new FindException("Error finding user["+calendar+"]");
 		}
@@ -1653,8 +1653,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 							+ "VALUES (?, ?, ?, ?, now(), ?)");
 			int databaseId = ev.getDatabaseId();
 			for (Attendee at : ev.getAttendees()) {
-				Integer userId = userDao.userIdFromEmailQuery(con,
-						at.getEmail());
+				Integer userId = userDao.userIdFromEmail(con,
+						at.getEmail(), token.getDomainId());
 				if (userId != null) {
 					dev.setInt(1, databaseId);
 					dev.setInt(2, userId);
@@ -2295,8 +2295,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 							+ "VALUES (?, ?, ?, now(), ?)");
 			int databaseId = ev.getDatabaseId();
 			for (Attendee at : ev.getAttendees()) {
-				Integer userId = userDao.userIdFromEmailQuery(con,
-						at.getEmail());
+				Integer userId = userDao.userIdFromEmail(con,
+						at.getEmail(), token.getDomainId());
 				if (userId != null) {
 					dev.setInt(1, databaseId);
 					dev.setInt(2, userId);

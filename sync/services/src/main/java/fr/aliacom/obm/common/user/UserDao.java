@@ -59,15 +59,8 @@ public class UserDao {
 		return ImmutableMap.of();
 	}
 	
-	public Integer userIdFromEmailQuery(Connection con, String mail)
+	private Integer userIdFromEmailQuery(Connection con, String mail, String domain)
 			throws SQLException {
-		String[] parts = mail.split("@");
-		String left = parts[0];
-		String right = "-";
-		if (parts.length > 1) {
-			right = parts[1];
-		}
-
 		Integer ret = null;
 
 		Statement st = null;
@@ -78,25 +71,25 @@ public class UserDao {
 			rs = st.executeQuery("SELECT userobm_id FROM UserObm "
 					+ "INNER JOIN Domain ON userobm_domain_id = domain_id "
 					+ "WHERE " + "( " + "(userobm_email = '"
-					+ left
+					+ mail
 					+ "' OR userobm_email like '"
-					+ left
+					+ mail
 					+ "\r\n%' OR userobm_email like '%\r\n"
-					+ left
+					+ mail
 					+ "\r\n%' OR userobm_email like '%\r\n"
-					+ left
+					+ mail
 					+ "') "
 					+ "AND "
 					+ "(domain_name = '"
-					+ right
+					+ domain
 					+ "' OR domain_alias = '"
-					+ right
+					+ domain
 					+ "' OR domain_alias like '"
-					+ right
+					+ domain
 					+ "\r\n%' OR domain_alias like '%\r\n"
-					+ right
+					+ domain
 					+ "\r\n%' OR domain_alias like '%\r\n"
-					+ right
+					+ domain
 					+ "') "
 					+ ") OR (userobm_email = '"
 					+ mail
@@ -201,8 +194,14 @@ public class UserDao {
 		Connection con = null;
 		Integer id = null;
 		try {
+			String[] parts = email.split("@");
+			String login = parts[0];
+			String domain = "-";
+			if (parts.length > 1) {
+				domain = parts[1];
+			}
 			con = obmHelper.getConnection();
-			id = userIdFromEmailQuery(con, email);
+			id = userIdFromEmailQuery(con, login, domain);
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
@@ -297,5 +296,46 @@ public class UserDao {
 			obmHelper.cleanup(con, ps, rs);
 		}
 		return ret;
+	}
+
+	private Integer userIdFromLogin(Connection con, String login, Integer domainId) {
+		
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		Integer ret = null;
+		String uq = "SELECT userobm_id "
+				+ "FROM UserObm "
+				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(uq);
+			ps.setInt(1, domainId);
+			ps.setString(2, login);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				ret = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			obmHelper.cleanup(con, ps, rs);
+		}
+		return ret;
+	}
+	
+	public Integer userIdFromEmail(Connection con, String calendar, Integer domainId) throws SQLException{
+		String[] parts = calendar.split("@");
+		String login = parts[0];
+		String domain = "-";
+		if (parts.length > 1) {
+			domain = parts[1];
+		}
+		Integer ownerId = userIdFromLogin(con, login, domainId);
+		if(ownerId == null){
+			ownerId = userIdFromEmailQuery(con, calendar, domain);	
+		}
+		
+		return ownerId;
 	}
 }
