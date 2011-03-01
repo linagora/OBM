@@ -1550,6 +1550,7 @@ CREATE TABLE `EventTemplate` (
   `eventtemplate_force_insertion` boolean default 0,
   `eventtemplate_opacity` enum('OPAQUE','TRANSPARENT') default 'OPAQUE',
   `eventtemplate_show_user_calendar` boolean default 0,
+  `eventtemplate_show_resource_calendar` boolean default 0,
   PRIMARY KEY  (`eventtemplate_id`),
   KEY `eventtemplate_domain_id_domain_id_fkey` (`eventtemplate_domain_id`),
   KEY `eventtemplate_owner_userobm_id_fkey` (`eventtemplate_owner`),

@@ -4120,6 +4120,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     if($show_user_calendar){
       $calendar['show_user_calendar'] = $show_user_calendar;
     }
+    $show_resource_calendar = $event_q->f('event_show_resource_calendar');
+    if($show_resource_calendar){
+      $calendar['show_resource_calendar'] = $show_resource_calendar;
+    }
     
     if ($properties != '') {
       $charset = mb_internal_encoding();

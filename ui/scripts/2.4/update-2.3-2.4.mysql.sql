@@ -267,6 +267,7 @@ ALTER TABLE `Category` ADD CONSTRAINT UNIQUE `categorycategory_categorycode_uniq
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_force_insertion` boolean default 0 AFTER eventtemplate_group_ids;
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_opacity` enum('OPAQUE','TRANSPARENT') default 'OPAQUE' AFTER eventtemplate_force_insertion;
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_user_calendar` boolean default 0 AFTER eventtemplate_opacity;
+ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_resource_calendar` boolean default 0 AFTER eventtemplate_show_user_calendar;
 
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed

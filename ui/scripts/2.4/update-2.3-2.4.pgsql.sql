@@ -364,3 +364,4 @@ UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_force_insertion boolean DEFAULT false;
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_opacity vopacity DEFAULT 'OPAQUE'::vopacity;
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_user_calendar boolean DEFAULT false;
+ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_resource_calendar boolean DEFAULT false;

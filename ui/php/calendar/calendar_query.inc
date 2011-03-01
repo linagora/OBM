@@ -2330,6 +2330,7 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   $force_insertion = $calendar['force'];
   $opacity = $calendar['opacity'];
   $show_user_calendar = $calendar['show_user_calendar'];
+  $show_resource_calendar = $calendar['show_resource_calendar'];
   
   $user_ids = is_array($calendar['sel_user_id']) ? "'".implode(',', $calendar['sel_user_id'])."'" : 'NULL';
   $contact_ids = is_array($calendar['sel_contact_id']) ? "'".implode(',', $calendar['sel_contact_id'])."'" : 'NULL';
@@ -2415,7 +2416,8 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       eventtemplate_document_ids = $document_ids,
       eventtemplate_force_insertion = '$force_insertion',
       eventtemplate_opacity = '$opacity',
-      eventtemplate_show_user_calendar = '$show_user_calendar'
+      eventtemplate_show_user_calendar = '$show_user_calendar',
+      eventtemplate_show_resource_calendar = '$show_resource_calendar'
       WHERE eventtemplate_id = $template_id";
   } else {
     $query = "INSERT INTO EventTemplate (
@@ -2449,7 +2451,8 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       eventtemplate_document_ids,
       eventtemplate_force_insertion,
       eventtemplate_opacity,
-      eventtemplate_show_user_calendar)
+      eventtemplate_show_user_calendar,
+      eventtemplate_show_resource_calendar)
       VALUES (
       '$name',
       NOW(),
@@ -2481,7 +2484,8 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       $document_ids,
       '$force_insertion',
       '$opacity',
-      '$show_user_calendar')";
+      '$show_user_calendar',
+      '$show_resource_calendar')";
 
   }
 
@@ -2585,7 +2589,8 @@ function run_query_calendar_get_template($template_id) {
     eventtemplate_document_ids AS event_document_ids,
     eventtemplate_force_insertion AS event_force_insertion,
     eventtemplate_opacity AS event_opacity,
-    eventtemplate_show_user_calendar AS event_show_user_calendar
+    eventtemplate_show_user_calendar AS event_show_user_calendar,
+    eventtemplate_show_resource_calendar AS event_show_resource_calendar
     FROM
     EventTemplate 
     LEFT JOIN EventCategory1 ON eventtemplate_category1_id = eventcategory1_id 
