@@ -983,8 +983,10 @@ public class CalendarBindingImpl implements ICalendar {
 	private boolean isAttendeeExistForCalendarOwner(final String calendar, final List<Attendee> attendees) {
 		for (final Attendee attendee: attendees) {
 			final ObmUser obmUser = userDao.findUser(attendee.getEmail());
-			if (obmUser.getLogin().equals(calendar)) {
-				return true;
+			if (obmUser != null) {
+				if (obmUser.getLogin().equals(calendar)) {
+					return true;
+				}	
 			}
 		}
 		return false;
