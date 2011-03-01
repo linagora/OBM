@@ -18,17 +18,12 @@
 package fr.aliacom.obm.common.calendar;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,8 +42,8 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.items.EventChanges;
-import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.items.ParticipationChanges;
+import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.ICalendar;
 import org.obm.sync.services.ImportICalendarException;
 
@@ -941,12 +936,11 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public void importICalendar(final AccessToken token, final String calendar, final URI ics) 
+	public void importICalendar(final AccessToken token, final String calendar, final String ics) 
 		throws ImportICalendarException, AuthFault, ServerFault {
 		
-		final String icsString = getStreamFromUri(ics);
-		final List<Event> events = parseICSEvent(token, icsString);
-		for (final Event event : events) {
+		final List<Event> events = parseICSEvent(token, ics);
+		for (final Event event: events) {
 			
 			if (!isAttendeeExistForCalendarOwner(calendar, event.getAttendees())) {
 				addAttendeeForCalendarOwner(token, calendar, event);
@@ -956,18 +950,6 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private String getStreamFromUri(final URI ics) throws ImportICalendarException {
-		try {
-			final URL url = ics.toURL();
-			final InputStream is = url.openStream();
-			return IOUtils.toString(is);
-		} catch (MalformedURLException e) {
-			throw new ImportICalendarException(e);
-		} catch (IOException e) {
-			throw new ImportICalendarException(e);
-		}
-	}
-
 	private List<Event> parseICSEvent(final AccessToken token, final String icsToString) throws ImportICalendarException {
 		try {
 			return Ical4jHelper.parseICSEvent(icsToString, token);

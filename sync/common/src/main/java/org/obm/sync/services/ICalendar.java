@@ -1,6 +1,5 @@
 package org.obm.sync.services;
 
-import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -11,9 +10,9 @@ import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
-import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
@@ -231,10 +230,10 @@ public interface ICalendar {
 	
 	/**
 	 * Import ics file in calendar's user
-	 * Adding a new attendee (owner) if calendar owner not exist in ics file
+	 * Adding a new attendee (owner) if calendar owner not exist in data's ics
 	 * 
-	 * Return ImportICalendarException if import fails or if file not found
+	 * Return ImportICalendarException if import fails
 	 */
-	public void importICalendar(AccessToken token, String calendar, URI ics) throws ImportICalendarException, AuthFault, ServerFault; 
+	public void importICalendar(AccessToken token, String calendar, String ics) throws ImportICalendarException, AuthFault, ServerFault; 
 	
 }
