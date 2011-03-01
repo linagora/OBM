@@ -22,8 +22,6 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import javax.transaction.UserTransaction;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
@@ -38,12 +36,14 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.items.FolderChangesResponse;
+import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.IAddressBook;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.StoreException;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
@@ -62,7 +62,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	private final ContactMerger contactMerger;
 
 	@Inject
-	private AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper) {
+	protected AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper) {
 		this.contactDao = contactDao;
 		this.userDao = userDao;
 		this.contactMerger = contactMerger;
@@ -70,6 +70,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public boolean isReadOnly(AccessToken token, BookType book)	throws AuthFault, ServerFault {
 		if (book == BookType.contacts) {
 			return false;
@@ -78,11 +79,13 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public BookType[] listBooks(AccessToken token) {
 		return new BookType[] { BookType.contacts, BookType.users };
 	}
 
 	@Override
+	@Transactional
 	public List<AddressBook> listAllBooks(AccessToken token) throws AuthFault, ServerFault {
 		Connection con = null;
 		try {
@@ -97,6 +100,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	@Override
+	@Transactional
 	public ContactChangesResponse getSync(AccessToken token, BookType book, Date d)
 			throws AuthFault, ServerFault {
 		try {
@@ -109,6 +113,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date timestamp)
 			throws AuthFault, ServerFault {
 		try {
@@ -121,22 +126,16 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	
-	private AddressBookChangesResponse getSync(AccessToken token, Date timestamp) throws Throwable {
-		UserTransaction ut = obmHelper.getUserTransaction();
+	private AddressBookChangesResponse getSync(AccessToken token, Date timestamp) throws ServerFault {
 		AddressBookChangesResponse response = new AddressBookChangesResponse();
-
 		try {
-			ut.begin();
 			response.setContactChanges(getContactsChanges(token, timestamp));
 			response.setBooksChanges(getFolderChanges(token, timestamp));
 			response.setLastSync(obmHelper.selectNow(obmHelper.getConnection()));
-			ut.commit();
 		} catch (Throwable t) {
-			ut.rollback();
 			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
-			throw t;
+			throw new ServerFault(t);
 		}
-		
 		return response;
 	}
 
@@ -157,29 +156,25 @@ public class AddressBookBindingImpl implements IAddressBook {
 		return changes;
 	}
 	
-	private ContactChangesResponse getSync(BookType book, Date timestamp, AccessToken token) throws Throwable {
-		UserTransaction ut = obmHelper.getUserTransaction();
+	private ContactChangesResponse getSync(BookType book, Date timestamp, AccessToken token) throws ServerFault {
 		ContactChangesResponse response = new ContactChangesResponse();
-
 		try {
-			ut.begin();
 			if (book == BookType.users) {
 				response.setChanges(getUsersChanges(token, timestamp));
 			} else {
 				response.setChanges(getContactsChanges(token, timestamp));
 			}
 			response.setLastSync(obmHelper.selectNow(obmHelper.getConnection()));
-			ut.commit();
 		} catch (Throwable t) {
-			ut.rollback();
 			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
-			throw t;
+			throw new ServerFault(t);
 		}
 		
 		return response;
 	}
 	
 	@Override
+	@Transactional
 	public Contact createContact(AccessToken token, BookType book, Contact contact)
 		throws AuthFault, ServerFault {
 
@@ -199,6 +194,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	@Override
+	@Transactional
 	public Contact createContactWithoutDuplicate(AccessToken token, BookType book, Contact contact)
 		throws AuthFault, ServerFault {
 
@@ -244,6 +240,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public Contact modifyContact(AccessToken token, BookType book, Contact contact)
 		throws AuthFault, ServerFault {
 
@@ -262,7 +259,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	private Contact modifyContact(AccessToken token, Contact c)
-		throws SQLException {
+		throws SQLException, FindException {
 
 		Contact previous = contactDao.findContact(token, c.getUid());
 		if (previous != null) {
@@ -275,6 +272,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	@Override
+	@Transactional
 	public Contact removeContact(AccessToken token, BookType book, String uid)
 			throws AuthFault, ServerFault {
 
@@ -300,6 +298,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public Contact getContactFromId(AccessToken token, BookType book, String id)
 			throws AuthFault, ServerFault {
 		if (book != BookType.contacts) {
@@ -316,6 +315,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public KeyList getContactTwinKeys(AccessToken token, BookType book, Contact contact)
 		throws AuthFault, ServerFault {
 
@@ -332,6 +332,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public List<Contact> searchContact(AccessToken token, String query, int limit) 
 		throws AuthFault, ServerFault {
 
@@ -344,6 +345,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public FolderChangesResponse getFolderSync(AccessToken token, Date d)
 			throws AuthFault, ServerFault {
 
@@ -353,24 +355,18 @@ public class AddressBookBindingImpl implements IAddressBook {
 			return sync;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault("error find contacts ");
+			throw new ServerFault(e);
 		}
 	}
 
 	private FolderChangesResponse getFolderSync(Date timestamp, AccessToken token) throws Throwable {
-		UserTransaction ut = obmHelper.getUserTransaction();
-		
 		try {
-			ut.begin();
 			FolderChangesResponse response = new FolderChangesResponse();
 			response.setFolderChanges(getFolderChanges(token, timestamp));
 			response.setLastSync(obmHelper.selectNow(obmHelper.getConnection()));
-			ut.commit();
 			return response;
 		} catch (Throwable t) {
-			ut.rollback();
-			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
-			throw t;
+			throw  new ServerFault(t);
 		}
 	}
 
@@ -382,6 +378,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	@Override
+	@Transactional
 	public List<Contact> searchContactInGroup(AccessToken token, AddressBook book, String query, int limit) throws AuthFault, ServerFault {
 
 		try {
@@ -393,6 +390,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public Contact createContactInBook(AccessToken token, int addressBookId,
 			Contact contact) throws AuthFault, ServerFault {
 		try {
@@ -410,29 +408,33 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	
 	@Override
+	@Transactional
 	public Contact modifyContactInBook(AccessToken token, int addressBookId,
 			Contact contact) throws AuthFault, ServerFault {
 		try  {
 			return modifyContact(token, contact);
-		} catch (SQLException e) {
+		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault(e.getMessage());
+			throw new ServerFault(e);
 		}
 	}
 	
 	@Override
+	@Transactional
 	public Contact removeContactInBook(AccessToken token, int addressBookId,
 			String uid) throws AuthFault, ServerFault {
 		return removeContact(token, BookType.contacts, uid);
 	}
 	
 	@Override
+	@Transactional
 	public Contact getContactInBook(AccessToken token, int addressBookId,
 			String id) throws AuthFault, ServerFault {
 		return getContactFromId(token, BookType.contacts, id);
 	}
 
 	@Override
+	@Transactional
 	public boolean unsubscribeBook(AccessToken token, Integer addressBookId) throws AuthFault, ServerFault {
 		try {
 			return contactDao.unsubscribeBook(token, addressBookId);

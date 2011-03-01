@@ -81,7 +81,7 @@ public class SessionManagement {
 
 	private ConcurrentMap<String, AccessToken> configureSessionCache() {
 		return new MapMaker().
-			expiration(20, TimeUnit.MINUTES).
+			expireAfterAccess(20, TimeUnit.MINUTES).
 			concurrencyLevel(16).
 			evictionListener(new MapEvictionListener<String, AccessToken>() {
 				@Override

@@ -108,7 +108,6 @@ public class MailingListItemsWriterTest extends TestCase {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 			DOMUtils.serialise(xml, out);
-			System.err.println(out.toString());
 			assertEquals(sb.toString(), out.toString());
 		} catch (TransformerException e1) {
 			e1.printStackTrace();

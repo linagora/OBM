@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.ISetting;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.VacationSettings;
@@ -41,11 +42,12 @@ public class SettingBindingImpl implements ISetting {
 	private SettingDao settingDao;
 
 	@Inject
-	private SettingBindingImpl(SettingDao settingDao) {
+	protected SettingBindingImpl(SettingDao settingDao) {
 		this.settingDao = settingDao;
 	}
 
 	@Override
+	@Transactional
 	public Map<String, String> getSettings(AccessToken token)
 			throws ServerFault, AuthFault {
 		try {
@@ -58,6 +60,7 @@ public class SettingBindingImpl implements ISetting {
 	}
 
 	@Override
+	@Transactional
 	public void setVacationSettings(AccessToken token, VacationSettings vs)
 			throws AuthFault, ServerFault {
 		try {
@@ -72,6 +75,7 @@ public class SettingBindingImpl implements ISetting {
 	}
 
 	@Override
+	@Transactional
 	public void setEmailForwarding(AccessToken token, ForwardingSettings fs)
 			throws AuthFault, ServerFault {
 		try {
@@ -86,6 +90,7 @@ public class SettingBindingImpl implements ISetting {
 	}
 
 	@Override
+	@Transactional
 	public ForwardingSettings getEmailForwarding(AccessToken token)
 			throws AuthFault, ServerFault {
 		try {
@@ -98,6 +103,7 @@ public class SettingBindingImpl implements ISetting {
 	}
 
 	@Override
+	@Transactional
 	public VacationSettings getVacationSettings(AccessToken token)
 			throws AuthFault, ServerFault {
 		try {

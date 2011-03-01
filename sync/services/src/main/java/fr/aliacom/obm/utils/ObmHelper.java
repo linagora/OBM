@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.obm.sync.base.ObmDbType;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.services.constant.ConstantService;
@@ -43,6 +44,21 @@ import fr.aliacom.obm.services.constant.ConstantService;
 @Singleton
 public class ObmHelper {
 
+	public static class TransactionProvider implements Provider<UserTransaction> {
+		
+		private final ObmHelper helper;
+
+		@Inject
+		public TransactionProvider(ObmHelper helper) {
+			this.helper = helper;
+		}
+		
+		@Override
+		public UserTransaction get() {
+			return helper.getUserTransaction();
+		}
+	}
+	
 	private static final Log logger = LogFactory.getLog(ObmHelper.class);
 	private static final String DATA_SOURCE = "java:comp/env/jdbc/ObmDS";
 	private static final String USER_TRANSACTION = "java:comp/UserTransaction";

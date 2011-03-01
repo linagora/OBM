@@ -36,8 +36,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.transaction.UserTransaction;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -227,21 +225,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser)throws FindException {
+	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser)throws FindException, SQLException {
 		logger.info("create with token " + editor.getSessionId() + " from "
 				+ editor.getOrigin() + " for " + editor.getEmail());
 
 		Connection con = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			createEvent(con, editor, calendar, ev, useObmUser);
-
-			ut.commit();
-		} catch (Throwable e) {
-			obmHelper.rollback(ut);
-			logger.error("ut was rollback", e);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -258,7 +249,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		if(ownerId == null){
 			throw new FindException("Error finding user["+calendar+"]");
 		}
-		
 		
 		String evQ = "INSERT INTO Event (" + EVENT_INSERT_FIELDS
 				+ ") values ( " + ownerId + ",  " +
@@ -1356,22 +1346,16 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public Event modifyEvent(AccessToken at, String calendar, Event ev,
-			boolean updateAttendees, Boolean useObmUser) {
+			boolean updateAttendees, Boolean useObmUser) throws SQLException, FindException {
 
 		logger.info("should modify event with title " + ev.getTitle()
 				+ " date: " + ev.getDate() + " id: " + ev.getDatabaseId());
 		
 		Connection con = null;
 
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			modifyEvent(con, at, calendar, ev, updateAttendees, useObmUser);
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -1567,18 +1551,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event removeEvent(AccessToken token, Event event, EventType eventType) {
+	public Event removeEvent(AccessToken token, Event event, EventType eventType) throws SQLException {
 		Event deletedEvent = null;
 		Connection con = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			deletedEvent = removeEvent(con, token, eventType, event);
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -1587,18 +1565,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 	
 	@Override
-	public Event removeEvent(AccessToken token, int eventId, EventType eventType) {
+	public Event removeEvent(AccessToken token, int eventId, EventType eventType) throws SQLException {
 		Event event = null;
 		Connection con = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			event = removeEvent(con, token, eventId, eventType);
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -2226,18 +2198,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public Event removeEventByExtId(AccessToken token, ObmUser calendar,
-			String extId) {
+			String extId) throws SQLException {
 		Event event = null;
 		Connection con = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			event = removeEventByExtId(con, calendar, token, extId);
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -2288,23 +2254,16 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public boolean changeParticipationState(AccessToken token, ObmUser calendar,
-			String extId, ParticipationState participationState) {
+			String extId, ParticipationState participationState) throws SQLException {
 
-		UserTransaction ut = obmHelper.getUserTransaction();
 		Connection con = null;
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			boolean success = changeParticipationState(con, token, extId, calendar, participationState);
-			ut.commit();
 			return success;
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
-		return false;
 	}
 	
 	private boolean changeParticipationState(Connection con,

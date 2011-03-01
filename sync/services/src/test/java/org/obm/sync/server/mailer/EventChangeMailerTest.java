@@ -230,7 +230,6 @@ public class EventChangeMailerTest {
 			Assert.assertThat(applicationIcs.getContent(), IsInstanceOf.instanceOf(SharedByteArrayInputStream.class));
 			SharedByteArrayInputStream stream = (SharedByteArrayInputStream) applicationIcs.getContent();
 			String decodedString = IOUtils.toString(stream, Charsets.US_ASCII.displayName());
-			System.err.println(decodedString);
 			checkStringContains(decodedString, getExpectedIcsStrings());
 		}
 
