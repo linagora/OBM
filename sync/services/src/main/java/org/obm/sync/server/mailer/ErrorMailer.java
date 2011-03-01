@@ -51,6 +51,7 @@ public class ErrorMailer extends AbstractMailer {
 			Date now = new Date();
 			Date lastNotificationDate = lastNotificationDateByUser.putIfAbsent(at.getUserWithDomain(), now);
 			if (isNotificationNeeded(lastNotificationDate, now)) {
+				lastNotificationDateByUser.put(at.getUserWithDomain(), now);
 				ErrorMail mail = 
 					new ErrorMail(
 							getSystemAddress(at), 
