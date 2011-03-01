@@ -40,6 +40,7 @@
 						<buildOutputDirectory>eclipse-build</buildOutputDirectory>
 						<downloadJavadocs>true</downloadJavadocs>
 						<downloadSources>true</downloadSources>
+						<addVersionToProjectName>true</addVersionToProjectName>
 						<additionalConfig>
 							<file>
 								<name>.settings/org.eclipse.jdt.core.prefs</name>

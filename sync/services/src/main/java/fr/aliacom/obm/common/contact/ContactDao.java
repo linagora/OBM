@@ -38,8 +38,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import javax.transaction.UserTransaction;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -323,7 +321,6 @@ public class ContactDao {
 		return c;
 	}
 
-
 	private void indexContact(AccessToken at, Contact c) {
 		try {
 			// no need to pass the sql connection as indexing will be done in a
@@ -334,17 +331,11 @@ public class ContactDao {
 		}
 	}
 
-	public Contact createContact(AccessToken at, Contact c) {
+	public Contact createContact(AccessToken at, Contact c) throws SQLException {
 		Connection con = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			createContact(at, con, c);
-			ut.commit();
-		} catch (Throwable e) {
-			obmHelper.rollback(ut);
-			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -358,17 +349,11 @@ public class ContactDao {
 		return createContactInAddressBook(con, at, c, addressbookId);
 	}
 
-	public Contact createContactInAddressBook(AccessToken at, Contact c, int addressbookId) {
+	public Contact createContactInAddressBook(AccessToken at, Contact c, int addressbookId) throws SQLException {
 		Connection con = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			c = createContactInAddressBook(con, at, c, addressbookId);
-			ut.commit();
-		} catch (Throwable e) {
-			obmHelper.rollback(ut);
-			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -701,7 +686,7 @@ public class ContactDao {
 		}
 	}
 
-	public Contact modifyContact(AccessToken token, Contact c) {
+	public Contact modifyContact(AccessToken token, Contact c) throws SQLException, FindException {
 
 		if (!hasRightsOn(token, c.getUid())) {
 			logger.warn("contact " + c.getLastname() + " " + c.getFirstname()
@@ -721,10 +706,7 @@ public class ContactDao {
 
 		Connection con = null;
 		PreparedStatement ps = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
-
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 
 			Integer anniversaryId = createOrUpdateDate(token, con, c, c
@@ -776,10 +758,6 @@ public class ContactDao {
 			createOrUpdateWebsites(con, c.getEntityId(), c, c.getWebsites());
 			createOrUpdateIMIdentifiers(con, c.getEntityId(), c
 					.getImIdentifiers());
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, null);
 		}
@@ -1002,22 +980,16 @@ public class ContactDao {
 		}
 	}
 
-	private Contact removeContact(AccessToken at, Contact c) {
+	private Contact removeContact(AccessToken at, Contact c) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			ps = con
 					.prepareStatement("UPDATE Contact set contact_archive=1, contact_origin=? WHERE contact_id=?");
 			ps.setString(1, at.getOrigin());
 			ps.setInt(2, c.getUid());
 			ps.executeUpdate();
-			ut.commit();
-		} catch (Throwable t) {
-			obmHelper.rollback(ut);
-			logger.error(t.getMessage(), t);
 		} finally {
 			obmHelper.cleanup(con, ps, null);
 		}
@@ -1036,7 +1008,7 @@ public class ContactDao {
 	}
 
 
-	public Contact removeContact(AccessToken at, int uid) {
+	public Contact removeContact(AccessToken at, int uid) throws SQLException {
 		Contact c = findContact(at, uid);
 		if (c == null) {
 			return null;
@@ -1570,41 +1542,25 @@ public class ContactDao {
 		return l;
 	}
 	
-	public int markUpdated(int databaseId) {
+	public int markUpdated(int databaseId) throws SQLException {
 		Connection con = null;
 		PreparedStatement st = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 				st = con.prepareStatement("update Contact SET contact_timeupdate=? WHERE contact_id=?");
 				st.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
 				st.setInt(2, databaseId);
 				st.execute();
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, st, null);
 		}
 		return databaseId;
 	}
 
-	public boolean unsubscribeBook(AccessToken at, Integer addressBookId) {
-
-		UserTransaction ut = obmHelper.getUserTransaction();
-		try {
-			ut.begin();
-			boolean success = unsubscribeBookQuery(at, addressBookId);
-			if (success) {
-				keepTrackOfDeletedBookSubscription(at, addressBookId);
-			}
-			ut.commit();
-			return success;
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
+	public boolean unsubscribeBook(AccessToken at, Integer addressBookId) throws SQLException {
+		boolean success = unsubscribeBookQuery(at, addressBookId);
+		if (success) {
+			keepTrackOfDeletedBookSubscription(at, addressBookId);
 		}
 		return false;
 	}

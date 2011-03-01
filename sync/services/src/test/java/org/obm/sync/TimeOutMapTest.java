@@ -15,9 +15,8 @@ public class TimeOutMapTest {
 
 	@Test
 	public void testTimeOutMap() throws Exception {
-		System.out.println("Test started !");
 		ConcurrentMap<String, Object> t = new MapMaker().
-			expiration(5, TimeUnit.SECONDS).
+			expireAfterWrite(5, TimeUnit.SECONDS).
 			evictionListener(new MapEvictionListener<String, Object>() {
 				@Override
 				public void onEviction(String key, Object value) {
@@ -29,7 +28,6 @@ public class TimeOutMapTest {
 		for (int i = 0; i < 4; i++) {
 			Thread.sleep(1000);
 			assertNotNull(t.get("a"));
-			System.out.println((i + 1) + " second elapsed");
 		}
 		Thread.sleep(1000);
 		assertNull(t.get("a"));

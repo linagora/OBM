@@ -20,7 +20,7 @@ public class DomainCache implements DomainService {
 
 	private ConcurrentMap<String, ObmDomain> configureObmDomainCache(final DomainDao domainDao) {
 		return new MapMaker().
-		expiration(1, TimeUnit.MINUTES).
+		expireAfterWrite(1, TimeUnit.MINUTES).
 		concurrencyLevel(1).
 		makeComputingMap(new Function<String, ObmDomain>() {
 			@Override

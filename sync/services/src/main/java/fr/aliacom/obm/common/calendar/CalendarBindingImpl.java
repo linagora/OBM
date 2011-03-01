@@ -47,6 +47,7 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.items.EventChanges;
+import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.ICalendar;
 import org.obm.sync.services.ImportICalendarException;
@@ -84,7 +85,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private final Helper helper;
 
 	@Inject
-	private CalendarBindingImpl(EventChangeHandler eventChangeHandler,
+	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
 			DomainService domainService, UserDao userDao,
 			CalendarDao calendarDao, SettingDao settingDao,
 			CategoryDao categoryDao, Helper helper) {
@@ -98,6 +99,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public CalendarInfo[] listCalendars(AccessToken token) throws ServerFault,
 			AuthFault {
 		try {
@@ -154,6 +156,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public Event removeEvent(AccessToken token, String calendar, String eventId)
 			throws AuthFault, ServerFault {
 		try {
@@ -201,6 +204,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public Event removeEventByExtId(AccessToken token, String calendar,
 			String extId) throws AuthFault, ServerFault {
 		try {
@@ -236,6 +240,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public Event modifyEvent(AccessToken token, String calendar, Event event,
 			boolean updateAttendees) throws AuthFault, ServerFault {
 
@@ -247,7 +252,6 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
 			Event before = loadCurrentEvent(token, calendarUser, event);
-
 
 			if (before == null) {
 				logger.warn(LogUtils.prefix(token)
@@ -333,6 +337,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public String createEvent(AccessToken token, String calendar, Event event)
 			throws AuthFault, ServerFault {
 
@@ -476,12 +481,14 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	@Override
+	@Transactional
 	public EventChanges getSync(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault {
 		return getSync(token, calendar, lastSync, false);
 	}
 
 	@Override
+	@Transactional
 	public EventChanges getSyncWithSortedChanges(AccessToken token,
 			String calendar, Date lastSync) throws AuthFault, ServerFault {
 
@@ -525,6 +532,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	
 	@Override
+	@Transactional
 	public EventChanges getSyncEventDate(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault {
 		return getSync(token, calendar, lastSync, true);
@@ -564,9 +572,8 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	// methods for Funambol sync
-
 	@Override
+	@Transactional
 	public Event getEventFromId(AccessToken token, String calendar,
 			String eventId) throws AuthFault, ServerFault {
 		try {
@@ -596,6 +603,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public KeyList getEventTwinKeys(AccessToken token, String calendar,
 			Event event) throws AuthFault, ServerFault {
 		if (!helper.canReadCalendar(token, calendar)) {
@@ -617,6 +625,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public KeyList getRefusedKeys(AccessToken token, String calendar, Date since)
 			throws AuthFault, ServerFault {
 		if (!helper.canReadCalendar(token, calendar)) {
@@ -637,6 +646,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public List<Category> listCategories(AccessToken token) throws ServerFault,
 			AuthFault {
 		try {
@@ -649,6 +659,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public String getUserEmail(AccessToken token) throws AuthFault, ServerFault {
 		try {
 			ObmUser obmuser = userDao.findUserById(token.getObmId());
@@ -665,6 +676,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public Integer getEventObmIdFromExtId(AccessToken token, String calendar,
 			String extId) throws ServerFault {
 
@@ -676,6 +688,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public Event getEventFromExtId(AccessToken token, String calendar,
 			String extId) throws ServerFault {
 		if (!helper.canReadCalendar(token, calendar)) {
@@ -692,6 +705,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public List<Event> getListEventsFromIntervalDate(AccessToken token,
 			String calendar, Date start, Date end) throws AuthFault,
 			ServerFault {
@@ -715,6 +729,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public List<Event> getAllEvents(AccessToken token, String calendar,
 			EventType eventType) throws AuthFault, ServerFault {
 		try {
@@ -733,18 +748,21 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public String parseEvent(AccessToken token, Event event)
 			throws ServerFault, AuthFault {
 		return Ical4jHelper.parseEvent(event, token);
 	}
 
 	@Override
+	@Transactional
 	public String parseEvents(AccessToken token, List<Event> events)
 			throws ServerFault, AuthFault {
 		return Ical4jHelper.parseEvents(token, events);
 	}
 
 	@Override
+	@Transactional
 	public List<Event> parseICS(AccessToken token, String ics)
 			throws Exception, ServerFault {
 		String fixedIcs = fixIcsAttendees(ics);
@@ -777,6 +795,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public FreeBusyRequest parseICSFreeBusy(AccessToken token, String ics)
 			throws ServerFault, AuthFault {
 		try {
@@ -789,6 +808,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public List<EventParticipationState> getEventParticipationStateWithAlertFromIntervalDate(
 			AccessToken token, String specificCalendar, Date start, Date end)
 			throws ServerFault, AuthFault {
@@ -818,6 +838,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public List<EventTimeUpdate> getEventTimeUpdateNotRefusedFromIntervalDate(
 			AccessToken token, String calendar, Date start, Date end)
 			throws ServerFault, AuthFault {
@@ -838,6 +859,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public Date getLastUpdate(AccessToken token, String calendar)
 			throws ServerFault, AuthFault {
 		try {
@@ -853,18 +875,19 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public boolean isWritableCalendar(AccessToken token, String calendar)
 			throws AuthFault, ServerFault {
 		try {
-			getCalendarOwner(calendar, token.getDomain());
 			return helper.canWriteOnCalendar(token, calendar);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
-
+	
 	@Override
+	@Transactional
 	public List<FreeBusy> getFreeBusy(AccessToken token, FreeBusyRequest fb)
 			throws AuthFault, ServerFault {
 		try {
@@ -876,6 +899,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public String parseFreeBusyToICS(AccessToken token, FreeBusy fbr)
 			throws ServerFault, AuthFault {
 		try {
@@ -891,6 +915,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public boolean changeParticipationState(AccessToken token, String calendar,
 			String extId, ParticipationState participationState) throws ServerFault {
 		if (helper.canWriteOnCalendar(token, calendar)) {
@@ -902,12 +927,13 @@ public class CalendarBindingImpl implements ICalendar {
 				Event newEvent = calendarService.findEventByExtId(token, calendarOwner, extId);
 				if (newEvent != null) {
 				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
-						settingsDao.getUserLanguage(token));
+							settingsDao.getUserLanguage(token));
+					
 				} else {
 					logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
 				}
 				return changed;
-			} catch (FindException e) {
+			} catch (Exception e) {
 				throw new ServerFault("no user found with calendar " + calendar);
 			}
 		}
@@ -915,6 +941,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@Override
+	@Transactional
 	public void importICalendar(final AccessToken token, final String calendar, final URI ics) 
 		throws ImportICalendarException, AuthFault, ServerFault {
 		

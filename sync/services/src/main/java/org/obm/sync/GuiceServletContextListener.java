@@ -5,21 +5,25 @@ import java.util.Collections;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.transaction.UserTransaction;
 
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
+import org.obm.sync.server.transactional.Transactional;
+import org.obm.sync.server.transactional.TransactionalInterceptor;
 
-import com.google.inject.Binder;
+import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.Message;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
 import fr.aliacom.obm.common.domain.DomainCache;
 import fr.aliacom.obm.common.domain.DomainService;
+import fr.aliacom.obm.utils.ObmHelper.TransactionProvider;
 
 public class GuiceServletContextListener implements ServletContextListener { 
 
@@ -38,14 +42,20 @@ public class GuiceServletContextListener implements ServletContextListener {
     } 
     
     private Injector createInjector() {
-    	return Guice.createInjector(new Module() {
-    		@Override
-    		public void configure(Binder binder) {
-    			binder.bind(DomainService.class).to(DomainCache.class);
-    			binder.bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
-    			binder.bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-    			binder.bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
-    		}
+    	return Guice.createInjector(new AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(DomainService.class).to(DomainCache.class);
+    			bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
+    			bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
+    			bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
+    			
+    			bind(UserTransaction.class).toProvider(TransactionProvider.class);
+    			TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
+				bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), 
+						transactionalInterceptor);
+				requestInjection(transactionalInterceptor);
+			}
     	});
     }
     

@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.transaction.UserTransaction;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
@@ -141,34 +139,26 @@ public class MailingListHome {
 		return new ArrayList<MailingList>(0);
 	}
 
-	public MailingList createMailingList(AccessToken at, MailingList mailingList) {
+	public MailingList createMailingList(AccessToken at, MailingList mailingList) throws SQLException {
 		MailingList ret = null;
 		Connection con = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			ret = createMailingList(con, at, mailingList);
-			ut.commit();
-		} catch (Throwable e) {
-			obmHelper.rollback(ut);
-			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
 		return ret;
 	}
 
-	public MailingList modifyMailingList(AccessToken at, MailingList ml) {
+	public MailingList modifyMailingList(AccessToken at, MailingList ml) throws SQLException {
 		String q = "update MailingList SET " + "mailinglist_name=?, "
 				+ "mailinglist_userupdate=?, "
 				+ "mailinglist_timeupdate=now() "
 				+ "WHERE mailinglist_id=? AND mailinglist_owner=? ";
 		Connection con = null;
 		PreparedStatement ps = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 
@@ -183,31 +173,21 @@ public class MailingListHome {
 					ml.getEmails(), true);
 			ml.getEmails().clear();
 			ml.addEmails(mles);
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, null);
 		}
 		return ml;
 	}
 
-	public void removeMailingList(AccessToken at, Integer id) {
+	public void removeMailingList(AccessToken at, Integer id) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement("DELETE FROM MailingList WHERE mailinglist_id=?  AND mailinglist_owner=? ");
 			ps.setInt(1, id);
 			ps.setInt(2, at.getObmId());
 			ps.executeUpdate();
-			ut.commit();
-		} catch (Throwable t) {
-			obmHelper.rollback(ut);
-			logger.error(t.getMessage(), t);
 		} finally {
 			obmHelper.cleanup(con, ps, null);
 		}
@@ -305,18 +285,12 @@ public class MailingListHome {
 	}
 
 	public List<MLEmail> addEmails(AccessToken at, Integer mailingListId,
-			List<MLEmail> emails) {
+			List<MLEmail> emails) throws SQLException {
 		List<MLEmail> ret = new ArrayList<MLEmail>(0);
 		Connection con = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			ret = createOrUpdateEmails(con, at, mailingListId, emails, false);
-			ut.commit();
-		} catch (Throwable e) {
-			obmHelper.rollback(ut);
-			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -325,15 +299,13 @@ public class MailingListHome {
 	}
 
 	public void removeEmail(AccessToken at, Integer mailingListId,
-			Integer emailId) {
+			Integer emailId) throws SQLException {
 		String q = "DELETE e FROM MailingListEmail e "
 				+ " INNER JOIN MailingList l ON l.mailinglist_id=e.mailinglistemail_mailinglist_id "
 				+ "WHERE e.mailinglistemail_mailinglist_id=? AND e.mailinglistemail_id=? AND l.mailinglist_owner=?";
 		Connection con = null;
 		PreparedStatement ps = null;
-		UserTransaction ut = obmHelper.getUserTransaction();
 		try {
-			ut.begin();
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 
@@ -342,10 +314,6 @@ public class MailingListHome {
 			ps.setInt(idx++, emailId);
 			ps.setInt(idx++, at.getObmId());
 			ps.executeUpdate();
-			ut.commit();
-		} catch (Throwable se) {
-			obmHelper.rollback(ut);
-			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, null);
 		}

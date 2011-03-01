@@ -26,12 +26,15 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
+import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.IMailingList;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.utils.LogUtils;
 
+@Singleton
 public class MailingListBindingImpl implements IMailingList {
 
 	private static final Log logger = LogFactory.getLog(MailingListBindingImpl.class);
@@ -39,11 +42,12 @@ public class MailingListBindingImpl implements IMailingList {
 	private MailingListHome mailingListHome;
 	
 	@Inject
-	private MailingListBindingImpl(MailingListHome mailingListHome) {
+	protected MailingListBindingImpl(MailingListHome mailingListHome) {
 		this.mailingListHome = mailingListHome;
 	}
 
 	@Override
+	@Transactional
 	public List<MailingList> listAllMailingList(AccessToken token)
 			throws AuthFault, ServerFault {
 		try {
@@ -55,6 +59,7 @@ public class MailingListBindingImpl implements IMailingList {
 	}
 
 	@Override
+	@Transactional
 	public MailingList createMailingList(AccessToken token,
 			MailingList mailingList) throws AuthFault, ServerFault {
 		try {
@@ -71,6 +76,7 @@ public class MailingListBindingImpl implements IMailingList {
 	}
 
 	@Override
+	@Transactional
 	public MailingList modifyMailingList(AccessToken token,
 			MailingList mailingList) throws AuthFault, ServerFault {
 		try {
@@ -87,6 +93,7 @@ public class MailingListBindingImpl implements IMailingList {
 	}
 
 	@Override
+	@Transactional
 	public void removeMailingList(AccessToken token, Integer id)
 			throws AuthFault, ServerFault {
 		try {
@@ -100,6 +107,7 @@ public class MailingListBindingImpl implements IMailingList {
 	}
 
 	@Override
+	@Transactional
 	public MailingList getMailingListFromId(AccessToken token, Integer id)
 			throws AuthFault, ServerFault {
 		try {
@@ -111,6 +119,7 @@ public class MailingListBindingImpl implements IMailingList {
 	}
 
 	@Override
+	@Transactional
 	public List<MLEmail> addEmails(AccessToken at, Integer mailingListId,
 			List<MLEmail> email) throws AuthFault, ServerFault {
 		try {
@@ -124,6 +133,7 @@ public class MailingListBindingImpl implements IMailingList {
 	}
 
 	@Override
+	@Transactional
 	public void removeEmail(AccessToken at, Integer mailingListId,
 			Integer emailId) throws AuthFault, ServerFault {
 		try {

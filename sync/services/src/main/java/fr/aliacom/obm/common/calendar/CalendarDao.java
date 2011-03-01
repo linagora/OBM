@@ -22,7 +22,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public interface CalendarDao {
 
-	Event createEvent(AccessToken at, String calendar, Event event, Boolean useObmUser) throws FindException;
+	Event createEvent(AccessToken at, String calendar, Event event, Boolean useObmUser) throws FindException,  SQLException ;
 
 	List<Event> findAllEvents(AccessToken token, ObmUser calendarUser, EventType typeFilter);
 
@@ -54,13 +54,13 @@ public interface CalendarDao {
 
 	List<CalendarInfo> listCalendars(ObmUser user) throws FindException;
 
-	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees, Boolean useObmUser) throws FindException;
+	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees, Boolean useObmUser) throws FindException, SQLException;
 
-	Event removeEvent(AccessToken token, int eventId, EventType eventType);
+	Event removeEvent(AccessToken token, int eventId, EventType eventType) throws SQLException;
 
-	Event removeEvent(AccessToken token, Event event, EventType eventType);
+	Event removeEvent(AccessToken token, Event event, EventType eventType) throws SQLException;
 	
-	Event removeEventByExtId(AccessToken token, ObmUser calendar, String eventExtId);
+	Event removeEventByExtId(AccessToken token, ObmUser calendar, String eventExtId) throws SQLException;
 
 	Event createEvent(Connection con, AccessToken editor, String calendar, Event ev, Boolean useObmUser) throws SQLException, FindException;
 
@@ -68,8 +68,8 @@ public interface CalendarDao {
 			boolean updateAttendees, Boolean useObmUser)
 			throws SQLException, FindException;
 
-	Event removeEvent(Connection con, AccessToken token, int uid, EventType et);
+	Event removeEvent(Connection con, AccessToken token, int uid, EventType et) throws SQLException ;
 	
-	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, String extId, ParticipationState participationState);
+	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, String extId, ParticipationState participationState) throws SQLException ;
 
 }

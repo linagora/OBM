@@ -49,7 +49,6 @@ public class CalendarItemsParserTest {
 		"</exceptions><eventExceptions/>" +
 		"</recurrence>" +
 		"</event>";
-		System.err.println(xml);
 		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
 		Event ev = parser.parseEvent(doc.getDocumentElement());
 
@@ -120,7 +119,6 @@ public class CalendarItemsParserTest {
 		"</exceptions><eventExceptions/>" +
 		"</recurrence>" +
 		"</event>";
-		System.err.println(xml);
 		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
 		Event ev = parser.parseEvent(doc.getDocumentElement());
 
