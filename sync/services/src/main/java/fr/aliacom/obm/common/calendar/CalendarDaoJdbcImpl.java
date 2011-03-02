@@ -74,7 +74,7 @@ import fr.aliacom.obm.utils.Ical4jHelper;
 import fr.aliacom.obm.utils.LinkedEntity;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
-import fr.aliacom.obm.utils.RFC2245;
+import fr.aliacom.obm.utils.RFC2445;
 
 /**
  * Calendar data access functions
@@ -427,7 +427,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} else {
 			ps.setNull(idx++, Types.INTEGER);
 		}
-		ps.setInt(idx++, RFC2245.getPriorityOrDefault(ev.getPriority()));
+		ps.setInt(idx++, RFC2445.getPriorityOrDefault(ev.getPriority()));
 		ps.setInt(idx++, ev.getPrivacy());
 		ps.setTimestamp(idx++, new Timestamp(ev.getDate().getTime()));
 		ps.setInt(idx++, ev.getDuration());
@@ -1683,12 +1683,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private Object getJdbcObjectParticipationState(final Attendee at) {
-		final ParticipationState pStat = RFC2245.getParticipationStateOrDefault(at.getState());
+		final ParticipationState pStat = RFC2445.getParticipationStateOrDefault(at.getState());
 		return pStat.getJdbcObject(obmHelper.getType());
 	}
 
 	private Object getJdbcObjectParticipationRole(final Attendee at) {
-		final ParticipationRole pRole = RFC2245.getParticipationRoleOrDefault(at.getRequired());
+		final ParticipationRole pRole = RFC2445.getParticipationRoleOrDefault(at.getRequired());
 		return pRole.getJdbcObject(obmHelper.getType());
 	}
 	

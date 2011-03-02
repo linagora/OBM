@@ -6,11 +6,13 @@ import org.obm.sync.calendar.ParticipationState;
 import com.google.common.base.Objects;
 
 /**
- * RFC2245 standard
+ * RFC2445 standard
+ * Internet Calendaring and Scheduling Core Object Specification 
+ * 						(iCalendar)
  * 
- * this functions returns default value of RFC2245
+ * this functions returns default value of RFC2445
  */
-public class RFC2245 {
+public class RFC2445 {
 
 	public static int getPriorityOrDefault(Integer priority) {
 		return Objects.firstNonNull(priority, 0);
