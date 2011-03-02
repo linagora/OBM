@@ -5750,18 +5750,18 @@ function dis_calendar_free_interval($current_view, $calendar) {
 			$tips = array();
 			if (is_array($ocs)) {
 			  foreach($ocs as $index => $oc) {
-				if($oc->date->compare($e) >= 0) break;
-				if($oc->end->compare($d) <= 0) unset($ocs[$index]);
-				elseif ($oc->date->compare($e) < 0 && $oc->end->compare($d) > 0 && $oc->event->isOpaque()) {
-				  array_push($tips, $oc);
-				  $busy = true;
-				}
+				  if($oc->date->compare($e) >= 0) break;
+				  if($oc->end->compare($d) <= 0) unset($ocs[$index]);
+				  elseif ($oc->date->compare($e) < 0 && $oc->end->compare($d) > 0 && $oc->event->isOpaque()) {
+				    array_push($tips, $oc);
+				    $busy = true;
+				  }
 			  } 
 			  if ($busy) {
 				$is_busy = true;
 				array_push($busy_time_slots, $slots);
-				$tip = $GLOBALS['l_occupied'];
-				
+				$tip = html_freebusy_tip($tips);
+        if (!$tip) $tip = $GLOBALS['l_occupied'];
 				$td_id = "contact_".$id."_".$d->getTimestamp();
 				$c[$id] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
 				$js_tips .= "obm.tip.add($('$td_id'), \"$tip\");";
