@@ -455,8 +455,8 @@ public class EventHandler extends SecureSyncHandler {
 		final String calendar = params.getParameter("calendar");
 		final String ics = params.getParameter("ics");
 		
-		binding.importICalendar(token, calendar, ics);
-		return responder.sendBoolean(true);
+		int countEvent = binding.importICalendar(token, calendar, ics);
+		return responder.sendInt(countEvent);
 	}
 	
 }

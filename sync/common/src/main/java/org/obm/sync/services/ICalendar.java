@@ -234,6 +234,6 @@ public interface ICalendar {
 	 * 
 	 * Return ImportICalendarException if import fails
 	 */
-	public void importICalendar(AccessToken token, String calendar, String ics) throws ImportICalendarException, AuthFault, ServerFault; 
+	public int importICalendar(AccessToken token, String calendar, String ics) throws ImportICalendarException, AuthFault, ServerFault; 
 	
 }

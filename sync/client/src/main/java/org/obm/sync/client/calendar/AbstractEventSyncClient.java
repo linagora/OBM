@@ -420,7 +420,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	}
 	
 	@Override
-	public void importICalendar(final AccessToken token, final String calendar, final String ics)
+	public int importICalendar(final AccessToken token, final String calendar, final String ics)
 			throws ImportICalendarException, AuthFault, ServerFault {
 		
 		final Map<String, String> params = initParams(token);
@@ -429,6 +429,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		
 		final Document doc = execute(type + "/importICalendar", params);
 		checkServerError(doc);
+		return Integer.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
 	
 }

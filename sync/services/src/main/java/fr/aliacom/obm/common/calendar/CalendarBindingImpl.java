@@ -936,18 +936,24 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public void importICalendar(final AccessToken token, final String calendar, final String ics) 
+	public int importICalendar(final AccessToken token, final String calendar, final String ics) 
 		throws ImportICalendarException, AuthFault, ServerFault {
 		
 		final List<Event> events = parseICSEvent(token, ics);
+		int countEvent = 0;
 		for (final Event event: events) {
 			
 			if (!isAttendeeExistForCalendarOwner(calendar, event.getAttendees())) {
 				addAttendeeForCalendarOwner(token, calendar, event);
 			}
 			
-			createEvent(token, calendar, event);
+			String eventId = createEvent(token, calendar, event);
+			if ((eventId != null && (!eventId.equals("0")))) {
+				countEvent += 1;
+			}
 		}
+		
+		return countEvent;
 	}
 	
 	private List<Event> parseICSEvent(final AccessToken token, final String icsToString) throws ImportICalendarException {
