@@ -349,20 +349,14 @@ public class CalendarBindingImpl implements ICalendar {
 						"event creation with an event coming from OBM");
 			}
 
-			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
-
-			if (StringUtils.isNotEmpty(event.getExtId())) {
-				Event duplicateByExtId = calendarService.findEventByExtId(
-						token, calendarUser, event.getExtId());
-				if (duplicateByExtId != null) {
-					String message = String
-							.format("Calendar : duplicate with same extId found for event [%s, %s, %d, %s]",
-									event.getTitle(), event.getDate()
-											.toString(), event.getDuration(),
-									event.getExtId());
-					logger.info(LogUtils.prefix(token) + message);
-					throw new ServerFault(message);
-				}
+			if (isEventExists(token, calendar, event)) {
+				final String message = String
+				.format("Calendar : duplicate with same extId found for event [%s, %s, %d, %s]",
+						event.getTitle(), event.getDate()
+						.toString(), event.getDuration(),
+						event.getExtId());
+				logger.info(LogUtils.prefix(token) + message);
+				throw new ServerFault(message);
 			}
 
 			if (!helper.canWriteOnCalendar(token, calendar)) {
@@ -938,22 +932,48 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional
 	public int importICalendar(final AccessToken token, final String calendar, final String ics) 
 		throws ImportICalendarException, AuthFault, ServerFault {
-		
+
 		final List<Event> events = parseICSEvent(token, ics);
 		int countEvent = 0;
 		for (final Event event: events) {
-			
+
 			if (!isAttendeeExistForCalendarOwner(calendar, event.getAttendees())) {
 				addAttendeeForCalendarOwner(token, calendar, event);
 			}
-			
-			String eventId = createEvent(token, calendar, event);
-			if ((eventId != null && (!eventId.equals("0")))) {
+
+			if (createEventIfNotExists(token, calendar, event)) {
 				countEvent += 1;
 			}
+
 		}
-		
+
 		return countEvent;
+	}
+
+	private boolean createEventIfNotExists(final AccessToken token, final String calendar, final Event event)
+			throws AuthFault, ServerFault, ImportICalendarException {
+		try {
+			if (!isEventExists(token, calendar, event)) {
+				final String eventId = createEvent(token, calendar, event);
+				if ((eventId != null && (!eventId.equals("0")))) {
+					return true;
+				}	
+			}
+		} catch (FindException e) {
+			throw new ImportICalendarException(e);
+		}
+		return false;
+	}
+
+	private boolean isEventExists(final AccessToken token, final String calendar, final Event event) throws FindException {
+		final ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
+		if (StringUtils.isNotEmpty(event.getExtId())) {
+			final Event eventExist = calendarService.findEventByExtId(token, calendarUser, event.getExtId());
+			if (eventExist != null) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private List<Event> parseICSEvent(final AccessToken token, final String icsToString) throws ImportICalendarException {
