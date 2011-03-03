@@ -376,7 +376,7 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $retour = run_query_calendar_touch_event($event_id);
+    //$retour = run_query_calendar_touch_event($event_id);
 
     // Send mail
     if ($owner_notification == 'true') {
