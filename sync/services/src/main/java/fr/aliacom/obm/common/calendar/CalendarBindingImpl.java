@@ -937,6 +937,8 @@ public class CalendarBindingImpl implements ICalendar {
 		int countEvent = 0;
 		for (final Event event: events) {
 
+			removeAttendeeWithNoEmail(event);
+			
 			if (!isAttendeeExistForCalendarOwner(calendar, event.getAttendees())) {
 				addAttendeeForCalendarOwner(token, calendar, event);
 			}
@@ -948,6 +950,16 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 
 		return countEvent;
+	}
+
+	private void removeAttendeeWithNoEmail(Event event) { 
+		final List<Attendee> newAttendees = new ArrayList<Attendee>();
+		for (final Attendee attendee: event.getAttendees()) {
+			if (attendee.getEmail() != null) {
+				newAttendees.add(attendee);
+			}
+		}
+		event.setAttendees(newAttendees);
 	}
 
 	private boolean createEventIfNotExists(final AccessToken token, final String calendar, final Event event)
