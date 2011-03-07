@@ -11,24 +11,46 @@ public class LightningVersion extends Version {
 		}
 	}
 	
-	private Integer linagoraVersion;
+	private final Integer linagoraVersion;
+	private final Pattern obmVersionPattern;
+	private final Pattern linagoraVersionPattern;
 
-	public LightningVersion(int major, int minor, Integer release,
-			Integer subRelease, String suffix) {
+	public LightningVersion(int major, int minor, Integer release, Integer subRelease, String suffix) {
 		super(major, minor, release, subRelease, suffix);
-		parseSuffix(suffix);
+		obmVersionPattern = Pattern.compile(".*\\.(\\d{2})obm");
+		linagoraVersionPattern = Pattern.compile(".*-LINAGORA-(\\d{2})");		
+		linagoraVersion = parseSuffix(suffix);
 	}
 
-	private void parseSuffix(String suffix) {
-		Pattern linagoraVersionPattern = Pattern.compile(".*-LINAGORA-(\\d{2})");
-		Matcher matcher = linagoraVersionPattern.matcher(suffix);
-		if (matcher.matches()) {
-			linagoraVersion = Integer.valueOf(matcher.group(1));
-		} else {
-			linagoraVersion = null;
+	private Integer parseSuffix(String suffix) {
+		Integer version = parseLinagoraSuffix(suffix);
+		if (version == null) {
+			return parseObmSuffix(suffix);
 		}
+		return version;
 	}
 
+	private Integer parseLinagoraSuffix(String suffix) {
+		return extractVersionWithPattern(suffix, linagoraVersionPattern);
+	}
+
+	private Integer parseObmSuffix(String suffix) {
+		return extractVersionWithPattern(suffix, obmVersionPattern);
+	}
+
+	private Integer extractVersionWithPattern(String suffix, Pattern pattern) {
+		Matcher matcher = pattern.matcher(suffix);
+		return getIntegerFromMatcher(matcher);
+	}
+
+	private Integer getIntegerFromMatcher(Matcher matcher) {
+		if (matcher.matches()) {
+			return Integer.valueOf(matcher.group(1));
+		}
+		return null;
+	}
+
+	
 	public Integer getLinagoraVersion() {
 		return linagoraVersion;
 	}

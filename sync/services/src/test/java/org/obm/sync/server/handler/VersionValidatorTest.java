@@ -118,6 +118,20 @@ public class VersionValidatorTest{
 	}
 	
 	@Test
+	public void testCheckLightningVersionContainsLinagoraDot3() throws OBMConnectorVersionException {
+		Parser parser = createMockParser(new Version(3, 0, null, null, null), new LightningVersion(1, 0, null, null, "b2.03obm"));
+		VersionValidator validator = new VersionValidator(parser);
+		validator.checkObmConnectorVersion(createFakeAccessToken());
+	}
+	
+	@Test
+	public void testCheckLightningReleaseContainsLinagoraDot3() throws OBMConnectorVersionException {
+		Parser parser = createMockParser(new Version(3, 0, null, null, null), new LightningVersion(1, 0, null, null, ".03obm"));
+		VersionValidator validator = new VersionValidator(parser);
+		validator.checkObmConnectorVersion(createFakeAccessToken());
+	}
+	
+	@Test
 	public void testCheckObmConnectorVersionEmpty() throws OBMConnectorVersionException {
 		Parser parser = EasyMock.createMock(Parser.class);
 		EasyMock.expect(parser.parse(EasyMock.anyObject(String.class))).andReturn(null);
