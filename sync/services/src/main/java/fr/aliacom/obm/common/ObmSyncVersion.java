@@ -19,21 +19,21 @@ package fr.aliacom.obm.common;
 
 import java.util.StringTokenizer;
 
-import org.obm.sync.auth.VersionInfo;
+import org.obm.sync.auth.MavenVersion;
 
 // versionning MAJOR.MINOR.RELEASE
 // DO NOT FORGET TO EDIT THIS FILE BEFORE TAG !
 public final class ObmSyncVersion {
 
-	public static final VersionInfo current() {
+	public static final MavenVersion current() {
 		Package p = ObmSyncVersion.class.getPackage();
 		return parseImplementationVersion(p.getImplementationVersion());
 	}
 
 	// 2.3.22-SNAPSHOT
-	private static VersionInfo parseImplementationVersion(
+	private static MavenVersion parseImplementationVersion(
 			String implementationVersion) {
-		VersionInfo version = new VersionInfo();
+		MavenVersion version = new MavenVersion();
 		StringTokenizer token = new StringTokenizer(implementationVersion, ".");
 		if (token.hasMoreTokens()) {
 			String major = getNextString(token);
