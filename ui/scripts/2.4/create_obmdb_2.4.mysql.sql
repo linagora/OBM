@@ -3776,6 +3776,7 @@ CREATE TABLE opush_sync_mail (
         `collection_id`   INTEGER NOT NULL,
         `device_id`       INTEGER NOT NULL,
         `mail_uid`        INTEGER NOT NULL,
+	`is_read` 	  boolean default 0,
         KEY `opush_sync_mail_collection_id_opush_folder_mapping_id_fkey` (`collection_id`),
         KEY `opush_sync_mail_device_id_opush_device_id_fkey` (`device_id`),
         CONSTRAINT `opush_sync_mail_collection_id_opush_folder_mapping_id_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE,

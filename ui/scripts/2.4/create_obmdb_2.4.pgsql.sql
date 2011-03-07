@@ -11659,7 +11659,8 @@ CREATE TABLE opush_sync_perms (
 CREATE TABLE opush_sync_mail (
         collection_id   INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
         device_id       INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
-        mail_uid        INTEGER NOT NULL
+        mail_uid        INTEGER NOT NULL,
+	is_read         boolean default false
 );
 
 
