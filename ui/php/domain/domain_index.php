@@ -109,6 +109,9 @@ if ($action == 'index' || $action == '') {
     if ($cid > 0) {
       set_update_state();
       $params['domain_id'] = $cid;
+      if (function_exists('specific_insert_domain')) {
+        specific_insert_domain($cid);
+      }
       $display['msg'] .= display_ok_msg($l_insert_ok);
       $display['detail'] = dis_domain_consult($params);
     } else {
