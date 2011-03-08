@@ -147,39 +147,16 @@ public class UserDao {
 		try {
 			st = con.createStatement();
 			// by Mehdi
-			rs = st
-					.executeQuery("SELECT userentity_entity_id FROM UserObm INNER JOIN UserEntity ON userobm_id=userentity_user_id "
-							+ "INNER JOIN Domain ON userobm_domain_id = domain_id "
-							+ "WHERE " + "( " + "(userobm_email = '"
-							+ left
-							+ "' OR userobm_email like '"
-							+ left
-							+ "\r\n%' OR userobm_email like '%\r\n"
-							+ left
-							+ "\r\n%' OR userobm_email like '%\r\n"
-							+ left
-							+ "') "
-							+ "AND "
-							+ "(domain_name = '"
-							+ right
-							+ "' OR domain_alias = '"
-							+ right
-							+ "' OR domain_alias like '"
-							+ right
-							+ "\r\n%' OR domain_alias like '%\r\n"
-							+ right
-							+ "\r\n%' OR domain_alias like '%\r\n"
-							+ right
-							+ "') "
-							+ ") OR (userobm_email = '"
-							+ mail
-							+ "' OR userobm_email like '"
-							+ mail
-							+ "\r\n%' OR userobm_email like '%\r\n"
-							+ mail
-							+ "\r\n%' OR userobm_email like '%\r\n"
-							+ mail
-							+ "') ");
+			String query = "SELECT     userentity_entity_id ";
+			query       += "FROM       UserObm ";
+			query       += "INNER JOIN UserEntity ON userobm_id = userentity_user_id ";
+			query       += "INNER JOIN Domain ON userobm_domain_id = domain_id ";
+			query       += "WHERE      (     (userobm_email = '"+left+"' OR userobm_email LIKE '"+left+"%' OR userobm_email LIKE '%"+left+"%')";
+			query       += "             AND (domain_name = '"+right+"' OR domain_alias = '"+right+"' OR domain_alias LIKE '"+right+"%' OR domain_alias LIKE '%"+right+"%')";
+			query       += "            ) ";
+			query       += "OR          (userobm_email = '"+left+"' OR userobm_email LIKE '"+left+"%' OR userobm_email LIKE '%"+mail+"%')";
+
+			rs = st.executeQuery(query);
 			if (rs.next()) {
 				ret = rs.getInt(1);
 			}
