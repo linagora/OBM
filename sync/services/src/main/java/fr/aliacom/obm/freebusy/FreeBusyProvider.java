@@ -36,9 +36,12 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 
+import com.google.common.base.Strings;
 import com.google.inject.Injector;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
+import fr.aliacom.obm.common.domain.DomainDao;
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.utils.Ical4jHelper;
@@ -49,6 +52,7 @@ public class FreeBusyProvider extends HttpServlet {
 	private Log logger = LogFactory.getLog(FreeBusyProvider.class);
 	private CalendarDao calendarDao;
 	private UserDao userDao;
+	private DomainDao domainDao;
 	
 	@Override
 	public void init() throws ServletException {
@@ -56,6 +60,7 @@ public class FreeBusyProvider extends HttpServlet {
 		Injector injector = (Injector) getServletContext().getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
 		calendarDao = injector.getInstance(CalendarDao.class);
 		userDao = injector.getInstance(UserDao.class);
+		domainDao = injector.getInstance(DomainDao.class);
 	}
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -69,10 +74,18 @@ public class FreeBusyProvider extends HttpServlet {
 
 		String email = reqString.substring(reqString.lastIndexOf("/") + 1);
 		logger.info("freebusy email : '" + email + "'");
-
-		ObmUser user = userDao.findUser(email);
 		
-		if (user == null || !user.isPublicFreeBusy()) {
+		ObmDomain domain = null;
+		ObmUser user = null;
+		
+		String domainName = getDomainName(email);
+		if(!Strings.isNullOrEmpty(domainName)){
+			domain = domainDao.findDomainByName(domainName);
+		}
+		if(domain != null){
+			user = userDao.findUser(email, domain.getId());
+		}
+		if (domain == null || user == null || !user.isPublicFreeBusy()) {
 			logger.warn("FreeBusyProvider : user not found : '" + email + "' or freebusy is not public.");
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			return;
@@ -95,12 +108,21 @@ public class FreeBusyProvider extends HttpServlet {
 		fbr.setAttendees(atts);
 		fbr.setOwner(email);
 
-		List<FreeBusy> fb = calendarDao.getFreeBusy(fbr);
+		List<FreeBusy> fb = calendarDao.getFreeBusy(domain.getId(), fbr);
 		String ics = "";
 		if (fb.size() > 0) {
 			ics = Ical4jHelper.parseFreeBusy(fb.iterator().next());
 		}
 		response.getOutputStream().write(ics.getBytes());
+	}
+
+	private String getDomainName(String email) {
+		String[] parts = email.split("@");
+		String domain = null;
+		if (parts.length > 1) {
+			domain = parts[1];
+		}
+		return domain;
 	}
 
 }

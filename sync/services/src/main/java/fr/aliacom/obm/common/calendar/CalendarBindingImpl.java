@@ -879,7 +879,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public List<FreeBusy> getFreeBusy(AccessToken token, FreeBusyRequest fb)
 			throws AuthFault, ServerFault {
 		try {
-			return calendarService.getFreeBusy(fb);
+			return calendarService.getFreeBusy(token.getDomainId(), fb);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -939,7 +939,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 			removeAttendeeWithNoEmail(event);
 			
-			if (!isAttendeeExistForCalendarOwner(calendar, event.getAttendees())) {
+			if (!isAttendeeExistForCalendarOwner(token, calendar, event.getAttendees())) {
 				addAttendeeForCalendarOwner(token, calendar, event);
 			}
 
@@ -1018,9 +1018,9 @@ public class CalendarBindingImpl implements ICalendar {
 		return obmUser;
 	}
 	
-	private boolean isAttendeeExistForCalendarOwner(final String calendar, final List<Attendee> attendees) {
+	private boolean isAttendeeExistForCalendarOwner(final AccessToken at, final String calendar, final List<Attendee> attendees) {
 		for (final Attendee attendee: attendees) {
-			final ObmUser obmUser = userDao.findUser(attendee.getEmail());
+			final ObmUser obmUser = userDao.findUser(attendee.getEmail(), at.getDomainId());
 			if (obmUser != null) {
 				if (obmUser.getLogin().equals(calendar)) {
 					return true;

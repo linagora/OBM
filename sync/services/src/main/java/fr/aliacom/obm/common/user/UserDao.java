@@ -98,6 +98,7 @@ public class UserDao {
 					+ "\r\n%' OR userobm_email like '%\r\n"
 					+ mail
 					+ "\r\n%' OR userobm_email like '%\r\n" + mail + "') ");
+
 			if (rs.next()) {
 				ret = rs.getInt(1);
 			}
@@ -130,55 +131,13 @@ public class UserDao {
 		}
 		return ret;
 	}
-
-	public Integer userEntityFromEmailQuery(Connection con, String mail)
-			throws SQLException {
-		String[] parts = mail.split("@");
-		String left = parts[0];
-		String right = "-";
-		if (parts.length > 1) {
-			right = parts[1];
-		}
-
-		Integer ret = null;
-
-		Statement st = null;
-		ResultSet rs = null;
-		try {
-			st = con.createStatement();
-			// by Mehdi
-			String query = "SELECT     userentity_entity_id ";
-			query       += "FROM       UserObm ";
-			query       += "INNER JOIN UserEntity ON userobm_id = userentity_user_id ";
-			query       += "INNER JOIN Domain ON userobm_domain_id = domain_id ";
-			query       += "WHERE      (     (userobm_email = '"+left+"' OR userobm_email LIKE '"+left+"%' OR userobm_email LIKE '%"+left+"%')";
-			query       += "             AND (domain_name = '"+right+"' OR domain_alias = '"+right+"' OR domain_alias LIKE '"+right+"%' OR domain_alias LIKE '%"+right+"%')";
-			query       += "            ) ";
-			query       += "OR          (userobm_email = '"+left+"' OR userobm_email LIKE '"+left+"%' OR userobm_email LIKE '%"+mail+"%')";
-
-			rs = st.executeQuery(query);
-			if (rs.next()) {
-				ret = rs.getInt(1);
-			}
-
-		} finally {
-			obmHelper.cleanup(null, st, rs);
-		}
-		return ret;
-	}
-
-	public ObmUser findUser(String email) {
+	
+	public ObmUser findUser(String email, Integer domainId) {
 		Connection con = null;
 		Integer id = null;
 		try {
-			String[] parts = email.split("@");
-			String login = parts[0];
-			String domain = "-";
-			if (parts.length > 1) {
-				domain = parts[1];
-			}
 			con = obmHelper.getConnection();
-			id = userIdFromEmailQuery(con, login, domain);
+			id = 	userIdFromEmail(con, email, domainId);
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
@@ -281,7 +240,6 @@ public class UserDao {
 				+ "FROM UserObm "
 				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
 		try {
-			con = obmHelper.getConnection();
 			ps = con.prepareStatement(uq);
 			ps.setInt(1, domainId);
 			ps.setString(2, login);
@@ -292,7 +250,7 @@ public class UserDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 		return ret;
 	}
@@ -306,9 +264,36 @@ public class UserDao {
 		}
 		Integer ownerId = userIdFromLogin(con, login, domainId);
 		if(ownerId == null){
-			ownerId = userIdFromEmailQuery(con, calendar, domain);	
+			ownerId = userIdFromEmailQuery(con, login, domain);	
 		}
-		
 		return ownerId;
+	}
+	
+	public Integer userEntityIdFromEmail(Connection con, String calendar, Integer domainId) throws SQLException{
+		Integer userId = userIdFromEmail(con, calendar, domainId);
+		return userId != null ? getUserEntityIdFromUserId(con, userId) : null;
+	}
+	
+	private Integer getUserEntityIdFromUserId(Connection con, Integer userId){
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Integer ret = null;
+		String uq = "SELECT userentity_entity_id "
+				+ "FROM UserEntity "
+				+ "WHERE userentity_user_id=? ";
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(uq);
+			ps.setInt(1, userId);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				ret = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
+		return ret;
 	}
 }
