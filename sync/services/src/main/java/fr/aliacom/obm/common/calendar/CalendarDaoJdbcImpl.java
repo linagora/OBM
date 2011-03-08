@@ -64,6 +64,7 @@ import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -706,7 +707,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 	
 	@Override
-	public List<FreeBusy> getFreeBusy(FreeBusyRequest fbr) {
+	public List<FreeBusy> getFreeBusy(Integer domainId, FreeBusyRequest fbr) {
 
 		String fb = "SELECT e.event_id, e.event_date, e.event_duration, event_allday"
 				+ ", e.event_repeatkind, e.event_repeatdays, e.event_repeatfrequence, e.event_endrepeat"
@@ -735,7 +736,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				logger.info("freebusy " + att.getEmail() + " dstart: "
 						+ fbr.getStart() + " dend: " + fbr.getEnd());
 
-				ObmUser u = userDao.findUser(att.getEmail());
+				ObmUser u = userDao.findUser(att.getEmail(), domainId);
 
 				Calendar cal = getGMTCalendar();
 				if (u != null) {
@@ -1391,15 +1392,15 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public void modifyEvent(Connection con, AccessToken at, String calendar, Event ev, 
+	public void modifyEvent(Connection con, AccessToken editor, String calendar, Event ev, 
 			boolean updateAttendees, Boolean useObmUser)
 			throws SQLException, FindException {
-		Event old = findEvent(at, Integer.valueOf(ev.getUid()));
+		Event old = findEvent(editor, Integer.valueOf(ev.getUid()));
 		if (old == null) {
 			return;
 		}
-		old.getAttendees().removeAll(ev.getAttendees());
-		List<Attendee> attendeetoRemove = old.getAttendees();
+		List<Attendee> attendeetoRemove = Lists.newArrayList(old.getAttendees());
+		attendeetoRemove.removeAll(ev.getAttendees());
 
 		old.getRecurrence().getEventExceptions()
 				.removeAll(ev.getRecurrence().getEventExceptions());
@@ -1408,35 +1409,35 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 
-			ps = createEventUpdateStatement(con, at, ev);
+			ps = createEventUpdateStatement(con, editor, ev);
 			ps.executeUpdate();
 			ps.close();
 			ps = null;
 			if (updateAttendees) {
-				removeAttendees(con, attendeetoRemove, ev);
+				removeAttendees(editor, con, attendeetoRemove, ev);
 			}
 
 			if (updateAttendees) {
-				updateAttendees(at, con, calendar, ev, useObmUser);
+				updateAttendees(editor, con, calendar, ev, useObmUser);
 				markUpdated(con, ev.getDatabaseId());
 			}
-			updateAlerts(at, con, ev);
+			updateAlerts(editor, con, ev);
 
 			removeAllException(con, ev);
 
-			insertExceptions(at, ev, con, ev.getDatabaseId());
+			insertExceptions(editor, ev, con, ev.getDatabaseId());
 			if (ev.getRecurrence() != null) {
 				for (Event event : ev.getRecurrence().getEventExceptions()) {
 					event.setDatabaseId(0);
 				}
-				insertEventExceptions(at, calendar, ev.getRecurrence()
+				insertEventExceptions(editor, calendar, ev.getRecurrence()
 						.getEventExceptions(), con, ev.getDatabaseId(), useObmUser);
 			}
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 		
-		indexEvent(at, ev);
+		indexEvent(editor, ev);
 	}
 
 	private PreparedStatement createEventUpdateStatement(Connection con,
@@ -1538,7 +1539,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private void removeAttendees(Connection con, List<Attendee> toRemove,
+	private void removeAttendees(AccessToken editor, Connection con, List<Attendee> toRemove,
 			Event ev) throws SQLException {
 		logger.info("event update will remove " + toRemove.size()
 				+ " attendees.");
@@ -1547,8 +1548,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		try {
 			ps = con.prepareStatement(q);
 			for (Attendee at : toRemove) {
-				Integer id = userDao.userEntityFromEmailQuery(con,
-						at.getEmail());
+				Integer id = userDao.userEntityIdFromEmail(con,
+						at.getEmail(), editor.getDomainId());
 				if (id == null) {
 					id = userDao
 							.contactEntityFromEmailQuery(con, at.getEmail());
@@ -1678,19 +1679,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		PreparedStatement ps = null;
 		try {
 			ps = con.prepareStatement(attQ);
-			Integer userEntityCalender = userDao.userEntityFromEmailQuery(con, calendar);
+			Integer userEntityCalender = userDao.userEntityIdFromEmail(con, calendar, editor.getDomainId());
 			for (Attendee at : attendees) {
-				Integer userEntity  = userDao.userEntityFromEmailQuery(con,
-						at.getEmail());
-				if(!useObmUser && !userEntityCalender.equals(userEntity)){
-					userEntity = null;
-					logger.info("user with email " + at.getEmail()
-							+ " not found. Checking contacts.");
-				}
-				if (userEntity == null) {
-					userEntity = userDao.contactEntityFromEmailQuery(con,
-							at.getEmail());
-				}
+				Integer userEntity = getUserEntityOrContactEntity(editor, con, userEntityCalender, at.getEmail(), useObmUser);
+				
 				if (userEntity == null) {
 					logger.info("Attendee " + at.getEmail()
 							+ " not found in OBM, will create a contact");
@@ -1729,6 +1721,21 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return pRole.getJdbcObject(obmHelper.getType());
 	}
 	
+	private Integer getUserEntityOrContactEntity(AccessToken editor, Connection con, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
+		Integer userEntity  = userDao.userEntityIdFromEmail(con,
+				email, editor.getDomainId());
+		if(!useObmUser && !userEntityCalendar.equals(userEntity)){
+			userEntity = null;
+			logger.info("user with email " + email
+					+ " not found. Checking contacts.");
+		}
+		if (userEntity == null) {
+			userEntity = userDao.contactEntityFromEmailQuery(con,
+					email);
+		}
+		return userEntity;
+	}
+
 	private void updateAttendees(AccessToken updater, Connection con, String calendar, Event ev,
 			Boolean useObmUser) throws SQLException {
 		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=? "
@@ -1743,19 +1750,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 			ps = con.prepareStatement(q);
-			Integer userEntityCalender = userDao.userEntityFromEmailQuery(con, calendar);
+			Integer userEntityCalendar = userDao.userEntityIdFromEmail(con, calendar, updater.getDomainId());
 			for (Attendee at : ev.getAttendees()) {
-				Integer userEntity = userDao.userEntityFromEmailQuery(con,
-						at.getEmail());
-				if(!useObmUser && !userEntityCalender.equals(userEntity)){
-					userEntity = null;
-					logger.info("user with email " + at.getEmail()
-							+ " not found. Checking contacts.");
-				}
-				if (userEntity == null) {
-					userEntity = userDao.contactEntityFromEmailQuery(con,
-							at.getEmail());
-				}
+				Integer userEntity = getUserEntityOrContactEntity(updater, con, userEntityCalendar, at.getEmail(), useObmUser);
 				if (userEntity == null) {
 					logger.info("skipping attendee update for email "
 							+ at.getEmail() + ". Will add as contact");
