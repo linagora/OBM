@@ -4586,9 +4586,13 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         }
         $res_js = "{".implode(",", $u)."}";
 
+        $add_displayed_res = true;
         if ( $add_displayed_res ) {
           $add_displayed_res_checked = "checked='checked'";
         }
+        $addResourceJs = "
+          add_displayed_attendee($('cba_add_displayed_res').checked, $res_js, $uid, 'resource', 'sel_resource_id');
+        ";
         $block_add_displayed_res = "<tr>
           <th>
           <label for='cba_add_displayed_res'>$GLOBALS[l_add_displayed_resources]</label>
@@ -5027,6 +5031,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $freebusy
 
   <script type=\"text/javascript\">
+    window.addEvent('domready', function(){
+      $addResourceJs
+    });
     obm.initialize.chain(function () {
       $user_complete
       $resource_complete
