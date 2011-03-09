@@ -1,52 +1,86 @@
 package org.obm.sync.server.handler;
 
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ClientInformations;
-import org.obm.sync.auth.LightningVersion;
-import org.obm.sync.auth.OBMConnectorVersionException;
-import org.obm.sync.auth.Version;
+import java.util.StringTokenizer;
 
-import com.google.inject.Inject;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ConnectorVersion;
+import org.obm.sync.auth.OBMConnectorVersionException;
+
 import com.google.inject.Singleton;
 
 @Singleton
 public class VersionValidator {
 
-	private Version obmConnectorRequiredVersion;
-	private int linagoraVersion; 
-	private ClientInformations.Parser parser;
+	private ConnectorVersion obmConnectorRequiredVersion;
 
-	@Inject
-	protected VersionValidator(ClientInformations.Parser parser) {
-		this.obmConnectorRequiredVersion = new Version(2, 4, 1, 8);
-		this.linagoraVersion = 2;
-		this.parser = parser;
+	protected VersionValidator() {
+		this.obmConnectorRequiredVersion = new ConnectorVersion(2, 4, 1, 8);
 	}
 
+	// thunderbird[ext: 2.4.1.8-rc11, light: 1.0b2]
 	public void checkObmConnectorVersion(AccessToken token)
 			throws OBMConnectorVersionException {
 		String origin = token.getOrigin();
-		if (origin == null) {
-			//don't filter if origin is null
-			return;
-		}
-		ClientInformations actualVersion = parser.parse(origin);
-		if (actualVersion == null) {
-			//don't filter if origin is not parsable
-			return;
-		}
-		Version connectorVersion = actualVersion.getObmConnectorVersion();
-		if (connectorVersion == null || connectorVersion.compareTo(obmConnectorRequiredVersion) < 0) {
-			throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
-		}
-		LightningVersion lightningVersion = actualVersion.getLightningVersion();
-		if (lightningVersion == null) {
-			throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
-		}
-		Integer linagoraVersion = lightningVersion.getLinagoraVersion();
-		if (linagoraVersion == null || linagoraVersion < this.linagoraVersion) {
-			throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
+		if (origin != null && origin.startsWith("thunderbird")) {
+			ConnectorVersion actualVersion = parseConnectorVersionString(origin);
+			if (actualVersion.compareTo(obmConnectorRequiredVersion) < 0) {
+				throw new OBMConnectorVersionException(token, obmConnectorRequiredVersion);
+			}
 		}
 	}
 
+	// 2.4.1.8-rc11
+	private ConnectorVersion parseConnectorVersionString(String origin) {
+		String extVertion = getExtVersion(origin);
+		if (extVertion != null) {
+			StringTokenizer token = new StringTokenizer(extVertion, ".");
+			if (token.hasMoreTokens()) {
+				int major = getNextInteger(token);
+				int minor = getNextInteger(token);
+				int release = getNextInteger(token);
+				int subRelease = 0;
+				// 8-rc11
+				String tokenSubRelease = getNextString(token);
+				token = new StringTokenizer(tokenSubRelease, "-");
+				if (token.hasMoreTokens()) {
+					subRelease = getNextInteger(token);
+				} else {
+					subRelease = getInteger(tokenSubRelease);
+				}
+				return new ConnectorVersion(major, minor, release, subRelease);
+			}
+		}
+		return new ConnectorVersion(0, 0, 0, 0);
+	}
+
+	private Integer getNextInteger(StringTokenizer token) {
+		return getInteger(getNextString(token));
+	}
+
+	private int getInteger(String s) {
+		try {
+			return Integer.parseInt(s);
+		} catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	private String getNextString(StringTokenizer token) {
+		if (token.hasMoreTokens()) {
+			return token.nextToken();
+		}
+		return "0";
+	}
+
+	// thunderbird[ext: 2.4.1.8-rc11, light: 1.0b2]
+	private String getExtVersion(String origin) {
+		int indStart = origin.indexOf("thunderbird[ext:");
+		if (indStart >= 0) {
+			int indEnd = origin.indexOf(",", indStart);
+			if (indEnd >= 0) {
+				return origin.substring(indStart + "thunderbird[ext:".length(),	indEnd).trim();
+			}
+		}
+		return null;
+	}
 }

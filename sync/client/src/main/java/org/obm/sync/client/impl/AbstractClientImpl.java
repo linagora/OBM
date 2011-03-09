@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.auth.MavenVersion;
+import org.obm.sync.auth.VersionInfo;
 import org.obm.sync.client.ISyncClient;
 import org.obm.sync.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -167,7 +167,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		Element root = doc.getDocumentElement();
 		String sid = DOMUtils.getElementText(root, "sid");
 		Element v = DOMUtils.getUniqueElement(root, "version");
-		MavenVersion version = new MavenVersion();
+		VersionInfo version = new VersionInfo();
 		if (v != null) {
 			version.setMajor(v.getAttribute("major"));
 			version.setMinor(v.getAttribute("minor"));

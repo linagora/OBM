@@ -23,7 +23,7 @@ public class AccessToken {
 
 	private List<CalendarInfo> calendarRights;
 
-	private MavenVersion version;
+	private VersionInfo version;
 	private int conversationUid;
 
 	public AccessToken(int obmId, int domainId, String origin) {
@@ -122,11 +122,11 @@ public class AccessToken {
 		this.calendarRights = calendarRights;
 	}
 
-	public void setVersion(MavenVersion version) {
+	public void setVersion(VersionInfo version) {
 		this.version = version;
 	}
 
-	public MavenVersion getVersion() {
+	public VersionInfo getVersion() {
 		return version;
 	}
 
