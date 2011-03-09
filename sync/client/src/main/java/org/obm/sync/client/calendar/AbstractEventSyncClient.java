@@ -58,12 +58,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	}
 
 	@Override
-	public String createEvent(AccessToken token, String calendar, Event event)
+	public String createEvent(AccessToken token, String calendar, Event event, boolean notification)
 			throws AuthFault, ServerFault {
 		Map<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("event", ciw.getEventString(event));
-
+		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/createEvent", params);
 		checkServerError(doc);
 		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
@@ -168,35 +168,36 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 
 	@Override
 	public Event modifyEvent(AccessToken token, String calendar, Event event,
-			boolean updateAttendees) throws AuthFault, ServerFault {
+			boolean updateAttendees, boolean notification) throws AuthFault, ServerFault {
 		Map<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("event", ciw.getEventString(event));
 		params.put("updateAttendees", "" + updateAttendees);
+		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/modifyEvent", params);
 		checkServerError(doc);
 		return respParser.parseEvent(doc.getDocumentElement());
 	}
 
 	@Override
-	public Event removeEvent(AccessToken token, String calendar, String uid)
+	public Event removeEvent(AccessToken token, String calendar, String uid, boolean notification)
 			throws AuthFault, ServerFault {
 		Map<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("id", uid);
-
+		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/removeEvent", params);
 		checkServerError(doc);
 		return respParser.parseEvent(doc.getDocumentElement());
 	}
 	
 	@Override
-	public Event removeEventByExtId(AccessToken token, String calendar, String extId)
+	public Event removeEventByExtId(AccessToken token, String calendar, String extId, boolean notification)
 			throws AuthFault, ServerFault {
 		Map<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
-
+		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/removeEventByExtId", params);
 		checkServerError(doc);
 		return respParser.parseEvent(doc.getDocumentElement());
@@ -409,11 +410,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public boolean changeParticipationState(AccessToken token, String calendar,
 			String extId,
-			ParticipationState participationState) throws ServerFault {
+			ParticipationState participationState, boolean notification) throws ServerFault {
 		Map<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		params.put("state", participationState.toString());
+		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/changeParticipationState", params);
 		checkServerError(doc);
 		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));

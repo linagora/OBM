@@ -352,7 +352,7 @@ public class EventHandler extends SecureSyncHandler {
 	private String createEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
-		String ev = binding.createEvent(at,	getCalendar(at, params), getEvent(params));
+		String ev = binding.createEvent(at,	getCalendar(at, params), getEvent(params), getNotificationOption(params));
 		return responder.sendString(ev);
 	}
 	
@@ -363,6 +363,14 @@ public class EventHandler extends SecureSyncHandler {
 		return toModify;
 	}
 
+	private boolean getNotificationOption(ParametersSource params) {
+		String notificationParam = params.getParameter("notification");
+		if (notificationParam != null) {
+			return Boolean.valueOf(notificationParam);
+		}
+		return true;
+	}
+	
 	private List<Event> getEvents(ParametersSource params) throws SAXException,
 			IOException, FactoryConfigurationError {
 		Document doc = DOMUtils.parse(p(params, "events"));
@@ -374,7 +382,9 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
 		Event ev = binding.modifyEvent(at, getCalendar(at, params),
-				getEvent(params), Boolean.valueOf(params.getParameter("updateAttendees")));
+				getEvent(params), Boolean.valueOf(params.getParameter("updateAttendees")), 
+				getNotificationOption(params)
+				);
 		if (ev != null) {
 			return responder.sendEvent(ev);
 		}
@@ -385,7 +395,7 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault {
 		Event ev = binding.removeEvent(at, getCalendar(at, params),
-				params.getParameter("id"));
+				params.getParameter("id"), getNotificationOption(params));
 		if (ev != null) {
 			return responder.sendEvent(ev);
 		}
@@ -397,7 +407,7 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws AuthFault, ServerFault {
 		Event ev = binding.removeEventByExtId(at, getCalendar(at, params),
-				params.getParameter("extId"));
+				params.getParameter("extId"), getNotificationOption(params));
 		if (ev != null) {
 			return responder.sendEvent(ev);
 		}
@@ -446,7 +456,8 @@ public class EventHandler extends SecureSyncHandler {
 			ParametersSource params, XmlResponder responder) throws ServerFault {
 		boolean success = binding.changeParticipationState(at, getCalendar(at, params),
 				params.getParameter("extId"),
-				ParticipationState.getValueOf(params.getParameter("state")));
+				ParticipationState.getValueOf(params.getParameter("state")), 
+				getNotificationOption(params));
 		return responder.sendBoolean(success);
 	}
 	

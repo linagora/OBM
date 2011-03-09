@@ -18,6 +18,7 @@
 package fr.aliacom.obm.common.calendar;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -152,7 +153,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public Event removeEvent(AccessToken token, String calendar, String eventId)
+	public Event removeEvent(AccessToken token, String calendar, String eventId, boolean notification)
 			throws AuthFault, ServerFault {
 		try {
 			// only remove if logged user is owner
@@ -171,10 +172,8 @@ public class CalendarBindingImpl implements ICalendar {
 				if (helper.canWriteOnCalendar(token, owner)) {
 					ev = calendarService.removeEvent(token, uid, ev.getType());
 					logger.info(LogUtils.prefix(token) + "Calendar : event[" + uid + "] removed");
-					if (ev.isInternalEvent()) {
-						eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
-					} else {
-						notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED);
+					if (notification) {
+						notifyOnRemoveEvent(token, calendar, ev);
 					}
 					return ev;
 				}
@@ -198,10 +197,18 @@ public class CalendarBindingImpl implements ICalendar {
 		return null;
 	}
 
+	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event ev) throws FindException {
+		if (ev.isInternalEvent()) {
+			eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
+		} else {
+			notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED);
+		}
+	}
+
 	@Override
 	@Transactional
 	public Event removeEventByExtId(AccessToken token, String calendar,
-			String extId) throws AuthFault, ServerFault {
+			String extId, boolean notification) throws AuthFault, ServerFault {
 		try {
 			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
 			// only remove if logged user is owner
@@ -221,10 +228,8 @@ public class CalendarBindingImpl implements ICalendar {
 				calendarService.removeEventByExtId(token, calendarUser, extId);
 				logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
 				
-				if (ev.isInternalEvent()) {
-					eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
-				} else {
-					notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED);
+				if (notification) {
+					notifyOnRemoveEvent(token, calendar, ev);
 				}
 				return ev;
 			}
@@ -237,7 +242,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public Event modifyEvent(AccessToken token, String calendar, Event event,
-			boolean updateAttendees) throws AuthFault, ServerFault {
+			boolean updateAttendees, boolean notification) throws AuthFault, ServerFault {
 
 		if (event == null) {
 			logger.warn(LogUtils.prefix(token)
@@ -263,9 +268,9 @@ public class CalendarBindingImpl implements ICalendar {
 				return event;
 			} else{
 				if(before.isInternalEvent()){
-					return modifyInternalEvent(token, calendar, before, event, updateAttendees);
+					return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
 				} else {
-					return modifyExternalEvent(token, calendar, event, updateAttendees);
+					return modifyExternalEvent(token, calendar, event, updateAttendees, notification);
 				}
 			}
 
@@ -288,7 +293,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private Event modifyInternalEvent(AccessToken token, String calendar, Event before,  Event event,
-			boolean updateAttendees) throws ServerFault {
+			boolean updateAttendees, boolean notification) throws ServerFault {
 		try{
 			changePartipationStateOnNewWritableCalendar(token, before, event);
 			Event after = calendarService.modifyEvent(token, calendar, event, updateAttendees, true);
@@ -297,9 +302,10 @@ public class CalendarBindingImpl implements ICalendar {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 						+ after.getTitle() + "] modified");
 			}
-			eventChangeHandler.update(token, before, after,
-					settingsDao.getUserLanguage(token));
-
+			if (notification) {
+				eventChangeHandler.update(token, before, after,
+						settingsDao.getUserLanguage(token));
+			}
 			return after;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -308,7 +314,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private Event modifyExternalEvent(AccessToken token, String calendar, 
-			Event event, boolean updateAttendees) throws ServerFault {
+			Event event, boolean updateAttendees, boolean notification) throws ServerFault {
 		try {
 			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
 				ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
@@ -322,7 +328,9 @@ public class CalendarBindingImpl implements ICalendar {
 				if (after != null) {
 					logger.info(LogUtils.prefix(token) + "Calendar : External event[" + after.getTitle() + "] modified");
 				}
-				notifyOrganizerForExternalEvent(token, calendar, after);
+				if (notification) {
+					notifyOrganizerForExternalEvent(token, calendar, after);
+				}
 				return after;
 			}
 		} catch (Throwable e) {
@@ -333,7 +341,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public String createEvent(AccessToken token, String calendar, Event event)
+	public String createEvent(AccessToken token, String calendar, Event event, boolean notification)
 			throws AuthFault, ServerFault {
 
 		try {
@@ -360,7 +368,6 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 
 			if (!helper.canWriteOnCalendar(token, calendar)) {
-				// helper.resetAttendeesStatus(event);
 				String message = "[" + token.getUser() + "] Calendar : "
 						+ token.getUser() + " cannot create event on "
 						+ calendar + "calendar : no write right";
@@ -369,9 +376,9 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 			Event ev = null;
 			if (event.isInternalEvent()) {
-				ev = createInternalEvent(token, calendar, event);
+				ev = createInternalEvent(token, calendar, event, notification);
 			} else {
-				ev = createExternalEvent(token, calendar, event);
+				ev = createExternalEvent(token, calendar, event, notification);
 			}
 			return (String.valueOf(ev.getDatabaseId()));
 		} catch (Throwable e) {
@@ -380,17 +387,21 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private Event createExternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {
+	private Event createExternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
 		try {
 			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
 				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ event.getTitle() + "] refused, mark event as deleted");
 				calendarService.removeEvent(token, event, event.getType());
-				notifyOrganizerForExternalEvent(token, calendar, event);
+				if (notification) {
+					notifyOrganizerForExternalEvent(token, calendar, event);
+				}
 				return event;
 			} else {
 				Event ev = calendarService.createEvent(token, calendar, event, false);
 				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ ev.getTitle() + "] created");
-				notifyOrganizerForExternalEvent(token, calendar, ev);
+				if (notification) {
+					notifyOrganizerForExternalEvent(token, calendar, ev);
+				}
 				return ev;
 			}
 		} catch (Throwable e) {
@@ -422,11 +433,13 @@ public class CalendarBindingImpl implements ICalendar {
 		notifyOrganizerForExternalEvent(token, calendar, ev, calendarOwnerAsAttendee.getState());
 	}
 
-	private Event createInternalEvent(AccessToken token, String calendar, Event event) throws ServerFault {
+	private Event createInternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
 		try{
 			changePartipationStateOnWritableCalendar(token, event);
 			Event ev = calendarService.createEvent(token, calendar, event, true);
-			eventChangeHandler.create(token, ev, settingsDao.getUserLanguage(token));
+			if (notification) {
+				eventChangeHandler.create(token, ev, settingsDao.getUserLanguage(token));
+			}
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");
 			return ev;
@@ -905,7 +918,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public boolean changeParticipationState(AccessToken token, String calendar,
-			String extId, ParticipationState participationState) throws ServerFault {
+			String extId, ParticipationState participationState, boolean notification) throws ServerFault {
 		if (helper.canWriteOnCalendar(token, calendar)) {
 			try {
 				//We should handle all this in a transaction, but we don't, so
@@ -914,9 +927,10 @@ public class CalendarBindingImpl implements ICalendar {
 				boolean changed = calendarService.changeParticipationState(token, calendarOwner, extId, participationState);
 				Event newEvent = calendarService.findEventByExtId(token, calendarOwner, extId);
 				if (newEvent != null) {
-					eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
-							settingsDao.getUserLanguage(token));
-					
+					if (notification) {
+						eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
+								settingsDao.getUserLanguage(token));
+					}
 				} else {
 					logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
 				}
@@ -933,6 +947,14 @@ public class CalendarBindingImpl implements ICalendar {
 	public int importICalendar(final AccessToken token, final String calendar, final String ics) 
 		throws ImportICalendarException, AuthFault, ServerFault {
 
+		if (!helper.canWriteOnCalendar(token, calendar)) {
+			String message = "[" + token.getUser() + "] Calendar : "
+					+ token.getUser() + " cannot create event on "
+					+ calendar + "calendar : no write right";
+			logger.info(LogUtils.prefix(token) + message);
+			throw new ServerFault(message);
+		}
+		
 		final List<Event> events = parseICSEvent(token, ics);
 		int countEvent = 0;
 		for (final Event event: events) {
@@ -946,9 +968,7 @@ public class CalendarBindingImpl implements ICalendar {
 			if (createEventIfNotExists(token, calendar, event)) {
 				countEvent += 1;
 			}
-
 		}
-
 		return countEvent;
 	}
 
@@ -963,15 +983,17 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private boolean createEventIfNotExists(final AccessToken token, final String calendar, final Event event)
-			throws AuthFault, ServerFault, ImportICalendarException {
+			throws ImportICalendarException {
 		try {
 			if (!isEventExists(token, calendar, event)) {
-				final String eventId = createEvent(token, calendar, event);
-				if ((eventId != null && (!eventId.equals("0")))) {
+				final Event newEvent = calendarService.createEvent(token, calendar, event, false);
+				if (newEvent != null) {
 					return true;
-				}	
+				}
 			}
 		} catch (FindException e) {
+			throw new ImportICalendarException(e);
+		} catch (SQLException e) {
 			throw new ImportICalendarException(e);
 		}
 		return false;

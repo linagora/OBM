@@ -36,29 +36,31 @@ public interface ICalendar {
 	 *            is ignored
 	 * @param eventId
 	 *            the id of the event to remove
+	 * @param notification
+	 * 			  send email notification if needed
 	 * @return the removed event on success, the found event if access rights
 	 *         are too low to remove but enough to read, and null if event was
 	 *         not found
 	 */
-	public Event removeEvent(AccessToken token, String calendar, String eventId)
+	public Event removeEvent(AccessToken token, String calendar, String eventId, boolean notification)
 			throws AuthFault, ServerFault;
 
 	/**
 	 * FIXME: remove this service
 	 */
 	public Event removeEventByExtId(AccessToken token, String calendar,
-			String extId) throws AuthFault, ServerFault;
+			String extId, boolean notification) throws AuthFault, ServerFault;
 
 	/**
 	 * FIXME: needs work
 	 */
 	public Event modifyEvent(AccessToken token, String calendar, Event event,
-			boolean updateAttendees) throws AuthFault, ServerFault;
+			boolean updateAttendees, boolean notification) throws AuthFault, ServerFault;
 
 	/**
 	 * FIXME: needs work
 	 */
-	public String createEvent(AccessToken token, String calendar, Event event)
+	public String createEvent(AccessToken token, String calendar, Event event, boolean notification)
 			throws AuthFault, ServerFault;
 
 	/**
@@ -226,7 +228,8 @@ public interface ICalendar {
 	/**
 	 * change user of given calendar participation state
 	 */
-	public boolean changeParticipationState(AccessToken token, String calendar, String extId, ParticipationState participationState) throws ServerFault;
+	public boolean changeParticipationState(AccessToken token, String calendar, String extId, 
+			ParticipationState participationState, boolean notification) throws ServerFault;
 	
 	/**
 	 * Import ics file in calendar's user
@@ -234,6 +237,7 @@ public interface ICalendar {
 	 * 
 	 * Return ImportICalendarException if import fails
 	 */
-	public int importICalendar(AccessToken token, String calendar, String ics) throws ImportICalendarException, AuthFault, ServerFault; 
+	public int importICalendar(AccessToken token, String calendar, String ics) 
+		throws ImportICalendarException, AuthFault, ServerFault; 
 	
 }
