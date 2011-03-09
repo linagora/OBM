@@ -1539,14 +1539,30 @@ sub _getFtpBackupHost {
     my $entityDelegation = $ldapEntityEntity->[0]->get_value('delegation');
 
     my $ldapEntity = undef ;
-	if ( defined($entityDelegation))  {
+    if ( defined($entityDelegation))  {
+    	$self->_log("Search for FTP server in $entityDelegation",3 ) ;
         $ldapEntity = $self->_getLdapValues(
             '(&(objectClass=obmHost)(obmDomain='.$entity->getRealm().')
                 (delegation='.$entityDelegation.'))',['cn'] ) ;
+	# Si on a rien trouve on prend les hotes ftp puis on compare leur delegation a
+	#  celle de l'entity. On prend la plus proche
+	    if ( $#{$ldapEntity} < 0 ) {
+              $self->_log('They are not FTP backup with entity\'s delegation.Search for parent delegation',3);
+	      my $ldapEntities = $self->_getLdapValues(
+	        '(&(objectClass=obmHost)(ftpLogin=*)(obmDomain='.$entity->getRealm().'))'
+	             ,['cn','delegation'] );
+
+	        my $best_deleg = _searchParentDelegation($ldapEntities,$entityDelegation) ;
+	        $self->_log("The best delegation candidate is $best_deleg",1 ) ;
+	        $ldapEntity = $self->_getLdapValues(
+	        	'(&(objectClass=obmHost)(obmDomain='.$entity->getRealm().')
+	    	   (delegation='.$best_deleg.'))',['cn'] ) ;
+	        $self->_log("The FTP server is".$ldapEntity->[0]->get_value("cn")."for $entityDelegation",1 ) ;
+	    }
     }
     # if entityDelegation aren't defined search ftp of obm domain 
 	# or if entityDelegation are defined but no ftp found
-    if ( !defined($entityDelegation) || !defined($ldapEntity) ) {
+    if ( !defined($entityDelegation) || $#{$ldapEntity} < 0 ) {
         $ldapEntity = $self->_getLdapValues(
             '(&(objectClass=obmBackup)(obmDomain='.$entity->getRealm().'))',
             ['ftpHost'] );
@@ -1564,10 +1580,10 @@ sub _getFtpBackupHost {
     }
 
     if($#{$ldapEntity} < 0) {
-        $self->_log('No backup FTP server linked to OBM domaine \''.$entity->getRealm().'\'', 3);
+        $self->_log('No backup FTP server linked to OBM domain \''.$entity->getRealm().'\'', 3);
         $response->setExtraContent({
             pushFtp => {
-                content => 'No backup FTP server linked to OBM domaine \''.$entity->getRealm().'\'',
+                content => 'No backup FTP server linked to OBM domain \''.$entity->getRealm().'\'',
                 success => 'false'
             }
         });
@@ -1839,6 +1855,41 @@ sub _getFtpBackup {
     return 0;
 }
 
+sub _searchParentDelegation {
+   my $ldapEntities = shift ;
+   my $entityDelegation = shift ;
+   my $best_deleg ;
+   my @deleg ;
+   foreach my $ldapEntity (@{$ldapEntities}) {
+       push(@deleg,$ldapEntity->get_value('delegation')) ;
+   }
+   # search for delagation
+   my @arr_delegation = split("",$entityDelegation) ;
+   my $res_before = -1 ;
+   foreach my $search (@deleg) {
+     if ( length($search) > length($entityDelegation) ) {
+       next ;
+     }
+     else {
+       my @arr_search = split("",$search) ;
+       my $res = 0 ;
+       my $index = 0 ;
+       foreach my $char ( @arr_search ) {
+         if ( $char eq $arr_delegation[$index]) {
+           $res++ ;
+         }
+         $index++ ;
+       }
+       # On prend la delegation avec le plus grand nombre de caratere correspondant a la delegation de l'entit
+       if ( $res > $res_before ) {
+         $best_deleg = $search ;
+       }
+       $res_before = $res
+     }
+   }
+   return $best_deleg ;
+
+}
 
 # Perldoc
 
