@@ -121,6 +121,10 @@ public class ObmHelper {
 			Statement st = con.createStatement();
 			st.execute("set time_zone='+00:00'");
 			st.close();
+		} else if (getType() == ObmDbType.PGSQL) {
+			Statement st = con.createStatement();
+			st.execute("SET TIME ZONE 'GMT'");
+			st.close();
 		}
 		return con;
 	}
