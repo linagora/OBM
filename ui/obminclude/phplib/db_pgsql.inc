@@ -481,7 +481,7 @@ class DB_Sql {
    * @return void
    */
   static function CONCAT($args) {
-    return '('.implode('||',$args).')'; 
+    return implode(' || ',$args);
   }
 
   /**
