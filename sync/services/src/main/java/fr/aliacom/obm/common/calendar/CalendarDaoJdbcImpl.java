@@ -62,7 +62,6 @@ import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
 import org.obm.sync.utils.DisplayNameUtils;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -79,6 +78,7 @@ import fr.aliacom.obm.utils.Ical4jHelper;
 import fr.aliacom.obm.utils.LinkedEntity;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
+import fr.aliacom.obm.utils.RFC2445;
 
 /**
  * Calendar data access functions
@@ -457,7 +457,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} else {
 			ps.setNull(idx++, Types.INTEGER);
 		}
-		ps.setInt(idx++, ev.getPriority());
+		ps.setInt(idx++, RFC2445.getPriorityOrDefault(ev.getPriority()));
 		ps.setInt(idx++, ev.getPrivacy());
 		ps.setTimestamp(idx++, new Timestamp(ev.getDate().getTime()));
 		ps.setInt(idx++, ev.getDuration());
@@ -480,7 +480,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setObject(idx++, ev.getType().getJdbcObject(obmHelper.getType()));
 		return idx;
 	}
-
+	
 	private List<DeletedEvent> findDeletedEvents(ObmUser calendarUser, Date d,
 			EventType et, List<DeletedEvent> declined) {
 
@@ -1696,8 +1696,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 				ps.setInt(1, ev.getDatabaseId());
 				ps.setInt(2, userEntity);
-				ps.setObject(3, getParticipationStateOrDefault(at));
-				ps.setObject(4, getParticipationRoleOrDefault(at));
+				ps.setObject(3, getJdbcObjectParticipationState(at));
+				ps.setObject(4, getJdbcObjectParticipationRole(at));
 				ps.setInt(5, at.getPercent());
 				ps.setInt(6, editor.getObmId());
 				ps.setBoolean(7, at.isOrganizer());
@@ -1711,13 +1711,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private Object getParticipationStateOrDefault(final Attendee at) {
-		final ParticipationState pStat = Objects.firstNonNull(at.getState(), ParticipationState.NEEDSACTION);
+	private Object getJdbcObjectParticipationState(final Attendee at) {
+		final ParticipationState pStat = RFC2445.getParticipationStateOrDefault(at.getState());
 		return pStat.getJdbcObject(obmHelper.getType());
 	}
 
-	private Object getParticipationRoleOrDefault(final Attendee at) {
-		final ParticipationRole pRole = Objects.firstNonNull(at.getRequired(), ParticipationRole.REQ);
+	private Object getJdbcObjectParticipationRole(final Attendee at) {
+		final ParticipationRole pRole = RFC2445.getParticipationRoleOrDefault(at.getRequired());
 		return pRole.getJdbcObject(obmHelper.getType());
 	}
 	

@@ -18,8 +18,6 @@
 package org.obm.sync.server.handler;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
@@ -81,6 +79,7 @@ import fr.aliacom.obm.utils.LogUtils;
  * <code>/calendar/parseICSFreeBusy?sid=xxx</code>
  * <code>/calendar/getFreeBusy?sid=xxx</code>
  * <code>/calendar/parseFreeBusyToICS?sid=xxx</code>
+ * <code>/calendar/importICalendar</code>
  */
 @Singleton
 public class EventHandler extends SecureSyncHandler {
@@ -453,17 +452,11 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private String importICalendar(final AccessToken token, final ParametersSource params, 
 			XmlResponder responder) throws ImportICalendarException, AuthFault, ServerFault {
-	
 		final String calendar = params.getParameter("calendar");
-		URI ics;
-		try {
-			ics = new URI(params.getParameter("ics"));
-		} catch (URISyntaxException e) {
-			throw new ImportICalendarException(e);
-		}
+		final String ics = params.getParameter("ics");
 		
-		binding.importICalendar(token, calendar, ics);
-		return responder.sendBoolean(true);
+		int countEvent = binding.importICalendar(token, calendar, ics);
+		return responder.sendInt(countEvent);
 	}
 	
 }
