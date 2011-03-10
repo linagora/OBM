@@ -4,9 +4,9 @@ public class Version implements Comparable<Version> {
 	
 	private final int major;
 	private final int minor;
-	private final Integer release;
-	private final Integer subRelease;
-	private final String suffix;
+	private Integer release;
+	private Integer subRelease;
+	private String suffix;
 
 	public interface Factory<T extends Version> {
 		public T create(int major, int minor, Integer release, Integer subRelease, String suffix);
@@ -72,4 +72,16 @@ public class Version implements Comparable<Version> {
 		return String.format("%d.%d.%d.%d", major, minor, release, subRelease); 
 	}
 
+	public void setSubRelease(Integer subRelease) {
+		this.subRelease = subRelease;
+	}
+	
+	public void setRelease(Integer release) {
+		this.release = release;
+	}
+	
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
+	
 }

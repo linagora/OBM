@@ -21,7 +21,7 @@ public class ClientInformations {
 		public Parser() {
 			super();
 			thunderbirdStringSplitter = Pattern.compile("thunderbird\\[ext: (.+), light: (.+)\\]");
-			connectorVersionPattern = Pattern.compile("(\\d+)\\.(\\d+)(\\.(\\d+))?(\\.(\\d+))?(.+)?");
+			connectorVersionPattern = Pattern.compile("(\\d+)\\.(\\d+)?(\\.(\\d+))?(\\.(\\d+))?(.+)?");
 		}
 
 		public ClientInformations parse(String thunderbirdVersionAsString) {
