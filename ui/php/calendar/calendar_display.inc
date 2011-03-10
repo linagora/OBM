@@ -3765,7 +3765,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
       if (is_array($calendar['new_group_id'])) $groups_id = $calendar['new_group_id'];
       if (is_array($calendar['new_resource_id'])) $res_id = $calendar['new_resource_id'];
       if (is_array($calendar['new_contact_id'])) $contacts_id = $calendar['new_contact_id'];
-      
+
       if (isset($calendar['template_id'])) {
         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
         $users_id = array_merge($users_id, $template_entities['user']);
@@ -3789,7 +3789,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
   $possible_owners = $possible_owners['entity'];
   $cats1 = of_category_get_ordered('event', 'category1');
 
-  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view);
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view, $template_entities);
 
   if ($action == 'new' || $action == 'new_meeting' || $action == 'save_as_template') {
     $GLOBALS[display][search] = dis_calendar_select_template_form($action, $calendar);
@@ -4071,7 +4071,7 @@ function dis_calendar_occurency_popup() {
 //   - $cats1        : Array : Calendar categories1
 //   - $documents    : Array : Attached documents
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts, $tags_q, $documents, $current_view) {
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts, $tags_q, $documents, $current_view, $template_entities=null) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
   global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
@@ -4410,16 +4410,19 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   if (is_array($contacts['entity'])) {
     foreach ($contacts['entity'] as $u_id => $u_ent) {
-      $u_name = $u_ent['label'];
-      $sel_id = "data-contact-$u_id";
-      $div_id = "sel_contact_id-$sel_id";
-      $dis_sel_contact .= "<div class=\"elementRow\" id=\"$div_id\">
-      <a href=\"javascript: remove_element('$div_id','sel_contact_id');\">
-      <img src=\"$ico_delete\" alt=\"[Delete]\" />
-      </a>
-      $u_name
-      <input value=\"$sel_id\" name=\"sel_contact_id[]\" type=\"hidden\" />
-      </div> ";
+      if(in_array($u_id, $template_entities['contact']))
+      {
+        $u_name = $u_ent['label'];
+        $sel_id = "data-contact-$u_id";
+        $div_id = "sel_contact_id-$sel_id";
+        $dis_sel_contact .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_contact_id');\">
+        <img src=\"$ico_delete\" alt=\"[Delete]\" />
+        </a>
+        $u_name
+        <input value=\"$sel_id\" name=\"sel_contact_id[]\" type=\"hidden\" />
+        </div> ";
+      }
     }
   }
 
@@ -4578,31 +4581,45 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
     // resource select
     if ($action == 'new' && !isset($calendar['new_meeting'])) {
-      if (is_array($res['entity']) && sizeof($res['entity']) >= 1) {
+      if ($current_view->resources_count() > 0) {
         $u = array();
-        foreach($res['entity'] as $id => $res) {
-          $name = phpStringToJsString($res["label"]);
+        foreach($res['entity'] as $id => $resource) {
+          $name = phpStringToJsString($resource["label"]);
           array_push($u, "'$id' : '$name'");
         }
         $res_js = "{".implode(",", $u)."}";
-
-        $add_displayed_res = true;
         if ( $add_displayed_res ) {
           $add_displayed_res_checked = "checked='checked'";
         }
-        $addResourceJs = "
-          add_displayed_attendee($('cba_add_displayed_res').checked, $res_js, $uid, 'resource', 'sel_resource_id');
-        ";
         $block_add_displayed_res = "<tr>
           <th>
           <label for='cba_add_displayed_res'>$GLOBALS[l_add_displayed_resources]</label>
           </th>
           <td>
-            <input type='checkbox' id='cba_add_displayed_res' value='1' $add_displayed_res_checked name='cba_add_displayed_res' 
+            <input type='checkbox' id='cba_add_displayed_res' value='1' $add_displayed_res_checked name='cba_add_displayed_res'
               onclick=\"add_displayed_attendee(this.checked, $res_js, $uid, 'resource', 'sel_resource_id')\"/>
           </td>
           </tr>";
       }
+      
+      if (is_array($res['entity'])) {
+        foreach ($res['entity'] as $u_id => $u_ent) {
+          if(in_array($u_id, $template_entities['resource']))
+          {
+            $u_name = $u_ent['label'];
+            $sel_id = "data-resource-$u_id";
+            $div_id = "sel_resource_id-$sel_id";
+            $dis_sel_resource .= "<div class=\"elementRow\" id=\"$div_id\">
+            <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
+            <img src=\"$ico_delete\" alt=\"[Delete]\" />
+            </a>
+            $u_name
+            <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
+            </div> ";
+          }
+        }
+      }
+
       if (is_array($template_res_id)) {
         $resources = get_calendar_resource_from_ids($template_res_id);
         $res = $resources['entity'];
@@ -4622,6 +4639,25 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
           }
         }
       } 
+    } else if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
+      $res = $calendar['resource_id'];
+      if (is_array($res)) {
+        foreach($res as $u) {
+          $id = explode("-", $u);
+          $infos = get_resource_info($id[2]);
+          $u_name = $infos['name'];
+          $sel_id = $u;
+          $div_id = "sel_resource_id-$sel_id";
+          $dis_sel_resource .= "<div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
+          <img src=\"$ico_delete\" alt=\"[Delete]\" />
+          </a>
+          $u_name
+          <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
+          </div>";
+
+        }
+      }
     } else {
       if (is_array($res['entity'])) {
         foreach ($res['entity'] as $r_id => $r_ent) {
@@ -5012,9 +5048,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $freebusy
 
   <script type=\"text/javascript\">
-    window.addEvent('domready', function(){
-      $addResourceJs
-    });
     obm.initialize.chain(function () {
       $user_complete
       $resource_complete
@@ -5749,7 +5782,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
 				$is_busy = true;
 				array_push($busy_time_slots, $slots);
 				$tip = html_freebusy_tip($tips);
-        if (!$tip) $tip = $GLOBALS['l_occupied'];
+        if (!$tip) $tip = $GLOBALS['l_occupied'];				
 				$td_id = "contact_".$id."_".$d->getTimestamp();
 				$c[$id] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
 				$js_tips .= "obm.tip.add($('$td_id'), \"$tip\");";
