@@ -325,7 +325,7 @@ function run_query_calendar_touch_event($event_id) {
 // Parameters:
 //   - $calendar : Calendar params
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_insert_decision($calendar) {
+function run_query_calendar_insert_decision($calendar, $userId) {
 
   $entity_id = $calendar['entity_id'];
   $entity = $calendar['entity_kind'];
@@ -333,7 +333,28 @@ function run_query_calendar_insert_decision($calendar) {
   $state = $calendar['decision_event'];
   $owner_notification = $calendar['owner_notification'];
 
-  run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id, $state, $owner_notification, true);
+  $concernedPeople = get_concerned_people_for_event($event_id);
+
+  if(count($concernedPeople) <= 1 && $state == "DECLINED"){
+    $query = "DELETE FROM Event WHERE event_id = $event_id";
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+  }
+  else{
+    run_query_calendar_update_occurrence_state($event_id,$entity,$entity_id,$state, $owner_notification);
+  }
+}
+
+function get_concerned_people_for_event($eventId){
+  $concernedPeople = array();
+ 
+  $attendees = run_query_get_events_attendee(array($eventId), false, false);
+  while($attendees->next_record()){
+    $attendeeCommonName = $attendees->f("eventlink_label");
+    $attendeeId = $attendees->f("eventlink_entity_id");
+    $concernedPeople[$attendeeId] = $attendeeCommonName;
+  }
+  return $concernedPeople;
 }
 
 
@@ -4016,7 +4037,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
  * @access public
  * @return void
  */
-function run_query_get_events_attendee($events) {
+function run_query_get_events_attendee($events, $with_resources = true, $with_contacts = true) {
   global $cdg_sql;
 
   $event_list = implode(',',$events);
@@ -4042,12 +4063,14 @@ function run_query_get_events_attendee($events) {
     eventlink_state,
     userentity_user_id as eventlink_entity_id,
     'user' as eventlink_entity,
-    #CONCAT(userobm_lastname, ' ', userobm_firstname) as eventlink_label
+    ".DB_OBM::CONCAT(array("userobm_lastname", "' '", "userobm_firstname"))." as eventlink_label
     FROM Event
     INNER JOIN EventLink ON eventlink_event_id = event_id
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     INNER JOIN UserObm ON userentity_user_id = userobm_id
-    WHERE event_id IN ($event_list) $multidomain   
+    WHERE event_id IN ($event_list) $multidomain";
+  if($with_resources)
+    $query .= "
     UNION
     SELECT
     event_id,
@@ -4059,14 +4082,16 @@ function run_query_get_events_attendee($events) {
     INNER JOIN EventLink ON eventlink_event_id = event_id
     INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
     INNER JOIN Resource ON resourceentity_resource_id = resource_id
-    WHERE event_id IN ($event_list) $multidomain
+    WHERE event_id IN ($event_list) $multidomain";
+  if($with_contacts)
+    $query .= "
     UNION
     SELECT
     event_id,
     eventlink_state,
     contactentity_contact_id as eventlink_entity_id,
     'contact' as eventlink_entity,
-    #CONCAT(contact_lastname, ' ', contact_firstname) as eventlink_label
+    ".DB_OBM::CONCAT(array("contact_lastname", "' '", "contact_firstname"))." as eventlink_label
     FROM Event
     INNER JOIN EventLink ON eventlink_event_id = event_id
     INNER JOIN ContactEntity ON contactentity_entity_id = eventlink_entity_id

@@ -187,7 +187,7 @@ if ($action == 'search') {
     $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
   } else {
     if (check_calendar_participation_decision($params)) {
-      run_query_calendar_insert_decision($params);
+      run_query_calendar_insert_decision($params, $obm['uid']);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
     }
