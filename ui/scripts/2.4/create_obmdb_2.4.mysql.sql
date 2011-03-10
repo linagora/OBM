@@ -484,7 +484,7 @@ CREATE TABLE `Contact` (
   `contact_kind_id`             int(8) default NULL,
   `contact_marketingmanager_id` int(8) default NULL,
   `contact_commonname`          varchar(256) default '',
-  `contact_lastname`            varchar(64) NOT NULL default '',
+  `contact_lastname`            varchar(64) default NULL,
   `contact_firstname`           varchar(64) default NULL,
   `contact_middlename`          varchar(32) default NULL,
   `contact_suffix`              varchar(16) default NULL,

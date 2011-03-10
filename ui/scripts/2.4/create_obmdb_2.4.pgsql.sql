@@ -250,7 +250,7 @@ CREATE TABLE contact (
     contact_kind_id             integer,
     contact_marketingmanager_id integer,
     contact_commonname 		character varying(256) DEFAULT ''::character varying,
-    contact_lastname            character varying(64) DEFAULT ''::character varying NOT NULL,
+    contact_lastname            character varying(64) DEFAULT NULL,
     contact_firstname           character varying(64),
     contact_middlename          varchar(32) DEFAULT NULL,
     contact_suffix              varchar(16) DEFAULT NULL,
