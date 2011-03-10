@@ -1001,12 +1001,26 @@ if ($action == 'search') {
 
 } elseif ($action == 'ics_insert')  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (!empty($params[ics_tmp])) {
-    $result = run_query_icalendar_insert($params) ;
+  if (!empty($params["ics_tmp"])) {
+    if(   !array_key_exists("fi_ics", $_FILES)
+     || !file_exists($_FILES["fi_ics"]["tmp_name"])
+  ){
+    $result = false;
+  }
+  else{
+    $ics = file_get_contents($_FILES["fi_ics"]["tmp_name"]);
+    $result = run_icalendar_obmsync_insert($ics) ;
+  }
     if($result !== false) {
-      $display['msg'] .= display_ok_msg("$result[0] $l_ics_import_ok");
-       if ($result[1] != 0) 
-      $display['msg'] .= display_warn_msg("$result[1] $l_ics_import_nok");
+      if (!empty($result[1]) && empty($result[0])){
+        $display['msg'] .= display_warn_msg(
+                              "$result[1] : ".
+                              __("events from this ics could not be imported")
+                           );
+      }
+      else{
+        $display['msg'] .= display_ok_msg("$result[0] $l_ics_import_ok");
+      }
       $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
     } else {
       $display['msg'] .= display_err_msg("$l_file_format $l_unknown");

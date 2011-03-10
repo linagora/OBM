@@ -1124,6 +1124,73 @@ function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $res
   fclose($fd_dest);
 }
 
+function run_icalendar_obmsync_insert($ics){
+  global $obm;
+
+  $obmSyncServer = of_domain_get_domain_syncserver($obm['domain_id']);
+  if(!count($obmSyncServer)){
+    return array(0, __("Couldn't find an obm-sync server for this domain"));
+  }
+  $iterator = new ArrayIterator($obmSyncServer);
+  $obmSyncServer = $iterator->current();
+  $obmSyncRootPath = "http://".$obmSyncServer[0]["ip"].":8080";
+  $userInfo = get_user_info($obm['uid']);
+  $loginPath = "/obm-sync/services/login/doLogin";
+  $username = $userInfo["login"];
+  $password = $userInfo["password"];
+  $origin= "what_is_origin";
+
+  $loginUrl = $obmSyncRootPath.$loginPath."?login=".$username."&password=".$password."&origin=".$origin;
+  $xmlLogin = new DomDocument();
+  $xmlLogin->load($loginUrl);
+  $errors = $xmlLogin->getElementsByTagName("error");
+  if($errors->length > 0){
+    return array(0, __("Couldn't login to obm-sync"));
+  }
+  $sid = $xmlLogin->getElementsByTagName('sid')
+                  ->item(0)
+                  ->nodeValue;
+
+  $insertPath = "/obm-sync/services/calendar/importICalendar";
+  $insertUrl = $obmSyncRootPath.$insertPath."?sid=".$sid."&calendar=".$username;
+
+  // Sends ics to obm-sync import service
+  $ch = curl_init($insertUrl);
+  curl_setopt($ch, CURLOPT_POST, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array("ics"=>$ics)));
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch,CURLOPT_HTTPHEADER,array (
+      "Content-Type: application/x-www-form-urlencoded; charset=utf-8"
+  ));
+  $ret = curl_exec($ch);
+  if (!$ret) {
+      return array(0, __("An unknown error occured during the ics import"));
+  }
+  curl_close($ch);
+
+  $xmlInsert = new DomDocument();
+  $xmlInsert->loadXML($ret);
+  $errors = $xmlInsert->getElementsByTagName("error");
+  $error = null;
+  if($errors->length > 0){
+    $error = $errors->item(0)->nodeValue ?
+             $errors->item(0)->nodeValue :
+             __("An unknown error occured during the ics import");
+    if(preg_match("/Calendar : duplicate with same extId found/", $error, $matches)){
+      preg_match("/\[.*\]/", $error, $matches);
+      
+      $error = __("An event from the ics already exists")." ".$matches[0];
+    }
+
+    return array(0, $error);
+
+  }
+
+  $nbInsertedEvents = $xmlInsert->getElementsByTagName("value")->item(0)->nodeValue;
+  return array($nbInsertedEvents, null);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Analyse the imported ics file
