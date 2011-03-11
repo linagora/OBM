@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -36,6 +37,7 @@ import net.fortuna.ical4j.model.parameter.PartStat;
 import net.fortuna.ical4j.model.parameter.Role;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.Clazz;
+import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Organizer;
@@ -457,12 +459,38 @@ public class Ical4jHelperTest {
 
 	@Test
 	public void testGetVAlarm() {
-		Event event = new Event();
+		final Event event = new Event();
 		event.setAlert(30);
-		VAlarm valarm = Ical4jHelper.getVAlarm(event.getAlert());
+		final VAlarm valarm = Ical4jHelper.getVAlarm(event.getAlert());
 		assertEquals(30, valarm.getTrigger().getDuration().getSeconds());
 	}
 
+	@Test
+	public void testAppendAllDayWithDateTimeObject() throws ParseException {
+		final Event event = new Event();
+		final DtStart startDate = new DtStart();
+		final DateProperty endDate = new DtEnd();
+		
+		startDate.setValue("19980118T230000");
+		endDate.setValue("19980118T230000");
+		
+		Ical4jHelper.appendAllDay(event, startDate, endDate);
+		assertFalse(event.isAllday());
+	}
+	
+	@Test
+	public void testAppendAllDayWithDateObject() {
+		final Event event = new Event();
+		final DtStart startDate = new DtStart();
+		final DateProperty endDate = new DtEnd();
+		
+		startDate.setDate(new net.fortuna.ical4j.model.Date());
+		endDate.setDate(new net.fortuna.ical4j.model.Date());
+		
+		Ical4jHelper.appendAllDay(event, startDate, endDate);
+		assertTrue(event.isAllday());
+	}	
+	
 	@Test
 	public void testGetClazz() {
 		Event event = new Event();
@@ -624,6 +652,18 @@ public class Ical4jHelperTest {
 			assertNotNull(event.getTitle());
 		}
 		assertEquals(221, events.size());
+	}
+	
+	@Test
+	public void testParsingICSFiles() throws IOException, ParserException {
+		final String[] icsFiles = {"cdespino.ics", "dkaplan.ics"};
+		
+		final AccessToken token = new AccessToken(0, 0, null);
+		for (String icsFile: icsFiles) {
+			final String ics = IOUtils.toString(getStreamICS(icsFile));
+			Ical4jHelper.parseICSEvent(ics, token);	
+		}
+		assertTrue(true);
 	}
 
 }
