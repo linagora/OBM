@@ -983,9 +983,8 @@ public class Ical4jHelper {
 					int sec = min * 60 + dur.getSeconds();
 					
 					event.setAlert(sec);	
+					return;
 				}
-				
-				return;
 			}
 		}
 		event.setAlert(-1);

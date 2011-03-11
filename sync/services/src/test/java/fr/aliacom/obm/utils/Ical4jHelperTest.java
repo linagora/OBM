@@ -270,7 +270,7 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testGetAlert() {
+	public void testGetAlertWithNoRepeat() {
 		Dur dur = new Dur(0, 0, -30, 0);
 		VAlarm va = new VAlarm(dur);
 		Trigger ti = va.getTrigger();
@@ -279,7 +279,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
 		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
-		assertEquals(new Integer(30 * 60), event.getAlert());
+		assertEquals(new Integer(-1), event.getAlert());
 	}
 
 	@Test
