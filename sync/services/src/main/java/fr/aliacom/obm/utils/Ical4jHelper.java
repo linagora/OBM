@@ -84,6 +84,7 @@ import net.fortuna.ical4j.model.property.Priority;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
+import net.fortuna.ical4j.model.property.Repeat;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Transp;
@@ -343,20 +344,14 @@ public class Ical4jHelper {
 		}
 	}
 
-	private static void appendAllDay(Event event, DtStart startDate,
-			DateProperty endDate) {
-		if (endDate == null) {
-			event.setAllday(true);
-		} else {
-			if (startDate.getDate() != null
-					&& startDate.getDate() instanceof DateTime
-					&& startDate.getDate() instanceof DateTime) {
+	public static void appendAllDay(Event event, DtStart startDate, DateProperty endDate) {
+		if (endDate != null && startDate != null && startDate.getDate() != null && endDate.getDate() != null)  {
+			if (startDate.getDate() instanceof DateTime	|| endDate.getDate() instanceof DateTime) {
 				event.setAllday(false);
-			} else {
-				event.setAllday(true);
+				return;
 			}
-		}
-
+		}		
+		event.setAllday(true);
 	}
 
 	private static void appendDuration(Event event, DtStart startDate,
@@ -959,27 +954,44 @@ public class Ical4jHelper {
 
 	public static void appendAlert(Event event, ComponentList cl) {
 		if (cl.size() > 0) {
-			VAlarm valarm = (VAlarm) cl.get(0);
+			
+			final VAlarm valarm = (VAlarm) cl.get(0);
 			if (valarm != null) {
-				Trigger trigger = valarm.getTrigger();
-				Dur dur = trigger.getDuration();
-				Dur durZero = new Dur(0, 0, 0, 0);
-				if (dur.equals(durZero)) {
-					event.setAlert(-1);
-				} else if (dur.isNegative()) {
-					dur = dur.negate();
+
+				if (isVAlarmRepeat(valarm)) {
+					final Trigger trigger = valarm.getTrigger();
+					
+					Dur dur = trigger.getDuration();
+					Dur durZero = new Dur(0, 0, 0, 0);
+					
+					if (dur.equals(durZero)) {
+						event.setAlert(-1);
+					} else if (dur.isNegative()) {
+						dur = dur.negate();
+					}
+					
+					int day = (dur.getWeeks() * 7) + dur.getDays();
+					int hours = (day * 24) + dur.getHours();
+					int min = (hours * 60) + dur.getMinutes();
+					int sec = min * 60 + dur.getSeconds();
+					
+					event.setAlert(sec);	
 				}
-				int day = (dur.getWeeks() * 7) + dur.getDays();
-				int hours = (day * 24) + dur.getHours();
-				int min = (hours * 60) + dur.getMinutes();
-				int sec = min * 60 + dur.getSeconds();
-				event.setAlert(sec);
+				
 				return;
 			}
 		}
 		event.setAlert(-1);
 	}
 
+	private static boolean isVAlarmRepeat(final VAlarm valarm) {
+		final Repeat repeat = valarm.getRepeat();
+		if (repeat != null) {
+			return true;
+		}
+		return false;
+	}
+	
 	public static void appendRecurence(Event event, CalendarComponent component) {
 		RRule rrule = (RRule) component.getProperties().getProperty(
 				Property.RRULE);
