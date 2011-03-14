@@ -459,7 +459,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		ps.setInt(idx++, RFC2445.getPriorityOrDefault(ev.getPriority()));
 		ps.setInt(idx++, ev.getPrivacy());
-		ps.setTimestamp(idx++, new Timestamp(ev.getDate().getTime()));
+		if (ev.getDate() != null) {
+			ps.setTimestamp(idx++, new Timestamp(ev.getDate().getTime()));
+		} else {
+			ps.setNull(idx++, Types.DATE);
+		}
 		ps.setInt(idx++, ev.getDuration());
 		ps.setBoolean(idx++, ev.isAllday());
 		EventRecurrence r = ev.getRecurrence();
