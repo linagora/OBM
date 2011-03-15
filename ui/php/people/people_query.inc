@@ -921,7 +921,7 @@ function run_query_people_get_admin($delegation) {
   if(count($profiles) > 0) {
     $query = "SELECT userobm_id, userobm_delegation_target FROM UserObm 
       WHERE '$delegation' #LIKE #CONCAT(userobm_delegation_target ,'%') AND userobm_perms IN ('".implode("','", $profiles)."') $multidomain
-      ORDER BY userobm_delegation_target DESC";
+      AND userobm_archive=0 ORDER BY userobm_delegation_target DESC";
     $obm_q->xquery($query);
     while($obm_q->next_record()) {
       if(!$minDelegation) $minDelegation = strtolower($obm_q->f('userobm_delegation_target'));
