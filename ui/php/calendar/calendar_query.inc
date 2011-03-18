@@ -42,6 +42,7 @@ function run_query_calendar_detail($calendar_id) {
     event_owner,
     o.userobm_lastname AS owner_lastname,
     o.userobm_firstname AS owner_firstname,
+    d.domain_name AS owner_domain,
     event_opacity,
     event_title,
     event_description,
@@ -74,6 +75,7 @@ function run_query_calendar_detail($calendar_id) {
     INNER JOIN UserObm AS c ON event_usercreate = c.userobm_id
     LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
     INNER JOIN UserObm AS o ON event_owner = o.userobm_id
+    INNER JOIN Domain AS d ON d.domain_id = o.userobm_domain_id
     LEFT JOIN EventTag AS t ON event_tag_id = t.eventtag_id
     LEFT JOIN EventException AS ee ON event_id = ee.eventexception_child_id
     WHERE event_type='VEVENT'

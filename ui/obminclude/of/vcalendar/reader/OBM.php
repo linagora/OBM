@@ -110,8 +110,6 @@ class Vcalendar_Reader_OBM {
         $timezone = $exceptions->f('event_timezone');
         if ($timezone) $date->setOriginalTimeZone($timezone);
         $this->addExdate($this->vevents[$exceptions->f('eventexception_parent_id')] , $date);
-        
-        
         $enddate = clone $date;
         $enddate->addSecond(3600);
         $this->addExdate($this->vevents[$exceptions->f('eventexception_parent_id')] , $enddate);
@@ -158,6 +156,7 @@ class Vcalendar_Reader_OBM {
     $vevent->set('class', $this->parsePrivacy($data['event_privacy']));
     if($data['event_priority']) $vevent->set('priority', $this->parsePriority($data['event_priority']));
     $vevent->set('organizer', $data['event_owner']);
+    $vevent->set('x-obm-domain', $data['owner_domain']);
     $vevent->set('location', $data['event_location']);
     $vevent->set('categories', array($data['eventcategory1_label']));
     $vevent->set('x-obm-color', $data['event_color']);
