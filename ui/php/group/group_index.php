@@ -369,8 +369,12 @@ if (($action == 'index') || ($action == '')) {
 
 } elseif ($action == 'import_file') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_group_import_file_run($params);
-
+  if ( !array_key_exists("fi_file", $_FILES) || !file_exists($_FILES["fi_file"]["tmp_name"])) {
+    $display['msg'] .=  display_err_msg("$l_file_error");
+    $display['detail'] = dis_group_import_index();
+  } else {
+    $display['detail'] = dis_group_import_file_run($params);
+  }
 } elseif ($action == 'admin') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_group_admin_index();
