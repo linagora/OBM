@@ -2417,10 +2417,10 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   $repeatfrequency = $calendar['repeatfrequency'];
   $date_exception = $calendar['date_exception'];
   $allow_documents = ($calendar['allow_documents'] != 1) ? 0 : 1;
-  $force_insertion = $calendar['force'];
+  $force_insertion = $calendar['force'] ? 'true' : 'false';
   $opacity = $calendar['opacity'];
-  $show_user_calendar = $calendar['show_user_calendar'];
-  $show_resource_calendar = $calendar['show_resource_calendar'];
+  $show_user_calendar = $calendar['show_user_calendar'] ? 'true' : 'false';
+  $show_resource_calendar = $calendar['show_resource_calendar'] ? 'true' : 'false';
   
   $user_ids = is_array($calendar['sel_user_id']) ? "'".implode(',', $calendar['sel_user_id'])."'" : 'NULL';
   $contact_ids = is_array($calendar['sel_contact_id']) ? "'".implode(',', $calendar['sel_contact_id'])."'" : 'NULL';
