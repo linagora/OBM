@@ -903,7 +903,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
       <legend>$GLOBALS[l_backup_ftp_servers]</legend>
         <table>
         <tr>
-        <th>$GLOBALS[l_header_select_backupftpserver]<a href=\'\' onclick=\"copyField($('ftp_server').getLast(), $('ftp_server'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add ftpserver]\" /></a></th>
+        <th>$GLOBALS[l_header_select_backupftpserver]<a href=\'\' onclick=\"copyField($('obm_backupFtpServer').getLast(), $('obm_backupFtpServer'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add ftpserver]\" /></a></th>
         <td id='obm_backupFtpServer'>
           $backup_ftp_list
           <div class=\"multiple\">
