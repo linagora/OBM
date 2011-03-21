@@ -214,7 +214,7 @@ if ($action == 'search') {
     );
   } else {
     $entities = array(
-      'user' => $current_view->get_users(),
+      'user' => array($obm['uid']),
       'resource' => $current_view->get_resources(),
       'contact' => $current_view->get_contacts()
     );
