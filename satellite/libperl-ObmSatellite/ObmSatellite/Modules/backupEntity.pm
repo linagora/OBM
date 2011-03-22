@@ -1865,33 +1865,24 @@ sub _searchParentDelegation {
    foreach my $ldapEntity (@{$ldapEntities}) {
        push(@deleg,$ldapEntity->get_value('delegation')) ;
    }
-   # search for delagation
-   my @arr_delegation = split("",$entityDelegation) ;
-   my $res_before = -1 ;
-   foreach my $search (@deleg) {
-     if ( length($search) > length($entityDelegation) ) {
-       next ;
-     }
-     else {
-       my @arr_search = split("",$search) ;
-       my $res = 0 ;
-       my $index = 0 ;
-       foreach my $char ( @arr_search ) {
-         if ( $char eq $arr_delegation[$index]) {
-           $res++ ;
-         }
-         $index++ ;
-       }
-       # On prend la delegation avec le plus grand nombre de caratere correspondant a la delegation de l'entit
-       if ( $res > $res_before ) {
-         $best_deleg = $search ;
-       }
-       $res_before = $res
-     }
+   my @strEntityDelegation = split("",$entityDelegation) ;
+   foreach my $char ( @strEntityDelegation ) {
+        chop($entityDelegation) ;
+        foreach my $ftpDelegation ( @deleg ) {
+                if ( $entityDelegation eq $ftpDelegation) {
+                        $best_deleg = $ftpDelegation ;
+                        last ;
+                }
+        }
    }
-   return $best_deleg ;
-
+   if ( $best_deleg ne "" ) {
+        return $best_deleg ;
+   }
+   else {
+        return undef;
+   }
 }
+
 
 # Perldoc
 
