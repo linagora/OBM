@@ -1968,6 +1968,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $event = $occurrence->event;
   $owner = $event->owner;
   $owner_name = phpStringToJsString($event->owner_name);
+  $organizer_name = phpStringToJsString($event->organizer_name);
 
   if ($owner == $obm['uid'] || in_array($owner,$writable_entity['ids'])) {
     $updatable =  true;
@@ -2047,6 +2048,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "colors: {event: {body:'$eventColor[body]', header:'$eventColor[header]'}}";
   //$ed[] = "colors: {event: {body:'".$event->color."'}}";
   $ed[] = "status:'$entity_state'";
+  $ed[] = "organizer_name:'$organizer_name'";
   if (is_array($attendees))
     $ed[] = "attendees:[".implode(',',$attendees)."]";
   else
@@ -2893,7 +2895,20 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
   $id = $event_q->f('event_id');
   $is_exception = $event_q->f('event_is_exception');
-  
+
+  $organizer_display_name = null;
+  foreach($entities as $entityType => $entitiesLists){
+    if($entityType == "user" || $entityType == "contact"){
+      foreach ($entitiesLists['entity'] as $entity){
+        if($entity['is_organizer']){
+          $organizer_display_name = $entity['label'];
+          break;
+        }
+      }
+      if($organizer_display_name) break;
+    }
+  }
+
   if ($event_q->f('event_privacy') == 0 || 
       $event_q->f('event_owner') == $obm['uid'] ||
       in_array($obm['uid'],$entities['user']['ids'])) {
@@ -3321,6 +3336,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   <tr>
     <th>$l_owner :</th>
     <td>$owner_lastname $owner_firstname</td>
+  </tr>
+  <tr>
+    <th>".__("Organizer")." :</th>
+    <td>$organizer_display_name</td>
   </tr>
   <tr>
     <th>$l_location :</th>
@@ -3914,6 +3933,10 @@ function dis_calendar_quick_form($calendar_entity) {
             <td id='calendarQuickFormOwner'></td>
             </tr>
             <tr>
+            <th>".__("Organizer")."</th>
+            <td id=\"calendarQuickFormOrganizer\"></td>
+            </tr>
+            <tr>
             <th>$GLOBALS[l_location]</th>
             <td id='calendarQuickFormLocation'></td>
             </tr>
@@ -4096,6 +4119,23 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $repeatfrequency = 1;
   $uid = $obm['uid']; 
   $tagcolor = "#eff0f2" ; // backcolor by default
+  $organizerName = null;
+
+  // Gets the organizerName
+  foreach($users['entity'] as $userEntity){
+    if($userEntity["is_organizer"]){
+      $organizerName = $userEntity["label"];
+      break;
+    }
+  }
+  if(empty($organizerName) && is_array($contacts['entity'])){
+    foreach($contacts['entity'] as $contactEntity){
+      if($contactEntity["is_organizer"]){
+        $organizerName = $contactEntity["label"];
+        break;
+      }
+    }
+  }
 
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') || ($action == 'new' && $event_q != '') || ($action == 'edit_template')) {
     $is_exception = $event_q->f('event_is_exception');
@@ -4443,9 +4483,19 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   foreach ($possible_owners as $o) {
     $block_owner .= "
       <option value=\"$o[id]\" ".($o['id']==$owner ? "selected=\"selected\"" : "").">$o[label]</option>";
+
+    if(empty($organizerName) && $o['id']==$owner) $organizerName = $o[label];
   }
   $block_owner .= "
     </select>
+    </td>";
+
+  $block_organizer = "
+    <th>
+      ".__("Organizer")."
+    </th>
+    <td>
+      <span>$organizerName</span>
     </td>";
   
   $dis_others_attendees = dis_calendar_mail_field($others_attendees, $class);
@@ -4942,6 +4992,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   </tr> 
   <tr>
     $block_owner
+  </tr>
+  <tr>
+    $block_organizer
   </tr>
   <tr>
     <th>$l_location</th>

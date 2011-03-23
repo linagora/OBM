@@ -2028,6 +2028,7 @@ Obm.CalendarQuickForm = new Class({
     this.item = $('calendarQuickFormItem');
     this.owner = $('calendarQuickFormOwner');
     this.location = $('calendarQuickFormLocation');
+    this.organizer = $('calendarQuickFormOrganizer');
     this.category = $('calendarQuickFormCategory');
     this.attendees = $('calendarQuickFormAttendees');
     this.deleteButton = $('calendarQuickFormDelete');
@@ -2140,6 +2141,8 @@ Obm.CalendarQuickForm = new Class({
     this.category.set('html',evt.event.category);
     this.owner.set('html',evt.event.owner_name);
     this.location.set('html',evt.event.location);
+    this.organizer.set('html',evt.event.organizer_name);
+
     this.data.setStyle('display','block');
     if (!this.eventData.all_day) {
       if (date_begin.format('Ymd') == date_end.format('Ymd')) {

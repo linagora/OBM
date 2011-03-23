@@ -1140,7 +1140,7 @@ function run_icalendar_obmsync_insert($ics){
   $loginPath = "/obm-sync/services/login/doLogin";
   $username = $userInfo["login"];
   $password = $userInfo["password"];
-  $origin= "what_is_origin";
+  $origin= $obm['domain_name'];
 
   $loginUrl = $obmSyncRootPath.$loginPath."?login=".$username."&password=".$password."&origin=".$origin;
   $xmlLogin = new DomDocument();
@@ -4132,6 +4132,7 @@ function run_query_get_events_attendee($events, $with_resources = true, $with_co
     eventlink_state,
     userentity_user_id as eventlink_entity_id,
     'user' as eventlink_entity,
+    eventlink_is_organizer,
     ".DB_OBM::CONCAT(array("userobm_lastname", "' '", "userobm_firstname"))." as eventlink_label
     FROM Event
     INNER JOIN EventLink ON eventlink_event_id = event_id
@@ -4146,6 +4147,7 @@ function run_query_get_events_attendee($events, $with_resources = true, $with_co
     eventlink_state,
     resourceentity_resource_id as eventlink_entity_id,
     'resource' as eventlink_entity,
+    eventlink_is_organizer,
     resource_name as eventlink_label
     FROM Event
     INNER JOIN EventLink ON eventlink_event_id = event_id
@@ -4160,6 +4162,7 @@ function run_query_get_events_attendee($events, $with_resources = true, $with_co
     eventlink_state,
     contactentity_contact_id as eventlink_entity_id,
     'contact' as eventlink_entity,
+    eventlink_is_organizer,
     ".DB_OBM::CONCAT(array("contact_lastname", "' '", "contact_firstname"))." as eventlink_label
     FROM Event
     INNER JOIN EventLink ON eventlink_event_id = event_id
@@ -4434,6 +4437,9 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $entity_state = $attendee_q->f('eventlink_state');
       $entity_label = $attendee_q->f('eventlink_label');
       $event = $of->events[$id];
+      if($attendee_q->f('eventlink_is_organizer')){
+        $event->setOrganizerName($entity_label);
+      }
       $event->addAttendee($entity,$entity_id,$entity_label,$entity_state);
     }
   }
@@ -5242,6 +5248,7 @@ Class Event {
   var $all_day;
   var $owner;
   var $owner_name;
+  var $organizer_name;
   var $color;
   var $tag ;
   var $timezone;
@@ -5266,7 +5273,7 @@ Class Event {
    * @access public
    * @return void
    */
-  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color,$opacity,$tag,$external=false) {
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color,$opacity,$tag,$external=false, $organizerName=null) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
@@ -5284,6 +5291,7 @@ Class Event {
     $this->opacity = $opacity;
     $this->tag = $tag;
     $this->external = $external;
+    $this->organizer_name = $organizerName != null ? $organizerName : $owner_name;
   }
 
   /**
@@ -5354,6 +5362,10 @@ Class Event {
    */
   function addAttendee($entity,$entity_id,$entity_label, $entity_state) {
     $this->attendee[$entity][$entity_id] = $entity_label.'('.$GLOBALS["l_".strtolower(str_replace('-', '_', $entity_state))].')';
+  }
+
+  function setOrganizerName($organizerName){
+    $this->organizer_name = $organizerName;
   }
 
 }
