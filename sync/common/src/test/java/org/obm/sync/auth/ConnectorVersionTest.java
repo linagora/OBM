@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ConnectorVersionTest {
-
+	
 	@Test
 	public void compareEquals() {
 		Version  c1 = new Version(1, 2, 3, 4);
@@ -30,14 +30,14 @@ public class ConnectorVersionTest {
 	public void compareReleaseHigher() {
 		Version  c1 = new Version(1, 2, 4, 4);
 		Version  c2 = new Version(1, 2, 3, 4);
-		Assert.assertEquals(10, c1.compareTo(c2));
+		Assert.assertEquals(1, c1.compareTo(c2));
 	}
 	
 	@Test
 	public void compareSubReleaseHigher() {
 		Version  c1 = new Version(1, 2, 3, 5);
 		Version  c2 = new Version(1, 2, 3, 4);
-		Assert.assertEquals(10, c1.compareTo(c2));
+		Assert.assertEquals(1, c1.compareTo(c2));
 	}
 	
 	@Test
@@ -58,13 +58,20 @@ public class ConnectorVersionTest {
 	public void compareReleaseLower() {
 		Version  c1 = new Version(1, 2, 2, 4);
 		Version  c2 = new Version(1, 2, 3, 4);
-		Assert.assertEquals(-10, c1.compareTo(c2));
+		Assert.assertEquals(-1, c1.compareTo(c2));
 	}
 	
 	@Test
 	public void compareSubReleaseLower() {
 		Version  c1 = new Version(1, 2, 3, 3);
 		Version  c2 = new Version(1, 2, 3, 4);
-		Assert.assertEquals(-10, c1.compareTo(c2));
+		Assert.assertEquals(-1, c1.compareTo(c2));
+	}
+	
+	@Test
+	public void compareWithInteger() {
+		Version  c1 = new Version(1, 2, new Integer(3), new Integer(3));
+		Version  c2 = new Version(1, 2, new Integer(3), new Integer(3));
+		Assert.assertEquals(0, c1.compareTo(c2));
 	}
 }

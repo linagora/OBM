@@ -59,12 +59,28 @@ public class Version implements Comparable<Version> {
 			return major > o.major ? 10 : -10;
 		} else if (minor != o.minor) {
 			return minor > o.minor ? 10 : -10;
-		} else if (release != o.release) {
-			return release > o.release ? 10 : -10;
-		} else if (subRelease != o.subRelease) {
-			return subRelease > o.subRelease ? 10 : -10;
+		} else if (compareInteger(release,o.release) != 0) {
+			return compareInteger(release,o.release);
+		} else if (compareInteger(subRelease, o.subRelease) != 0) {
+			return compareInteger(subRelease, o.subRelease);
 		}
 		return 0;
+	}
+	
+	private int compareInteger(Integer lhs, Integer rhs) {
+		if (lhs == null) {
+			if (rhs == null) {
+				return 0;
+			} else {
+				return -1;
+			}
+		} else {
+			if (rhs == null) {
+				return 0;
+			} else {
+				return lhs - rhs;
+			}
+		}
 	}
 	
 	@Override
