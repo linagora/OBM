@@ -48,22 +48,23 @@ function html_vacation_consult($usr_q) {
   <h1>$l_vacation</h1>
 
   <table>
-  <tr>
-    <th>$l_vacation_enabled</th>
-    <td>$status</td>
-  </tr>
-   <tr>
-      <th>$l_vacation_datebegin</th>
-      <td>$vacation_datebegin</td>
+    <tr>
+      <th>$l_vacation_enabled</th>
+      <td>$status</td>
     </tr>
     <tr>
-      <th>$l_vacation_dateend</th>
-      <td>$vacation_dateend</td>
+      <th>".__("Vacation programmation")."</th>
+      <td>"
+        .__(
+             "The vacation message will be on starting the %date_start% and until the %date_end%",
+             array("%date_start%"=>$vacation_datebegin, "%date_end%"=>$vacation_dateend)
+           ).
+      "</td>
     </tr>
-  <tr>
-    <th>$l_vacation_message</th>
-    <td>$message</td>
-  </tr>
+    <tr>
+      <th>$l_vacation_message</th>
+      <td>$message</td>
+    </tr>
   </table>
   </div>";
   
