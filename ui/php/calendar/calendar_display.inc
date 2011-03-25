@@ -498,7 +498,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       <input type='text' name='' value='' id='contactSearch' autocomplete='off' />
     </fieldset>";
   $contact_complete = "
-    new obm.AutoComplete.Search('$GLOBALS[path]/contact/contact_index.php?action=ext_search_mail', 'sel_ent', 'contactSearch')";
+    new obm.AutoComplete.Search('$GLOBALS[path]/contact/contact_index.php?action=ext_search_mail&fromMyContacts=1&withCalendar=1', 'sel_ent', 'contactSearch')";
 
   $block_entity = "
   $block_group

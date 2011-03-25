@@ -554,6 +554,15 @@ class OBM_Contact implements OBM_ISearchable {
       $doc->setMultiValue('country', $address['country']);
     }
 
+    if($contact->getCalendar()){
+      echo $calendar->id." true <br />";
+      $doc->setField('hasACalendar', "true");
+    }
+    else {
+      echo $calendar->firstname." false <br />";
+      $doc->setField('hasACalendar', "false");
+    }
+
     OBM_IndexingService::store('contact', array($doc));
   }
   

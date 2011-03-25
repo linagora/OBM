@@ -1758,6 +1758,12 @@ function run_query_contact_ext_search($contact) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $pattern = '('.$contact['pattern']."* OR "."email:".$contact['pattern']."*) AND -is:archive ";
+  if($contact["withCalendar"]){
+    $pattern .= " AND hasACalendar:true";
+  }
+  if($contact["fromMyContacts"]){
+    $pattern .= " AND -in:collected_contacts AND -in:public_contacts";
+  }
   $addressbook_id = $contact['addressbook_id'];
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('contact');
