@@ -14,6 +14,7 @@
     </fieldType>
     <fieldType name="date" class="solr.DateField"/>
     <fieldType name="integer" class="solr.IntField"/>
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true" />
   </types>
 
   <fields>   
@@ -77,6 +78,7 @@
     <field name="comment" type="text" indexed="true" stored="false"  multiValued="true" /> 
     <field name="displayname" type="text" indexed="true" stored="false"  multiValued="true" /> 
     <field name="sortable" type="string" indexed="true" stored="false"  multiValued="false" /> 
+    <field name="hasACalendar" type="boolean" indexed="true" stored="false"  multiValued="false" /> 
 
   </fields>
 

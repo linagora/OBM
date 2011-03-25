@@ -147,6 +147,8 @@ def index_contact(domain, domain_name, solr):
 		if sql_is_true(rows[i][32]):
 			contact.appendChild(solr_set_field(doc, 'is', 'newsletter'))
 
+                hasACalendar = contact_count_calendars(rows[i][0])[0][0] > 0
+                contact.appendChild(solr_set_field(doc, 'hasACalendar', hasACalendar))
 		# Coords
 		coords = contact_get_coords(rows[i][0])
 
@@ -398,6 +400,16 @@ def contact_get_categories(contact_id):
       INNER JOIN ContactEntity ON contactentity_entity_id = categorylink_entity_id
       WHERE contactentity_contact_id='"""+str(contact_id)+"""'
       ORDER BY contactentity_contact_id, category_category, category_code, category_label""")
+	rows = cur.fetchall()
+	return rows
+
+def contact_count_calendars(contact_id):
+	cur = ds.cursor()
+	cur.execute("""SELECT COUNT(website_entity_id)
+      FROM Contact
+      INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+      LEFT JOIN Website ON website_entity_id = contactentity_entity_id AND website_label LIKE 'CALURI%'
+      WHERE contact_id ='"""+str(contact_id)+"""';""")
 	rows = cur.fetchall()
 	return rows
 
