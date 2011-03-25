@@ -2030,7 +2030,7 @@ function run_query_calendar_reset_event_links($users, $contacts, $resources, $ev
   if (is_array($users)) {
     $users = array_unique($users);
     foreach ($users as $user_id) {
-      if (!$user_id == $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
+      if ($user_id != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
         run_query_calendar_update_entity_event('user', $user_id, $event_id, 'NEEDS-ACTION');
       }
     }
