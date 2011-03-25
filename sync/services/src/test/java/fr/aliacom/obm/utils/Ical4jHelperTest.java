@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -59,6 +60,10 @@ import org.obm.sync.calendar.RecurrenceKind;
 
 public class Ical4jHelperTest {
 
+	private Calendar getCalendar() {
+		return new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+	}
+	
 	protected AccessToken getMockAccessToken() {
 		AccessToken at = new AccessToken(1, 1, "unitTest");
 		at.setDomain("test.tlse.lng");
@@ -68,7 +73,7 @@ public class Ical4jHelperTest {
 	protected Event getTestEvent() {
 		Event ev = new Event();
 
-		Calendar cal = new GregorianCalendar();
+		Calendar cal = getCalendar();
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
@@ -133,7 +138,7 @@ public class Ical4jHelperTest {
 
 	@Test
 	public void testGetRecur() {
-		Calendar cal = new GregorianCalendar();
+		Calendar cal = getCalendar();
 		cal.setTime(new Date());
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
@@ -185,7 +190,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetIsAllDay() {
 
-		Calendar cal = new GregorianCalendar();
+		Calendar cal = getCalendar();
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
@@ -217,7 +222,8 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetDuration() {
 
-		Calendar cal = new GregorianCalendar();
+		Calendar cal = getCalendar();
+		cal.set(Calendar.HOUR, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
@@ -435,7 +441,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetExDate() {
 		Event event = new Event();
-		Calendar cal = new GregorianCalendar();
+		Calendar cal = getCalendar();
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
@@ -532,7 +538,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetDtEnd() {
 		Event event = new Event();
-		Calendar cal = new GregorianCalendar();
+		Calendar cal = getCalendar();
 		cal.set(Calendar.MILLISECOND, 0);
 		event.setDate(cal.getTime());
 		event.setDuration(3600);
@@ -545,7 +551,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetDtStart() {
 		Event event = new Event();
-		Calendar cal = new GregorianCalendar();
+		Calendar cal = getCalendar();
 		cal.set(Calendar.MILLISECOND, 0);
 		event.setDate(cal.getTime());
 		DtStart dtstart = Ical4jHelper.getDtStart(event.getDate(),
@@ -588,7 +594,7 @@ public class Ical4jHelperTest {
 
 	@Test
 	public void testGetRRule() {
-		Calendar cal = new GregorianCalendar();
+		Calendar cal = getCalendar();
 		cal.setTime(new Date());
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
