@@ -333,7 +333,7 @@ public class EventChangeMailer extends AbstractMailer{
 			.put("user", attendeeUpdated.getDisplayName())
 			.put("participationState", state)
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
-			.put("start", new SimpleDate(event.getDate(), TemplateDateModel.DATETIME));
+			.put("start", new SimpleDate(event.getDate(), TemplateDateModel.DATE));
 		return datamodel;
 	}
 	
