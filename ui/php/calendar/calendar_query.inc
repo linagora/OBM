@@ -1140,7 +1140,7 @@ function run_icalendar_obmsync_insert($ics){
   $loginPath = "/obm-sync/services/login/doLogin";
   $username = $userInfo["login"];
   $password = $userInfo["password"];
-  $origin= $obm['domain_name'];
+  $origin= $GLOBALS['c_origin_web'];
 
   $loginUrl = $obmSyncRootPath.$loginPath."?login=".$username."&password=".$password."&origin=".$origin;
   $xmlLogin = new DomDocument();
