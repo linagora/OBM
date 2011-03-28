@@ -11660,9 +11660,17 @@ CREATE TABLE opush_sync_mail (
         collection_id   INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
         device_id       INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
         mail_uid        INTEGER NOT NULL,
-	is_read         boolean default false
+	is_read         boolean default false,
+	timestamp       TIMESTAMP NOT NULL
 );
 
+
+CREATE TABLE opush_sync_deleted_mail (
+        collection_id   INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
+        device_id       INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
+        mail_uid        INTEGER NOT NULL,
+        timestamp       TIMESTAMP NOT NULL
+);
 
 --
 -- Table structure for table `opush_ping_heartbeat`

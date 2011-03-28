@@ -3770,17 +3770,33 @@ CREATE TABLE `opush_sync_perms` (
 --
 -- Table structure for table `opush_sync_mail`
 --
-
 DROP TABLE IF EXISTS `opush_sync_mail`;
 CREATE TABLE opush_sync_mail (
         `collection_id`   INTEGER NOT NULL,
         `device_id`       INTEGER NOT NULL,
         `mail_uid`        INTEGER NOT NULL,
 	`is_read` 	  boolean default 0,
+	`timestamp`       timestamp NOT NULL,
         KEY `opush_sync_mail_collection_id_opush_folder_mapping_id_fkey` (`collection_id`),
         KEY `opush_sync_mail_device_id_opush_device_id_fkey` (`device_id`),
         CONSTRAINT `opush_sync_mail_collection_id_opush_folder_mapping_id_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE,
         CONSTRAINT `opush_sync_mail_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+--
+-- Table structure for table `opush_sync_deleted_mail`
+--
+DROP TABLE IF EXISTS `opush_sync_deleted_mail`;
+CREATE TABLE opush_sync_deleted_mail (
+        `collection_id`   INTEGER NOT NULL,
+        `device_id`       INTEGER NOT NULL,
+        `mail_uid`        INTEGER NOT NULL,
+        `timestamp`       timestamp NOT NULL,
+        KEY `opush_sync_deletedmail_collection_id_folder_mapping_id_fkey` (`collection_id`),
+        KEY `opush_sync_deletedmail_device_id_device_id_fkey` (`device_id`),
+        CONSTRAINT `opush_sync_deletedmail_collection_id_folder_mapping_id_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE,
+        CONSTRAINT `opush_sync_deletedmail_device_id_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
