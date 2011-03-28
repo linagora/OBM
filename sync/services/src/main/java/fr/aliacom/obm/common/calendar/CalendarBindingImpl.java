@@ -156,8 +156,6 @@ public class CalendarBindingImpl implements ICalendar {
 	public Event removeEvent(AccessToken token, String calendar, String eventId, boolean notification)
 			throws AuthFault, ServerFault {
 		try {
-			// only remove if logged user is owner
-			// or as write right on owner
 			int uid = Integer.valueOf(eventId);
 			Event ev = calendarService.findEvent(token, uid);
 
@@ -167,23 +165,20 @@ public class CalendarBindingImpl implements ICalendar {
 				return null;
 			}
 
-			String owner = ev.getOwner();
+			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
+			ObmUser owner = getCalendarOwner(ev.getOwner(), token.getDomain());
 			if (owner != null) {
-				if (helper.canWriteOnCalendar(token, owner)) {
-					ev = calendarService.removeEvent(token, uid, ev.getType());
-					logger.info(LogUtils.prefix(token) + "Calendar : event[" + uid + "] removed");
-					if (notification) {
-						notifyOnRemoveEvent(token, calendar, ev);
+				if (helper.canWriteOnCalendar(token, calendar)) {
+					if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
+						return cancelEvent(token, calendar, notification, uid, ev);
+					} else {
+						changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, notification);
+						return calendarService.findEvent(token, uid);
 					}
-					return ev;
 				}
-				if (helper.canReadCalendar(token, owner)) {
-					logger.info(LogUtils.prefix(token)
-							+ "remove not allowed of " + ev.getTitle());
-					return ev;
-				}
-				logger.info(LogUtils.prefix(token) + "read not allowed of "
-						+ ev.getTitle());
+				
+				logger.info(LogUtils.prefix(token) + "remove not allowed of " + ev.getTitle());
+				return ev;
 			} else {
 				logger.info(LogUtils.prefix(token)
 						+ "try to remove an event without owner "
@@ -197,6 +192,29 @@ public class CalendarBindingImpl implements ICalendar {
 		return null;
 	}
 
+	private Event cancelEvent(AccessToken token, String calendar,
+			boolean notification, int uid, Event ev) throws SQLException,
+			FindException {
+		Event removed = calendarService.removeEvent(token, uid, ev.getType());
+		logger.info(LogUtils.prefix(token) + "Calendar : event[" + uid + "] removed");
+		if (notification) {
+			notifyOnRemoveEvent(token, calendar, removed);
+		}
+		return removed;
+	}
+
+	private Event cancelEventByExtId(AccessToken token, ObmUser calendar, Event event, boolean notification) throws SQLException, FindException {
+		String extId = event.getExtId();
+		Event removed = calendarService.removeEventByExtId(token, calendar, extId);
+		logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
+		
+		if (notification) {
+			notifyOnRemoveEvent(token, calendar.getEmailAtDomain(), removed);
+		}
+		return removed;
+	}
+
+	
 	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event ev) throws FindException {
 		if (ev.isInternalEvent()) {
 			eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
@@ -211,8 +229,6 @@ public class CalendarBindingImpl implements ICalendar {
 			String extId, boolean notification) throws AuthFault, ServerFault {
 		try {
 			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
-			// only remove if logged user is owner
-			// or as write right on owner
 			final Event ev = calendarService.findEventByExtId(token, calendarUser, extId);
 
 			if (ev == null) {
@@ -220,18 +236,23 @@ public class CalendarBindingImpl implements ICalendar {
 				return ev;
 			} else {
 
-				if (ev.getOwner() != null && !helper.canWriteOnCalendar(token, ev.getOwner())) {
+				if (!helper.canWriteOnCalendar(token, calendar)) {
 					logger.info(LogUtils.prefix(token) + "remove not allowed of " + ev.getTitle());
 					return ev;
 				}
 
-				calendarService.removeEventByExtId(token, calendarUser, extId);
-				logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
-				
-				if (notification) {
-					notifyOnRemoveEvent(token, calendar, ev);
+				ObmUser owner = getCalendarOwner(ev.getOwner(), token.getDomain());
+				if (owner == null) {
+					logger.info(LogUtils.prefix(token) + "error, trying to remove an event without any owner : " + ev.getTitle());
+					return ev;
 				}
-				return ev;
+				
+				if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
+					return cancelEventByExtId(token, calendarUser, ev, notification);
+				} else {
+					changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, notification);
+					return calendarService.findEventByExtId(token, calendarUser, extId);
+				}
 			}
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -922,25 +943,34 @@ public class CalendarBindingImpl implements ICalendar {
 			String extId, ParticipationState participationState, boolean notification) throws ServerFault {
 		if (helper.canWriteOnCalendar(token, calendar)) {
 			try {
-				//We should handle all this in a transaction, but we don't, so
-				//when event is not found, we just don't send change event
-				ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
-				boolean changed = calendarService.changeParticipationState(token, calendarOwner, extId, participationState);
-				Event newEvent = calendarService.findEventByExtId(token, calendarOwner, extId);
-				if (newEvent != null) {
-					if (notification) {
-						eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
-								settingsDao.getUserLanguage(token));
-					}
-				} else {
-					logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
-				}
-				return changed;
+				return changeParticipationStateInternal(token, calendar, extId, participationState, notification);
 			} catch (Exception e) {
 				throw new ServerFault("no user found with calendar " + calendar);
 			}
 		}
 		throw new ServerFault("user has no write rights on calendar " + calendar);
+	}
+
+	private boolean changeParticipationStateInternal(AccessToken token,
+			String calendar, String extId,
+			ParticipationState participationState, boolean notification)
+			throws FindException, SQLException {
+		
+		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
+		boolean changed = calendarService.changeParticipationState(token, calendarOwner, extId, participationState);
+		logger.info(LogUtils.prefix(token) + 
+				"Calendar : event[extId:" + extId + "] change participation state for user " + 
+				calendarOwner.getEmailAtDomain() + " new state : " + participationState);
+		Event newEvent = calendarService.findEventByExtId(token, calendarOwner, extId);
+		if (newEvent != null) {
+			if (notification) {
+				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
+						settingsDao.getUserLanguage(token));
+			}
+		} else {
+			logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
+		}
+		return changed;
 	}
 
 	@Override
