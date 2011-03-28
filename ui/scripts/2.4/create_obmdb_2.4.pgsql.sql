@@ -1435,11 +1435,7 @@ CREATE TABLE mailinglist (
     mailinglist_usercreate integer DEFAULT NULL,
     mailinglist_owner integer NOT NULL,
     mailinglist_name character varying(64) NOT NULL,
-    CONSTRAINT mailinglist_pkey PRIMARY KEY (mailinglist_id),
-    CONSTRAINT mailinglist_domain_id_domain_id_fkey FOREIGN KEY (mailinglist_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT mailinglist_usercreate_userobm_id_fkey FOREIGN KEY (mailinglist_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL,
-    CONSTRAINT mailinglist_userupdate_userobm_id_fkey FOREIGN KEY (mailinglist_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL,
-    CONSTRAINT mailinglist_owner_userobm_id_fkey FOREIGN KEY (mailinglist_owner) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL
+    CONSTRAINT mailinglist_pkey PRIMARY KEY (mailinglist_id)
 );
 
 --
@@ -1450,8 +1446,7 @@ CREATE TABLE mailinglistemail (
   mailinglistemail_mailinglist_id integer NOT NULL,
   mailinglistemail_label character varying(255) NOT NULL,
   mailinglistemail_address character varying(255) NOT NULL,
-  CONSTRAINT mailinglistemail_pkey PRIMARY KEY (mailinglistemail_id),
-  CONSTRAINT mailinglistemail_mailinglist_id_mailinglist_id_fkey FOREIGN KEY (mailinglistemail_mailinglist_id) REFERENCES mailinglist(mailinglist_id) ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT mailinglistemail_pkey PRIMARY KEY (mailinglistemail_id)
 );
 
 --
@@ -4953,21 +4948,6 @@ ALTER TABLE ONLY deleted
 ALTER TABLE ONLY deletedaddressbook
     ADD CONSTRAINT deletedaddressbook_pkey PRIMARY KEY (addressbook_id);
   
-  
---
--- Name: deletedsyncedaddressbook_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY deletedsyncedaddressbook
-  ADD CONSTRAINT deletedsyncedaddressbook_pkey PRIMARY KEY (user_id, addressbook_id);
-
-ALTER TABLE ONLY deletedsyncedaddressbook
-    ADD CONSTRAINT deletedsyncedaddressbook_user_id_userobm_id_fkey FOREIGN KEY (user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE ONLY deletedsyncedaddressbook
-    ADD CONSTRAINT deletedsyncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
 --
 -- Name: deleteduser_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
@@ -11586,38 +11566,6 @@ CREATE TABLE P_CategoryLink (LIKE CategoryLink);
 INSERT INTO P_CategoryLink SELECT * FROM CategoryLink;
 
 --
--- Name: mailinglist; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-CREATE TABLE mailinglist (
-    mailinglist_id serial,
-    mailinglist_domain_id integer NOT NULL,
-    mailinglist_timeupdate timestamp without time zone,
-    mailinglist_timecreate timestamp without time zone DEFAULT now(),
-    mailinglist_userupdate integer DEFAULT NULL,
-    mailinglist_usercreate integer DEFAULT NULL,
-    mailinglist_owner integer NOT NULL,
-    mailinglist_name character varying(64) NOT NULL,
-    CONSTRAINT mailinglist_pkey PRIMARY KEY (mailinglist_id),
-    CONSTRAINT mailinglist_domain_id_domain_id_fkey FOREIGN KEY (mailinglist_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT mailinglist_usercreate_userobm_id_fkey FOREIGN KEY (mailinglist_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL,
-    CONSTRAINT mailinglist_userupdate_userobm_id_fkey FOREIGN KEY (mailinglist_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL,
-    CONSTRAINT mailinglist_owner_userobm_id_fkey FOREIGN KEY (mailinglist_owner) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL
-);
-
---
--- Name: mailinglistemail; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-CREATE TABLE mailinglistemail (
-  mailinglistemail_id serial,
-  mailinglistemail_mailinglist_id integer NOT NULL,
-  mailinglistemail_label character varying(255) NOT NULL,
-  mailinglistemail_address character varying(255) NOT NULL,
-  CONSTRAINT mailinglistemail_pkey PRIMARY KEY (mailinglistemail_id),
-  CONSTRAINT mailinglistemail_mailinglist_id_mailinglist_id_fkey FOREIGN KEY (mailinglistemail_mailinglist_id) REFERENCES mailinglist(mailinglist_id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-
---
 -- OPush tables
 --
 
@@ -11786,6 +11734,39 @@ CREATE INDEX userpattern_property_userpattern_id_userpattern_id_fkey ON userpatt
 ALTER TABLE ONLY userpattern_property
     ADD CONSTRAINT userpattern_property_userpattern_id_userpattern_id_fkey FOREIGN KEY (userpattern_id) REFERENCES userpattern(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+
+
+--
+-- mailinglist fkey
+--
+ALTER TABLE ONLY mailinglist
+    ADD CONSTRAINT mailinglist_domain_id_domain_id_fkey FOREIGN KEY (mailinglist_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY mailinglist
+    ADD CONSTRAINT mailinglist_usercreate_userobm_id_fkey FOREIGN KEY (mailinglist_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY mailinglist
+    ADD CONSTRAINT mailinglist_userupdate_userobm_id_fkey FOREIGN KEY (mailinglist_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY mailinglist
+    ADD CONSTRAINT mailinglist_owner_userobm_id_fkey FOREIGN KEY (mailinglist_owner) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
+-- mailinglistemail fkey
+--
+
+ALTER TABLE ONLY mailinglistemail
+    ADD CONSTRAINT mailinglistemail_mailinglist_id_mailinglist_id_fkey FOREIGN KEY (mailinglistemail_mailinglist_id) REFERENCES mailinglist(mailinglist_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Name: deletedsyncedaddressbook_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY deletedsyncedaddressbook
+  ADD CONSTRAINT deletedsyncedaddressbook_pkey PRIMARY KEY (user_id, addressbook_id);
+
+ALTER TABLE ONLY deletedsyncedaddressbook
+    ADD CONSTRAINT deletedsyncedaddressbook_user_id_userobm_id_fkey FOREIGN KEY (user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY deletedsyncedaddressbook
+    ADD CONSTRAINT deletedsyncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
 -- Table structure for table `field`
