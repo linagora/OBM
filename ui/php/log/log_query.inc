@@ -20,6 +20,10 @@ function get_log_mail_files() {
 
   $files = array();
 
+  if(!file_exists($clog_root)){
+    return array();
+  }
+  
   $log_dir = dir("$clog_root/");
   while ($entry=$log_dir->read()) {
     if (preg_match("/^mail.log(.*)(\.gz)?$/",$entry, $match)) {
@@ -64,8 +68,11 @@ function get_log_emails_from_users($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_users_view_log($params){
   global $clog_root;
-
   $filename = $params['file'];
+  // Stripcslashes to cancel the magic_quotes (aujourd'hui becomes aujourd\'hui which fails on fopen)
+  if (get_magic_quotes_gpc())
+    $filename = stripcslashes ($filename);
+  
   $pla = new PostfixLogAnalyser($params['sel_user_id']);
   if (preg_match('/.gz$/', $filename)) {
     $handle = gzopen($clog_root."/".$filename,"r");
