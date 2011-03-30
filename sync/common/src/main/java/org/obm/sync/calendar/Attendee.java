@@ -81,14 +81,13 @@ public class Attendee {
 		return false;
 	}
 
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
 				+ ((displayName == null) ? 0 : displayName.hashCode());
-		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.toLowerCase().hashCode());
 		result = prime * result + (obmUser ? 1231 : 1237);
 		result = prime * result + (organizer ? 1231 : 1237);
 		result = prime * result + percent;

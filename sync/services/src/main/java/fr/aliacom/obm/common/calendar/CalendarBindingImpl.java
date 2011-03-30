@@ -263,33 +263,35 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public Event modifyEvent(AccessToken token, String calendar, Event event,
-			boolean updateAttendees, boolean notification) throws AuthFault, ServerFault {
+	public Event modifyEvent(AccessToken token, String calendar, Event event, boolean updateAttendees, boolean notification) 
+		throws AuthFault, ServerFault {
 
 		if (event == null) {
-			logger.warn(LogUtils.prefix(token)
-					+ "Modify on NULL event: doing nothing");
+			logger.warn(LogUtils.prefix(token) + "Modify on NULL event: doing nothing");
 			return null;
 		}
+		
 		try {
-			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
-			Event before = loadCurrentEvent(token, calendarUser, event);
+			
+			final ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
+			final Event before = loadCurrentEvent(token, calendarUser, event);
 
 			if (before == null) {
-				logger.warn(LogUtils.prefix(token)
-						+ "Event[uid:"+ event.getUid() + "extId:" + event.getExtId() +
+				logger.warn(LogUtils.prefix(token) + "Event[uid:"+ event.getUid() + "extId:" + event.getExtId() +
 						"] doesn't exist in database: : doing nothing");
 				return null;
 			}
-			if (before.getOwner() != null
-					&& !helper.canWriteOnCalendar(token, before.getOwner())) {
+			
+			if (before.getOwner() != null && !helper.canWriteOnCalendar(token, before.getOwner())) {
 				logger.info(LogUtils.prefix(token) + "Calendar : "
 						+ token.getUser() + " cannot modify event["
 						+ before.getTitle() + "] because not owner"
 						+ " or no write right on owner " + before.getOwner()+". ParticipationState will be updated.");
 				return event;
-			} else{
-				if(before.isInternalEvent()){
+				
+			} else {
+				
+				if (before.isInternalEvent()) {
 					return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
 				} else {
 					return modifyExternalEvent(token, calendar, event, updateAttendees, notification);
@@ -305,7 +307,7 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) {
 		if (Strings.isNullOrEmpty(event.getUid())) {
-			Event currentEvent = calendarService.findEventByExtId(token, calendarUser, event.getExtId());
+			final Event currentEvent = calendarService.findEventByExtId(token, calendarUser, event.getExtId());
 			event.setUid(currentEvent.getUid());
 			return currentEvent;
 		} else {
@@ -317,17 +319,17 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event modifyInternalEvent(AccessToken token, String calendar, Event before,  Event event,
 			boolean updateAttendees, boolean notification) throws ServerFault {
 		try{
-			changePartipationStateOnNewWritableCalendar(token, before, event);
-			Event after = calendarService.modifyEvent(token, calendar, event, updateAttendees, true);
-
+			prepareParticipationStateForNewEventAttendees(token, before, event);
+			
+			final Event after = calendarService.modifyEvent(token, calendar, event, updateAttendees, true);
 			if (after != null) {
-				logger.info(LogUtils.prefix(token) + "Calendar : internal event["
-						+ after.getTitle() + "] modified");
+				logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
 			}
+			
 			if (notification) {
-				eventChangeHandler.update(token, before, after,
-						settingsDao.getUserLanguage(token));
+				eventChangeHandler.update(token, before, after, settingsDao.getUserLanguage(token));
 			}
+			
 			return after;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -484,19 +486,32 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private List<Attendee> changePartipationStateOnNewWritableCalendar(AccessToken token,  Event before, Event event) {
-		List<Attendee> newAtt = Lists.newLinkedList();
-		for(Attendee att : event.getAttendees()){
-			if(!before.getAttendees().contains(att)){
-				acceptePartipationStateIfCanWriteOnCalendar(token, att);
+	private void prepareParticipationStateForNewEventAttendees(final AccessToken token,  final Event before, final Event event) {
+		for (final Attendee currentAtt : event.getAttendees()) {
+			for (final Attendee beforeAtt: before.getAttendees()) {
+				if (currentAtt.equals(beforeAtt)) {
+					prepareParticipationStateForAttendee(token, currentAtt);
+					break;
+				}	
 			}
 		}
-		return newAtt;
+	}
+	
+	private void prepareParticipationStateForAttendee(final AccessToken token, final Attendee att) {
+		try {
+			if (helper.canWriteOnCalendar(token,  att.getEmail())) {
+				att.setState(ParticipationState.ACCEPTED);
+			} else {
+				att.setState(ParticipationState.NEEDSACTION);
+			}
+		} catch (Exception e) {
+			logger.error("Error while checks right on calendar: "+ att.getEmail(), e);
+		}
 	}
 	
 	private void acceptePartipationStateIfCanWriteOnCalendar(AccessToken token, Attendee att){
 		try {
-			if(helper.canWriteOnCalendar(token,  att.getEmail())){
+			if (helper.canWriteOnCalendar(token,  att.getEmail())) {
 				att.setState(ParticipationState.ACCEPTED);
 			}
 		} catch (Exception e) {
