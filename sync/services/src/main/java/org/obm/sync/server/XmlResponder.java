@@ -74,22 +74,29 @@ public class XmlResponder {
 		this.mliw = new MailingListItemsWriter();
 	}
 
-	public String sendError(String s) {
+	private String sendError(String message, String type) {
 		String res = "";
 		try {
 			Document doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/error.xsd", "error");
 			Element root = doc.getDocumentElement();
-			DOMUtils.createElementAndText(root, "message", s);
+			DOMUtils.createElementAndText(root, "message", message);
+			if(!Strings.isNullOrEmpty(type)){
+				DOMUtils.createElementAndText(root, "type", type);
+			}
 			res = sendDom(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 		return res;
 	}
+	
+	public String sendError(String message) {
+		return sendError(Strings.nullToEmpty(message), null);
+	}
 
 	public String sendError(Exception e) {
-		return sendError(Strings.nullToEmpty(e.getMessage()));
+		return sendError(Strings.nullToEmpty(e.getMessage()), e.getClass().getName());
 	}
 
 	public String sendToken(AccessToken at) {

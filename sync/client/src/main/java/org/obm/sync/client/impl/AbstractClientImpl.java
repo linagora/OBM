@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.client.ISyncClient;
@@ -188,7 +189,13 @@ public abstract class AbstractClientImpl implements ISyncClient {
 
 	protected void checkServerError(Document doc) throws ServerFault {
 		if (documentIsError(doc)) {
-			throw new ServerFault("server returner error");
+			String message = DOMUtils.getElementText(doc.getDocumentElement(), "message");
+			String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
+			if(EventAlreadyExistException.class.getName().equals(type)){
+				throw new EventAlreadyExistException(message);
+			} else {
+				throw new ServerFault(message);
+			}
 		}
 	}
 

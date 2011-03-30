@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
@@ -385,7 +386,7 @@ public class CalendarBindingImpl implements ICalendar {
 						.toString(), event.getDuration(),
 						event.getExtId());
 				logger.info(LogUtils.prefix(token) + message);
-				throw new ServerFault(message);
+				throw new EventAlreadyExistException(message);
 			}
 
 			if (!helper.canWriteOnCalendar(token, calendar)) {
