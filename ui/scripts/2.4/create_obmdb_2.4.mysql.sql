@@ -1546,6 +1546,7 @@ CREATE TABLE `EventTemplate` (
   `eventtemplate_contact_ids` text NULL,
   `eventtemplate_resource_ids` text NULL,
   `eventtemplate_document_ids` text NULL,
+  `eventtemplate_organizer` int(11) default 0,
   `eventtemplate_group_ids` text NULL,
   `eventtemplate_force_insertion` boolean default 0,
   `eventtemplate_opacity` enum('OPAQUE','TRANSPARENT') default 'OPAQUE',
