@@ -1,6 +1,5 @@
 package fr.aliacom.obm.common.calendar;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -75,34 +74,27 @@ public class EventChangeHandler {
 		}
 		
 		final Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
-		notifyAcceptedUpdateUsers(previous, current, locale, currentUsers);
-		notifyNeedActionUpdateUsers(at, previous, current, locale, currentUsers);
+		if (!currentUsers.isEmpty()) {
+			final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(currentUsers);
+			notifyAcceptedUpdateUsers(previous, current, locale, atts);
+			notifyNeedActionUpdateUsers(at, previous, current, locale, atts);
+		}
+	
+		
 	}
 	
-	private void notifyAcceptedUpdateUsers(final Event previous, final Event current, final Locale locale, Set<Attendee> currentUsers) {
-		final List<Attendee> attendees = findAttendeeByParticipationState(ParticipationState.ACCEPTED, currentUsers);
-		if (!attendees.isEmpty()) {
-			eventChangeMailer.notifyAcceptedUpdateUsers(attendees, previous, current, locale);
-		}		
+	private void notifyAcceptedUpdateUsers(final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts) {
+		final Set<Attendee> accepted = atts.get(ParticipationState.ACCEPTED);
+		if(accepted != null && !accepted.isEmpty()){
+			eventChangeMailer.notifyAcceptedUpdateUsers(accepted, previous, current, locale);
+		}	
 	}
 	
-	private void notifyNeedActionUpdateUsers(final AccessToken at, final Event previous, final Event current, final Locale locale, Set<Attendee> currentUsers) { 
-		final List<Attendee> attendees = findAttendeeByParticipationState(ParticipationState.NEEDSACTION, currentUsers);
-		if (!attendees.isEmpty()) {
-			eventChangeMailer.notifyNeedActionUpdateUsers(at, attendees, previous, current, locale);	
+	private void notifyNeedActionUpdateUsers(final AccessToken at, final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts) { 
+		final Set<Attendee> notAccepted = atts.get(ParticipationState.NEEDSACTION);
+		if (notAccepted != null && !notAccepted.isEmpty()) {
+			eventChangeMailer.notifyNeedActionUpdateUsers(at, notAccepted, previous, current, locale);
 		}
-	}
-
-	private List<Attendee> findAttendeeByParticipationState(final ParticipationState needsaction, final Set<Attendee> currentAttendees) {
-		final List<Attendee> attendees = new ArrayList<Attendee>();
-		for (final Attendee attendee: currentAttendees) {
-			if (!attendee.isOrganizer()) {
-				if (attendee.getState() == needsaction) {
-					attendees.add(attendee);
-				}	
-			}
-		}
-		return attendees;
 	}
 
 	public void delete(final AccessToken at, final Event event, Locale locale) throws NotificationException {
