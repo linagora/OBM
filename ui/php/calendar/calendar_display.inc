@@ -3792,6 +3792,9 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
         $res_id = array_merge($res_id, $template_entities['resource']);
         $groups_id = array_merge($groups_id, $template_entities['group']);
         $documents_id = array_merge($documents_id, $template_entities['document']);
+        if($event_q->f('event_organizer')){
+          $calendar['organizer'] = $event_q->f('event_organizer');
+        }
       }
     }
 
@@ -3801,11 +3804,22 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     $groups = (count($groups_id) > 0) ? get_calendar_group_from_ids($groups_id) : array();
     $documents = (count($documents_id) > 0) ? get_calendar_document_from_ids($documents_id) : array();
   }
+
+  if($organizerId = getOrganizerId($users, $contacts))
+    $calendar['organizer'] = $organizerId;
   
   $possible_owners = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
-  $possible_owners = $possible_owners['entity'];
+  $possible_owners2 = OBM_Acl_Utils::expandEntitiesArray(
+    OBM_Acl::getAllowedEntities($calendar['organizer'], 'calendar', 'write')
+  );
+  foreach($possible_owners2['ids'] as $possibleOwnerId){
+    if(!in_array($possibleOwnerId, $possible_owners['ids'])){
+      $possible_owners['entity'][$possibleOwnerId] = $possible_owners2['entity'][$possibleOwnerId];
+    }
+  }
+  $possible_owners = $possible_owners["entity"];
   $cats1 = of_category_get_ordered('event', 'category1');
 
   $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view, $template_entities);
@@ -3817,6 +3831,24 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
   $GLOBALS[display][search] .= dis_back_to_calendar($action);
 
   return $block;
+}
+
+function getOrganizerId($users, $contacts){
+  // Gets the organizerName
+  foreach($users['entity'] as $organizerId=>$userEntity){
+    if($userEntity["is_organizer"]){
+      return $organizerId;
+    }
+  }
+  if(empty($organizerName) && is_array($contacts['entity'])){
+    foreach($contacts['entity'] as $organizerId=>$contactEntity){
+      if($contactEntity["is_organizer"]){
+        return $organizerId;
+      }
+    }
+  }
+
+  return null;
 }
 
 
@@ -4122,19 +4154,26 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $organizerName = null;
 
   // Gets the organizerName
-  foreach($users['entity'] as $userEntity){
+  foreach($users['entity'] as $organizerId=>$userEntity){
     if($userEntity["is_organizer"]){
       $organizerName = $userEntity["label"];
       break;
     }
   }
   if(empty($organizerName) && is_array($contacts['entity'])){
-    foreach($contacts['entity'] as $contactEntity){
+    foreach($contacts['entity'] as $organizerId=>$contactEntity){
       if($contactEntity["is_organizer"]){
         $organizerName = $contactEntity["label"];
         break;
       }
     }
+  }
+
+  if (isset($calendar['organizer'])) {
+    $organizerId = $calendar['organizer'];
+  }
+  elseif(!$organizerId) {
+    $organizerId = $uid;
   }
 
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') || ($action == 'new' && $event_q != '') || ($action == 'edit_template')) {
@@ -4208,8 +4247,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       }
     }
     // Alerts
-    if (is_array($alerts) && isset($alerts[$owner])) {
-      $selected_alert = $alerts[$owner];
+    if (is_array($alerts) && isset($alerts[$organizerId])) {
+      $selected_alert = $alerts[$organizerId];
     } elseif (isset($calendar['template_id'])) {
       $selected_alert = $event_q->f('event_alert');
     }
@@ -4473,21 +4512,22 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
-      
   $block_owner = "
     <th>
     $l_owner
     </th>
     <td>
-    <select name='sel_owner' id='sel_owner'>";  
-  foreach ($possible_owners as $o) {
-    $block_owner .= "
-      <option value=\"$o[id]\" ".($o['id']==$owner ? "selected=\"selected\"" : "").">$o[label]</option>";
+    <span>";
+    foreach ($possible_owners as $o) {
+      if($o['id']==$uid){
+        $block_owner .= $o[label];
+      }
 
-    if(empty($organizerName) && $o['id']==$owner) $organizerName = $o[label];
-  }
-  $block_owner .= "
-    </select>
+      if(empty($organizerName) && $o['id']==$organizerId) $organizerName = $o[label];
+    }
+    $block_owner .= "
+    </span>
+    <input type=\"hidden\" name=\"sel_owner\" value=\"".$uid."\" />
     </td>";
 
   $block_organizer = "
@@ -4496,6 +4536,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </th>
     <td>
       <span>$organizerName</span>
+      <input type=\"hidden\" name=\"sel_organizer\" value=\"".$organizerId."\" />
     </td>";
   
   $dis_others_attendees = dis_calendar_mail_field($others_attendees, $class);
@@ -6475,6 +6516,10 @@ function dis_calendar_template_form($action, $params, $template_q, $entity_ids, 
   if (empty($entity_ids)) {
     $entity_ids = array('user' => array(), 'contact' => array(), 'resource' => array(), 'group' => array(), 'document' => array());
   }
+
+  if($template_q->f('event_organizer')){
+    $params['organizer'] = $template_q->f('event_organizer');
+  }
   $users_id = is_array($params['sel_user_id']) ? $params['sel_user_id'] : array();
   $contacts_id = is_array($params['sel_contact_id']) ? $params['sel_contact_id'] : array();
   $res_id = is_array($params['sel_resource_id']) ? $params['sel_resource_id'] : array();
@@ -6496,7 +6541,15 @@ function dis_calendar_template_form($action, $params, $template_q, $entity_ids, 
   $possible_owners = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
-  $possible_owners = $possible_owners['entity'];
+  $possible_owners2 = OBM_Acl_Utils::expandEntitiesArray(
+    OBM_Acl::getAllowedEntities($params['organizer'], 'calendar', 'write')
+  );
+  foreach($possible_owners2['ids'] as $possibleOwnerId){
+    if(!in_array($possibleOwnerId, $possible_owners['ids'])){
+      $possible_owners['entity'][$possibleOwnerId] = $possible_owners2['entity'][$possibleOwnerId];
+    }
+  }
+  $possible_owners = $possible_owners["entity"];
   $cats1 = of_category_get_ordered('event', 'category1');
   
   $block = html_calendar_event_form($action, $params, $template_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view);

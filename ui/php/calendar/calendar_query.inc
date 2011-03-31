@@ -672,11 +672,17 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
     $owner = $calendar['owner'];
   }
 
+  if (!is_numeric($calendar['organizer']) || $calendar['organizer'] <= 0) {
+    $organizerId = $obm['uid'];
+  } else {
+    $organizerId = $calendar['organizer'];
+  }
+
   // Insert the Event
   list($event_id, $event_entity_id) = run_query_calendar_insert_event_data($calendar, $owner);
   
   // Insert EventLinks
-  run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $owner);
+  run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $obm["uid"], $organizerId);
   
   // Insert Event documents
   if (is_array($documents)) {
@@ -687,7 +693,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   }
 
   // Insert my own alert
-  run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
+  run_query_calendar_event_alert_insert($event_id, $organizerId, $calendar['alert']);
 
   $calendar['calendar_id'] = $event_id;
   if ($calendar['attendees_notification']) {
@@ -870,7 +876,6 @@ function run_query_calendar_insert_event_data($calendar, $owner) {
     '$allow_documents',
     $repeat_end,
     $obm[domain_id])";
-
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
   $obm_q = new DB_OBM();
   $obm_q->query($query);
@@ -1648,9 +1653,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
 function run_query_calendar_update_event_data($calendar) {
   global $cdg_sql, $obm, $c_none;
   $title = sql_parse_text($calendar['title']);
-  if (is_numeric($calendar['owner']) && $calendar['owner'] >= 0) {
-    $owner = "event_owner = $calendar[owner],";
-  }
+  
   $category1_id = sql_parse_id( $calendar['category1']);
   $priority = $calendar['priority'];
   $description = sql_parse_text($calendar['description']);
@@ -1724,7 +1727,6 @@ function run_query_calendar_update_event_data($calendar) {
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
-      $owner
       event_userupdate = $obm[uid], 
       event_title = '$title', 
       event_date = '$datebegin',     
@@ -1846,12 +1848,11 @@ function run_query_calendar_quick_event_update($calendar) {
  */
 function run_query_calendar_quick_event_insert(&$calendar,$state) {
   global $cdg_sql, $obm;
-
   $title = sql_parse_text($calendar['title']);
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
-  $owner = $calendar['entity_id'];
-  $users = array($owner);
+  $organizerId = $calendar['entity_id'];
+  $users = array($organizerId);
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $opacity = 'OPAQUE';
   if ($all_day == 'TRUE') {
@@ -1943,7 +1944,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
     $obm[uid],
     'VEVENT',
     '$GLOBALS[c_origin_ajax]',
-    $owner,
+    ".$obm['uid'].",
     '".Of_Date::getOption('timezone')."', 
     '$title', 
     '$datebegin',     
@@ -1968,7 +1969,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   $event_id = $obm_q->lastid();
   $event_entity_id = of_entity_insert('event', $event_id);
 
-  run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $owner);
+  run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $obm["uid"], $organizerId);
 
   // Documents
   if (is_array($documents)) {
@@ -1985,11 +1986,11 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   return $event_id;
 }
 
-function run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $owner) {
+function run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $owner, $organizer) {
   run_query_calendar_add_event_links($users, $contacts, $resources, $event_id);
-  run_query_calendar_set_organizer($owner, $event_id);
+  run_query_calendar_set_organizer($organizer, $event_id);
   if (!in_array($owner, (array) $users)) {
-    run_query_calendar_insert_entity_event('user', $owner, $event_id, 'DECLINED', true);
+    run_query_calendar_insert_entity_event('user', $owner, $event_id, 'DECLINED');
   }
 }
 
@@ -2427,6 +2428,7 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   $resource_ids = is_array($calendar['sel_resource_id']) ? "'".implode(',', $calendar['sel_resource_id'])."'" : 'NULL';
   $group_ids = is_array($calendar['sel_group_id']) ? "'".implode(',', $calendar['sel_group_id'])."'" : 'NULL';
   $document_ids = is_array($calendar['sel_document_id']) ? "'".implode(',', $calendar['sel_document_id'])."'" : 'NULL';
+  $organizer = $calendar['organizer'] ? $calendar['organizer'] : "0";
 
   $event_tag_id = run_query_calendar_create_or_update_tag($calendar);
   
@@ -2539,6 +2541,7 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       eventtemplate_resource_ids,
       eventtemplate_group_ids,
       eventtemplate_document_ids,
+      eventtemplate_organizer,
       eventtemplate_force_insertion,
       eventtemplate_opacity,
       eventtemplate_show_user_calendar,
@@ -2572,13 +2575,13 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       $resource_ids,
       $group_ids,
       $document_ids,
+      $organizer,
       '$force_insertion',
       '$opacity',
       '$show_user_calendar',
       '$show_resource_calendar')";
 
   }
-
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_create_or_update_event_template()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -2676,6 +2679,7 @@ function run_query_calendar_get_template($template_id) {
     eventtemplate_contact_ids AS event_contact_ids,
     eventtemplate_resource_ids AS event_resource_ids,
     eventtemplate_group_ids AS event_group_ids,
+    eventtemplate_organizer AS event_organizer,
     eventtemplate_document_ids AS event_document_ids,
     eventtemplate_force_insertion AS event_force_insertion,
     eventtemplate_opacity AS event_opacity,
@@ -2860,7 +2864,8 @@ function run_query_calendar_duplicate_template($template_id, $duplicate_name) {
     eventtemplate_contact_ids,
     eventtemplate_resource_ids,
     eventtemplate_group_ids,
-    eventtemplate_document_ids) 
+    eventtemplate_document_ids,
+    eventtemplate_organizer)
     SELECT 
     '$duplicate_name',
     NOW(),
@@ -2889,7 +2894,8 @@ function run_query_calendar_duplicate_template($template_id, $duplicate_name) {
     eventtemplate_contact_ids,
     eventtemplate_resource_ids,
     eventtemplate_group_ids,
-    eventtemplate_document_ids
+    eventtemplate_document_ids,
+    eventtemplate_organizer
     FROM EventTemplate 
     WHERE eventtemplate_id = $template_id";
 
@@ -2941,7 +2947,7 @@ function run_query_calendar_import_template($xml) {
   $columns = array('name','title','owner','date','description','location',
     'category1_id','priority','privacy','duration','repeatkind','repeatfrequence',
     'repeatdays','allday','tag_id','allow_documents','alert','endrepeat','user_ids',
-    'contact_ids','resource_ids','group_ids','document_ids');
+    'contact_ids','resource_ids','group_ids','document_ids', 'organizer');
     
   foreach ($columns as $column) {
     $value = addslashes((string) $xml->{$column});
@@ -2987,7 +2993,8 @@ function run_query_calendar_import_template($xml) {
       eventtemplate_contact_ids,
       eventtemplate_resource_ids,
       eventtemplate_group_ids,
-      eventtemplate_document_ids)
+      eventtemplate_document_ids,
+      eventtemplate_organizer)
       VALUES (
       $name,
       NOW(),
@@ -3016,7 +3023,8 @@ function run_query_calendar_import_template($xml) {
       $contact_ids,
       $resource_ids,
       $group_ids,
-      $document_ids)";
+      $document_ids,
+      $organizer)";
   
   display_debug_msg($query, $cdg_sql,"run_query_calendar_import_template()");
   $obm_q = new DB_OBM ;

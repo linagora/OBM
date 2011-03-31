@@ -15,6 +15,8 @@ CREATE TABLE opush_sync_deleted_mail (
         CONSTRAINT `opush_sync_deletedmail_device_id_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- possibility to save an organizer which is not the same as the owner into an event template :
+ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_organizer` int(11) default 0 AFTER eventtemplate_group_ids;
 
 UPDATE ObmInfo SET obminfo_value = '2.3.19' WHERE obminfo_name = 'db_version';
 

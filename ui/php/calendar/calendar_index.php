@@ -1268,11 +1268,11 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_calendar_params() {
-  global $ccalendar_first_hour, $ccalendar_last_hour;
+  global $ccalendar_first_hour, $ccalendar_last_hour, $obm;
 
   // Get global params
   $params = get_global_params('Entity');
-
+  
   // Get calendar specific params
   if ($params['group_view'] == '') {
     $params['group_view'] = $params['group_id'];
@@ -1355,6 +1355,10 @@ function get_calendar_params() {
       $data = explode('-', $params['owner']);
       $params['owner'] = $data[2];
     }
+  }
+
+  if ($params['organizer']=='') {
+    $params['organizer'] = $obm['uid'];
   }
 
   // sel_group_id can be filled by sel_group_id
