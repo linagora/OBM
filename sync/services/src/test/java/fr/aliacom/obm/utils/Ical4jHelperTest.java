@@ -41,6 +41,7 @@ import net.fortuna.ical4j.model.property.Clazz;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Transp;
@@ -279,6 +280,7 @@ public class Ical4jHelperTest {
 	public void testGetAlertWithNoRepeat() {
 		Dur dur = new Dur(0, 0, -30, 0);
 		VAlarm va = new VAlarm(dur);
+		va.getProperties().add(new Duration(dur));
 		Trigger ti = va.getTrigger();
 		ti.getParameters().add(new Value("DURATION"));
 

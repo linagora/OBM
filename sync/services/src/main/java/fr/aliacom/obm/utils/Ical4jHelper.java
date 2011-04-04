@@ -965,14 +965,15 @@ public class Ical4jHelper {
 			final VAlarm valarm = (VAlarm) cl.get(0);
 			if (valarm != null) {
 
-				if (isVAlarmRepeat(valarm)) {
+				if (isVAlarmRepeat(valarm) || (valarm.getDuration()==null)) {
 					final Trigger trigger = valarm.getTrigger();
 					
 					Dur dur = trigger.getDuration();
 					Dur durZero = new Dur(0, 0, 0, 0);
 					
-					if (dur.equals(durZero)) {
+					if (dur==null || dur.equals(durZero)) {
 						event.setAlert(-1);
+						return;
 					} else if (dur.isNegative()) {
 						dur = dur.negate();
 					}
