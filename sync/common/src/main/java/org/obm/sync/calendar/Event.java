@@ -386,4 +386,13 @@ public class Event {
 		return null;
 	}
 	
+	public Attendee findOrganizer() {
+		for (Attendee att : attendees) {
+			if (att.isOrganizer()) {
+				return  att;
+			}
+		}
+		return null;
+	}
+	
 }

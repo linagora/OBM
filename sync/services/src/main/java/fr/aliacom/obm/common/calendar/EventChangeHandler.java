@@ -195,30 +195,19 @@ public class EventChangeHandler {
 		New, Current, Old;
 	}
 	
-	public void updateParticipationState(
-			Event event, ObmUser calendarOwner, ParticipationState state,
-			Locale locale) {
-		
-		if( ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)){
-			Attendee organizer = findOrganizer(event);
+	public void updateParticipationState(final Event event, final ObmUser calendarOwner, final ParticipationState state, 
+			final Locale locale, final AccessToken token) {
+		if (ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)) {
+			final Attendee organizer = event.findOrganizer();
 			if (organizer != null) {
-				if(!ParticipationState.DECLINED.equals(organizer.getState())&& !StringUtils.isEmpty(organizer.getEmail()) 
-						&& !organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain())){
-					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale);
-				} 
+				if (!ParticipationState.DECLINED.equals(organizer.getState())&& !StringUtils.isEmpty(organizer.getEmail()) 
+						&& !organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain())) {
+					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale, token);
+				}
 			} else {
 				logger.error("Can't find organizer, email won't send");
 			}
 		}
-	}
-
-	private Attendee findOrganizer(Event event) {
-		for(Attendee att : event.getAttendees()){
-			if(att.isOrganizer()){
-				return  att;
-			}
-		}
-		return null;
 	}
 	
 }

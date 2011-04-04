@@ -94,6 +94,7 @@ public class Ical4jHelperTest {
 		at.setEmail("adrien@zz.com");
 		at.setState(ParticipationState.ACCEPTED);
 		at.setRequired(ParticipationRole.CHAIR);
+		at.setOrganizer(true);
 		la.add(at);
 
 		at = new Attendee();

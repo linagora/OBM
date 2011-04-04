@@ -529,6 +529,12 @@ public class Ical4jHelper {
 		return calendar.toString();
 	}
 	
+	public static String buildIcsInvitationReply(final Event event) {
+		final Calendar calendar = buildVEvent(null, event);		
+		calendar.getProperties().add(Method.REPLY);
+		return calendar.toString();
+	}
+	
 	private static void appendDurationToIcs(PropertyList prop, Event event) {
 		prop.add(new Duration(new Dur(event.getDate(), event.getEndDate())));
 	}
@@ -722,7 +728,12 @@ public class Ical4jHelper {
 	}
 
 	private static void appendOrganizerToICS(PropertyList prop, Event event) {
-		prop.add(getOrganizer(event.getOwnerDisplayName(), event.getOwnerEmail()));
+		final Attendee organizer = event.findOrganizer();
+		if (organizer != null) {
+			prop.add(getOrganizer(organizer.getDisplayName(), organizer.getEmail()));	
+		} else {
+			prop.add(getOrganizer(event.getOwnerDisplayName(), event.getOwnerEmail()));
+		}
 	}
 
 	private static void appendTranspToICS(PropertyList prop, Event event) {

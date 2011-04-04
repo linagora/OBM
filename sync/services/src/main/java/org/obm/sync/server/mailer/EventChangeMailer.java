@@ -142,17 +142,21 @@ public class EventChangeMailer extends AbstractMailer{
 		}
 	}
 	
-	public void notifyUpdateParticipationState(Event event, Attendee organizer, ObmUser attendeeUpdated, ParticipationState newState, Locale locale) {
+	public void notifyUpdateParticipationState(final Event event, final Attendee organizer, final ObmUser attendeeUpdated, 
+			final ParticipationState newState, final Locale locale, final AccessToken token) {
+	
 		try {
-			
-			EventMail mail = 
+			final EventMail mail = 
 				new EventMail(
 						extractSenderAddress(attendeeUpdated),
 						event.getAttendees(), 
 						updateParticipationStateTitle(event.getTitle(), locale), 
 						updateParticipationStateBodyTxt(event, attendeeUpdated, newState, locale),
-						updateParticipationStateBodyHtml(event, attendeeUpdated, newState, locale));
+						updateParticipationStateBodyHtml(event, attendeeUpdated, newState, locale),
+						createReplyIcs(token, event), "REPLY"
+						);
 			sendNotificationMessageToOrganizer(organizer, mail);
+			
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -355,6 +359,10 @@ public class EventChangeMailer extends AbstractMailer{
 
 	private String updateUserIcs(AccessToken at, Event current) {
 		return Ical4jHelper.buildIcsInvitationRequest(at, current);
+	}
+
+	private String createReplyIcs(final AccessToken at, final Event event) {
+		return Ical4jHelper.buildIcsInvitationReply(event);
 	}
 
 	/* package */ void setMailService(MailService mailService) {

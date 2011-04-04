@@ -447,7 +447,7 @@ public class CalendarBindingImpl implements ICalendar {
 				"Calendar : sending participation notification to organizer of event ["+ ev.getTitle() + "]");
 		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
 		eventChangeHandler.updateParticipationState(ev, calendarOwner, state, 
-				settingsDao.getUserLanguage(token));
+				settingsDao.getUserLanguage(token), token);
 	}
 
 	
@@ -981,7 +981,7 @@ public class CalendarBindingImpl implements ICalendar {
 		if (newEvent != null) {
 			if (notification) {
 				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
-						settingsDao.getUserLanguage(token));
+						settingsDao.getUserLanguage(token), token);
 			}
 		} else {
 			logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
