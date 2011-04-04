@@ -44,6 +44,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.Repeat;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 
@@ -278,7 +279,7 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testGetAlertWithNoRepeat() {
+	public void testGetAlertWithDurationAndNoRepeat() {
 		Dur dur = new Dur(0, 0, -30, 0);
 		VAlarm va = new VAlarm(dur);
 		va.getProperties().add(new Duration(dur));
@@ -289,6 +290,52 @@ public class Ical4jHelperTest {
 		vEvent.getAlarms().add(va);
 		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
 		assertEquals(new Integer(-1), event.getAlert());
+	}
+	
+	@Test
+	public void testGetAlertWithoutRepeatAndWithoutDuration() {
+		Dur dur = new Dur(0, 0, -30, 0);
+		VAlarm va = new VAlarm(dur);
+		Trigger ti = va.getTrigger();
+		ti.getParameters().add(new Value("DURATION"));
+
+		VEvent vEvent = new VEvent();
+		vEvent.getAlarms().add(va);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertFalse(
+				new Integer(-1).equals(event.getAlert())
+		);
+	}
+	
+	@Test
+	public void testGetAlertWithRepeatAndNoDuration() {
+		Dur dur = new Dur(0, 0, -30, 0);
+		VAlarm va = new VAlarm(dur);
+		va.getProperties().add(new Repeat());
+		Trigger ti = va.getTrigger();
+		ti.getParameters().add(new Value("DURATION"));
+
+		VEvent vEvent = new VEvent();
+		vEvent.getAlarms().add(va);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertEquals(new Integer(-1), event.getAlert());
+	}
+	
+	@Test
+	public void testGetAlertWithRepeatAndDuration() {
+		Dur dur = new Dur(0, 0, -30, 0);
+		VAlarm va = new VAlarm(dur);
+		va.getProperties().add(new Repeat());
+		va.getProperties().add(new Duration(dur));
+		Trigger ti = va.getTrigger();
+		ti.getParameters().add(new Value("DURATION"));
+
+		VEvent vEvent = new VEvent();
+		vEvent.getAlarms().add(va);
+		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		assertFalse(
+				new Integer(-1).equals(event.getAlert())
+		);
 	}
 
 	@Test

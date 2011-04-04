@@ -976,7 +976,9 @@ public class Ical4jHelper {
 			final VAlarm valarm = (VAlarm) cl.get(0);
 			if (valarm != null) {
 
-				if (isVAlarmRepeat(valarm) || (valarm.getDuration()==null)) {
+				if (	(isVAlarmRepeat(valarm) && valarm.getDuration()!=null)
+					||	(!isVAlarmRepeat(valarm) && valarm.getDuration()==null)
+				) {
 					final Trigger trigger = valarm.getTrigger();
 					
 					Dur dur = trigger.getDuration();
