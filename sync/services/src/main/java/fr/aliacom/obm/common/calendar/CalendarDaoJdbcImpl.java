@@ -63,6 +63,7 @@ import org.obm.sync.solr.SolrHelper.Factory;
 import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
@@ -1684,7 +1685,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		try {
 			ps = con.prepareStatement(attQ);
 			Integer userEntityCalender = userDao.userEntityIdFromEmail(con, calendar, editor.getDomainId());
-			for (Attendee at : attendees) {
+			
+			final Set<Attendee> listAttendee = removeDuplicateAttendee(attendees);			
+			for (final Attendee at : listAttendee) {
 				Integer userEntity = getUserEntityOrContactEntity(editor, con, userEntityCalender, at.getEmail(), useObmUser);
 				
 				if (userEntity == null) {
@@ -1725,6 +1728,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return pRole.getJdbcObject(obmHelper.getType());
 	}
 	
+	private Set<Attendee> removeDuplicateAttendee(List<Attendee> attendees) {
+		return ImmutableSet.copyOf(attendees);
+	}
+
 	private Integer getUserEntityOrContactEntity(AccessToken editor, Connection con, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
 		Integer userEntity  = userDao.userEntityIdFromEmail(con,
 				email, editor.getDomainId());
