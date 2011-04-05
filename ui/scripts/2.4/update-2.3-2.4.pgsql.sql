@@ -354,10 +354,6 @@ ALTER TABLE deletedevent ADD COLUMN deletedevent_event_ext_id character varying(
 ALTER TABLE Category ALTER COLUMN category_code TYPE character varying(100);
 ALTER TABLE Category ADD CONSTRAINT categorycategory_categorycode_uniquekey UNIQUE (category_category,category_code);
 
-------------------------------------------------------------------------
--- Write that the 2.3->2.4 is completed
-UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
-
 --
 -- possibility to save the forced insertion state into an event template
 --
@@ -365,3 +361,9 @@ ALTER TABLE EventTemplate ADD COLUMN eventtemplate_force_insertion boolean DEFAU
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_opacity vopacity DEFAULT 'OPAQUE'::vopacity;
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_user_calendar boolean DEFAULT false;
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_resource_calendar boolean DEFAULT false;
+
+
+------------------------------------------------------------------------
+-- Write that the 2.3->2.4 is completed
+UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
+
