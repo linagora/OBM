@@ -13,4 +13,7 @@ CREATE TABLE opush_sync_deleted_mail (
 -- possibility to save an organizer which is not the same as the owner into an event template :
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_organizer INTEGER DEFAULT 0;
 
+-- add sequence field to table event
+ALTER TABLE event ADD COLUMN event_sequence INTEGER DEFAULT 0;
+
 UPDATE ObmInfo SET obminfo_value = '2.3.19' WHERE obminfo_name = 'db_version';
