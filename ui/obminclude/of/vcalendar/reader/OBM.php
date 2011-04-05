@@ -28,6 +28,7 @@ class Vcalendar_Reader_OBM {
       $ids = array_merge($ids,$this->readPeriod($startTime,$endTime));
     }
     $this->alerts = $this->readEventsAlerts($ids);
+    $this->valarms = $this->readEventsVAlarms($ids);
   }
 
   function readPeriod($startTime, $endTime) {
@@ -62,6 +63,32 @@ class Vcalendar_Reader_OBM {
       $alerts[$this->db->f('eventalert_event_id')][] = array('user' => $this->db->f('eventalert_user_id'), 'duration' => $this->db->f('eventalert_duration'));
     }
     return $alerts;
+  }
+
+  function readEventsVAlarms($events) {
+    $valarms = array();
+
+    if(!empty($events)){
+      $query = 'SELECT      event_date,
+                            event_title,
+                            eventalert_duration,
+                            eventalert_event_id
+                FROM        EventAlert
+                INNER JOIN  Event ON eventalert_event_id = event_id
+                WHERE       eventalert_event_id IN ('.implode(',', $events).')';
+      $this->db->query($query);
+      while($this->db->next_record()) {
+        $trigger = $this->db->f('eventalert_duration')  < 0 ? "-P" : "P";
+        $trigger .= $this->db->f('eventalert_duration')."S";
+        $valarm = array(
+          "trigger"=>$trigger,
+          "action"=>"display",
+          "description"=>$this->db->f('event_title')
+        );
+        $valarms[$this->db->f('eventalert_event_id')][] = $valarm;
+      }
+    }
+    return $valarms;
   }
 
   /**
@@ -163,6 +190,11 @@ class Vcalendar_Reader_OBM {
     if(!empty($this->alerts[$data['event_id']])) {
       foreach($this->alerts[$data['event_id']] as $alert) {
         $vevent->set('x-obm-alert', $alert);
+      }
+    }
+    if(!empty($this->valarms[$data['event_id']])) {
+      foreach($this->valarms[$data['event_id']] as $valarm) {
+        $vevent->set('valarm', $valarm);
       }
     }
     $vevent->set('uid', $data['event_ext_id']);
