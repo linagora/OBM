@@ -143,7 +143,7 @@ public class EventChangeMailer extends AbstractMailer{
 	}
 	
 	public void notifyUpdateParticipationState(final Event event, final Attendee organizer, final ObmUser attendeeUpdated, 
-			final ParticipationState newState, final Locale locale, final AccessToken token) {
+			final ParticipationState newState, final Locale locale) {
 	
 		try {
 			final EventMail mail = 
@@ -153,7 +153,7 @@ public class EventChangeMailer extends AbstractMailer{
 						updateParticipationStateTitle(event.getTitle(), locale), 
 						updateParticipationStateBodyTxt(event, attendeeUpdated, newState, locale),
 						updateParticipationStateBodyHtml(event, attendeeUpdated, newState, locale),
-						createReplyIcs(token, event), "REPLY"
+						createReplyIcs(event), "REPLY"
 						);
 			sendNotificationMessageToOrganizer(organizer, mail);
 			
@@ -361,7 +361,7 @@ public class EventChangeMailer extends AbstractMailer{
 		return Ical4jHelper.buildIcsInvitationRequest(at, current);
 	}
 
-	private String createReplyIcs(final AccessToken at, final Event event) {
+	private String createReplyIcs(final Event event) {
 		return Ical4jHelper.buildIcsInvitationReply(event);
 	}
 

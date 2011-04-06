@@ -196,13 +196,13 @@ public class EventChangeHandler {
 	}
 	
 	public void updateParticipationState(final Event event, final ObmUser calendarOwner, final ParticipationState state, 
-			final Locale locale, final AccessToken token) {
+			final Locale locale) {
 		if (ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)) {
 			final Attendee organizer = event.findOrganizer();
 			if (organizer != null) {
 				if (!ParticipationState.DECLINED.equals(organizer.getState())&& !StringUtils.isEmpty(organizer.getEmail()) 
 						&& !organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain())) {
-					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale, token);
+					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale);
 				}
 			} else {
 				logger.error("Can't find organizer, email won't send");
