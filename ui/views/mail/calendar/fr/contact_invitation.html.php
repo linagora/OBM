@@ -24,7 +24,7 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2">Vous êtes invité à participer à ce rendez-vous</td>
+        <td colspan="2">Vous êtes invité(e) à participer à ce rendez-vous</td>
     </tr>
     <tr>
         <td style="text-align:right;width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;"><?php echo $title; ?></td>

@@ -24,7 +24,7 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2"><strong>Vous êtes invité à participer à ce rendez-vous</strong></td>
+        <td colspan="2"><strong>Vous êtes invité(e) à participer à ce rendez-vous</strong></td>
     </tr>
     <tr>
         <td style="text-align:right;width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;"><?php echo $title; ?></td>
@@ -51,7 +51,7 @@
     </tr>
     <tr>
         <td style="text-align:right;" colspan="2">
-          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Plus de détail</a>
+          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Plus de détails</a>
         </td>
     </tr>
 </table>

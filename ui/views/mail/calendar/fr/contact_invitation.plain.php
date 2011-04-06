@@ -22,7 +22,7 @@ Message automatique envoyé par OBM
 NOUVEAU RENDEZ-VOUS !
 ------------------------------------------------------------------
 
-Vous êtes invité à participer à ce rendez-vous
+Vous êtes invité(e) à participer à ce rendez-vous
 
 du     : <?php echo $start; ?>
 
