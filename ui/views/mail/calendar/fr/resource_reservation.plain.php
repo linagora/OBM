@@ -22,7 +22,7 @@ Message automatique envoyé par OBM
 NOUVELLE RESERVATION DE RESSOURCE !
 ------------------------------------------------------------------
 
-Une ressource dont vous êtes responsable à été réservée
+Une ressource dont vous êtes responsable a été réservée
 
 du     : <?php echo $start; ?>
 
