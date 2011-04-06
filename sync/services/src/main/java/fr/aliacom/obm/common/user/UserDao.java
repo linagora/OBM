@@ -68,7 +68,7 @@ public class UserDao {
 		try {
 			st = con.createStatement();
 			// by Mehdi
-			String query = "SELECT     userentity_entity_id ";
+			String query = "SELECT     userentity_user_id ";
 			query       += "FROM       UserObm ";
 			query       += "INNER JOIN UserEntity ON userobm_id = userentity_user_id ";
 			query       += "INNER JOIN Domain ON userobm_domain_id = domain_id ";
