@@ -282,7 +282,7 @@ function html_batch_user_search_form($user) {
     </label>";
     $block .= "
     <label>$l_fax<br />
-      <input type=\"text\" name=\"tf_fax\" size=\"16\" maxlength=\"16\"
+      <input type=\"text\" name=\"tf_fax\" size=\"16\" maxlength=\"32\"
       value=\"$fax\" />
     </label>";
     $block .= "
