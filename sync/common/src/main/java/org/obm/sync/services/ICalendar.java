@@ -16,6 +16,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 
 public interface ICalendar {
@@ -63,6 +64,14 @@ public interface ICalendar {
 	public String createEvent(AccessToken token, String calendar, Event event, boolean notification)
 			throws AuthFault, ServerFault;
 
+	/**
+	 * return every changes made to calendar since lastSync date for events into the sync range.
+	 * This service treats participation changes as full changes.
+	 * Logged user needs read rights on calendar.
+	 */
+	EventChanges getSyncInRange(AccessToken token, String calendar, Date lastSync,
+			SyncRange syncRange) throws AuthFault, ServerFault;
+	
 	/**
 	 * return every changes made to calendar since lastSync date.
 	 * This service treats participation changes as full changes.
@@ -238,6 +247,6 @@ public interface ICalendar {
 	 * Return ImportICalendarException if import fails
 	 */
 	public int importICalendar(AccessToken token, String calendar, String ics) 
-		throws ImportICalendarException, AuthFault, ServerFault; 
-	
+		throws ImportICalendarException, AuthFault, ServerFault;
+
 }

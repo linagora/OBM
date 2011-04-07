@@ -57,6 +57,7 @@ import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
@@ -856,39 +857,48 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public EventChanges getSync(AccessToken token, ObmUser calendarUser,
-			Date lastSync, EventType typeFilter, boolean onEventDate) {
+			Date lastSync, SyncRange syncRange, EventType typeFilter, boolean onEventDate) {
 		EventChanges ret = new EventChanges();
 
 		PreparedStatement evps = null;
 		ResultSet evrs = null;
 		Connection con = null;
 		Calendar cal = getGMTCalendar();
-
-		String fetchIds = "SELECT e.event_id, att.eventlink_state, e.event_ext_id "
-				+ " FROM Event e "
-				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
-				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
-				+ "INNER JOIN EventLink attupd ON attupd.eventlink_event_id=e.event_id "
-				+ "WHERE e.event_type=? AND ue.userentity_user_id=? ";
+		StringBuilder fetchIds = new StringBuilder();
+		fetchIds.append("SELECT e.event_id, att.eventlink_state, e.event_ext_id ");
+		fetchIds.append(" FROM Event e ");
+		fetchIds.append("INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id ");
+		fetchIds.append("INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id ");
+		fetchIds.append("INNER JOIN EventLink attupd ON attupd.eventlink_event_id=e.event_id ");
+		fetchIds.append("WHERE e.event_type=? AND ue.userentity_user_id=? ");
 
 		// dirty hack to disable need-action to opush & tbird
 		if (token.getOrigin().contains("push")) {
-			fetchIds += " AND att.eventlink_state != 'NEEDS-ACTION' ";
+			fetchIds.append(" AND att.eventlink_state != 'NEEDS-ACTION' ");
 		}
 
 		if (lastSync != null) {
-			fetchIds += " AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? OR attupd.eventlink_timeupdate >= ?";
+			fetchIds.append(" AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? OR attupd.eventlink_timeupdate >= ?");
 			if (onEventDate) {
-				fetchIds += " OR e.event_date >= ? OR event_repeatkind != 'none'";
+				fetchIds.append(" OR e.event_date >= ? OR event_repeatkind != 'none'");
 			}
-			fetchIds += ")";
+			fetchIds.append(")");
 		}
 
-		fetchIds += " GROUP BY e.event_id, att.eventlink_state, e.event_ext_id";
+		fetchIds.append(" GROUP BY e.event_id, att.eventlink_state, e.event_ext_id");
 		
-		StringBuilder sb = new StringBuilder(fetchIds);
-		SyncRange sr = addSyncRanges(sb, token);
-
+		if(syncRange != null){
+			fetchIds.append("AND (");
+			fetchIds.append("event_repeatkind != 'none' OR ");
+			fetchIds.append("(event_date >= ? ");
+			if(syncRange.getBefore() != null){
+				fetchIds.append("AND event_date <= ? ");
+			}
+			fetchIds.append(") )");
+			logger.info(token.getUser() + " will use the sync range [ "
+					+ syncRange.getAfter() + " - " + syncRange.getBefore() + " ]");
+		}
+		
 		List<DeletedEvent> declined = new LinkedList<DeletedEvent>();
 
 		StringBuilder fetched = new StringBuilder();
@@ -896,7 +906,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		boolean fetchedData = false;
 		try {
 			con = obmHelper.getConnection();
-			evps = con.prepareStatement(sb.toString());
+			evps = con.prepareStatement(fetchIds.toString());
 			int idx = 1;
 			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
 			evps.setObject(idx++, calendarUser.getUid());
@@ -908,9 +918,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					evps.setTimestamp(idx++, new Timestamp(lastSync.getTime()));
 				}
 			}
-			if (sr != null) {
-				evps.setTimestamp(idx++, sr.before);
-				evps.setTimestamp(idx++, sr.after);
+			if (syncRange != null) {
+				evps.setTimestamp(idx++, new Timestamp(syncRange.getAfter().getTime()));
+				if(syncRange.getBefore() != null){
+					evps.setTimestamp(idx++, new Timestamp(syncRange.getBefore().getTime()));
+				}
 			}
 
 			evrs = evps.executeQuery();
@@ -1013,28 +1025,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 	
-	private SyncRange addSyncRanges(StringBuilder sb, AccessToken token) {
-		String min = token.getServiceProperty("funis/sync_days_min");
-		String max = token.getServiceProperty("funis/sync_days_max");
-		if (min == null || max == null) {
-			return null;
-		}
-		int minDays = Integer.parseInt(min);
-		int maxDays = Integer.parseInt(max);
-		Calendar now = getGMTCalendar();
-		now.add(Calendar.DAY_OF_MONTH, 0 - minDays);
-		Timestamp before = new Timestamp(now.getTimeInMillis());
-		now.add(Calendar.DAY_OF_MONTH, minDays + maxDays);
-		Timestamp after = new Timestamp(now.getTimeInMillis());
-		sb.append("AND (");
-		sb.append("event_repeatkind != 'none' OR ");
-		sb.append("(event_date >= ? AND event_date <= ?)");
-		sb.append(")");
-		logger.info(token.getUser() + " will use the sync range [ "
-				+ before.toString() + " - " + after.toString() + " ]");
-		return new SyncRange(before, after);
-	}
-
 	private Set<CalendarInfo> listUserRights(Set<CalendarInfo> l, ObmUser user)
 			throws FindException {
 		String query =
@@ -2003,7 +1993,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "WHERE ue.userentity_user_id=? and e.event_type=? ";
 
 		StringBuilder sb = new StringBuilder(ev);
-		SyncRange sr = addSyncRanges(sb, token);
 
 		PreparedStatement evps = null;
 		ResultSet evrs = null;
@@ -2018,11 +2007,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			int idx = 1;
 			evps.setObject(idx++, calendarUser.getUid());
 			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
-
-			if (sr != null) {
-				evps.setTimestamp(idx++, sr.before);
-				evps.setTimestamp(idx++, sr.after);
-			}
 			evrs = evps.executeQuery();
 
 			while (evrs.next()) {

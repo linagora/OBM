@@ -14,6 +14,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 
 import fr.aliacom.obm.common.FindException;
@@ -50,7 +51,7 @@ public interface CalendarDao {
 	List<FreeBusy> getFreeBusy(Integer domainId, FreeBusyRequest request);
 
 	EventChanges getSync(AccessToken token, ObmUser calendarUser,
-			Date lastSync, EventType typeFilter, boolean onEventDate);
+			Date lastSync, SyncRange syncRange, EventType typeFilter, boolean onEventDate);
 
 	List<CalendarInfo> listCalendars(ObmUser user) throws FindException;
 

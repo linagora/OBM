@@ -43,6 +43,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.server.transactional.Transactional;
@@ -523,7 +524,14 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional
 	public EventChanges getSync(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault {
-		return getSync(token, calendar, lastSync, false);
+		return getSync(token, calendar, lastSync, null, false);
+	}
+	
+	@Override
+	@Transactional
+	public EventChanges getSyncInRange(AccessToken token, String calendar,
+			Date lastSync, SyncRange syncRange) throws AuthFault, ServerFault {
+		return getSync(token, calendar, lastSync, syncRange, false);
 	}
 
 	@Override
@@ -531,7 +539,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public EventChanges getSyncWithSortedChanges(AccessToken token,
 			String calendar, Date lastSync) throws AuthFault, ServerFault {
 
-		EventChanges changes = getSync(token, calendar, lastSync, false);
+		EventChanges changes = getSync(token, calendar, lastSync, null, false);
 		
 		//sort between update and participation update based on event timestamp
 		sortUpdatedEvents(changes, lastSync);
@@ -574,11 +582,11 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional
 	public EventChanges getSyncEventDate(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault {
-		return getSync(token, calendar, lastSync, true);
+		return getSync(token, calendar, lastSync, null, true);
 	}
 
 	private EventChanges getSync(AccessToken token, String calendar,
-			Date lastSync, boolean onEventDate) throws ServerFault {
+			Date lastSync, SyncRange syncRange, boolean onEventDate) throws ServerFault {
 
 		logger.info(LogUtils.prefix(token) + "Calendar : getSync(" + calendar
 				+ ", " + lastSync + ")");
@@ -600,7 +608,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 		try {
 			EventChanges ret = calendarService.getSync(token, calendarUser,
-					lastSync, type, onEventDate);
+					lastSync, syncRange, type, onEventDate);
 			logger.info(LogUtils.prefix(token) + "Calendar : getSync("
 					+ calendar + ") => " + ret.getUpdated().length + " upd, "
 					+ ret.getRemoved().length + " rmed.");
@@ -1097,5 +1105,4 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 		return false;
 	}
-
 }

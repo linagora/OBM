@@ -22,6 +22,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
@@ -98,17 +99,23 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public EventChanges getSyncWithSortedChanges(AccessToken token,
 			String calendar, Date lastSync) throws AuthFault, ServerFault {
-		return getSync(token, calendar, lastSync, "getSyncWithSortedChanges");
+		return getSync(token, calendar, lastSync, null, "getSyncWithSortedChanges");
 	}
 	
 	@Override
 	public EventChanges getSync(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault {
-		return getSync(token, calendar, lastSync, "getSync");
+		return getSync(token, calendar, lastSync, null, "getSync");
+	}
+	
+	@Override
+	public EventChanges getSyncInRange(AccessToken token, String calendar, Date lastSync,
+			SyncRange syncRange) throws AuthFault, ServerFault{
+		return getSync(token, calendar, lastSync, syncRange, "getSyncInRange");
 	}
 	
 	private EventChanges getSync(AccessToken token, String calendar,
-			Date lastSync, String methodName) throws ServerFault {
+			Date lastSync, SyncRange syncRange, String methodName) throws ServerFault {
 		if (logger.isDebugEnabled()) {
 			logger.debug("getSync(" + token.getSessionId() + ", " + calendar
 					+ ", " + lastSync + ")");
@@ -120,6 +127,14 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 			params.put("lastSync", DateHelper.asString(lastSync));
 		} else {
 			params.put("lastSync", "0");
+		}
+		if(syncRange != null){
+			if(syncRange.getAfter() != null){
+				params.put("syncRangeAfter", DateHelper.asString(syncRange.getAfter()));
+			}
+			if(syncRange.getBefore() != null){
+				params.put("syncRangeBefore", DateHelper.asString(syncRange.getBefore()));
+			}
 		}
 
 		Document doc = execute(type + "/" + methodName, params);

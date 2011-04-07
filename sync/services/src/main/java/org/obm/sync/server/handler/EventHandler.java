@@ -38,6 +38,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.server.ParametersSource;
 import org.obm.sync.server.XmlResponder;
@@ -107,9 +108,10 @@ public class EventHandler extends SecureSyncHandler {
 			XmlResponder responder, AccessToken at) 
 		throws AuthFault, ServerFault, SAXException,
 			IOException, FactoryConfigurationError, Exception {
-		
 		if (method.equals("getSync")) {
 			return getSync(at, params, responder);
+		} else if (method.equals("getSyncInRange")) {
+			return getSyncInRange(at, params, responder);
 		} else if (method.equals("getSyncWithSortedChanges")) {
 			return getSyncWithSortedChanges(at, params, responder);
 		} else if (method.equals("getSyncEventDate")) {
@@ -441,6 +443,21 @@ public class EventHandler extends SecureSyncHandler {
 					getCalendar(at, params), 
 					DateHelper.asDate(params.getParameter("lastSync")));
 			return responder.sendCalendarChanges(ret);
+	}
+	
+	private String getSyncInRange(
+			AccessToken at, ParametersSource params, XmlResponder responder) 
+	throws AuthFault, ServerFault {
+		final Date after = DateHelper.asDate(params.getParameter("syncRangeAfter"));
+		final Date before = DateHelper.asDate(params.getParameter("syncRangeBefore"));
+		SyncRange syncRange = null;
+		if(after != null || before != null){
+			syncRange = new SyncRange(before, after);
+		}
+		EventChanges ret = binding.getSyncInRange(at, 
+				getCalendar(at, params), 
+				DateHelper.asDate(params.getParameter("lastSync")), syncRange);
+		return responder.sendCalendarChanges(ret);
 	}
 
 	private String isWritableCalendar(
