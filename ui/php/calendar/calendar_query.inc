@@ -1598,7 +1598,9 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
           if ($u['is_organizer'] == true) {
             $k = array_search($id, $removed_entities);
             unset($removed_entities[$k]);
-            run_query_calendar_update_entity_event('user', $id, $event_id, 'DECLINED');
+            if($k !== false){
+              run_query_calendar_update_entity_event('user', $id, $event_id, 'DECLINED');
+            }
           }
         }
       }
