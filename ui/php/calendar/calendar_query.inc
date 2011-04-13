@@ -67,7 +67,8 @@ function run_query_calendar_detail($calendar_id) {
     event_date,
     $eventexception_sql_if AS event_is_exception,
     ee.eventexception_parent_id AS event_eventexception_parent_id,
-    ee.eventexception_date AS event_eventexception_date
+    ee.eventexception_date AS event_eventexception_date,
+    event_sequence
     FROM
     Event
     INNER JOIN EventEntity AS e ON event_id = evententity_event_id
@@ -411,6 +412,20 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   return $retour;    
 }
 
+
+function run_query_increment_sequence($event_id){
+  global $cdg_sql;
+
+  $query = "UPDATE Event
+    SET event_sequence = event_sequence + 1
+    WHERE event_id = $event_id";  
+  display_debug_msg($query, $cdg_sql, 'run_query_increment_sequence()');
+
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
 
 /**
  * Check if the user participation to en event differs from the one given
@@ -3872,7 +3887,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     eventtag_color AS event_color,
     eventtag_label as tag,
     eventtag_id,
-    event_allday,";
+    event_allday,
+    event_sequence,";
 
   $left_q = "
     LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
@@ -4021,7 +4037,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     eventtag_color AS event_color,
     eventtag_label as tag,
     eventtag_id,
-    event_allday,";
+    event_allday,
+    event_sequence,";
 
   $left_q = "
     LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id

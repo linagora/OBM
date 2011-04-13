@@ -178,6 +178,7 @@ class Vcalendar_Reader_OBM {
     if($data['event_allday'] != 0) {
       $vevent->set('x-obm-all-day', 1);
     }
+    $vevent->set('sequence', $data['event_sequence']);
     $vevent->set('summary', $data['event_title']);
     $vevent->set('description', $data['event_description']);
     $vevent->set('class', $this->parsePrivacy($data['event_privacy']));

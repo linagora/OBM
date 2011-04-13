@@ -589,8 +589,8 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
       $attendees['current'] = array('user'=>array(), 'resource' => array(), 'contact' => array());        
       $this->send($old, $new, $attendees);
     } else {
-      $attendees = $this->diffAttendees($old, $new);
-      $attendeesState = $this->diffAttendeesState($old, $new);
+      $attendees = self::diffAttendees($old, $new);
+      $attendeesState = self::diffAttendeesState($old, $new);
       $this->send($old, $new, $attendees, $attendeesState);
     }
   }
@@ -603,7 +603,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @access private
    * @return void
    */
-  private function diffAttendees($old, $new) {
+  private static function diffAttendees($old, $new) {
     $attendees = array();
     $attendees['new']['user'] = array_diff($new->user, $old->user);
     $attendees['new']['resource'] = array_diff($new->resource, $old->resource);
@@ -625,7 +625,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @access private
    * @return void
    */
-  private function diffAttendeesState($old, $new) {
+  public static function diffAttendeesState($old, $new) {
     $newState = array_intersect($new->user, $old->user);
     $oldState = array_intersect($old->user, $new->user);
     $att['user'] = array_udiff($newState, $oldState, array('OBM_EventAttendee', 'cmpState')); 
@@ -645,9 +645,17 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @access private
    * @return void
    */
-  private function send($old, $new, $attendees, $attendeesState=null) {
-    if(!$this->mustBeSent($old, $new)) 
+  private function send($old, $new, $attendees, $attendeesState=null) {    
+    /* Sequence incrementation must be done before email sending since sequence
+       number is retrieved from database at ics generation */
+    if(self::mustIncrementSequence($old, $new, $attendeesState)){
+      $eventId = $new->id ? $new->id : $old->id;
+      run_query_increment_sequence($eventId);
+    }
+
+    if(!$this->mustBeSent($old, $new))
       return false;
+
     foreach($attendees as $state => $attendeesList) {
       foreach($attendeesList as $kind => $recipients) {
         if(count($recipients) > 0) {
@@ -658,6 +666,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
         }
       }
     }
+    
     if ($attendeesState != null && !$this->hasEventChanged($old, $new)) {
       foreach($attendeesState['user'] as $ustate) {
         $this->sendEventStateUpdateMail($new, $ustate);
@@ -666,6 +675,39 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
         $this->sendResourceStateUpdateMail($new, $rstate);
       }
     }
+  }
+
+  /**
+   * Checks if the sequence number should be incremented or not
+   * For now increments in the following cases :
+   * - Modification of location, date start or duration
+   * - Modification of the all day state
+   * - Modification of anything related with event recurrence, including exceptions
+   * - Event Removal
+   *
+   * Not incremented neither for modification of non significative informations (like
+   * title, description, color ...) nor for modification of attendees list or
+   * modification of list of documents or resources
+   *
+   *
+   * @param OBM_Event $old
+   * @param OBM_Event $new
+   * @return boolean  Tells if a change that should affect the sequence number exists
+   */
+  private static function mustIncrementSequence($old, $new){
+    // Sequence incrementation in case of event removal
+    if($old != null && $new == null){
+      return true;
+    }
+    if($new && $old){
+      // Must increment when a significant change occurs (event start, duration,
+      // repeat informations including exceptions, location, allday)
+      if(self::hasEventChanged($old, $new)){
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   /**
@@ -771,7 +813,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    */
   private function sendCurrentUserMail($old, $new, $recipients) {
     list($invit_recipients, $notice_recipients) = $this->sortObmUsersRecipients($recipients);
-    if (!empty($invit_recipients) && $this->hasEventFullyChanged($old, $new)) {
+    if (!empty($invit_recipients) && self::hasEventFullyChanged($old, $new)) {
       $this->mailer->sendEventUpdate($new, $old, $invit_recipients);
     }
     if (!empty($notice_recipients) && $this->hasEventFullyChanged($old, $new)) {
@@ -835,7 +877,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function sendCurrentContactMail($old, $new, $recipients) {
-    if ($this->hasEventFullyChanged($old, $new)) {
+    if (self::hasEventFullyChanged($old, $new)) {
       $this->mailer->sendContactUpdate($new, $old, $recipients);
     }
   }
@@ -888,7 +930,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function sendCurrentResourceMail($old, $new, $recipients) {
-    if ($this->hasEventFullyChanged($old, $new)) {
+    if (self::hasEventFullyChanged($old, $new)) {
       foreach ($recipients as $resource) {
         $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resource->id));
         if (!in_array($GLOBALS['obm']['uid'], $resourceOwners) && count($resourceOwners) > 0) {
