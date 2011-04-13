@@ -92,6 +92,15 @@ class CalendarMailer extends OBM_Mailer {
     $this->recipients = $this->getRecipients(array($event->owner), 'set_mail_participation');
     $this->subject = __('Participation updated: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from, '', $user);
+
+    $this->parts[] = array(
+      'content' => file_get_contents($this->generateIcs($event, $this->recipients, "request"), 'r'),
+      'content_type' => 'text/calendar; charset=UTF-8; method=REPLY'
+    );
+    $this->attachments[] = array(
+      'content' => file_get_contents($this->generateIcs($event, $this->recipients, "request"), 'r'),
+      'filename' => 'meeting.ics', 'content_type' => 'application/ics'
+    );
   }
 
 
