@@ -47,8 +47,10 @@ public class LDAPUtils {
 				"com.sun.jndi.ldap.LdapCtxFactory");
 		env.put("java.naming.provider.url", uri);
 		env.put(DirContext.SECURITY_AUTHENTICATION, "simple");
-		env.put(DirContext.SECURITY_PRINCIPAL, rootDn);
-		env.put(DirContext.SECURITY_CREDENTIALS, rootPw);
+		if(rootDn != null && rootPw != null){
+			env.put(DirContext.SECURITY_PRINCIPAL, rootDn);
+			env.put(DirContext.SECURITY_CREDENTIALS, rootPw);
+		}
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("binddn: " + rootDn + " bindpw: " + rootPw);
