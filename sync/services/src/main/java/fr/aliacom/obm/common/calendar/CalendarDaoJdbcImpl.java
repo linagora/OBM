@@ -1917,10 +1917,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public List<Event> findListEventsFromIntervalDate(AccessToken token,
-			ObmUser calendarUser, Date start, Date end, EventType typeFilter) {
-		String ev = "SELECT "
-				+ EVENT_SELECT_FIELDS
+	public List<Event> listEventsByIntervalDate(final AccessToken token, final ObmUser obmUser, 
+			final Date startDate, final Date endDate, final EventType typeFilter) {
+		
+		final String sql = "SELECT " + EVENT_SELECT_FIELDS
 				+ ", eventexception_date as recurrence_id "
 				+ " FROM Event e "
 				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
@@ -1933,29 +1933,30 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "WHERE e.event_type=? AND ue.userentity_user_id=? "
 				+ "AND ((event_repeatkind != 'none' AND (event_endrepeat IS NULL OR event_endrepeat >= ?)) OR "
 				+ "(event_date >= ? AND event_date <= ?) )";
+		
 		PreparedStatement evps = null;
 		ResultSet evrs = null;
 		Connection con = null;
-		List<Event> changedEvent = new LinkedList<Event>();
-		Map<Integer, Event> eventById = new HashMap<Integer, Event>();
-		List<Event> ret = new LinkedList<Event>();
-		Calendar cal = getGMTCalendar();
+		
+		final List<Event> changedEvent = new LinkedList<Event>();
+		final Map<Integer, Event> eventById = new HashMap<Integer, Event>();
+		final List<Event> ret = new LinkedList<Event>();
+		final Calendar cal = getGMTCalendar();
+		
 		try {
 			con = obmHelper.getConnection();
-			evps = con.prepareStatement(ev);
+			evps = con.prepareStatement(sql);
 			int idx = 1;
 			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
-			evps.setObject(idx++, calendarUser.getUid());
-			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
-			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
-			evps.setTimestamp(idx++, new Timestamp(end.getTime()));
+			evps.setObject(idx++, obmUser.getUid());
+			evps.setTimestamp(idx++, new Timestamp(startDate.getTime()));
+			evps.setTimestamp(idx++, new Timestamp(startDate.getTime()));
+			evps.setTimestamp(idx++, new Timestamp(endDate.getTime()));
 			evrs = evps.executeQuery();
 			while (evrs.next()) {
 				Event event = eventFromCursor(cal, evrs);
-				Set<Date> extDate = getAllDateEventException(con,
-						event.getDatabaseId());
-				Date recurDate = Ical4jHelper.isInIntervalDate(event, start,
-						end, extDate);
+				Set<Date> extDate = getAllDateEventException(con, event.getDatabaseId());
+				Date recurDate = Ical4jHelper.isInIntervalDate(event, startDate, endDate, extDate);
 				if (recurDate != null) {
 					eventById.put(event.getDatabaseId(), event);
 					changedEvent.add(event);
@@ -1969,10 +1970,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 
 		String evIdList = buildEventId(changedEvent);
-		loadAttendeesAndAlerts(token, eventById, evIdList, calendarUser
-				.getDomain().getName());
+		loadAttendeesAndAlerts(token, eventById, evIdList, obmUser.getDomain().getName());
 		loadExceptions(cal, eventById, evIdList);
 		loadEventExceptions(token, eventById, evIdList);
+		
 		return ret;
 	}
 
@@ -2327,4 +2328,5 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(null, ps, null);
 		}
 	}
+	
 }

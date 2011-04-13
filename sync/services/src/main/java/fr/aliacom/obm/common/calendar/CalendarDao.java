@@ -35,8 +35,7 @@ public interface CalendarDao {
 
 	Date findLastUpdate(AccessToken token, String calendar);
 
-	List<Event> findListEventsFromIntervalDate(AccessToken token,
-			ObmUser calendarUser, Date start, Date end, EventType typeFilter);
+	List<Event> listEventsByIntervalDate(AccessToken token, ObmUser obmUser, Date start, Date end, EventType typeFilter);
 
 	List<String> findRefusedEventsKeys(ObmUser calendarUser, Date date);
 
@@ -72,5 +71,4 @@ public interface CalendarDao {
 	Event removeEvent(Connection con, AccessToken token, int uid, EventType et) throws SQLException ;
 	
 	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, String extId, ParticipationState participationState) throws SQLException ;
-
 }

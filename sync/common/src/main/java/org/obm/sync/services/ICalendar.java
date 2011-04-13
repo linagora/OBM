@@ -248,5 +248,11 @@ public interface ICalendar {
 	 */
 	public int importICalendar(AccessToken token, String calendar, String ics) 
 		throws ImportICalendarException, AuthFault, ServerFault;
+	
+	/**
+	 * remove all calendar's events older than 6 month 
+	 * 
+	 */
+	public void purge(AccessToken token, String calendar) throws ServerFault;
 
 }

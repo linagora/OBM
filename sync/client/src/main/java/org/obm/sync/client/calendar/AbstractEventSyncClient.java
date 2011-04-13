@@ -449,4 +449,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		return Integer.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
 	
+	@Override
+	public void purge(final AccessToken token, final String calendar) throws ServerFault {
+		final Map<String, String> params = initParams(token);
+		params.put("calendar", calendar);
+		final Document doc = execute(type + "/purge", params);
+		checkServerError(doc);
+	}
+	
 }

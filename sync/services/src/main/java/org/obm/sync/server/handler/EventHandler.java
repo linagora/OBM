@@ -81,6 +81,7 @@ import fr.aliacom.obm.utils.LogUtils;
  * <code>/calendar/getFreeBusy?sid=xxx</code>
  * <code>/calendar/parseFreeBusyToICS?sid=xxx</code>
  * <code>/calendar/importICalendar</code>
+ * <code>/calendar/purge</code>
  */
 @Singleton
 public class EventHandler extends SecureSyncHandler {
@@ -171,11 +172,13 @@ public class EventHandler extends SecureSyncHandler {
 			return changeParticipationState(at, params, responder);
 		} else if (method.equals("importICalendar")) {
 			return importICalendar(at, params, responder);
+		} else if (method.equals("purge")) {
+			return purge(at, params, responder);
 		} else {
 			logger.error(LogUtils.prefix(at) + "cannot handle method '" + method + "'");
 			return "";
 		}
-	}
+	} 
 
 	private String parseFreeBusyToICS(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
@@ -485,6 +488,11 @@ public class EventHandler extends SecureSyncHandler {
 		
 		int countEvent = binding.importICalendar(token, calendar, ics);
 		return responder.sendInt(countEvent);
+	}
+	
+	private String purge(final AccessToken at, final ParametersSource params, final XmlResponder responder) throws ServerFault {
+		binding.purge(at, getCalendar(at, params));
+		return responder.sendBoolean(true);
 	}
 	
 }

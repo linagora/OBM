@@ -20,6 +20,7 @@ package fr.aliacom.obm.common.calendar;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -767,7 +768,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e1.getMessage());
 		}
 		try {
-			return calendarService.findListEventsFromIntervalDate(token,
+			return calendarService.listEventsByIntervalDate(token,
 					calendarUser, start, end, type);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -1105,4 +1106,28 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 		return false;
 	}
+
+	@Override
+	public void purge(final AccessToken token, final String calendar) throws ServerFault {
+		if (!helper.canReadCalendar(token, calendar)) {
+			throw new ServerFault("user has no read rights on calendar " + calendar);
+		}
+		try {
+			
+			final ObmUser obmUser = getCalendarOwner(calendar, token.getDomain());
+			
+			final Calendar endDate = Calendar.getInstance();
+			endDate.add(Calendar.MONTH, -6);
+		
+			final List<Event> events = calendarService.listEventsByIntervalDate(token, obmUser, new Date(0), endDate.getTime(), type);
+			for (final Event event: events) {
+				removeEvent(token, calendar, event.getExtId(), false);
+			}
+			
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}		
+	}
+	
 }
