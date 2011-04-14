@@ -15,8 +15,10 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -49,8 +51,10 @@ import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.internal.matchers.StringContains;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -59,6 +63,9 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
 
 public class Ical4jHelperTest {
 
@@ -73,49 +80,16 @@ public class Ical4jHelperTest {
 	}
 
 	protected Event getTestEvent() {
-		Event ev = new Event();
+		final Event ev = buildEvent();
 
-		Calendar cal = getCalendar();
+		final Calendar cal = getCalendar();
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
-		ev.setDate(cal.getTime());
-
-		ev.setExtId(UUID.randomUUID().toString());
-
-		ev.setTitle("fake rdv " + System.currentTimeMillis());
-		ev.setOwner("adrien");
-		ev.setDuration(3600);
-		ev.setLocation("tlse");
-
-		List<Attendee> la = new LinkedList<Attendee>();
-
-		Attendee at = new Attendee();
-		at.setDisplayName("adrien@zz.com");
-		at.setEmail("adrien@zz.com");
-		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.CHAIR);
-		at.setOrganizer(true);
-		la.add(at);
-
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase");
-		at.setEmail("notin@mydb.com");
-		at.setState(ParticipationState.NEEDSACTION);
-		at.setRequired(ParticipationRole.OPT);
-		la.add(at);
-
-		at = new Attendee();
-		at.setDisplayName("pouic");
-		at.setEmail("pouic@zz.com");
-		at.setState(ParticipationState.INPROGRESS);
-		at.setRequired(ParticipationRole.OPT);
-		la.add(at);
-
-		ev.setAttendees(la);
+	
 		ev.setAlert(60);
 
-		EventRecurrence er = new EventRecurrence();
+		final EventRecurrence er = new EventRecurrence();
 		er.setKind(RecurrenceKind.monthlybydate);
 		er.setFrequence(1);
 		er.addException(ev.getDate());
@@ -722,4 +696,92 @@ public class Ical4jHelperTest {
 		assertTrue(true);
 	}
 
+	@Test
+	public void testBuildIcsInvitationReply() {
+		final Event event = buildEvent();
+		final Attendee attendeeReply = event.getAttendees().get(2);
+
+		final ObmUser obmUser = buildObmUser(attendeeReply);
+
+		final String ics = Ical4jHelper.buildIcsInvitationReply(event, obmUser);
+		Assert.assertThat(ics, StringContains.containsString("ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;" +
+				"CN=OBM USER 3;ROLE=REQ-PARTICIPANT:mailto:obm3@obm.org"));
+		Assert.assertEquals(1, countStringOccurrences(ics, "ATTENDEE;"));	
+	}
+	
+	private Event buildEvent() {
+		final Event event = new Event();
+		event.setDate(new Date());
+
+		event.setExtId(UUID.randomUUID().toString());
+		event.setTitle("rdv " + System.currentTimeMillis());
+		event.setOwner("obm");
+		event.setDuration(3600);
+		event.setLocation("obm loca");
+		
+		final Attendee at1 = new Attendee();
+		at1.setDisplayName("OBM ORGANIZER");
+		at1.setEmail("obm@obm.org");
+		at1.setState(ParticipationState.ACCEPTED);
+		at1.setRequired(ParticipationRole.CHAIR);
+		at1.setOrganizer(true);
+		
+		final Attendee at2 = new Attendee();
+		at2.setDisplayName("OBM USER 2");
+		at2.setEmail("obm2@obm.org");
+		at2.setState(ParticipationState.ACCEPTED);
+		at2.setRequired(ParticipationRole.REQ);
+		
+		final Attendee at3 = new Attendee();
+		at3.setDisplayName("OBM USER 3");
+		at3.setEmail("obm3@obm.org");
+		at3.setState(ParticipationState.ACCEPTED);
+		at3.setRequired(ParticipationRole.REQ);
+		
+		final Attendee at4 = new Attendee();
+		at4.setDisplayName("OBM USER 4");
+		at4.setEmail("obm4@obm.org");
+		at4.setState(ParticipationState.DECLINED);
+		at4.setRequired(ParticipationRole.REQ);
+		
+		event.addAttendee(at1);
+		event.addAttendee(at2);
+		event.addAttendee(at3);
+		event.addAttendee(at4);
+		return event;
+	}
+	
+	private ObmUser buildObmUser(final Attendee attendeeReply) {
+		final ObmDomain obmDomain = new ObmDomain();
+		obmDomain.setName(splitEmail(attendeeReply.getEmail()).get("domain"));
+		
+		final ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(obmDomain);
+		obmUser.setEmail(splitEmail(attendeeReply.getEmail()).get("email"));
+		return obmUser;
+	}
+	
+	private Map<String, String> splitEmail(String email) {
+		Map<String, String> split = new HashMap<String, String>();
+		String[] tab = email.split("@");
+		for (String s: tab) {
+			if (!split.containsKey("email")) {
+				split.put("email", s);	
+			} else {
+				split.put("domain", s);
+			}	
+		}
+		return split;
+	}
+
+	private int countStringOccurrences(String str, String occ) {
+		int i = str.indexOf(occ);
+		int countIndexOf = 0;
+		while (i != -1) {
+			countIndexOf += 1;
+			i = str.indexOf(occ, i + occ.length());
+		}
+		return countIndexOf;
+	}
+	
 }

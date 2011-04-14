@@ -111,6 +111,8 @@ import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.collect.ImmutableList;
 
+import fr.aliacom.obm.common.user.ObmUser;
+
 public class Ical4jHelper {
 
 	private static final int SECONDS_IN_DAY = 43200000;
@@ -438,11 +440,9 @@ public class Ical4jHelper {
 	}
 
 	public static String parseEvents(AccessToken token, List<Event> listEvent) {
-
-		Calendar calendar = initCalandar();
-
-		for (Event event : listEvent) {
-			VEvent vEvent = getVEvent(token, event);
+		final Calendar calendar = initCalandar();
+		for (final Event event: listEvent) {
+			final VEvent vEvent = getVEvent(token, event, null);
 			calendar.getComponents().add(vEvent);
 		}
 		return calendar.toString();
@@ -451,7 +451,7 @@ public class Ical4jHelper {
 	public static String parseEvent(Event event, AccessToken token) {
 		
 		if (EventType.VEVENT.equals(event.getType())) {
-			Calendar c = buildVEvent(token, event);
+			Calendar c = buildVEvent(token, event, null);
 			return c.toString();
 		} else if (EventType.VTODO.equals(event.getType())) {
 			Calendar c = buildVTodo(event, token);
@@ -473,13 +473,13 @@ public class Ical4jHelper {
 		return calendar;
 	}
 
-	private static Calendar buildVEvent(AccessToken at, Event event) {
+	private static Calendar buildVEvent(AccessToken at, Event event, Attendee replyAttendee) {
 		Calendar calendar = initCalandar();
-		VEvent vEvent = getVEvent(at, event);
+		VEvent vEvent = getVEvent(at, event, replyAttendee);
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = getVEvent(null, ee, event.getExtId(), event);
+				VEvent eventExt = getVEvent(null, ee, event.getExtId(), event, replyAttendee);
 				calendar.getComponents().add(eventExt);
 			}
 		}
@@ -492,7 +492,7 @@ public class Ical4jHelper {
 		appendUidToICS(prop, event, null);
 		appendCreated(prop, event);
 		appendLastModified(prop, event);
-		appendAttendeeToICS(prop, event);
+		appendAttendeesToICS(prop, event.getAttendees());
 		appendCategoryToICS(prop, event);
 		appendDtStartToICS(prop, event);
 		appendDurationToIcs(prop, event);
@@ -529,34 +529,48 @@ public class Ical4jHelper {
 		return calendar.toString();
 	}
 	
-	public static String buildIcsInvitationReply(final Event event) {
-		final Calendar calendar = buildVEvent(null, event);		
+	public static String buildIcsInvitationReply(final Event event, final ObmUser obmUserReply) {
+		final Attendee replyAttendee = findAttendeeFromObmUserReply(event.getAttendees(), obmUserReply);
+		final Calendar calendar = buildVEvent(null, event, replyAttendee);		
 		calendar.getProperties().add(Method.REPLY);
 		return calendar.toString();
 	}
 	
+	private static Attendee findAttendeeFromObmUserReply(final List<Attendee> attendees, final ObmUser obmUser) {
+		for (final Attendee attendee: attendees) {
+			if (attendee.getEmail().equalsIgnoreCase(obmUser.getEmailAtDomain())) {
+				return attendee;
+			}
+		}
+		return null;
+	}
+
 	private static void appendDurationToIcs(PropertyList prop, Event event) {
 		prop.add(new Duration(new Dur(event.getDate(), event.getEndDate())));
 	}
 
 	public static String buildIcsInvitationCancel(AccessToken at, Event event) {
-		Calendar calendar = buildVEvent(at, event);
+		Calendar calendar = buildVEvent(at, event, null);
 		calendar.getProperties().add(Method.CANCEL);
 		return calendar.toString();
 	}
 	
-	public static VEvent getVEvent(AccessToken at, Event event) {
-		return getVEvent(at, event, null, null);
+	public static VEvent getVEvent(AccessToken at, Event event, Attendee replyAttendee) {
+		return getVEvent(at, event, null, null, replyAttendee);
 	}
 
-	public static VEvent getVEvent(AccessToken at, Event event, String parentExtID, Event parent) {
+	public static VEvent getVEvent(AccessToken at, Event event, String parentExtID, Event parent,  Attendee replyAttendee) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 
 		appendUidToICS(prop, event, parentExtID);
 		appendCreated(prop, event);
 		appendLastModified(prop, event);
-		appendAttendeeToICS(prop, event);
+		if (replyAttendee == null) {
+			appendAttendeesToICS(prop, event.getAttendees());
+		} else {
+			appendAttendeesToICS(prop, ImmutableList.of(replyAttendee));
+		}
 		appendCategoryToICS(prop, event);
 		appendDtStartToICS(prop, event);
 		appendDtEndToICS(prop, event);
@@ -594,7 +608,7 @@ public class Ical4jHelper {
 		appendUidToICS(prop, event, parentExtID);
 		appendCreated(prop, event);
 		appendLastModified(prop, event);
-		appendAttendeeToICS(prop, event);
+		appendAttendeesToICS(prop, event.getAttendees());
 		appendCategoryToICS(prop, event);
 		appendDtStartToICS(prop, event);
 		appendDuedToICS(prop, event);
@@ -783,11 +797,10 @@ public class Ical4jHelper {
 		}
 	}
 
-	private static void appendAttendeeToICS(PropertyList prop, Event event) {
-		for (Attendee attendee : event.getAttendees()) {
+	private static void appendAttendeesToICS(PropertyList prop, List<Attendee> attendees) {
+		for (final Attendee attendee: attendees) {
 			prop.add(getAttendee(attendee));
 		}
-
 	}
 
 	private static net.fortuna.ical4j.model.property.Attendee getAttendee(
