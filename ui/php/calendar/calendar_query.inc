@@ -1416,7 +1416,7 @@ function check_calendar_update_rights($params) {
     if ($cgp_use['property']['delegation']) { 
       $obm_q = new DB_OBM;
       $query = "SELECT userobm_delegation FROM UserObm
-        INNER JOIN CalendarEntity on calendarentity_calendar_id=userobm_id WHERE calendarentity_entity_id='$entity_id'";
+        INNER JOIN CalendarEntity on calendarentity_calendar_id=userobm_id WHERE calendarentity_calendar_id='$entity_id'";
 
       display_debug_msg($query, $cdg_sql, "check_calendar_update_rights");
       $obm_q->query($query);
