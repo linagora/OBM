@@ -1121,7 +1121,7 @@ public class CalendarBindingImpl implements ICalendar {
 		
 			final List<Event> events = calendarService.listEventsByIntervalDate(token, obmUser, new Date(0), endDate.getTime(), type);
 			for (final Event event: events) {
-				removeEvent(token, calendar, event.getExtId(), false);
+				removeEvent(token, calendar, event.getUid(), false);
 			}
 			
 		} catch (Throwable e) {
