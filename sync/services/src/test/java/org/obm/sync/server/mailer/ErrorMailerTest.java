@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -37,6 +38,8 @@ import freemarker.template.Template;
 @SuiteClasses({ErrorMailerTest.Error.class})
 public class ErrorMailerTest {
 
+	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
+	
 	public abstract static class Common {
 		
 		AccessToken at;
@@ -47,7 +50,7 @@ public class ErrorMailerTest {
 			
 			templateLoader = new ITemplateLoader() {
 				@Override
-				public Template getTemplate(String templateName, Locale locale)
+				public Template getTemplate(String templateName, Locale locale, TimeZone timezone)
 						throws IOException {
 					Configuration cfg = new Configuration();
 					cfg.setClassForTemplateLoading(getClass(), "template");
@@ -150,7 +153,7 @@ public class ErrorMailerTest {
 
 		@Override
 		protected void executeProcess(ErrorMailer errorMailer) {
-			errorMailer.notifyConnectorVersionError(getMockAccessToken(), "1.1.1", Locale.FRENCH);
+			errorMailer.notifyConnectorVersionError(getMockAccessToken(), "1.1.1", Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Test

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +44,7 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader{
 		return externalCfg;
 	}
 	
-	public Template getTemplate(String templateName, Locale locale) throws IOException {
+	public Template getTemplate(String templateName, Locale locale, TimeZone timezone) throws IOException {
 		Template ret = null;
 		try{
 			ret = getOverrideCfg().getTemplate(templateName, locale);
@@ -58,6 +59,7 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader{
 		if(ret == null){
 			throw new FileNotFoundException("Error while loading Template[ " + templateName + "] in " + constantService.getDefaultTemplateFolder() );
 		}
+		ret.setTimeZone(timezone);
 		return ret;
 	}
 }

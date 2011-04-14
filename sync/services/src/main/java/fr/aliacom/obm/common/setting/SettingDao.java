@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +44,8 @@ import fr.aliacom.obm.utils.ObmHelper;
 @Singleton
 public class SettingDao {
 
+	private static final String SETTING_TIME_ZONE = "set_timezone";
+	
 	private static final Log logger = LogFactory.getLog(SettingDao.class);
 	private final ObmHelper obmHelper;
 
@@ -260,6 +263,12 @@ public class SettingDao {
 		}
 
 		return ret;
+	}
+
+	public TimeZone getUserTimeZone(AccessToken token) {
+		Map<String, String> settings = getSettings(token);
+		String timezoneAsString = Objects.firstNonNull(settings.get(SETTING_TIME_ZONE), "GMT");
+		return TimeZone.getTimeZone(timezoneAsString);
 	}
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -38,72 +39,72 @@ public class EventChangeHandler {
 		this.eventChangeMailer = eventChangeMailer;
 	}
 	
-	public void create(final AccessToken at, final Event event, Locale locale) throws NotificationException {
+	public void create(final AccessToken at, final Event event, final Locale locale, final TimeZone timezone) throws NotificationException {
 		if (eventCreationInvolveNotification(event)) {
 			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
-			notifyCreate(at, attendees, event, locale);
+			notifyCreate(at, attendees, event, locale, timezone);
 		}
 	}
 	
-	private void notifyCreate(final AccessToken at, Collection<Attendee> attendees, final Event event, Locale locale){
+	private void notifyCreate(final AccessToken at, Collection<Attendee> attendees, final Event event, final Locale locale, final TimeZone timezone){
 		Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
 		
 		Set<Attendee> accepted = attendeeGroups.get(ParticipationState.ACCEPTED);
 		if(accepted != null && !accepted.isEmpty()){
-			eventChangeMailer.notifyAcceptedNewUsers(accepted, event, locale);
+			eventChangeMailer.notifyAcceptedNewUsers(accepted, event, locale, timezone);
 		}
 		
 		Set<Attendee> notAccepted = attendeeGroups.get(ParticipationState.NEEDSACTION);
 		if (notAccepted != null && !notAccepted.isEmpty()) {
-			eventChangeMailer.notifyNeedActionNewUsers(at, notAccepted, event, locale);
+			eventChangeMailer.notifyNeedActionNewUsers(at, notAccepted, event, locale, timezone);
 		}
 		
 	}
 
-	public void update(final AccessToken at, final Event previous, final Event current, final Locale locale) throws NotificationException {
+	public void update(final AccessToken at, final Event previous, final Event current, final Locale locale, final TimeZone timezone) throws NotificationException {
 		
 		final Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
 		final Set<Attendee> removedUsers = attendeeGroups.get(AttendeeStateValue.Old);
 		if (!removedUsers.isEmpty()) {
-			eventChangeMailer.notifyRemovedUsers(at, removedUsers, current, locale);
+			eventChangeMailer.notifyRemovedUsers(at, removedUsers, current, locale, timezone);
 		}
 		
 		final Set<Attendee> addedUsers = attendeeGroups.get(AttendeeStateValue.New);
 		if (!addedUsers.isEmpty()) {
-			notifyCreate(at, addedUsers, current, locale);
+			notifyCreate(at, addedUsers, current, locale, timezone);
 		}
 		
 		final Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
 		if (!currentUsers.isEmpty()) {
 			final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(currentUsers);
-			notifyAcceptedUpdateUsers(previous, current, locale, atts);
-			notifyNeedActionUpdateUsers(at, previous, current, locale, atts);
+			notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone);
+			notifyNeedActionUpdateUsers(at, previous, current, locale, atts, timezone);
 		}
 	
 		
 	}
 	
-	private void notifyAcceptedUpdateUsers(final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts) {
+	private void notifyAcceptedUpdateUsers(final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, final TimeZone timezone) {
 		final Set<Attendee> accepted = atts.get(ParticipationState.ACCEPTED);
 		if(accepted != null && !accepted.isEmpty()){
-			eventChangeMailer.notifyAcceptedUpdateUsers(accepted, previous, current, locale);
+			eventChangeMailer.notifyAcceptedUpdateUsers(accepted, previous, current, locale, timezone);
 		}	
 	}
 	
-	private void notifyNeedActionUpdateUsers(final AccessToken at, final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts) { 
+	private void notifyNeedActionUpdateUsers(final AccessToken at, final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, final TimeZone timezone) { 
 		final Set<Attendee> notAccepted = atts.get(ParticipationState.NEEDSACTION);
 		if (notAccepted != null && !notAccepted.isEmpty()) {
-			eventChangeMailer.notifyNeedActionUpdateUsers(at, notAccepted, previous, current, locale);
+			eventChangeMailer.notifyNeedActionUpdateUsers(at, notAccepted, previous, current, locale, timezone);
 		}
 	}
 
-	public void delete(final AccessToken at, final Event event, Locale locale) throws NotificationException {
+	public void delete(final AccessToken at, final Event event, final Locale locale, final TimeZone timezone) throws NotificationException {
  		if (eventDeletionInvolveNotification(event)) {
  			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
  			Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
  			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
  			if(notify.size() >0){
- 				eventChangeMailer.notifyRemovedUsers(at, notify, event, locale);
+ 				eventChangeMailer.notifyRemovedUsers(at, notify, event, locale, timezone);
  			}
  		}
  	}
@@ -196,13 +197,13 @@ public class EventChangeHandler {
 	}
 	
 	public void updateParticipationState(final Event event, final ObmUser calendarOwner, final ParticipationState state, 
-			final Locale locale) {
+			final Locale locale, final TimeZone timezone) {
 		if (ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)) {
 			final Attendee organizer = event.findOrganizer();
 			if (organizer != null) {
 				if (!ParticipationState.DECLINED.equals(organizer.getState())&& !StringUtils.isEmpty(organizer.getEmail()) 
 						&& !organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain())) {
-					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale);
+					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale, timezone);
 				}
 			} else {
 				logger.error("Can't find organizer, email won't send");

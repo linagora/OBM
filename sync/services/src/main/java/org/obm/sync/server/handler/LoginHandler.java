@@ -98,7 +98,7 @@ public class LoginHandler implements ISyncHandler {
 			logger.error(e.getToken().getOrigin() +" isn't longer suppored.");
 			errorMailer.notifyConnectorVersionError(e.getToken(),
 					e.getConnectorVersion().toString(),
-					settingsDao.getUserLanguage(e.getToken()));
+					settingsDao.getUserLanguage(e.getToken()), settingsDao.getUserTimeZone(e.getToken()));
 		}
 	}
 }

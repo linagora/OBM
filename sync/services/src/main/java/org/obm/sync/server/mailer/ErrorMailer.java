@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +47,7 @@ public class ErrorMailer extends AbstractMailer {
 				.makeMap();
 	}
 	
-	public void notifyConnectorVersionError(AccessToken at, String version, Locale locale) throws NotificationException {
+	public void notifyConnectorVersionError(AccessToken at, String version, Locale locale, TimeZone timezone) throws NotificationException {
 		try {
 			Date now = new Date();
 			Date lastNotificationDate = lastNotificationDateByUser.putIfAbsent(at.getUserWithDomain(), now);
@@ -57,7 +58,7 @@ public class ErrorMailer extends AbstractMailer {
 							getSystemAddress(at), 
 							convertAccessTokenToAddresse(at), 
 							connectorVersionErrorTitle(locale), 
-							newUserBodyTxt(version,locale));
+							newUserBodyTxt(version,locale, timezone));
 				sendNotificationMessage(mail, ImmutableList.of(convertAccessTokenToAddresse(at)));
 			}
 		} catch (UnsupportedEncodingException e) {
@@ -92,8 +93,8 @@ public class ErrorMailer extends AbstractMailer {
 	}
 	
 	
-	private String newUserBodyTxt(String version, Locale locale) throws IOException, TemplateException {
-		return applyOBMConnectorVersionOnTemplate("OBMConnectorErrorVersionPlain.tpl", version, locale);
+	private String newUserBodyTxt(String version, Locale locale, TimeZone timezone) throws IOException, TemplateException {
+		return applyOBMConnectorVersionOnTemplate("OBMConnectorErrorVersionPlain.tpl", version, locale, timezone);
 	}
 	
 	private void sendNotificationMessage(ErrorMail mail, List<InternetAddress>  addresses) throws MessagingException {
@@ -101,10 +102,10 @@ public class ErrorMailer extends AbstractMailer {
 		mailService.sendMessage(session, addresses, mimeMail);
 	}
 	
-	private String applyOBMConnectorVersionOnTemplate(String templateName, String version, Locale locale)
+	private String applyOBMConnectorVersionOnTemplate(String templateName, String version, Locale locale, TimeZone timezone)
 			throws IOException, TemplateException {
 		Builder<Object, Object> builder = buildOBMConnectorVersionDatamodel(version);
-		Template template = templateLoader.getTemplate(templateName, locale);
+		Template template = templateLoader.getTemplate(templateName, locale, timezone);
 		return applyTemplate(builder.build(), template);
 	}
 	

@@ -51,6 +51,8 @@ import freemarker.template.Template;
 	EventChangeMailerTest.AcceptedUpdate.class, EventChangeMailerTest.NeedActionUpdate.class})
 public class EventChangeMailerTest {
 
+	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
+	
 	public abstract static class Common {
 		
 		
@@ -59,12 +61,15 @@ public class EventChangeMailerTest {
 		public Common(){
 			templateLoader = new ITemplateLoader() {
 				@Override
-				public Template getTemplate(String templateName, Locale locale)
+				public Template getTemplate(String templateName, Locale locale, TimeZone timezone)
 						throws IOException {
 					Configuration cfg = new Configuration();
 					cfg.setClassForTemplateLoading(getClass(), "template");
+					Template template = cfg.getTemplate(templateName, locale);
+					template.setTimeZone(TIMEZONE);
 					return cfg.getTemplate(templateName, locale);
 				}
+
 			};
 			
 		}
@@ -108,7 +113,7 @@ public class EventChangeMailerTest {
 
 		protected Date date(int year, int month, int day, int hour, int minute) {
 			Calendar calendar = GregorianCalendar.getInstance();
-			calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
+			calendar.setTimeZone(TIMEZONE);
 			calendar.set(year, month, day, hour, minute, 0);
 			Date refDate = calendar.getTime();
 			return refDate;
@@ -149,7 +154,7 @@ public class EventChangeMailerTest {
 			event.setOwner("raphael");
 			event.setOwnerDisplayName("Raphael ROUGERON");
 			event.setOwnerEmail("rrougeron@linagora.com");
-			event.setDate(date(2010, 10, 8, 10, 00));
+			event.setDate(date(2010, 10, 8, 11, 00));
 			event.setExtId("f1514f44bf39311568d64072c1fec10f47fe");
 			event.setDuration(2700);
 			event.setUid("1354");
@@ -268,7 +273,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyNeedActionNewUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH);
+			eventChangeMailer.notifyNeedActionNewUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Test
@@ -345,7 +350,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyAcceptedNewUsers(event.getAttendees(), event, Locale.FRENCH);
+			eventChangeMailer.notifyAcceptedNewUsers(event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Test
@@ -413,12 +418,12 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event before = buildTestEvent();
 			Event after = before.clone();
-			after.setDate(date(2010, 10, 8, 11, 00));
+			after.setDate(date(2010, 10, 8, 12, 00));
 			after.setDuration(3600);
 			for(Attendee att : before.getAttendees()){
 				att.setState(ParticipationState.ACCEPTED);
 			}
-			eventChangeMailer.notifyAcceptedUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH);
+			eventChangeMailer.notifyAcceptedUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Override
@@ -486,12 +491,12 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event before = buildTestEvent();
 			Event after = before.clone();
-			after.setDate(date(2010, 10, 8, 11, 00));
+			after.setDate(date(2010, 10, 8, 12, 00));
 			after.setDuration(3600);
 			for(Attendee att : before.getAttendees()){
 				att.setState(ParticipationState.NEEDSACTION);
 			}
-			eventChangeMailer.notifyNeedActionUpdateUsers(getStubAccessToken(), before.getAttendees(), before, after, Locale.FRENCH);
+			eventChangeMailer.notifyNeedActionUpdateUsers(getStubAccessToken(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Override
@@ -574,7 +579,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyRemovedUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH);
+			eventChangeMailer.notifyRemovedUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Override

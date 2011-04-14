@@ -220,7 +220,7 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event ev) throws FindException {
 		if (ev.isInternalEvent()) {
-			eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token));
+			eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
 		} else {
 			notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED);
 		}
@@ -329,7 +329,7 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 			
 			if (notification) {
-				eventChangeHandler.update(token, before, after, settingsDao.getUserLanguage(token));
+				eventChangeHandler.update(token, before, after, settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
 			}
 			
 			return after;
@@ -449,7 +449,7 @@ public class CalendarBindingImpl implements ICalendar {
 				"Calendar : sending participation notification to organizer of event ["+ ev.getTitle() + "]");
 		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
 		eventChangeHandler.updateParticipationState(ev, calendarOwner, state, 
-				settingsDao.getUserLanguage(token));
+				settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
 	}
 
 	
@@ -465,7 +465,7 @@ public class CalendarBindingImpl implements ICalendar {
 			Event ev = calendarService.createEvent(token, calendar, event, true);
 			ev = calendarService.findEvent(token, ev.getDatabaseId());
 			if (notification) {
-			    eventChangeHandler.create(token, ev, settingsDao.getUserLanguage(token));
+				eventChangeHandler.create(token, ev, settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
 			}
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");
@@ -990,7 +990,7 @@ public class CalendarBindingImpl implements ICalendar {
 		if (newEvent != null) {
 			if (notification) {
 				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
-						settingsDao.getUserLanguage(token));
+						settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
 			}
 		} else {
 			logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
