@@ -734,12 +734,12 @@ if ($action == 'search') {
 
 } elseif ($action == 'rights_admin') {
 ///////////////////////////////////////////////////////////////////////////////
-  if(!Obm_Acl::isAllowed($obm['uid'], 'calendar', $params['entity_id'], "admin")){
-    $err['msg'] = $l_insufficient_permission;
-    $display['msg'] .= display_err_msg($err['msg']);
+  if(Obm_Acl::isAllowed($obm['uid'], 'calendar', $params['entity_id'], "admin") || check_calendar_update_rights($params) ){
+    $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
   }
   else{
-    $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
+    $err['msg'] = $l_insufficient_permission;
+    $display['msg'] .= display_err_msg($err['msg']);
   }
 
 } elseif ($action == 'rights_update') {

@@ -1399,6 +1399,45 @@ function check_access_entity($calendar_ids, $resource_ids) {
   return $ok;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Calendar specific rights checking (eg : delegation)
+// Parameters:
+//   - $params[] : user values
+// Returns:
+//   - true if OK, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_calendar_update_rights($params) {
+  global $err, $cgp_use, $l_error_delegation;
+
+  $entity_id = $params['entity_id'];
+  if ($entity_id > 0) {
+    // Check if delegation is used
+    if ($cgp_use['property']['delegation']) { 
+      $obm_q = new DB_OBM;
+      $query = "SELECT userobm_delegation FROM UserObm
+        INNER JOIN CalendarEntity on calendarentity_calendar_id=userobm_id WHERE calendarentity_entity_id='$entity_id'";
+
+      display_debug_msg($query, $cdg_sql, "check_calendar_update_rights");
+      $obm_q->query($query);
+      if($obm_q->num_rows()>0) {
+        $obm_q->next_record();
+        $calendar_delegation = $obm_q->f("userobm_delegation");
+  
+        // Check delegation update right
+        if (! of_delegation_check_update_rights($params, $calendar_delegation, $calendar_delegation)) {
+	        $err['msg'] .= $l_error_delegation;
+	        return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
+
+
+
 /**
  * Check if the user is an event's attendee
  * @param $event_id
