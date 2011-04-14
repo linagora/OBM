@@ -223,12 +223,12 @@ elseif ($action == "ext_get_ids") {
     $display["detail"] = dis_document_can_delete($params["document_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err["msg"]);
-    $display["detail"] = dis_document_consult($params);
+    $display["detail"] = dis_document_force_delete($params["document_id"]);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_can_delete($params["document_id"])) {
+  if ($params["force"] == "true" || check_document_can_delete($params["document_id"])) {
     $retour = run_query_document_delete($params["document_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_document : $l_delete_ok");

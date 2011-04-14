@@ -158,6 +158,10 @@ form {
   text-align: center;
 }
 
+.L {
+  text-align: left;
+}
+
 .R {
   text-align: right;
 }

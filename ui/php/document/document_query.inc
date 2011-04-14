@@ -641,9 +641,9 @@ function run_query_document_get_type_by_ext($ext) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the Mime Type of a file
+// Get the number of entities linked to a document
 // Parameters:
-//   - $type : Mime-Type
+//   - $document_id
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_link_nb($document_id) {
   global $cdg_sql;
@@ -659,6 +659,28 @@ function get_document_link_nb($document_id) {
   $obm_q->next_record();
 
   return $obm_q->f("nb");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get events linked to a document
+// Parameters:
+//   - $document_id
+///////////////////////////////////////////////////////////////////////////////
+function get_document_linked_events($document_id) {
+  global $cdg_sql;
+
+  $document_id = sql_parse_id($document_id, true);
+  $query = "SELECT event_id, event_title
+    FROM Event 
+    INNER JOIN EventEntity ON evententity_event_id = event_id 
+    INNER JOIN DocumentLink ON evententity_entity_id = documentlink_entity_id
+    WHERE documentlink_document_id $document_id ";
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "get_document_linked_events()");
+  $obm_q->query($query);
+
+  return $obm_q;
 }
 
 

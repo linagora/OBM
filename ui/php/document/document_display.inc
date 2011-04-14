@@ -741,6 +741,38 @@ function dis_document_can_delete($p_id) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the list of events linked to a document
+// Parameters:
+//   - $p_id : document id
+///////////////////////////////////////////////////////////////////////////////
+function dis_document_force_delete($p_id) {
+  global $l_force_delete, $l_back, $path;
+  
+  $events_q = get_document_linked_events($p_id);
+  
+  $block = "<div class=\"detail admin\"><table class=\"L\">
+    <thead>
+      <tr><td>$GLOBALS[l_events]</td></tr>
+    </thead>
+    <tbody>";
+  
+  while ($events_q->next_record()) {
+    $id = $events_q->f('event_id');
+    $title = $events_q->f('event_title');
+    $block.= "<tr><td><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=$id\">$title</a></td></tr>";
+  }
+  
+  $block .="</tbody></table></div>
+  <div class=\"buttons\">
+  <a href=\"$path/document/document_index.php?action=delete&amp;force=true&amp;document_id=$p_id\" >$l_force_delete</a>
+  <a href=\"$path/document/document_index.php?action=detailconsult&amp;document_id=$p_id\">$l_back</a>
+  </div>";
+
+  return $block;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Display and check the directory links (and delete form if ok)
