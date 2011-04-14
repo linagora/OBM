@@ -880,24 +880,26 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		if (lastSync != null) {
 			fetchIds.append(" AND (e.event_timecreate >= ? OR e.event_timeupdate >= ? OR attupd.eventlink_timeupdate >= ?");
 			if (onEventDate) {
-				fetchIds.append(" OR e.event_date >= ? OR event_repeatkind != 'none'");
+				fetchIds.append(" OR e.event_date >= ? OR e.event_repeatkind != 'none'");
 			}
 			fetchIds.append(")");
 		}
-
-		fetchIds.append(" GROUP BY e.event_id, att.eventlink_state, e.event_ext_id");
 		
 		if(syncRange != null){
 			fetchIds.append("AND (");
-			fetchIds.append("event_repeatkind != 'none' OR ");
-			fetchIds.append("(event_date >= ? ");
+			fetchIds.append("e.event_repeatkind != 'none' OR ");
+			fetchIds.append("(e.event_date >= ? ");
 			if(syncRange.getBefore() != null){
-				fetchIds.append("AND event_date <= ? ");
+				fetchIds.append("AND e.event_date <= ? ");
 			}
 			fetchIds.append(") )");
 			logger.info(token.getUser() + " will use the sync range [ "
 					+ syncRange.getAfter() + " - " + syncRange.getBefore() + " ]");
 		}
+
+		fetchIds.append(" GROUP BY e.event_id, att.eventlink_state, e.event_ext_id");
+		
+		
 		
 		List<DeletedEvent> declined = new LinkedList<DeletedEvent>();
 
