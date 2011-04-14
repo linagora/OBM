@@ -63,7 +63,12 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_mailbox_right_dis_admin($params["entity_id"]);
+  if(Obm_Acl::isAllowed($obm['uid'], 'mailbox', $params['entity_id'], "admin") || check_mailbox_update_rights($params) ){
+    $display["detail"] = dis_mailbox_right_dis_admin($params["entity_id"]);
+  } else {
+    $err['msg'] = $l_insufficient_permission;
+    $display['msg'] .= display_err_msg($err['msg']);
+  }
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
