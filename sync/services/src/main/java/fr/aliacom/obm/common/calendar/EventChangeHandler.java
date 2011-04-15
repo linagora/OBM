@@ -25,8 +25,10 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserSettings;
 
 public class EventChangeHandler {
@@ -34,12 +36,14 @@ public class EventChangeHandler {
 	private static final Log logger = LogFactory.getLog(EventChangeHandler.class);
 	private final EventChangeMailer eventChangeMailer;
 	private final SettingsService settingsService;
+	private final UserService userService;
 
 	@Inject
 	/* package */ EventChangeHandler(EventChangeMailer eventChangeMailer,
-			SettingsService settingsService) {
+			SettingsService settingsService, UserService userService) {
 		this.eventChangeMailer = eventChangeMailer;
 		this.settingsService = settingsService;
+		this.userService = userService;
 	}
 	
 	public void create(final ObmUser user, final Event event) throws NotificationException {
@@ -208,17 +212,51 @@ public class EventChangeHandler {
 	}
 	
 	public void updateParticipationState(final Event event, final ObmUser calendarOwner, final ParticipationState state) {
-		if (ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)) {
+		if (isHandledParticipationState(state)) {
 			final Attendee organizer = event.findOrganizer();
 			if (organizer != null) {
-				if (!ParticipationState.DECLINED.equals(organizer.getState())&& !StringUtils.isEmpty(organizer.getEmail()) 
-						&& !organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain())) {
-					UserSettings settings = settingsService.getSettings(calendarOwner);					
+				if (updateParticipationStateNeedsNotification(calendarOwner, organizer)) {
+					UserSettings settings = settingsService.getSettings(calendarOwner);
 					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, settings.locale(), settings.timezone());
 				}
 			} else {
 				logger.error("Can't find organizer, email won't send");
 			}
+		}
+	}
+	
+	private boolean updateParticipationStateNeedsNotification(
+			final ObmUser calendarOwner, final Attendee organizer) {
+
+		return organizerHasEmailAddress(organizer) && organizerMayAttend(organizer) &&
+		organizerExpectParticipationEmails(organizer, calendarOwner.getDomain()) &&
+		!organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain());
+	}
+
+	private boolean organizerExpectParticipationEmails(Attendee organizer, ObmDomain domain) {
+		ObmUser user = userService.getUserFromLogin(organizer.getEmail(), domain.getName());
+		UserSettings settings = settingsService.getSettings(user);
+		return settings.expectParticipationEmailNotification();
+	}
+
+	private boolean organizerMayAttend(final Attendee organizer) {
+		return !ParticipationState.DECLINED.equals(organizer.getState());
+	}
+
+	private boolean organizerHasEmailAddress(final Attendee organizer) {
+		return !StringUtils.isEmpty(organizer.getEmail());
+	}
+	
+	private boolean isHandledParticipationState(final ParticipationState state) {
+		if (state == null) {
+			return false;
+		}
+		switch (state) {
+		case ACCEPTED:
+		case DECLINED:
+			return true;
+		default:
+			return false;
 		}
 	}
 	

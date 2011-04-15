@@ -15,6 +15,9 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 import org.obm.sync.server.mailer.EventChangeMailer;
 
+import fr.aliacom.obm.common.setting.SettingsService;
+import fr.aliacom.obm.common.user.UserService;
+
 
 public abstract class AbstractEventChangeHandlerTest {
 
@@ -24,7 +27,10 @@ public abstract class AbstractEventChangeHandlerTest {
 
 
 	private EventChangeHandler newEventChangeHandler(EventChangeMailer mailer) {
-		return new EventChangeHandler(mailer, getDefaultSettingsService());
+		UserService userService = EasyMock.createMock(UserService.class);
+		SettingsService defaultSettingsService = getDefaultSettingsService();
+		EasyMock.replay(userService, defaultSettingsService);
+		return new EventChangeHandler(mailer, defaultSettingsService, userService);
 	}
 	
 	protected abstract void processEvent(EventChangeHandler eventChangeHandler, Event event) throws NotificationException;

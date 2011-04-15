@@ -1,7 +1,9 @@
 package fr.aliacom.obm.common.calendar;
 
+import static fr.aliacom.obm.ToolBox.getDefaultObmDomain;
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
 import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
+import static fr.aliacom.obm.ToolBox.getDefaultSettings;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.compareCollections;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendee;
@@ -30,14 +32,34 @@ import org.obm.sync.server.mailer.EventChangeMailer;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.internal.Lists;
 
+import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserService;
+import fr.aliacom.obm.common.user.UserSettings;
 
 @RunWith(Suite.class)
-@SuiteClasses({EventChangeHandlerTest.UpdateTests.class, EventChangeHandlerTest.CreateTests.class, EventChangeHandlerTest.DeleteTests.class})
+@SuiteClasses({
+	EventChangeHandlerTest.UpdateTests.class, 
+	EventChangeHandlerTest.CreateTests.class, 
+	EventChangeHandlerTest.DeleteTests.class, 
+	EventChangeHandlerTest.UpdateParticipationTests.class})
 public class EventChangeHandlerTest {
 	
 	private static final Locale LOCALE = Locale.FRENCH;
 	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
+	
+	private static EventChangeHandler newEventChangeHandler(
+			EventChangeMailer mailer, SettingsService settingsService, UserService userService) {
+		
+		return new EventChangeHandler(mailer, settingsService, userService);
+	}
+	
+	private static EventChangeHandler newEventChangeHandler(EventChangeMailer mailer) {
+		UserService userService = EasyMock.createMock(UserService.class);
+		SettingsService settingsService = getDefaultSettingsService();
+		EasyMock.replay(userService, settingsService);
+		return newEventChangeHandler(mailer, settingsService, userService);
+	}
 	
 	public static class CreateTests extends AbstractEventChangeHandlerTest {
 		@Override
@@ -273,10 +295,6 @@ public class EventChangeHandlerTest {
 
 	public static class UpdateTests {
 
-		private EventChangeHandler newEventChangeHandler(EventChangeMailer mailer) {
-			return new EventChangeHandler(mailer, getDefaultSettingsService());
-		}
-		
 		@Test
 		public void testDefaultEventNoChange() {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -443,5 +461,94 @@ public class EventChangeHandlerTest {
 			verify(mailer);
 		}	
 	
+	}
+
+	public static class UpdateParticipationTests {
+		
+		@Test
+		public void testParticipationChangeWithOwnerExpectingEmails() {
+			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
+			Attendee organizer = createRequiredAttendee("organizer@test", ParticipationState.ACCEPTED);
+			organizer.setOrganizer(true);
+			
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+			
+			Event event = new Event();
+			event.setDate(after());
+			event.addAttendee(attendee);
+			event.addAttendee(organizer);
+			
+			ObmUser attendeeUser = new ObmUser();
+			attendeeUser.setEmail(attendee.getEmail());
+			attendeeUser.setDomain(getDefaultObmDomain());
+			
+			ObmUser organizerUser = new ObmUser();
+			attendeeUser.setEmail(attendee.getEmail());
+			attendeeUser.setDomain(getDefaultObmDomain());
+			
+			mailer.notifyUpdateParticipationState(
+					eq(event), eq(organizer), eq(attendeeUser),
+					eq(ParticipationState.ACCEPTED), eq(LOCALE), eq(TIMEZONE));
+			expectLastCall().once();
+			
+			UserService userService = EasyMock.createMock(UserService.class);
+			userService.getUserFromLogin(organizer.getEmail(), attendeeUser.getDomain().getName());
+			EasyMock.expectLastCall().andReturn(organizerUser).once();
+
+			UserSettings settings = getDefaultSettings();
+			EasyMock.expect(settings.expectParticipationEmailNotification()).andReturn(true).once();
+			
+			SettingsService settingsService = EasyMock.createMock(SettingsService.class);
+			settingsService.getSettings(eq(organizerUser));
+			EasyMock.expectLastCall().andReturn(settings).once();
+			settingsService.getSettings(eq(attendeeUser));
+			EasyMock.expectLastCall().andReturn(settings).once();
+			
+			EasyMock.replay(userService, settingsService, settings, mailer);
+			
+			EventChangeHandler handler = newEventChangeHandler(mailer, settingsService, userService);
+			handler.updateParticipationState(event, attendeeUser, ParticipationState.ACCEPTED);
+			verify(userService, settingsService, settings, mailer);
+		}
+
+		@Test
+		public void testParticipationChangeWithOwnerNotExpectingEmails() {
+			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
+			Attendee organizer = createRequiredAttendee("organizer@test", ParticipationState.ACCEPTED);
+			organizer.setOrganizer(true);
+			
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+			
+			Event event = new Event();
+			event.setDate(after());
+			event.addAttendee(attendee);
+			event.addAttendee(organizer);
+			
+			ObmUser attendeeUser = new ObmUser();
+			attendeeUser.setEmail(attendee.getEmail());
+			attendeeUser.setDomain(getDefaultObmDomain());
+			
+			ObmUser organizerUser = new ObmUser();
+			attendeeUser.setEmail(attendee.getEmail());
+			attendeeUser.setDomain(getDefaultObmDomain());
+			
+			
+			UserService userService = EasyMock.createMock(UserService.class);
+			userService.getUserFromLogin(organizer.getEmail(), attendeeUser.getDomain().getName());
+			EasyMock.expectLastCall().andReturn(organizerUser).once();
+
+			UserSettings settings = getDefaultSettings();
+			EasyMock.expect(settings.expectParticipationEmailNotification()).andReturn(false).once();
+			
+			SettingsService settingsService = EasyMock.createMock(SettingsService.class);
+			settingsService.getSettings(eq(organizerUser));
+			EasyMock.expectLastCall().andReturn(settings).once();
+			
+			EasyMock.replay(userService, settingsService, settings, mailer);
+			
+			EventChangeHandler handler = newEventChangeHandler(mailer, settingsService, userService);
+			handler.updateParticipationState(event, attendeeUser, ParticipationState.ACCEPTED);
+			verify(userService, settingsService, settings, mailer);
+		}
 	}
 }
