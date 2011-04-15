@@ -262,4 +262,9 @@ public class ObmUser {
 	public String getDisplayName(){
 		return DisplayNameUtils.getDisplayName(commonName, firstName, lastName);
 	}
+	
+	@Override
+	public String toString() {
+		return getEmailAtDomain();
+	}
 }

@@ -1,5 +1,7 @@
 package org.obm.sync.server.mailer;
 
+import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -69,7 +71,6 @@ public class EventChangeMailerTest {
 					template.setTimeZone(TIMEZONE);
 					return cfg.getTemplate(templateName, locale);
 				}
-
 			};
 			
 		}
@@ -273,7 +274,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyNeedActionNewUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
+			eventChangeMailer.notifyNeedActionNewUsers(getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Test
@@ -496,7 +497,7 @@ public class EventChangeMailerTest {
 			for(Attendee att : before.getAttendees()){
 				att.setState(ParticipationState.NEEDSACTION);
 			}
-			eventChangeMailer.notifyNeedActionUpdateUsers(getStubAccessToken(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE);
+			eventChangeMailer.notifyNeedActionUpdateUsers(getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Override
@@ -579,7 +580,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyRemovedUsers(getStubAccessToken(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
+			eventChangeMailer.notifyRemovedUsers(getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Override

@@ -83,7 +83,7 @@ public class FreeBusyProvider extends HttpServlet {
 			domain = domainDao.findDomainByName(domainName);
 		}
 		if(domain != null){
-			user = userDao.findUser(email, domain.getId());
+			user = userDao.findUser(email, domain);
 		}
 		if (domain == null || user == null || !user.isPublicFreeBusy()) {
 			logger.warn("FreeBusyProvider : user not found : '" + email + "' or freebusy is not public.");
@@ -108,7 +108,7 @@ public class FreeBusyProvider extends HttpServlet {
 		fbr.setAttendees(atts);
 		fbr.setOwner(email);
 
-		List<FreeBusy> fb = calendarDao.getFreeBusy(domain.getId(), fbr);
+		List<FreeBusy> fb = calendarDao.getFreeBusy(domain, fbr);
 		String ics = "";
 		if (fb.size() > 0) {
 			ics = Ical4jHelper.parseFreeBusy(fb.iterator().next());

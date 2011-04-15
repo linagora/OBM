@@ -713,7 +713,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 	
 	@Override
-	public List<FreeBusy> getFreeBusy(Integer domainId, FreeBusyRequest fbr) {
+	public List<FreeBusy> getFreeBusy(ObmDomain domain, FreeBusyRequest fbr) {
 
 		String fb = "SELECT e.event_id, e.event_date, e.event_duration, event_allday"
 				+ ", e.event_repeatkind, e.event_repeatdays, e.event_repeatfrequence, e.event_endrepeat"
@@ -742,7 +742,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				logger.info("freebusy " + att.getEmail() + " dstart: "
 						+ fbr.getStart() + " dend: " + fbr.getEnd());
 
-				ObmUser u = userDao.findUser(att.getEmail(), domainId);
+				ObmUser u = userDao.findUser(att.getEmail(), domain);
 
 				Calendar cal = getGMTCalendar();
 				if (u != null) {

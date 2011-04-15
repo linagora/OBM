@@ -47,7 +47,7 @@ public interface CalendarDao {
 			AccessToken token, ObmUser calendarUser, Date start, Date end,
 			EventType typeFilter);
 
-	List<FreeBusy> getFreeBusy(Integer domainId, FreeBusyRequest request);
+	List<FreeBusy> getFreeBusy(ObmDomain domain, FreeBusyRequest request);
 
 	EventChanges getSync(AccessToken token, ObmUser calendarUser,
 			Date lastSync, SyncRange syncRange, EventType typeFilter, boolean onEventDate);

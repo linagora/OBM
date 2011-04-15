@@ -52,9 +52,7 @@ import org.obm.sync.services.ICalendar;
 import org.obm.sync.services.ImportICalendarException;
 
 import com.google.common.base.Function;
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
@@ -63,36 +61,37 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.setting.SettingDao;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserDao;
+import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.Helper;
 import fr.aliacom.obm.utils.Ical4jHelper;
 import fr.aliacom.obm.utils.LogUtils;
 
 public class CalendarBindingImpl implements ICalendar {
 
-	private static final Log logger = LogFactory
-			.getLog(CalendarBindingImpl.class);
+	private static final Log logger = LogFactory.getLog(CalendarBindingImpl.class);
 
 	private EventType type;
-	private DomainService domainService;
-	private EventChangeHandler eventChangeHandler;
-	private UserDao userDao;
-	private CalendarDao calendarService;
-
-	private CategoryDao categoryDao;
-	private SettingDao settingsDao;
+	
+	private final CalendarDao calendarDao;
+	private final CategoryDao categoryDao;
+	private final SettingDao settingsDao;
+	
+	private final DomainService domainService;
+	private final UserService userService;
+	private final EventChangeHandler eventChangeHandler;
+	
 	private final Helper helper;
 
 	@Inject
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
-			DomainService domainService, UserDao userDao,
+			DomainService domainService, UserService userService,
 			CalendarDao calendarDao, SettingDao settingDao,
 			CategoryDao categoryDao, Helper helper) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
-		this.userDao = userDao;
+		this.userService = userService;
 		this.settingsDao = settingDao;
-		this.calendarService = calendarDao;
+		this.calendarDao = calendarDao;
 		this.categoryDao = categoryDao;
 		this.helper = helper;
 	}
@@ -124,34 +123,8 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private List<CalendarInfo> listCalendarsImpl(AccessToken token)
 			throws FindException {
-		ObmUser u = getCalendarOwner(token.getUser(), token.getDomain());
-		return calendarService.listCalendars(u);
-	}
-
-	/**
-	 * Returns an ObmUser if the calendar@domainName has an email and is not
-	 * archived
-	 */
-	private ObmUser getCalendarOwner(String calendar, String domainName)
-			throws FindException {
-		String username = Iterables.getFirst(Splitter.on('@')
-				.omitEmptyStrings().split(calendar), null);
-		if (username == null) {
-			throw new FindException("invalid calendar string : " + calendar);
-		}
-		ObmDomain domain = domainService.findDomainByName(domainName);
-		if(domain == null){
-			logger.info("domain :" + domainName
-					+ " not found");
-			throw new FindException("Domain["+domainName+"] not exist or not valid");
-		}
-		ObmUser user = userDao.findUserByLogin(username, domain);
-		if (user == null || StringUtils.isEmpty(user.getEmail())) {
-			logger.info("user :" + calendar
-					+ " not found, archived or have no email");
-			throw new FindException("Calendar not exist or not valid");
-		}
-		return user;
+		ObmUser u = userService.getUserFromAccessToken(token);
+		return calendarDao.listCalendars(u);
 	}
 
 	@Override
@@ -160,7 +133,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throws AuthFault, ServerFault {
 		try {
 			int uid = Integer.valueOf(eventId);
-			Event ev = calendarService.findEvent(token, uid);
+			Event ev = calendarDao.findEvent(token, uid);
 
 			if (ev == null) {
 				logger.info(LogUtils.prefix(token) + "event with id : "
@@ -168,15 +141,15 @@ public class CalendarBindingImpl implements ICalendar {
 				return null;
 			}
 
-			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
-			ObmUser owner = getCalendarOwner(ev.getOwner(), token.getDomain());
+			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
+			ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain());
 			if (owner != null) {
 				if (helper.canWriteOnCalendar(token, calendar)) {
 					if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
 						return cancelEvent(token, calendar, notification, uid, ev);
 					} else {
 						changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, notification);
-						return calendarService.findEvent(token, uid);
+						return calendarDao.findEvent(token, uid);
 					}
 				}
 				
@@ -198,7 +171,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event cancelEvent(AccessToken token, String calendar,
 			boolean notification, int uid, Event ev) throws SQLException,
 			FindException {
-		Event removed = calendarService.removeEvent(token, uid, ev.getType());
+		Event removed = calendarDao.removeEvent(token, uid, ev.getType());
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + uid + "] removed");
 		if (notification) {
 			notifyOnRemoveEvent(token, calendar, removed);
@@ -208,7 +181,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private Event cancelEventByExtId(AccessToken token, ObmUser calendar, Event event, boolean notification) throws SQLException, FindException {
 		String extId = event.getExtId();
-		Event removed = calendarService.removeEventByExtId(token, calendar, extId);
+		Event removed = calendarDao.removeEventByExtId(token, calendar, extId);
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
 		
 		if (notification) {
@@ -220,7 +193,9 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event ev) throws FindException {
 		if (ev.isInternalEvent()) {
-			eventChangeHandler.delete(token, ev, settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
+			ObmUser user = userService.getUserFromAccessToken(token);
+			eventChangeHandler.delete(user, ev, 
+					settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
 		} else {
 			notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED);
 		}
@@ -231,8 +206,8 @@ public class CalendarBindingImpl implements ICalendar {
 	public Event removeEventByExtId(AccessToken token, String calendar,
 			String extId, boolean notification) throws AuthFault, ServerFault {
 		try {
-			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
-			final Event ev = calendarService.findEventByExtId(token, calendarUser, extId);
+			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
+			final Event ev = calendarDao.findEventByExtId(token, calendarUser, extId);
 
 			if (ev == null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] not removed, it doesn't exist");
@@ -244,7 +219,7 @@ public class CalendarBindingImpl implements ICalendar {
 					return ev;
 				}
 
-				ObmUser owner = getCalendarOwner(ev.getOwner(), token.getDomain());
+				ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain());
 				if (owner == null) {
 					logger.info(LogUtils.prefix(token) + "error, trying to remove an event without any owner : " + ev.getTitle());
 					return ev;
@@ -254,7 +229,7 @@ public class CalendarBindingImpl implements ICalendar {
 					return cancelEventByExtId(token, calendarUser, ev, notification);
 				} else {
 					changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, notification);
-					return calendarService.findEventByExtId(token, calendarUser, extId);
+					return calendarDao.findEventByExtId(token, calendarUser, extId);
 				}
 			}
 		} catch (Throwable e) {
@@ -275,7 +250,7 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		try {
 			
-			final ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
+			final ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
 			final Event before = loadCurrentEvent(token, calendarUser, event);
 
 			if (before == null) {
@@ -309,12 +284,12 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) {
 		if (Strings.isNullOrEmpty(event.getUid())) {
-			final Event currentEvent = calendarService.findEventByExtId(token, calendarUser, event.getExtId());
+			final Event currentEvent = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
 			event.setUid(currentEvent.getUid());
 			return currentEvent;
 		} else {
 			int uid = Integer.valueOf(event.getUid());
-			return calendarService.findEvent(token, uid);
+			return calendarDao.findEvent(token, uid);
 		}
 	}
 
@@ -323,13 +298,15 @@ public class CalendarBindingImpl implements ICalendar {
 		try{
 			prepareParticipationStateForNewEventAttendees(token, before, event);
 			
-			final Event after = calendarService.modifyEvent(token, calendar, event, updateAttendees, true);
+			final Event after = calendarDao.modifyEvent(token, calendar, event, updateAttendees, true);
 			if (after != null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
 			}
 			
 			if (notification) {
-				eventChangeHandler.update(token, before, after, settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
+				ObmUser user = userService.getUserFromAccessToken(token);
+				eventChangeHandler.update(user, before, after, 
+						settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
 			}
 			
 			return after;
@@ -343,14 +320,14 @@ public class CalendarBindingImpl implements ICalendar {
 			Event event, boolean updateAttendees, boolean notification) throws ServerFault {
 		try {
 			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
-				ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
-				calendarService.removeEventByExtId(token, calendarOwner, event.getExtId());
+				ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
+				calendarDao.removeEventByExtId(token, calendarOwner, event.getExtId());
 				notifyOrganizerForExternalEvent(token, calendar, event);
 				logger.info(LogUtils.prefix(token) + "Calendar : External event[" + event.getTitle() + 
 						"] removed, calendar owner won't attende to it");
 				return event;
 			} else {
-				Event after = calendarService.modifyEvent(token,  calendar, event, updateAttendees, false);
+				Event after = calendarDao.modifyEvent(token,  calendar, event, updateAttendees, false);
 				if (after != null) {
 					logger.info(LogUtils.prefix(token) + "Calendar : External event[" + after.getTitle() + "] modified");
 				}
@@ -417,13 +394,13 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
 				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ event.getTitle() + "] refused, mark event as deleted");
-				calendarService.removeEvent(token, event, event.getType());
+				calendarDao.removeEvent(token, event, event.getType());
 				if (notification) {
 					notifyOrganizerForExternalEvent(token, calendar, event);
 				}
 				return event;
 			} else {
-				Event ev = calendarService.createEvent(token, calendar, event, false);
+				Event ev = calendarDao.createEvent(token, calendar, event, false);
 				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ ev.getTitle() + "] created");
 				if (notification) {
 					notifyOrganizerForExternalEvent(token, calendar, ev);
@@ -438,7 +415,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private boolean isEventDeclinedForCalendarOwner(AccessToken token,
 			String calendar, Event event) throws FindException {
-		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
+		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
 		Attendee userAsAttendee = event.findAttendeeForUser(calendarOwner.getEmailAtDomain());
 		return userAsAttendee != null && userAsAttendee.getState() == ParticipationState.DECLINED;
 	}
@@ -447,14 +424,14 @@ public class CalendarBindingImpl implements ICalendar {
 			String calendar, Event ev, ParticipationState state) throws FindException {
 		logger.info(LogUtils.prefix(token) + 
 				"Calendar : sending participation notification to organizer of event ["+ ev.getTitle() + "]");
-		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
+		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
 		eventChangeHandler.updateParticipationState(ev, calendarOwner, state, 
 				settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
 	}
 
 	
 	private void notifyOrganizerForExternalEvent(AccessToken token, String calendar, Event ev) throws FindException {
-		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
+		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
 		Attendee calendarOwnerAsAttendee = ev.findAttendeeForUser(calendarOwner.getEmailAtDomain());
 		notifyOrganizerForExternalEvent(token, calendar, ev, calendarOwnerAsAttendee.getState());
 	}
@@ -462,10 +439,12 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event createInternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
 		try{
 			changePartipationStateOnWritableCalendar(token, event);
-			Event ev = calendarService.createEvent(token, calendar, event, true);
-			ev = calendarService.findEvent(token, ev.getDatabaseId());
+			Event ev = calendarDao.createEvent(token, calendar, event, true);
+			ev = calendarDao.findEvent(token, ev.getDatabaseId());
 			if (notification) {
-				eventChangeHandler.create(token, ev, settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
+				ObmUser user = userService.getUserFromAccessToken(token);
+			    eventChangeHandler.create(user, ev, settingsDao.getUserLanguage(token),
+			    		settingsDao.getUserTimeZone(token));
 			}
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");
@@ -594,7 +573,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 		ObmUser calendarUser = null;
 		try {
-			calendarUser = getCalendarOwner(calendar, token.getDomain());
+			calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
 		} catch (FindException e) {
 			throw new ServerFault(e.getMessage());
 		}
@@ -608,7 +587,7 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 
 		try {
-			EventChanges ret = calendarService.getSync(token, calendarUser,
+			EventChanges ret = calendarDao.getSync(token, calendarUser,
 					lastSync, syncRange, type, onEventDate);
 			logger.info(LogUtils.prefix(token) + "Calendar : getSync("
 					+ calendar + ") => " + ret.getUpdated().length + " upd, "
@@ -626,7 +605,7 @@ public class CalendarBindingImpl implements ICalendar {
 			String eventId) throws AuthFault, ServerFault {
 		try {
 			int uid = Integer.valueOf(eventId);
-			Event evt = calendarService.findEvent(token, uid);
+			Event evt = calendarDao.findEvent(token, uid);
 			if(evt == null){
 				return null;
 			}
@@ -661,7 +640,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			ObmDomain domain = domainService
 					.findDomainByName(token.getDomain());
-			List<String> keys = calendarService.findEventTwinKeys(calendar,
+			List<String> keys = calendarDao.findEventTwinKeys(calendar,
 					event, domain);
 			logger.info(LogUtils.prefix(token) + "found " + keys.size()
 					+ " twinkeys ");
@@ -681,11 +660,8 @@ public class CalendarBindingImpl implements ICalendar {
 					+ calendar);
 		}
 		try {
-			ObmDomain domain = domainService
-					.findDomainByName(token.getDomain());
-			ObmUser calendarUser = userDao.findUserByLogin(calendar, domain);
-			List<String> keys = calendarService.findRefusedEventsKeys(
-					calendarUser, since);
+			ObmUser user = userService.getUserFromCalendar(calendar, token.getDomain());
+			List<String> keys = calendarDao.findRefusedEventsKeys(user, since);
 			return new KeyList(keys);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -710,7 +686,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional
 	public String getUserEmail(AccessToken token) throws AuthFault, ServerFault {
 		try {
-			ObmUser obmuser = userDao.findUserById(token.getObmId());
+			ObmUser obmuser = userService.getUserFromAccessToken(token);
 			if (obmuser != null) {
 				return helper.constructEmailFromList(obmuser.getEmail(),
 						token.getDomain());
@@ -744,8 +720,8 @@ public class CalendarBindingImpl implements ICalendar {
 					+ calendar);
 		}
 		try {
-			ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
-			return calendarService.findEventByExtId(token, calendarUser, extId);
+			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
+			return calendarDao.findEventByExtId(token, calendarUser, extId);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -763,12 +739,12 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 		ObmUser calendarUser = null;
 		try {
-			calendarUser = getCalendarOwner(calendar, token.getDomain());
+			calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
 		} catch (FindException e1) {
 			throw new ServerFault(e1.getMessage());
 		}
 		try {
-			return calendarService.listEventsByIntervalDate(token,
+			return calendarDao.listEventsByIntervalDate(token,
 					calendarUser, start, end, type);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -782,9 +758,9 @@ public class CalendarBindingImpl implements ICalendar {
 			EventType eventType) throws AuthFault, ServerFault {
 		try {
 			if (helper.canReadCalendar(token, calendar)) {
-				ObmUser calendarUser = getCalendarOwner(calendar,
+				ObmUser calendarUser = userService.getUserFromCalendar(calendar,
 						token.getDomain());
-				return calendarService.findAllEvents(token, calendarUser,
+				return calendarDao.findAllEvents(token, calendarUser,
 						eventType);
 			}
 			throw new ServerFault("user has no read rights on calendar "
@@ -799,14 +775,16 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional
 	public String parseEvent(AccessToken token, Event event)
 			throws ServerFault, AuthFault {
-		return Ical4jHelper.parseEvent(event, token);
+		ObmUser user = userService.getUserFromAccessToken(token);
+		return Ical4jHelper.parseEvent(event, user);
 	}
 
 	@Override
 	@Transactional
 	public String parseEvents(AccessToken token, List<Event> events)
 			throws ServerFault, AuthFault {
-		return Ical4jHelper.parseEvents(token, events);
+		ObmUser user = userService.getUserFromAccessToken(token);
+		return Ical4jHelper.parseEvents(user, events);
 	}
 
 	@Override
@@ -814,7 +792,8 @@ public class CalendarBindingImpl implements ICalendar {
 	public List<Event> parseICS(AccessToken token, String ics)
 			throws Exception, ServerFault {
 		String fixedIcs = fixIcsAttendees(ics);
-		return Ical4jHelper.parseICSEvent(fixedIcs, token);
+		ObmUser user = userService.getUserFromAccessToken(token);
+		return Ical4jHelper.parseICSEvent(fixedIcs, user);
 	}
 
 	private String fixIcsAttendees(String ics) {
@@ -864,9 +843,9 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			String calendar = getCalendarOrDefault(token, specificCalendar);
 			if (helper.canReadCalendar(token, calendar)) {
-				ObmUser calendarUser = getCalendarOwner(calendar,
+				ObmUser calendarUser = userService.getUserFromCalendar(calendar,
 						token.getDomain());
-				return calendarService
+				return calendarDao
 						.getEventParticipationStateWithAlertFromIntervalDate(
 								token, calendarUser, start, end, type);
 			}
@@ -892,9 +871,9 @@ public class CalendarBindingImpl implements ICalendar {
 			throws ServerFault, AuthFault {
 		try {
 			if (helper.canReadCalendar(token, calendar)) {
-				ObmUser calendarUser = getCalendarOwner(calendar,
+				ObmUser calendarUser = userService.getUserFromCalendar(calendar,
 						token.getDomain());
-				return calendarService
+				return calendarDao
 						.getEventTimeUpdateNotRefusedFromIntervalDate(token,
 								calendarUser, start, end, type);
 			}
@@ -912,7 +891,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throws ServerFault, AuthFault {
 		try {
 			if (helper.canReadCalendar(token, calendar)) {
-				return calendarService.findLastUpdate(token, calendar);
+				return calendarDao.findLastUpdate(token, calendar);
 			}
 			throw new ServerFault("user has no read rights on calendar "
 					+ calendar);
@@ -939,7 +918,8 @@ public class CalendarBindingImpl implements ICalendar {
 	public List<FreeBusy> getFreeBusy(AccessToken token, FreeBusyRequest fb)
 			throws AuthFault, ServerFault {
 		try {
-			return calendarService.getFreeBusy(token.getDomainId(), fb);
+			ObmDomain domain = domainService.findDomainByName(token.getDomain());
+			return calendarDao.getFreeBusy(domain, fb);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -981,12 +961,12 @@ public class CalendarBindingImpl implements ICalendar {
 			ParticipationState participationState, boolean notification)
 			throws FindException, SQLException {
 		
-		ObmUser calendarOwner = getCalendarOwner(calendar, token.getDomain());
-		boolean changed = calendarService.changeParticipationState(token, calendarOwner, extId, participationState);
+		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
+		boolean changed = calendarDao.changeParticipationState(token, calendarOwner, extId, participationState);
 		logger.info(LogUtils.prefix(token) + 
 				"Calendar : event[extId:" + extId + "] change participation state for user " + 
 				calendarOwner.getEmailAtDomain() + " new state : " + participationState);
-		Event newEvent = calendarService.findEventByExtId(token, calendarOwner, extId);
+		Event newEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
 		if (newEvent != null) {
 			if (notification) {
 				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
@@ -1041,7 +1021,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throws ImportICalendarException {
 		try {
 			if (!isEventExists(token, calendar, event)) {
-				final Event newEvent = calendarService.createEvent(token, calendar, event, false);
+				final Event newEvent = calendarDao.createEvent(token, calendar, event, false);
 				if (newEvent != null) {
 					return true;
 				}
@@ -1055,9 +1035,9 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private boolean isEventExists(final AccessToken token, final String calendar, final Event event) throws FindException {
-		final ObmUser calendarUser = getCalendarOwner(calendar, token.getDomain());
+		final ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
 		if (StringUtils.isNotEmpty(event.getExtId())) {
-			final Event eventExist = calendarService.findEventByExtId(token, calendarUser, event.getExtId());
+			final Event eventExist = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
 			if (eventExist != null) {
 				return true;
 			}
@@ -1067,7 +1047,8 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private List<Event> parseICSEvent(final AccessToken token, final String icsToString) throws ImportICalendarException {
 		try {
-			return Ical4jHelper.parseICSEvent(icsToString, token);
+			ObmUser user = userService.getUserFromAccessToken(token);
+			return Ical4jHelper.parseICSEvent(icsToString, user);
 		} catch (IOException e) {
 			throw new ImportICalendarException(e);
 		} catch (ParserException e) {
@@ -1076,28 +1057,19 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private void addAttendeeForCalendarOwner(final AccessToken token, final String calendar, final Event event) throws ImportICalendarException {
-		final ObmDomain obmDomain = new ObmDomain();
-		obmDomain.setName(token.getDomain());
-		obmDomain.setId(token.getDomainId());
-		
-		final ObmUser obmUser = getCalendarOwnerUser(calendar, obmDomain);
-		final Attendee attendee = new Attendee();
-		attendee.setEmail(obmUser.getEmailAtDomain());
-		
-		event.getAttendees().add(attendee);
-	}
-
-	private ObmUser getCalendarOwnerUser(final String calendar, final ObmDomain obmDomain) throws ImportICalendarException {
-		final ObmUser obmUser = userDao.findUserByLogin(calendar, obmDomain);
-		if (obmUser == null) {
+		try {
+			final ObmUser obmUser = userService.getUserFromCalendar(calendar, token.getDomain());
+			final Attendee attendee = new Attendee();
+			attendee.setEmail(obmUser.getEmailAtDomain());
+			event.getAttendees().add(attendee);
+		} catch (FindException e) {
 			throw new ImportICalendarException("user " + calendar + " not found");
 		}
-		return obmUser;
 	}
-	
+
 	private boolean isAttendeeExistForCalendarOwner(final AccessToken at, final String calendar, final List<Attendee> attendees) {
 		for (final Attendee attendee: attendees) {
-			final ObmUser obmUser = userDao.findUser(attendee.getEmail(), at.getDomainId());
+			final ObmUser obmUser = userService.getUserFromAttendee(attendee, at.getDomain());
 			if (obmUser != null) {
 				if (obmUser.getLogin().equals(calendar)) {
 					return true;
@@ -1113,13 +1085,12 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault("user has no read rights on calendar " + calendar);
 		}
 		try {
-			
-			final ObmUser obmUser = getCalendarOwner(calendar, token.getDomain());
+			final ObmUser obmUser = userService.getUserFromCalendar(calendar, token.getDomain());
 			
 			final Calendar endDate = Calendar.getInstance();
 			endDate.add(Calendar.MONTH, -6);
 		
-			final List<Event> events = calendarService.listEventsByIntervalDate(token, obmUser, new Date(0), endDate.getTime(), type);
+			final List<Event> events = calendarDao.listEventsByIntervalDate(token, obmUser, new Date(0), endDate.getTime(), type);
 			for (final Event event: events) {
 				removeEvent(token, calendar, event.getUid(), false);
 			}

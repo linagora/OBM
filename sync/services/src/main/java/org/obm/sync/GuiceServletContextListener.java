@@ -23,6 +23,8 @@ import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
 import fr.aliacom.obm.common.domain.DomainCache;
 import fr.aliacom.obm.common.domain.DomainService;
+import fr.aliacom.obm.common.user.UserService;
+import fr.aliacom.obm.common.user.UserServiceImpl;
 import fr.aliacom.obm.utils.ObmHelper.TransactionProvider;
 
 public class GuiceServletContextListener implements ServletContextListener { 
@@ -46,6 +48,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 			@Override
 			protected void configure() {
 				bind(DomainService.class).to(DomainCache.class);
+				bind(UserService.class).to(UserServiceImpl.class);
     			bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
     			bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
     			bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);

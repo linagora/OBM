@@ -10,7 +10,6 @@ import java.util.TimeZone;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
@@ -30,8 +29,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class EventChangeHandler {
 
-	private static final Log logger = LogFactory
-	.getLog(EventChangeHandler.class);
+	private static final Log logger = LogFactory.getLog(EventChangeHandler.class);
 	private EventChangeMailer eventChangeMailer;
 
 	@Inject
@@ -39,14 +37,14 @@ public class EventChangeHandler {
 		this.eventChangeMailer = eventChangeMailer;
 	}
 	
-	public void create(final AccessToken at, final Event event, final Locale locale, final TimeZone timezone) throws NotificationException {
+	public void create(final ObmUser user, final Event event, Locale locale, final TimeZone timezone) throws NotificationException {
 		if (eventCreationInvolveNotification(event)) {
 			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
-			notifyCreate(at, attendees, event, locale, timezone);
+			notifyCreate(user, attendees, event, locale, timezone);
 		}
 	}
 	
-	private void notifyCreate(final AccessToken at, Collection<Attendee> attendees, final Event event, final Locale locale, final TimeZone timezone){
+	private void notifyCreate(final ObmUser user, Collection<Attendee> attendees, final Event event, Locale locale, final TimeZone timezone){
 		Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
 		
 		Set<Attendee> accepted = attendeeGroups.get(ParticipationState.ACCEPTED);
@@ -56,55 +54,56 @@ public class EventChangeHandler {
 		
 		Set<Attendee> notAccepted = attendeeGroups.get(ParticipationState.NEEDSACTION);
 		if (notAccepted != null && !notAccepted.isEmpty()) {
-			eventChangeMailer.notifyNeedActionNewUsers(at, notAccepted, event, locale, timezone);
+			eventChangeMailer.notifyNeedActionNewUsers(user, notAccepted, event, locale, timezone);
 		}
 		
 	}
 
-	public void update(final AccessToken at, final Event previous, final Event current, final Locale locale, final TimeZone timezone) throws NotificationException {
+	public void update(final ObmUser user, final Event previous, final Event current, final Locale locale, final TimeZone timezone) throws NotificationException {
 		
 		final Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
 		final Set<Attendee> removedUsers = attendeeGroups.get(AttendeeStateValue.Old);
 		if (!removedUsers.isEmpty()) {
-			eventChangeMailer.notifyRemovedUsers(at, removedUsers, current, locale, timezone);
+			eventChangeMailer.notifyRemovedUsers(user, removedUsers, current, locale, timezone);
 		}
 		
 		final Set<Attendee> addedUsers = attendeeGroups.get(AttendeeStateValue.New);
 		if (!addedUsers.isEmpty()) {
-			notifyCreate(at, addedUsers, current, locale, timezone);
+			notifyCreate(user, addedUsers, current, locale, timezone);
 		}
 		
 		final Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
 		if (!currentUsers.isEmpty()) {
 			final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(currentUsers);
 			notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone);
-			notifyNeedActionUpdateUsers(at, previous, current, locale, atts, timezone);
+			notifyNeedActionUpdateUsers(user, previous, current, locale, atts, timezone);
 		}
 	
 		
 	}
 	
-	private void notifyAcceptedUpdateUsers(final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, final TimeZone timezone) {
+	private void notifyAcceptedUpdateUsers(final Event previous, final Event current, 
+			final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone) {
 		final Set<Attendee> accepted = atts.get(ParticipationState.ACCEPTED);
 		if(accepted != null && !accepted.isEmpty()){
 			eventChangeMailer.notifyAcceptedUpdateUsers(accepted, previous, current, locale, timezone);
 		}	
 	}
 	
-	private void notifyNeedActionUpdateUsers(final AccessToken at, final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, final TimeZone timezone) { 
+	private void notifyNeedActionUpdateUsers(final ObmUser user, final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone) { 
 		final Set<Attendee> notAccepted = atts.get(ParticipationState.NEEDSACTION);
 		if (notAccepted != null && !notAccepted.isEmpty()) {
-			eventChangeMailer.notifyNeedActionUpdateUsers(at, notAccepted, previous, current, locale, timezone);
+			eventChangeMailer.notifyNeedActionUpdateUsers(user, notAccepted, previous, current, locale, timezone);
 		}
 	}
 
-	public void delete(final AccessToken at, final Event event, final Locale locale, final TimeZone timezone) throws NotificationException {
+	public void delete(final ObmUser user, final Event event, Locale locale, final TimeZone timezone) throws NotificationException {
  		if (eventDeletionInvolveNotification(event)) {
  			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
  			Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
  			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
  			if(notify.size() >0){
- 				eventChangeMailer.notifyRemovedUsers(at, notify, event, locale, timezone);
+ 				eventChangeMailer.notifyRemovedUsers(user, notify, event, locale, timezone);
  			}
  		}
  	}

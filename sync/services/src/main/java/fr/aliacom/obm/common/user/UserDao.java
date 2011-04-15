@@ -23,6 +23,7 @@ import fr.aliacom.obm.utils.ObmHelper;
 public class UserDao {
 
 	private static final Log logger = LogFactory.getLog(UserDao.class);
+	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login";
 	private final ObmHelper obmHelper;
 	
 	@Inject
@@ -113,19 +114,19 @@ public class UserDao {
 	}
 
 	
-	public ObmUser findUser(String email, Integer domainId) {
+	public ObmUser findUser(String email, ObmDomain domain) {
 		Connection con = null;
 		Integer id = null;
 		try {
 			con = obmHelper.getConnection();
-			id = 	userIdFromEmail(con, email, domainId);
+			id = userIdFromEmail(con, email, domain.getId());
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
 		if (id != null && id > 0) {
-			return findUserById(id);
+			return findUserById(id, domain);
 		}
 		return null;
 	}
@@ -139,8 +140,8 @@ public class UserDao {
 		ResultSet rs = null;
 
 		ObmUser ret = null;
-		String uq = "SELECT userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname "
-				+ "FROM UserObm LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
+		String uq = "SELECT " + USER_FIELDS
+				+ " FROM UserObm LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
 				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
 		try {
@@ -150,15 +151,51 @@ public class UserDao {
 			ps.setString(2, login);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				ret = new ObmUser();
-				ret.setUid(rs.getInt(1));
-				ret.setLogin(login);
-				ret.setDomain(domain);
-				ret.setEmail(rs.getString(2));
-				ret.setFirstName(rs.getString(3));
-				ret.setLastName(rs.getString(4));
-				ret.setPublicFreeBusy(computePublicFreeBusy(5, rs));
-				ret.setCommonName(rs.getString("userobm_commonname"));
+				ret = createUserFromResultSet(domain, rs);
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			obmHelper.cleanup(con, ps, rs);
+		}
+		return ret;
+	}
+
+	private ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs)
+			throws SQLException {
+		ObmUser ret;
+		ret = new ObmUser();
+		ret.setUid(rs.getInt(1));
+		ret.setLogin(rs.getString("userobm_login"));
+		ret.setDomain(domain);
+		ret.setEmail(rs.getString(2));
+		ret.setFirstName(rs.getString(3));
+		ret.setLastName(rs.getString(4));
+		ret.setPublicFreeBusy(computePublicFreeBusy(5, rs));
+		ret.setFirstName(rs.getString("userobm_firstname"));
+		ret.setLastName(rs.getString("userobm_lastname"));
+		ret.setCommonName(rs.getString("userobm_commonname"));
+		return ret;
+	}
+
+	public ObmUser findUserById(int id, ObmDomain domain) {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		ObmUser ret = null;
+		String uq = "SELECT " + USER_FIELDS
+				+ " FROM UserObm LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
+				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=? "
+				+ "WHERE userobm_id=? ";
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(uq);
+			ps.setInt(1, id);
+			ps.setInt(2, id);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				createUserFromResultSet(domain, rs);
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -169,7 +206,7 @@ public class UserDao {
 	}
 
 	private boolean computePublicFreeBusy(int idx, ResultSet rs)
-			throws SQLException {
+	throws SQLException {
 		boolean user = true;
 		boolean def = !"no".equalsIgnoreCase(rs.getString(idx));
 		String userPref = rs.getString(idx + 1);
@@ -181,40 +218,7 @@ public class UserDao {
 		return user;
 	}
 
-	public ObmUser findUserById(int id) {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		ObmUser ret = null;
-		String uq = "SELECT userobm_id, userobm_email, userobm_login, defpref.userobmpref_value, userpref.userobmpref_value, userobm_firstname, userobm_lastname,  userobm_commonname "
-				+ "FROM UserObm LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
-				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=? "
-				+ "WHERE userobm_id=? ";
-		try {
-			con = obmHelper.getConnection();
-			ps = con.prepareStatement(uq);
-			ps.setInt(1, id);
-			ps.setInt(2, id);
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				ret = new ObmUser();
-				ret.setUid(rs.getInt(1));
-				ret.setEmail(rs.getString(2));
-				ret.setLogin(rs.getString(3));
-				ret.setPublicFreeBusy(computePublicFreeBusy(4, rs));
-				ret.setFirstName(rs.getString("userobm_firstname"));
-				ret.setLastName(rs.getString("userobm_lastname"));
-				ret.setCommonName(rs.getString("userobm_commonname"));
-			}
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-		} finally {
-			obmHelper.cleanup(con, ps, rs);
-		}
-		return ret;
-	}
-
+	
 	private Integer userIdFromLogin(Connection con, String login, Integer domainId) {
 		
 		PreparedStatement ps = null;

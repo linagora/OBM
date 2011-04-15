@@ -12,7 +12,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.obm.sync.Messages;
-import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
@@ -45,7 +44,7 @@ public class EventChangeMailer extends AbstractMailer{
 		this.baseUrl = constantService.getObmUIBaseUrl();
 	}
 	
-	public void notifyNeedActionNewUsers(AccessToken at, Collection<Attendee> attendee, Event event, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void notifyNeedActionNewUsers(ObmUser user, Collection<Attendee> attendee, Event event, Locale locale, final TimeZone timezone) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -54,7 +53,7 @@ public class EventChangeMailer extends AbstractMailer{
 						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale), 
 						inviteNewUserBodyTxt(event, locale, timezone),
 						inviteNewUserBodyHtml(event, locale, timezone),
-						newUserIcs(at, event), "REQUEST");
+						newUserIcs(user, event), "REQUEST");
 			sendNotificationMessageToAttendee(attendee, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -65,7 +64,7 @@ public class EventChangeMailer extends AbstractMailer{
 		}
 	}
 	
-	public void notifyAcceptedNewUsers(Collection<Attendee> attendee, Event event, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void notifyAcceptedNewUsers(Collection<Attendee> attendee, Event event, Locale locale, TimeZone timezone) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -84,7 +83,7 @@ public class EventChangeMailer extends AbstractMailer{
 		}
 	}
 
-	public void notifyRemovedUsers(AccessToken at, Collection<Attendee> attendees, Event event, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void notifyRemovedUsers(ObmUser user, Collection<Attendee> attendees, Event event, Locale locale, final TimeZone timezone) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -93,7 +92,7 @@ public class EventChangeMailer extends AbstractMailer{
 						removedUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale), 
 						removedUserBodyTxt(event, locale, timezone),
 						removedUserBodyHtml(event, locale, timezone), 
-						removedUserIcs(at, event), "CANCEL");
+						removedUserIcs(user, event), "CANCEL");
 			sendNotificationMessageToAttendee(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -104,7 +103,7 @@ public class EventChangeMailer extends AbstractMailer{
 		}
 	}
 
-	public void notifyNeedActionUpdateUsers(AccessToken at, Collection<Attendee> attendees, Event previous, Event current, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void notifyNeedActionUpdateUsers(ObmUser user, Collection<Attendee> attendees, Event previous, Event current, Locale locale, final TimeZone timezone) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -113,7 +112,7 @@ public class EventChangeMailer extends AbstractMailer{
 						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
 						inviteUpdateUserBodyTxt(previous, current, locale, timezone),
 						inviteUpdateUserBodyHtml(previous, current, locale, timezone), 
-						updateUserIcs(at, current), "REQUEST");
+						updateUserIcs(user, current), "REQUEST");
 			sendNotificationMessageToAttendee(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -342,12 +341,12 @@ public class EventChangeMailer extends AbstractMailer{
 		return datamodel;
 	}
 	
-	private String newUserIcs(AccessToken at, Event event) {
-		return Ical4jHelper.buildIcsInvitationRequest(at, event);
+	private String newUserIcs(ObmUser user, Event event) {
+		return Ical4jHelper.buildIcsInvitationRequest(user, event);
 	}
 
-	private String removedUserIcs(AccessToken at, Event event) {
-		return Ical4jHelper.buildIcsInvitationCancel(at, event);
+	private String removedUserIcs(ObmUser user, Event event) {
+		return Ical4jHelper.buildIcsInvitationCancel(user, event);
 	}
 
 	private String removedUserTitle(String owner, String title, Locale locale) {
@@ -358,8 +357,8 @@ public class EventChangeMailer extends AbstractMailer{
 		return new Messages(locale).updatedEventTitle(owner, title);
 	}
 
-	private String updateUserIcs(AccessToken at, Event current) {
-		return Ical4jHelper.buildIcsInvitationRequest(at, current);
+	private String updateUserIcs(ObmUser user, Event current) {
+		return Ical4jHelper.buildIcsInvitationRequest(user, current);
 	}
 
 	private String createReplyIcs(final Event event, final ObmUser attendeeUpdated) {

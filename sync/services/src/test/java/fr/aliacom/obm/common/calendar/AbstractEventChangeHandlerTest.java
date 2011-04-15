@@ -8,24 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.easymock.EasyMock;
-import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
-import org.obm.sync.server.mailer.EventChangeMailer;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
+import org.obm.sync.server.mailer.EventChangeMailer;
 
 
 public abstract class AbstractEventChangeHandlerTest {
 
 	public AbstractEventChangeHandlerTest() {
 		super();
-	}
-	
-	protected AccessToken getMockAccessToken(){
-		AccessToken at = new AccessToken(1, 1, "unitTest");
-		at.setDomain("test.tlse.lng");
-		return at;
 	}
 	
 	protected abstract void processEvent(EventChangeHandler eventChangeHandler, Event event) throws NotificationException;

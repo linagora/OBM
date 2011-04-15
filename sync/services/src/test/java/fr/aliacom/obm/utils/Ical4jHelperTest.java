@@ -73,10 +73,12 @@ public class Ical4jHelperTest {
 		return new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 	}
 	
-	protected AccessToken getMockAccessToken() {
-		AccessToken at = new AccessToken(1, 1, "unitTest");
-		at.setDomain("test.tlse.lng");
-		return at;
+	protected ObmUser getDefaultObmUser() {
+		ObmUser obmUser = new ObmUser();
+		ObmDomain obmDomain = new ObmDomain();
+		obmDomain.setName("test.tlse.lng");
+		obmUser.setDomain(obmDomain);
+		return obmUser;
 	}
 
 	protected Event getTestEvent() {
@@ -108,7 +110,7 @@ public class Ical4jHelperTest {
 		List<Event> l = new LinkedList<Event>();
 		l.add(event1);
 		l.add(event2);
-		String ics = Ical4jHelper.parseEvents(getMockAccessToken(), l);
+		String ics = Ical4jHelper.parseEvents(getDefaultObmUser(), l);
 		assertNotNull(ics);
 		assertNotSame("", ics);
 	}
@@ -182,7 +184,7 @@ public class Ical4jHelperTest {
 		vEvent.getProperties().add(dtEnd);
 		AccessToken token = new AccessToken(0, 0, null);
 		token.setEmail("adrien@zz.com");
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertTrue(event.isAllday());
 
 		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) - 1);
@@ -192,7 +194,7 @@ public class Ical4jHelperTest {
 		vEvent = new VEvent();
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
-		Event event1 = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event1 = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(event1.isAllday());
 	}
 
@@ -213,7 +215,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(172800, event.getDuration());
 
 	}
@@ -222,12 +224,12 @@ public class Ical4jHelperTest {
 	public void testGetPrivacy() {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.PUBLIC);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(0, event.getPrivacy());
 
 		vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.PRIVATE);
-		Event event1 = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event1 = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(1, event1.getPrivacy());
 	}
 
@@ -238,7 +240,7 @@ public class Ical4jHelperTest {
 		orga.setValue("mailto:" + "adrien@zz.com");
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals("Adrien Poupard", event.getOwner());
 	}
 
@@ -248,7 +250,7 @@ public class Ical4jHelperTest {
 		orga.setValue("mailto:" + "adrien@zz.com");
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals("adrien@zz.com", event.getOwner());
 	}
 
@@ -262,7 +264,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(new Integer(-1), event.getAlert());
 	}
 	
@@ -275,7 +277,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(
 				new Integer(-1).equals(event.getAlert())
 		);
@@ -291,7 +293,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(new Integer(-1), event.getAlert());
 	}
 	
@@ -306,7 +308,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(
 				new Integer(-1).equals(event.getAlert())
 		);
@@ -320,7 +322,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		EventRecurrence er = event.getRecurrence();
 		assertNotNull(er);
 		assertEquals(1, er.getFrequence());
@@ -338,7 +340,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(3, event.getAttendees().size());
 	}
 
@@ -352,7 +354,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		Attendee organizer = null;
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
@@ -373,7 +375,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		Attendee organizer = null;
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
@@ -393,7 +395,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertTrue(event.isInternalEvent());
 
 	}
@@ -406,7 +408,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(1244470973000L, event.getTimeCreate().getTime());
 	}
 
@@ -418,7 +420,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(1244470995000L, event.getTimeUpdate().getTime());
 
 	}
@@ -431,7 +433,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertNull(event.getTimeUpdate());
 
 	}
@@ -444,7 +446,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(event.isInternalEvent());
 
 	}
@@ -457,7 +459,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getMockAccessToken(), vEvent);
+		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(event.isInternalEvent());
 
 	}
@@ -658,8 +660,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParserAttendee() throws IOException, ParserException {
 		String ics = IOUtils.toString(getStreamICS("bugGn.ics"));
-		AccessToken token = new AccessToken(0, 0, null);
-		List<Event> event = Ical4jHelper.parseICSEvent(ics, token);
+		List<Event> event = Ical4jHelper.parseICSEvent(ics, getDefaultObmUser());
 		assertEquals(event.size(), 1);
 	}
 
@@ -675,9 +676,8 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParsingICSFileOf200kio() throws IOException, ParserException {
 		final String ics = IOUtils.toString(getStreamICS("bellemin-calendrierobm.ics"));
-		final AccessToken token = new AccessToken(0, 0, null);
 		
-		final List<Event> events = Ical4jHelper.parseICSEvent(ics, token);
+		final List<Event> events = Ical4jHelper.parseICSEvent(ics, getDefaultObmUser());
 		for (final Event event: events) {
 			assertNotNull(event.getTitle());
 		}
@@ -688,10 +688,9 @@ public class Ical4jHelperTest {
 	public void testParsingICSFiles() throws IOException, ParserException {
 		final String[] icsFiles = {"cdespino.ics", "dkaplan.ics"};
 		
-		final AccessToken token = new AccessToken(0, 0, null);
 		for (String icsFile: icsFiles) {
 			final String ics = IOUtils.toString(getStreamICS(icsFile));
-			Ical4jHelper.parseICSEvent(ics, token);	
+			Ical4jHelper.parseICSEvent(ics, getDefaultObmUser());	
 		}
 		assertTrue(true);
 	}
