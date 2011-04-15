@@ -915,7 +915,7 @@ Obm.CalendarManager = new Class({
       var min = Math.min(obm.calendarManager.customStart*1000, this.current.getTime());
       var max = Math.max(obm.calendarManager.customStart*1000, this.current.getTime());
       data.date = new Obm.DateTime(min).format('c');
-      data.ndays = (max - min)/86400000 + 1;
+      data.ndays = Math.ceil((max - min)/86400000)+1;
       data.cal_range = 'custom';
       obm.vars.consts.nbDisplayedDays = data.ndays;
     } else {
