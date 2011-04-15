@@ -32,6 +32,8 @@ import org.obm.sync.setting.VacationSettings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.LogUtils;
 
 @Singleton
@@ -41,9 +43,12 @@ public class SettingBindingImpl implements ISetting {
 
 	private SettingDao settingDao;
 
+	private final UserService userService;
+
 	@Inject
-	protected SettingBindingImpl(SettingDao settingDao) {
+	protected SettingBindingImpl(SettingDao settingDao, UserService userService) {
 		this.settingDao = settingDao;
+		this.userService = userService;
 	}
 
 	@Override
@@ -52,7 +57,8 @@ public class SettingBindingImpl implements ISetting {
 			throws ServerFault, AuthFault {
 		try {
 			logger.info(LogUtils.prefix(token) + "Setting : getSettings()");
-			return settingDao.getSettings(token);
+			ObmUser user = userService.getUserFromAccessToken(token);
+			return settingDao.getSettings(user);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());

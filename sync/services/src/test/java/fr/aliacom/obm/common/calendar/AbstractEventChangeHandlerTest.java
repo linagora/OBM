@@ -1,5 +1,6 @@
 package fr.aliacom.obm.common.calendar;
 
+import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.before;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendee;
@@ -20,6 +21,11 @@ public abstract class AbstractEventChangeHandlerTest {
 	public AbstractEventChangeHandlerTest() {
 		super();
 	}
+
+
+	private EventChangeHandler newEventChangeHandler(EventChangeMailer mailer) {
+		return new EventChangeHandler(mailer, getDefaultSettingsService());
+	}
 	
 	protected abstract void processEvent(EventChangeHandler eventChangeHandler, Event event) throws NotificationException;
 	
@@ -28,7 +34,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		EasyMock.replay(mailer);
 		Event event = new Event();
 		event.setDate(after());
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
@@ -39,7 +45,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		Event event = new Event();
 		event.setDate(after());
 		event.setAttendees(new ArrayList<Attendee>());
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
@@ -52,7 +58,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		String ownerEmail = "user@domain.net";
 		event.setOwnerEmail(ownerEmail);
 		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
@@ -64,7 +70,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.addAttendee(createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED));
 		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
 		EasyMock.replay(mailer);
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
@@ -81,7 +87,7 @@ public abstract class AbstractEventChangeHandlerTest {
 
 		EventChangeMailer mailer = expectationAcceptedAttendees(attendeeAccepted);
 		
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
@@ -100,7 +106,7 @@ public abstract class AbstractEventChangeHandlerTest {
 
 		EventChangeMailer mailer = expectationNeedActionAttendees(attendeeNeedAction);
 		
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
@@ -119,7 +125,7 @@ public abstract class AbstractEventChangeHandlerTest {
 
 		EventChangeMailer mailer = expectationDeclinedAttendees(attendeeDeclined);
 		
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
@@ -141,7 +147,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		
 		EventChangeMailer mailer = expectationTwoAttendees(attendeeAccepted, attendeeNotAccepted);
 		
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
@@ -161,7 +167,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		
 		EventChangeMailer mailer = expectationSameAttendeeTwice(attendeeOne);
 		
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}
@@ -190,7 +196,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		
 		EventChangeMailer mailer = expectationManyAttendee(needActionAttendees, accpetedAttendees);
 		
-		EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		processEvent(eventChangeHandler, event);
 		EasyMock.verify(mailer);
 	}

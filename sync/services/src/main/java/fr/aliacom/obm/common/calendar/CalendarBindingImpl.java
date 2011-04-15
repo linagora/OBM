@@ -59,7 +59,6 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.setting.SettingDao;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.Helper;
@@ -74,7 +73,6 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private final CalendarDao calendarDao;
 	private final CategoryDao categoryDao;
-	private final SettingDao settingsDao;
 	
 	private final DomainService domainService;
 	private final UserService userService;
@@ -85,12 +83,11 @@ public class CalendarBindingImpl implements ICalendar {
 	@Inject
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
 			DomainService domainService, UserService userService,
-			CalendarDao calendarDao, SettingDao settingDao,
+			CalendarDao calendarDao,
 			CategoryDao categoryDao, Helper helper) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;
-		this.settingsDao = settingDao;
 		this.calendarDao = calendarDao;
 		this.categoryDao = categoryDao;
 		this.helper = helper;
@@ -194,8 +191,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event ev) throws FindException {
 		if (ev.isInternalEvent()) {
 			ObmUser user = userService.getUserFromAccessToken(token);
-			eventChangeHandler.delete(user, ev, 
-					settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
+			eventChangeHandler.delete(user, ev);
 		} else {
 			notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED);
 		}
@@ -305,8 +301,7 @@ public class CalendarBindingImpl implements ICalendar {
 			
 			if (notification) {
 				ObmUser user = userService.getUserFromAccessToken(token);
-				eventChangeHandler.update(user, before, after, 
-						settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
+				eventChangeHandler.update(user, before, after);
 			}
 			
 			return after;
@@ -425,8 +420,7 @@ public class CalendarBindingImpl implements ICalendar {
 		logger.info(LogUtils.prefix(token) + 
 				"Calendar : sending participation notification to organizer of event ["+ ev.getTitle() + "]");
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
-		eventChangeHandler.updateParticipationState(ev, calendarOwner, state, 
-				settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
+		eventChangeHandler.updateParticipationState(ev, calendarOwner, state);
 	}
 
 	
@@ -443,8 +437,7 @@ public class CalendarBindingImpl implements ICalendar {
 			ev = calendarDao.findEvent(token, ev.getDatabaseId());
 			if (notification) {
 				ObmUser user = userService.getUserFromAccessToken(token);
-			    eventChangeHandler.create(user, ev, settingsDao.getUserLanguage(token),
-			    		settingsDao.getUserTimeZone(token));
+			    eventChangeHandler.create(user, ev);
 			}
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");
@@ -969,8 +962,7 @@ public class CalendarBindingImpl implements ICalendar {
 		Event newEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
 		if (newEvent != null) {
 			if (notification) {
-				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState,
-						settingsDao.getUserLanguage(token), settingsDao.getUserTimeZone(token));
+				eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState);
 			}
 		} else {
 			logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");

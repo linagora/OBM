@@ -29,7 +29,10 @@ import org.obm.sync.server.mailer.ErrorMailer;
 
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.setting.SettingDao;
+import fr.aliacom.obm.common.setting.SettingsService;
+import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserService;
+import fr.aliacom.obm.common.user.UserSettings;
 
 /**
  * Responds to the following urls :
@@ -38,18 +41,22 @@ import fr.aliacom.obm.common.setting.SettingDao;
  */
 public class LoginHandler implements ISyncHandler {
 	
-	private Log logger = LogFactory.getLog(getClass());
-	private LoginBindingImpl binding;
-	private ErrorMailer errorMailer;
-	private SettingDao settingsDao;
-	private VersionValidator versionValidator;
+	private final Log logger = LogFactory.getLog(getClass());
+	private final LoginBindingImpl binding;
+	private final ErrorMailer errorMailer;
+	private final VersionValidator versionValidator;
+	private final SettingsService settingsService;
+	private final UserService userService;
 	
 	@Inject
-	private LoginHandler(LoginBindingImpl loginBindingImpl, ErrorMailer errorMailer, SettingDao settingsDao, VersionValidator versionValidator) {
+	private LoginHandler(LoginBindingImpl loginBindingImpl, ErrorMailer errorMailer, 
+			SettingsService settingsService, VersionValidator versionValidator,
+			UserService userService) {
 		this.binding = loginBindingImpl;
 		this.errorMailer = errorMailer;
-		this.settingsDao = settingsDao;
+		this.settingsService = settingsService;
 		this.versionValidator = versionValidator;
+		this.userService = userService;
 	}
 
 	@Override
@@ -94,11 +101,13 @@ public class LoginHandler implements ISyncHandler {
 				responder.sendError("Login failed for user '" + login
 					+ "' with password '" + pass + "'");
 			}
-		} catch(OBMConnectorVersionException e){
+		} catch(OBMConnectorVersionException e) {
 			logger.error(e.getToken().getOrigin() +" isn't longer suppored.");
+			ObmUser user = userService.getUserFromAccessToken(e.getToken());
+			UserSettings settings = settingsService.getSettings(user);
 			errorMailer.notifyConnectorVersionError(e.getToken(),
 					e.getConnectorVersion().toString(),
-					settingsDao.getUserLanguage(e.getToken()), settingsDao.getUserTimeZone(e.getToken()));
+					settings.locale(), settings.timezone());
 		}
 	}
 }

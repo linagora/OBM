@@ -24,10 +24,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,16 +32,16 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.VacationSettings;
 
-import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.utils.ObmHelper;
 
 @Singleton
 public class SettingDao {
-
-	private static final String SETTING_TIME_ZONE = "set_timezone";
 	
 	private static final Log logger = LogFactory.getLog(SettingDao.class);
 	private final ObmHelper obmHelper;
@@ -54,21 +51,15 @@ public class SettingDao {
 		this.obmHelper = obmHelper;
 	}
 	
-	public Locale getUserLanguage(AccessToken at) {
-		Map<String, String> settings = getSettings(at);
-		String localeAsString = Objects.firstNonNull(settings.get("set_lang"), "en");
-		return new Locale(localeAsString);
-	}
-	
-	public Map<String, String> getSettings(AccessToken at) {
-		Map<String, String> data = new HashMap<String, String>();
+	public Map<String, String> getSettings(ObmUser user) {
+		Builder<String, String> mapBuilder = new Builder<String, String>();
 
+		String domain = user.getDomain().getName();
+		String userLogin = user.getLogin();
+		
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-
-		String domain = at.getDomain();
-		String user = at.getUser();
 
 		try {
 			con = obmHelper.getConnection();
@@ -77,32 +68,25 @@ public class SettingDao {
 					+ "where userobmpref_user_id is null "
 					+ "and userobmpref_option not in "
 					+ "(select userobmpref_option from UserObmPref where userobmpref_user_id=(select userobm_id from UserObm "
-					+ "where userobm_login=? ";
-			if (domain != null) {
-				q += "and userobm_domain_id=(select domain_id from Domain where domain_name=?) ";
-			}
-			q += ")) "
+					+ "where userobm_login=? "
+					+ "and userobm_domain_id=(select domain_id from Domain where domain_name=?) "
+					+ ")) "
 					+ "union "
 					+ "select userobmpref_option, userobmpref_value from UserObmPref "
 					+ "where userobmpref_user_id=(select userobm_id from UserObm "
-					+ "where userobm_login=? ";
-			if (domain != null) {
-				q += "and userobm_domain_id=(select domain_id from Domain where domain_name=?) ";
-			}
-			q += " )";
+					+ "where userobm_login=? "
+					+ "and userobm_domain_id=(select domain_id from Domain where domain_name=?) "
+					+ " )";
+			
 			ps = con.prepareStatement(q);
 			int idx = 1;
-			ps.setString(idx++, user);
-			if (domain != null) {
-				ps.setString(idx++, domain);
-			}
-			ps.setString(idx++, user);
-			if (domain != null) {
-				ps.setString(idx++, domain);
-			}
+			ps.setString(idx++, userLogin);
+			ps.setString(idx++, domain);
+			ps.setString(idx++, userLogin);
+			ps.setString(idx++, domain);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				data.put(rs.getString(1), rs.getString(2));
+				mapBuilder.put(rs.getString(1), rs.getString(2));
 			}
 		} catch (SQLException se) {
 			logger.error("Error fetching preferences for " + user + " at "
@@ -110,7 +94,9 @@ public class SettingDao {
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-
+		
+		ImmutableMap<String, String> data = mapBuilder.build();
+		
 		logger.info("return " + data.size() + " settings for userid: " + user
 				+ " at " + domain);
 		return data;
@@ -263,12 +249,6 @@ public class SettingDao {
 		}
 
 		return ret;
-	}
-
-	public TimeZone getUserTimeZone(AccessToken token) {
-		Map<String, String> settings = getSettings(token);
-		String timezoneAsString = Objects.firstNonNull(settings.get(SETTING_TIME_ZONE), "GMT");
-		return TimeZone.getTimeZone(timezoneAsString);
 	}
 
 }

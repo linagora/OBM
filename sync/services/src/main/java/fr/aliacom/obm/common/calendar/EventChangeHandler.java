@@ -25,26 +25,34 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserSettings;
 
 public class EventChangeHandler {
 
 	private static final Log logger = LogFactory.getLog(EventChangeHandler.class);
-	private EventChangeMailer eventChangeMailer;
+	private final EventChangeMailer eventChangeMailer;
+	private final SettingsService settingsService;
 
 	@Inject
-	/* package */ EventChangeHandler(EventChangeMailer eventChangeMailer) {
+	/* package */ EventChangeHandler(EventChangeMailer eventChangeMailer,
+			SettingsService settingsService) {
 		this.eventChangeMailer = eventChangeMailer;
+		this.settingsService = settingsService;
 	}
 	
-	public void create(final ObmUser user, final Event event, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void create(final ObmUser user, final Event event) throws NotificationException {
 		if (eventCreationInvolveNotification(event)) {
 			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
-			notifyCreate(user, attendees, event, locale, timezone);
+			UserSettings settings = settingsService.getSettings(user);
+			notifyCreate(user, attendees, event, settings.locale(), settings.timezone());
 		}
 	}
 	
-	private void notifyCreate(final ObmUser user, Collection<Attendee> attendees, final Event event, Locale locale, final TimeZone timezone){
+	private void notifyCreate(final ObmUser user, final Collection<Attendee> attendees, 
+			final Event event, final Locale locale, final TimeZone timezone){
+		
 		Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
 		
 		Set<Attendee> accepted = attendeeGroups.get(ParticipationState.ACCEPTED);
@@ -59,7 +67,11 @@ public class EventChangeHandler {
 		
 	}
 
-	public void update(final ObmUser user, final Event previous, final Event current, final Locale locale, final TimeZone timezone) throws NotificationException {
+	public void update(final ObmUser user, final Event previous, final Event current) throws NotificationException {
+		
+		UserSettings settings = settingsService.getSettings(user);
+		TimeZone timezone = settings.timezone();
+		Locale locale = settings.locale();
 		
 		final Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
 		final Set<Attendee> removedUsers = attendeeGroups.get(AttendeeStateValue.Old);
@@ -78,7 +90,6 @@ public class EventChangeHandler {
 			notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone);
 			notifyNeedActionUpdateUsers(user, previous, current, locale, atts, timezone);
 		}
-	
 		
 	}
 	
@@ -97,13 +108,14 @@ public class EventChangeHandler {
 		}
 	}
 
-	public void delete(final ObmUser user, final Event event, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void delete(final ObmUser user, final Event event) throws NotificationException {
  		if (eventDeletionInvolveNotification(event)) {
  			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
  			Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
  			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
- 			if(notify.size() >0){
- 				eventChangeMailer.notifyRemovedUsers(user, notify, event, locale, timezone);
+ 			if (!notify.isEmpty()) {
+ 				UserSettings settings = settingsService.getSettings(user);
+ 				eventChangeMailer.notifyRemovedUsers(user, notify, event, settings.locale(), settings.timezone());
  			}
  		}
  	}
@@ -195,14 +207,14 @@ public class EventChangeHandler {
 		New, Current, Old;
 	}
 	
-	public void updateParticipationState(final Event event, final ObmUser calendarOwner, final ParticipationState state, 
-			final Locale locale, final TimeZone timezone) {
+	public void updateParticipationState(final Event event, final ObmUser calendarOwner, final ParticipationState state) {
 		if (ParticipationState.ACCEPTED.equals(state) || ParticipationState.DECLINED.equals(state)) {
 			final Attendee organizer = event.findOrganizer();
 			if (organizer != null) {
 				if (!ParticipationState.DECLINED.equals(organizer.getState())&& !StringUtils.isEmpty(organizer.getEmail()) 
 						&& !organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain())) {
-					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, locale, timezone);
+					UserSettings settings = settingsService.getSettings(calendarOwner);					
+					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, settings.locale(), settings.timezone());
 				}
 			} else {
 				logger.error("Can't find organizer, email won't send");

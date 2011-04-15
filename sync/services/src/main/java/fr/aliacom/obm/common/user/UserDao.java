@@ -195,7 +195,7 @@ public class UserDao {
 			ps.setInt(2, id);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				createUserFromResultSet(domain, rs);
+				ret = createUserFromResultSet(domain, rs);
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);

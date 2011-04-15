@@ -1,6 +1,7 @@
 package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
+import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.compareCollections;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendee;
@@ -41,7 +42,7 @@ public class EventChangeHandlerTest {
 	public static class CreateTests extends AbstractEventChangeHandlerTest {
 		@Override
 		protected void processEvent(EventChangeHandler eventChangeHandler, Event event) {
-			eventChangeHandler.create(getDefaultObmUser(), event, LOCALE, TIMEZONE);
+			eventChangeHandler.create(getDefaultObmUser(), event);
 		}
 		
 		@Test
@@ -158,7 +159,7 @@ public class EventChangeHandlerTest {
 	public static class DeleteTests extends AbstractEventChangeHandlerTest {
 		@Override
 		protected void processEvent(EventChangeHandler eventChangeHandler, Event event) {
-			eventChangeHandler.delete(getDefaultObmUser(), event, LOCALE, TIMEZONE);
+			eventChangeHandler.delete(getDefaultObmUser(), event);
 		}
 		
 		@Test
@@ -271,6 +272,10 @@ public class EventChangeHandlerTest {
 	}
 
 	public static class UpdateTests {
+
+		private EventChangeHandler newEventChangeHandler(EventChangeMailer mailer) {
+			return new EventChangeHandler(mailer, getDefaultSettingsService());
+		}
 		
 		@Test
 		public void testDefaultEventNoChange() {
@@ -278,11 +283,11 @@ public class EventChangeHandlerTest {
 			replay(mailer);
 			Event event = new Event();
 			event.setDate(after());
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
-			eventChangeHandler.update(getDefaultObmUser(), event, event, LOCALE, TIMEZONE);
+			EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+			eventChangeHandler.update(getDefaultObmUser(), event, event);
 			verify(mailer);
 		}
-		
+
 		@Test
 		public void testDefaultEventDateChangeZeroUser() {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -291,8 +296,8 @@ public class EventChangeHandlerTest {
 			event.setDate(after());
 			Event eventAfter = new Event();
 			eventAfter.setDate(longAfter());
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
-			eventChangeHandler.update(getDefaultObmUser(),event, eventAfter, LOCALE, TIMEZONE);
+			EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+			eventChangeHandler.update(getDefaultObmUser(),event, eventAfter);
 			verify(mailer);
 		}
 		
@@ -314,8 +319,8 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 			replay(mailer);
 			
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
-			eventChangeHandler.update(getDefaultObmUser(), previousEvent, currentEvent, LOCALE, TIMEZONE);
+			EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+			eventChangeHandler.update(getDefaultObmUser(), previousEvent, currentEvent);
 			verify(mailer);
 		}
 		
@@ -337,8 +342,8 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 			replay(mailer);
 			
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
-			eventChangeHandler.update(getDefaultObmUser(), previousEvent, currentEvent, LOCALE, TIMEZONE);
+			EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+			eventChangeHandler.update(getDefaultObmUser(), previousEvent, currentEvent);
 			verify(mailer);
 		}
 		
@@ -357,8 +362,8 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 			replay(mailer);
 			
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
-			eventChangeHandler.update(getDefaultObmUser(), previousEvent, previousEvent, LOCALE, TIMEZONE);
+			EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+			eventChangeHandler.update(getDefaultObmUser(), previousEvent, previousEvent);
 			verify(mailer);
 		}
 		
@@ -377,8 +382,8 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 			replay(mailer);
 			
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
-			eventChangeHandler.update(getDefaultObmUser(), previousEvent, previousEvent, LOCALE, TIMEZONE);
+			EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+			eventChangeHandler.update(getDefaultObmUser(), previousEvent, previousEvent);
 			verify(mailer);
 		}
 		
@@ -405,8 +410,8 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 			replay(mailer);
 			
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
-			eventChangeHandler.update(getDefaultObmUser(), previousEvent, currentEvent, LOCALE, TIMEZONE);
+			EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+			eventChangeHandler.update(getDefaultObmUser(), previousEvent, currentEvent);
 			verify(mailer);
 		}
 		
@@ -433,8 +438,8 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 			replay(mailer);
 			
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(mailer);
-			eventChangeHandler.update(getDefaultObmUser(), previousEvent, currentEvent, LOCALE, TIMEZONE);
+			EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+			eventChangeHandler.update(getDefaultObmUser(), previousEvent, currentEvent);
 			verify(mailer);
 		}	
 	
