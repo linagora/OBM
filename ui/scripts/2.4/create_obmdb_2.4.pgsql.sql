@@ -2307,7 +2307,7 @@ CREATE TABLE userobm (
   userobm_archive smallint DEFAULT 0 NOT NULL,
   userobm_status userstatus DEFAULT 'VALID'::userstatus,
   userobm_timelastaccess timestamp without time zone,
-  userobm_login character varying(64) DEFAULT ''::character varying NOT NULL,
+  userobm_login character varying(100) DEFAULT ''::character varying NOT NULL,
   userobm_nb_login_failed integer DEFAULT 0,
   userobm_password_type character varying(6) DEFAULT 'PLAIN'::character varying NOT NULL,
   userobm_password character varying(64) DEFAULT ''::character varying NOT NULL,
