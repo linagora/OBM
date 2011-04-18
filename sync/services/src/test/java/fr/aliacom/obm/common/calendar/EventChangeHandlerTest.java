@@ -355,7 +355,7 @@ public class EventChangeHandlerTest {
 			currentEvent.setDate(longAfter());
 			currentEvent.addAttendee(attendee);
 
-			mailer.notifyAcceptedUpdateUsers(compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyAcceptedUpdateUsers(anyObject(ObmUser.class), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent), eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
 			expectLastCall().once();
 			replay(mailer);
@@ -395,7 +395,7 @@ public class EventChangeHandlerTest {
 			previousEvent.setDate(after());
 			previousEvent.addAttendee(attendee);
 
-			mailer.notifyAcceptedUpdateUsers( compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyAcceptedUpdateUsers(anyObject(ObmUser.class), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent) , eq(previousEvent), eq(LOCALE), eq(TIMEZONE));
 			expectLastCall().once();
 			replay(mailer);
@@ -451,7 +451,7 @@ public class EventChangeHandlerTest {
 			
 			mailer.notifyAcceptedNewUsers(compareCollections(ImmutableList.of(addedAttendee)), eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
 			expectLastCall().once();
-			mailer.notifyAcceptedUpdateUsers( compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyAcceptedUpdateUsers(anyObject(ObmUser.class), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent) , eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
 			expectLastCall().once();
 			replay(mailer);

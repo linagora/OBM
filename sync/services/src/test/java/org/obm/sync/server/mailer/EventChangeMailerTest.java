@@ -1,6 +1,7 @@
 package org.obm.sync.server.mailer;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
+import static org.easymock.EasyMock.anyObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -44,6 +45,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools;
+import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ConstantService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -185,12 +187,14 @@ public class EventChangeMailerTest {
 		
 		private void testNotification() throws UnsupportedEncodingException, IOException, MessagingException {
 			MimeMessage mimeMessage = test();
-			InvitationParts parts = checkNotificationStructure(mimeMessage);
+			InvitationParts parts = checkStructure(mimeMessage);
 			checkContent(parts);
 		}
 
 		protected abstract void checkContent(InvitationParts parts) throws IOException, MessagingException;
 
+		protected abstract InvitationParts checkStructure(MimeMessage mimeMessage) throws UnsupportedEncodingException, IOException, MessagingException;
+		
 		protected InvitationParts checkInvitationStructure(MimeMessage mimeMessage) throws UnsupportedEncodingException, IOException, MessagingException {
 			InvitationParts parts = new InvitationParts();
 			parts.rawMessage = getRawMessage(mimeMessage);
@@ -290,6 +294,11 @@ public class EventChangeMailerTest {
 		}
 
 		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage) throws UnsupportedEncodingException, IOException, MessagingException {
+			return checkInvitationStructure(mimeMessage);
+		}
+		
+		@Override
 		protected void checkContent(InvitationParts parts) throws IOException, MessagingException {
 			checkStringContains(parts.rawMessage, 
 					"From: Raphael ROUGERON <rrougeron@linagora.com>",
@@ -368,6 +377,13 @@ public class EventChangeMailerTest {
 		}
 
 		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage)
+				throws UnsupportedEncodingException, IOException,
+				MessagingException {
+			return checkNotificationStructure(mimeMessage);
+		}
+		
+		@Override
 		protected void checkContent(InvitationParts parts) throws IOException, MessagingException {
 			checkStringContains(parts.rawMessage, 
 					"From: Raphael ROUGERON <rrougeron@linagora.com>",
@@ -432,7 +448,7 @@ public class EventChangeMailerTest {
 			for(Attendee att : before.getAttendees()){
 				att.setState(ParticipationState.ACCEPTED);
 			}
-			eventChangeMailer.notifyAcceptedUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE);
+			eventChangeMailer.notifyAcceptedUpdateUsers(getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Override
@@ -474,6 +490,13 @@ public class EventChangeMailerTest {
 					"Ronan LANORE <rlanore@linagora.com>, Guillaume ALAUX " +
 					"<galaux@linagora.com>, Matthieu BAECHLER <mbaechler@linagora.com>, Blandine " +
 					"DESCAMPS <blandine.descamps@linagora.com>");
+		}
+		
+		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage)
+				throws UnsupportedEncodingException, IOException,
+				MessagingException {
+			return checkInvitationStructure(mimeMessage);
 		}
 		
 		@Override
@@ -564,6 +587,13 @@ public class EventChangeMailerTest {
 		}
 		
 		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage)
+				throws UnsupportedEncodingException, IOException,
+				MessagingException {
+			return checkInvitationStructure(mimeMessage);
+		}
+		
+		@Override
 		protected void checkContent(InvitationParts parts) throws IOException,
 				MessagingException {
 			checkStringContains(parts.rawMessage, 
@@ -650,6 +680,13 @@ public class EventChangeMailerTest {
 					"Ronan LANORE <rlanore@linagora.com>, Guillaume ALAUX " +
 					"<galaux@linagora.com>, Matthieu BAECHLER <mbaechler@linagora.com>, Blandine " +
 					"DESCAMPS <blandine.descamps@linagora.com>");
+		}
+		
+		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage)
+				throws UnsupportedEncodingException, IOException,
+				MessagingException {
+			return checkInvitationStructure(mimeMessage);
 		}
 		
 		@Override
