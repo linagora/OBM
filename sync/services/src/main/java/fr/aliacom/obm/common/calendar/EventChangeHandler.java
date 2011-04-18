@@ -91,21 +91,22 @@ public class EventChangeHandler {
 		final Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
 		if (!currentUsers.isEmpty()) {
 			final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(currentUsers);
-			notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone);
+			notifyAcceptedUpdateUsers(user, previous, current, locale, atts, timezone);
 			notifyNeedActionUpdateUsers(user, previous, current, locale, atts, timezone);
 		}
 		
 	}
 	
-	private void notifyAcceptedUpdateUsers(final Event previous, final Event current, 
+	private void notifyAcceptedUpdateUsers(final ObmUser user, final Event previous, final Event current, 
 			final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone) {
 		final Set<Attendee> accepted = atts.get(ParticipationState.ACCEPTED);
-		if(accepted != null && !accepted.isEmpty()){
-			eventChangeMailer.notifyAcceptedUpdateUsers(accepted, previous, current, locale, timezone);
+		if (accepted != null && !accepted.isEmpty()) {
+			eventChangeMailer.notifyAcceptedUpdateUsers(user, accepted, previous, current, locale, timezone);
 		}	
 	}
 	
-	private void notifyNeedActionUpdateUsers(final ObmUser user, final Event previous, final Event current, final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone) { 
+	private void notifyNeedActionUpdateUsers(final ObmUser user, final Event previous, final Event current,
+			final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone) { 
 		final Set<Attendee> notAccepted = atts.get(ParticipationState.NEEDSACTION);
 		if (notAccepted != null && !notAccepted.isEmpty()) {
 			eventChangeMailer.notifyNeedActionUpdateUsers(user, notAccepted, previous, current, locale, timezone);

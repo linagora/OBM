@@ -123,7 +123,7 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	public void notifyAcceptedUpdateUsers(Collection<Attendee> attendees, Event previous, Event current, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void notifyAcceptedUpdateUsers(ObmUser user, Collection<Attendee> attendees, Event previous, Event current, Locale locale, final TimeZone timezone) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -131,7 +131,8 @@ public class EventChangeMailer extends AbstractMailer {
 						current.getAttendees(), 
 						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
 						notifyUpdateUserBodyTxt(previous, current, locale, timezone),
-						notifyUpdateUserBodyHtml(previous, current, locale, timezone));
+						notifyUpdateUserBodyHtml(previous, current, locale, timezone), 
+						updateUserIcs(user, current), "REQUEST");
 			sendNotificationMessageToAttendee(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
