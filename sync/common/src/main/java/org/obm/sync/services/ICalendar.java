@@ -43,14 +43,14 @@ public interface ICalendar {
 	 *         are too low to remove but enough to read, and null if event was
 	 *         not found
 	 */
-	public Event removeEvent(AccessToken token, String calendar, String eventId, boolean notification)
+	public Event removeEvent(AccessToken token, String calendar, String eventId, int sequence, boolean notification)
 			throws AuthFault, ServerFault;
 
 	/**
 	 * FIXME: remove this service
 	 */
 	public Event removeEventByExtId(AccessToken token, String calendar,
-			String extId, boolean notification) throws AuthFault, ServerFault;
+			String extId, int sequence, boolean notification) throws AuthFault, ServerFault;
 
 	/**
 	 * FIXME: needs work
@@ -238,7 +238,7 @@ public interface ICalendar {
 	 * change user of given calendar participation state
 	 */
 	public boolean changeParticipationState(AccessToken token, String calendar, String extId, 
-			ParticipationState participationState, boolean notification) throws ServerFault;
+			ParticipationState participationState, int sequence, boolean notification) throws ServerFault;
 	
 	/**
 	 * Import ics file in calendar's user

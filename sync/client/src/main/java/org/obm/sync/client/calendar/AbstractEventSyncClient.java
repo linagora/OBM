@@ -195,11 +195,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	}
 
 	@Override
-	public Event removeEvent(AccessToken token, String calendar, String uid, boolean notification)
+	public Event removeEvent(AccessToken token, String calendar, String uid, int sequence, boolean notification)
 			throws AuthFault, ServerFault {
 		Map<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("id", uid);
+		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/removeEvent", params);
 		checkServerError(doc);
@@ -207,11 +208,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	}
 	
 	@Override
-	public Event removeEventByExtId(AccessToken token, String calendar, String extId, boolean notification)
+	public Event removeEventByExtId(AccessToken token, String calendar, String extId, int sequence, boolean notification)
 			throws AuthFault, ServerFault {
 		Map<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
+		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/removeEventByExtId", params);
 		checkServerError(doc);
@@ -424,12 +426,13 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	
 	@Override
 	public boolean changeParticipationState(AccessToken token, String calendar,
-			String extId,
-			ParticipationState participationState, boolean notification) throws ServerFault {
+			String extId, ParticipationState participationState, 
+			int sequence, boolean notification) throws ServerFault {
 		Map<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		params.put("state", participationState.toString());
+		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/changeParticipationState", params);
 		checkServerError(doc);

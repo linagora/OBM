@@ -440,7 +440,8 @@ public class ContactDao {
 		}
 		logger.info("date == null");
 		if (dateId != 0) {
-			calendarDao.removeEvent(con, at, dateId, EventType.VEVENT);
+			//sequence is set to zero as no email notification will be send 
+			calendarDao.removeEvent(con, at, dateId, EventType.VEVENT, 0);
 			return 0;
 		}
 		return dateId;

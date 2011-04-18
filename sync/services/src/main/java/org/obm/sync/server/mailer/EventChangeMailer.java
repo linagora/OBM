@@ -34,7 +34,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateException;
 
-public class EventChangeMailer extends AbstractMailer{
+public class EventChangeMailer extends AbstractMailer {
 
 	private final String baseUrl;
 	

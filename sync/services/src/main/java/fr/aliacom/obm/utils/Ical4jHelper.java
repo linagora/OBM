@@ -85,6 +85,7 @@ import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Repeat;
+import net.fortuna.ical4j.model.property.Sequence;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Transp;
@@ -493,6 +494,7 @@ public class Ical4jHelper {
 		appendUidToICS(prop, event, null);
 		appendCreated(prop, event);
 		appendLastModified(prop, event);
+		appendSequence(prop, event);
 		appendAttendeesToICS(prop, event.getAttendees());
 		appendCategoryToICS(prop, event);
 		appendDtStartToICS(prop, event);
@@ -567,6 +569,7 @@ public class Ical4jHelper {
 		appendUidToICS(prop, event, parentExtID);
 		appendCreated(prop, event);
 		appendLastModified(prop, event);
+		appendSequence(prop, event);
 		if (replyAttendee == null) {
 			appendAttendeesToICS(prop, event.getAttendees());
 		} else {
@@ -782,6 +785,10 @@ public class Ical4jHelper {
 		}
 	}
 
+	private static void appendSequence(PropertyList prop, Event event) {
+		prop.add(new Sequence(event.getSequence()));
+	}
+	
 	private static void appendCreated(PropertyList prop, Event event) {
 		if(event.getTimeCreate() != null){
 			prop.add(new Created(new DateTime(event.getTimeCreate().getTime())));

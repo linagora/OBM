@@ -272,6 +272,13 @@ public class EventChangeMailerTest {
 	public static class NeedActionCreation extends Common {
 
 		@Override
+		protected Event buildTestEvent() {
+			Event event = super.buildTestEvent();
+			event.setSequence(5);
+			return event;
+		}
+		
+		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
 			Event event = buildTestEvent();
 			eventChangeMailer.notifyNeedActionNewUsers(getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
@@ -333,7 +340,8 @@ public class EventChangeMailerTest {
 					"UID:f1514f44bf39311568d64072c1fec10f47fe",
 					"X-OBM-DOMAIN:test.tlse.lng",
 					"CREATED:20090608T142253Z",
-					"LAST-MODIFIED:20090608T142315Z"
+					"LAST-MODIFIED:20090608T142315Z",
+					"SEQUENCE:5"
 			};
 		}
 		@Override
@@ -497,6 +505,7 @@ public class EventChangeMailerTest {
 			for(Attendee att : before.getAttendees()){
 				att.setState(ParticipationState.NEEDSACTION);
 			}
+			after.setSequence(4);
 			eventChangeMailer.notifyNeedActionUpdateUsers(getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE);
 		}
 		
@@ -529,7 +538,8 @@ public class EventChangeMailerTest {
 					"UID:f1514f44bf39311568d64072c1fec10f47fe",
 					"X-OBM-DOMAIN:test.tlse.lng",
 					"CREATED:20090608T142253Z",
-					"LAST-MODIFIED:20090608T142315Z"
+					"LAST-MODIFIED:20090608T142315Z",
+					"SEQUENCE:4"
 				};
 		}
 		
@@ -576,6 +586,13 @@ public class EventChangeMailerTest {
 		public void invitationCancel() throws IOException, MessagingException {
 			super.testInvitation();
 		}
+
+		@Override
+		protected Event buildTestEvent() {
+			Event event = super.buildTestEvent();
+			event.setSequence(2);
+			return event;
+		}
 		
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer) {
@@ -609,7 +626,8 @@ public class EventChangeMailerTest {
 					"UID:f1514f44bf39311568d64072c1fec10f47fe",
 					"X-OBM-DOMAIN:test.tlse.lng",
 					"CREATED:20090608T142253Z",
-					"LAST-MODIFIED:20090608T142315Z"
+					"LAST-MODIFIED:20090608T142315Z",
+					"SEQUENCE:2"
 				};
 		}
 		

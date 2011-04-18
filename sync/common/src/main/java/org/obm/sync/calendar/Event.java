@@ -44,10 +44,13 @@ public class Event {
 	private Date recurrenceId;
 	private boolean internalEvent;
 	
+	private int sequence;
+	
 	public Event() {
 		attendees = new LinkedList<Attendee>();
 		type = EventType.VEVENT;
 		timezoneName = "Europe/Paris";
+		sequence = 0;
 	}
 
 	public String getTitle() {
@@ -288,6 +291,8 @@ public class Event {
 		event.setUid(uid);
 		event.setRecurrenceId(recurrenceId);
 		event.setInternalEvent(internalEvent);
+		event.setSequence(sequence);
+		
 		event.setTimeCreate(timeCreate);
 		event.setTimeUpdate(timeUpdate);
 		return event;
@@ -375,6 +380,14 @@ public class Event {
 			return true;
 		}
 		return false;
+	}
+	
+	public void setSequence(int sequence) {
+		this.sequence = sequence;
+	}
+	
+	public int getSequence() {
+		return sequence;
 	}
 
 	public Attendee findAttendeeForUser(String userEmail) {

@@ -74,12 +74,13 @@ private CalendarItemsWriter writer;
 		er.addException(cal.getTime());
 		er.setEnd(null);
 		ev.setRecurrence(er);
+		ev.setSequence(3);
 
 		
 		String eventS = writer.getEventString(ev);
 		
 		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" isInternal=\"true\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" id=\"\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<timeupdate>1292580000000</timeupdate>" +
 		"<timecreate>1289988000000</timecreate>"+
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
@@ -140,7 +141,7 @@ private CalendarItemsWriter writer;
 		er.addException(cal.getTime());
 		er.setEnd(null);
 		ev.setRecurrence(er);
-		
+		ev.setSequence(6);
 		
 		Document doc = DOMUtils.createDoc(
 				"http://www.obm.org/xsd/sync/event.xsd", "event");
@@ -148,7 +149,7 @@ private CalendarItemsWriter writer;
 		writer.appendEvent(root, ev);
 		
 		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" isInternal=\"false\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" id=\"\" isInternal=\"false\" sequence=\"6\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
 		"<opacity>OPAQUE</opacity>" +
 		"<title>fake rdv</title>" +

@@ -56,11 +56,15 @@ public interface CalendarDao {
 
 	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees, Boolean useObmUser) throws FindException, SQLException;
 
-	Event removeEvent(AccessToken token, int eventId, EventType eventType) throws SQLException;
-
-	Event removeEvent(AccessToken token, Event event, EventType eventType) throws SQLException;
+	Event modifyEventForcingSequence(AccessToken at, String calendar, Event ev,
+			boolean updateAttendees, int sequence, Boolean useObmUser)
+			throws SQLException, FindException;
 	
-	Event removeEventByExtId(AccessToken token, ObmUser calendar, String eventExtId) throws SQLException;
+	Event removeEvent(AccessToken token, int eventId, EventType eventType, int sequence) throws SQLException;
+
+	Event removeEvent(AccessToken token, Event event, EventType eventType, int sequence) throws SQLException;
+	
+	Event removeEventByExtId(AccessToken token, ObmUser calendar, String eventExtId, int sequence) throws SQLException;
 
 	Event createEvent(Connection con, AccessToken editor, String calendar, Event ev, Boolean useObmUser) throws SQLException, FindException;
 
@@ -68,7 +72,11 @@ public interface CalendarDao {
 			boolean updateAttendees, Boolean useObmUser)
 			throws SQLException, FindException;
 
-	Event removeEvent(Connection con, AccessToken token, int uid, EventType et) throws SQLException ;
+	void modifyEventForcingSequence(Connection con, AccessToken editor, String calendar,
+			Event ev, boolean updateAttendees, int sequence, Boolean useObmUser)
+			throws SQLException, FindException;
+	
+	Event removeEvent(Connection con, AccessToken token, int uid, EventType et, int sequence) throws SQLException;
 	
 	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, String extId, ParticipationState participationState) throws SQLException ;
 }

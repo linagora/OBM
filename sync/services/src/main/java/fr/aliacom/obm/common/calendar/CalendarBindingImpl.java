@@ -126,7 +126,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public Event removeEvent(AccessToken token, String calendar, String eventId, boolean notification)
+	public Event removeEvent(AccessToken token, String calendar, String eventId, int sequence, boolean notification)
 			throws AuthFault, ServerFault {
 		try {
 			int uid = Integer.valueOf(eventId);
@@ -145,7 +145,7 @@ public class CalendarBindingImpl implements ICalendar {
 					if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
 						return cancelEvent(token, calendar, notification, uid, ev);
 					} else {
-						changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, notification);
+						changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, sequence, notification);
 						return calendarDao.findEvent(token, uid);
 					}
 				}
@@ -168,7 +168,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event cancelEvent(AccessToken token, String calendar,
 			boolean notification, int uid, Event ev) throws SQLException,
 			FindException {
-		Event removed = calendarDao.removeEvent(token, uid, ev.getType());
+		Event removed = calendarDao.removeEvent(token, uid, ev.getType(), ev.getSequence() + 1);
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + uid + "] removed");
 		if (notification) {
 			notifyOnRemoveEvent(token, calendar, removed);
@@ -178,7 +178,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private Event cancelEventByExtId(AccessToken token, ObmUser calendar, Event event, boolean notification) throws SQLException, FindException {
 		String extId = event.getExtId();
-		Event removed = calendarDao.removeEventByExtId(token, calendar, extId);
+		Event removed = calendarDao.removeEventByExtId(token, calendar, extId, event.getSequence() + 1);
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
 		
 		if (notification) {
@@ -200,7 +200,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public Event removeEventByExtId(AccessToken token, String calendar,
-			String extId, boolean notification) throws AuthFault, ServerFault {
+			String extId, int sequence, boolean notification) throws AuthFault, ServerFault {
 		try {
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
 			final Event ev = calendarDao.findEventByExtId(token, calendarUser, extId);
@@ -224,7 +224,7 @@ public class CalendarBindingImpl implements ICalendar {
 				if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
 					return cancelEventByExtId(token, calendarUser, ev, notification);
 				} else {
-					changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, notification);
+					changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, sequence, notification);
 					return calendarDao.findEventByExtId(token, calendarUser, extId);
 				}
 			}
@@ -294,7 +294,9 @@ public class CalendarBindingImpl implements ICalendar {
 		try{
 			prepareParticipationStateForNewEventAttendees(token, before, event);
 			
-			final Event after = calendarDao.modifyEvent(token, calendar, event, updateAttendees, true);
+	     final Event after = calendarDao.modifyEventForcingSequence(
+	    		 token, calendar, event, updateAttendees, before.getSequence() + 1, true);
+	     
 			if (after != null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
 			}
@@ -316,7 +318,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
 				ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
-				calendarDao.removeEventByExtId(token, calendarOwner, event.getExtId());
+				calendarDao.removeEventByExtId(token, calendarOwner, event.getExtId(), event.getSequence());
 				notifyOrganizerForExternalEvent(token, calendar, event);
 				logger.info(LogUtils.prefix(token) + "Calendar : External event[" + event.getTitle() + 
 						"] removed, calendar owner won't attende to it");
@@ -389,7 +391,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
 				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ event.getTitle() + "] refused, mark event as deleted");
-				calendarDao.removeEvent(token, event, event.getType());
+				calendarDao.removeEvent(token, event, event.getType(), event.getSequence());
 				if (notification) {
 					notifyOrganizerForExternalEvent(token, calendar, event);
 				}
@@ -938,10 +940,10 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public boolean changeParticipationState(AccessToken token, String calendar,
-			String extId, ParticipationState participationState, boolean notification) throws ServerFault {
+			String extId, ParticipationState participationState, int sequence, boolean notification) throws ServerFault {
 		if (helper.canWriteOnCalendar(token, calendar)) {
 			try {
-				return changeParticipationStateInternal(token, calendar, extId, participationState, notification);
+				return changeParticipationStateInternal(token, calendar, extId, participationState, sequence, notification);
 			} catch (Exception e) {
 				throw new ServerFault("no user found with calendar " + calendar);
 			}
@@ -951,14 +953,17 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private boolean changeParticipationStateInternal(AccessToken token,
 			String calendar, String extId,
-			ParticipationState participationState, boolean notification)
+			ParticipationState participationState, int sequence, boolean notification)
 			throws FindException, SQLException {
 		
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
-		boolean changed = calendarDao.changeParticipationState(token, calendarOwner, extId, participationState);
-		logger.info(LogUtils.prefix(token) + 
-				"Calendar : event[extId:" + extId + "] change participation state for user " + 
-				calendarOwner.getEmailAtDomain() + " new state : " + participationState);
+		Event currentEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
+		boolean changed = false;
+		if (currentEvent != null) {
+			 changed = applyParticipationChange(token, extId, participationState, 
+					sequence, calendarOwner, currentEvent);
+		}
+		
 		Event newEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
 		if (newEvent != null) {
 			if (notification) {
@@ -968,6 +973,24 @@ public class CalendarBindingImpl implements ICalendar {
 			logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
 		}
 		return changed;
+	}
+
+	private boolean applyParticipationChange(AccessToken token, String extId,
+			ParticipationState participationState, int sequence,
+			ObmUser calendarOwner, Event currentEvent) throws SQLException {
+		
+		if (currentEvent.getSequence() == sequence) {
+			boolean changed = calendarDao.changeParticipationState(token, calendarOwner, extId, participationState);
+			logger.info(LogUtils.prefix(token) + 
+					"Calendar : event[extId:" + extId + "] change participation state for user " + 
+					calendarOwner.getEmailAtDomain() + " new state : " + participationState);
+			return changed;
+		} else {
+			logger.info(LogUtils.prefix(token) + 
+					"Calendar : event[extId:" + extId + "] ignoring new participation state for user " + 
+					calendarOwner.getEmailAtDomain() + " as sequence number is older than current event");
+			return false;
+		}
 	}
 
 	@Override
@@ -1084,7 +1107,7 @@ public class CalendarBindingImpl implements ICalendar {
 		
 			final List<Event> events = calendarDao.listEventsByIntervalDate(token, obmUser, new Date(0), endDate.getTime(), type);
 			for (final Event event: events) {
-				removeEvent(token, calendar, event.getUid(), false);
+				removeEvent(token, calendar, event.getUid(), event.getSequence() + 1, false);
 			}
 			
 		} catch (Throwable e) {

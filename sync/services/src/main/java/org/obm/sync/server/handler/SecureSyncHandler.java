@@ -24,6 +24,8 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.server.ParametersSource;
 
+import com.google.common.base.Strings;
+
 import fr.aliacom.obm.common.session.SessionManagement;
 
 public abstract class SecureSyncHandler implements ISyncHandler {
@@ -39,6 +41,15 @@ public abstract class SecureSyncHandler implements ISyncHandler {
 		return params.getParameter(name);
 	}
 
+	protected int i(ParametersSource params, String name, int defaultValue) {
+		String text = params.getParameter(name);
+		if (Strings.isNullOrEmpty(text)) {
+			return defaultValue;
+		} else {
+			return Integer.valueOf(text);
+		}
+	}
+	
 	private AccessToken getToken(ParametersSource params) {
 		AccessToken at = new AccessToken(0, 0, "unused");
 		at.setSessionId(params.getParameter("sid"));

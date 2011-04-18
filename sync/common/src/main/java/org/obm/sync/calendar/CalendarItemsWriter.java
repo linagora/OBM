@@ -83,6 +83,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		e.setAttribute("type", ev.getType().toString());
 		e.setAttribute("allDay", "" + ev.isAllday());
 		e.setAttribute("id", ev.getUid());
+		e.setAttribute("sequence", String.valueOf(ev.getSequence()));
 		e.setAttribute("isInternal", ""+ev.isInternalEvent());
 		if (ev.getTimeUpdate() != null) {
 			createIfNotNull(e, "timeupdate", ""
