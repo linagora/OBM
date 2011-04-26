@@ -521,7 +521,7 @@ function get_project_params() {
     }
     else if (strcmp(substr($key, 0, 10),'data-user-') == 0) {
       $nb_mem++;
-      $mem_num = substr($key, 7);
+      $mem_num = substr($key, 10);
       $params["mem$nb_mem"] = $mem_num;
     } 
   }
