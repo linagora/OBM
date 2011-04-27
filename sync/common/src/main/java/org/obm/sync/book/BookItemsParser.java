@@ -88,6 +88,10 @@ public class BookItemsParser extends AbstractItemsParser {
 	}
 
 	private void parseWebsites(Contact c, Element uniqueElement) {
+		if(uniqueElement == null){
+			return;
+		}
+		
 		String[] attrs = { "label", "url" };
 		String[][] values = DOMUtils
 				.getAttributes(uniqueElement, "site", attrs);
@@ -98,6 +102,10 @@ public class BookItemsParser extends AbstractItemsParser {
 	}
 
 	private void parseEmails(Contact c, Element uniqueElement) {
+		if(uniqueElement == null){
+			return;
+		}
+		
 		String[] attrs = { "label", "value" };
 		String[][] values = DOMUtils
 				.getAttributes(uniqueElement, "mail", attrs);
@@ -107,6 +115,10 @@ public class BookItemsParser extends AbstractItemsParser {
 	}
 
 	private void parseAddresses(Contact c, Element uniqueElement) {
+		if(uniqueElement == null){
+			return;
+		}
+		
 		String[] attrs = { "label", "zip", "expressPostal", "town", "country",
 				"state" };
 		String[][] values = DOMUtils.getAttributes(uniqueElement, "address",
@@ -121,6 +133,10 @@ public class BookItemsParser extends AbstractItemsParser {
 
 	private void parseInstantMessagingIdentifiers(Contact c,
 			Element uniqueElement) {
+		if(uniqueElement == null){
+			return;
+		}
+		
 		String[] attrs = { "label", "protocol", "address" };
 		String[][] values = DOMUtils.getAttributes(uniqueElement, "im", attrs);
 		for (String[] p : values) {
@@ -129,6 +145,9 @@ public class BookItemsParser extends AbstractItemsParser {
 	}
 
 	private void parsePhones(Contact c, Element uniqueElement) {
+		if(uniqueElement == null){
+		  return;
+		}
 		String[] attrs = { "label", "number" };
 		String[][] values = DOMUtils.getAttributes(uniqueElement, "phone",
 				attrs);
