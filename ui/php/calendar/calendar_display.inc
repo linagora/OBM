@@ -4695,7 +4695,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       
       if (is_array($res['entity'])) {
         foreach ($res['entity'] as $u_id => $u_ent) {
-          if(in_array($u_id, $template_entities['resource']))
+          if(     is_array($template_entities['resource'])
+             &&   in_array($u_id, $template_entities['resource']))
           {
             $u_name = $u_ent['label'];
             $sel_id = "data-resource-$u_id";
