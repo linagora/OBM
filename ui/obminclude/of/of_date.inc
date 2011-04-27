@@ -397,6 +397,11 @@ class Of_Date extends DateTime {
     return self::TIME_SHORT;
   }
 
+  public function getHourFormat(){
+    if (self::$_options['timeformat'] == '12H') return self::HOUR_AM;
+    return self::HOUR;
+  }
+
   /**
    * Sets a new date or date part 
    *
@@ -1060,6 +1065,7 @@ class Of_Date extends DateTime {
    */
 
   public function setHour($hour, $format=null) {
+    if($format==null) $format = $this->getHourFormat();
     return $this->_set(self::HOUR, $hour, $format);
   }
 
