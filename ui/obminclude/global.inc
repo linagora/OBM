@@ -149,6 +149,9 @@ $ccalendar_resource = true;
 // Calendar send ics file
 $ccalendar_send_ics = true;
 
+// Ics mime encoding for emails
+$ccalendar_ics_encoding = '8bit';
+
 // Calendar hour fraction (minutes select granularity)
 $ccalendar_hour_fraction = 4;
 
