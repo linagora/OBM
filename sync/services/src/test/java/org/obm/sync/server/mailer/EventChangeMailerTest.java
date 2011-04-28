@@ -1,7 +1,6 @@
 package org.obm.sync.server.mailer;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
-import static org.easymock.EasyMock.anyObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,7 +36,6 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
-import org.obm.sync.server.mailer.EventChangeMailer;
 import org.obm.sync.server.template.ITemplateLoader;
 
 import com.google.common.base.Charsets;
@@ -45,7 +43,6 @@ import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools;
-import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ConstantService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
