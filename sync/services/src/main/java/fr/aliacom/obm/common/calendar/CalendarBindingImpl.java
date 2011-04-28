@@ -281,7 +281,9 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) {
 		if (Strings.isNullOrEmpty(event.getUid())) {
 			final Event currentEvent = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
-			event.setUid(currentEvent.getUid());
+			if (currentEvent != null) {
+				event.setUid(currentEvent.getUid());
+			}
 			return currentEvent;
 		} else {
 			int uid = Integer.valueOf(event.getUid());

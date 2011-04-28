@@ -64,6 +64,8 @@ import org.obm.sync.solr.SolrHelper.Factory;
 import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -1925,11 +1927,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ResultSet evrs = null;
 		Connection con = null;
 
-		List<Event> changedEvent = new LinkedList<Event>();
-		Map<Integer, Event> eventById = new HashMap<Integer, Event>();
-		Event ret = null;
-		String domainName = null;
-		Calendar cal = getGMTCalendar();
 		try {
 			con = obmHelper.getConnection();
 			evps = con.prepareStatement(ev);
@@ -1937,24 +1934,23 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evps.setString(2, calendar.getLogin());
 			evrs = evps.executeQuery();
 			if (evrs.next()) {
-				ret = eventFromCursor(cal, evrs);
-				domainName = evrs.getString("domain_name");
-				eventById.put(ret.getDatabaseId(), ret);
-				changedEvent.add(ret);
+				Calendar cal = getGMTCalendar();
+				Event ret = eventFromCursor(cal, evrs);
+				String domainName = evrs.getString("domain_name");
+				Map<Integer, Event> eventById = ImmutableMap.of(ret.getDatabaseId(), ret);
+				String evIdList = buildEventId(ImmutableList.of(ret));
+				loadAttendeesAndAlerts(token, eventById, evIdList, domainName);
+				loadExceptions(cal, eventById, evIdList);
+				loadEventExceptions(token, eventById, evIdList);
+				return ret;
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, evps, evrs);
 		}
-
-		if (!changedEvent.isEmpty()) {
-			String evIdList = buildEventId(changedEvent);
-			loadAttendeesAndAlerts(token, eventById, evIdList, domainName);
-			loadExceptions(cal, eventById, evIdList);
-			loadEventExceptions(token, eventById, evIdList);
-		}
-		return ret;
+			
+		return null;
 	}
 
 	@Override
