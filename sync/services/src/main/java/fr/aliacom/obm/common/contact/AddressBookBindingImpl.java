@@ -286,11 +286,12 @@ public class AddressBookBindingImpl implements IAddressBook {
 		Contact previous = contactDao.findContact(token, c.getUid());
 		if (previous != null) {
 			contactMerger.merge(previous, c);
+			return contactDao.modifyContact(token, c);
 		} else {
 			logger.warn("previous version not found for c.uid: "
 					+ c.getUid() + " c.last: " + c.getLastname());
+			return c;
 		}
-		return contactDao.modifyContact(token, c);
 	}
 	
 	@Override
