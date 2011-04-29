@@ -555,11 +555,9 @@ class OBM_Contact implements OBM_ISearchable {
     }
 
     if($contact->getCalendar()){
-      echo $calendar->id." true <br />";
       $doc->setField('hasACalendar', "true");
     }
     else {
-      echo $calendar->firstname." false <br />";
       $doc->setField('hasACalendar', "false");
     }
 
