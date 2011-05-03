@@ -554,7 +554,7 @@ class OBM_Contact implements OBM_ISearchable {
       $doc->setMultiValue('country', $address['country']);
     }
 
-    if($contact->getCalendar()){
+    if($contact->hasACalendarUrl()){
       $doc->setField('hasACalendar', "true");
     }
     else {
@@ -1701,6 +1701,17 @@ class OBM_Contact implements OBM_ISearchable {
             }
           }
           return Vpdi::decodeOne($d);
+        }
+      }
+    }
+    return false;
+  }
+
+  public function hasACalendarUrl(){
+    if (is_array($this->website)) {
+      foreach($this->website as $website) {
+        if ($website['label'][0] == 'CALURI' && $website['url']) {
+          return true;
         }
       }
     }
