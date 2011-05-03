@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -83,7 +85,7 @@ public class ContactIndexer implements Runnable {
 			st = con.createStatement();
 
 			rs = st.executeQuery("SELECT "
-					+ "c.*, ab.*, k.*, cf.*, "
+					+ "c.*, ab.*, k.*, cf.*, Website.website_url, Website.website_label, "
 					+ "bd.event_id as bd_id, bd.event_date as bd_date, an.event_id as an_id, an.event_date as an_date "
 					+ "FROM Contact c "
 					+ "INNER JOIN AddressBook ab ON c.contact_addressbook_id=ab.id "
@@ -91,6 +93,8 @@ public class ContactIndexer implements Runnable {
 					+ "LEFT JOIN ContactFunction cf ON c.contact_function_id=cf.contactfunction_id "
 					+ "LEFT JOIN Event bd ON c.contact_birthday_id=bd.event_id "
 					+ "LEFT JOIN Event an ON c.contact_anniversary_id=an.event_id "
+					+ "LEFT JOIN ContactEntity ce ON c.contact_id=ce.contactentity_contact_id "	
+					+ "LEFT JOIN Website ON ce.contactentity_entity_id=Website.website_entity_id "
 					+ "WHERE c.contact_id=" + cid);
 			if (!rs.next()) {
 				logger.warn("contact with id " + cid + " not found.");
@@ -139,7 +143,7 @@ public class ContactIndexer implements Runnable {
 			f(sid, "comment3", rs.getString("contact_comment3"));
 
 			f(sid, "from", rs.getString("contact_origin"));
-
+			f(sid, "hasACalendar", hasCaluri(rs.getString("website_label"), rs.getString("website_url")));
 			rs.close();
 			rs = null;
 
@@ -222,6 +226,22 @@ public class ContactIndexer implements Runnable {
 			obmHelper.cleanup(con, st, rs);
 		}
 		return found;
+	}
+
+	private boolean hasCaluri(String websiteLabel, String websiteUrl) {
+		if(websiteUrl != null && websiteLabel != null){
+			StringTokenizer websiteTokenizer = new StringTokenizer(websiteLabel, ";");
+			try{
+				String websiteCategory = websiteTokenizer.nextToken();
+				if(websiteCategory.equals("CALURI")){
+					return true;
+				}
+			}
+			catch (NoSuchElementException $e){
+				return false;
+			}
+		}
+		return false;
 	}
 
 	private void f(SolrInputDocument sid, String field,
