@@ -3346,7 +3346,7 @@ CREATE TABLE `UserObm` (
   `userobm_archive`            int(1) NOT NULL default '0',
   `userobm_status`             enum('INIT', 'VALID') default 'VALID',
   `userobm_timelastaccess`     timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_login`              varchar(100) NOT NULL default '',
+  `userobm_login`              varchar(256) NOT NULL default '',
   `userobm_nb_login_failed`    int(2) default '0',
   `userobm_password_type`      char(6) NOT NULL default 'PLAIN',
   `userobm_password`           varchar(64) NOT NULL default '',

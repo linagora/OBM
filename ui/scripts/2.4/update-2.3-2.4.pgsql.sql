@@ -93,7 +93,7 @@ ALTER TABLE userobm
 ADD COLUMN userobm_commonname varchar(256) default '', 
 ALTER userobm_delegation TYPE character varying(256),
 ALTER userobm_delegation_target TYPE character varying(256),
-ALTER userobm_login TYPE character varying(100);
+ALTER userobm_login TYPE character varying(256);
 
 --
 -- Update contact
@@ -107,7 +107,7 @@ ALTER TABLE p_userobm
 ADD COLUMN userobm_commonname varchar(256) default '', 
 ALTER userobm_delegation TYPE character varying(256),
 ALTER userobm_delegation_target TYPE character varying(256),
-ALTER userobm_login TYPE character varying(100);
+ALTER userobm_login TYPE character varying(256);
 
 --
 -- Update obmbookmarkproperty
