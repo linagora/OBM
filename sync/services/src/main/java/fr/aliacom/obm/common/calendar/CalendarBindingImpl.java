@@ -318,7 +318,8 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event modifyExternalEvent(AccessToken token, String calendar, 
 			Event event, boolean updateAttendees, boolean notification) throws ServerFault {
 		try {
-			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
+			Attendee attendee = calendarOwnerAsAttendee(token, calendar, event);
+			if (isEventDeclinedForCalendarOwner(attendee)) {
 				ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
 				calendarDao.removeEventByExtId(token, calendarOwner, event.getExtId(), event.getSequence());
 				notifyOrganizerForExternalEvent(token, calendar, event);
@@ -391,7 +392,14 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private Event createExternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
 		try {
-			if (isEventDeclinedForCalendarOwner(token, calendar, event)) {
+			Attendee attendee = calendarOwnerAsAttendee(token, calendar, event);
+			if (attendee == null) {
+				String message = "Calendar : external event["+ event.getTitle() + "] doesn't involve calendar owner, ignoring creation";
+				logger.info(LogUtils.prefix(token) + message);
+				throw new ServerFault(message);
+			}
+			
+			if (isEventDeclinedForCalendarOwner(attendee)) {
 				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ event.getTitle() + "] refused, mark event as deleted");
 				calendarDao.removeEvent(token, event, event.getType(), event.getSequence());
 				if (notification) {
@@ -411,11 +419,15 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e.getMessage());
 		}
 	}
-
-	private boolean isEventDeclinedForCalendarOwner(AccessToken token,
-			String calendar, Event event) throws FindException {
+	
+	private Attendee calendarOwnerAsAttendee(AccessToken token, String calendar, Event event) 
+		throws FindException {
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
 		Attendee userAsAttendee = event.findAttendeeForUser(calendarOwner.getEmailAtDomain());
+		return userAsAttendee;
+	}
+
+	private boolean isEventDeclinedForCalendarOwner(Attendee userAsAttendee) {
 		return userAsAttendee != null && userAsAttendee.getState() == ParticipationState.DECLINED;
 	}
 
@@ -429,8 +441,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	
 	private void notifyOrganizerForExternalEvent(AccessToken token, String calendar, Event ev) throws FindException {
-		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
-		Attendee calendarOwnerAsAttendee = ev.findAttendeeForUser(calendarOwner.getEmailAtDomain());
+		Attendee calendarOwnerAsAttendee = calendarOwnerAsAttendee(token, calendar, ev);
 		notifyOrganizerForExternalEvent(token, calendar, ev, calendarOwnerAsAttendee.getState());
 	}
 
