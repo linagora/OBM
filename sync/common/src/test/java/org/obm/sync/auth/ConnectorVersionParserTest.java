@@ -50,7 +50,7 @@ public class ConnectorVersionParserTest {
 		String valid = "thunderbird[ext: 2.4.1.8, light: 1.0b2-LINAGORA-02]";
 		ClientInformations.Parser parser = new ClientInformations.Parser();
 		ClientInformations infos = parser.parse(valid);
-		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, null);
+		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, "");
 		testLightningVersion(infos.getLightningVersion(), 1, 0, null, null, "b2-LINAGORA-02", 2);
 	}
 	
@@ -59,7 +59,7 @@ public class ConnectorVersionParserTest {
 		String valid = "thunderbird[ext: 2.4.1.8, light: 1.0b2.03obm]";
 		ClientInformations.Parser parser = new ClientInformations.Parser();
 		ClientInformations infos = parser.parse(valid);
-		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, null);
+		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, "");
 		testLightningVersion(infos.getLightningVersion(), 1, 0, null, null, "b2.03obm", 3);
 	}
 
@@ -68,7 +68,7 @@ public class ConnectorVersionParserTest {
 		String valid = "thunderbird[ext: 2.4.1.8, light: 1.0.03obm]";
 		ClientInformations.Parser parser = new ClientInformations.Parser();
 		ClientInformations infos = parser.parse(valid);
-		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, null);
+		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, "");
 		testLightningVersion(infos.getLightningVersion(), 1, 0, null, null, "3obm", 3);
 	}
 	
@@ -77,7 +77,7 @@ public class ConnectorVersionParserTest {
 		String valid = "thunderbird[ext: 2.4.1.8, light: 1.0.1.03obm]";
 		ClientInformations.Parser parser = new ClientInformations.Parser();
 		ClientInformations infos = parser.parse(valid);
-		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, null);
+		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, "");
 		testLightningVersion(infos.getLightningVersion(), 1, 0, 1, null, "3obm", 3);
 	}
 	
@@ -86,7 +86,7 @@ public class ConnectorVersionParserTest {
 		String valid = "thunderbird[ext: 2.4.1.8, light: 1.0.1.3.03obm]";
 		ClientInformations.Parser parser = new ClientInformations.Parser();
 		ClientInformations infos = parser.parse(valid);
-		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, null);
+		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 8, "");
 		testLightningVersion(infos.getLightningVersion(), 1, 0, 1, 3, ".03obm", 3);
 	}
 	
@@ -95,7 +95,7 @@ public class ConnectorVersionParserTest {
 		String valid = "thunderbird[ext: 2.4.1.12, light: 0.9.03obm]";
 		ClientInformations.Parser parser = new ClientInformations.Parser();
 		ClientInformations infos = parser.parse(valid);
-		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 12, null);
+		testVersion(infos.getObmConnectorVersion(), 2, 4, 1, 12, "");
 		testLightningVersion(infos.getLightningVersion(), 0, 9, null, null, "3obm", 3);
 	}
 	
