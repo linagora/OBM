@@ -47,7 +47,16 @@ public class Version implements Comparable<Version> {
 	}
 
 	public String getSuffix() {
-		return suffix;
+		return firstNonNull(suffix, "");
+	}
+	
+	private String firstNonNull(String... values) {
+		for (String s: values) {
+			if (s != null) {
+				return s;
+			}
+		}
+		return "";
 	}
 	
 	@Override

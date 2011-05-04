@@ -2,10 +2,11 @@ package org.obm.sync.server.handler;
 
 
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Test;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ClientInformations.Parser;
 import org.obm.sync.auth.ClientInformations;
+import org.obm.sync.auth.ClientInformations.Parser;
 import org.obm.sync.auth.LightningVersion;
 import org.obm.sync.auth.OBMConnectorVersionException;
 import org.obm.sync.auth.Version;
@@ -144,6 +145,13 @@ public class VersionValidatorTest{
 		EasyMock.expect(parser.parse(EasyMock.anyObject(String.class))).andReturn(null);
 		VersionValidator validator = new VersionValidator(parser);
 		validator.checkObmConnectorVersion(createFakeAccessToken());
+	}
+	
+	@Test
+	public void testCheckNullLightningSuffix() {
+		Parser parser = createMockParser(new Version(2, 4, 0, 1, null), new LightningVersion(0, 8, null, null, null));
+		VersionValidator versionValidator = new VersionValidator(parser);
+		Assert.assertNotNull(versionValidator);
 	}
 	
 }
