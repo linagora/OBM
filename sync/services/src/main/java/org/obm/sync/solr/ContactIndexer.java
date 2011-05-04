@@ -237,7 +237,7 @@ public class ContactIndexer implements Runnable {
 					return true;
 				}
 			}
-			catch (NoSuchElementException $e){
+			catch (NoSuchElementException e){
 				return false;
 			}
 		}
