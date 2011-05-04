@@ -134,8 +134,8 @@ public class CalendarItemsParser extends AbstractItemsParser {
 	private void parseRecurrence(Event ev, Element rec) {
 		String kind = rec.getAttribute("kind");
 		EventRecurrence er = new EventRecurrence();
-		er.setKind(RecurrenceKind.valueOf(kind));
-		if (!"none".equals(kind)) {
+		er.setKind(RecurrenceKind.lookup(kind));
+		if (er.getKind() != RecurrenceKind.none) {
 			if (rec.hasAttribute("end")) {
 				er.setEnd(DateHelper.asDate(rec.getAttribute("end")));
 			}

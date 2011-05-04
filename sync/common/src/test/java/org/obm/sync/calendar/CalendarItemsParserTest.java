@@ -234,4 +234,36 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals(1292580000000L,ev.getTimeUpdate().getTime());
 	}
 
+	@Test
+	public void testParseNullRecurrence() throws SAXException, IOException, FactoryConfigurationError {
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<timeupdate>1292580000000</timeupdate>" +
+		"<timecreate>1289988000000</timecreate>" +
+		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
+		"<opacity>OPAQUE</opacity>" +
+		"<title>fake rdv</title>" +
+		"<owner>john@do.fr</owner>" +
+		"<tz>Europe/Paris</tz>" +
+		"<date>1295258400000</date>" +
+		"<duration>3600</duration>" +
+		"<location>tlse</location>" +
+		"<alert>60</alert>" +
+		"<priority>0</priority>" +
+		"<privacy>0</privacy>" +
+		"<attendees>" +
+		"<attendee displayName=\"John Do\" email=\"john@do.fr\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\" isOrganizer=\"true\"/>" +
+		"</attendees><recurrence days=\"\" freq=\"1\">" +
+		"<exceptions>" +
+		"<exception>1295258400000</exception>" +
+		"</exceptions><eventExceptions/>" +
+		"</recurrence>" +
+		"</event>";
+		
+		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
+		Event ev = parser.parseEvent(doc.getDocumentElement());
+		
+		Assert.assertEquals(RecurrenceKind.none, ev.getRecurrence().getKind());
+	}
+	
 }
