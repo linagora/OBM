@@ -368,11 +368,6 @@ ALTER TABLE EventTemplate ADD COLUMN eventtemplate_opacity vopacity DEFAULT 'OPA
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_user_calendar boolean DEFAULT false;
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_resource_calendar boolean DEFAULT false;
 
---
--- Add sequence field to table event
---
-ALTER TABLE event ADD COLUMN event_sequence INTEGER DEFAULT 0;
-
 
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed

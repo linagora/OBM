@@ -877,8 +877,7 @@ CREATE TABLE event (
     event_allow_documents boolean DEFAULT false,
     event_description text,
     event_properties text,
-    event_tag_id integer default NULL,
-    event_sequence integer default 0
+    event_tag_id integer default NULL
 );
 
 

@@ -281,11 +281,6 @@ ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_opacity` enum('OPAQUE','TR
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_user_calendar` boolean default 0 AFTER eventtemplate_opacity;
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_resource_calendar` boolean default 0 AFTER eventtemplate_show_user_calendar;
 
---
--- Add sequence field to table event
---
-ALTER TABLE `Event` ADD COLUMN `event_sequence` int(8) default '0';
-
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 -- ----------------------------------------------------------------------------
