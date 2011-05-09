@@ -347,10 +347,6 @@ CREATE TABLE P_field (LIKE field);
 -- Resource group delegation
 --
 ALTER TABLE RGroup ADD COLUMN rgroup_delegation varchar(256) default '';
--- 
--- deleted_event_ext_id
---
-ALTER TABLE deletedevent ADD COLUMN deletedevent_event_ext_id character varying(300) DEFAULT ''::character varying;
 
 --
 -- update category_code length to 20

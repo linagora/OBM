@@ -257,10 +257,6 @@ CREATE TABLE `P_field` (LIKE `field`);
 --
 ALTER TABLE RGroup ADD COLUMN rgroup_delegation varchar(256) default '';
 
--- 
--- deleted_event_ext_id
---
-ALTER TABLE `DeletedEvent` ADD COLUMN `deletedevent_event_ext_id` varchar(300) default '' AFTER deletedevent_event_id;
 
 --
 -- update category_code length to 20
