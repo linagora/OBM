@@ -1369,6 +1369,7 @@ CREATE TABLE `Event` (
   `event_description` text,
   `event_properties` text,
 	`event_tag_id` int(8) default NULL,
+  `event_sequence` int(8) default '0',
   PRIMARY KEY  (`event_id`),
   KEY `event_domain_id_domain_id_fkey` (`event_domain_id`),
   KEY `event_owner_userobm_id_fkey` (`event_owner`),
