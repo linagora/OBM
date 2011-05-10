@@ -106,6 +106,8 @@ ADD COLUMN contact_commonname varchar(256) default '';
 --
 -- SyncedAddressbook
 --
+DELETE FROM SyncedAddressbook WHERE user_id NOT IN (SELECT userobm_id FROM UserObm);
+DELETE FROM SyncedAddressbook WHERE addressbook_id NOT IN (SELECT id FROM AddressBook);
 ALTER TABLE SyncedAddressbook ENGINE = INNODB DEFAULT CHARSET=utf8;
 ALTER TABLE SyncedAddressbook ADD CONSTRAINT `syncedaddressbook_user_id_userobm_id_fkey` FOREIGN KEY (user_id) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE SyncedAddressbook ADD CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES AddressBook (id) ON DELETE CASCADE ON UPDATE CASCADE;
