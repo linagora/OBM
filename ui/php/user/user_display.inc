@@ -2363,7 +2363,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </tr>
    <tr>
     <th class=\"$class[commonname]\">$l_commonname</th>
-    <td><input id=\"userCommonname\" name=\"tf_commonname\" size=\"32\" maxlength=\"64\" autocomplete=\"off\" value=\"$cname\" /></td>
+    <td><input id=\"userCommonname\" name=\"tf_commonname\" size=\"32\" maxlength=\"256\" autocomplete=\"off\" value=\"$cname\" /></td>
   </tr> 
   <tr>
     <th class=\"$class[login]\">$l_login</th>
