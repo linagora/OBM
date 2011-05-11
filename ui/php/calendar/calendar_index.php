@@ -1217,7 +1217,7 @@ if (!$params['ajax']) {
   exit();
 } elseif ($action == 'share') {
 ///////////////////////////////////////////////////////////////////////////////
-  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' ) || check_calendar_update_rights($params) ) {
     $token = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);
     dis_calendar_share_public($token);
     json_ok_msg("$l_share_calendar : $l_share_ok");
