@@ -312,7 +312,7 @@ CREATE TABLE `Category` (
   KEY `category_domain_id_domain_id_fkey` (`category_domain_id`),
   KEY `category_userupdate_userobm_id_fkey` (`category_userupdate`),
   KEY `category_usercreate_userobm_id_fkey` (`category_usercreate`),
-  CONSTRAINT UNIQUE `categorycategory_categorycode_uniquekey` (`category_category`,`category_code`),
+  CONSTRAINT UNIQUE `categorycategory_categorycode_uniquekey` (`category_category`,`category_code`,`category_label`),
   CONSTRAINT `category_usercreate_userobm_id_fkey` FOREIGN KEY (`category_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `category_domain_id_domain_id_fkey` FOREIGN KEY (`category_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `category_userupdate_userobm_id_fkey` FOREIGN KEY (`category_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE

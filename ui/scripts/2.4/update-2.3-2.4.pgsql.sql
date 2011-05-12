@@ -353,7 +353,7 @@ ALTER TABLE RGroup ADD COLUMN rgroup_delegation varchar(256) default '';
 -- add unicity constraint
 --
 ALTER TABLE Category ALTER COLUMN category_code TYPE character varying(100);
-ALTER TABLE Category ADD CONSTRAINT categorycategory_categorycode_uniquekey UNIQUE (category_category,category_code);
+ALTER TABLE Category ADD CONSTRAINT categorycategory_categorycode_uniquekey UNIQUE (category_category,category_code,category_label);
 
 --
 -- possibility to save the forced insertion state into an event template
