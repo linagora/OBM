@@ -1,8 +1,13 @@
 package org.obm.sync.solr;
 
 import java.net.MalformedURLException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.ConfigurationException;
 
@@ -30,12 +35,14 @@ public class SolrHelper {
 	
 	@Singleton
 	public static class Factory {
-		private HttpClient client;
-		private MultiThreadedHttpConnectionManager manager;
-		private String locatorUrl;
-		private ExecutorService executor;
+		private final HttpClient client;
+		private final MultiThreadedHttpConnectionManager manager;
+		private final String locatorUrl;
+		private final ExecutorService executor;
 		private final ContactIndexer.Factory contactIndexerFactory;
 		private final org.obm.sync.solr.EventIndexer.Factory eventIndexerFactory;
+		private final LinkedBlockingQueue<Runnable> workQueue;
+		private final Timer debugTimer;
 		
 		@Inject
 		private Factory(ConstantService constantService, ContactIndexer.Factory contactIndexerFactory,
@@ -44,13 +51,28 @@ public class SolrHelper {
 			this.eventIndexerFactory = eventIndexerFactory;
 			locatorUrl = constantService.getLocatorUrl();
 			manager = new MultiThreadedHttpConnectionManager();
-			executor = Executors.newSingleThreadExecutor();
+			workQueue = new LinkedBlockingQueue<Runnable>();
+			executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, workQueue);
 			client = new HttpClient(manager);
+			debugTimer = new Timer();
+			if (logger.isInfoEnabled()) {
+				scheduleFixedRateDebugLog();
+			}
+		}
+
+		private void scheduleFixedRateDebugLog() {
+			debugTimer.scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					logger.info("SolR indexing queue size : " + workQueue.size());
+				}
+			}, 0, 10000);
 		}
 		
 		public void shutdown() {
 			executor.shutdown();
 			manager.shutdown();
+			debugTimer.cancel();
 		}
 
 		public SolrHelper createClient(AccessToken at) throws MalformedURLException {
