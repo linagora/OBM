@@ -44,7 +44,7 @@ $regexp_email_right = $regexp_domain;
 $regexp_rootLdap = "^dc=(.+),dc=.+\$";
 
 # Login regexp
-$regexp_login = "^([a-z0-9][a-z0-9-._]{0,63})\$";
+$regexp_login = "^([a-z0-9][a-z0-9-._]{0,256})\$";
 if( $OBM::Parameters::common::obmModules->{'samba'} ) {
     $regexp_login = "^([a-z0-9][a-z0-9-._]{0,31})\$";
 }
