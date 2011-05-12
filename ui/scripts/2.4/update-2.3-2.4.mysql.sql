@@ -273,7 +273,6 @@ ALTER TABLE `Category` ADD CONSTRAINT UNIQUE `categorycategory_categorycode_uniq
 -- - the availability of attendees and resources
 -- - the checked state of the show users calendars
 --
-ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_organizer` int(11) default 0 AFTER eventtemplate_group_ids;
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_force_insertion` boolean default 0 AFTER eventtemplate_group_ids;
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_opacity` enum('OPAQUE','TRANSPARENT') default 'OPAQUE' AFTER eventtemplate_force_insertion;
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_user_calendar` boolean default 0 AFTER eventtemplate_opacity;

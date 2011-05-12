@@ -358,7 +358,6 @@ ALTER TABLE Category ADD CONSTRAINT categorycategory_categorycode_uniquekey UNIQ
 --
 -- possibility to save the forced insertion state into an event template
 --
-ALTER TABLE EventTemplate ADD COLUMN eventtemplate_organizer INTEGER DEFAULT 0;
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_force_insertion boolean DEFAULT false;
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_opacity vopacity DEFAULT 'OPAQUE'::vopacity;
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_user_calendar boolean DEFAULT false;
