@@ -468,6 +468,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if ($addressbook && $addressbook->write && check_can_delete_contact($params['id'])) {
       if($contact->archive) {
         OBM_Contact::delete($contact);
+        update_last_visit('contact',$params['id'],'delete');
       } else {
         $contact->archive = 1;
         OBM_Contact::store($contact);
@@ -475,7 +476,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
       // Update "archive" addressbook
       $contacts = $addressbooks->searchContacts($params['searchpattern']);
       $subTemplate['contacts'] = new OBM_Template('contacts');
-      $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));  
+      $subTemplate['contacts']->set('fields', get_display_pref($GLOBALS['obm']['uid'], 'contact'));      
     } else {
       header('HTTP', true, 403);
       //FIXME : Not compatible with the HTML/Ajax implemetation

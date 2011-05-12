@@ -162,6 +162,7 @@ Obm.Contact.AddressBook = new Class ({
       //});      
       this.dataRequest.write({ajax:1, action:'deleteContact', 'id':id, searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')});
       this.hideContact();
+      window.location.href =  obm.vars.consts.obmUrl + '/contact/contact_index.php';
     }
   },
 
