@@ -2,8 +2,8 @@ package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmDomain;
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
-import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.ToolBox.getDefaultSettings;
+import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.compareCollections;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendee;
@@ -30,7 +30,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.server.mailer.EventChangeMailer;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.internal.Lists;
+import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
