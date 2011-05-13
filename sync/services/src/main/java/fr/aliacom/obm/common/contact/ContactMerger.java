@@ -19,12 +19,14 @@ package fr.aliacom.obm.common.contact;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.IMergeable;
+import org.obm.sync.book.Website;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -35,6 +37,7 @@ import fr.aliacom.obm.utils.ObmHelper;
  * Merges contact data sent by sync client into the contact data store in the
  * database. This is necessary to avoid deleting data not handled by a given
  * sync client.
+ * 
  */
 @Singleton
 public class ContactMerger {
@@ -46,56 +49,69 @@ public class ContactMerger {
 		this.obmHelper = obmHelper;
 	}
 	
-	public void merge(Contact previous, Contact c) throws SQLException {
+	public void merge(Contact actualC, Contact updateC) throws SQLException {
 		// TODO fix merge to not delete values not provided by sync client
-		if (previous.getEntityId() == null) {
-			Integer entityId = obmHelper.fetchEntityId("Contact", previous
+		if (actualC.getEntityId() == null) {
+			Integer entityId = obmHelper.fetchEntityId("Contact", actualC
 					.getUid());
-			previous.setEntityId(entityId);
+			actualC.setEntityId(entityId);
 		}
 
-		c.setEntityId(previous.getEntityId());
-		c.setFolderId(previous.getFolderId());
+		updateC.setEntityId(actualC.getEntityId());
+		updateC.setFolderId(actualC.getFolderId());
 
-		if (c.getFirstname() == null && previous.getFirstname() != null) {
-			c.setFirstname(previous.getFirstname());
+		if (updateC.getFirstname() == null && actualC.getFirstname() != null) {
+			updateC.setFirstname(actualC.getFirstname());
 		}
-		if (c.getCompany() == null && previous.getCompany() != null) {
-			c.setCompany(previous.getCompany());
+		if (updateC.getCompany() == null && actualC.getCompany() != null) {
+			updateC.setCompany(actualC.getCompany());
 		}
-		if (c.getAka() == null && previous.getAka() != null) {
-			c.setAka(previous.getAka());
+		if (updateC.getAka() == null && actualC.getAka() != null) {
+			updateC.setAka(actualC.getAka());
 		}
-		if (c.getService() == null && previous.getService() != null) {
-			c.setService(previous.getService());
+		if (updateC.getService() == null && actualC.getService() != null) {
+			updateC.setService(actualC.getService());
 		}
-		if (c.getTitle() == null && previous.getTitle() != null) {
-			c.setTitle(previous.getTitle());
-		}
-
-		if (c.getSuffix() == null && previous.getSuffix() != null) {
-			c.setSuffix(previous.getSuffix());
-		}
-		if (c.getMiddlename() == null && previous.getMiddlename() != null) {
-			c.setMiddlename(previous.getMiddlename());
-		}
-		if (c.getManager() == null && previous.getManager() != null) {
-			c.setManager(previous.getManager());
-		}
-		if (c.getAssistant() == null && previous.getAssistant() != null) {
-			c.setAssistant(previous.getAssistant());
-		}
-		if (c.getSpouse() == null && previous.getSpouse() != null) {
-			c.setSpouse(previous.getSpouse());
+		if (updateC.getTitle() == null && actualC.getTitle() != null) {
+			updateC.setTitle(actualC.getTitle());
 		}
 
-		mergeMap(previous.getPhones(), c.getPhones());
-		mergeMap(previous.getEmails(), c.getEmails());
-		mergeMap(previous.getAddresses(), c.getAddresses());
-		mergeMap(previous.getImIdentifiers(), c.getImIdentifiers());
-		mergeMap(previous.getWebsites(), c.getWebsites());
+		if (updateC.getSuffix() == null && actualC.getSuffix() != null) {
+			updateC.setSuffix(actualC.getSuffix());
+		}
+		if (updateC.getMiddlename() == null && actualC.getMiddlename() != null) {
+			updateC.setMiddlename(actualC.getMiddlename());
+		}
+		if (updateC.getManager() == null && actualC.getManager() != null) {
+			updateC.setManager(actualC.getManager());
+		}
+		if (updateC.getAssistant() == null && actualC.getAssistant() != null) {
+			updateC.setAssistant(actualC.getAssistant());
+		}
+		if (updateC.getSpouse() == null && actualC.getSpouse() != null) {
+			updateC.setSpouse(actualC.getSpouse());
+		}
+
+		mergeMap(actualC.getPhones(), updateC.getPhones());
+		mergeMap(actualC.getEmails(), updateC.getEmails());
+		mergeMap(actualC.getAddresses(), updateC.getAddresses());
+		mergeMap(actualC.getImIdentifiers(), updateC.getImIdentifiers());
+		
+		HashSet<Website> websites = mergeWebSite(actualC, updateC);
+		updateC.updateWebSites(websites);
+	}	
+	
+	private HashSet<Website> mergeWebSite(Contact actualC, Contact updateC) {
+		HashSet<Website> websites = new HashSet<Website>();
+		websites.addAll(updateC.getWebsites());
+		for (Website website: actualC.getWebsites()) {
+			if (!updateC.getWebsites().contains(website)) {				
+				websites.add(website);
+			}
+		}
+		return websites;
 	}
-
+	
 	private <T extends IMergeable> void mergeMap(Map<String, T> old,
 			Map<String, T> recent) {
 		Set<String> oldLabels = old.keySet();

@@ -2,7 +2,9 @@ package org.obm.sync.book;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.obm.sync.utils.DisplayNameUtils;
 
@@ -41,14 +43,14 @@ public class Contact {
 	private String calUri;
 	
 	private Map<String, Phone> phones;
-	private Map<String, Website> websites;
+	private HashSet<Website> websites;
 	private Map<String, Email> emails;
 	private Map<String, InstantMessagingId> imIdentifiers;
 	private Map<String, Address> addresses;
 
 	public Contact() {
 		phones = new HashMap<String, Phone>();
-		websites = new HashMap<String, Website>();
+		websites = new HashSet<Website>();
 		emails = new HashMap<String, Email>();
 		addresses = new HashMap<String, Address>();
 		imIdentifiers = new HashMap<String, InstantMessagingId>();
@@ -139,7 +141,7 @@ public class Contact {
 		return phones;
 	}
 
-	public Map<String, Website> getWebsites() {
+	public HashSet<Website> getWebsites() {
 		return websites;
 	}
 
@@ -163,8 +165,8 @@ public class Contact {
 		addresses.put(lbl, p);
 	}
 
-	public void addWebsite(String lbl, Website p) {
-		websites.put(lbl, p);
+	public void addWebsite(Website website) {
+		websites.add(website);
 	}
 
 	public void addIMIdentifier(String lbl, InstantMessagingId imid) {
@@ -275,4 +277,16 @@ public class Contact {
 		return DisplayNameUtils.getDisplayName(commonname, firstname, lastname);
 	}
 
+	public Set<String> listWebSitesLabel() {
+		Set<String> labels = new HashSet<String>();
+		for (Website website: websites) {
+			labels.add(website.getLabel());
+		}
+		return labels;
+	}
+	
+	public void updateWebSites(HashSet<Website> websites) {
+		this.websites = websites;
+	}
+	
 }

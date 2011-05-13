@@ -96,7 +96,7 @@ public class BookItemsParser extends AbstractItemsParser {
 		String[][] values = DOMUtils
 				.getAttributes(uniqueElement, "site", attrs);
 		for (String[] p : values) {
-			c.addWebsite(p[0], new Website(p[1]));
+			c.addWebsite(new Website(p[0], p[1]));
 		}
 
 	}

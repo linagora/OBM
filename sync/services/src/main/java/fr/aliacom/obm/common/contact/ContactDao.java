@@ -85,17 +85,17 @@ public class ContactDao {
 
 	private static final String DEFAULT_ADDRESS_BOOK_NAME = "contacts";
 	private static final String COLLECTED_ADDRESS_BOOK_NAME = "collected_contacts";
-	
+
 	private static final String ANNIVERSARY_FIELD = "contact_anniversary_id";
 	private static final String BIRTHDAY_FIELD = "contact_birthday_id";
 
 	private static final String CONTACT_SELECT_FIELDS = "contact_id, contact_firstname, contact_lastname, contactentity_entity_id, "
-			+ "contact_aka, contact_company, contact_title, contact_service, contact_birthday_id, "
-			+ "contact_anniversary_id, contact_middlename, contact_suffix, contact_manager, contact_assistant, contact_spouse, "
-			+ "contact_addressbook_id, contact_comment, contact_commonname";
+		+ "contact_aka, contact_company, contact_title, contact_service, contact_birthday_id, "
+		+ "contact_anniversary_id, contact_middlename, contact_suffix, contact_manager, contact_assistant, contact_spouse, "
+		+ "contact_addressbook_id, contact_comment, contact_commonname";
 
 	private static final String MY_GROUPS_QUERY = "SELECT groupentity_entity_id FROM of_usergroup "
-			+ "INNER JOIN GroupEntity ON of_usergroup_group_id=groupentity_group_id WHERE of_usergroup_user_id=?";
+		+ "INNER JOIN GroupEntity ON of_usergroup_group_id=groupentity_group_id WHERE of_usergroup_user_id=?";
 
 	private final CalendarDao calendarDao;
 	private final Factory solrHelperFactory;
@@ -108,28 +108,28 @@ public class ContactDao {
 		this.obmHelper = obmHelper;
 	}
 
-	
+
 	public ContactUpdates findUpdatedContacts(Date timestamp, AccessToken at) {
 
 		String q = "SELECT "
-				+ CONTACT_SELECT_FIELDS
-				+ ", contact_archive, now() as last_sync FROM Contact"
-				+ " INNER JOIN SyncedAddressbook s ON (contact_addressbook_id=s.addressbook_id AND s.user_id="
-				+ at.getObmId()
-				+ ") "
-				+ "INNER JOIN ContactEntity ON contactentity_contact_id=contact_id "
-				+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=s.addressbook_id "
-				+ "INNER JOIN AddressBook ON id=s.addressbook_id "
-				+ "LEFT JOIN EntityRight urights ON "
-				+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
-				+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
-				+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
-				+ "AND grights.entityright_consumer_id IN ("
-				+ MY_GROUPS_QUERY
-				+ ") "
-				+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
-				+ "WHERE "
-				+ "(owner=? OR urights.entityright_read=1 OR grights.entityright_read=1 OR prights.entityright_read=1)";
+			+ CONTACT_SELECT_FIELDS
+			+ ", contact_archive, now() as last_sync FROM Contact"
+			+ " INNER JOIN SyncedAddressbook s ON (contact_addressbook_id=s.addressbook_id AND s.user_id="
+			+ at.getObmId()
+			+ ") "
+			+ "INNER JOIN ContactEntity ON contactentity_contact_id=contact_id "
+			+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=s.addressbook_id "
+			+ "INNER JOIN AddressBook ON id=s.addressbook_id "
+			+ "LEFT JOIN EntityRight urights ON "
+			+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
+			+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
+			+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
+			+ "AND grights.entityright_consumer_id IN ("
+			+ MY_GROUPS_QUERY
+			+ ") "
+			+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
+			+ "WHERE "
+			+ "(owner=? OR urights.entityright_read=1 OR grights.entityright_read=1 OR prights.entityright_read=1)";
 
 		q += " AND (contact_timecreate >= ? OR contact_timeupdate >= ? OR s.timestamp >= ?)";
 
@@ -142,7 +142,7 @@ public class ContactDao {
 		try {
 			List<Contact> contacts = new ArrayList<Contact>();
 			Set<Integer> archivedContactIds = new TreeSet<Integer>();
-			
+
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 
@@ -184,16 +184,16 @@ public class ContactDao {
 
 			upd.setArchived(archivedContactIds);
 			upd.setContacts(contacts);
-			
+
 			logger.info("returning " + upd.getContacts().size() + " contact(s) updated");
 			logger.info("returning " + upd.getArchived().size() + " contact(s) archived");
-			
+
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-		
+
 		return upd;
 	}
 
@@ -213,7 +213,7 @@ public class ContactDao {
 			return;
 		}
 		String q = "select event_id, event_date from Event where event_id IN ("
-				+ buildIdList(bdayIds) + ")";
+			+ buildIdList(bdayIds) + ")";
 		try {
 			ps = con.prepareStatement(q);
 			rs = ps.executeQuery();
@@ -245,7 +245,7 @@ public class ContactDao {
 			return;
 		}
 		String q = "select event_id, event_date from Event where event_id IN ("
-				+ buildIdList(bdayIds) + ")";
+			+ buildIdList(bdayIds) + ")";
 		try {
 			ps = con.prepareStatement(q);
 			rs = ps.executeQuery();
@@ -303,21 +303,20 @@ public class ContactDao {
 			int contactId = insertIntoContact(con, at, c, addressBookId);
 			LinkedEntity le = obmHelper.linkEntity(con, "ContactEntity",
 					"contact_id", contactId);
-			int entityId = le.getEntityId();
-			c.setEntityId(entityId);
+			c.setEntityId(le.getEntityId());
 
-			createOrUpdatePhones(con, entityId, c.getPhones());
-			createOrUpdateAddresses(con, entityId, c.getAddresses());
-			createOrUpdateEmails(con, entityId, c.getEmails());
-			createOrUpdateWebsites(con, entityId,c, c.getWebsites());
-			createOrUpdateIMIdentifiers(con, entityId, c.getImIdentifiers());
+			createOrUpdatePhones(con, c.getEntityId(), c.getPhones());
+			createOrUpdateAddresses(con, c.getEntityId(), c.getAddresses());
+			createOrUpdateEmails(con, c.getEntityId(), c.getEmails());
+			createOrUpdateWebsites(con, c);
+			createOrUpdateIMIdentifiers(con, c.getEntityId(), c.getImIdentifiers());
 			c.setUid(contactId);
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
 		}
-		
+
 		indexContact(at, c);
-		
+
 		return c;
 	}
 
@@ -344,7 +343,7 @@ public class ContactDao {
 
 
 	public Contact createContact(AccessToken at, Connection con, Contact c)
-			throws SQLException {
+	throws SQLException {
 		int addressbookId = chooseAddressBookFromContact(con, at, c);
 		return createContactInAddressBook(con, at, c, addressbookId);
 	}
@@ -359,7 +358,7 @@ public class ContactDao {
 		}
 		return c;
 	}
-	
+
 	private Event getEvent(AccessToken token, String displayName, Date startDate) {
 
 		Calendar cal = Calendar.getInstance();
@@ -409,7 +408,7 @@ public class ContactDao {
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			String q = "select " + dateField
-					+ " from Contact where contact_id=?";
+			+ " from Contact where contact_id=?";
 			try {
 				ps = con.prepareStatement(q);
 				ps.setInt(1, c.getUid());
@@ -452,15 +451,15 @@ public class ContactDao {
 		PreparedStatement ps = null;
 		try {
 			ps = con
-					.prepareStatement("DELETE FROM IM WHERE im_entity_id=? AND im_label IN ("
-							+ lblList(imIdentifiers.keySet()) + ")");
+			.prepareStatement("DELETE FROM IM WHERE im_entity_id=? AND im_label IN ("
+					+ formatListStringForSqlRequest(imIdentifiers.keySet()) + ")");
 			ps.setInt(1, entityId);
 			ps.executeUpdate();
 
 			ps.close();
 			ps = con
-					.prepareStatement("INSERT INTO IM (im_entity_id, im_label, im_protocol, im_address) "
-							+ "VALUES (?, ?, ?, ?)");
+			.prepareStatement("INSERT INTO IM (im_entity_id, im_label, im_protocol, im_address) "
+					+ "VALUES (?, ?, ?, ?)");
 			for (String s : imIdentifiers.keySet()) {
 				ps.setInt(1, entityId);
 				ps.setString(2, s);
@@ -474,41 +473,43 @@ public class ContactDao {
 		}
 	}
 
-	private void createOrUpdateWebsites(Connection con, int entityId, Contact c,
-			Map<String, Website> websites) throws SQLException {
+	private void createOrUpdateWebsites(final Connection con, final Contact c) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			ps = con
-					.prepareStatement("DELETE FROM Website WHERE website_entity_id=? AND website_label IN ("
-							+ lblList(websites.keySet()) + ")");
-			ps.setInt(1, entityId);
+			ps = con.prepareStatement("DELETE FROM Website WHERE website_entity_id=? AND website_label IN (" + 
+					formatListStringForSqlRequest(c.listWebSitesLabel()) + ")");
+			ps.setInt(1, c.getEntityId());
 			ps.executeUpdate();
 
 			ps.close();
-			ps = con
-					.prepareStatement("INSERT INTO Website (website_entity_id, website_label, website_url) "
-							+ "VALUES (?, ?, ?)");
-			if( !StringUtils.isEmpty(c.getCalUri())){
-				ps.setInt(1, entityId);
-				ps.setString(2, "CALURI;X-OBM-Ref1");
-				ps.setString(3, c.getCalUri());
-				ps.addBatch();
-			}
-			for (String s : websites.keySet()) {
-				if(!s.toLowerCase().startsWith("caluri") || !websites.get(s).getUrl().equals(c.getCalUri())){
-					ps.setInt(1, entityId);
-					ps.setString(2, s);
-					ps.setString(3, websites.get(s).getUrl());
-					ps.addBatch();
+			ps = con.prepareStatement("INSERT INTO Website (website_entity_id, website_label, website_url) VALUES (?, ?, ?)");
+
+			final String label = "CALURI;X-OBM-Ref1";
+			insertWebSite(con, c.getEntityId(), label, c.getCalUri());
+			for (final Website website: c.getWebsites()) {
+				if (!website.isCalendarUrl() || !website.getLabel().equalsIgnoreCase(label)) {
+					insertWebSite(con, c.getEntityId(), website.getLabel(),  website.getUrl());
 				}
 			}
-			
-			
-			ps.executeBatch();
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 
+	}
+
+	private void insertWebSite(Connection con, int entityId, String label, String url) throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			ps = con.prepareStatement("INSERT INTO Website (website_entity_id, website_label, website_url) VALUES (?, ?, ?)");
+			if (!StringUtils.isEmpty(url)) {
+				ps.setInt(1, entityId);
+				ps.setString(2, label);
+				ps.setString(3, url);
+				ps.executeUpdate();
+			}
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
 	}
 
 	private void createOrUpdateAddresses(Connection con, int entityId,
@@ -516,16 +517,16 @@ public class ContactDao {
 		PreparedStatement ps = null;
 		try {
 			ps = con
-					.prepareStatement("DELETE FROM Address WHERE address_entity_id=? and address_label IN ("
-							+ lblList(addresses.keySet()) + ")");
+			.prepareStatement("DELETE FROM Address WHERE address_entity_id=? and address_label IN ("
+					+ formatListStringForSqlRequest(addresses.keySet()) + ")");
 			ps.setInt(1, entityId);
 			ps.executeUpdate();
 
 			ps.close();
 			ps = con
-					.prepareStatement("INSERT INTO Address (address_entity_id, address_label, "
-							+ "address_street, address_zipcode, address_town, address_expresspostal, address_country, address_state) "
-							+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+			.prepareStatement("INSERT INTO Address (address_entity_id, address_label, "
+					+ "address_street, address_zipcode, address_town, address_expresspostal, address_country, address_state) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 			for (String s : addresses.keySet()) {
 				Address ad = addresses.get(s);
 				ps.setInt(1, entityId);
@@ -545,10 +546,10 @@ public class ContactDao {
 
 	}
 
-	private String lblList(Set<String> keySet) {
-		StringBuilder sb = new StringBuilder(keySet.size() * 20);
+	private String formatListStringForSqlRequest(Set<String> values) {
+		final StringBuilder sb = new StringBuilder(values.size() * 20);
 		sb.append("'_unused_'");
-		for (String s : keySet) {
+		for (final String s: values) {
 			sb.append(",'");
 			sb.append(s);
 			sb.append("'");
@@ -561,15 +562,15 @@ public class ContactDao {
 		PreparedStatement ps = null;
 		try {
 			ps = con
-					.prepareStatement("DELETE FROM Email WHERE email_entity_id=? AND email_label IN ("
-							+ lblList(emails.keySet()) + ")");
+			.prepareStatement("DELETE FROM Email WHERE email_entity_id=? AND email_label IN ("
+					+ formatListStringForSqlRequest(emails.keySet()) + ")");
 			ps.setInt(1, entityId);
 			ps.executeUpdate();
 
 			ps.close();
 			ps = con
-					.prepareStatement("INSERT INTO Email (email_entity_id, email_label, email_address) "
-							+ "VALUES (?, ?, ?)");
+			.prepareStatement("INSERT INTO Email (email_entity_id, email_label, email_address) "
+					+ "VALUES (?, ?, ?)");
 			for (String s : emails.keySet()) {
 				ps.setInt(1, entityId);
 				ps.setString(2, s);
@@ -587,15 +588,15 @@ public class ContactDao {
 		PreparedStatement ps = null;
 		try {
 			ps = con
-					.prepareStatement("DELETE FROM Phone WHERE phone_entity_id=? and phone_label IN ("
-							+ lblList(phones.keySet()) + ")");
+			.prepareStatement("DELETE FROM Phone WHERE phone_entity_id=? and phone_label IN ("
+					+ formatListStringForSqlRequest(phones.keySet()) + ")");
 			ps.setInt(1, entityId);
 			ps.executeUpdate();
 
 			ps.close();
 			ps = con
-					.prepareStatement("INSERT INTO Phone (phone_entity_id, phone_label, phone_number) "
-							+ "VALUES (?, ?, ?)");
+			.prepareStatement("INSERT INTO Phone (phone_entity_id, phone_label, phone_number) "
+					+ "VALUES (?, ?, ?)");
 			for (String s : phones.keySet()) {
 				ps.setInt(1, entityId);
 				ps.setString(2, s);
@@ -614,7 +615,7 @@ public class ContactDao {
 		ResultSet rs = null;
 		try {
 			ps = con.prepareStatement(
-				"SELECT id from AddressBook WHERE name=? AND owner=? AND is_default");
+			"SELECT id from AddressBook WHERE name=? AND owner=? AND is_default");
 			if (c.isCollected()) {
 				ps.setString(1, COLLECTED_ADDRESS_BOOK_NAME);
 			} else {
@@ -630,20 +631,20 @@ public class ContactDao {
 			obmHelper.cleanup(null, ps, rs);
 		}
 	}
-	
+
 	private int insertIntoContact(Connection con, AccessToken at, Contact c, int addressBookId)
-			throws SQLException {
+	throws SQLException {
 		PreparedStatement ps = null;
 		try {
 
 			ps = con
-					.prepareStatement("INSERT INTO Contact "
-							+ " (contact_commonname, contact_firstname, contact_lastname, contact_origin, contact_domain_id, contact_usercreate, "
-							+ "contact_company, contact_aka, contact_service, contact_title, contact_birthday_id, contact_anniversary_id, "
-							+ "contact_timecreate, "
-							+ "contact_suffix, contact_middlename, contact_manager, contact_spouse, contact_assistant, "
-							+ "contact_collected, contact_addressbook_id) "
-							+ " VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), ?, ?, ?, ?, ?, ?, ?) ");
+			.prepareStatement("INSERT INTO Contact "
+					+ " (contact_commonname, contact_firstname, contact_lastname, contact_origin, contact_domain_id, contact_usercreate, "
+					+ "contact_company, contact_aka, contact_service, contact_title, contact_birthday_id, contact_anniversary_id, "
+					+ "contact_timecreate, "
+					+ "contact_suffix, contact_middlename, contact_manager, contact_spouse, contact_assistant, "
+					+ "contact_collected, contact_addressbook_id) "
+					+ " VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), ?, ?, ?, ?, ?, ?, ?) ");
 			int idx = 1;
 			ps.setString(idx++, c.getCommonname());
 			ps.setString(idx++, c.getFirstname());
@@ -697,11 +698,11 @@ public class ContactDao {
 		}
 
 		String q = "update Contact SET "
-				+ "contact_commonname=?, contact_firstname=?, "
-				+ "contact_lastname=?, contact_origin=?, contact_userupdate=?, "
-				+ "contact_aka=?, contact_title=?, contact_service=?, contact_company=?, contact_comment=?, "
-				+ "contact_suffix=?, contact_manager=?, contact_middlename=?, contact_assistant=?, contact_spouse=?, contact_anniversary_id=?, contact_birthday_id=? "
-				+ "WHERE contact_id=? ";
+			+ "contact_commonname=?, contact_firstname=?, "
+			+ "contact_lastname=?, contact_origin=?, contact_userupdate=?, "
+			+ "contact_aka=?, contact_title=?, contact_service=?, contact_company=?, contact_comment=?, "
+			+ "contact_suffix=?, contact_manager=?, contact_middlename=?, contact_assistant=?, contact_spouse=?, contact_anniversary_id=?, contact_birthday_id=? "
+			+ "WHERE contact_id=? ";
 		logger.info("modify contact with id=" + c.getUid() + " entityId="
 				+ c.getEntityId());
 
@@ -756,35 +757,34 @@ public class ContactDao {
 			createOrUpdateAddresses(con, c.getEntityId(), c.getAddresses());
 			createOrUpdateEmails(con, c.getEntityId(), c.getEmails());
 			createOrUpdatePhones(con, c.getEntityId(), c.getPhones());
-			createOrUpdateWebsites(con, c.getEntityId(), c, c.getWebsites());
-			createOrUpdateIMIdentifiers(con, c.getEntityId(), c
-					.getImIdentifiers());
+			createOrUpdateWebsites(con, c);
+			createOrUpdateIMIdentifiers(con, c.getEntityId(), c.getImIdentifiers());
 		} finally {
 			obmHelper.cleanup(con, ps, null);
 		}
-		
+
 		indexContact(token, c);
-		
+
 		return c;
 	}
 
 	private boolean hasRightsOn(AccessToken token, int contactUid) {
 
 		String q = "select contact_usercreate="
-				+ token.getObmId()
-				+ " or urights.entityright_write=1 or grights.entityright_write=1 or prights.entityright_write=1 "
-				+ "FROM Contact "
-				+ "INNER JOIN AddressBook a ON a.id=contact_addressbook_id "
-				+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=a.id "
-				+ "LEFT JOIN EntityRight urights ON "
-				+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
-				+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
-				+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
-				+ "AND grights.entityright_consumer_id IN ("
-				+ MY_GROUPS_QUERY
-				+ ") "
-				+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
-				+ "WHERE contact_id=?";
+			+ token.getObmId()
+			+ " or urights.entityright_write=1 or grights.entityright_write=1 or prights.entityright_write=1 "
+			+ "FROM Contact "
+			+ "INNER JOIN AddressBook a ON a.id=contact_addressbook_id "
+			+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=a.id "
+			+ "LEFT JOIN EntityRight urights ON "
+			+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
+			+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
+			+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
+			+ "AND grights.entityright_consumer_id IN ("
+			+ MY_GROUPS_QUERY
+			+ ") "
+			+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
+			+ "WHERE contact_id=?";
 
 		boolean ret = false;
 
@@ -817,9 +817,9 @@ public class ContactDao {
 	 */
 	public Contact findContact(AccessToken token, int id) {
 		String q = "SELECT "
-				+ CONTACT_SELECT_FIELDS
-				+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
-				+ "contact_id=? AND contactentity_contact_id=contact_id AND contact_archive != 1";
+			+ CONTACT_SELECT_FIELDS
+			+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
+			+ "contact_id=? AND contactentity_contact_id=contact_id AND contact_archive != 1";
 
 		int idx = 1;
 		Contact ret = null;
@@ -857,7 +857,7 @@ public class ContactDao {
 	 */
 	private void loadEmails(Connection con, Map<Integer, Contact> entityContact) {
 		String q = "select email_entity_id, email_label, email_address FROM Email where email_entity_id IN ("
-				+ buildIdList(entityContact.keySet()) + ")";
+			+ buildIdList(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -878,9 +878,9 @@ public class ContactDao {
 	private void loadAddresses(AccessToken token, Connection con,
 			Map<Integer, Contact> entityContact) {
 		String q = "select address_entity_id, address_label, "
-				+ "address_street, address_zipcode, address_expresspostal, address_town, address_country, address_state "
-				+ "FROM Address where address_entity_id IN ("
-				+ buildIdList(entityContact.keySet()) + ")";
+			+ "address_street, address_zipcode, address_expresspostal, address_town, address_country, address_state "
+			+ "FROM Address where address_entity_id IN ("
+			+ buildIdList(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -890,7 +890,7 @@ public class ContactDao {
 				Contact c = entityContact.get(rs.getInt(1));
 				Address p = new Address(rs.getString(3), rs.getString(4), rs
 						.getString(5), rs.getString(6), getCountryName(token,
-						con, rs.getString(7)), rs.getString(8));
+								con, rs.getString(7)), rs.getString(8));
 				c.addAddress(rs.getString(2), p);
 			}
 		} catch (SQLException se) {
@@ -900,10 +900,9 @@ public class ContactDao {
 		}
 	}
 
-	private void loadWebsites(Connection con,
-			Map<Integer, Contact> entityContact) {
+	private void loadWebsites(Connection con, Map<Integer, Contact> entityContact) {
 		String q = "select website_entity_id, website_label, website_url FROM Website where website_entity_id IN ("
-				+ buildIdList(entityContact.keySet()) + ")";
+			+ buildIdList(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -912,12 +911,11 @@ public class ContactDao {
 			while (rs.next()) {
 				Contact c = entityContact.get(rs.getInt(1));
 				String label = rs.getString(2);
-				String value = rs.getString(3);
-				if(c.getCalUri() ==  null && label.toLowerCase().startsWith("caluri")){
-					c.setCalUri(value);
-				}
-				Website w = new Website(value);
-				c.addWebsite(label, w);
+				String url = rs.getString(3);
+				if (c.getCalUri() ==  null && label.toLowerCase().startsWith("caluri")) {
+					c.setCalUri(url);
+				}				
+				c.addWebsite(new Website(label, url));
 			}
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
@@ -929,7 +927,7 @@ public class ContactDao {
 	private void loadIMIdentifiers(Connection con,
 			Map<Integer, Contact> entityContact) {
 		String q = "select im_entity_id, im_label, im_address, im_protocol FROM IM where im_entity_id IN ("
-				+ buildIdList(entityContact.keySet()) + ")";
+			+ buildIdList(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -963,7 +961,7 @@ public class ContactDao {
 
 	private void loadPhones(Connection con, Map<Integer, Contact> entityContact) {
 		String q = "select phone_entity_id, phone_label, phone_number FROM Phone where phone_entity_id IN ("
-				+ buildIdList(entityContact.keySet()) + ")";
+			+ buildIdList(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -987,7 +985,7 @@ public class ContactDao {
 		try {
 			con = obmHelper.getConnection();
 			ps = con
-					.prepareStatement("UPDATE Contact set contact_archive=1, contact_origin=? WHERE contact_id=?");
+			.prepareStatement("UPDATE Contact set contact_archive=1, contact_origin=? WHERE contact_id=?");
 			ps.setString(1, at.getOrigin());
 			ps.setInt(2, c.getUid());
 			ps.executeUpdate();
@@ -996,7 +994,7 @@ public class ContactDao {
 		}
 
 		removeContactFromSolr(at, c);
-		
+
 		return c;
 	}
 
@@ -1030,10 +1028,10 @@ public class ContactDao {
 		Connection con = null;
 
 		String q = "SELECT "
-				+ "deletedcontact_contact_id "
-				+ "FROM DeletedContact "
-				+ "INNER JOIN SyncedAddressbook s ON ( s.addressbook_id=deletedcontact_addressbook_id AND s.user_id= "
-				+ at.getObmId() + ")";
+			+ "deletedcontact_contact_id "
+			+ "FROM DeletedContact "
+			+ "INNER JOIN SyncedAddressbook s ON ( s.addressbook_id=deletedcontact_addressbook_id AND s.user_id= "
+			+ at.getObmId() + ")";
 		if (d != null) {
 			q += " WHERE deletedcontact_timestamp >= ? ";
 		}
@@ -1116,8 +1114,8 @@ public class ContactDao {
 		}
 
 		String q = "select country_name from Country where lower(country_lang)="
-				+ userLangSelect(token.getObmId())
-				+ " AND (lower(trim(country_name))=? OR lower(country_iso3166)=?)";
+			+ userLangSelect(token.getObmId())
+			+ " AND (lower(trim(country_name))=? OR lower(country_iso3166)=?)";
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1141,13 +1139,13 @@ public class ContactDao {
 
 	private String userLangSelect(int obmId) {
 		String q = "(SELECT lower(userobmpref_value) "
-				+ "FROM UserObmPref "
-				+ "WHERE  userobmpref_option='set_lang' AND (userobmpref_user_id = "
-				+ obmId
-				+ " OR ( "
-				+ "userobmpref_user_id IS NULL AND "
-				+ "userobmpref_option  NOT IN (SELECT userobmpref_option FROM UserObmPref WHERE userobmpref_user_id ="
-				+ obmId + "))))";
+			+ "FROM UserObmPref "
+			+ "WHERE  userobmpref_option='set_lang' AND (userobmpref_user_id = "
+			+ obmId
+			+ " OR ( "
+			+ "userobmpref_user_id IS NULL AND "
+			+ "userobmpref_option  NOT IN (SELECT userobmpref_option FROM UserObmPref WHERE userobmpref_user_id ="
+			+ obmId + "))))";
 		return q;
 	}
 
@@ -1157,11 +1155,11 @@ public class ContactDao {
 	 */
 	public List<Contact> searchSimilar(AccessToken at, Contact c) {
 		String q = "SELECT "
-				+ CONTACT_SELECT_FIELDS
-				+ ", now() as last_sync FROM Contact "
-				+ "INNER JOIN AddressBook a ON a.id=contact_addressbook_id "
-				+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=a.id "
-				+ "INNER JOIN ContactEntity ON contactentity_contact_id=contact_id ";
+			+ CONTACT_SELECT_FIELDS
+			+ ", now() as last_sync FROM Contact "
+			+ "INNER JOIN AddressBook a ON a.id=contact_addressbook_id "
+			+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=a.id "
+			+ "INNER JOIN ContactEntity ON contactentity_contact_id=contact_id ";
 
 		if (c.getEmails().size() > 0) {
 			q += "LEFT JOIN Email ON email_entity_id=contactentity_entity_id ";
@@ -1172,17 +1170,17 @@ public class ContactDao {
 		}
 
 		q += "LEFT JOIN EntityRight urights ON "
-				+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
-				+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
-				+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
-				+ "AND grights.entityright_consumer_id IN ("
-				+ MY_GROUPS_QUERY
-				+ ") "
-				+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
-				+ "WHERE "
-				+ "((contact_archive != 1 AND contact_usercreate=?) OR "
-				+ "(contact_archive != 1) OR "
-				+ "(contact_archive != 1 AND (urights.entityright_read=1 OR grights.entityright_read=1 OR prights.entityright_read=1))) ";
+			+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
+			+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
+			+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
+			+ "AND grights.entityright_consumer_id IN ("
+			+ MY_GROUPS_QUERY
+			+ ") "
+			+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
+			+ "WHERE "
+			+ "((contact_archive != 1 AND contact_usercreate=?) OR "
+			+ "(contact_archive != 1) OR "
+			+ "(contact_archive != 1 AND (urights.entityright_read=1 OR grights.entityright_read=1 OR prights.entityright_read=1))) ";
 
 		if (c.getFirstname() != null && c.getFirstname().length() > 0) {
 			q += " AND lower(contact_firstname) = ? ";
@@ -1277,30 +1275,30 @@ public class ContactDao {
 	public List<AddressBook> findAddressBooks(Connection con, AccessToken at) {
 		List<AddressBook> ret = new LinkedList<AddressBook>();
 		String q = "SELECT AddressBook.id as uid, "
-				+ " AddressBook.name as name"
-				+ " FROM AddressBook "
-				+ "WHERE AddressBook.owner = ? "
-				+ "UNION "
-				+ "SELECT AddressBook.id as uid, "
-				+ " AddressBook.name as name "
-				+ "FROM AddressBook "
-				+ "INNER JOIN ( "
-				+ "SELECT addressbookentity_addressbook_id FROM  UserEntity "
-				+ " INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id "
-				+ " INNER JOIN AddressbookEntity ON addressbookentity_entity_id = entityright_entity_id "
-				+ " WHERE userentity_user_id = ? AND entityright_read = 1 "
-				+ " UNION ALL "
-				+ " SELECT addressbookentity_addressbook_id FROM EntityRight "
-				+ "  INNER JOIN AddressbookEntity ON addressbookentity_entity_id = entityright_entity_id "
-				+ " INNER JOIN AddressBook ON addressbookentity_addressbook_id = AddressBook.id "
-				+ "  WHERE entityright_consumer_id IS NULL AND entityright_read = 1 AND AddressBook.domain_id = ? "
-				+ "  UNION ALL "
-				+ "  SELECT addressbookentity_addressbook_id FROM of_usergroup "
-				+ "  INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id "
-				+ "  INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id "
-				+ "  INNER JOIN AddressbookEntity ON addressbookentity_entity_id = entityright_entity_id "
-				+ "  WHERE of_usergroup_user_id = ? AND entityright_read = 1 "
-				+ ") AS Rights ON AddressBook.id = Rights.addressbookentity_addressbook_id";
+			+ " AddressBook.name as name"
+			+ " FROM AddressBook "
+			+ "WHERE AddressBook.owner = ? "
+			+ "UNION "
+			+ "SELECT AddressBook.id as uid, "
+			+ " AddressBook.name as name "
+			+ "FROM AddressBook "
+			+ "INNER JOIN ( "
+			+ "SELECT addressbookentity_addressbook_id FROM  UserEntity "
+			+ " INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id "
+			+ " INNER JOIN AddressbookEntity ON addressbookentity_entity_id = entityright_entity_id "
+			+ " WHERE userentity_user_id = ? AND entityright_read = 1 "
+			+ " UNION ALL "
+			+ " SELECT addressbookentity_addressbook_id FROM EntityRight "
+			+ "  INNER JOIN AddressbookEntity ON addressbookentity_entity_id = entityright_entity_id "
+			+ " INNER JOIN AddressBook ON addressbookentity_addressbook_id = AddressBook.id "
+			+ "  WHERE entityright_consumer_id IS NULL AND entityright_read = 1 AND AddressBook.domain_id = ? "
+			+ "  UNION ALL "
+			+ "  SELECT addressbookentity_addressbook_id FROM of_usergroup "
+			+ "  INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id "
+			+ "  INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id "
+			+ "  INNER JOIN AddressbookEntity ON addressbookentity_entity_id = entityright_entity_id "
+			+ "  WHERE of_usergroup_user_id = ? AND entityright_read = 1 "
+			+ ") AS Rights ON AddressBook.id = Rights.addressbookentity_addressbook_id";
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1327,7 +1325,7 @@ public class ContactDao {
 	private List<Contact> searchContact(AccessToken at, List<AddressBook> addrBooks, Connection con, String querys, int limit) throws MalformedURLException, SQLException {
 		List<Contact> ret = new LinkedList<Contact>();
 		Set<Integer> evtIds = new HashSet<Integer>();
-		
+
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -1384,10 +1382,10 @@ public class ContactDao {
 			}
 
 			String q = "SELECT "
-					+ CONTACT_SELECT_FIELDS
-					+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
-					+ "contactentity_contact_id=contact_id AND contact_archive != 1 AND contact_id IN ("
-					+ buildIdList(evtIds) + ")";
+				+ CONTACT_SELECT_FIELDS
+				+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
+				+ "contactentity_contact_id=contact_id AND contact_archive != 1 AND contact_id IN ("
+				+ buildIdList(evtIds) + ")";
 
 			ps = con.prepareStatement(q);
 
@@ -1422,7 +1420,7 @@ public class ContactDao {
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * Search contacts. Query will match against lastname, firstname & email
 	 * prefixes.
@@ -1457,14 +1455,14 @@ public class ContactDao {
 		}
 		return new ArrayList<Contact>();
 	}
-	
+
 	public List<Folder> findUpdatedFolders(Date timestamp, AccessToken at) {
 		String q = "SELECT a.id, a.name, userobm_id, userobm_lastname, userobm_firstname"
-				+ " FROM AddressBook a "
-				+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?) "
-				+ " INNER JOIN UserObm ON (owner=userobm_id) "
-				+ "WHERE (a.syncable OR a.name=?) AND "
-				+ "(a.timeupdate >= ? OR a.timecreate >= ? OR s.timestamp >= ?)";
+			+ " FROM AddressBook a "
+			+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?) "
+			+ " INNER JOIN UserObm ON (owner=userobm_id) "
+			+ "WHERE (a.syncable OR a.name=?) AND "
+			+ "(a.timeupdate >= ? OR a.timecreate >= ? OR s.timestamp >= ?)";
 
 		int idx = 1;
 
@@ -1527,7 +1525,7 @@ public class ContactDao {
 			ps.setTimestamp(idx++, new Timestamp(d.getTime()));
 			ps.setInt(idx++, at.getObmId());
 			ps.setTimestamp(idx++, new Timestamp(d.getTime()));
-			
+
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				l.add(rs.getInt(1));
@@ -1542,16 +1540,16 @@ public class ContactDao {
 
 		return l;
 	}
-	
+
 	public int markUpdated(int databaseId) throws SQLException {
 		Connection con = null;
 		PreparedStatement st = null;
 		try {
 			con = obmHelper.getConnection();
-				st = con.prepareStatement("update Contact SET contact_timeupdate=? WHERE contact_id=?");
-				st.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-				st.setInt(2, databaseId);
-				st.execute();
+			st = con.prepareStatement("update Contact SET contact_timeupdate=? WHERE contact_id=?");
+			st.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+			st.setInt(2, databaseId);
+			st.execute();
 		} finally {
 			obmHelper.cleanup(con, st, null);
 		}
@@ -1565,7 +1563,7 @@ public class ContactDao {
 		}
 		return false;
 	}
-	
+
 	private boolean unsubscribeBookQuery(AccessToken at, int addressBookId) throws SQLException {
 		Connection con = null;
 		PreparedStatement st = null;
@@ -1579,7 +1577,7 @@ public class ContactDao {
 			obmHelper.cleanup(con, st, null);
 		}
 	}
-	
+
 	private boolean keepTrackOfDeletedBookSubscription(AccessToken at, int addressBookId) throws SQLException {
 		Connection con = null;
 		PreparedStatement st = null;

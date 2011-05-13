@@ -1,6 +1,7 @@
 package org.obm.sync.book;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.obm.sync.items.AbstractItemsWriter;
@@ -103,13 +104,12 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	private void addWebsite(Element root, Map<String, Website> websites) {
-		Element e = DOMUtils.createElement(root, "websites");
-		for (String s : websites.keySet()) {
+	private void addWebsite(final Element root, final HashSet<Website> websites) {
+		final Element e = DOMUtils.createElement(root, "websites");
+		for (final Website website: websites) {
 			Element c = DOMUtils.createElement(e, "site");
-			Website p = websites.get(s);
-			c.setAttribute("label", s);
-			c.setAttribute("url", p.getUrl());
+			c.setAttribute("label", website.getLabel());
+			c.setAttribute("url", website.getUrl());
 		}
 	}
 
