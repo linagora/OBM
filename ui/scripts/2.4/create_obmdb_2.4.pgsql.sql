@@ -2321,7 +2321,7 @@ CREATE TABLE userobm (
   userobm_gid integer,
   userobm_datebegin date,
   userobm_hidden integer DEFAULT 0,
-  userobm_kind character varying(12),
+  userobm_kind character varying(64),
   userobm_commonname character varying(256) DEFAULT ''::character varying,
   userobm_lastname character varying(64) DEFAULT ''::character varying,
   userobm_firstname character varying(64) DEFAULT ''::character varying,

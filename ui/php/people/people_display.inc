@@ -826,7 +826,7 @@ function html_people_form($usr_q, $user, $field='') {
   <table>
   <tr>
     <th class=\"$class[kind]\">$l_kind</th>
-    <td><input name=\"tf_kind\" size=\"32\" maxlength=\"32\" value=\"$kind\" /></td>
+    <td><input name=\"tf_kind\" size=\"32\" maxlength=\"64\" value=\"$kind\" /></td>
   </tr>
   <tr>
     <th class=\"$class[lastname]\">$l_lastname</th>

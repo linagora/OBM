@@ -2350,7 +2350,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table>
   <tr>
     <th class=\"$class[kind]\">$l_kind</th>
-    <td><input id=\"userKind\" name=\"tf_kind\" size=\"32\" maxlength=\"12\" value=\"$kind\" autocomplete =\"off\"/>
+    <td><input id=\"userKind\" name=\"tf_kind\" size=\"32\" maxlength=\"64\" value=\"$kind\" autocomplete =\"off\"/>
     </td>
   </tr>
   <tr>

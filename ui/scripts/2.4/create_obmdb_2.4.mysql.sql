@@ -3360,7 +3360,7 @@ CREATE TABLE `UserObm` (
   `userobm_gid`                int(8) default NULL,
   `userobm_datebegin`          date default NULL,
   `userobm_hidden`             int(1) default '0',
-  `userobm_kind`               varchar(12) default NULL,
+  `userobm_kind`               varchar(64) default NULL,
   `userobm_commonname`         varchar(256) default '',
   `userobm_lastname`           varchar(64) default '',
   `userobm_firstname`          varchar(64) default '',
