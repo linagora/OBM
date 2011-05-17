@@ -17,7 +17,9 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.user;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.obm.sync.utils.DisplayNameUtils;
 
@@ -31,7 +33,8 @@ public class ObmUser {
 	private String lastName;
 	private String firstName;
 	private String email;
-
+	private List<String> emailAlias;
+	
 	private String address1;
 	private String address2;
 	private String address3;
@@ -179,6 +182,14 @@ public class ObmUser {
 		this.email = email;
 	}
 
+	public List<String> getEmailAlias() {
+		return emailAlias;
+	}
+	
+	public void setEmailAlias(List<String> emailAlias) {
+		this.emailAlias = emailAlias;
+	}
+	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -261,6 +272,13 @@ public class ObmUser {
 
 	public String getDisplayName(){
 		return DisplayNameUtils.getDisplayName(commonName, firstName, lastName);
+	}
+	
+	public void addAlias(String alias) {
+		if (emailAlias == null) {
+			emailAlias = new ArrayList<String>();
+		}
+		emailAlias.add(alias);
 	}
 	
 	@Override
