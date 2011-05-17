@@ -79,17 +79,17 @@ public class EventChangeHandler {
 		
 		final Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
 		final Set<Attendee> removedUsers = attendeeGroups.get(AttendeeStateValue.Old);
-		if (!removedUsers.isEmpty()) {
+		if (removedUsers != null && !removedUsers.isEmpty()) {
 			eventChangeMailer.notifyRemovedUsers(user, removedUsers, current, locale, timezone);
 		}
 		
 		final Set<Attendee> addedUsers = attendeeGroups.get(AttendeeStateValue.New);
-		if (!addedUsers.isEmpty()) {
+		if (addedUsers != null && !addedUsers.isEmpty()) {
 			notifyCreate(user, addedUsers, current, locale, timezone);
 		}
 		
 		final Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
-		if (!currentUsers.isEmpty()) {
+		if (currentUsers != null && !currentUsers.isEmpty()) {
 			final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(currentUsers);
 			notifyAcceptedUpdateUsers(user, previous, current, locale, atts, timezone);
 			notifyNeedActionUpdateUsers(user, previous, current, locale, atts, timezone);
