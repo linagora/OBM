@@ -94,11 +94,17 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		if (eventsExp != null) {
 			NodeList elems = eventsExp.getElementsByTagName("eventException");
 			for (int i = 0; i < elems.getLength(); i++) {
-				Event eexcept = parseEvent((Element) elems.item(i));
+				Event eexcept = parseEventException(ev, (Element) elems.item(i));
 				ev.getRecurrence().addEventException(eexcept);
 			}
 		}
 		return ev;
+	}
+
+	private Event parseEventException(Event eventReference, Element item) {
+		Event eexcept = parseEvent(item);
+		eexcept.setExtId(eventReference.getExtId());
+		return eexcept;
 	}
 
 	private void parseAttendees(Event ev, Element e) {
