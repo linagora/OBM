@@ -396,15 +396,18 @@ Obm.CalendarManager = new Class({
   newAlldayDummyEventHighlight: function(evt) {
     if (this.dummy) {
       var div = this.dummyPrepare(evt);
-      var start = Math.min(div[1], this.dummy.downCell[1]);
-      var end = Math.max(div[1], this.dummy.downCell[1]);
       if (div[0] == 'dayContainer') {
         $$('div.selection').each(function(e) {
           $(e).removeClass('selection');
         });
-        for(var i=start;i<=end;i++) {
-          if ($(obm.calendarManager.dayContainers[i])) {
-            $(obm.calendarManager.dayContainers[i]).addClass('selection');
+          var start = Math.min(div[1], this.dummy.downCell[1]);
+          var end = Math.max(div[1], this.dummy.downCell[1]);
+
+        if(this.dummy.downCell != undefined){
+          for(var i=start;i<=end;i++) {
+            if ($(obm.calendarManager.dayContainers[i])) {
+              $(obm.calendarManager.dayContainers[i]).addClass('selection');
+            }
           }
         }
       }
