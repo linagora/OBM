@@ -1232,7 +1232,7 @@ if (!$params['ajax']) {
 
 } elseif ($action == 'share_reinit') {
 ///////////////////////////////////////////////////////////////////////////////
-  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' ) || check_calendar_update_rights($params)) {
     run_query_calendar_delete_token($params['entity_id'],$params['entity_type'],$params['type']);
     json_ok_msg("$l_share_calendar : $l_reinit_ok");
   } else {
@@ -1243,7 +1243,7 @@ if (!$params['ajax']) {
 
 } elseif ($action == 'send_url') {
 ///////////////////////////////////////////////////////////////////////////////
-  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' )) {
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' ) || check_calendar_update_rights($params)) {
     $format = $params['format'];
     $params['others_attendees'][]=$params['mail'];
     $entity = get_user_info($params['entity_id']);
