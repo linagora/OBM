@@ -4452,11 +4452,13 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if ($current_view->users_count() + $current_view->contacts_count() > 1) {
     
     $u = array();
+    $displayedPeople = array();
     if ($current_view->users_count() > 0) {
       $displayed_users = get_userobm_from_ids($current_view->get_users());
       foreach($displayed_users['entity'] as $id => $entity) {
         $name = phpStringToJsString($entity['label']);
         array_push($u, "'$id' : '$name'");
+        $displayedPeople[$id] = $name;
       }
     }
     $users_js = "{".implode(",", $u)."}";
@@ -4467,6 +4469,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       foreach($displayed_contacts['entity'] as $id => $entity) {
         $name = phpStringToJsString($entity['label']);
         array_push($c, "'$id' : '$name'");
+        $displayedPeople[$id] = $name;
       }
     }
     $contact_js = "{".implode(",", $c)."}";
@@ -4534,10 +4537,27 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <th>
       ".__("Organizer")."
     </th>
-    <td>
-      <span>$organizerName</span>
-      <input type=\"hidden\" name=\"sel_organizer\" value=\"".$organizerId."\" />
-    </td>";
+    <td>";
+      if($action != 'new' || !$displayedPeople){
+        $block_organizer .= "
+        <span>$organizerName</span>
+        <input type=\"hidden\" name=\"sel_organizer\" value=\"".$organizerId."\" />";
+      }
+      else{
+        $block_organizer .= "
+        <select name=\"sel_organizer\">";
+        foreach($displayedPeople as $displayedPersonId=>$displayedPersonName){
+          $selectedPerson = $displayedPersonId == $organizerId ? "selected=selected" : "";
+          $block_organizer .= "<option $selectedPerson
+                                      value=\"".$displayedPersonId."\">".
+                                $displayedPersonName.
+                             "</option>";
+        }
+        $block_organizer .=
+        "</select>";
+      }
+      $block_organizer .=
+  "</td>";
   
   $dis_others_attendees = dis_calendar_mail_field($others_attendees, $class);
   if ($has_access_to_other_calendars = OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access') || true) { // FIXME
