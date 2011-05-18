@@ -21,6 +21,7 @@ $l_confirm = "Confirmer";
 $l_add = "Ajouter";
 $l_remove = "Supprimer";
 $l_import_file = "Importer le fichier";
+$l_exemple_file = "Télécharger le fichier exemple";
 $l_home = "Accueil";
 $l_entity_right = "Gérer les droits de";
 $l_access_permission = "Permissions d'accès";

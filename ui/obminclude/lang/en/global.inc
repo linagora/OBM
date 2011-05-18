@@ -20,6 +20,7 @@ $l_confirm = "Confirm";
 $l_add = "Add";
 $l_remove = "Remove";
 $l_import_file = "Import this file";
+$l_exemple_file = "Download a file example";
 $l_home = "Home";
 $l_entity_right = "Manage rights for";
 $l_access_permission = "Access rights";

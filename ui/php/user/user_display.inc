@@ -2900,7 +2900,7 @@ function dis_user_admin_index() {
  **/
 function dis_user_import_index() {
   global $display, $l_user, $l_header_import, $l_enabled, $l_kind, $l_profile;
-  global $l_lastname, $l_firstname, $l_login, $l_password, $l_password_type;
+  global $l_lastname, $l_firstname, $l_commonname,$l_login, $l_password, $l_password_type;
   global $l_mail, $l_mail_server, $l_email, $l_quota;
   global $l_desc, $l_group, $l_email_nomade, $l_access_nomade;
   global $l_delegation, $l_delegation_target;
@@ -2954,11 +2954,13 @@ function dis_user_import_index() {
     <th>36</th>
     <th>37</th>
     <th>38</th>
+    <th>39</th>
  </tr>
   <tr>
     <th>$l_kind</th>
     <th>$l_lastname</th>
     <th>$l_firstname</th>
+    <th>$l_commonname</th>
     <th>$l_profile</th>
     <th>$l_delegation_target</th>
     <th>$l_delegation</th>
@@ -2985,6 +2987,7 @@ function dis_user_import_index() {
     <th>$l_group</th>
   </tr>
   <tr>
+    <th></th>
     <th></th>
     <th></th>
     <th></th>
@@ -3029,6 +3032,7 @@ function dis_user_import_index() {
     <td>M</td>
     <td>BAUD</td>
     <td>Pierre</td>
+    <td>Pierre BAUD</td>
     <td>admin</td>
     <td>France</td>
     <td>France</td>
@@ -3081,8 +3085,8 @@ function dis_user_import_index() {
  * HTML Display Import Consultation File block
  **/
 function html_user_import_file() {
-  global $l_user, $l_header_import, $l_file, $l_import_file;
-  global $display;
+  global $l_user, $l_header_import, $l_file, $l_import_file, $l_exemple_file;
+  global $display, $ico_document, $resources_path;
 
   $url = url_prepare('user_index.php');
 
@@ -3090,6 +3094,10 @@ function html_user_import_file() {
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
       <input type=\"hidden\" name=\"action\" value=\"import_file\" />
     <table>
+    <tr>
+      <th>$l_exemple_file</th>
+      <td><a href=\"".url_prepare("$resources_path/public/user_import.sample.csv")."\"><img src=\"$ico_document\" /></a></td>
+    </tr>
     <tr>
       <th>$l_import_file</th>
       <td>
@@ -3114,7 +3122,7 @@ function html_user_import_file() {
  **/
 function dis_user_import_file_run($params) {
   global $obm, $display, $err, $ccscd_tab, $l_user, $l_header_import, $l_group;
-  global $l_delegation, $l_login, $l_lastname, $l_firstname, $l_email;
+  global $l_delegation, $l_login, $l_lastname, $l_firstname, $l_commonname, $l_email;
   global $l_login_in_use, $l_file_error, $l_user_import_row_cols_error;
 
   $file = $params['file_saved'];
@@ -3135,6 +3143,7 @@ function dis_user_import_file_run($params) {
   $c_kind = $cpt++;
   $c_lastname = $cpt++;
   $c_firstname = $cpt++;
+  $c_commonname = $cpt++;
   $c_profile = $cpt++;
   $c_delegation_target = $cpt++;
   $c_delegation = $cpt++;
@@ -3220,6 +3229,7 @@ function dis_user_import_file_run($params) {
     $user['kind'] = addslashes(trim($row[$c_kind]));
     $user['lastname'] = addslashes(trim($row[$c_lastname]));
     $user['firstname'] = addslashes(trim($row[$c_firstname]));
+    $user['commonname'] = addslashes(trim($row[$c_commonname]));
     $user['delegation_target'] = addslashes(trim($row[$c_delegation_target]));
     $user['delegation'] = addslashes(trim($row[$c_delegation]));
     $user['login'] = addslashes(trim($row[$c_login]));
