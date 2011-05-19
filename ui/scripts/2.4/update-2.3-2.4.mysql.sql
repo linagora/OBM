@@ -86,7 +86,7 @@ ALTER TABLE UserObm
 ADD COLUMN userobm_commonname varchar(256) default '',
 MODIFY `userobm_delegation` varchar(256) default '',
 MODIFY `userobm_delegation_target` varchar(256) default '',
-MODIFY `userobm_login` varchar(256),
+MODIFY `userobm_login` varchar(80),
 MODIFY `userobm_kind` varchar(64) default NULL;
 
 --
@@ -96,7 +96,7 @@ ALTER TABLE P_UserObm
 ADD COLUMN userobm_commonname varchar(256) default '',
 MODIFY `userobm_delegation` varchar(256) default '',
 MODIFY `userobm_delegation_target` varchar(256) default '',
-MODIFY `userobm_login` varchar(256),
+MODIFY `userobm_login` varchar(80),
 MODIFY `userobm_kind` varchar(64) default NULL;
 
 --
