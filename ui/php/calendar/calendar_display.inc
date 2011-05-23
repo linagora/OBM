@@ -3334,10 +3334,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     <td>$title</td>
   </tr>
   <tr>
-    <th>$l_owner :</th>
-    <td>$owner_lastname $owner_firstname</td>
-  </tr>
-  <tr>
     <th>".__("Organizer")." :</th>
     <td>$organizer_display_name</td>
   </tr>
@@ -3961,10 +3957,6 @@ function dis_calendar_quick_form($calendar_entity) {
             <h3>$GLOBALS[l_carac]</h3>
             <table>
             <tr>
-            <th>$GLOBALS[l_owner]</th>
-            <td id='calendarQuickFormOwner'></td>
-            </tr>
-            <tr>
             <th>".__("Organizer")."</th>
             <td id=\"calendarQuickFormOrganizer\"></td>
             </tr>
@@ -4515,23 +4507,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
-  $block_owner = "
-    <th>
-    $l_owner
-    </th>
-    <td>
-    <span>";
     foreach ($possible_owners as $o) {
-      if($o['id']==$uid){
-        $block_owner .= $o[label];
-      }
-
       if(empty($organizerName) && $o['id']==$organizerId) $organizerName = $o[label];
     }
-    $block_owner .= "
-    </span>
-    <input type=\"hidden\" name=\"sel_owner\" value=\"".$uid."\" />
-    </td>";
 
   $block_organizer = "
     <th>
@@ -5054,9 +5032,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <th>$l_title</th>
     <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"250\" size=\"25\" value=\"$title\" /></td>
   </tr> 
-  <tr>
-    $block_owner
-  </tr>
   <tr>
     $block_organizer
   </tr>

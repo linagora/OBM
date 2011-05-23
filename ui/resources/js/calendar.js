@@ -2028,7 +2028,6 @@ Obm.CalendarQuickForm = new Class({
     this.data = $('calendarQuickFormData');
     this.description = $('calendarQuickFormDescription');
     this.item = $('calendarQuickFormItem');
-    this.owner = $('calendarQuickFormOwner');
     this.location = $('calendarQuickFormLocation');
     this.organizer = $('calendarQuickFormOrganizer');
     this.category = $('calendarQuickFormCategory');
@@ -2141,7 +2140,6 @@ Obm.CalendarQuickForm = new Class({
     this.description.set('html',evt.event.description);
     this.item.set('html',evt.event.item);
     this.category.set('html',evt.event.category);
-    this.owner.set('html',evt.event.owner_name);
     this.location.set('html',evt.event.location);
     this.organizer.set('html',evt.event.organizer_name);
 
