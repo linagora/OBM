@@ -205,7 +205,9 @@ if ($action == 'search') {
   $extra_js_include[] = 'inplaceeditor.js';
   $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
   $extra_js_include[] = 'freebusy.js';
+  $extra_js_include[] = '/event/eventForm.js';
   $extra_css[] = $css_ext_color_picker ;
+  $GLOBALS['extra_js'] .= file_get_contents("../../resources/js/event/eventFormInit.js");
   if (is_array($params['sel_user_id']) || is_array($params['sel_resource_id'])) {
     $entities = array(
       'user' => $params['sel_user_id'],
