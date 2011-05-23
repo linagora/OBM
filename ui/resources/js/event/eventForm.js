@@ -8,12 +8,14 @@ Obm.Event.Form = new Class ({
   },
 
   initialize: function(){
-    this.organizerList = $$(this.options.organizerSelector);
-    this.organizerList.setProperty('formerValue', this.organizerList.get("value"));
-    this.organizerList.addEvent('change', this.switchAttendees.bind(this));
+    if($$("select[name=sel_organizer]") != ""){
+      this.organizerList = $$(this.options.organizerSelector);
+      this.organizerList.setProperty('formerValue', this.organizerList.get("value"));
+      this.organizerList.addEvent('change', this.switchAttendees.bind(this));
 
-    var attendeeId = this.getSelectedOrganizerValue();
-    $("sel_user_id-data-user-"+attendeeId).setProperty("automatic", "true");
+      var attendeeId = this.getSelectedOrganizerValue();
+      $("sel_user_id-data-user-"+attendeeId).setProperty("automatic", "true");
+    }
   },
 
   switchAttendees: function(organizerList){
