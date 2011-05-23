@@ -3869,7 +3869,7 @@ function dis_calendar_quick_form($calendar_entity) {
     $u = get_user_info(); 
     $entity_view.="<select id=\"calendarViewEntity\">";
     foreach($calendar_entity['user'] as $user){
-      if(OBM_Acl::canAccess($user_id, 'calendar',array($user['id']))) {
+      if(OBM_Acl::canWrite($user_id, 'calendar',array($user['id']))) {
         if($user_id == $user["id"]) {
           $uid = true;
         }
@@ -4547,11 +4547,13 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         $block_organizer .= "
         <select name=\"sel_organizer\">";
         foreach($displayedPeople as $displayedPersonId=>$displayedPersonName){
-          $selectedPerson = $displayedPersonId == $organizerId ? "selected=selected" : "";
-          $block_organizer .= "<option $selectedPerson
-                                      value=\"".$displayedPersonId."\">".
-                                $displayedPersonName.
-                             "</option>";
+          if(OBM_Acl::canWrite($uid, 'calendar',$displayedPersonId)) {
+            $selectedPerson = $displayedPersonId == $organizerId ? "selected=selected" : "";
+            $block_organizer .= "<option $selectedPerson
+                                        value=\"".$displayedPersonId."\">".
+                                  $displayedPersonName.
+                               "</option>";
+          }
         }
         $block_organizer .=
         "</select>";
