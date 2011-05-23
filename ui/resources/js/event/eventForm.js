@@ -87,7 +87,7 @@ Obm.Event.Form = new Class ({
                         {
                           type: 'hidden',
                           name: "sel_user_id[]",
-                          value: 'value="data-user-"'+attendeeId
+                          value: "data-user-"+attendeeId
                         }
                       );
   },
