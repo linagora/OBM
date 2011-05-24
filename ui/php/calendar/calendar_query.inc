@@ -3180,9 +3180,6 @@ function check_calendar_access_by_token($id, $right = 'read') {
   return false;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Do you really need a description ?
-///////////////////////////////////////////////////////////////////////////////
 function get_user_id_by_token() {
   $uid = $GLOBALS['token']['uid'];
   if ((!$uid) && ($GLOBALS['token']['entity']=='user')) {
@@ -3253,7 +3250,6 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
 function run_query_get_allowed_groups($ids=null) {
   global $cdg_sql, $obm, $ccalendar_public_groups;
 
-  $uid = $obm['uid'];
   $where = sql_obm_entity_privacy('group');
   if (! $ccalendar_public_groups) {
     $where .= " AND group_privacy=1";

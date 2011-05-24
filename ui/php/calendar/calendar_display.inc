@@ -3836,7 +3836,6 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
 }
 
 function getOrganizerId($users, $contacts){
-  // Gets the organizerName
   foreach($users['entity'] as $organizerId=>$userEntity){
     if($userEntity["is_organizer"]){
       return $organizerId;
@@ -4527,9 +4526,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
 
   $possibleOrganizers = array();
-  foreach($displayedPeople as $displayedPersonId=>$displayedPersonName){
-    if(OBM_Acl::canWrite($uid, 'calendar',$displayedPersonId)) {
-      $possibleOrganizers[$displayedPersonId] = $displayedPersonName;
+  if(is_array($displayedPeople)){
+    foreach($displayedPeople as $displayedPersonId=>$displayedPersonName){
+      if(OBM_Acl::canWrite($uid, 'calendar',$displayedPersonId)) {
+        $possibleOrganizers[$displayedPersonId] = $displayedPersonName;
+      }
     }
   }
   if(!array_key_exists($organizerId, $possibleOrganizers)) $organizerId = $uid;
