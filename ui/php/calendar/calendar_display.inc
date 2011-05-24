@@ -3783,13 +3783,19 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
 
       if (isset($calendar['template_id'])) {
         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
+        if(     logguedUserIsTheOnlyAttendee($users_id)
+            &&  $event_q->f('event_organizer') != $obm['uid']
+            &&  OBM_Acl::canWrite($obm['uid'], 'calendar',$event_q->f('event_organizer'))
+        ){
+          $users_id = array();
+        }
         $users_id = array_merge($users_id, $template_entities['user']);
         $contacts_id = array_merge($contacts_id, $template_entities['contact']);
         $res_id = array_merge($res_id, $template_entities['resource']);
         $groups_id = array_merge($groups_id, $template_entities['group']);
         $documents_id = array_merge($documents_id, $template_entities['document']);
         if($event_q->f('event_organizer')){
-          $calendar['organizer'] = $event_q->f('event_organizer');
+          $calendar['organizer'] =  $event_q->f('event_organizer');
         }
       }
     }
@@ -3847,6 +3853,15 @@ function getOrganizerId($users, $contacts){
   return null;
 }
 
+
+function logguedUserIsTheOnlyAttendee($attendees){
+  if(count($attendees) == 1 && $attendees[0]==$GLOBALS['obm']['uid']){
+    return true;
+  }
+  echo "<pre>" . print_r($attendees, true) . "</pre>";
+  exit;
+  return false;
+}
 
 /**
  * HTML for the quick form popup in the calendar view.
@@ -4507,9 +4522,17 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
-    foreach ($possible_owners as $o) {
-      if(empty($organizerName) && $o['id']==$organizerId) $organizerName = $o[label];
+  foreach ($possible_owners as $o) {
+    if(empty($organizerName) && $o['id']==$organizerId) $organizerName = $o[label];
+  }
+
+  $possibleOrganizers = array();
+  foreach($displayedPeople as $displayedPersonId=>$displayedPersonName){
+    if(OBM_Acl::canWrite($uid, 'calendar',$displayedPersonId)) {
+      $possibleOrganizers[$displayedPersonId] = $displayedPersonName;
     }
+  }
+  if(!array_key_exists($organizerId, $possibleOrganizers)) $organizerId = $uid;
 
   $block_organizer = "
     <th>
@@ -4524,14 +4547,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       else{
         $block_organizer .= "
         <select name=\"sel_organizer\">";
-        foreach($displayedPeople as $displayedPersonId=>$displayedPersonName){
-          if(OBM_Acl::canWrite($uid, 'calendar',$displayedPersonId)) {
-            $selectedPerson = $displayedPersonId == $organizerId ? "selected=selected" : "";
-            $block_organizer .= "<option $selectedPerson
-                                        value=\"".$displayedPersonId."\">".
-                                  $displayedPersonName.
-                               "</option>";
-          }
+        foreach($possibleOrganizers as $displayedPersonId=>$displayedPersonName){
+          $selectedPerson = $displayedPersonId == $organizerId ? "selected=selected" : "";
+          $block_organizer .= "<option $selectedPerson
+                                      value=\"".$displayedPersonId."\">".
+                                $displayedPersonName.
+                             "</option>";
         }
         $block_organizer .=
         "</select>";

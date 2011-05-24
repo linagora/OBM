@@ -680,12 +680,6 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   $resources = $sel_entity_id['resource'];
   $contacts = $sel_entity_id['contact'];
   $documents = $sel_entity_id['document'];
-  
-  if (!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
-    $owner = $obm['uid'];
-  } else {
-    $owner = $calendar['owner'];
-  }
 
   if (!is_numeric($calendar['organizer']) || $calendar['organizer'] <= 0) {
     $organizerId = $obm['uid'];
@@ -694,10 +688,10 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   }
 
   // Insert the Event
-  list($event_id, $event_entity_id) = run_query_calendar_insert_event_data($calendar, $owner);
+  list($event_id, $event_entity_id) = run_query_calendar_insert_event_data($calendar, $organizerId);
   
   // Insert EventLinks
-  run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $obm["uid"], $organizerId);
+  run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $organizerId);
   
   // Insert Event documents
   if (is_array($documents)) {
@@ -715,7 +709,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
     $data = array ( 
       'id' => $event_id,
       'title' => "$calendar[title]" ,
-      'owner' => "$calendar[owner]" ,
+      'owner' => "$organizerId" ,
       'location' => "$calendar[location]" ,
       'category1' => "$calendar[category1]" ,
       'privacy' => $calendar['privacy'],
@@ -748,7 +742,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 //   - $owner
 // Returns: array(event id inserted, event entity id inserted)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_insert_event_data($calendar, $owner) {
+function run_query_calendar_insert_event_data($calendar, $organizer) {
   global $cdg_sql, $obm;
 
   if (array_key_exists('ext_id', $calendar)) {
@@ -871,7 +865,7 @@ function run_query_calendar_insert_event_data($calendar, $owner) {
     '$obm[uid]',
     'VEVENT',
     '$GLOBALS[c_origin_web]',
-    '$owner',
+    '$organizer',
     '".Of_Date::getOption('timezone')."',
     '$opacity', 
     '$title',
@@ -1686,9 +1680,9 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
 
   // Insert My alert if set
   if (($calendar['alert']) > 0) {
-    run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
+    run_query_calendar_event_alert_insert($event_id, $calendar['organizer'], $calendar['alert']);
   } else {
-    run_query_calendar_event_alert_delete($event_id, $obm['uid']);
+    run_query_calendar_event_alert_delete($event_id, $calendar['organizer']);
   }
 
   // Send mail
@@ -1911,6 +1905,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   $users = array($organizerId);
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $opacity = 'OPAQUE';
+  $organizer = $calendar['organizer'] ? $calendar['organizer'] : $obm['uid'];
   if ($all_day == 'TRUE') {
     if ($event_duration == 3600) {
       $event_duration = "86400";
@@ -2000,7 +1995,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
     $obm[uid],
     'VEVENT',
     '$GLOBALS[c_origin_ajax]',
-    ".$obm['uid'].",
+    ".$organizer.",
     '".Of_Date::getOption('timezone')."', 
     '$title', 
     '$datebegin',     
@@ -2025,7 +2020,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   $event_id = $obm_q->lastid();
   $event_entity_id = of_entity_insert('event', $event_id);
 
-  run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $obm["uid"], $organizerId);
+  run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $organizerId);
 
   // Documents
   if (is_array($documents)) {
@@ -2042,11 +2037,11 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   return $event_id;
 }
 
-function run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $owner, $organizer) {
+function run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $organizer) {
   run_query_calendar_add_event_links($users, $contacts, $resources, $event_id);
   run_query_calendar_set_organizer($organizer, $event_id);
-  if (!in_array($owner, (array) $users)) {
-    run_query_calendar_insert_entity_event('user', $owner, $event_id, 'DECLINED');
+  if (!in_array($organizer, (array) $users)) {
+    run_query_calendar_insert_entity_event('user', $organizer, $event_id, 'DECLINED');
   }
 }
 
@@ -2149,6 +2144,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $datebegin = $calendar['date_begin'];
     $ext_id = generateUniqueKey();
+    $organizer = $calendar['organizer'] ? $calendar['organizer'] : $obm['uid'];
 
     $query = "INSERT INTO Event (
       event_ext_id,
@@ -2183,7 +2179,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       $obm[uid],
       'VEVENT',
       '$GLOBALS[c_origin_web]',
-      $obm[uid],
+      $organizer,
       '".Of_Date::getOption('timezone')."',
       '$title',
       '$datebegin',
@@ -2451,11 +2447,11 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
                                ? array_merge($calendar['sel_document_id'], $other_files)
                                : $other_files;
   }
-  
-  if (!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
+
+  if (!is_numeric($calendar['organizer']) || $calendar['organizer'] <= 0) {
     $owner = $obm['uid'];
   } else {
-    $owner = $calendar['owner'];
+    $owner = $calendar['organizer'];
   }
   $name = sql_parse_text($calendar['template_name']);
   $title = sql_parse_text($calendar['title']);
