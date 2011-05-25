@@ -3396,6 +3396,8 @@ function dis_user_display_pref($prefs) {
  * @return void
  */
 function dis_user_export_pdf($id) {
+  $pdf = OBM_Pdf::load('user');
+  $pdf->setFontSize(11);
   
   $user = run_query_user_detail($id);
   $login = $user->f('userobm_login');
@@ -3415,40 +3417,54 @@ function dis_user_export_pdf($id) {
 
   $admin = get_user_info();
 
-  $pdf = OBM_Pdf::load('user');
-  $pdf->setFontSize(11);
+  $admin_name_max_length = 40;
+  $admin_email_max_length = 60;
+  $display_name_max_length = 40;
+  $user_login_max_length = 70;
+  $user_password_max_length = 70;
+  $user_email_max_length = 70;
 
   // Apply font and draw text
   $Y = 705;
   $X = 50;
   $pdf->pages[0]->setFont(Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_ITALIC), $pdf->getFontSize());
-  $Y -= $pdf->getLineHeight();    
-  $pdf->pages[0]->drawText($admin['firstname'].' '.$admin['lastname'], $X, $Y, 'UTF-8');
-  $Y -= $pdf->getLineHeight();    
-  $pdf->pages[0]->drawText("$GLOBALS[l_phone] : $admin[phone]", $X, $Y, 'UTF-8');  
-  $Y -= $pdf->getLineHeight();    
-  $pdf->pages[0]->drawText("$GLOBALS[l_email] : $admin[email]", $X, $Y, 'UTF-8');      
+  $Y -= $pdf->getLineHeight();
+
+  $pdf->drawSplittedText(
+          $pdf->pages[0],
+          $admin['firstname']." ".$admin['lastname'],
+          $admin_name_max_length,
+          $X,
+          $Y
+  );
+  $pdf->pages[0]->drawText("$GLOBALS[l_phone] : $admin[phone]", $X, $Y, 'UTF-8');
+  $Y -= $pdf->getLineHeight();
+  $pdf->drawSplittedText(
+          $pdf->pages[0],
+          $GLOBALS['l_email']." : ".$admin['email'],
+          $admin_email_max_length,
+          $X,
+          $Y
+  );
   $pdf->pages[0]->setFont($pdf->getFont(), $pdf->getFontSize());
   $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(0));
   $Y = 715;
   $X = 300;
-  $Y -= $pdf->getLineHeight();  
-  $pdf->pages[0]->drawText($display_name, $X, $Y, 'UTF-8');
+  $Y -= $pdf->getLineHeight();
+  $pdf->drawSplittedText($pdf->pages[0], $display_name, $display_name_max_length, $X, $Y);
   foreach($address as $address_part) {
     $Y -= $pdf->getLineHeight();  
     $pdf->pages[0]->drawText($address_part, $X, $Y, 'UTF-8');
   }
 
-  $Y = 390;
+  $Y = 420;
   $X = 98;
-  $Y -= $pdf->getLineHeight();  
-  $pdf->pages[0]->drawText("$GLOBALS[l_login] : ". $login, $X, $Y, 'UTF-8');
-  $Y -= $pdf->getLineHeight();  
-  $pdf->pages[0]->drawText("$GLOBALS[l_password] : ". $password, $X, $Y, 'UTF-8');
+  $Y -= $pdf->getLineHeight();
+  $pdf->drawSplittedText($pdf->pages[0], $GLOBALS['l_login']." : ".$login, $user_login_max_length, $X, $Y);
+  $pdf->drawSplittedText($pdf->pages[0], $GLOBALS['l_password']." : ".$login, $user_password_max_length, $X, $Y);
   for($i = 0; $i < 5 && $i < count($email); $i++) {
     $mail = $email[$i];
-    $Y -= $pdf->getLineHeight();  
-    $pdf->pages[0]->drawText("$GLOBALS[l_email] : ". $mail, $X, $Y, 'UTF-8');  
+    $pdf->drawSplittedText($pdf->pages[0], $GLOBALS['l_email']." : ".$mail, $user_email_max_length, $X, $Y);
     if($i == 4 && $count($email) > 4) {
       $Y -= $pdf->getLineHeight();  
       $pdf->pages[0]->drawText("$GLOBALS[l_email] : [...]", $X, $Y, 'UTF-8');  

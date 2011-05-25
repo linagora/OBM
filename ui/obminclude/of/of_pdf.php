@@ -119,7 +119,27 @@ class OBM_Pdf extends Zend_Pdf{
     $stringWidth = (array_sum($widths) / $this->font->getUnitsPerEm()) * $this->font_size;
 
     return $stringWidth;
-  }  
+  }
+
+   /**
+   * Long words killer
+   *
+   */
+  function cutLongWords($string,$length,$separation) {
+    return preg_replace('/([^ ]{'.$length.'})/si','\1'.$separation,$string);
+  }
+
+  function drawSplittedText(Zend_Pdf_Page $page, 
+                            $string,
+                            $max_length,
+                            $X,
+                            &$Y){
+    $chunks = str_split($string, $max_length);
+    foreach ($chunks as $key=>$line) {
+      $page->drawText($line, $X, $Y, 'UTF-8');
+      $Y -= $this->getLineHeight();
+    }
+  }
 
   /**
    * get font 
