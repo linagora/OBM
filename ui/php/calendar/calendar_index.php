@@ -208,7 +208,7 @@ if ($action == 'search') {
   $extra_js_include[] = '/event/eventForm.js';
   $extra_css[] = $css_ext_color_picker ;
   $GLOBALS['extra_js'] .= '
-  window.addEvent("domready", function()
+  window.addEvent("domready", function(){
     var eventForm = new Obm.Event.Form();
   });';
   if (is_array($params['sel_user_id']) || is_array($params['sel_resource_id'])) {
