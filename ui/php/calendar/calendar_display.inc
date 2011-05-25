@@ -3783,7 +3783,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
 
       if (isset($calendar['template_id'])) {
         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
-        if(     logguedUserIsTheOnlyAttendee($users_id)
+        if(     check_loggued_user_is_the_only_attendee($users_id)
             &&  $event_q->f('event_organizer') != $obm['uid']
             &&  OBM_Acl::canWrite($obm['uid'], 'calendar',$event_q->f('event_organizer'))
         ){
@@ -3807,8 +3807,8 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     $documents = (count($documents_id) > 0) ? get_calendar_document_from_ids($documents_id) : array();
   }
 
-  if($organizerId = getOrganizerId($users, $contacts))
-    $calendar['organizer'] = $organizerId;
+  if($organizer_id = getOrganizerId($users, $contacts))
+    $calendar['organizer'] = $organizer_id;
   
   $possible_owners = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
@@ -3836,15 +3836,15 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
 }
 
 function getOrganizerId($users, $contacts){
-  foreach($users['entity'] as $organizerId=>$userEntity){
-    if($userEntity["is_organizer"]){
-      return $organizerId;
+  foreach($users['entity'] as $organizer_id=>$user_entity){
+    if($user_entity["is_organizer"]){
+      return $organizer_id;
     }
   }
-  if(empty($organizerName) && is_array($contacts['entity'])){
-    foreach($contacts['entity'] as $organizerId=>$contactEntity){
-      if($contactEntity["is_organizer"]){
-        return $organizerId;
+  if(empty($organizer_name) && is_array($contacts['entity'])){
+    foreach($contacts['entity'] as $organizer_id=>$contact_entity){
+      if($contact_entity["is_organizer"]){
+        return $organizer_id;
       }
     }
   }
@@ -3853,12 +3853,10 @@ function getOrganizerId($users, $contacts){
 }
 
 
-function logguedUserIsTheOnlyAttendee($attendees){
+function check_loggued_user_is_the_only_attendee($attendees){
   if(count($attendees) == 1 && $attendees[0]==$GLOBALS['obm']['uid']){
     return true;
   }
-  echo "<pre>" . print_r($attendees, true) . "</pre>";
-  exit;
   return false;
 }
 
@@ -4157,29 +4155,29 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $repeatfrequency = 1;
   $uid = $obm['uid']; 
   $tagcolor = "#eff0f2" ; // backcolor by default
-  $organizerName = null;
+  $organizer_name = null;
 
   // Gets the organizerName
-  foreach($users['entity'] as $organizerId=>$userEntity){
-    if($userEntity["is_organizer"]){
-      $organizerName = $userEntity["label"];
+  foreach($users['entity'] as $organizer_id=>$user_entity){
+    if($user_entity["is_organizer"]){
+      $organizer_name = $user_entity["label"];
       break;
     }
   }
-  if(empty($organizerName) && is_array($contacts['entity'])){
-    foreach($contacts['entity'] as $organizerId=>$contactEntity){
-      if($contactEntity["is_organizer"]){
-        $organizerName = $contactEntity["label"];
+  if(empty($organizer_name) && is_array($contacts['entity'])){
+    foreach($contacts['entity'] as $organizer_id=>$contact_entity){
+      if($contact_entity["is_organizer"]){
+        $organizer_name = $contact_entity["label"];
         break;
       }
     }
   }
 
   if (isset($calendar['organizer'])) {
-    $organizerId = $calendar['organizer'];
+    $organizer_id = $calendar['organizer'];
   }
-  elseif(!$organizerId) {
-    $organizerId = $uid;
+  elseif(!$organizer_id) {
+    $organizer_id = $uid;
   }
 
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') || ($action == 'new' && $event_q != '') || ($action == 'edit_template')) {
@@ -4253,8 +4251,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       }
     }
     // Alerts
-    if (is_array($alerts) && isset($alerts[$organizerId])) {
-      $selected_alert = $alerts[$organizerId];
+    if (is_array($alerts) && isset($alerts[$organizer_id])) {
+      $selected_alert = $alerts[$organizer_id];
     } elseif (isset($calendar['template_id'])) {
       $selected_alert = $event_q->f('event_alert');
     }
@@ -4522,18 +4520,18 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
   foreach ($possible_owners as $o) {
-    if(empty($organizerName) && $o['id']==$organizerId) $organizerName = $o[label];
+    if(empty($organizer_name) && $o['id']==$organizer_id) $organizer_name = $o[label];
   }
 
-  $possibleOrganizers = array();
+  $possible_organizers = array();
   if(is_array($displayedPeople)){
-    foreach($displayedPeople as $displayedPersonId=>$displayedPersonName){
-      if(OBM_Acl::canWrite($uid, 'calendar',$displayedPersonId)) {
-        $possibleOrganizers[$displayedPersonId] = $displayedPersonName;
+    foreach($displayedPeople as $displayed_person_id=>$displayed_person_name){
+      if(OBM_Acl::canWrite($uid, 'calendar',$displayed_person_id)) {
+        $possible_organizers[$displayed_person_id] = $displayed_person_name;
       }
     }
   }
-  if(!array_key_exists($organizerId, $possibleOrganizers)) $organizerId = $uid;
+  if(!array_key_exists($organizer_id, $possible_organizers)) $organizer_id = $uid;
 
   $block_organizer = "
     <th>
@@ -4542,17 +4540,17 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <td>";
       if($action != 'new' || !$displayedPeople){
         $block_organizer .= "
-        <span>$organizerName</span>
-        <input type=\"hidden\" name=\"sel_organizer\" value=\"".$organizerId."\" />";
+        <span>$organizer_name</span>
+        <input type=\"hidden\" name=\"sel_organizer\" value=\"".$organizer_id."\" />";
       }
       else{
         $block_organizer .= "
         <select name=\"sel_organizer\">";
-        foreach($possibleOrganizers as $displayedPersonId=>$displayedPersonName){
-          $selectedPerson = $displayedPersonId == $organizerId ? "selected=selected" : "";
-          $block_organizer .= "<option $selectedPerson
-                                      value=\"".$displayedPersonId."\">".
-                                $displayedPersonName.
+        foreach($possible_organizers as $displayed_person_id=>$displayed_person_name){
+          $selected_person = $displayed_person_id == $organizer_id ? "selected=selected" : "";
+          $block_organizer .= "<option $selected_person
+                                      value=\"".$displayed_person_id."\">".
+                                $displayed_person_name.
                              "</option>";
         }
         $block_organizer .=
