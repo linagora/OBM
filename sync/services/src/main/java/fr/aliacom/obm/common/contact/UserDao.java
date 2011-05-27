@@ -124,7 +124,7 @@ public class UserDao {
 			return null;
 		}
 		if (!m.contains("@")) {
-			m = m += "@" + domain;
+			return m + "@" + domain;
 		}
 		return m;
 	}
