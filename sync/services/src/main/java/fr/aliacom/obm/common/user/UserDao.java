@@ -326,7 +326,6 @@ public class UserDao {
 				+ "FROM UserEntity "
 				+ "WHERE userentity_user_id=? ";
 		try {
-			con = obmHelper.getConnection();
 			ps = con.prepareStatement(uq);
 			ps.setInt(1, userId);
 			rs = ps.executeQuery();
