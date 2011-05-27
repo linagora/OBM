@@ -9,7 +9,7 @@ public class Version implements Comparable<Version> {
 	private String suffix;
 
 	public interface Factory<T extends Version> {
-		public T create(int major, int minor, Integer release, Integer subRelease, String suffix);
+		T create(int major, int minor, Integer release, Integer subRelease, String suffix);
 	}
 	
 	public static class FactoryImpl implements Factory<Version> {

@@ -5,6 +5,6 @@ import fr.aliacom.obm.common.user.UserSettings;
 
 public interface SettingsService {
 
-	public UserSettings getSettings(ObmUser user);
+	UserSettings getSettings(ObmUser user);
 	
 }

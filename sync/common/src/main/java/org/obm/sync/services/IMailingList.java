@@ -10,23 +10,23 @@ import org.obm.sync.mailingList.MailingList;
 
 public interface IMailingList {
 
-	public List<MailingList> listAllMailingList(AccessToken token) throws AuthFault, ServerFault;
+	List<MailingList> listAllMailingList(AccessToken token) throws AuthFault, ServerFault;
 
-	public MailingList createMailingList(AccessToken token, 
+	MailingList createMailingList(AccessToken token, 
 			MailingList mailingList) throws AuthFault, ServerFault;
 
-	public MailingList modifyMailingList(AccessToken token, 
+	MailingList modifyMailingList(AccessToken token, 
 			MailingList mailingList) throws AuthFault, ServerFault;
 
-	public void removeMailingList(AccessToken token, Integer id)
+	void removeMailingList(AccessToken token, Integer id)
 			throws AuthFault, ServerFault;
 
-	public MailingList getMailingListFromId(AccessToken token, Integer id)
+	MailingList getMailingListFromId(AccessToken token, Integer id)
 			throws AuthFault, ServerFault;
 	
-	public List<MLEmail> addEmails(AccessToken token, 
+	List<MLEmail> addEmails(AccessToken token, 
 			Integer mailingListId, List<MLEmail> email) throws AuthFault, ServerFault;
 	
-	public void removeEmail(AccessToken token, 
+	void removeEmail(AccessToken token, 
 			Integer mailingListId, Integer emailId) throws AuthFault, ServerFault;
 }

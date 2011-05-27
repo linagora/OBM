@@ -19,44 +19,44 @@ public interface IAddressBook {
 	/**
 	 * check if given book is read only for logged user
 	 */
-	public boolean isReadOnly(AccessToken token, BookType book)
+	boolean isReadOnly(AccessToken token, BookType book)
 			throws AuthFault, ServerFault;
 
 	
 	/**
 	 * list accessible book types for logged user
 	 */
-	public BookType[] listBooks(AccessToken token);
+	BookType[] listBooks(AccessToken token);
 	
 	/**
 	 * List all accessible books for logged user
 	 */
-	public List<AddressBook> listAllBooks(AccessToken token) throws AuthFault, ServerFault;
+	List<AddressBook> listAllBooks(AccessToken token) throws AuthFault, ServerFault;
 
 	/**
 	 * get a list of updated and removed contacts sync given date for a given BookType
 	 */
-	public ContactChangesResponse getSync(AccessToken token, BookType book, Date date)
+	ContactChangesResponse getSync(AccessToken token, BookType book, Date date)
 			throws AuthFault, ServerFault;
 
 	
 	/**
 	 * get a list of updated and removed addressbooks since given date, including addressbooks content
 	 */
-	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date date)
+	AddressBookChangesResponse getAddressBookSync(AccessToken token, Date date)
 			throws AuthFault, ServerFault;
 
 	
 	/**
 	 * Create the given contact into given book if book is writable
 	 */
-	public Contact createContact(AccessToken token, BookType book, Contact contact) 
+	Contact createContact(AccessToken token, BookType book, Contact contact) 
 		throws AuthFault, ServerFault;
 
 	/**
 	 * Create the given contact into given book if book is writable
 	 */
-	public Contact createContactInBook(AccessToken token, int addressBookId, Contact contact) 
+	Contact createContactInBook(AccessToken token, int addressBookId, Contact contact) 
 		throws AuthFault, ServerFault;
 
 	
@@ -66,37 +66,37 @@ public interface IAddressBook {
 	 * 
 	 * Please use it only if you know what you are doing.
 	 */
-	public Contact createContactWithoutDuplicate(AccessToken token,
+	Contact createContactWithoutDuplicate(AccessToken token,
 			BookType book, Contact contact) throws AuthFault, ServerFault;
 
 	/**
 	 * modify existing contact with data provided if possible.
 	 */
-	public Contact modifyContact(AccessToken token, BookType book,
+	Contact modifyContact(AccessToken token, BookType book,
 			Contact contact) throws AuthFault, ServerFault;
 
 	/**
 	 * modify existing contact with data provided if possible.
 	 */
-	public Contact modifyContactInBook(AccessToken token, int addressBookId,
+	Contact modifyContactInBook(AccessToken token, int addressBookId,
 			Contact contact) throws AuthFault, ServerFault;
 
 	/**
 	 * remove the contact with specified uid 
 	 */
-	public Contact removeContact(AccessToken token, BookType book, String uid)
+	Contact removeContact(AccessToken token, BookType book, String uid)
 			throws AuthFault, ServerFault;
 
 	/**
 	 * remove the contact with specified uid 
 	 */
-	public Contact removeContactInBook(AccessToken token, int addressBookId, String uid)
+	Contact removeContactInBook(AccessToken token, int addressBookId, String uid)
 			throws AuthFault, ServerFault;
 	
 	/**
 	 * Search contacts using a solr query
 	 */
-	public List<Contact> searchContact(AccessToken token, String query,
+	List<Contact> searchContact(AccessToken token, String query,
 			int limit) throws AuthFault, ServerFault;
 
 	// Methods for Funambol sync
@@ -104,25 +104,25 @@ public interface IAddressBook {
 	/**
 	 * Retrieve a contact by its uid
 	 */
-	public Contact getContactFromId(AccessToken token, BookType book, String id)
+	Contact getContactFromId(AccessToken token, BookType book, String id)
 			throws AuthFault, ServerFault;
 
 	/**
 	 * Retrieve a contact by its uid
 	 */
-	public Contact getContactInBook(AccessToken token, int addressBookId, String id)
+	Contact getContactInBook(AccessToken token, int addressBookId, String id)
 			throws AuthFault, ServerFault;
 
 	/**
 	 * Search contact similar to the given one.
 	 */
-	public KeyList getContactTwinKeys(AccessToken token, BookType book,
+	KeyList getContactTwinKeys(AccessToken token, BookType book,
 			Contact contact) throws AuthFault, ServerFault;
 
 	/**
 	 * Get the list of folders that changed or were deleted since given date.
 	 */
-	public FolderChangesResponse getFolderSync(AccessToken token, Date lastSync)
+	FolderChangesResponse getFolderSync(AccessToken token, Date lastSync)
 			throws AuthFault, ServerFault;
 
 	/**
