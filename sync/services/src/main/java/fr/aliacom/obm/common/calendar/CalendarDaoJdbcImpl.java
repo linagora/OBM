@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -360,11 +361,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						+ "(eventexception_parent_id, eventexception_child_id, eventexception_date, eventexception_usercreate) "
 						+ "values (?, ?, ?, " + editor.getObmId() + ")");
 
-				for (Integer exId : eventsEx.keySet()) {
+				for (Entry<Integer, Date> entry: eventsEx.entrySet()) {
 					ps.setInt(1, id);
-					ps.setInt(2, exId);
-					ps.setTimestamp(3, new Timestamp(eventsEx.get(exId)
-							.getTime()));
+					ps.setInt(2, entry.getKey());
+					ps.setTimestamp(3, new Timestamp(entry.getValue().getTime()));
 					ps.addBatch();
 				}
 				ps.executeBatch();

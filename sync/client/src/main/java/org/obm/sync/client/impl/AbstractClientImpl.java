@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -16,8 +17,8 @@ import org.apache.commons.logging.LogFactory;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
-import org.obm.sync.auth.ServerFault;
 import org.obm.sync.auth.MavenVersion;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.ISyncClient;
 import org.obm.sync.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -130,8 +131,8 @@ public abstract class AbstractClientImpl implements ISyncClient {
 			Map<String, String> parameters) {
 		InputStream is = null;
 		try {
-			for (String p : parameters.keySet()) {
-				pm.setParameter(p, parameters.get(p));
+			for (Entry<String, String> entry: parameters.entrySet()) {
+				pm.setParameter(entry.getKey(), entry.getValue());
 			}
 			int ret = 0;
 			synchronized (hc) {

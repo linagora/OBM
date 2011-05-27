@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -460,11 +461,11 @@ public class ContactDao {
 			ps = con
 			.prepareStatement("INSERT INTO IM (im_entity_id, im_label, im_protocol, im_address) "
 					+ "VALUES (?, ?, ?, ?)");
-			for (String s : imIdentifiers.keySet()) {
+			for (Entry<String, InstantMessagingId> entry: imIdentifiers.entrySet()) {
 				ps.setInt(1, entityId);
-				ps.setString(2, s);
-				ps.setString(3, imIdentifiers.get(s).getProtocol());
-				ps.setString(4, imIdentifiers.get(s).getId());
+				ps.setString(2, entry.getKey());
+				ps.setString(3, entry.getValue().getProtocol());
+				ps.setString(4, entry.getValue().getId());
 				ps.addBatch();
 			}
 			ps.executeBatch();
@@ -527,10 +528,10 @@ public class ContactDao {
 			.prepareStatement("INSERT INTO Address (address_entity_id, address_label, "
 					+ "address_street, address_zipcode, address_town, address_expresspostal, address_country, address_state) "
 					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-			for (String s : addresses.keySet()) {
-				Address ad = addresses.get(s);
+			for (Entry<String, Address> entry: addresses.entrySet()) {
+				Address ad = entry.getValue();
 				ps.setInt(1, entityId);
-				ps.setString(2, s);
+				ps.setString(2, entry.getKey());
 				ps.setString(3, ad.getStreet());
 				ps.setString(4, ad.getZipCode());
 				ps.setString(5, ad.getTown());
@@ -571,10 +572,10 @@ public class ContactDao {
 			ps = con
 			.prepareStatement("INSERT INTO Email (email_entity_id, email_label, email_address) "
 					+ "VALUES (?, ?, ?)");
-			for (String s : emails.keySet()) {
+			for (Entry<String, Email> entry: emails.entrySet()) {
 				ps.setInt(1, entityId);
-				ps.setString(2, s);
-				ps.setString(3, emails.get(s).getEmail());
+				ps.setString(2, entry.getKey());
+				ps.setString(3, entry.getValue().getEmail());
 				ps.addBatch();
 			}
 			ps.executeBatch();
@@ -597,10 +598,10 @@ public class ContactDao {
 			ps = con
 			.prepareStatement("INSERT INTO Phone (phone_entity_id, phone_label, phone_number) "
 					+ "VALUES (?, ?, ?)");
-			for (String s : phones.keySet()) {
+			for (Entry<String, Phone> entry: phones.entrySet()) {
 				ps.setInt(1, entityId);
-				ps.setString(2, s);
-				ps.setString(3, phones.get(s).getNumber());
+				ps.setString(2, entry.getKey());
+				ps.setString(3, entry.getValue().getNumber());
 				ps.addBatch();
 			}
 			ps.executeBatch();

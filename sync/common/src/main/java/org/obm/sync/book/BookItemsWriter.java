@@ -3,6 +3,7 @@ package org.obm.sync.book;
 import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.obm.sync.items.AbstractItemsWriter;
 import org.obm.sync.items.AddressBookChangesResponse;
@@ -85,10 +86,10 @@ public class BookItemsWriter extends AbstractItemsWriter {
 	private void addIM(Element root,
 			Map<String, InstantMessagingId> imIdentifiers) {
 		Element e = DOMUtils.createElement(root, "instantmessaging");
-		for (String s : imIdentifiers.keySet()) {
+		for (Entry<String, InstantMessagingId> entry: imIdentifiers.entrySet()) {
 			Element c = DOMUtils.createElement(e, "im");
-			InstantMessagingId p = imIdentifiers.get(s);
-			c.setAttribute("label", s);
+			InstantMessagingId p = entry.getValue();
+			c.setAttribute("label", entry.getKey());
 			c.setAttribute("protocol", p.getProtocol());
 			c.setAttribute("address", p.getId());
 		}
@@ -96,10 +97,10 @@ public class BookItemsWriter extends AbstractItemsWriter {
 
 	private void addEmail(Element root, Map<String, Email> emails) {
 		Element e = DOMUtils.createElement(root, "emails");
-		for (String s : emails.keySet()) {
+		for (Entry<String, Email> entry: emails.entrySet()) {
 			Element c = DOMUtils.createElement(e, "mail");
-			Email p = emails.get(s);
-			c.setAttribute("label", s);
+			Email p = entry.getValue();
+			c.setAttribute("label", entry.getKey());
 			c.setAttribute("value", p.getEmail());
 		}
 	}
@@ -115,10 +116,10 @@ public class BookItemsWriter extends AbstractItemsWriter {
 
 	private void addAddress(Element root, Map<String, Address> addresses) {
 		Element e = DOMUtils.createElement(root, "addresses");
-		for (String s : addresses.keySet()) {
+		for (Entry<String, Address> entry: addresses.entrySet()) {
 			Element c = DOMUtils.createElement(e, "address");
-			Address p = addresses.get(s);
-			c.setAttribute("label", s);
+			Address p = entry.getValue();
+			c.setAttribute("label", entry.getKey());
 			c.setAttribute("zip", p.getZipCode());
 			c.setAttribute("town", p.getTown());
 			c.setAttribute("country", p.getCountry());
@@ -130,10 +131,10 @@ public class BookItemsWriter extends AbstractItemsWriter {
 
 	private void addPhones(Element root, Map<String, Phone> phones) {
 		Element e = DOMUtils.createElement(root, "phones");
-		for (String s : phones.keySet()) {
+		for (Entry<String, Phone> entry: phones.entrySet()) {
 			Element c = DOMUtils.createElement(e, "phone");
-			Phone p = phones.get(s);
-			c.setAttribute("label", s);
+			Phone p = entry.getValue();
+			c.setAttribute("label", entry.getKey());
 			c.setAttribute("number", p.getNumber());
 		}
 	}
