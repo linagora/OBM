@@ -242,15 +242,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser)throws FindException, SQLException {
 		logger.info("create with token " + editor.getSessionId() + " from "
 				+ editor.getOrigin() + " for " + editor.getEmail());
-		Event ret = ev;
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			ret = createEvent(con, editor, calendar, ev, useObmUser);
+			return createEvent(con, editor, calendar, ev, useObmUser);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
-		return ret;
 	}
 
 	@Override

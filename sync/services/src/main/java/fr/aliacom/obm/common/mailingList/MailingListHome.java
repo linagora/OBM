@@ -286,16 +286,13 @@ public class MailingListHome {
 
 	public List<MLEmail> addEmails(AccessToken at, Integer mailingListId,
 			List<MLEmail> emails) throws SQLException {
-		List<MLEmail> ret = new ArrayList<MLEmail>(0);
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			ret = createOrUpdateEmails(con, at, mailingListId, emails, false);
+			return createOrUpdateEmails(con, at, mailingListId, emails, false);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
-
-		return ret;
 	}
 
 	public void removeEmail(AccessToken at, Integer mailingListId,

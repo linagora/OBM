@@ -24,13 +24,6 @@ public class EventParticipationState {
 
 	public void setUid(String uid) {
 		this.uid = uid;
-		if (uid != null && uid.length() > 0) {
-			String idString = uid;
-			int idx = idString.lastIndexOf("-");
-			if (idx > 0) {
-				idString = idString.substring(idx + 1);
-			}
-		}
 	}
 
 	public ParticipationState getState() {
