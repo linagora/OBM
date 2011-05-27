@@ -137,7 +137,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		Element rec = DOMUtils.createElement(e, "recurrence");
 		EventRecurrence r = ev.getRecurrence();
 		rec.setAttribute("kind", r.getKind().toString());
-		if (!"none".equals(r.getKind())) {
+		if (RecurrenceKind.none != r.getKind()) {
 			if (r.getEnd() != null) {
 				rec.setAttribute("end", DateHelper.asString(r.getEnd()));
 			}
