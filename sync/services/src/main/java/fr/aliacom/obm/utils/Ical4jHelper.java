@@ -343,7 +343,7 @@ public class Ical4jHelper {
 			} else if (priority.getLevel() > 0 && priority.getLevel() < 3) {
 				value = 3;
 			}
-			event.setPriority(new Integer(value));
+			event.setPriority(value);
 		}
 	}
 

@@ -1046,7 +1046,7 @@ public class ContactDao {
 			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				l.add(new Integer(rs.getInt(1)));
+				l.add(rs.getInt(1));
 			}
 
 			logger.info("Returning " + l.size() + " contact(s) deleted");
