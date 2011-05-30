@@ -382,6 +382,17 @@ public class Event {
 		return false;
 	}
 	
+	public boolean exceptionModifiedSince(Date reference){
+		boolean exceptionModified = false;
+		for (Event event: recurrence.getEventExceptions()) {
+			if (event.modifiedSince(reference)) {
+				exceptionModified = true;
+				break;
+			}
+		}
+		return exceptionModified;
+	}
+	
 	public void setSequence(int sequence) {
 		this.sequence = sequence;
 	}

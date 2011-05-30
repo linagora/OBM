@@ -871,11 +871,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Connection con = null;
 		Calendar cal = getGMTCalendar();
 		StringBuilder fetchIds = new StringBuilder();
-		fetchIds.append("SELECT e.event_id, att.eventlink_state, e.event_ext_id ");
+		fetchIds.append("SELECT e.event_id, att.eventlink_state, e.event_ext_id, ex.eventexception_parent_id ");
 		fetchIds.append(" FROM Event e ");
 		fetchIds.append("INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id ");
 		fetchIds.append("INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id ");
 		fetchIds.append("INNER JOIN EventLink attupd ON attupd.eventlink_event_id=e.event_id ");
+		fetchIds.append("LEFT JOIN EventException ex ON ex.eventexception_child_id = e.event_id ");
 		fetchIds.append("WHERE e.event_type=? AND ue.userentity_user_id=? ");
 
 		// dirty hack to disable need-action to opush & tbird
@@ -903,8 +904,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					+ syncRange.getAfter() + " - " + syncRange.getBefore() + " ]");
 		}
 
-		fetchIds.append(" GROUP BY e.event_id, att.eventlink_state, e.event_ext_id");
-		
+		fetchIds.append(" GROUP BY e.event_id, att.eventlink_state, e.event_ext_id, ex.eventexception_parent_id");
 		
 		
 		List<DeletedEvent> declined = new LinkedList<DeletedEvent>();
@@ -942,7 +942,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					declined.add(new DeletedEvent(eventId, evrs.getString(3)));
 				} else {
 					fetchedData = true;
-					fetched.append(',');
+					int recurentParentId = evrs.getInt(4);
+					if(recurentParentId > 0){
+						fetched.append(",");
+						fetched.append(recurentParentId);
+					}
+					fetched.append(",");
 					fetched.append(eventId);
 				}
 			}
@@ -1286,7 +1291,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN EventEntity ON evententity_event_id=event_id "
 				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
 				+ "INNER JOIN EventException ON e.event_id = eventexception_child_id "
-				+ "WHERE eventexception_parent_id IN (" + evIdList + ") ";
+				+ "WHERE eventexception_parent_id IN (" + evIdList + ") "
+				+ "OR eventexception_child_id IN (" + evIdList + ") ";
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;

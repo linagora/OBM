@@ -540,7 +540,7 @@ public class CalendarBindingImpl implements ICalendar {
 		List<Event> participationChanged = new ArrayList<Event>();
 		
 		for (Event event: changes.getUpdated()) {
-			if (event.modifiedSince(lastSync)) {
+			if (event.modifiedSince(lastSync) || event.exceptionModifiedSince(lastSync)) {
 				updated.add(event);
 			} else {
 				//means that only participation changed

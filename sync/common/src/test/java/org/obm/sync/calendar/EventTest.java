@@ -2,6 +2,8 @@ package org.obm.sync.calendar;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -146,5 +148,47 @@ public class EventTest {
 		calendar.add(Calendar.MONTH, 1);	
 		boolean modified = event.modifiedSince(calendar.getTime());
 		Assert.assertEquals(false, modified);
+	}
+	
+	@Test
+	public void testRecurrentEventHasAModifiedException(){
+		Event event = new Event();
+		Calendar calendar = Calendar.getInstance();
+		Date dateStart = calendar.getTime();
+		Calendar calendarUpdate = calendar;
+		calendarUpdate.add(Calendar.HOUR, 1);
+		event.setTimeCreate(dateStart);
+		event.setDate(dateStart);
+		
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		
+		List<Event> eventExceptions = new LinkedList<Event>();
+		Event exception = event.clone();
+		exception.setTimeCreate(dateStart);
+		exception.setTimeUpdate(calendarUpdate.getTime());
+		eventExceptions.add(exception);
+		
+		recurrence.setEventExceptions(eventExceptions);		
+		event.setRecurrence(recurrence);
+		
+		Assert.assertEquals(true, event.exceptionModifiedSince(dateStart));
+	}
+	
+	@Test
+	public void testRecurrentEventHasNotAnyModifiedException(){
+		Event event = new Event();
+		Calendar calendar = Calendar.getInstance();
+		Date dateStart = calendar.getTime();
+		Calendar calendarUpdate = calendar;
+		calendarUpdate.add(Calendar.HOUR, 1);
+		event.setTimeCreate(dateStart);
+		event.setDate(dateStart);
+		
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		event.setRecurrence(recurrence);
+		
+		Assert.assertEquals(false, event.exceptionModifiedSince(dateStart));
 	}
 }
