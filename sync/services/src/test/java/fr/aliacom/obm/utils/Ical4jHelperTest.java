@@ -51,10 +51,12 @@ import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.io.IOUtils;
+import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
+import org.junit.internal.matchers.TypeSafeMatcher;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -64,10 +66,31 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 
+import com.google.common.base.Splitter;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class Ical4jHelperTest {
+
+	private static class StringLengthLessThan extends TypeSafeMatcher<String> {
+
+		private final int length;
+
+		public StringLengthLessThan(int length) {
+			this.length = length;
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText("check that given string's length is less than " + length);
+		}
+
+		@Override
+		public boolean matchesSafely(String item) {
+			return (item.length() < length);
+		}
+	}
 
 	private Calendar getCalendar() {
 		return new GregorianCalendar(TimeZone.getTimeZone("GMT"));
@@ -702,9 +725,13 @@ public class Ical4jHelperTest {
 
 		final ObmUser obmUser = buildObmUser(attendeeReply);
 
-		final String ics = Ical4jHelper.buildIcsInvitationReply(event, obmUser);
-		Assert.assertThat(ics, StringContains.containsString("ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;" +
-				"CN=OBM USER 3;ROLE=REQ-PARTICIPANT:mailto:obm3@obm.org"));
+		Ical4jHelper ical4jHelper = new Ical4jHelper();
+		final String ics = ical4jHelper.buildIcsInvitationReply(event, obmUser);
+		
+		String icsAttendee = "ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;" +
+		"CN=OBM USER 3;ROLE=\r\n REQ-PARTICIPANT:mailto:obm3@obm.org";
+		
+		Assert.assertThat(ics, StringContains.containsString(icsAttendee));
 		Assert.assertEquals(1, countStringOccurrences(ics, "ATTENDEE;"));	
 	}
 	
@@ -781,6 +808,33 @@ public class Ical4jHelperTest {
 			i = str.indexOf(occ, i + occ.length());
 		}
 		return countIndexOf;
+	}
+
+	@Test
+	public void testInvitationRequestWithLongAttendee() {
+		Event event = buildEvent();
+		Attendee superLongAttendee = new Attendee();
+		superLongAttendee.setDisplayName("my attendee is more than 75 characters long");
+		superLongAttendee.setEmail("so-we-just-give-him-a-very-long-email-address@test.com");
+		event.addAttendee(superLongAttendee);
+
+		final Attendee attendeeReply = event.getAttendees().get(2);
+		final ObmUser obmUser = buildObmUser(attendeeReply);
+
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(obmUser, event);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser);
+		
+		checkStringLengthLessThan(icsRequest, 75);
+		checkStringLengthLessThan(icsCancel, 75);
+		checkStringLengthLessThan(icsReply, 75);
+	}
+	
+	private void checkStringLengthLessThan(String ics, int length) {
+		Iterable<String> lines = Splitter.on("\r\n").split(ics);
+		for (String line: lines) {
+			Assert.assertThat(line, new StringLengthLessThan(length));
+		}
 	}
 	
 }

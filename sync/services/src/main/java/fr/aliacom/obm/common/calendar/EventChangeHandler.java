@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.jms.JMSException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,12 +26,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
+import com.linagora.obm.sync.Producer;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserSettings;
+import fr.aliacom.obm.utils.Ical4jHelper;
 
 public class EventChangeHandler {
 
@@ -37,25 +41,44 @@ public class EventChangeHandler {
 	private final EventChangeMailer eventChangeMailer;
 	private final SettingsService settingsService;
 	private final UserService userService;
+	private final Producer producer;
+	private final Ical4jHelper ical4jHelper;
 
 	@Inject
 	/* package */ EventChangeHandler(EventChangeMailer eventChangeMailer,
-			SettingsService settingsService, UserService userService) {
+			SettingsService settingsService, UserService userService, Producer producer, Ical4jHelper ical4jHelper) {
 		this.eventChangeMailer = eventChangeMailer;
 		this.settingsService = settingsService;
 		this.userService = userService;
+		this.producer = producer;
+		this.ical4jHelper = ical4jHelper;
 	}
 	
-	public void create(final ObmUser user, final Event event) throws NotificationException {
-		if (eventCreationInvolveNotification(event)) {
-			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
-			UserSettings settings = settingsService.getSettings(user);
-			notifyCreate(user, attendees, event, settings.locale(), settings.timezone());
+	public void create(final ObmUser user, final Event event, boolean notification) throws NotificationException {
+		Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
+		String ics = ical4jHelper.buildIcsInvitationRequest(user, event);
+		writeIcs(ics);
+		if (notification && eventCreationInvolveNotification(event)) {
+			notifyCreate(user, attendees, event, ics);
+		}
+	}
+	
+	private void writeIcs(String... ics)  {
+		try {
+			for (String s: ics) {
+				producer.write(s);	
+			}
+		} catch (JMSException e) {
+			throw new NotificationException(e);
 		}
 	}
 	
 	private void notifyCreate(final ObmUser user, final Collection<Attendee> attendees, 
-			final Event event, final Locale locale, final TimeZone timezone){
+			final Event event, String ics) throws NotificationException {
+		
+		UserSettings settings = settingsService.getSettings(user);
+		Locale locale = settings.locale();
+		TimeZone timezone = settings.timezone();
 		
 		Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
 		
@@ -66,61 +89,74 @@ public class EventChangeHandler {
 		
 		Set<Attendee> notAccepted = attendeeGroups.get(ParticipationState.NEEDSACTION);
 		if (notAccepted != null && !notAccepted.isEmpty()) {
-			eventChangeMailer.notifyNeedActionNewUsers(user, notAccepted, event, locale, timezone);
+			eventChangeMailer.notifyNeedActionNewUsers(notAccepted, event, locale, timezone, ics);
 		}
-		
 	}
 
-	public void update(final ObmUser user, final Event previous, final Event current) throws NotificationException {
+	public void update(final ObmUser user, final Event previous, final Event current, boolean notification) throws NotificationException {
 		
-		UserSettings settings = settingsService.getSettings(user);
-		TimeZone timezone = settings.timezone();
-		Locale locale = settings.locale();
+		String addUserIcs = ical4jHelper.buildIcsInvitationRequest(user, current);
+		String removedUserIcs = ical4jHelper.buildIcsInvitationCancel(user, current);
+		String updateUserIcs = ical4jHelper.buildIcsInvitationRequest(user, current);
 		
-		final Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
-		final Set<Attendee> removedUsers = attendeeGroups.get(AttendeeStateValue.Old);
-		if (removedUsers != null && !removedUsers.isEmpty()) {
-			eventChangeMailer.notifyRemovedUsers(user, removedUsers, current, locale, timezone);
+		writeIcs(updateUserIcs);
+		
+		if (notification) {
+			
+			UserSettings settings = settingsService.getSettings(user);
+			TimeZone timezone = settings.timezone();
+			Locale locale = settings.locale();
+
+			final Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
+			final Set<Attendee> removedUsers = attendeeGroups.get(AttendeeStateValue.Old);
+			if (!removedUsers.isEmpty()) {
+				eventChangeMailer.notifyRemovedUsers(removedUsers, current, locale, timezone, removedUserIcs);
+			}
+
+			final Set<Attendee> addedUsers = attendeeGroups.get(AttendeeStateValue.New);
+			if (!addedUsers.isEmpty()) {
+				notifyCreate(user, addedUsers, current, addUserIcs);
+			}
+
+			final Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
+			if (!currentUsers.isEmpty()) {
+				final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(currentUsers);
+				notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
+				notifyNeedActionUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
+			}
 		}
-		
-		final Set<Attendee> addedUsers = attendeeGroups.get(AttendeeStateValue.New);
-		if (addedUsers != null && !addedUsers.isEmpty()) {
-			notifyCreate(user, addedUsers, current, locale, timezone);
-		}
-		
-		final Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
-		if (currentUsers != null && !currentUsers.isEmpty()) {
-			final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(currentUsers);
-			notifyAcceptedUpdateUsers(user, previous, current, locale, atts, timezone);
-			notifyNeedActionUpdateUsers(user, previous, current, locale, atts, timezone);
-		}
-		
 	}
 	
-	private void notifyAcceptedUpdateUsers(final ObmUser user, final Event previous, final Event current, 
-			final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone) {
+	private void notifyAcceptedUpdateUsers(Event previous, Event current, Locale locale, 
+			Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone, String ics) {
+		
 		final Set<Attendee> accepted = atts.get(ParticipationState.ACCEPTED);
 		if (accepted != null && !accepted.isEmpty()) {
-			eventChangeMailer.notifyAcceptedUpdateUsers(user, accepted, previous, current, locale, timezone);
+			eventChangeMailer.notifyAcceptedUpdateUsers(accepted, previous, current, locale, timezone, ics);
 		}	
 	}
 	
-	private void notifyNeedActionUpdateUsers(final ObmUser user, final Event previous, final Event current,
-			final Locale locale, final Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone) { 
+	private void notifyNeedActionUpdateUsers(Event previous, Event current,
+			Locale locale, Map<ParticipationState, ? extends Set<Attendee>> atts, 
+					TimeZone timezone, String ics) { 
+		
 		final Set<Attendee> notAccepted = atts.get(ParticipationState.NEEDSACTION);
 		if (notAccepted != null && !notAccepted.isEmpty()) {
-			eventChangeMailer.notifyNeedActionUpdateUsers(user, notAccepted, previous, current, locale, timezone);
+			eventChangeMailer.notifyNeedActionUpdateUsers(notAccepted, previous, current, locale, timezone, ics);
 		}
 	}
 
-	public void delete(final ObmUser user, final Event event) throws NotificationException {
- 		if (eventDeletionInvolveNotification(event)) {
+	public void delete(final ObmUser user, final Event event, boolean notification) throws NotificationException {
+		String removeUserIcs = ical4jHelper.buildIcsInvitationCancel(user, event);
+		writeIcs(removeUserIcs);
+		
+ 		if (notification && eventDeletionInvolveNotification(event)) {
  			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
  			Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
  			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
  			if (!notify.isEmpty()) {
  				UserSettings settings = settingsService.getSettings(user);
- 				eventChangeMailer.notifyRemovedUsers(user, notify, event, settings.locale(), settings.timezone());
+ 				eventChangeMailer.notifyRemovedUsers(notify, event, settings.locale(), settings.timezone(), removeUserIcs);
  			}
  		}
  	}
@@ -212,16 +248,25 @@ public class EventChangeHandler {
 		New, Current, Old;
 	}
 	
-	public void updateParticipationState(final Event event, final ObmUser calendarOwner, final ParticipationState state) {
-		if (isHandledParticipationState(state)) {
-			final Attendee organizer = event.findOrganizer();
-			if (organizer != null) {
-				if (updateParticipationStateNeedsNotification(calendarOwner, organizer)) {
-					UserSettings settings = settingsService.getSettings(calendarOwner);
-					eventChangeMailer.notifyUpdateParticipationState(event, organizer, calendarOwner, state, settings.locale(), settings.timezone());
+	public void updateParticipationState(final Event event, final ObmUser calendarOwner, 
+			final ParticipationState state, boolean notification) {
+		
+		String ics = ical4jHelper.buildIcsInvitationReply(event, calendarOwner);
+		writeIcs(ics);
+		
+		if (notification) {
+			if (isHandledParticipationState(state)) {
+				final Attendee organizer = event.findOrganizer();
+				if (organizer != null) {
+					if (updateParticipationStateNeedsNotification(calendarOwner, organizer)) {
+						UserSettings settings = settingsService.getSettings(calendarOwner);
+						eventChangeMailer.notifyUpdateParticipationState(event, 
+								organizer, calendarOwner, state, settings.locale(), 
+								settings.timezone(), ics);
+					}
+				} else {
+					logger.error("Can't find organizer, email won't send");
 				}
-			} else {
-				logger.error("Can't find organizer, email won't send");
 			}
 		}
 	}

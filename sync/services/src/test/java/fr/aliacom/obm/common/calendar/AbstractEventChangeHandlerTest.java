@@ -1,5 +1,7 @@
 package fr.aliacom.obm.common.calendar;
 
+import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
+import static fr.aliacom.obm.ToolBox.getDefaultProducer;
 import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.before;
@@ -15,61 +17,81 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 import org.obm.sync.server.mailer.EventChangeMailer;
 
+import com.linagora.obm.sync.Producer;
+
 import fr.aliacom.obm.common.setting.SettingsService;
+import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
+import fr.aliacom.obm.utils.Ical4jHelper;
 
 
 public abstract class AbstractEventChangeHandlerTest {
 
+	private static final String ICSDATA = "ics data";
+	
 	public AbstractEventChangeHandlerTest() {
 		super();
 	}
 
-
 	private EventChangeHandler newEventChangeHandler(EventChangeMailer mailer) {
 		UserService userService = EasyMock.createMock(UserService.class);
 		SettingsService defaultSettingsService = getDefaultSettingsService();
+		Producer producer = getDefaultProducer();
 		EasyMock.replay(userService, defaultSettingsService);
-		return new EventChangeHandler(mailer, defaultSettingsService, userService);
+		Ical4jHelper ical4jHelper = EasyMock.createMock(Ical4jHelper.class);
+		return new EventChangeHandler(mailer, defaultSettingsService, userService, producer, ical4jHelper);
 	}
 	
-	protected abstract void processEvent(EventChangeHandler eventChangeHandler, Event event) throws NotificationException;
+	protected abstract void processEvent(EventChangeHandler eventChangeHandler, Event event, ObmUser obmUser) throws NotificationException;
 	
-	public void testDefaultEvent() {
-		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
-		EasyMock.replay(mailer);
+	public void testDefaultEvent()  {
+	
 		Event event = new Event();
 		event.setDate(after());
+		ObmUser defaultObmUser = getDefaultObmUser();
+		
+		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
+		EasyMock.replay(mailer);
+		
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser);
 		EasyMock.verify(mailer);
 	}
 
 	public void testNoAttendee() {
-		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
-		EasyMock.replay(mailer);
 		Event event = new Event();
 		event.setDate(after());
 		event.setAttendees(new ArrayList<Attendee>());
+		ObmUser defaultObmUser = getDefaultObmUser();
+		
+		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
+		EasyMock.replay(mailer);
+		
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser);
 		EasyMock.verify(mailer);
 	}
 
 	public void testOnlyOwnerIsAttendee() {
-		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
-		EasyMock.replay(mailer);
+		ObmUser defaultObmUser = getDefaultObmUser();
 		Event event = new Event();
 		event.setDate(after());
 		String ownerEmail = "user@domain.net";
 		event.setOwnerEmail(ownerEmail);
 		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
+		
+		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
+		EasyMock.replay(mailer);
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser);
 		EasyMock.verify(mailer);
 	}
 
 	public void testEventInThePast() {
+		ObmUser defaultObmUser = getDefaultObmUser();
 		Event event = new Event();
 		event.setDate(before());
 		event.setOwnerEmail("user@test");
@@ -77,7 +99,8 @@ public abstract class AbstractEventChangeHandlerTest {
 		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
 		EasyMock.replay(mailer);
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser);
 		EasyMock.verify(mailer);
 	}
 	
@@ -91,14 +114,14 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
 		event.addAttendee(attendeeAccepted);
 
-		EventChangeMailer mailer = expectationAcceptedAttendees(attendeeAccepted);
-		
+		ObmUser obmUSer = getDefaultObmUser();
+		EventChangeMailer mailer = expectationAcceptedAttendees(attendeeAccepted, event, obmUSer);
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		processEvent(eventChangeHandler, event, obmUSer);
 		EasyMock.verify(mailer);
 	}
 	
-	protected abstract EventChangeMailer expectationAcceptedAttendees(Attendee attendeeAccepted);
+	protected abstract EventChangeMailer expectationAcceptedAttendees(Attendee attendeeAccepted, Event event, ObmUser obmUser);
 	
 	public void testNeedActionAttendee() {
 		Attendee attendeeNeedAction = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
@@ -110,14 +133,14 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
 		event.addAttendee(attendeeNeedAction);
 
-		EventChangeMailer mailer = expectationNeedActionAttendees(attendeeNeedAction);
-		
+		ObmUser defaultObmUser = getDefaultObmUser();
+		EventChangeMailer mailer = expectationNeedActionAttendees(attendeeNeedAction, ICSDATA, event, defaultObmUser);
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		processEvent(eventChangeHandler, event, defaultObmUser);
 		EasyMock.verify(mailer);
 	}
 	
-	protected abstract EventChangeMailer expectationNeedActionAttendees(Attendee attendeeNeedAction);
+	protected abstract EventChangeMailer expectationNeedActionAttendees(Attendee attendeeNeedAction, String icsData, Event event, ObmUser obmUser);
 	
 	public void testDeclinedAttendee() {
 		Attendee attendeeDeclined = createRequiredAttendee("attendee1@test", ParticipationState.DECLINED);
@@ -129,14 +152,16 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
 		event.addAttendee(attendeeDeclined);
 
-		EventChangeMailer mailer = expectationDeclinedAttendees(attendeeDeclined);
+		ObmUser defaultObmUser = getDefaultObmUser();
+		
+		EventChangeMailer mailer = expectationDeclinedAttendees(attendeeDeclined, event, defaultObmUser);
 		
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		processEvent(eventChangeHandler, event, defaultObmUser);
 		EasyMock.verify(mailer);
 	}
 	
-	protected abstract EventChangeMailer expectationDeclinedAttendees(Attendee attendeeDeclined);
+	protected abstract EventChangeMailer expectationDeclinedAttendees(Attendee attendeeDeclined, Event event, ObmUser obmUser);
 
 	public void testTwoAttendee() {
 		Attendee attendeeAccepted = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
@@ -151,14 +176,16 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.addAttendee(attendeeAccepted);
 		event.addAttendee(attendeeNotAccepted);
 		
-		EventChangeMailer mailer = expectationTwoAttendees(attendeeAccepted, attendeeNotAccepted);
-		
+		ObmUser defaultObmUser = getDefaultObmUser();
+		EventChangeMailer mailer = expectationTwoAttendees(attendeeAccepted, attendeeNotAccepted, event, defaultObmUser);
+	
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		processEvent(eventChangeHandler, event, defaultObmUser);
 		EasyMock.verify(mailer);
 	}
 
-	protected abstract EventChangeMailer expectationTwoAttendees(Attendee attendeeAccepted, Attendee attendeeNotAccepted);
+	protected abstract EventChangeMailer expectationTwoAttendees(Attendee attendeeAccepted, Attendee attendeeNotAccepted, Event event,
+			ObmUser obmUser);
 
 	public void testSameAttendeeTwice() {
 		Attendee attendeeOne = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
@@ -171,14 +198,15 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.addAttendee(attendeeOne);
 		event.addAttendee(attendeeOne);
 		
-		EventChangeMailer mailer = expectationSameAttendeeTwice(attendeeOne);
+		ObmUser defaultObmUser = getDefaultObmUser();
+		EventChangeMailer mailer = expectationSameAttendeeTwice(attendeeOne, event, defaultObmUser);
 		
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		processEvent(eventChangeHandler, event, defaultObmUser);
 		EasyMock.verify(mailer);
 	}
 
-	protected abstract EventChangeMailer expectationSameAttendeeTwice(Attendee attendee);
+	protected abstract EventChangeMailer expectationSameAttendeeTwice(Attendee attendee, Event event, ObmUser defaultObmUser);
 
 	private List<Attendee> createRequiredAttendees(String prefix, String suffix, ParticipationState state, int start, int number) {
 		ArrayList<Attendee> result = new ArrayList<Attendee>();
@@ -200,13 +228,14 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.addAttendees(needActionAttendees);
 		event.addAttendees(accpetedAttendees);
 		
-		EventChangeMailer mailer = expectationManyAttendee(needActionAttendees, accpetedAttendees);
+		ObmUser defaultObmUser = getDefaultObmUser();
+		EventChangeMailer mailer = expectationManyAttendee(needActionAttendees, accpetedAttendees, event, defaultObmUser);
 		
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event);
+		processEvent(eventChangeHandler, event, defaultObmUser);
 		EasyMock.verify(mailer);
 	}
 
-	protected abstract EventChangeMailer expectationManyAttendee(List<Attendee> needActionAttendees, List<Attendee> accpetedAttendees);
+	protected abstract EventChangeMailer expectationManyAttendee(List<Attendee> needActionAttendees, List<Attendee> accpetedAttendees, Event event, ObmUser defaultObmUser);
 	
 }

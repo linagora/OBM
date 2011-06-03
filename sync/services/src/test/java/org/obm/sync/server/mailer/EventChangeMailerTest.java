@@ -1,7 +1,5 @@
 package org.obm.sync.server.mailer;
 
-import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -41,9 +39,11 @@ import org.obm.sync.server.template.ITemplateLoader;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools;
 import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.utils.Ical4jHelper;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -170,7 +170,8 @@ public class EventChangeMailerTest {
 			MailService mailService = defineMailServiceExpectations(expectedRecipients, capturedMessage);
 			EventChangeMailer eventChangeMailer = new EventChangeMailer(mailService, constantService, getStubTemplateLoader());
 			
-			executeProcess(eventChangeMailer);
+			Ical4jHelper ical4jHelper = new Ical4jHelper();
+			executeProcess(eventChangeMailer, ical4jHelper);
 
 			EasyMock.verify(mailService, constantService);
 			return  capturedMessage.getValue();
@@ -267,7 +268,7 @@ public class EventChangeMailerTest {
 		protected abstract String[] getExpectedPlainStrings();
 
 
-		protected abstract void executeProcess(EventChangeMailer eventChangeMailer);
+		protected abstract void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper);
 	}
 
 	public static class NeedActionCreation extends Common {
@@ -280,9 +281,10 @@ public class EventChangeMailerTest {
 		}
 		
 		@Override
-		protected void executeProcess(EventChangeMailer eventChangeMailer) {
+		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyNeedActionNewUsers(getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
+			String ics  = ical4jHelper.buildIcsInvitationRequest(ToolBox.getDefaultObmUser(), event);
+			eventChangeMailer.notifyNeedActionNewUsers(event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics);
 		}
 		
 		@Test
@@ -363,7 +365,7 @@ public class EventChangeMailerTest {
 	public static class AcceptedCreation extends Common {
 
 		@Override
-		protected void executeProcess(EventChangeMailer eventChangeMailer) {
+		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
 			eventChangeMailer.notifyAcceptedNewUsers(event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
 		}
@@ -437,15 +439,15 @@ public class EventChangeMailerTest {
 		}
 		
 		@Override
-		protected void executeProcess(EventChangeMailer eventChangeMailer) {
+		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event before = buildTestEvent();
 			Event after = before.clone();
 			after.setDate(date(2010, 10, 8, 12, 00));
 			after.setDuration(3600);
-			for(Attendee att : before.getAttendees()){
+			for (Attendee att: before.getAttendees()) {
 				att.setState(ParticipationState.ACCEPTED);
 			}
-			eventChangeMailer.notifyAcceptedUpdateUsers(getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE);
+			eventChangeMailer.notifyAcceptedUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "");
 		}
 		
 		@Override
@@ -517,16 +519,17 @@ public class EventChangeMailerTest {
 		}
 		
 		@Override
-		protected void executeProcess(EventChangeMailer eventChangeMailer) {
+		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event before = buildTestEvent();
 			Event after = before.clone();
 			after.setDate(date(2010, 10, 8, 12, 00));
 			after.setDuration(3600);
-			for(Attendee att : before.getAttendees()){
+			for (Attendee att : before.getAttendees()) {
 				att.setState(ParticipationState.NEEDSACTION);
 			}
 			after.setSequence(4);
-			eventChangeMailer.notifyNeedActionUpdateUsers(getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getDefaultObmUser(), after);			
+			eventChangeMailer.notifyNeedActionUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics);
 		}
 		
 		@Override
@@ -622,9 +625,10 @@ public class EventChangeMailerTest {
 		}
 		
 		@Override
-		protected void executeProcess(EventChangeMailer eventChangeMailer) {
+		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyRemovedUsers(getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getDefaultObmUser(), event);
+			eventChangeMailer.notifyRemovedUsers(event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics);
 		}
 		
 		@Override

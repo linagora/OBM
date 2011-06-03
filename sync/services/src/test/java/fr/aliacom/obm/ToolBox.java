@@ -5,6 +5,8 @@ import java.util.TimeZone;
 
 import org.easymock.EasyMock;
 
+import com.linagora.obm.sync.Producer;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -40,6 +42,10 @@ public class ToolBox {
 		EasyMock.expectLastCall().andReturn(defaultSettings).anyTimes();
 		EasyMock.replay(defaultSettings);
 		return service;
+	}
+	
+	public static Producer getDefaultProducer() {
+		return EasyMock.createMock(Producer.class);
 	}
 	
 }

@@ -19,6 +19,8 @@ package fr.aliacom.obm.utils;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.data.UnfoldingReader;
 import net.fortuna.ical4j.model.Calendar;
@@ -116,10 +119,82 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class Ical4jHelper {
 
+	private static final int MAX_FOLD_LENGTH = 74; 
 	private static final int SECONDS_IN_DAY = 43200000;
 	private static final String XOBMDOMAIN = "X-OBM-DOMAIN";
 	private static Log logger = LogFactory.getLog(Ical4jHelper.class);
+	
+	public String buildIcsInvitationRequest(ObmUser user, Event event) {
+		Calendar calendar = initCalendar();
+		VEvent vEvent = buildIcsInvitationVEvent(user, event);
+		calendar.getComponents().add(vEvent);
+		if (event.getRecurrence() != null) {
+			for (Event ee : event.getRecurrence().getEventExceptions()) {
+				VEvent eventExt = buildIcsInvitationVEvent(null, ee);
+				appendUidToICS(eventExt.getProperties(), ee, event.getExtId());
+				calendar.getComponents().add(eventExt);
+			}
+		}
+		calendar.getProperties().add(Method.REQUEST);
+		return foldingWriterToString(calendar);
+	}
+	
+	private String foldingWriterToString(final Calendar calendar) {
+		Writer writer =  new StringWriter();
+		CalendarOutputter calendarOutputter = new CalendarOutputter(true, MAX_FOLD_LENGTH);
+		try {
+			calendarOutputter.output(calendar, writer);
+			return writer.toString(); 
+		} catch (IOException e) {
+			logger.error(e);
+		} catch (ValidationException e) {
+			logger.error(e);
+		}
+		return null;
+	}
 
+	public String buildIcsInvitationReply(final Event event, final ObmUser obmUserReply) {
+		final Attendee replyAttendee = findAttendeeFromObmUserReply(event.getAttendees(), obmUserReply);
+		final Calendar calendar = buildVEvent(null, event, replyAttendee);		
+		calendar.getProperties().add(Method.REPLY);
+		return foldingWriterToString(calendar);
+	}
+	
+	public String buildIcsInvitationCancel(ObmUser user, Event event) {
+		Calendar calendar = buildVEvent(user, event, null);
+		calendar.getProperties().add(Method.CANCEL);
+		return foldingWriterToString(calendar);
+	}
+	
+	private VEvent buildIcsInvitationVEvent(ObmUser user, Event event) {
+		VEvent vEvent = new VEvent();
+		PropertyList prop = vEvent.getProperties();
+		appendUidToICS(prop, event, null);
+		appendCreated(prop, event);
+		appendLastModified(prop, event);
+		appendSequence(prop, event);
+		appendAttendeesToICS(prop, event.getAttendees());
+		appendCategoryToICS(prop, event);
+		appendDtStartToICS(prop, event);
+		appendDurationToIcs(prop, event);
+		appendDescriptionToICS(prop, event);
+		appendLocationToICS(prop, event);
+		appendTranspToICS(prop, event);
+		appendOrganizerToICS(prop, event);
+		appendPriorityToICS(prop, event);
+		appendPrivacyToICS(prop, event);
+		appendSummaryToICS(prop, event);
+		appendRRuleToICS(prop, event);
+		appendExDateToICS(prop, event);
+		appendVAlarmToICS(vEvent.getAlarms(), event);
+		appendRecurenceIdToICS(prop, event);
+		appendXMozLastAck(prop);
+		if(user != null){
+			appendXObmDomain(user.getDomain(), prop);
+		}
+		return vEvent;
+	}
+	
 	public static FreeBusyRequest parseICSFreeBusy(String ics) 
 		throws IOException, ParserException {
 		CalendarBuilder builder = new CalendarBuilder();
@@ -441,7 +516,7 @@ public class Ical4jHelper {
 
 	public static String parseEvents(ObmUser user, List<Event> listEvent) {
 
-		Calendar calendar = initCalandar();
+		Calendar calendar = initCalendar();
 
 		for (Event event : listEvent) {
 			VEvent vEvent = getVEvent(user, event, null);
@@ -463,7 +538,7 @@ public class Ical4jHelper {
 	}
 
 	private static Calendar buildVTodo(Event event, ObmUser user) {
-		Calendar calendar = initCalandar();
+		Calendar calendar = initCalendar();
 		VToDo vTodo = getVToDo(event, user);
 		calendar.getComponents().add(vTodo);
 		if (event.getRecurrence() != null) {
@@ -476,7 +551,7 @@ public class Ical4jHelper {
 	}
 
 	private static Calendar buildVEvent(ObmUser user, Event event, Attendee replyAttendee) {
-		Calendar calendar = initCalandar();
+		Calendar calendar = initCalendar();
 		VEvent vEvent = getVEvent(user, event, replyAttendee);
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
@@ -488,56 +563,9 @@ public class Ical4jHelper {
 		return calendar;
 	}
 
-	private static VEvent buildIcsInvitationVEvent(ObmUser user, Event event) {
-		VEvent vEvent = new VEvent();
-		PropertyList prop = vEvent.getProperties();
-		appendUidToICS(prop, event, null);
-		appendCreated(prop, event);
-		appendLastModified(prop, event);
-		appendSequence(prop, event);
-		appendAttendeesToICS(prop, event.getAttendees());
-		appendCategoryToICS(prop, event);
-		appendDtStartToICS(prop, event);
-		appendDurationToIcs(prop, event);
-		appendDescriptionToICS(prop, event);
-		appendLocationToICS(prop, event);
-		appendTranspToICS(prop, event);
-		appendOrganizerToICS(prop, event);
-		appendPriorityToICS(prop, event);
-		appendPrivacyToICS(prop, event);
-		appendSummaryToICS(prop, event);
-		appendRRuleToICS(prop, event);
-		appendExDateToICS(prop, event);
-		appendVAlarmToICS(vEvent.getAlarms(), event);
-		appendRecurenceIdToICS(prop, event);
-		appendXMozLastAck(prop);
-		if(user != null){
-			appendXObmDomain(user.getDomain(), prop);
-		}
-		return vEvent;
-	}
 	
-	public static String buildIcsInvitationRequest(ObmUser user, Event event) {
-		Calendar calendar = initCalandar();
-		VEvent vEvent = buildIcsInvitationVEvent(user, event);
-		calendar.getComponents().add(vEvent);
-		if (event.getRecurrence() != null) {
-			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = buildIcsInvitationVEvent(null, ee);
-				appendUidToICS(eventExt.getProperties(), ee, event.getExtId());
-				calendar.getComponents().add(eventExt);
-			}
-		}
-		calendar.getProperties().add(Method.REQUEST);
-		return calendar.toString();
-	}
 	
-	public static String buildIcsInvitationReply(final Event event, final ObmUser obmUserReply) {
-		final Attendee replyAttendee = findAttendeeFromObmUserReply(event.getAttendees(), obmUserReply);
-		final Calendar calendar = buildVEvent(null, event, replyAttendee);		
-		calendar.getProperties().add(Method.REPLY);
-		return calendar.toString();
-	}
+	
 	
 	private static Attendee findAttendeeFromObmUserReply(final List<Attendee> attendees, final ObmUser obmUser) {
 		for (final Attendee attendee: attendees) {
@@ -552,11 +580,7 @@ public class Ical4jHelper {
 		prop.add(new Duration(new Dur(event.getDate(), event.getEndDate())));
 	}
 
-	public static String buildIcsInvitationCancel(ObmUser user, Event event) {
-		Calendar calendar = buildVEvent(user, event, null);
-		calendar.getProperties().add(Method.CANCEL);
-		return calendar.toString();
-	}
+	
 	
 	public static VEvent getVEvent(ObmUser user, Event event, Attendee replyAttendee) {
 		return getVEvent(user, event, null, null, replyAttendee);
@@ -1230,7 +1254,7 @@ public class Ical4jHelper {
 		return ret;
 	}
 
-	public static Calendar initCalandar() {
+	public static Calendar initCalendar() {
 		Calendar calendar = new Calendar();
 
 		calendar.getProperties().add(
@@ -1534,7 +1558,7 @@ public class Ical4jHelper {
 	}
 
 	public static String parseFreeBusy(FreeBusy fb) {
-		Calendar calendar = initCalandar();
+		Calendar calendar = initCalendar();
 		calendar.getProperties().add(Method.REPLY);
 		VFreeBusy vFreeBusy = getVFreeBusy(fb, fb.getAtt(),	fb.getFreeBusyIntervals());
 		calendar.getComponents().add(vFreeBusy);

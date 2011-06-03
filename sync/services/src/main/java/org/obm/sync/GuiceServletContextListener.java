@@ -38,14 +38,19 @@ public class GuiceServletContextListener implements ServletContextListener {
     	
         final ServletContext servletContext = servletContextEvent.getServletContext(); 
 
-        Injector injector = createInjector(); 
-        if (injector == null) { 
-                failStartup("Could not create injector: createInjector() returned null"); 
+        
+        try {
+        	Injector injector = createInjector();
+        	if (injector == null) { 
+        		failStartup("Could not create injector: createInjector() returned null"); 
+        	} 
+        	servletContext.setAttribute(ATTRIBUTE_NAME, injector);
+        } catch (Exception e) {
+        	failStartup(e.getMessage());
         } 
-        servletContext.setAttribute(ATTRIBUTE_NAME, injector); 
     } 
     
-    private Injector createInjector() {
+    private Injector createInjector() throws Exception {
     	return Guice.createInjector(new AbstractModule() {
 			@Override
 			protected void configure() {
@@ -57,12 +62,13 @@ public class GuiceServletContextListener implements ServletContextListener {
     			bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
     			
     			bind(UserTransaction.class).toProvider(TransactionProvider.class);
+    			
     			TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
 				bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), 
 						transactionalInterceptor);
 				requestInjection(transactionalInterceptor);
 			}
-    	});
+    	}, new MessageQueueModule());
     }
     
     private void failStartup(String message) { 

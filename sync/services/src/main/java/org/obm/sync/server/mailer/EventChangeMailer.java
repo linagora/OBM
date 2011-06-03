@@ -28,7 +28,6 @@ import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventMail;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ConstantService;
-import fr.aliacom.obm.utils.Ical4jHelper;
 import freemarker.template.SimpleDate;
 import freemarker.template.Template;
 import freemarker.template.TemplateDateModel;
@@ -44,7 +43,9 @@ public class EventChangeMailer extends AbstractMailer {
 		this.baseUrl = constantService.getObmUIBaseUrl();
 	}
 	
-	public void notifyNeedActionNewUsers(ObmUser user, Collection<Attendee> attendee, Event event, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void notifyNeedActionNewUsers(Collection<Attendee> attendee, Event event, 
+			Locale locale, TimeZone timezone, String ics) throws NotificationException {
+		
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -53,7 +54,7 @@ public class EventChangeMailer extends AbstractMailer {
 						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale), 
 						inviteNewUserBodyTxt(event, locale, timezone),
 						inviteNewUserBodyHtml(event, locale, timezone),
-						newUserIcs(user, event), "REQUEST");
+						ics, "REQUEST");
 			sendNotificationMessageToAttendee(attendee, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -83,7 +84,9 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 
-	public void notifyRemovedUsers(ObmUser user, Collection<Attendee> attendees, Event event, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void notifyRemovedUsers(Collection<Attendee> attendees, Event event, 
+			Locale locale, final TimeZone timezone, String ics) throws NotificationException {
+		
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -92,7 +95,7 @@ public class EventChangeMailer extends AbstractMailer {
 						removedUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale), 
 						removedUserBodyTxt(event, locale, timezone),
 						removedUserBodyHtml(event, locale, timezone), 
-						removedUserIcs(user, event), "CANCEL");
+						ics, "CANCEL");
 			sendNotificationMessageToAttendee(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -103,7 +106,9 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 
-	public void notifyNeedActionUpdateUsers(ObmUser user, Collection<Attendee> attendees, Event previous, Event current, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void notifyNeedActionUpdateUsers(Collection<Attendee> attendees, 
+			Event previous, Event current, Locale locale,
+			TimeZone timezone, String ics) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -112,7 +117,7 @@ public class EventChangeMailer extends AbstractMailer {
 						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
 						inviteUpdateUserBodyTxt(previous, current, locale, timezone),
 						inviteUpdateUserBodyHtml(previous, current, locale, timezone), 
-						updateUserIcs(user, current), "REQUEST");
+						ics, "REQUEST");
 			sendNotificationMessageToAttendee(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -123,7 +128,9 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	public void notifyAcceptedUpdateUsers(ObmUser user, Collection<Attendee> attendees, Event previous, Event current, Locale locale, final TimeZone timezone) throws NotificationException {
+	public void notifyAcceptedUpdateUsers(Collection<Attendee> attendees, 
+			Event previous, Event current, Locale locale, 
+			TimeZone timezone, String ics) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -132,7 +139,7 @@ public class EventChangeMailer extends AbstractMailer {
 						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
 						notifyUpdateUserBodyTxt(previous, current, locale, timezone),
 						notifyUpdateUserBodyHtml(previous, current, locale, timezone), 
-						updateUserIcs(user, current), "REQUEST");
+						ics, "REQUEST");
 			sendNotificationMessageToAttendee(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -143,18 +150,18 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	public void notifyUpdateParticipationState(final Event event, final Attendee organizer, final ObmUser attendeeUpdated, 
-			final ParticipationState newState, final Locale locale, final TimeZone timezone) {
+	public void notifyUpdateParticipationState(final Event event, final Attendee organizer, final ObmUser obmUser, 
+			final ParticipationState newState, final Locale locale, final TimeZone timezone, String ics) {
 	
 		try {
 			final EventMail mail = 
 				new EventMail(
-						extractSenderAddress(attendeeUpdated),
+						extractSenderAddress(obmUser),
 						event.getAttendees(), 
 						updateParticipationStateTitle(event.getTitle(), locale), 
-						updateParticipationStateBodyTxt(event, attendeeUpdated, newState, locale, timezone),
-						updateParticipationStateBodyHtml(event, attendeeUpdated, newState, locale, timezone),
-						createReplyIcs(event, attendeeUpdated), "REPLY"
+						updateParticipationStateBodyTxt(event, obmUser, newState, locale, timezone),
+						updateParticipationStateBodyHtml(event, obmUser, newState, locale, timezone),
+						ics, "REPLY"
 						);
 			sendNotificationMessageToOrganizer(organizer, mail);
 			
@@ -342,28 +349,12 @@ public class EventChangeMailer extends AbstractMailer {
 		return datamodel;
 	}
 	
-	private String newUserIcs(ObmUser user, Event event) {
-		return Ical4jHelper.buildIcsInvitationRequest(user, event);
-	}
-
-	private String removedUserIcs(ObmUser user, Event event) {
-		return Ical4jHelper.buildIcsInvitationCancel(user, event);
-	}
-
 	private String removedUserTitle(String owner, String title, Locale locale) {
 		return new Messages(locale).canceledEventTitle(owner, title);
 	}
 
 	private String updateUserTitle(String owner, String title, Locale locale) {
 		return new Messages(locale).updatedEventTitle(owner, title);
-	}
-
-	private String updateUserIcs(ObmUser user, Event current) {
-		return Ical4jHelper.buildIcsInvitationRequest(user, current);
-	}
-
-	private String createReplyIcs(final Event event, final ObmUser attendeeUpdated) {
-		return Ical4jHelper.buildIcsInvitationReply(event, attendeeUpdated);
 	}
 
 	/* package */ void setMailService(MailService mailService) {
