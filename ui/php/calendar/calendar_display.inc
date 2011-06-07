@@ -3420,11 +3420,11 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
   
   if (!$event->isPrivate()) {
 
-    $title = $event->getSummary();
-    $location = $event->getLocation();
+    $title = htmlspecialchars($event->getSummary());
+    $location = htmlspecialchars($event->getLocation());
   //FIXME  $cats1 = of_category_get_entitycategories('event', 'category1', $id, 'mono');
-    $description = nl2br(preg_replace('@(https?://([-\w\.]+)+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?)@', '<a href="$1">$1</a>', $event->getDescription()));
-    $owner = $event->getOrganizer()->cn;
+    $description = nl2br(preg_replace('@(https?://([-\w\.]+)+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?)@', '<a href="$1">$1</a>', htmlspecialchars($event->getDescription())));
+    $owner = htmlspecialchars($event->getOrganizer()->cn);
     $owner_lastname = $owner;
     $priority = $event->getPriority(); 
 
@@ -3549,8 +3549,8 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
 
   if (!$event->isPrivate()) {
 	foreach ($attendees as $attendee) {
-        $label = $attendee->cn ? $attendee->cn : str_replace('MAILTO:', '', $attendee->uri);
-        $state = $attendee->partstat;
+        $label = $attendee->cn ? htmlspecialchars($attendee->cn) : str_replace('MAILTO:', '', $attendee->uri);
+        $state = htmlspecialchars($attendee->partstat);
         $ACCEPTED = 'class="disabled"';
         ${'NEEDS-ACTION'} = 'class="disabled"';
         $DECLINED = 'class="disabled"';
