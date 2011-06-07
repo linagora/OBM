@@ -16,7 +16,8 @@ class Vcalendar_Reader_OBM {
 
   var $eventSets = array();
   
-  function Vcalendar_Reader_OBM($entities, $ids = array(), $startTime = NULL, $endTime = NULL) {
+  // 'status' enables filtering of event upon user participation
+  function Vcalendar_Reader_OBM($entities, $ids = array(), $startTime = NULL, $endTime = NULL, $status = NULL) {
     $this->db = new DB_OBM;
     $this->entities = $entities;
     if(!empty($ids)) {
@@ -25,15 +26,15 @@ class Vcalendar_Reader_OBM {
       $ids = array();
     }
     if(!is_null($startTime) && !is_null($endTime)) {
-      $ids = array_merge($ids,$this->readPeriod($startTime,$endTime));
+      $ids = array_merge($ids,$this->readPeriod($startTime,$endTime, $status));
     }
     $this->alerts = $this->readEventsAlerts($ids);
     $this->valarms = $this->readEventsVAlarms($ids);
   }
 
-  function readPeriod($startTime, $endTime) {
-    $noRepeatEvent = run_query_calendar_no_repeat_events($startTime,$endTime,$this->entities,NULL);
-    $repeatEvent = run_query_calendar_repeat_events($startTime,$endTime,$this->entities,NULL,'',null,null,true);
+  function readPeriod($startTime, $endTime, $status=NULL) {
+    $noRepeatEvent = run_query_calendar_no_repeat_events($startTime,$endTime,$this->entities,$status);
+    $repeatEvent = run_query_calendar_repeat_events($startTime,$endTime,$this->entities,$status,'',null,null,true);
     $ids = array();
     while($noRepeatEvent->next_record()) {
       $ids[] = $noRepeatEvent->f('event_id');
