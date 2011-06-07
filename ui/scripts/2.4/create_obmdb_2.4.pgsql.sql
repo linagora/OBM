@@ -4733,7 +4733,7 @@ ALTER TABLE ONLY category
 --
 
 ALTER TABLE ONLY category
-    ADD CONSTRAINT categorycategory_categorycode_uniquekey UNIQUE (category_category,category_code,category_label);
+    ADD CONSTRAINT categorycategory_categorycode_uniquekey UNIQUE (category_domain_id,category_category,category_code,category_label);
 
 --
 -- Name: categorylink_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 

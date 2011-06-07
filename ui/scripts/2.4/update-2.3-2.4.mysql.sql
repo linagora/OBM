@@ -267,7 +267,7 @@ ALTER TABLE RGroup ADD COLUMN rgroup_delegation varchar(256) default '';
 -- add unicity constraint
 --
 ALTER TABLE `Category` MODIFY COLUMN `category_code` varchar(100) NOT NULL default '';
-ALTER TABLE `Category` ADD CONSTRAINT UNIQUE `categorycategory_categorycode_uniquekey` (`category_category`,`category_code`,`category_label`);
+ALTER TABLE `Category` ADD CONSTRAINT UNIQUE `categorycategory_categorycode_uniquekey` (`category_domain_id`,`category_category`,`category_code`,`category_label`);
 
 --
 -- possibility to save special informations into an event template :
