@@ -146,13 +146,13 @@ class Backup {
     display_debug_msg($query, $GLOBALS['cdg_sql'], 'Backup::userDetails()');
     $obm_q->query($query);
 
+    if (!$obm_q->next_record()) {
+      throw new Exception($GLOBALS['l_err_reference']);
+    }
+
     $host = $obm_q->f('host') ;
     if (empty($host)) {
       throw new Exception($GLOBALS['l_err_host']) ;
-    }
-
-    if (!$obm_q->next_record()) {
-      throw new Exception($GLOBALS['l_err_reference']);
     }
 
 // Comment for doing a backup user even if mailbox is disable
