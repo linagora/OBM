@@ -130,12 +130,13 @@ class Backup {
     $multidomain = sql_multidomain('userobm');
     $id = sql_parse_id($user_id, true);	
 
+// Comment for doing a backup user even if mailbox is disable
+//  userobm_mail_perms as mail_enabled,
     $query = "SELECT
         userobm_id as id,
         userobm_login as login,
         'user' as entity,
         domain_name as realm,
-        userobm_mail_perms as mail_enabled,
         ms.host_ip as host
       FROM UserObm
       LEFT JOIN Domain on userobm_domain_id=domain_id
@@ -145,14 +146,20 @@ class Backup {
     display_debug_msg($query, $GLOBALS['cdg_sql'], 'Backup::userDetails()');
     $obm_q->query($query);
 
+    $host = $obm_q->f('host') ;
+    if (empty($host)) {
+      throw new Exception($GLOBALS['l_err_host']) ;
+    }
+
     if (!$obm_q->next_record()) {
       throw new Exception($GLOBALS['l_err_reference']);
     }
 
-    $mail_enabled = $obm_q->f('mail_enabled');
-    if (empty($mail_enabled)) {
-      throw new Exception($GLOBALS['l_err_backup_no_mail']);
-    }
+// Comment for doing a backup user even if mailbox is disable
+//    $mail_enabled = $obm_q->f('mail_enabled');
+//    if (empty($mail_enabled)) {
+//      throw new Exception($GLOBALS['l_err_backup_no_mail']);
+//    }
 
     $this->details = $obm_q->Record;
   }

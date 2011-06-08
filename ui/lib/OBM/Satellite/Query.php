@@ -71,10 +71,10 @@ abstract class OBM_Satellite_Query {
   public function execute() {
     $body = curl_exec($this->request);
     $code = curl_getinfo($this->request, CURLINFO_HTTP_CODE);
-    curl_close($this->request);
     if ($body===FALSE)
-      throw new Exception('Unexpected response');
+      throw new Exception(curl_error($this->request));
 
+    curl_close($this->request);
     if (($code >= 200) && ($code < 300)) {
       return $this->parseResponse($body);
     }
