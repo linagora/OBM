@@ -284,6 +284,14 @@ public class AddressBookBindingImpl implements IAddressBook {
 		throws SQLException, FindException {
 
 		Contact previous = contactDao.findContact(token, c.getUid());
+		
+		if (!contactDao.hasRightsOn(token, c.getUid())) {
+			logger.warn("contact " + c.getLastname() + " " + c.getFirstname()
+					+ "(" + c.getUid() + ") not modified. not allowed for "
+					+ token.getEmail());
+			return previous;
+		}
+		
 		if (previous != null) {
 			contactMerger.merge(previous, c);
 			return contactDao.modifyContact(token, c);

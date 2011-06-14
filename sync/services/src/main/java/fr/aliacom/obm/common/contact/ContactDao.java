@@ -691,13 +691,6 @@ public class ContactDao {
 
 	public Contact modifyContact(AccessToken token, Contact c) throws SQLException, FindException {
 
-		if (!hasRightsOn(token, c.getUid())) {
-			logger.warn("contact " + c.getLastname() + " " + c.getFirstname()
-					+ "(" + c.getUid() + ") not modified. not allowed for "
-					+ token.getEmail());
-			return c;
-		}
-
 		String q = "update Contact SET "
 			+ "contact_commonname=?, contact_firstname=?, "
 			+ "contact_lastname=?, contact_origin=?, contact_userupdate=?, "
@@ -769,7 +762,7 @@ public class ContactDao {
 		return c;
 	}
 
-	private boolean hasRightsOn(AccessToken token, int contactUid) {
+	public boolean hasRightsOn(AccessToken token, int contactUid) {
 
 		String q = "select contact_usercreate="
 			+ token.getObmId()

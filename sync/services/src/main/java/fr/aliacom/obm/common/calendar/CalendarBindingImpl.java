@@ -255,7 +255,7 @@ public class CalendarBindingImpl implements ICalendar {
 						+ token.getUser() + " cannot modify event["
 						+ before.getTitle() + "] because not owner"
 						+ " or no write right on owner " + before.getOwner()+". ParticipationState will be updated.");
-				return event;
+				return before;
 				
 			} else {
 				
