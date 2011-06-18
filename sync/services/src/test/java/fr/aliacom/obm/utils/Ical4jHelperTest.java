@@ -91,6 +91,10 @@ public class Ical4jHelperTest {
 			return (item.length() < length);
 		}
 	}
+	
+	private Ical4jHelper getIcal4jHelper(){
+		return new Ical4jHelper();
+	}
 
 	private Calendar getCalendar() {
 		return new GregorianCalendar(TimeZone.getTimeZone("GMT"));
@@ -133,7 +137,7 @@ public class Ical4jHelperTest {
 		List<Event> l = new LinkedList<Event>();
 		l.add(event1);
 		l.add(event2);
-		String ics = Ical4jHelper.parseEvents(getDefaultObmUser(), l);
+		String ics = getIcal4jHelper().parseEvents(getDefaultObmUser(), l);
 		assertNotNull(ics);
 		assertNotSame("", ics);
 	}
@@ -159,7 +163,7 @@ public class Ical4jHelperTest {
 		er.setEnd(null);
 		event1.setRecurrence(er);
 
-		Recur recur = Ical4jHelper.getRecur(event1.getRecurrence(),
+		Recur recur = getIcal4jHelper().getRecur(event1.getRecurrence(),
 				event1.getDate());
 		assertTrue(recur.getDayList().contains(WeekDay.MO));
 		assertTrue(recur.getDayList().contains(WeekDay.TU));
@@ -180,12 +184,12 @@ public class Ical4jHelperTest {
 	public void testGetListDay() {
 		EventRecurrence er = new EventRecurrence();
 		er.setDays("1010101");
-		Set<WeekDay> swd = Ical4jHelper.getListDay(er);
+		Set<WeekDay> swd = getIcal4jHelper().getListDay(er);
 		assertTrue(swd.contains(WeekDay.SU));
 		assertTrue(swd.contains(WeekDay.TU));
 		assertTrue(swd.contains(WeekDay.TH));
 		assertTrue(swd.contains(WeekDay.SA));
-		Ical4jHelper.getListDay(er);
+		getIcal4jHelper().getListDay(er);
 	}
 
 	@Ignore
@@ -207,7 +211,7 @@ public class Ical4jHelperTest {
 		vEvent.getProperties().add(dtEnd);
 		AccessToken token = new AccessToken(0, 0, null);
 		token.setEmail("adrien@zz.com");
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertTrue(event.isAllday());
 
 		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) - 1);
@@ -217,7 +221,7 @@ public class Ical4jHelperTest {
 		vEvent = new VEvent();
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
-		Event event1 = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event1 = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(event1.isAllday());
 	}
 
@@ -238,7 +242,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(172800, event.getDuration());
 
 	}
@@ -247,12 +251,12 @@ public class Ical4jHelperTest {
 	public void testGetPrivacy() {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.PUBLIC);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(0, event.getPrivacy());
 
 		vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.PRIVATE);
-		Event event1 = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event1 = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(1, event1.getPrivacy());
 	}
 
@@ -263,7 +267,7 @@ public class Ical4jHelperTest {
 		orga.setValue("mailto:" + "adrien@zz.com");
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals("Adrien Poupard", event.getOwner());
 	}
 
@@ -273,7 +277,7 @@ public class Ical4jHelperTest {
 		orga.setValue("mailto:" + "adrien@zz.com");
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals("adrien@zz.com", event.getOwner());
 	}
 
@@ -287,7 +291,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(new Integer(-1), event.getAlert());
 	}
 	
@@ -300,7 +304,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(
 				new Integer(-1).equals(event.getAlert())
 		);
@@ -316,7 +320,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(new Integer(-1), event.getAlert());
 	}
 	
@@ -331,7 +335,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(
 				new Integer(-1).equals(event.getAlert())
 		);
@@ -342,10 +346,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("getRecurence.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		EventRecurrence er = event.getRecurrence();
 		assertNotNull(er);
 		assertEquals(1, er.getFrequence());
@@ -360,10 +364,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("attendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(3, event.getAttendees().size());
 	}
 
@@ -374,10 +378,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("organizerInAttendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		Attendee organizer = null;
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
@@ -395,10 +399,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("organizerNotInAttendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		Attendee organizer = null;
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
@@ -415,10 +419,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("eventInternal.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertTrue(event.isInternalEvent());
 
 	}
@@ -428,10 +432,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("eventComplet.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(1244470973000L, event.getTimeCreate().getTime());
 	}
 
@@ -440,10 +444,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("eventComplet.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertEquals(1244470995000L, event.getTimeUpdate().getTime());
 
 	}
@@ -453,10 +457,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("eventNewComplet.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertNull(event.getTimeUpdate());
 
 	}
@@ -466,10 +470,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("eventExternalObm.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(event.isInternalEvent());
 
 	}
@@ -479,10 +483,10 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("eventExternal.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = Ical4jHelper.getComponents(calendar,
+		ComponentList vEvents = getIcal4jHelper().getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = Ical4jHelper.getEvent(getDefaultObmUser(), vEvent);
+		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertFalse(event.isInternalEvent());
 
 	}
@@ -507,7 +511,7 @@ public class Ical4jHelperTest {
 		er.setExceptions(except);
 		event.setRecurrence(er);
 
-		Set<Property> ret = Ical4jHelper.getExDate(event);
+		Set<Property> ret = getIcal4jHelper().getExDate(event);
 		assertEquals(2, ret.size());
 
 	}
@@ -516,7 +520,7 @@ public class Ical4jHelperTest {
 	public void testGetVAlarm() {
 		final Event event = new Event();
 		event.setAlert(30);
-		final VAlarm valarm = Ical4jHelper.getVAlarm(event.getAlert());
+		final VAlarm valarm = getIcal4jHelper().getVAlarm(event.getAlert());
 		assertEquals(30, valarm.getTrigger().getDuration().getSeconds());
 	}
 
@@ -529,7 +533,7 @@ public class Ical4jHelperTest {
 		startDate.setValue("19980118T230000");
 		endDate.setValue("19980118T230000");
 		
-		Ical4jHelper.appendAllDay(event, startDate, endDate);
+		getIcal4jHelper().appendAllDay(event, startDate, endDate);
 		assertFalse(event.isAllday());
 	}
 	
@@ -542,7 +546,7 @@ public class Ical4jHelperTest {
 		startDate.setDate(new net.fortuna.ical4j.model.Date());
 		endDate.setDate(new net.fortuna.ical4j.model.Date());
 		
-		Ical4jHelper.appendAllDay(event, startDate, endDate);
+		getIcal4jHelper().appendAllDay(event, startDate, endDate);
 		assertTrue(event.isAllday());
 	}	
 	
@@ -550,11 +554,11 @@ public class Ical4jHelperTest {
 	public void testGetClazz() {
 		Event event = new Event();
 		event.setPrivacy(0);
-		Clazz clazz = Ical4jHelper.getClazz(event.getPrivacy());
+		Clazz clazz = getIcal4jHelper().getClazz(event.getPrivacy());
 		assertEquals("PUBLIC", clazz.getValue());
 
 		event.setPrivacy(1);
-		clazz = Ical4jHelper.getClazz(event.getPrivacy());
+		clazz = getIcal4jHelper().getClazz(event.getPrivacy());
 		assertEquals("PRIVATE", clazz.getValue());
 	}
 
@@ -563,7 +567,7 @@ public class Ical4jHelperTest {
 		Event event = new Event();
 		event.setOwner("Adrien Poupard");
 		event.setOwnerEmail("adrien@zz.com");
-		Organizer orga = Ical4jHelper.getOrganizer(event.getOwner(),
+		Organizer orga = getIcal4jHelper().getOrganizer(event.getOwner(),
 				event.getOwnerEmail());
 		assertEquals("mailto:adrien@zz.com", orga.getValue());
 		assertEquals("Adrien Poupard", orga.getParameter(Parameter.CN)
@@ -575,11 +579,11 @@ public class Ical4jHelperTest {
 	public void testGetTransp() {
 		Event event = new Event();
 		event.setOpacity(EventOpacity.OPAQUE);
-		Transp t = Ical4jHelper.getTransp(event.getOpacity());
+		Transp t = getIcal4jHelper().getTransp(event.getOpacity());
 		assertEquals(Transp.OPAQUE, t);
 
 		event.setOpacity(EventOpacity.TRANSPARENT);
-		t = Ical4jHelper.getTransp(event.getOpacity());
+		t = getIcal4jHelper().getTransp(event.getOpacity());
 		assertEquals(Transp.TRANSPARENT, t);
 
 	}
@@ -591,7 +595,7 @@ public class Ical4jHelperTest {
 		cal.set(Calendar.MILLISECOND, 0);
 		event.setDate(cal.getTime());
 		event.setDuration(3600);
-		DtEnd dtend = Ical4jHelper.getDtEnd(event.getDate(),
+		DtEnd dtend = getIcal4jHelper().getDtEnd(event.getDate(),
 				event.getDuration(), false);
 		assertEquals(cal.getTime().getTime() + 3600000, dtend.getDate()
 				.getTime());
@@ -603,7 +607,7 @@ public class Ical4jHelperTest {
 		Calendar cal = getCalendar();
 		cal.set(Calendar.MILLISECOND, 0);
 		event.setDate(cal.getTime());
-		DtStart dtstart = Ical4jHelper.getDtStart(event.getDate(),
+		DtStart dtstart = getIcal4jHelper().getDtStart(event.getDate(),
 				event.isAllday());
 		assertEquals(cal.getTime().getTime(), dtstart.getDate().getTime());
 	}
@@ -616,7 +620,7 @@ public class Ical4jHelperTest {
 		at.setState(ParticipationState.ACCEPTED);
 		at.setRequired(ParticipationRole.CHAIR);
 
-		Role role = Ical4jHelper.getRole(at);
+		Role role = getIcal4jHelper().getRole(at);
 		assertEquals(role, Role.CHAIR);
 	}
 
@@ -625,7 +629,7 @@ public class Ical4jHelperTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("adrien");
 
-		Cn cn = Ical4jHelper.getCn(at);
+		Cn cn = getIcal4jHelper().getCn(at);
 		assertEquals("adrien", cn.getValue());
 	}
 
@@ -637,7 +641,7 @@ public class Ical4jHelperTest {
 		at.setState(ParticipationState.ACCEPTED);
 		at.setRequired(ParticipationRole.CHAIR);
 
-		PartStat ps = Ical4jHelper.getPartStat(at);
+		PartStat ps = getIcal4jHelper().getPartStat(at);
 		assertEquals(ps, PartStat.ACCEPTED);
 	}
 
@@ -662,7 +666,7 @@ public class Ical4jHelperTest {
 		er.setEnd(null);
 		event.setRecurrence(er);
 
-		RRule rule = Ical4jHelper.getRRule(event);
+		RRule rule = getIcal4jHelper().getRRule(event);
 		Recur recur = rule.getRecur();
 		assertTrue(recur.getDayList().contains(WeekDay.MO));
 		assertTrue(recur.getDayList().contains(WeekDay.TU));
@@ -683,7 +687,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParserAttendee() throws IOException, ParserException {
 		String ics = IOUtils.toString(getStreamICS("bugGn.ics"));
-		List<Event> event = Ical4jHelper.parseICSEvent(ics, getDefaultObmUser());
+		List<Event> event = getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());
 		assertEquals(event.size(), 1);
 	}
 
@@ -700,7 +704,7 @@ public class Ical4jHelperTest {
 	public void testParsingICSFileOf200kio() throws IOException, ParserException {
 		final String ics = IOUtils.toString(getStreamICS("bellemin-calendrierobm.ics"));
 		
-		final List<Event> events = Ical4jHelper.parseICSEvent(ics, getDefaultObmUser());
+		final List<Event> events = getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());
 		for (final Event event: events) {
 			assertNotNull(event.getTitle());
 		}
@@ -713,7 +717,7 @@ public class Ical4jHelperTest {
 		
 		for (String icsFile: icsFiles) {
 			final String ics = IOUtils.toString(getStreamICS(icsFile));
-			Ical4jHelper.parseICSEvent(ics, getDefaultObmUser());	
+			getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());	
 		}
 		assertTrue(true);
 	}

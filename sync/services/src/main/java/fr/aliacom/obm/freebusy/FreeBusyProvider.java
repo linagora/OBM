@@ -53,6 +53,7 @@ public class FreeBusyProvider extends HttpServlet {
 	private CalendarDao calendarDao;
 	private UserDao userDao;
 	private DomainDao domainDao;
+	private Ical4jHelper ical4jHelper;
 	
 	@Override
 	public void init() throws ServletException {
@@ -61,6 +62,7 @@ public class FreeBusyProvider extends HttpServlet {
 		calendarDao = injector.getInstance(CalendarDao.class);
 		userDao = injector.getInstance(UserDao.class);
 		domainDao = injector.getInstance(DomainDao.class);
+		ical4jHelper = injector.getInstance(Ical4jHelper.class);
 	}
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -111,7 +113,7 @@ public class FreeBusyProvider extends HttpServlet {
 		List<FreeBusy> fb = calendarDao.getFreeBusy(domain, fbr);
 		String ics = "";
 		if (fb.size() > 0) {
-			ics = Ical4jHelper.parseFreeBusy(fb.iterator().next());
+			ics = ical4jHelper.parseFreeBusy(fb.iterator().next());
 		}
 		response.getOutputStream().write(ics.getBytes());
 	}

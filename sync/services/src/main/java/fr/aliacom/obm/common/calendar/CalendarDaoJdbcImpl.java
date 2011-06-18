@@ -191,17 +191,19 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	private final ObmHelper obmHelper;
 
 	private final Helper helper;
+	private final Ical4jHelper ical4jHelper;
 
 	private final Factory solrHelperFactory;
 
 	@Inject
 	private CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ContactDao contactDao,
-			ObmHelper obmHelper, Helper helper) {
+			ObmHelper obmHelper, Helper helper, Ical4jHelper ical4jHelper) {
 		this.userDao = userDao;
 		this.solrHelperFactory = solrHelperFactory;
 		this.contactDao = contactDao;
 		this.obmHelper = obmHelper;
 		this.helper = helper;
+		this.ical4jHelper = ical4jHelper;
 	}
 
 	private String buildEventId(List<Event> changedEvent) {
@@ -787,7 +789,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 								freebusy.addFreeBusyInterval(getFreeBusyInterval(cal.getTime(), rs));
 							} else {
 								Set<Date> extDate = getAllDateEventException(con, rs.getInt("event_id"));
-								List<Date> recurDates = Ical4jHelper
+								List<Date> recurDates = ical4jHelper
 										.dateInInterval(er, cal.getTime(),
 												fbr.getStart(), fbr.getEnd(),
 												extDate);
@@ -1996,7 +1998,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			while (evrs.next()) {
 				Event event = eventFromCursor(cal, evrs);
 				Set<Date> extDate = getAllDateEventException(con, event.getDatabaseId());
-				Date recurDate = Ical4jHelper.isInIntervalDate(event, startDate, endDate, extDate);
+				Date recurDate = ical4jHelper.isInIntervalDate(event, startDate, endDate, extDate);
 				if (recurDate != null) {
 					eventById.put(event.getDatabaseId(), event);
 					changedEvent.add(event);
@@ -2110,7 +2112,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				cal.setTimeInMillis(evrs.getTimestamp("event_date").getTime());
 				Set<Date> extDate = getAllDateEventException(con,
 						evrs.getInt("event_id"));
-				Date recurDate = Ical4jHelper.isInIntervalDate(er,
+				Date recurDate = ical4jHelper.isInIntervalDate(er,
 						cal.getTime(), start, end, extDate);
 				if (recurDate != null) {
 					psEvent.setDate(recurDate);
@@ -2185,7 +2187,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				EventRecurrence er = eventRecurrenceFromCursor(cal, evrs);
 				Set<Date> extDate = getAllDateEventException(con,
 						evrs.getInt("event_id"));
-				Date recurDate = Ical4jHelper.isInIntervalDate(er,
+				Date recurDate = ical4jHelper.isInIntervalDate(er,
 						event.getDate(), start, end, extDate);
 				if (recurDate != null) {
 					ret.add(event);

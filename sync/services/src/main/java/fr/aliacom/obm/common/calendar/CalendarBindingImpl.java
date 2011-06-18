@@ -79,18 +79,21 @@ public class CalendarBindingImpl implements ICalendar {
 	private final EventChangeHandler eventChangeHandler;
 	
 	private final Helper helper;
-
+	private final Ical4jHelper ical4jHelper;
+	
 	@Inject
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
 			DomainService domainService, UserService userService,
 			CalendarDao calendarDao,
-			CategoryDao categoryDao, Helper helper) {
+			CategoryDao categoryDao, Helper helper, 
+			Ical4jHelper ical4jHelper) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;
 		this.calendarDao = calendarDao;
 		this.categoryDao = categoryDao;
 		this.helper = helper;
+		this.ical4jHelper = ical4jHelper;
 	}
 
 	@Override
@@ -769,7 +772,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public String parseEvent(AccessToken token, Event event)
 			throws ServerFault, AuthFault {
 		ObmUser user = userService.getUserFromAccessToken(token);
-		return Ical4jHelper.parseEvent(event, user);
+		return ical4jHelper.parseEvent(event, user);
 	}
 
 	@Override
@@ -777,7 +780,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public String parseEvents(AccessToken token, List<Event> events)
 			throws ServerFault, AuthFault {
 		ObmUser user = userService.getUserFromAccessToken(token);
-		return Ical4jHelper.parseEvents(user, events);
+		return ical4jHelper.parseEvents(user, events);
 	}
 
 	@Override
@@ -786,7 +789,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throws Exception, ServerFault {
 		String fixedIcs = fixIcsAttendees(ics);
 		ObmUser user = userService.getUserFromAccessToken(token);
-		return Ical4jHelper.parseICSEvent(fixedIcs, user);
+		return ical4jHelper.parseICSEvent(fixedIcs, user);
 	}
 
 	private String fixIcsAttendees(String ics) {
@@ -819,7 +822,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public FreeBusyRequest parseICSFreeBusy(AccessToken token, String ics)
 			throws ServerFault, AuthFault {
 		try {
-			return Ical4jHelper.parseICSFreeBusy(ics);
+			return ical4jHelper.parseICSFreeBusy(ics);
 		} catch (Exception e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -924,7 +927,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public String parseFreeBusyToICS(AccessToken token, FreeBusy fbr)
 			throws ServerFault, AuthFault {
 		try {
-			return Ical4jHelper.parseFreeBusy(fbr);
+			return ical4jHelper.parseFreeBusy(fbr);
 		} catch (Exception e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -1006,9 +1009,13 @@ public class CalendarBindingImpl implements ICalendar {
 		int countEvent = 0;
 		for (final Event event: events) {
 
-                        removeAttendeeWithNoEmail(event);
+			removeAttendeeWithNoEmail(event);
 			if (!isAttendeeExistForCalendarOwner(token, calendar, event.getAttendees())) {
 				addAttendeeForCalendarOwner(token, calendar, event);
+			}
+			
+			if(event.isEventInThePast()){
+				changeCalendarOwnerAttendeeParticipationStateToAccepted(token, calendar, event);
 			}
 
 			if (createEventIfNotExists(token, calendar, event)) {
@@ -1016,6 +1023,15 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 		}
 		return countEvent;
+	}
+
+	private void changeCalendarOwnerAttendeeParticipationStateToAccepted(
+			AccessToken at, String calendar, Event event) {
+		for (final Attendee attendee: event.getAttendees()) {
+			if (isAttendeeExistForCalendarOwner(at, calendar, attendee)) {
+				attendee.setState(ParticipationState.ACCEPTED);
+			}	
+		}
 	}
 
 	private void removeAttendeeWithNoEmail(Event event) { 
@@ -1059,7 +1075,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private List<Event> parseICSEvent(final AccessToken token, final String icsToString) throws ImportICalendarException {
 		try {
 			ObmUser user = userService.getUserFromAccessToken(token);
-			return Ical4jHelper.parseICSEvent(icsToString, user);
+			return ical4jHelper.parseICSEvent(icsToString, user);
 		} catch (IOException e) {
 			throw new ImportICalendarException(e);
 		} catch (ParserException e) {
@@ -1080,11 +1096,19 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private boolean isAttendeeExistForCalendarOwner(final AccessToken at, final String calendar, final List<Attendee> attendees) {
 		for (final Attendee attendee: attendees) {
-			final ObmUser obmUser = userService.getUserFromAttendee(attendee, at.getDomain());
-			if (obmUser != null) {
-				if (obmUser.getLogin().equals(calendar)) {
-					return true;
-				}	
+			if (isAttendeeExistForCalendarOwner(at, calendar, attendee)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isAttendeeExistForCalendarOwner(final AccessToken at, final String calendar, final Attendee attendee) {
+		final ObmUser obmUser = userService.getUserFromAttendee(attendee,
+				at.getDomain());
+		if (obmUser != null) {
+			if (obmUser.getLogin().equals(calendar)) {
+				return true;
 			}
 		}
 		return false;
