@@ -36,7 +36,7 @@ public class CalendarBindingImplTest {
 
 	private ObmUser mockObmUser(String userEmail) {
 		ObmUser user = createMock(ObmUser.class);
-		expect(user.getEmailAtDomain()).andReturn(userEmail).atLeastOnce();
+		expect(user.getEmail()).andReturn(userEmail).atLeastOnce();
 		return user;
 	}
 	

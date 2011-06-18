@@ -142,7 +142,7 @@ public class CalendarBindingImpl implements ICalendar {
 			ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain());
 			if (owner != null) {
 				if (helper.canWriteOnCalendar(token, calendar)) {
-					if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
+					if (owner.getEmail().equals(calendarUser.getEmail())) {
 						return cancelEvent(token, calendar, notification, uid, ev);
 					} else {
 						changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, sequence, notification);
@@ -178,7 +178,7 @@ public class CalendarBindingImpl implements ICalendar {
 		String extId = event.getExtId();
 		Event removed = calendarDao.removeEventByExtId(token, calendar, extId, event.getSequence() + 1);
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
-		notifyOnRemoveEvent(token, calendar.getEmailAtDomain(), removed, notification);
+		notifyOnRemoveEvent(token, calendar.getEmail(), removed, notification);
 		return removed;
 	}
 
@@ -216,7 +216,7 @@ public class CalendarBindingImpl implements ICalendar {
 					return ev;
 				}
 				
-				if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
+				if (owner.getEmail().equals(calendarUser.getEmail())) {
 					return cancelEventByExtId(token, calendarUser, ev, notification);
 				} else {
 					changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, sequence, notification);
@@ -410,7 +410,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Attendee calendarOwnerAsAttendee(AccessToken token, String calendar, Event event) 
 		throws FindException {
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
-		Attendee userAsAttendee = event.findAttendeeForUser(calendarOwner.getEmailAtDomain());
+		Attendee userAsAttendee = event.findAttendeeForUser(calendarOwner.getEmail());
 		return userAsAttendee;
 	}
 
@@ -682,8 +682,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			ObmUser obmuser = userService.getUserFromAccessToken(token);
 			if (obmuser != null) {
-				return helper.constructEmailFromList(obmuser.getEmail(),
-						token.getDomain());
+				return obmuser.getEmail();
 			}
 			return "";
 
@@ -980,12 +979,12 @@ public class CalendarBindingImpl implements ICalendar {
 			boolean changed = calendarDao.changeParticipationState(token, calendarOwner, extId, participationState);
 			logger.info(LogUtils.prefix(token) + 
 					"Calendar : event[extId:" + extId + "] change participation state for user " + 
-					calendarOwner.getEmailAtDomain() + " new state : " + participationState);
+					calendarOwner.getEmail() + " new state : " + participationState);
 			return changed;
 		} else {
 			logger.info(LogUtils.prefix(token) + 
 					"Calendar : event[extId:" + extId + "] ignoring new participation state for user " + 
-					calendarOwner.getEmailAtDomain() + " as sequence number is older than current event");
+					calendarOwner.getEmail() + " as sequence number is older than current event");
 			return false;
 		}
 	}
@@ -1072,7 +1071,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			final ObmUser obmUser = userService.getUserFromCalendar(calendar, token.getDomain());
 			final Attendee attendee = new Attendee();
-			attendee.setEmail(obmUser.getEmailAtDomain());
+			attendee.setEmail(obmUser.getEmail());
 			event.getAttendees().add(attendee);
 		} catch (FindException e) {
 			throw new ImportICalendarException("user " + calendar + " not found");

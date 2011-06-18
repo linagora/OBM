@@ -176,7 +176,7 @@ public class EventChangeMailer extends AbstractMailer {
 
 	private InternetAddress extractSenderAddress(ObmUser user)
 	throws UnsupportedEncodingException {
-		return new InternetAddress(user.getEmailAtDomain(), user.getDisplayName());
+		return new InternetAddress(user.getEmail(), user.getDisplayName());
 	}
 	
 	private InternetAddress extractSenderAddress(Event event)

@@ -276,7 +276,7 @@ public class EventChangeHandler {
 
 		return organizerHasEmailAddress(organizer) && organizerMayAttend(organizer) &&
 		organizerExpectParticipationEmails(organizer, calendarOwner.getDomain()) &&
-		!organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain());
+		!organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmail());
 	}
 
 	private boolean organizerExpectParticipationEmails(Attendee organizer, ObmDomain domain) {

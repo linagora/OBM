@@ -1128,8 +1128,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	public List<CalendarInfo> listCalendars(ObmUser user) throws FindException {
 		Set<CalendarInfo> rights = new HashSet<CalendarInfo>();
 		CalendarInfo myself = new CalendarInfo();
-		myself.setMail(helper.constructEmailFromList(user.getEmail(), user
-				.getDomain().getName()));
+		myself.setMail(user.getEmail());
 		myself.setUid(user.getLogin());
 		myself.setFirstname(user.getFirstName());
 		myself.setLastname(user.getLastName());

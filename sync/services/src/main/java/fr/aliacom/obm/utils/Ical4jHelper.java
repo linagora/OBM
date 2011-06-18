@@ -322,8 +322,8 @@ public class Ical4jHelper {
 		appendAttendees(event, vTodo);
 		appendRecurence(event, vTodo);
 		appendAlert(event, vTodo.getAlarms());
-		appendPercent(event, vTodo.getPercentComplete(), user.getEmailAtDomain());
-		appendStatus(event, vTodo.getStatus(), user.getEmailAtDomain());
+		appendPercent(event, vTodo.getPercentComplete(), user.getEmail());
+		appendStatus(event, vTodo.getStatus(), user.getEmail());
 		appendOpacity(event,
 				(Transp) vTodo.getProperties().getProperty(Property.TRANSP),
 				event.isAllday());
@@ -569,7 +569,7 @@ public class Ical4jHelper {
 	
 	private static Attendee findAttendeeFromObmUserReply(final List<Attendee> attendees, final ObmUser obmUser) {
 		for (final Attendee attendee: attendees) {
-			if (attendee.getEmail().equalsIgnoreCase(obmUser.getEmailAtDomain())) {
+			if (attendee.getEmail().equalsIgnoreCase(obmUser.getEmail())) {
 				return attendee;
 			}
 		}
@@ -682,7 +682,7 @@ public class Ical4jHelper {
 	private static void appendStatusToICS(PropertyList prop, Event event,
 			ObmUser user) {
 		for (Attendee att : event.getAttendees()) {
-			if (att.getEmail().equals(user.getEmailAtDomain())) {
+			if (att.getEmail().equals(user.getEmail())) {
 				if (ParticipationState.NEEDSACTION.equals(att.getState())) {
 					prop.add(Status.VTODO_NEEDS_ACTION);
 				} else if (ParticipationState.INPROGRESS.equals(att.getState())) {
@@ -702,7 +702,7 @@ public class Ical4jHelper {
 	private static void appendPercentCompleteToICS(PropertyList prop,
 			Event event, ObmUser user) {
 		for (Attendee att : event.getAttendees()) {
-			if (att.getEmail().equals(user.getEmailAtDomain())) {
+			if (att.getEmail().equals(user.getEmail())) {
 				prop.add(new PercentComplete(att.getPercent()));
 			}
 		}

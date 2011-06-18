@@ -171,13 +171,12 @@ public class ObmUser {
 	}
 
 	public String getEmail() {
+		if( email != null && !email.contains("@")){
+			return email + "@" + domain.getName();
+		}
 		return email;
 	}
 	
-	public String getEmailAtDomain() {
-		return email + "@" + domain.getName();
-	}
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -283,6 +282,6 @@ public class ObmUser {
 	
 	@Override
 	public String toString() {
-		return getEmailAtDomain();
+		return getEmail();
 	}
 }
