@@ -42,6 +42,10 @@ public class ParametersSource {
 		return req.getParameter(name);
 	}
 
+	public String[] getParameterValues(String name) {
+		return req.getParameterValues(name);
+	}
+	
 	public String getClientIP() {
 		String xForwardedFor = req.getHeader("X-Forwarded-For");
 		if (StringUtils.isBlank(xForwardedFor)) {

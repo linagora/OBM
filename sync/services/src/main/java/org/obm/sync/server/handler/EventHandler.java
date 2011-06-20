@@ -82,6 +82,7 @@ import fr.aliacom.obm.utils.LogUtils;
  * <code>/calendar/parseFreeBusyToICS?sid=xxx</code>
  * <code>/calendar/importICalendar</code>
  * <code>/calendar/purge</code>
+ * <code>/calendar/getCalendarMetadata?sid=xxx&amp;calendar=calendar_obm_email1&amp;calendar=calendar_obm_email2&amp;...</code>
  */
 @Singleton
 public class EventHandler extends SecureSyncHandler {
@@ -174,11 +175,21 @@ public class EventHandler extends SecureSyncHandler {
 			return importICalendar(at, params, responder);
 		} else if (method.equals("purge")) {
 			return purge(at, params, responder);
+		}
+		else if (method.equals("getCalendarMetadata")) {
+			return getCalendarMetadata(at, params, responder);
 		} else {
 			logger.error(LogUtils.prefix(at) + "cannot handle method '" + method + "'");
 			return "";
 		}
 	} 
+
+	private String getCalendarMetadata(AccessToken at, ParametersSource params,
+			XmlResponder responder) throws ServerFault, AuthFault {
+		String[] calendarEmails = params.getParameterValues("calendar");
+		CalendarInfo[] lc = binding.getCalendarMetadata(at, calendarEmails);
+		return responder.sendCalendarInformations(lc);
+	}
 
 	private String parseFreeBusyToICS(
 			AccessToken at, ParametersSource params, XmlResponder responder) 

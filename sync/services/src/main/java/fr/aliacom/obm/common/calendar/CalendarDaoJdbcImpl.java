@@ -25,6 +25,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -84,6 +85,7 @@ import fr.aliacom.obm.utils.LinkedEntity;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
 import fr.aliacom.obm.utils.RFC2445;
+import fr.aliacom.obm.utils.StringSQLCollectionHelper;
 
 /**
  * Calendar data access functions
@@ -1039,9 +1041,72 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		
 		return ret;
 	}
-	
-	private Set<CalendarInfo> listUserRights(Set<CalendarInfo> l, ObmUser user)
+
+	private Set<CalendarInfo> listCalendarRights(ObmUser user, String[] calendarEmails)
 			throws FindException {
+		Set<CalendarInfo> rights = new HashSet<CalendarInfo>();
+
+		StringSQLCollectionHelper collectionHelper = new StringSQLCollectionHelper(
+				Arrays.asList(calendarEmails));
+
+		String calendarEmailsPlaceHolders = collectionHelper.asPlaceHolders();
+
+		String query =
+		// direct rights
+		"select userobm_login, userobm_firstname, userobm_lastname, userobm_email, entityright_read, entityright_write "
+				+ "from EntityRight "
+				+ "inner join UserEntity u1 on entityright_consumer_id=u1.userentity_entity_id "
+				+ "inner join CalendarEntity u2 on u2.calendarentity_entity_id=entityright_entity_id "
+				+ "inner join UserObm on userobm_id=u2.calendarentity_calendar_id "
+				+ "where u1.userentity_user_id=? and (entityright_read=1 or entityright_write=1) and userobm_email is not null "
+				+ "and userobm_email in ("
+				+ calendarEmailsPlaceHolders
+				+ ") and userobm_archive != 1"
+				+ " union "
+				// public cals
+				+ "select userobm_login, userobm_firstname, userobm_lastname, userobm_email, entityright_read, entityright_write "
+				+ "from EntityRight "
+				+ "inner join CalendarEntity u2 on u2.calendarentity_entity_id=entityright_entity_id "
+				+ "inner join UserObm on userobm_id=u2.calendarentity_calendar_id "
+				+ "where entityright_consumer_id is null and (entityright_read=1 or entityright_write=1) and userobm_email is not null and userobm_email != '' "
+				+ "and userobm_domain_id=? "
+				+ "and userobm_email in ("
+				+ calendarEmailsPlaceHolders + ") and userobm_archive != 1";
+
+		Connection con = null;
+		ResultSet rs = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(query);
+
+			int parameterCount = 1;
+
+			ps.setInt(parameterCount++, user.getUid());
+			parameterCount = collectionHelper.insertValues(ps, parameterCount);
+
+			ps.setInt(parameterCount++, user.getDomain().getId());
+			parameterCount = collectionHelper.insertValues(ps, parameterCount);
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				processRightsRow(rs, rights, user);
+			}
+		} catch (SQLException e) {
+			logger.error("Error finding user rights", e);
+			throw new FindException(e);
+		} finally {
+			try {
+				obmHelper.cleanup(con, ps, rs);
+			} catch (Exception e) {
+				logger.error("Could not clean up jdbc stuff");
+			}
+		}
+		return rights;
+	}
+
+	private Set<CalendarInfo> listUserRights(ObmUser user) throws FindException {
 		String query =
 		// direct rights
 		"select userobm_login, userobm_firstname, userobm_lastname, userobm_email, entityright_read, entityright_write "
@@ -1065,6 +1130,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
+		Set<CalendarInfo> calendarInfos = new HashSet<CalendarInfo>();
 
 		try {
 			con = obmHelper.getConnection();
@@ -1073,7 +1139,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				processRightsRow(rs, l, user);
+				processRightsRow(rs, calendarInfos, user);
 			}
 		} catch (SQLException e) {
 			logger.error("Error finding user rights", e);
@@ -1085,11 +1151,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				logger.error("Could not clean up jdbc stuff");
 			}
 		}
-		return l;
+		return calendarInfos;
 	}
 
-	private Set<CalendarInfo> listGroupRights(Set<CalendarInfo> l, ObmUser user)
-			throws FindException {
+	private Set<CalendarInfo> listGroupRights(ObmUser user) throws FindException {
 		String query = "select userobm_login, userobm_firstname, userobm_lastname, userobm_email, entityright_read, entityright_write "
 				+ "from EntityRight "
 				+ "inner join GroupEntity u1 on entityright_consumer_id=u1.groupentity_entity_id "
@@ -1102,6 +1167,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
+		Set<CalendarInfo> calendarInfos = new HashSet<CalendarInfo>();
 
 		try {
 			con = obmHelper.getConnection();
@@ -1110,7 +1176,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				processRightsRow(rs, l, user);
+				processRightsRow(rs, calendarInfos, user);
 			}
 		} catch (SQLException e) {
 			logger.error("Error finding user rights", e);
@@ -1123,43 +1189,31 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 		}
 
-		return l;
+		return calendarInfos;
 	}
 
 	@Override
-	public List<CalendarInfo> listCalendars(ObmUser user) throws FindException {
-		Set<CalendarInfo> rights = new HashSet<CalendarInfo>();
-		CalendarInfo myself = new CalendarInfo();
-		myself.setMail(user.getEmail());
-		myself.setUid(user.getLogin());
-		myself.setFirstname(user.getFirstName());
-		myself.setLastname(user.getLastName());
-		myself.setRead(true);
-		myself.setWrite(true);
-		rights.add(myself);
+	public Collection<CalendarInfo> listCalendars(ObmUser user) throws FindException {
+		Set<CalendarInfo> calendarUserRights = listUserRights(user);
+		Set<CalendarInfo> calendarGroupRights = listGroupRights(user);
 
-		listUserRights(rights, user);
-		listGroupRights(rights, user);
-		ArrayList<CalendarInfo> ret = new ArrayList<CalendarInfo>(rights.size());
-		ret.addAll(rights);
-		return ret;
+		Set<CalendarInfo> calendarRights = new HashSet<CalendarInfo>();
+		calendarRights.addAll(calendarUserRights);
+		calendarRights.addAll(calendarGroupRights);
+		return calendarRights;
 	}
 
-	private void processRightsRow(ResultSet rs, Set<CalendarInfo> l,
-			ObmUser user) throws SQLException {
-		String email = helper.constructEmailFromList(rs.getString(4), user
-				.getDomain().getName());
-		CalendarInfo info = new CalendarInfo();
-		info.setUid(rs.getString(1));
-		info.setFirstname(rs.getString(2));
-		info.setLastname(rs.getString(3));
-		info.setMail(email);
-		info.setRead(rs.getBoolean(5));
-		info.setWrite(rs.getBoolean(6));
+	@Override
+	public Collection<CalendarInfo> getCalendarMetadata(ObmUser user, String[] calendarEmails)
+			throws FindException {
+		Set<CalendarInfo> rights = this.listCalendarRights(user, calendarEmails);
+		return rights;
+	}
 
-		if (info.isWrite()) {
-			info.setRead(true);
-		}
+	private void processRightsRow(ResultSet rs, Set<CalendarInfo> l, ObmUser user)
+			throws SQLException {
+		CalendarInfo info = makeCalendarInfo(rs, user.getDomain().getName());
+
 		if (!l.contains(info)) {
 			l.add(info);
 		} else {
@@ -1176,8 +1230,24 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private void loadAttendeesAndAlerts(AccessToken token,
-			Map<Integer, Event> eventsById, String evIdList, String domainName) {
+	private CalendarInfo makeCalendarInfo(ResultSet rs, String domainName) throws SQLException {
+		String email = helper.constructEmailFromList(rs.getString(4), domainName);
+
+		CalendarInfo info = new CalendarInfo();
+		info.setUid(rs.getString(1));
+		info.setFirstname(rs.getString(2));
+		info.setLastname(rs.getString(3));
+		info.setMail(email);
+		info.setRead(rs.getBoolean(5));
+		info.setWrite(rs.getBoolean(6));
+		if (info.isWrite()) {
+			info.setRead(true);
+		}
+		return info;
+	}
+
+	private void loadAttendeesAndAlerts(AccessToken token, Map<Integer, Event> eventsById,
+			String evIdList, String domainName) {
 		if (eventsById.isEmpty()) {
 			return;
 		}

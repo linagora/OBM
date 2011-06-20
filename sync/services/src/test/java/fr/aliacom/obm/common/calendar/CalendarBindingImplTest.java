@@ -3,6 +3,7 @@ package fr.aliacom.obm.common.calendar;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -16,14 +17,20 @@ import org.junit.Test;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.services.ImportICalendarException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+
 import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.FindException;
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.Helper;
@@ -32,6 +39,53 @@ import fr.aliacom.obm.utils.Ical4jHelper;
 
 public class CalendarBindingImplTest {
 
+	private class ColdWarFixtures {
+		private ObmDomain domain;
+		private ObmUser user;
+
+		private String userEmail = "beria@ussr";
+		private String userEmailWithoutDomain = "beria";
+		private String domainName = "ussr";
+
+		private CalendarInfo beriaInfo;
+		private CalendarInfo hooverInfo;
+		private CalendarInfo mccarthyInfo;
+
+		private ColdWarFixtures() {
+			beriaInfo = new CalendarInfo();
+			beriaInfo.setUid("beria");
+			beriaInfo.setFirstname("Lavrenti");
+			beriaInfo.setLastname("Beria");
+			beriaInfo.setMail("beria@ussr");
+			beriaInfo.setRead(true);
+			beriaInfo.setWrite(true);
+			
+			hooverInfo = new CalendarInfo();
+			hooverInfo.setUid("hoover");
+			hooverInfo.setFirstname("John");
+			hooverInfo.setLastname("Hoover");
+			hooverInfo.setMail("hoover@usa");
+			hooverInfo.setRead(true);
+			hooverInfo.setWrite(false);
+			
+			mccarthyInfo = new CalendarInfo();
+			mccarthyInfo.setUid("mccarthy");
+			mccarthyInfo.setFirstname("Joseph");
+			mccarthyInfo.setLastname("McCarthy");
+			mccarthyInfo.setMail("mccarthy@usa");
+			mccarthyInfo.setRead(true);
+			mccarthyInfo.setWrite(false);
+			
+			domain = new ObmDomain();
+			domain.setName(domainName);
+			
+			user = new ObmUser();
+			user.setLogin(userEmailWithoutDomain);
+			user.setEmail(userEmailWithoutDomain);
+			user.setDomain(domain);
+		}
+	}
+	
 	private Helper mockRightsHelper(String calendar, AccessToken accessToken) {
 		Helper rightsHelper = createMock(Helper.class);
 		rightsHelper.canWriteOnCalendar(eq(accessToken), eq(calendar));
@@ -51,6 +105,92 @@ public class CalendarBindingImplTest {
 		ObmUser user = createMock(ObmUser.class);
 		expect(user.getEmail()).andReturn(userEmail).atLeastOnce();
 		return user;
+	}
+	
+	@Test
+	public void testGetCalendarMetadata() throws ServerFault, AuthFault, FindException {
+		ColdWarFixtures fixtures = new ColdWarFixtures();
+		String[] calendarEmails = {
+				fixtures.beriaInfo.getMail(),
+				fixtures.hooverInfo.getMail(),
+				fixtures.mccarthyInfo.getMail()
+		};
+		
+		CalendarInfo[] expectedCalendarInfos = {
+				fixtures.beriaInfo,
+				fixtures.hooverInfo,
+				fixtures.mccarthyInfo,
+		};
+		
+		CalendarInfo[] calendarInfosFromDao = {
+				fixtures.hooverInfo,
+				fixtures.mccarthyInfo,
+		};
+			
+		AccessToken accessToken = mockAccessToken(fixtures.domainName);
+		Helper rightsHelper = createMock(Helper.class);
+		
+		rightsHelper.constructEmailFromList(eq(fixtures.userEmail), eq(fixtures.domainName));
+		EasyMock.expectLastCall().andReturn(fixtures.userEmail);
+		
+		UserService userService = createMock(UserService.class);
+		userService.getUserFromAccessToken(eq(accessToken));
+		EasyMock.expectLastCall().andReturn(fixtures.user).once();
+		
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		calendarDao.getCalendarMetadata(eq(fixtures.user), eq(calendarEmails));
+		// Wrap the returned list into array list because we need a mutable list
+		EasyMock.expectLastCall().andReturn( new ArrayList<CalendarInfo>(Arrays.asList(calendarInfosFromDao)) ).once();
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null);
+		
+		Object[] mocks = {accessToken, userService, calendarDao, rightsHelper};
+		
+		EasyMock.replay(mocks);
+		CalendarInfo[] result = calendarService.getCalendarMetadata(accessToken, calendarEmails);
+		assertEquals(new HashSet<CalendarInfo>(Arrays.asList(expectedCalendarInfos)), new HashSet<CalendarInfo>(Arrays.asList(result)));
+	}
+	
+	@Test
+	public void testGetCalendarMetadataExceptCurrentUser() throws ServerFault, AuthFault, FindException {
+		ColdWarFixtures fixtures = new ColdWarFixtures();
+		String[] calendarEmails = {
+				fixtures.hooverInfo.getMail(),
+				fixtures.mccarthyInfo.getMail()
+		};
+		
+		CalendarInfo[] expectedCalendarInfos = {
+				fixtures.hooverInfo,
+				fixtures.mccarthyInfo,
+		};
+		
+		CalendarInfo[] calendarInfosFromDao = {
+				fixtures.hooverInfo,
+				fixtures.mccarthyInfo,
+		};
+			
+		AccessToken accessToken = mockAccessToken(fixtures.domainName);
+		Helper rightsHelper = createMock(Helper.class);
+		
+		rightsHelper.constructEmailFromList(eq(fixtures.userEmailWithoutDomain), eq(fixtures.domainName));
+		EasyMock.expectLastCall().andReturn(fixtures.userEmail);
+		
+		UserService userService = createMock(UserService.class);
+		userService.getUserFromAccessToken(eq(accessToken));
+		EasyMock.expectLastCall().andReturn(fixtures.user).once();
+		
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		calendarDao.getCalendarMetadata(eq(fixtures.user), eq(calendarEmails));
+		// Wrap the returned list into array list because we need a mutable list
+		EasyMock.expectLastCall().andReturn( new ArrayList<CalendarInfo>(Arrays.asList(calendarInfosFromDao)) ).once();
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null);
+		
+		Object[] mocks = {accessToken, userService, calendarDao, rightsHelper};
+		
+		EasyMock.replay(mocks);
+		CalendarInfo[] result = calendarService.getCalendarMetadata(accessToken, calendarEmails);
+		assertEquals(new HashSet<CalendarInfo>(Arrays.asList(expectedCalendarInfos)), new HashSet<CalendarInfo>(Arrays.asList(result)));
 	}
 	
 	@Test(expected=ServerFault.class)

@@ -2,6 +2,7 @@ package fr.aliacom.obm.common.calendar;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public interface CalendarDao {
 	EventChanges getSync(AccessToken token, ObmUser calendarUser,
 			Date lastSync, SyncRange syncRange, EventType typeFilter, boolean onEventDate);
 
-	List<CalendarInfo> listCalendars(ObmUser user) throws FindException;
+	Collection<CalendarInfo> listCalendars(ObmUser user) throws FindException;
 
 	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees, Boolean useObmUser) throws FindException, SQLException;
 
@@ -79,4 +80,7 @@ public interface CalendarDao {
 	Event removeEvent(Connection con, AccessToken token, int uid, EventType et, int sequence) throws SQLException;
 	
 	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, String extId, ParticipationState participationState) throws SQLException ;
+
+	Collection<CalendarInfo> getCalendarMetadata(ObmUser user, String[] calendars)
+			throws FindException;
 }

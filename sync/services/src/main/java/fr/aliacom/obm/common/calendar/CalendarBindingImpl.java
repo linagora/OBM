@@ -20,7 +20,9 @@ package fr.aliacom.obm.common.calendar;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -81,6 +83,19 @@ public class CalendarBindingImpl implements ICalendar {
 	private final Helper helper;
 	private final Ical4jHelper ical4jHelper;
 	
+
+	private CalendarInfo makeOwnCalendarInfo(ObmUser user) {
+		CalendarInfo myself = new CalendarInfo();
+		myself.setMail(helper.constructEmailFromList(user.getEmail(), user
+				.getDomain().getName()));
+		myself.setUid(user.getLogin());
+		myself.setFirstname(user.getFirstName());
+		myself.setLastname(user.getLastName());
+		myself.setRead(true);
+		myself.setWrite(true);
+		return myself;
+	}
+	
 	@Inject
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
 			DomainService domainService, UserService userService,
@@ -101,8 +116,8 @@ public class CalendarBindingImpl implements ICalendar {
 	public CalendarInfo[] listCalendars(AccessToken token) throws ServerFault,
 			AuthFault {
 		try {
-			List<CalendarInfo> l = getRights(token);
-			CalendarInfo[] ret = l.toArray(new CalendarInfo[0]);
+			Collection<CalendarInfo> calendarInfos = getRights(token);
+			CalendarInfo[] ret = calendarInfos.toArray(new CalendarInfo[0]);
 			logger.info(LogUtils.prefix(token) + "Returning " + ret.length
 					+ " calendar infos.");
 			return ret;
@@ -112,8 +127,32 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private List<CalendarInfo> getRights(AccessToken t) throws FindException {
-		List<CalendarInfo> rights = t.getCalendarRights();
+	@Override
+	@Transactional
+	public CalendarInfo[] getCalendarMetadata(AccessToken token, String[] calendars) throws ServerFault,
+			AuthFault {
+		try {
+			ObmUser user = userService.getUserFromAccessToken(token);
+			Collection<CalendarInfo> calendarInfos = calendarDao.getCalendarMetadata(user, calendars);
+
+			if (Arrays.binarySearch(calendars, user.getEmail()) >= 0) {
+				// Add the calendar of the current user if needed, since the user's permissions over her own calendars
+				// will not be listed in the database
+				CalendarInfo myself = makeOwnCalendarInfo(user);
+				calendarInfos.add(myself);
+			}
+			CalendarInfo[] ret = calendarInfos.toArray(new CalendarInfo[0]);
+			logger.info(LogUtils.prefix(token) + "Returning " + ret.length
+					+ " calendar infos.");
+			return ret;
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}
+	}
+
+	private Collection<CalendarInfo> getRights(AccessToken t) throws FindException {
+		Collection<CalendarInfo> rights = t.getCalendarRights();
 		if (rights == null) {
 			rights = listCalendarsImpl(t);
 			t.setCalendarRights(rights);
@@ -121,10 +160,13 @@ public class CalendarBindingImpl implements ICalendar {
 		return rights;
 	}
 
-	private List<CalendarInfo> listCalendarsImpl(AccessToken token)
+	private Collection<CalendarInfo> listCalendarsImpl(AccessToken token)
 			throws FindException {
-		ObmUser u = userService.getUserFromAccessToken(token);
-		return calendarDao.listCalendars(u);
+		ObmUser user = userService.getUserFromAccessToken(token);
+		Collection<CalendarInfo> calendarInfos = calendarDao.listCalendars(user);
+		CalendarInfo myself = makeOwnCalendarInfo(user);
+		calendarInfos.add(myself);
+		return calendarInfos;
 	}
 
 	@Override
