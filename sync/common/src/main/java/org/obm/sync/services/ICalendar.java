@@ -28,6 +28,17 @@ public interface ICalendar {
 			AuthFault;
 
 	/**
+	 * Returns calendar metadata for a list of given calendars.
+	 * 
+	 * @param token
+	 *            must contains a valid session to execute this service
+	 * @param calendars
+	 * 			  the OBM emails associated to the calendars we want to retrieve.
+	 */
+	CalendarInfo[] getCalendarMetadata(AccessToken token, String[] calendars)
+			throws ServerFault, AuthFault;
+
+	/**
 	 * Remove an event from database if user has enough access rights on the
 	 * event referenced by eventId.
 	 * 
@@ -38,64 +49,64 @@ public interface ICalendar {
 	 * @param eventId
 	 *            the id of the event to remove
 	 * @param notification
-	 * 			  send email notification if needed
+	 *            send email notification if needed
 	 * @return the removed event on success, the found event if access rights
 	 *         are too low to remove but enough to read, and null if event was
 	 *         not found
 	 */
-	Event removeEvent(AccessToken token, String calendar, String eventId, int sequence, boolean notification)
-			throws AuthFault, ServerFault;
+	Event removeEvent(AccessToken token, String calendar, String eventId,
+			int sequence, boolean notification) throws AuthFault, ServerFault;
 
 	/**
 	 * FIXME: remove this service
 	 */
-	Event removeEventByExtId(AccessToken token, String calendar,
-			String extId, int sequence, boolean notification) throws AuthFault, ServerFault;
+	Event removeEventByExtId(AccessToken token, String calendar, String extId,
+			int sequence, boolean notification) throws AuthFault, ServerFault;
 
 	/**
 	 * FIXME: needs work
 	 */
 	Event modifyEvent(AccessToken token, String calendar, Event event,
-			boolean updateAttendees, boolean notification) throws AuthFault, ServerFault;
+			boolean updateAttendees, boolean notification) throws AuthFault,
+			ServerFault;
 
 	/**
 	 * FIXME: needs work
 	 */
-	String createEvent(AccessToken token, String calendar, Event event, boolean notification)
+	String createEvent(AccessToken token, String calendar, Event event,
+			boolean notification) throws AuthFault, ServerFault;
+
+	/**
+	 * return every changes made to calendar since lastSync date for events into
+	 * the sync range. This service treats participation changes as full
+	 * changes. Logged user needs read rights on calendar.
+	 */
+	EventChanges getSyncInRange(AccessToken token, String calendar,
+			Date lastSync, SyncRange syncRange) throws AuthFault, ServerFault;
+
+	/**
+	 * return every changes made to calendar since lastSync date. This service
+	 * treats participation changes as full changes. Logged user needs read
+	 * rights on calendar.
+	 */
+	EventChanges getSync(AccessToken token, String calendar, Date lastSync)
 			throws AuthFault, ServerFault;
 
 	/**
-	 * return every changes made to calendar since lastSync date for events into the sync range.
-	 * This service treats participation changes as full changes.
-	 * Logged user needs read rights on calendar.
-	 */
-	EventChanges getSyncInRange(AccessToken token, String calendar, Date lastSync,
-			SyncRange syncRange) throws AuthFault, ServerFault;
-	
-	/**
-	 * return every changes made to calendar since lastSync date.
-	 * This service treats participation changes as full changes.
-	 * Logged user needs read rights on calendar.
-	 */
-	EventChanges getSync(AccessToken token, String calendar,
-			Date lastSync) throws AuthFault, ServerFault;
-
-	/**
-	 * return every changes made to calendar since lastSync date.
-	 * This service treats participation changes as special changes
-	 * in order to let client know if the event itself has been modified
-	 * or not.
-	 * Logged user needs read rights on calendar.
+	 * return every changes made to calendar since lastSync date. This service
+	 * treats participation changes as special changes in order to let client
+	 * know if the event itself has been modified or not. Logged user needs read
+	 * rights on calendar.
 	 */
 	EventChanges getSyncWithSortedChanges(AccessToken token, String calendar,
 			Date lastSync) throws AuthFault, ServerFault;
-	
+
 	/**
 	 * return every event in calendar the will happen after start date Logged
 	 * user needs read rights on calendar
 	 */
-	EventChanges getSyncEventDate(AccessToken token, String calendar,
-			Date start) throws AuthFault, ServerFault;
+	EventChanges getSyncEventDate(AccessToken token, String calendar, Date start)
+			throws AuthFault, ServerFault;
 
 	/**
 	 * Find an event from its id.
@@ -113,8 +124,8 @@ public interface ICalendar {
 	 * equals to the given event User needs read access on selected calendar to
 	 * execute this service.
 	 */
-	KeyList getEventTwinKeys(AccessToken token, String calendar,
-			Event event) throws AuthFault, ServerFault;
+	KeyList getEventTwinKeys(AccessToken token, String calendar, Event event)
+			throws AuthFault, ServerFault;
 
 	/**
 	 * get current user email based
@@ -131,8 +142,7 @@ public interface ICalendar {
 	/**
 	 * List known categories.
 	 */
-	List<Category> listCategories(AccessToken at) throws AuthFault,
-			ServerFault;
+	List<Category> listCategories(AccessToken at) throws AuthFault, ServerFault;
 
 	/**
 	 * @return the obm id of the event that have the given extId into the given
@@ -145,8 +155,8 @@ public interface ICalendar {
 	 * retrieve an event by its extId into specified calendar User needs read
 	 * access on selected calendar to execute this service.
 	 */
-	Event getEventFromExtId(AccessToken token, String calendar,
-			String extId) throws AuthFault, ServerFault;
+	Event getEventFromExtId(AccessToken token, String calendar, String extId)
+			throws AuthFault, ServerFault;
 
 	/**
 	 * retrieve all events between start and end date. User needs read access on
@@ -174,8 +184,8 @@ public interface ICalendar {
 	/**
 	 * Convert an event into an ICS
 	 */
-	String parseEvent(AccessToken token, Event event)
-			throws ServerFault, AuthFault;
+	String parseEvent(AccessToken token, Event event) throws ServerFault,
+			AuthFault;
 
 	/**
 	 * Convert a list of event into an ICS
@@ -186,8 +196,8 @@ public interface ICalendar {
 	/**
 	 * Convert an ICS containing Events to a Event list
 	 */
-	List<Event> parseICS(AccessToken token, String ics)
-			throws Exception, ServerFault;
+	List<Event> parseICS(AccessToken token, String ics) throws Exception,
+			ServerFault;
 
 	/**
 	 * Convert an ICS Freebusy request into an FreeBusyRequest object
@@ -225,32 +235,33 @@ public interface ICalendar {
 	 * Retrieve last update (event creation or update) for a given calendar.
 	 * Logged user must have read access on the calendar.
 	 */
-	Date getLastUpdate(AccessToken token, String calendar)
-			throws ServerFault, AuthFault;
+	Date getLastUpdate(AccessToken token, String calendar) throws ServerFault,
+			AuthFault;
 
 	/**
 	 * Check that logged user has access to a given calendar
 	 */
 	boolean isWritableCalendar(AccessToken token, String calendar)
 			throws ServerFault, AuthFault;
-	
+
 	/**
 	 * change user of given calendar participation state
 	 */
-	boolean changeParticipationState(AccessToken token, String calendar, String extId, 
-			ParticipationState participationState, int sequence, boolean notification) throws ServerFault;
-	
+	boolean changeParticipationState(AccessToken token, String calendar,
+			String extId, ParticipationState participationState, int sequence,
+			boolean notification) throws ServerFault;
+
 	/**
-	 * Import ics file in calendar's user
-	 * Adding a new attendee (owner) if calendar owner not exist in data's ics
+	 * Import ics file in calendar's user Adding a new attendee (owner) if
+	 * calendar owner not exist in data's ics
 	 * 
 	 * Return ImportICalendarException if import fails
 	 */
-	int importICalendar(AccessToken token, String calendar, String ics) 
-		throws ImportICalendarException, AuthFault, ServerFault;
-	
+	int importICalendar(AccessToken token, String calendar, String ics)
+			throws ImportICalendarException, AuthFault, ServerFault;
+
 	/**
-	 * remove all calendar's events older than 6 month 
+	 * remove all calendar's events older than 6 month
 	 * 
 	 */
 	void purge(AccessToken token, String calendar) throws ServerFault;

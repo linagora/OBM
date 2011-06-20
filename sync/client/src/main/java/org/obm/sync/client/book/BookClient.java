@@ -2,7 +2,6 @@ package org.obm.sync.client.book;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -22,6 +21,8 @@ import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.Multimap;
+
 public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	private BookItemsParser respParser;
@@ -36,7 +37,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public Contact createContact(AccessToken token, BookType book,
 			Contact contact) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("contact", biw.getContactAsString(contact));
 		Document doc = execute("/book/createContact", params);
@@ -46,7 +47,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public Contact createContactWithoutDuplicate(AccessToken token,
 			BookType book, Contact contact) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("contact", biw.getContactAsString(contact));
 		Document doc = execute("/book/createContactWithoutDuplicate", params);
@@ -56,7 +57,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public Contact getContactFromId(AccessToken token, BookType book, String id)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("id", id);
 		Document doc = execute("/book/getContactFromId", params);
@@ -71,7 +72,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public KeyList getContactTwinKeys(AccessToken token, BookType book,
 			Contact contact) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("contact", biw.getContactAsString(contact));
 		Document doc = execute("/book/getContactTwinKeys", params);
@@ -81,7 +82,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public ContactChangesResponse getSync(AccessToken token, BookType book,
 			Date lastSync) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		if (lastSync != null) {
 			params.put("lastSync", DateHelper.asString(lastSync));
@@ -97,7 +98,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public boolean isReadOnly(AccessToken token, BookType book)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		Document doc = execute("/book/isReadOnly", params);
 		return "true".equals(respParser.parseArrayOfString(doc)[0]);
@@ -105,7 +106,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public BookType[] listBooks(AccessToken token) {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/book/listBooks", params);
 		String[] sa = respParser.parseArrayOfString(doc);
 		BookType[] bts = new BookType[sa.length];
@@ -117,7 +118,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public List<AddressBook> listAllBooks(AccessToken token) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/book/listAllBooks", params);
 		List<AddressBook> addressBooks = respParser.parseListAddressBook(doc);
 		return addressBooks;
@@ -126,7 +127,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public Contact modifyContact(AccessToken token, BookType book,
 			Contact contact) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		String ct = biw.getContactAsString(contact);
 		params.put("contact", ct);
@@ -137,7 +138,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public Contact removeContact(AccessToken token, BookType book, String uid)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("id", uid);
 		Document doc = execute("/book/removeContact", params);
@@ -147,7 +148,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public List<Contact> searchContact(AccessToken token, String query,
 			int limit) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("query", query);
 		params.put("limit", "" + limit);
 		Document doc = execute("/book/searchContact", params);
@@ -157,7 +158,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public List<Contact> searchContactInGroup(AccessToken token, AddressBook group, String query,
 			int limit) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("query", query);
 		params.put("limit", String.valueOf(limit));
 		params.put("group", String.valueOf(group.getUid()));
@@ -168,7 +169,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public FolderChangesResponse getFolderSync(AccessToken token, Date lastSync)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		if (lastSync != null) {
 			params.put("lastSync", DateHelper.asString(lastSync));
 		} else {
@@ -182,7 +183,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date lastSync) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		if (lastSync != null) {
 			params.put("lastSync", DateHelper.asString(lastSync));
 		} else {
@@ -197,7 +198,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public Contact createContactInBook(AccessToken token, int addressBookId,
 			Contact contact) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
 		params.put("contact", biw.getContactAsString(contact));
 		Document doc = execute("/book/createContactInBook", params);
@@ -206,7 +207,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public Contact getContactInBook(AccessToken token, int addressBookId, String id) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
 		params.put("id", id);
 		Document doc = execute("/book/getContactInBook", params);
@@ -220,7 +221,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public Contact modifyContactInBook(AccessToken token, int addressBookId, Contact contact) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
 		String ct = biw.getContactAsString(contact);
 		params.put("contact", ct);
@@ -230,7 +231,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public Contact removeContactInBook(AccessToken token, int addressBookId, String uid) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
 		params.put("id", uid);
 		Document doc = execute("/book/removeContactInBook", params);
@@ -240,7 +241,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public boolean unsubscribeBook(AccessToken token, Integer addressBookId)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
 		Document doc = execute("/book/unsubscribeBook", params);
 		return "true".equalsIgnoreCase(DOMUtils.getElementText(doc

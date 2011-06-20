@@ -2,8 +2,6 @@ package org.obm.sync.client.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -23,6 +21,9 @@ import org.obm.sync.client.ISyncClient;
 import org.obm.sync.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Utility methods for client implementations
@@ -62,7 +63,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 	}
 
 	protected synchronized Document execute(String action,
-			Map<String, String> parameters) {
+			Multimap<String, String> parameters) {
 		PostMethod pm = new PostMethod(url + action);
 		pm.setRequestHeader("Content-Type",
 				"application/x-www-form-urlencoded; charset=utf-8");
@@ -103,7 +104,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 	}
 
 	protected synchronized InputStream executeStream(String action,
-			Map<String, String> parameters) {
+			Multimap<String, String> parameters) {
 		PostMethod pm = new PostMethod(url + action);
 		pm.setRequestHeader("Content-Type",
 				"application/x-www-form-urlencoded; charset=utf-8");
@@ -115,23 +116,23 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		}
 	}
 
-	protected void setToken(Map<String, String> parameters, AccessToken token) {
+	protected void setToken(Multimap<String, String> parameters, AccessToken token) {
 		if (token != null) {
 			parameters.put("sid", token.getSessionId());
 		}
 	}
 
-	protected Map<String, String> initParams(AccessToken at) {
-		Map<String, String> m = new HashMap<String, String>();
+	protected Multimap<String, String> initParams(AccessToken at) {
+		Multimap<String, String> m = ArrayListMultimap.create();
 		setToken(m, at);
 		return m;
 	}
 
 	private synchronized InputStream executeStream(PostMethod pm,
-			Map<String, String> parameters) {
+			Multimap<String, String> parameters) {
 		InputStream is = null;
 		try {
-			for (Entry<String, String> entry: parameters.entrySet()) {
+			for (Entry<String, String> entry: parameters.entries()) {
 				pm.setParameter(entry.getKey(), entry.getValue());
 			}
 			int ret = 0;
@@ -151,7 +152,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 	}
 
 	protected synchronized void executeVoid(String action,
-			Map<String, String> parameters) {
+			Multimap<String, String> parameters) {
 		PostMethod pm = new PostMethod(url + action);
 		pm.setRequestHeader("Content-Type",
 				"application/x-www-form-urlencoded; charset=utf-8");
@@ -160,7 +161,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 	}
 
 	public AccessToken login(String login, String password, String origin) {
-		HashMap<String, String> params = new HashMap<String, String>();
+		Multimap<String, String> params = ArrayListMultimap.create();
 		params.put("login", login);
 		params.put("password", password);
 		params.put("origin", origin);
@@ -184,7 +185,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 	}
 
 	public void logout(AccessToken at) {
-		Map<String, String> params = initParams(at);
+		Multimap<String, String> params = initParams(at);
 		executeVoid("/login/doLogout", params);
 	}
 

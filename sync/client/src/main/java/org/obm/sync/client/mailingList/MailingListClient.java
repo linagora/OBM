@@ -1,8 +1,6 @@
 package org.obm.sync.client.mailingList;
 
 import java.util.List;
-import java.util.Map;
-
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -14,6 +12,8 @@ import org.obm.sync.mailingList.MailingListItemsParser;
 import org.obm.sync.mailingList.MailingListItemsWriter;
 import org.obm.sync.services.IMailingList;
 import org.w3c.dom.Document;
+
+import com.google.common.collect.Multimap;
 
 public class MailingListClient extends AbstractClientImpl implements IMailingList {
 
@@ -32,7 +32,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if(mailingList == null){
 			return null;
 		}
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("mailingList", mlWriter.getMailingListsAsString(mailingList));
 		Document doc = execute("/mailingList/createMailingList", params);
 		return mlParser.parseMailingList(doc.getDocumentElement());
@@ -44,7 +44,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if(id == null){
 			return null;
 		}
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("id", id.toString());
 		Document doc = execute("/mailingList/getMailingListFromId", params);
 		try {
@@ -57,7 +57,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 
 	@Override
 	public List<MailingList> listAllMailingList(AccessToken token) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/mailingList/listAllMailingList", params);
 		List<MailingList> addressBooks = mlParser.parseListMailingList(doc);
 		return addressBooks;
@@ -69,7 +69,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if(mailingList == null){
 			return null;
 		}
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		String ml = mlWriter.getMailingListsAsString(mailingList);
 		params.put("mailingList", ml);
 		Document doc = execute("/mailingList/modifyMailingList", params);
@@ -82,7 +82,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if(id == null){
 			return;
 		}
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("id", id.toString());
 		executeVoid("/mailingList/removeMailingList", params);
 	}
@@ -93,7 +93,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if(mailingListId == null || email == null){
 			return null;
 		}
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("mailingListId", mailingListId.toString());
 		params.put("mailingListEmails", mlWriter.getMailingListEmailsAsString(email));
 		Document doc = execute("/mailingList/addEmails", params);
@@ -106,7 +106,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if(mailingListId == null || emailId == null){
 			return;
 		}
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("mailingListId", mailingListId.toString());
 		params.put("mailingListEmailId", emailId.toString());
 		executeVoid("/mailingList/removeEmail", params);

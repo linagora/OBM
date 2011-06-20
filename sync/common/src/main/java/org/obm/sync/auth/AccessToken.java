@@ -1,7 +1,7 @@
 package org.obm.sync.auth;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.obm.sync.calendar.CalendarInfo;
@@ -21,7 +21,7 @@ public class AccessToken {
 
 	private Map<String, String> serviceProps;
 
-	private List<CalendarInfo> calendarRights;
+	private Collection<CalendarInfo> calendarRights;
 
 	private MavenVersion version;
 	private int conversationUid;
@@ -114,11 +114,11 @@ public class AccessToken {
 		this.serviceProps = props;
 	}
 
-	public List<CalendarInfo> getCalendarRights() {
+	public Collection<CalendarInfo> getCalendarRights() {
 		return calendarRights;
 	}
 
-	public void setCalendarRights(List<CalendarInfo> calendarRights) {
+	public void setCalendarRights(Collection<CalendarInfo> calendarRights) {
 		this.calendarRights = calendarRights;
 	}
 

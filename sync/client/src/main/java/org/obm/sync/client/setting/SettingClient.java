@@ -12,6 +12,8 @@ import org.obm.sync.setting.SettingItemsParser;
 import org.obm.sync.setting.VacationSettings;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.Multimap;
+
 public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	private SettingItemsParser respParser;
@@ -24,7 +26,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	@Override
 	public Map<String, String> getSettings(AccessToken token) throws AuthFault,
 			ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getSettings", params);
 		checkServerError(doc);
 		return respParser.parseListSettings(doc);
@@ -33,7 +35,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	@Override
 	public void setVacationSettings(AccessToken token, VacationSettings vs)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("enabled", "" + vs.isEnabled());
 		if (vs.isEnabled()) {
 			if (vs.getStart() != null) {
@@ -51,7 +53,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	@Override
 	public void setEmailForwarding(AccessToken token, ForwardingSettings fs)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("enabled", "" + fs.isEnabled());
 		if (fs.getEmail() != null && fs.isEnabled()) {
 			params.put("email", fs.getEmail());
@@ -64,7 +66,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	@Override
 	public ForwardingSettings getEmailForwarding(AccessToken token)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getEmailForwarding", params);
 		checkServerError(doc);
 		return respParser.parseForwarding(doc);
@@ -73,7 +75,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	@Override
 	public VacationSettings getVacationSettings(AccessToken token)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getVacationSettings", params);
 		checkServerError(doc);
 		return respParser.parseVacation(doc);

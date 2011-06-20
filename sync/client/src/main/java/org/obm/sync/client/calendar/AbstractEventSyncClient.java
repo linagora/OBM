@@ -1,10 +1,8 @@
 package org.obm.sync.client.calendar;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.obm.sync.auth.AccessToken;
@@ -30,6 +28,9 @@ import org.obm.sync.services.ImportICalendarException;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * OBM sync client implementation for calendar synchronisations
@@ -61,7 +62,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public String createEvent(AccessToken token, String calendar, Event event, boolean notification)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("event", ciw.getEventString(event));
 		params.put("notification", String.valueOf(notification));
@@ -73,7 +74,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public Event getEventFromId(AccessToken token, String calendar, String id)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("id", id);
 		Document doc = execute(type + "/getEventFromId", params);
@@ -87,7 +88,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public KeyList getEventTwinKeys(AccessToken token, String calendar,
 			Event event) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("event", ciw.getEventString(event));
 
@@ -120,7 +121,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 			logger.debug("getSync(" + token.getSessionId() + ", " + calendar
 					+ ", " + lastSync + ")");
 		}
-		Map<String, String> params = new HashMap<String, String>();
+		Multimap<String, String> params = ArrayListMultimap.create();
 		setToken(params, token);
 		params.put("calendar", calendar);
 		if (lastSync != null) {
@@ -149,7 +150,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 			logger.debug("getSyncEventDate(" + token.getSessionId() + ", " + calendar
 					+ ", " + lastSync + ")");
 		}
-		Map<String, String> params = new HashMap<String, String>();
+		Multimap<String, String> params = ArrayListMultimap.create();
 		setToken(params, token);
 		params.put("calendar", calendar);
 		if (lastSync != null) {
@@ -165,7 +166,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 
 	@Override
 	public String getUserEmail(AccessToken token) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		Document doc = execute(type + "/getUserEmail", params);
 		checkServerError(doc);
 		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
@@ -174,7 +175,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public CalendarInfo[] listCalendars(AccessToken token) throws ServerFault,
 			AuthFault {
-		Map<String, String> params = new HashMap<String, String>();
+		Multimap<String, String> params = ArrayListMultimap.create();
 		setToken(params, token);
 		Document doc = execute(type + "/listCalendars", params);
 		checkServerError(doc);
@@ -184,7 +185,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public Event modifyEvent(AccessToken token, String calendar, Event event,
 			boolean updateAttendees, boolean notification) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("event", ciw.getEventString(event));
 		params.put("updateAttendees", "" + updateAttendees);
@@ -197,7 +198,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public Event removeEvent(AccessToken token, String calendar, String uid, int sequence, boolean notification)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("id", uid);
 		params.put("sequence", String.valueOf(sequence));
@@ -210,7 +211,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public Event removeEventByExtId(AccessToken token, String calendar, String extId, int sequence, boolean notification)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		params.put("sequence", String.valueOf(sequence));
@@ -223,7 +224,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public KeyList getRefusedKeys(AccessToken token, String calendar, Date since)
 			throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		if (since != null) {
 			params.put("since", DateHelper.asString(since));
@@ -240,7 +241,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	public List<Category> listCategories(AccessToken at) throws AuthFault,
 			ServerFault {
 		List<Category> ret = new LinkedList<Category>();
-		Map<String, String> params = initParams(at);
+		Multimap<String, String> params = initParams(at);
 		Document doc = execute(type + "/listCategories", params);
 		checkServerError(doc);
 		ret.addAll(respParser.parseCategories(doc.getDocumentElement()));
@@ -250,7 +251,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public Event getEventFromExtId(AccessToken token, String calendar,
 			String extId) throws AuthFault, ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		Document doc = execute(type + "/getEventFromExtId", params);
@@ -264,7 +265,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public Integer getEventObmIdFromExtId(AccessToken token, String calendar, String extId)
 		throws ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		Document doc = execute(type + "/getEventObmIdFromExtId", params);
@@ -282,7 +283,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 			String calendar, Date start, Date end) throws AuthFault,
 			ServerFault {
 		List<Event> ret = new LinkedList<Event>();
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("start", Long.toString(start.getTime()));
 		params.put("end", Long.toString(end.getTime()));
@@ -296,7 +297,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public List<Event> getAllEvents(AccessToken token, String calendar,
 			EventType eventType) throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("eventType", eventType.name());
 
@@ -309,7 +310,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	public List<EventTimeUpdate> getEventTimeUpdateNotRefusedFromIntervalDate(
 			AccessToken token, String calendar, Date start, Date end)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("start", Long.toString(start.getTime()));
 		if (end != null) {
@@ -324,7 +325,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public String parseEvent(AccessToken token, Event event)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("event", ciw.getEventString(event));
 
 		Document doc = execute(type + "/parseEvent", params);
@@ -335,7 +336,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public String parseEvents(AccessToken token, List<Event> events)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("events", ciw.getListEventString(events));
 
 		Document doc = execute(type + "/parseEvents", params);
@@ -346,7 +347,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public List<Event> parseICS(AccessToken token, String ics)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("ics", ics);
 		Document doc = execute(type + "/parseICS", params);
 		checkServerError(doc);
@@ -356,7 +357,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public FreeBusyRequest parseICSFreeBusy(AccessToken token, String ics)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("ics", ics);
 		Document doc = execute(type + "/parseICSFreeBusy", params);
 		checkServerError(doc);
@@ -367,7 +368,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	public List<EventParticipationState> getEventParticipationStateWithAlertFromIntervalDate(
 			AccessToken token, String calendar, Date start, Date end)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("start", Long.toString(start.getTime()));
 		params.put("end", Long.toString(end.getTime()));
@@ -383,7 +384,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public Date getLastUpdate(AccessToken token, String calendar)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		Document doc = execute(type + "/getLastUpdate", params);
 		checkServerError(doc);
@@ -394,7 +395,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public boolean isWritableCalendar(AccessToken token, String calendar)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		Document doc = execute(type + "/isWritableCalendar", params);
 		checkServerError(doc);
@@ -405,7 +406,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public List<FreeBusy> getFreeBusy(AccessToken token, FreeBusyRequest fbr)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("freebusyrequest", ciw.getFreeBusyRequestString(fbr));
 		Document doc = execute(type + "/getFreeBusy", params);
 		checkServerError(doc);
@@ -415,7 +416,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	@Override
 	public String parseFreeBusyToICS(AccessToken token, FreeBusy fb)
 			throws ServerFault, AuthFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("freebusy", ciw.getFreeBusyString(fb));
 
 		Document doc = execute(type + "/parseFreeBusyToICS", params);
@@ -428,7 +429,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	public boolean changeParticipationState(AccessToken token, String calendar,
 			String extId, ParticipationState participationState, 
 			int sequence, boolean notification) throws ServerFault {
-		Map<String, String> params = initParams(token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		params.put("state", participationState.toString());
@@ -443,7 +444,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	public int importICalendar(final AccessToken token, final String calendar, final String ics)
 			throws ImportICalendarException, AuthFault, ServerFault {
 		
-		final Map<String, String> params = initParams(token);
+		final Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("ics", ics);
 		
@@ -454,10 +455,20 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	
 	@Override
 	public void purge(final AccessToken token, final String calendar) throws ServerFault {
-		final Map<String, String> params = initParams(token);
+		final Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		final Document doc = execute(type + "/purge", params);
 		checkServerError(doc);
 	}
-	
+
+	@Override
+	public CalendarInfo[] getCalendarMetadata(AccessToken token,
+			String[] calendars) throws ServerFault, AuthFault {
+		final Multimap<String, String> params = initParams(token);
+		for (String calendar : calendars)
+			params.put("calendar", calendar);
+		final Document doc = execute(type + "/getCalendarMetadata", params);
+		checkServerError(doc);
+		return respParser.parseInfos(doc);
+	}
 }
