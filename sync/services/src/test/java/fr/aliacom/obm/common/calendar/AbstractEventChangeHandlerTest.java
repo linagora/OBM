@@ -78,7 +78,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		ObmUser defaultObmUser = getDefaultObmUser();
 		Event event = new Event();
 		event.setDate(after());
-		String ownerEmail = "user@domain.net";
+		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
 		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
 		
@@ -90,6 +90,23 @@ public abstract class AbstractEventChangeHandlerTest {
 		EasyMock.verify(mailer);
 	}
 
+	public void testObmUserIsNotOwner() {
+		ObmUser defaultObmUser = getDefaultObmUser();
+		Event event = new Event();
+		event.setDate(after());
+		String ownerEmail = "user@domain.net";
+		Attendee owner = createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED);
+		event.setOwnerEmail(ownerEmail);
+		event.addAttendee(owner);
+		
+		EventChangeMailer mailer = expectationObmUserIsNotOwner(owner);
+
+		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser);
+		EasyMock.verify(mailer);
+	}
+	
 	public void testEventInThePast() {
 		ObmUser defaultObmUser = getDefaultObmUser();
 		Event event = new Event();
@@ -122,6 +139,8 @@ public abstract class AbstractEventChangeHandlerTest {
 	}
 	
 	protected abstract EventChangeMailer expectationAcceptedAttendees(Attendee attendeeAccepted, Event event, ObmUser obmUser);
+	
+	protected abstract EventChangeMailer expectationObmUserIsNotOwner(Attendee owner);
 	
 	public void testNeedActionAttendee() {
 		Attendee attendeeNeedAction = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);

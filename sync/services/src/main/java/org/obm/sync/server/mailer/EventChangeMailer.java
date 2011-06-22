@@ -55,7 +55,7 @@ public class EventChangeMailer extends AbstractMailer {
 						inviteNewUserBodyTxt(event, locale, timezone),
 						inviteNewUserBodyHtml(event, locale, timezone),
 						ics, "REQUEST");
-			sendNotificationMessageToAttendee(attendee, mail);
+			sendNotificationMessageToAttendees(attendee, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -74,7 +74,7 @@ public class EventChangeMailer extends AbstractMailer {
 						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale),
 						notifyNewUserBodyTxt(event, locale, timezone),
 						notifyNewUserBodyHtml(event, locale, timezone));
-			sendNotificationMessageToAttendee(attendee, mail);
+			sendNotificationMessageToAttendees(attendee, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -96,7 +96,7 @@ public class EventChangeMailer extends AbstractMailer {
 						removedUserBodyTxt(event, locale, timezone),
 						removedUserBodyHtml(event, locale, timezone), 
 						ics, "CANCEL");
-			sendNotificationMessageToAttendee(attendees, mail);
+			sendNotificationMessageToAttendees(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -118,7 +118,7 @@ public class EventChangeMailer extends AbstractMailer {
 						inviteUpdateUserBodyTxt(previous, current, locale, timezone),
 						inviteUpdateUserBodyHtml(previous, current, locale, timezone), 
 						ics, "REQUEST");
-			sendNotificationMessageToAttendee(attendees, mail);
+			sendNotificationMessageToAttendees(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -140,7 +140,28 @@ public class EventChangeMailer extends AbstractMailer {
 						notifyUpdateUserBodyTxt(previous, current, locale, timezone),
 						notifyUpdateUserBodyHtml(previous, current, locale, timezone), 
 						ics, "REQUEST");
-			sendNotificationMessageToAttendee(attendees, mail);
+			sendNotificationMessageToAttendees(attendees, mail);
+		} catch (UnsupportedEncodingException e) {
+			throw new NotificationException(e);
+		} catch (IOException e) {
+			throw new NotificationException(e);
+		} catch (TemplateException e) {
+			throw new NotificationException(e);
+		}
+	}
+	
+
+	public void notifyOwnerUpdate(Attendee owner, Event previous, Event current, Locale locale,
+			TimeZone timezone) {
+		try {
+			EventMail mail = 
+				new EventMail(
+						extractSenderAddress(current),
+						current.getAttendees(), 
+						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
+						notifyUpdateUserBodyTxt(previous, current, locale, timezone),
+						notifyUpdateUserBodyHtml(previous, current, locale, timezone));
+			sendNotificationMessageToAttendee(owner, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -173,6 +194,27 @@ public class EventChangeMailer extends AbstractMailer {
 			throw new NotificationException(e);
 		}
 	}
+	
+
+	public void notifyOwnerRemovedEvent(Attendee owner, Event event, Locale locale, TimeZone timezone) {
+		try {
+			EventMail mail = 
+				new EventMail(
+						extractSenderAddress(event), 
+						event.getAttendees(), 
+						removedUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale),
+						removedUserBodyTxt(event, locale, timezone),
+						removedUserBodyHtml(event, locale, timezone));
+			sendNotificationMessageToAttendee(owner, mail);
+		} catch (UnsupportedEncodingException e) {
+			throw new NotificationException(e);
+		} catch (IOException e) {
+			throw new NotificationException(e);
+		} catch (TemplateException e) {
+			throw new NotificationException(e);
+		}
+	}
+
 
 	private InternetAddress extractSenderAddress(ObmUser user)
 	throws UnsupportedEncodingException {
@@ -196,9 +238,18 @@ public class EventChangeMailer extends AbstractMailer {
 		return new InternetAddress(attendee.getEmail(), attendee.getDisplayName());
 	}
 	
+	private void sendNotificationMessageToAttendee(Attendee attendee, EventMail mail) throws NotificationException {
+		try {
+			InternetAddress add = convertAttendeeToAddresse(attendee);
+			sendNotificationMessage(mail, add);
+		} catch (MessagingException e) {
+			throw new NotificationException(e);
+		} catch (IOException e) {
+			throw new NotificationException(e);
+		}
+	}
 	
-	
-	private void sendNotificationMessageToAttendee(Collection<Attendee> attendees, EventMail mail) throws NotificationException {
+	private void sendNotificationMessageToAttendees(Collection<Attendee> attendees, EventMail mail) throws NotificationException {
 		try {
 			List<InternetAddress> adds = convertAttendeesToAddresses(attendees);
 			sendNotificationMessage(mail, adds);
@@ -223,6 +274,11 @@ public class EventChangeMailer extends AbstractMailer {
 	private void sendNotificationMessage(EventMail mail, List<InternetAddress>  addresses) throws MessagingException, IOException{
 		MimeMessage mimeMail = mail.buildMimeMail(session);
 		mailService.sendMessage(session, addresses, mimeMail);
+	}
+	
+	private void sendNotificationMessage(EventMail mail, InternetAddress address) throws MessagingException, IOException{
+		MimeMessage mimeMail = mail.buildMimeMail(session);
+		mailService.sendMessage(session, address, mimeMail);
 	}
 	
 	private String participationState(ParticipationState state, Locale locale){
@@ -256,7 +312,7 @@ public class EventChangeMailer extends AbstractMailer {
 	private String inviteNewUserBodyHtml(Event event, Locale locale, TimeZone timezone) throws IOException, TemplateException {
 		return applyEventOnTemplate("EventInvitationHtml.tpl", event, locale, timezone);
 	}
-	
+
 	private String updateParticipationStateBodyTxt(Event event,
 			ObmUser attendeeUpdated, ParticipationState newState, Locale locale, TimeZone timezone) throws IOException, TemplateException {
 		return applyUpdateParticipationStateOnTemplate("ParticipationStateChangePlain.tpl", event, attendeeUpdated, newState, locale, timezone);
@@ -360,5 +416,4 @@ public class EventChangeMailer extends AbstractMailer {
 	/* package */ void setMailService(MailService mailService) {
 		this.mailService = mailService;
 	}
-
 }

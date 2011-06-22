@@ -1,5 +1,6 @@
 package fr.aliacom.obm.common.calendar;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -55,14 +56,32 @@ public class EventChangeHandler {
 	}
 	
 	public void create(final ObmUser user, final Event event, boolean notification) throws NotificationException {
+		Attendee owner = findOwner(event);
 		Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
 		String ics = ical4jHelper.buildIcsInvitationRequest(user, event);
 		writeIcs(ics);
 		if (notification && eventCreationInvolveNotification(event)) {
 			notifyCreate(user, attendees, event, ics);
 		}
+		if (notification && !eventCreatedByOwner(user, event)) {
+			notifyOwnerCreate(user, event, owner);
+		}
 	}
 	
+	private void notifyOwnerCreate(ObmUser user, Event event, Attendee owner) {
+		UserSettings settings = settingsService.getSettings(user);
+		Locale locale = settings.locale();
+		TimeZone timezone = settings.timezone();
+		
+		Collection<Attendee> ownerAsCollection = new ArrayList<Attendee>(1);
+		ownerAsCollection.add(owner);
+		eventChangeMailer.notifyAcceptedNewUsers(ownerAsCollection, event, locale, timezone);
+	}
+
+	private boolean eventCreatedByOwner(ObmUser user, Event event) {
+		return user.getEmail().equals(event.getOwnerEmail());
+	}
+
 	private void writeIcs(String... ics)  {
 		try {
 			for (String s: ics) {
@@ -124,6 +143,10 @@ public class EventChangeHandler {
 				notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 				notifyNeedActionUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 			}
+			Attendee owner = findOwner(current);
+			if (owner != null && !eventCreatedByOwner(user, current)) {
+				notifyOwnerUpdate(owner, previous, current, locale, timezone);
+			}
 		}
 	}
 	
@@ -134,6 +157,10 @@ public class EventChangeHandler {
 		if (accepted != null && !accepted.isEmpty()) {
 			eventChangeMailer.notifyAcceptedUpdateUsers(accepted, previous, current, locale, timezone, ics);
 		}	
+	}
+	
+	private void notifyOwnerUpdate(Attendee owner, Event previous, Event current, Locale locale, TimeZone timezone) {
+		eventChangeMailer.notifyOwnerUpdate(owner, previous, current, locale, timezone);
 	}
 	
 	private void notifyNeedActionUpdateUsers(Event previous, Event current,
@@ -151,6 +178,9 @@ public class EventChangeHandler {
 		writeIcs(removeUserIcs);
 		
  		if (notification && eventDeletionInvolveNotification(event)) {
+ 			
+ 			Attendee owner = findOwner(event); 			
+ 			
  			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
  			Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
  			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
@@ -158,9 +188,22 @@ public class EventChangeHandler {
  				UserSettings settings = settingsService.getSettings(user);
  				eventChangeMailer.notifyRemovedUsers(notify, event, settings.locale(), settings.timezone(), removeUserIcs);
  			}
+ 			if (owner != null && !eventCreatedByOwner(user, event)) {
+ 				notifyOwnerDelete(user, event, owner);
+ 			}
  		}
  	}
  	
+	private void notifyOwnerDelete(ObmUser user, Event event, Attendee owner) {
+		UserSettings settings = settingsService.getSettings(user);
+		Locale locale = settings.locale();
+		TimeZone timezone = settings.timezone();
+		
+		Collection<Attendee> ownerAsCollection = new ArrayList<Attendee>(1);
+		ownerAsCollection.add(owner);
+		eventChangeMailer.notifyOwnerRemovedEvent(owner, event, locale, timezone);		
+	}
+
 	private boolean eventCreationInvolveNotification(final Event event) {
 		return !event.isEventInThePast();
 	}
@@ -180,6 +223,15 @@ public class EventChangeHandler {
 				return !at.getEmail().equalsIgnoreCase(event.getOwnerEmail());
 			}
 		});
+	}
+	
+	private Attendee findOwner(final Event event) {
+		for (Attendee attendee : event.getAttendees()) {
+			boolean isOwner = attendee.getEmail().equalsIgnoreCase(event.getOwnerEmail());
+			if (isOwner)
+				return attendee;
+		}
+		return null;
 	}
 	
 	private Map<ParticipationState, ? extends Set<Attendee>> computeParticipationStateGroups(Collection<Attendee> attendees) {

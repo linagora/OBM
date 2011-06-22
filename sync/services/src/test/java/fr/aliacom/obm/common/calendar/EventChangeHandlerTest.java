@@ -16,6 +16,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -118,6 +119,11 @@ public class EventChangeHandlerTest {
 			super.testDeclinedAttendee();
 		}
 		
+		@Test
+		public void testObmUserIsNotOwner() {
+			super.testObmUserIsNotOwner();
+		}
+		
 		@Override
 		protected EventChangeMailer expectationAcceptedAttendees(
 				Attendee attendeeAccepted, Event event, ObmUser obmUser) {
@@ -206,6 +212,17 @@ public class EventChangeHandlerTest {
 			return mailer;
 
 		}
+		
+		@Override
+		protected EventChangeMailer expectationObmUserIsNotOwner(Attendee owner) {
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+			List<Attendee> ownerAsList = new ArrayList<Attendee>();
+			ownerAsList.add(owner);
+			mailer.notifyAcceptedNewUsers(eq(ownerAsList), EasyMock.anyObject(Event.class), eq(LOCALE), eq(TIMEZONE));
+			expectLastCall().once();
+			replay(mailer);
+			return mailer;
+		}
 	}
 	
 	public static class DeleteTests extends AbstractEventChangeHandlerTest {
@@ -248,6 +265,11 @@ public class EventChangeHandlerTest {
 		@Test
 		public void testDeclinedAttendee() {
 			super.testDeclinedAttendee();
+		}
+
+		@Test
+		public void testObmUserIsNotOwner() {
+			super.testObmUserIsNotOwner();
 		}
 		
 		@Override
@@ -332,6 +354,17 @@ public class EventChangeHandlerTest {
 			replay(mailer);
 			return mailer;
 		}
+		
+		@Override
+		protected EventChangeMailer expectationObmUserIsNotOwner(Attendee owner) {
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+
+			mailer.notifyOwnerRemovedEvent(eq(owner), EasyMock.anyObject(Event.class), eq(LOCALE), eq(TIMEZONE));
+			EasyMock.expectLastCall().once();
+			EasyMock.replay(mailer);
+			return mailer;
+		}
+		
 	}
 
 	public static class UpdateTests {
@@ -552,8 +585,7 @@ public class EventChangeHandlerTest {
 			eventChangeHandler.update(defaultObmUser, previousEvent, currentEvent, true);
 			
 			verify(mailer, ical4jHelper);
-		}	
-	
+		}
 	}
 
 	public static class UpdateParticipationTests {

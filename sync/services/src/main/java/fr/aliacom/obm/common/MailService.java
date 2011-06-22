@@ -26,4 +26,8 @@ public class MailService {
 		provider.sendEmail(session, message);
 	}
 	
+	public void sendMessage(Session session, InternetAddress to, MimeMessage message) throws MessagingException {
+		message.setRecipients(RecipientType.TO, new InternetAddress[]{to});
+		provider.sendEmail(session, message);
+	}
 }
