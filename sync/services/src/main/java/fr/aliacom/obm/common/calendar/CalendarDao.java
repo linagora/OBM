@@ -81,6 +81,6 @@ public interface CalendarDao {
 	
 	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, String extId, ParticipationState participationState) throws SQLException ;
 
-	Collection<CalendarInfo> getCalendarMetadata(ObmUser user, String[] calendars)
+	Collection<CalendarInfo> getCalendarMetadata(ObmUser user, Collection<String> calendars)
 			throws FindException;
 }

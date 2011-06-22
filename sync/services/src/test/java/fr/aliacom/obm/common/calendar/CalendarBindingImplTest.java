@@ -107,6 +107,11 @@ public class CalendarBindingImplTest {
 		return user;
 	}
 	
+	private String stripEmail(String email) {
+		String strippedEmail = email.substring(0, email.indexOf('@'));
+		return strippedEmail;
+	}
+	
 	@Test
 	public void testGetCalendarMetadata() throws ServerFault, AuthFault, FindException {
 		ColdWarFixtures fixtures = new ColdWarFixtures();
@@ -114,6 +119,13 @@ public class CalendarBindingImplTest {
 				fixtures.beriaInfo.getMail(),
 				fixtures.hooverInfo.getMail(),
 				fixtures.mccarthyInfo.getMail()
+		};
+		
+		String[] calendarEmailsWithStrippedEmail = {
+				fixtures.hooverInfo.getMail(),
+				stripEmail(fixtures.hooverInfo.getMail()),
+				fixtures.mccarthyInfo.getMail(),
+				stripEmail(fixtures.mccarthyInfo.getMail()),
 		};
 		
 		CalendarInfo[] expectedCalendarInfos = {
@@ -138,7 +150,7 @@ public class CalendarBindingImplTest {
 		EasyMock.expectLastCall().andReturn(fixtures.user).once();
 		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
-		calendarDao.getCalendarMetadata(eq(fixtures.user), eq(calendarEmails));
+		calendarDao.getCalendarMetadata(eq(fixtures.user), eq(Arrays.asList(calendarEmailsWithStrippedEmail)));
 		// Wrap the returned list into array list because we need a mutable list
 		EasyMock.expectLastCall().andReturn( new ArrayList<CalendarInfo>(Arrays.asList(calendarInfosFromDao)) ).once();
 
@@ -157,6 +169,13 @@ public class CalendarBindingImplTest {
 		String[] calendarEmails = {
 				fixtures.hooverInfo.getMail(),
 				fixtures.mccarthyInfo.getMail()
+		};
+		
+		String[] calendarEmailsWithStrippedEmail = {
+				fixtures.hooverInfo.getMail(),
+				stripEmail(fixtures.hooverInfo.getMail()),
+				fixtures.mccarthyInfo.getMail(),
+				stripEmail(fixtures.mccarthyInfo.getMail())
 		};
 		
 		CalendarInfo[] expectedCalendarInfos = {
@@ -180,7 +199,7 @@ public class CalendarBindingImplTest {
 		EasyMock.expectLastCall().andReturn(fixtures.user).once();
 		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
-		calendarDao.getCalendarMetadata(eq(fixtures.user), eq(calendarEmails));
+		calendarDao.getCalendarMetadata(eq(fixtures.user), eq(Arrays.asList(calendarEmailsWithStrippedEmail)));
 		// Wrap the returned list into array list because we need a mutable list
 		EasyMock.expectLastCall().andReturn( new ArrayList<CalendarInfo>(Arrays.asList(calendarInfosFromDao)) ).once();
 

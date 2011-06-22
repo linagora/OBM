@@ -20,10 +20,10 @@ package fr.aliacom.obm.common.calendar;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
@@ -126,16 +126,48 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e.getMessage());
 		}
 	}
-
+	
 	@Override
 	@Transactional
 	public CalendarInfo[] getCalendarMetadata(AccessToken token, String[] calendars) throws ServerFault,
 			AuthFault {
 		try {
 			ObmUser user = userService.getUserFromAccessToken(token);
-			Collection<CalendarInfo> calendarInfos = calendarDao.getCalendarMetadata(user, calendars);
 
-			if (Arrays.binarySearch(calendars, user.getEmail()) >= 0) {
+			// Since multidomain emails won't have the @domain part after them in the database,
+			// add the stripped version of the calendar emails (minus the @domain part) to the query
+			
+			// Create a new list using Arrays.asList(calendars), since asList returns an unmodifiable list
+			List<String> calendarEmails = new ArrayList<String>();
+			boolean hasUserEmail = false;
+			String userEmail = user.getEmail();
+			for (String calendarEmail : calendars) {
+				// We'll add the user manually later
+				if (calendarEmail.equals(userEmail)) {
+					hasUserEmail = true;
+					continue;
+				}
+				int atPosition = calendarEmail.indexOf('@');
+				if (atPosition > 0) {
+					String strippedCalendarEmail = calendarEmail.substring(0, atPosition);
+					calendarEmails.add(calendarEmail);
+					calendarEmails.add(strippedCalendarEmail);
+				}
+				else {
+					logger.warn(LogUtils.prefix(token) + "Got an invalid email address: " + calendarEmail);
+				}
+			}
+
+
+			Collection<CalendarInfo> calendarInfos;
+			if (calendarEmails.size() > 0) {
+				calendarInfos = calendarDao.getCalendarMetadata(user, calendarEmails);
+            }
+			else {
+				calendarInfos = new HashSet<CalendarInfo>();
+            }
+
+			if (hasUserEmail) {
 				// Add the calendar of the current user if needed, since the user's permissions over her own calendars
 				// will not be listed in the database
 				CalendarInfo myself = makeOwnCalendarInfo(user);

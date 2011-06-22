@@ -25,7 +25,6 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -1042,37 +1041,38 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 
-	private Set<CalendarInfo> listCalendarRights(ObmUser user, String[] calendarEmails)
+	private Set<CalendarInfo> listCalendarRights(ObmUser user, Collection<String> calendarEmails)
 			throws FindException {
 		Set<CalendarInfo> rights = new HashSet<CalendarInfo>();
 
-		StringSQLCollectionHelper collectionHelper = new StringSQLCollectionHelper(
-				Arrays.asList(calendarEmails));
+		StringSQLCollectionHelper collectionHelper = new StringSQLCollectionHelper(calendarEmails);
 
 		String calendarEmailsPlaceHolders = collectionHelper.asPlaceHolders();
 
-		String query =
-		// direct rights
-		"select userobm_login, userobm_firstname, userobm_lastname, userobm_email, entityright_read, entityright_write "
-				+ "from EntityRight "
-				+ "inner join UserEntity u1 on entityright_consumer_id=u1.userentity_entity_id "
-				+ "inner join CalendarEntity u2 on u2.calendarentity_entity_id=entityright_entity_id "
-				+ "inner join UserObm on userobm_id=u2.calendarentity_calendar_id "
-				+ "where u1.userentity_user_id=? and (entityright_read=1 or entityright_write=1) and userobm_email is not null "
-				+ "and userobm_email in ("
-				+ calendarEmailsPlaceHolders
-				+ ") and userobm_archive != 1"
-				+ " union "
-				// public cals
-				+ "select userobm_login, userobm_firstname, userobm_lastname, userobm_email, entityright_read, entityright_write "
-				+ "from EntityRight "
-				+ "inner join CalendarEntity u2 on u2.calendarentity_entity_id=entityright_entity_id "
-				+ "inner join UserObm on userobm_id=u2.calendarentity_calendar_id "
-				+ "where entityright_consumer_id is null and (entityright_read=1 or entityright_write=1) and userobm_email is not null and userobm_email != '' "
-				+ "and userobm_domain_id=? "
-				+ "and userobm_email in ("
-				+ calendarEmailsPlaceHolders + ") and userobm_archive != 1";
+		String directRightsQuery =
+		"SELECT u.userobm_login, u.userobm_firstname, u.userobm_lastname, u.userobm_email, er.entityright_read, er.entityright_write "
+	    + "FROM UserObm u "
+	    + "JOIN CalendarEntity ce ON u.userobm_id=ce.calendarentity_calendar_id "
+	    + "LEFT JOIN EntityRight er ON ce.calendarentity_entity_id=er.entityright_entity_id "
+	    + "LEFT JOIN UserEntity ue ON er.entityright_consumer_id=ue.userentity_entity_id " 	    
+		+ "WHERE (ue.userentity_user_id=? OR ue.userentity_user_id IS NULL) "
+		+ "AND u.userobm_email IN (" + calendarEmailsPlaceHolders + ") "
+		+ "AND u.userobm_archive != 1 "
+		+ "AND u.userobm_domain_id=?";
 
+		String publicCalsQuery =
+		// public cals
+		"SELECT u.userobm_login, u.userobm_firstname, u.userobm_lastname, u.userobm_email, er.entityright_read, er.entityright_write "
+		+ "FROM UserObm u "
+		+ "JOIN CalendarEntity ce ON u.userobm_id=ce.calendarentity_calendar_id "
+		+ "JOIN EntityRight er ON ce.calendarentity_entity_id=er.entityright_entity_id "
+		+ "WHERE er.entityright_consumer_id IS NULL "
+		+ "AND u.userobm_domain_id=? "
+		+ "AND u.userobm_email in (" + calendarEmailsPlaceHolders + ") "
+		+ "AND u.userobm_archive != 1";
+
+		String query = directRightsQuery + " UNION " + publicCalsQuery;
+		
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
@@ -1085,6 +1085,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			ps.setInt(parameterCount++, user.getUid());
 			parameterCount = collectionHelper.insertValues(ps, parameterCount);
+			ps.setInt(parameterCount++, user.getDomain().getId());
 
 			ps.setInt(parameterCount++, user.getDomain().getId());
 			parameterCount = collectionHelper.insertValues(ps, parameterCount);
@@ -1204,28 +1205,25 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Collection<CalendarInfo> getCalendarMetadata(ObmUser user, String[] calendarEmails)
+	public Collection<CalendarInfo> getCalendarMetadata(ObmUser user, Collection<String> calendarEmails)
 			throws FindException {
 		Set<CalendarInfo> rights = this.listCalendarRights(user, calendarEmails);
 		return rights;
 	}
 
-	private void processRightsRow(ResultSet rs, Set<CalendarInfo> l, ObmUser user)
+	private void processRightsRow(ResultSet rs, Set<CalendarInfo> dbResults, ObmUser user)
 			throws SQLException {
-		CalendarInfo info = makeCalendarInfo(rs, user.getDomain().getName());
-
-		if (!l.contains(info)) {
-			l.add(info);
-		} else {
-			Map<String, CalendarInfo> uidIdx = new HashMap<String, CalendarInfo>();
-			for (CalendarInfo ci : l) {
-				uidIdx.put(ci.getUid(), ci);
-			}
-			CalendarInfo old = uidIdx.get(info.getUid());
-
-			if (info.isWrite() && !old.isWrite()) {
-				l.remove(old);
-				l.add(info);
+		CalendarInfo newInfo = makeCalendarInfo(rs, user.getDomain().getName());
+		// FIXME this is an ugly hack to give the user the maximum read/write rights
+		// Should be fixed by changing the SQL query
+		boolean wasAdded = dbResults.add(newInfo);
+		if (!wasAdded) {
+			for (CalendarInfo oldInfo : dbResults) {
+				if (oldInfo.equals(newInfo)) {
+					oldInfo.setRead(oldInfo.isRead() || newInfo.isRead());
+					oldInfo.setWrite(oldInfo.isWrite() || newInfo.isWrite());
+					break;
+				}
 			}
 		}
 	}
