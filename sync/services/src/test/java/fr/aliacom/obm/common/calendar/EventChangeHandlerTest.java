@@ -640,6 +640,50 @@ public class EventChangeHandlerTest {
 			
 			verify(userService, settingsService, settings, mailer, ical4jHelper);
 		}
+		
+		@Test
+		public void testParticipationChangeWithExternalOrganizer() {
+			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
+			Attendee organizer = createRequiredAttendee("organizer@test", ParticipationState.ACCEPTED);
+			organizer.setOrganizer(true);
+			
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+			
+			Event event = new Event();
+			event.setDate(after());
+			event.addAttendee(attendee);
+			event.addAttendee(organizer);
+			
+			ObmUser attendeeUser = new ObmUser();
+			attendeeUser.setEmail(attendee.getEmail());
+			attendeeUser.setDomain(getDefaultObmDomain());
+			
+			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationReply(event, attendeeUser)).andReturn(ICS_DATA_REPLY);
+			
+			mailer.notifyUpdateParticipationState(
+					eq(event), eq(organizer), eq(attendeeUser),
+					eq(ParticipationState.ACCEPTED), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_REPLY));
+			expectLastCall().once();
+			
+			UserService userService = EasyMock.createMock(UserService.class);
+			userService.getUserFromLogin(organizer.getEmail(), attendeeUser.getDomain().getName());
+			EasyMock.expectLastCall().andReturn(null).once();
+
+			UserSettings settings = getDefaultSettings();
+			
+			SettingsService settingsService = EasyMock.createMock(SettingsService.class);
+			settingsService.getSettings(eq(attendeeUser));
+			EasyMock.expectLastCall().andReturn(settings).once();
+			Producer producer = getDefaultProducer();
+			
+			EasyMock.replay(userService, settingsService, settings, mailer, ical4jHelper);
+			
+			EventChangeHandler handler = newEventChangeHandler(mailer, settingsService, userService, producer, ical4jHelper);
+			handler.updateParticipationState(event, attendeeUser, ParticipationState.ACCEPTED, true);
+			
+			verify(userService, settingsService, settings, mailer, ical4jHelper);
+		}
 
 		@Test
 		public void testParticipationChangeWithOwnerNotExpectingEmails() {

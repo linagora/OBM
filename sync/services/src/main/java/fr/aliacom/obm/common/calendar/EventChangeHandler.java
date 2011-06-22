@@ -333,6 +333,9 @@ public class EventChangeHandler {
 
 	private boolean organizerExpectParticipationEmails(Attendee organizer, ObmDomain domain) {
 		ObmUser user = userService.getUserFromLogin(organizer.getEmail(), domain.getName());
+		if(user == null){
+			return true;
+		}
 		UserSettings settings = settingsService.getSettings(user);
 		return settings.expectParticipationEmailNotification();
 	}
