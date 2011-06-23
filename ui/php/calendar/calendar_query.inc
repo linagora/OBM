@@ -4521,13 +4521,14 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $search = true;
     }
     foreach($calendar_entity['contact'] as $c) {
+      $obmsyncServer = array_key_exists("obmsyncServer",$c) ? $c["obmsyncServer"] : null;
       $contact = OBM_Contact::get($c['id']);
       $emails = array();
       foreach($contact->email as $email) {
         $emails[] = 'mailto:'.trim(strtolower($email['address']));
       }
       $owner_name = $contact->display_name();
-      if (is_array($vevents = $contact->getEventsInInterval($start, $end))) {
+      if (is_array($vevents = $contact->getEventsInInterval($start, $end, $obmsyncServer))) {
         $extra_exceptions = array();
         foreach($vevents as $vevent) {
           if (!$search || 
@@ -4536,7 +4537,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
               ($search  && $type == 'basic' && ((empty($pattern_owner) || !empty($pattern_owner) && (array_intersect(explode(" ", strtolower($owner_name)), explode(" ", $pattern_owner)))) 
                 || $vevent->match($pattern, $type)))) {
             $uid = $vevent->getUid();
-            $recurrence_id = $vevent->evt->getRecurrenceId();
+			$recurrence_id = $vevent->getRecurrenceId() ;
             if ($recurrence_id) {
               $extra_exceptions[] = array('uid' => $vevent->getUid(), 'date' => $recurrence_id);
               $uid = $uid.'-'.count($extra_exceptions);
@@ -4544,19 +4545,23 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
             $event = new Event($uid,$vevent->getDuration(), $vevent->getSummary(), $vevent->getLocation(),
               $vevent->getCategory(),$vevent->isPrivate(),$vevent->getDescription(), null,
               $vevent->isAllDay(),'none',$c['id'],$owner_name, null, $vevent->getTransparency(),null,true);
-            $attendees = $vevent->evt->getAttendees();
-            $partstat = 'ACCEPTED';
-            foreach($attendees as $attendee) {
-              if(trim(strtolower($attendee->cn)) == trim(strtolower($c['name']))) {
-                $partstat = $attendee->partstat;
-                break;
-              }
-              if(in_array(trim(strtolower($attendee->uri)), $emails)) {
-                $partstat = $attendee->partstat;
-                break;
-              }
-            }
-            $event->addAttendee('contact',$c['id'],$owner_name, $partstat);
+	    if ( get_class($vevent) == "Vpdi_Icalendar_Freebusy" ) {
+	      $event->addAttendee('contact',$c['id'],$owner_name, "ACCEPTED");
+	    } else {
+	      $attendees = $vevent->evt->getAttendees();
+	      $partstat = 'ACCEPTED';
+	      foreach($attendees as $attendee) {
+		if(trim(strtolower($attendee->cn)) == trim(strtolower($c['name']))) {
+		  $partstat = $attendee->partstat;
+		  break;
+		}
+		if(in_array(trim(strtolower($attendee->uri)), $emails)) {
+		  $partstat = $attendee->partstat;
+		  break;
+		}
+	      }
+	      $event->addAttendee('contact',$c['id'],$owner_name, $partstat);
+	    }
             $date = clone $vevent->start;
             if ($rrule = $vevent->getRrule()) {
               // Repeat events

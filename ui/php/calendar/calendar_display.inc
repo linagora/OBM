@@ -5686,7 +5686,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
 //   - $curdate : current date
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_free_interval($current_view, $calendar) {
-
+  global $obm;
   if ($calendar['date_begin']) {
     $date = clone $calendar['date_begin'];
   } else {
@@ -5715,6 +5715,22 @@ function dis_calendar_free_interval($current_view, $calendar) {
   $ret = get_calendar_entity_label($entities);
   $ret['resourcegroup'] = run_query_resource_resourcegroup($calendar['sel_resource_group_id']);
   $entity_store = store_calendar_entities($ret);
+
+  if ( $entity_store["contact"] && is_array($entity_store["contact"]) ) {
+    $obmSyncIP = null;
+    $obmSyncServer = of_domain_get_domain_syncserver($obm['domain_id']);
+    if(count($obmSyncServer)){
+      $iterator = new ArrayIterator($obmSyncServer);
+      $obmSyncServer = $iterator->current();
+      $obmSyncIP = $obmSyncServer[0]["ip"];
+    }
+    if ( $obmSyncIP ) {
+      foreach ( $entity_store["contact"] as $key => $contact ) {
+	$entity_store["contact"][$key]["obmsyncServer"] = $obmSyncIP;
+      }
+    }
+  }
+
   calendar_events_model($date,$end, $entity_store, array('ACCEPTED', 'NEEDS-ACTION'), '', false, null, 'OPAQUE');
   if (!is_array($entity_store['resource'])) $entity_store['resource'] = array();
   if (!is_array($entity_store['resourcegroup'])) $entity_store['resourcegroup'] = array();

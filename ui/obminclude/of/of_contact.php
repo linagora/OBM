@@ -1718,10 +1718,27 @@ class OBM_Contact implements OBM_ISearchable {
     return false;
   }
 
-  public function getEventsInInterval($begin, $end) {
+
+  private function get_freebusy_from_obmsync($obmsyncserver, $email){
+      $obmSyncRootPath = "http://".$obmsyncserver.":8080";
+      $freebusyUrl = $obmSyncRootPath."/obm-sync/freebusy/".rawurlencode($email)+"?dataSource=remote";
+      $ret = file_get_contents($freebusyUrl);
+      if (!$ret) {
+	return false;
+      }
+      $calendar = reset(Vpdi::decode($ret));
+      $periods = $calendar->getBusyPeriods();
+      return $periods;
+  }
+
+  public function getEventsInInterval($begin, $end, $obmsyncserver = null ) {
     $cal = self::getCalendar();
     if ($cal) {
       $vfreebusy = $cal->getBusyPeriodsWithinInterval($begin, $end);
+      return $vfreebusy;
+    }
+    if ( $obmsyncserver && $this->email_address ) {
+      $vfreebusy = $this->get_freebusy_from_obmsync($obmsyncserver, $this->email_address);
       return $vfreebusy;
     }
     return false;

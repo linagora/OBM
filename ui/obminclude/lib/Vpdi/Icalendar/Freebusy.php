@@ -102,6 +102,10 @@ class Vpdi_Icalendar_Freebusy {
     return "";
   }
 
+  public function getRecurrenceId() {
+    return null;
+  }
+
   public function isAllDay() {
     return ($this->duration >= 84600);
   }

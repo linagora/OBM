@@ -46,6 +46,10 @@ class Vpdi_Icalendar_Event {
     $this->end = new Of_Date($this->start->format('U') + $this->duration);
   }
 
+  public function getRecurrenceId() {
+    return $this->evt->getRecurrenceId();
+  }
+
   public function getUid() {
     return "ext-".$this->evt->getUid();
   }
