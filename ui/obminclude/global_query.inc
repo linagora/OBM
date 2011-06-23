@@ -1423,7 +1423,9 @@ function global_freeze_user($params) {
   $query = "SELECT userobm_id,
     $lastaccess,
     userobm_nb_login_failed
-    FROM UserObm WHERE userobm_login='$login'
+    FROM UserObm
+    INNER JOIN Domain ON userobm_domain_id = domain_id
+    WHERE userobm_login='$login'
     $where_domain
     AND userobm_archive=0";
   $obm_q->query($query);
