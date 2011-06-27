@@ -3723,6 +3723,7 @@ function check_calendar_data_form($calendar) {
   global $l_err_begin_end, $l_err_end_repeat,$l_err_end_repeat2,$l_err_repeatfrequency;
   global $l_err_end_repeat3, $l_err_days_repeat, $l_err_days_repeat_not_weekly;
   global $l_err_monthly_dateend_repeat, $l_err_yearly_dateend_repeat;
+  global $l_err_transparent_empty_resources;
 
   $title = $calendar['title'];
   $begin = $calendar['date_begin'];
@@ -3734,6 +3735,8 @@ function check_calendar_data_form($calendar) {
   $event_duration = $calendar['event_duration'];
   ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
   $others_attendees = $calendar['others_attendees'];
+  $opacity = $calendar['opacity'];
+  $resources = $calendar['resource_id'];
   
   if (trim($title) == '') {
     $err['msg'] = $l_fill_title;
@@ -3821,6 +3824,11 @@ function check_calendar_data_form($calendar) {
   // Yearly repetition end >= date end + 1 year
   if ($kind == 'yearly' && !is_null($repeat_end) && $clone->addYear(1)->compare($repeat_end) > 0) {
     $err['msg'] = $l_err_yearly_dateend_repeat;
+    return false;
+  }
+
+  if($opacity == 'TRANSPARENT' && !empty($resources)){
+    $err['msg'] = $l_err_transparent_empty_resources;
     return false;
   }
 
