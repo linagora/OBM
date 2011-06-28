@@ -27,7 +27,7 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 		<servlet-name>FreeBusyServlet</servlet-name>
 		<display-name>OBM FreeBusy Servlet</display-name>
 		<servlet-class>
-			fr.aliacom.obm.freebusy.FreeBusyProvider
+			fr.aliacom.obm.freebusy.FreeBusyServlet
     </servlet-class>
 	</servlet>
 
