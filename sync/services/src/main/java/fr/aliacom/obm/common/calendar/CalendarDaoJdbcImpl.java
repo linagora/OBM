@@ -37,7 +37,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
@@ -408,17 +407,15 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setCategory(evrs.getString("eventcategory1_label")); // cat as string
 		// in
 		// sync ??
-		e.setTitle(StringEscapeUtils.unescapeHtml(evrs.getString("event_title")));
-		e.setLocation(StringEscapeUtils.unescapeHtml(evrs
-				.getString("event_location")));
+		e.setTitle(evrs.getString("event_title"));
+		e.setLocation(evrs.getString("event_location"));
 		cal.setTimeInMillis(evrs.getTimestamp("event_date").getTime());
 		e.setDate(cal.getTime());
 		e.setDuration(evrs.getInt("event_duration"));
 		e.setPriority(evrs.getInt("event_priority"));
 		e.setPrivacy(evrs.getInt("event_privacy"));
 		e.setAllday(evrs.getBoolean("event_allday"));
-		e.setDescription(StringEscapeUtils.unescapeHtml(evrs
-				.getString("event_description")));
+		e.setDescription(evrs.getString("event_description"));
 		e.setSequence(evrs.getInt("event_sequence"));
 
 		EventRecurrence er = new EventRecurrence();
@@ -458,8 +455,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setString(idx++, ev.getExtId());
 		ps.setString(idx++, ev.getTimezoneName());
 		ps.setObject(idx++, ev.getOpacity().getJdbcObject(obmHelper.getType()));
-		ps.setString(idx++, StringEscapeUtils.escapeHtml(ev.getTitle()));
-		ps.setString(idx++, StringEscapeUtils.escapeHtml(ev.getLocation()));
+		ps.setString(idx++, ev.getTitle());
+		ps.setString(idx++, ev.getLocation());
 		Integer cat = catIdFromString(ps.getConnection(), ev.getCategory(),
 				at.getDomainId());
 		if (cat != null) {
@@ -488,7 +485,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setNull(idx++, Types.VARCHAR); // color
 		ps.setNull(idx++, Types.DATE); // FIXME completed
 		ps.setNull(idx++, Types.VARCHAR); // FIXME url
-		ps.setString(idx++, StringEscapeUtils.escapeHtml(ev.getDescription()));
+		ps.setString(idx++, ev.getDescription());
 		ps.setInt(idx++, at.getDomainId());
 		ps.setString(idx++, at.getOrigin());
 		ps.setObject(idx++, ev.getType().getJdbcObject(obmHelper.getType()));
@@ -605,8 +602,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			query = con.prepareStatement(squery);
 			int index = 1;
-			query.setString(index++,
-					StringEscapeUtils.unescapeHtml(event.getTitle()));
+			query.setString(index++, event.getTitle());
 			query.setString(index++, calendar);
 			if (event.isAllday()) {
 
@@ -1567,8 +1563,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setString(3, ev.getTimezoneName() != null ? ev.getTimezoneName()
 				: "Europe/Paris");
 		ps.setObject(4, ev.getOpacity().getJdbcObject(obmHelper.getType()));
-		ps.setString(5, StringEscapeUtils.escapeHtml(ev.getTitle()));
-		ps.setString(6, StringEscapeUtils.escapeHtml(ev.getLocation()));
+		ps.setString(5, ev.getTitle());
+		ps.setString(6, ev.getLocation());
 		Integer cat = catIdFromString(con, ev.getCategory(), at.getDomainId());
 		if (cat != null) {
 			ps.setInt(7, cat);
@@ -1594,7 +1590,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		ps.setNull(17, Types.TIMESTAMP);
 		ps.setNull(18, Types.VARCHAR);
-		ps.setString(19, StringEscapeUtils.escapeHtml(ev.getDescription()));
+		ps.setString(19, ev.getDescription());
 		ps.setString(20, at.getOrigin());
 		ps.setInt(21, sequence);
 		ps.setInt(22, ev.getDatabaseId());
@@ -2204,7 +2200,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		EventParticipationState e = new EventParticipationState();
 		int id = evrs.getInt("event_id");
 		e.setUid("" + id);
-		e.setTitle(StringEscapeUtils.unescapeHtml(evrs.getString("event_title")));
+		e.setTitle(evrs.getString("event_title"));
 		e.setState(getAttendeeState(evrs));
 		e.setAlert(evrs.getInt("eventalert_duration"));
 		return e;
