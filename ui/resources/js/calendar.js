@@ -1234,7 +1234,7 @@ Obm.CalendarManager = new Class({
       var str = response.elementId.split('_');
       showOkMessage(response.message);
       if (response.isPeriodic && response.all) { 
-        $$('div.evt_'+str[1]).each(function(e) {
+        var deleteRoutine = function(e) {
           var evt = obm.calendarManager.events.get(e.id);
           if(evt) {
             obm.calendarManager.unregister(evt);
@@ -1242,7 +1242,13 @@ Obm.CalendarManager = new Class({
             evt.element.destroy();
             delete evt;
           }
-        });
+        };
+        $$('div.evt_'+str[1]).each(deleteRoutine);
+        if ( response.deleted_ids ) {
+            for ( var i = 0, j = response.deleted_ids.length; i<j; i++ ) {
+               $$('div.evt_'+response.deleted_ids[i] ).each(deleteRoutine);
+            }
+        }
       } else {      
         for(var i=0;i< events.length;i++) {
           var ivent = events[i].event;

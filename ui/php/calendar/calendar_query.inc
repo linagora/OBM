@@ -2299,6 +2299,7 @@ function run_query_delete_event_exceptions($event_id) {
     $query = "DELETE FROM EventException WHERE eventexception_parent_id = $event_id";
     display_debug_msg($query, $cdg_sql, 'run_query_delete_event_exceptions(2)');
     $obm_q->query($query);
+	return $childs;
   }
 }
 
@@ -3228,19 +3229,26 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
       }
     }
   }
-
+  $deleted_evt_ids = array($event_id);
+  
   // Delete documents
   run_query_calendar_delete_document($event_id);
 
   // Send mail
+  if (!($is_exception || $event->repeat_kind == 'none')) 
+  {
+    $deleted_evt_ids = array_merge($deleted_evt_ids, run_query_delete_event_exceptions($event_id));
+  }
+  $obm_q->query($query);
+  of_entity_delete('event', $event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
-
+  $obm_q->query($query);
+  
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
   if($force_sendmail || (isset($calendar['send_mail']) && $calendar['send_mail'])) {
     OBM_EventFactory::getInstance()->delete($event);
   }
-  $obm_q->query($query);
-  of_entity_delete('event', $event_id);
+  return $deleted_evt_ids;
 }
 
 

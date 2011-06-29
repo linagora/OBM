@@ -486,13 +486,15 @@ if ($action == 'search') {
   if (check_calendar_access($id)) {
     $eve_q = run_query_calendar_detail($id);
     json_delete_event_data($id, $params, $current_view);
+	$deleted_evt_ids = array();
     if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {
-      run_query_calendar_delete($params,false);
+    	$deleted_evt_ids = run_query_calendar_delete($params,false);
     } else {
-      run_query_calendar_event_exception_insert($params);
+      	run_query_calendar_event_exception_insert($params);
     }
+	
     json_ok_msg("$l_event : $l_delete_ok");
-    echo "({".$display['json']."})";
+    echo "({".$display['json'].",deleted_ids: [".implode(",",$deleted_evt_ids)."]})";
     exit();
   } else {
     json_error_msg($l_invalid_data . " : $err[msg]");

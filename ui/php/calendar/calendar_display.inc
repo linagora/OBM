@@ -7129,6 +7129,7 @@ function json_delete_event_data($id,$calendar,$current_view) {
   global $ccalendar_max_users;
   global $l_user, $l_resource;
 
+  $attendees = array();
   $element_id = $calendar['element_id'];
   $ent_q = run_query_get_events_attendee(array($id));
   $entities = get_calendar_event_entity($id);
@@ -7157,7 +7158,7 @@ function json_delete_event_data($id,$calendar,$current_view) {
       $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}"; 
     }
   }
-
+	
   $ed[] = 'id:'.$id;
   $ed[] = "opacity:'$opacity'";
   $ed[] = 'duration:'.$duration;
