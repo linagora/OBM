@@ -1721,8 +1721,8 @@ class OBM_Contact implements OBM_ISearchable {
 
   private function get_freebusy_from_obmsync($obmsyncserver, $email){
       $obmSyncRootPath = "http://".$obmsyncserver.":8080";
-      $freebusyUrl = $obmSyncRootPath."/obm-sync/freebusy/".rawurlencode($email)+"?dataSource=remote";
-      $ret = file_get_contents($freebusyUrl);
+      $freebusyUrl = $obmSyncRootPath."/obm-sync/freebusy/".rawurlencode($email)."?dataSource=remote";
+      $ret = @file_get_contents($freebusyUrl);
       if (!$ret) {
 	return false;
       }
