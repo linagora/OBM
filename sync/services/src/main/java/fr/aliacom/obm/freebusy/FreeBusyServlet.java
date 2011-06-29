@@ -18,6 +18,8 @@
 package fr.aliacom.obm.freebusy;
 
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -83,6 +85,7 @@ public class FreeBusyServlet extends HttpServlet {
 		// "/obm-sync/freebusy/firstname.lastname@obmdomain"
 
 		String email = reqString.substring(reqString.lastIndexOf("/") + 1);
+		email = URLDecoder.decode(email, "UTF-8");
 		logger.info("freebusy email : '" + email + "'");
 		
 
