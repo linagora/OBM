@@ -283,7 +283,11 @@ public class EventChangeHandler {
 	
 	private Map<AttendeeStateValue, ? extends Set<Attendee>> computeUpdateNotificationGroups(Event previous, Event current) {
 		if (previous.isEventInThePast() && current.isEventInThePast()) {
-			return ImmutableMap.of();
+			Set<Attendee> emptyAttendeesSet = ImmutableSet.of();
+			return ImmutableMap.of(
+					AttendeeStateValue.Old, emptyAttendeesSet,
+					AttendeeStateValue.Current, emptyAttendeesSet,
+					AttendeeStateValue.New, emptyAttendeesSet);
 		}
 		ImmutableSet<Attendee> previousAttendees = ImmutableSet.copyOf(filterOwner(previous, previous.getAttendees()));
 		ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(filterOwner(current, current.getAttendees()));
