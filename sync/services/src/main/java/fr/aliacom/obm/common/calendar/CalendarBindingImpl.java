@@ -1201,7 +1201,18 @@ public class CalendarBindingImpl implements ICalendar {
 		
 			final List<Event> events = calendarDao.listEventsByIntervalDate(token, obmUser, new Date(0), endDate.getTime(), type);
 			for (final Event event: events) {
-				removeEvent(token, calendar, event.getUid(), event.getSequence() + 1, false);
+				boolean eventHasOtherAttendees = event.getAttendees().size() > 1;
+				if (eventHasOtherAttendees) {
+					Attendee ownerAsAttendee = calendarOwnerAsAttendee(token, calendar, event);
+					ParticipationState participation = ownerAsAttendee.getState();
+					if (!participation.equals(ParticipationState.DECLINED)) {
+						this.changeParticipationStateInternal(token, calendar, event.getExtId(), ParticipationState.DECLINED, 
+								event.getSequence(), false);
+					}
+				}
+				else {
+					removeEvent(token, calendar, event.getUid(), event.getSequence() + 1, false);
+				}
 			}
 			
 		} catch (Throwable e) {
