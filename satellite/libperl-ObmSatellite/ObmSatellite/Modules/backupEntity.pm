@@ -1866,13 +1866,19 @@ sub _searchParentDelegation {
        push(@deleg,$ldapEntity->get_value('delegation')) ;
    }
    my @strEntityDelegation = split("",$entityDelegation) ;
+   my $last = 0 ;
    foreach my $char ( @strEntityDelegation ) {
         chop($entityDelegation) ;
         foreach my $ftpDelegation ( @deleg ) {
                 if ( $entityDelegation eq $ftpDelegation) {
                         $best_deleg = $ftpDelegation ;
+                        $last = 1 ;
                         last ;
                 }
+        }
+        # On finit la boucle uniquement si nous avons trouvé une correspondance
+        if ( $last == 1 ) {
+                last ;
         }
    }
    if ( $best_deleg ne "" ) {
