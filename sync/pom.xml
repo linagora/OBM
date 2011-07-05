@@ -259,7 +259,6 @@ org.eclipse.jdt.core.codeComplete.staticFinalFieldPrefixes=]]>
 				<groupId>javax.transaction</groupId>
 				<artifactId>jta</artifactId>
 				<version>${jta.version}</version>
-				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>commons-codec</groupId>
