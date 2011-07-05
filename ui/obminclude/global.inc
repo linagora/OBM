@@ -152,6 +152,9 @@ $ccalendar_send_ics = true;
 // Ics mime encoding for emails
 $ccalendar_ics_encoding = '8bit';
 
+// Remote calendar cache time to live
+$cremote_calendar_ics_ttl = 60;
+
 // Calendar hour fraction (minutes select granularity)
 $ccalendar_hour_fraction = 4;
 

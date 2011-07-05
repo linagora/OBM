@@ -1674,13 +1674,14 @@ class OBM_Contact implements OBM_ISearchable {
   }
 
   public function getCalendar() {
+    global $cremote_calendar_ics_ttl;
     if (is_array($this->website)) {
       foreach($this->website as $website) {
         if ($website['label'][0] == 'CALURI') {
           $url = $website['url'];
           $file = "/tmp/".str_replace("/", "_", $url);
           $now = new Of_Date();
-          if (file_exists($file) && ($now->getTimestamp() - filectime($file)) < 900) {
+          if (file_exists($file) && ($now->getTimestamp() - filectime($file)) < $cremote_calendar_ics_ttl) {
             // get ics from stored file
             $f = fopen($file, 'r');
             $d = stream_get_contents($f);
