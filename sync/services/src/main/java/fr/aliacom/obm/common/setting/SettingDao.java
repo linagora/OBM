@@ -26,11 +26,11 @@ import java.sql.Types;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.VacationSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
@@ -43,7 +43,8 @@ import fr.aliacom.obm.utils.ObmHelper;
 @Singleton
 public class SettingDao {
 	
-	private static final Log logger = LogFactory.getLog(SettingDao.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(SettingDao.class);
 	private final ObmHelper obmHelper;
 
 	@Inject

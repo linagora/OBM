@@ -5,12 +5,12 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocatorClient {
 
-	private static final Log logger = LogFactory.getLog(LocatorClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(LocatorClient.class);
 	private final String locatorUrl;
 
 	public LocatorClient(String LocatorUrl) {

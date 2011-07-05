@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sync >
+	<Collections>
+		<Collection>
+			<SyncKey>DEFAULT_CALENDAR_FOLDER</SyncKey>
+			<CollectionId>DEFAULT_CALENDAR_FOLDER</CollectionId>
+			<Options>
+				<FilterType>4</FilterType>
+			</Options>
+		</Collection>
+	</Collections>
+</Sync>

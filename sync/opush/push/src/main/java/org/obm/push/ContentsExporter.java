@@ -1,0 +1,245 @@
+package org.obm.push;
+
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TimeZone;
+
+import org.obm.push.backend.BackendSession;
+import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.IContentsExporter;
+import org.obm.push.backend.MSAttachementData;
+import org.obm.push.calendar.CalendarBackend;
+import org.obm.push.contacts.ContactsBackend;
+import org.obm.push.exception.FolderTypeNotFoundException;
+import org.obm.push.exception.ObjectNotFoundException;
+import org.obm.push.mail.MailBackend;
+import org.obm.push.store.ActiveSyncException;
+import org.obm.push.store.FilterType;
+import org.obm.push.store.FolderType;
+import org.obm.push.store.PIMDataType;
+import org.obm.push.store.SyncCollection;
+import org.obm.push.store.SyncState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
+public class ContentsExporter implements IContentsExporter {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(ContentsExporter.class);
+
+	private IInvitationFilterManager invitationFilterManager;
+	
+	private MailBackend mailBackend;
+	private CalendarBackend calBackend;
+	private ContactsBackend contactsBackend;
+
+	@Inject
+	private ContentsExporter(MailBackend mailBackend,
+			CalendarBackend calendarExporter, ContactsBackend contactsBackend, 
+			IInvitationFilterManager invitationFilterManager) {
+		
+		this.mailBackend = mailBackend;
+		this.calBackend = calendarExporter;
+		this.contactsBackend = contactsBackend;
+		this.invitationFilterManager = invitationFilterManager;
+		
+	}
+
+	private void proccessFilterType(SyncState state, FilterType filterType) {
+	
+		if (filterType != null) {
+			
+			// FILTER_BY_NO_INCOMPLETE_TASKS;//8
+			
+			final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+			cal.set(Calendar.HOUR, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+
+			switch (filterType) {
+			case ONE_DAY_BACK:
+				cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) - 1);
+				break;
+			case THREE_DAYS_BACK:
+				cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) - 3);
+				break;
+			case ONE_WEEK_BACK:
+				cal.set(Calendar.WEEK_OF_YEAR, cal.get(Calendar.WEEK_OF_YEAR) - 1);
+				break;
+			case TWO_WEEKS_BACK:
+				cal.set(Calendar.WEEK_OF_YEAR, cal.get(Calendar.WEEK_OF_YEAR) - 2);
+				break;
+			case ONE_MONTHS_BACK:
+				cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
+				break;
+			case THREE_MONTHS_BACK:
+				cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 3);
+				break;
+			case SIX_MONTHS_BACK:
+				cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 6);
+				break;
+			default:
+			case ALL_ITEMS:
+				cal.setTimeInMillis(0);
+				break;
+			}
+
+			if (state.getLastSync() != null	&& cal.getTime().after(state.getLastSync())) {
+				state.setLastSync(cal.getTime());
+				state.setLastSyncFiltred(true);
+			}
+			
+		}
+	}
+
+	private DataDelta getContactsChanges(BackendSession bs, SyncState state,
+			Integer collectionId) {
+		return contactsBackend.getContentChanges(bs, state, collectionId);
+	}
+
+	private DataDelta getTasksChanges(BackendSession bs, SyncState state,
+			Integer collectionId) throws ActiveSyncException {
+		return this.calBackend.getContentChanges(bs, state, collectionId);
+	}
+
+	private DataDelta getCalendarChanges(BackendSession bs, SyncState state, Integer collectionId) throws ActiveSyncException {
+		return calBackend.getContentChanges(bs, state, collectionId);
+	}
+
+	private DataDelta getMailChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) throws ActiveSyncException {
+		return mailBackend.getContentChanges(bs, state, collectionId, filter);
+	}
+	
+	@Override
+	public int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId, 
+			Collection<FolderType> syncedCollection) throws ActiveSyncException {
+		DataDelta dd = getChanged(bs, state, filterType, collectionId, syncedCollection);
+		Integer filterCount = invitationFilterManager.getCountFilterChanges(bs, state.getKey(), state.getDataType(), collectionId);
+		return dd.getChanges().size() + dd.getDeletions().size() + filterCount;
+	}
+	
+	@Override
+	public DataDelta getChanged(BackendSession bs, SyncState state, FilterType filter, Integer collectionId, 
+			Collection<FolderType> allSyncCollection) throws ActiveSyncException {
+		DataDelta delta = null;
+		switch (state.getDataType()) {
+		case CALENDAR:
+			proccessFilterType(state, filter);
+			delta = getCalendarChanges(bs, state, collectionId);
+			invitationFilterManager.filterEvent(bs, state, collectionId, delta);
+			break;
+		case CONTACTS:
+			delta = getContactsChanges(bs, state, collectionId);
+			break;
+		case EMAIL:
+			proccessFilterType(state, filter);
+			delta = getMailChanges(bs, state, collectionId, filter);
+			invitationFilterManager.filterInvitation(bs, state, collectionId, delta);
+			break;
+		case TASKS:
+			delta = getTasksChanges(bs, state, collectionId);
+			break;
+		case FOLDER:
+			break;
+		}
+		logger.info("Get changed from " + state.getLastSync() + " on collectionPath [ " + collectionId + " ]");
+		
+		return delta;
+	}
+	
+	@Override
+	public List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
+			List<String> fetchServerIds) throws ActiveSyncException {
+		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
+		switch (getDataType) {
+		case CONTACTS:
+			changes.addAll(contactsBackend.fetchItems(bs, fetchServerIds));
+			break;
+		case EMAIL:
+			changes.addAll(mailBackend.fetchItems(bs, fetchServerIds));
+			break;
+		case CALENDAR:
+		case TASKS:
+			changes.addAll(calBackend.fetchItems(bs, fetchServerIds));
+			break;
+		case FOLDER:
+			break;
+		}
+		return changes;
+	}
+
+	@Override
+	public MSAttachementData getEmailAttachement(BackendSession bs,
+			String attachmentId) throws ObjectNotFoundException {
+		return mailBackend.getAttachment(bs, attachmentId);
+	}
+
+	@Override
+	public boolean validatePassword(String loginAtDomain, String password) {
+		return calBackend.validatePassword(loginAtDomain, password);
+	}
+
+	@Override
+	public List<ItemChange> fetchCalendars(BackendSession bs,
+			Integer collectionId, Collection<String> uids)
+			throws ActiveSyncException {
+		return calBackend.fetchItems(bs, collectionId, uids);
+	}
+
+	
+	@Override
+	public List<ItemChange> fetchEmails(BackendSession bs,
+			Integer collectionId, Collection<Long> uids)
+			throws ActiveSyncException {
+		return mailBackend.fetchItems(bs, collectionId, uids);
+	}
+
+	@Override
+	public List<ItemChange> fetchCalendarDeletedItems(BackendSession bs,
+			Integer collectionId, Collection<String> uids) throws ActiveSyncException {
+		return calBackend.fetchDeletedItems(bs, collectionId, uids);
+	}
+
+	@Override
+	public boolean getFilterChanges(BackendSession bs, SyncCollection collection) {
+		return invitationFilterManager.getCountFilterChanges(bs, collection.getSyncKey(), collection.getDataType(), collection.getCollectionId()) > 0;
+	}
+	
+	@Override
+	public Collection<FolderType> getSyncFolderType(Collection<SyncCollection> changedFolders) {
+		Builder<FolderType> ret = ImmutableSet.builder();
+		for(SyncCollection col : changedFolders){
+			try {
+				ret.add(this.getFolderType(col));
+			} catch (FolderTypeNotFoundException e) {
+				//Nothing to do
+				logger.error(e.getMessage(), e);
+			}
+		}
+		return ret.build();
+	}
+
+	private FolderType getFolderType(SyncCollection col) throws FolderTypeNotFoundException {
+		switch (col.getDataType()) {
+		case CONTACTS:
+			return contactsBackend.getFolderType(col.getCollectionPath());
+		case EMAIL:
+			return mailBackend.getFolderType(col.getCollectionPath());
+		case CALENDAR:
+		case TASKS:
+			return calBackend.getFolderType(col.getCollectionPath());
+		default:
+			throw new FolderTypeNotFoundException("The collection's path [ " + col.getCollectionPath() + " ] is invalid");		
+		}
+	}
+	
+}

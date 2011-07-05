@@ -22,8 +22,8 @@ import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -32,7 +32,8 @@ public class ParametersSource {
 
 	private HttpServletRequest req;
 
-	private static final Log logger = LogFactory.getLog(ParametersSource.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(ParametersSource.class);
 
 	public ParametersSource(HttpServletRequest req) {
 		this.req = req;

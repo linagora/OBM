@@ -5,20 +5,20 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.base.Category;
 import org.obm.sync.items.AbstractItemsParser;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class CalendarItemsParser extends AbstractItemsParser {
 
-	protected Log logger = LogFactory.getLog(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	public EventChanges parseChanges(Document doc) {
 		EventChanges changes = new EventChanges();

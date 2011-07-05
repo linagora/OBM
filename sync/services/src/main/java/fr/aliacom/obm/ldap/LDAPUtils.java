@@ -28,12 +28,12 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LDAPUtils {
 
-	private Log logger = LogFactory.getLog(LDAPUtils.class);
+	private Logger logger =  LoggerFactory.getLogger(LDAPUtils.class);
 
 	private String baseDn;
 
@@ -84,7 +84,7 @@ public class LDAPUtils {
 			ret = new PasswordHandler().verify(new String(hashedPassword),
 					userPassword);
 		} catch (NoSuchAlgorithmException nsae) {
-			logger.fatal("Cannot match encrypted password", nsae);
+			logger.error("Cannot match encrypted password", nsae);
 		}
 		return ret;
 	}
@@ -100,13 +100,13 @@ public class LDAPUtils {
 			ctx = getConnection();
 			ldapEntry = findOneAttributeSetBy(matchField, matchValue, ctx);
 		} catch (NamingException ne) {
-			logger.error(ne, ne);
+			logger.error(ne.getMessage(), ne);
 		} finally {
 			if (ctx != null) {
 				try {
 					ctx.close();
 				} catch (NamingException e) {
-					logger.error(e, e);
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}
@@ -133,7 +133,7 @@ public class LDAPUtils {
 				}
 			}
 		} catch (NamingException ne) {
-			logger.fatal("no entry found in directory", ne);
+			logger.error("no entry found in directory", ne);
 		}
 		return result;
 	}

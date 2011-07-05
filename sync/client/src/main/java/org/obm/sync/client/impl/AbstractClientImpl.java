@@ -10,8 +10,6 @@ import org.apache.commons.httpclient.HttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -19,6 +17,8 @@ import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.ISyncClient;
 import org.obm.sync.utils.DOMUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -34,7 +34,7 @@ import com.google.common.collect.Multimap;
 public abstract class AbstractClientImpl implements ISyncClient {
 
 	protected HttpClient hc;
-	protected Log logger = LogFactory.getLog(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 	private String url;
 
 	static {
@@ -191,9 +191,11 @@ public abstract class AbstractClientImpl implements ISyncClient {
 
 	protected void checkServerError(Document doc) throws ServerFault {
 		if (documentIsError(doc)) {
-			String message = DOMUtils.getElementText(doc.getDocumentElement(), "message");
-			String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
-			if(EventAlreadyExistException.class.getName().equals(type)){
+			String message = DOMUtils.getElementText(doc.getDocumentElement(),
+					"message");
+			String type = DOMUtils.getElementText(doc.getDocumentElement(),
+					"type");
+			if (EventAlreadyExistException.class.getName().equals(type)) {
 				throw new EventAlreadyExistException(message);
 			} else {
 				throw new ServerFault(message);

@@ -22,9 +22,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -41,7 +41,8 @@ import fr.aliacom.obm.utils.ObmHelper;
 public class DatabaseAuthentificationService implements
 		IAuthentificationService {
 
-	private static final Log logger = LogFactory.getLog(DatabaseAuthentificationService.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(DatabaseAuthentificationService.class);
 	private final ObmHelper obmHelper;
 	private final Helper helper;
 

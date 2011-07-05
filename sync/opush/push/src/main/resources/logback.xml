@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration scan="true" scanPeriod="60 seconds">
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout>
+			<pattern>
+				%d{HH:mm:ss.SSS} [%-5level] [%X{title}] {%logger{32}} [%X{user}] : %msg%n
+			</pattern>
+		</layout>
+	</appender>
+ 
+	<appender name="SIFTING" class="ch.qos.logback.classic.sift.SiftingAppender">
+		<discriminator>
+			<Key>sessionId</Key>
+			<DefaultValue>no-session</DefaultValue>
+		</discriminator>
+		<sift>
+			<appender name="FILE-${user}" class="ch.qos.logback.core.FileAppender">
+				<File>logs/${sessionId}.log</File>
+				<Append>true</Append>
+				<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+					<evaluator>
+						<expression>
+							return (marker != null) &amp;&amp; 
+							(		marker.contains("ActiveSync")
+								||	marker.contains("ActiveSyncXmlRequest")
+								||	marker.contains("ActiveSyncRequestHeaders")
+								||  marker.contains("ActiveSyncRequestInfo")
+								||	marker.contains("ActiveSyncXmlResponse")
+								||	marker.contains("ActiveSyncResponseHeaders")
+								||	marker.contains("HttpRequest")
+							);
+						</expression>
+					</evaluator>
+					<OnMismatch>DENY</OnMismatch>
+					<OnMatch>NEUTRAL</OnMatch>
+				</filter>
+
+				<encoder class="org.obm.push.logging.XmlTechnicalLogEncoder">
+					<layout class="org.obm.push.logging.XmlTechnicalLogLayout" />
+				</encoder>
+			</appender>
+		</sift>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="SIFTING" />
+	</root>
+
+</configuration>

@@ -12,13 +12,13 @@ import javax.naming.ConfigurationException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.locator.LocatorClient;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -30,7 +30,8 @@ import fr.aliacom.obm.services.constant.ConstantService;
  */
 public class SolrHelper {
 
-	private static final Log logger = LogFactory.getLog(SolrHelper.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(SolrHelper.class);
 	
 	@Singleton
 	public static class Factory {

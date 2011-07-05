@@ -23,9 +23,9 @@ import java.util.Properties;
 
 import javax.naming.ConfigurationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -36,7 +36,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class ConstantService {
 
-	private static final Log logger = LogFactory.getLog(ConstantService.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConstantService.class);
 	private static final String DEFAULT_TEMPLATE_FOLDER = "/usr/share/obm-sync/resources";
 	private static final String OVERRIDE_TEMPLATE_FOLDER = "/etc/obm-sync/resources/template/";
 	private static final String OBM_SYNC_MAILER = "x-obm-sync";

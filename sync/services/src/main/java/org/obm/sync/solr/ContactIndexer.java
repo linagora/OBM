@@ -8,8 +8,6 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
@@ -17,6 +15,8 @@ import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
 import org.obm.sync.book.InstantMessagingId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -25,7 +25,8 @@ import fr.aliacom.obm.utils.ObmHelper;
 
 public class ContactIndexer implements Runnable {
 
-	private static final Log logger = LogFactory.getLog(ContactIndexer.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(ContactIndexer.class);
 
 	private final ObmHelper obmHelper;
 	private final CommonsHttpSolrServer srv;

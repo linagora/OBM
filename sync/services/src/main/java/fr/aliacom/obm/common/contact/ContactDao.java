@@ -40,8 +40,6 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
@@ -67,6 +65,8 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -82,7 +82,8 @@ import fr.aliacom.obm.utils.ObmHelper;
 @Singleton
 public class ContactDao {
 
-	private static final Log logger = LogFactory.getLog(ContactDao.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(ContactDao.class);
 
 	private static final String DEFAULT_ADDRESS_BOOK_NAME = "contacts";
 	private static final String COLLECTED_ADDRESS_BOOK_NAME = "collected_contacts";

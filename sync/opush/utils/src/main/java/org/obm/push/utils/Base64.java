@@ -1,40 +1,9 @@
-//////////////////////license & copyright header/////////////////////////
-//                                                                     //
-//    Base64 - encode/decode data using the Base64 encoding scheme     //
-//                                                                     //
-//                Copyright (c) 1998 by Kevin Kelley                   //
-//                                                                     //
-// This library is free software; you can redistribute it and/or       //
-// modify it under the terms of the GNU Lesser General Public          //
-// License as published by the Free Software Foundation; either        //
-// version 2.1 of the License, or (at your option) any later version.  //
-//                                                                     //
-// This library is distributed in the hope that it will be useful,     //
-// but WITHOUT ANY WARRANTY; without even the implied warranty of      //
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       //
-// GNU Lesser General Public License for more details.                 //
-//                                                                     //
-// You should have received a copy of the GNU Lesser General Public    //
-// License along with this library; if not, write to the Free Software //
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA           //
-// 02111-1307, USA, or contact the author:                             //
-//                                                                     //
-// Kevin Kelley <kelley@ruralnet.net> - 30718 Rd. 28, La Junta, CO,    //
-// 81050  USA.                                                         //
-//                                                                     //
-////////////////////end license & copyright header///////////////////////
-
-package fr.aliacom.obm.ldap;
+package org.obm.push.utils;
 
 /**
  * Provides encoding of raw bytes to base64-encoded characters, and decoding of
  * base64 characters to raw bytes.
  * 
- * @author Kevin Kelley (kelley@ruralnet.net)
- * @version 1.3
- * @date 06 August 1998
- * @modified 14 February 2000
- * @modified 22 September 2000
  */
 public class Base64 {
 
@@ -57,15 +26,15 @@ public class Base64 {
 			boolean quad = false;
 			boolean trip = false;
 
-			int val = (0xFF & data[i]);
+			int val = (0xFF & (int) data[i]);
 			val <<= 8;
 			if ((i + 1) < data.length) {
-				val |= (0xFF & data[i + 1]);
+				val |= (0xFF & (int) data[i + 1]);
 				trip = true;
 			}
 			val <<= 8;
 			if ((i + 2) < data.length) {
-				val |= (0xFF & data[i + 2]);
+				val |= (0xFF & (int) data[i + 2]);
 				quad = true;
 			}
 			out[index + 3] = alphabet[(quad ? (val & 0x3F) : 64)];

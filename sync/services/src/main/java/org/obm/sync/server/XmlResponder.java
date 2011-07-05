@@ -24,8 +24,6 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.base.Category;
@@ -52,6 +50,8 @@ import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.SettingItemsWriter;
 import org.obm.sync.setting.VacationSettings;
 import org.obm.sync.utils.DOMUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -60,7 +60,7 @@ import com.google.common.base.Strings;
 public class XmlResponder {
 
 	private HttpServletResponse resp;
-	private Log logger = LogFactory.getLog(getClass());
+	private Logger logger =  LoggerFactory.getLogger(getClass());
 	private CalendarItemsWriter ciw;
 	private BookItemsWriter biw;
 	private SettingItemsWriter siw;

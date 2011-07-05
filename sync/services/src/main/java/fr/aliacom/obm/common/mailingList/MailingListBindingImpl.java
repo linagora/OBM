@@ -19,8 +19,6 @@ package fr.aliacom.obm.common.mailingList;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
@@ -28,6 +26,8 @@ import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
 import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.IMailingList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -37,7 +37,8 @@ import fr.aliacom.obm.utils.LogUtils;
 @Singleton
 public class MailingListBindingImpl implements IMailingList {
 
-	private static final Log logger = LogFactory.getLog(MailingListBindingImpl.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(MailingListBindingImpl.class);
 
 	private MailingListHome mailingListHome;
 	

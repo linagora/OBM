@@ -17,12 +17,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.server.ParametersSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
@@ -30,13 +29,13 @@ import fr.aliacom.obm.common.session.SessionManagement;
 
 public abstract class SecureSyncHandler implements ISyncHandler {
 
-	protected Log logger = LogFactory.getLog(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 	private SessionManagement sessions;
 
 	protected SecureSyncHandler(SessionManagement sessionManagement) {
 		sessions = sessionManagement;
 	}
-	
+
 	protected String p(ParametersSource params, String name) {
 		return params.getParameter(name);
 	}
@@ -49,14 +48,15 @@ public abstract class SecureSyncHandler implements ISyncHandler {
 			return Integer.valueOf(text);
 		}
 	}
-	
+
 	private AccessToken getToken(ParametersSource params) {
 		AccessToken at = new AccessToken(0, 0, "unused");
 		at.setSessionId(params.getParameter("sid"));
 		return at;
 	}
-	
-	protected AccessToken getCheckedToken(ParametersSource params) throws AuthFault {
+
+	protected AccessToken getCheckedToken(ParametersSource params)
+			throws AuthFault {
 		AccessToken token = getToken(params);
 		sessions.checkToken(token);
 		return token;

@@ -25,9 +25,9 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchResult;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -41,7 +41,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 @Singleton
 public class LDAPAuthService implements IAuthentificationService {
 
-	private static Log logger = LogFactory.getLog(LDAPAuthService.class);
+	private static Logger logger =  LoggerFactory.getLogger(LDAPAuthService.class);
 	private LDAPAuthConfig authConfig;
 	private LDAPDirectory directory;
 	private final UserDao userDao;

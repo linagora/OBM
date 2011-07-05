@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -23,7 +23,7 @@ import fr.aliacom.obm.utils.ObmHelper;
 @Singleton
 public class UserDao {
 
-	private static final Log logger = LogFactory.getLog(UserDao.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
 	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login";
 	private final ObmHelper obmHelper;
 	

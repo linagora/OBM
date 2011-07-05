@@ -22,9 +22,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.server.handler.ISyncHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -36,7 +36,7 @@ public class SyncStatus {
 
 	private static final String TITLE = "OBM Sync Status";
 
-	private Log logger = LogFactory.getLog(getClass());
+	private Logger logger =  LoggerFactory.getLogger(getClass());
 
 	private Map<String, ISyncHandler> handlers;
 

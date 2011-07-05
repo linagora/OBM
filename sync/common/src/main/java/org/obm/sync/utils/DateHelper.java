@@ -2,12 +2,12 @@ package org.obm.sync.utils;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DateHelper {
 
-	private static final Log logger = LogFactory.getLog(DateHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(DateHelper.class);
 
 	public static final String asString(Date d) {
 		return String.valueOf(d.getTime());

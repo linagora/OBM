@@ -4,7 +4,6 @@
 
 	<persistence-enabled>true</persistence-enabled>
 	<security-enabled>false</security-enabled>
-	<log-delegate-factory-class-name>org.hornetq.integration.logging.Log4jLogDelegateFactory</log-delegate-factory-class-name>
 
 	<connectors>
 		<connector name="in-vm">

@@ -22,12 +22,12 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.MapEvictionListener;
@@ -54,7 +54,8 @@ public class SessionManagement {
 
 	private ConcurrentMap<String, AccessToken> sessions;
 
-	private static final Log logger = LogFactory.getLog(SessionManagement.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(SessionManagement.class);
 	
 	private final AtomicInteger conversationUidGenerator;
 	private final AuthentificationServiceFactory authentificationServiceFactory;

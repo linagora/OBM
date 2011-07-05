@@ -1,8 +1,8 @@
 package org.obm.sync.items;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.utils.DOMUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 /**
@@ -13,7 +13,7 @@ import org.w3c.dom.Element;
  */
 public abstract class AbstractItemsWriter {
 
-	protected Log logger = LogFactory.getLog(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected void createIfNotNull(Element e, String nodeName, String value) {
 		if (value != null && value.length() > 0) {

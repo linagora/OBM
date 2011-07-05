@@ -28,13 +28,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
 import org.obm.sync.book.Folder;
 import org.obm.sync.utils.DateHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -45,7 +45,7 @@ import fr.aliacom.obm.utils.ObmHelper;
 @Singleton
 public class UserDao {
 
-	private static final Log logger = LogFactory.getLog(UserDao.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
 	private final ObmHelper obmHelper;
 	
 	private static final int FOLDER_UID = -1;

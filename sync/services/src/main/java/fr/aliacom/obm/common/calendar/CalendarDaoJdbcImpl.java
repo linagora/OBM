@@ -37,8 +37,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
@@ -62,6 +60,8 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
 import org.obm.sync.utils.DisplayNameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
@@ -91,8 +91,8 @@ import fr.aliacom.obm.utils.StringSQLCollectionHelper;
 @Singleton
 public class CalendarDaoJdbcImpl implements CalendarDao {
 
-	private static final Log logger = LogFactory
-			.getLog(CalendarDaoJdbcImpl.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(CalendarDaoJdbcImpl.class);
 
 	// event_ext_id | character varying(255) | default ''::character varying
 	// event_owner | integer |
@@ -1820,12 +1820,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private Object getJdbcObjectParticipationState(final Attendee at) {
+	private Object getJdbcObjectParticipationState(final Attendee at) throws SQLException {
 		final ParticipationState pStat = RFC2445.getParticipationStateOrDefault(at.getState());
 		return pStat.getJdbcObject(obmHelper.getType());
 	}
 
-	private Object getJdbcObjectParticipationRole(final Attendee at) {
+	private Object getJdbcObjectParticipationRole(final Attendee at) throws SQLException {
 		final ParticipationRole pRole = RFC2445.getParticipationRoleOrDefault(at.getRequired());
 		return pRole.getJdbcObject(obmHelper.getType());
 	}

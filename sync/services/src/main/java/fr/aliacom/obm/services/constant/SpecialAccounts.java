@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -30,7 +30,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class SpecialAccounts {
 
-	private static final Log logger = LogFactory.getLog(SpecialAccounts.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(SpecialAccounts.class);
 
 	private Map<String, String> rootAccounts;
 	private ArrayList<String> anyUserAccounts;

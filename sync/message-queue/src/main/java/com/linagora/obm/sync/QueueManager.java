@@ -8,13 +8,13 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hornetq.jms.server.embedded.EmbeddedJMS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueueManager {
 
-	private static final Log logger = LogFactory.getLog(QueueManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(QueueManager.class);
 	private final EmbeddedJMS jmsServer;
 	private boolean started;
 	private ConnectionFactory cf;

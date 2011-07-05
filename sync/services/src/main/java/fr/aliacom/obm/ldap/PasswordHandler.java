@@ -20,6 +20,8 @@ package fr.aliacom.obm.ldap;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.codec.binary.Base64;
+
 public class PasswordHandler {
 
 	PasswordHandler() {
@@ -56,7 +58,7 @@ public class PasswordHandler {
 		// TODO: vérifier si le synchronized que j'ai ajouté est nécessaire
 		MessageDigest msgDigest = MessageDigest.getInstance(alg);
 
-		byte[][] hs = split(Base64.decode(digest.toCharArray()), size);
+		byte[][] hs = split(Base64.decodeBase64(digest), size);
 		byte[] hash = hs[0];
 		byte[] salt = hs[1];
 
@@ -102,7 +104,7 @@ public class PasswordHandler {
 		byte[] pwhash = msgDigest.digest();
 
 		StringBuffer digest = new StringBuffer(label);
-		digest.append(Base64.encode(concatenate(pwhash, salt)));
+		digest.append(Base64.encodeBase64String(concatenate(pwhash, salt)));
 
 		return digest.toString();
 	}

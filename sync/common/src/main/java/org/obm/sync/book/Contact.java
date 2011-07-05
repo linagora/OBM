@@ -144,6 +144,13 @@ public class Contact {
 	public HashSet<Website> getWebsites() {
 		return websites;
 	}
+	
+	public Website getWebsite() {
+		if (websites.size() > 0) {
+			return websites.iterator().next();
+		}
+		return null;
+	}
 
 	public Map<String, Email> getEmails() {
 		return emails;

@@ -8,15 +8,16 @@ import javax.transaction.UserTransaction;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class TransactionalInterceptor implements MethodInterceptor {
 
-	private static final Log logger = LogFactory.getLog(TransactionalInterceptor.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(TransactionalInterceptor.class);
 	
 	@Inject
 	private Provider<UserTransaction> userTransactionProvider;

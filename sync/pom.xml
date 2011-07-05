@@ -3,16 +3,44 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                        http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.linagora.obm.sync</groupId>
+	<groupId>com.linagora.obm</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<version>2.4.0-SNAPSHOT</version>
-	<name>obm-sync parent project</name>
+	<version>obm-sync-opush-SNAPSHOT</version>
+	<name>obm-sync and opush 2.4 parent project</name>
 
 	<properties>
+		<obm-sync-client.version>obm-sync-2.4-SNAPSHOT</obm-sync-client.version>		
+		<obm-sync-common.version>obm-sync-2.4-SNAPSHOT</obm-sync-common.version>		
+		<obm-sync-locator.version>obm-sync-2.4-SNAPSHOT</obm-sync-locator.version>		
+		<obm-sync-message-queue.version>obm-sync-2.4-SNAPSHOT</obm-sync-message-queue.version>	
+		<obm-sync-services.version>obm-sync-2.4-SNAPSHOT</obm-sync-services.version>		
+
+		<dbcp.version>2.4-SNAPSHOT</dbcp.version>
+		<utils.version>2.4-SNAPSHOT</utils.version>
+
+		<postgresql.version>9.0-801.jdbc4</postgresql.version>
+		<mysql-connector-java.version>5.1.16</mysql-connector-java.version>
+
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<hornetq.version>2.2.2.Final</hornetq.version>
+		<junit.version>4.8.2</junit.version>
+		<easymock.version>3.0</easymock.version>
+		<guava.version>r09</guava.version>
+		<commons-httpclient.version>3.1</commons-httpclient.version>
+		<commons-io.version>2.0.1</commons-io.version>
+		<jms.version>1.1</jms.version>
+		<netty.version>3.2.4.Final</netty.version>		
+		<ical4j.version>1.0-rc3</ical4j.version>
+		<jta.version>1.1</jta.version>
+		<commons-lang.version>2.6</commons-lang.version>
+		<slf4j.version>1.6.1</slf4j.version>
+		<servlet-api.version>2.5</servlet-api.version>
+		<mail.version>1.4.4</mail.version>
+		<freemarker.version>2.3.18</freemarker.version>
+		<jsoup.version>1.5.2</jsoup.version>
 		<guice.version>3.0</guice.version>
+		<apache-mime4j.version>0.6.1</apache-mime4j.version>
 	</properties>
 
 	<repositories>
@@ -38,11 +66,24 @@
 		<module>services</module>
 		<module>locator</module>
 		<module>message-queue</module>
+		<module>opush</module>	
+		<module>configuration</module>
+		<module>obm-locator</module>
+		<module>utils</module>
+		<module>dbcp</module>
 	</modules>
 
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+ 					<version>2.8.1</version>
+					<configuration>
+					<argLine>-Xms512m -Xmx512m -XX:MaxPermSize=128M</argLine>
+					</configuration>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -72,7 +113,7 @@ org.eclipse.jdt.core.compiler.problem.incompleteEnumSwitch=warning
 org.eclipse.jdt.core.compiler.problem.redundantNullCheck=warning
 org.eclipse.jdt.core.compiler.problem.potentialNullReference=warning
 org.eclipse.jdt.core.compiler.problem.parameterAssignment=ignore
-org.eclipse.jdt.core.compiler.problem.undocumentedEmptyBlock=warning
+org.eclipse.jdt.core.compiler.problem.undocumentedEmptyBlock=ignore
 org.eclipse.jdt.core.compiler.source=1.6
 org.eclipse.jdt.core.codeComplete.staticFieldSuffixes=
 org.eclipse.jdt.core.compiler.problem.unusedParameter=warning
@@ -112,6 +153,24 @@ org.eclipse.jdt.core.codeComplete.staticFinalFieldPrefixes=]]>
 						</additionalConfig>
 					</configuration>
 				</plugin>
+				
+				<plugin>
+					<groupId>org.mortbay.jetty</groupId>
+					<artifactId>maven-jetty-plugin</artifactId>
+					<version>6.1.26</version>
+					<configuration>
+						<scanIntervalSeconds>10</scanIntervalSeconds>
+						<stopKey>foo</stopKey>
+						<stopPort>9999</stopPort>
+						<connectors>
+							<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+								<port>8083</port>
+								<maxIdleTime>60000</maxIdleTime>
+							</connector>
+						</connectors>
+					</configuration>
+				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -119,21 +178,120 @@ org.eclipse.jdt.core.codeComplete.staticFinalFieldPrefixes=]]>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>0.9.29</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>0.9.29</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-access</artifactId>
+				<version>0.9.29</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jul-to-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>${servlet-api.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>${mail.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.freemarker</groupId>
+				<artifactId>freemarker</artifactId>
+				<version>${freemarker.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>${postgresql.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>${mysql-connector-java.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jsoup</groupId>
+				<artifactId>jsoup</artifactId>
+				<version>${jsoup.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.inject</groupId>
+				<artifactId>guice</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.fortuna.ical4j</groupId>
+				<artifactId>ical4j</artifactId>
+				<version>${ical4j.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>javax.transaction</groupId>
+				<artifactId>jta</artifactId>
+				<version>${jta.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.5</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>${commons-lang.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.jms</groupId>
+				<artifactId>jms</artifactId>
+				<version>${jms.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.netty</groupId>
+				<artifactId>netty</artifactId>
+				<version>${netty.version}</version>
+			</dependency>			
+			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.8.2</version>
+				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.easymock</groupId>
 				<artifactId>easymock</artifactId>
-				<version>3.0</version>
+				<version>${easymock.version}</version>
 				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-				<version>1.1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.hornetq</groupId>
@@ -163,18 +321,39 @@ org.eclipse.jdt.core.codeComplete.staticFinalFieldPrefixes=]]>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>r09</version>
-			</dependency>
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.16</version>
-				<scope>provided</scope>
+				<version>${guava.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.inject</groupId>
 				<artifactId>guice</artifactId>
 				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-httpclient</groupId>
+				<artifactId>commons-httpclient</artifactId>
+				<version>${commons-httpclient.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.james</groupId>
+				<artifactId>apache-mime4j</artifactId>
+				<version>${apache-mime4j.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

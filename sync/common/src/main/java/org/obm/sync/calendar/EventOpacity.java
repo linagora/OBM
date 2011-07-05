@@ -1,6 +1,7 @@
 package org.obm.sync.calendar;
 
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 
 import org.obm.sync.base.ObmDbType;
 
@@ -8,7 +9,7 @@ public enum EventOpacity {
 
 	OPAQUE, TRANSPARENT;
 
-	public Object getJdbcObject(ObmDbType type) {
+	public Object getJdbcObject(ObmDbType type) throws SQLException {
 		if (type == ObmDbType.PGSQL) {
 			try {
 				Object o = Class.forName("org.postgresql.util.PGobject")
@@ -22,15 +23,14 @@ public enum EventOpacity {
 				setValue.invoke(o, toString());
 				return o;
 			} catch (Throwable e) {
-				e.printStackTrace();
+				throw new SQLException(e.getMessage(), e);
 			}
-			return null;
 		}
 		return toString();
 	}
-	
-	public static EventOpacity getValueOf(String opacity){
-		if(TRANSPARENT.toString().equalsIgnoreCase(opacity)){
+
+	public static EventOpacity getValueOf(String opacity) {
+		if (TRANSPARENT.toString().equalsIgnoreCase(opacity)) {
 			return TRANSPARENT;
 		}
 		return OPAQUE;

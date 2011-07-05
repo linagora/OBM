@@ -2,29 +2,41 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	
 	<parent>
-		<groupId>com.linagora.obm.sync</groupId>
+		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>2.4.0-SNAPSHOT</version>
+		<version>obm-sync-opush-SNAPSHOT</version>
 	</parent>
+	
 	<artifactId>locator</artifactId>
 	<packaging>jar</packaging>
-	<name>Client for obm-locator service</name>
+	<name>obm-sync client for obm-locator service</name>
 	<url>http://www.obm.org/</url>
+	<version>obm-sync-2.4-SNAPSHOT</version>
+
 	<dependencies>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.0</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.sync</groupId>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>common</artifactId>
-			<version>2.4.0-SNAPSHOT</version>
+			<version>${obm-sync-common.version}</version>
 		</dependency>
 	</dependencies>
+
 </project>

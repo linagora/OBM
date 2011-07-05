@@ -28,15 +28,15 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dumps the request for debugging purpose
  */
 public class DumpFilter implements Filter {
 
-	Log logger = LogFactory.getLog(getClass());
+	Logger logger =  LoggerFactory.getLogger(getClass());
 
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {

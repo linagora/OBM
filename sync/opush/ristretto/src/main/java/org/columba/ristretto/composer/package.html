@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+
+  @(#)package.html	1.0 2003/08/23
+
+  The contents of this file are subject to the Mozilla Public License Version 1.1
+  (the "License"); you may not use this file except in compliance with the 
+  License. You may obtain a copy of the License at http://www.mozilla.org/MPL/
+
+  Software distributed under the License is distributed on an "AS IS" basis,
+  WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License 
+  for the specific language governing rights and
+  limitations under the License.
+
+  The Original Code is "The Columba Project"
+
+  The Initial Developers of the Original Code are Frederik Dietz and Timo Stich.
+  Portions created by Frederik Dietz and Timo Stich are Copyright (C) 2003. 
+
+All Rights Reserved.
+
+-->
+
+</head>
+<body bgcolor="white">
+
+This is the package for rendering messages. To create
+a message with ristretto you have to build a MimePart hierarchy,
+with headers and bodies. After that take the root MimePart and
+give it as parameter to the MimeTreeRenderer render methods.
+As a result you get an InputStream from wich you can read the
+fully RFC compatible rendered message.
+<p>
+<h3>The underlying structure
+<p>
+To render the single mimeparts there exist the MimePartRenderer.
+Built in we have a DefaultRenderer which simply adds the header
+and the specified body to the message. Maybe a quoted-printable
+or base64 encoding is done if specified in the MimeHeader.
+Next there is a TextPartRenderer wich works like the DefaultMimePartRenderer
+except that it does CharsetConversion if specified in the MimeHeader.
+Last there is a MultipartRenderer which renderes all childparts
+to one multipart like defined in RFC 2046.
+<p>
+This framework can easily be enhanced by adding your own mimepartrenderer.
+An example where this can be done is e.g. to add GnuPG support like defined
+in RFC 3501. To add your own renderer call MimeTreeRenderer
+addMimePartRenderer once and your Renderer will be used for
+the mimetype you specified whenever such a mimepart is encounterd
+while rendering your message.
+
+
+</body>
+</html>

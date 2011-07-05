@@ -1,15 +1,15 @@
 package org.obm.sync.solr;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Removes by uniqueID in a Solr index.
  */
 public class Remover implements Runnable {
 
-	private static final Log logger = LogFactory.getLog(Remover.class);
+	private static final Logger logger = LoggerFactory.getLogger(Remover.class);
 
 	private CommonsHttpSolrServer srv;
 	private String id;

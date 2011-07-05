@@ -11,13 +11,13 @@ import java.util.TimeZone;
 import javax.jms.JMSException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 import org.obm.sync.server.mailer.EventChangeMailer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -38,7 +38,8 @@ import fr.aliacom.obm.utils.Ical4jHelper;
 
 public class EventChangeHandler {
 
-	private static final Log logger = LogFactory.getLog(EventChangeHandler.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(EventChangeHandler.class);
 	private final EventChangeMailer eventChangeMailer;
 	private final SettingsService settingsService;
 	private final UserService userService;

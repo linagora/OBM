@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetItemEstimate xmlns="ItemEstimate:" xmlns:AirSync="AirSync:">
+	<Collections>
+		<Collection>
+			<CollectionId>1</CollectionId>
+			<AirSync:FilterType>4</AirSync:FilterType>
+			<AirSync:SyncKey>111222333444555
+			</AirSync:SyncKey>
+		</Collection>
+		<Collection>
+			<CollectionId>2</CollectionId>
+			<AirSync:FilterType>0</AirSync:FilterType>
+			<AirSync:SyncKey>111222333444
+			</AirSync:SyncKey>
+		</Collection>
+	</Collections>
+</GetItemEstimate>

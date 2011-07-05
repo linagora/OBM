@@ -8,10 +8,10 @@ import java.util.List;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.items.AbstractItemsParser;
 import org.obm.sync.utils.DOMUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -19,9 +19,8 @@ import org.xml.sax.SAXException;
 
 public class MailingListItemsParser extends AbstractItemsParser {
 
-	@SuppressWarnings("unused")
-	private static final Log logger = LogFactory
-			.getLog(MailingListItemsParser.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(MailingListItemsParser.class);
 
 	public MailingList parseMailingList(String parameter) throws SAXException,
 			IOException, FactoryConfigurationError {
@@ -90,7 +89,7 @@ public class MailingListItemsParser extends AbstractItemsParser {
 					mailingListEmails.getBytes()));
 			return parseEmails(doc.getDocumentElement());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		return new ArrayList<MLEmail>(0);
 	}

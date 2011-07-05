@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Provision>
+<Policies>
+<Policy>
+<PolicyType>MS-WAP-Provisioning-XML</PolicyType>
+<PolicyKey>FILL_ME</PolicyKey>
+<Status>1</Status>
+</Policy>
+</Policies>
+</Provision>

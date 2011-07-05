@@ -1,0 +1,30 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+
+	<listener>
+		<listener-class>org.obm.push.GuiceServletContextListener</listener-class>
+	</listener>
+	
+	<servlet> 
+		<servlet-name>activeSyncServlet</servlet-name> 
+		<servlet-class>org.obm.push.ActiveSyncServlet</servlet-class> 
+ 		<load-on-startup>1</load-on-startup>
+	</servlet> 
+
+	<servlet-mapping>
+		<servlet-name>activeSyncServlet</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>continuation</filter-name>
+		<filter-class>org.eclipse.jetty.continuation.ContinuationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>continuation</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+</web-app>

@@ -110,7 +110,6 @@ public class MailingListItemsWriterTest extends TestCase {
 			DOMUtils.serialise(xml, out);
 			assertEquals(sb.toString(), out.toString());
 		} catch (TransformerException e1) {
-			e1.printStackTrace();
 			fail(e1.getMessage());
 		}
 	}

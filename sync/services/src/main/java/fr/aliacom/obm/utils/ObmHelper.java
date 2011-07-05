@@ -28,9 +28,9 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.base.ObmDbType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -59,7 +59,8 @@ public class ObmHelper {
 		}
 	}
 	
-	private static final Log logger = LogFactory.getLog(ObmHelper.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(ObmHelper.class);
 	private static final String DATA_SOURCE = "java:comp/env/jdbc/ObmDS";
 	private static final String USER_TRANSACTION = "java:comp/UserTransaction";
 

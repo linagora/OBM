@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
@@ -16,6 +14,8 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -27,7 +27,8 @@ import fr.aliacom.obm.utils.ObmHelper;
 
 public class EventIndexer implements Runnable {
 
-	private static final Log logger = LogFactory.getLog(EventIndexer.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(EventIndexer.class);
 	
 	@Singleton
 	public static class Factory {

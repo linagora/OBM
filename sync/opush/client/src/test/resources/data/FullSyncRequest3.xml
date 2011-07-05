@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sync>
+<Collections>
+<Collection>
+<SyncKey>FILL_ME</SyncKey>
+<CollectionId>1</CollectionId>
+</Collection>
+<Collection>
+<SyncKey>FILL_ME</SyncKey>
+<CollectionId>2</CollectionId>
+</Collection>
+<Collection>
+<SyncKey>FILL_ME</SyncKey>
+<CollectionId>12</CollectionId>
+</Collection>
+<Collection>
+<SyncKey>FILL_ME</SyncKey>
+<CollectionId>11</CollectionId>
+</Collection>
+</Collections>
+<Wait>1</Wait>
+</Sync>

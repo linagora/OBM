@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                        http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>com.linagora.obm</groupId>
+		<artifactId>parent</artifactId>
+		<version>obm-sync-opush-SNAPSHOT</version>
+	</parent>
+	
+	<groupId>com.linagora.obm.opush</groupId>
+	<artifactId>parent</artifactId>
+	<packaging>pom</packaging>
+	<name>opush parent project</name>
+	<url>http://www.obm.org/</url>	
+	<version>opush-2.4-SNAPSHOT</version>
+
+	<properties>
+		<opush-aliapool.version>opush-2.4-SNAPSHOT</opush-aliapool.version>
+		<opush-client.version>opush-2.4-SNAPSHOT</opush-client.version>
+		<opush-imap.version>opush-2.4-SNAPSHOT</opush-imap.version>
+		<opush-mail.version>opush-2.4-SNAPSHOT</opush-mail.version>
+		<opush-mime.version>opush-2.4-SNAPSHOT</opush-mime.version>
+		<opush-push.version>opush-2.4-SNAPSHOT</opush-push.version>
+		<opush-tnefconverter.version>opush-2.4-SNAPSHOT</opush-tnefconverter.version>
+		<opush-wbxml.version>opush-2.4-SNAPSHOT</opush-wbxml.version>
+
+		<mailapi.version>1.4.3</mailapi.version>
+		<backport-util-concurrent.version>3.1</backport-util-concurrent.version>
+	</properties>
+
+	<scm>
+		<connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-0.6.1</connection>
+		<url>http://svn.apache.org/viewvc/james/mime4j/tags/apache-mime4j-0.6.1</url>
+	</scm>
+
+	<modules>
+		<module>tnefconverter</module>
+		<module>push</module>
+		<module>wbxml</module>
+		<module>client</module>
+		<module>imap</module>
+		<module>mail</module>
+		<module>mime</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>common</artifactId>
+				<version>${obm-sync-common.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>client</artifactId>
+				<version>${obm-sync-client.version}</version>
+			</dependency>			
+			<dependency>
+				<groupId>backport-util-concurrent</groupId>
+				<artifactId>backport-util-concurrent</artifactId>
+				<version>${backport-util-concurrent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mailapi</artifactId>
+				<version>${mailapi.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>

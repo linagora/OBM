@@ -62,7 +62,6 @@ public class MailingListItemsParserTest extends TestCase {
 			assertEquals(ml, ret.iterator().next());
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}
@@ -88,7 +87,6 @@ public class MailingListItemsParserTest extends TestCase {
 			assertEquals(ml, ret);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}
@@ -114,7 +112,6 @@ public class MailingListItemsParserTest extends TestCase {
 			ret.contains(e3);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}
@@ -141,7 +138,6 @@ public class MailingListItemsParserTest extends TestCase {
 			ret.contains(e3);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}

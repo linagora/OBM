@@ -1,10 +1,10 @@
 package fr.aliacom.obm.common.user;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -18,7 +18,8 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 @Singleton
 public class UserServiceImpl implements UserService {
 
-	private static final Log logger = LogFactory.getLog(UserServiceImpl.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(UserServiceImpl.class);
 	private final DomainService domainService;
 	private final UserDao userDao;
 

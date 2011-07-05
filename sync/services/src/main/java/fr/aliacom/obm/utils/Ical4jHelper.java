@@ -98,8 +98,6 @@ import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
@@ -111,6 +109,8 @@ import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
@@ -126,7 +126,8 @@ public class Ical4jHelper {
 	private static final int MAX_FOLD_LENGTH = 74; 
 	private static final int SECONDS_IN_DAY = 43200000;
 	private static final String XOBMDOMAIN = "X-OBM-DOMAIN";
-	private Log logger = LogFactory.getLog(Ical4jHelper.class);
+
+	private static Logger logger = LoggerFactory.getLogger(Ical4jHelper.class);
 	
 	public String buildIcsInvitationRequest(ObmUser user, Event event) {
 		Calendar calendar = initCalendar();
@@ -150,9 +151,9 @@ public class Ical4jHelper {
 			calendarOutputter.output(calendar, writer);
 			return writer.toString(); 
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		} catch (ValidationException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 		return null;
 	}
@@ -1319,7 +1320,7 @@ public class Ical4jHelper {
 						extd.setValue(da.toString());
 						ret.add(extd);
 					} catch (Exception e) {
-						logger.error(e, e);
+						logger.error(e.getMessage(), e);
 					}
 				}
 			}

@@ -29,8 +29,6 @@ import java.util.List;
 import net.fortuna.ical4j.data.ParserException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -52,6 +50,8 @@ import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.ICalendar;
 import org.obm.sync.services.ImportICalendarException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
@@ -69,7 +69,8 @@ import fr.aliacom.obm.utils.LogUtils;
 
 public class CalendarBindingImpl implements ICalendar {
 
-	private static final Log logger = LogFactory.getLog(CalendarBindingImpl.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(CalendarBindingImpl.class);
 
 	private EventType type;
 	

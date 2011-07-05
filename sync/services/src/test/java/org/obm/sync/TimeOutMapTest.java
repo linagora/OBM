@@ -20,7 +20,6 @@ public class TimeOutMapTest {
 			evictionListener(new MapEvictionListener<String, Object>() {
 				@Override
 				public void onEviction(String key, Object value) {
-					System.out.println("key " + key + " evicted");
 				}
 			}).makeMap();
 		t.put("a", new Object());

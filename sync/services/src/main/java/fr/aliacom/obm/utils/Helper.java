@@ -27,12 +27,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -43,13 +43,13 @@ import com.google.inject.Singleton;
 @Singleton
 public class Helper {
 
-	private static final Log logger = LogFactory.getLog(Helper.class);
+	private static final Logger logger = LoggerFactory.getLogger(Helper.class);
 	private static final String HEX_DIGITS = "0123456789abcdef";
 	private static final String DATE_UTC_PATTERN = "yyyyMMdd'T'HHmmss'Z'";
 
 	private final SimpleDateFormat dateFormatUTC;
 	private final ObmHelper obmHelper;
-	
+
 	@Inject
 	protected Helper(ObmHelper obmHelper) {
 		this.obmHelper = obmHelper;
@@ -59,13 +59,14 @@ public class Helper {
 
 	public String getLoginFromEmail(String email) {
 		String username = "";
-		if(email != null){
-			Iterable<String> it = Splitter.on('@').omitEmptyStrings().split(email);
+		if (email != null) {
+			Iterable<String> it = Splitter.on('@').omitEmptyStrings()
+					.split(email);
 			username = Iterables.get(it, 0, "");
 		}
 		return username;
 	}
-	
+
 	public String constructEmailFromList(String listofmail, String domain) {
 
 		String[] lemail = null;
@@ -191,8 +192,7 @@ public class Helper {
 	 * Returns true if the logged in user can writer on the given user_login's
 	 * calendar
 	 */
-	public boolean canReadCalendar(AccessToken writer,
-			String targetCalendar) {
+	public boolean canReadCalendar(AccessToken writer, String targetCalendar) {
 		String calendarLogin = getLoginFromEmail(targetCalendar);
 		// implicit right
 		if (checkImplicitRights(writer, calendarLogin)) {
@@ -263,7 +263,8 @@ public class Helper {
 
 	private boolean checkImplicitRights(AccessToken writer,
 			String targetCalendar) {
-		return writer.getUser().equalsIgnoreCase(targetCalendar) || writer.getUserWithDomain().equalsIgnoreCase(targetCalendar);
+		return writer.getUser().equalsIgnoreCase(targetCalendar)
+				|| writer.getUserWithDomain().equalsIgnoreCase(targetCalendar);
 	}
 
 	/**
@@ -277,7 +278,8 @@ public class Helper {
 		}
 	}
 
-	public boolean attendeesContainsUser(List<Attendee> attendees, AccessToken token) {
+	public boolean attendeesContainsUser(List<Attendee> attendees,
+			AccessToken token) {
 		final String email = token.getEmail();
 		return Iterables.any(attendees, new Predicate<Attendee>() {
 			@Override

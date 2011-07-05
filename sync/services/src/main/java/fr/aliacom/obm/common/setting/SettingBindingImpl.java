@@ -19,8 +19,6 @@ package fr.aliacom.obm.common.setting;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
@@ -28,6 +26,8 @@ import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.ISetting;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.VacationSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -39,7 +39,8 @@ import fr.aliacom.obm.utils.LogUtils;
 @Singleton
 public class SettingBindingImpl implements ISetting {
 
-	private static final Log logger = LogFactory.getLog(SettingBindingImpl.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(SettingBindingImpl.class);
 
 	private SettingDao settingDao;
 

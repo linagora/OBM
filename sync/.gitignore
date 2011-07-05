@@ -3,4 +3,10 @@ build/
 client-build/
 dist-client/
 dist/
+message-queue/data/
+.project
+.classpath
+.settings
+*target*
+*eclipse-build*
 

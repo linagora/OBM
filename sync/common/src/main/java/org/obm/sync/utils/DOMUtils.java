@@ -23,8 +23,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,9 +42,10 @@ import org.xml.sax.SAXException;
  */
 public final class DOMUtils {
 
+	private static final Logger logger = LoggerFactory.getLogger(DOMUtils.class);
+
 	private static TransformerFactory fac;
 	private static DocumentBuilderFactory dbf;
-
 	private static ThreadLocal<DocumentBuilder> builder = new ThreadLocal<DocumentBuilder>();
 
 	static {
@@ -60,14 +61,12 @@ public final class DOMUtils {
 			try {
 				ret = dbf.newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}
 			builder.set(ret);
 		}
 		return ret;
 	}
-
-	private static final Log logger = LogFactory.getLog(DOMUtils.class);
 
 	public static String getElementTextInChildren(Element root,
 			String elementName) {
@@ -286,7 +285,7 @@ public final class DOMUtils {
 	public static void logDom(Document doc) throws TransformerException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		serialise(doc, out, true);
-		System.out.println(out.toString());
+		logger.info(out.toString());
 	}
 
 	public static Document parse(InputStream is) throws SAXException,

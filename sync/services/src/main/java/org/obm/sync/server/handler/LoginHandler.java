@@ -17,15 +17,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.OBMConnectorVersionException;
 import org.obm.sync.login.LoginBindingImpl;
 import org.obm.sync.server.ParametersSource;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.server.mailer.ErrorMailer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -40,18 +39,18 @@ import fr.aliacom.obm.common.user.UserSettings;
  * <code>/login/doLogin?login=xx&password=yy</code>
  */
 public class LoginHandler implements ISyncHandler {
-	
-	private final Log logger = LogFactory.getLog(getClass());
+
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final LoginBindingImpl binding;
 	private final ErrorMailer errorMailer;
 	private final VersionValidator versionValidator;
 	private final SettingsService settingsService;
 	private final UserService userService;
-	
+
 	@Inject
-	private LoginHandler(LoginBindingImpl loginBindingImpl, ErrorMailer errorMailer, 
-			SettingsService settingsService, VersionValidator versionValidator,
-			UserService userService) {
+	private LoginHandler(LoginBindingImpl loginBindingImpl,
+			ErrorMailer errorMailer, SettingsService settingsService,
+			VersionValidator versionValidator, UserService userService) {
 		this.binding = loginBindingImpl;
 		this.errorMailer = errorMailer;
 		this.settingsService = settingsService;
@@ -79,11 +78,11 @@ public class LoginHandler implements ISyncHandler {
 		binding.logout(params.getParameter("sid"));
 	}
 
-	private void doLogin(ParametersSource params, XmlResponder responder){
+	private void doLogin(ParametersSource params, XmlResponder responder) {
 		String login = params.getParameter("login");
 		String pass = params.getParameter("password");
 		String origin = params.getParameter("origin");
-		try{
+		try {
 			if (origin == null) {
 				responder.sendError("login refused with null origin");
 				return;
@@ -91,23 +90,23 @@ public class LoginHandler implements ISyncHandler {
 			if (logger.isDebugEnabled()) {
 				params.dumpHeaders();
 			}
-			AccessToken token = binding.logUserIn(login, pass, origin, 
-					params.getClientIP(), params.getRemoteIP(), 
+			AccessToken token = binding.logUserIn(login, pass, origin,
+					params.getClientIP(), params.getRemoteIP(),
 					params.getLemonLdapLogin(), params.getLemonLdapDomain());
 			if (token != null) {
 				versionValidator.checkObmConnectorVersion(token);
 				responder.sendToken(token);
 			} else {
 				responder.sendError("Login failed for user '" + login
-					+ "' with password '" + pass + "'");
+						+ "' with password '" + pass + "'");
 			}
-		} catch(OBMConnectorVersionException e) {
-			logger.error(e.getToken().getOrigin() +" isn't longer suppored.");
+		} catch (OBMConnectorVersionException e) {
+			logger.error(e.getToken().getOrigin() + " isn't longer suppored.");
 			ObmUser user = userService.getUserFromAccessToken(e.getToken());
 			UserSettings settings = settingsService.getSettings(user);
-			errorMailer.notifyConnectorVersionError(e.getToken(),
-					e.getConnectorVersion().toString(),
-					settings.locale(), settings.timezone());
+			errorMailer.notifyConnectorVersionError(e.getToken(), e
+					.getConnectorVersion().toString(), settings.locale(),
+					settings.timezone());
 		}
 	}
 }

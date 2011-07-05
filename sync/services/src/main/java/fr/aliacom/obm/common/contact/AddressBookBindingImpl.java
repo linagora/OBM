@@ -24,8 +24,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
@@ -41,6 +39,8 @@ import org.obm.sync.items.FolderChanges;
 import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.IAddressBook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
@@ -58,7 +58,8 @@ import fr.aliacom.obm.utils.ObmHelper;
 @Singleton
 public class AddressBookBindingImpl implements IAddressBook {
 
-	private static final Log logger = LogFactory.getLog(AddressBookBindingImpl.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(AddressBookBindingImpl.class);
 
 	private final ContactDao contactDao;
 	private final UserDao userDao;
