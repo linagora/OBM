@@ -7,7 +7,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import net.fortuna.ical4j.data.ParserException;
 
@@ -17,15 +19,11 @@ import org.junit.Test;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.services.ImportICalendarException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 
 import com.google.common.collect.ImmutableList;
 
@@ -272,7 +270,7 @@ public class CalendarBindingImplTest {
 		expect(eventWithOwnerAttendee.getExtId()).andReturn(eventExtId).atLeastOnce();
 		expect(eventWithOwnerAttendee.isEventInThePast()).andReturn(true).once();
 		expect(eventWithOwnerAttendee.getAttendees()).andReturn(ImmutableList.of(fakeUserAttendee)).atLeastOnce();
-		eventWithOwnerAttendee.setAttendees(EasyMock.anyObject(List.class));
+		eventWithOwnerAttendee.setAttendees(Arrays.asList(fakeUserAttendee));
 		EasyMock.expectLastCall().once();
 		
 		Helper rightsHelper = mockRightsHelper(calendar, accessToken);
@@ -314,7 +312,7 @@ public class CalendarBindingImplTest {
 		expect(eventWithOwnerAttendee.getExtId()).andReturn(eventExtId).atLeastOnce();
 		expect(eventWithOwnerAttendee.isEventInThePast()).andReturn(false).once();
 		expect(eventWithOwnerAttendee.getAttendees()).andReturn(ImmutableList.of(fakeUserAttendee)).atLeastOnce();
-		eventWithOwnerAttendee.setAttendees(EasyMock.anyObject(List.class));
+		eventWithOwnerAttendee.setAttendees(Arrays.asList(fakeUserAttendee));
 		EasyMock.expectLastCall().once();
 		
 		Helper rightsHelper = mockRightsHelper(calendar, accessToken);

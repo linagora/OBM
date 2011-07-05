@@ -8,8 +8,6 @@ import java.util.List;
 
 public class Event {
 
-	private static final long serialVersionUID = 1L;
-
 	private String title;
 	private String domain;
 	private String description;

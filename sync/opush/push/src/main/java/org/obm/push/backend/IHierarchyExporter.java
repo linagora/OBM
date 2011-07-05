@@ -17,12 +17,8 @@ public interface IHierarchyExporter {
 
 	void configure(SyncState state, String dataClass, Integer filterType,
 			int i, int j);
-	
+
 	String getRootFolderUrl(BackendSession bs);
-
-//	SyncState getState(BackendSession bs);
-
-	// void synchronize(BackendSession bs);
 
 	List<ItemChange> getChanged(BackendSession bs);
 

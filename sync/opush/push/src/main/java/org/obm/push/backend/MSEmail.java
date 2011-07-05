@@ -23,8 +23,6 @@ public class MSEmail implements IApplicationData {
 		return PIMDataType.EMAIL;
 	}
 
-	private static final long serialVersionUID = 1165242659388338781L;
-
 	private String subject;
 	private MSEmailBody body;
 	private MSAddress from;

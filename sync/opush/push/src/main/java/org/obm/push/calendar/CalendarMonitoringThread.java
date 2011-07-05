@@ -110,7 +110,6 @@ public class CalendarMonitoringThread extends MonitoringThread {
 	private Date fillChangedCollections(ResultSet rs,
 			Set<SyncCollection> changed, Date lastSync) throws SQLException {
 		Date ret = lastSync;
-		int i = 0;
 		while (rs.next()) {
 			String login = rs.getString(1);
 			String domain = rs.getString(2);
@@ -134,7 +133,6 @@ public class CalendarMonitoringThread extends MonitoringThread {
 			String s = colName.toString();
 			sc.setCollectionPath(s);
 			changed.add(sc);
-			i++;
 			if (logger.isInfoEnabled()) {
 				logger.info("Detected cal change for " + s);
 			}

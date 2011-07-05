@@ -45,6 +45,7 @@ public class GuiceServletContextListener implements ServletContextListener {
         		failStartup("Could not create injector: createInjector() returned null"); 
         	} 
         	servletContext.setAttribute(ATTRIBUTE_NAME, injector);
+        	XTrustProvider.install();
         } catch (Exception e) {
         	failStartup(e.getMessage());
         } 

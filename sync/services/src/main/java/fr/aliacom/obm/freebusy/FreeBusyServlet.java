@@ -18,7 +18,6 @@
 package fr.aliacom.obm.freebusy;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;

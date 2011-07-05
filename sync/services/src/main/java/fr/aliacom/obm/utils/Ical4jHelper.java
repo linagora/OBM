@@ -121,8 +121,6 @@ import fr.aliacom.obm.common.user.ObmUser;
 @Singleton
 public class Ical4jHelper {
 	
-	private static final long serialVersionUID = -8511131061773801072L;
-
 	private static final int MAX_FOLD_LENGTH = 74; 
 	private static final int SECONDS_IN_DAY = 43200000;
 	private static final String XOBMDOMAIN = "X-OBM-DOMAIN";

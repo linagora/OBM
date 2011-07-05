@@ -21,8 +21,6 @@ import java.util.Set;
 
 public class FastFetch {
 
-	private static final long serialVersionUID = -8557645090248136216L;
-
 	private long uid;
 	private Date internalDate;
 	private Set<Flag> flags;
