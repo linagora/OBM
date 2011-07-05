@@ -3237,7 +3237,11 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
   // Send mail
   if (!($is_exception || $event->repeat_kind == 'none')) 
   {
-    $deleted_evt_ids = array_merge($deleted_evt_ids, run_query_delete_event_exceptions($event_id));
+    $deleted_events_exceptions = run_query_delete_event_exceptions($event_id);
+    if ( !is_array($deleted_events_exceptions) ) {
+      $deleted_events_exceptions = array();
+    }
+    $deleted_evt_ids = array_merge($deleted_evt_ids, $deleted_events_exceptions);
   }
   $obm_q->query($query);
   of_entity_delete('event', $event_id);
