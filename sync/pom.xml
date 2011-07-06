@@ -10,11 +10,11 @@
 	<name>obm-sync and opush 2.4 parent project</name>
 
 	<properties>
-		<obm-sync-client.version>obm-sync-2.4-SNAPSHOT</obm-sync-client.version>		
-		<obm-sync-common.version>obm-sync-2.4-SNAPSHOT</obm-sync-common.version>		
-		<obm-sync-locator.version>obm-sync-2.4-SNAPSHOT</obm-sync-locator.version>		
-		<obm-sync-message-queue.version>obm-sync-2.4-SNAPSHOT</obm-sync-message-queue.version>	
-		<obm-sync-services.version>obm-sync-2.4-SNAPSHOT</obm-sync-services.version>		
+		<obm-sync-client.version>2.4.0-SNAPSHOT</obm-sync-client.version>		
+		<obm-sync-common.version>2.4.0-SNAPSHOT</obm-sync-common.version>		
+		<obm-sync-locator.version>2.4.0-SNAPSHOT</obm-sync-locator.version>		
+		<obm-sync-message-queue.version>2.4.0-SNAPSHOT</obm-sync-message-queue.version>	
+		<obm-sync-services.version>2.4.0-SNAPSHOT</obm-sync-services.version>		
 
 		<dbcp.version>2.4-SNAPSHOT</dbcp.version>
 		<utils.version>2.4-SNAPSHOT</utils.version>
