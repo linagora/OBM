@@ -562,18 +562,19 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				eventById.put(ret.getDatabaseId(), ret);
 				changedEvent.add(ret);
 			}
+			String evIdList = buildEventId(changedEvent);
+			if (!changedEvent.isEmpty()) {
+				loadAttendeesAndAlerts(con, token, eventById, evIdList, domainName);
+				loadExceptions(con, cal, eventById, evIdList);
+				loadEventExceptions(con, token, eventById, evIdList);
+			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, evps, evrs);
 		}
 
-		String evIdList = buildEventId(changedEvent);
-		if (!changedEvent.isEmpty()) {
-			loadAttendeesAndAlerts(token, eventById, evIdList, domainName);
-			loadExceptions(cal, eventById, evIdList);
-			loadEventExceptions(token, eventById, evIdList);
-		}
+		
 		return ret;
 	}
 
@@ -1022,14 +1023,21 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 		}
 
-		if (!changedEvent.isEmpty()) {
-			String evIdList = buildEventId(changedEvent);
-			loadAttendeesAndAlerts(token, eventById, evIdList, calendarUser
-					.getDomain().getName());
-			loadExceptions(cal, eventById, evIdList);
-			loadEventExceptions(token, eventById, evIdList);
+		Connection conComp = null;
+		try {
+			conComp = obmHelper.getConnection();
+			if (!changedEvent.isEmpty()) {
+				String evIdList = buildEventId(changedEvent);
+				loadAttendeesAndAlerts(conComp, token, eventById, evIdList, calendarUser
+						.getDomain().getName());
+				loadExceptions(con, cal, eventById, evIdList);
+				loadEventExceptions(con, token, eventById, evIdList);
+			}
+		} catch (SQLException e) {
+			logger.error("error loading attendees, alerts, exceptions, eventException", e);
+		} finally {
+			obmHelper.cleanup(conComp, null, null);
 		}
-
 		ret.setUpdated(changedEvent.toArray(new Event[0]));
 		ret.setDeletions(findDeletedEvents(calendarUser, lastSync, typeFilter,
 				declined));
@@ -1240,8 +1248,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return info;
 	}
 
-	private void loadAttendeesAndAlerts(AccessToken token, Map<Integer, Event> eventsById,
-			String evIdList, String domainName) {
+	private void loadAttendeesAndAlerts(Connection con, AccessToken token, Map<Integer, Event> eventsById,
+			String evIdList, String domainName) throws SQLException {
 		if (eventsById.isEmpty()) {
 			return;
 		}
@@ -1265,25 +1273,24 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Connection con = null;
 		try {
-			con = obmHelper.getConnection();
-			//obm user
 			ps = con.prepareStatement(attUserAlerts);
 			rs = ps.executeQuery();
 			Multimap<Integer, AttendeeAlert> attsUsersByEvent = getUserAttendeesByEventIdFromCursor(rs, domainName);
 			appendAttendeeToEvent(eventsById, attsUsersByEvent);
+			appendEventToAlert(token, eventsById, attsUsersByEvent);
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
+		try {
 			//contact			
 			ps = con.prepareStatement(attContactAlerts);
 			rs = ps.executeQuery();
 			Multimap<Integer, AttendeeAlert> attsContactsByEvent = getContactAttendeesByEventIdFromCursor(rs, domainName);
 			appendAttendeeToEvent(eventsById, attsContactsByEvent);
 			
-			appendEventToAlert(token, eventsById, attsUsersByEvent);
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 		defineEventsInternalStatus(eventsById.values());
 	}
@@ -1345,8 +1352,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private void loadEventExceptions(AccessToken token,
-			Map<Integer, Event> eventById, String evIdList) {
+	private void loadEventExceptions(Connection con, AccessToken token,
+			Map<Integer, Event> eventById, String evIdList) throws SQLException {
 		String ev = "SELECT "
 				+ EVENT_SELECT_FIELDS
 				+ ", eventexception_date as recurrence_id "
@@ -1361,7 +1368,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Connection con = null;
 
 		String domainName = null;
 
@@ -1370,7 +1376,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Calendar cal = getGMTCalendar();
 		try {
 
-			con = obmHelper.getConnection();
 			ps = con.prepareStatement(ev);
 			rs = ps.executeQuery();
 
@@ -1387,19 +1392,16 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 							eventExcept);
 				}
 			}
-
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			String evExceptIdList = buildEventId(changedEvent);
+			loadAttendeesAndAlerts(con, token, evenExcepttById, evExceptIdList,
+					domainName);
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
-		String evExceptIdList = buildEventId(changedEvent);
-		loadAttendeesAndAlerts(token, evenExcepttById, evExceptIdList,
-				domainName);
 	}
 
-	private void loadExceptions(Calendar cal, Map<Integer, Event> eventById,
-			String evIdList) {
+	private void loadExceptions(Connection con, Calendar cal, Map<Integer, Event> eventById,
+			String evIdList) throws SQLException {
 		if (eventById.isEmpty()) {
 			return;
 		}
@@ -1410,9 +1412,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ ") AND eventexception_child_id IS NULL";
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Connection con = null;
 		try {
-			con = obmHelper.getConnection();
 			ps = con.prepareStatement(exceps);
 			rs = ps.executeQuery();
 			while (rs.next()) {
@@ -1424,10 +1424,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					er.addException(cal.getTime());
 				}
 			}
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 	}
 
@@ -2008,9 +2006,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				String domainName = evrs.getString("domain_name");
 				Map<Integer, Event> eventById = ImmutableMap.of(ret.getDatabaseId(), ret);
 				String evIdList = buildEventId(ImmutableList.of(ret));
-				loadAttendeesAndAlerts(token, eventById, evIdList, domainName);
-				loadExceptions(cal, eventById, evIdList);
-				loadEventExceptions(token, eventById, evIdList);
+				loadAttendeesAndAlerts(con, token, eventById, evIdList, domainName);
+				loadExceptions(con, cal, eventById, evIdList);
+				loadEventExceptions(con, token, eventById, evIdList);
 				return ret;
 			}
 		} catch (SQLException e) {
@@ -2069,17 +2067,18 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					ret.add(event);
 				}
 			}
+			
+			String evIdList = buildEventId(changedEvent);
+			loadAttendeesAndAlerts(con, token, eventById, evIdList, obmUser.getDomain().getName());
+			loadExceptions(con, cal, eventById, evIdList);
+			loadEventExceptions(con, token, eventById, evIdList);
+			
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, evps, evrs);
 		}
 
-		String evIdList = buildEventId(changedEvent);
-		loadAttendeesAndAlerts(token, eventById, evIdList, obmUser.getDomain().getName());
-		loadExceptions(cal, eventById, evIdList);
-		loadEventExceptions(token, eventById, evIdList);
-		
 		return ret;
 	}
 
@@ -2121,18 +2120,20 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				eventById.put(event.getDatabaseId(), event);
 				ret.add(event);
 			}
-
+			
+			String evIdList = buildEventId(ret);
+			loadAttendeesAndAlerts(con, token, eventById, evIdList, calendarUser
+					.getDomain().getName());
+			loadExceptions(con, cal, eventById, evIdList);
+			loadEventExceptions(con, token, eventById, evIdList);
+			
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, evps, evrs);
 		}
 
-		String evIdList = buildEventId(ret);
-		loadAttendeesAndAlerts(token, eventById, evIdList, calendarUser
-				.getDomain().getName());
-		loadExceptions(cal, eventById, evIdList);
-		loadEventExceptions(token, eventById, evIdList);
+		
 		return ret;
 	}
 
