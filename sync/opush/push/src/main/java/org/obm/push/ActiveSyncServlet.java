@@ -56,6 +56,8 @@ import org.slf4j.Marker;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import ch.qos.logback.core.sift.AppenderTracker;
+import ch.qos.logback.core.sift.SiftingAppenderBase;
+
 import com.google.inject.Injector;
 
 /**
@@ -459,7 +461,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		if (logFileName != null) {
 
 			LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-			SiftingAppender siftingAppender = (SiftingAppender) loggerContext
+			SiftingAppenderBase<?> siftingAppender = (SiftingAppender) loggerContext
 														.getLogger(Logger.ROOT_LOGGER_NAME)
 														.getAppender("SIFTING");
 			if (siftingAppender != null) {

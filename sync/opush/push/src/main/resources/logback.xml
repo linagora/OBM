@@ -59,9 +59,9 @@
 	</appender>
 
 	<root level="INFO">
-		<appender-ref ref="PROD" />
-		<!--appender-ref ref="STDOUT" /-->
-		<!--appender-ref ref="SIFTING" /-->
+		<!--<appender-ref ref="PROD" />-->
+		<appender-ref ref="STDOUT" />
+		<!--<appender-ref ref="SIFTING" />-->
 	</root>
 
 </configuration>
