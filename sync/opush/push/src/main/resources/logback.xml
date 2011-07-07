@@ -2,10 +2,24 @@
 
 <configuration scan="true" scanPeriod="60 seconds">
 
+	<appender name="PROD" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <File>/var/log/opush/opush.log</File>
+                <encoder>
+                        <pattern>%d{HH:mm:ss.SSS} [%-5level] {%logger{32}} [%X{user}]:%msg%n</pattern>
+                </encoder>
+                <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                        <maxIndex>10</maxIndex>
+                        <FileNamePattern>/var/log/opush/opush.log.%i</FileNamePattern>
+                </rollingPolicy>
+                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                        <MaxFileSize>30000KB</MaxFileSize>
+                </triggeringPolicy>
+        </appender>
+
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout>
 			<pattern>
-				%d{HH:mm:ss.SSS} [%-5level] [%X{title}] {%logger{32}} [%X{user}] : %msg%n
+				%d{HH:mm:ss.SSS} [%-5level] {%logger{32}} [%X{user}] : %msg%n
 			</pattern>
 		</layout>
 	</appender>
@@ -45,7 +59,9 @@
 	</appender>
 
 	<root level="INFO">
-		<appender-ref ref="SIFTING" />
+		<appender-ref ref="PROD" />
+		<!--appender-ref ref="STDOUT" /-->
+		<!--appender-ref ref="SIFTING" /-->
 	</root>
 
 </configuration>
