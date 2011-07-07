@@ -34,7 +34,7 @@
 		<ical4j.version>1.0-rc3</ical4j.version>
 		<jta.version>1.1</jta.version>
 		<commons-lang.version>2.6</commons-lang.version>
-		<slf4j.version>1.5.8</slf4j.version>
+		<slf4j.version>1.6.1</slf4j.version>
 		<servlet-api.version>2.5</servlet-api.version>
 		<mail.version>1.4.4</mail.version>
 		<freemarker.version>2.3.18</freemarker.version>
