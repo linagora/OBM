@@ -9,7 +9,7 @@
                 </encoder>
                 <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
                         <maxIndex>10</maxIndex>
-                        <FileNamePattern>/var/log/opush/opush.log.%i</FileNamePattern>
+                        <FileNamePattern>/var/log/jetty/opush/opush.log.%i</FileNamePattern>
                 </rollingPolicy>
                 <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
                         <MaxFileSize>30000KB</MaxFileSize>
