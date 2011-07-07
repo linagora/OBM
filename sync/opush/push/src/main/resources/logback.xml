@@ -3,13 +3,13 @@
 <configuration scan="true" scanPeriod="60 seconds">
 
 	<appender name="PROD" class="ch.qos.logback.core.rolling.RollingFileAppender">
-                <File>/var/log/jetty/opush/opush.log</File>
+                <File>/var/log/opush/opush.log</File>
                 <encoder>
                         <pattern>%d{HH:mm:ss.SSS} [%-5level] {%logger{32}} [%X{user}]:%msg%n</pattern>
                 </encoder>
                 <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
                         <maxIndex>10</maxIndex>
-                        <FileNamePattern>/var/log/jetty/opush/opush.log.%i</FileNamePattern>
+                        <FileNamePattern>/var/log/opush/opush.log.%i</FileNamePattern>
                 </rollingPolicy>
                 <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
                         <MaxFileSize>30000KB</MaxFileSize>
