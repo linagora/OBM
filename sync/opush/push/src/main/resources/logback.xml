@@ -3,7 +3,7 @@
 <configuration scan="true" scanPeriod="60 seconds">
 
 	<appender name="PROD" class="ch.qos.logback.core.rolling.RollingFileAppender">
-                <File>/var/log/opush/opush.log</File>
+                <File>/var/log/jetty/opush/opush.log</File>
                 <encoder>
                         <pattern>%d{HH:mm:ss.SSS} [%-5level] {%logger{32}} [%X{user}]:%msg%n</pattern>
                 </encoder>
