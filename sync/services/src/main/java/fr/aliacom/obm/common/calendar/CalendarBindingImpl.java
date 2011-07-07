@@ -474,6 +474,7 @@ public class CalendarBindingImpl implements ICalendar {
 				notifyOrganizerForExternalEvent(token, calendar, event, notification);
 				return event;
 			} else {
+				changeOrganizerParticipationStateToAccepted(event);
 				Event ev = calendarDao.createEvent(token, calendar, event, false);
 				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ ev.getTitle() + "] created");
 				notifyOrganizerForExternalEvent(token, calendar, ev, notification);
@@ -485,6 +486,14 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
+	private void changeOrganizerParticipationStateToAccepted(Event event) {
+		for(Attendee att : event.getAttendees()){
+			if(att.isOrganizer()){
+				att.setState(ParticipationState.ACCEPTED);
+			}
+		}
+	}
+
 	private Attendee calendarOwnerAsAttendee(AccessToken token, String calendar, Event event) 
 		throws FindException {
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
