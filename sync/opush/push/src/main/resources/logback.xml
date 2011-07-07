@@ -4,9 +4,9 @@
 
 	<appender name="PROD" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <File>/var/log/opush/opush.log</File>
-                <encoder>
+                <layout>
                         <pattern>%d{HH:mm:ss.SSS} [%-5level] {%logger{32}} [%X{user}]:%msg%n</pattern>
-                </encoder>
+                </layout>
                 <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
                         <maxIndex>10</maxIndex>
                         <FileNamePattern>/var/log/opush/opush.log.%i</FileNamePattern>
@@ -59,8 +59,8 @@
 	</appender>
 
 	<root level="INFO">
-		<!--<appender-ref ref="PROD" />-->
-		<appender-ref ref="STDOUT" />
+		<appender-ref ref="PROD" />
+		<!--appender-ref ref="STDOUT" /-->
 		<!--<appender-ref ref="SIFTING" />-->
 	</root>
 
