@@ -284,23 +284,26 @@ public class AddressBookBindingImpl implements IAddressBook {
 	private Contact modifyContact(AccessToken token, Contact c)
 		throws SQLException, FindException {
 
+		Contact modifiedContact;
 		Contact previous = contactDao.findContact(token, c.getUid());
 		
-		if (!contactDao.hasRightsOn(token, c.getUid())) {
+		if (previous == null) {
+			logger.warn("previous version not found for c.uid: "
+					+ c.getUid() + " c.last: " + c.getLastname());
+			modifiedContact = c;
+
+		}
+		else if (!contactDao.hasRightsOn(token, c.getUid())) {
 			logger.warn("contact " + c.getLastname() + " " + c.getFirstname()
 					+ "(" + c.getUid() + ") not modified. not allowed for "
 					+ token.getEmail());
-			return previous;
+			modifiedContact = previous;
 		}
-		
-		if (previous != null) {
+		else {
 			contactMerger.merge(previous, c);
-			return contactDao.modifyContact(token, c);
-		} else {
-			logger.warn("previous version not found for c.uid: "
-					+ c.getUid() + " c.last: " + c.getLastname());
-			return c;
+			modifiedContact = contactDao.modifyContact(token, c);
 		}
+		return modifiedContact;
 	}
 	
 	@Override
