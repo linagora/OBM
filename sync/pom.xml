@@ -16,8 +16,8 @@
 		<obm-sync-message-queue.version>2.4.0-SNAPSHOT</obm-sync-message-queue.version>	
 		<obm-sync-services.version>2.4.0-SNAPSHOT</obm-sync-services.version>		
 
-		<dbcp.version>2.4-SNAPSHOT</dbcp.version>
-		<utils.version>2.4-SNAPSHOT</utils.version>
+		<dbcp.version>2.4.0-SNAPSHOT</dbcp.version>
+		<utils.version>2.4.0-SNAPSHOT</utils.version>
 
 		<postgresql.version>9.0-801.jdbc4</postgresql.version>
 		<mysql-connector-java.version>5.1.16</mysql-connector-java.version>

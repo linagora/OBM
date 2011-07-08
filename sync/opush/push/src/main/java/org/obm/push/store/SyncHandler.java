@@ -70,8 +70,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
 	}
 
-	@Inject
-	private SyncHandler(IBackend backend, EncoderFactory encoderFactory,
+	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			SyncDecoder syncDecoder, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
 			StateMachine stMachine) {

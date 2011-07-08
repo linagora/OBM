@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.wbxml.parsers.WbxmlEncoder;
@@ -99,8 +100,8 @@ public class WBXMLTools {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			DOMUtils.serialise(doc, out);
-			InputSource is = new InputSource(new ByteArrayInputStream(out
-					.toByteArray()));
+			StringReader stringReader = new StringReader(new String(out.toByteArray(), "UTF-8"));
+			InputSource is = new InputSource(stringReader);
 			out = new ByteArrayOutputStream();
 			encoder.convert(is, out);
 			byte[] ret = out.toByteArray();
