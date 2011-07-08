@@ -88,7 +88,7 @@ public class HostLocationServlet extends HttpServlet {
 	private String getRequestUri(HttpServletRequest req) {
 		String uri = null;
 		if (req != null) {
-			uri = req.getRequestURI();
+			uri = req.getPathInfo();
 			if (uri.startsWith("/")) {
 				uri = uri.substring(1);
 			}
