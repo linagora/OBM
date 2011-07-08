@@ -1153,6 +1153,7 @@ if (!$params['ajax']) {
   $view->save();
   $view_id = $view->get_id();
   $view_label = $view->get_label();
+  $obmbookmarkproperty = "set_cal_view_id=$view_id";
   $msg = "\"obmbookmark_id\": \"$view_id\", \"obmbookmark_label\":\"$view_label\", \"obmbookmarkproperties\":\"$obmbookmarkproperty\"";
   json_ok_msg("$l_view : $l_insert_ok");
   echo "({".$display['json'].",$msg})";
