@@ -18,7 +18,7 @@ import ch.qos.logback.core.encoder.EncoderBase;
 public class XmlTechnicalLogEncoder<E> extends EncoderBase<E> {
 
 	protected Layout<E> layout;
-	public static String buffer;
+	private String buffer;
 
 	public Layout<E> getLayout() {
 		return layout;
@@ -35,13 +35,13 @@ public class XmlTechnicalLogEncoder<E> extends EncoderBase<E> {
 	}
 
 	public void writeHeader() {
-		if (layout != null && (outputStream != null)) {
+		if (layout != null && outputStream != null) {
 			buffer += layout.getFileHeader();
 	    }
 	}
 
 	public void writeFooter() throws IOException{
-		if (layout != null && (outputStream != null)) {
+		if (layout != null && outputStream != null) {
 			buffer += layout.getFileFooter();
 
 		    flushBuffer();
@@ -49,8 +49,8 @@ public class XmlTechnicalLogEncoder<E> extends EncoderBase<E> {
 	}
 
 	private void flushBuffer() throws IOException{
-		buffer = formatXmlInput(buffer);
-	    outputStream.write(buffer.getBytes());
+		String formattedBuffer = formatXmlInput(buffer);
+	    outputStream.write(formattedBuffer.getBytes());
 	    outputStream.flush();
 		buffer = "";
 	}
