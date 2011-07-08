@@ -11,7 +11,7 @@
 	</parent>
 	
 	<artifactId>obm-locator</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>obm-locator</name>
 	<url>http://www.obm.org/</url>
 	<version>2.4-SNAPSHOT</version>
