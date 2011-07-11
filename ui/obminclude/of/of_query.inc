@@ -3975,9 +3975,8 @@ function of_service_property_unique($service, $service_property, $value, $id='')
 function generateUniqueKey($universal=true) {
   if($universal) {
     return get_obm_info('product_id').sha1(uniqid()).sha1($GLOBALS['obm']['domain_name']).sha1(mktime()*rand());
-
   }
-  return uniqid();
+  return sha1($GLOBALS['obm']['domain_name'].uniqid().mktime()*rand());
 }
 
 function get_domain_property($domain, $property) {
