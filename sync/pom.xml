@@ -250,11 +250,6 @@ org.eclipse.jdt.core.codeComplete.staticFinalFieldPrefixes=]]>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.google.inject</groupId>
-				<artifactId>guice</artifactId>
-				<version>${guice.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>net.fortuna.ical4j</groupId>
 				<artifactId>ical4j</artifactId>
 				<version>${ical4j.version}</version>
