@@ -566,6 +566,7 @@ obm.AutoComplete.Search = new Class({
       new Element('a').adopt(
                         new Element('img')
                           .setProperty('src',obm.vars.images.del)
+                          .setStyles({'cursor':'pointer' })
                       ).addEvent('mousedown',
                         function() {
                           var item = $(item_id);
