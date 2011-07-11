@@ -20,6 +20,10 @@
   color: #368397;
 }
 
+#calendarSelection .elementRow {
+  white-space: normal;
+}
+
 #calendarLayout {
   -moz-user-select:none;
   -webkit-user-select:none;
