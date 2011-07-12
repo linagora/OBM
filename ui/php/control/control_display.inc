@@ -104,7 +104,7 @@ function html_control_consult($domain_id="") {
 
   $u = get_control_user_infos($domain_id);
   $g = get_control_group_infos($domain_id);
-  $g_public = $g['nb'] - $g['nb_private'];
+  $g_total = $g['nb_public'] + $g['nb_private'];
   $nb_mailshare = get_control_mailshare_infos($domain_id);
   $disk_use = get_sys_disk_use();
   
@@ -143,7 +143,7 @@ function html_control_consult($domain_id="") {
     </tr>
     <tr>
       <th>$l_nb_group ($l_public / $l_private)</th>
-      <td>$g[nb] ($g_public / $g[nb_private])</td>
+      <td>$g_total ($g[nb_public] / $g[nb_private])</td>
     </tr>
     <tr>
       <th>$l_nb_mailshare</th>

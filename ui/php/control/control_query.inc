@@ -74,11 +74,11 @@ function get_control_group_infos($domain_id='') {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $r["nb"] = $obm_q->f('count(*)');
+  $r['nb_public'] = $obm_q->f('count(*)');
 
   // get # private groups
 
-  $query = "SELECT count(*) FROM P_UGroup
+  $query = "SELECT count(*) FROM UGroup
     WHERE group_privacy = 1
       $where_domain";
   display_debug_msg($query, $cdg_sql, 'get_control_group_infos(2)');
