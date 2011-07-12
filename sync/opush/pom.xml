@@ -42,6 +42,7 @@
 		<module>imap</module>
 		<module>mail</module>
 		<module>mime</module>
+		<module>technical-log</module>
 	</modules>
 
 	<dependencyManagement>

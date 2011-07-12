@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TechnicalLogs>
+    <TechnicalLog>
+        <time>1310131550370</time>
+        <level>INFO</level>
+        <logger>org.obm.push.impl.FolderSyncHandler</logger>
+        <title>Opush ActiveSync</title>
+        <user>adrien@test.tlse.lng</user>
+        <ActiveSyncXmlRequest><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<FolderSync>
+<SyncKey>0</SyncKey>
+</FolderSync>
+]]></ActiveSyncXmlRequest>
+    </TechnicalLog>
+    <TechnicalLog>
+        <time>1310131550962</time>
+        <level>INFO</level>
+        <logger>org.obm.push.impl.Responder</logger>
+        <title>Opush ActiveSync</title>
+        <user>adrien@test.tlse.lng</user>
+        <ActiveSyncXmlResponse><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<FolderSync>
+<Status>1</Status>
+<SyncKey>213a99e4-d3f8-487b-b111-a19c6628a111</SyncKey>
+<Changes>
+<Count>7</Count>
+<Add>
+<ServerId>26</ServerId>
+<ParentId>0</ParentId>
+<DisplayName>adrien@test.tlse.lng calendar</DisplayName>
+<Type>8</Type>
+</Add>
+<Add>
+<ServerId>27</ServerId>
+<ParentId>0</ParentId>
+<DisplayName>adrien@test.tlse.lng INBOX</DisplayName>
+<Type>2</Type>
+</Add>
+<Add>
+<ServerId>28</ServerId>
+<ParentId>0</ParentId>
+<DisplayName>adrien@test.tlse.lng Drafts</DisplayName>
+<Type>3</Type>
+</Add>
+<Add>
+<ServerId>29</ServerId>
+<ParentId>0</ParentId>
+<DisplayName>adrien@test.tlse.lng Sent</DisplayName>
+<Type>5</Type>
+</Add>
+<Add>
+<ServerId>30</ServerId>
+<ParentId>0</ParentId>
+<DisplayName>adrien@test.tlse.lng Trash</DisplayName>
+<Type>4</Type>
+</Add>
+<Add>
+<ServerId>31</ServerId>
+<ParentId>0</ParentId>
+<DisplayName>adrien@test.tlse.lng contacts</DisplayName>
+<Type>9</Type>
+</Add>
+<Add>
+<ServerId>32</ServerId>
+<ParentId>0</ParentId>
+<DisplayName>adrien@test.tlse.lng tasks</DisplayName>
+<Type>7</Type>
+</Add>
+</Changes>
+</FolderSync>
+]]></ActiveSyncXmlResponse>
+    </TechnicalLog>
+    <TechnicalLog>
+        <time>1310131551767</time>
+        <level>INFO</level>
+        <logger>org.obm.push.Base64QueryString</logger>
+        <title>Opush ActiveSync</title>
+        <user>adrien@test.tlse.lng</user>
+        <ActiveSyncRequestInfo><![CDATA[<rawRequest>79000c0410bad73e6e02156460e800185977c03182040000000003505043</rawRequest><decodedRequestParameters><protocolVersion>12.1</protocolVersion><command>Sync</command><localeInt>3076</localeInt><deviceId>utc+bgIVZGDoABhZd8Axgg==</deviceId><policyKey>0</policyKey><deviceType>PPC</deviceType></decodedRequestParameters>]]></ActiveSyncRequestInfo>
+    </TechnicalLog>
+    <TechnicalLog>
+        <time>1310131551768</time>
+        <level>INFO</level>
+        <logger>org.obm.push.ActiveSyncServlet</logger>
+        <title>Opush ActiveSync</title>
+        <user>adrien@test.tlse.lng</user>
+        <HttpRequest><![CDATA[POST /push/Microsoft-Server-ActiveSync?eQAMBBC61z5uAhVkYOgAGFl3wDGCBAAAAAADUFBD HTTP/1.0
+Host: localhost:8083
+Connection: close
+Accept-Encoding: gzip
+Content-Type: application/vnd.ms-sync
+Authorization: Basic dGVzdC50bHNlLmxuZ1xhZHJpZW46YWxpYWNvbQ==
+Content-Length: 60
+Cache-Control: no-cache
+
+]]></HttpRequest>
+    </TechnicalLog>
+    <TechnicalLog>
+        <time>1310131551768</time>
+        <level>INFO</level>
+        <logger>org.obm.push.ActiveSyncServlet</logger>
+        <title>Opush ActiveSync</title>
+        <user>adrien@test.tlse.lng</user>
+        <HttpRequest><![CDATA[POST /push/Microsoft-Server-ActiveSync?eQAMBBC61z5uAhVkYOgAGFl3wDGCBAAAAAADUFBD HTTP/1.0
+Host: localhost:8083
+Connection: close
+Accept-Encoding: gzip
+Content-Type: application/vnd.ms-sync
+Authorization: Basic dGVzdC50bHNlLmxuZ1xhZHJpZW46YWxpYWNvbQ==
+Content-Length: 60
+Cache-Control: no-cache
+
+]]></HttpRequest>
+    </TechnicalLog>
+</TechnicalLogs>
