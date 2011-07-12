@@ -1224,7 +1224,7 @@ $mobile_devices";
 /**
  * Mobile device management HTML
  */
-function html_user_mobile_devices($user_id, $type) {
+function html_user_mobile_devices($user_id, $type, $user=false) {
   global $perm;
 
   $is_superman = 'obm.vars.consts.isSuperman='.($perm->is_superman('user')==true?1:0).';';
@@ -1258,7 +1258,8 @@ function html_user_mobile_devices($user_id, $type) {
       if ($mobile_q->f('first_sync')) {
         $first_sync = new Of_Date($mobile_q->f('first_sync'), 'GMT');
       }
-      $delegation = of_delegation_check_update_rights($user, $userobm_delegation);
+      $u = get_user_info($user_id);
+      $delegation = of_delegation_check_update_rights($user, $u['delegation'] );
       $devices .= "<tr id='mobile_$mobile_id' class='mobile'>
         <td>$mobile_user_agent</td>
         <td>$mobile_type</td>
@@ -2263,7 +2264,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   }
 
   // Mobile devices
-  $mobile_devices = html_user_mobile_devices($id, 'form');
+  $mobile_devices = html_user_mobile_devices($id, 'form', $user);
 
   // some constants
   $csize_add = '48';
