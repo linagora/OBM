@@ -703,6 +703,9 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 
   // Insert my own alert
   run_query_calendar_event_alert_insert($event_id, $organizerId, $calendar['alert']);
+  
+  // SOLR CREATE
+  run_query_calendar_solr_store($event_id);
 
   $calendar['calendar_id'] = $event_id;
   if ($calendar['attendees_notification']) {
@@ -898,9 +901,6 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
       run_query_calendar_event_exception_insert($calendar);
     }
   }
-
-  // SOLR CREATE
-  run_query_calendar_solr_store($id);
 
   return array($id, $eid);
 }
@@ -1684,6 +1684,9 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   } else {
     run_query_calendar_event_alert_delete($event_id, $calendar['organizer']);
   }
+  
+  // SOLR
+  run_query_calendar_solr_store($event_id);
 
   // Send mail
   if ($calendar['attendees_notification']) {
@@ -1805,14 +1808,10 @@ function run_query_calendar_update_event_data($calendar) {
 
   $event_id = $calendar['calendar_id'];
 
-  // SOLR
-  run_query_calendar_solr_store($event_id);
-
   if ($repeat_kind == 'none') {
     run_query_delete_event_exceptions($event_id);
     return;
   }
-  //else
 
   $old_exceptions = array();
   $exceptions_q = run_query_get_events_exception(array($event_id));
@@ -5255,7 +5254,8 @@ function run_query_calendar_solr_store($event_id) {
       event_opacity,
       event_privacy,
       event_origin,
-      #CONCAT(userobm_lastname, ' ', userobm_firstname) as owner 
+      userobm_lastname as owner_lastname,
+      userobm_firstname as owner_firstname
     FROM Event
     LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
     LEFT JOIN EventTag ON eventtag_id = event_tag_id
@@ -5302,7 +5302,7 @@ function run_query_calendar_solr_store($event_id) {
   }
   $doc->setField('from', $db->f('event_origin'));
   $attendees_q = run_query_get_events_attendee(array($event_id));
-  while($attendees_q->next_record()) {
+  while ($attendees_q->next_record()) {
     $doc->setMultiValue('with', $attendees_q->f('eventlink_label'));
     $doc->setMultiValue('withId', $attendees_q->f('eventlink_entity_id'));
   }

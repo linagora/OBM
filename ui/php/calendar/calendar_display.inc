@@ -145,7 +145,7 @@ function dis_calendar_search_result($calendar, $current_view) {
     }   
     if (isset($calendar['owner']) && $calendar['owner'] != '') {
       $pattern .= " owner:(".$calendar['owner'].')';
-    }   
+    }
     if (isset($calendar['attendees']) && $calendar['attendees'] != '') {
       $pattern .= " with:(".$calendar['attendees'].')';
     }   
@@ -157,9 +157,9 @@ function dis_calendar_search_result($calendar, $current_view) {
     }
   }
 
-  $events = OBM_Search::search('event', $pattern, 0, 10000, array()); 
-  $GLOBALS[display][search] = dis_calendar_html_search_form($calendar, $pattern);
-  $GLOBALS[display][search] .= dis_back_to_calendar($action);
+  $events = OBM_Search::search('event', $pattern, 0, 10000, array());
+  $GLOBALS['display']['search'] = dis_calendar_html_search_form($calendar, $pattern);
+  $GLOBALS['display']['search'] .= dis_back_to_calendar($action);
 
   $block = "<h1>$GLOBALS[l_search_result]</h1>";
   $block .= dis_calendar_list_view($current_view, $calendar_entity, $readable_entity, $begin, $end, $events);
@@ -918,16 +918,19 @@ function dis_calendar_navbar_label($current_view,$ndays=7) {
 function dis_calendar_html_search_form($calendar, $p="") {
   global $obm;
 
-  $pattern = stripslashes($calendar['pattern']);
+  if ($_GET['action'] == 'search') {
+    $pattern = stripslashes($calendar['pattern']);
+    $title = stripslashes($calendar['title']);
+    $owner = stripslashes($calendar['owner']);
+    $location = stripslashes($calendar['location']);
+    $desc = stripslashes($calendar['desc']);
+    $attendees = stripslashes($calendar['attendees']);
+    $category = $calendar['category'];
+    $period = $calendar['period'];
+    $tag = $calendar['tag'];
+  }
+  
   if (!empty($p)) $pattern = $p;
-  $title = stripslashes($calendar['title']);
-  $owner = stripslashes($calendar['owner']);
-  $location = stripslashes($calendar['location']);
-  $desc = stripslashes($calendar['desc']);
-  $attendees = stripslashes($calendar['attendees']);
-  $category = $calendar['category'];
-  $period = $calendar['period'];
-  $tag = $calendar['tag'];
   if (!isset($period)) $period = 'today';
   if (!isset($calendar['searchType']) || $calendar['searchType'] == 'basic') {
     $basic = '';
