@@ -18,18 +18,12 @@ import org.obm.sync.items.FolderChanges;
 import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class BookItemsParser extends AbstractItemsParser {
-
-	@SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory
-			.getLogger(BookItemsParser.class);
 
 	public AddressBook parseAddressBook(Element root) {
 		AddressBook book = new AddressBook();

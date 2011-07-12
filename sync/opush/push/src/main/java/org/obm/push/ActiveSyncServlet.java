@@ -352,10 +352,9 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void noHandlerError(ActiveSyncRequest request, BackendSession bs) {
 		logger.warn("no handler for command = {}", bs.getCommand());
-		Enumeration heads = request.getHttpServletRequest().getHeaderNames();
+		Enumeration<?> heads = request.getHttpServletRequest().getHeaderNames();
 		while (heads.hasMoreElements()) {
 			String h = (String) heads.nextElement();
 			logger.warn("{} : {}", h, request.getHeader(h));

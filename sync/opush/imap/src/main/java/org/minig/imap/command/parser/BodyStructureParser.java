@@ -70,7 +70,6 @@ public class BodyStructureParser {
 			return Sequence('(', FirstOf(bodyType1part(), bodyTypeMPart()), ')');
 		}
 
-		@SuppressWarnings("unchecked")
 		boolean pushBodyParams() {
 			swap();
 			pop();
@@ -146,7 +145,6 @@ public class BodyStructureParser {
 			return Sequence(number(), drop());
 		}
 
-		@SuppressWarnings("unchecked")
 		boolean addBodyParam() {
 			swap();
 			BodyParam bodyParam = BodyParamParser.parse((String)pop(), (String)pop());
@@ -180,7 +178,6 @@ public class BodyStructureParser {
 					addMimePart());
 		}
 
-		@SuppressWarnings("unchecked")
 		boolean mergeBodyParams() {
 			List<Object> extParts = (List<Object>)pop();
 			Set<BodyParam> extBodyParams = (Set<BodyParam>)extParts.get(0);
@@ -241,7 +238,6 @@ public class BodyStructureParser {
 					createMimePart());
 		}
 
-		@SuppressWarnings("unchecked")
 		boolean createMimePart() {
 			String contentTransfertEncoding = (String)pop();
 			String bodyId = (String)pop();
