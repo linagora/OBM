@@ -194,13 +194,18 @@
           </dl>
           <?php } ?>
           <?php if(!empty($contact->comment)) { ?>
-          <dl id="commentLayout" class="details"><?php echo nl2br($contact->comment) ?></dl>
-          <?php } ?>
-          <?php if(!empty($contact->comment2)) { ?>
-          <dl id="comment2Layout" class="details"><?php echo nl2br($contact->comment2) ?></dl>
-          <?php } ?>
-          <?php if(!empty($contact->comment3)) { ?>
-          <dl id="comment3Layout" class="details"><?php echo nl2br($contact->comment3) ?></dl>
+            <dl id="commentLayout" class="details">
+              <dt><?php echo __('Comments') ?> : </dt>
+              <dd>
+                <?php echo nl2br($contact->comment) ?>
+                <?php if(!empty($contact->comment2)) { ?>
+                  <br/><?php echo nl2br($contact->comment2) ?></dl>
+                <?php } ?>
+                <?php if(!empty($contact->comment3)) { ?>
+                  <br/><?php echo nl2br($contact->comment3) ?></dl>
+                <?php } ?>
+              </dd>
+            </dl>
           <?php } ?>
         </td>
       </tr>
