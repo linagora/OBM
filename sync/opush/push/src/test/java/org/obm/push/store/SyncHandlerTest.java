@@ -64,7 +64,6 @@ public class SyncHandlerTest {
 		Collection<SyncCollection> syncCollectionsList = ImmutableList.of(syncCollection);
 		
 		IContentsExporter exporter = EasyMock.createMock(IContentsExporter.class);
-		EasyMock.expect(exporter.getSyncFolderType(syncCollectionsList)).andReturn(null);
 		
 		bs.getLastClientSyncState(collectionId);
 		EasyMock.expectLastCall().andReturn(null);

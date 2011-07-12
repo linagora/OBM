@@ -182,14 +182,13 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	}
 
 	private void doUpdates(BackendSession bs, SyncCollection c, Element ce,
-			Map<String, String> processedClientIds,
-			Collection<FolderType> allSyncFolderType)
+			Map<String, String> processedClientIds)
 			throws ActiveSyncException {
 
 		DataDelta delta = null;
 		if (bs.getUnSynchronizedItemChange(c.getCollectionId()).size() == 0) {
 			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getFilterType(),
-					c.getCollectionId(), allSyncFolderType);
+					c.getCollectionId());
 		}
 
 		List<ItemChange> changed = processWindowSize(c, delta, bs,
@@ -464,9 +463,6 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			Collection<SyncCollection> changedFolders,
 			Map<String, String> processedClientIds, IContinuation continuation) {
 
-		Collection<FolderType> allSyncFolderType = contentsExporter
-				.getSyncFolderType(changedFolders);
-
 		Document reply = null;
 		try {
 			reply = DOMUtils.createDoc(null, "Sync");
@@ -512,8 +508,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 
 						if (!syncKey.equals("0")) {
 							if (c.getFetchIds().size() == 0) {
-								doUpdates(bs, c, ce, processedClientIds,
-										allSyncFolderType);
+								doUpdates(bs, c, ce, processedClientIds);
 							} else {
 								doFetch(bs, c, ce);
 							}

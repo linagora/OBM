@@ -12,20 +12,16 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.MSAttachementData;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
-import org.obm.push.exception.FolderTypeNotFoundException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.FilterType;
-import org.obm.push.store.FolderType;
 import org.obm.push.store.PIMDataType;
 import org.obm.push.store.SyncCollection;
 import org.obm.push.store.SyncState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -120,16 +116,19 @@ public class ContentsExporter implements IContentsExporter {
 	}
 	
 	@Override
-	public int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId, 
-			Collection<FolderType> syncedCollection) throws ActiveSyncException {
-		DataDelta dd = getChanged(bs, state, filterType, collectionId, syncedCollection);
+	public int getCount(BackendSession bs, SyncState state,
+			FilterType filterType, Integer collectionId)
+			throws ActiveSyncException {
+		
+		DataDelta dd = getChanged(bs, state, filterType, collectionId);
 		Integer filterCount = invitationFilterManager.getCountFilterChanges(bs, state.getKey(), state.getDataType(), collectionId);
 		return dd.getChanges().size() + dd.getDeletions().size() + filterCount;
 	}
 	
 	@Override
-	public DataDelta getChanged(BackendSession bs, SyncState state, FilterType filter, Integer collectionId, 
-			Collection<FolderType> allSyncCollection) throws ActiveSyncException {
+	public DataDelta getChanged(BackendSession bs, SyncState state,
+			FilterType filter, Integer collectionId) throws ActiveSyncException {
+		
 		DataDelta delta = null;
 		switch (state.getDataType()) {
 		case CALENDAR:
@@ -212,34 +211,6 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public boolean getFilterChanges(BackendSession bs, SyncCollection collection) {
 		return invitationFilterManager.getCountFilterChanges(bs, collection.getSyncKey(), collection.getDataType(), collection.getCollectionId()) > 0;
-	}
-	
-	@Override
-	public Collection<FolderType> getSyncFolderType(Collection<SyncCollection> changedFolders) {
-		Builder<FolderType> ret = ImmutableSet.builder();
-		for(SyncCollection col : changedFolders){
-			try {
-				ret.add(this.getFolderType(col));
-			} catch (FolderTypeNotFoundException e) {
-				//Nothing to do
-				logger.error(e.getMessage(), e);
-			}
-		}
-		return ret.build();
-	}
-
-	private FolderType getFolderType(SyncCollection col) throws FolderTypeNotFoundException {
-		switch (col.getDataType()) {
-		case CONTACTS:
-			return contactsBackend.getFolderType(col.getCollectionPath());
-		case EMAIL:
-			return mailBackend.getFolderType(col.getCollectionPath());
-		case CALENDAR:
-		case TASKS:
-			return calBackend.getFolderType(col.getCollectionPath());
-		default:
-			throw new FolderTypeNotFoundException("The collection's path [ " + col.getCollectionPath() + " ] is invalid");		
-		}
 	}
 	
 }
