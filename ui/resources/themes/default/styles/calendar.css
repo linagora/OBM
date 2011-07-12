@@ -727,6 +727,10 @@ li.eventOwner19Legend {
   margin: 0 0.5em;
 }
 
+#calendarQuickForm select {
+  width: 90%;
+}
+
 #calendarQuickForm table {
   width: 80%;
 }
