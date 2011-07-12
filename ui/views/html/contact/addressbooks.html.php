@@ -15,7 +15,7 @@
               <?php } ?>  
               <li><a href='<?php echo self::__actionlink('export', array('searchpattern' => 'addressbookId:'.$_id))?>'><?php echo __('Export') ?></a></li>
               <?php if (!$_addressbook->isDefault && $_addressbook->admin) { ?>
-              <li><a href="" onclick="$('addressbook-<?php echo $_id ?>').getElement('input').show().getNext().hide();return false;" ><?php echo __('Update') ?></a></li>
+              <li><a href="" onclick="$('addressbook-<?php echo $_id ?>').getElement('input').show().getNext().hide();return false;" ><?php echo __('Rename') ?></a></li>
               <li><a href="" onclick="obm.contact.addressbook.deleteAddressBook(<?php echo $_id ?>, '<?php echo $this->toJs($_addressbook->name) ?>'); return false;" ><?php echo __('Delete') ?></a></li>
               <?php } ?> 
               <?php if ($_addressbook->admin) { ?>

@@ -72,6 +72,7 @@ return array(
   'Title' => 'Titre',
   'Town' => 'Ville',
   'Update' => 'Mettre à jour',
+  'Rename' => 'Renommer',
   'Validate' => 'Valider',
   'Website' => 'Site web',
   'Websites' => 'Sites web',
