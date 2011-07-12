@@ -11,7 +11,7 @@ public class TestJabxTechnicalLogParser {
 	@Test
 	public void basicTechnicalLog() throws TechnicalLogParserException {
 		InputStream xml = loadXML("data/adrien@test.tlse.lng-2011.07.08_03:25:50.log");
-		JabxTechnicalLogParser parser = new JabxTechnicalLogParser();
+		JaxbTechnicalLogParser parser = new JaxbTechnicalLogParser();
 		TechnicalLogs logs = parser.parse(xml);
 		Assert.assertEquals(5, logs.getTechnicalLog().size());
 	}

@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBException;
 import org.obm.push.technicallog.jaxb.schema.TechnicalLogs;
 
 
-public class JabxTechnicalLogParser implements ITechnicalLogParser{
+public class JaxbTechnicalLogParser implements ITechnicalLogParser{
 
 	@Override
 	public TechnicalLogs parse(InputStream xml) throws TechnicalLogParserException {
