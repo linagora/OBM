@@ -111,11 +111,9 @@ public class ActiveSyncServlet extends HttpServlet {
 
 			ICollectionChangeListener ccl = c.getCollectionChangeListener();
 			if (c.isError()) {
-				ph.sendError(new Responder(response),
-						ccl.getDirtyCollections(), c.getErrorStatus(), c);
+				ph.sendError(new Responder(response), c.getErrorStatus(), c);
 			} else if (ccl != null) {
-				ph.sendResponseWithoutHierarchyChanges(bs, new Responder(
-						response), ccl.getDirtyCollections(), c);
+				ph.sendResponseWithoutHierarchyChanges(bs, new Responder(response), c);
 			}
 			return;
 		}

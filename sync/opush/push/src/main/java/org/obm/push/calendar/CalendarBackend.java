@@ -3,10 +3,8 @@ package org.obm.push.calendar;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.naming.ConfigurationException;
 
@@ -40,6 +38,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.obm.sync.items.EventChanges;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -47,7 +46,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class CalendarBackend extends ObmSyncBackend {
 
-	private Map<PIMDataType, ObmSyncCalendarConverter> converters;
+	private final ImmutableMap<PIMDataType, ObmSyncCalendarConverter> converters;
 
 	@Inject
 	public CalendarBackend(ISyncStorage storage,
@@ -55,9 +54,9 @@ public class CalendarBackend extends ObmSyncBackend {
 			throws ConfigurationException {
 		
 		super(storage, configurationService, dbcp);
-		converters = new HashMap<PIMDataType, ObmSyncCalendarConverter>(2);
-		converters.put(PIMDataType.CALENDAR, new EventConverter());
-		converters.put(PIMDataType.TASKS, new TodoConverter());
+		converters = ImmutableMap.of(
+				PIMDataType.CALENDAR, new EventConverter(), 
+				PIMDataType.TASKS, new TodoConverter());
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) {

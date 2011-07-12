@@ -32,9 +32,9 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private ISyncStorage storage;
-	private CalendarBackend calendarBackend;
-	private MailBackend mailBackend;
+	private final ISyncStorage storage;
+	private final CalendarBackend calendarBackend;
+	private final MailBackend mailBackend;
 
 	@Inject
 	private InvitationFilterManagerImpl(ISyncStorage storage,
