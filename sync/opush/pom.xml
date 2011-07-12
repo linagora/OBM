@@ -43,6 +43,7 @@
 		<module>mail</module>
 		<module>mime</module>
 		<module>technical-log</module>
+		<module>push-dao</module>
 	</modules>
 
 	<dependencyManagement>
