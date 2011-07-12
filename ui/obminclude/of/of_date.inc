@@ -158,6 +158,10 @@ class Of_Date extends DateTime {
     'inputdate' => 'd/m/Y',
     'timezone' => 'Europe/Paris'
   );
+  
+  private static $_localized_formats = array(
+    'd M Y' => '%e %B %Y'
+  );
 
   private static $_loaded = false;
 
@@ -268,7 +272,6 @@ class Of_Date extends DateTime {
    * @param string $part  Part to get
    * @return integer|string  UNIX timestamp
    */
-  //FIXME => Make it locale aware
   public function get($part=self::ISO_8601) {
     switch ($part) {
       case self:: WEEKDAY_NARROW :
@@ -278,6 +281,9 @@ class Of_Date extends DateTime {
         return strtoupper(substr($this->format(self::WEEKDAY_SHORT), 0, 2));
         break;        
       default :
+        if (array_key_exists($part, self::$_localized_formats)) {
+          return strftime(self::$_localized_formats[$part], $this->getTimestamp());
+        }
         return $this->format($part);
     }
   }

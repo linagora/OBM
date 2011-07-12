@@ -120,7 +120,10 @@ if ($module != '') {
   }
 }
 
-if($_SESSION['set_lang']) SI18n::set_locale($_SESSION['set_lang']);
+if($_SESSION['set_lang']) {
+  SI18n::set_locale($_SESSION['set_lang']);
+  setlocale(LC_TIME, 'fr_FR.utf8', 'fr_FR', 'fr');
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Display file (global display functions)          //
