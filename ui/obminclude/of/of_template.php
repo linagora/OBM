@@ -210,7 +210,7 @@ class OBM_Template {
     }
     $return .= '
         </select></th>
-        <th><input type="text" name="emails['.$emailIndex.'][address]" alt="'.__('Email').'" title="'.__('Email').'" value="'.$value['address'].'"/></th>
+        <th><input type="text" name="emails['.$emailIndex.'][address]" alt="'.__('Email').'" title="'.__('Email').'" value="'.htmlentities($value['address']).'"/></th>
       </tr>
       </tbody>
       </table>';    
