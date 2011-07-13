@@ -122,7 +122,8 @@ if ($module != '') {
 
 if($_SESSION['set_lang']) {
   SI18n::set_locale($_SESSION['set_lang']);
-  setlocale(LC_TIME, 'fr_FR.utf8', 'fr_FR', 'fr');
+  $full_locale = $_SESSION['set_lang'].'_'.strtoupper($_SESSION['set_lang']);
+  setlocale(LC_TIME, $full_locale.'.utf8', $full_locale, $_SESSION['set_lang']);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -142,9 +143,7 @@ if ($conf_modules && file_exists("$path/../conf/modules/$module.inc")) {
 ///////////////////////////////////////////////////////////////////////////////
 // Sections definitions
 ///////////////////////////////////////////////////////////////////////////////
-//while (list($sec,$value) = each($cgp_show['section'])) { // <-- BUG, Why ???
 foreach ($cgp_show['section'] as $sec => $value) {
-
   if ($value) {
     $sec_right = $value['right'];
     if ($sec_right == '') {
