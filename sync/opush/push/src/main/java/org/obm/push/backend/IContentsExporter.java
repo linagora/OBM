@@ -7,7 +7,6 @@ import org.obm.push.ItemChange;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.FilterType;
-import org.obm.push.store.FolderType;
 import org.obm.push.store.PIMDataType;
 import org.obm.push.store.SyncCollection;
 import org.obm.push.store.SyncState;
@@ -18,11 +17,11 @@ import org.obm.push.store.SyncState;
  */
 public interface IContentsExporter {
 
-	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, 
-			Integer collectionId, Collection<FolderType> syncedCollection) throws ActiveSyncException ;
+	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
+			throws ActiveSyncException ;
 
-	int getCount(BackendSession bs, SyncState state, FilterType filterType,
-			Integer collectionId, Collection<FolderType> syncedCollection) throws ActiveSyncException;
+	int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
+			throws ActiveSyncException;
 
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
 			List<String> fetchIds) throws ActiveSyncException;
@@ -42,6 +41,5 @@ public interface IContentsExporter {
 	boolean validatePassword(String userID, String password);
 
 	boolean getFilterChanges(BackendSession bs, SyncCollection collection);
-
-	Collection<FolderType> getSyncFolderType(Collection<SyncCollection> changedFolders);
+	
 }

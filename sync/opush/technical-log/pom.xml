@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.linagora.obm.opush</groupId>
+		<artifactId>parent</artifactId>
+		<version>2.4.0-rc5-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>technical-log</artifactId>
+	<packaging>jar</packaging>
+	<name>opush technical-log</name>
+	<url>http://www.obm.org/</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.7.5</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<schemaDirectory>src/main/resources/xsd</schemaDirectory>
+					<bindingDirectory>src/main/resources/xjb</bindingDirectory>
+					<generatePackage>org.obm.push.technicallog.jaxb.schema</generatePackage>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -31,8 +31,6 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 
 public class SyncHandlerTest {
 	@Test
@@ -60,9 +58,12 @@ public class SyncHandlerTest {
 		
 		EasyMock.expect(bs.getProtocolVersion()).andReturn(5d).anyTimes();
 		
+
+		syncCollection.setSyncKey(syncKey);
+		syncCollection.addChange(new SyncCollectionChange("serverId", null, "modType", event, PIMDataType.CALENDAR));
+		Collection<SyncCollection> syncCollectionsList = ImmutableList.of(syncCollection);
+		
 		IContentsExporter exporter = EasyMock.createMock(IContentsExporter.class);
-		exporter.getSyncFolderType((Collection<SyncCollection>) EasyMock.anyObject());
-		EasyMock.expectLastCall().andReturn(null);
 		
 		bs.getLastClientSyncState(collectionId);
 		EasyMock.expectLastCall().andReturn(null);
@@ -95,9 +96,6 @@ public class SyncHandlerTest {
 		Capture<Document> document = new Capture<Document>();
 		responder.sendResponse(EasyMock.eq("AirSync"), EasyMock.capture(document));
 		
-		syncCollection.setSyncKey(syncKey);
-		syncCollection.addChange(new SyncCollectionChange("serverId", null, "modType", event, PIMDataType.CALENDAR));
-		Collection<SyncCollection> syncCollectionsList = ImmutableList.of(syncCollection);
 		
 		IContinuation continuation = EasyMock.createMock(IContinuation.class);
 		EasyMock.expect(continuation.getReqId()).andReturn(123);

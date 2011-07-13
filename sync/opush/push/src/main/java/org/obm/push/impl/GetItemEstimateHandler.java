@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +15,6 @@ import org.obm.push.state.StateMachine;
 import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.CollectionNotFoundException;
 import org.obm.push.store.FilterType;
-import org.obm.push.store.FolderType;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.PIMDataType;
 import org.obm.push.store.SyncCollection;
@@ -51,16 +49,13 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
 		final List<SyncCollection> syncCollections = createListSyncCollection(
 				bs, doc);
-		
-		final Collection<FolderType> allSyncFolderType = contentsExporter
-				.getSyncFolderType(syncCollections);
 
 		final Document document = DOMUtils.createDoc(null, "GetItemEstimate");
 
 		final Element rootElement = document.getDocumentElement();
 
 		for (final SyncCollection syncCollection : syncCollections) {
-			createResponse(bs, allSyncFolderType, rootElement, syncCollection);
+			createResponse(bs, rootElement, syncCollection);
 		}
 
 		try {
@@ -71,7 +66,6 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	private void createResponse(BackendSession bs,
-			final Collection<FolderType> allSyncFolderType,
 			final Element root,
 			final SyncCollection syncCollection) throws DOMException {
 		
@@ -96,8 +90,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 					final Element collectionElement = createCollectionElement(responseElement);
 					createClassElement(syncCollection, collectionElement);
 					createCollectionIdElement(syncCollection, collectionElement);
-					createEstimateElement(bs, allSyncFolderType,
-							syncCollection, collectionId, state,
+					createEstimateElement(bs, syncCollection, collectionId, state,
 							collectionElement);
 
 					bs.addLastClientSyncState(syncCollection.getCollectionId(),
@@ -144,7 +137,6 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	private void createEstimateElement(BackendSession bs,
-			Collection<FolderType> allSyncFolderType,
 			SyncCollection syncCollection, Integer collectionId,
 			SyncState state, Element collectionElement)
 			throws ActiveSyncException, DOMException {
@@ -154,7 +146,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		
 		int count = contentsExporter
 				.getCount(bs, state, syncCollection.getFilterType(),
-						collectionId, allSyncFolderType);
+						collectionId);
 
 		Element estim = DOMUtils.createElement(collectionElement, "Estimate");
 		estim.setTextContent(String.valueOf(count

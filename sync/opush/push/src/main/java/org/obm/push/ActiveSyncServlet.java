@@ -111,11 +111,9 @@ public class ActiveSyncServlet extends HttpServlet {
 
 			ICollectionChangeListener ccl = c.getCollectionChangeListener();
 			if (c.isError()) {
-				ph.sendError(new Responder(response),
-						ccl.getDirtyCollections(), c.getErrorStatus(), c);
+				ph.sendError(new Responder(response), c.getErrorStatus(), c);
 			} else if (ccl != null) {
-				ph.sendResponseWithoutHierarchyChanges(bs, new Responder(
-						response), ccl.getDirtyCollections(), c);
+				ph.sendResponseWithoutHierarchyChanges(bs, new Responder(response), c);
 			}
 			return;
 		}
@@ -352,10 +350,9 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void noHandlerError(ActiveSyncRequest request, BackendSession bs) {
 		logger.warn("no handler for command = {}", bs.getCommand());
-		Enumeration heads = request.getHttpServletRequest().getHeaderNames();
+		Enumeration<?> heads = request.getHttpServletRequest().getHeaderNames();
 		while (heads.hasMoreElements()) {
 			String h = (String) heads.nextElement();
 			logger.warn("{} : {}", h, request.getHeader(h));

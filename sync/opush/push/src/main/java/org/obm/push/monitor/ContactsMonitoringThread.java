@@ -1,4 +1,4 @@
-package org.obm.push.contacts;
+package org.obm.push.monitor;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,9 +13,8 @@ import java.util.TimeZone;
 
 import org.obm.dbcp.DBCP;
 import org.obm.push.backend.ICollectionChangeListener;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.impl.ChangedCollections;
-import org.obm.push.impl.MonitoringThread;
-import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.SyncCollection;
 import org.obm.push.utils.JDBCUtils;
 
@@ -26,20 +25,20 @@ public class ContactsMonitoringThread extends MonitoringThread {
 
 	@Singleton
 	public static class Factory {
-		private final ObmSyncBackend backend;
 		private final DBCP dbcp;
+		private final IContentsExporter contentsExporter;
 
 		@Inject
-		private Factory(ContactsBackend backend, DBCP dbcp) {
-			this.backend = backend;
+		private Factory(DBCP dbcp, IContentsExporter contentsExporter) {
 			this.dbcp = dbcp;
+			this.contentsExporter = contentsExporter;
 		}
 
 		public ContactsMonitoringThread createClient(long freqMs,
 				Set<ICollectionChangeListener> ccls) {
 			
-			return new ContactsMonitoringThread(freqMs, ccls, this.backend,
-					this.dbcp);
+			return new ContactsMonitoringThread(freqMs, ccls,
+					this.dbcp, this.contentsExporter);
 		}
 	}
 	
@@ -55,10 +54,10 @@ public class ContactsMonitoringThread extends MonitoringThread {
 			+ "		inner join Domain d on d.domain_id=uo.userobm_domain_id WHERE uo.userobm_id IN ";
 	
 	private ContactsMonitoringThread(long freqMs,
-			Set<ICollectionChangeListener> ccls, ObmSyncBackend backend,
-			DBCP dbcp) {
+			Set<ICollectionChangeListener> ccls,
+			DBCP dbcp, IContentsExporter contentsExporter) {
 
-		super(freqMs, ccls, backend, dbcp);
+		super(freqMs, ccls, dbcp, contentsExporter);
 	}
 
 	@Override

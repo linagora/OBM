@@ -10,26 +10,14 @@ import org.obm.sync.book.Email;
 import org.obm.sync.book.InstantMessagingId;
 import org.obm.sync.book.Phone;
 import org.obm.sync.book.Website;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Converts between OBM & MS Exchange contact models
- * 
- * @author tom
- * 
  */
 public class ContactConverter {
 
-	@SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory
-			.getLogger(ContactConverter.class);
-
 	/**
 	 * OBM to PDA
-	 * 
-	 * @param c
-	 * @return
 	 */
 	public MSContact convert(Contact c) {
 		MSContact msc = new MSContact();

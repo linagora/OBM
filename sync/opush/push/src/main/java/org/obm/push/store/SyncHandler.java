@@ -64,7 +64,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 
 	public static final Integer SYNC_TRUNCATION_ALL = 9;
 	private static Map<Integer, IContinuation> waitContinuationCache;
-	private SyncDecoder syncDecoder;
+	private final SyncDecoder syncDecoder;
 
 	static {
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
@@ -149,11 +149,9 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			// resend the request with the full XML
 			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue());
 		} catch (CollectionNotFoundException ce) {
-			sendError(responder, new HashSet<SyncCollection>(),
-					SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
+			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
 		} catch (ObjectNotFoundException oe) {
-			sendError(responder, new HashSet<SyncCollection>(),
-					SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
+			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
 		} catch (ActiveSyncException e) {
 			// sendError(responder, new HashSet<SyncCollection>(),
 			// SyncStatus.SERVER_ERROR.asXmlValue(), continuation);
@@ -182,14 +180,12 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	}
 
 	private void doUpdates(BackendSession bs, SyncCollection c, Element ce,
-			Map<String, String> processedClientIds,
-			Collection<FolderType> allSyncFolderType)
+			Map<String, String> processedClientIds)
 			throws ActiveSyncException {
 
 		DataDelta delta = null;
 		if (bs.getUnSynchronizedItemChange(c.getCollectionId()).size() == 0) {
-			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getFilterType(),
-					c.getCollectionId(), allSyncFolderType);
+			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getFilterType(), c.getCollectionId());
 		}
 
 		List<ItemChange> changed = processWindowSize(c, delta, bs,
@@ -443,15 +439,14 @@ public class SyncHandler extends WbxmlRequestHandler implements
 
 	@Override
 	public void sendResponseWithoutHierarchyChanges(BackendSession bs,
-			Responder responder, Collection<SyncCollection> changedFolders,
-			IContinuation continuation) {
-		sendResponse(bs, responder, changedFolders, false, continuation);
+			Responder responder, IContinuation continuation) {
+		sendResponse(bs, responder, false, continuation);
 	}
 
 	@Override
 	public void sendResponse(BackendSession bs, Responder responder,
-			Collection<SyncCollection> changedFolders,
 			boolean sendHierarchyChange, IContinuation continuation) {
+		
 		Map<String, String> processedClientIds = new HashMap<String, String>(
 				bs.getLastSyncProcessedClientIds());
 		bs.setLastSyncProcessedClientIds(new HashMap<String, String>());
@@ -463,9 +458,6 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	public void processResponse(BackendSession bs, Responder responder,
 			Collection<SyncCollection> changedFolders,
 			Map<String, String> processedClientIds, IContinuation continuation) {
-
-		Collection<FolderType> allSyncFolderType = contentsExporter
-				.getSyncFolderType(changedFolders);
 
 		Document reply = null;
 		try {
@@ -512,8 +504,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 
 						if (!syncKey.equals("0")) {
 							if (c.getFetchIds().size() == 0) {
-								doUpdates(bs, c, ce, processedClientIds,
-										allSyncFolderType);
+								doUpdates(bs, c, ce, processedClientIds);
 							} else {
 								doFetch(bs, c, ce);
 							}
@@ -523,8 +514,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 								c.getCollectionId()));
 					}
 				} catch (CollectionNotFoundException e) {
-					sendError(responder, new HashSet<SyncCollection>(),
-							SyncStatus.OBJECT_NOT_FOUND.asXmlValue(),
+					sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(),
 							continuation);
 				}
 			}
@@ -548,9 +538,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	}
 
 	@Override
-	public void sendError(Responder responder,
-			Set<SyncCollection> changedFolders, String errorStatus,
-			IContinuation continuation) {
+	public void sendError(Responder responder, String errorStatus, IContinuation continuation) {
 		Document ret = DOMUtils.createDoc(null, "Sync");
 		Element root = ret.getDocumentElement();
 		DOMUtils.createElementAndText(root, "Status", errorStatus.toString());

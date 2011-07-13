@@ -112,42 +112,42 @@ public class PingHandler extends WbxmlRequestHandler implements
 			continuation.setCollectionChangeListener(l);
 			logger.info("suspend for " + intervalSeconds + " seconds");
 			synchronized (bs) {
-				// logger
-				// .warn("for testing purpose, we will only suspend for 40sec (to monitor: "
-				// + bs.getLastMonitored() + ")");
-				// continuation.suspend(40 * 1000);
 				continuation.suspend(intervalSeconds * 1000);
 			}
 		} else {
 			logger.error("Don't know what to monitor, interval is null");
 			sendError(responder, PingStatus.MISSING_REQUEST_PARAMS,continuation);
-			// sendResponse(bs, responder, null, true);
 		}
 	}
 
 	@Override
 	public void sendResponseWithoutHierarchyChanges(BackendSession bs, Responder responder,
-			Collection<SyncCollection> changedFolders,
 			IContinuation continuation) {
-		sendResponse(bs, responder, changedFolders, false, continuation);
+		sendResponse(bs, responder, false, continuation);
 	}
 	
 	@Override
 	public void sendResponse(BackendSession bs, Responder responder,
-			Collection<SyncCollection> changedFolders, boolean sendHierarchyChange,IContinuation continuation) {
+			boolean sendHierarchyChange, IContinuation continuation) {
+		
 		Document ret = DOMUtils.createDoc(null, "Ping");
 
-		fillResponse(ret.getDocumentElement(), changedFolders,
-				sendHierarchyChange);
+		final Set<SyncCollection> changes = backend.getChangesSyncCollections(
+				continuation.getCollectionChangeListener());
+
+		fillResponse(ret.getDocumentElement(), changes, sendHierarchyChange);
 		try {
 			responder.sendResponse("Ping", ret);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
+		
 	}
-
+	
 	private void fillResponse(Element element,
-			Collection<SyncCollection> changedFolders, boolean sendHierarchyChange) {
+			Collection<SyncCollection> changedFolders,
+			boolean sendHierarchyChange) {
+		
 		if (sendHierarchyChange) {
 			DOMUtils.createElementAndText(element, "Status",
 					PingStatus.FOLDER_SYNC_REQUIRED.asXmlValue());
@@ -166,12 +166,11 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	private void sendError(Responder responder, PingStatus status, IContinuation continuation) {
-		sendError(responder, new HashSet<SyncCollection>(), status.asXmlValue(),continuation);
+		sendError(responder, status.asXmlValue(),continuation);
 	}
 
 	@Override
-	public void sendError(Responder responder,
-			Set<SyncCollection> changedFolders, String errorStatus, IContinuation continuation) {
+	public void sendError(Responder responder, String errorStatus, IContinuation continuation) {
 		Document ret = DOMUtils.createDoc(null, "Ping");
 		Element root = ret.getDocumentElement();
 		DOMUtils.createElementAndText(root, "Status", errorStatus);
@@ -182,4 +181,5 @@ public class PingHandler extends WbxmlRequestHandler implements
 			logger.error(e.getMessage(), e);
 		}
 	}
+	
 }
