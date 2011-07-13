@@ -6,18 +6,18 @@
 	<groupId>com.linagora.obm</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<version>obm-sync-opush-SNAPSHOT</version>
+	<version>2.4.0-rc4</version>
 	<name>obm-sync and opush 2.4 parent project</name>
 
 	<properties>
-		<obm-sync-client.version>2.4.0-SNAPSHOT</obm-sync-client.version>		
-		<obm-sync-common.version>2.4.0-SNAPSHOT</obm-sync-common.version>		
-		<obm-sync-locator.version>2.4.0-SNAPSHOT</obm-sync-locator.version>		
-		<obm-sync-message-queue.version>2.4.0-SNAPSHOT</obm-sync-message-queue.version>	
-		<obm-sync-services.version>2.4.0-SNAPSHOT</obm-sync-services.version>		
+		<obm-sync-client.version>2.4.0-rc4</obm-sync-client.version>		
+		<obm-sync-common.version>2.4.0-rc4</obm-sync-common.version>		
+		<obm-sync-locator.version>2.4.0-rc4</obm-sync-locator.version>		
+		<obm-sync-message-queue.version>2.4.0-rc4</obm-sync-message-queue.version>	
+		<obm-sync-services.version>2.4.0-rc4</obm-sync-services.version>		
 
-		<dbcp.version>2.4.0-SNAPSHOT</dbcp.version>
-		<utils.version>2.4.0-SNAPSHOT</utils.version>
+		<dbcp.version>2.4.0-rc4</dbcp.version>
+		<utils.version>2.4.0-rc4</utils.version>
 
 		<postgresql.version>9.0-801.jdbc4</postgresql.version>
 		<mysql-connector-java.version>5.1.16</mysql-connector-java.version>
@@ -248,6 +248,11 @@ org.eclipse.jdt.core.codeComplete.staticFinalFieldPrefixes=]]>
 				<artifactId>jsoup</artifactId>
 				<version>${jsoup.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.inject</groupId>
+				<artifactId>guice</artifactId>
+				<version>${guice.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>net.fortuna.ical4j</groupId>
