@@ -1,5 +1,6 @@
 package org.obm.push;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -118,7 +119,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public int getCount(BackendSession bs, SyncState state,
 			FilterType filterType, Integer collectionId)
-			throws ActiveSyncException {
+			throws ActiveSyncException, SQLException {
 		
 		DataDelta dd = getChanged(bs, state, filterType, collectionId);
 		Integer filterCount = invitationFilterManager.getCountFilterChanges(bs, state.getKey(), state.getDataType(), collectionId);
@@ -127,7 +128,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public DataDelta getChanged(BackendSession bs, SyncState state,
-			FilterType filter, Integer collectionId) throws ActiveSyncException {
+			FilterType filter, Integer collectionId) throws ActiveSyncException, SQLException {
 		
 		DataDelta delta = null;
 		switch (state.getDataType()) {

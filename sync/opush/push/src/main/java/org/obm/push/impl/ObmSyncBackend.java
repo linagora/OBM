@@ -3,6 +3,7 @@ package org.obm.push.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.CollectionNotFoundException;
+import org.obm.push.store.DeviceDao;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.PIMDataType;
 import org.obm.push.utils.JDBCUtils;
@@ -38,17 +40,19 @@ public class ObmSyncBackend {
 
 	protected String obmSyncHost;
 	protected ISyncStorage storage;
+	private DeviceDao deviceDao;
 
 	private final DataSource dataSource;
 	private final LocatorClient locatorClient;
 
-	protected ObmSyncBackend(ISyncStorage storage,
+	protected ObmSyncBackend(ISyncStorage storage, DeviceDao deviceDao,
 			ConfigurationService configurationService, DBCP dbcp)
 			throws ConfigurationException {
 
 		this.locatorClient = new LocatorClient(
 				configurationService.getLocatorUrl());
 		this.dataSource = dbcp.getDataSource();
+		this.deviceDao = deviceDao;
 		this.storage = storage;
 		validateOBMConnection();
 	}
@@ -151,9 +155,9 @@ public class ObmSyncBackend {
 				+ bs.getLoginAtDomain();
 	}
 
-	public Integer getCollectionIdFor(String deviceId, String collection)
-			throws CollectionNotFoundException {
-		return storage.getCollectionMapping(deviceId, collection);
+	public Integer getCollectionIdFor(String loginAtDomain, String deviceId, String collection)
+			throws CollectionNotFoundException, SQLException {
+		return storage.getCollectionMapping(loginAtDomain, deviceId, collection);
 	}
 
 	public String getCollectionPathFor(Integer collectionId)
@@ -184,11 +188,11 @@ public class ObmSyncBackend {
 		return Integer.parseInt(serverId.substring(idx + 1));
 	}
 
-	public int getDevId(String deviceId) {
-		return storage.getDevId(deviceId);
+	public int getDevId(String loginAtDomain, String deviceId) throws SQLException {
+		return deviceDao.findDevice(loginAtDomain, deviceId);
 	}
 
-	public String createCollectionMapping(String devId, String col) {
-		return storage.addCollectionMapping(devId, col).toString();
+	public String createCollectionMapping(String loginAtDomain, String devId, String col) throws SQLException {
+		return storage.addCollectionMapping(loginAtDomain, devId, col).toString();
 	}
 }

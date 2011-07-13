@@ -1,5 +1,6 @@
 package org.obm.push.store;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -181,7 +182,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 
 	private void doUpdates(BackendSession bs, SyncCollection c, Element ce,
 			Map<String, String> processedClientIds)
-			throws ActiveSyncException {
+			throws ActiveSyncException, SQLException {
 
 		DataDelta delta = null;
 		if (bs.getUnSynchronizedItemChange(c.getCollectionId()).size() == 0) {

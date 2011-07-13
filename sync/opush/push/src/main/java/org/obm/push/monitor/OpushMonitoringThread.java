@@ -1,5 +1,6 @@
 package org.obm.push.monitor;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
@@ -51,6 +52,8 @@ public class OpushMonitoringThread {
 						addPushNotification(pushNotifyList, ccl);
 					}
 				} catch (ActiveSyncException e) {
+					logger.error(e.getMessage(), e);
+				} catch (SQLException e) {
 					logger.error(e.getMessage(), e);
 				}
 			}

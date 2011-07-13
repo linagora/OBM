@@ -1,5 +1,6 @@
 package org.obm.push.state;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -26,9 +27,9 @@ public class StateMachine {
 		this.store = store;
 	}
 	
-	public SyncState getFolderSyncState(String deviceId, String collectionUrl, String syncKey) {
+	public SyncState getFolderSyncState(String loginAtDomain, String deviceId, String collectionUrl, String syncKey) throws SQLException {
 		try {
-			return getSyncState(store.getCollectionMapping(deviceId, collectionUrl),syncKey);
+			return getSyncState(store.getCollectionMapping(loginAtDomain, deviceId, collectionUrl),syncKey);
 		} catch (CollectionNotFoundException e) {
 			SyncState ret = new SyncState(collectionUrl);
 			ret.setKey(syncKey);
@@ -53,7 +54,7 @@ public class StateMachine {
 		return ret;
 	}
 
-	public String allocateNewSyncKey(BackendSession bs, Integer collectionId) throws CollectionNotFoundException {
+	public String allocateNewSyncKey(BackendSession bs, Integer collectionId) throws CollectionNotFoundException, SQLException {
 		final SyncState newState = new SyncState(store.getCollectionPath(collectionId));
 		final Date date = bs.getUpdatedSyncDate(collectionId);
 		if (date != null) {
@@ -63,7 +64,7 @@ public class StateMachine {
 		String newSk = UUID.randomUUID().toString();
 		newState.setKey(newSk);
 		
-		store.updateState(bs.getDevId(), collectionId, newState);
+		store.updateState(bs.getLoginAtDomain(), bs.getDevId(), collectionId, newState);
 		return newSk;
 	}
 

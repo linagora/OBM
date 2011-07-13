@@ -61,22 +61,23 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		String syncKey = DOMUtils.getElementText(doc.getDocumentElement(),
 				"SyncKey");
 
-		SyncState state = stMachine.getFolderSyncState(bs.getDevId(),
-				hierarchyExporter.getRootFolderUrl(bs), syncKey);
-		
-		if (!state.isValid()) {
-			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
-			return;
-		}
-		// look for Add, Modify, Remove
-
-		Element changes = DOMUtils.getUniqueElement(doc.getDocumentElement(),
-				"Changes");
-
-		// dataClass, filterType, state, int, int
-		hierarchyExporter.configure(state, null, null, 0, 0);
-
 		try {
+			SyncState state = stMachine.getFolderSyncState(bs.getLoginAtDomain(), bs.getDevId(),
+					hierarchyExporter.getRootFolderUrl(bs), syncKey);
+			
+			if (!state.isValid()) {
+				sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
+				return;
+			}
+			// look for Add, Modify, Remove
+
+			Element changes = DOMUtils.getUniqueElement(doc.getDocumentElement(),
+					"Changes");
+
+			// dataClass, filterType, state, int, int
+			hierarchyExporter.configure(state, null, null, 0, 0);
+
+			
 			Document ret = DOMUtils.createDoc(null, "FolderSync");
 			Element root = ret.getDocumentElement();
 			DOMUtils.createElementAndText(root, "Status", "1");

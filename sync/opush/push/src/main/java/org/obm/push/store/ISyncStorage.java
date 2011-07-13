@@ -9,15 +9,13 @@ import java.util.Set;
 
 public interface ISyncStorage {
 
-	void updateState(String devId, Integer collectionId, SyncState state);
-
-	SyncState findStateForDevice(String devId, Integer collectionId);
+	void updateState(String loginAtDomain, String devId, Integer collectionId, SyncState state) throws SQLException;
 
 	SyncState findStateForKey(String syncKey);
 
-	long findLastHearbeat(String devId);
+	long findLastHearbeat(String loginAtDomain, String deviceId) throws SQLException;
 
-	void updateLastHearbeat(String devId, long hearbeat);
+	void updateLastHearbeat(String loginAtDomain, String deviceId, long hearbeat) throws SQLException;
 
 	/**
 	 * Stores device informations for the given user. Returns <code>true</code>
@@ -25,26 +23,20 @@ public interface ISyncStorage {
 	 */
 	boolean initDevice(String loginAtDomain, String deviceId, String deviceType);
 
-	Integer addCollectionMapping(String deviceId, String collection);
+	Integer addCollectionMapping(String loginAtDomain, String deviceId, String collection) throws SQLException;
 
 	/**
 	 * Fetches the id associated with a given collection id string.
 	 */
-	Integer getCollectionMapping(String deviceId, String collectionId)
-			throws CollectionNotFoundException;
+	Integer getCollectionMapping(String loginAtDomain, String deviceId, String collectionId)
+			throws CollectionNotFoundException, SQLException;
 
 	String getCollectionPath(Integer collectionId)
 			throws CollectionNotFoundException;
 
 	PIMDataType getDataClass(String collectionId);
 
-	void resetForFullSync(String devId);
-
-	Integer getDevId(String deviceId);
-
-	Set<Integer> getAllCollectionId(String devId);
-
-	void resetCollection(String devId, Integer collectionId);
+	void resetCollection(String loginAtDomain, String devId, Integer collectionId) throws SQLException;
 
 	/**
 	 * Returns <code>true</code> if the device is authorized to synchronize.

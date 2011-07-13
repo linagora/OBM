@@ -11,12 +11,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import javax.transaction.TransactionManager;
 
@@ -43,48 +40,18 @@ import com.google.inject.Singleton;
 @Singleton
 public class SyncStorage implements ISyncStorage {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SyncStorage.class);
+	private static final Logger logger = LoggerFactory.getLogger(SyncStorage.class);
 
-	private Map<String, Integer> devIdCache;
 	private final DBCP dbcp;
+
+	private final DeviceDao deviceDao;
 	
 	@Inject
-	private SyncStorage(DBCP dbcp) {
-		this.devIdCache = new HashMap<String, Integer>();
+	private SyncStorage(DBCP dbcp, DeviceDao dao) {
 		this.dbcp = dbcp;
+		this.deviceDao = dao;
 	}
 	
-	@Override
-	public SyncState findStateForDevice(String devId, Integer collectionId) {
-		int id = devIdCache.get(devId);
-		SyncState ret = null;
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-		try {
-			con = dbcp.getDataSource().getConnection();
-			ps = con.prepareStatement("SELECT sync_key, last_sync FROM opush_sync_state WHERE device_id=? AND collection_id=?");
-			ps.setInt(1, id);
-			ps.setInt(2, collectionId);
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				String key = rs.getString(1);
-				long timeInMillis = rs.getTimestamp(2).getTime();
-				String dataPath = getCollectionPath(collectionId, con);
-				ret = new SyncState(dataPath);
-				ret.setKey(key);
-				cal.setTimeInMillis(timeInMillis);
-				ret.setLastSync(cal.getTime());
-			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
-		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
-		}
-		return ret;
-	}
 
 	@Override
 	public SyncState findStateForKey(String syncKey) {
@@ -116,8 +83,9 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public long findLastHearbeat(String devId) {
-		int id = devIdCache.get(devId);
+	public long findLastHearbeat(String loginAtDomain, String devId) throws SQLException {
+		Integer id = deviceDao.findDevice(loginAtDomain, devId);
+		
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -140,8 +108,8 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public synchronized void updateLastHearbeat(String devId, long hearbeat) {
-		int id = devIdCache.get(devId);
+	public synchronized void updateLastHearbeat(String loginAtDomain, String devId, long hearbeat) throws SQLException {
+		Integer id = deviceDao.findDevice(loginAtDomain, devId);
 		Connection con = null;
 		PreparedStatement ps = null;
 		TransactionManager tm = dbcp.getDataSource().getTransactionManager();
@@ -165,65 +133,28 @@ public class SyncStorage implements ISyncStorage {
 			JDBCUtils.cleanup(con, ps, null);
 		}
 	}
-
+	
 	@Override
-	public boolean initDevice(String loginAtDomain, String deviceId,
-			String deviceType) {
-		String[] parts = loginAtDomain.split("@");
-		String login = parts[0].toLowerCase();
-		String domain = parts[1].toLowerCase();
+	public boolean initDevice(String loginAtDomain, String deviceId, String deviceType) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		int id = 0;
 		boolean ret = true;
 		TransactionManager ut = dbcp.getDataSource().getTransactionManager();
 		try {
 			ut.begin();
-			con = dbcp.getDataSource().getConnection();
-			ps = con.prepareStatement("SELECT id FROM opush_device "
-					+ "INNER JOIN UserObm ON owner=userobm_id "
-					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
-					+ "WHERE identifier=? AND type=? AND lower(userobm_login)=? AND lower(domain_name)=?");
-			ps.setString(1, deviceId);
-			ps.setString(2, deviceType);
-			ps.setString(3, login);
-			ps.setString(4, domain);
-			rs = ps.executeQuery();
-			if (!rs.next()) {
-				rs.close();
-				ps.close();
-
-				ps = con.prepareStatement("INSERT INTO opush_device (identifier, type, owner) "
-						+ "SELECT ?, ?, userobm_id FROM UserObm "
-						+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
-						+ "WHERE lower(userobm_login)=? AND lower(domain_name)=?");
-				ps.setString(1, deviceId);
-				ps.setString(2, deviceType);
-				ps.setString(3, login);
-				ps.setString(4, domain);
-				int insert = ps.executeUpdate();
-				if (insert > 0) {
-					id = dbcp.lastInsertId(con);
-				} else {
+			Integer opushDeviceId = deviceDao.findDevice(loginAtDomain, deviceId);
+			if (opushDeviceId == null) {
+				boolean registered = deviceDao.registerNewDevice(loginAtDomain, deviceId, deviceType);
+				if (!registered) {
 					logger.warn("did not insert any row in device table for device "
-							+ deviceType + " of " + login + " @ " + domain);
+							+ deviceType + " of " + loginAtDomain);
 					ret = false;
 				}
-			} else {
-				id = rs.getInt(1);
 			}
-			
-			logger.info("put device id = {}", deviceId);
-			devIdCache.put(deviceId, id);
 			ut.commit();
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
 			rollback(ut);
 			ret = false;
-		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
 		}
 		return ret;
 	}
@@ -294,9 +225,9 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public synchronized void updateState(String devId, Integer collectionId,
-			SyncState state) {
-		int id = devIdCache.get(devId);
+	public synchronized void updateState(String loginAtDomain, String devId, Integer collectionId,
+			SyncState state) throws SQLException {
+		Integer id = deviceDao.findDevice(loginAtDomain, devId);
 		Connection con = null;
 		PreparedStatement ps = null;
 		TransactionManager ut = dbcp.getDataSource().getTransactionManager();
@@ -322,9 +253,9 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public Integer getCollectionMapping(String deviceId, String collection)
-			throws CollectionNotFoundException {
-		int id = devIdCache.get(deviceId);
+	public Integer getCollectionMapping(String loginAtDomain, String deviceId, String collection)
+			throws CollectionNotFoundException, SQLException {
+		Integer id = deviceDao.findDevice(loginAtDomain, deviceId);
 		Integer ret = null;
 
 		Connection con = null;
@@ -351,8 +282,8 @@ public class SyncStorage implements ISyncStorage {
 		return ret;
 	}
 
-	public Integer addCollectionMapping(String deviceId, String collection) {
-		int id = devIdCache.get(deviceId);
+	public Integer addCollectionMapping(String loginAtDomain, String deviceId, String collection) throws SQLException {
+		Integer id = deviceDao.findDevice(loginAtDomain, deviceId);
 		Integer ret = null;
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -443,37 +374,8 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public synchronized void resetForFullSync(String devId) {
-		int id = devIdCache.get(devId);
-		Connection con = null;
-		PreparedStatement ps = null;
-		TransactionManager ut = dbcp.getDataSource().getTransactionManager();
-		try {
-			ut.begin();
-			con = dbcp.getDataSource().getConnection();
-
-			ps = con.prepareStatement("DELETE FROM opush_sync_state WHERE device_id=?");
-			ps.setInt(1, id);
-			ps.executeUpdate();
-
-			ps = con.prepareStatement("DELETE FROM opush_sync_mail WHERE device_id=?");
-			ps.setInt(1, id);
-			ps.executeUpdate();
-
-			ut.commit();
-			logger.warn("mappings & states cleared for full sync of device "
-					+ devId);
-		} catch (Throwable e) {
-			rollback(ut);
-			logger.error(e.getMessage(), e);
-		} finally {
-			JDBCUtils.cleanup(con, ps, null);
-		}
-	}
-
-	@Override
-	public synchronized void resetCollection(String devId, Integer collectionId) {
-		int id = devIdCache.get(devId);
+	public synchronized void resetCollection(String loginAtDomain, String devId, Integer collectionId) throws SQLException {
+		Integer id = deviceDao.findDevice(loginAtDomain, devId);
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -505,34 +407,6 @@ public class SyncStorage implements ISyncStorage {
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
-	}
-
-	@Override
-	public Integer getDevId(String devId) {
-		return devIdCache.get(devId);
-	}
-
-	@Override
-	public Set<Integer> getAllCollectionId(String devId) {
-		Set<Integer> ret = new HashSet<Integer>();
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		int id = devIdCache.get(devId);
-		try {
-			con = dbcp.getDataSource().getConnection();
-			ps = con.prepareStatement("SELECT id FROM opush_folder_mapping WHERE device_id=?");
-			ps.setInt(1, id);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				ret.add(rs.getInt("id"));
-			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
-		} finally {
-			JDBCUtils.cleanup(con, ps, null);
-		}
-		return ret;
 	}
 
 	@Override

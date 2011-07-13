@@ -1,5 +1,6 @@
 package org.obm.push.backend;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,10 +19,10 @@ import org.obm.push.store.SyncState;
 public interface IContentsExporter {
 
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws ActiveSyncException ;
+			throws ActiveSyncException, SQLException;
 
 	int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws ActiveSyncException;
+			throws ActiveSyncException, SQLException;
 
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
 			List<String> fetchIds) throws ActiveSyncException;

@@ -1,5 +1,6 @@
 package org.obm.push;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,24 +53,24 @@ public class HierarchyExporter implements IHierarchyExporter {
 		}
 	}
 
-	private List<ItemChange> getContactsChanges(BackendSession bs) {
+	private List<ItemChange> getContactsChanges(BackendSession bs) throws SQLException {
 		return contactsBackend.getHierarchyChanges(bs);
 	}
 
-	private List<ItemChange> getTasksChanges(BackendSession bs) {
+	private List<ItemChange> getTasksChanges(BackendSession bs) throws SQLException {
 		return calendarExporter.getHierarchyTaskChanges(bs);
 	}
 
-	private List<ItemChange> getCalendarChanges(BackendSession bs) {
+	private List<ItemChange> getCalendarChanges(BackendSession bs) throws SQLException {
 		return calendarExporter.getHierarchyChanges(bs);
 	}
 
-	private List<ItemChange> getMailChanges(BackendSession bs) {
+	private List<ItemChange> getMailChanges(BackendSession bs) throws SQLException {
 		return mailExporter.getHierarchyChanges(bs);
 	}
 
 	@Override
-	public List<ItemChange> getChanged(BackendSession bs) {
+	public List<ItemChange> getChanged(BackendSession bs) throws SQLException {
 		folderExporter.synchronize(bs);
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		changes.addAll(getCalendarChanges(bs));
@@ -80,7 +81,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 
 	@Override
-	public int getCount(BackendSession bs) {
+	public int getCount(BackendSession bs) throws SQLException {
 		return getChanged(bs).size();
 	}
 
@@ -90,7 +91,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 
 	@Override
-	public int getRootFolderId(BackendSession bs) throws ActiveSyncException {
+	public int getRootFolderId(BackendSession bs) throws ActiveSyncException, SQLException {
 		return folderExporter.getServerIdFor(bs);
 	}
 

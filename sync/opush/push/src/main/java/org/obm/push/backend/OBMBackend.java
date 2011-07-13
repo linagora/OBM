@@ -1,5 +1,6 @@
 package org.obm.push.backend;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import org.obm.push.store.SyncCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -130,14 +132,13 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public void resetCollection(BackendSession bs, Integer collectionId) {
+	public void resetCollection(BackendSession bs, Integer collectionId) throws SQLException {
 		logger.info("reset Collection " + collectionId
 				+ " For Full Sync devId: " + bs.getDevId());
 		try {
-			Set<Integer> colIds = new HashSet<Integer>();
-			colIds.add(collectionId);
+			Set<Integer> colIds = ImmutableSet.of(collectionId);
 			emailManager.resetForFullSync(colIds);
-			store.resetCollection(bs.getDevId(), collectionId);
+			store.resetCollection(bs.getLoginAtDomain(), bs.getDevId(), collectionId);
 			bs.clear(collectionId);
 		} catch (RuntimeException re) {
 			logger.error(re.getMessage(), re);
@@ -152,7 +153,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Set<SyncCollection> getChangesSyncCollections(
-			CollectionChangeListener collectionChangeListener) {
+			CollectionChangeListener collectionChangeListener) throws SQLException {
 		
 		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();
 		final BackendSession backendSession = collectionChangeListener.getSession();
@@ -169,7 +170,7 @@ public class OBMBackend implements IBackend {
 	}
 	
 	private int getCount(BackendSession backendSession,
-			SyncCollection syncCollection) {
+			SyncCollection syncCollection) throws SQLException {
 		
 		try {
 			

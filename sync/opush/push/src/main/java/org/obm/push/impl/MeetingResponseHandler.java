@@ -1,5 +1,6 @@
 package org.obm.push.impl;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -91,7 +92,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 
 	private void handleMeetingResponse(BackendSession bs, MeetingResponse item,
-			Element response, MSEmail invitation) {
+			Element response, MSEmail invitation) throws SQLException {
 		
 		String calId = contentsImporter.importCalendarUserStatus(bs,
 				item.getCollectionId(), invitation, item.getUserResponse());

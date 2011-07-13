@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -36,6 +37,7 @@ import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.CollectionNotFoundException;
+import org.obm.push.store.DeviceDao;
 import org.obm.push.store.FilterType;
 import org.obm.push.store.FolderType;
 import org.obm.push.store.IApplicationData;
@@ -59,15 +61,15 @@ public class MailBackend extends ObmSyncBackend {
 	private IEmailManager emailManager;
 
 	@Inject
-	private MailBackend(ISyncStorage storage, IEmailManager emailManager,
+	private MailBackend(ISyncStorage storage, DeviceDao deviceDao, IEmailManager emailManager,
 			ConfigurationService configurationService, DBCP dbcp)
 			throws ConfigurationException {
 		
-		super(storage, configurationService, dbcp);
+		super(storage, deviceDao, configurationService, dbcp);
 		this.emailManager = emailManager;
 	}
 
-	public List<ItemChange> getHierarchyChanges(BackendSession bs) {
+	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
 		ret.add(genItemChange(bs, EmailManager.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER));
 		ret.add(genItemChange(bs,  EmailManager.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS));
@@ -77,7 +79,7 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	private ItemChange genItemChange(BackendSession bs, String imapFolder,
-			FolderType type) {
+			FolderType type) throws SQLException {
 		ItemChange ic = new ItemChange();
 		ic.setParentId("0");
 		ic.setDisplayName(bs.getLoginAtDomain() + " " + imapFolder);
@@ -91,10 +93,10 @@ public class MailBackend extends ObmSyncBackend {
 		String s = buildPath(bs, imapFolder);
 		String serverId;
 		try {
-			Integer collectionId = getCollectionIdFor(bs.getDevId(), s);
+			Integer collectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), s);
 			serverId = getServerIdFor(collectionId);
 		} catch (ActiveSyncException e) {
-			serverId = createCollectionMapping(bs.getDevId(), sb.toString());
+			serverId = createCollectionMapping(bs.getLoginAtDomain(), bs.getDevId(), sb.toString());
 			ic.setIsNew(true);
 		}
 
@@ -121,14 +123,14 @@ public class MailBackend extends ObmSyncBackend {
 		List<ItemChange> changes = new LinkedList<ItemChange>();
 		List<ItemChange> deletions = new LinkedList<ItemChange>();
 		try {
-			int devId = getDevId(bs.getDevId());
+			int devId = getDevId(bs.getLoginAtDomain(), bs.getDevId());
 			
 			final MailChanges mc = emailManager.getSync(bs, state, devId, collectionId, collectionPath, filter);
 			
 			changes = getChanges(bs, collectionId, collectionPath, mc.getUpdated());
 			deletions.addAll(getDeletions(collectionId, mc.getRemoved()));
 			
-			bs.addUpdatedSyncDate(getCollectionIdFor(bs.getDevId(), collectionPath), mc.getLastSync());
+			bs.addUpdatedSyncDate(getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), collectionPath), mc.getLastSync());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -210,11 +212,11 @@ public class MailBackend extends ObmSyncBackend {
 				Long uid = getEmailUidFromServerId(serverId);
 				Integer collectionId = getCollectionIdFor(serverId);
 				String collectionName = getCollectionPathFor(collectionId);
-				Integer devId = getDevId(bs.getDevId());
+				Integer devId = getDevId(bs.getLoginAtDomain(), bs.getDevId());
 
 				if (moveToTrash) {
 					String wasteBasketPath = getWasteBasketPath(bs);
-					Integer wasteBasketId = getCollectionIdFor(bs.getDevId(),
+					Integer wasteBasketId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(),
 							wasteBasketPath);
 					emailManager.moveItem(bs, devId, collectionName,
 							collectionId, wasteBasketPath, wasteBasketId, uid);
@@ -230,10 +232,10 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	private void removeInvitationStatus(BackendSession bs,
-			Integer emailCollectionId, Long mailUid) {
+			Integer emailCollectionId, Long mailUid) throws SQLException {
 		try {
 			String calPath = getDefaultCalendarName(bs);
-			Integer eventCollectionId = getCollectionIdFor(bs.getDevId(),
+			Integer eventCollectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(),
 					calPath);
 			storage.removeInvitationStatus(eventCollectionId,
 					emailCollectionId, mailUid);
@@ -270,9 +272,9 @@ public class MailBackend extends ObmSyncBackend {
 		Long newUidMail = null;
 		try {
 			Long currentMailUid = getEmailUidFromServerId(messageId);
-			srcFolderId = getCollectionIdFor(bs.getDevId(), srcFolder);
-			dstFolderId = getCollectionIdFor(bs.getDevId(), dstFolder);
-			Integer devId = getDevId(bs.getDevId());
+			srcFolderId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), srcFolder);
+			dstFolderId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), dstFolder);
+			Integer devId = getDevId(bs.getLoginAtDomain(), bs.getDevId());
 
 			newUidMail = emailManager.moveItem(bs, devId, srcFolder,
 					srcFolderId, dstFolder, dstFolderId, currentMailUid);
@@ -518,8 +520,8 @@ public class MailBackend extends ObmSyncBackend {
 		}
 		try {
 
-			int devId = getDevId(bs.getDevId());
-			int collectionId = getCollectionIdFor(bs.getDevId(), collectionPath);
+			int devId = getDevId(bs.getLoginAtDomain(), bs.getDevId());
+			int collectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), collectionPath);
 			emailManager.purgeFolder(bs, devId, collectionPath, collectionId);
 			if (deleteSubFolder) {
 				logger.warn("deleteSubFolder isn't implemented because opush doesn't yet manage folders");

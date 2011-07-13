@@ -1,5 +1,6 @@
 package org.obm.push.calendar;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -21,6 +22,7 @@ import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.CollectionNotFoundException;
+import org.obm.push.store.DeviceDao;
 import org.obm.push.store.FolderType;
 import org.obm.push.store.IApplicationData;
 import org.obm.push.store.ISyncStorage;
@@ -49,17 +51,17 @@ public class CalendarBackend extends ObmSyncBackend {
 	private final ImmutableMap<PIMDataType, ObmSyncCalendarConverter> converters;
 
 	@Inject
-	public CalendarBackend(ISyncStorage storage,
+	public CalendarBackend(ISyncStorage storage, DeviceDao deviceDao,
 			ConfigurationService configurationService, DBCP dbcp)
 			throws ConfigurationException {
 		
-		super(storage, configurationService, dbcp);
+	    super(storage, deviceDao, configurationService, dbcp);
 		converters = ImmutableMap.of(
 				PIMDataType.CALENDAR, new EventConverter(), 
 				PIMDataType.TASKS, new TodoConverter());
 	}
 
-	public List<ItemChange> getHierarchyChanges(BackendSession bs) {
+	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 
 		if (!bs.checkHint("hint.multipleCalendars", false)) {
@@ -67,10 +69,10 @@ public class CalendarBackend extends ObmSyncBackend {
 			String col = getDefaultCalendarName(bs);
 			String serverId = "";
 			try {
-				Integer collectionId = getCollectionIdFor(bs.getDevId(), col);
+				Integer collectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), col);
 				serverId = getServerIdFor(collectionId);
 			} catch (ActiveSyncException e) {
-				serverId = createCollectionMapping(bs.getDevId(), col);
+				serverId = createCollectionMapping(bs.getLoginAtDomain(), bs.getDevId(), col);
 				ic.setIsNew(true);
 			}
 			ic.setServerId(serverId);
@@ -94,7 +96,7 @@ public class CalendarBackend extends ObmSyncBackend {
 				ItemChange ic = new ItemChange();
 				String col = "obm:\\\\" + bs.getLoginAtDomain()
 						+ "\\calendar\\" + ci.getUid() + domain;
-				Integer collectionId = getCollectionIdFor(bs.getDevId(), col);
+				Integer collectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), col);
 				ic.setServerId(getServerIdFor(collectionId));
 				ic.setParentId("0");
 				ic.setDisplayName(ci.getMail() + " calendar");
@@ -113,17 +115,17 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	public List<ItemChange> getHierarchyTaskChanges(BackendSession bs) {
+	public List<ItemChange> getHierarchyTaskChanges(BackendSession bs) throws SQLException {
 		List<ItemChange> ret = new ArrayList<ItemChange>(1);
 		ItemChange ic = new ItemChange();
 		String col = "obm:\\\\" + bs.getLoginAtDomain() + "\\tasks\\"
 				+ bs.getLoginAtDomain();
 		String serverId;
 		try {
-			Integer collectionId = getCollectionIdFor(bs.getDevId(), col);
+			Integer collectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), col);
 			serverId = getServerIdFor(collectionId);
 		} catch (ActiveSyncException e) {
-			serverId = createCollectionMapping(bs.getDevId(), col);
+			serverId = createCollectionMapping(bs.getLoginAtDomain(), bs.getDevId(), col);
 			ic.setIsNew(true);
 		}
 		ic.setServerId(serverId);
@@ -384,13 +386,13 @@ public class CalendarBackend extends ObmSyncBackend {
 	private String updateUserStatus(BackendSession bs, MSEvent msEvent,
 			AttendeeStatus status, AbstractEventSyncClient calCli,
 			AccessToken at) throws ServerFault,
-			CollectionNotFoundException, ActiveSyncException {
+			CollectionNotFoundException, ActiveSyncException, SQLException {
 		logger.info("update user status[" + status.toString()
 					+ "] in calendar " + bs.getLoginAtDomain());
 		ParticipationState participationStatus = EventConverter.status(null, status);
 		calCli.changeParticipationState(at, bs.getLoginAtDomain(), msEvent.getUID(), participationStatus, msEvent.getObmSequence(), true);
 		
-		Integer collectionId = getCollectionIdFor(bs.getDevId(), getDefaultCalendarName(bs));
+		Integer collectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), getDefaultCalendarName(bs));
 		return getServerIdFor(collectionId, msEvent.getObmUID());
 	}
 
@@ -470,10 +472,10 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 	
-	public Integer getCollectionId (BackendSession bs) throws CollectionNotFoundException{
+	public Integer getCollectionId (BackendSession bs) throws CollectionNotFoundException, SQLException{
 		String calPath = getDefaultCalendarName(bs);
-		Integer eventCollectionId = getCollectionIdFor(bs.getDevId(),
-				calPath);
+		Integer eventCollectionId = getCollectionIdFor(bs.getLoginAtDomain(), 
+				bs.getDevId(), calPath);
 		return eventCollectionId;
 	}
 

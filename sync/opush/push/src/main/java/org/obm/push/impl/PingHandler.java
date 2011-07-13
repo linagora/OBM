@@ -46,77 +46,82 @@ public class PingHandler extends WbxmlRequestHandler implements
 	@Override
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
-		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()
-				+ ")");
-		long intervalSeconds = 0;
-		if (doc == null) {
-			logger
-					.info("Empty Ping, reusing cached heartbeat & monitored folders");
+		try {
+			logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()
+					+ ")");
+			
+			long intervalSeconds = 0;
+			if (doc == null) {
+				logger
+						.info("Empty Ping, reusing cached heartbeat & monitored folders");
 
-			intervalSeconds = storage.findLastHearbeat(bs.getDevId());
+				intervalSeconds = storage.findLastHearbeat(bs.getLoginAtDomain(), bs.getDevId());
 
-			// 5sec, why not ? a mobile device asking for <5sec is just stupid
-			if (bs.getLastMonitored() == null
-					|| bs.getLastMonitored().isEmpty() || intervalSeconds < 5) {
+				// 5sec, why not ? a mobile device asking for <5sec is just stupid
+				if (bs.getLastMonitored() == null
+						|| bs.getLastMonitored().isEmpty() || intervalSeconds < 5) {
 
-				logger.error("Don't know what to monitor, " + "interval: "
-						+ intervalSeconds + " toMonitor: "
-						+ bs.getLastMonitored());
-				sendError(responder, PingStatus.MISSING_REQUEST_PARAMS, continuation);
-				return;
-			}
-		} else {
-			Element pr = doc.getDocumentElement();
-			Element hb = DOMUtils.getUniqueElement(pr, "HeartbeatInterval");
-			if (hb != null) {
-				intervalSeconds = Long.parseLong(hb.getTextContent());
+					logger.error("Don't know what to monitor, " + "interval: "
+							+ intervalSeconds + " toMonitor: "
+							+ bs.getLastMonitored());
+					sendError(responder, PingStatus.MISSING_REQUEST_PARAMS, continuation);
+					return;
+				}
 			} else {
-				intervalSeconds = storage.findLastHearbeat(bs.getDevId());
-			}
+				Element pr = doc.getDocumentElement();
+				Element hb = DOMUtils.getUniqueElement(pr, "HeartbeatInterval");
+				if (hb != null) {
+					intervalSeconds = Long.parseLong(hb.getTextContent());
+				} else {
+					intervalSeconds = storage.findLastHearbeat(bs.getLoginAtDomain(), bs.getDevId());
+				}
 
-			Set<SyncCollection> toMonitor = new HashSet<SyncCollection>();
-			NodeList folders = pr.getElementsByTagName("Folder");
-			for (int i = 0; i < folders.getLength(); i++) {
-				Element f = (Element) folders.item(i);
-				SyncCollection sc = new SyncCollection();
-				sc.setDataClass(DOMUtils.getElementText(f, "Class"));
-				int id = Integer.parseInt(DOMUtils.getElementText(f, "Id"));
-				sc.setCollectionId(id);
-				toMonitor.add(sc);
-				if ("email".equalsIgnoreCase(sc.getDataClass())) {
-					try {
-						backend.startEmailMonitoring(bs, id);
-					} catch (CollectionNotFoundException e) {
-						sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED, continuation);
-					} catch (ActiveSyncException e) {
-						sendError(responder, PingStatus.SERVER_ERROR, continuation);
+				Set<SyncCollection> toMonitor = new HashSet<SyncCollection>();
+				NodeList folders = pr.getElementsByTagName("Folder");
+				for (int i = 0; i < folders.getLength(); i++) {
+					Element f = (Element) folders.item(i);
+					SyncCollection sc = new SyncCollection();
+					sc.setDataClass(DOMUtils.getElementText(f, "Class"));
+					int id = Integer.parseInt(DOMUtils.getElementText(f, "Id"));
+					sc.setCollectionId(id);
+					toMonitor.add(sc);
+					if ("email".equalsIgnoreCase(sc.getDataClass())) {
+						try {
+							backend.startEmailMonitoring(bs, id);
+						} catch (CollectionNotFoundException e) {
+							sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED, continuation);
+						} catch (ActiveSyncException e) {
+							sendError(responder, PingStatus.SERVER_ERROR, continuation);
+						}
 					}
 				}
+				// pda is allowed to only send the folder list on the first ping
+				if (folders.getLength() > 0) {
+					logger.warn("=========== setting monitored to "
+							+ toMonitor.size());
+					bs.setLastMonitored(toMonitor);
+				}
+				storage.updateLastHearbeat(bs.getLoginAtDomain(), bs.getDevId(),
+						intervalSeconds);
 			}
-			// pda is allowed to only send the folder list on the first ping
-			if (folders.getLength() > 0) {
-				logger.warn("=========== setting monitored to "
-						+ toMonitor.size());
-				bs.setLastMonitored(toMonitor);
-			}
-			storage.updateLastHearbeat(bs.getDevId(),
-					intervalSeconds);
-		}
 
-		if (intervalSeconds > 0 && bs.getLastMonitored() != null) {
-			bs.setLastContinuationHandler(ActiveSyncServlet.PING_HANDLER);
-			CollectionChangeListener l = new CollectionChangeListener(bs,
-					continuation, bs.getLastMonitored());
-			IListenerRegistration reg = backend.addChangeListener(l);
-			continuation.setListenerRegistration(reg);
-			continuation.setCollectionChangeListener(l);
-			logger.info("suspend for " + intervalSeconds + " seconds");
-			synchronized (bs) {
-				continuation.suspend(intervalSeconds * 1000);
+			if (intervalSeconds > 0 && bs.getLastMonitored() != null) {
+				bs.setLastContinuationHandler(ActiveSyncServlet.PING_HANDLER);
+				CollectionChangeListener l = new CollectionChangeListener(bs,
+						continuation, bs.getLastMonitored());
+				IListenerRegistration reg = backend.addChangeListener(l);
+				continuation.setListenerRegistration(reg);
+				continuation.setCollectionChangeListener(l);
+				logger.info("suspend for " + intervalSeconds + " seconds");
+				synchronized (bs) {
+					continuation.suspend(intervalSeconds * 1000);
+				}
+			} else {
+				logger.error("Don't know what to monitor, interval is null");
+				sendError(responder, PingStatus.MISSING_REQUEST_PARAMS,continuation);
 			}
-		} else {
-			logger.error("Don't know what to monitor, interval is null");
-			sendError(responder, PingStatus.MISSING_REQUEST_PARAMS,continuation);
+		} catch (Exception e) {
+			sendError(responder, PingStatus.SERVER_ERROR, continuation);
 		}
 	}
 
@@ -132,11 +137,12 @@ public class PingHandler extends WbxmlRequestHandler implements
 		
 		Document ret = DOMUtils.createDoc(null, "Ping");
 
-		final Set<SyncCollection> changes = backend.getChangesSyncCollections(
-				continuation.getCollectionChangeListener());
-
-		fillResponse(ret.getDocumentElement(), changes, sendHierarchyChange);
+		
 		try {
+			final Set<SyncCollection> changes = backend.getChangesSyncCollections(
+					continuation.getCollectionChangeListener());
+
+			fillResponse(ret.getDocumentElement(), changes, sendHierarchyChange);
 			responder.sendResponse("Ping", ret);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

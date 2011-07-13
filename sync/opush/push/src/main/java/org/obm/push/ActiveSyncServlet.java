@@ -287,10 +287,6 @@ public class ActiveSyncServlet extends HttpServlet {
 	/**
 	 * Parameters can be in query string or in header, whether a base64 query
 	 * string is used.
-	 * 
-	 * @param r
-	 * @param name
-	 * @return
 	 */
 	private String p(ActiveSyncRequest r, String name) {
 		String ret = r.getParameter(name);

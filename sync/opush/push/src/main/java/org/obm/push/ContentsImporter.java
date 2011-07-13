@@ -1,6 +1,7 @@
 package org.obm.push;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsImporter;
@@ -123,7 +124,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importCalendarUserStatus(BackendSession bs,  Integer invitationCollexctionId, MSEmail invitation,
-			AttendeeStatus userResponse) {
+			AttendeeStatus userResponse) throws SQLException {
 		String ret = calBackend.handleMeetingResponse(bs, invitation, userResponse);
 		invitationFilterManager.handleMeetingResponse(bs, invitationCollexctionId, invitation);
 		return ret;

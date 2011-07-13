@@ -2,6 +2,7 @@ package org.obm.push.store;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ import com.google.common.collect.ImmutableList;
 
 public class SyncHandlerTest {
 	@Test
-	public void testProcessResponseWithAccents() throws IOException, TransformerException, CollectionNotFoundException{
+	public void testProcessResponseWithAccents() throws IOException, TransformerException, CollectionNotFoundException, SQLException{
 
 		String expectedString = "éàâ";
 		int collectionId = 0;

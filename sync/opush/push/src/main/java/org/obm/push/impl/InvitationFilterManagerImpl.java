@@ -1,5 +1,6 @@
 package org.obm.push.impl;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -46,7 +47,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public void handleMeetingResponse(BackendSession bs, Integer emailCollectionId, MSEmail invitation) {
+	public void handleMeetingResponse(BackendSession bs, Integer emailCollectionId, MSEmail invitation) throws SQLException {
 		try {
 			Integer eventCollectionId = calendarBackend.getCollectionId(bs);
 			storage.updateInvitationStatus(InvitationStatus.EMAIL_TO_DELETED, emailCollectionId, ImmutableList.of(invitation.getUid()));
@@ -138,7 +139,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) {
+	public void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) throws SQLException {
 		try {
 			final Map<String, ItemChange> syncedItem = new HashMap<String, ItemChange>();
 			final List<ItemChange> itemToSync = mergeChangesAndToSyncedEmail(bs, state, emailCollectionId,  delta.getChanges());

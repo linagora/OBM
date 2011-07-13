@@ -1,6 +1,7 @@
 package org.obm.push.backend;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 
 import org.obm.push.data.calendarenum.AttendeeStatus;
 import org.obm.push.exception.NotAllowedException;
@@ -30,7 +31,7 @@ public interface IContentsImporter {
 			throws ServerErrorException;
 
 	String importCalendarUserStatus(BackendSession bs, Integer invitationCollectionId, MSEmail invitation,
-			AttendeeStatus userResponse);
+			AttendeeStatus userResponse) throws SQLException;
 
 	void sendEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent)
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException;

@@ -1,5 +1,6 @@
 package org.obm.push.impl;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -54,11 +55,11 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
 		final Element rootElement = document.getDocumentElement();
 
-		for (final SyncCollection syncCollection : syncCollections) {
-			createResponse(bs, rootElement, syncCollection);
-		}
-
 		try {
+			for (final SyncCollection syncCollection : syncCollections) {
+				createResponse(bs, rootElement, syncCollection);
+			}
+
 			responder.sendResponse("ItemEstimate", document);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -67,7 +68,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
 	private void createResponse(BackendSession bs,
 			final Element root,
-			final SyncCollection syncCollection) throws DOMException {
+			final SyncCollection syncCollection) throws DOMException, SQLException {
 		
 		final Element responseElement = DOMUtils
 				.createElement(root, "Response");
@@ -139,7 +140,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	private void createEstimateElement(BackendSession bs,
 			SyncCollection syncCollection, Integer collectionId,
 			SyncState state, Element collectionElement)
-			throws ActiveSyncException, DOMException {
+			throws ActiveSyncException, DOMException, SQLException {
 
 		Set<ItemChange> unSynchronizedItemChanges = bs
 				.getUnSynchronizedItemChange(syncCollection.getCollectionId());

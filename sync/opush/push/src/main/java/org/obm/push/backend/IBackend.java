@@ -1,6 +1,7 @@
 package org.obm.push.backend;
 
 import java.util.Set;
+import java.sql.SQLException;
 
 import org.obm.push.provisioning.Policy;
 import org.obm.push.store.ActiveSyncException;
@@ -24,11 +25,11 @@ public interface IBackend {
 	void startEmailMonitoring(BackendSession bs, Integer collectionId)
 			throws ActiveSyncException;
 
-	void resetCollection(BackendSession bs, Integer collectionId);
+	void resetCollection(BackendSession bs, Integer collectionId) throws SQLException;
 
 	boolean validatePassword(String userID, String password);
 
 	Set<SyncCollection> getChangesSyncCollections(
-			CollectionChangeListener collectionChangeListener);
+			CollectionChangeListener collectionChangeListener) throws SQLException;
 	
 }
