@@ -21,11 +21,20 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convert events between OBM-Sync object model & Microsoft object model
+ * 
+ * @author tom
+ * 
  */
 public class TodoConverter implements ObmSyncCalendarConverter {
+
+	@SuppressWarnings("unused")
+	private static final Logger logger = LoggerFactory
+			.getLogger(TodoConverter.class);
 
 	public IApplicationData convert(BackendSession bs, Event e) {
 		MSTask mse = new MSTask();

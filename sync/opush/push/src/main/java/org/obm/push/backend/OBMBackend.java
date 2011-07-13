@@ -6,18 +6,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.push.calendar.CalendarMonitoringThread;
+import org.obm.push.calendar.CalendarMonitoringThread.Factory;
+import org.obm.push.contacts.ContactsMonitoringThread;
 import org.obm.push.impl.ListenerRegistration;
+import org.obm.push.mail.EmailMonitoringThread;
 import org.obm.push.mail.IEmailManager;
 import org.obm.push.mail.MailBackend;
-import org.obm.push.monitor.CalendarMonitoringThread;
-import org.obm.push.monitor.ContactsMonitoringThread;
-import org.obm.push.monitor.EmailMonitoringThread;
 import org.obm.push.provisioning.MSEASProvisioingWBXML;
 import org.obm.push.provisioning.MSWAPProvisioningXML;
 import org.obm.push.provisioning.Policy;
 import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.SyncCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +33,11 @@ public class OBMBackend implements IBackend {
 	private final IEmailManager	emailManager;
 	private final IContentsExporter contentsExporter;
 	private final MailBackend mailBackend;
-	private final CalendarMonitoringThread calendarPushMonitor;
-	private final ContactsMonitoringThread contactsPushMonitor;
-	
 	private final Set<ICollectionChangeListener> registeredListeners;
 	private final Map<Integer, EmailMonitoringThread> emailPushMonitors;
+
+	private CalendarMonitoringThread calendarPushMonitor;
+	private ContactsMonitoringThread contactsPushMonitor;
 	
 	@Inject
 	private OBMBackend(ISyncStorage store, IEmailManager emailManager,
@@ -50,29 +50,26 @@ public class OBMBackend implements IBackend {
 		this.contentsExporter = contentsExporter;
 		this.mailBackend = mailBackend;
 		
-		this.registeredListeners = Collections
+		registeredListeners = Collections
 				.synchronizedSet(new HashSet<ICollectionChangeListener>());
 		
-		this.emailPushMonitors = Collections
+		emailPushMonitors = Collections
 				.synchronizedMap(new HashMap<Integer, EmailMonitoringThread>());
 		
-		this.calendarPushMonitor = calendarMonitoringThreadFactory
-				.createClient(5000, this.registeredListeners);
-		
-		this.contactsPushMonitor = contactsMonitoringThreadFactory
-				.createClient(5000, this.registeredListeners);
-		
-		startMonitoringThreads(calendarPushMonitor, contactsPushMonitor);
+		startOBMMonitoringThreads(calendarMonitoringThreadFactory,
+				contactsMonitoringThreadFactory);
 	}
 
-	private void startMonitoringThreads(
-			CalendarMonitoringThread calendarPushMonitor,
-			ContactsMonitoringThread contactsPushMonitor) {
+	private void startOBMMonitoringThreads(
+			Factory calendarMonitoringThreadFactory,
+			org.obm.push.contacts.ContactsMonitoringThread.Factory contactsMonitoringThreadFactory) {
 		
+		calendarPushMonitor = calendarMonitoringThreadFactory.createClient(5000, registeredListeners);
 		Thread calThread = new Thread(calendarPushMonitor);
 		calThread.setDaemon(true);
 		calThread.start();
 
+		contactsPushMonitor = contactsMonitoringThreadFactory.createClient(5000, registeredListeners);
 		Thread contactThread = new Thread(contactsPushMonitor);
 		contactThread.setDaemon(true);
 		contactThread.start();
@@ -89,7 +86,7 @@ public class OBMBackend implements IBackend {
 			emt.stopIdle();
 		} else {
 			emt = new EmailMonitoringThread(mailBackend, registeredListeners,
-					bs, collectionId, emailManager, contentsExporter);
+					bs, collectionId, emailManager);
 		}
 		try {
 			emt.startIdle();
@@ -148,40 +145,6 @@ public class OBMBackend implements IBackend {
 	@Override
 	public boolean validatePassword(String userID, String password) {
 		return contentsExporter.validatePassword(userID, password);
-	}
-
-	@Override
-	public Set<SyncCollection> getChangesSyncCollections(
-			CollectionChangeListener collectionChangeListener) {
-		
-		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();
-		final BackendSession backendSession = collectionChangeListener.getSession();
-		
-		for (SyncCollection syncCollection: collectionChangeListener.getMonitoredCollections()) {
-			
-			int count = getCount(backendSession, syncCollection);
-			if (count > 0) {
-				syncCollectionsChanged.add(syncCollection);
-			}
-		}
-		
-		return syncCollectionsChanged;
-	}
-	
-	private int getCount(BackendSession backendSession,
-			SyncCollection syncCollection) {
-		
-		try {
-			
-			return contentsExporter.getCount(backendSession,
-					syncCollection.getSyncState(),
-					syncCollection.getFilterType(),
-					syncCollection.getCollectionId());
-		} catch (ActiveSyncException e) {
-			logger.error(e.getMessage(), e);
-		}
-		
-		return 0;
 	}
 	
 }

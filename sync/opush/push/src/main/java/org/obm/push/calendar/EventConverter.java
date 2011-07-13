@@ -27,11 +27,18 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convert events between OBM-Sync object model & Microsoft object model
  */
 public class EventConverter implements ObmSyncCalendarConverter{
+
+	
+	@SuppressWarnings("unused")
+	private static final Logger logger = LoggerFactory
+			.getLogger(EventConverter.class);
 
 	@Override
 	public IApplicationData convert(BackendSession bs, Event e) {

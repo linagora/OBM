@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>2.4.0-rc5-SNAPSHOT</version>
+		<version>obm-sync-opush-SNAPSHOT</version>
 	</parent>
 	
 	<groupId>com.linagora.obm.opush</groupId>
@@ -14,16 +14,16 @@
 	<packaging>pom</packaging>
 	<name>opush parent project</name>
 	<url>http://www.obm.org/</url>	
-	<version>2.4.0-rc5-SNAPSHOT</version>
+	<version>2.4.0-SNAPSHOT</version>
 
 	<properties>
-		<opush-client.version>2.4.0-rc5-SNAPSHOT</opush-client.version>
-		<opush-imap.version>2.4.0-rc5-SNAPSHOT</opush-imap.version>
-		<opush-mail.version>2.4.0-rc5-SNAPSHOT</opush-mail.version>
-		<opush-mime.version>2.4.0-rc5-SNAPSHOT</opush-mime.version>
-		<opush-push.version>2.4.0-rc5-SNAPSHOT</opush-push.version>
-		<opush-tnefconverter.version>2.4.0-rc5-SNAPSHOT</opush-tnefconverter.version>
-		<opush-wbxml.version>2.4.0-rc5-SNAPSHOT</opush-wbxml.version>
+		<opush-client.version>2.4.0-SNAPSHOT</opush-client.version>
+		<opush-imap.version>2.4.0-SNAPSHOT</opush-imap.version>
+		<opush-mail.version>2.4.0-SNAPSHOT</opush-mail.version>
+		<opush-mime.version>2.4.0-SNAPSHOT</opush-mime.version>
+		<opush-push.version>2.4.0-SNAPSHOT</opush-push.version>
+		<opush-tnefconverter.version>2.4.0-SNAPSHOT</opush-tnefconverter.version>
+		<opush-wbxml.version>2.4.0-SNAPSHOT</opush-wbxml.version>
 
 		<mailapi.version>1.4.3</mailapi.version>
 		<backport-util-concurrent.version>3.1</backport-util-concurrent.version>
@@ -42,8 +42,6 @@
 		<module>imap</module>
 		<module>mail</module>
 		<module>mime</module>
-		<module>technical-log</module>
-		<module>push-dao</module>
 	</modules>
 
 	<dependencyManagement>

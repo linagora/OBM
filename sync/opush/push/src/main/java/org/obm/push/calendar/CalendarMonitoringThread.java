@@ -1,4 +1,4 @@
-package org.obm.push.monitor;
+package org.obm.push.calendar;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,8 +13,9 @@ import java.util.TimeZone;
 
 import org.obm.dbcp.DBCP;
 import org.obm.push.backend.ICollectionChangeListener;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.impl.ChangedCollections;
+import org.obm.push.impl.MonitoringThread;
+import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.SyncCollection;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.calendar.EventType;
@@ -27,20 +28,20 @@ public class CalendarMonitoringThread extends MonitoringThread {
 
 	@Singleton
 	public static class Factory {
+		private final ObmSyncBackend backend;
 		private final DBCP dbcp;
-		private final IContentsExporter contentsExporter;
 
 		@Inject
-		private Factory(DBCP dbcp, IContentsExporter contentsExporter) {
+		private Factory(CalendarBackend backend, DBCP dbcp) {
+			this.backend = backend;
 			this.dbcp = dbcp;
-			this.contentsExporter = contentsExporter;
 		}
 
 		public CalendarMonitoringThread createClient(long freqMs,
 				Set<ICollectionChangeListener> ccls) {
 			
-			return new CalendarMonitoringThread(freqMs, ccls,
-					this.dbcp, this.contentsExporter);
+			return new CalendarMonitoringThread(freqMs, ccls, this.backend,
+					this.dbcp);
 		}
 	}
 
@@ -60,14 +61,14 @@ public class CalendarMonitoringThread extends MonitoringThread {
 			+ "where deletedevent_timestamp >= ? ";
 
 	private CalendarMonitoringThread(long freqMs,
-			Set<ICollectionChangeListener> ccls,
-			DBCP dbcp, IContentsExporter contentsExporter) {
+			Set<ICollectionChangeListener> ccls, ObmSyncBackend backend,
+			DBCP dbcp) {
 
-		super(freqMs, ccls, dbcp, contentsExporter);
+		super(freqMs, ccls, backend, dbcp);
 	}
 
 	@Override
-	public ChangedCollections getChangedCollections(Date lastSync) {
+	protected ChangedCollections getChangedCollections(Date lastSync) {
 
 		Date dbDate = lastSync;
 		Set<SyncCollection> changed = new HashSet<SyncCollection>();

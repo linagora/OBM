@@ -1470,6 +1470,7 @@ public class Ical4jHelper {
 		return calendar.getComponents(component);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Property> getProperties(Component comp, String property) {
 		List<Property> propsSet = new ArrayList<Property>();
 		PropertyList propList = comp.getProperties(property);

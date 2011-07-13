@@ -94,7 +94,6 @@ public class ObmSyncBackend {
 
 	protected ItemChange createItemChangeToRemove(Integer collectionId,
 			String del) {
-		
 		ItemChange ic = new ItemChange();
 		ic.setServerId(getServerIdFor(collectionId, del));
 		return ic;
