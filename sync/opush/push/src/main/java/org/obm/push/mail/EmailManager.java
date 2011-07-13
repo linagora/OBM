@@ -54,7 +54,6 @@ import org.obm.push.store.EmailCache;
 import org.obm.push.store.FilterType;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.SyncState;
-import org.obm.push.utils.IniFile;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,15 +68,14 @@ import com.google.inject.Singleton;
 @Singleton
 public class EmailManager implements IEmailManager {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(EmailManager.class);
 	public static final String IMAP_INBOX_NAME = "INBOX";
 	public static final String IMAP_DRAFTS_NAME = "Drafts";
 	public static final String IMAP_SENT_NAME = "Sent";
 	public static final String IMAP_TRASH_NAME = "Trash";
-	private static final String BACKEND_CONF_FILE = "/etc/opush/mail_conf.ini";
-	private static final String BACKEND_IMAP_LOGIN_WITH_DOMAIN = "imap.loginWithDomain";
-	private static final String BACKEND_IMAP_ACTIVATE_TLS = "imap.activateTLS";
+	
+	private static final Logger logger = LoggerFactory
+			.getLogger(EmailManager.class);
+	
 
 	private ISyncStorage syncStore;
 	private SmtpSender smtpProvider;
@@ -92,6 +90,7 @@ public class EmailManager implements IEmailManager {
 
 	@Inject
 	private EmailManager(ISyncStorage syncStore,
+			EmailConfiguration emailConfiguration,
 			ConfigurationService configurationService, DBCP dbcp,
 			SmtpSender smtpSender) throws ConfigurationException {
 		
@@ -100,16 +99,8 @@ public class EmailManager implements IEmailManager {
 		this.smtpProvider = smtpSender;
 		this.syncStore = syncStore;
 		this.uidCache = initUidCacheMap();
-		IniFile ini = new IniFile(BACKEND_CONF_FILE) {
-			@Override
-			public String getCategory() {
-				return null;
-			}
-		};
-		loginWithDomain = !"false".equals(ini.getData().get(
-				BACKEND_IMAP_LOGIN_WITH_DOMAIN));
-		activateTLS = !"false".equals(ini.getData().get(
-				BACKEND_IMAP_ACTIVATE_TLS));
+		this.loginWithDomain = emailConfiguration.loginWithDomain();
+		this.activateTLS = emailConfiguration.activateTls();
 	}
 
 	private ConcurrentMap<Integer, IEmailSync> initUidCacheMap() {
