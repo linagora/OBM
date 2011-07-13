@@ -24,7 +24,6 @@ public class ObmSearchContact implements ISearchSource {
 
 	private final static Logger logger = LoggerFactory.getLogger(ObmSearchContact.class);
 	
-	protected String obmSyncHost;
 	private final LocatorClient locatorClient;
 	
 	@Inject
@@ -33,10 +32,12 @@ public class ObmSearchContact implements ISearchSource {
 		locatorClient = new LocatorClient(configurationService.getLocatorUrl());
 	}
 	
+	@Override
 	public StoreName getStoreName() {
 		return StoreName.GAL;
 	}
 
+	@Override
 	public List<SearchResult> search(BackendSession bs, String query,
 			Integer limit) {
 		BookClient bc = getBookClient(bs);
@@ -55,18 +56,17 @@ public class ObmSearchContact implements ISearchSource {
 		return ret;
 	}
 	
-	protected BookClient getBookClient(BackendSession bs) {
+	private BookClient getBookClient(BackendSession bs) {
 		AddressBookLocator abl = new AddressBookLocator();
-		if (obmSyncHost == null) {
-			locateObmSync(bs.getLoginAtDomain());
-		}
-		BookClient bookCli = abl.locate("http://" + obmSyncHost
+		BookClient bookCli = abl.locate("http://" + locateObmSync(bs.getLoginAtDomain())
 				+ ":8080/obm-sync/services");
 		return bookCli;
 	}
 	
-	protected void locateObmSync(String loginAtDomain) {
-		obmSyncHost = locatorClient.getServiceLocation("sync/obm_sync", loginAtDomain);
+	private String locateObmSync(String loginAtDomain) {
+		String obmSyncHost = locatorClient.getServiceLocation("sync/obm_sync", loginAtDomain);
 		logger.info("Using " + obmSyncHost + " as obm_sync host.");
+		return obmSyncHost;
 	}
+	
 }
