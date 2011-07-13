@@ -2399,7 +2399,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   $dis_delegation_target
   <tr>
     <th class=\"$class[title]\">$l_title</th>
-    <td><input id=\"userTitle\" name=\"tf_title\" size=\"32\" maxlength=\"64\" value=\"$title\" /></td>
+    <td><input id=\"userTitle\" name=\"tf_title\" size=\"32\" maxlength=\"256\" value=\"$title\" /></td>
   </tr>
   <tr>
     <th class=\"$class[datebegin]\">$l_datebegin</th>

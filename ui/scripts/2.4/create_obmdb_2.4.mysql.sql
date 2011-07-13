@@ -3364,7 +3364,7 @@ CREATE TABLE `UserObm` (
   `userobm_commonname`         varchar(256) default '',
   `userobm_lastname`           varchar(64) default '',
   `userobm_firstname`          varchar(64) default '',
-  `userobm_title`              varchar(64) default '',
+  `userobm_title`              varchar(256) default '',
   `userobm_sound`              varchar(64) default NULL,
   `userobm_company`            varchar(64) default NULL,
   `userobm_direction`          varchar(64) default NULL,

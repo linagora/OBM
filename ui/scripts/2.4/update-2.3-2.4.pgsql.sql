@@ -94,7 +94,8 @@ ADD COLUMN userobm_commonname varchar(256) default '',
 ALTER userobm_delegation TYPE character varying(256),
 ALTER userobm_delegation_target TYPE character varying(256),
 ALTER userobm_login TYPE character varying(80),
-ALTER userobm_kind TYPE character varying(64);
+ALTER userobm_kind TYPE character varying(64),
+ALTER userobm_title TYPE character varying(256);
 --
 -- Update contact
 --
@@ -108,7 +109,9 @@ ADD COLUMN userobm_commonname varchar(256) default '',
 ALTER userobm_delegation TYPE character varying(256),
 ALTER userobm_delegation_target TYPE character varying(256),
 ALTER userobm_login TYPE character varying(80),
-ALTER userobm_kind TYPE character varying(64);
+ALTER userobm_kind TYPE character varying(64),
+ALTER userobm_title TYPE character varying(256);
+
 
 --
 -- Update obmbookmarkproperty

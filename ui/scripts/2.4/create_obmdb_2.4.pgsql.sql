@@ -2325,7 +2325,7 @@ CREATE TABLE userobm (
   userobm_commonname character varying(256) DEFAULT ''::character varying,
   userobm_lastname character varying(64) DEFAULT ''::character varying,
   userobm_firstname character varying(64) DEFAULT ''::character varying,
-  userobm_title character varying(64) DEFAULT ''::character varying,
+  userobm_title character varying(256) DEFAULT ''::character varying,
   userobm_sound character varying(64),
   userobm_company character varying(64),
   userobm_direction character varying(64),
