@@ -1,11 +1,7 @@
 package org.obm.push.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
@@ -26,14 +22,15 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class SearchHandler extends WbxmlRequestHandler {
 
-	private Map<StoreName, Set<ISearchSource>> sources;
-
+	private final ImmutableMultimap<StoreName, ISearchSource> sources;
+	
 	@Inject
 	private SearchHandler(IBackend backend, EncoderFactory encoderFactory,
 			BookSource bookSource, ObmSearchContact obmSearchContact,
@@ -43,15 +40,9 @@ public class SearchHandler extends WbxmlRequestHandler {
 		super(backend, encoderFactory, contentsImporter, storage,
 				contentsExporter, stMachine);
 		
-		sources = new HashMap<StoreName, Set<ISearchSource>>();
-		registerSources(bookSource, obmSearchContact);
-	}
-
-	private void registerSources(BookSource bookSource,
-			ObmSearchContact obmSearchContact) {
-		
-		addRegisterSource(obmSearchContact.getStoreName(), obmSearchContact);
-		addRegisterSource(bookSource.getStoreName(), bookSource);
+		this.sources = ImmutableMultimap.of(
+				bookSource.getStoreName(), bookSource, 
+				obmSearchContact.getStoreName(), obmSearchContact);
 	}
 	
 	@Override
@@ -207,23 +198,11 @@ public class SearchHandler extends WbxmlRequestHandler {
 		return value != null && !"".equals(value);
 	}
 
-	private void addRegisterSource(StoreName key, ISearchSource value) {
-		Set<ISearchSource> set = this.sources.get(key);
-		if (set == null) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Add " + value.getClass().getName()
-						+ " in search sources for store " + key);
-			}
-			set = new HashSet<ISearchSource>();
-			this.sources.put(key, set);
-		}
-		set.add(value);
-	}
-
 	public List<SearchResult> search(BackendSession bs, StoreName store,
 			String query, Integer limit) {
-		List<SearchResult> ret = new LinkedList<SearchResult>();
-		for (ISearchSource source : sources.get(store)) {
+		
+		final List<SearchResult> ret = new LinkedList<SearchResult>();
+		for (final ISearchSource source: sources.get(store)) {
 			ret.addAll(source.search(bs, query, limit));
 		}
 		return ret;
