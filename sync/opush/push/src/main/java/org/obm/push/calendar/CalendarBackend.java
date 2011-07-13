@@ -55,9 +55,9 @@ public class CalendarBackend extends ObmSyncBackend {
 			ConfigurationService configurationService, DBCP dbcp)
 			throws ConfigurationException {
 		
-	    super(storage, deviceDao, configurationService, dbcp);
+		super(storage, deviceDao, configurationService, dbcp);
 		converters = ImmutableMap.of(
-				PIMDataType.CALENDAR, new EventConverter(), 
+				PIMDataType.CALENDAR, new EventConverter(),
 				PIMDataType.TASKS, new TodoConverter());
 	}
 

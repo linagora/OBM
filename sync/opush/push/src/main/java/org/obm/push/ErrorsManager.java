@@ -19,10 +19,10 @@ import com.google.inject.Singleton;
 @Singleton
 public class ErrorsManager implements IErrorsManager {
 	
-	private Logger logger = LoggerFactory.getLogger(getClass());
-	
 	private final static String errorNameSender = "X-OBM-OPUSH";
-	private IEmailManager manager;
+	
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final IEmailManager manager;
 	
 	@Inject
 	private ErrorsManager(IEmailManager manager) {

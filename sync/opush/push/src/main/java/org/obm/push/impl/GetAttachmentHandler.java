@@ -20,7 +20,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class GetAttachmentHandler implements IRequestHandler {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final IContentsExporter contentsExporter;
 

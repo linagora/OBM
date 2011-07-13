@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,26 +30,27 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class SyncDecoder {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SyncDecoder.class);
+	private static final Logger logger = LoggerFactory.getLogger(SyncDecoder.class);
 	
-	private ISyncStorage store;
-	private Map<PIMDataType, IDataDecoder> decoders;
+	private final ISyncStorage store;
+	private final Map<PIMDataType, IDataDecoder> decoders;
 
 	@Inject
 	private SyncDecoder(ISyncStorage store) {
 		this.store = store;
-		this.decoders = new HashMap<PIMDataType, IDataDecoder>();
-		decoders.put(PIMDataType.CONTACTS, new ContactDecoder());
-		decoders.put(PIMDataType.CALENDAR, new CalendarDecoder());
-		decoders.put(PIMDataType.EMAIL, new EmailDecoder());
-		decoders.put(PIMDataType.TASKS, new TaskDecoder());
+		this.decoders = ImmutableMap.<PIMDataType, IDataDecoder>builder()
+				.put(PIMDataType.CONTACTS, new ContactDecoder())
+				.put(PIMDataType.CALENDAR, new CalendarDecoder())
+				.put(PIMDataType.EMAIL, new EmailDecoder())
+				.put(PIMDataType.TASKS, new TaskDecoder())
+				.build();
 	}
 
 	public Sync decodeSync(Document doc, BackendSession bs)

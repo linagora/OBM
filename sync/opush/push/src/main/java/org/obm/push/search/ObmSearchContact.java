@@ -22,8 +22,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class ObmSearchContact implements ISearchSource {
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(ObmSearchContact.class);
+	private final static Logger logger = LoggerFactory.getLogger(ObmSearchContact.class);
 	
 	protected String obmSyncHost;
 	private final LocatorClient locatorClient;

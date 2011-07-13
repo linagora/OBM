@@ -27,10 +27,10 @@ import com.google.inject.Singleton;
 @Singleton
 public class ContentsImporter implements IContentsImporter {
 
-	private MailBackend mailBackend;
-	private CalendarBackend calBackend;
-	private ContactsBackend contactBackend;
-	private IInvitationFilterManager invitationFilterManager;
+	private final MailBackend mailBackend;
+	private final CalendarBackend calBackend;
+	private final ContactsBackend contactBackend;
+	private final IInvitationFilterManager invitationFilterManager;
 
 	@Inject
 	private ContentsImporter(MailBackend mailBackend,

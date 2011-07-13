@@ -22,13 +22,12 @@ import com.google.inject.Singleton;
 @Singleton
 public class HierarchyExporter implements IHierarchyExporter {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(HierarchyExporter.class);
+	private static final Logger logger = LoggerFactory.getLogger(HierarchyExporter.class);
 
-	private FolderBackend folderExporter;
-	private MailBackend mailExporter;
-	private CalendarBackend calendarExporter;
-	private ContactsBackend contactsBackend;
+	private final FolderBackend folderExporter;
+	private final MailBackend mailExporter;
+	private final CalendarBackend calendarExporter;
+	private final ContactsBackend contactsBackend;
 
 	@Inject
 	private HierarchyExporter(FolderBackend folderExporter,

@@ -59,7 +59,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class EmailSyncCache implements IEmailSync {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final ISyncStorage storage;
 	private final DataSource dataSource;

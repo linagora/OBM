@@ -17,8 +17,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class StateMachine {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(StateMachine.class);
+	private static final Logger logger = LoggerFactory.getLogger(StateMachine.class);
 
 	private final ISyncStorage store;
 

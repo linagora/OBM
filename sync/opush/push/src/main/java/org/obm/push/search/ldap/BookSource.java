@@ -21,8 +21,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class BookSource implements ISearchSource {
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(BookSource.class);
+	private final static Logger logger = LoggerFactory.getLogger(BookSource.class);
 	private final Configuration conf;
 	
 	@Inject

@@ -16,9 +16,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class SmtpLocator {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SmtpLocator.class);
-	private LocatorClient locatorClient;
+	private static final Logger logger = LoggerFactory.getLogger(SmtpLocator.class);
+	private final LocatorClient locatorClient;
 
 	@Inject
 	private SmtpLocator(ConfigurationService configurationService) throws ConfigurationException {

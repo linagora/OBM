@@ -58,7 +58,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class MailBackend extends ObmSyncBackend {
 
-	private IEmailManager emailManager;
+	private final IEmailManager emailManager;
 
 	@Inject
 	private MailBackend(ISyncStorage storage, DeviceDao deviceDao, IEmailManager emailManager,

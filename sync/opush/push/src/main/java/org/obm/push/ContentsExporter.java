@@ -29,14 +29,13 @@ import com.google.inject.Singleton;
 @Singleton
 public class ContentsExporter implements IContentsExporter {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ContentsExporter.class);
+	private static final Logger logger = LoggerFactory.getLogger(ContentsExporter.class);
 
-	private IInvitationFilterManager invitationFilterManager;
+	private final IInvitationFilterManager invitationFilterManager;
 	
-	private MailBackend mailBackend;
-	private CalendarBackend calBackend;
-	private ContactsBackend contactsBackend;
+	private final MailBackend mailBackend;
+	private final CalendarBackend calBackend;
+	private final ContactsBackend contactsBackend;
 
 	@Inject
 	private ContentsExporter(MailBackend mailBackend,
