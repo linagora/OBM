@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
  * Configuration service
  */
 public class ConfigurationService {
+	
+	private final static String LOCATOR_PORT = "8082";
+	private final static String LOCATOR_APP_NAME = "obm-locator";
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(ConfigurationService.class);
@@ -74,7 +77,7 @@ public class ConfigurationService {
 			throw new ConfigurationException(
 					"Missing host key in configuration");
 		}
-		return "https://" + locatorHost + ":8084/";
+		return "http://" + locatorHost + ":"+LOCATOR_PORT+"/"+LOCATOR_APP_NAME+"/";
 	}
 
 	public String getObmUIBaseUrl() {
