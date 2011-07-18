@@ -58,6 +58,7 @@ import ch.qos.logback.classic.sift.SiftingAppender;
 import ch.qos.logback.core.sift.AppenderTracker;
 import ch.qos.logback.core.sift.SiftingAppenderBase;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Injector;
 
 /**
@@ -105,10 +106,7 @@ public class ActiveSyncServlet extends HttpServlet {
 			if (bs == null) {
 				return;
 			}
-			synchronized (handlers) {
-				ph = (IContinuationHandler) handlers.get(bs
-						.getLastContinuationHandler());
-			}
+			ph = (IContinuationHandler) handlers.get(bs.getLastContinuationHandler());
 
 			ICollectionChangeListener ccl = c.getCollectionChangeListener();
 			if (c.isError()) {
@@ -174,43 +172,37 @@ public class ActiveSyncServlet extends HttpServlet {
 			
 			sessions = Collections
 					.synchronizedMap(new HashMap<String, BackendSession>());
-			handlers = Collections
-					.synchronizedMap(new HashMap<String, IRequestHandler>());
-			
-			synchronized (handlers) {
-				handlers.put("FolderSync",
-						injector.getInstance(FolderSyncHandler.class));
-				handlers.put("Sync", injector.getInstance(SyncHandler.class));
-				handlers.put("GetItemEstimate",
-						injector.getInstance(GetItemEstimateHandler.class));
-				handlers.put("Provision",
-						injector.getInstance(ProvisionHandler.class));
-				handlers.put("Ping", injector.getInstance(PingHandler.class));
-				handlers.put("Settings",
-						injector.getInstance(SettingsHandler.class));
-				handlers.put("Search",
-						injector.getInstance(SearchHandler.class));
-				handlers.put("SendMail",
-						injector.getInstance(SendMailHandler.class));
-				handlers.put("MoveItems",
-						injector.getInstance(MoveItemsHandler.class));
-				handlers.put("SmartReply",
-						injector.getInstance(SmartReplyHandler.class));
-				handlers.put("SmartForward",
-						injector.getInstance(SmartForwardHandler.class));
-				handlers.put("MeetingResponse",
-						injector.getInstance(MeetingResponseHandler.class));
-				handlers.put("GetAttachment",
-						injector.getInstance(GetAttachmentHandler.class));
-				handlers.put("ItemOperations",
-						injector.getInstance(ItemOperationsHandler.class));
-			}
+			handlers = createHandlersMap();
 			logger.info("Opush ActiveSync servlet initialised.");
 		} catch (ConfigurationException e) {
 			throw new ServletException(e);
 		}
 	}
 
+	private ImmutableMap<String, IRequestHandler> createHandlersMap() {
+		return ImmutableMap.<String, IRequestHandler>builder()
+				.put("FolderSync",		getInstance(FolderSyncHandler.class))
+				.put("Sync", 			getInstance(SyncHandler.class))
+				.put("GetItemEstimate", getInstance(GetItemEstimateHandler.class))
+				.put("Provision", 		getInstance(ProvisionHandler.class))
+				.put("Ping", 			getInstance(PingHandler.class))
+				.put("Settings", 		getInstance(SettingsHandler.class))
+				.put("Search", 			getInstance(SearchHandler.class))
+				.put("SendMail", 		getInstance(SendMailHandler.class))
+				.put("MoveItems", 		getInstance(MoveItemsHandler.class))
+				.put("SmartReply", 		getInstance(SmartReplyHandler.class))
+				.put("SmartForward", 	getInstance(SmartForwardHandler.class))
+				.put("MeetingResponse",	getInstance(MeetingResponseHandler.class))
+				.put("GetAttachment", 	getInstance(GetAttachmentHandler.class))
+				.put("ItemOperations", 	getInstance(ItemOperationsHandler.class))
+				.build();
+	}
+
+	private IRequestHandler getInstance(Class<? extends IRequestHandler> clazz) {
+		return injector.getInstance(clazz);
+	}
+
+	
 	/**
 	 * Checks authentification headers. Returns non null value if login/password
 	 * is valid & the device has been authorized.
@@ -435,9 +427,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 
 	private IRequestHandler getHandler(BackendSession p) {
-		synchronized (handlers) {
-			return handlers.get(p.getCommand());
-		}
+		return handlers.get(p.getCommand());
 	}
 
 	private boolean validatePassword(String loginAtDomain, String password) {
