@@ -18,10 +18,9 @@ import org.slf4j.LoggerFactory;
 
 public class BackendSession {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(BackendSession.class);
+	private static final Logger logger = LoggerFactory.getLogger(BackendSession.class);
 
-	private String loginAtDomain;
+	private final String loginAtDomain;
 	private String password;
 	private String devId;
 	private String devType;
@@ -88,10 +87,6 @@ public class BackendSession {
 
 	public String getLoginAtDomain() {
 		return loginAtDomain;
-	}
-
-	public void setLoginAtDomain(String loginAtDomain) {
-		this.loginAtDomain = loginAtDomain;
 	}
 
 	public String getPassword() {

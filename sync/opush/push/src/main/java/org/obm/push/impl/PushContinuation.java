@@ -1,5 +1,7 @@
 package org.obm.push.impl;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.continuation.Continuation;
@@ -9,9 +11,28 @@ import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 public class PushContinuation implements IContinuation {
 
-	private static int id = 0;
+	@Singleton
+	public static class Factory {
+		
+		private final AtomicInteger id;
+		
+		@Inject
+		private Factory() {
+			super();
+			this.id = new AtomicInteger();
+		}
+		
+		public PushContinuation createContinuation(HttpServletRequest req) {
+			return new PushContinuation(req, id.getAndIncrement());
+		}
+	}
+	
+	
 
 	private final static String KEY_BACKEND_SESSION = "key_backend_session";
 	private final static String KEY_IS_ERROR = "key_is_error";
@@ -22,9 +43,9 @@ public class PushContinuation implements IContinuation {
 	
 	private Continuation c;
 
-	public PushContinuation(HttpServletRequest req) {
+	private PushContinuation(HttpServletRequest req, int id) {
 		this.c = ContinuationSupport.getContinuation(req);
-		this.c.setAttribute(KEY_ID_REQUEST, id++);
+		this.c.setAttribute(KEY_ID_REQUEST, id);
 	}
 
 	public int getReqId() {

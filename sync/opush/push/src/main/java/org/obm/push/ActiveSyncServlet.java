@@ -80,12 +80,13 @@ public class ActiveSyncServlet extends HttpServlet {
 
 	private ISyncStorage storage;
 	private IBackend backend;
+	private PushContinuation.Factory continuationFactory;
 
 	@Override
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		IContinuation c = new PushContinuation(request);
+		IContinuation c = continuationFactory.createContinuation(request);
 
 		logger.debug(
 				"query = {}, initial = {}, resume = {}, m = {}, num = {}",
@@ -160,14 +161,17 @@ public class ActiveSyncServlet extends HttpServlet {
 		try {
 			super.init(config);
 			
-			injector = (Injector) config.getServletContext().getAttribute(
-					GuiceServletContextListener.ATTRIBUTE_NAME);
+			injector = 
+					(Injector) config
+						.getServletContext()
+						.getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
+			
 			configureLogger();
 
-			storage = injector.getInstance(IStorageFactory.class)
-					.createStorage();
+			storage = injector.getInstance(IStorageFactory.class).createStorage();
 			backend = injector.getInstance(IBackendFactory.class).loadBackend();
-
+			continuationFactory = injector.getInstance(PushContinuation.Factory.class);
+			
 			sessions = Collections
 					.synchronizedMap(new HashMap<String, BackendSession>());
 			handlers = Collections
