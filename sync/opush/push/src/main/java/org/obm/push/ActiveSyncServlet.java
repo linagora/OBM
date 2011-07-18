@@ -2,7 +2,6 @@ package org.obm.push;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -285,8 +284,6 @@ public class ActiveSyncServlet extends HttpServlet {
 		BackendSession bs = sessionService.getSession(credentials, devId, request);
 		logger.info("activeSyncMethod = {}", bs.getCommand());
 		
-		bs.setProtocolVersion(getProtocolVersion(request));
-		
 		if (bs.getCommand() == null) {
 			logger.warn("POST received without explicit command, aborting");
 			return;
@@ -300,20 +297,6 @@ public class ActiveSyncServlet extends HttpServlet {
 
 		sendASHeaders(response);
 		rh.process(continuation, bs, request, new Responder(response));
-	}
-
-	private BigDecimal getProtocolVersion(ActiveSyncRequest request) {
-		final String proto = request.p("MS-ASProtocolVersion");
-		if (proto != null) {
-			try {
-				BigDecimal protocolVersion = new BigDecimal(proto);
-				logger.info("Client supports protocol = {}", protocolVersion);
-				return protocolVersion;
-			} catch (NumberFormatException nfe) {
-				logger.warn("invalid MS-ASProtocolVersion = {}", proto);
-			}
-		}
-		return new BigDecimal("12.1");
 	}
 	
 	private ActiveSyncRequest getActiveSyncRequest(HttpServletRequest r) {
