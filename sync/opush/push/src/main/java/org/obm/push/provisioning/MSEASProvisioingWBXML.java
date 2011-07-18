@@ -1,5 +1,7 @@
 package org.obm.push.provisioning;
 
+import java.math.BigDecimal;
+
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
@@ -12,10 +14,10 @@ import org.w3c.dom.Element;
 
 public class MSEASProvisioingWBXML extends Policy {
 
-	private double protocolVersion;
+	private BigDecimal protocolVersion;
 
-	public MSEASProvisioingWBXML(double protocolVersion) {
-		this.protocolVersion = protocolVersion;
+	public MSEASProvisioingWBXML(BigDecimal bigDecimal) {
+		this.protocolVersion = bigDecimal;
 	}
 
 	private void p(Element provDoc, String field, String value) {
@@ -43,7 +45,7 @@ public class MSEASProvisioingWBXML extends Policy {
 		DOMUtils.createElement(provDoc, "DevicePasswordExpiration");
 		p(provDoc, "DevicePasswordHistory", "0");
 
-		if (protocolVersion > 12.0) {
+		if (protocolVersion.compareTo(new BigDecimal("12.0")) > 0) {
 			p(provDoc, "AllowStorageCard", "1");
 			p(provDoc, "AllowCamera", "1");
 			p(provDoc, "RequireDeviceEncryption", "0");

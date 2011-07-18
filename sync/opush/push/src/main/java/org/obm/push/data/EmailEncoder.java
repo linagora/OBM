@@ -1,5 +1,6 @@
 package org.obm.push.data;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -90,13 +91,13 @@ public class EmailEncoder implements IDataEncoder {
 		DOMUtils.createElementAndText(parent, "Email:Read", mail.isRead() ? "1"
 				: "0");
 
-		if (bs.getProtocolVersion() == 2.5) {
+		if (bs.getProtocolVersion().compareTo(new BigDecimal("2.5")) == 0) {
 			appendBody25(parent, mail, c);
 		} else {
 			appendBody(parent, mail, c);
 		}
 
-		if (bs.getProtocolVersion() == 2.5) {
+		if (bs.getProtocolVersion().compareTo(new BigDecimal("2.5")) == 0) {
 			appendAttachments25(parent, mail);
 		} else {
 			appendAttachments(parent, mail);

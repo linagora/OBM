@@ -1,5 +1,6 @@
 package org.obm.push.data;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -100,7 +101,7 @@ public class TaskEncoder extends Encoder implements IDataEncoder {
 		if (task.getDescription() != null) {
 			body = task.getDescription().trim();
 		}
-		if (bs.getProtocolVersion() >= 12) {
+		if (bs.getProtocolVersion().compareTo(new BigDecimal("12")) >= 0) {
 			Element d = DOMUtils.createElement(p, "AirSyncBase:Body");
 			s(d, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
 			s(d, "AirSyncBase:EstimatedDataSize", "" + body.length());

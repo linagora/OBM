@@ -1,5 +1,6 @@
 package org.obm.push.data;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,6 +23,7 @@ import org.w3c.dom.Element;
 public class CalendarEncoder extends Encoder implements IDataEncoder {
 
 	private static final Pattern hexa = Pattern.compile("[0-9a-fA-F]");
+	private static final BigDecimal TWELVE = BigDecimal.valueOf(12);
 	private SimpleDateFormat sdf;
 	
 	
@@ -88,7 +90,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 					
 					s(ae, "Calendar:AttendeeName", ma.getName());
 
-					if (bs.getProtocolVersion() >= 12) {
+					if (bs.getProtocolVersion().compareTo(TWELVE) >= 0) {
 						s(ae, "Calendar:AttendeeStatus", ma.getAttendeeStatus()
 							.asIntString());
 						s(ae, "Calendar:AttendeeType", ma.getAttendeeType()
@@ -126,7 +128,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 					CalendarMeetingStatus.IS_NOT_IN_MEETING.asIntString());
 		}
 
-		if (isReponse && bs.getProtocolVersion() > 12) {
+		if (isReponse && bs.getProtocolVersion().compareTo(TWELVE) > 0) {
 			s(p, "AirSyncBase:NativeBodyType", Type.PLAIN_TEXT.toString());
 		}
 
@@ -188,7 +190,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 		if (event.getDescription() != null) {
 			body = event.getDescription().trim();
 		}
-		if (bs.getProtocolVersion() >= 12) {
+		if (bs.getProtocolVersion().compareTo(TWELVE) >= 0) {
 			Element d = DOMUtils.createElement(p, "AirSyncBase:Body");
 			s(d, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
 			s(d, "AirSyncBase:EstimatedDataSize", "" + body.length());

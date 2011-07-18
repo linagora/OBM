@@ -1,5 +1,6 @@
 package org.obm.push.data;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
@@ -121,7 +122,7 @@ public class ContactEncoder implements IDataEncoder {
 		if(c.getData() != null){
 			dataBody = c.getData().trim();
 		}
-		if (bs.getProtocolVersion() > 12) {
+		if (bs.getProtocolVersion().compareTo(BigDecimal.valueOf(12)) > 0) {
 			Element body = DOMUtils.createElement(parent, "AirSyncBase:Body");
 			e(body, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
 			e(body, "AirSyncBase:EstimatedDataSize", ""+dataBody.length());

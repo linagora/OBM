@@ -1,6 +1,7 @@
 package org.obm.push.backend;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class BackendSession {
 
 	private String lastContinuationHandler;
 
-	private double protocolVersion;
+	private BigDecimal protocolVersion;
 
 	private String policyKey;
 
@@ -130,11 +131,11 @@ public class BackendSession {
 		this.updatedSyncDate.put(collectionId, updatedSyncDate);
 	}
 
-	public void setProtocolVersion(double parseInt) {
+	public void setProtocolVersion(BigDecimal parseInt) {
 		this.protocolVersion = parseInt;
 	}
 
-	public double getProtocolVersion() {
+	public BigDecimal getProtocolVersion() {
 		return protocolVersion;
 	}
 

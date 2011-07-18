@@ -2,6 +2,7 @@ package org.obm.push.store;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
@@ -57,7 +58,7 @@ public class SyncHandlerTest {
 		bs.checkHint("hint.loadAttendees", true);
 		EasyMock.expectLastCall().andReturn(false).anyTimes();
 		
-		EasyMock.expect(bs.getProtocolVersion()).andReturn(5d).anyTimes();
+		EasyMock.expect(bs.getProtocolVersion()).andReturn(BigDecimal.valueOf(5)).anyTimes();
 		
 
 		syncCollection.setSyncKey(syncKey);

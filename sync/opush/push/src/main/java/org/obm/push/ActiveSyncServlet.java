@@ -2,6 +2,7 @@ package org.obm.push;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -285,19 +286,9 @@ public class ActiveSyncServlet extends HttpServlet {
 		String loginAtDomain = getLoginAtDomain(userID);
 		BackendSession bs = sessionService.getSession(loginAtDomain, password, devId, request);
 		logger.info("activeSyncMethod = {}", bs.getCommand());
-		String proto = request.p("MS-ASProtocolVersion");
-		if (proto == null) {
-			proto = "12.1";
-		}
-
-		try {
-			bs.setProtocolVersion(Double.parseDouble(proto));
-			logger.info("Client supports protocol = {}", proto);
-		} catch (NumberFormatException nfe) {
-			logger.warn("invalid MS-ASProtocolVersion = {}", proto);
-			bs.setProtocolVersion(12.1);
-		}
-
+		
+		bs.setProtocolVersion(getProtocolVersion(request));
+		
 		if (bs.getCommand() == null) {
 			logger.warn("POST received without explicit command, aborting");
 			return;
@@ -313,6 +304,20 @@ public class ActiveSyncServlet extends HttpServlet {
 		rh.process(continuation, bs, request, new Responder(response));
 	}
 
+	private BigDecimal getProtocolVersion(ActiveSyncRequest request) {
+		final String proto = request.p("MS-ASProtocolVersion");
+		if (proto != null) {
+			try {
+				BigDecimal protocolVersion = new BigDecimal(proto);
+				logger.info("Client supports protocol = {}", protocolVersion);
+				return protocolVersion;
+			} catch (NumberFormatException nfe) {
+				logger.warn("invalid MS-ASProtocolVersion = {}", proto);
+			}
+		}
+		return new BigDecimal("12.1");
+	}
+	
 	private ActiveSyncRequest getActiveSyncRequest(HttpServletRequest r) {
 		String qs = r.getQueryString();
 		if (qs.contains("Cmd=")) {

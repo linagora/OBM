@@ -1,5 +1,6 @@
 package org.obm.push.backend;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -111,7 +112,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Policy getDevicePolicy(BackendSession bs) {
-		if (bs.getProtocolVersion() <= 2.5) {
+		if (bs.getProtocolVersion().compareTo(new BigDecimal("2.5")) <= 0) {
 			return new MSWAPProvisioningXML();
 		} else {
 			return new MSEASProvisioingWBXML(bs.getProtocolVersion());

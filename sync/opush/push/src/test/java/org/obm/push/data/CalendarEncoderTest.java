@@ -1,6 +1,7 @@
 package org.obm.push.data;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,7 +37,7 @@ public class CalendarEncoderTest {
 	private BackendSession getFakeBackendSession() {
 		BackendSession bs = new BackendSession("adrien@test.tlse.lngr", "test",
 				"devId", "devType", "Sync");
-		bs.setProtocolVersion(12.5);
+		bs.setProtocolVersion(new BigDecimal(12.5));
 		return bs;
 	}
 
