@@ -1904,7 +1904,6 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   $users = array($organizerId);
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $opacity = 'OPAQUE';
-  $organizer = $calendar['organizer'] ? $calendar['organizer'] : $obm['uid'];
   if ($all_day == 'TRUE') {
     if ($event_duration == 3600) {
       $event_duration = "86400";
@@ -1994,7 +1993,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
     $obm[uid],
     'VEVENT',
     '$GLOBALS[c_origin_ajax]',
-    ".$organizer.",
+    ".$organizerId.",
     '".Of_Date::getOption('timezone')."', 
     '$title', 
     '$datebegin',     
