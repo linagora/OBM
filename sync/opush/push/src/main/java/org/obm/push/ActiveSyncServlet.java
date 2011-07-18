@@ -95,25 +95,7 @@ public class ActiveSyncServlet extends HttpServlet {
 						c.isResumed(), request.getMethod(), c.getReqId() });
 
 		if (c.isResumed() || !c.isInitial()) {
-			BackendSession bs = c.getBackendSession();
-			IContinuationHandler ph = null;
-
-			IListenerRegistration reg = c.getListenerRegistration();
-			if (reg != null) {
-				reg.cancel();
-			}
-
-			if (bs == null) {
-				return;
-			}
-			ph = (IContinuationHandler) handlers.get(bs.getLastContinuationHandler());
-
-			ICollectionChangeListener ccl = c.getCollectionChangeListener();
-			if (c.isError()) {
-				ph.sendError(new Responder(response), c.getErrorStatus(), c);
-			} else if (ccl != null) {
-				ph.sendResponseWithoutHierarchyChanges(bs, new Responder(response), c);
-			}
+			handleContinuation(response, c);
 			return;
 		}
 
@@ -152,6 +134,30 @@ public class ActiveSyncServlet extends HttpServlet {
 				creds.getPassword(), p(asrequest, "DeviceId"), asrequest,
 				response);
 
+	}
+
+	private void handleContinuation(HttpServletResponse response, IContinuation c) {
+		BackendSession bs = c.getBackendSession();
+
+		IListenerRegistration reg = c.getListenerRegistration();
+		if (reg != null) {
+			reg.cancel();
+		}
+
+		if (bs == null) {
+			return;
+		}
+		
+		IContinuationHandler ph = 
+				(IContinuationHandler) handlers.get(bs.getLastContinuationHandler());
+
+		ICollectionChangeListener ccl = c.getCollectionChangeListener();
+		if (c.isError()) {
+			ph.sendError(new Responder(response), c.getErrorStatus(), c);
+		} else if (ccl != null) {
+			ph.sendResponseWithoutHierarchyChanges(bs, new Responder(response), c);
+		}
+		return;
 	}
 
 	@Override
