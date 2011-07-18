@@ -2,8 +2,6 @@ package org.obm.push;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -47,13 +45,7 @@ import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.SyncHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.slf4j.Marker;
-
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.sift.SiftingAppender;
-import ch.qos.logback.core.sift.AppenderTracker;
-import ch.qos.logback.core.sift.SiftingAppenderBase;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Injector;
@@ -65,8 +57,7 @@ import com.google.inject.Injector;
  */
 public class ActiveSyncServlet extends HttpServlet {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ActiveSyncServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(ActiveSyncServlet.class);
 
 	private Injector injector;
 
@@ -74,8 +65,9 @@ public class ActiveSyncServlet extends HttpServlet {
 	public static final String PING_HANDLER = "Ping";
 
 	private Map<String, IRequestHandler> handlers;
+
 	private SessionService sessionService;
-	
+	private LoggerService loggerService; 
 	private ISyncStorage storage;
 	private IBackend backend;
 	private PushContinuation.Factory continuationFactory;
@@ -169,8 +161,7 @@ public class ActiveSyncServlet extends HttpServlet {
 						.getServletContext()
 						.getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
 			
-			configureLogger();
-
+			loggerService = injector.getInstance(LoggerService.class);
 			storage = injector.getInstance(IStorageFactory.class).createStorage();
 			backend = injector.getInstance(IBackendFactory.class).loadBackend();
 			sessionService = injector.getInstance(SessionService.class);
@@ -242,7 +233,7 @@ public class ActiveSyncServlet extends HttpServlet {
 								&& storage.syncAuthorized(loginAtDomain,
 										deviceId);
 						if (valid) {
-							initLoggerSession(loginAtDomain);
+							loggerService.initLoggerSession(loginAtDomain);
 							
 							logger.info("login/password ok & the device has been authorized");
 							return new Credentials(loginAtDomain, password);
@@ -263,17 +254,6 @@ public class ActiveSyncServlet extends HttpServlet {
 			response.setStatus(401);
 		}
 		return creds;
-	}
-
-	private void initLoggerSession(String loginAtDomain) {
-		Calendar date = Calendar.getInstance();
-		SimpleDateFormat dateformatter = new SimpleDateFormat("yyyy.MM.dd_hh:mm:ss");
-		String now = dateformatter.format(date.getTime());
-
-		closePrecedentLogFile();
-		String sessionId = loginAtDomain+"-"+now;
-		configureLogger("user", loginAtDomain);
-		configureLogger("sessionId", sessionId);
 	}
 
 	private void processActiveSyncMethod(IContinuation continuation,
@@ -380,38 +360,5 @@ public class ActiveSyncServlet extends HttpServlet {
 	private boolean validatePassword(String loginAtDomain, String password) {
 		return backend.validatePassword(loginAtDomain, password);
 	}
-
-	private String getLastSessionLogFileName(){
-		String sessionId = MDC.get("sessionId");
-		if(sessionId == null) {
-			return "no-session";
-		} else {
-			return sessionId;
-		}
-	}
-
-	private void closePrecedentLogFile(){
-		String logFileName = getLastSessionLogFileName();
-		if (logFileName != null) {
-
-			LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-			SiftingAppenderBase<?> siftingAppender = (SiftingAppender) loggerContext
-														.getLogger(Logger.ROOT_LOGGER_NAME)
-														.getAppender("SIFTING");
-			if (siftingAppender != null) {
-				AppenderTracker<?> appenderTracker = siftingAppender.getAppenderTracker();
-				appenderTracker.stopAndRemoveNow(logFileName);
-			}
-		}
-	}
-
-	private void configureLogger(String key, String value) {
-		MDC.put(key, value);
-		configureLogger();
-	}
-
-	private void configureLogger() {
-		MDC.put("title", "Opush ActiveSync");
-	}
-
+	
 }
