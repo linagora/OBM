@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.obm.push.ItemChange;
+import org.obm.push.impl.Credentials;
 import org.obm.push.store.FilterType;
 import org.obm.push.store.SyncCollection;
 import org.obm.push.store.SyncState;
@@ -21,8 +22,7 @@ public class BackendSession {
 
 	private static final Logger logger = LoggerFactory.getLogger(BackendSession.class);
 
-	private final String loginAtDomain;
-	private String password;
+	private Credentials credentials;
 	private String devId;
 	private String devType;
 	private String command;
@@ -44,11 +44,11 @@ public class BackendSession {
 
 	private Map<String, String> lastSyncProcessedClientIds;
 
-	public BackendSession(String loginAtDomain, String password, String devId,
+
+	public BackendSession(Credentials credentials, String devId,
 			String devType, String command) {
 		super();
-		this.loginAtDomain = loginAtDomain;
-		this.password = password;
+		this.credentials = credentials;
 		this.devId = devId;
 		this.devType = devType;
 		this.command = command;
@@ -87,15 +87,15 @@ public class BackendSession {
 	}
 
 	public String getLoginAtDomain() {
-		return loginAtDomain;
+		return credentials.getLoginAtDomain();
 	}
 
 	public String getPassword() {
-		return password;
+		return credentials.getPassword();
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setCredentials(Credentials credentials) {
+		this.credentials = credentials;
 	}
 
 	public String getDevId() {

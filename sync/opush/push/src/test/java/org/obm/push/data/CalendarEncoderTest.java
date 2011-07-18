@@ -13,6 +13,7 @@ import org.obm.push.data.calendarenum.AttendeeStatus;
 import org.obm.push.data.calendarenum.AttendeeType;
 import org.obm.push.data.calendarenum.CalendarBusyStatus;
 import org.obm.push.data.calendarenum.CalendarSensitivity;
+import org.obm.push.impl.Credentials;
 import org.obm.push.store.SyncCollection;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -35,7 +36,7 @@ public class CalendarEncoderTest {
 	}
 
 	private BackendSession getFakeBackendSession() {
-		BackendSession bs = new BackendSession("adrien@test.tlse.lngr", "test",
+		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lngr", "test"),
 				"devId", "devType", "Sync");
 		bs.setProtocolVersion(new BigDecimal(12.5));
 		return bs;

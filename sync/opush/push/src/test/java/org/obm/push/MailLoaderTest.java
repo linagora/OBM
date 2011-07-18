@@ -7,6 +7,7 @@ import org.minig.imap.StoreClient;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.MSEmail;
 import org.obm.push.backend.MSEvent;
+import org.obm.push.impl.Credentials;
 import org.obm.push.mail.MailMessageLoader;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.locators.CalendarLocator;
@@ -15,7 +16,7 @@ import org.obm.sync.locators.CalendarLocator;
 public class MailLoaderTest extends TestCase {
 
 	public void testMailLoader() {
-		BackendSession bs = new BackendSession("thomas@zz.com", "aliacom",
+		BackendSession bs = new BackendSession(new Credentials("thomas@zz.com", "aliacom"),
 				"devId", "devType", "command");
 		StoreClient store = new StoreClient("obm23.buffy.kvm", 143,
 				"thomas@zz.com", "aliacom");
@@ -31,7 +32,7 @@ public class MailLoaderTest extends TestCase {
 	}
 	
 	public void testMailLoader1() {
-		BackendSession bs = new BackendSession("adrien@test.tlse.lng", "aliacom",
+		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lng", "aliacom"),
 				"devId", "devType", "command");
 		StoreClient store = new StoreClient("obm", 143,
 				"adrien@test.tlse.lng", "aliacom");
@@ -45,7 +46,7 @@ public class MailLoaderTest extends TestCase {
 	}
 	
 	public void testMailLoader2() {
-		BackendSession bs = new BackendSession("adrien@test.tlse.lng", "aliacom",
+		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lng", "aliacom"),
 				"devId", "devType", "command");
 		StoreClient store = new StoreClient("obm", 143,
 				"adrien@test.tlse.lng", "aliacom");

@@ -129,8 +129,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 
 		processActiveSyncMethod(c, 
-				creds.getLoginAtDomain(),
-				creds.getPassword(), 
+				creds, 
 				asrequest.p("DeviceId"), 
 				asrequest,
 				response);
@@ -279,12 +278,11 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 
 	private void processActiveSyncMethod(IContinuation continuation,
-			String userID, String password, String devId,
+			Credentials credentials, String devId,
 			ActiveSyncRequest request, HttpServletResponse response)
 			throws IOException {
 
-		String loginAtDomain = getLoginAtDomain(userID);
-		BackendSession bs = sessionService.getSession(loginAtDomain, password, devId, request);
+		BackendSession bs = sessionService.getSession(credentials, devId, request);
 		logger.info("activeSyncMethod = {}", bs.getCommand());
 		
 		bs.setProtocolVersion(getProtocolVersion(request));

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.obm.push.backend.BackendSession;
 import org.obm.push.impl.ActiveSyncRequest;
+import org.obm.push.impl.Credentials;
 import org.obm.push.impl.HintsLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,32 +26,32 @@ public class SessionService {
 
 	}
 	
-	public synchronized BackendSession getSession(String loginAtDomain, String password,
-			String devId, ActiveSyncRequest r) {
+	public synchronized BackendSession getSession(
+			Credentials credentials, String devId, ActiveSyncRequest r) {
 
-		String sessionId = loginAtDomain + "/" + devId;
+		String sessionId = credentials.getLoginAtDomain() + "/" + devId;
 
 		if (sessions.containsKey(sessionId)) {
 			BackendSession bs = sessions.get(sessionId);
-			return updateSession(password, r, bs);
+			return updateSession(credentials, r, bs);
 		} else {
-			BackendSession bs = createSession(loginAtDomain, password, r, sessionId);
+			BackendSession bs = createSession(credentials, r, sessionId);
 			sessions.put(sessionId, bs);
 			return bs;
 		}
 	}
 
-	private BackendSession updateSession(String password, ActiveSyncRequest r,
+	private BackendSession updateSession(Credentials credentials, ActiveSyncRequest r,
 			BackendSession bs) {
-		bs.setPassword(password);
+		bs.setCredentials(credentials);
 		logger.info("Existing session = {} | {} ", bs, bs.getLastMonitored());
 		bs.setCommand(r.p("Cmd"));
 		return bs;
 	}
 
-	private BackendSession createSession(String loginAtDomain, String password,
+	private BackendSession createSession(Credentials credentials,
 			ActiveSyncRequest r, String sessionId) {
-		BackendSession bs = new BackendSession(loginAtDomain, password, r.p("DeviceId"),
+		BackendSession bs = new BackendSession(credentials, r.p("DeviceId"),
 				r.extractDeviceType(), r.p("Cmd"));
 		HintsLoader.addHintsToSession(r, bs);
 		logger.info("New session = {}", sessionId);
