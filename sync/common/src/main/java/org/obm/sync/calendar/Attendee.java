@@ -83,7 +83,7 @@ public class Attendee {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof Attendee))
 			return false;
 		Attendee other = (Attendee) obj;
 		if (email != null && email.equalsIgnoreCase(other.email)) {
