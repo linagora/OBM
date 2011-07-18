@@ -71,10 +71,10 @@ public class MailBackend extends ObmSyncBackend {
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
-		ret.add(genItemChange(bs, EmailManager.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER));
-		ret.add(genItemChange(bs,  EmailManager.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS));
-		ret.add(genItemChange(bs,  EmailManager.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER));
-		ret.add(genItemChange(bs,  EmailManager.IMAP_TRASH_NAME,FolderType.DEFAULT_DELETED_ITEMS_FOLDERS));
+		ret.add(genItemChange(bs, EmailConfiguration.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER));
+		ret.add(genItemChange(bs,  EmailConfiguration.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS));
+		ret.add(genItemChange(bs,  EmailConfiguration.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER));
+		ret.add(genItemChange(bs,  EmailConfiguration.IMAP_TRASH_NAME,FolderType.DEFAULT_DELETED_ITEMS_FOLDERS));
 		return ret;
 	}
 
@@ -552,16 +552,16 @@ public class MailBackend extends ObmSyncBackend {
 	 */
 	public FolderType getFolderType(String collectionPath) throws FolderTypeNotFoundException {
 		if (collectionPath != null) {
-			if(collectionPath.contains(EmailManager.IMAP_INBOX_NAME)){
+			if(collectionPath.contains(EmailConfiguration.IMAP_INBOX_NAME)){
 				return FolderType.DEFAULT_INBOX_FOLDER;
 			} 
-			if(collectionPath.contains(EmailManager.IMAP_DRAFTS_NAME)){
+			if(collectionPath.contains(EmailConfiguration.IMAP_DRAFTS_NAME)){
 				return FolderType.DEFAULT_DRAFTS_FOLDERS;
 			}
-			if(collectionPath.contains(EmailManager.IMAP_SENT_NAME)){
+			if(collectionPath.contains(EmailConfiguration.IMAP_SENT_NAME)){
 				return FolderType.DEFAULT_SENT_EMAIL_FOLDER;
 			}
-			if(collectionPath.contains(EmailManager.IMAP_TRASH_NAME)){
+			if(collectionPath.contains(EmailConfiguration.IMAP_TRASH_NAME)){
 				return FolderType.DEFAULT_DELETED_ITEMS_FOLDERS;
 			}
 		}

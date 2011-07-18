@@ -35,8 +35,6 @@ public interface IEmailManager {
 	String parseMailBoxName(BackendSession bs, String collectionName)
 			throws IMAPException;
 
-	void resetForFullSync(Set<Integer> listCollectionId);
-
 	void delete(BackendSession bs, Integer devId, String collectionPath,
 			Integer collectionId, Long uid) throws IMAPException;
 
@@ -64,9 +62,9 @@ public interface IEmailManager {
 	Long storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead)
 			throws StoreEmailException;
 
-	Boolean getLoginWithDomain();
+	boolean getLoginWithDomain();
 
-	Boolean getActivateTLS();
+	boolean getActivateTLS();
 	
 	String locateImap(BackendSession bs);
 

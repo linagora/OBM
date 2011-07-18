@@ -95,15 +95,15 @@ public interface ISyncStorage {
 			Collection<Long> uids) throws SQLException;
 
 	void addMessages(Integer devId, Integer collectionId,
-			Collection<EmailCache> emails) throws SQLException;
+			Collection<Email> emails) throws SQLException;
 	
-	void addMessages(Integer devId, Integer collectionId, Date lastSync, Collection<EmailCache> messages) throws SQLException;
+	void addMessages(Integer devId, Integer collectionId, Date lastSync, Collection<Email> messages) throws SQLException;
 	
-	Set<EmailCache> getSyncedMail(Integer devId, Integer collectionId);
+	Set<Email> getSyncedMail(Integer devId, Integer collectionId);
 
 	Set<Long> getDeletedMail(Integer devId, Integer collectionId, Date lastSync);
 
-	Set<EmailCache> getUpdatedMail(Integer devId, Integer collectionId,
+	Set<Email> getUpdatedMail(Integer devId, Integer collectionId,
 			Date updatedFrom);
 
 	boolean eventIsAlreadySynced(Integer eventCollectionId, String eventUid);

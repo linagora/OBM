@@ -25,8 +25,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
 import javax.naming.ConfigurationException;
 
@@ -40,7 +38,6 @@ import org.minig.imap.ListResult;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.DBCP;
 import org.obm.locator.LocatorClient;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.MSEmail;
@@ -50,7 +47,7 @@ import org.obm.push.exception.ServerErrorException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.StoreEmailException;
 import org.obm.push.mail.smtp.SmtpSender;
-import org.obm.push.store.EmailCache;
+import org.obm.push.store.Email;
 import org.obm.push.store.FilterType;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.SyncState;
@@ -61,68 +58,58 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class EmailManager implements IEmailManager {
 
-	public static final String IMAP_INBOX_NAME = "INBOX";
-	public static final String IMAP_DRAFTS_NAME = "Drafts";
-	public static final String IMAP_SENT_NAME = "Sent";
-	public static final String IMAP_TRASH_NAME = "Trash";
-	
 	private static final Logger logger = LoggerFactory
 			.getLogger(EmailManager.class);
 	
-
-	private ISyncStorage syncStore;
-	private SmtpSender smtpProvider;
-
-	private Boolean loginWithDomain;
-	private Boolean activateTLS;
-	protected String imapHost;
-
-	private ConcurrentMap<Integer, IEmailSync> uidCache;
-	private LocatorClient locatorClient;
-	private final DBCP dbcp;
-
+	private final ISyncStorage syncStore;
+	private final SmtpSender smtpProvider;
+	private final LocatorClient locatorClient;
+	private final EmailSync emailSyncCache;
+	
+	private final boolean loginWithDomain;
+	private final boolean activateTLS;
+	
 	@Inject
 	private EmailManager(ISyncStorage syncStore,
 			EmailConfiguration emailConfiguration,
-			ConfigurationService configurationService, DBCP dbcp,
-			SmtpSender smtpSender) throws ConfigurationException {
+			ConfigurationService configurationService,
+			SmtpSender smtpSender, EmailSync emailSyncCache) throws ConfigurationException {
 		
-		this.dbcp = dbcp;
+		this.emailSyncCache = emailSyncCache;
 		this.locatorClient = new LocatorClient(configurationService.getLocatorUrl());
 		this.smtpProvider = smtpSender;
 		this.syncStore = syncStore;
-		this.uidCache = initUidCacheMap();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.activateTLS = emailConfiguration.activateTls();
 	}
 
-	private ConcurrentMap<Integer, IEmailSync> initUidCacheMap() {
-		return new MapMaker()
-	       .concurrencyLevel(16)
-	       .expireAfterWrite(1, TimeUnit.DAYS)
-	       .weakValues()
-	       .makeMap();
-	}
-
-
 	@Override
 	public String locateImap(BackendSession bs) {
-		 return locatorClient.getServiceLocation("mail/imap_frontend",
-				bs.getLoginAtDomain());
+		String locateImap = locatorClient.
+				getServiceLocation("mail/imap_frontend", bs.getLoginAtDomain());
+		logger.info("Using {} as imap host.", locateImap);
+		return locateImap;
 	}
 
 	private StoreClient getImapClient(BackendSession bs) {
-		if (imapHost == null) {
-			imapHost = locateImap(bs);
-			logger.info("Using " + imapHost + " as imap host.");
-		}
+		final String imapHost = locateImap(bs);
+		final String login = getLogin(bs);
+		StoreClient storeClient = new StoreClient(imapHost, 143, login, bs.getPassword()); 
+		
+		logger.info("Creating storeClient with login {} : " +
+				"loginWithDomain = {} | activateTLS = {}", 
+				new Object[]{login, loginWithDomain, activateTLS});
+		
+		return storeClient; 
+	}
+
+	private String getLogin(BackendSession bs) {
 		String login = bs.getLoginAtDomain();
 		if (!loginWithDomain) {
 			int at = login.indexOf("@");
@@ -130,39 +117,21 @@ public class EmailManager implements IEmailManager {
 				login = login.substring(0, at);
 			}
 		}
-		logger.info("creating storeClient with login: " + login
-				+ " (loginWithDomain: " + loginWithDomain + ", activateTLS:"
-				+ activateTLS + ")");
-		StoreClient imapCli = new StoreClient(imapHost, 143, login,
-				bs.getPassword());
-
-		return imapCli;
-	}
-
-	
-
-	private IEmailSync cache(Integer collectionId) {
-		IEmailSync ret = uidCache.get(collectionId);
-		if (ret == null) {
-			ret = new EmailSyncCache(syncStore, dbcp);
-			uidCache.put(collectionId, ret);
-		}
-		return ret;
-	}
+		return login;
+	}	
 
 	@Override
 	public MailChanges getSync(BackendSession bs, SyncState state,
 			Integer devId, Integer collectionId, String collectionName,
 			FilterType filter) throws ServerErrorException {
-		IEmailSync uc = cache(collectionId);
-		StoreClient store = getImapClient(bs);
+		
+		final StoreClient store = getImapClient(bs);
 		try {
 			login(store);
 			String mailBox = parseMailBoxName(store, collectionName);
 			store.select(mailBox);
-			MailChanges sync = uc.getSync(store, devId, bs, state,
+			return emailSyncCache.getSync(store, devId, bs, state,
 					collectionId, filter);
-			return sync;
 		} catch (Throwable e) {
 			throw new ServerErrorException(e);
 		} finally {
@@ -235,8 +204,8 @@ public class EmailManager implements IEmailManager {
 	}
 
 	private String parseMailBoxName(StoreClient store, String collectionName) throws IMAPException {
-		if (collectionName.toLowerCase().endsWith(IMAP_INBOX_NAME.toLowerCase())) {
-			return IMAP_INBOX_NAME;
+		if (collectionName.toLowerCase().endsWith(EmailConfiguration.IMAP_INBOX_NAME.toLowerCase())) {
+			return EmailConfiguration.IMAP_INBOX_NAME;
 		}
 		
 		int slash = collectionName.lastIndexOf("email\\");
@@ -249,14 +218,7 @@ public class EmailManager implements IEmailManager {
 		}
 		throw new IMAPException("Cannot find IMAP folder for collection [ " + collectionName + " ]");
 	}
-
-	@Override
-	public void resetForFullSync(Set<Integer> listCollectionId) {
-		for (Integer colId : listCollectionId) {
-			uidCache.remove(colId);
-		}
-	}
-
+	 
 	@Override
 	public void delete(BackendSession bs, Integer devId, String collectionPath,
 			Integer collectionId, Long uid) throws IMAPException {
@@ -441,7 +403,7 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			return storeMail(store, IMAP_INBOX_NAME, isRead, mailContent, false);
+			return storeMail(store, EmailConfiguration.IMAP_INBOX_NAME, isRead, mailContent, false);
 		} catch (Throwable e) {
 			throw new StoreEmailException(
 					"Error during store mail in Inbox folder", e);
@@ -525,11 +487,11 @@ public class EmailManager implements IEmailManager {
 			Integer collectionId, Long mailUids) {
 		Collection<FastFetch> fetch = store.uidFetchFast(ImmutableSet
 				.of(mailUids));
-		Collection<EmailCache> emails = Collections2.transform(fetch,
-				new Function<FastFetch, EmailCache>() {
+		Collection<Email> emails = Collections2.transform(fetch,
+				new Function<FastFetch, Email>() {
 					@Override
-					public EmailCache apply(FastFetch input) {
-						return new EmailCache(input.getUid(), input.isRead());
+					public Email apply(FastFetch input) {
+						return new Email(input.getUid(), input.isRead());
 					}
 				});
 		try {
@@ -540,12 +502,12 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public Boolean getLoginWithDomain() {
+	public boolean getLoginWithDomain() {
 		return loginWithDomain;
 	}
 
 	@Override
-	public Boolean getActivateTLS() {
+	public boolean getActivateTLS() {
 		return activateTLS;
 	}
 

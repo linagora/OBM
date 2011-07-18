@@ -34,7 +34,8 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 
 	public EmailMonitoringThread(ObmSyncBackend cb,
 			Set<ICollectionChangeListener> ccls, BackendSession bs,
-			Integer collectionId, IEmailManager emailManager, IContentsExporter contentsExporter) throws ActiveSyncException {
+			Integer collectionId, IEmailManager emailManager, 
+			IContentsExporter contentsExporter) throws ActiveSyncException {
 		
 		super(contentsExporter);
 		

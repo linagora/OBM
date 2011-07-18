@@ -22,7 +22,6 @@ import org.obm.push.store.SyncCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -133,11 +132,9 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public void resetCollection(BackendSession bs, Integer collectionId) throws SQLException {
-		logger.info("reset Collection " + collectionId
-				+ " For Full Sync devId: " + bs.getDevId());
+		logger.info("reset Collection {} For Full Sync devId {}", 
+				new Object[]{collectionId, bs.getDevId()});
 		try {
-			Set<Integer> colIds = ImmutableSet.of(collectionId);
-			emailManager.resetForFullSync(colIds);
 			store.resetCollection(bs.getLoginAtDomain(), bs.getDevId(), collectionId);
 			bs.clear(collectionId);
 		} catch (RuntimeException re) {

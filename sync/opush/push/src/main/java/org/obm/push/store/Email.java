@@ -1,11 +1,11 @@
 package org.obm.push.store;
 
-public class EmailCache {
+public class Email {
 
 	private long uid;
 	private boolean read;
 	
-	public EmailCache(long uid, boolean read) {
+	public Email(long uid, boolean read) {
 		super();
 		this.uid = uid;
 		this.read = read;
@@ -36,7 +36,7 @@ public class EmailCache {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		EmailCache other = (EmailCache) obj;
+		Email other = (Email) obj;
 		if (read != other.read)
 			return false;
 		if (uid != other.uid)
@@ -46,6 +46,7 @@ public class EmailCache {
 
 	@Override
 	public String toString() {
-		return "EmailCache [uid=" + uid + ", read=" + read + "]";
+		return "EmailCache [ uid = " + uid + ", read = " + read + " ]";
 	}
+	
 }

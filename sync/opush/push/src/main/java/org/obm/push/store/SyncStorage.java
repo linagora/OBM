@@ -982,9 +982,9 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public Set<EmailCache> getSyncedMail(Integer devId, Integer collectionId) {
+	public Set<Email> getSyncedMail(Integer devId, Integer collectionId) {
 		long time = System.currentTimeMillis();
-		Set<EmailCache> uids = new HashSet<EmailCache>();
+		Set<Email> uids = new HashSet<Email>();
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -999,7 +999,7 @@ public class SyncStorage implements ISyncStorage {
 			while (evrs.next()) {
 				Long uid = evrs.getLong("mail_uid");
 				Boolean read = evrs.getBoolean("is_read");
-				uids.add(new EmailCache(uid, read));
+				uids.add(new Email(uid, read));
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -1015,10 +1015,10 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public Set<EmailCache> getUpdatedMail(Integer devId, Integer collectionId,
+	public Set<Email> getUpdatedMail(Integer devId, Integer collectionId,
 			Date updatedFrom) {
 		long time = System.currentTimeMillis();
-		Set<EmailCache> uids = new HashSet<EmailCache>();
+		Set<Email> uids = new HashSet<Email>();
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet evrs = null;
@@ -1034,7 +1034,7 @@ public class SyncStorage implements ISyncStorage {
 			while (evrs.next()) {
 				Long uid = evrs.getLong("mail_uid");
 				Boolean read = evrs.getBoolean("is_read");
-				uids.add(new EmailCache(uid, read));
+				uids.add(new Email(uid, read));
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -1125,13 +1125,13 @@ public class SyncStorage implements ISyncStorage {
 
 	@Override
 	public void addMessages(Integer devId, Integer collectionId,
-			Collection<EmailCache> messages) throws SQLException {
+			Collection<Email> messages) throws SQLException {
 		addMessages(devId, collectionId, null, messages);
 	}
 
 	@Override
 	public void addMessages(Integer devId, Integer collectionId, Date lastSync,
-			Collection<EmailCache> messages) throws SQLException {
+			Collection<Email> messages) throws SQLException {
 		if (lastSync == null) {
 			lastSync = DateUtils.getCurrentGMTCalendar().getTime();
 		}
@@ -1150,7 +1150,7 @@ public class SyncStorage implements ISyncStorage {
 
 			insert = con
 					.prepareStatement("INSERT INTO opush_sync_mail (collection_id, device_id, mail_uid, is_read, timestamp) VALUES (?, ?, ?, ?, ?)");
-			for (EmailCache uid : messages) {
+			for (Email uid : messages) {
 				insert.setInt(1, collectionId);
 				insert.setInt(2, devId);
 				insert.setLong(3, uid.getUid());
@@ -1164,11 +1164,11 @@ public class SyncStorage implements ISyncStorage {
 		}
 	}
 
-	private String buildListIdFromEmailCache(Collection<EmailCache> messages) {
+	private String buildListIdFromEmailCache(Collection<Email> messages) {
 		Collection<Long> uids = Collections2.transform(messages,
-				new Function<EmailCache, Long>() {
+				new Function<Email, Long>() {
 					@Override
-					public Long apply(EmailCache input) {
+					public Long apply(Email input) {
 						return input.getUid();
 					}
 				});
