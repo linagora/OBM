@@ -13,7 +13,7 @@ import org.slf4j.Marker;
 import org.obm.push.logging.TechnicalLogType;
 import org.obm.push.utils.StringUtils;
 
-public class Base64QueryString implements ActiveSyncRequest {
+public class Base64QueryString extends AbstractActiveSyncRequest implements ActiveSyncRequest {
 
 	/**
 	 * <code>

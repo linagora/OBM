@@ -13,4 +13,12 @@ public interface ActiveSyncRequest {
 	String getHeader(String name);
 
 	HttpServletRequest getHttpServletRequest();
+	
+	/**
+	 * Parameters can be in query string or in header, whether a base64 query
+	 * string is used.
+	 */
+	String p(String name);
+	
+	public String extractDeviceType();
 }

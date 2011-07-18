@@ -4,7 +4,7 @@ import org.obm.push.backend.BackendSession;
 
 public class HintsLoader {
 
-	public void addHints(ActiveSyncRequest r, BackendSession bs) {
+	public static void addHintsToSession(ActiveSyncRequest r, BackendSession bs) {
 		String ua = r.getHeader("User-Agent");
 		
 		// NokiaE71

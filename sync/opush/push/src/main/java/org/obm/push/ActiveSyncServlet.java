@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -29,7 +27,6 @@ import org.obm.push.impl.Credentials;
 import org.obm.push.impl.FolderSyncHandler;
 import org.obm.push.impl.GetAttachmentHandler;
 import org.obm.push.impl.GetItemEstimateHandler;
-import org.obm.push.impl.HintsLoader;
 import org.obm.push.impl.IContinuationHandler;
 import org.obm.push.impl.IRequestHandler;
 import org.obm.push.impl.ItemOperationsHandler;
@@ -77,8 +74,8 @@ public class ActiveSyncServlet extends HttpServlet {
 	public static final String PING_HANDLER = "Ping";
 
 	private Map<String, IRequestHandler> handlers;
-	private Map<String, BackendSession> sessions;
-
+	private SessionService sessionService;
+	
 	private ISyncStorage storage;
 	private IBackend backend;
 	private PushContinuation.Factory continuationFactory;
@@ -118,20 +115,23 @@ public class ActiveSyncServlet extends HttpServlet {
 			return;
 		}
 
-		String policy = p(asrequest, "X-Ms-PolicyKey");
+		String policy = asrequest.p("X-Ms-PolicyKey");
 		if (policy != null && policy.equals("0")
-				&& !p(asrequest, "Cmd").equals("Provision")) {
+				&& !asrequest.p("Cmd").equals("Provision")) {
 
 			logger.info("forcing device (ua: {}) provisioning",
-					p(asrequest, "User-Agent"));
+					asrequest.p("User-Agent"));
 			response.setStatus(449);
 			return;
 		} else {
 			logger.info("policy used = {}", policy);
 		}
 
-		processActiveSyncMethod(c, creds.getLoginAtDomain(),
-				creds.getPassword(), p(asrequest, "DeviceId"), asrequest,
+		processActiveSyncMethod(c, 
+				creds.getLoginAtDomain(),
+				creds.getPassword(), 
+				asrequest.p("DeviceId"), 
+				asrequest,
 				response);
 
 	}
@@ -174,10 +174,9 @@ public class ActiveSyncServlet extends HttpServlet {
 
 			storage = injector.getInstance(IStorageFactory.class).createStorage();
 			backend = injector.getInstance(IBackendFactory.class).loadBackend();
+			sessionService = injector.getInstance(SessionService.class);
 			continuationFactory = injector.getInstance(PushContinuation.Factory.class);
 			
-			sessions = Collections
-					.synchronizedMap(new HashMap<String, BackendSession>());
 			handlers = createHandlersMap();
 			logger.info("Opush ActiveSync servlet initialised.");
 		} catch (ConfigurationException e) {
@@ -237,9 +236,9 @@ public class ActiveSyncServlet extends HttpServlet {
 						String userId = userPass.substring(0, p);
 						String password = userPass.substring(p + 1);
 						String loginAtDomain = getLoginAtDomain(userId);
-						String deviceId = p(request, "DeviceId");
+						String deviceId = request.p("DeviceId");
 						valid = storage.initDevice(loginAtDomain, deviceId,
-								extractDeviceType(request))
+								request.extractDeviceType())
 								&& validatePassword(loginAtDomain, password)
 								&& storage.syncAuthorized(loginAtDomain,
 										deviceId);
@@ -278,34 +277,15 @@ public class ActiveSyncServlet extends HttpServlet {
 		configureLogger("sessionId", sessionId);
 	}
 
-	private String extractDeviceType(ActiveSyncRequest request) {
-		String ret = p(request, "DeviceType");
-		if (ret.startsWith("IMEI")) {
-			ret = p(request, "User-Agent");
-		}
-		return ret;
-	}
-
-	/**
-	 * Parameters can be in query string or in header, whether a base64 query
-	 * string is used.
-	 */
-	private String p(ActiveSyncRequest r, String name) {
-		String ret = r.getParameter(name);
-		if (ret == null) {
-			ret = r.getHeader(name);
-		}
-		return ret;
-	}
-
 	private void processActiveSyncMethod(IContinuation continuation,
 			String userID, String password, String devId,
 			ActiveSyncRequest request, HttpServletResponse response)
 			throws IOException {
 
-		BackendSession bs = getSession(userID, password, devId, request);
+		String loginAtDomain = getLoginAtDomain(userID);
+		BackendSession bs = sessionService.getSession(loginAtDomain, password, devId, request);
 		logger.info("activeSyncMethod = {}", bs.getCommand());
-		String proto = p(request, "MS-ASProtocolVersion");
+		String proto = request.p("MS-ASProtocolVersion");
 		if (proto == null) {
 			proto = "12.1";
 		}
@@ -354,31 +334,6 @@ public class ActiveSyncServlet extends HttpServlet {
 		while (heads.hasMoreElements()) {
 			String h = (String) heads.nextElement();
 			logger.warn("{} : {}", h, request.getHeader(h));
-		}
-	}
-
-	private BackendSession getSession(String userID, String password,
-			String devId, ActiveSyncRequest r) {
-
-		String uid = getLoginAtDomain(userID);
-		String sessionId = uid + "/" + devId;
-
-		BackendSession bs = null;
-		synchronized (sessions) {
-			if (sessions.containsKey(sessionId)) {
-				bs = sessions.get(sessionId);
-				bs.setPassword(password);
-				logger.info("Existing session = {} | {} ", bs,
-						bs.getLastMonitored());
-				bs.setCommand(p(r, "Cmd"));
-			} else {
-				bs = new BackendSession(uid, password, p(r, "DeviceId"),
-						extractDeviceType(r), p(r, "Cmd"));
-				sessions.put(sessionId, bs);
-				new HintsLoader().addHints(r, bs);
-				logger.info("New session = {}", sessionId);
-			}
-			return bs;
 		}
 	}
 

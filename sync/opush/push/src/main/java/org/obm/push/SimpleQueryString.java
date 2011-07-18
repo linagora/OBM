@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.obm.push.impl.ActiveSyncRequest;
 
-public class SimpleQueryString implements ActiveSyncRequest{
+public class SimpleQueryString extends AbstractActiveSyncRequest implements ActiveSyncRequest {
 
 	private HttpServletRequest request;
 	
