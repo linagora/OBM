@@ -1289,9 +1289,22 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
       onmousedown='obm.calendarManager.newAlldayDummyEvent(event);'
       onmouseup='obm.calendarManager.newAlldayDummyEvent(event);'
       ondblclick='obm.calendarQuickForm.compute(event);'";
-    $dis_grid_action = "
-      onmousedown='obm.calendarManager.newDummyEvent(event);' 
-      ondblclick='obm.calendarQuickForm.compute(event);'";
+
+    $can_write_in_calendar = false;
+    foreach ($calendar_entity as $type => $entity) {
+      foreach ($entity as $id => $data) {
+        error_log("Testing if ".$GLOBALS[obm][uid]." can write to calendar $id");
+        if (OBM_Acl::canWrite($GLOBALS[obm][uid], 'calendar', $id)) {
+            $can_write_in_calendar = true;
+            break;
+        }
+      }
+    }
+    if ($can_write_in_calendar) {
+        $dis_grid_action = "
+          onmousedown='obm.calendarManager.newDummyEvent(event);' 
+          ondblclick='obm.calendarQuickForm.compute(event);'";
+    }
   }
   $block .= "
   <div id='calendarHeader'>
@@ -4533,8 +4546,16 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         $possible_organizers[$displayed_person_id] = $displayed_person_name;
       }
     }
+    if(!array_key_exists($organizer_id, $possible_organizers)) $organizer_id = $uid;
   }
-  if(!array_key_exists($organizer_id, $possible_organizers)) $organizer_id = $uid;
+  else {
+      if (!OBM_Acl::canWrite($uid, 'calendar',$organizer_id)) {
+          error_log("The current user of id $uid doesn't have write rights on the $calendar of user $organizer_id");
+          # Redirect to calendar index
+          header("Location: $GLOBALS[path]/calendar/calendar_index.php");
+          exit;
+      }
+  }
 
   $block_organizer = "
     <th>
