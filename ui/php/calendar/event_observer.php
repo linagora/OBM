@@ -669,7 +669,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
     
     if ($attendeesState != null && !$this->hasEventChanged($old, $new)) {
       foreach($attendeesState['user'] as $ustate) {
-        $this->sendEventStateUpdateMail($new, $ustate);
+        $this->sendEventStateUpdateMail($new, $ustate, $attendeesState);
       }
       foreach($attendeesState['resource'] as $rstate) {
         $this->sendResourceStateUpdateMail($new, $rstate);
@@ -746,9 +746,9 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @access private
    * @return void
    */
-  private function sendEventStateUpdateMail($new, $user) {
+  private function sendEventStateUpdateMail($new, $user, $attendeesState) {
     if($new->get('owner')->get('id') != $user->get('id')) {
-      $this->mailer->sendEventStateUpdate($new, $user);
+      $this->mailer->sendEventStateUpdate($new, $user, $attendeesState);
     }
   }
 

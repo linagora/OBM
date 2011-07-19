@@ -106,9 +106,22 @@ class Vcalendar_Reader_OBM {
         $this->vevents[$id] = &$this->addVevent($set);
       }
     }
-    $attendees = run_query_get_events_attendee(array_keys($this->vevents));
-    while($attendees->next_record()) {
-      $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
+     $attendees = run_query_get_events_attendee(array_keys($this->vevents));
+    if ( strcasecmp($method,"REPLY") == 0 && $this->entities && is_array($this->entities) && count($this->entities) && array_key_exists("user",$this->entities) && is_array($this->entities["user"]) ) {
+      $userId = reset(array_keys($this->entities["user"]));
+//       print_r($this->entities);
+      while($attendees->next_record()) {
+//        print_r($attendees->Record);
+
+       if ( $attendees->f('eventlink_entity_id') == $userId ) {
+         $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
+         break;
+       }
+      }
+    } else {
+     while($attendees->next_record()) {
+       $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
+     }
     }
     
     if ($include_attachments) {

@@ -87,10 +87,12 @@ class OBM_Mailer extends SMailer {
   /**
    * Get sender email address
    */
-  protected function getSender() {
+  protected function getSender($userId = null) {
     global $obm, $cdg_sql;
-
-    $uid = sql_parse_id($obm['uid'], true);
+    if ( !$userId ) {
+      $userId = $obm['uid'];
+    }
+    $uid = sql_parse_id($userId, true);
     $query = "SELECT 
     userobm_email, userobm_lastname, userobm_firstname, userobm_commonname, domain_name
     FROM UserObm

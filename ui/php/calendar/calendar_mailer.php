@@ -87,8 +87,15 @@ class CalendarMailer extends OBM_Mailer {
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
   }
 
-  protected function eventStateUpdate($event, $user) {
-    $this->from = $this->getSender();
+  protected function eventStateUpdate($event, $user, $attendeeState) {
+    $userId = null;
+    if ( $attendeeState && is_array( $attendeeState ) && array_key_exists("user",$attendeeState) &&
+	  is_array($attendeeState["user"]) && count($attendeeState["user"]) ) {
+      $user = reset($attendeeState["user"]);
+      $userId = $user->id ;
+      $this->userId = $userId;
+    }
+    $this->from = $this->getSender($userId);
     $this->recipients = $this->getRecipients(array($event->owner), 'set_mail_participation');
     $this->subject = __('Participation updated: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from, '', $user);
