@@ -99,12 +99,13 @@ class Vcalendar_Reader_OBM {
     $this->document = new Vcalendar();
     $this->setHeaders($method);
     foreach($this->eventSets as $set) {
+	  if (!($set))
+		  continue;
       $id = $set['event_id'];      
       if(is_null($this->vevents[$id])) {
         $this->vevents[$id] = &$this->addVevent($set);
       }
     }
-
     $attendees = run_query_get_events_attendee(array_keys($this->vevents));
     while($attendees->next_record()) {
       $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
