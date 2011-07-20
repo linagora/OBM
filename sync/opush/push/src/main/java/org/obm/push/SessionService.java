@@ -27,10 +27,7 @@ public class SessionService {
 			Credentials credentials, String devId, ActiveSyncRequest request) {
 
 		String sessionId = credentials.getLoginAtDomain() + "/" + devId;
-		
-		BackendSession session = createSession(credentials, request, sessionId);
-		session.setProtocolVersion(getProtocolVersion(request));
-		return session;
+		return createSession(credentials, request, sessionId);
 	}
 
 	private BackendSession createSession(Credentials credentials,
@@ -39,7 +36,7 @@ public class SessionService {
 		String userAgent = r.getHeader("User-Agent");
 		String devType = r.extractDeviceType();
 		BackendSession bs = new BackendSession(credentials, r.p("DeviceId"),
-				r.p("Cmd"), deviceFactory.create(devType, userAgent));
+				r.p("Cmd"), deviceFactory.create(devType, userAgent), getProtocolVersion(r));
 		
 		logger.info("New session = {}", sessionId);
 		return bs;

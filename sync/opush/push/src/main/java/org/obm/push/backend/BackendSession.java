@@ -24,6 +24,7 @@ public class BackendSession {
 	private final String devId;
 	private final Device device;
 	private final String command;
+	private final BigDecimal protocolVersion;
 	
 	private Map<Integer, Date> updatedSyncDate;
 	private Map<Integer, Set<ItemChange>> unSynchronizedItemChangeByCollection;
@@ -33,7 +34,7 @@ public class BackendSession {
 
 	private String lastContinuationHandler;
 
-	private BigDecimal protocolVersion;
+	
 
 	private String policyKey;
 
@@ -44,12 +45,13 @@ public class BackendSession {
 	
 
 
-	public BackendSession(Credentials credentials, String devId, String command, Device device) {
+	public BackendSession(Credentials credentials, String devId, String command, Device device, BigDecimal protocolVersion) {
 		super();
 		this.credentials = credentials;
 		this.devId = devId;
 		this.command = command;
 		this.device = device;
+		this.protocolVersion = protocolVersion;
 		this.unSynchronizedItemChangeByCollection = new HashMap<Integer, Set<ItemChange>>();
 		this.unSynchronizedDeletedItemChangeByCollection = new HashMap<Integer, Set<ItemChange>>();
 		this.lastClientSyncState = new HashMap<Integer, SyncState>();
@@ -90,12 +92,8 @@ public class BackendSession {
 		this.updatedSyncDate.put(collectionId, updatedSyncDate);
 	}
 
-	public void setProtocolVersion(BigDecimal parseInt) {
-		this.protocolVersion = parseInt;
-	}
-
 	public BigDecimal getProtocolVersion() {
-		return protocolVersion;
+		return this.protocolVersion;
 	}
 
 	public void setPolicyKey(String pKey) {

@@ -39,8 +39,7 @@ public class CalendarEncoderTest {
 
 	private BackendSession getFakeBackendSession() {
 		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lngr", "test"),
-				"devId", "Sync", new Device("devType", new Properties()));
-		bs.setProtocolVersion(new BigDecimal(12.5));
+				"devId", "Sync", new Device("devType", new Properties()), new BigDecimal("12.5"));
 		return bs;
 	}
 

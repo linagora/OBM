@@ -1,5 +1,6 @@
 package org.obm.push;
 
+import java.math.BigDecimal;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -19,7 +20,7 @@ public class MailLoaderTest extends TestCase {
 
 	public void testMailLoader() {
 		BackendSession bs = new BackendSession(new Credentials("thomas@zz.com", "aliacom"),
-				"devId", "command", new Device("devType", new Properties()));
+				"devId", "command", new Device("devType", new Properties()), new BigDecimal(0));
 		StoreClient store = new StoreClient("obm23.buffy.kvm", 143,
 				"thomas@zz.com", "aliacom");
 		store.login();
@@ -35,7 +36,7 @@ public class MailLoaderTest extends TestCase {
 	
 	public void testMailLoader1() {
 		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lng", "aliacom"),
-				"devId", "command", new Device("devType", new Properties()));
+				"devId", "command", new Device("devType", new Properties()), new BigDecimal(0));
 		StoreClient store = new StoreClient("obm", 143,
 				"adrien@test.tlse.lng", "aliacom");
 		store.login();
@@ -49,7 +50,7 @@ public class MailLoaderTest extends TestCase {
 	
 	public void testMailLoader2() {
 		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lng", "aliacom"),
-				"devId", "command", new Device("devType", new Properties()));
+				"devId", "command", new Device("devType", new Properties()), new BigDecimal(0));
 		StoreClient store = new StoreClient("obm", 143,
 				"adrien@test.tlse.lng", "aliacom");
 		store.login();
