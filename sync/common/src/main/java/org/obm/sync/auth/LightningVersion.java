@@ -17,7 +17,7 @@ public class LightningVersion extends Version {
 
 	public LightningVersion(int major, int minor, Integer release, Integer subRelease, String suffix) {
 		super(major, minor, release, subRelease, suffix);
-		obmVersionPattern = Pattern.compile(".*(\\d+)obm");
+		obmVersionPattern = Pattern.compile(".*?(\\d+)obm");
 		linagoraVersionPattern = Pattern.compile(".*-LINAGORA-(\\d{2})");		
 		linagoraVersion = parseSuffix();
 	}
