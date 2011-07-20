@@ -86,7 +86,7 @@ public class SyncHandlerTest {
 		StateMachine stateMachine = EasyMock.createMock(StateMachine.class); 
 		stateMachine.getSyncState(collectionId, syncKey);
 		EasyMock.expectLastCall().andReturn(syncState);
-		stateMachine.allocateNewSyncKey(bs, collectionId);
+		stateMachine.allocateNewSyncKey(bs, collectionId, null);
 		EasyMock.expectLastCall().andReturn("newSyncKey");
 		
 		IBackend backend = EasyMock.createMock(IBackend.class);

@@ -253,7 +253,7 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public Integer getCollectionMapping(String loginAtDomain, String deviceId, String collection)
+	public int getCollectionMapping(String loginAtDomain, String deviceId, String collection)
 			throws CollectionNotFoundException, SQLException {
 		Integer id = deviceDao.findDevice(loginAtDomain, deviceId);
 		Integer ret = null;

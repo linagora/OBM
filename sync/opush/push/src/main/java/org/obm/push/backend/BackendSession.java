@@ -2,7 +2,6 @@ package org.obm.push.backend;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,7 +25,6 @@ public class BackendSession {
 	private final String command;
 	private final BigDecimal protocolVersion;
 	private final Map<Integer, SyncState> lastClientSyncState;
-	private final Map<Integer, Date> updatedSyncDate;
 	private final Map<Integer, Set<ItemChange>> unSynchronizedDeletedItemChangeByCollection;
 	
 	private String lastContinuationHandler;
@@ -44,7 +42,6 @@ public class BackendSession {
 		this.protocolVersion = protocolVersion;
 		this.unSynchronizedDeletedItemChangeByCollection = new HashMap<Integer, Set<ItemChange>>();
 		this.lastClientSyncState = new HashMap<Integer, SyncState>();
-		this.updatedSyncDate = new HashMap<Integer, Date>();
 		this.lastMonitored = new HashMap<Integer, SyncCollection>();
 	}
 
@@ -70,15 +67,6 @@ public class BackendSession {
 
 	public String getCommand() {
 		return command;
-	}
-	
-	public Date getUpdatedSyncDate(Integer collectionId) {
-		return updatedSyncDate.get(collectionId);
-	}
-
-	public void addUpdatedSyncDate(Integer collectionId, Date updatedSyncDate) {
-		logger.info("addUpdatedSyncDate [" + collectionId + ", " + updatedSyncDate.toString() + " ]");
-		this.updatedSyncDate.put(collectionId, updatedSyncDate);
 	}
 
 	public BigDecimal getProtocolVersion() {
@@ -133,7 +121,6 @@ public class BackendSession {
 	}
 
 	public void clear(Integer collectionId) {
-		this.updatedSyncDate.remove(collectionId);
 		this.lastClientSyncState.remove(collectionId);
 	}
 

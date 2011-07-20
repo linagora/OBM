@@ -3,6 +3,8 @@ package org.obm.push.store;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.google.common.base.Objects;
+
 
 /**
  * Stores the last sync date for a given sync key & collection
@@ -18,14 +20,21 @@ public class SyncState {
 	private PIMDataType dataType;
 
 	public SyncState(String path) {
-		this(path, null);
+		this(path, null, null);
+	}
+	
+	public SyncState(String path, Date lastSync) {
+		this(path, null, lastSync);
 	}
 	
 	public SyncState(String path, String key) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, 1970);
-		cal.set(Calendar.MONTH, Calendar.JANUARY);
-		lastSync = cal.getTime();
+		this(path, key, null);
+	}
+	
+	public SyncState(String path, String key, Date lastSync) {
+		
+		this.lastSync = Objects.firstNonNull(lastSync, getEpoch());
+		
 		lastSyncFiltred = false;
 		if (path.contains("\\calendar\\")) {
 			this.dataType = PIMDataType.CALENDAR;
@@ -41,6 +50,13 @@ public class SyncState {
 		this.key = key;
 	}
 
+	private Date getEpoch() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, 1970);
+		cal.set(Calendar.MONTH, Calendar.JANUARY);
+		return cal.getTime();
+	}
+	
 	public Date getLastSync() {
 		return lastSync;
 	}

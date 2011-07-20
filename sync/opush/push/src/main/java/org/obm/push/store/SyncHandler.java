@@ -3,6 +3,7 @@ package org.obm.push.store;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -181,15 +182,17 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		}
 	}
 
-	private void doUpdates(BackendSession bs, SyncCollection c, Element ce,
+	private Date doUpdates(BackendSession bs, SyncCollection c, Element ce,
 			Map<String, String> processedClientIds)
 			throws ActiveSyncException, SQLException {
 
 		DataDelta delta = null;
+		Date lastSync = null;
 		
 		int unSynchronizedItemNb = unSynchronizedItemCache.list(bs.getCredentials(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
 			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getOptions().getFilterType(), c.getCollectionId());
+			lastSync = delta.getSyncDate();
 		}
 
 		List<ItemChange> changed = processWindowSize(c, delta, bs,
@@ -287,7 +290,8 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		if (commands.getChildNodes().getLength() == 0) {
 			commands.getParentNode().removeChild(commands);
 		}
-
+		
+		return lastSync;
 	}
 
 	private List<ItemChange> processWindowSize(SyncCollection c, DataDelta delta, 
@@ -483,8 +487,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 					}
 
 					String syncKey = c.getSyncKey();
-					SyncState st = stMachine
-							.getSyncState(c.getCollectionId(), syncKey);
+					SyncState st = stMachine.getSyncState(c.getCollectionId(), syncKey);
 
 					SyncState oldClientSyncKey = bs.getLastClientSyncState(c
 							.getCollectionId());
@@ -511,16 +514,17 @@ public class SyncHandler extends WbxmlRequestHandler implements
 						DOMUtils.createElementAndText(ce, "Status",
 								SyncStatus.OK.asXmlValue());
 
+						Date syncDate = null;
 						if (!syncKey.equals("0")) {
 							if (c.getFetchIds().size() == 0) {
-								doUpdates(bs, c, ce, processedClientIds);
+								syncDate = doUpdates(bs, c, ce, processedClientIds);
 							} else {
 								doFetch(bs, c, ce);
 							}
 						}
 						bs.addLastClientSyncState(c.getCollectionId(), st);
 						sk.setTextContent(stMachine.allocateNewSyncKey(bs,
-								c.getCollectionId()));
+								c.getCollectionId(), syncDate));
 					}
 				} catch (CollectionNotFoundException e) {
 					sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(),

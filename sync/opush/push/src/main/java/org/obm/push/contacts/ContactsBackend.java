@@ -1,6 +1,7 @@
 package org.obm.push.contacts;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -66,6 +67,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			Integer collectionId) {
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		List<ItemChange> deletions = new LinkedList<ItemChange>();
+		Date lastSync = null;
 		logger.info("getContentChanges(" + state.getLastSync() + ")");
 		BookClient bc = getBookClient(bs);
 		AccessToken token = login(bc, bs);
@@ -83,17 +85,13 @@ public class ContactsBackend extends ObmSyncBackend {
 				ItemChange change = createItemChangeToRemove(collectionId, "" + del);
 				deletions.add(change);
 			}
-
-			bs.addUpdatedSyncDate(
-					collectionId, changes
-							.getLastSync());
+			lastSync = changes.getLastSync();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			bc.logout(token);
 		}
-		
-		return new DataDelta(addUpd, deletions);
+		return new DataDelta(addUpd, deletions, lastSync);
 	}
 
 	private ItemChange getContactChange( Integer collectionId,

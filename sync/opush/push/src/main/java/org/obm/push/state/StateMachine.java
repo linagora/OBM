@@ -28,43 +28,31 @@ public class StateMachine {
 	
 	public SyncState getFolderSyncState(String loginAtDomain, String deviceId, String collectionUrl, String syncKey) throws SQLException {
 		try {
-			return getSyncState(store.getCollectionMapping(loginAtDomain, deviceId, collectionUrl),syncKey);
+			int collectionId = store.getCollectionMapping(loginAtDomain, deviceId, collectionUrl);
+			return getSyncState(collectionId, syncKey);
+		
 		} catch (CollectionNotFoundException e) {
-			SyncState ret = new SyncState(collectionUrl);
-			ret.setKey(syncKey);
-			if (!"0".equals(syncKey)) {
-				ret.setLastSync(null);
-			}
-			return ret;
+			return new SyncState(collectionUrl, syncKey);
 		}
 	}
 
 	public SyncState getSyncState(Integer collectionId, String syncKey) throws CollectionNotFoundException {
-		SyncState ret = null;
-
-		ret = store.findStateForKey(syncKey);
-		if (ret == null) {
-			ret = new SyncState(store.getCollectionPath(collectionId));
-			ret.setKey(syncKey);
-			if (!"0".equals(syncKey)) {
-				ret.setLastSync(null);
-			}
+		SyncState syncState = store.findStateForKey(syncKey);
+		if (syncState != null) {
+			return syncState;
 		}
-		return ret;
+		return new SyncState(store.getCollectionPath(collectionId), syncKey);
 	}
 
-	public String allocateNewSyncKey(BackendSession bs, Integer collectionId) throws CollectionNotFoundException, SQLException {
-		final SyncState newState = new SyncState(store.getCollectionPath(collectionId));
-		final Date date = bs.getUpdatedSyncDate(collectionId);
-		if (date != null) {
-			logger.info("allocateNewSyncKey [ " + collectionId + ", " + date.toString() + " ]");
-			newState.setLastSync(date);
-		}
+	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync) throws CollectionNotFoundException, SQLException {
 		String newSk = UUID.randomUUID().toString();
-		newState.setKey(newSk);
+		final SyncState newState = new SyncState(store.getCollectionPath(collectionId), newSk, lastSync);
+		
+		logger.info("allocateNewSyncKey [ " + collectionId + ", " + newState.getLastSync().toString() + " ]");
 		
 		store.updateState(bs.getLoginAtDomain(), bs.getDevId(), collectionId, newState);
 		return newSk;
 	}
+
 
 }

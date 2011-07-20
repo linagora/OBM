@@ -149,7 +149,8 @@ public class CalendarBackend extends ObmSyncBackend {
 		
 		final List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		final List<ItemChange> deletions = new LinkedList<ItemChange>();
-
+		Date syncDate = null;
+		
 		final Date lastSyncDate = state.getLastSync();
 	
 		final AbstractEventSyncClient cc = getCalendarClient(bs, state.getDataType());
@@ -175,7 +176,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			
 			final String userEmail = cc.getUserEmail(token);
 			addOrRemoveEventFilter(addUpd, deletions, changes, userEmail, collectionId, bs);
-			bs.addUpdatedSyncDate(collectionId, changes.getLastSync());
+			syncDate = changes.getLastSync();
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -184,7 +185,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		}
 		
 		logger.info("getContentChanges(" + calendar + ", " + collectionPath + ", lastSync: " + lastSyncDate + ") => " + addUpd.size() + " entries.");
-		return new DataDelta(addUpd, deletions);
+		return new DataDelta(addUpd, deletions, syncDate);
 	}
 
 	private void addOrUpdateEventFilter(List<ItemChange> addUpd, Event[] events, String userEmail, 

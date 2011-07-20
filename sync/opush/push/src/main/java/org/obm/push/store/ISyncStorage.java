@@ -28,7 +28,7 @@ public interface ISyncStorage {
 	/**
 	 * Fetches the id associated with a given collection id string.
 	 */
-	Integer getCollectionMapping(String loginAtDomain, String deviceId, String collectionId)
+	int getCollectionMapping(String loginAtDomain, String deviceId, String collectionId)
 			throws CollectionNotFoundException, SQLException;
 
 	String getCollectionPath(Integer collectionId)

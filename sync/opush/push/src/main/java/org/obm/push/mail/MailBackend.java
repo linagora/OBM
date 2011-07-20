@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -122,6 +123,7 @@ public class MailBackend extends ObmSyncBackend {
 		logger.info("Collection [ " + collectionPath + " ]");
 		List<ItemChange> changes = new LinkedList<ItemChange>();
 		List<ItemChange> deletions = new LinkedList<ItemChange>();
+		Date lastSync = null;
 		try {
 			int devId = getDevId(bs.getLoginAtDomain(), bs.getDevId());
 			
@@ -129,12 +131,12 @@ public class MailBackend extends ObmSyncBackend {
 			
 			changes = getChanges(bs, collectionId, collectionPath, mc.getUpdated());
 			deletions.addAll(getDeletions(collectionId, mc.getRemoved()));
+			lastSync = mc.getLastSync();
 			
-			bs.addUpdatedSyncDate(getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), collectionPath), mc.getLastSync());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		return new DataDelta(changes, deletions);
+		return new DataDelta(changes, deletions, lastSync);
 	}
 
 	private List<ItemChange> getChanges(BackendSession bs, Integer collectionId, String collection, Set<Long> updated) {

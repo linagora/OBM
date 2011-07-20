@@ -46,15 +46,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		
 		logger.info("devType = {}", bs.getDevType());
 		if (doc == null) {
-			try {
-				responder
-						.sendResponseFile(
-								"text/plain",
-								new ByteArrayInputStream("OPUSH IS ALIVE\n"
-										.getBytes()));
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
+			answerOpushIsAlive(responder);
 			return;
 		}
 
@@ -111,7 +103,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			}
 			
 			String newSyncKey = stMachine.allocateNewSyncKey(bs,
-					hierarchyExporter.getRootFolderId(bs));
+					hierarchyExporter.getRootFolderId(bs), null);
 			
 			sk.setTextContent(newSyncKey);
 			responder.sendResponse("FolderHierarchy", ret);
@@ -122,6 +114,18 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 		}
 
+	}
+
+	private void answerOpushIsAlive(Responder responder) {
+		try {
+			responder
+					.sendResponseFile(
+							"text/plain",
+							new ByteArrayInputStream("OPUSH IS ALIVE\n"
+									.getBytes()));
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
 	}
 
 	private void encode(Element add, ItemChange sf) {
