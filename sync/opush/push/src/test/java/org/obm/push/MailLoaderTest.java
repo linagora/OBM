@@ -1,5 +1,7 @@
 package org.obm.push;
 
+import java.util.Properties;
+
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
@@ -17,7 +19,7 @@ public class MailLoaderTest extends TestCase {
 
 	public void testMailLoader() {
 		BackendSession bs = new BackendSession(new Credentials("thomas@zz.com", "aliacom"),
-				"devId", "devType", "command");
+				"devId", "command", new Device("devType", new Properties()));
 		StoreClient store = new StoreClient("obm23.buffy.kvm", 143,
 				"thomas@zz.com", "aliacom");
 		store.login();
@@ -33,7 +35,7 @@ public class MailLoaderTest extends TestCase {
 	
 	public void testMailLoader1() {
 		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lng", "aliacom"),
-				"devId", "devType", "command");
+				"devId", "command", new Device("devType", new Properties()));
 		StoreClient store = new StoreClient("obm", 143,
 				"adrien@test.tlse.lng", "aliacom");
 		store.login();
@@ -47,7 +49,7 @@ public class MailLoaderTest extends TestCase {
 	
 	public void testMailLoader2() {
 		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lng", "aliacom"),
-				"devId", "devType", "command");
+				"devId", "command", new Device("devType", new Properties()));
 		StoreClient store = new StoreClient("obm", 143,
 				"adrien@test.tlse.lng", "aliacom");
 		store.login();

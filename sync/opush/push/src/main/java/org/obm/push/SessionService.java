@@ -2,10 +2,10 @@ package org.obm.push;
 
 import java.math.BigDecimal;
 
+import org.obm.push.Device.Factory;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.impl.ActiveSyncRequest;
 import org.obm.push.impl.Credentials;
-import org.obm.push.impl.HintsLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +16,11 @@ import com.google.inject.Singleton;
 public class SessionService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
+	private final Factory deviceFactory;
 	
 	@Inject
-	private SessionService() {
+	private SessionService(Device.Factory deviceFactory) {
+		this.deviceFactory = deviceFactory;
 	}
 	
 	public BackendSession getSession(
@@ -33,9 +35,12 @@ public class SessionService {
 
 	private BackendSession createSession(Credentials credentials,
 			ActiveSyncRequest r, String sessionId) {
+		
+		String userAgent = r.getHeader("User-Agent");
+		String devType = r.extractDeviceType();
 		BackendSession bs = new BackendSession(credentials, r.p("DeviceId"),
-				r.extractDeviceType(), r.p("Cmd"));
-		HintsLoader.addHintsToSession(r, bs);
+				r.p("Cmd"), deviceFactory.create(devType, userAgent));
+		
 		logger.info("New session = {}", sessionId);
 		return bs;
 	}

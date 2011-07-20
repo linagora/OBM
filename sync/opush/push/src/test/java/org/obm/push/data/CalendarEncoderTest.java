@@ -2,10 +2,12 @@ package org.obm.push.data;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
+import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.push.Device;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.MSAttendee;
 import org.obm.push.backend.MSEvent;
@@ -37,7 +39,7 @@ public class CalendarEncoderTest {
 
 	private BackendSession getFakeBackendSession() {
 		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lngr", "test"),
-				"devId", "devType", "Sync");
+				"devId", "Sync", new Device("devType", new Properties()));
 		bs.setProtocolVersion(new BigDecimal(12.5));
 		return bs;
 	}

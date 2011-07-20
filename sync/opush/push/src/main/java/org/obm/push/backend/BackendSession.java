@@ -1,15 +1,14 @@
 package org.obm.push.backend;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
+import org.obm.push.Device;
 import org.obm.push.ItemChange;
 import org.obm.push.impl.Credentials;
 import org.obm.push.store.SyncCollection;
@@ -21,11 +20,10 @@ public class BackendSession {
 
 	private static final Logger logger = LoggerFactory.getLogger(BackendSession.class);
 
-	private Credentials credentials;
-	private String devId;
-	private String devType;
+	private final Credentials credentials;
+	private final String devId;
 	private String command;
-	private Properties hints;
+	
 	private Map<Integer, Date> updatedSyncDate;
 	private Map<Integer, Set<ItemChange>> unSynchronizedItemChangeByCollection;
 	private Map<Integer, Set<ItemChange>> unSynchronizedDeletedItemChangeByCollection;
@@ -42,45 +40,24 @@ public class BackendSession {
 
 	private Map<String, String> lastSyncProcessedClientIds;
 
+	private final Device device;
 
-	public BackendSession(Credentials credentials, String devId,
-			String devType, String command) {
+
+	public BackendSession(Credentials credentials, String devId, String command, Device device) {
 		super();
 		this.credentials = credentials;
 		this.devId = devId;
-		this.devType = devType;
 		this.command = command;
+		this.device = device;
 		this.unSynchronizedItemChangeByCollection = new HashMap<Integer, Set<ItemChange>>();
 		this.unSynchronizedDeletedItemChangeByCollection = new HashMap<Integer, Set<ItemChange>>();
 		this.lastClientSyncState = new HashMap<Integer, SyncState>();
 		this.updatedSyncDate = new HashMap<Integer, Date>();
 		this.lastMonitored = new HashMap<Integer, SyncCollection>();
-		loadHints();
-	}
-
-	public void setHint(String key, boolean value) {
-		hints.put(key, value);
 	}
 
 	public boolean checkHint(String key, boolean defaultValue) {
-		if (!hints.containsKey(key)) {
-			return defaultValue;
-		} else {
-			return "true".equals(hints.get(key));
-		}
-	}
-
-	private void loadHints() {
-		hints = new Properties();
-		try {
-			InputStream in = BackendSession.class.getClassLoader()
-					.getResourceAsStream("hints/" + devType + ".hints");
-			hints.load(in);
-			in.close();
-			logger.info("Loaded hints for " + devType);
-		} catch (Throwable e) {
-			logger.warn("could not load hints for device type " + devType);
-		}
+		return device.checkHint(key, defaultValue);
 	}
 
 	public String getLoginAtDomain() {
@@ -91,24 +68,12 @@ public class BackendSession {
 		return credentials.getPassword();
 	}
 
-	public void setCredentials(Credentials credentials) {
-		this.credentials = credentials;
-	}
-
 	public String getDevId() {
 		return devId;
 	}
 
-	public void setDevId(String devId) {
-		this.devId = devId;
-	}
-
 	public String getDevType() {
-		return devType;
-	}
-
-	public void setDevType(String devType) {
-		this.devType = devType;
+		return device.getDevType();
 	}
 
 	public String getCommand() {
