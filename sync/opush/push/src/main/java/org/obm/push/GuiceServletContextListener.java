@@ -7,9 +7,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.push.backend.BackendFactory;
 import org.obm.push.backend.IBackend;
-import org.obm.push.backend.IBackendFactory;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
@@ -18,9 +16,7 @@ import org.obm.push.backend.OBMBackend;
 import org.obm.push.impl.InvitationFilterManagerImpl;
 import org.obm.push.mail.EmailManager;
 import org.obm.push.mail.IEmailManager;
-import org.obm.push.store.IStorageFactory;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.StorageFactory;
 import org.obm.push.store.SyncStorage;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
@@ -60,8 +56,6 @@ public class GuiceServletContextListener implements ServletContextListener {
     	return Guice.createInjector(new AbstractModule() {
 			@Override
 			protected void configure() {
-				bind(IStorageFactory.class).to(StorageFactory.class);
-				bind(IBackendFactory.class).to(BackendFactory.class);
 				bind(ISyncStorage.class).to(SyncStorage.class);
 				bind(IEmailManager.class).to(EmailManager.class);
 				bind(IHierarchyExporter.class).to(HierarchyExporter.class);

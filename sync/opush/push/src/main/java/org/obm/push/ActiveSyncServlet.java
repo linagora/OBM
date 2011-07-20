@@ -6,7 +6,6 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.naming.ConfigurationException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
-import org.obm.push.backend.IBackendFactory;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
@@ -40,7 +38,6 @@ import org.obm.push.impl.SettingsHandler;
 import org.obm.push.impl.SmartForwardHandler;
 import org.obm.push.impl.SmartReplyHandler;
 import org.obm.push.logging.TechnicalLogType;
-import org.obm.push.store.IStorageFactory;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.SyncHandler;
 import org.slf4j.Logger;
@@ -145,25 +142,21 @@ public class ActiveSyncServlet extends HttpServlet {
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
-		try {
-			super.init(config);
-			
-			injector = 
-					(Injector) config
-						.getServletContext()
-						.getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
-			
-			loggerService = injector.getInstance(LoggerService.class);
-			storage = injector.getInstance(IStorageFactory.class).createStorage();
-			backend = injector.getInstance(IBackendFactory.class).loadBackend();
-			sessionService = injector.getInstance(SessionService.class);
-			continuationFactory = injector.getInstance(PushContinuation.Factory.class);
-			
-			handlers = createHandlersMap();
-			logger.info("Opush ActiveSync servlet initialised.");
-		} catch (ConfigurationException e) {
-			throw new ServletException(e);
-		}
+		super.init(config);
+		
+		injector = 
+				(Injector) config
+					.getServletContext()
+					.getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
+		
+		loggerService = injector.getInstance(LoggerService.class);
+		storage = injector.getInstance(ISyncStorage.class);
+		backend = injector.getInstance(IBackend.class);
+		sessionService = injector.getInstance(SessionService.class);
+		continuationFactory = injector.getInstance(PushContinuation.Factory.class);
+		
+		handlers = createHandlersMap();
+		logger.info("Opush ActiveSync servlet initialised.");
 	}
 
 	private ImmutableMap<String, IRequestHandler> createHandlersMap() {
