@@ -10,14 +10,8 @@
 	<name>obm-sync and opush 2.4 parent project</name>
 
 	<properties>
-		<obm-sync-client.version>2.4.0-rc5-SNAPSHOT</obm-sync-client.version>		
-		<obm-sync-common.version>2.4.0-rc5-SNAPSHOT</obm-sync-common.version>		
-		<obm-sync-locator.version>2.4.0-rc5-SNAPSHOT</obm-sync-locator.version>		
-		<obm-sync-message-queue.version>2.4.0-rc5-SNAPSHOT</obm-sync-message-queue.version>	
-		<obm-sync-services.version>2.4.0-rc5-SNAPSHOT</obm-sync-services.version>		
-
-		<dbcp.version>2.4.0-rc5-SNAPSHOT</dbcp.version>
-		<utils.version>2.4.0-rc5-SNAPSHOT</utils.version>
+		<obm.version>2.4.0-rc5-SNAPSHOT</obm.version>		
+		
 
 		<postgresql.version>9.0-801.jdbc4</postgresql.version>
 		<mysql-connector-java.version>5.1.16</mysql-connector-java.version>

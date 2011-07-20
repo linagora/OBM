@@ -27,12 +27,12 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>imap</artifactId>
-			<version>${opush-imap.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>mime</artifactId>
-			<version>${opush-mime.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>
 

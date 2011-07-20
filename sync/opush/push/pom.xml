@@ -105,12 +105,12 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>locator</artifactId>
-			<version>2.4.0-rc5-SNAPSHOT</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>imap</artifactId>
-			<version>${opush-imap.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>columba</groupId>
@@ -120,37 +120,37 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>tnefconverter</artifactId>
-			<version>${opush-tnefconverter.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>mail</artifactId>
-			<version>${opush-mail.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>utils</artifactId>
-			<version>${utils.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>wbxml</artifactId>
-			<version>${opush-wbxml.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>dbcp</artifactId>
-			<version>${dbcp.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
-			<version>2.4.0-rc5-SNAPSHOT</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-dao</artifactId>
-			<version>2.4.0-rc5-SNAPSHOT</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 

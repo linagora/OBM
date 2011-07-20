@@ -46,17 +46,17 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>utils</artifactId>
-			<version>${utils.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>dbcp</artifactId>
-			<version>${dbcp.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
-			<version>2.4.0-rc5-SNAPSHOT</version>
+			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>
 </project>

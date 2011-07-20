@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common</artifactId>
-			<version>${obm-sync-common.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

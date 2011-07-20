@@ -20,12 +20,12 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>dbcp</artifactId>
-			<version>${dbcp.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>utils</artifactId>
-			<version>${utils.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

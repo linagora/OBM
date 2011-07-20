@@ -17,14 +17,6 @@
 	<version>2.4.0-rc5-SNAPSHOT</version>
 
 	<properties>
-		<opush-client.version>2.4.0-rc5-SNAPSHOT</opush-client.version>
-		<opush-imap.version>2.4.0-rc5-SNAPSHOT</opush-imap.version>
-		<opush-mail.version>2.4.0-rc5-SNAPSHOT</opush-mail.version>
-		<opush-mime.version>2.4.0-rc5-SNAPSHOT</opush-mime.version>
-		<opush-push.version>2.4.0-rc5-SNAPSHOT</opush-push.version>
-		<opush-tnefconverter.version>2.4.0-rc5-SNAPSHOT</opush-tnefconverter.version>
-		<opush-wbxml.version>2.4.0-rc5-SNAPSHOT</opush-wbxml.version>
-
 		<mailapi.version>1.4.3</mailapi.version>
 		<backport-util-concurrent.version>3.1</backport-util-concurrent.version>
 	</properties>
@@ -51,12 +43,12 @@
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>common</artifactId>
-				<version>${obm-sync-common.version}</version>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>client</artifactId>
-				<version>${obm-sync-client.version}</version>
+				<version>${obm.version}</version>
 			</dependency>			
 			<dependency>
 				<groupId>backport-util-concurrent</groupId>

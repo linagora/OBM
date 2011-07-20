@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common</artifactId>
-			<version>${obm-sync-common.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
@@ -55,12 +55,12 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>message-queue</artifactId>
-			<version>${obm-sync-message-queue.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>locator</artifactId>
-			<version>${obm-sync-locator.version}</version>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.solr</groupId>
