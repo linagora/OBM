@@ -1,4 +1,3 @@
-package org.obm.configuration;
 /* ***** BEGIN LICENSE BLOCK *****
  * 
  * Copyright (c) 1997-2008 Aliasource - Groupe LINAGORA
@@ -16,7 +15,7 @@ package org.obm.configuration;
  *  http://www.obm.org/                                              
  * 
  * ***** END LICENSE BLOCK ***** */
-
+package org.obm.configuration;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,8 +34,7 @@ public class ConfigurationService {
 	private final static String LOCATOR_PORT = "8082";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ConfigurationService.class);
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Properties props;
 
