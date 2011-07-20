@@ -98,10 +98,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 				sync = syncDecoder.decodeSync(doc, bs);
 				bs.setLastSyncProcessedClientIds(processedClientIds);
 			} else {
-				if (bs.getLastSync() == null) {
-					throw new PartialException();
-				}
-				sync = bs.getLastSync();
+				throw new PartialException();
 			}
 			boolean modif = processCollections(bs, sync, processedClientIds);
 			if (sync.getWaitInSecond() > 0 && !modif) {

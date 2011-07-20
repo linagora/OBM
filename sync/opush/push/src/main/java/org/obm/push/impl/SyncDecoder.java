@@ -54,8 +54,7 @@ public class SyncDecoder {
 				.build();
 	}
 
-	public Sync decodeSync(Document doc, BackendSession bs)
-			throws PartialException, ProtocolException {
+	public Sync decodeSync(Document doc, BackendSession bs) throws PartialException, ProtocolException {
 		Sync ret = new Sync();
 		Element root = doc.getDocumentElement();
 		ret.setWait(getWait(root));
@@ -70,10 +69,6 @@ public class SyncDecoder {
 			SyncCollection collec = getCollection(col, isPartial,
 					bs.getLastMonitoredById());
 			ret.addCollection(collec);
-		}
-		if (ret.getWaitInSecond() > 0 && ret.getCollections().size() == 0
-				&& bs.getLastSync() != null) {
-			ret.getCollections().addAll(bs.getLastSync().getCollections());
 		}
 		if (ret.getCollections().size() == 0) {
 			throw new PartialException();

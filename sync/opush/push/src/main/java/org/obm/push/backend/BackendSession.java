@@ -31,8 +31,6 @@ public class BackendSession {
 	
 	private String lastContinuationHandler;
 	private String policyKey;
-	
-	private Sync lastSync;
 
 	private Map<Integer, SyncCollection> lastMonitored;
 	private Map<String, String> lastSyncProcessedClientIds;
@@ -137,14 +135,6 @@ public class BackendSession {
 	public void clear(Integer collectionId) {
 		this.updatedSyncDate.remove(collectionId);
 		this.lastClientSyncState.remove(collectionId);
-	}
-	
-	public Sync getLastSync() {
-		return lastSync;
-	}
-
-	public void setLastSync(Sync lastSync) {
-		this.lastSync = lastSync;
 	}
 
 	public String getLastContinuationHandler() {
