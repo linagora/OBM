@@ -40,6 +40,7 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -65,6 +66,11 @@ import com.google.inject.Singleton;
 public class SyncHandler extends WbxmlRequestHandler implements
 		IContinuationHandler {
 
+	private static class ModificationStatus {
+		public Map<String, String> processedClientIds = new HashMap<String, String>();
+		public boolean hasChanges = false;
+	}
+	
 	public static final Integer SYNC_TRUNCATION_ALL = 9;
 	private static Map<Integer, IContinuation> waitContinuationCache;
 	private final SyncDecoder syncDecoder;
@@ -92,54 +98,19 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()
 				+ ")");
 		try {
-			Map<String, String> processedClientIds = new HashMap<String, String>();
-			Sync sync = null;
-			if (doc != null) {
-				sync = syncDecoder.decodeSync(doc, bs);
-				bs.setLastSyncProcessedClientIds(processedClientIds);
-			} else {
+			if (doc == null) {
 				throw new PartialException();
 			}
-			boolean modif = processCollections(bs, sync, processedClientIds);
-			if (sync.getWaitInSecond() > 0 && !modif) {
-				logger.info("suspend for " + sync.getWaitInSecond()
-						+ " seconds");
-				if (sync.getWaitInSecond() > 3540) {
-					sendWaitIntervalOutOfRangeError(responder);
-					return;
-				}
-				for (SyncCollection sc : sync.getCollections()) {
-					String collectionPath = storage.getCollectionPath(sc.getCollectionId());
-					sc.setCollectionPath(collectionPath);
-					PIMDataType dataClass = storage.getDataClass(
-							collectionPath);
-					if ("email".equalsIgnoreCase(dataClass.toString())) {
-						backend.startEmailMonitoring(bs, sc.getCollectionId());
-						break;
-					}
-				}
-				continuation.setLastContinuationHandler(this);
-				bs.setLastMonitored(sync.getCollectionById());
-				CollectionChangeListener l = new CollectionChangeListener(bs,
-						continuation, sync.getCollections());
-				IListenerRegistration reg = backend.addChangeListener(l);
-				continuation.setListenerRegistration(reg);
-				continuation.setCollectionChangeListener(l);
-				for (SyncCollection sc : sync.getCollections()) {
-					waitContinuationCache.put(sc.getCollectionId(),
-							continuation);
-				}
+			Sync sync = null;
+			sync = syncDecoder.decodeSync(doc, bs);
 
-				synchronized (bs) {
-					// logger
-					// .warn("for testing purpose, we will only suspend for 40sec (to monitor: "
-					// + bs.getLastMonitored() + ")");
-					// continuation.suspend(10 * 1000);
-					continuation.suspend(sync.getWaitInSecond() * 1000);
-				}
+			ModificationStatus modificationStatus = processCollections(bs, sync);
+
+			if (!modificationStatus.hasChanges && sync.getWaitInSecond() > 0) {
+				registerWaitingSync(continuation, bs, responder, sync);
 			} else {
 				processResponse(bs, responder, sync.getCollections(),
-						processedClientIds, continuation);
+						modificationStatus.processedClientIds, continuation);
 			}
 
 		} catch (ProtocolException convExpt) {
@@ -164,6 +135,46 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			throw e;
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
+		}
+	}
+
+	private void registerWaitingSync(IContinuation continuation,
+			BackendSession bs, Responder responder, Sync sync)
+			throws CollectionNotFoundException, ActiveSyncException {
+		logger.info("suspend for " + sync.getWaitInSecond()
+				+ " seconds");
+		if (sync.getWaitInSecond() > 3540) {
+			sendWaitIntervalOutOfRangeError(responder);
+			return;
+		}
+		for (SyncCollection sc : sync.getCollections()) {
+			String collectionPath = storage.getCollectionPath(sc.getCollectionId());
+			sc.setCollectionPath(collectionPath);
+			PIMDataType dataClass = storage.getDataClass(
+					collectionPath);
+			if ("email".equalsIgnoreCase(dataClass.toString())) {
+				backend.startEmailMonitoring(bs, sc.getCollectionId());
+				break;
+			}
+		}
+		continuation.setLastContinuationHandler(this);
+		bs.setLastMonitored(sync.getCollectionById());
+		CollectionChangeListener l = new CollectionChangeListener(bs,
+				continuation, sync.getCollections());
+		IListenerRegistration reg = backend.addChangeListener(l);
+		continuation.setListenerRegistration(reg);
+		continuation.setCollectionChangeListener(l);
+		for (SyncCollection sc : sync.getCollections()) {
+			waitContinuationCache.put(sc.getCollectionId(),
+					continuation);
+		}
+
+		synchronized (bs) {
+			// logger
+			// .warn("for testing purpose, we will only suspend for 40sec (to monitor: "
+			// + bs.getLastMonitored() + ")");
+			// continuation.suspend(10 * 1000);
+			continuation.suspend(sync.getWaitInSecond() * 1000);
 		}
 	}
 
@@ -380,14 +391,15 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		encoder.encode(bs, apData, data, c, true);
 	}
 
-	private boolean processCollections(BackendSession bs,
-			Sync sync, Map<String, String> processedClientIds)
+	private ModificationStatus processCollections(BackendSession bs, Sync sync)
 			throws ActiveSyncException {
-		boolean changes = false;
+		ModificationStatus modificationStatus = new ModificationStatus();
+
 		for (SyncCollection collection : sync.getCollections()) {
-			SyncState colState = stMachine.getSyncState(collection.getCollectionId(),
+			// get our sync state for this collection
+			SyncState collectionState = stMachine.getSyncState(collection.getCollectionId(),
 					collection.getSyncKey());
-			collection.setSyncState(colState);
+			collection.setSyncState(collectionState);
 			// Disables last push request
 			IContinuation cont = waitContinuationCache.get(collection
 					.getCollectionId());
@@ -395,32 +407,30 @@ public class SyncHandler extends WbxmlRequestHandler implements
 				cont.error(SyncStatus.NEED_RETRY.asXmlValue());
 			}
 
-			if (colState.isValid()) {
-				// get our sync state for this collection
-				processModification(bs, collection, processedClientIds);
+			if (collectionState.isValid()) {
+
+				Map<String, String> processedClientIds = processModification(bs, collection);
+				modificationStatus.processedClientIds.putAll(processedClientIds);
 			}
-			changes = changes || haveFilteredItemToSync(bs, collection);
+			modificationStatus.hasChanges |= haveFilteredItemToSync(bs, collection);
 		}
-		return changes;
+		return modificationStatus;
 	}
 
 	private boolean haveFilteredItemToSync(BackendSession bs,
 			SyncCollection collection) {
 		return contentsExporter.getFilterChanges(bs, collection);
 	}
-
+	
 	/**
 	 * Handles modifications requested by mobile device
-	 * 
-	 * @param bs
-	 * @param collection
-	 * @param importer
-	 * @param modification
-	 * @param processedClientIds
-	 * @throws ActiveSyncException
+	 * @return 
 	 */
-	private void processModification(BackendSession bs,
-			SyncCollection collection, Map<String, String> processedClientIds) throws ActiveSyncException {
+	private Map<String, String> processModification(BackendSession bs,
+			SyncCollection collection) throws ActiveSyncException {
+		
+		Map<String, String> processedClientIds = new HashMap<String, String>();
+		
 		for (SyncCollectionChange change : collection.getChanges()) {
 
 			if (change.getModType().equals("Modify")) {
@@ -450,6 +460,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 						collection.getOptions().isDeletesAsMoves());
 			}
 		}
+		return processedClientIds;
 	}
 
 	@Override
@@ -462,9 +473,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	public void sendResponse(BackendSession bs, Responder responder,
 			boolean sendHierarchyChange, IContinuation continuation) {
 		
-		Map<String, String> processedClientIds = new HashMap<String, String>(
-				bs.getLastSyncProcessedClientIds());
-		bs.setLastSyncProcessedClientIds(new HashMap<String, String>());
+		Map<String, String> processedClientIds = ImmutableMap.<String, String>of();
 		processResponse(bs, responder, bs.getLastMonitored(),
 				processedClientIds, continuation);
 

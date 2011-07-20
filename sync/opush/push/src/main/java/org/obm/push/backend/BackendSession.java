@@ -19,7 +19,6 @@ public class BackendSession {
 	private final BigDecimal protocolVersion;
 
 	private Map<Integer, SyncCollection> lastMonitored;
-	private Map<String, String> lastSyncProcessedClientIds;
 
 	public BackendSession(Credentials credentials, String devId, String command, Device device, BigDecimal protocolVersion) {
 		super();
@@ -69,15 +68,6 @@ public class BackendSession {
 
 	public void setLastMonitored(Map<Integer, SyncCollection> lastMonitored) {
 		this.lastMonitored = lastMonitored;
-	}
-
-	public Map<String, String> getLastSyncProcessedClientIds() {
-		return lastSyncProcessedClientIds;
-	}
-
-	public void setLastSyncProcessedClientIds(
-			Map<String, String> lastSyncProcessedClientIds) {
-		this.lastSyncProcessedClientIds = lastSyncProcessedClientIds;
 	}
 
 	public void setLastMonitored(Set<SyncCollection> toMonitor) {
