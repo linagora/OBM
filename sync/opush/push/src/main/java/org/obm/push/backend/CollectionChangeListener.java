@@ -34,10 +34,8 @@ public class CollectionChangeListener implements
 	}
 	
 	public void changesDetected() {
-		synchronized (bs) {
-			continuation.setBackendSession(bs);
-			continuation.resume();
-		}
+		continuation.setBackendSession(bs);
+		continuation.resume();
 	}
 
 }

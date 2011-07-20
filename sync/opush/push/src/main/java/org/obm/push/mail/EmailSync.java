@@ -63,7 +63,7 @@ public class EmailSync implements IEmailSync {
 	}
 
 	@Override
-	public synchronized MailChanges getSync(StoreClient imapStore, Integer devId, BackendSession bs, 
+	public MailChanges getSync(StoreClient imapStore, Integer devId, BackendSession bs, 
 			SyncState state, Integer collectionId, FilterType filter) throws ServerErrorException {
 		
 		TransactionManager ut = dataSource.getTransactionManager();

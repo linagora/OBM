@@ -108,7 +108,7 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public synchronized void updateLastHearbeat(String loginAtDomain, String devId, long hearbeat) throws SQLException {
+	public void updateLastHearbeat(String loginAtDomain, String devId, long hearbeat) throws SQLException {
 		Integer id = deviceDao.findDevice(loginAtDomain, devId);
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -225,7 +225,7 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public synchronized void updateState(String loginAtDomain, String devId, Integer collectionId,
+	public void updateState(String loginAtDomain, String devId, Integer collectionId,
 			SyncState state) throws SQLException {
 		Integer id = deviceDao.findDevice(loginAtDomain, devId);
 		Connection con = null;
@@ -374,7 +374,7 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public synchronized void resetCollection(String loginAtDomain, String devId, Integer collectionId) throws SQLException {
+	public void resetCollection(String loginAtDomain, String devId, Integer collectionId) throws SQLException {
 		Integer id = deviceDao.findDevice(loginAtDomain, devId);
 
 		Connection con = null;

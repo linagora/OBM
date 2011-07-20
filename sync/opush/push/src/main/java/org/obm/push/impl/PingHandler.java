@@ -112,9 +112,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 				continuation.setListenerRegistration(reg);
 				continuation.setCollectionChangeListener(l);
 				logger.info("suspend for " + intervalSeconds + " seconds");
-				synchronized (bs) {
-					continuation.suspend(intervalSeconds * 1000);
-				}
+				continuation.suspend(intervalSeconds * 1000);
 			} else {
 				logger.error("Don't know what to monitor, interval is null");
 				sendError(responder, PingStatus.MISSING_REQUEST_PARAMS,continuation);

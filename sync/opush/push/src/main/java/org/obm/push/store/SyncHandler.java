@@ -169,13 +169,11 @@ public class SyncHandler extends WbxmlRequestHandler implements
 					continuation);
 		}
 
-		synchronized (bs) {
-			// logger
-			// .warn("for testing purpose, we will only suspend for 40sec (to monitor: "
-			// + bs.getLastMonitored() + ")");
-			// continuation.suspend(10 * 1000);
-			continuation.suspend(sync.getWaitInSecond() * 1000);
-		}
+		// logger
+		// .warn("for testing purpose, we will only suspend for 40sec (to monitor: "
+		// + bs.getLastMonitored() + ")");
+		// continuation.suspend(10 * 1000);
+		continuation.suspend(sync.getWaitInSecond() * 1000);
 	}
 
 	private void sendWaitIntervalOutOfRangeError(Responder responder) {
