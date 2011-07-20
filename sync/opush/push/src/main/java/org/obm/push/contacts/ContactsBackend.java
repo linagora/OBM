@@ -90,9 +90,10 @@ public class ContactsBackend extends ObmSyncBackend {
 							.getLastSync());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+		} finally {
+			bc.logout(token);
 		}
-
-		bc.logout(token);
+		
 		return new DataDelta(addUpd, deletions);
 	}
 
@@ -129,8 +130,9 @@ public class ContactsBackend extends ObmSyncBackend {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+		} finally {
+			bc.logout(token);
 		}
-		bc.logout(token);
 
 		return getServerIdFor(collectionId, id);
 	}
@@ -148,8 +150,9 @@ public class ContactsBackend extends ObmSyncBackend {
 					bc.removeContact(token, BookType.contacts, id);
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
+				} finally {
+					bc.logout(token);
 				}
-				bc.logout(token);
 			}
 		}
 	}
@@ -157,14 +160,14 @@ public class ContactsBackend extends ObmSyncBackend {
 	public List<ItemChange> fetchItems(BackendSession bs,
 			List<String> fetchServerIds) throws ObjectNotFoundException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
+		BookClient bc = getBookClient(bs);
+		AccessToken token = bc.login(bs.getLoginAtDomain(), bs.getPassword(), "o-push");
+
 		try {
 			for (String serverId : fetchServerIds) {
 				Integer id = getItemIdFor(serverId);
 				if (id != null) {
-					BookClient bc = getBookClient(bs);
-					AccessToken token = bc.login(bs.getLoginAtDomain(), bs
-							.getPassword(), "o-push");
-
+					
 					Contact c = bc.getContactFromId(token, BookType.contacts,
 							id.toString());
 					ItemChange ic = new ItemChange();
@@ -177,6 +180,8 @@ public class ContactsBackend extends ObmSyncBackend {
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 			throw new ObjectNotFoundException();
+		} finally {
+			bc.logout(token);
 		}
 		return ret;
 	}

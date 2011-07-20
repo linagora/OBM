@@ -122,14 +122,17 @@ public class ObmSyncBackend {
 		CalendarClient cc = cl.locate("http://" + obmSyncHost
 				+ ":8080/obm-sync/services");
 		AccessToken token = cc.login(loginAtDomain, password, "o-push");
-		Boolean valid = true;
-		if (token == null || token.getSessionId() == null) {
-			logger.info(loginAtDomain
-					+ " can't log on obm-sync. The username or password isn't valid");
-			valid = false;
+		try {
+			Boolean valid = true;
+			if (token == null || token.getSessionId() == null) {
+				logger.info(loginAtDomain
+						+ " can't log on obm-sync. The username or password isn't valid");
+				valid = false;
+			}
+			return valid;
+		} finally {
+			cc.logout(token);
 		}
-		cc.logout(token);
-		return valid;
 	}
 
 	private void validateOBMConnection() {

@@ -109,8 +109,9 @@ public class CalendarBackend extends ObmSyncBackend {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+		} finally {
+			cc.logout(token);
 		}
-		cc.logout(token);
 
 		return ret;
 	}
@@ -333,8 +334,9 @@ public class CalendarBackend extends ObmSyncBackend {
 					}
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
+				} finally {
+					bc.logout(token);
 				}
-				bc.logout(token);
 			}
 		}
 	}

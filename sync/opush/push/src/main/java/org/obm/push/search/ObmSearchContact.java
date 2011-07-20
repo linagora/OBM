@@ -52,6 +52,8 @@ public class ObmSearchContact implements ISearchSource {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+		} finally {
+			bc.logout(token);
 		}
 		return ret;
 	}
