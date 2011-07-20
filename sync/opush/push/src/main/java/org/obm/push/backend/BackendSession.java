@@ -19,7 +19,6 @@ public class BackendSession {
 	private final BigDecimal protocolVersion;
 	
 	private String lastContinuationHandler;
-	private String policyKey;
 
 	private Map<Integer, SyncCollection> lastMonitored;
 	private Map<String, String> lastSyncProcessedClientIds;
@@ -60,14 +59,6 @@ public class BackendSession {
 
 	public BigDecimal getProtocolVersion() {
 		return this.protocolVersion;
-	}
-
-	public void setPolicyKey(String pKey) {
-		this.policyKey = pKey;
-	}
-
-	public String getPolicyKey() {
-		return policyKey;
 	}
 	
 	public Map<Integer, SyncCollection> getLastMonitoredById() {

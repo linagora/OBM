@@ -89,8 +89,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 				DOMUtils.createElementAndText(policy, "PolicyType", policyType);
 				if (DEFAULT_PKEY.equals(pKey)) {
 					DOMUtils.createElementAndText(policy, "Status", "1");
-					pKey = "" + Math.abs((random.nextInt() >> 2));
-					bs.setPolicyKey(pKey);
+					pKey = String.valueOf(Math.abs((random.nextInt() >> 2)));
 					DOMUtils.createElementAndText(policy, "PolicyKey", pKey);
 				} else {
 					// The client is acknowledging the wrong policy key.
