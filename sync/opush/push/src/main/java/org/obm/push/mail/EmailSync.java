@@ -24,13 +24,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.transaction.TransactionManager;
-
 import org.minig.imap.FastFetch;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
-import org.obm.dbcp.DBCP;
-import org.obm.dbcp.DataSource;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.store.Email;
@@ -50,29 +46,23 @@ import com.google.inject.Singleton;
 @Singleton
 public class EmailSync implements IEmailSync {
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(EmailSync.class);
+	private final static Logger logger = LoggerFactory.getLogger(EmailSync.class);
 
 	private final ISyncStorage storage;
-	private final DataSource dataSource;
 
 	@Inject
-	public EmailSync(ISyncStorage storage, DBCP dbcp) {
+	public EmailSync(ISyncStorage storage) {
 		this.storage = storage;
-		this.dataSource = dbcp.getDataSource();
 	}
 
 	@Override
 	public MailChanges getSync(StoreClient imapStore, Integer devId, BackendSession bs, 
 			SyncState state, Integer collectionId, FilterType filter) throws ServerErrorException {
 		
-		TransactionManager ut = dataSource.getTransactionManager();
 		try {
 			
 			long time = getCurrentTime();
 			long ct = getCurrentTime();
-			
-			ut.begin();
 			
 			final Set<Email> syncedMail = storage.getSyncedMail(devId, collectionId);
 			
@@ -111,10 +101,8 @@ public class EmailSync implements IEmailSync {
 					new Object[]{collectionId, filter, sync.getUpdated().size(), removed.size(), 
 					time, ct, writeTime, computeChangesTime});			
 			
-			ut.commit();
 			return sync;
 		} catch (Exception t) {
-			rollback(ut);
 			logger.error(t.getMessage(), t);
 			throw new ServerErrorException(t);
 		}
@@ -241,14 +229,6 @@ public class EmailSync implements IEmailSync {
 				});
 	}
 
-	private void rollback(TransactionManager ut) {
-		try {
-			ut.rollback();
-		} catch (Throwable e) {
-			logger.error("Error while rollbacking transaction");
-		}
-	}
-	
 	private MailChanges getMailChanges(final Set<Email> updated, 
 			final Collection<Long> removed) {
 		

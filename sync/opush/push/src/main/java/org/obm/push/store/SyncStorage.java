@@ -15,8 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.transaction.TransactionManager;
-
 import org.obm.dbcp.DBCP;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.IniFile;
@@ -112,9 +110,7 @@ public class SyncStorage implements ISyncStorage {
 		Integer id = deviceDao.findDevice(loginAtDomain, devId);
 		Connection con = null;
 		PreparedStatement ps = null;
-		TransactionManager tm = dbcp.getDataSource().getTransactionManager();
 		try {
-			tm.begin();
 			con = dbcp.getDataSource().getConnection();
 			ps = con.prepareStatement("DELETE FROM opush_ping_heartbeat WHERE device_id=? ");
 			ps.setInt(1, id);
@@ -125,10 +121,8 @@ public class SyncStorage implements ISyncStorage {
 			ps.setInt(1, id);
 			ps.setLong(2, hearbeat);
 			ps.executeUpdate();
-			tm.commit();
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
-			rollback(tm);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
@@ -138,9 +132,7 @@ public class SyncStorage implements ISyncStorage {
 	public boolean initDevice(String loginAtDomain, String deviceId, String deviceType) {
 
 		boolean ret = true;
-		TransactionManager ut = dbcp.getDataSource().getTransactionManager();
 		try {
-			ut.begin();
 			Integer opushDeviceId = deviceDao.findDevice(loginAtDomain, deviceId);
 			if (opushDeviceId == null) {
 				boolean registered = deviceDao.registerNewDevice(loginAtDomain, deviceId, deviceType);
@@ -150,10 +142,8 @@ public class SyncStorage implements ISyncStorage {
 					ret = false;
 				}
 			}
-			ut.commit();
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
-			rollback(ut);
 			ret = false;
 		}
 		return ret;
@@ -230,9 +220,7 @@ public class SyncStorage implements ISyncStorage {
 		Integer id = deviceDao.findDevice(loginAtDomain, devId);
 		Connection con = null;
 		PreparedStatement ps = null;
-		TransactionManager ut = dbcp.getDataSource().getTransactionManager();
 		try {
-			ut.begin();
 			con = dbcp.getDataSource().getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_sync_state (sync_key, device_id, last_sync, collection_id) VALUES (?, ?, ?, ?)");
 			ps.setString(1, state.getKey());
@@ -240,13 +228,11 @@ public class SyncStorage implements ISyncStorage {
 			ps.setTimestamp(3, new Timestamp(state.getLastSync().getTime()));
 			ps.setInt(4, collectionId);
 			ps.executeUpdate();
-			ut.commit();
 			logger.info("UpdateState [ " + devId + ", " + collectionId + ", "
 					+ state.getKey() + ", " + state.getLastSync().toString()
 					+ " ]");
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
-			rollback(ut);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
@@ -379,9 +365,7 @@ public class SyncStorage implements ISyncStorage {
 
 		Connection con = null;
 		PreparedStatement ps = null;
-		TransactionManager ut = dbcp.getDataSource().getTransactionManager();
 		try {
-			ut.begin();
 			con = dbcp.getDataSource().getConnection();
 			ps = con.prepareStatement("DELETE FROM opush_sync_state WHERE device_id=? AND collection_id=?");
 			ps.setInt(1, id);
@@ -398,11 +382,9 @@ public class SyncStorage implements ISyncStorage {
 			ps.setInt(2, collectionId);
 			ps.executeUpdate();
 
-			ut.commit();
 			logger.warn("mappings & states cleared for sync of collection "
 					+ collectionId + " of device " + devId);
 		} catch (Throwable e) {
-			rollback(ut);
 			logger.error(e.getMessage(), e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
@@ -628,9 +610,7 @@ public class SyncStorage implements ISyncStorage {
 			String synkKey, Date dtStamp) {
 
 		PreparedStatement ps = null;
-		TransactionManager ut = dbcp.getDataSource().getTransactionManager();
 		try {
-			ut.begin();
 			StringBuilder query = new StringBuilder(
 					"UPDATE opush_invitation_mapping SET status=?, sync_key=?, dtstamp= ? ");
 			query.append("WHERE event_collection_id=? AND event_uid=? ");
@@ -666,13 +646,7 @@ public class SyncStorage implements ISyncStorage {
 			}
 
 			ps.execute();
-			ut.commit();
 		} catch (Throwable se) {
-			try {
-				rollback(ut);
-			} catch (Exception e) {
-				logger.error("Error while rolling-back", e);
-			}
 			logger.error(se.getMessage(), se);
 		} finally {
 			JDBCUtils.cleanup(null, ps, null);
@@ -730,10 +704,8 @@ public class SyncStorage implements ISyncStorage {
 		if (emailUids != null && emailUids.size() > 0) {
 			Connection con = null;
 			PreparedStatement ps = null;
-			TransactionManager ut = dbcp.getDataSource().getTransactionManager();
 			String uids = buildEmailUid(emailUids);
 			try {
-				ut.begin();
 				con = dbcp.getDataSource().getConnection();
 				ps = con.prepareStatement("UPDATE opush_invitation_mapping SET status=?, sync_key=?, dtstamp=dtstamp WHERE mail_collection_id=? AND mail_uid IN ("
 						+ uids + ")");
@@ -746,13 +718,7 @@ public class SyncStorage implements ISyncStorage {
 				}
 				ps.setInt(idx++, emailCollectionId);
 				ps.execute();
-				ut.commit();
 			} catch (Throwable se) {
-				try {
-					rollback(ut);
-				} catch (Exception e) {
-					logger.error("Error while rolling-back", e);
-				}
 				logger.error(se.getMessage(), se);
 			} finally {
 				JDBCUtils.cleanup(con, ps, null);
@@ -773,10 +739,8 @@ public class SyncStorage implements ISyncStorage {
 		if (eventUids.size() > 0) {
 			Connection con = null;
 			PreparedStatement ps = null;
-			TransactionManager ut = dbcp.getDataSource().getTransactionManager();
 			String uids = buildEventUid(eventUids);
 			try {
-				ut.begin();
 				con = dbcp.getDataSource().getConnection();
 				ps = con.prepareStatement("UPDATE opush_invitation_mapping SET status=?, sync_key=?, dtstamp=dtstamp WHERE mail_collection_id IS NULL AND mail_uid IS NULL AND event_collection_id=? AND event_uid IN ("
 						+ uids + ")");
@@ -788,13 +752,7 @@ public class SyncStorage implements ISyncStorage {
 				}
 				ps.setInt(3, eventCollectionId);
 				ps.execute();
-				ut.commit();
 			} catch (Throwable se) {
-				try {
-					rollback(ut);
-				} catch (Exception e) {
-					logger.error("Error while rolling-back", e);
-				}
 				logger.error(se.getMessage(), se);
 			} finally {
 				JDBCUtils.cleanup(con, ps, null);
@@ -958,9 +916,7 @@ public class SyncStorage implements ISyncStorage {
 			Integer emailCollectionId, Long emailUid) {
 		Connection con = null;
 		PreparedStatement ps = null;
-		TransactionManager ut = dbcp.getDataSource().getTransactionManager();
 		try {
-			ut.begin();
 			con = dbcp.getDataSource().getConnection();
 			ps = con.prepareStatement("DELETE FROM opush_invitation_mapping "
 					+ "WHERE event_collection_id=? AND mail_collection_id=? AND mail_uid=?");
@@ -968,13 +924,7 @@ public class SyncStorage implements ISyncStorage {
 			ps.setInt(2, emailCollectionId);
 			ps.setLong(3, emailUid);
 			ps.execute();
-			ut.commit();
 		} catch (Throwable se) {
-			try {
-				rollback(ut);
-			} catch (Exception e) {
-				logger.error("Error while rolling-back", e);
-			}
 			logger.error(se.getMessage(), se);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
@@ -1298,14 +1248,6 @@ public class SyncStorage implements ISyncStorage {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
 		return false;
-	}
-
-	private void rollback(TransactionManager ut) {
-		try {
-			ut.rollback();
-		} catch (Throwable e) {
-			logger.error("Error while rollbacking transaction", e);
-		}
 	}
 	
 }
