@@ -1,8 +1,6 @@
 package org.obm.push;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.obm.push.backend.BackendSession;
 import org.obm.push.impl.ActiveSyncRequest;
@@ -19,42 +17,18 @@ public class SessionService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
 	
-	private Map<String, BackendSession> sessions;
-
 	@Inject
 	private SessionService() {
-		sessions = new HashMap<String, BackendSession>();
-
 	}
 	
-	public synchronized BackendSession getSession(
+	public BackendSession getSession(
 			Credentials credentials, String devId, ActiveSyncRequest request) {
 
 		String sessionId = credentials.getLoginAtDomain() + "/" + devId;
 		
-		BackendSession session = getOrCreateSession(credentials, request, sessionId);
+		BackendSession session = createSession(credentials, request, sessionId);
 		session.setProtocolVersion(getProtocolVersion(request));
 		return session;
-	}
-
-	private BackendSession getOrCreateSession(Credentials credentials,
-			ActiveSyncRequest request, String sessionId) {
-		if (sessions.containsKey(sessionId)) {
-			BackendSession bs = sessions.get(sessionId);
-			return updateSession(credentials, request, bs);
-		} else {
-			BackendSession bs = createSession(credentials, request, sessionId);
-			sessions.put(sessionId, bs);
-			return bs;
-		}
-	}
-
-	private BackendSession updateSession(Credentials credentials, ActiveSyncRequest r,
-			BackendSession bs) {
-		bs.setCredentials(credentials);
-		logger.info("Existing session = {} | {} ", bs, bs.getLastMonitored());
-		bs.setCommand(r.p("Cmd"));
-		return bs;
 	}
 
 	private BackendSession createSession(Credentials credentials,
@@ -65,7 +39,6 @@ public class SessionService {
 		logger.info("New session = {}", sessionId);
 		return bs;
 	}
-
 
 	private BigDecimal getProtocolVersion(ActiveSyncRequest request) {
 		final String proto = request.p("MS-ASProtocolVersion");
