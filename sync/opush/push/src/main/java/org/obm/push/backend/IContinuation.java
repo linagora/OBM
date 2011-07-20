@@ -1,5 +1,7 @@
 package org.obm.push.backend;
 
+import org.obm.push.impl.IContinuationHandler;
+
 
 public interface IContinuation {
 
@@ -26,4 +28,8 @@ public interface IContinuation {
 	void setCollectionChangeListener(CollectionChangeListener l);
 	
 	int getReqId();
+	
+	void setLastContinuationHandler(IContinuationHandler iContinuationHandler);
+	
+	IContinuationHandler getLastContinuationHandler();
 }

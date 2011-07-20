@@ -17,8 +17,6 @@ public class BackendSession {
 	private final Device device;
 	private final String command;
 	private final BigDecimal protocolVersion;
-	
-	private String lastContinuationHandler;
 
 	private Map<Integer, SyncCollection> lastMonitored;
 	private Map<String, String> lastSyncProcessedClientIds;
@@ -71,14 +69,6 @@ public class BackendSession {
 
 	public void setLastMonitored(Map<Integer, SyncCollection> lastMonitored) {
 		this.lastMonitored = lastMonitored;
-	}
-
-	public String getLastContinuationHandler() {
-		return lastContinuationHandler;
-	}
-
-	public void setLastContinuationHandler(String lastContinuationHandler) {
-		this.lastContinuationHandler = lastContinuationHandler;
 	}
 
 	public Map<String, String> getLastSyncProcessedClientIds() {

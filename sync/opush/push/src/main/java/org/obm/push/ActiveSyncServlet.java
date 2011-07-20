@@ -60,12 +60,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	private static final Logger logger = LoggerFactory.getLogger(ActiveSyncServlet.class);
 
 	private Injector injector;
-
-	public static final String SYNC_HANDLER = "Sync";
-	public static final String PING_HANDLER = "Ping";
-
 	private Map<String, IRequestHandler> handlers;
-
 	private SessionService sessionService;
 	private LoggerService loggerService; 
 	private ISyncStorage storage;
@@ -139,16 +134,13 @@ public class ActiveSyncServlet extends HttpServlet {
 			return;
 		}
 		
-		IContinuationHandler ph = 
-				(IContinuationHandler) handlers.get(bs.getLastContinuationHandler());
-
+		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
 		if (c.isError()) {
 			ph.sendError(new Responder(response), c.getErrorStatus(), c);
 		} else if (ccl != null) {
 			ph.sendResponseWithoutHierarchyChanges(bs, new Responder(response), c);
 		}
-		return;
 	}
 
 	@Override

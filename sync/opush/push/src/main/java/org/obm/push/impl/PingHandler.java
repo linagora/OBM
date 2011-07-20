@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.obm.push.ActiveSyncServlet;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IBackend;
@@ -106,7 +105,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 			}
 
 			if (intervalSeconds > 0 && bs.getLastMonitored() != null) {
-				bs.setLastContinuationHandler(ActiveSyncServlet.PING_HANDLER);
+				continuation.setLastContinuationHandler(this);
 				CollectionChangeListener l = new CollectionChangeListener(bs,
 						continuation, bs.getLastMonitored());
 				IListenerRegistration reg = backend.addChangeListener(l);

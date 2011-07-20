@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
-import org.obm.push.ActiveSyncServlet;
 import org.obm.push.ItemChange;
 import org.obm.push.UnsynchronizedItemService;
 import org.obm.push.backend.BackendSession;
@@ -119,7 +118,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 						break;
 					}
 				}
-				bs.setLastContinuationHandler(ActiveSyncServlet.SYNC_HANDLER);
+				continuation.setLastContinuationHandler(this);
 				bs.setLastMonitored(sync.getCollectionById());
 				CollectionChangeListener l = new CollectionChangeListener(bs,
 						continuation, sync.getCollections());

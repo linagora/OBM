@@ -32,14 +32,13 @@ public class PushContinuation implements IContinuation {
 		}
 	}
 	
-	
-
 	private final static String KEY_BACKEND_SESSION = "key_backend_session";
 	private final static String KEY_IS_ERROR = "key_is_error";
 	private final static String KEY_STATUS_ERROR = "key_stauts_error";
 	private final static String KEY_COLLECTION_CHANGE_LISTENER = "key_collection_change_listener";
 	private final static String KEY_LISTENER_REGISTRATION = "key_listener_registration";
 	private final static String KEY_ID_REQUEST = "key_id_request";
+	private final static String KEY_LAST_CONTINUATION_HANDLER = "key_last_continuation_handler";
 	
 	private Continuation c;
 
@@ -118,6 +117,16 @@ public class PushContinuation implements IContinuation {
 	@Override
 	public Boolean isResumed() {
 		return c.isResumed();
+	}
+
+	@Override
+	public void setLastContinuationHandler(IContinuationHandler iContinuationHandler) {
+		c.setAttribute(KEY_LAST_CONTINUATION_HANDLER, iContinuationHandler);
+	}
+
+	@Override
+	public IContinuationHandler getLastContinuationHandler() {
+		return (IContinuationHandler) c.getAttribute(KEY_LAST_CONTINUATION_HANDLER);
 	}
 
 }
