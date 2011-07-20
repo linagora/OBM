@@ -22,7 +22,8 @@ public class BackendSession {
 
 	private final Credentials credentials;
 	private final String devId;
-	private String command;
+	private final Device device;
+	private final String command;
 	
 	private Map<Integer, Date> updatedSyncDate;
 	private Map<Integer, Set<ItemChange>> unSynchronizedItemChangeByCollection;
@@ -40,7 +41,7 @@ public class BackendSession {
 
 	private Map<String, String> lastSyncProcessedClientIds;
 
-	private final Device device;
+	
 
 
 	public BackendSession(Credentials credentials, String devId, String command, Device device) {
@@ -79,11 +80,7 @@ public class BackendSession {
 	public String getCommand() {
 		return command;
 	}
-
-	public void setCommand(String command) {
-		this.command = command;
-	}
-
+	
 	public Date getUpdatedSyncDate(Integer collectionId) {
 		return updatedSyncDate.get(collectionId);
 	}
