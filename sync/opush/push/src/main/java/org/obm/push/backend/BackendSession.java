@@ -11,12 +11,8 @@ import org.obm.push.Device;
 import org.obm.push.ItemChange;
 import org.obm.push.impl.Credentials;
 import org.obm.push.store.SyncCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BackendSession {
-
-	private static final Logger logger = LoggerFactory.getLogger(BackendSession.class);
 
 	private final Credentials credentials;
 	private final String devId;
@@ -107,9 +103,6 @@ public class BackendSession {
 			ret = new HashSet<ItemChange>();
 		}
 		return ret;
-	}
-
-	public void clear(Integer collectionId) {
 	}
 
 	public String getLastContinuationHandler() {

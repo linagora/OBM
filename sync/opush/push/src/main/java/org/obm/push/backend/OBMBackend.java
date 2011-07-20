@@ -137,7 +137,6 @@ public class OBMBackend implements IBackend {
 				new Object[]{collectionId, bs.getDevId()});
 		try {
 			store.resetCollection(bs.getLoginAtDomain(), bs.getDevId(), collectionId);
-			bs.clear(collectionId);
 		} catch (RuntimeException re) {
 			logger.error(re.getMessage(), re);
 			throw re;
