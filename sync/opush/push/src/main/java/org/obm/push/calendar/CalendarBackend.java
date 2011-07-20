@@ -40,6 +40,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.obm.sync.items.EventChanges;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -62,27 +63,17 @@ public class CalendarBackend extends ObmSyncBackend {
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
-		List<ItemChange> ret = new LinkedList<ItemChange>();
 
 		if (!bs.checkHint("hint.multipleCalendars", false)) {
-			ItemChange ic = new ItemChange();
-			String col = getDefaultCalendarName(bs);
-			String serverId = "";
-			try {
-				Integer collectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), col);
-				serverId = getServerIdFor(collectionId);
-			} catch (ActiveSyncException e) {
-				serverId = createCollectionMapping(bs.getLoginAtDomain(), bs.getDevId(), col);
-				ic.setIsNew(true);
-			}
-			ic.setServerId(serverId);
-			ic.setParentId("0");
-			ic.setDisplayName(bs.getLoginAtDomain() + " calendar");
-			ic.setItemType(FolderType.DEFAULT_CALENDAR_FOLDER);
-			ret.add(ic);
-			return ret;
+			return getDefaultCalendarItemChange(bs);
+		} else {
+			return getCalendarList(bs);
 		}
-		// ADD EVENT FOLDER
+	}
+
+	private List<ItemChange> getCalendarList(BackendSession bs) {
+
+		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AbstractEventSyncClient cc = getCalendarClient(bs, null);
 		AccessToken token = login(cc, bs);
 		try {
@@ -111,8 +102,26 @@ public class CalendarBackend extends ObmSyncBackend {
 		} finally {
 			cc.logout(token);
 		}
-
 		return ret;
+	}
+
+	private List<ItemChange> getDefaultCalendarItemChange(BackendSession bs) throws SQLException {
+		
+		ItemChange ic = new ItemChange();
+		String col = getDefaultCalendarName(bs);
+		String serverId = "";
+		try {
+			Integer collectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), col);
+			serverId = getServerIdFor(collectionId);
+		} catch (ActiveSyncException e) {
+			serverId = createCollectionMapping(bs.getLoginAtDomain(), bs.getDevId(), col);
+			ic.setIsNew(true);
+		}
+		ic.setServerId(serverId);
+		ic.setParentId("0");
+		ic.setDisplayName(bs.getLoginAtDomain() + " calendar");
+		ic.setItemType(FolderType.DEFAULT_CALENDAR_FOLDER);
+		return ImmutableList.of(ic);
 	}
 
 	public List<ItemChange> getHierarchyTaskChanges(BackendSession bs) throws SQLException {
