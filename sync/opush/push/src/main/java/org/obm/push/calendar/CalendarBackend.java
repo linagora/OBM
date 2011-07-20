@@ -84,8 +84,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		}
 		// ADD EVENT FOLDER
 		AbstractEventSyncClient cc = getCalendarClient(bs, null);
-		AccessToken token = cc.login(bs.getLoginAtDomain(), bs.getPassword(),
-				"o-push");
+		AccessToken token = login(cc, bs);
 		try {
 			CalendarInfo[] cals = cc.listCalendars(token);
 
@@ -145,7 +144,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		final Date lastSyncDate = state.getLastSync();
 	
 		final AbstractEventSyncClient cc = getCalendarClient(bs, state.getDataType());
-		final AccessToken token = cc.login(bs.getLoginAtDomain(), bs.getPassword(), "o-push");
+		final AccessToken token = login(cc, bs);
 		
 		final String collectionPath = getCollectionPathFor(collectionId);
 		
@@ -242,8 +241,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		logger.info("createOrUpdate(" + bs.getLoginAtDomain() + ", "
 				+ collectionPath + ", " + serverId + ")");
 		AbstractEventSyncClient cc = getCalendarClient(bs, data.getType());
-		AccessToken token = cc.login(bs.getLoginAtDomain(), bs.getPassword(),
-		"o-push");
+		AccessToken token = login(cc, bs);
 		try {
 			String id = null;
 			Event oldEvent = null;
@@ -317,8 +315,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			if (id != null) {
 				AbstractEventSyncClient bc = getCalendarClient(bs,
 						PIMDataType.CALENDAR);
-				AccessToken token = bc.login(bs.getLoginAtDomain(),
-						bs.getPassword(), "o-push");
+				AccessToken token = login(bc, bs);
 				try {
 					Event evr = bc.getEventFromId(token, bs.getLoginAtDomain(),
 							id);
@@ -403,8 +400,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AbstractEventSyncClient calCli = getCalendarClient(bs,
 				PIMDataType.CALENDAR);
-		AccessToken token = calCli.login(bs.getLoginAtDomain(),
-				bs.getPassword(), "o-push");
+		AccessToken token = login(calCli, bs);
 		try {
 			for (String serverId : fetchServerIds) {
 				String id = getEventUidFromServerId(serverId);
@@ -430,7 +426,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<String> uids) {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AbstractEventSyncClient calCli = getCalendarClient(bs, PIMDataType.CALENDAR);
-		AccessToken token = calCli.login(bs.getLoginAtDomain(), bs.getPassword(), "o-push");
+		AccessToken token = login(calCli, bs);
 		try {
 			for (String eventUid : uids) {
 				Event e = calCli.getEventFromExtId(token, bs.getLoginAtDomain(), eventUid);
@@ -458,7 +454,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	public List<ItemChange> fetchDeletedItems(BackendSession bs, Integer collectionId, Collection<String> uids) {
 		final List<ItemChange> ret = Lists.newArrayListWithCapacity(uids.size());
 		final AbstractEventSyncClient calCli = getCalendarClient(bs, PIMDataType.CALENDAR);
-		final AccessToken token = calCli.login(bs.getLoginAtDomain(), bs.getPassword(), "o-push");
+		final AccessToken token = login(calCli, bs);
 		try {
 			for (final String eventUid: uids) {
 				Integer id = calCli.getEventObmIdFromExtId(token, bs.getLoginAtDomain(), eventUid);

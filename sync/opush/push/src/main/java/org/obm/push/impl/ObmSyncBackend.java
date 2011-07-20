@@ -23,6 +23,7 @@ import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.PIMDataType;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.obm.sync.client.calendar.CalendarClient;
@@ -36,6 +37,7 @@ import com.google.common.base.Strings;
 
 public class ObmSyncBackend {
 
+	public static final String OBM_SYNC_ORIGIN = "o-push";
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected String obmSyncHost;
@@ -63,6 +65,10 @@ public class ObmSyncBackend {
 		logger.info("Using " + obmSyncHost + " as obm_sync host.");
 	}
 
+	protected AccessToken login(ISyncClient client, BackendSession session) {
+		return client.login(session.getLoginAtDomain(), session.getPassword(), OBM_SYNC_ORIGIN);
+	}
+	
 	protected AbstractEventSyncClient getCalendarClient(BackendSession bs) {
 		return getCalendarClient(bs, PIMDataType.CALENDAR);
 	}
@@ -121,7 +127,7 @@ public class ObmSyncBackend {
 		}
 		CalendarClient cc = cl.locate("http://" + obmSyncHost
 				+ ":8080/obm-sync/services");
-		AccessToken token = cc.login(loginAtDomain, password, "o-push");
+		AccessToken token = cc.login(loginAtDomain, password, OBM_SYNC_ORIGIN);
 		try {
 			Boolean valid = true;
 			if (token == null || token.getSessionId() == null) {

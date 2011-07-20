@@ -68,8 +68,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		List<ItemChange> deletions = new LinkedList<ItemChange>();
 		logger.info("getContentChanges(" + state.getLastSync() + ")");
 		BookClient bc = getBookClient(bs);
-		AccessToken token = bc.login(bs.getLoginAtDomain(), bs.getPassword(),
-				"o-push");
+		AccessToken token = login(bc, bs);
 
 		try {
 			ContactChangesResponse changes = bc.getSync(token, BookType.contacts, state
@@ -112,8 +111,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		logger.info("create in " + collectionId + " (contact: "
 				+ data.getFirstName() + " " + data.getLastName() + ")");
 		BookClient bc = getBookClient(bs);
-		AccessToken token = bc.login(bs.getLoginAtDomain(), bs.getPassword(),
-				"o-push");
+		AccessToken token = login(bc, bs);
 
 		String id = null;
 		try {
@@ -144,8 +142,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			if (idx > 0) {
 				String id = serverId.substring(idx + 1);
 				BookClient bc = getBookClient(bs);
-				AccessToken token = bc.login(bs.getLoginAtDomain(), bs
-						.getPassword(), "o-push");
+				AccessToken token = login(bc, bs);
 				try {
 					bc.removeContact(token, BookType.contacts, id);
 				} catch (Exception e) {
@@ -161,7 +158,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			List<String> fetchServerIds) throws ObjectNotFoundException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		BookClient bc = getBookClient(bs);
-		AccessToken token = bc.login(bs.getLoginAtDomain(), bs.getPassword(), "o-push");
+		AccessToken token = login(bc, bs);
 
 		try {
 			for (String serverId : fetchServerIds) {

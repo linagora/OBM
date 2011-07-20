@@ -392,7 +392,7 @@ public class MailBackend extends ObmSyncBackend {
 	private String getUserEmail(BackendSession bs) throws Exception {
 		AbstractEventSyncClient cal = getCalendarClient(bs);
 		AccessToken at = cal.login(bs.getLoginAtDomain(), bs.getPassword(),
-				"opush");
+				OBM_SYNC_ORIGIN);
 		String from = "";
 		try {
 			from = cal.getUserEmail(at);

@@ -52,6 +52,7 @@ import org.obm.push.backend.MSEvent;
 import org.obm.push.backend.MessageClass;
 import org.obm.push.backend.MethodAttachment;
 import org.obm.push.calendar.EventConverter;
+import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.MSEmailBodyType;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
@@ -196,7 +197,7 @@ public class MailMessageLoader {
 		final String ics = FileUtils.streamString(invitation, true);
 		if (ics != null && !"".equals(ics) && ics.startsWith("BEGIN")) {
 			final AccessToken at = calendarClient.login(bs.getLoginAtDomain(),
-					bs.getPassword(), "o-push");
+					bs.getPassword(), ObmSyncBackend.OBM_SYNC_ORIGIN);
 			try {
 				final List<Event> obmEvents = calendarClient.parseICS(at, ics);
 				if (obmEvents.size() > 0) {
