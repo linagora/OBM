@@ -7,6 +7,7 @@ public class ItemChange {
 	
 	private String serverId;
 	private String parentId;
+	
 	private String displayName;
 	private FolderType itemType;
 	private boolean isNew;

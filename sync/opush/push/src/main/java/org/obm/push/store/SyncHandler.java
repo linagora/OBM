@@ -14,6 +14,7 @@ import java.util.Set;
 import org.eclipse.jetty.continuation.ContinuationThrowable;
 import org.obm.push.ActiveSyncServlet;
 import org.obm.push.ItemChange;
+import org.obm.push.UnsynchronizedItemService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.DataDelta;
@@ -29,6 +30,7 @@ import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
 import org.obm.push.impl.ActiveSyncRequest;
+import org.obm.push.impl.Credentials;
 import org.obm.push.impl.IContinuationHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.SyncDecoder;
@@ -66,6 +68,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	public static final Integer SYNC_TRUNCATION_ALL = 9;
 	private static Map<Integer, IContinuation> waitContinuationCache;
 	private final SyncDecoder syncDecoder;
+	private final UnsynchronizedItemService unSynchronizedItemCache;
 
 	static {
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
@@ -74,12 +77,13 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			SyncDecoder syncDecoder, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine) {
+			StateMachine stMachine, UnsynchronizedItemService unSynchronizedItemCache) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
 				contentsExporter, stMachine);
 		
 		this.syncDecoder = syncDecoder;
+		this.unSynchronizedItemCache = unSynchronizedItemCache;
 	}
 
 	@Override
@@ -185,7 +189,9 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			throws ActiveSyncException, SQLException {
 
 		DataDelta delta = null;
-		if (bs.getUnSynchronizedItemChange(c.getCollectionId()).size() == 0) {
+		
+		int unSynchronizedItemNb = unSynchronizedItemCache.list(bs.getCredentials(), c.getCollectionId()).size();
+		if (unSynchronizedItemNb == 0) {
 			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getOptions().getFilterType(), c.getCollectionId());
 		}
 
@@ -287,27 +293,31 @@ public class SyncHandler extends WbxmlRequestHandler implements
 
 	}
 
-	private List<ItemChange> processWindowSize(SyncCollection c,
-			DataDelta delta, BackendSession bs,
-			Map<String, String> processedClientIds) {
-		List<ItemChange> changed = new ArrayList<ItemChange>();
+	private List<ItemChange> processWindowSize(SyncCollection c, DataDelta delta, 
+			BackendSession backendSession, Map<String, String> processedClientIds) {
+		
+		final Credentials credentials = backendSession.getCredentials();
+		final Integer collectionId = c.getCollectionId();
+		final Integer windowSize = c.getWindowSize();	
+		
+		final List<ItemChange> changed = new ArrayList<ItemChange>();
 		if (delta != null) {
 			changed.addAll(delta.getChanges());
 		}
-		changed.addAll(bs.getUnSynchronizedItemChange(c.getCollectionId()));
-
-		bs.getUnSynchronizedItemChange(c.getCollectionId()).clear();
-		logger.info("should send " + changed.size() + " change(s)");
-		int changeItem = changed.size() - c.getWindowSize();
-		logger.info("WindowsSize value is " + c.getWindowSize() + ", "
-				+ (changeItem < 0 ? 0 : changeItem) + " changes will not send");
-
-		if (changed.size() <= c.getWindowSize()) {
+		
+		changed.addAll(unSynchronizedItemCache.list(credentials, collectionId));
+		unSynchronizedItemCache.clear(credentials, collectionId);
+		
+		if (changed.size() <= windowSize) {
 			return changed;
 		}
+		
+		logger.info("should send {} change(s)", changed.size());
+		int changeItem = changed.size() - c.getWindowSize();
+		logger.info("WindowsSize value is {} , {} changes will not send", 
+				new Object[]{ c.getWindowSize(), (changeItem < 0 ? 0 : changeItem) });
 
-		int nbChangeByMobile = processedClientIds.size();
-		Set<ItemChange> changeByMobile = new HashSet<ItemChange>();
+		final Set<ItemChange> changeByMobile = new HashSet<ItemChange>();
 		// Find changes ask by the device
 		for (Iterator<ItemChange> it = changed.iterator(); it.hasNext();) {
 			ItemChange ic = it.next();
@@ -316,20 +326,21 @@ public class SyncHandler extends WbxmlRequestHandler implements
 				changeByMobile.add(ic);
 				it.remove();
 			}
-			if (nbChangeByMobile == changeByMobile.size()) {
+			if (processedClientIds.size() == changeByMobile.size()) {
 				break;
 			}
 		}
 
 		int changedSize = changed.size();
-		for (int i = c.getWindowSize(); i < changedSize; i++) {
+		for (int i = windowSize; i < changedSize; i++) {
 			ItemChange ic = changed.get(changed.size() - 1);
-			bs.addUnSynchronizedItemChange(c.getCollectionId(), ic);
+			unSynchronizedItemCache.add(credentials, collectionId, ic);
 			changed.remove(ic);
 		}
 
 		changed.addAll(changeByMobile);
 		c.setMoreAvailable(true);
+		
 		return changed;
 	}
 

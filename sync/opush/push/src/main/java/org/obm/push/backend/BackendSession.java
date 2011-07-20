@@ -27,7 +27,6 @@ public class BackendSession {
 	private final BigDecimal protocolVersion;
 	private final Map<Integer, SyncState> lastClientSyncState;
 	private final Map<Integer, Date> updatedSyncDate;
-	private final Map<Integer, Set<ItemChange>> unSynchronizedItemChangeByCollection;
 	private final Map<Integer, Set<ItemChange>> unSynchronizedDeletedItemChangeByCollection;
 	
 	private String lastContinuationHandler;
@@ -45,7 +44,6 @@ public class BackendSession {
 		this.command = command;
 		this.device = device;
 		this.protocolVersion = protocolVersion;
-		this.unSynchronizedItemChangeByCollection = new HashMap<Integer, Set<ItemChange>>();
 		this.unSynchronizedDeletedItemChangeByCollection = new HashMap<Integer, Set<ItemChange>>();
 		this.lastClientSyncState = new HashMap<Integer, SyncState>();
 		this.updatedSyncDate = new HashMap<Integer, Date>();
@@ -108,26 +106,6 @@ public class BackendSession {
 	public void setLastMonitored(Map<Integer, SyncCollection> lastMonitored) {
 		this.lastMonitored = lastMonitored;
 	}
-
-	public Set<ItemChange> getUnSynchronizedItemChange(Integer collectionId) {
-		Set<ItemChange> ret = unSynchronizedItemChangeByCollection
-				.get(collectionId);
-		if (ret == null) {
-			ret = new HashSet<ItemChange>();
-		}
-		return ret;
-	}
-
-	public void addUnSynchronizedItemChange(Integer collectionId,
-			ItemChange change) {
-		Set<ItemChange> changes = unSynchronizedItemChangeByCollection
-				.get(collectionId);
-		if (changes == null) {
-			changes = new HashSet<ItemChange>();
-			unSynchronizedItemChangeByCollection.put(collectionId, changes);
-		}
-		changes.add(change);
-	}
 	
 	public void addUnSynchronizedDeletedItemChange(Integer collectionId, ItemChange change) {
 		Set<ItemChange> deletes = unSynchronizedDeletedItemChangeByCollection.get(collectionId);
@@ -158,7 +136,6 @@ public class BackendSession {
 
 	public void clear(Integer collectionId) {
 		this.updatedSyncDate.remove(collectionId);
-		this.unSynchronizedItemChangeByCollection.remove(collectionId);
 		this.lastClientSyncState.remove(collectionId);
 	}
 	
@@ -192,6 +169,10 @@ public class BackendSession {
 		for(SyncCollection col : toMonitor){
 			this.lastMonitored.put(col.getCollectionId(), col);
 		}
+	}
+
+	public Credentials getCredentials() {
+		return credentials;
 	}
 
 }

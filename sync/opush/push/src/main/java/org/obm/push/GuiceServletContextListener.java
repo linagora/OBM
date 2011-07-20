@@ -71,6 +71,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(IBackend.class).to(OBMBackend.class);
 				bind(IContentsImporter.class).to(ContentsImporter.class);
 				bind(IErrorsManager.class).to(ErrorsManager.class);
+				bind(UnsynchronizedItemService.class).to(UnsynchronizedItemImpl.class);
 			}
     	});
     }

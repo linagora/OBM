@@ -3,9 +3,8 @@ package org.obm.push.impl;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import org.obm.push.ItemChange;
+import org.obm.push.UnsynchronizedItemService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -34,13 +33,17 @@ import com.google.inject.Singleton;
 @Singleton
 public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
+	private final UnsynchronizedItemService unSynchronizedItemCache;
+
 	@Inject
 	private GetItemEstimateHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
-			ISyncStorage storage, IContentsExporter contentsExporter, StateMachine stMachine) {
+			ISyncStorage storage, IContentsExporter contentsExporter, StateMachine stMachine,
+			UnsynchronizedItemService unSynchronizedItemCache) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
 				contentsExporter, stMachine);
+		this.unSynchronizedItemCache = unSynchronizedItemCache;
 	}
 
 	@Override
@@ -141,16 +144,11 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			SyncState state, Element collectionElement)
 			throws ActiveSyncException, DOMException, SQLException {
 
-		Set<ItemChange> unSynchronizedItemChanges = bs
-				.getUnSynchronizedItemChange(syncCollection.getCollectionId());
-		
-		int count = contentsExporter
-				.getCount(bs, state, syncCollection.getOptions().getFilterType(),
-						collectionId);
+		int unSynchronizedItemNb = unSynchronizedItemCache.list(bs.getCredentials(), syncCollection.getCollectionId()).size();
+		int count = contentsExporter.getCount(bs, state, syncCollection.getOptions().getFilterType(), collectionId);
 
 		Element estim = DOMUtils.createElement(collectionElement, "Estimate");
-		estim.setTextContent(String.valueOf(count
-				+ unSynchronizedItemChanges.size()));
+		estim.setTextContent(String.valueOf(count + unSynchronizedItemNb));
 	}
 
 	private List<SyncCollection> createListSyncCollection(BackendSession bs,
