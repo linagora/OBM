@@ -174,7 +174,7 @@ public class OBMBackend implements IBackend {
 			
 			return contentsExporter.getCount(backendSession,
 					syncCollection.getSyncState(),
-					syncCollection.getFilterType(),
+					syncCollection.getOptions().getFilterType(),
 					syncCollection.getCollectionId());
 		} catch (ActiveSyncException e) {
 			logger.error(e.getMessage(), e);

@@ -113,7 +113,7 @@ public class EmailEncoder implements IDataEncoder {
 	}
 
 	private void appendBody25(Element parent, MSEmail mail, SyncCollection c) {
-		if (c.getTruncation() != null && c.getTruncation().equals(1)) {
+		if (c.getOptions().getTruncation() != null && c.getOptions().getTruncation().equals(1)) {
 			DOMUtils.createElementAndText(parent, "Email:BodyTruncated", "1");
 		} else {
 			MSEmailBodyType availableFormat = getAvailableFormat(c, mail);
@@ -145,11 +145,11 @@ public class EmailEncoder implements IDataEncoder {
 					"AirSyncBase:EstimatedDataSize", ""
 							+ data.getBytes().length);
 
-			if (c.getBodyPreference(availableFormat) != null
-					&& c.getBodyPreference(availableFormat).getTruncationSize() != null) {
-				if (c.getBodyPreference(availableFormat).getTruncationSize() < data
+			if (c.getOptions().getBodyPreference(availableFormat) != null
+					&& c.getOptions().getBodyPreference(availableFormat).getTruncationSize() != null) {
+				if (c.getOptions().getBodyPreference(availableFormat).getTruncationSize() < data
 						.length()) {
-					data = data.substring(0, c.getBodyPreference(availableFormat)
+					data = data.substring(0, c.getOptions().getBodyPreference(availableFormat)
 							.getTruncationSize());
 					DOMUtils.createElementAndText(elemBody,
 							"AirSyncBase:Truncated", "1");
@@ -176,21 +176,21 @@ public class EmailEncoder implements IDataEncoder {
 	}
 
 	private MSEmailBodyType getAvailableFormat(SyncCollection c, MSEmail mail) {
-		if (c.getMimeSupport() != null && c.getMimeSupport().equals(2)) {
+		if (c.getOptions().getMimeSupport() != null && c.getOptions().getMimeSupport().equals(2)) {
 			return MSEmailBodyType.MIME;
-		} else if (c.getBodyPreferences().size() > 1) {
-			if (c.getBodyPreference(MSEmailBodyType.HTML) != null
+		} else if (c.getOptions().getBodyPreferences().size() > 1) {
+			if (c.getOptions().getBodyPreference(MSEmailBodyType.HTML) != null
 					&& mail.getBody().getValue(MSEmailBodyType.HTML) != null) {
 				return MSEmailBodyType.HTML;
-			} else if (c.getBodyPreference(MSEmailBodyType.PlainText) != null
+			} else if (c.getOptions().getBodyPreference(MSEmailBodyType.PlainText) != null
 					&& mail.getBody().getValue(MSEmailBodyType.PlainText) != null) {
 				return MSEmailBodyType.PlainText;
-			} else if (c.getBodyPreference(MSEmailBodyType.MIME) != null
+			} else if (c.getOptions().getBodyPreference(MSEmailBodyType.MIME) != null
 					&& mail.getBody().getValue(MSEmailBodyType.MIME) != null) {
 				return MSEmailBodyType.MIME;
 			}
-		} else if (c.getBodyPreferences().size() == 1) {
-			BodyPreference pref = c.getBodyPreferences().values().iterator()
+		} else if (c.getOptions().getBodyPreferences().size() == 1) {
+			BodyPreference pref = c.getOptions().getBodyPreferences().values().iterator()
 					.next();
 			if (pref != null && pref.getType() != null) {
 				return pref.getType();

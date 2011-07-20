@@ -23,6 +23,8 @@ import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.StorageFactory;
 import org.obm.push.store.SyncStorage;
 import org.obm.sync.XTrustProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -32,6 +34,8 @@ import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener { 
 
+	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
+	
 	public static final String ATTRIBUTE_NAME = "OpushGuiceInjecter";
 	
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -47,6 +51,7 @@ public class GuiceServletContextListener implements ServletContextListener {
         	servletContext.setAttribute(ATTRIBUTE_NAME, injector);
         	XTrustProvider.install();
         } catch (Exception e) {
+        	logger.error(e.getMessage(), e);
         	failStartup(e.getMessage());
         } 
     } 

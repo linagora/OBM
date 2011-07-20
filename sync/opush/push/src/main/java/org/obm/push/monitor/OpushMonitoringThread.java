@@ -45,7 +45,7 @@ public class OpushMonitoringThread {
 				try {
 					int count = contentsExporter.getCount(backendSession,
 							syncCollection.getSyncState(),
-							syncCollection.getFilterType(),
+							syncCollection.getOptions().getFilterType(),
 							syncCollection.getCollectionId());
 					
 					if (count > 0) {

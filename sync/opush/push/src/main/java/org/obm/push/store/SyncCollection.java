@@ -1,10 +1,8 @@
 package org.obm.push.store;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Objects;
@@ -15,82 +13,56 @@ public class SyncCollection {
 	private SyncState syncState;
 	private List<String> fetchIds;
 	private String dataClass;
-	private Integer conflict;
 	private Integer collectionId;
 	private String collectionPath;
 	private String syncKey;
-	private Integer truncation;
-	private Boolean deletesAsMoves;
-	private FilterType filterType;
 	private Integer windowSize;
 	private boolean moreAvailable;
-	private Integer mimeSupport;
-	private Integer mimeTruncation;
-	private Map<MSEmailBodyType,BodyPreference> bodyPreferences;
 	private Set<SyncCollectionChange> changes;
 	private SyncStatus status;
 	private PIMDataType dataType;
+	private SyncCollectionOptions options;
 	
 	public SyncCollection() {
 		fetchIds = new LinkedList<String>();
-		conflict = 1;
 		collectionId = 0;
-		truncation = SyncHandler.SYNC_TRUNCATION_ALL;
 		moreAvailable = false;
 		windowSize = 100;
-		deletesAsMoves = true;
-		this.bodyPreferences = new HashMap<MSEmailBodyType, BodyPreference>();
 		changes = new HashSet<SyncCollectionChange>();
 		status = SyncStatus.OK;
+		options = new SyncCollectionOptions();
 	}
-	
+
 	public SyncState getSyncState() {
 		return syncState;
 	}
+
 	public void setSyncState(SyncState syncState) {
 		this.syncState = syncState;
 	}
+
 	public String getDataClass() {
 		return dataClass;
 	}
+
 	public void setDataClass(String dataClass) {
 		this.dataClass = dataClass;
 	}
-	public Integer getConflict() {
-		return conflict;
-	}
-	public void setConflict(Integer conflict) {
-		this.conflict = conflict;
-	}
+
 	public Integer getCollectionId() {
 		return collectionId;
 	}
+
 	public void setCollectionId(Integer collectionId) {
 		this.collectionId = collectionId;
 	}
+
 	public String getSyncKey() {
 		return syncKey;
 	}
+
 	public void setSyncKey(String syncKey) {
 		this.syncKey = syncKey;
-	}
-
-	public Integer getTruncation() {
-		return truncation;
-	}
-
-	public void setTruncation(Integer truncation) {
-		this.truncation = truncation;
-	}
-
-	public boolean isDeletesAsMoves() {
-		return deletesAsMoves;
-	}
-
-	public void setDeletesAsMoves(Boolean deletesAsMoves) {
-		if(deletesAsMoves != null){
-			this.deletesAsMoves = deletesAsMoves;
-		}
 	}
 
 	public List<String> getFetchIds() {
@@ -101,14 +73,6 @@ public class SyncCollection {
 		this.fetchIds = fetchIds;
 	}
 
-	public FilterType getFilterType() {
-		return filterType;
-	}
-
-	public void setFilterType(FilterType filterType) {
-		this.filterType = filterType;
-	}
-	
 	public Integer getWindowSize() {
 		return windowSize;
 	}
@@ -155,34 +119,6 @@ public class SyncCollection {
 		return Objects.hashCode(collectionId);
 	}
 
-	public Integer getMimeSupport() {
-		return mimeSupport;
-	}
-
-	public void setMimeSupport(Integer mimeSupport) {
-		this.mimeSupport = mimeSupport;
-	}
-
-	public Integer getMimeTruncation() {
-		return mimeTruncation;
-	}
-
-	public void setMimeTruncation(Integer mimeTruncation) {
-		this.mimeTruncation = mimeTruncation;
-	}
-	
-	public Map<MSEmailBodyType,BodyPreference> getBodyPreferences() {
-		return bodyPreferences;
-	}
-	
-	public BodyPreference getBodyPreference(MSEmailBodyType type) {
-		return bodyPreferences.get(type);
-	}
-
-	public void addBodyPreference(BodyPreference bodyPreference) {
-		this.bodyPreferences.put(bodyPreference.getType(), bodyPreference);
-	}
-
 	public Set<SyncCollectionChange> getChanges() {
 		return changes;
 	}
@@ -205,5 +141,13 @@ public class SyncCollection {
 
 	public void setDataType(PIMDataType dataType) {
 		this.dataType = dataType;
+	}
+
+	public SyncCollectionOptions getOptions() {
+		return options;
+	}
+
+	public void setOptions(SyncCollectionOptions options) {
+		this.options = options;
 	}
 }

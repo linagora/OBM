@@ -186,7 +186,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 
 		DataDelta delta = null;
 		if (bs.getUnSynchronizedItemChange(c.getCollectionId()).size() == 0) {
-			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getFilterType(), c.getCollectionId());
+			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getOptions().getFilterType(), c.getCollectionId());
 		}
 
 		List<ItemChange> changed = processWindowSize(c, delta, bs,
@@ -345,8 +345,8 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 			DOMUtils.createElementAndText(add, "Status",
 					SyncStatus.OK.asXmlValue());
-			c.setTruncation(null);
-			for (BodyPreference bp : c.getBodyPreferences().values()) {
+			c.getOptions().setTruncation(null);
+			for (BodyPreference bp : c.getOptions().getBodyPreferences().values()) {
 				bp.setTruncationSize(null);
 			}
 			serializeChange(bs, add, c, ic);
@@ -433,7 +433,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			} else if (change.getModType().equals("Delete")) {
 				contentsImporter.importMessageDeletion(bs, change.getType(),
 						collection.getCollectionId(), change.getServerId(),
-						collection.isDeletesAsMoves());
+						collection.getOptions().isDeletesAsMoves());
 			}
 		}
 	}

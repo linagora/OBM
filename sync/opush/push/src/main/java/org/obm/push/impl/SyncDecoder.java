@@ -22,6 +22,7 @@ import org.obm.push.store.MSEmailBodyType;
 import org.obm.push.store.PIMDataType;
 import org.obm.push.store.SyncCollection;
 import org.obm.push.store.SyncCollectionChange;
+import org.obm.push.store.SyncCollectionOptions;
 import org.obm.push.store.SyncStatus;
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public class SyncDecoder {
 		NodeList nl = root.getElementsByTagName("Collection");
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element col = (Element) nl.item(i);
-			SyncCollection collec = getCollection(bs, col, isPartial,
+			SyncCollection collec = getCollection(col, isPartial,
 					bs.getLastMonitoredById());
 			ret.addCollection(collec);
 		}
@@ -96,7 +97,7 @@ public class SyncDecoder {
 		return ret;
 	}
 
-	private SyncCollection getCollection(BackendSession bs, Element col,
+	private SyncCollection getCollection(Element col,
 			boolean isPartial, Map<Integer, SyncCollection> lastMonitored)
 			throws PartialException, ProtocolException{
 		SyncCollection collection = new SyncCollection();
@@ -104,7 +105,8 @@ public class SyncDecoder {
 		if (collectionId == null) {
 			throw new ProtocolException("CollectionId can't be null");
 		}
-		if (isPartial && lastMonitored.get(collectionId) == null) {
+		SyncCollection lastSyncCollection = lastMonitored.get(collectionId);
+		if (isPartial && lastSyncCollection == null) {
 			throw new PartialException();
 		}
 		try {
@@ -121,82 +123,85 @@ public class SyncDecoder {
 				collection.setWindowSize(Integer.parseInt(wse.getTextContent()));
 			}
 			
-			Element option = DOMUtils.getUniqueElement(col, "Options");
-			if (option != null) {
-				String truncation = DOMUtils.getElementText(option, "Truncation");
-
-				String mimeSupport = DOMUtils.getElementText(option, "MIMESupport");
-				String mimeTruncation = DOMUtils.getElementText(option,
-						"MIMETruncation");
-				String conflict = DOMUtils.getElementText(option, "Conflict");
-				String deletesAsMoves = DOMUtils.getElementText(option,
-						"DeletesAsMoves");
-				NodeList bodyPreferences = col
-						.getElementsByTagName("BodyPreference");
-
-				collection.setFilterType(getFilterType(bs, collectionId, option));
-
-				if (conflict != null) {
-					collection.setConflict(Integer.parseInt(conflict));
-				}
-				if (mimeSupport != null) {
-					collection.setMimeSupport(Integer.parseInt(mimeSupport));
-				}
-				if (mimeTruncation != null) {
-					collection.setMimeTruncation(Integer.parseInt(mimeTruncation));
-				}
-				if (truncation != null) {
-					collection.setTruncation(Integer.parseInt(truncation));
-				}
-				if ("0".equals(deletesAsMoves)) {
-					collection.setDeletesAsMoves(false);
-				} else {
-					collection.setDeletesAsMoves(true);
-				}
-
-				if (bodyPreferences != null) {
-					for (int i = 0; i < bodyPreferences.getLength(); i++) {
-						Element bodyPreference = (Element) bodyPreferences.item(i);
-						String truncationSize = DOMUtils.getElementText(
-								bodyPreference, "TruncationSize");
-						String type = DOMUtils.getElementText(bodyPreference,
-								"Type");
-						BodyPreference bp = new BodyPreference();
-						// nokia n900 sets type without truncationsize
-						if (truncationSize != null) {
-							bp.setTruncationSize(Integer.parseInt(truncationSize));
-						}
-						bp.setType(MSEmailBodyType.getValueOf(Integer
-								.parseInt(type)));
-						collection.addBodyPreference(bp);
-					}
-				}
-			} else {
-				collection.setFilterType( getFilterType(bs, collectionId));
-			}
+			SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
+			collection.setOptions(options);
+			
 			appendCommand(col, collection);
 		} catch (CollectionNotFoundException e) {
 			collection.setError(SyncStatus.OBJECT_NOT_FOUND);
 		}
 		// TODO sync supported
 		// TODO sync <getchanges/>
-		// TODO sync options
 
 		return collection;
 	}
 
-	private FilterType getFilterType(BackendSession bs, Integer collectionId,
-			Element option) {
-		String filterType = DOMUtils.getElementText(option, "FilterType");
-		if (filterType != null) {
-			return FilterType.getFilterType(filterType);
-		} else {
-			return getFilterType(bs, collectionId);
+	private SyncCollectionOptions getUpdatedOptions(SyncCollection lastSyncCollection,
+			Element collectionElement) {
+		SyncCollectionOptions options = null;
+		if(lastSyncCollection != null){
+			options = lastSyncCollection.getOptions();
 		}
-	}
-	
-	private FilterType getFilterType(BackendSession bs, Integer collectionId) {
-		return bs.getLastFilterType(collectionId);
+		if(options == null){
+			options = new SyncCollectionOptions();
+		}
+		
+		Element optionsElement = DOMUtils.getUniqueElement(collectionElement, "Options");
+		if (optionsElement != null) {
+			String filterTypeElement = DOMUtils.getElementText(optionsElement, "FilterType");
+			if (filterTypeElement != null) {
+				options.setFilterType(FilterType.getFilterType(filterTypeElement));
+			}
+			
+			String mimeSupport = DOMUtils.getElementText(optionsElement, "MIMESupport");
+			if (mimeSupport != null) {
+				options.setMimeSupport(Integer.parseInt(mimeSupport));
+			}
+			
+			String mimeTruncation = DOMUtils.getElementText(optionsElement,	"MIMETruncation");
+			if (mimeTruncation != null) {
+				options.setMimeTruncation(Integer.parseInt(mimeTruncation));
+			}
+			
+			String conflict = DOMUtils.getElementText(optionsElement, "Conflict");
+			if (conflict != null) {
+				options.setConflict(Integer.parseInt(conflict));
+			}
+
+			String truncation = DOMUtils.getElementText(optionsElement, "Truncation");
+			if (truncation != null) {
+				options.setTruncation(Integer.parseInt(truncation));
+			}
+			
+			String deletesAsMoves = DOMUtils.getElementText(optionsElement,	"DeletesAsMoves");
+			if(deletesAsMoves != null){
+				if ("0".equals(deletesAsMoves)) {
+					options.setDeletesAsMoves(false);
+				} else {
+					options.setDeletesAsMoves(true);
+				}
+			}
+
+			NodeList bodyPreferences = optionsElement.getElementsByTagName("BodyPreference");
+			if (bodyPreferences != null) {
+				for (int i = 0; i < bodyPreferences.getLength(); i++) {
+					Element bodyPreference = (Element) bodyPreferences.item(i);
+					String truncationSize = DOMUtils.getElementText(
+							bodyPreference, "TruncationSize");
+					String type = DOMUtils.getElementText(bodyPreference,
+							"Type");
+					BodyPreference bp = new BodyPreference();
+					// nokia n900 sets type without truncationsize
+					if (truncationSize != null) {
+						bp.setTruncationSize(Integer.parseInt(truncationSize));
+					}
+					bp.setType(MSEmailBodyType.getValueOf(Integer
+							.parseInt(type)));
+					options.addBodyPreference(bp);
+				}
+			}
+		}
+		return options;
 	}
 
 	private Integer getCollectionId(Element col) {

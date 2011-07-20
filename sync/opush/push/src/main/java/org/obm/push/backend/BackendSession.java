@@ -12,7 +12,6 @@ import java.util.Set;
 
 import org.obm.push.ItemChange;
 import org.obm.push.impl.Credentials;
-import org.obm.push.store.FilterType;
 import org.obm.push.store.SyncCollection;
 import org.obm.push.store.SyncState;
 import org.slf4j.Logger;
@@ -31,7 +30,6 @@ public class BackendSession {
 	private Map<Integer, Set<ItemChange>> unSynchronizedItemChangeByCollection;
 	private Map<Integer, Set<ItemChange>> unSynchronizedDeletedItemChangeByCollection;
 	private Map<Integer, SyncState> lastClientSyncState;
-	private Map<Integer, FilterType> lastFilterTypeByCollectionId;
 	private Sync lastSync;
 
 	private String lastContinuationHandler;
@@ -57,7 +55,6 @@ public class BackendSession {
 		this.lastClientSyncState = new HashMap<Integer, SyncState>();
 		this.updatedSyncDate = new HashMap<Integer, Date>();
 		this.lastMonitored = new HashMap<Integer, SyncCollection>();
-		this.lastFilterTypeByCollectionId = new HashMap<Integer, FilterType>();
 		loadHints();
 	}
 
@@ -250,11 +247,4 @@ public class BackendSession {
 		}
 	}
 
-	public FilterType getLastFilterType(Integer collectionId) {
-		return lastFilterTypeByCollectionId.get(collectionId);
-	}
-
-	public void addLastFilterType(Integer collectionId, FilterType filter) {
-		this.lastFilterTypeByCollectionId.put(collectionId, filter);
-	}
 }

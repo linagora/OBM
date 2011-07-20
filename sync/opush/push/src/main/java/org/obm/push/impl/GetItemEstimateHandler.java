@@ -19,6 +19,7 @@ import org.obm.push.store.FilterType;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.PIMDataType;
 import org.obm.push.store.SyncCollection;
+import org.obm.push.store.SyncCollectionOptions;
 import org.obm.push.store.SyncState;
 import org.obm.push.tnefconverter.RTFUtils;
 import org.obm.push.utils.DOMUtils;
@@ -96,8 +97,6 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
 					bs.addLastClientSyncState(syncCollection.getCollectionId(),
 							state);
-					bs.addLastFilterType(syncCollection.getCollectionId(),
-							syncCollection.getFilterType());
 				}
 
 			} else {
@@ -146,7 +145,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 				.getUnSynchronizedItemChange(syncCollection.getCollectionId());
 		
 		int count = contentsExporter
-				.getCount(bs, state, syncCollection.getFilterType(),
+				.getCount(bs, state, syncCollection.getOptions().getFilterType(),
 						collectionId);
 
 		Element estim = DOMUtils.createElement(collectionElement, "Estimate");
@@ -179,7 +178,9 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			sc.setDataClass(dataClass);
 			sc.setSyncKey(syncKey);
 			sc.setCollectionId(Integer.parseInt(collectionId));
-			sc.setFilterType(FilterType.getFilterType(filterType));
+			SyncCollectionOptions options = new SyncCollectionOptions();
+			options.setFilterType(FilterType.getFilterType(filterType));
+			sc.setOptions(options);
 
 			try {
 				String collectionPath = storage.getCollectionPath(

@@ -27,6 +27,7 @@ import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.MSEmailBodyType;
 import org.obm.push.store.PIMDataType;
 import org.obm.push.store.SyncCollection;
+import org.obm.push.store.SyncCollectionOptions;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.FileUtils;
 import org.w3c.dom.Document;
@@ -187,7 +188,11 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			c.setCollectionId(collectionId);
 			BodyPreference bp = new BodyPreference();
 			bp.setType(MSEmailBodyType.getValueOf(type));
-			c.addBodyPreference(bp);
+			
+			SyncCollectionOptions options = new SyncCollectionOptions();
+			options.addBodyPreference(bp);
+			c.setOptions(options);
+			
 			IDataEncoder encoder = getEncoders().getEncoder(
 					fetchResult.ic.get(0).getData());
 			encoder.encode(bs, dataElem, fetchResult.ic.get(0).getData(), c,
