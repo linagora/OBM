@@ -1,8 +1,8 @@
 package org.obm.push;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
@@ -28,51 +28,79 @@ public class UnsynchronizedItemImpl implements UnsynchronizedItemService {
 	}
 
 	@Override
-	public void add(Credentials credentials, int collectionId, ItemChange ic) {
-		Key key = buildKey(credentials, collectionId);
+	public void storeItemToAdd(Credentials credentials, int collectionId, ItemChange ic) {
+		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.ADD);
+		storeItem(ic, key);
+	}
 
-		List<ItemChange> itemChanges = list(key);
+	@Override
+	public Set<ItemChange> listItemToAdd(Credentials credentials, int collectionId) {
+		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.ADD);
+		return listItem(key);
+	}
+
+	@Override
+	public void clearItemToAdd(Credentials credentials, int collectionId) {
+		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.ADD);
+		clearItem(key);
+	}
+
+	@Override
+	public void storeItemToRemove(Credentials credentials, int collectionId, ItemChange ic) {
+		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.DELETE);
+		storeItem(ic, key);
+	}
+
+	@Override
+	public Set<ItemChange> listItemToRemove(Credentials credentials, int collectionId) {
+		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.DELETE);
+		return listItem(key);
+	}
+
+	@Override
+	public void clearItemToRemove(Credentials credentials, int collectionId) {
+		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.DELETE);
+		clearItem(key);
+	}
+
+	private void storeItem(ItemChange ic, Key key) {
+		Set<ItemChange> itemChanges = listItem(key);
 		itemChanges.add(ic);
 		store.put( new Element(key, itemChanges) );
 	}
-
-	@Override
-	public List<ItemChange> list(Credentials credentials, int collectionId) {
-		Key key = buildKey(credentials, collectionId);
-		return list(key);
-	}
-
-	@Override
-	public void clear(Credentials credentials, int collectionId) {
-		Key key = buildKey(credentials, collectionId);
-
-		List<ItemChange> itemChanges = list(key);
+	
+	private void clearItem(Key key) {
+		Set<ItemChange> itemChanges = listItem(key);
 		itemChanges.clear();
 		store.put( new Element(key, itemChanges) );
 	}
-
-	private List<ItemChange> list(Key key) {
+	
+	private Set<ItemChange> listItem(Key key) {
 		Element element = store.get(key);
 		if (element != null) {
-			return (List<ItemChange>) element.getValue();
+			return (Set<ItemChange>) element.getValue();
 		} else {
-			return new ArrayList<ItemChange>();
+			return new HashSet<ItemChange>();
 		}
 	}
 
-	private Key buildKey(Credentials credentials, Integer collectionId) {
-		return new Key(credentials, collectionId);
+	private Key buildKey(Credentials credentials, Integer collectionId, 
+			UnsynchronizedItemType unsynchronizedItemType) {
+		
+		return new Key(credentials, collectionId, unsynchronizedItemType);
 	}
 
 	private class Key implements Serializable {
 
 		private final Credentials credentials;
 		private final int collectionId;
-
-		public Key(Credentials credentials, int collectionId) {
+		private final UnsynchronizedItemType unsynchronizedItemType;
+		
+		public Key(Credentials credentials, int collectionId, UnsynchronizedItemType unsynchronizedItemType) {
 			super();
 			this.credentials = credentials;
 			this.collectionId = collectionId;
+			this.unsynchronizedItemType = unsynchronizedItemType;
 		}
 
 		@Override
@@ -82,6 +110,10 @@ public class UnsynchronizedItemImpl implements UnsynchronizedItemService {
 			result = prime * result + collectionId;
 			result = prime * result
 					+ ((credentials == null) ? 0 : credentials.hashCode());
+			result = prime
+					* result
+					+ ((unsynchronizedItemType == null) ? 0
+							: unsynchronizedItemType.hashCode());
 			return result;
 		}
 
@@ -101,8 +133,10 @@ public class UnsynchronizedItemImpl implements UnsynchronizedItemService {
 					return false;
 			} else if (!credentials.equals(other.credentials))
 				return false;
+			if (unsynchronizedItemType != other.unsynchronizedItemType)
+				return false;
 			return true;
-		}
+		}		
 	}
 
 }

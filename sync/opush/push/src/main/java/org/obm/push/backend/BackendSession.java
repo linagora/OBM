@@ -3,12 +3,10 @@ package org.obm.push.backend;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.obm.push.Device;
-import org.obm.push.ItemChange;
 import org.obm.push.impl.Credentials;
 import org.obm.push.store.SyncCollection;
 
@@ -19,7 +17,6 @@ public class BackendSession {
 	private final Device device;
 	private final String command;
 	private final BigDecimal protocolVersion;
-	private final Map<Integer, Set<ItemChange>> unSynchronizedDeletedItemChangeByCollection;
 	
 	private String lastContinuationHandler;
 	private String policyKey;
@@ -34,7 +31,6 @@ public class BackendSession {
 		this.command = command;
 		this.device = device;
 		this.protocolVersion = protocolVersion;
-		this.unSynchronizedDeletedItemChangeByCollection = new HashMap<Integer, Set<ItemChange>>();
 		this.lastMonitored = new HashMap<Integer, SyncCollection>();
 	}
 
@@ -84,25 +80,6 @@ public class BackendSession {
 
 	public void setLastMonitored(Map<Integer, SyncCollection> lastMonitored) {
 		this.lastMonitored = lastMonitored;
-	}
-	
-	public void addUnSynchronizedDeletedItemChange(Integer collectionId, ItemChange change) {
-		Set<ItemChange> deletes = unSynchronizedDeletedItemChangeByCollection.get(collectionId);
-		if (deletes == null) {
-			deletes = new HashSet<ItemChange>();
-			unSynchronizedDeletedItemChangeByCollection.put(collectionId, deletes);
-		}
-		deletes.add(change);
-	}
-
-	public Set<ItemChange> getUnSynchronizedDeletedItemChange(
-			Integer collectionId) {
-		Set<ItemChange> ret = unSynchronizedDeletedItemChangeByCollection
-				.get(collectionId);
-		if (ret == null) {
-			ret = new HashSet<ItemChange>();
-		}
-		return ret;
 	}
 
 	public String getLastContinuationHandler() {

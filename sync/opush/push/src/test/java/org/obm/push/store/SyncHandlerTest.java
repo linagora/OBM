@@ -77,8 +77,6 @@ public class SyncHandlerTest {
 		itemChange.setData(event);
 		itemChanges.add(itemChange);
 		EasyMock.expectLastCall().andReturn(itemChanges).anyTimes();
-		bs.getUnSynchronizedDeletedItemChange(collectionId);
-		EasyMock.expectLastCall().andReturn(null);
 
 		StateMachine stateMachine = EasyMock.createMock(StateMachine.class); 
 		stateMachine.getSyncState(collectionId, syncKey);

@@ -189,7 +189,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		DataDelta delta = null;
 		Date lastSync = null;
 		
-		int unSynchronizedItemNb = unSynchronizedItemCache.list(bs.getCredentials(), c.getCollectionId()).size();
+		int unSynchronizedItemNb = unSynchronizedItemCache.listItemToAdd(bs.getCredentials(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
 			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getOptions().getFilterType(), c.getCollectionId());
 			lastSync = delta.getSyncDate();
@@ -210,25 +210,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			processedIds.append(' ').append(k.getValue());
 		}
 
-		Set<ItemChange> unSyncdeleted = bs.getUnSynchronizedDeletedItemChange(c
-				.getCollectionId());
-		if (delta != null && delta.getDeletions() != null
-				&& unSyncdeleted != null) {
-			delta.getDeletions().addAll(unSyncdeleted);
-			unSyncdeleted.clear();
-		}
-
-		if (delta != null && delta.getDeletions() != null) {
-			for (ItemChange ic : delta.getDeletions()) {
-				if (processedClientIds.containsKey(ic.getServerId())) {
-					// changed.add(ic);
-					bs.addUnSynchronizedDeletedItemChange(c.getCollectionId(),
-							ic);
-				} else {
-					serializeDeletion(commands, ic);
-				}
-			}
-		}
+		serializeDeletion(bs, c, processedClientIds, delta, commands);
 
 		for (ItemChange ic : changed) {
 			String clientId = processedClientIds.get(ic.getServerId());
@@ -294,6 +276,27 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		return lastSync;
 	}
 
+	private void serializeDeletion(BackendSession bs, SyncCollection c, Map<String, String> processedClientIds, 
+			DataDelta delta, Element commands) {
+		
+		Set<ItemChange> unSyncdeleted = unSynchronizedItemCache.listItemToRemove(bs.getCredentials(), c.getCollectionId());
+		
+		if (delta != null && delta.getDeletions() != null && unSyncdeleted != null) {
+			delta.getDeletions().addAll(unSyncdeleted);
+			unSynchronizedItemCache.clearItemToRemove(bs.getCredentials(), c.getCollectionId());
+		}
+
+		if (delta != null && delta.getDeletions() != null) {
+			for (ItemChange ic: delta.getDeletions()) {
+				if (processedClientIds.containsKey(ic.getServerId())) {
+					unSynchronizedItemCache.storeItemToRemove(bs.getCredentials(), c.getCollectionId(), ic);
+				} else {
+					serializeDeletion(commands, ic);
+				}
+			}
+		}
+	}
+
 	private List<ItemChange> processWindowSize(SyncCollection c, DataDelta delta, 
 			BackendSession backendSession, Map<String, String> processedClientIds) {
 		
@@ -306,8 +309,8 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			changed.addAll(delta.getChanges());
 		}
 		
-		changed.addAll(unSynchronizedItemCache.list(credentials, collectionId));
-		unSynchronizedItemCache.clear(credentials, collectionId);
+		changed.addAll(unSynchronizedItemCache.listItemToAdd(credentials, collectionId));
+		unSynchronizedItemCache.clearItemToAdd(credentials, collectionId);
 		
 		if (changed.size() <= windowSize) {
 			return changed;
@@ -335,7 +338,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		int changedSize = changed.size();
 		for (int i = windowSize; i < changedSize; i++) {
 			ItemChange ic = changed.get(changed.size() - 1);
-			unSynchronizedItemCache.add(credentials, collectionId, ic);
+			unSynchronizedItemCache.storeItemToAdd(credentials, collectionId, ic);
 			changed.remove(ic);
 		}
 

@@ -1,6 +1,6 @@
 package org.obm.push;
 
-import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -23,55 +23,84 @@ public class UnSynchronizedItemImplTest {
 	
 	@Test
 	public void list() {
-		List<ItemChange> itemChanges = unSynchronizedItemImpl.list(credentials, 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
 		Assert.assertNotNull(itemChanges);
 	}
 	
 	@Test
 	public void add() {
-		unSynchronizedItemImpl.add(credentials, 1, buildItemChange("test 1"));
-		List<ItemChange> itemChanges = unSynchronizedItemImpl.list(credentials, 1);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, buildItemChange("test 1"));
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(1, itemChanges.size());
-		Assert.assertEquals("test 1", itemChanges.get(0).getDisplayName());
+		Assert.assertEquals("test 1", itemChanges.iterator().next().getDisplayName());
 	}
 	
 	@Test
 	public void addTwoItemsOnTheSameCollection() {
-		unSynchronizedItemImpl.add(credentials, 1, buildItemChange("test 1"));
-		unSynchronizedItemImpl.add(credentials, 1, buildItemChange("test 2"));
-		List<ItemChange> itemChanges = unSynchronizedItemImpl.list(credentials, 1);
+		ItemChange ItemChange1 = buildItemChange("test 1");
+		ItemChange ItemChange2 = buildItemChange("test 2");
+		ItemChange ItemChange3 = buildItemChange("test 3");
+		
+		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange1);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange2);
+		
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(2, itemChanges.size());
-		Assert.assertEquals("test 1", itemChanges.get(0).getDisplayName());
-		Assert.assertEquals("test 2", itemChanges.get(1).getDisplayName());
+		
+		Assert.assertTrue(itemChanges.contains(ItemChange1));
+		Assert.assertTrue(itemChanges.contains(ItemChange2));
+		Assert.assertFalse(itemChanges.contains(ItemChange3));
 	}
 	
 	@Test
 	public void addItemsOnTwoCollections() {
-		unSynchronizedItemImpl.add(credentials, 1, buildItemChange("test 1.1"));
-		unSynchronizedItemImpl.add(credentials, 1, buildItemChange("test 1.2"));
-		unSynchronizedItemImpl.add(credentials, 2, buildItemChange("test 2.1"));
+		ItemChange ItemChange1 = buildItemChange("test 1.1");
+		ItemChange ItemChange2 = buildItemChange("test 1.2");
+		ItemChange ItemChange21 = buildItemChange("test 2.1");
 		
-		List<ItemChange> itemChangesOneCollection = unSynchronizedItemImpl.list(credentials, 1);
-		List<ItemChange> itemChangesTwoCollection = unSynchronizedItemImpl.list(credentials, 2);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange1);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange2);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, 2, ItemChange21);
+		
+		Set<ItemChange> itemChangesOneCollection = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
+		Set<ItemChange> itemChangesTwoCollection = unSynchronizedItemImpl.listItemToAdd(credentials, 2);
 		
 		Assert.assertNotNull(itemChangesOneCollection);
 		Assert.assertEquals(2, itemChangesOneCollection.size());
-		Assert.assertEquals("test 1.1", itemChangesOneCollection.get(0).getDisplayName());
-		Assert.assertEquals("test 1.2", itemChangesOneCollection.get(1).getDisplayName());
+		Assert.assertTrue(itemChangesOneCollection.contains(ItemChange1));
+		Assert.assertTrue(itemChangesOneCollection.contains(ItemChange2));
 		
 		Assert.assertNotNull(itemChangesTwoCollection);
 		Assert.assertEquals(1, itemChangesTwoCollection.size());
-		Assert.assertEquals("test 2.1", itemChangesTwoCollection.get(0).getDisplayName());	
+		Assert.assertTrue(itemChangesTwoCollection.contains(ItemChange21));	
+	}
+	
+	@Test
+	public void addTwoItemsDifferentTypeOnTheSameCollection() {
+		ItemChange ItemChange1 = buildItemChange("test 1");
+		ItemChange ItemChange2 = buildItemChange("test 2");
+		ItemChange ItemChange3 = buildItemChange("test 3");
+		
+		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange1);
+		unSynchronizedItemImpl.storeItemToRemove(credentials, 1, ItemChange2);
+		
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
+		Assert.assertNotNull(itemChanges);
+		Assert.assertEquals(1, itemChanges.size());
+		
+		Assert.assertTrue(itemChanges.contains(ItemChange1));
+		Assert.assertFalse(itemChanges.contains(ItemChange2));
+		Assert.assertFalse(itemChanges.contains(ItemChange3));
 	}
 	
 	@Test
 	public void clear() {
-		unSynchronizedItemImpl.add(credentials, 1, buildItemChange("test 1"));
-		unSynchronizedItemImpl.clear(credentials, 1);		
+		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, buildItemChange("test 1"));
+		unSynchronizedItemImpl.clearItemToAdd(credentials, 1);		
 		
-		List<ItemChange> itemChanges = unSynchronizedItemImpl.list(credentials, 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(0, itemChanges.size());
 	}
