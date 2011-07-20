@@ -14,10 +14,10 @@
 		
 
 		<postgresql.version>9.0-801.jdbc4</postgresql.version>
-		<mysql-connector-java.version>5.1.16</mysql-connector-java.version>
+		<mysql-connector-java.version>5.1.17</mysql-connector-java.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<hornetq.version>2.2.2.Final</hornetq.version>
+		<hornetq.version>2.2.6.Final</hornetq.version>
 		<junit.version>4.8.2</junit.version>
 		<easymock.version>3.0</easymock.version>
 		<guava.version>r09</guava.version>
@@ -32,7 +32,7 @@
 		<servlet-api.version>2.5</servlet-api.version>
 		<mail.version>1.4.4</mail.version>
 		<freemarker.version>2.3.18</freemarker.version>
-		<jsoup.version>1.5.2</jsoup.version>
+		<jsoup.version>1.6.1</jsoup.version>
 		<guice.version>3.0</guice.version>
 		<apache-mime4j.version>0.6.1</apache-mime4j.version>
 	</properties>
@@ -293,11 +293,6 @@ org.eclipse.jdt.core.compiler.source=1.6]]>
 				<artifactId>jsoup</artifactId>
 				<version>${jsoup.version}</version>
 				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.google.inject</groupId>
-				<artifactId>guice</artifactId>
-				<version>${guice.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>net.fortuna.ical4j</groupId>
