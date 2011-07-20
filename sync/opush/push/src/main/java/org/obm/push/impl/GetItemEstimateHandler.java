@@ -97,9 +97,6 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 					createCollectionIdElement(syncCollection, collectionElement);
 					createEstimateElement(bs, syncCollection, collectionId, state,
 							collectionElement);
-
-					bs.addLastClientSyncState(syncCollection.getCollectionId(),
-							state);
 				}
 
 			} else {

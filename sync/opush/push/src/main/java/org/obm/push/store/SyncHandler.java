@@ -489,13 +489,6 @@ public class SyncHandler extends WbxmlRequestHandler implements
 					String syncKey = c.getSyncKey();
 					SyncState st = stMachine.getSyncState(c.getCollectionId(), syncKey);
 
-					SyncState oldClientSyncKey = bs.getLastClientSyncState(c
-							.getCollectionId());
-					if (oldClientSyncKey != null
-							&& oldClientSyncKey.getKey().equals(syncKey)) {
-						st.setLastSync(oldClientSyncKey.getLastSync());
-					}
-
 					if (c.getDataClass() != null) {
 						DOMUtils.createElementAndText(ce, "Class",
 								c.getDataClass());
@@ -522,7 +515,6 @@ public class SyncHandler extends WbxmlRequestHandler implements
 								doFetch(bs, c, ce);
 							}
 						}
-						bs.addLastClientSyncState(c.getCollectionId(), st);
 						sk.setTextContent(stMachine.allocateNewSyncKey(bs,
 								c.getCollectionId(), syncDate));
 					}

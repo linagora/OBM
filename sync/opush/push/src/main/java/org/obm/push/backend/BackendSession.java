@@ -11,7 +11,6 @@ import org.obm.push.Device;
 import org.obm.push.ItemChange;
 import org.obm.push.impl.Credentials;
 import org.obm.push.store.SyncCollection;
-import org.obm.push.store.SyncState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +23,6 @@ public class BackendSession {
 	private final Device device;
 	private final String command;
 	private final BigDecimal protocolVersion;
-	private final Map<Integer, SyncState> lastClientSyncState;
 	private final Map<Integer, Set<ItemChange>> unSynchronizedDeletedItemChangeByCollection;
 	
 	private String lastContinuationHandler;
@@ -41,7 +39,6 @@ public class BackendSession {
 		this.device = device;
 		this.protocolVersion = protocolVersion;
 		this.unSynchronizedDeletedItemChangeByCollection = new HashMap<Integer, Set<ItemChange>>();
-		this.lastClientSyncState = new HashMap<Integer, SyncState>();
 		this.lastMonitored = new HashMap<Integer, SyncCollection>();
 	}
 
@@ -112,16 +109,7 @@ public class BackendSession {
 		return ret;
 	}
 
-	public SyncState getLastClientSyncState(Integer collectionId) {
-		return lastClientSyncState.get(collectionId);
-	}
-
-	public void addLastClientSyncState(Integer collectionId, SyncState synckey) {
-		lastClientSyncState.put(collectionId, synckey);
-	}
-
 	public void clear(Integer collectionId) {
-		this.lastClientSyncState.remove(collectionId);
 	}
 
 	public String getLastContinuationHandler() {

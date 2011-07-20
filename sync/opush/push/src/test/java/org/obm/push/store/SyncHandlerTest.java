@@ -71,15 +71,12 @@ public class SyncHandlerTest {
 		
 		IContentsExporter exporter = EasyMock.createMock(IContentsExporter.class);
 		
-		bs.getLastClientSyncState(collectionId);
-		EasyMock.expectLastCall().andReturn(null);
 		Set<ItemChange> itemChanges = new HashSet<ItemChange>();
 		ItemChange itemChange = new ItemChange();
 		itemChange.setServerId("serverId");
 		itemChange.setData(event);
 		itemChanges.add(itemChange);
 		EasyMock.expectLastCall().andReturn(itemChanges).anyTimes();
-		bs.addLastClientSyncState(collectionId, syncState);
 		bs.getUnSynchronizedDeletedItemChange(collectionId);
 		EasyMock.expectLastCall().andReturn(null);
 
