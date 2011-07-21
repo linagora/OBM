@@ -39,12 +39,14 @@ public class TransactionalInterceptor implements MethodInterceptor {
 		
 		try {
 			if (!nestedTransaction) {
+				logger.info("transaction was started");
 				ut.begin();
 			}
 			
 			Object obj = methodInvocation.proceed();
 			
 			if (!nestedTransaction) {
+				logger.info("transaction was commited");
 				ut.commit();
 			}
 			return obj;
@@ -55,6 +57,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
 					ut.rollback();
 				} else {
 					if (!nestedTransaction) {
+						logger.info("transaction was commited");
 						ut.commit();
 					}
 				}
