@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.obm.push.SyncedCollectionStoreService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.Sync;
 import org.obm.push.data.CalendarDecoder;
@@ -41,11 +42,13 @@ public class SyncDecoder {
 	private static final Logger logger = LoggerFactory.getLogger(SyncDecoder.class);
 	
 	private final ISyncStorage store;
+	private final SyncedCollectionStoreService syncedCollectionStoreService;
 	private final Map<PIMDataType, IDataDecoder> decoders;
 
 	@Inject
-	private SyncDecoder(ISyncStorage store) {
+	private SyncDecoder(SyncedCollectionStoreService syncedCollectionStoreService, ISyncStorage store) {
 		this.store = store;
+		this.syncedCollectionStoreService = syncedCollectionStoreService;
 		this.decoders = ImmutableMap.<PIMDataType, IDataDecoder>builder()
 				.put(PIMDataType.CONTACTS, new ContactDecoder())
 				.put(PIMDataType.CALENDAR, new CalendarDecoder())
@@ -66,13 +69,13 @@ public class SyncDecoder {
 		NodeList nl = root.getElementsByTagName("Collection");
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element col = (Element) nl.item(i);
-			SyncCollection collec = getCollection(col, isPartial,
-					bs.getLastMonitoredById());
+			SyncCollection collec = getCollection(bs, col, isPartial);
 			ret.addCollection(collec);
 		}
 		if (ret.getCollections().size() == 0) {
 			throw new PartialException();
 		}
+		syncedCollectionStoreService.put(bs.getCredentials(), ret.getCollections());
 		return ret;
 	}
 
@@ -92,15 +95,15 @@ public class SyncDecoder {
 		return ret;
 	}
 
-	private SyncCollection getCollection(Element col,
-			boolean isPartial, Map<Integer, SyncCollection> lastMonitored)
+	private SyncCollection getCollection(BackendSession bs, Element col,
+			boolean isPartial)
 			throws PartialException, ProtocolException{
 		SyncCollection collection = new SyncCollection();
 		Integer collectionId = getCollectionId(col);
 		if (collectionId == null) {
 			throw new ProtocolException("CollectionId can't be null");
 		}
-		SyncCollection lastSyncCollection = lastMonitored.get(collectionId);
+		SyncCollection lastSyncCollection = syncedCollectionStoreService.get(bs.getCredentials(), collectionId);
 		if (isPartial && lastSyncCollection == null) {
 			throw new PartialException();
 		}
