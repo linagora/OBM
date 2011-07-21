@@ -4,6 +4,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+<<<<<<< HEAD
+=======
+import org.obm.push.ActiveSyncServlet;
+import org.obm.push.MonitoredCollectionStoreService;
+>>>>>>> OBMFULL-2455 - Removes lastMonitored from BackendSession
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IBackend;
@@ -32,14 +37,18 @@ import com.google.inject.Singleton;
 @Singleton
 public class PingHandler extends WbxmlRequestHandler implements
 		IContinuationHandler {
+	
+	private final MonitoredCollectionStoreService monitoredCollectionService;
 
 	@Inject
 	private PingHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage,
-			IContentsExporter contentsExporter, StateMachine stMachine) {
+			IContentsExporter contentsExporter, StateMachine stMachine,
+			MonitoredCollectionStoreService monitoredCollectionService) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
 				contentsExporter, stMachine);
+		this.monitoredCollectionService = monitoredCollectionService;
 	}
 
 	@Override
@@ -50,6 +59,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 					+ ")");
 			
 			long intervalSeconds = 0;
+			Collection<SyncCollection> lastMonitoredCollection = monitoredCollectionService.list(bs.getCredentials());
 			if (doc == null) {
 				logger
 						.info("Empty Ping, reusing cached heartbeat & monitored folders");
@@ -57,12 +67,11 @@ public class PingHandler extends WbxmlRequestHandler implements
 				intervalSeconds = storage.findLastHearbeat(bs.getLoginAtDomain(), bs.getDevId());
 
 				// 5sec, why not ? a mobile device asking for <5sec is just stupid
-				if (bs.getLastMonitored() == null
-						|| bs.getLastMonitored().isEmpty() || intervalSeconds < 5) {
+				if (lastMonitoredCollection.isEmpty()|| intervalSeconds < 5) {
 
 					logger.error("Don't know what to monitor, " + "interval: "
 							+ intervalSeconds + " toMonitor: "
-							+ bs.getLastMonitored());
+							+ lastMonitoredCollection);
 					sendError(responder, PingStatus.MISSING_REQUEST_PARAMS, continuation);
 					return;
 				}
@@ -98,16 +107,21 @@ public class PingHandler extends WbxmlRequestHandler implements
 				if (folders.getLength() > 0) {
 					logger.warn("=========== setting monitored to "
 							+ toMonitor.size());
-					bs.setLastMonitored(toMonitor);
+					monitoredCollectionService.put(bs.getCredentials(), toMonitor);
 				}
 				storage.updateLastHearbeat(bs.getLoginAtDomain(), bs.getDevId(),
 						intervalSeconds);
 			}
 
+<<<<<<< HEAD
 			if (intervalSeconds > 0 && bs.getLastMonitored() != null) {
 				continuation.setLastContinuationHandler(this);
+=======
+			if (intervalSeconds > 0 && lastMonitoredCollection != null) {
+				bs.setLastContinuationHandler(ActiveSyncServlet.PING_HANDLER);
+>>>>>>> OBMFULL-2455 - Removes lastMonitored from BackendSession
 				CollectionChangeListener l = new CollectionChangeListener(bs,
-						continuation, bs.getLastMonitored());
+						continuation, lastMonitoredCollection);
 				IListenerRegistration reg = backend.addChangeListener(l);
 				continuation.setListenerRegistration(reg);
 				continuation.setCollectionChangeListener(l);

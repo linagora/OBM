@@ -18,10 +18,10 @@ public class ObjectStoreManagerTest {
 	}
 
 	@Test
-	public void loadOneStore() {
+	public void loadStores() {
 		List<String> stores = opushCacheManager.listStores();
 		Assert.assertNotNull(stores);
-		Assert.assertEquals(1, stores.size());
+		Assert.assertEquals(3, stores.size());
 	}
 	
 	@Test
@@ -37,7 +37,7 @@ public class ObjectStoreManagerTest {
 
 		Assert.assertNull(opushCacheManager.getStore("test 2"));
 		
-		Assert.assertEquals(3, opushCacheManager.listStores().size());
+		Assert.assertEquals(5, opushCacheManager.listStores().size());
 	}
 	
 	@Test
@@ -54,7 +54,7 @@ public class ObjectStoreManagerTest {
 		opushCacheManager.createNewStore("test 1");
 		Assert.assertNotNull(opushCacheManager.getStore("test 1"));
 
-		Assert.assertEquals(2, opushCacheManager.listStores().size());
+		Assert.assertEquals(4, opushCacheManager.listStores().size());
 	}
 
 }

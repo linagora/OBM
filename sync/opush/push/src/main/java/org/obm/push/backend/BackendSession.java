@@ -1,14 +1,9 @@
 package org.obm.push.backend;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import org.obm.push.Device;
 import org.obm.push.impl.Credentials;
-import org.obm.push.store.SyncCollection;
 
 public class BackendSession {
 
@@ -18,8 +13,6 @@ public class BackendSession {
 	private final String command;
 	private final BigDecimal protocolVersion;
 
-	private Map<Integer, SyncCollection> lastMonitored;
-
 	public BackendSession(Credentials credentials, String devId, String command, Device device, BigDecimal protocolVersion) {
 		super();
 		this.credentials = credentials;
@@ -27,7 +20,6 @@ public class BackendSession {
 		this.command = command;
 		this.device = device;
 		this.protocolVersion = protocolVersion;
-		this.lastMonitored = new HashMap<Integer, SyncCollection>();
 	}
 
 	public boolean checkHint(String key, boolean defaultValue) {
@@ -58,25 +50,6 @@ public class BackendSession {
 		return this.protocolVersion;
 	}
 	
-	public Map<Integer, SyncCollection> getLastMonitoredById() {
-		return lastMonitored;
-	}
-
-	public Collection<SyncCollection> getLastMonitored() {
-		return lastMonitored.values();
-	}
-
-	public void setLastMonitored(Map<Integer, SyncCollection> lastMonitored) {
-		this.lastMonitored = lastMonitored;
-	}
-
-	public void setLastMonitored(Set<SyncCollection> toMonitor) {
-		this.lastMonitored.clear();
-		for(SyncCollection col : toMonitor){
-			this.lastMonitored.put(col.getCollectionId(), col);
-		}
-	}
-
 	public Credentials getCredentials() {
 		return credentials;
 	}

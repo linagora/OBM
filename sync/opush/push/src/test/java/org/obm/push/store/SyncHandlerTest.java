@@ -19,6 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
 import org.obm.push.ItemChange;
+import org.obm.push.MonitoredCollectionStoreService;
 import org.obm.push.UnsynchronizedItemService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
@@ -91,9 +92,9 @@ public class SyncHandlerTest {
 		EasyMock.expectLastCall().andReturn(new CalendarEncoder());
 		
 		UnsynchronizedItemService synchronizedItemCache = EasyMock.createMock(UnsynchronizedItemService.class);
-		
+		MonitoredCollectionStoreService monitoredCollectionStoreService = EasyMock.createMock(MonitoredCollectionStoreService.class);
 		SyncHandler syncHandler = new SyncHandler(backend, encoderFactory, null, null, null, exporter, 
-				stateMachine, synchronizedItemCache);
+				stateMachine, synchronizedItemCache, monitoredCollectionStoreService);
 				
 		Responder responder = EasyMock.createMock(Responder.class);
 		Capture<Document> document = new Capture<Document>();

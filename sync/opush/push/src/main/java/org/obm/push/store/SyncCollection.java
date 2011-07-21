@@ -1,5 +1,6 @@
 package org.obm.push.store;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Set;
 import com.google.common.base.Objects;
 
 
-public class SyncCollection {
+public class SyncCollection implements Serializable{
 	
 	private SyncState syncState;
 	private List<String> fetchIds;

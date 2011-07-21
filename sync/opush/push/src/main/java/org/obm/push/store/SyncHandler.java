@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
 import org.obm.push.ItemChange;
+import org.obm.push.MonitoredCollectionStoreService;
 import org.obm.push.UnsynchronizedItemService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.CollectionChangeListener;
@@ -75,6 +76,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	private static Map<Integer, IContinuation> waitContinuationCache;
 	private final SyncDecoder syncDecoder;
 	private final UnsynchronizedItemService unSynchronizedItemCache;
+	private final MonitoredCollectionStoreService monitoredCollectionService;
 
 	static {
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
@@ -83,13 +85,15 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			SyncDecoder syncDecoder, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine, UnsynchronizedItemService unSynchronizedItemCache) {
+			StateMachine stMachine, UnsynchronizedItemService unSynchronizedItemCache,
+			MonitoredCollectionStoreService monitoredCollectionService) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
 				contentsExporter, stMachine);
 		
 		this.syncDecoder = syncDecoder;
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
+		this.monitoredCollectionService = monitoredCollectionService;
 	}
 
 	@Override
@@ -103,6 +107,35 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			}
 			Sync sync = null;
 			sync = syncDecoder.decodeSync(doc, bs);
+			boolean modif = processCollections(bs, sync, processedClientIds);
+			if (sync.getWaitInSecond() > 0 && !modif) {
+				logger.info("suspend for " + sync.getWaitInSecond()
+						+ " seconds");
+				if (sync.getWaitInSecond() > 3540) {
+					sendWaitIntervalOutOfRangeError(responder);
+					return;
+				}
+				for (SyncCollection sc : sync.getCollections()) {
+					String collectionPath = storage.getCollectionPath(sc.getCollectionId());
+					sc.setCollectionPath(collectionPath);
+					PIMDataType dataClass = storage.getDataClass(
+							collectionPath);
+					if ("email".equalsIgnoreCase(dataClass.toString())) {
+						backend.startEmailMonitoring(bs, sc.getCollectionId());
+						break;
+					}
+				}
+				bs.setLastContinuationHandler(ActiveSyncServlet.SYNC_HANDLER);
+				monitoredCollectionService.put(bs.getCredentials(), sync.getCollectionById().values());
+				CollectionChangeListener l = new CollectionChangeListener(bs,
+						continuation, sync.getCollections());
+				IListenerRegistration reg = backend.addChangeListener(l);
+				continuation.setListenerRegistration(reg);
+				continuation.setCollectionChangeListener(l);
+				for (SyncCollection sc : sync.getCollections()) {
+					waitContinuationCache.put(sc.getCollectionId(),
+							continuation);
+				}
 
 			ModificationStatus modificationStatus = processCollections(bs, sync);
 
@@ -158,7 +191,6 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			}
 		}
 		continuation.setLastContinuationHandler(this);
-		bs.setLastMonitored(sync.getCollectionById());
 		CollectionChangeListener l = new CollectionChangeListener(bs,
 				continuation, sync.getCollections());
 		IListenerRegistration reg = backend.addChangeListener(l);
@@ -471,9 +503,10 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	public void sendResponse(BackendSession bs, Responder responder,
 			boolean sendHierarchyChange, IContinuation continuation) {
 		
-		Map<String, String> processedClientIds = ImmutableMap.<String, String>of();
-		processResponse(bs, responder, bs.getLastMonitored(),
-				processedClientIds, continuation);
+		Map<String, String> processedClientIds = new HashMap<String, String>(
+				bs.getLastSyncProcessedClientIds());
+		bs.setLastSyncProcessedClientIds(new HashMap<String, String>());
+		processResponse(bs, responder, monitoredCollectionService.list(bs.getCredentials()),
 
 	}
 
