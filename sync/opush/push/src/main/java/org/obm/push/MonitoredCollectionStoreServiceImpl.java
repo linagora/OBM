@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.obm.push.impl.Credentials;
@@ -15,20 +14,23 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class MonitoredCollectionStoreServiceImpl implements MonitoredCollectionStoreService {
+public class MonitoredCollectionStoreServiceImpl extends AbstractStoreService implements MonitoredCollectionStoreService {
 
 	private static final String STORE_NAME = "monitoredCollectionService";
-	private final ObjectStoreManager objectStoreManager;
-	private final Cache store;
 	
-	@Inject MonitoredCollectionStoreServiceImpl(ObjectStoreManager objectStoreManager) {
-		this.objectStoreManager = objectStoreManager;
-		this.store = this.objectStoreManager.getStore( STORE_NAME );
+	@Inject  MonitoredCollectionStoreServiceImpl(
+			ObjectStoreManager objectStoreManager) {
+		super(objectStoreManager);
 	}
 
 	@Override
-	public Collection<SyncCollection> list(Credentials credentials) {
-		Key key = buildKey(credentials);
+	protected String getStoreName() {
+		return STORE_NAME;
+	}
+	
+	@Override
+	public Collection<SyncCollection> list(Credentials credentials, Device device) {
+		Key key = buildKey(credentials, device);
 		Element element = store.get(key);
 		if (element != null) {
 			return (List<SyncCollection>) element.getValue();
@@ -38,42 +40,45 @@ public class MonitoredCollectionStoreServiceImpl implements MonitoredCollectionS
 	}
 
 	@Override
-	public void put(Credentials credentials,
+	public void put(Credentials credentials, Device device,
 			Collection<SyncCollection> collections) {
-		remove(credentials);
-		add(credentials, collections);
+		Key key = buildKey(credentials, device);
+		remove(key);
+		add(key, collections);
 	}
 	
-	private void add(Credentials credentials,
-			Collection<SyncCollection> collections) {
-		Key key = buildKey(credentials);
+	private void add(Key key, Collection<SyncCollection> collections) {
 		store.put( new Element(key, collections) );
 	}
 	
-	private void remove(Credentials credentials) {
-		Key key = buildKey(credentials);
+	private void remove(Key key) {
 		store.remove(key);
 	}
 
-	private Key buildKey(Credentials credentials) {
-		return new Key(credentials);
+	private Key buildKey(Credentials credentials, Device device) {
+		return new Key(credentials, device);
 	}
 
 	private class Key implements Serializable {
 
 		private final Credentials credentials;
+		private final Device device;
 
-		public Key(Credentials credentials) {
+		public Key(Credentials credentials, Device device) {
 			super();
 			this.credentials = credentials;
+			this.device = device;
 		}
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
+			result = prime * result + getOuterType().hashCode();
 			result = prime * result
 					+ ((credentials == null) ? 0 : credentials.hashCode());
+			result = prime * result
+					+ ((device == null) ? 0 : device.hashCode());
 			return result;
 		}
 
@@ -86,12 +91,26 @@ public class MonitoredCollectionStoreServiceImpl implements MonitoredCollectionS
 			if (getClass() != obj.getClass())
 				return false;
 			Key other = (Key) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
 			if (credentials == null) {
 				if (other.credentials != null)
 					return false;
 			} else if (!credentials.equals(other.credentials))
 				return false;
+			if (device == null) {
+				if (other.device != null)
+					return false;
+			} else if (!device.equals(other.device))
+				return false;
 			return true;
 		}
+
+		private MonitoredCollectionStoreServiceImpl getOuterType() {
+			return MonitoredCollectionStoreServiceImpl.this;
+		}
+
+		
+		
 	}
 }

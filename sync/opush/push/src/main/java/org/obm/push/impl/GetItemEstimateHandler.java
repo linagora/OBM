@@ -141,7 +141,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			SyncState state, Element collectionElement)
 			throws ActiveSyncException, DOMException, SQLException {
 
-		int unSynchronizedItemNb = unSynchronizedItemCache.listItemToAdd(bs.getCredentials(), syncCollection.getCollectionId()).size();
+		int unSynchronizedItemNb = unSynchronizedItemCache.listItemToAdd(bs.getCredentials(), bs.getDevice(), syncCollection.getCollectionId()).size();
 		
 		int count = contentsExporter.getCount(bs, state, syncCollection.getOptions().getFilterType(), collectionId);
 

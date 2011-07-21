@@ -35,8 +35,9 @@ public class SessionService {
 		
 		String userAgent = r.getHeader("User-Agent");
 		String devType = r.extractDeviceType();
-		BackendSession bs = new BackendSession(credentials, r.p("DeviceId"),
-				r.p("Cmd"), deviceFactory.create(devType, userAgent), getProtocolVersion(r));
+		String devId = r.p("DeviceId");
+		BackendSession bs = new BackendSession(credentials, 
+				r.p("Cmd"), deviceFactory.create(devType, userAgent, devId), getProtocolVersion(r));
 		
 		logger.info("New session = {}", sessionId);
 		return bs;

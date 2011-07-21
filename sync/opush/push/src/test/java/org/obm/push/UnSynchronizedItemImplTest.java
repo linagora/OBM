@@ -23,14 +23,14 @@ public class UnSynchronizedItemImplTest {
 	
 	@Test
 	public void list() {
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 	}
 	
 	@Test
 	public void add() {
-		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, buildItemChange("test 1"));
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, buildItemChange("test 1"));
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(1, itemChanges.size());
 		Assert.assertEquals("test 1", itemChanges.iterator().next().getDisplayName());
@@ -42,10 +42,10 @@ public class UnSynchronizedItemImplTest {
 		ItemChange ItemChange2 = buildItemChange("test 2");
 		ItemChange ItemChange3 = buildItemChange("test 3");
 		
-		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange1);
-		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange2);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange1);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange2);
 		
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(2, itemChanges.size());
 		
@@ -60,12 +60,12 @@ public class UnSynchronizedItemImplTest {
 		ItemChange ItemChange2 = buildItemChange("test 1.2");
 		ItemChange ItemChange21 = buildItemChange("test 2.1");
 		
-		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange1);
-		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange2);
-		unSynchronizedItemImpl.storeItemToAdd(credentials, 2, ItemChange21);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange1);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange2);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 2, ItemChange21);
 		
-		Set<ItemChange> itemChangesOneCollection = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
-		Set<ItemChange> itemChangesTwoCollection = unSynchronizedItemImpl.listItemToAdd(credentials, 2);
+		Set<ItemChange> itemChangesOneCollection = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
+		Set<ItemChange> itemChangesTwoCollection = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 2);
 		
 		Assert.assertNotNull(itemChangesOneCollection);
 		Assert.assertEquals(2, itemChangesOneCollection.size());
@@ -83,10 +83,10 @@ public class UnSynchronizedItemImplTest {
 		ItemChange ItemChange2 = buildItemChange("test 2");
 		ItemChange ItemChange3 = buildItemChange("test 3");
 		
-		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, ItemChange1);
-		unSynchronizedItemImpl.storeItemToRemove(credentials, 1, ItemChange2);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange1);
+		unSynchronizedItemImpl.storeItemToRemove(credentials, getFakeDeviceId(), 1, ItemChange2);
 		
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(1, itemChanges.size());
 		
@@ -97,10 +97,10 @@ public class UnSynchronizedItemImplTest {
 	
 	@Test
 	public void clear() {
-		unSynchronizedItemImpl.storeItemToAdd(credentials, 1, buildItemChange("test 1"));
-		unSynchronizedItemImpl.clearItemToAdd(credentials, 1);		
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, buildItemChange("test 1"));
+		unSynchronizedItemImpl.clearItemToAdd(credentials, getFakeDeviceId(), 1);		
 		
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(0, itemChanges.size());
 	}
@@ -111,4 +111,7 @@ public class UnSynchronizedItemImplTest {
 		return itemChange;
 	}
 	
+	private Device getFakeDeviceId(){
+		return new Device("DevType", "DevId", null);
+	}
 }

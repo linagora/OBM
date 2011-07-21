@@ -27,14 +27,14 @@ public class SyncedCollectionStoreServiceImplTest {
 	
 	@Test
 	public void get() {
-		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, 1);
+		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
 		Assert.assertNull(syncCollection);
 	}
 	
 	@Test
 	public void put() {
-		syncedCollectionStoreServiceImpl.put(credentials, buildListCollection(1));
-		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, 1);
+		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
+		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(syncCollection);
 		Assert.assertEquals(new Integer(1), syncCollection.getCollectionId());
 	}
@@ -43,17 +43,11 @@ public class SyncedCollectionStoreServiceImplTest {
 	public void putUpdatedCollection() {
 		Collection<SyncCollection> cols = buildListCollection(1);
 		cols.iterator().next().setCollectionPath("PATH1");
-		syncedCollectionStoreServiceImpl.put(credentials, cols);
-		
-		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, 1);
-		Assert.assertNotNull(syncCollection);
-		Assert.assertEquals(new Integer(1), syncCollection.getCollectionId());
-		Assert.assertEquals("PATH1", syncCollection.getCollectionPath());
-		
+		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), cols);
 		cols.iterator().next().setCollectionPath("PATH1CHANGE");
-		syncedCollectionStoreServiceImpl.put(credentials, cols);
+		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), cols);
 		
-		syncCollection = syncedCollectionStoreServiceImpl.get(credentials, 1);
+		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(syncCollection);
 		Assert.assertEquals(new Integer(1), syncCollection.getCollectionId());
 		Assert.assertEquals("PATH1CHANGE", syncCollection.getCollectionPath());
@@ -61,16 +55,15 @@ public class SyncedCollectionStoreServiceImplTest {
 	
 	@Test
 	public void putList() {
-		syncedCollectionStoreServiceImpl.put(credentials, buildListCollection(1,2,3));
-		SyncCollection syncCollection1 = syncedCollectionStoreServiceImpl.get(credentials, 1);
+		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1,2,3));
+		SyncCollection syncCollection1 = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
+		SyncCollection syncCollection2 = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 2);
+		SyncCollection syncCollection3 = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 3);
+		
 		Assert.assertNotNull(syncCollection1);
 		Assert.assertEquals(new Integer(1), syncCollection1.getCollectionId());
-		
-		SyncCollection syncCollection2 = syncedCollectionStoreServiceImpl.get(credentials, 2);
 		Assert.assertNotNull(syncCollection2);
 		Assert.assertEquals(new Integer(2), syncCollection2.getCollectionId());
-		
-		SyncCollection syncCollection3 = syncedCollectionStoreServiceImpl.get(credentials, 3);
 		Assert.assertNotNull(syncCollection3);
 		Assert.assertEquals(new Integer(3), syncCollection3.getCollectionId());
 	}
@@ -83,6 +76,10 @@ public class SyncedCollectionStoreServiceImplTest {
 			cols.add(col);
 		}
 		return cols;
+	}
+	
+	private Device getFakeDeviceId(){
+		return new Device("DevType", "DevId", null);
 	}
 	
 }

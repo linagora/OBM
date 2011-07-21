@@ -7,8 +7,8 @@ import org.obm.push.store.SyncCollection;
 
 public interface MonitoredCollectionStoreService {
 	
-	Collection<SyncCollection> list(Credentials credentials);
+	Collection<SyncCollection> list(Credentials credentials, Device device);
 	
-	void put(Credentials credentials, Collection<SyncCollection> collections);
+	void put(Credentials credentials, Device device, Collection<SyncCollection> collections);
 
 }

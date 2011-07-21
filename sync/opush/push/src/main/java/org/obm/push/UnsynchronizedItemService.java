@@ -6,16 +6,16 @@ import org.obm.push.impl.Credentials;
 
 public interface UnsynchronizedItemService {
 	
-	void storeItemToAdd(Credentials credentials, int collectionId, ItemChange ic);
+	void storeItemToAdd(Credentials credentials, Device device, int collectionId, ItemChange ic);
 
-	Set<ItemChange> listItemToAdd(Credentials credentials, int collectionId);
+	Set<ItemChange> listItemToAdd(Credentials credentials, Device device, int collectionId);
 
-	void clearItemToAdd(Credentials credentials, int collectionId);
+	void clearItemToAdd(Credentials credentials, Device device, int collectionId);
 	
-	void storeItemToRemove(Credentials credentials, int collectionId, ItemChange ic);
+	void storeItemToRemove(Credentials credentials, Device device, int collectionId, ItemChange ic);
 
-	Set<ItemChange> listItemToRemove(Credentials credentials, int collectionId);
+	Set<ItemChange> listItemToRemove(Credentials credentials, Device device, int collectionId);
 
-	void clearItemToRemove(Credentials credentials, int collectionId);
+	void clearItemToRemove(Credentials credentials, Device device, int collectionId);
 
 }

@@ -4,11 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-<<<<<<< HEAD
-=======
-import org.obm.push.ActiveSyncServlet;
 import org.obm.push.MonitoredCollectionStoreService;
->>>>>>> OBMFULL-2455 - Removes lastMonitored from BackendSession
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IBackend;
@@ -59,7 +55,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 					+ ")");
 			
 			long intervalSeconds = 0;
-			Collection<SyncCollection> lastMonitoredCollection = monitoredCollectionService.list(bs.getCredentials());
+			Collection<SyncCollection> lastMonitoredCollection = monitoredCollectionService.list(bs.getCredentials(), bs.getDevice());
 			if (doc == null) {
 				logger
 						.info("Empty Ping, reusing cached heartbeat & monitored folders");
@@ -107,19 +103,14 @@ public class PingHandler extends WbxmlRequestHandler implements
 				if (folders.getLength() > 0) {
 					logger.warn("=========== setting monitored to "
 							+ toMonitor.size());
-					monitoredCollectionService.put(bs.getCredentials(), toMonitor);
+					monitoredCollectionService.put(bs.getCredentials(), bs.getDevice(), toMonitor);
 				}
 				storage.updateLastHearbeat(bs.getLoginAtDomain(), bs.getDevId(),
 						intervalSeconds);
 			}
 
-<<<<<<< HEAD
-			if (intervalSeconds > 0 && bs.getLastMonitored() != null) {
+			if (intervalSeconds > 0 && lastMonitoredCollection  != null) {
 				continuation.setLastContinuationHandler(this);
-=======
-			if (intervalSeconds > 0 && lastMonitoredCollection != null) {
-				bs.setLastContinuationHandler(ActiveSyncServlet.PING_HANDLER);
->>>>>>> OBMFULL-2455 - Removes lastMonitored from BackendSession
 				CollectionChangeListener l = new CollectionChangeListener(bs,
 						continuation, lastMonitoredCollection);
 				IListenerRegistration reg = backend.addChangeListener(l);

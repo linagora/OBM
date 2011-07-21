@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.obm.push.impl.Credentials;
@@ -13,53 +12,52 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class UnsynchronizedItemImpl implements UnsynchronizedItemService {
+public class UnsynchronizedItemImpl extends AbstractStoreService implements UnsynchronizedItemService {
 
-	private final ObjectStoreManager objectStoreManager;
-	private final Cache store;
+	private static final String STORE_NAME = "unsynchronizedItemService";
 	
 	@Inject UnsynchronizedItemImpl(ObjectStoreManager objectStoreManager) {
-		this.objectStoreManager = objectStoreManager;
-		this.store = this.objectStoreManager.getStore( getStoreName() );
+		super(objectStoreManager);
 	}
-
-	String getStoreName() {
-		return "unsynchronizedItemService";
+	
+	@Override
+	protected String getStoreName() {
+		return STORE_NAME;
 	}
 
 	@Override
-	public void storeItemToAdd(Credentials credentials, int collectionId, ItemChange ic) {
-		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.ADD);
+	public void storeItemToAdd(Credentials credentials, Device device, int collectionId, ItemChange ic) {
+		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
 		storeItem(ic, key);
 	}
 
 	@Override
-	public Set<ItemChange> listItemToAdd(Credentials credentials, int collectionId) {
-		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.ADD);
+	public Set<ItemChange> listItemToAdd(Credentials credentials, Device device, int collectionId) {
+		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
 		return listItem(key);
 	}
 
 	@Override
-	public void clearItemToAdd(Credentials credentials, int collectionId) {
-		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.ADD);
+	public void clearItemToAdd(Credentials credentials, Device device, int collectionId) {
+		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
 		clearItem(key);
 	}
 
 	@Override
-	public void storeItemToRemove(Credentials credentials, int collectionId, ItemChange ic) {
-		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.DELETE);
+	public void storeItemToRemove(Credentials credentials, Device device, int collectionId, ItemChange ic) {
+		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
 		storeItem(ic, key);
 	}
 
 	@Override
-	public Set<ItemChange> listItemToRemove(Credentials credentials, int collectionId) {
-		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.DELETE);
+	public Set<ItemChange> listItemToRemove(Credentials credentials, Device device, int collectionId) {
+		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
 		return listItem(key);
 	}
 
 	@Override
-	public void clearItemToRemove(Credentials credentials, int collectionId) {
-		Key key = buildKey(credentials, collectionId, UnsynchronizedItemType.DELETE);
+	public void clearItemToRemove(Credentials credentials, Device device, int collectionId) {
+		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
 		clearItem(key);
 	}
 
@@ -84,10 +82,10 @@ public class UnsynchronizedItemImpl implements UnsynchronizedItemService {
 		}
 	}
 
-	private Key buildKey(Credentials credentials, Integer collectionId, 
+	private Key buildKey(Credentials credentials, Device device, Integer collectionId, 
 			UnsynchronizedItemType unsynchronizedItemType) {
 		
-		return new Key(credentials, collectionId, unsynchronizedItemType);
+		return new Key(credentials, device, collectionId, unsynchronizedItemType);
 	}
 
 	private class Key implements Serializable {
@@ -95,21 +93,26 @@ public class UnsynchronizedItemImpl implements UnsynchronizedItemService {
 		private final Credentials credentials;
 		private final int collectionId;
 		private final UnsynchronizedItemType unsynchronizedItemType;
+		private final Device device;
 		
-		public Key(Credentials credentials, int collectionId, UnsynchronizedItemType unsynchronizedItemType) {
+		public Key(Credentials credentials, Device device, int collectionId, UnsynchronizedItemType unsynchronizedItemType) {
 			super();
 			this.credentials = credentials;
+			this.device = device;
 			this.collectionId = collectionId;
 			this.unsynchronizedItemType = unsynchronizedItemType;
 		}
-
+		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
+			result = prime * result + getOuterType().hashCode();
 			result = prime * result + collectionId;
 			result = prime * result
 					+ ((credentials == null) ? 0 : credentials.hashCode());
+			result = prime * result
+					+ ((device == null) ? 0 : device.hashCode());
 			result = prime
 					* result
 					+ ((unsynchronizedItemType == null) ? 0
@@ -126,6 +129,8 @@ public class UnsynchronizedItemImpl implements UnsynchronizedItemService {
 			if (getClass() != obj.getClass())
 				return false;
 			Key other = (Key) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
 			if (collectionId != other.collectionId)
 				return false;
 			if (credentials == null) {
@@ -133,10 +138,19 @@ public class UnsynchronizedItemImpl implements UnsynchronizedItemService {
 					return false;
 			} else if (!credentials.equals(other.credentials))
 				return false;
+			if (device == null) {
+				if (other.device != null)
+					return false;
+			} else if (!device.equals(other.device))
+				return false;
 			if (unsynchronizedItemType != other.unsynchronizedItemType)
 				return false;
 			return true;
-		}		
+		}
+		
+		private UnsynchronizedItemImpl getOuterType() {
+			return UnsynchronizedItemImpl.this;
+		}
 	}
 
 }

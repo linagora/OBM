@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
+import org.obm.push.Device;
 import org.obm.push.ItemChange;
 import org.obm.push.MonitoredCollectionStoreService;
 import org.obm.push.UnsynchronizedItemService;
@@ -107,35 +108,6 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			}
 			Sync sync = null;
 			sync = syncDecoder.decodeSync(doc, bs);
-			boolean modif = processCollections(bs, sync, processedClientIds);
-			if (sync.getWaitInSecond() > 0 && !modif) {
-				logger.info("suspend for " + sync.getWaitInSecond()
-						+ " seconds");
-				if (sync.getWaitInSecond() > 3540) {
-					sendWaitIntervalOutOfRangeError(responder);
-					return;
-				}
-				for (SyncCollection sc : sync.getCollections()) {
-					String collectionPath = storage.getCollectionPath(sc.getCollectionId());
-					sc.setCollectionPath(collectionPath);
-					PIMDataType dataClass = storage.getDataClass(
-							collectionPath);
-					if ("email".equalsIgnoreCase(dataClass.toString())) {
-						backend.startEmailMonitoring(bs, sc.getCollectionId());
-						break;
-					}
-				}
-				bs.setLastContinuationHandler(ActiveSyncServlet.SYNC_HANDLER);
-				monitoredCollectionService.put(bs.getCredentials(), sync.getCollectionById().values());
-				CollectionChangeListener l = new CollectionChangeListener(bs,
-						continuation, sync.getCollections());
-				IListenerRegistration reg = backend.addChangeListener(l);
-				continuation.setListenerRegistration(reg);
-				continuation.setCollectionChangeListener(l);
-				for (SyncCollection sc : sync.getCollections()) {
-					waitContinuationCache.put(sc.getCollectionId(),
-							continuation);
-				}
 
 			ModificationStatus modificationStatus = processCollections(bs, sync);
 
@@ -191,6 +163,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			}
 		}
 		continuation.setLastContinuationHandler(this);
+		monitoredCollectionService.put(bs.getCredentials(), bs.getDevice(), sync.getCollectionById().values());
 		CollectionChangeListener l = new CollectionChangeListener(bs,
 				continuation, sync.getCollections());
 		IListenerRegistration reg = backend.addChangeListener(l);
@@ -229,7 +202,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		DataDelta delta = null;
 		Date lastSync = null;
 		
-		int unSynchronizedItemNb = unSynchronizedItemCache.listItemToAdd(bs.getCredentials(), c.getCollectionId()).size();
+		int unSynchronizedItemNb = unSynchronizedItemCache.listItemToAdd(bs.getCredentials(), bs.getDevice(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
 			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getOptions().getFilterType(), c.getCollectionId());
 			lastSync = delta.getSyncDate();
@@ -319,17 +292,17 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	private void serializeDeletion(BackendSession bs, SyncCollection c, Map<String, String> processedClientIds, 
 			DataDelta delta, Element commands) {
 		
-		Set<ItemChange> unSyncdeleted = unSynchronizedItemCache.listItemToRemove(bs.getCredentials(), c.getCollectionId());
+		Set<ItemChange> unSyncdeleted = unSynchronizedItemCache.listItemToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
 		
 		if (delta != null && delta.getDeletions() != null && unSyncdeleted != null) {
 			delta.getDeletions().addAll(unSyncdeleted);
-			unSynchronizedItemCache.clearItemToRemove(bs.getCredentials(), c.getCollectionId());
+			unSynchronizedItemCache.clearItemToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
 		}
 
 		if (delta != null && delta.getDeletions() != null) {
 			for (ItemChange ic: delta.getDeletions()) {
 				if (processedClientIds.containsKey(ic.getServerId())) {
-					unSynchronizedItemCache.storeItemToRemove(bs.getCredentials(), c.getCollectionId(), ic);
+					unSynchronizedItemCache.storeItemToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId(), ic);
 				} else {
 					serializeDeletion(commands, ic);
 				}
@@ -341,6 +314,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			BackendSession backendSession, Map<String, String> processedClientIds) {
 		
 		final Credentials credentials = backendSession.getCredentials();
+		final Device device = backendSession.getDevice();
 		final Integer collectionId = c.getCollectionId();
 		final Integer windowSize = c.getWindowSize();	
 		
@@ -349,8 +323,8 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			changed.addAll(delta.getChanges());
 		}
 		
-		changed.addAll(unSynchronizedItemCache.listItemToAdd(credentials, collectionId));
-		unSynchronizedItemCache.clearItemToAdd(credentials, collectionId);
+		changed.addAll(unSynchronizedItemCache.listItemToAdd(credentials, device, collectionId));
+		unSynchronizedItemCache.clearItemToAdd(credentials, device,collectionId);
 		
 		if (changed.size() <= windowSize) {
 			return changed;
@@ -378,7 +352,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		int changedSize = changed.size();
 		for (int i = windowSize; i < changedSize; i++) {
 			ItemChange ic = changed.get(changed.size() - 1);
-			unSynchronizedItemCache.storeItemToAdd(credentials, collectionId, ic);
+			unSynchronizedItemCache.storeItemToAdd(credentials, device, collectionId, ic);
 			changed.remove(ic);
 		}
 
@@ -503,10 +477,9 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	public void sendResponse(BackendSession bs, Responder responder,
 			boolean sendHierarchyChange, IContinuation continuation) {
 		
-		Map<String, String> processedClientIds = new HashMap<String, String>(
-				bs.getLastSyncProcessedClientIds());
-		bs.setLastSyncProcessedClientIds(new HashMap<String, String>());
-		processResponse(bs, responder, monitoredCollectionService.list(bs.getCredentials()),
+		Map<String, String> processedClientIds = ImmutableMap.<String, String>of();
+		processResponse(bs, responder, monitoredCollectionService.list(bs.getCredentials(), bs.getDevice()), 
+				processedClientIds, continuation);
 
 	}
 

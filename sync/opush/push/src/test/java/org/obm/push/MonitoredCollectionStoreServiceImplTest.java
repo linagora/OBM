@@ -27,30 +27,30 @@ public class MonitoredCollectionStoreServiceImplTest {
 	
 	@Test
 	public void testList() {
-		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials);
+		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
 		Assert.assertNotNull(syncCollections);
 	}
 	
 	@Test
-	public void testReplace() {
-		monitoredCollectionStoreServiceImpl.put(credentials, buildListCollection(1));
-		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials);
+	public void testSimplePut() {
+		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
+		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
 		Assert.assertNotNull(syncCollections);
 		Assert.assertEquals(1, syncCollections.size());
 		containsCollectionWithId(syncCollections, 1);
-		
-		
-		monitoredCollectionStoreServiceImpl.put(credentials, buildListCollection(2, 3));
-		syncCollections = monitoredCollectionStoreServiceImpl.list(credentials);
+	}
+	
+	@Test
+	public void testPutNewItems() {
+		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
+		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(2, 3));
+
+		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
 		Assert.assertNotNull(syncCollections);
 		Assert.assertEquals(2, syncCollections.size());
 		containsCollectionWithId(syncCollections, 2);
 		containsCollectionWithId(syncCollections, 3);
 		
-		monitoredCollectionStoreServiceImpl.put(credentials, buildListCollection());
-		syncCollections = monitoredCollectionStoreServiceImpl.list(credentials);
-		Assert.assertNotNull(syncCollections);
-		Assert.assertEquals(0, syncCollections.size());
 	}
 	
 	private void containsCollectionWithId(
@@ -72,5 +72,9 @@ public class MonitoredCollectionStoreServiceImplTest {
 			cols.add(col);
 		}
 		return cols;
+	}
+	
+	private Device getFakeDeviceId(){
+		return new Device("DevType", "DevId", null);
 	}
 }

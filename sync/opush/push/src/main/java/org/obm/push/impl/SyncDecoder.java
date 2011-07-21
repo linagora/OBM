@@ -75,7 +75,7 @@ public class SyncDecoder {
 		if (ret.getCollections().size() == 0) {
 			throw new PartialException();
 		}
-		syncedCollectionStoreService.put(bs.getCredentials(), ret.getCollections());
+		syncedCollectionStoreService.put(bs.getCredentials(), bs.getDevice(), ret.getCollections());
 		return ret;
 	}
 
@@ -103,7 +103,7 @@ public class SyncDecoder {
 		if (collectionId == null) {
 			throw new ProtocolException("CollectionId can't be null");
 		}
-		SyncCollection lastSyncCollection = syncedCollectionStoreService.get(bs.getCredentials(), collectionId);
+		SyncCollection lastSyncCollection = syncedCollectionStoreService.get(bs.getCredentials(), bs.getDevice(), collectionId);
 		if (isPartial && lastSyncCollection == null) {
 			throw new PartialException();
 		}

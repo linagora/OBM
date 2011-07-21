@@ -14,10 +14,10 @@ public class Device {
 	
 	public static class Factory {
 	
-		public Device create(String devType, String userAgent) {
+		public Device create(String devType, String userAgent, String devId) {
 			Properties hints = getHints(userAgent, devType);
 			String rewritenDevType = rewriteDevType(userAgent, devType);
-			return new Device(rewritenDevType, hints);
+			return new Device(rewritenDevType, devId, hints);
 		}
 				
 		private String rewriteDevType(String userAgent, String devType) {
@@ -66,9 +66,11 @@ public class Device {
 	
 	private final String devType;
 	private final Properties hints;
+	private final String devId;
 	
-	public Device(String devType, Properties hints) {
+	public Device(String devType, String devId, Properties hints) {
 		this.devType = devType;
+		this.devId = devId;
 		this.hints = hints;
 	}	
 	
@@ -82,6 +84,41 @@ public class Device {
 
 	public String getDevType() {
 		return devType;
+	}
+
+	public String getDevId() {
+		return devId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((devId == null) ? 0 : devId.hashCode());
+		result = prime * result + ((devType == null) ? 0 : devType.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Device other = (Device) obj;
+		if (devId == null) {
+			if (other.devId != null)
+				return false;
+		} else if (!devId.equals(other.devId))
+			return false;
+		if (devType == null) {
+			if (other.devType != null)
+				return false;
+		} else if (!devType.equals(other.devType))
+			return false;
+		return true;
 	}
 	
 }

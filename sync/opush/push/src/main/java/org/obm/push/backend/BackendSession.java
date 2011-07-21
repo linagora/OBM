@@ -8,15 +8,13 @@ import org.obm.push.impl.Credentials;
 public class BackendSession {
 
 	private final Credentials credentials;
-	private final String devId;
 	private final Device device;
 	private final String command;
 	private final BigDecimal protocolVersion;
 
-	public BackendSession(Credentials credentials, String devId, String command, Device device, BigDecimal protocolVersion) {
+	public BackendSession(Credentials credentials, String command, Device device, BigDecimal protocolVersion) {
 		super();
 		this.credentials = credentials;
-		this.devId = devId;
 		this.command = command;
 		this.device = device;
 		this.protocolVersion = protocolVersion;
@@ -35,7 +33,7 @@ public class BackendSession {
 	}
 
 	public String getDevId() {
-		return devId;
+		return device.getDevId();
 	}
 
 	public String getDevType() {
@@ -52,6 +50,10 @@ public class BackendSession {
 	
 	public Credentials getCredentials() {
 		return credentials;
+	}
+	
+	public Device getDevice(){
+		return device;
 	}
 
 }
