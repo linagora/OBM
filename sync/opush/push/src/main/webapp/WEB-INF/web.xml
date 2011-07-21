@@ -27,4 +27,10 @@
 		<filter-name>continuation</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+
+	<resource-env-ref>
+		<description>JTA Transaction</description>
+		<resource-env-ref-name>UserTransaction</resource-env-ref-name>
+		<resource-env-ref-type>javax.transaction.TransactionManager</resource-env-ref-type>
+	</resource-env-ref>
 </web-app>

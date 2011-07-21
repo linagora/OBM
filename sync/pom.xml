@@ -209,6 +209,8 @@ org.eclipse.jdt.core.compiler.source=1.6]]>
 								<maxIdleTime>60000</maxIdleTime>
 							</connector>
 						</connectors>
+						<jettyEnvXml>${basedir}/jetty-env.xml</jettyEnvXml>
+						
 					</configuration>
 				</plugin>
 
