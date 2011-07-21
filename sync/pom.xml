@@ -65,6 +65,7 @@
 		<module>obm-locator</module>
 		<module>utils</module>
 		<module>dbcp</module>
+		<module>annotations</module>
 	</modules>
 
 	<build>

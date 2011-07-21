@@ -37,8 +37,8 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.items.FolderChangesResponse;
-import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.IAddressBook;
+import org.obm.annotations.transactional.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

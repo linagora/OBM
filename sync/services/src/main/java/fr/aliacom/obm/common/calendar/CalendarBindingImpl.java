@@ -47,9 +47,9 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
-import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.ICalendar;
 import org.obm.sync.services.ImportICalendarException;
+import org.obm.annotations.transactional.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

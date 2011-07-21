@@ -22,10 +22,10 @@ import java.util.Map;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.server.transactional.Transactional;
 import org.obm.sync.services.ISetting;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.VacationSettings;
+import org.obm.annotations.transactional.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

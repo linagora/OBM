@@ -12,8 +12,8 @@ import javax.transaction.UserTransaction;
 
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
-import org.obm.sync.server.transactional.Transactional;
-import org.obm.sync.server.transactional.TransactionalInterceptor;
+import org.obm.annotations.transactional.Transactional;
+import org.obm.annotations.transactional.TransactionalInterceptor;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
