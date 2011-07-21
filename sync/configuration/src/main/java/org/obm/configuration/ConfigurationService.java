@@ -19,10 +19,12 @@ package org.obm.configuration;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import javax.naming.ConfigurationException;
 
+import org.obm.configuration.store.StoreNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * Configuration service
  */
 public class ConfigurationService {
-	
+
 	private final static String LOCATOR_PORT = "8082";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
 
@@ -75,7 +77,8 @@ public class ConfigurationService {
 			throw new ConfigurationException(
 					"Missing host key in configuration");
 		}
-		return "http://" + locatorHost + ":"+LOCATOR_PORT+"/"+LOCATOR_APP_NAME+"/";
+		return "http://" + locatorHost + ":" + LOCATOR_PORT + "/"
+				+ LOCATOR_APP_NAME + "/";
 	}
 
 	public String getObmUIBaseUrl() {
@@ -83,6 +86,10 @@ public class ConfigurationService {
 		String hostname = getStringValue("external-url");
 		String path = getStringValue("obm-prefix");
 		return protocol + "://" + hostname + path;
+	}
+
+	public InputStream getStoreConfiguration() throws StoreNotFoundException {
+		throw new StoreNotFoundException("Store not found for " + getClass() + " configuration.");
 	}
 
 }

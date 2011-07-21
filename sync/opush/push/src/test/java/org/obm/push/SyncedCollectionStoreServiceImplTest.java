@@ -1,5 +1,6 @@
 package org.obm.push;
 
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.List;
 
@@ -7,20 +8,21 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.impl.Credentials;
 import org.obm.push.store.SyncCollection;
 
 import com.google.common.collect.Lists;
 
-public class SyncedCollectionStoreServiceImplTest {
+public class SyncedCollectionStoreServiceImplTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager objectStoreManager;
 	private SyncedCollectionStoreServiceImpl syncedCollectionStoreServiceImpl;
 	private Credentials credentials;
 	
 	@Before
-	public void init() {
-		this.objectStoreManager = new ObjectStoreManager();
+	public void init() throws FileNotFoundException, StoreNotFoundException {
+		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionStoreServiceImpl(objectStoreManager);
 		this.credentials = new Credentials("login@domain", "password");
 	}

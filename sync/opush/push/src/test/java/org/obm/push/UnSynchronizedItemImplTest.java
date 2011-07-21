@@ -1,22 +1,28 @@
 package org.obm.push;
 
+import java.io.FileNotFoundException;
 import java.util.Set;
 
 import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.impl.Credentials;
 
-public class UnSynchronizedItemImplTest {
+public class UnSynchronizedItemImplTest extends StoreManagerConfigurationTest  {
 
 	private ObjectStoreManager objectStoreManager;
 	private UnsynchronizedItemImpl unSynchronizedItemImpl;
 	private Credentials credentials;
 	
+	public UnSynchronizedItemImplTest() {
+		super();
+	}
+	
 	@Before
-	public void init() {
-		this.objectStoreManager = new ObjectStoreManager();
+	public void init() throws StoreNotFoundException, FileNotFoundException {
+		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.unSynchronizedItemImpl = new UnsynchronizedItemImpl(objectStoreManager);
 		this.credentials = new Credentials("login@domain", "password");
 	}

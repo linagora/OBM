@@ -1,12 +1,15 @@
 package org.obm.push;
 
-import java.net.URL;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
+
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.store.StoreNotFoundException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -17,9 +20,9 @@ public class ObjectStoreManager {
 	private final static int MAX_ELEMENT_IN_MEMORY = 5000;
 	private final CacheManager singletonManager;
 
-	@Inject ObjectStoreManager() {
-		URL configurationUrl = getClass().getResource("/objectStoreManager.xml");
-		this.singletonManager = new CacheManager(configurationUrl);
+	@Inject ObjectStoreManager(ConfigurationService configurationService) throws StoreNotFoundException {
+		InputStream storeConfiguration = configurationService.getStoreConfiguration();
+		this.singletonManager = new CacheManager(storeConfiguration);
 	}
 
 	public void createNewStore(String storeName) {

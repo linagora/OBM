@@ -37,10 +37,9 @@ public class GuiceServletContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
     	
         final ServletContext servletContext = servletContextEvent.getServletContext(); 
-
         
         try {
-        	Injector injector = createInjector();
+        	Injector injector = createInjector(servletContext);
         	if (injector == null) { 
         		failStartup("Could not create injector: createInjector() returned null"); 
         	} 
@@ -52,7 +51,7 @@ public class GuiceServletContextListener implements ServletContextListener {
         } 
     } 
     
-    private Injector createInjector() {
+    private Injector createInjector(final ServletContext servletContext) {
     	return Guice.createInjector(new AbstractModule() {
 			@Override
 			protected void configure() {
@@ -68,6 +67,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(UnsynchronizedItemService.class).to(UnsynchronizedItemImpl.class);
 				bind(MonitoredCollectionStoreService.class).to(MonitoredCollectionStoreServiceImpl.class);
 				bind(SyncedCollectionStoreService.class).to(SyncedCollectionStoreServiceImpl.class);
+				bind(ServletContext.class).toInstance(servletContext);
 			}
     	}, new TransactionalModule());
     }

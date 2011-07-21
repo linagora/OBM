@@ -1,20 +1,26 @@
 package org.obm.push;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.configuration.store.StoreNotFoundException;
 
-public class ObjectStoreManagerTest {
+public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager opushCacheManager;
 
+	public ObjectStoreManagerTest() {
+		super();
+	}
+	
 	@Before
-	public void init() {
+	public void init() throws StoreNotFoundException, FileNotFoundException {
 		// by default, loading one store in objectStoreManager.xml
-		this.opushCacheManager = new ObjectStoreManager();
+		this.opushCacheManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 	}
 
 	@Test
