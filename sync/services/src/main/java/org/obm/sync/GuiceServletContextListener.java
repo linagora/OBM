@@ -8,18 +8,15 @@ import java.util.ServiceLoader;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.transaction.UserTransaction;
 
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
-import org.obm.annotations.transactional.Transactional;
-import org.obm.annotations.transactional.TransactionalInterceptor;
+import org.obm.annotations.transactional.TransactionalModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.Message;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
@@ -33,7 +30,6 @@ import fr.aliacom.obm.common.user.UserServiceImpl;
 import fr.aliacom.obm.freebusy.FreeBusyPluginModule;
 import fr.aliacom.obm.freebusy.DatabaseFreeBusyProvider;
 import fr.aliacom.obm.freebusy.LocalFreeBusyProvider;
-import fr.aliacom.obm.utils.ObmHelper.TransactionProvider;
 
 public class GuiceServletContextListener implements ServletContextListener { 
 
@@ -67,8 +63,6 @@ public class GuiceServletContextListener implements ServletContextListener {
     			bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
     			bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
     			bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
-    			
-    			bind(UserTransaction.class).toProvider(TransactionProvider.class);
 
     		    ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader.load( FreeBusyPluginModule.class );
     		    
@@ -81,14 +75,9 @@ public class GuiceServletContextListener implements ServletContextListener {
     		    for(FreeBusyPluginModule pluginModule : pluginModulesList) {
     		    	this.install(pluginModule);
     		    }
-    		      
-
-    			TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
-				bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), 
-						transactionalInterceptor);
-				requestInjection(transactionalInterceptor);
 			}
-    	}, new MessageQueueModule());
+    	}, new MessageQueueModule()
+    	, new TransactionalModule());
     }
     
     private void failStartup(String message) { 

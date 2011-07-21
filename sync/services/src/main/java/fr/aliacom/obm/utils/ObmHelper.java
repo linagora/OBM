@@ -26,14 +26,12 @@ import java.util.Date;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import javax.transaction.UserTransaction;
 
 import org.obm.sync.base.ObmDbType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.services.constant.ConstantService;
@@ -43,29 +41,11 @@ import fr.aliacom.obm.services.constant.ConstantService;
  */
 @Singleton
 public class ObmHelper {
-
-	public static class TransactionProvider implements Provider<UserTransaction> {
-		
-		private final ObmHelper helper;
-
-		@Inject
-		public TransactionProvider(ObmHelper helper) {
-			this.helper = helper;
-		}
-		
-		@Override
-		public UserTransaction get() {
-			return helper.getUserTransaction();
-		}
-	}
 	
-	private static final Logger logger = LoggerFactory
-			.getLogger(ObmHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(ObmHelper.class);
 	private static final String DATA_SOURCE = "java:comp/env/jdbc/ObmDS";
-	private static final String USER_TRANSACTION = "java:comp/UserTransaction";
 
 	private DataSource ds;
-	private UserTransaction ut;
 	private ObmDbType type = ObmDbType.PGSQL;
 
 	@Inject
@@ -74,7 +54,6 @@ public class ObmHelper {
 		try {
 			context = new InitialContext();
 			ds = (DataSource) context.lookup(DATA_SOURCE);
-			ut = (UserTransaction) context.lookup(USER_TRANSACTION);
 		} catch (NamingException e) {
 			logger.error("Cannot locate datasource at " + "jdbc/ObmDS", e);
 			throw e;
@@ -128,21 +107,6 @@ public class ObmHelper {
 			st.close();
 		}
 		return con;
-	}
-
-	/**
-	 * Get the transaction for current thread
-	 */
-	public UserTransaction getUserTransaction() {
-		return ut;
-	}
-
-	public void rollback(UserTransaction ut) {
-		try {
-			ut.rollback();
-		} catch (Exception e) {
-			logger.error("Error while rolling-back", e);
-		}
 	}
 
 	public int lastInsertId(Connection con) throws SQLException {

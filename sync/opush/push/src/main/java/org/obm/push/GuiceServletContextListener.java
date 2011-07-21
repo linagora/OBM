@@ -5,9 +5,7 @@ import java.util.Collections;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import org.obm.annotations.transactional.Transactional;
-import org.obm.annotations.transactional.TransactionalInterceptor;
+import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -28,7 +26,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener { 
@@ -68,14 +65,9 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(IBackend.class).to(OBMBackend.class);
 				bind(IContentsImporter.class).to(ContentsImporter.class);
 				bind(IErrorsManager.class).to(ErrorsManager.class);
-				bind(UnsynchronizedItemService.class).to(UnsynchronizedItemImpl.class);  		      
-
-				TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
-				bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), 
-						transactionalInterceptor);
-				requestInjection(transactionalInterceptor);
+				bind(UnsynchronizedItemService.class).to(UnsynchronizedItemImpl.class);
 			}
-    	});
+    	}, new TransactionalModule());
     }
     
     private void failStartup(String message) { 
