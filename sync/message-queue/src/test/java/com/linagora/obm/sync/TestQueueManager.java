@@ -21,6 +21,7 @@ public class TestQueueManager {
 
 	private QueueManager queueManager;
 	private List<Connection> connections;
+	private final static long TIMEOUT = 1000;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -56,7 +57,8 @@ public class TestQueueManager {
 		
 		writeMessageOnTopic(testText, topicName, queueManager);
 		
-		TextMessage messageReceived = (TextMessage) consumer.receive(1000);
+	
+		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived.getText());
 	}
 
@@ -72,14 +74,14 @@ public class TestQueueManager {
 		
 		writeMessageOnTopic(testText, topicName, queueManager);
 		
-		TextMessage messageReceived1 = (TextMessage) consumer.receive(10);
+		TextMessage messageReceived1 = (TextMessage) consumer.receive(TIMEOUT);
 		consumerSession.close();
 
 		writeMessageOnTopic(testText, topicName, queueManager);
 		consumerSession = queueManager.createSession(connection);
 		consumer = queueManager.createConsumerOnTopic(consumerSession, topicName);
 		
-		TextMessage messageReceived2 = (TextMessage) consumer.receive(10);
+		TextMessage messageReceived2 = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived1.getText());
 		Assert.assertNull(messageReceived2);
 	}
@@ -107,7 +109,7 @@ public class TestQueueManager {
 		consumerSession = queueManager.createSession(connection2);
 		consumer = queueManager.createDurableConsumerOnTopic(consumerSession, topicName, clientId);
 		
-		TextMessage messageReceived = (TextMessage) consumer.receive(10);
+		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived.getText());
 	}
 	
@@ -136,7 +138,7 @@ public class TestQueueManager {
 		consumerSession = queueManager.createSession(connection2);
 		consumer = queueManager.createDurableConsumerOnTopic(consumerSession, topicName, clientId);
 		
-		TextMessage messageReceived = (TextMessage) consumer.receive(10);
+		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived.getText());
 	}
 	
@@ -151,7 +153,7 @@ public class TestQueueManager {
 		connection.start();
 		Session consumerSession = queueManager.createSession(connection);
 		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, topicName);
-		TextMessage messageReceived = (TextMessage) consumer.receive(100);
+		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertNull(messageReceived);
 	}
 	
@@ -170,8 +172,8 @@ public class TestQueueManager {
 		
 		writeMessageOnTopic(testText, topicName, queueManager);
 		
-		TextMessage messageReceived1 = (TextMessage) consumer1.receive(1000);
-		TextMessage messageReceived2 = (TextMessage) consumer2.receive(1000);
+		TextMessage messageReceived1 = (TextMessage) consumer1.receive(TIMEOUT);
+		TextMessage messageReceived2 = (TextMessage) consumer2.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived1.getText());
 		Assert.assertEquals(testText, messageReceived2.getText());
 	}
