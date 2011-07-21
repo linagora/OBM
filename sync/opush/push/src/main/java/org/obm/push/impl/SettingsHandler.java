@@ -1,5 +1,6 @@
 package org.obm.push.impl;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -21,7 +22,7 @@ import com.google.inject.Singleton;
 public class SettingsHandler extends WbxmlRequestHandler {
 
 	@Inject
-	private SettingsHandler(IBackend backend, EncoderFactory encoderFactory,
+	protected SettingsHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage,
 			IContentsExporter contentsExporter, StateMachine stMachine) {
 		
@@ -30,6 +31,7 @@ public class SettingsHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
@@ -31,6 +32,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 	}
 
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			ActiveSyncRequest request, Responder responder) throws IOException {
 		InputStream mailContent = null;

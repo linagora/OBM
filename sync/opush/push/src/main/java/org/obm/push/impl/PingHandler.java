@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.obm.push.MonitoredCollectionStoreService;
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IBackend;
@@ -37,7 +38,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	private final MonitoredCollectionStoreService monitoredCollectionService;
 
 	@Inject
-	private PingHandler(IBackend backend, EncoderFactory encoderFactory,
+	protected PingHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			MonitoredCollectionStoreService monitoredCollectionService) {
@@ -48,6 +49,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		try {

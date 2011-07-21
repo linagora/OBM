@@ -2,6 +2,7 @@ package org.obm.push.impl;
 
 import java.util.Random;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -29,7 +30,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	private final Random random;
 
 	@Inject
-	private ProvisionHandler(IBackend backend, EncoderFactory encoderFactory,
+	protected ProvisionHandler(IBackend backend, EncoderFactory encoderFactory,
 			Random random, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
 			StateMachine stMachine) {
@@ -41,6 +42,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()

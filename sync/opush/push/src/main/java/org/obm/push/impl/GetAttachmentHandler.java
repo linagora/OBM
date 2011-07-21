@@ -2,6 +2,7 @@ package org.obm.push.impl;
 
 import java.io.IOException;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContinuation;
@@ -25,11 +26,12 @@ public class GetAttachmentHandler implements IRequestHandler {
 	private final IContentsExporter contentsExporter;
 
 	@Inject
-	private GetAttachmentHandler(IContentsExporter contentsExporter) {
+	protected GetAttachmentHandler(IContentsExporter contentsExporter) {
 		this.contentsExporter = contentsExporter;
 	}
 
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			ActiveSyncRequest request, Responder responder) throws IOException {
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()

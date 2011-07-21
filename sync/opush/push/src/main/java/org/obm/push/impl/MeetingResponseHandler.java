@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
@@ -35,7 +36,7 @@ import com.google.inject.Singleton;
 public class MeetingResponseHandler extends WbxmlRequestHandler {
 
 	@Inject
-	private MeetingResponseHandler(IBackend backend,
+	protected MeetingResponseHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
 			StateMachine stMachine) {
@@ -54,6 +55,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	// </MeetingResponse>
 
 	@Override
+	@Transactional
 	protected void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		

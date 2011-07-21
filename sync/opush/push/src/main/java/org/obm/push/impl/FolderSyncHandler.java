@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
@@ -29,7 +30,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	private final IHierarchyExporter hierarchyExporter;
 
 	@Inject
-	private FolderSyncHandler(IBackend backend, EncoderFactory encoderFactory,
+	protected FolderSyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage,
 			IHierarchyExporter hierarchyExporter,
 			IContentsExporter contentsExporter, StateMachine stMachine) {
@@ -41,6 +42,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		

@@ -3,6 +3,7 @@ package org.obm.push.impl;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -30,7 +31,7 @@ import com.google.inject.Singleton;
 public class MoveItemsHandler extends WbxmlRequestHandler {
 
 	@Inject
-	private MoveItemsHandler(IBackend backend, EncoderFactory encoderFactory,
+	protected MoveItemsHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage,
 			IContentsExporter contentsExporter, StateMachine stMachine) {
 		
@@ -52,6 +53,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 	// </Move>
 	// </MoveItems>
 	@Override
+	@Transactional
 	protected void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()

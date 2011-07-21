@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.eclipse.jetty.http.HttpHeaderValues;
 import org.eclipse.jetty.http.HttpHeaders;
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
@@ -44,7 +45,7 @@ import com.google.inject.Singleton;
 public class ItemOperationsHandler extends WbxmlRequestHandler {
 
 	@Inject
-	private ItemOperationsHandler(IBackend backend,
+	protected ItemOperationsHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
 			StateMachine stMachine) {
@@ -54,6 +55,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()

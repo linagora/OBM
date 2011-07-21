@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.obm.push.UnsynchronizedItemService;
+import org.obm.annotations.transactional.Transactional;
+import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -36,7 +38,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	private final UnsynchronizedItemService unSynchronizedItemCache;
 
 	@Inject
-	private GetItemEstimateHandler(IBackend backend,
+	protected GetItemEstimateHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter, StateMachine stMachine,
 			UnsynchronizedItemService unSynchronizedItemCache) {
@@ -47,6 +49,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()

@@ -3,6 +3,7 @@ package org.obm.push.impl;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -32,7 +33,7 @@ public class SearchHandler extends WbxmlRequestHandler {
 	private final ImmutableMultimap<StoreName, ISearchSource> sources;
 	
 	@Inject
-	private SearchHandler(IBackend backend, EncoderFactory encoderFactory,
+	protected SearchHandler(IBackend backend, EncoderFactory encoderFactory,
 			BookSource bookSource, ObmSearchContact obmSearchContact,
 			IContentsImporter contentsImporter, ISyncStorage storage,
 			IContentsExporter contentsExporter, StateMachine stMachine) {
@@ -46,6 +47,7 @@ public class SearchHandler extends WbxmlRequestHandler {
 	}
 	
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()

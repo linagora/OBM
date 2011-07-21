@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
 import org.obm.push.Device;
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.ItemChange;
 import org.obm.push.MonitoredCollectionStoreService;
 import org.obm.push.UnsynchronizedItemService;
@@ -98,6 +99,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	}
 
 	@Override
+	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()
