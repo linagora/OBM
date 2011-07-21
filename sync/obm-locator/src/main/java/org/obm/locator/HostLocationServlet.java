@@ -3,6 +3,7 @@ package org.obm.locator;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -15,13 +16,24 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Locates OBM host IP addresses with a service, service_property, login@domain.
- * This call url shoud be /location/host/sync/obm_sync/login@domain
+ * This call url should be /location/host/sync/obm_sync/login@domain
  * 
  */
 public class HostLocationServlet extends HttpServlet {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
-
+	private LocatorDbHelper locatorDbHelper;
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		try {
+			locatorDbHelper = LocatorDbHelper.getInstance();
+		} catch (NamingException e) {
+			throw new ServletException(e.getExplanation(), e.getCause());
+		}
+	}
+	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -40,7 +52,7 @@ public class HostLocationServlet extends HttpServlet {
 		String property = split[3];
 		String loginAtDomain = split[4];
 
-		Set<String> ips = LocatorDbHelper.getInstance().findDomainHost(
+		Set<String> ips = locatorDbHelper.findDomainHost(
 				loginAtDomain, service, property);
 
 		if (ips.size() > 0) {

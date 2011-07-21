@@ -1,6 +1,6 @@
 package org.obm.annotations.transactional;
 
-import javax.transaction.UserTransaction;
+import javax.transaction.TransactionManager;
 
 import org.obm.annotations.transactional.TransactionProvider;
 
@@ -12,7 +12,7 @@ public class TransactionalModule extends AbstractModule{
 	@Override
 	protected void configure() {
 
-		bind(UserTransaction.class).toProvider(TransactionProvider.class);
+		bind(TransactionManager.class).toProvider(TransactionProvider.class);
 
 		TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
 		bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), 

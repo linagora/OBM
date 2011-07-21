@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 import javax.transaction.Status;
 import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
+import javax.transaction.TransactionManager;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -20,7 +20,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
 			.getLogger(TransactionalInterceptor.class);
 	
 	@Inject
-	private Provider<UserTransaction> userTransactionProvider;
+	private Provider<TransactionManager> transactionManagerProvider;
 
 	public TransactionalInterceptor() {
 		super();
@@ -29,8 +29,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Transactional transactional = readTransactionMetadata(methodInvocation);
-		UserTransaction ut = userTransactionProvider.get();
-
+		TransactionManager ut = transactionManagerProvider.get();
 		if (transactional == null) {
 			return methodInvocation.proceed();
 		}
@@ -62,12 +61,13 @@ public class TransactionalInterceptor implements MethodInterceptor {
 					}
 				}
 			}
+			logger.info(e.getMessage(),e);
 			throw e;
 		}
 	}
 
-	private boolean isTransactionActive(UserTransaction ut)	throws SystemException {
-		int status = ut.getStatus();
+	private boolean isTransactionActive(TransactionManager tm)	throws SystemException {
+		int status = tm.getStatus();
 		return Status.STATUS_ACTIVE == status
 				|| Status.STATUS_PREPARING == status
 				|| Status.STATUS_PREPARED == status;

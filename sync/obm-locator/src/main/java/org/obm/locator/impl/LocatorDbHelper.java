@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.naming.NamingException;
+
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.dbcp.DBCP;
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
@@ -24,13 +27,13 @@ public class LocatorDbHelper {
 		this.dbcp = dbcp;
 	}
 	
-	public static synchronized LocatorDbHelper getInstance() {
+	public static synchronized LocatorDbHelper getInstance() throws NamingException {
 		if (instance == null) {
-			instance = new LocatorDbHelper(new DBCP());
+			instance = new LocatorDbHelper(new DBCP(new TransactionProvider().get()));
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * Returns the ips of the hosts with the given service/property in the users
 	 * domain.

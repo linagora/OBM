@@ -6,7 +6,7 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
+import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -53,12 +53,12 @@ public class TransactionalTest {
 		}
 	}
 	
-	private TestClass createTestClass(final Provider<UserTransaction> provider) {
+	private TestClass createTestClass(final Provider<TransactionManager> provider) {
 		Injector injector = Guice.createInjector(new AbstractModule() {
 
 			@Override
 			protected void configure() {
-				bind(UserTransaction.class).toProvider(provider);
+				bind(TransactionManager.class).toProvider(provider);
 				TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
 				bindInterceptor(Matchers.any(), 
 						Matchers.annotatedWith(Transactional.class), 
@@ -81,7 +81,7 @@ public class TransactionalTest {
 	
 	@Test
 	public void testOneTransaction() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		UserTransaction transaction = EasyMock.createStrictMock(UserTransaction.class);
+		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
 		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
 		transaction.begin();
 		EasyMock.expectLastCall().once();
@@ -96,7 +96,7 @@ public class TransactionalTest {
 
 	@Test
 	public void testNested() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		UserTransaction transaction = EasyMock.createStrictMock(UserTransaction.class);
+		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
 		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION)).once();
 		transaction.begin();
 		EasyMock.expectLastCall().once();
@@ -112,7 +112,7 @@ public class TransactionalTest {
 	
 	@Test
 	public void testRollback() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
-		UserTransaction transaction = EasyMock.createStrictMock(UserTransaction.class);
+		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
 		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
 		transaction.begin();
 		EasyMock.expectLastCall().once();
@@ -134,7 +134,7 @@ public class TransactionalTest {
 
 	@Test
 	public void testNestedRollback() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
-		UserTransaction transaction = EasyMock.createStrictMock(UserTransaction.class);
+		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
 		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION)).once();
 		transaction.begin();
 		EasyMock.expectLastCall().once();
@@ -157,7 +157,7 @@ public class TransactionalTest {
 	
 	@Test(expected=RuntimeException.class)
 	public void testRollbackException() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		UserTransaction transaction = EasyMock.createStrictMock(UserTransaction.class);
+		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
 		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
 		transaction.begin();
 		EasyMock.expectLastCall().once();
@@ -176,7 +176,7 @@ public class TransactionalTest {
 	
 	@Test(expected=RuntimeException.class)
 	public void testNestedRollbackException() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
-		UserTransaction transaction = EasyMock.createStrictMock(UserTransaction.class);
+		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
 		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
 		transaction.begin();
 		EasyMock.expectLastCall().once();

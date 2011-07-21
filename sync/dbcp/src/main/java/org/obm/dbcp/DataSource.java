@@ -12,15 +12,15 @@ import org.apache.commons.dbcp.managed.LocalXAConnectionFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.obm.dbcp.jdbc.IJDBCDriver;
 
-import com.atomikos.icatch.jta.UserTransactionManager;
-
 public class DataSource {
 
 	private final ConnectionFactory connectionFactory;
 	private TransactionManager transactionManager;
 
-	public DataSource(IJDBCDriver cf, String dbHost, String dbName,
+	public DataSource(TransactionManager transactionManager, IJDBCDriver cf, String dbHost, String dbName,
 			String login, String password) {
+		this.transactionManager = transactionManager;
+
 		connectionFactory = buildConnectionFactory(cf, dbHost,
 				dbName, login, password);
 
@@ -31,12 +31,12 @@ public class DataSource {
 			IJDBCDriver cf, String dbHost, String dbName, String login,
 			String password) {
 
-		transactionManager = new UserTransactionManager();
+		
 
 		String jdbcUrl = cf.getJDBCUrl(dbHost, dbName);
 		ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(
 				jdbcUrl, login, password);
-		connectionFactory = new LocalXAConnectionFactory(transactionManager,
+		connectionFactory = new LocalXAConnectionFactory(this.transactionManager,
 				connectionFactory);
 
 		return connectionFactory;
