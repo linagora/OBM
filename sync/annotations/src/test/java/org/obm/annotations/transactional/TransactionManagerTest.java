@@ -1,4 +1,4 @@
-package org.obm.dbcp;
+package org.obm.annotations.transactional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
