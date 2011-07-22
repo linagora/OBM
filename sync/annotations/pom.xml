@@ -43,6 +43,11 @@
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
 		</dependency>
+		<dependency>
+                        <groupId>com.atomikos</groupId>
+                        <artifactId>transactions-jta</artifactId>
+                        <version>3.7.0</version>
+                </dependency>
 	</dependencies>
 
 </project>

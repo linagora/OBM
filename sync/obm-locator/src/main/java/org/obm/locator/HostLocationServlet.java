@@ -3,7 +3,6 @@ package org.obm.locator;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -30,8 +29,6 @@ public class HostLocationServlet extends HttpServlet {
 		super.init();
 		try {
 			locatorDbHelper = LocatorDbHelper.getInstance();
-		} catch (NamingException e) {
-			throw new ServletException(e.getExplanation(), e.getCause());
 		} catch (SystemException e) {
 			throw new ServletException(e.getMessage(), e.getCause());
 		}
