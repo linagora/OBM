@@ -1,7 +1,8 @@
 package org.obm.push.backend;
 
-import java.util.Collection;
+import java.util.Set;
 
+import org.obm.push.impl.ChangedCollections;
 import org.obm.push.store.SyncCollection;
 
 /**
@@ -14,7 +15,7 @@ import org.obm.push.store.SyncCollection;
  */
 public interface ICollectionChangeListener {
 
-	Collection<SyncCollection> getMonitoredCollections();
+	Set<SyncCollection> getMonitoredCollections();
 
 	BackendSession getSession();
 
@@ -25,5 +26,7 @@ public interface ICollectionChangeListener {
 	 * 
 	 */
 	void changesDetected();
+
+	boolean monitorOneOf(ChangedCollections changedCollections);
 
 }

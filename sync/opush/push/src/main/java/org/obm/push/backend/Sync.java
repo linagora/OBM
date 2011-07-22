@@ -1,10 +1,12 @@
 package org.obm.push.backend;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.obm.push.store.SyncCollection;
+
+import com.google.common.collect.ImmutableSet;
 
 public class Sync {
 	
@@ -28,12 +30,8 @@ public class Sync {
 		this.wait = wait;
 	}
 	
-	public Map<Integer, SyncCollection> getCollectionById() {
-		return collections;
-	}
-	
-	public Collection<SyncCollection> getCollections() {
-		return collections.values();
+	public Set<SyncCollection> getCollections() {
+		return ImmutableSet.copyOf(collections.values());
 	}
 	
 	public SyncCollection getCollection(Integer collectionId) {

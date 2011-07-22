@@ -1,18 +1,21 @@
 package org.obm.push.backend;
 
-import java.util.Collection;
+import java.util.Set;
 
+import org.obm.push.impl.ChangedCollections;
 import org.obm.push.store.SyncCollection;
+
+import com.google.common.collect.Sets;
 
 public class CollectionChangeListener implements
 		ICollectionChangeListener {
 
 	private BackendSession bs;
-	private Collection<SyncCollection> monitoredCollections;
+	private Set<SyncCollection> monitoredCollections;
 	private IContinuation continuation;
 
 	public CollectionChangeListener(BackendSession bs,
-			IContinuation c, Collection<SyncCollection> monitoredCollections) {
+			IContinuation c, Set<SyncCollection> monitoredCollections) {
 		this.bs = bs;
 		this.monitoredCollections = monitoredCollections;
 		this.continuation = c;
@@ -24,7 +27,7 @@ public class CollectionChangeListener implements
 	}
 
 	@Override
-	public Collection<SyncCollection> getMonitoredCollections() {
+	public Set<SyncCollection> getMonitoredCollections() {
 		return monitoredCollections;
 	}
 
@@ -38,4 +41,9 @@ public class CollectionChangeListener implements
 		continuation.resume();
 	}
 
+	@Override
+	public boolean monitorOneOf(ChangedCollections changedCollections) {
+		return !Sets.intersection(getMonitoredCollections(), changedCollections.getChanged()).isEmpty();
+	}
+	
 }

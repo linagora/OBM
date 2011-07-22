@@ -1,15 +1,14 @@
 package org.obm.push;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import net.sf.ehcache.Element;
 
 import org.obm.push.impl.Credentials;
 import org.obm.push.store.SyncCollection;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -29,25 +28,25 @@ public class MonitoredCollectionStoreServiceImpl extends AbstractStoreService im
 	}
 	
 	@Override
-	public Collection<SyncCollection> list(Credentials credentials, Device device) {
+	public Set<SyncCollection> list(Credentials credentials, Device device) {
 		Key key = buildKey(credentials, device);
 		Element element = store.get(key);
 		if (element != null) {
-			return (List<SyncCollection>) element.getValue();
+			return (Set<SyncCollection>) element.getValue();
 		} else {
-			return Lists.newArrayList();
+			return ImmutableSet.<SyncCollection>of();
 		}
 	}
 
 	@Override
 	public void put(Credentials credentials, Device device,
-			Collection<SyncCollection> collections) {
+			Set<SyncCollection> collections) {
 		Key key = buildKey(credentials, device);
 		remove(key);
 		add(key, collections);
 	}
 	
-	private void add(Key key, Collection<SyncCollection> collections) {
+	private void add(Key key, Set<SyncCollection> collections) {
 		store.put( new Element(key, collections) );
 	}
 	

@@ -2,7 +2,7 @@ package org.obm.push;
 
 import java.io.FileNotFoundException;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -12,7 +12,7 @@ import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.impl.Credentials;
 import org.obm.push.store.SyncCollection;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class MonitoredCollectionStoreServiceImplTest extends StoreManagerConfigurationTest {
 
@@ -66,8 +66,8 @@ public class MonitoredCollectionStoreServiceImplTest extends StoreManagerConfigu
 		Assert.assertTrue(find);
 	}
 
-	private Collection<SyncCollection> buildListCollection(Integer... ids) {
-		List<SyncCollection> cols = Lists.newLinkedList();
+	private Set<SyncCollection> buildListCollection(Integer... ids) {
+		Set<SyncCollection> cols = Sets.newHashSet();
 		for(Integer id : ids){
 			SyncCollection col = new SyncCollection();
 			col.setCollectionId(id);

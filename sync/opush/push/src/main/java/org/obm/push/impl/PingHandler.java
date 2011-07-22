@@ -57,7 +57,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 					+ ")");
 			
 			long intervalSeconds = 0;
-			Collection<SyncCollection> lastMonitoredCollection = monitoredCollectionService.list(bs.getCredentials(), bs.getDevice());
+			Set<SyncCollection> lastMonitoredCollection = monitoredCollectionService.list(bs.getCredentials(), bs.getDevice());
 			if (doc == null) {
 				logger
 						.info("Empty Ping, reusing cached heartbeat & monitored folders");
