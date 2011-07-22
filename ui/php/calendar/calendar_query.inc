@@ -6837,4 +6837,18 @@ function run_query_calendar_no_mail($users) {
   }
   return true;
 }
+
+# Given a list of calendars, and a user id, returns the subset of calendars this 
+# user can write to
+function run_query_writable_calendars($obm_user_id, $selected_calendars) {
+  $writable_calendars = array();
+  foreach ($selected_calendars as $calendar){
+	$calendar_user_id = $calendar['id'];
+	# The calendar owner is always able to write on his own calendar
+    if (OBM_Acl::canWrite($user_id, 'calendar', array($calendar_user_id)) || ($obm_user_id == $calendar_user_id)) {
+	  array_push($writable_calendars, $calendar);
+	}
+  }
+  return $writable_calendars;
+}
 ?>

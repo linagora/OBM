@@ -109,13 +109,6 @@ require("$obminclude/of/of_category.inc");
 require('calendar_mailer.php');
 require('event_observer.php');
 require('../contact/addressbook.php');
-get_calendar_action();
-update_calendar_action();
-$perm->check_permissions($module, $action);
-
-page_close();
-
-OBM_EventFactory::getInstance()->attach(new OBM_EventMailObserver());
 
 if ($params['new_sel'] && (($action != 'insert') && ($action != 'update'))) {
   $current_view->set_users($params['sel_user_id']);
@@ -129,6 +122,23 @@ $resources = $current_view->get_resources();
 if (empty($users) && empty($resources)) {
   $current_view->add_user($obm['uid']);
 }
+# Retrieve the list of writable calendars
+$calendar_entity = $current_view->get_entities();
+$calendar_user_objects = $calendar_entity['user'];
+$writable_calendars = run_query_writable_calendars($obm['uid'], array_values($calendar_user_objects));
+$default_writable_calendar = null;
+if (count($writable_calendars) > 0) {
+  $default_writable_calendar = $writable_calendars[0];
+}
+
+get_calendar_action();
+update_calendar_action();
+$perm->check_permissions($module, $action);
+
+page_close();
+
+OBM_EventFactory::getInstance()->attach(new OBM_EventMailObserver());
+
 
 // Category Filter 
 if (($action == 'insert') || ($action == 'update') 
@@ -143,6 +153,7 @@ $params['category_filter'] = $cal_category_filter;
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
+
 
 if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
@@ -218,13 +229,21 @@ if ($action == 'search') {
       'contact' => $params['sel_contact_id']
     );
   } else {
+    $users = null;
+    if ($default_writable_calendar != null) {
+      $users = array($default_writable_calendar['id']);
+    }
+    else {
+      $users = array($obm['uid']);
+    }
     $entities = array(
-      'user' => array($obm['uid']),
+      'user' => $users,
       'resource' => $current_view->get_resources(),
       'contact' => $current_view->get_contacts()
     );
   }
-  $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view);
+  $organizer_id = is_null($default_writable_calendar) ? null : $default_writable_calendar['id'];
+  $display['detail'] = dis_calendar_event_form($action, $params, '', $entities, $current_view, $organizer_id);
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -241,7 +260,6 @@ if ($action == 'search') {
     $entities['contact'] = array();
   }
   $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
-  
   if (check_user_defined_rules() && check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
     try {
       $conflicts = check_calendar_conflict($params, $entities);
@@ -1584,6 +1602,7 @@ function get_calendar_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
+
   // New   
   $actions['calendar']['new'] = array (
     'Name'     => $l_header_new_event,
@@ -2045,8 +2064,10 @@ function get_calendar_action() {
 // Calendar Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_calendar_action() {
-  global $actions, $params, $path, $obm;
-
+  global $actions, $params, $path, $obm, $writable_calendars;
+  if (!$writable_calendars) {
+      unset($actions['calendar']['new']);
+  }
   $id = $params['calendar_id'];
   if($id) {
     $event_info = get_calendar_event_info($id);
@@ -2070,5 +2091,4 @@ function update_calendar_action() {
     }
   }
 }
-
 ?>
