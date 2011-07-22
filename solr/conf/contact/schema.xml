@@ -10,6 +10,7 @@
 	      <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
 	      <filter class="solr.ISOLatin1AccentFilterFactory" />
         <filter class="solr.WordDelimiterFilterFactory" />
+        <filter class="solr.ReversedWildcardFilterFactory" />
       </analyzer>
     </fieldType>
     <fieldType name="date" class="solr.DateField"/>
