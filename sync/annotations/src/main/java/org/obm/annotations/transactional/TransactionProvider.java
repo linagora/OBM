@@ -2,6 +2,7 @@ package org.obm.annotations.transactional;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
 import com.google.inject.Inject;
@@ -15,11 +16,10 @@ public class TransactionProvider implements Provider<TransactionManager> {
 	private TransactionManager transactionManager;
 
 	@Inject
-	public TransactionProvider() throws NamingException {
-		
+	public TransactionProvider() throws NamingException, SystemException {
 		InitialContext context = new InitialContext();
 		transactionManager = (TransactionManager) context.lookup(TRANSACTION_MANAGER);
-
+		transactionManager.setTransactionTimeout(3600);
 	}
 	
 	@Override

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.naming.NamingException;
+import javax.transaction.SystemException;
 
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.dbcp.DBCP;
@@ -27,7 +28,7 @@ public class LocatorDbHelper {
 		this.dbcp = dbcp;
 	}
 	
-	public static synchronized LocatorDbHelper getInstance() throws NamingException {
+	public static synchronized LocatorDbHelper getInstance() throws NamingException, SystemException {
 		if (instance == null) {
 			instance = new LocatorDbHelper(new DBCP(new TransactionProvider().get()));
 		}

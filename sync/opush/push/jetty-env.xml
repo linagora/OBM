@@ -15,7 +15,7 @@
 
 	<New id="UserTransaction" class="org.mortbay.jetty.plus.naming.Transaction">
 		<Arg>
-			<New class="com.atomikos.icatch.jta.J2eeTransactionManager" />
+			<New class="com.atomikos.icatch.jta.UserTransactionManager" />
 		</Arg>
 	</New>
 </Configure>
