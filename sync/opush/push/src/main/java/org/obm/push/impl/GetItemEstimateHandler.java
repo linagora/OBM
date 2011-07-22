@@ -4,9 +4,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.obm.push.UnsynchronizedItemService;
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.ItemChange;
+import org.obm.push.UnsynchronizedItemService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
