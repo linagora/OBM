@@ -1,9 +1,11 @@
 package org.obm.push.backend;
 
+import java.io.Serializable;
+
 import org.obm.push.data.calendarenum.AttendeeStatus;
 import org.obm.push.data.calendarenum.AttendeeType;
 
-public class MSAttendee {
+public class MSAttendee implements Serializable {
 	private String email;
 	private String name;
 	private AttendeeStatus attendeeStatus;

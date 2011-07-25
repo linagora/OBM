@@ -1,5 +1,6 @@
 package org.obm.push.backend;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -9,7 +10,7 @@ import org.obm.push.store.MSEmailBodyType;
 
 import com.google.common.base.Objects;
 
-public class MSEmailBody {
+public class MSEmailBody implements Serializable {
 
 	private String charset;
 

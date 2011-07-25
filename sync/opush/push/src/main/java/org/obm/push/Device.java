@@ -1,6 +1,7 @@
 package org.obm.push;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
@@ -8,7 +9,7 @@ import org.obm.push.backend.BackendSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Device {
+public class Device implements Serializable {
 
 	private final static Logger logger = LoggerFactory.getLogger(Device.class);
 	

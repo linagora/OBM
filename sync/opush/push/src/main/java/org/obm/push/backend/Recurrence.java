@@ -1,12 +1,13 @@
 package org.obm.push.backend;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
 import org.obm.push.data.calendarenum.RecurrenceDayOfWeek;
 import org.obm.push.data.calendarenum.RecurrenceType;
 
-public class Recurrence {
+public class Recurrence implements Serializable {
 	
 	private Date until;
 	private RecurrenceType type;

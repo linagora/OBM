@@ -1,11 +1,13 @@
 package org.obm.push.backend;
 
+import java.io.Serializable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
-public class MSAddress {
+public class MSAddress implements Serializable {
 	
 	private static final Logger logger = LoggerFactory
 			.getLogger(MSAddress.class);

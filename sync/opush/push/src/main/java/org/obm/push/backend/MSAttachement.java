@@ -1,11 +1,13 @@
 package org.obm.push.backend;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author adrienp
  *
  */
-public class MSAttachement {
+public class MSAttachement implements Serializable {
 	
 	private String displayName;
 	private String fileReference;
