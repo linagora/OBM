@@ -12,6 +12,8 @@ import javax.servlet.ServletContextListener;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -63,6 +65,7 @@ public class GuiceServletContextListener implements ServletContextListener {
     			bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
     			bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
     			bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
+    			bind(IDBCP.class).to(DBCP.class);
 
     		    ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader.load( FreeBusyPluginModule.class );
     		    

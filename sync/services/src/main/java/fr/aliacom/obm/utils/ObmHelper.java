@@ -23,9 +23,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
+import org.obm.dbcp.DBCP;
+import org.obm.dbcp.DataSource;
 
 import org.obm.sync.base.ObmDbType;
 import org.slf4j.Logger;
@@ -43,24 +42,13 @@ import fr.aliacom.obm.services.constant.ConstantService;
 public class ObmHelper {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ObmHelper.class);
-	private static final String DATA_SOURCE = "java:comp/env/jdbc/ObmDS";
 
-	private DataSource ds;
 	private ObmDbType type = ObmDbType.PGSQL;
+	private DataSource ds;
 
 	@Inject
-	private ObmHelper(ConstantService constantService) throws NamingException {
-		InitialContext context;
-		try {
-			context = new InitialContext();
-			ds = (DataSource) context.lookup(DATA_SOURCE);
-		} catch (NamingException e) {
-			logger.error("Cannot locate datasource at " + "jdbc/ObmDS", e);
-			throw e;
-		} catch (RuntimeException t) {
-			logger.error("Unexpected error while initializing ObmHelper", t);
-			throw t;
-		}
+	private ObmHelper(ConstantService constantService, DBCP dbcp) {
+		this.ds = dbcp.getDataSource();
 		type = ObmDbType.valueOf(constantService.getStringValue("dbtype").trim());
 	}
 

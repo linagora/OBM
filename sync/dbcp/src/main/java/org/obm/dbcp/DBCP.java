@@ -35,7 +35,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class DBCP {
+public class DBCP implements IDBCP{
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
