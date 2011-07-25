@@ -15,6 +15,7 @@
        timeToIdleSeconds="300"
        timeToLiveSeconds="600"
        memoryStoreEvictionPolicy="LFU"
+       transactionalMode="xa"
         />
         
 	<cache name="syncedCollectionStoreService"
@@ -26,6 +27,7 @@
        timeToIdleSeconds="300"
        timeToLiveSeconds="600"
        memoryStoreEvictionPolicy="LFU"
+       transactionalMode="xa"
         />
 
 	<cache name="monitoredCollectionService"
@@ -37,6 +39,7 @@
        timeToIdleSeconds="300"
        timeToLiveSeconds="600"
        memoryStoreEvictionPolicy="LFU"
+       transactionalMode="xa"
         />
         
 </ehcache>
