@@ -34,8 +34,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.obm.sync.GuiceServletContextListener;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.FreeBusyRequest;
@@ -54,7 +54,7 @@ public class FreeBusyServlet extends HttpServlet {
 	private enum FreeBusyQueryType { LOCAL, REMOTE }
 	
 	private static final long serialVersionUID = -3887606350629311688L;
-	private Log logger = LogFactory.getLog(FreeBusyServlet.class);
+	private Logger logger = LoggerFactory.getLogger(FreeBusyServlet.class);
 	private LocalFreeBusyProvider localFreeBusyProvider;
 	private Collection<RemoteFreeBusyProvider> remoteFreeBusyProviders;
 	
