@@ -1,9 +1,11 @@
 package org.obm.push;
 
+import java.io.Serializable;
+
 import org.obm.push.store.FolderType;
 import org.obm.push.store.IApplicationData;
 
-public class ItemChange {
+public class ItemChange  implements Serializable {
 	
 	private String serverId;
 	private String parentId;
