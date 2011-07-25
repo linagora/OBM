@@ -3900,9 +3900,6 @@ function dis_calendar_quick_form($calendar_entity) {
         $entity_view.="<option id='calendarViewEntity$user[id]' value='$user[id]'>$user[name]</option>";
       }
     }
-    if(!isset($uid)) {
-      $entity_view.="<option id='calendarViewEntity$user_id' value='$user_id'>$u[firstname] $u[lastname]</option>";
-    }
     $entity_view.="</select>";
     $entity_view.="<input id='calendarKindEntity' type='hidden' value='user' />";
     $calendar_list = "
