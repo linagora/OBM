@@ -396,3 +396,8 @@ $l_fontSize = "Taille du texte";
 $l_fontSize_small = "Petite";
 $l_fontSize_medium = "Moyenne";
 $l_fontSize_big = "Grande";
+
+
+// additional obm event description informations
+$l_obm_reserved_event_data_attachment_begin = "// PIECES JOINTES (DONNEES RESERVEES OBM, NE PAS EDITER) ";
+$l_obm_reserved_event_data_attachment_end = "// FIN PIECES JOINTES ";

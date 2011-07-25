@@ -523,3 +523,9 @@ $l_fontSize = "Text size";
 $l_fontSize_small = "Small";
 $l_fontSize_medium = "Medium";
 $l_fontSize_big = "Large";
+
+
+// additional obm event description informations
+$l_obm_reserved_event_data_attachment_begin = "// ATTACHED DOCUMENTS LIST (OBM RESERVED DATA, DO NOT EDIT CONTENTS) ";
+$l_obm_reserved_event_data_attachment_end = "// END ATTACHED DOCUMENTS LIST ";
+

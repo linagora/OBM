@@ -124,27 +124,6 @@ class Vcalendar_Reader_OBM {
      }
     }
     
-    if ($include_attachments) {
-      $rs = run_query_get_events_documents(array_keys($this->vevents));
-      $attachments = array();
-      while($rs->next_record()) {
-        //$this->addDocument($this->vevents[$rs->f('event_id')] , $rs->f('document_id'));
-        $event_id = $rs->f('event_id');
-        $document_id = $rs->f('document_id');
-        if (!array_key_exists($event_id, $attachments)) $attachments[$event_id] = array();
-        $attachments[$event_id][] = $GLOBALS['cgp_host'].'document/document_download.php?externalToken='.get_calendar_entity_share($document_id, 'document', 'private', 'document').'&document_id='.$document_id;
-      }
-      if (count($attachments) != 0) {
-        foreach ($attachments as $id => $links) {
-          $description = $this->vevents[$id]->get('description');
-          $description.= "\r\n\r\n".$GLOBALS['l_attachments_mail_body']."\r\n";
-          $description.= implode("\r\n", $links);
-          $this->vevents[$id]->reset('description');
-          $this->vevents[$id]->set('description', $description);
-        }
-      }
-    }
-    
     if(count($this->vevents) > 0) {
       $exceptions = run_query_get_events_exception(array_keys($this->vevents));
       while($exceptions->next_record()) {
