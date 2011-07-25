@@ -1,7 +1,9 @@
 package org.obm.push.store;
 
+import java.io.Serializable;
 
-public class BodyPreference {
+
+public class BodyPreference implements Serializable {
 
 	private Integer truncationSize;
 	private MSEmailBodyType type;
