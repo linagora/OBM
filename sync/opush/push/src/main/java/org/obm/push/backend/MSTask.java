@@ -1,5 +1,6 @@
 package org.obm.push.backend;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import org.obm.push.store.PIMDataType;
  * @author adrienp
  *
  */
-public class MSTask implements IApplicationData {
+public class MSTask implements IApplicationData, Serializable {
 
 	@Override
 	public PIMDataType getType() {

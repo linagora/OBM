@@ -1,7 +1,10 @@
 package org.obm.push.store;
 
+import java.io.Serializable;
 
-public class SyncCollectionChange {
+
+public class SyncCollectionChange implements Serializable {
+
 	private String serverId;
 	private String clientId;
 	private String modType;

@@ -1,6 +1,7 @@
 package org.obm.push.backend;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,7 +17,7 @@ import org.obm.push.store.PIMDataType;
  * @author adrienp
  *
  */
-public class MSEmail implements IApplicationData {
+public class MSEmail implements IApplicationData, Serializable {
 
 	@Override
 	public PIMDataType getType() {

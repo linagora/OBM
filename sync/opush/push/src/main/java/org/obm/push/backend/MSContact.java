@@ -1,5 +1,6 @@
 package org.obm.push.backend;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,7 +9,7 @@ import org.obm.push.store.IApplicationData;
 import org.obm.push.store.PIMDataType;
 
 
-public class MSContact implements IApplicationData {
+public class MSContact implements IApplicationData, Serializable {
 	
 	private String assistantName;
 	private String assistantPhoneNumber;

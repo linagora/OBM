@@ -1,5 +1,6 @@
 package org.obm.push.backend;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +13,7 @@ import org.obm.push.data.calendarenum.CalendarSensitivity;
 import org.obm.push.store.IApplicationData;
 import org.obm.push.store.PIMDataType;
 
-public class MSEvent implements IApplicationData {
+public class MSEvent implements IApplicationData, Serializable {
 	
 	private String organizerName;
 	private String organizerEmail;
