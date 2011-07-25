@@ -3,28 +3,42 @@ package org.obm.push;
 import java.io.FileNotFoundException;
 import java.util.Set;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.impl.Credentials;
+
+import com.atomikos.icatch.jta.UserTransactionManager;
 
 public class UnSynchronizedItemImplTest extends StoreManagerConfigurationTest  {
 
 	private ObjectStoreManager objectStoreManager;
 	private UnsynchronizedItemImpl unSynchronizedItemImpl;
 	private Credentials credentials;
+	private UserTransactionManager transactionManager;
 	
 	public UnSynchronizedItemImplTest() {
 		super();
 	}
 	
 	@Before
-	public void init() throws StoreNotFoundException, FileNotFoundException {
+	public void init() throws StoreNotFoundException, FileNotFoundException, NotSupportedException, SystemException {
+		transactionManager = new UserTransactionManager();
+		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.unSynchronizedItemImpl = new UnsynchronizedItemImpl(objectStoreManager);
 		this.credentials = new Credentials("login@domain", "password");
+	}
+	
+	@After
+	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
+		transactionManager.rollback();
 	}
 	
 	@Test
@@ -44,61 +58,61 @@ public class UnSynchronizedItemImplTest extends StoreManagerConfigurationTest  {
 	
 	@Test
 	public void addTwoItemsOnTheSameCollection() {
-		ItemChange ItemChange1 = buildItemChange("test 1");
-		ItemChange ItemChange2 = buildItemChange("test 2");
-		ItemChange ItemChange3 = buildItemChange("test 3");
+		ItemChange itemChange1 = buildItemChange("test 1");
+		ItemChange itemChange2 = buildItemChange("test 2");
+		ItemChange itemChange3 = buildItemChange("test 3");
 		
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange1);
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange2);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange1);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange2);
 		
 		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(2, itemChanges.size());
 		
-		Assert.assertTrue(itemChanges.contains(ItemChange1));
-		Assert.assertTrue(itemChanges.contains(ItemChange2));
-		Assert.assertFalse(itemChanges.contains(ItemChange3));
+		Assert.assertTrue( contains(itemChanges, itemChange1) );
+		Assert.assertTrue( contains(itemChanges, itemChange2) );
+		Assert.assertFalse( contains(itemChanges, itemChange3) );
 	}
 	
 	@Test
 	public void addItemsOnTwoCollections() {
-		ItemChange ItemChange1 = buildItemChange("test 1.1");
-		ItemChange ItemChange2 = buildItemChange("test 1.2");
-		ItemChange ItemChange21 = buildItemChange("test 2.1");
+		ItemChange itemChange1 = buildItemChange("test 1.1");
+		ItemChange itemChange2 = buildItemChange("test 1.2");
+		ItemChange itemChange21 = buildItemChange("test 2.1");
 		
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange1);
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange2);
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 2, ItemChange21);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange1);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange2);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 2, itemChange21);
 		
 		Set<ItemChange> itemChangesOneCollection = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
 		Set<ItemChange> itemChangesTwoCollection = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 2);
 		
 		Assert.assertNotNull(itemChangesOneCollection);
 		Assert.assertEquals(2, itemChangesOneCollection.size());
-		Assert.assertTrue(itemChangesOneCollection.contains(ItemChange1));
-		Assert.assertTrue(itemChangesOneCollection.contains(ItemChange2));
+		Assert.assertTrue( contains(itemChangesOneCollection, itemChange1) );
+		Assert.assertTrue( contains(itemChangesOneCollection, itemChange2) );
 		
 		Assert.assertNotNull(itemChangesTwoCollection);
 		Assert.assertEquals(1, itemChangesTwoCollection.size());
-		Assert.assertTrue(itemChangesTwoCollection.contains(ItemChange21));	
+		Assert.assertTrue( contains(itemChangesTwoCollection, itemChange21) );	
 	}
 	
 	@Test
 	public void addTwoItemsDifferentTypeOnTheSameCollection() {
-		ItemChange ItemChange1 = buildItemChange("test 1");
-		ItemChange ItemChange2 = buildItemChange("test 2");
-		ItemChange ItemChange3 = buildItemChange("test 3");
+		ItemChange itemChange1 = buildItemChange("test 1");
+		ItemChange itemChange2 = buildItemChange("test 2");
+		ItemChange itemChange3 = buildItemChange("test 3");
 		
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, ItemChange1);
-		unSynchronizedItemImpl.storeItemToRemove(credentials, getFakeDeviceId(), 1, ItemChange2);
+		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange1);
+		unSynchronizedItemImpl.storeItemToRemove(credentials, getFakeDeviceId(), 1, itemChange2);
 		
 		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(1, itemChanges.size());
 		
-		Assert.assertTrue(itemChanges.contains(ItemChange1));
-		Assert.assertFalse(itemChanges.contains(ItemChange2));
-		Assert.assertFalse(itemChanges.contains(ItemChange3));
+		Assert.assertTrue( contains(itemChanges, itemChange1) );
+		Assert.assertFalse( contains(itemChanges, itemChange2) );
+		Assert.assertFalse( contains(itemChanges, itemChange3) );
 	}
 	
 	@Test
@@ -120,4 +134,14 @@ public class UnSynchronizedItemImplTest extends StoreManagerConfigurationTest  {
 	private Device getFakeDeviceId(){
 		return new Device("DevType", "DevId", null);
 	}
+	
+	private boolean contains(Set<ItemChange> expected, ItemChange actual) {
+		for (ItemChange itemChange: expected) {
+			if (itemChange.getDisplayName().equals(actual.getDisplayName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }

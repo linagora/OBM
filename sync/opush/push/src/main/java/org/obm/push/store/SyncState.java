@@ -1,5 +1,6 @@
 package org.obm.push.store;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -12,7 +13,7 @@ import com.google.common.base.Objects;
  * @author tom
  * 
  */
-public class SyncState {
+public class SyncState implements Serializable {
 
 	private Date lastSync;
 	private Boolean lastSyncFiltred;

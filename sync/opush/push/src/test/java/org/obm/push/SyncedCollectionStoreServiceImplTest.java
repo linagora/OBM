@@ -4,14 +4,19 @@ import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.List;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.impl.Credentials;
 import org.obm.push.store.SyncCollection;
 
+import com.atomikos.icatch.jta.UserTransactionManager;
 import com.google.common.collect.Lists;
 
 public class SyncedCollectionStoreServiceImplTest extends StoreManagerConfigurationTest {
@@ -19,12 +24,20 @@ public class SyncedCollectionStoreServiceImplTest extends StoreManagerConfigurat
 	private ObjectStoreManager objectStoreManager;
 	private SyncedCollectionStoreServiceImpl syncedCollectionStoreServiceImpl;
 	private Credentials credentials;
+	private UserTransactionManager transactionManager;
 	
 	@Before
-	public void init() throws FileNotFoundException, StoreNotFoundException {
+	public void init() throws FileNotFoundException, StoreNotFoundException, NotSupportedException, SystemException {
+		this.transactionManager = new UserTransactionManager();
+		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionStoreServiceImpl(objectStoreManager);
 		this.credentials = new Credentials("login@domain", "password");
+	}
+	
+	@After
+	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
+		transactionManager.rollback();
 	}
 	
 	@Test

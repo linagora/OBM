@@ -1,9 +1,10 @@
 package org.obm.push.store;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SyncCollectionOptions {
+public class SyncCollectionOptions implements Serializable {
 	
 	private Integer truncation;
 	private Integer mimeSupport;
