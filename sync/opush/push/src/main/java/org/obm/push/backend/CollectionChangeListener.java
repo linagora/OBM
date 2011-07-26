@@ -1,10 +1,13 @@
 package org.obm.push.backend;
 
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.obm.push.impl.ChangedCollections;
 import org.obm.push.store.SyncCollection;
 
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Sets;
 
 public class CollectionChangeListener implements
@@ -43,7 +46,23 @@ public class CollectionChangeListener implements
 
 	@Override
 	public boolean monitorOneOf(ChangedCollections changedCollections) {
-		return !Sets.intersection(getMonitoredCollections(), changedCollections.getChanged()).isEmpty();
+		TreeSet<SyncCollection> collectionPathSet = convertSetToComparePath(changedCollections);
+		return !Sets.intersection(getMonitoredCollections(), collectionPathSet).isEmpty();
+	}
+
+	private TreeSet<SyncCollection> convertSetToComparePath(ChangedCollections changedCollections) {
+		
+		TreeSet<SyncCollection> collectionPathSet = Sets.newTreeSet(new Comparator<SyncCollection>() {
+
+			@Override
+			public int compare(SyncCollection o1, SyncCollection o2) {
+				return ComparisonChain.start()
+						.compare(o1.getCollectionPath(), o2.getCollectionPath())
+						.result();
+			}
+		});
+		collectionPathSet.addAll(changedCollections.getChanged());
+		return collectionPathSet;
 	}
 	
 }

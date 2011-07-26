@@ -5,6 +5,8 @@ import java.util.Set;
 
 import org.obm.push.store.SyncCollection;
 
+import com.google.common.base.Objects;
+
 public class ChangedCollections {
 
 	private Date lastSync;
@@ -24,6 +26,12 @@ public class ChangedCollections {
 		return changed;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(getClass())
+			.add("lastSync", lastSync)
+			.add("changes", changed)
+			.toString();
+	}
 	
 }
