@@ -136,6 +136,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 	
 	@Override
+	@Transactional
 	public void sendResponse(BackendSession bs, Responder responder,
 			boolean sendHierarchyChange, IContinuation continuation) {
 		

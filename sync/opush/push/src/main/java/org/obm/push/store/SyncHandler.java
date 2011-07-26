@@ -476,6 +476,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	}
 
 	@Override
+	@Transactional
 	public void sendResponse(BackendSession bs, Responder responder,
 			boolean sendHierarchyChange, IContinuation continuation) {
 		
@@ -485,7 +486,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 
 	}
 
-	public void processResponse(BackendSession bs, Responder responder,
+	/* package */ void processResponse(BackendSession bs, Responder responder,
 			Collection<SyncCollection> changedFolders,
 			Map<String, String> processedClientIds, IContinuation continuation) {
 
@@ -547,7 +548,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		}
 	}
 
-	public void sendError(Responder responder, String errorStatus) {
+	private void sendError(Responder responder, String errorStatus) {
 		try {
 			Document reply = null;
 			reply = DOMUtils.createDoc(null, "Sync");
