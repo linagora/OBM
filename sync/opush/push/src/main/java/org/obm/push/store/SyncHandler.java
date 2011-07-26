@@ -3,6 +3,7 @@ package org.obm.push.store;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,8 +14,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
-import org.obm.push.Device;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.push.Device;
 import org.obm.push.ItemChange;
 import org.obm.push.MonitoredCollectionStoreService;
 import org.obm.push.UnsynchronizedItemService;
@@ -43,7 +44,6 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -480,7 +480,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	public void sendResponse(BackendSession bs, Responder responder,
 			boolean sendHierarchyChange, IContinuation continuation) {
 		
-		Map<String, String> processedClientIds = ImmutableMap.<String, String>of();
+		Map<String, String> processedClientIds = Collections.emptyMap();
 		processResponse(bs, responder, monitoredCollectionService.list(bs.getCredentials(), bs.getDevice()), 
 				processedClientIds, continuation);
 
