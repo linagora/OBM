@@ -1,10 +1,12 @@
 package org.obm.push;
 
 import java.util.Collections;
+import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.backend.IBackend;
@@ -45,6 +47,7 @@ public class GuiceServletContextListener implements ServletContextListener {
         	} 
         	servletContext.setAttribute(ATTRIBUTE_NAME, injector);
         	XTrustProvider.install();
+        	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         } catch (Exception e) {
         	logger.error(e.getMessage(), e);
         	failStartup(e.getMessage());

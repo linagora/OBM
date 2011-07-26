@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.obm.sync.server.template.ITemplateLoader;
-import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.dbcp.DBCP;
 import org.obm.dbcp.IDBCP;
+import org.obm.sync.server.template.ITemplateLoader;
+import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -29,8 +30,8 @@ import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.setting.SettingsServiceImpl;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserServiceImpl;
-import fr.aliacom.obm.freebusy.FreeBusyPluginModule;
 import fr.aliacom.obm.freebusy.DatabaseFreeBusyProvider;
+import fr.aliacom.obm.freebusy.FreeBusyPluginModule;
 import fr.aliacom.obm.freebusy.LocalFreeBusyProvider;
 
 public class GuiceServletContextListener implements ServletContextListener { 
@@ -49,6 +50,7 @@ public class GuiceServletContextListener implements ServletContextListener {
         		failStartup("Could not create injector: createInjector() returned null"); 
         	} 
         	servletContext.setAttribute(ATTRIBUTE_NAME, injector);
+        	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         } catch (Exception e) {
         	failStartup(e.getMessage());
         } 
