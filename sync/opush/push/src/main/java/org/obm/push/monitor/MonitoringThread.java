@@ -56,6 +56,7 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 				}
 				ChangedCollections changedCollections = getChangedCollections(lastSync);
 				toNotify = listPushNotification(selectListenersToNotify(changedCollections, ccls));
+				lastSync = changedCollections.getLastSync();
 			}
 			
 			for (PushNotification listener: toNotify) {
