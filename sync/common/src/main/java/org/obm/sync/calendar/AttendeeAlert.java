@@ -1,6 +1,5 @@
-package fr.aliacom.obm.common.calendar;
+package org.obm.sync.calendar;
 
-import org.obm.sync.calendar.Attendee;
 
 public class AttendeeAlert extends Attendee{
 	

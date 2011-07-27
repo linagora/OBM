@@ -41,6 +41,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.AttendeeAlert;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
