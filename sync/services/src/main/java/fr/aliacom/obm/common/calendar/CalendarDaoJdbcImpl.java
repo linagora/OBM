@@ -1030,8 +1030,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				String evIdList = buildEventId(changedEvent);
 				loadAttendeesAndAlerts(conComp, token, eventById, evIdList, calendarUser
 						.getDomain().getName());
-				loadExceptions(con, cal, eventById, evIdList);
-				loadEventExceptions(con, token, eventById, evIdList);
+				loadExceptions(conComp, cal, eventById, evIdList);
+				loadEventExceptions(conComp, token, eventById, evIdList);
 			}
 		} catch (SQLException e) {
 			logger.error("error loading attendees, alerts, exceptions, eventException", e);
