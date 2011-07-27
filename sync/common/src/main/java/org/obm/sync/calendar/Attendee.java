@@ -76,36 +76,29 @@ public class Attendee {
 	public void setObmUser(boolean obmUser) {
 		this.obmUser = obmUser;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((email == null) ? 0 : email.toLowerCase().hashCode());
+		return result;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Attendee))
+		if (getClass() != obj.getClass())
 			return false;
 		Attendee other = (Attendee) obj;
-		if (email != null && email.equalsIgnoreCase(other.email)) {
-			return true;
-		}
-		return false;
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equalsIgnoreCase(other.email))
+			return false;
+		return true;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((displayName == null) ? 0 : displayName.hashCode());
-		result = prime * result + ((email == null) ? 0 : email.toLowerCase().hashCode());
-		result = prime * result + (obmUser ? 1231 : 1237);
-		result = prime * result + (organizer ? 1231 : 1237);
-		result = prime * result + percent;
-		result = prime * result
-				+ ((required == null) ? 0 : required.hashCode());
-		result = prime * result + ((state == null) ? 0 : state.hashCode());
-		return result;
-	}
-
 }
