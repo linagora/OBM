@@ -9,6 +9,8 @@ import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
+import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -71,6 +73,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(MonitoredCollectionStoreService.class).to(MonitoredCollectionStoreServiceImpl.class);
 				bind(SyncedCollectionStoreService.class).to(SyncedCollectionStoreServiceImpl.class);
 				bind(ServletContext.class).toInstance(servletContext);
+				bind(IDBCP.class).to(DBCP.class);
 			}
     	}, new TransactionalModule());
     }
