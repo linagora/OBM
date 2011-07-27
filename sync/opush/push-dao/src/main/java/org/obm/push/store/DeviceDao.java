@@ -52,12 +52,10 @@ public class DeviceDao {
 		String login = parts[0].toLowerCase();
 		String domain = parts[1].toLowerCase();
 		
-		Connection con = null;
+		Connection con = dbcp.getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		con = dbcp.getConnection();
 		try {
-			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_device (identifier, type, owner) "
 					+ "SELECT ?, ?, userobm_id FROM UserObm "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "

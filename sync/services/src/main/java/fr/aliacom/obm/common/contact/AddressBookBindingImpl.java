@@ -119,16 +119,20 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	private ContactChangesResponse getSync(BookType book, Date timestamp, AccessToken token) throws ServerFault {
 		ContactChangesResponse response = new ContactChangesResponse();
+		Connection connection = null;
 		try {
 			if (book == BookType.users) {
 				response.setChanges(getUsersChanges(token, timestamp));
 			} else {
 				response.setChanges(getContactsChanges(token, timestamp));
 			}
-			response.setLastSync(obmHelper.selectNow(obmHelper.getConnection()));
+			obmHelper.getConnection()
+			response.setLastSync(obmHelper.selectNow(connection));
 		} catch (Throwable t) {
 			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
 			throw new ServerFault(t);
+		} finally {
+			obmHelper.cleanup(connection, null, null);
 		}
 		return response;
 	}
@@ -155,13 +159,17 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	private AddressBookChangesResponse getSync(AccessToken token, Date timestamp) throws ServerFault {
 		AddressBookChangesResponse response = new AddressBookChangesResponse();
+		Connection connection = null;
 		try {
+			connection = obmHelper.getConnection();
 			response.setContactChanges(getContactsChanges(token, timestamp));
 			response.setBooksChanges(getFolderChanges(token, timestamp));
-			response.setLastSync(obmHelper.selectNow(obmHelper.getConnection()));
+			response.setLastSync(obmHelper.selectNow(connection));
 		} catch (Throwable t) {
 			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
 			throw new ServerFault(t);
+		} finally {
+			obmHelper.cleanup(connection, null, null);
 		}
 		
 		return response;
@@ -395,13 +403,16 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	private FolderChangesResponse getFolderSync(Date timestamp, AccessToken token) throws Throwable {
+		Connection connection = obmHelper.getConnection();
 		try {
 			FolderChangesResponse response = new FolderChangesResponse();
 			response.setFolderChanges(getFolderChanges(token, timestamp));
-			response.setLastSync(obmHelper.selectNow(obmHelper.getConnection()));
+			response.setLastSync(obmHelper.selectNow(connection));
 			return response;
 		} catch (Throwable t) {
 			throw  new ServerFault(t);
+		} finally {
+			obmHelper.cleanup(connection, null, null);
 		}
 	}
 

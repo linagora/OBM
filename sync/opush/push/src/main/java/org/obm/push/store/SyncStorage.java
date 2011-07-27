@@ -271,10 +271,9 @@ public class SyncStorage implements ISyncStorage {
 	public Integer addCollectionMapping(String loginAtDomain, String deviceId, String collection) throws SQLException {
 		Integer id = deviceDao.findDevice(loginAtDomain, deviceId);
 		Integer ret = null;
-		Connection con = null;
+		Connection con = dbcp.getConnection();
 		PreparedStatement ps = null;
 		try {
-			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_folder_mapping (device_id, collection) VALUES (?, ?)");
 			ps.setInt(1, id);
 			ps.setString(2, collection);
@@ -1085,12 +1084,11 @@ public class SyncStorage implements ISyncStorage {
 		if (lastSync == null) {
 			lastSync = DateUtils.getCurrentGMTCalendar().getTime();
 		}
-		Connection con = null;
+		Connection con = dbcp.getConnection();
 		PreparedStatement insert = null;
 		PreparedStatement del = null;
 		String ids = buildListIdFromEmailCache(messages);
 		try {
-			con = dbcp.getConnection();
 			del = con
 					.prepareStatement("DELETE FROM opush_sync_mail WHERE collection_id=? AND device_id=? AND mail_uid IN ("
 							+ ids + ")");
