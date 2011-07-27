@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.IniFile;
 import org.obm.push.utils.JDBCUtils;
@@ -40,12 +40,12 @@ public class SyncStorage implements ISyncStorage {
 
 	private static final Logger logger = LoggerFactory.getLogger(SyncStorage.class);
 
-	private final DBCP dbcp;
+	private final IDBCP dbcp;
 
 	private final DeviceDao deviceDao;
 	
 	@Inject
-	private SyncStorage(DBCP dbcp, DeviceDao dao) {
+	private SyncStorage(IDBCP dbcp, DeviceDao dao) {
 		this.dbcp = dbcp;
 		this.deviceDao = dao;
 	}
@@ -60,7 +60,7 @@ public class SyncStorage implements ISyncStorage {
 		ResultSet rs = null;
 
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT device_id, last_sync, collection_id FROM opush_sync_state WHERE sync_key=?");
 			ps.setString(1, syncKey);
 
@@ -89,7 +89,7 @@ public class SyncStorage implements ISyncStorage {
 		ResultSet rs = null;
 
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT last_heartbeat FROM opush_ping_heartbeat WHERE device_id=?");
 			ps.setInt(1, id);
 
@@ -111,7 +111,7 @@ public class SyncStorage implements ISyncStorage {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("DELETE FROM opush_ping_heartbeat WHERE device_id=? ");
 			ps.setInt(1, id);
 			ps.executeUpdate();
@@ -175,7 +175,7 @@ public class SyncStorage implements ISyncStorage {
 		ResultSet rs = null;
 		boolean hasSyncPerm = false;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT policy FROM opush_sync_perms "
 					+ "INNER JOIN UserObm u ON owner=userobm_id "
 					+ "INNER JOIN Domain d ON userobm_domain_id=domain_id "
@@ -221,7 +221,7 @@ public class SyncStorage implements ISyncStorage {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_sync_state (sync_key, device_id, last_sync, collection_id) VALUES (?, ?, ?, ?)");
 			ps.setString(1, state.getKey());
 			ps.setInt(2, id);
@@ -248,7 +248,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT id FROM opush_folder_mapping WHERE device_id=? AND collection=?");
 			ps.setInt(1, id);
 			ps.setString(2, collection);
@@ -274,7 +274,7 @@ public class SyncStorage implements ISyncStorage {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_folder_mapping (device_id, collection) VALUES (?, ?)");
 			ps.setInt(1, id);
 			ps.setString(2, collection);
@@ -298,7 +298,7 @@ public class SyncStorage implements ISyncStorage {
 		ResultSet rs = null;
 
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT collection FROM opush_folder_mapping WHERE id=?");
 			ps.setInt(1, collectionId);
 			rs = ps.executeQuery();
@@ -366,7 +366,7 @@ public class SyncStorage implements ISyncStorage {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("DELETE FROM opush_sync_state WHERE device_id=? AND collection_id=?");
 			ps.setInt(1, id);
 			ps.setInt(2, collectionId);
@@ -403,7 +403,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(calQuery);
 			ps.setInt(1, eventCollectionId);
 			ps.setString(2, eventUid);
@@ -443,7 +443,7 @@ public class SyncStorage implements ISyncStorage {
 				+ "WHERE event_collection_id=? AND event_uid=? AND status=?";
 
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(query);
 			int i = 1;
 			ps.setInt(i++, eventCollectionId);
@@ -474,7 +474,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(calQuery);
 			int i = 1;
 			ps.setInt(i++, emailCollectionId);
@@ -509,7 +509,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(calQuery);
 			int i = 1;
 			ps.setInt(i++, eventCollectionId);
@@ -577,7 +577,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(calQuery.toString());
 			int i = 1;
 			ps.setInt(i++, eventCollectionId);
@@ -706,7 +706,7 @@ public class SyncStorage implements ISyncStorage {
 			PreparedStatement ps = null;
 			String uids = buildEmailUid(emailUids);
 			try {
-				con = dbcp.getDataSource().getConnection();
+				con = dbcp.getConnection();
 				ps = con.prepareStatement("UPDATE opush_invitation_mapping SET status=?, sync_key=?, dtstamp=dtstamp WHERE mail_collection_id=? AND mail_uid IN ("
 						+ uids + ")");
 				int idx = 1;
@@ -741,7 +741,7 @@ public class SyncStorage implements ISyncStorage {
 			PreparedStatement ps = null;
 			String uids = buildEventUid(eventUids);
 			try {
-				con = dbcp.getDataSource().getConnection();
+				con = dbcp.getConnection();
 				ps = con.prepareStatement("UPDATE opush_invitation_mapping SET status=?, sync_key=?, dtstamp=dtstamp WHERE mail_collection_id IS NULL AND mail_uid IS NULL AND event_collection_id=? AND event_uid IN ("
 						+ uids + ")");
 				ps.setString(1, status.toString());
@@ -769,7 +769,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(calQuery);
 			ps.setInt(1, eventCollectionId);
 			ps.setString(2, InvitationStatus.EVENT_MUST_SYNCED.toString());
@@ -808,7 +808,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(calQuery);
 			ps.setInt(1, emailCollectionId);
 			ps.setString(2, statusAction.toString());
@@ -849,7 +849,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(calQuery);
 			ps.setInt(1, eventCollectionId);
 			ps.setString(2, statusAction.toString());
@@ -917,7 +917,7 @@ public class SyncStorage implements ISyncStorage {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("DELETE FROM opush_invitation_mapping "
 					+ "WHERE event_collection_id=? AND mail_collection_id=? AND mail_uid=?");
 			ps.setInt(1, eventCollectionId);
@@ -940,7 +940,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet evrs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT mail_uid, is_read FROM opush_sync_mail WHERE collection_id=? and device_id=?");
 			ps.setInt(1, collectionId);
 			ps.setInt(2, devId);
@@ -973,7 +973,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet evrs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT mail_uid, is_read "
 					+ "FROM opush_sync_mail "
 					+ "WHERE collection_id=? and device_id=? and timestamp >= ?");
@@ -1008,7 +1008,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement ps = null;
 		ResultSet evrs = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT mail_uid "
 					+ "FROM opush_sync_deleted_mail "
 					+ "WHERE collection_id=? and device_id=? and timestamp >= ?");
@@ -1048,7 +1048,7 @@ public class SyncStorage implements ISyncStorage {
 		Connection con = null;
 		String ids = buildListId(uids);
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			del = con
 					.prepareStatement("DELETE FROM opush_sync_mail WHERE collection_id=? AND device_id=? AND mail_uid IN ("
 							+ ids + ")");
@@ -1090,7 +1090,7 @@ public class SyncStorage implements ISyncStorage {
 		PreparedStatement del = null;
 		String ids = buildListIdFromEmailCache(messages);
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			del = con
 					.prepareStatement("DELETE FROM opush_sync_mail WHERE collection_id=? AND device_id=? AND mail_uid IN ("
 							+ ids + ")");
@@ -1144,7 +1144,7 @@ public class SyncStorage implements ISyncStorage {
 				+ "WHERE event_collection_id = ? AND event_uid = ? AND status = ? AND dtstamp > event_timeupdate";
 
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(query);
 			ps.setInt(1, eventCollectionId);
 			ps.setString(2, eventUid);
@@ -1173,7 +1173,7 @@ public class SyncStorage implements ISyncStorage {
 				+ "WHERE event_collection_id = ? AND event_uid = ? AND (status = ? OR status = ?)";
 
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(query);
 			ps.setString(1, InvitationStatus.EVENT_TO_DELETED.toString());
 			ps.setInt(2, eventCollectionId);
@@ -1199,7 +1199,7 @@ public class SyncStorage implements ISyncStorage {
 				+ "WHERE event_collection_id = ? AND event_uid = ? AND (status = ? OR status = ?)";
 
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(query);
 			ps.setString(1, InvitationStatus.DELETED.toString());
 			ps.setInt(2, eventCollectionId);
@@ -1230,7 +1230,7 @@ public class SyncStorage implements ISyncStorage {
 				+ ")";
 
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(query);
 			ps.setInt(1, eventCollectionId);
 			ps.setString(2, eventUid);

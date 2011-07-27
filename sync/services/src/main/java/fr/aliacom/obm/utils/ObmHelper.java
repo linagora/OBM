@@ -23,9 +23,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
-import org.obm.dbcp.DBCP;
-import org.obm.dbcp.DataSource;
-
+import org.obm.dbcp.IDBCP;
 import org.obm.sync.base.ObmDbType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +34,7 @@ import com.google.inject.Singleton;
 import fr.aliacom.obm.services.constant.ConstantService;
 
 /**
- * Helper functions for hibernate / datasource management
+ * Helper functions datasource management
  */
 @Singleton
 public class ObmHelper {
@@ -44,11 +42,12 @@ public class ObmHelper {
 	private static final Logger logger = LoggerFactory.getLogger(ObmHelper.class);
 
 	private ObmDbType type = ObmDbType.PGSQL;
-	private DataSource ds;
+
+	private final IDBCP dbcp;
 
 	@Inject
-	private ObmHelper(ConstantService constantService, DBCP dbcp) {
-		this.ds = dbcp.getDataSource();
+	private ObmHelper(ConstantService constantService, IDBCP dbcp) {
+		this.dbcp = dbcp;
 		type = ObmDbType.valueOf(constantService.getStringValue("dbtype").trim());
 	}
 
@@ -84,7 +83,7 @@ public class ObmHelper {
 	 * for a given transaction.
 	 */
 	public Connection getConnection() throws SQLException {
-		Connection con = ds.getConnection();
+		Connection con = dbcp.getConnection();
 		if (getType() == ObmDbType.MYSQL) {
 			Statement st = con.createStatement();
 			st.execute("set time_zone='+00:00'");

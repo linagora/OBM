@@ -11,8 +11,7 @@ import java.util.List;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.DBCP;
-import org.obm.dbcp.DataSource;
+import org.obm.dbcp.IDBCP;
 import org.obm.locator.LocatorClient;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
@@ -44,16 +43,16 @@ public class ObmSyncBackend {
 	protected ISyncStorage storage;
 	private DeviceDao deviceDao;
 
-	private final DataSource dataSource;
 	private final LocatorClient locatorClient;
+	private final IDBCP dbcp;
 
 	protected ObmSyncBackend(ISyncStorage storage, DeviceDao deviceDao,
-			ConfigurationService configurationService, DBCP dbcp)
+			ConfigurationService configurationService, IDBCP dbcp)
 			throws ConfigurationException {
 
+		this.dbcp = dbcp;
 		this.locatorClient = new LocatorClient(
 				configurationService.getLocatorUrl());
-		this.dataSource = dbcp.getDataSource();
 		this.deviceDao = deviceDao;
 		this.storage = storage;
 		validateOBMConnection();
@@ -146,7 +145,7 @@ public class ObmSyncBackend {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = dataSource.getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("select now()");
 			rs = ps.executeQuery();
 			if (rs.next()) {

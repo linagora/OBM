@@ -10,7 +10,7 @@ import java.util.List;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
@@ -53,7 +53,7 @@ public class CalendarBackend extends ObmSyncBackend {
 
 	@Inject
 	public CalendarBackend(ISyncStorage storage, DeviceDao deviceDao,
-			ConfigurationService configurationService, DBCP dbcp)
+			ConfigurationService configurationService, IDBCP dbcp)
 			throws ConfigurationException {
 		
 		super(storage, deviceDao, configurationService, dbcp);

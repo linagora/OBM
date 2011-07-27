@@ -22,7 +22,7 @@ import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
 import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
@@ -63,7 +63,7 @@ public class MailBackend extends ObmSyncBackend {
 
 	@Inject
 	private MailBackend(ISyncStorage storage, DeviceDao deviceDao, IEmailManager emailManager,
-			ConfigurationService configurationService, DBCP dbcp)
+			ConfigurationService configurationService, IDBCP dbcp)
 			throws ConfigurationException {
 		
 		super(storage, deviceDao, configurationService, dbcp);

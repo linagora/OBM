@@ -39,7 +39,7 @@ public class DBCP implements IDBCP{
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private DataSource ds;
+	private DBConnectionPool ds;
 
 	private String lastInsertIdQuery;
 
@@ -69,7 +69,7 @@ public class DBCP implements IDBCP{
 	private void createDataSource(TransactionManager transactionManager) {
 		try {
 			IJDBCDriver cf = buildJDBCConnectionFactory(dbType);
-			ds = new DataSource(transactionManager, cf, dbHost, dbName, login, password);
+			ds = new DBConnectionPool(transactionManager, cf, dbHost, dbName, login, password);
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 		}
@@ -108,9 +108,10 @@ public class DBCP implements IDBCP{
 		}
 		return ret;
 	}
-	
-	public DataSource getDataSource() {
-		return ds;
-	}
 
+	@Override
+	public Connection getConnection() throws SQLException {
+		return ds.getConnection();
+	}
+	
 }

@@ -5,17 +5,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.utils.JDBCUtils;
 
 import com.google.inject.Inject;
 
 public class DeviceDao {
 
-	private final DBCP dbcp;
+	private final IDBCP dbcp;
 
 	@Inject
-	private DeviceDao(DBCP dbcp) {
+	private DeviceDao(IDBCP dbcp) {
 		this.dbcp = dbcp;
 	}
 	
@@ -28,7 +28,7 @@ public class DeviceDao {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		con = dbcp.getDataSource().getConnection();
+		con = dbcp.getConnection();
 		try {
 			ps = con.prepareStatement("SELECT id FROM opush_device "
 					+ "INNER JOIN UserObm ON owner=userobm_id "
@@ -55,9 +55,9 @@ public class DeviceDao {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		con = dbcp.getDataSource().getConnection();
+		con = dbcp.getConnection();
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_device (identifier, type, owner) "
 					+ "SELECT ?, ?, userobm_id FROM UserObm "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "

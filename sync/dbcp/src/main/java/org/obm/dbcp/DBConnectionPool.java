@@ -8,30 +8,29 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.dbcp.ConnectionFactory;
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.dbcp.managed.LocalXAConnectionFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.obm.dbcp.jdbc.IJDBCDriver;
 
-public class DataSource {
+public class DBConnectionPool {
 
-	private final ConnectionFactory connectionFactory;
-	private TransactionManager transactionManager;
+	private final TransactionManager transactionManager;
+	private final PoolingDataSource poolingDataSource;
 
-	public DataSource(TransactionManager transactionManager, IJDBCDriver cf, String dbHost, String dbName,
+	/* package */ DBConnectionPool(TransactionManager transactionManager, IJDBCDriver cf, String dbHost, String dbName,
 			String login, String password) {
 		this.transactionManager = transactionManager;
 
-		connectionFactory = buildConnectionFactory(cf, dbHost,
-				dbName, login, password);
+		ConnectionFactory connectionFactory = 
+				buildConnectionFactory(cf, dbHost, dbName, login, password);
 
-		buildManagedDataSource(connectionFactory);
+		poolingDataSource = buildManagedDataSource(connectionFactory);
 	}
 
 	private ConnectionFactory buildConnectionFactory(
 			IJDBCDriver cf, String dbHost, String dbName, String login,
 			String password) {
-
-		
 
 		String jdbcUrl = cf.getJDBCUrl(dbHost, dbName);
 		ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(
@@ -42,7 +41,7 @@ public class DataSource {
 		return connectionFactory;
 	}
 
-	private void buildManagedDataSource(
+	private PoolingDataSource buildManagedDataSource(
 			ConnectionFactory connectionFactory)
 			throws IllegalStateException {
 
@@ -50,13 +49,14 @@ public class DataSource {
 		PoolableConnectionFactory factory = new PoolableConnectionFactory(
 				connectionFactory, pool, null, null, false, true);
 		pool.setFactory(factory);
+		return new PoolingDataSource(pool);
 	}
 
-	public Connection getConnection() throws SQLException {
-		return connectionFactory.createConnection();
+	/* package */ Connection getConnection() throws SQLException {
+		return poolingDataSource.getConnection();
 	}
 
-	public TransactionManager getTransactionManager() {
+	/* package */ TransactionManager getTransactionManager() {
 		return transactionManager;
 	}
 

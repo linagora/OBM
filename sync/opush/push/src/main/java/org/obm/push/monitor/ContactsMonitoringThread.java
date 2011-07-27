@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.impl.ChangedCollections;
@@ -25,11 +25,11 @@ public class ContactsMonitoringThread extends MonitoringThread {
 
 	@Singleton
 	public static class Factory {
-		private final DBCP dbcp;
+		private final IDBCP dbcp;
 		private final IContentsExporter contentsExporter;
 
 		@Inject
-		private Factory(DBCP dbcp, IContentsExporter contentsExporter) {
+		private Factory(IDBCP dbcp, IContentsExporter contentsExporter) {
 			this.dbcp = dbcp;
 			this.contentsExporter = contentsExporter;
 		}
@@ -55,7 +55,7 @@ public class ContactsMonitoringThread extends MonitoringThread {
 	
 	private ContactsMonitoringThread(long freqMs,
 			Set<ICollectionChangeListener> ccls,
-			DBCP dbcp, IContentsExporter contentsExporter) {
+			IDBCP dbcp, IContentsExporter contentsExporter) {
 
 		super(freqMs, ccls, dbcp, contentsExporter);
 	}
@@ -77,7 +77,7 @@ public class ContactsMonitoringThread extends MonitoringThread {
 		}
 		int idx = 1;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(CHANGED_UIDS);
 			ps.setTimestamp(idx++, ts);
 			ps.setTimestamp(idx++, ts);

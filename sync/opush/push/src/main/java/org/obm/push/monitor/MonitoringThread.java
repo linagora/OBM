@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.impl.ChangedCollections;
@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableSet;
 
 public abstract class MonitoringThread extends OpushMonitoringThread implements Runnable {
 	
-	protected final DBCP dbcp;
+	protected final IDBCP dbcp;
 	
 	private final Set<ICollectionChangeListener> ccls;
 	private final long freqMillisec;
@@ -26,7 +26,7 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 	
 	protected MonitoringThread(long freqMillisec,
 			Set<ICollectionChangeListener> ccls,
-			DBCP dbcp, IContentsExporter contentsExporter) {
+			IDBCP dbcp, IContentsExporter contentsExporter) {
 		
 		super(contentsExporter);
 		

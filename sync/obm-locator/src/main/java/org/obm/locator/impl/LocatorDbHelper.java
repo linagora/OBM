@@ -11,6 +11,7 @@ import javax.transaction.SystemException;
 
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +22,9 @@ public class LocatorDbHelper {
 			.getLogger(LocatorDbHelper.class);
 
 	private static LocatorDbHelper instance;
-	private final DBCP dbcp;
+	private final IDBCP dbcp;
 	
-	private LocatorDbHelper(DBCP dbcp) {
+	private LocatorDbHelper(IDBCP dbcp) {
 		this.dbcp = dbcp;
 	}
 	
@@ -62,7 +63,7 @@ public class LocatorDbHelper {
 		int idx = loginAtDomain.indexOf("@");
 		String domain = loginAtDomain.substring(idx + 1);
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement(q);
 			ps.setString(1, domain);
 			ps.setString(2, service);
