@@ -126,7 +126,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 			} else {
 				response.setChanges(getContactsChanges(token, timestamp));
 			}
-			obmHelper.getConnection()
+			connection = obmHelper.getConnection();
 			response.setLastSync(obmHelper.selectNow(connection));
 		} catch (Throwable t) {
 			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
