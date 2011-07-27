@@ -900,7 +900,6 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
       run_query_calendar_event_exception_insert($calendar);
     }
   }
-  error_log(" in function : run_query_calendar_insert_event_data : eid=$event_entity_id");
   run_query_update_description_with_attachments($eid);
   return array($id, $eid);
 }
@@ -1121,6 +1120,7 @@ function get_event_desc_with_attachements($attachments_urls, $description) {
     
   $description = str_replace("\r\n", "\n", $description);
   $block_regexp = "/\s*" . preg_quote($header, "/") . ".*" . preg_quote($footer, "/") . "\s*/s";
+  
   if (($ret = preg_match($block_regexp, $description)) == 1) {
     $new_description = preg_replace($block_regexp, $desc_attachment_block, $description);
   }
@@ -1128,7 +1128,7 @@ function get_event_desc_with_attachements($attachments_urls, $description) {
     $new_description = $description . $desc_attachment_block;
   }
   else if ($ret == FALSE) {
-    error_log("_OBM_ERROR event_entity_id=[$event_entity_id], regexp error while forging description with attachments.");
+    error_log("OBM-UI: Calendar: event_entity_id=[$event_entity_id], regexp error while forging description with attachments.");
   }
   return $new_description;
 }
@@ -1154,7 +1154,7 @@ function run_query_update_description_with_attachments($event_entity_id)
     $obm_q->query($query_update_desc);
   }
   else {
-    error_log("_OBM_ERROR event_entity_id=[$event_entity_id], problem finding event_id from event_entity_id while forging description with attachments.");
+    error_log("OBM-UI: Calendar: event_entity_id=[$event_entity_id], problem finding event_id from event_entity_id while forging description with attachments.");
   }
 }
 
@@ -1181,7 +1181,6 @@ function run_query_calendar_attach_document($document_id, $event_id) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_attach_document()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  error_log(" in function : run_query_calendar_attach_document : eid=$event_id");
   run_query_update_description_with_attachments($event_id);
   return $obm_q; 
 }
@@ -1204,7 +1203,6 @@ function run_query_calendar_detach_document($document_id, $event_id) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_detach_document()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  error_log(" in function : run_query_calendar_detach_document : eid=$event_id");
   run_query_update_description_with_attachments($event_id);
   return $obm_q;
 }
@@ -2154,7 +2152,6 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
       run_query_calendar_attach_document($document_id, $event_entity_id);
     }
   }
-  error_log(" in function : run_query_calendar_quick_event_insert : eid=$event_entity_id");
   run_query_update_description_with_attachments($event_entity_id);
 
   if ($calendar['send_mail']) {
