@@ -412,7 +412,6 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   return $retour;    
 }
 
-
 function run_query_increment_sequence($event_id){
   global $cdg_sql;
 
@@ -901,6 +900,7 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
       run_query_calendar_event_exception_insert($calendar);
     }
   }
+  error_log(" in function : run_query_calendar_insert_event_data : eid=$event_entity_id");
   run_query_update_description_with_attachments($eid);
   return array($id, $eid);
 }
@@ -1031,119 +1031,132 @@ function get_calendar_document_from_ids($documents) {
     $docs['ids'][] = $id;
     $docs['entity'][$id] = array('label' => $name);
   }
-
   return $docs;
 }
 
-// find event id from entity ids
+///////////////////////////////////////////////////////////////////////////////
+// Return the Event Id for a given Event Entity id, null otherwise 
+// Parameters: 
+//   - $event_entity_id :
+///////////////////////////////////////////////////////////////////////////////
 function select_eventid_from_evententity($event_entity_id)
 {
-	global $cdg_sql, $obm;	
-
-	$query_fetch_event_id = "SELECT evententity_event_id
-							 FROM EventEntity
-							 WHERE evententity_entity_id = $event_entity_id";
-		
-	$obm_q = new DB_OBM;  		  				  
-	$obm_q->query($query_fetch_event_id);
-	if ($obm_q->num_rows() == 1 && $obm_q->next_record()) 
-	{
-		$event_id = $obm_q->f('evententity_event_id');
-	}
-	else 
-	{
-		$event_id = null;	
-	}
-	return $event_id;
+  global $cdg_sql, $obm;
+  
+  $query_fetch_event_id = "SELECT evententity_event_id
+                          FROM EventEntity
+                          WHERE evententity_entity_id = $event_entity_id";
+                          
+  $obm_q = new DB_OBM;
+  $obm_q->query($query_fetch_event_id);
+  if ($obm_q->num_rows() == 1 && $obm_q->next_record()) {
+    $event_id = $obm_q->f('evententity_event_id');
+  }
+  else {
+    $event_id = null;
+  }
+  return $event_id;
 }
 
-// loop over all attachements, generate a list of attachement URLS
+///////////////////////////////////////////////////////////////////////////////
+// Returns an array of external, tokenized url for each obm document attached
+// To an event
+// Parameters: 
+//   - $event_id  :
+///////////////////////////////////////////////////////////////////////////////
 function get_event_attachments_urls($event_id)
 {
-	$documents_rs = run_query_get_events_documents(array($event_id));
-	$attachments = array();
-	
-	while ($documents_rs->next_record()) 
-	{
-		$document_id = $documents_rs->f('document_id');
-		$attachments[] = $GLOBALS['cgp_host'].'document/document_download.php?externalToken='.
-		get_calendar_entity_share($document_id, 'document', 'private', 'document').
-		'&document_id='.$document_id;
-	}
-	
-	return $attachments;
+  $documents_rs = run_query_get_events_documents(array($event_id));
+  $attachments = array();
+  
+  while ($documents_rs->next_record()) {
+    $document_id = $documents_rs->f('document_id');
+    $attachments[] = $GLOBALS['cgp_host'].'document/document_download.php?externalToken='.
+    get_calendar_entity_share($document_id, 'document', 'private', 'document').
+    '&document_id='.$document_id;
+  }
+  return $attachments;
 }
 
-// get description in db,
-function get_event_description($event_id)
-{
-	global $cdg_sql, $obm;
-		
-	$query_fetch_desc = "SELECT event_description
-					 	FROM Event 
-					 	WHERE event_id = $event_id";
-	
-	$obm_q = new DB_OBM; 			 
-	$obm_q->query($query_fetch_desc);
-	$obm_q->next_record();
-	$description =  $obm_q->f('event_description');
-	return $description;
+///////////////////////////////////////////////////////////////////////////////
+// Returns an event description given its id
+// Parameters: 
+//   - $event_id  :
+///////////////////////////////////////////////////////////////////////////////
+function get_event_description($event_id) {
+  global $cdg_sql, $obm;
+  
+  $query_fetch_desc = "SELECT event_description
+                      FROM Event
+                      WHERE event_id = $event_id";
+  
+  $obm_q = new DB_OBM;
+  $obm_q->query($query_fetch_desc);
+  $obm_q->next_record();
+  $description =  $obm_q->f('event_description');
+  return $description;
 }
 
-// match & replace reserved content between tags by new list.
-function get_event_desc_with_attachements($attachments_urls, $description)
-{
-	global $l_obm_reserved_event_data_attachment_begin; 
-  	global $l_obm_reserved_event_data_attachment_end;
-	
-	$header = $l_obm_reserved_event_data_attachment_begin;
-	$footer = $l_obm_reserved_event_data_attachment_end;
-	
-	$block_regexp = "/" . preg_quote($header, "/") . ".*" . preg_quote($footer, "/") . "/s";
-	
-	if (!empty($attachments_urls)) 
-	{
-		$desc_attachment_block = $header . "\n" . implode("\n", $attachments_urls) . "\n" . $footer;
-	}
-	else
-	{
-		$desc_attachment_block = "";		
-	}
-	if (preg_match($block_regexp, $description) >= 1)
-	{
-	  	error_log("_OBM_DEBUG : match found");
-	  	$new_description = preg_replace($block_regexp, $desc_attachment_block, $description);
-	} 
-	else 
-	{
-		error_log("_OBM_DEBUG : NO match found");
-	  	$new_description = $description . $desc_attachment_block; 
-	}
+///////////////////////////////////////////////////////////////////////////////
+// For a given description and a given array of url, generate a new description
+// with a unique obm reserved area listing all URLS linking to this event's
+// attached documents.
+// Parameters: 
+//   - $attachments_urls :
+//   - $description :
+///////////////////////////////////////////////////////////////////////////////
+function get_event_desc_with_attachements($attachments_urls, $description) {
+  global $l_obm_reserved_event_data_attachment_begin;
+  global $l_obm_reserved_event_data_attachment_end;
 
-	return $new_description;
+  $header = trim($l_obm_reserved_event_data_attachment_begin);
+  $footer = trim($l_obm_reserved_event_data_attachment_end);
+
+  if (!empty($attachments_urls)) {
+    $desc_attachment_block = "\n\n" . $header . "\n" . implode("\n", $attachments_urls) . "\n" . $footer . "\n\n";
+  }
+  else {
+    $desc_attachment_block = "";
+  }
+    
+  $description = str_replace("\r\n", "\n", $description);
+  $block_regexp = "/\s*" . preg_quote($header, "/") . ".*" . preg_quote($footer, "/") . "\s*/s";
+  if (($ret = preg_match($block_regexp, $description)) == 1) {
+    $new_description = preg_replace($block_regexp, $desc_attachment_block, $description);
+  }
+  else if ($ret == 0) {
+    $new_description = $description . $desc_attachment_block;
+  }
+  else if ($ret == FALSE) {
+    error_log("_OBM_ERROR event_entity_id=[$event_entity_id], regexp error while forging description with attachments.");
+  }
+  return $new_description;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Attach a document to an event
+// Parameters: 
+//   - $document_id :
+//   - $event_id  :
+///////////////////////////////////////////////////////////////////////////////
 function run_query_update_description_with_attachments($event_entity_id)
 {
-  	global $cdg_sql, $obm;
-  	
-	$event_id = select_eventid_from_evententity($event_entity_id);
-	
-	if (!empty($event_id))
-	{
-		$new_description = get_event_desc_with_attachements(get_event_attachments_urls($event_id), get_event_description($event_id));
-	    $query_update_desc = "UPDATE Event
-	    					  SET event_description = '$new_description'
-	    					  WHERE event_id = $event_id";
-		$obm_q = new DB_OBM; 					  
-		$obm_q->query($query_update_desc);
-	}
-	else
-	{
-		error_log("_OBM_ERROR event_entity_id=[$event_entity_id], problem finding event_id");		
-	}
-}
+  global $cdg_sql, $obm;
 
+  $event_id = select_eventid_from_evententity($event_entity_id);
+
+  if (!empty($event_id)) {
+    $new_description = get_event_desc_with_attachements(get_event_attachments_urls($event_id), get_event_description($event_id));
+    $query_update_desc = "UPDATE Event
+    SET event_description = '$new_description'
+    WHERE event_id = $event_id";
+    $obm_q = new DB_OBM;
+    $obm_q->query($query_update_desc);
+  }
+  else {
+    error_log("_OBM_ERROR event_entity_id=[$event_entity_id], problem finding event_id from event_entity_id while forging description with attachments.");
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Attach a document to an event
@@ -1168,8 +1181,8 @@ function run_query_calendar_attach_document($document_id, $event_id) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_attach_document()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+  error_log(" in function : run_query_calendar_attach_document : eid=$event_id");
   run_query_update_description_with_attachments($event_id);
-  
   return $obm_q; 
 }
 
@@ -1184,13 +1197,14 @@ function run_query_calendar_detach_document($document_id, $event_id) {
 
   $event_id = sql_parse_id($event_id);
   $document_id = sql_parse_id($document_id);
-  global $cdg_sql, $obm;  $query = "DELETE FROM DocumentLink 
+  $query = "DELETE FROM DocumentLink 
     WHERE documentlink_document_id = $document_id
     AND documentlink_entity_id = $event_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_detach_document()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+  error_log(" in function : run_query_calendar_detach_document : eid=$event_id");
   run_query_update_description_with_attachments($event_id);
   return $obm_q;
 }
@@ -2140,6 +2154,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
       run_query_calendar_attach_document($document_id, $event_entity_id);
     }
   }
+  error_log(" in function : run_query_calendar_quick_event_insert : eid=$event_entity_id");
   run_query_update_description_with_attachments($event_entity_id);
 
   if ($calendar['send_mail']) {
