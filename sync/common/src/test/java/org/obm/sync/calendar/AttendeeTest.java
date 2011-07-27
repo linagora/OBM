@@ -47,6 +47,18 @@ public class AttendeeTest {
 		Assert.assertTrue(att1.equals(att2));
 		Assert.assertTrue(att2.equals(att1));
 	}
+
+        @Test
+        public void testEqualAttendeeAlert() {
+                Attendee att1 = new Attendee();
+                att1.setEmail("test@test.tlse.lng");
+                Attendee att2 = new AttendeeAlert();
+                att2.setEmail("test@test.tlse.lng");
+
+                Assert.assertTrue(att1.equals(att2));
+        }
+
+
 	
 	@Test
 	public void testHashCodeCase() {
