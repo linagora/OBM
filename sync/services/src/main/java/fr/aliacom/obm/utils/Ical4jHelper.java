@@ -157,15 +157,17 @@ public class Ical4jHelper {
 	}
 
 	public String buildIcsInvitationReply(final Event event, final ObmUser obmUserReply) {
+		Method method = Method.REPLY;
 		final Attendee replyAttendee = findAttendeeFromObmUserReply(event.getAttendees(), obmUserReply);
-		final Calendar calendar = buildVEvent(null, event, replyAttendee);		
-		calendar.getProperties().add(Method.REPLY);
+		final Calendar calendar = buildVEvent(null, event, replyAttendee,method);		
+		calendar.getProperties().add(method);
 		return foldingWriterToString(calendar);
 	}
 	
 	public String buildIcsInvitationCancel(ObmUser user, Event event) {
-		Calendar calendar = buildVEvent(user, event, null);
-		calendar.getProperties().add(Method.CANCEL);
+		Method method = Method.CANCEL;
+		Calendar calendar = buildVEvent(user, event, null, method);
+		calendar.getProperties().add(method);
 		return foldingWriterToString(calendar);
 	}
 	
@@ -522,16 +524,15 @@ public class Ical4jHelper {
 		Calendar calendar = initCalendar();
 
 		for (Event event : listEvent) {
-			VEvent vEvent = getVEvent(user, event, null);
+			VEvent vEvent = getVEvent(user, event, null, null);
 			calendar.getComponents().add(vEvent);
 		}
 		return calendar.toString();
 	}
 
 	public String parseEvent(Event event, ObmUser user) {
-		
 		if (EventType.VEVENT.equals(event.getType())) {
-			Calendar c = buildVEvent(user, event, null);
+			Calendar c = buildVEvent(user, event, null, null);
 			return c.toString();
 		} else if (EventType.VTODO.equals(event.getType())) {
 			Calendar c = buildVTodo(event, user);
@@ -553,13 +554,13 @@ public class Ical4jHelper {
 		return calendar;
 	}
 
-	private Calendar buildVEvent(ObmUser user, Event event, Attendee replyAttendee) {
+	private Calendar buildVEvent(ObmUser user, Event event, Attendee replyAttendee, Method method) {
 		Calendar calendar = initCalendar();
-		VEvent vEvent = getVEvent(user, event, replyAttendee);
+		VEvent vEvent = getVEvent(user, event, replyAttendee, method);
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = getVEvent(null, ee, event.getExtId(), event, replyAttendee);
+				VEvent eventExt = getVEvent(null, ee, event.getExtId(), event, replyAttendee, method);
 				calendar.getComponents().add(eventExt);
 			}
 		}
@@ -585,11 +586,11 @@ public class Ical4jHelper {
 
 	
 	
-	public VEvent getVEvent(ObmUser user, Event event, Attendee replyAttendee) {
-		return getVEvent(user, event, null, null, replyAttendee);
+	public VEvent getVEvent(ObmUser user, Event event, Attendee replyAttendee, Method method) {
+		return getVEvent(user, event, null, null, replyAttendee, method);
 	}
 
-	public VEvent getVEvent(ObmUser user, Event event, String parentExtID, Event parent, Attendee replyAttendee) {
+	public VEvent getVEvent(ObmUser user, Event event, String parentExtID, Event parent, Attendee replyAttendee, Method method) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 
@@ -618,13 +619,23 @@ public class Ical4jHelper {
 		appendSummaryToICS(prop, event);
 		appendRRuleToICS(prop, event);
 		appendExDateToICS(prop, event);
-		appendVAlarmToICS(vEvent.getAlarms(), event);
+		if(canAddVAlarmToICS(method)){
+			appendVAlarmToICS(vEvent.getAlarms(), event);
+		}
 		appendRecurenceIdToICS(prop, event);
 		appendXMozLastAck(prop);
 		if(user != null){
 			appendXObmDomain(user.getDomain(), prop);
 		}
 		return vEvent;
+	}
+
+	private boolean canAddVAlarmToICS(Method method) {
+		if(method == null || Method.ADD.equals(method) || Method.COUNTER.equals(method) || Method.PUBLISH.equals(method) || Method.REQUEST.equals(method)){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public VToDo getVToDo(Event event, ObmUser user) {
