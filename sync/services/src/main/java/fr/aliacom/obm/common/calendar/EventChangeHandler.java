@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -169,7 +170,22 @@ public class EventChangeHandler {
 					TimeZone timezone, String ics) { 
 		
 		final Set<Attendee> notAccepted = atts.get(ParticipationState.NEEDSACTION);
+		logger.info("Listing all event attendees for event (name=[" + current.getTitle() + "]");
+		for (Entry<ParticipationState, ? extends Set<Attendee>> attendeesByState : atts.entrySet()) {
+			logger.info("Attendees in" + attendeesByState.getKey().name());
+			for (Attendee attendee : attendeesByState.getValue())
+			{
+				logger.info("<" + attendee.getEmail() + ">");
+				
+			}
+		}
+		
 		if (notAccepted != null && !notAccepted.isEmpty()) {
+			logger.info("Sending a notification to users in need action state");
+			for (Attendee attendee : notAccepted)
+			{
+				logger.info("<" + attendee.getEmail() + ">");
+			}
 			eventChangeMailer.notifyNeedActionUpdateUsers(notAccepted, previous, current, locale, timezone, ics);
 		}
 	}
