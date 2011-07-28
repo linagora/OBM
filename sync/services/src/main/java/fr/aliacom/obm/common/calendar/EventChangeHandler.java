@@ -3,6 +3,7 @@ package fr.aliacom.obm.common.calendar;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -293,8 +294,22 @@ public class EventChangeHandler {
 		ret.put(ParticipationState.INPROGRESS, inprogressAttendees);
 		return ret.build();
 	}
+
+	private Set<Attendee> generateStableAttendeesSet(Set<Attendee> currentAtts, Set<Attendee> previousAtts, Set<Attendee> newAtts) {
+		Set<Attendee> stableAttendees = new HashSet<Attendee>(currentAtts);
+		
+		Iterator<Attendee> it = stableAttendees.iterator();
+		
+		while (it.hasNext()) {
+			Attendee att = it.next();
+			if (newAtts.contains(att) || previousAtts.contains(att)) {
+				it.remove();
+			}
+		}
+		return stableAttendees;
+	}
 	
-	private Map<AttendeeStateValue, ? extends Set<Attendee>> computeUpdateNotificationGroups(Event previous, Event current) {
+	/* package */ Map<AttendeeStateValue, ? extends Set<Attendee>> computeUpdateNotificationGroups(Event previous, Event current) {
 		if (previous.isEventInThePast() && current.isEventInThePast()) {
 			Set<Attendee> emptyAttendeesSet = ImmutableSet.of();
 			return ImmutableMap.of(
@@ -306,24 +321,15 @@ public class EventChangeHandler {
 		ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(filterOwner(current, current.getAttendees()));
 		SetView<Attendee> removedAttendees = Sets.difference(previousAttendees, currentAttendees);
 		SetView<Attendee> newAttendees = Sets.difference(currentAttendees, previousAttendees);
+		Set<Attendee> stableAttendees = generateStableAttendeesSet(currentAttendees, removedAttendees, newAttendees);
 		
-		Set<Attendee> stableAttendees = new HashSet<Attendee>(currentAttendees);
-		
-		for (Attendee att : stableAttendees) {
-			if (newAttendees.contains(att) || removedAttendees.contains(att))
-			{
-				stableAttendees.remove(att);
-			}
-		}
-		
-		//SetView<Attendee> stableAttendees = Sets.intersection(currentAttendees, previousAttendees);
 		return ImmutableMap.of(
 				AttendeeStateValue.Old, removedAttendees,
 				AttendeeStateValue.Current, stableAttendees,
 				AttendeeStateValue.New, newAttendees);
 	}
 
-	private static enum AttendeeStateValue {
+	/* package */ static enum AttendeeStateValue {
 		New, Current, Old;
 	}
 	

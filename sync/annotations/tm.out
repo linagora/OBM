@@ -1,0 +1,38 @@
+11-07-28 15:56:39,201 [main] Logfile closed: /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog-1.log
+11-07-28 15:56:49,480 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 15:56:52,523 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 18:24:10,794 [main] Starting read of logfile /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog0.log
+11-07-28 18:24:10,890 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100001 with state COMMITTING
+11-07-28 18:24:10,891 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100001 with state COMMITTING
+11-07-28 18:24:10,891 [main] Done read of logfile
+11-07-28 18:24:10,891 [main] Logfile closed: /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog0.log
+11-07-28 18:24:21,112 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 18:24:24,154 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 18:34:34,172 [main] Starting read of logfile /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog1.log
+11-07-28 18:34:34,223 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100002 with state COMMITTING
+11-07-28 18:34:34,224 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100002 with state COMMITTING
+11-07-28 18:34:34,224 [main] Done read of logfile
+11-07-28 18:34:34,225 [main] Logfile closed: /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog1.log
+11-07-28 18:34:44,440 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 18:34:47,483 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 18:36:42,727 [main] Starting read of logfile /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog2.log
+11-07-28 18:36:42,806 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100003 with state COMMITTING
+11-07-28 18:36:42,807 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100003 with state COMMITTING
+11-07-28 18:36:42,807 [main] Done read of logfile
+11-07-28 18:36:42,807 [main] Logfile closed: /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog2.log
+11-07-28 18:36:53,018 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 18:36:56,060 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 18:56:17,210 [main] Starting read of logfile /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog3.log
+11-07-28 18:56:17,296 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100004 with state COMMITTING
+11-07-28 18:56:17,297 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100004 with state COMMITTING
+11-07-28 18:56:17,297 [main] Done read of logfile
+11-07-28 18:56:17,298 [main] Logfile closed: /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog3.log
+11-07-28 18:56:27,496 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 18:56:30,538 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 19:00:15,255 [main] Starting read of logfile /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog4.log
+11-07-28 19:00:15,327 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100005 with state COMMITTING
+11-07-28 19:00:15,328 [main] Local heuristic termination of coordinator 127.0.0.1.tm0000100005 with state COMMITTING
+11-07-28 19:00:15,328 [main] Done read of logfile
+11-07-28 19:00:15,329 [main] Logfile closed: /home/erwan/projects/obm/workspace/obm-sync/trunk/annotations/./tmlog4.log
+11-07-28 19:00:25,530 [Atomikos:0] Rollback of timedout ACTIVE coordinator !
+11-07-28 19:00:28,572 [Atomikos:0] Rollback of timedout ACTIVE coordinator !

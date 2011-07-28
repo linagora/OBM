@@ -19,11 +19,14 @@ import static org.easymock.EasyMock.verify;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.jms.JMSException;
 
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -37,6 +40,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.linagora.obm.sync.Producer;
 
+import fr.aliacom.obm.common.calendar.EventChangeHandler.AttendeeStateValue;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
@@ -48,7 +52,8 @@ import fr.aliacom.obm.utils.Ical4jHelper;
 	EventChangeHandlerTest.UpdateTests.class, 
 	EventChangeHandlerTest.CreateTests.class, 
 	EventChangeHandlerTest.DeleteTests.class, 
-	EventChangeHandlerTest.UpdateParticipationTests.class})
+	EventChangeHandlerTest.UpdateParticipationTests.class,
+	EventChangeHandlerTest.GeneralTest.class})
 public class EventChangeHandlerTest {
 	
 	private static final String ICS_DATA_ADD = "ics data add attendee";
@@ -724,6 +729,57 @@ public class EventChangeHandlerTest {
 			EventChangeHandler handler = newEventChangeHandler(mailer, settingsService, userService, producer, ical4jHelper);
 			handler.updateParticipationState(event, attendeeUser, ParticipationState.ACCEPTED, true);
 			verify(userService, settingsService, settings, mailer);
+		}
+	}
+
+	public static class GeneralTest {
+
+		@Test
+		public void testComputeUpdateNotificationGroupsWhereAttendeesComeFrom() {
+			final String email = "myEmail";
+			EventChangeHandler eventChangeHandler = new EventChangeHandler(null, null, null, null, null);
+
+			Attendee attendee1 = new Attendee();
+			attendee1.setEmail(email);
+			Event event1 = new Event();
+			event1.setAttendees(ImmutableList.of(attendee1));
+
+			Attendee attendee2 = new Attendee();
+			attendee2.setEmail(email);
+			Event event2 = new Event();
+			event2.setAttendees(ImmutableList.of(attendee2));
+
+			Map<AttendeeStateValue, ? extends Set<Attendee>> groups = 
+					eventChangeHandler.computeUpdateNotificationGroups(event1, event2);
+			Set<Attendee> actual = groups.get(AttendeeStateValue.Current);
+
+			Assert.assertSame(attendee2, actual.iterator().next());
+		}
+
+		@Test
+		public void testComputeUpdateNotificationGroupsConcurrentModificationBug() {
+			final String email = "myEmail";
+			EventChangeHandler eventChangeHandler = new EventChangeHandler(null, null, null, null, null);
+
+			Attendee attendee1 = new Attendee();
+			attendee1.setEmail(email);
+			Event event1 = new Event();
+			event1.setAttendees(ImmutableList.of(attendee1));
+
+			Attendee attendee2 = new Attendee();
+			attendee2.setEmail(email);
+			Attendee attendee3 = new Attendee();
+			attendee3.setEmail("another email");
+			Attendee attendee4 = new Attendee();
+			attendee4.setEmail("yet another email");
+			Event event2 = new Event();
+			event2.setAttendees(ImmutableList.of(attendee2, attendee3, attendee4));
+
+			Map<AttendeeStateValue, ? extends Set<Attendee>> groups = 
+					eventChangeHandler.computeUpdateNotificationGroups(event1, event2);
+			Set<Attendee> actual = groups.get(AttendeeStateValue.Current);
+
+			Assert.assertSame(attendee2, actual.iterator().next());
 		}
 	}
 }

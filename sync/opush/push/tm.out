@@ -1,0 +1,144 @@
+11-07-28 15:57:36,128 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,179 [main] Coordinator not recoverable: 127.0.0.1.tm0000100001
+11-07-28 15:57:36,201 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,202 [main] Coordinator not recoverable: 127.0.0.1.tm0000200001
+11-07-28 15:57:36,213 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,213 [main] Coordinator not recoverable: 127.0.0.1.tm0000300001
+11-07-28 15:57:36,215 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,215 [main] Coordinator not recoverable: 127.0.0.1.tm0000400001
+11-07-28 15:57:36,221 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,222 [main] Coordinator not recoverable: 127.0.0.1.tm0000500001
+11-07-28 15:57:36,239 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,427 [main] Coordinator not recoverable: 127.0.0.1.tm0000600001
+11-07-28 15:57:36,429 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,451 [main] Coordinator not recoverable: 127.0.0.1.tm0000700001
+11-07-28 15:57:36,467 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,476 [main] Coordinator not recoverable: 127.0.0.1.tm0000800001
+11-07-28 15:57:36,480 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,488 [main] Coordinator not recoverable: 127.0.0.1.tm0000900001
+11-07-28 15:57:36,675 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,689 [main] Coordinator not recoverable: 127.0.0.1.tm0001000001
+11-07-28 15:57:36,693 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,713 [main] Coordinator not recoverable: 127.0.0.1.tm0001100001
+11-07-28 15:57:36,715 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,724 [main] Coordinator not recoverable: 127.0.0.1.tm0001200001
+11-07-28 15:57:36,725 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,732 [main] Coordinator not recoverable: 127.0.0.1.tm0001300001
+11-07-28 15:57:36,735 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,742 [main] Coordinator not recoverable: 127.0.0.1.tm0001400001
+11-07-28 15:57:36,745 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,753 [main] Coordinator not recoverable: 127.0.0.1.tm0001500001
+11-07-28 15:57:36,928 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,939 [main] Coordinator not recoverable: 127.0.0.1.tm0001600001
+11-07-28 15:57:36,941 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,954 [main] Coordinator not recoverable: 127.0.0.1.tm0001700001
+11-07-28 15:57:36,961 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 15:57:36,983 [main] Coordinator not recoverable: 127.0.0.1.tm0001800001
+11-07-28 18:35:31,607 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:31,745 [main] Coordinator not recoverable: 127.0.0.1.tm0000100002
+11-07-28 18:35:31,828 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:31,876 [main] Coordinator not recoverable: 127.0.0.1.tm0000200002
+11-07-28 18:35:32,035 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:32,036 [main] Coordinator not recoverable: 127.0.0.1.tm0000300002
+11-07-28 18:35:32,037 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:32,037 [main] Coordinator not recoverable: 127.0.0.1.tm0000400002
+11-07-28 18:35:32,044 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:32,045 [main] Coordinator not recoverable: 127.0.0.1.tm0000500002
+11-07-28 18:35:34,119 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:34,753 [main] Coordinator not recoverable: 127.0.0.1.tm0000600002
+11-07-28 18:35:34,754 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:34,864 [main] Coordinator not recoverable: 127.0.0.1.tm0000700002
+11-07-28 18:35:34,882 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:34,960 [main] Coordinator not recoverable: 127.0.0.1.tm0000800002
+11-07-28 18:35:34,964 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:34,994 [main] Coordinator not recoverable: 127.0.0.1.tm0000900002
+11-07-28 18:35:35,498 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:35,520 [main] Coordinator not recoverable: 127.0.0.1.tm0001000002
+11-07-28 18:35:35,527 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:35,542 [main] Coordinator not recoverable: 127.0.0.1.tm0001100002
+11-07-28 18:35:35,544 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:35,556 [main] Coordinator not recoverable: 127.0.0.1.tm0001200002
+11-07-28 18:35:35,557 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:35,566 [main] Coordinator not recoverable: 127.0.0.1.tm0001300002
+11-07-28 18:35:35,569 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:35,577 [main] Coordinator not recoverable: 127.0.0.1.tm0001400002
+11-07-28 18:35:35,581 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:35,592 [main] Coordinator not recoverable: 127.0.0.1.tm0001500002
+11-07-28 18:35:36,141 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:36,203 [main] Coordinator not recoverable: 127.0.0.1.tm0001600002
+11-07-28 18:35:36,205 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:36,231 [main] Coordinator not recoverable: 127.0.0.1.tm0001700002
+11-07-28 18:35:36,236 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:35:36,248 [main] Coordinator not recoverable: 127.0.0.1.tm0001800002
+11-07-28 18:37:45,822 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:45,952 [main] Coordinator not recoverable: 127.0.0.1.tm0000100003
+11-07-28 18:37:45,988 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:45,996 [main] Coordinator not recoverable: 127.0.0.1.tm0000200003
+11-07-28 18:37:46,048 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:46,049 [main] Coordinator not recoverable: 127.0.0.1.tm0000300003
+11-07-28 18:37:46,051 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:46,052 [main] Coordinator not recoverable: 127.0.0.1.tm0000400003
+11-07-28 18:37:46,066 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:46,067 [main] Coordinator not recoverable: 127.0.0.1.tm0000500003
+11-07-28 18:37:46,086 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,125 [main] Coordinator not recoverable: 127.0.0.1.tm0000600003
+11-07-28 18:37:49,126 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,202 [main] Coordinator not recoverable: 127.0.0.1.tm0000700003
+11-07-28 18:37:49,245 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,255 [main] Coordinator not recoverable: 127.0.0.1.tm0000800003
+11-07-28 18:37:49,259 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,268 [main] Coordinator not recoverable: 127.0.0.1.tm0000900003
+11-07-28 18:37:49,799 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,823 [main] Coordinator not recoverable: 127.0.0.1.tm0001000003
+11-07-28 18:37:49,839 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,852 [main] Coordinator not recoverable: 127.0.0.1.tm0001100003
+11-07-28 18:37:49,854 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,867 [main] Coordinator not recoverable: 127.0.0.1.tm0001200003
+11-07-28 18:37:49,869 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,880 [main] Coordinator not recoverable: 127.0.0.1.tm0001300003
+11-07-28 18:37:49,882 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,891 [main] Coordinator not recoverable: 127.0.0.1.tm0001400003
+11-07-28 18:37:49,894 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:49,903 [main] Coordinator not recoverable: 127.0.0.1.tm0001500003
+11-07-28 18:37:50,241 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:50,266 [main] Coordinator not recoverable: 127.0.0.1.tm0001600003
+11-07-28 18:37:50,268 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:50,288 [main] Coordinator not recoverable: 127.0.0.1.tm0001700003
+11-07-28 18:37:50,293 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 18:37:50,305 [main] Coordinator not recoverable: 127.0.0.1.tm0001800003
+11-07-28 19:01:21,272 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,325 [main] Coordinator not recoverable: 127.0.0.1.tm0000100004
+11-07-28 19:01:21,397 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,398 [main] Coordinator not recoverable: 127.0.0.1.tm0000200004
+11-07-28 19:01:21,410 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,411 [main] Coordinator not recoverable: 127.0.0.1.tm0000300004
+11-07-28 19:01:21,413 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,413 [main] Coordinator not recoverable: 127.0.0.1.tm0000400004
+11-07-28 19:01:21,420 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,421 [main] Coordinator not recoverable: 127.0.0.1.tm0000500004
+11-07-28 19:01:21,436 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,635 [main] Coordinator not recoverable: 127.0.0.1.tm0000600004
+11-07-28 19:01:21,636 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,661 [main] Coordinator not recoverable: 127.0.0.1.tm0000700004
+11-07-28 19:01:21,679 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,689 [main] Coordinator not recoverable: 127.0.0.1.tm0000800004
+11-07-28 19:01:21,692 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,702 [main] Coordinator not recoverable: 127.0.0.1.tm0000900004
+11-07-28 19:01:21,876 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,897 [main] Coordinator not recoverable: 127.0.0.1.tm0001000004
+11-07-28 19:01:21,903 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,916 [main] Coordinator not recoverable: 127.0.0.1.tm0001100004
+11-07-28 19:01:21,919 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,931 [main] Coordinator not recoverable: 127.0.0.1.tm0001200004
+11-07-28 19:01:21,932 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,940 [main] Coordinator not recoverable: 127.0.0.1.tm0001300004
+11-07-28 19:01:21,943 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,951 [main] Coordinator not recoverable: 127.0.0.1.tm0001400004
+11-07-28 19:01:21,954 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:21,962 [main] Coordinator not recoverable: 127.0.0.1.tm0001500004
+11-07-28 19:01:22,298 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:22,309 [main] Coordinator not recoverable: 127.0.0.1.tm0001600004
+11-07-28 19:01:22,310 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:22,322 [main] Coordinator not recoverable: 127.0.0.1.tm0001700004
+11-07-28 19:01:22,328 [main] Attempt to create a transaction with a timeout that exceeds com.atomikos.icatch.max_timeout - truncating to: 300000
+11-07-28 19:01:22,339 [main] Coordinator not recoverable: 127.0.0.1.tm0001800004
