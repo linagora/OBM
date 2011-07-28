@@ -2,6 +2,7 @@ package fr.aliacom.obm.common.calendar;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -175,7 +176,6 @@ public class EventChangeHandler {
 			for (Attendee attendee : attendeesByState.getValue())
 			{
 				logger.info("<" + attendee.getEmail() + "> is in [" + attendee.getState().name() + "]");
-				
 			}
 		}
 		
@@ -306,7 +306,17 @@ public class EventChangeHandler {
 		ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(filterOwner(current, current.getAttendees()));
 		SetView<Attendee> removedAttendees = Sets.difference(previousAttendees, currentAttendees);
 		SetView<Attendee> newAttendees = Sets.difference(currentAttendees, previousAttendees);
-		SetView<Attendee> stableAttendees = Sets.intersection(previousAttendees, currentAttendees);
+		
+		Set<Attendee> stableAttendees = new HashSet<Attendee>(currentAttendees);
+		
+		for (Attendee att : stableAttendees) {
+			if (newAttendees.contains(att) || removedAttendees.contains(att))
+			{
+				stableAttendees.remove(att);
+			}
+		}
+		
+		//SetView<Attendee> stableAttendees = Sets.intersection(currentAttendees, previousAttendees);
 		return ImmutableMap.of(
 				AttendeeStateValue.Old, removedAttendees,
 				AttendeeStateValue.Current, stableAttendees,
