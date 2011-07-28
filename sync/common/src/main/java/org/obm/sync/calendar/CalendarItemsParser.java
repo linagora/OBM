@@ -59,6 +59,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		ev.setAllday(e.hasAttribute("allDay") ? "true".equals(e
 				.getAttribute("allDay")) : false);
 		ev.setType(EventType.valueOf(e.getAttribute("type")));
+		ev.setSequence(Integer.valueOf(e.getAttribute("sequence")));
 		ev.setExtId(s(e, "extId"));
 		ev.setRecurrenceId(d(e, "recurrenceId"));
 
