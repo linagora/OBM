@@ -356,6 +356,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			logger.info("handleMeetingResponse : " + event.getUID());
 			Event obmEvent = createOrModifyInvitationEvent(bs, event, calCli, at);
 			event.setObmUID(obmEvent.getUid());
+			event.setObmSequence(obmEvent.getSequence());
 			String serverId = updateUserStatus(bs, event, status, calCli, at);
 			
 			return serverId;
@@ -384,6 +385,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			return calCli.getEventFromId(at, bs.getLoginAtDomain(), id);
 		} else {
 			newEvent.setUid(obmEvent.getUid());
+			newEvent.setSequence(obmEvent.getSequence());
 			if(!obmEvent.isInternalEvent()){
 				logger.info("createOrModifyInvitationEvent : update event " + event.getUID());
 				obmEvent = calCli.modifyEvent(at, bs.getLoginAtDomain(), newEvent, true, false);
