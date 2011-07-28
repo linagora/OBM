@@ -27,7 +27,7 @@ public class CalendarItemsParserTest {
 	@Test
 	public void testParseInternalEventTrue() throws SAXException, IOException, FactoryConfigurationError {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" isInternal=\"true\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" isInternal=\"true\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
 		"<opacity>OPAQUE</opacity>" +
 		"<title>fake rdv</title>" +
@@ -97,7 +97,7 @@ public class CalendarItemsParserTest {
 	@Test
 	public void testParseInternalEventFalse() throws SAXException, IOException, FactoryConfigurationError {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" isInternal=\"false\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" isInternal=\"false\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
 		"<opacity>OPAQUE</opacity>" +
 		"<title>fake rdv</title>" +
@@ -167,7 +167,7 @@ public class CalendarItemsParserTest {
 	@Test
 	public void testParseExternalEvent() throws SAXException, IOException, FactoryConfigurationError {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<timeupdate>1292580000000</timeupdate>" +
 		"<timecreate>1289988000000</timecreate>" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
@@ -237,7 +237,7 @@ public class CalendarItemsParserTest {
 	@Test
 	public void testParseNullRecurrence() throws SAXException, IOException, FactoryConfigurationError {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<timeupdate>1292580000000</timeupdate>" +
 		"<timecreate>1289988000000</timecreate>" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
