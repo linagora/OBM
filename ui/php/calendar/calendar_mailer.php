@@ -102,7 +102,8 @@ class CalendarMailer extends OBM_Mailer {
 
     $this->parts[] = array(
       'content' => file_get_contents($this->generateIcs($event, "reply"), 'r'),
-      'content_type' => 'text/calendar; charset=UTF-8; method=REPLY'
+      'content_type' => 'text/calendar; charset=UTF-8; method=REPLY',
+      'encoding' => $this->icsEncoding
     );
     $this->attachments[] = array(
       'content' => file_get_contents($this->generateIcs($event, "reply"), 'r'),

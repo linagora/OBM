@@ -150,7 +150,7 @@ $ccalendar_resource = true;
 $ccalendar_send_ics = true;
 
 // Ics mime encoding for emails
-$ccalendar_ics_encoding = '8bit';
+$ccalendar_ics_encoding = 'base64';
 
 // Remote calendar cache time to live
 $cremote_calendar_ics_ttl = 60;

@@ -109,7 +109,7 @@ $ccalendar_resource = true;
 $ccalendar_send_ics = true;
 
 // Calendar ics attachment encoding (8bit, base64 or quoted-printable)
-$ccalendar_ics_encoding = '8bit';
+$ccalendar_ics_encoding = 'base64';
 
 // Calendar hour fraction (minutes select granularity)
 $ccalendar_hour_fraction = 4;
