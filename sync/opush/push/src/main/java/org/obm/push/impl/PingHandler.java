@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.MonitoredCollectionStoreService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IBackend;
@@ -25,6 +24,7 @@ import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ISyncStorage;
+import org.obm.push.store.MonitoredCollectionDao;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -34,19 +34,19 @@ import com.google.inject.Singleton;
 public class PingHandler extends WbxmlRequestHandler implements
 		IContinuationHandler {
 	
-	private final MonitoredCollectionStoreService monitoredCollectionService;
+	private final MonitoredCollectionDao monitoredCollectionDao;
 	private final PingProtocol protocol;
 
 	@Inject
 	protected PingHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage,
 			IContentsExporter contentsExporter, StateMachine stMachine,
-			MonitoredCollectionStoreService monitoredCollectionService,
-			PingProtocol pingProtocol, CollectionDao collectionDao) {
+			PingProtocol pingProtocol, MonitoredCollectionDao monitoredCollectionDao,
+			CollectionDao collectionDao) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
 				contentsExporter, stMachine, collectionDao);
-		this.monitoredCollectionService = monitoredCollectionService;
+		this.monitoredCollectionDao = monitoredCollectionDao;
 		this.protocol = pingProtocol;
 	}
 
@@ -86,13 +86,13 @@ public class PingHandler extends WbxmlRequestHandler implements
 			pingRequest.setHeartbeatInterval(5l);
 		}
 		if (pingRequest.getSyncCollections().isEmpty()) {
-			Set<SyncCollection> lastMonitoredCollection = monitoredCollectionService.list(bs.getCredentials(), bs.getDevice());
+			Set<SyncCollection> lastMonitoredCollection = monitoredCollectionDao.list(bs.getCredentials(), bs.getDevice());
 			if (lastMonitoredCollection.isEmpty()) {
 				throw new MissingRequestParameterException();
 			}
 			pingRequest.setSyncCollections(lastMonitoredCollection);
 		} else {
-			monitoredCollectionService.put(bs.getCredentials(), bs.getDevice(), pingRequest.getSyncCollections());
+			monitoredCollectionDao.put(bs.getCredentials(), bs.getDevice(), pingRequest.getSyncCollections());
 		}
 
 		for (SyncCollection syncCollection: pingRequest.getSyncCollections()) {

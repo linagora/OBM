@@ -1,6 +1,5 @@
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
-import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Set;
 
@@ -13,25 +12,29 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.impl.Credentials;
+import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
+import org.obm.push.store.ehcache.ObjectStoreManager;
+import org.obm.push.store.ehcache.StoreManagerConfigurationTest;
 
 import com.atomikos.icatch.jta.UserTransactionManager;
 import com.google.common.collect.Sets;
 
-public class MonitoredCollectionStoreServiceImplTest extends StoreManagerConfigurationTest {
+public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager objectStoreManager;
-	private MonitoredCollectionStoreServiceImpl monitoredCollectionStoreServiceImpl;
+	private MonitoredCollectionDaoEhcacheImpl monitoredCollectionStoreServiceImpl;
 	private Credentials credentials;
 	private UserTransactionManager transactionManager;
 	
 	@Before
-	public void init() throws FileNotFoundException, StoreNotFoundException, NotSupportedException, SystemException {
+	public void init() throws StoreNotFoundException, NotSupportedException, SystemException {
 		this.transactionManager = new UserTransactionManager();
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
-		this.monitoredCollectionStoreServiceImpl = new MonitoredCollectionStoreServiceImpl(objectStoreManager);
+		this.monitoredCollectionStoreServiceImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
 		this.credentials = new Credentials("login@domain", "password");
 	}
 	

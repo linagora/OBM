@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.obm.push.SyncedCollectionStoreService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.Sync;
 import org.obm.push.bean.BodyPreference;
@@ -26,6 +25,7 @@ import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ISyncStorage;
+import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +44,11 @@ public class SyncDecoder {
 	
 	private final ISyncStorage store;
 	private final CollectionDao collectionDao;
-	private final SyncedCollectionStoreService syncedCollectionStoreService;
+	private final SyncedCollectionDao syncedCollectionStoreService;
 	private final Map<PIMDataType, IDataDecoder> decoders;
 
 	@Inject
-	private SyncDecoder(SyncedCollectionStoreService syncedCollectionStoreService, ISyncStorage store, 
+	private SyncDecoder(SyncedCollectionDao syncedCollectionStoreService, ISyncStorage store, 
 			CollectionDao collectionDao) {
 		this.collectionDao = collectionDao;
 		this.store = store;

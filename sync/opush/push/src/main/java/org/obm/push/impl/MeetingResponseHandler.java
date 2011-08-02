@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -17,6 +16,7 @@ import org.obm.push.bean.MeetingHandlerRequest;
 import org.obm.push.bean.MeetingHandlerResponse;
 import org.obm.push.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
 import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.data.EncoderFactory;

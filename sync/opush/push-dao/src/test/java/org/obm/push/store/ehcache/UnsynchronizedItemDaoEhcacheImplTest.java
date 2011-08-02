@@ -1,6 +1,5 @@
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
-import java.io.FileNotFoundException;
 import java.util.Set;
 
 import javax.transaction.NotSupportedException;
@@ -12,27 +11,32 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.store.StoreNotFoundException;
-import org.obm.push.impl.Credentials;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
+import org.obm.push.bean.ItemChange;
+import org.obm.push.store.ehcache.ObjectStoreManager;
+import org.obm.push.store.ehcache.StoreManagerConfigurationTest;
+import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 
 import com.atomikos.icatch.jta.UserTransactionManager;
 
-public class UnSynchronizedItemImplTest extends StoreManagerConfigurationTest  {
+public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurationTest  {
 
 	private ObjectStoreManager objectStoreManager;
-	private UnsynchronizedItemImpl unSynchronizedItemImpl;
+	private UnsynchronizedItemDaoEhcacheImpl unSynchronizedItemImpl;
 	private Credentials credentials;
 	private UserTransactionManager transactionManager;
 	
-	public UnSynchronizedItemImplTest() {
+	public UnsynchronizedItemDaoEhcacheImplTest() {
 		super();
 	}
 	
 	@Before
-	public void init() throws StoreNotFoundException, FileNotFoundException, NotSupportedException, SystemException {
+	public void init() throws StoreNotFoundException, NotSupportedException, SystemException {
 		transactionManager = new UserTransactionManager();
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
-		this.unSynchronizedItemImpl = new UnsynchronizedItemImpl(objectStoreManager);
+		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
 		this.credentials = new Credentials("login@domain", "password");
 	}
 	

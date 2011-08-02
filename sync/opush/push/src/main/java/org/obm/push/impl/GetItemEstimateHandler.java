@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.UnsynchronizedItemService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -15,15 +14,19 @@ import org.obm.push.bean.GetItemEstimateResponse;
 import org.obm.push.bean.GetItemEstimateResponse.Estimate;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.data.EncoderFactory;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.CollectionNotFoundException;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.tnefconverter.RTFUtils;
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -32,14 +35,14 @@ import com.google.inject.Singleton;
 @Singleton
 public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
-	private final UnsynchronizedItemService unSynchronizedItemCache;
+	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	private final GetItemEstimateProtocol protocol;
 
 	@Inject
 	protected GetItemEstimateHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter, StateMachine stMachine,
-			UnsynchronizedItemService unSynchronizedItemCache, CollectionDao collectionDao,
+			UnsynchronizedItemDao unSynchronizedItemCache, CollectionDao collectionDao,
 			GetItemEstimateProtocol protocol) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,

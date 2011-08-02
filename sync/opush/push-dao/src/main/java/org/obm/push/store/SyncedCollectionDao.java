@@ -1,11 +1,12 @@
-package org.obm.push;
+package org.obm.push.store;
 
 import java.util.Collection;
 
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.impl.Credentials;
 
-public interface SyncedCollectionStoreService {
+public interface SyncedCollectionDao {
 	
 	SyncCollection get(Credentials credentials, Device device, Integer collectionId);
 	

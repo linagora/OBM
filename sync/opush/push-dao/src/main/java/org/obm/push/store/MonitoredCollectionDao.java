@@ -1,11 +1,12 @@
-package org.obm.push;
+package org.obm.push.store;
 
 import java.util.Set;
 
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.impl.Credentials;
 
-public interface MonitoredCollectionStoreService {
+public interface MonitoredCollectionDao {
 	
 	Set<SyncCollection> list(Credentials credentials, Device device);
 	

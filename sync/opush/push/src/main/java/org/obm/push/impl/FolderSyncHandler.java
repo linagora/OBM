@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -13,15 +12,16 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.bean.FolderSyncRequest;
 import org.obm.push.bean.FolderSyncResponse;
+import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.SyncState;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.protocol.FolderSyncProtocol;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.CollectionNotFoundException;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.bean.SyncState;
 import org.obm.push.store.CollectionDao;
 import org.w3c.dom.Document;
 

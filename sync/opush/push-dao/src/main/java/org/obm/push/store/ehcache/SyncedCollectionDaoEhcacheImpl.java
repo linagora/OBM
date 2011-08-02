@@ -1,22 +1,24 @@
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
 import java.io.Serializable;
 import java.util.Collection;
 
 import net.sf.ehcache.Element;
 
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.impl.Credentials;
+import org.obm.push.store.SyncedCollectionDao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SyncedCollectionStoreServiceImpl extends AbstractStoreService implements SyncedCollectionStoreService {
+public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implements SyncedCollectionDao {
 
 	private static final String STORE_NAME = "syncedCollectionStoreService";
 	
-	@Inject  SyncedCollectionStoreServiceImpl(
+	@Inject  SyncedCollectionDaoEhcacheImpl(
 			ObjectStoreManager objectStoreManager) {
 		super(objectStoreManager);
 	}
@@ -106,8 +108,8 @@ public class SyncedCollectionStoreServiceImpl extends AbstractStoreService imple
 			return true;
 		}
 
-		private SyncedCollectionStoreServiceImpl getOuterType() {
-			return SyncedCollectionStoreServiceImpl.this;
+		private SyncedCollectionDaoEhcacheImpl getOuterType() {
+			return SyncedCollectionDaoEhcacheImpl.this;
 		}
 	}
 }

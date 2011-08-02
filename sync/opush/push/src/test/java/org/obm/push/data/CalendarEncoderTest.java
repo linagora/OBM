@@ -7,16 +7,16 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.Device;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.impl.Credentials;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 

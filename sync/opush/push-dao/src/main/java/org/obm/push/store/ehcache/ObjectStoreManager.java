@@ -1,4 +1,4 @@
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
 import java.io.InputStream;
 import java.util.Arrays;

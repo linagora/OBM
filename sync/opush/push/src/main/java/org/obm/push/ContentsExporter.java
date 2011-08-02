@@ -11,6 +11,7 @@ import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;

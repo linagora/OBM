@@ -22,7 +22,13 @@ import org.obm.push.mail.EmailManager;
 import org.obm.push.mail.IEmailManager;
 import org.obm.push.store.DaoModule;
 import org.obm.push.store.ISyncStorage;
+import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.SyncStorage;
+import org.obm.push.store.SyncedCollectionDao;
+import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
+import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
+import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,9 +76,9 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(IBackend.class).to(OBMBackend.class);
 				bind(IContentsImporter.class).to(ContentsImporter.class);
 				bind(IErrorsManager.class).to(ErrorsManager.class);
-				bind(UnsynchronizedItemService.class).to(UnsynchronizedItemImpl.class);
-				bind(MonitoredCollectionStoreService.class).to(MonitoredCollectionStoreServiceImpl.class);
-				bind(SyncedCollectionStoreService.class).to(SyncedCollectionStoreServiceImpl.class);
+				bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
+				bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
+				bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
 				bind(ServletContext.class).toInstance(servletContext);
 				bind(IDBCP.class).to(DBCP.class);
 			}

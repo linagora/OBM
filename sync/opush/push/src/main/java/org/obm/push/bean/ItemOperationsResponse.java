@@ -1,6 +1,5 @@
 package org.obm.push.bean;
 
-import org.obm.push.ItemChange;
 import org.obm.push.impl.ItemOperationsStatus;
 
 public class ItemOperationsResponse {

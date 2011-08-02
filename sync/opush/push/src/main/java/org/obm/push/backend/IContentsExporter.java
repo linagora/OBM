@@ -4,8 +4,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-import org.obm.push.ItemChange;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;

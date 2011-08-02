@@ -1,4 +1,4 @@
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
 import junit.framework.Assert;
 import net.sf.ehcache.Cache;
@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.push.exception.EhcacheRollbackException;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

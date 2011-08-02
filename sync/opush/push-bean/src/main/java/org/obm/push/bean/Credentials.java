@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.bean;
 
 import java.io.Serializable;
 

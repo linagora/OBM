@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.obm.push.ItemChange;
+import org.obm.push.bean.ItemChange;
 
 public class DataDelta {
 	

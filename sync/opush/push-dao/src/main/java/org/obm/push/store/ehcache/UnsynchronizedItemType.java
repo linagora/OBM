@@ -1,4 +1,4 @@
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
 public enum UnsynchronizedItemType {
 

@@ -1,9 +1,8 @@
 package org.obm.push.backend;
 
 import java.math.BigDecimal;
-
-import org.obm.push.Device;
-import org.obm.push.impl.Credentials;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 
 public class BackendSession {
 

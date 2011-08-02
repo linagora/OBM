@@ -1,11 +1,10 @@
-package org.obm.push;
+package org.obm.push.bean;
 
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.obm.push.backend.BackendSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ public class Device implements Serializable {
 			Properties hints = new Properties();
 			InputStream in = null;
 			try {
-				in = BackendSession.class.getClassLoader()
+				in = Device.class.getClassLoader()
 						.getResourceAsStream("hints/" + devType + ".hints");
 				hints.load(in);
 			} catch (Throwable e) {

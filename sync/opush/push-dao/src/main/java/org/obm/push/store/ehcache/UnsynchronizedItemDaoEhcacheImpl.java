@@ -1,4 +1,4 @@
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -6,17 +6,20 @@ import java.util.Set;
 
 import net.sf.ehcache.Element;
 
-import org.obm.push.impl.Credentials;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
+import org.obm.push.bean.ItemChange;
+import org.obm.push.store.UnsynchronizedItemDao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class UnsynchronizedItemImpl extends AbstractStoreService implements UnsynchronizedItemService {
+public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao implements UnsynchronizedItemDao {
 
 	private static final String STORE_NAME = "unsynchronizedItemService";
 	
-	@Inject UnsynchronizedItemImpl(ObjectStoreManager objectStoreManager) {
+	@Inject UnsynchronizedItemDaoEhcacheImpl(ObjectStoreManager objectStoreManager) {
 		super(objectStoreManager);
 	}
 	
@@ -148,8 +151,8 @@ public class UnsynchronizedItemImpl extends AbstractStoreService implements Unsy
 			return true;
 		}
 		
-		private UnsynchronizedItemImpl getOuterType() {
-			return UnsynchronizedItemImpl.this;
+		private UnsynchronizedItemDaoEhcacheImpl getOuterType() {
+			return UnsynchronizedItemDaoEhcacheImpl.this;
 		}
 	}
 

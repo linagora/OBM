@@ -5,9 +5,9 @@ import java.io.IOException;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.obm.push.ItemChange;
 import org.obm.push.bean.FolderSyncRequest;
 import org.obm.push.bean.FolderSyncResponse;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.impl.FolderSyncStatus;
 import org.obm.push.impl.Responder;

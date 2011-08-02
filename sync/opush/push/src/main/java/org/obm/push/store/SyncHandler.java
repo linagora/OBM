@@ -14,10 +14,6 @@ import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.Device;
-import org.obm.push.ItemChange;
-import org.obm.push.MonitoredCollectionStoreService;
-import org.obm.push.UnsynchronizedItemService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.DataDelta;
@@ -33,7 +29,10 @@ import org.obm.push.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
@@ -47,7 +46,6 @@ import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.impl.ActiveSyncRequest;
-import org.obm.push.impl.Credentials;
 import org.obm.push.impl.IContinuationHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.WbxmlRequestHandler;
@@ -86,9 +84,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 	
 	private static Map<Integer, IContinuation> waitContinuationCache;
-	private final UnsynchronizedItemService unSynchronizedItemCache;
-	private final MonitoredCollectionStoreService monitoredCollectionService;
 	private final SyncProtocol syncProtocol;
+	private final UnsynchronizedItemDao unSynchronizedItemCache;
+	private final MonitoredCollectionDao monitoredCollectionService;
 
 	static {
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
@@ -96,8 +94,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine, UnsynchronizedItemService unSynchronizedItemCache,
-			MonitoredCollectionStoreService monitoredCollectionService, SyncProtocol SyncProtocol,
+			StateMachine stMachine, UnsynchronizedItemDao unSynchronizedItemCache,
+			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
 			CollectionDao collectionDao) {
 		
 		super(backend, encoderFactory, contentsImporter, storage, contentsExporter, stMachine, collectionDao);

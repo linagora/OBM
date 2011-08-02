@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.obm.push.IInvitationFilterManager;
-import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.InvitationStatus;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;

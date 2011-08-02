@@ -2,8 +2,6 @@ package org.obm.push.bean;
 
 import java.util.Collection;
 
-import org.obm.push.ItemChange;
-
 public class FolderSyncResponse {
 	
 	private final Collection<ItemChange> itemChanges;

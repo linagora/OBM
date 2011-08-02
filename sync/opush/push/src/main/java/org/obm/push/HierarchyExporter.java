@@ -7,6 +7,7 @@ import java.util.List;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;

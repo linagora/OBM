@@ -1,10 +1,12 @@
-package org.obm.push;
+package org.obm.push.store;
 
 import java.util.Set;
 
-import org.obm.push.impl.Credentials;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
+import org.obm.push.bean.ItemChange;
 
-public interface UnsynchronizedItemService {
+public interface UnsynchronizedItemDao {
 	
 	void storeItemToAdd(Credentials credentials, Device device, int collectionId, ItemChange ic);
 

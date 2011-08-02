@@ -8,8 +8,9 @@ import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.Device;
 import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSAttendee;
@@ -24,7 +25,6 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
-import org.obm.push.impl.Credentials;
 
 import com.google.common.collect.ImmutableSet;
 
