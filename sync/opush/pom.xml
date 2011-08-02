@@ -37,6 +37,7 @@
 		<module>technical-log</module>
 		<module>push-dao</module>
 		<module>push-bean</module>
+		<module>push-service</module>
 		<module>protocol</module>
 	</modules>
 

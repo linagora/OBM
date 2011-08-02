@@ -20,7 +20,7 @@ import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
 import org.minig.mime.QuotedPrintableDecoderInputStream;
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ObmConfigurationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
@@ -63,7 +63,7 @@ public class MailBackend extends ObmSyncBackend {
 
 	@Inject
 	private MailBackend(IEmailManager emailManager,
-			ConfigurationService configurationService, CollectionDao collectionDao,
+			ObmConfigurationService configurationService, CollectionDao collectionDao,
 			FiltrageInvitationDao filtrageInvitationDao)
 			throws ConfigurationException {
 		

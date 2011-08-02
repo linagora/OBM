@@ -17,58 +17,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.store.StoreNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Configuration service
  */
-public class ConfigurationService {
+public class ObmConfigurationService extends AbstractConfigurationService{
 
 	private final static String LOCATOR_PORT = "8082";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-	private Properties props;
-
-	public ConfigurationService() {
-		props = new Properties();
-		FileInputStream in = null;
-		try {
-			in = new FileInputStream("/etc/obm/obm_conf.ini");
-			props.load(in);
-		} catch (IOException e) {
-			logger.error("/etc/obm/obm_conf.ini not found", e);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					logger.error("error closing ini file inputstream", e);
-				}
-			}
-		}
-	}
-
-	public String getStringValue(String prop) {
-		return props.getProperty(prop);
-	}
-
-	public boolean getBooleanValue(String prop) {
-		return Boolean.valueOf(getStringValue(prop)).booleanValue();
-	}
-
-	public int getIntValue(String prop) {
-		return Integer.parseInt(getStringValue(prop));
+	public ObmConfigurationService() {
+		super("/etc/obm/obm_conf.ini");
 	}
 
 	public String getLocatorUrl() throws ConfigurationException {

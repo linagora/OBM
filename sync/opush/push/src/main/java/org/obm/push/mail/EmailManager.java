@@ -36,7 +36,7 @@ import org.minig.imap.ListInfo;
 import org.minig.imap.ListResult;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ObmConfigurationService;
 import org.obm.locator.LocatorClient;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
@@ -78,7 +78,7 @@ public class EmailManager implements IEmailManager {
 	@Inject
 	private EmailManager(EmailDao emailDao,
 			EmailConfiguration emailConfiguration,
-			ConfigurationService configurationService,
+			ObmConfigurationService configurationService,
 			SmtpSender smtpSender, EmailSync emailSyncCache) throws ConfigurationException {
 		
 		this.emailSyncCache = emailSyncCache;

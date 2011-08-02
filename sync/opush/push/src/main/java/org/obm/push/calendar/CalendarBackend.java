@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.naming.ConfigurationException;
 
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ObmConfigurationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
@@ -50,7 +50,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	private final ImmutableMap<PIMDataType, ObmSyncCalendarConverter> converters;
 
 	@Inject
-	public CalendarBackend(	ConfigurationService configurationService, CollectionDao collectionDao)
+	public CalendarBackend(	ObmConfigurationService configurationService, CollectionDao collectionDao)
 			throws ConfigurationException {
 		
 		super(configurationService, collectionDao);

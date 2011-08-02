@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.naming.ConfigurationException;
 
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ObmConfigurationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FolderType;
@@ -32,7 +32,7 @@ import com.google.inject.Singleton;
 public class ContactsBackend extends ObmSyncBackend {
 
 	@Inject
-	private ContactsBackend(ConfigurationService configurationService, CollectionDao collectionDao)
+	private ContactsBackend(ObmConfigurationService configurationService, CollectionDao collectionDao)
 			throws ConfigurationException {
 		
 		super(configurationService, collectionDao);

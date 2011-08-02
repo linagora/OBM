@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.naming.ConfigurationException;
 
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ObmConfigurationService;
 import org.obm.locator.LocatorClient;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SearchResult;
@@ -29,7 +29,7 @@ public class ObmSearchContact implements ISearchSource {
 	private final LocatorClient locatorClient;
 	
 	@Inject
-	private ObmSearchContact(ConfigurationService configurationService) throws ConfigurationException {
+	private ObmSearchContact(ObmConfigurationService configurationService) throws ConfigurationException {
 		super();
 		locatorClient = new LocatorClient(configurationService.getLocatorUrl());
 	}

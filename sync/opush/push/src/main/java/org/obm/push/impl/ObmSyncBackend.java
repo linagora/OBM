@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.naming.ConfigurationException;
 
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ObmConfigurationService;
 import org.obm.locator.LocatorClient;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Device;
@@ -38,7 +38,7 @@ public class ObmSyncBackend {
 	private final CollectionDao collectionDao;
 	private final LocatorClient locatorClient;
 
-	protected ObmSyncBackend(ConfigurationService configurationService, 
+	protected ObmSyncBackend(ObmConfigurationService configurationService, 
 			CollectionDao collectionDao)
 			throws ConfigurationException {
 

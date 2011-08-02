@@ -10,11 +10,8 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.Device.Factory;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.DeviceDao;
-import org.obm.push.utils.IniFile;
 import org.obm.push.utils.JDBCUtils;
 
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -92,23 +89,6 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 	
 	public boolean syncAuthorized(String loginAtDomain, String deviceId) throws DaoException {
-		IniFile ini = new IniFile("/etc/opush/sync_perms.ini") {
-			@Override
-			public String getCategory() {
-				return null;
-			}
-		};
-
-		if (userIsBlacklisted(loginAtDomain, ini)) {
-			return false;
-		}
-
-		String syncperm = ini.getData().get("allow.unknown.pda");
-
-		if ("true".equals(syncperm)) {
-			return true;
-		}
-
 		String[] parts = loginAtDomain.split("@");
 		String login = parts[0].toLowerCase();
 		String domain = parts[1].toLowerCase();
@@ -142,18 +122,4 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		}
 		return hasSyncPerm;
 	}
-
-	private boolean userIsBlacklisted(String loginAtDomain, IniFile ini) {
-		String blacklist = Strings.nullToEmpty(ini.getData().get(
-				"blacklist.users"));
-		Iterable<String> users = Splitter.on(',').trimResults()
-				.split(blacklist);
-		for (String user : users) {
-			if (user.equalsIgnoreCase(loginAtDomain)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 }

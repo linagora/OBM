@@ -2,8 +2,8 @@ package org.obm.push.backend;
 
 import javax.naming.ConfigurationException;
 
-import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.BackendSession;
+import org.obm.configuration.ObmConfigurationService;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.impl.ObmSyncBackend;
@@ -16,7 +16,7 @@ import com.google.inject.Singleton;
 public class FolderBackend extends ObmSyncBackend {
 
 	@Inject
-	private FolderBackend(ConfigurationService configurationService, CollectionDao collectionDao)
+	private FolderBackend(ObmConfigurationService configurationService, CollectionDao collectionDao)
 			throws ConfigurationException {
 		
 		super(configurationService, collectionDao);

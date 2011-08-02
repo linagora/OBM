@@ -3,7 +3,7 @@ package org.obm.push.mail.smtp;
 import javax.naming.ConfigurationException;
 
 import org.columba.ristretto.smtp.SMTPProtocol;
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ObmConfigurationService;
 import org.obm.locator.LocatorClient;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.SmtpLocatorException;
@@ -20,7 +20,7 @@ public class SmtpLocator {
 	private final LocatorClient locatorClient;
 
 	@Inject
-	private SmtpLocator(ConfigurationService configurationService) throws ConfigurationException {
+	private SmtpLocator(ObmConfigurationService configurationService) throws ConfigurationException {
 		super();
 		locatorClient = new LocatorClient(configurationService.getLocatorUrl());
 	}

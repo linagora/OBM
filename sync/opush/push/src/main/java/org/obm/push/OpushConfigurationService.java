@@ -4,14 +4,14 @@ import java.io.InputStream;
 
 import javax.servlet.ServletContext;
 
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ObmConfigurationService;
 import org.obm.configuration.store.StoreNotFoundException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class OpushConfigurationService extends ConfigurationService {
+public class OpushConfigurationService extends ObmConfigurationService {
 	
 	private final ServletContext servletContext;
 	

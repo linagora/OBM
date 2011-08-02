@@ -140,7 +140,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-dao</artifactId>
+			<artifactId>push-service</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
