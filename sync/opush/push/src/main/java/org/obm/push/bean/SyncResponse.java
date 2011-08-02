@@ -1,21 +1,63 @@
 package org.obm.push.bean;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
+import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.store.SyncCollection;
 
 public class SyncResponse {
 
-	private final Collection<SyncCollection> changedFolders;
+	public static class SyncCollectionResponse {
+		private final SyncCollection syncCollection;
+		private List<ItemChange> itemChanges;
+		private List<ItemChange> itemChangesDeletion;
+		private boolean syncStatevalid;
+		private String allocateNewSyncKey;
+		
+		public SyncCollectionResponse(SyncCollection syncCollection) {
+			this.syncCollection = syncCollection;
+		}
+
+		public SyncCollection getSyncCollection() {
+			return syncCollection;
+		}
+		public void setSyncStateValid(boolean syncStateValid) {
+			syncStatevalid = syncStateValid;
+		}
+		public boolean isSyncStatevalid() {
+			return syncStatevalid;
+		}
+		public void setItemChanges(List<ItemChange> itemChanges) {
+			this.itemChanges = itemChanges;
+		}
+		public List<ItemChange> getItemChanges() {
+			return itemChanges;
+		}
+		public void setNewSyncKey(String allocateNewSyncKey) {
+			this.allocateNewSyncKey = allocateNewSyncKey;
+		}
+		public String getAllocateNewSyncKey() {
+			return allocateNewSyncKey;
+		}
+		public void setItemChangesDeletion(List<ItemChange> itemChangesDeletion) {
+			this.itemChangesDeletion = itemChangesDeletion;
+		}
+		public List<ItemChange> getItemChangesDeletion() {
+			return itemChangesDeletion;
+		}
+	}
+	
+	private final Collection<SyncCollectionResponse> collectionResponses;
 	private final BackendSession backendSession;
 	private final EncoderFactory encoderFactory;
 	private final Map<String, String> processedClientIds;
-
-	public SyncResponse(Collection<SyncCollection> changedFolders, BackendSession bs, EncoderFactory encoderFactory, Map<String, String> processedClientIds) {
-		this.changedFolders = changedFolders;
+	
+	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, BackendSession bs, EncoderFactory encoderFactory, Map<String, String> processedClientIds) {
+		this.collectionResponses = collectionResponses;
 		this.backendSession = bs;
 		this.encoderFactory = encoderFactory;
 		this.processedClientIds = processedClientIds;
@@ -25,10 +67,6 @@ public class SyncResponse {
 		this(null, null, null, null);
 	}
 
-	public Collection<SyncCollection> listChangedFolders() {
-		return changedFolders;
-	}
-	
 	public BackendSession getBackendSession() {
 		return backendSession;
 	}
@@ -37,7 +75,11 @@ public class SyncResponse {
 		return encoderFactory;
 	}
 	
-	public Map<String, String> listProcessedClientIds() {
+	public Collection<SyncCollectionResponse> getCollectionResponses() {
+		return collectionResponses;
+	}
+	
+	public Map<String, String> getProcessedClientIds() {
 		return processedClientIds;
 	}
 	

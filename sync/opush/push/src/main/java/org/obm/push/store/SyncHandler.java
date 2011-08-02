@@ -29,6 +29,7 @@ import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.backend.Sync;
 import org.obm.push.bean.SyncRequest;
 import org.obm.push.bean.SyncResponse;
+import org.obm.push.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.exception.ObjectNotFoundException;
@@ -171,7 +172,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		continuation.suspend(sync.getWaitInSecond() * 1000);
 	}
 
-	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds) 
+	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds, SyncCollectionResponse syncCollectionResponse) 
 			throws ActiveSyncException, SQLException {
 
 		DataDelta delta = null;
@@ -184,10 +185,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 
 		List<ItemChange> changed = processWindowSize(c, delta, bs, processedClientIds);
-		c.setItemChanges(changed);
+		syncCollectionResponse.setItemChanges(changed);
 	
 		List<ItemChange> itemChangesDeletion = serializeDeletion(bs, c, processedClientIds, delta);
-		c.setItemChangesDeletion(itemChangesDeletion);
+		syncCollectionResponse.setItemChangesDeletion(itemChangesDeletion);
 		
 		return lastSync;
 	}
@@ -362,29 +363,34 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws SQLException, ActiveSyncException {
 
+		final List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
+			
+			SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(c);
+			
 			if ("0".equals(c.getSyncKey())) {
 				backend.resetCollection(bs, c.getCollectionId());
 			}
 			SyncState st = stMachine.getSyncState(c.getCollectionId(), c.getSyncKey());
 			boolean syncStateValid = st.isValid();
-			c.setSyncStateValid(syncStateValid);
+			syncCollectionResponse.setSyncStateValid(syncStateValid);
 			if (syncStateValid) {
 
 				Date syncDate = null;
 				if (!c.getSyncKey().equals("0")) {
 					if (c.getFetchIds().size() == 0) {
-						syncDate = doUpdates(bs, c, processedClientIds);
+						syncDate = doUpdates(bs, c, processedClientIds, syncCollectionResponse);
 					} else {
 						List<ItemChange> itemChanges = contentsExporter.fetch(bs, c.getSyncState().getDataType(), c.getFetchIds());
-						c.setItemChanges(itemChanges);
+						syncCollectionResponse.setItemChanges(itemChanges);
 					}
 				}
-				c.setNewSyncKey(stMachine.allocateNewSyncKey(bs, c.getCollectionId(), syncDate));
+				syncCollectionResponse.setNewSyncKey(stMachine.allocateNewSyncKey(bs, c.getCollectionId(), syncDate));
 			}
+			syncCollectionResponses.add(syncCollectionResponse);
 		}
 		logger.info("Resp for requestId = {}", continuation.getReqId());
-		return new SyncResponse(changedFolders, bs, getEncoders(), processedClientIds);
+		return new SyncResponse(syncCollectionResponses, bs, getEncoders(), processedClientIds);
 	}
 
 	@Override

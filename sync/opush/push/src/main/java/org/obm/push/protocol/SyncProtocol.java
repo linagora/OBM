@@ -10,6 +10,7 @@ import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.bean.SyncRequest;
 import org.obm.push.bean.SyncResponse;
+import org.obm.push.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.data.IDataEncoder;
 import org.obm.push.exception.NoDocumentException;
@@ -49,31 +50,33 @@ public class SyncProtocol {
 		Element root = reply.getDocumentElement();
 		
 		final Element cols = DOMUtils.createElement(root, "Collections");
-		for (SyncCollection syncCollection : syncResponse.listChangedFolders()) {
+		for (SyncCollectionResponse collectionResponse: syncResponse.getCollectionResponses()) {
 
 			Element ce = DOMUtils.createElement(cols, "Collection");
-			if (syncCollection.getDataClass() != null) {
-				DOMUtils.createElementAndText(ce, "Class", syncCollection.getDataClass());
+			if (collectionResponse.getSyncCollection().getDataClass() != null) {
+				DOMUtils.createElementAndText(ce, "Class", collectionResponse.getSyncCollection().getDataClass());
 			}
 			
-			if (!syncCollection.isSyncStatevalid()) {
-				DOMUtils.createElementAndText(ce, "CollectionId", syncCollection.getCollectionId().toString());
+			if (!collectionResponse.isSyncStatevalid()) {
+				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
 				DOMUtils.createElementAndText(ce, "Status", SyncStatus.INVALID_SYNC_KEY.asXmlValue());
 				DOMUtils.createElementAndText(ce, "SyncKey", "0");
 			} else {
 				Element sk = DOMUtils.createElement(ce, "SyncKey");
-				DOMUtils.createElementAndText(ce, "CollectionId", syncCollection.getCollectionId().toString());
+				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
 				DOMUtils.createElementAndText(ce, "Status", SyncStatus.OK.asXmlValue());
 
-				if (!syncCollection.getSyncKey().equals("0")) {
-					if (syncCollection.getFetchIds().size() == 0) {
-						buildUpdateItemChange(syncResponse.getBackendSession(), syncCollection, syncResponse.listProcessedClientIds(), ce, syncResponse.getEncoderFactory());
+				if (!collectionResponse.getSyncCollection().getSyncKey().equals("0")) {
+					if (collectionResponse.getSyncCollection().getFetchIds().size() == 0) {
+						buildUpdateItemChange(syncResponse.getBackendSession(), collectionResponse, 
+								syncResponse.getProcessedClientIds(), ce, syncResponse.getEncoderFactory());
 					} else {
-						buildFetchItemChange(syncResponse.getBackendSession(), syncCollection, ce, syncResponse.getEncoderFactory());
+						buildFetchItemChange(syncResponse.getBackendSession(), collectionResponse, ce, 
+								syncResponse.getEncoderFactory());
 					}
 				}
 				
-				sk.setTextContent(syncCollection.getAllocateNewSyncKey());
+				sk.setTextContent(collectionResponse.getAllocateNewSyncKey());
 			}
 			
 		}
@@ -99,18 +102,18 @@ public class SyncProtocol {
 		return ret;
 	}
 
-	private void buildFetchItemChange(BackendSession bs, SyncCollection c, Element ce, EncoderFactory encoderFactory) {
+	private void buildFetchItemChange(BackendSession bs, SyncCollectionResponse c, Element ce, EncoderFactory encoderFactory) {
 		Element commands = DOMUtils.createElement(ce, "Responses");
-		for (ItemChange ic : c.listItemChanges()) {
+		for (ItemChange ic : c.getItemChanges()) {
 			Element add = DOMUtils.createElement(commands, "Fetch");
 			DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 			DOMUtils.createElementAndText(add, "Status",
 					SyncStatus.OK.asXmlValue());
-			c.getOptions().setTruncation(null);
-			for (BodyPreference bp : c.getOptions().getBodyPreferences().values()) {
+			c.getSyncCollection().getOptions().setTruncation(null);
+			for (BodyPreference bp : c.getSyncCollection().getOptions().getBodyPreferences().values()) {
 				bp.setTruncationSize(null);
 			}
-			serializeChange(bs, add, c, ic, encoderFactory);
+			serializeChange(bs, add, c.getSyncCollection(), ic, encoderFactory);
 		}
 	}
 	
@@ -123,21 +126,21 @@ public class SyncProtocol {
 		encoder.encode(bs, apData, data, c, true);
 	}
 	
-	private void buildUpdateItemChange(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds, Element ce, EncoderFactory encoderFactory) {
+	private void buildUpdateItemChange(BackendSession bs, SyncCollectionResponse c,	Map<String, String> processedClientIds, Element ce, EncoderFactory encoderFactory) {
 		Element responses = DOMUtils.createElement(ce, "Responses");
-		if (c.isMoreAvailable()) {
+		if (c.getSyncCollection().isMoreAvailable()) {
 			// MoreAvailable has to be before Commands
 			DOMUtils.createElement(ce, "MoreAvailable");
 		}
 		
 		Element commands = DOMUtils.createElement(ce, "Commands");
 		
-		List<ItemChange> itemChangesDeletion = c.listItemChangesDeletion();
+		List<ItemChange> itemChangesDeletion = c.getItemChangesDeletion();
 		for (ItemChange ic: itemChangesDeletion) {
 			serializeDeletion(commands, ic);
 		}
 		
-		for (ItemChange ic : c.listItemChanges()) {
+		for (ItemChange ic : c.getItemChanges()) {
 			String clientId = processedClientIds.get(ic.getServerId());
 			if (clientId != null) {
 				// Acks Add done by pda
@@ -156,7 +159,7 @@ public class SyncProtocol {
 				// New change done on server
 				Element add = DOMUtils.createElement(commands, "Add");
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-				serializeChange(bs, add, c, ic, encoderFactory);
+				serializeChange(bs, add, c.getSyncCollection(), ic, encoderFactory);
 			}
 			processedClientIds.remove(ic.getServerId());
 		}
@@ -168,7 +171,7 @@ public class SyncProtocol {
 				processedClientIds.entrySet());
 		for (Entry<String, String> entry : entries) {
 			if (entry.getKey() != null) {
-				if (entry.getKey().startsWith(c.getCollectionId().toString())) {
+				if (entry.getKey().startsWith(c.getSyncCollection().getCollectionId().toString())) {
 					Element add = null;
 					if (entry.getValue() != null) {
 						add = DOMUtils.createElement(responses, "Add");
