@@ -22,7 +22,6 @@ import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
 import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.IDBCP;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.FilterType;
@@ -44,7 +43,6 @@ import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FiltrageInvitationDao;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.FileUtils;
@@ -65,12 +63,12 @@ public class MailBackend extends ObmSyncBackend {
 	private final FiltrageInvitationDao filtrageInvitationDao;
 
 	@Inject
-	private MailBackend(ISyncStorage storage, DeviceDaoJdbcImpl deviceDao, IEmailManager emailManager,
-			ConfigurationService configurationService, IDBCP dbcp, CollectionDao collectionDao,
+	private MailBackend(DeviceDaoJdbcImpl deviceDao, IEmailManager emailManager,
+			ConfigurationService configurationService, CollectionDao collectionDao,
 			FiltrageInvitationDao filtrageInvitationDao)
 			throws ConfigurationException {
 		
-		super(storage, deviceDao, configurationService, dbcp, collectionDao);
+		super(deviceDao, configurationService, collectionDao);
 		this.emailManager = emailManager;
 		this.filtrageInvitationDao = filtrageInvitationDao;
 	}

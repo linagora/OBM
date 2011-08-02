@@ -8,7 +8,6 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.ISyncStorage;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -19,11 +18,11 @@ public class SettingsHandler extends WbxmlRequestHandler {
 
 	@Inject
 	protected SettingsHandler(IBackend backend, EncoderFactory encoderFactory,
-			IContentsImporter contentsImporter, ISyncStorage storage,
+			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			CollectionDao collectionDao) {
 		
-		super(backend, encoderFactory, contentsImporter, storage,
+		super(backend, encoderFactory, contentsImporter, 
 				contentsExporter, stMachine, collectionDao);
 	}
 

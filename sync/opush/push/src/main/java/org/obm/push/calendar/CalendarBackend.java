@@ -10,7 +10,6 @@ import java.util.List;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.IDBCP;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AttendeeStatus;
@@ -28,7 +27,6 @@ import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
-import org.obm.push.store.ISyncStorage;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -53,11 +51,11 @@ public class CalendarBackend extends ObmSyncBackend {
 	private final ImmutableMap<PIMDataType, ObmSyncCalendarConverter> converters;
 
 	@Inject
-	public CalendarBackend(ISyncStorage storage, DeviceDao deviceDao,
-			ConfigurationService configurationService, IDBCP dbcp, CollectionDao collectionDao)
+	public CalendarBackend(DeviceDao deviceDao,
+			ConfigurationService configurationService, CollectionDao collectionDao)
 			throws ConfigurationException {
 		
-		super(storage, deviceDao, configurationService, dbcp, collectionDao);
+		super(deviceDao, configurationService, collectionDao);
 		converters = ImmutableMap.of(
 				PIMDataType.CALENDAR, new EventConverter(),
 				PIMDataType.TASKS, new TodoConverter());

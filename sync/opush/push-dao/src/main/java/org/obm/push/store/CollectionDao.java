@@ -1,7 +1,9 @@
 package org.obm.push.store;
 
 import java.sql.SQLException;
+import java.util.Date;
 
+import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.CollectionNotFoundException;
 
@@ -23,5 +25,9 @@ public interface CollectionDao {
 	void updateState(String loginAtDomain, String devId, Integer collectionId, SyncState state) throws SQLException;
 
 	SyncState findStateForKey(String syncKey);
+	
+	ChangedCollections getCalendarChangedCollections(Date lastSync) throws SQLException;
+
+	ChangedCollections getContactChangedCollections(Date lastSync) throws SQLException;
 	
 }

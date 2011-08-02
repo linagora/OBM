@@ -24,7 +24,6 @@ import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.HearbeatDao;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.w3c.dom.Document;
 
@@ -41,12 +40,12 @@ public class PingHandler extends WbxmlRequestHandler implements
 
 	@Inject
 	protected PingHandler(IBackend backend, EncoderFactory encoderFactory,
-			IContentsImporter contentsImporter, ISyncStorage storage,
+			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			PingProtocol pingProtocol, MonitoredCollectionDao monitoredCollectionDao,
 			CollectionDao collectionDao, HearbeatDao hearbeatDao) {
 		
-		super(backend, encoderFactory, contentsImporter, storage,
+		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao);
 		this.monitoredCollectionDao = monitoredCollectionDao;
 		this.protocol = pingProtocol;

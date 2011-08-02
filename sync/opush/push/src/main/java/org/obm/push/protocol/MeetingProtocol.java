@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.MeetingHandlerRequest;
 import org.obm.push.bean.MeetingHandlerResponse;
 import org.obm.push.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
-import org.obm.push.data.calendarenum.AttendeeStatus;
 import org.obm.push.data.email.MeetingResponse;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.impl.MeetingResponseStatus;

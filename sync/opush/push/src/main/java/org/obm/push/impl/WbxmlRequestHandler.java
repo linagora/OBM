@@ -11,7 +11,6 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.logging.TechnicalLogType;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
@@ -34,20 +33,18 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 	protected final IBackend backend;
 	protected final EncoderFactory encoderFactory;
 	protected final IContentsImporter contentsImporter;
-	protected final ISyncStorage storage;
 	protected final IContentsExporter contentsExporter;
 	protected final StateMachine stMachine;
 	protected final CollectionDao collectionDao;
 
 	protected WbxmlRequestHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
-			ISyncStorage storage, IContentsExporter contentsExporter,
+			IContentsExporter contentsExporter,
 			StateMachine stMachine, CollectionDao collectionDao) {
 		
 		this.backend = backend;
 		this.encoderFactory = encoderFactory;
 		this.contentsImporter = contentsImporter;
-		this.storage = storage;
 		this.contentsExporter = contentsExporter;
 		this.stMachine = stMachine;
 		this.collectionDao = collectionDao;

@@ -9,8 +9,6 @@ import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.DBCP;
-import org.obm.dbcp.IDBCP;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -21,9 +19,7 @@ import org.obm.push.impl.InvitationFilterManagerImpl;
 import org.obm.push.mail.EmailManager;
 import org.obm.push.mail.IEmailManager;
 import org.obm.push.store.DaoModule;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.MonitoredCollectionDao;
-import org.obm.push.store.SyncStorage;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
@@ -67,7 +63,6 @@ public class GuiceServletContextListener implements ServletContextListener {
     	return Guice.createInjector(new AbstractModule() {
 			@Override
 			protected void configure() {
-				bind(ISyncStorage.class).to(SyncStorage.class);
 				bind(IEmailManager.class).to(EmailManager.class);
 				bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 				bind(IContentsExporter.class).to(ContentsExporter.class);
@@ -80,7 +75,6 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
 				bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
 				bind(ServletContext.class).toInstance(servletContext);
-				bind(IDBCP.class).to(DBCP.class);
 			}
     	}, new TransactionalModule(), new DaoModule());
     }

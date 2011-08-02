@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+
 import com.google.common.base.Objects;
 
 
@@ -25,15 +26,21 @@ public class SyncCollection implements Serializable{
 	private SyncCollectionOptions options;
 	
 	public SyncCollection() {
+		this(0, null);
+	}
+
+	public SyncCollection(int collectionId, String collectionPath) {
+		super();
+		this.collectionId = collectionId;
+		this.collectionPath = collectionPath;
 		fetchIds = new LinkedList<String>();
-		collectionId = 0;
 		moreAvailable = false;
 		windowSize = 100;
 		changes = new HashSet<SyncCollectionChange>();
 		status = SyncStatus.OK;
 		options = new SyncCollectionOptions();
 	}
-
+	
 	public SyncState getSyncState() {
 		return syncState;
 	}
@@ -150,5 +157,13 @@ public class SyncCollection implements Serializable{
 
 	public void setOptions(SyncCollectionOptions options) {
 		this.options = options;
+	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(getClass())
+				.add("id", collectionId)
+				.add("path", collectionPath)
+				.toString();
 	}
 }

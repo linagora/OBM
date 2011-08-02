@@ -21,7 +21,6 @@ import org.obm.push.search.StoreName;
 import org.obm.push.search.ldap.BookSource;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.ISyncStorage;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMultimap;
@@ -37,11 +36,11 @@ public class SearchHandler extends WbxmlRequestHandler {
 	@Inject
 	protected SearchHandler(IBackend backend, EncoderFactory encoderFactory,
 			BookSource bookSource, ObmSearchContact obmSearchContact,
-			IContentsImporter contentsImporter, ISyncStorage storage,
+			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			SearchProtocol searchProtocol, CollectionDao collectionDao) {
 		
-		super(backend, encoderFactory, contentsImporter, storage,
+		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao);
 		
 		this.protocol = searchProtocol;

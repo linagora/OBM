@@ -1,21 +1,17 @@
 package org.obm.push.exception;
 
 
-
-/**
- * 
- * @author adrienp
- *
- */
 public class CollectionNotFoundException extends ActiveSyncException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6611196276103565064L;
-
+	private Integer collectionId;
+	
 	public CollectionNotFoundException() {
 		super();
+	}
+	
+	public CollectionNotFoundException(int collectionId) {
+		super();
+		this.collectionId = collectionId;
 	}
 
 	public CollectionNotFoundException(String message, Throwable cause) {
@@ -30,4 +26,8 @@ public class CollectionNotFoundException extends ActiveSyncException {
 		super(cause);
 	}
 
+	public Integer getCollectionId() {
+		return collectionId;
+	}
+	
 }

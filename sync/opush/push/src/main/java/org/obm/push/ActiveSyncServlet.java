@@ -38,7 +38,7 @@ import org.obm.push.impl.SettingsHandler;
 import org.obm.push.impl.SmartForwardHandler;
 import org.obm.push.impl.SmartReplyHandler;
 import org.obm.push.logging.TechnicalLogType;
-import org.obm.push.store.ISyncStorage;
+import org.obm.push.store.DeviceDao;
 import org.obm.push.store.SyncHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,9 +60,9 @@ public class ActiveSyncServlet extends HttpServlet {
 	private Map<String, IRequestHandler> handlers;
 	private SessionService sessionService;
 	private LoggerService loggerService; 
-	private ISyncStorage storage;
 	private IBackend backend;
 	private PushContinuation.Factory continuationFactory;
+	private DeviceDao deviceDao;
 
 	@Override
 	protected void service(HttpServletRequest request,
@@ -150,10 +150,10 @@ public class ActiveSyncServlet extends HttpServlet {
 					.getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
 		
 		loggerService = injector.getInstance(LoggerService.class);
-		storage = injector.getInstance(ISyncStorage.class);
 		backend = injector.getInstance(IBackend.class);
 		sessionService = injector.getInstance(SessionService.class);
 		continuationFactory = injector.getInstance(PushContinuation.Factory.class);
+		deviceDao = injector.getInstance(DeviceDao.class);
 		
 		handlers = createHandlersMap();
 		logger.info("Opush ActiveSync servlet initialised.");
@@ -212,10 +212,10 @@ public class ActiveSyncServlet extends HttpServlet {
 						String password = userPass.substring(p + 1);
 						String loginAtDomain = getLoginAtDomain(userId);
 						String deviceId = request.p("DeviceId");
-						valid = storage.initDevice(loginAtDomain, deviceId,
+						valid = initDevice(loginAtDomain, deviceId,
 								request.extractDeviceType())
 								&& validatePassword(loginAtDomain, password)
-								&& storage.syncAuthorized(loginAtDomain,
+								&& deviceDao.syncAuthorized(loginAtDomain,
 										deviceId);
 						if (valid) {
 							loggerService.initLoggerSession(loginAtDomain);
@@ -239,6 +239,26 @@ public class ActiveSyncServlet extends HttpServlet {
 			response.setStatus(401);
 		}
 		return creds;
+	}
+
+	private boolean initDevice(String loginAtDomain, String deviceId,
+			String deviceType) {
+		boolean ret = true;
+		try {
+			Integer opushDeviceId = deviceDao.findDevice(loginAtDomain, deviceId);
+			if (opushDeviceId == null) {
+				boolean registered = deviceDao.registerNewDevice(loginAtDomain, deviceId, deviceType);
+				if (!registered) {
+					logger.warn("did not insert any row in device table for device "
+							+ deviceType + " of " + loginAtDomain);
+					ret = false;
+				}
+			}
+		} catch (Throwable se) {
+			logger.error(se.getMessage(), se);
+			ret = false;
+		}
+		return ret;
 	}
 
 	private void processActiveSyncMethod(IContinuation continuation,

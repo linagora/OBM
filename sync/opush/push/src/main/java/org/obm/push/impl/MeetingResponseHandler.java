@@ -26,7 +26,6 @@ import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.ISyncStorage;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -43,10 +42,10 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	@Inject
 	protected MeetingResponseHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
-			ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine, MeetingProtocol meetingProtocol, CollectionDao collectionDao) {
+			IContentsExporter contentsExporter,	StateMachine stMachine, 
+			MeetingProtocol meetingProtocol, CollectionDao collectionDao) {
 		
-		super(backend, encoderFactory, contentsImporter, storage,
+		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao);
 		this.meetingProtocol = meetingProtocol;
 	}

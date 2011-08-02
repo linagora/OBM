@@ -7,8 +7,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.impl.ChangedCollections;
-
+import org.obm.push.bean.ChangedCollections;
 import com.google.common.collect.ImmutableSet;
 
 public class CollectionChangeListenerTest {

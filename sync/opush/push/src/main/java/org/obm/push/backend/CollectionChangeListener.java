@@ -4,8 +4,8 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.impl.ChangedCollections;
 
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Sets;

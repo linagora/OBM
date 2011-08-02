@@ -5,64 +5,77 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obm.dbcp.IDBCP;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
-import org.obm.push.impl.ChangedCollections;
+import org.obm.push.bean.ChangedCollections;
 import org.obm.push.impl.PushNotification;
+import org.obm.push.store.CollectionDao;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 public abstract class MonitoringThread extends OpushMonitoringThread implements Runnable {
 	
-	protected final IDBCP dbcp;
-	
+	protected final CollectionDao collectionDao;
 	private final Set<ICollectionChangeListener> ccls;
 	private final long freqMillisec;
 	private boolean stopped;
 	
-	protected abstract ChangedCollections getChangedCollections(Date lastSync);
+	protected abstract ChangedCollections getChangedCollections(Date lastSync) throws ChangedCollectionsException;
 	
 	protected MonitoringThread(long freqMillisec,
 			Set<ICollectionChangeListener> ccls,
-			IDBCP dbcp, IContentsExporter contentsExporter) {
-		
+			CollectionDao collectionDao, IContentsExporter contentsExporter) {
 		super(contentsExporter);
-		
+
 		this.freqMillisec = freqMillisec;
 		this.stopped = false;
 		this.ccls = ccls;
-		this.dbcp = dbcp;
+		this.collectionDao = collectionDao;
 	}
 	
 	@Override
 	public void run() {
-		Date lastSync = getBaseLastSync();
-		
-		while (!stopped) {
-			try {
-				Thread.sleep(freqMillisec);
-			} catch (InterruptedException e) {
-				stopped = true;
-				continue;
-			}
-				
-			List<PushNotification> toNotify = ImmutableList.<PushNotification>of();
-			
-			synchronized (ccls) {
-				if (ccls.isEmpty()) {
-					continue;
+		try {
+			Date lastSync = getBaseLastSync();
+			logger.info("lastsync: "+lastSync);
+			while (!stopped) {
+				try {
+					try {
+						Thread.sleep(freqMillisec);
+					} catch (InterruptedException e) {
+						stopped = true;
+						continue;
+					}
+						
+					List<PushNotification> toNotify = ImmutableList.<PushNotification>of();
+					
+					synchronized (ccls) {
+						if (ccls.isEmpty()) {
+							continue;
+						}
+						ChangedCollections changedCollections = getChangedCollections(lastSync);
+						
+			            if (logger.isInfoEnabled() && changedCollections.getChanged().size() > 0) {
+							logger.info("changed collections: " + changedCollections.toString());
+						}
+						toNotify = listPushNotification(selectListenersToNotify(changedCollections, ccls));
+					}
+					
+					for (PushNotification listener: toNotify) {
+						listener.emit();
+					}
+					ChangedCollections changedCollections = getChangedCollections(lastSync);
+					toNotify = listPushNotification(selectListenersToNotify(changedCollections, ccls));
+					lastSync = changedCollections.getLastSync();
+
+				} catch (ChangedCollectionsException e1) {
+					logger.error(e1.getMessage(), e1);
 				}
-				ChangedCollections changedCollections = getChangedCollections(lastSync);
-				toNotify = listPushNotification(selectListenersToNotify(changedCollections, ccls));
-				lastSync = changedCollections.getLastSync();
 			}
-			
-			for (PushNotification listener: toNotify) {
-				listener.emit();
-			}
-		}
+		} catch (ChangedCollectionsException e1) {
+			logger.error(e1.getMessage(), e1);
+		}	
 	}
 
 	private Set<ICollectionChangeListener> selectListenersToNotify(ChangedCollections changedCollections,
@@ -83,9 +96,15 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 		
 	}
 
-	private Date getBaseLastSync() {
+	private Date getBaseLastSync() throws ChangedCollectionsException {
 		ChangedCollections collections = getChangedCollections(new Date(0));
 		return collections.getLastSync();
+	}
+	
+	protected class ChangedCollectionsException extends Exception {
+		public ChangedCollectionsException(Throwable cause) {
+			super(cause);
+		}
 	}
 	
 }

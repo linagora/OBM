@@ -18,5 +18,19 @@ public enum PIMDataType {
 			return "";
 		}
 	}
+	
+	public static PIMDataType getPIMDataType(String collectionPath) {
+		if (collectionPath.contains("\\calendar\\")) {
+			return PIMDataType.CALENDAR;
+		} else if (collectionPath.contains("\\contacts")) {
+			return PIMDataType.CONTACTS;
+		} else if (collectionPath.contains("\\email\\")) {
+			return PIMDataType.EMAIL;
+		} else if (collectionPath.contains("\\tasks\\")) {
+			return PIMDataType.TASKS;
+		} else {
+			return PIMDataType.FOLDER;
+		}
+	}
 
 }

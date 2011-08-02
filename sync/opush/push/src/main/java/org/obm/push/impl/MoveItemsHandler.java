@@ -16,13 +16,12 @@ import org.obm.push.bean.MoveItemsResponse;
 import org.obm.push.bean.MoveItemsResponse.MoveItemsItem;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.data.EncoderFactory;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.protocol.MoveItemsProtocol;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -40,11 +39,11 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 
 	@Inject
 	protected MoveItemsHandler(IBackend backend, EncoderFactory encoderFactory,
-			IContentsImporter contentsImporter, ISyncStorage storage,
-			IContentsExporter contentsExporter, StateMachine stMachine, MoveItemsProtocol moveItemsProtocol,
+			IContentsImporter contentsImporter, IContentsExporter contentsExporter, 
+			StateMachine stMachine, MoveItemsProtocol moveItemsProtocol,
 			CollectionDao collectionDao) {
 		
-		super(backend, encoderFactory, contentsImporter, storage, contentsExporter, stMachine, collectionDao);
+		super(backend, encoderFactory, contentsImporter, contentsExporter, stMachine, collectionDao);
 		this.moveItemsProtocol = moveItemsProtocol;
 	}
 
@@ -90,7 +89,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			MoveItemsItem moveItemsItem = new MoveItemsItem(statusForItem.status, item.getSourceMessageId());
 			if (statusForItem.status == null) {
 				try {
-					PIMDataType dataClass = storage.getDataClass(statusForItem.srcCollection);
+					PIMDataType dataClass = PIMDataType.getPIMDataType(statusForItem.srcCollection);
 					String newDstId = contentsImporter.importMoveItem(bs, dataClass, statusForItem.srcCollection, statusForItem.dstCollection, item.getSourceMessageId());
 					
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SUCCESS);
@@ -116,14 +115,14 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 		StatusForItem status = new StatusForItem();
 		try {
 			status.dstCollectionId = Integer.parseInt(item.getDestinationFolderId());
-			status.dstCollection = storage.getCollectionPath(status.dstCollectionId);
+			status.dstCollection = collectionDao.getCollectionPath(status.dstCollectionId);
 		} catch (CollectionNotFoundException ex) {
 			status.status = MoveItemsStatus.INVALID_DESTINATION_COLLECTION_ID;
 		}
 		
 		try {
 			status.srcCollectionId = Integer.parseInt(item.getSourceFolderId());
-			status.srcCollection = storage.getCollectionPath(status.srcCollectionId);
+			status.srcCollection = collectionDao.getCollectionPath(status.srcCollectionId);
 		} catch (CollectionNotFoundException ex) {
 			status.status = MoveItemsStatus.INVALID_SOURCE_COLLECTION_ID;
 		}

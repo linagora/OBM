@@ -5,12 +5,10 @@ import java.sql.SQLException;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.IDBCP;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
-import org.obm.push.store.ISyncStorage;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -19,12 +17,11 @@ import com.google.inject.Singleton;
 public class FolderBackend extends ObmSyncBackend {
 
 	@Inject
-	private FolderBackend(ISyncStorage storage, DeviceDao deviceDao,
-			ConfigurationService configurationService, IDBCP dbcp,
-			CollectionDao collectionDao)
+	private FolderBackend(DeviceDao deviceDao,
+			ConfigurationService configurationService, CollectionDao collectionDao)
 			throws ConfigurationException {
 		
-		super(storage, deviceDao, configurationService, dbcp, collectionDao);
+		super(deviceDao, configurationService, collectionDao);
 	}
 
 	public void synchronize(BackendSession bs) throws SQLException {

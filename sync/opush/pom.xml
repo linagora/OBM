@@ -36,6 +36,7 @@
 		<module>mime</module>
 		<module>technical-log</module>
 		<module>push-dao</module>
+		<module>push-bean</module>
 	</modules>
 
 	<dependencyManagement>

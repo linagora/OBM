@@ -18,15 +18,11 @@ import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
-import org.obm.push.tnefconverter.RTFUtils;
-import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -41,11 +37,11 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	@Inject
 	protected GetItemEstimateHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
-			ISyncStorage storage, IContentsExporter contentsExporter, StateMachine stMachine,
+			IContentsExporter contentsExporter, StateMachine stMachine,
 			UnsynchronizedItemDao unSynchronizedItemCache, CollectionDao collectionDao,
 			GetItemEstimateProtocol protocol) {
 		
-		super(backend, encoderFactory, contentsImporter, storage,
+		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.protocol = protocol;
@@ -79,7 +75,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		for (SyncCollection syncCollection: request.getSyncCollections()) {
 			Integer collectionId = syncCollection.getCollectionId();
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
-			PIMDataType dataType = storage.getDataClass(collectionPath);
+			PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
 			syncCollection.setCollectionPath(collectionPath);
 			syncCollection.setDataType(dataType);
 

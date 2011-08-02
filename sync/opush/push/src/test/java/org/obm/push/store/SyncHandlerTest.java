@@ -32,7 +32,7 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.data.CalendarEncoder;
 import org.obm.push.data.EncoderFactory;
-import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.impl.Responder;
 import org.obm.push.state.StateMachine;
 import org.obm.push.utils.DOMUtils;
@@ -96,7 +96,7 @@ public class SyncHandlerTest {
 		
 		UnsynchronizedItemDao synchronizedItemCache = EasyMock.createMock(UnsynchronizedItemDao.class);
 		MonitoredCollectionDao monitoredCollectionStoreService = EasyMock.createMock(MonitoredCollectionDao.class);
-		SyncHandler syncHandler = new SyncHandler(backend, encoderFactory, null, null, exporter, 
+		SyncHandler syncHandler = new SyncHandler(backend, encoderFactory, null, exporter, 
 				stateMachine, synchronizedItemCache, monitoredCollectionStoreService, null, null);
 				
 		Responder responder = EasyMock.createMock(Responder.class);

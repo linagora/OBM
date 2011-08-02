@@ -1,8 +1,5 @@
 package org.obm.push.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -11,7 +8,6 @@ import java.util.List;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.IDBCP;
 import org.obm.locator.LocatorClient;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.bean.ItemChange;
@@ -20,8 +16,6 @@ import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
-import org.obm.push.store.ISyncStorage;
-import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.book.BookClient;
@@ -41,24 +35,18 @@ public class ObmSyncBackend {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected String obmSyncHost;
-	protected ISyncStorage storage;
 	private final DeviceDao deviceDao;
 	private final CollectionDao collectionDao;
 	private final LocatorClient locatorClient;
-	private final IDBCP dbcp;
 
-	protected ObmSyncBackend(ISyncStorage storage, DeviceDao deviceDao,
-			ConfigurationService configurationService, IDBCP dbcp, 
+	protected ObmSyncBackend(DeviceDao deviceDao, ConfigurationService configurationService, 
 			CollectionDao collectionDao)
 			throws ConfigurationException {
 
-		this.dbcp = dbcp;
 		this.locatorClient = new LocatorClient(
 				configurationService.getLocatorUrl());
 		this.deviceDao = deviceDao;
-		this.storage = storage;
 		this.collectionDao = collectionDao;
-		validateOBMConnection();
 	}
 
 	protected void locateObmSync(String loginAtDomain) {
@@ -142,25 +130,7 @@ public class ObmSyncBackend {
 			cc.logout(token);
 		}
 	}
-
-	private void validateOBMConnection() {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			con = dbcp.getConnection();
-			ps = con.prepareStatement("select now()");
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				logger.info("OBM Db connection is OK");
-			}
-		} catch (Exception e) {
-			logger.error("OBM Db connection is broken: " + e.getMessage(), e);
-		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
-		}
-	}
-
+	
 	protected String getDefaultCalendarName(BackendSession bs) {
 		return "obm:\\\\" + bs.getLoginAtDomain() + "\\calendar\\"
 				+ bs.getLoginAtDomain();

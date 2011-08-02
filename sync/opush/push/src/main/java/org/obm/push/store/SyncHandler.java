@@ -28,17 +28,14 @@ import org.obm.push.bean.SyncResponse;
 import org.obm.push.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.exception.NoDocumentException;
-import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
-import org.obm.push.data.IDataEncoder;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.ObjectNotFoundException;
@@ -93,12 +90,12 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
-			IContentsImporter contentsImporter, ISyncStorage storage, IContentsExporter contentsExporter,
+			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
 			StateMachine stMachine, UnsynchronizedItemDao unSynchronizedItemCache,
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
 			CollectionDao collectionDao) {
 		
-		super(backend, encoderFactory, contentsImporter, storage, contentsExporter, stMachine, collectionDao);
+		super(backend, encoderFactory, contentsImporter, contentsExporter, stMachine, collectionDao);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.monitoredCollectionService = monitoredCollectionService;
 		this.syncProtocol = SyncProtocol;
@@ -158,8 +155,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		for (SyncCollection sc : sync.getCollections()) {
 			String collectionPath = collectionDao.getCollectionPath(sc.getCollectionId());
 			sc.setCollectionPath(collectionPath);
-			PIMDataType dataClass = storage.getDataClass(
-					collectionPath);
+			PIMDataType dataClass = PIMDataType.getPIMDataType(collectionPath);
 			if ("email".equalsIgnoreCase(dataClass.toString())) {
 				backend.startEmailMonitoring(bs, sc.getCollectionId());
 				break;

@@ -24,7 +24,6 @@ import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
@@ -42,16 +41,14 @@ public class SyncDecoder {
 
 	private static final Logger logger = LoggerFactory.getLogger(SyncDecoder.class);
 	
-	private final ISyncStorage store;
 	private final CollectionDao collectionDao;
 	private final SyncedCollectionDao syncedCollectionStoreService;
 	private final Map<PIMDataType, IDataDecoder> decoders;
 
 	@Inject
-	private SyncDecoder(SyncedCollectionDao syncedCollectionStoreService, ISyncStorage store, 
+	private SyncDecoder(SyncedCollectionDao syncedCollectionStoreService,
 			CollectionDao collectionDao) {
 		this.collectionDao = collectionDao;
-		this.store = store;
 		this.syncedCollectionStoreService = syncedCollectionStoreService;
 		this.decoders = ImmutableMap.<PIMDataType, IDataDecoder>builder()
 				.put(PIMDataType.CONTACTS, new ContactDecoder())
@@ -115,7 +112,7 @@ public class SyncDecoder {
 			collection.setCollectionId(collectionId);
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			collection.setCollectionPath(collectionPath);
-			PIMDataType dataType = store.getDataClass(collectionPath);
+			PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
 			collection.setDataType(dataType);
 			collection.setDataClass(DOMUtils.getElementText(col, "Class"));
 			collection.setSyncKey(DOMUtils.getElementText(col, "SyncKey"));

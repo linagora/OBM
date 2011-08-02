@@ -33,7 +33,7 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 		ResultSet rs = null;
 
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT last_heartbeat FROM opush_ping_heartbeat WHERE device_id=?");
 			ps.setInt(1, id);
 
@@ -55,7 +55,7 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
-			con = dbcp.getDataSource().getConnection();
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("DELETE FROM opush_ping_heartbeat WHERE device_id=? ");
 			ps.setInt(1, id);
 			ps.executeUpdate();

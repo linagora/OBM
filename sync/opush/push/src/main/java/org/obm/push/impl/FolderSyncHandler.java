@@ -21,7 +21,6 @@ import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.protocol.FolderSyncProtocol;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.CollectionDao;
 import org.w3c.dom.Document;
 
@@ -36,12 +35,11 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	
 	@Inject
 	protected FolderSyncHandler(IBackend backend, EncoderFactory encoderFactory,
-			IContentsImporter contentsImporter, ISyncStorage storage,
-			IHierarchyExporter hierarchyExporter,
+			IContentsImporter contentsImporter, IHierarchyExporter hierarchyExporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			CollectionDao collectionDao, FolderSyncProtocol protocol) {
 		
-		super(backend, encoderFactory, contentsImporter, storage,
+		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao);
 		
 		this.hierarchyExporter = hierarchyExporter;

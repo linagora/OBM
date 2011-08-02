@@ -33,7 +33,6 @@ import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.search.StoreName;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.utils.FileUtils;
 import org.w3c.dom.Document;
 
@@ -49,10 +48,10 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	@Inject
 	protected ItemOperationsHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
-			ISyncStorage storage, IContentsExporter contentsExporter,
+			IContentsExporter contentsExporter,
 			StateMachine stMachine, ItemOperationsProtocol protocol,
 			CollectionDao collectionDao) {
-		super(backend, encoderFactory, contentsImporter, storage,
+		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao);
 		this.protocol = protocol;
 	}
@@ -158,7 +157,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		FetchItemResult fetchResult = new FetchItemResult();
 		try {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
-			PIMDataType dataType = storage.getDataClass(collectionPath);
+			PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
 			
 			List<ItemChange> itemChanges = contentsExporter.fetch(bs, dataType, ImmutableList.of(serverId));
 			if (itemChanges.isEmpty()) {

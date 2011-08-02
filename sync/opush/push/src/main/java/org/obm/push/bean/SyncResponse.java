@@ -4,10 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.data.EncoderFactory;
-import org.obm.push.store.SyncCollection;
 
 public class SyncResponse {
 

@@ -16,7 +16,6 @@ import org.obm.push.exception.InvalidPolicyKeyException;
 import org.obm.push.protocol.ProvisionProtocol;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.ISyncStorage;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -32,11 +31,10 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	@Inject
 	protected ProvisionHandler(IBackend backend, EncoderFactory encoderFactory,
 			Random random, IContentsImporter contentsImporter,
-			ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine, CollectionDao collectionDao, 
+			IContentsExporter contentsExporter, StateMachine stMachine, CollectionDao collectionDao, 
 			ProvisionProtocol provisionProtocol) {
 		
-		super(backend, encoderFactory, contentsImporter, storage,
+		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao);
 		
 		this.random = random;

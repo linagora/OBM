@@ -8,7 +8,6 @@ import java.util.List;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.dbcp.IDBCP;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.FolderType;
@@ -20,7 +19,6 @@ import org.obm.push.exception.FolderTypeNotFoundException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.BookType;
@@ -35,11 +33,11 @@ import com.google.inject.Singleton;
 public class ContactsBackend extends ObmSyncBackend {
 
 	@Inject
-	private ContactsBackend(ISyncStorage storage, DeviceDaoJdbcImpl deviceDao,
-			ConfigurationService configurationService, IDBCP dbcp, CollectionDao collectionDao)
+	private ContactsBackend(DeviceDaoJdbcImpl deviceDao,
+			ConfigurationService configurationService, CollectionDao collectionDao)
 			throws ConfigurationException {
 		
-		super(storage, deviceDao, configurationService, dbcp, collectionDao);
+		super(deviceDao, configurationService, collectionDao);
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
