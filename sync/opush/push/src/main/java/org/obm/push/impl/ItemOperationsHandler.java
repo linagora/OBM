@@ -9,7 +9,6 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.backend.MSAttachementData;
 import org.obm.push.bean.ItemOperationsRequest;
 import org.obm.push.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
 import org.obm.push.bean.ItemOperationsRequest.Fetch;
@@ -18,21 +17,23 @@ import org.obm.push.bean.ItemOperationsResponse.EmptyFolderContentsResult;
 import org.obm.push.bean.ItemOperationsResponse.MailboxFetchResult;
 import org.obm.push.bean.ItemOperationsResponse.MailboxFetchResult.FetchAttachmentResult;
 import org.obm.push.bean.ItemOperationsResponse.MailboxFetchResult.FetchItemResult;
+import org.obm.push.bean.MSAttachementData;
 import org.obm.push.data.EncoderFactory;
+import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.UnsupportedStoreException;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.search.StoreName;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.BodyPreference;
-import org.obm.push.store.CollectionNotFoundException;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.MSEmailBodyType;
-import org.obm.push.store.PIMDataType;
-import org.obm.push.store.SyncCollection;
-import org.obm.push.store.SyncCollectionOptions;
 import org.obm.push.utils.FileUtils;
 import org.w3c.dom.Document;
 
@@ -49,10 +50,10 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	protected ItemOperationsHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine, ItemOperationsProtocol protocol) {
-
+			StateMachine stMachine, ItemOperationsProtocol protocol,
+			CollectionDao collectionDao) {
 		super(backend, encoderFactory, contentsImporter, storage,
-				contentsExporter, stMachine);
+				contentsExporter, stMachine, collectionDao);
 		this.protocol = protocol;
 	}
 
@@ -114,7 +115,6 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			mailboxFetchResponse.setFetchAttachmentResult(fileReferenceFetch);
 			
 		} else if (fetch.getCollectionId() != null && fetch.getServerId() != null) {
-			
 			try {
 				Integer collectionId = Integer.valueOf(fetch.getCollectionId());
 				mailboxFetchResponse.setFetchItemResult(fetchItem(fetch.getServerId(), collectionId, fetch.getType(), bs));
@@ -157,7 +157,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		
 		FetchItemResult fetchResult = new FetchItemResult();
 		try {
-			String collectionPath = storage.getCollectionPath(collectionId);
+			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			PIMDataType dataType = storage.getDataClass(collectionPath);
 			
 			List<ItemChange> itemChanges = contentsExporter.fetch(bs, dataType, ImmutableList.of(serverId));
@@ -188,7 +188,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		
 		EmptyFolderContentsResult emptyFolderContentsResult = new EmptyFolderContentsResult();
 		try {
-			String collectionPath = storage.getCollectionPath(request.getCollectionId());
+			String collectionPath = collectionDao.getCollectionPath(request.getCollectionId());
 			contentsImporter.emptyFolderContent(bs, collectionPath, request.isDeleteSubFolderElem());
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SUCCESS);
 		} catch (CollectionNotFoundException e) {

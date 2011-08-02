@@ -10,6 +10,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.state.StateMachine;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.logging.TechnicalLogType;
 import org.obm.push.utils.FileUtils;
@@ -36,11 +37,12 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 	protected final ISyncStorage storage;
 	protected final IContentsExporter contentsExporter;
 	protected final StateMachine stMachine;
+	protected final CollectionDao collectionDao;
 
 	protected WbxmlRequestHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine) {
+			StateMachine stMachine, CollectionDao collectionDao) {
 		
 		this.backend = backend;
 		this.encoderFactory = encoderFactory;
@@ -48,6 +50,7 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 		this.storage = storage;
 		this.contentsExporter = contentsExporter;
 		this.stMachine = stMachine;
+		this.collectionDao = collectionDao;
 	}
 
 	@Override

@@ -2,8 +2,8 @@ package org.obm.push;
 
 import java.util.Set;
 
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.impl.Credentials;
-import org.obm.push.store.SyncCollection;
 
 public interface MonitoredCollectionStoreService {
 	

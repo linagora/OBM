@@ -4,14 +4,14 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateRequest;
 import org.obm.push.bean.GetItemEstimateResponse;
 import org.obm.push.bean.GetItemEstimateResponse.Estimate;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.impl.GetItemEstimateStatus;
 import org.obm.push.store.CollectionNotFoundException;
-import org.obm.push.store.FilterType;
-import org.obm.push.store.SyncCollection;
-import org.obm.push.store.SyncCollectionOptions;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

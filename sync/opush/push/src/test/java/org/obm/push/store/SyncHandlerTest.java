@@ -25,11 +25,16 @@ import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.backend.MSEvent;
+import org.obm.push.bean.CalendarBusyStatus;
+import org.obm.push.bean.CalendarSensitivity;
+import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionChange;
+import org.obm.push.bean.SyncState;
 import org.obm.push.data.CalendarEncoder;
 import org.obm.push.data.EncoderFactory;
-import org.obm.push.data.calendarenum.CalendarBusyStatus;
-import org.obm.push.data.calendarenum.CalendarSensitivity;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.impl.Responder;
 import org.obm.push.state.StateMachine;
 import org.obm.push.utils.DOMUtils;
@@ -94,7 +99,7 @@ public class SyncHandlerTest {
 		UnsynchronizedItemService synchronizedItemCache = EasyMock.createMock(UnsynchronizedItemService.class);
 		MonitoredCollectionStoreService monitoredCollectionStoreService = EasyMock.createMock(MonitoredCollectionStoreService.class);
 		SyncHandler syncHandler = new SyncHandler(backend, encoderFactory, null, null, exporter, 
-				stateMachine, synchronizedItemCache, monitoredCollectionStoreService, null);
+				stateMachine, synchronizedItemCache, monitoredCollectionStoreService, null, null);
 				
 		Responder responder = EasyMock.createMock(Responder.class);
 		Capture<Document> document = new Capture<Document>();

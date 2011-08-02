@@ -14,14 +14,15 @@ import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.bean.FolderSyncRequest;
 import org.obm.push.bean.FolderSyncResponse;
 import org.obm.push.data.EncoderFactory;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.protocol.FolderSyncProtocol;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.CollectionNotFoundException;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.SyncState;
+import org.obm.push.bean.SyncState;
+import org.obm.push.store.CollectionDao;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -38,10 +39,10 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			IContentsImporter contentsImporter, ISyncStorage storage,
 			IHierarchyExporter hierarchyExporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
-			FolderSyncProtocol protocol) {
+			CollectionDao collectionDao, FolderSyncProtocol protocol) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
-				contentsExporter, stMachine);
+				contentsExporter, stMachine, collectionDao);
 		
 		this.hierarchyExporter = hierarchyExporter;
 		this.protocol = protocol;

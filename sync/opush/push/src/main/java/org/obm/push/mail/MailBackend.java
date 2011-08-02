@@ -26,8 +26,13 @@ import org.obm.dbcp.IDBCP;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.MSAttachementData;
-import org.obm.push.backend.MSEmail;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSAttachementData;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.SyncState;
+import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.FolderTypeNotFoundException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ObjectNotFoundException;
@@ -36,14 +41,11 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.impl.ObmSyncBackend;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.CollectionNotFoundException;
-import org.obm.push.store.DeviceDao;
-import org.obm.push.store.FilterType;
+import org.obm.push.store.CollectionDao;
+import org.obm.push.store.FiltrageInvitationDao;
 import org.obm.push.store.FolderType;
-import org.obm.push.store.IApplicationData;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.SyncState;
+import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
@@ -60,14 +62,17 @@ import com.google.inject.Singleton;
 public class MailBackend extends ObmSyncBackend {
 
 	private final IEmailManager emailManager;
+	private final FiltrageInvitationDao filtrageInvitationDao;
 
 	@Inject
-	private MailBackend(ISyncStorage storage, DeviceDao deviceDao, IEmailManager emailManager,
-			ConfigurationService configurationService, IDBCP dbcp)
+	private MailBackend(ISyncStorage storage, DeviceDaoJdbcImpl deviceDao, IEmailManager emailManager,
+			ConfigurationService configurationService, IDBCP dbcp, CollectionDao collectionDao,
+			FiltrageInvitationDao filtrageInvitationDao)
 			throws ConfigurationException {
 		
-		super(storage, deviceDao, configurationService, dbcp);
+		super(storage, deviceDao, configurationService, dbcp, collectionDao);
 		this.emailManager = emailManager;
+		this.filtrageInvitationDao = filtrageInvitationDao;
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
@@ -239,7 +244,7 @@ public class MailBackend extends ObmSyncBackend {
 			String calPath = getDefaultCalendarName(bs);
 			Integer eventCollectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(),
 					calPath);
-			storage.removeInvitationStatus(eventCollectionId,
+			filtrageInvitationDao.removeInvitationStatus(eventCollectionId,
 					emailCollectionId, mailUid);
 		} catch (CollectionNotFoundException e) {
 			logger.error(e.getMessage(), e);

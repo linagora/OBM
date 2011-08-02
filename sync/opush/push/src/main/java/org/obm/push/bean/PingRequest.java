@@ -2,8 +2,6 @@ package org.obm.push.bean;
 
 import java.util.Set;
 
-import org.obm.push.store.SyncCollection;
-
 public class PingRequest {
 
 	private Long heartbeatInterval;

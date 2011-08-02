@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.obm.push.store.SyncCollection;
+import org.obm.push.bean.SyncCollection;
 
 import com.google.common.collect.ImmutableSet;
 

@@ -1,6 +1,6 @@
 package org.obm.push.data.email;
 
-import org.obm.push.data.calendarenum.AttendeeStatus;
+import org.obm.push.bean.AttendeeStatus;
 
 public class MeetingResponse {
 	

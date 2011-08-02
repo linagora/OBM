@@ -58,5 +58,14 @@
 			<artifactId>configuration</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-bean</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 </project>

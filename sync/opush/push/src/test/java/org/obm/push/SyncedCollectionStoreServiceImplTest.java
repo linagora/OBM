@@ -13,8 +13,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.impl.Credentials;
-import org.obm.push.store.SyncCollection;
 
 import com.atomikos.icatch.jta.UserTransactionManager;
 import com.google.common.collect.Lists;

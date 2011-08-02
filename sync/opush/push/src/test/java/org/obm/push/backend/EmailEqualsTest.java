@@ -1,7 +1,7 @@
 package org.obm.push.backend;
 
 import org.junit.Test;
-import org.obm.push.store.Email;
+import org.obm.push.bean.Email;
 
 import junit.framework.Assert;
 

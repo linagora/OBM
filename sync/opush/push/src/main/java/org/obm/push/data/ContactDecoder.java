@@ -1,8 +1,8 @@
 package org.obm.push.data;
 
-import org.obm.push.backend.MSContact;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSContact;
 import org.obm.push.data.email.Type;
-import org.obm.push.store.IApplicationData;
 import org.obm.push.tnefconverter.RTFUtils;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;

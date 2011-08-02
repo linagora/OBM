@@ -2,7 +2,6 @@ package org.obm.push.bean;
 
 import org.obm.push.ItemChange;
 import org.obm.push.impl.ItemOperationsStatus;
-import org.obm.push.store.SyncCollection;
 
 public class ItemOperationsResponse {
 

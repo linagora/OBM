@@ -12,10 +12,10 @@ import org.minig.imap.idle.IdleTag;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.impl.PushNotification;
 import org.obm.push.mail.IEmailManager;
-import org.obm.push.store.ActiveSyncException;
 
 public class EmailMonitoringThread extends OpushMonitoringThread implements IIdleCallback {
 	

@@ -5,21 +5,21 @@ import java.sql.SQLException;
 
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsImporter;
-import org.obm.push.backend.MSContact;
-import org.obm.push.backend.MSEmail;
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSContact;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
-import org.obm.push.data.calendarenum.AttendeeStatus;
+import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.mail.MailBackend;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.CollectionNotFoundException;
-import org.obm.push.store.IApplicationData;
-import org.obm.push.store.PIMDataType;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

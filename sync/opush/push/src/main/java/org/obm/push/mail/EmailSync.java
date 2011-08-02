@@ -28,11 +28,11 @@ import org.minig.imap.FastFetch;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.Email;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ServerErrorException;
-import org.obm.push.store.Email;
-import org.obm.push.store.FilterType;
-import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.SyncState;
+import org.obm.push.store.EmailDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,11 +48,11 @@ public class EmailSync implements IEmailSync {
 
 	private final static Logger logger = LoggerFactory.getLogger(EmailSync.class);
 
-	private final ISyncStorage storage;
+	private final EmailDao emailDao;
 
 	@Inject
-	public EmailSync(ISyncStorage storage) {
-		this.storage = storage;
+	public EmailSync(EmailDao emailDao) {
+		this.emailDao = emailDao;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class EmailSync implements IEmailSync {
 			long time = getCurrentTime();
 			long ct = getCurrentTime();
 			
-			final Set<Email> syncedMail = storage.getSyncedMail(devId, collectionId);
+			final Set<Email> syncedMail = emailDao.getSyncedMail(devId, collectionId);
 			
 			ct = computeTime(ct);
 			
@@ -162,7 +162,7 @@ public class EmailSync implements IEmailSync {
 			Set<Email> syncedMails, Collection<Email> allMailToSync, Date lastSync) {
 		
 		final Set<Long> removed = new HashSet<Long>();
-		Collection<Long> uidDeletedMails = storage.getDeletedMail(devId, collectionId, lastSync);
+		Collection<Long> uidDeletedMails = emailDao.getDeletedMail(devId, collectionId, lastSync);
 		Collection<Long> uidSyncedMails = transformEmailToUid(syncedMails);
 		Collection<Long> uidAllMailToSync = transformEmailToUid(allMailToSync);
 		
@@ -188,7 +188,7 @@ public class EmailSync implements IEmailSync {
 			}
 		}
 
-		Set<Email> updated = storage.getUpdatedMail(devId, collectionId, lastSync);
+		Set<Email> updated = emailDao.getUpdatedMail(devId, collectionId, lastSync);
 		builder.addAll(updated.iterator());
 		
 		return builder.build();
@@ -199,11 +199,11 @@ public class EmailSync implements IEmailSync {
 			throws SQLException {
 		
 		if (removed.size() > 0) {
-			storage.removeMessages(devId, collectionId, lastSync, removed);
+			emailDao.removeMessages(devId, collectionId, lastSync, removed);
 		}
 		
 		if (updated.size() > 0) {
-			storage.addMessages(devId, collectionId, lastSync, updated);
+			emailDao.addMessages(devId, collectionId, lastSync, updated);
 		}
 	}
 

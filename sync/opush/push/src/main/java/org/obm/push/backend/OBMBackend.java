@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.IEmailManager;
 import org.obm.push.mail.MailBackend;
@@ -17,9 +19,7 @@ import org.obm.push.monitor.EmailMonitoringThread;
 import org.obm.push.provisioning.MSEASProvisioingWBXML;
 import org.obm.push.provisioning.MSWAPProvisioningXML;
 import org.obm.push.provisioning.Policy;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.SyncCollection;
+import org.obm.push.store.CollectionDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ public class OBMBackend implements IBackend {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	private final ISyncStorage store;
+	private final CollectionDao collectionDao;
 	private final IEmailManager	emailManager;
 	private final IContentsExporter contentsExporter;
 	private final MailBackend mailBackend;
@@ -42,12 +42,12 @@ public class OBMBackend implements IBackend {
 	private final Map<Integer, EmailMonitoringThread> emailPushMonitors;
 	
 	@Inject
-	private OBMBackend(ISyncStorage store, IEmailManager emailManager,
+	private OBMBackend(CollectionDao collectionDao, IEmailManager emailManager,
 			IContentsExporter contentsExporter, MailBackend mailBackend,
 			CalendarMonitoringThread.Factory calendarMonitoringThreadFactory,
 			ContactsMonitoringThread.Factory contactsMonitoringThreadFactory) {
 		
-		this.store = store;
+		this.collectionDao = collectionDao;
 		this.emailManager = emailManager;
 		this.contentsExporter = contentsExporter;
 		this.mailBackend = mailBackend;
@@ -136,7 +136,7 @@ public class OBMBackend implements IBackend {
 		logger.info("reset Collection {} For Full Sync devId {}", 
 				new Object[]{collectionId, bs.getDevId()});
 		try {
-			store.resetCollection(bs.getLoginAtDomain(), bs.getDevId(), collectionId);
+			collectionDao.resetCollection(bs.getLoginAtDomain(), bs.getDevId(), collectionId);
 		} catch (RuntimeException re) {
 			logger.error(re.getMessage(), re);
 			throw re;

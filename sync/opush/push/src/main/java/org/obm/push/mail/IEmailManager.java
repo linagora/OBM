@@ -9,14 +9,14 @@ import java.util.Set;
 import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
 import org.obm.push.backend.BackendSession;
-import org.obm.push.backend.MSEmail;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.StoreEmailException;
-import org.obm.push.store.FilterType;
-import org.obm.push.store.SyncState;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 
 public interface IEmailManager {

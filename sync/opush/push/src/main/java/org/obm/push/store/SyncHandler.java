@@ -32,6 +32,16 @@ import org.obm.push.bean.SyncResponse;
 import org.obm.push.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.exception.NoDocumentException;
+import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionChange;
+import org.obm.push.bean.SyncState;
+import org.obm.push.bean.SyncStatus;
+import org.obm.push.data.IDataEncoder;
+import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
@@ -75,7 +85,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		public boolean hasChanges = false;
 	}
 	
-	public static final Integer SYNC_TRUNCATION_ALL = 9;
 	private static Map<Integer, IContinuation> waitContinuationCache;
 	private final UnsynchronizedItemService unSynchronizedItemCache;
 	private final MonitoredCollectionStoreService monitoredCollectionService;
@@ -88,9 +97,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage, IContentsExporter contentsExporter,
 			StateMachine stMachine, UnsynchronizedItemService unSynchronizedItemCache,
-			MonitoredCollectionStoreService monitoredCollectionService, SyncProtocol SyncProtocol) {
+			MonitoredCollectionStoreService monitoredCollectionService, SyncProtocol SyncProtocol,
+			CollectionDao collectionDao) {
 		
-		super(backend, encoderFactory, contentsImporter, storage, contentsExporter, stMachine);
+		super(backend, encoderFactory, contentsImporter, storage, contentsExporter, stMachine, collectionDao);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.monitoredCollectionService = monitoredCollectionService;
 		this.syncProtocol = SyncProtocol;
@@ -148,7 +158,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 		
 		for (SyncCollection sc : sync.getCollections()) {
-			String collectionPath = storage.getCollectionPath(sc.getCollectionId());
+			String collectionPath = collectionDao.getCollectionPath(sc.getCollectionId());
 			sc.setCollectionPath(collectionPath);
 			PIMDataType dataClass = storage.getDataClass(
 					collectionPath);

@@ -20,6 +20,7 @@ import org.obm.push.backend.OBMBackend;
 import org.obm.push.impl.InvitationFilterManagerImpl;
 import org.obm.push.mail.EmailManager;
 import org.obm.push.mail.IEmailManager;
+import org.obm.push.store.DaoModule;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.SyncStorage;
 import org.obm.sync.XTrustProvider;
@@ -75,7 +76,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(ServletContext.class).toInstance(servletContext);
 				bind(IDBCP.class).to(DBCP.class);
 			}
-    	}, new TransactionalModule());
+    	}, new TransactionalModule(), new DaoModule());
     }
     
     private void failStartup(String message) { 

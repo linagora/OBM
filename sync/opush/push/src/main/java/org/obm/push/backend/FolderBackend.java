@@ -6,8 +6,9 @@ import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
 import org.obm.dbcp.IDBCP;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.impl.ObmSyncBackend;
-import org.obm.push.store.ActiveSyncException;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.ISyncStorage;
 
@@ -19,10 +20,11 @@ public class FolderBackend extends ObmSyncBackend {
 
 	@Inject
 	private FolderBackend(ISyncStorage storage, DeviceDao deviceDao,
-			ConfigurationService configurationService, IDBCP dbcp)
+			ConfigurationService configurationService, IDBCP dbcp,
+			CollectionDao collectionDao)
 			throws ConfigurationException {
 		
-		super(storage, deviceDao, configurationService, dbcp);
+		super(storage, deviceDao, configurationService, dbcp, collectionDao);
 	}
 
 	public void synchronize(BackendSession bs) throws SQLException {

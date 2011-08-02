@@ -1,7 +1,7 @@
 package org.obm.push.calendar;
 
 import org.obm.push.backend.BackendSession;
-import org.obm.push.store.IApplicationData;
+import org.obm.push.bean.IApplicationData;
 import org.obm.sync.calendar.Event;
 
 public interface ObmSyncCalendarConverter {

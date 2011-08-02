@@ -15,11 +15,12 @@ import org.obm.dbcp.IDBCP;
 import org.obm.locator.LocatorClient;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.CollectionNotFoundException;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.PIMDataType;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.ISyncClient;
@@ -41,13 +42,14 @@ public class ObmSyncBackend {
 
 	protected String obmSyncHost;
 	protected ISyncStorage storage;
-	private DeviceDao deviceDao;
-
+	private final DeviceDao deviceDao;
+	private final CollectionDao collectionDao;
 	private final LocatorClient locatorClient;
 	private final IDBCP dbcp;
 
 	protected ObmSyncBackend(ISyncStorage storage, DeviceDao deviceDao,
-			ConfigurationService configurationService, IDBCP dbcp)
+			ConfigurationService configurationService, IDBCP dbcp, 
+			CollectionDao collectionDao)
 			throws ConfigurationException {
 
 		this.dbcp = dbcp;
@@ -55,6 +57,7 @@ public class ObmSyncBackend {
 				configurationService.getLocatorUrl());
 		this.deviceDao = deviceDao;
 		this.storage = storage;
+		this.collectionDao = collectionDao;
 		validateOBMConnection();
 	}
 
@@ -165,12 +168,12 @@ public class ObmSyncBackend {
 
 	public Integer getCollectionIdFor(String loginAtDomain, String deviceId, String collection)
 			throws CollectionNotFoundException, SQLException {
-		return storage.getCollectionMapping(loginAtDomain, deviceId, collection);
+		return collectionDao.getCollectionMapping(loginAtDomain, deviceId, collection);
 	}
 
 	public String getCollectionPathFor(Integer collectionId)
 			throws ActiveSyncException {
-		return storage.getCollectionPath(collectionId);
+		return collectionDao.getCollectionPath(collectionId);
 	}
 
 	public String getServerIdFor(Integer collectionId) {
@@ -201,6 +204,6 @@ public class ObmSyncBackend {
 	}
 
 	public String createCollectionMapping(String loginAtDomain, String devId, String col) throws SQLException {
-		return storage.addCollectionMapping(loginAtDomain, devId, col).toString();
+		return collectionDao.addCollectionMapping(loginAtDomain, devId, col).toString();
 	}
 }

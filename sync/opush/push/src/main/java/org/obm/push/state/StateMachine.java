@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.obm.push.backend.BackendSession;
-import org.obm.push.store.CollectionNotFoundException;
-import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.SyncState;
+import org.obm.push.bean.SyncState;
+import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.store.CollectionDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,16 +19,16 @@ public class StateMachine {
 
 	private static final Logger logger = LoggerFactory.getLogger(StateMachine.class);
 
-	private final ISyncStorage store;
+	private final CollectionDao collectionDao;
 
 	@Inject
-	private StateMachine(ISyncStorage store) {
-		this.store = store;
+	private StateMachine(CollectionDao collectionDao) {
+		this.collectionDao = collectionDao;
 	}
 	
 	public SyncState getFolderSyncState(String loginAtDomain, String deviceId, String collectionUrl, String syncKey) throws SQLException {
 		try {
-			int collectionId = store.getCollectionMapping(loginAtDomain, deviceId, collectionUrl);
+			int collectionId = collectionDao.getCollectionMapping(loginAtDomain, deviceId, collectionUrl);
 			return getSyncState(collectionId, syncKey);
 		
 		} catch (CollectionNotFoundException e) {
@@ -37,19 +37,19 @@ public class StateMachine {
 	}
 
 	public SyncState getSyncState(Integer collectionId, String syncKey) throws CollectionNotFoundException {
-		SyncState syncState = store.findStateForKey(syncKey);
+		SyncState syncState = collectionDao.findStateForKey(syncKey);
 		if (syncState != null) {
 			return syncState;
 		}
-		return new SyncState(store.getCollectionPath(collectionId), syncKey);
+		return new SyncState(collectionDao.getCollectionPath(collectionId), syncKey);
 	}
 
 	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync) throws CollectionNotFoundException, SQLException {
 		final String newSk = UUID.randomUUID().toString();
-		final SyncState newState = new SyncState(store.getCollectionPath(collectionId), newSk, lastSync);
+		final SyncState newState = new SyncState(collectionDao.getCollectionPath(collectionId), newSk, lastSync);
 		logger.info("allocateNewSyncKey [ collectionId = {} | lastSync.toString = {} ]",
 				new Object[]{ collectionId, newState.getLastSync().toString() });
-		store.updateState(bs.getLoginAtDomain(), bs.getDevId(), collectionId, newState);
+		collectionDao.updateState(bs.getLoginAtDomain(), bs.getDevId(), collectionId, newState);
 		return newSk;
 	}
 

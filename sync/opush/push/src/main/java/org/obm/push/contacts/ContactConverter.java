@@ -2,7 +2,7 @@ package org.obm.push.contacts;
 
 import java.util.Map;
 
-import org.obm.push.backend.MSContact;
+import org.obm.push.bean.MSContact;
 import org.obm.push.search.SearchResult;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;

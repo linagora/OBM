@@ -5,8 +5,8 @@ import java.util.Collection;
 
 import net.sf.ehcache.Element;
 
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.impl.Credentials;
-import org.obm.push.store.SyncCollection;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

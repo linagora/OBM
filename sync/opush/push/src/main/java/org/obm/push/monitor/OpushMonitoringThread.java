@@ -8,9 +8,9 @@ import java.util.Set;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.impl.PushNotification;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.SyncCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

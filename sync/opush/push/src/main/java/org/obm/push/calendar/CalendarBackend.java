@@ -14,20 +14,21 @@ import org.obm.dbcp.IDBCP;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.MSEmail;
-import org.obm.push.backend.MSEvent;
-import org.obm.push.data.calendarenum.AttendeeStatus;
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncState;
+import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.FolderTypeNotFoundException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.CollectionNotFoundException;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.FolderType;
-import org.obm.push.store.IApplicationData;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.PIMDataType;
-import org.obm.push.store.SyncState;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -53,10 +54,10 @@ public class CalendarBackend extends ObmSyncBackend {
 
 	@Inject
 	public CalendarBackend(ISyncStorage storage, DeviceDao deviceDao,
-			ConfigurationService configurationService, IDBCP dbcp)
+			ConfigurationService configurationService, IDBCP dbcp, CollectionDao collectionDao)
 			throws ConfigurationException {
 		
-		super(storage, deviceDao, configurationService, dbcp);
+		super(storage, deviceDao, configurationService, dbcp, collectionDao);
 		converters = ImmutableMap.of(
 				PIMDataType.CALENDAR, new EventConverter(),
 				PIMDataType.TASKS, new TodoConverter());

@@ -1,8 +1,8 @@
 package org.obm.push.data;
 
 import org.obm.push.backend.BackendSession;
-import org.obm.push.store.IApplicationData;
-import org.obm.push.store.SyncCollection;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.SyncCollection;
 import org.w3c.dom.Element;
 
 public interface IDataEncoder {

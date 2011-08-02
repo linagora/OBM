@@ -14,8 +14,8 @@ import java.util.TimeZone;
 import org.obm.dbcp.IDBCP;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.impl.ChangedCollections;
-import org.obm.push.store.SyncCollection;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.calendar.EventType;
 

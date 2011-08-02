@@ -1,12 +1,12 @@
 package org.obm.push.data;
 
-import org.obm.push.backend.MSTask;
-import org.obm.push.backend.Recurrence;
-import org.obm.push.data.calendarenum.CalendarSensitivity;
-import org.obm.push.data.calendarenum.RecurrenceDayOfWeek;
-import org.obm.push.data.calendarenum.RecurrenceType;
+import org.obm.push.bean.CalendarSensitivity;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSTask;
+import org.obm.push.bean.Recurrence;
+import org.obm.push.bean.RecurrenceDayOfWeek;
+import org.obm.push.bean.RecurrenceType;
 import org.obm.push.data.email.Type;
-import org.obm.push.store.IApplicationData;
 import org.obm.push.tnefconverter.RTFUtils;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;

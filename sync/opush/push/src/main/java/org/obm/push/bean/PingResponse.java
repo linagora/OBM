@@ -3,7 +3,6 @@ package org.obm.push.bean;
 import java.util.Set;
 
 import org.obm.push.impl.PingStatus;
-import org.obm.push.store.SyncCollection;
 
 public class PingResponse {
 

@@ -3,16 +3,17 @@ package org.obm.push.backend;
 import java.io.InputStream;
 import java.sql.SQLException;
 
-import org.obm.push.data.calendarenum.AttendeeStatus;
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.exception.SmtpInvalidRcptException;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.CollectionNotFoundException;
-import org.obm.push.store.IApplicationData;
-import org.obm.push.store.PIMDataType;
 
 /**
  * Content management interface, ie. CRUD API.

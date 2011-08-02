@@ -4,8 +4,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.obm.push.ItemChange;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.SyncState;
+import org.obm.push.bean.SyncState;
+import org.obm.push.exception.ActiveSyncException;
 
 /**
  * The exporter API fetches data from the backend store and returns it to the

@@ -7,24 +7,25 @@ import java.util.Map;
 import org.obm.push.SyncedCollectionStoreService;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.Sync;
+import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionChange;
+import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.data.CalendarDecoder;
 import org.obm.push.data.ContactDecoder;
 import org.obm.push.data.EmailDecoder;
 import org.obm.push.data.IDataDecoder;
 import org.obm.push.data.TaskDecoder;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
-import org.obm.push.store.BodyPreference;
-import org.obm.push.store.CollectionNotFoundException;
-import org.obm.push.store.FilterType;
-import org.obm.push.store.IApplicationData;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.MSEmailBodyType;
-import org.obm.push.store.PIMDataType;
-import org.obm.push.store.SyncCollection;
-import org.obm.push.store.SyncCollectionChange;
-import org.obm.push.store.SyncCollectionOptions;
-import org.obm.push.store.SyncStatus;
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +43,14 @@ public class SyncDecoder {
 	private static final Logger logger = LoggerFactory.getLogger(SyncDecoder.class);
 	
 	private final ISyncStorage store;
+	private final CollectionDao collectionDao;
 	private final SyncedCollectionStoreService syncedCollectionStoreService;
 	private final Map<PIMDataType, IDataDecoder> decoders;
 
 	@Inject
-	private SyncDecoder(SyncedCollectionStoreService syncedCollectionStoreService, ISyncStorage store) {
+	private SyncDecoder(SyncedCollectionStoreService syncedCollectionStoreService, ISyncStorage store, 
+			CollectionDao collectionDao) {
+		this.collectionDao = collectionDao;
 		this.store = store;
 		this.syncedCollectionStoreService = syncedCollectionStoreService;
 		this.decoders = ImmutableMap.<PIMDataType, IDataDecoder>builder()
@@ -109,7 +113,7 @@ public class SyncDecoder {
 		}
 		try {
 			collection.setCollectionId(collectionId);
-			String collectionPath = store.getCollectionPath(collectionId);
+			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			collection.setCollectionPath(collectionPath);
 			PIMDataType dataType = store.getDataClass(collectionPath);
 			collection.setDataType(dataType);

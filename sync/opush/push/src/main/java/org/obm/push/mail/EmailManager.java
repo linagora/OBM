@@ -40,17 +40,17 @@ import org.minig.imap.StoreClient;
 import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClient;
 import org.obm.push.backend.BackendSession;
-import org.obm.push.backend.MSEmail;
+import org.obm.push.bean.Email;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.StoreEmailException;
 import org.obm.push.mail.smtp.SmtpSender;
-import org.obm.push.store.Email;
-import org.obm.push.store.FilterType;
-import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.SyncState;
+import org.obm.push.store.EmailDao;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class EmailManager implements IEmailManager {
 	private static final Logger logger = LoggerFactory
 			.getLogger(EmailManager.class);
 	
-	private final ISyncStorage syncStore;
+	private final EmailDao emailDao;
 	private final SmtpSender smtpProvider;
 	private final LocatorClient locatorClient;
 	private final EmailSync emailSyncCache;
@@ -76,7 +76,7 @@ public class EmailManager implements IEmailManager {
 	private final boolean activateTLS;
 	
 	@Inject
-	private EmailManager(ISyncStorage syncStore,
+	private EmailManager(EmailDao emailDao,
 			EmailConfiguration emailConfiguration,
 			ConfigurationService configurationService,
 			SmtpSender smtpSender, EmailSync emailSyncCache) throws ConfigurationException {
@@ -84,7 +84,7 @@ public class EmailManager implements IEmailManager {
 		this.emailSyncCache = emailSyncCache;
 		this.locatorClient = new LocatorClient(configurationService.getLocatorUrl());
 		this.smtpProvider = smtpSender;
-		this.syncStore = syncStore;
+		this.emailDao = emailDao;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.activateTLS = emailConfiguration.activateTls();
 	}
@@ -477,7 +477,7 @@ public class EmailManager implements IEmailManager {
 	private void deleteMessageInCache(Integer devId, Integer collectionId,
 			Collection<Long> mailUids) {
 		try {
-			syncStore.removeMessages(devId, collectionId, mailUids);
+			emailDao.removeMessages(devId, collectionId, mailUids);
 		} catch (SQLException e) {
 			logger.error("Error while deleting messages in db", e);
 		}
@@ -495,7 +495,7 @@ public class EmailManager implements IEmailManager {
 					}
 				});
 		try {
-			syncStore.addMessages(devId, collectionId, emails);
+			emailDao.addMessages(devId, collectionId, emails);
 		} catch (SQLException e) {
 			logger.error("Error while adding messages in db", e);
 		}

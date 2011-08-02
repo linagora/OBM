@@ -5,12 +5,13 @@ import java.util.Collection;
 import java.util.List;
 
 import org.obm.push.ItemChange;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.MSAttachementData;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncState;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.ObjectNotFoundException;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.FilterType;
-import org.obm.push.store.PIMDataType;
-import org.obm.push.store.SyncCollection;
-import org.obm.push.store.SyncState;
 
 /**
  * The exporter API fetches data from the backend store and returns it to the

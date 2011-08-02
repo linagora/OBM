@@ -14,14 +14,15 @@ import org.obm.push.backend.MoveItem;
 import org.obm.push.bean.MoveItemsRequest;
 import org.obm.push.bean.MoveItemsResponse;
 import org.obm.push.bean.MoveItemsResponse.MoveItemsItem;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.protocol.MoveItemsProtocol;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.CollectionNotFoundException;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.PIMDataType;
+import org.obm.push.store.CollectionDao;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -40,9 +41,10 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 	@Inject
 	protected MoveItemsHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage,
-			IContentsExporter contentsExporter, StateMachine stMachine, MoveItemsProtocol moveItemsProtocol) {
+			IContentsExporter contentsExporter, StateMachine stMachine, MoveItemsProtocol moveItemsProtocol,
+			CollectionDao collectionDao) {
 		
-		super(backend, encoderFactory, contentsImporter, storage, contentsExporter, stMachine);
+		super(backend, encoderFactory, contentsImporter, storage, contentsExporter, stMachine, collectionDao);
 		this.moveItemsProtocol = moveItemsProtocol;
 	}
 

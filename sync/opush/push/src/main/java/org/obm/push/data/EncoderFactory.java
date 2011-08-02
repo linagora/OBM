@@ -1,6 +1,6 @@
 package org.obm.push.data;
 
-import org.obm.push.store.IApplicationData;
+import org.obm.push.bean.IApplicationData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

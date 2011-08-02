@@ -13,19 +13,20 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.backend.MSEmail;
 import org.obm.push.bean.MeetingHandlerRequest;
 import org.obm.push.bean.MeetingHandlerResponse;
 import org.obm.push.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.data.EncoderFactory;
-import org.obm.push.data.calendarenum.AttendeeStatus;
 import org.obm.push.data.email.MeetingResponse;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.protocol.MeetingProtocol;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.ActiveSyncException;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.PIMDataType;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -43,10 +44,10 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	protected MeetingResponseHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine, MeetingProtocol meetingProtocol) {
+			StateMachine stMachine, MeetingProtocol meetingProtocol, CollectionDao collectionDao) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
-				contentsExporter, stMachine);
+				contentsExporter, stMachine, collectionDao);
 		this.meetingProtocol = meetingProtocol;
 	}
 

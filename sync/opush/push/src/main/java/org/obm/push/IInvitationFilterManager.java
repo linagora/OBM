@@ -4,9 +4,9 @@ import java.sql.SQLException;
 
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.MSEmail;
-import org.obm.push.store.PIMDataType;
-import org.obm.push.store.SyncState;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncState;
 
 public interface IInvitationFilterManager {
 

@@ -11,8 +11,8 @@ import org.columba.ristretto.io.CharSequenceSource;
 import org.columba.ristretto.message.LocalMimePart;
 import org.columba.ristretto.message.MimeHeader;
 import org.minig.mime.QuotedPrintableDecoderInputStream;
-import org.obm.push.backend.MSEmail;
-import org.obm.push.store.MSEmailBodyType;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.utils.FileUtils;
 
 public class ReplyEmailHandler extends SendEmailHandler {

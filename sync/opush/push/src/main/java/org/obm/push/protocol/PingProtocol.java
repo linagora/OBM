@@ -4,8 +4,8 @@ import java.util.HashSet;
 
 import org.obm.push.bean.PingRequest;
 import org.obm.push.bean.PingResponse;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.impl.PingStatus;
-import org.obm.push.store.SyncCollection;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

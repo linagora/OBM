@@ -3,7 +3,7 @@ package org.obm.push.impl;
 import java.util.Date;
 import java.util.Set;
 
-import org.obm.push.store.SyncCollection;
+import org.obm.push.bean.SyncCollection;
 
 import com.google.common.base.Objects;
 

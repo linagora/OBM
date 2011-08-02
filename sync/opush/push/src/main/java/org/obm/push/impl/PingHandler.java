@@ -19,11 +19,12 @@ import org.obm.push.data.EncoderFactory;
 import org.obm.push.exception.FolderSyncRequiredException;
 import org.obm.push.exception.MissingRequestParameterException;
 import org.obm.push.protocol.PingProtocol;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.CollectionNotFoundException;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.SyncCollection;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -41,10 +42,10 @@ public class PingHandler extends WbxmlRequestHandler implements
 			IContentsImporter contentsImporter, ISyncStorage storage,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			MonitoredCollectionStoreService monitoredCollectionService,
-			PingProtocol pingProtocol) {
+			PingProtocol pingProtocol, CollectionDao collectionDao) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
-				contentsExporter, stMachine);
+				contentsExporter, stMachine, collectionDao);
 		this.monitoredCollectionService = monitoredCollectionService;
 		this.protocol = pingProtocol;
 	}

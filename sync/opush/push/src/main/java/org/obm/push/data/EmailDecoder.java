@@ -1,7 +1,7 @@
 package org.obm.push.data;
 
-import org.obm.push.backend.MSEmail;
-import org.obm.push.store.IApplicationData;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSEmail;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 

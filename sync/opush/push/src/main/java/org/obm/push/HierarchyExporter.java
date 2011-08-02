@@ -7,12 +7,12 @@ import java.util.List;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.mail.MailBackend;
-import org.obm.push.store.ActiveSyncException;
-import org.obm.push.store.PIMDataType;
-import org.obm.push.store.SyncState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

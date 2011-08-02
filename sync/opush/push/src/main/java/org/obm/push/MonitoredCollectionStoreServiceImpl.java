@@ -5,8 +5,8 @@ import java.util.Set;
 
 import net.sf.ehcache.Element;
 
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.impl.Credentials;
-import org.obm.push.store.SyncCollection;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;

@@ -1,6 +1,5 @@
 package org.obm.push.exception;
 
-import org.obm.push.store.ActiveSyncException;
 
 public class FolderTypeNotFoundException extends ActiveSyncException {
 	/**

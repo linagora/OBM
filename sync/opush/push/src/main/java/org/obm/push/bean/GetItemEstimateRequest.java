@@ -2,8 +2,6 @@ package org.obm.push.bean;
 
 import java.util.Collection;
 
-import org.obm.push.store.SyncCollection;
-
 public class GetItemEstimateRequest {
 
 	private final Collection<SyncCollection> syncCollections;

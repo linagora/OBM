@@ -2,8 +2,8 @@ package org.obm.push.backend;
 
 import java.util.Set;
 
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.impl.ChangedCollections;
-import org.obm.push.store.SyncCollection;
 
 /**
  * This interface is used in the push process to wait for changes.

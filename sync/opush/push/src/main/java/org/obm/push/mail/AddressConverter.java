@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.minig.imap.Address;
-import org.obm.push.backend.MSAddress;
+import org.obm.push.bean.MSAddress;
 
 public class AddressConverter {
 	

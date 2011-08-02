@@ -7,6 +7,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.state.StateMachine;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ISyncStorage;
 import org.w3c.dom.Document;
 
@@ -19,10 +20,11 @@ public class SettingsHandler extends WbxmlRequestHandler {
 	@Inject
 	protected SettingsHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage,
-			IContentsExporter contentsExporter, StateMachine stMachine) {
+			IContentsExporter contentsExporter, StateMachine stMachine,
+			CollectionDao collectionDao) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
-				contentsExporter, stMachine);
+				contentsExporter, stMachine, collectionDao);
 	}
 
 	@Override

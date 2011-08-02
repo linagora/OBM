@@ -13,16 +13,17 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.GetItemEstimateRequest;
 import org.obm.push.bean.GetItemEstimateResponse;
 import org.obm.push.bean.GetItemEstimateResponse.Estimate;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.CollectionNotFoundException;
 import org.obm.push.store.ISyncStorage;
-import org.obm.push.store.PIMDataType;
-import org.obm.push.store.SyncCollection;
-import org.obm.push.store.SyncState;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncState;
+import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.store.CollectionDao;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -38,10 +39,11 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	protected GetItemEstimateHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter, StateMachine stMachine,
-			UnsynchronizedItemService unSynchronizedItemCache, GetItemEstimateProtocol protocol) {
+			UnsynchronizedItemService unSynchronizedItemCache, CollectionDao collectionDao,
+			GetItemEstimateProtocol protocol) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
-				contentsExporter, stMachine);
+				contentsExporter, stMachine, collectionDao);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.protocol = protocol;
 	}
@@ -73,7 +75,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		for (SyncCollection syncCollection: request.getSyncCollections()) {
 			Integer collectionId = syncCollection.getCollectionId();
-			String collectionPath = storage.getCollectionPath(collectionId);
+			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			PIMDataType dataType = storage.getDataClass(collectionPath);
 			syncCollection.setCollectionPath(collectionPath);
 			syncCollection.setDataType(dataType);
