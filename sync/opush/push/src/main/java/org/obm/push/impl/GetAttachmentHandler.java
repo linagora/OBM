@@ -2,6 +2,8 @@ package org.obm.push.impl;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsExporter;
@@ -36,7 +38,7 @@ public class GetAttachmentHandler implements IRequestHandler {
 			MSAttachementData attachment = getAttachment(bs, AttachmentName);
 			responder.sendResponseFile(attachment.getContentType(),	attachment.getFile());
 		} catch (ObjectNotFoundException e) {
-			responder.sendError(500);
+			responder.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 

@@ -4,7 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.eclipse.jetty.http.HttpStatus;
+import javax.servlet.http.HttpServletResponse;
+
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsImporter;
@@ -40,8 +41,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 			mailContent = new BufferedInputStream(request.getInputStream());
 			mailContent.mark(mailContent.available());
 		} catch (IOException e) {
-			// 400 Bad Request
-			responder.sendError(HttpStatus.BAD_REQUEST_400);
+			responder.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 
@@ -79,7 +79,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 			logger.error(
 					"Error while sending mail. HTTP error[500] will send to the pda.",
 					e);
-			responder.sendError(500);
+			responder.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 
