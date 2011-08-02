@@ -48,7 +48,6 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
-	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		
@@ -72,6 +71,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 
 	}
 
+	@Transactional
 	private FolderSyncResponse doTheJob(BackendSession bs,
 			FolderSyncRequest folderSyncRequest) throws SQLException,
 			InvalidSyncKeyException, CollectionNotFoundException,
