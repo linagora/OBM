@@ -47,7 +47,6 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
-	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 
@@ -68,6 +67,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		}
 	}
 
+	@Transactional
 	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, ActiveSyncException, SQLException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
