@@ -16,7 +16,6 @@
 
 package org.obm.push.mail;
 
-import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -31,6 +30,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncState;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.store.EmailDao;
 import org.slf4j.Logger;
@@ -159,7 +159,7 @@ public class EmailSync implements IEmailSync {
 	}
 	
 	private Collection<Long> getRemoved(Integer devId, Integer collectionId,
-			Set<Email> syncedMails, Collection<Email> allMailToSync, Date lastSync) {
+			Set<Email> syncedMails, Collection<Email> allMailToSync, Date lastSync) throws DaoException {
 		
 		final Set<Long> removed = new HashSet<Long>();
 		Collection<Long> uidDeletedMails = emailDao.getDeletedMail(devId, collectionId, lastSync);
@@ -175,7 +175,7 @@ public class EmailSync implements IEmailSync {
 	}
 
 	private Set<Email> getUpdated(final Integer devId, final Integer collectionId, final Set<Email> syncedMail,
-			final Collection<FastFetch> allMailToSync, final Date startWindowSync, Date lastSync) {
+			final Collection<FastFetch> allMailToSync, final Date startWindowSync, Date lastSync) throws DaoException {
 		
 		Builder<Email> builder = ImmutableSet.builder();
 		if (syncedMail != null) {
@@ -196,7 +196,7 @@ public class EmailSync implements IEmailSync {
 
 	private void updateData(Integer devId, Integer collectionId, Date lastSync, 
 			final Collection<Long> removed, final Collection<Email> updated)
-			throws SQLException {
+			throws DaoException {
 		
 		if (removed.size() > 0) {
 			emailDao.removeMessages(devId, collectionId, lastSync, removed);

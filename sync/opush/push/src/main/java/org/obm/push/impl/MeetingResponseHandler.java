@@ -1,7 +1,6 @@
 package org.obm.push.impl;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +18,7 @@ import org.obm.push.bean.MeetingResponse;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
@@ -82,7 +82,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			} catch (IOException e1) {
 				logger.error(e.getMessage(), e);
 			}
-		} catch (SQLException e) {
+		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
 		} catch (ActiveSyncException e) {
 			logger.error(e.getMessage(), e);
@@ -92,7 +92,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 	
 	@Transactional
-	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) throws SQLException, ActiveSyncException {
+	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) throws ActiveSyncException, DaoException {
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
 			
@@ -122,7 +122,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 	
 	private ItemChange retrieveMailWithMeetingRequest(BackendSession bs, MeetingResponse item)
-		throws ActiveSyncException {
+		throws ActiveSyncException, DaoException {
 		
 		List<ItemChange> lit = contentsExporter.fetch(bs, PIMDataType.EMAIL, Arrays.asList(item.getReqId()));
 		if (lit.size() > 0) {

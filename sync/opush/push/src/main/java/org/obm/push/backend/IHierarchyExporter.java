@@ -1,12 +1,12 @@
 package org.obm.push.backend;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 
 /**
  * The exporter API fetches data from the backend store and returns it to the
@@ -22,8 +22,8 @@ public interface IHierarchyExporter {
 
 	String getRootFolderUrl(BackendSession bs);
 
-	List<ItemChange> getChanged(BackendSession bs) throws SQLException;
+	List<ItemChange> getChanged(BackendSession bs) throws DaoException;
 
-	int getRootFolderId(BackendSession bs) throws ActiveSyncException, SQLException;
+	int getRootFolderId(BackendSession bs) throws ActiveSyncException, DaoException;
 
 }

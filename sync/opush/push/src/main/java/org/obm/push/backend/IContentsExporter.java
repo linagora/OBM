@@ -1,6 +1,5 @@
 package org.obm.push.backend;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ObjectNotFoundException;
 
 /**
@@ -21,16 +21,16 @@ import org.obm.push.exception.ObjectNotFoundException;
 public interface IContentsExporter {
 
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws ActiveSyncException, SQLException;
+			throws ActiveSyncException, DaoException;
 
 	int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws ActiveSyncException, SQLException;
+			throws ActiveSyncException, DaoException;
 
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchIds) throws ActiveSyncException;
+			List<String> fetchIds) throws ActiveSyncException, DaoException;
 	
 	List<ItemChange> fetchEmails(BackendSession bs,
-			Integer collectionId, Collection<Long> uids) throws ActiveSyncException;
+			Integer collectionId, Collection<Long> uids) throws ActiveSyncException, DaoException;
 	
 	List<ItemChange> fetchCalendars(BackendSession bs,
 			Integer collectionId, Collection<String> uids) throws ActiveSyncException;
@@ -43,6 +43,6 @@ public interface IContentsExporter {
 
 	boolean validatePassword(String userID, String password);
 
-	boolean getFilterChanges(BackendSession bs, SyncCollection collection);
+	boolean getFilterChanges(BackendSession bs, SyncCollection collection) throws DaoException;
 	
 }

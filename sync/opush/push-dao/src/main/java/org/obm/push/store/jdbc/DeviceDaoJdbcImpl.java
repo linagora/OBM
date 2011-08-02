@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import org.obm.dbcp.IDBCP;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.Device.Factory;
+import org.obm.push.exception.DaoException;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.utils.IniFile;
 import org.obm.push.utils.JDBCUtils;
@@ -28,8 +29,9 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		this.deviceFactory = deviceFactory;
 	}
 
+	@Override
 	public Device getDevice(String loginAtDomain, String deviceId, String userAgent) 
-			throws SQLException {
+			throws DaoException {
 		String[] parts = loginAtDomain.split("@");
 		String login = parts[0].toLowerCase();
 		String domain = parts[1].toLowerCase();
@@ -37,8 +39,8 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		con = dbcp.getConnection();
 		try {
+			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT id, identifier, type FROM opush_device "
 					+ "INNER JOIN UserObm ON owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
@@ -54,6 +56,8 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 				
 				return deviceFactory.create(databaseId, devType, userAgent, devId);
 			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
@@ -61,7 +65,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 
 	public boolean registerNewDevice(String loginAtDomain, String deviceId,
-			String deviceType) throws SQLException {
+			String deviceType) throws DaoException {
 		String[] parts = loginAtDomain.split("@");
 		String login = parts[0].toLowerCase();
 		String domain = parts[1].toLowerCase();
@@ -69,7 +73,6 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		con = dbcp.getConnection();
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_device (identifier, type, owner) "
@@ -81,12 +84,14 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 			ps.setString(3, login);
 			ps.setString(4, domain);
 			return ps.executeUpdate() != 0;
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
 	}
 	
-	public boolean syncAuthorized(String loginAtDomain, String deviceId) {
+	public boolean syncAuthorized(String loginAtDomain, String deviceId) throws DaoException {
 		IniFile ini = new IniFile("/etc/opush/sync_perms.ini") {
 			@Override
 			public String getCategory() {
@@ -126,8 +131,8 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 			if (rs.next()) {
 				hasSyncPerm = true;
 			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}

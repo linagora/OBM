@@ -1,7 +1,6 @@
 package org.obm.push.impl;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Set;
 
 import org.obm.annotations.transactional.Transactional;
@@ -11,6 +10,7 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderSyncRequiredException;
 import org.obm.push.exception.MissingRequestParameterException;
 import org.obm.push.protocol.PingProtocol;
@@ -75,7 +75,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 
 	@Transactional
 	private void doTheJob(IContinuation continuation, BackendSession bs, PingRequest pingRequest) 
-			throws SQLException, MissingRequestParameterException, ActiveSyncException {
+			throws MissingRequestParameterException, ActiveSyncException, DaoException {
 		
 		if (pingRequest.getHeartbeatInterval() == null) {
 			Long heartbeatInterval = hearbeatDao.findLastHearbeat(bs.getDevice());
@@ -137,7 +137,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	@Transactional
-	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) throws FolderSyncRequiredException, SQLException {
+	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) throws FolderSyncRequiredException, DaoException {
 		if (sendHierarchyChange) {
 			throw new FolderSyncRequiredException();
 		}

@@ -2,7 +2,6 @@ package org.obm.push.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.obm.annotations.transactional.Transactional;
@@ -17,6 +16,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.protocol.FolderSyncProtocol;
@@ -93,9 +93,9 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	
 	@Transactional
 	private FolderSyncResponse doTheJob(BackendSession bs,
-			FolderSyncRequest folderSyncRequest) throws SQLException,
+			FolderSyncRequest folderSyncRequest) throws
 			InvalidSyncKeyException, CollectionNotFoundException,
-			ActiveSyncException {
+			ActiveSyncException, DaoException {
 		
 		// FIXME we know that we do not monitor hierarchy, so just respond
 		// that nothing changed

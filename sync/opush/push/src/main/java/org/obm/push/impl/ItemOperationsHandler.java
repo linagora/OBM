@@ -19,6 +19,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.UnsupportedStoreException;
@@ -178,6 +179,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
 		} catch (ActiveSyncException e) {
 			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_CONNECTION_FAILED);
+		} catch (DaoException e) {
+			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return fetchResult;
 	}
@@ -194,6 +197,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.BLOCKED_ACCESS);
 		} catch (NotAllowedException e) {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.BLOCKED_ACCESS);
+		} catch (DaoException e) {
+			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return emptyFolderContentsResult;
 	}

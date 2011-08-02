@@ -5,8 +5,9 @@ import java.math.BigDecimal;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.Device.Factory;
+import org.obm.push.exception.DaoException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
+import org.obm.push.store.DeviceDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,17 +26,16 @@ public class SessionService {
 	}
 	
 	public BackendSession getSession(
-			Credentials credentials, String devId, ActiveSyncRequest request) {
+			Credentials credentials, String devId, ActiveSyncRequest request) throws DaoException {
 
 		String sessionId = credentials.getLoginAtDomain() + "/" + devId;
 		return createSession(credentials, request, sessionId);
 	}
 
 	private BackendSession createSession(Credentials credentials,
-			ActiveSyncRequest r, String sessionId) {
+			ActiveSyncRequest r, String sessionId) throws DaoException {
 		
 		String userAgent = r.getUserAgent();
-		String devType = r.getDeviceType();
 		String devId = r.getDeviceId();
 		
 		Device device = deviceDao.getDevice(credentials.getLoginAtDomain(), devId, userAgent);

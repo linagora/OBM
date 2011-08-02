@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +17,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.store.FiltrageInvitationDao;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public void handleMeetingResponse(BackendSession bs, Integer emailCollectionId, MSEmail invitation) throws SQLException {
+	public void handleMeetingResponse(BackendSession bs, Integer emailCollectionId, MSEmail invitation) throws DaoException {
 		try {
 			Integer eventCollectionId = calendarBackend.getCollectionId(bs);
 			filtrageInvitationDao.updateInvitationStatus(InvitationStatus.EMAIL_TO_DELETED, emailCollectionId, ImmutableList.of(invitation.getUid()));
@@ -58,7 +58,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public DataDelta filterEvent(final BackendSession bs, final SyncState state, final Integer eventCollectionId, final DataDelta delta) {
+	public DataDelta filterEvent(final BackendSession bs, final SyncState state, final Integer eventCollectionId, final DataDelta delta) throws DaoException {
 		final String syncKey = state.getKey();
 		
 		final List<ItemChange> toSynced = mergeChangesAndToSyncedEvent(bs, eventCollectionId, syncKey, delta.getChanges());
@@ -92,7 +92,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 		return its;
 	}
 
-	private List<ItemChange> getEventToDeleted(BackendSession bs, Integer eventCollectionId, String syncKey) {
+	private List<ItemChange> getEventToDeleted(BackendSession bs, Integer eventCollectionId, String syncKey) throws DaoException {
 		final List<String> eventUIDToDeleted = filtrageInvitationDao.getEventToDeleted(eventCollectionId, syncKey);
 		if (eventUIDToDeleted.isEmpty()) {
 			return ImmutableList.of();
@@ -105,14 +105,14 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 		return eventToDeleted;
 	}
 
-	private List<ItemChange> proccessEventMustSynced(BackendSession bs, Integer eventCollectionId, String syncKey) {
+	private List<ItemChange> proccessEventMustSynced(BackendSession bs, Integer eventCollectionId, String syncKey) throws DaoException {
 		List<String> eventsToSync = filtrageInvitationDao.getInvitationEventMustSynced(eventCollectionId);
 		List<ItemChange> itemsChange = calendarBackend.fetchItems(bs, eventCollectionId, eventsToSync);
 		filtrageInvitationDao.updateInvitationEventStatus(InvitationStatus.EVENT_SYNCED, syncKey, eventCollectionId, eventsToSync);
 		return itemsChange;
 	}
 
-	private void processFilterEvent(Integer eventCollectionId, String syncKey, List<ItemChange> toSynced) {
+	private void processFilterEvent(Integer eventCollectionId, String syncKey, List<ItemChange> toSynced) throws DaoException {
 		for (final Iterator<ItemChange> it = toSynced.iterator(); it.hasNext();) {
 			final ItemChange ic = it.next();
 			if (ic.getData() instanceof MSEvent) {
@@ -122,7 +122,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 		}
 	}
 
-	private void setEventStatus(final Integer eventCollectionId, final String syncKey, final MSEvent event) {
+	private void setEventStatus(final Integer eventCollectionId, final String syncKey, final MSEvent event) throws DaoException {
 		if (!filtrageInvitationDao.isMostRecentInvitation(eventCollectionId, event.getUID(), event.getDtStamp())) {
 			logger.info("A more recent event or email is synchronized on phone. The event[ " + event.getUID() + ", " + event.getSubject()
 					+ "] will not synced");
@@ -138,7 +138,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) throws SQLException {
+	public void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) throws DaoException {
 		try {
 			final Map<String, ItemChange> syncedItem = new HashMap<String, ItemChange>();
 			final List<ItemChange> itemToSync = mergeChangesAndToSyncedEmail(bs, state, emailCollectionId,  delta.getChanges());
@@ -171,7 +171,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	private void setInvitationStatus(final Integer emailCollectionId, final Integer eventCollectionId, final Map<String, ItemChange> syncedItem, 
-			final MSEmail mail, final SyncState state, final ItemChange ic) {
+			final MSEmail mail, final SyncState state, final ItemChange ic) throws DaoException {
 		if (!filtrageInvitationDao.isMostRecentInvitation(eventCollectionId, mail.getInvitation().getUID(), mail.getInvitation().getLastUpdate())) {
 			logger.info("A more recent event or email is synchronized on phone. The email[UID: " + mail.getUid() + "dtstam: "
 					+ mail.getInvitation().getDtStamp() + "] will not synced");
@@ -203,7 +203,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	private List<ItemChange> mergeChangesAndToSyncedEmail(BackendSession bs, SyncState state, Integer emailCollectionId, 
-			List<ItemChange> changes) throws ActiveSyncException {
+			List<ItemChange> changes) throws ActiveSyncException, DaoException {
 		final List<ItemChange> its = Lists.newArrayList(changes.iterator());
 		final List<Long> emailToSync = filtrageInvitationDao.getEmailToSynced(emailCollectionId, state.getKey());
 		for (final ItemChange ic : changes) {
@@ -217,7 +217,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public int getCountFilterChanges(BackendSession bs, String syncKey, PIMDataType dataType, Integer collectionId) {
+	public int getCountFilterChanges(BackendSession bs, String syncKey, PIMDataType dataType, Integer collectionId) throws DaoException {
 		switch (dataType) {
 		case CALENDAR:
 			return filtrageInvitationDao.getCountEventFilterChanges(collectionId, syncKey);
@@ -229,12 +229,12 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public void deleteFilteredEvent(Integer collectionId, String eventUid) {
+	public void deleteFilteredEvent(Integer collectionId, String eventUid) throws DaoException {
 		filtrageInvitationDao.updateInvitationEventStatus(InvitationStatus.DELETED, collectionId, ImmutableList.of(eventUid));
 	}
 
 	@Override
-	public void deleteFilteredEmail(Integer collectionId, Long emailUid) {
+	public void deleteFilteredEmail(Integer collectionId, Long emailUid) throws DaoException {
 		filtrageInvitationDao.updateInvitationStatus(InvitationStatus.DELETED, collectionId, ImmutableList.of(emailUid));
 	}
 	

@@ -1,6 +1,5 @@
 package org.obm.push;
 
-import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -19,6 +18,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.mail.MailBackend;
 import org.slf4j.Logger;
@@ -104,22 +104,24 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	private DataDelta getTasksChanges(BackendSession bs, SyncState state,
-			Integer collectionId) throws ActiveSyncException {
+			Integer collectionId) throws ActiveSyncException, DaoException {
 		return this.calBackend.getContentChanges(bs, state, collectionId);
 	}
 
-	private DataDelta getCalendarChanges(BackendSession bs, SyncState state, Integer collectionId) throws ActiveSyncException {
+	private DataDelta getCalendarChanges(BackendSession bs, SyncState state, Integer collectionId) 
+			throws ActiveSyncException, DaoException {
 		return calBackend.getContentChanges(bs, state, collectionId);
 	}
 
-	private DataDelta getMailChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) throws ActiveSyncException {
+	private DataDelta getMailChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) 
+			throws ActiveSyncException, DaoException {
 		return mailBackend.getContentChanges(bs, state, collectionId, filter);
 	}
 	
 	@Override
 	public int getCount(BackendSession bs, SyncState state,
 			FilterType filterType, Integer collectionId)
-			throws ActiveSyncException, SQLException {
+			throws ActiveSyncException, DaoException {
 		
 		DataDelta dd = getChanged(bs, state, filterType, collectionId);
 		Integer filterCount = invitationFilterManager.getCountFilterChanges(bs, state.getKey(), state.getDataType(), collectionId);
@@ -128,7 +130,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public DataDelta getChanged(BackendSession bs, SyncState state,
-			FilterType filter, Integer collectionId) throws ActiveSyncException, SQLException {
+			FilterType filter, Integer collectionId) throws ActiveSyncException, DaoException {
 		
 		DataDelta delta = null;
 		switch (state.getDataType()) {
@@ -158,7 +160,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchServerIds) throws ActiveSyncException {
+			List<String> fetchServerIds) throws ActiveSyncException, DaoException {
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		switch (getDataType) {
 		case CONTACTS:
@@ -199,7 +201,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public List<ItemChange> fetchEmails(BackendSession bs,
 			Integer collectionId, Collection<Long> uids)
-			throws ActiveSyncException {
+			throws ActiveSyncException, DaoException {
 		return mailBackend.fetchItems(bs, collectionId, uids);
 	}
 
@@ -210,7 +212,7 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public boolean getFilterChanges(BackendSession bs, SyncCollection collection) {
+	public boolean getFilterChanges(BackendSession bs, SyncCollection collection) throws DaoException {
 		return invitationFilterManager.getCountFilterChanges(bs, collection.getSyncKey(), collection.getDataType(), collection.getCollectionId()) > 0;
 	}
 	

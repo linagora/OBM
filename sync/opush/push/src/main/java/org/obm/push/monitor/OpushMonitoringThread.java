@@ -1,6 +1,5 @@
 package org.obm.push.monitor;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
@@ -10,6 +9,7 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.impl.PushNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class OpushMonitoringThread {
 					}
 				} catch (ActiveSyncException e) {
 					logger.error(e.getMessage(), e);
-				} catch (SQLException e) {
+				} catch (DaoException e) {
 					logger.error(e.getMessage(), e);
 				}
 			}

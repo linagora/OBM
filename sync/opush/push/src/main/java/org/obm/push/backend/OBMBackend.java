@@ -1,7 +1,6 @@
 package org.obm.push.backend;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +10,7 @@ import java.util.Set;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.IEmailManager;
 import org.obm.push.mail.MailBackend;
@@ -87,22 +87,25 @@ public class OBMBackend implements IBackend {
 		synchronized (emailPushMonitors) {
 			emt = emailPushMonitors.get(collectionId);
 		}
-
-		if (emt != null) {
-			emt.stopIdle();
-		} else {
-			emt = new EmailMonitoringThread(mailBackend, registeredListeners,
-					bs, collectionId, emailManager, contentsExporter);
-		}
 		try {
+			if (emt != null) {
+				emt.stopIdle();
+			} else {
+				emt = new EmailMonitoringThread(mailBackend, registeredListeners,
+					bs, collectionId, emailManager, contentsExporter);
+			}
+		
 			emt.startIdle();
+			
+			synchronized (emailPushMonitors) {
+				emailPushMonitors.put(collectionId, emt);
+			}
 		} catch (Exception e) {
 			logger.error("Error while starting idle on collection["
 					+ collectionId + "]", e);
-			emt.stopIdle();
-		}
-		synchronized (emailPushMonitors) {
-			emailPushMonitors.put(collectionId, emt);
+			if(emt != null){
+				emt.stopIdle();
+			}
 		}
 	}
 
@@ -133,7 +136,7 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public void resetCollection(BackendSession bs, Integer collectionId) throws SQLException {
+	public void resetCollection(BackendSession bs, Integer collectionId) throws DaoException {
 		logger.info("reset Collection {} For Full Sync devId {}", 
 				new Object[]{collectionId, bs.getDevId()});
 		try {
@@ -151,7 +154,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Set<SyncCollection> getChangesSyncCollections(
-			CollectionChangeListener collectionChangeListener) throws SQLException {
+			CollectionChangeListener collectionChangeListener) throws DaoException {
 		
 		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();
 		final BackendSession backendSession = collectionChangeListener.getSession();
@@ -168,7 +171,7 @@ public class OBMBackend implements IBackend {
 	}
 	
 	private int getCount(BackendSession backendSession,
-			SyncCollection syncCollection) throws SQLException {
+			SyncCollection syncCollection) throws DaoException {
 		
 		try {
 			

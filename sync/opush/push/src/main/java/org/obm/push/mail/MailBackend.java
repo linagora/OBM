@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -33,6 +32,7 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderTypeNotFoundException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ObjectNotFoundException;
@@ -72,7 +72,7 @@ public class MailBackend extends ObmSyncBackend {
 		this.filtrageInvitationDao = filtrageInvitationDao;
 	}
 
-	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
+	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
 		ret.add(genItemChange(bs, EmailConfiguration.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER));
 		ret.add(genItemChange(bs,  EmailConfiguration.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS));
@@ -82,7 +82,7 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	private ItemChange genItemChange(BackendSession bs, String imapFolder,
-			FolderType type) throws SQLException {
+			FolderType type) throws DaoException {
 		ItemChange ic = new ItemChange();
 		ic.setParentId("0");
 		ic.setDisplayName(bs.getLoginAtDomain() + " " + imapFolder);
@@ -120,7 +120,7 @@ public class MailBackend extends ObmSyncBackend {
 		return buildPath(bs, "Trash");
 	}
 
-	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) throws ActiveSyncException {
+	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) throws ActiveSyncException, DaoException {
 		String collectionPath = getCollectionPathFor(collectionId);
 		logger.info("Collection [ " + collectionPath + " ]");
 		List<ItemChange> changes = new LinkedList<ItemChange>();
@@ -163,7 +163,7 @@ public class MailBackend extends ObmSyncBackend {
 	
 	public List<ItemChange> fetchItems(
 			BackendSession bs, List<String> fetchIds)
-			throws ActiveSyncException {
+			throws ActiveSyncException, DaoException {
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
 		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(fetchIds);
 		for (Entry<Integer, Collection<Long>> entry : emailUids.entrySet()) {
@@ -188,7 +188,7 @@ public class MailBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<Long> uids) throws ActiveSyncException {
+	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<Long> uids) throws ActiveSyncException, DaoException {
 		final Builder<ItemChange> ret = ImmutableList.builder();
 		final String collectionPath = getCollectionPathFor(collectionId);
 		try {
@@ -236,7 +236,7 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	private void removeInvitationStatus(BackendSession bs,
-			Integer emailCollectionId, Long mailUid) throws SQLException {
+			Integer emailCollectionId, Long mailUid) throws DaoException {
 		try {
 			String calPath = getDefaultCalendarName(bs);
 			Integer eventCollectionId = getCollectionIdFor(bs.getDevice(),
@@ -251,7 +251,7 @@ public class MailBackend extends ObmSyncBackend {
 
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, MSEmail data)
-			throws ActiveSyncException {
+			throws ActiveSyncException, DaoException {
 		String collectionPath = getCollectionPathFor(collectionId);
 		logger.info("createOrUpdate(" + bs.getLoginAtDomain() + ", "
 				+ collectionPath + ", " + serverId + ", " + clientId + ")");
@@ -444,7 +444,7 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	public MSEmail getEmail(BackendSession bs, Integer collectionId,
-			String serverId) throws ActiveSyncException {
+			String serverId) throws ActiveSyncException, DaoException {
 		String collectionName = getCollectionPathFor(collectionId);
 		Long uid = getEmailUidFromServerId(serverId);
 		Set<Long> uids = new HashSet<Long>();

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import org.obm.dbcp.DBCP;
 import org.obm.push.bean.Device;
+import org.obm.push.exception.DaoException;
 import org.obm.push.store.HearbeatDao;
 import org.obm.push.utils.JDBCUtils;
 
@@ -22,7 +23,7 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 	}
 
 	@Override
-	public long findLastHearbeat(Device device) throws SQLException {
+	public long findLastHearbeat(Device device) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		
 		Connection con = null;
@@ -38,8 +39,8 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 			if (rs.next()) {
 				return rs.getLong("last_heartbeat");
 			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
@@ -47,7 +48,7 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 	}
 
 	@Override
-	public void updateLastHearbeat(Device device, long hearbeat) throws SQLException {
+	public void updateLastHearbeat(Device device, long hearbeat) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -62,8 +63,8 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 			ps.setInt(1, devDbId);
 			ps.setLong(2, hearbeat);
 			ps.executeUpdate();
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}

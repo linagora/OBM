@@ -1,6 +1,5 @@
 package org.obm.push.state;
 
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -8,6 +7,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class StateMachine {
 		this.collectionDao = collectionDao;
 	}
 	
-	public SyncState getFolderSyncState(Device device, String collectionUrl, String syncKey) throws SQLException {
+	public SyncState getFolderSyncState(Device device, String collectionUrl, String syncKey) throws DaoException {
 		try {
 			int collectionId = collectionDao.getCollectionMapping(device, collectionUrl);
 			return getSyncState(collectionId, syncKey);
@@ -37,7 +37,7 @@ public class StateMachine {
 		}
 	}
 
-	public SyncState getSyncState(Integer collectionId, String syncKey) throws CollectionNotFoundException {
+	public SyncState getSyncState(Integer collectionId, String syncKey) throws CollectionNotFoundException, DaoException {
 		SyncState syncState = collectionDao.findStateForKey(syncKey);
 		if (syncState != null) {
 			return syncState;
@@ -45,7 +45,7 @@ public class StateMachine {
 		return new SyncState(collectionDao.getCollectionPath(collectionId), syncKey);
 	}
 
-	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync) throws CollectionNotFoundException, SQLException {
+	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync) throws CollectionNotFoundException, DaoException {
 		final String newSk = UUID.randomUUID().toString();
 		final SyncState newState = new SyncState(collectionDao.getCollectionPath(collectionId), newSk, lastSync);
 		logger.info("allocateNewSyncKey [ collectionId = {} | lastSync.toString = {} ]",

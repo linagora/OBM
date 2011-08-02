@@ -1,7 +1,6 @@
 package org.obm.push.backend;
 
 import java.io.InputStream;
-import java.sql.SQLException;
 
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
@@ -10,6 +9,7 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
@@ -23,17 +23,17 @@ public interface IContentsImporter {
 
 	String importMessageChange(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
-			throws ActiveSyncException;
+			throws ActiveSyncException, DaoException;
 
 	void importMessageDeletion(BackendSession bs, PIMDataType type,
-			Integer collectionId, String serverId, Boolean moveToTrash) throws ActiveSyncException;
+			Integer collectionId, String serverId, Boolean moveToTrash) throws ActiveSyncException, DaoException;
 
 	String importMoveItem(BackendSession bs, PIMDataType type,
 			String srcFolder, String dstFolder, String messageId)
 			throws ServerErrorException;
 
 	String importCalendarUserStatus(BackendSession bs, Integer invitationCollectionId, MSEmail invitation,
-			AttendeeStatus userResponse) throws SQLException;
+			AttendeeStatus userResponse) throws DaoException;
 
 	void sendEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent)
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException;

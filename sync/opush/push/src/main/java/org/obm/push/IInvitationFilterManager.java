@@ -1,20 +1,19 @@
 package org.obm.push;
 
-import java.sql.SQLException;
-
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
+import org.obm.push.exception.DaoException;
 
 public interface IInvitationFilterManager {
 
-	DataDelta filterEvent(BackendSession bs, SyncState state, Integer eventCollectionId, DataDelta delta);
-	void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) throws SQLException;
-	void handleMeetingResponse(BackendSession bs, Integer invitationCollexctionId, MSEmail invitation) throws SQLException;
-	int getCountFilterChanges(BackendSession bs, String syncKey, PIMDataType dataType, Integer collectionId);
-	void deleteFilteredEvent(Integer collectionId, String eventUid);
-	void deleteFilteredEmail(Integer collectionId, Long mailUid);
+	DataDelta filterEvent(BackendSession bs, SyncState state, Integer eventCollectionId, DataDelta delta) throws DaoException;
+	void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) throws DaoException;
+	void handleMeetingResponse(BackendSession bs, Integer invitationCollexctionId, MSEmail invitation) throws DaoException;
+	int getCountFilterChanges(BackendSession bs, String syncKey, PIMDataType dataType, Integer collectionId) throws DaoException;
+	void deleteFilteredEvent(Integer collectionId, String eventUid) throws DaoException;
+	void deleteFilteredEmail(Integer collectionId, Long mailUid) throws DaoException;
 
 }

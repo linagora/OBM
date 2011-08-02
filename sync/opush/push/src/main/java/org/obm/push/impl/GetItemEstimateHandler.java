@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.obm.annotations.transactional.Transactional;
@@ -10,6 +9,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
@@ -71,7 +71,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	@Transactional
-	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, ActiveSyncException, SQLException {
+	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, ActiveSyncException, DaoException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		for (SyncCollection syncCollection: request.getSyncCollections()) {

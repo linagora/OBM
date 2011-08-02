@@ -13,6 +13,7 @@ import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.impl.PushNotification;
 import org.obm.push.mail.IEmailManager;
@@ -35,7 +36,7 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 	public EmailMonitoringThread(ObmSyncBackend cb,
 			Set<ICollectionChangeListener> ccls, BackendSession bs,
 			Integer collectionId, IEmailManager emailManager, 
-			IContentsExporter contentsExporter) throws ActiveSyncException {
+			IContentsExporter contentsExporter) throws ActiveSyncException, DaoException {
 		
 		super(contentsExporter);
 		

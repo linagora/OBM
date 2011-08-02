@@ -14,6 +14,7 @@ import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.exception.ServerErrorException;
 import org.obm.push.protocol.MoveItemsProtocol;
@@ -116,23 +117,26 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 	private StatusForItem getStatusForItem(MoveItem item) {
 		StatusForItem status = new StatusForItem();
 		try {
-			status.dstCollectionId = Integer.parseInt(item.getDestinationFolderId());
-			status.dstCollection = collectionDao.getCollectionPath(status.dstCollectionId);
-		} catch (CollectionNotFoundException ex) {
-			status.status = MoveItemsStatus.INVALID_DESTINATION_COLLECTION_ID;
+			try {
+				status.dstCollectionId = Integer.parseInt(item.getDestinationFolderId());
+				status.dstCollection = collectionDao.getCollectionPath(status.dstCollectionId);
+			} catch (CollectionNotFoundException ex) {
+				status.status = MoveItemsStatus.INVALID_DESTINATION_COLLECTION_ID;
+			}
+
+			try {
+				status.srcCollectionId = Integer.parseInt(item.getSourceFolderId());
+				status.srcCollection = collectionDao.getCollectionPath(status.srcCollectionId);
+			} catch (CollectionNotFoundException ex) {
+				status.status = MoveItemsStatus.INVALID_SOURCE_COLLECTION_ID;
+			}
+
+			if (status.status == null && status.srcCollectionId.equals(status.dstCollectionId)) {
+				status.status = MoveItemsStatus.SAME_SOURCE_AND_DESTINATION_COLLECTION_ID;
+			}
+		} catch (DaoException ex) {
+			status.status = MoveItemsStatus.SERVER_ERROR;
 		}
-		
-		try {
-			status.srcCollectionId = Integer.parseInt(item.getSourceFolderId());
-			status.srcCollection = collectionDao.getCollectionPath(status.srcCollectionId);
-		} catch (CollectionNotFoundException ex) {
-			status.status = MoveItemsStatus.INVALID_SOURCE_COLLECTION_ID;
-		}
-		
-		if (status.status == null && status.srcCollectionId.equals(status.dstCollectionId)) {
-			status.status = MoveItemsStatus.SAME_SOURCE_AND_DESTINATION_COLLECTION_ID;
-		}
-		
 		return status;
 	}
 	

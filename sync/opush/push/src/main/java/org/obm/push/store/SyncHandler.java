@@ -1,7 +1,6 @@
 package org.obm.push.store;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -34,6 +33,7 @@ import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.NoDocumentException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
@@ -138,14 +138,14 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
-		} catch (SQLException e) {
+		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 
 	@Transactional
 	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync)
-			throws CollectionNotFoundException, ActiveSyncException, WaitIntervalOutOfRangeException {
+			throws CollectionNotFoundException, ActiveSyncException, WaitIntervalOutOfRangeException, DaoException {
 		
 		logger.info("suspend for {} seconds", sync.getWaitInSecond());
 		if (sync.getWaitInSecond() > 3540) {
@@ -177,7 +177,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds, SyncCollectionResponse syncCollectionResponse) 
-			throws ActiveSyncException, SQLException {
+			throws ActiveSyncException, DaoException {
 
 		DataDelta delta = null;
 		Date lastSync = null;
@@ -273,7 +273,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private ModificationStatus processCollections(BackendSession bs, Sync sync)
-			throws ActiveSyncException {
+			throws ActiveSyncException, DaoException {
 		ModificationStatus modificationStatus = new ModificationStatus();
 
 		for (SyncCollection collection : sync.getCollections()) {
@@ -299,7 +299,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private boolean haveFilteredItemToSync(BackendSession bs,
-			SyncCollection collection) {
+			SyncCollection collection) throws DaoException {
 		return contentsExporter.getFilterChanges(bs, collection);
 	}
 	
@@ -308,7 +308,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	 * @return 
 	 */
 	private Map<String, String> processModification(BackendSession bs,
-			SyncCollection collection) throws ActiveSyncException {
+			SyncCollection collection) throws ActiveSyncException, DaoException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
 		
@@ -354,7 +354,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			SyncResponse syncResponse = doTheJob(bs, monitoredCollectionService.list(bs.getCredentials(), bs.getDevice()),
 					ImmutableMap.<String, String> of(), continuation);
 			responder.sendResponse("AirSync", syncProtocol.endcodeResponse(syncResponse));
-		} catch (SQLException e) {
+		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
 		} catch (ActiveSyncException e) {
 			logger.error(e.getMessage(), e);
@@ -365,7 +365,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	@Transactional
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
-			Map<String, String> processedClientIds, IContinuation continuation) throws SQLException, ActiveSyncException {
+			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, ActiveSyncException {
 
 		final List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {

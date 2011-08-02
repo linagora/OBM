@@ -1,6 +1,5 @@
 package org.obm.push;
 
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +12,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.mail.MailBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,24 +53,24 @@ public class HierarchyExporter implements IHierarchyExporter {
 		}
 	}
 
-	private List<ItemChange> getContactsChanges(BackendSession bs) throws SQLException {
+	private List<ItemChange> getContactsChanges(BackendSession bs) throws DaoException {
 		return contactsBackend.getHierarchyChanges(bs);
 	}
 
-	private List<ItemChange> getTasksChanges(BackendSession bs) throws SQLException {
+	private List<ItemChange> getTasksChanges(BackendSession bs) throws DaoException {
 		return calendarExporter.getHierarchyTaskChanges(bs);
 	}
 
-	private List<ItemChange> getCalendarChanges(BackendSession bs) throws SQLException {
+	private List<ItemChange> getCalendarChanges(BackendSession bs) throws DaoException {
 		return calendarExporter.getHierarchyChanges(bs);
 	}
 
-	private List<ItemChange> getMailChanges(BackendSession bs) throws SQLException {
+	private List<ItemChange> getMailChanges(BackendSession bs) throws DaoException {
 		return mailExporter.getHierarchyChanges(bs);
 	}
 
 	@Override
-	public List<ItemChange> getChanged(BackendSession bs) throws SQLException {
+	public List<ItemChange> getChanged(BackendSession bs) throws DaoException {
 		folderExporter.synchronize(bs);
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		changes.addAll(getCalendarChanges(bs));
@@ -81,7 +81,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 
 	@Override
-	public int getRootFolderId(BackendSession bs) throws ActiveSyncException, SQLException {
+	public int getRootFolderId(BackendSession bs) throws ActiveSyncException, DaoException {
 		return folderExporter.getServerIdFor(bs);
 	}
 

@@ -20,6 +20,7 @@ import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.exception.DaoException;
 import org.obm.push.impl.FolderSyncHandler;
 import org.obm.push.impl.GetAttachmentHandler;
 import org.obm.push.impl.GetItemEstimateHandler;
@@ -114,11 +115,15 @@ public class ActiveSyncServlet extends HttpServlet {
 			logger.info("policy used = {}", policy);
 		}
 
-		processActiveSyncMethod(c, 
-				creds, 
-				asrequest.getDeviceId(), 
-				asrequest,
-				response);
+		try {
+			processActiveSyncMethod(c, 
+					creds, 
+					asrequest.getDeviceId(), 
+					asrequest,
+					response);
+		} catch (DaoException e) {
+			logger.error(e.getMessage(), e);
+		}
 
 	}
 
@@ -217,10 +222,14 @@ public class ActiveSyncServlet extends HttpServlet {
 						String deviceId = request.getDeviceId();
 						String deviceType = request.getDeviceType();
 						String userAgent = request.getUserAgent();
-						valid = initDevice(loginAtDomain, deviceId, deviceType, userAgent)
-								&& validatePassword(loginAtDomain, password)
-								&& deviceDao.syncAuthorized(loginAtDomain,
-										deviceId);
+						try {
+							valid = initDevice(loginAtDomain, deviceId, deviceType, userAgent)
+									&& validatePassword(loginAtDomain, password)
+									&& deviceDao.syncAuthorized(loginAtDomain,
+											deviceId);
+						} catch (DaoException e) {
+							//Do nothing valid doesn't change
+						}
 						if (valid) {
 							loggerService.initLoggerSession(loginAtDomain);
 							
@@ -268,7 +277,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	private void processActiveSyncMethod(IContinuation continuation,
 			Credentials credentials, String devId,
 			ActiveSyncRequest request, HttpServletResponse response)
-			throws IOException {
+			throws IOException, DaoException {
 
 		BackendSession bs = sessionService.getSession(credentials, devId, request);
 		logger.info("activeSyncMethod = {}", bs.getCommand());

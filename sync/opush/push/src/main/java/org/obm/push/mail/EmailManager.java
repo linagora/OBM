@@ -19,7 +19,6 @@ package org.obm.push.mail;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -44,6 +43,7 @@ import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.ServerErrorException;
@@ -478,7 +478,7 @@ public class EmailManager implements IEmailManager {
 			Collection<Long> mailUids) {
 		try {
 			emailDao.removeMessages(devId, collectionId, mailUids);
-		} catch (SQLException e) {
+		} catch (DaoException e) {
 			logger.error("Error while deleting messages in db", e);
 		}
 	}
@@ -496,7 +496,7 @@ public class EmailManager implements IEmailManager {
 				});
 		try {
 			emailDao.addMessages(devId, collectionId, emails);
-		} catch (SQLException e) {
+		} catch (DaoException e) {
 			logger.error("Error while adding messages in db", e);
 		}
 	}

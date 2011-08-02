@@ -1,13 +1,13 @@
 package org.obm.push.store;
 
-import java.sql.SQLException;
 
 import org.obm.push.bean.Device;
+import org.obm.push.exception.DaoException;
 
 public interface HearbeatDao {
 
-	long findLastHearbeat(Device device) throws SQLException;
+	long findLastHearbeat(Device device) throws DaoException;
 
-	void updateLastHearbeat(Device device, long hearbeat) throws SQLException;
+	void updateLastHearbeat(Device device, long hearbeat) throws DaoException;
 
 }

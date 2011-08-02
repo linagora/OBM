@@ -1,6 +1,5 @@
 package org.obm.push.calendar;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -22,6 +21,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderTypeNotFoundException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
@@ -59,7 +59,7 @@ public class CalendarBackend extends ObmSyncBackend {
 				PIMDataType.TASKS, new TodoConverter());
 	}
 
-	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
+	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
 
 		if (!bs.checkHint("hint.multipleCalendars", false)) {
 			return getDefaultCalendarItemChange(bs);
@@ -102,7 +102,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	private List<ItemChange> getDefaultCalendarItemChange(BackendSession bs) throws SQLException {
+	private List<ItemChange> getDefaultCalendarItemChange(BackendSession bs) throws DaoException {
 		
 		ItemChange ic = new ItemChange();
 		String col = getDefaultCalendarName(bs);
@@ -121,7 +121,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ImmutableList.of(ic);
 	}
 
-	public List<ItemChange> getHierarchyTaskChanges(BackendSession bs) throws SQLException {
+	public List<ItemChange> getHierarchyTaskChanges(BackendSession bs) throws DaoException {
 		List<ItemChange> ret = new ArrayList<ItemChange>(1);
 		ItemChange ic = new ItemChange();
 		String col = "obm:\\\\" + bs.getLoginAtDomain() + "\\tasks\\"
@@ -142,7 +142,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) throws ActiveSyncException {
+	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) throws ActiveSyncException, DaoException {
 		
 		final List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		final List<ItemChange> deletions = new LinkedList<ItemChange>();
@@ -243,7 +243,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	}
 
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
-			String serverId, IApplicationData data) throws ActiveSyncException {
+			String serverId, IApplicationData data) throws ActiveSyncException, DaoException {
 		String collectionPath = getCollectionPathFor(collectionId);
 		logger.info("createOrUpdate(" + bs.getLoginAtDomain() + ", "
 				+ collectionPath + ", " + serverId + ")");
@@ -314,7 +314,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		return null;
 	}
 
-	public void delete(BackendSession bs, Integer collectionId, String serverId) throws ActiveSyncException {
+	public void delete(BackendSession bs, Integer collectionId, String serverId) throws ActiveSyncException, DaoException {
 		logger.info("delete serverId " + serverId);
 		String collectionPath = getCollectionPathFor(collectionId);
 		if (serverId != null) {
@@ -394,7 +394,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	private String updateUserStatus(BackendSession bs, MSEvent msEvent,
 			AttendeeStatus status, AbstractEventSyncClient calCli,
 			AccessToken at) throws ServerFault,
-			CollectionNotFoundException, ActiveSyncException, SQLException {
+			CollectionNotFoundException, ActiveSyncException, DaoException {
 		logger.info("update user status[" + status.toString()
 					+ "] in calendar " + bs.getLoginAtDomain());
 		ParticipationState participationStatus = EventConverter.status(null, status);
@@ -479,7 +479,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 	
-	public Integer getCollectionId (BackendSession bs) throws CollectionNotFoundException, SQLException{
+	public Integer getCollectionId (BackendSession bs) throws CollectionNotFoundException, DaoException {
 		String calPath = getDefaultCalendarName(bs);
 		Integer eventCollectionId = getCollectionIdFor(bs.getDevice(), calPath);
 		return eventCollectionId;

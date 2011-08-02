@@ -8,6 +8,7 @@ import java.util.Set;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.ChangedCollections;
+import org.obm.push.exception.DaoException;
 import org.obm.push.impl.PushNotification;
 import org.obm.push.store.CollectionDao;
 
@@ -21,7 +22,7 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 	private final long freqMillisec;
 	private boolean stopped;
 	
-	protected abstract ChangedCollections getChangedCollections(Date lastSync) throws ChangedCollectionsException;
+	protected abstract ChangedCollections getChangedCollections(Date lastSync) throws ChangedCollectionsException, DaoException;
 	
 	protected MonitoringThread(long freqMillisec,
 			Set<ICollectionChangeListener> ccls,
@@ -71,10 +72,14 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 
 				} catch (ChangedCollectionsException e1) {
 					logger.error(e1.getMessage(), e1);
+				} catch (DaoException e) {
+					logger.error(e.getMessage(), e);
 				}
 			}
 		} catch (ChangedCollectionsException e1) {
 			logger.error(e1.getMessage(), e1);
+		} catch (DaoException e) {
+			logger.error(e.getMessage(), e);
 		}	
 	}
 
@@ -96,7 +101,7 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 		
 	}
 
-	private Date getBaseLastSync() throws ChangedCollectionsException {
+	private Date getBaseLastSync() throws ChangedCollectionsException, DaoException {
 		ChangedCollections collections = getChangedCollections(new Date(0));
 		return collections.getLastSync();
 	}

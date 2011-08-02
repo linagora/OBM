@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +14,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.ISyncClient;
@@ -135,12 +135,12 @@ public class ObmSyncBackend {
 	}
 
 	public Integer getCollectionIdFor(Device device, String collection)
-			throws CollectionNotFoundException, SQLException {
+			throws CollectionNotFoundException, DaoException {
 		return collectionDao.getCollectionMapping(device, collection);
 	}
 
 	public String getCollectionPathFor(Integer collectionId)
-			throws ActiveSyncException {
+			throws ActiveSyncException, DaoException {
 		return collectionDao.getCollectionPath(collectionId);
 	}
 
@@ -167,7 +167,7 @@ public class ObmSyncBackend {
 		return Integer.parseInt(serverId.substring(idx + 1));
 	}
 
-	public String createCollectionMapping(Device device, String col) throws SQLException {
+	public String createCollectionMapping(Device device, String col) throws DaoException {
 		return collectionDao.addCollectionMapping(device, col).toString();
 	}
 }

@@ -1,7 +1,6 @@
 package org.obm.push;
 
 import java.io.InputStream;
-import java.sql.SQLException;
 
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.bean.AttendeeStatus;
@@ -14,6 +13,7 @@ import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
@@ -46,7 +46,7 @@ public class ContentsImporter implements IContentsImporter {
 	@Override
 	public String importMessageChange(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
-			throws ActiveSyncException {
+			throws ActiveSyncException, DaoException {
 		String id = null;
 		switch (data.getType()) {
 		case CONTACTS:
@@ -68,7 +68,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public void importMessageDeletion(BackendSession bs, PIMDataType type, 
-			Integer collectionId, String serverId, Boolean moveToTrash) throws ActiveSyncException {
+			Integer collectionId, String serverId, Boolean moveToTrash) throws ActiveSyncException, DaoException {
 		switch (type) {
 		case CALENDAR:
 			String eventUid = calBackend.getEventUidFromServerId(serverId);
@@ -124,7 +124,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importCalendarUserStatus(BackendSession bs,  Integer invitationCollexctionId, MSEmail invitation,
-			AttendeeStatus userResponse) throws SQLException {
+			AttendeeStatus userResponse) throws DaoException {
 		String ret = calBackend.handleMeetingResponse(bs, invitation, userResponse);
 		invitationFilterManager.handleMeetingResponse(bs, invitationCollexctionId, invitation);
 		return ret;

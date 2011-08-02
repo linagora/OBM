@@ -1,12 +1,12 @@
 package org.obm.push.monitor;
 
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.Set;
 
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.ChangedCollections;
+import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 
 import com.google.inject.Inject;
@@ -41,10 +41,10 @@ public class CalendarMonitoringThread extends MonitoringThread {
 	}
 
 	@Override
-	public ChangedCollections getChangedCollections(Date lastSync) throws ChangedCollectionsException {
+	public ChangedCollections getChangedCollections(Date lastSync) throws ChangedCollectionsException, DaoException {
 		try{
 			return collectionDao.getCalendarChangedCollections(lastSync);
-		} catch (SQLException e) {
+		} catch (DaoException e) {
 			throw new ChangedCollectionsException(e);
 		}
 	}

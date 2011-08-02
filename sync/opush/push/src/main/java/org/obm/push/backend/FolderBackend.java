@@ -1,12 +1,11 @@
 package org.obm.push.backend;
 
-import java.sql.SQLException;
-
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 
@@ -23,7 +22,7 @@ public class FolderBackend extends ObmSyncBackend {
 		super(configurationService, collectionDao);
 	}
 
-	public void synchronize(BackendSession bs) throws SQLException {
+	public void synchronize(BackendSession bs) throws DaoException {
 		try {
 			getCollectionIdFor(bs.getDevice(), getColName(bs));
 		} catch (ActiveSyncException e) {
@@ -31,7 +30,7 @@ public class FolderBackend extends ObmSyncBackend {
 		}
 	}
 
-	public int getServerIdFor(BackendSession bs) throws ActiveSyncException, SQLException {
+	public int getServerIdFor(BackendSession bs) throws ActiveSyncException, DaoException {
 		return getCollectionIdFor(bs.getDevice(), getColName(bs));
 	}
 	

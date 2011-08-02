@@ -110,8 +110,6 @@ public class MonitoredCollectionDaoEhcacheImpl extends AbstractEhcacheDao implem
 		private MonitoredCollectionDaoEhcacheImpl getOuterType() {
 			return MonitoredCollectionDaoEhcacheImpl.this;
 		}
-
-		
 		
 	}
 }

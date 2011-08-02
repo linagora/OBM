@@ -18,6 +18,7 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
 import org.obm.push.store.CollectionDao;
@@ -55,7 +56,7 @@ public class SyncDecoder {
 				.build();
 	}
 
-	public Sync decodeSync(Document doc, BackendSession backendSession) throws PartialException, ProtocolException {
+	public Sync decodeSync(Document doc, BackendSession backendSession) throws PartialException, ProtocolException, DaoException {
 		Sync ret = new Sync();
 		Element root = doc.getDocumentElement();
 		ret.setWait(getWait(root));
@@ -94,7 +95,7 @@ public class SyncDecoder {
 	}
 
 	private SyncCollection getCollection(Credentials credentials, Device device, Element col, boolean isPartial)
-			throws PartialException, ProtocolException{
+			throws PartialException, ProtocolException, DaoException{
 		
 		SyncCollection collection = new SyncCollection();
 		Integer collectionId = getCollectionId(col);

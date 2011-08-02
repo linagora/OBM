@@ -1,6 +1,5 @@
 package org.obm.push.contacts;
 
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +14,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderTypeNotFoundException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
@@ -38,7 +38,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		super(configurationService, collectionDao);
 	}
 
-	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
+	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 
 		ItemChange ic = new ItemChange();

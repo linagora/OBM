@@ -16,6 +16,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.calendar.EventType;
@@ -33,7 +34,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 		super(dbcp);
 	}
 
-	public Integer addCollectionMapping(Device device, String collection) throws SQLException {
+	@Override
+	public Integer addCollectionMapping(Device device, String collection) throws DaoException {
 		Integer id = device.getDatabaseId();
 		Integer ret = null;
 		Connection con = null;
@@ -45,6 +47,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			ps.setString(2, collection);
 			ps.executeUpdate();
 			ret = dbcp.lastInsertId(con);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
@@ -52,7 +56,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 	}
 	
 	@Override
-	public void resetCollection(Device device, Integer collectionId) throws SQLException {
+	public void resetCollection(Device device, Integer collectionId) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -75,8 +79,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 
 			logger.warn("mappings & states cleared for sync of collection "
 					+ collectionId + " of device " + device.getDevId());
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
@@ -84,7 +88,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 	
 	@Override
 	public String getCollectionPath(Integer collectionId)
-			throws CollectionNotFoundException {
+			throws CollectionNotFoundException, DaoException {
 		String ret = null;
 
 		Connection con = null;
@@ -100,8 +104,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			if (rs.next()) {
 				ret = rs.getString(1);
 			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
@@ -113,7 +117,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 	}
 
 	private String getCollectionPath(Integer collectionId, Connection con)
-			throws CollectionNotFoundException {
+			throws CollectionNotFoundException, DaoException {
 		String ret = null;
 
 		PreparedStatement ps = null;
@@ -127,8 +131,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			if (rs.next()) {
 				ret = rs.getString(1);
 			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(null, ps, rs);
 		}
@@ -140,7 +144,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 	
 	@Override
 	public void updateState(Device device, Integer collectionId,
-			SyncState state) throws SQLException {
+			SyncState state) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -155,15 +159,15 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			logger.info("UpdateState [ " + collectionId + ", "
 					+ state.getKey() + ", " + state.getLastSync().toString()
 					+ " ]");
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
 	}
 	
 	@Override
-	public SyncState findStateForKey(String syncKey) {
+	public SyncState findStateForKey(String syncKey) throws DaoException, CollectionNotFoundException {
 
 		SyncState ret = null;
 		Connection con = null;
@@ -183,8 +187,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 				ret.setKey(syncKey);
 				ret.setLastSync(lastSync);
 			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
@@ -192,7 +196,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 	}
 	
 	public int getCollectionMapping(Device device,
-			String collection) throws CollectionNotFoundException, SQLException {
+			String collection) throws CollectionNotFoundException, DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		Integer ret = null;
 
@@ -209,8 +213,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			if (rs.next()) {
 				ret = rs.getInt(1);
 			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
@@ -221,7 +225,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 	}
 
 	@Override
-	public ChangedCollections getCalendarChangedCollections(Date lastSync) throws SQLException {
+	public ChangedCollections getCalendarChangedCollections(Date lastSync) throws DaoException {
 		final String query = "select "
 				+ "userobm_login, domain_name, now(), e.event_type as type "
 				+ "from EventLink "
@@ -252,13 +256,15 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			ps.setTimestamp(idx++, ts);
 			rs = ps.executeQuery();
 			return getCalendarChangedCollectionsFromResultSet(rs, lastSync);
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
 	}
 	
 	@Override
-	public ChangedCollections getContactChangedCollections(Date lastSync) throws SQLException {
+	public ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException {
 		
 		String query = "select "
 		+ "	distinct userobm_login, domain_name, now()"
@@ -287,6 +293,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 						+ changedCollections.getLastSync());
 			}
 			return changedCollections;
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}

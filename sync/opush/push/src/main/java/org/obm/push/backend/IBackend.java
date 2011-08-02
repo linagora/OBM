@@ -1,12 +1,12 @@
 package org.obm.push.backend;
 
 import java.util.Set;
-import java.sql.SQLException;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.protocol.provisioning.Policy;
+import org.obm.push.exception.DaoException;
 
 public interface IBackend {
 
@@ -26,11 +26,11 @@ public interface IBackend {
 	void startEmailMonitoring(BackendSession bs, Integer collectionId)
 			throws ActiveSyncException;
 
-	void resetCollection(BackendSession bs, Integer collectionId) throws SQLException;
+	void resetCollection(BackendSession bs, Integer collectionId) throws DaoException;
 
 	boolean validatePassword(String userID, String password);
 
 	Set<SyncCollection> getChangesSyncCollections(
-			CollectionChangeListener collectionChangeListener) throws SQLException;
+			CollectionChangeListener collectionChangeListener) throws DaoException;
 	
 }

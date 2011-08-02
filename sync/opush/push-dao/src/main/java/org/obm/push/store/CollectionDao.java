@@ -1,34 +1,31 @@
 package org.obm.push.store;
 
-import java.sql.SQLException;
 import java.util.Date;
 
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.DaoException;
 
 public interface CollectionDao {
 
-	Integer addCollectionMapping(Device device, String collection) throws SQLException;
+	Integer addCollectionMapping(Device device, String collection) throws DaoException;
 
-	/**
-	 * Fetches the id associated with a given collection id string.
-	 */
 	int getCollectionMapping(Device device, String collectionId)
-			throws CollectionNotFoundException, SQLException;
+			throws CollectionNotFoundException, DaoException;
 
 	String getCollectionPath(Integer collectionId)
-			throws CollectionNotFoundException;
+			throws CollectionNotFoundException, DaoException;
 
-	void resetCollection(Device device, Integer collectionId) throws SQLException;
+	void resetCollection(Device device, Integer collectionId) throws DaoException;
 	
-	void updateState(Device device, Integer collectionId, SyncState state) throws SQLException;
+	void updateState(Device device, Integer collectionId, SyncState state) throws DaoException;
 
-	SyncState findStateForKey(String syncKey);
+	SyncState findStateForKey(String syncKey) throws DaoException, CollectionNotFoundException;
 	
-	ChangedCollections getCalendarChangedCollections(Date lastSync) throws SQLException;
+	ChangedCollections getCalendarChangedCollections(Date lastSync) throws DaoException;
 
-	ChangedCollections getContactChangedCollections(Date lastSync) throws SQLException;
+	ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException;
 	
 }

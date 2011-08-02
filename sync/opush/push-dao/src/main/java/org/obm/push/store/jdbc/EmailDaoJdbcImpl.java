@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.obm.dbcp.DBCP;
 import org.obm.push.bean.Email;
+import org.obm.push.exception.DaoException;
 import org.obm.push.store.EmailDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
@@ -35,13 +36,13 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 
 	@Override
 	public void addMessages(Integer devId, Integer collectionId,
-			Collection<Email> messages) throws SQLException {
+			Collection<Email> messages) throws DaoException {
 		addMessages(devId, collectionId, null, messages);
 	}
 
 	@Override
 	public void addMessages(Integer devId, Integer collectionId, Date lastSync,
-			Collection<Email> messages) throws SQLException {
+			Collection<Email> messages) throws DaoException {
 		if (lastSync == null) {
 			lastSync = DateUtils.getCurrentGMTCalendar().getTime();
 		}
@@ -69,6 +70,8 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 				insert.addBatch();
 			}
 			insert.executeBatch();
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, insert, null);
 		}
@@ -76,14 +79,14 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 
 	@Override
 	public void removeMessages(Integer devId, Integer collectionId,
-			Collection<Long> mailUids) throws SQLException {
+			Collection<Long> mailUids) throws DaoException {
 		removeMessages(devId, collectionId, Calendar.getInstance().getTime(),
 				mailUids);
 	}
 
 	@Override
 	public void removeMessages(Integer devId, Integer collectionId,
-			Date lastSync, Collection<Long> uids) throws SQLException {
+			Date lastSync, Collection<Long> uids) throws DaoException {
 		PreparedStatement del = null;
 		PreparedStatement insert = null;
 		Connection con = null;
@@ -108,6 +111,8 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			}
 			insert.executeBatch();
 
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(null, insert, null);
 			JDBCUtils.cleanup(con, del, null);
@@ -115,7 +120,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 	}
 	
 	@Override
-	public Set<Email> getSyncedMail(Integer devId, Integer collectionId) {
+	public Set<Email> getSyncedMail(Integer devId, Integer collectionId) throws DaoException {
 		long time = System.currentTimeMillis();
 		Set<Email> uids = new HashSet<Email>();
 
@@ -135,7 +140,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 				uids.add(new Email(uid, read));
 			}
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, evrs);
 		}
@@ -149,7 +154,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 
 	@Override
 	public Set<Email> getUpdatedMail(Integer devId, Integer collectionId,
-			Date updatedFrom) {
+			Date updatedFrom) throws DaoException {
 		long time = System.currentTimeMillis();
 		Set<Email> uids = new HashSet<Email>();
 		Connection con = null;
@@ -170,7 +175,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 				uids.add(new Email(uid, read));
 			}
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, evrs);
 		}
@@ -184,7 +189,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 
 	@Override
 	public Set<Long> getDeletedMail(Integer devId, Integer collectionId,
-			Date lastSync) {
+			Date lastSync) throws DaoException {
 		long time = System.currentTimeMillis();
 		Builder<Long> uids = ImmutableSet.builder();
 		Connection con = null;
@@ -205,7 +210,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 				uids.add(uid);
 			}
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, evrs);
 		}
