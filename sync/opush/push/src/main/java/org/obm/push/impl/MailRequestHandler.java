@@ -1,19 +1,18 @@
 package org.obm.push.impl;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.obm.annotations.transactional.Transactional;
+import org.eclipse.jetty.http.HttpStatus;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IErrorsManager;
+import org.obm.push.bean.MailRequest;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.protocol.MailProtocol;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,81 +23,72 @@ public abstract class MailRequestHandler implements IRequestHandler {
 	
 	protected final IContentsImporter contentsImporter;
 	private final IErrorsManager errorManager;
+	private final MailProtocol mailProtocol;
 	
-	protected MailRequestHandler(IContentsImporter contentsImporter,
-			IErrorsManager errorManager) {
-		
+	protected MailRequestHandler(IContentsImporter contentsImporter, IErrorsManager errorManager, MailProtocol mailProtocol) {
 		this.contentsImporter = contentsImporter;
 		this.errorManager = errorManager;
+		this.mailProtocol = mailProtocol;
 	}
 
+	protected abstract void doTheJob(MailRequest mailRequest, BackendSession bs) 
+			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException;
+	
 	@Override
-	@Transactional
-	public void process(IContinuation continuation, BackendSession bs,
-			ActiveSyncRequest request, Responder responder) throws IOException {
-		InputStream mailContent = null;
+	public void process(IContinuation continuation, BackendSession bs, ActiveSyncRequest request, Responder responder) {
+		MailRequest mailRequest = null;
 		try {
-			mailContent = new BufferedInputStream(request.getInputStream());
-			mailContent.mark(mailContent.available());
-		} catch (IOException e) {
-			responder.sendError(HttpServletResponse.SC_BAD_REQUEST);
-			return;
-		}
-
-		try {
-			Boolean saveInSent = false;
-			String sis = request.getParameter("SaveInSent");
-			if (sis != null) {
-				saveInSent = sis.equalsIgnoreCase("T");
-			}
+			
+			mailRequest = mailProtocol.getRequest(request);
 			if (logger.isDebugEnabled()) {
-				logger.debug("Mail content:\n"
-						+ new String(FileUtils.streamBytes(mailContent, false)));
-				mailContent.reset();
+				logger.debug("Mail content:\n" + new String(FileUtils.streamBytes(mailRequest.getMailContent(), false)));
+				mailRequest.getMailContent().reset();
 			}
-			this.process(continuation, bs, mailContent, saveInSent, request,
-					responder);
+			doTheJob(mailRequest, bs);
 
 		} catch (SmtpInvalidRcptException se) {
-			notifyUser(bs, mailContent, se);
-		} catch (ProcessingEmailException pe) {
-			notifyUser(bs, mailContent, pe);
+			notifyUser(bs,  mailRequest.getMailContent(), se);
+		} catch (ProcessingEmailException pe) {	
+			notifyUser(bs,  mailRequest.getMailContent(), pe);
 		} catch (SendEmailException e) {
-			handleSendEmailException(e, responder, bs, mailContent);
-		} catch (Throwable t) {
-			notifyUser(bs, mailContent, t);
+			handleSendEmailException(e, responder, bs,  mailRequest.getMailContent());
+		} catch (IOException e) {
+			try {
+				responder.sendError(HttpStatus.BAD_REQUEST_400);
+			} catch (IOException e1) {
+				logger.error(e1.getMessage(), e);
+			}
+			return;
+		} finally {
+			resetInputstream(mailRequest);
 		}
 	}
 
-	private void handleSendEmailException(SendEmailException e,
-			Responder responder, BackendSession bs, InputStream mailContent)
-			throws IOException {
+	private void resetInputstream(MailRequest mailRequest) {
+		if (mailRequest != null && mailRequest.getMailContent() != null) {
+			try {
+				mailRequest.getMailContent().reset();
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+	}
+
+	private void handleSendEmailException(SendEmailException e, Responder responder, BackendSession bs, InputStream mailContent) {
 		if (e.getSmtpErrorCode() >= 500) {
 			notifyUser(bs, mailContent, e);
 		} else {
-			logger.error(
-					"Error while sending mail. HTTP error[500] will send to the pda.",
-					e);
-			responder.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			try {
+				responder.sendError(500);
+			} catch (IOException e1) {
+				logger.error(e.getMessage(), e1);
+			}
 		}
 	}
 
-	private void notifyUser(BackendSession bs, InputStream mailContent,
-			Throwable t) {
-		logger.error(
-				"Error while sending mail. A mail with the error will be sent at the sender.",
-				t);
-		try {
-			mailContent.reset();
-		} catch (IOException e) {
-		}
+	private void notifyUser(BackendSession bs, InputStream mailContent, Throwable t) {
+		logger.error("Error while sending mail. A mail with the error will be sent at the sender.", t);
 		errorManager.sendMailHandlerError(bs, mailContent, t);
 	}
-
-	public abstract void process(IContinuation continuation, BackendSession bs,
-			InputStream mailContent, Boolean saveInSent,
-			ActiveSyncRequest request, Responder responder)
-			throws SendEmailException, ProcessingEmailException,
-			SmtpInvalidRcptException;
 
 }
