@@ -96,7 +96,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	@Override
-	@Transactional
 	public void process(IContinuation continuation, BackendSession bs, Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
 			SyncRequest syncRequest = syncProtocol.getRequest(doc, bs);
@@ -138,6 +137,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
+	@Transactional
 	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync)
 			throws CollectionNotFoundException, ActiveSyncException, WaitIntervalOutOfRangeException {
 		
@@ -358,6 +358,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
+	@Transactional
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws SQLException, ActiveSyncException {
 
