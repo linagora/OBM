@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.obm.push.ItemChange;
+
 import com.google.common.base.Objects;
 
 
@@ -23,6 +25,10 @@ public class SyncCollection implements Serializable{
 	private SyncStatus status;
 	private PIMDataType dataType;
 	private SyncCollectionOptions options;
+	private List<ItemChange> itemChanges;
+	private List<ItemChange> itemChangesDeletion;
+	private boolean syncStatevalid;
+	private String allocateNewSyncKey;
 	
 	public SyncCollection() {
 		this(0, null);
@@ -104,28 +110,6 @@ public class SyncCollection implements Serializable{
 		this.collectionPath = collectionPath;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SyncCollection other = (SyncCollection) obj;
-		if (collectionId == null) {
-			if (other.collectionId != null)
-				return false;
-		} else if (!collectionId.equals(other.collectionId))
-			return false;
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(collectionId);
-	}
-
 	public Set<SyncCollectionChange> getChanges() {
 		return changes;
 	}
@@ -158,6 +142,60 @@ public class SyncCollection implements Serializable{
 		this.options = options;
 	}
 	
+	public void setItemChanges(List<ItemChange> itemChanges) {
+		this.itemChanges = itemChanges;
+	}
+	
+	public List<ItemChange> listItemChanges() {
+		return itemChanges;
+	}
+
+	public void setItemChangesDeletion(List<ItemChange> itemChangesDeletion) {
+		this.itemChangesDeletion = itemChangesDeletion;
+	}
+	
+	public List<ItemChange> listItemChangesDeletion() {
+		return itemChangesDeletion;
+	}
+
+	public void setSyncStateValid(boolean syncStatevalid) {
+		this.syncStatevalid = syncStatevalid;
+	}
+	
+	public boolean isSyncStatevalid() {
+		return syncStatevalid;
+	}
+
+	public void setNewSyncKey(String allocateNewSyncKey) {
+		this.allocateNewSyncKey = allocateNewSyncKey;
+	}
+	
+	public String getAllocateNewSyncKey() {
+		return allocateNewSyncKey;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SyncCollection other = (SyncCollection) obj;
+		if (collectionId == null) {
+			if (other.collectionId != null)
+				return false;
+		} else if (!collectionId.equals(other.collectionId))
+			return false;
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(collectionId);
+	}
+	
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(getClass())
@@ -165,4 +203,5 @@ public class SyncCollection implements Serializable{
 				.add("path", collectionPath)
 				.toString();
 	}
+	
 }

@@ -36,8 +36,7 @@ public class Responder {
 		this.resp = resp;
 	}
 
-	public void sendResponse(String defaultNamespace, Document doc)
-			throws IOException {
+	public void sendResponse(String defaultNamespace, Document doc) throws IOException {
 		if (logger.isInfoEnabled()) {
 			Marker asXmlResponseMarker = TechnicalLogType.ACTIVE_SYNC_RESPONSE.getMarker();
 			DOMDumper.dumpXml(logger, asXmlResponseMarker, doc);
@@ -50,7 +49,7 @@ public class Responder {
 		out.flush();
 		out.close();
 	}
-
+	
 	public void sendResponseFile(String contentType, InputStream file)
 			throws IOException {
 		byte[] b = FileUtils.streamBytes(file, false);

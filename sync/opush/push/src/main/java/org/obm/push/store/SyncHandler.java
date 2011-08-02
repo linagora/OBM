@@ -1,16 +1,15 @@
 package org.obm.push.store;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
@@ -28,22 +27,24 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.backend.Sync;
+import org.obm.push.bean.SyncRequest;
+import org.obm.push.bean.SyncResponse;
 import org.obm.push.data.EncoderFactory;
-import org.obm.push.data.IDataEncoder;
+import org.obm.push.exception.NoDocumentException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
+import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.impl.ActiveSyncRequest;
 import org.obm.push.impl.Credentials;
 import org.obm.push.impl.IContinuationHandler;
 import org.obm.push.impl.Responder;
-import org.obm.push.impl.SyncDecoder;
 import org.obm.push.impl.WbxmlRequestHandler;
+import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.state.StateMachine;
-import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -66,8 +67,7 @@ import com.google.inject.Singleton;
 //</Collections>
 //</Sync>
 @Singleton
-public class SyncHandler extends WbxmlRequestHandler implements
-		IContinuationHandler {
+public class SyncHandler extends WbxmlRequestHandler implements IContinuationHandler {
 
 	private static class ModificationStatus {
 		public Map<String, String> processedClientIds = new HashMap<String, String>();
@@ -76,83 +76,76 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	
 	public static final Integer SYNC_TRUNCATION_ALL = 9;
 	private static Map<Integer, IContinuation> waitContinuationCache;
-	private final SyncDecoder syncDecoder;
 	private final UnsynchronizedItemService unSynchronizedItemCache;
 	private final MonitoredCollectionStoreService monitoredCollectionService;
+	private final SyncProtocol syncProtocol;
 
 	static {
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
 	}
 
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
-			SyncDecoder syncDecoder, IContentsImporter contentsImporter,
-			ISyncStorage storage, IContentsExporter contentsExporter,
+			IContentsImporter contentsImporter, ISyncStorage storage, IContentsExporter contentsExporter,
 			StateMachine stMachine, UnsynchronizedItemService unSynchronizedItemCache,
-			MonitoredCollectionStoreService monitoredCollectionService) {
+			MonitoredCollectionStoreService monitoredCollectionService, SyncProtocol SyncProtocol) {
 		
-		super(backend, encoderFactory, contentsImporter, storage,
-				contentsExporter, stMachine);
-		
-		this.syncDecoder = syncDecoder;
+		super(backend, encoderFactory, contentsImporter, storage, contentsExporter, stMachine);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.monitoredCollectionService = monitoredCollectionService;
+		this.syncProtocol = SyncProtocol;
 	}
 
 	@Override
 	@Transactional
-	public void process(IContinuation continuation, BackendSession bs,
-			Document doc, ActiveSyncRequest request, Responder responder) {
-		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()
-				+ ")");
+	public void process(IContinuation continuation, BackendSession bs, Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
-			if (doc == null) {
-				throw new PartialException();
-			}
-			Sync sync = null;
-			sync = syncDecoder.decodeSync(doc, bs);
-
-			ModificationStatus modificationStatus = processCollections(bs, sync);
-
-			if (!modificationStatus.hasChanges && sync.getWaitInSecond() > 0) {
-				registerWaitingSync(continuation, bs, responder, sync);
+			SyncRequest syncRequest = syncProtocol.getRequest(doc, bs);
+			
+			ModificationStatus modificationStatus = processCollections(bs, syncRequest.getSync());
+			if (!modificationStatus.hasChanges && syncRequest.getSync().getWaitInSecond() > 0) {
+				registerWaitingSync(continuation, bs, syncRequest.getSync());
 			} else {
-				processResponse(bs, responder, sync.getCollections(),
-						modificationStatus.processedClientIds, continuation);
-			}
-
+				
+				SyncResponse syncResponse = doTheJob(bs, syncRequest.getSync().getCollections(), 
+						 modificationStatus.processedClientIds, continuation);
+				responder.sendResponse("AirSync", syncProtocol.endcodeResponse(syncResponse));
+			} 
+			
 		} catch (ProtocolException convExpt) {
 			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), null);
 		} catch (PartialException pe) {
-			// Status 13
-			// The client sent an empty or partial Sync request,
-			// but the server is unable to process it. Please
-			// resend the request with the full XML
 			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue(), null);
 		} catch (CollectionNotFoundException ce) {
 			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
 		} catch (ObjectNotFoundException oe) {
 			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
 		} catch (ActiveSyncException e) {
-			// sendError(responder, new HashSet<SyncCollection>(),
-			// SyncStatus.SERVER_ERROR.asXmlValue(), continuation);
 			logger.error(e.getMessage(), e);
-
 		} catch (ContinuationThrowable e) {
-			// used by org.mortbay.util.ajax.Continuation
 			throw e;
-		} catch (Throwable e) {
+		} catch (NoDocumentException e) {
+			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue(), null);
+		} catch (WaitIntervalOutOfRangeException e) {
+			try {
+				responder.sendResponse("AirSync", syncProtocol.encodeResponse() );
+			} catch (IOException e1) {
+				logger.error(e.getMessage(), e);
+			}
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 
-	private void registerWaitingSync(IContinuation continuation,
-			BackendSession bs, Responder responder, Sync sync)
-			throws CollectionNotFoundException, ActiveSyncException {
+	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync)
+			throws CollectionNotFoundException, ActiveSyncException, WaitIntervalOutOfRangeException {
+		
 		logger.info("suspend for {} seconds", sync.getWaitInSecond());
 		if (sync.getWaitInSecond() > 3540) {
-			sendWaitIntervalOutOfRangeError(responder);
-			return;
+			throw new WaitIntervalOutOfRangeException();
 		}
+		
 		for (SyncCollection sc : sync.getCollections()) {
 			String collectionPath = storage.getCollectionPath(sc.getCollectionId());
 			sc.setCollectionPath(collectionPath);
@@ -174,30 +167,11 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			waitContinuationCache.put(sc.getCollectionId(),
 					continuation);
 		}
-
-		// logger
-		// .warn("for testing purpose, we will only suspend for 40sec (to monitor: "
-		// + bs.getLastMonitored() + ")");
-		// continuation.suspend(10 * 1000);
+		
 		continuation.suspend(sync.getWaitInSecond() * 1000);
 	}
 
-	private void sendWaitIntervalOutOfRangeError(Responder responder) {
-		try {
-			Document reply = null;
-			reply = DOMUtils.createDoc(null, "Sync");
-			Element root = reply.getDocumentElement();
-			DOMUtils.createElementAndText(root, "Status",
-					SyncStatus.WAIT_INTERVAL_OUT_OF_RANGE.asXmlValue());
-			DOMUtils.createElementAndText(root, "Limit", "59");
-			responder.sendResponse("AirSync", reply);
-		} catch (Exception e) {
-			logger.error("Error creating Sync response", e);
-		}
-	}
-
-	private Date doUpdates(BackendSession bs, SyncCollection c, Element ce,
-			Map<String, String> processedClientIds)
+	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds) 
 			throws ActiveSyncException, SQLException {
 
 		DataDelta delta = null;
@@ -209,88 +183,17 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			lastSync = delta.getSyncDate();
 		}
 
-		List<ItemChange> changed = processWindowSize(c, delta, bs,
-				processedClientIds);
-
-		Element responses = DOMUtils.createElement(ce, "Responses");
-		if (c.isMoreAvailable()) {
-			// MoreAvailable has to be before Commands
-			DOMUtils.createElement(ce, "MoreAvailable");
-		}
-		Element commands = DOMUtils.createElement(ce, "Commands");
-
-		StringBuilder processedIds = new StringBuilder();
-		for (Entry<String, String> k : processedClientIds.entrySet()) {
-			processedIds.append(' ').append(k.getValue());
-		}
-
-		serializeDeletion(bs, c, processedClientIds, delta, commands);
-
-		for (ItemChange ic : changed) {
-			String clientId = processedClientIds.get(ic.getServerId());
-			logger.info("processedIds = {} | ic.clientId = {} | ic.serverId = {}", 
-					new Object[]{ processedIds.toString(), clientId, ic.getServerId() });
-			
-			if (clientId != null) {
-				// Acks Add done by pda
-				Element add = DOMUtils.createElement(responses, "Add");
-				DOMUtils.createElementAndText(add, "ClientId", clientId);
-				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-				DOMUtils.createElementAndText(add, "Status",
-						SyncStatus.OK.asXmlValue());
-			} else if (processedClientIds.keySet().contains(ic.getServerId())) {
-				// Change asked by device
-				Element add = DOMUtils.createElement(responses, "Change");
-				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-				DOMUtils.createElementAndText(add, "Status",
-						SyncStatus.OK.asXmlValue());
-			} else {
-				// New change done on server
-				Element add = DOMUtils.createElement(commands, "Add");
-				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-				serializeChange(bs, add, c, ic);
-			}
-			processedClientIds.remove(ic.getServerId());
-		}
-
-		// Send error for the remaining entry in the Map because the
-		// client has requested the addition of a resource that already exists
-		// on the server
-		Set<Entry<String, String>> entries = new HashSet<Map.Entry<String, String>>(
-				processedClientIds.entrySet());
-		for (Entry<String, String> entry : entries) {
-			if (entry.getKey() != null) {
-				if (entry.getKey().startsWith(c.getCollectionId().toString())) {
-					Element add = null;
-					if (entry.getValue() != null) {
-						add = DOMUtils.createElement(responses, "Add");
-						DOMUtils.createElementAndText(add, "ClientId",
-								entry.getValue());
-					} else {
-						add = DOMUtils.createElement(responses, "Change");
-					}
-					DOMUtils.createElementAndText(add, "ServerId",
-							entry.getKey());
-					// need send ok since we do not synchronize event with
-					// ParticipationState need-action
-					DOMUtils.createElementAndText(add, "Status",
-							SyncStatus.OK.asXmlValue());
-				}
-				processedClientIds.remove(entry.getKey());
-			}
-		}
-		if (responses.getChildNodes().getLength() == 0) {
-			responses.getParentNode().removeChild(responses);
-		}
-		if (commands.getChildNodes().getLength() == 0) {
-			commands.getParentNode().removeChild(commands);
-		}
+		List<ItemChange> changed = processWindowSize(c, delta, bs, processedClientIds);
+		c.setItemChanges(changed);
+	
+		List<ItemChange> itemChangesDeletion = serializeDeletion(bs, c, processedClientIds, delta);
+		c.setItemChangesDeletion(itemChangesDeletion);
 		
 		return lastSync;
 	}
 
-	private void serializeDeletion(BackendSession bs, SyncCollection c, Map<String, String> processedClientIds, 
-			DataDelta delta, Element commands) {
+	private List<ItemChange> serializeDeletion(BackendSession bs, SyncCollection c, Map<String, String> processedClientIds, 
+			DataDelta delta) {
 		
 		Set<ItemChange> unSyncdeleted = unSynchronizedItemCache.listItemToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
 		
@@ -299,15 +202,17 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			unSynchronizedItemCache.clearItemToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
 		}
 
+		final List<ItemChange> itemChangesDeletion = new ArrayList<ItemChange>();
 		if (delta != null && delta.getDeletions() != null) {
 			for (ItemChange ic: delta.getDeletions()) {
 				if (processedClientIds.containsKey(ic.getServerId())) {
 					unSynchronizedItemCache.storeItemToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId(), ic);
 				} else {
-					serializeDeletion(commands, ic);
+					itemChangesDeletion.add(ic);
 				}
 			}
 		}
+		return itemChangesDeletion;
 	}
 
 	private List<ItemChange> processWindowSize(SyncCollection c, DataDelta delta, 
@@ -360,39 +265,6 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		c.setMoreAvailable(true);
 		
 		return changed;
-	}
-
-	private void doFetch(BackendSession bs, SyncCollection c, Element ce)
-			throws ActiveSyncException {
-		
-		List<ItemChange> changed;
-		changed = contentsExporter
-				.fetch(bs, c.getSyncState().getDataType(), c.getFetchIds());
-		Element commands = DOMUtils.createElement(ce, "Responses");
-		for (ItemChange ic : changed) {
-			Element add = DOMUtils.createElement(commands, "Fetch");
-			DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-			DOMUtils.createElementAndText(add, "Status",
-					SyncStatus.OK.asXmlValue());
-			c.getOptions().setTruncation(null);
-			for (BodyPreference bp : c.getOptions().getBodyPreferences().values()) {
-				bp.setTruncationSize(null);
-			}
-			serializeChange(bs, add, c, ic);
-		}
-	}
-
-	private void serializeDeletion(Element commands, ItemChange ic) {
-		Element del = DOMUtils.createElement(commands, "Delete");
-		DOMUtils.createElementAndText(del, "ServerId", ic.getServerId());
-	}
-
-	private void serializeChange(BackendSession bs, Element col,
-			SyncCollection c, ItemChange ic) {
-		IApplicationData data = ic.getData();
-		IDataEncoder encoder = getEncoders().getEncoder(data);
-		Element apData = DOMUtils.createElement(col, "ApplicationData");
-		encoder.encode(bs, apData, data, c, true);
 	}
 
 	private ModificationStatus processCollections(BackendSession bs, Sync sync)
@@ -467,95 +339,60 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	}
 
 	@Override
-	public void sendResponseWithoutHierarchyChanges(BackendSession bs,
-			Responder responder, IContinuation continuation) {
+	public void sendResponseWithoutHierarchyChanges(BackendSession bs, Responder responder, IContinuation continuation) {
 		sendResponse(bs, responder, false, continuation);
 	}
 
 	@Override
-	@Transactional
-	public void sendResponse(BackendSession bs, Responder responder,
-			boolean sendHierarchyChange, IContinuation continuation) {
-		
-		Map<String, String> processedClientIds = Collections.emptyMap();
-		processResponse(bs, responder, monitoredCollectionService.list(bs.getCredentials(), bs.getDevice()), 
-				processedClientIds, continuation);
-
+	public void sendResponse(BackendSession bs, Responder responder, boolean sendHierarchyChange, IContinuation continuation) {
+		try {
+			SyncResponse syncResponse = doTheJob(bs, monitoredCollectionService.list(bs.getCredentials(), bs.getDevice()),
+					ImmutableMap.<String, String> of(), continuation);
+			responder.sendResponse("AirSync", syncProtocol.endcodeResponse(syncResponse));
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		} catch (ActiveSyncException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
 	}
 
-	/* package */ void processResponse(BackendSession bs, Responder responder,
-			Collection<SyncCollection> changedFolders,
-			Map<String, String> processedClientIds, IContinuation continuation) {
+	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
+			Map<String, String> processedClientIds, IContinuation continuation) throws SQLException, ActiveSyncException {
 
-		Document reply = null;
-		try {
-			reply = DOMUtils.createDoc(null, "Sync");
-			Element root = reply.getDocumentElement();
-
-			Element cols = DOMUtils.createElement(root, "Collections");
-
-			for (SyncCollection c : changedFolders) {
-				Element ce = DOMUtils.createElement(cols, "Collection");
-				try {
-					if ("0".equals(c.getSyncKey())) {
-						backend.resetCollection(bs, c.getCollectionId());
-					}
-
-					String syncKey = c.getSyncKey();
-					SyncState st = stMachine.getSyncState(c.getCollectionId(), syncKey);
-
-					if (c.getDataClass() != null) {
-						DOMUtils.createElementAndText(ce, "Class",
-								c.getDataClass());
-					}
-
-					if (!st.isValid()) {
-						DOMUtils.createElementAndText(ce, "CollectionId", c
-								.getCollectionId().toString());
-						DOMUtils.createElementAndText(ce, "Status",
-								SyncStatus.INVALID_SYNC_KEY.asXmlValue());
-						DOMUtils.createElementAndText(ce, "SyncKey", "0");
-					} else {
-						Element sk = DOMUtils.createElement(ce, "SyncKey");
-						DOMUtils.createElementAndText(ce, "CollectionId", c
-								.getCollectionId().toString());
-						DOMUtils.createElementAndText(ce, "Status",
-								SyncStatus.OK.asXmlValue());
-
-						Date syncDate = null;
-						if (!syncKey.equals("0")) {
-							if (c.getFetchIds().size() == 0) {
-								syncDate = doUpdates(bs, c, ce, processedClientIds);
-							} else {
-								doFetch(bs, c, ce);
-							}
-						}
-						sk.setTextContent(stMachine.allocateNewSyncKey(bs,
-								c.getCollectionId(), syncDate));
-					}
-				} catch (CollectionNotFoundException e) {
-					sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(),
-							continuation);
-				}
+		for (SyncCollection c : changedFolders) {
+			if ("0".equals(c.getSyncKey())) {
+				backend.resetCollection(bs, c.getCollectionId());
 			}
-			logger.info("Resp for requestId = {}", continuation.getReqId());
-			responder.sendResponse("AirSync", reply);
-		} catch (Exception e) {
-			logger.error("Error creating Sync response", e);
+			SyncState st = stMachine.getSyncState(c.getCollectionId(), c.getSyncKey());
+			boolean syncStateValid = st.isValid();
+			c.setSyncStateValid(syncStateValid);
+			if (syncStateValid) {
+
+				Date syncDate = null;
+				if (!c.getSyncKey().equals("0")) {
+					if (c.getFetchIds().size() == 0) {
+						syncDate = doUpdates(bs, c, processedClientIds);
+					} else {
+						List<ItemChange> itemChanges = contentsExporter.fetch(bs, c.getSyncState().getDataType(), c.getFetchIds());
+						c.setItemChanges(itemChanges);
+					}
+				}
+				c.setNewSyncKey(stMachine.allocateNewSyncKey(bs, c.getCollectionId(), syncDate));
+			}
 		}
+		logger.info("Resp for requestId = {}", continuation.getReqId());
+		return new SyncResponse(changedFolders, bs, getEncoders(), processedClientIds);
 	}
 
 	@Override
 	public void sendError(Responder responder, String errorStatus, IContinuation continuation) {
-		Document ret = DOMUtils.createDoc(null, "Sync");
-		Element root = ret.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status", errorStatus.toString());
-
 		try {
 			if (continuation != null) {
-				logger.info("Resp for requestId = {}", continuation.getReqId());	
+				logger.info("Resp for requestId = {}", continuation.getReqId());
 			}
-			responder.sendResponse("AirSync", ret);
+			responder.sendResponse("AirSync", syncProtocol.encodeResponse(errorStatus) );
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

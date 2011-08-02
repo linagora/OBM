@@ -41,7 +41,7 @@ public class SyncHandlerTest {
 	
 	@Ignore("I'm wait for the task of 'backendsession stateless' is completed !")
 	@Test
-	public void testProcessResponseWithAccents() throws IOException, TransformerException, CollectionNotFoundException, SQLException{
+	public void testProcessResponseWithAccents() throws IOException, TransformerException, SQLException, ActiveSyncException{
 
 		String expectedString = "éàâ";
 		int collectionId = 0;
@@ -93,8 +93,8 @@ public class SyncHandlerTest {
 		
 		UnsynchronizedItemService synchronizedItemCache = EasyMock.createMock(UnsynchronizedItemService.class);
 		MonitoredCollectionStoreService monitoredCollectionStoreService = EasyMock.createMock(MonitoredCollectionStoreService.class);
-		SyncHandler syncHandler = new SyncHandler(backend, encoderFactory, null, null, null, exporter, 
-				stateMachine, synchronizedItemCache, monitoredCollectionStoreService);
+		SyncHandler syncHandler = new SyncHandler(backend, encoderFactory, null, null, exporter, 
+				stateMachine, synchronizedItemCache, monitoredCollectionStoreService, null);
 				
 		Responder responder = EasyMock.createMock(Responder.class);
 		Capture<Document> document = new Capture<Document>();
@@ -106,7 +106,7 @@ public class SyncHandlerTest {
 		
 		EasyMock.replay(bs, responder, continuation, stateMachine, backend, encoderFactory);
 		
-		syncHandler.processResponse(bs, responder, syncCollectionsList,new HashMap<String, String>(), continuation);
+		syncHandler.doTheJob(bs, syncCollectionsList,new HashMap<String, String>(), continuation);
 		
 		EasyMock.verify(bs, responder, continuation, stateMachine, backend, encoderFactory);
 		
