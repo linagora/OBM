@@ -1,12 +1,8 @@
-package org.obm.push.search;
+package org.obm.push.bean;
 
+import org.obm.push.search.StoreName;
 
-/**
- * 
- * @author adrienp
- *
- */
-public class SearchItem {
+public class SearchRequest {
 	
 	private StoreName storeName;
 	private String query;
