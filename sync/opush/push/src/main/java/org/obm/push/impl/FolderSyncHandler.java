@@ -2,7 +2,11 @@ package org.obm.push.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
+
+import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.ItemChange;
@@ -13,7 +17,10 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.data.EncoderFactory;
+import org.obm.push.exception.InvalidSyncKeyException;
+import org.obm.push.exception.NoDocumentException;
 import org.obm.push.state.StateMachine;
+import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.CollectionNotFoundException;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.SyncState;
@@ -27,6 +34,43 @@ import com.google.inject.Singleton;
 @Singleton
 public class FolderSyncHandler extends WbxmlRequestHandler {
 
+	private static class FolderSyncRequest {
+		
+		private final String syncKey;
+		
+		public FolderSyncRequest(String syncKey) {
+			this.syncKey = syncKey;
+		}
+		
+		public String getSyncKey() {
+			return syncKey;
+		}
+	}
+	
+	private static class FolderSyncResponse {
+		
+		private final Collection<ItemChange> itemChanges;
+		private final String newSyncKey;
+		
+		public FolderSyncResponse(Collection<ItemChange> itemChanges, String newSyncKey) {
+			this.itemChanges = itemChanges;
+			this.newSyncKey = newSyncKey;
+		}
+		
+		public int getCount() {
+			return itemChanges.size();
+		}
+
+		public Collection<ItemChange> getItemChanges() {
+			return itemChanges;
+		}
+		
+		public String getNewSyncKey() {
+			return newSyncKey;
+		}
+		
+	}
+	
 	private final IHierarchyExporter hierarchyExporter;
 
 	@Inject
@@ -46,78 +90,91 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		
-		logger.info("devType = {}", bs.getDevType());
-		if (doc == null) {
-			answerOpushIsAlive(responder);
-			return;
-		}
-
-		String syncKey = DOMUtils.getElementText(doc.getDocumentElement(),
-				"SyncKey");
-
 		try {
-			SyncState state = stMachine.getFolderSyncState(bs.getLoginAtDomain(), bs.getDevId(),
-					hierarchyExporter.getRootFolderUrl(bs), syncKey);
-			
-			if (!state.isValid()) {
-				sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
-				return;
-			}
-			// look for Add, Modify, Remove
-
-			Element changes = DOMUtils.getUniqueElement(doc.getDocumentElement(),
-					"Changes");
-
-			// dataClass, filterType, state, int, int
-			hierarchyExporter.configure(state, null, null, 0, 0);
-
-			
-			Document ret = DOMUtils.createDoc(null, "FolderSync");
-			Element root = ret.getDocumentElement();
-			DOMUtils.createElementAndText(root, "Status", "1");
-			Element sk = DOMUtils.createElement(root, "SyncKey");
-			changes = DOMUtils.createElement(root, "Changes");
-
-			// FIXME we know that we do not monitor hierarchy, so just respond
-			// that nothing changed
-			List<ItemChange> changed = hierarchyExporter.getChanged(bs);
-			if ("0".equals(syncKey)) {
-				int cnt = hierarchyExporter.getCount(bs);
-				DOMUtils.createElementAndText(changes, "Count", cnt + "");
-
-				for (ItemChange sf : changed) {
-					Element add = DOMUtils.createElement(changes, "Add");
-					encode(add, sf);
-				}
-				List<ItemChange> deleted = hierarchyExporter.getDeleted(bs);
-				for (ItemChange sf : deleted) {
-					Element remove = DOMUtils.createElement(changes, "Remove");
-					encode(remove, sf);
-				}
-			} else {
-				DOMUtils.createElementAndText(changes, "Count", "0");
-				for (ItemChange sf : changed) {
-					if (sf.isNew()) {
-						sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
-						return;
-					}
-				}
-			}
-			
-			String newSyncKey = stMachine.allocateNewSyncKey(bs,
-					hierarchyExporter.getRootFolderId(bs), null);
-			
-			sk.setTextContent(newSyncKey);
+			FolderSyncRequest folderSyncRequest = getRequest(doc);
+			FolderSyncResponse folderSyncResponse = doTheJob(bs, folderSyncRequest);
+			Document ret = encodeResponse(folderSyncResponse);
 			responder.sendResponse("FolderHierarchy", ret);
+			
 		} catch (CollectionNotFoundException e) {
 			logger.error(e.getMessage(), e);
 			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
+		} catch (InvalidSyncKeyException e) {
+			logger.error(e.getMessage(), e);
+			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
+		} catch (NoDocumentException e) {
+			answerOpushIsAlive(responder);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 
 	}
 
+	private Document encodeResponse(FolderSyncResponse folderSyncResponse)
+			throws FactoryConfigurationError {
+		Document ret = DOMUtils.createDoc(null, "FolderSync");
+		Element root = ret.getDocumentElement();
+		DOMUtils.createElementAndText(root, "Status", "1");
+		Element sk = DOMUtils.createElement(root, "SyncKey");
+		Element changes = DOMUtils.createElement(root, "Changes");
+			DOMUtils.createElementAndText(changes, "Count", String.valueOf(folderSyncResponse.getCount()));
+
+			for (ItemChange sf : folderSyncResponse.getItemChanges()) {
+				Element add = DOMUtils.createElement(changes, "Add");
+				addItemChange(add, sf);
+			}
+		sk.setTextContent(folderSyncResponse.getNewSyncKey());
+		return ret;
+	}
+
+	private FolderSyncResponse doTheJob(BackendSession bs,
+			FolderSyncRequest folderSyncRequest) throws SQLException,
+			InvalidSyncKeyException, CollectionNotFoundException,
+			ActiveSyncException {
+		
+		// FIXME we know that we do not monitor hierarchy, so just respond
+		// that nothing changed
+		
+		SyncState state = stMachine.getFolderSyncState(bs.getLoginAtDomain(), bs.getDevId(),
+				hierarchyExporter.getRootFolderUrl(bs), folderSyncRequest.getSyncKey());
+		
+		if (!state.isValid()) {
+			throw new InvalidSyncKeyException();
+		}
+		hierarchyExporter.configure(state, null, null, 0, 0);
+								
+		List<ItemChange> changed = hierarchyExporter.getChanged(bs);
+		
+		if (!isSynckeyValid(folderSyncRequest.getSyncKey(), changed)) {
+			throw new InvalidSyncKeyException();
+		}
+		
+		String newSyncKey = stMachine.allocateNewSyncKey(bs,
+				hierarchyExporter.getRootFolderId(bs), null);
+		
+		FolderSyncResponse folderSyncResponse = new FolderSyncResponse(changed, newSyncKey);
+		return folderSyncResponse;
+	}
+
+	private boolean isSynckeyValid(String syncKey, List<ItemChange> changed) {
+		if (!"0".equals(syncKey)) {
+			for (ItemChange sf : changed) {
+				if (sf.isNew()) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private FolderSyncRequest getRequest(Document doc) throws NoDocumentException {
+		if (doc == null) {
+			throw new NoDocumentException();
+		}
+		String syncKey = DOMUtils.getElementText(doc.getDocumentElement(), "SyncKey");
+		return new FolderSyncRequest(syncKey);
+	}
+	
 	private void answerOpushIsAlive(Responder responder) {
 		try {
 			responder
@@ -130,7 +187,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		}
 	}
 
-	private void encode(Element add, ItemChange sf) {
+	private void addItemChange(Element add, ItemChange sf) {
 		DOMUtils.createElementAndText(add, "ServerId", sf.getServerId());
 		DOMUtils.createElementAndText(add, "ParentId", sf.getParentId());
 		DOMUtils.createElementAndText(add, "DisplayName", sf.getDisplayName());

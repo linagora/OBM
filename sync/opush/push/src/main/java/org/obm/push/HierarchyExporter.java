@@ -80,16 +80,6 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 
 	@Override
-	public int getCount(BackendSession bs) throws SQLException {
-		return getChanged(bs).size();
-	}
-
-	@Override
-	public List<ItemChange> getDeleted(BackendSession bs) {
-		return new LinkedList<ItemChange>();
-	}
-
-	@Override
 	public int getRootFolderId(BackendSession bs) throws ActiveSyncException, SQLException {
 		return folderExporter.getServerIdFor(bs);
 	}

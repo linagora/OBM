@@ -23,10 +23,6 @@ public interface IHierarchyExporter {
 
 	List<ItemChange> getChanged(BackendSession bs) throws SQLException;
 
-	int getCount(BackendSession bs) throws SQLException;
-
-	List<ItemChange> getDeleted(BackendSession bs);
-
 	int getRootFolderId(BackendSession bs) throws ActiveSyncException, SQLException;
 
 }
