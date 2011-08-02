@@ -1,11 +1,11 @@
 package org.obm.push.impl;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
@@ -14,17 +14,19 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.MSEmail;
+import org.obm.push.bean.MeetingHandlerRequest;
+import org.obm.push.bean.MeetingHandlerResponse;
+import org.obm.push.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
 import org.obm.push.data.EncoderFactory;
 import org.obm.push.data.calendarenum.AttendeeStatus;
 import org.obm.push.data.email.MeetingResponse;
+import org.obm.push.exception.NoDocumentException;
+import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.ActiveSyncException;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.PIMDataType;
-import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -35,14 +37,17 @@ import com.google.inject.Singleton;
 @Singleton
 public class MeetingResponseHandler extends WbxmlRequestHandler {
 
+	private final MeetingProtocol meetingProtocol;
+	
 	@Inject
 	protected MeetingResponseHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine) {
+			StateMachine stMachine, MeetingProtocol meetingProtocol) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
 				contentsExporter, stMachine);
+		this.meetingProtocol = meetingProtocol;
 	}
 
 	// <?xml version="1.0" encoding="UTF-8"?>
@@ -55,65 +60,63 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	// </MeetingResponse>
 
 	@Override
-	@Transactional
 	protected void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		
 		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType() + ")");
-		
-		NodeList requests = doc.getDocumentElement().getElementsByTagName("Request");
-
-		List<MeetingResponse> items = parseNodeListAsMeetingResponses(requests);
-
+		MeetingHandlerRequest meetingRequest;
 		try {
-			Document reply = DOMUtils.createDoc(null, "MeetingResponse");
-			Element root = reply.getDocumentElement();
-			for (MeetingResponse item : items) {
-
-				ItemChange ic = retrieveMailWithMeetingRequest(bs, item);
-
-				Element response = DOMUtils.createElement(root, "Result");
-				if (ic == null || ic.getData() == null) {
-					meetingRequestEmailNotFound(response);
-				} else {
-					MSEmail invitation = ((MSEmail) ic.getData());
-					
-					if (invitation == null) {
-						meetingRequestInvitationNotFound(response);
-					} else {
-						handleMeetingResponse(bs, item, response, invitation);
-					}
-				}
-				DOMUtils.createElementAndText(response, "ReqId", item.getReqId());
-
-				responder.sendResponse("MeetingResponse", reply);
+			
+			meetingRequest = meetingProtocol.getRequest(doc);
+			MeetingHandlerResponse meetingResponse = doTheJob(meetingRequest, bs);
+			meetingProtocol.sendResponse(responder, meetingResponse);
+			
+		} catch (NoDocumentException e) {
+			try {
+				responder.sendResponse("MeetingResponse", 
+						meetingProtocol.encodeErrorResponse(MeetingResponseStatus.INVALID_MEETING_RREQUEST) );
+			} catch (IOException e1) {
+				logger.error(e.getMessage(), e);
 			}
-		} catch (Exception e) {
-			logger.info("Error creating Sync response", e);
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		} catch (ActiveSyncException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
-	private void handleMeetingResponse(BackendSession bs, MeetingResponse item,
-			Element response, MSEmail invitation) throws SQLException {
-		
-		String calId = contentsImporter.importCalendarUserStatus(bs,
-				item.getCollectionId(), invitation, item.getUserResponse());
-		
-		DOMUtils.createElementAndText(response, "Status", "1");
-
-		if (!AttendeeStatus.DECLINE.equals(item.getUserResponse())) {
-			DOMUtils.createElementAndText(response, "CalId", calId);
+	@Transactional
+	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) throws SQLException, ActiveSyncException {
+		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
+		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
+			
+			ItemChange ic = retrieveMailWithMeetingRequest(bs, item);
+			ItemChangeMeetingResponse meetingResponse = new ItemChangeMeetingResponse();
+			
+			if (ic != null && ic.getData() != null) {
+				MSEmail invitation = ((MSEmail) ic.getData());
+				if (invitation != null) {
+					meetingResponse.setStatus(MeetingResponseStatus.SUCCESS);
+					if (!AttendeeStatus.DECLINE.equals(item.getUserResponse())) {
+						String calId = contentsImporter.importCalendarUserStatus(bs,
+								item.getCollectionId(), invitation, item.getUserResponse());	
+						meetingResponse.setCalId(calId);	
+					}
+				} else {
+					meetingResponse.setStatus(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
+				}
+			} else {
+				meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
+			}
+			
+			meetingResponse.setReqId(item.getReqId());	
+			meetingResponses.add(meetingResponse);
 		}
+		return new MeetingHandlerResponse(meetingResponses);
 	}
-
-	private void meetingRequestInvitationNotFound(Element response) {
-		DOMUtils.createElementAndText(response, "Status", "2");
-	}
-
-	private void meetingRequestEmailNotFound(Element response) {
-		DOMUtils.createElementAndText(response, "Status", "3");
-	}
-
+	
 	private ItemChange retrieveMailWithMeetingRequest(BackendSession bs, MeetingResponse item)
 		throws ActiveSyncException {
 		
@@ -124,46 +127,5 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			return null;
 		}
 	}
-
-	private List<MeetingResponse> parseNodeListAsMeetingResponses(
-			NodeList requests) {
-		List<MeetingResponse> items = new ArrayList<MeetingResponse>();
-
-		for (int i = 0; i < requests.getLength(); i++) {
-			Element req = (Element) requests.item(i);
-			MeetingResponse mr = parseElementAsMeetingResponse(req);
-			items.add(mr);
-		}
-		return items;
-	}
-
-	private MeetingResponse parseElementAsMeetingResponse(Element req) {
-		String userResponse = DOMUtils.getElementText(req, "UserResponse");
-		String collectionId = DOMUtils.getElementText(req, "CollectionId");
-		String reqId = DOMUtils.getElementText(req, "ReqId");
-		String longId = DOMUtils.getElementText(req, "LongId");
-
-		MeetingResponse mr = new MeetingResponse();
-
-		if (!StringUtils.isEmpty(collectionId)) {
-			mr.setCollectionId(Integer.parseInt(collectionId));
-		}
-		mr.setReqId(reqId);
-		mr.setLongId(longId);
-		mr.setUserResponse(getAttendeeStatus(userResponse));
-		return mr;
-	}
 	
-	private AttendeeStatus getAttendeeStatus(String userResponse) {
-		if ("1".equals(userResponse)) {
-			return AttendeeStatus.ACCEPT;
-		} else if ("2".equals(userResponse)) {
-			return AttendeeStatus.TENTATIVE;
-		} else if ("3".equals(userResponse)) {
-			return AttendeeStatus.DECLINE;
-		} else {
-			return AttendeeStatus.TENTATIVE;
-		}
-
-	}
 }
