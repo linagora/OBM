@@ -1,12 +1,7 @@
 package org.obm.push.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
-import org.eclipse.jetty.http.HttpHeaderValues;
-import org.eclipse.jetty.http.HttpHeaders;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.ItemChange;
 import org.obm.push.backend.BackendSession;
@@ -15,10 +10,19 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.MSAttachementData;
+import org.obm.push.bean.ItemOperationsRequest;
+import org.obm.push.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
+import org.obm.push.bean.ItemOperationsRequest.Fetch;
+import org.obm.push.bean.ItemOperationsResponse;
+import org.obm.push.bean.ItemOperationsResponse.EmptyFolderContentsResult;
+import org.obm.push.bean.ItemOperationsResponse.MailboxFetchResult;
+import org.obm.push.bean.ItemOperationsResponse.MailboxFetchResult.FetchAttachmentResult;
+import org.obm.push.bean.ItemOperationsResponse.MailboxFetchResult.FetchItemResult;
 import org.obm.push.data.EncoderFactory;
-import org.obm.push.data.IDataEncoder;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ObjectNotFoundException;
+import org.obm.push.exception.UnsupportedStoreException;
+import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.search.StoreName;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.ActiveSyncException;
@@ -29,281 +33,170 @@ import org.obm.push.store.MSEmailBodyType;
 import org.obm.push.store.PIMDataType;
 import org.obm.push.store.SyncCollection;
 import org.obm.push.store.SyncCollectionOptions;
-import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.FileUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-/**
- * Handles the ItemOperations command
- */
 @Singleton
 public class ItemOperationsHandler extends WbxmlRequestHandler {
+
+	private final ItemOperationsProtocol protocol;
 
 	@Inject
 	protected ItemOperationsHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			ISyncStorage storage, IContentsExporter contentsExporter,
-			StateMachine stMachine) {
+			StateMachine stMachine, ItemOperationsProtocol protocol) {
 
 		super(backend, encoderFactory, contentsImporter, storage,
 				contentsExporter, stMachine);
+		this.protocol = protocol;
 	}
 
+	
 	@Override
-	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
-		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()
-				+ ")");
-		boolean multipart = isAcceptMultipart(request);
-		boolean gzip = isAcceptGZip(request);
 
 		try {
-			Element fetch = DOMUtils.getUniqueElement(doc.getDocumentElement(),
-					"Fetch");
-			Element emptyFolder = DOMUtils.getUniqueElement(
-					doc.getDocumentElement(), "EmptyFolderContents");
-
-			if (fetch != null) {
-				fetchOperation(bs, responder, multipart, gzip, fetch);
-			} else if (emptyFolder != null) {
-				emptyFolderOperation(emptyFolder, bs, responder);
-			}
+			ItemOperationsRequest itemOperationRequest = protocol.getRequest(request, doc);
+			ItemOperationsResponse response = doTheJob(bs, itemOperationRequest);
+			Document document = protocol.encodeResponse(response, bs);
+			responder.sendResponse("ItemOperations", document);
+		} catch (CollectionNotFoundException e) {
+			logger.error("Collection not found");
+			//DOCUMENT_LIBRARY_STORE_UNKNOWN
+		} catch (UnsupportedStoreException e) {
+			logger.error("ItemOperations is not implemented for this store");
+			//DOCUMENT_LIBRARY_STORE_UNKNOWN
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 
-	private boolean isAcceptGZip(ActiveSyncRequest request) {
-		String acceptEncoding = request.getHeader(HttpHeaders.ACCEPT_ENCODING);
-		return acceptEncoding != null
-				&& acceptEncoding.contains(HttpHeaderValues.GZIP);
-	}
 
-	private boolean isAcceptMultipart(ActiveSyncRequest request) {
-		return "T".equals(request.getHeader("MS-ASAcceptMultiPart"))
-				|| "T".equalsIgnoreCase(request.getParameter("AcceptMultiPart"));
-	}
-
-	// <?xml version="1.0" encoding="UTF-8"?>
-	// <ItemOperations>
-	// <EmptyFolderContents>
-	// <CollectionId>68</CollectionId>
-	// <Options>
-	// <DeleteSubFolders/>
-	// </Options>
-	// </EmptyFolderContents>
-	// </ItemOperations>
-	private void emptyFolderOperation(Element emptyFolder, BackendSession bs,
-			Responder responder) throws IOException {
-		int collectionId = Integer.parseInt(DOMUtils.getElementText(
-				emptyFolder, "CollectionId"));
-		Element deleteSubFolderElem = DOMUtils.getUniqueElement(emptyFolder,
-				"DeleteSubFolders");
-		ItemOperationsStatus status = null;
-		try {
-			String collectionPath = storage.getCollectionPath(
-					collectionId);
-			contentsImporter.emptyFolderContent(
-					bs, collectionPath, deleteSubFolderElem != null);
-			status = ItemOperationsStatus.SUCCESS;
-		} catch (CollectionNotFoundException e) {
-			status = ItemOperationsStatus.BLOCKED_ACCESS;
-		} catch (NotAllowedException e) {
-			status = ItemOperationsStatus.BLOCKED_ACCESS;
+	@Transactional
+	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest)
+			throws CollectionNotFoundException, UnsupportedStoreException {
+		
+		ItemOperationsResponse response = new ItemOperationsResponse();
+		Fetch fetch = itemOperationRequest.getFetch();
+		EmptyFolderContentsRequest emptyFolderContents = itemOperationRequest.getEmptyFolderContents();
+		if (fetch != null) {
+			response.setMailboxFetchResult(fetchOperation(bs, fetch));
+		} else if (emptyFolderContents != null) {
+			EmptyFolderContentsResult result = emptyFolderOperation(bs, emptyFolderContents);
+			response.setEmptyFolderContentsResult(result);
 		}
-
-		Document ret = DOMUtils.createDoc(null, "ItemOperations");
-		Element root = ret.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status",
-				ItemOperationsStatus.SUCCESS.asXmlValue());
-		Element response = DOMUtils.createElement(root, "Response");
-		Element empty = DOMUtils.createElement(response, "EmptyFolderContents");
-		DOMUtils.createElementAndText(empty, "Status", status.asXmlValue());
-		DOMUtils.createElementAndText(empty, "AirSync:CollectionId", ""
-				+ collectionId);
-		responder.sendResponse("ItemOperations", ret);
+		response.setMultipart(itemOperationRequest.isMultipart());
+		response.setGzip(itemOperationRequest.isGzip());
+		return response;
 	}
 
-	private void fetchOperation(BackendSession bs, Responder responder,
-			boolean multipart, boolean gzip, Element fetch) throws IOException {
-		StoreName store = StoreName.getValue(DOMUtils.getElementText(fetch,
-				"Store"));
-		Document ret = DOMUtils.createDoc(null, "ItemOperations");
+	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, UnsupportedStoreException {
+		
+		final StoreName store = fetch.getStoreName();
 		if (StoreName.Mailbox.equals(store)) {
-			InputStream stream = processMailboxFetch(bs, fetch, multipart, ret);
-			if (multipart) {
-				responder.sendMSSyncMultipartResponse("ItemOperations", ret,
-						ImmutableList.of(stream), gzip);
-			} else {
-				responder.sendResponse("ItemOperations", ret);
-			}
+			return processMailboxFetch(bs, fetch);
 		} else {
-			logger.error("ItemOperations is not implemented for store " + store);
+			throw new UnsupportedStoreException();
 		}
 	}
 
-	private InputStream processMailboxFetch(BackendSession bs, Element fetch,
-			boolean multipart, Document ret) {
-		
-		String reference = DOMUtils.getElementText(fetch, "FileReference");
-		String collectionId = DOMUtils.getElementText(fetch, "CollectionId");
-		String serverId = DOMUtils.getElementText(fetch, "ServerId");
-		Integer type = Integer.getInteger(DOMUtils
-				.getElementText(fetch, "Type"));
-		
-		if (reference != null) {
+	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch) throws CollectionNotFoundException {
+		MailboxFetchResult mailboxFetchResponse = new MailboxFetchResult();
+		if (fetch.getFileReference() != null) {
 			
-			return processFileReferenceFetch(bs, reference, multipart, ret);
-		} else if (collectionId != null && serverId != null) {
+			FetchAttachmentResult fileReferenceFetch = processFileReferenceFetch(bs, fetch.getFileReference());
+			mailboxFetchResponse.setFetchAttachmentResult(fileReferenceFetch);
 			
-			return processCollectionFetch(bs, multipart,
-					Integer.parseInt(collectionId), serverId, type, ret);
-		}
-		return null;
-	}
-
-	private InputStream processCollectionFetch(BackendSession bs, boolean multipart,
-			Integer collectionId, String serverId, Integer type, Document ret) {
-
-		FetchResult fetchResult = fetchItem(serverId, collectionId, bs);
-
-		Element root = ret.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status",
-				ItemOperationsStatus.SUCCESS.asXmlValue());
-		Element resp = DOMUtils.createElement(root, "Response");
-		Element fetchResp = DOMUtils.createElement(resp, "Fetch");
-		DOMUtils.createElementAndText(fetchResp, "Status",
-				fetchResult.status.asXmlValue());
-		DOMUtils.createElementAndText(fetchResp, "AirSync:ServerId", serverId);
-		DOMUtils.createElementAndText(fetchResp, "AirSync:CollectionId",
-				collectionId.toString());
-		if (ItemOperationsStatus.SUCCESS.equals(fetchResult.status)) {
-			Element dataElem = DOMUtils.createElement(fetchResp, "Properties");
-
-			SyncCollection c = new SyncCollection();
-			c.setCollectionId(collectionId);
-			BodyPreference bp = new BodyPreference();
-			bp.setType(MSEmailBodyType.getValueOf(type));
+		} else if (fetch.getCollectionId() != null && fetch.getServerId() != null) {
 			
-			SyncCollectionOptions options = new SyncCollectionOptions();
-			options.addBodyPreference(bp);
-			c.setOptions(options);
-			
-			IDataEncoder encoder = getEncoders().getEncoder(
-					fetchResult.ic.get(0).getData());
-			encoder.encode(bs, dataElem, fetchResult.ic.get(0).getData(), c,
-					true);
-			if (multipart) {
-				Element data = DOMUtils.getUniqueElement(dataElem,
-						"AirSyncBase:Data");
-				String dataValue = "";
-				if (data != null) {
-					dataValue = data.getTextContent();
-					Element pData = (Element) data.getParentNode();
-					pData.removeChild(data);
-					DOMUtils.createElementAndText(pData, "Part", "1");
-				}
-				return new ByteArrayInputStream(dataValue.getBytes());
+			try {
+				Integer collectionId = Integer.valueOf(fetch.getCollectionId());
+				mailboxFetchResponse.setFetchItemResult(fetchItem(fetch.getServerId(), collectionId, fetch.getType(), bs));
+			} catch (NumberFormatException e) {
+				throw new CollectionNotFoundException();
 			}
 		}
-		return null;
+		return mailboxFetchResponse;
 	}
 
-	private static class FetchResult {
-		public List<ItemChange> ic;
-		public ItemOperationsStatus status;
-	}
-
-	private FetchResult fetchItem(String serverId, Integer collectionId,
-			BackendSession bs) {
-		
-		List<String> fetchIds = ImmutableList.of(serverId);
-		FetchResult fetchResult = new FetchResult();
-		fetchResult.status = ItemOperationsStatus.SUCCESS;
-		fetchResult.ic = null;
-		try {
-			String collectionPath = storage.getCollectionPath(
-					collectionId);
-			PIMDataType dataType = storage.getDataClass(
-					collectionPath);
-
-			fetchResult.ic = contentsExporter.fetch(bs, dataType, fetchIds);
-			if (fetchResult.ic.size() == 0) {
-				fetchResult.status = ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND;
-			}
-		} catch (ActiveSyncException e) {
-			fetchResult.status = ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND;
-		}
-		return fetchResult;
-	}
-
-	private InputStream processFileReferenceFetch(BackendSession bs,
-			String reference, boolean multipart, Document ret) {
+	private FetchAttachmentResult processFileReferenceFetch(BackendSession bs, String reference) {
 
 		FetchAttachmentResult fetchAttachmentResult = fetchAttachment(bs, reference);
-
-		Element root = ret.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status",
-				ItemOperationsStatus.SUCCESS.asXmlValue());
-		Element resp = DOMUtils.createElement(root, "Response");
-		Element fetchResp = DOMUtils.createElement(resp, "Fetch");
-		DOMUtils.createElementAndText(fetchResp, "Status",
-				fetchAttachmentResult.status.asXmlValue());
-		if (ItemOperationsStatus.SUCCESS.equals(fetchAttachmentResult.status)) {
-			DOMUtils.createElementAndText(fetchResp,
-					"AirSyncBase:FileReference", reference);
-			Element properties = DOMUtils
-					.createElement(fetchResp, "Properties");
-			DOMUtils.createElementAndText(properties,
-					"AirSyncBase:ContentType",
-					fetchAttachmentResult.contentType);
-			if (!multipart) {
-				DOMUtils.createElementAndText(properties, "Data",
-						fetchAttachmentResult.attch);
-			} else {
-				DOMUtils.createElementAndText(properties, "Part", "1");
-			}
+		if (ItemOperationsStatus.SUCCESS.equals(fetchAttachmentResult.getStatus())) {
+			fetchAttachmentResult.setReference(reference);
 		}
-		return fetchAttachmentResult.stream;
-	}
-
-	private static class FetchAttachmentResult {
-		public ItemOperationsStatus status;
-		public String attch;
-		public InputStream stream;
-		public String contentType;
-
+		return fetchAttachmentResult;
 	}
 
 	private FetchAttachmentResult fetchAttachment(BackendSession bs, String reference) {
 
 		FetchAttachmentResult fetchResult = new FetchAttachmentResult();
-		fetchResult.status = ItemOperationsStatus.SUCCESS;
-		fetchResult.attch = "";
-		MSAttachementData data = null;
 		try {
-			data = contentsExporter.getEmailAttachement(bs, reference);
-			fetchResult.contentType = data.getContentType();
+			MSAttachementData data = contentsExporter.getEmailAttachement(bs, reference);
+			fetchResult.setContentType(data.getContentType());
+			try {
+				fetchResult.setAttch(FileUtils.streamBytes(data.getFile(), true));
+				fetchResult.setStatus(ItemOperationsStatus.SUCCESS);
+			} catch (Throwable e) {
+				fetchResult.setStatus(ItemOperationsStatus.MAILBOX_ITEM_FAILED_CONVERSATION);
+			}
 		} catch (ObjectNotFoundException e) {
-			fetchResult.status = ItemOperationsStatus.MAILBOX_INVALID_ATTACHMENT_ID;
+			fetchResult.setStatus(ItemOperationsStatus.MAILBOX_INVALID_ATTACHMENT_ID);
 		}
 
-		if (data != null) {
-			try {
-				byte[] att = FileUtils.streamBytes(data.getFile(), true);
-				fetchResult.attch = new String(att);
-				fetchResult.stream = new ByteArrayInputStream(att);
-			} catch (Throwable e) {
-				fetchResult.status = ItemOperationsStatus.MAILBOX_ITEM_FAILED_CONVERSATION;
-			}
-		}
 		return fetchResult;
 	}
 
+	private FetchItemResult fetchItem(String serverId, Integer collectionId, Integer type, BackendSession bs) {
+		
+		FetchItemResult fetchResult = new FetchItemResult();
+		try {
+			String collectionPath = storage.getCollectionPath(collectionId);
+			PIMDataType dataType = storage.getDataClass(collectionPath);
+			
+			List<ItemChange> itemChanges = contentsExporter.fetch(bs, dataType, ImmutableList.of(serverId));
+			if (itemChanges.isEmpty()) {
+				fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
+			} else {
+				fetchResult.setItemChange(itemChanges.get(0));
+				SyncCollection c = new SyncCollection();
+				c.setCollectionId(collectionId);
+				BodyPreference bp = new BodyPreference();
+				bp.setType(MSEmailBodyType.getValueOf(type));
+				SyncCollectionOptions options = new SyncCollectionOptions();
+				options.addBodyPreference(bp);
+				c.setOptions(options);
+				fetchResult.setSyncCollection(c);
+				fetchResult.setStatus(ItemOperationsStatus.SUCCESS);
+			}
+		} catch (CollectionNotFoundException e) {
+			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
+		} catch (ActiveSyncException e) {
+			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_CONNECTION_FAILED);
+		}
+		return fetchResult;
+	}
+	
+	private EmptyFolderContentsResult emptyFolderOperation(
+			BackendSession bs, EmptyFolderContentsRequest request) {
+		
+		EmptyFolderContentsResult emptyFolderContentsResult = new EmptyFolderContentsResult();
+		try {
+			String collectionPath = storage.getCollectionPath(request.getCollectionId());
+			contentsImporter.emptyFolderContent(bs, collectionPath, request.isDeleteSubFolderElem());
+			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SUCCESS);
+		} catch (CollectionNotFoundException e) {
+			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.BLOCKED_ACCESS);
+		} catch (NotAllowedException e) {
+			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.BLOCKED_ACCESS);
+		}
+		return emptyFolderContentsResult;
+	}
+	
 }
