@@ -21,7 +21,15 @@ import com.google.inject.matcher.Matchers;
 
 public class TransactionalTest {
 
-	public static class TestClass {
+	public abstract static class AbstractTestClass {
+		@Transactional
+		protected abstract void parentAndChildWithTransactionalTag();
+		@Transactional
+		protected abstract void parentWithTransactionalTagAndChildWithout();
+		protected abstract void childWithTransactionalTagAndParentWithout();
+	}
+	
+	public static class TestClass extends AbstractTestClass {
 		@Transactional
 		public void successfullMethod() {
 			//success !!
@@ -50,6 +58,23 @@ public class TransactionalTest {
 		@Transactional
 		public void nestedMethod() {
 			successfullMethod();
+		}
+
+		@Transactional
+		@Override
+		protected void parentAndChildWithTransactionalTag() {
+			//success !!
+		}
+		
+		@Override
+		protected void parentWithTransactionalTagAndChildWithout() {
+			//success !!
+		}
+
+		@Transactional
+		@Override
+		protected void childWithTransactionalTagAndParentWithout() {
+			//success !!
 		}
 	}
 	
@@ -192,4 +217,45 @@ public class TransactionalTest {
 			EasyMock.verify(transaction);
 		}
 	}
+	
+	@Test
+	public void parentAndChildWithTransactionalTag() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		transaction.begin();
+		EasyMock.expectLastCall().once();
+		transaction.commit();
+		EasyMock.expectLastCall().once();
+		EasyMock.replay(transaction);
+		
+		TestClass testClass = createTestClass(getProvider(transaction));
+		testClass.parentAndChildWithTransactionalTag();
+		EasyMock.verify(transaction);
+	}
+	
+	@Test
+	public void parentWithTransactionalTagAndChildWithout() throws SecurityException, IllegalStateException {
+		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.replay(transaction);
+		
+		TestClass testClass = createTestClass(getProvider(transaction));
+		testClass.parentWithTransactionalTagAndChildWithout();
+		EasyMock.verify(transaction);
+	}
+	
+	@Test
+	public void childWithTransactionalTagAndParentWithout() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		transaction.begin();
+		EasyMock.expectLastCall().once();
+		transaction.commit();
+		EasyMock.expectLastCall().once();
+		EasyMock.replay(transaction);
+		
+		TestClass testClass = createTestClass(getProvider(transaction));
+		testClass.childWithTransactionalTagAndParentWithout();
+		EasyMock.verify(transaction);
+	}
+	
 }
