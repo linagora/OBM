@@ -81,7 +81,7 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public long findLastHearbeat(String loginAtDomain, String devId) throws SQLException {
+	public Long findLastHearbeat(String loginAtDomain, String devId) throws SQLException {
 		Integer id = deviceDao.findDevice(loginAtDomain, devId);
 		
 		Connection con = null;
@@ -102,7 +102,7 @@ public class SyncStorage implements ISyncStorage {
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
-		return 0L;
+		return null;
 	}
 
 	@Override

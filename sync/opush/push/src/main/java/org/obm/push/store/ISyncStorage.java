@@ -13,7 +13,7 @@ public interface ISyncStorage {
 
 	SyncState findStateForKey(String syncKey);
 
-	long findLastHearbeat(String loginAtDomain, String deviceId) throws SQLException;
+	Long findLastHearbeat(String loginAtDomain, String deviceId) throws SQLException;
 
 	void updateLastHearbeat(String loginAtDomain, String deviceId, long hearbeat) throws SQLException;
 
