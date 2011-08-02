@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.obm.dbcp.DBCP;
-import org.obm.push.store.DeviceDao;
+import org.obm.push.bean.Device;
 import org.obm.push.store.HearbeatDao;
 import org.obm.push.utils.JDBCUtils;
 
@@ -16,17 +16,14 @@ import com.google.inject.Singleton;
 @Singleton
 public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements HearbeatDao{
 
-	private final DeviceDao deviceDao;
-	
 	@Inject
-	private HearbeatDaoJdbcDaoImpl(DBCP dbcp, DeviceDao deviceDao) {
+	private HearbeatDaoJdbcDaoImpl(DBCP dbcp) {
 		super(dbcp);
-		this.deviceDao = deviceDao;
 	}
 
 	@Override
-	public long findLastHearbeat(String loginAtDomain, String devId) throws SQLException {
-		Integer id = deviceDao.findDevice(loginAtDomain, devId);
+	public long findLastHearbeat(Device device) throws SQLException {
+		final Integer devDbId = device.getDatabaseId();
 		
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -35,7 +32,7 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT last_heartbeat FROM opush_ping_heartbeat WHERE device_id=?");
-			ps.setInt(1, id);
+			ps.setInt(1, devDbId);
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
@@ -50,19 +47,19 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 	}
 
 	@Override
-	public void updateLastHearbeat(String loginAtDomain, String devId, long hearbeat) throws SQLException {
-		Integer id = deviceDao.findDevice(loginAtDomain, devId);
+	public void updateLastHearbeat(Device device, long hearbeat) throws SQLException {
+		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("DELETE FROM opush_ping_heartbeat WHERE device_id=? ");
-			ps.setInt(1, id);
+			ps.setInt(1, devDbId);
 			ps.executeUpdate();
 
 			ps.close();
 			ps = con.prepareStatement("INSERT INTO opush_ping_heartbeat (device_id, last_heartbeat) VALUES (?, ?)");
-			ps.setInt(1, id);
+			ps.setInt(1, devDbId);
 			ps.setLong(2, hearbeat);
 			ps.executeUpdate();
 		} catch (Throwable se) {

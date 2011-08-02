@@ -21,7 +21,7 @@ public class MailLoaderTest extends TestCase {
 
 	public void testMailLoader() {
 		BackendSession bs = new BackendSession(new Credentials("thomas@zz.com", "aliacom"),
-				"command", new Device("devType", "devId", new Properties()), new BigDecimal(0));
+				"command", getFakeDevice(), new BigDecimal(0));
 		StoreClient store = new StoreClient("obm23.buffy.kvm", 143,
 				"thomas@zz.com", "aliacom");
 		store.login();
@@ -35,9 +35,13 @@ public class MailLoaderTest extends TestCase {
 		assertNotNull(invit);
 	}
 	
+	private Device getFakeDevice() {
+		return new Device(1, "devType", "devId", new Properties());
+	}
+
 	public void testMailLoader1() {
 		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lng", "aliacom"),
-				"command", new Device("devType", "devId",new Properties()), new BigDecimal(0));
+				"command", getFakeDevice(), new BigDecimal(0));
 		StoreClient store = new StoreClient("obm", 143,
 				"adrien@test.tlse.lng", "aliacom");
 		store.login();
@@ -51,7 +55,7 @@ public class MailLoaderTest extends TestCase {
 	
 	public void testMailLoader2() {
 		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lng", "aliacom"),
-				"command", new Device("devType","devId", new Properties()), new BigDecimal(0));
+				"command", getFakeDevice(), new BigDecimal(0));
 		StoreClient store = new StoreClient("obm", 143,
 				"adrien@test.tlse.lng", "aliacom");
 		store.login();

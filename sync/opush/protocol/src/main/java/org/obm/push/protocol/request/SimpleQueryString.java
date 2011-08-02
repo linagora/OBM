@@ -8,10 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class SimpleQueryString extends AbstractActiveSyncRequest implements ActiveSyncRequest {
 
-	private HttpServletRequest request;
-	
 	public SimpleQueryString(HttpServletRequest r) {
-		this.request = r;
+		super(r);
 	}
 
 	@Override
@@ -32,6 +30,25 @@ public class SimpleQueryString extends AbstractActiveSyncRequest implements Acti
 	@Override
 	public HttpServletRequest getHttpServletRequest() {
 		return request;
+	}
+
+	@Override
+	public String getDeviceId() {
+		return p("DeviceId");
+	}
+
+	@Override
+	public String getDeviceType() {
+		String deviceType = p("DeviceType");
+		if (deviceType.startsWith("IMEI")) {
+			return p("User-Agent");
+		}
+		return deviceType;
+	}
+	
+	@Override
+	public String getCommand() {
+		return p("Cmd");
 	}
 
 }

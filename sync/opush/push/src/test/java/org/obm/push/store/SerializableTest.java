@@ -79,7 +79,7 @@ public class SerializableTest {
 	
 	@Test
 	public void testDevice() throws IOException {
-		Device obj = new Device("toto", "toto", new Properties());
+		Device obj = new Device(1, "toto", "toto", new Properties());
 		objectOutputStream.writeObject(obj);
 	}
 

@@ -17,11 +17,11 @@ import com.google.inject.Singleton;
 public class SessionService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
-	private final Factory deviceFactory;
+	private final DeviceDao deviceDao;
 	
 	@Inject
-	private SessionService(Device.Factory deviceFactory) {
-		this.deviceFactory = deviceFactory;
+	private SessionService(DeviceDao deviceDao) {
+		this.deviceDao = deviceDao;
 	}
 	
 	public BackendSession getSession(
@@ -34,18 +34,22 @@ public class SessionService {
 	private BackendSession createSession(Credentials credentials,
 			ActiveSyncRequest r, String sessionId) {
 		
-		String userAgent = r.getHeader("User-Agent");
-		String devType = r.extractDeviceType();
-		String devId = r.p("DeviceId");
+		String userAgent = r.getUserAgent();
+		String devType = r.getDeviceType();
+		String devId = r.getDeviceId();
+		
+		Device device = deviceDao.getDevice(credentials.getLoginAtDomain(), devId, userAgent);
+		
 		BackendSession bs = new BackendSession(credentials, 
-				r.p("Cmd"), deviceFactory.create(devType, userAgent, devId), getProtocolVersion(r));
+				r.getCommand(), device, getProtocolVersion(r));
+		
 		
 		logger.info("New session = {}", sessionId);
 		return bs;
 	}
 
 	private BigDecimal getProtocolVersion(ActiveSyncRequest request) {
-		final String proto = request.p("MS-ASProtocolVersion");
+		final String proto = request.getMSASProtocolVersion();
 		if (proto != null) {
 			try {
 				BigDecimal protocolVersion = new BigDecimal(proto);

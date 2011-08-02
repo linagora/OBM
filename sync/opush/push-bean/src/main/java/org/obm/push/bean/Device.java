@@ -14,10 +14,10 @@ public class Device implements Serializable {
 	
 	public static class Factory {
 	
-		public Device create(String devType, String userAgent, String devId) {
+		public Device create(Integer databaseId, String devType, String userAgent, String devId) {
 			Properties hints = getHints(userAgent, devType);
 			String rewritenDevType = rewriteDevType(userAgent, devType);
-			return new Device(rewritenDevType, devId, hints);
+			return new Device(databaseId, rewritenDevType, devId, hints);
 		}
 				
 		private String rewriteDevType(String userAgent, String devType) {
@@ -67,8 +67,10 @@ public class Device implements Serializable {
 	private final String devType;
 	private final Properties hints;
 	private final String devId;
+	private final Integer databaseId;
 	
-	public Device(String devType, String devId, Properties hints) {
+	public Device(Integer databaseId, String devType, String devId, Properties hints) {
+		this.databaseId = databaseId;
 		this.devType = devType;
 		this.devId = devId;
 		this.hints = hints;
@@ -88,6 +90,10 @@ public class Device implements Serializable {
 
 	public String getDevId() {
 		return devId;
+	}
+	
+	public Integer getDatabaseId() {
+		return databaseId;
 	}
 
 	@Override

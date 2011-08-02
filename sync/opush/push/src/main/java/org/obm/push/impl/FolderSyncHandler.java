@@ -100,7 +100,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		// FIXME we know that we do not monitor hierarchy, so just respond
 		// that nothing changed
 		
-		SyncState state = stMachine.getFolderSyncState(bs.getLoginAtDomain(), bs.getDevId(),
+		SyncState state = stMachine.getFolderSyncState(bs.getDevice(),
 				hierarchyExporter.getRootFolderUrl(bs), folderSyncRequest.getSyncKey());
 		
 		if (!state.isValid()) {

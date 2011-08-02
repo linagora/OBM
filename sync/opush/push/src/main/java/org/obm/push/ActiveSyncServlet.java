@@ -19,6 +19,7 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.impl.FolderSyncHandler;
 import org.obm.push.impl.GetAttachmentHandler;
 import org.obm.push.impl.GetItemEstimateHandler;
@@ -101,12 +102,12 @@ public class ActiveSyncServlet extends HttpServlet {
 			return;
 		}
 
-		String policy = asrequest.p("X-Ms-PolicyKey");
+		String policy = asrequest.getMsPolicyKey();
 		if (policy != null && policy.equals("0")
-				&& !asrequest.p("Cmd").equals("Provision")) {
+				&& !asrequest.getCommand().equals("Provision")) {
 
 			logger.info("forcing device (ua: {}) provisioning",
-					asrequest.p("User-Agent"));
+					asrequest.getUserAgent());
 			response.setStatus(449);
 			return;
 		} else {
@@ -115,7 +116,7 @@ public class ActiveSyncServlet extends HttpServlet {
 
 		processActiveSyncMethod(c, 
 				creds, 
-				asrequest.p("DeviceId"), 
+				asrequest.getDeviceId(), 
 				asrequest,
 				response);
 
@@ -213,9 +214,10 @@ public class ActiveSyncServlet extends HttpServlet {
 						String userId = userPass.substring(0, p);
 						String password = userPass.substring(p + 1);
 						String loginAtDomain = getLoginAtDomain(userId);
-						String deviceId = request.p("DeviceId");
-						valid = initDevice(loginAtDomain, deviceId,
-								request.extractDeviceType())
+						String deviceId = request.getDeviceId();
+						String deviceType = request.getDeviceType();
+						String userAgent = request.getUserAgent();
+						valid = initDevice(loginAtDomain, deviceId, deviceType, userAgent)
 								&& validatePassword(loginAtDomain, password)
 								&& deviceDao.syncAuthorized(loginAtDomain,
 										deviceId);
@@ -244,10 +246,10 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 
 	private boolean initDevice(String loginAtDomain, String deviceId,
-			String deviceType) {
+			String deviceType, String userAgent) {
 		boolean ret = true;
 		try {
-			Integer opushDeviceId = deviceDao.findDevice(loginAtDomain, deviceId);
+			Device opushDeviceId = deviceDao.getDevice(loginAtDomain, deviceId, userAgent);
 			if (opushDeviceId == null) {
 				boolean registered = deviceDao.registerNewDevice(loginAtDomain, deviceId, deviceType);
 				if (!registered) {

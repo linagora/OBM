@@ -12,11 +12,11 @@ import java.util.TimeZone;
 
 import org.obm.dbcp.IDBCP;
 import org.obm.push.bean.ChangedCollections;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.DeviceDao;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.calendar.EventType;
 
@@ -28,16 +28,13 @@ import com.google.inject.Singleton;
 public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 		CollectionDao {
 	
-	private final DeviceDao deviceDao;
-
 	@Inject
-	protected CollectionDaoJdbcImpl(IDBCP dbcp, DeviceDao deviceDao) {
+	protected CollectionDaoJdbcImpl(IDBCP dbcp) {
 		super(dbcp);
-		this.deviceDao = deviceDao;
 	}
 
-	public Integer addCollectionMapping(String loginAtDomain, String deviceId, String collection) throws SQLException {
-		Integer id = deviceDao.findDevice(loginAtDomain, deviceId);
+	public Integer addCollectionMapping(Device device, String collection) throws SQLException {
+		Integer id = device.getDatabaseId();
 		Integer ret = null;
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -55,29 +52,29 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 	}
 	
 	@Override
-	public void resetCollection(String loginAtDomain, String deviceId, Integer collectionId) throws SQLException {
-		Integer id = deviceDao.findDevice(loginAtDomain, deviceId);
+	public void resetCollection(Device device, Integer collectionId) throws SQLException {
+		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("DELETE FROM opush_sync_state WHERE device_id=? AND collection_id=?");
-			ps.setInt(1, id);
+			ps.setInt(1, devDbId);
 			ps.setInt(2, collectionId);
 			ps.executeUpdate();
 
 			ps = con.prepareStatement("DELETE FROM opush_sync_mail WHERE device_id=? AND collection_id=?");
-			ps.setInt(1, id);
+			ps.setInt(1, devDbId);
 			ps.setInt(2, collectionId);
 			ps.executeUpdate();
 
 			ps = con.prepareStatement("DELETE FROM opush_sync_deleted_mail WHERE device_id=? AND collection_id=?");
-			ps.setInt(1, id);
+			ps.setInt(1, devDbId);
 			ps.setInt(2, collectionId);
 			ps.executeUpdate();
 
 			logger.warn("mappings & states cleared for sync of collection "
-					+ collectionId + " of device " + deviceId);
+					+ collectionId + " of device " + device.getDevId());
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		} finally {
@@ -142,16 +139,16 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 	}
 	
 	@Override
-	public void updateState(String loginAtDomain, String deviceId, Integer collectionId,
+	public void updateState(Device device, Integer collectionId,
 			SyncState state) throws SQLException {
-		Integer id = deviceDao.findDevice(loginAtDomain, deviceId);
+		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_sync_state (sync_key, device_id, last_sync, collection_id) VALUES (?, ?, ?, ?)");
 			ps.setString(1, state.getKey());
-			ps.setInt(2, id);
+			ps.setInt(2, devDbId);
 			ps.setTimestamp(3, new Timestamp(state.getLastSync().getTime()));
 			ps.setInt(4, collectionId);
 			ps.executeUpdate();
@@ -194,9 +191,9 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 		return ret;
 	}
 	
-	public int getCollectionMapping(String loginAtDomain, String deviceId,
+	public int getCollectionMapping(Device device,
 			String collection) throws CollectionNotFoundException, SQLException {
-		Integer id = deviceDao.findDevice(loginAtDomain, deviceId);
+		final Integer devDbId = device.getDatabaseId();
 		Integer ret = null;
 
 		Connection con = null;
@@ -205,7 +202,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT id FROM opush_folder_mapping WHERE device_id=? AND collection=?");
-			ps.setInt(1, id);
+			ps.setInt(1, devDbId);
 			ps.setString(2, collection);
 			rs = ps.executeQuery();
 

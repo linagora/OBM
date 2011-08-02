@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
@@ -26,9 +27,9 @@ public class StateMachine {
 		this.collectionDao = collectionDao;
 	}
 	
-	public SyncState getFolderSyncState(String loginAtDomain, String deviceId, String collectionUrl, String syncKey) throws SQLException {
+	public SyncState getFolderSyncState(Device device, String collectionUrl, String syncKey) throws SQLException {
 		try {
-			int collectionId = collectionDao.getCollectionMapping(loginAtDomain, deviceId, collectionUrl);
+			int collectionId = collectionDao.getCollectionMapping(device, collectionUrl);
 			return getSyncState(collectionId, syncKey);
 		
 		} catch (CollectionNotFoundException e) {
@@ -49,7 +50,7 @@ public class StateMachine {
 		final SyncState newState = new SyncState(collectionDao.getCollectionPath(collectionId), newSk, lastSync);
 		logger.info("allocateNewSyncKey [ collectionId = {} | lastSync.toString = {} ]",
 				new Object[]{ collectionId, newState.getLastSync().toString() });
-		collectionDao.updateState(bs.getLoginAtDomain(), bs.getDevId(), collectionId, newState);
+		collectionDao.updateState(bs.getDevice(), collectionId, newState);
 		return newSk;
 	}
 

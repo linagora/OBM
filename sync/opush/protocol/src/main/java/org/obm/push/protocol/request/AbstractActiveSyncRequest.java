@@ -1,9 +1,17 @@
 package org.obm.push.protocol.request;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 public abstract class AbstractActiveSyncRequest implements ActiveSyncRequest {
 	
-	public String p(String name) {
+	protected final HttpServletRequest request;
+	
+	protected AbstractActiveSyncRequest(HttpServletRequest request) {
+		this.request = request;
+	}
+	
+	protected String p(String name) {
 		String ret = getParameter(name);
 		if (ret == null) {
 			ret = getHeader(name);
@@ -11,12 +19,18 @@ public abstract class AbstractActiveSyncRequest implements ActiveSyncRequest {
 		return ret;
 	}
 	
-	public String extractDeviceType() {
-		String deviceType = p("DeviceType");
-		if (deviceType.startsWith("IMEI")) {
-			return p("User-Agent");
-		}
-		return deviceType;
+	@Override
+	public String getUserAgent() {
+		return request.getHeader("User-Agent");
 	}
 
+	@Override
+	public String getMsPolicyKey() {
+		return request.getHeader("X-Ms-PolicyKey");
+	}
+	
+	@Override
+	public String getMSASProtocolVersion() {
+		return request.getHeader("MS-ASProtocolVersion");
+	}
 }

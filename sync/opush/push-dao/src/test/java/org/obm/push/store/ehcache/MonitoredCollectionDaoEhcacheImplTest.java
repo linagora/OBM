@@ -93,6 +93,6 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 	}
 	
 	private Device getFakeDeviceId(){
-		return new Device("DevType", "DevId", null);
+		return new Device(1, "DevType", "DevId", null);
 	}
 }

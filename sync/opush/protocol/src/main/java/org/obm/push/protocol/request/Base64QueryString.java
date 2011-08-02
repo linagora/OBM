@@ -45,7 +45,6 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 	private static final Logger logger = LoggerFactory
 			.getLogger(Base64QueryString.class);
 	
-	private HttpServletRequest request;
 	private InputStream stream;
 	
 	private byte[] data;
@@ -66,7 +65,7 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 	
 
 	public Base64QueryString(HttpServletRequest r, InputStream stream) {
-		request = r;
+		super(r);
 		this.stream = stream;
 		this.data = Base64.decodeBase64(r.getQueryString());
 		int i = 0;
@@ -229,4 +228,19 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 		return this.request;
 	}
 
+	@Override
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	@Override
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	@Override
+	public String getCommand() {
+		return Base64CommandCodes.getCmd(cmdCode);
+	}
+	
 }

@@ -2,6 +2,8 @@ package org.obm.push.store;
 
 import java.sql.SQLException;
 
+import org.obm.push.bean.Device;
+
 public interface DeviceDao {
 	
 	/**
@@ -9,7 +11,7 @@ public interface DeviceDao {
 	 */
 	boolean syncAuthorized(String loginAtDomain, String deviceId);
 
-	public Integer findDevice(String loginAtDomain, String deviceId)
+	public Device getDevice(String loginAtDomain, String deviceId, String userAgent)
 			throws SQLException;
 
 	public boolean registerNewDevice(String loginAtDomain, String deviceId,

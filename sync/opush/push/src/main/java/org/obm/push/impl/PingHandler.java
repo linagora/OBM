@@ -78,13 +78,13 @@ public class PingHandler extends WbxmlRequestHandler implements
 			throws SQLException, MissingRequestParameterException, ActiveSyncException {
 		
 		if (pingRequest.getHeartbeatInterval() == null) {
-			Long heartbeatInterval = hearbeatDao.findLastHearbeat(bs.getLoginAtDomain(), bs.getDevId());
+			Long heartbeatInterval = hearbeatDao.findLastHearbeat(bs.getDevice());
 			if (heartbeatInterval == null) {
 				throw new MissingRequestParameterException();
 			}
 			pingRequest.setHeartbeatInterval(heartbeatInterval);
 		} else {
-			hearbeatDao.updateLastHearbeat(bs.getLoginAtDomain(), bs.getDevId(), pingRequest.getHeartbeatInterval());
+			hearbeatDao.updateLastHearbeat(bs.getDevice(), pingRequest.getHeartbeatInterval());
 		}
 		if (pingRequest.getHeartbeatInterval() < 5) {
 			pingRequest.setHeartbeatInterval(5l);

@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.obm.dbcp.IDBCP;
+import org.obm.push.bean.Device;
+import org.obm.push.bean.Device.Factory;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.utils.IniFile;
 import org.obm.push.utils.JDBCUtils;
@@ -18,12 +20,15 @@ import com.google.inject.Singleton;
 @Singleton
 public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 
+	private Factory deviceFactory;
+
 	@Inject
-	private DeviceDaoJdbcImpl(IDBCP dbcp) {
+	private DeviceDaoJdbcImpl(IDBCP dbcp, Device.Factory deviceFactory) {
 		super(dbcp);
+		this.deviceFactory = deviceFactory;
 	}
 
-	public Integer findDevice(String loginAtDomain, String deviceId)
+	public Device getDevice(String loginAtDomain, String deviceId, String userAgent) 
 			throws SQLException {
 		String[] parts = loginAtDomain.split("@");
 		String login = parts[0].toLowerCase();
@@ -34,7 +39,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		ResultSet rs = null;
 		con = dbcp.getConnection();
 		try {
-			ps = con.prepareStatement("SELECT id FROM opush_device "
+			ps = con.prepareStatement("SELECT id, identifier, type FROM opush_device "
 					+ "INNER JOIN UserObm ON owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "WHERE identifier=? AND lower(userobm_login)=? AND lower(domain_name)=?");
@@ -43,7 +48,11 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 			ps.setString(3, domain);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				return rs.getInt(1);
+				Integer databaseId = rs.getInt("id");
+				String devId = rs.getString("identifier");
+				String devType = rs.getString("type");
+				
+				return deviceFactory.create(databaseId, devType, userAgent, devId);
 			}
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);

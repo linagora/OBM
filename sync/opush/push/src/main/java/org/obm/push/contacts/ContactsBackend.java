@@ -19,7 +19,6 @@ import org.obm.push.exception.FolderTypeNotFoundException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
@@ -33,11 +32,10 @@ import com.google.inject.Singleton;
 public class ContactsBackend extends ObmSyncBackend {
 
 	@Inject
-	private ContactsBackend(DeviceDaoJdbcImpl deviceDao,
-			ConfigurationService configurationService, CollectionDao collectionDao)
+	private ContactsBackend(ConfigurationService configurationService, CollectionDao collectionDao)
 			throws ConfigurationException {
 		
-		super(deviceDao, configurationService, collectionDao);
+		super(configurationService, collectionDao);
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws SQLException {
@@ -47,10 +45,10 @@ public class ContactsBackend extends ObmSyncBackend {
 		String col = "obm:\\\\" + bs.getLoginAtDomain() + "\\contacts";
 		String serverId;
 		try {
-			Integer collectionId = getCollectionIdFor(bs.getLoginAtDomain(), bs.getDevId(), col);
+			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
 			serverId = getServerIdFor(collectionId);
 		} catch (ActiveSyncException e) {
-			serverId = createCollectionMapping(bs.getLoginAtDomain(), bs.getDevId(), col);
+			serverId = createCollectionMapping(bs.getDevice(), col);
 			ic.setIsNew(true);
 		}
 

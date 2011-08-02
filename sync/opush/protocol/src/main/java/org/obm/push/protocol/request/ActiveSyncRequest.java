@@ -14,11 +14,13 @@ public interface ActiveSyncRequest {
 
 	HttpServletRequest getHttpServletRequest();
 	
-	/**
-	 * Parameters can be in query string or in header, whether a base64 query
-	 * string is used.
-	 */
-	String p(String name);
+	public String getDeviceId();
+	public String getDeviceType();
+	public String getUserAgent();
 	
-	public String extractDeviceType();
+	public String getCommand();
+	
+	public String getMsPolicyKey();
+	public String getMSASProtocolVersion();
+	
 }

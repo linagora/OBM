@@ -137,7 +137,7 @@ public class OBMBackend implements IBackend {
 		logger.info("reset Collection {} For Full Sync devId {}", 
 				new Object[]{collectionId, bs.getDevId()});
 		try {
-			collectionDao.resetCollection(bs.getLoginAtDomain(), bs.getDevId(), collectionId);
+			collectionDao.resetCollection(bs.getDevice(), collectionId);
 		} catch (RuntimeException re) {
 			logger.error(re.getMessage(), re);
 			throw re;

@@ -40,7 +40,7 @@ public class CalendarEncoderTest {
 
 	private BackendSession getFakeBackendSession() {
 		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lngr", "test"),
-				"Sync", new Device("devType", "devId", new Properties()), new BigDecimal("12.5"));
+				"Sync", getFakeDevice(), new BigDecimal("12.5"));
 		return bs;
 	}
 
@@ -130,4 +130,7 @@ public class CalendarEncoderTest {
 		event.addAttendee(att);
 	}
 
+	private Device getFakeDevice() {
+		return new Device(1, "devType", "devId", new Properties());
+	}
 }
