@@ -1,7 +1,7 @@
 package org.obm.push.impl;
 
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContinuation;
+import org.obm.push.bean.BackendSession;
 
 public interface IContinuationHandler {
 	void sendResponse(BackendSession bs, Responder responder,

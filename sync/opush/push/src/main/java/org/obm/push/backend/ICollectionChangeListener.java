@@ -2,6 +2,7 @@ package org.obm.push.backend;
 
 import java.util.Set;
 
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.SyncCollection;
 

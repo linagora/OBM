@@ -7,7 +7,9 @@ import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClient;
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.SearchResult;
+import org.obm.push.bean.StoreName;
 import org.obm.push.contacts.ContactConverter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;

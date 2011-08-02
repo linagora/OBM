@@ -158,6 +158,11 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>annotations</artifactId>
 			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>protocol</artifactId>
+			<version>${obm.version}</version>
 		</dependency>	
 	</dependencies>
 

@@ -5,7 +5,7 @@ import javax.naming.ConfigurationException;
 import org.columba.ristretto.smtp.SMTPProtocol;
 import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClient;
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.SmtpLocatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

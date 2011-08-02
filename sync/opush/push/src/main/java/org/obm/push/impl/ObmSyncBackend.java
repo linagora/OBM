@@ -9,7 +9,7 @@ import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClient;
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.ActiveSyncException;

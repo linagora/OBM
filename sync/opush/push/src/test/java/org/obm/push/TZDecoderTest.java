@@ -5,7 +5,7 @@ import java.util.TimeZone;
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
-import org.obm.push.data.TZDecoder;
+import org.obm.push.protocol.data.TZDecoder;
 
 @Ignore("It's necessary to do again all tests")
 public class TZDecoderTest extends TestCase {

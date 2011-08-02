@@ -7,23 +7,25 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.MeetingHandlerRequest;
-import org.obm.push.bean.MeetingHandlerResponse;
-import org.obm.push.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
 import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MeetingResponse;
+import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.data.EncoderFactory;
-import org.obm.push.data.email.MeetingResponse;
+import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.protocol.MeetingProtocol;
-import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.protocol.bean.MeetingHandlerRequest;
+import org.obm.push.protocol.bean.MeetingHandlerResponse;
+import org.obm.push.protocol.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
+import org.obm.push.protocol.data.EncoderFactory;
+import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.w3c.dom.Document;
@@ -69,7 +71,9 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			
 			meetingRequest = meetingProtocol.getRequest(doc);
 			MeetingHandlerResponse meetingResponse = doTheJob(meetingRequest, bs);
-			meetingProtocol.sendResponse(responder, meetingResponse);
+			for (Document document: meetingProtocol.encodeResponses(meetingResponse)) {
+				responder.sendResponse("MeetingResponse", document);
+			}
 			
 		} catch (NoDocumentException e) {
 			try {
@@ -86,7 +90,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 		}
 	}
-
+	
 	@Transactional
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) throws SQLException, ActiveSyncException {
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();

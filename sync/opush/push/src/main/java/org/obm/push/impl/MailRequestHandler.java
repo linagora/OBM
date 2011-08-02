@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.jetty.http.HttpStatus;
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IErrorsManager;
-import org.obm.push.bean.MailRequest;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.protocol.MailProtocol;
+import org.obm.push.protocol.bean.MailRequest;
+import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

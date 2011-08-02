@@ -7,10 +7,10 @@ import java.util.Map;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.SearchResult;
+import org.obm.push.bean.StoreName;
 import org.obm.push.search.ISearchSource;
-import org.obm.push.search.SearchResult;
-import org.obm.push.search.StoreName;
 import org.obm.push.utils.LdapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

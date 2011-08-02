@@ -39,7 +39,7 @@ import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClient;
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmail;

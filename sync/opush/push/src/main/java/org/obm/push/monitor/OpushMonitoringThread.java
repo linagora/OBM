@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.impl.PushNotification;

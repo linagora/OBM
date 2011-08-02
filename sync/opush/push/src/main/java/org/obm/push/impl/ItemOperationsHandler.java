@@ -3,25 +3,18 @@ package org.obm.push.impl;
 import java.util.List;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.ItemOperationsRequest;
-import org.obm.push.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
-import org.obm.push.bean.ItemOperationsRequest.Fetch;
-import org.obm.push.bean.ItemOperationsResponse;
-import org.obm.push.bean.ItemOperationsResponse.EmptyFolderContentsResult;
-import org.obm.push.bean.ItemOperationsResponse.MailboxFetchResult;
-import org.obm.push.bean.ItemOperationsResponse.MailboxFetchResult.FetchAttachmentResult;
-import org.obm.push.bean.ItemOperationsResponse.MailboxFetchResult.FetchItemResult;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSAttachementData;
-import org.obm.push.data.EncoderFactory;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.StoreName;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.exception.ActiveSyncException;
@@ -30,7 +23,16 @@ import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.UnsupportedStoreException;
 import org.obm.push.protocol.ItemOperationsProtocol;
-import org.obm.push.search.StoreName;
+import org.obm.push.protocol.bean.ItemOperationsRequest;
+import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
+import org.obm.push.protocol.bean.ItemOperationsRequest.Fetch;
+import org.obm.push.protocol.bean.ItemOperationsResponse;
+import org.obm.push.protocol.bean.ItemOperationsResponse.EmptyFolderContentsResult;
+import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult;
+import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchAttachmentResult;
+import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchItemResult;
+import org.obm.push.protocol.data.EncoderFactory;
+import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.FileUtils;
@@ -55,7 +57,6 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 				contentsExporter, stMachine, collectionDao);
 		this.protocol = protocol;
 	}
-
 	
 	@Override
 	public void process(IContinuation continuation, BackendSession bs,
@@ -76,8 +77,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 		}
 	}
-
-
+	
 	@Transactional
 	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest)
 			throws CollectionNotFoundException, UnsupportedStoreException {

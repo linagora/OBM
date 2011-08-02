@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.SyncCollection;
 

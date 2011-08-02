@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.obm.push.backend.BackendSession;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;

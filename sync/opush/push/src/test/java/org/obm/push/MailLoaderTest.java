@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 
 import org.junit.Ignore;
 import org.minig.imap.StoreClient;
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEmail;

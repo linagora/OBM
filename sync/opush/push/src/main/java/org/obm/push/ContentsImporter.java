@@ -3,9 +3,9 @@ package org.obm.push;
 import java.io.InputStream;
 import java.sql.SQLException;
 
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.MSEmail;

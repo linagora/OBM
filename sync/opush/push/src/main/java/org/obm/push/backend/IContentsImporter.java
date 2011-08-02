@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 
 import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;

@@ -5,11 +5,10 @@ import java.util.Map;
 
 import org.junit.Ignore;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.utils.SyncKeyUtils;
 import org.w3c.dom.Document;
 
-import static org.obm.sync.push.client.utils.SyncKeyUtils.fillSyncKey;
-import static org.obm.sync.push.client.utils.SyncKeyUtils.processCollection;
+import static org.obm.push.client.tests.SyncKeyUtils.fillSyncKey;
+import static org.obm.push.client.tests.SyncKeyUtils.processCollection;
 
 @Ignore("It's necessary to do again all tests")
 public class TestFullSync extends AbstractPushTest {

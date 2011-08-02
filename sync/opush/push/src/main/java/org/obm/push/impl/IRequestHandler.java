@@ -2,8 +2,9 @@ package org.obm.push.impl;
 
 import java.io.IOException;
 
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContinuation;
+import org.obm.push.bean.BackendSession;
+import org.obm.push.protocol.request.ActiveSyncRequest;
 
 /**
  * Interface to handle client ActiveSync requests

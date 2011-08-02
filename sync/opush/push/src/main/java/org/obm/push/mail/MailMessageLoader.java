@@ -43,7 +43,7 @@ import org.obm.mail.conversation.MessageId;
 import org.obm.mail.message.MailMessageAttachment;
 import org.obm.mail.message.MailMessageInvitation;
 import org.obm.mail.message.MessageLoader;
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmail;

@@ -6,10 +6,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
+import org.obm.push.bean.BackendSession;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

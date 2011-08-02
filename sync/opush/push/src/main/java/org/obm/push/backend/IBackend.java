@@ -3,9 +3,10 @@ package org.obm.push.backend;
 import java.util.Set;
 import java.sql.SQLException;
 
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ActiveSyncException;
-import org.obm.push.provisioning.Policy;
+import org.obm.push.protocol.provisioning.Policy;
 
 public interface IBackend {
 

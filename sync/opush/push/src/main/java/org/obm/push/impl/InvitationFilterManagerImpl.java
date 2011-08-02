@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.obm.push.IInvitationFilterManager;
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.InvitationStatus;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSEmail;

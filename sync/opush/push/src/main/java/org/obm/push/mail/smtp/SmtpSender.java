@@ -9,7 +9,7 @@ import java.util.Set;
 import org.columba.ristretto.message.Address;
 import org.columba.ristretto.smtp.SMTPException;
 import org.columba.ristretto.smtp.SMTPProtocol;
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.SmtpServiceNotAvailableException;

@@ -37,12 +37,6 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-/**
- * Utility methods to extract data from a DOM.
- * 
- * @author Thomas Cataldo
- * 
- */
 public final class DOMUtils {
 
 	private static final Logger logger = LoggerFactory

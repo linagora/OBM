@@ -14,6 +14,7 @@ import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.protocol.data.CalendarDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;

@@ -2,11 +2,11 @@ package org.obm.push;
 
 import java.math.BigDecimal;
 
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.Device.Factory;
-import org.obm.push.impl.ActiveSyncRequest;
+import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

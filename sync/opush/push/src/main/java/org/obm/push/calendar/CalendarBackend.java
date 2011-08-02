@@ -10,9 +10,9 @@ import java.util.List;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;

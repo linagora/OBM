@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.obm.push.backend.BackendSession;
 import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSTask;

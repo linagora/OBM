@@ -2,6 +2,8 @@ package org.obm.push.backend;
 
 import java.io.InputStream;
 
+import org.obm.push.bean.BackendSession;
+
 
 public interface IErrorsManager {
 	

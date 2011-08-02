@@ -1,6 +1,6 @@
 package org.obm.push.calendar;
 
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.sync.calendar.Event;
 

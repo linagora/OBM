@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;

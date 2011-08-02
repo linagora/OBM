@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.ConfigurationService;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;

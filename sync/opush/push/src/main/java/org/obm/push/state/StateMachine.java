@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
 
-import org.obm.push.backend.BackendSession;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;

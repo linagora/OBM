@@ -1,14 +1,14 @@
 package org.obm.push.impl;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
-import org.obm.push.bean.MailRequest;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.protocol.MailProtocol;
+import org.obm.push.protocol.bean.MailRequest;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

@@ -15,7 +15,7 @@ import javax.xml.transform.TransformerException;
 
 import org.eclipse.jetty.http.HttpHeaderValues;
 import org.eclipse.jetty.http.HttpHeaders;
-import org.obm.push.logging.TechnicalLogType;
+import org.obm.push.protocol.logging.TechnicalLogType;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;

@@ -1,11 +1,12 @@
 package org.obm.push.impl;
 
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.data.EncoderFactory;
+import org.obm.push.bean.BackendSession;
+import org.obm.push.protocol.data.EncoderFactory;
+import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.w3c.dom.Document;

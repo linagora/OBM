@@ -1,25 +1,29 @@
 package org.obm.push.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IHierarchyExporter;
-import org.obm.push.bean.FolderSyncRequest;
-import org.obm.push.bean.FolderSyncResponse;
+import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
-import org.obm.push.data.EncoderFactory;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.protocol.FolderSyncProtocol;
+import org.obm.push.protocol.bean.FolderSyncRequest;
+import org.obm.push.protocol.bean.FolderSyncResponse;
+import org.obm.push.protocol.data.EncoderFactory;
+import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.w3c.dom.Document;
@@ -58,18 +62,35 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			
 		} catch (CollectionNotFoundException e) {
 			logger.error(e.getMessage(), e);
-			protocol.sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
+			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
 		} catch (InvalidSyncKeyException e) {
 			logger.error(e.getMessage(), e);
-			protocol.sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
+			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
 		} catch (NoDocumentException e) {
-			protocol.answerOpushIsAlive(responder);
+			answerOpushIsAlive(responder);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 
 	}
 
+	private void sendError(Responder resp, FolderSyncStatus status) {
+		try {
+			resp.sendResponse("FolderHierarchy", protocol.encodeErrorResponse(status));
+		} catch (IOException e) {
+			logger.info(e.getMessage(), e);
+		}
+	}
+	
+	private void answerOpushIsAlive(Responder responder) {
+		try {
+			responder.sendResponseFile("text/plain", new ByteArrayInputStream(
+					"OPUSH IS ALIVE\n".getBytes()));
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+	
 	@Transactional
 	private FolderSyncResponse doTheJob(BackendSession bs,
 			FolderSyncRequest folderSyncRequest) throws SQLException,
