@@ -45,14 +45,12 @@ public class StateMachine {
 	}
 
 	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync) throws CollectionNotFoundException, SQLException {
-		String newSk = UUID.randomUUID().toString();
+		final String newSk = UUID.randomUUID().toString();
 		final SyncState newState = new SyncState(store.getCollectionPath(collectionId), newSk, lastSync);
-		
-		logger.info("allocateNewSyncKey [ " + collectionId + ", " + newState.getLastSync().toString() + " ]");
-		
+		logger.info("allocateNewSyncKey [ collectionId = {} | lastSync.toString = {} ]",
+				new Object[]{ collectionId, newState.getLastSync().toString() });
 		store.updateState(bs.getLoginAtDomain(), bs.getDevId(), collectionId, newState);
 		return newSk;
 	}
-
 
 }

@@ -121,13 +121,13 @@ public class SyncHandler extends WbxmlRequestHandler implements
 			}
 
 		} catch (ProtocolException convExpt) {
-			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue());
+			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), null);
 		} catch (PartialException pe) {
 			// Status 13
 			// The client sent an empty or partial Sync request,
 			// but the server is unable to process it. Please
 			// resend the request with the full XML
-			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue());
+			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue(), null);
 		} catch (CollectionNotFoundException ce) {
 			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
 		} catch (ObjectNotFoundException oe) {
@@ -148,8 +148,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 	private void registerWaitingSync(IContinuation continuation,
 			BackendSession bs, Responder responder, Sync sync)
 			throws CollectionNotFoundException, ActiveSyncException {
-		logger.info("suspend for " + sync.getWaitInSecond()
-				+ " seconds");
+		logger.info("suspend for {} seconds", sync.getWaitInSecond());
 		if (sync.getWaitInSecond() > 3540) {
 			sendWaitIntervalOutOfRangeError(responder);
 			return;
@@ -229,10 +228,9 @@ public class SyncHandler extends WbxmlRequestHandler implements
 
 		for (ItemChange ic : changed) {
 			String clientId = processedClientIds.get(ic.getServerId());
-			logger.info("processedIds:" + processedIds.toString()
-					+ " ic.clientId: " + clientId + " ic.serverId: "
-					+ ic.getServerId());
-
+			logger.info("processedIds = {} | ic.clientId = {} | ic.serverId = {}", 
+					new Object[]{ processedIds.toString(), clientId, ic.getServerId() });
+			
 			if (clientId != null) {
 				// Acks Add done by pda
 				Element add = DOMUtils.createElement(responses, "Add");
@@ -445,10 +443,9 @@ public class SyncHandler extends WbxmlRequestHandler implements
 						change.getData());
 			} else if (change.getModType().equals("Add")
 					|| change.getModType().equals("Change")) {
-				logger.info("processing Add/Change (srv: "
-						+ change.getServerId() + ", cli:"
-						+ change.getClientId() + ")");
-
+				logger.info("processing Add/Change (srv = {} | cli = {} )",
+						new Object[]{ change.getServerId(), change.getClientId() });
+				
 				String obmId = contentsImporter.importMessageChange(bs,
 						collection.getCollectionId(), change.getServerId(),
 						change.getClientId(), change.getData());
@@ -541,19 +538,7 @@ public class SyncHandler extends WbxmlRequestHandler implements
 							continuation);
 				}
 			}
-			logger.info("Resp for requestId: " + continuation.getReqId());
-			responder.sendResponse("AirSync", reply);
-		} catch (Exception e) {
-			logger.error("Error creating Sync response", e);
-		}
-	}
-
-	private void sendError(Responder responder, String errorStatus) {
-		try {
-			Document reply = null;
-			reply = DOMUtils.createDoc(null, "Sync");
-			Element root = reply.getDocumentElement();
-			DOMUtils.createElementAndText(root, "Status", errorStatus);
+			logger.info("Resp for requestId = {}", continuation.getReqId());
 			responder.sendResponse("AirSync", reply);
 		} catch (Exception e) {
 			logger.error("Error creating Sync response", e);
@@ -567,11 +552,13 @@ public class SyncHandler extends WbxmlRequestHandler implements
 		DOMUtils.createElementAndText(root, "Status", errorStatus.toString());
 
 		try {
-			logger.info("Resp for requestId: " + continuation.getReqId());
+			if (continuation != null) {
+				logger.info("Resp for requestId = {}", continuation.getReqId());	
+			}
 			responder.sendResponse("AirSync", ret);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-
 	}
+	
 }
