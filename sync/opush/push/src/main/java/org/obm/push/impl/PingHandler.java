@@ -23,6 +23,7 @@ import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.ISyncStorage;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.w3c.dom.Document;
@@ -36,18 +37,20 @@ public class PingHandler extends WbxmlRequestHandler implements
 	
 	private final MonitoredCollectionDao monitoredCollectionDao;
 	private final PingProtocol protocol;
+	private final HearbeatDao hearbeatDao;
 
 	@Inject
 	protected PingHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, ISyncStorage storage,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			PingProtocol pingProtocol, MonitoredCollectionDao monitoredCollectionDao,
-			CollectionDao collectionDao) {
+			CollectionDao collectionDao, HearbeatDao hearbeatDao) {
 		
 		super(backend, encoderFactory, contentsImporter, storage,
 				contentsExporter, stMachine, collectionDao);
 		this.monitoredCollectionDao = monitoredCollectionDao;
 		this.protocol = pingProtocol;
+		this.hearbeatDao = hearbeatDao;
 	}
 
 	@Override
@@ -74,13 +77,13 @@ public class PingHandler extends WbxmlRequestHandler implements
 			throws SQLException, MissingRequestParameterException, ActiveSyncException {
 		
 		if (pingRequest.getHeartbeatInterval() == null) {
-			Long heartbeatInterval = storage.findLastHearbeat(bs.getLoginAtDomain(), bs.getDevId());
+			Long heartbeatInterval = hearbeatDao.findLastHearbeat(bs.getLoginAtDomain(), bs.getDevId());
 			if (heartbeatInterval == null) {
 				throw new MissingRequestParameterException();
 			}
 			pingRequest.setHeartbeatInterval(heartbeatInterval);
 		} else {
-			storage.updateLastHearbeat(bs.getLoginAtDomain(), bs.getDevId(), pingRequest.getHeartbeatInterval());
+			hearbeatDao.updateLastHearbeat(bs.getLoginAtDomain(), bs.getDevId(), pingRequest.getHeartbeatInterval());
 		}
 		if (pingRequest.getHeartbeatInterval() < 5) {
 			pingRequest.setHeartbeatInterval(5l);

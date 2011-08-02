@@ -3,11 +3,9 @@ package org.obm.push.store;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import org.obm.dbcp.IDBCP;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncState;
 import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
 import org.obm.push.utils.IniFile;
 import org.obm.push.utils.JDBCUtils;
@@ -39,16 +37,14 @@ public class SyncStorage implements ISyncStorage {
 	}
 
 	@Override
-	public boolean initDevice(String loginAtDomain, String deviceId,
-			String deviceType) {
+	@Deprecated
+	public boolean initDevice(String loginAtDomain, String deviceId, String deviceType) {
 
 		boolean ret = true;
 		try {
-			Integer opushDeviceId = deviceDao.findDevice(loginAtDomain,
-					deviceId);
+			Integer opushDeviceId = deviceDao.findDevice(loginAtDomain, deviceId);
 			if (opushDeviceId == null) {
-				boolean registered = deviceDao.registerNewDevice(loginAtDomain,
-						deviceId, deviceType);
+				boolean registered = deviceDao.registerNewDevice(loginAtDomain, deviceId, deviceType);
 				if (!registered) {
 					logger.warn("did not insert any row in device table for device "
 							+ deviceType + " of " + loginAtDomain);
@@ -74,55 +70,6 @@ public class SyncStorage implements ISyncStorage {
 			return PIMDataType.TASKS;
 		} else {
 			return PIMDataType.FOLDER;
-		}
-	}
-
-	@Override
-	public Long findLastHearbeat(String loginAtDomain, String devId) throws SQLException {
-		Integer id = deviceDao.findDevice(loginAtDomain, devId);
-
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = dbcp.getConnection();
-			ps = con.prepareStatement("SELECT last_heartbeat FROM opush_ping_heartbeat WHERE device_id=?");
-			ps.setInt(1, id);
-
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				return rs.getLong("last_heartbeat");
-			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
-		} finally {
-			JDBCUtils.cleanup(con, ps, null);
-		}
-		return null;
-	}
-
-	@Override
-	public void updateLastHearbeat(String loginAtDomain, String devId,
-			long hearbeat) throws SQLException {
-		Integer id = deviceDao.findDevice(loginAtDomain, devId);
-		Connection con = null;
-		PreparedStatement ps = null;
-		try {
-			con = dbcp.getConnection();
-			ps = con.prepareStatement("DELETE FROM opush_ping_heartbeat WHERE device_id=? ");
-			ps.setInt(1, id);
-			ps.executeUpdate();
-
-			ps.close();
-			ps = con.prepareStatement("INSERT INTO opush_ping_heartbeat (device_id, last_heartbeat) VALUES (?, ?)");
-			ps.setInt(1, id);
-			ps.setLong(2, hearbeat);
-			ps.executeUpdate();
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
-		} finally {
-			JDBCUtils.cleanup(con, ps, null);
 		}
 	}
 

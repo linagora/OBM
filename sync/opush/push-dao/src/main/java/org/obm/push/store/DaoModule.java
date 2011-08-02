@@ -7,6 +7,7 @@ import org.obm.push.store.jdbc.CollectionDaoJdbcImpl;
 import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
 import org.obm.push.store.jdbc.EmailDaoJdbcImpl;
 import org.obm.push.store.jdbc.FiltrageInvitationDaoJdbcImpl;
+import org.obm.push.store.jdbc.HearbeatDaoJdbcDaoImpl;
 
 import com.google.inject.AbstractModule;
 
