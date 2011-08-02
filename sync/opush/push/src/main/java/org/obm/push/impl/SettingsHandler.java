@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.BackendSession;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -14,10 +13,6 @@ import org.w3c.dom.Document;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-/**
- * Handles the Provision cmd
- * 
- */
 @Singleton
 public class SettingsHandler extends WbxmlRequestHandler {
 
@@ -31,11 +26,8 @@ public class SettingsHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
-	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
-		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()
-				+ ")");
 
 		try {
 			// send back the original document
