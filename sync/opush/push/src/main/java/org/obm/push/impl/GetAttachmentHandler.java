@@ -14,10 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-/**
- * Handles the search cmd
- * 
- */
 @Singleton
 public class GetAttachmentHandler implements IRequestHandler {
 
@@ -31,22 +27,22 @@ public class GetAttachmentHandler implements IRequestHandler {
 	}
 
 	@Override
-	@Transactional
 	public void process(IContinuation continuation, BackendSession bs,
 			ActiveSyncRequest request, Responder responder) throws IOException {
-		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()
-				+ ")");
 
 		String AttachmentName = request.getParameter("AttachmentName");
 
-		MSAttachementData attachment;
 		try {
-			attachment = contentsExporter.getEmailAttachement(
-					bs, AttachmentName);
-			responder.sendResponseFile(attachment.getContentType(),
-					attachment.getFile());
+			MSAttachementData attachment = getAttachment(bs, AttachmentName);
+			responder.sendResponseFile(attachment.getContentType(),	attachment.getFile());
 		} catch (ObjectNotFoundException e) {
 			responder.sendError(500);
 		}
+	}
+
+	@Transactional
+	private MSAttachementData getAttachment(BackendSession bs,
+			String AttachmentName) throws ObjectNotFoundException {
+		return contentsExporter.getEmailAttachement(bs, AttachmentName);
 	}
 }
