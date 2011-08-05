@@ -8,24 +8,14 @@
 		<listener-class>org.obm.push.GuiceServletContextListener</listener-class>
 	</listener>
 	
-	<servlet> 
-		<servlet-name>activeSyncServlet</servlet-name> 
-		<servlet-class>org.obm.push.ActiveSyncServlet</servlet-class> 
- 		<load-on-startup>1</load-on-startup>
-	</servlet> 
-
-	<servlet-mapping>
-		<servlet-name>activeSyncServlet</servlet-name>
-		<url-pattern>/*</url-pattern>
-	</servlet-mapping>
-
 	<filter>
-		<filter-name>continuation</filter-name>
-		<filter-class>org.eclipse.jetty.continuation.ContinuationFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>continuation</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+    	<filter-name>guiceFilter</filter-name>
+    	<filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+  	</filter>
+
+  	<filter-mapping>
+    	<filter-name>guiceFilter</filter-name>
+    	<url-pattern>/*</url-pattern>
+  	</filter-mapping>
 
 </web-app>

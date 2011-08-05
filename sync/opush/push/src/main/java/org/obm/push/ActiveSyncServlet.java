@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
+import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
@@ -20,23 +21,24 @@ import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.exception.DaoException;
-import org.obm.push.impl.FolderSyncHandler;
-import org.obm.push.impl.GetAttachmentHandler;
-import org.obm.push.impl.GetItemEstimateHandler;
-import org.obm.push.impl.IContinuationHandler;
-import org.obm.push.impl.IRequestHandler;
-import org.obm.push.impl.ItemOperationsHandler;
-import org.obm.push.impl.MeetingResponseHandler;
-import org.obm.push.impl.MoveItemsHandler;
-import org.obm.push.impl.PingHandler;
-import org.obm.push.impl.ProvisionHandler;
+import org.obm.push.handler.FolderSyncHandler;
+import org.obm.push.handler.GetAttachmentHandler;
+import org.obm.push.handler.GetItemEstimateHandler;
+import org.obm.push.handler.IContinuationHandler;
+import org.obm.push.handler.IRequestHandler;
+import org.obm.push.handler.ItemOperationsHandler;
+import org.obm.push.handler.MeetingResponseHandler;
+import org.obm.push.handler.MoveItemsHandler;
+import org.obm.push.handler.PingHandler;
+import org.obm.push.handler.ProvisionHandler;
+import org.obm.push.handler.SearchHandler;
+import org.obm.push.handler.SendMailHandler;
+import org.obm.push.handler.SettingsHandler;
+import org.obm.push.handler.SmartForwardHandler;
+import org.obm.push.handler.SmartReplyHandler;
 import org.obm.push.impl.PushContinuation;
+import org.obm.push.impl.PushContinuation.Factory;
 import org.obm.push.impl.Responder;
-import org.obm.push.impl.SearchHandler;
-import org.obm.push.impl.SendMailHandler;
-import org.obm.push.impl.SettingsHandler;
-import org.obm.push.impl.SmartForwardHandler;
-import org.obm.push.impl.SmartReplyHandler;
 import org.obm.push.protocol.logging.TechnicalLogType;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.protocol.request.Base64QueryString;
@@ -48,17 +50,20 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 
 /**
  * ActiveSync server implementation. Routes all request to appropriate request
  * handlers.
  * 
  */
+@Singleton
 public class ActiveSyncServlet extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveSyncServlet.class);
-
+	
 	private Injector injector;
 	private Map<String, IRequestHandler> handlers;
 	private SessionService sessionService;
@@ -67,7 +72,21 @@ public class ActiveSyncServlet extends HttpServlet {
 	private PushContinuation.Factory continuationFactory;
 	private DeviceService deviceService;
 
+	
+	@Inject
+	protected ActiveSyncServlet(SessionService sessionService, LoggerService loggerService,
+			IBackend backend, Factory continuationFactory,
+			DeviceService deviceService) {
+		super();
+		this.sessionService = sessionService;
+		this.loggerService = loggerService;
+		this.backend = backend;
+		this.continuationFactory = continuationFactory;
+		this.deviceService = deviceService;
+	}
+
 	@Override
+	@Transactional
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
@@ -150,20 +169,11 @@ public class ActiveSyncServlet extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		
-		injector = 
+		this.injector = 
 				(Injector) config
-					.getServletContext()
-					.getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
-		
-		loggerService = injector.getInstance(LoggerService.class);
-		backend = injector.getInstance(IBackend.class);
-		sessionService = injector.getInstance(SessionService.class);
-		continuationFactory = injector.getInstance(PushContinuation.Factory.class);
-		deviceService = injector.getInstance(DeviceService.class);
-		
+				.getServletContext()
+				.getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
 		handlers = createHandlersMap();
-		logger.info("Opush ActiveSync servlet initialised.");
 	}
 
 	private ImmutableMap<String, IRequestHandler> createHandlersMap() {

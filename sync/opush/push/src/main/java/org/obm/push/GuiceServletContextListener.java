@@ -48,9 +48,8 @@ public class GuiceServletContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
     	
         final ServletContext servletContext = servletContextEvent.getServletContext(); 
-        
         try {
-        	Injector injector = createInjector(servletContext);
+        	Injector injector = createInjector();
         	if (injector == null) { 
         		failStartup("Could not create injector: createInjector() returned null"); 
         	} 
@@ -63,7 +62,7 @@ public class GuiceServletContextListener implements ServletContextListener {
         } 
     } 
     
-    private Injector createInjector(final ServletContext servletContext) {
+    private Injector createInjector() {
     	return Guice.createInjector(new AbstractModule() {
 			@Override
 			protected void configure() {
@@ -78,11 +77,10 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
 				bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
 				bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
-				bind(ServletContext.class).toInstance(servletContext);
 				bind(DeviceService.class).to(DeviceServiceImpl.class);
 				bind(SyncPermsConfigurationService.class).to(OpushSyncPermsConfigurationService.class);
 			}
-    	}, new TransactionalModule(), new DaoModule());
+    	}, new TransactionalModule(), new DaoModule(), new OpushServletModule());
     }
     
     private void failStartup(String message) { 
