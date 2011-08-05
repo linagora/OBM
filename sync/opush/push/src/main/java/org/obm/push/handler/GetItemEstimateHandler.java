@@ -1,7 +1,8 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.util.ArrayList;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -23,6 +24,7 @@ import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.impl.Responder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.w3c.dom.Document;
@@ -70,7 +72,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		}
 	}
 
-	@Transactional
+	@Transactional(propagation=Propagation.NESTED)
 	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, ActiveSyncException, DaoException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();

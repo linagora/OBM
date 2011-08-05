@@ -1,5 +1,6 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
@@ -23,8 +24,8 @@ public class SmartReplyHandler extends MailRequestHandler {
 		super(contentsImporter, errorManager, mailProtocol);
 	}
 
-	@Transactional
 	@Override
+	@Transactional(propagation=Propagation.NESTED)
 	public void doTheJob(MailRequest mailRequest, BackendSession bs)
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
 		

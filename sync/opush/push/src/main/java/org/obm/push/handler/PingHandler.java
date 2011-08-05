@@ -1,8 +1,9 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.io.IOException;
 import java.util.Set;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IBackend;
@@ -23,6 +24,7 @@ import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.impl.Responder;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.HearbeatDao;
@@ -73,7 +75,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 		}
 	}
 
-	@Transactional
+	@Transactional(propagation=Propagation.NESTED)
 	private void doTheJob(IContinuation continuation, BackendSession bs, PingRequest pingRequest) 
 			throws MissingRequestParameterException, ActiveSyncException, DaoException {
 		

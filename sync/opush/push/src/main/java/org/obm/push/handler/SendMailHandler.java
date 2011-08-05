@@ -1,5 +1,6 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
@@ -14,22 +15,21 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SmartForwardHandler extends MailRequestHandler {
+public class SendMailHandler extends MailRequestHandler {
 
 	@Inject
-	protected SmartForwardHandler(IContentsImporter contentsImporter, 
+	protected SendMailHandler(IContentsImporter contentsImporter,
 			IErrorsManager errorManager, MailProtocol mailProtocol) {
 		
 		super(contentsImporter, errorManager, mailProtocol);
 	}
 
-	@Transactional
 	@Override
+	@Transactional(propagation=Propagation.NESTED)
 	public void doTheJob(MailRequest mailRequest, BackendSession bs) 
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
 		
-		contentsImporter.forwardEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(), 
-				mailRequest.getCollectionId(), mailRequest.getServerId());
+		contentsImporter.sendEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent());
 	}
-	
+
 }

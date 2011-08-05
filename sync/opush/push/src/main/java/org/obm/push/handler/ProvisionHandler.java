@@ -1,8 +1,9 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.io.IOException;
 import java.util.Random;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -10,6 +11,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.InvalidPolicyKeyException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.ProvisionProtocol;
 import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
@@ -63,7 +65,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		}
 	}
 
-	@Transactional
+	@Transactional(propagation=Propagation.NESTED)
 	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, BackendSession bs) {
 		ProvisionResponse provisionResponse = new ProvisionResponse(provisionRequest.getPolicyType());
 		

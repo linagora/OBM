@@ -1,7 +1,8 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.util.List;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -23,6 +24,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.UnsupportedStoreException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
@@ -79,7 +81,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		}
 	}
 	
-	@Transactional
+	@Transactional(propagation=Propagation.NESTED)
 	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest)
 			throws CollectionNotFoundException, UnsupportedStoreException {
 		

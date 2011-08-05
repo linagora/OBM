@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +11,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.ProcessingEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;

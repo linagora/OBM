@@ -1,4 +1,4 @@
-package org.obm.push.store;
+package org.obm.push.handler;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.DataDelta;
@@ -38,9 +39,7 @@ import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
-import org.obm.push.impl.IContinuationHandler;
 import org.obm.push.impl.Responder;
-import org.obm.push.impl.WbxmlRequestHandler;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -48,6 +47,9 @@ import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
+import org.obm.push.store.CollectionDao;
+import org.obm.push.store.MonitoredCollectionDao;
+import org.obm.push.store.UnsynchronizedItemDao;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMap;
@@ -143,7 +145,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
-	@Transactional
+	@Transactional(propagation=Propagation.NESTED)
 	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync)
 			throws CollectionNotFoundException, ActiveSyncException, WaitIntervalOutOfRangeException, DaoException {
 		

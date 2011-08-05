@@ -1,10 +1,11 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -20,6 +21,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NoDocumentException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
@@ -91,7 +93,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		}
 	}
 	
-	@Transactional
+	@Transactional(propagation=Propagation.NESTED)
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) throws ActiveSyncException, DaoException {
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {

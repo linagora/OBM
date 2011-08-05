@@ -1,8 +1,9 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -13,6 +14,7 @@ import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.SearchStatus;
 import org.obm.push.bean.StoreName;
 import org.obm.push.exception.XMLValidationException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.SearchProtocol;
 import org.obm.push.protocol.bean.SearchRequest;
 import org.obm.push.protocol.bean.SearchResponse;
@@ -76,7 +78,7 @@ public class SearchHandler extends WbxmlRequestHandler {
 		}
 	}
 
-	@Transactional
+	@Transactional(propagation=Propagation.NESTED)
 	private SearchResponse search(BackendSession bs, SearchRequest searchRequest) {
 		final List<SearchResult> results = new LinkedList<SearchResult>();
 		for (final ISearchSource source: sources.get(searchRequest.getStoreName())) {

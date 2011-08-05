@@ -1,4 +1,4 @@
-package org.obm.push.store;
+package org.obm.push.bean;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

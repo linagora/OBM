@@ -1,9 +1,10 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -19,6 +20,7 @@ import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.NoDocumentException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.FolderSyncProtocol;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;
@@ -91,7 +93,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		}
 	}
 	
-	@Transactional
+	@Transactional(propagation=Propagation.NESTED)
 	private FolderSyncResponse doTheJob(BackendSession bs,
 			FolderSyncRequest folderSyncRequest) throws
 			InvalidSyncKeyException, CollectionNotFoundException,

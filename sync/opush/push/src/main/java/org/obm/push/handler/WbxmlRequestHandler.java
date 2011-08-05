@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +8,8 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.impl.DOMDumper;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.logging.TechnicalLogType;
 import org.obm.push.protocol.request.ActiveSyncRequest;

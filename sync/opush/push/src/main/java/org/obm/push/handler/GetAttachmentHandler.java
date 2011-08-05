@@ -1,15 +1,17 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.exception.ObjectNotFoundException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +45,7 @@ public class GetAttachmentHandler implements IRequestHandler {
 		}
 	}
 
-	@Transactional
+	@Transactional(propagation=Propagation.NESTED)
 	private MSAttachementData getAttachment(BackendSession bs,
 			String AttachmentName) throws ObjectNotFoundException {
 		return contentsExporter.getEmailAttachement(bs, AttachmentName);
