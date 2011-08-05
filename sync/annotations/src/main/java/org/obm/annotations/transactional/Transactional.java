@@ -10,5 +10,7 @@ import java.lang.annotation.Target;
 public @interface Transactional {
 
     Class<? extends Exception>[] noRollbackOn() default {};
+    
+    Propagation propagation() default Propagation.REQUIRED;
 
 }

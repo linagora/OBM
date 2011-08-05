@@ -34,17 +34,19 @@ public class TransactionalInterceptor implements MethodInterceptor {
 			return methodInvocation.proceed();
 		}
 
-		boolean nestedTransaction = isTransactionActive(ut);
+		boolean isInSubTransaction = isTransactionActive(ut);
+		boolean haveCreatedNewTransaction = false;
 		
 		try {
-			if (!nestedTransaction) {
+			if (canBeginNewTransaction(isInSubTransaction, transactional)) {
 				logger.info("transaction was started");
 				ut.begin();
+				haveCreatedNewTransaction = true;
 			}
 			
 			Object obj = methodInvocation.proceed();
 			
-			if (!nestedTransaction) {
+			if (canCommitTransaction(ut, haveCreatedNewTransaction)) {
 				logger.info("transaction was commited");
 				ut.commit();
 			}
@@ -55,7 +57,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
 					logger.error("transaction was rollback", e);
 					ut.rollback();
 				} else {
-					if (!nestedTransaction) {
+					if (canCommitTransaction(ut, haveCreatedNewTransaction)) {
 						logger.info("transaction was commited");
 						ut.commit();
 					}
@@ -64,6 +66,15 @@ public class TransactionalInterceptor implements MethodInterceptor {
 			logger.info(e.getMessage(),e);
 			throw e;
 		}
+	}
+
+	private boolean canCommitTransaction(TransactionManager ut, boolean haveCreatedNewTransaction) throws SystemException {
+		return isTransactionActive(ut) && haveCreatedNewTransaction;
+	}
+
+	private boolean canBeginNewTransaction(boolean isInSubTransaction,
+			Transactional transactional) {
+		return !isInSubTransaction || (isInSubTransaction && Propagation.NESTED.equals(transactional.propagation()));
 	}
 
 	private boolean isTransactionActive(TransactionManager tm)	throws SystemException {
