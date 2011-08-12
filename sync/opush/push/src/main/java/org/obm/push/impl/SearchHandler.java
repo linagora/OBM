@@ -1,5 +1,6 @@
 package org.obm.push.impl;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,22 +60,24 @@ public class SearchHandler extends WbxmlRequestHandler {
 			SearchRequest searchRequest = protocol.getRequest(doc.getDocumentElement());
 			SearchResponse response = search(bs, searchRequest);
 			Document document = protocol.encodeResponse(response);
-			responder.sendResponse("Search", document);
+			sendResponse(responder, document);
 		} catch (XMLValidationException e) {
 			logger.error("Protocol violation", e);
 			sendError(responder, SearchStatus.PROTOCOL_VIOLATION);
-		} catch (Exception e) {
-			logger.error("Error creating search response", e);
+		}
+	}
+
+	private void sendResponse(Responder responder, Document document) {
+		try {
+			responder.sendResponse("Search", document);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
 	private void sendError(Responder responder, SearchStatus error) {
-		try {
-			Document document = protocol.buildError(error);
-			responder.sendResponse("Search", document);
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
+		Document document = protocol.buildError(error);
+		sendResponse(responder, document);
 	}
 
 	@Transactional(propagation=Propagation.NESTED)
