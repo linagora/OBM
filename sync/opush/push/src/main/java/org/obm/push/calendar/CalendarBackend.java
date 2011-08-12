@@ -22,7 +22,6 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
@@ -405,31 +404,22 @@ public class CalendarBackend extends ObmSyncBackend {
 		return getServerIdFor(collectionId, msEvent.getObmUID());
 	}
 
-	public List<ItemChange> fetchItems(BackendSession bs,
-			List<String> fetchServerIds) throws ObjectNotFoundException {
+	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
-		AbstractEventSyncClient calCli = getCalendarClient(bs,
-				PIMDataType.CALENDAR);
+		AbstractEventSyncClient calCli = getCalendarClient(bs, PIMDataType.CALENDAR);
 		AccessToken token = login(calCli, bs);
-		try {
-			for (String serverId : fetchServerIds) {
-				String id = getEventUidFromServerId(serverId);
-				if (id != null) {
-					Event e = calCli.getEventFromId(token,
-							bs.getLoginAtDomain(), id);
-					ItemChange ic = new ItemChange();
-					ic.setServerId(serverId);
-					IApplicationData ev = convertEvent(bs, e);
-					ic.setData(ev);
-					ret.add(ic);
-				}
+		for (String serverId : fetchServerIds) {
+			String id = getEventUidFromServerId(serverId);
+			if (id != null) {
+				Event e = calCli.getEventFromId(token, bs.getLoginAtDomain(), id);
+				ItemChange ic = new ItemChange();
+				ic.setServerId(serverId);
+				IApplicationData ev = convertEvent(bs, e);
+				ic.setData(ev);
+				ret.add(ic);
 			}
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
-			throw new ObjectNotFoundException();
-		} finally {
-			calCli.logout(token);
 		}
+		calCli.logout(token);
 		return ret;
 	}
 	

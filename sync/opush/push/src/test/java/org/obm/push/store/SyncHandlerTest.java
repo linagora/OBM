@@ -31,7 +31,6 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.data.CalendarEncoder;
 import org.obm.push.protocol.data.EncoderFactory;
@@ -40,6 +39,7 @@ import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.SyncHandler;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.auth.ServerFault;
 import org.w3c.dom.Document;
 
 
@@ -49,7 +49,7 @@ public class SyncHandlerTest {
 	
 	@Ignore("I'm wait for the task of 'backendsession stateless' is completed !")
 	@Test
-	public void testProcessResponseWithAccents() throws IOException, TransformerException, DaoException, CollectionNotFoundException, ObjectNotFoundException{
+	public void testProcessResponseWithAccents() throws IOException, TransformerException, DaoException, CollectionNotFoundException, ServerFault{
 
 		String expectedString = "éàâ";
 		int collectionId = 0;

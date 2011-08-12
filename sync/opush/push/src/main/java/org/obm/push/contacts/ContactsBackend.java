@@ -16,10 +16,10 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.client.book.BookClient;
@@ -149,8 +149,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		}
 	}
 
-	public List<ItemChange> fetchItems(BackendSession bs,
-			List<String> fetchServerIds) throws ObjectNotFoundException {
+	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) throws ServerFault {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		BookClient bc = getBookClient(bs);
 		AccessToken token = login(bc, bs);
@@ -159,9 +158,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			for (String serverId : fetchServerIds) {
 				Integer id = getItemIdFor(serverId);
 				if (id != null) {
-					
-					Contact c = bc.getContactFromId(token, BookType.contacts,
-							id.toString());
+					Contact c = bc.getContactFromId(token, BookType.contacts, id.toString());
 					ItemChange ic = new ItemChange();
 					ic.setServerId(serverId);
 					MSContact cal = new ContactConverter().convert(c);
@@ -169,9 +166,9 @@ public class ContactsBackend extends ObmSyncBackend {
 					ret.add(ic);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
-			throw new ObjectNotFoundException();
+			throw new ServerFault(e);
 		} finally {
 			bc.logout(token);
 		}

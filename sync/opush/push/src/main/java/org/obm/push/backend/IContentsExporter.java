@@ -13,6 +13,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
+import org.obm.sync.auth.ServerFault;
 
 /**
  * The exporter API fetches data from the backend store and returns it to the
@@ -27,7 +28,7 @@ public interface IContentsExporter {
 			throws DaoException, CollectionNotFoundException;
 
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchIds) throws ObjectNotFoundException, CollectionNotFoundException, DaoException ;
+			List<String> fetchIds) throws CollectionNotFoundException, DaoException, ServerFault ;
 	
 	List<ItemChange> fetchEmails(BackendSession bs,
 			Integer collectionId, Collection<Long> uids) throws DaoException, CollectionNotFoundException;

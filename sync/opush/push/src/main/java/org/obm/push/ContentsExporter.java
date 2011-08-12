@@ -21,6 +21,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.mail.MailBackend;
+import org.obm.sync.auth.ServerFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +159,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchServerIds) throws ObjectNotFoundException, CollectionNotFoundException, DaoException {
+			List<String> fetchServerIds) throws CollectionNotFoundException, DaoException, ServerFault {
 		
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		switch (getDataType) {

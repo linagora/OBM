@@ -35,7 +35,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.impl.IContinuationHandler;
@@ -51,6 +50,7 @@ import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.sync.auth.ServerFault;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMap;
@@ -116,34 +116,36 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				
 				SyncResponse syncResponse = doTheJob(bs, syncRequest.getSync().getCollections(), 
 						 modificationStatus.processedClientIds, continuation);
-				responder.sendResponse("AirSync", syncProtocol.endcodeResponse(syncResponse));
+				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 			} 
 			
 		} catch (ProtocolException convExpt) {
-			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), null);
+			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), convExpt);
 		} catch (PartialException pe) {
-			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue(), null);
+			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue(), pe);
 		} catch (CollectionNotFoundException ce) {
-			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
-		} catch (ObjectNotFoundException oe) {
-			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
+			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation, ce);
+		} catch (ServerFault serverFault) {
+			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), serverFault);
 		} catch (ContinuationThrowable e) {
 			throw e;
 		} catch (NoDocumentException e) {
-			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue(), null);
+			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue(), e);
 		} catch (WaitIntervalOutOfRangeException e) {
-			try {
-				responder.sendResponse("AirSync", syncProtocol.encodeResponse() );
-			} catch (IOException e1) {
-				logger.error(e.getMessage(), e);
-			}
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			sendResponse(responder, syncProtocol.encodeResponse());
 		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
 
+	private void sendResponse(Responder responder, Document document) {
+		try {
+			responder.sendResponse("AirSync", document);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+	
 	@Transactional(propagation=Propagation.NESTED)
 	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync)
 			throws CollectionNotFoundException, WaitIntervalOutOfRangeException, DaoException {
@@ -354,21 +356,20 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		try {
 			SyncResponse syncResponse = doTheJob(bs, monitoredCollectionService.list(bs.getCredentials(), bs.getDevice()),
 					ImmutableMap.<String, String> of(), continuation);
-			responder.sendResponse("AirSync", syncProtocol.endcodeResponse(syncResponse));
+			sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (CollectionNotFoundException e) {
-			logger.error(e.getMessage(), e);
-		} catch (ObjectNotFoundException e) {
-			logger.error(e.getMessage(), e);
+			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation, e);
+		} catch (ServerFault e) {
+			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
 
 	@Transactional
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
-			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, ObjectNotFoundException {
+			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, 
+			CollectionNotFoundException, ServerFault {
 
 		final List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
@@ -398,6 +399,16 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 		logger.info("Resp for requestId = {}", continuation.getReqId());
 		return new SyncResponse(syncCollectionResponses, bs, getEncoders(), processedClientIds);
+	}
+
+	
+	private void sendError(Responder responder, String errorStatus, Exception exception) {
+		sendError(responder, errorStatus, null, exception);
+	}
+	
+	private void sendError(Responder responder, String errorStatus, IContinuation continuation, Exception exception) {
+		logger.error(exception.getMessage(), exception);
+		sendError(responder, errorStatus, continuation);
 	}
 
 	@Override

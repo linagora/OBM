@@ -21,7 +21,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
@@ -30,6 +29,7 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.sync.auth.ServerFault;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -88,7 +88,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
-		} catch (ObjectNotFoundException e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
 		} catch (CollectionNotFoundException e) {
 			logger.error(e.getMessage(), e);
@@ -97,7 +97,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	
 	@Transactional(propagation=Propagation.NESTED)
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 
-			throws DaoException, ObjectNotFoundException, CollectionNotFoundException {
+			throws DaoException, ServerFault, CollectionNotFoundException {
 		
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
@@ -128,7 +128,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 	
 	private ItemChange retrieveMailWithMeetingRequest(BackendSession bs, MeetingResponse item)
-		throws DaoException, ObjectNotFoundException, CollectionNotFoundException {
+		throws DaoException, ServerFault, CollectionNotFoundException {
 		
 		List<ItemChange> lit = contentsExporter.fetch(bs, PIMDataType.EMAIL, Arrays.asList(item.getReqId()));
 		if (lit.size() > 0) {

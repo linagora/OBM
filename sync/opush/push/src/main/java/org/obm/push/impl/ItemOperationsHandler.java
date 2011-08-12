@@ -37,6 +37,7 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.FileUtils;
+import org.obm.sync.auth.ServerFault;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
@@ -177,7 +178,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			}
 		} catch (CollectionNotFoundException e) {
 			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
-		} catch (ObjectNotFoundException e) {
+		} catch (ServerFault e) {
 			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_CONNECTION_FAILED);
 		} catch (DaoException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);

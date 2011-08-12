@@ -207,6 +207,7 @@ public class SyncDecoder {
 			try {
 				return Integer.parseInt(fid.getTextContent());
 			} catch (NumberFormatException e) {
+				logger.error(e.getMessage(), e);
 			}
 		}
 		return null;

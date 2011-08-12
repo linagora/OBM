@@ -55,18 +55,13 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public Contact getContactFromId(AccessToken token, BookType book, String id)
-			throws AuthFault, ServerFault {
+	public Contact getContactFromId(AccessToken token, BookType book, String id) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("id", id);
 		Document doc = execute("/book/getContactFromId", params);
-		try {
-			checkServerError(doc);
-			return respParser.parseContact(doc.getDocumentElement());
-		} catch (ServerFault se) {
-			return null;
-		}
+		checkServerError(doc);
+		return respParser.parseContact(doc.getDocumentElement());
 	}
 
 	@Override

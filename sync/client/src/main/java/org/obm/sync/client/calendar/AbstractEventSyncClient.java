@@ -72,8 +72,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	}
 
 	@Override
-	public Event getEventFromId(AccessToken token, String calendar, String id)
-			throws AuthFault, ServerFault {
+	public Event getEventFromId(AccessToken token, String calendar, String id) {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("id", id);
