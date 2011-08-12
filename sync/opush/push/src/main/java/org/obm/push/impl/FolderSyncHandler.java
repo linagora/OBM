@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -58,37 +57,30 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			FolderSyncRequest folderSyncRequest = protocol.getRequest(doc);
 			FolderSyncResponse folderSyncResponse = doTheJob(bs, folderSyncRequest);
 			Document ret = protocol.encodeResponse(folderSyncResponse);
-			responder.sendResponse("FolderHierarchy", ret);
+			sendResponse(responder, ret);
 			
 		} catch (CollectionNotFoundException e) {
-			logger.error(e.getMessage(), e);
-			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
+			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY, e);
 		} catch (InvalidSyncKeyException e) {
-			logger.error(e.getMessage(), e);
-			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY);
+			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY, e);
 		} catch (NoDocumentException e) {
-			answerOpushIsAlive(responder);
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
+		} catch (DaoException e) {
+			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
 		}
-
 	}
 
-	private void sendError(Responder resp, FolderSyncStatus status) {
+	private void sendResponse(Responder responder, Document ret) {
 		try {
-			resp.sendResponse("FolderHierarchy", protocol.encodeErrorResponse(status));
+			responder.sendResponse("FolderHierarchy", ret);
 		} catch (IOException e) {
-			logger.info(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 	
-	private void answerOpushIsAlive(Responder responder) {
-		try {
-			responder.sendResponseFile("text/plain", new ByteArrayInputStream(
-					"OPUSH IS ALIVE\n".getBytes()));
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+	private void sendError(Responder responder, FolderSyncStatus status, Exception exception) {
+		logger.error(exception.getMessage(), exception);
+		sendResponse(responder, protocol.encodeErrorResponse(status));
 	}
 	
 	@Transactional(propagation=Propagation.NESTED)
@@ -115,8 +107,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		String newSyncKey = stMachine.allocateNewSyncKey(bs,
 				hierarchyExporter.getRootFolderId(bs), null);
 		
-		FolderSyncResponse folderSyncResponse = new FolderSyncResponse(changed, newSyncKey);
-		return folderSyncResponse;
+		return new FolderSyncResponse(changed, newSyncKey);
 	}
 
 	private boolean isSynckeyValid(String syncKey, List<ItemChange> changed) {
