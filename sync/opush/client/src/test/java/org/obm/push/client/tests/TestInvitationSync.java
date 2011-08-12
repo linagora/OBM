@@ -30,7 +30,7 @@ public class TestInvitationSync extends OPClientTests {
 		replace(doc, calendarFolder, syncResp);
 		replace(doc, inbox, syncResp);
 
-		Document ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		Document ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
 		in = loadDataFile("InvitationSync.xml");
@@ -64,7 +64,7 @@ public class TestInvitationSync extends OPClientTests {
 		synckeyElem = DOMUtils.getUniqueElement(doc.getDocumentElement(),
 				"AirSync:SyncKey");
 		synckeyElem.setTextContent(sk);
-		ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
 		// sk = DOMUtils.getUniqueElement(ret.getDocumentElement(), "SyncKey")

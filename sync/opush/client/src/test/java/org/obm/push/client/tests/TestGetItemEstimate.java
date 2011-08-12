@@ -31,7 +31,7 @@ public class TestGetItemEstimate extends AbstractPushTest {
 		in = loadDataFile("GetItemEstimateRequest.xml");
 		doc = DOMUtils.parse(in);
 		fillSyncKey(doc.getDocumentElement(), sks);
-		ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 	}
 
@@ -67,26 +67,26 @@ public class TestGetItemEstimate extends AbstractPushTest {
 		}
 
 		DOMUtils.logDom(doc);
-		ret = postXml25("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml25("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
-		ret = postXml120("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml120("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
-		ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 	}
 
 	public void testGetItemEstimateBadSyncKey() throws Exception {
 		InputStream in = loadDataFile("GetItemEstimateRequestBadSyncKey.xml");
 		Document doc = DOMUtils.parse(in);
-		Document ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		Document ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
-		ret = postXml120("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml120("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
-		ret = postXml25("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml25("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
 	}

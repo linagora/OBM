@@ -267,10 +267,10 @@ public class TagsTables {
 	};
 
 	/**
-	 * ItemEstimate
+	 * GetItemEstimate
 	 */
 	public static final String[] CP_6 = {
-	// ItemEstimate
+	// GetItemEstimate
 			"GetItemEstimate", // 0x05
 			"Version", // 0x06
 			"Collections", // 0x07
@@ -680,9 +680,9 @@ public class TagsTables {
 		NAMESPACES_TAGS.put(5, CP_5);
 		createMappings("Move");
 
-		NAMESPACES_IDS.put("ItemEstimate", 6);
+		NAMESPACES_IDS.put("GetItemEstimate", 6);
 		NAMESPACES_TAGS.put(6, CP_6);
-		createMappings("ItemEstimate");
+		createMappings("GetItemEstimate");
 
 		NAMESPACES_IDS.put("FolderHierarchy", 7);
 		NAMESPACES_TAGS.put(7, CP_7);

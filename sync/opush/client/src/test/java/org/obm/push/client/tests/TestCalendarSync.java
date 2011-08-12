@@ -32,7 +32,7 @@ public class TestCalendarSync extends OPClientTests {
 		in = loadDataFile("GetItemEstimateRequestEvent.xml");
 		doc = DOMUtils.parse(in);
 		replace(doc, calendarFolder, syncResp);
-		ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
 		in = loadDataFile("CalSyncRequest.xml");
@@ -60,7 +60,7 @@ public class TestCalendarSync extends OPClientTests {
 		in = loadDataFile("GetItemEstimateRequestEvent.xml");
 		doc = DOMUtils.parse(in);
 		replace(doc, calendarFolder, syncResp1);
-		ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
 		in = loadDataFile("CalSyncRequest.xml");
@@ -110,7 +110,7 @@ public class TestCalendarSync extends OPClientTests {
 		in = loadDataFile("GetItemEstimateRequestEvent.xml");
 		doc = DOMUtils.parse(in);
 		replace(doc, calendarFolder, syncResp1);
-		ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
 		in = loadDataFile("CalSyncRequest.xml");
@@ -126,7 +126,7 @@ public class TestCalendarSync extends OPClientTests {
 		in = loadDataFile("GetItemEstimateRequestEvent.xml");
 		doc = DOMUtils.parse(in);
 		replace(doc, calendarFolder, syncResp2);
-		ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 	
 		in = loadDataFile("CalSyncRequest.xml");

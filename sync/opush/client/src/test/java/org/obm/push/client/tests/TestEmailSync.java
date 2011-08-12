@@ -27,7 +27,7 @@ public class TestEmailSync extends OPClientTests {
 		in = loadDataFile("GetItemEstimateRequestEmail.xml");
 		doc = DOMUtils.parse(in);
 		replace(doc, inbox, syncResp);
-		Document estimateRet = postXml("ItemEstimate", doc, "GetItemEstimate");
+		Document estimateRet = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(estimateRet);
 		
 		
@@ -65,7 +65,7 @@ public class TestEmailSync extends OPClientTests {
 		in = loadDataFile("GetItemEstimateRequestEmail.xml");
 		doc = DOMUtils.parse(in);
 		replace(doc, inbox, syncResp);
-		Document estimateRet = postXml("ItemEstimate", doc, "GetItemEstimate");
+		Document estimateRet = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(estimateRet);
 		
 		
@@ -101,7 +101,7 @@ public class TestEmailSync extends OPClientTests {
 		in = loadDataFile("GetItemEstimateRequestEmail.xml");
 		doc = DOMUtils.parse(in);
 		replace(doc, inbox, syncResp);
-		ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 		
 		in = loadDataFile("EmailSyncRequest.xml");

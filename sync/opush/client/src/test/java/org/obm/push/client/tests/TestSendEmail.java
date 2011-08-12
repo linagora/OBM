@@ -11,7 +11,7 @@ public class TestSendEmail extends AbstractPushTest {
 	public void testGetItemEstimate() throws Exception {
 		InputStream in = loadDataFile("GetItemEstimateRequest.xml");
 		Document doc = DOMUtils.parse(in);
-		Document ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		Document ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 	}
 

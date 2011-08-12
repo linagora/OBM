@@ -30,7 +30,7 @@ public class TestFullSync extends AbstractPushTest {
 		doc = DOMUtils.parse(in);
 		fillSyncKey(doc.getDocumentElement(), sks);
 		DOMUtils.logDom(doc);
-		ret = postXml("ItemEstimate", doc, "GetItemEstimate");
+		ret = postXml("GetItemEstimate", doc, "GetItemEstimate");
 		assertNotNull(ret);
 
 		in = loadDataFile("FullSyncRequest2.xml");
