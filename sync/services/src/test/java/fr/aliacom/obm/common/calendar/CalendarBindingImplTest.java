@@ -17,7 +17,6 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
@@ -111,7 +110,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testGetCalendarMetadata() throws ServerFault, AuthFault, FindException {
+	public void testGetCalendarMetadata() throws ServerFault, FindException {
 		ColdWarFixtures fixtures = new ColdWarFixtures();
 		String[] calendarEmails = {
 				fixtures.beriaInfo.getMail(),
@@ -162,7 +161,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testGetCalendarMetadataExceptCurrentUser() throws ServerFault, AuthFault, FindException {
+	public void testGetCalendarMetadataExceptCurrentUser() throws ServerFault, FindException {
 		ColdWarFixtures fixtures = new ColdWarFixtures();
 		String[] calendarEmails = {
 				fixtures.hooverInfo.getMail(),
@@ -211,7 +210,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test(expected=ServerFault.class)
-	public void testCalendarOwnerNotAnAttendee() throws AuthFault, ServerFault, FindException {
+	public void testCalendarOwnerNotAnAttendee() throws ServerFault, FindException {
 		String calendar = "cal1";
 		String domainName = "domain1";
 		String eventExtId = "extid";
@@ -253,7 +252,7 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testImportEventInThePast() 
-		throws ImportICalendarException, AuthFault, ServerFault, IOException, ParserException, FindException, SQLException {
+		throws ImportICalendarException, ServerFault, IOException, ParserException, FindException, SQLException {
 		String calendar = "cal1";
 		String domainName = "domain1";
 		String userEmail = "user@domain1";
@@ -295,7 +294,7 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testImportEventInTheFuture() 
-		throws ImportICalendarException, AuthFault, ServerFault, IOException, ParserException, FindException, SQLException {
+		throws ImportICalendarException, ServerFault, IOException, ParserException, FindException, SQLException {
 		String calendar = "cal1";
 		String domainName = "domain1";
 		String userEmail = "user@domain1";

@@ -19,13 +19,12 @@ package fr.aliacom.obm.common.mailingList;
 
 import java.util.List;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
 import org.obm.sync.services.IMailingList;
-import org.obm.annotations.transactional.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +49,7 @@ public class MailingListBindingImpl implements IMailingList {
 	@Override
 	@Transactional
 	public List<MailingList> listAllMailingList(AccessToken token)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		try {
 			return mailingListHome.findMailingLists(token);
 		} catch (Throwable e) {
@@ -62,7 +61,7 @@ public class MailingListBindingImpl implements IMailingList {
 	@Override
 	@Transactional
 	public MailingList createMailingList(AccessToken token,
-			MailingList mailingList) throws AuthFault, ServerFault {
+			MailingList mailingList) throws ServerFault {
 		try {
 			MailingList ml = mailingListHome.createMailingList(
 					token, mailingList);
@@ -79,7 +78,7 @@ public class MailingListBindingImpl implements IMailingList {
 	@Override
 	@Transactional
 	public MailingList modifyMailingList(AccessToken token,
-			MailingList mailingList) throws AuthFault, ServerFault {
+			MailingList mailingList) throws ServerFault {
 		try {
 			MailingList ml = mailingListHome.modifyMailingList(
 					token, mailingList);
@@ -96,7 +95,7 @@ public class MailingListBindingImpl implements IMailingList {
 	@Override
 	@Transactional
 	public void removeMailingList(AccessToken token, Integer id)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		try {
 			mailingListHome.removeMailingList(token, id);
 			logger.info(LogUtils.prefix(token) + "Mailing list : " + id
@@ -110,7 +109,7 @@ public class MailingListBindingImpl implements IMailingList {
 	@Override
 	@Transactional
 	public MailingList getMailingListFromId(AccessToken token, Integer id)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		try {
 			return mailingListHome.getMailingListFromId(token, id);
 		} catch (Throwable e) {
@@ -122,7 +121,7 @@ public class MailingListBindingImpl implements IMailingList {
 	@Override
 	@Transactional
 	public List<MLEmail> addEmails(AccessToken at, Integer mailingListId,
-			List<MLEmail> email) throws AuthFault, ServerFault {
+			List<MLEmail> email) throws ServerFault {
 		try {
 			List<MLEmail> ret = mailingListHome.addEmails(at, mailingListId, email);
 			logger.info(LogUtils.prefix(at) + ret.size() +" emails were added in mailingList: " + mailingListId );
@@ -136,7 +135,7 @@ public class MailingListBindingImpl implements IMailingList {
 	@Override
 	@Transactional
 	public void removeEmail(AccessToken at, Integer mailingListId,
-			Integer emailId) throws AuthFault, ServerFault {
+			Integer emailId) throws ServerFault {
 		try {
 			mailingListHome.removeEmail(at, mailingListId,
 					emailId);

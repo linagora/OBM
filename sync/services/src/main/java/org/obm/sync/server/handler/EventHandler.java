@@ -25,7 +25,6 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
@@ -108,7 +107,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String searchAndInvokeMethod(String method, ParametersSource params, 
 			XmlResponder responder, AccessToken at) 
-		throws AuthFault, ServerFault, SAXException,
+		throws ServerFault, SAXException,
 			IOException, FactoryConfigurationError, Exception {
 		if (method.equals("getSync")) {
 			return getSync(at, params, responder);
@@ -185,7 +184,7 @@ public class EventHandler extends SecureSyncHandler {
 	} 
 
 	private String getCalendarMetadata(AccessToken at, ParametersSource params,
-			XmlResponder responder) throws ServerFault, AuthFault {
+			XmlResponder responder) throws ServerFault {
 		String[] calendarEmails = params.getParameterValues("calendar");
 		CalendarInfo[] lc = binding.getCalendarMetadata(at, calendarEmails);
 		return responder.sendCalendarInformations(lc);
@@ -193,7 +192,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String parseFreeBusyToICS(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws SAXException, IOException, FactoryConfigurationError, ServerFault, AuthFault {
+			throws SAXException, IOException, FactoryConfigurationError, ServerFault {
 		String fbAsString = params.getParameter("freebusy");
 		Document doc = DOMUtils.parse(fbAsString);
 		FreeBusy fb = cip.parseFreeBusy(doc.getDocumentElement());
@@ -203,7 +202,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getFreeBusy(
 			AccessToken at, ParametersSource params,	XmlResponder responder) 
-			throws SAXException, IOException, FactoryConfigurationError, AuthFault, ServerFault {
+			throws SAXException, IOException, FactoryConfigurationError, ServerFault {
 		String fbAsString = params.getParameter("freebusyrequest");
 		Document doc = DOMUtils.parse(fbAsString);
 		FreeBusyRequest fb = cip.parseFreeBusyRequest(doc.getDocumentElement());
@@ -213,7 +212,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String parseICSFreeBusy(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws ServerFault, AuthFault {
+			throws ServerFault {
 		String ics = params.getParameter("ics");
 		FreeBusyRequest freeBusy = binding.parseICSFreeBusy(at, ics);
 		return responder.sendFreeBusyRequest(freeBusy);
@@ -230,13 +229,13 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private String getLastUpdate(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws ServerFault, AuthFault {
+			throws ServerFault {
 		Date d = binding.getLastUpdate(at, getCalendar(at, params));
 		return responder.sendLong(d.getTime());
 	}
 
 	private String getEventTimeUpdateNotRefusedFromIntervalDate(
-			AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, AuthFault {
+			AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		String calendar = getCalendar(at, params);
 		Date start = DateHelper.asDate(params.getParameter("start"));
 		Date end = null;
@@ -251,7 +250,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getEventParticipationStateWithAlertFromIntervalDate(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws ServerFault, AuthFault {
+			throws ServerFault {
 		List<EventParticipationState> e = 
 			binding.getEventParticipationStateWithAlertFromIntervalDate(at,
 				getCalendar(at, params), 
@@ -271,7 +270,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String parseEvents(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws SAXException, IOException, FactoryConfigurationError, ServerFault, AuthFault {
+			throws SAXException, IOException, FactoryConfigurationError, ServerFault {
 		List<Event> events = getEvents(params);
 		String ics = binding.parseEvents(at, events);
 		return responder.sendString(ics);
@@ -279,7 +278,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String parseEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws SAXException, IOException, FactoryConfigurationError, ServerFault, AuthFault {
+			throws SAXException, IOException, FactoryConfigurationError, ServerFault {
 		Event event = getEvent(params);
 		String ics = binding.parseEvent(at, event);
 		return responder.sendString(ics);
@@ -287,7 +286,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getAllEvents(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 			List<Event> e = 
 				binding.getAllEvents(at, getCalendar(at, params), 
 						EventType.valueOf(params.getParameter("eventType")));
@@ -296,7 +295,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getListEventsFromIntervalDate(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		List<Event> e = binding.getListEventsFromIntervalDate(at, 
 				getCalendar(at, params), 
 				DateHelper.asDate(params.getParameter("start")), 
@@ -325,18 +324,18 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendError("not found");
 	}
 
-	private String getUserEmail(AccessToken at, XmlResponder responder) throws AuthFault, ServerFault {
+	private String getUserEmail(AccessToken at, XmlResponder responder) throws ServerFault {
 		String ue = binding.getUserEmail(at);
 		return responder.sendString(ue);
 	}
 
-	private String listCategories(AccessToken at, XmlResponder responder) throws ServerFault, AuthFault {
+	private String listCategories(AccessToken at, XmlResponder responder) throws ServerFault {
 		List<Category> ret = binding.listCategories(at);
 		return responder.sendCategories(ret);
 	}
 
 	private String getRefusedKeys(AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws AuthFault, ServerFault {
+		throws ServerFault {
 		KeyList ret = binding.getRefusedKeys(at, 
 				getCalendar(at, params), 
 				DateHelper.asDate(params.getParameter("since")));
@@ -344,18 +343,18 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String getEventTwinKeys(AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 		KeyList kl = binding.getEventTwinKeys(at, getCalendar(at, params), getEvent(params));
 		return responder.sendKeyList(kl);
 	}
 
-	private String listCalendars(AccessToken at, XmlResponder responder) throws ServerFault, AuthFault {
+	private String listCalendars(AccessToken at, XmlResponder responder) throws ServerFault {
 		CalendarInfo[] lc = binding.listCalendars(at);
 		return responder.sendCalendarInformations(lc);
 	}
 
 	private String getEventFromId(AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws AuthFault, ServerFault {
+		throws ServerFault {
 		Event e = binding.getEventFromId(at, 
 				getCalendar(at, params), 
 				params.getParameter("id"));
@@ -367,7 +366,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String createEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 		String ev = binding.createEvent(at,	getCalendar(at, params), getEvent(params), getNotificationOption(params));
 		return responder.sendString(ev);
 	}
@@ -396,7 +395,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String modifyEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 		Event ev = binding.modifyEvent(at, getCalendar(at, params),
 				getEvent(params), Boolean.valueOf(params.getParameter("updateAttendees")), 
 				getNotificationOption(params)
@@ -409,7 +408,7 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private String removeEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws AuthFault, ServerFault {
+		throws ServerFault {
 		Event ev = binding.removeEvent(at, getCalendar(at, params),
 				params.getParameter("id"), 
 				i(params, "sequence", 0),
@@ -423,7 +422,7 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private String removeEventByExtId(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws AuthFault, ServerFault {
+		throws ServerFault {
 		Event ev = binding.removeEventByExtId(at, getCalendar(at, params),
 				params.getParameter("extId"), 
 				i(params, "sequence", 0),
@@ -437,7 +436,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getSyncEventDate(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws AuthFault, ServerFault {
+		throws ServerFault {
 		EventChanges ret = binding.getSyncEventDate(at, 
 				getCalendar(at, params), 
 				DateHelper.asDate(params.getParameter("lastSync")));
@@ -446,7 +445,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getSyncWithSortedChanges(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 			EventChanges ret = binding.getSyncWithSortedChanges(at, 
 					getCalendar(at, params), 
 					DateHelper.asDate(params.getParameter("lastSync")));
@@ -456,7 +455,7 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private String getSync(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 			EventChanges ret = binding.getSync(at, 
 					getCalendar(at, params), 
 					DateHelper.asDate(params.getParameter("lastSync")));
@@ -465,7 +464,7 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private String getSyncInRange(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-	throws AuthFault, ServerFault {
+	throws ServerFault {
 		final Date after = DateHelper.asDate(params.getParameter("syncRangeAfter"));
 		final Date before = DateHelper.asDate(params.getParameter("syncRangeBefore"));
 		SyncRange syncRange = null;
@@ -480,7 +479,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String isWritableCalendar(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws AuthFault, ServerFault {
+		throws ServerFault {
 		boolean ret = binding.isWritableCalendar(at, getCalendar(at, params));
 		logger.info("isWritable(" + at.getEmail() + ", "
 				+ getCalendar(at, params) + ") => " + ret);
@@ -498,7 +497,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 	
 	private String importICalendar(final AccessToken token, final ParametersSource params, 
-			XmlResponder responder) throws ImportICalendarException, AuthFault, ServerFault {
+			XmlResponder responder) throws ImportICalendarException, ServerFault {
 		final String calendar = params.getParameter("calendar");
 		final String ics = params.getParameter("ics");
 		

@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.Map;
 
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.server.ParametersSource;
 import org.obm.sync.server.XmlResponder;
@@ -70,14 +69,14 @@ public class SettingHandler extends SecureSyncHandler {
 
 	}
 
-	private void getEmailForwarding(AccessToken at, XmlResponder responder) throws AuthFault, ServerFault {
+	private void getEmailForwarding(AccessToken at, XmlResponder responder) throws ServerFault {
 		ForwardingSettings fs = binding.getEmailForwarding(at);
 		responder.sendEmailForwarding(fs);
 
 	}
 
 	private void setEmailForwarding(AccessToken at, ParametersSource params,
-			XmlResponder responder) throws AuthFault, ServerFault {
+			XmlResponder responder) throws ServerFault {
 		ForwardingSettings fs = new ForwardingSettings();
 		fs.setEnabled(Boolean.valueOf(params.getParameter("enabled")));
 		fs.setLocalCopy(Boolean.valueOf(params.getParameter("localCopy")));
@@ -87,13 +86,13 @@ public class SettingHandler extends SecureSyncHandler {
 	}
 
 	private void getVacationSettings(AccessToken at, XmlResponder responder) 
-		throws AuthFault, ServerFault {
+		throws ServerFault {
 		VacationSettings vs = binding.getVacationSettings(at);
 		responder.sendVacation(vs);
 	}
 
 	private void setVacationSettings(AccessToken at, ParametersSource params,
-			XmlResponder responder) throws AuthFault, ServerFault {
+			XmlResponder responder) throws ServerFault {
 		VacationSettings vs = new VacationSettings();
 		vs.setEnabled(Boolean.valueOf(params.getParameter("enabled")));
 		if (vs.isEnabled()) {
@@ -120,7 +119,7 @@ public class SettingHandler extends SecureSyncHandler {
 		responder.sendString("Vacation settings stored");
 	}
 
-	private void getSettings(AccessToken at, XmlResponder responder) throws ServerFault, AuthFault {
+	private void getSettings(AccessToken at, XmlResponder responder) throws ServerFault {
 		Map<String, String> ret = binding.getSettings(at);
 		responder.sendSettings(ret);
 	}

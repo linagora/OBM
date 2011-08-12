@@ -24,7 +24,6 @@ import java.util.List;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
@@ -108,7 +107,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 	}
 
 	private void unsubscribeBook(AccessToken token, ParametersSource params,
-			XmlResponder responder) throws AuthFault, ServerFault {
+			XmlResponder responder) throws ServerFault {
 		boolean ret = binding.unsubscribeBook(token, getBookId(params));
 		responder.sendBoolean(ret);
 	}
@@ -119,7 +118,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendFolderChanges(fc);
 	}
 
-	private void getContactTwinKeys(AccessToken at, ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError, AuthFault, ServerFault {
+	private void getContactTwinKeys(AccessToken at, ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError, ServerFault {
 		Contact contact = getContactFromParams(params);
 		KeyList ret = binding.getContactTwinKeys(at, type(params), contact);
 		responder.sendKeyList(ret);
@@ -129,7 +128,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return BookType.valueOf(params.getParameter("book"));
 	}
 
-	private void getContactFromId(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault {
+	private void getContactFromId(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		String contactId = p(params, "id");
 		Contact ret = binding.getContactFromId(at, type(params), contactId);
 		if (ret != null) {
@@ -139,7 +138,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void removeContact(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault {
+	private void removeContact(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		Contact ret = binding.removeContact(at, type(params), p(params, "id"));
 		if (ret != null) {
 			responder.sendContact(ret);
@@ -148,19 +147,19 @@ public class AddressBookHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void modifyContact(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
+	private void modifyContact(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 		Contact contact = getContactFromParams(params);
 		Contact ret = binding.modifyContact(at, type(params), contact);
 		responder.sendContact(ret);
 	}
 
-	private void createContactWithoutDuplicate(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
+	private void createContactWithoutDuplicate(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 		Contact contact = getContactFromParams(params);
 		Contact ret = binding.createContactWithoutDuplicate(at,	type(params), contact);
 		responder.sendContact(ret);
 	}
 
-	private void createContact(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
+	private void createContact(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 			Contact contact = getContactFromParams(params);
 			Contact ret = binding.createContact(at, type(params), contact);
 			responder.sendContact(ret);
@@ -171,7 +170,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return bip.parseContact(p(params, "contact"));
 	}
 
-	private void getSync(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault {
+	private void getSync(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		Date lastSync = getLastSyncFromParams(params);
 		ContactChangesResponse cc = binding.getSync(at, type(params), lastSync);
 		responder.sendContactChanges(cc);
@@ -181,7 +180,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return DateHelper.asDate(p(params, "lastSync"));
 	}
 
-	private void listBooks(AccessToken at, XmlResponder responder) {
+	private void listBooks(AccessToken at, XmlResponder responder) throws ServerFault {
 		BookType[] ret = binding.listBooks(at);
 		String[] st = new String[ret.length];
 		for (int i = 0; i < st.length; i++) {
@@ -190,24 +189,24 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendArrayOfString(st);
 	}
 
-	private void listAllBooks(AccessToken at, XmlResponder responder) throws AuthFault, ServerFault {
+	private void listAllBooks(AccessToken at, XmlResponder responder) throws ServerFault {
 		List<AddressBook> ret = binding.listAllBooks(at);
 		responder.sendListAddressBooks(ret);
 	}
 	
-	private void isReadOnly(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault {
+	private void isReadOnly(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		boolean ret = binding.isReadOnly(at, type(params));
 		responder.sendBoolean(ret);
 	}
 
-	private void searchContact(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault {
+	private void searchContact(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		String query = p(params, "query");
 		int limit = Integer.parseInt(p(params, "limit"));
 		List<Contact> ret = binding.searchContact(at, query, limit);
 		responder.sendListContact(ret);
 	}
 
-	private void searchContactInGroup(AccessToken at, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault {
+	private void searchContactInGroup(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		String query = p(params, "query");
 		int limit = Integer.valueOf(p(params, "limit"));
 		int groupId = Integer.valueOf(p(params, "group"));
@@ -216,7 +215,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendListContact(ret);
 	}
 
-	private AddressBook getAddressBookFromUid(AccessToken at, int uid) throws AuthFault, ServerFault {
+	private AddressBook getAddressBookFromUid(AccessToken at, int uid) throws ServerFault {
 		List<AddressBook> allBooks = binding.listAllBooks(at);
 		for (AddressBook book: allBooks) {
 			if (book.getUid() == uid) {
@@ -230,7 +229,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return Integer.valueOf(p(params, "bookId"));
 	}
 	
-	private void removeContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault {
+	private void removeContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws ServerFault {
 		Contact ret = binding.removeContactInBook(token, getBookId(params), p(params, "id"));
 		if (ret != null) {
 			responder.sendContact(ret);
@@ -239,14 +238,14 @@ public class AddressBookHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void modifyContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws AuthFault, ServerFault, SAXException, IOException, FactoryConfigurationError {
+	private void modifyContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 		Contact contact = getContactFromParams(params);
 		Contact ret = binding.modifyContactInBook(token, getBookId(params), contact);
 		responder.sendContact(ret);		
 	}
 
 	private void getContactInBook(AccessToken token, ParametersSource params,
-			XmlResponder responder) throws AuthFault, ServerFault {
+			XmlResponder responder) throws ServerFault {
 		
 		String contactId = p(params, "id");
 		Contact ret = binding.getContactInBook(token, getBookId(params), contactId);
@@ -258,14 +257,14 @@ public class AddressBookHandler extends SecureSyncHandler {
 	}
 
 	private void createContactInBook(AccessToken token,
-			ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError, AuthFault, ServerFault {
+			ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError, ServerFault {
 		Contact contact = getContactFromParams(params);
 		Contact ret = binding.createContactInBook(token, getBookId(params), contact);
 		responder.sendContact(ret);		
 	}
 
 	private void getAddressBookSync(AccessToken token, ParametersSource params,
-			XmlResponder responder) throws AuthFault, ServerFault {
+			XmlResponder responder) throws ServerFault {
 		Date lastSync = getLastSyncFromParams(params);
 		AddressBookChangesResponse response = binding.getAddressBookSync(token, lastSync);
 		responder.sendAddressBookChanges(response);	

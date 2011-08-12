@@ -25,7 +25,6 @@ import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
@@ -366,8 +365,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	}
 
 	private Event createOrModifyInvitationEvent(BackendSession bs, MSEvent event,
-			AbstractEventSyncClient calCli, AccessToken at) throws AuthFault,
-			ServerFault {
+			AbstractEventSyncClient calCli, AccessToken at) throws ServerFault {
 		Event obmEvent = calCli.getEventFromExtId(at, bs.getLoginAtDomain(), event.getUID());
 		Boolean isInternal = EventConverter.isInternalEvent(obmEvent, false);
 		Event newEvent = null;
@@ -408,18 +406,23 @@ public class CalendarBackend extends ObmSyncBackend {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AbstractEventSyncClient calCli = getCalendarClient(bs, PIMDataType.CALENDAR);
 		AccessToken token = login(calCli, bs);
-		for (String serverId : fetchServerIds) {
-			String id = getEventUidFromServerId(serverId);
-			if (id != null) {
-				Event e = calCli.getEventFromId(token, bs.getLoginAtDomain(), id);
-				ItemChange ic = new ItemChange();
-				ic.setServerId(serverId);
-				IApplicationData ev = convertEvent(bs, e);
-				ic.setData(ev);
-				ret.add(ic);
+		try {
+			for (String serverId : fetchServerIds) {
+				String id = getEventUidFromServerId(serverId);
+				if (id != null) {
+					Event e = calCli.getEventFromId(token, bs.getLoginAtDomain(), id);
+					ItemChange ic = new ItemChange();
+					ic.setServerId(serverId);
+					IApplicationData ev = convertEvent(bs, e);
+					ic.setData(ev);
+					ret.add(ic);
+				}
 			}
+		} catch (ServerFault e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			calCli.logout(token);	
 		}
-		calCli.logout(token);
 		return ret;
 	}
 	

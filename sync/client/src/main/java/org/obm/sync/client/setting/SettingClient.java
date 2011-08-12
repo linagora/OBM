@@ -3,7 +3,6 @@ package org.obm.sync.client.setting;
 import java.util.Map;
 
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.services.ISetting;
@@ -24,8 +23,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	}
 
 	@Override
-	public Map<String, String> getSettings(AccessToken token) throws AuthFault,
-			ServerFault {
+	public Map<String, String> getSettings(AccessToken token) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getSettings", params);
 		checkServerError(doc);
@@ -34,7 +32,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	@Override
 	public void setVacationSettings(AccessToken token, VacationSettings vs)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("enabled", "" + vs.isEnabled());
 		if (vs.isEnabled()) {
@@ -52,7 +50,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	@Override
 	public void setEmailForwarding(AccessToken token, ForwardingSettings fs)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("enabled", "" + fs.isEnabled());
 		if (fs.getEmail() != null && fs.isEnabled()) {
@@ -65,7 +63,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	@Override
 	public ForwardingSettings getEmailForwarding(AccessToken token)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getEmailForwarding", params);
 		checkServerError(doc);
@@ -74,7 +72,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	@Override
 	public VacationSettings getVacationSettings(AccessToken token)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getVacationSettings", params);
 		checkServerError(doc);

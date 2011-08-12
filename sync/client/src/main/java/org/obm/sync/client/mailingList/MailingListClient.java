@@ -3,7 +3,6 @@ package org.obm.sync.client.mailingList;
 import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.mailingList.MLEmail;
@@ -27,45 +26,41 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 	}
 
 	@Override
-	public MailingList createMailingList(AccessToken token, 
-			MailingList mailingList) throws AuthFault, ServerFault {
+	public MailingList createMailingList(AccessToken token, MailingList mailingList) throws ServerFault {
 		if(mailingList == null){
 			return null;
 		}
 		Multimap<String, String> params = initParams(token);
 		params.put("mailingList", mlWriter.getMailingListsAsString(mailingList));
 		Document doc = execute("/mailingList/createMailingList", params);
+		checkServerError(doc);
 		return mlParser.parseMailingList(doc.getDocumentElement());
 	}
 
 	@Override
-	public MailingList getMailingListFromId(AccessToken token,  Integer id)
-			throws AuthFault, ServerFault {
-		if(id == null){
+	public MailingList getMailingListFromId(AccessToken token,  Integer id) throws ServerFault {
+		if (id == null) {
 			return null;
 		}
 		Multimap<String, String> params = initParams(token);
 		params.put("id", id.toString());
 		Document doc = execute("/mailingList/getMailingListFromId", params);
-		try {
-			checkServerError(doc);
-			return mlParser.parseMailingList(doc.getDocumentElement());
-		} catch (ServerFault se) {
-			return null;
-		}
+		checkServerError(doc);
+		return mlParser.parseMailingList(doc.getDocumentElement());
 	}
 
 	@Override
-	public List<MailingList> listAllMailingList(AccessToken token) throws AuthFault, ServerFault {
+	public List<MailingList> listAllMailingList(AccessToken token) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/mailingList/listAllMailingList", params);
+		checkServerError(doc);
 		List<MailingList> addressBooks = mlParser.parseListMailingList(doc);
 		return addressBooks;
 	}
 	
 	@Override
 	public MailingList modifyMailingList(AccessToken token, 
-			MailingList mailingList) throws AuthFault, ServerFault {
+			MailingList mailingList) throws ServerFault {
 		if(mailingList == null){
 			return null;
 		}
@@ -73,12 +68,12 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		String ml = mlWriter.getMailingListsAsString(mailingList);
 		params.put("mailingList", ml);
 		Document doc = execute("/mailingList/modifyMailingList", params);
+		checkServerError(doc);
 		return mlParser.parseMailingList(doc.getDocumentElement());
 	}
 
 	@Override
-	public void removeMailingList(AccessToken token, Integer id)
-			throws AuthFault, ServerFault {
+	public void removeMailingList(AccessToken token, Integer id) throws ServerFault {
 		if(id == null){
 			return;
 		}
@@ -89,7 +84,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 
 	@Override
 	public List<MLEmail> addEmails(AccessToken token, Integer mailingListId,
-			List<MLEmail> email) throws AuthFault, ServerFault {
+			List<MLEmail> email) throws ServerFault {
 		if(mailingListId == null || email == null){
 			return null;
 		}
@@ -97,12 +92,13 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		params.put("mailingListId", mailingListId.toString());
 		params.put("mailingListEmails", mlWriter.getMailingListEmailsAsString(email));
 		Document doc = execute("/mailingList/addEmails", params);
+		checkServerError(doc);
 		return mlParser.parseMailingListEmails(doc);
 	}
 	
 	@Override
 	public void removeEmail(AccessToken token, Integer mailingListId,
-			Integer emailId) throws AuthFault, ServerFault {
+			Integer emailId) throws ServerFault {
 		if(mailingListId == null || emailId == null){
 			return;
 		}

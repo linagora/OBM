@@ -19,13 +19,12 @@ package fr.aliacom.obm.common.setting;
 
 import java.util.Map;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.services.ISetting;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.VacationSettings;
-import org.obm.annotations.transactional.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class SettingBindingImpl implements ISetting {
 	@Override
 	@Transactional
 	public Map<String, String> getSettings(AccessToken token)
-			throws ServerFault, AuthFault {
+			throws ServerFault {
 		try {
 			logger.info(LogUtils.prefix(token) + "Setting : getSettings()");
 			ObmUser user = userService.getUserFromAccessToken(token);
@@ -69,7 +68,7 @@ public class SettingBindingImpl implements ISetting {
 	@Override
 	@Transactional
 	public void setVacationSettings(AccessToken token, VacationSettings vs)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		try {
 			logger.info(LogUtils.prefix(token) + "Setting : setVacation("
 					+ vs.isEnabled() + " " + vs.getStart() + " " + vs.getEnd()
@@ -84,7 +83,7 @@ public class SettingBindingImpl implements ISetting {
 	@Override
 	@Transactional
 	public void setEmailForwarding(AccessToken token, ForwardingSettings fs)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		try {
 			logger.info(LogUtils.prefix(token) + "Setting : setForwarding("
 					+ fs.isEnabled() + ", " + fs.getEmail() + ", localCopy: "
@@ -99,7 +98,7 @@ public class SettingBindingImpl implements ISetting {
 	@Override
 	@Transactional
 	public ForwardingSettings getEmailForwarding(AccessToken token)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		try {
 			logger.info(LogUtils.prefix(token) + "Setting : getEmailForwarding()");
 			return settingDao.getEmailForwarding(token);
@@ -112,7 +111,7 @@ public class SettingBindingImpl implements ISetting {
 	@Override
 	@Transactional
 	public VacationSettings getVacationSettings(AccessToken token)
-			throws AuthFault, ServerFault {
+			throws ServerFault {
 		try {
 			logger.info(LogUtils.prefix(token) + "Setting : getVacationSettings()");
 			return settingDao.getVacationSettings(token);
