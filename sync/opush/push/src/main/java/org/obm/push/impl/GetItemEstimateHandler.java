@@ -1,5 +1,6 @@
 package org.obm.push.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.obm.annotations.transactional.Propagation;
@@ -57,15 +58,28 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			GetItemEstimateRequest estimateRequest = protocol.getRequest(doc);
 			GetItemEstimateResponse response = doTheJob(bs, estimateRequest);
 			Document document = protocol.encodeResponse(response);
-			responder.sendResponse("ItemEstimate", document);
+			sendResponse(responder, document);
 
 		} catch (InvalidSyncKeyException e) {
-			Integer collectionId = e.getCollectionId();
-			protocol.buildError(GetItemEstimateStatus.INVALID_SYNC_KEY, collectionId);
+			sendErrorResponse(responder, 
+					protocol.buildError(GetItemEstimateStatus.INVALID_SYNC_KEY, e.getCollectionId()), e);
 		} catch (CollectionNotFoundException e) {
-			Integer collectionId = e.getCollectionId();
-			protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION, collectionId);
-		} catch (Exception e) {
+			sendErrorResponse(responder, 
+					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION, e.getCollectionId()), e);
+		} catch (DaoException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	private void sendErrorResponse(Responder responder, Document document, Exception exception) {
+		logger.error(exception.getMessage(), exception);
+		sendResponse(responder, document);
+	}
+	
+	private void sendResponse(Responder responder, Document document) {
+		try {
+			responder.sendResponse("GetItemEstimate", document);
+		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
