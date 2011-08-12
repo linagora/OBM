@@ -83,7 +83,7 @@ public class ContactsBackend extends ObmSyncBackend {
 				deletions.add(change);
 			}
 			lastSync = changes.getLastSync();
-		} catch (Exception e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			bc.logout(token);
@@ -121,7 +121,7 @@ public class ContactsBackend extends ObmSyncBackend {
 						new ContactConverter().contact(data));
 				id = createdContact.getUid().toString();
 			}
-		} catch (Exception e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			bc.logout(token);
@@ -140,7 +140,7 @@ public class ContactsBackend extends ObmSyncBackend {
 				AccessToken token = login(bc, bs);
 				try {
 					bc.removeContact(token, BookType.contacts, id);
-				} catch (Exception e) {
+				} catch (ServerFault e) {
 					logger.error(e.getMessage(), e);
 				} finally {
 					bc.logout(token);
@@ -168,7 +168,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			}
 		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
-			throw new ServerFault(e);
+			throw e;
 		} finally {
 			bc.logout(token);
 		}

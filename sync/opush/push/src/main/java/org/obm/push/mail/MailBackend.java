@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.naming.ConfigurationException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
@@ -34,18 +35,20 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
-import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FiltrageInvitationDao;
+import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 
 import com.google.common.collect.ImmutableList;
@@ -136,7 +139,7 @@ public class MailBackend extends ObmSyncBackend {
 			deletions.addAll(getDeletions(collectionId, mc.getRemoved()));
 			lastSync = mc.getLastSync();
 			
-		} catch (Exception e) {
+		} catch (ServerErrorException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return new DataDelta(changes, deletions, lastSync);
@@ -149,7 +152,9 @@ public class MailBackend extends ObmSyncBackend {
 			for (final MSEmail mail : msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
-		} catch (Exception e) {
+		} catch (IMAPException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return itch.build();
@@ -200,7 +205,9 @@ public class MailBackend extends ObmSyncBackend {
 				ic.setData(email);
 				ret.add(ic);
 			}
-		} catch (Exception e) {
+		} catch (IMAPException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return ret.build();
@@ -230,7 +237,11 @@ public class MailBackend extends ObmSyncBackend {
 							collectionId, uid);
 				}
 				removeInvitationStatus(bs, collectionId, uid);
-			} catch (Exception e) {
+			} catch (IMAPException e) {
+				logger.error(e.getMessage(), e);
+			} catch (CollectionNotFoundException e) {
+				logger.error(e.getMessage(), e);
+			} catch (DaoException e) {
 				logger.error(e.getMessage(), e);
 			}
 		}
@@ -282,7 +293,11 @@ public class MailBackend extends ObmSyncBackend {
 					srcFolderId, dstFolder, dstFolderId, currentMailUid);
 			removeInvitationStatus(bs, srcFolderId, currentMailUid);
 			return dstFolderId + ":" + newUidMail;
-		} catch (Exception e) {
+		} catch (IMAPException e) {
+			throw new ServerErrorException(e);
+		} catch (DaoException e) {
+			throw new ServerErrorException(e);
+		} catch (CollectionNotFoundException e) {
 			throw new ServerErrorException(e);
 		}
 
@@ -306,9 +321,9 @@ public class MailBackend extends ObmSyncBackend {
 			throw se;
 		} catch (SendEmailException e){
 			throw e;
-		}	catch (Throwable e) {
+		} catch (ServerFault e) {
 			throw new ProcessingEmailException(e);
-		}
+		} 
 	}
 
 	public void replyEmail(BackendSession bs, InputStream mailContent,
@@ -352,9 +367,17 @@ public class MailBackend extends ObmSyncBackend {
 			throw se;
 		} catch (SendEmailException e){
 			throw e;
-		} catch (Throwable e) {
+		} catch (CollectionNotFoundException e) {
 			throw new ProcessingEmailException(e);
-		}
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
+		} catch (IMAPException e) {
+			throw new ProcessingEmailException(e);
+		} catch (ServerFault e) {
+			throw new ProcessingEmailException(e);
+		} 
 	}
 
 	public void forwardEmail(BackendSession bs, InputStream mailContent,
@@ -386,12 +409,22 @@ public class MailBackend extends ObmSyncBackend {
 			throw se;
 		} catch (SendEmailException e){
 			throw e;
-		} catch (Throwable e) {
+		} catch (ServerFault e) {
 			throw new ProcessingEmailException(e);
-		}
+		} catch (NumberFormatException e) {
+			throw new ProcessingEmailException(e);
+		} catch (CollectionNotFoundException e) {
+			throw new ProcessingEmailException(e);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
+		} catch (IMAPException e) {
+			throw new ProcessingEmailException(e);
+		} 
 	}
 
-	private String getUserEmail(BackendSession bs) throws Exception {
+	private String getUserEmail(BackendSession bs) throws ServerFault {
 		AbstractEventSyncClient cal = getCalendarClient(bs);
 		AccessToken at = cal.login(bs.getLoginAtDomain(), bs.getPassword(),
 				OBM_SYNC_ORIGIN);
@@ -428,7 +461,13 @@ public class MailBackend extends ObmSyncBackend {
 			throw se;
 		} catch (SendEmailException e){
 			throw e;
-		} catch (Throwable e) {
+		} catch (TNEFConverterException e) {
+			throw new ProcessingEmailException(e);
+		} catch (MimeException e) {
+			throw new ProcessingEmailException(e);
+		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
+		} catch (Exception e) {
 			throw new ProcessingEmailException(e);
 		} finally {
 			if(emailData != null){
@@ -458,7 +497,9 @@ public class MailBackend extends ObmSyncBackend {
 			if (emails.size() > 0) {
 				return emails.get(0);
 			}
-		} catch (Exception e) {
+		} catch (IMAPException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return null;
@@ -539,7 +580,13 @@ public class MailBackend extends ObmSyncBackend {
 			if (deleteSubFolder) {
 				logger.warn("deleteSubFolder isn't implemented because opush doesn't yet manage folders");
 			}
-		} catch (Throwable e) {
+		} catch (CollectionNotFoundException e) {
+			logger.error(e.getMessage(), e);
+			throw new NotAllowedException(e);
+		} catch (DaoException e) {
+			logger.error(e.getMessage(), e);
+			throw new NotAllowedException(e);
+		} catch (IMAPException e) {
 			logger.error(e.getMessage(), e);
 			throw new NotAllowedException(e);
 		}

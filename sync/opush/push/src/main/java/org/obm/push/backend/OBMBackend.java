@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.minig.imap.IMAPException;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
@@ -100,11 +101,13 @@ public class OBMBackend implements IBackend {
 			synchronized (emailPushMonitors) {
 				emailPushMonitors.put(collectionId, emt);
 			}
-		} catch (Exception e) {
-			logger.error("Error while starting idle on collection["
-					+ collectionId + "]", e);
-			if(emt != null){
-				emt.stopIdle();
+		} catch (DaoException e) {
+			logger.error("Error while starting idle on collection [ " + collectionId + " ]", e);
+		} catch (IMAPException e) {
+			logger.error("Error while starting idle on collection [ " + collectionId + " ]", e);
+		} finally {
+			if (emt != null) {
+				emt.stopIdle();	
 			}
 		}
 	}

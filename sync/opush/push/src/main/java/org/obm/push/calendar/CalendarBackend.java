@@ -91,7 +91,11 @@ public class CalendarBackend extends ObmSyncBackend {
 				}
 				ret.add(ic);
 			}
-		} catch (Exception e) {
+		} catch (CollectionNotFoundException e) {
+			logger.error(e.getMessage(), e);
+		} catch (DaoException e) {
+			logger.error(e.getMessage(), e);
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			cc.logout(token);
@@ -173,7 +177,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			addOrRemoveEventFilter(addUpd, deletions, changes, userEmail, collectionId, bs);
 			syncDate = changes.getLastSync();
 			
-		} catch (Exception e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			cc.logout(token);
@@ -256,7 +260,7 @@ public class CalendarBackend extends ObmSyncBackend {
 				id = serverId.substring(idx + 1);
 				try {
 					oldEvent = cc.getEventFromId(token, bs.getLoginAtDomain(), id);
-				} catch (Exception e) {
+				} catch (ServerFault e) {
 					logger.error(e.getMessage(), e);
 				}
 			}
@@ -264,7 +268,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			String email = bs.getLoginAtDomain();
 			try {
 				email = cc.getUserEmail(token);
-			} catch (Exception e) {
+			} catch (ServerFault e) {
 				logger.error("Error finding email: " + e.getMessage(), e);
 			}
 			Boolean isInternal = EventConverter.isInternalEvent(oldEvent, true);
@@ -282,7 +286,7 @@ public class CalendarBackend extends ObmSyncBackend {
 					event.setUid(id);
 					cc.modifyEvent(token, parseCalendarName(collectionPath), event,
 							true, true);
-				} catch (Exception e) {
+				} catch (ServerFault e) {
 					logger.error(e.getMessage(), e);
 				}
 			} else {
@@ -291,7 +295,7 @@ public class CalendarBackend extends ObmSyncBackend {
 							event, true);
 				} catch (EventAlreadyExistException e) {
 					id = getEventIdFromExtId(token, collectionPath, cc, event);
-				} catch (Exception e) {
+				} catch (ServerFault e) {
 					logger.error(e.getMessage(), e);
 				}
 			}
@@ -335,7 +339,7 @@ public class CalendarBackend extends ObmSyncBackend {
 							updateUserStatus(bs, mser, AttendeeStatus.DECLINE, bc, token);
 						}
 					}
-				} catch (Exception e) {
+				} catch (ServerFault e) {
 					logger.error(e.getMessage(), e);
 				} finally {
 					bc.logout(token);
@@ -356,7 +360,11 @@ public class CalendarBackend extends ObmSyncBackend {
 			String serverId = updateUserStatus(bs, event, status, calCli, at);
 			
 			return serverId;
-		} catch (Exception e) {
+		} catch (ServerFault e) {
+			logger.error(e.getMessage(), e);
+		} catch (CollectionNotFoundException e) {
+			logger.error(e.getMessage(), e);
+		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			calCli.logout(at);
@@ -438,7 +446,7 @@ public class CalendarBackend extends ObmSyncBackend {
 					ret.add(ic);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			calCli.logout(token);
@@ -465,7 +473,7 @@ public class CalendarBackend extends ObmSyncBackend {
 					ret.add( createItemChangeToRemove(collectionId, String.valueOf(id)) );
 				}
 			}
-		} catch (Throwable e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			calCli.logout(token);
