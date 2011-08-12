@@ -1,4 +1,4 @@
-package org.obm.push.handler;
+package org.obm.push.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,7 +20,6 @@ import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.NoDocumentException;
-import org.obm.push.impl.Responder;
 import org.obm.push.protocol.FolderSyncProtocol;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;

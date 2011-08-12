@@ -1,4 +1,4 @@
-package org.obm.push.handler;
+package org.obm.push.impl;
 
 import java.io.IOException;
 import java.util.Set;
@@ -24,7 +24,6 @@ import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.CollectionNotFoundException;
-import org.obm.push.impl.Responder;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.HearbeatDao;

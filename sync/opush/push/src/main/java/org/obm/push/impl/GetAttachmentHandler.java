@@ -1,4 +1,4 @@
-package org.obm.push.handler;
+package org.obm.push.impl;
 
 import java.io.IOException;
 
@@ -11,7 +11,6 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.exception.ObjectNotFoundException;
-import org.obm.push.impl.Responder;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

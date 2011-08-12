@@ -1,4 +1,4 @@
-package org.obm.push.handler;
+package org.obm.push.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,7 +21,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NoDocumentException;
-import org.obm.push.impl.Responder;
 import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;

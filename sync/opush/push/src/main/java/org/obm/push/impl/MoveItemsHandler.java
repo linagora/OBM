@@ -1,4 +1,4 @@
-package org.obm.push.handler;
+package org.obm.push.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NoDocumentException;
 import org.obm.push.exception.ServerErrorException;
-import org.obm.push.impl.Responder;
 import org.obm.push.protocol.MoveItemsProtocol;
 import org.obm.push.protocol.bean.MoveItemsRequest;
 import org.obm.push.protocol.bean.MoveItemsResponse;

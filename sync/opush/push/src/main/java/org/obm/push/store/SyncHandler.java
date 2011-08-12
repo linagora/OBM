@@ -1,4 +1,4 @@
-package org.obm.push.handler;
+package org.obm.push.store;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +39,9 @@ import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.PartialException;
 import org.obm.push.exception.ProtocolException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
+import org.obm.push.impl.IContinuationHandler;
 import org.obm.push.impl.Responder;
+import org.obm.push.impl.WbxmlRequestHandler;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;

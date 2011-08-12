@@ -1,4 +1,4 @@
-package org.obm.push.handler;
+package org.obm.push.impl;
 
 import java.util.List;
 
@@ -24,7 +24,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.NotAllowedException;
 import org.obm.push.exception.ObjectNotFoundException;
 import org.obm.push.exception.UnsupportedStoreException;
-import org.obm.push.impl.Responder;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;

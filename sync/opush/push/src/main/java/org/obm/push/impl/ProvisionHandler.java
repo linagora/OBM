@@ -1,4 +1,4 @@
-package org.obm.push.handler;
+package org.obm.push.impl;
 
 import java.io.IOException;
 import java.util.Random;
@@ -11,7 +11,6 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.InvalidPolicyKeyException;
-import org.obm.push.impl.Responder;
 import org.obm.push.protocol.ProvisionProtocol;
 import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;

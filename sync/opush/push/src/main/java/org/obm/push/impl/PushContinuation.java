@@ -10,7 +10,6 @@ import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.handler.IContinuationHandler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
