@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.minig.imap.IMAPException;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
@@ -181,7 +182,7 @@ public class ContentsExporter implements IContentsExporter {
 
 	@Override
 	public MSAttachementData getEmailAttachement(BackendSession bs,
-			String attachmentId) throws ObjectNotFoundException {
+			String attachmentId) throws ObjectNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
 		return mailBackend.getAttachment(bs, attachmentId);
 	}
 

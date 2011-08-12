@@ -164,4 +164,11 @@ public class ItemOperationsProtocol {
 		}
 	}
 	
+	public Document encodeErrorRespponse(ItemOperationsStatus status) {
+		Document document = DOMUtils.createDoc(null, "ItemOperations");
+		Element root = document.getDocumentElement();
+		DOMUtils.createElementAndText(root, "Status", status.asXmlValue());
+		return document;
+	}
+	
 }

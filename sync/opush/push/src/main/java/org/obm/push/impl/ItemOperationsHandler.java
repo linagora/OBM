@@ -1,8 +1,10 @@
 package org.obm.push.impl;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.obm.annotations.transactional.Propagation;
+import org.minig.imap.IMAPException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -68,21 +70,34 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			ItemOperationsRequest itemOperationRequest = protocol.getRequest(request, doc);
 			ItemOperationsResponse response = doTheJob(bs, itemOperationRequest);
 			Document document = protocol.encodeResponse(response, bs);
-			responder.sendResponse("ItemOperations", document);
+			sendResponse(responder, document);
 		} catch (CollectionNotFoundException e) {
-			logger.error("Collection not found");
-			//DOCUMENT_LIBRARY_STORE_UNKNOWN
+			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (UnsupportedStoreException e) {
-			logger.error("ItemOperations is not implemented for this store");
-			//DOCUMENT_LIBRARY_STORE_UNKNOWN
-		} catch (Exception e) {
+			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
+		} catch (DaoException e) {
+			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
+		} catch (IMAPException e) {
+			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
+		} 
+	}
+	
+	private void sendErrorResponse(Responder responder, ItemOperationsStatus status, Exception exception) {
+		logger.error(exception.getMessage(), exception);
+		sendResponse(responder, protocol.encodeErrorRespponse(status));
+	}
+	
+	private void sendResponse(Responder responder, Document document) {
+		try {
+			responder.sendResponse("ItemOperations", document);
+		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 	
 	@Transactional(propagation=Propagation.NESTED)
 	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest)
-			throws CollectionNotFoundException, UnsupportedStoreException {
+			throws CollectionNotFoundException, UnsupportedStoreException, DaoException, IMAPException {
 		
 		ItemOperationsResponse response = new ItemOperationsResponse();
 		Fetch fetch = itemOperationRequest.getFetch();
@@ -98,7 +113,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return response;
 	}
 
-	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, UnsupportedStoreException {
+	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, UnsupportedStoreException, DaoException, IMAPException {
 		
 		final StoreName store = fetch.getStoreName();
 		if (StoreName.Mailbox.equals(store)) {
@@ -108,7 +123,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		}
 	}
 
-	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch) throws CollectionNotFoundException {
+	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, DaoException, IMAPException {
 		MailboxFetchResult mailboxFetchResponse = new MailboxFetchResult();
 		if (fetch.getFileReference() != null) {
 			
@@ -126,7 +141,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return mailboxFetchResponse;
 	}
 
-	private FetchAttachmentResult processFileReferenceFetch(BackendSession bs, String reference) {
+	private FetchAttachmentResult processFileReferenceFetch(BackendSession bs, String reference) throws CollectionNotFoundException, DaoException, IMAPException {
 
 		FetchAttachmentResult fetchAttachmentResult = fetchAttachment(bs, reference);
 		if (ItemOperationsStatus.SUCCESS.equals(fetchAttachmentResult.getStatus())) {
@@ -135,7 +150,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return fetchAttachmentResult;
 	}
 
-	private FetchAttachmentResult fetchAttachment(BackendSession bs, String reference) {
+	private FetchAttachmentResult fetchAttachment(BackendSession bs, String reference) throws CollectionNotFoundException, DaoException, IMAPException {
 
 		FetchAttachmentResult fetchResult = new FetchAttachmentResult();
 		try {

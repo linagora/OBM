@@ -3,6 +3,7 @@ package org.obm.push.backend;
 import java.util.Collection;
 import java.util.List;
 
+import org.minig.imap.IMAPException;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
@@ -39,7 +40,7 @@ public interface IContentsExporter {
 			Integer collectionId, Collection<String> uids) ;
 	
 	MSAttachementData getEmailAttachement(BackendSession bs,
-			String attachmentName) throws ObjectNotFoundException;
+			String attachmentName) throws ObjectNotFoundException, CollectionNotFoundException, DaoException, IMAPException;
 
 	boolean validatePassword(String userID, String password);
 

@@ -3,6 +3,7 @@ package org.obm.push.mail;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -463,11 +464,11 @@ public class MailBackend extends ObmSyncBackend {
 		return null;
 	}
 
-	public MSAttachementData getAttachment(BackendSession bs,
-			String attachmentId) throws ObjectNotFoundException {
+	public MSAttachementData getAttachment(BackendSession bs, String attachmentId) 
+			throws ObjectNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
+		
 		if (attachmentId != null && !attachmentId.isEmpty()) {
-			Map<String, String> parsedAttId = AttachmentHelper
-					.parseAttachmentId(attachmentId);
+			Map<String, String> parsedAttId = AttachmentHelper.parseAttachmentId(attachmentId);
 			try {
 				String collectionId = parsedAttId
 						.get(AttachmentHelper.COLLECTION_ID);
@@ -506,10 +507,20 @@ public class MailBackend extends ObmSyncBackend {
 
 				return new MSAttachementData(contentType,
 						new ByteArrayInputStream(rawData));
-			} catch (Throwable e) {
+		
+			} catch (CollectionNotFoundException e) {
+				throw e;
+			} catch (NumberFormatException e) {
+				logger.error(e.getMessage(), e);
+			} catch (DaoException e) {
+				throw e;
+			} catch (IMAPException e) {
+				throw e;
+			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}
 		}
+		
 		throw new ObjectNotFoundException();
 	}
 

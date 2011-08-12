@@ -5,11 +5,14 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.annotations.transactional.Propagation;
+import org.minig.imap.IMAPException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSAttachementData;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.slf4j.Logger;
@@ -32,7 +35,7 @@ public class GetAttachmentHandler implements IRequestHandler {
 
 	@Override
 	public void process(IContinuation continuation, BackendSession bs,
-			ActiveSyncRequest request, Responder responder) throws IOException {
+			ActiveSyncRequest request, Responder responder) {
 
 		String AttachmentName = request.getParameter("AttachmentName");
 
@@ -40,13 +43,30 @@ public class GetAttachmentHandler implements IRequestHandler {
 			MSAttachementData attachment = getAttachment(bs, AttachmentName);
 			responder.sendResponseFile(attachment.getContentType(),	attachment.getFile());
 		} catch (ObjectNotFoundException e) {
+			sendErrorResponse(responder, e);
+		} catch (CollectionNotFoundException e) {
+			sendErrorResponse(responder, e);
+		} catch (DaoException e) {
+			sendErrorResponse(responder, e);
+		} catch (IMAPException e) {
+			sendErrorResponse(responder, e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	private void sendErrorResponse(Responder responder, Exception exception) {
+		logger.error(exception.getMessage(), exception);
+		try {
 			responder.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
 	@Transactional(propagation=Propagation.NESTED)
 	private MSAttachementData getAttachment(BackendSession bs,
-			String AttachmentName) throws ObjectNotFoundException {
+			String AttachmentName) throws ObjectNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
 		return contentsExporter.getEmailAttachement(bs, AttachmentName);
 	}
 }
