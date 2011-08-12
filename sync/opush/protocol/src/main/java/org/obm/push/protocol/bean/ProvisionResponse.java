@@ -1,5 +1,6 @@
 package org.obm.push.protocol.bean;
 
+import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.protocol.provisioning.Policy;
 
 public class ProvisionResponse {
@@ -7,7 +8,7 @@ public class ProvisionResponse {
 	private final String policyType;
 	private Long policyKey;
 	private Policy policy;
-	private int status;
+	private ProvisionStatus status;
 	
 	public ProvisionResponse(String policyType) {
 		super();
@@ -26,11 +27,11 @@ public class ProvisionResponse {
 		return policy;	
 	}
 
-	public int getStatus() {
+	public ProvisionStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(ProvisionStatus status) {
 		this.status = status;
 	}
 

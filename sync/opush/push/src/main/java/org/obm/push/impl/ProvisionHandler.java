@@ -10,6 +10,7 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
 import org.obm.push.protocol.ProvisionProtocol;
 import org.obm.push.protocol.bean.ProvisionRequest;
@@ -36,44 +37,45 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 			IContentsExporter contentsExporter, StateMachine stMachine, CollectionDao collectionDao, 
 			ProvisionProtocol provisionProtocol) {
 		
-		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao);
-		
+		super(backend, encoderFactory, contentsImporter, contentsExporter, stMachine, collectionDao);
 		this.random = random;
 		this.protocol = provisionProtocol;
 	}
 	
 	@Override
-	public void process(IContinuation continuation, BackendSession bs,
-			Document doc, ActiveSyncRequest request, Responder responder) {
-
+	public void process(IContinuation continuation, BackendSession bs, Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
 			ProvisionRequest provisionRequest = protocol.getRequest(doc);
-			
 			logger.info("required {}", provisionRequest.toString());
-			
 			ProvisionResponse provisionResponse = doTheJob(provisionRequest, bs);
 			Document ret = protocol.encodeResponse(provisionResponse);
-
-			responder.sendResponse("Provision", ret);
-
+			sendResponse(responder, ret);
 		} catch (InvalidPolicyKeyException e) {
-			logger.error("Error creating provision response", e);
+			sendErrorResponse(responder, ProvisionStatus.PROTOCOL_ERROR, e);
+		}
+	}
+
+	private void sendErrorResponse(Responder responder, ProvisionStatus status, InvalidPolicyKeyException e) {
+		logger.error("Error creating provision response", e);
+		sendResponse(responder, protocol.encodeErrorResponse(status));
+	}
+
+	private void sendResponse(Responder responder, Document ret) {
+		try {
+			responder.sendResponse("Provision", ret);
 		} catch (IOException e) {
-			logger.error("Error creating provision response", e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
 	@Transactional(propagation=Propagation.NESTED)
 	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, BackendSession bs) {
 		ProvisionResponse provisionResponse = new ProvisionResponse(provisionRequest.getPolicyType());
-		
 		final Long nextPolicyKey = nextPolicyKey(provisionRequest.getPolicyKey());
 		if (nextPolicyKey == null) {
-			// The client is acknowledging the wrong policy key.
-			provisionResponse.setStatus(5);
+			provisionResponse.setStatus(ProvisionStatus.THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY);
 		} else {
-			provisionResponse.setStatus(1);
+			provisionResponse.setStatus(ProvisionStatus.SUCCESS);
 			provisionResponse.setPolicyKey(nextPolicyKey);
 		}
 		if (provisionRequest.getPolicyKey() == 0) {
