@@ -67,7 +67,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 		} catch (CollectionNotFoundException e) {
 			logger.error("unable to start monitoring, collection not found", e);
 			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED);
-		} catch (Exception e) {
+		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
 			sendError(responder, PingStatus.SERVER_ERROR);
 		}
@@ -127,11 +127,20 @@ public class PingHandler extends WbxmlRequestHandler implements
 		try {
 			PingResponse response = buildResponse(sendHierarchyChange, continuation);
 			Document document = protocol.encodeResponse(response);
-			responder.sendResponse("Ping", document);
+			sendResponse(responder, document);
 		} catch (FolderSyncRequiredException e) {
 			logger.error("unable to start monitoring, collection not found", e);
 			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED);
-		} catch (Exception e) {
+		} catch (DaoException e) {
+			logger.error(e.getMessage(), e);
+			sendError(responder, PingStatus.SERVER_ERROR);
+		} 
+	}
+
+	private void sendResponse(Responder responder, Document document) {
+		try {
+			responder.sendResponse("Ping", document);
+		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
@@ -151,23 +160,13 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	@Override
-	public void sendError(Responder responder, String errorStatus,
-			IContinuation continuation) {
+	public void sendError(Responder responder, String errorStatus, IContinuation continuation) {
 		Document document = protocol.buildError(errorStatus);
-		try {
-			responder.sendResponse("Ping", document);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		sendResponse(responder, document);
 	}
 
 	private void sendError(Responder responder, PingStatus serverError) {
-		Document document = protocol.buildError(serverError);
-		try {
-			responder.sendResponse("Ping", document);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		sendError(responder, serverError.asXmlValue(), null);
 	}
 	
 }

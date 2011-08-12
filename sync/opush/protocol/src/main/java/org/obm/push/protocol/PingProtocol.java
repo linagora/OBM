@@ -2,7 +2,6 @@ package org.obm.push.protocol;
 
 import java.util.HashSet;
 
-import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
@@ -47,10 +46,6 @@ public class PingProtocol {
 			DOMUtils.createElementAndText(folders, "Folder", sc.getCollectionId().toString());
 		}
 		return document;
-	}
-
-	public Document buildError(PingStatus status) {
-		return buildError(status.asXmlValue());
 	}
 
 	public Document buildError(String errorStatus) {
