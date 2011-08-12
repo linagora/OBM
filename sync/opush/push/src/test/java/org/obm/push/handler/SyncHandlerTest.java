@@ -1,4 +1,4 @@
-package org.obm.push.store;
+package org.obm.push.handler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,12 +33,12 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.handler.SyncHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.data.CalendarEncoder;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.MonitoredCollectionDao;
-import org.obm.push.store.SyncHandler;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;

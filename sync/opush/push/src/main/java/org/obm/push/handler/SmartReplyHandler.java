@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import org.minig.imap.IMAPException;
 import org.obm.annotations.transactional.Propagation;
@@ -19,10 +19,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SmartForwardHandler extends MailRequestHandler {
+public class SmartReplyHandler extends MailRequestHandler {
 
 	@Inject
-	protected SmartForwardHandler(IContentsImporter contentsImporter, 
+	protected SmartReplyHandler(IContentsImporter contentsImporter,
 			IErrorsManager errorManager, MailProtocol mailProtocol) {
 		
 		super(contentsImporter, errorManager, mailProtocol);
@@ -30,11 +30,11 @@ public class SmartForwardHandler extends MailRequestHandler {
 
 	@Override
 	@Transactional(propagation=Propagation.NESTED)
-	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws ProcessingEmailException, CollectionNotFoundException, 
-	SendEmailException, SmtpInvalidRcptException, UnknownObmSyncServerException, DaoException, IMAPException {
-
-		contentsImporter.forwardEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(), 
-				mailRequest.getCollectionId(), mailRequest.getServerId());
+	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws SendEmailException, ProcessingEmailException, 
+		SmtpInvalidRcptException, CollectionNotFoundException, IMAPException, DaoException, UnknownObmSyncServerException {
+		
+		contentsImporter.replyEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(),
+				Integer.getInteger(mailRequest.getCollectionId()), mailRequest.getServerId());
 	}
 	
 }

@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.util.Set;
 
@@ -19,6 +19,7 @@ import org.obm.push.exception.MissingRequestParameterException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;

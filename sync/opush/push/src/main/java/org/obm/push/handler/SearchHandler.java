@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +14,7 @@ import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.SearchStatus;
 import org.obm.push.bean.StoreName;
 import org.obm.push.exception.activesync.XMLValidationException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.SearchProtocol;
 import org.obm.push.protocol.bean.SearchRequest;
 import org.obm.push.protocol.bean.SearchResponse;

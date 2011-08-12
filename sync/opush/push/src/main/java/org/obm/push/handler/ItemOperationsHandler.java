@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.util.List;
 
@@ -24,6 +24,7 @@ import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;

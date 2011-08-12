@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;

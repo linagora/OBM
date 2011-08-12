@@ -1,4 +1,4 @@
-package org.obm.push.store;
+package org.obm.push.handler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,9 +38,7 @@ import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
-import org.obm.push.impl.IContinuationHandler;
 import org.obm.push.impl.Responder;
-import org.obm.push.impl.WbxmlRequestHandler;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -48,6 +46,9 @@ import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
+import org.obm.push.store.CollectionDao;
+import org.obm.push.store.MonitoredCollectionDao;
+import org.obm.push.store.UnsynchronizedItemDao;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMap;

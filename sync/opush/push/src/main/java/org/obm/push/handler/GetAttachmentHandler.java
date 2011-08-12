@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,6 +12,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

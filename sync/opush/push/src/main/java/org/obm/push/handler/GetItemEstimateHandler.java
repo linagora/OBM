@@ -1,4 +1,4 @@
-package org.obm.push.impl;
+package org.obm.push.handler;
 
 import java.util.ArrayList;
 
@@ -18,6 +18,7 @@ import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.impl.Responder;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
 import org.obm.push.protocol.bean.GetItemEstimateResponse;
