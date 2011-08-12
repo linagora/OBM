@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.exception.ActiveSyncException;
+import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.exception.DaoException;
 

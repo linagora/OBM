@@ -1,4 +1,6 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
+
+
 
 
 public class CollectionNotFoundException extends ActiveSyncException {

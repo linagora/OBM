@@ -1,13 +1,6 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
-/**
- * 
- * @author adrienp
- *
- */
 public class ActiveSyncException extends Exception {
-
-	private static final long serialVersionUID = 8811943439586363944L;
 
 	public ActiveSyncException() {
 		super();
@@ -24,6 +17,5 @@ public class ActiveSyncException extends Exception {
 	public ActiveSyncException(Throwable cause) {
 		super(cause);
 	}
-	
 	
 }

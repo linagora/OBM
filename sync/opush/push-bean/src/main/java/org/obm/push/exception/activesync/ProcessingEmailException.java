@@ -1,17 +1,7 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
 
-/**
- * 
- * @author adrienp
- *
- */
-public class ProcessingEmailException extends ActiveSyncException{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6611196276103565064L;
+public class ProcessingEmailException extends ActiveSyncException {
 
 	public ProcessingEmailException() {
 		super();

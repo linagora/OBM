@@ -1,14 +1,7 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
 
-/**
- * 
- * @author adrienp
- * 
- */
 public class SendEmailException extends ActiveSyncException {
-
-	private static final long serialVersionUID = 6611196276103565064L;
 
 	int smtpErrorCode = -1;
 
@@ -25,4 +18,5 @@ public class SendEmailException extends ActiveSyncException {
 	public int getSmtpErrorCode() {
 		return smtpErrorCode;
 	}
+	
 }

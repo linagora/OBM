@@ -5,9 +5,9 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.exception.ProcessingEmailException;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.SendEmailException;
+import org.obm.push.exception.activesync.SmtpInvalidRcptException;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
 

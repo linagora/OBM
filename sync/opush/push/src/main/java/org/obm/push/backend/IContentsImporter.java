@@ -7,14 +7,14 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.exception.ActiveSyncException;
-import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.NotAllowedException;
-import org.obm.push.exception.ProcessingEmailException;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.ServerErrorException;
-import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.activesync.ActiveSyncException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.NotAllowedException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.SendEmailException;
+import org.obm.push.exception.activesync.ServerErrorException;
+import org.obm.push.exception.activesync.SmtpInvalidRcptException;
 
 /**
  * Content management interface, ie. CRUD API.

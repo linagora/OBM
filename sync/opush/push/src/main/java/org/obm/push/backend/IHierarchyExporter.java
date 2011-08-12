@@ -5,8 +5,8 @@ import java.util.List;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
-import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.ActiveSyncException;
 
 /**
  * The exporter API fetches data from the backend store and returns it to the

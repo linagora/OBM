@@ -3,7 +3,7 @@ package org.obm.push.protocol;
 import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.SearchStatus;
 import org.obm.push.bean.StoreName;
-import org.obm.push.exception.XMLValidationException;
+import org.obm.push.exception.activesync.XMLValidationException;
 import org.obm.push.protocol.bean.SearchRequest;
 import org.obm.push.protocol.bean.SearchResponse;
 import org.obm.push.utils.DOMUtils;

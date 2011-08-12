@@ -1,12 +1,8 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
 
 public class FolderTypeNotFoundException extends ActiveSyncException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6611196276103565064L;
-
+	
 	public FolderTypeNotFoundException() {
 		super();
 	}

@@ -1,7 +1,7 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
 
-public class XMLValidationException extends ActiveSyncException{
+public class XMLValidationException extends ActiveSyncException {
 
 	public XMLValidationException() {
 		super();

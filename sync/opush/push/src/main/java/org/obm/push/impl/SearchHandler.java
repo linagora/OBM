@@ -13,7 +13,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.SearchStatus;
 import org.obm.push.bean.StoreName;
-import org.obm.push.exception.XMLValidationException;
+import org.obm.push.exception.activesync.XMLValidationException;
 import org.obm.push.protocol.SearchProtocol;
 import org.obm.push.protocol.bean.SearchRequest;
 import org.obm.push.protocol.bean.SearchResponse;

@@ -1,17 +1,7 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
 
-/**
- * 
- * @author adrienp
- *
- */
-public class NotAllowedException extends ActiveSyncException{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5550850138721348282L;
+public class NotAllowedException extends ActiveSyncException {
 
 	public NotAllowedException() {
 		super();
@@ -28,4 +18,5 @@ public class NotAllowedException extends ActiveSyncException{
 	public NotAllowedException(Throwable cause) {
 		super(cause);
 	}
+	
 }

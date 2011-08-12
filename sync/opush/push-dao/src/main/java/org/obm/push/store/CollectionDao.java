@@ -5,8 +5,8 @@ import java.util.Date;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncState;
-import org.obm.push.exception.CollectionNotFoundException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 
 public interface CollectionDao {
 

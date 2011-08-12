@@ -8,7 +8,7 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
-import org.obm.push.exception.CollectionNotFoundException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
 import org.obm.push.protocol.bean.GetItemEstimateResponse;
 import org.obm.push.protocol.bean.GetItemEstimateResponse.Estimate;

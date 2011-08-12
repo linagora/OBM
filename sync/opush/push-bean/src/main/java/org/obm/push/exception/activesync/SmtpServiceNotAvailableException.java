@@ -1,13 +1,6 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
-/**
- * 
- * @author adrienp
- * 
- */
 public class SmtpServiceNotAvailableException extends SendEmailException {
-	
-	private static final long serialVersionUID = 5060249645307973053L;
 	
 	private static int ERROR_CODE_DOMAIN_SERVICE_NOT_AVAILABLE_CLOSING_TRANSMISSION_CHANNEL = 451;
 
@@ -17,4 +10,5 @@ public class SmtpServiceNotAvailableException extends SendEmailException {
 				ERROR_CODE_DOMAIN_SERVICE_NOT_AVAILABLE_CLOSING_TRANSMISSION_CHANNEL,
 				cause);
 	}
+	
 }

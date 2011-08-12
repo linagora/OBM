@@ -1,18 +1,8 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
 
-/**
- * 
- * @author adrienp
- *
- */
-public class ServerErrorException extends ActiveSyncException{
+public class ServerErrorException extends ActiveSyncException {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6353475048296553646L;
-
 	public ServerErrorException() {
 		super();
 	}
@@ -28,4 +18,5 @@ public class ServerErrorException extends ActiveSyncException{
 	public ServerErrorException(Throwable cause) {
 		super(cause);
 	}
+	
 }

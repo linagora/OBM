@@ -4,8 +4,8 @@ import javax.naming.ConfigurationException;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.configuration.ObmConfigurationService;
-import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 

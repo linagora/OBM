@@ -1,18 +1,7 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
 
-
-/**
- * 
- * @author adrienp
- *
- */
-public class ProtocolException extends ActiveSyncException{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6611196276103565064L;
+public class ProtocolException extends ActiveSyncException {
 
 	public ProtocolException() {
 		super();

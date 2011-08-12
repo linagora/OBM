@@ -1,17 +1,11 @@
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
 import java.util.Map;
 import java.util.Map.Entry;
 
 
-/**
- * 
- * @author adrienp
- * 
- */
 public class SmtpInvalidRcptException extends ActiveSyncException {
-	
-	private static final long serialVersionUID = -4332866043885420096L;
+
 	private Map<String, Throwable> rcpt;
 	
 	public SmtpInvalidRcptException(Map<String, Throwable> rcpt, String message, Throwable cause) {
@@ -34,7 +28,5 @@ public class SmtpInvalidRcptException extends ActiveSyncException {
 		}
 		return b.toString();
 	}
-
-	
 	
 }

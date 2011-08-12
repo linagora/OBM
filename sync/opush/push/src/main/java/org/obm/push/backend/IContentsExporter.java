@@ -10,9 +10,9 @@ import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
-import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.ObjectNotFoundException;
+import org.obm.push.exception.activesync.ActiveSyncException;
+import org.obm.push.exception.activesync.ObjectNotFoundException;
 
 /**
  * The exporter API fetches data from the backend store and returns it to the

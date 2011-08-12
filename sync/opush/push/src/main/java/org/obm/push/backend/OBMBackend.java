@@ -9,8 +9,8 @@ import java.util.Set;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.exception.ActiveSyncException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.IEmailManager;
 import org.obm.push.mail.MailBackend;
