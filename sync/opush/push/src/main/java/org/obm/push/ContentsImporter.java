@@ -44,8 +44,8 @@ public class ContentsImporter implements IContentsImporter {
 	}
 
 	@Override
-	public String importMessageChange(BackendSession bs, Integer collectionId,
-			String serverId, String clientId, IApplicationData data) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
+	public String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data) 
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
 		String id = null;
 		switch (data.getType()) {

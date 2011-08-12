@@ -48,10 +48,6 @@ import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.CollectionDao;
-import org.obm.push.store.MonitoredCollectionDao;
-import org.obm.push.store.UnsynchronizedItemDao;
-import org.obm.sync.auth.ServerFault;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMap;
@@ -126,8 +122,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.PARTIAL_REQUEST.asXmlValue(), pe);
 		} catch (CollectionNotFoundException ce) {
 			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation, ce);
-		} catch (ServerFault serverFault) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), serverFault);
 		} catch (ContinuationThrowable e) {
 			throw e;
 		} catch (NoDocumentException e) {
@@ -367,8 +361,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (CollectionNotFoundException e) {
 			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation, e);
-		} catch (ServerFault e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (UnknownObmSyncServerException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
@@ -377,7 +369,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	@Transactional
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, 
-			CollectionNotFoundException, ServerFault, UnknownObmSyncServerException {
+			CollectionNotFoundException, UnknownObmSyncServerException {
 
 		final List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {

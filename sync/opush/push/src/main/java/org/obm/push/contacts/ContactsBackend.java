@@ -14,6 +14,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
@@ -60,31 +61,30 @@ public class ContactsBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	public DataDelta getContentChanges(BackendSession bs, SyncState state,
-			Integer collectionId) {
+	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) throws UnknownObmSyncServerException {
+		logger.info("getContentChanges({})", state.getLastSync());
+		
+		BookClient bc = getBookClient(bs);
+		AccessToken token = login(bc, bs);
+		
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		List<ItemChange> deletions = new LinkedList<ItemChange>();
 		Date lastSync = null;
-		logger.info("getContentChanges(" + state.getLastSync() + ")");
-		BookClient bc = getBookClient(bs);
-		AccessToken token = login(bc, bs);
-
+		
 		try {
-			ContactChangesResponse changes = bc.getSync(token, BookType.contacts, state
-					.getLastSync());
-
-			for (Contact c : changes.getUpdated()) {
+			ContactChangesResponse changes = bc.getSync(token, BookType.contacts, state.getLastSync());
+			for (Contact c: changes.getUpdated()) {
 				ItemChange change = getContactChange(collectionId, c);
 				addUpd.add(change);
 			}
 
-			for (Integer del : changes.getRemoved()) {
+			for (Integer del: changes.getRemoved()) {
 				ItemChange change = createItemChangeToRemove(collectionId, "" + del);
 				deletions.add(change);
 			}
 			lastSync = changes.getLastSync();
 		} catch (ServerFault e) {
-			logger.error(e.getMessage(), e);
+			throw new UnknownObmSyncServerException(e);
 		} finally {
 			bc.logout(token);
 		}
@@ -101,10 +101,10 @@ public class ContactsBackend extends ObmSyncBackend {
 		return ic;
 	}
 
-	public String createOrUpdate(BackendSession bs, Integer collectionId,
-			String serverId, MSContact data) {
-		logger.info("create in " + collectionId + " (contact: "
-				+ data.getFirstName() + " " + data.getLastName() + ")");
+	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, MSContact data) throws UnknownObmSyncServerException {
+		logger.info("create contact ({} | {}) in collectionId {}", 
+				new Object[]{data.getFirstName(), data.getLastName(), collectionId});
+
 		BookClient bc = getBookClient(bs);
 		AccessToken token = login(bc, bs);
 
@@ -122,7 +122,7 @@ public class ContactsBackend extends ObmSyncBackend {
 				id = createdContact.getUid().toString();
 			}
 		} catch (ServerFault e) {
-			logger.error(e.getMessage(), e);
+			throw new UnknownObmSyncServerException(e);
 		} finally {
 			bc.logout(token);
 		}
@@ -130,18 +130,18 @@ public class ContactsBackend extends ObmSyncBackend {
 		return getServerIdFor(collectionId, id);
 	}
 
-	public void delete(BackendSession bs, String serverId) {
-		logger.info("delete serverId " + serverId);
+	public void delete(BackendSession bs, String serverId) throws UnknownObmSyncServerException {
+		logger.info("delete serverId {}", serverId);
+		
 		if (serverId != null) {
 			int idx = serverId.indexOf(":");
 			if (idx > 0) {
-				String id = serverId.substring(idx + 1);
 				BookClient bc = getBookClient(bs);
 				AccessToken token = login(bc, bs);
 				try {
-					bc.removeContact(token, BookType.contacts, id);
+					bc.removeContact(token, BookType.contacts, serverId.substring(idx + 1) );
 				} catch (ServerFault e) {
-					logger.error(e.getMessage(), e);
+					throw new UnknownObmSyncServerException(e);
 				} finally {
 					bc.logout(token);
 				}
@@ -149,29 +149,27 @@ public class ContactsBackend extends ObmSyncBackend {
 		}
 	}
 
-	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) throws ServerFault {
-		List<ItemChange> ret = new LinkedList<ItemChange>();
+	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) {
 		BookClient bc = getBookClient(bs);
 		AccessToken token = login(bc, bs);
 
-		try {
-			for (String serverId : fetchServerIds) {
-				Integer id = getItemIdFor(serverId);
-				if (id != null) {
+		List<ItemChange> ret = new LinkedList<ItemChange>();
+		for (String serverId: fetchServerIds) {
+			Integer id = getItemIdFor(serverId);
+			if (id != null) {
+				try {
 					Contact c = bc.getContactFromId(token, BookType.contacts, id.toString());
 					ItemChange ic = new ItemChange();
 					ic.setServerId(serverId);
 					MSContact cal = new ContactConverter().convert(c);
 					ic.setData(cal);
 					ret.add(ic);
+				} catch (ServerFault e) {
+					logger.error("Contact from id {} not found", id.toString());
 				}
 			}
-		} catch (ServerFault e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		} finally {
-			bc.logout(token);
 		}
+		bc.logout(token);
 		return ret;
 	}
 

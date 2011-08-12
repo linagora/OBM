@@ -20,10 +20,9 @@ import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.MailBackend;
-import org.obm.sync.auth.ServerFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +100,7 @@ public class ContentsExporter implements IContentsExporter {
 		}
 	}
 
-	private DataDelta getContactsChanges(BackendSession bs, SyncState state, Integer collectionId) {
+	private DataDelta getContactsChanges(BackendSession bs, SyncState state, Integer collectionId) throws UnknownObmSyncServerException {
 		return contactsBackend.getContentChanges(bs, state, collectionId);
 	}
 
@@ -130,8 +129,8 @@ public class ContentsExporter implements IContentsExporter {
 	}
 	
 	@Override
-	public DataDelta getChanged(BackendSession bs, SyncState state,
-			FilterType filter, Integer collectionId) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+	public DataDelta getChanged(BackendSession bs, SyncState state, FilterType filter, Integer collectionId) 
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
 		
 		DataDelta delta = null;
 		switch (state.getDataType()) {
@@ -161,7 +160,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchServerIds) throws CollectionNotFoundException, DaoException, ServerFault, UnknownObmSyncServerException {
+			List<String> fetchServerIds) throws CollectionNotFoundException, DaoException {
 		
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		switch (getDataType) {

@@ -30,7 +30,6 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.sync.auth.ServerFault;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -82,8 +81,6 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST, e);
 		} catch (DaoException e) {
 			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
-		} catch (ServerFault e) {
-			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST, e);
 		} catch (UnknownObmSyncServerException e) {
@@ -106,7 +103,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 
 	@Transactional(propagation=Propagation.NESTED)
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ServerFault {
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
 		
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
@@ -137,7 +134,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 	
 	private ItemChange retrieveMailWithMeetingRequest(BackendSession bs, MeetingResponse item)
-		throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ServerFault {
+		throws DaoException, CollectionNotFoundException {
 		
 		List<ItemChange> lit = contentsExporter.fetch(bs, PIMDataType.EMAIL, Arrays.asList(item.getReqId()));
 		if (lit.size() > 0) {

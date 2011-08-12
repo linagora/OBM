@@ -21,11 +21,10 @@ import org.obm.push.bean.StoreName;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.UnsupportedStoreException;
+import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
-import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
@@ -40,7 +39,6 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.FileUtils;
-import org.obm.sync.auth.ServerFault;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
@@ -194,12 +192,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			}
 		} catch (CollectionNotFoundException e) {
 			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
-		} catch (ServerFault e) {
-			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_CONNECTION_FAILED);
 		} catch (DaoException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
-		} catch (UnknownObmSyncServerException e) {
-			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_CONNECTION_FAILED);
 		}
 		return fetchResult;
 	}
