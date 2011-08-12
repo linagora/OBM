@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
@@ -52,13 +53,13 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	}
 
 	@Override
-	public String createEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
+	public String createEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault, EventAlreadyExistException {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("event", ciw.getEventString(event));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/createEvent", params);
-		checkServerError(doc);
+		checkEventAlreadyExistException(doc);
 		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
 	}
 
@@ -68,7 +69,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("calendar", calendar);
 		params.put("id", id);
 		Document doc = execute(type + "/getEventFromId", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		if (doc.getDocumentElement().getNodeName().equals("event")) {
 			return respParser.parseEvent(doc.getDocumentElement());
 		}
@@ -83,7 +84,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("event", ciw.getEventString(event));
 
 		Document doc = execute(type + "/getEventTwinKeys", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseKeyList(doc);
 	}
 
@@ -129,7 +130,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		}
 
 		Document doc = execute(type + "/" + methodName, params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseChanges(doc);
 	}
 	
@@ -149,7 +150,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		}
 
 		Document doc = execute(type + "/getSyncEventDate", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseChanges(doc);
 	}
 
@@ -157,7 +158,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	public String getUserEmail(AccessToken token) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute(type + "/getUserEmail", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
 	}
 
@@ -166,7 +167,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		Multimap<String, String> params = ArrayListMultimap.create();
 		setToken(params, token);
 		Document doc = execute(type + "/listCalendars", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseInfos(doc);
 	}
 
@@ -179,7 +180,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("updateAttendees", "" + updateAttendees);
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/modifyEvent", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseEvent(doc.getDocumentElement());
 	}
 
@@ -192,7 +193,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/removeEvent", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseEvent(doc.getDocumentElement());
 	}
 	
@@ -205,7 +206,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/removeEventByExtId", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseEvent(doc.getDocumentElement());
 	}
 
@@ -220,7 +221,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		}
 
 		Document doc = execute(type + "/getRefusedKeys", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseKeyList(doc);
 	}
 
@@ -229,7 +230,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		List<Category> ret = new LinkedList<Category>();
 		Multimap<String, String> params = initParams(at);
 		Document doc = execute(type + "/listCategories", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		ret.addAll(respParser.parseCategories(doc.getDocumentElement()));
 		return ret;
 	}
@@ -240,7 +241,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		Document doc = execute(type + "/getEventFromExtId", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		if (doc.getDocumentElement().getNodeName().equals("event")) {
 			return respParser.parseEvent(doc.getDocumentElement());
 		}
@@ -254,7 +255,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		Document doc = execute(type + "/getEventObmIdFromExtId", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		String value = DOMUtils.getElementText(doc.getDocumentElement(), "value");
 		return Integer.parseInt(value);
 	}
@@ -269,7 +270,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("end", Long.toString(end.getTime()));
 
 		Document doc = execute(type + "/getListEventsFromIntervalDate", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		ret.addAll(respParser.parseListEvents(doc.getDocumentElement()));
 		return ret;
 	}
@@ -282,7 +283,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("eventType", eventType.name());
 
 		Document doc = execute(type + "/getAllEvents", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseListEvents(doc.getDocumentElement());
 	}
 
@@ -298,7 +299,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		}
 		Document doc = execute(type
 				+ "/getEventTimeUpdateNotRefusedFromIntervalDate", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseListEventTimeUpdate(doc.getDocumentElement());
 	}
 
@@ -309,7 +310,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("event", ciw.getEventString(event));
 
 		Document doc = execute(type + "/parseEvent", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
 	}
 
@@ -320,7 +321,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("events", ciw.getListEventString(events));
 
 		Document doc = execute(type + "/parseEvents", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
 	}
 
@@ -330,7 +331,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		Multimap<String, String> params = initParams(token);
 		params.put("ics", ics);
 		Document doc = execute(type + "/parseICS", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseListEvents(doc.getDocumentElement());
 	}
 
@@ -339,7 +340,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		Multimap<String, String> params = initParams(token);
 		params.put("ics", ics);
 		Document doc = execute(type + "/parseICSFreeBusy", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseFreeBusyRequest(doc.getDocumentElement());
 	}
 
@@ -354,7 +355,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		Document doc = execute(type
 				+ "/getEventParticipationStateWithAlertFromIntervalDate",
 				params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseListEventParticipationState(doc
 				.getDocumentElement());
 	}
@@ -364,7 +365,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		Document doc = execute(type + "/getLastUpdate", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		String date = DOMUtils.getElementText(doc.getDocumentElement(), "value");
 		return new Date(new Long(date));
 	}
@@ -374,7 +375,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		Document doc = execute(type + "/isWritableCalendar", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return "true".equalsIgnoreCase(DOMUtils.getElementText(doc
 				.getDocumentElement(), "value"));
 	}
@@ -384,7 +385,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		Multimap<String, String> params = initParams(token);
 		params.put("freebusyrequest", ciw.getFreeBusyRequestString(fbr));
 		Document doc = execute(type + "/getFreeBusy", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseListFreeBusy(doc.getDocumentElement());
 	}
 
@@ -394,7 +395,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("freebusy", ciw.getFreeBusyString(fb));
 
 		Document doc = execute(type + "/parseFreeBusyToICS", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		String ret = DOMUtils.getElementText(doc.getDocumentElement(), "value");
 		return ret;
 	}
@@ -410,7 +411,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(type + "/changeParticipationState", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
 	
@@ -421,7 +422,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		params.put("ics", ics);
 		
 		final Document doc = execute(type + "/importICalendar", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return Integer.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
 	
@@ -430,7 +431,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		final Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		final Document doc = execute(type + "/purge", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 	}
 
 	@Override
@@ -440,7 +441,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 		for (String calendar : calendars)
 			params.put("calendar", calendar);
 		final Document doc = execute(type + "/getCalendarMetadata", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseInfos(doc);
 	}
 	

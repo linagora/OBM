@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
@@ -69,9 +70,10 @@ public interface ICalendar {
 
 	/**
 	 * FIXME: needs work
+	 * @throws EventAlreadyExistException 
 	 */
 	String createEvent(AccessToken token, String calendar, Event event,
-			boolean notification) throws ServerFault;
+			boolean notification) throws ServerFault, EventAlreadyExistException;
 
 	/**
 	 * return every changes made to calendar since lastSync date for events into

@@ -189,10 +189,15 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		executeVoid("/login/doLogout", params);
 	}
 
-	protected void checkServerError(Document doc) throws ServerFault {
+	protected void checkServerFaultException(Document doc) throws ServerFault {
 		if (documentIsError(doc)) {
-			String message = DOMUtils.getElementText(doc.getDocumentElement(),
-					"message");
+			throw new ServerFault( getErrrorMessage(doc) );
+		}
+	}
+
+	protected void checkEventAlreadyExistException(Document doc) throws ServerFault, EventAlreadyExistException {
+		if (documentIsError(doc)) {
+			String message = getErrrorMessage(doc);
 			String type = DOMUtils.getElementText(doc.getDocumentElement(),
 					"type");
 			if (EventAlreadyExistException.class.getName().equals(type)) {
@@ -205,6 +210,10 @@ public abstract class AbstractClientImpl implements ISyncClient {
 
 	protected boolean documentIsError(Document doc) {
 		return doc.getDocumentElement().getNodeName().equals("error");
+	}
+	
+	private String getErrrorMessage(Document doc) {
+		return DOMUtils.getElementText(doc.getDocumentElement(), "message");
 	}
 
 }

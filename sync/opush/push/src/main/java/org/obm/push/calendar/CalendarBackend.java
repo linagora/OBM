@@ -366,6 +366,8 @@ public class CalendarBackend extends ObmSyncBackend {
 			logger.error(e.getMessage(), e);
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
+		} catch (EventAlreadyExistException e) {
+			logger.error(e.getMessage(), e);
 		} finally {
 			calCli.logout(at);
 		}
@@ -373,7 +375,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	}
 
 	private Event createOrModifyInvitationEvent(BackendSession bs, MSEvent event,
-			AbstractEventSyncClient calCli, AccessToken at) throws ServerFault {
+			AbstractEventSyncClient calCli, AccessToken at) throws ServerFault, EventAlreadyExistException {
 		Event obmEvent = calCli.getEventFromExtId(at, bs.getLoginAtDomain(), event.getUID());
 		Boolean isInternal = EventConverter.isInternalEvent(obmEvent, false);
 		Event newEvent = null;

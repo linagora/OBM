@@ -26,7 +26,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	public Map<String, String> getSettings(AccessToken token) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getSettings", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseListSettings(doc);
 	}
 
@@ -45,7 +45,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 			params.put("text", "" + vs.getText());
 		}
 		Document doc = execute("/setting/setVacationSettings", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 		}
 		params.put("localCopy", "" + fs.isLocalCopy());
 		Document doc = execute("/setting/setEmailForwarding", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getEmailForwarding", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseForwarding(doc);
 	}
 
@@ -75,7 +75,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getVacationSettings", params);
-		checkServerError(doc);
+		checkServerFaultException(doc);
 		return respParser.parseVacation(doc);
 	}
 }

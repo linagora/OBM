@@ -17,6 +17,7 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
@@ -210,7 +211,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test(expected=ServerFault.class)
-	public void testCalendarOwnerNotAnAttendee() throws ServerFault, FindException {
+	public void testCalendarOwnerNotAnAttendee() throws ServerFault, FindException, EventAlreadyExistException {
 		String calendar = "cal1";
 		String domainName = "domain1";
 		String eventExtId = "extid";

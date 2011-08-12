@@ -411,7 +411,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public String createEvent(AccessToken token, String calendar, Event event, boolean notification)
-			throws ServerFault {
+			throws ServerFault, EventAlreadyExistException {
 
 		try {
 			if (event == null) {
@@ -450,7 +450,7 @@ public class CalendarBindingImpl implements ICalendar {
 				ev = createExternalEvent(token, calendar, event, notification);
 			}
 			return (String.valueOf(ev.getDatabaseId()));
-		} catch (Throwable e) {
+		} catch (FindException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}

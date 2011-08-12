@@ -25,6 +25,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
@@ -366,7 +367,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String createEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws ServerFault, SAXException, IOException, FactoryConfigurationError {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError, EventAlreadyExistException {
 		String ev = binding.createEvent(at,	getCalendar(at, params), getEvent(params), getNotificationOption(params));
 		return responder.sendString(ev);
 	}
