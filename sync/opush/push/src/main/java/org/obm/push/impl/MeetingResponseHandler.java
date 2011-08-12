@@ -74,27 +74,33 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			meetingRequest = meetingProtocol.getRequest(doc);
 			MeetingHandlerResponse meetingResponse = doTheJob(meetingRequest, bs);
 			for (Document document: meetingProtocol.encodeResponses(meetingResponse)) {
-				responder.sendResponse("MeetingResponse", document);
+				sendResponse(responder, document);
 			}
 			
 		} catch (NoDocumentException e) {
-			try {
-				responder.sendResponse("MeetingResponse", 
-						meetingProtocol.encodeErrorResponse(MeetingResponseStatus.INVALID_MEETING_RREQUEST) );
-			} catch (IOException e1) {
-				logger.error(e.getMessage(), e);
-			}
+			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST, e);
 		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
 		} catch (ServerFault e) {
-			logger.error(e.getMessage(), e);
+			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
 		} catch (CollectionNotFoundException e) {
-			logger.error(e.getMessage(), e);
+			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST, e);
 		}
 	}
 	
+	private void sendErrorResponse(Responder responder, MeetingResponseStatus status, Exception exception) {
+		logger.error(exception.getMessage(), exception);
+		sendResponse(responder, meetingProtocol.encodeErrorResponse(status));
+	}
+	
+	private void sendResponse(Responder responder, Document document) {
+		try {
+			responder.sendResponse("MeetingResponse", document);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}	
+	}
+
 	@Transactional(propagation=Propagation.NESTED)
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 
 			throws DaoException, ServerFault, CollectionNotFoundException {
