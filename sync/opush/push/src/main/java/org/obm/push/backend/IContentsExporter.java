@@ -13,7 +13,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
+import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.sync.auth.ServerFault;
 
 /**
@@ -40,7 +40,7 @@ public interface IContentsExporter {
 			Integer collectionId, Collection<String> uids) ;
 	
 	MSAttachementData getEmailAttachement(BackendSession bs,
-			String attachmentName) throws ObjectNotFoundException, CollectionNotFoundException, DaoException, IMAPException;
+			String attachmentName) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, IMAPException;
 
 	boolean validatePassword(String userID, String password);
 

@@ -20,7 +20,7 @@ import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
+import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.mail.MailBackend;
 import org.obm.sync.auth.ServerFault;
 import org.slf4j.Logger;
@@ -182,7 +182,7 @@ public class ContentsExporter implements IContentsExporter {
 
 	@Override
 	public MSAttachementData getEmailAttachement(BackendSession bs,
-			String attachmentId) throws ObjectNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
+			String attachmentId) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
 		return mailBackend.getAttachment(bs, attachmentId);
 	}
 

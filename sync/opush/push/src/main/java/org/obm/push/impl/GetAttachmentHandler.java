@@ -13,7 +13,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
+import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class GetAttachmentHandler implements IRequestHandler {
 		try {
 			MSAttachementData attachment = getAttachment(bs, AttachmentName);
 			responder.sendResponseFile(attachment.getContentType(),	attachment.getFile());
-		} catch (ObjectNotFoundException e) {
+		} catch (AttachementNotFoundException e) {
 			sendErrorResponse(responder, e);
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, e);
@@ -66,7 +66,7 @@ public class GetAttachmentHandler implements IRequestHandler {
 
 	@Transactional(propagation=Propagation.NESTED)
 	private MSAttachementData getAttachment(BackendSession bs,
-			String AttachmentName) throws ObjectNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
+			String AttachmentName) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
 		return contentsExporter.getEmailAttachement(bs, AttachmentName);
 	}
 }

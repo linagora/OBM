@@ -37,7 +37,7 @@ import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
+import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.impl.ObmSyncBackend;
@@ -465,7 +465,7 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	public MSAttachementData getAttachment(BackendSession bs, String attachmentId) 
-			throws ObjectNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
+			throws AttachementNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
 		
 		if (attachmentId != null && !attachmentId.isEmpty()) {
 			Map<String, String> parsedAttId = AttachmentHelper.parseAttachmentId(attachmentId);
@@ -521,7 +521,7 @@ public class MailBackend extends ObmSyncBackend {
 			}
 		}
 		
-		throw new ObjectNotFoundException();
+		throw new AttachementNotFoundException();
 	}
 
 	public void purgeFolder(BackendSession bs, String collectionPath,

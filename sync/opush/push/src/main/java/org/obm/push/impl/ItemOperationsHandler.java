@@ -24,7 +24,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnsupportedStoreException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
-import org.obm.push.exception.activesync.ObjectNotFoundException;
+import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
@@ -162,7 +162,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			} catch (Throwable e) {
 				fetchResult.setStatus(ItemOperationsStatus.MAILBOX_ITEM_FAILED_CONVERSATION);
 			}
-		} catch (ObjectNotFoundException e) {
+		} catch (AttachementNotFoundException e) {
 			fetchResult.setStatus(ItemOperationsStatus.MAILBOX_INVALID_ATTACHMENT_ID);
 		}
 
