@@ -67,4 +67,11 @@ public class MoveItemsProtocol {
 		return reply;
 	}
 	
+	public Document encodeErrorResponse(MoveItemsStatus moveItemsStatus) {
+		Document document = DOMUtils.createDoc(null, "Move");
+		Element root = document.getDocumentElement();
+		DOMUtils.createElementAndText(root, "Status", moveItemsStatus.asXmlValue());
+		return document;
+	}
+	
 }

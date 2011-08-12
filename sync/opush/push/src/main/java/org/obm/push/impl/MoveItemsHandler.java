@@ -75,13 +75,21 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			MoveItemsRequest moveItemsRequest = moveItemsProtocol.getRequest(doc);
 			MoveItemsResponse moveItemsResponse = doTheJob(moveItemsRequest, bs);
 			Document reply = moveItemsProtocol.encodeResponse(moveItemsResponse);
-			responder.sendResponse("Move", reply);
+			sendResponse(responder, reply);
 
 		} catch (NoDocumentException e) {
 			logger.error(e.getMessage(), e);
+			sendResponse(responder, 
+					moveItemsProtocol.encodeErrorResponse(MoveItemsStatus.SERVER_ERROR));
+		}
+	}
+	
+	private void sendResponse(Responder responder, Document doc) {
+		try {
+			responder.sendResponse("Move", doc);
 		} catch (IOException e) {
 			logger.error("Error creating sync response", e);
-		}
+		}	
 	}
 
 	@Transactional(propagation=Propagation.NESTED)
