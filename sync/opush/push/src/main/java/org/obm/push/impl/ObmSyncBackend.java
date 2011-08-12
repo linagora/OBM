@@ -13,7 +13,6 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
@@ -139,8 +138,7 @@ public class ObmSyncBackend {
 		return collectionDao.getCollectionMapping(device, collection);
 	}
 
-	public String getCollectionPathFor(Integer collectionId)
-			throws ActiveSyncException, DaoException {
+	public String getCollectionPathFor(Integer collectionId) throws CollectionNotFoundException, DaoException {
 		return collectionDao.getCollectionPath(collectionId);
 	}
 

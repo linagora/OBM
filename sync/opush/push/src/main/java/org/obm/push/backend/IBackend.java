@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.exception.activesync.ActiveSyncException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.exception.DaoException;
 
@@ -23,8 +23,7 @@ public interface IBackend {
 	 */
 	IListenerRegistration addChangeListener(ICollectionChangeListener ccl);
 
-	void startEmailMonitoring(BackendSession bs, Integer collectionId)
-			throws ActiveSyncException;
+	void startEmailMonitoring(BackendSession bs, Integer collectionId) throws CollectionNotFoundException;
 
 	void resetCollection(BackendSession bs, Integer collectionId) throws DaoException;
 

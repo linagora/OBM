@@ -12,6 +12,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.ActiveSyncException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
 
 /**
@@ -21,13 +22,13 @@ import org.obm.push.exception.activesync.ObjectNotFoundException;
 public interface IContentsExporter {
 
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws ActiveSyncException, DaoException;
+			throws DaoException, CollectionNotFoundException;
 
 	int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
 			throws ActiveSyncException, DaoException;
 
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchIds) throws ActiveSyncException, DaoException;
+			List<String> fetchIds) throws ObjectNotFoundException, CollectionNotFoundException, DaoException ;
 	
 	List<ItemChange> fetchEmails(BackendSession bs,
 			Integer collectionId, Collection<Long> uids) throws ActiveSyncException, DaoException;

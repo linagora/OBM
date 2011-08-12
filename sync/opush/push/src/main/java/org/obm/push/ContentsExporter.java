@@ -19,6 +19,7 @@ import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.ActiveSyncException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.mail.MailBackend;
 import org.slf4j.Logger;
@@ -98,23 +99,22 @@ public class ContentsExporter implements IContentsExporter {
 		}
 	}
 
-	private DataDelta getContactsChanges(BackendSession bs, SyncState state,
-			Integer collectionId) {
+	private DataDelta getContactsChanges(BackendSession bs, SyncState state, Integer collectionId) {
 		return contactsBackend.getContentChanges(bs, state, collectionId);
 	}
 
-	private DataDelta getTasksChanges(BackendSession bs, SyncState state,
-			Integer collectionId) throws ActiveSyncException, DaoException {
+	private DataDelta getTasksChanges(BackendSession bs, SyncState state, Integer collectionId) 
+			throws CollectionNotFoundException, DaoException  {
 		return this.calBackend.getContentChanges(bs, state, collectionId);
 	}
 
 	private DataDelta getCalendarChanges(BackendSession bs, SyncState state, Integer collectionId) 
-			throws ActiveSyncException, DaoException {
+			throws CollectionNotFoundException, DaoException {
 		return calBackend.getContentChanges(bs, state, collectionId);
 	}
 
 	private DataDelta getMailChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) 
-			throws ActiveSyncException, DaoException {
+			throws CollectionNotFoundException, DaoException {
 		return mailBackend.getContentChanges(bs, state, collectionId, filter);
 	}
 	
@@ -130,7 +130,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public DataDelta getChanged(BackendSession bs, SyncState state,
-			FilterType filter, Integer collectionId) throws ActiveSyncException, DaoException {
+			FilterType filter, Integer collectionId) throws DaoException, CollectionNotFoundException {
 		
 		DataDelta delta = null;
 		switch (state.getDataType()) {
@@ -160,7 +160,8 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchServerIds) throws ActiveSyncException, DaoException {
+			List<String> fetchServerIds) throws ObjectNotFoundException, CollectionNotFoundException, DaoException {
+		
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		switch (getDataType) {
 		case CONTACTS:

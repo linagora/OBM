@@ -8,7 +8,6 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -23,10 +22,10 @@ public interface IContentsImporter {
 
 	String importMessageChange(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
-			throws ActiveSyncException, DaoException;
+			throws CollectionNotFoundException, DaoException;
 
 	void importMessageDeletion(BackendSession bs, PIMDataType type,
-			Integer collectionId, String serverId, Boolean moveToTrash) throws ActiveSyncException, DaoException;
+			Integer collectionId, String serverId, Boolean moveToTrash) throws CollectionNotFoundException, DaoException;
 
 	String importMoveItem(BackendSession bs, PIMDataType type,
 			String srcFolder, String dstFolder, String messageId)

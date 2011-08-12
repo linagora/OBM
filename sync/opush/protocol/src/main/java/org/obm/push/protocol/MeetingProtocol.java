@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.MeetingResponse;
 import org.obm.push.bean.MeetingResponseStatus;
-import org.obm.push.exception.NoDocumentException;
+import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.protocol.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;

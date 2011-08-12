@@ -11,6 +11,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.ActiveSyncException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.IEmailManager;
 import org.obm.push.mail.MailBackend;
@@ -81,8 +82,8 @@ public class OBMBackend implements IBackend {
 		contactThread.start();
 	}
 
-	public void startEmailMonitoring(BackendSession bs, Integer collectionId)
-			throws ActiveSyncException {
+	@Override
+	public void startEmailMonitoring(BackendSession bs, Integer collectionId) throws CollectionNotFoundException {
 		EmailMonitoringThread emt = null;
 		synchronized (emailPushMonitors) {
 			emt = emailPushMonitors.get(collectionId);

@@ -12,7 +12,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -45,8 +44,8 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importMessageChange(BackendSession bs, Integer collectionId,
-			String serverId, String clientId, IApplicationData data)
-			throws ActiveSyncException, DaoException {
+			String serverId, String clientId, IApplicationData data) throws CollectionNotFoundException, DaoException {
+		
 		String id = null;
 		switch (data.getType()) {
 		case CONTACTS:
@@ -68,7 +67,8 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public void importMessageDeletion(BackendSession bs, PIMDataType type, 
-			Integer collectionId, String serverId, Boolean moveToTrash) throws ActiveSyncException, DaoException {
+			Integer collectionId, String serverId, Boolean moveToTrash) throws CollectionNotFoundException, DaoException {
+		
 		switch (type) {
 		case CALENDAR:
 			String eventUid = calBackend.getEventUidFromServerId(serverId);

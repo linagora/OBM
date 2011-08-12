@@ -31,11 +31,11 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
-import org.obm.push.exception.NoDocumentException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
@@ -128,8 +128,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
 		} catch (ObjectNotFoundException oe) {
 			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation);
-		} catch (ActiveSyncException e) {
-			logger.error(e.getMessage(), e);
 		} catch (ContinuationThrowable e) {
 			throw e;
 		} catch (NoDocumentException e) {
@@ -149,7 +147,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	@Transactional(propagation=Propagation.NESTED)
 	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync)
-			throws CollectionNotFoundException, ActiveSyncException, WaitIntervalOutOfRangeException, DaoException {
+			throws CollectionNotFoundException, WaitIntervalOutOfRangeException, DaoException {
 		
 		logger.info("suspend for {} seconds", sync.getWaitInSecond());
 		if (sync.getWaitInSecond() > 3540) {
@@ -180,8 +178,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		continuation.suspend(sync.getWaitInSecond() * 1000);
 	}
 
-	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds, SyncCollectionResponse syncCollectionResponse) 
-			throws ActiveSyncException, DaoException {
+	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds, 
+			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException {
 
 		DataDelta delta = null;
 		Date lastSync = null;
@@ -276,8 +274,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return changed;
 	}
 
-	private ModificationStatus processCollections(BackendSession bs, Sync sync)
-			throws ActiveSyncException, DaoException {
+	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException {
 		ModificationStatus modificationStatus = new ModificationStatus();
 
 		for (SyncCollection collection : sync.getCollections()) {
@@ -310,9 +307,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	/**
 	 * Handles modifications requested by mobile device
 	 * @return 
+	 * @throws CollectionNotFoundException 
 	 */
 	private Map<String, String> processModification(BackendSession bs,
-			SyncCollection collection) throws ActiveSyncException, DaoException {
+			SyncCollection collection) throws CollectionNotFoundException, DaoException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
 		
@@ -369,7 +367,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	@Transactional
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
-			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, ActiveSyncException {
+			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, ObjectNotFoundException {
 
 		final List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {

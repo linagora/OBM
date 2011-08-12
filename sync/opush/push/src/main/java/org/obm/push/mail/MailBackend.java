@@ -120,7 +120,8 @@ public class MailBackend extends ObmSyncBackend {
 		return buildPath(bs, "Trash");
 	}
 
-	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) throws ActiveSyncException, DaoException {
+	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) 
+			throws CollectionNotFoundException, DaoException {
 		String collectionPath = getCollectionPathFor(collectionId);
 		logger.info("Collection [ " + collectionPath + " ]");
 		List<ItemChange> changes = new LinkedList<ItemChange>();
@@ -161,9 +162,7 @@ public class MailBackend extends ObmSyncBackend {
 		return ic;
 	}
 	
-	public List<ItemChange> fetchItems(
-			BackendSession bs, List<String> fetchIds)
-			throws ActiveSyncException, DaoException {
+	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchIds) throws CollectionNotFoundException, DaoException {
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
 		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(fetchIds);
 		for (Entry<Integer, Collection<Long>> entry : emailUids.entrySet()) {
@@ -188,7 +187,9 @@ public class MailBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<Long> uids) throws ActiveSyncException, DaoException {
+	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<Long> uids) 
+			throws CollectionNotFoundException, DaoException {
+		
 		final Builder<ItemChange> ret = ImmutableList.builder();
 		final String collectionPath = getCollectionPathFor(collectionId);
 		try {
@@ -250,8 +251,8 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
-			String serverId, String clientId, MSEmail data)
-			throws ActiveSyncException, DaoException {
+			String serverId, String clientId, MSEmail data) throws CollectionNotFoundException, DaoException {
+		
 		String collectionPath = getCollectionPathFor(collectionId);
 		logger.info("createOrUpdate(" + bs.getLoginAtDomain() + ", "
 				+ collectionPath + ", " + serverId + ", " + clientId + ")");

@@ -142,7 +142,8 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) throws ActiveSyncException, DaoException {
+	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) 
+			throws CollectionNotFoundException, DaoException {
 		
 		final List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		final List<ItemChange> deletions = new LinkedList<ItemChange>();
@@ -243,7 +244,8 @@ public class CalendarBackend extends ObmSyncBackend {
 	}
 
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
-			String serverId, IApplicationData data) throws ActiveSyncException, DaoException {
+			String serverId, IApplicationData data) throws CollectionNotFoundException, DaoException {
+
 		String collectionPath = getCollectionPathFor(collectionId);
 		logger.info("createOrUpdate(" + bs.getLoginAtDomain() + ", "
 				+ collectionPath + ", " + serverId + ")");
@@ -314,7 +316,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		return null;
 	}
 
-	public void delete(BackendSession bs, Integer collectionId, String serverId) throws ActiveSyncException, DaoException {
+	public void delete(BackendSession bs, Integer collectionId, String serverId) throws CollectionNotFoundException, DaoException {
 		logger.info("delete serverId " + serverId);
 		String collectionPath = getCollectionPathFor(collectionId);
 		if (serverId != null) {

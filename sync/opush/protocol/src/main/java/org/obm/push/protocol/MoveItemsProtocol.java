@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
-import org.obm.push.exception.NoDocumentException;
+import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.protocol.bean.MoveItemsRequest;
 import org.obm.push.protocol.bean.MoveItemsResponse;
 import org.obm.push.protocol.bean.MoveItemsResponse.MoveItemsItem;

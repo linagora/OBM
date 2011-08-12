@@ -4,7 +4,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.exception.NoDocumentException;
+import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.utils.DOMUtils;
