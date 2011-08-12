@@ -1,7 +1,7 @@
-package org.obm.push.exception.activesync;
+package org.obm.push.exception;
 
 
-public class SendEmailException extends ActiveSyncException {
+public class SendEmailException extends Exception {
 
 	int smtpErrorCode = -1;
 

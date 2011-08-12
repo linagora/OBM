@@ -12,10 +12,10 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
+import org.obm.push.exception.SendEmailException;
+import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.SendEmailException;
 import org.obm.push.exception.activesync.ServerErrorException;
-import org.obm.push.exception.activesync.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 

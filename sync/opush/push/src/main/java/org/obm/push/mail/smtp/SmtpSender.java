@@ -10,9 +10,9 @@ import org.columba.ristretto.message.Address;
 import org.columba.ristretto.smtp.SMTPException;
 import org.columba.ristretto.smtp.SMTPProtocol;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.exception.activesync.SendEmailException;
-import org.obm.push.exception.activesync.SmtpInvalidRcptException;
-import org.obm.push.exception.activesync.SmtpServiceNotAvailableException;
+import org.obm.push.exception.SendEmailException;
+import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.SmtpServiceNotAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

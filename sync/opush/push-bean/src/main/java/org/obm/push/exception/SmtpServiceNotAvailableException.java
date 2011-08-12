@@ -1,4 +1,4 @@
-package org.obm.push.exception.activesync;
+package org.obm.push.exception;
 
 public class SmtpServiceNotAvailableException extends SendEmailException {
 	

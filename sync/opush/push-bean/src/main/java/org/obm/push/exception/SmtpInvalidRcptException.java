@@ -1,10 +1,10 @@
-package org.obm.push.exception.activesync;
+package org.obm.push.exception;
 
 import java.util.Map;
 import java.util.Map.Entry;
 
 
-public class SmtpInvalidRcptException extends ActiveSyncException {
+public class SmtpInvalidRcptException extends Exception {
 
 	private Map<String, Throwable> rcpt;
 	

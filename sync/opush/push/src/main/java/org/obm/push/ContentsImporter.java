@@ -12,12 +12,12 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.SendEmailException;
+import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.SendEmailException;
 import org.obm.push.exception.activesync.ServerErrorException;
-import org.obm.push.exception.activesync.SmtpInvalidRcptException;
 import org.obm.push.mail.MailBackend;
 
 import com.google.inject.Inject;
