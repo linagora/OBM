@@ -12,6 +12,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -23,21 +24,21 @@ import org.obm.sync.auth.ServerFault;
 public interface IContentsExporter {
 
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws DaoException, CollectionNotFoundException;
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
 
 	int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws DaoException, CollectionNotFoundException;
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
 
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchIds) throws CollectionNotFoundException, DaoException, ServerFault ;
+			List<String> fetchIds) throws CollectionNotFoundException, DaoException, ServerFault, UnknownObmSyncServerException ;
 	
 	List<ItemChange> fetchEmails(BackendSession bs,
 			Integer collectionId, Collection<Long> uids) throws DaoException, CollectionNotFoundException;
 	
-	List<ItemChange> fetchCalendars(BackendSession bs, Integer collectionId, Collection<String> uids) ;
+	List<ItemChange> fetchCalendars(BackendSession bs, Integer collectionId, Collection<String> uids) throws UnknownObmSyncServerException ;
 
-	List<ItemChange> fetchCalendarDeletedItems(BackendSession bs,
-			Integer collectionId, Collection<String> uids) ;
+	List<ItemChange> fetchCalendarDeletedItems(BackendSession bs,Integer collectionId, Collection<String> uids) 
+			throws UnknownObmSyncServerException ;
 	
 	MSAttachementData getEmailAttachement(BackendSession bs,
 			String attachmentName) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, IMAPException;

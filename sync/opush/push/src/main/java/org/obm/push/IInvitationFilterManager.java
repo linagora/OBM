@@ -6,10 +6,13 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 
 public interface IInvitationFilterManager {
 
-	DataDelta filterEvent(BackendSession bs, SyncState state, Integer eventCollectionId, DataDelta delta) throws DaoException;
+	DataDelta filterEvent(BackendSession bs, SyncState state, Integer eventCollectionId, DataDelta delta) 
+			throws DaoException, UnknownObmSyncServerException;
+	
 	void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) throws DaoException;
 	void handleMeetingResponse(BackendSession bs, Integer invitationCollexctionId, MSEmail invitation) throws DaoException;
 	int getCountFilterChanges(BackendSession bs, String syncKey, PIMDataType dataType, Integer collectionId) throws DaoException;

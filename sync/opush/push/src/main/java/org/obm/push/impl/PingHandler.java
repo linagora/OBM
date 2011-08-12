@@ -14,6 +14,7 @@ import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderSyncRequiredException;
 import org.obm.push.exception.MissingRequestParameterException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
@@ -62,14 +63,11 @@ public class PingHandler extends WbxmlRequestHandler implements
 			doTheJob(continuation, bs, pingRequest);
 
 		} catch (MissingRequestParameterException e) {
-			logger.error("Don't know what to monitor", e);
-			sendError(responder, PingStatus.MISSING_REQUEST_PARAMS);
+			sendError(responder, PingStatus.MISSING_REQUEST_PARAMS, "Don't know what to monitor");
 		} catch (CollectionNotFoundException e) {
-			logger.error("unable to start monitoring, collection not found", e);
-			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED);
+			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED, "unable to start monitoring, collection not found");
 		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
-			sendError(responder, PingStatus.SERVER_ERROR);
+			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
 		}
 	}
 
@@ -129,11 +127,13 @@ public class PingHandler extends WbxmlRequestHandler implements
 			Document document = protocol.encodeResponse(response);
 			sendResponse(responder, document);
 		} catch (FolderSyncRequiredException e) {
-			logger.error("unable to start monitoring, collection not found", e);
-			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED);
+			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED, "unable to start monitoring, collection not found");
 		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
-			sendError(responder, PingStatus.SERVER_ERROR);
+			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
+		} catch (CollectionNotFoundException e) {
+			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
+		} catch (UnknownObmSyncServerException e) {
+			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
 		} 
 	}
 
@@ -146,7 +146,9 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	@Transactional
-	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) throws FolderSyncRequiredException, DaoException {
+	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) 
+			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+		
 		if (sendHierarchyChange) {
 			throw new FolderSyncRequiredException();
 		}
@@ -165,7 +167,8 @@ public class PingHandler extends WbxmlRequestHandler implements
 		sendResponse(responder, document);
 	}
 
-	private void sendError(Responder responder, PingStatus serverError) {
+	private void sendError(Responder responder, PingStatus serverError, String errorMessage) {
+		logger.error(errorMessage);
 		sendError(responder, serverError.asXmlValue(), null);
 	}
 	

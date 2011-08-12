@@ -16,6 +16,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
@@ -68,6 +69,8 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION, e.getCollectionId()), e);
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
+		} catch (UnknownObmSyncServerException e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -85,7 +88,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	@Transactional(propagation=Propagation.NESTED)
-	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, CollectionNotFoundException {
+	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		for (SyncCollection syncCollection: request.getSyncCollections()) {

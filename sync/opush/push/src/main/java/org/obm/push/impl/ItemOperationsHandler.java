@@ -21,6 +21,7 @@ import org.obm.push.bean.StoreName;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.UnsupportedStoreException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
@@ -197,6 +198,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_CONNECTION_FAILED);
 		} catch (DaoException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
+		} catch (UnknownObmSyncServerException e) {
+			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_CONNECTION_FAILED);
 		}
 		return fetchResult;
 	}

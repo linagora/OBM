@@ -555,7 +555,7 @@ public class EventConverter implements ObmSyncCalendarConverter{
 		}
 	}
 	
-	public static Boolean isInternalEvent(Event event, Boolean defaultValue){
+	public static boolean isInternalEvent(Event event, boolean defaultValue){
 		return event != null ? event.isInternalEvent() : defaultValue;
 	}
 }

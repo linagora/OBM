@@ -14,6 +14,7 @@ import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -44,7 +45,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importMessageChange(BackendSession bs, Integer collectionId,
-			String serverId, String clientId, IApplicationData data) throws CollectionNotFoundException, DaoException {
+			String serverId, String clientId, IApplicationData data) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
 		String id = null;
 		switch (data.getType()) {
@@ -66,8 +67,8 @@ public class ContentsImporter implements IContentsImporter {
 	}
 
 	@Override
-	public void importMessageDeletion(BackendSession bs, PIMDataType type, 
-			Integer collectionId, String serverId, Boolean moveToTrash) throws CollectionNotFoundException, DaoException {
+	public void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
+					throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
 		switch (type) {
 		case CALENDAR:
@@ -124,7 +125,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importCalendarUserStatus(BackendSession bs,  Integer invitationCollexctionId, MSEmail invitation,
-			AttendeeStatus userResponse) throws DaoException {
+			AttendeeStatus userResponse) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
 		String ret = calBackend.handleMeetingResponse(bs, invitation, userResponse);
 		invitationFilterManager.handleMeetingResponse(bs, invitationCollexctionId, invitation);
 		return ret;

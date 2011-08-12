@@ -7,6 +7,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 
 public interface IBackend {
 
@@ -29,7 +30,7 @@ public interface IBackend {
 
 	boolean validatePassword(String userID, String password);
 
-	Set<SyncCollection> getChangesSyncCollections(
-			CollectionChangeListener collectionChangeListener) throws DaoException;
+	Set<SyncCollection> getChangesSyncCollections(CollectionChangeListener collectionChangeListener) 
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
 	
 }

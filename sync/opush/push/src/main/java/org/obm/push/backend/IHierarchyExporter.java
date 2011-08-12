@@ -6,6 +6,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 
 /**
@@ -22,7 +23,7 @@ public interface IHierarchyExporter {
 
 	String getRootFolderUrl(BackendSession bs);
 
-	List<ItemChange> getChanged(BackendSession bs) throws DaoException;
+	List<ItemChange> getChanged(BackendSession bs) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
 
 	int getRootFolderId(BackendSession bs) throws DaoException, CollectionNotFoundException;
 

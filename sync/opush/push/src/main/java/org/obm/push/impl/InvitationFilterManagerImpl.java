@@ -16,6 +16,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.store.FiltrageInvitationDao;
@@ -57,9 +58,10 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public DataDelta filterEvent(final BackendSession bs, final SyncState state, final Integer eventCollectionId, final DataDelta delta) throws DaoException {
-		final String syncKey = state.getKey();
+	public DataDelta filterEvent(final BackendSession bs, final SyncState state, final Integer eventCollectionId, final DataDelta delta) 
+			throws DaoException, UnknownObmSyncServerException {
 		
+		final String syncKey = state.getKey();
 		final List<ItemChange> toSynced = mergeChangesAndToSyncedEvent(bs, eventCollectionId, syncKey, delta.getChanges());
 		processFilterEvent(eventCollectionId, syncKey, toSynced);
 

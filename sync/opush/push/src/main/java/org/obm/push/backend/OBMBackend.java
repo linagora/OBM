@@ -11,6 +11,7 @@ import org.minig.imap.IMAPException;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.IEmailManager;
@@ -157,7 +158,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Set<SyncCollection> getChangesSyncCollections(
-			CollectionChangeListener collectionChangeListener) throws DaoException {
+			CollectionChangeListener collectionChangeListener) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
 		
 		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();
 		final BackendSession backendSession = collectionChangeListener.getSession();
@@ -173,20 +174,10 @@ public class OBMBackend implements IBackend {
 		return syncCollectionsChanged;
 	}
 	
-	private int getCount(BackendSession backendSession,
-			SyncCollection syncCollection) throws DaoException {
-		
-		try {
-			
-			return contentsExporter.getCount(backendSession,
-					syncCollection.getSyncState(),
-					syncCollection.getOptions().getFilterType(),
-					syncCollection.getCollectionId());
-		} catch (CollectionNotFoundException e) {
-			logger.error(e.getMessage(), e);
-		}
-		
-		return 0;
+	private int getCount(BackendSession backendSession, SyncCollection syncCollection) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+		return contentsExporter.getCount(backendSession, syncCollection
+				.getSyncState(), syncCollection.getOptions().getFilterType(),
+				syncCollection.getCollectionId());
 	}
 	
 }

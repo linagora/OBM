@@ -16,6 +16,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.protocol.FolderSyncProtocol;
@@ -67,6 +68,8 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
 		} catch (DaoException e) {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
+		} catch (UnknownObmSyncServerException e) {
+			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
 		}
 	}
 
@@ -85,7 +88,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	
 	@Transactional(propagation=Propagation.NESTED)
 	private FolderSyncResponse doTheJob(BackendSession bs, FolderSyncRequest folderSyncRequest) throws
-			InvalidSyncKeyException, CollectionNotFoundException, DaoException {
+			InvalidSyncKeyException, CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
 		// FIXME we know that we do not monitor hierarchy, so just respond
 		// that nothing changed

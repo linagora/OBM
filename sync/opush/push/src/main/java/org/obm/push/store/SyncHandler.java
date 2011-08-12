@@ -32,6 +32,7 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
@@ -135,6 +136,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendResponse(responder, syncProtocol.encodeResponse());
 		} catch (DaoException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
+		} catch (UnknownObmSyncServerException e) {
+			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
 
@@ -180,7 +183,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds, 
-			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException {
+			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
 
 		DataDelta delta = null;
 		Date lastSync = null;
@@ -275,7 +278,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return changed;
 	}
 
-	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException {
+	private ModificationStatus processCollections(BackendSession bs, Sync sync) 
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
+		
 		ModificationStatus modificationStatus = new ModificationStatus();
 
 		for (SyncCollection collection : sync.getCollections()) {
@@ -309,9 +314,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	 * Handles modifications requested by mobile device
 	 * @return 
 	 * @throws CollectionNotFoundException 
+	 * @throws UnknownObmSyncServerException 
 	 */
 	private Map<String, String> processModification(BackendSession bs,
-			SyncCollection collection) throws CollectionNotFoundException, DaoException {
+			SyncCollection collection) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
 		
@@ -363,13 +369,15 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation, e);
 		} catch (ServerFault e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
+		} catch (UnknownObmSyncServerException e) {
+			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
 
 	@Transactional
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, 
-			CollectionNotFoundException, ServerFault {
+			CollectionNotFoundException, ServerFault, UnknownObmSyncServerException {
 
 		final List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {

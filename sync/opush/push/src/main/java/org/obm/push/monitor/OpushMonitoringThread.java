@@ -9,6 +9,7 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.impl.PushNotification;
 import org.slf4j.Logger;
@@ -54,6 +55,8 @@ public class OpushMonitoringThread {
 				} catch (CollectionNotFoundException e) {
 					logger.error(e.getMessage(), e);
 				} catch (DaoException e) {
+					logger.error(e.getMessage(), e);
+				} catch (UnknownObmSyncServerException e) {
 					logger.error(e.getMessage(), e);
 				}
 			}
