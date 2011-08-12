@@ -8,10 +8,13 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
+import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.GetItemEstimateStatus;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
@@ -20,10 +23,6 @@ import org.obm.push.protocol.bean.GetItemEstimateResponse.Estimate;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.GetItemEstimateStatus;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncState;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.w3c.dom.Document;
@@ -72,7 +71,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	@Transactional(propagation=Propagation.NESTED)
-	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, ActiveSyncException, DaoException {
+	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, CollectionNotFoundException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		for (SyncCollection syncCollection: request.getSyncCollections()) {

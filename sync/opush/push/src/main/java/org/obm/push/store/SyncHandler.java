@@ -33,7 +33,6 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
@@ -358,9 +357,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			responder.sendResponse("AirSync", syncProtocol.endcodeResponse(syncResponse));
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
-		} catch (ActiveSyncException e) {
-			logger.error(e.getMessage(), e);
 		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (CollectionNotFoundException e) {
+			logger.error(e.getMessage(), e);
+		} catch (ObjectNotFoundException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}

@@ -19,8 +19,9 @@ import org.obm.push.bean.MeetingResponse;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
+import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
@@ -85,15 +86,19 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			}
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
-		} catch (ActiveSyncException e) {
-			logger.error(e.getMessage(), e);
 		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (ObjectNotFoundException e) {
+			logger.error(e.getMessage(), e);
+		} catch (CollectionNotFoundException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 	
 	@Transactional(propagation=Propagation.NESTED)
-	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) throws ActiveSyncException, DaoException {
+	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 
+			throws DaoException, ObjectNotFoundException, CollectionNotFoundException {
+		
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
 			
@@ -123,7 +128,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 	
 	private ItemChange retrieveMailWithMeetingRequest(BackendSession bs, MeetingResponse item)
-		throws ActiveSyncException, DaoException {
+		throws DaoException, ObjectNotFoundException, CollectionNotFoundException {
 		
 		List<ItemChange> lit = contentsExporter.fetch(bs, PIMDataType.EMAIL, Arrays.asList(item.getReqId()));
 		if (lit.size() > 0) {

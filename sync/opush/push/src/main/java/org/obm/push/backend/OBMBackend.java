@@ -10,7 +10,6 @@ import java.util.Set;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.IEmailManager;
@@ -180,7 +179,7 @@ public class OBMBackend implements IBackend {
 					syncCollection.getSyncState(),
 					syncCollection.getOptions().getFilterType(),
 					syncCollection.getCollectionId());
-		} catch (ActiveSyncException e) {
+		} catch (CollectionNotFoundException e) {
 			logger.error(e.getMessage(), e);
 		}
 		

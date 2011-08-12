@@ -14,7 +14,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
@@ -47,7 +47,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
 			serverId = getServerIdFor(collectionId);
-		} catch (ActiveSyncException e) {
+		} catch (CollectionNotFoundException e) {
 			serverId = createCollectionMapping(bs.getDevice(), col);
 			ic.setIsNew(true);
 		}

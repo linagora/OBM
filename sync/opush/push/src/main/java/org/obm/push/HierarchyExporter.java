@@ -12,7 +12,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.MailBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +81,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 
 	@Override
-	public int getRootFolderId(BackendSession bs) throws ActiveSyncException, DaoException {
+	public int getRootFolderId(BackendSession bs) throws DaoException, CollectionNotFoundException {
 		return folderExporter.getServerIdFor(bs);
 	}
 

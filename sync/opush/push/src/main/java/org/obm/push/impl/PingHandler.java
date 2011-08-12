@@ -22,7 +22,6 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
@@ -76,7 +75,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 
 	@Transactional(propagation=Propagation.NESTED)
 	private void doTheJob(IContinuation continuation, BackendSession bs, PingRequest pingRequest) 
-			throws MissingRequestParameterException, ActiveSyncException, DaoException {
+			throws MissingRequestParameterException, DaoException, CollectionNotFoundException {
 		
 		if (pingRequest.getHeartbeatInterval() == null) {
 			Long heartbeatInterval = hearbeatDao.findLastHearbeat(bs.getDevice());

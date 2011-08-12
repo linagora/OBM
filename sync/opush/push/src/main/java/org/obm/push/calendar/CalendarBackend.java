@@ -20,7 +20,6 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
@@ -110,7 +109,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
 			serverId = getServerIdFor(collectionId);
-		} catch (ActiveSyncException e) {
+		} catch (CollectionNotFoundException e) {
 			serverId = createCollectionMapping(bs.getDevice(), col);
 			ic.setIsNew(true);
 		}
@@ -130,7 +129,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
 			serverId = getServerIdFor(collectionId);
-		} catch (ActiveSyncException e) {
+		} catch (CollectionNotFoundException e) {
 			serverId = createCollectionMapping(bs.getDevice(), col);
 			ic.setIsNew(true);
 		}
@@ -396,7 +395,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	private String updateUserStatus(BackendSession bs, MSEvent msEvent,
 			AttendeeStatus status, AbstractEventSyncClient calCli,
 			AccessToken at) throws ServerFault,
-			CollectionNotFoundException, ActiveSyncException, DaoException {
+			CollectionNotFoundException, DaoException {
 		logger.info("update user status[" + status.toString()
 					+ "] in calendar " + bs.getLoginAtDomain());
 		ParticipationState participationStatus = EventConverter.status(null, status);

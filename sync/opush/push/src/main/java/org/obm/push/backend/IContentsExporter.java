@@ -11,7 +11,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
 
@@ -25,19 +24,18 @@ public interface IContentsExporter {
 			throws DaoException, CollectionNotFoundException;
 
 	int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws ActiveSyncException, DaoException;
+			throws DaoException, CollectionNotFoundException;
 
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
 			List<String> fetchIds) throws ObjectNotFoundException, CollectionNotFoundException, DaoException ;
 	
 	List<ItemChange> fetchEmails(BackendSession bs,
-			Integer collectionId, Collection<Long> uids) throws ActiveSyncException, DaoException;
+			Integer collectionId, Collection<Long> uids) throws DaoException, CollectionNotFoundException;
 	
-	List<ItemChange> fetchCalendars(BackendSession bs,
-			Integer collectionId, Collection<String> uids) throws ActiveSyncException;
+	List<ItemChange> fetchCalendars(BackendSession bs, Integer collectionId, Collection<String> uids) ;
 
 	List<ItemChange> fetchCalendarDeletedItems(BackendSession bs,
-			Integer collectionId, Collection<String> uids) throws ActiveSyncException;
+			Integer collectionId, Collection<String> uids) ;
 	
 	MSAttachementData getEmailAttachement(BackendSession bs,
 			String attachmentName) throws ObjectNotFoundException;

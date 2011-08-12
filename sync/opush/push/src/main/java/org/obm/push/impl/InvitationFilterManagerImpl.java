@@ -16,7 +16,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.store.FiltrageInvitationDao;
@@ -165,7 +164,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 			delta.getChanges().addAll(syncedItem.values());
 		
 			logger.info(emailUidToDeleted.size() + " email(s) will be deleted on the PDA");
-		} catch (ActiveSyncException e) {
+		} catch (CollectionNotFoundException e) {
 			logger.info(e.getMessage(), e);
 		}
 	}
@@ -203,7 +202,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	private List<ItemChange> mergeChangesAndToSyncedEmail(BackendSession bs, SyncState state, Integer emailCollectionId, 
-			List<ItemChange> changes) throws ActiveSyncException, DaoException {
+			List<ItemChange> changes) throws DaoException, CollectionNotFoundException {
 		final List<ItemChange> its = Lists.newArrayList(changes.iterator());
 		final List<Long> emailToSync = filtrageInvitationDao.getEmailToSynced(emailCollectionId, state.getKey());
 		for (final ItemChange ic : changes) {

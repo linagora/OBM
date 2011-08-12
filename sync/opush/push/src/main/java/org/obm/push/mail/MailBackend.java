@@ -33,7 +33,6 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
@@ -98,7 +97,7 @@ public class MailBackend extends ObmSyncBackend {
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), s);
 			serverId = getServerIdFor(collectionId);
-		} catch (ActiveSyncException e) {
+		} catch (CollectionNotFoundException e) {
 			serverId = createCollectionMapping(bs.getDevice(), sb.toString());
 			ic.setIsNew(true);
 		}
@@ -444,8 +443,9 @@ public class MailBackend extends ObmSyncBackend {
 		return new Address(from);
 	}
 
-	public MSEmail getEmail(BackendSession bs, Integer collectionId,
-			String serverId) throws ActiveSyncException, DaoException {
+	public MSEmail getEmail(BackendSession bs, Integer collectionId, String serverId) 
+			throws DaoException, CollectionNotFoundException {
+		
 		String collectionName = getCollectionPathFor(collectionId);
 		Long uid = getEmailUidFromServerId(serverId);
 		Set<Long> uids = new HashSet<Long>();

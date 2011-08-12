@@ -18,7 +18,6 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ActiveSyncException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ObjectNotFoundException;
 import org.obm.push.mail.MailBackend;
@@ -119,9 +118,8 @@ public class ContentsExporter implements IContentsExporter {
 	}
 	
 	@Override
-	public int getCount(BackendSession bs, SyncState state,
-			FilterType filterType, Integer collectionId)
-			throws ActiveSyncException, DaoException {
+	public int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId)
+			throws DaoException, CollectionNotFoundException {
 		
 		DataDelta dd = getChanged(bs, state, filterType, collectionId);
 		Integer filterCount = invitationFilterManager.getCountFilterChanges(bs, state.getKey(), state.getDataType(), collectionId);
@@ -192,23 +190,18 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public List<ItemChange> fetchCalendars(BackendSession bs,
-			Integer collectionId, Collection<String> uids)
-			throws ActiveSyncException {
+	public List<ItemChange> fetchCalendars(BackendSession bs, Integer collectionId, Collection<String> uids) {
 		return calBackend.fetchItems(bs, collectionId, uids);
 	}
-
 	
 	@Override
-	public List<ItemChange> fetchEmails(BackendSession bs,
-			Integer collectionId, Collection<Long> uids)
-			throws ActiveSyncException, DaoException {
+	public List<ItemChange> fetchEmails(BackendSession bs, Integer collectionId, Collection<Long> uids) 
+			throws DaoException, CollectionNotFoundException {
 		return mailBackend.fetchItems(bs, collectionId, uids);
 	}
 
 	@Override
-	public List<ItemChange> fetchCalendarDeletedItems(BackendSession bs,
-			Integer collectionId, Collection<String> uids) throws ActiveSyncException {
+	public List<ItemChange> fetchCalendarDeletedItems(BackendSession bs, Integer collectionId, Collection<String> uids) {
 		return calBackend.fetchDeletedItems(bs, collectionId, uids);
 	}
 
