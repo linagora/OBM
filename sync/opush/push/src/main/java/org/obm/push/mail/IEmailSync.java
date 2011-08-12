@@ -4,11 +4,11 @@ import org.minig.imap.StoreClient;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncState;
-import org.obm.push.exception.activesync.ServerErrorException;
+import org.obm.push.exception.DaoException;
 
 public interface IEmailSync {
 
 	MailChanges getSync(StoreClient imapStore, Integer devId,
-			BackendSession bs, SyncState state, Integer collectionId, FilterType filter)
-			throws ServerErrorException;
+			BackendSession bs, SyncState state, Integer collectionId, FilterType filter) throws DaoException;
+
 }

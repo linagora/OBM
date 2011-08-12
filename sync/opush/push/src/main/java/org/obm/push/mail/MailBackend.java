@@ -41,6 +41,7 @@ import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerErrorException;
+import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FiltrageInvitationDao;
@@ -138,8 +139,7 @@ public class MailBackend extends ObmSyncBackend {
 			changes = getChanges(bs, collectionId, collectionPath, mc.getUpdated());
 			deletions.addAll(getDeletions(collectionId, mc.getRemoved()));
 			lastSync = mc.getLastSync();
-			
-		} catch (ServerErrorException e) {
+		} catch (IMAPException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return new DataDelta(changes, deletions, lastSync);
@@ -153,8 +153,6 @@ public class MailBackend extends ObmSyncBackend {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
 		} catch (IMAPException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return itch.build();
@@ -206,8 +204,6 @@ public class MailBackend extends ObmSyncBackend {
 				ret.add(ic);
 			}
 		} catch (IMAPException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return ret.build();
@@ -371,8 +367,6 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
-		} catch (IOException e) {
-			throw new ProcessingEmailException(e);
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
 		} catch (ServerFault e) {
@@ -416,8 +410,6 @@ public class MailBackend extends ObmSyncBackend {
 		} catch (CollectionNotFoundException e) {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
-			throw new ProcessingEmailException(e);
-		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
@@ -467,6 +459,8 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
+		} catch (StoreEmailException e) {
+			throw new ProcessingEmailException(e);
 		} catch (Exception e) {
 			throw new ProcessingEmailException(e);
 		} finally {
@@ -492,14 +486,11 @@ public class MailBackend extends ObmSyncBackend {
 		uids.add(uid);
 		List<MSEmail> emails;
 		try {
-			emails = emailManager.fetchMails(bs, getCalendarClient(bs),
-					collectionId, collectionName, uids);
+			emails = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collectionName, uids);
 			if (emails.size() > 0) {
 				return emails.get(0);
 			}
 		} catch (IMAPException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return null;

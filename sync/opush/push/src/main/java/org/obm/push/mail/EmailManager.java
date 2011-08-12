@@ -47,7 +47,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.store.EmailDao;
@@ -121,19 +120,15 @@ public class EmailManager implements IEmailManager {
 	}	
 
 	@Override
-	public MailChanges getSync(BackendSession bs, SyncState state,
-			Integer devId, Integer collectionId, String collectionName,
-			FilterType filter) throws ServerErrorException {
+	public MailChanges getSync(BackendSession bs, SyncState state, Integer devId, Integer collectionId, 
+			String collectionName, FilterType filter) throws IMAPException, DaoException {
 		
 		final StoreClient store = getImapClient(bs);
 		try {
 			login(store);
 			String mailBox = parseMailBoxName(store, collectionName);
 			store.select(mailBox);
-			return emailSyncCache.getSync(store, devId, bs, state,
-					collectionId, filter);
-		} catch (Throwable e) {
-			throw new ServerErrorException(e);
+			return emailSyncCache.getSync(store, devId, bs, state, collectionId, filter);
 		} finally {
 			store.logout();
 		}
@@ -141,7 +136,8 @@ public class EmailManager implements IEmailManager {
 
 	@Override
 	public List<MSEmail> fetchMails(BackendSession bs, AbstractEventSyncClient calendarClient, Integer collectionId, 
-			String collectionName, Collection<Long> uids) throws IOException, IMAPException {
+			String collectionName, Collection<Long> uids) throws IMAPException {
+		
 		final List<MSEmail> mails = new LinkedList<MSEmail>();
 		final StoreClient store = getImapClient(bs);
 		try {
@@ -155,26 +151,18 @@ public class EmailManager implements IEmailManager {
 					mails.add(email);
 				}
 			}
-			
 		} finally {
 			store.logout();
 		}
 		return mails;
 	}
 
-	private ListResult listAllFolder(StoreClient store) throws IMAPException {
-		try {
-			return store.listAll();
-		} catch (Throwable e) {
-			logger.error("Can't read list of folder.", e);
-			throw new IMAPException("Can't read list of folder");
-		}
-
+	private ListResult listAllFolder(StoreClient store) {
+		return store.listAll();
 	}
 
 	@Override
-	public void updateReadFlag(BackendSession bs, String collectionName,
-			Long uid, boolean read) throws IMAPException {
+	public void updateReadFlag(BackendSession bs, String collectionName, Long uid, boolean read) throws IMAPException {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
@@ -191,8 +179,7 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public String parseMailBoxName(BackendSession bs, String collectionName)
-			throws IMAPException {
+	public String parseMailBoxName(BackendSession bs, String collectionName) throws IMAPException {
 		// parse obm:\\adrien@test.tlse.lng\email\INBOX\Sent
 		StoreClient store = getImapClient(bs);
 		try {
@@ -220,8 +207,9 @@ public class EmailManager implements IEmailManager {
 	}
 	 
 	@Override
-	public void delete(BackendSession bs, Integer devId, String collectionPath,
-			Integer collectionId, Long uid) throws IMAPException {
+	public void delete(BackendSession bs, Integer devId, String collectionPath, Integer collectionId, Long uid) 
+			throws IMAPException, DaoException {
+		
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
@@ -229,7 +217,7 @@ public class EmailManager implements IEmailManager {
 			store.select(mailBoxName);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
-			logger.info("delete conv id : " + uid);
+			logger.info("delete conv id = ", uid);
 			store.uidStore(Arrays.asList(uid), fl, true);
 			store.expunge();
 			deleteMessageInCache(devId, collectionId, Arrays.asList(uid));
@@ -239,9 +227,9 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public Long moveItem(BackendSession bs, Integer devId, String srcFolder,
-			Integer srcFolderId, String dstFolder, Integer dstFolderId, Long uid)
-			throws IMAPException {
+	public Long moveItem(BackendSession bs, Integer devId, String srcFolder, Integer srcFolderId, String dstFolder, Integer dstFolderId, 
+			Long uid) throws IMAPException, DaoException {
+		
 		StoreClient store = getImapClient(bs);
 		Collection<Long> newUid = null;
 		try {
@@ -253,7 +241,7 @@ public class EmailManager implements IEmailManager {
 			newUid = store.uidCopy(uids, dstMailBox);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
-			logger.info("delete conv id : " + uid);
+			logger.info("delete conv id = ", uid);
 			store.uidStore(uids, fl, true);
 			store.expunge();
 			deleteMessageInCache(devId, srcFolderId, Arrays.asList(uid));
@@ -268,9 +256,9 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public List<InputStream> fetchMIMEMails(BackendSession bs,
-			AbstractEventSyncClient calendarClient, String collectionName, Set<Long> uids)
-			throws IOException, IMAPException {
+	public List<InputStream> fetchMIMEMails(BackendSession bs, AbstractEventSyncClient calendarClient, String collectionName, 
+			Set<Long> uids) throws IMAPException {
+		
 		List<InputStream> mails = new LinkedList<InputStream>();
 		StoreClient store = getImapClient(bs);
 		try {
@@ -292,8 +280,7 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public void setAnsweredFlag(BackendSession bs, String collectionName,
-			Long uid) throws IMAPException {
+	public void setAnsweredFlag(BackendSession bs, String collectionName, Long uid) throws IMAPException {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
@@ -302,44 +289,35 @@ public class EmailManager implements IEmailManager {
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.ANSWERED);
 			store.uidStore(Arrays.asList(uid), fl, true);
-			logger.info("flag  change: "
-					+ ("+ ANSWERED" + " on mail " + uid + " in " + mailBoxName));
+			logger.info("flag  change : ANSWERED on mail {} in {}", new Object[]{uid, mailBoxName});
 		} finally {
 			store.logout();
 		}
 	}
 
 	@Override
-	public void sendEmail(BackendSession bs, Address from, Set<Address> setTo,
-			Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
-			Boolean saveInSent) throws ProcessingEmailException, SendEmailException, SmtpInvalidRcptException {
+	public void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
+			Boolean saveInSent) throws ProcessingEmailException, SendEmailException, SmtpInvalidRcptException, StoreEmailException {
+		
 		SmtpInvalidRcptException invalidRctp = null;
 		InputStream streamMail = new BufferedInputStream(mimeMail);
 		try {
-			try{
-				streamMail.mark(streamMail.available());
-			} catch (IOException e) {
-				throw new ProcessingEmailException();
-			} 
-			
+			streamMail.mark(streamMail.available());
 			try {
 				smtpProvider.sendEmail(bs, from, setTo, setCc, setCci, streamMail);
 			} catch (SmtpInvalidRcptException e1) {
 				invalidRctp = e1;
 			}
-			
 			if (saveInSent) {
-				try {
-					streamMail.reset();
-					storeInSent(bs, streamMail);
-				} catch (Throwable e) {
-					logger.error("Error during store mail in Sent folder", e);
-				}
+				streamMail.reset();
+				storeInSent(bs, streamMail);
 			}
+		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
 		} finally {
 			closeStream(streamMail);
 		}
-		if(invalidRctp != null){
+		if (invalidRctp != null) {
 			throw invalidRctp;
 		}
 	}	
@@ -355,9 +333,7 @@ public class EmailManager implements IEmailManager {
 	}
 	
 	@Override
-	public InputStream findAttachment(BackendSession bs, String collectionName,
-			Long mailUid, String mimePartAddress) throws IMAPException {
-
+	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, String mimePartAddress) throws IMAPException {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
@@ -370,16 +346,14 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public void purgeFolder(BackendSession bs, Integer devId,
-			String collectionPath, Integer collectionId) throws IMAPException {
+	public void purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) throws IMAPException, DaoException {
 		long time = System.currentTimeMillis();
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
 			String mailBoxName = parseMailBoxName(store, collectionPath);
 			store.select(mailBoxName);
-			logger.info("Mailbox folder[" + collectionPath
-					+ "] will be purged...");
+			logger.info("Mailbox folder[ {} ] will be purged...", collectionPath);
 			Collection<Long> uids = store.uidSearch(new SearchQuery());
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
@@ -387,26 +361,22 @@ public class EmailManager implements IEmailManager {
 			store.expunge();
 			deleteMessageInCache(devId, collectionId, uids);
 			time = System.currentTimeMillis() - time;
-			logger.info("Mailbox folder[" + collectionPath + "] was purged in "
-					+ time + " millisec. " + uids.size()
-					+ " messages have been deleted");
+			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
+					new Object[]{collectionPath, time, uids.size()});
 		} finally {
 			store.logout();
 		}
-
 	}
 
 	@Override
-	public Long storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead)
-			throws StoreEmailException {
+	public Long storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws StoreEmailException {
 		logger.info("Store mail in folder[Inbox]");
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
 			return storeMail(store, EmailConfiguration.IMAP_INBOX_NAME, isRead, mailContent, false);
-		} catch (Throwable e) {
-			throw new StoreEmailException(
-					"Error during store mail in Inbox folder", e);
+		} catch (IMAPException e) {
+			throw new StoreEmailException("Error during store mail in Inbox folder", e);
 		} finally {
 			store.logout();
 		}
@@ -423,8 +393,7 @@ public class EmailManager implements IEmailManager {
 	 * @return the imap uid of the mail
 	 * @throws StoreEmailException
 	 */
-	private long storeInSent(BackendSession bs, InputStream mail)
-			throws StoreEmailException {
+	private long storeInSent(BackendSession bs, InputStream mail) throws StoreEmailException {
 		logger.info("Store mail in folder[Sent]");
 		StoreClient store = getImapClient(bs);
 		try {
@@ -437,9 +406,8 @@ public class EmailManager implements IEmailManager {
 				}
 			}
 			return storeMail(store, sentFolderName,true, mail, true);
-		} catch (Throwable e) {
-			throw new StoreEmailException(
-					"Error during store mail in Sent folder", e);
+		} catch (IMAPException e) {
+			throw new StoreEmailException("Error during store mail in Sent folder", e);
 		} finally {
 			store.logout();
 		}
@@ -474,21 +442,17 @@ public class EmailManager implements IEmailManager {
 		return ret;
 	}
 
-	private void deleteMessageInCache(Integer devId, Integer collectionId,
-			Collection<Long> mailUids) {
+	private void deleteMessageInCache(Integer devId, Integer collectionId, Collection<Long> mailUids) throws DaoException {
 		try {
 			emailDao.removeMessages(devId, collectionId, mailUids);
 		} catch (DaoException e) {
-			logger.error("Error while deleting messages in db", e);
+			throw new DaoException("Error while deleting messages in db", e);
 		}
 	}
 
-	private void addMessageInCache(StoreClient store, Integer devId,
-			Integer collectionId, Long mailUids) {
-		Collection<FastFetch> fetch = store.uidFetchFast(ImmutableSet
-				.of(mailUids));
-		Collection<Email> emails = Collections2.transform(fetch,
-				new Function<FastFetch, Email>() {
+	private void addMessageInCache(StoreClient store, Integer devId, Integer collectionId, Long mailUids) throws DaoException {
+		Collection<FastFetch> fetch = store.uidFetchFast(ImmutableSet.of(mailUids));
+		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
 					@Override
 					public Email apply(FastFetch input) {
 						return new Email(input.getUid(), input.isRead());
@@ -497,7 +461,7 @@ public class EmailManager implements IEmailManager {
 		try {
 			emailDao.addMessages(devId, collectionId, emails);
 		} catch (DaoException e) {
-			logger.error("Error while adding messages in db", e);
+			throw new DaoException("Error while adding messages in db", e);
 		}
 	}
 

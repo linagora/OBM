@@ -31,7 +31,6 @@ import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.store.EmailDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,55 +56,52 @@ public class EmailSync implements IEmailSync {
 
 	@Override
 	public MailChanges getSync(StoreClient imapStore, Integer devId, BackendSession bs, 
-			SyncState state, Integer collectionId, FilterType filter) throws ServerErrorException {
-		
-		try {
-			
-			long time = getCurrentTime();
-			long ct = getCurrentTime();
-			
-			final Set<Email> syncedMail = emailDao.getSyncedMail(devId, collectionId);
-			
-			ct = computeTime(ct);
-			
-			final Date startSyncWindows = getStartOfSynchronizationWindow(filter, state);
-			final Date lastSync = state.getLastSync();
-			
-			final Collection<FastFetch> allMailInSynchronizationWindow = loadAllMailInSyncWindowFromIMAP(
-					bs, imapStore, startSyncWindows);
-			
-			final Set<Email> allEmailInSynchronizationWindow = transformFastFetchToEmail(allMailInSynchronizationWindow);
+			SyncState state, Integer collectionId, FilterType filter) throws DaoException {
 
-			long computeChangesTime = getCurrentTime();
-			
-			final Collection<Long> removed = getRemoved(devId, collectionId,
-					syncedMail, allEmailInSynchronizationWindow, lastSync);
-			
-			final Set<Email> updated = getUpdated(devId, collectionId, syncedMail,
-					allMailInSynchronizationWindow, startSyncWindows, lastSync);
-			
-			final MailChanges sync = getMailChanges(updated, removed);
-			
-			computeChangesTime = computeTime(computeChangesTime);
+		long time = getCurrentTime();
+		long ct = getCurrentTime();
 
-			long writeTime = getCurrentTime();
-			if (!syncedMail.equals(allEmailInSynchronizationWindow)) {
-				updateData(devId, collectionId, lastSync, removed, updated);
-			}
-			
-			writeTime = computeTime(writeTime);
-			time = computeTime(time);
-			
-			logger.info("CollectionId = {} | Filter = {} | Changes found = {} | removes found = {} | " +
-					" TIME : total = {}, loading = {}, updating = {}, computeChanges = {}", 
-					new Object[]{collectionId, filter, sync.getUpdated().size(), removed.size(), 
-					time, ct, writeTime, computeChangesTime});			
-			
-			return sync;
-		} catch (Exception t) {
-			logger.error(t.getMessage(), t);
-			throw new ServerErrorException(t);
+		final Set<Email> syncedMail = emailDao.getSyncedMail(devId,
+				collectionId);
+
+		ct = computeTime(ct);
+
+		final Date startSyncWindows = getStartOfSynchronizationWindow(filter,
+				state);
+		final Date lastSync = state.getLastSync();
+
+		final Collection<FastFetch> allMailInSynchronizationWindow = loadAllMailInSyncWindowFromIMAP(
+				bs, imapStore, startSyncWindows);
+
+		final Set<Email> allEmailInSynchronizationWindow = transformFastFetchToEmail(allMailInSynchronizationWindow);
+
+		long computeChangesTime = getCurrentTime();
+
+		final Collection<Long> removed = getRemoved(devId, collectionId,
+				syncedMail, allEmailInSynchronizationWindow, lastSync);
+
+		final Set<Email> updated = getUpdated(devId, collectionId, syncedMail,
+				allMailInSynchronizationWindow, startSyncWindows, lastSync);
+
+		final MailChanges sync = getMailChanges(updated, removed);
+
+		computeChangesTime = computeTime(computeChangesTime);
+
+		long writeTime = getCurrentTime();
+		if (!syncedMail.equals(allEmailInSynchronizationWindow)) {
+			updateData(devId, collectionId, lastSync, removed, updated);
 		}
+
+		writeTime = computeTime(writeTime);
+		time = computeTime(time);
+
+		logger.info(
+				"CollectionId = {} | Filter = {} | Changes found = {} | removes found = {} | "
+						+ " TIME : total = {}, loading = {}, updating = {}, computeChanges = {}",
+				new Object[] { collectionId, filter, sync.getUpdated().size(),
+						removed.size(), time, ct, writeTime, computeChangesTime });
+
+		return sync;
 	}
 
 	private long computeTime(long time) {
