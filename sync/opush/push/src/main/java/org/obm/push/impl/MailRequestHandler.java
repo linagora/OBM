@@ -59,11 +59,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 		} catch (SendEmailException e) {
 			handleSendEmailException(e, responder, bs,  mailRequest.getMailContent());
 		} catch (IOException e) {
-			try {
-				responder.sendError(HttpStatus.BAD_REQUEST_400);
-			} catch (IOException e1) {
-				logger.error(e1.getMessage(), e);
-			}
+			responder.sendError(HttpStatus.BAD_REQUEST_400);
 			return;
 		} catch (CollectionNotFoundException e) {
 			notifyUser(bs,  mailRequest.getMailContent(), e);
@@ -92,11 +88,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 		if (e.getSmtpErrorCode() >= 500) {
 			notifyUser(bs, mailContent, e);
 		} else {
-			try {
-				responder.sendError(500);
-			} catch (IOException e1) {
-				logger.error(e.getMessage(), e1);
-			}
+			responder.sendError(500);
 		}
 	}
 

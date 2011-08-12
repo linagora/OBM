@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.obm.annotations.transactional.Propagation;
@@ -74,11 +73,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	}
 
 	private void sendResponse(Responder responder, Document ret) {
-		try {
-			responder.sendResponse("FolderHierarchy", ret);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		responder.sendResponse("FolderHierarchy", ret);
 	}
 	
 	private void sendError(Responder responder, FolderSyncStatus status, Exception exception) {

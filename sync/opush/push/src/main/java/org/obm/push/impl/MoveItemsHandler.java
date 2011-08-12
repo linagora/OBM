@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,11 +84,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 	}
 	
 	private void sendResponse(Responder responder, Document doc) {
-		try {
-			responder.sendResponse("Move", doc);
-		} catch (IOException e) {
-			logger.error("Error creating sync response", e);
-		}	
+		responder.sendResponse("Move", doc);
 	}
 
 	@Transactional(propagation=Propagation.NESTED)

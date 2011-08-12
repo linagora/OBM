@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.obm.annotations.transactional.Propagation;
@@ -87,11 +86,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 	
 	private void sendResponse(Responder responder, Document document) {
-		try {
-			responder.sendResponse("ItemOperations", document);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		responder.sendResponse("ItemOperations", document);
 	}
 	
 	@Transactional(propagation=Propagation.NESTED)

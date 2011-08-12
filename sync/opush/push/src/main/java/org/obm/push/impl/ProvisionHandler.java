@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.IOException;
 import java.util.Random;
 
 import org.obm.annotations.transactional.Propagation;
@@ -61,11 +60,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	}
 
 	private void sendResponse(Responder responder, Document ret) {
-		try {
-			responder.sendResponse("Provision", ret);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		responder.sendResponse("Provision", ret);
 	}
 
 	@Transactional(propagation=Propagation.NESTED)

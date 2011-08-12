@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -85,6 +84,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST, e);
 		} catch (UnknownObmSyncServerException e) {
+			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
 		} catch (ProcessingEmailException e) {
 			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
 		}
@@ -96,11 +96,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 	
 	private void sendResponse(Responder responder, Document document) {
-		try {
-			responder.sendResponse("MeetingResponse", document);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}	
+		responder.sendResponse("MeetingResponse", document);
 	}
 
 	@Transactional(propagation=Propagation.NESTED)

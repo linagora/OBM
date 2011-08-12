@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,11 +67,7 @@ public class SearchHandler extends WbxmlRequestHandler {
 	}
 
 	private void sendResponse(Responder responder, Document document) {
-		try {
-			responder.sendResponse("Search", document);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		responder.sendResponse("Search", document);
 	}
 
 	private void sendError(Responder responder, SearchStatus error) {

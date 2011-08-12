@@ -1,7 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.annotations.transactional.Propagation;
@@ -48,8 +46,6 @@ public class GetAttachmentHandler implements IRequestHandler {
 			sendErrorResponse(responder, e);
 		} catch (DaoException e) {
 			sendErrorResponse(responder, e);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
 		} catch (ProcessingEmailException e) {
 			sendErrorResponse(responder, e);
 		}
@@ -57,11 +53,7 @@ public class GetAttachmentHandler implements IRequestHandler {
 
 	private void sendErrorResponse(Responder responder, Exception exception) {
 		logger.error(exception.getMessage(), exception);
-		try {
-			responder.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		responder.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
 	@Transactional(propagation=Propagation.NESTED)

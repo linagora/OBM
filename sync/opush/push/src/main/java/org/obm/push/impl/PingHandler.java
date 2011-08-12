@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.obm.annotations.transactional.Propagation;
@@ -141,11 +140,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	private void sendResponse(Responder responder, Document document) {
-		try {
-			responder.sendResponse("Ping", document);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		responder.sendResponse("Ping", document);
 	}
 
 	@Transactional

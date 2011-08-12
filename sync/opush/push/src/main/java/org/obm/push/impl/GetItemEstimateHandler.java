@@ -1,6 +1,5 @@
 package org.obm.push.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.obm.annotations.transactional.Propagation;
@@ -83,11 +82,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 	
 	private void sendResponse(Responder responder, Document document) {
-		try {
-			responder.sendResponse("GetItemEstimate", document);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		responder.sendResponse("GetItemEstimate", document);
 	}
 
 	@Transactional(propagation=Propagation.NESTED)

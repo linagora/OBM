@@ -1,6 +1,5 @@
 package org.obm.push.store;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -139,11 +138,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private void sendResponse(Responder responder, Document document) {
-		try {
-			responder.sendResponse("AirSync", document);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+		responder.sendResponse("AirSync", document);
 	}
 	
 	@Transactional(propagation=Propagation.NESTED)
