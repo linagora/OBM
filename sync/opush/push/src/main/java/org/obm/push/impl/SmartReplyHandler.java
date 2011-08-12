@@ -1,12 +1,16 @@
 package org.obm.push.impl;
 
+import org.minig.imap.IMAPException;
 import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
@@ -26,8 +30,8 @@ public class SmartReplyHandler extends MailRequestHandler {
 
 	@Override
 	@Transactional(propagation=Propagation.NESTED)
-	public void doTheJob(MailRequest mailRequest, BackendSession bs)
-			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
+	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws SendEmailException, ProcessingEmailException, 
+		SmtpInvalidRcptException, CollectionNotFoundException, IMAPException, DaoException, UnknownObmSyncServerException {
 		
 		contentsImporter.replyEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(),
 				Integer.getInteger(mailRequest.getCollectionId()), mailRequest.getServerId());

@@ -16,8 +16,8 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.store.FiltrageInvitationDao;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 
 	@Override
 	public DataDelta filterEvent(final BackendSession bs, final SyncState state, final Integer eventCollectionId, final DataDelta delta) 
-			throws DaoException, UnknownObmSyncServerException {
+			throws DaoException {
 		
 		final String syncKey = state.getKey();
 		final List<ItemChange> toSynced = mergeChangesAndToSyncedEvent(bs, eventCollectionId, syncKey, delta.getChanges());
@@ -139,7 +139,9 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) throws DaoException {
+	public void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) 
+			throws DaoException, ProcessingEmailException {
+		
 		try {
 			final Map<String, ItemChange> syncedItem = new HashMap<String, ItemChange>();
 			final List<ItemChange> itemToSync = mergeChangesAndToSyncedEmail(bs, state, emailCollectionId,  delta.getChanges());
@@ -204,7 +206,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	private List<ItemChange> mergeChangesAndToSyncedEmail(BackendSession bs, SyncState state, Integer emailCollectionId, 
-			List<ItemChange> changes) throws DaoException, CollectionNotFoundException {
+			List<ItemChange> changes) throws DaoException, CollectionNotFoundException, ProcessingEmailException {
 		final List<ItemChange> its = Lists.newArrayList(changes.iterator());
 		final List<Long> emailToSync = filtrageInvitationDao.getEmailToSynced(emailCollectionId, state.getKey());
 		for (final ItemChange ic : changes) {

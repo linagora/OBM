@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.obm.annotations.transactional.Propagation;
-import org.minig.imap.IMAPException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -25,6 +24,7 @@ import org.obm.push.exception.UnsupportedStoreException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
@@ -76,7 +76,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (DaoException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
-		} catch (IMAPException e) {
+		} catch (ProcessingEmailException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
 		} 
 	}
@@ -95,8 +95,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 	
 	@Transactional(propagation=Propagation.NESTED)
-	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest)
-			throws CollectionNotFoundException, UnsupportedStoreException, DaoException, IMAPException {
+	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest) throws CollectionNotFoundException, 
+		UnsupportedStoreException, DaoException, ProcessingEmailException {
 		
 		ItemOperationsResponse response = new ItemOperationsResponse();
 		Fetch fetch = itemOperationRequest.getFetch();
@@ -112,7 +112,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return response;
 	}
 
-	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, UnsupportedStoreException, DaoException, IMAPException {
+	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, UnsupportedStoreException, 
+		DaoException, ProcessingEmailException {
 		
 		final StoreName store = fetch.getStoreName();
 		if (StoreName.Mailbox.equals(store)) {
@@ -122,7 +123,9 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		}
 	}
 
-	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, DaoException, IMAPException {
+	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, DaoException, 
+		ProcessingEmailException {
+		
 		MailboxFetchResult mailboxFetchResponse = new MailboxFetchResult();
 		if (fetch.getFileReference() != null) {
 			
@@ -140,7 +143,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return mailboxFetchResponse;
 	}
 
-	private FetchAttachmentResult processFileReferenceFetch(BackendSession bs, String reference) throws CollectionNotFoundException, DaoException, IMAPException {
+	private FetchAttachmentResult processFileReferenceFetch(BackendSession bs, String reference) throws CollectionNotFoundException, DaoException, 
+		ProcessingEmailException {
 
 		FetchAttachmentResult fetchAttachmentResult = fetchAttachment(bs, reference);
 		if (ItemOperationsStatus.SUCCESS.equals(fetchAttachmentResult.getStatus())) {
@@ -149,7 +153,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return fetchAttachmentResult;
 	}
 
-	private FetchAttachmentResult fetchAttachment(BackendSession bs, String reference) throws CollectionNotFoundException, DaoException, IMAPException {
+	private FetchAttachmentResult fetchAttachment(BackendSession bs, String reference) throws CollectionNotFoundException, DaoException, 
+		ProcessingEmailException {
 
 		FetchAttachmentResult fetchResult = new FetchAttachmentResult();
 		try {
@@ -194,6 +199,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
 		} catch (DaoException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
+		} catch (ProcessingEmailException e) {
+			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return fetchResult;
 	}
@@ -211,6 +218,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		} catch (NotAllowedException e) {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.BLOCKED_ACCESS);
 		} catch (DaoException e) {
+			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SERVER_ERROR);
+		} catch (ProcessingEmailException e) {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return emptyFolderContentsResult;

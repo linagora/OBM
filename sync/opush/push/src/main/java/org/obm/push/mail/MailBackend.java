@@ -33,14 +33,12 @@ import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
@@ -125,37 +123,42 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) 
-			throws CollectionNotFoundException, DaoException {
-		String collectionPath = getCollectionPathFor(collectionId);
-		logger.info("Collection [ " + collectionPath + " ]");
-		List<ItemChange> changes = new LinkedList<ItemChange>();
-		List<ItemChange> deletions = new LinkedList<ItemChange>();
-		Date lastSync = null;
+			throws ProcessingEmailException, CollectionNotFoundException {
+		
+		String collectionPath;
 		try {
+			collectionPath = getCollectionPathFor(collectionId);
+			logger.info("Collection [ " + collectionPath + " ]");
+			List<ItemChange> changes = new LinkedList<ItemChange>();
+			List<ItemChange> deletions = new LinkedList<ItemChange>();
+			Date lastSync = null;
 			final Integer devDbId = bs.getDevice().getDatabaseId();
-			
+
 			final MailChanges mc = emailManager.getSync(bs, state, devDbId, collectionId, collectionPath, filter);
-			
+
 			changes = getChanges(bs, collectionId, collectionPath, mc.getUpdated());
 			deletions.addAll(getDeletions(collectionId, mc.getRemoved()));
 			lastSync = mc.getLastSync();
+			return new DataDelta(changes, deletions, lastSync);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
 		} catch (IMAPException e) {
-			logger.error(e.getMessage(), e);
+			throw new ProcessingEmailException(e);
 		}
-		return new DataDelta(changes, deletions, lastSync);
 	}
 
-	private List<ItemChange> getChanges(BackendSession bs, Integer collectionId, String collection, Set<Long> updated) {
+	private List<ItemChange> getChanges(BackendSession bs, Integer collectionId, String collection, Set<Long> updated) throws ProcessingEmailException {
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
+		List<MSEmail> msMails;
 		try {
-			final List<MSEmail> msMails = emailManager.fetchMails(bs,	getCalendarClient(bs), collectionId, collection, updated);
-			for (final MSEmail mail : msMails) {
+			msMails = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collection, updated);
+			for (final MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
+			return itch.build();
 		} catch (IMAPException e) {
-			logger.error(e.getMessage(), e);
+			throw new ProcessingEmailException(e);
 		}
-		return itch.build();
 	}
 	
 	private ItemChange getItemChange(Integer collectionId, Long uid, IApplicationData data) {
@@ -165,23 +168,27 @@ public class MailBackend extends ObmSyncBackend {
 		return ic;
 	}
 	
-	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchIds) throws CollectionNotFoundException, DaoException {
+	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchIds) throws ProcessingEmailException {
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
 		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(fetchIds);
 		for (Entry<Integer, Collection<Long>> entry : emailUids.entrySet()) {
 			Integer collectionId = entry.getKey();
 			Collection<Long> uids = entry.getValue();
-			ret.addAll(fetchItems(bs, collectionId, uids));
+			try {
+				ret.addAll(fetchItems(bs, collectionId, uids));
+			} catch (CollectionNotFoundException e) {
+				logger.error("fetchItems : collection {} not found !", collectionId);
+			}
 		}
 		return ret;
 	}
 	
 	private Map<Integer, Collection<Long>> getEmailUidByCollectionId(List<String> fetchIds) {
 		Map<Integer, Collection<Long>> ret = Maps.newHashMap();
-		for(String serverId : fetchIds){
+		for (String serverId : fetchIds) {
 			Integer collectionId = getCollectionIdFor(serverId);
 			Collection<Long> set = ret.get(collectionId);
-			if(set == null){
+			if (set == null) {
 				set = Sets.newHashSet();
 				ret.put(collectionId, set);
 			}
@@ -191,11 +198,11 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<Long> uids) 
-			throws CollectionNotFoundException, DaoException {
+			throws CollectionNotFoundException, ProcessingEmailException {
 		
-		final Builder<ItemChange> ret = ImmutableList.builder();
-		final String collectionPath = getCollectionPathFor(collectionId);
 		try {
+			final Builder<ItemChange> ret = ImmutableList.builder();
+			final String collectionPath = getCollectionPathFor(collectionId);
 			final List<MSEmail> emails = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collectionPath, uids);
 			for (final MSEmail email: emails) {
 				ItemChange ic = new ItemChange();
@@ -203,20 +210,22 @@ public class MailBackend extends ObmSyncBackend {
 				ic.setData(email);
 				ret.add(ic);
 			}
+			return ret.build();	
 		} catch (IMAPException e) {
-			logger.error(e.getMessage(), e);
+			throw new ProcessingEmailException(e);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
 		}
-		return ret.build();
 	}
 
-	public void delete(BackendSession bs, String serverId, Boolean moveToTrash) {
-		if (moveToTrash) {
-			logger.info("move to trash serverId " + serverId);
-		} else {
-			logger.info("delete serverId " + serverId);
-		}
-		if (serverId != null) {
-			try {
+	public void delete(BackendSession bs, String serverId, Boolean moveToTrash) throws CollectionNotFoundException, ProcessingEmailException {
+		try {
+			if (moveToTrash) {
+				logger.info("move to trash serverId {}", serverId);
+			} else {
+				logger.info("delete serverId {}", serverId);
+			}
+			if (serverId != null) {
 				final Long uid = getEmailUidFromServerId(serverId);
 				final Integer collectionId = getCollectionIdFor(serverId);
 				final String collectionName = getCollectionPathFor(collectionId);
@@ -224,79 +233,67 @@ public class MailBackend extends ObmSyncBackend {
 
 				if (moveToTrash) {
 					String wasteBasketPath = getWasteBasketPath(bs);
-					Integer wasteBasketId = getCollectionIdFor(bs.getDevice(),
-							wasteBasketPath);
-					emailManager.moveItem(bs, devDbId, collectionName,
-							collectionId, wasteBasketPath, wasteBasketId, uid);
+					Integer wasteBasketId = getCollectionIdFor(bs.getDevice(), wasteBasketPath);
+					emailManager.moveItem(bs, devDbId, collectionName, collectionId, wasteBasketPath, wasteBasketId, uid);
 				} else {
-					emailManager.delete(bs, devDbId, collectionName,
-							collectionId, uid);
+					emailManager.delete(bs, devDbId, collectionName, collectionId, uid);
 				}
 				removeInvitationStatus(bs, collectionId, uid);
-			} catch (IMAPException e) {
-				logger.error(e.getMessage(), e);
-			} catch (CollectionNotFoundException e) {
-				logger.error(e.getMessage(), e);
-			} catch (DaoException e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
+			}	
+		} catch (IMAPException e) {
+			throw new ProcessingEmailException(e);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		}		
 	}
 
-	private void removeInvitationStatus(BackendSession bs,
-			Integer emailCollectionId, Long mailUid) throws DaoException {
+	private void removeInvitationStatus(BackendSession bs, Integer emailCollectionId, Long mailUid) 
+			throws CollectionNotFoundException, ProcessingEmailException {
+		
 		try {
 			String calPath = getDefaultCalendarName(bs);
-			Integer eventCollectionId = getCollectionIdFor(bs.getDevice(),
-					calPath);
-			filtrageInvitationDao.removeInvitationStatus(eventCollectionId,
-					emailCollectionId, mailUid);
-		} catch (CollectionNotFoundException e) {
-			logger.error(e.getMessage(), e);
+			Integer eventCollectionId = getCollectionIdFor(bs.getDevice(), calPath);
+			filtrageInvitationDao.removeInvitationStatus(eventCollectionId, emailCollectionId, mailUid);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
 		}
-
 	}
 
-	public String createOrUpdate(BackendSession bs, Integer collectionId,
-			String serverId, String clientId, MSEmail data) throws CollectionNotFoundException, DaoException {
+	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, String clientId, MSEmail data) 
+			throws CollectionNotFoundException, ProcessingEmailException {
 		
-		String collectionPath = getCollectionPathFor(collectionId);
-		logger.info("createOrUpdate(" + bs.getLoginAtDomain() + ", "
-				+ collectionPath + ", " + serverId + ", " + clientId + ")");
-		if (serverId != null) {
-			Long mailUid = getEmailUidFromServerId(serverId);
-			try {
-				emailManager.updateReadFlag(bs, collectionPath, mailUid,
-						data.isRead());
-			} catch (IMAPException e) {
-				logger.error(e.getMessage(), e);
+		try {
+			String collectionPath = getCollectionPathFor(collectionId);
+			logger.info("createOrUpdate( {}, {}, {} )", new Object[]{collectionPath, serverId, clientId});
+			if (serverId != null) {
+				Long mailUid = getEmailUidFromServerId(serverId);
+				emailManager.updateReadFlag(bs, collectionPath, mailUid, data.isRead());
 			}
+			return null;
+		} catch (IMAPException e) {
+			throw new ProcessingEmailException(e);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
 		}
-		return null;
 	}
 
-	public String move(BackendSession bs, String srcFolder, String dstFolder,
-			String messageId) throws ServerErrorException {
-		logger.info("move(" + bs.getLoginAtDomain() + ", messageId "
-				+ messageId + " from " + srcFolder + " to " + dstFolder + ")");
+	public String move(BackendSession bs, String srcFolder, String dstFolder, String messageId) 
+			throws CollectionNotFoundException, ProcessingEmailException {
+		
 		try {
+			logger.info("move( messageId =  {}, from = {}, to = {} )", new Object[]{messageId, srcFolder, dstFolder});
 			final Long currentMailUid = getEmailUidFromServerId(messageId);
 			final Integer srcFolderId = getCollectionIdFor(bs.getDevice(), srcFolder);
 			final Integer dstFolderId = getCollectionIdFor(bs.getDevice(), dstFolder);
 			final Integer devDbId = bs.getDevice().getDatabaseId();
-
-			Long newUidMail = emailManager.moveItem(bs, devDbId, srcFolder,
-					srcFolderId, dstFolder, dstFolderId, currentMailUid);
+			Long newUidMail = emailManager.moveItem(bs, devDbId, srcFolder, srcFolderId, dstFolder, dstFolderId, currentMailUid);
 			removeInvitationStatus(bs, srcFolderId, currentMailUid);
-			return dstFolderId + ":" + newUidMail;
+			return dstFolderId + ":" + newUidMail;	
 		} catch (IMAPException e) {
-			throw new ServerErrorException(e);
+			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
-			throw new ServerErrorException(e);
-		} catch (CollectionNotFoundException e) {
-			throw new ServerErrorException(e);
+			throw new ProcessingEmailException(e);
 		}
-
 	}
 
 	private Integer getCollectionIdFor(String serverId) {
@@ -308,74 +305,55 @@ public class MailBackend extends ObmSyncBackend {
 		return collectionId;
 	}
 
-	public void sendEmail(BackendSession bs, InputStream mailContent,
-			Boolean saveInSent) throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
+	public void sendEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent) throws ProcessingEmailException {
 		try {
 			SendEmailHandler handler = new SendEmailHandler(getUserEmail(bs));
 			send(bs, mailContent, handler, saveInSent);
-		} catch (SmtpInvalidRcptException se){
-			throw se;
-		} catch (SendEmailException e){
-			throw e;
-		} catch (ServerFault e) {
+		} catch (UnknownObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}
 
-	public void replyEmail(BackendSession bs, InputStream mailContent,
-			Boolean saveInSent, Integer collectionId, String serverId)
-			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
-		String collectionPath = "";
+	public void replyEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, Integer collectionId, String serverId)
+			throws ProcessingEmailException, CollectionNotFoundException {
+		
 		try {
+			String collectionPath = "";
 			if (collectionId != null && collectionId > 0) {
-				try {
-					collectionPath = getCollectionPathFor(collectionId);
-				} catch (Throwable e) {
-				}
+				collectionPath = getCollectionPathFor(collectionId);
 			}
+			
 			if (serverId == null || !serverId.isEmpty()) {
 				collectionId = getCollectionIdFor(serverId);
 				collectionPath = getCollectionPathFor(collectionId);
-
 			}
+			
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> mail = emailManager.fetchMails(bs,
-					getCalendarClient(bs), collectionId, collectionPath, uids);
+			List<MSEmail> mail = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collectionPath, uids);
 
 			if (mail.size() > 0) {
 				//TODO uses headers References and In-Reply-To
-				ReplyEmailHandler reh = new ReplyEmailHandler(getUserEmail(bs),
-						mail.get(0));
+				ReplyEmailHandler reh = new ReplyEmailHandler(getUserEmail(bs), mail.get(0));
 				send(bs, mailContent, reh, saveInSent);
-				try{
-					emailManager.setAnsweredFlag(bs, collectionPath, uid);
-				} catch (Throwable e) {
-					logger.info("Can't set Answered Flag to mail["+uid+"]");
-				}
+				emailManager.setAnsweredFlag(bs, collectionPath, uid);
 			} else {
-				SendEmailHandler handler = new SendEmailHandler(
-						getUserEmail(bs));
+				SendEmailHandler handler = new SendEmailHandler(getUserEmail(bs));
 				send(bs, mailContent, handler, saveInSent);
 			}
-		} catch (SmtpInvalidRcptException se){
-			throw se;
-		} catch (SendEmailException e){
-			throw e;
-		} catch (CollectionNotFoundException e) {
-			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
-		} catch (ServerFault e) {
+		} catch (UnknownObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}
 
-	public void forwardEmail(BackendSession bs, InputStream mailContent,
-			Boolean saveInSent, String collectionId, String serverId) throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
+	public void forwardEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, String collectionId, String serverId) 
+			throws ProcessingEmailException, CollectionNotFoundException {
+		
 		try {
 			String collectionName = getCollectionPathFor(Integer
 					.parseInt(collectionId));
@@ -399,39 +377,30 @@ public class MailBackend extends ObmSyncBackend {
 						getUserEmail(bs));
 				send(bs, mailContent, handler, saveInSent);
 			}
-		} catch (SmtpInvalidRcptException se){
-			throw se;
-		} catch (SendEmailException e){
-			throw e;
-		} catch (ServerFault e) {
-			throw new ProcessingEmailException(e);
 		} catch (NumberFormatException e) {
-			throw new ProcessingEmailException(e);
-		} catch (CollectionNotFoundException e) {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
+		} catch (UnknownObmSyncServerException e) {
+			throw new ProcessingEmailException(e);
 		} 
 	}
 
-	private String getUserEmail(BackendSession bs) throws ServerFault {
+	private String getUserEmail(BackendSession bs) throws UnknownObmSyncServerException {
 		AbstractEventSyncClient cal = getCalendarClient(bs);
-		AccessToken at = cal.login(bs.getLoginAtDomain(), bs.getPassword(),
-				OBM_SYNC_ORIGIN);
-		String from = "";
+		AccessToken at = cal.login(bs.getLoginAtDomain(), bs.getPassword(), OBM_SYNC_ORIGIN);
 		try {
-			from = cal.getUserEmail(at);
+			return cal.getUserEmail(at);
+		} catch (ServerFault e) {
+			throw new UnknownObmSyncServerException(e);
 		} finally {
 			cal.logout(at);
 		}
-		return from;
 	}
 
-	private void send(BackendSession bs, InputStream mailContent,
-			SendEmailHandler handler, Boolean saveInSent)
-			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
+	private void send(BackendSession bs, InputStream mailContent, SendEmailHandler handler, Boolean saveInSent) throws ProcessingEmailException {
 		InputStream emailData = null;
 		try {
 			MimeStreamParser parser = new MimeStreamParser();
@@ -449,10 +418,6 @@ public class MailBackend extends ObmSyncBackend {
 			} else {
 				logger.warn("OPUSH blocks email invitation sending by PDA. Now that obm-sync handle email sending on event creation/modification/deletion, we must filter mail from PDA for these actions.");
 			}
-		} catch (SmtpInvalidRcptException se){
-			throw se;
-		} catch (SendEmailException e){
-			throw e;
 		} catch (TNEFConverterException e) {
 			throw new ProcessingEmailException(e);
 		} catch (MimeException e) {
@@ -477,27 +442,26 @@ public class MailBackend extends ObmSyncBackend {
 		return new Address(from);
 	}
 
-	public MSEmail getEmail(BackendSession bs, Integer collectionId, String serverId) 
-			throws DaoException, CollectionNotFoundException {
-		
-		String collectionName = getCollectionPathFor(collectionId);
-		Long uid = getEmailUidFromServerId(serverId);
-		Set<Long> uids = new HashSet<Long>();
-		uids.add(uid);
-		List<MSEmail> emails;
+	public MSEmail getEmail(BackendSession bs, Integer collectionId, String serverId) throws CollectionNotFoundException, ProcessingEmailException {
 		try {
-			emails = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collectionName, uids);
+			String collectionName = getCollectionPathFor(collectionId);
+			Long uid = getEmailUidFromServerId(serverId);
+			Set<Long> uids = new HashSet<Long>();
+			uids.add(uid);
+			List<MSEmail> emails = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collectionName, uids);
 			if (emails.size() > 0) {
 				return emails.get(0);
 			}
+			return null;	
 		} catch (IMAPException e) {
-			logger.error(e.getMessage(), e);
+			throw new ProcessingEmailException(e);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
 		}
-		return null;
 	}
 
 	public MSAttachementData getAttachment(BackendSession bs, String attachmentId) 
-			throws AttachementNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
+			throws AttachementNotFoundException, CollectionNotFoundException, ProcessingEmailException {
 		
 		if (attachmentId != null && !attachmentId.isEmpty()) {
 			Map<String, String> parsedAttId = AttachmentHelper.parseAttachmentId(attachmentId);
@@ -540,46 +504,39 @@ public class MailBackend extends ObmSyncBackend {
 				return new MSAttachementData(contentType,
 						new ByteArrayInputStream(rawData));
 		
-			} catch (CollectionNotFoundException e) {
-				throw e;
 			} catch (NumberFormatException e) {
-				logger.error(e.getMessage(), e);
-			} catch (DaoException e) {
-				throw e;
-			} catch (IMAPException e) {
-				throw e;
+				throw new ProcessingEmailException(e);
 			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
+				throw new ProcessingEmailException(e);
+			} catch (IMAPException e) {
+				throw new ProcessingEmailException(e);
+			} catch (DaoException e) {
+				throw new ProcessingEmailException(e);
 			}
 		}
 		
 		throw new AttachementNotFoundException();
 	}
 
-	public void purgeFolder(BackendSession bs, String collectionPath,
-			boolean deleteSubFolder) throws NotAllowedException {
-		String wasteBasketPath = getWasteBasketPath(bs);
-		if (!wasteBasketPath.equals(collectionPath)) {
-			throw new NotAllowedException(
-					"Only the Trash folder can be purged.");
-		}
-		try {
+	public void purgeFolder(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
+			throws NotAllowedException, CollectionNotFoundException, ProcessingEmailException {
 
+		try {
+			String wasteBasketPath = getWasteBasketPath(bs);
+			if (!wasteBasketPath.equals(collectionPath)) {
+				throw new NotAllowedException(
+						"Only the Trash folder can be purged.");
+			}
 			final Integer devDbId = bs.getDevice().getDatabaseId();
 			int collectionId = getCollectionIdFor(bs.getDevice(), collectionPath);
 			emailManager.purgeFolder(bs, devDbId, collectionPath, collectionId);
 			if (deleteSubFolder) {
 				logger.warn("deleteSubFolder isn't implemented because opush doesn't yet manage folders");
-			}
-		} catch (CollectionNotFoundException e) {
-			logger.error(e.getMessage(), e);
-			throw new NotAllowedException(e);
-		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
-			throw new NotAllowedException(e);
+			}	
 		} catch (IMAPException e) {
-			logger.error(e.getMessage(), e);
-			throw new NotAllowedException(e);
+			throw new ProcessingEmailException(e);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
 		}
 	}
 

@@ -14,23 +14,20 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerErrorException;
 
 /**
  * Content management interface, ie. CRUD API.
  */
 public interface IContentsImporter {
 
-	String importMessageChange(BackendSession bs, Integer collectionId,
-			String serverId, String clientId, IApplicationData data)
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException;
+	String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data)
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException;
 
-	void importMessageDeletion(BackendSession bs, PIMDataType type,
-			Integer collectionId, String serverId, Boolean moveToTrash) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException;
+	void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException;
 
-	String importMoveItem(BackendSession bs, PIMDataType type,
-			String srcFolder, String dstFolder, String messageId)
-			throws ServerErrorException;
+	String importMoveItem(BackendSession bs, PIMDataType type, String srcFolder, String dstFolder, String messageId)
+			throws CollectionNotFoundException, DaoException, ProcessingEmailException;
 
 	String importCalendarUserStatus(BackendSession bs, Integer invitationCollectionId, MSEmail invitation,
 			AttendeeStatus userResponse) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
@@ -38,14 +35,15 @@ public interface IContentsImporter {
 	void sendEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent)
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException;
 
-	void replyEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent,
-			Integer collectionId, String serverId) throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException;
+	void replyEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent,	Integer collectionId, String serverId) 
+			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
+			DaoException, UnknownObmSyncServerException;
 
-	void forwardEmail(BackendSession bs, InputStream mailContent,
-			Boolean saveInSent, String collectionId, String serverId)
-			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException;
+	void forwardEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, String collectionId, String serverId)
+			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
+			UnknownObmSyncServerException, DaoException;
 
-	void emptyFolderContent(BackendSession bs, String collectionPath,
-			boolean deleteSubFolder) throws CollectionNotFoundException,
-			NotAllowedException;
+	void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
+			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException;
+	
 }

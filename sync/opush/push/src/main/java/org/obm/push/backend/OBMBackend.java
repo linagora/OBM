@@ -13,6 +13,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.IEmailManager;
 import org.obm.push.mail.MailBackend;
@@ -157,8 +158,8 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public Set<SyncCollection> getChangesSyncCollections(
-			CollectionChangeListener collectionChangeListener) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+	public Set<SyncCollection> getChangesSyncCollections(CollectionChangeListener collectionChangeListener) 
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();
 		final BackendSession backendSession = collectionChangeListener.getSession();
@@ -174,7 +175,9 @@ public class OBMBackend implements IBackend {
 		return syncCollectionsChanged;
 	}
 	
-	private int getCount(BackendSession backendSession, SyncCollection syncCollection) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+	private int getCount(BackendSession backendSession, SyncCollection syncCollection) 
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
+		
 		return contentsExporter.getCount(backendSession, syncCollection
 				.getSyncState(), syncCollection.getOptions().getFilterType(),
 				syncCollection.getCollectionId());

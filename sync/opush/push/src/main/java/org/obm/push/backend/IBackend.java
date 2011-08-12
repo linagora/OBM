@@ -4,10 +4,11 @@ import java.util.Set;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.protocol.provisioning.Policy;
 
 public interface IBackend {
 
@@ -31,6 +32,6 @@ public interface IBackend {
 	boolean validatePassword(String userID, String password);
 
 	Set<SyncCollection> getChangesSyncCollections(CollectionChangeListener collectionChangeListener) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
 	
 }

@@ -3,7 +3,6 @@ package org.obm.push.backend;
 import java.util.Collection;
 import java.util.List;
 
-import org.minig.imap.IMAPException;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
@@ -15,6 +14,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 
 /**
  * The exporter API fetches data from the backend store and returns it to the
@@ -23,16 +23,16 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 public interface IContentsExporter {
 
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
 
 	int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
 
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchIds) throws CollectionNotFoundException, DaoException;
+			List<String> fetchIds) throws CollectionNotFoundException, DaoException, ProcessingEmailException;
 	
 	List<ItemChange> fetchEmails(BackendSession bs,
-			Integer collectionId, Collection<Long> uids) throws DaoException, CollectionNotFoundException;
+			Integer collectionId, Collection<Long> uids) throws DaoException, CollectionNotFoundException, ProcessingEmailException;
 	
 	List<ItemChange> fetchCalendars(BackendSession bs, Integer collectionId, Collection<String> uids) throws UnknownObmSyncServerException ;
 
@@ -40,7 +40,7 @@ public interface IContentsExporter {
 			throws UnknownObmSyncServerException ;
 	
 	MSAttachementData getEmailAttachement(BackendSession bs,
-			String attachmentName) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, IMAPException;
+			String attachmentName) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, ProcessingEmailException;
 
 	boolean validatePassword(String userID, String password);
 

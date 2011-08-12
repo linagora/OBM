@@ -18,7 +18,6 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.mail.MailBackend;
 
 import com.google.inject.Inject;
@@ -45,7 +44,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		String id = null;
 		switch (data.getType()) {
@@ -68,7 +67,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
-					throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
+					throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		switch (type) {
 		case CALENDAR:
@@ -97,7 +96,7 @@ public class ContentsImporter implements IContentsImporter {
 	}
 
 	public String importMoveItem(BackendSession bs, PIMDataType type,
-			String srcFolder, String dstFolder, String messageId) throws ServerErrorException {
+			String srcFolder, String dstFolder, String messageId) throws CollectionNotFoundException, DaoException, ProcessingEmailException {
 		switch (type) {
 		case EMAIL:
 			return mailBackend.move(bs, srcFolder, dstFolder, messageId);
@@ -117,10 +116,10 @@ public class ContentsImporter implements IContentsImporter {
 	}
 
 	@Override
-	public void replyEmail(BackendSession bs, InputStream mailContent,
-			Boolean saveInSent, Integer collectionId, String serverId)  throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
-		mailBackend.replyEmail(bs, mailContent, saveInSent, collectionId,
-				serverId);
+	public void replyEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, Integer collectionId, String serverId)  
+					throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
+					DaoException, UnknownObmSyncServerException {
+		mailBackend.replyEmail(bs, mailContent, saveInSent, collectionId, serverId);
 	}
 
 	@Override
@@ -132,16 +131,16 @@ public class ContentsImporter implements IContentsImporter {
 	}
 
 	@Override
-	public void forwardEmail(BackendSession bs, InputStream mailContent,
-			Boolean saveInSent, String collectionId, String serverId)  throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
-		mailBackend.forwardEmail(bs, mailContent, saveInSent, collectionId,
-				serverId);
+	public void forwardEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, String collectionId, String serverId)  
+			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
+			UnknownObmSyncServerException, DaoException {
+		mailBackend.forwardEmail(bs, mailContent, saveInSent, collectionId, serverId);
 	}
 
 	@Override
-	public void emptyFolderContent(BackendSession bs, String collectionPath,
-			boolean deleteSubFolder) throws CollectionNotFoundException,
-			NotAllowedException {
+	public void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
+			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException {
+		
 		if (collectionPath != null && collectionPath.contains("email\\")) {
 			mailBackend.purgeFolder(bs, collectionPath, deleteSubFolder);
 		} else {
@@ -149,7 +148,6 @@ public class ContentsImporter implements IContentsImporter {
 					"emptyFolderContent is only supported for emails, collection was "
 							+ collectionPath);
 		}
-
 	}
 
 }

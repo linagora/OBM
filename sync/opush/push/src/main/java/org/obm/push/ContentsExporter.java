@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.minig.imap.IMAPException;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
@@ -22,6 +21,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,13 +115,13 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	private DataDelta getMailChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) 
-			throws CollectionNotFoundException, DaoException {
+			throws CollectionNotFoundException, ProcessingEmailException {
 		return mailBackend.getContentChanges(bs, state, collectionId, filter);
 	}
 	
 	@Override
 	public int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId)
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		DataDelta dd = getChanged(bs, state, filterType, collectionId);
 		Integer filterCount = invitationFilterManager.getCountFilterChanges(bs, state.getKey(), state.getDataType(), collectionId);
@@ -130,7 +130,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public DataDelta getChanged(BackendSession bs, SyncState state, FilterType filter, Integer collectionId) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		DataDelta delta = null;
 		switch (state.getDataType()) {
@@ -160,7 +160,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
-			List<String> fetchServerIds) throws CollectionNotFoundException, DaoException {
+			List<String> fetchServerIds) throws CollectionNotFoundException, DaoException, ProcessingEmailException {
 		
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		switch (getDataType) {
@@ -181,8 +181,8 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public MSAttachementData getEmailAttachement(BackendSession bs,
-			String attachmentId) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
+	public MSAttachementData getEmailAttachement(BackendSession bs, String attachmentId) 
+			throws AttachementNotFoundException, CollectionNotFoundException, DaoException, ProcessingEmailException {
 		return mailBackend.getAttachment(bs, attachmentId);
 	}
 
@@ -198,7 +198,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public List<ItemChange> fetchEmails(BackendSession bs, Integer collectionId, Collection<Long> uids) 
-			throws DaoException, CollectionNotFoundException {
+			throws DaoException, CollectionNotFoundException, ProcessingEmailException {
 		return mailBackend.fetchItems(bs, collectionId, uids);
 	}
 

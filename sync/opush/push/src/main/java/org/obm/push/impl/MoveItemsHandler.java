@@ -17,7 +17,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
-import org.obm.push.exception.activesync.ServerErrorException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.protocol.MoveItemsProtocol;
 import org.obm.push.protocol.bean.MoveItemsRequest;
 import org.obm.push.protocol.bean.MoveItemsResponse;
@@ -106,7 +106,11 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 					
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SUCCESS);
 					moveItemsItem.setDstMesgId(newDstId);
-				} catch (ServerErrorException ex) {
+				} catch (CollectionNotFoundException e) {
+					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+				} catch (DaoException e) {
+					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+				} catch (ProcessingEmailException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
 				}
 			}

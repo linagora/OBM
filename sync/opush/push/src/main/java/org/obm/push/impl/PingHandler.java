@@ -11,19 +11,20 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
+import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.PingStatus;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderSyncRequiredException;
 import org.obm.push.exception.MissingRequestParameterException;
 import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.PingStatus;
-import org.obm.push.bean.SyncCollection;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.HearbeatDao;
@@ -134,6 +135,8 @@ public class PingHandler extends WbxmlRequestHandler implements
 			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
 		} catch (UnknownObmSyncServerException e) {
 			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
+		} catch (ProcessingEmailException e) {
+			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
 		} 
 	}
 
@@ -147,7 +150,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 
 	@Transactional
 	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) 
-			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		if (sendHierarchyChange) {
 			throw new FolderSyncRequiredException();

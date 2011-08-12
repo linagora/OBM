@@ -5,15 +5,15 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.annotations.transactional.Propagation;
-import org.minig.imap.IMAPException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +48,10 @@ public class GetAttachmentHandler implements IRequestHandler {
 			sendErrorResponse(responder, e);
 		} catch (DaoException e) {
 			sendErrorResponse(responder, e);
-		} catch (IMAPException e) {
-			sendErrorResponse(responder, e);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
+		} catch (ProcessingEmailException e) {
+			sendErrorResponse(responder, e);
 		}
 	}
 
@@ -65,8 +65,9 @@ public class GetAttachmentHandler implements IRequestHandler {
 	}
 
 	@Transactional(propagation=Propagation.NESTED)
-	private MSAttachementData getAttachment(BackendSession bs,
-			String AttachmentName) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, IMAPException {
+	private MSAttachementData getAttachment(BackendSession bs, String AttachmentName) 
+			throws AttachementNotFoundException, CollectionNotFoundException, DaoException, ProcessingEmailException {
 		return contentsExporter.getEmailAttachement(bs, AttachmentName);
 	}
+	
 }
