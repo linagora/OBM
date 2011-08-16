@@ -2,6 +2,7 @@ package org.obm.push.handler;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,7 +52,6 @@ import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.w3c.dom.Document;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -356,7 +356,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	public void sendResponse(BackendSession bs, Responder responder, boolean sendHierarchyChange, IContinuation continuation) {
 		try {
 			SyncResponse syncResponse = doTheJob(bs, monitoredCollectionService.list(bs.getCredentials(), bs.getDevice()),
-					ImmutableMap.<String, String> of(), continuation);
+					Collections.EMPTY_MAP, continuation);
 			sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 		} catch (DaoException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
