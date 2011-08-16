@@ -2,6 +2,8 @@ package fr.aliacom.obm.common.calendar;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.isNull;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 
@@ -9,6 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 
 import net.fortuna.ical4j.data.ParserException;
@@ -22,6 +26,7 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.services.ImportICalendarException;
 
@@ -86,8 +91,8 @@ public class CalendarBindingImplTest {
 	
 	private Helper mockRightsHelper(String calendar, AccessToken accessToken) {
 		Helper rightsHelper = createMock(Helper.class);
-		rightsHelper.canWriteOnCalendar(eq(accessToken), eq(calendar));
-		EasyMock.expectLastCall().andReturn(true);
+		expect(rightsHelper.canWriteOnCalendar(eq(accessToken), eq(calendar))).andReturn(true).anyTimes();
+		expect(rightsHelper.canReadCalendar(eq(accessToken), eq(calendar))).andReturn(true).anyTimes();
 		return rightsHelper;
 	}
 
@@ -293,6 +298,78 @@ public class CalendarBindingImplTest {
 		Assert.assertEquals(ParticipationState.ACCEPTED, fakeUserAttendee.getState());
 	}
 	
+	@Test
+	public void testPurge() throws FindException, ServerFault, SQLException {
+		String calendar = "cal1";
+		String domainName = "domain1";
+		String userEmail = "user@domain1";
+		String oldEventNoOtherAttendeesExtId = "oldEventNoOtherAttendeesExtId";
+		String oldEventWithOtherAttendeesExtId = "oldEventWithOtherAttendeesExtId";
+		String oldEventNoOtherAttendeesUid = "1";
+		String oldEventWithOtherAttendeesUid = "2";
+
+		String otherUserEmail = "user2@domain1";
+		Attendee userAttendee = getFakeOwnerAttendee(userEmail);
+		Attendee otherAttendee = getFakeOwnerAttendee(otherUserEmail);
+		userAttendee.setState(ParticipationState.NEEDSACTION);
+		final ObmUser obmUser = mockObmUser(userEmail);
+
+		AccessToken accessToken = mockAccessToken(domainName);
+
+		final Calendar oldEventDate = Calendar.getInstance();
+		oldEventDate.add(Calendar.MONTH, -8);
+
+		Event oldEventNoOtherAttendees = new Event();
+		oldEventNoOtherAttendees.setExtId(oldEventNoOtherAttendeesExtId);
+		oldEventNoOtherAttendees.setUid(oldEventNoOtherAttendeesUid);
+		oldEventNoOtherAttendees.setAttendees(ImmutableList.of(userAttendee));
+		oldEventNoOtherAttendees.setOwner(userEmail);
+		oldEventNoOtherAttendees.setType(EventType.VEVENT);
+		oldEventNoOtherAttendees.setInternalEvent(true);
+
+		Event oldEventWithOtherAttendees = new Event();
+		oldEventWithOtherAttendees.setExtId(oldEventWithOtherAttendeesExtId);
+		oldEventWithOtherAttendees.setUid(oldEventWithOtherAttendeesUid);
+		oldEventWithOtherAttendees.setAttendees(ImmutableList.of(userAttendee, otherAttendee));
+		oldEventWithOtherAttendees.setOwner(userEmail);
+		oldEventWithOtherAttendees.setType(EventType.VEVENT);
+
+		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
+		eventChangeHandler.delete(obmUser, oldEventNoOtherAttendees, false);
+		eventChangeHandler.updateParticipationState(oldEventWithOtherAttendees, obmUser, 
+				ParticipationState.DECLINED, false);
+
+		UserService userService = createMock(UserService.class);
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser).atLeastOnce();
+		expect(userService.getUserFromLogin(userEmail, domainName)).andReturn(obmUser).atLeastOnce();
+		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).atLeastOnce();
+
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		expect(calendarDao.listEventsByIntervalDate(eq(accessToken), eq(obmUser), isA(Date.class), 
+				isA(Date.class), (EventType)isNull())).
+			andReturn(ImmutableList.of(oldEventNoOtherAttendees, oldEventWithOtherAttendees)).once();
+		expect(calendarDao.findEvent(accessToken, Integer.parseInt(oldEventNoOtherAttendeesUid))).
+			andReturn(oldEventNoOtherAttendees).atLeastOnce();
+		expect(calendarDao.removeEvent(accessToken, Integer.parseInt(oldEventNoOtherAttendeesUid), 
+				oldEventNoOtherAttendees.getType(), oldEventNoOtherAttendees.getSequence()+1)).
+				andReturn(oldEventNoOtherAttendees);
+		expect(calendarDao.findEventByExtId(accessToken, obmUser, oldEventWithOtherAttendeesExtId)).
+			andReturn(oldEventWithOtherAttendees).atLeastOnce();
+		expect(calendarDao.changeParticipationState(accessToken, obmUser, 
+				oldEventWithOtherAttendees.getExtId(), ParticipationState.DECLINED)).andReturn(true);		
+
+		Helper rightsHelper = mockRightsHelper(calendar, accessToken);
+
+		Object[] mocks = { accessToken, userService, rightsHelper, obmUser, calendarDao, eventChangeHandler };
+		EasyMock.replay(mocks);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, rightsHelper, null);
+
+		calendarService.purge(accessToken, calendar);
+
+		EasyMock.verify(mocks);
+	}
+
 	@Test
 	public void testImportEventInTheFuture() 
 		throws ImportICalendarException, ServerFault, IOException, ParserException, FindException, SQLException {
