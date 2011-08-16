@@ -104,16 +104,19 @@ public class OBMBackend implements IBackend {
 				emailPushMonitors.put(collectionId, emt);
 			}
 		} catch (DaoException e) {
-			logger.error("Error while starting idle on collection [ " + collectionId + " ]", e);
+			stopIdle(emt, collectionId, e);
 		} catch (IMAPException e) {
-			logger.error("Error while starting idle on collection [ " + collectionId + " ]", e);
-		} finally {
-			if (emt != null) {
-				emt.stopIdle();	
-			}
+			stopIdle(emt, collectionId, e);
 		}
 	}
 
+	private void stopIdle(EmailMonitoringThread emt, Integer collectionId, Exception exception) {
+		logger.error("Error while starting idle on collection [ " + collectionId + " ]", exception);
+		if (emt != null) {
+			emt.stopIdle();	
+		}
+	}
+	
 	@Override
 	public String getWasteBasket() {
 		return "Trash";
