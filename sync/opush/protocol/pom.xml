@@ -68,6 +68,16 @@
 			<artifactId>jetty-http</artifactId>
 			<version>7.4.2.v20110526</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 </project>
