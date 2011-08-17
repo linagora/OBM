@@ -49,11 +49,10 @@ public class GetItemEstimateProtocol {
 	}
 
 	public Document encodeResponse(GetItemEstimateResponse response) {
-		
 		final Document document = createDocument();
-		final Element responseElement = createResponseNode(document);
-		DOMUtils.createElementAndText(responseElement, "Status", "1");
 		for (Estimate estimate: response.getEstimates()) {
+			final Element responseElement = createResponseNode(document);
+			DOMUtils.createElementAndText(responseElement, "Status", GetItemEstimateStatus.OK.asXmlValue());
 			final Element collectionElement = DOMUtils.createElement(responseElement, "Collection");
 			createCollectionIdElement(estimate.getCollection(), collectionElement);
 			createEstimateElement(estimate.getEstimate(), collectionElement);
