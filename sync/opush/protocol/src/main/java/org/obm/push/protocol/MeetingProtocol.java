@@ -27,8 +27,7 @@ public class MeetingProtocol {
 		return new MeetingHandlerRequest(items);
 	}
 	
-	public List<Document> encodeResponses(MeetingHandlerResponse meetingResponse) {
-		final List<Document> responses = new ArrayList<Document>();
+	public Document encodeResponses(MeetingHandlerResponse meetingResponse) {
 		Document reply = DOMUtils.createDoc(null, "MeetingResponse");
 		Element root = reply.getDocumentElement();
 		for (ItemChangeMeetingResponse item: meetingResponse.getItemChanges()) {
@@ -38,9 +37,8 @@ public class MeetingProtocol {
 				DOMUtils.createElementAndText(response, "CalId", item.getCalId());
 			}
 			DOMUtils.createElementAndText(response, "ReqId", item.getReqId());
-			responses.add(DOMUtils.cloneDOM(reply));
 		}
-		return responses;
+		return reply;
 	}
 	
 	public Document encodeErrorResponse(MeetingResponseStatus invalidMeetingRrequest) {

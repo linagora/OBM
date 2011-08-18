@@ -68,15 +68,13 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	protected void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		
-		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType() + ")");
 		MeetingHandlerRequest meetingRequest;
 		try {
 			
 			meetingRequest = meetingProtocol.getRequest(doc);
 			MeetingHandlerResponse meetingResponse = doTheJob(meetingRequest, bs);
-			for (Document document: meetingProtocol.encodeResponses(meetingResponse)) {
-				sendResponse(responder, document);
-			}
+			Document document = meetingProtocol.encodeResponses(meetingResponse);
+			sendResponse(responder, document);
 			
 		} catch (NoDocumentException e) {
 			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST, e);
