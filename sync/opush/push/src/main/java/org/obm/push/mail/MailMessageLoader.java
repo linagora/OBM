@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.minig.imap.Envelope;
@@ -138,7 +139,9 @@ public class MailMessageLoader {
 			parser.parse(mimeData);
 
 			mm.setMimeData(handler.getMessage());
-		} catch (Exception e) {
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (MimeException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}

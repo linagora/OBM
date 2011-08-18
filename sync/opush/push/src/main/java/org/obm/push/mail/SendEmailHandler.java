@@ -79,7 +79,7 @@ public class SendEmailHandler implements ContentHandler {
 		return invitation;
 	}
 
-	public InputStream getMessage() throws Exception {
+	public InputStream getMessage() {
 		return MimeTreeRenderer.getInstance().renderMimePart(root);
 	}
 

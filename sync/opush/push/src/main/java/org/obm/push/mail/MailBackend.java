@@ -33,6 +33,8 @@ import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.SendEmailException;
+import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -426,7 +428,9 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (StoreEmailException e) {
 			throw new ProcessingEmailException(e);
-		} catch (Exception e) {
+		} catch (SendEmailException e) {
+			throw new ProcessingEmailException(e);
+		} catch (SmtpInvalidRcptException e) {
 			throw new ProcessingEmailException(e);
 		} finally {
 			if(emailData != null){
