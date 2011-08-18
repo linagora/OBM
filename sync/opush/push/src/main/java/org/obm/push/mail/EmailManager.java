@@ -303,20 +303,29 @@ public class EmailManager implements IEmailManager {
 		InputStream streamMail = new BufferedInputStream(mimeMail);
 		try {
 			streamMail.mark(streamMail.available());
+			
 			try {
 				smtpProvider.sendEmail(bs, from, setTo, setCc, setCci, streamMail);
 			} catch (SmtpInvalidRcptException e1) {
 				invalidRctp = e1;
 			}
+			
 			if (saveInSent) {
 				streamMail.reset();
-				storeInSent(bs, streamMail);
+				final Long uid = storeInSent(bs, streamMail);
+				if (uid != null) {
+					logger.info("This mail {} is stored in 'sent' folder.", uid);
+				} else {
+					logger.error("The mail can't to be store in 'sent' folder.");
+				}
 			}
+			
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
 		} finally {
 			closeStream(streamMail);
 		}
+		
 		if (invalidRctp != null) {
 			throw invalidRctp;
 		}
@@ -386,21 +395,18 @@ public class EmailManager implements IEmailManager {
 	 * Store the mail in the Sent folder storeInSent reset the mimeMail will be
 	 * if storeInSent read it
 	 * 
-	 * @param bs
-	 *            the BackendSession
-	 * @param mail
-	 *            the mail that will be stored
+	 * @param bs the BackendSession
+	 * @param mail the mail that will be stored
 	 * @return the imap uid of the mail
 	 * @throws StoreEmailException
 	 */
-	private long storeInSent(BackendSession bs, InputStream mail) throws StoreEmailException {
-		logger.info("Store mail in folder[Sent]");
+	private Long storeInSent(BackendSession bs, InputStream mail) throws StoreEmailException {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
 			String sentFolderName = null;
 			ListResult lr = listAllFolder(store);
-			for (ListInfo i : lr) {
+			for (ListInfo i: lr) {
 				if (i.getName().toLowerCase().endsWith("sent")) {
 					sentFolderName = i.getName();
 				}

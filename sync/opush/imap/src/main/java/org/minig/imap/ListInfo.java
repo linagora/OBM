@@ -16,6 +16,8 @@
 
 package org.minig.imap;
 
+import com.google.common.base.Objects;
+
 public class ListInfo {
 
 	private String name;
@@ -50,6 +52,11 @@ public class ListInfo {
 		return createSubfolder;
 	}
 	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(getClass())
+				.add("name", name)
+				.toString();
+	}
 	
-
 }
