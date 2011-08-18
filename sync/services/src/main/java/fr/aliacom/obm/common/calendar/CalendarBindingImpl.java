@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
@@ -778,27 +779,28 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public Integer getEventObmIdFromExtId(AccessToken token, String calendar,
-			String extId) throws ServerFault {
-
+			String extId) throws ServerFault, EventNotFoundException {
 		Event event = getEventFromExtId(token, calendar, extId);
-		if (event != null) {
-			return event.getDatabaseId();
-		}
-		return null;
+		return event.getDatabaseId();
 	}
 
 	@Override
 	@Transactional
-	public Event getEventFromExtId(AccessToken token, String calendar,
-			String extId) throws ServerFault {
+	public Event getEventFromExtId(AccessToken token, String calendar, String extId) 
+			throws ServerFault, EventNotFoundException {
+		
 		if (!helper.canReadCalendar(token, calendar)) {
 			throw new ServerFault("user has no read rights on calendar "
 					+ calendar);
 		}
 		try {
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
-			return calendarDao.findEventByExtId(token, calendarUser, extId);
-		} catch (Throwable e) {
+			Event event = calendarDao.findEventByExtId(token, calendarUser, extId);
+			if (event == null) {
+				throw new EventNotFoundException("Event from extId " + extId + " not found.");
+			} 
+			return event;
+		} catch (FindException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}

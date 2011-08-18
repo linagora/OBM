@@ -13,6 +13,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.ISyncClient;
@@ -191,17 +192,28 @@ public abstract class AbstractClientImpl implements ISyncClient {
 
 	protected void checkServerFaultException(Document doc) throws ServerFault {
 		if (documentIsError(doc)) {
-			throw new ServerFault( getErrrorMessage(doc) );
+			throw new ServerFault( getErrorMessage(doc) );
 		}
 	}
 
 	protected void checkEventAlreadyExistException(Document doc) throws ServerFault, EventAlreadyExistException {
 		if (documentIsError(doc)) {
-			String message = getErrrorMessage(doc);
-			String type = DOMUtils.getElementText(doc.getDocumentElement(),
-					"type");
+			String message = getErrorMessage(doc);
+			String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
 			if (EventAlreadyExistException.class.getName().equals(type)) {
 				throw new EventAlreadyExistException(message);
+			} else {
+				throw new ServerFault(message);
+			}
+		}
+	}
+	
+	protected void checkEventNotFoundException(Document doc) throws ServerFault, EventNotFoundException {
+		if (documentIsError(doc)) {
+			String message = getErrorMessage(doc);
+			String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
+			if (EventNotFoundException.class.getName().equals(type)) {
+				throw new EventNotFoundException(message);
 			} else {
 				throw new ServerFault(message);
 			}
@@ -212,7 +224,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		return doc.getDocumentElement().getNodeName().equals("error");
 	}
 	
-	private String getErrrorMessage(Document doc) {
+	private String getErrorMessage(Document doc) {
 		return DOMUtils.getElementText(doc.getDocumentElement(), "message");
 	}
 

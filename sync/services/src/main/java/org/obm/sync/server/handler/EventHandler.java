@@ -26,6 +26,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
@@ -305,24 +306,20 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendListEvent(e);
 	}
 
-	private String getEventObmIdFromExtId(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
-		Integer id = binding.getEventObmIdFromExtId(at, 
-				getCalendar(at, params), params.getParameter("extId"));
+	private String getEventObmIdFromExtId(AccessToken at, ParametersSource params, XmlResponder responder) 
+			throws ServerFault, EventNotFoundException {
+		
+		Integer id = binding.getEventObmIdFromExtId(at, getCalendar(at, params), params.getParameter("extId"));
 		if (id != null) {
 			return responder.sendInt(id);
 		}
 		return responder.sendError("not found");		
 	}
 	
-	private String getEventFromExtId(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws ServerFault {
-		Event e = binding.getEventFromExtId(at, 
-				getCalendar(at, params), params.getParameter("extId"));
-		if (e != null) {
-			return responder.sendEvent(e);
-		}
-		return responder.sendError("not found");
+	private String getEventFromExtId(AccessToken at, ParametersSource params, XmlResponder responder) 
+			throws ServerFault, EventNotFoundException {
+		Event e = binding.getEventFromExtId(at, getCalendar(at, params), params.getParameter("extId"));
+		return responder.sendEvent(e);
 	}
 
 	private String getUserEmail(AccessToken at, XmlResponder responder) throws ServerFault {

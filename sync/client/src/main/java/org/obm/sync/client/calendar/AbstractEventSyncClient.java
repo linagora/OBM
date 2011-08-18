@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.httpclient.HttpClient;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
@@ -236,12 +237,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	}
 
 	@Override
-	public Event getEventFromExtId(AccessToken token, String calendar, String extId) throws ServerFault {
+	public Event getEventFromExtId(AccessToken token, String calendar, String extId) throws ServerFault, EventNotFoundException {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		Document doc = execute(type + "/getEventFromExtId", params);
-		checkServerFaultException(doc);
+		checkEventNotFoundException(doc);
 		if (doc.getDocumentElement().getNodeName().equals("event")) {
 			return respParser.parseEvent(doc.getDocumentElement());
 		}
@@ -250,12 +251,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl
 	}
 
 	@Override
-	public Integer getEventObmIdFromExtId(AccessToken token, String calendar, String extId) throws ServerFault {
+	public Integer getEventObmIdFromExtId(AccessToken token, String calendar, String extId) throws ServerFault, EventNotFoundException {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId);
 		Document doc = execute(type + "/getEventObmIdFromExtId", params);
-		checkServerFaultException(doc);
+		checkEventNotFoundException(doc);
 		String value = DOMUtils.getElementText(doc.getDocumentElement(), "value");
 		return Integer.parseInt(value);
 	}

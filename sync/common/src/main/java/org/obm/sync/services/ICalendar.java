@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
@@ -146,16 +147,17 @@ public interface ICalendar {
 	/**
 	 * @return the obm id of the event that have the given extId into the given
 	 *         calendar
+	 * @throws EventNotFoundException 
 	 */
 	Integer getEventObmIdFromExtId(AccessToken token, String calendar,
-			String extId) throws ServerFault;
+			String extId) throws ServerFault, EventNotFoundException;
 
 	/**
 	 * retrieve an event by its extId into specified calendar User needs read
 	 * access on selected calendar to execute this service.
+	 * @throws EventNotFoundException 
 	 */
-	Event getEventFromExtId(AccessToken token, String calendar, String extId)
-			throws ServerFault;
+	Event getEventFromExtId(AccessToken token, String calendar, String extId) throws ServerFault, EventNotFoundException;
 
 	/**
 	 * retrieve all events between start and end date. User needs read access on

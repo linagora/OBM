@@ -27,6 +27,7 @@ import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
@@ -300,10 +301,12 @@ public class CalendarBackend extends ObmSyncBackend {
 			if (obmid != null) {
 				return obmid.toString();
 			}
-			return null;
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
+		} catch (EventNotFoundException e) {
+			logger.info(e.getMessage());
 		}
+		return null;
 	}
 
 	public void delete(BackendSession bs, Integer collectionId, String serverId) 
@@ -362,7 +365,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			throws UnknownObmSyncServerException {
 		
 		try {
-			Event obmEvent = calCli.getEventFromExtId(at, bs.getLoginAtDomain(), event.getUID());
+			Event obmEvent = getEventFromExtId(bs, event, calCli, at);
 			
 			boolean isInternal = EventConverter.isInternalEvent(obmEvent, false);
 			Event newEvent = null;
@@ -397,6 +400,17 @@ public class CalendarBackend extends ObmSyncBackend {
 		} catch (ServerFault fault) {
 			throw new UnknownObmSyncServerException(fault);
 		}		
+	}
+
+	private Event getEventFromExtId(BackendSession bs, MSEvent event, AbstractEventSyncClient calCli, AccessToken at) 
+			throws ServerFault {
+		Event obmEvent = null;
+		try {
+			obmEvent = calCli.getEventFromExtId(at, bs.getLoginAtDomain(), event.getUID());
+		} catch (EventNotFoundException e) {
+			logger.info(e.getMessage());
+		}
+		return obmEvent;
 	}
 
 	private String updateUserStatus(BackendSession bs, MSEvent msEvent, AttendeeStatus status, AbstractEventSyncClient calCli,
@@ -447,7 +461,9 @@ public class CalendarBackend extends ObmSyncBackend {
 				if (e != null) {
 					ret.add( createItemChangeToAddFromEvent(bs, collectionId, e) );
 				}
-			} catch (ServerFault e1) {
+			} catch (ServerFault e) {
+				logger.error(e.getMessage(), e);
+			} catch (EventNotFoundException e) {
 				logger.error("fetchItems : event from extId {} not found", eventUid);
 			}
 		}
@@ -475,6 +491,8 @@ public class CalendarBackend extends ObmSyncBackend {
 					ret.add(createItemChangeToRemove(collectionId, String.valueOf(id)));
 				}
 			} catch (ServerFault e) {
+				logger.error(e.getMessage(), e);
+			} catch (EventNotFoundException e) {
 				logger.error("fetchDeletedItems : event from extId {} not found", eventUid);
 			}
 		}
