@@ -112,16 +112,16 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 				MSEmail invitation = ((MSEmail) ic.getData());
 				if (invitation != null) {
 					meetingResponse.setStatus(MeetingResponseStatus.SUCCESS);
+					String calId = contentsImporter.importCalendarUserStatus(bs, item.getCollectionId(), 
+							invitation, item.getUserResponse());
 					if (!AttendeeStatus.DECLINE.equals(item.getUserResponse())) {
-						String calId = contentsImporter.importCalendarUserStatus(bs,
-								item.getCollectionId(), invitation, item.getUserResponse());	
 						meetingResponse.setCalId(calId);	
 					}
 				} else {
 					meetingResponse.setStatus(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 				}
 			} else {
-				meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
+				meetingResponse.setStatus(MeetingResponseStatus.SERVER_MAILBOX_ERROR);
 			}
 			
 			meetingResponse.setReqId(item.getReqId());	
