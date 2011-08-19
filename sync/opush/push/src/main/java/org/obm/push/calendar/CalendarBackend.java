@@ -416,7 +416,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	private String updateUserStatus(BackendSession bs, MSEvent msEvent, AttendeeStatus status, AbstractEventSyncClient calCli,
 			AccessToken at) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
-		logger.info("update user status[ {} in calendar ", status.toString());
+		logger.info("update user status[ {} in calendar ]", status.toString());
 		ParticipationState participationStatus = EventConverter.status(null, status);
 		try {
 			calCli.changeParticipationState(at, bs.getLoginAtDomain(), msEvent.getUID(), participationStatus, msEvent.getObmSequence(), true);

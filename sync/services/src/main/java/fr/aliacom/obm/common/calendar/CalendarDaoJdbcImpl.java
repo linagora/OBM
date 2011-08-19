@@ -2396,28 +2396,59 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			boolean success = changeParticipationState(con, token, extId, calendar, participationState);
-			return success;
+			changeParticipationState(con, token, extId, calendar, participationState);
+			ParticipationState stateFromDatabase = getParticipationState(con, extId, calendar);
+			if (stateFromDatabase != null && (participationState == stateFromDatabase)) {
+				return true;
+			}
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
+		return false;
 	}
 	
-	private boolean changeParticipationState(Connection con,
-			AccessToken token,
-			String extId, ObmUser calendarOwner,
+	private ParticipationState getParticipationState(Connection con, String extId, ObmUser calendarOwner) throws SQLException {
+		
+		PreparedStatement ps = null;
+		String q = "SELECT att.eventlink_state FROM Event e "
+				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
+				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
+				+ "INNER JOIN UserObm ON e.event_owner=userobm_id "
+				+ "INNER JOIN Domain ON e.event_domain_id=domain_id "
+				+ "WHERE e.event_ext_id = ? AND event_usercreate = ? AND ue.userentity_user_id = ?";
+		
+		try {
+			ps = con.prepareStatement(q);		
+
+			int idx = 1;
+			ps.setString(idx++, extId);
+			ps.setInt(idx++, calendarOwner.getUid());
+			ps.setInt(idx++, calendarOwner.getUid());
+			ResultSet resultSet = ps.executeQuery();
+			if (resultSet.next()) {
+				return ParticipationState.getValueOf(resultSet.getString(1));
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+		return null;
+	}
+	
+	private void changeParticipationState(Connection con, AccessToken token, String extId, ObmUser calendarOwner,
 			ParticipationState participationState) throws SQLException {
 
 		PreparedStatement ps = null;
 		String q = "UPDATE EventLink " 
-			+ "SET eventlink_state=?, eventlink_userupdate=? "
-			+ "WHERE eventlink_event_id="
-			+ "( SELECT event_id FROM Event WHERE event_ext_id=? ) AND "
+			+ "SET eventlink_state = ?, eventlink_userupdate = ? "
+			+ "WHERE eventlink_event_id = "
+			+ "( SELECT event_id FROM Event WHERE event_ext_id = ? AND event_usercreate = ? ) AND "
 			+ "eventlink_entity_id IN "
-			+ "( SELECT userentity_entity_id FROM UserEntity WHERE userentity_user_id=? )";
+			+ "( SELECT userentity_entity_id FROM UserEntity WHERE userentity_user_id = ? )";
 		
 		Integer loggedUserId = token.getObmId();
-		Integer userId = calendarOwner.getUid();
 
 		try {
 			ps = con.prepareStatement(q);		
@@ -2427,10 +2458,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					participationState.getJdbcObject(obmHelper.getType()));
 			ps.setInt(idx++, loggedUserId);
 			ps.setString(idx++, extId);
-			ps.setInt(idx++, userId);
+			ps.setInt(idx++, calendarOwner.getUid());
+			ps.setInt(idx++, calendarOwner.getUid());
 			ps.execute();
-			//FIXME check that update change an entry in db
-			return true;
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}

@@ -1026,8 +1026,10 @@ public class CalendarBindingImpl implements ICalendar {
 		if (helper.canWriteOnCalendar(token, calendar)) {
 			try {
 				return changeParticipationStateInternal(token, calendar, extId, participationState, sequence, notification);
-			} catch (Exception e) {
+			} catch (FindException e) {
 				throw new ServerFault("no user found with calendar " + calendar);
+			} catch (SQLException e) {
+				throw new ServerFault(e);
 			}
 		}
 		throw new ServerFault("user has no write rights on calendar " + calendar);
