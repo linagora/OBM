@@ -9,7 +9,7 @@ public interface IContinuation {
 	Boolean isInitial();
 	Boolean isResumed();
 	
-	void suspend(long msTimeout);
+	void suspend(BackendSession bs, long secondsTimeout);
 
 	void resume();
 	
@@ -20,7 +20,6 @@ public interface IContinuation {
 	String getErrorStatus();
 
 	BackendSession getBackendSession();
-	void setBackendSession(BackendSession bs);
 	
 	IListenerRegistration getListenerRegistration();
 	void setListenerRegistration(IListenerRegistration reg);

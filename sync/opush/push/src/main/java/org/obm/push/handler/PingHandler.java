@@ -109,8 +109,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 		IListenerRegistration reg = backend.addChangeListener(l);
 		continuation.setListenerRegistration(reg);
 		continuation.setCollectionChangeListener(l);
-		logger.info("suspend for {} seconds", pingRequest.getHeartbeatInterval());
-		continuation.suspend(pingRequest.getHeartbeatInterval() * 1000);
+		continuation.suspend(bs, pingRequest.getHeartbeatInterval());
 	}
 
 	@Override

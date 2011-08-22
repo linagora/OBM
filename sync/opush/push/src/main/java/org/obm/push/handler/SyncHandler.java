@@ -146,7 +146,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync)
 			throws CollectionNotFoundException, WaitIntervalOutOfRangeException, DaoException {
 		
-		logger.info("suspend for {} seconds", sync.getWaitInSecond());
 		if (sync.getWaitInSecond() > 3540) {
 			throw new WaitIntervalOutOfRangeException();
 		}
@@ -172,7 +171,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 					continuation);
 		}
 		
-		continuation.suspend(sync.getWaitInSecond() * 1000);
+		continuation.suspend(bs, sync.getWaitInSecond());
 	}
 
 	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds, 
