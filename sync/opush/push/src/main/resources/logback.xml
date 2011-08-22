@@ -58,7 +58,13 @@
 		</sift>
 	</appender>
 
-	<root level="INFO">
+	<!-- push -->
+	<logger level="DEBUG" name="org.obm.push.monitor" />
+	<!-- request/response -->
+    <logger level="INFO" name="org.obm.push.impl.Responder" />
+    <logger level="INFO" name="org.obm.push.handler" />
+
+	<root level="ERROR">
 		<appender-ref ref="PROD" />
 		<!--appender-ref ref="STDOUT" /-->
 		<!--<appender-ref ref="SIFTING" />-->
