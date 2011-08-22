@@ -63,16 +63,13 @@ public class SyncDecoder {
 
 		Boolean isPartial = getPartial(root);
 		if (isPartial) {
-			logger.info("Partial element has been found. Collection(s) will be from cache");
+			throw new PartialException();
 		}
 		NodeList nl = root.getElementsByTagName("Collection");
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element col = (Element) nl.item(i);
 			SyncCollection collec = getCollection(backendSession.getCredentials(), backendSession.getDevice(), col, isPartial);
 			ret.addCollection(collec);
-		}
-		if (ret.getCollections().size() == 0) {
-			throw new PartialException();
 		}
 		syncedCollectionStoreService.put(backendSession.getCredentials(), backendSession.getDevice(), ret.getCollections());
 		return ret;
