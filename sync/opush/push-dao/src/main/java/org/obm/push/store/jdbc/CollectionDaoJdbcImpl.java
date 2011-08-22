@@ -288,8 +288,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			ps.setTimestamp(idx++, ts);
 			rs = ps.executeQuery();
 			ChangedCollections changedCollections = getContactChangedCollectionsFromResultSet(rs, lastSync);
-			if (logger.isInfoEnabled() && changedCollections.getChanged().size() > 0) {
-				logger.info("changed collections: " + changedCollections.getChanged().size() + " dbDate: "
+			if (logger.isInfoEnabled() && changedCollections.getChanges().size() > 0) {
+				logger.info("changed collections: " + changedCollections.getChanges().size() + " dbDate: "
 						+ changedCollections.getLastSync());
 			}
 			return changedCollections;

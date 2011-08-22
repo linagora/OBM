@@ -39,7 +39,7 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 	public void run() {
 		try {
 			Date lastSync = getBaseLastSync();
-			logger.info("lastsync: "+lastSync);
+			logger.info("Starting monitoring thread with reference date {}", lastSync);
 			while (!stopped) {
 				try {
 					try {
@@ -57,8 +57,8 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 						}
 						ChangedCollections changedCollections = getChangedCollections(lastSync);
 						
-			            if (logger.isInfoEnabled() && changedCollections.getChanged().size() > 0) {
-							logger.info("changed collections: " + changedCollections.toString());
+			            if (logger.isInfoEnabled() && changedCollections.hasChanges()) {
+							logger.info("changes detected : {}", changedCollections.toString());
 						}
 						toNotify = listPushNotification(selectListenersToNotify(changedCollections, ccls));
 					}
@@ -86,7 +86,7 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 	private Set<ICollectionChangeListener> selectListenersToNotify(ChangedCollections changedCollections,
 			Set<ICollectionChangeListener> ccls) {
 		
-		if (changedCollections.getChanged().isEmpty()) {
+		if (changedCollections.getChanges().isEmpty()) {
 			return ImmutableSet.<ICollectionChangeListener>of();
 		}
 		

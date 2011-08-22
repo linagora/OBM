@@ -8,11 +8,11 @@ import com.google.common.base.Objects;
 public class ChangedCollections {
 
 	private Date lastSync;
-	private Set<SyncCollection> changed;
+	private Set<SyncCollection> changes;
 	
 	public ChangedCollections(Date lastSync, Set<SyncCollection> changed) {
 		this.lastSync = lastSync;
-		this.changed = changed;
+		this.changes = changed;
 	}
 
 	
@@ -20,15 +20,19 @@ public class ChangedCollections {
 		return lastSync;
 	}
 
-	public Set<SyncCollection> getChanged() {
-		return changed;
+	public boolean hasChanges() {
+		return !changes.isEmpty();
+	}
+	
+	public Set<SyncCollection> getChanges() {
+		return changes;
 	}
 	
 	@Override
 	public String toString() {
 		return Objects
 				.toStringHelper(getClass())
-				.addValue(changed)
+				.addValue(changes)
 				.toString();
 	}
 	

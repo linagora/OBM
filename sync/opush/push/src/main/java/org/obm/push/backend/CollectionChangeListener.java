@@ -62,7 +62,7 @@ public class CollectionChangeListener implements
 						.result();
 			}
 		});
-		collectionPathSet.addAll(changedCollections.getChanged());
+		collectionPathSet.addAll(changedCollections.getChanges());
 		return collectionPathSet;
 	}
 	

@@ -57,8 +57,7 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 			store.startIdle(this);
 		}
 		remainConnected = true;
-		logger.info("Start email push monitoring for collection[ "
-				+ collectionName + "]");
+		logger.info("Start monitoring for collection : '{}'", collectionName);
 	}
 	
 	public synchronized void stopIdle() {
@@ -68,8 +67,7 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 			store = null;
 		}
 		remainConnected = false;
-		logger.info("Stop email push monitoring for collection[ "
-				+ collectionName + "]");
+		logger.info("Stop monitoring for collection : '{}'", collectionName);
 	}
 
 	@Override
@@ -103,8 +101,7 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 				login = login.substring(0, at);
 			}
 		}
-		logger.info("creating idleClient with login: " + login
-				+ " (loginWithDomain: " + useDomain + ")");
+		logger.debug("Creating idleClient with login: {}, (useDomain {})", login, useDomain);
 		IdleClient idleCli = new IdleClient(emailManager.locateImap(bs), 143, login, bs
 				.getPassword());
 		return idleCli;
