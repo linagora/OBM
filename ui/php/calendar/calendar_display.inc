@@ -1963,8 +1963,10 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
 /**
  * Perform HTML and javascript code for events. 
  * 
- * @param mixed $calendar 
- * @param mixed $calendar_entity 
+ * @param Occurrence $occurence
+ * @param String $unit display unit (hour day)
+ * @param Array $calendar_entity array of calendars entities we create display ( ["user"] => Array ( [ user_id ] => array(["name"] => "joe", ["class"] => "eventOwner|eventOwner0...", ["type"] => "user", ["id"] => 9) ) )
+ * @param Array $writable_entity array of entities we ($obm["uid"]) can write to ( ["ids"] => array(9,15), ["entity"] => array ( [ user_id ] => array ( ["id"] => 9, ["label"] => "joe" ), array(...) ) )
  * @access public
  * @return event HTML and javascript code
  */
@@ -1982,17 +1984,6 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $owner = $event->owner;
   $owner_name = phpStringToJsString($event->owner_name);
   $organizer_name = phpStringToJsString($event->organizer_name);
-
-  if ($owner == $obm['uid'] || in_array($owner,$writable_entity['ids'])) {
-    $updatable =  true;
-    $ed[] = 'updatable:true';
-  }
-  
-  if ($output_target == 'print' || $action == 'portlet') {
-    $updatable =  false;
-    $ed[] = 'updatable:false';
-  }
-
   $attendee = $event->attendee;
   if ($event->privacy == 1 && (is_null($attendee['user'][$obm['uid']])) && $owner != $obm['uid']) {
     $title = phpStringToJsString($l_private);
@@ -2043,6 +2034,16 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
   $opacity = strtolower($occurrence->event->opacity);
   $eventColor = get_color_data($event->color);
+  $updatable = false;
+  if ( $entity_id == $event->owner && ( $owner == $obm['uid'] || in_array($owner,$writable_entity['ids']) ) ) {
+    $updatable =  true;
+    $ed[] = 'updatable:true';
+  }
+  
+  if ($output_target == 'print' || $action == 'portlet') {
+    $updatable =  false;
+    $ed[] = 'updatable:false';
+  }
 
   $ed[] = "id:'$id'";
   $ed[] = "opacity:'$event->opacity'";
