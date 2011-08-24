@@ -265,5 +265,66 @@ public class CalendarItemsParserTest {
 		
 		Assert.assertEquals(RecurrenceKind.none, ev.getRecurrence().getKind());
 	}
-	
+
+	@Test
+	public void testEventException() throws SAXException, IOException {
+		String xml ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+			"<event id=\"316\" isInternal=\"true\" sequence=\"1\" allDay=\"false\" type=\"VEVENT\">" +
+			"  <extId>a7db3cd5-adf3-42f4-95f3-d0a7a9c01aa3</extId>" +
+			"  <owner>test2</owner>" +
+			"  <priority>2</priority>" +
+			"  <privacy>0</privacy>" +
+			"  <date>1313994600000</date>" +
+			"  <duration>3600</duration>" +
+			"  <title>New Event from TBird</title>" +
+			"  <alert>-1</alert>" +
+			"  <opacity>OPAQUE</opacity>" +
+			"  <ownerEmail>test2@par.lng</ownerEmail>" +
+			"  <attendees>" +
+			"    <attendee email=\"test2@par.lng\" displayName=\"test2 test2\" state=\"NEEDS-ACTION\" required=\"REQ\" isOrganizer=\"true\"/>" +
+			"  </attendees>" +
+			"  <recurrence kind=\"daily\" freq=\"1\" days=\"\">" +
+			"    <eventExceptions>" +
+			"      <eventException allDay=\"false\" type=\"VEVENT\">" +
+			"        <recurrenceId>1314081000000</recurrenceId>" +
+			"        <owner>test2</owner>" +
+			"        <priority>2</priority>" +
+			"        <privacy>0</privacy>" +
+			"        <date>1314077400000</date>" +
+			"        <duration>3600</duration>" +
+			"        <title>New Event from TBird</title>" +
+			"        <alert>-1</alert>" +
+			"        <opacity>OPAQUE</opacity>" +
+			"        <ownerEmail>test2@par.lng</ownerEmail>" +
+			"        <attendees>" +
+			"          <attendee email=\"test@par.lng\" displayName=\"test test\" state=\"NEEDS-ACTION\" required=\"OPT\"/>" +
+			"          <attendee email=\"test2@par.lng\" displayName=\"test2 test2\" state=\"NEEDS-ACTION\" required=\"REQ\" isOrganizer=\"true\"/>" +
+			"        </attendees>" +
+			"        <recurrence kind=\"none\" freq=\"1\" days=\"\" end=\"1314177107089\"/>" +
+			"      </eventException>" +
+			"    </eventExceptions>" +
+			"  </recurrence>" +
+			"</event>";
+		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
+		Event ev = parser.parseEvent(doc.getDocumentElement());
+
+		Assert.assertEquals(1, ev.getRecurrence().getEventExceptions().size());
+
+		Event evEx = ev.getRecurrence().getEventExceptions().get(0);
+		Assert.assertEquals("", evEx.getUid());
+		Assert.assertEquals("a7db3cd5-adf3-42f4-95f3-d0a7a9c01aa3", evEx.getExtId());
+		Assert.assertEquals(false, evEx.isAllday());
+		Assert.assertEquals(EventType.VEVENT, evEx.getType());
+		Assert.assertEquals(1314081000000L, evEx.getRecurrenceId().getTime());
+		Assert.assertEquals("test2", evEx.getOwner());
+		Assert.assertEquals(new Integer(2), evEx.getPriority());
+		Assert.assertEquals(0, evEx.getPrivacy());
+		Assert.assertEquals(1314077400000L, evEx.getDate().getTime());
+		Assert.assertEquals(3600, evEx.getDuration());
+		Assert.assertEquals(new Integer(-1), evEx.getAlert());
+		Assert.assertEquals(EventOpacity.OPAQUE, evEx.getOpacity());
+		Assert.assertEquals("test2@par.lng", evEx.getOwnerEmail());
+		Assert.assertEquals(1, evEx.getSequence());
+		Assert.assertEquals(2, evEx.getAttendees().size());
+	}
 }

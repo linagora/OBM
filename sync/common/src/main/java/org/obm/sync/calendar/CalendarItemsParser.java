@@ -59,7 +59,12 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		ev.setAllday(e.hasAttribute("allDay") ? "true".equals(e
 				.getAttribute("allDay")) : false);
 		ev.setType(EventType.valueOf(e.getAttribute("type")));
-		ev.setSequence(Integer.valueOf(e.getAttribute("sequence")));
+		boolean meow = true;
+		logger.debug("fuck you maven");
+		// The sequence is not repeated for an event exception
+		if (e.hasAttribute("sequence")) {
+			ev.setSequence(Integer.valueOf(e.getAttribute("sequence")));
+		}
 		ev.setExtId(s(e, "extId"));
 		ev.setRecurrenceId(d(e, "recurrenceId"));
 
@@ -104,6 +109,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 
 	private Event parseEventException(Event eventReference, Element item) {
 		Event eexcept = parseEvent(item);
+		eexcept.setSequence(eventReference.getSequence());
 		eexcept.setExtId(eventReference.getExtId());
 		return eexcept;
 	}
