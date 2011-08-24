@@ -1333,6 +1333,13 @@ function get_calendar_params() {
   if (isset($params['time_end']) &&  !is_null($params['date_end'])) {
     $params['date_end']->setHour($params['time_end']);
     $params['date_end']->setMinute($params['min_end']);
+
+    if(!is_null($params['repeat_end'])) {
+      # Don't remove the two lines below. The side effect is that this sets the
+      # end date right.
+      $params['repeat_end']->setHour($params['time_end']);
+      $params['repeat_end']->setMinute($params['min_end']);
+    }
   } elseif(!is_null($params['date_end'])) {
     $params['date_end']->setHour($ccalendar_last_hour);
   }
@@ -1529,7 +1536,6 @@ function get_calendar_params() {
   }
   
   get_global_params_document($params);
-  
   return $params;
 }
 

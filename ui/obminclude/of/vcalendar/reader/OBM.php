@@ -182,6 +182,13 @@ class Vcalendar_Reader_OBM {
     $vevent->set('location', $data['event_location']);
     $vevent->set('categories', array($data['eventcategory1_label']));
     $vevent->set('x-obm-color', $data['event_color']);
+
+    if ($data['event_is_exception']) {
+        $recurrence_id = $this->parseDate($data['event_eventexception_date']);
+        $recurrence_id->setOriginalTimeZone($data['event_timezone']);
+        $vevent->set('recurrence-id', $recurrence_id);
+    }
+
     if(!empty($this->alerts[$data['event_id']])) {
       foreach($this->alerts[$data['event_id']] as $alert) {
         $vevent->set('x-obm-alert', $alert);

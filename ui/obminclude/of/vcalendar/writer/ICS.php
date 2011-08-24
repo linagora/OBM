@@ -58,7 +58,7 @@ class Vcalendar_Writer_ICS {
     foreach ($properties as $name => $value) {
       $this->writeProperty($name, $value);
     }
-    //$this->writeProperty('dtstamp', $this->parseDate(gmdate('Y-m-d H:i:s')));
+
     
     // FIXME ??? maybe a good substitute
     $this->writeProperty('dtstamp', $this->parseDate(new Of_Date()));
@@ -73,6 +73,12 @@ class Vcalendar_Writer_ICS {
       $this->buffer .= $this->parseProperty($this->parseName($name). ":".$this->parseText($value));
       $this->buffer .= "\r\n";      
     }    
+  }
+
+  function writeRecurrenceId($name, $value)
+  {
+	$result = "RECURRENCE-ID:" . $this->parseDate($value) . "\r\n";
+	$this->buffer .= $result;
   }
 
   function parseName($name) {
