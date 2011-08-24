@@ -1023,16 +1023,25 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional
 	public boolean changeParticipationState(AccessToken token, String calendar,
 			String extId, ParticipationState participationState, int sequence, boolean notification) throws ServerFault {
+		String userEmail = userService.getUserFromAccessToken(token).getEmail();
 		if (helper.canWriteOnCalendar(token, calendar)) {
 			try {
-				return changeParticipationStateInternal(token, calendar, extId, participationState, sequence, notification);
+				boolean wasDone = changeParticipationStateInternal(token, calendar, extId, participationState, sequence,
+						notification);
+				if (!wasDone) {
+					logger.warn("Change of participation state failed to " + participationState + " (got sequence number " +
+						sequence + ", probably stale) on calendar " + calendar + " on event "+ extId + " by user " + userEmail);
+				}
+				return wasDone;
 			} catch (FindException e) {
 				throw new ServerFault("no user found with calendar " + calendar);
 			} catch (SQLException e) {
 				throw new ServerFault(e);
 			}
 		}
-		throw new ServerFault("user has no write rights on calendar " + calendar);
+		else {
+			throw new ServerFault("The user " + userEmail + " has no write rights on calendar " + calendar);
+		}
 	}
 
 	private boolean changeParticipationStateInternal(AccessToken token,
@@ -1070,7 +1079,7 @@ public class CalendarBindingImpl implements ICalendar {
 		} else {
 			logger.info(LogUtils.prefix(token) + 
 					"Calendar : event[extId:" + extId + "] ignoring new participation state for user " + 
-					calendarOwner.getEmail() + " as sequence number is older than current event");
+					calendarOwner.getEmail() + " as sequence number is different from current event (got " + sequence + ", expected " + currentEvent.getSequence());
 			return false;
 		}
 	}
