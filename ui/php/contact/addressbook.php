@@ -124,6 +124,19 @@ class OBM_AddressBook implements OBM_ISearchable {
     return new OBM_AddressBookArray($writable);
   }
 
+ public static function lookupPublicAddressBookIdFor($domain_id) {
+  	
+  	$db = new DB_OBM;
+  	$db->xquery("
+  		SELECT id 
+  		FROM AddressBook 
+  		WHERE name = 'public_contacts'
+  		AND domain_id = #INT($domain_id)");
+  		
+  	$db->next_record();
+  	return $db->f('id'); 
+  }
+  
   public static function search($searchPattern=null) {
     if($searchPattern !== null) {
       $query = " AND AddressBook.id= #INT($searchPattern)";

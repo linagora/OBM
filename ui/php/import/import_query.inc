@@ -1055,10 +1055,12 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
   $com = addslashes($fields["con_com"]);
   $arch = '0';
-  $priv = '0';
   $company_id = sql_parse_id($comp_id);
+  $contact_addressbook_id = OBM_AddressBook::lookupPublicAddressBookIdFor($domain_id);
+  
   $query = "INSERT INTO Contact (
-    contact_domain_id,
+  	contact_addressbook_id,  
+  	contact_domain_id,
     contact_timecreate,
     contact_userupdate,
     contact_usercreate,
@@ -1073,9 +1075,9 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_title,
     contact_mailing_ok,
     contact_archive,
-    contact_privacy,
     contact_comment)
   VALUES (
+  	$contact_addressbook_id,
     $domain_id,
     NOW(),
     null,
@@ -1091,7 +1093,6 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     '$title',
     '$mailok',
     $arch,
-    $priv,
     '$com')";
 
   display_debug_msg($query, $cdg_sql, "run_query_import_contact_insert(1)");
@@ -1113,7 +1114,9 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     }
     run_query_entity_coords_update($entity_id, $coords);
   }
-
+  $inserted_contact = OBM_Contact::get($id);
+  OBM_Contact::solrStore($inserted_contact);
+  OBM_IndexingService::commit('contact');
   return $id;
 }
 
@@ -1201,7 +1204,6 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
   $com = addslashes($fields["con_com"]);
   $arch = '0';
-  $priv = '0';
   $cont_id = sql_parse_id($contact_id, true);
   $query = "UPDATE Contact SET
     contact_timeupdate='". date("Y-m-d H:i:s") ."',
@@ -1216,7 +1218,6 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_title='$title',
     contact_mailing_ok='$mailok',
     contact_archive='$arch',
-    contact_privacy='$priv',
     contact_comment='$com'
   WHERE contact_id $cont_id ";
 

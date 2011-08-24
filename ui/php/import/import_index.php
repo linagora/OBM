@@ -52,6 +52,8 @@ $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
 require("$obminclude/global.inc");
 include("$obminclude/of/of_category.inc");
+require_once("$obminclude/of/of_search.php");
+require_once ('../contact/addressbook.php');
 $params = get_import_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 
