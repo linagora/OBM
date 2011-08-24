@@ -76,6 +76,15 @@ public class PingHandler extends WbxmlRequestHandler implements
 	private void doTheJob(IContinuation continuation, BackendSession bs, PingRequest pingRequest) 
 			throws MissingRequestParameterException, DaoException, CollectionNotFoundException {
 		
+		checkHeartbeatInterval(bs, pingRequest);
+		checkSyncCollections(bs, pingRequest);
+		startEmailMonitoringThreadIfNeeded(bs, pingRequest);
+		suspendContinuation(continuation, bs, pingRequest);
+	}
+
+	private void checkHeartbeatInterval(BackendSession bs, PingRequest pingRequest) 
+			throws DaoException, MissingRequestParameterException {
+		
 		if (pingRequest.getHeartbeatInterval() == null) {
 			Long heartbeatInterval = hearbeatDao.findLastHearbeat(bs.getDevice());
 			if (heartbeatInterval == null) {
@@ -83,11 +92,16 @@ public class PingHandler extends WbxmlRequestHandler implements
 			}
 			pingRequest.setHeartbeatInterval(heartbeatInterval);
 		} else {
+			if (pingRequest.getHeartbeatInterval() < 5) {
+				pingRequest.setHeartbeatInterval(5l);
+			}
 			hearbeatDao.updateLastHearbeat(bs.getDevice(), pingRequest.getHeartbeatInterval());
 		}
-		if (pingRequest.getHeartbeatInterval() < 5) {
-			pingRequest.setHeartbeatInterval(5l);
-		}
+	}
+	
+	private void checkSyncCollections(BackendSession bs, PingRequest pingRequest)
+			throws MissingRequestParameterException {
+		
 		if (pingRequest.getSyncCollections().isEmpty()) {
 			Set<SyncCollection> lastMonitoredCollection = monitoredCollectionDao.list(bs.getCredentials(), bs.getDevice());
 			if (lastMonitoredCollection.isEmpty()) {
@@ -97,13 +111,19 @@ public class PingHandler extends WbxmlRequestHandler implements
 		} else {
 			monitoredCollectionDao.put(bs.getCredentials(), bs.getDevice(), pingRequest.getSyncCollections());
 		}
+	}
 
+	private void startEmailMonitoringThreadIfNeeded(BackendSession bs,
+			PingRequest pingRequest) throws CollectionNotFoundException {
 		for (SyncCollection syncCollection: pingRequest.getSyncCollections()) {
 			if ("email".equalsIgnoreCase(syncCollection.getDataClass())) {
 				backend.startEmailMonitoring(bs, syncCollection.getCollectionId());
 			}
 		}
+	}
 
+	private void suspendContinuation(IContinuation continuation,
+			BackendSession bs, PingRequest pingRequest) {
 		continuation.setLastContinuationHandler(this);
 		CollectionChangeListener l = new CollectionChangeListener(bs, continuation, pingRequest.getSyncCollections());
 		IListenerRegistration reg = backend.addChangeListener(l);
@@ -111,7 +131,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 		continuation.setCollectionChangeListener(l);
 		continuation.suspend(bs, pingRequest.getHeartbeatInterval());
 	}
-
+	
 	@Override
 	public void sendResponseWithoutHierarchyChanges(BackendSession bs, Responder responder,
 			IContinuation continuation) {
