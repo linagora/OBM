@@ -2267,8 +2267,12 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $location = $event_q->f('event_location');
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $datebegin = $calendar['date_begin'];
-    $ext_id = generateUniqueKey();
+    $ext_id = $event_q->f('event_ext_id');
     $organizer = $calendar['organizer'] ? $calendar['organizer'] : $obm['uid'];
+
+    $sequence_number = $event_q->f('event_sequence');
+    # Increment sequence number, just like we do in OBM-Sync
+    $sequence_number++;
 
     $query = "INSERT INTO Event (
       event_ext_id,
@@ -2294,7 +2298,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       event_allday,
       event_tag_id,
       event_endrepeat,
-      event_domain_id
+      event_domain_id,
+      event_sequence
     )
     VALUES (
       '$ext_id',
@@ -2320,7 +2325,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       $all_day,
       $event_tag_id,
       $repeat_end,
-      '$obm[domain_id]'
+      '$obm[domain_id]',
+      $sequence_number
     )";
 
     display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data(0)');
@@ -2362,16 +2368,12 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   $obm_q->query($query);
   $query = "Update Event SET
     event_userupdate = $obm[uid],
-    event_timeupdate = NOW()
-    WHERE event_id $sql_id";
+    event_timeupdate = NOW(),
+    event_sequence = $sequence_number
+    WHERE event_ext_id = '$ext_id'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(3)');
   $obm_q->query($query);
-  // Send mail
-  if ($calendar['send_mail']) {
-    $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
-    OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
-  }
 
   if ($new_id) {
     if ($calendar['send_mail']) {
