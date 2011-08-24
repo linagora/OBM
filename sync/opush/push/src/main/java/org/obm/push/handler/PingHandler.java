@@ -13,6 +13,7 @@ import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderSyncRequiredException;
 import org.obm.push.exception.MissingRequestParameterException;
@@ -100,7 +101,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 	
 	private void checkSyncCollections(BackendSession bs, PingRequest pingRequest)
-			throws MissingRequestParameterException {
+			throws MissingRequestParameterException, CollectionNotFoundException, DaoException {
 		
 		if (pingRequest.getSyncCollections().isEmpty()) {
 			Set<SyncCollection> lastMonitoredCollection = monitoredCollectionDao.list(bs.getCredentials(), bs.getDevice());
@@ -110,6 +111,15 @@ public class PingHandler extends WbxmlRequestHandler implements
 			pingRequest.setSyncCollections(lastMonitoredCollection);
 		} else {
 			monitoredCollectionDao.put(bs.getCredentials(), bs.getDevice(), pingRequest.getSyncCollections());
+		}
+		loadSyncKeys(pingRequest.getSyncCollections());
+	}
+
+	private void loadSyncKeys(Set<SyncCollection> syncCollections) throws CollectionNotFoundException, DaoException {
+		for (SyncCollection collection: syncCollections) {
+			String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
+			collection.setCollectionPath(collectionPath);
+			collection.setSyncState(new SyncState(collectionPath));
 		}
 	}
 
