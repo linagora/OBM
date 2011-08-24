@@ -39,6 +39,8 @@ import com.google.inject.Singleton;
 public class PingHandler extends WbxmlRequestHandler implements
 		IContinuationHandler {
 	
+	private static final int MIN_SANE_HEARTBEAT_VALUE = 5;
+	
 	private final MonitoredCollectionDao monitoredCollectionDao;
 	private final PingProtocol protocol;
 	private final HearbeatDao hearbeatDao;
@@ -93,9 +95,8 @@ public class PingHandler extends WbxmlRequestHandler implements
 			}
 			pingRequest.setHeartbeatInterval(heartbeatInterval);
 		} else {
-			if (pingRequest.getHeartbeatInterval() < 5) {
-				pingRequest.setHeartbeatInterval(5l);
-			}
+			long heartbeatInterval = Math.max(MIN_SANE_HEARTBEAT_VALUE, pingRequest.getHeartbeatInterval());
+			pingRequest.setHeartbeatInterval(heartbeatInterval);
 			hearbeatDao.updateLastHearbeat(bs.getDevice(), pingRequest.getHeartbeatInterval());
 		}
 	}
