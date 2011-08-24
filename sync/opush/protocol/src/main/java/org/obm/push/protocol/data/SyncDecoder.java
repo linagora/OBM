@@ -112,9 +112,9 @@ public class SyncDecoder {
 			collection.setDataClass(DOMUtils.getElementText(col, "Class"));
 			collection.setSyncKey(DOMUtils.getElementText(col, "SyncKey"));
 
-			Element wse = DOMUtils.getUniqueElement(col, "WindowSize");
-			if (wse != null) {
-				collection.setWindowSize(Integer.parseInt(wse.getTextContent()));
+			Element windowSizeElement = DOMUtils.getUniqueElement(col, "WindowSize");
+			if (windowSizeElement != null) {
+				collection.setWindowSize(Integer.parseInt(windowSizeElement.getTextContent()));
 			}
 			
 			SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
