@@ -1100,7 +1100,10 @@ function dis_calendar_select_template_form($action, $calendar) {
     if (isset($t_id) && $t_id == $id) {
       $selected = "selected=\"selected\"";
     }
-    $select.= "<option value=\"$id\" $selected>$name</option>";
+    if (strlen($name) > 30) {
+      $title = "title=\"$name\"";
+    }
+    $select.= "<option value=\"$id\" $title $selected>$name</option>";
   }
   return "
     <div id=\"templateSelect\">
@@ -2011,6 +2014,9 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       }
     }
     $location = phpStringToJsString($event->location);
+    if (is_array($event->category1)) {
+      $event->category1 = implode(' ', $event->category1);
+    }
     $category = phpStringToJsString($event->category1);  
     $attendees = array();
     foreach ($attendee as $entity => $entities) {
@@ -3927,7 +3933,11 @@ function dis_calendar_quick_form($calendar_entity) {
       $id = $templates_q->f('eventtemplate_id');
       $name = $templates_q->f('eventtemplate_name');
       array_push($eventtemplate_title, phpStringToJsString($templates_q->f('eventtemplate_title')));
-      $select.= "<option value=\"$id\">$name</option>";
+      if (strlen($name) > 30) {
+        $name2 = preg_replace("/(.{80})/","$1 ",$name);
+        $title = "title=\"$name2\"";
+      }
+      $select.= "<option value=\"$id\" $title>$name</option>";
     }
 
     $block_template = "
