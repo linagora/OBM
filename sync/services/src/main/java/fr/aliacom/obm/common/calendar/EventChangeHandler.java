@@ -320,13 +320,13 @@ public class EventChangeHandler {
 		ImmutableSet<Attendee> previousAttendees = ImmutableSet.copyOf(filterOwner(previous, previous.getAttendees()));
 		ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(filterOwner(current, current.getAttendees()));
 		SetView<Attendee> removedAttendees = Sets.difference(previousAttendees, currentAttendees);
-		SetView<Attendee> newAttendees = Sets.difference(currentAttendees, previousAttendees);
-		Set<Attendee> stableAttendees = generateStableAttendeesSet(currentAttendees, removedAttendees, newAttendees);
+		SetView<Attendee> addedAttendees = Sets.difference(currentAttendees, previousAttendees);
+		Set<Attendee> keptAttendees = generateStableAttendeesSet(currentAttendees, removedAttendees, addedAttendees);
 		
 		return ImmutableMap.of(
 				AttendeeStateValue.REMOVED, removedAttendees,
-				AttendeeStateValue.KEPT, stableAttendees,
-				AttendeeStateValue.ADDED, newAttendees);
+				AttendeeStateValue.KEPT, keptAttendees,
+				AttendeeStateValue.ADDED, addedAttendees);
 	}
 
 	/* package */ static enum AttendeeStateValue {
