@@ -101,7 +101,7 @@ public class EventChangeHandler {
 		Locale locale = settings.locale();
 		TimeZone timezone = settings.timezone();
 		
-		Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
+		Map<ParticipationState, Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
 		
 		Set<Attendee> accepted = attendeeGroups.get(ParticipationState.ACCEPTED);
 		if(accepted != null && !accepted.isEmpty()){
@@ -128,7 +128,7 @@ public class EventChangeHandler {
 			TimeZone timezone = settings.timezone();
 			Locale locale = settings.locale();
 
-			final Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
+			final Map<AttendeeStateValue, Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
 			final Set<Attendee> removedAttendees = attendeeGroups.get(AttendeeStateValue.REMOVED);
 			if (!removedAttendees.isEmpty()) {
 				eventChangeMailer.notifyRemovedUsers(removedAttendees, current, locale, timezone, removedUserIcs);
@@ -141,7 +141,7 @@ public class EventChangeHandler {
 
 			final Set<Attendee> keptAttendees = attendeeGroups.get(AttendeeStateValue.KEPT);
 			if (!keptAttendees.isEmpty()) {
-				final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(keptAttendees);
+				final Map<ParticipationState, Set<Attendee>> atts = computeParticipationStateGroups(keptAttendees);
 				notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 				notifyNeedActionUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 			}
@@ -166,11 +166,11 @@ public class EventChangeHandler {
 	}
 	
 	private void notifyNeedActionUpdateUsers(Event previous, Event current,
-			Locale locale, Map<ParticipationState, ? extends Set<Attendee>> atts, 
+			Locale locale, Map<ParticipationState, Set<Attendee>> atts,
 					TimeZone timezone, String ics) { 
 		
 		logger.info("Listing all event attendees for event with name=[" + current.getTitle() + "]");
-		for (Entry<ParticipationState, ? extends Set<Attendee>> attendeesByState : atts.entrySet()) {
+		for (Entry<ParticipationState, Set<Attendee>> attendeesByState : atts.entrySet()) {
 			logger.info("Attendees in state=[" + attendeesByState.getKey().name() + "]");
 			for (Attendee attendee : attendeesByState.getValue())
 			{
@@ -194,8 +194,8 @@ public class EventChangeHandler {
  			Attendee owner = findOwner(event); 			
  			
  			Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
- 			Map<ParticipationState, ? extends Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
- 			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
+			Map<ParticipationState, Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
+			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
  			if (!notify.isEmpty()) {
  				UserSettings settings = settingsService.getSettings(user);
  				eventChangeMailer.notifyRemovedUsers(notify, event, settings.locale(), settings.timezone(), removeUserIcs);
@@ -246,7 +246,7 @@ public class EventChangeHandler {
 		return null;
 	}
 	
-	private Map<ParticipationState, ? extends Set<Attendee>> computeParticipationStateGroups(Collection<Attendee> attendees) {
+	private Map<ParticipationState, Set<Attendee>> computeParticipationStateGroups(Collection<Attendee> attendees) {
 		Set<Attendee> acceptedAttendees = Sets.newLinkedHashSet();
 		Set<Attendee> needActionAttendees = Sets.newLinkedHashSet();
 		Set<Attendee> declinedAttendees = Sets.newLinkedHashSet();
@@ -293,7 +293,7 @@ public class EventChangeHandler {
 		return ret.build();
 	}
 	
-	/* package */ Map<AttendeeStateValue, ? extends Set<Attendee>> computeUpdateNotificationGroups(Event previous, Event current) {
+	/* package */ Map<AttendeeStateValue, Set<Attendee>> computeUpdateNotificationGroups(Event previous, Event current) {
 		if (previous.isEventInThePast() && current.isEventInThePast()) {
 			Set<Attendee> emptyAttendeesSet = ImmutableSet.of();
 			return ImmutableMap.of(

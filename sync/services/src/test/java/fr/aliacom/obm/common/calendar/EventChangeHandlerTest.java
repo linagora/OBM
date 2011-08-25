@@ -752,7 +752,7 @@ public class EventChangeHandlerTest {
 			previous.setAttendees(previousAtts);
 			current.setAttendees(currentAtts);
 
-			Map<AttendeeStateValue, ? extends Set<Attendee>> groups = eventChangeHandler
+			Map<AttendeeStateValue, Set<Attendee>> groups = eventChangeHandler
 					.computeUpdateNotificationGroups(previous, current);
 
 			Assert.assertTrue(groups.get(AttendeeStateValue.KEPT).isEmpty());
@@ -776,7 +776,7 @@ public class EventChangeHandlerTest {
 			previous.setAttendees(previousAtts);
 			current.setAttendees(currentAtts);
 
-			Map<AttendeeStateValue, ? extends Set<Attendee>> groups =
+			Map<AttendeeStateValue, Set<Attendee>> groups =
 				eventChangeHandler.computeUpdateNotificationGroups(previous, current);
 
 			Assert.assertEquals(keptUserMail, groups.get(AttendeeStateValue.KEPT).iterator().next().getEmail());
@@ -802,7 +802,7 @@ public class EventChangeHandlerTest {
 			Event event2 = new Event();
 			event2.setAttendees(ImmutableList.of(attendee2));
 
-			Map<AttendeeStateValue, ? extends Set<Attendee>> groups = 
+			Map<AttendeeStateValue, Set<Attendee>> groups =
 					eventChangeHandler.computeUpdateNotificationGroups(event1, event2);
 			Set<Attendee> actual = groups.get(AttendeeStateValue.KEPT);
 
@@ -828,7 +828,7 @@ public class EventChangeHandlerTest {
 			Event event2 = new Event();
 			event2.setAttendees(ImmutableList.of(attendee2, attendee3, attendee4));
 
-			Map<AttendeeStateValue, ? extends Set<Attendee>> groups = 
+			Map<AttendeeStateValue, Set<Attendee>> groups =
 					eventChangeHandler.computeUpdateNotificationGroups(event1, event2);
 			Set<Attendee> actual = groups.get(AttendeeStateValue.KEPT);
 
