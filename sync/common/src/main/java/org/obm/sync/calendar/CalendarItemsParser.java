@@ -59,8 +59,6 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		ev.setAllday(e.hasAttribute("allDay") ? "true".equals(e
 				.getAttribute("allDay")) : false);
 		ev.setType(EventType.valueOf(e.getAttribute("type")));
-		boolean meow = true;
-		logger.debug("fuck you maven");
 		// The sequence is not repeated for an event exception
 		if (e.hasAttribute("sequence")) {
 			ev.setSequence(Integer.valueOf(e.getAttribute("sequence")));
