@@ -131,19 +131,19 @@ public class EventChangeHandler {
 			Locale locale = settings.locale();
 
 			final Map<AttendeeStateValue, ? extends Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
-			final Set<Attendee> removedUsers = attendeeGroups.get(AttendeeStateValue.Old);
-			if (!removedUsers.isEmpty()) {
-				eventChangeMailer.notifyRemovedUsers(removedUsers, current, locale, timezone, removedUserIcs);
+			final Set<Attendee> removedAttendees = attendeeGroups.get(AttendeeStateValue.REMOVED);
+			if (!removedAttendees.isEmpty()) {
+				eventChangeMailer.notifyRemovedUsers(removedAttendees, current, locale, timezone, removedUserIcs);
 			}
 
-			final Set<Attendee> addedUsers = attendeeGroups.get(AttendeeStateValue.New);
-			if (!addedUsers.isEmpty()) {
-				notifyCreate(user, addedUsers, current, addUserIcs);
+			final Set<Attendee> addedAttendees = attendeeGroups.get(AttendeeStateValue.ADDED);
+			if (!addedAttendees.isEmpty()) {
+				notifyCreate(user, addedAttendees, current, addUserIcs);
 			}
 
-			final Set<Attendee> currentUsers = attendeeGroups.get(AttendeeStateValue.Current);
-			if (!currentUsers.isEmpty()) {
-				final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(currentUsers);
+			final Set<Attendee> keptAttendees = attendeeGroups.get(AttendeeStateValue.KEPT);
+			if (!keptAttendees.isEmpty()) {
+				final Map<ParticipationState, ? extends Set<Attendee>> atts = computeParticipationStateGroups(keptAttendees);
 				notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 				notifyNeedActionUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 			}
@@ -313,9 +313,9 @@ public class EventChangeHandler {
 		if (previous.isEventInThePast() && current.isEventInThePast()) {
 			Set<Attendee> emptyAttendeesSet = ImmutableSet.of();
 			return ImmutableMap.of(
-					AttendeeStateValue.Old, emptyAttendeesSet,
-					AttendeeStateValue.Current, emptyAttendeesSet,
-					AttendeeStateValue.New, emptyAttendeesSet);
+					AttendeeStateValue.REMOVED, emptyAttendeesSet,
+					AttendeeStateValue.KEPT, emptyAttendeesSet,
+					AttendeeStateValue.ADDED, emptyAttendeesSet);
 		}
 		ImmutableSet<Attendee> previousAttendees = ImmutableSet.copyOf(filterOwner(previous, previous.getAttendees()));
 		ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(filterOwner(current, current.getAttendees()));
@@ -324,13 +324,13 @@ public class EventChangeHandler {
 		Set<Attendee> stableAttendees = generateStableAttendeesSet(currentAttendees, removedAttendees, newAttendees);
 		
 		return ImmutableMap.of(
-				AttendeeStateValue.Old, removedAttendees,
-				AttendeeStateValue.Current, stableAttendees,
-				AttendeeStateValue.New, newAttendees);
+				AttendeeStateValue.REMOVED, removedAttendees,
+				AttendeeStateValue.KEPT, stableAttendees,
+				AttendeeStateValue.ADDED, newAttendees);
 	}
 
 	/* package */ static enum AttendeeStateValue {
-		New, Current, Old;
+		ADDED, KEPT, REMOVED;
 	}
 	
 	public void updateParticipationState(final Event event, final ObmUser calendarOwner, 

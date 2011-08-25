@@ -751,7 +751,7 @@ public class EventChangeHandlerTest {
 
 			Map<AttendeeStateValue, ? extends Set<Attendee>> groups = 
 					eventChangeHandler.computeUpdateNotificationGroups(event1, event2);
-			Set<Attendee> actual = groups.get(AttendeeStateValue.Current);
+			Set<Attendee> actual = groups.get(AttendeeStateValue.KEPT);
 
 			Assert.assertSame(attendee2, actual.iterator().next());
 		}
@@ -777,7 +777,7 @@ public class EventChangeHandlerTest {
 
 			Map<AttendeeStateValue, ? extends Set<Attendee>> groups = 
 					eventChangeHandler.computeUpdateNotificationGroups(event1, event2);
-			Set<Attendee> actual = groups.get(AttendeeStateValue.Current);
+			Set<Attendee> actual = groups.get(AttendeeStateValue.KEPT);
 
 			Assert.assertSame(attendee2, actual.iterator().next());
 		}
