@@ -104,14 +104,15 @@ public class PingHandler extends WbxmlRequestHandler implements
 	private void checkSyncCollections(BackendSession bs, PingRequest pingRequest)
 			throws MissingRequestParameterException, CollectionNotFoundException, DaoException {
 		
-		if (pingRequest.getSyncCollections().isEmpty()) {
+		Set<SyncCollection> syncCollections = pingRequest.getSyncCollections();
+		if (syncCollections == null || syncCollections.isEmpty()) {
 			Set<SyncCollection> lastMonitoredCollection = monitoredCollectionDao.list(bs.getCredentials(), bs.getDevice());
 			if (lastMonitoredCollection.isEmpty()) {
 				throw new MissingRequestParameterException();
 			}
 			pingRequest.setSyncCollections(lastMonitoredCollection);
 		} else {
-			monitoredCollectionDao.put(bs.getCredentials(), bs.getDevice(), pingRequest.getSyncCollections());
+			monitoredCollectionDao.put(bs.getCredentials(), bs.getDevice(), syncCollections);
 		}
 		loadSyncKeys(pingRequest.getSyncCollections());
 	}
