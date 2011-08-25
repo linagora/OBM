@@ -6,6 +6,7 @@ import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.before;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendee;
+import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendees;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -227,13 +228,6 @@ public abstract class AbstractEventChangeHandlerTest {
 
 	protected abstract EventChangeMailer expectationSameAttendeeTwice(Attendee attendee, Event event, ObmUser defaultObmUser);
 
-	private List<Attendee> createRequiredAttendees(String prefix, String suffix, ParticipationState state, int start, int number) {
-		ArrayList<Attendee> result = new ArrayList<Attendee>();
-		for (int i = 0; i < number; ++i) {
-			result.add(createRequiredAttendee(prefix + (start + i )+ suffix,state));
-		}
-		return result;
-	}
 	
 	public void testManyAttendees() {
 		List<Attendee> accpetedAttendees = createRequiredAttendees("attendee", "@test", ParticipationState.ACCEPTED,0,  5);

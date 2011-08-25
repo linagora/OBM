@@ -8,6 +8,7 @@ import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.compareCollections;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendee;
+import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendees;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.longAfter;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
@@ -53,7 +54,7 @@ import fr.aliacom.obm.utils.Ical4jHelper;
 	EventChangeHandlerTest.CreateTests.class, 
 	EventChangeHandlerTest.DeleteTests.class, 
 	EventChangeHandlerTest.UpdateParticipationTests.class,
-	EventChangeHandlerTest.GeneralTest.class})
+	EventChangeHandlerTest.ComputeAttendeesDiffsTests.class})
 public class EventChangeHandlerTest {
 	
 	private static final String ICS_DATA_ADD = "ics data add attendee";
@@ -732,7 +733,59 @@ public class EventChangeHandlerTest {
 		}
 	}
 
-	public static class GeneralTest {
+	public static class ComputeAttendeesDiffsTests {
+
+		@Test
+		public void testComputeUpdateNotificationDiffWithNoKeptAttendees() {
+			final String addedUserMail = "new@testing.org";
+			final String removedUserMail = "old@testing.org";
+
+			List<Attendee> previousAtts = ImmutableList.of(createRequiredAttendee(removedUserMail, ParticipationState.ACCEPTED));
+			List<Attendee> currentAtts = ImmutableList.of(createRequiredAttendee(addedUserMail, ParticipationState.NEEDSACTION));
+
+			Event previous = new Event();
+			Event current = new Event();
+
+			EventChangeHandler eventChangeHandler = new EventChangeHandler(
+					null, null, null, null, null);
+
+			previous.setAttendees(previousAtts);
+			current.setAttendees(currentAtts);
+
+			Map<AttendeeStateValue, ? extends Set<Attendee>> groups = eventChangeHandler
+					.computeUpdateNotificationGroups(previous, current);
+
+			Assert.assertTrue(groups.get(AttendeeStateValue.KEPT).isEmpty());
+			Assert.assertEquals(removedUserMail, groups.get(AttendeeStateValue.REMOVED).iterator().next().getEmail());
+			Assert.assertEquals(addedUserMail, groups.get(AttendeeStateValue.ADDED).iterator().next().getEmail());
+			Assert.assertEquals(ParticipationState.ACCEPTED, groups.get(AttendeeStateValue.REMOVED).iterator().next().getState());
+			Assert.assertEquals(ParticipationState.NEEDSACTION,	groups.get(AttendeeStateValue.ADDED).iterator().next().getState());
+		}
+
+		@Test
+		public void testComputeUpdateNotificationSimpleDiff() {
+			final String addedUserMail = "user2@testing.org";
+			final String keptUserMail = "user1@testing.org";
+			final String removedUserMail = "user0@testing.org";
+			List<Attendee> previousAtts = createRequiredAttendees("user", "@testing.org", ParticipationState.ACCEPTED, 0, 2);
+			List<Attendee> currentAtts = createRequiredAttendees("user", "@testing.org", ParticipationState.NEEDSACTION, 1, 2);
+			Event previous = new Event();
+			Event current = new Event();
+			EventChangeHandler eventChangeHandler = new EventChangeHandler(null, null, null, null, null);
+
+			previous.setAttendees(previousAtts);
+			current.setAttendees(currentAtts);
+
+			Map<AttendeeStateValue, ? extends Set<Attendee>> groups =
+				eventChangeHandler.computeUpdateNotificationGroups(previous, current);
+
+			Assert.assertEquals(keptUserMail, groups.get(AttendeeStateValue.KEPT).iterator().next().getEmail());
+			Assert.assertEquals(removedUserMail, groups.get(AttendeeStateValue.REMOVED).iterator().next().getEmail());
+			Assert.assertEquals(addedUserMail, groups.get(AttendeeStateValue.ADDED).iterator().next().getEmail());
+			Assert.assertEquals(ParticipationState.NEEDSACTION, groups.get(AttendeeStateValue.KEPT).iterator().next().getState());
+			Assert.assertEquals(ParticipationState.ACCEPTED, groups.get(AttendeeStateValue.REMOVED).iterator().next().getState());
+			Assert.assertEquals(ParticipationState.NEEDSACTION, groups.get(AttendeeStateValue.ADDED).iterator().next().getState());
+		}
 
 		@Test
 		public void testComputeUpdateNotificationGroupsWhereAttendeesComeFrom() {

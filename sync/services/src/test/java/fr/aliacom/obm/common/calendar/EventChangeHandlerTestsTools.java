@@ -1,10 +1,12 @@
 package fr.aliacom.obm.common.calendar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.easymock.EasyMock;
 import org.easymock.LogicalOperator;
@@ -58,5 +60,11 @@ public class EventChangeHandlerTestsTools {
 		return attendee;
 	}
 
-	
+	static List<Attendee> createRequiredAttendees(String prefix, String suffix, ParticipationState state, int start, int number) {
+		ArrayList<Attendee> result = new ArrayList<Attendee>();
+		for (int i = 0; i < number; ++i) {
+			result.add(createRequiredAttendee(prefix + (start + i)+ suffix,state));
+		}
+		return result;
+	}
 }
