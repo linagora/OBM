@@ -991,6 +991,19 @@ function run_query_calendar_update_entity_event($entity, $entity_id, $event_id, 
   return $obm_q; 
 }
 
+function run_query_calendar_update_entity_recurrent_event($entity, $entity_id, $ext_id, $state) {
+  global $cdg_sql, $obm;
+  $entity_id = sql_parse_id($entity_id);
+  $query = "UPDATE EventLink SET eventlink_state = '$state'
+    WHERE eventlink_event_id IN (SELECT event_id FROM Event WHERE event_ext_id='$ext_id')
+    AND eventlink_entity_id = ".of_entity_subquery($entity, $entity_id);
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_entity_recurrent_event()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
 function run_query_calendar_set_organizer($user_id, $event_id) {
   global $cdg_sql, $obm;
 
@@ -2336,6 +2349,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $entities = get_calendar_event_entity($id);
     foreach ($entities as $entity => $data) {
       foreach ($data['entity'] as $entity_id => $entity_data) {
+        # Ensure that both the new exception, the recurring event and the old
+        # exceptions have the same participation state
+        run_query_calendar_update_entity_recurrent_event($entity, $entity_id, $ext_id, $entity_data['state']);
         run_query_calendar_insert_entity_event($entity, $entity_id, $new_id, $entity_data['state']);
       }
     }
