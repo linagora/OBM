@@ -78,8 +78,7 @@ import org.slf4j.LoggerFactory;
 
 public class ClientSupport {
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(ClientSupport.class);
+	private final static Logger logger = LoggerFactory.getLogger(ClientSupport.class);
 	
 	private final IoHandler handler;
 	private IoSession session;
@@ -127,16 +126,16 @@ public class ClientSupport {
 				return false;
 			}
 			session = cf.getSession();
-			logger.info("Connection established");
+			logger.debug("Connection established");
 			if (activateTLS) {
 				boolean tlsActivated = run(new StartTLSCommand());
 				if (tlsActivated) {
 					activateSSL();
 				} else {
-					logger.warn("TLS not supported by IMAP server.");
+					logger.debug("TLS not supported by IMAP server.");
 				}
 			}
-			logger.info("Sending " + login + " login informations.");
+			logger.debug("Sending " + login + " login informations.");
 			return run(new LoginCommand(login, password));
 		} catch (Exception e) {
 			logger.error("login error", e);
@@ -151,7 +150,7 @@ public class ClientSupport {
 			session.getFilterChain().addBefore(
 					"org.apache.mina.common.ExecutorThreadModel", "tls",
 					sslFilter);
-			logger.info("Network traffic with IMAP server will be encrypted. ");
+			logger.debug("Network traffic with IMAP server will be encrypted. ");
 		} catch (Throwable t) {
 			logger.error("Error starting ssl", t);
 		}
@@ -163,9 +162,9 @@ public class ClientSupport {
 				try {
 					sslFilter.stopSSL(session);
 				} catch (SSLException e) {
-					logger.warn("error stopping ssl", e);
+					logger.error("error stopping ssl", e);
 				} catch (IllegalStateException ei) {
-					logger.warn("imap connection is already stop");
+					logger.error("imap connection is already stop");
 				}
 			}
 			session.close().join();
@@ -204,7 +203,7 @@ public class ClientSupport {
 	public void setResponses(List<IMAPResponse> rs) {
 		if (logger.isDebugEnabled()) {
 			for (IMAPResponse ir : rs) {
-				logger.info("S: " + ir.getPayload());
+				logger.debug("S: " + ir.getPayload());
 			}
 		}
 

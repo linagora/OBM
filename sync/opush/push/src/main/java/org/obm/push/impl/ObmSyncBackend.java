@@ -97,12 +97,10 @@ public class ObmSyncBackend {
 		return ic;
 	}
 
-	protected List<ItemChange> getDeletions(Integer collectionId,
-			Collection<? extends Object> uids) {
+	protected List<ItemChange> getDeletions(Integer collectionId, Collection<? extends Object> uids) {
 		final List<ItemChange> deletions = new LinkedList<ItemChange>();
 		for (final Object uid : uids) {
-			deletions
-					.add(createItemChangeToRemove(collectionId, uid.toString()));
+			deletions.add(createItemChangeToRemove(collectionId, uid.toString()));
 		}
 		return deletions;
 	}

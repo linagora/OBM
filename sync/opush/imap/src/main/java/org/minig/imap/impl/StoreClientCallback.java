@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class StoreClientCallback implements IResponseCallback {
 
 	private final static Logger logger = LoggerFactory
-			.getLogger(MessageSet.class);
+			.getLogger(StoreClientCallback.class);
 
 	IMAPResponseParser rParser;
 	private LinkedList<IMAPResponse> responses;
@@ -39,13 +39,13 @@ public class StoreClientCallback implements IResponseCallback {
 
 	@Override
 	public void connected() {
-		logger.info("connected() callback called.");
+		logger.debug("connected() callback called.");
 		rParser.setServerHelloReceived(false);
 	}
 
 	@Override
 	public void disconnected() {
-		logger.info("disconnected() callback called.");
+		logger.debug("disconnected() callback called.");
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class StoreClientCallback implements IResponseCallback {
 		try {
 			rp = rParser.parse(imapResponse);
 		} catch (RuntimeException re) {
-			logger.warn("Runtime exception on: " + imapResponse);
+			logger.error("Runtime exception on: " + imapResponse);
 			throw re;
 		}
 

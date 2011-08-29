@@ -101,7 +101,7 @@ public class EmailManager implements IEmailManager {
 		final String login = getLogin(bs);
 		StoreClient storeClient = new StoreClient(imapHost, 143, login, bs.getPassword()); 
 		
-		logger.info("Creating storeClient with login {} : " +
+		logger.debug("Creating storeClient with login {} : " +
 				"loginWithDomain = {} | activateTLS = {}", 
 				new Object[]{login, loginWithDomain, activateTLS});
 		

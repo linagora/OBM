@@ -44,7 +44,7 @@ public class SessionService {
 				r.getCommand(), device, getProtocolVersion(r));
 		
 		
-		logger.info("New session = {}", sessionId);
+		logger.debug("New session = {}", sessionId);
 		return bs;
 	}
 
@@ -53,7 +53,7 @@ public class SessionService {
 		if (proto != null) {
 			try {
 				BigDecimal protocolVersion = new BigDecimal(proto);
-				logger.info("Client supports protocol = {}", protocolVersion);
+				logger.debug("Client supports protocol = {}", protocolVersion);
 				return protocolVersion;
 			} catch (NumberFormatException nfe) {
 				logger.warn("invalid MS-ASProtocolVersion = {}", proto);

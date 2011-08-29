@@ -153,8 +153,7 @@ public class ContentsExporter implements IContentsExporter {
 		case FOLDER:
 			break;
 		}
-		logger.info("Get changed from " + state.getLastSync() + " on collectionPath [ " + collectionId + " ]");
-		
+		logger.debug("Get changed from " + state.getLastSync() + " on collectionPath [ " + collectionId + " ]");
 		return delta;
 	}
 	

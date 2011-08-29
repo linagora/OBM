@@ -142,8 +142,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 	
 	@Override
-	public void updateState(Device device, Integer collectionId,
-			SyncState state) throws DaoException {
+	public void updateState(Device device, Integer collectionId, SyncState state) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -155,8 +154,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps.setTimestamp(3, new Timestamp(state.getLastSync().getTime()));
 			ps.setInt(4, collectionId);
 			ps.executeUpdate();
-			logger.info("UpdateState [ {}, {}, {} ]",
-					new Object[]{collectionId, state.getKey(), state.getLastSync().toString()});
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
@@ -166,7 +163,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	
 	@Override
 	public SyncState findStateForKey(String syncKey) throws DaoException, CollectionNotFoundException {
-
 		SyncState ret = null;
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -263,7 +259,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	
 	@Override
 	public ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException {
-		
 		String query = "select "
 		+ "	distinct userobm_login, domain_name, now()"
 		+ "	from SyncedAddressbook sa "
@@ -285,12 +280,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps.setTimestamp(idx++, ts);
 			ps.setTimestamp(idx++, ts);
 			rs = ps.executeQuery();
-			ChangedCollections changedCollections = getContactChangedCollectionsFromResultSet(rs, lastSync);
-			if (changedCollections.getChanges().size() > 0) {
-				logger.info("changed collections: {} dbDate: {}", 
-						new Object[]{changedCollections.getChanges().size(), changedCollections.getLastSync()});
-			}
-			return changedCollections;
+			return getContactChangedCollectionsFromResultSet(rs, lastSync);
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {

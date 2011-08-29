@@ -66,12 +66,21 @@ public class EmailSync implements IEmailSync {
 		
 		MailChanges mailChanges = getMailChanges(listEmailsToUpdated, listEmailsToRemoved);
 		
-		logger.info("sync emails [ emailFromDatabase = {} | emailFromPDA = {} | " +
-				"emailsToUpdatedDB = {} | emailsToRemovedDB = {} | emailSendToPDA = upd {}, rm {} ]", 
-				new Object[]{listSyncedEmailFromDatabase.size(), listEmailFromIMAPOfPDA.size(), listEmailsToUpdated.size(), 
-				listEmailsToRemoved.size(), mailChanges.getUpdated().size(), mailChanges.getRemoved().size()});
+		info(syncStartDate, listSyncedEmailFromDatabase, listEmailFromIMAPOfPDA, listEmailsToUpdated, 
+				listEmailsToRemoved, mailChanges);
 		
 		return mailChanges;
+	}
+
+	private void info(Date syncStartDate, Set<Email> listSyncedEmailFromDatabase, Set<Email> listEmailFromIMAPOfPDA, 
+			Set<Email> listEmailsToUpdated, Collection<Long> listEmailsToRemoved, MailChanges mailChanges) {
+		logger.info("Synchronization window date {}", syncStartDate.toString());
+		logger.info("{} email(s) from database", listSyncedEmailFromDatabase.size());
+		logger.info("{} email(s) from imap", listEmailFromIMAPOfPDA.size());
+		logger.info("{} email(s) will be updated", listEmailsToUpdated.size());
+		logger.info("{} email(s) will be removed", listEmailsToRemoved.size());
+		logger.info("{} email(s) send to pda", mailChanges.getUpdated().size());
+		logger.info("Now, last sync {}", mailChanges.getLastSync().toString());
 	}
 
 	private Date getStartDateSynchronizationWindowEmails(FilterType filter, SyncState state) {

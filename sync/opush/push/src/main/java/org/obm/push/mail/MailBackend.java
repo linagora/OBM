@@ -127,10 +127,8 @@ public class MailBackend extends ObmSyncBackend {
 	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) 
 			throws ProcessingEmailException, CollectionNotFoundException {
 		
-		String collectionPath;
 		try {
-			collectionPath = getCollectionPathFor(collectionId);
-			logger.info("Collection [ " + collectionPath + " ]");
+			String collectionPath = getCollectionPathFor(collectionId);
 			List<ItemChange> changes = new LinkedList<ItemChange>();
 			List<ItemChange> deletions = new LinkedList<ItemChange>();
 			Date lastSync = null;

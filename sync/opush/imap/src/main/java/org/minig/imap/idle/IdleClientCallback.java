@@ -49,13 +49,13 @@ public class IdleClientCallback implements IResponseCallback {
 
 	@Override
 	public void connected() {
-		logger.info("connected() callback called.");
+		logger.debug("connected() callback called.");
 		imrParser.setServerHelloReceived(false);
 	}
 
 	@Override
 	public void disconnected() {
-		logger.info("disconnected() callback called.");
+		logger.debug("disconnected() callback called.");
 		if (observer != null) {
 			observer.disconnectedCallBack();
 		}

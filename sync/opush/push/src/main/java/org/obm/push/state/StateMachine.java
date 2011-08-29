@@ -48,9 +48,9 @@ public class StateMachine {
 	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync) throws CollectionNotFoundException, DaoException {
 		final String newSk = UUID.randomUUID().toString();
 		final SyncState newState = new SyncState(collectionDao.getCollectionPath(collectionId), newSk, lastSync);
-		logger.info("allocateNewSyncKey [ collectionId = {} | lastSync.toString = {} ]",
-				new Object[]{ collectionId, newState.getLastSync().toString() });
 		collectionDao.updateState(bs.getDevice(), collectionId, newState);
+		logger.info("Allocate new synckey {} for collectionPath {} with {} last sync", 
+				new Object[]{newState.getKey(), newState.getDataType().asXmlValue(), newState.getLastSync()});
 		return newSk;
 	}
 

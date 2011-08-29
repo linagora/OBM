@@ -64,8 +64,6 @@ public class ContactsBackend extends ObmSyncBackend {
 	}
 
 	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) throws UnknownObmSyncServerException {
-		logger.info("getContentChanges({})", state.getLastSync());
-		
 		BookClient bc = getBookClient(bs);
 		AccessToken token = login(bc, bs);
 		

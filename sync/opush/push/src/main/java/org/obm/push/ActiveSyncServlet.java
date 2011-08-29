@@ -116,7 +116,7 @@ public class ActiveSyncServlet extends HttpServlet {
 
 		final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
 		Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
-		logger.info(asXmlRequestMarker, asrequest.getHttpServletRequest().toString());
+		logger.debug(asXmlRequestMarker, asrequest.getHttpServletRequest().toString());
 		Credentials creds = performAuthentification(asrequest, response);
 		if (creds == null) {
 			return;
@@ -126,12 +126,12 @@ public class ActiveSyncServlet extends HttpServlet {
 		if (policy != null && policy.equals("0")
 				&& !asrequest.getCommand().equals("Provision")) {
 
-			logger.info("forcing device (ua: {}) provisioning",
+			logger.debug("forcing device (ua: {}) provisioning",
 					asrequest.getUserAgent());
 			response.setStatus(449);
 			return;
 		} else {
-			logger.info("policy used = {}", policy);
+			logger.debug("policy used = {}", policy);
 		}
 
 		try {
@@ -214,7 +214,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		Credentials creds = null;
 		boolean valid = false;
 		Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
-		logger.info(asXmlRequestMarker, request.getHttpServletRequest().toString());
+		logger.debug(asXmlRequestMarker, request.getHttpServletRequest().toString());
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader != null) {
 			StringTokenizer st = new StringTokenizer(authHeader);
@@ -243,7 +243,7 @@ public class ActiveSyncServlet extends HttpServlet {
 						if (valid) {
 							loggerService.initLoggerSession(loginAtDomain);
 							
-							logger.info("login/password ok & the device has been authorized");
+							logger.debug("login/password ok & the device has been authorized");
 							return new Credentials(loginAtDomain, password);
 						}
 					}
