@@ -123,12 +123,14 @@ if (empty($users) && empty($resources)) {
   $current_view->add_user($obm['uid']);
 }
 # Retrieve the list of writable calendars
-$calendar_entity = $current_view->get_entities();
-$calendar_user_objects = $calendar_entity['user'];
-$writable_calendars = run_query_writable_calendars($obm['uid'], array_values($calendar_user_objects));
 $default_writable_calendar = null;
-if (count($writable_calendars) > 0) {
-  $default_writable_calendar = $writable_calendars[0];
+$calendar_entity = $current_view->get_entities();
+if (isset($calendar_entity['user'])) {
+  $calendar_user_objects = $calendar_entity['user'];
+  $writable_calendars = run_query_writable_calendars($obm['uid'], array_values($calendar_user_objects));
+  if (count($writable_calendars) > 0) {
+    $default_writable_calendar = $writable_calendars[0];
+  }
 }
 
 get_calendar_action();
