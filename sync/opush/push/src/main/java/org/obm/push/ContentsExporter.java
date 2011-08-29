@@ -81,7 +81,7 @@ public class ContentsExporter implements IContentsExporter {
 
 	private int getCount(BackendSession bs, SyncState syncState, Integer collectionId, DataDelta delta) throws DaoException {
 		int filterCount = invitationFilterManager.getCountFilterChanges(bs, syncState.getKey(), syncState.getDataType(), collectionId);
-		int count = delta.getChanges().size() + delta.getDeletions().size() + filterCount;
+		int count = delta.getItemEstimateSize() + filterCount;
 		logger.info("{} email(s) changes", count);
 		return count;
 	}
@@ -168,20 +168,21 @@ public class ContentsExporter implements IContentsExporter {
 
 	@Override
 	public int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state) throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
-		switch (state.getDataType()) {
-		case CALENDAR:
-			return getItemEstimateSize(bs, state, filterType, collectionId);
-		case CONTACTS:
-			return getItemEstimateSize(bs, state, filterType, collectionId);
-		case EMAIL:
-			return getItemEmailEstimateSize(bs, state, filterType, collectionId);
-		case FOLDER:
-			return getItemEstimateSize(bs, state, filterType, collectionId);
-		case TASKS:
-			return getItemEstimateSize(bs, state, filterType, collectionId);
-		default:
-			return 0;
+		if (state.getDataType() != null) {
+			switch (state.getDataType()) {
+			case CALENDAR:
+				return getItemEstimateSize(bs, state, filterType, collectionId);
+			case CONTACTS:
+				return getItemEstimateSize(bs, state, filterType, collectionId);
+			case EMAIL:
+				return getItemEmailEstimateSize(bs, state, filterType, collectionId);
+			case FOLDER:
+				return getItemEstimateSize(bs, state, filterType, collectionId);
+			case TASKS:
+				return getItemEstimateSize(bs, state, filterType, collectionId);
+			}
 		}
+		return 0;
 	}
 	
 }

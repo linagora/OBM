@@ -48,7 +48,7 @@ public enum FilterType {
 		Calendar date = DateUtils.getMidnightCalendar();
 		switch (this) {
 		case ALL_ITEMS:
-			return DateUtils.getGeneseCalendar();
+			return DateUtils.getEpochCalendar();
 		case ONE_DAY_BACK:
 			date.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH)-1);
 			return date;

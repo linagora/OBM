@@ -29,5 +29,16 @@ public class DataDelta {
 	public Date getSyncDate() {
 		return syncDate;
 	}
+	
+	public int getItemEstimateSize() {
+		int count = 0;
+		if (changes != null) {
+			count += changes.size();
+		}
+		if (deletions != null) {
+			count += deletions.size();
+		}
+		return count;
+	}
 
 }

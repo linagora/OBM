@@ -10,7 +10,7 @@ public class DateUtils {
 		return Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 	}
 	
-	public static Calendar getGeneseCalendar() {
+	public static Calendar getEpochCalendar() {
 		Calendar calendar = getCurrentGMTCalendar();
 		calendar.setTimeInMillis(0);
 		return calendar;

@@ -10,7 +10,7 @@ public class DateUtilsTest {
 
 	@Test
 	public void getGeneseDate() {
-		Calendar currentGMTCalendar = DateUtils.getGeneseCalendar();
+		Calendar currentGMTCalendar = DateUtils.getEpochCalendar();
 		Assert.assertEquals(1970, currentGMTCalendar.get(Calendar.YEAR));
 		Assert.assertEquals(0, currentGMTCalendar.get(Calendar.MONTH));
 		Assert.assertEquals(1, currentGMTCalendar.get(Calendar.DAY_OF_MONTH));

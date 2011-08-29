@@ -215,7 +215,7 @@ public class EmailManager implements IEmailManager {
 			logger.info("delete conv id = ", uid);
 			store.uidStore(Arrays.asList(uid), fl, true);
 			store.expunge();
-			deleteMessageInCache(devId, collectionId, Arrays.asList(uid));
+			deleteEmails(devId, collectionId, Arrays.asList(uid));
 		} finally {
 			store.logout();
 		}
@@ -239,7 +239,7 @@ public class EmailManager implements IEmailManager {
 			logger.info("delete conv id = ", uid);
 			store.uidStore(uids, fl, true);
 			store.expunge();
-			deleteMessageInCache(devId, srcFolderId, Arrays.asList(uid));
+			deleteEmails(devId, srcFolderId, Arrays.asList(uid));
 			addMessageInCache(store, devId, dstFolderId, uid);
 		} finally {
 			store.logout();
@@ -363,7 +363,7 @@ public class EmailManager implements IEmailManager {
 			fl.add(Flag.DELETED);
 			store.uidStore(uids, fl, true);
 			store.expunge();
-			deleteMessageInCache(devId, collectionId, uids);
+			deleteEmails(devId, collectionId, uids);
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
 					new Object[]{collectionPath, time, uids.size()});
@@ -443,9 +443,9 @@ public class EmailManager implements IEmailManager {
 		return ret;
 	}
 
-	private void deleteMessageInCache(Integer devId, Integer collectionId, Collection<Long> mailUids) throws DaoException {
+	private void deleteEmails(Integer devId, Integer collectionId, Collection<Long> mailUids) throws DaoException {
 		try {
-			emailDao.removeMessages(devId, collectionId, mailUids);
+			emailDao.deleteSyncEmails(devId, collectionId, mailUids);
 		} catch (DaoException e) {
 			throw new DaoException("Error while deleting messages in db", e);
 		}
@@ -460,7 +460,7 @@ public class EmailManager implements IEmailManager {
 					}
 				});
 		try {
-			emailDao.addMessages(devId, collectionId, emails);
+			emailDao.updatedSyncedEmails(devId, collectionId, emails);
 		} catch (DaoException e) {
 			throw new DaoException("Error while adding messages in db", e);
 		}
@@ -480,10 +480,10 @@ public class EmailManager implements IEmailManager {
 	public void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedToLong,
 			Collection<Email> updatedToLong) throws DaoException {
 		if (removedToLong != null && !removedToLong.isEmpty()) {
-			emailDao.removeMessages(devId, collectionId, lastSync, removedToLong);
+			emailDao.deleteSyncEmails(devId, collectionId, lastSync, removedToLong);
 		}
 		if (updatedToLong != null && !updatedToLong.isEmpty()) {
-			emailDao.addMessages(devId, collectionId, lastSync, updatedToLong);
+			emailDao.updatedSyncedEmails(devId, collectionId, lastSync, updatedToLong);
 		}
 	}
 

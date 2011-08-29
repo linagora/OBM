@@ -27,13 +27,11 @@ import org.minig.imap.StoreClient;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.EmailNotFoundException;
 import org.obm.push.store.EmailDao;
-import org.obm.push.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -49,54 +47,45 @@ public class EmailSync implements IEmailSync {
 	}
 
 	@Override
-	public MailChanges getSync(StoreClient imapStore, Integer devId, SyncState state, Integer collectionId) 
-			throws DaoException {
-
-		Set<Email> dbEmails = emailDao.getSyncedMail(devId, collectionId);
-		Set<Email> imapEmails = getImapEmails(imapStore, state.getLastSync());
-		Set<Email> emailsToUpdated = getUpdated(dbEmails, imapEmails);
-		Set<Email> emailsToRemoved = getRemoved(dbEmails, imapEmails);
-
-		loggerInfo(state.getLastSync(), dbEmails, imapEmails, emailsToUpdated, emailsToRemoved);
-		return getMailChanges(emailsToUpdated, emailsToRemoved);
+	public MailChanges getSync(StoreClient imapStore, Integer devId, SyncState state, Integer collectionId) throws DaoException {
+		Set<Email> emailsFromIMAP = getImapEmails(imapStore, state.getLastSync());
+		Set<Email> updateEmailsOnlyPDA = listEmailsSynced(devId, collectionId, emailsFromIMAP);
+		
+		MailChanges mailChanges = new MailChanges(new HashSet<Email>(), updateEmailsOnlyPDA, emailsFromIMAP);
+		loggerInfo(state.getLastSync(), emailsFromIMAP, mailChanges);
+		return mailChanges;
 	}
 
-	private void loggerInfo(Date syncStartDate, Set<Email> emailsFromDB, Set<Email> emailsFromIMAP, 
-			Set<Email> emailsToUpdated, Set<Email> emailsToRemoved) {
+	private Set<Email> listEmailsSynced(Integer devId, Integer collectionId, Set<Email> emailsFromIMAP) throws DaoException {
+		Set<Email> updateEmailsOnlyPDA = new HashSet<Email>();
+		for (Email email: emailsFromIMAP) {
+			if (!isEmailSynced(email, devId, collectionId)){
+				updateEmailsOnlyPDA.add(email);
+			}
+		}
+		return updateEmailsOnlyPDA;
+	}
+
+	private boolean isEmailSynced(Email email, Integer devId, Integer collectionId) throws DaoException {
+		try {
+			emailDao.getSyncedEmail(devId, collectionId, email.getUid());
+			return true;
+		} catch (EmailNotFoundException e) {
+			return false;
+		}
+	}
+
+	private void loggerInfo(Date syncStartDate, Set<Email> emailsFromIMAP, MailChanges mailChanges) {
 		logger.info("Synchronization date {}", syncStartDate.toString());
-		logger.info("{} email(s) from database", emailsFromDB.size());
 		logger.info("{} email(s) from imap", emailsFromIMAP.size());
-		logger.info("{} email(s) will be updated", emailsToUpdated.size());
-		logger.info("{} email(s) will be removed", emailsToRemoved.size());
+		logger.info("{} email(s) will be updated to pda", mailChanges.getUpdatedEmailFromImap().size());
+		logger.info("{} email(s) will be updated to db", mailChanges.getUpdatedEmailToDB().size());
 	}
 
 	private Set<Email> getImapEmails(StoreClient imapStore, Date windows) {
 		Collection<Long> uids = imapStore.uidSearch(new SearchQuery(null, windows));
 		Collection<FastFetch> mails = imapStore.uidFetchFast(uids);
 		return EmailFactory.listEmailFromFastFetch(mails);
-	}
-	
-	private Set<Email> getRemoved(Set<Email> emailsFromDB, Set<Email> emailsFromIMAP) {
-		Set<Email> listEmailToRemoved = new HashSet<Email>();
-		listEmailToRemoved.addAll(emailsFromDB);
-		listEmailToRemoved.removeAll(emailsFromIMAP);
-		return listEmailToRemoved;
-	}
-
-	private Set<Email> getUpdated(Set<Email> emailsFromDB, Collection<Email> emailsFromIMAP) {
-		Builder<Email> builder = ImmutableSet.builder();
-		if (emailsFromDB != null) {
-			for (Email imapMail: emailsFromIMAP) {
-				if (!emailsFromDB.contains(imapMail)) {
-					builder.add(imapMail);
-				}
-			}
-		}
-		return builder.build();
-	}
-
-	private MailChanges getMailChanges(Set<Email> updated, Set<Email> removed) {
-		return new MailChanges(removed, updated, DateUtils.getCurrentDate());
 	}
 
 }

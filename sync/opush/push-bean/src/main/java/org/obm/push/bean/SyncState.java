@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.obm.push.utils.DateUtils;
+
 import com.google.common.base.Objects;
 
 
@@ -34,7 +36,7 @@ public class SyncState implements Serializable {
 	}
 	
 	public SyncState(String path, String key, Date lastSync) {
-		this.lastSync = Objects.firstNonNull(lastSync, getEpoch());
+		this.lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochCalendar().getTime());
 		lastSyncFiltred = false;
 		if (path.contains("\\calendar\\")) {
 			this.dataType = PIMDataType.CALENDAR;
@@ -50,13 +52,6 @@ public class SyncState implements Serializable {
 		this.key = key;
 	}
 
-	private Date getEpoch() {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, 1970);
-		cal.set(Calendar.MONTH, Calendar.JANUARY);
-		return cal.getTime();
-	}
-	
 	public Date getLastSync() {
 		return lastSync;
 	}

@@ -2,38 +2,26 @@ package org.obm.push.mail;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.obm.push.bean.Email;
+import org.obm.push.utils.DateUtils;
 
 public class MailChanges {
 	
 	private final Set<Email> removed;
-	private final Set<Email> updated;
+	private final Set<Email> updatedEmailsFromIMAP;
+	private final Set<Email> updatedEmailsToDB;
 	
 	private Date lastSync;
 	
-	public MailChanges(Set<Email> removed, Set<Email> updated, Date lastSync) {
-		this.removed = removed;
-		this.updated = updated;
-		this.lastSync = lastSync;
+	public MailChanges(Set<Email> removedEmails, Set<Email> updatedEmailsFromImap, Set<Email> updatedEmailsToDB) {
+		this.removed = removedEmails;
+		this.updatedEmailsFromIMAP = updatedEmailsFromImap;
+		this.updatedEmailsToDB = updatedEmailsToDB;
+		this.lastSync = DateUtils.getCurrentDate();
 	}
 	
-	public MailChanges() {
-		this(new HashSet<Email>(), new HashSet<Email>(), null);
-	}
-	
-	public MailChanges(Date lastSync) {
-		this(new HashSet<Email>(), new HashSet<Email>(), lastSync);
-	}
-	
-	public MailChanges(Collection<Email> removed, Collection<Email> updated, Date lastSync) {
-		this(lastSync);
-		addRemoved(removed);
-		addUpdated(updated);
-	}
-
 	public Set<Email> getRemoved() {
 		return removed;
 	}
@@ -42,16 +30,16 @@ public class MailChanges {
 		this.removed.addAll(removed);
 	}
 
-	public Set<Email> getUpdated() {
-		return updated;
+	public Set<Email> getUpdatedEmailFromImap() {
+		return updatedEmailsFromIMAP;
 	}
 
 	public void addUpdated(Collection<Email> updated) {
-		this.updated.addAll(updated);
+		this.updatedEmailsFromIMAP.addAll(updated);
 	}
 	
 	public void addUpdated(Email uid){
-		this.updated.add(uid);
+		this.updatedEmailsFromIMAP.add(uid);
 	}
 
 	public void addRemoved(Email uid){
@@ -70,8 +58,12 @@ public class MailChanges {
 		return EmailFactory.listUIDFromEmail(getRemoved());
 	}
 	
-	public Collection<Long> getUpdatedToLong() {
-		return EmailFactory.listUIDFromEmail(getUpdated());
+	public Collection<Long> getUpdatedEmailFromImapToLong() {
+		return EmailFactory.listUIDFromEmail(getUpdatedEmailFromImap());
+	}
+	
+	public Set<Email> getUpdatedEmailToDB() {
+		return updatedEmailsToDB;
 	}
 	
 }

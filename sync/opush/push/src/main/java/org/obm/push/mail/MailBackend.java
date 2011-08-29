@@ -154,7 +154,7 @@ public class MailBackend extends ObmSyncBackend {
 		MailChanges mailChanges = getSync(bs, state, collectionId, filter);
 		try {
 			emailManager.updateData(bs.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
-					mailChanges.getRemovedToLong(), mailChanges.getUpdated());
+					mailChanges.getRemovedToLong(), mailChanges.getUpdatedEmailToDB());
 			return getDataDelta(bs, collectionId, mailChanges);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
@@ -164,7 +164,7 @@ public class MailBackend extends ObmSyncBackend {
 	private DataDelta getDataDelta(BackendSession bs, Integer collectionId, MailChanges mailChanges) 
 			throws ProcessingEmailException, CollectionNotFoundException, DaoException {
 		
-		List<ItemChange> itemChanges = fetchMails(bs, collectionId, getCollectionPathFor(collectionId), mailChanges.getUpdatedToLong());
+		List<ItemChange> itemChanges = fetchMails(bs, collectionId, getCollectionPathFor(collectionId), mailChanges.getUpdatedEmailFromImapToLong());
 		List<ItemChange> itemDeletions = getDeletions(collectionId, mailChanges.getRemovedToLong());
 		return new DataDelta(itemChanges, itemDeletions, mailChanges.getLastSync());
 	}

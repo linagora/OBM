@@ -54,7 +54,7 @@ public class Email {
 
 	@Override
 	public String toString() {
-		return "EmailCache [ uid = " + uid + ", read = " + read + " ]";
+		return "Email [ uid = " + uid + ", read = " + read + " ]";
 	}
 	
 }
