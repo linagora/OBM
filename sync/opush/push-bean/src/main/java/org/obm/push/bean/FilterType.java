@@ -17,6 +17,10 @@ public enum FilterType {
 	FILTER_BY_NO_INCOMPLETE_TASKS;// 8
 
 	public static FilterType getFilterType(String number) {
+		if (number == null) {
+			return ALL_ITEMS;
+		}
+		
 		if ("0".equals(number)) {
 			return ALL_ITEMS;
 		} else if ("1".equals(number)) {
@@ -35,9 +39,9 @@ public enum FilterType {
 			return SIX_MONTHS_BACK;
 		} else if ("8".equals(number)) {
 			return FILTER_BY_NO_INCOMPLETE_TASKS;
-		} else {
-			return ALL_ITEMS;
 		}
+		
+		return ALL_ITEMS;
 	}
 
 	public Calendar getFilteredDate() {

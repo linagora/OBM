@@ -143,9 +143,7 @@ public class SyncDecoder {
 		Element optionsElement = DOMUtils.getUniqueElement(collectionElement, "Options");
 		if (optionsElement != null) {
 			String filterTypeElement = DOMUtils.getElementText(optionsElement, "FilterType");
-			if (filterTypeElement != null) {
-				options.setFilterType(FilterType.getFilterType(filterTypeElement));
-			}
+			options.setFilterType(FilterType.getFilterType(filterTypeElement));
 			
 			String mimeSupport = DOMUtils.getElementText(optionsElement, "MIMESupport");
 			if (mimeSupport != null) {
