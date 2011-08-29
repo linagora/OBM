@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
@@ -17,9 +18,9 @@ public interface IAddressBook {
 
 	/**
 	 * check if given book is read only for logged user
+	 * @throws ServerFault 
 	 */
-	boolean isReadOnly(AccessToken token, BookType book)
-			throws ServerFault;
+	boolean isReadOnly(AccessToken token, BookType book) throws ServerFault ;
 
 	
 	/**
@@ -83,15 +84,17 @@ public interface IAddressBook {
 
 	/**
 	 * remove the contact with specified uid 
+	 * @throws ContactNotFoundException 
 	 */
 	Contact removeContact(AccessToken token, BookType book, String uid)
-			throws ServerFault;
+			throws ServerFault, ContactNotFoundException;
 
 	/**
 	 * remove the contact with specified uid 
+	 * @throws ContactNotFoundException 
 	 */
 	Contact removeContactInBook(AccessToken token, int addressBookId, String uid)
-			throws ServerFault;
+			throws ServerFault, ContactNotFoundException;
 	
 	/**
 	 * Search contacts using a solr query

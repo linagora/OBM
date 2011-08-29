@@ -18,6 +18,7 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.mail.MailBackend;
 
 import com.google.inject.Inject;
@@ -67,7 +68,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
-					throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+					throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
 		
 		switch (type) {
 		case CALENDAR:

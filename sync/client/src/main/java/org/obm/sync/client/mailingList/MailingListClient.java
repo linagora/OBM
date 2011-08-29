@@ -5,6 +5,7 @@ import java.util.List;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
+import org.obm.sync.client.impl.ExceptionFactory;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
 import org.obm.sync.mailingList.MailingListItemsParser;
@@ -33,7 +34,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		Multimap<String, String> params = initParams(token);
 		params.put("mailingList", mlWriter.getMailingListsAsString(mailingList));
 		Document doc = execute("/mailingList/createMailingList", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 		return mlParser.parseMailingList(doc.getDocumentElement());
 	}
 
@@ -45,7 +46,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		Multimap<String, String> params = initParams(token);
 		params.put("id", id.toString());
 		Document doc = execute("/mailingList/getMailingListFromId", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 		return mlParser.parseMailingList(doc.getDocumentElement());
 	}
 
@@ -53,7 +54,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 	public List<MailingList> listAllMailingList(AccessToken token) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/mailingList/listAllMailingList", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 		List<MailingList> addressBooks = mlParser.parseListMailingList(doc);
 		return addressBooks;
 	}
@@ -68,7 +69,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		String ml = mlWriter.getMailingListsAsString(mailingList);
 		params.put("mailingList", ml);
 		Document doc = execute("/mailingList/modifyMailingList", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 		return mlParser.parseMailingList(doc.getDocumentElement());
 	}
 
@@ -92,7 +93,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		params.put("mailingListId", mailingListId.toString());
 		params.put("mailingListEmails", mlWriter.getMailingListEmailsAsString(email));
 		Document doc = execute("/mailingList/addEmails", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 		return mlParser.parseMailingListEmails(doc);
 	}
 	

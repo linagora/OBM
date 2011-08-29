@@ -5,6 +5,7 @@ import java.util.Map;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
+import org.obm.sync.client.impl.ExceptionFactory;
 import org.obm.sync.services.ISetting;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.SettingItemsParser;
@@ -26,7 +27,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	public Map<String, String> getSettings(AccessToken token) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getSettings", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 		return respParser.parseListSettings(doc);
 	}
 
@@ -45,7 +46,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 			params.put("text", "" + vs.getText());
 		}
 		Document doc = execute("/setting/setVacationSettings", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 		}
 		params.put("localCopy", "" + fs.isLocalCopy());
 		Document doc = execute("/setting/setEmailForwarding", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 	}
 
 	@Override
@@ -66,7 +67,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getEmailForwarding", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 		return respParser.parseForwarding(doc);
 	}
 
@@ -75,7 +76,8 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		Document doc = execute("/setting/getVacationSettings", params);
-		checkServerFaultException(doc);
+		ExceptionFactory.checkServerFaultException(doc);
 		return respParser.parseVacation(doc);
 	}
+	
 }

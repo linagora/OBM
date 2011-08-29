@@ -13,7 +13,7 @@ public enum SyncStatus {
 	INVALID_SYNC_KEY, // 3
 	PROTOCOL_ERROR, // 4
 	SERVER_ERROR, // 5
-	CONVERSATION_ERROR, // 6
+	CONVERSATION_ERROR_OR_INVALID_ITEM, // 6
 	CONFLICT, // 7
 	OBJECT_NOT_FOUND, // 8
 	OUT_OF_DISK_SPACE, // 9
@@ -29,7 +29,7 @@ public enum SyncStatus {
 		switch (this) {
 		case CONFLICT:
 			return "7";
-		case CONVERSATION_ERROR:
+		case CONVERSATION_ERROR_OR_INVALID_ITEM:
 			return "6";
 		case HIERARCHY_CHANGED:
 			return "12";

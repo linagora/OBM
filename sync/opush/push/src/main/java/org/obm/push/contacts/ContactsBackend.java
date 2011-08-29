@@ -17,9 +17,11 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
+import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
@@ -130,9 +132,8 @@ public class ContactsBackend extends ObmSyncBackend {
 		return getServerIdFor(collectionId, id);
 	}
 
-	public void delete(BackendSession bs, String serverId) throws UnknownObmSyncServerException {
+	public void delete(BackendSession bs, String serverId) throws UnknownObmSyncServerException, ServerItemNotFoundException {
 		logger.info("delete serverId {}", serverId);
-		
 		if (serverId != null) {
 			int idx = serverId.indexOf(":");
 			if (idx > 0) {
@@ -142,6 +143,8 @@ public class ContactsBackend extends ObmSyncBackend {
 					bc.removeContact(token, BookType.contacts, serverId.substring(idx + 1) );
 				} catch (ServerFault e) {
 					throw new UnknownObmSyncServerException(e);
+				} catch (ContactNotFoundException e) {
+					throw new ServerItemNotFoundException(serverId);
 				} finally {
 					bc.logout(token);
 				}

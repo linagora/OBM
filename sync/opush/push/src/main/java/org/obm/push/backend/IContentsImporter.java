@@ -14,6 +14,7 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.ServerItemNotFoundException;
 
 /**
  * Content management interface, ie. CRUD API.
@@ -24,7 +25,7 @@ public interface IContentsImporter {
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException;
 
 	void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException;
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException;
 
 	String importMoveItem(BackendSession bs, PIMDataType type, String srcFolder, String dstFolder, String messageId)
 			throws CollectionNotFoundException, DaoException, ProcessingEmailException;

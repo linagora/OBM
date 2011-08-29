@@ -24,6 +24,7 @@ import java.util.List;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
@@ -138,13 +139,11 @@ public class AddressBookHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void removeContact(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
+	private void removeContact(AccessToken at, ParametersSource params, XmlResponder responder) 
+			throws ServerFault, ContactNotFoundException {
+		
 		Contact ret = binding.removeContact(at, type(params), p(params, "id"));
-		if (ret != null) {
-			responder.sendContact(ret);
-		} else {
-			responder.sendError("contact did not exist");
-		}
+		responder.sendContact(ret);
 	}
 
 	private void modifyContact(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
@@ -229,13 +228,11 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return Integer.valueOf(p(params, "bookId"));
 	}
 	
-	private void removeContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws ServerFault {
+	private void removeContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) 
+			throws ServerFault, ContactNotFoundException {
+		
 		Contact ret = binding.removeContactInBook(token, getBookId(params), p(params, "id"));
-		if (ret != null) {
-			responder.sendContact(ret);
-		} else {
-			responder.sendError("contact did not exist");
-		}
+		responder.sendContact(ret);
 	}
 
 	private void modifyContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {

@@ -12,10 +12,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.EventAlreadyExistException;
-import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.MavenVersion;
-import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.ISyncClient;
 import org.obm.sync.utils.DOMUtils;
 import org.slf4j.Logger;
@@ -188,44 +185,6 @@ public abstract class AbstractClientImpl implements ISyncClient {
 	public void logout(AccessToken at) {
 		Multimap<String, String> params = initParams(at);
 		executeVoid("/login/doLogout", params);
-	}
-
-	protected void checkServerFaultException(Document doc) throws ServerFault {
-		if (documentIsError(doc)) {
-			throw new ServerFault( getErrorMessage(doc) );
-		}
-	}
-
-	protected void checkEventAlreadyExistException(Document doc) throws ServerFault, EventAlreadyExistException {
-		if (documentIsError(doc)) {
-			String message = getErrorMessage(doc);
-			String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
-			if (EventAlreadyExistException.class.getName().equals(type)) {
-				throw new EventAlreadyExistException(message);
-			} else {
-				throw new ServerFault(message);
-			}
-		}
-	}
-	
-	protected void checkEventNotFoundException(Document doc) throws ServerFault, EventNotFoundException {
-		if (documentIsError(doc)) {
-			String message = getErrorMessage(doc);
-			String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
-			if (EventNotFoundException.class.getName().equals(type)) {
-				throw new EventNotFoundException(message);
-			} else {
-				throw new ServerFault(message);
-			}
-		}
-	}
-
-	protected boolean documentIsError(Document doc) {
-		return doc.getDocumentElement().getNodeName().equals("error");
-	}
-	
-	private String getErrorMessage(Document doc) {
-		return DOMUtils.getElementText(doc.getDocumentElement(), "message");
 	}
 
 }

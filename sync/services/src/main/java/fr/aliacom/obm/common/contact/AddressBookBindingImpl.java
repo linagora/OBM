@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
@@ -75,7 +76,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional
-	public boolean isReadOnly(AccessToken token, BookType book)	throws ServerFault {
+	public boolean isReadOnly(AccessToken token, BookType book) {
 		if (book == BookType.contacts) {
 			return false;
 		}
@@ -257,13 +258,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 
-	private void checkContactsAddressBook(AccessToken token, BookType book)
-			throws ServerFault, StoreException {
-		
+	private void checkContactsAddressBook(AccessToken token, BookType book) throws StoreException {
 		if (isReadOnly(token, book)) {
 			throw new StoreException("users not writable");
 		}
-		
 		if (book != BookType.contacts) {
 			throw new StoreException("booktype not supported");
 		}
@@ -288,52 +286,43 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 
-	private Contact modifyContact(AccessToken token, Contact c)
-		throws SQLException, FindException {
-
+	private Contact modifyContact(AccessToken token, Contact c) throws SQLException, FindException {
 		Contact modifiedContact;
-		Contact previous = contactDao.findContact(token, c.getUid());
-		
-		if (previous == null) {
-			logger.warn("previous version not found for c.uid: "
-					+ c.getUid() + " c.last: " + c.getLastname());
+		try {
+			Contact previous = contactDao.findContact(token, c.getUid());
+			if (!contactDao.hasRightsOn(token, c.getUid())) {
+				logger.warn("contact " + c.getLastname() + " " + c.getFirstname()
+						+ "(" + c.getUid() + ") not modified. not allowed for "
+						+ token.getEmail());
+				modifiedContact = previous;
+			} else {
+				contactMerger.merge(previous, c);
+				modifiedContact = contactDao.modifyContact(token, c);
+			}
+		} catch (ContactNotFoundException e) {
+			logger.warn("previous version not found for c.uid: " + c.getUid() + " c.last: " + c.getLastname());
 			modifiedContact = c;
-
-		}
-		else if (!contactDao.hasRightsOn(token, c.getUid())) {
-			logger.warn("contact " + c.getLastname() + " " + c.getFirstname()
-					+ "(" + c.getUid() + ") not modified. not allowed for "
-					+ token.getEmail());
-			modifiedContact = previous;
-		}
-		else {
-			contactMerger.merge(previous, c);
-			modifiedContact = contactDao.modifyContact(token, c);
 		}
 		return modifiedContact;
 	}
 	
 	@Override
 	@Transactional
-	public Contact removeContact(AccessToken token, BookType book, String uid)
-			throws ServerFault {
-
-		Integer integerUid = null;
+	public Contact removeContact(AccessToken token, BookType book, String uid) throws ServerFault, ContactNotFoundException { 
 		try {
-			integerUid = Integer.valueOf(uid);
-		} catch (NumberFormatException e) {
-			logger.error(LogUtils.prefix(token) + "contact uid is not an integer", e);
-			return null;
-		}
-
-		try {
+			Integer integerUid = Integer.valueOf(uid);
+			
 			checkContactsAddressBook(token, book);
 
 			Contact c = contactDao.removeContact(token, integerUid);
-			logger.info(LogUtils.prefix(token) + "contact[" + uid
-					+ "] removed (archived)");
+			logger.info(LogUtils.prefix(token) + "contact[" + uid + "] removed (archived)");
 			return c;
-		} catch (Throwable e) {
+		} catch (NumberFormatException e) {
+			throw new ContactNotFoundException("contact uid [" + uid +"] is not an integer");
+		} catch (StoreException e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		} catch (SQLException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
@@ -425,7 +414,6 @@ public class AddressBookBindingImpl implements IAddressBook {
 		changes.setRemoved(contactDao.findRemovedFolders(timestamp, token));
 		return changes;
 	}
-	
 
 	@Override
 	@Transactional
@@ -456,7 +444,6 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 	
-	
 	@Override
 	@Transactional
 	public Contact modifyContactInBook(AccessToken token, int addressBookId,
@@ -471,8 +458,8 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	@Override
 	@Transactional
-	public Contact removeContactInBook(AccessToken token, int addressBookId,
-			String uid) throws ServerFault {
+	public Contact removeContactInBook(AccessToken token, int addressBookId, String uid) 
+			throws ServerFault, ContactNotFoundException {
 		return removeContact(token, BookType.contacts, uid);
 	}
 	

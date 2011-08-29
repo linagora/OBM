@@ -39,6 +39,7 @@ import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
+import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.SyncRequest;
@@ -309,25 +310,23 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	 * @throws CollectionNotFoundException 
 	 * @throws UnknownObmSyncServerException 
 	 * @throws ProcessingEmailException 
+	 * @throws ServerItemNotFoundException 
 	 */
-	private Map<String, String> processModification(BackendSession bs,
-			SyncCollection collection) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+	private Map<String, String> processModification(BackendSession bs, SyncCollection collection) 
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, 
+			ProcessingEmailException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
-		
 		for (SyncCollectionChange change : collection.getChanges()) {
 
 			if (change.getModType().equals("Modify")) {
-				contentsImporter.importMessageChange(bs, collection.getCollectionId(),
-						change.getServerId(), change.getClientId(),
-						change.getData());
-			} else if (change.getModType().equals("Add")
-					|| change.getModType().equals("Change")) {
-				logger.info("processing Add/Change (srv = {} | cli = {} )",
-						new Object[]{ change.getServerId(), change.getClientId() });
 				
-				String obmId = contentsImporter.importMessageChange(bs,
-						collection.getCollectionId(), change.getServerId(),
+				contentsImporter.importMessageChange(bs, collection.getCollectionId(), change.getServerId(), change.getClientId(),
+						change.getData());
+			
+			} else if (change.getModType().equals("Add") || change.getModType().equals("Change")) {
+
+				String obmId = contentsImporter.importMessageChange(bs,	collection.getCollectionId(), change.getServerId(),
 						change.getClientId(), change.getData());
 				if (obmId != null) {
 					if (change.getClientId() != null) {
@@ -337,10 +336,19 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 						processedClientIds.put(obmId, null);
 					}
 				}
+				
 			} else if (change.getModType().equals("Delete")) {
-				contentsImporter.importMessageDeletion(bs, change.getType(),
-						collection.getCollectionId(), change.getServerId(),
-						collection.getOptions().isDeletesAsMoves());
+				
+				try {
+					contentsImporter.importMessageDeletion(bs, change.getType(), collection.getCollectionId(), change.getServerId(),
+							collection.getOptions().isDeletesAsMoves());
+					
+					processedClientIds.put(change.getServerId(), null);
+				} catch (ServerItemNotFoundException e) {
+					// Error 6, Error in client/server conversion. The client has sent a malformed or invalid item.	Item 
+					// Stop sending the item. This is not a transient condition. 
+				}
+				
 			}
 		}
 		return processedClientIds;

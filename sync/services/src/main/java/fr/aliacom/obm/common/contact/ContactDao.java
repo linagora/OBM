@@ -48,6 +48,7 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
@@ -809,8 +810,9 @@ public class ContactDao {
 
 	/**
 	 * @return the contact with the given id if it is not archived
+	 * @throws ContactNotFoundException 
 	 */
-	public Contact findContact(AccessToken token, int id) {
+	public Contact findContact(AccessToken token, int id) throws ContactNotFoundException {
 		String q = "SELECT "
 			+ CONTACT_SELECT_FIELDS
 			+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
@@ -838,6 +840,9 @@ public class ContactDao {
 				loadEmails(con, entityContact);
 				loadBirthday(con, entityContact);
 				loadAnniversary(con, entityContact);
+			}
+			if (ret == null) {
+				throw new ContactNotFoundException("Contact " + id + " not found");
 			}
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
@@ -1001,19 +1006,14 @@ public class ContactDao {
 		}
 	}
 
-
-	public Contact removeContact(AccessToken at, int uid) throws SQLException {
+	public Contact removeContact(AccessToken at, int uid) throws SQLException, ContactNotFoundException {
 		Contact c = findContact(at, uid);
-		if (c == null) {
-			return null;
-		}
 		if (!hasRightsOn(at, uid)) {
 			logger.info("contact " + uid + " removal not permitted for "
 					+ at.getEmail());
 			return c;
 		}
 		return removeContact(at, c);
-
 	}
 
 	public Set<Integer> findRemovalCandidates(Date d, AccessToken at) {
