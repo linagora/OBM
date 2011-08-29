@@ -6313,12 +6313,15 @@ function dis_calendar_right_dis_admin($id='') {
   $name = $infos['firstname'] . ' ' . $infos['lastname'];
   $display['title'] = $name;
 
+  $hide_user = null;
   if ($id == $obm['uid']) {
     $block = "<h1>$l_rights_on_my</h1>";
+    $hide_user = true;
   } else {
     $block = "<h1>$l_user_right $name</h1>";
+    $hide_user = false;
   }
-  $block .= of_right_dis_admin('calendar', $id);
+  $block .= of_right_dis_admin('calendar', $id, $hide_user);
   $block .= html_share_calendar($id,$name);
   if ($GLOBALS['c_calendar_display_my_rights']) $block .= html_calendar_my_rights();
 

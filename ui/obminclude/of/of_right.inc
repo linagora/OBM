@@ -16,7 +16,7 @@ OBM_Acl::initialize();
 //   - $entity    : entity to administer the right for
 //   - $entity_id : entity id
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_dis_admin($entity, $entity_id) {
+function of_right_dis_admin($entity, $entity_id, $hide_user=false) {
   global $display, $obm, $l_of_right_err_empty;
 
   if (!isset($entity_id) || ($entity_id == '')) {
@@ -27,9 +27,29 @@ function of_right_dis_admin($entity, $entity_id) {
   $display['features'] = html_entityadmin_bar($entity_id, $entity);
   
   $consumers = OBM_Acl::getEntityConsumers($entity, $entity_id);
+
+  $consumers_to_display = null;
+  if ($hide_user) {
+      # Remove the current user, as there is no point to let the user change the
+      # rights on their own account (in practice, they always have all the rights)
+      # Should really be done by changing the SQL query, but this would mean too
+      # many changes in of_acl.php, so we do it the naive way instead
+      $consumers_to_display = array();
+      foreach ($consumers as $consumer) {
+          if ($consumer['id'] != $entity_id) {
+              array_push($consumers_to_display, $consumer);
+          }
+      }
+  }
+  else {
+      $consumers_to_display = $consumers;
+  }
+
   $public_rights = OBM_Acl::getPublicRights($entity, $entity_id);
 
-  return html_dis_right_admin($consumers, $public_rights, $entity_id, $entity);
+  $html = html_dis_right_admin($consumers_to_display, $public_rights,
+      $entity_id, $entity);
+  return $html;
 }
 
 
