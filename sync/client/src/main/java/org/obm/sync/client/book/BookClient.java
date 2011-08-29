@@ -13,26 +13,33 @@ import org.obm.sync.book.BookItemsWriter;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.client.impl.ExceptionFactory;
+import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChangesResponse;
+import org.obm.sync.locators.Locator;
 import org.obm.sync.services.IAddressBook;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public class BookClient extends AbstractClientImpl implements IAddressBook {
 
-	private BookItemsParser respParser;
-	private BookItemsWriter biw;
+	private final BookItemsParser respParser;
+	private final BookItemsWriter biw;
+	private final Locator Locator;
 
-	public BookClient(String obmSyncServicesUrl) {
-		super(obmSyncServicesUrl);
-		respParser = new BookItemsParser();
-		biw = new BookItemsWriter();
+	@Inject
+	private BookClient(SyncClientException syncClientException, Locator Locator) {
+		super(syncClientException);
+		this.Locator = Locator;
+		this.respParser = new BookItemsParser();
+		this.biw = new BookItemsWriter();
 	}
 
 	@Override
@@ -40,8 +47,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("contact", biw.getContactAsString(contact));
-		Document doc = execute("/book/createContact", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/createContact", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 
@@ -50,8 +57,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("contact", biw.getContactAsString(contact));
-		Document doc = execute("/book/createContactWithoutDuplicate", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/createContactWithoutDuplicate", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 
@@ -60,8 +67,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("id", id);
-		Document doc = execute("/book/getContactFromId", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/getContactFromId", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 
@@ -70,8 +77,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("contact", biw.getContactAsString(contact));
-		Document doc = execute("/book/getContactTwinKeys", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/getContactTwinKeys", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseKeyList(doc);
 	}
 
@@ -85,8 +92,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 			params.put("lastSync", "0");
 		}
 
-		Document doc = execute("/book/getSync", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/getSync", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseChanges(doc);
 	}
 
@@ -94,16 +101,16 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	public boolean isReadOnly(AccessToken token, BookType book) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
-		Document doc = execute("/book/isReadOnly", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/isReadOnly", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return "true".equals(respParser.parseArrayOfString(doc)[0]);
 	}
 
 	@Override
 	public BookType[] listBooks(AccessToken token) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
-		Document doc = execute("/book/listBooks", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/listBooks", params);
+		exceptionFactory.checkServerFaultException(doc);
 		String[] sa = respParser.parseArrayOfString(doc);
 		BookType[] bts = new BookType[sa.length];
 		for (int i = 0; i < sa.length; i++) {
@@ -115,8 +122,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public List<AddressBook> listAllBooks(AccessToken token) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
-		Document doc = execute("/book/listAllBooks", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/listAllBooks", params);
+		exceptionFactory.checkServerFaultException(doc);
 		List<AddressBook> addressBooks = respParser.parseListAddressBook(doc);
 		return addressBooks;
 	}
@@ -127,8 +134,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		params.put("book", book.toString());
 		String ct = biw.getContactAsString(contact);
 		params.put("contact", ct);
-		Document doc = execute("/book/modifyContact", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/modifyContact", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 
@@ -137,8 +144,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("book", book.toString());
 		params.put("id", uid);
-		Document doc = execute("/book/removeContact", params);
-		ExceptionFactory.checkContactNotFoundException(doc);
+		Document doc = execute(token, "/book/removeContact", params);
+		exceptionFactory.checkContactNotFoundException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 
@@ -147,8 +154,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("query", query);
 		params.put("limit", "" + limit);
-		Document doc = execute("/book/searchContact", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/searchContact", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseListContact(doc.getDocumentElement());
 	}
 
@@ -158,8 +165,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		params.put("query", query);
 		params.put("limit", String.valueOf(limit));
 		params.put("group", String.valueOf(group.getUid()));
-		Document doc = execute("/book/searchContactInGroup", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/searchContactInGroup", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseListContact(doc.getDocumentElement());
 	}
 	
@@ -172,8 +179,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 			params.put("lastSync", "0");
 		}
 
-		Document doc = execute("/book/getFolderSync", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/getFolderSync", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseFolderChangesResponse(doc);
 	}
 	
@@ -186,8 +193,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 			params.put("lastSync", "0");
 		}
 
-		Document doc = execute("/book/getAddressBookSync", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/getAddressBookSync", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseAddressBookChanges(doc);
 	}
 	
@@ -196,8 +203,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
 		params.put("contact", biw.getContactAsString(contact));
-		Document doc = execute("/book/createContactInBook", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/createContactInBook", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 	
@@ -206,7 +213,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
 		params.put("id", id);
-		Document doc = execute("/book/getContactInBook", params);
+		Document doc = execute(token, "/book/getContactInBook", params);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 	
@@ -216,8 +223,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		params.put("bookId", String.valueOf(addressBookId));
 		String ct = biw.getContactAsString(contact);
 		params.put("contact", ct);
-		Document doc = execute("/book/modifyContactInBook", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/modifyContactInBook", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 	
@@ -226,8 +233,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
 		params.put("id", uid);
-		Document doc = execute("/book/removeContactInBook", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/removeContactInBook", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 
@@ -235,10 +242,15 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	public boolean unsubscribeBook(AccessToken token, Integer addressBookId) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
-		Document doc = execute("/book/unsubscribeBook", params);
-		ExceptionFactory.checkServerFaultException(doc);
+		Document doc = execute(token, "/book/unsubscribeBook", params);
+		exceptionFactory.checkServerFaultException(doc);
 		return "true".equalsIgnoreCase(DOMUtils.getElementText(doc
 				.getDocumentElement(), "value"));
+	}
+
+	@Override
+	protected Locator getLocator() {
+		return Locator;
 	}
 	
 }

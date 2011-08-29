@@ -345,8 +345,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 					
 					processedClientIds.put(change.getServerId(), null);
 				} catch (ServerItemNotFoundException e) {
-					// Error 6, Error in client/server conversion. The client has sent a malformed or invalid item.	Item 
-					// Stop sending the item. This is not a transient condition. 
+					logger.info("Item {} not exist on server. The client has sent a malformed or invalid item. Stop sending the item !", 
+							change.getServerId());
 				}
 				
 			}

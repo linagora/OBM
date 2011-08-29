@@ -14,6 +14,7 @@ import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.client.ISyncClient;
+import org.obm.sync.locators.Locator;
 import org.obm.sync.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,18 +24,15 @@ import org.w3c.dom.Element;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-/**
- * Utility methods for client implementations
- * 
- * @author tom
- * 
- */
 public abstract class AbstractClientImpl implements ISyncClient {
 
-	protected HttpClient hc;
-	protected Logger logger = LoggerFactory.getLogger(getClass());
-	private String url;
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final SyncClientException exceptionFactory;
 
+	protected HttpClient hc;
+	
+	protected abstract Locator getLocator();
+	
 	static {
 		XTrustProvider.install();
 	}
@@ -45,13 +43,9 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		}
 	};
 
-	protected AbstractClientImpl(String backendUrl, HttpClient cli) {
-		this.hc = cli;
-		this.url = backendUrl;
-	}
-
-	protected AbstractClientImpl(String backendUrl) {
-		this(backendUrl, createHttpClient());
+	protected AbstractClientImpl(SyncClientException exceptionFactory) {
+		this.exceptionFactory = exceptionFactory;
+		this.hc = createHttpClient();
 	}
 
 	private static HttpClient createHttpClient() {
@@ -60,9 +54,10 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		return ret;
 	}
 
-	protected synchronized Document execute(String action,
+	protected synchronized Document execute(AccessToken token, String action,
 			Multimap<String, String> parameters) {
-		PostMethod pm = new PostMethod(url + action);
+		
+		PostMethod pm = new PostMethod(getBackendUrl(token.getUserWithDomain()) + action);
 		pm.setRequestHeader("Content-Type",
 				"application/x-www-form-urlencoded; charset=utf-8");
 		try {
@@ -101,9 +96,9 @@ public abstract class AbstractClientImpl implements ISyncClient {
 
 	}
 
-	protected synchronized InputStream executeStream(String action,
+	protected synchronized InputStream executeStream(AccessToken token, String action,
 			Multimap<String, String> parameters) {
-		PostMethod pm = new PostMethod(url + action);
+		PostMethod pm = new PostMethod(getBackendUrl(token.getUserWithDomain()) + action);
 		pm.setRequestHeader("Content-Type",
 				"application/x-www-form-urlencoded; charset=utf-8");
 		try {
@@ -149,22 +144,24 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		return is;
 	}
 
-	protected synchronized void executeVoid(String action,
-			Multimap<String, String> parameters) {
-		PostMethod pm = new PostMethod(url + action);
-		pm.setRequestHeader("Content-Type",
-				"application/x-www-form-urlencoded; charset=utf-8");
+	protected synchronized void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
+		PostMethod pm = new PostMethod(getBackendUrl(at.getUserWithDomain()) + action);
+		pm.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
 		executeStream(pm, parameters);
 		pm.releaseConnection();
 	}
 
-	public AccessToken login(String login, String password, String origin) {
+	public AccessToken login(String loginAtDomain, String password, String origin) {
 		Multimap<String, String> params = ArrayListMultimap.create();
-		params.put("login", login);
+		params.put("login", loginAtDomain);
 		params.put("password", password);
 		params.put("origin", origin);
 
-		Document doc = execute("/login/doLogin", params);
+		AccessToken token = new AccessToken(0, 0, origin);
+		token.setUser(loginAtDomain.split("@", 2)[0]);
+		token.setDomain(loginAtDomain.split("@", 2)[1]);
+		
+		Document doc = execute(token, "/login/doLogin", params);
 		Element root = doc.getDocumentElement();
 		String sid = DOMUtils.getElementText(root, "sid");
 		Element v = DOMUtils.getUniqueElement(root, "version");
@@ -174,17 +171,19 @@ public abstract class AbstractClientImpl implements ISyncClient {
 			version.setMinor(v.getAttribute("minor"));
 			version.setRelease(v.getAttribute("release"));
 		}
-		AccessToken token = new AccessToken(0, 0, origin);
 		token.setSessionId(sid);
-		token.setUser(login.split("@", 2)[0]);
 		token.setVersion(version);
-
 		return token;
 	}
 
 	public void logout(AccessToken at) {
 		Multimap<String, String> params = initParams(at);
-		executeVoid("/login/doLogout", params);
+		executeVoid(at, "/login/doLogout", params);
+	}
+	
+	private String getBackendUrl(String loginAtDomain) {
+		Locator locator = getLocator();
+		return locator.backendUrl(loginAtDomain);
 	}
 
 }

@@ -1,13 +1,13 @@
 package org.obm.push.backend;
 
-import javax.naming.ConfigurationException;
-
-import org.obm.configuration.ObmConfigurationService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
+import org.obm.sync.client.book.BookClient;
+import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.client.calendar.TodoClient;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,10 +16,8 @@ import com.google.inject.Singleton;
 public class FolderBackend extends ObmSyncBackend {
 
 	@Inject
-	private FolderBackend(ObmConfigurationService configurationService, CollectionDao collectionDao)
-			throws ConfigurationException {
-		
-		super(configurationService, collectionDao);
+	private FolderBackend(CollectionDao collectionDao, BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient) {
+		super(collectionDao, bookClient, calendarClient, todoClient);
 	}
 
 	public void synchronize(BackendSession bs) throws DaoException {

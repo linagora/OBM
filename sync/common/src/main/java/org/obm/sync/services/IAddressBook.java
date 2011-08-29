@@ -84,14 +84,12 @@ public interface IAddressBook {
 
 	/**
 	 * remove the contact with specified uid 
-	 * @throws ContactNotFoundException 
 	 */
 	Contact removeContact(AccessToken token, BookType book, String uid)
 			throws ServerFault, ContactNotFoundException;
 
 	/**
 	 * remove the contact with specified uid 
-	 * @throws ContactNotFoundException 
 	 */
 	Contact removeContactInBook(AccessToken token, int addressBookId, String uid)
 			throws ServerFault, ContactNotFoundException;

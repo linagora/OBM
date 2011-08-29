@@ -23,14 +23,14 @@ import javax.naming.ConfigurationException;
 
 import org.obm.configuration.store.StoreNotFoundException;
 
-/**
- * Configuration service
- */
 public class ObmConfigurationService extends AbstractConfigurationService{
 
 	private final static String LOCATOR_PORT = "8082";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
 
+	private final static String OBM_SYNC_PORT = "8080";
+	private final static String OBM_SYNC_APP_NAME = "obm-sync/services";
+	
 	public ObmConfigurationService() {
 		super("/etc/obm/obm_conf.ini");
 	}
@@ -41,8 +41,7 @@ public class ObmConfigurationService extends AbstractConfigurationService{
 			throw new ConfigurationException(
 					"Missing host key in configuration");
 		}
-		return "http://" + locatorHost + ":" + LOCATOR_PORT + "/"
-				+ LOCATOR_APP_NAME + "/";
+		return "http://" + locatorHost + ":" + LOCATOR_PORT + "/" + LOCATOR_APP_NAME + "/";
 	}
 
 	public String getObmUIBaseUrl() {
@@ -54,6 +53,10 @@ public class ObmConfigurationService extends AbstractConfigurationService{
 
 	public InputStream getStoreConfiguration() throws StoreNotFoundException {
 		throw new StoreNotFoundException("Store not found for " + getClass() + " configuration.");
+	}
+	
+	public String getObmSyncUrl(String obmSyncHost) {
+		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
 	}
 
 }

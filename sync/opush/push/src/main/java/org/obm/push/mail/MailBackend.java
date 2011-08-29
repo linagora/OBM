@@ -13,15 +13,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.naming.ConfigurationException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
 import org.minig.mime.QuotedPrintableDecoderInputStream;
-import org.obm.configuration.ObmConfigurationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
@@ -49,7 +46,10 @@ import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
+import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.client.calendar.TodoClient;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -65,12 +65,10 @@ public class MailBackend extends ObmSyncBackend {
 	private final FiltrageInvitationDao filtrageInvitationDao;
 
 	@Inject
-	private MailBackend(IEmailManager emailManager,
-			ObmConfigurationService configurationService, CollectionDao collectionDao,
-			FiltrageInvitationDao filtrageInvitationDao)
-			throws ConfigurationException {
+	private MailBackend(IEmailManager emailManager,	CollectionDao collectionDao, FiltrageInvitationDao filtrageInvitationDao, 
+			BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient)  {
 		
-		super(configurationService, collectionDao);
+		super(collectionDao, bookClient, calendarClient, todoClient);
 		this.emailManager = emailManager;
 		this.filtrageInvitationDao = filtrageInvitationDao;
 	}
@@ -175,7 +173,7 @@ public class MailBackend extends ObmSyncBackend {
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
 		List<MSEmail> msMails;
 		try {
-			msMails = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collection, updated);
+			msMails = emailManager.fetchMails(bs, getCalendarClient(), collectionId, collection, updated);
 			for (MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
@@ -227,7 +225,7 @@ public class MailBackend extends ObmSyncBackend {
 		try {
 			final Builder<ItemChange> ret = ImmutableList.builder();
 			final String collectionPath = getCollectionPathFor(collectionId);
-			final List<MSEmail> emails = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collectionPath, uids);
+			final List<MSEmail> emails = emailManager.fetchMails(bs, getCalendarClient(), collectionId, collectionPath, uids);
 			for (final MSEmail email: emails) {
 				ItemChange ic = new ItemChange();
 				ic.setServerId(getServerIdFor(collectionId, String.valueOf(email.getUid())));
@@ -355,7 +353,7 @@ public class MailBackend extends ObmSyncBackend {
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> mail = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collectionPath, uids);
+			List<MSEmail> mail = emailManager.fetchMails(bs, getCalendarClient(), collectionId, collectionPath, uids);
 
 			if (mail.size() > 0) {
 				//TODO uses headers References and In-Reply-To
@@ -385,7 +383,7 @@ public class MailBackend extends ObmSyncBackend {
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
 			List<InputStream> mail = emailManager.fetchMIMEMails(bs,
-					getCalendarClient(bs), collectionName, uids);
+					getCalendarClient(), collectionName, uids);
 
 			if (mail.size() > 0) {
 				ForwardEmailHandler reh = new ForwardEmailHandler(
@@ -413,7 +411,7 @@ public class MailBackend extends ObmSyncBackend {
 	}
 
 	private String getUserEmail(BackendSession bs) throws UnknownObmSyncServerException {
-		AbstractEventSyncClient cal = getCalendarClient(bs);
+		AbstractEventSyncClient cal = getCalendarClient();
 		AccessToken at = cal.login(bs.getLoginAtDomain(), bs.getPassword(), OBM_SYNC_ORIGIN);
 		try {
 			return cal.getUserEmail(at);
@@ -474,7 +472,7 @@ public class MailBackend extends ObmSyncBackend {
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> emails = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collectionName, uids);
+			List<MSEmail> emails = emailManager.fetchMails(bs, getCalendarClient(), collectionId, collectionName, uids);
 			if (emails.size() > 0) {
 				return emails.get(0);
 			}

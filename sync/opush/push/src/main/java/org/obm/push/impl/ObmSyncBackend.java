@@ -4,10 +4,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.naming.ConfigurationException;
-
-import org.obm.configuration.ObmConfigurationService;
-import org.obm.locator.LocatorClient;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
@@ -20,9 +16,7 @@ import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.obm.sync.client.calendar.CalendarClient;
-import org.obm.sync.locators.AddressBookLocator;
-import org.obm.sync.locators.CalendarLocator;
-import org.obm.sync.locators.TaskLocator;
+import org.obm.sync.client.calendar.TodoClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,77 +26,33 @@ public class ObmSyncBackend {
 
 	public static final String OBM_SYNC_ORIGIN = "o-push";
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-
 	protected String obmSyncHost;
+
 	private final CollectionDao collectionDao;
-	private final LocatorClient locatorClient;
+	private final BookClient bookClient;
+	private final CalendarClient calendarClient;
+	private final TodoClient todoClient;
 
-	protected ObmSyncBackend(ObmConfigurationService configurationService, 
-			CollectionDao collectionDao)
-			throws ConfigurationException {
-
-		this.locatorClient = new LocatorClient(
-				configurationService.getLocatorUrl());
+	protected ObmSyncBackend(CollectionDao collectionDao, BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient) {
+		this.bookClient = bookClient;
+		this.calendarClient = calendarClient;
+		this.todoClient = todoClient;
 		this.collectionDao = collectionDao;
-	}
-
-	protected void locateObmSync(String loginAtDomain) {
-		obmSyncHost = locatorClient.getServiceLocation("sync/obm_sync",
-				loginAtDomain);
-		logger.info("Using " + obmSyncHost + " as obm_sync host.");
 	}
 
 	protected AccessToken login(ISyncClient client, BackendSession session) {
 		return client.login(session.getLoginAtDomain(), session.getPassword(), OBM_SYNC_ORIGIN);
 	}
-	
-	protected AbstractEventSyncClient getCalendarClient(BackendSession bs) {
-		return getCalendarClient(bs, PIMDataType.CALENDAR);
-	}
-
-	protected AbstractEventSyncClient getCalendarClient(BackendSession bs,
-			PIMDataType type) {
-
-		if (obmSyncHost == null) {
-			locateObmSync(bs.getLoginAtDomain());
-		}
-
-		AbstractEventSyncClient cli = null;
-		if (PIMDataType.TASKS.equals(type)) {
-			TaskLocator tl = new TaskLocator();
-			cli = tl.locate("http://" + obmSyncHost + ":8080/obm-sync/services");
-		} else {
-			CalendarLocator cl = new CalendarLocator();
-			cli = cl.locate("http://" + obmSyncHost + ":8080/obm-sync/services");
-		}
-
-		return cli;
-	}
-
-	protected BookClient getBookClient(BackendSession bs) {
-		AddressBookLocator abl = new AddressBookLocator();
-		if (obmSyncHost == null) {
-			locateObmSync(bs.getLoginAtDomain());
-		}
-		BookClient bookCli = abl.locate("http://" + obmSyncHost
-				+ ":8080/obm-sync/services");
-		return bookCli;
-	}
 
 	public boolean validatePassword(String loginAtDomain, String password) {
-		CalendarLocator cl = new CalendarLocator();
-		if (obmSyncHost == null) {
-			locateObmSync(loginAtDomain);
-		}
-		CalendarClient cc = cl.locate("http://" + obmSyncHost + ":8080/obm-sync/services");
-		AccessToken token = cc.login(loginAtDomain, password, OBM_SYNC_ORIGIN);
+		AccessToken token = calendarClient.login(loginAtDomain, password, OBM_SYNC_ORIGIN);
 		try {
 			if (token == null || token.getSessionId() == null) {
 				logger.info(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
 				return false;
 			}
 		} finally {
-			cc.logout(token);
+			calendarClient.logout(token);
 		}
 		return true;
 	}
@@ -155,6 +105,22 @@ public class ObmSyncBackend {
 
 	protected String createCollectionMapping(Device device, String col) throws DaoException {
 		return collectionDao.addCollectionMapping(device, col).toString();
+	}
+	
+	protected BookClient getBookClient() {
+		return bookClient;
+	}
+	
+	protected AbstractEventSyncClient getCalendarClient() {
+		return getEventSyncClient(PIMDataType.CALENDAR);
+	}
+
+	protected AbstractEventSyncClient getEventSyncClient(PIMDataType type) {
+		if (PIMDataType.TASKS.equals(type)) {
+			return todoClient;
+		} else {
+			return calendarClient;
+		}
 	}
 	
 }

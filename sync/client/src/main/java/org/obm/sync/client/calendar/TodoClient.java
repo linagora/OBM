@@ -1,19 +1,17 @@
 package org.obm.sync.client.calendar;
 
-import org.apache.commons.httpclient.HttpClient;
+import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.locators.Locator;
 
-/**
- * OBM sync client implementation for calendar synchronisations
- * 
- * @author tom
- * 
- */
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
 public class TodoClient extends AbstractEventSyncClient {
-	public TodoClient(String obmSyncServicesUrl) {
-		super("/todo", obmSyncServicesUrl);
+	
+	@Inject
+	private TodoClient(SyncClientException syncClientException, Locator locator) {
+		super("/todo", syncClientException, locator);
 	}
-
-	public TodoClient(String obmSyncServicesUrl, HttpClient cli) {
-		super("/todo", obmSyncServicesUrl, cli);
-	}
+	
 }
