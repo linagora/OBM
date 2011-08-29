@@ -272,7 +272,10 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
 
   $output_target = $calendar['output_target'];
   $block = html_calendar_minical($current_view);
-  $block .= html_calendar_bar_legend($p_view, $calendar_entity);
+  if ($p_view == 'planning') {
+    $block.= html_calendar_legend();
+  }
+  $block .= html_calendar_displayed_calendars($p_view, $calendar_entity);
   if ($action != 'perform_meeting' && $output_target != 'print') {
     $block .= html_calendar_select_calendar_entity($p_view, $current_view, $calendar_entity, $entity_readable);
     $block .= html_calendar_view_selector($calendar, $current_view, $my_views);
@@ -281,13 +284,29 @@ function html_calendar_planning_bar($calendar, $current_view, $calendar_entity, 
   return $block;
 }
 
+function html_calendar_legend() {
+  global $l_meeting_legend;
+  
+  $colorTemplate = 'user';
+  $script_range = 'obm.vars.conf.displayRange = true;';
+  $cats1 = of_category_get_ordered('event', 'category1');
+  $nb = count($cats1);
+  $colors = random_color($nb);
+  foreach($cats1 as $key => $cat_info) {
+    $dis_legend .= "<li style=\"color:#fff;background-color:rgb($colors[$key])\">$cat_info[label]</li>";
+  }
+  # Adding legend color for event without category
+  $dis_legend .= "<li style=\"color:#fff;background-color: rgb(99, 100, 102)\">{$GLOBALS['l_cat_none']}</li>";
+  return "
+    <div class=\"portlet\" id=\"calendarLegend\">
+    <h1>$l_meeting_legend</h1>
+    <ul>
+      $dis_legend
+    </ul>
+    </div>";
+}
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the navigation bar
-// Parameters:
-//   - $calendar_entity : array of entities elements to display
-///////////////////////////////////////////////////////////////////////////////
-function html_calendar_bar_legend($p_view, $calendar_entity) {
+function html_calendar_displayed_calendars($p_view, $calendar_entity) {
   global $ico_user, $ico_resource, $l_meeting_legend, $ico_contact;
   global $l_calendar_displayed, $l_resource_displayed,$c_all,$l_event_color_tt;
   global $ico_delete,$output_target,$l_color,$l_users,$l_events;
@@ -303,42 +322,30 @@ function html_calendar_bar_legend($p_view, $calendar_entity) {
     $mono_user = false;
   }
   ${'select_color_'.$colorTemplate} = "selected=\"selected\"";
-  if ($p_view == 'planning') {
-    $script_range = 'obm.vars.conf.displayRange = true;';
-    $l_legend = $l_meeting_legend;
-    $cats1 = of_category_get_ordered('event', 'category1');
-    $nb = count($cats1);
-    $colors = random_color($nb);
-    foreach($cats1 as $key => $cat_info) {
-      $dis_legend .= "<li style=\"color:#fff;background-color:rgb($colors[$key])\">$cat_info[label]</li>";
-    }
-    # Adding legend color for event without category
-    $dis_legend .= "<li style=\"color:#fff;background-color: rgb(99, 100, 102)\">{$GLOBALS['l_cat_none']}</li>";
-  } else {
-    $script_range = 'obm.vars.conf.displayRange = true;';
-    $l_legend = $l_calendar_displayed;
-    foreach ($calendar_entity as $type => $entity) {
-      foreach ($entity as $id => $data) {
-        $data_id = "data-$type-$id";
-        $warn = "";
-        $class = "class='colorChooser'";
-        if ($type == 'contact') {
-          $contact = OBM_Contact::get($id);
-          if (!$contact->getCalendar()) {
-            $warn = "<span class='NW' style='float:right'><img src='$GLOBALS[ico_warning]' title=\"$GLOBALS[l_calendar_not_available]\" /></span>";
-            $class = "";
-          }
+  
+  $script_range = 'obm.vars.conf.displayRange = true;';
+  $l_legend = $l_calendar_displayed;
+  foreach ($calendar_entity as $type => $entity) {
+    foreach ($entity as $id => $data) {
+      $data_id = "data-$type-$id";
+      $warn = "";
+      $class = "class='colorChooser'";
+      if ($type == 'contact') {
+        $contact = OBM_Contact::get($id);
+        if (!$contact->getCalendar()) {
+          $warn = "<span class='NW' style='float:right'><img src='$GLOBALS[ico_warning]' title=\"$GLOBALS[l_calendar_not_available]\" /></span>";
+          $class = "";
         }
-
-        $dis_legend .= "
-          <li title=\"$tooltip\" class=\"$data[class]Legend\"><input $class name=\"class-$type-$id\" type=\"hidden\" /><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
-          <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
-        if ($output_target != 'print') {
-          $dis_legend .= "<img src=\"$ico_delete\"
-          onclick=\"\$('$data_id').dispose(); $('calendarSelectForm').submit();\" onmouseover=\"this.style.cursor = 'pointer';\"/>";
-        }
-        $dis_legend .= "&nbsp;$data[name]&nbsp;$warn</li>";
       }
+
+      $dis_legend .= "
+        <li title=\"$tooltip\" class=\"$data[class]Legend\"><input $class name=\"class-$type-$id\" type=\"hidden\" /><img src=\"".${"ico_$type"}."\" alt=\"[$type]\" />
+        <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
+      if ($output_target != 'print') {
+        $dis_legend .= "<img src=\"$ico_delete\"
+        onclick=\"\$('$data_id').dispose(); $('calendarSelectForm').submit();\" onmouseover=\"this.style.cursor = 'pointer';\"/>";
+      }
+      $dis_legend .= "&nbsp;$data[name]&nbsp;$warn</li>";
     }
   }
 
