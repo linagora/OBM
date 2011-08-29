@@ -1,6 +1,7 @@
 package org.obm.push.handler;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.Transactional;
@@ -10,6 +11,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.GetItemEstimateStatus;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
@@ -91,25 +93,32 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		UnknownObmSyncServerException, ProcessingEmailException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
+		
 		for (SyncCollection syncCollection: request.getSyncCollections()) {
+		
 			Integer collectionId = syncCollection.getCollectionId();
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
-			PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
+			
 			syncCollection.setCollectionPath(collectionPath);
-			syncCollection.setDataType(dataType);
+			syncCollection.setDataType( PIMDataType.getPIMDataType(collectionPath) );
 
-			final SyncState state = stMachine.getSyncState(
-					syncCollection.getCollectionId(),
-					syncCollection.getSyncKey());
+			SyncState state = stMachine.getSyncState(syncCollection.getCollectionId(), syncCollection.getSyncKey());
 			if (!state.isValid()) {
 				throw new InvalidSyncKeyException();
 			}
-			int unSynchronizedItemNb = unSynchronizedItemCache.listItemToAdd(bs.getCredentials(), bs.getDevice(), syncCollection.getCollectionId()).size();
-			int count = contentsExporter.getCount(bs, state, syncCollection.getOptions().getFilterType(), collectionId);
-			int estimate = count + unSynchronizedItemNb;
-			estimates.add(new Estimate(syncCollection, estimate));
+			
+			int unSynchronizedItemNb = listItemToAddSize(bs, syncCollection);
+			int count = contentsExporter.getItemEstimateSize(bs, syncCollection.getOptions().getFilterType(), collectionId, state);
+			estimates.add( new Estimate(syncCollection, count + unSynchronizedItemNb) );
 		}
+		
 		return new GetItemEstimateResponse(estimates);
+	}
+
+	private int listItemToAddSize(BackendSession bs, SyncCollection syncCollection) {
+		Set<ItemChange> listItemToAdd = unSynchronizedItemCache.listItemToAdd(bs.getCredentials(), 
+				bs.getDevice(), syncCollection.getCollectionId());
+		return listItemToAdd.size();
 	}
 
 }

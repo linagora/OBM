@@ -17,7 +17,7 @@ import com.google.common.base.Objects;
 public class SyncState implements Serializable {
 
 	private Date lastSync;
-	private Boolean lastSyncFiltred;
+	private boolean lastSyncFiltred;
 	private String key;
 	private PIMDataType dataType;
 
@@ -34,9 +34,7 @@ public class SyncState implements Serializable {
 	}
 	
 	public SyncState(String path, String key, Date lastSync) {
-		
 		this.lastSync = Objects.firstNonNull(lastSync, getEpoch());
-		
 		lastSyncFiltred = false;
 		if (path.contains("\\calendar\\")) {
 			this.dataType = PIMDataType.CALENDAR;
@@ -86,7 +84,7 @@ public class SyncState implements Serializable {
 		return lastSyncFiltred;
 	}
 
-	public void setLastSyncFiltred(Boolean lastSyncFiltred) {
+	public void setLastSyncFiltred(boolean lastSyncFiltred) {
 		this.lastSyncFiltred = lastSyncFiltred;
 	}
 
@@ -96,6 +94,16 @@ public class SyncState implements Serializable {
 
 	public void setDataType(PIMDataType dataType) {
 		this.dataType = dataType;
+	}
+	
+	public void updatingLastSync(FilterType filterType) {
+		if (filterType != null) {
+			Calendar calendar = filterType.getFilteredDate();
+			if (getLastSync() != null && calendar.getTime().after(getLastSync())) {
+				setLastSync(calendar.getTime());
+				setLastSyncFiltred(true);
+			}
+		}
 	}
 
 }

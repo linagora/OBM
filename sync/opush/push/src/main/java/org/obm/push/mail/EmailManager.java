@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +41,6 @@ import org.obm.configuration.ObmConfigurationService;
 import org.obm.locator.LocatorClient;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
-import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -63,24 +63,20 @@ import com.google.inject.Singleton;
 @Singleton
 public class EmailManager implements IEmailManager {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(EmailManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(EmailManager.class);
 	
 	private final EmailDao emailDao;
 	private final SmtpSender smtpProvider;
 	private final LocatorClient locatorClient;
-	private final EmailSync emailSyncCache;
-	
+	private final EmailSync emailSync;
 	private final boolean loginWithDomain;
 	private final boolean activateTLS;
 	
 	@Inject
-	private EmailManager(EmailDao emailDao,
-			EmailConfiguration emailConfiguration,
-			ObmConfigurationService configurationService,
-			SmtpSender smtpSender, EmailSync emailSyncCache) throws ConfigurationException {
+	private EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, ObmConfigurationService configurationService,
+			SmtpSender smtpSender, EmailSync emailSync) throws ConfigurationException {
 		
-		this.emailSyncCache = emailSyncCache;
+		this.emailSync = emailSync;
 		this.locatorClient = new LocatorClient(configurationService.getLocatorUrl());
 		this.smtpProvider = smtpSender;
 		this.emailDao = emailDao;
@@ -120,15 +116,14 @@ public class EmailManager implements IEmailManager {
 	}	
 
 	@Override
-	public MailChanges getSync(BackendSession bs, SyncState state, Integer devId, Integer collectionId, 
-			String collectionName, FilterType filter) throws IMAPException, DaoException {
+	public MailChanges getSync(BackendSession bs, SyncState syncState, Integer deviceId, Integer collectionId, String collectionName) 
+			throws IMAPException, DaoException {
 		
-		final StoreClient store = getImapClient(bs);
+		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			String mailBox = parseMailBoxName(store, collectionName);
-			store.select(mailBox);
-			return emailSyncCache.getSync(store, devId, state, collectionId, filter);
+			store.select( parseMailBoxName(store, collectionName) );
+			return emailSync.getSync(store, deviceId, syncState, collectionId);
 		} finally {
 			store.logout();
 		}
@@ -479,6 +474,17 @@ public class EmailManager implements IEmailManager {
 	@Override
 	public boolean getActivateTLS() {
 		return activateTLS;
+	}
+
+	@Override
+	public void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedToLong,
+			Collection<Email> updatedToLong) throws DaoException {
+		if (removedToLong != null && !removedToLong.isEmpty()) {
+			emailDao.removeMessages(devId, collectionId, lastSync, removedToLong);
+		}
+		if (updatedToLong != null && !updatedToLong.isEmpty()) {
+			emailDao.addMessages(devId, collectionId, lastSync, updatedToLong);
+		}
 	}
 
 }

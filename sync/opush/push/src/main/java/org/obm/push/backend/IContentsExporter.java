@@ -25,9 +25,6 @@ public interface IContentsExporter {
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
 
-	int getCount(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
-
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
 			List<String> fetchIds) throws CollectionNotFoundException, DaoException, ProcessingEmailException;
 	
@@ -45,5 +42,8 @@ public interface IContentsExporter {
 	boolean validatePassword(String userID, String password);
 
 	boolean getFilterChanges(BackendSession bs, SyncCollection collection) throws DaoException;
+
+	int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state) 
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException;
 	
 }

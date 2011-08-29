@@ -1,7 +1,8 @@
 package org.obm.push.bean;
 
 import java.util.Calendar;
-import java.util.TimeZone;
+
+import org.obm.push.utils.DateUtils;
 
 public enum FilterType {
 
@@ -39,12 +40,11 @@ public enum FilterType {
 		}
 	}
 
-	public Calendar getFilteredDate(Calendar date) {
+	public Calendar getFilteredDate() {
+		Calendar date = DateUtils.getMidnightCalendar();
 		switch (this) {
 		case ALL_ITEMS:
-			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-			cal.setTimeInMillis(0);
-			return cal;
+			return DateUtils.getGeneseCalendar();
 		case ONE_DAY_BACK:
 			date.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH)-1);
 			return date;
@@ -70,5 +70,5 @@ public enum FilterType {
 			return date;
 		}
 	}
-
+	
 }

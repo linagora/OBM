@@ -1,10 +1,7 @@
 package org.obm.push.mail;
 
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.minig.imap.FastFetch;
 import org.obm.push.bean.Email;
@@ -35,12 +32,6 @@ public class EmailFactory {
 				return email.getUid();
 			}
 		});
-	}
-	
-	public static Date getNowDate() {
-		Calendar lastSync = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-		lastSync.setTime(new Date());
-		return lastSync.getTime();
 	}
 	
 }

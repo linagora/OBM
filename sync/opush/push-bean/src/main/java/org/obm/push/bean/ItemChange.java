@@ -13,6 +13,14 @@ public class ItemChange  implements Serializable {
 	
 	private IApplicationData data;
 
+	public ItemChange() {
+		this(null);
+	}
+	
+	public ItemChange(String serverId) {
+		this.serverId = serverId;
+	}
+	
 	public String getServerId() {
 		return serverId;
 	}

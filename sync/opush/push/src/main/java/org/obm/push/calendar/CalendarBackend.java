@@ -12,6 +12,7 @@ import org.obm.configuration.ObmConfigurationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
@@ -84,7 +85,7 @@ public class CalendarBackend extends ObmSyncBackend {
 				String col = "obm:\\\\" + bs.getLoginAtDomain()
 						+ "\\calendar\\" + ci.getUid() + domain;
 				Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
-				ic.setServerId(getServerIdFor(collectionId));
+				ic.setServerId(collectionIdToString(collectionId));
 				ic.setParentId("0");
 				ic.setDisplayName(ci.getMail() + " calendar");
 				if (bs.getLoginAtDomain().equalsIgnoreCase(ci.getMail())) {
@@ -109,7 +110,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		String serverId = "";
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
-			serverId = getServerIdFor(collectionId);
+			serverId = collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
 			serverId = createCollectionMapping(bs.getDevice(), col);
 			ic.setIsNew(true);
@@ -129,7 +130,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		String serverId;
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
-			serverId = getServerIdFor(collectionId);
+			serverId = collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
 			serverId = createCollectionMapping(bs.getDevice(), col);
 			ic.setIsNew(true);
@@ -142,31 +143,27 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) 
+	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
-		final List<ItemChange> addUpd = new LinkedList<ItemChange>();
-		final List<ItemChange> deletions = new LinkedList<ItemChange>();
+		AbstractEventSyncClient cc = getCalendarClient(bs, state.getDataType());
+		AccessToken token = login(cc, bs);
+		
+		List<ItemChange> addUpd = new LinkedList<ItemChange>();
+		List<ItemChange> deletions = new LinkedList<ItemChange>();
 		Date syncDate = null;
 		
-		final Date lastSyncDate = state.getLastSync();
-	
-		final AbstractEventSyncClient cc = getCalendarClient(bs, state.getDataType());
-		final AccessToken token = login(cc, bs);
-		
-		final String collectionPath = getCollectionPathFor(collectionId);
-		
-		logger.info("Collection [ {} ]", collectionPath);
-		logger.info("LastSync [ {} ]", lastSyncDate.toString());
-		
-		final String calendar = parseCalendarName(collectionPath);
+		String collectionPath = getCollectionPathFor(collectionId);
+		String calendar = parseCalendarName(collectionPath);
+
+		state.updatingLastSync(filterType);
 		try {
 			
 			EventChanges changes = null;
 			if (state.isLastSyncFiltred()) {
-				changes = cc.getSyncEventDate(token, calendar, lastSyncDate);
+				changes = cc.getSyncEventDate(token, calendar, state.getLastSync());
 			} else {
-				changes = cc.getSync(token, calendar, lastSyncDate);
+				changes = cc.getSync(token, calendar, state.getLastSync());
 			}
 			
 			logger.info("Event changes [ {} ]", changes.getUpdated().length);
@@ -182,7 +179,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			cc.logout(token);
 		}
 		logger.info("getContentChanges( {}, {}, lastSync = {} ) => {} entries.",
-				new Object[]{calendar, collectionPath, lastSyncDate, addUpd.size()});
+				new Object[]{calendar, collectionPath, state.getLastSync(), addUpd.size()});
 		return new DataDelta(addUpd, deletions, syncDate);
 	}
 
@@ -202,12 +199,12 @@ public class CalendarBackend extends ObmSyncBackend {
 		
 		for (final Event event : events) {
 			if (!checkIfEventCanBeAdded(event, userEmail)) {
-				deletions.add(createItemChangeToRemove(collectionId, event.getUid()));
+				deletions.add(getItemChange(collectionId, event.getUid()));
 			}			
 		}
 		
 		for (final String eventIdRemove : eventsIdRemoved) {
-			deletions.add(createItemChangeToRemove(collectionId, eventIdRemove));
+			deletions.add(getItemChange(collectionId, eventIdRemove));
 		}
 	}
 	
@@ -488,7 +485,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			try {
 				id = calCli.getEventObmIdFromExtId(token, bs.getLoginAtDomain(), eventUid);
 				if (id != null) {
-					ret.add(createItemChangeToRemove(collectionId, String.valueOf(id)));
+					ret.add(getItemChange(collectionId, String.valueOf(id)));
 				}
 			} catch (ServerFault e) {
 				logger.error(e.getMessage(), e);

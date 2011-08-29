@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -101,7 +100,7 @@ public class MailBackend extends ObmSyncBackend {
 		String serverId;
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), s);
-			serverId = getServerIdFor(collectionId);
+			serverId = collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
 			serverId = createCollectionMapping(bs.getDevice(), sb.toString());
 			ic.setIsNew(true);
@@ -120,39 +119,64 @@ public class MailBackend extends ObmSyncBackend {
 		return sb.toString();
 	}
 
-	public String getWasteBasketPath(BackendSession bs) {
+	private String getWasteBasketPath(BackendSession bs) {
 		return buildPath(bs, "Trash");
 	}
 
-	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) 
+	private MailChanges getSync(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 
 			throws ProcessingEmailException, CollectionNotFoundException {
 		
 		try {
 			String collectionPath = getCollectionPathFor(collectionId);
-			List<ItemChange> changes = new LinkedList<ItemChange>();
-			List<ItemChange> deletions = new LinkedList<ItemChange>();
-			Date lastSync = null;
-			final Integer devDbId = bs.getDevice().getDatabaseId();
+			Integer devDbId = bs.getDevice().getDatabaseId();
 
-			final MailChanges mc = emailManager.getSync(bs, state, devDbId, collectionId, collectionPath, filter);
-
-			changes = getChanges(bs, collectionId, collectionPath, mc.getUpdated());
-			deletions.addAll(getDeletions(collectionId, mc.getRemoved()));
-			lastSync = mc.getLastSync();
-			return new DataDelta(changes, deletions, lastSync);
+			state.updatingLastSync(filterType);
+			return emailManager.getSync(bs, state, devDbId, collectionId, collectionPath);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
+	
+	public DataDelta getMailChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 
+			throws ProcessingEmailException, CollectionNotFoundException {
+		
+		MailChanges mailChanges = getSync(bs, state, collectionId, filterType);
+		try {
+			return getDataDelta(bs, collectionId, mailChanges);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		}
+	}
+	
+	public DataDelta getAndUpdateEmailChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) 
+			throws ProcessingEmailException, CollectionNotFoundException {
+		
+		MailChanges mailChanges = getSync(bs, state, collectionId, filter);
+		try {
+			emailManager.updateData(bs.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
+					mailChanges.getRemovedToLong(), mailChanges.getUpdated());
+			return getDataDelta(bs, collectionId, mailChanges);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		}
+	}
 
-	private List<ItemChange> getChanges(BackendSession bs, Integer collectionId, String collection, Set<Long> updated) throws ProcessingEmailException {
+	private DataDelta getDataDelta(BackendSession bs, Integer collectionId, MailChanges mailChanges) 
+			throws ProcessingEmailException, CollectionNotFoundException, DaoException {
+		
+		List<ItemChange> itemChanges = fetchMails(bs, collectionId, getCollectionPathFor(collectionId), mailChanges.getUpdatedToLong());
+		List<ItemChange> itemDeletions = getDeletions(collectionId, mailChanges.getRemovedToLong());
+		return new DataDelta(itemChanges, itemDeletions, mailChanges.getLastSync());
+	}
+
+	private List<ItemChange> fetchMails(BackendSession bs, Integer collectionId, String collection, Collection<Long> updated) throws ProcessingEmailException {
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
 		List<MSEmail> msMails;
 		try {
 			msMails = emailManager.fetchMails(bs, getCalendarClient(bs), collectionId, collection, updated);
-			for (final MSEmail mail: msMails) {
+			for (MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
 			return itch.build();

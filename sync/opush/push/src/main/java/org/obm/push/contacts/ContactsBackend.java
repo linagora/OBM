@@ -49,7 +49,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		String serverId;
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
-			serverId = getServerIdFor(collectionId);
+			serverId = collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
 			serverId = createCollectionMapping(bs.getDevice(), col);
 			ic.setIsNew(true);
@@ -79,7 +79,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			}
 
 			for (Integer del: changes.getRemoved()) {
-				ItemChange change = createItemChangeToRemove(collectionId, "" + del);
+				ItemChange change = getItemChange(collectionId, "" + del);
 				deletions.add(change);
 			}
 			lastSync = changes.getLastSync();

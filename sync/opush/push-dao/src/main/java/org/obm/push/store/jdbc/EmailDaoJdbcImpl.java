@@ -35,16 +35,14 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 	}
 
 	@Override
-	public void addMessages(Integer devId, Integer collectionId,
-			Collection<Email> messages) throws DaoException {
+	public void addMessages(Integer devId, Integer collectionId, Collection<Email> messages) throws DaoException {
 		addMessages(devId, collectionId, null, messages);
 	}
 
 	@Override
-	public void addMessages(Integer devId, Integer collectionId, Date lastSync,
-			Collection<Email> messages) throws DaoException {
+	public void addMessages(Integer devId, Integer collectionId, Date lastSync, Collection<Email> messages) throws DaoException {
 		if (lastSync == null) {
-			lastSync = DateUtils.getCurrentGMTCalendar().getTime();
+			lastSync = DateUtils.getCurrentDate();
 		}
 		Connection con = null;
 		PreparedStatement insert = null;
@@ -52,16 +50,15 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 		String ids = buildListIdFromEmailCache(messages);
 		try {
 			con = dbcp.getConnection();
-			del = con
-					.prepareStatement("DELETE FROM opush_sync_mail WHERE collection_id=? AND device_id=? AND mail_uid IN ("
-							+ ids + ")");
+			del = con.prepareStatement(
+					"DELETE FROM opush_sync_mail WHERE collection_id=? AND device_id=? AND mail_uid IN (" + ids + ")");
 			del.setInt(1, collectionId);
 			del.setInt(2, devId);
 			del.executeUpdate();
 
-			insert = con
-					.prepareStatement("INSERT INTO opush_sync_mail (collection_id, device_id, mail_uid, is_read, timestamp) VALUES (?, ?, ?, ?, ?)");
-			for (Email uid : messages) {
+			insert = con.prepareStatement(
+					"INSERT INTO opush_sync_mail (collection_id, device_id, mail_uid, is_read, timestamp) VALUES (?, ?, ?, ?, ?)");
+			for (Email uid: messages) {
 				insert.setInt(1, collectionId);
 				insert.setInt(2, devId);
 				insert.setLong(3, uid.getUid());

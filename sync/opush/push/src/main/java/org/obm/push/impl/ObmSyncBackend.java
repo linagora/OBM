@@ -89,41 +89,22 @@ public class ObmSyncBackend {
 		return bookCli;
 	}
 
-	protected ItemChange createItemChangeToRemove(Integer collectionId,
-			String del) {
-		
-		ItemChange ic = new ItemChange();
-		ic.setServerId(getServerIdFor(collectionId, del));
-		return ic;
-	}
-
-	protected List<ItemChange> getDeletions(Integer collectionId, Collection<? extends Object> uids) {
-		final List<ItemChange> deletions = new LinkedList<ItemChange>();
-		for (final Object uid : uids) {
-			deletions.add(createItemChangeToRemove(collectionId, uid.toString()));
-		}
-		return deletions;
-	}
-
 	public boolean validatePassword(String loginAtDomain, String password) {
 		CalendarLocator cl = new CalendarLocator();
 		if (obmSyncHost == null) {
 			locateObmSync(loginAtDomain);
 		}
-		CalendarClient cc = cl.locate("http://" + obmSyncHost
-				+ ":8080/obm-sync/services");
+		CalendarClient cc = cl.locate("http://" + obmSyncHost + ":8080/obm-sync/services");
 		AccessToken token = cc.login(loginAtDomain, password, OBM_SYNC_ORIGIN);
 		try {
-			Boolean valid = true;
 			if (token == null || token.getSessionId() == null) {
-				logger.info(loginAtDomain
-						+ " can't log on obm-sync. The username or password isn't valid");
-				valid = false;
+				logger.info(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
+				return false;
 			}
-			return valid;
 		} finally {
 			cc.logout(token);
 		}
+		return true;
 	}
 	
 	protected String getDefaultCalendarName(BackendSession bs) {
@@ -140,14 +121,23 @@ public class ObmSyncBackend {
 		return collectionDao.getCollectionPath(collectionId);
 	}
 
-	public String getServerIdFor(Integer collectionId) {
-		if (collectionId == null) {
-			return null;
+	protected List<ItemChange> getDeletions(Integer collectionId, Collection<Long> uids) {
+		List<ItemChange> deletions = new LinkedList<ItemChange>();
+		for (Long uid: uids) {
+			deletions.add( getItemChange(collectionId, uid.toString()) );
 		}
-		return collectionId.toString();
+		return deletions;
+	}
+	
+	protected ItemChange getItemChange(Integer collectionId, String clientId) {
+		return new ItemChange( getServerIdFor(collectionId, clientId) );
+	}
+	
+	protected String collectionIdToString(Integer collectionId) {
+		return String.valueOf(collectionId);
 	}
 
-	public String getServerIdFor(Integer collectionId, String clientId) {
+	protected String getServerIdFor(Integer collectionId, String clientId) {
 		if (collectionId == null || Strings.isNullOrEmpty(clientId)) {
 			return null;
 		}
@@ -163,7 +153,8 @@ public class ObmSyncBackend {
 		return Integer.parseInt(serverId.substring(idx + 1));
 	}
 
-	public String createCollectionMapping(Device device, String col) throws DaoException {
+	protected String createCollectionMapping(Device device, String col) throws DaoException {
 		return collectionDao.addCollectionMapping(device, col).toString();
 	}
+	
 }

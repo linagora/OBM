@@ -2,13 +2,14 @@ package org.obm.push.mail;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.FilterType;
+import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -20,7 +21,7 @@ import org.obm.sync.client.calendar.AbstractEventSyncClient;
 
 public interface IEmailManager {
 
-	MailChanges getSync(BackendSession bs, SyncState state, Integer devId, Integer collectionId, String collectionName, FilterType filter)
+	MailChanges getSync(BackendSession bs, SyncState state, Integer devId, Integer collectionId, String collectionName)
 			throws IMAPException, DaoException;
 
 	List<MSEmail> fetchMails(BackendSession bs, AbstractEventSyncClient calendarClient, Integer collectionId, String collectionName, 
@@ -54,5 +55,8 @@ public interface IEmailManager {
 	boolean getActivateTLS();
 	
 	String locateImap(BackendSession bs);
+
+	void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedToLong, Collection<Email> updatedToLong)
+			throws DaoException;
 
 }

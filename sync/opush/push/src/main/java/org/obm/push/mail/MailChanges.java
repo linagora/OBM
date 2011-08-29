@@ -5,54 +5,56 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.obm.push.bean.Email;
+
 public class MailChanges {
 	
-	private final Set<Long> removed;
-	private final Set<Long> updated;
+	private final Set<Email> removed;
+	private final Set<Email> updated;
 	
 	private Date lastSync;
 	
-	public MailChanges(Set<Long> removed, Set<Long> updated, Date lastSync) {
+	public MailChanges(Set<Email> removed, Set<Email> updated, Date lastSync) {
 		this.removed = removed;
 		this.updated = updated;
 		this.lastSync = lastSync;
 	}
 	
 	public MailChanges() {
-		this(new HashSet<Long>(), new HashSet<Long>(), null);
+		this(new HashSet<Email>(), new HashSet<Email>(), null);
 	}
 	
 	public MailChanges(Date lastSync) {
-		this(new HashSet<Long>(), new HashSet<Long>(), lastSync);
+		this(new HashSet<Email>(), new HashSet<Email>(), lastSync);
 	}
 	
-	public MailChanges(Collection<Long> removed, Collection<Long> updated, Date lastSync) {
+	public MailChanges(Collection<Email> removed, Collection<Email> updated, Date lastSync) {
 		this(lastSync);
 		addRemoved(removed);
 		addUpdated(updated);
 	}
 
-	public Set<Long> getRemoved() {
+	public Set<Email> getRemoved() {
 		return removed;
 	}
 
-	public void addRemoved(Collection<Long> removed) {
+	public void addRemoved(Collection<Email> removed) {
 		this.removed.addAll(removed);
 	}
 
-	public Set<Long> getUpdated() {
+	public Set<Email> getUpdated() {
 		return updated;
 	}
 
-	public void addUpdated(Collection<Long> updated) {
+	public void addUpdated(Collection<Email> updated) {
 		this.updated.addAll(updated);
 	}
 	
-	public void addUpdated(Long uid){
+	public void addUpdated(Email uid){
 		this.updated.add(uid);
 	}
 
-	public void addRemoved(Long uid){
+	public void addRemoved(Email uid){
 		this.removed.add(uid);
 	}
 
@@ -62,6 +64,14 @@ public class MailChanges {
 
 	public void setLastSync(Date lastSync) {
 		this.lastSync = lastSync;
+	}
+	
+	public Collection<Long> getRemovedToLong() {
+		return EmailFactory.listUIDFromEmail(getRemoved());
+	}
+	
+	public Collection<Long> getUpdatedToLong() {
+		return EmailFactory.listUIDFromEmail(getUpdated());
 	}
 	
 }

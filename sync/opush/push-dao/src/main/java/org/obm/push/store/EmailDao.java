@@ -9,17 +9,13 @@ import org.obm.push.exception.DaoException;
 
 public interface EmailDao {
 
-	void addMessages(Integer devId, Integer collectionId,
-			Collection<Email> emails) throws DaoException;
+	void addMessages(Integer devId, Integer collectionId, Collection<Email> emails) throws DaoException;
 
-	void addMessages(Integer devId, Integer collectionId, Date lastSync,
-			Collection<Email> messages) throws DaoException;
+	void addMessages(Integer devId, Integer collectionId, Date lastSync, Collection<Email> messages) throws DaoException;
 
-	void removeMessages(Integer devId, Integer collectionId,
-			Collection<Long> mailUids) throws DaoException;
+	void removeMessages(Integer devId, Integer collectionId, Collection<Long> mailUids) throws DaoException;
 
-	void removeMessages(Integer devId, Integer collectionId, Date lastSync,
-			Collection<Long> uids) throws DaoException;
+	void removeMessages(Integer devId, Integer collectionId, Date lastSync, Collection<Long> uids) throws DaoException;
 	
 	Set<Email> getSyncedMail(Integer devId, Integer collectionId) throws DaoException;
 
