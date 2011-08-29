@@ -141,7 +141,7 @@ function dis_calendar_search_result($calendar, $current_view) {
     if (isset($calendar['desc']) && $calendar['desc'] != '') {
       $pattern .= " description:(".$calendar['desc'].')';
     }   
-    if (isset($calendar['owner']) && $calendar['owner'] != '') {
+    if (isset($calendar['owner']) && $calendar['owner'] != '' && $calendar['owner'] != $obm['uid']) {
       $pattern .= " owner:(".$calendar['owner'].')';
     }
     if (isset($calendar['attendees']) && $calendar['attendees'] != '') {
@@ -927,6 +927,8 @@ function dis_calendar_html_search_form($calendar, $p="") {
     $period = $calendar['period'];
     $tag = $calendar['tag'];
   }
+  
+  if ($owner == $obm['uid']) $owner = '';
   
   if (!empty($p)) $pattern = $p;
   if (!isset($period)) $period = 'today';

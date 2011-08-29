@@ -1280,14 +1280,6 @@ function check_contact_data_form($cid, &$contact) {
     OBM_Error::getInstance()->addError('lastname', $l_fill_lastname);
   }
 
-  /*if ($cgp_show['module']['company']) {
-    // MANDATORY: a company must be set
-    if (($c_id < 1) && ($c_new_id < 1)) {
-      $err['msg'] = $l_fill_company;
-      return false;
-    }
-  }*/
-
   // Contact Firstname
   $firstname = ucfirst($firstname);
 
