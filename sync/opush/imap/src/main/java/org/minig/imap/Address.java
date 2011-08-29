@@ -20,12 +20,6 @@ import org.obm.push.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Simple mail address representation
- * 
- * @author tom
- * 
- */
 public final class Address {
 
 	private static final Logger logger = LoggerFactory.getLogger(Address.class);
@@ -39,18 +33,15 @@ public final class Address {
 
 	public Address(String displayName, String mail) {
 		if (displayName != null) {
-			this.displayName = StringUtils
-					.stripAddressForbiddenChars(displayName);
+			this.displayName = StringUtils.stripAddressForbiddenChars(displayName);
 		}
+		
 		if (mail != null && mail.contains("@")) {
 			this.mail = StringUtils.stripAddressForbiddenChars(mail);
 		} else {
 			// FIXME ...
 			if (logger.isDebugEnabled()) {
-				logger
-						.debug("mail: "
-								+ mail
-								+ " is not a valid email, building a john.doe@minig.org");
+				logger.debug("mail: {} is not a valid email, building a john.doe@minig.org", mail);
 			}
 			this.displayName = StringUtils.stripAddressForbiddenChars(mail);
 			this.mail = "john.doe@minig.org";

@@ -26,8 +26,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
-		CollectionDao {
+public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements CollectionDao {
 	
 	@Inject
 	protected CollectionDaoJdbcImpl(IDBCP dbcp) {
@@ -77,8 +76,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			ps.setInt(2, collectionId);
 			ps.executeUpdate();
 
-			logger.warn("mappings & states cleared for sync of collection "
-					+ collectionId + " of device " + device.getDevId());
+			logger.warn("mappings & states cleared for sync of collection {} of device {}",
+					new Object[]{collectionId, device.getDevId()});
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
@@ -156,9 +155,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			ps.setTimestamp(3, new Timestamp(state.getLastSync().getTime()));
 			ps.setInt(4, collectionId);
 			ps.executeUpdate();
-			logger.info("UpdateState [ " + collectionId + ", "
-					+ state.getKey() + ", " + state.getLastSync().toString()
-					+ " ]");
+			logger.info("UpdateState [ {}, {}, {} ]",
+					new Object[]{collectionId, state.getKey(), state.getLastSync().toString()});
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
@@ -288,9 +286,9 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements
 			ps.setTimestamp(idx++, ts);
 			rs = ps.executeQuery();
 			ChangedCollections changedCollections = getContactChangedCollectionsFromResultSet(rs, lastSync);
-			if (logger.isInfoEnabled() && changedCollections.getChanges().size() > 0) {
-				logger.info("changed collections: " + changedCollections.getChanges().size() + " dbDate: "
-						+ changedCollections.getLastSync());
+			if (changedCollections.getChanges().size() > 0) {
+				logger.info("changed collections: {} dbDate: {}", 
+						new Object[]{changedCollections.getChanges().size(), changedCollections.getLastSync()});
 			}
 			return changedCollections;
 		} catch (SQLException e) {
