@@ -121,48 +121,39 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 	
 	@Override
 	public Set<Email> getSyncedMail(Integer devId, Integer collectionId) throws DaoException {
-		long time = System.currentTimeMillis();
 		Set<Email> uids = new HashSet<Email>();
-
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet evrs = null;
 		try {
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("SELECT mail_uid, is_read FROM opush_sync_mail WHERE collection_id=? and device_id=?");
+			ps = con.prepareStatement("SELECT mail_uid, is_read, timestamp FROM opush_sync_mail WHERE collection_id = ? and device_id = ?");
 			ps.setInt(1, collectionId);
 			ps.setInt(2, devId);
-
 			evrs = ps.executeQuery();
 			while (evrs.next()) {
-				Long uid = evrs.getLong("mail_uid");
-				Boolean read = evrs.getBoolean("is_read");
-				uids.add(new Email(uid, read));
+				long uid = evrs.getLong("mail_uid");
+				boolean read = evrs.getBoolean("is_read");
+				Date date = evrs.getDate("timestamp");
+				uids.add(new Email(uid, read, date));
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, evrs);
 		}
-
-		if (logger.isDebugEnabled()) {
-			time = System.currentTimeMillis() - time;
-			logger.debug(" loadMailCache() in " + time + "ms.");
-		}
 		return uids;
 	}
 
 	@Override
-	public Set<Email> getUpdatedMail(Integer devId, Integer collectionId,
-			Date updatedFrom) throws DaoException {
-		long time = System.currentTimeMillis();
+	public Set<Email> getUpdatedMail(Integer devId, Integer collectionId, Date updatedFrom) throws DaoException {
 		Set<Email> uids = new HashSet<Email>();
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet evrs = null;
 		try {
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("SELECT mail_uid, is_read "
+			ps = con.prepareStatement("SELECT mail_uid, is_read, timestamp "
 					+ "FROM opush_sync_mail "
 					+ "WHERE collection_id=? and device_id=? and timestamp >= ?");
 			ps.setInt(1, collectionId);
@@ -170,27 +161,21 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			ps.setTimestamp(3, new Timestamp(updatedFrom.getTime()));
 			evrs = ps.executeQuery();
 			while (evrs.next()) {
-				Long uid = evrs.getLong("mail_uid");
-				Boolean read = evrs.getBoolean("is_read");
-				uids.add(new Email(uid, read));
+				long uid = evrs.getLong("mail_uid");
+				boolean read = evrs.getBoolean("is_read");
+				Date date = evrs.getDate("timestamp");
+				uids.add(new Email(uid, read, date));
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, evrs);
 		}
-
-		if (logger.isDebugEnabled()) {
-			time = System.currentTimeMillis() - time;
-			logger.debug(" getUpdatedMail() in " + time + "ms.");
-		}
 		return uids;
 	}
 
 	@Override
-	public Set<Long> getDeletedMail(Integer devId, Integer collectionId,
-			Date lastSync) throws DaoException {
-		long time = System.currentTimeMillis();
+	public Set<Long> getDeletedMail(Integer devId, Integer collectionId, Date lastSync) throws DaoException {
 		Builder<Long> uids = ImmutableSet.builder();
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -203,20 +188,15 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			ps.setInt(1, collectionId);
 			ps.setInt(2, devId);
 			ps.setTimestamp(3, new Timestamp(lastSync.getTime()));
-
 			evrs = ps.executeQuery();
 			while (evrs.next()) {
-				Long uid = evrs.getLong("mail_uid");
+				long uid = evrs.getLong("mail_uid");
 				uids.add(uid);
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, evrs);
-		}
-		if (logger.isDebugEnabled()) {
-			time = System.currentTimeMillis() - time;
-			logger.debug(" loadMailCache() in " + time + "ms.");
 		}
 		return uids.build();
 	}

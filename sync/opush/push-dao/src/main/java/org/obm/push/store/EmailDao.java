@@ -25,6 +25,6 @@ public interface EmailDao {
 
 	Set<Long> getDeletedMail(Integer devId, Integer collectionId, Date lastSync) throws DaoException;
 
-	Set<Email> getUpdatedMail(Integer devId, Integer collectionId,
-			Date updatedFrom) throws DaoException;
+	Set<Email> getUpdatedMail(Integer devId, Integer collectionId, Date updatedFrom) throws DaoException;
+	
 }

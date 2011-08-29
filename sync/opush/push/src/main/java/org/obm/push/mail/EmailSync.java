@@ -16,6 +16,7 @@
 
 package org.obm.push.mail;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -26,7 +27,6 @@ import java.util.TimeZone;
 import org.minig.imap.FastFetch;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncState;
@@ -35,8 +35,6 @@ import org.obm.push.store.EmailDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.Inject;
@@ -46,7 +44,6 @@ import com.google.inject.Singleton;
 public class EmailSync implements IEmailSync {
 
 	private final static Logger logger = LoggerFactory.getLogger(EmailSync.class);
-
 	private final EmailDao emailDao;
 
 	@Inject
@@ -55,183 +52,85 @@ public class EmailSync implements IEmailSync {
 	}
 
 	@Override
-	public MailChanges getSync(StoreClient imapStore, Integer devId, BackendSession bs, 
-			SyncState state, Integer collectionId, FilterType filter) throws DaoException {
+	public MailChanges getSync(StoreClient imapStore, Integer devId, SyncState state, Integer collectionId, FilterType filter) 
+			throws DaoException {
 
-		long time = getCurrentTime();
-		long ct = getCurrentTime();
+		Date syncStartDate = getStartDateSynchronizationWindowEmails(filter, state);
+		Set<Email> listSyncedEmailFromDatabase = emailDao.getSyncedMail(devId, collectionId);
+		
+		Set<Email> listEmailFromIMAPOfPDA = loadAllMailInSyncWindowFromIMAP(imapStore, syncStartDate);
+		Set<Email> listEmailsToUpdated = getUpdated(listSyncedEmailFromDatabase, listEmailFromIMAPOfPDA);
+		Collection<Long> listEmailsToRemoved = getRemoved(listSyncedEmailFromDatabase, listEmailFromIMAPOfPDA);
 
-		final Set<Email> syncedMail = emailDao.getSyncedMail(devId,
-				collectionId);
-
-		ct = computeTime(ct);
-
-		final Date startSyncWindows = getStartOfSynchronizationWindow(filter,
-				state);
-		final Date lastSync = state.getLastSync();
-
-		final Collection<FastFetch> allMailInSynchronizationWindow = loadAllMailInSyncWindowFromIMAP(
-				bs, imapStore, startSyncWindows);
-
-		final Set<Email> allEmailInSynchronizationWindow = transformFastFetchToEmail(allMailInSynchronizationWindow);
-
-		long computeChangesTime = getCurrentTime();
-
-		final Collection<Long> removed = getRemoved(devId, collectionId,
-				syncedMail, allEmailInSynchronizationWindow, lastSync);
-
-		final Set<Email> updated = getUpdated(devId, collectionId, syncedMail,
-				allMailInSynchronizationWindow, startSyncWindows, lastSync);
-
-		final MailChanges sync = getMailChanges(updated, removed);
-
-		computeChangesTime = computeTime(computeChangesTime);
-
-		long writeTime = getCurrentTime();
-		if (!syncedMail.equals(allEmailInSynchronizationWindow)) {
-			updateData(devId, collectionId, lastSync, removed, updated);
-		}
-
-		writeTime = computeTime(writeTime);
-		time = computeTime(time);
-
-		logger.info(
-				"CollectionId = {} | Filter = {} | Changes found = {} | removes found = {} | "
-						+ " TIME : total = {}, loading = {}, updating = {}, computeChanges = {}",
-				new Object[] { collectionId, filter, sync.getUpdated().size(),
-						removed.size(), time, ct, writeTime, computeChangesTime });
-
-		return sync;
+		updateData(devId, collectionId, state.getLastSync(), listEmailsToRemoved, listEmailsToUpdated);
+		
+		MailChanges mailChanges = getMailChanges(listEmailsToUpdated, listEmailsToRemoved);
+		
+		logger.info("sync emails [ emailFromDatabase = {} | emailFromPDA = {} | " +
+				"emailsToUpdatedDB = {} | emailsToRemovedDB = {} | emailSendToPDA = upd {}, rm {} ]", 
+				new Object[]{listSyncedEmailFromDatabase.size(), listEmailFromIMAPOfPDA.size(), listEmailsToUpdated.size(), 
+				listEmailsToRemoved.size(), mailChanges.getUpdated().size(), mailChanges.getRemoved().size()});
+		
+		return mailChanges;
 	}
 
-	private long computeTime(long time) {
-		return getCurrentTime() - time;
-	}
-	
-	private long getCurrentTime() {
-		return System.currentTimeMillis();
-	}
-	
-	private Date getStartOfSynchronizationWindow(FilterType filter, SyncState state) {
+	private Date getStartDateSynchronizationWindowEmails(FilterType filter, SyncState state) {
 		if (filter != null) {
-			
-			final Calendar today = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+			Calendar today = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 			today.set(Calendar.MILLISECOND, 0);
 			today.set(Calendar.SECOND, 0);
 			today.set(Calendar.MINUTE, 0);
 			today.set(Calendar.HOUR, 0);
-			
 			return filter.getFilteredDate(today).getTime();
 		} else {
 			return state.getLastSync();
 		}
 	}
 	
-	private Collection<FastFetch> loadAllMailInSyncWindowFromIMAP(BackendSession bs, 
-			StoreClient imapStore, Date windows) {
-		
-		Collection<FastFetch> mails = ImmutableSet.of();
-		long time = getCurrentTime();
-		
-		try {
-			
-			Collection<Long> uids = imapStore.uidSearch(
-					new SearchQuery(null, windows));
-			mails = imapStore.uidFetchFast(uids);
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
-		}
-		
-		if (logger.isDebugEnabled()) {
-			time = getCurrentTime() - time;
-			logger.debug(bs.getLoginAtDomain()
-					+ " loadAllMailInSyncWindowFromIMAP in " + time + "ms.");
-		}
-		
-		logger.info("[" + bs.getLoginAtDomain() + "] " + mails.size()
-				+ " mails on imap after " + windows);
-		
-		return mails;
+	private Set<Email> loadAllMailInSyncWindowFromIMAP(StoreClient imapStore, Date windows) {
+		Collection<Long> uids = imapStore.uidSearch(new SearchQuery(null, windows));
+		Collection<FastFetch> mails = imapStore.uidFetchFast(uids);
+		return EmailFactory.listEmailFromFastFetch(mails);
 	}
 	
-	private Collection<Long> getRemoved(Integer devId, Integer collectionId,
-			Set<Email> syncedMails, Collection<Email> allMailToSync, Date lastSync) throws DaoException {
-		
-		final Set<Long> removed = new HashSet<Long>();
-		Collection<Long> uidDeletedMails = emailDao.getDeletedMail(devId, collectionId, lastSync);
-		Collection<Long> uidSyncedMails = transformEmailToUid(syncedMails);
-		Collection<Long> uidAllMailToSync = transformEmailToUid(allMailToSync);
-		
-		if (syncedMails != null) {
-			removed.addAll(uidDeletedMails);
-			removed.addAll(uidSyncedMails);
-			removed.removeAll(uidAllMailToSync);
-		}
-		return removed;
+	private Collection<Long> getRemoved( Set<Email> listSyncedEmailFromDatabase, Collection<Email> listEmailFromIMAPOfPDA) {
+		Collection<Long> listEmailToRemoved = new ArrayList<Long>();
+		listEmailToRemoved.addAll( EmailFactory.listUIDFromEmail(listSyncedEmailFromDatabase) );
+		listEmailToRemoved.removeAll( EmailFactory.listUIDFromEmail(listEmailFromIMAPOfPDA) );
+		return listEmailToRemoved;
 	}
 
-	private Set<Email> getUpdated(final Integer devId, final Integer collectionId, final Set<Email> syncedMail,
-			final Collection<FastFetch> allMailToSync, final Date startWindowSync, Date lastSync) throws DaoException {
-		
+	private Set<Email> getUpdated(Set<Email> listSyncedEmailFromDatabase, Collection<Email> listEmailFromIMAPOfPDA) {
 		Builder<Email> builder = ImmutableSet.builder();
-		if (syncedMail != null) {
-			for (FastFetch fast : allMailToSync) {
-				Email imapMail = transformFastFetchToEmail(fast);
-				if (fast.getInternalDate().after(startWindowSync)
-						&& !syncedMail.contains(imapMail)) {
+		if (listSyncedEmailFromDatabase != null) {
+			for (Email imapMail: listEmailFromIMAPOfPDA) {
+				if (!listSyncedEmailFromDatabase.contains(imapMail)) {
 					builder.add(imapMail);
 				}
 			}
 		}
-
-		Set<Email> updated = emailDao.getUpdatedMail(devId, collectionId, lastSync);
-		builder.addAll(updated.iterator());
-		
 		return builder.build();
 	}
 
-	private void updateData(Integer devId, Integer collectionId, Date lastSync, 
-			final Collection<Long> removed, final Collection<Email> updated)
+	private void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removed, Collection<Email> updated)
 			throws DaoException {
 		
-		if (removed.size() > 0) {
+		if (removed != null && removed.size() > 0) {
 			emailDao.removeMessages(devId, collectionId, lastSync, removed);
 		}
-		
-		if (updated.size() > 0) {
+		if (updated != null && updated.size() > 0) {
 			emailDao.addMessages(devId, collectionId, lastSync, updated);
 		}
 	}
-
-	private Set<Email> transformFastFetchToEmail(Collection<FastFetch> fetchs) {
-		Builder<Email> builder = ImmutableSet.builder();
-		for (FastFetch f: fetchs) {
-			builder.add(transformFastFetchToEmail(f));
+	
+	private MailChanges getMailChanges(Set<Email> updated, Collection<Long> removed) {
+		Collection<Long> longs = new HashSet<Long>();
+		for (Email email: updated) {
+			if (!email.isRead()) {
+				longs.add(email.getUid());
+			}
 		}
-		return builder.build();
-	}
-
-	private Email transformFastFetchToEmail(FastFetch fast) {
-		return new Email(fast.getUid(), fast.isRead());
-	}
-
-	private Collection<Long> transformEmailToUid(Collection<Email> oldUids) {
-		return Collections2.transform(oldUids,
-				new Function<Email, Long>() {
-					@Override
-					public Long apply(Email input) {
-						return input.getUid();
-					}
-				});
-	}
-
-	private MailChanges getMailChanges(final Set<Email> updated, 
-			final Collection<Long> removed) {
-		
-		Calendar lastSync = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-		lastSync.setTime(new Date());
-		return new MailChanges(
-				removed, transformEmailToUid(updated), lastSync.getTime());
+		return new MailChanges(removed, longs, EmailFactory.getNowDate());
 	}
 
 }

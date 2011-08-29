@@ -128,7 +128,7 @@ public class EmailManager implements IEmailManager {
 			login(store);
 			String mailBox = parseMailBoxName(store, collectionName);
 			store.select(mailBox);
-			return emailSyncCache.getSync(store, devId, bs, state, collectionId, filter);
+			return emailSyncCache.getSync(store, devId, state, collectionId, filter);
 		} finally {
 			store.logout();
 		}
@@ -461,7 +461,7 @@ public class EmailManager implements IEmailManager {
 		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
 					@Override
 					public Email apply(FastFetch input) {
-						return new Email(input.getUid(), input.isRead());
+						return new Email(input.getUid(), input.isRead(), input.getInternalDate());
 					}
 				});
 		try {

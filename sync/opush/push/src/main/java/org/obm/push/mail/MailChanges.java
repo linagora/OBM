@@ -26,9 +26,7 @@ public class MailChanges {
 		this(new HashSet<Long>(), new HashSet<Long>(), lastSync);
 	}
 	
-	public MailChanges(Collection<Long> removed,
-			Collection<Long> updated, Date lastSync) {
-		
+	public MailChanges(Collection<Long> removed, Collection<Long> updated, Date lastSync) {
 		this(lastSync);
 		addRemoved(removed);
 		addUpdated(updated);

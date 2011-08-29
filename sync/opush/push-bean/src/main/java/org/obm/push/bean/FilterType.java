@@ -69,6 +69,6 @@ public enum FilterType {
 		default:
 			return date;
 		}
-
 	}
+
 }

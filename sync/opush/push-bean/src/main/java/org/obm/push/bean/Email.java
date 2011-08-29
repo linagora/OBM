@@ -1,14 +1,18 @@
 package org.obm.push.bean;
 
+import java.util.Date;
+
 public class Email {
 
-	private long uid;
-	private boolean read;
+	private final long uid;
+	private final boolean read;
+	private final Date date;
 	
-	public Email(long uid, boolean read) {
+	public Email(long uid, boolean read, Date date) {
 		super();
 		this.uid = uid;
 		this.read = read;
+		this.date = date;
 	}
 
 	public long getUid() {
@@ -17,6 +21,10 @@ public class Email {
 
 	public boolean isRead() {
 		return read;
+	}
+	
+	public Date getDate() {
+		return date;
 	}
 	
 	@Override
