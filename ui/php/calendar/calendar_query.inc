@@ -390,14 +390,7 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   }
 
   $id = sql_parse_id($event_id, true);
-  $query = "UPDATE EventLink 
-    SET eventlink_state = '$state'
-    WHERE eventlink_entity_id = ".of_entity_subquery($entity, $entity_id)." 
-    AND eventlink_event_id $id";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
+  $retour = run_query_calendar_update_entity_recurrent_event($entity, $entity_id, $oldEvent->uid, $state);
 
   if ($retour) {
     //$retour = run_query_calendar_touch_event($event_id);
