@@ -72,7 +72,6 @@ public class HierarchyExporter implements IHierarchyExporter {
 
 	@Override
 	public List<ItemChange> getChanged(BackendSession bs) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
-		folderExporter.synchronize(bs);
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		changes.addAll(getCalendarChanges(bs));
 		changes.addAll(getMailChanges(bs));

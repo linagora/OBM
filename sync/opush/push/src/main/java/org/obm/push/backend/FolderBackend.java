@@ -20,14 +20,6 @@ public class FolderBackend extends ObmSyncBackend {
 		super(collectionDao, bookClient, calendarClient, todoClient);
 	}
 
-	public void synchronize(BackendSession bs) throws DaoException {
-		try {
-			getCollectionIdFor(bs.getDevice(), getColName(bs));
-		} catch (CollectionNotFoundException e) {
-			createCollectionMapping(bs.getDevice(), getColName(bs));
-		}
-	}
-
 	public int getServerIdFor(BackendSession bs) throws DaoException, CollectionNotFoundException {
 		return getCollectionIdFor(bs.getDevice(), getColName(bs));
 	}

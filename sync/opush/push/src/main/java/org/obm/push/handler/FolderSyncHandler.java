@@ -10,6 +10,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
@@ -28,6 +29,7 @@ import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -60,8 +62,6 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			Document ret = protocol.encodeResponse(folderSyncResponse);
 			sendResponse(responder, ret);
 			
-		} catch (CollectionNotFoundException e) {
-			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY, e);
 		} catch (InvalidSyncKeyException e) {
 			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY, e);
 		} catch (NoDocumentException e) {
@@ -82,42 +82,45 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		sendResponse(responder, protocol.encodeErrorResponse(status));
 	}
 	
+	private int getOrCreateRootFolderId(Device deviceId, String rootFolderUrl) throws DaoException {
+		try {
+			return collectionDao.getCollectionMapping(deviceId, rootFolderUrl);
+		} catch (CollectionNotFoundException e) {
+			return collectionDao.addCollectionMapping(deviceId, rootFolderUrl);
+		}
+	}
+	
 	@Transactional(propagation=Propagation.NESTED)
 	private FolderSyncResponse doTheJob(BackendSession bs, FolderSyncRequest folderSyncRequest) throws
-			InvalidSyncKeyException, CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
+			InvalidSyncKeyException, DaoException, UnknownObmSyncServerException {
 		
 		// FIXME we know that we do not monitor hierarchy, so just respond
 		// that nothing changed
 		
-		SyncState state = stMachine.getFolderSyncState(bs.getDevice(),
-				hierarchyExporter.getRootFolderUrl(bs), folderSyncRequest.getSyncKey());
-		
-		if (!state.isValid()) {
-			throw new InvalidSyncKeyException();
+		Device deviceId = bs.getDevice();
+		String rootFolderUrl = hierarchyExporter.getRootFolderUrl(bs);
+		int rootFolderCollectionId = getOrCreateRootFolderId(deviceId, rootFolderUrl);
+
+		try {
+			if (isFirstSync(folderSyncRequest)) {
+				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null);
+				List<ItemChange> changed = hierarchyExporter.getChanged(bs);
+				return new FolderSyncResponse(changed, newSyncKey);
+			} else {
+				SyncState syncState = stMachine.getSyncState(rootFolderCollectionId, folderSyncRequest.getSyncKey());
+				if (!syncState.isValid()) {
+					throw new InvalidSyncKeyException();
+				}
+				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null);
+				return new FolderSyncResponse(ImmutableList.<ItemChange>of(), newSyncKey);
+			}
+		} catch (CollectionNotFoundException e) {
+			throw new DaoException(e);
 		}
-		hierarchyExporter.configure(state, null, null, 0, 0);
-								
-		List<ItemChange> changed = hierarchyExporter.getChanged(bs);
-		
-		if (!isSynckeyValid(folderSyncRequest.getSyncKey(), changed)) {
-			throw new InvalidSyncKeyException();
-		}
-		
-		String newSyncKey = stMachine.allocateNewSyncKey(bs,
-				hierarchyExporter.getRootFolderId(bs), null);
-		
-		return new FolderSyncResponse(changed, newSyncKey);
 	}
 
-	private boolean isSynckeyValid(String syncKey, List<ItemChange> changed) {
-		if (!"0".equals(syncKey)) {
-			for (ItemChange sf : changed) {
-				if (sf.isNew()) {
-					return false;
-				}
-			}
-		}
-		return true;
+	private boolean isFirstSync(FolderSyncRequest folderSyncRequest) {
+		return folderSyncRequest.getSyncKey().equals("0");
 	}
-	
+
 }

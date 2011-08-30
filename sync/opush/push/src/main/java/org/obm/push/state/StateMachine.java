@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -25,16 +24,6 @@ public class StateMachine {
 	@Inject
 	private StateMachine(CollectionDao collectionDao) {
 		this.collectionDao = collectionDao;
-	}
-	
-	public SyncState getFolderSyncState(Device device, String collectionUrl, String syncKey) throws DaoException {
-		try {
-			int collectionId = collectionDao.getCollectionMapping(device, collectionUrl);
-			return getSyncState(collectionId, syncKey);
-		
-		} catch (CollectionNotFoundException e) {
-			return new SyncState(collectionUrl, syncKey);
-		}
 	}
 
 	public SyncState getSyncState(Integer collectionId, String syncKey) throws CollectionNotFoundException, DaoException {

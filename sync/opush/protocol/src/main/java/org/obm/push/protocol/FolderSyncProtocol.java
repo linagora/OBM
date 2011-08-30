@@ -25,19 +25,17 @@ public class FolderSyncProtocol {
 		return new FolderSyncRequest(syncKey);
 	}
 
-	public Document encodeResponse(FolderSyncResponse folderSyncResponse)
-			throws FactoryConfigurationError {
+	public Document encodeResponse(FolderSyncResponse folderSyncResponse) throws FactoryConfigurationError {
 		Document ret = DOMUtils.createDoc(null, "FolderSync");
 		Element root = ret.getDocumentElement();
 		DOMUtils.createElementAndText(root, "Status", "1");
 		Element sk = DOMUtils.createElement(root, "SyncKey");
 		Element changes = DOMUtils.createElement(root, "Changes");
-			DOMUtils.createElementAndText(changes, "Count", String.valueOf(folderSyncResponse.getCount()));
-
-			for (ItemChange sf : folderSyncResponse.getItemChanges()) {
-				Element add = DOMUtils.createElement(changes, "Add");
-				addItemChange(add, sf);
-			}
+		DOMUtils.createElementAndText(changes, "Count", String.valueOf(folderSyncResponse.getCount()));
+		for (ItemChange sf: folderSyncResponse.getItemChanges()) {
+			Element add = DOMUtils.createElement(changes, "Add");
+			addItemChange(add, sf);
+		}
 		sk.setTextContent(folderSyncResponse.getNewSyncKey());
 		return ret;
 	}
