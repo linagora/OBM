@@ -1434,7 +1434,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		PreparedStatement st = null;
 		try {
 			st = con.prepareStatement("UPDATE Event SET event_timeupdate=? WHERE event_id=?");
-			st.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+			st.setTimestamp(1, new Timestamp(obmHelper.selectNow(con).getTime()));
 			st.setInt(2, databaseId);
 			st.execute();
 		} finally {

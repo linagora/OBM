@@ -1542,7 +1542,7 @@ public class ContactDao {
 		try {
 			con = obmHelper.getConnection();
 			st = con.prepareStatement("update Contact SET contact_timeupdate=? WHERE contact_id=?");
-			st.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+			st.setTimestamp(1, new Timestamp(obmHelper.selectNow(con).getTime()));
 			st.setInt(2, databaseId);
 			st.execute();
 		} finally {
