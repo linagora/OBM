@@ -412,12 +412,17 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   return $retour;    
 }
 
-function run_query_increment_sequence($event_id){
+/**
+* increment sequence number for all events having ext_id $event_ext_id
+* => this propagates changes in exceptions
+*
+*/
+function run_query_increment_sequence($event_ext_id){
   global $cdg_sql;
 
   $query = "UPDATE Event
     SET event_sequence = event_sequence + 1
-    WHERE event_id = $event_id";  
+    WHERE event_ext_id = '$event_ext_id'";  
   display_debug_msg($query, $cdg_sql, 'run_query_increment_sequence()');
 
   $obm_q = new DB_OBM;
@@ -425,6 +430,28 @@ function run_query_increment_sequence($event_id){
 
   return $retour;
 }
+
+/*
+	if true we should update event sequence
+*/
+function hasEventChanged($old, $new) {
+	if($old != null && $new == null || $old == null && $new != null ) {
+      return true;
+    }
+    return  $new->location != $old->location
+        || $new->allday  != $old->allday
+        || $new->date_begin->compare($old->date_begin) != 0
+        || $new->duration != $old->duration
+        || $new->repeat_kind    != $old->repeat_kind
+        || $new->repeat_kind    != $old->repeat_kind
+        || ($new->repeat_kind == 'weekly' && $new->repeat_days != $old->repeat_days)
+        || ($new->repeat_kind != 'none' && $new->repeat_end->compareDateIso($old->repeat_end) != 0)
+        || ($new->repeat_kind != 'none' && $new->repeatfrequency != $old->repeatfrequency)
+        || (count(array_udiff($new->date_exception, $old->date_exception, array('Of_Date', 'cmp'))))
+        || (count(array_udiff($old->date_exception, $new->date_exception, array('Of_Date', 'cmp'))));
+}
+
+
 
 /**
  * Check if the user participation to en event differs from the one given
@@ -1808,8 +1835,9 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   
   run_query_calendar_add_event_links($new_entities['user'], $new_entities['contact'], $new_entities['resource'], $event_id);
   
-  if (OBM_EventMailObserver::hasEventChanged($oldEvent, $updatedEvent)) {
+  if (hasEventChanged($oldEvent, $updatedEvent)) {
     run_query_calendar_reset_event_links($same_entities['user'], $same_entities['contact'], $same_entities['resource'], $event_id);
+	run_query_increment_sequence($oldEvent->uid);
   }
   
   foreach ($new_entities['document'] as $document_id) {
@@ -1825,6 +1853,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   
   // SOLR
   run_query_calendar_solr_store($event_id);
+
 
   // Send mail
   if ($calendar['attendees_notification']) {
@@ -2015,12 +2044,21 @@ function run_query_calendar_quick_event_update($calendar) {
       event_allday = $all_day
       WHERE
       event_id $event_id $multidomain";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_event_update()');
-  $obm_q->query($query);
+	display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_event_update()');
+	$obm_q->query($query);
 
+	// reload event from database
+	$newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
+	// increment sequence
+	if ( hasEventChanged($oldEvent, $newEvent) ) {
+		run_query_increment_sequence($newEvent->uid);
+	}
+
+	// reload once again to have the correct sequence number
+	$newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   // Send mail
   if ($calendar['send_mail']) {
-    $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
+    
     OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
   }
 }

@@ -450,7 +450,6 @@ class OBM_EventFactory /*Implements OBM_Subject*/{
     $event->description = $this->db->f('event_description');
     $event->event_duration = $this->db->f('event_event_duration');
     $event->repeat_days = $this->db->f('event_repeatdays'); 
-
     $event->date_exception = $this->getEventExceptions($id);
     $event->user = $this->getEventUsers($id);
     $event->resource = $this->getEventResources($id);
@@ -648,11 +647,12 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
   private function send($old, $new, $attendees, $attendeesState=null) {    
     /* Sequence incrementation must be done before email sending since sequence
        number is retrieved from database at ics generation */
+/*
     if(self::mustIncrementSequence($old, $new, $attendeesState)){
       $eventId = $new->id ? $new->id : $old->id;
       run_query_increment_sequence($eventId);
     }
-
+*/
     if(!$this->mustBeSent($old, $new))
       return false;
 
