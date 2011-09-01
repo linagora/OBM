@@ -542,24 +542,14 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private void changePartipationStateOnWritableCalendar(AccessToken token, Event event){
 		for (Attendee att: event.getAttendees()) {
-			if (ParticipationState.NEEDSACTION.equals(att.getState()) && !StringUtils.isEmpty(att.getEmail())) {
-				try {
-					acceptePartipationStateIfCanWriteOnCalendar(token, att);
-				} catch (Exception e) {
-					logger.error("Error while checks right on calendar: "+att.getEmail(), e);
-				}
-			}
-		}
-	}
-	
-	private void acceptePartipationStateIfCanWriteOnCalendar(AccessToken token, Attendee att) {
-		try {
-			if (helper.canWriteOnCalendar(token,  att.getEmail())) {
+			if (!StringUtils.isEmpty(att.getEmail()) && helper.canWriteOnCalendar(token,  att.getEmail())) {
 				att.setCanWriteOnCalendar(true);
-				att.setState(ParticipationState.ACCEPTED);
+				if (ParticipationState.NEEDSACTION.equals(att.getState())) {
+					att.setState(ParticipationState.ACCEPTED);
+				}
+			} else {
+				att.setCanWriteOnCalendar(false);
 			}
-		} catch (Exception e) {
-			logger.error("Error while checks right on calendar: "+att.getEmail(), e);
 		}
 	}
 	

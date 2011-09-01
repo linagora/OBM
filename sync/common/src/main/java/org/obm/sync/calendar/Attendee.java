@@ -14,7 +14,7 @@ public class Attendee {
 	private int percent;
 	private boolean organizer;
 	private boolean obmUser;
-	private boolean canWriteOnCalendar;
+	private Boolean canWriteOnCalendar;
 	
 	public ParticipationState getState() {
 		return state;
@@ -80,11 +80,11 @@ public class Attendee {
 		this.obmUser = obmUser;
 	}
 
-	public boolean isCanWriteOnCalendar() {
+	public Boolean isCanWriteOnCalendar() {
 		return canWriteOnCalendar;
 	}
 	
-	public void setCanWriteOnCalendar(boolean b) {
+	public void setCanWriteOnCalendar(Boolean b) {
 		canWriteOnCalendar = b;
 	}
 	

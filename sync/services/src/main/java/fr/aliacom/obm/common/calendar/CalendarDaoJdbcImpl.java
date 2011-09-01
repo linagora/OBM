@@ -37,6 +37,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.apache.commons.lang.StringUtils;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
@@ -1461,8 +1462,20 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 
 		int id = ev.getDatabaseId();
-
-		return findEventById(at, id);
+		
+		Event event = findEventById(at, id);
+		setAttendeeCanWriteOnCalendar(at, event);
+		return event;
+	}
+	
+	private void setAttendeeCanWriteOnCalendar(AccessToken accessToken, Event event) {
+		for (Attendee attendee: event.getAttendees()) {
+			if (!StringUtils.isEmpty(attendee.getEmail()) && helper.canWriteOnCalendar(accessToken,  attendee.getEmail())) {
+				attendee.setCanWriteOnCalendar(true);
+			} else {
+				attendee.setCanWriteOnCalendar(false);
+			}
+		}
 	}
 	
 	@Override

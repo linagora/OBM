@@ -57,6 +57,7 @@ public class EventChangeHandlerTestsTools {
 		attendee.setEmail(email);
 		attendee.setRequired(ParticipationRole.REQ);
 		attendee.setState(state);
+		attendee.setCanWriteOnCalendar(false);
 		return attendee;
 	}
 
