@@ -366,22 +366,32 @@ public class CalendarBindingImpl implements ICalendar {
 			boolean notification) throws ServerFault {
 		
 		try {
-			changePartipationStateOnWritableCalendar(token, event);
+			boolean hasImportantChanges = hasImportantChanges(before, event);
+			if (hasImportantChanges)
+                changePartipationStateOnWritableCalendar(token, event);
+			
+			int newSequence = hasImportantChanges ? before.getSequence() + 1 : before.getSequence();
 			final Event after = calendarDao.modifyEventForcingSequence(token, calendar, event, updateAttendees, 
-					before.getSequence() + 1, true);
+					newSequence, true);
 
 			if (after != null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
 			}
 
-			ObmUser user = userService.getUserFromAccessToken(token);
-			eventChangeHandler.update(user, before, after, notification);
-
+			if (hasImportantChanges) {
+				ObmUser user = userService.getUserFromAccessToken(token);
+				eventChangeHandler.update(user, before, after, notification);
+			}
 			return after;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
+	}
+
+	private boolean hasImportantChanges(Event before, Event after) {
+		boolean hasImportantChanges = before.getSequence() != after.getSequence();
+		return hasImportantChanges;
 	}
 
 	private Event modifyExternalEvent(AccessToken token, String calendar, 
