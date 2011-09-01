@@ -263,7 +263,7 @@ public class CalendarBindingImplTest {
 		String domainName = "domain1";
 		String userEmail = "user@domain1";
 		String eventExtId = "extid";
-		Attendee fakeUserAttendee = getFakeOwnerAttendee(userEmail);
+		Attendee fakeUserAttendee = getFakeAttendee(userEmail);
 		fakeUserAttendee.setState(ParticipationState.NEEDSACTION);
 		
 		final ObmUser obmUser = mockObmUser(userEmail);
@@ -309,8 +309,8 @@ public class CalendarBindingImplTest {
 		String oldEventWithOtherAttendeesUid = "2";
 
 		String otherUserEmail = "user2@domain1";
-		Attendee userAttendee = getFakeOwnerAttendee(userEmail);
-		Attendee otherAttendee = getFakeOwnerAttendee(otherUserEmail);
+		Attendee userAttendee = getFakeAttendee(userEmail);
+		Attendee otherAttendee = getFakeAttendee(otherUserEmail);
 		userAttendee.setState(ParticipationState.NEEDSACTION);
 		final ObmUser obmUser = mockObmUser(userEmail);
 
@@ -377,7 +377,7 @@ public class CalendarBindingImplTest {
 		String domainName = "domain1";
 		String userEmail = "user@domain1";
 		String eventExtId = "extid";
-		Attendee fakeUserAttendee = getFakeOwnerAttendee(userEmail);
+		Attendee fakeUserAttendee = getFakeAttendee(userEmail);
 		fakeUserAttendee.setState(ParticipationState.NEEDSACTION);
 		
 		final ObmUser obmUser = mockObmUser(userEmail);
@@ -412,7 +412,56 @@ public class CalendarBindingImplTest {
 		Assert.assertEquals(ParticipationState.NEEDSACTION, fakeUserAttendee.getState());
 	}
 
-	private Attendee getFakeOwnerAttendee(String userEmail) {
+	@Test
+	public void testAttendeeHasRightToWriteOnCalendar() throws FindException, ServerFault, SQLException {
+		String calendar = "cal1";
+		String domainName = "domain1";
+		String userEmail = "user@domain1";
+		String extId = "extId";
+		boolean updateAttendee = true;
+		boolean notification = false;
+		
+		Attendee attendee = getFakeAttendee(userEmail);
+		attendee.setState(ParticipationState.NEEDSACTION);
+		
+		Event beforeEvent = new Event();
+		beforeEvent.setType(EventType.VEVENT);
+		beforeEvent.setInternalEvent(true);
+		beforeEvent.setExtId(extId);
+		
+		Event event = new Event();
+		event.setType(EventType.VEVENT);
+		event.setInternalEvent(true);
+		event.setExtId(extId);
+		event.addAttendee(attendee);
+		
+		ObmUser obmUser = new ObmUser();
+		obmUser.setEmail(userEmail);
+		
+		AccessToken accessToken = mockAccessToken(domainName);
+		Helper helper = mockRightsHelper(calendar, accessToken);
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		UserService userService = createMock(UserService.class);
+		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
+		
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser).atLeastOnce();
+		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(beforeEvent).atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(true).atLeastOnce();
+		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event, updateAttendee, 1, true)).andReturn(event).atLeastOnce();
+		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).atLeastOnce();
+		eventChangeHandler.update(obmUser, beforeEvent, event, notification);
+		
+		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
+		
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, helper, null);
+		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee, notification);
+		
+		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
+		
+		Assert.assertEquals(ParticipationState.ACCEPTED, newEvent.getAttendees().get(0).getState());
+	}
+	
+	private Attendee getFakeAttendee(String userEmail) {
 		Attendee att = new Attendee();
 		att.setEmail(userEmail);
 		return att;

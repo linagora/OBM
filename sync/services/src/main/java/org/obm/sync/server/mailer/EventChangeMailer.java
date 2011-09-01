@@ -128,18 +128,11 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	public void notifyAcceptedUpdateUsers(Collection<Attendee> attendees, 
-			Event previous, Event current, Locale locale, 
+	public void notifyAcceptedUpdateUsers(Collection<Attendee> attendees, Event previous, Event current, Locale locale, 
 			TimeZone timezone, String ics) throws NotificationException {
+
 		try {
-			EventMail mail = 
-				new EventMail(
-						extractSenderAddress(current),
-						current.getAttendees(), 
-						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
-						notifyUpdateUserBodyTxt(previous, current, locale, timezone),
-						notifyUpdateUserBodyHtml(previous, current, locale, timezone), 
-						ics, "REQUEST");
+			EventMail mail = getNotifyUpdateUserEventMail(previous, current, locale, timezone, ics);
 			sendNotificationMessageToAttendees(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -149,7 +142,27 @@ public class EventChangeMailer extends AbstractMailer {
 			throw new NotificationException(e);
 		}
 	}
+
+	public void notifyAcceptedUpdateUsersCanWriteOnCalendar(Collection<Attendee> attendees, Event previous, Event current, 
+			Locale locale, TimeZone timezone) throws NotificationException {
+		notifyAcceptedUpdateUsers(attendees, previous, current, locale, timezone, null);
+	}
 	
+	private EventMail getNotifyUpdateUserEventMail(Event previous, Event current, Locale locale, TimeZone timezone, String ics) 
+			throws UnsupportedEncodingException, IOException, TemplateException {
+		
+		EventMail eventMail = new EventMail(
+				extractSenderAddress(current),
+				current.getAttendees(), 
+				updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
+				notifyUpdateUserBodyTxt(previous, current, locale, timezone),
+				notifyUpdateUserBodyHtml(previous, current, locale, timezone));
+		if (ics != null) {
+			eventMail.setIcsContent(ics);
+			eventMail.setIcsMethod("REQUEST");
+		}
+		return eventMail;
+	}
 
 	public void notifyOwnerUpdate(Attendee owner, Event previous, Event current, Locale locale,
 			TimeZone timezone) {

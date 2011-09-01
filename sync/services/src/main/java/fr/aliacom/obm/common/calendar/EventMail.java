@@ -28,14 +28,12 @@ public class EventMail {
 	private final String subject;
 	private final String bodyTxt;
 	private final String bodyHtml;
-	private final String icsContent;
-	private final String icsMethod;
+	private String icsContent;
+	private String icsMethod;
 	
-	public EventMail(Address from, List<Attendee> recipients, String subject,
-			String bodyTxt, String bodyHtml) {
-		this(from, recipients,subject,bodyTxt,bodyHtml, null, null);
+	public EventMail(Address from, List<Attendee> recipients, String subject, String bodyTxt, String bodyHtml) {
+		this(from, recipients, subject, bodyTxt, bodyHtml, null, null);
 	}
-	
 	
 	public EventMail(Address from, List<Attendee> recipients, String subject,
 			String bodyTxt, String bodyHtml, String icsContent, String icsMethod) {
@@ -115,4 +113,13 @@ public class EventMail {
 		part.setText(bodyTxt, Charsets.UTF_8.displayName(), "plain");
 		return part;
 	}
+	
+	public void setIcsContent(String icsContent) {
+		this.icsContent = icsContent;
+	}
+	
+	public void setIcsMethod(String icsMethod) {
+		this.icsMethod = icsMethod;
+	}
+	
 }

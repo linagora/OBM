@@ -362,21 +362,21 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private Event modifyInternalEvent(AccessToken token, String calendar, Event before,  Event event,
-			boolean updateAttendees, boolean notification) throws ServerFault {
-		try{
-			prepareParticipationStateForNewEventAttendees(token, before, event);
-			
-	     final Event after = calendarDao.modifyEventForcingSequence(
-	    		 token, calendar, event, updateAttendees, before.getSequence() + 1, true);
-	     
+	private Event modifyInternalEvent(AccessToken token, String calendar, Event before, Event event, boolean updateAttendees,
+			boolean notification) throws ServerFault {
+		
+		try {
+			changePartipationStateOnWritableCalendar(token, event);
+			final Event after = calendarDao.modifyEventForcingSequence(token, calendar, event, updateAttendees, 
+					before.getSequence() + 1, true);
+
 			if (after != null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
 			}
-			
+
 			ObmUser user = userService.getUserFromAccessToken(token);
 			eventChangeHandler.update(user, before, after, notification);
-			
+
 			return after;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -535,8 +535,8 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private void changePartipationStateOnWritableCalendar(AccessToken token, Event event){
-		for(Attendee att : event.getAttendees()){
-			if(ParticipationState.NEEDSACTION.equals(att.getState()) && !StringUtils.isEmpty(att.getEmail())) {
+		for (Attendee att: event.getAttendees()) {
+			if (ParticipationState.NEEDSACTION.equals(att.getState()) && !StringUtils.isEmpty(att.getEmail())) {
 				try {
 					acceptePartipationStateIfCanWriteOnCalendar(token, att);
 				} catch (Exception e) {
@@ -546,32 +546,10 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private void prepareParticipationStateForNewEventAttendees(final AccessToken token,  final Event before, final Event event) {
-		for (final Attendee currentAtt : event.getAttendees()) {
-			for (final Attendee beforeAtt: before.getAttendees()) {
-				if (currentAtt.equals(beforeAtt)) {
-					prepareParticipationStateForAttendee(token, currentAtt);
-					break;
-				}	
-			}
-		}
-	}
-	
-	private void prepareParticipationStateForAttendee(final AccessToken token, final Attendee att) {
+	private void acceptePartipationStateIfCanWriteOnCalendar(AccessToken token, Attendee att) {
 		try {
 			if (helper.canWriteOnCalendar(token,  att.getEmail())) {
-				att.setState(ParticipationState.ACCEPTED);
-			} else {
-				att.setState(ParticipationState.NEEDSACTION);
-			}
-		} catch (Exception e) {
-			logger.error("Error while checks right on calendar: "+ att.getEmail(), e);
-		}
-	}
-	
-	private void acceptePartipationStateIfCanWriteOnCalendar(AccessToken token, Attendee att){
-		try {
-			if (helper.canWriteOnCalendar(token,  att.getEmail())) {
+				att.setCanWriteOnCalendar(true);
 				att.setState(ParticipationState.ACCEPTED);
 			}
 		} catch (Exception e) {

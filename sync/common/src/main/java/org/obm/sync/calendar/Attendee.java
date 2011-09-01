@@ -2,6 +2,8 @@ package org.obm.sync.calendar;
 
 import java.util.List;
 
+import com.google.common.base.Objects;
+
 public class Attendee {
 
 	private ParticipationState state;
@@ -12,7 +14,8 @@ public class Attendee {
 	private int percent;
 	private boolean organizer;
 	private boolean obmUser;
-
+	private boolean canWriteOnCalendar;
+	
 	public ParticipationState getState() {
 		return state;
 	}
@@ -77,6 +80,14 @@ public class Attendee {
 		this.obmUser = obmUser;
 	}
 
+	public boolean isCanWriteOnCalendar() {
+		return canWriteOnCalendar;
+	}
+	
+	public void setCanWriteOnCalendar(boolean b) {
+		canWriteOnCalendar = b;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -101,4 +112,13 @@ public class Attendee {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(getClass()).
+				add("email", getEmail()).
+				add("state", getState()).
+				add("canWriteOnCalendar", isCanWriteOnCalendar()).toString();
+	}
+	
 }

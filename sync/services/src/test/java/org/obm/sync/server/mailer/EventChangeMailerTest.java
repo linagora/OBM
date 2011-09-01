@@ -48,8 +48,9 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @RunWith(Suite.class)
-@SuiteClasses({EventChangeMailerTest.AcceptedCreation.class, EventChangeMailerTest.NeedActionCreation.class, EventChangeMailerTest.Cancelation.class,
-	EventChangeMailerTest.AcceptedUpdate.class, EventChangeMailerTest.NeedActionUpdate.class})
+@SuiteClasses({EventChangeMailerTest.AcceptedCreation.class, EventChangeMailerTest.NeedActionCreation.class, 
+	EventChangeMailerTest.Cancelation.class, EventChangeMailerTest.NotifyAcceptedUpdateUsers.class, 
+	EventChangeMailerTest.NeedActionUpdate.class, EventChangeMailerTest.NotifyAcceptedUpdateUsersCanWriteOnCalendar.class})
 public class EventChangeMailerTest {
 
 	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
@@ -431,11 +432,42 @@ public class EventChangeMailerTest {
 
 	}
 
-	public static class AcceptedUpdate extends Common {
+	public static class NotifyAcceptedUpdateUsersCanWriteOnCalendar extends NotifyAcceptedUpdateUsers {
+		
+		@Override
+		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after) {
+			eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(before.getAttendees(), 
+					before, after, Locale.FRENCH, TIMEZONE);
+		}
+		
+		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage) 
+				throws UnsupportedEncodingException, IOException, MessagingException {
+			return checkNotificationStructure(mimeMessage);
+		}
+		
+		@Override
+		protected void checkContent(InvitationParts parts) throws IOException, MessagingException { 
+			checkStringContains(parts.rawMessage, 
+					"From: Raphael ROUGERON <rrougeron@linagora.com>",
+					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
+					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_par_Raphael");
+			checkPlainMessage(parts.plainText);
+			checkHtmlMessage(parts.htmlText);
+			Assert.assertNull(parts.applicationIcs);
+		}
+		
+	}
+	
+	public static class NotifyAcceptedUpdateUsers extends Common {
 
 		@Test
 		public void invitationUpdate() throws IOException, MessagingException {
 			super.testNotification();
+		}
+		
+		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after) {
+			eventChangeMailer.notifyAcceptedUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "");
 		}
 		
 		@Override
@@ -447,7 +479,7 @@ public class EventChangeMailerTest {
 			for (Attendee att: before.getAttendees()) {
 				att.setState(ParticipationState.ACCEPTED);
 			}
-			eventChangeMailer.notifyAcceptedUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "");
+			notifyAcceptedUpdateUsers(eventChangeMailer, before, after);
 		}
 		
 		@Override

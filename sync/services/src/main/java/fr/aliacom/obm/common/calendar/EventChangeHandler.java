@@ -48,8 +48,9 @@ public class EventChangeHandler {
 	private final Ical4jHelper ical4jHelper;
 
 	@Inject
-	/* package */ EventChangeHandler(EventChangeMailer eventChangeMailer,
-			SettingsService settingsService, UserService userService, Producer producer, Ical4jHelper ical4jHelper) {
+	/* package */ EventChangeHandler(EventChangeMailer eventChangeMailer, SettingsService settingsService, 
+			UserService userService, Producer producer, Ical4jHelper ical4jHelper) {
+		
 		this.eventChangeMailer = eventChangeMailer;
 		this.settingsService = settingsService;
 		this.userService = userService;
@@ -114,7 +115,8 @@ public class EventChangeHandler {
 		}
 	}
 
-	public void update(final ObmUser user, final Event previous, final Event current, boolean notification) throws NotificationException {
+	public void update(ObmUser user, Event previous, Event current, boolean notification) 
+			throws NotificationException {
 		
 		String addUserIcs = ical4jHelper.buildIcsInvitationRequest(user, current);
 		String removedUserIcs = ical4jHelper.buildIcsInvitationCancel(user, current);
@@ -128,23 +130,24 @@ public class EventChangeHandler {
 			TimeZone timezone = settings.timezone();
 			Locale locale = settings.locale();
 
-			final Map<AttendeeStateValue, Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
+			Map<AttendeeStateValue, Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
 			final Set<Attendee> removedAttendees = attendeeGroups.get(AttendeeStateValue.REMOVED);
 			if (!removedAttendees.isEmpty()) {
 				eventChangeMailer.notifyRemovedUsers(removedAttendees, current, locale, timezone, removedUserIcs);
 			}
 
-			final Set<Attendee> addedAttendees = attendeeGroups.get(AttendeeStateValue.ADDED);
+			Set<Attendee> addedAttendees = attendeeGroups.get(AttendeeStateValue.ADDED);
 			if (!addedAttendees.isEmpty()) {
 				notifyCreate(user, addedAttendees, current, addUserIcs);
 			}
 
-			final Set<Attendee> keptAttendees = attendeeGroups.get(AttendeeStateValue.KEPT);
+			Set<Attendee> keptAttendees = attendeeGroups.get(AttendeeStateValue.KEPT);
 			if (!keptAttendees.isEmpty()) {
-				final Map<ParticipationState, Set<Attendee>> atts = computeParticipationStateGroups(keptAttendees);
+				Map<ParticipationState, Set<Attendee>> atts = computeParticipationStateGroups(keptAttendees);
 				notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 				notifyNeedActionUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 			}
+			
 			Attendee owner = findOwner(current);
 			if (owner != null && !eventCreatedByOwner(user, current)) {
 				notifyOwnerUpdate(owner, previous, current, locale, timezone);
@@ -155,10 +158,28 @@ public class EventChangeHandler {
 	private void notifyAcceptedUpdateUsers(Event previous, Event current, Locale locale, 
 			Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone, String ics) {
 		
-		final Set<Attendee> accepted = atts.get(ParticipationState.ACCEPTED);
-		if (accepted != null && !accepted.isEmpty()) {
-			eventChangeMailer.notifyAcceptedUpdateUsers(accepted, previous, current, locale, timezone, ics);
-		}	
+		Set<Attendee> attendeesAccepted = atts.get(ParticipationState.ACCEPTED);
+		if (attendeesAccepted != null) {
+			Collection<Attendee> attendeesCanWriteOnCalendar = filterCanWriteOnCalendar(attendeesAccepted);
+			if (attendeesCanWriteOnCalendar != null && !attendeesCanWriteOnCalendar.isEmpty()) {
+				eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(attendeesCanWriteOnCalendar, previous, 
+						current, locale, timezone);
+			}
+			
+			attendeesAccepted.removeAll(attendeesCanWriteOnCalendar);
+			if (!attendeesAccepted.isEmpty()) {
+				eventChangeMailer.notifyAcceptedUpdateUsers(attendeesAccepted, previous, current, locale, timezone, ics);
+			}
+		}
+	}
+	
+	private Collection<Attendee> filterCanWriteOnCalendar(Set<Attendee> attendees) {
+		return Collections2.filter(attendees, new Predicate<Attendee>() {
+			@Override
+			public boolean apply(Attendee attendee) {
+				return attendee.isCanWriteOnCalendar();
+			}
+		});
 	}
 	
 	private void notifyOwnerUpdate(Attendee owner, Event previous, Event current, Locale locale, TimeZone timezone) {
@@ -294,6 +315,7 @@ public class EventChangeHandler {
 	}
 	
 	/* package */ Map<AttendeeStateValue, Set<Attendee>> computeUpdateNotificationGroups(Event previous, Event current) {
+		
 		if (previous.isEventInThePast() && current.isEventInThePast()) {
 			Set<Attendee> emptyAttendeesSet = ImmutableSet.of();
 			return ImmutableMap.of(
@@ -301,6 +323,7 @@ public class EventChangeHandler {
 					AttendeeStateValue.KEPT, emptyAttendeesSet,
 					AttendeeStateValue.ADDED, emptyAttendeesSet);
 		}
+		
 		ImmutableSet<Attendee> previousAttendees = ImmutableSet.copyOf(filterOwner(previous, previous.getAttendees()));
 		ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(filterOwner(current, current.getAttendees()));
 		SetView<Attendee> removedAttendees = Sets.difference(previousAttendees, currentAttendees);
