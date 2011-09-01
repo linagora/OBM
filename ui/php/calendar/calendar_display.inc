@@ -4491,7 +4491,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $u = array();
     $displayedPeople = array();
     if ($current_view->users_count() > 0) {
-      $displayed_users = get_userobm_from_ids($current_view->get_users());
+      $displayed_users = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $current_view->get_users()));
       foreach($displayed_users['entity'] as $id => $entity) {
         $name = phpStringToJsString($entity['label']);
         array_push($u, "'$id' : '$name'");
