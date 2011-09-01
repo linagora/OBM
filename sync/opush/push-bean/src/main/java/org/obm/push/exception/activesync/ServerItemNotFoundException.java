@@ -17,8 +17,9 @@ public class ServerItemNotFoundException extends ActiveSyncException {
 		super(message, cause);
 	}
 
-	public ServerItemNotFoundException(String message) {
-		super(message);
+	public ServerItemNotFoundException(String serverItemId) {
+		super();
+		this.serverItemId = Integer.valueOf(serverItemId);
 	}
 
 	public ServerItemNotFoundException(Throwable cause) {

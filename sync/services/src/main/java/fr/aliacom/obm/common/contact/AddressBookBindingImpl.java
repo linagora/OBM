@@ -27,6 +27,7 @@ import java.util.Set;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ContactNotFoundException;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
@@ -286,7 +287,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 
-	private Contact modifyContact(AccessToken token, Contact c) throws SQLException, FindException {
+	private Contact modifyContact(AccessToken token, Contact c) throws SQLException, FindException, EventNotFoundException, ServerFault {
 		Contact modifiedContact;
 		try {
 			Contact previous = contactDao.findContact(token, c.getUid());

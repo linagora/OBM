@@ -306,52 +306,76 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	
 	/**
 	 * Handles modifications requested by mobile device
-	 * @return 
-	 * @throws CollectionNotFoundException 
-	 * @throws UnknownObmSyncServerException 
-	 * @throws ProcessingEmailException 
-	 * @throws ServerItemNotFoundException 
 	 */
-	private Map<String, String> processModification(BackendSession bs, SyncCollection collection) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, 
-			ProcessingEmailException {
+	private Map<String, String> processModification(BackendSession bs, SyncCollection collection) throws CollectionNotFoundException, 
+		DaoException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
-		for (SyncCollectionChange change : collection.getChanges()) {
+		for (SyncCollectionChange change: collection.getChanges()) {
 
 			if (change.getModType().equals("Modify")) {
-				
-				contentsImporter.importMessageChange(bs, collection.getCollectionId(), change.getServerId(), change.getClientId(),
-						change.getData());
-			
-			} else if (change.getModType().equals("Add") || change.getModType().equals("Change")) {
+				updateServerItem(bs, collection, change);
 
-				String obmId = contentsImporter.importMessageChange(bs,	collection.getCollectionId(), change.getServerId(),
-						change.getClientId(), change.getData());
-				if (obmId != null) {
-					if (change.getClientId() != null) {
-						processedClientIds.put(obmId, change.getClientId());
-					}
-					if (change.getServerId() != null) {
-						processedClientIds.put(obmId, null);
-					}
-				}
-				
+			} else if (change.getModType().equals("Add") || change.getModType().equals("Change")) {
+				addServerItem(bs, collection, processedClientIds, change);
+			
 			} else if (change.getModType().equals("Delete")) {
-				
-				try {
-					contentsImporter.importMessageDeletion(bs, change.getType(), collection.getCollectionId(), change.getServerId(),
-							collection.getOptions().isDeletesAsMoves());
-					
-					processedClientIds.put(change.getServerId(), null);
-				} catch (ServerItemNotFoundException e) {
-					logger.info("Item {} not exist on server. The client has sent a malformed or invalid item. Stop sending the item !", 
-							change.getServerId());
-				}
-				
+				deleteServerItem(bs, collection, processedClientIds, change);
 			}
 		}
 		return processedClientIds;
+	}
+
+	private void updateServerItem(BackendSession bs, SyncCollection collection, SyncCollectionChange change) 
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+		
+		try {
+			contentsImporter.importMessageChange(bs, collection.getCollectionId(), change.getServerId(), change.getClientId(),
+					change.getData());
+		} catch (ServerItemNotFoundException e) {
+			logger.info("Item {} not exist on server. The client has sent a malformed or invalid item. Stop sending the item !", 
+					e.getServerItemId());
+		}
+	}
+	
+	private void addServerItem(BackendSession bs, SyncCollection collection, Map<String, String> processedClientIds, 
+			SyncCollectionChange change) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+		
+		try {
+			String obmId = contentsImporter.importMessageChange(bs,	collection.getCollectionId(), change.getServerId(),
+					change.getClientId(), change.getData());
+		
+			if (obmId != null) {
+				
+				if (change.getClientId() != null) {
+					processedClientIds.put(obmId, change.getClientId());
+				}
+				
+				if (change.getServerId() != null) {
+					processedClientIds.put(obmId, null);
+				}
+				
+			}
+			
+		} catch (ServerItemNotFoundException e) {
+			logger.info("Item {} not exist on server. The client has sent a malformed or invalid item. Stop sending the item !", 
+					e.getServerItemId());
+		}
+	}
+	
+	private void deleteServerItem(BackendSession bs, SyncCollection collection, Map<String, String> processedClientIds, 
+			SyncCollectionChange change) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+	
+		try {
+			
+			contentsImporter.importMessageDeletion(bs, change.getType(), collection.getCollectionId(), change.getServerId(),
+					collection.getOptions().isDeletesAsMoves());
+			
+			processedClientIds.put(change.getServerId(), null);
+		} catch (ServerItemNotFoundException e) {
+			logger.info("Item {} not exist on server. The client has sent a malformed or invalid item. Stop sending the item !", 
+					e.getServerItemId());
+		}
 	}
 
 	@Override

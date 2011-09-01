@@ -45,7 +45,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
 		
 		String id = null;
 		switch (data.getType()) {
@@ -125,10 +125,11 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importCalendarUserStatus(BackendSession bs,  Integer invitationCollexctionId, MSEmail invitation,
-			AttendeeStatus userResponse) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
-		String ret = calBackend.handleMeetingResponse(bs, invitation, userResponse);
+			AttendeeStatus userResponse) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ServerItemNotFoundException {
+		
+		String serverId = calBackend.handleMeetingResponse(bs, invitation, userResponse);
 		invitationFilterManager.handleMeetingResponse(bs, invitationCollexctionId, invitation);
-		return ret;
+		return serverId;
 	}
 
 	@Override

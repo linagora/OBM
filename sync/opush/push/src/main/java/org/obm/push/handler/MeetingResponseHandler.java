@@ -22,6 +22,7 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
@@ -82,8 +83,6 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST, e);
-		} catch (UnknownObmSyncServerException e) {
-			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
 		} catch (ProcessingEmailException e) {
 			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
 		}
@@ -100,7 +99,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 
 	@Transactional(propagation=Propagation.NESTED)
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
+			throws DaoException, CollectionNotFoundException, ProcessingEmailException {
 		
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
@@ -111,12 +110,21 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			if (ic != null && ic.getData() != null) {
 				MSEmail invitation = ((MSEmail) ic.getData());
 				if (invitation != null) {
+					
 					meetingResponse.setStatus(MeetingResponseStatus.SUCCESS);
-					String calId = contentsImporter.importCalendarUserStatus(bs, item.getCollectionId(), 
-							invitation, item.getUserResponse());
-					if (!AttendeeStatus.DECLINE.equals(item.getUserResponse())) {
-						meetingResponse.setCalId(calId);	
+					try {
+						String calId = contentsImporter.importCalendarUserStatus(bs, item.getCollectionId(), invitation, 
+								item.getUserResponse());
+					
+						if (!AttendeeStatus.DECLINE.equals(item.getUserResponse())) {
+							meetingResponse.setCalId(calId);	
+						}
+					} catch (ServerItemNotFoundException e) {
+						meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
+					} catch (UnknownObmSyncServerException e) {
+						meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
 					}
+					
 				} else {
 					meetingResponse.setStatus(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 				}

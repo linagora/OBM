@@ -60,17 +60,13 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public Event getEventFromId(AccessToken token, String calendar, String id) throws ServerFault {
+	public Event getEventFromId(AccessToken token, String calendar, String id) throws ServerFault, EventNotFoundException {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("id", id);
 		Document doc = execute(token, type + "/getEventFromId", params);
-		exceptionFactory.checkServerFaultException(doc);
-		if (doc.getDocumentElement().getNodeName().equals("event")) {
-			return respParser.parseEvent(doc.getDocumentElement());
-		}
-		logger.warn("event " + id + " not found.");
-		return null;
+		exceptionFactory.checkEventNotFoundException(doc);
+		return respParser.parseEvent(doc.getDocumentElement());
 	}
 
 	@Override
@@ -181,14 +177,16 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public Event removeEvent(AccessToken token, String calendar, String uid, int sequence, boolean notification) throws ServerFault {
+	public Event removeEvent(AccessToken token, String calendar, String uid, int sequence, boolean notification) 
+			throws ServerFault, EventNotFoundException {
+		
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("id", uid);
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(token, type + "/removeEvent", params);
-		exceptionFactory.checkServerFaultException(doc);
+		exceptionFactory.checkEventNotFoundException(doc);
 		return respParser.parseEvent(doc.getDocumentElement());
 	}
 	

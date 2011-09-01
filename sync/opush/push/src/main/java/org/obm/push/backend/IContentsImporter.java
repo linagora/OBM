@@ -22,7 +22,7 @@ import org.obm.push.exception.activesync.ServerItemNotFoundException;
 public interface IContentsImporter {
 
 	String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data)
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException;
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException;
 
 	void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException;
@@ -31,7 +31,7 @@ public interface IContentsImporter {
 			throws CollectionNotFoundException, DaoException, ProcessingEmailException;
 
 	String importCalendarUserStatus(BackendSession bs, Integer invitationCollectionId, MSEmail invitation,
-			AttendeeStatus userResponse) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
+			AttendeeStatus userResponse) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ServerItemNotFoundException;
 
 	void sendEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent)
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException;

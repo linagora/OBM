@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.EventNotFoundException;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventParticipationState;
@@ -28,7 +30,7 @@ public interface CalendarDao {
 
 	List<Event> findAllEvents(AccessToken token, ObmUser calendarUser, EventType typeFilter);
 
-	Event findEvent(AccessToken token, int eventId);
+	Event findEventById(AccessToken token, int eventId) throws EventNotFoundException, ServerFault;
 
 	Event findEventByExtId(AccessToken token, ObmUser calendarUser, String eventExtId);
 
@@ -55,13 +57,13 @@ public interface CalendarDao {
 
 	Collection<CalendarInfo> listCalendars(ObmUser user) throws FindException;
 
-	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees, Boolean useObmUser) throws FindException, SQLException;
+	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees, Boolean useObmUser) throws FindException, SQLException, EventNotFoundException, ServerFault;
 
 	Event modifyEventForcingSequence(AccessToken at, String calendar, Event ev,
 			boolean updateAttendees, int sequence, Boolean useObmUser)
-			throws SQLException, FindException;
+			throws SQLException, FindException, EventNotFoundException, ServerFault;
 	
-	Event removeEvent(AccessToken token, int eventId, EventType eventType, int sequence) throws SQLException;
+	Event removeEvent(AccessToken token, int eventId, EventType eventType, int sequence) throws SQLException, EventNotFoundException, ServerFault;
 
 	Event removeEvent(AccessToken token, Event event, EventType eventType, int sequence) throws SQLException;
 	
@@ -71,13 +73,13 @@ public interface CalendarDao {
 
 	void modifyEvent(Connection con, AccessToken at,  String calendar, Event ev,
 			boolean updateAttendees, Boolean useObmUser)
-			throws SQLException, FindException;
+			throws SQLException, FindException, ServerFault, EventNotFoundException;
 
 	void modifyEventForcingSequence(Connection con, AccessToken editor, String calendar,
 			Event ev, boolean updateAttendees, int sequence, Boolean useObmUser)
-			throws SQLException, FindException;
+			throws SQLException, FindException, ServerFault, EventNotFoundException;
 	
-	Event removeEvent(Connection con, AccessToken token, int uid, EventType et, int sequence) throws SQLException;
+	Event removeEvent(Connection con, AccessToken token, int uid, EventType et, int sequence) throws SQLException, EventNotFoundException, ServerFault;
 	
 	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, String extId, ParticipationState participationState) throws SQLException ;
 

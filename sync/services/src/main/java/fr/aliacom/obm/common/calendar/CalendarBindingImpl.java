@@ -203,16 +203,11 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public Event removeEvent(AccessToken token, String calendar, String eventId, int sequence, boolean notification)
-			throws ServerFault {
+			throws ServerFault, EventNotFoundException {
+		
 		try {
 			int uid = Integer.valueOf(eventId);
-			Event ev = calendarDao.findEvent(token, uid);
-
-			if (ev == null) {
-				logger.info(LogUtils.prefix(token) + "event with id : "
-						+ eventId + "not found");
-				return null;
-			}
+			Event ev = calendarDao.findEventById(token, uid);
 
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
 			ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain());
@@ -222,28 +217,29 @@ public class CalendarBindingImpl implements ICalendar {
 						return cancelEvent(token, calendar, notification, uid, ev);
 					} else {
 						changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, sequence, notification);
-						return calendarDao.findEvent(token, uid);
+						return calendarDao.findEventById(token, uid);
 					}
 				}
-				
-				logger.info(LogUtils.prefix(token) + "remove not allowed of " + ev.getTitle());
-				return ev;
+				throw new ServerFault(calendar + " has no write right to remove event " + ev.getTitle());
 			} else {
-				logger.info(LogUtils.prefix(token)
-						+ "try to remove an event without owner "
-						+ ev.getTitle());
+				throw new ServerFault("It's not possible to remove an event without owner " + ev.getTitle());
 			}
-
-		} catch (Throwable e) {
+		} catch (ServerFault e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e);
+		} catch (FindException e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e);
+		} catch (SQLException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e);
 		}
-		return null;
 	}
 
 	private Event cancelEvent(AccessToken token, String calendar,
 			boolean notification, int uid, Event ev) throws SQLException,
-			FindException {
+			FindException, EventNotFoundException, ServerFault {
+		
 		Event removed = calendarDao.removeEvent(token, uid, ev.getType(), ev.getSequence() + 1);
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + uid + "] removed");
 		notifyOnRemoveEvent(token, calendar, removed, notification);
@@ -349,7 +345,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	}
 	
-	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) {
+	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) throws EventNotFoundException, ServerFault {
 		if (Strings.isNullOrEmpty(event.getUid())) {
 			final Event currentEvent = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
 			if (currentEvent != null) {
@@ -358,7 +354,7 @@ public class CalendarBindingImpl implements ICalendar {
 			return currentEvent;
 		} else {
 			int uid = Integer.valueOf(event.getUid());
-			return calendarDao.findEvent(token, uid);
+			return calendarDao.findEventById(token, uid);
 		}
 	}
 
@@ -532,7 +528,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try{
 			changePartipationStateOnWritableCalendar(token, event);
 			Event ev = calendarDao.createEvent(token, calendar, event, true);
-			ev = calendarDao.findEvent(token, ev.getDatabaseId());
+			ev = calendarDao.findEventById(token, ev.getDatabaseId());
 			ObmUser user = userService.getUserFromAccessToken(token);
 			eventChangeHandler.create(user, ev, notification);
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
@@ -668,32 +664,17 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public Event getEventFromId(AccessToken token, String calendar,
-			String eventId) throws ServerFault {
-		try {
-			int uid = Integer.valueOf(eventId);
-			Event evt = calendarDao.findEvent(token, uid);
-			if(evt == null){
-				return null;
-			}
-			String owner = evt.getOwner();
-			if (owner == null) {
-				logger.info(LogUtils.prefix(token)
-						+ "try to get an event without owner " + evt.getTitle());
-				return null;
-			}
-			if (helper.canReadCalendar(token, owner)
-					|| helper.attendeesContainsUser(evt.getAttendees(), token)) {
-				return evt;
-			}
-			logger.info(LogUtils.prefix(token) + "read not allowed for "
-					+ evt.getTitle());
-			return null;
-
-		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault(e.getMessage());
+	public Event getEventFromId(AccessToken token, String calendar, String eventId) throws ServerFault, EventNotFoundException {
+		Event event = calendarDao.findEventById(token, Integer.valueOf(eventId));
+		String owner = event.getOwner();
+		if (owner == null) {
+			throw new ServerFault("Owner not found for event " + eventId);
 		}
+		
+		if (!helper.canReadCalendar(token, owner) && !helper.attendeesContainsUser(event.getAttendees(), token)) {
+			throw new ServerFault("user has no read rights on calendar " + calendar);
+		}
+		return event;
 	}
 
 	@Override

@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
@@ -300,7 +301,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testPurge() throws FindException, ServerFault, SQLException {
+	public void testPurge() throws FindException, ServerFault, SQLException, NumberFormatException, EventNotFoundException {
 		String calendar = "cal1";
 		String domainName = "domain1";
 		String userEmail = "user@domain1";
@@ -349,7 +350,7 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.listEventsByIntervalDate(eq(accessToken), eq(obmUser), isA(Date.class), 
 				isA(Date.class), (EventType)isNull())).
 			andReturn(ImmutableList.of(oldEventNoOtherAttendees, oldEventWithOtherAttendees)).once();
-		expect(calendarDao.findEvent(accessToken, Integer.parseInt(oldEventNoOtherAttendeesUid))).
+		expect(calendarDao.findEventById(accessToken, Integer.parseInt(oldEventNoOtherAttendeesUid))).
 			andReturn(oldEventNoOtherAttendees).atLeastOnce();
 		expect(calendarDao.removeEvent(accessToken, Integer.parseInt(oldEventNoOtherAttendeesUid), 
 				oldEventNoOtherAttendees.getType(), oldEventNoOtherAttendees.getSequence()+1)).
@@ -414,7 +415,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testAttendeeHasRightToWriteOnCalendar() throws FindException, ServerFault, SQLException {
+	public void testAttendeeHasRightToWriteOnCalendar() throws FindException, ServerFault, SQLException, EventNotFoundException {
 		String calendar = "cal1";
 		String domainName = "domain1";
 		String userEmail = "user@domain1";
@@ -464,7 +465,7 @@ public class CalendarBindingImplTest {
 		Assert.assertEquals(ParticipationState.ACCEPTED, newEvent.getAttendees().get(0).getState());
 	}
 	
-	public void testDontSendEmailsAndDontUpdateStatusForUnimportantChanges() throws ServerFault, FindException, SQLException {
+	public void testDontSendEmailsAndDontUpdateStatusForUnimportantChanges() throws ServerFault, FindException, SQLException, EventNotFoundException {
 		String calendar = "cal1";
 		String domainName = "domain1";
 		String userEmail = "user@domain1";

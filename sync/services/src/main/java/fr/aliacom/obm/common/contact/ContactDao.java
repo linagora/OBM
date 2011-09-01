@@ -49,6 +49,8 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ContactNotFoundException;
+import org.obm.sync.auth.EventNotFoundException;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
@@ -404,7 +406,7 @@ public class ContactDao {
 	}
 
 	private Integer createOrUpdateDate(AccessToken at, Connection con,
-			Contact c, Date date, String dateField) throws SQLException, FindException {
+			Contact c, Date date, String dateField) throws SQLException, FindException, EventNotFoundException, ServerFault {
 		int dateId = 0;
 		if (c.getUid() != null && c.getUid().intValue() != 0) {
 			logger.info("c.getUid != null");
@@ -435,7 +437,7 @@ public class ContactDao {
 				return e.getDatabaseId();
 			}
 			logger.info("eventId != null");
-			Event e = calendarDao.findEvent(at, dateId);
+			Event e = calendarDao.findEventById(at, dateId);
 			e.setDate(date);
 			calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false, true);
 			return e.getDatabaseId();
@@ -691,7 +693,7 @@ public class ContactDao {
 		}
 	}
 
-	public Contact modifyContact(AccessToken token, Contact c) throws SQLException, FindException {
+	public Contact modifyContact(AccessToken token, Contact c) throws SQLException, FindException, EventNotFoundException, ServerFault {
 
 		String q = "update Contact SET "
 			+ "contact_commonname=?, contact_firstname=?, "

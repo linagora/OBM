@@ -352,14 +352,9 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String getEventFromId(AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws ServerFault {
-		Event e = binding.getEventFromId(at, 
-				getCalendar(at, params), 
-				params.getParameter("id"));
-		if (e != null) {
-			return responder.sendEvent(e);
-		}
-		return responder.sendError("not found");
+			throws ServerFault, EventNotFoundException {
+		Event e = binding.getEventFromId(at, getCalendar(at, params), params.getParameter("id"));
+		return responder.sendEvent(e);
 	}
 
 	private String createEvent(
@@ -404,18 +399,13 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendError("Event did not exist.");
 	}
 	
-	private String removeEvent(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
-		throws ServerFault {
-		Event ev = binding.removeEvent(at, getCalendar(at, params),
-				params.getParameter("id"), 
-				i(params, "sequence", 0),
+	private String removeEvent(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, EventNotFoundException {
+		Event ev = binding.removeEvent(at, getCalendar(at, params), params.getParameter("id"), i(params, "sequence", 0),
 				getNotificationOption(params));
 		if (ev != null) {
 			return responder.sendEvent(ev);
 		}
 		return responder.sendError("Event did not exist.");
-
 	}
 	
 	private String removeEventByExtId(

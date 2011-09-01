@@ -53,9 +53,10 @@ public interface ICalendar {
 	 * @return the removed event on success, the found event if access rights
 	 *         are too low to remove but enough to read, and null if event was
 	 *         not found
+	 * @throws EventNotFoundException 
 	 */
 	Event removeEvent(AccessToken token, String calendar, String eventId,
-			int sequence, boolean notification) throws ServerFault;
+			int sequence, boolean notification) throws ServerFault, EventNotFoundException;
 
 	/**
 	 * FIXME: remove this service
@@ -115,8 +116,7 @@ public interface ICalendar {
 	 *         is present in its calendar, null if event is not found or user
 	 *         has not enough rights to read this event
 	 */
-	Event getEventFromId(AccessToken token, String calendar, String id)
-			throws ServerFault;
+	Event getEventFromId(AccessToken token, String calendar, String id) throws ServerFault, EventNotFoundException;
 
 	/**
 	 * Return id of events who have : - start date, subject and duration if not
