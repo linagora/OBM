@@ -363,21 +363,20 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		try {
 			boolean hasImportantChanges = hasImportantChanges(before, event);
-			if (hasImportantChanges)
+			if (hasImportantChanges) {
                 changePartipationStateOnWritableCalendar(token, event);
-			
-			int newSequence = hasImportantChanges ? before.getSequence() + 1 : before.getSequence();
-			final Event after = calendarDao.modifyEventForcingSequence(token, calendar, event, updateAttendees, 
-					newSequence, true);
+            }
+
+			final Event after = calendarDao.modifyEventForcingSequence(
+					token, calendar, event, updateAttendees, event.getSequence(), true);
 
 			if (after != null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
 			}
 
-			if (hasImportantChanges) {
-				ObmUser user = userService.getUserFromAccessToken(token);
-				eventChangeHandler.update(user, before, after, notification);
-			}
+            ObmUser user = userService.getUserFromAccessToken(token);
+			eventChangeHandler.update(user, before, after, notification, hasImportantChanges);
+
 			return after;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);

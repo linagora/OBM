@@ -66,7 +66,7 @@ public class EventChangeHandler {
 		if (notification && eventCreationInvolveNotification(event)) {
 			notifyCreate(user, attendees, event, ics);
 		}
-		if (notification && !eventCreatedByOwner(user, event)) {
+		if (notification && !isUserEventOwner(user, event)) {
 			notifyOwnerCreate(user, event, owner);
 		}
 	}
@@ -81,7 +81,7 @@ public class EventChangeHandler {
 		eventChangeMailer.notifyAcceptedNewUsers(ownerAsCollection, event, locale, timezone);
 	}
 
-	private boolean eventCreatedByOwner(ObmUser user, Event event) {
+	private boolean isUserEventOwner(ObmUser user, Event event) {
 		return user.getEmail().equals(event.getOwnerEmail());
 	}
 
@@ -115,7 +115,7 @@ public class EventChangeHandler {
 		}
 	}
 
-	public void update(ObmUser user, Event previous, Event current, boolean notification) 
+	public void update(ObmUser user, Event previous, Event current, boolean notification, boolean hasImportantChanges)
 			throws NotificationException {
 		
 		String addUserIcs = ical4jHelper.buildIcsInvitationRequest(user, current);
@@ -142,14 +142,14 @@ public class EventChangeHandler {
 			}
 
 			Set<Attendee> keptAttendees = attendeeGroups.get(AttendeeStateValue.KEPT);
-			if (!keptAttendees.isEmpty()) {
+			if (!keptAttendees.isEmpty() && hasImportantChanges) {
 				Map<ParticipationState, Set<Attendee>> atts = computeParticipationStateGroups(keptAttendees);
 				notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 				notifyNeedActionUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
 			}
 			
 			Attendee owner = findOwner(current);
-			if (owner != null && !eventCreatedByOwner(user, current)) {
+			if (owner != null && !isUserEventOwner(user, current) && hasImportantChanges) {
 				notifyOwnerUpdate(owner, previous, current, locale, timezone);
 			}
 		}
@@ -218,10 +218,10 @@ public class EventChangeHandler {
 			Map<ParticipationState, Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
 			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
  			if (!notify.isEmpty()) {
- 				UserSettings settings = settingsService.getSettings(user);
- 				eventChangeMailer.notifyRemovedUsers(notify, event, settings.locale(), settings.timezone(), removeUserIcs);
+				UserSettings settings = settingsService.getSettings(user);
+				eventChangeMailer.notifyRemovedUsers(notify, event, settings.locale(), settings.timezone(), removeUserIcs);
  			}
- 			if (owner != null && !eventCreatedByOwner(user, event)) {
+			if (owner != null && !isUserEventOwner(user, event)) {
  				notifyOwnerDelete(user, event, owner);
  			}
  		}
