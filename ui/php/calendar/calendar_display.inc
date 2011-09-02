@@ -3810,6 +3810,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
       if (is_array($calendar['new_resource_id'])) $res_id = $calendar['new_resource_id'];
       if (is_array($calendar['new_contact_id'])) $contacts_id = $calendar['new_contact_id'];
 
+      if (isset($calendar['organizer'])) $organizer_id = $calendar['organizer'];
       if (isset($calendar['template_id'])) {
         list($event_q, $template_entities) = run_query_calendar_get_template($calendar['template_id']);
         if(     check_loggued_user_is_the_only_attendee($users_id)
