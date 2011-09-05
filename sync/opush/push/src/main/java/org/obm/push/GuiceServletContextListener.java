@@ -23,12 +23,14 @@ import org.obm.push.service.DeviceService;
 import org.obm.push.service.OpushSyncPermsConfigurationService;
 import org.obm.push.service.impl.DeviceServiceImpl;
 import org.obm.push.store.DaoModule;
+import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
+import org.obm.push.store.jdbc.ItemTrackingDaoJdbcImpl;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
 				bind(DeviceService.class).to(DeviceServiceImpl.class);
 				bind(SyncPermsConfigurationService.class).to(OpushSyncPermsConfigurationService.class);
+				bind(ItemTrackingDao.class).to(ItemTrackingDaoJdbcImpl.class);
 			}
     	}, new TransactionalModule(), new DaoModule(), new OpushServletModule());
     }
