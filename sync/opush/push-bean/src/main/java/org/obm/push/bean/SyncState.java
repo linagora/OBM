@@ -22,6 +22,7 @@ public class SyncState implements Serializable {
 	private boolean lastSyncFiltred;
 	private String key;
 	private PIMDataType dataType;
+	private int id;
 
 	public SyncState(String path) {
 		this(path, null, null);
@@ -99,6 +100,14 @@ public class SyncState implements Serializable {
 				setLastSyncFiltred(true);
 			}
 		}
+	}
+
+	public int getId() {
+		return this.id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 
 }

@@ -170,7 +170,9 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 
 		try {
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("SELECT device_id, last_sync, collection_id FROM opush_sync_state WHERE sync_key=?");
+			ps = con.prepareStatement(
+					"SELECT id, device_id, last_sync, collection_id " +
+					"FROM opush_sync_state WHERE sync_key=?");
 			ps.setString(1, syncKey);
 
 			rs = ps.executeQuery();
@@ -178,6 +180,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 				Timestamp lastSync = rs.getTimestamp("last_sync");
 				ret = new SyncState(getCollectionPath(
 						rs.getInt("collection_id"), con));
+				ret.setId(rs.getInt("id"));
 				ret.setKey(syncKey);
 				ret.setLastSync(lastSync);
 			}
