@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.obm.push.bean.Email;
 import org.obm.push.utils.DateUtils;
+import org.obm.push.utils.index.IndexUtils;
 
 public class MailChanges {
 	
@@ -55,11 +56,11 @@ public class MailChanges {
 	}
 	
 	public Collection<Long> getRemovedToLong() {
-		return EmailFactory.listUIDFromEmail(getRemoved());
+		return IndexUtils.listIndexes(getRemoved());
 	}
 	
 	public Collection<Long> getUpdatedEmailFromImapToLong() {
-		return EmailFactory.listUIDFromEmail(getUpdatedEmailFromImap());
+		return IndexUtils.listIndexes(getUpdatedEmailFromImap());
 	}
 	
 	public Set<Email> getUpdatedEmailToDB() {

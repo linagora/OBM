@@ -241,7 +241,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 		}
 		return uids.build();
 	}
-
+	
 	private String buildListId(Collection<Long> uids) {
 		if (uids.isEmpty()) {
 			return "0";

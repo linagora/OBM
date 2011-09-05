@@ -2,7 +2,9 @@ package org.obm.push.bean;
 
 import java.util.Date;
 
-public class Email {
+import org.obm.push.utils.index.Indexed;
+
+public class Email implements Indexed<Long> {
 
 	private final long uid;
 	private final boolean read;
@@ -19,6 +21,11 @@ public class Email {
 		return uid;
 	}
 
+	@Override
+	public Long getIndex() {
+		return getUid();
+	}
+	
 	public boolean isRead() {
 		return read;
 	}
