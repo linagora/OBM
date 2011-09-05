@@ -371,16 +371,8 @@ ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_resource_calendar boolea
 -- empty sync_state table to force initial sync for all client devices
 -- and add a id column
 --
-DROP TABLE opush_sync_state;
-
-CREATE TABLE opush_sync_state (
-       id    		SERIAL PRIMARY KEY,
-       sync_key		VARCHAR(64) UNIQUE NOT NULL,
-       collection_id	INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
-       device_id	INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
-       last_sync	TIMESTAMP NOT NULL
-);
-
+DELETE FROM opush_sync_state;
+ALTER TABLE opush_sync_state ADD COLUMN id SERIAL PRIMARY KEY;
 
 CREATE TABLE opush_synced_item (
        id		SERIAL PRIMARY KEY,
