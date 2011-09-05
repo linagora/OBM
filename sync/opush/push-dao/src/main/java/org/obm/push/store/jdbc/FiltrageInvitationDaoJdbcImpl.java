@@ -36,7 +36,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 		ResultSet rs = null;
 
 		String query = "SELECT * FROM opush_invitation_mapping "
-				+ "JOIN event ON event_ext_id = event_uid "
+				+ "JOIN Event ON event_ext_id = event_uid "
 				+ "WHERE event_collection_id = ? AND event_uid = ? AND status = ? AND ( dtstamp > event_timeupdate OR event_timeupdate IS NULL)";
 
 		try {
