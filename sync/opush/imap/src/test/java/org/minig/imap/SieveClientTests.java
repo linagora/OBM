@@ -84,7 +84,7 @@ public class SieveClientTests extends SieveTestCase {
 			sc.deletescript(ss.getName());
 		}
 		scripts = sc.listscripts();
-		assertTrue(scripts.size() == 0);
+		assertTrue(scripts.isEmpty());
 	}
 
 	@Override

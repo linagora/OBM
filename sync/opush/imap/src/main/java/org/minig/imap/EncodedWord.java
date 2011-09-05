@@ -196,7 +196,7 @@ public class EncodedWord {
 		}
 
 		// No need to create encodedWords
-		if (words.size() == 0) {
+		if (words.isEmpty()) {
 			return result.append(input);
 		}
 

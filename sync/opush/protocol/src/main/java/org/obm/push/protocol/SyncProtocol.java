@@ -68,7 +68,7 @@ public class SyncProtocol {
 				DOMUtils.createElementAndText(ce, "Status", SyncStatus.OK.asXmlValue());
 
 				if (!collectionResponse.getSyncCollection().getSyncKey().equals("0")) {
-					if (collectionResponse.getSyncCollection().getFetchIds().size() == 0) {
+					if (collectionResponse.getSyncCollection().getFetchIds().isEmpty()) {
 						buildUpdateItemChange(syncResponse.getBackendSession(), collectionResponse, 
 								syncResponse.getProcessedClientIds(), ce, syncResponse.getEncoderFactory());
 					} else {

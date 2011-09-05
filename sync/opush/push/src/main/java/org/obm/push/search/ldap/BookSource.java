@@ -31,7 +31,7 @@ public class BookSource implements ISearchSource {
 
 	private String uniqueAttribute(String string, Map<String, List<String>> m) {
 		List<String> cnl = m.get(string);
-		if (cnl == null || cnl.size() == 0) {
+		if (cnl == null || cnl.isEmpty()) {
 			return "";
 		} else {
 			return cnl.get(0);
