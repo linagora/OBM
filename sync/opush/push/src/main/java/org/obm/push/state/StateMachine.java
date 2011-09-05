@@ -54,7 +54,9 @@ public class StateMachine {
 		newState.setId(syncStateId);
 		logger.info("Allocate new synckey {} for collectionPath {} with {} last sync", 
 				new Object[]{newState.getKey(), newState.getDataType().asXmlValue(), newState.getLastSync()});
-		itemTrackingDao.markAsSynced(newState, listNewItems(changes));
+		if (changes != null && !changes.isEmpty()) {
+			itemTrackingDao.markAsSynced(newState, listNewItems(changes));
+		}
 		
 		return newSk;
 	}
