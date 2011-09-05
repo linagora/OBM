@@ -145,24 +145,21 @@ public class SyncProtocol {
 		
 		for (ItemChange ic : c.getItemChanges()) {
 			String clientId = processedClientIds.get(ic.getServerId());
-			if (clientId != null) {
-				// Acks Add done by pda
+			if (itemChangeIsClientAddAck(clientId)) {
 				Element add = DOMUtils.createElement(responses, "Add");
 				DOMUtils.createElementAndText(add, "ClientId", clientId);
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-				DOMUtils.createElementAndText(add, "Status",
-						SyncStatus.OK.asXmlValue());
-			} else if (processedClientIds.keySet().contains(ic.getServerId())) {
-				// Change asked by device
+				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asXmlValue());
+			
+			} else if (itemChangeIsClientChangeAck(processedClientIds, ic)) {
 				Element add = DOMUtils.createElement(responses, "Change");
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-				DOMUtils.createElementAndText(add, "Status",
-						SyncStatus.OK.asXmlValue());
-			} else {
-				// New change done on server
-				Element add = DOMUtils.createElement(commands, "Add");
-				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-				serializeChange(bs, add, c.getSyncCollection(), ic, encoderFactory);
+				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asXmlValue());
+			} else { // New change done on server
+				String commandName = selectCommandName(ic);
+				Element command = DOMUtils.createElement(commands, commandName);
+				DOMUtils.createElementAndText(command, "ServerId", ic.getServerId());
+				serializeChange(bs, command, c.getSyncCollection(), ic, encoderFactory);
 			}
 			processedClientIds.remove(ic.getServerId());
 		}
@@ -199,6 +196,23 @@ public class SyncProtocol {
 		if (commands.getChildNodes().getLength() == 0) {
 			commands.getParentNode().removeChild(commands);
 		}
+	}
+
+	private String selectCommandName(ItemChange itemChange) {
+		if (itemChange.isNew()) {
+			return "Add";
+		} else {
+			return "Change";
+		}
+	}
+
+	private boolean itemChangeIsClientChangeAck(
+			Map<String, String> processedClientIds, ItemChange ic) {
+		return processedClientIds.keySet().contains(ic.getServerId());
+	}
+
+	private boolean itemChangeIsClientAddAck(String clientId) {
+		return clientId != null;
 	}
 	
 	private static void serializeDeletion(Element commands, ItemChange ic) {
