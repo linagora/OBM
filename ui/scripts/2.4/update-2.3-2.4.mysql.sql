@@ -283,6 +283,44 @@ ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_opacity` enum('OPAQUE','TR
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_user_calendar` boolean default 0 AFTER eventtemplate_opacity;
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_resource_calendar` boolean default 0 AFTER eventtemplate_show_user_calendar;
 
+CREATE TABLE `opush_synced_item` (
+       `device_id`        INTEGER NOT NULL,
+       `collection_id`	  INTEGER NOT NULL,
+       `item_id`          INTEGER NOT NULL,
+       KEY `opush_synced_item_device_id_opush_device_id_fkey` (`device_id`),
+       KEY `opush_synced_item_collection_id_opush_folder_mapping_id_fkey` (`collection_id`),
+       CONSTRAINT `opush_synced_item_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE,
+       CONSTRAINT `opush_synced_item_collection_id_opush_folder_mapping_id_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE,
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- store last sync dates
+DROP TABLE IF EXISTS `opush_sync_state`;
+CREATE TABLE `opush_sync_state` (
+        `id` INTEGER NOT NULL auto_increment,
+        `sync_key`        VARCHAR(64) UNIQUE NOT NULL,
+        `collection_id`   INTEGER NOT NULL,
+        `device_id`       INTEGER NOT NULL,
+        `last_sync`       TIMESTAMP NOT NULL,
+	PRIMARY KEY  (`id`),
+        KEY `opush_sync_state_collection_id_opush_folder_mapping_id_fkey` (`collection_id`),
+        KEY `opush_sync_state_device_id_opush_device_id_fkey` (`device_id`),
+        CONSTRAINT `opush_sync_state_collection_id_opush_folder_mapping_id_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE,
+        CONSTRAINT `opush_sync_state_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `opush_synced_item` (
+       `id` INTEGER NOT NULL auto_increment,
+       `sync_state_id`	  INTEGER NOT NULL,
+       `item_id`          INTEGER NOT NULL,
+       PRIMARY KEY  (`id`),
+       KEY `opush_synced_item_sync_state_id_opush_sync_state_id_fkey` (`sync_state_id`),
+       CONSTRAINT `opush_synced_item_sync_state_id_opush_sync_state_id_fkey` FOREIGN KEY (`sync_state_id`) REFERENCES `opush_sync_state` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 -- ----------------------------------------------------------------------------

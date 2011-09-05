@@ -367,6 +367,27 @@ ALTER TABLE EventTemplate ADD COLUMN eventtemplate_opacity vopacity DEFAULT 'OPA
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_user_calendar boolean DEFAULT false;
 ALTER TABLE EventTemplate ADD COLUMN eventtemplate_show_resource_calendar boolean DEFAULT false;
 
+-- 
+-- empty sync_state table to force initial sync for all client devices
+-- and add a id column
+--
+DROP TABLE opush_sync_state;
+
+CREATE TABLE opush_sync_state (
+       id    		SERIAL PRIMARY KEY,
+       sync_key		VARCHAR(64) UNIQUE NOT NULL,
+       collection_id	INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
+       device_id	INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
+       last_sync	TIMESTAMP NOT NULL
+);
+
+
+CREATE TABLE opush_synced_item (
+       id		SERIAL PRIMARY KEY,
+       sync_state_id	INTEGER NOT NULL REFERENCES opush_sync_state(id) ON DELETE CASCADE,
+       item_id		INTEGER NOT NULL
+);
+
 
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed

@@ -11586,10 +11586,17 @@ CREATE TABLE opush_folder_mapping (
 
 -- store last sync dates
 CREATE TABLE opush_sync_state (
+       id    		SERIAL PRIMARY KEY,
        sync_key		VARCHAR(64) UNIQUE NOT NULL,
        collection_id	INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
        device_id	INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
        last_sync	TIMESTAMP NOT NULL
+);
+
+CREATE TABLE opush_synced_item (
+       id		SERIAL PRIMARY KEY,
+       sync_state_id	INTEGER NOT NULL REFERENCES opush_sync_state(id) ON DELETE CASCADE,
+       item_id		INTEGER NOT NULL
 );
 
 CREATE TABLE opush_sec_policy (
