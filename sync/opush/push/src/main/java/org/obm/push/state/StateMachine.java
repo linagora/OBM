@@ -50,10 +50,12 @@ public class StateMachine {
 		
 		final String newSk = UUID.randomUUID().toString();
 		final SyncState newState = new SyncState(collectionDao.getCollectionPath(collectionId), newSk, lastSync);
-		collectionDao.updateState(bs.getDevice(), collectionId, newState);
+		final int syncStateId = collectionDao.updateState(bs.getDevice(), collectionId, newState);
+		newState.setId(syncStateId);
 		logger.info("Allocate new synckey {} for collectionPath {} with {} last sync", 
 				new Object[]{newState.getKey(), newState.getDataType().asXmlValue(), newState.getLastSync()});
 		itemTrackingDao.markAsSynced(newState, listNewItems(changes));
+		
 		return newSk;
 	}
 

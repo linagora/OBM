@@ -20,7 +20,11 @@ public interface CollectionDao {
 
 	void resetCollection(Device device, Integer collectionId) throws DaoException;
 	
-	void updateState(Device device, Integer collectionId, SyncState state) throws DaoException;
+	/**
+	 * Create a new SyncState entry in database and returns its unique id
+	 * @return SyncState database unique id
+	 */
+	int updateState(Device device, Integer collectionId, SyncState state) throws DaoException;
 
 	SyncState findStateForKey(String syncKey) throws DaoException, CollectionNotFoundException;
 	

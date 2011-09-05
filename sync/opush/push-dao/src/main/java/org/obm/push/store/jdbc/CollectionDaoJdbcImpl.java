@@ -142,7 +142,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 	
 	@Override
-	public void updateState(Device device, Integer collectionId, SyncState state) throws DaoException {
+	public int updateState(Device device, Integer collectionId, SyncState state) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -153,7 +153,11 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps.setInt(2, devDbId);
 			ps.setTimestamp(3, new Timestamp(state.getLastSync().getTime()));
 			ps.setInt(4, collectionId);
-			ps.executeUpdate();
+			if (ps.executeUpdate() == 0) {
+				throw new DaoException("No SyncState inserted");
+			} else {
+				return dbcp.lastInsertId(con);
+			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
