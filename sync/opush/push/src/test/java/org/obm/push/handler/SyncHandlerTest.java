@@ -1,15 +1,12 @@
 package org.obm.push.handler;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.xml.transform.TransformerException;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -26,23 +23,19 @@ import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncState;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.handler.SyncHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.data.CalendarEncoder;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.state.StateMachine;
+import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
-
 
 import com.google.common.collect.ImmutableList;
 
@@ -50,7 +43,7 @@ public class SyncHandlerTest {
 	
 	@Ignore("I'm wait for the task of 'backendsession stateless' is completed !")
 	@Test
-	public void testProcessResponseWithAccents() throws IOException, TransformerException, DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException{
+	public void testProcessResponseWithAccents() throws Exception {
 
 		String expectedString = "éàâ";
 		int collectionId = 0;
@@ -81,9 +74,11 @@ public class SyncHandlerTest {
 		
 		IContentsExporter exporter = EasyMock.createMock(IContentsExporter.class);
 		
+		ServerId serverId = new ServerId("13:2343");
+		
 		Set<ItemChange> itemChanges = new HashSet<ItemChange>();
 		ItemChange itemChange = new ItemChange();
-		itemChange.setServerId("serverId");
+		itemChange.setServerId(serverId.toString());
 		itemChange.setData(event);
 		itemChanges.add(itemChange);
 		EasyMock.expectLastCall().andReturn(itemChanges).anyTimes();
@@ -91,7 +86,7 @@ public class SyncHandlerTest {
 		StateMachine stateMachine = EasyMock.createMock(StateMachine.class); 
 		stateMachine.getSyncState(collectionId, syncKey);
 		EasyMock.expectLastCall().andReturn(syncState);
-		stateMachine.allocateNewSyncKey(bs, collectionId, null);
+		stateMachine.allocateNewSyncKey(bs, collectionId, null, itemChanges);
 		EasyMock.expectLastCall().andReturn("newSyncKey");
 		
 		IBackend backend = EasyMock.createMock(IBackend.class);
@@ -100,10 +95,13 @@ public class SyncHandlerTest {
 		encoderFactory.getEncoder(event);
 		EasyMock.expectLastCall().andReturn(new CalendarEncoder());
 		
+		ItemTrackingDao itemTrackingDao = EasyMock.createMock(ItemTrackingDao.class);
+		EasyMock.expect(itemTrackingDao.isServerIdSynced(syncState, serverId)).andReturn(false);
+		
 		UnsynchronizedItemDao synchronizedItemCache = EasyMock.createMock(UnsynchronizedItemDao.class);
 		MonitoredCollectionDao monitoredCollectionStoreService = EasyMock.createMock(MonitoredCollectionDao.class);
 		SyncHandler syncHandler = new SyncHandler(backend, encoderFactory, null, exporter, 
-				stateMachine, synchronizedItemCache, monitoredCollectionStoreService, null, null);
+				stateMachine, synchronizedItemCache, monitoredCollectionStoreService, null, null, itemTrackingDao);
 				
 		Responder responder = EasyMock.createMock(Responder.class);
 		Capture<Document> document = new Capture<Document>();

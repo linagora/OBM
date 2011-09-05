@@ -18,6 +18,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.FolderSyncProtocol;
@@ -70,6 +71,8 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
 		} catch (UnknownObmSyncServerException e) {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
+		} catch (InvalidServerId e) {
+			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
 		}
 	}
 
@@ -92,7 +95,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	
 	@Transactional(propagation=Propagation.NESTED)
 	private FolderSyncResponse doTheJob(BackendSession bs, FolderSyncRequest folderSyncRequest) throws
-			InvalidSyncKeyException, DaoException, UnknownObmSyncServerException {
+			InvalidSyncKeyException, DaoException, UnknownObmSyncServerException, InvalidServerId {
 		
 		// FIXME we know that we do not monitor hierarchy, so just respond
 		// that nothing changed
@@ -103,16 +106,17 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 
 		try {
 			if (isFirstSync(folderSyncRequest)) {
-				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null);
 				List<ItemChange> changed = hierarchyExporter.getChanged(bs);
+				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed);
 				return new FolderSyncResponse(changed, newSyncKey);
 			} else {
 				SyncState syncState = stMachine.getSyncState(rootFolderCollectionId, folderSyncRequest.getSyncKey());
 				if (!syncState.isValid()) {
 					throw new InvalidSyncKeyException();
 				}
-				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null);
-				return new FolderSyncResponse(ImmutableList.<ItemChange>of(), newSyncKey);
+				ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
+				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed);
+				return new FolderSyncResponse(changed, newSyncKey);
 			}
 		} catch (CollectionNotFoundException e) {
 			throw new DaoException(e);

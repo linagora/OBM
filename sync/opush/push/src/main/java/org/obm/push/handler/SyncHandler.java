@@ -26,6 +26,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ServerId;
 import org.obm.push.bean.Sync;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
@@ -35,6 +36,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -49,6 +51,7 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.w3c.dom.Document;
@@ -86,6 +89,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final SyncProtocol syncProtocol;
 	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	private final MonitoredCollectionDao monitoredCollectionService;
+	private final ItemTrackingDao itemTrackingDao;
 
 	static {
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
@@ -95,12 +99,13 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
 			StateMachine stMachine, UnsynchronizedItemDao unSynchronizedItemCache,
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
-			CollectionDao collectionDao) {
+			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, stMachine, collectionDao);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.monitoredCollectionService = monitoredCollectionService;
 		this.syncProtocol = SyncProtocol;
+		this.itemTrackingDao = itemTrackingDao;
 	}
 
 	@Override
@@ -117,7 +122,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 						 modificationStatus.processedClientIds, continuation);
 				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 			} 
-			
+		} catch (InvalidServerId e) {
+			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), e);
 		} catch (ProtocolException convExpt) {
 			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), convExpt);
 		} catch (PartialException pe) {
@@ -397,13 +403,15 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (ProcessingEmailException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
+		} catch (InvalidServerId e) {
+			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), e);			
 		}
 	}
 
 	@Transactional
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, 
-			CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
+			CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId {
 
 		final List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
@@ -418,7 +426,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			syncCollectionResponse.setSyncStateValid(syncStateValid);
 			if (syncStateValid) {
 
-				Date syncDate = null;
+				Date syncDate = st.getLastSync();
 				if (!c.getSyncKey().equals("0")) {
 					if (c.getFetchIds().isEmpty()) {
 						syncDate = doUpdates(bs, c, processedClientIds, syncCollectionResponse);
@@ -427,12 +435,25 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 						syncCollectionResponse.setItemChanges(itemChanges);
 					}
 				}
-				syncCollectionResponse.setNewSyncKey(stMachine.allocateNewSyncKey(bs, c.getCollectionId(), syncDate));
+				identifyNewItems(syncCollectionResponse, st);
+				String newSyncKey = stMachine.allocateNewSyncKey(bs, c.getCollectionId(), syncDate, syncCollectionResponse.getItemChanges());
+				syncCollectionResponse.setNewSyncKey(newSyncKey);
 			}
 			syncCollectionResponses.add(syncCollectionResponse);
 		}
 		logger.info("Resp for requestId = {}", continuation.getReqId());
 		return new SyncResponse(syncCollectionResponses, bs, getEncoders(), processedClientIds);
+	}
+
+	private void identifyNewItems(
+			SyncCollectionResponse syncCollectionResponse, SyncState st)
+			throws DaoException, InvalidServerId {
+		
+		for (ItemChange change: syncCollectionResponse.getItemChanges()) {
+			boolean isItemAddition = st.getKey().equals("0") || 
+					!itemTrackingDao.isServerIdSynced(st, new ServerId(change.getServerId()));
+			change.setIsNew(isItemAddition);
+		}
 	}
 
 	
