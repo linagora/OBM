@@ -434,8 +434,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 						List<ItemChange> itemChanges = contentsExporter.fetch(bs, c.getSyncState().getDataType(), c.getFetchIds());
 						syncCollectionResponse.setItemChanges(itemChanges);
 					}
+					identifyNewItems(syncCollectionResponse, st);
 				}
-				identifyNewItems(syncCollectionResponse, st);
 				String newSyncKey = stMachine.allocateNewSyncKey(bs, c.getCollectionId(), syncDate, syncCollectionResponse.getItemChanges());
 				syncCollectionResponse.setNewSyncKey(newSyncKey);
 			}
