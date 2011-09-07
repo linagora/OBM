@@ -2387,6 +2387,11 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       }
     }
   }
+  else {
+      $sequence_number = $oldEvent->sequence;
+      $ext_id = $oldEvent->uid;
+      $new_id = $oldEvent->id;
+  }
 
   $sql_id = sql_parse_id($id);
   $sql_new_id = ( $new_id ? sql_parse_id($new_id) : 'NULL' );

@@ -54,6 +54,7 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
   private $user;
   private $resource;
   private $contact;
+  private $sequence;
 
 
   /**
@@ -433,6 +434,7 @@ class OBM_EventFactory /*Implements OBM_Subject*/{
     $event = new OBM_Event($id);
     $event->title = $this->db->f('event_title');
     $event->uid = $this->db->f('event_ext_id');
+    $event->sequence = $this->db->f('event_sequence');
     $event->owner = new OBM_EventAttendee($this->db->f('userobm_id'), null, $this->db->f('userobm_firstname').' '.$this->db->f('userobm_lastname')) ;
     $event->opacity = $this->db->f('event_opacity');
     $event->location = $this->db->f('event_location');
