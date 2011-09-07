@@ -4,17 +4,27 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
+import javax.naming.ConfigurationException;
+
 import org.apache.commons.io.IOUtils;
+import org.obm.configuration.ObmConfigurationService;
+import org.obm.locator.store.LocatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LocatorClient {
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	private static final Logger logger = LoggerFactory.getLogger(LocatorClient.class);
+@Singleton
+public class LocatorClientImpl implements LocatorService {
+
+	private static final Logger logger = LoggerFactory.getLogger(LocatorClientImpl.class);
+	
 	private final String locatorUrl;
 
-	public LocatorClient(String LocatorUrl) {
-		locatorUrl = ensureTrailingSlash(LocatorUrl);
+	@Inject
+	private LocatorClientImpl(ObmConfigurationService obmConfigurationService) throws ConfigurationException {
+		locatorUrl = ensureTrailingSlash( obmConfigurationService.getLocatorUrl() );
 	}
 
 	private String ensureTrailingSlash(String url) {
@@ -23,7 +33,8 @@ public class LocatorClient {
 		}
 		return url + "/";
 	}
-
+	
+	@Override
 	public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) {
 		String url = buildFullServiceUrl(serviceSlashProperty, loginAtDomain);
 		InputStream is = null;
@@ -38,7 +49,7 @@ public class LocatorClient {
 			IOUtils.closeQuietly(is);
 		}
 	}
-
+	
 	private String buildFullServiceUrl(String serviceSlashProperty, String loginAtDomain) {
 		return locatorUrl + "location/host/" + serviceSlashProperty + "/" + loginAtDomain;
 	}

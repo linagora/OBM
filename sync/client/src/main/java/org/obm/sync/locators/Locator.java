@@ -1,9 +1,7 @@
 package org.obm.sync.locators;
 
-import javax.naming.ConfigurationException;
-
 import org.obm.configuration.ObmConfigurationService;
-import org.obm.locator.LocatorClient;
+import org.obm.locator.store.LocatorService;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,13 +9,13 @@ import com.google.inject.Singleton;
 @Singleton
 public class Locator {
 
-	private final LocatorClient locatorClient;
+	private final LocatorService locatorService;
 	private final ObmConfigurationService configurationService;
 
 	@Inject
-	private Locator(ObmConfigurationService configurationService) throws ConfigurationException {
+	private Locator(ObmConfigurationService configurationService, LocatorService locatorService) {
 		this.configurationService = configurationService;
-		this.locatorClient = new LocatorClient(configurationService.getLocatorUrl());
+		this.locatorService = locatorService;
 	}
 	
 	public String backendUrl(String loginAtDomain) {
@@ -26,7 +24,7 @@ public class Locator {
 	}
 	
 	private String getObmSyncHost(String loginAtDomain) {
-		return locatorClient.getServiceLocation("sync/obm_sync", loginAtDomain);
+		return locatorService.getServiceLocation("sync/obm_sync", loginAtDomain);
 	}
 	
 }

@@ -26,8 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.naming.ConfigurationException;
-
 import org.columba.ristretto.message.Address;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
@@ -37,8 +35,7 @@ import org.minig.imap.ListInfo;
 import org.minig.imap.ListResult;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
-import org.obm.configuration.ObmConfigurationService;
-import org.obm.locator.LocatorClient;
+import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
@@ -67,26 +64,26 @@ public class EmailManager implements IEmailManager {
 	
 	private final EmailDao emailDao;
 	private final SmtpSender smtpProvider;
-	private final LocatorClient locatorClient;
+	private final LocatorService locatorService;
 	private final EmailSync emailSync;
 	private final boolean loginWithDomain;
 	private final boolean activateTLS;
 	
 	@Inject
-	private EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, ObmConfigurationService configurationService,
-			SmtpSender smtpSender, EmailSync emailSync) throws ConfigurationException {
+	private EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, SmtpSender smtpSender, 
+			EmailSync emailSync, LocatorService locatorService) {
 		
 		this.emailSync = emailSync;
-		this.locatorClient = new LocatorClient(configurationService.getLocatorUrl());
 		this.smtpProvider = smtpSender;
 		this.emailDao = emailDao;
+		this.locatorService = locatorService;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.activateTLS = emailConfiguration.activateTls();
 	}
 
 	@Override
 	public String locateImap(BackendSession bs) {
-		String locateImap = locatorClient.
+		String locateImap = locatorService.
 				getServiceLocation("mail/imap_frontend", bs.getLoginAtDomain());
 		logger.info("Using {} as imap host.", locateImap);
 		return locateImap;

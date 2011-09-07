@@ -40,7 +40,12 @@ public abstract class AbstractConfigurationService {
 		return Boolean.valueOf(getStringValue(prop)).booleanValue();
 	}
 
-	public int getIntValue(String prop) {
-		return Integer.parseInt(getStringValue(prop));
+	public int getIntValue(String prop, int defaultValue) {
+		try {
+			return Integer.parseInt(getStringValue(prop));
+		} catch (NumberFormatException nfe) {
+			return defaultValue;
+		}
 	}
+	
 }

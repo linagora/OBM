@@ -18,12 +18,15 @@
 package org.obm.configuration;
 
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.store.StoreNotFoundException;
 
-public class ObmConfigurationService extends AbstractConfigurationService{
+import com.google.common.collect.ImmutableMap;
+
+public class ObmConfigurationService extends AbstractConfigurationService {
 
 	private final static String LOCATOR_PORT = "8082";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
@@ -31,8 +34,14 @@ public class ObmConfigurationService extends AbstractConfigurationService{
 	private final static String OBM_SYNC_PORT = "8080";
 	private final static String OBM_SYNC_APP_NAME = "obm-sync/services";
 	
+	private final ImmutableMap<String, TimeUnit> timeUnits;
+	
 	public ObmConfigurationService() {
 		super("/etc/obm/obm_conf.ini");
+		timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
+								"seconds", TimeUnit.SECONDS,
+								"minutes", TimeUnit.MINUTES,
+								"hours", TimeUnit.HOURS);
 	}
 
 	public String getLocatorUrl() throws ConfigurationException {
@@ -57,6 +66,25 @@ public class ObmConfigurationService extends AbstractConfigurationService{
 	
 	public String getObmSyncUrl(String obmSyncHost) {
 		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
+	}
+	
+	public int getLocatorCacheTimeout() {
+		return getIntValue("locator-cache-timeout", 30);
+	}
+	
+	public TimeUnit getLocatorCacheTimeUnit() {
+		String key = getStringValue("locator-cache-timeunit");
+		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
+	}
+	
+	private TimeUnit getTimeUnitOrDefault(String key, TimeUnit defaultUnit) {
+		if (key != null) {
+			TimeUnit unit = timeUnits.get(key.toLowerCase());
+			if (unit != null) {
+				return unit;
+			}
+		}
+		return defaultUnit;
 	}
 
 }

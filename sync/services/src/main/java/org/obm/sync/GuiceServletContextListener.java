@@ -13,6 +13,8 @@ import javax.servlet.ServletContextListener;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.dbcp.DBCP;
 import org.obm.dbcp.IDBCP;
+import org.obm.locator.store.LocatorService;
+import org.obm.locator.store.LocatorCache;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 
@@ -68,7 +70,8 @@ public class GuiceServletContextListener implements ServletContextListener {
     			bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
     			bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
     			bind(IDBCP.class).to(DBCP.class);
-
+    			bind(LocatorService.class).to(LocatorCache.class);
+    			
     		    ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader.load( FreeBusyPluginModule.class );
     		    
     		    List<FreeBusyPluginModule> pluginModulesList = new ArrayList<FreeBusyPluginModule>();

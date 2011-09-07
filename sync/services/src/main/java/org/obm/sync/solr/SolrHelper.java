@@ -8,12 +8,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.ConfigurationException;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.obm.locator.LocatorClient;
+import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
@@ -22,8 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import fr.aliacom.obm.services.constant.ConstantService;
 
 /**
  * Manages full-text indexing of events & contacts in a SOLR server
@@ -37,19 +33,20 @@ public class SolrHelper {
 	public static class Factory {
 		private final HttpClient client;
 		private final MultiThreadedHttpConnectionManager manager;
-		private final String locatorUrl;
 		private final ExecutorService executor;
 		private final ContactIndexer.Factory contactIndexerFactory;
 		private final org.obm.sync.solr.EventIndexer.Factory eventIndexerFactory;
 		private final LinkedBlockingQueue<Runnable> workQueue;
 		private final Timer debugTimer;
+		private final LocatorService locatorService;
 		
 		@Inject
-		private Factory(ConstantService constantService, ContactIndexer.Factory contactIndexerFactory,
-				EventIndexer.Factory eventIndexerFactory) throws ConfigurationException {
+		private Factory(ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory, 
+				LocatorService locatorService) {
+			
 			this.contactIndexerFactory = contactIndexerFactory;
 			this.eventIndexerFactory = eventIndexerFactory;
-			locatorUrl = constantService.getLocatorUrl();
+			this.locatorService = locatorService;
 			manager = new MultiThreadedHttpConnectionManager();
 			workQueue = new LinkedBlockingQueue<Runnable>();
 			executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, workQueue);
@@ -76,7 +73,7 @@ public class SolrHelper {
 		}
 
 		public SolrHelper createClient(AccessToken at) throws MalformedURLException {
-			return new SolrHelper(at, locatorUrl, client, executor, contactIndexerFactory, eventIndexerFactory);
+			return new SolrHelper(at, locatorService, client, executor, contactIndexerFactory, eventIndexerFactory);
 		}
 	}
 	
@@ -87,20 +84,20 @@ public class SolrHelper {
 	private final int domain;
 	private final org.obm.sync.solr.EventIndexer.Factory eventIndexerFactory;
 
-	private SolrHelper(AccessToken at, String locatorUrl, HttpClient client, ExecutorService executor, 
+	private SolrHelper(AccessToken at, LocatorService locatorClient, HttpClient client, ExecutorService executor, 
 			ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory) throws MalformedURLException {
+		
 		this.eventIndexerFactory = eventIndexerFactory;
 		this.domain = at.getDomainId();
 		this.executor = executor;
 		this.contactIndexerFactory = contactIndexerFactory;
-		LocatorClient lc = new LocatorClient(locatorUrl);
 
 		sContact = new CommonsHttpSolrServer("http://"
-				+ lc.getServiceLocation("solr/contact", at.getUser() + "@"
+				+ locatorClient.getServiceLocation("solr/contact", at.getUser() + "@"
 						+ at.getDomain()) + ":8080/solr/contact", client);
 
 		sEvent = new CommonsHttpSolrServer("http://"
-				+ lc.getServiceLocation("solr/event", at.getUser() + "@"
+				+ locatorClient.getServiceLocation("solr/event", at.getUser() + "@"
 						+ at.getDomain()) + ":8080/solr/event", client);
 	}
 	
