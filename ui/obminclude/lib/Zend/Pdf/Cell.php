@@ -177,7 +177,7 @@ class Zend_Pdf_Cell {
 		$align = null;//$this->_text[$this->_lineNumber]['alignment'];
 		$offset = 0;//$this->_text[$this->_lineNumber]['x'];
 		//if adding this section over flows borders
-		if ($lineWidth+$section['width'] > $maxWidth) {
+		if ($lineWidth > 0 && $lineWidth+$section['width'] > $maxWidth) {
 			//section of text is greater than our box's diminsions
 			$splitSection=explode(' ',$section['text']);
 			$maxTextSection=$this->_makeTextSection(array_shift($splitSection).' ', $encoding);
