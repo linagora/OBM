@@ -1829,7 +1829,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   run_query_calendar_add_event_links($new_entities['user'], $new_entities['contact'], $new_entities['resource'], $event_id);
   
   if (hasEventChanged($oldEvent, $updatedEvent)) {
-    run_query_calendar_reset_event_links($same_entities['user'], $same_entities['contact'], $same_entities['resource'], $event_id);
+    run_query_calendar_reset_event_links($same_entities['user'], $same_entities['contact'], $same_entities['resource'], $oldEvent->uid);
 	run_query_increment_sequence($oldEvent->uid);
   }
   
@@ -2244,28 +2244,28 @@ function run_query_calendar_add_event_links($users, $contacts, $resources, $even
   }
 }
 
-function run_query_calendar_reset_event_links($users, $contacts, $resources, $event_id) {
+function run_query_calendar_reset_event_links($users, $contacts, $resources, $event_ext_id) {
   global $obm;
   
   if (is_array($users)) {
     $users = array_unique($users);
     foreach ($users as $user_id) {
       if ($user_id != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
-        run_query_calendar_update_entity_event('user', $user_id, $event_id, 'NEEDS-ACTION');
+        run_query_calendar_update_entity_recurrent_event('user', $user_id, $event_ext_id, 'NEEDS-ACTION');
       }
     }
   }
   if (is_array($contacts)) {
     $contacts = array_unique($contacts);
     foreach ($contacts as $contact_id) {
-      run_query_calendar_update_entity_event('contact', $contact_id, $event_id, 'NEEDS-ACTION');
+      run_query_calendar_update_entity_recurrent_event('contact', $contact_id, $event_ext_id, 'NEEDS-ACTION');
     }
   }
   if (is_array($resources)) {
     $resources = array_unique($resources);
     foreach ($resources as $res_id) {
       if (!OBM_Acl::canWrite($obm['uid'], 'resource', $res_id)) {
-        run_query_calendar_update_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
+        run_query_calendar_update_entity_recurrent_event('resource', $res_id, $event_ext_id, 'NEEDS-ACTION');
       }
     }
   }
@@ -2524,11 +2524,12 @@ function run_query_quick_attendee_update($params, $eve_q) {
   global $obm, $cgp_host;
 
   $event_id = $eve_q->f('event_id');
+  $oldEvent = OBM_EventFactory::getInstance()->getById($event_id);
   $entities = get_calendar_event_entity($event_id);
   $users = isset($entities['user']) ? $entities['user']['ids'] : array();
   $contacts = isset($entities['contact']) ? $entities['contact']['ids'] : array();
   $resources = isset($entities['resources']) ? $entities['resources']['ids'] : array();
-  run_query_calendar_reset_event_links($users, $contacts, $resources, $event_id);
+  run_query_calendar_reset_event_links($users, $contacts, $resources, $oldEvent->uid);
 }
 
 
