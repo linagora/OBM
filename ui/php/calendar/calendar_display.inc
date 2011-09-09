@@ -2714,6 +2714,8 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $sel_ent = "data-$entity_kind-$entity_id";
   $entity_info = get_entity_info($entity_id, $entity_kind);
 
+  $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS['path'].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
+
   foreach($conflicts as $conflict) {
     $private = true;
     $id = $conflict->event->id;

@@ -194,6 +194,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'decision') {
 ///////////////////////////////////////////////////////////////////////////////
+  $extra_js_include[] = 'freebusy.js';
   if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
     $display['detail'] = html_calendar_dis_conflict($params, $conflicts) ;
     $display['detail'] .= html_calendar_conflict_form($params);
