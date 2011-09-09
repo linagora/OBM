@@ -95,6 +95,7 @@ class Of_Date extends DateTime {
   const RFC_1123       = 'D, d M y H:i:s O';// --- DATE_RFC1123
   const RSS            = 'D, d M Y H:i:s P';// --- DATE_RSS
   const W3C            = 'c';              // --- DATE_W3C
+  const SOLR            = 'Y-m-d\TH:i:s\Z';              // --- DATE_W3C
 
   // OBM Format 
   const OBM_DATE_DAY            = 'l j F Y';

@@ -131,9 +131,13 @@ function dis_calendar_search_result($calendar, $current_view) {
     $end->setMinute(0);
     $end->setSecond(0);
     $end->addDay(1);
+    
+    $solrBegan = $begin->get(Of_Date::SOLR);
+    $solrEnd = $end->get(Of_Date::SOLR);
+    $pattern = "+(date:[$solrBegan TO $solrEnd] OR is:periodic)";
 
     if (isset($calendar['title']) && $calendar['title'] != '') {
-      $pattern = "title:(".$calendar['title'].')';
+      $pattern .= " title:(".$calendar['title'].')';
     }    
     if (isset($calendar['location']) && $calendar['location'] != '') {
       $pattern .= " location:(".$calendar['location'].')';
