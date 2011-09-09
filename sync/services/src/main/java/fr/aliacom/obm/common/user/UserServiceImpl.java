@@ -61,7 +61,11 @@ public class UserServiceImpl implements UserService {
 					+ " not found");
 			throw new FindException("Domain["+domainName+"] not exist or not valid");
 		}
-		ObmUser user = userDao.findUserByLogin(username, domain);
+		// Lowercase the username, we're going to attempt to match it against the
+		// login, and all logins in the DB are lowercase, while usernames might not be so,
+		// especially if provisioning from LDAP is involved (OBMFULL-2553)
+		String lcUsername = username.toLowerCase();
+		ObmUser user = userDao.findUserByLogin(lcUsername, domain);
 		if (user == null || StringUtils.isEmpty(user.getEmail())) {
 			logger.info("user :" + calendar	+ " not found, archived or have no email");
 			throw new FindException("Calendar not exist or not valid");
