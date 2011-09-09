@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
 	private final UserDao userDao;
 
 	@Inject
-	private UserServiceImpl(DomainService domainService, UserDao userDao) {
+	/* package */ UserServiceImpl(DomainService domainService, UserDao userDao) {
 		this.domainService = domainService;
 		this.userDao = userDao;
 	}
