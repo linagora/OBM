@@ -4190,18 +4190,21 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $uid = $obm['uid']; 
   $tagcolor = "#eff0f2" ; // backcolor by default
   $organizer_name = null;
+  $organizer_id = null;
 
   // Gets the organizerName
-  foreach($users['entity'] as $organizer_id=>$user_entity){
+  foreach($users['entity'] as $user_id=>$user_entity){
     if($user_entity["is_organizer"]){
       $organizer_name = $user_entity["label"];
+      $organizer_id = $user_id;
       break;
     }
   }
   if(empty($organizer_name) && is_array($contacts['entity'])){
-    foreach($contacts['entity'] as $organizer_id=>$contact_entity){
+    foreach($contacts['entity'] as $contact_id=>$contact_entity){
       if($contact_entity["is_organizer"]){
         $organizer_name = $contact_entity["label"];
+        $organizer_id = $contact_id;
         break;
       }
     }
