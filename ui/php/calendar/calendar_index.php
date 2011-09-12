@@ -1153,7 +1153,9 @@ if ($action == 'search') {
     $current_view->set_contacts($displayed_contacts);
     redirect_ok($params, "$l_add_shared_calendar_ok");
   } else {
-    redirect_to("$path/contact/contact_index.php?action=updateContact");
+    $url = "$path/contact/contact_index.php?action=updateContact&shared_calendar_url=";
+    $url .= urlencode($params['shared_calendar_url']);
+    redirect_to($url);
   }
 }
 

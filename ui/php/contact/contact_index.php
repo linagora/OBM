@@ -342,6 +342,14 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
         $contact->company = $company['name'];
         $contact->market_id = $params['market'];
       }
+      if($params['shared_calendar_url'])  {
+        $label = 'CALURI';
+        $website = array(
+          'label' => 'CALURI',
+          'url' => $params['shared_calendar_url']
+        );
+	$contact->__set('website',array ( '0' => $website));
+      }      
       if(!$params['addressbook']) {
         $contact->addressbook_id = $addressbooks->getMyContacts()->id;
       } else {
