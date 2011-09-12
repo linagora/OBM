@@ -2207,10 +2207,10 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
 
 function run_query_calendar_create_event_links($users, $contacts, $resources, $event_id, $organizer) {
   run_query_calendar_add_event_links($users, $contacts, $resources, $event_id);
-  run_query_calendar_set_organizer($organizer, $event_id);
   if (!in_array($organizer, (array) $users)) {
     run_query_calendar_insert_entity_event('user', $organizer, $event_id, 'ACCEPTED');
   }
+  run_query_calendar_set_organizer($organizer, $event_id);
 }
 
 function run_query_calendar_add_event_links($users, $contacts, $resources, $event_id) {
