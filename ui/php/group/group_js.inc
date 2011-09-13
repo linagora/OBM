@@ -40,10 +40,10 @@ function check_group_get_id(valeur,text) {
       window.opener.document.$params[ext_widget].value=valeur;
       window.opener.document.$params[ext_widget_text].value=text;
       if ('$params[ext_target]' == '$l_calendar') {
-        window.opener.location=('../calendar/calendar_index.php?date=$params[date]&group_id='+valeur+'&new_group=1');
+        window.opener.location='../calendar/calendar_index.php?date=$params[date]&group_id='+valeur+'&new_group=1';
       }
       if ('$params[ext_target]' == '$l_time') {
-        window.opener.location=('../time/time_index.php?action=$params[ext_action]&date=$params[date]&group_id='+valeur);
+        window.opener.location='../time/time_index.php?action=$params[ext_action]&date=$params[date]&group_id='+valeur;
       }
       window.close();
       return true;
