@@ -24,6 +24,7 @@ public class ResponderImpl implements Responder {
 
 	@Override
 	public void sendResponse(String defaultNamespace, Document doc) {
+		logger.debug("response: send response");
 		try {
 			if (logger.isDebugEnabled()) {
 				DOMDumper.dumpXml(logger, doc);
@@ -42,6 +43,7 @@ public class ResponderImpl implements Responder {
 	
 	@Override
 	public void sendResponseFile(String contentType, InputStream file) {
+		logger.debug("response: send file");
 		try {
 			byte[] b = FileUtils.streamBytes(file, false);
 			resp.setContentType(contentType);
@@ -58,6 +60,7 @@ public class ResponderImpl implements Responder {
 
 	@Override
 	public void sendError(int statusCode) {
+		logger.debug("response: send error");
 		try {
 			resp.sendError(statusCode);
 		} catch (IOException e) {
@@ -67,7 +70,7 @@ public class ResponderImpl implements Responder {
 
 	@Override
 	public void sendNoChangeResponse() {
-		logger.warn("must inform the device that nothing changed");
+		logger.debug("response: send no changes");
 	}
 	
 }
