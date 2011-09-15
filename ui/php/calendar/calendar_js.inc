@@ -753,7 +753,7 @@ function getShareUrl(type,format) {
         async: true,
         onComplete: function(response) {
           if(response.error == 0){
-            showSharePopup(type,format,response.token)        
+            showSharePopup(type,format,response.token, response.email)        
           } else {
             showMessage('error',response.message);
           }
@@ -801,7 +801,7 @@ function reinitUrl(type) {
   }).get({entity_type : type_id.value, entity_id : id.value, type : type, action : 'share_reinit', ajax : 1});
 }
 
-function showSharePopup(type,format,token){
+function showSharePopup(type,format,token, userEmail){
   var url = \"$cgp_host\";
   var popup = $('sharePopup');
   if(popup){
@@ -815,7 +815,7 @@ function showSharePopup(type,format,token){
     var text = \"$l_share_calendar_public\";
   }
   if(format=='Ics'){
-    url+='calendar/calendar_render.php?action=ics_export&externalToken='+token;
+    url+='calendar/calendar_render.php?action=ics_export&externalToken='+token+'&email='+encodeURI(userEmail);
     elem.setProperty('href',url).appendText(url);
   } else {
     url+='calendar/calendar_render.php?externalToken='+token;

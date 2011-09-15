@@ -4184,7 +4184,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_no_end_repeat;
   global $l_daily, $l_weekly, $l_monthlybydate,$l_monthlybyday,$l_yearly;
   global $l_carac,$l_module_calendar;
-  global $l_none,$l_force,$l_repeat_update,$l_groups,$l_force_disabled;
+  global $l_none, $l_none_f, $l_force,$l_repeat_update,$l_groups,$l_force_disabled;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color;
@@ -5071,7 +5071,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   // Alerts
   $sel_alert = "<select name=\"sel_alert\">
-        <option value=\"$c_none\">$l_none</option>";
+        <option value=\"$c_none\">$l_none_f</option>";
   $user_alert = $ccalendar_alerts;
   if($selected_alert && ($selected_alert!= $c_none) && !($user_alert[$selected_alert])) {
     $user_alert[$selected_alert] = Of_Date::secondToString($selected_alert);
@@ -9958,8 +9958,8 @@ function dis_back_to_calendar($action) {
 /**
  *
  */
-function dis_calendar_share_public($token) {
+function dis_calendar_share_public($token, $email) {
   global $display;
-  $display['json'] = "token :'".phpStringToJsString($token)."'";
+  $display['json'] = "token :'".phpStringToJsString($token)."',email :'".phpStringToJsString($email)."'";
 }
 ?>
