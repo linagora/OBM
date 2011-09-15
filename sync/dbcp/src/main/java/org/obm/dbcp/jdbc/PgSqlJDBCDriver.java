@@ -34,4 +34,9 @@ public class PgSqlJDBCDriver implements IJDBCDriver {
 		return "SELECT lastval()";
 	}
 
+	@Override
+	public String setGMTTimezoneQuery() {
+		return "SET TIME ZONE 'GMT'";
+	}
+
 }

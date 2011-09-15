@@ -2,6 +2,7 @@ package org.obm.dbcp;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.transaction.TransactionManager;
 
@@ -17,10 +18,12 @@ public class DBConnectionPool {
 
 	private final TransactionManager transactionManager;
 	private final PoolingDataSource poolingDataSource;
+	private final IJDBCDriver cf;
 
 	/* package */ DBConnectionPool(TransactionManager transactionManager, IJDBCDriver cf, String dbHost, String dbName,
 			String login, String password) {
 		this.transactionManager = transactionManager;
+		this.cf = cf;
 
 		ConnectionFactory connectionFactory = 
 				buildConnectionFactory(cf, dbHost, dbName, login, password);
@@ -53,7 +56,19 @@ public class DBConnectionPool {
 	}
 
 	/* package */ Connection getConnection() throws SQLException {
-		return poolingDataSource.getConnection();
+		Connection connection = poolingDataSource.getConnection();
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			statement.execute(cf.setGMTTimezoneQuery());
+		} catch (SQLException e) {
+			connection.close();
+		} finally {
+			if (statement != null) {
+				statement.close();	
+			}
+		}
+		return connection;
 	}
 
 	/* package */ TransactionManager getTransactionManager() {

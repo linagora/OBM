@@ -52,4 +52,9 @@ public class MySqlJDBCDriver implements IJDBCDriver {
 		return "SELECT last_insert_id()";
 	}
 
+	@Override
+	public String setGMTTimezoneQuery() {
+		return "set time_zone='+00:00'";
+	}
+
 }

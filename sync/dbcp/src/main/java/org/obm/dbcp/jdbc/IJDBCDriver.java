@@ -9,4 +9,5 @@ public interface IJDBCDriver {
 
 	String getLastInsertIdQuery();
 
+	String setGMTTimezoneQuery();
 }

@@ -83,17 +83,7 @@ public class ObmHelper {
 	 * for a given transaction.
 	 */
 	public Connection getConnection() throws SQLException {
-		Connection con = dbcp.getConnection();
-		if (getType() == ObmDbType.MYSQL) {
-			Statement st = con.createStatement();
-			st.execute("set time_zone='+00:00'");
-			st.close();
-		} else if (getType() == ObmDbType.PGSQL) {
-			Statement st = con.createStatement();
-			st.execute("SET TIME ZONE 'GMT'");
-			st.close();
-		}
-		return con;
+		return dbcp.getConnection();
 	}
 
 	public int lastInsertId(Connection con) throws SQLException {
