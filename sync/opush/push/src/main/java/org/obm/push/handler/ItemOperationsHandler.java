@@ -2,8 +2,6 @@ package org.obm.push.handler;
 
 import java.util.List;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -90,7 +88,6 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		responder.sendResponse("ItemOperations", document);
 	}
 	
-	@Transactional(propagation=Propagation.NESTED)
 	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest) throws CollectionNotFoundException, 
 		UnsupportedStoreException, DaoException, ProcessingEmailException {
 		

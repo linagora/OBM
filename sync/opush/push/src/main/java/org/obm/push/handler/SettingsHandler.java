@@ -1,7 +1,5 @@
 package org.obm.push.handler;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -31,7 +29,6 @@ public class SettingsHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NESTED)
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 

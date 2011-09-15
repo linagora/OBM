@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IBackend;
@@ -150,7 +148,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		responder.sendResponse("AirSync", document);
 	}
 	
-	@Transactional(propagation=Propagation.NESTED)
 	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync)
 			throws CollectionNotFoundException, WaitIntervalOutOfRangeException, DaoException {
 		
@@ -415,7 +412,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
-	@Transactional
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, 
 			CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId {

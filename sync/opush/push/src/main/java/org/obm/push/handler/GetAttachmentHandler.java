@@ -2,8 +2,6 @@ package org.obm.push.handler;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
@@ -57,7 +55,6 @@ public class GetAttachmentHandler implements IRequestHandler {
 		responder.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
-	@Transactional(propagation=Propagation.NESTED)
 	private MSAttachementData getAttachment(BackendSession bs, String AttachmentName) 
 			throws AttachementNotFoundException, CollectionNotFoundException, DaoException, ProcessingEmailException {
 		return contentsExporter.getEmailAttachement(bs, AttachmentName);

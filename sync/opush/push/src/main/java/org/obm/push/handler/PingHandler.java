@@ -2,8 +2,6 @@ package org.obm.push.handler;
 
 import java.util.Set;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -75,7 +73,6 @@ public class PingHandler extends WbxmlRequestHandler implements
 		}
 	}
 
-	@Transactional(propagation=Propagation.NESTED)
 	private void doTheJob(IContinuation continuation, BackendSession bs, PingRequest pingRequest) 
 			throws MissingRequestParameterException, DaoException, CollectionNotFoundException {
 		
@@ -175,7 +172,6 @@ public class PingHandler extends WbxmlRequestHandler implements
 		responder.sendResponse("Ping", document);
 	}
 
-	@Transactional
 	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) 
 			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
 		

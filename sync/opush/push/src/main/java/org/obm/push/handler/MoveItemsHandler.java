@@ -3,8 +3,6 @@ package org.obm.push.handler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -88,7 +86,6 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 		responder.sendResponse("Move", doc);
 	}
 
-	@Transactional(propagation=Propagation.NESTED)
 	private MoveItemsResponse doTheJob(MoveItemsRequest moveItemsRequest, BackendSession bs) {
 		final List<MoveItemsItem> moveItemsItems = new ArrayList<MoveItemsResponse.MoveItemsItem>();
 		for (MoveItem item: moveItemsRequest.getMoveItems()) {

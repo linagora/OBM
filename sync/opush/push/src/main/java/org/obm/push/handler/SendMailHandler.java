@@ -1,7 +1,5 @@
 package org.obm.push.handler;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
@@ -25,7 +23,6 @@ public class SendMailHandler extends MailRequestHandler {
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NESTED)
 	public void doTheJob(MailRequest mailRequest, BackendSession bs) 
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
 		

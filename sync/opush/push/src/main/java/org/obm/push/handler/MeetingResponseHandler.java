@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -97,7 +95,6 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		responder.sendResponse("MeetingResponse", document);
 	}
 
-	@Transactional(propagation=Propagation.NESTED)
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException {
 		

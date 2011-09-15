@@ -3,8 +3,6 @@ package org.obm.push.handler;
 import java.util.ArrayList;
 import java.util.Set;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -88,7 +86,6 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		responder.sendResponse("GetItemEstimate", document);
 	}
 
-	@Transactional(propagation=Propagation.NESTED)
 	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, CollectionNotFoundException, 
 		UnknownObmSyncServerException, ProcessingEmailException {
 		

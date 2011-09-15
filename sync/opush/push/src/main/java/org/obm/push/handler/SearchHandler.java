@@ -3,8 +3,6 @@ package org.obm.push.handler;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -76,7 +74,6 @@ public class SearchHandler extends WbxmlRequestHandler {
 		sendResponse(responder, document);
 	}
 
-	@Transactional(propagation=Propagation.NESTED)
 	private SearchResponse search(BackendSession bs, SearchRequest searchRequest) {
 		final List<SearchResult> results = new LinkedList<SearchResult>();
 		for (final ISearchSource source: sources.get(searchRequest.getStoreName())) {

@@ -2,8 +2,6 @@ package org.obm.push.handler;
 
 import java.util.Random;
 
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -64,7 +62,6 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		responder.sendResponse("Provision", ret);
 	}
 
-	@Transactional(propagation=Propagation.NESTED)
 	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, BackendSession bs) {
 		ProvisionResponse provisionResponse = new ProvisionResponse(provisionRequest.getPolicyType());
 		final Long nextPolicyKey = nextPolicyKey(provisionRequest.getPolicyKey());
