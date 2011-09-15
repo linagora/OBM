@@ -111,7 +111,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 				return new FolderSyncResponse(changed, newSyncKey);
 			} else {
 				SyncState syncState = stMachine.getSyncState(rootFolderCollectionId, folderSyncRequest.getSyncKey());
-				if (!syncState.isValid()) {
+				if (syncState == null) {
 					throw new InvalidSyncKeyException();
 				}
 				ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();

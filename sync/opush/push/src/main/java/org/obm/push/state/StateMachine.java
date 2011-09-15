@@ -38,11 +38,7 @@ public class StateMachine {
 	}
 
 	public SyncState getSyncState(Integer collectionId, String syncKey) throws CollectionNotFoundException, DaoException {
-		SyncState syncState = collectionDao.findStateForKey(syncKey);
-		if (syncState != null) {
-			return syncState;
-		}
-		return new SyncState(collectionDao.getCollectionPath(collectionId), syncKey);
+		return collectionDao.findStateForKey(syncKey);
 	}
 
 	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync, Collection<ItemChange> changes) 

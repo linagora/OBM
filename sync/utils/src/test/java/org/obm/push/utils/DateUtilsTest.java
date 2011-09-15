@@ -10,11 +10,13 @@ public class DateUtilsTest {
 
 	@Test
 	public void getGeneseDate() {
-		Calendar currentGMTCalendar = DateUtils.getEpochCalendar();
+		Calendar currentGMTCalendar = DateUtils.getEpochPlusOneSecondCalendar();
 		Assert.assertEquals(1970, currentGMTCalendar.get(Calendar.YEAR));
 		Assert.assertEquals(0, currentGMTCalendar.get(Calendar.MONTH));
 		Assert.assertEquals(1, currentGMTCalendar.get(Calendar.DAY_OF_MONTH));
-		Assert.assertEquals(0, currentGMTCalendar.get(Calendar.SECOND));
+		Assert.assertEquals(0, currentGMTCalendar.get(Calendar.HOUR));
+		Assert.assertEquals(0, currentGMTCalendar.get(Calendar.MINUTE));
+		Assert.assertEquals(1, currentGMTCalendar.get(Calendar.SECOND));
 	}
 	
 	@Test

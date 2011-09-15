@@ -37,7 +37,7 @@ public class SyncState implements Serializable {
 	}
 	
 	public SyncState(String path, String key, Date lastSync) {
-		this.lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochCalendar().getTime());
+		this.lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		lastSyncFiltred = false;
 		if (path.contains("\\calendar\\")) {
 			this.dataType = PIMDataType.CALENDAR;
@@ -59,13 +59,6 @@ public class SyncState implements Serializable {
 
 	public void setLastSync(Date lastSync) {
 		this.lastSync = lastSync;
-	}
-
-	/**
-	 * @return true if we matched the SyncKey to a sync date
-	 */
-	public boolean isValid() {
-		return lastSync != null;
 	}
 
 	public String getKey() {

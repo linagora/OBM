@@ -103,7 +103,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			syncCollection.setDataType( PIMDataType.getPIMDataType(collectionPath) );
 
 			SyncState state = stMachine.getSyncState(syncCollection.getCollectionId(), syncCollection.getSyncKey());
-			if (!state.isValid()) {
+			if (state == null) {
 				throw new InvalidSyncKeyException();
 			}
 			

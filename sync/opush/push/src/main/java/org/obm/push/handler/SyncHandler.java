@@ -56,6 +56,7 @@ import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -284,10 +285,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		ModificationStatus modificationStatus = new ModificationStatus();
 
 		for (SyncCollection collection : sync.getCollections()) {
-			// get our sync state for this collection
-			SyncState collectionState = stMachine.getSyncState(collection.getCollectionId(),
-					collection.getSyncKey());
-			collection.setSyncState(collectionState);
+
 			// Disables last push request
 			IContinuation cont = waitContinuationCache.get(collection
 					.getCollectionId());
@@ -295,11 +293,21 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				cont.error(SyncStatus.NEED_RETRY.asXmlValue());
 			}
 
-			if (collectionState.isValid()) {
+			// get our sync state for this collection
+			SyncState collectionState = stMachine.getSyncState(collection.getCollectionId(),
+					collection.getSyncKey());
 
+			if (collectionState != null) {
+				collection.setSyncState(collectionState);
 				Map<String, String> processedClientIds = processModification(bs, collection);
 				modificationStatus.processedClientIds.putAll(processedClientIds);
+			} else {
+				collection.setSyncState(
+						new SyncState(
+								collectionDao.getCollectionPath(collection.getCollectionId()), 
+																collection.getSyncKey()));
 			}
+			
 			modificationStatus.hasChanges |= haveFilteredItemToSync(bs, collection);
 		}
 		return modificationStatus;
@@ -420,14 +428,17 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			
 			if ("0".equals(c.getSyncKey())) {
 				backend.resetCollection(bs, c.getCollectionId());
-			}
-			SyncState st = stMachine.getSyncState(c.getCollectionId(), c.getSyncKey());
-			boolean syncStateValid = st.isValid();
-			syncCollectionResponse.setSyncStateValid(syncStateValid);
-			if (syncStateValid) {
-
-				Date syncDate = st.getLastSync();
-				if (!c.getSyncKey().equals("0")) {
+				syncCollectionResponse.setSyncStateValid(true);
+				String newSyncKey = stMachine.allocateNewSyncKey(bs, c.getCollectionId(), null, ImmutableList.<ItemChange>of());
+				syncCollectionResponse.setNewSyncKey(newSyncKey);
+			} else {
+				SyncState st = stMachine.getSyncState(c.getCollectionId(), c.getSyncKey());
+				if (st == null) {
+					syncCollectionResponse.setSyncStateValid(false);
+				} else {
+					c.setSyncState(st);
+					syncCollectionResponse.setSyncStateValid(true);
+					Date syncDate = null;
 					if (c.getFetchIds().isEmpty()) {
 						syncDate = doUpdates(bs, c, processedClientIds, syncCollectionResponse);
 					} else {
@@ -435,9 +446,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 						syncCollectionResponse.setItemChanges(itemChanges);
 					}
 					identifyNewItems(syncCollectionResponse, st);
+					String newSyncKey = stMachine.allocateNewSyncKey(bs, c.getCollectionId(), syncDate, syncCollectionResponse.getItemChanges());
+					syncCollectionResponse.setNewSyncKey(newSyncKey);
 				}
-				String newSyncKey = stMachine.allocateNewSyncKey(bs, c.getCollectionId(), syncDate, syncCollectionResponse.getItemChanges());
-				syncCollectionResponse.setNewSyncKey(newSyncKey);
 			}
 			syncCollectionResponses.add(syncCollectionResponse);
 		}
