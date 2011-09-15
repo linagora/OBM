@@ -3,13 +3,16 @@ package org.obm.annotations.transactional;
 public enum Propagation {
 	
 	/**
-	 * Support a current transaction, create a new one if none exists.
+	 * Method needs a transaction to run. A transaction is created 
+	 * if none is associated with current context and use current 
+	 * transaction if it already exists.
 	 * This is the default setting of a transaction annotation.
 	 */
 	REQUIRED,
 
 	/**
-	 * Execute within a nested transaction if a current transaction exists, create a new one if none exists.
+	 * Method needs to be run in its own transaction.
+	 * A new transaction is always created.
 	 */
-	NESTED;
+	REQUIRES_NEW;
 }

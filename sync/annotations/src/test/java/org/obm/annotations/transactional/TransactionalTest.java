@@ -77,7 +77,7 @@ public class TransactionalTest {
 			//success !!
 		}
 		
-		@Transactional(propagation=Propagation.NESTED)
+		@Transactional(propagation=Propagation.REQUIRES_NEW)
 		protected void simpleNested() {
 			//success !!
 		}
@@ -87,12 +87,12 @@ public class TransactionalTest {
 			simpleNested();
 		}
 		
-		@Transactional(propagation=Propagation.NESTED)
+		@Transactional(propagation=Propagation.REQUIRES_NEW)
 		public void nestedThrowingRuntimeException(){
 			throw new RuntimeException();
 		}
 		
-		@Transactional(propagation=Propagation.NESTED, noRollbackOn=RuntimeException.class)
+		@Transactional(propagation=Propagation.REQUIRES_NEW, noRollbackOn=RuntimeException.class)
 		public void nestedThrowingRuntimeExceptionButNoRollbackMethod(){
 			throw new RuntimeException();
 		}
@@ -153,9 +153,11 @@ public class TransactionalTest {
 		transaction.begin();
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		transaction.commit();
 		EasyMock.expectLastCall().once();
+		
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_COMMITTED)).anyTimes();
 		EasyMock.replay(transaction);
 		
 		TestClass testClass = createTestClass(getProvider(transaction));
@@ -169,10 +171,7 @@ public class TransactionalTest {
 		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION)).once();
 		transaction.begin();
 		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).once();
-		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(5);
 		transaction.commit();
 		EasyMock.expectLastCall().once();
 		EasyMock.replay(transaction);
@@ -210,10 +209,9 @@ public class TransactionalTest {
 		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION)).once();
 		transaction.begin();
 		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(2);
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		transaction.rollback();
 		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION)).once();
 		EasyMock.replay(transaction);
 		
 		TestClass testClass = createTestClass(getProvider(transaction));
@@ -254,7 +252,7 @@ public class TransactionalTest {
 		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
 		transaction.begin();
 		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(4);
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		transaction.rollback();
 		EasyMock.expectLastCall().once();
 		EasyMock.replay(transaction);
@@ -274,7 +272,7 @@ public class TransactionalTest {
 		transaction.begin();
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		transaction.commit();
 		EasyMock.expectLastCall().once();
 		EasyMock.replay(transaction);
@@ -301,7 +299,7 @@ public class TransactionalTest {
 		transaction.begin();
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		transaction.commit();
 		EasyMock.expectLastCall().once();
 		EasyMock.replay(transaction);
@@ -318,7 +316,7 @@ public class TransactionalTest {
 		transaction.begin();
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		transaction.commit();
 		EasyMock.expectLastCall().once();
 		EasyMock.replay(transaction);
@@ -339,11 +337,11 @@ public class TransactionalTest {
 		transaction.begin();
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		transaction.commit();
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		transaction.commit();
 		EasyMock.expectLastCall().once();
 		EasyMock.replay(transaction);
@@ -432,11 +430,11 @@ public class TransactionalTest {
 		transaction.begin();
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		transaction.commit();
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(2);
 		transaction.rollback();
 		EasyMock.expectLastCall().once();
 		EasyMock.replay(transaction);

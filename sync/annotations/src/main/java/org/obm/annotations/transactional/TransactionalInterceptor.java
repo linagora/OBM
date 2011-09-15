@@ -2,6 +2,8 @@ package org.obm.annotations.transactional;
 
 import java.lang.reflect.Method;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
@@ -16,8 +18,7 @@ import com.google.inject.Provider;
 
 public class TransactionalInterceptor implements MethodInterceptor {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(TransactionalInterceptor.class);
+	private static final Logger logger = LoggerFactory.getLogger(TransactionalInterceptor.class);
 	
 	@Inject
 	private Provider<TransactionManager> transactionManagerProvider;
@@ -29,54 +30,101 @@ public class TransactionalInterceptor implements MethodInterceptor {
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Transactional transactional = readTransactionMetadata(methodInvocation);
-		TransactionManager ut = transactionManagerProvider.get();
 		if (transactional == null) {
 			return methodInvocation.proceed();
 		}
-
-		boolean isInSubTransaction = isTransactionActive(ut);
-		boolean haveCreatedNewTransaction = false;
-		
 		try {
-			if (canBeginNewTransaction(isInSubTransaction, transactional)) {
-				logger.info("transaction was started");
-				ut.begin();
-				haveCreatedNewTransaction = true;
-			}
-			
-			Object obj = methodInvocation.proceed();
-			
-			if (canCommitTransaction(ut, haveCreatedNewTransaction)) {
-				logger.info("transaction was commited");
-				ut.commit();
-			}
-			return obj;
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			if (isTransactionActive(ut)) {
-				if (needRollback(transactional, e)) {
-					logger.error("transaction was rollback", e);
-					ut.rollback();
-				} else {
-					if (canCommitTransaction(ut, haveCreatedNewTransaction)) {
-						logger.info("transaction was commited");
-						ut.commit();
-					}
-				}
-			}
-			throw e;
+			return managerTransaction(methodInvocation, transactional);
+		} finally {
+			logger.debug("exiting interceptor, thread {}", Thread.currentThread().getId());
 		}
 	}
 
-	private boolean canCommitTransaction(TransactionManager ut, boolean haveCreatedNewTransaction) throws SystemException {
-		return isTransactionActive(ut) && haveCreatedNewTransaction;
+	private Object managerTransaction(MethodInvocation methodInvocation,
+			Transactional transactional) throws Throwable {
+		
+		TransactionManager ut = transactionManagerProvider.get();
+		boolean haveCreatedNewTransaction = false;
+		
+		try {
+			haveCreatedNewTransaction = attachTransactionIfNeeded(ut, transactional.propagation());
+			Object obj = methodInvocation.proceed();
+			detachTransactionIfNeeded(ut, haveCreatedNewTransaction);
+			return obj;
+		} catch (RollbackException e) {
+			throw e;
+		} catch (Throwable t) {
+			rollbackTransaction(transactional, ut, haveCreatedNewTransaction, t);
+			throw t;
+		}
 	}
 
-	private boolean canBeginNewTransaction(boolean isInSubTransaction,
-			Transactional transactional) {
-		return !isInSubTransaction || (isInSubTransaction && Propagation.NESTED.equals(transactional.propagation()));
+	private boolean attachTransactionIfNeeded(	TransactionManager ut, 
+			Propagation propagation) throws NotSupportedException,
+			SystemException {
+		
+		boolean transactionAlreadyAttached = isTransactionAssociated(ut);
+		
+		if (transactionAlreadyAttached && propagation == Propagation.REQUIRED) {
+			logger.debug("reuse current transaction, thread {}", Thread.currentThread().getId());
+			return false;
+		} else {
+			ut.begin();
+			logger.debug("transaction was started, thread {}", Thread.currentThread().getId());
+			return true;
+		}
+	}
+	
+	private void detachTransactionIfNeeded(TransactionManager ut,
+			boolean haveCreatedNewTransaction) throws Throwable {
+		
+		if (isTransactionAssociated(ut) && haveCreatedNewTransaction) {
+			logger.debug("transaction status {}, thread {}", ut.getStatus(), Thread.currentThread().getId());
+			if (canCommitTransaction(ut)) {
+				ut.commit();
+				logger.debug("transaction was commited, thread {}", Thread.currentThread().getId());
+			} else {
+				ut.rollback();
+				logger.debug("transaction was rollback, thread {}", Thread.currentThread().getId());
+				throw new RollbackException();
+			}
+		} else {
+			logger.info("no transaction associated, thread {}", Thread.currentThread().getId());
+		}
 	}
 
+	private void rollbackTransaction(Transactional transactional, TransactionManager ut,
+			boolean haveCreatedNewTransaction, Throwable e) {
+		logger.error(e.getMessage(), e);		
+		try {
+			if (isTransactionAssociated(ut) && haveCreatedNewTransaction) {
+				if (needRollback(transactional, e)) {
+					logger.error("transaction was rollback", e);
+					ut.rollback();
+					return;
+				} else {
+					if (canCommitTransaction(ut)) {
+						logger.info("transaction was commited, thread {}", Thread.currentThread().getId());
+						ut.commit();
+						return;
+					}
+				}
+			}
+			logger.warn("transaction may be leaked", e);
+		} catch (Throwable t) {
+			logger.error("transaction rollback failed", t);
+		}
+	}
+
+	private boolean canCommitTransaction(TransactionManager ut) throws SystemException {
+		return isTransactionActive(ut);
+	}
+
+	private boolean isTransactionAssociated(TransactionManager tm) throws SystemException {
+		int status = tm.getStatus();
+		return status != Status.STATUS_NO_TRANSACTION;
+	}
+	
 	private boolean isTransactionActive(TransactionManager tm)	throws SystemException {
 		int status = tm.getStatus();
 		return Status.STATUS_ACTIVE == status
@@ -98,7 +146,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
 		return null;
 	}
 
-	private boolean needRollback(Transactional transactional, Exception e) {
+	private boolean needRollback(Transactional transactional, Throwable e) {
 
 		for (Class<? extends Exception> rollBackOn : transactional.noRollbackOn()) {
 			if (rollBackOn.isInstance(e)) {
