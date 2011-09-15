@@ -31,7 +31,12 @@ public class PushContinuation implements IContinuation {
 		}
 		
 		public PushContinuation createContinuation(HttpServletRequest req) {
-			return new PushContinuation(req, id.getAndIncrement());
+			Continuation continuation = ContinuationSupport.getContinuation(req);
+			Object attachedRequestId = continuation.getAttribute(KEY_ID_REQUEST);
+			if (attachedRequestId == null) {
+				continuation.setAttribute(KEY_ID_REQUEST, id.getAndIncrement());
+			}
+			return	new PushContinuation(continuation);
 		}
 	}
 	
@@ -45,10 +50,9 @@ public class PushContinuation implements IContinuation {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private Continuation c;
-
-	private PushContinuation(HttpServletRequest req, int id) {
-		this.c = ContinuationSupport.getContinuation(req);
-		this.c.setAttribute(KEY_ID_REQUEST, id);
+	
+	private PushContinuation(Continuation continuation) {
+		this.c = continuation;
 	}
 
 	public int getReqId() {
