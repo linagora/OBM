@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
 
 import junit.framework.Assert;
 
@@ -15,11 +16,9 @@ import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.store.ehcache.ObjectStoreManager;
-import org.obm.push.store.ehcache.StoreManagerConfigurationTest;
-import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 
-import com.atomikos.icatch.jta.UserTransactionManager;
+import bitronix.tm.TransactionManagerServices;
+
 import com.google.common.collect.Lists;
 
 public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
@@ -27,11 +26,11 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	private ObjectStoreManager objectStoreManager;
 	private SyncedCollectionDaoEhcacheImpl syncedCollectionStoreServiceImpl;
 	private Credentials credentials;
-	private UserTransactionManager transactionManager;
+	private TransactionManager transactionManager;
 	
 	@Before
 	public void init() throws StoreNotFoundException, NotSupportedException, SystemException {
-		this.transactionManager = new UserTransactionManager();
+		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);

@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
 
 import junit.framework.Assert;
 
@@ -14,18 +15,15 @@ import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.store.ehcache.ObjectStoreManager;
-import org.obm.push.store.ehcache.StoreManagerConfigurationTest;
-import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 
-import com.atomikos.icatch.jta.UserTransactionManager;
+import bitronix.tm.TransactionManagerServices;
 
 public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurationTest  {
 
 	private ObjectStoreManager objectStoreManager;
 	private UnsynchronizedItemDaoEhcacheImpl unSynchronizedItemImpl;
 	private Credentials credentials;
-	private UserTransactionManager transactionManager;
+	private TransactionManager transactionManager;
 	
 	public UnsynchronizedItemDaoEhcacheImplTest() {
 		super();
@@ -33,7 +31,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	@Before
 	public void init() throws StoreNotFoundException, NotSupportedException, SystemException {
-		transactionManager = new UserTransactionManager();
+		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
