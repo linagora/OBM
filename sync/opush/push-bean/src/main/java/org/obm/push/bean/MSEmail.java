@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.push.utils.SerializableInputStream;
+
 /**
  * 
  * @author adrienp
@@ -36,7 +38,7 @@ public class MSEmail implements IApplicationData, Serializable {
 	private List<MSAddress> to;
 	private List<MSAddress> cc;
 	private List<MSAddress> bcc;
-	private InputStream mimeData;
+	private SerializableInputStream mimeData;
 
 	private String smtpId;
 	
@@ -251,7 +253,7 @@ public class MSEmail implements IApplicationData, Serializable {
 	}
 
 	public void setMimeData(InputStream mimeData) {
-		this.mimeData = mimeData;
+		this.mimeData = new SerializableInputStream(mimeData);
 	}
 	
 }

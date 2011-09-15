@@ -1,5 +1,6 @@
 package org.obm.push.bean;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -59,6 +60,7 @@ public class SerializableTest {
 		msEmail.setBody(new MSEmailBody());
 		msEmail.setFrom(new MSAddress("toto@titi.com"));
 		msEmail.setAttachements(ImmutableSet.of(new MSAttachement()));
+		msEmail.setMimeData(new ByteArrayInputStream(new byte[0]));
 		objectOutputStream.writeObject(msEmail);
 	}
 
