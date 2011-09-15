@@ -37,7 +37,7 @@ public class StateMachine {
 		this.itemTrackingDao = itemTrackingDao;
 	}
 
-	public SyncState getSyncState(Integer collectionId, String syncKey) throws CollectionNotFoundException, DaoException {
+	public SyncState getSyncState(String syncKey) throws CollectionNotFoundException, DaoException {
 		return collectionDao.findStateForKey(syncKey);
 	}
 

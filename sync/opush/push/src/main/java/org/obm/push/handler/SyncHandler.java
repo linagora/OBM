@@ -294,8 +294,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			}
 
 			// get our sync state for this collection
-			SyncState collectionState = stMachine.getSyncState(collection.getCollectionId(),
-					collection.getSyncKey());
+			SyncState collectionState = stMachine.getSyncState(collection.getSyncKey());
 
 			if (collectionState != null) {
 				collection.setSyncState(collectionState);
@@ -432,7 +431,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				String newSyncKey = stMachine.allocateNewSyncKey(bs, c.getCollectionId(), null, ImmutableList.<ItemChange>of());
 				syncCollectionResponse.setNewSyncKey(newSyncKey);
 			} else {
-				SyncState st = stMachine.getSyncState(c.getCollectionId(), c.getSyncKey());
+				SyncState st = stMachine.getSyncState(c.getSyncKey());
 				if (st == null) {
 					syncCollectionResponse.setSyncStateValid(false);
 				} else {

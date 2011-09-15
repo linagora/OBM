@@ -110,7 +110,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed);
 				return new FolderSyncResponse(changed, newSyncKey);
 			} else {
-				SyncState syncState = stMachine.getSyncState(rootFolderCollectionId, folderSyncRequest.getSyncKey());
+				SyncState syncState = stMachine.getSyncState(folderSyncRequest.getSyncKey());
 				if (syncState == null) {
 					throw new InvalidSyncKeyException();
 				}
