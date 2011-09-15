@@ -52,6 +52,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
 			}
 			return obj;
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			if (isTransactionActive(ut)) {
 				if (needRollback(transactional, e)) {
 					logger.error("transaction was rollback", e);
@@ -63,7 +64,6 @@ public class TransactionalInterceptor implements MethodInterceptor {
 					}
 				}
 			}
-			logger.info(e.getMessage(),e);
 			throw e;
 		}
 	}
