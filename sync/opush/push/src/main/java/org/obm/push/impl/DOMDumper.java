@@ -7,7 +7,6 @@ import javax.xml.transform.TransformerException;
 
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
-import org.slf4j.Marker;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -23,7 +22,7 @@ public class DOMDumper {
 	 * 
 	 * @param doc
 	 */
-	public static void dumpXml(Logger logger, Marker asXmlRequestMarker, Document doc) {
+	public static void dumpXml(Logger logger, Document doc) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			Document c = DOMUtils.cloneDOM(doc);
@@ -43,9 +42,9 @@ public class DOMDumper {
 			}
 
 			DOMUtils.serialise(c, out, true);
-			logger.info(asXmlRequestMarker, out.toString());
+			logger.debug(out.toString());
 		} catch (TransformerException e) {
-			logger.error(asXmlRequestMarker, e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 }

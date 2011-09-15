@@ -11,7 +11,6 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.logging.TechnicalLogType;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
@@ -19,7 +18,6 @@ import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 import org.w3c.dom.Document;
 
 /**
@@ -86,8 +84,7 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 		}
 
 		if (doc != null && logger.isInfoEnabled()) {
-			Marker asXmlRequestMarker = TechnicalLogType.ACTIVE_SYNC_REQUEST.getMarker();
-			DOMDumper.dumpXml(logger, asXmlRequestMarker, doc);
+			DOMDumper.dumpXml(logger, doc);
 		}
 
 		process(continuation, bs, doc, request, responder);

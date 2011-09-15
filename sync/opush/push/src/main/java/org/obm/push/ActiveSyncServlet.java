@@ -39,7 +39,7 @@ import org.obm.push.handler.SmartReplyHandler;
 import org.obm.push.handler.SyncHandler;
 import org.obm.push.impl.PushContinuation;
 import org.obm.push.impl.PushContinuation.Factory;
-import org.obm.push.impl.Responder;
+import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.logging.TechnicalLogType;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.protocol.request.Base64QueryString;
@@ -48,7 +48,6 @@ import org.obm.push.service.DeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
-
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
@@ -161,9 +160,9 @@ public class ActiveSyncServlet extends HttpServlet {
 		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
 		if (c.isError()) {
-			ph.sendError(new Responder(response), c.getErrorStatus(), c);
+			ph.sendError(new ResponderImpl(response), c.getErrorStatus(), c);
 		} else if (ccl != null) {
-			ph.sendResponseWithoutHierarchyChanges(bs, new Responder(response), c);
+			ph.sendResponseWithoutHierarchyChanges(bs, new ResponderImpl(response), c);
 		}
 	}
 
@@ -284,7 +283,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 
 		sendASHeaders(response);
-		rh.process(continuation, bs, request, new Responder(response));
+		rh.process(continuation, bs, request, new ResponderImpl(response));
 	}
 	
 	private ActiveSyncRequest getActiveSyncRequest(HttpServletRequest r) {
