@@ -76,7 +76,7 @@ public class EmailSync implements IEmailSync {
 	}
 
 	private void loggerInfo(Date syncStartDate, Set<Email> emailsFromIMAP, MailChanges mailChanges) {
-		logger.info("Synchronization date {}", syncStartDate.toString());
+		logger.info("Synchronization date {}", syncStartDate);
 		logger.info("{} email(s) from imap", emailsFromIMAP.size());
 		logger.info("{} email(s) will be updated to pda", mailChanges.getUpdatedEmailFromImap().size());
 		logger.info("{} email(s) will be updated to db", mailChanges.getUpdatedEmailToDB().size());
