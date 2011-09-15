@@ -422,37 +422,64 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 		final List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
-			
-			SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(c);
-			
-			if ("0".equals(c.getSyncKey())) {
-				backend.resetCollection(bs, c.getCollectionId());
-				syncCollectionResponse.setSyncStateValid(true);
-				String newSyncKey = stMachine.allocateNewSyncKey(bs, c.getCollectionId(), null, ImmutableList.<ItemChange>of());
-				syncCollectionResponse.setNewSyncKey(newSyncKey);
-			} else {
-				SyncState st = stMachine.getSyncState(c.getSyncKey());
-				if (st == null) {
-					syncCollectionResponse.setSyncStateValid(false);
-				} else {
-					c.setSyncState(st);
-					syncCollectionResponse.setSyncStateValid(true);
-					Date syncDate = null;
-					if (c.getFetchIds().isEmpty()) {
-						syncDate = doUpdates(bs, c, processedClientIds, syncCollectionResponse);
-					} else {
-						List<ItemChange> itemChanges = contentsExporter.fetch(bs, c.getSyncState().getDataType(), c.getFetchIds());
-						syncCollectionResponse.setItemChanges(itemChanges);
-					}
-					identifyNewItems(syncCollectionResponse, st);
-					String newSyncKey = stMachine.allocateNewSyncKey(bs, c.getCollectionId(), syncDate, syncCollectionResponse.getItemChanges());
-					syncCollectionResponse.setNewSyncKey(newSyncKey);
-				}
-			}
+			SyncCollectionResponse syncCollectionResponse = computeSyncState(bs, processedClientIds, c);
 			syncCollectionResponses.add(syncCollectionResponse);
 		}
 		logger.info("Resp for requestId = {}", continuation.getReqId());
 		return new SyncResponse(syncCollectionResponses, bs, getEncoders(), processedClientIds);
+	}
+
+	private SyncCollectionResponse computeSyncState(BackendSession bs,
+			Map<String, String> processedClientIds, SyncCollection syncCollection)
+			throws DaoException, CollectionNotFoundException, InvalidServerId,
+			UnknownObmSyncServerException, ProcessingEmailException {
+
+		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
+		
+		if ("0".equals(syncCollection.getSyncKey())) {
+			handleInitialSync(bs, syncCollection, syncCollectionResponse);
+		} else {
+			handleDataSync(bs, processedClientIds, syncCollection, syncCollectionResponse);
+		}
+		return syncCollectionResponse;
+	}
+
+	private void handleDataSync(BackendSession bs,
+			Map<String, String> processedClientIds,
+			SyncCollection syncCollection,
+			SyncCollectionResponse syncCollectionResponse)
+			throws CollectionNotFoundException, DaoException,
+			UnknownObmSyncServerException, ProcessingEmailException,
+			InvalidServerId {
+		
+		SyncState st = stMachine.getSyncState(syncCollection.getSyncKey());
+		if (st == null) {
+			syncCollectionResponse.setSyncStateValid(false);
+		} else {
+			syncCollection.setSyncState(st);
+			syncCollectionResponse.setSyncStateValid(true);
+			Date syncDate = null;
+			if (syncCollection.getFetchIds().isEmpty()) {
+				syncDate = doUpdates(bs, syncCollection, processedClientIds, syncCollectionResponse);
+			} else {
+				List<ItemChange> itemChanges = contentsExporter.fetch(bs, syncCollection.getSyncState().getDataType(), syncCollection.getFetchIds());
+				syncCollectionResponse.setItemChanges(itemChanges);
+			}
+			identifyNewItems(syncCollectionResponse, st);
+			String newSyncKey = stMachine.allocateNewSyncKey(bs, syncCollection.getCollectionId(), syncDate, syncCollectionResponse.getItemChanges());
+			syncCollectionResponse.setNewSyncKey(newSyncKey);
+		}
+	}
+
+	private void handleInitialSync(BackendSession bs,
+			SyncCollection syncCollection,
+			SyncCollectionResponse syncCollectionResponse) throws DaoException,
+			CollectionNotFoundException, InvalidServerId {
+		
+		backend.resetCollection(bs, syncCollection.getCollectionId());
+		syncCollectionResponse.setSyncStateValid(true);
+		String newSyncKey = stMachine.allocateNewSyncKey(bs, syncCollection.getCollectionId(), null, ImmutableList.<ItemChange>of());
+		syncCollectionResponse.setNewSyncKey(newSyncKey);
 	}
 
 	private void identifyNewItems(
