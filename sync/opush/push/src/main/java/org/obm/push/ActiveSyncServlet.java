@@ -123,7 +123,7 @@ public class ActiveSyncServlet extends HttpServlet {
 				return;
 			}
 
-			loggerService.initLoggerSession(creds.getLoginAtDomain());
+			loggerService.initSession(creds.getLoginAtDomain(), c.getReqId(), asrequest.getCommand());
 
 			String policy = asrequest.getMsPolicyKey();
 			if (policy != null && policy.equals("0")
@@ -153,7 +153,7 @@ public class ActiveSyncServlet extends HttpServlet {
 			logger.error(e.getMessage(), e);
 			throw e;
 		} finally {
-			loggerService.initLoggerSession("");
+			loggerService.closeSession();
 		}
 	}
 
@@ -168,7 +168,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		if (bs == null) {
 			return;
 		}
-		loggerService.initLoggerSession(bs.getCredentials().getLoginAtDomain());
+		loggerService.initSession(bs.getLoginAtDomain(), c.getReqId(), bs.getCommand());
 		logger.debug("continuation");
 		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();

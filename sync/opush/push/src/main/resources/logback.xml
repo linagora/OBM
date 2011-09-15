@@ -5,7 +5,7 @@
 	<appender name="PROD" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <File>/var/log/opush/opush.log</File>
                 <layout>
-                        <pattern>%d{HH:mm:ss.SSS} [%-5level] {%logger{32}} [%X{user}]:%msg%n</pattern>
+                        <pattern>%d{HH:mm:ss.SSS} [%-5level] {%logger{32}} [t%X{threadId}/c%X{command}/r%X{requestId}/%X{user}]:%msg%n</pattern>
                 </layout>
                 <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
                         <maxIndex>10</maxIndex>
@@ -61,8 +61,10 @@
 	<!-- push -->
 	<logger level="DEBUG" name="org.obm.push.monitor" />
 	<!-- request/response -->
-    <logger level="INFO" name="org.obm.push.impl.Responder" />
+    <logger level="DEBUG" name="org.obm.push.impl.ResponderImpl" />
     <logger level="INFO" name="org.obm.push.handler" />
+    <logger level="DEBUG" name="org.obm.annotations.transactional" />
+	<logger level="INFO" name="org.obm.push.ActiveSyncServlet" />
 
 	<root level="ERROR">
 		<appender-ref ref="PROD" />

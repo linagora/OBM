@@ -7,31 +7,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import ch.qos.logback.core.sift.AppenderTracker;
 import ch.qos.logback.core.sift.SiftingAppenderBase;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class LoggerService {
 
 	@Inject
 	private LoggerService() {
-		configureLogger();
 	}
 	
-	public void initLoggerSession(String loginAtDomain) {
+	public void initSession(String loginAtDomain, int requestId, String command) {
 		Calendar date = Calendar.getInstance();
 		SimpleDateFormat dateformatter = new SimpleDateFormat("yyyy.MM.dd_hh:mm:ss");
 		String now = dateformatter.format(date.getTime());
 
 		closePrecedentLogFile();
 		String sessionId = loginAtDomain+"-"+now;
-		configureLogger("user", loginAtDomain);
-		configureLogger("sessionId", sessionId);
+		
+		MDC.put("title", "Opush ActiveSync");
+		MDC.put("user", loginAtDomain);
+		MDC.put("sessionId", sessionId);
+		MDC.put("threadId", String.valueOf(Thread.currentThread().getId()));
+		MDC.put("requestId", String.valueOf(requestId));
+		MDC.put("command", command);
 	}
 	
 	private String getLastSessionLogFileName(){
@@ -58,14 +62,8 @@ public class LoggerService {
 		}
 	}
 
-	private void configureLogger(String key, String value) {
-		MDC.put(key, value);
-		configureLogger();
+	public void closeSession() {
+		MDC.clear();
 	}
-
-	private void configureLogger() {
-		MDC.put("title", "Opush ActiveSync");
-	}
-
 	
 }
