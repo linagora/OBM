@@ -38,6 +38,7 @@ import org.obm.push.handler.SmartForwardHandler;
 import org.obm.push.handler.SmartReplyHandler;
 import org.obm.push.handler.SyncHandler;
 import org.obm.push.impl.PushContinuation;
+import org.obm.push.impl.Responder;
 import org.obm.push.impl.PushContinuation.Factory;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.logging.TechnicalLogType;
@@ -90,59 +91,70 @@ public class ActiveSyncServlet extends HttpServlet {
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		IContinuation c = continuationFactory.createContinuation(request);
-
-		logger.debug(
-				"query = {}, initial = {}, resume = {}, m = {}, num = {}",
-				new Object[] { request.getQueryString(), c.isInitial(),
-						c.isResumed(), request.getMethod(), c.getReqId() });
-
-		if (c.isResumed() || !c.isInitial()) {
-			handleContinuation(response, c);
-			return;
-		}
-
-		String m = request.getMethod();
-		if ("OPTIONS".equals(m)) {
-			sendOptionsResponse(response);
-			return;
-		}
-
-		if ("GET".equals(m)) { // htc sapphire does that
-			sendOptionsResponse(response);
-			return;
-		}
-
-		final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
-		Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
-		logger.debug(asXmlRequestMarker, asrequest.getHttpServletRequest().toString());
-		Credentials creds = performAuthentification(asrequest, response);
-		if (creds == null) {
-			return;
-		}
-
-		String policy = asrequest.getMsPolicyKey();
-		if (policy != null && policy.equals("0")
-				&& !asrequest.getCommand().equals("Provision")) {
-
-			logger.debug("forcing device (ua: {}) provisioning",
-					asrequest.getUserAgent());
-			response.setStatus(449);
-			return;
-		} else {
-			logger.debug("policy used = {}", policy);
-		}
-
 		try {
-			processActiveSyncMethod(c, 
-					creds, 
-					asrequest.getDeviceId(), 
-					asrequest,
-					response);
-		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
-		}
+			IContinuation c = continuationFactory.createContinuation(request);
 
+			logger.debug(
+					"query = {}, initial = {}, resume = {}, m = {}, num = {}",
+					new Object[] { request.getQueryString(), c.isInitial(),
+							c.isResumed(), request.getMethod(), c.getReqId() });
+
+			if (c.isResumed() || !c.isInitial()) {
+				handleContinuation(response, c);
+				return;
+			}
+
+			String m = request.getMethod();
+			if ("OPTIONS".equals(m)) {
+				sendOptionsResponse(response);
+				return;
+			}
+
+			if ("GET".equals(m)) { // htc sapphire does that
+				sendOptionsResponse(response);
+				return;
+			}
+
+			final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
+			Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
+			logger.debug(asXmlRequestMarker, asrequest.getHttpServletRequest().toString());
+			Credentials creds = performAuthentification(asrequest, response);
+			if (creds == null) {
+				return;
+			}
+
+			loggerService.initLoggerSession(creds.getLoginAtDomain());
+
+			String policy = asrequest.getMsPolicyKey();
+			if (policy != null && policy.equals("0")
+					&& !asrequest.getCommand().equals("Provision")) {
+
+				logger.debug("forcing device (ua: {}) provisioning",
+						asrequest.getUserAgent());
+				response.setStatus(449);
+				return;
+			} else {
+				logger.debug("policy used = {}", policy);
+			}
+
+			try {
+				processActiveSyncMethod(c, 
+						creds, 
+						asrequest.getDeviceId(), 
+						asrequest,
+						response);
+			} catch (DaoException e) {
+				logger.error(e.getMessage(), e);
+			}
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		} catch (RuntimeException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		} finally {
+			loggerService.initLoggerSession("");
+		}
 	}
 
 	private void handleContinuation(HttpServletResponse response, IContinuation c) {
@@ -156,13 +168,15 @@ public class ActiveSyncServlet extends HttpServlet {
 		if (bs == null) {
 			return;
 		}
-		
+		loggerService.initLoggerSession(bs.getCredentials().getLoginAtDomain());
+		logger.debug("continuation");
 		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
+		Responder responder = new ResponderImpl(response);
 		if (c.isError()) {
-			ph.sendError(new ResponderImpl(response), c.getErrorStatus(), c);
+			ph.sendError(responder, c.getErrorStatus(), c);
 		} else if (ccl != null) {
-			ph.sendResponseWithoutHierarchyChanges(bs, new ResponderImpl(response), c);
+			ph.sendResponseWithoutHierarchyChanges(bs, responder, c);
 		}
 	}
 
@@ -203,10 +217,6 @@ public class ActiveSyncServlet extends HttpServlet {
 	/**
 	 * Checks authentification headers. Returns non null value if login/password
 	 * is valid & the device has been authorized.
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
 	 */
 	private Credentials performAuthentification(ActiveSyncRequest request,
 			HttpServletResponse response) {
@@ -240,8 +250,6 @@ public class ActiveSyncServlet extends HttpServlet {
 							//Do nothing valid doesn't change
 						}
 						if (valid) {
-							loggerService.initLoggerSession(loginAtDomain);
-							
 							logger.debug("login/password ok & the device has been authorized");
 							return new Credentials(loginAtDomain, password);
 						}
@@ -269,7 +277,7 @@ public class ActiveSyncServlet extends HttpServlet {
 			throws IOException, DaoException {
 
 		BackendSession bs = sessionService.getSession(credentials, devId, request);
-		logger.info("activeSyncMethod = {}", bs.getCommand());
+		logger.debug("incoming query");
 		
 		if (bs.getCommand() == null) {
 			logger.warn("POST received without explicit command, aborting");
@@ -283,7 +291,8 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 
 		sendASHeaders(response);
-		rh.process(continuation, bs, request, new ResponderImpl(response));
+		Responder responder = new ResponderImpl(response);
+		rh.process(continuation, bs, request, responder);
 	}
 	
 	private ActiveSyncRequest getActiveSyncRequest(HttpServletRequest r) {
