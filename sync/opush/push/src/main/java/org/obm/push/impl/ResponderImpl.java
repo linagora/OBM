@@ -52,7 +52,7 @@ public class ResponderImpl implements Responder {
 			out.write(b);
 			out.flush();
 			out.close();
-			resp.setStatus(200);	
+			resp.setStatus(HttpServletResponse.SC_OK);	
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
