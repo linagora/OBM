@@ -22,10 +22,14 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 
+import com.google.common.base.Objects;
+
 /**
  * Convert events between OBM-Sync object model & Microsoft object model
  */
 public class TodoConverter implements ObmSyncCalendarConverter {
+
+	private static final int TASK_IMPORTANCE_NORMAL = 1;
 
 	public IApplicationData convert(BackendSession bs, Event e) {
 		MSTask mse = new MSTask();
@@ -253,7 +257,8 @@ public class TodoConverter implements ObmSyncCalendarConverter {
 		}
 
 		e.setCompletion(data.getDateCompleted());
-		switch (data.getImportance()) {
+		int importance = Objects.firstNonNull(data.getImportance(), TASK_IMPORTANCE_NORMAL);
+		switch (importance) {
 		case 0:
 			e.setPriority(1);
 			break;
