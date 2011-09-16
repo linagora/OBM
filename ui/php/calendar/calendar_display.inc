@@ -4199,11 +4199,13 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $organizer_id = null;
 
   // Gets the organizerName
-  foreach($users['entity'] as $user_id=>$user_entity){
-    if($user_entity["is_organizer"]){
-      $organizer_name = $user_entity["label"];
-      $organizer_id = $user_id;
-      break;
+  if(is_array($users['entity'])){
+    foreach($users['entity'] as $user_id=>$user_entity){
+      if($user_entity["is_organizer"]){
+        $organizer_name = $user_entity["label"];
+        $organizer_id = $user_id;
+        break;
+      }
     }
   }
   if(empty($organizer_name) && is_array($contacts['entity'])){
