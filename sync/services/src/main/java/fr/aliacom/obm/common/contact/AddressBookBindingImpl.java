@@ -50,6 +50,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.StoreException;
+import fr.aliacom.obm.services.constant.ConstantService;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
 
@@ -61,18 +62,22 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(AddressBookBindingImpl.class);
+	public static final String GLOBAL_ADDRESS_BOOK_SYNC = "globalAddressBookSync";
+	public static final boolean GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE = true;
 
 	private final ContactDao contactDao;
 	private final UserDao userDao;
 	private final ObmHelper obmHelper;
 	private final ContactMerger contactMerger;
+	private final ConstantService configuration;
 
 	@Inject
-	protected AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper) {
+	/*package*/ AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper, ConstantService configuration) {
 		this.contactDao = contactDao;
 		this.userDao = userDao;
 		this.contactMerger = contactMerger;
 		this.obmHelper = obmHelper;
+		this.configuration = configuration;
 	}
 
 	@Override
@@ -140,8 +145,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	private ContactChanges getUsersChanges(AccessToken token, Date timestamp) {
 		ContactChanges changes = new ContactChanges();
-		changes.setUpdated(userDao.findUpdatedUsers(timestamp, token).getContacts());
-		changes.setRemoved(userDao.findRemovalCandidates(timestamp, token));
+		if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC, GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
+			changes.setUpdated(userDao.findUpdatedUsers(timestamp, token).getContacts());
+			changes.setRemoved(userDao.findRemovalCandidates(timestamp, token));			
+		}
 		return changes;
 	}
 	
@@ -154,7 +161,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 			return getSync(token, timestamp);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault("error synchronizing contacts ");
+			throw new ServerFault("error synchronizing contacts ", e);
 		}
 	}
 	
@@ -180,7 +187,14 @@ public class AddressBookBindingImpl implements IAddressBook {
 		ContactChanges changes = new ContactChanges();
 		
 		ContactUpdates contactUpdates = contactDao.findUpdatedContacts(timestamp, token);
-		ContactUpdates userUpdates = userDao.findUpdatedUsers(timestamp, token);
+
+		ContactUpdates userUpdates = new ContactUpdates();
+		if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
+				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
+			userUpdates = userDao.findUpdatedUsers(timestamp, token);
+		} else {
+			userUpdates = new ContactUpdates();
+		}
 		Set<Integer> removalCandidates = contactDao.findRemovalCandidates(timestamp, token);
 		
 		List<Contact> updated = getUpdatedContacts(contactUpdates, userUpdates);
@@ -409,7 +423,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 		FolderChanges changes = new FolderChanges();
 		
 		List<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
-		updated.addAll(userDao.findUpdatedFolders(timestamp));
+		if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
+				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
+			updated.addAll(userDao.findUpdatedFolders(timestamp));
+		}
 		changes.setUpdated(updated);
 		
 		changes.setRemoved(contactDao.findRemovedFolders(timestamp, token));

@@ -21,6 +21,10 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.easytesting</groupId>
+			<artifactId>fest-assert</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>net.fortuna.ical4j</groupId>
 			<artifactId>ical4j</artifactId>
 		</dependency>
@@ -36,11 +40,6 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>

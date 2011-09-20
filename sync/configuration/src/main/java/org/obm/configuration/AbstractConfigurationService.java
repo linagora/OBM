@@ -36,8 +36,19 @@ public abstract class AbstractConfigurationService {
 		return props.getProperty(prop);
 	}
 
+	public String getStringValue(String prop, String defaultValue) {
+		return props.getProperty(prop, defaultValue);
+	}
+
 	public boolean getBooleanValue(String prop) {
 		return Boolean.valueOf(getStringValue(prop)).booleanValue();
+	}
+
+	public boolean getBooleanValue(String prop, boolean defaultValue) {
+		String valueString = getStringValue(prop);
+		boolean value = valueString != null ? Boolean.valueOf(valueString).booleanValue()
+				: defaultValue;
+		return value;
 	}
 
 	public int getIntValue(String prop, int defaultValue) {

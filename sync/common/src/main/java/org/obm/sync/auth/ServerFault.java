@@ -6,7 +6,7 @@ public class ServerFault extends Exception {
 		super(s);
 	}
 	
-	public ServerFault(String message, Exception cause) {
+	public ServerFault(String message, Throwable cause) {
 		super(message, cause);
 	}
 	
