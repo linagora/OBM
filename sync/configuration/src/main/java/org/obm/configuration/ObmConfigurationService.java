@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableMap;
 
 public class ObmConfigurationService extends AbstractConfigurationService {
 
-	private final static String LOCATOR_PORT = "8082";
+	private final static String LOCATOR_PORT = "8080";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
 
 	private final static String OBM_SYNC_PORT = "8080";
