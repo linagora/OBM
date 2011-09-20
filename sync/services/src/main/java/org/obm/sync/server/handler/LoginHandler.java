@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
@@ -79,20 +80,24 @@ public class LoginHandler implements ISyncHandler {
 	}
 
 	private void doLogin(ParametersSource params, XmlResponder responder) {
+		
 		String login = params.getParameter("login");
 		String pass = params.getParameter("password");
 		String origin = params.getParameter("origin");
+		
 		try {
 			if (origin == null) {
 				responder.sendError("login refused with null origin");
 				return;
 			}
+		
 			if (logger.isDebugEnabled()) {
 				params.dumpHeaders();
 			}
-			AccessToken token = binding.logUserIn(login, pass, origin,
-					params.getClientIP(), params.getRemoteIP(),
+			
+			AccessToken token = binding.logUserIn(login, pass, origin, params.getClientIP(), params.getRemoteIP(),
 					params.getLemonLdapLogin(), params.getLemonLdapDomain());
+			
 			if (token != null) {
 				versionValidator.checkObmConnectorVersion(token);
 				responder.sendToken(token);
@@ -107,6 +112,9 @@ public class LoginHandler implements ISyncHandler {
 			errorMailer.notifyConnectorVersionError(e.getToken(), e
 					.getConnectorVersion().toString(), settings.locale(),
 					settings.timezone());
+		} catch (ObmSyncVersionNotFoundException e) {
+			responder.sendError("Invalid obm-sync server version");
 		}
+		
 	}
 }

@@ -36,6 +36,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.ObmSyncVersion;
+import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -129,10 +130,12 @@ public class SessionManagement {
 
 	/**
 	 * @return null if the credential are not valid
+	 * @throws ObmSyncVersionNotFoundException 
 	 */
 	public AccessToken login(String specifiedLogin, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain) {
+			String lemonDomain) throws ObmSyncVersionNotFoundException {
+		
 		String login = chooseLogin(specifiedLogin, lemonLogin, lemonDomain);
 		logger.debug("Login trial for login: " + login
 				+ " from client ip: " + clientIP + ", remoteIP: "
@@ -192,7 +195,7 @@ public class SessionManagement {
 		sessions.put(token.getSessionId(), token);
 	}
 
-	private AccessToken buildAccessToken(String origin,	String userLogin, ObmDomain obmDomain) {
+	private AccessToken buildAccessToken(String origin,	String userLogin, ObmDomain obmDomain) throws ObmSyncVersionNotFoundException {
 		ObmUser databaseUser = userManagementDAO.findUserByLogin(userLogin, obmDomain);
 		if (databaseUser == null) {
 			logger.info("access refused to login: " + userLogin

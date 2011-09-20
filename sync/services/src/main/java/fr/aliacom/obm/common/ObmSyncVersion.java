@@ -25,14 +25,17 @@ import org.obm.sync.auth.MavenVersion;
 // DO NOT FORGET TO EDIT THIS FILE BEFORE TAG !
 public final class ObmSyncVersion {
 
-	public static final MavenVersion current() {
+	public static final MavenVersion current() throws ObmSyncVersionNotFoundException {
 		Package p = ObmSyncVersion.class.getPackage();
-		return parseImplementationVersion(p.getImplementationVersion());
+		String version = p.getImplementationVersion();
+		if (version == null) {
+			throw new ObmSyncVersionNotFoundException();
+		}
+		return parseImplementationVersion(version);
 	}
-
+	
 	// 2.3.22-SNAPSHOT
-	private static MavenVersion parseImplementationVersion(
-			String implementationVersion) {
+	private static MavenVersion parseImplementationVersion(String implementationVersion) {
 		MavenVersion version = new MavenVersion();
 		StringTokenizer token = new StringTokenizer(implementationVersion, ".");
 		if (token.hasMoreTokens()) {
@@ -61,4 +64,5 @@ public final class ObmSyncVersion {
 		}
 		return "0";
 	}
+	
 }
