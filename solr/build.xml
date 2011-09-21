@@ -12,7 +12,7 @@
     <property name="pack" 
 	      value="debian/${ant.project.name}"/>
     <property name="dd" 
-	      value="debian/${ant.project.name}/usr/share"/>
+	      value="debian/${ant.project.name}/var/lib/jetty/webapps"/>
 
     <mkdir dir="${dd}"/>
 
