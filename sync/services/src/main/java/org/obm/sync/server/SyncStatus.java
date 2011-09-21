@@ -30,7 +30,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.ObmSyncVersion;
-import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 
 @Singleton
 public class SyncStatus {
@@ -95,15 +94,9 @@ public class SyncStatus {
 
 	private void printSyncInfo(PrintWriter w) {
 		section("OBM Sync informations", w);
-		w.println("<p><em>Version :</em> " + getObmSyncVersion() + "</p> ");
-	}
-	
-	private String getObmSyncVersion() {
-		try {
-			return ObmSyncVersion.current().toString();
-		} catch (ObmSyncVersionNotFoundException e) {
-			return "Invalid obm-sync server version";
-		}
+		w.println("<p><em>Version :</em> " + 
+				ObmSyncVersion.current().toString()
+				+ "</p> ");
 	}
 
 }

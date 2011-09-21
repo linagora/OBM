@@ -22,7 +22,6 @@ import org.obm.sync.auth.AccessToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.session.SessionManagement;
 
 @Singleton
@@ -37,9 +36,9 @@ public class LoginBindingImpl {
 	
 	public AccessToken logUserIn(String user, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain) throws ObmSyncVersionNotFoundException {
-		
-		return sessionManagement.login(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain);
+			String lemonDomain) {
+		return sessionManagement.login(user, password, origin,
+				clientIP, remoteIP, lemonLogin, lemonDomain);
 	}
 
 	public void logout(String sessionId) {
