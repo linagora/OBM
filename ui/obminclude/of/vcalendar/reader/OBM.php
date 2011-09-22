@@ -216,7 +216,9 @@ class Vcalendar_Reader_OBM {
   
   function addAttendee(&$vevent, &$data) {
    $vevent->private = ($vevent->private && ($GLOBALS['obm']['uid'] != $data['eventlink_entity_id']));
-   $vevent->set('attendee', $this->parseAttendee($data['eventlink_entity_id'], $data['eventlink_entity'], $data['eventlink_state']));
+   if (!$vevent->private) {
+       $vevent->set('attendee', $this->parseAttendee($data['eventlink_entity_id'], $data['eventlink_entity'], $data['eventlink_state']));
+   }
   }
   
   function addDocument(&$vevent, $document_id) {
