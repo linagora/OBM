@@ -3792,7 +3792,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     $documents = $entities['document'];
     $exception_q = run_query_get_one_event_exception($calendar['calendar_id']);
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
-  
+   
     // Entities from Freebusy
     if (isset($calendar['new_meeting']) && $calendar['new_meeting'] == 1) {
       $users = (is_array($calendar['new_user_id'])) ? get_userobm_from_ids($calendar['new_user_id']) : array();
@@ -3833,6 +3833,10 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
         if($event_q->f('event_organizer')){
           $calendar['organizer'] =  $event_q->f('event_organizer');
         }
+      }
+
+      if($action == 'insert') {
+        if (isset($calendar['organizer'])) $organizer_id = $calendar['organizer'];  
       }
     }
 
@@ -4567,7 +4571,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   foreach ($possible_owners as $o) {
     if(empty($organizer_name) && $o['id']==$organizer_id) $organizer_name = $o[label];
   }
-
+   
   $possible_organizers = array();
   if(is_array($displayedPeople)){
     foreach($displayedPeople as $displayed_person_id=>$displayed_person_name){
@@ -7477,7 +7481,6 @@ function dis_calendar_pdf_view($calendar, $current_view) {
   $calendar_entity = $current_view->get_entities();
 
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view.'_pdf';
-
   $calendar_function($calendar, $current_view, $calendar_entity);
 }
 
