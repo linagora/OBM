@@ -2019,13 +2019,16 @@ function run_query_calendar_quick_event_update($calendar) {
   $title = sql_parse_text($calendar['title']);
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
+  $all_day = ($calendar["all_day"])?'TRUE':'FALSE';
+  if ($all_day == 'TRUE' && $event_duration == 3600) {
+      $event_duration = 86400;
+  }
   $event_id = sql_parse_id($calendar['calendar_id'], true);
   $all = $calendar['all'];
   if ($all != 1) {
     $event_date = "event_date = '$datebegin',";
   }
   $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
-  $all_day = ($calendar["all_day"])?'TRUE':'FALSE';
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
