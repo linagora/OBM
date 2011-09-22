@@ -36,22 +36,18 @@ import fr.aliacom.obm.common.ObmSyncVersion;
 
 public class SyncServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1612856606691389911L;
-
-	private Logger logger =  LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Injector injector;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
+		logger.info("Init obm-sync servlet ...");
 		super.init(config);
 		injector = (Injector)config.getServletContext().getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
 		logger.info("Starting obm-sync " + ObmSyncVersion.current());
 	}
-	
+
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
