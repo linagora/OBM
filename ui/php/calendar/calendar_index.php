@@ -304,8 +304,11 @@ if ($action == 'search') {
 
           $current_view->set_date($params["date_begin"]);
           $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$event_id";
+          if($GLOBALS['display']['warm_add_organizer'] == true){
+            $add_organizer = $GLOBALS['l_event_add_organizer'];
+	  } 
           $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
-          redirect_ok($params, "$l_event: $l_insert_ok - $detail");
+          redirect_ok($params, "$l_event: $l_insert_ok - $add_organizer - $detail");
         }
       } catch (OverQuotaDocumentException $e) {
         $extra_js_include[] = 'inplaceeditor.js';
