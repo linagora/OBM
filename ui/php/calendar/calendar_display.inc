@@ -4542,7 +4542,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </td>
       </tr>";
   }
-
   if (is_array($contacts['entity'])) {
     foreach ($contacts['entity'] as $u_id => $u_ent) {
       if(is_array($template_entities['contact']) && in_array($u_id, $template_entities['contact']))
@@ -8150,7 +8149,6 @@ Class CalendarPdf{
       $page_size = explode(':', Zend_Pdf_Page::SIZE_A4_LANDSCAPE);
       $this->page_orientation = 'A4-LANDSCAPE';
     }
-
     // Zend PDF
     $this->pdf = new Zend_Pdf();
     $this->margin = 30;
@@ -9259,6 +9257,7 @@ Class CalendarPdfList Extends CalendarPdf{
   var $calendar_x0, $calendar_y0;
   var $calendar_x1, $calendar_y1;
   var $occurrences;
+  var $max_length_details;
 
   function __construct($current_view, $range, $calendar, $calendar_entity, $occurrences){
     global $ccalendar_first_hour;
@@ -9267,6 +9266,8 @@ Class CalendarPdfList Extends CalendarPdf{
 
     parent::__construct($current_view, $calendar, $calendar_entity);
 
+    $this->max_length_details = array("A4-LANDSCAPE" => array(6 => 185, 8 => 135, 10 => 107),
+                                      "A4" => array(6 => 96, 8 => 70, 10 => 55));
     $this->ico_private = Zend_Pdf_Image::imageWithPath($ico_pdf_private_alt);
     $this->ico_meeting = Zend_Pdf_Image::imageWithPath($ico_pdf_meeting_alt);
     $this->ico_periodic = Zend_Pdf_Image::imageWithPath($ico_pdf_periodic_alt);
@@ -9398,7 +9399,6 @@ Class CalendarPdfList Extends CalendarPdf{
 
   }
   
-
   /**
    * add an event to the PDF, in the PdfStub $stub object
    * which describes the drawing instructions.
@@ -9590,14 +9590,13 @@ Class CalendarPdfList Extends CalendarPdf{
           }
           if (sizeof($value)==0) $stub->subY($this->font_height);
           foreach($value as $array_value){
-            // try to keep a serious value, otherwise a single piece of text would be larger than the page
-            if(strlen($array_value) > 1000) {
-              $array_value = substr($array_value, 0, 995)."(...)";
+            $lines = $this->cut_up_line($array_value);
+            foreach($lines as $line) {
+              $stub->setX($x0+80);
+              $stub->addText($this->calendar_x1 - ($x0+80) - $this->calendar_x0,
+                             0, $line, 'UTF-8');
+              $stub->gotoNextSpacePosition(PdfStub::POS_BOTTOM);
             }
-            $stub->setX($x0+80);
-            $stub->addText($this->calendar_x1 - ($x0+80) - $this->calendar_x0,
-                           0, $array_value, 'UTF-8');
-            $stub->gotoNextSpacePosition(PdfStub::POS_BOTTOM);
           }
         
         }
@@ -9611,8 +9610,20 @@ Class CalendarPdfList Extends CalendarPdf{
     }
   }
 
-}
+ function cut_up_line($text) {
+    $line_length = $this->max_length_details[$this->page_orientation][$this->font_size];
+    $array_word = explode(" ", $text);
+    $i = 0;
+    foreach($array_word as $word){
+      if((strlen($ret[$i]) + strlen($word)) > $line_length){
+        $i = $i + 1;
+      }
+      $ret[$i] .= $word." ";
+    }
+    return $ret;
+  }
 
+} 
 /**
  * Generate email field  
  * 
