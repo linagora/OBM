@@ -61,7 +61,10 @@ public class StateMachine {
 		HashSet<ServerId> serverIds = Sets.newHashSet();
 		for (ItemChange change: changes) {
 			if (change.isNew()) {
-				serverIds.add(new ServerId(change.getServerId()));
+				ServerId serverId = new ServerId(change.getServerId());
+				if (serverId.isItem()) {
+					serverIds.add(serverId);
+				}
 			}
 		}
 		return serverIds;

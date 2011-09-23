@@ -58,6 +58,10 @@ public class ServerId {
 		return itemId;
 	}
 
+	public boolean isItem() {
+		return itemId != null;
+	}
+	
 	@Override
 	public String toString() {
 		return collectionId + ":" + itemId;

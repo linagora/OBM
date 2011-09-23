@@ -66,6 +66,7 @@ public class ServerIdTest {
 		ServerId serverId = new ServerId("123");
 		Assert.assertEquals(123, serverId.getCollectionId());
 		Assert.assertNull(serverId.getItemId());
+		Assert.assertFalse(serverId.isItem());
 	}
 	
 	@Test
@@ -73,6 +74,7 @@ public class ServerIdTest {
 		ServerId serverId = new ServerId("123:345");
 		Assert.assertEquals(123, serverId.getCollectionId());
 		Assert.assertEquals(Integer.valueOf(345), serverId.getItemId());
+		Assert.assertTrue(serverId.isItem());
 	}
 	
 	@Test
