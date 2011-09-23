@@ -11643,7 +11643,7 @@ CREATE TABLE opush_invitation_mapping (
         mail_collection_id INTEGER REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
         mail_uid INTEGER,
         event_collection_id INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE,
-        event_uid VARCHAR(300),
+        event_uid INTEGER NOT NULL REFERENCES event(event_id) ON DELETE CASCADE,
         status VARCHAR(20),
         dtstamp timestamp without time zone,
         sync_key VARCHAR(64) REFERENCES opush_sync_state(sync_key) ON DELETE CASCADE

@@ -321,6 +321,10 @@ CREATE TABLE `opush_synced_item` (
        CONSTRAINT `opush_synced_item_sync_state_id_opush_sync_state_id_fkey` FOREIGN KEY (`sync_state_id`) REFERENCES `opush_sync_state` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DELETE FROM `opush_invitation_mapping`;
+ALTER TABLE `opush_invitation_mapping` MODIFY COLUMN `event_uid` INTEGER NOT NULL;
+ALTER TABLE `opush_invitation_mapping` ADD CONSTRAINT `opush_invitation_mapping_event_id_fkey` FOREIGN KEY (`event_uid`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE;
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 -- ----------------------------------------------------------------------------
