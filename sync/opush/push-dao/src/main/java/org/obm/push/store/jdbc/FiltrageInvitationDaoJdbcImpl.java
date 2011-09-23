@@ -16,6 +16,8 @@ import org.obm.push.bean.InvitationStatus;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.FiltrageInvitationDao;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
+import org.obm.push.utils.jdbc.LongSQLCollectionHelper;
 import org.obm.sync.calendar.EventObmId;
 
 import com.google.inject.Inject;
@@ -480,11 +482,14 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 		if (emailUids != null && emailUids.size() > 0) {
 			Connection con = null;
 			PreparedStatement ps = null;
-			String uids = buildEmailUid(emailUids);
+			LongSQLCollectionHelper idList = new LongSQLCollectionHelper(emailUids);
 			try {
 				con = dbcp.getConnection();
-				ps = con.prepareStatement("UPDATE opush_invitation_mapping SET status=?, sync_key=?, dtstamp=dtstamp WHERE mail_collection_id=? AND mail_uid IN ("
-						+ uids + ")");
+				ps = con.prepareStatement(
+						"UPDATE opush_invitation_mapping " +
+						"SET status=?, sync_key=?, dtstamp=dtstamp " +
+						"WHERE mail_collection_id=? AND mail_uid " +
+						"IN (" + idList.asPlaceHolders() + ")");
 				int idx = 1;
 				ps.setString(idx++, status.toString());
 				if (syncKey == null) {
@@ -493,6 +498,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 					ps.setString(idx++, syncKey);
 				}
 				ps.setInt(idx++, emailCollectionId);
+				idList.insertValues(ps, idx);
 				ps.execute();
 			} catch (SQLException e) {
 				throw new DaoException(e);
@@ -515,11 +521,15 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 		if (eventUids.size() > 0) {
 			Connection con = null;
 			PreparedStatement ps = null;
-			String uids = buildEventUid(eventUids);
+			IntegerIndexedSQLCollectionHelper idList = new IntegerIndexedSQLCollectionHelper(eventUids);
 			try {
 				con = dbcp.getConnection();
-				ps = con.prepareStatement("UPDATE opush_invitation_mapping SET status=?, sync_key=?, dtstamp=dtstamp WHERE mail_collection_id IS NULL AND mail_uid IS NULL AND event_collection_id=? AND event_uid IN ("
-						+ uids + ")");
+				ps = con.prepareStatement(
+						"UPDATE opush_invitation_mapping " +
+						"SET status=?, sync_key=?, dtstamp=dtstamp " +
+						"WHERE mail_collection_id IS NULL AND mail_uid IS NULL " +
+						"AND event_collection_id=? AND event_uid " +
+						"IN (" + idList.asPlaceHolders() + ")");
 				ps.setString(1, status.toString());
 				if (syncKey == null) {
 					ps.setNull(2, Types.VARCHAR);
@@ -527,6 +537,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 					ps.setString(2, syncKey);
 				}
 				ps.setInt(3, eventCollectionId);
+				idList.insertValues(ps, 4);
 				ps.execute();
 			} catch (SQLException e) {
 				throw new DaoException(e);
@@ -641,28 +652,6 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			JDBCUtils.cleanup(con, ps, rs);
 		}
 		return ret;
-	}
-	
-	private String buildEmailUid(Collection<Long> emailUids) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("0");
-		for (Long l : emailUids) {
-			sb.append(",");
-			sb.append(l);
-		}
-		return sb.toString();
-	}
-
-	private String buildEventUid(Collection<EventObmId> eventUids) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("'0'");
-		for (EventObmId s : eventUids) {
-			sb.append(",");
-			sb.append("'");
-			sb.append(s.getObmId());
-			sb.append("'");
-		}
-		return sb.toString();
 	}
 
 }

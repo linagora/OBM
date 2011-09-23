@@ -19,8 +19,8 @@ import org.obm.push.exception.EmailNotFoundException;
 import org.obm.push.store.EmailDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.push.utils.jdbc.LongSQLCollectionHelper;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.Inject;
@@ -106,12 +106,16 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 		PreparedStatement insert = null;
 		Connection con = null;
 		
-		String ids = buildListId(uids);
+		LongSQLCollectionHelper idList = new LongSQLCollectionHelper(uids);
 		try {
 			con = dbcp.getConnection();
-			del = con.prepareStatement("DELETE FROM opush_sync_mail WHERE collection_id=? AND device_id=? AND mail_uid IN (" + ids + ")");
+			del = con.prepareStatement(
+					"DELETE FROM opush_sync_mail " +
+					"WHERE collection_id=? AND device_id=? AND mail_uid " +
+					"IN (" + idList.asPlaceHolders() + ")");
 			del.setInt(1, collectionId);
 			del.setInt(2, devId);
+			idList.insertValues(del, 3);
 			del.executeUpdate();
 
 			insert = con.prepareStatement("INSERT INTO opush_sync_deleted_mail (collection_id, device_id, mail_uid, timestamp) VALUES (?, ?, ?, ?)");
@@ -240,13 +244,6 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			JDBCUtils.cleanup(con, ps, evrs);
 		}
 		return uids.build();
-	}
-	
-	private String buildListId(Collection<Long> uids) {
-		if (uids.isEmpty()) {
-			return "0";
-		}
-		return Joiner.on(",").skipNulls().join(uids);
 	}
 
 }
