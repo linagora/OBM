@@ -1,6 +1,8 @@
 package org.obm.sync.mailingList;
 
-public class MLEmail {
+import org.obm.push.utils.index.Indexed;
+
+public class MLEmail implements Indexed<Integer> {
 
 	private Integer id;
 	private String label;
@@ -71,6 +73,10 @@ public class MLEmail {
 	public String toString() {
 		return "MLEmail [displayName=" + label + ", address=" + address + "]";
 	}
-	
+
+	@Override
+	public Integer getIndex() {
+		return getId();
+	}
 	
 }

@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Event {
+import org.obm.push.utils.index.Indexed;
+
+public class Event implements Indexed<Integer> {
 
 	private String title;
 	private String domain;
@@ -396,6 +398,11 @@ public class Event {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public Integer getIndex() {
+		return getUid().getIndex();
 	}
 	
 }

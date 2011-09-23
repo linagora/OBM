@@ -26,12 +26,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -85,15 +87,15 @@ public class MailingListHome {
 	}
 
 	private List<MLEmail> getMailingListFromIds(Connection con, AccessToken at,
-			Integer mailingListId, int... emailIds) {
+			Integer mailingListId, List<Integer> ids) {
 		List<MLEmail> ret = new ArrayList<MLEmail>(0);
-		String mlIds = buildMailListEmailsId(emailIds);
+		IntegerSQLCollectionHelper mlIds = new IntegerSQLCollectionHelper(ids);
 		String q = "SELECT  "
 				+ ML_SELECT_FIELDS
 				+ " FROM MailingList "
 				+ " INNER JOIN MailingListEmail e ON mailinglist_id = mailinglistemail_mailinglist_id "
 				+ " WHERE mailinglist_id=? AND mailinglist_owner=? AND mailinglistemail_id IN ("
-				+ mlIds + ")";
+				+ mlIds.asPlaceHolders() + ")";
 
 		int idx = 1;
 
@@ -103,6 +105,7 @@ public class MailingListHome {
 			ps = con.prepareStatement(q);
 			ps.setInt(idx++, mailingListId);
 			ps.setInt(idx++, at.getObmId());
+			mlIds.insertValues(ps, idx);
 			rs = ps.executeQuery();
 			ret = mailingListEmailFromCursor(rs);
 		} catch (SQLException se) {
@@ -237,14 +240,13 @@ public class MailingListHome {
 			ps = con.prepareStatement("INSERT INTO MailingListEmail (mailinglistemail_mailinglist_id, mailinglistemail_label, mailinglistemail_address) "
 					+ "VALUES (?, ?, ?)");
 			
-			int[] ids = new int[emails.size()];
-			int i = 0;
+			List<Integer> ids = Lists.newArrayListWithExpectedSize(emails.size());
 			for (MLEmail e : emails) {
 				ps.setInt(1, mlId);
 				ps.setString(2, e.getLabel());
 				ps.setString(3, e.getAddress());
 				ps.executeUpdate();
-				ids[i++] = obmHelper.lastInsertId(con);
+				ids.add(obmHelper.lastInsertId(con));
 			}
 			
 			return getMailingListFromIds(con, at, mlId, ids);
@@ -317,13 +319,4 @@ public class MailingListHome {
 		}
 	}
 
-	private String buildMailListEmailsId(int[] ids) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("0");
-		for (int e : ids) {
-			sb.append(",");
-			sb.append(e);
-		}
-		return sb.toString();
-	}
 }

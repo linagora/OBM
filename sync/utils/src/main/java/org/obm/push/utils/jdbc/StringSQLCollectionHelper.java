@@ -1,4 +1,4 @@
-package fr.aliacom.obm.utils;
+package org.obm.push.utils.jdbc;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,6 +14,11 @@ public class StringSQLCollectionHelper extends AbstractSQLCollectionHelper<Strin
 	protected void insertValue(String value, PreparedStatement statement,
 			int parameterCount) throws SQLException {
 		statement.setString(parameterCount, value);
+	}
+	
+	@Override
+	protected String getZeroValue() {
+		return "'_unused_'";
 	}
 	
 }

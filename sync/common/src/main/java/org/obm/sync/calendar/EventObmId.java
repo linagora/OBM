@@ -2,9 +2,11 @@ package org.obm.sync.calendar;
 
 import java.io.Serializable;
 
+import org.obm.push.utils.index.Indexed;
+
 import com.google.common.base.Objects;
 
-public class EventObmId implements Serializable {
+public class EventObmId implements Indexed<Integer>, Serializable {
 
 	private final int obmId;
 
@@ -18,6 +20,11 @@ public class EventObmId implements Serializable {
 	
 	public int getObmId() {
 		return obmId;
+	}
+	
+	@Override
+	public Integer getIndex() {
+		return getObmId();
 	}
 	
 	public String serializeToString() {

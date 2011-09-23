@@ -22,7 +22,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -47,6 +46,9 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
+import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
+import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -218,10 +220,13 @@ public class ContactDao {
 		if (bdayIds.isEmpty()) {
 			return;
 		}
+		
+		IntegerIndexedSQLCollectionHelper eventIds = new IntegerIndexedSQLCollectionHelper(bdayIds);
 		String q = "select event_id, event_date from Event where event_id IN ("
-			+ buildIdList(bdayIds) + ")";
+			+ eventIds.asPlaceHolders() + ")";
 		try {
 			ps = con.prepareStatement(q);
+			eventIds.insertValues(ps, 1);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				EventObmId evId = new EventObmId(rs.getInt(1));
@@ -250,10 +255,13 @@ public class ContactDao {
 		if (bdayIds.isEmpty()) {
 			return;
 		}
+		
+		IntegerIndexedSQLCollectionHelper eventIds = new IntegerIndexedSQLCollectionHelper(bdayIds);
 		String q = "select event_id, event_date from Event where event_id IN ("
-			+ buildIdList(bdayIds) + ")";
+			+ eventIds.asPlaceHolders() + ")";
 		try {
 			ps = con.prepareStatement(q);
+			eventIds.insertValues(ps, 1);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				EventObmId evId = new EventObmId(rs.getInt(1));
@@ -487,10 +495,12 @@ public class ContactDao {
 			Map<String, InstantMessagingId> imIdentifiers) throws SQLException {
 		PreparedStatement ps = null;
 		try {
+			StringSQLCollectionHelper imIds = new StringSQLCollectionHelper(imIdentifiers.keySet());
 			ps = con
 			.prepareStatement("DELETE FROM IM WHERE im_entity_id=? AND im_label IN ("
-					+ formatListStringForSqlRequest(imIdentifiers.keySet()) + ")");
+					+ imIds.asPlaceHolders() + ")");
 			ps.setInt(1, entityId);
+			imIds.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
@@ -513,9 +523,11 @@ public class ContactDao {
 	private void createOrUpdateWebsites(final Connection con, final Contact c) throws SQLException {
 		PreparedStatement ps = null;
 		try {
+			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(c.listWebSitesLabel());
 			ps = con.prepareStatement("DELETE FROM Website WHERE website_entity_id=? AND website_label IN (" + 
-					formatListStringForSqlRequest(c.listWebSitesLabel()) + ")");
+					labels.asPlaceHolders() + ")");
 			ps.setInt(1, c.getEntityId());
+			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
@@ -553,10 +565,12 @@ public class ContactDao {
 			Map<String, Address> addresses) throws SQLException {
 		PreparedStatement ps = null;
 		try {
+			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(addresses.keySet());
 			ps = con
 			.prepareStatement("DELETE FROM Address WHERE address_entity_id=? and address_label IN ("
-					+ formatListStringForSqlRequest(addresses.keySet()) + ")");
+					+ labels.asPlaceHolders() + ")");
 			ps.setInt(1, entityId);
+			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
@@ -583,25 +597,17 @@ public class ContactDao {
 
 	}
 
-	private String formatListStringForSqlRequest(Set<String> values) {
-		final StringBuilder sb = new StringBuilder(values.size() * 20);
-		sb.append("'_unused_'");
-		for (final String s: values) {
-			sb.append(",'");
-			sb.append(s);
-			sb.append("'");
-		}
-		return sb.toString();
-	}
 
 	private void createOrUpdateEmails(Connection con, int entityId,
 			Map<String, Email> emails) throws SQLException {
 		PreparedStatement ps = null;
 		try {
+			StringSQLCollectionHelper emailStrings = new StringSQLCollectionHelper(emails.keySet());
 			ps = con
 			.prepareStatement("DELETE FROM Email WHERE email_entity_id=? AND email_label IN ("
-					+ formatListStringForSqlRequest(emails.keySet()) + ")");
+					+ emailStrings.asPlaceHolders() + ")");
 			ps.setInt(1, entityId);
+			emailStrings.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
@@ -624,10 +630,12 @@ public class ContactDao {
 			Map<String, Phone> phones) throws SQLException {
 		PreparedStatement ps = null;
 		try {
+			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(phones.keySet());
 			ps = con
 			.prepareStatement("DELETE FROM Phone WHERE phone_entity_id=? and phone_label IN ("
-					+ formatListStringForSqlRequest(phones.keySet()) + ")");
+					+ labels.asPlaceHolders() + ")");
 			ps.setInt(1, entityId);
+			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
@@ -889,13 +897,15 @@ public class ContactDao {
 	 * bulk loads all emails of the given entities (contacts)
 	 */
 	private void loadEmails(Connection con, Map<Integer, Contact> entityContact) {
+		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(entityContact.keySet());
 		String q = "select email_entity_id, email_label, email_address FROM Email where email_entity_id IN ("
-			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
-		Statement st = null;
+			+ contactIds.asPlaceHolders() + ")";
+		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			st = con.createStatement();
-			rs = st.executeQuery(q);
+			st = con.prepareStatement(q);
+			contactIds.insertValues(st, 1);
+			rs = st.executeQuery();
 			while (rs.next()) {
 				Contact c = entityContact.get(rs.getInt(1));
 				Email p = new Email(rs.getString(3));
@@ -910,15 +920,17 @@ public class ContactDao {
 
 	private void loadAddresses(AccessToken token, Connection con,
 			Map<Integer, Contact> entityContact) {
+		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(entityContact.keySet());
 		String q = "select address_entity_id, address_label, "
 			+ "address_street, address_zipcode, address_expresspostal, address_town, address_country, address_state "
 			+ "FROM Address where address_entity_id IN ("
-			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
-		Statement st = null;
+			+ contactIds.asPlaceHolders() + ")";
+		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			st = con.createStatement();
-			rs = st.executeQuery(q);
+			st = con.prepareStatement(q);
+			contactIds.insertValues(st, 1);
+			rs = st.executeQuery();
 			while (rs.next()) {
 				Contact c = entityContact.get(rs.getInt(1));
 				Address p = new Address(rs.getString(3), rs.getString(4), rs
@@ -934,13 +946,15 @@ public class ContactDao {
 	}
 
 	private void loadWebsites(Connection con, Map<Integer, Contact> entityContact) {
+		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(entityContact.keySet());
 		String q = "select website_entity_id, website_label, website_url FROM Website where website_entity_id IN ("
-			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
-		Statement st = null;
+			+ contactIds.asPlaceHolders() + ")";
+		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			st = con.createStatement();
-			rs = st.executeQuery(q);
+			st = con.prepareStatement(q);
+			contactIds.insertValues(st, 1);
+			rs = st.executeQuery();
 			while (rs.next()) {
 				Contact c = entityContact.get(rs.getInt(1));
 				String label = rs.getString(2);
@@ -959,13 +973,15 @@ public class ContactDao {
 
 	private void loadIMIdentifiers(Connection con,
 			Map<Integer, Contact> entityContact) {
+		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(entityContact.keySet());
 		String q = "select im_entity_id, im_label, im_address, im_protocol FROM IM where im_entity_id IN ("
-			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
-		Statement st = null;
+			+ contactIds.asPlaceHolders() + ")";
+		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			st = con.createStatement();
-			rs = st.executeQuery(q);
+			st = con.prepareStatement(q);
+			contactIds.insertValues(st, 1);
+			rs = st.executeQuery();
 			while (rs.next()) {
 				Contact c = entityContact.get(rs.getInt(1));
 				InstantMessagingId p = new InstantMessagingId(rs.getString(4),
@@ -978,42 +994,17 @@ public class ContactDao {
 			obmHelper.cleanup(null, st, rs);
 		}
 	}
-
-	/**
-	 * Creates a comma separated list of id usable in IN (x,y,z) SQL queries
-	 */
-	private String buildIdList(Set<EventObmId> set) {
-		StringBuilder sb = new StringBuilder(10 * set.size());
-		sb.append("0");
-		for (EventObmId i : set) {
-			sb.append(",");
-			sb.append(i.getObmId());
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * Creates a comma separated list of id usable in IN (x,y,z) SQL queries
-	 */
-	private String buildIdListFromIntegers(Set<Integer> set) {
-		StringBuilder sb = new StringBuilder(10 * set.size());
-		sb.append("0");
-		for (int i : set) {
-			sb.append(",");
-			sb.append(i);
-		}
-		return sb.toString();
-	}
-
 	
 	private void loadPhones(Connection con, Map<Integer, Contact> entityContact) {
+		IntegerSQLCollectionHelper phoneIds = new IntegerSQLCollectionHelper(entityContact.keySet());
 		String q = "select phone_entity_id, phone_label, phone_number FROM Phone where phone_entity_id IN ("
-			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
-		Statement st = null;
+			+ phoneIds.asPlaceHolders() + ")";
+		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
-			st = con.createStatement();
-			rs = st.executeQuery(q);
+			st = con.prepareStatement(q);
+			phoneIds.insertValues(st, 1);
+			rs = st.executeQuery();
 			while (rs.next()) {
 				Contact c = entityContact.get(rs.getInt(1));
 				Phone p = new Phone(rs.getString(3));
@@ -1423,14 +1414,15 @@ public class ContactDao {
 				}
 			}
 
+			IntegerSQLCollectionHelper eventIds = new IntegerSQLCollectionHelper(evtIds);
 			String q = "SELECT "
 				+ CONTACT_SELECT_FIELDS
 				+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
 				+ "contactentity_contact_id=contact_id AND contact_archive != 1 AND contact_id IN ("
-				+ buildIdListFromIntegers(evtIds) + ")";
+				+ eventIds.asPlaceHolders() + ")";
 
 			ps = con.prepareStatement(q);
-
+			eventIds.insertValues(ps, 1);
 			rs = ps.executeQuery();
 			Map<Integer, Contact> entityContact = new HashMap<Integer, Contact>();
 
