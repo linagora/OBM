@@ -4544,7 +4544,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   if (is_array($contacts['entity'])) {
     foreach ($contacts['entity'] as $u_id => $u_ent) {
-      if(is_array($template_entities['contact']) && in_array($u_id, $template_entities['contact']))
+      if($template_entities == null || (is_array($template_entities['contact']) && in_array($u_id, $template_entities['contact'])))
       {
         $u_name = $u_ent['label'];
         $sel_id = "data-contact-$u_id";
