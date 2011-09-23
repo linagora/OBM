@@ -1,13 +1,15 @@
 package org.obm.sync.auth;
 
+import org.obm.sync.calendar.EventObmId;
+
 public class EventNotFoundException extends Exception {
 
 	public EventNotFoundException(String s) {
 		super(s);
 	}
 	
-	public EventNotFoundException(int uid) {
-		this("Event from uid " + uid + " not found.");
+	public EventNotFoundException(EventObmId uid) {
+		this("Event " + uid + " not found.");
 	}
 
 }

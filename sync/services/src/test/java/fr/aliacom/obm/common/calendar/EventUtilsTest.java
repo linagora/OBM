@@ -10,6 +10,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 
@@ -21,7 +22,7 @@ public class EventUtilsTest {
 		Calendar cal = new GregorianCalendar();
 		cal.setTimeInMillis(1295258400000L);
 		ev.setDate(cal.getTime());
-		ev.setExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149");
+		ev.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"));
 		ev.setTitle("fake rdv");
 		ev.setOwner("john@do.fr");
 		ev.setDuration(3600);

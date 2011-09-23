@@ -61,6 +61,7 @@ import org.obm.sync.book.Phone;
 import org.obm.sync.book.Website;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
@@ -206,8 +207,8 @@ public class ContactDao {
 			Map<Integer, Contact> entityContact) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Set<Integer> bdayIds = new HashSet<Integer>();
-		HashMap<Integer, Contact> eventIdMap = new HashMap<Integer, Contact>();
+		Set<EventObmId> bdayIds = new HashSet<EventObmId>();
+		HashMap<EventObmId, Contact> eventIdMap = new HashMap<EventObmId, Contact>();
 		for (Contact c : entityContact.values()) {
 			if (c.getBirthdayId() != null) {
 				bdayIds.add(c.getBirthdayId());
@@ -223,7 +224,7 @@ public class ContactDao {
 			ps = con.prepareStatement(q);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				int evId = rs.getInt(1);
+				EventObmId evId = new EventObmId(rs.getInt(1));
 				Contact c = eventIdMap.get(evId);
 				c.setBirthday(rs.getTimestamp(2));
 			}
@@ -238,8 +239,8 @@ public class ContactDao {
 			Map<Integer, Contact> entityContact) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Set<Integer> bdayIds = new HashSet<Integer>();
-		HashMap<Integer, Contact> eventIdMap = new HashMap<Integer, Contact>();
+		Set<EventObmId> bdayIds = new HashSet<EventObmId>();
+		HashMap<EventObmId, Contact> eventIdMap = new HashMap<EventObmId, Contact>();
 		for (Contact c : entityContact.values()) {
 			if (c.getBirthdayId() != null) {
 				bdayIds.add(c.getAnniversaryId());
@@ -255,7 +256,7 @@ public class ContactDao {
 			ps = con.prepareStatement(q);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				int evId = rs.getInt(1);
+				EventObmId evId = new EventObmId(rs.getInt(1));
 				Contact c = eventIdMap.get(evId);
 				c.setAnniversary(rs.getTimestamp(2));
 			}
@@ -277,11 +278,17 @@ public class ContactDao {
 		c.setCompany(rs.getString(6));
 		c.setTitle(rs.getString(7));
 		c.setService(rs.getString(8));
-		c.setBirthdayId(rs.getInt(9));
+		int birthdayId = rs.getInt(9);
+		if (!rs.wasNull()) {
+			c.setBirthdayId(new EventObmId(birthdayId));
+		}
 
 		// "contact_anniversary_id, contact_middlename, contact_suffix, contact_manager, contact_assistant, contact_spouse ";
 		// post freeze fields
-		c.setAnniversaryId(rs.getInt(10));
+		int anniversaryId = rs.getInt(10);
+		if (!rs.wasNull()) {
+			c.setAnniversaryId(new EventObmId(anniversaryId));
+		}
 		c.setMiddlename(rs.getString(11));
 		c.setSuffix(rs.getString(12));
 		c.setManager(rs.getString(13));
@@ -297,11 +304,11 @@ public class ContactDao {
 
 	private Contact createContactInAddressBook(Connection con, AccessToken at, Contact c, int addressBookId) {
 		try {
-			Integer anniversaryId = createOrUpdateDate(at, con, c, c
+			EventObmId anniversaryId = createOrUpdateDate(at, con, c, c
 					.getAnniversary(), ANNIVERSARY_FIELD);
 			c.setAnniversaryId(anniversaryId);
 
-			Integer birthdayId = createOrUpdateDate(at, con, c,
+			EventObmId birthdayId = createOrUpdateDate(at, con, c,
 					c.getBirthday(), BIRTHDAY_FIELD);
 			c.setBirthdayId(birthdayId);
 
@@ -405,50 +412,75 @@ public class ContactDao {
 		return b.toString();
 	}
 
-	private Integer createOrUpdateDate(AccessToken at, Connection con,
-			Contact c, Date date, String dateField) throws SQLException, FindException, EventNotFoundException, ServerFault {
-		int dateId = 0;
+	private EventObmId createOrUpdateDate(AccessToken at, Connection con,
+			Contact c, Date date, String idField) throws SQLException, FindException, EventNotFoundException, ServerFault {
+		EventObmId dateId = null;
 		if (c.getUid() != null && c.getUid().intValue() != 0) {
-			logger.info("c.getUid != null");
-			PreparedStatement ps = null;
-			ResultSet rs = null;
-			String q = "select " + dateField
-			+ " from Contact where contact_id=?";
-			try {
-				ps = con.prepareStatement(q);
-				ps.setInt(1, c.getUid());
-				rs = ps.executeQuery();
-				if (rs.next()) {
-					dateId = rs.getInt(1);
-				}
-			} catch (SQLException se) {
-				logger.error(se.getMessage(), se);
-			} finally {
-				obmHelper.cleanup(null, ps, rs);
-			}
+			dateId = getDateIdForContact(con, c, idField);
 		}
 
 		if (date != null) {
 			logger.info("date != null");
-			if (dateId == 0) {
-				logger.info("eventId == null");
-				Event e = calendarDao.createEvent(con, at, at.getUserWithDomain(),
-						getEvent(at, displayName(c), date), true);
-				return e.getDatabaseId();
+			if (dateId == null) {
+				return createEventForContactDate(at, con, c, date);
+			} else {
+				return retrieveAndModifyEventForContactDate(at, con, date, dateId);
 			}
-			logger.info("eventId != null");
-			Event e = calendarDao.findEventById(at, dateId);
-			e.setDate(date);
-			calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false, true);
-			return e.getDatabaseId();
+		} else {
+			logger.info("date == null");
+			if (dateId != null) {
+				//sequence is set to zero as no email notification will be send 
+				calendarDao.removeEventById(con, at, dateId, EventType.VEVENT, 0);
+				return null;
+			} else {
+				return dateId;
+			}
 		}
-		logger.info("date == null");
-		if (dateId != 0) {
-			//sequence is set to zero as no email notification will be send 
-			calendarDao.removeEvent(con, at, dateId, EventType.VEVENT, 0);
-			return 0;
+	}
+
+
+	private EventObmId retrieveAndModifyEventForContactDate(AccessToken at,
+			Connection con, Date date, EventObmId dateId)
+			throws EventNotFoundException, ServerFault, SQLException,
+			FindException {
+		logger.info("eventId != null");
+		Event e = calendarDao.findEventById(at, dateId);
+		e.setDate(date);
+		calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false, true);
+		return e.getUid();
+	}
+
+
+	private EventObmId createEventForContactDate(AccessToken at,
+			Connection con, Contact c, Date date) throws SQLException,
+			FindException {
+		logger.info("eventId == null");
+		Event e = calendarDao.createEvent(con, at, at.getUserWithDomain(),
+				getEvent(at, displayName(c), date), true);
+		return e.getUid();
+	}
+
+
+	private EventObmId getDateIdForContact(Connection con, Contact c, String idField) {
+		
+		logger.info("c.getUid != null");
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String q = "select " + idField
+		+ " from Contact where contact_id=?";
+		try {
+			ps = con.prepareStatement(q);
+			ps.setInt(1, c.getUid());
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				return new EventObmId(rs.getInt(1));
+			}
+		} catch (SQLException se) {
+			logger.error(se.getMessage(), se);
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
 		}
-		return dateId;
+		return null;
 	}
 
 	private void createOrUpdateIMIdentifiers(Connection con, int entityId,
@@ -662,13 +694,13 @@ public class ContactDao {
 			ps.setString(idx++, c.getAka());
 			ps.setString(idx++, c.getService());
 			ps.setString(idx++, c.getTitle());
-			if (c.getBirthdayId() != null && c.getBirthdayId() > 0) {
-				ps.setInt(idx++, c.getBirthdayId());
+			if (c.getBirthdayId() != null) {
+				ps.setInt(idx++, c.getBirthdayId().getObmId());
 			} else {
 				ps.setNull(idx++, Types.BIGINT);
 			}
-			if (c.getAnniversaryId() != null && c.getAnniversaryId() > 0) {
-				ps.setInt(idx++, c.getAnniversaryId());
+			if (c.getAnniversaryId() != null) {
+				ps.setInt(idx++, c.getAnniversaryId().getObmId());
 			} else {
 				ps.setNull(idx++, Types.BIGINT);
 			}
@@ -709,11 +741,11 @@ public class ContactDao {
 		try {
 			con = obmHelper.getConnection();
 
-			Integer anniversaryId = createOrUpdateDate(token, con, c, c
+			EventObmId anniversaryId = createOrUpdateDate(token, con, c, c
 					.getAnniversary(), ANNIVERSARY_FIELD);
 			c.setAnniversaryId(anniversaryId);
 
-			Integer birthdayId = createOrUpdateDate(token, con, c, c
+			EventObmId birthdayId = createOrUpdateDate(token, con, c, c
 					.getBirthday(), BIRTHDAY_FIELD);
 			c.setBirthdayId(birthdayId);
 
@@ -737,16 +769,15 @@ public class ContactDao {
 			ps.setString(idx++, c.getMiddlename());
 			ps.setString(idx++, c.getAssistant());
 			ps.setString(idx++, c.getSpouse());
-			if (c.getAnniversaryId() == null
-					|| c.getAnniversaryId().intValue() == 0) {
+			if (c.getAnniversaryId() == null) {
 				ps.setNull(idx++, Types.INTEGER);
 			} else {
-				ps.setInt(idx++, c.getAnniversaryId());
+				ps.setInt(idx++, c.getAnniversaryId().getObmId());
 			}
-			if (c.getBirthdayId() == null || c.getBirthdayId().intValue() == 0) {
+			if (c.getBirthdayId() == null) {
 				ps.setNull(idx++, Types.INTEGER);
 			} else {
-				ps.setInt(idx++, c.getBirthdayId());
+				ps.setInt(idx++, c.getBirthdayId().getObmId());
 			}
 
 			ps.setInt(idx++, c.getUid());
@@ -859,7 +890,7 @@ public class ContactDao {
 	 */
 	private void loadEmails(Connection con, Map<Integer, Contact> entityContact) {
 		String q = "select email_entity_id, email_label, email_address FROM Email where email_entity_id IN ("
-			+ buildIdList(entityContact.keySet()) + ")";
+			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -882,7 +913,7 @@ public class ContactDao {
 		String q = "select address_entity_id, address_label, "
 			+ "address_street, address_zipcode, address_expresspostal, address_town, address_country, address_state "
 			+ "FROM Address where address_entity_id IN ("
-			+ buildIdList(entityContact.keySet()) + ")";
+			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -904,7 +935,7 @@ public class ContactDao {
 
 	private void loadWebsites(Connection con, Map<Integer, Contact> entityContact) {
 		String q = "select website_entity_id, website_label, website_url FROM Website where website_entity_id IN ("
-			+ buildIdList(entityContact.keySet()) + ")";
+			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -929,7 +960,7 @@ public class ContactDao {
 	private void loadIMIdentifiers(Connection con,
 			Map<Integer, Contact> entityContact) {
 		String q = "select im_entity_id, im_label, im_address, im_protocol FROM IM where im_entity_id IN ("
-			+ buildIdList(entityContact.keySet()) + ")";
+			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -951,19 +982,33 @@ public class ContactDao {
 	/**
 	 * Creates a comma separated list of id usable in IN (x,y,z) SQL queries
 	 */
-	private String buildIdList(Set<Integer> set) {
+	private String buildIdList(Set<EventObmId> set) {
 		StringBuilder sb = new StringBuilder(10 * set.size());
 		sb.append("0");
-		for (Integer i : set) {
+		for (EventObmId i : set) {
+			sb.append(",");
+			sb.append(i.getObmId());
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Creates a comma separated list of id usable in IN (x,y,z) SQL queries
+	 */
+	private String buildIdListFromIntegers(Set<Integer> set) {
+		StringBuilder sb = new StringBuilder(10 * set.size());
+		sb.append("0");
+		for (int i : set) {
 			sb.append(",");
 			sb.append(i);
 		}
 		return sb.toString();
 	}
 
+	
 	private void loadPhones(Connection con, Map<Integer, Contact> entityContact) {
 		String q = "select phone_entity_id, phone_label, phone_number FROM Phone where phone_entity_id IN ("
-			+ buildIdList(entityContact.keySet()) + ")";
+			+ buildIdListFromIntegers(entityContact.keySet()) + ")";
 		Statement st = null;
 		ResultSet rs = null;
 		try {
@@ -1382,7 +1427,7 @@ public class ContactDao {
 				+ CONTACT_SELECT_FIELDS
 				+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
 				+ "contactentity_contact_id=contact_id AND contact_archive != 1 AND contact_id IN ("
-				+ buildIdList(evtIds) + ")";
+				+ buildIdListFromIntegers(evtIds) + ")";
 
 			ps = con.prepareStatement(q);
 

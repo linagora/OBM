@@ -7,6 +7,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.sync.calendar.EventObmId;
 
 public interface IInvitationFilterManager {
 
@@ -14,11 +15,11 @@ public interface IInvitationFilterManager {
 
 	void filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) throws DaoException, ProcessingEmailException;
 
-	void handleMeetingResponse(BackendSession bs, Integer invitationCollexctionId, MSEmail invitation) throws DaoException;
+	void handleMeetingResponse(BackendSession bs, Integer invitationCollectionId, MSEmail invitation) throws DaoException;
 
 	int getCountFilterChanges(BackendSession bs, String syncKey, PIMDataType dataType, Integer collectionId) throws DaoException;
 
-	void deleteFilteredEvent(Integer collectionId, String eventUid) throws DaoException;
+	void deleteFilteredEvent(Integer collectionId, EventObmId eventUid) throws DaoException;
 
 	void deleteFilteredEmail(Integer collectionId, Long mailUid) throws DaoException;
 

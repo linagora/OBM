@@ -33,7 +33,7 @@ private CalendarItemsWriter writer;
 	}
 	
 	@Test
-	public void testGetEventString() {
+	public void testGetEventString() throws TransformerException {
 		Event ev = new Event();
 		ev.setInternalEvent(true);
 		Calendar cal = new GregorianCalendar();
@@ -45,7 +45,7 @@ private CalendarItemsWriter writer;
 		cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
 		ev.setTimeCreate(cal.getTime());
 		
-		ev.setExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149");
+		ev.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"));
 		ev.setTitle("fake rdv");
 		ev.setOwner("john@do.fr");
 		ev.setDuration(3600);
@@ -80,7 +80,7 @@ private CalendarItemsWriter writer;
 		String eventS = writer.getEventString(ev);
 		
 		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<timeupdate>1292580000000</timeupdate>" +
 		"<timecreate>1289988000000</timecreate>"+
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
@@ -113,7 +113,7 @@ private CalendarItemsWriter writer;
 		Calendar cal = new GregorianCalendar();
 		cal.setTimeInMillis(1295258400000L);
 		ev.setDate(cal.getTime());
-		ev.setExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149");
+		ev.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"));
 		ev.setTitle("fake rdv");
 		ev.setOwner("john@do.fr");
 		ev.setDuration(3600);
@@ -149,7 +149,7 @@ private CalendarItemsWriter writer;
 		writer.appendEvent(root, ev);
 		
 		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" isInternal=\"false\" sequence=\"6\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" isInternal=\"false\" sequence=\"6\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
 		"<opacity>OPAQUE</opacity>" +
 		"<title>fake rdv</title>" +

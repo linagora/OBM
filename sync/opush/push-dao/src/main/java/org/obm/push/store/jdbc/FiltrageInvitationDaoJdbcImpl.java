@@ -16,12 +16,13 @@ import org.obm.push.bean.InvitationStatus;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.FiltrageInvitationDao;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.sync.calendar.EventObmId;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements FiltrageInvitationDao{
+public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements FiltrageInvitationDao {
 
 	@Inject
 	private FiltrageInvitationDaoJdbcImpl(IDBCP dbcp) {
@@ -30,7 +31,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 	
 	@Override
 	public boolean eventIsAlreadySynced(Integer eventCollectionId,
-			String eventUid) throws DaoException {
+			EventObmId eventUid) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -43,7 +44,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			con = dbcp.getConnection();
 			ps = con.prepareStatement(query);
 			ps.setInt(1, eventCollectionId);
-			ps.setString(2, eventUid);
+			ps.setInt(2, eventUid.getObmId());
 			ps.setString(3, InvitationStatus.EVENT_SYNCED.toString());
 			rs = ps.executeQuery();
 			if (rs.next()) {
@@ -60,7 +61,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 
 	@Override
 	public void setEventStatusAtToDelete(Integer eventCollectionId,
-			String eventUid) throws DaoException {
+			EventObmId eventUid) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 
@@ -73,7 +74,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			ps = con.prepareStatement(query);
 			ps.setString(1, InvitationStatus.EVENT_TO_DELETED.toString());
 			ps.setInt(2, eventCollectionId);
-			ps.setString(3, eventUid);
+			ps.setInt(3, eventUid.getObmId());
 			ps.setString(4, InvitationStatus.EVENT_SYNCED.toString());
 			ps.setString(5, InvitationStatus.EVENT_TO_SYNCED.toString());
 			ps.execute();
@@ -86,7 +87,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 
 	@Override
 	public void setInvitationStatusAtToDelete(Integer eventCollectionId,
-			String eventUid) throws DaoException {
+			EventObmId eventUid) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 
@@ -99,7 +100,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			ps = con.prepareStatement(query);
 			ps.setString(1, InvitationStatus.DELETED.toString());
 			ps.setInt(2, eventCollectionId);
-			ps.setString(3, eventUid);
+			ps.setInt(3, eventUid.getObmId());
 			ps.setString(4, InvitationStatus.EMAIL_SYNCED.toString());
 			ps.setString(5, InvitationStatus.EMAIL_TO_SYNCED.toString());
 			ps.execute();
@@ -112,7 +113,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 
 	@Override
 	public boolean invitationIsAlreadySynced(Integer eventCollectionId,
-			String eventUid) throws DaoException {
+			EventObmId eventUid) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -129,10 +130,10 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			con = dbcp.getConnection();
 			ps = con.prepareStatement(query);
 			ps.setInt(1, eventCollectionId);
-			ps.setString(2, eventUid);
+			ps.setInt(2, eventUid.getObmId());
 			ps.setString(3, InvitationStatus.EMAIL_SYNCED.toString());
 			ps.setInt(4, eventCollectionId);
-			ps.setString(5, eventUid);
+			ps.setInt(5, eventUid.getObmId());
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				return true;
@@ -168,7 +169,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 	
 	@Override
 	public Boolean isMostRecentInvitation(Integer eventCollectionId,
-			String eventUid, Date dtStamp) throws DaoException {
+			EventObmId eventUid, Date dtStamp) throws DaoException {
 
 		Boolean ret = true;
 		String calQuery = "SELECT * FROM opush_invitation_mapping "
@@ -181,7 +182,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			con = dbcp.getConnection();
 			ps = con.prepareStatement(calQuery);
 			ps.setInt(1, eventCollectionId);
-			ps.setString(2, eventUid);
+			ps.setInt(2, eventUid.getObmId());
 			ps.setTimestamp(3, new Timestamp(dtStamp.getTime()));
 			rs = ps.executeQuery();
 			if (rs.next()) {
@@ -196,19 +197,19 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 	}
 
 	@Override
-	public boolean haveEmailToDeleted(Integer eventCollectionId, String eventUid) throws DaoException {
+	public boolean haveEmailToDeleted(Integer eventCollectionId, EventObmId eventUid) throws DaoException {
 		return isInvitationExistsToStatus(eventCollectionId, eventUid,
 				InvitationStatus.EMAIL_TO_DELETED);
 	}
 
 	@Override
-	public boolean haveEventToDeleted(Integer eventCollectionId, String eventUid) throws DaoException {
+	public boolean haveEventToDeleted(Integer eventCollectionId, EventObmId eventUid) throws DaoException {
 		return isInvitationExistsToStatus(eventCollectionId, eventUid,
 				InvitationStatus.EVENT_TO_DELETED);
 	}
 
 	private boolean isInvitationExistsToStatus(Integer eventCollectionId,
-			String eventUid, InvitationStatus status) throws DaoException {
+			EventObmId eventUid, InvitationStatus status) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -222,7 +223,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			ps = con.prepareStatement(query);
 			int i = 1;
 			ps.setInt(i++, eventCollectionId);
-			ps.setString(i++, eventUid);
+			ps.setInt(i++, eventUid.getObmId());
 			ps.setString(i++, status.toString());
 
 			rs = ps.executeQuery();
@@ -309,21 +310,21 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 
 	@Override
 	public void createOrUpdateInvitationEventAsMustSynced(
-			Integer eventCollectionId, String eventUid, Date dtStamp) throws DaoException {
+			Integer eventCollectionId, EventObmId eventUid, Date dtStamp) throws DaoException {
 		createOrUpdateInvitationEvent(eventCollectionId, eventUid, dtStamp,
 				InvitationStatus.EVENT_MUST_SYNCED);
 	}
 
 	@Override
 	public void createOrUpdateInvitationEvent(Integer eventCollectionId,
-			String uid, Date dtStamp, InvitationStatus status) throws DaoException {
+			EventObmId uid, Date dtStamp, InvitationStatus status) throws DaoException {
 		createOrUpdateInvitationEvent(eventCollectionId, uid, dtStamp, status,
 				null);
 	}
 
 	@Override
 	public void createOrUpdateInvitationEvent(Integer eventCollectionId,
-			String eventUid, Date dtStamp, InvitationStatus status,
+			EventObmId eventUid, Date dtStamp, InvitationStatus status,
 			String syncKey) throws DaoException {
 		createOrUpdateInvitation(eventCollectionId, eventUid, null, null,
 				dtStamp, status, syncKey);
@@ -331,7 +332,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 
 	@Override
 	public void createOrUpdateInvitation(Integer eventCollectionId,
-			String eventUid, Integer emailCollectionId, Long emailUid,
+			EventObmId eventUid, Integer emailCollectionId, Long emailUid,
 			Date dtStamp, InvitationStatus status, String syncKey) throws DaoException {
 
 		StringBuilder calQuery = new StringBuilder(
@@ -356,7 +357,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			ps = con.prepareStatement(calQuery.toString());
 			int i = 1;
 			ps.setInt(i++, eventCollectionId);
-			ps.setString(i++, eventUid);
+			ps.setInt(i++, eventUid.getObmId());
 
 			if (emailCollectionId != null) {
 				ps.setInt(i++, emailCollectionId);
@@ -380,7 +381,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 	}
 
 	private void updateToSyncedInvitation(Connection con,
-			Integer eventCollectionId, String eventUid,
+			Integer eventCollectionId, EventObmId eventUid,
 			Integer emailCollectionId, Long emailUid, InvitationStatus status,
 			String synkKey, Date dtStamp) throws DaoException {
 
@@ -412,7 +413,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			}
 
 			ps.setInt(i++, eventCollectionId);
-			ps.setString(i++, eventUid);
+			ps.setInt(i++, eventUid.getObmId());
 			if (emailCollectionId != null) {
 				ps.setInt(i++, emailCollectionId);
 			}
@@ -429,7 +430,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 	}
 
 	private void createInvitation(Connection con, Integer eventCollectionId,
-			String eventUid, Integer emailCollectionId, Long emailUid,
+			EventObmId eventUid, Integer emailCollectionId, Long emailUid,
 			Date dtStamp, InvitationStatus status, String syncKey)
 			throws SQLException {
 
@@ -451,7 +452,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			}
 
 			ps.setInt(i++, eventCollectionId);
-			ps.setString(i++, eventUid);
+			ps.setInt(i++, eventUid.getObmId());
 
 			if (dtStamp != null) {
 				ps.setTimestamp(i++, new Timestamp(dtStamp.getTime()));
@@ -503,14 +504,14 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 
 	@Override
 	public void updateInvitationEventStatus(InvitationStatus status,
-			Integer eventCollectionId, Collection<String> eventUids) throws DaoException {
+			Integer eventCollectionId, Collection<EventObmId> eventUids) throws DaoException {
 		updateInvitationEventStatus(status, null, eventCollectionId, eventUids);
 	}
 
 	@Override
 	public void updateInvitationEventStatus(InvitationStatus status,
 			String syncKey, Integer eventCollectionId,
-			Collection<String> eventUids) throws DaoException {
+			Collection<EventObmId> eventUids) throws DaoException {
 		if (eventUids.size() > 0) {
 			Connection con = null;
 			PreparedStatement ps = null;
@@ -536,8 +537,8 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 	}
 
 	@Override
-	public List<String> getInvitationEventMustSynced(Integer eventCollectionId) throws DaoException {
-		List<String> ret = new ArrayList<String>();
+	public List<EventObmId> getInvitationEventMustSynced(Integer eventCollectionId) throws DaoException {
+		List<EventObmId> ret = new ArrayList<EventObmId>();
 		String calQuery = "SELECT event_uid FROM opush_invitation_mapping "
 				+ "WHERE event_collection_id=? AND status=?";
 		Connection con = null;
@@ -551,7 +552,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ret.add(rs.getString("event_uid"));
+				ret.add(new EventObmId(rs.getString("event_uid")));
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -602,22 +603,22 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 	}
 
 	@Override
-	public List<String> getEventToSynced(Integer eventCollectionId,
+	public List<EventObmId> getEventToSynced(Integer eventCollectionId,
 			String syncKey) throws DaoException {
 		return getEvent(eventCollectionId, syncKey,
 				InvitationStatus.EVENT_SYNCED, InvitationStatus.EVENT_TO_SYNCED);
 	}
 
 	@Override
-	public List<String> getEventToDeleted(Integer eventCollectionId,
+	public List<EventObmId> getEventToDeleted(Integer eventCollectionId,
 			String syncKey) throws DaoException {
 		return getEvent(eventCollectionId, syncKey, InvitationStatus.DELETED,
 				InvitationStatus.EVENT_TO_DELETED);
 	}
 
-	private List<String> getEvent(Integer eventCollectionId, String syncKey,
+	private List<EventObmId> getEvent(Integer eventCollectionId, String syncKey,
 			InvitationStatus status, InvitationStatus statusAction) throws DaoException {
-		List<String> ret = new ArrayList<String>();
+		List<EventObmId> ret = new ArrayList<EventObmId>();
 		String calQuery = "SELECT event_uid"
 				+ " FROM opush_invitation_mapping WHERE event_collection_id=? AND ( status=? OR ( sync_key=? AND status=? ))";
 		Connection con = null;
@@ -632,7 +633,7 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 			ps.setString(4, status.toString());
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ret.add(rs.getString("event_uid"));
+				ret.add(new EventObmId(rs.getString("event_uid")));
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -652,13 +653,13 @@ public class FiltrageInvitationDaoJdbcImpl extends AbstractJdbcImpl implements F
 		return sb.toString();
 	}
 
-	private String buildEventUid(Collection<String> eventUids) {
+	private String buildEventUid(Collection<EventObmId> eventUids) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("'0'");
-		for (String s : eventUids) {
+		for (EventObmId s : eventUids) {
 			sb.append(",");
 			sb.append("'");
-			sb.append(s);
+			sb.append(s.getObmId());
 			sb.append("'");
 		}
 		return sb.toString();

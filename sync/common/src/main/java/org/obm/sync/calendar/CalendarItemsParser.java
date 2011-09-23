@@ -16,6 +16,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.google.common.base.Strings;
+
 public class CalendarItemsParser extends AbstractItemsParser {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -33,8 +35,9 @@ public class CalendarItemsParser extends AbstractItemsParser {
 				.getLength() + 1);
 		for (int i = 0; i < rmed.getLength(); i++) {
 			Element e = (Element) rmed.item(i);
-			removedIds.add(new DeletedEvent(Integer.parseInt(e
-					.getAttribute("id")), e.getAttribute("extId")));
+			removedIds.add(new DeletedEvent(
+					new EventObmId(e.getAttribute("id")), 
+					new EventExtId(e.getAttribute("extId"))));
 		}
 		changes.setDeletions(removedIds);
 
@@ -53,7 +56,10 @@ public class CalendarItemsParser extends AbstractItemsParser {
 
 	public Event parseEvent(Element e) {
 		Event ev = new Event();
-		ev.setUid(e.getAttribute("id"));
+		String id = e.getAttribute("id");
+		if (!Strings.isNullOrEmpty(id)) {
+			ev.setUid(new EventObmId(id));
+		}
 		ev.setInternalEvent(e.hasAttribute("isInternal") ? !"false".equals(e
 				.getAttribute("isInternal")) : true);
 		ev.setAllday(e.hasAttribute("allDay") ? "true".equals(e
@@ -63,7 +69,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		if (e.hasAttribute("sequence")) {
 			ev.setSequence(Integer.valueOf(e.getAttribute("sequence")));
 		}
-		ev.setExtId(s(e, "extId"));
+		ev.setExtId(new EventExtId(s(e, "extId")));
 		ev.setRecurrenceId(d(e, "recurrenceId"));
 
 		String opacity = DOMUtils.getElementTextInChildren(e, "opacity");

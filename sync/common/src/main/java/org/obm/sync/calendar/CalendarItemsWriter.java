@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.transform.TransformerException;
+
 import org.obm.sync.base.Category;
 import org.obm.sync.items.AbstractItemsWriter;
 import org.obm.sync.items.EventChanges;
@@ -33,12 +35,12 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 							.getLastSync()));
 
 			Element removed = DOMUtils.createElement(root, "removed");
-			String[] rmIds = cc.getRemoved();
-			String[] rmExtIds = cc.getRemovedExtIds();
+			EventObmId[] rmIds = cc.getRemoved();
+			EventExtId[] rmExtIds = cc.getRemovedExtIds();
 			for (int i = 0; i < rmIds.length; i++) {
 				Element e = DOMUtils.createElement(removed, "event");
-				e.setAttribute("id", ""+rmIds[i]);
-				e.setAttribute("extId", ""+rmExtIds[i]);
+				e.setAttribute("id", rmIds[i].serializeToString());
+				e.setAttribute("extId", rmExtIds[i].serializeToString());
 			}
 
 			Element updated = DOMUtils.createElement(root, "updated");
@@ -57,8 +59,8 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 
 	private void appendParticipationChanges(Element parent,	ParticipationChanges changes) {
 		Element participation = DOMUtils.createElement(parent, "participation");
-		participation.setAttribute("id", String.valueOf(changes.getEventId()));
-		participation.setAttribute("extId", changes.getEventExtId());
+		participation.setAttribute("id", changes.getEventId().serializeToString());
+		participation.setAttribute("extId", changes.getEventExtId().serializeToString());
 		Element attendees = DOMUtils.createElement(participation, "attendees");
 		for (Attendee a: changes.getAttendees()) {
 			appendAttendeeForParticipation(attendees, a);
@@ -82,7 +84,10 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		}
 		e.setAttribute("type", ev.getType().toString());
 		e.setAttribute("allDay", "" + ev.isAllday());
-		e.setAttribute("id", ev.getUid());
+		EventObmId eventId = ev.getUid();
+		if (eventId != null) {
+			e.setAttribute("id", eventId.serializeToString());
+		}
 		e.setAttribute("sequence", String.valueOf(ev.getSequence()));
 		e.setAttribute("isInternal", ""+ev.isInternalEvent());
 		if (ev.getTimeUpdate() != null) {
@@ -97,7 +102,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 			createIfNotNull(e, "recurrenceId", DateHelper.asString(ev
 					.getRecurrenceId()));
 		}
-		createIfNotNull(e, "extId", ev.getExtId());
+		createIfNotNull(e, "extId", ev.getExtId().serializeToString());
 		if(ev.getOpacity() == null){
 			ev.setOpacity(EventOpacity.OPAQUE);
 		}
@@ -190,33 +195,25 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		DOMUtils.createElementAndText(info, "write", "" + ci.isWrite());
 	}
 
-	public String getEventString(Event event) {
+	public String getEventString(Event event) throws TransformerException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/event.xsd", "event");
-			Element root = doc.getDocumentElement();
-			appendEvent(root, event);
-			DOMUtils.serialise(doc, out);
-		} catch (Exception e) {
-			logger.error("Error writing event as string", e);
-		}
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/event.xsd", "event");
+		Element root = doc.getDocumentElement();
+		appendEvent(root, event);
+		DOMUtils.serialise(doc, out);
 		return out.toString();
 	}
 
-	public String getListEventString(List<Event> events) {
+	public String getListEventString(List<Event> events) throws TransformerException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/events.xsd", "events");
-			Element root = doc.getDocumentElement();
-			for (Event event : events) {
-				appendEvent(root, event);
-			}
-			DOMUtils.serialise(doc, out);
-		} catch (Exception e) {
-			logger.error("Error writing event as string", e);
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/events.xsd", "events");
+		Element root = doc.getDocumentElement();
+		for (Event event : events) {
+			appendEvent(root, event);
 		}
+		DOMUtils.serialise(doc, out);
 		return out.toString();
 	}
 

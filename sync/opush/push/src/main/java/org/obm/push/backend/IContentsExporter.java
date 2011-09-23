@@ -31,11 +31,6 @@ public interface IContentsExporter {
 	List<ItemChange> fetchEmails(BackendSession bs,
 			Integer collectionId, Collection<Long> uids) throws DaoException, CollectionNotFoundException, ProcessingEmailException;
 	
-	List<ItemChange> fetchCalendars(BackendSession bs, Integer collectionId, Collection<String> uids) throws UnknownObmSyncServerException ;
-
-	List<ItemChange> fetchCalendarDeletedItems(BackendSession bs,Integer collectionId, Collection<String> uids) 
-			throws UnknownObmSyncServerException ;
-	
 	MSAttachementData getEmailAttachement(BackendSession bs,
 			String attachmentName) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, ProcessingEmailException;
 

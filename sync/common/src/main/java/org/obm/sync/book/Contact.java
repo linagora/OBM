@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.utils.DisplayNameUtils;
 
 public class Contact {
@@ -26,10 +27,10 @@ public class Contact {
 	private String company;
 
 	private Date birthday;
-	private Integer birthdayId;
+	private EventObmId birthdayId;
 
 	private Date anniversary;
-	private Integer anniversaryId;
+	private EventObmId anniversaryId;
 
 	private String assistant;
 	private String manager;
@@ -192,11 +193,11 @@ public class Contact {
 		this.entityId = entityId;
 	}
 
-	public Integer getBirthdayId() {
+	public EventObmId getBirthdayId() {
 		return birthdayId;
 	}
 
-	public void setBirthdayId(Integer birthdayId) {
+	public void setBirthdayId(EventObmId birthdayId) {
 		this.birthdayId = birthdayId;
 	}
 
@@ -224,11 +225,11 @@ public class Contact {
 		this.anniversary = anniversary;
 	}
 
-	public Integer getAnniversaryId() {
+	public EventObmId getAnniversaryId() {
 		return anniversaryId;
 	}
 
-	public void setAnniversaryId(Integer anniversaryId) {
+	public void setAnniversaryId(EventObmId anniversaryId) {
 		this.anniversaryId = anniversaryId;
 	}
 

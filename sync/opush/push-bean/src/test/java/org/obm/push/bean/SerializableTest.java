@@ -26,6 +26,8 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -68,6 +70,8 @@ public class SerializableTest {
 	public void testMSEvent() throws IOException {
 		MSEvent msEvent = new MSEvent();
 		msEvent.addAttendee(new MSAttendee());
+		msEvent.setObmId(new EventObmId(12));
+		msEvent.setExtId(new EventExtId("1fqe45"));
 		msEvent.setRecurrence(new Recurrence());
 		objectOutputStream.writeObject(msEvent);
 	}

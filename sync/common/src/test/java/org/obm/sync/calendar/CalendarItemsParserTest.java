@@ -57,7 +57,7 @@ public class CalendarItemsParserTest {
 		
 		Assert.assertTrue(ev.isInternalEvent());
 		Assert.assertEquals(cal.getTime(), ev.getDate());
-		Assert.assertEquals("2bf7db53-8820-4fe5-9a78-acc6d3262149", ev.getExtId());
+		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
 		Assert.assertEquals(3600, ev.getDuration());
@@ -127,7 +127,7 @@ public class CalendarItemsParserTest {
 		
 		Assert.assertFalse(ev.isInternalEvent());
 		Assert.assertEquals(cal.getTime(), ev.getDate());
-		Assert.assertEquals("2bf7db53-8820-4fe5-9a78-acc6d3262149", ev.getExtId());
+		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
 		Assert.assertEquals(3600, ev.getDuration());
@@ -201,7 +201,7 @@ public class CalendarItemsParserTest {
 		Assert.assertTrue(ev.isInternalEvent());
 //		Assert.assertFalse(ev.isInternalEvent());
 		Assert.assertEquals(cal.getTime(), ev.getDate());
-		Assert.assertEquals("2bf7db53-8820-4fe5-9a78-acc6d3262149", ev.getExtId());
+		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
 		Assert.assertEquals(3600, ev.getDuration());
@@ -311,8 +311,8 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals(1, ev.getRecurrence().getEventExceptions().size());
 
 		Event evEx = ev.getRecurrence().getEventExceptions().get(0);
-		Assert.assertEquals("", evEx.getUid());
-		Assert.assertEquals("a7db3cd5-adf3-42f4-95f3-d0a7a9c01aa3", evEx.getExtId());
+		Assert.assertEquals(null, evEx.getUid());
+		Assert.assertEquals(new EventExtId("a7db3cd5-adf3-42f4-95f3-d0a7a9c01aa3"), evEx.getExtId());
 		Assert.assertEquals(false, evEx.isAllday());
 		Assert.assertEquals(EventType.VEVENT, evEx.getType());
 		Assert.assertEquals(1314081000000L, evEx.getRecurrenceId().getTime());

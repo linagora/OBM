@@ -15,6 +15,7 @@ import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.tnefconverter.RTFUtils;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.calendar.EventExtId;
 import org.w3c.dom.Element;
 
 public class CalendarDecoder extends Decoder implements IDataDecoder {
@@ -29,8 +30,10 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 				syncData, "OrganizerName")));
 		calendar.setOrganizerEmail(parseDOMString(DOMUtils.getUniqueElement(
 				syncData, "OrganizerEmail")));
-		calendar.setUID(parseDOMString(DOMUtils.getUniqueElement(syncData,
-				"UID")));
+		String extId = parseDOMString(DOMUtils.getUniqueElement(syncData, "UID"));
+		if (extId != null) {
+			calendar.setExtId(new EventExtId(extId));
+		}
 		calendar.setTimeZone(parseDOMTimeZone(DOMUtils.getUniqueElement(
 				syncData, "TimeZone")));
 

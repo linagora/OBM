@@ -11,9 +11,8 @@ public class Event {
 	private String title;
 	private String domain;
 	private String description;
-	private String uid;
-	private String extId;
-	private int databaseId;
+	private EventObmId uid;
+	private EventExtId extId;
 	private int privacy;
 	private String owner;
 	private String ownerDisplayName;
@@ -144,21 +143,12 @@ public class Event {
 		this.location = location;
 	}
 
-	public String getUid() {
+	public EventObmId getUid() {
 		return uid;
 	}
 
-	public void setUid(String uid) {
+	public void setUid(EventObmId uid) {
 		this.uid = uid;
-		if (uid != null && uid.length() > 0) {
-			String idString = uid;
-			int idx = idString.lastIndexOf("-");
-			if (idx > 0) {
-				idString = idString.substring(idx + 1);
-				this.uid = idString;
-			}
-			this.databaseId = Integer.parseInt(idString);
-		}
 	}
 
 	public Integer getAlert() {
@@ -217,14 +207,6 @@ public class Event {
 		this.percent = percent;
 	}
 
-	public int getDatabaseId() {
-		return databaseId;
-	}
-
-	public void setDatabaseId(int databaseId) {
-		this.databaseId = databaseId;
-	}
-
 	public void addAttendee(Attendee att) {
 		attendees.add(att);
 	}
@@ -245,11 +227,11 @@ public class Event {
 		this.entityId = entityId;
 	}
 
-	public String getExtId() {
+	public EventExtId getExtId() {
 		return extId;
 	}
 
-	public void setExtId(String extId) {
+	public void setExtId(EventExtId extId) {
 		this.extId = extId;
 	}
 
@@ -268,7 +250,6 @@ public class Event {
 		event.addAttendees(new LinkedList<Attendee>(attendees));
 		event.setCategory(category);
 		event.setCompletion(completion);
-		event.setDatabaseId(databaseId);
 		event.setDate(date);
 		event.setDescription(description);
 		event.setDuration(duration);

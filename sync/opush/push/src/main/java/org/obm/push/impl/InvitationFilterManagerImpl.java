@@ -20,6 +20,7 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.store.FiltrageInvitationDao;
+import org.obm.sync.calendar.EventObmId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 		try {
 			Integer eventCollectionId = calendarBackend.getCollectionId(bs);
 			filtrageInvitationDao.updateInvitationStatus(InvitationStatus.EMAIL_TO_DELETED, emailCollectionId, ImmutableList.of(invitation.getUid()));
-			filtrageInvitationDao.createOrUpdateInvitationEventAsMustSynced(eventCollectionId, invitation.getInvitation().getUID(), 
+			filtrageInvitationDao.createOrUpdateInvitationEventAsMustSynced(eventCollectionId, invitation.getInvitation().getObmId(), 
 					invitation.getInvitation().getDtStamp());
 		} catch (CollectionNotFoundException e) {
 			logger.info(e.getMessage(), e);
@@ -79,11 +80,11 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	private List<ItemChange> mergeChangesAndToSyncedEvent(BackendSession bs, Integer eventCollectionId, String syncKey, List<ItemChange> changes) {
 		List<ItemChange> its = Lists.newArrayList(changes.iterator());
 		try {
-			List<String> eventToSynced = filtrageInvitationDao.getEventToSynced(eventCollectionId, syncKey);
+			List<EventObmId> eventToSynced = filtrageInvitationDao.getEventToSynced(eventCollectionId, syncKey);
 			for (final ItemChange ic : changes) {
 				if (ic.getData() instanceof MSEvent) {
 					MSEvent event = (MSEvent) ic.getData();
-					eventToSynced.remove(event.getUID());
+					eventToSynced.remove(event.getObmId());
 				}
 			}
 			its.addAll(calendarBackend.fetchItems(bs, eventCollectionId, eventToSynced));
@@ -94,7 +95,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	private List<ItemChange> getEventToDeleted(BackendSession bs, Integer eventCollectionId, String syncKey) throws DaoException {
-		final List<String> eventUIDToDeleted = filtrageInvitationDao.getEventToDeleted(eventCollectionId, syncKey);
+		final List<EventObmId> eventUIDToDeleted = filtrageInvitationDao.getEventToDeleted(eventCollectionId, syncKey);
 		if (eventUIDToDeleted.isEmpty()) {
 			return ImmutableList.of();
 		}
@@ -107,7 +108,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	private List<ItemChange> proccessEventMustSynced(BackendSession bs, Integer eventCollectionId, String syncKey) throws DaoException {
-		List<String> eventsToSync = filtrageInvitationDao.getInvitationEventMustSynced(eventCollectionId);
+		List<EventObmId> eventsToSync = filtrageInvitationDao.getInvitationEventMustSynced(eventCollectionId);
 		List<ItemChange> itemsChange = calendarBackend.fetchItems(bs, eventCollectionId, eventsToSync);
 		filtrageInvitationDao.updateInvitationEventStatus(InvitationStatus.EVENT_SYNCED, syncKey, eventCollectionId, eventsToSync);
 		return itemsChange;
@@ -124,16 +125,16 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	private void setEventStatus(final Integer eventCollectionId, final String syncKey, final MSEvent event) throws DaoException {
-		if (!filtrageInvitationDao.isMostRecentInvitation(eventCollectionId, event.getUID(), event.getDtStamp())) {
-			logger.info("A more recent event or email is synchronized on phone. The event[ " + event.getUID() + ", " + event.getSubject()
+		if (!filtrageInvitationDao.isMostRecentInvitation(eventCollectionId, event.getObmId(), event.getDtStamp())) {
+			logger.info("A more recent event or email is synchronized on phone. The event[ " + event.getObmId() + ", " + event.getSubject()
 					+ "] will not synced");
 		} else {
-			boolean isInvitationAlreadySynced = filtrageInvitationDao.invitationIsAlreadySynced(eventCollectionId, event.getUID());
+			boolean isInvitationAlreadySynced = filtrageInvitationDao.invitationIsAlreadySynced(eventCollectionId, event.getObmId());
 			if (isInvitationAlreadySynced) {
-				filtrageInvitationDao.createOrUpdateInvitationEvent(eventCollectionId, event.getUID(), event.getDtStamp(), InvitationStatus.EVENT_TO_SYNCED);
+				filtrageInvitationDao.createOrUpdateInvitationEvent(eventCollectionId, event.getObmId(), event.getDtStamp(), InvitationStatus.EVENT_TO_SYNCED);
 			} else {
-				filtrageInvitationDao.createOrUpdateInvitationEvent(eventCollectionId, event.getUID(), event.getDtStamp(), InvitationStatus.EVENT_SYNCED, syncKey);
-				filtrageInvitationDao.setInvitationStatusAtToDelete(eventCollectionId, event.getUID());
+				filtrageInvitationDao.createOrUpdateInvitationEvent(eventCollectionId, event.getObmId(), event.getDtStamp(), InvitationStatus.EVENT_SYNCED, syncKey);
+				filtrageInvitationDao.setInvitationStatusAtToDelete(eventCollectionId, event.getObmId());
 			}
 		}
 	}
@@ -175,24 +176,25 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 
 	private void setInvitationStatus(final Integer emailCollectionId, final Integer eventCollectionId, final Map<String, ItemChange> syncedItem, 
 			final MSEmail mail, final SyncState state, final ItemChange ic) throws DaoException {
-		if (!filtrageInvitationDao.isMostRecentInvitation(eventCollectionId, mail.getInvitation().getUID(), mail.getInvitation().getLastUpdate())) {
+		EventObmId invitationEventId = mail.getInvitation().getObmId();
+		if (!filtrageInvitationDao.isMostRecentInvitation(eventCollectionId, invitationEventId, mail.getInvitation().getLastUpdate())) {
 			logger.info("A more recent event or email is synchronized on phone. The email[UID: " + mail.getUid() + "dtstam: "
 					+ mail.getInvitation().getDtStamp() + "] will not synced");
 		} else {
 			
 			InvitationStatus status = null;
 			String stateKey = null;
-			boolean isAlreadyEventSynced = filtrageInvitationDao.eventIsAlreadySynced(eventCollectionId, mail.getInvitation().getUID());
+			boolean isAlreadyEventSynced = filtrageInvitationDao.eventIsAlreadySynced(eventCollectionId, invitationEventId);
 			if (isAlreadyEventSynced) {
 				status = InvitationStatus.EMAIL_TO_DELETED;
 			} else {
 				status = InvitationStatus.EMAIL_SYNCED;
 				syncedItem.put(ic.getServerId(), ic);
 				stateKey = state.getKey();
-				filtrageInvitationDao.setEventStatusAtToDelete(eventCollectionId, mail.getInvitation().getUID());
+				filtrageInvitationDao.setEventStatusAtToDelete(eventCollectionId, invitationEventId);
 			}
 			
-			filtrageInvitationDao.createOrUpdateInvitation(eventCollectionId, mail.getInvitation().getUID(), emailCollectionId, mail.getUid(), 
+			filtrageInvitationDao.createOrUpdateInvitation(eventCollectionId, invitationEventId, emailCollectionId, mail.getUid(), 
 					mail.getInvitation().getDtStamp(), status, stateKey);
 			
 			logger.info("setInvitationStatus [ uid:" + mail.getUid() + ", eventCollId:" + eventCollectionId + ", isAlreadyEventSynced:" + isAlreadyEventSynced + " ]");
@@ -232,7 +234,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
-	public void deleteFilteredEvent(Integer collectionId, String eventUid) throws DaoException {
+	public void deleteFilteredEvent(Integer collectionId, EventObmId eventUid) throws DaoException {
 		filtrageInvitationDao.updateInvitationEventStatus(InvitationStatus.DELETED, collectionId, ImmutableList.of(eventUid));
 	}
 

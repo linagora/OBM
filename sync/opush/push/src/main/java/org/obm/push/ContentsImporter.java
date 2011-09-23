@@ -20,6 +20,7 @@ import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.mail.MailBackend;
+import org.obm.sync.calendar.Event;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -72,10 +73,10 @@ public class ContentsImporter implements IContentsImporter {
 		
 		switch (type) {
 		case CALENDAR:
-			String eventUid = calBackend.getEventUidFromServerId(serverId);
+			Event event = calBackend.getEventFromServerId(bs, serverId);
 			calBackend.delete(bs, collectionId, serverId);
-			if(eventUid != null){
-				invitationFilterManager.deleteFilteredEvent(collectionId, eventUid);
+			if (event.getUid() != null) {
+				invitationFilterManager.deleteFilteredEvent(collectionId, event.getUid());
 			}
 			break;
 		case CONTACTS:

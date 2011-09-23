@@ -33,6 +33,8 @@ import org.obm.sync.base.KeyList;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.CalendarItemsParser;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
@@ -309,16 +311,16 @@ public class EventHandler extends SecureSyncHandler {
 	private String getEventObmIdFromExtId(AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws ServerFault, EventNotFoundException {
 		
-		Integer id = binding.getEventObmIdFromExtId(at, getCalendar(at, params), params.getParameter("extId"));
+		EventObmId id = binding.getEventObmIdFromExtId(at, getCalendar(at, params), getExtId(params, "extId"));
 		if (id != null) {
-			return responder.sendInt(id);
+			return responder.sendInt(id.getObmId());
 		}
 		return responder.sendError("not found");		
 	}
 	
 	private String getEventFromExtId(AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws ServerFault, EventNotFoundException {
-		Event e = binding.getEventFromExtId(at, getCalendar(at, params), params.getParameter("extId"));
+		Event e = binding.getEventFromExtId(at, getCalendar(at, params), getExtId(params, "extId"));
 		return responder.sendEvent(e);
 	}
 
@@ -353,15 +355,15 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getEventFromId(AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws ServerFault, EventNotFoundException {
-		Event e = binding.getEventFromId(at, getCalendar(at, params), params.getParameter("id"));
+		Event e = binding.getEventFromId(at, getCalendar(at, params), getObmId(params, "id"));
 		return responder.sendEvent(e);
 	}
 
 	private String createEvent(
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws ServerFault, SAXException, IOException, FactoryConfigurationError, EventAlreadyExistException {
-		String ev = binding.createEvent(at,	getCalendar(at, params), getEvent(params), getNotificationOption(params));
-		return responder.sendString(ev);
+		EventObmId ev = binding.createEvent(at,	getCalendar(at, params), getEvent(params), getNotificationOption(params));
+		return responder.sendInt(ev.getObmId());
 	}
 	
 	private Event getEvent(ParametersSource params) throws SAXException,
@@ -400,7 +402,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 	
 	private String removeEvent(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, EventNotFoundException {
-		Event ev = binding.removeEvent(at, getCalendar(at, params), params.getParameter("id"), i(params, "sequence", 0),
+		Event ev = binding.removeEventById(at, getCalendar(at, params), getObmId(params, "id"), i(params, "sequence", 0),
 				getNotificationOption(params));
 		if (ev != null) {
 			return responder.sendEvent(ev);
@@ -412,7 +414,7 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws ServerFault {
 		Event ev = binding.removeEventByExtId(at, getCalendar(at, params),
-				params.getParameter("extId"), 
+				getExtId(params, "extId"), 
 				i(params, "sequence", 0),
 				getNotificationOption(params));
 		if (ev != null) {
@@ -477,7 +479,7 @@ public class EventHandler extends SecureSyncHandler {
 	private String changeParticipationState(AccessToken at,
 			ParametersSource params, XmlResponder responder) throws ServerFault {
 		boolean success = binding.changeParticipationState(at, getCalendar(at, params),
-				params.getParameter("extId"),
+				getExtId(params, "extId"),
 				ParticipationState.getValueOf(params.getParameter("state")),
 				i(params, "sequence", 0),
 				getNotificationOption(params));
@@ -498,4 +500,12 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendBoolean(true);
 	}
 	
+	private EventExtId getExtId(ParametersSource params, String tagName) {
+		return new EventExtId(params.getParameter(tagName));
+	}
+	
+	private EventObmId getObmId(ParametersSource params, String tagName) {
+		return new EventObmId(params.getParameter(tagName));
+	}
+
 }

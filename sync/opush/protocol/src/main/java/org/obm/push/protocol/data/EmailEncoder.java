@@ -278,8 +278,8 @@ public class EmailEncoder implements IDataEncoder {
 			Element tz = DOMUtils.createElement(mr, "Email:TimeZone");
 			// taken from exchange 2k7 : eastern greenland, gmt+0, no dst
 			tz.setTextContent("xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==");
-			DOMUtils.createElementAndText(mr, "Email:GlobalObjId", new String(
-					Base64.encodeBase64(invi.getUID().getBytes())));
+			DOMUtils.createElementAndText(mr, "Email:GlobalObjId", 
+					Base64.encodeBase64String(invi.getExtId().serializeToString().getBytes()));
 
 			appendRecurence(mr, invi);
 		}

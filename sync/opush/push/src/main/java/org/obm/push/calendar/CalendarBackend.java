@@ -31,6 +31,8 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.book.BookClient;
@@ -191,7 +193,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		}
 	}
 	
-	private void removeEventFilter(List<ItemChange> deletions, Event[] events, String[] eventsIdRemoved, 
+	private void removeEventFilter(List<ItemChange> deletions, Event[] events, EventObmId[] eventsIdRemoved, 
 			String userEmail, Integer collectionId) {
 		
 		for (final Event event : events) {
@@ -200,11 +202,15 @@ public class CalendarBackend extends ObmSyncBackend {
 			}			
 		}
 		
-		for (final String eventIdRemove : eventsIdRemoved) {
+		for (final EventObmId eventIdRemove : eventsIdRemoved) {
 			deletions.add(getItemChange(collectionId, eventIdRemove));
 		}
 	}
 	
+	private ItemChange getItemChange(Integer collectionId,	EventObmId eventIdRemove) {
+		return getItemChange(collectionId, eventIdRemove.serializeToString());
+	}
+
 	private void addOrRemoveEventFilter(List<ItemChange> addUpd, List<ItemChange> deletions, 
 			EventChanges eventChanges, String userEmail, Integer collectionId, BackendSession bs) {
 		
@@ -237,6 +243,10 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ic;
 	}
 
+	private String getServerIdFor(Integer collectionId, EventObmId uid) {
+		return getServerIdFor(collectionId, uid.serializeToString());
+	}
+
 	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, IApplicationData data) 
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ServerItemNotFoundException {
 
@@ -246,14 +256,14 @@ public class CalendarBackend extends ObmSyncBackend {
 		String collectionPath = getCollectionPathFor(collectionId);
 		logger.info("createOrUpdate( collectionPath = {}, serverId = {} )", new Object[]{collectionPath, serverId});
 		
-		String eventId = null;
+		EventObmId eventId = null;
 		Event event = null;
 		try {
 			
 			Event oldEvent = null;
 			if (serverId != null) {
 				int idx = serverId.lastIndexOf(":");
-				eventId = serverId.substring(idx + 1);
+				eventId = new EventObmId(serverId.substring(idx + 1));
 				oldEvent = cc.getEventFromId(token, bs.getLoginAtDomain(), eventId);	
 			}
 
@@ -287,14 +297,11 @@ public class CalendarBackend extends ObmSyncBackend {
 		return getServerIdFor(collectionId, eventId);
 	}
 
-	private String getEventIdFromExtId(AccessToken token, String collectionPath, AbstractEventSyncClient cc, Event event) 
+	private EventObmId getEventIdFromExtId(AccessToken token, String collectionPath, AbstractEventSyncClient cc, Event event)
 			throws UnknownObmSyncServerException {
 		
 		try {
-			Integer obmid = cc.getEventObmIdFromExtId(token, parseCalendarName(collectionPath), event.getExtId());
-			if (obmid != null) {
-				return obmid.toString();
-			}
+			return cc.getEventObmIdFromExtId(token, parseCalendarName(collectionPath), event.getExtId());
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
 		} catch (EventNotFoundException e) {
@@ -308,21 +315,21 @@ public class CalendarBackend extends ObmSyncBackend {
 		
 		String collectionPath = getCollectionPathFor(collectionId);
 		if (serverId != null) {
-			String id = getEventUidFromServerId(serverId);
-			if (id != null) {
-				AbstractEventSyncClient bc = getEventSyncClient(PIMDataType.CALENDAR);
-				AccessToken token = login(bc, bs);
-				try {
-					logger.info("Delete event id {}", serverId);
-					Event evr = bc.getEventFromId(token, bs.getLoginAtDomain(), id);
-					bc.removeEvent(token, parseCalendarName(collectionPath), id, evr.getSequence(), true);
-				} catch (ServerFault e) {
-					throw new UnknownObmSyncServerException(e);
-				} catch (EventNotFoundException e) {
-					throw new ServerItemNotFoundException(serverId);
-				} finally {
-					bc.logout(token);
-				}
+
+			AbstractEventSyncClient bc = getEventSyncClient(PIMDataType.CALENDAR);
+			AccessToken token = login(bc, bs);
+			try {
+				logger.info("Delete event serverId {}", serverId);
+				//FIXME: not transactional
+				String calendarName = parseCalendarName(collectionPath);
+				Event evr = getEventFromServerId(bc, token, calendarName, serverId);
+				bc.removeEventById(token, calendarName, evr.getUid(), evr.getSequence(), true);
+			} catch (ServerFault e) {
+				throw new UnknownObmSyncServerException(e);
+			} catch (EventNotFoundException e) {
+				throw new ServerItemNotFoundException(serverId);
+			} finally {
+				bc.logout(token);
 			}
 		}
 	}
@@ -334,9 +341,9 @@ public class CalendarBackend extends ObmSyncBackend {
 		AbstractEventSyncClient calCli = getEventSyncClient(event.getType());
 		AccessToken at = calCli.login(bs.getLoginAtDomain(), bs.getPassword(), "o-push");
 		try {
-			logger.info("handleMeetingResponse = {}", event.getUID());
+			logger.info("handleMeetingResponse = {}", event.getObmId());
 			Event obmEvent = createOrModifyInvitationEvent(bs, event, calCli, at);
-			event.setObmUID(obmEvent.getUid());
+			event.setObmId(obmEvent.getUid());
 			event.setObmSequence(obmEvent.getSequence());
 			return updateUserStatus(bs, event, status, calCli, at);
 		} catch (UnknownObmSyncServerException e) {
@@ -364,13 +371,13 @@ public class CalendarBackend extends ObmSyncBackend {
 			
 			if (obmEvent == null) {
 				
-				String id = null;
+				EventObmId id = null;
 				try {
 					id = calCli.createEvent(at, bs.getLoginAtDomain(), newEvent, isInternal);
 				} catch (EventAlreadyExistException e) {
 					throw new UnknownObmSyncServerException("it's not possible because getEventFromExtId == null");
 				}
-				logger.info("createOrModifyInvitationEvent : create new event {}", event.getUID());
+				logger.info("createOrModifyInvitationEvent : create new event {}", event.getObmId());
 				return calCli.getEventFromId(at, bs.getLoginAtDomain(), id);
 				
 			} else {
@@ -378,7 +385,7 @@ public class CalendarBackend extends ObmSyncBackend {
 				newEvent.setUid(obmEvent.getUid());
 				newEvent.setSequence(obmEvent.getSequence());
 				if(!obmEvent.isInternalEvent()){
-					logger.info("createOrModifyInvitationEvent : update event {}", event.getUID());
+					logger.info("createOrModifyInvitationEvent : update event {}", event.getObmId());
 					obmEvent = calCli.modifyEvent(at, bs.getLoginAtDomain(), newEvent, true, false);
 				}
 				return obmEvent;
@@ -391,13 +398,12 @@ public class CalendarBackend extends ObmSyncBackend {
 
 	private Event getEventFromExtId(BackendSession bs, MSEvent event, AbstractEventSyncClient calCli, AccessToken at) 
 			throws ServerFault {
-		Event obmEvent = null;
 		try {
-			obmEvent = calCli.getEventFromExtId(at, bs.getLoginAtDomain(), event.getUID());
+			return calCli.getEventFromExtId(at, bs.getLoginAtDomain(), event.getExtId());
 		} catch (EventNotFoundException e) {
 			logger.info(e.getMessage());
 		}
-		return obmEvent;
+		return null;
 	}
 
 	private String updateUserStatus(BackendSession bs, MSEvent msEvent, AttendeeStatus status, AbstractEventSyncClient calCli,
@@ -406,9 +412,9 @@ public class CalendarBackend extends ObmSyncBackend {
 		logger.info("update user status[ {} in calendar ]", status.toString());
 		ParticipationState participationStatus = EventConverter.status(null, status);
 		try {
-			calCli.changeParticipationState(at, bs.getLoginAtDomain(), msEvent.getUID(), participationStatus, msEvent.getObmSequence(), true);
+			calCli.changeParticipationState(at, bs.getLoginAtDomain(), msEvent.getExtId(), participationStatus, msEvent.getObmSequence(), true);
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), getDefaultCalendarName(bs));
-			return getServerIdFor(collectionId, msEvent.getObmUID());
+			return getServerIdFor(collectionId, msEvent.getObmId());
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
 		}
@@ -419,40 +425,39 @@ public class CalendarBackend extends ObmSyncBackend {
 		AbstractEventSyncClient calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		AccessToken token = login(calCli, bs);
 		for (String serverId : fetchServerIds) {
-			String id = getEventUidFromServerId(serverId);
-			if (id != null) {
-				try {
-					Event e = calCli.getEventFromId(token, bs.getLoginAtDomain(), id);
+			try {
+				Event event = getEventFromServerId(calCli, token, bs.getLoginAtDomain(), serverId);
+				if (event != null) {
 					ItemChange ic = new ItemChange();
 					ic.setServerId(serverId);
-					IApplicationData ev = convertEvent(bs, e);
+					IApplicationData ev = convertEvent(bs, event);
 					ic.setData(ev);
 					ret.add(ic);
-				} catch (ServerFault e1) {
-					logger.error(e1.getMessage(), e1);
-				} catch (EventNotFoundException e) {
-					logger.error("event from id {} not found.", id);
 				}
+			} catch (EventNotFoundException e) {
+				logger.error("event from serverId {} not found.", serverId);
+			} catch (ServerFault e1) {
+				logger.error(e1.getMessage(), e1);
 			}
 		}
 		calCli.logout(token);	
 		return ret;
 	}
 	
-	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<String> uids) {
+	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<EventObmId> uids) {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AbstractEventSyncClient calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		AccessToken token = login(calCli, bs);
-		for (String eventUid : uids) {
+		for (EventObmId itemId : uids) {
 			try {
-				Event e = calCli.getEventFromExtId(token, bs.getLoginAtDomain(), eventUid);
+				Event e = calCli.getEventFromId(token, bs.getLoginAtDomain(), itemId);
 				if (e != null) {
 					ret.add( createItemChangeToAddFromEvent(bs, collectionId, e) );
 				}
 			} catch (ServerFault e) {
 				logger.error(e.getMessage(), e);
 			} catch (EventNotFoundException e) {
-				logger.error("fetchItems : event from extId {} not found", eventUid);
+				logger.error("fetchItems : event from extId {} not found", itemId);
 			}
 		}
 		calCli.logout(token);
@@ -466,17 +471,16 @@ public class CalendarBackend extends ObmSyncBackend {
 			return converters.get(PIMDataType.CALENDAR).convert(bs, e);
 		}
 	}
-
-	public List<ItemChange> fetchDeletedItems(BackendSession bs, Integer collectionId, Collection<String> uids) {
+	
+	public List<ItemChange> fetchDeletedItems(BackendSession bs, Integer collectionId, Collection<EventObmId> uids) {
 		final List<ItemChange> ret = Lists.newArrayListWithCapacity(uids.size());
 		final AbstractEventSyncClient calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		final AccessToken token = login(calCli, bs);
-		for (final String eventUid : uids) {
-			Integer id;
+		for (final EventObmId eventUid : uids) {
 			try {
-				id = calCli.getEventObmIdFromExtId(token, bs.getLoginAtDomain(), eventUid);
-				if (id != null) {
-					ret.add(getItemChange(collectionId, String.valueOf(id)));
+				Event event = calCli.getEventFromId(token, bs.getLoginAtDomain(), eventUid);
+				if (event != null) {
+					ret.add(getItemChange(collectionId, event.getUid()));
 				}
 			} catch (ServerFault e) {
 				logger.error(e.getMessage(), e);
@@ -488,19 +492,12 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 	
+	
 	public Integer getCollectionId (BackendSession bs) throws CollectionNotFoundException, DaoException {
 		String calPath = getDefaultCalendarName(bs);
 		return getCollectionIdFor(bs.getDevice(), calPath);
 	}
 
-	public String getEventUidFromServerId(String serverId) {
-		Integer uid = getItemIdFor(serverId);
-		if(uid == null){
-			return null;
-		}
-		return uid.toString();
-	}
-	
 	/**
 	 *  obm:\\adrien@test.tlse.lng\calendar\adrien@test.tlse.lng
 	 *  obm:\\adrien@test.tlse.lng\task\adrien@test.tlse.lng
@@ -515,6 +512,40 @@ public class CalendarBackend extends ObmSyncBackend {
 			}
 		}
 		throw new FolderTypeNotFoundException("The collection's path[ " + collectionPath + "] is invalid");
+	}
+
+	public Event getEventFromServerId(BackendSession bs, String serverId) {
+		
+		final AbstractEventSyncClient calCli = getEventSyncClient(PIMDataType.CALENDAR);
+		final AccessToken token = login(calCli, bs);
+		try {
+			return getEventFromServerId(calCli, token, bs.getLoginAtDomain(), serverId);
+		} catch (EventNotFoundException e) {
+			logger.error(e.getMessage(), e);
+		} catch (ServerFault e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			calCli.logout(token);
+		}
+		return null;
+	}
+
+
+	private Event getEventFromServerId(AbstractEventSyncClient calCli, AccessToken token, String calendar, String serverId) throws ServerFault, EventNotFoundException {
+		Integer itemId = getItemIdFor(serverId);
+		if (itemId == null) {
+			return null;
+		}
+		return calCli.getEventFromId(token, calendar, new EventObmId(itemId));
+	}
+
+	
+	public EventExtId getEventExtIdFromServerId(BackendSession bs, String serverId) {
+		Event event = getEventFromServerId(bs, serverId);
+		if (event != null) {
+			return event.getExtId();
+		}
+		return null;
 	}
 
 }

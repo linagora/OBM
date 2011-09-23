@@ -35,6 +35,7 @@ import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.calendar.EventObmId;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
@@ -55,7 +56,7 @@ public class SyncHandlerTest {
 		MSEvent event = new MSEvent();
 		event.setStartTime(new Date());
 		event.setSubject(expectedString);
-		event.setUID("A");
+		event.setObmId(new EventObmId(10));
 		event.setLocation("quelque part");
 		event.setEndTime(new Date());
 		event.setSensitivity(CalendarSensitivity.NORMAL);

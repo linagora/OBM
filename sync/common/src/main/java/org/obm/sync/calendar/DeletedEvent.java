@@ -2,19 +2,19 @@ package org.obm.sync.calendar;
 
 public final class DeletedEvent {
 	
-	private Integer id;
-	private String extId;
+	private EventObmId id;
+	private EventExtId extId;
 	
-	public DeletedEvent(int id, String extId) {
+	public DeletedEvent(EventObmId id, EventExtId extId) {
 		this.id = id;
 		this.extId = extId;
 	}
 
-	public Integer getId() {
+	public EventObmId getId() {
 		return id;
 	}
 
-	public String getExtId() {
+	public EventExtId getExtId() {
 		return extId;
 	}
 

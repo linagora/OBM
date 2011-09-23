@@ -10,7 +10,7 @@ import java.util.Set;
 import com.google.common.base.Objects;
 
 
-public class SyncCollection implements Serializable{
+public class SyncCollection implements Serializable {
 	
 	private SyncState syncState;
 	private List<String> fetchIds;

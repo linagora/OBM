@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.transform.TransformerException;
+
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -14,6 +16,8 @@ import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.CalendarItemsParser;
 import org.obm.sync.calendar.CalendarItemsWriter;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
@@ -49,21 +53,25 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public String createEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault, EventAlreadyExistException {
+	public EventObmId createEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault, EventAlreadyExistException {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
-		params.put("event", ciw.getEventString(event));
+		try {
+			params.put("event", ciw.getEventString(event));
+		} catch (TransformerException e) {
+			throw new IllegalArgumentException(e);
+		}
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(token, type + "/createEvent", params);
 		exceptionFactory.checkEventAlreadyExistException(doc);
-		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
+		return new EventObmId(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
 
 	@Override
-	public Event getEventFromId(AccessToken token, String calendar, String id) throws ServerFault, EventNotFoundException {
+	public Event getEventFromId(AccessToken token, String calendar, EventObmId id) throws ServerFault, EventNotFoundException {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
-		params.put("id", id);
+		params.put("id", id.serializeToString());
 		Document doc = execute(token, type + "/getEventFromId", params);
 		exceptionFactory.checkEventNotFoundException(doc);
 		return respParser.parseEvent(doc.getDocumentElement());
@@ -73,7 +81,11 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	public KeyList getEventTwinKeys(AccessToken token, String calendar, Event event) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
-		params.put("event", ciw.getEventString(event));
+		try {
+			params.put("event", ciw.getEventString(event));
+		} catch (TransformerException e) {
+			throw new IllegalArgumentException(e);
+		}
 
 		Document doc = execute(token, type + "/getEventTwinKeys", params);
 		exceptionFactory.checkServerFaultException(doc);
@@ -168,7 +180,11 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 			boolean updateAttendees, boolean notification) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
-		params.put("event", ciw.getEventString(event));
+		try {
+			params.put("event", ciw.getEventString(event));
+		} catch (TransformerException e) {
+			throw new IllegalArgumentException(e);
+		}
 		params.put("updateAttendees", "" + updateAttendees);
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(token, type + "/modifyEvent", params);
@@ -177,12 +193,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public Event removeEvent(AccessToken token, String calendar, String uid, int sequence, boolean notification) 
+	public Event removeEventById(AccessToken token, String calendar, EventObmId uid, int sequence, boolean notification) 
 			throws ServerFault, EventNotFoundException {
 		
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
-		params.put("id", uid);
+		params.put("id", uid.serializeToString());
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(token, type + "/removeEvent", params);
@@ -191,11 +207,11 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 	
 	@Override
-	public Event removeEventByExtId(AccessToken token, String calendar, String extId, int sequence, boolean notification)
+	public Event removeEventByExtId(AccessToken token, String calendar, EventExtId extId, int sequence, boolean notification)
 			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
-		params.put("extId", extId);
+		params.put("extId", extId.serializeToString());
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(token, type + "/removeEventByExtId", params);
@@ -229,10 +245,10 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public Event getEventFromExtId(AccessToken token, String calendar, String extId) throws ServerFault, EventNotFoundException {
+	public Event getEventFromExtId(AccessToken token, String calendar, EventExtId extId) throws ServerFault, EventNotFoundException {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
-		params.put("extId", extId);
+		params.put("extId", extId.serializeToString());
 		Document doc = execute(token, type + "/getEventFromExtId", params);
 		exceptionFactory.checkEventNotFoundException(doc);
 		if (doc.getDocumentElement().getNodeName().equals("event")) {
@@ -243,14 +259,14 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public Integer getEventObmIdFromExtId(AccessToken token, String calendar, String extId) throws ServerFault, EventNotFoundException {
+	public EventObmId getEventObmIdFromExtId(AccessToken token, String calendar, EventExtId extId) throws ServerFault, EventNotFoundException {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
-		params.put("extId", extId);
+		params.put("extId", extId.serializeToString());
 		Document doc = execute(token, type + "/getEventObmIdFromExtId", params);
 		exceptionFactory.checkEventNotFoundException(doc);
 		String value = DOMUtils.getElementText(doc.getDocumentElement(), "value");
-		return Integer.parseInt(value);
+		return new EventObmId(value);
 	}
 
 	@Override
@@ -298,7 +314,11 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	@Override
 	public String parseEvent(AccessToken token, Event event) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
-		params.put("event", ciw.getEventString(event));
+		try {
+			params.put("event", ciw.getEventString(event));
+		} catch (TransformerException e) {
+			throw new IllegalArgumentException(e);
+		}
 
 		Document doc = execute(token, type + "/parseEvent", params);
 		exceptionFactory.checkServerFaultException(doc);
@@ -309,8 +329,11 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	public String parseEvents(AccessToken token, List<Event> events)
 			throws ServerFault {
 		Multimap<String, String> params = initParams(token);
-		params.put("events", ciw.getListEventString(events));
-
+		try {
+			params.put("events", ciw.getListEventString(events));
+		} catch (TransformerException e) {
+			throw new IllegalArgumentException(e);
+		}
 		Document doc = execute(token, type + "/parseEvents", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
@@ -393,11 +416,11 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	
 	@Override
 	public boolean changeParticipationState(AccessToken token, String calendar,
-			String extId, ParticipationState participationState, 
+			EventExtId extId, ParticipationState participationState, 
 			int sequence, boolean notification) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
-		params.put("extId", extId);
+		params.put("extId", extId.serializeToString());
 		params.put("state", participationState.toString());
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));

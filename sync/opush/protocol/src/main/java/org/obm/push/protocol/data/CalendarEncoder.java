@@ -1,6 +1,7 @@
 package org.obm.push.protocol.data;
 
 import java.math.BigDecimal;
+import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import org.apache.commons.codec.binary.Hex;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.IApplicationData;
@@ -17,11 +19,12 @@ import org.obm.push.bean.Recurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.calendar.EventExtId;
 import org.w3c.dom.Element;
 
 public class CalendarEncoder extends Encoder implements IDataEncoder {
 
-	private static final Pattern hexa = Pattern.compile("[0-9a-fA-F]");
+	private static final Pattern hexa = Pattern.compile("[0-9a-fA-F]+");
 	private static final BigDecimal TWELVE = BigDecimal.valueOf(12);
 	private SimpleDateFormat sdf;
 	
@@ -58,10 +61,16 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 		s(p, "Calendar:StartTime", ev.getStartTime(),sdf);
 		s(p, "Calendar:Subject", ev.getSubject());
 
-		if (hexa.matcher(ev.getUID()).matches()) {
-			s(p, "Calendar:UID", ev.getUID());
-		} else if (ev.getUID().hashCode() != 0) {
-			s(p, "Calendar:UID", Integer.toHexString(ev.getUID().hashCode()));
+		EventExtId eventExtId = ev.getExtId();
+		if (eventExtId != null && eventExtId.isDefined()) {
+			String eventExtIdAsString = eventExtId.serializeToString();
+			if (isHex(eventExtIdAsString)) {
+				s(p, "Calendar:UID", eventExtIdAsString);
+			} else {
+				s(p, "Calendar:UID", Hex.encodeHexString(eventExtIdAsString.getBytes()));
+			}
+		} else {
+			throw new InvalidParameterException("a event must have an extId");
 		}
 		if (ev.getOrganizerEmail() != null) {
 			s(p, "Calendar:OrganizerName", ev.getOrganizerName());
@@ -137,6 +146,10 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 
 		// DOMUtils.createElement(p, "Calendar:Compressed_RTF");
 
+	}
+
+	private boolean isHex(String eventExtIdAsString) {
+		return hexa.matcher(eventExtIdAsString).matches();
 	}
 
 	private void encodeExceptions(BackendSession bs,

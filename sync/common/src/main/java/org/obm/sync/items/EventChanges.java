@@ -5,32 +5,34 @@ import java.util.List;
 
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 
 public class EventChanges {
 
-	private String[] removed;
+	private EventObmId[] removed;
+	private EventExtId[] removedExtIds;
 	private Event[] updated;
 	private ParticipationChanges[] participationUpdated;
 	private Date lastSync;
-	private String[] removedExtIds;
 
 	public EventChanges() {
-		removed = new String[0];
+		removed = new EventObmId[0];
 		updated = new Event[0];
 		participationUpdated = new ParticipationChanges[0];
-		removedExtIds = new String[0];
+		removedExtIds = new EventExtId[0];
 	}
 	
-	public String[] getRemoved() {
+	public EventObmId[] getRemoved() {
 		return removed;
 	}
 
 	public void setDeletions(List<DeletedEvent> deletions) {
-		this.removed = new String[deletions.size()];
-		this.removedExtIds = new String[deletions.size()];
+		this.removed = new EventObmId[deletions.size()];
+		this.removedExtIds = new EventExtId[deletions.size()];
 		int i = 0;
 		for (DeletedEvent de : deletions) {
-			removed[i] = de.getId().toString();
+			removed[i] = de.getId();
 			removedExtIds[i] = de.getExtId();
 			i++;
 		}
@@ -52,7 +54,7 @@ public class EventChanges {
 		this.lastSync = lastSync;
 	}
 
-	public String[] getRemovedExtIds() {
+	public EventExtId[] getRemovedExtIds() {
 		return removedExtIds;
 	}
 

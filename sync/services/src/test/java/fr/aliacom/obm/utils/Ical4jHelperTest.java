@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.UUID;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -60,6 +59,7 @@ import org.junit.internal.matchers.TypeSafeMatcher;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationRole;
@@ -743,7 +743,7 @@ public class Ical4jHelperTest {
 		final Event event = new Event();
 		event.setDate(new Date());
 
-		event.setExtId(UUID.randomUUID().toString());
+		event.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262eza9"));
 		event.setTitle("rdv " + System.currentTimeMillis());
 		event.setOwner("obm");
 		event.setDuration(3600);

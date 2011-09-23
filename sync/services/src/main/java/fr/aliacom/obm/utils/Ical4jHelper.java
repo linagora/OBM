@@ -22,6 +22,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URISyntaxException;
+import java.security.InvalidParameterException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -100,6 +101,7 @@ import net.fortuna.ical4j.model.property.XProperty;
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
@@ -225,12 +227,12 @@ public class Ical4jHelper {
 
 		if (calendar != null) {
 			ComponentList comps = getComponents(calendar, Component.VEVENT);
-			Map<String, Event> mapEvents = 
+			Map<EventExtId, Event> mapEvents = 
 				getEvents(comps, Component.VEVENT, user);
 			ret.addAll(mapEvents.values());
 
 			comps = getComponents(calendar, Component.VTODO);
-			Map<String, Event> mapTodo = 
+			Map<EventExtId, Event> mapTodo = 
 				getEvents(comps, Component.VTODO, user);
 			ret.addAll(mapTodo.values());
 		}
@@ -238,9 +240,9 @@ public class Ical4jHelper {
 		return ret;
 	}
 
-	private Map<String, Event> getEvents(ComponentList cl,
+	private Map<EventExtId, Event> getEvents(ComponentList cl,
 			String typeCalendar, ObmUser user) {
-		Map<String, Event> mapEvents = new HashMap<String, Event>();
+		Map<EventExtId, Event> mapEvents = new HashMap<EventExtId, Event>();
 		for (Object obj: cl) {
 			Component comp = (Component) obj;
 			if (comp != null) {
@@ -502,7 +504,7 @@ public class Ical4jHelper {
 
 	private void appendUid(Event event, Uid uid) {
 		if (uid != null) {
-			event.setExtId(uid.getValue());
+			event.setExtId(new EventExtId(uid.getValue()));
 		}
 	}
 
@@ -590,7 +592,7 @@ public class Ical4jHelper {
 		return getVEvent(user, event, null, null, replyAttendee, method);
 	}
 
-	public VEvent getVEvent(ObmUser user, Event event, String parentExtID, Event parent, Attendee replyAttendee, Method method) {
+	public VEvent getVEvent(ObmUser user, Event event, EventExtId parentExtID, Event parent, Attendee replyAttendee, Method method) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 
@@ -642,7 +644,7 @@ public class Ical4jHelper {
 		return getVTodo(event, null, user, null);
 	}
 
-	private VToDo getVTodo(Event event, String parentExtID,
+	private VToDo getVTodo(Event event, EventExtId parentExtID,
 			ObmUser user, Event pere) {
 		VToDo vTodo = new VToDo();
 		PropertyList prop = vTodo.getProperties();
@@ -875,15 +877,14 @@ public class Ical4jHelper {
 	}
 
 	private void appendUidToICS(PropertyList prop, Event event,
-			String parentExtId) {
-		if (!isEmpty(parentExtId)) {
-			prop.add(new Uid(parentExtId));
-		} else if (!isEmpty(event.getExtId())) {
-			prop.add(new Uid(event.getExtId()));
+			EventExtId parentExtId) {
+		if (parentExtId != null && parentExtId.isDefined()) {
+			prop.add(new Uid(parentExtId.serializeToString()));
+		} else if (event.getExtId() != null && event.getExtId().isDefined()) {
+			prop.add(new Uid(event.getExtId().serializeToString()));
 		} else {
-			prop.add(new Uid(event.getUid()));
+			throw new InvalidParameterException();
 		}
-
 	}
 
 	public Date isInIntervalDate(Event event, Date start, Date end,

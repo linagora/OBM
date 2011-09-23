@@ -59,8 +59,8 @@ public class EventConverter implements ObmSyncCalendarConverter{
 		if (e.getAlert() != null && e.getAlert() > 0) {
 			mse.setReminder(e.getAlert() / 60);
 		}
-		mse.setUID(e.getExtId());
-		mse.setObmUID(e.getUid());
+		mse.setExtId(e.getExtId());
+		mse.setObmId(e.getUid());
 		mse.setBusyStatus(busyStatus(e.getOpacity()));
 		mse.setSensitivity(getSensitivity(e.getPrivacy()));
 		mse.setObmSequence(e.getSequence());
@@ -354,8 +354,8 @@ public class EventConverter implements ObmSyncCalendarConverter{
 	private Event convert(BackendSession bs, Event oldEvent, IApplicationData appliData, Boolean isObmInternalEvent) {
 		MSEvent data = (MSEvent) appliData;
 		Event e = convertEventOne(bs, oldEvent, null, data, isObmInternalEvent);
-		e.setExtId(data.getUID());
-		e.setUid(data.getObmUID());
+		e.setExtId(data.getExtId());
+		e.setUid(data.getObmId());
 		if(data.getObmSequence() != null){
 			e.setSequence(data.getObmSequence());
 		}

@@ -11,6 +11,8 @@ import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
@@ -55,13 +57,13 @@ public interface ICalendar {
 	 *         not found
 	 * @throws EventNotFoundException 
 	 */
-	Event removeEvent(AccessToken token, String calendar, String eventId,
+	Event removeEventById(AccessToken token, String calendar, EventObmId eventId,
 			int sequence, boolean notification) throws ServerFault, EventNotFoundException;
 
 	/**
 	 * FIXME: remove this service
 	 */
-	Event removeEventByExtId(AccessToken token, String calendar, String extId,
+	Event removeEventByExtId(AccessToken token, String calendar, EventExtId extId,
 			int sequence, boolean notification) throws ServerFault;
 
 	/**
@@ -74,7 +76,7 @@ public interface ICalendar {
 	 * FIXME: needs work
 	 * @throws EventAlreadyExistException 
 	 */
-	String createEvent(AccessToken token, String calendar, Event event,
+	EventObmId createEvent(AccessToken token, String calendar, Event event,
 			boolean notification) throws ServerFault, EventAlreadyExistException;
 
 	/**
@@ -116,7 +118,7 @@ public interface ICalendar {
 	 *         is present in its calendar, null if event is not found or user
 	 *         has not enough rights to read this event
 	 */
-	Event getEventFromId(AccessToken token, String calendar, String id) throws ServerFault, EventNotFoundException;
+	Event getEventFromId(AccessToken token, String calendar, EventObmId id) throws ServerFault, EventNotFoundException;
 
 	/**
 	 * Return id of events who have : - start date, subject and duration if not
@@ -149,15 +151,15 @@ public interface ICalendar {
 	 *         calendar
 	 * @throws EventNotFoundException 
 	 */
-	Integer getEventObmIdFromExtId(AccessToken token, String calendar,
-			String extId) throws ServerFault, EventNotFoundException;
+	EventObmId getEventObmIdFromExtId(AccessToken token, String calendar,
+			EventExtId extId) throws ServerFault, EventNotFoundException;
 
 	/**
 	 * retrieve an event by its extId into specified calendar User needs read
 	 * access on selected calendar to execute this service.
 	 * @throws EventNotFoundException 
 	 */
-	Event getEventFromExtId(AccessToken token, String calendar, String extId) throws ServerFault, EventNotFoundException;
+	Event getEventFromExtId(AccessToken token, String calendar, EventExtId extId) throws ServerFault, EventNotFoundException;
 
 	/**
 	 * retrieve all events between start and end date. User needs read access on
@@ -246,7 +248,7 @@ public interface ICalendar {
 	 * change user of given calendar participation state
 	 */
 	boolean changeParticipationState(AccessToken token, String calendar,
-			String extId, ParticipationState participationState, int sequence,
+			EventExtId extId, ParticipationState participationState, int sequence,
 			boolean notification) throws ServerFault;
 
 	/**

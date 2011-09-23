@@ -47,7 +47,6 @@ public class ContentsExporter implements IContentsExporter {
 		this.calBackend = calendarExporter;
 		this.contactsBackend = contactsBackend;
 		this.invitationFilterManager = invitationFilterManager;
-		
 	}
 
 	private DataDelta getContactsChanges(BackendSession bs, SyncState state, Integer collectionId) throws UnknownObmSyncServerException {
@@ -146,19 +145,9 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public List<ItemChange> fetchCalendars(BackendSession bs, Integer collectionId, Collection<String> uids) throws UnknownObmSyncServerException {
-		return calBackend.fetchItems(bs, collectionId, uids);
-	}
-	
-	@Override
 	public List<ItemChange> fetchEmails(BackendSession bs, Integer collectionId, Collection<Long> uids) 
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException {
 		return mailBackend.fetchItems(bs, collectionId, uids);
-	}
-
-	@Override
-	public List<ItemChange> fetchCalendarDeletedItems(BackendSession bs, Integer collectionId, Collection<String> uids) throws UnknownObmSyncServerException {
-		return calBackend.fetchDeletedItems(bs, collectionId, uids);
 	}
 
 	@Override

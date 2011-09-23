@@ -11,6 +11,8 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
@@ -30,9 +32,9 @@ public interface CalendarDao {
 
 	List<Event> findAllEvents(AccessToken token, ObmUser calendarUser, EventType typeFilter);
 
-	Event findEventById(AccessToken token, int eventId) throws EventNotFoundException, ServerFault;
+	Event findEventById(AccessToken token, EventObmId eventId) throws EventNotFoundException, ServerFault;
 
-	Event findEventByExtId(AccessToken token, ObmUser calendarUser, String eventExtId);
+	Event findEventByExtId(AccessToken token, ObmUser calendarUser, EventExtId eventExtId);
 
 	List<String> findEventTwinKeys(String calendar, Event event, ObmDomain domain);
 
@@ -63,11 +65,13 @@ public interface CalendarDao {
 			boolean updateAttendees, int sequence, Boolean useObmUser)
 			throws SQLException, FindException, EventNotFoundException, ServerFault;
 	
-	Event removeEvent(AccessToken token, int eventId, EventType eventType, int sequence) throws SQLException, EventNotFoundException, ServerFault;
+	Event removeEventById(AccessToken token, EventObmId eventId, EventType eventType, int sequence) throws SQLException, EventNotFoundException, ServerFault;
+
+	Event removeEventById(Connection con, AccessToken token, EventObmId uid, EventType et, int sequence) throws SQLException, EventNotFoundException, ServerFault;
 
 	Event removeEvent(AccessToken token, Event event, EventType eventType, int sequence) throws SQLException;
 	
-	Event removeEventByExtId(AccessToken token, ObmUser calendar, String eventExtId, int sequence) throws SQLException;
+	Event removeEventByExtId(AccessToken token, ObmUser calendar, EventExtId eventExtId, int sequence) throws SQLException;
 
 	Event createEvent(Connection con, AccessToken editor, String calendar, Event ev, Boolean useObmUser) throws SQLException, FindException;
 
@@ -79,9 +83,7 @@ public interface CalendarDao {
 			Event ev, boolean updateAttendees, int sequence, Boolean useObmUser)
 			throws SQLException, FindException, ServerFault, EventNotFoundException;
 	
-	Event removeEvent(Connection con, AccessToken token, int uid, EventType et, int sequence) throws SQLException, EventNotFoundException, ServerFault;
-	
-	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, String extId, ParticipationState participationState) throws SQLException ;
+	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, EventExtId extId, ParticipationState participationState) throws SQLException ;
 
 	Collection<CalendarInfo> getCalendarMetadata(ObmUser user, Collection<String> calendars)
 			throws FindException;

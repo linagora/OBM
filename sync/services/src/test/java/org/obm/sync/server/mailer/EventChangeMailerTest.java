@@ -33,6 +33,8 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.server.template.ITemplateLoader;
 
@@ -156,9 +158,9 @@ public class EventChangeMailerTest {
 			event.setOwnerDisplayName("Raphael ROUGERON");
 			event.setOwnerEmail("rrougeron@linagora.com");
 			event.setDate(date(2010, 10, 8, 11, 00));
-			event.setExtId("f1514f44bf39311568d64072c1fec10f47fe");
+			event.setExtId(new EventExtId("f1514f44bf39311568d64072c1fec10f47fe"));
 			event.setDuration(2700);
-			event.setUid("1354");
+			event.setUid(new EventObmId(1354));
 			return event;
 		}
 

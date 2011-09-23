@@ -7,13 +7,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
+
 public class MSEvent implements IApplicationData, Serializable {
 	
 	private String organizerName;
 	private String organizerEmail;
 	private String location;
 	private String subject;
-	private String uID;
+	private EventObmId obmId;
+	private EventExtId extId;
 	private String description;
 	private Date created;
 	private Date lastUpdate;
@@ -32,7 +36,6 @@ public class MSEvent implements IApplicationData, Serializable {
 	private TimeZone timeZone;
 	private Date exceptionStartTime;
 	private boolean deletedException;
-	private String obmUID;
 	private Integer obmSequence;
 	
 	public MSEvent(){
@@ -79,12 +82,20 @@ public class MSEvent implements IApplicationData, Serializable {
 		this.subject = subject;
 	}
 
-	public String getUID() {
-		return uID;
+	public EventObmId getObmId() {
+		return obmId;
 	}
 
-	public void setUID(String uid) {
-		uID = uid;
+	public void setObmId(EventObmId obmId) {
+		this.obmId = obmId;
+	}
+	
+	public EventExtId getExtId() {
+		return extId;
+	}
+	
+	public void setExtId(EventExtId extId) {
+		this.extId = extId;
 	}
 
 	public Boolean getAllDayEvent() {
@@ -207,14 +218,6 @@ public class MSEvent implements IApplicationData, Serializable {
 
 	public void setExceptionStartTime(Date exceptionStartTime) {
 		this.exceptionStartTime = exceptionStartTime;
-	}
-	
-	public String getObmUID() {
-		return obmUID;
-	}
-
-	public void setObmUID(String obmUID) {
-		this.obmUID = obmUID;
 	}
 	
 	public String getDescription() {
