@@ -2,18 +2,15 @@ package org.obm.push.bean;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 
 import com.google.common.base.Objects;
 
 public class MSEmailBody implements Serializable {
 
+	private final Map<MSEmailBodyType, String> formatValueMap;
 	private String charset;
-
-	Map<MSEmailBodyType, String> formatValueMap;
 
 	public MSEmailBody() {
 		formatValueMap = new HashMap<MSEmailBodyType, String>();
@@ -52,31 +49,28 @@ public class MSEmailBody implements Serializable {
 		this.charset = charset;
 	}
 
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		MSEmailBody other = (MSEmailBody) obj;
-		if (formatValueMap == null) {
-			if (other.formatValueMap != null)
-				return false;
-		} else {
-			for(Iterator<MSEmailBodyType> it = formatValueMap.keySet().iterator();it.hasNext();){
-				MSEmailBodyType key = it.next();
-				if(!formatValueMap.get(key).equals(other.formatValueMap.get(key))){
-					return false;
-				}
-			}
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(formatValueMap, charset);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MSEmailBody) {
+			MSEmailBody that = (MSEmailBody) object;
+			return Objects.equal(this.formatValueMap, that.formatValueMap)
+				&& Objects.equal(this.charset, that.charset);
 		}
-		return true;
+		return false;
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hashCode(formatValueMap);
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("formatValueMap", formatValueMap)
+			.add("charset", charset)
+			.toString();
 	}
+
 	
 }

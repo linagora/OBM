@@ -12,9 +12,6 @@ import com.google.common.base.Objects;
 
 /**
  * Stores the last sync date for a given sync key & collection
- * 
- * @author tom
- * 
  */
 public class SyncState implements Serializable {
 
@@ -103,4 +100,33 @@ public class SyncState implements Serializable {
 		this.id = id;
 	}
 
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(lastSync, lastSyncFiltred, key, dataType, id);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SyncState) {
+			SyncState that = (SyncState) object;
+			return Objects.equal(this.lastSync, that.lastSync)
+				&& Objects.equal(this.lastSyncFiltred, that.lastSyncFiltred)
+				&& Objects.equal(this.key, that.key)
+				&& Objects.equal(this.dataType, that.dataType)
+				&& Objects.equal(this.id, that.id);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("lastSync", lastSync)
+			.add("lastSyncFiltred", lastSyncFiltred)
+			.add("key", key)
+			.add("dataType", dataType)
+			.add("id", id)
+			.toString();
+	}
+	
 }

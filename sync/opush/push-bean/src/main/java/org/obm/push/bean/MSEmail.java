@@ -9,13 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.obm.push.utils.SerializableInputStream;
 
-/**
- * 
- * @author adrienp
- *
- */
+import com.google.common.base.Objects;
+
 public class MSEmail implements IApplicationData, Serializable {
 
 	@Override
@@ -256,5 +254,40 @@ public class MSEmail implements IApplicationData, Serializable {
 		this.mimeData = new SerializableInputStream(mimeData);
 	}
 	
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(answered, attachements, bcc, body, cc, date, 
+				forwardMessage, from, headers, importance, invitation, messageClass,
+				mimeData, read, smtpId, starred, subject, to, uid);
+	}
+	
+	@Override
+	public final boolean equals(Object obj) {
+		if (obj instanceof MSEmail) {
+			MSEmail other = (MSEmail) obj;
+			return new EqualsBuilder()
+				.append(answered, other.answered)
+				.append(attachements, other.attachements)
+				.append(bcc, other.bcc)
+				.append(body, other.body)
+				.append(cc, other.cc)
+				.append(date, other.date)
+				.append(forwardMessage, other.forwardMessage)
+				.append(from, other.from)
+				.append(headers, other.headers)
+				.append(importance, other.importance)
+				.append(invitation, other.invitation)
+				.append(messageClass, other.messageClass)
+				.append(mimeData, other.mimeData)
+				.append(read, other.read)
+				.append(smtpId, other.smtpId)
+				.append(starred, other.starred)
+				.append(subject, other.subject)
+				.append(to, other.to)
+				.append(uid, other.uid)
+				.isEquals();
+		}
+		return false;
+	}
 }
 

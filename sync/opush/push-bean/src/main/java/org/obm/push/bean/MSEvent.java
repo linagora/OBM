@@ -10,8 +10,11 @@ import java.util.TimeZone;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 
+import com.google.common.base.Objects;
+
 public class MSEvent implements IApplicationData, Serializable {
 	
+	private final Set<MSAttendee> attendees;
 	private String organizerName;
 	private String organizerEmail;
 	private String location;
@@ -29,7 +32,6 @@ public class MSEvent implements IApplicationData, Serializable {
 	private CalendarSensitivity sensitivity;
 	private CalendarMeetingStatus meetingStatus;
 	private Integer reminder;
-	private Set<MSAttendee> attendees;
 	private List<String> categories;
 	private Recurrence recurrence;
 	private List<MSEvent> exceptions;
@@ -37,9 +39,11 @@ public class MSEvent implements IApplicationData, Serializable {
 	private Date exceptionStartTime;
 	private boolean deletedException;
 	private Integer obmSequence;
+	private transient Set<String> attendeeEmails;
 	
 	public MSEvent(){
 		this.attendees = new HashSet<MSAttendee>();
+		this.attendeeEmails = new HashSet<String>();
 	}
 
 	public TimeZone getTimeZone() {
@@ -143,8 +147,9 @@ public class MSEvent implements IApplicationData, Serializable {
 	}
 	
 	public void addAttendee(MSAttendee att) {
-		if(!attendees.contains(att)){
+		if(!attendeeEmails.contains(att.getEmail())){
 			attendees.add(att);
+			attendeeEmails.add(att.getEmail());
 		}
 	}
 
@@ -251,4 +256,80 @@ public class MSEvent implements IApplicationData, Serializable {
 	public void setObmSequence(Integer obmSequence) {
 		this.obmSequence = obmSequence;
 	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("attendees", attendees)
+			.add("organizerName", organizerName)
+			.add("organizerEmail", organizerEmail)
+			.add("location", location)
+			.add("subject", subject)
+			.add("obmId", obmId)
+			.add("extId", extId)
+			.add("description", description)
+			.add("created", created)
+			.add("lastUpdate", lastUpdate)
+			.add("dtStamp", dtStamp)
+			.add("endTime", endTime)
+			.add("startTime", startTime)
+			.add("allDayEvent", allDayEvent)
+			.add("busyStatus", busyStatus)
+			.add("sensitivity", sensitivity)
+			.add("meetingStatus", meetingStatus)
+			.add("reminder", reminder)
+			.add("categories", categories)
+			.add("recurrence", recurrence)
+			.add("exceptions", exceptions)
+			.add("timeZone", timeZone)
+			.add("exceptionStartTime", exceptionStartTime)
+			.add("deletedException", deletedException)
+			.add("obmSequence", obmSequence)
+			.toString();
+	}
+
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(attendees, organizerName, organizerEmail, location, 
+				subject, obmId, extId, description, created, lastUpdate, dtStamp, 
+				endTime, startTime, allDayEvent, busyStatus, sensitivity, meetingStatus, 
+				reminder, categories, recurrence, exceptions, timeZone, exceptionStartTime, 
+				deletedException, obmSequence);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MSEvent) {
+			MSEvent that = (MSEvent) object;
+			return Objects.equal(this.attendees, that.attendees)
+				&& Objects.equal(this.organizerName, that.organizerName)
+				&& Objects.equal(this.organizerEmail, that.organizerEmail)
+				&& Objects.equal(this.location, that.location)
+				&& Objects.equal(this.subject, that.subject)
+				&& Objects.equal(this.obmId, that.obmId)
+				&& Objects.equal(this.extId, that.extId)
+				&& Objects.equal(this.description, that.description)
+				&& Objects.equal(this.created, that.created)
+				&& Objects.equal(this.lastUpdate, that.lastUpdate)
+				&& Objects.equal(this.dtStamp, that.dtStamp)
+				&& Objects.equal(this.endTime, that.endTime)
+				&& Objects.equal(this.startTime, that.startTime)
+				&& Objects.equal(this.allDayEvent, that.allDayEvent)
+				&& Objects.equal(this.busyStatus, that.busyStatus)
+				&& Objects.equal(this.sensitivity, that.sensitivity)
+				&& Objects.equal(this.meetingStatus, that.meetingStatus)
+				&& Objects.equal(this.reminder, that.reminder)
+				&& Objects.equal(this.categories, that.categories)
+				&& Objects.equal(this.recurrence, that.recurrence)
+				&& Objects.equal(this.exceptions, that.exceptions)
+				&& Objects.equal(this.timeZone, that.timeZone)
+				&& Objects.equal(this.exceptionStartTime, that.exceptionStartTime)
+				&& Objects.equal(this.deletedException, that.deletedException)
+				&& Objects.equal(this.obmSequence, that.obmSequence);
+		}
+		return false;
+	}
+	
+	
+	
 }

@@ -11,22 +11,25 @@ public class EmailEqualsTest {
 	
 	@Test
 	public void testEquals(){
-		Email e1 = new Email(10, true, new Date());
-		Email e2 = new Email(10, true, new Date());
+		Date date = new Date();
+		Email e1 = new Email(10, true, date);
+		Email e2 = new Email(10, true, date);
 		Assert.assertEquals(e1, e2);
 	}
 	
 	@Test
 	public void testNotEqualsUid(){
-		Email e1 = new Email(10, true, new Date());
-		Email e2 = new Email(11, true, new Date());
+		Date date = new Date();
+		Email e1 = new Email(10, true, date);
+		Email e2 = new Email(11, true, date);
 		Assert.assertNotSame(e1, e2);
 	}
 	
 	@Test
 	public void testNotEqualsRead(){
-		Email e1 = new Email(11, false, new Date());
-		Email e2 = new Email(11, true, new Date());
+		Date date = new Date();
+		Email e1 = new Email(11, false, date);
+		Email e2 = new Email(11, true, date);
 		Assert.assertNotSame(e1, e2);
 	}
 	

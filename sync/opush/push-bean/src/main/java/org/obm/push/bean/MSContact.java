@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.google.common.base.Objects;
+
 
 
 public class MSContact implements IApplicationData, Serializable {
@@ -577,4 +579,161 @@ public class MSContact implements IApplicationData, Serializable {
 	public void setData(String data) {
 		this.data = data;
 	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(assistantName, assistantPhoneNumber, assistnamePhoneNumber, 
+				business2PhoneNumber, businessAddressCity, businessPhoneNumber, webPage, 
+				businessAddressCountry, department, email1Address, email2Address, email3Address, 
+				businessFaxNumber, fileAs, firstName, middleName, homeAddressCity, 
+				homeAddressCountry, homeFaxNumber, homePhoneNumber, home2PhoneNumber, 
+				homeAddressPostalCode, homeAddressState, homeAddressStreet, mobilePhoneNumber, 
+				suffix, companyName, otherAddressCity, otherAddressCountry, carPhoneNumber, 
+				otherAddressPostalCode, otherAddressState, otherAddressStreet, pagerNumber, 
+				title, businessPostalCode, lastName, spouse, businessState, businessStreet, 
+				jobTitle, yomiFirstName, yomiLastName, yomiCompanyName, officeLocation, 
+				radioPhoneNumber, picture, data, anniversary, birthday, categories, children, 
+				customerId, governmentId, iMAddress, iMAddress2, iMAddress3, managerName, 
+				companyMainPhone, accountName, nickName, mMS);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MSContact) {
+			MSContact that = (MSContact) object;
+			return Objects.equal(this.assistantName, that.assistantName)
+				&& Objects.equal(this.assistantPhoneNumber, that.assistantPhoneNumber)
+				&& Objects.equal(this.assistnamePhoneNumber, that.assistnamePhoneNumber)
+				&& Objects.equal(this.business2PhoneNumber, that.business2PhoneNumber)
+				&& Objects.equal(this.businessAddressCity, that.businessAddressCity)
+				&& Objects.equal(this.businessPhoneNumber, that.businessPhoneNumber)
+				&& Objects.equal(this.webPage, that.webPage)
+				&& Objects.equal(this.businessAddressCountry, that.businessAddressCountry)
+				&& Objects.equal(this.department, that.department)
+				&& Objects.equal(this.email1Address, that.email1Address)
+				&& Objects.equal(this.email2Address, that.email2Address)
+				&& Objects.equal(this.email3Address, that.email3Address)
+				&& Objects.equal(this.businessFaxNumber, that.businessFaxNumber)
+				&& Objects.equal(this.fileAs, that.fileAs)
+				&& Objects.equal(this.firstName, that.firstName)
+				&& Objects.equal(this.middleName, that.middleName)
+				&& Objects.equal(this.homeAddressCity, that.homeAddressCity)
+				&& Objects.equal(this.homeAddressCountry, that.homeAddressCountry)
+				&& Objects.equal(this.homeFaxNumber, that.homeFaxNumber)
+				&& Objects.equal(this.homePhoneNumber, that.homePhoneNumber)
+				&& Objects.equal(this.home2PhoneNumber, that.home2PhoneNumber)
+				&& Objects.equal(this.homeAddressPostalCode, that.homeAddressPostalCode)
+				&& Objects.equal(this.homeAddressState, that.homeAddressState)
+				&& Objects.equal(this.homeAddressStreet, that.homeAddressStreet)
+				&& Objects.equal(this.mobilePhoneNumber, that.mobilePhoneNumber)
+				&& Objects.equal(this.suffix, that.suffix)
+				&& Objects.equal(this.companyName, that.companyName)
+				&& Objects.equal(this.otherAddressCity, that.otherAddressCity)
+				&& Objects.equal(this.otherAddressCountry, that.otherAddressCountry)
+				&& Objects.equal(this.carPhoneNumber, that.carPhoneNumber)
+				&& Objects.equal(this.otherAddressPostalCode, that.otherAddressPostalCode)
+				&& Objects.equal(this.otherAddressState, that.otherAddressState)
+				&& Objects.equal(this.otherAddressStreet, that.otherAddressStreet)
+				&& Objects.equal(this.pagerNumber, that.pagerNumber)
+				&& Objects.equal(this.title, that.title)
+				&& Objects.equal(this.businessPostalCode, that.businessPostalCode)
+				&& Objects.equal(this.lastName, that.lastName)
+				&& Objects.equal(this.spouse, that.spouse)
+				&& Objects.equal(this.businessState, that.businessState)
+				&& Objects.equal(this.businessStreet, that.businessStreet)
+				&& Objects.equal(this.jobTitle, that.jobTitle)
+				&& Objects.equal(this.yomiFirstName, that.yomiFirstName)
+				&& Objects.equal(this.yomiLastName, that.yomiLastName)
+				&& Objects.equal(this.yomiCompanyName, that.yomiCompanyName)
+				&& Objects.equal(this.officeLocation, that.officeLocation)
+				&& Objects.equal(this.radioPhoneNumber, that.radioPhoneNumber)
+				&& Objects.equal(this.picture, that.picture)
+				&& Objects.equal(this.data, that.data)
+				&& Objects.equal(this.anniversary, that.anniversary)
+				&& Objects.equal(this.birthday, that.birthday)
+				&& Objects.equal(this.categories, that.categories)
+				&& Objects.equal(this.children, that.children)
+				&& Objects.equal(this.customerId, that.customerId)
+				&& Objects.equal(this.governmentId, that.governmentId)
+				&& Objects.equal(this.iMAddress, that.iMAddress)
+				&& Objects.equal(this.iMAddress2, that.iMAddress2)
+				&& Objects.equal(this.iMAddress3, that.iMAddress3)
+				&& Objects.equal(this.managerName, that.managerName)
+				&& Objects.equal(this.companyMainPhone, that.companyMainPhone)
+				&& Objects.equal(this.accountName, that.accountName)
+				&& Objects.equal(this.nickName, that.nickName)
+				&& Objects.equal(this.mMS, that.mMS);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("assistantName", assistantName)
+			.add("assistantPhoneNumber", assistantPhoneNumber)
+			.add("assistnamePhoneNumber", assistnamePhoneNumber)
+			.add("business2PhoneNumber", business2PhoneNumber)
+			.add("businessAddressCity", businessAddressCity)
+			.add("businessPhoneNumber", businessPhoneNumber)
+			.add("webPage", webPage)
+			.add("businessAddressCountry", businessAddressCountry)
+			.add("department", department)
+			.add("email1Address", email1Address)
+			.add("email2Address", email2Address)
+			.add("email3Address", email3Address)
+			.add("businessFaxNumber", businessFaxNumber)
+			.add("fileAs", fileAs)
+			.add("firstName", firstName)
+			.add("middleName", middleName)
+			.add("homeAddressCity", homeAddressCity)
+			.add("homeAddressCountry", homeAddressCountry)
+			.add("homeFaxNumber", homeFaxNumber)
+			.add("homePhoneNumber", homePhoneNumber)
+			.add("home2PhoneNumber", home2PhoneNumber)
+			.add("homeAddressPostalCode", homeAddressPostalCode)
+			.add("homeAddressState", homeAddressState)
+			.add("homeAddressStreet", homeAddressStreet)
+			.add("mobilePhoneNumber", mobilePhoneNumber)
+			.add("suffix", suffix)
+			.add("companyName", companyName)
+			.add("otherAddressCity", otherAddressCity)
+			.add("otherAddressCountry", otherAddressCountry)
+			.add("carPhoneNumber", carPhoneNumber)
+			.add("otherAddressPostalCode", otherAddressPostalCode)
+			.add("otherAddressState", otherAddressState)
+			.add("otherAddressStreet", otherAddressStreet)
+			.add("pagerNumber", pagerNumber)
+			.add("title", title)
+			.add("businessPostalCode", businessPostalCode)
+			.add("lastName", lastName)
+			.add("spouse", spouse)
+			.add("businessState", businessState)
+			.add("businessStreet", businessStreet)
+			.add("jobTitle", jobTitle)
+			.add("yomiFirstName", yomiFirstName)
+			.add("yomiLastName", yomiLastName)
+			.add("yomiCompanyName", yomiCompanyName)
+			.add("officeLocation", officeLocation)
+			.add("radioPhoneNumber", radioPhoneNumber)
+			.add("picture", picture)
+			.add("data", data)
+			.add("anniversary", anniversary)
+			.add("birthday", birthday)
+			.add("categories", categories)
+			.add("children", children)
+			.add("customerId", customerId)
+			.add("governmentId", governmentId)
+			.add("iMAddress", iMAddress)
+			.add("iMAddress2", iMAddress2)
+			.add("iMAddress3", iMAddress3)
+			.add("managerName", managerName)
+			.add("companyMainPhone", companyMainPhone)
+			.add("accountName", accountName)
+			.add("nickName", nickName)
+			.add("mMS", mMS)
+			.toString();
+	}
+
+	
 }

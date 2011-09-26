@@ -2,7 +2,9 @@ package org.obm.push.bean;
 
 import java.io.Serializable;
 
-public class ItemChange  implements Serializable {
+import com.google.common.base.Objects;
+
+public class ItemChange implements Serializable {
 	
 	private String serverId;
 	private String parentId;
@@ -68,4 +70,36 @@ public class ItemChange  implements Serializable {
 	public void setIsNew(Boolean isNew) {
 		this.isNew = isNew;
 	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(serverId, parentId, displayName, itemType, isNew, data);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof ItemChange) {
+			ItemChange that = (ItemChange) object;
+			return Objects.equal(this.serverId, that.serverId)
+				&& Objects.equal(this.parentId, that.parentId)
+				&& Objects.equal(this.displayName, that.displayName)
+				&& Objects.equal(this.itemType, that.itemType)
+				&& Objects.equal(this.isNew, that.isNew)
+				&& Objects.equal(this.data, that.data);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("serverId", serverId)
+			.add("parentId", parentId)
+			.add("displayName", displayName)
+			.add("itemType", itemType)
+			.add("isNew", isNew)
+			.add("data", data)
+			.toString();
+	}
+
 }

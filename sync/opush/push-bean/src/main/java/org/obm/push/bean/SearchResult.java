@@ -1,5 +1,7 @@
 package org.obm.push.bean;
 
+import com.google.common.base.Objects;
+
 public class SearchResult {
 
 	private String displayName;
@@ -102,4 +104,46 @@ public class SearchResult {
 		MobilePhone = mobilePhone;
 	}
 
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(displayName, alias, emailAddress, firstName, lastName, 
+				Phone, Office, Title, Company, HomePhone, MobilePhone);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SearchResult) {
+			SearchResult that = (SearchResult) object;
+			return Objects.equal(this.displayName, that.displayName)
+				&& Objects.equal(this.alias, that.alias)
+				&& Objects.equal(this.emailAddress, that.emailAddress)
+				&& Objects.equal(this.firstName, that.firstName)
+				&& Objects.equal(this.lastName, that.lastName)
+				&& Objects.equal(this.Phone, that.Phone)
+				&& Objects.equal(this.Office, that.Office)
+				&& Objects.equal(this.Title, that.Title)
+				&& Objects.equal(this.Company, that.Company)
+				&& Objects.equal(this.HomePhone, that.HomePhone)
+				&& Objects.equal(this.MobilePhone, that.MobilePhone);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("displayName", displayName)
+			.add("alias", alias)
+			.add("emailAddress", emailAddress)
+			.add("firstName", firstName)
+			.add("lastName", lastName)
+			.add("Phone", Phone)
+			.add("Office", Office)
+			.add("Title", Title)
+			.add("Company", Company)
+			.add("HomePhone", HomePhone)
+			.add("MobilePhone", MobilePhone)
+			.toString();
+	}
+	
 }

@@ -4,6 +4,8 @@ import java.util.Date;
 
 import org.obm.push.utils.index.Indexed;
 
+import com.google.common.base.Objects;
+
 public class Email implements Indexed<Long> {
 
 	private final long uid;
@@ -33,35 +35,30 @@ public class Email implements Indexed<Long> {
 	public Date getDate() {
 		return date;
 	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (read ? 1231 : 1237);
-		result = prime * result + (int) (uid ^ (uid >>> 32));
-		return result;
-	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Email other = (Email) obj;
-		if (read != other.read)
-			return false;
-		if (uid != other.uid)
-			return false;
-		return true;
+	public final int hashCode(){
+		return Objects.hashCode(uid, read, date);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof Email) {
+			Email that = (Email) object;
+			return Objects.equal(this.uid, that.uid)
+				&& Objects.equal(this.read, that.read)
+				&& Objects.equal(this.date, that.date);
+		}
+		return false;
 	}
 
 	@Override
 	public String toString() {
-		return "Email [ uid = " + uid + ", read = " + read + " ]";
+		return Objects.toStringHelper(this)
+			.add("uid", uid)
+			.add("read", read)
+			.add("date", date)
+			.toString();
 	}
 	
 }

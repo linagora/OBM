@@ -105,28 +105,6 @@ public class SyncCollection implements Serializable {
 		this.collectionPath = collectionPath;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SyncCollection other = (SyncCollection) obj;
-		if (collectionId == null) {
-			if (other.collectionId != null)
-				return false;
-		} else if (!collectionId.equals(other.collectionId))
-			return false;
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(collectionId);
-	}
-
 	public Set<SyncCollectionChange> getChanges() {
 		return changes;
 	}
@@ -158,12 +136,49 @@ public class SyncCollection implements Serializable {
 	public void setOptions(SyncCollectionOptions options) {
 		this.options = options;
 	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(syncState, fetchIds, dataClass, collectionId, collectionPath, 
+				syncKey, windowSize, moreAvailable, changes, status, dataType, options);
+	}
 	
 	@Override
-	public String toString() {
-		return Objects.toStringHelper(getClass())
-				.add("id", collectionId)
-				.add("path", collectionPath)
-				.toString();
+	public final boolean equals(Object object){
+		if (object instanceof SyncCollection) {
+			SyncCollection that = (SyncCollection) object;
+			return Objects.equal(this.syncState, that.syncState)
+				&& Objects.equal(this.fetchIds, that.fetchIds)
+				&& Objects.equal(this.dataClass, that.dataClass)
+				&& Objects.equal(this.collectionId, that.collectionId)
+				&& Objects.equal(this.collectionPath, that.collectionPath)
+				&& Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.windowSize, that.windowSize)
+				&& Objects.equal(this.moreAvailable, that.moreAvailable)
+				&& Objects.equal(this.changes, that.changes)
+				&& Objects.equal(this.status, that.status)
+				&& Objects.equal(this.dataType, that.dataType)
+				&& Objects.equal(this.options, that.options);
+		}
+		return false;
 	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("syncState", syncState)
+			.add("fetchIds", fetchIds)
+			.add("dataClass", dataClass)
+			.add("collectionId", collectionId)
+			.add("collectionPath", collectionPath)
+			.add("syncKey", syncKey)
+			.add("windowSize", windowSize)
+			.add("moreAvailable", moreAvailable)
+			.add("changes", changes)
+			.add("status", status)
+			.add("dataType", dataType)
+			.add("options", options)
+			.toString();
+	}
+	
 }

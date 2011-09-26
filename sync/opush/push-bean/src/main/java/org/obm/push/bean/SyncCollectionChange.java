@@ -1,6 +1,7 @@
 package org.obm.push.bean;
 
 import java.io.Serializable;
+import com.google.common.base.Objects;
 
 
 public class SyncCollectionChange implements Serializable {
@@ -41,4 +42,33 @@ public class SyncCollectionChange implements Serializable {
 		return type;
 	}
 
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(serverId, clientId, modType, type, data);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SyncCollectionChange) {
+			SyncCollectionChange that = (SyncCollectionChange) object;
+			return Objects.equal(this.serverId, that.serverId)
+				&& Objects.equal(this.clientId, that.clientId)
+				&& Objects.equal(this.modType, that.modType)
+				&& Objects.equal(this.type, that.type)
+				&& Objects.equal(this.data, that.data);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("serverId", serverId)
+			.add("clientId", clientId)
+			.add("modType", modType)
+			.add("type", type)
+			.add("data", data)
+			.toString();
+	}
+	
 }

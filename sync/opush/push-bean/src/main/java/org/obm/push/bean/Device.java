@@ -8,6 +8,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
+
 public class Device implements Serializable {
 
 	private final static Logger logger = LoggerFactory.getLogger(Device.class);
@@ -97,34 +99,31 @@ public class Device implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((devId == null) ? 0 : devId.hashCode());
-		result = prime * result + ((devType == null) ? 0 : devType.hashCode());
-		return result;
+	public final int hashCode(){
+		return Objects.hashCode(devType, hints, devId, databaseId);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof Device) {
+			Device that = (Device) object;
+			return Objects.equal(this.devType, that.devType)
+				&& Objects.equal(this.hints, that.hints)
+				&& Objects.equal(this.devId, that.devId)
+				&& Objects.equal(this.databaseId, that.databaseId);
+		}
+		return false;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Device other = (Device) obj;
-		if (devId == null) {
-			if (other.devId != null)
-				return false;
-		} else if (!devId.equals(other.devId))
-			return false;
-		if (devType == null) {
-			if (other.devType != null)
-				return false;
-		} else if (!devType.equals(other.devType))
-			return false;
-		return true;
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("logger", logger)
+			.add("devType", devType)
+			.add("hints", hints)
+			.add("devId", devId)
+			.add("databaseId", databaseId)
+			.toString();
 	}
 	
 }

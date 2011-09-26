@@ -3,6 +3,7 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import com.google.common.base.Objects;
 
 
 public class Recurrence implements Serializable {
@@ -88,16 +89,45 @@ public class Recurrence implements Serializable {
 	public void setDeadOccur(Boolean deadOccur) {
 		this.deadOccur = deadOccur;
 	}
-	
 	@Override
-	public String toString() {
-		return "Recurrence [dayOfMonth=" + dayOfMonth + ", dayOfWeek="
-				+ dayOfWeek + ", deadOccur=" + deadOccur + ", interval="
-				+ interval + ", monthOfYear=" + monthOfYear + ", occurrences="
-				+ occurrences + ", regenerate=" + regenerate + ", start="
-				+ start + ", type=" + type + ", until=" + until
-				+ ", weekOfMonth=" + weekOfMonth + "]";
+	public final int hashCode(){
+		return Objects.hashCode(until, type, weekOfMonth, monthOfYear, dayOfMonth, 
+				occurrences, interval, dayOfWeek, start, regenerate, deadOccur);
 	}
 	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof Recurrence) {
+			Recurrence that = (Recurrence) object;
+			return Objects.equal(this.until, that.until)
+				&& Objects.equal(this.type, that.type)
+				&& Objects.equal(this.weekOfMonth, that.weekOfMonth)
+				&& Objects.equal(this.monthOfYear, that.monthOfYear)
+				&& Objects.equal(this.dayOfMonth, that.dayOfMonth)
+				&& Objects.equal(this.occurrences, that.occurrences)
+				&& Objects.equal(this.interval, that.interval)
+				&& Objects.equal(this.dayOfWeek, that.dayOfWeek)
+				&& Objects.equal(this.start, that.start)
+				&& Objects.equal(this.regenerate, that.regenerate)
+				&& Objects.equal(this.deadOccur, that.deadOccur);
+		}
+		return false;
+	}
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("until", until)
+			.add("type", type)
+			.add("weekOfMonth", weekOfMonth)
+			.add("monthOfYear", monthOfYear)
+			.add("dayOfMonth", dayOfMonth)
+			.add("occurrences", occurrences)
+			.add("interval", interval)
+			.add("dayOfWeek", dayOfWeek)
+			.add("start", start)
+			.add("regenerate", regenerate)
+			.add("deadOccur", deadOccur)
+			.toString();
+	}
 	
 }

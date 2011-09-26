@@ -2,6 +2,8 @@ package org.obm.push.bean;
 
 import java.math.BigDecimal;
 
+import com.google.common.base.Objects;
+
 public class BackendSession {
 
 	private final Credentials credentials;
@@ -53,4 +55,31 @@ public class BackendSession {
 		return device;
 	}
 
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(credentials, device, command, protocolVersion);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof BackendSession) {
+			BackendSession that = (BackendSession) object;
+			return Objects.equal(this.credentials, that.credentials)
+				&& Objects.equal(this.device, that.device)
+				&& Objects.equal(this.command, that.command)
+				&& Objects.equal(this.protocolVersion, that.protocolVersion);
+		}
+		return false;
+	}
+
+	@Override
+	public final String toString() {
+		return Objects.toStringHelper(this)
+			.add("credentials", credentials)
+			.add("device", device)
+			.add("command", command)
+			.add("protocolVersion", protocolVersion)
+			.toString();
+	}
+	
 }

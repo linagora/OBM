@@ -2,11 +2,8 @@ package org.obm.push.bean;
 
 import java.io.Serializable;
 
-/**
- * 
- * @author adrienp
- *
- */
+import com.google.common.base.Objects;
+
 public class MSAttachement implements Serializable {
 	
 	private String displayName;
@@ -76,4 +73,39 @@ public class MSAttachement implements Serializable {
 	public void setIsInline(String isInline) {
 		this.isInline = isInline;
 	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(displayName, fileReference, method, estimatedDataSize, 
+				contentId, contentLocation, isInline);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MSAttachement) {
+			MSAttachement that = (MSAttachement) object;
+			return Objects.equal(this.displayName, that.displayName)
+				&& Objects.equal(this.fileReference, that.fileReference)
+				&& Objects.equal(this.method, that.method)
+				&& Objects.equal(this.estimatedDataSize, that.estimatedDataSize)
+				&& Objects.equal(this.contentId, that.contentId)
+				&& Objects.equal(this.contentLocation, that.contentLocation)
+				&& Objects.equal(this.isInline, that.isInline);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("displayName", displayName)
+			.add("fileReference", fileReference)
+			.add("method", method)
+			.add("estimatedDataSize", estimatedDataSize)
+			.add("contentId", contentId)
+			.add("contentLocation", contentLocation)
+			.add("isInline", isInline)
+			.toString();
+	}
+	
 }

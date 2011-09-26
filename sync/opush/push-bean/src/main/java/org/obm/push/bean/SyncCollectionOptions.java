@@ -3,6 +3,7 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import com.google.common.base.Objects;
 
 public class SyncCollectionOptions implements Serializable {
 	
@@ -83,4 +84,40 @@ public class SyncCollectionOptions implements Serializable {
 	public void addBodyPreference(BodyPreference bodyPreference) {
 		this.bodyPreferences.put(bodyPreference.getType(), bodyPreference);
 	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(truncation, mimeSupport, mimeTruncation, conflict, 
+				deletesAsMoves, filterType, bodyPreferences);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SyncCollectionOptions) {
+			SyncCollectionOptions that = (SyncCollectionOptions) object;
+			return Objects.equal(this.truncation, that.truncation)
+				&& Objects.equal(this.mimeSupport, that.mimeSupport)
+				&& Objects.equal(this.mimeTruncation, that.mimeTruncation)
+				&& Objects.equal(this.conflict, that.conflict)
+				&& Objects.equal(this.deletesAsMoves, that.deletesAsMoves)
+				&& Objects.equal(this.filterType, that.filterType)
+				&& Objects.equal(this.bodyPreferences, that.bodyPreferences);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("SYNC_TRUNCATION_ALL", SYNC_TRUNCATION_ALL)
+			.add("truncation", truncation)
+			.add("mimeSupport", mimeSupport)
+			.add("mimeTruncation", mimeTruncation)
+			.add("conflict", conflict)
+			.add("deletesAsMoves", deletesAsMoves)
+			.add("filterType", filterType)
+			.add("bodyPreferences", bodyPreferences)
+			.toString();
+	}
+	
 }

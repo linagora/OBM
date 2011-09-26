@@ -7,6 +7,7 @@ import org.obm.push.exception.activesync.InvalidServerId;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.google.common.base.Objects;
 
 public class ServerId {
 
@@ -66,34 +67,23 @@ public class ServerId {
 	public String toString() {
 		return collectionId + ":" + itemId;
 	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + collectionId;
-		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
-		return result;
-	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ServerId other = (ServerId) obj;
-		if (collectionId != other.collectionId)
-			return false;
-		if (itemId == null) {
-			if (other.itemId != null)
-				return false;
-		} else if (!itemId.equals(other.itemId))
-			return false;
-		return true;
+	public final int hashCode(){
+		return Objects.hashCode(collectionId, itemId);
 	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof ServerId) {
+			ServerId that = (ServerId) object;
+			return Objects.equal(this.collectionId, that.collectionId)
+				&& Objects.equal(this.itemId, that.itemId);
+		}
+		return false;
+	}
+	
+
 
 	
 }

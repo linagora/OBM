@@ -3,6 +3,7 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import com.google.common.base.Objects;
 
 public class MSTask implements IApplicationData, Serializable {
 
@@ -140,129 +141,52 @@ public class MSTask implements IApplicationData, Serializable {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((UtcDueDate == null) ? 0 : UtcDueDate.hashCode());
-		result = prime * result
-				+ ((categories == null) ? 0 : categories.hashCode());
-		result = prime * result
-				+ ((complete == null) ? 0 : complete.hashCode());
-		result = prime * result
-				+ ((dateCompleted == null) ? 0 : dateCompleted.hashCode());
-		result = prime * result
-				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((dueDate == null) ? 0 : dueDate.hashCode());
-		result = prime * result
-				+ ((importance == null) ? 0 : importance.hashCode());
-		result = prime * result
-				+ ((recurrence == null) ? 0 : recurrence.hashCode());
-		result = prime * result
-				+ ((reminderSet == null) ? 0 : reminderSet.hashCode());
-		result = prime * result
-				+ ((reminderTime == null) ? 0 : reminderTime.hashCode());
-		result = prime * result
-				+ ((sensitivity == null) ? 0 : sensitivity.hashCode());
-		result = prime * result
-				+ ((startDate == null) ? 0 : startDate.hashCode());
-		result = prime * result + ((subject == null) ? 0 : subject.hashCode());
-		result = prime * result
-				+ ((utcStartDate == null) ? 0 : utcStartDate.hashCode());
-		return result;
+	public final int hashCode(){
+		return Objects.hashCode(subject, importance, utcStartDate, startDate, UtcDueDate, 
+				dueDate, categories, recurrence, complete, dateCompleted, sensitivity, 
+				reminderTime, reminderSet, description);
 	}
-
+	
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		MSTask other = (MSTask) obj;
-		if (UtcDueDate == null) {
-			if (other.UtcDueDate != null)
-				return false;
-		} else if (!UtcDueDate.equals(other.UtcDueDate))
-			return false;
-		if (categories == null) {
-			if (other.categories != null)
-				return false;
-		} else if (!categories.equals(other.categories))
-			return false;
-		if (complete == null) {
-			if (other.complete != null)
-				return false;
-		} else if (!complete.equals(other.complete))
-			return false;
-		if (dateCompleted == null) {
-			if (other.dateCompleted != null)
-				return false;
-		} else if (!dateCompleted.equals(other.dateCompleted))
-			return false;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (dueDate == null) {
-			if (other.dueDate != null)
-				return false;
-		} else if (!dueDate.equals(other.dueDate))
-			return false;
-		if (importance == null) {
-			if (other.importance != null)
-				return false;
-		} else if (!importance.equals(other.importance))
-			return false;
-		if (recurrence == null) {
-			if (other.recurrence != null)
-				return false;
-		} else if (!recurrence.equals(other.recurrence))
-			return false;
-		if (reminderSet == null) {
-			if (other.reminderSet != null)
-				return false;
-		} else if (!reminderSet.equals(other.reminderSet))
-			return false;
-		if (reminderTime == null) {
-			if (other.reminderTime != null)
-				return false;
-		} else if (!reminderTime.equals(other.reminderTime))
-			return false;
-		if (sensitivity == null) {
-			if (other.sensitivity != null)
-				return false;
-		} else if (!sensitivity.equals(other.sensitivity))
-			return false;
-		if (startDate == null) {
-			if (other.startDate != null)
-				return false;
-		} else if (!startDate.equals(other.startDate))
-			return false;
-		if (subject == null) {
-			if (other.subject != null)
-				return false;
-		} else if (!subject.equals(other.subject))
-			return false;
-		if (utcStartDate == null) {
-			if (other.utcStartDate != null)
-				return false;
-		} else if (!utcStartDate.equals(other.utcStartDate))
-			return false;
-		return true;
+	public final boolean equals(Object object){
+		if (object instanceof MSTask) {
+			MSTask that = (MSTask) object;
+			return Objects.equal(this.subject, that.subject)
+				&& Objects.equal(this.importance, that.importance)
+				&& Objects.equal(this.utcStartDate, that.utcStartDate)
+				&& Objects.equal(this.startDate, that.startDate)
+				&& Objects.equal(this.UtcDueDate, that.UtcDueDate)
+				&& Objects.equal(this.dueDate, that.dueDate)
+				&& Objects.equal(this.categories, that.categories)
+				&& Objects.equal(this.recurrence, that.recurrence)
+				&& Objects.equal(this.complete, that.complete)
+				&& Objects.equal(this.dateCompleted, that.dateCompleted)
+				&& Objects.equal(this.sensitivity, that.sensitivity)
+				&& Objects.equal(this.reminderTime, that.reminderTime)
+				&& Objects.equal(this.reminderSet, that.reminderSet)
+				&& Objects.equal(this.description, that.description);
+		}
+		return false;
 	}
 
 	@Override
 	public String toString() {
-		return "MSTask [UtcDueDate=" + UtcDueDate + ", categories="
-				+ categories + ", complete=" + complete + ", dateCompleted="
-				+ dateCompleted + ", description=" + description + ", dueDate="
-				+ dueDate + ", importance=" + importance + ", recurrence="
-				+ recurrence + ", reminderSet=" + reminderSet
-				+ ", reminderTime=" + reminderTime + ", sensitivity="
-				+ sensitivity + ", startDate=" + startDate + ", subject="
-				+ subject + ", utcStartDate=" + utcStartDate + "]";
+		return Objects.toStringHelper(this)
+			.add("subject", subject)
+			.add("importance", importance)
+			.add("utcStartDate", utcStartDate)
+			.add("startDate", startDate)
+			.add("UtcDueDate", UtcDueDate)
+			.add("dueDate", dueDate)
+			.add("categories", categories)
+			.add("recurrence", recurrence)
+			.add("complete", complete)
+			.add("dateCompleted", dateCompleted)
+			.add("sensitivity", sensitivity)
+			.add("reminderTime", reminderTime)
+			.add("reminderSet", reminderSet)
+			.add("description", description)
+			.toString();
 	}
+	
 }
