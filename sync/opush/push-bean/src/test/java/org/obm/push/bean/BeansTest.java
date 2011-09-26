@@ -39,6 +39,7 @@ public class BeansTest {
 					.add(SyncCollectionChange.class)
 					.add(SyncCollectionOptions.class)
 					.add(SyncState.class)
+					.add(User.class)
 					.build();
 		for (Class<?> clazz: list) {
 			createEqualsVerifier(clazz).verify();

@@ -2,7 +2,9 @@ package org.obm.push;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidParameterException;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -20,6 +22,7 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.FolderSyncHandler;
 import org.obm.push.handler.GetAttachmentHandler;
@@ -38,8 +41,8 @@ import org.obm.push.handler.SmartForwardHandler;
 import org.obm.push.handler.SmartReplyHandler;
 import org.obm.push.handler.SyncHandler;
 import org.obm.push.impl.PushContinuation;
-import org.obm.push.impl.Responder;
 import org.obm.push.impl.PushContinuation.Factory;
+import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.logging.TechnicalLogType;
 import org.obm.push.protocol.request.ActiveSyncRequest;
@@ -50,7 +53,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -220,8 +226,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	 */
 	private Credentials performAuthentification(ActiveSyncRequest request,
 			HttpServletResponse response) {
-		Credentials creds = null;
-		boolean valid = false;
+
 		Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
 		logger.debug(asXmlRequestMarker, request.getHttpServletRequest().toString());
 		String authHeader = request.getHeader("Authorization");
@@ -237,38 +242,43 @@ public class ActiveSyncServlet extends HttpServlet {
 					if (p != -1) {
 						String userId = userPass.substring(0, p);
 						String password = userPass.substring(p + 1);
-						String loginAtDomain = getLoginAtDomain(userId);
 						String deviceId = request.getDeviceId();
 						String deviceType = request.getDeviceType();
 						String userAgent = request.getUserAgent();
 						try {
-							valid = deviceService.initDevice(loginAtDomain, deviceId, deviceType, userAgent)
+							String loginAtDomain = getLoginAtDomain(userId);
+							boolean valid = deviceService.initDevice(loginAtDomain, deviceId, deviceType, userAgent)
 									&& validatePassword(loginAtDomain, password)
-									&& deviceService.syncAuthorized(loginAtDomain,
-											deviceId);
+									&& deviceService.syncAuthorized(loginAtDomain, deviceId);
+							if (valid) {
+								logger.debug("login/password ok & the device has been authorized");
+								return new Credentials(loginAtDomain, password);
+							}
 						} catch (DaoException e) {
 							//Do nothing valid doesn't change
-						}
-						if (valid) {
-							logger.debug("login/password ok & the device has been authorized");
-							return new Credentials(loginAtDomain, password);
+						} catch (InvalidParameterException e) {
+							//will be logged later
 						}
 					}
 				}
 			}
 		}
+		returnHttpUnauthorized(request.getHttpServletRequest(), response);
+		return null;
+	}
 
-		if (!valid) {
-			String uri = request.getHttpServletRequest().getMethod() + " "
-					+ request.getHttpServletRequest().getRequestURI() + " "
-					+ request.getHttpServletRequest().getQueryString();
+	private void returnHttpUnauthorized(HttpServletRequest httpServletRequest,
+			HttpServletResponse response) {
 
-			logger.warn("invalid auth, sending http 401 ( uri = {} )", uri);
-			String s = "Basic realm=\"OBMPushService\"";
-			response.setHeader("WWW-Authenticate", s);
-			response.setStatus(401);
-		}
-		return creds;
+		logger.warn("invalid auth, sending http 401 ( uri = {}{}{} )", 
+				new Object[] { 
+					httpServletRequest.getMethod(), 
+					httpServletRequest.getRequestURI(), 
+					httpServletRequest.getQueryString()});
+		
+		String s = "Basic realm=\"OBMPushService\"";
+		response.setHeader("WWW-Authenticate", s);
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	}
 
 	private void processActiveSyncMethod(IContinuation continuation,
@@ -319,21 +329,42 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 	}
 
-	private String getLoginAtDomain(String userID) {
-		String uid = userID;
-		String domain = null;
-		int idx = uid.indexOf("\\");
-		if (idx > 0) {
-			domain = uid.substring(0, idx);
-			if (!uid.contains("@")) {
-				uid = uid.substring(idx + 1) + "@" + domain;
-			} else {
-				uid = uid.substring(idx + 1);
-			}
+	/* package */ String getLoginAtDomain(String userID) {
+		Iterable<String> parts = splitOnSlashes(userID);
+		User user = buildUserFromParts(parts);
+		if (user == null) {
+			parts = splitOnArrobase(userID);
+			user = buildUserFromParts(parts);
 		}
-		uid = uid.toLowerCase();
-		return uid;
+		if (user == null) {
+			throw new InvalidParameterException();
+		}
+		return user.getLoginAtDomain();
 	}
+
+	private Iterable<String> splitOnSlashes(String userID) {
+		Iterable<String> parts = Splitter.on("\\").split(userID);
+		return parts;
+	}
+
+	private Iterable<String> splitOnArrobase(String userID) {
+		Iterable<String> parts = Splitter.on("@").split(userID);
+		return ImmutableList.copyOf(parts).reverse();
+	}
+
+	private User buildUserFromParts(Iterable<String> parts) {
+		int nbParts = Iterables.size(parts);
+		if (nbParts > 2) {
+			throw new InvalidParameterException();
+		} else if (nbParts == 2) {
+			Iterator<String> iterator = parts.iterator();
+			String domainName = iterator.next();
+			String userName = iterator.next();
+			return new User(userName, domainName);
+		}
+		return null;
+	}
+
 
 	/**
 	 * 
