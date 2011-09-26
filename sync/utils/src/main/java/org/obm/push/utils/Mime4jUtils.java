@@ -32,31 +32,12 @@ import org.apache.james.mime4j.storage.Storage;
 import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
 
-/**
- * 
- * 
- * @author adrien
- * 
- */
 public class Mime4jUtils {
-
-	private static final Mime4jUtils instance;
-
-	static {
-		instance = new Mime4jUtils();
-	}
-
-	public static Mime4jUtils getInstance() {
-		return instance;
-	}
 
 	private Mime4jUtils() {
 	}
 
 	public static Message getNewMessage() {
-		//MessageBuilder builder = MessageBuilderFactory.newInstance()
-			//	.newMessageBuilder();
-		// create mime4j message
 		return new Message();
 	}
 
