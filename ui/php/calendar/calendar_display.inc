@@ -2897,13 +2897,12 @@ function dis_calendar_event_consult_ext($contact_id, $id) {
   return $block;
 }
 
-function check_event_details_access() {
-  global $obm;
-  
-  if (isset($GLOBALS['token'])) {
-    return $GLOBALS['token']['type'] == 'private';
+function event_details_access_rights() {
+  $access_type = 'rw';
+  if (isset($GLOBALS['token']) && ($GLOBALS['token']['type'] == 'public')) {
+    $access_type = 'r';
   }
-  return true;
+  return $access_type;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3098,11 +3097,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   }
 
   $ie6_radio_fix = "style='border:none; padding:0;margin:0;width:auto;'";
-
-  if (($event_q->f('event_privacy') == 0 && check_event_details_access()) || 
+  $access_rights =  event_details_access_rights();
+  if ($event_q->f('event_privacy') == 0 ||
       $event_q->f('event_owner') == $obm['uid'] ||
       in_array($obm['uid'],$entities['user']['ids'])) {
-
     $attendee = $entities['user'];
     if (is_array($attendee['entity'])) {
       foreach ($attendee['entity'] as $u_id => $entity) {
@@ -3115,7 +3113,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $ACCEPTED = '';
         ${'NEEDS-ACTION'} = '';
         $DECLINED = '';
-        if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id)) {
+        if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id) && $access_rights =='rw') {
           $user_alert = $ccalendar_alerts;
           if($alerts[$u_id] && !($user_alert[$alerts[$u_id]])) {
             $user_alert[$alerts[$u_id]] = Of_Date::secondToString($alerts[$u_id]);
@@ -3301,9 +3299,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     }
   }
   
-  if (($event_q->f('event_privacy') == 0 && check_event_details_access()) || 
+  if ($access_rights == 'rw' && ($event_q->f('event_privacy') == 0 ||
       $event_q->f('event_owner') == $obm['uid'] ||
-      in_array($obm['uid'],$entities['user']['ids'])) {
+      in_array($obm['uid'],$entities['user']['ids']))) {
   
     $display_documents_form = !isset($GLOBALS['token']) && ($event_q->f('event_owner') == $obm['uid'] 
       || ($allow_documents && in_array($obm['uid'], $entities['user']['ids'])));
