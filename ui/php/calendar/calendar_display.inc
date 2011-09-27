@@ -428,7 +428,7 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
       $g_public_name = get_last_group_text($this_group);
     } 
 
-    $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;filter_entity=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']))."&amp;ext_target=$l_calendar&amp;sel_privacy=__PUBLIC__";
+    $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;filter_entity=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/'.basename($_SERVER['SCRIPT_NAME']))."&amp;ext_target=calendar&amp;sel_privacy=__PUBLIC__";
     $group_add_button = "
       <a href=\"javascript: return false;\" 
       onclick=\"popup('$url_group', '');
