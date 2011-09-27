@@ -1,7 +1,5 @@
 package org.obm.push.backend;
 
-import java.io.InputStream;
-
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
@@ -33,14 +31,14 @@ public interface IContentsImporter {
 	String importCalendarUserStatus(BackendSession bs, Integer invitationCollectionId, MSEmail invitation,
 			AttendeeStatus userResponse) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ServerItemNotFoundException;
 
-	void sendEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent)
+	void sendEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent)
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException;
 
-	void replyEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent,	Integer collectionId, String serverId) 
+	void replyEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent,	Integer collectionId, String serverId) 
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
 			DaoException, UnknownObmSyncServerException;
 
-	void forwardEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, String collectionId, String serverId)
+	void forwardEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, String collectionId, String serverId)
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
 			UnknownObmSyncServerException, DaoException;
 

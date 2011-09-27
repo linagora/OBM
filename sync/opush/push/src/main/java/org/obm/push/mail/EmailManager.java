@@ -16,7 +16,7 @@
 
 package org.obm.push.mail;
 
-import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -35,6 +35,7 @@ import org.minig.imap.ListInfo;
 import org.minig.imap.ListResult;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
@@ -47,6 +48,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.store.EmailDao;
+import org.obm.push.utils.FileUtils;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +72,7 @@ public class EmailManager implements IEmailManager {
 	private final boolean activateTLS;
 	
 	@Inject
-	private EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, SmtpSender smtpSender, 
+	/*package*/ EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, SmtpSender smtpSender, 
 			EmailSync emailSync, LocatorService locatorService) {
 		
 		this.emailSync = emailSync;
@@ -292,8 +294,9 @@ public class EmailManager implements IEmailManager {
 			Boolean saveInSent) throws ProcessingEmailException, SendEmailException, SmtpInvalidRcptException, StoreEmailException {
 		
 		SmtpInvalidRcptException invalidRctp = null;
-		InputStream streamMail = new BufferedInputStream(mimeMail);
+		InputStream streamMail = null;
 		try {
+			streamMail = new ByteArrayInputStream(FileUtils.streamBytes(mimeMail, true));
 			streamMail.mark(streamMail.available());
 			
 			try {

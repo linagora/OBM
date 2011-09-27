@@ -57,16 +57,21 @@ public class Mime4jUtils {
 	 * Creates a text part from the specified string.
 	 */
 	public static BodyPart createTextPart(String text, String subtype) {
-		text.replace("\r\n", "\n").replace("\n", "\r\n");
-		BodyFactory bodyFactory = new BodyFactory();
-		// Use UTF-8 to encode the specified text
-		TextBody body = bodyFactory.textBody(text, "UTF-8");
+		TextBody body = createBody(text);
 		// Create a text/plain body part
 		BodyPart bodyPart = new BodyPart();
 		bodyPart.setText(body, subtype);
 		bodyPart.setContentTransferEncoding("quoted-printable");
 
 		return bodyPart;
+	}
+
+	public static TextBody createBody(String text) {
+		text.replace("\r\n", "\n").replace("\n", "\r\n");
+		BodyFactory bodyFactory = new BodyFactory();
+		// Use UTF-8 to encode the specified text
+		TextBody body = bodyFactory.textBody(text, "UTF-8");
+		return body;
 	}
 	
 	public static InputStream toInputStream(Message message) throws IOException{

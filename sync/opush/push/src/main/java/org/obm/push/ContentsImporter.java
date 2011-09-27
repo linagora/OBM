@@ -1,7 +1,5 @@
 package org.obm.push;
 
-import java.io.InputStream;
-
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
@@ -112,13 +110,13 @@ public class ContentsImporter implements IContentsImporter {
 	}
 
 	@Override
-	public void sendEmail(BackendSession bs, InputStream mailContent,
+	public void sendEmail(BackendSession bs, byte[] mailContent,
 			Boolean saveInSent)  throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
 		mailBackend.sendEmail(bs, mailContent, saveInSent);
 	}
 
 	@Override
-	public void replyEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, Integer collectionId, String serverId)  
+	public void replyEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, Integer collectionId, String serverId)  
 					throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
 					DaoException, UnknownObmSyncServerException {
 		mailBackend.replyEmail(bs, mailContent, saveInSent, collectionId, serverId);
@@ -134,7 +132,7 @@ public class ContentsImporter implements IContentsImporter {
 	}
 
 	@Override
-	public void forwardEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, String collectionId, String serverId)  
+	public void forwardEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, String collectionId, String serverId)  
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
 			UnknownObmSyncServerException, DaoException {
 		mailBackend.forwardEmail(bs, mailContent, saveInSent, collectionId, serverId);

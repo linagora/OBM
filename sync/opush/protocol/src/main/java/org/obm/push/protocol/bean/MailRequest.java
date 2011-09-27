@@ -1,15 +1,13 @@
 package org.obm.push.protocol.bean;
 
-import java.io.InputStream;
-
 public class MailRequest {
 
 	private final String collectionId;
 	private final String serverId;
 	private final boolean saveInSent;
-	private final InputStream mailContent;
+	private final byte[] mailContent;
 
-	public MailRequest(String collectionId, String serverId, boolean saveInSent, InputStream mailContent) {
+	public MailRequest(String collectionId, String serverId, boolean saveInSent, byte[] mailContent) {
 		this.collectionId = collectionId;
 		this.serverId = serverId;
 		this.saveInSent = saveInSent;
@@ -28,7 +26,7 @@ public class MailRequest {
 		return saveInSent;
 	}
 	
-	public InputStream getMailContent() {
+	public byte[] getMailContent() {
 		return mailContent;
 	}
 	

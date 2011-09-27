@@ -1,6 +1,5 @@
 package org.obm.push.mail;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,6 +18,7 @@ import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
 import org.minig.mime.QuotedPrintableDecoderInputStream;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
@@ -65,7 +65,7 @@ public class MailBackend extends ObmSyncBackend {
 	private final FiltrageInvitationDao filtrageInvitationDao;
 
 	@Inject
-	private MailBackend(IEmailManager emailManager,	CollectionDao collectionDao, FiltrageInvitationDao filtrageInvitationDao, 
+	/*package*/ MailBackend(IEmailManager emailManager,	CollectionDao collectionDao, FiltrageInvitationDao filtrageInvitationDao, 
 			BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient)  {
 		
 		super(collectionDao, bookClient, calendarClient, todoClient);
@@ -327,7 +327,7 @@ public class MailBackend extends ObmSyncBackend {
 		return collectionId;
 	}
 
-	public void sendEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent) throws ProcessingEmailException {
+	public void sendEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent) throws ProcessingEmailException {
 		try {
 			SendEmailHandler handler = new SendEmailHandler(getUserEmail(bs));
 			send(bs, mailContent, handler, saveInSent);
@@ -336,7 +336,7 @@ public class MailBackend extends ObmSyncBackend {
 		} 
 	}
 
-	public void replyEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, Integer collectionId, String serverId)
+	public void replyEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, Integer collectionId, String serverId)
 			throws ProcessingEmailException, CollectionNotFoundException {
 		
 		try {
@@ -373,7 +373,7 @@ public class MailBackend extends ObmSyncBackend {
 		} 
 	}
 
-	public void forwardEmail(BackendSession bs, InputStream mailContent, Boolean saveInSent, String collectionId, String serverId) 
+	public void forwardEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, String collectionId, String serverId) 
 			throws ProcessingEmailException, CollectionNotFoundException {
 		
 		try {
@@ -422,17 +422,18 @@ public class MailBackend extends ObmSyncBackend {
 		}
 	}
 
-	private void send(BackendSession bs, InputStream mailContent, SendEmailHandler handler, Boolean saveInSent) throws ProcessingEmailException {
+	private void send(BackendSession bs, byte[] mailContent, SendEmailHandler handler, Boolean saveInSent) throws ProcessingEmailException {
 		InputStream emailData = null;
 		try {
 			MimeStreamParser parser = new MimeStreamParser();
 			parser.setContentHandler(handler);
-			parser.parse(mailContent);
-			emailData = new BufferedInputStream(handler.getMessage());
+			parser.parse(new ByteArrayInputStream(mailContent));
+			emailData = new ByteArrayInputStream(FileUtils.streamBytes(handler.getMessage(), true));
 			emailData.mark(emailData.available());
 			
 			Boolean isScheduleMeeting = !TNEFUtils.isScheduleMeetingRequest(emailData);
 			emailData.reset();
+
 			Address from = getAddress(handler.getFrom());
 			if(!handler.isInvitation()  &&  isScheduleMeeting){
 				emailManager.sendEmail(bs, from, handler.getTo(),
