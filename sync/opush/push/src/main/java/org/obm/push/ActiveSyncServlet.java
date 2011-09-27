@@ -255,7 +255,7 @@ public class ActiveSyncServlet extends HttpServlet {
 								return new Credentials(loginAtDomain, password);
 							}
 						} catch (DaoException e) {
-							//Do nothing valid doesn't change
+							logger.error("Database exception while authenticating user", e);
 						} catch (InvalidParameterException e) {
 							//will be logged later
 						}
@@ -331,10 +331,10 @@ public class ActiveSyncServlet extends HttpServlet {
 
 	/* package */ String getLoginAtDomain(String userID) {
 		Iterable<String> parts = splitOnSlashes(userID);
-		User user = buildUserFromParts(parts);
+		User user = buildUserFromLoginParts(parts);
 		if (user == null) {
-			parts = splitOnArrobase(userID);
-			user = buildUserFromParts(parts);
+			parts = splitOnAtSign(userID);
+			user = buildUserFromLoginParts(parts);
 		}
 		if (user == null) {
 			throw new InvalidParameterException();
@@ -347,12 +347,12 @@ public class ActiveSyncServlet extends HttpServlet {
 		return parts;
 	}
 
-	private Iterable<String> splitOnArrobase(String userID) {
+	private Iterable<String> splitOnAtSign(String userID) {
 		Iterable<String> parts = Splitter.on("@").split(userID);
 		return ImmutableList.copyOf(parts).reverse();
 	}
 
-	private User buildUserFromParts(Iterable<String> parts) {
+	private User buildUserFromLoginParts(Iterable<String> parts) {
 		int nbParts = Iterables.size(parts);
 		if (nbParts > 2) {
 			throw new InvalidParameterException();
