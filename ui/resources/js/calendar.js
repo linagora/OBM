@@ -2286,7 +2286,9 @@ Obm.CalendarQuickForm = new Class({
       +encodeURIComponent(this.eventData.date_begin)+'&duration='
       +this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)
       +'&new_user_id[]='+this.eventData.entity_id;
-    
+    if(this.eventData.all_day){
+      this.gotoURI += '&all_day=1&opacity=TRANSPARENT'
+    } 
     gotoUriContainsActionNew = new RegExp("action=new");
     if(action == "new" || gotoUriContainsActionNew.test(this.gotoURI))
       this.gotoURI +='&organizer='+this.eventData.entity_id;
