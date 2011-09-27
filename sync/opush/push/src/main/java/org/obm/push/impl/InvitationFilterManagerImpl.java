@@ -173,7 +173,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 		
 		for (Iterator<ItemChange> it = itemToSync.iterator(); it.hasNext();) {
 			ItemChange ic = it.next();
-			if (ic.getData() instanceof MSEmail) {
+			if (ic.isMSEmail()) {
 				MSEmail mail = (MSEmail) ic.getData();
 				if (mail.getInvitation() != null) {
 					Integer eventCollectionId = calendarBackend.getCollectionId(bs);
@@ -191,7 +191,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 		
 		for (Iterator<ItemChange> it = itemToSync.iterator(); it.hasNext();) {
 			ItemChange ic = it.next();
-			if (ic.getData() instanceof MSEmail) {
+			if (ic.isMSEmail()) {
 				MSEmail mail = (MSEmail) ic.getData();
 				if (mail.getInvitation() != null) {
 					if (emailMustToBeSynced(eventCollectionId, mail)){

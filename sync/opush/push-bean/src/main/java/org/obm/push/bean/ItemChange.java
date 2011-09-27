@@ -76,6 +76,13 @@ public class ItemChange implements Serializable {
 		return Objects.hashCode(serverId, parentId, displayName, itemType, isNew, data);
 	}
 	
+	public boolean isMSEmail() {
+		if (getData() instanceof MSEmail) {
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof ItemChange) {
