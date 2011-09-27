@@ -4219,10 +4219,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       }
     }
   }
+  $write_allowed_entities = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write', $current_view->get_users()));
+  if(sizeof($write_allowed_entities['ids']) == 1 ) {
+      $organizer_id = $write_allowed_entities['ids']['0'];
+  }
 
-  if (isset($calendar['organizer'])) {
+  if (!isset($organizer_id) && isset($calendar['organizer'])) {
     $organizer_id = $calendar['organizer'];
   }
+
   elseif(!$organizer_id) {
     $organizer_id = $uid;
   }
