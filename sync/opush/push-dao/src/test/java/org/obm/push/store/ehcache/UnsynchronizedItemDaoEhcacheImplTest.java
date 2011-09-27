@@ -55,14 +55,14 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(1, itemChanges.size());
-		Assert.assertEquals("test 1", itemChanges.iterator().next().getDisplayName());
+		Assert.assertEquals("test 1", itemChanges.iterator().next().getServerId());
 	}
 	
 	@Test
 	public void addTwoItemsOnTheSameCollection() {
-		ItemChange itemChange1 = buildItemChange("test 1");
-		ItemChange itemChange2 = buildItemChange("test 2");
-		ItemChange itemChange3 = buildItemChange("test 3");
+		ItemChange itemChange1 = buildItemChange("1");
+		ItemChange itemChange2 = buildItemChange("2");
+		ItemChange itemChange3 = buildItemChange("3");
 		
 		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange1);
 		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange2);
@@ -129,7 +129,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	private ItemChange buildItemChange(String displayName) {
 		ItemChange itemChange = new ItemChange();
-		itemChange.setDisplayName(displayName);
+		itemChange.setServerId(displayName);
 		return itemChange;
 	}
 	
@@ -139,7 +139,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	private boolean contains(Set<ItemChange> expected, ItemChange actual) {
 		for (ItemChange itemChange: expected) {
-			if (itemChange.getDisplayName().equals(actual.getDisplayName())) {
+			if (itemChange.getServerId().equals(actual.getServerId())) {
 				return true;
 			}
 		}
