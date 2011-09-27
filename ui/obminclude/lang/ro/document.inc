@@ -223,4 +223,5 @@ $l_invalid_dir_path = "Repertoriul specificat nu este valid";
 $l_invalid_file = "Fișier incorect";
 $l_invalid_existing_file = "Repertoriul specificat nu indică niciun fișier valabil";
 $l_error_dir = "Directoriul nu este gol. Verificați repertoriul si numele";
+$l_file_maxsize = "Warning: maximum file size is set to ";
 

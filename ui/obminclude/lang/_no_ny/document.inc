@@ -57,3 +57,4 @@ $l_fill_label = "\\n Vous devez renseigner le Label avant de valider.";
 $l_fill_date = "La date doit être renseignée.";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_delete_confirm = "Confirmer la suppression de l'affaire ?";
+$l_file_maxsize = "Warning: maximum file size is set to ";

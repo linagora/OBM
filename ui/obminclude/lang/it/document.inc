@@ -285,4 +285,5 @@ $l_browse = "Percorrere";
 $l_document_display = "Opzioni di visualizzazione dell'elenco documenti";
 $l_no_document = "Documento introvabile";
 $l_header_new_dir = "Nuova directory";
+$l_file_maxsize = "Warning: maximum file size is set to ";
 

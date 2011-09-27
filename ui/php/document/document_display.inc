@@ -443,7 +443,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
   global $l_name, $l_author, $l_path, $l_kind, $l_browse, $l_header_new;
-  global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
+  global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto, $l_file_maxsize;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   // if update mode and first display values are taken from database
@@ -577,6 +577,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
   $block_private = "<input type=\"checkbox\" id=\"cba_privacy\" name=\"cba_privacy\" value=\"1\" $privacy />";
 
   // --- HTML Template --------------------------------------------------------
+  $max_filesize = ini_get("upload_max_filesize");
   $block = "
   <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\"
     onsubmit=\"if (check_document(this)){this.tf_url.value= this.preurl.value + this.tf_url.value; return true;} else return false;\"
@@ -623,7 +624,7 @@ function html_document_form($action, $document, $doc_q, $mime_q) {
       </td>
     </tr> 
     <tr id=\"browse_field\" $dis_field>
-      <th>$l_file</th>
+      <th>$l_file ($l_file_maxsize $max_filesize)</th>
       <td><input type=\"file\" id=\"fi_file\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
     </tr>
     <tr id=\"url_field\" $dis_url>

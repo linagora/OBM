@@ -123,5 +123,6 @@ $l_cant_delete = "";
 $l_create_file_error = ""; 
 $l_insert = ""; 
 $l_links = ""; 
-$l_url = ""; 
+$l_url = "";
+$l_file_maxsize = "Warning: maximum file size is set to ";
 

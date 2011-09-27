@@ -92,3 +92,4 @@ $l_over_quota_error = "Adding this document would exceed your allocated quota ! 
 $l_quota_msg = "You are currently using %s (%s) of the %s dedicated to your private documents";
 $l_filesize_units = array('Byte','KB','MB','GB','TB','PB');
 $l_err_file_access_forbidden = "You're not allowed to access this document";
+$l_file_maxsize = "Warning: maximum file size is set to ";

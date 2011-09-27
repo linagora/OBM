@@ -96,4 +96,5 @@ $l_new_file = "Archivo a enviar";
 $l_link = "Vínculo HTTP";
 $l_links = "Vínculo HTTPS";
 $l_existing_file = "Archivo YA enviado";
+$l_file_maxsize = "Warning: maximum file size is set to ";
 

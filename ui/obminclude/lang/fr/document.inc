@@ -97,3 +97,4 @@ $l_invalid_dir_path = "Le chemin spécifié est invalide";
 $l_invalid_file = "Fichier incorrect";
 $l_invalid_existing_file = "Le chemin spécifié ne pointe pas vers un fichier valid";
 $l_error_dir = "Le répertoire n'est pas valide. Vérifier le chemin et le nom";
+$l_file_maxsize = "Attention : taille maximum fixée à ";
