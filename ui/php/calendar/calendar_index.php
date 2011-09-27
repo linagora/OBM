@@ -277,6 +277,7 @@ if ($action == 'search') {
           $extra_css[] = $css_ext_color_picker ;
           $display['detail'] .= html_calendar_dis_conflict($params,$conflicts) ;
           $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
+          $display['msg'] .= display_warn_msg("$l_other_files_detached");
           $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
         } else {
           // Insert "others attendees" as private contacts
@@ -316,10 +317,12 @@ if ($action == 'search') {
         $extra_js_include[] = 'freebusy.js';
         $extra_css[] = $css_ext_color_picker ;
         $display['msg'] .= display_err_msg("$l_event : $l_over_quota_error");
+        $display['msg'] .= display_warn_msg("$l_other_files_detached");
         $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
       }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['msg'] .= display_warn_msg("$l_other_files_detached");
     $extra_js_include[] = 'inplaceeditor.js';
     $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
     $extra_js_include[] = 'freebusy.js';
@@ -411,6 +414,7 @@ if ($action == 'search') {
         $extra_css[] = $css_ext_color_picker ;
         $display['detail'] = html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_update_error");
+        $display['msg'] .= display_warn_msg("$l_other_files_detached");
         $display['detail'] .= dis_calendar_event_form($action, $params, '', $entities, $current_view);
       } else {
         // Insert "others attendees" as private contacts
@@ -441,10 +445,12 @@ if ($action == 'search') {
       $extra_js_include[] = 'freebusy.js';
       $extra_css[] = $css_ext_color_picker ;
       $display['msg'] .= display_err_msg("$l_event : $l_over_quota_error");
+      $display['msg'] .= display_warn_msg("$l_other_files_detached");
       $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
     }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['msg'] .= display_warn_msg("$l_other_files_detached");
     $extra_js_include[] = 'inplaceeditor.js';
     $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
     $extra_js_include[] = 'freebusy.js';
