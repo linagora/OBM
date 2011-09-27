@@ -1,6 +1,7 @@
 package org.obm.push.backend;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -11,8 +12,8 @@ public class DataDelta {
 	private final List<ItemChange> changes;
 	private final List<ItemChange> deletions;
 	private final Date syncDate;
-
-	public DataDelta(List<ItemChange> changes, List<ItemChange> deletions, Date syncDate) {
+	
+	public DataDelta(Collection<ItemChange> changes, List<ItemChange> deletions, Date syncDate) {
 		this.syncDate = syncDate;
 		this.changes = new ArrayList<ItemChange>(changes);
 		this.deletions = new ArrayList<ItemChange>(deletions);

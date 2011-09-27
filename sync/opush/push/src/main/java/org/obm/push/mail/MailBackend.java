@@ -165,7 +165,7 @@ public class MailBackend extends ObmSyncBackend {
 			throws ProcessingEmailException, CollectionNotFoundException, DaoException {
 		
 		List<ItemChange> itemChanges = fetchMails(bs, collectionId, getCollectionPathFor(collectionId), mailChanges.getUpdatedEmailFromImapToLong());
-		List<ItemChange> itemDeletions = getDeletions(collectionId, mailChanges.getRemovedToLong());
+		List<ItemChange> itemDeletions = buildItemsToDeletedFromUids(collectionId, mailChanges.getRemovedToLong());
 		return new DataDelta(itemChanges, itemDeletions, mailChanges.getLastSync());
 	}
 
@@ -562,10 +562,6 @@ public class MailBackend extends ObmSyncBackend {
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		}
-	}
-
-	public List<ItemChange> createItemsChangeToDeletedFromUidsInvitation(Integer collectionId, Collection<Long> uids) {
-		return getDeletions(collectionId, uids);
 	}
 	
 	public Long getEmailUidFromServerId(String serverId){
