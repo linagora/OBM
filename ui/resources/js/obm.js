@@ -557,6 +557,10 @@ function showOkMessage(message) {
   showMessage('ok',message);
 }
 
+function showWarnMessage(message) {
+  showMessage('warning',message);
+}
+
 function showErrorMessage(message) {
   showMessage('error',message);
 }

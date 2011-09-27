@@ -975,6 +975,14 @@ function redirect_ok(&$params, $msg) {
 /**
  *
  */
+function redirect_warn(&$params, $msg) {
+  $params['redirection'] = true;
+  $_SESSION['obm_message'] = "<script text='language/javascript'>showWarnMessage(\"".phpStringToJsString($msg)."\")</script>";
+}
+
+/**
+ *
+ */
 function redirect_err(&$params, $msg) {
   $params['redirection'] = true;
   $_SESSION['obm_message'] = "<script text='language/javascript'>showErrorMessage(\"".phpStringToJsString($msg)."\")</script>";

@@ -305,11 +305,12 @@ if ($action == 'search') {
 
           $current_view->set_date($params["date_begin"]);
           $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$event_id";
-          if($GLOBALS['display']['warm_add_organizer'] == true){
-            $add_organizer = $GLOBALS['l_event_add_organizer'];
-	  } 
           $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
-          redirect_ok($params, "$l_event: $l_insert_ok - $add_organizer - $detail");
+          if($GLOBALS['display']['warm_add_organizer'] == true){
+            redirect_warn($params, "$l_event: $l_insert_ok - $l_event_add_organizer - $detail");
+	  } else {
+            redirect_ok($params, "$l_event: $l_insert_ok - $detail");
+          }
         }
       } catch (OverQuotaDocumentException $e) {
         $extra_js_include[] = 'inplaceeditor.js';
@@ -437,7 +438,11 @@ if ($action == 'search') {
         if ($params['show_resource_calendar'])  $current_view->set_resources($params['sel_resource_id']);
         $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$params["calendar_id"];
         $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
-        redirect_ok($params, "$l_event: $l_update_ok - $detail");
+        if($GLOBALS['display']['warm_add_organizer'] == true){
+          redirect_warn($params, "$l_event: $l_update_ok - $l_event_add_organizer - $detail"); 
+        } else {
+          redirect_ok($params, "$l_event: $l_update_ok - $detail");
+        }
       }
     } catch (OverQuotaDocumentException $e) {
       $extra_js_include[] = 'inplaceeditor.js';

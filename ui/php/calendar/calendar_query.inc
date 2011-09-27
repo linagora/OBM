@@ -1713,6 +1713,11 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
     $users_array = array_merge($users_array,$user_group_array);
     $users_array = array_unique($users_array);
   }
+  if(!in_array($calendar['organizer'], $users_array)){
+    $organizer_array = array(0 => $calendar['organizer']);
+    $users_array = array_merge($users_array, $organizer_array);
+    $GLOBALS['display']['warm_add_organizer'] = true;
+  }
 
   // Get the final resource list
   $resources_array = $sel_entity_id['resource'];
