@@ -40,6 +40,10 @@ exit $updateCyrusAcl->run(\%parameters);
 
 $| = 1;
 
+sub new {
+    my ($class) = @_;
+    bless {}, $class;
+}
 
 sub run {
     my $self = shift;
