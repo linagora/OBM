@@ -33,7 +33,7 @@ return array(
   'New resource reservation: %title%' => 'Nouvelle réservation de ressource : %title%',
   'Exploitation report : %name%' => 'Rapport d\'exploitation : %name%',
   '%displayname% validation confirmation' => 'Confirmation de la validation de l\'utilisateur %displayname%',
-  'Resource participation updated: %title%' => 'La réservation d\'une resource à été statuée : %title%',
+  'Resource participation updated: %title%' => 'La réservation d\'une ressource a été statuée : %title%',
   'Participation updated: %title%' => 'Mise à jour de participation : %title%',
   'User %displayname% is to be validated' => 'L\'utilisateur %displayname doit être validé',
   '%lastname% %firstname%' => '%firstname% %lastname%',
