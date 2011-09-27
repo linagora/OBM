@@ -126,6 +126,7 @@ $l_select_pdf_day = "Devi selezionare un giorno";
 $l_view_week_desc = "Guarda gli appuntamenti su una settimana";
 $l_err_end_repeat = "La fine della ripetizione deve essere anteriore alla data di fine";
 $l_other_files = "Altri file";
+$l_other_files_maxsize = "Warning: maximum file size is set to ";
 $l_confirm_reset = "Questa opzione eliminerà completamente il tuo calendario e annullerà la tua partecipazione a tutte le riunioni dove sei stato invitato. Sei sicuro di proseguire? ";
 $l_begin = "Inizio";
 $l_confirm_delete_all = "Questa opzione eliminerà tutte le occorrenze di questo appuntamento per tutti gli utenti, vuoi proseguire?";

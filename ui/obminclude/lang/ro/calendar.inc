@@ -21,6 +21,7 @@ $l_title = "Titlu";
 $l_location = "Locație";
 $l_documents = "Documente";
 $l_other_files = "Alte fișiere";
+$l_other_files_maxsize = "Warning: maximum file size is set to ";
 $l_allow_documents = "Autorizați participanților să adauge documente";
 $l_details = "Consultați";
 $l_private_description = "Acest eveniment este privat. Este imposibil să vizualizați detaliile.";

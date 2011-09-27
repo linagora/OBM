@@ -24,6 +24,7 @@ $l_title = "Titre";
 $l_location = "Lieu";
 $l_documents = "Documents";
 $l_other_files = "Autres fichiers";
+$l_other_files_maxsize = "Attention : taille maximum fixée à ";
 $l_allow_documents = "Autoriser les participants à attacher des documents";
 $l_details = "Consulter";
 $l_private_description = "Cet évènement est personnel. Impossible de voir le détail.";

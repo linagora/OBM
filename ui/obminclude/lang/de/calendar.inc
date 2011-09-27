@@ -122,6 +122,7 @@ $l_confirm_delete = "Dadurch wird der Eintritt des Ereignisses, für alle Benutz
 $l_view_week_desc = "Sehen die Ereignisse auf einer Woche";
 $l_err_end_repeat = "Das Ende der Wiederholung muss größer als das Enddatum sein.";
 $l_other_files = "Andere Dateien";
+$l_other_files_maxsize = "Warning: maximum file size is set to ";
 $l_confirm_reset = "Dieser Vorgang wird Ihren Kalender klar und wird Ihrer Teilnahme an den Sitzungen löschen. Wollen Sie wirklich weitergehen ?";
 $l_begin = "Anfang";
 $l_confirm_delete_all = "Dieser Vorgang wird alle Vorkommen dieser Veranstaltung für alle Benutzer löschen, wollen Sie weitergehen ?";

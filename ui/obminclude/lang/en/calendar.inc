@@ -458,6 +458,7 @@ $l_view_list = "Events list";
 $l_cal_range = "Display period";
 $l_tag_management = "Tag Management";
 $l_other_files = "Other files";
+$l_other_files_maxsize = "Warning: maximum file size is set to ";
 $l_event_before_date = "Events date before:";
 $l_tags = "Tags";
 $l_purge_popup_title = "Purge address book";

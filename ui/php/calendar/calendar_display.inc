@@ -9711,18 +9711,25 @@ function html_calendar_file_block() {
   if ($nbdocs <= 1) {
     $style = "style='display:none;'";
   }
+
+  $ini_max_filesize = ini_get('upload_max_filesize');
+
   return "<th class='' id='calendarFileBlock'>
     $GLOBALS[l_other_files]
     <a id='addFileButton' href='#' $style onclick=\"add_file_field();return false;\">
       <img src=\"$GLOBALS[ico_add]\" alt=\"[Add file field]\" />
     </a>
   </th>
+
   <td id='calendarFileHome'>
+    <div>
+       $GLOBALS[l_other_files_maxsize] $ini_max_filesize
+    </div>
     <div class=\"multiple\">
       <a onclick=\"remove_element(this.parentNode,'calendarFileHome');obm.vars.consts.nbdocs++;$('addFileButton').style.display = '';return false\" href=\"\">
        <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
-      </a>        
-      <input type=\"file\" size=\"7\" class=\"otherFile\" name=\"fi_other_files[]\" />  
+    </a>
+      <input type=\"file\" size=\"7\" class=\"otherFile\" name=\"fi_other_files[]\" />
     </div>
   </td>";
 }
