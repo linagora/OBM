@@ -18,6 +18,10 @@ external-url = obm
 external-protocol = http
 obm-prefix = /
 
+; Synchronize global OBM address book
+globalAddressBookSync = true
+
+
 ; Database infos
 host = localhost
 ; dbtype = PGSQL
