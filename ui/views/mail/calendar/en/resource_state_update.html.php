@@ -25,7 +25,7 @@
     </tr>
     <tr>
       <td colspan="2">
-<?php echo $target; ?> owner has changed its state to <?php echo $targetState; ?> for the appointment <?php echo $title; ?> scheduled on <?php echo $start; ?>.
+<?php echo $target; ?> owner has changed its state to <?php echo $targetState; ?> for the appointment <?php echo $title; ?> scheduled from <?php echo $start; ?> to <?php echo $end; ?>.
       </td>
     </tr>
 

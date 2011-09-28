@@ -25,7 +25,7 @@
     </tr>
     <tr>
       <td colspan="2">
-L'administrateur de la ressource <?php echo $target; ?> a <?php echo $targetState; ?> sa participation pour l'événement <?php echo $title; ?> prévu le <?php echo $start; ?>.
+L'administrateur de la ressource <?php echo $target; ?> a <?php echo $targetState; ?> sa participation pour l'événement <?php echo $title; ?> prévu du <?php echo $start; ?> au <?php echo $end; ?>.
       </td>
     </tr>
 
