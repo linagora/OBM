@@ -242,7 +242,7 @@ public class CalendarBindingImplTest {
 		expect(event.getUid()).andReturn(null).atLeastOnce();
 		expect(event.isInternalEvent()).andReturn(false).atLeastOnce();
 		expect(event.getTitle()).andReturn("title").atLeastOnce();
-		event.findAttendeeForUser(userEmail);
+		event.findAttendeeFromEmail(userEmail);
 		EasyMock.expectLastCall().andReturn(null).atLeastOnce();
 		
 		final UserService userService = createMock(UserService.class);

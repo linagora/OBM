@@ -500,7 +500,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Attendee calendarOwnerAsAttendee(AccessToken token, String calendar, Event event) 
 		throws FindException {
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
-		Attendee userAsAttendee = event.findAttendeeForUser(calendarOwner.getEmail());
+		Attendee userAsAttendee = event.findAttendeeFromEmail(calendarOwner.getEmail());
 		return userAsAttendee;
 	}
 

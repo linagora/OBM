@@ -382,7 +382,7 @@ public class Event implements Indexed<Integer> {
 		return sequence;
 	}
 
-	public Attendee findAttendeeForUser(String userEmail) {
+	public Attendee findAttendeeFromEmail(String userEmail) {
 		for (Attendee at: attendees) {
 			if (at.getEmail().equalsIgnoreCase(userEmail)) {
 				return at;

@@ -381,31 +381,32 @@ public class EventConverter implements ObmSyncCalendarConverter{
 	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
 	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
 	// optional.
-	private Event convertEventOne(BackendSession bs, Event oldEvent, Event parentEvent,
-			MSEvent data, Boolean isObmInternalEvent) {
+	private Event convertEventOne(BackendSession bs, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) {
 		Event e = new Event();
-		defineOwner(bs, e);
+		defineOwner(bs, e, oldEvent);
 		e.setInternalEvent(isObmInternalEvent);
 		e.setType(EventType.VEVENT);
-		if (parentEvent != null && parentEvent.getTitle() != null
-				&& !parentEvent.getTitle().isEmpty()) {
+		
+		if (parentEvent != null && parentEvent.getTitle() != null && !parentEvent.getTitle().isEmpty()) {
 			e.setTitle(parentEvent.getTitle());
 		} else {
 			e.setTitle(data.getSubject());
 		}
-		if (parentEvent != null && parentEvent.getDescription() != null
-				&& !parentEvent.getDescription().isEmpty()) {
+		
+		if (parentEvent != null && parentEvent.getDescription() != null && !parentEvent.getDescription().isEmpty()) {
 			e.setDescription(parentEvent.getDescription());
 		} else {
 			e.setDescription(data.getDescription());
 		}
+		
 		e.setLocation(data.getLocation());
 		e.setDate(data.getStartTime());
-		int duration = (int) (data.getEndTime().getTime() - data.getStartTime()
-				.getTime()) / 1000;
+		
+		int duration = (int) (data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000;
 		e.setDuration(duration);
 		e.setAllday(data.getAllDayEvent() != null ? data.getAllDayEvent() : false);
 		e.setRecurrenceId(data.getExceptionStartTime());
+		
 		if (data.getReminder() != null && data.getReminder() > 0) {
 			e.setAlert(data.getReminder() * 60);
 		}
@@ -424,14 +425,86 @@ public class EventConverter implements ObmSyncCalendarConverter{
 			e.setPrivacy(privacy(oldEvent, data.getSensitivity()));
 		}
 		
-		List<Attendee> atts = getAttendees(bs, oldEvent, parentEvent, data);
-		e.setAttendees(atts);
+		e.setAttendees( getAttendees(oldEvent, parentEvent, data) );
+		defineOrganizer(e, data, bs);
+		
 		return e;
 	}
 
-	private void defineOwner(BackendSession bs, Event e) {
-		e.setOwnerEmail(bs.getLoginAtDomain());
+	private void defineOwner(BackendSession bs, Event e, Event oldEvent) {
+		if (oldEvent != null) {
+			e.setOwnerEmail(oldEvent.getOwnerEmail());
+		} else{
+			e.setOwnerEmail(bs.getLoginAtDomain());
+		}
 	}
+
+	private List<Attendee> getAttendees(Event oldEvent, Event parentEvent, MSEvent data) {
+		List<Attendee> ret = new LinkedList<Attendee>();
+		if (parentEvent != null && data.getAttendees().isEmpty()) {
+			// copy parent attendees. CalendarBackend ensured parentEvent has attendees.
+			ret.addAll(parentEvent.getAttendees());
+		} else {
+			for (MSAttendee at: data.getAttendees()) {
+				ret.add( convertAttendee(oldEvent, data, at) );
+			}
+		}
+		return ret;
+	}
+	
+	private void defineOrganizer(Event e, MSEvent data, BackendSession bs) {
+		if (e.findOrganizer() == null) {
+			if (data.getOrganizerEmail() != null) {
+				Attendee attendee = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
+				e.getAttendees().add(attendee);
+			} else {
+				e.getAttendees().add( getOrganizer(bs.getLoginAtDomain(), "") );
+			}	
+		}
+	}
+	
+	private Attendee convertAttendee(Event oldEvent, MSEvent event, MSAttendee at) {
+		Attendee ret = new Attendee();
+		ret.setEmail(at.getEmail());
+		ret.setDisplayName(at.getName());
+		ret.setRequired(ParticipationRole.REQ);
+		
+		ParticipationState status = getParticipationState( 
+				getAttendeeState(oldEvent, at) , at.getAttendeeStatus());
+		ret.setState(status);
+		
+		ret.setOrganizer( isOrganizer(event, at) );
+		return ret;
+	}
+
+	private ParticipationState getAttendeeState(Event oldEvent, MSAttendee at) {
+		if (oldEvent != null) {
+			Attendee attendee = oldEvent.findAttendeeFromEmail(at.getEmail());
+			if (attendee != null) {
+				return attendee.getState();
+			}
+		}
+		return ParticipationState.NEEDSACTION;
+	}
+
+	private boolean isOrganizer(MSEvent event, MSAttendee at) {
+		if(at.getEmail() != null  && at.getEmail().equals(event.getOrganizerEmail())){
+			return true;
+		} else if(at.getName() != null  && at.getName().equals(event.getOrganizerName())){
+			return true;
+		}
+		return false;
+	}
+	
+	private Attendee getOrganizer(String email, String displayName) {
+		Attendee att = new Attendee();
+		att.setEmail(email);
+		att.setEmail(displayName);
+		att.setState(ParticipationState.ACCEPTED);
+		att.setRequired(ParticipationRole.REQ);
+		att.setOrganizer(true);
+		return att;
+	}	
 	
 	private int privacy(Event oldEvent, CalendarSensitivity sensitivity) {
 		if (sensitivity == null) {
@@ -458,91 +531,11 @@ public class EventConverter implements ObmSyncCalendarConverter{
 		}
 	}
 
-	private List<Attendee> getAttendees(BackendSession bs, Event oldEvent, Event parentEvent,
-			MSEvent data) {
-		List<Attendee> ret = new LinkedList<Attendee>();
-		if (parentEvent != null && data.getAttendees().isEmpty()) {
-			// copy parent attendees. CalendarBackend ensured parentEvent has
-			// attendees.
-			ret.addAll(parentEvent.getAttendees());
-		} else {
-			if(data.getOrganizerEmail() != null){
-				MSAttendee organizer = new MSAttendee();
-				organizer.setName(data.getOrganizerName());
-				organizer.setEmail(data.getOrganizerEmail());
-				organizer.setAttendeeStatus(AttendeeStatus.ACCEPT);
-				organizer.setAttendeeType(AttendeeType.REQUIRED);
-				ret.add(convertAttendee(oldEvent,data, organizer));
-			}
-			for (MSAttendee at : data.getAttendees()) {
-				ret.add(convertAttendee(oldEvent,data, at));
-			}
-			
-		}
-		defineOrganizerAndOwner(bs, ret);
-		return ret;
-	}
-	
-	private void defineOrganizerAndOwner(BackendSession bs, List<Attendee> ret) {
-		Attendee owner = null;
-		for(Attendee att : ret){
-			if (att.isOrganizer()) {
-				return;
-			}
-			if(bs.getLoginAtDomain().equals(att.getEmail())){
-				owner = att;
-			}
-		}
-		if(owner == null){
-			owner = getOwner(bs.getLoginAtDomain(), ParticipationState.ACCEPTED);
-			owner.setOrganizer(true);
-			ret.add(owner);
-		}
-	}
-
-	private Attendee getOwner(String email, ParticipationState state){
-		Attendee att = new Attendee();
-		att.setEmail(email);
-		att.setState(state);
-		att.setRequired(ParticipationRole.REQ);
-		return att;
-	}
-	
-	
-	private Attendee convertAttendee(Event oldEvent, MSEvent event, MSAttendee at) {
-		ParticipationState oldState = ParticipationState.NEEDSACTION;
-		if (oldEvent != null) {
-			for (Attendee oldAtt : oldEvent.getAttendees()) {
-				if (oldAtt.getEmail().equals(at.getEmail())) {
-					oldState = oldAtt.getState();
-					break;
-				}
-			}
-		}
-		Attendee ret = new Attendee();
-		ret.setEmail(at.getEmail());
-		ret.setDisplayName(at.getName());
-		ret.setRequired(ParticipationRole.REQ);
-		ret.setState(status(oldState, at.getAttendeeStatus()));
-		ret.setOrganizer(isOrganizer(event, at));
-		return ret;
-	}
-
-	private Boolean isOrganizer(MSEvent event, MSAttendee at) {
-		
-		if(at.getEmail() != null  && at.getEmail().equals(event.getOrganizerEmail())){
-			return true;
-		} else if(at.getName() != null  && at.getName().equals(event.getOrganizerName())){
-			return true;
-		}
-		return false;
-	}
-
-	public static ParticipationState status(ParticipationState oldParticipationState,
-			AttendeeStatus attendeeStatus) {
+	public static ParticipationState getParticipationState(ParticipationState oldParticipationState, AttendeeStatus attendeeStatus) {
 		if (attendeeStatus == null) {
 			return oldParticipationState;
 		}
+		
 		switch (attendeeStatus) {
 		case DECLINE:
 			return ParticipationState.DECLINED;
@@ -559,4 +552,5 @@ public class EventConverter implements ObmSyncCalendarConverter{
 	public static boolean isInternalEvent(Event event, boolean defaultValue){
 		return event != null ? event.isInternalEvent() : defaultValue;
 	}
+	
 }
