@@ -11,4 +11,5 @@ dist/
 *.epoch
 *.out
 *.log
+*.tlog
 message-queue/data/
