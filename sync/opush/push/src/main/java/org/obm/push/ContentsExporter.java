@@ -73,9 +73,9 @@ public class ContentsExporter implements IContentsExporter {
 	private int getItemEmailEstimateSize(BackendSession bs, SyncState syncState, FilterType filterType, Integer collectionId) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException {
 		
-		DataDelta unFilteredChanges = mailBackend.getMailChanges(bs, syncState, collectionId, filterType);
-		DataDelta deltaFiltered = invitationFilterManager.filterInvitation(bs, syncState, collectionId, unFilteredChanges);
-		return getCount(bs, syncState, collectionId, deltaFiltered);
+		DataDelta unfilteredDelta = mailBackend.getMailChanges(bs, syncState, collectionId, filterType);
+		DataDelta filteredDelta = invitationFilterManager.filterInvitation(bs, syncState, collectionId, unfilteredDelta);
+		return getCount(bs, syncState, collectionId, filteredDelta);
 	}
 
 	private int getCount(BackendSession bs, SyncState syncState, Integer collectionId, DataDelta delta) throws DaoException {

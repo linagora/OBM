@@ -71,7 +71,7 @@ public class ObmSyncBackend {
 		return collectionDao.getCollectionPath(collectionId);
 	}
 
-	protected List<ItemChange> buildItemsToDeletedFromUids(Integer collectionId, Collection<Long> uids) {
+	protected List<ItemChange> buildItemsToDeleteFromUids(Integer collectionId, Collection<Long> uids) {
 		List<ItemChange> deletions = new LinkedList<ItemChange>();
 		for (Long uid: uids) {
 			deletions.add( getItemChange(collectionId, uid.toString()) );

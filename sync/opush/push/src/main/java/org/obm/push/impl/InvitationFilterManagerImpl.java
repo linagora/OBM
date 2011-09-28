@@ -143,13 +143,13 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	public DataDelta filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta unfilteredChanges) 
 			throws DaoException, ProcessingEmailException, CollectionNotFoundException {
 		
-		List<ItemChange> itemsToDeleted = listEmailsToDeleted(emailCollectionId, state);
+		List<ItemChange> itemsToDelete = listEmailsToDelete(emailCollectionId, state);
 
-		List<ItemChange> itemToSync = mergeChangesAndToSyncedEmail(bs, state, emailCollectionId,  unfilteredChanges.getChanges());
-		Map<String, ItemChange> syncedItem = listItemsToBeSynced(bs, itemToSync, itemsToDeleted);
+		List<ItemChange> itemsToSync = mergeChangesAndToSyncedEmail(bs, state, emailCollectionId,  unfilteredChanges.getChanges());
+		Map<String, ItemChange> syncedItem = listItemsToSync(bs, itemsToSync, itemsToDelete);
 		
 		DataDelta changesFiltered = new DataDelta(syncedItem.values(), unfilteredChanges.getDeletions(), unfilteredChanges.getSyncDate());
-		changesFiltered.getDeletions().addAll(itemsToDeleted);
+		changesFiltered.getDeletions().addAll(itemsToDelete);
 		
 		logger.info("Email(s) will be deleted {} and synchronized {} on pda.", 
 				new Object[]{changesFiltered.getDeletions().size(), changesFiltered.getChanges().size()});
@@ -161,17 +161,17 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	public void createOrUpdateInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) 
 			throws DaoException, ProcessingEmailException {
 		try {
-			List<ItemChange> itemToSync = mergeChangesAndToSyncedEmail(bs, state, emailCollectionId,  delta.getChanges());
-			createOrUpdateInvitation(bs, state, emailCollectionId, itemToSync);
+			List<ItemChange> itemsToSync = mergeChangesAndToSyncedEmail(bs, state, emailCollectionId,  delta.getChanges());
+			createOrUpdateInvitation(bs, state, emailCollectionId, itemsToSync);
 		} catch (CollectionNotFoundException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 	
-	private void createOrUpdateInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, List<ItemChange> itemToSync) 
+	private void createOrUpdateInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, List<ItemChange> itemsToSync) 
 			throws CollectionNotFoundException, DaoException {
 		
-		for (Iterator<ItemChange> it = itemToSync.iterator(); it.hasNext();) {
+		for (Iterator<ItemChange> it = itemsToSync.iterator(); it.hasNext();) {
 			ItemChange ic = it.next();
 			if (ic.isMSEmail()) {
 				MSEmail mail = (MSEmail) ic.getData();
@@ -183,7 +183,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 		}
 	}
 	
-	private Map<String, ItemChange> listItemsToBeSynced(BackendSession bs, List<ItemChange> itemToSync, List<ItemChange> itemsToDeleted) 
+	private Map<String, ItemChange> listItemsToSync(BackendSession bs, List<ItemChange> itemToSync, List<ItemChange> itemsToDeleted) 
 			throws CollectionNotFoundException, DaoException {
 		
 		Integer eventCollectionId = calendarBackend.getCollectionId(bs);
@@ -207,9 +207,9 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 		return syncedItem;
 	}
 	
-	private List<ItemChange> listEmailsToDeleted(Integer emailCollectionId, SyncState state) throws DaoException {
+	private List<ItemChange> listEmailsToDelete(Integer emailCollectionId, SyncState state) throws DaoException {
 		List<Long> emailUidToDeleted = filtrageInvitationDao.getEmailToDeleted(emailCollectionId, state.getKey());
-		return mailBackend.buildItemsToDeletedFromUids(emailCollectionId, emailUidToDeleted);
+		return mailBackend.buildItemsToDeleteFromUids(emailCollectionId, emailUidToDeleted);
 	}
 	
 	private void createOrUpdateInvitation(final Integer emailCollectionId, final Integer eventCollectionId, 
@@ -255,7 +255,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 		final List<ItemChange> its = Lists.newArrayList(changes.iterator());
 		final List<Long> emailToSync = filtrageInvitationDao.getEmailToSynced(emailCollectionId, state.getKey());
 		for (ItemChange ic: changes) {
-			if (ic.getData() instanceof MSEmail) {
+			if (ic.isMSEmail()) {
 				MSEmail email = (MSEmail) ic.getData();
 				emailToSync.remove(email.getUid());
 			}
