@@ -444,6 +444,7 @@ class OBM_EventFactory /*Implements OBM_Subject*/{
     $event->date_end = clone $event->date_begin;
     $event->date_end->addSecond($this->db->f('event_duration'));
     $event->duration = $this->db->f('event_duration');
+    $event->allday = $this->db->f('event_allday');
     $event->priority = $this->db->f('event_priority');
     $event->color = $this->db->f('event_color');
     $event->repeat_kind = $this->db->f('event_repeatkind');
@@ -763,7 +764,11 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function sendResourceStateUpdateMail($new, $res) {
-    $this->mailer->sendResourceStateUpdate($new, $res);
+    if($new->get('allday')){
+      $this->mailer->sendResourceStateUpdateAllday($new, $res);
+    } else {
+      $this->mailer->sendResourceStateUpdate($new, $res);
+    }
   }
 
   /**

@@ -138,6 +138,10 @@ class CalendarMailer extends OBM_Mailer {
   }
 
   protected function resourceStateUpdate($event, $res) {
+    $this->resourceStateUpdateAllday($event, $res);
+  }
+
+  protected function resourceStateUpdateAllday($event, $res) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients(array($event->owner), 'set_mail_participation');
     $this->subject = __('Resource participation updated: %title%', array('%title%' => $event->title));
@@ -259,6 +263,7 @@ class CalendarMailer extends OBM_Mailer {
       'host'             => $GLOBALS['cgp_host'],
       $prefix.'id'       => $event->id,
       $prefix.'start'    => $event->date_begin->getOutputDateTime(),
+      $prefix.'startDate'    => $event->date_begin->getOutputDate(),
       $prefix.'end'      => $event->date_end->getOutputDateTime(),
       $prefix.'title'    => $event->title,
       $prefix.'location' => $event->location,
