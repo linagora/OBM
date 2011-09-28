@@ -1794,10 +1794,12 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   
   $new_entities = array();
   $entity_types = array('user', 'contact', 'resource', 'document');
+  $db = new DB_OBM;
   foreach ($entity_types as $type) {
     $entity_array = "{$type}s_array";
     
     $same_entities[$type] = array();
+    $removed_entities = null;
     
     if (is_array($entities[$type]['ids'])) {
       $new_entities[$type] = array_diff($$entity_array, $entities[$type]['ids']);
@@ -1806,8 +1808,8 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
         foreach ($entities[$type]['entity'] as $id => $u) {
           if ($u['is_organizer'] == true) {
             $k = array_search($id, $removed_entities);
-            unset($removed_entities[$k]);
             if($k !== false){
+              unset($removed_entities[$k]);
               run_query_calendar_update_entity_event('user', $id, $event_id, 'DECLINED');
             }
           }
@@ -1820,10 +1822,9 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
 	      }			
         } else {
           $query = "DELETE FROM EventLink WHERE eventlink_entity_id IN ".of_entity_subquery($type, $removed_entities)." AND eventlink_event_id = $event_id";
+          $db->query($query);
         }
       }
-      $db = new DB_OBM;
-      $db->query($query);
       
       $same_entities[$type] = array_diff($entities[$type]['ids'], $new_entities[$type], $removed_entities);
     } else {
