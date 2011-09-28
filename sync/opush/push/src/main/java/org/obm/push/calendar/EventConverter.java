@@ -485,18 +485,19 @@ public class EventConverter implements ObmSyncCalendarConverter{
 	
 	private void defineOrganizerAndOwner(BackendSession bs, List<Attendee> ret) {
 		Attendee owner = null;
-		boolean hasOrganizer = false;
 		for(Attendee att : ret){
-			hasOrganizer = hasOrganizer || att.isOrganizer();
+			if (att.isOrganizer()) {
+				return;
+			}
 			if(bs.getLoginAtDomain().equals(att.getEmail())){
 				owner = att;
 			}
 		}
 		if(owner == null){
 			owner = getOwner(bs.getLoginAtDomain(), ParticipationState.ACCEPTED);
+			owner.setOrganizer(true);
 			ret.add(owner);
 		}
-		owner.setOrganizer(!hasOrganizer);
 	}
 
 	private Attendee getOwner(String email, ParticipationState state){
