@@ -6,7 +6,7 @@ dist/
 .project
 .classpath
 .settings
-*target*
+*/target
 *eclipse-build*
 *.epoch
 *.out
