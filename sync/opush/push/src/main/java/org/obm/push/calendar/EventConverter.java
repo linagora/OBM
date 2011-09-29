@@ -499,7 +499,7 @@ public class EventConverter implements ObmSyncCalendarConverter{
 	private Attendee getOrganizer(String email, String displayName) {
 		Attendee att = new Attendee();
 		att.setEmail(email);
-		att.setEmail(displayName);
+		att.setDisplayName(displayName);
 		att.setState(ParticipationState.ACCEPTED);
 		att.setRequired(ParticipationRole.REQ);
 		att.setOrganizer(true);
