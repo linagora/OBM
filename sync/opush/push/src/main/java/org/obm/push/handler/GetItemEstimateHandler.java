@@ -63,8 +63,9 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			sendResponse(responder, document);
 
 		} catch (InvalidSyncKeyException e) {
-			sendErrorResponse(responder, 
-					protocol.buildError(GetItemEstimateStatus.INVALID_SYNC_KEY, e.getCollectionId()), e);
+			logger.warn(e.getMessage(), e);
+			sendResponse(responder, 
+					protocol.buildError(GetItemEstimateStatus.INVALID_SYNC_KEY, e.getCollectionId()));
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, 
 					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION, e.getCollectionId()), e);
@@ -99,9 +100,10 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			syncCollection.setCollectionPath(collectionPath);
 			syncCollection.setDataType( PIMDataType.getPIMDataType(collectionPath) );
 
-			SyncState state = stMachine.getSyncState(syncCollection.getSyncKey());
+			String syncKey = syncCollection.getSyncKey();
+			SyncState state = stMachine.getSyncState(syncKey);
 			if (state == null) {
-				throw new InvalidSyncKeyException();
+				throw new InvalidSyncKeyException(syncKey);
 			}
 			
 			int unSynchronizedItemNb = listItemToAddSize(bs, syncCollection);

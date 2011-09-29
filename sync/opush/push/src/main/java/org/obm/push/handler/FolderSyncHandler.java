@@ -62,7 +62,8 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			sendResponse(responder, ret);
 			
 		} catch (InvalidSyncKeyException e) {
-			sendError(responder, FolderSyncStatus.INVALID_SYNC_KEY, e);
+			logger.warn(e.getMessage(), e);
+			sendResponse(responder, protocol.encodeErrorResponse(FolderSyncStatus.INVALID_SYNC_KEY));
 		} catch (NoDocumentException e) {
 			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
 		} catch (DaoException e) {
@@ -107,9 +108,10 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed);
 				return new FolderSyncResponse(changed, newSyncKey);
 			} else {
-				SyncState syncState = stMachine.getSyncState(folderSyncRequest.getSyncKey());
+				String syncKey = folderSyncRequest.getSyncKey();
+				SyncState syncState = stMachine.getSyncState(syncKey);
 				if (syncState == null) {
-					throw new InvalidSyncKeyException();
+					throw new InvalidSyncKeyException(syncKey);
 				}
 				ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
 				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed);
