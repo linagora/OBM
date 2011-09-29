@@ -171,8 +171,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	private void createOrUpdateInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, List<ItemChange> itemsToSync) 
 			throws CollectionNotFoundException, DaoException {
 		
-		for (Iterator<ItemChange> it = itemsToSync.iterator(); it.hasNext();) {
-			ItemChange ic = it.next();
+		for (ItemChange ic: itemsToSync) {
 			if (ic.isMSEmail()) {
 				MSEmail mail = (MSEmail) ic.getData();
 				if (mail.getInvitation() != null) {
@@ -216,6 +215,10 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 			final MSEmail mail, final SyncState state) throws DaoException {
 		
 		EventObmId invitationEventId = mail.getInvitation().getObmId();
+		if (invitationEventId == null) {
+			//filter only apply to internal events
+			return;
+		}
 		if (!filtrageInvitationDao.isMostRecentInvitation(eventCollectionId, invitationEventId, mail.getInvitation().getLastUpdate())) {
 			logger.info("A more recent event or email is synchronized on phone. The email[UID: " + mail.getUid() + "dtstam: "
 					+ mail.getInvitation().getDtStamp() + "] will not synced");
@@ -241,6 +244,10 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	
 	private boolean emailMustToBeSynced(Integer eventCollectionId, MSEmail mail) throws DaoException {
 		EventObmId invitationEventId = mail.getInvitation().getObmId();
+		if (invitationEventId == null) {
+			//we only need to exclude invitation that belongs to internal events
+			return true;
+		}
 		if (filtrageInvitationDao.isMostRecentInvitation(eventCollectionId, invitationEventId, mail.getInvitation().getLastUpdate())) {
 			if (!filtrageInvitationDao.eventIsAlreadySynced(eventCollectionId, invitationEventId)) {
 				return true;
