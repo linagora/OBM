@@ -1,0 +1,82 @@
+#!/bin/bash
+###############################################################################
+# Script de gestion du serveur obmSaslauthd.pl
+###############################################################################
+# init-obmSaslauthd         Startup script for the obm-saslauthd Server
+#
+# chkconfig: - 99 10
+# description: OBM-Saslauthd is a server which can check password against LDAP
+#              and ticket against OBM SSO server
+# processname: obmSaslauthd.pl
+# config: /path/to/obm/auto/obmSaslauthd/obmSaslauthd.cf
+# pidfile: /var/run/saslauthd/obmSaslauthd.pid
+
+OBMPATH="/opt/obm-saslauthd/current"
+
+daemon_path="$OBMPATH/obmSaslauthd.pl"
+
+daemon_dir="/var/run/saslauthd"
+daemon_pid=$daemon_dir"/obmSaslauthd.pid"
+
+if [ ! -d $daemon_dir ]; then
+    /bin/mkdir $daemon_dir
+fi
+
+case "$1" in
+    start)
+        echo -n "Starting obm-Saslauthd : "
+        if [ ! -e $daemon_pid ]; then
+            $daemon_path
+            echo "done."
+        else
+            echo "Le fichier PID $daemon_pid existe, le serveur est en cours d'execution."
+            echo "failed."
+        fi
+        ;;
+
+    stop)
+        echo -n "Stopping obm-Saslauthd : "
+        if [ -e $daemon_pid ]; then
+            kill -TERM `cat $daemon_pid`
+            rm -f $daemon_pid
+            echo "done."
+        else
+            echo "Le serveur n'est pas en cours d'execution"
+            echo "failed."
+        fi
+        ;;
+
+    reload)
+        echo -n "Reload obm-Saslauthd : "
+        if [ -e $daemon_pid ]; then
+            kill -HUP `cat $daemon_pid`
+            echo "done."
+        else
+            echo "failed."
+        fi
+        ;;
+
+    status)
+        if [ -f ${daemon_pid} ] && kill -0 `cat ${daemon_pid}` > /dev/null 2>&1; then
+            echo "Le serveur est en cours d'execution avec le PID `cat ${daemon_pid}`"
+            exit 0
+        else
+            echo "Le serveur n'est pas en cours d'execution"
+            exit 1;
+        fi
+
+        # Ne doit jamais être atteinds, retourne le code UNKNOW STATUS
+        exit 4;
+        ;;
+
+    restart)
+        $0 stop
+        $0 start
+        ;;
+
+    *)
+        echo "Usage : $0 start|stop|reload|restart"
+        ;;
+esac
+
+exit 0
