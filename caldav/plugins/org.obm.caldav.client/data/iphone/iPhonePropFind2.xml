@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<x0:propfind xmlns:x1="urn:ietf:params:xml:ns:caldav" xmlns:x0="DAV:" xmlns:x2="http://apple.com/ns/ical/">
+ <x0:prop>
+  <x0:displayname/>
+  <x1:calendar-description/>
+  <x1:supported-calendar-component-set/>
+  <x2:calendar-color/>
+  <x0:resourcetype/>
+ </x0:prop>
+</x0:propfind>

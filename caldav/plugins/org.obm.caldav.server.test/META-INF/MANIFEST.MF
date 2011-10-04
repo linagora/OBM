@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test
+Bundle-SymbolicName: org.obm.caldav.server.test
+Bundle-Version: 1.0.0
+Bundle-Activator: org.obm.caldav.server.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.junit;bundle-version="3.8.2",
+ org.obm.caldav.server;bundle-version="1.0.0",
+ org.obm.caldav.utils;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

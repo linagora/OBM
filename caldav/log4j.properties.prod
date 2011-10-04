@@ -1,0 +1,13 @@
+##########################
+# Log configuration file #
+##########################
+
+log4j.appender.R = org.apache.log4j.RollingFileAppender
+log4j.appender.R.File = /var/log/obm-caldav/obm-caldav.log
+log4j.appender.R.MaxFileSize=30000KB
+log4j.appender.R.MaxBackupIndex=10
+log4j.appender.R.layout=org.apache.log4j.PatternLayout
+log4j.appender.R.layout.ConversionPattern=%d %c{1} %p - %m\n 
+
+log4j.rootLogger=INFO, R
+

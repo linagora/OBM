@@ -1,0 +1,12 @@
+#!/bin/bash
+# OBM Caldav Server App launcher
+
+appid=org.obm.caldav.server.caldavapp
+
+
+curdir=`dirname $0`
+echo -n "equinox shell lib loading..."
+source ${curdir}/equinox.lib
+echo "[OK]"
+
+aliasource_equinox_run_server_appid ${curdir} ${appid}

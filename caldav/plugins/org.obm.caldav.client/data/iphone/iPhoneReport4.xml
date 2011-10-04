@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<x0:calendar-multiget xmlns:x0="urn:ietf:params:xml:ns:caldav"
+	xmlns:x1="DAV:">
+	<x1:prop>
+		<x1:getetag />
+		<x0:calendar-data />
+	</x1:prop>
+	<x1:href>/calendars/__uids__/38eae584-2b75-582b-a058-018391d1003f/calendar/b96ae388-524f-43ee-878e-96c5246a650b.ics
+	</x1:href>
+	<x1:href>/calendars/__uids__/38eae584-2b75-582b-a058-018391d1003f/calendar/e9b9b4a6-02e9-4fd0-a456-22b1214eb91d.ics
+	</x1:href>
+	<x1:href>/calendars/__uids__/38eae584-2b75-582b-a058-018391d1003f/calendar/42e24cf6-f41d-439c-a6c2-f10a949a856e.ics
+	</x1:href>
+	<x1:href>/calendars/__uids__/38eae584-2b75-582b-a058-018391d1003f/calendar/c72e2a9b-7302-4306-9a6b-1a131d252427.ics
+	</x1:href>
+</x0:calendar-multiget>
