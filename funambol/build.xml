@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- this runs from ".." -->
+
+<project name="java-obm-funambol" default="dist" basedir=".">
+
+  <target name="dist">
+    <echo>Preparing ${ant.project.name} distribution...</echo>
+
+    <copy todir="obm-funambol/build" file="obm-funambol/build.properties"/>
+
+    <ant antfile="build/build.xml" 
+	 target="pack"
+	 dir="obm-funambol"
+	 />
+
+    <mkdir 
+	dir="debian/obm-funambol/usr/share/funambol-6.5.1/ds-server/modules"/>
+    <mkdir 
+	dir="debian/obm-funambol/usr/share/funambol-6.5.1/funambol/WEB-INF/lib"/>
+    <copy todir="debian/obm-funambol/usr/share/funambol-6.5.1/ds-server/modules" 
+	  file="obm-funambol/output/obm-0.1.1.s4j"/>
+    <copy todir="debian/obm-funambol/usr/share/funambol-6.5.1/funambol/WEB-INF/lib/" 
+	  file="obm-funambol/lib/obm-sync-client.jar"/>
+
+    <jar jarfile="debian/obm-funambol/usr/share/funambol-6.5.1/funambol/WEB-INF/lib/obm-0.1.1.jar">
+      <fileset dir="obm-funambol/output/classes">
+	<include name="**/*.class" />
+      </fileset>
+    </jar>
+
+    <echo>${ant.project.name} distribution done.</echo>
+  </target>
+  
+</project>

@@ -1,0 +1,36 @@
+BEGIN:VCARD
+VERSION:2.1
+N:BarLast;FooFirst;;;
+FN:BarLast,FooFirst
+TITLE:
+ORG:;
+BDAY:20081202
+TEL;HOME;VOICE;X-Synthesis-Ref1:Home Tel
+TEL;HOME;VOICE;X-Synthesis-Ref2:Home2 Tel
+TEL;WORK;VOICE;X-Synthesis-Ref1:06 12 40 39 09
+TEL;WORK;VOICE;X-Synthesis-Ref2:Work2 Tel
+TEL;WORK;VOICE;X-Synthesis-Ref3:06 12 40 39 08
+TEL;CELL;VOICE;X-Synthesis-Ref1:Mob Tel
+TEL;CELL;VOICE;X-Synthesis-Ref2:Radio Tel
+TEL;CELL;CAR;VOICE:Car Tel
+TEL;PAGER:Pager 
+TEL;HOME;FAX:Home Fax
+TEL;WORK;FAX:Work Fax
+EMAIL;INTERNET:foo@bar.baz
+EMAIL;INTERNET:mail2
+EMAIL;INTERNET:mail3
+URL:http://webpage
+NOTE;ENCODING=QUOTED-PRINTABLE:=0D=0A=
+=0D=0A=
+=0D=0A=
+=0D=0A=
+=0D=0A=
+=0D=0A=
+=0D=0A=
+The note=0D=0A=
+
+ADR;HOME:;;Home Addr;Tlse France;;31300;France
+ADR;WORK:;;Street;Work Addr;State;Zip;France
+ADR:;;Other Addr Filled;Like Shit;;;France
+PHOTO:
+END:VCARD

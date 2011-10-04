@@ -1,0 +1,520 @@
+2008-11-26  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	add funis origin
+	
+	* src/java/fr/aliasource/funambol/engine/source/ContactSyncSource.j
+	ava: (ContactSyncSource), (ContactSyncSource.beginSync):
+	* src/java/fr/aliasource/funambol/engine/source/ObmSyncSource.java:
+	(ObmSyncSource), (ObmSyncSource.init):
+	* src/java/fr/aliasource/obm/items/manager/ObmManager.java:
+	(ObmManager.logIn):
+
+2008-11-25  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Call logout on endSync
+
+	Remove SIF support, as we do not support the funambol free (as in
+	crap) plugin.
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource),
+	(CalendarSyncSource.getFoundationFromSyncItem),
+	(CalendarSyncSource.getSyncItemFromFoundation),
+	(CalendarSyncSource.endSync):
+	* src/java/fr/aliasource/funambol/engine/source/ContactSyncSource.j
+	ava: (ContactSyncSource.beginSync),
+	(ContactSyncSource.getSyncItemFromId),
+	(ContactSyncSource.getSyncItemFromFoundation), (ContactSyncSource),
+	(ContactSyncSource.getFoundationFromSyncItem),
+	(ContactSyncSource.endSync):
+	* src/java/fr/aliasource/funambol/engine/source/ObmSyncSource.java:
+	(ObmSyncSource), (ObmSyncSource.getInfo):
+	* src/java/fr/aliasource/funambol/utils/MyCal2Sif.java:
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.getDeletedItemKeys), (CalendarManager.getSync),
+	(CalendarManager), (CalendarManager.logout):
+	* src/java/fr/aliasource/obm/items/manager/ContactManager.java:
+	(ContactManager), (ContactManager.logout):
+	* tests/fr/aliasource/funambol/ICalParsingTest.java:
+	(ICalParsingTest), (ICalParsingTest.testAsVcal):
+
+2008-11-25  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Warning fixes
+	
+	* src/java/fr/aliasource/funambol/utils/FunisHelper.java:
+	(FunisHelper):
+	* src/java/fr/aliasource/funambol/utils/Helper.java:
+	(Helper.listToTab), (Helper.setToTab):
+	* src/java/fr/aliasource/funambol/utils/MyCal2Sif.java:
+	(MyCal2Sif), (MyCal2Sif.MyCal2Sif):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter..cc2vcc):
+	* src/java/fr/aliasource/obm/items/manager/ContactManager.java:
+	(ContactManager.obmContactTofoundation), (ContactManager),
+	(ContactManager.foundationContactToObm):
+	* src/java/fr/aliasource/obm/items/manager/ObmManager.java:
+
+2008-11-24  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Make funis sync sources build again
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getAllSyncItemKeys),
+	(CalendarSyncSource.getDeletedSyncItemKeys),
+	(CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getUpdatedSyncItemKeys):
+	* src/java/fr/aliasource/funambol/engine/source/ContactSyncSource.j
+	ava: (ContactSyncSource.beginSync),
+	(ContactSyncSource.getAllSyncItemKeys),
+	(ContactSyncSource.getDeletedSyncItemKeys),
+	(ContactSyncSource.getSyncItemKeysFromTwin),
+	(ContactSyncSource.getUpdatedSyncItemKeys):
+	* src/java/fr/aliasource/funambol/engine/source/ObmSyncSource.java:
+	(ObmSyncSource), (ObmSyncSource.getSyncItemKeysFromKeys):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper..getRecurrenceFromFoundation),
+	(CalendarHelper..isUserRefused), (CalendarHelper..refuseEvent):
+	* src/java/fr/aliasource/funambol/utils/ContactHelper.java:
+	(ContactHelper), (ContactHelper.setFoundationPhone),
+	(ContactHelper.getPhone), (ContactHelper.setFoundationTitle),
+	(ContactHelper.getTitle), (ContactHelper.setFoundationEmail),
+	(ContactHelper.getEmail), (ContactHelper.setFoundationNote),
+	(ContactHelper.getNote), (ContactHelper.constructDisplayName):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager), (CalendarManager.getAllItemKeys),
+	(CalendarManager.getDeletedItemKeys),
+	(CalendarManager.getUpdatedItemKeys),
+	(CalendarManager.getEventTwinKeys), (CalendarManager.getSync),
+	(CalendarManager.fillObmEventWithVEvent):
+	* src/java/fr/aliasource/obm/items/manager/ContactManager.java:
+	(ContactManager), (ContactManager.initRestriction),
+	(ContactManager.getAllItemKeys), (ContactManager.getBook),
+	(ContactManager.setBook), (ContactManager.getDeletedItemKeys),
+	(ContactManager.getUpdatedItemKeys),
+	(ContactManager.getItemFromId), (ContactManager.updateItem),
+	(ContactManager.addItem), (ContactManager.getContactTwinKeys),
+	(ContactManager.getSync), (ContactManager.obmContactTofoundation),
+	(ContactManager.updateAddress), (ContactManager.s),
+	(ContactManager.foundationContactToObm):
+	* src/java/fr/aliasource/obm/items/manager/ObmManager.java:
+	(ObmManager):
+
+2008-10-30  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Fix dt start calculation
+	
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.addItem),
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.parseStart):
+
+2008-07-11  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Use new obm-sync client
+	
+	* .classpath:
+	* build/build_deploy_vm.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.beginSync):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper..getRecurrence),
+	(CalendarHelper..getRecurrenceFromFoundation),
+	(CalendarHelper..isUserRefused), (CalendarHelper..refuseEvent):
+	* src/java/fr/aliasource/funambol/utils/ContactHelper.java:
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager), (CalendarManager.CalendarManager),
+	(CalendarManager.getBinding), (CalendarManager.logIn),
+	(CalendarManager.initUserEmail),
+	(CalendarManager.getRefusedItemKeys),
+	(CalendarManager.getItemFromId), (CalendarManager.removeItem),
+	(CalendarManager.updateItem), (CalendarManager.addItem),
+	(CalendarManager.getEventTwinKeys), (CalendarManager.getSync),
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.fillObmEventWithVEvent),
+	(CalendarManager.parseStart):
+	* src/java/fr/aliasource/obm/items/manager/ContactManager.java:
+	(ContactManager), (ContactManager.ContactManager),
+	(ContactManager.initRestriction), (ContactManager.logIn),
+	(ContactManager.getAllItemKeys), (ContactManager.getBinding),
+	(ContactManager.getNewItemKeys),
+	(ContactManager.getDeletedItemKeys),
+	(ContactManager.getUpdatedItemKeys),
+	(ContactManager.getItemFromId), (ContactManager.removeItem),
+	(ContactManager.updateItem), (ContactManager.addItem),
+	(ContactManager.getContactTwinKeys), (ContactManager.getSync),
+	(ContactManager.obmContactTofoundation),
+	(ContactManager.foundationContactToObm):
+	* src/java/fr/aliasource/obm/items/manager/ObmManager.java:
+
+2008-04-25  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	fix brain bug : s/endsWith/startsWith to detect indented vcal
+	lines.
+	
+	* src/java/fr/aliasource/funambol/utils/FunisHelper.java:
+	(FunisHelper.removeQuotedPrintableFromVCalString),
+	(FunisHelper.nextLineIsIndented):
+	* test-data/sga.vcal:
+	* tests/fr/aliasource/funambol/VCalQuotedTest.java:
+	(VCalQuotedTest.testParsingSGA):
+
+2008-04-16  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Handle synthesis indented output.
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal):
+	* src/java/fr/aliasource/funambol/utils/FunambolHelper.java:
+	* src/java/fr/aliasource/funambol/utils/FunisHelper.java:
+	(FunisHelper), (FunisHelper.removeQuotedPrintableFromVCalString),
+	(FunisHelper.nextLineIsIndented), (FunisHelper.safeSplit):
+	* tests/fr/aliasource/funambol/VCalQuotedTest.java:
+	(VCalQuotedTest.processVCal):
+
+2008-04-15  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Remove soft line breaks from quote printable content & put it back
+	on one line.
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal):
+	* src/java/fr/aliasource/funambol/utils/FunambolHelper.java:
+	(FunambolHelper),
+	(FunambolHelper.removeQuotedPrintableFromVCalString),
+	(FunambolHelper.safeSplit):
+	* test-data/quoted.vcal:
+	* tests/fr/aliasource/funambol/VCalQuotedTest.java:
+	(VCalQuotedTest), (VCalQuotedTest.setUp),
+	(VCalQuotedTest.tearDown), (VCalQuotedTest.processVCal),
+	(VCalQuotedTest.readTestFile), (VCalQuotedTest.testParsing):
+
+2008-02-14  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Fix for "notes" usage on windows mobile with synthesis : 
+	replace =0D=0A=\r\n\r\n with =0D=0A\r\n
+	
+	* build/build_deploy_vm.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal):
+
+2008-01-30  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Symbian sends vtodo during calendar sync... skip them
+	
+	* build/build_deploy_vm.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.addSyncItem),
+	(CalendarSyncSource.updateSyncItem),
+	(CalendarSyncSource.getSyncItemFromId):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.updateItem), (CalendarManager.addItem),
+	(CalendarManager.getEventTwinKeys),
+	(CalendarManager.foundationCalendarToObmEvent), (CalendarManager),
+	(CalendarManager.fillObmEventWithVEvent):
+
+2007-12-17  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	rm remaining printStackTrace in recurrence handling
+	
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper..getRecurrence),
+	(CalendarHelper..getRecurrenceFromFoundation):
+	* src/java/fr/aliasource/funambol/utils/MD5Helper.java:
+
+2007-11-20  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	fix all day bb (obm display bugs if (duration % 86400 == 0 and
+	dtstart=midnight) on all day)
+	
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper.), (CalendarHelper..getRecurrenceFromFoundation):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter..cc2vcc), (MyCalContentConverter..vcc2cc),
+	(MyCalContentConverter..decodeField):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.obmEventToFoundationCalendar), (CalendarManager),
+	(CalendarManager.foundationCalendarToObmEvent),
+	(CalendarManager.parseStart), (CalendarManager.parseEnd):
+
+2007-11-15  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	fix recurrence end date calculation
+	
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper..getRecurrenceFromFoundation):
+
+2007-11-05  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	force uppercase "encoding" to work correctly with syncje clients
+	
+	* build/build_deploy.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource), (CalendarSyncSource.beginSync),
+	(CalendarSyncSource.addSyncItem),
+	(CalendarSyncSource.getAllSyncItemKeys),
+	(CalendarSyncSource.getDeletedSyncItemKeys),
+	(CalendarSyncSource.getNewSyncItemKeys),
+	(CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getUpdatedSyncItemKeys),
+	(CalendarSyncSource.removeSyncItem),
+	(CalendarSyncSource.updateSyncItem),
+	(CalendarSyncSource.getSyncItemFromId),
+	(CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getXMLFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromXML),
+	(CalendarSyncSource.getFoundationFromSyncItem),
+	(CalendarSyncSource.getSyncItemFromFoundation):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter.), (MyCalContentConverter..decodeField):
+	* src/java/fr/aliasource/funambol/utils/MyVCalConverter.java:
+	(MyVCalConverter), (MyVCalConverter.calendar2vcalendar),
+	(MyVCalConverter.decodeField):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.foundationCalendarToObmEvent):
+	* tests/fr/aliasource/funambol/ICalParsingTest.java:
+	(ICalParsingTest), (ICalParsingTest.testAsVcal):
+	* tests/fr/aliasource/funambol/QuotedPrintableCodecTest.java:
+	(QuotedPrintableCodecTest), (QuotedPrintableCodecTest.setUp),
+	(QuotedPrintableCodecTest.testDecode),
+	(QuotedPrintableCodecTest.tearDown):
+
+2007-10-08  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	use xvcalparser for version 1.0 et icalparser
+	
+	* .classpath:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getFoundationFromSyncItem):
+	* tests/fr/aliasource/funambol/ICalParsingTest.java:
+	(ICalParsingTest), (ICalParsingTest.testAsIcal),
+	(ICalParsingTest.testAsVcal), (ICalParsingTest.setUp),
+	(ICalParsingTest.tearDown):
+
+2007-10-05  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	fix epocsound on aalarm fields
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getFoundationCalendarFromICal):
+
+2007-10-02  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+        Add "Z" to date if missing, to fix crash with synthesis SyncML
+	
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper..getDateFromUTCString):
+
+2007-09-25  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	blackberry ok
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.parseStart), (CalendarManager.parseEnd):
+
+2007-09-24  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+        sife fix
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getFoundationFromSyncItem):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper), (CalendarHelper.private),
+	(CalendarHelper..getUTCFormat), (CalendarHelper.),
+	(CalendarHelper..getUTCFormatAllDay),
+	(CalendarHelper..getDateFromUTCString),
+	(CalendarHelper..getOneCategory), (CalendarHelper..getRecurrence),
+	(CalendarHelper..getMonthOfYear), (CalendarHelper..getNthDay),
+	(CalendarHelper..getDayOfWeek), (CalendarHelper..getDayOfMonth),
+	(CalendarHelper..getDayOfWeekMask),
+	(CalendarHelper..getRecurrenceFromFoundation),
+	(CalendarHelper..getOBMDayOfWeekMask),
+	(CalendarHelper..isUserRefused), (CalendarHelper..refuseEvent),
+	(CalendarHelper..formatWithTiret):
+	* src/java/fr/aliasource/funambol/utils/MyCal2Sif.java:
+	(MyCal2Sif), (MyCal2Sif.createTagFromAllDayProperty):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter),
+	(MyCalContentConverter..MyCalContentConverter),
+	(MyCalContentConverter.), (MyCalContentConverter..cc2vcc),
+	(MyCalContentConverter..vcc2cc),
+	(MyCalContentConverter..composeFieldXTag),
+	(MyCalContentConverter..composeFieldRrule),
+	(MyCalContentConverter..extractAAlarmPropertyValue),
+	(MyCalContentConverter..composeFieldLastModified),
+	(MyCalContentConverter..extractRRulePropertyValue),
+	(MyCalContentConverter..extractExDatePropertyValue),
+	(MyCalContentConverter..extractRDatePropertyValue),
+	(MyCalContentConverter..extractExceptionsAsSCSVs),
+	(MyCalContentConverter..appendToStringBuffer),
+	(MyCalContentConverter..isEndDateOrDuration),
+	(MyCalContentConverter..instanceModifierToInt),
+	(MyCalContentConverter..isAnInstanceModifier),
+	(MyCalContentConverter..getRecurrencePattern),
+	(MyCalContentConverter..getRDates),
+	(MyCalContentConverter..getExDates),
+	(MyCalContentConverter..getExceptionsAsList),
+	(MyCalContentConverter..find),
+	(MyCalContentConverter..fixDateProperty),
+	(MyCalContentConverter..fixEventDates),
+	(MyCalContentConverter..fixTaskDates),
+	(MyCalContentConverter..isAllDayCheckingDuration),
+	(MyCalContentConverter..importance13To19),
+	(MyCalContentConverter..importance19To13),
+	(MyCalContentConverter..accessClassTo03),
+	(MyCalContentConverter..accessClassFrom03),
+	(MyCalContentConverter..convertAAlarmToReminder),
+	(MyCalContentConverter..convertAAlarmToReminderBasedOnMinutes):
+	* src/java/fr/aliasource/funambol/utils/MyVCalConverter.java:
+	(MyVCalConverter), (MyVCalConverter.MyVCalConverter),
+	(MyVCalConverter.vcalendar2calendar),
+	(MyVCalConverter.calendar2vcalendar),
+	(MyVCalConverter.setCommonProperties):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.foundationCalendarToObmEvent):
+
+2007-09-24  Thomas Cataldo,,,  <thomas.cataldo@aliasource.fr>
+
+	attempt at fixing ical for win mobile
+
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getFoundationFromSyncItem):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper), (CalendarHelper..getUTCFormatAllDay):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter),
+	(MyCalContentConverter..MyCalContentConverter),
+	(MyCalContentConverter.), (MyCalContentConverter..cc2vcc),
+	(MyCalContentConverter..vcc2cc),
+	(MyCalContentConverter..composeFieldXTag),
+	(MyCalContentConverter..composeFieldRrule),
+	(MyCalContentConverter..extractAAlarmPropertyValue),
+	(MyCalContentConverter..composeFieldLastModified),
+	(MyCalContentConverter..extractRRulePropertyValue),
+	(MyCalContentConverter..extractExDatePropertyValue),
+	(MyCalContentConverter..extractRDatePropertyValue),
+	(MyCalContentConverter..extractExceptionsAsSCSVs),
+	(MyCalContentConverter..appendToStringBuffer),
+	(MyCalContentConverter..isEndDateOrDuration),
+	(MyCalContentConverter..instanceModifierToInt),
+	(MyCalContentConverter..isAnInstanceModifier),
+	(MyCalContentConverter..getRecurrencePattern),
+	(MyCalContentConverter..getRDates),
+	(MyCalContentConverter..getExDates),
+	(MyCalContentConverter..getExceptionsAsList),
+	(MyCalContentConverter..find),
+	(MyCalContentConverter..fixDateProperty),
+	(MyCalContentConverter..fixEventDates),
+	(MyCalContentConverter..fixTaskDates),
+	(MyCalContentConverter..isAllDayCheckingDuration),
+	(MyCalContentConverter..importance13To19),
+	(MyCalContentConverter..importance19To13),
+	(MyCalContentConverter..accessClassTo03),
+	(MyCalContentConverter..accessClassFrom03),
+	(MyCalContentConverter..convertAAlarmToReminder),
+	(MyCalContentConverter..convertAAlarmToReminderBasedOnMinutes):
+	* src/java/fr/aliasource/funambol/utils/MyVCalConverter.java:
+	(MyVCalConverter), (MyVCalConverter.MyVCalConverter),
+	(MyVCalConverter.vcalendar2calendar),
+	(MyVCalConverter.calendar2vcalendar),
+	(MyVCalConverter.setCommonProperties):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.foundationCalendarToObmEvent):
+
+2007-09-24  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	misc fixes for win mobile & blacberry.
+
+	upd to 6.5.1 APIs.
+	
+	* .classpath:
+	* build/build.xml:
+	* build/build_deploy.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource), (CalendarSyncSource.beginSync),
+	(CalendarSyncSource.addSyncItem),
+	(CalendarSyncSource.getAllSyncItemKeys),
+	(CalendarSyncSource.getDeletedSyncItemKeys),
+	(CalendarSyncSource.getNewSyncItemKeys),
+	(CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getUpdatedSyncItemKeys),
+	(CalendarSyncSource.removeSyncItem),
+	(CalendarSyncSource.updateSyncItem),
+	(CalendarSyncSource.getSyncItemFromId),
+	(CalendarSyncSource.getICalFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromICal),
+	(CalendarSyncSource.getXMLFromFoundationCalendar),
+	(CalendarSyncSource.getFoundationCalendarFromXML),
+	(CalendarSyncSource.getFoundationFromSyncItem),
+	(CalendarSyncSource.getSyncItemFromFoundation):
+	* src/java/fr/aliasource/funambol/engine/source/ObmSyncSource.java:
+	(ObmSyncSource), (ObmSyncSource.ObmSyncSource),
+	(ObmSyncSource.init), (ObmSyncSource.getSourceType),
+	(ObmSyncSource.isEncode), (ObmSyncSource.setEncode),
+	(ObmSyncSource.toString), (ObmSyncSource.beginSync),
+	(ObmSyncSource.setOperationStatus),
+	(ObmSyncSource.getSyncItemKeysFromKeys), (ObmSyncSource.getDevice),
+	(ObmSyncSource.getRestrictions), (ObmSyncSource.setRestrictions),
+	(ObmSyncSource.commitSync), (ObmSyncSource.endSync),
+	(ObmSyncSource.getInfo), (ObmSyncSource.getName),
+	(ObmSyncSource.getSourceQuery), (ObmSyncSource.getSourceURI):
+	* src/java/fr/aliasource/funambol/security/ObmOfficer.java:
+	(ObmOfficer), (ObmOfficer.getClientAuth),
+	(ObmOfficer.getServerAuth), (ObmOfficer.getObmAddress),
+	(ObmOfficer.authenticateUser), (ObmOfficer.authorize),
+	(ObmOfficer.unAuthenticate), (ObmOfficer.setObmAddress):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper), (CalendarHelper..getUTCFormatAllDay),
+	(CalendarHelper.), (CalendarHelper..getDateFromUTCString):
+	* src/java/fr/aliasource/funambol/utils/Helper.java:
+	(Helper.listToTab), (Helper.setToTab):
+	* src/java/fr/aliasource/funambol/utils/MyCal2Sif.java:
+	(MyCal2Sif), (MyCal2Sif.MyCal2Sif),
+	(MyCal2Sif.createTagFromAllDayProperty):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager), (CalendarManager.CalendarManager),
+	(CalendarManager.initRestriction), (CalendarManager.getSync),
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.foundationCalendarToObmEvent),
+	(CalendarManager.parseStart), (CalendarManager.parseEnd):
+
+2007-08-23  Thomas Cataldo  <thomas.cataldo@miliconvert.org>
+
+        newItemKeys is a no-op.
+
+	add .classpath, .project
+
+	some java5 fixes
+	
+	* .classpath:
+	* .project:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getNewSyncItemKeys):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager), (CalendarManager.CalendarManager),
+	(CalendarManager.initRestriction), (CalendarManager.logIn),
+	(CalendarManager.initUserEmail), (CalendarManager.getAllItemKeys),
+	(CalendarManager.getNewItemKeys),
+	(CalendarManager.getDeletedItemKeys),
+	(CalendarManager.getRefusedItemKeys),
+	(CalendarManager.getUpdatedItemKeys),
+	(CalendarManager.getItemFromId), (CalendarManager.removeItem),
+	(CalendarManager.updateItem), (CalendarManager.addItem),
+	(CalendarManager.getEventTwinKeys), (CalendarManager.getSync),
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.foundationCalendarToObmEvent):
+
