@@ -1,0 +1,388 @@
+# Objects and attributes definition, needed by OBM
+
+# Attribute: mailBoxServer
+# Entity OBM domain name
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.13
+    NAME 'obmDomain'
+    DESC 'OBM domain for the entity'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+    SINGLE-VALUE )
+
+# Attribute: obmUID
+# OBM unique identifier
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.21 
+    NAME 'obmUID'
+    DESC 'OBM unique identifier'
+    EQUALITY integerMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+    SINGLE-VALUE )
+
+# Attribute: webAccess
+# Entity web access
+#   REJECT : web acces forbiden
+#   PERMIT : web access allowed
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.1
+        NAME 'webAccess'
+        DESC 'Web access authorization. PERMIT: ok, REJECT:nok'
+        EQUALITY caseIgnoreMatch
+    	SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{5}
+        SINGLE-VALUE )
+
+# Attribute: mailAccess
+# Entity mail permission
+#   PERMIT : mail access allowed
+#   REJECT : web access forbiden
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.2
+        NAME 'mailAccess'
+        DESC 'Mail access authorization. PERMIT: ok, REJECT: nok'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10}
+        SINGLE-VALUE )
+
+# Attribute: mailLocalOnly
+# Entity mail limitation
+#   local_only : entity can send mail to local recipient only (not supported)
+#   no value : no mail restriction
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.3
+        NAME 'mailLocalOnly'
+        DESC 'Local mail restriction. non existent or local_only'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{20}
+        SINGLE-VALUE )
+
+# Attribute: mailAlias
+# Entity mail alias
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.4
+    NAME 'mailAlias'
+    DESC 'Alias list for users'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+
+# Attribute: mailBox
+# Entity BAL name
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.5
+    NAME 'mailBox'
+    DESC 'RFC1274: RFC822 Mailbox'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+
+# Attribute: mailBoxServer
+# Cyrus IMAP backend on which entity mailbox is
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.12
+    NAME 'mailBoxServer'
+    DESC 'User mailbox server'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+    SINGLE-VALUE )
+
+# Attribute: hiddenUser
+# Used by LDAP ACL to hide all or part of LDAP entity description according to
+# OBM hide entity option
+# Access to hide part can be allowed by LDAP ACLs
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.14
+    NAME 'hiddenUser'
+    DESC 'User must be hidden for any/some LDAP query'
+    EQUALITY booleanMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+    SINGLE-VALUE )
+
+# Attribute: externalContactEmail
+# OBM entity external contact mail addresses
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.15
+    NAME 'externalContactEmail'
+    DESC 'External contact e-mail address'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+
+# Attribute: delegation
+# OBM entity delegation
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.19
+    NAME 'delegation'
+    DESC 'User Delegation'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+    SINGLE-VALUE )
+
+# Attribute: direction
+# OBM entity direction
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.20
+    NAME 'direction'
+    DESC 'User Direction'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+    SINGLE-VALUE )
+
+# Classe d'objet: obmUser
+# Extend OBM user LDAP description
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.1
+	NAME 'obmUser'
+	DESC 'OBM user description'
+	SUP top AUXILIARY
+    MUST uid
+	MAY ( webAccess $ mailAccess $ mailAlias $ mailLocalOnly $ mailBox $ mailBoxServer $ obmDomain $ personalTitle $ organizationName $ hiddenUser $direction $ delegation ) )
+
+# Object: obmSystemUser
+# Extend OBM system user LDAP description
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.5
+	NAME 'obmSystemUser'
+	DESC 'OBM system user description'
+	SUP top AUXILIARY
+    MUST uid
+	MAY ( obmDomain ) )
+
+# Object: obmGroup
+# Extend OBM group LDAP description
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.2
+    NAME 'obmGroup'
+    DESC 'OBM special groups description'
+    SUP top AUXILIARY
+    MUST cn
+    MAY ( mailBox $ mail $ mailAlias $ mailAccess $ obmDomain $ externalContactEmail $ member ) )
+
+# Object: obmMailShare
+# Extend OBM mailshare LDAP description
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.3
+    NAME 'obmMailShare'
+    DESC 'OBM Mail Share Directory description'
+    STRUCTURAL
+    MUST ( cn )
+    MAY ( mailBox $ mailBoxServer $ mail $ description $ mailAlias $ mailAccess $ obmDomain $ delegation) )
+
+# Attribute: ftpLogin
+# FTP server login
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.27
+    NAME 'ftpLogin'
+    DESC 'FTP server login account'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Attribut: ftpPassword
+# FTP server password
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.28
+    NAME 'ftpPassword'
+    DESC 'FTP server password account'
+    EQUALITY octetStringMatch
+    SINGLE-VALUE
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{128} )
+
+# Attribut: ftpRoot
+# FTP server directory which is use as FTP root
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.29
+    NAME 'ftpRoot'
+    DESC 'FTP server directory which is use as FTP root'
+    EQUALITY caseExactIA5Match
+    SINGLE-VALUE
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+# Object: obmHost
+# Extend OBM host LDAP description
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
+    NAME 'obmHost'
+    DESC 'OBM special hosts description'
+    SUP top AUXILIARY
+    MUST cn
+    MAY ( obmDomain $ delegation $ ipHostNumber $ ftpLogin $ ftpPassword $ ftpRoot ) )
+
+# Attribute: myDestination
+# Mail domain to an OBM domain
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.6
+        NAME 'myDestination'
+        DESC 'Mail local domains'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Attribute: myNetwork
+# Mynetwork to an OBM domain
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.7
+        NAME 'myNetwork'
+        DESC 'Mail local networks'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Attribute: relayhost
+# Relayhost to an OBM domain. All local mails are routed by this relay.
+# Syntax: proto:IP
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.8
+        NAME 'relayhost'
+        DESC 'Relay Host'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{50} 
+        SINGLE-VALUE )
+
+# Attribute: smarthost
+# Smarthost to an OBM domain. All non local mails are routed by this relay.
+# Syntax: proto:IP
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.9
+        NAME 'smarthost'
+        DESC 'Smart Host'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{50} 
+        SINGLE-VALUE )
+	
+# Attribute: localRestrictionSender - not supported
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.10
+        NAME 'localRestrictionSender'
+        DESC 'Default policies for local sender'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10} 
+        SINGLE-VALUE )
+
+# Attribute: toLocalDomain - not supported
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.11
+        NAME 'toLocalDomain'
+        DESC 'Default policies for local recipient'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10} 
+        SINGLE-VALUE )
+
+# Attribute: imapHost
+# IMAP servers list to an OBM domain
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.16
+        NAME 'imapHost'
+        DESC 'IMAP Hosts for domain'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Attribute: smtpInHost
+# SMTP-in servers list to an OBM domain
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.17
+        NAME 'smtpInHost'
+        DESC 'SMTP-in Hosts for domain'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Attribute: smtpOutHost
+# SMTP-out servers list to an OBM domain
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.18
+        NAME 'smtpOutHost'
+        DESC 'SMTP-out Hosts for domain'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Object: obmMailServer
+# Mail servers configuration options to an OBM domain
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.4
+    NAME 'obmMailServer'
+    DESC 'Mail servers configuration for the domain'
+    SUP top STRUCTURAL
+    MUST ( cn )
+    MAY ( myDestination $ obmDomain $ imapHost $ smtpInHost $ smtpOutHost ) )
+
+# Object: obmSamba
+# Extend Samba OBM entities
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.6
+    NAME 'obmSamba'
+    DESC 'Samba OBM informations'
+    SUP top AUXILIARY
+    MAY ( obmDomain ) )
+
+# Attribute: workUrl
+# Contact work URL to Mozilla compatibility
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.22
+    NAME 'workUrl'
+    DESC 'OBM contact work URL (Mozilla)'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# Attribute: URL
+# Contact work URL to MS compatibility
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.23
+    NAME 'URL'
+    DESC 'Personal OBM contact work URL (MS)'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# Attribute: company
+# Contact company name to MS Outlook compatibility
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.24
+    NAME 'company'
+    DESC 'RFC2256: organization this object belongs to'
+    SUP name )
+
+# Attribute: obmLang
+# Default OBM domain language
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.25
+    NAME 'obmLang'
+    DESC 'OBM language'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    SINGLE-VALUE )
+
+# Object: obmContact
+# Extend OBM contact
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.8
+    NAME 'obmContact'
+    DESC 'OBM contacts description'
+    SUP top AUXILIARY
+    MAY ( obmDomain $ obmUID $ URL $ workUrl $ company $ mailAlias ) )
+
+# Object: obmSettings
+# Used to store some OBM settings
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.9
+    NAME 'obmSettings'
+    DESC 'OBM settings'
+    SUP top STRUCTURAL
+    MUST ( cn )
+    MAY ( obmDomain $ obmLang ) )
+
+# Attribute: lastUpdate
+# Last update time
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.26
+    NAME 'lastUpdate'
+    DESC 'Last update time'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{25} )
+
+# Object: obmContactService
+# OBM contact service configuration
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.10
+    NAME 'obmContactService'
+    DESC 'OBM LDAP public contacts publication configuration'
+    SUP top STRUCTURAL
+    MUST ( cn )
+    MAY ( lastUpdate $ obmDomain ) )
+
+# Attribute: ftpHost
+# FTP servers to an OBM domain
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.30 
+        NAME 'ftpHost'
+        DESC 'FTP Hosts for domain'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Object: obmBackupService
+# OBM backup service configuration
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.11
+    NAME 'obmBackup'
+    DESC 'OBM backup service configuration'
+    SUP top STRUCTURAL
+    MUST ( cn )
+    MAY ( ftpHost $ obmDomain ) )

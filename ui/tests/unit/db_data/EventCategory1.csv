@@ -1,0 +1,17 @@
+"eventcategory1_id";"eventcategory1_domain_id";"eventcategory1_timeupdate";"eventcategory1_timecreate";"eventcategory1_userupdate";"eventcategory1_usercreate";"eventcategory1_code";"eventcategory1_label";"eventcategory1_color"
+1;1;"2009-02-23 10:56:35";"2009-02-23 10:56:35";NULL;NULL;"";"RDV";NULL
+2;1;"2009-02-23 10:56:35";"2009-02-23 10:56:35";NULL;NULL;"";"Formation";NULL
+3;1;"2009-02-23 10:56:35";"2009-02-23 10:56:35";NULL;NULL;"";"Commercial";NULL
+4;1;"2009-02-23 10:56:35";"2009-02-23 10:56:35";NULL;NULL;"";"Reunion";NULL
+5;1;"2009-02-23 10:56:35";"2009-02-23 10:56:35";NULL;NULL;"";"Appel tel.";NULL
+6;1;"2009-02-23 10:56:35";"2009-02-23 10:56:35";NULL;NULL;"";"Support";NULL
+7;1;"2009-02-23 10:56:35";"2009-02-23 10:56:35";NULL;NULL;"";"Intervention";NULL
+8;1;"2009-02-23 10:56:35";"2009-02-23 10:56:35";NULL;NULL;"";"Personnel";NULL
+9;2;"2009-02-23 10:57:42";"2009-02-23 10:57:42";NULL;1;"";"Appel tel.";NULL
+10;2;"2009-02-23 10:57:42";"2009-02-23 10:57:42";NULL;1;"";"Commercial";NULL
+11;2;"2009-02-23 10:57:42";"2009-02-23 10:57:42";NULL;1;"";"Formation";NULL
+12;2;"2009-02-23 10:57:42";"2009-02-23 10:57:42";NULL;1;"";"Intervention";NULL
+13;2;"2009-02-23 10:57:42";"2009-02-23 10:57:42";NULL;1;"";"Personnel";NULL
+14;2;"2009-02-23 10:57:42";"2009-02-23 10:57:42";NULL;1;"";"RDV";NULL
+15;2;"2009-02-23 10:57:42";"2009-02-23 10:57:42";NULL;1;"";"Reunion";NULL
+16;2;"2009-02-23 10:57:42";"2009-02-23 10:57:42";NULL;1;"";"Support";NULL

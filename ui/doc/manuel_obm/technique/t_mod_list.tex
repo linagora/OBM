@@ -1,0 +1,389 @@
+% Documentation technique d'OBM : module List
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\clearpage
+\section{List}
+
+révision : \obm 2.0.0
+
+Le module \List \obm.
+
+.\\
+Todo\\
+tests des requetes (correction + limites ressources)\\
+
+\subsection{Organisation de la base de données}
+
+Le module \List utilise 2 tables :
+\begin{itemize}
+ \item List
+ \item ContactList
+\end{itemize}
+\vspace{0.3cm}
+
+La table List stocke les informations générales sur les listes, la table ContactList assure la liaison des contacts statiques avec une liste.
+
+
+\subsubsection{La table List}
+Table principale des informations d'une liste.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_privacy & int 1 & Visibilité de la liste & \\
+\hline
+\_name & varchar 64 & Nom de la liste & \\
+\hline
+\_subject & varchar 128 & Sujet de la liste & \\
+\hline
+\_email & varchar 128 & Adresse E-mail de la liste & \\
+\hline
+\_mode & int 1 & Mode (Normal=0 ou Expert=1) & \\
+\hline
+\_mailing\_ok & int 1 & Indicateur de prise en compte d'activation pour mailing & \\
+\hline
+\_static\_nb & int 10 & Nombre de contacts statiques (directs) associés à la liste & \\
+\hline
+\_query\_nb & int 10 & Nombre total de contacts de la liste & \\
+\hline
+\_query & text (64k) & Requête sauvegardée des critères (modes normal et expert) & \\
+\hline
+\_structure & text (64k) & Description des critères du mode normal (graphique) &\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le champ query}
+
+Ce champ stocke la requête SQL générée manuellement (mode expert) ou automatiquement en fonction des critères (mode normal).
+
+
+\subsubsection{Le champ structure (critères)}
+
+Ce champ stocke les critères de recherche saisis graphiquement.
+A noter : le tableau des critères est sérialisé pour stockage dans ce champ.
+
+
+\subsubsection{La table ContactList}
+Table de liaison entre une liste et ses contacts statiques.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_list\_id & int 8 & Identifiant de la liste & \\
+\hline
+\_contact\_id & int 8 & Identifiant du contact & \\
+\hline
+\end{tabular}
+
+
+\subsection{Les contacts statiques et dynamiques}
+
+Une liste est constituée de 2 types de contacts :
+
+\begin{itemize}
+\item Les contacts statiques, sélectionnés individuellement par l'utilisateur
+\item Les contacts dynamiques, issus d'une requête (soit écrite manuellement : mode expert, soit générée en fonction des critères choisis : mode normal)
+\end{itemize}
+\vspace{0.3cm}
+
+L'écran de consultation d'une liste affiche les 2 listes de contacts de façon distincte. La liste des contacts statiques en premier, puis la liste des contacts dynamiques.
+
+\paragraph{A noter qu'en mode normal}, les contacts statiques sont automatiquement ajoutés aux critères (à la requête générée) et que par conséquence, les contacts dynamiques représentent l'ensemble des contacts de la liste. Ceci est utile pour les exports par exemple.
+
+Les contacts statiques sont ajoutés au plus au niveau de la clause WHERE de la requête ce qui permet leur présence même si ces contacts vérifiaient des critères d'exclusion.
+
+
+\subsection{Détermination mode normal ou mode expert}
+
+Depuis \obm 1.1.0, le champ ``list\_mode'' détermine le mode de requête.
+
+A noter que les critères graphiques sont conservés lorsque la liste bascule en état expert.
+Ce qui permet de revenir en mode ``normal'' en retrouvant les critères du moment de la bascule.
+
+
+\subsection{Gestion des formulaires de critères}
+
+En mode normal, les critères sont gérés graphiquement. Il y a 2 formulaires de gestion des critètes :\\
+
+\begin{itemize}
+\item Le formulaire (non modifiable directement) d'affichage et stockage des critères d'une liste
+\item Le formulaire d'ajout / modification d'une ligne de critères
+\end{itemize}
+\vspace{0.3cm}
+
+Ces formulaires bénéficient d'interfaces d'échange d'informations et gèrent les données utilisateurs (cf \ref{of_userdata}):\\
+
+\begin{tabular}{|c|p{4.5cm}|p{6.5cm}|}
+ \hline
+ \textbf{Sens} & \textbf{Description} & \textbf{Effectué par} \\
+ \hline
+nouveau => liste
+&
+La création d'un nouveau bloc de critères ajoute une ligne de critères dans le formulaire global de liste
+&
+Javascript : \fonction{list\_add\_criteria\_line()} qui ajoute (ou remplace) une ligne de critères.
+Insertion des opérateurs (liens vers suppression et modification, opérateur logique et d'exclusion), puis insertion des critères ``société'', ``contact'' et ``publication'' chacun par une fonction respective (ex: \fonction{list\_add\_company\_criteria\_line()}).
+Pour chaque critère (renseigné ou non) une cellule est remplie (avec un input hidden si le critère est non renseigné).Le cas spécial \variable{of\_select} est géré (checkbox puis select).
+\\
+\hline
+liste => nouveau
+&
+La modification d'une ligne de critère ouvre le formulaire d'ajout de critère en édition sur les critères de la ligne sélectionnée.
+&
+javascript : \fonction{get\_list\_criteria\_from\_query()} qui parcourt les lignes de critères, récupère le type de champ (SELECT, INPUT ou exception => of\_select) et récupère les données en conséquence (lastChild,...).
+L'object \variable{of\_select} est géré (cas particulier d'un champ contenant 2 obejts : 1 checkbox en premier puis un select).
+\\
+\hline
+\end{tabular}
+
+
+\subsection{Gestion des paramètres de critères}
+
+Les critères sont passés sous formes de paramètres de tableau (indexés par la ligne de critère).
+Chaque paramètre est dont backslashé individuellement.\\
+
+La fonction de récupération des paramètres (\fonction{get\_list\_params()}) regroupe tous les paramètres dans un tableau unique \variable{\$params[criteria]} afin de faciliter les manipulations et les transferts.\\
+
+Certains traitements nécessitent les paramètres non backslashés, ou au contraire backslashés (par exemple la liste des critères est sérialisée avant stockage en base, il faut donc stripslasher tous les critères individuellement puis backslasher le résultat de la sérialisation).
+2 fonctions sont donc prévues pour traiter ceci globalement par la fonction PHP \fonction{array\_walk} :\\
+
+\begin{itemize}
+\item \fonction{list\_strip\_slashes\_array()}
+\item \fonction{list\_add\_slashes\_array()}
+\end{itemize}
+
+
+\subsection{Gestion des données utilisateurs}
+
+Le module \List gère les données utilisateurs en proposant ces données dans les critères.
+
+Les catégories utilisateurs peuvent contenir des codes hiérarchiques (1.2.6,...). La sélection de ces catégories propose pour chaque catégorie un indicateur (case à cocher) qui permet de ne demander que la ou les catégories sélectionnées, ou l'ensemble de la hiérarchie des codes sélectionnés.
+
+La sélection de la catégorie ``1.3 catégorie troisième'' donnera :\\
+
+\begin{itemize}
+\item Si la case arborescance est cochée : toutes les catégories 1.3 et 1.3.*
+\item Sinon uniquement la catégorie de code 1.3
+\end{itemize}
+\vspace{0.3cm}
+
+Les critères stockés sont toujours les Ids des catégories sélectionnées, ainsi que l'état de l'indicateur d'arborescence.
+Avant la génération de la requête, la fonction \fonction{prepare\_list\_criteria()} va ajuster les critères pour transformer les critères d'Ids en codes si l'indicateur d'arborescence est sélectionné.
+
+En fonction des critères (id ou code) la procédure de génération effectuera la construction adéquate (Join et where sur les codes ou Id).
+
+
+\subsection{Construction des requètes dynamiques}
+
+La construction de la requète selon les critères demandés est effectuée par la fonction \fonction{make\_list\_query\_from\_criteria()}.
+
+
+\subsubsection{Informations de publication}
+
+La série de critère "\publication" permet de rechercher des contacts selon leurs abonnements aux publications.\\
+
+La sélection de la case à cocher "Information des publications" permet d'afficher dans les listes de résultat les informations de publication associées aux contacts.
+Une conséquence importante est que ceci modifie en profondeur le résultat de la liste, qui devient une liste d'associations contact - publication (un contact pourra apparaître plusieurs fois selon ses abonnements).
+
+La clé d'une ligne devient le champ \variable{subscription\_id}. Seules les lignes avec un abonnement apparaissent. Même un contact ajouté statiquement n'apparaitra pas s'il n'a pas d'abonnement.
+
+Lorsque les informations de publication sont demandées, il devient impossible de cumuler un même critère de publication par un ET. (Exemple : publication dont le titre est "TITRE1" et dont le titre est "TITRE2"), car une ligne de résultat ne contient qu'une publication et ne correspondra donc jamais.
+
+
+\subsubsection{Problématique des liaisons n-n}
+
+Certains critères comme les catégories de société ou de contact et les publications correspondent à des liaisons n-n entre contact et le critère demandé.
+
+Ceci impose un traitement particulier des liens.
+La demande d'un de ces critères nécessite l'insertion d'une jointure (LEFT JOIN) dans la requète.
+La complexité vient de deux facteurs :\\
+\begin{itemize}
+\item Lorsqu'un de ces critères est combiné avec lui-même par un ET, cela implique de créer une jointure supplémentaire (Société de catégorie 1 ET de catégorie 2 va nécessiter 2 jointures vers les catégories de société).
+\item Dans le cas des informations de publication, tous les critères ajoutent la même jointure.
+Il faut donc veiller à ne pas ajouter la jointure si elle a déjà été ajoutée par un critère différent de publication.
+\end{itemize}
+\vspace{0.3cm}
+
+La variable \variable{\$join\_nb["field"]} permet de référencer le nombre de jointures associé au champ field.
+
+La variable \variable{\$join\_nb["module"]} permet de référencer le nombre de jointures associé au module, nécessaire pour le module \publication ou tous les critères impliquent la même jointure.\\
+
+L'algorithme de gestion des critères et d'ajout des jointures pour la construction de la requète est donc, au traitement d'un critère :\\
+
+\begin{tabular}{|l|p{4.5cm}|p{5.5cm}|}
+ \hline
+ \textbf{Condition} & \textbf{Condition} & \textbf{Action de jointure} \\
+ \hline
+ \hline
+  \#join champ est null & \#join module null OU module!=publication & Ajout de la jointure assoicée au champ. \\ 
+ \hline
+  \#join champ est null & \#join module non null ET module=publication & Rien. \\ 
+ \hline
+  \#join champ non null & ligne combinée par AND et même critère & Ajout de la jointure (si \#join du champ > \#join du module, ceci pour traiter le cas du module publication). \\
+ \hline
+\end{tabular}
+
+
+\subsubsection{Problématique ``AND NOT'' avec liaisons n-n}
+
+L'utilisateur qui sélectionne pour un critère (ou une ligne) les opérateurs AND NOT pense que ceci va exclure tous les contacts liés à ces critères.
+
+Ceci n'est plus vrai avec les critères des liaisons n-n, exemple :
+
+Un contact est doublement lié à la catégorie1, aux entrées ``A'' et ``B''.
+L'utilisateur saisi une clause : AND NOT catégorie1 = A.
+Il pense que le contact sera exclu du résultat, ce qui n'est pas certain car le contact peut faire partie du résultat par sa liaison avec l'entrée ``B''.\\
+
+Pour aboutir à un comportement fidèle à ce qu'attend un utilisateur, \obm traite les lignes de critères avec opérateurs ``AND NOT'' de façon spéciale.
+Ces lignes ne génèrent pas des lignes de critères classiques, mais des sous-requêtes en rajoutant dans la clause WHERE de la requête générée des sous-requêtes du type : ``AND contact\_id NOT IN (SELECT ... critères ...)''.
+
+Une ligne de critère est traitée comme cela lorsque :
+\begin{itemize}
+\item Les opérateurs de la ligne sont ``AND NOT''
+\item La ligne possède un critère avec liaison ``n-n'', repéré car ce critère possède obligatoirement une jointure dédiée à ajouter et donc une entrée dans \variable{\$add\_join}
+\end{itemize}
+
+
+\subsubsection{Gestion des exclusions}
+
+\obm ajoute une fonctionnalité à la génération des requêtes qui est la gestion des exclusions.\\
+
+Une exclusion est une ligne de critères positionnée avec l'opérateur ``Exclude''
+
+Ces lignes sont traitées de façon spéciale dans la clause WHERE, pour ne pas tenir compte de la chaine d'opérateurs logiques, en les combinant avec un AND à l'ensemble des critères, afin que l'exclusion soit effective peu importe ou est placée la ligne de critères.
+
+
+\subsubsection{Les champs multiples (critères multi-valués)}
+
+Certains critères, comme les catégories permettent un choix multiple.
+Lorsqu'il s'agit d'Id ou de valeurs directes, cela peut être traité par une simple clause WHERE du type ID in (liste d'id).
+
+Pour d'autres cela nécessite une boucle de clauses, comme pour les codes de catégories :
+WHERE (code=1 ou code like '1.*') OR (code=2 ou code like '2.*')...
+
+Pour ce cas, la variable \variable{\$field\_multi\_op[field]} si positionnée indique que le champ ``field'' est multiple nécessitant une boucle de critère et sa valeur indique l'opération logique entre les critères (OR, AND).
+
+\subsubsection{Equivalence de jointure}
+
+Plusieurs critères lorsqu'ils sont sélectionnés nécessitent d'ajouter une jointure sur une table annexe. Un compteur de jointure est donc établi pour numéroter la table jointe lorsque celle-ci doit être jointe plusieurs fois.
+Le tableau \variable{\$add\_join} permet de déterminer si et quelle jointure est associée à un critère.
+
+Différents critères peuvent nécessiter la même jointure, dans ce cas la variable \variable{\$field\_join\_equiv} permet de faire la correspondance.
+Exemple, pour une catégorie, les critères category et category\_code entrainnent tous deux la jointure de la table CategoryLink.
+On note l'équivalenc de jointure de la forme :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+$field_join_equiv["${cat_name}_code"] = "${cat_name}";
+\end{verbatim}
+\end{minipage}
+}
+
+Et on rend les jointures identiques (on joint aussi la table Category pour le critère Category alors que cela n'était pas nécessaire car la jointure avec la table de liaison suffirait pour le critère id de la catégorie).
+
+
+\subsection{Interface publique externe}
+
+Le module \List propose des fonctions utilisables par les autres modules pour exporter le contenu d'une liste.
+Le module statistiques peut calculer des statistiques sur les contacts ou sociétés d'une liste. Pour cela il a besoin de connaitres le contenu de la liste.\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+ext_list_get_contact_ids($id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction de récupération de la liste des ids des contacts de la liste}\\
+\hline
+\$id & Id de la liste\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+DBO & Dataset contenant la liste des ids (contact\_id)\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+ext_list_get_company_ids($id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction de récupération de la liste des ids des sociétés de la liste}\\
+\hline
+\$id & Id de la liste\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+DBO & Dataset contenant la liste des ids (company\_id)\\
+\hline
+\end{tabular}
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \List, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+ \hline
+  index & read & (Défaut) formulaire de recherche de listes. \\ 
+ \hline
+  search & read & Résultat de recherche. \\
+ \hline
+  new & write & Formulaire de création d'une liste. \\
+ \hline
+  new\_criterion & write & Formulaire de saisie d'un nouveau critère graphique. \\
+ \hline
+  detailconsult & read & Fiche détail d'une liste. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'une liste. \\
+ \hline
+  detailduplicate & write & Formulaire de duplication d'une liste. \\
+ \hline
+  insert & write & Insertion d'une liste. \\
+ \hline
+  update & write & Mise à jour d'une liste. \\
+ \hline
+  check\_delete & write & Vérification avant suppression d'une liste. \\
+ \hline
+  delete & write & Suppression d'une liste. \\
+ \hline
+  contact\_add & write & Ajouts de contacts statiques à la liste\\
+ \hline
+  contact\_del & write & Suppression de contacts statiques de la liste\\
+ \hline
+\end{tabular}

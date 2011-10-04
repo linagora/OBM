@@ -1,0 +1,7 @@
+Les extensions autoconf_tdb2.xpi et autoconf_tdb3.xpi sont des "ré-écritures" de l'autoconf en des extensions thunderbird. Elles ont été développées par Christel DELAHAYE pour le Ministère des Finances (christel point delahaye at aliceadsl point fr) et proposées à la core team OBM comme contribution.
+
+Ci-après une description de l'état d'avancement par l'auteur :
+    Je vous envoie le code des xpis (tdb V2 et début pour tdb V3) tels qu'ils ont été adaptés pour notre besoin. 
+    La gestion des erreurs n'est pas encore implémentée ni l'écriture des logs et il me reste à prendre en compte la mise à jour des extensions (suppression des répertoires existants) et optimiser un peu tout cela mais grosso modo toutes les opérations sont présentes pour la version 2. Il me reste à reprendre ce qui est commencé pour tdb3, l'évolution de l'api xpcom entre les versions 1.5/8 et 1.9 a corrigé beaucoup de bugs et ajouté pas mal de fonctionnalités qui vont simplifier tout cela.
+
+Ces extensions n'ont pas été testées.

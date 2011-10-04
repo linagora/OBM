@@ -1,0 +1,23 @@
+HOW TO MAKE THE TEST RUN :
+- Copy conf/db.php.sample to conf/db.php
+- Edit conf/db.php with the correct values
+- Create the obm test database and insert the correct schema :
+  - mysqladmin -u root [-p] create obm_test; mysql -u root obm_test < obm/scripts/2.2/create_obmdb_2.2.mysql.sql
+  - creadb -U postgres [-W] obm_test; psql -U obm -p obm_test < obm/scripts/2.2/create_obmdb_2.2.pgsql.sql
+- Install phpunit >= 3.3
+  - With pecl : pecl install phpunit
+  - With debian : use the unstable repository, and apt-get install phpunit
+- For pgsql (with phpUnit < 4.0)
+  - Apply this patch :
+[code]
++++ /usr/share/php/PHPUnit/Extensions/Database/DB/MetaData.php	2009-04-08 12:12:37.000000000 +0200
+@@ -177,6 +177,7 @@
+      */
+     public function quoteSchemaObject($object)
+     {
++        return $object;
+         return $this->schemaObjectQuoteChar.
+         str_replace($this->schemaObjectQuoteChar, $this->schemaObjectQuoteChar.$this->schemaObjectQuoteChar, $object).
+         $this->schemaObjectQuoteChar;
+[/code]
+

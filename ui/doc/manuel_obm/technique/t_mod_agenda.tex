@@ -1,0 +1,460 @@
+% Documentation technique d'OBM : module Agenda
+% ALIACOM Mehdi Rande
+% $Id$
+
+\clearpage
+\section{L'agenda partagé}
+
+L'\agenda \obm  est un agenda partagé permettant d'inserer, modifier, 
+consulter ou supprimer des évenements pour un ou plusieurs utilisateurs 
+simultanés.
+
+\subsection{Organisation de la base de données}
+
+Le \calendar utilise 5 tables :
+\begin{itemize}
+ \item CalendarEvent
+ \item CalendarException
+ \item CalendarCategory
+ \item EntityEvent
+ \item EntityRight
+\end{itemize}
+
+\subsubsection{CalendarCategory}
+Cette table est utilisée pour sotcker les catégories des événements.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_label & varchar 128 &  Label de la catégorie & \\
+\hline
+\end{tabular}
+
+\subsubsection{CalendarEvent}
+Cette table stocke toute la description d'un évenement ainsi que ces caractéristiques.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant &  Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur &  Clé etrangère\\
+\hline
+\_usercreate & int 8 & Id du créateur & Clé etrangère\\
+\hline
+\_owner & int 8 & Id du propriétaire & Clé etrangère\\
+\hline
+\_title & varchar 255 & Titre & \\
+\hline
+\_location & varchar 100 & Lieu & \\
+\hline
+\_description & text & Description & \\
+\hline
+\_category\_id & int 8 & Id de la catégorie & Clé etrangère\\
+\hline
+\_priority & int 2 & Priorité : <1> Basse <2> Normal <3> Haute & \\
+\hline 
+\_privacy & int 2 & Privé : <0> Non <1> Oui & \\
+\hline
+\_date & timestamp & Date de début de la première occurence de l'événement & \\
+\hline
+\_duration & int 8 & Durée de l'événement en secondes & \\
+\hline
+\_allday & int 1 & Evénement sur toute la journée <0> Non <1> Oui & \\
+\hline
+\_repeatkind & varchar 20 & Type de répétition & \\
+\hline
+\_repeatfrequence & int 3 & Fréquence de répétition & \\
+\hline
+\_repeatdays & varchar 7 & Jours de répétion pour les répétition de type
+hebdomadaire & \\
+\hline
+\_endrepeat & timestamp & Date de fin de répétition & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{CalendarException}
+
+Cette table stocke les exceptions des événements périodiques.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & Clé etrangère\\
+\hline
+\_usercreate & int 8 & Id du créateur & Clé etrangère\\
+\hline
+\_event\_id & int 8 & Id de l'événement & Clé etrangère - Clé primaire \\
+\hline
+\_date & timestamp & Date de l'exception & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{EventEntity}
+
+Cette table stocke toutes les relations entre les événements et les entités (utilisateurs, groupes, resources,...).\\
+
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & Clé etrangère\\
+\hline
+\_usercreate & int 8 & Id du créateur & Clé etrangère\\
+\hline
+\_event\_id & int 8 & Id de l'événement & Clé etrangère - Clé primaire \\
+\hline
+\_entity\_id & int 8 & Id de l'entité & Clé etrangère - Clé primaire \\
+\hline
+\_entity & varchar 32 & nom de l'entité & Clé primaire - 'user', 'resource',... \\
+\hline
+\_state & char 1 & Etat de l'événément : <R> Refusé, <W> En attente, et <A> 
+Accepté  & \\
+\hline 
+\_required & int 1 & Détermine si l'utilisateur est nécessaire pour l'événement
+: <0> Non <1> Oui & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{EntityRight}
+
+Table générique de gestion des droits individuels ou ACL.
+L'entité est l'objet sur lequel on fixe les droits (un calendrier, une ressource,...).
+Le consommateur est l'objet à qui on donne les droits (utilisateur ou groupe).
+
+Voir section \ref{acl}.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_entity &varchar 32 & type de l'entité & Clé primaire - 'calendar', 'resource'\\
+\hline
+\_entity\_id & int 8 & Id de l'entité & Clé primaire\\
+\hline
+\_consumer & varchar 32 & type du consommateur & Clé primaire - 'user, 'group\\
+\hline
+\_consumer\_id & int 8 & Id du consommateur & Clé primaire\\
+\hline 
+\_read & int 1 & Droit de lecture <0> Non <1> Oui  & \\
+\hline
+\_write & int 1 & Droit d'ecriture <0> Non <1> Oui & \\
+\hline
+\end{tabular}
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \agenda, avec le droit d'accès requis 
+ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+  index & read & Accueil \\ 
+ \hline
+  decision & write & Définit l'état d'une liste d'événements \\
+ \hline
+  view\_year & read & Vue annuelle \\
+ \hline
+  view\_month & read & Vue mensuelle \\
+ \hline
+  view\_week & read & Vue hebdomadaire \\
+ \hline
+  view\_day & read & Vue quotidienne \\
+ \hline
+  new & write & Formulaire de nouvel événement \\
+ \hline
+  insert & write & Insertion de l'événement \\
+ \hline
+  detail\_consult & read & Consultation d'un événement \\
+ \hline
+  check\_delete & admin & Confirmation de suppression d'événement \\
+ \hline
+  delete & write & Suppression d'un événement \\
+ \hline
+  detailupdate & write & Formulaire de mise à jour d'un événement \\
+ \hline
+  update & write & Mise à jour d'un événement \\
+ \hline
+  update\_decision & write & Mise à jour de l'état d'un événements \\
+ \hline
+  rights\_admin & write & Formulaire de mise à jour des droits \\
+ \hline
+  rights\_update &  write & Mise à jour des droits \\
+ \hline
+  new\_meeting & write & Formulaire de nouvelle réunion \\
+ \hline
+  perform\_meeting & write & Vue réunion \\
+ \hline
+\end{tabular}
+
+
+\subsection{Paramètres}
+
+Différents paramètres concernant les utilisateurs, groupes et leur stockage dans le tableau de paramètres :\\
+
+\begin{tabular}{|l|p{3cm}|p{8cm}|}
+ \hline
+ \textbf{Haschage \$agenda} & \textbf{Paramètre} & \textbf{Description} \\
+ \hline
+  [``user\_id''] & param\_user & Utilisateur spécifié lors de l'acceptation d'événement (déléguation) \\ 
+ \hline
+  [``group\_view''] & param\_group & Groupe sélectionné pour l'affichage du calendrier d'un groupe \\ 
+ \hline
+  [``new\_group''] & new\_group & Indicateur de sélection d'un nouveau groupe\\
+ \hline
+  [``sel\_group\_id''] & sel\_group\_id & Groupes sélectionnés (formulaire rdv) \\ 
+ \hline
+  [``sel\_user\_id''] & sel\_user\_id ou sel\_ent[``user''] & Utilisateurs sélectionnés \\ 
+ \hline
+  [``sel\_resource\_id''] & sel\_resource\_id ou sel\_ent[``resource] & Ressources sélectionnées \\ 
+ \hline
+\end{tabular}
+
+
+\subsection{Sélection et stockage des utilisateurs, resources, groupes}
+
+Lors de la sélection de plusieurs utilisateurs ou entités, ceux-ci sont gardés en session afin de maintenir la sélection en changeant de vue ou en se déplaçant dans le calendrier.
+De même quand un événement est créé pour plusieurs utilisateurs, la vue passe automatiquement en vue multi-utilisateurs avec ces utilisateurs sélectionnés.
+
+Cependant les données stockées en session ne sont pas systématiquement les données sélectionnées; exemple :
+\begin{itemize}
+\item Quand un groupe est sélectionné, la vue passe automatiquement en vue membres du groupe, et le choix des utilisateurs est limité au groupe (restreint à ceux qui ont donné les droits en lecture).
+\item La sélection est limitée par défaut au nombre d'utilisateurs affichables simultanément (par défaut 6).
+\end{itemize}
+\vspace{0.3cm}
+
+Règles utilisées pour la sélection et le stockage en session des entités :\\
+
+Les entités sélectionnées sont stockées dans le tableau \variable{\$cal\_entity\_id} qui est stocké en session à la fin de l'exécution (car la sélection peut être modifiée par les traitements, comme la restriction au nombre d'utilisateurs affichables simultanément) et qui comprend plusieurs entrées :
+\begin{itemize}
+\item[-] [user] : tableau d'id d'utilisateurs
+\item[-] [resource] : tableau d'id de ressources
+\item[-] [group] : tableau d'id de groupes
+\item[-] [group\_view] : groupe sélectionné pour l'affichage des utilisateurs
+\end{itemize}
+\vspace{0.3cm}
+
+Le tableau \variable{\$cal\_entity\_id} est copié dans le hashage global \variable{\$agenda[entity]} afin de le mettre directement à disposition des différentes fonctions.\\
+
+\#nb correspond au nombre maximal de calendriers affichables simultanément.\\
+
+Si aucune entité n'est sélectionnée (utilisateur, groupe, ressource) l'utilisateur connecté est automatiquement sélectionné.\\
+
+\begin{longtable}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Action} & \textbf{Sélection} \\
+
+\hline
+Affichage d'une vue
+&
+\begin{itemize}
+\item Session inchangée (listes déjà été limitées à \#nb)
+\item Affichage calendriers  : contenu de [user], [resource]
+\item Group sélectionné : inchangé
+\end{itemize}
+\\ 
+
+\hline
+Sélection de 1 ou plusieurs utilisateurs ou ressources en mode vue
+&
+\begin{itemize}
+\item[-] [user] = sélection d'utilisateurs limitée à \#nb
+\item[-] [group] = inchangé
+\item[-] [resource] = sélection de ressources limitée à \#nb - \#nb\_users
+\item Affichage calendriers : contenu de [user] [resource]
+\item Groupe sélectionné : aucun 
+\end{itemize}
+\\ 
+
+\hline
+Sélection de 1 groupe mode vue
+&
+\begin{itemize}
+\item[-] [user] = utilisateurs du groupe sélectionné limité à \#nb
+\item[-] [group] = groupe sélectionné
+\item[-] [resource] = vide
+\item Affichage calendriers : contenu de [user]
+\item Group sélectionné : le groupe sélectionné
+\end{itemize}
+\\ 
+
+\hline
+Fenêtre nouveau rdv
+&
+\begin{itemize}
+\item Session inchangée (listes déjà été limitées à \#nb)
+\item Utilisateurs pré-sélectionnés : contenu de [user] 
+\item Groupes pré-sélectionnés : contenu de [group] 
+\item Ressources pré-sélectionnées : contenu de [resource]
+\end{itemize}
+\\ 
+
+\hline
+Création rdv : Sélection de 1 ou plusieurs utilisateurs, groupes, ressources
+&
+\begin{itemize}
+\item[Note] Les vues limitent les sélections, non les insertions
+\item[-] [user] = utilisateurs sélectionnés, limité à \#nb
+\item[-] [group] = groupes sélectionnés
+\item[-] [resource] = ressources sélectionnées limité à \#nb - \#nb\_users
+\item Affichage calendriers  : contenu de [user], [resource] 
+\item Group sélectionné : aucun
+\end{itemize}
+\\
+
+\hline
+Fenêtre nouvelle réunion
+&
+\begin{itemize}
+\item Utilisateurs pré-sélectionnés : contenu de [user] 
+\item Groupes pré-sélectionnés : contenu de [group] 
+\item Ressources pré-sélectionnées : contenu de [resource] 
+\end{itemize}
+\\ 
+
+\hline
+Recherche crénneaux disponibles
+&
+\begin{itemize}
+\item[-] [user] = utilisateurs sélectionnés
+\item[-] [group] = groupes sélectionnés
+\item[-] [resource] = ressources sélectionnées
+\end{itemize}
+\\
+\hline
+\end{longtable}
+
+
+
+\subsubsection{Remarques}
+ Par défaut l'action \textbf{index} affiche la vue hebdomadaire de la semaine
+ courante. Cependant si l'utilisateur courant ou bien un utilisateur qui lui a 
+ cédé les droits d'ecriture sur son agenda à des événements en attente cette
+ action affichera la liste des événements en attente.
+
+\subsection{Principe de fonctionnement d'affichage d'une vue}
+ Les etapes de construction de la vue sont :
+ \begin{itemize}
+  \item{Récupération des informations en base de données}
+  \item{Traitement des données et construction du modèle}
+  \item{Traitement du modèle et construction de la vue}
+  \item{Affichage de la vue}
+ \end{itemize}
+
+\subsubsection{Structure du modèle}
+ Le modèle de donnée est un des rare éléments à utiliser objets au sein d'un
+ module. Ceci vient du fait que l'approche objet est particulierement adapté aux
+ traitement à effectuer.
+
+ Voici les différents éléments de ce modèle :
+\paragraph{L'objet Event}
+ L'objet Event représente un événement au sens abstrait.
+ C'est à dire que quelque soit le nombre d'occurence d'un événement (dans le cas
+ d'un événement répétitif) il n'y aura qu'un seul objet Event.
+
+ \begin{tabular}{|l|p{9.5cm}|}
+  \hline
+   \textbf{Attribut} & \textbf{Description} \\
+  \hline
+   id & Identifiant \\
+  \hline
+   duration & Durée en secondes \\
+  \hline
+   title & Titre \\
+  \hline
+   category & Label de la catégorie \\
+  \hline
+   privacy & Si événement privé \\
+  \hline
+   description & Description de l'événement \\
+  \hline
+ \end{tabular}
+
+\paragraph{L'objet Day}
+ L'objet Day represente un jour. Il stockera toutes les informations relatives à
+ ce jour : date, événements, ... 
+ \\
+ \begin{tabular}{|l|p{9.5cm}|}
+  \hline
+   \textbf{Attribut} & \textbf{Description} \\
+  \hline
+   day & Date du jour \\
+  \hline
+   events & Tableau d'objet Events lié avec des id utilisateurs et une heure de
+   début \\
+  \hline
+   title & Titre \\
+  \hline
+ \end{tabular}
+ \\
+ \\
+ \\
+ \begin{tabular}{|l|c|p{9.5cm}|}
+  \hline
+   \textbf{Fonction} & \textbf{Paramètres} & \textbf{Description} \\
+  \hline
+   is\_same\_day & date & Return true si la date passée en parametre est la meme
+   que celle de l'objet\\
+  \hline
+   add\_even & event - begin\_date - uid & Ajoute un événement au tableau
+   \textbf{events}, le lie avec l'heure de début et l'uid passé en paramètre. Si
+   l'événement été déjà stocké, l'événement est juste lié à l'uid.\\
+  \hline
+   get\_events & uid & Retourne tout les événement du tableau \textbf{events} 
+   de l'utilisateurs dont l'uid est passé en paramètre.\\
+  \hline
+  \hline
+   have\_events\_between & start - end & Retourne tout les événement du tableau \textbf{events} 
+   qui se débute entre l'heure \textbf{start} et l'heure \textbf{end} \\
+  \hline
+   get\_events\_between & start - end - uid & Retourne tout les événement du tableau \textbf{events} 
+   qui se débute entre l'heure \textbf{start} et l'heure \textbf{end} pour
+   l'utilisateur \textbf{uid} \\
+  \hline
+ \end{tabular}
+  \textbf{Remarques :} \\
+  Les fonctions \textbf{have\_events\_between} et \textbf{get\_events\_between}
+  retourn \textbf{NULL} si aucun événements ne débute durant l'interval de
+  temps et que aucun événements ne se déroule durant l'interval de
+  temps, \textbf{-1} si aucun événements ne débute durant l'interval de
+  temps mais que des événements sont déjà en cours.
+  
+ \subsubsection{Affichage de la vue}
+   La fonction qui doit construire est afficher la vue reçoit donc un tableau
+   d'objets \textbf{Day} qui correspondent aux jours à afficher.
+   Pour construire la vue, la fonction interroge juste les objets \textbf{Day}
+   du tableau pour savoir si un jour donné contient des informations à afficher,
+   et si oui quelles sont ces information.
+

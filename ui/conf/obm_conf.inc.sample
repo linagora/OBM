@@ -1,0 +1,288 @@
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : obm_conf.inc.sample                                          //
+//     - Desc : OBM specific site configuration Sample file                  //
+// 2005-04-04 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+// Global parameters --------------------------------------------------------//
+
+// OBM host (for mail links)
+// CGP_HOST IS DEPRECATED. See external-url,..
+
+// Resources alias absolute path. (default value is '/images')
+// $resources_path = "$cgp_host/images"; 
+
+// Home page redirection
+//$c_home_redirect = "$cgp_host" . 'calendar/calendar_index.php';
+
+// Use specific langs (was $cgp_site_include)
+//$conf_lang = true;
+
+// Use specific check controls (see conf/modules/module.inc)
+//$conf_modules = true;
+
+// Todo lines to display
+$cgp_todo_nb = 5;
+
+// Maximum rows allowed to display
+$conf_display_max_rows = 200;
+
+// Allow * in search field
+$cgp_sql_star = true;
+// archive checkbox return only archived results
+//$cgp_archive_only = true;
+
+// Tuning constants
+$ctu_sql_limit = true;
+
+// MySQL (only 4.1+) charset used (for database and files !)
+//$cmy_character_set = '_latin1';
+
+// MySQL (only 4.1+) charset collation used (for database and files !)
+//$cmy_charset_collation = 'latin1_general_ci';
+
+// is Mail enabled for OBM ? (eg: calendar)
+$cgp_mail_enabled = true;
+
+// is Demo enabled (login screen array with default account)
+$cgp_demo_enabled = false;
+
+// Session Cookie lifetime (in seconds, 0=session cookie)
+$cs_lifetime = 0;
+
+// Use Database sessions
+$cgp_sess_db = false;
+//$cgp_sess_db = true;
+
+// authentification : 'CAS' (SSO AliaSuite), 'ldap' (LDAP authentication) or 'standalone' (default)
+//$auth_kind = 'CAS';
+//$cas_server = 'sso.aliacom.local';
+//$cas_server_port = 8443;
+//$cas_server_uri = '';
+//$auth_kind='ldap';
+
+// encyption used to store password : 'PLAIN', 'MD5SUM' or 'CRYPT'
+$password_encryption = 'PLAIN';
+
+// Modules specific parameters ----------------------------------------------//
+
+// Company : Auto format fields
+$caf_company_name = true;
+$caf_town = true;
+
+// Company + Contact : Advanced search enabled by default
+$csearch_advanced_default = false;
+
+// Contact : is mailing enabled by default for a new contact
+$cgp_mailing_default = true;
+
+// Calendar: display my rights panel
+$c_calendar_display_my_rights = false;
+
+// Calendar : show public groups
+$ccalendar_public_groups = true;
+
+// Calendar: generic E-mail resource admin for calendar module
+//$ccalendar_resource_admin = 'resource@mydomain';
+
+// Calendar first ay of week, first and last hour display
+//$ccalendar_weekstart = 'monday';
+$ccalendar_first_hour = 8;
+$ccalendar_last_hour = 20;
+
+// Calendar max user displayed in the calendar
+//$ccalendar_max_users = 25;
+
+// Calendar Resource usage
+$ccalendar_resource = true;
+
+// Set this to false if you want to forbid the insertion/update
+// of a event when a resource is one of the reasons of the conflict.
+// $ccalendar_resource_overbooking = false;
+
+// Calendar send ics file
+$ccalendar_send_ics = true;
+
+// Calendar ics attachment encoding (8bit, base64 or quoted-printable)
+$ccalendar_ics_encoding = 'base64';
+
+// Calendar hour fraction (minutes select granularity)
+$ccalendar_hour_fraction = 4;
+
+// Allow to set wheter calendar event creation happend on simple or double click
+// onClick or onDblClick (default is onDblClick)
+$ccalendar_invocation_method = 'onDblClick';
+
+// Time : Worked days in a week (start at sunday)
+$c_working_days = array(0,1,1,1,1,1,0);
+
+// Generic E-mail for Incident module
+//$cmail_incident = 'support@mydomain';
+
+// Mail redirection to multiple addresses
+// $c_max_email_nomade = 1;
+
+// Time : activity report logo
+$cimage_logo = 'linagora.jpg';
+
+// Document : $cdocument_root and $default_path are deprecated
+// see obm_conf.ini
+
+// Document: user quota for all private documents (in bytes, O = no quota)
+$c_quota_private_document = 104857600;
+
+// Document: whether to force download or not
+$c_document_display_inline = false;
+
+// Group : is a new group private by default
+$cgroup_private_default = true;
+
+// default taxes values
+$cdefault_tax = array ('TVA 19,6' => 1.196, 'TVA 5,5' => 1.055, 'Pas de TVA' => 1);
+
+//syslog log files root
+$clog_root = '/var/log';
+
+// default Right values; -1 = do not display
+$cgp_default_right = array (
+  'resource' => array (
+      'public' => array(
+        'access' => 1,
+        'read' => 0,
+        'write' => 0,
+        'admin' => 0
+      )
+    ),
+  'contact' => array (
+      'public' => array(
+        'access' => 1,
+        'read' => 1,
+        'write' => 0,
+        'admin' => 0
+      )
+    ),
+  'mailshare' => array (
+      'public' => array(
+        'access' => 1,
+        'read' => 0,
+        'write' => 0,
+        'admin' => 0
+      )
+    ),
+  'mailbox' => array (
+      'public' => array(
+        'access' => 1,
+        'read' => 0,
+        'write' => 0,
+        'admin' => 0
+      )
+    ),
+  'calendar' => array (
+      'public' => array(
+        'access' => 1,
+        'read' => 1,
+        'write' => 0,
+        'admin' => 0
+      )
+    )
+  );
+
+$profiles['admin'] = array (
+  'section' => array (
+    'default' => 1
+  ),
+  'module' => array (
+    'default' => $perm_admin,
+    'domain' => 0),
+  'properties' => array (
+    'admin_realm' => array ('user', 'delegation', 'domain')
+    ),
+  'level' => 1,
+  'level_managepeers' => 1,
+  'access_restriction' => 'ALLOW_ALL'
+
+);
+
+//-----------------//
+// Displayed Infos //
+//-----------------//
+// --- sections --- Default is true
+//$cgp_show['section'] = ''; // Needed if module order to change
+//$cgp_show['section']['com']['url'] = "$path/calendar/calendar_index.php";
+//$cgp_show['section']['webmail']['url'] = 'http://webmail';
+//$cgp_show['section']['webmail']['url'] = $path."/horde3";
+//$cgp_show['section']['webmail']['target'] = '_blank';
+
+$cgp_show['section']['com'] = false;
+$cgp_show['section']['prod'] = false;
+$cgp_show['section']['compta'] = false;
+
+// --- modules --- false to hide, otherwise section
+//$cgp_show['module'] = ''; // Needed if module order to change
+//$cgp_show['module']['company'] = 'com';
+//$cgp_show['module']['campaign'] = 'com';
+
+// Groupware configuration by default
+$cgp_show['module']['company'] = false;
+$cgp_show['module']['lead'] = false;
+$cgp_show['module']['deal'] = false;
+$cgp_show['module']['cv'] = false;
+$cgp_show['module']['publication'] = false;
+$cgp_show['module']['statistic'] = false;
+$cgp_show['module']['time'] = false;
+$cgp_show['module']['project'] = false;
+$cgp_show['module']['contract'] = false;
+$cgp_show['module']['incident'] = false;
+$cgp_show['module']['invoice'] = false;
+$cgp_show['module']['payment'] = false;
+$cgp_show['module']['account'] = false;
+// Can be enabled only if localhost is the only SMTP-in server for all of OBM
+// domain
+$cgp_show['module']['log'] = false;
+
+// --- fields ---
+// References fields
+//$cgp_hide['']['region'] = true;
+
+// Company module
+//$cgp_hide['company']['company_number'] = true;
+//$cgp_hide['company']['company_vat'] = true;
+//$cgp_hide['company']['company_siret'] = true;
+//$cgp_hide['company']['type'] = true;
+//$cgp_hide['company']['activity'] = true;
+//$cgp_hide['company']['nafcode'] = true;
+
+// Contact module
+//$cgp_hide['contact']['function'] = true;
+//$cgp_hide['contact']['contact_title'] = true;
+//$cgp_hide['contact']['responsible'] = true;
+//$cgp_hide['contact']['contact_service'] = true;
+//$cgp_hide['contact']['contact_comment2'] = true;
+//$cgp_hide['contact']['contact_comment3'] = true;
+//$cgp_hide['contact']['contact_date'] = true;
+
+//--------------------//
+// User specific data //
+//--------------------//
+// Categories available for modules :
+// company, contact, incident, document
+// Lang var definitions here for example : Put these in conf/lang/
+//$l_companycategory1 = 'Category1';
+//$cgp_user['company']['category']['companycategory1'] = array('mode'=>'multi');
+//$l_contactcategory1 = 'Contact category1';
+//$cgp_user['contact']['category']['contactcategory1'] = array('mode'=>'multi');
+//$l_contactcategory2 = 'Contact category2';
+//$cgp_user['contact']['category']['contactcategory2'] = array('mode'=>'multi');
+//$l_documentcategory1 = 'Doc cat1';
+//$cgp_user['document']['category']['documentcategory1'] = array('mode'=>'mono');
+
+//$l_documentcategory1 = 'Doc cat1';
+//$cgp_user['user']['category']['documentcategory1'] = array('mode'=>'mono');
+
+
+</script>

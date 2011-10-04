@@ -1,0 +1,131 @@
+% Manuel d'utilisation et documentation technique d'OBM
+% AliaSource Pierre Baudracco
+% $Id$
+\documentclass[french]{article}
+%
+% Packages supplementaires utilises
+%
+\usepackage[right]{eurosym}
+\usepackage{aeguill}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{indentfirst}
+\usepackage[pdftex]{graphicx}
+\usepackage{epsf}
+\usepackage{soul}
+\usepackage{calc}
+\usepackage{fancybox}
+\usepackage{url}
+%\usepackage{fancyheadings}
+\usepackage{fancyhdr}
+\usepackage{xspace}
+\usepackage{tabularx}
+\usepackage{textcomp}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{verbatim}
+\usepackage{multirow}
+\usepackage{eurosym}
+\usepackage{lscape}
+%\usepackage[pdftex,
+%         colorlinks=true,
+%         pdfstartview=FitV,
+%         linkcolor=blue,
+%         citecolor=blue,
+%         urlcolor=blue]
+% {hyperref}
+\pdfinfo{
+/Title              (Documentation utilisateur et technique OBM)
+/Author             (AliaSource)
+/Keywords           (OBM)
+}
+%
+% Definition des commandes personnalisées
+%[1]{\textsf{#1}\xspace
+\newcommand{\obm}{\textsc{obm}\xspace}
+\newcommand{\aliamin}{\textsc{aliamin}\xspace}
+\newcommand{\aliasuite}{\textsc{aliasuite}\xspace}
+\newcommand{\chart}{\textsc{chart}\xspace}
+\newcommand{\odt}{\textsc{odt}\xspace}
+\newcommand{\company}{\textsc{company}\xspace}
+\newcommand{\contact}{\textsc{contact}\xspace}
+\newcommand{\deal}{\textsc{affaire}\xspace}
+\newcommand{\List}{\textsc{list}\xspace}
+\newcommand{\calendar}{\textsc{calendar}\xspace}
+\newcommand{\agenda}{\textsc{agenda}\xspace}
+\newcommand{\cv}{\textsc{cv}\xspace}
+\newcommand{\todo}{\textsc{todo}\xspace}
+\newcommand{\publication}{\textsc{publication}\xspace}
+\newcommand{\timemanager}{\textsc{time manager}\xspace}
+\newcommand{\project}{\textsc{Projet}\xspace}
+\newcommand{\contract}{\textsc{contract}\xspace}
+\newcommand{\incident}{\textsc{incident}\xspace}
+\newcommand{\doc}{\textsc{document}\xspace}
+\newcommand{\account}{\textsc{account}\xspace}
+\newcommand{\invoice}{\textsc{invoice}\xspace}
+\newcommand{\payment}{\textsc{payment}\xspace}
+\newcommand{\user}{\textsc{user}\xspace}
+\newcommand{\group}{\textsc{group}\xspace}
+\newcommand{\resource}{\textsc{resource}\xspace}
+\newcommand{\host}{\textsc{host}\xspace}
+\newcommand{\mailshare}{\textsc{mailshare}\xspace}
+\newcommand{\mailbox}{\textsc{mailbox}\xspace}
+\newcommand{\settings}{\textsc{settings}\xspace}
+\newcommand{\adminref}{\textsc{admin\_ref}\xspace}
+\newcommand{\import}{\textsc{import}\xspace}
+\newcommand{\backup}{\textsc{sauvegarde}\xspace}
+\newcommand{\css}{\textsc{css}\xspace}
+\newcommand{\fonction}[1]{\textit{#1}\xspace}
+\newcommand{\fichier}[1]{\textbf{\textit{#1}}\xspace}
+\newcommand{\variable}[1]{\textbf{#1}\xspace}
+\newcommand{\db}[1]{\textbf{#1}\xspace}
+%
+% Modification des marges par defaut
+%
+\addtolength{\marginparwidth}{-1cm}
+\addtolength{\oddsidemargin}{-1cm}
+\addtolength{\evensidemargin}{-1cm}
+\addtolength{\textwidth}{2cm}
+\addtolength{\textheight}{2.0cm}
+%
+%
+%
+\pagestyle{fancy}
+\lhead[AliaSource]{AliaSource}
+%
+%
+%
+\author{AliaSource}
+%\date{}
+%
+% Debut du document
+%
+\begin{document}
+\frenchspacing 
+\selectlanguage{francais}
+\sloppy
+%
+%===   Page de garde ===
+%
+\pagestyle{empty}
+\begin{titlepage}
+\input{page_titre.tex}
+\end{titlepage}
+\pagestyle{fancy}
+%
+% === Table des matières ===
+%
+\clearpage
+\setcounter{tocdepth}{2}
+\tableofcontents
+%\setcounter{page}{0}
+%
+% === Corps du document ===
+%
+
+\clearpage
+\input{user/u_manuel.tex}
+\clearpage
+\input{technique/t_manuel.tex}
+
+\end{document}

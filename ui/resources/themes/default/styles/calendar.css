@@ -1,0 +1,1348 @@
+/*/////////////////////////////////////////////////////////////////////////////
+// OBM - File : agenda.css (standard)                                        //
+//     - Desc : CSS style file (standard theme) for Calendar module          //
+// 2003-09-01 Aliacom - Mehdi Rande                                          //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+/////////////////////////////////////////////////////////////////////////////*/
+
+/* ------------------------------------------------------------------------- */
+/* Calendar styles                                                           */
+/* ------------------------------------------------------------------------- */
+.waitingEventsContainer {
+  height: 200px;
+  overflow-x:hidden;
+  overflow-y:scroll;
+  border: 1px solid #CCC;
+}
+
+#calendarSelection legend {
+  color: #368397;
+}
+
+#calendarSelection .elementRow {
+  white-space: normal;
+}
+
+#calendarLayout {
+  -moz-user-select:none;
+  -webkit-user-select:none;
+}
+
+#calendarBody{
+  /* height necessary to display the full calendar (0 -> 24)
+  min-height: 1008px;*/
+  min-height: 330px;
+  overflow-y: none;
+}
+
+#calendarNavBar {
+  padding-left: 10px;
+  padding-top:4px;
+}
+
+#calendarNavBar span {
+  vertical-align:middle;
+}
+
+#calendarNavBar span.label {
+  font-weight:bold;
+  font-size:130%;
+}
+
+#calendarNavBar span.lnk {
+}
+
+#calendarNavBar input {
+  font-weight: normal;
+  font-size: 100%;
+  padding: 0;
+}
+
+#calendarNavBar a {
+  /* font-size: 90%; */
+}
+
+.dayColLabel {
+  border-bottom:1px solid #CCC;
+  position:absolute;
+  text-align:center;
+  background:#EFF0F2;
+  height: 100%;
+  vertical-align:middle;
+}
+
+.dayLabel {
+  text-align:center;
+  background:#EFF0F2;
+}
+
+.dayCol {
+  border-left:1px solid #AAA;
+  position:absolute;
+  height:100%;
+}
+
+.selection {
+  background-color: #4692a9!important;
+}
+
+.alldayContainer {
+  border-left:1px solid #AAA;
+  border-top:1px solid #AAA;
+  border-bottom:1px solid #AAA;
+  position:absolute;
+}
+
+.downlight {
+  background: #F0F0F0;
+}
+
+.alldayCell {
+  width:100%;
+  position: relative;
+}
+
+.dayMonthLabel {
+  background: #DDD;
+  text-align: right;
+  padding-right: 4px;
+}
+
+.hourPanel {
+  width: 4.5em;
+}
+
+.hourLabel {
+  font-weight:bold;
+  font-size: 150%;
+  padding-right: 8px;
+}
+
+.minuteLabel {
+  vertical-align:top;
+}
+
+
+.hourFull {
+  border-top:1px solid #CCC;
+  text-align:right;
+}
+
+.hourPartial {
+  border-top:1px dotted #CCC;
+  text-align:right;
+}
+
+.todayLabel {
+  background-color:#97C5D3;
+}
+
+.todayLabel a {
+  color:#FFF;
+  font-weight:bold;
+}
+
+#today {
+  background:#FFFFCC;
+  height:100%;
+  position:absolute;
+}
+
+#todayHourMarker {
+  border-top:2px solid red;
+  position:absolute;
+  opacity:0.4;
+  z-index:1000;
+}
+
+#hourMarker {
+  position:absolute;
+  opacity:0.4;
+  z-index:1000;
+  left: -3em;
+  background-image: url(../images/hour_marker.gif);
+}
+
+#calendarHeader {
+  margin-bottom:8px;
+  padding-right:16px;
+  position:relative;
+}
+
+#calendarGridContainer {
+  position:relative;
+}
+
+#calendarBody {
+  border:1px solid #AAA;
+  overflow-y:scroll;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* VERY COMPLEX CALENDAR HACK FOR IE, I'LL BE FURIOUS IF SOMEONE TOUCH IT ! */
+/* BEGIN ie 6, ie 7 HACK FOR CALENDAR */
+#calendarToolbar {
+  /margin-right: -1px;
+}
+#calendarLayout {
+  /padding-right: 18px;
+}
+#calendarHeader {
+  /margin-right: -1px;
+  /padding-right: 0px;
+}
+#calendarBody {
+  /width: 100%;
+  /padding-right: 17px;
+  /margin-right: -18px;
+}
+/* END ie 6, ie 7 HACK FOR CALENDAR */
+
+.calendarTable {
+  width:100%;
+  border-collapse:collapse;
+  background:#FFF;
+  table-layout:fixed;
+}
+
+#calendarHeaderGrid {
+  height: 20px;
+  position:relative;
+}
+
+#calendarGrid {
+  position:relative;
+}
+
+.calTip {
+  z-index: 100;
+  cursor:pointer;
+}
+
+.calTip a {
+  color:inherit;
+}
+
+.calTip h1 {
+  font-size: 100%;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  padding-bottom: 4px;
+  white-space: nowrap;
+  color: #636466;
+}
+
+.calTip .tip {
+  background: #FFF;
+  border: 2px solid orange;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
+  margin: 0;
+  padding: 8px;
+}
+
+.moreEvent {
+  padding: 0 0 1px 5px ;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.calendarDayOver {
+  background: #c3d9ff;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Events styles */
+/* ------------------------------------------------------------------------- */
+
+.event {
+  position: absolute;
+  z-index:10;
+  overflow:hidden;
+}
+
+.printableCalendar .printableEvent {
+  height:auto !important;
+  height:100%; 
+  min-height:100%; 
+}
+
+.event h1, .printableEvent h1 {
+  font-size: 90%;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.event h1.allDay {
+  text-align:left;
+  padding-left: 2px;
+  background: none;
+  display: inline;
+}
+
+.event h1 a, .printableEvent h1 a  {
+  color: #fff;
+}
+
+.event h1 a:visited {
+  color: #fff;
+}
+
+.event img {
+  margin-right: 1px;
+}
+
+.event .handle {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  cursor: s-resize;
+  width: 100%;
+  height: 4px;
+  line-height: 4px;
+  font-size: 4px;
+  background-image: url(../images/ico_handle.gif);
+  background-repeat : no-repeat;
+  background-position: center center;
+}
+
+.event dl {
+  margin: 0;
+  height: 100%;
+  overflow:hidden;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.event dl.allDay {
+  margin: 0;
+  height: auto;
+  overflow:hidden;
+}
+
+.event dl.transparent {
+  background-image: url('../images/hatch.gif');
+  background-repeat: repeat-y;
+}
+
+.event dt.transparent h1 {
+  background-image: url('../images/hatch.gif');
+  background-repeat: repeat-y;
+}
+
+.event dt {
+  white-space: nowrap;
+}
+
+.event dd {
+  margin: 0;
+  margin-left: 2px;
+}
+
+.event dd.transparent {
+  margin: 0;
+  margin-left: 10px;
+}
+
+.event dt.alldayTransparent {
+  background-image: url('../images/hatch.gif');
+  background-repeat: repeat-y;
+  margin: 0;
+}
+
+.event dt.alldayTransparent h1 {
+  margin: 0;
+  margin: 8px;
+}
+
+.event span {
+  height:100%;
+}
+
+.eventOwner {
+  color: #fff;
+  background-color: rgb(102, 140, 217);
+  border: 1px solid rgb(41, 82, 163);
+  /*background: -webkit-gradient(linear, left top, right bottom, from(rgb(102, 140, 217)), to(rgb(166, 188, 232)));*/
+}
+.eventOwner h1, li.eventOwner, .eventOwner .handle {
+  background-color: rgb(41, 82, 163);
+  border-top: rgb(102, 140, 217);
+  border-bottom: rgb(102, 140, 217);
+}
+li.eventOwnerLegend {
+  background-color: rgb(102, 140, 217);
+  color: #FFF;
+}
+
+.eventOwner0 {
+  color: #fff;
+  background-color: rgb(216, 102, 102);
+  border: 1px solid rgb(163, 41, 41);
+}
+.eventOwner0 h1, li.eventOwner0, .eventOwner0 .handle {
+  background-color: rgb(163, 41, 41);
+  border-top: rgb(216, 102, 102);
+  border-bottom: rgb(216, 102, 102);
+}
+li.eventOwner0Legend {
+  background-color: rgb(216, 102, 102);
+  color: #FFF;
+}
+
+.eventOwner1 {
+  color: #fff;
+  background-color: rgb(140, 102, 217);
+  border: 1px solid rgb(82, 41, 163);
+}
+.eventOwner1 h1, li.eventOwner1, .eventOwner1 .handle {
+  background-color: rgb(82, 41, 163);
+  border-top: rgb(140, 102, 217);
+  border-bottom: rgb(140, 102, 217);
+}
+li.eventOwner1Legend {
+  background-color: rgb(140, 102, 217);
+  color: #FFF;
+}
+
+.eventOwner2 {
+  color: #fff;
+  background-color: rgb(101, 173, 137);
+  border: 1px solid rgb(40, 117, 78)
+}
+.eventOwner2 h1, li.eventOwner2, .eventOwner2 .handle {
+  background-color: rgb(40, 117, 78);
+  border-top: rgb(101, 173, 137);
+  border-bottom: rgb(101, 173, 137);
+}
+li.eventOwner2Legend {
+  background-color: rgb(101, 173, 137);
+  color: #FFF;
+}
+
+.eventOwner3 {
+  color: #fff;
+  background-color: rgb(191, 191, 77);
+  border: 1px solid rgb(136, 136, 14);
+}
+.eventOwner3 h1, li.eventOwner3, .eventOwner3 .handle {
+  background-color: rgb(136, 136, 14);
+  border-top: rgb(191, 191, 77);
+  border-bottom: rgb(191, 191, 77);
+}
+li.eventOwner3Legend {
+  background-color: rgb(191, 191, 77);
+  color: #FFF;
+}
+
+.eventOwner4 {
+  color: #fff;
+  background-color: rgb(230, 128, 77);
+  border: 1px solid rgb(177, 68, 14);
+}
+.eventOwner4 h1, li.eventOwner4, .eventOwner4 .handle {
+  background-color: rgb(177, 68, 14);
+  border-top: rgb(230, 128, 77);
+  border-bottom: rgb(230, 128, 77);
+}
+li.eventOwner4Legend {
+  background-color: rgb(230, 128, 77);
+  color: #FFF;
+}
+
+.eventOwner5 {
+  color: #fff;
+  background-color: rgb(137, 151, 165);
+  border: 1px solid rgb(78, 93, 108);
+}
+.eventOwner5 h1, li.eventOwner5, .eventOwner5 .handle {
+  background-color: rgb(78, 93, 108);
+  border-top: rgb(137, 151, 165);
+  border-bottom: rgb(137, 151, 165);
+}
+li.eventOwner5Legend {
+  background-color: rgb(137, 151, 165);
+  color: #FFF;
+}
+
+.eventOwner6 {
+  color: #fff;
+  background-color: rgb(167, 167, 125);
+  border: 1px solid rgb(110, 110, 65);
+}
+.eventOwner6 h1, li.eventOwner6, .eventOwner6 .handle {
+  background-color: rgb(110, 110, 65);
+  border-top: rgb(167, 167, 125);
+  border-bottom: rgb(167, 167, 125);
+}
+li.eventOwner6Legend {
+  background-color: rgb(167, 167, 125);
+  color: #FFF;
+}
+
+.eventOwner7 {
+  color: #fff;
+  background-color: rgb(230, 115, 153);
+  border: 1px solid rgb(177, 54, 95);
+}
+.eventOwner7 h1, li.eventOwner7, .eventOwner7 .handle {
+  background-color: rgb(177, 54, 95);
+  border-top: rgb(177, 54, 95);
+  border-bottom: rgb(177, 54, 95);
+}
+li.eventOwner7Legend {
+  background-color: rgb(230, 115, 153);
+  color: #FFF;
+}
+
+.eventOwner8 {
+  color: #fff;
+  background-color: rgb(102, 140, 179);
+  border: 1px solid rgb(41, 82, 122);
+}
+.eventOwner8 h1, li.eventOwner8, .eventOwner8 .handle {
+  background-color: rgb(41, 82, 122);
+  border-top: rgb(102, 140, 179);
+  border-bottom: rgb(102, 140, 179);
+}
+li.eventOwner8Legend {
+  background-color: rgb(102, 140, 179);
+  color: #FFF;
+}
+
+.eventOwner9 {
+  color: #fff;
+  background-color: rgb(76, 176, 82);
+  border: 1px solid rgb(13, 120, 19);
+}
+.eventOwner9 h1, li.eventOwner9, .eventOwner9 .handle {
+  background-color: rgb(13, 120, 19);
+  border-top: rgb(76, 176, 82);
+  border-bottom: rgb(76, 176, 82);
+}
+li.eventOwner9Legend {
+  background-color: rgb(76, 176, 82);
+  color: #FFF;
+}
+
+.eventOwner10 {
+  color: #fff;
+  background-color: rgb(224, 194, 64);
+  border: 1px solid rgb(171, 139, 0);
+}
+.eventOwner10 h1, li.eventOwner10, .eventOwner10 .handle {
+  background-color: rgb(171, 139, 0);
+  border-top: rgb(224, 194, 64);
+  border-bottom: rgb(224, 194, 64);
+}
+li.eventOwner10Legend {
+  background-color: rgb(224, 194, 64);
+  color: #FFF;
+}
+
+.eventOwner11 {
+  color: #fff;
+  background-color: rgb(190, 148, 148);
+  border: 1px solid rgb(134, 90, 90);
+}
+.eventOwner11 h1, li.eventOwner11, .eventOwner11 .handle {
+  background-color: rgb(134, 90, 90);
+  border-top: rgb(190, 148, 148);
+  border-bottom: rgb(190, 148, 148);
+}
+li.eventOwner11Legend {
+  background-color: rgb(190, 148, 148);
+  color: #FFF;
+}
+
+.eventOwner12 {
+  color: #fff;
+  background-color: rgb(148, 162, 190);
+  border: 1px solid rgb(90, 105, 134);
+}
+.eventOwner12 h1, li.eventOwner12, .eventOwner12 .handle {
+  background-color: rgb(90, 105, 134);
+  border-top: rgb(148, 162, 190);
+  border-bottom: rgb(148, 162, 190);
+}
+li.eventOwner12Legend {
+  background-color: rgb(148, 162, 190);
+  color: #FFF;
+}
+
+.eventOwner13 {
+  color: #fff;
+  background-color: rgb(196, 168, 131);
+  border: 1px solid rgb(141, 111, 71);
+}
+.eventOwner13 h1, li.eventOwner13, .eventOwner13 .handle {
+  background-color: rgb(141, 111, 71);
+  border-top: rgb(196, 168, 131);
+  border-bottom: rgb(196, 168, 131);
+}
+li.eventOwner13Legend {
+  background-color: rgb(196, 168, 131);
+  color: #FFF;
+}
+
+.eventOwner14 {
+  color: #fff;
+  background-color: rgb(179, 115, 179);
+  border: 1px solid rgb(122, 54, 122);
+}
+.eventOwner14 h1, li.eventOwner14, .eventOwner14 .handle {
+  background-color: rgb(122, 54, 122);
+  border-top: rgb(163, 41, 41);
+  border-bottom: rgb(163, 41, 41);
+}
+li.eventOwner14Legend {
+  background-color: rgb(179, 115, 179);
+  color: #FFF;
+}
+
+.eventOwner15 {
+  color: #fff;
+  background-color: rgb(89, 191, 179);
+  border: 1px solid rgb(27, 136, 122);
+}
+.eventOwner15 h1, li.eventOwner15, .eventOwner15 .handle {
+  background-color: rgb(27, 136, 122);
+  border-top: rgb(89, 191, 179);
+  border-bottom: rgb(89, 191, 179);
+}
+li.eventOwner15Legend {
+  background-color: rgb(89, 191, 179);
+  color: #FFF;
+}
+
+.eventOwner16 {
+  color: #fff;
+  background-color: rgb(140, 191, 64);
+  border: 1px solid rgb(82, 136, 0);
+}
+.eventOwner16 h1, li.eventOwner16, .eventOwner16 .handle {
+  background-color: rgb(82, 136, 0);
+  border-top: rgb(140, 191, 64);
+  border-bottom: rgb(140, 191, 64);
+}
+li.eventOwner16Legend {
+  background-color: rgb(140, 191, 64);
+  color: #FFF;
+}
+
+.eventOwner17 {
+  color: #fff;
+  background-color: rgb(242, 166, 64);
+  border: 1px solid rgb(190, 109, 0);
+}
+.eventOwner17 h1, li.eventOwner17, .eventOwner17 .handle {
+  background-color: rgb(190, 109, 0);
+  border-top: rgb(242, 166, 64);
+  border-bottom: rgb(242, 166, 64);
+}
+li.eventOwner17Legend {
+  background-color: rgb(242, 166, 64);
+  color: #FFF;
+}
+
+.eventOwner18 {
+  color: #fff;
+  background-color: rgb(169, 146, 169);
+  border: 1px solid rgb(112, 87, 112); 
+}
+.eventOwner18 h1, li.eventOwner18, .eventOwner18 .handle {
+  background-color: rgb(112, 87, 112);
+  border-top: rgb(169, 146, 169);
+  border-bottom: rgb(169, 146, 169);
+}
+li.eventOwner18Legend {
+  background-color: rgb(169, 146, 169);
+  color: #FFF;
+}
+
+.eventOwner19 {
+  color: #fff;
+  background-color: rgb(133, 170, 165);
+  border: 1px solid rgb(74, 113, 108);
+}
+.eventOwner19 h1, li.eventOwner19, .eventOwner19 .handle {
+  background-color: rgb(74, 113, 108);
+  border-top: rgb(133, 170, 165);
+  border-bottom: rgb(133, 170, 165);
+}
+li.eventOwner19Legend {
+  background-color: rgb(133, 170, 165);
+  color: #FFF;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Calendar Quick Form */
+/* ------------------------------------------------------------------------- */
+#calendarQuickForm form  {
+  text-align: left;
+  margin-bottom: 0;
+}
+
+#calendarQuickForm h2 {
+  font-weight: bold;
+  font-size: 100%;  
+  margin: 0;
+}
+
+#calendarQuickForm h4 {
+  font-weight: bold;
+  font-size: 100%; 
+  margin: 3px;
+}
+
+#calendarQuickForm ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#calendarQuickForm img {
+  margin-top: -2px;
+}
+
+#calendarQuickForm fieldset {
+  border: 0;
+  text-align: center;
+}
+
+#calendarQuickForm fieldset input{
+  width: 18em;
+}
+
+#calendarQuickForm .buttons input{
+  width: auto;
+  margin: 0 0.5em;
+}
+
+#calendarQuickForm select  {
+  width: 100%;
+}
+
+#calendarQuickForm option  {
+  width: 275px;
+  overflow: auto;
+  word-wrap: break-word;
+}
+
+#calendarQuickForm table {
+  width: 80%;
+}
+
+#calendarQuickForm table th {
+  text-align: right;
+  padding-right: 10px;
+}
+
+#calendarQuickFormData {
+  margin:0;
+  padding: 0 0 5px 0;
+  height: 6em;
+  padding-bottom: 10px;
+  width: auto;
+}
+
+#calendarQuickFormData div {
+  background-color: #fff;
+  margin: 0 5px 5px 5px;
+  padding: 0px 3px;
+  border-left: 1px solid #358399;
+  border-right: 1px solid #358399;
+  border-bottom: 1px solid #358399;
+}
+
+/* OBM 2.2 FreeBusy */
+
+.freeBusyContent {
+  padding: 0;
+}
+
+.freeBusyContent h2 {
+  text-align:left;
+  margin-left:16em;
+}
+
+.freeBusyForm {
+  margin-left: 16em;
+  padding: 5px 0px 5px 0px;
+}
+
+.freeBusyCalendar {
+  margin-right: 2em;
+  position: relative;
+}
+
+#calendarFreeBusyScroll {
+  overflow-x:scroll;
+  overflow-y:hidden;
+  background: #FFF;
+  padding: 0;
+  margin-left: 1em;
+  position: relative;
+}
+
+#scrollLeft {
+  position: absolute;
+  text-align: center;
+  width:1em;
+  cursor: pointer;
+  background:	#35839A;
+  color:#FFF;
+  text-align: center;
+  height: 100%;
+}
+
+#scrollRight {
+  position: absolute;
+  text-align: center;
+  width: 1em;
+  right: -1em;
+  cursor: pointer;
+  background:	#35839A;
+  color:#FFF;
+  text-align: center;
+  height: 100%;
+  top: 0;
+}
+
+.freeBusyCalendar table {
+  border-spacing:0;
+  border-collapse:collapse;
+  background:#FFF;
+}
+
+.freeBusyCalendar tr {
+  height: 1.5em;
+}
+
+.freeBusyCalendarColDay {
+  border-right: 1px solid black;
+}
+
+.freeBusyCalendarDay {
+  text-align:left;
+  font-weight: bold;
+  padding-left: 1em;
+}
+
+.freeBusyCalendarHour {
+  padding-left: 1px;
+}
+
+.freeBusyCalendarHourDisplayed {
+  border-left: 1px solid #666;
+}
+
+.freeBusyEntities {
+  width: 15em;
+  position: absolute;
+  padding: 5px 0px 0px 5px;
+}
+
+.freeBusyEntities table {
+  border-spacing:0;
+  border-collapse:collapse;
+  width: 15em;
+}
+
+.freeBusyEntities tr {
+  height: 1.5em;
+}
+
+.freeBusyEntities .elementRow {
+  height: 1.4em;
+  border-bottom: 0.1em dotted #666;
+}
+
+.freeBusyEntities .allAttendees{
+  text-align: center;
+  font-weight: bold;
+}
+
+.freeBusyEntities input {
+  font-size: 90%;
+}
+
+.timeSlot {
+  border: 1px dotted #666;
+  margin: 0;
+  padding: 0;
+  height: 1.4em;
+}
+
+.timeSlotNoCalendar {
+  border: 1px dotted #666;
+  margin: 0;
+  padding: 0;
+  background: #CCC;
+  background-image: url('../images/hatch.gif');
+  height: 1.4em;
+}
+
+.haveEvent {
+  height: 0.5em;
+  background:#990000;
+
+}
+
+.haveEventAll {
+  height: 0.5em;
+  background:#000099;
+}
+
+.meeting {
+  background: #80A9B7;
+  cursor: move;
+  height: 100%;
+}
+
+.meetingBusy {
+  background: #F00;
+} 
+
+.meetingResize {
+  cursor: col-resize;
+  background: #000; /*#35839A;*/
+  width: 3px;
+  height: 100%;
+}
+
+.freeBusyButtons {
+  margin-top: 1em;
+  margin-left:16em;
+}
+
+input[type="submit"][disabled] {
+  background:#666;
+  color: #CCC;
+}
+
+#calendarToolbar {
+}
+
+.share td{
+  margin-left: 0.83em;
+  text-align : center;
+}
+
+.share th{
+  margin-left: 0.83em;
+  width : 23%;
+}
+
+.share a{
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
+.share div {
+  text-align : left;
+  font-size : 80%;
+  font-weight : normal;
+}
+
+.SharePopup h2{
+  font-weight: bold; 
+  text-align: left;
+  margin-top: 0.83em;
+  margin-left: 0.83em;
+  margin-right: 0.83em;
+}
+
+.SharePopup div{
+  margin-top: 0.83em;
+  margin-left: 0.83em;
+  margin-bottom: 0.83em;
+  margin-right: 0.83em;
+  overflow: hidden;
+}
+
+.sendPopup {
+  border:0 none;
+  clear:left;
+  padding-top:1em;
+  text-align:center;
+  padding-left:1em;
+  padding-right:1em;
+}
+
+.sendPopup h2{
+  font-weight: bold; 
+  text-align: left;
+  margin-top: 0.83em;
+  margin-left: 0.83em;
+  max-width : 60em;
+}
+
+.sendPopup input.downlight{
+  background: #F0F0F0;
+}
+
+.sendPopup div.downlight{
+  background: #F0F0F0;
+}
+
+.sendPopup input[type="submit"]{
+  background-color:#509CBC;
+  color:#FFFFFF;
+  font-weight:bold;
+  margin:0 3%;
+}
+
+.shareTip{
+  width :20em;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Extended color picker */
+/* ------------------------------------------------------------------------- */
+div.extColorPickerWrapper {
+  width: 20em;
+  margin: auto;
+}
+
+.extColorPickerWrapper input {
+  float: left;
+  width: 15em;
+}
+
+div.extColorPicker {
+  float: left;
+  border: 1px solid #d2d2d2 ;
+  width: 30px ;
+  height:  16px ;
+  line-height: 16px ;
+  text-align: left;
+}
+
+div.extColorPicker div {
+  float: left;
+  height: 14px ;  
+  width: 14px ;
+  line-height: 100%;
+  margin: 1px ; 
+}
+
+div.extColorPicker img {
+  margin-top: 5px;
+  vertical-align: top;
+  float: left;
+}
+
+div#tag_wrapper {
+  width: 95%;
+}
+
+div#tag_wrapper input {
+  width: 70%;
+	float: left;
+}
+
+div#tag_wrapper div {
+  width: 10% ;
+	float: left;
+	border: 1px solid #d2d2d2;
+}
+
+div.colorHint {
+  width: 14px ;
+	height: 14px ;
+	line-height: 14px;
+	float: right ;
+	margin: 2px;
+}
+
+#display_tag_color {
+  background-color: #EFF0F2 ;
+}
+
+.tagLegend {
+  color: #FFF;
+  padding-left: 3px;
+}
+
+.needsAction {
+  color: #808080;
+}
+
+
+
+
+
+.infoPopup {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  width: 20em;
+}
+
+.infoPopup h1{
+  margin: 0;
+  background-color: #d1d2d4;
+  font-weight: bold;
+  font-size: 100%;
+  background-image: url('../images/popup_title_border.png');
+  background-repeat: repeat-x;
+  background-position: 0 0.5em; 
+}
+
+.infoPopup h2{
+  background-color: #ebebeb;
+  font-weight: bold;
+  border-left: 1px solid #b3b3b3;
+  border-right: 1px solid #b3b3b3;
+  font-size: 100%;  
+  margin: 0;
+}
+
+.infoPopup ul{
+  margin: 0;
+  padding:0;
+  list-style: none;
+}
+
+.infoPopup li{
+  padding-left: 1.5em;
+}
+/* Planning list view */
+.eventList td {
+  vertical-align: top;
+}
+
+.eventDetail {
+  margin-left: 4em;
+  margin-bottom: 1em;
+  padding-left: 1em;
+  border-left: 4px solid #B3B3B3;
+}
+
+.eventDetail table {
+  border-spacing:0;
+}
+
+.eventDetail tbody th {
+  border-bottom: 1px solid #B3B3B3;
+  border-right: none;
+  border-top: none;
+  border-left: none;
+  background-color: transparent;
+}
+
+.eventDetail tbody td {
+  border-bottom: 1px solid #B3B3B3;
+  border-right: none;
+  border-left: none;
+  text-align: left;
+}
+
+table.planning td {
+  vertical-align: top;
+  padding: 0;
+  font-size: 120%;
+}
+
+table.planning tbody th {
+  text-align: left;
+}
+
+table.planning ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+table.planning li {
+  padding: 4px;
+  margin: 2px;
+  font-size: 11px;
+  height: 4em;
+}
+
+table.planning a {
+  color: #FFFFFF;
+}
+
+table.planningRessource a {
+  color: #636466;
+}
+
+table.planningRessource th {
+  background-color:#EEEEEE;
+}
+
+table.planningRessource td {
+  vertical-align: top;
+  padding: 0;
+  font-size: 90%;
+}
+
+table.planningRessource ul {
+  padding: 0;
+  padding-left: 4px;
+  margin: 0;
+  list-style: none;
+}
+
+table.planningRessource li {
+  padding: 0;
+  margin: 0;
+}
+
+table.planningRessource thead div {
+  clip: rect(auto,auto,auto,auto);
+  overflow: hidden;
+}
+
+tbody td.asEvent{
+  background-color:#DBDBDB;
+  border-bottom:none;
+}
+
+h1.hoursTitle{
+  margin:0;
+  font-size: 90%;
+  font-weight: bold;
+  padding: 2px;
+  color:white;
+  width:40%;
+}
+
+
+/* PORTLETS */
+
+.calendarPortlet {
+  border: 1px solid #666;
+}
+.calendarPortlet table {
+  font-size: 100%;
+}
+
+.tab {
+  border-bottom:1px solid #666;
+  padding-top: 2px;
+}
+
+.tab label {
+  padding-left: 4px;
+  padding-right: 4px;
+  border: 1px solid #666;
+  font-weight: bold;
+  cursor: pointer;
+  -moz-border-radius: 4px 4px 0px 0px;
+  -webkit-border-radius: 4px 4px 0px 0px;
+  border-radius: 4px 4px 0px 0px;
+}
+
+.tabSelected {
+  background: #4692a9;
+}
+
+.tab .tabSelected a{
+   color: #FFF;
+}
+
+/* mini calendar */
+.miniCalendar2 {
+  background-color: #fff;
+  text-align: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right:	auto;
+  border-collapse: collapse;	
+  border-spacing: 0;  
+  color: #636466;
+  color:#4692a9;
+  -moz-user-select:none;
+  -webkit-user-select:none;
+  table-layout:fixed;
+}
+
+.miniCalendar2 thead{
+  background-color:#d2d2d2;
+  color: #666; 
+  font-weight: bold;
+}
+
+.miniCalendar2 .labels{
+  background-color:#d2d2d2;
+  border-bottom: 1px solid #aaa;
+  color: #666;      
+}
+
+.miniCalendar2 tbody {
+  cursor:pointer;
+}
+
+.miniCalendar2 tbody td.hover {
+  background-color: #4692a9!important;
+  color:white!important;
+}
+
+.miniCalendar2 tbody td.weekend {
+  background:#EEE;
+}
+
+.miniCalendar2 tbody td.down {
+  color:#888;
+}
+
+.miniCalendar2 tbody td.today {
+  color:#FFF;
+  background:#97C5D3!important;
+  font-weight:bold;
+}
+
+.miniCalendar2 tbody td.selected {
+  background-color:#4692a9;
+  color:white;
+}
+
+.miniCal {
+  width: 15em;
+  margin: 0;
+  margin-bottom: 2px;
+  border: 1px solid #b3b3b3;
+  overflow: hidden;
+}
+
+.miniCal h1 {
+  font-weight: bold;
+  color: #646567;
+  background-color: #d2d2d2;
+  font-size:100%;
+  text-align: center;
+  margin:0;
+  padding: 2px 4px 0 4px;
+  border-top: 1px solid #fff;
+}
+
+#backToCalendar {
+  padding-top: 4px;
+  padding-left: 10px;
+}
+
+.rights {
+  table-layout:fixed;
+}
+
+.rights ul {
+  margin: 0;
+  padding-left:5px;
+  list-style: none;
+}
+
+.rights a {
+  font-weight:bold;
+}

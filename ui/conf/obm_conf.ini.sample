@@ -1,0 +1,145 @@
+; OBM system configuration file
+; Copy it to obm_conf.ini (without ".sample")
+; Set here Common global parameteres
+; 
+; Parameters are set like : key = value
+; Comments are lines beginning with ";"
+; OBM Automate need the [global] for the perl section (beware : php is permissive)
+;
+[global]
+; General information
+title = OBM
+;
+; example : for https://extranet.aliasource.fr/obm/ 
+; external-url = extranet.aliasource.fr
+; external-protocol = https
+; obm-prefix = /obm/
+external-url = obm
+external-protocol = http
+obm-prefix = /
+
+; Synchronize global OBM address book
+globalAddressBookSync = true
+
+
+; Database infos
+host = localhost
+; dbtype = PGSQL
+dbtype = MYSQL
+db = obm
+user = obm
+; Password must be enclosed with "
+password = "aliasource"
+
+; Default language
+lang = fr
+
+; Enabled OBM module
+obm-ldap = true
+obm-mail = true
+obm-samba = false
+obm-web = false
+obm-contact = false
+
+; singleNameSpace mode is anaivalable from OBM 2.3
+; Read /'etc/imapd.conf' and '/etc/saslauthd.conf' file for migration instructions
+
+; backupRoot is the directory used to store backup data
+backupRoot = "/var/lib/obm/backup"
+
+; documentRoot is root of document repository
+documentRoot="/var/lib/obm/documents"
+documentDefaultPath="/"
+
+; LDAP Authentification for obm-sync & ui
+; ldap authentication server (specify :port if different than default)
+;auth-ldap-server = ldap://localhost
+; base dn for search (search are performed with scope sub, of not specified, use the server default)
+;auth-ldap-basedn = "dc=local"
+; filter used for the search part of the authentication
+; See http://www.faqs.org/rfcs/rfc2254.html for filter syntax
+;  - %u will be replace with user login
+;  - %d will be replace with user OBM domain name
+; ie: toto@domain.foo : %u=toto, %d=domain.foo
+; auth-ldap-filter = "(&(uid=%u)(obmDomain=%d))"
+;auth-ldap-binddn = uid=uid=ldapadmin,ou=sysusers,dc=local
+;auth-ldap-bindpw = "mdp3PaAL"
+
+[automate]
+; Automate specific parameters
+;
+; Log level
+logLevel = 3
+;
+; LDAP server address
+ldapServer = ldap://localhost
+;
+; LDAP use TLS [none|may|encrypt]
+ldapTls = may
+;
+; LDAP Root
+; Exemple : 'aliasource,local' means that the root DN is: 'dc=aliasource,dc=local' 
+ldapRoot = local
+
+; Enable Cyrus partition support
+; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain
+; Going cyrusPartition enabled from cyrusPartition disabled needs system work
+cyrusPartition = true
+;
+; ldapAllMainMailAddress :
+;    false : publish user mail address only if mail right is enable - default
+;    true : publish main user mail address, even if mail right is disable
+ldapAllMainMailAddress = false
+;
+; userMailboxDefaultFolders are IMAP folders who are automaticaly created
+; at user creation ( must be enclosed with " and in IMAP UTF-7 modified encoding)
+; Small convertion table
+; é -> &AOk-
+; è -> &AOg-
+; à -> &AOA-
+; & -> &
+; Example : userMailboxDefaultFolders = "Envoy&AOk-s,Corbeille,Brouillons,El&AOk-ments ind&AOk-sirables"
+userMailboxDefaultFolders = 'Trash,Drafts,SPAM,Templates,Sent'
+;
+; shareMailboxDefaultFolders are IMAP folders who are automaticaly created
+; at share creation ( must be enclosed with " and in IMAP UTF-7 modified
+; encoding)
+shareMailboxDefaultFolders = ''
+;
+; oldSidMapping mode is for compatibility with Aliamin and old install
+; Modifying this on a running system need Samba domain work (re-register host,
+; ACL...) 
+; For new one, leave this to 'false'
+oldSidMapping = false
+;
+;
+; Settings use by OBM Thunderbird autoconf
+[autoconf]
+;
+ldapHost = 127.0.0.1
+ldapPort = 389
+ldapSearchBase = "dc=local"
+ldapAtts = cn,mail,mailAlias,mailBox,obmDomain,uid
+ldapFilter = "uid"
+;
+;
+[obm-sync]
+;Specials accounts for obm-sync : authentication with no password check
+;rootAccounts : create/modify/delete events in any calendar
+;appliAccounts : create/modify/delete events as appli user
+;anyUserAccounts : create/modify/delete events as user specified
+;
+;login@domain|ip,login@domain|ip,...
+rootAccounts=
+;
+;login@domain|ip,login@domain|ip,...
+appliAccounts=
+;
+;ip,ip,...
+anyUserAccounts=
+;
+;
+;LemonLDAP authentication with no password check
+; ip,ip,...
+lemonLdapIps=
+; EOF

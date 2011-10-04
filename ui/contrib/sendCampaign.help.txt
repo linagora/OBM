@@ -1,0 +1,44 @@
+Utilisation du daemon sendCampaign.pl
+daemon d'envoie de mails du module campaign d'OBM
+
+===============================================================================
+INSTALLATION
+============
+
+Quelques paquets à installer sous debian :
+tofrodos                       pour la commande fromdos
+libproc-pid-file-perl          dépendance sur la lib perl Proc::PID::File
+libproc-daemon-perl            dépendance sur la lib perl Proc::Daemon
+
+Ajout de quelques parametres dans le fichier /etc/obm/obm_conf.ini :
+;Campaign daemon
+[campaign]
+;email addr to sent reports
+reportAddr=admin@mondomaine.fr
+;from addr
+bounceAddr=no-reply@mondomaine.fr
+;max bandwidth allowed (in kbps)
+maxBandwidthAverage=512
+
+===============================================================================
+UTILISATION
+===========
+
+Lancer le daemon avec la commande :
+path/to/daemon/sendCampaign.pl --daemon
+
+Le daemon regarde la présence de nouvelle campagne débutant à la date du jour
+toutes les 10 minutes et dont le status est planifié ( créeé + date de début et
+date de fin renseignée + associée à une liste).
+Pour chaque nouvelle campagne, il importe la liste la liste des adresses mails,
+puis positionne la campagne en "En cours";
+
+Un sous-processus se charge de l'expedition des mails pour les campagnes
+"En cours". Ce sous-processus étale l'envoie des mails en fonction de la taille
+du message et de la bande passante allouée dans le fichier obm_conf.ini
+(parametre maxBandwidthAverage).
+
+Pour arreter le daemon, c'est encore plus simple :
+killall sendCampaign.pl
+
+===============================================================================

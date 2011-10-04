@@ -1,0 +1,58 @@
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File  : OBM-LANG-HOWTO                                              //
+//     - Desc  : How to build and use multiple languages in OBM              //
+// 1999-08-22 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+
+OBM supports Internationalization by including externals lang files.
+OBM doesn't deal with character sets but I think this is a browser issue.
+
+Like for themes, adding a new language in OBM is fairly simple
+
+- Create a directory named by your lang name in the directory php/lang
+It is important to respect the lang definitions (ex: it for Italy...)
+
+$ cd php/lang
+$ mkdir newlang
+
+
+- Cd to this new directory and copy all the files found in php/lang/en here.
+
+$ cd newlang
+$ cp ../en/* .
+
+
+- Edit and modify the files you've just created.
+There is one file per section (company, contact, deal, settings) one header
+file, a file named check_date_js.inc and an image flag-lang.gif.
+
+* The image is displayed in the settings screen. It must be a flag of the
+country and it must be called flag-newlang.gif .
+
+* check_date_js.inc is a JavaScript function that check a date validity. It
+depends on the language because date depends on it (DD/MM/YYYY in french,
+MM/DD/YYYY in english plus the ISO format YYYY-MM-DD which is incorporated in
+each language).
+
+* Each others files are sets of lines like (where "l_" stands for label) :
+$l_contact_name = "Contact Name";
+$l_from_company = "From_company";
+
+Just replace the values found here by yours.
+And your are done.
+
+---
+Example : adding french support
+
+cd php/lang
+mkdir fr
+cd fr
+cp ../en/* .
+cp /mypath/my_image_is_a_french_flag ./flag-fr.gif 
+
+---
+emacs contact.inc
+
+$l_contact_name = "Nom Contact";      // replacing "Contact Name"
+...
+

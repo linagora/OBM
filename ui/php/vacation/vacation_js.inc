@@ -1,0 +1,16 @@
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : vacation_js.inc
+//     - Desc : Vacation javascript functions File
+// 2007-01-22 Pierre Baudracco
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
+
+require("$obminclude/javascript/check_js.inc");
+// activate/deactivate the message textarea
+$extra_js .= "
+function disable_message_editing(formz, cb) {
+   formz.ta_message.disabled = !cb.checked;
+}
+";

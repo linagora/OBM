@@ -1,0 +1,271 @@
+# This is the main slapd configuration file. See slapd.conf(5) for more
+# info on the configuration options.
+# Designed on Debian from OpenLDAP 2.3 or greater
+###################################################################
+#Variables for packaging Redhat,Debian
+# _PATH_SCHEMA_
+#Debian : /etc/ldap/schema
+#Redhat : /etc/openldap/schema 
+#
+#_PATH_PIDFILE_
+#Debian : /var/run/slapd 
+#Redhat : /var/run/openldap
+#
+##_PATH_ARGSFILE_
+#Debian : /var/run/slapd 
+#Redhat : /var/run/openldap
+#
+#_COMMENT_
+#Dedian Need modulepath and moduleload, whereas  Redhat no.
+#
+#
+###################################################################
+# Global Directives:
+
+# Features to permit
+#allow bind_v2
+
+# Schema and objectClass definitions
+include         _PATH_SCHEMA_/core.schema
+include         _PATH_SCHEMA_/cosine.schema
+include         _PATH_SCHEMA_/nis.schema
+include         _PATH_SCHEMA_/inetorgperson.schema
+include         _PATH_SCHEMA_/obm.schema
+include         _PATH_SCHEMA_/samba.schema
+
+# Where the pid file is put. The init.d script
+# will not stop the server if you change this.
+pidfile         _PATH_PIDFILE_/slapd.pid
+
+# List of arguments that were passed to the server
+argsfile        _PATH_ARGSFILE_/slapd.args
+
+# Read slapd.conf(5) for possible values
+loglevel        0
+
+# Where the dynamically loaded modules are stored
+_COMMENT_modulepath      /usr/lib/ldap
+_COMMENT_moduleload      back_bdb
+#module pour syncrepl en MASTER
+#moduleload      syncprov
+
+# The maximum number of entries that is returned for a search operation
+# You can put no limit for authenticated user - see below
+# Default 500
+sizelimit unlimited
+
+# The tool-threads parameter sets the actual amount of cpu's that is used
+# for indexing.
+_COMMENT_tool-threads 1
+
+## BEGIN TLS
+#TLSCACertificateFile /var/lib/obm-ca/cacert.pem
+#TLSCertificateFile /etc/obm/certs/obm_cert.pem
+#TLSCertificateKeyFile  /etc/obm/certs/obm_cert.pem
+## End TLS
+
+#
+# Default database
+defaultsearchbase "dc=local"
+
+#######################################################################
+# Specific Backend Directives for bdb:
+# Backend specific directives apply to this backend until another
+# 'backend' directive occurs
+backend        bdb
+
+#######################################################################
+# Specific Directives for database #1, of type bdb:
+# Database specific directives apply to this databasse until another
+# 'database' directive occurs
+database        bdb
+
+# The base of your directory in database #1
+suffix          "dc=local"
+_COMMENT_overlay         glue
+
+# rootdn directive for specifying a superuser on the database. This is needed
+# for syncrepl.
+rootdn          "uid=ldapadmin,ou=sysusers,dc=local"
+#PLEASE, change password, cf /usr/share/doc/obm-ldap/
+rootpw          {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
+
+# Where the database file are physically stored for database #1
+directory       "/var/lib/ldap"
+
+# BEGIN DBD file environment setings
+# Modify this options need to recover DB_CONFIG file and BDB file environment
+# which need to stop 'slapd' and recover BDB files(1) if done on hot LDAP database.
+# Else you can simply remove database files before starting 'slapd'.
+#
+# 1) to recover BDB file environment :
+#    Debian : db_recover -cev -h 'directory'
+#    RedHat : slap_db_recover -cev -h 'directory'
+
+# For the Debian package we use 2MB as default but be sure to update this
+# value if you have plenty of RAM
+dbconfig set_cachesize        0  2428800  0
+# Sven Hartge reported that he had to set this value incredibly high
+# to get slapd running at all. See http://bugs.debian.org/303057
+# for more information.
+dbconfig set_flags      DB_LOG_AUTOREMOVE
+dbconfig set_lg_bsize   1048576
+
+# Number of objects that can be locked at the same time.
+dbconfig set_lk_max_objects   2000
+# Number of locks (both requested and granted)
+dbconfig set_lk_max_locks     2000
+# Number of lockers
+dbconfig set_lk_max_lockers   2000
+# END DBD file environment setings
+
+
+# BEGIN DBD LDAP database tuning
+# Modify this options need 'slapd' restart
+
+# Sync BDB cache every 1024 Kb write or 30s
+checkpoint                    1024      30
+## Maintain n entries in cache memory - default 1000
+#cachesize                     1000
+## Free n cache entries when reach 'cachesize' - default 1
+#cachefree                     1
+## Maintain n DN entries in DN cache memory - default 2*'cachesize' - ideal as of
+## real DN database entries
+#dncachesize                   2000
+# END DBD LDAP database tuning
+
+
+# BEGIN index definition
+# Database Index
+index           default                 pres
+index           uidNumber,gidNumber     eq,pres
+index           loginShell              eq,pres
+index           objectClass             pres,eq
+# Mail
+index           mailBox                 eq
+index           mailAccess              eq
+index           mailBoxServer           eq
+index           mail,mailAlias          eq,pres,sub
+# Group
+index           member                  eq,pres
+index           memberUid               eq,pres
+# Without Samba
+index           cn,sn,uid               pres,sub,eq
+# With Samba
+#index           cn,sn,uid,displayName   pres,sub,eq
+#index           sambaSID                eq,pres
+#index           sambaPrimaryGroupSID    eq,pres
+#index           sambaSIDList            eq,pres
+#index           sambaDomainName         eq
+
+## Index pour SyncRepl MASTER
+#index           entryCSN,entryUUID      eq
+# BEGIN index definition
+#
+
+## Replication SyncRepl en MASTER
+#overlay syncprov
+#syncprov-checkpoint 100 10
+#syncprov-sessionlog 100
+
+# Save the time that the entry gets modified, for database #1
+lastmod         on
+
+# Where to store the replica logs for database #1
+#replogfile     /var/lib/ldap/replog
+
+
+# BEGIN Common ACLs
+# Allow obmSatellite athenticated requests without response limits
+limits dn.exact="uid=obmsatellite,ou=sysusers,dc=local" size=unlimited
+
+# ACL sample to limit access on entries in relation to 'hiddenUser'
+# attribute
+# This ACL can be tuned to get more flexibility (see 'man slapd.access')
+access to filter=(hiddenUser=TRUE)
+    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
+    by anonymous auth
+    by self write
+    by * none
+
+access to filter=(objectClass=obmHost) attrs=ftpPassword
+    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
+    by * none
+
+# The userPassword by default can be changed
+# by the entry owning it if they are authenticated.
+# Others should not be able to see it, except the
+# admin entry below
+access to dn.sub="ou=sysusers,dc=local" attrs=userPassword,shadowLastChange
+    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
+    by anonymous auth
+    by * none
+# END Common ACLs
+
+
+# BEGIN without SAMBA ACLs
+access to attrs=userPassword,shadowLastChange
+	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by anonymous auth
+    by self write
+    by * none
+
+
+# Ensure read access to the base for things like
+# supportedSASLMechanisms.  Without this you may
+# have problems with SASL not knowing what
+# mechanisms are available and the like.
+# Note that this is covered by the 'access to *'
+# ACL below too but if you change that as people
+# are wont to do you'll still need this if you
+# want SASL (and possible other things) to work 
+# happily.
+access to dn.base=""
+	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+	by * read
+
+# The admin dn has full write access, everyone else
+# can read everything.
+access to *
+	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by * read
+
+## For Netscape Roaming support, each user gets a roaming
+## profile for which they have write access to
+#access to dn=".*,ou=Roaming,o=morsnet"
+#    by dn="cn=admin,dc=aliacom,dc=local" write
+#    by dnattr=owner write
+# 
+# END without SAMBA ACLs
+
+
+## BEGIN with SAMBA ACLs
+## The userPassword by default can be changed
+## by the entry owning it if they are authenticated.
+## Others should not be able to see it, except the
+## admin entry below
+#access to attrs=userPassword,shadowLastChange
+#    by anonymous auth
+#    by self write
+#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+#    by dn="uid=samba,ou=sysusers,dc=local" write
+#    by * none
+#
+#access to dn.base=""
+#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+#    by * read
+#
+#access to attrs=sambaLMPassword,sambaNTPassword,sambaPwdLastSet,sambaPwdMustChange,sambaPwdCanChange,sambaPasswordHistory
+#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+#    by dn="uid=samba,ou=sysusers,dc=local" write
+#    by anonymous auth
+#    by self write
+#    by * none
+#
+#access to *
+#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+#    by dn="uid=samba,ou=sysusers,dc=local" write
+#    by * read
+#
+## END with SAMBA ACLs

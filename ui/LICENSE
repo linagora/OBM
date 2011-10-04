@@ -1,0 +1,29 @@
+<!-- $Id$ -->
+
+=== English
+
+OBM is free software, licensed under the terms of the GNU Affero General Public License version 3 as published by the Free Software Foundation (see GNU_Affero_GPL_V3.0.txt).
+You can redistribute  it and/or modify since you respect the terms of this License.
+
+Finally, OBM is made using those external components and libraries. They are listed at the end of this file.
+
+
+=== French
+
+OBM est un logiciel libre, diffusé selon les termes de la licence GNU Affero General Public License version 3 telle que publiée par la Free Software Foundation (cf GNU_Affero_GPL_V3.0.txt).
+Vous ne pouvez le redistribuer ou le modifier que si vous respectez les termes de cette licence.
+
+Enfin, OBM utilise des composants et bibliothèques externes. Ils sont listés à la fin de ce fichier.
+
+
+=== External components and libraries
+
+- minig    : http://code.google.com/p/minig/ (GNU General Public License v3)
+- o-push   : http://code.google.com/p/o-push/ (GNU General Public License v3)
+- Stato    : http://www.stato-framework.org/ (MIT)
+- Zend framework : http://framework.zend.com/ (New BSD License)
+- MooTools : http://mootools.net/ (MIT)
+- FPDF     : http://www.fpdf.org/ (Permissive)
+- Solr php client : http://code.google.com/p/solr-php-client/ (New BSD License)
+- Different perl libs : http://www.cpan.org/ (Artistic, GPL)
+- ...

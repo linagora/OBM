@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<xliff version="1.0">
+  <file orginal="global" source-language="en_US" datatype="plaintext">
+    <body>
+      <trans-unit id="1">
+        <source>Stato is a PHP5 framework.</source>
+        <target>Stato est un cadre de travail PHP5.</target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source>Today's date is %date%</source>
+        <target>La date d'aujourd'hui est %date%</target>
+      </trans-unit>
+      <group restype="x-gettext-plurals">
+        <trans-unit id="3[0]" resname="zero">
+          <source>inbox</source>
+          <target>pas de message</target>
+        </trans-unit>
+        <trans-unit id="3[1]">
+          <source>inbox</source>
+          <target>1 message</target>
+        </trans-unit>
+        <trans-unit id="3[2]">
+          <source>inbox</source>
+          <target>%d messages</target>
+        </trans-unit>
+    </group>
+    <trans-unit id="4">
+        <source>%s is required.</source>
+        <target>Le champ %s est requis.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+

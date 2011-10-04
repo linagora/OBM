@@ -1,0 +1,9 @@
+<?php
+
+return array(
+  'obmdb_host' => 'localhost',
+  'obmdb_dbtype' => 'mysql',
+  'obmdb_db' => 'obm_test',
+  'obmdb_user' => '',
+  'obmdb_password' => ''
+);

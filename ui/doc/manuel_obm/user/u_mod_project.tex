@@ -1,0 +1,343 @@
+% Manuel d'utilisation d'OBM : module Project
+% ALIACOM Pierre Baudracco
+% $Id$
+
+\clearpage
+\section{Le module \project}
+
+révision : \obm 1.2.4
+
+\subsection{Présentation du module \project}
+
+Ce module est une gestion de projet.\\
+
+Un projet est découpé en tâches auxquelles il est possible d'affecter plusieurs utilisateurs avec des durées déterminées.
+En association avec le module de gestion de temps, le module \project permet de suivre la production des utilisateurs participant aux projets en cours.\\
+
+Les principales composantes du module \project sont énumérées ci-dessous et décrites en suivant :
+
+\begin{itemize}
+\item entité Projet
+\item entité Tâche
+\item entité Tâche de référence
+\item entité Membre
+\item Affectation (affectation des tâches aux membres avec une durée prévue)
+\item Avancement (suivi de l'avancement du projet par un chef de projet)
+\end{itemize}
+
+\subsection{Description d'un projet}
+
+Composantes d'un projet :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Nom & Nom du projet \\
+\hline
+Nom court & Nom court du projet utilisé pour des affichages synthétiques (ex: vue planning)\\
+\hline
+Catégorie & Catégorie du projet. On distingue les catégories de tâches facturées (projets clients) des tâches non facturées (projets internes). Les catégories de tâches sont gérées dans le module référentiel de la section administration.\\
+\hline
+Société & Pour les projets facturés. Indique le client.\\
+\hline
+Affaire & Pour les projets facturés. Indique l'affaire origine.\\
+\hline
+Temps vendu & Temps vendu pour un projet commercial.\\
+\hline
+Temps prévu & Temps prévu (peut être différent de vendu) du projet.\\
+\hline
+Archive & Etat d'archivage du projet. Un projet archivé ne pourra plus être modifié.\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+A un projet sont associés des tâches et des membres.
+
+
+\subsubsection{Création d'un projet}
+Un projet facturé est créé depuis l'affaire commerciale ayant aboutie à ce projet.
+
+Un projet non facturé (interne, R et D) se crée directement depuis le module \project.
+
+\subsection{Description d'une tâche}
+
+Un projet peut être divisé en différentes tâches qui vont permettre un suivi plus précis de l'activité des participants au projet. Il est possible de regrouper plusieurs tâches au sein d'une tâche parente (ex: création, maquettes, modèles dans la tâche parente Infographie).\\
+
+Composantes d'une tâche :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Nom & Nom de la tâche \\
+\hline
+Tâche parent & référence à la tâche parente si la tâche fait partie d'un groupe de tâches.\\
+\hline
+\end{tabular}
+
+
+\subsection{Les tâches de référence}
+
+Les tâches de référence ont pour objectif de simplifier et d'homogénéïser la création de tâches pour une catégorie de projets.
+Un projet de catégorie (ou type de tâche) Développement comportera souvent les même tâches (comme : conception, développement, tests,...).\\
+
+Les tâches de référence sont associées à une catégorie de projet.
+A la création d'un projet il est possible de sélectionner simplement des tâches, parmi les tâches de référence de la catégorie de projet, qui seront automatiquement créées.\\
+
+Les tâches de référence s'administrent via l'interface d'administration du module \project.\\
+
+Composantes d'une tâche de référence :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Type de tâche & (ou catégorie de projet) Type de tâche à laquelle est associée la tâche de référence \\
+\hline
+Label & Nom de la tâche \\
+\hline
+\end{tabular}
+
+
+\subsection{Description d'un participant}
+
+Des personnes (les membres ou participants) vont être affectées à la réalisation des différentes tâches du projet.\\
+
+Composantes d'un participant :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Utilisateur & Nom du membre \\
+\hline
+Statut & statut du membre (chef de projet, participant) \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Lorsqu'un participant est affecté à un projet au rôle de chef de projet (soit affecté à la création initiale du projet, soit positionné en chef de projet en modifiant son statut dans le projet), il est alerté par email.
+
+\subsection{Description d'une affectation}
+
+L'affectation permet d'affecter des participants aux différentes tâches en indiquant la durée prévue de réalisation.\\
+
+Cette affectation peut être modifiée au cours du projet.
+
+
+\subsection{Description de l'avancement}
+
+L'avancement est l'estimation par le chef de projet du temps restant à passer par chaque utilisateur pour terminer chaque tâche. En fonction de l'avance ou du retard sur une tâche, le temps restant sera souvent différent du temps prévu initial moins le temps déjà passé.
+La comparaison des ces temps permet de connaitre les débordements ou avances du projet de façon globale et par tâche.\\
+
+L'avancement peut être estimé régulièrement lors de la réalisation d'un projet.
+
+
+\subsection{La consultation d'un projet}
+\label{u_project_consult}
+
+L'accès à l'écran de consultation d'un projet s'effectue depuis l'écran de recherche, depuis les bookmarks ou dernières visites ou depuis le menu Consulter.
+
+La consultation du projet affiche différents types d'informations :\\
+
+\begin{itemize}
+\item les informations générales : le nom du projet, la société pour qui il est réalisé.
+\item les indicateurs d'avancement : ces indicateurs permettent d'évaluer globalement l'état de réalisation du projet (cf les indicateurs).
+\item le tableau de détail de l'avancement : permet de visualiser plus précisément l'avancement du projet (cf détail de l'avancement).
+\end{itemize}
+
+\subsubsection{Les indicateurs}
+
+Ils sont destinés à permettre un suivi global de l'état d'avancement du projet.
+Les différents indicateurs présents sont :
+
+\begin{itemize}
+\item temps vendu/prévu : c'est une estimation, faite au moment ou le projet est crée, du temps qui sera nécessaire à la réalisation du projet.
+\item temps attribué : c'est la somme des temps de travail prévu qui on déjà été affectés aux différents participants au projet.
+\item temps utilisé : cette donnée, calculée à partir des informations collectées par le module \timemanager, est la somme des durées des tâches qui ont déjà été effectuées dans le cadre de ce projet.
+\item temps estimé restant : c'est la somme des temps estimés restants qui ont été saisi dans l'écran d'avancement du projet.
+\item Attribution du temps prévu : c'est le rapport entre le temps attribué et le temps prévu.
+\item Utilisation du temps prévu : c'est le rapport entre le temps utilisé en le temps prévu. Il est ainsi possible d'avoir une idée de la quantité de temps qui a été utilisée.
+\item Avancement du projet : c'est le rapport entre le temps utilisé et une estimation du temps nécessaire pour réaliser l'intégralité du projet (temps utilisé + temps estimé restant).
+\item Evaluation de l'avance retard : C'est un indicateur obtenu en comparant l'utilisation du temps prévu et l'avancement du projet. On peut considérer que si la quantité de temps utilisé est supérieure à l'avancement, le projet aura du retard.
+\end{itemize}
+
+\subsubsection{Détail de l'avancement}
+
+Il s'agit d'un tableau indiquant pour chaque participant affecté à une tâche :
+
+\begin{itemize}
+\item le temps utilisé : cette valeur est calculée à partir des informations saisies dans le module \timemanager.
+\item temps estimé restant : valeur saisie dans le tableau d'avancement (avancement).
+\item temps prévu : valeur saisie dans le tableau d'avancement (affectation).
+\end{itemize}
+
+Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe de tâches.
+
+\subsubsection{La vue planning}
+
+Il s'agit d'une vue globale de l'activité sur un projet présentant pour chaque participant, le temps passé sur chaque tâche pour un mois donné sous forme de planning.
+
+%%\begin{figure}[h]
+  %% \begin{center}
+%% \includegraphics[width=12cm]{user/images/u_project_planning.jpg}
+  %% \caption{\project : vue planning}
+   %%\end{center}
+%%\end{figure}
+
+ 
+
+\subsection{Les alertes par email}
+
+Lorsqu'un participant est affecté à un projet au rôle de chef de projet (soit affecté à la création initiale du projet, soit positionné en chef de projet en modifiant son statut dans le projet), il est alerté par email.
+
+
+\subsection{Les sous-menus du module \project}
+
+Le module \project comporte 10 sous-menus :\\
+
+\begin{tabular}{|p{2.5cm}|p{9.5cm}|}
+\hline
+\textbf{Nom} & \textbf{Action / Description} \\
+\hline
+Chercher & Recherche multicritères des projets \\
+\hline
+Nouveau & Créer un nouveau projet interne\\
+\hline
+Consulter & Consulter les informations d'un projet\\
+\hline
+Modifier & Modifier les informations générales d'un projet\\
+\hline
+Supprimer & Vérifier les liens puis si besoin Supprimer un projet\\
+\hline
+Tâches & Gérer (créer / supprimer) les tâches du projet\\
+\hline
+Participants & Gérer (mettre à jour / supprimer) les utilisateurs affectés au projet\\
+\hline
+Ajouter participant & Ajouter des participants au projet\\
+\hline
+Avancement & Actualiser les affectations et l'état d'avancement des différentes tâches pour chaque participant au projet\\
+\hline
+Tableau de bord & Affichage de la synthèse de l'avancement du projet (participants / tâches)\\
+\hline
+Planning & Affichage de la vue planning du projet\\
+\hline
+Affichage & Personnalisation de l'affichage de la liste des projets\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le sous-menu : Chercher}
+
+Ce menu permet d'effectuer une recherche selon différents critères :
+
+\begin{itemize}
+\item Nom
+\item Nom de la société
+\item Catégorie
+\item Chef de projet
+\item Participant
+\end{itemize}
+
+Il est possible d'inclure les projets archivés et ceux qui n'ont pas été initialisés dans les résultats de recherche.
+
+\subsubsection{Le sous-menu : Nouveau}
+
+Ce menu permet de créer un projet interne (non facturé).
+
+\paragraph{La création des projets clients ou facturés} s'effectue depuis le module affaire.\\
+
+Un formulaire vierge de projet propose la saisie des champs :
+
+\begin{itemize}
+\item Nom (obligatoire),
+\item Catégorie (obligatoire),
+\item Temps prévu (obligatoire),
+\item Tâche,
+\item Participant.
+\end{itemize}
+\vspace{0.3cm}
+
+Les champs Tâche et Participant sont facultatifs et permettent un raccourci pour la création directe d'une tâche et d'un participant au projet (pratique pour les projets simple comprenant une seule tâche et une seul participant, comme les formations).\\
+
+Si le projet est valide, il est inséré dans la base de données et un message d'acceptation est affiché; sinon le formulaire de saisie de nouveau projet est affiché de nouveau avec un message indiquant la cause de non validité.
+
+
+\subsubsection{Le sous-menu : Consulter}
+
+Ce menu permet de retourner en mode consultation du projet en cours.
+Voir la section \ref{u_project_consult} ``Consultation d'un projet.
+
+
+\subsubsection{Le sous-menu : Modifier}
+
+L'écran de modification affiche les informations du projet dans un formulaire.
+Il est possible de modifier les informations suivantes :
+
+\begin{itemize}
+\item Nom,
+\item Catégorie,
+\item Temps prévu/vendu,
+\item Archive.
+\end{itemize}
+
+Pour valider les modifications effectuées il faut cliquer sur le bouton``valider les modifications''.
+
+
+\subsubsection{Le sous-menu : Supprimer}
+Ce menu permet la suppression d'un projet.
+
+\paragraph{Pour être supprimé} un projet ne doit pas être référencé dans la gestion des temps.
+
+
+\subsubsection{Le sous-menu : Tâches}
+
+Ce menu permet de :\\
+\begin{itemize}
+\item Visualiser la liste des tâches ratachées au projet
+\item Saisir de nouvelles tâches
+\item Supprimer des tâches
+\item Modifier des tâches existantes.
+\end{itemize}
+
+\paragraph{L'ajout d'une tâche} ne peut s'effectuer si la tâche référence une tâche parente possédant des affectations. Car les tâches de groupe (ou parentes) ne peuvent pas être affectées à des utilisateurs.
+
+\paragraph{La suppression d'une tâche} ne peut s'effectuer si la tâche (ou une tâche fille de la tâche si elle est parente) est affectée à un utilisateur ou est référencée dans la gestion des temps.
+
+\paragraph{La modification d'une tâche} ne peut s'effectuer si :
+\begin{itemize}
+\item Une tâche parente est indiquée, identique à la tâche elle-même
+\item Une tâche parente est indiquée et que la tâche est elle-même parente
+\item Une tâche parente est indiquée mais possède des affectations (possible uniquement si affectations simultanées)
+\item Une tâche parente est indiquée mais possède elle aussi un parent (possible uniquement si modifications simultanées)
+\end{itemize}
+
+
+\subsubsection{Le sous-menu : Participants}
+
+Ce menu permet de visualiser la liste des utilisateurs référencés pour le projet. Il permet aussi de modifier le statut des participants.
+
+
+\subsubsection{Le sous-menu : Ajouter participant}
+
+Ce menu ouvre une fenêtre qui permet de sélectionner des utilisateurs à affecter au projet.
+
+
+\subsubsection{Le sous-menu : Avancement}
+
+Ce menu permet de mettre à jour :\\
+\begin{itemize}
+\item l'affectation des participants aux différentes tâches. On affecte un participant à une tâche en indiquant le nombre de jours que devrait nécessiter la réalisation de la tâche en question.
+\item l'avancement des participants pour les tâches auquelles ils sont affectés. En indiquant le nombre de jour estimé restant pour accomplir une tâche, il devient possible de détecter les avances ou retards du projet.
+\end {itemize}
+\vspace{0.3cm}
+
+Il est possible de supprimer une affectation en laissant sa case vide.\\
+
+A l'initialisation d'une nouvelle affectation, si l'avancement (temps estimé restant) n'est pas renseigné il est automatiquement positonné à la durée affectée.
+
+
+\subsubsection{Le sous-menu : Affichage}
+
+Ce menu permet de paramétrer l'affichage de la liste des projets. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.

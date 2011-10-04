@@ -1,0 +1,227 @@
+% Documentation technique d'OBM : Gestion des entités privées
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+%%\clearpage
+\subsection{Gestion des entités privées, visibilité et droits sur entité}
+révision : \obm 2.1.0\\
+
+OBM permet de créer des entités privées, soit non visibles par tout le monde.\\
+
+La gestion des entités privées est standardisée afin de permettre une évolution possible des règles de visibilité des entités.
+Elle a été repensée et rendue non intrusive depuis \obm 0.8.5.\\
+
+Depuis \obm 2.0.2 certains modules implémentent une séparation des droits entre les entités publiques et privées (gérer des données publiques nécessite des droits plus importants).
+
+
+\subsubsection{Spécifications de la notion de visibilité}
+
+Actuellement une entité est visible par un utilisateur si l'entité est publique (privacy == 0) ou que l'utilisateur en est le créateur.
+
+\paragraph{Base de données :} La table de l'entité doit contenir un champ : \textbf{entite\_privacy} défini comme un entier.
+Les valeurs définies sont :\\
+
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Valeur} & \textbf{Description} \\
+\hline
+0 & entité publique \\
+\hline
+1 & entité privée \\
+\hline
+\end{tabular}
+%%\vspace{0.3cm}
+
+\paragraph{Implémentation du test de visibilité}
+\begin{verbatim}
+  $field_pri = "${entity}_privacy";
+  $field_uc = "${entity}_usercreate";
+  ...
+
+  if ( ($q->f("$field_pri") == 0)
+    || ($q->f("$field_uc") == $uid) ) {
+    return true;
+  } else {
+    return false;
+  }
+\end{verbatim}
+
+
+\subsubsection{API définie}
+
+Une api très simple (1 fonction définie dans global.inc) est disponible :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function check_privacy($module, $table, $action, $id, $p_uid="") {
+\end{verbatim}
+\end{minipage}
+}
+\begin{itemize}
+ \item \textbf{\$module} : menu (module) à vérifier.\\
+Exemple : ``CONTACT'', mais \$module peut être utilisé. Indispensable pour récupérer l'information dans le tableau global \$actions
+ \item \textbf{\$table} : table ou entité à vérifier.\\
+Exemple : ``Contact''... Attention ce n'est pas toujours le module (ex: ParenDeal dans module deal). L'entité (pour nom des colonnes) est tiré de cette chaîne (lowercase)
+ \item \textbf{\$action} : Action à vérifier
+ \item \textbf{\$id} : Id de l'entité à vérifier
+ \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilité doit être vérifié. Si non donné, l'utilisateur courant est utilisé.
+\end{itemize}
+
+
+\subsubsection{Implémentation dans un module}
+
+\paragraph{Actions soumises au test d'accès :}
+Tout accès à une entité doit être validé (passer le test de visibilité).
+Ceci doit donc être vrai pour les actions de consultations (detailconsult, detailupdate) mais aussi pour toutes les actions sur une entité (update, delete, document\_add...).\\
+
+Pour cette raison et pour éviter la répétition de ce test dans un module, le test est effectué une fois en début de module.\\
+
+Test pour le module \contact :
+\begin{verbatim}
+if (! check_privacy($module, "Contact", $action, $contact["id"], $uid)) {
+  $display["msg"] = display_err_msg($l_error_visibility);
+  $action = "index";
+} else {
+  update_last_visit("contact", $contact["id"], $action);
+}
+\end{verbatim}
+
+Afin d'être optimal, le test ne requiert un accès à la base de données que lorsque nécessaire.
+Les actions définies du module doivent indiquer si elles sont sujettes à la protection privée (attribut \textbf{Privacy}).\\
+
+Définition d'une action sujette à la protection donnée privée.
+\begin{verbatim}
+// Update
+  $actions["CONTACT"]["update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=update",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None') 
+                                     	);
+\end{verbatim}
+
+\paragraph{La fonction de recherche} de l'entité doit aussi tenir compte et intégrer le test de visibilité afin de ne pas afficher les entités non visibles dans les résultats de recherche.
+Une fonction est définie retournant la clause de visibilité pour l'entité demandée.\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function sql_obm_entity_privacy($entity, $p_uid="") {
+\end{verbatim}
+\end{minipage}
+}
+\begin{itemize}
+ \item \textbf{\$entity} : entité à vérifier.\\
+Exemple : ``contact'', ``deal''
+ \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilité doit être vérifié. Si non donné, l'utilisateur courant est utilisé.
+\end{itemize}
+\vspace{0.3cm}
+
+Exemple d'utilisation :
+\begin{verbatim}
+function run_query_contact_search($contact) {
+  global $cdg_sql, $c_all, $ctu_sql_limit;
+
+  $company_id = $contact["company_id"];
+  ...
+
+  // only the one which are allowed (ie. publics )
+  $where .= sql_obm_entity_privacy("contact");
+  ...
+\end{verbatim}
+
+
+\paragraph{La fonction de récupération} de l'entité (\fonction{run\_query\_entity\_detail()}) doit récuperer le champ en base de données et le présenter sous le nom \textbf{privacy} afin d'être traité de façon générique par l'affichage des informations de l'entité.\\
+
+Exemple d'utilisation :
+\begin{verbatim}
+  $query = "SELECT Deal.*,
+      deal_privacy as privacy,
+  ...
+\end{verbatim}
+
+
+\subsubsection{Séparation de droits de gestion public / privé}
+
+Pour certains modules, il est important de séparer les droits de gestion des données publiques des droits de gestion des données privées (exemple : gérer les groupes publics demande des privilèges supérieurs à la gestion de ses groupes privés).\\
+
+Les modules implémentant cette séparation sont listés plus bas.
+Cette séparation implique l'ajout de tests d'autorisation sur les actions detailupdate, update, check\_delete, delete, (user\_add,...).
+
+Ces tests d'autorisation sont effectués :
+\begin{itemize}
+\item directement dans les fonctions \fonction{check\_module\_data\_form()}
+\item à l'aide d'une fonction définie dans le module en question, du type \fonction{check\_module\_update\_rights()}
+\end{itemize}
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function check_group_update_rights($params) {
+\end{verbatim}
+\end{minipage}
+}
+\begin{itemize}
+ \item \textbf{\$params} : tableau de paramètres.
+ \item \textbf{Retourne true || false} : true si les droits sont suffisants
+\end{itemize}
+\vspace{0.3cm}
+
+Cette fonction doit être appelée :
+\begin{itemize}
+\item dans toute action nécessitant la vérification détaillée des droits
+\item dans la fonction (\fonction{update\_module\_action()}) qui met à jour les menus contextuels
+\end{itemize}
+
+
+\paragraph{Exemple d'utilisation (\fichier{module\_index.php})} :
+\begin{verbatim}
+} else if ($action == "detailupdate") {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_group_update_rights($params)) {
+    $obm_q = run_query_group_detail($params["group_id"]);
+    $display["detail"] = html_group_form($action, $obm_q, $params);
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg']);
+  }
+
+\end{verbatim}
+
+
+\subsubsection{Gestion de la notion de visibilité et conséquences}
+
+Une entité créée en tant que privée n'est visible que par son créateur.
+Il faut donc veiller à traiter les entités privés d'un utilisateur lorsque celui-ci doit être supprimé.
+
+Ces entités peuvent être supprimées ou rendues publiques (la fonction run\_query\_delete\_profile() effectue ce travail).
+
+
+\subsubsection{Modules gérant la notion de visibilité}
+
+\begin{tabular}{|p{3cm}|c|c|c|}
+\hline
+\textbf{Module} & \textbf{Depuis version} & \textbf{Séparation droits} & \textbf{Depuis version} \\
+\hline
+contact & 0.4.0 & X & 2.1.0\\
+\hline
+lead & 1.2 & & \\
+\hline
+deal & 0.4.0 & &\\
+\hline
+list & 0.8.2 & &\\
+\hline
+calendarevent & 0.5.0 & &\\
+\hline
+todo & 1.0 & &\\
+\hline
+contract & 0.9.0 & &\\
+\hline
+document & 0.7.0 & &\\
+\hline
+group & 0.9.0 & X & 2.0.2 \\
+\hline
+rgroup & 1.0 & &\\
+\hline
+\end{tabular}
