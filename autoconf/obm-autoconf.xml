@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Context path="/obm-autoconf" docBase="/usr/lib/obm-autoconf"
+  debug="0" privileged="false">
+
+  <ResourceLink name="UserTransaction" global="UTransaction"
+                type="javax.transaction.UserTransaction"/>
+
+  <Resource name="jdbc/AutoConfDS" auth="Container"
+            type="javax.sql.DataSource"
+            factory="fr.aliacom.jndi.DataSourceFactory"
+            login="obm"
+            password="obm"
+            className="org.postgresql.Driver"
+            url="jdbc:postgresql://127.0.0.1/obm"
+            max="4"
+            pingQuery="SELECT 1"/>
+</Context>
+

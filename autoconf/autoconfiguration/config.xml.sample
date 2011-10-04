@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fonction : fichier de configuration XML
+
+  Remarque: partout où noté "LDAP", des données provenant du serveur LDAP central
+            viennent compléter le document XML.
+            le motif est de la forme
+              ${nom_attribut_LDAP}
+            qui sera remplacé par le servlet par la valeur issue de l'annuaire.
+-->
+
+<configuration xmlns="http://ns.aliasource.fr/mozilla/1.0">
+
+  <!-- IDENTITÉS -->
+  <identities>
+    <identity id="identite-obm"
+              smtpServer="serveur-smtp-obm"
+              fullName="${cn}"
+              fromAddress="${mail}"
+              draftFolder="imap://${mailBox}@${imapMailHost}/INBOX/Brouillons"
+              draftFolder_pickerMode="1"
+              fccFolder="imap://${mailBox}@${imapMailHost}/INBOX/Envoy&amp;AOk-s"
+              fccFolder_pickerMode="1"
+              autocompleteDirectory="serveur-ldap-obm"/>
+  </identities>
+
+
+  <!-- SERVEURS -->
+  <servers>
+    <server id="serveur-courrier-obm"
+            type="imap"
+            label="${cn}"
+            username="${mailBox}"
+            hostname="${imapMailHost}"
+            port="143"
+            secureConnection="tls"
+            trashFolder="Corbeille"
+            secureAuthentication="false"
+            downloadBodies="true"
+            offlineDownload="true"/>
+    <server id="serveur-smtp-obm"
+            type="smtp"
+            label="Serveur Smtp obm"
+            username="${mailBox}"
+            hostname="${smtpMailHost}"
+            port="465"
+            secureConnection="ssl"/>
+  </servers>
+
+  <!-- COMPTES -->
+  <accounts defaultAccount="compte-obm">
+    <account id="compte-obm"
+             identities="identite-obm"
+             server="serveur-courrier-obm"/>
+  </accounts>
+
+  <!-- ANNUAIRES -->
+  <directories>
+	<directory id="ldap-contacts-publics"
+		label="Contacts OBM"
+		uri="ldap://${ldapHost}:389/ou=contacts,dc=zz.com,dc=local??sub?(&amp;(objectClass=*)(mail=*))"
+		autocomplete="true"/>
+  </directories>
+
+  <!-- PREFERENCES -->
+  <preferences>
+
+	<!-- Global Preferences  -->
+
+		<!-- désactiver le service de mise à jour intégré pour l'application -->
+		<preference type="boolean"
+		            name="app.update.enabled"
+		            value="false"
+		            set="lock"/>
+
+		<!-- page d'accueil de thunderbird -->
+<!--
+		<preference type="string"
+		            name="mailnews.start_page.override_url"
+		            value="http://server/thunderbird.html"
+		            set="user"/>              
+		<preference type="string"
+		            name="mailnews.start_page.url"
+		            value="http://server/thunderbird.html"
+		            set="user"/>              
+		<preference type="string"
+		            name="mailnews.start_page.welcome_url"
+		            value="http://server/thunderbird.html"
+		            set="user"/>       
+-->
+
+		<!-- Toujours afficher l'état du quota-->
+		<preference type="integer"
+		            name="mail.quota.mainwindow_threshold.show"
+		            value="1"
+		            set="user"/>
+		
+		<!--Use 'Collected addresses' in replace of 'Personnal Adresses' for collecting addresses-->		
+		<preference type="string"
+					name="mail.collect_addressbook"
+					value="moz-abmdbdirectory://history.mab"
+					set="user"/>
+		
+		<!--Download messages for offline use -->
+		<preference type="string"
+				          name="spellchecker.dictionary"
+				          value="fr-FR"
+				          set="user"/>
+
+         <!-- Installed extensions preferences -->
+			<!-- Extension spellchecker -->
+			<preference type="string"
+				          name="spellchecker.dictionary"
+				          value="fr-FR"
+				          set="user"/>
+		
+			<!-- Extensions minimize to tray -->
+			<preference type="boolean"
+				          name="extensions.minimizetotray.always"
+				          value="true"
+				          set="user"/>
+			<preference type="boolean"
+				          name="extensions.minimizetotray.minimize-on-close"
+				          value="true"
+				          set="user"/>
+			<preference type="boolean"
+				          name="extensions.minimizetotray.two-click-restore"
+				          value="false"
+				          set="user"/>
+			<preference type="boolean"
+				          name="extensions.minimizetotray.with-windows"
+				          value="true"
+				          set="user"/>
+
+			<!-- URL de connection au service Web d'OBM-sync -->
+			<preference type="string"
+				          name="extensions.obm.server"
+				          value="http://10.75.0.2/obm/services"
+				          set="user"/>
+		
+			<!-- URL de connection à OBM Web -->
+			<preference type="string"
+				          name="config.obm.obmUrl"
+				          value="http://10.75.0.2"
+				          set="user"/>
+
+			<!-- login de l'utilisateur -->
+			<preference type="string"
+				          name="config.obm.login"
+				          value="${mailBox}"
+				          set="user"/>
+			
+			<!-- Lighning synchronisation automatique de l'agenda en minutes -->
+			<preference type="boolean"
+				          name="calendar.autorefresh.enabled"
+				          value="true"
+				          set="user"/>
+			<preference type="integer"
+				          name="calendar.autorefresh.timeout"
+				          value="10"
+				          set="user"/>
+			
+			<!-- Toolbar initialize -->
+
+<!-- Configuration de l'initialisateur de Barre d'outils
+
+- nécessite OBM-maja
+- pour connaître les codes qui servent à construire une barre d'outils
+    - configurer la préférence "config.obm.autoconf.toolbar.debug" à 1
+        -> cela permet :
+	   - d'afficher des messages dans la console
+	   - d'ouvrir automatique une fenêtre d'outils au démarrage qui permet de récupérer les codes
+
+value="button-getmsg,button-newmsg,button-address,calendar-show-todaypane-button,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,separator,calendar-week-view-button,calendar-month-view-button,search-container"
+
+// main TB default			          
+value="button-getmsg,button-newmsg,button-address,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,search-container"
+
+// compose TB default
+value="button-send,separator,button-address,spellingButton,button-attach,button-security,button-save"
+
+// addressbook TB default
+value="button-newcard,button-newlist,separator,button-editcard,button-newmessage,separator,button-abdelete,spring,search-container"
+
+// empty default
+value="__empty"
+
+-->
+
+			<preference type="integer"
+				          name="config.obm.autoconf.toolbar.debug"
+				          value="1"
+				          set="user"/>
+			<preference type="string"
+				          name="config.obm.autoconf.toolbar.main"
+				          value="button-getmsg,button-newmsg,button-address,calendar-show-todaypane-button,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,separator,calendar-week-view-button,calendar-month-view-button,search-container"
+                          set="user"/>
+			<preference type="string"
+				          name="config.obm.autoconf.toolbar.compose"
+				          value="button-send,separator,button-address,spellingButton,button-attach,button-security,button-save"
+				          set="user"/>
+			<preference type="string"
+				          name="config.obm.autoconf.toolbar.addressbook"
+				          value="button-newcard,button-newlist,separator,button-editcard,button-newmessage,separator,button-abdelete,spring,search-container"
+				          set="user"/>
+			-->
+			
+			<!-- to set small icons on toolbar -->
+			<preference type="boolean"
+				          name="config.obm.autoconf.toolbar.main.smallicons"
+				          value="true"
+                          set="user"/>
+                          
+			<!-- to force toolbar init after loading window -->
+			<preference type="boolean"
+				          name="config.obm.autoconf.toolbar.main.force_after_load"
+				          value="true"
+                          set="user"/>
+
+			<preference type="string"
+				          name="config.obm.autoconf.toolbar.main"
+				          value="button-getmsg,button-newmsg,button-address,calendar-show-todaypane-button,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,separator,calendar-week-view-button,calendar-month-view-button,search-container"
+                          set="user"/>
+  </preferences>
+
+  <!-- EXTENSIONS -->
+  <extensions>
+
+    <!-- OBM-MAJA -->
+    <extension id="{912dfb00-4684-11dd-ae16-0800200c9a66}"
+               src="http://10.75.0.2/obm-autoconf/xpi/obm-maja_1.1.0.xpi"
+               version="1.1.0">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+
+    <!-- bouton-extension -->
+	   <extension id="bouton-extension@aliasource.fr"
+		       src="http://obm.eole.dgi/obm-autoconf/xpi/bouton-extension-1.5.xpi"
+			   version="1.5">
+	      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+				 minVersion="1.5"
+				 maxVersion="2.0.*"/>
+	    </extension>
+
+
+    <!-- Minimize To Tray -->
+<!--
+    <extension id="{31513E58-F253-47ad-86DB-D5F21E905429}"
+               src="http://10.75.0.2/obm-autoconf/xpi/minimizetotray-0.0.1.2006102615+-fx+zm+sb+tb.xpi"
+               version="0.0.1">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+-->
+	<!-- Minimize To Tray Enhancer -->
+<!--
+    <extension id="{de1b245c-de57-11da-ba2d-0050c2490048}"
+               src="http://10.75.0.2/obm-autoconf/xpi/minimize_to_tray_enhancer-0.7.5.3-fx+tb+sb.xpi"
+               version="0.7.5.3">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+ -->
+ 
+	<!-- Multi LDAP-->
+    <extension id="multildap@milimail.org"
+               src="http://10.75.0.2/obm-autoconf/xpi/multi_ldap-0.2.5.0.xpi"
+               version="0.2.5.0">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+	
+	<!-- Smart Save -->
+	<extension id="{031984cf-187c-40a2-bc8c-3ca45ccdb3e8}"
+               src="http://10.75.0.2/obm-autoconf/xpi/smartsave_thunderbird_extension-0.1.5.2-tb.xpi"
+               version="0.1.5.2">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+ 
+	<!-- Dictionnaire Fr -->
+    <extension id="fr-FR@dictionaries.addons.mozilla.org"
+               src="http://10.75.0.2/obm-autoconf/xpi/dictionnaire_myspell_en_fran__ais-1.6-fx+tb+sm.xpi"
+               version="1.6">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+
+	<!-- Lightning windows -->
+    <extension id="{e2fda1a4-762b-4020-b5ad-a41df1933103}"
+               src="http://10.75.0.2/obm-autoconf/xpi/lightning-0.7.win32.xpi"
+               version="0.7">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+			   <targetPlatform name="WINNT_x86-msvc"/>
+    </extension>
+
+	<!-- Connecteur OBM -->
+    set="user"/
+
+  </extensions>
+
+  <!-- CERTIFICATS -->
+<!--
+  <certificates>
+    <certificate src="http://10.75.0.2/obm-autoconf/certificates/mycertificate.crt"
+                 sha1Fingerprint="23:04:5A:97:EB:C8:EF:D7:75:ED:10:D2:3E:E0:33:3D:C4:01:CA:6B"/>
+    <certificate src="http://10.75.0.2/obm-autoconf/certificates/mycertificate.crt"
+                 sha1Fingerprint="C8:27:B7:2F:7B:F3:19:3E:58:22:6B:32:85:C2:E1:F5:81:66:60:09"/>
+  </certificates>
+-->
+
+  <!-- PROXYS -->
+<!--
+  <proxies>
+    <proxy type="auto"
+           value="autoconfHost/proxy.pac"/>
+  </proxies>
+-->
+
+<!-- PATCHS -->
+<!-- Exemples  de patchs -->
+<!--
+
+Permet d'appliquer des patchs en fonction d'un numéro de version.
+Les patchs doivent comporter un numéro de patch contenu l'attribut version,
+il n'est pas nécessaire que les numéros se suivent mais les patchs doivent être ordonnés dans la structure XML
+en respectant leur numéro de version,
+
+Lors d'une nouvelle configuration, on N'APPLIQUE AUCUN PATCH, et le numéro de patch du client
+est directement incrémenté au dernier numéro de patch trouvé.
+Si le client est déjà configuré et a des patchs à appliquer, on applique un à un les patchs de
+la dernière version du client jusqu'à la version du dernier patch de la configuration.
+
+Children supportés par add :
+- proxies
+- certificates
+- accounts
+- directories
+- preferences
+
+Children supportés par delete :
+- directories
+- preferences
+
+-->
+<!--
+<patches>
+  <patch version="2">
+    <add>
+       <directories>
+          <directory id="ldap-annuaire-aoc-personnes"
+            label="DGFIP-Personnes"
+            uri="ldap://ldap.oc.dgfip:389/ou=personnes,ou=DGCP,ou=Mefi,o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+          <directory id="ldap-annuaire-aoc-structures"
+            label="DGFIP-Structures"
+            uri="ldap://ldap.oc.dgfip:389/ou=structures,ou=DGCP,ou=Mefi,o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+          <directory id="ldap-annuaire-aoc-listes"
+            label="DGFIP-Listes"
+            uri="ldap://ldap.oc.dgfip:389/ou=listes,ou=DGCP,ou=Mefi,o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+        </directories>
+    </add>
+    <delete>
+       <directories>
+          <directory id="ldap-annuaire-aoc"
+            label="Annuaire Outil Collaboratif"
+            uri="ldap://ldap.oc.dgfip:389/o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+        </directories>
+    </delete>
+  </patch>
+  <patch version="3">
+    <delete>
+       <directories>
+          <directory id="ldap-annuaire-aoc-listes"
+            label="DGFIP-Listes"
+            uri="ldap://ldap.oc.dgfip:389/ou=listes,ou=DGCP,ou=Mefi,o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+        </directories>
+    </delete>
+  </patch>
+  <patch version="5">
+    <add>
+	<preferences>
+	<preference type="integer"
+			  name="config.obm.autoconf.toolbar.debug"
+			  value="1"
+			  set="user"/>
+	</preferences>
+    </add>
+  </patch>
+</patches>
+-->
+</configuration>

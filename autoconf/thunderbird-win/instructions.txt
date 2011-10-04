@@ -1,0 +1,19 @@
+**Création de l'installeur thunderbird avec autoconf**
+
+Prérequis :
+- 7zip installé     : http://7-zip.org
+
+Création :
+
+- éditer config.jsc pour mettre l'addresse du serveur d'autoconf
+- lancer au choix :
+  - sous Windows : le script add_autoconf.bat avec en paramètre
+ le path complet vers l'installeur standard de thunderbird à packager
+ (sans espaces dans le nom)
+ - sous Linux : add_autoconf.sh avec en paramètre le chemin vers le setup standard de thunderbird
+
+Le script :
+ * extrait l'installeur
+ * concatène all.js.add à all.js pour ajouté les préférences activant l'autoconfiguration
+ * ajoute le fichier config.jsc reférencé dans le all.js contenant l'url du script d'autoconfiguration à télécharger et éxécuter.
+ * reconstruit l'archive de l'installeur
