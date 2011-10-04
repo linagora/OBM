@@ -1,0 +1,24 @@
+[cyrusPartition]
+
+# Cyrus IMAPd configuration file
+# default: imapdConfFile = /etc/imapd.conf
+
+# Cyrus init script
+# default: cyrusStartupScript = /etc/init.d/cyrus2.3
+# Some use different script name to manage Cyrus service
+# Debian Etch and Lenny :
+#cyrusStartupScript = /etc/init.d/cyrus2.2
+# RedHat 5 :
+#cyrusStartupScript = /etc/init.d/cyrus-imapd
+
+# Cyrus partition root directory
+# Debian
+# default: imapdPartitionRoot = /var/spool/cyrus
+# RedHat
+#imapdPartitionRoot = /var/spool/imap
+
+# LDAP root
+# no default
+# using LDAP root from LDAP server description see /etc/obm/obm_conf.ini or
+# /etc/obm-satellite/obmSatellite.ini or define in, this file
+# ldapRoot = 

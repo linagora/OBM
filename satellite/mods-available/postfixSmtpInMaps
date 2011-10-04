@@ -1,0 +1,11 @@
+[postfixSmtpInMaps]
+
+# Postmap command
+# default: postmapCmd = /usr/sbin/postmap
+
+# LDAP root
+# no default
+# If not define in this file, get LDAP root DN from '/etc/obm/obm_conf.ini'
+# Use this option only if LDAP root DN differ from '/etc/obm/obm_conf.ini'.
+# Sample syntax: 'dc=linagora,dc=loc'
+#ldapRoot = 
