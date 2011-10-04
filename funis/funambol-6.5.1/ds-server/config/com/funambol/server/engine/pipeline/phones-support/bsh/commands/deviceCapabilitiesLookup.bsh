@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * This command retrieves and returns the Sync4jDevice's capabilities 
+ * corresponding to the device which is synchronizing. It returns null if the 
+ * device could not be found.
+ *
+ * @param deviceId the device's ID as retrieved from the SyncML message
+ *
+ * @return the device capabilities as a Capabilities object
+ *
+ * @version $Id: deviceCapabilitiesLookup.bsh,v 1.1 2007/07/25 13:21:15 luigiafassina Exp $
+ */
+
+import com.funambol.framework.server.Capabilities;
+import com.funambol.server.admin.AdminManager;
+
+Capabilities deviceCapabilitiesLookup(String deviceId) {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Get device with identifier " + deviceId);
+    }
+    
+    if (deviceId == null) {
+        return null;
+    }
+
+    Capabilities capabilities = null;
+
+    try {
+        capabilities = new AdminManager().getDeviceCapabilities(deviceId);
+    } catch (Exception e) {
+        String msg = "Error getting device (" + e.toString() + ")";
+        log.error(msg, e);
+    }
+
+    return capabilities;
+}

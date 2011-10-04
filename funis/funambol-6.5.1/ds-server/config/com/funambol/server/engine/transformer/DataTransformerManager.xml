@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_01" class="java.beans.XMLDecoder"> 
+ <object class="com.funambol.framework.engine.transformer.DataTransformerManager"> 
+  <void property="dataTransformersIn"> 
+   <void method="put"> 
+    <string>b64</string> 
+    <string>com.funambol.server.engine.transformer.B64Decoder</string> 
+   </void> 
+   <void method="put"> 
+    <string>des</string> 
+    <string>com.funambol.server.engine.transformer.DESDecoder</string> 
+   </void> 
+  </void> 
+  <void property="dataTransformersOut"> 
+   <void method="put"> 
+    <string>b64</string> 
+    <string>com.funambol.server.engine.transformer.B64Encoder</string> 
+   </void> 
+   <void method="put"> 
+    <string>des</string> 
+    <string>com.funambol.server.engine.transformer.DESEncoder</string> 
+   </void> 
+  </void> 
+  <void property="sourceUriTrasformationsRequired"> 
+   <void method="put"> 
+    <string>obm_calendar</string> 
+    <null/> 
+   </void> 
+   <void method="put"> 
+    <string>obm_cal_ical</string> 
+    <null/> 
+   </void> 
+   <void method="put"> 
+    <string>obm_addressbook</string> 
+    <null/> 
+   </void> 
+   <void method="put"> 
+    <string>obm_book_vcard</string> 
+    <null/> 
+   </void> 
+  </void> 
+ </object> 
+</java> 

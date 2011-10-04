@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.1_01" class="java.beans.XMLDecoder">
+ <object class="com.funambol.server.store.IDPersistentStore">
+  <void property="jndiDataSourceName">
+   <string>jdbc/fnblds</string>
+  </void>
+  <void property="sql">
+   <array class="java.lang.String" length="2">
+      <void index="0"><!-- SQL_GET_ID -->
+       <string>select counter from fnbl_id where idspace=?</string>
+      </void>
+      <void index="1"><!-- SQL_UPDATE_ID -->
+       <string>update fnbl_id set counter=? where idspace=?</string>
+      </void>
+   </array>
+  </void>
+ </object>
+</java>

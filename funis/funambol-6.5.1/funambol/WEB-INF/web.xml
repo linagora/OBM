@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--                                                               -->
+<!-- $Id: web.xml,v 1.24 2007/07/02 15:08:51 nichele Exp $ -->
+<!--                                                               -->
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+     	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+	     version="2.4">
+
+    <display-name>Funambol Data Synchronization Server</display-name>
+    <description>Funambol Data Synchronization Server</description>
+
+    <filter>
+        <filter-name>LogContextFilter</filter-name>
+        <filter-class>com.funambol.transport.http.server.LogContextFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>LogContextFilter</filter-name>
+        <url-pattern>/ds/*</url-pattern>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>REQUEST</dispatcher>        
+    </filter-mapping>
+
+    <listener>
+        <listener-class>com.funambol.transport.http.server.ServletListener</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>com.funambol.transport.http.server.SessionListener</listener-class>
+    </listener>
+
+    <!-- AXIS 1.2 beta - start  -->
+    <listener>
+        <listener-class>org.apache.axis.transport.http.AxisHTTPSessionListener</listener-class>
+    </listener>
+    <!-- AXIS 1.2 beta - end -->
+
+    <servlet>
+        <servlet-name>SyncServerServlet</servlet-name>
+        <display-name>SyncServerServlet</display-name>
+
+        <servlet-class>com.funambol.transport.http.server.Sync4jServlet</servlet-class>
+        <init-param>
+            <param-name>sync-holder-class</param-name>
+            <param-value>com.funambol.transport.http.server.LocalSyncHolder</param-value>
+        </init-param>
+        <init-param>
+            <param-name>log-messages</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>dirlog-messages</param-name>
+            <param-value>.</param-value>
+        </init-param>
+
+        <!-- Session timeout in seconds -->
+        <init-param>
+            <param-name>session-timeout</param-name>
+            <param-value>900</param-value> <!-- 15 minutes -->
+        </init-param>
+        <init-param>
+            <param-name>preferred-encoding</param-name>
+            <param-value>gzip</param-value>
+        </init-param>
+        <init-param>
+            <param-name>supported-encoding</param-name>
+            <param-value>gzip,deflate</param-value>
+        </init-param>
+
+        <!--
+         =======================================================================
+         The allowed values for compression-level are the following:
+         - DEFAULT_COMPRESSION  -1
+         - NO_COMPRESSION        0
+         - BEST_SPEED            1
+         - BEST_COMPRESSION      9
+         =======================================================================
+        -->
+        <init-param>
+            <param-name>compression-level</param-name>
+            <param-value>-1</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>ClassDownloadServlet</servlet-name>
+        <display-name>ClassDownloadServlet</display-name>
+        <servlet-class>com.funambol.server.admin.ws.ClassDownloadServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Sync4jAddressListener</servlet-name>
+        <display-name>Sync4jAddressListener</display-name>
+        <servlet-class>com.funambol.server.notification.listener.Sync4jAddressListener</servlet-class>
+    </servlet>
+
+    <!--  AXIS 1.2 beta - start -->
+    <servlet>
+        <servlet-name>AxisServlet</servlet-name>
+        <display-name>Apache-Axis Servlet</display-name>
+        <servlet-class>org.apache.axis.transport.http.AxisServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminServlet</servlet-name>
+        <display-name>Axis Admin Servlet</display-name>
+        <servlet-class>org.apache.axis.transport.http.AdminServlet</servlet-class>
+        <load-on-startup>100</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>SOAPMonitorService</servlet-name>
+        <display-name>SOAPMonitorService</display-name>
+        <servlet-class>org.apache.axis.monitor.SOAPMonitorService</servlet-class>
+        <init-param>
+            <param-name>SOAPMonitorPort</param-name>
+            <param-value>5001</param-value>
+        </init-param>
+        <load-on-startup>100</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AxisServlet</servlet-name>
+        <url-pattern>/servlet/AxisServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AxisServlet</servlet-name>
+        <url-pattern>*.jws</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AxisServlet</servlet-name>
+        <url-pattern>/services/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SOAPMonitorService</servlet-name>
+        <url-pattern>/SOAPMonitor</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminServlet</servlet-name>
+        <url-pattern>/servlet/AdminServlet</url-pattern>
+    </servlet-mapping>
+    <!-- AXIS 1.2 beta - end -->
+    <servlet-mapping>
+        <servlet-name>SyncServerServlet</servlet-name>
+        <url-pattern>/ds/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ClassDownloadServlet</servlet-name>
+        <url-pattern>/rmicl/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Sync4jAddressListener</servlet-name>
+        <url-pattern>/devinfo</url-pattern>
+    </servlet-mapping>
+
+    <!-- AXIS 1.2 beta - start -->
+    <!-- currently the W3C havent settled on a media type for WSDL;
+    http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft
+    for now we go with the basic 'it's XML' response -->
+    <mime-mapping>
+        <extension>wsdl</extension>
+        <mime-type>text/xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xsd</extension>
+        <mime-type>text/xml</mime-type>
+    </mime-mapping>
+    <!-- AXIS 1.2 beta - end -->
+
+    <welcome-file-list id="WelcomeFileList_FunambolDS">
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <resource-ref>
+        <description>DB Connection</description>
+        <res-ref-name>jdbc/fnblds</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
+</web-app>

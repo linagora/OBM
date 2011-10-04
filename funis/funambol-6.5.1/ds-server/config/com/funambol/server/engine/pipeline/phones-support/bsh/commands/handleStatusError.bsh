@@ -1,0 +1,88 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Handles Status commands with data 500.
+ * When on server side there is an error on Item sent by client, the server
+ * responses at the client command with a Status 500 that contains an Item in
+ * which the data explain the cause of the error.
+ * The client is not able to understand this Status command and so it interrupts
+ * the sync.
+ * It needs to remove the data and to add the SourceRef into Status command.
+ * Note: the client is not able to understand also a Status with Item in which
+ * the data is empty.
+ * The Nokia series 40 are an example of device that don't understand this
+ * command (even if they can send commands with empty data that are the cause
+ * of Status 500 server side).
+ *
+ * @param message the SyncML message
+ * @param cmds the array of the commands to send at the client
+ *
+ * @version $Id: handleStatusError.bsh,v 1.1 2007/07/25 13:21:15 luigiafassina Exp $
+ */
+void handleStatusError(SyncML message, AbstractCommand[] cmds) {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Handle Status command 500 if needs");
+    }
+    
+    Status      status     = null;
+    Status      newStatus  = null;
+    Item[]      item       = null;
+    ArrayList   items      = null;
+    TargetRef[] targetRefs = null;
+
+    for (int i=0; i< cmds.length; i++) {
+        if (cmds[i] instanceof Status) {
+            status = (Status)cmds[i];
+            data = status.data.data;
+            if ("500".equals(data)) {
+                items = status.getItems();
+                if (items != null && items.size() > 0) {
+                    locURI = ((Item)items.get(0)).source.locURI;
+                }
+                if (status.getTargetRef() == null) {
+                    targetRefs = new TargetRef[0];
+                } else {
+                    targetRefs = (TargetRef[])status.getTargetRef()
+                                                    .toArray(new TargetRef[0]);
+                }
+                newStatus = new Status(status.cmdID                          ,
+                                       status.msgRef                         ,
+                                       status.cmdRef                         ,
+                                       status.cmd                            ,
+                                       targetRefs                            ,
+                                       new SourceRef[]{new SourceRef(locURI)},
+                                       status.cred                           ,
+                                       status.chal                           ,
+                                       status.data                           ,
+                                       item);
+                cmds[i] = newStatus;
+            }
+        }
+    }
+    message.getSyncBody().setCommands(cmds);
+}

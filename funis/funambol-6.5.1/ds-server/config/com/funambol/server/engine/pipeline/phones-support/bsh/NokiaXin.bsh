@@ -1,0 +1,482 @@
+/*
+ * Copyright (C) 2006-2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Processes the incoming vcard items and adds the missing tokens.
+ * Handles large objects.
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Processes the incoming vcard items and adds the missing tokens.
+ *   Handles large objects.
+ *   Replaces DESCRIPTION token with SUMMARY token when the event has the first
+ *   token but not the second (e.g. from Nokia 7650).
+ *   Removes the X- before the CATEGORIES token.
+ *   Replaces T000000 with T235900 like all day event into undefined event.
+ *   Replaces T000000 with T235900 like all day event into Anniversary event.
+ *   Replaces T000000 with T235900 like all day event into Memo event and
+ *   subtracts one day by end date.
+ *
+ * . Todo
+ *   Processes the incoming vcard items and adds the missing tokens.
+ *   Handles large objects.
+ *   Replaces DESCRIPTION token with SUMMARY token when the event has the first
+ *   token but not the second (e.g. from Nokia 7650).
+ *   Removes the X- before the CATEGORIES token.
+ *
+ * @version $Id: NokiaXin.bsh,v 1.7 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+
+// ------------------------------------------------------------------- Constants
+private final String TIMEZERO      = "T000000";
+private final String TIMEENDALLADY = "T235900";
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+private Map missingCardTokens  = null;
+private Map missingEventTokens = null;
+private Map missingTodoTokens  = null;
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Processes input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("NokiaXin.preProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ *
+ * @param pimItemsHandler the object to handle the large object
+ *
+ */
+void processPIMItems(Map mapItems, PIMItemsHandler pimItemsHandler) {
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        preProcessVCard(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        adjustSummary(i);
+        replaceCategories(i);
+        handleUndefinedEvent(i);
+        handleAnniversary(i);
+        handleMemo(i);
+        preProcessVEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vtodo list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VTODO)) {
+        adjustSummary(i);
+        replaceCategories(i);
+        preProcessVTodo(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Processes the incoming vcard item.
+ *
+ * @param i the vcard item to be processed
+ */
+void preProcessVCard(Item i) {
+
+    //
+    // Adds void tokens if they are missing in VCARD item
+    //
+    i.data.data = addVoidTokens(i.data.data, "END:VCARD", missingCardTokens);
+}
+
+/**
+ * Initializes the hashmaps with the properties for contact, event and todo.
+ */
+void init() {
+
+    missingCardTokens  = new HashMap();
+    missingEventTokens = new HashMap();
+    missingTodoTokens  = new HashMap();
+
+    initPropsVCard();
+    initPropsVEvent();
+    initPropsVTodo();
+}
+
+/**
+ * Initializes hashmap of contact properties.
+ */
+void initPropsVCard() {
+    missingCardTokens.put("\r\nN"                  , "N:;;;;"              );
+    missingCardTokens.put("\r\nFN"                 , "FN:"                 );
+    missingCardTokens.put("\r\nADR"                , "ADR:;;;;;;"          );
+    missingCardTokens.put("\r\nADR;HOME"           , "ADR;HOME:;;;;;;"     );
+    missingCardTokens.put("\r\nADR;WORK"           , "ADR;WORK:;;;;;;"     );
+    missingCardTokens.put("\r\nTEL"                , "TEL:"                );
+    missingCardTokens.put("\r\nTEL;VOICE"          , "TEL;VOICE:"          );
+    missingCardTokens.put("\r\nTEL;VOICE;HOME"     , "TEL;VOICE;HOME:"     );
+    missingCardTokens.put("\r\nTEL;VOICE;WORK"     , "TEL;VOICE;WORK:"     );
+    missingCardTokens.put("\r\nTEL;VOICE;PREF"     , "TEL;VOICE;PREF:"     );
+    missingCardTokens.put("\r\nTEL;VOICE;CAR"      , "TEL;VOICE;CAR:"      );
+    missingCardTokens.put("\r\nTEL;WORK;PREF"      , "TEL;WORK;PREF:"      );
+    missingCardTokens.put("\r\nTEL;CELL"           , "TEL;CELL:"           );
+    missingCardTokens.put("\r\nTEL;CELL;WORK"      , "TEL;CELL;WORK:"      );
+    missingCardTokens.put("\r\nTEL;CELL;HOME"      , "TEL;CELL;HOME:"      );
+    missingCardTokens.put("\r\nTEL;FAX"            , "TEL;FAX:"            );
+    missingCardTokens.put("\r\nTEL;FAX;HOME"       , "TEL;FAX;HOME:"       );
+    missingCardTokens.put("\r\nTEL;FAX;WORK"       , "TEL;FAX;WORK:"       );
+    missingCardTokens.put("\r\nTEL;PAGER"          , "TEL;PAGER:"          );
+    missingCardTokens.put("\r\nEMAIL;INTERNET"     , "EMAIL;INTERNET:"     );
+    missingCardTokens.put("\r\nEMAIL;INTERNET;HOME", "EMAIL;INTERNET;HOME:");
+    missingCardTokens.put("\r\nEMAIL;INTERNET;WORK", "EMAIL;INTERNET;WORK:");
+    missingCardTokens.put("\r\nURL"                , "URL:"                );
+    missingCardTokens.put("\r\nURL;HOME"           , "URL;HOME:"           );
+    missingCardTokens.put("\r\nBDAY"               , "BDAY:"               );
+    missingCardTokens.put("\r\nROLE"               , "ROLE:"               );
+    missingCardTokens.put("\r\nTITLE"              , "TITLE:"              );
+    missingCardTokens.put("\r\nORG"                , "ORG:"                );
+    missingCardTokens.put("\r\nNOTE"               , "NOTE:"               );
+}
+
+/**
+ * Processes the incoming vevent item.
+ *
+ * @param i the vevent item to be processed
+ */
+void preProcessVEvent(Item i) {
+
+    //
+    // Adds void tokens if they are missing in VEVENT item
+    //
+    content = addVoidTokens(i.data.data, "END:VEVENT", missingEventTokens);
+    
+    i.data.data = content + "END:VCALENDAR\r\n";
+}
+
+/**
+ * Initializes hashmap of vevent properties.
+ */
+void initPropsVEvent() {
+    missingEventTokens.put("\r\nCLASS"       , "CLASS:"      );
+    missingEventTokens.put("\r\nDESCRIPTION" , "DESCRIPTION:");
+    missingEventTokens.put("\r\nLOCATION"    , "LOCATION:"   );
+    missingEventTokens.put("\r\nPRIORITY"    , "PRIORITY:"   );
+    missingEventTokens.put("\r\nSUMMARY"     , "SUMMARY:"    );
+    missingEventTokens.put("\r\nDTEND"       , "DTEND:"      );
+    missingEventTokens.put("\r\nDTSTART"     , "DTSTART:"    );
+    missingEventTokens.put("\r\nORGANIZER"   , "ORGANIZER:"  );
+    missingEventTokens.put("\r\nRRULE"       , "RRULE:"      );
+    missingEventTokens.put("\r\nSEQUENCE"    , "SEQUENCE:"   );
+    missingEventTokens.put("\r\nAALARM"      , "AALARM:;;;"  );
+}
+
+/**
+ * Processes the incoming vtodo item.
+ *
+ * @param i the vtodo item to be processed
+ */
+void preProcessVTodo(Item i) {
+
+    //
+    // Adds void tokens if they are missing in VTODO item
+    //
+    content = addVoidTokens(i.data.data, "END:VTODO", missingTodoTokens);
+
+    i.data.data = content + "END:VCALENDAR\r\n";
+}
+
+/**
+ * Initializes hashmap of todo properties.
+ */
+void initPropsVTodo() {
+    missingTodoTokens.put("\r\nCLASS"   , "CLASS:"    );
+    missingTodoTokens.put("\r\nPRIORITY", "PRIORITY:" );
+    missingTodoTokens.put("\r\nSUMMARY" , "SUMMARY:"  );
+    missingTodoTokens.put("\r\nDUE"     , "DUE:"      );
+    missingTodoTokens.put("\r\nRRULE"   , "RRULE:"    );
+    missingTodoTokens.put("\r\nAALARM"  , "AALARM:;;;");
+}
+
+/**
+ * Replaces DESCRIPTION token with SUMMARY token when the event has the first
+ * token but not the second (e.g. from Nokia 7650).
+ *
+ * @param i the item to be processed
+ */
+void adjustSummary(Item i) {
+
+    data = i.data.data;
+
+    if (data.indexOf("\r\nDESCRIPTION") != - 1 &&
+        data.indexOf("\r\nSUMMARY"    ) == -1    ) {
+
+        data = data.replace("\r\nDESCRIPTION:", "\r\nSUMMARY:");
+        i.data.setData(data);
+    }
+}
+
+/**
+ * Removes the X- before the CATEGORIES token.
+ * If the phone does not recognize the CATEGORIES token, it puts X- before this
+ * token.
+ *
+ * @param i the item to be processed
+ */
+void replaceCategories(Item i) {
+
+    data = i.data.data;
+
+    startCategories = data.indexOf("\r\nCATEGORIES");
+
+    //verifies if the field CATEGORIES is present
+    if(startCategories != -1) {
+        endCategories = data.indexOf("\r\n", startCategories + 2);
+        categories    = data.substring(startCategories, endCategories);
+
+        //
+        // the categories must be split in order to verify if the value starts
+        // with X-
+        //
+        String prefix = categories.split(":")[0];
+        String value  = categories.split(":")[1];
+        if (value.startsWith("X-")){
+            //
+            // The data is build taking the part before the X- and the part
+            // after
+            //
+            beforeX = data.substring(0, startCategories + prefix.length() + 1);
+            afterX  = data.substring(startCategories + prefix.length() + 3,
+                                     data.length());
+            data = beforeX + afterX;
+        }
+    }
+
+    i.data.setData(data);
+}
+
+/**
+ * Replaces T000000 with T235900 like all day event into undefined event.
+ * The undefined event is an event in which the X-EPOCAGENDAENTRYTYPE is not
+ * specified and so it's not possible, checking this field, to tell if it is
+ * an appointment, or a memo or is an anniversary or something else.
+ * With phones like Nokia 6600, when you create an anniversary, the start date
+ * is equals to end date (it's not possible set the end date on the phone) and
+ * both end with T000000. This even must be considerated an all day event and so
+ * is needed to convert the end date into conventional format T235900.
+ * Generally the X-EPOCAGENDAENTRYTYPE has one the following values:
+ * . EVENT       for Memo
+ * . ANNIVERSARY for Anniversary
+ * . APPOINTMENT for Meeting
+ * . TODO        for To-do
+ *
+ * For example, the phone can send an event without X-EPOCAGENDAENTRYTYPE but
+ * with DTSTART:20070222T000000 and DTEND:20070222T000000: in this case is need
+ * to convert the end date to be able to consider the event as all day.
+ */
+void handleUndefinedEvent(Item i) {
+    //
+    // Checks:
+    // 1) Is the X-EPOCAGENDAENTRYTYPE specified into event?
+    // 2) Is the start date equal to end date?
+    // 3) Does the start date finish with T000000?
+    //
+    data = i.data.data;
+
+    if (data.indexOf("\r\nX-EPOCAGENDAENTRYTYPE:") != - 1) {
+        return;
+    }
+
+    indStart = data.indexOf("\nDTSTART:");
+    indEnd   = data.indexOf("\nDTEND:"  );
+    if (indStart == -1 || indEnd == -1) {
+        return;
+    }
+    dtStart = data.substring(indStart + 9, data.indexOf("\r\n", indStart + 9));
+    dtEnd   = data.substring(indEnd   + 7, data.indexOf("\r\n", indEnd   + 7));
+
+    if (!dtStart.equals(dtEnd)) {
+        return;
+    }
+
+    if (!dtEnd.endsWith(TIMEZERO)) {
+        return;
+    }
+    dtEnd = dtEnd.replace(TIMEZERO, TIMEENDALLADY);
+
+    newData = new StringBuffer(data.substring(0, indEnd + 7))
+            .append(dtEnd)
+            .append(data.substring(data.indexOf("\r\n", indEnd + 7)))
+            ;
+
+    i.data.setData(newData.toString());
+}
+
+/**
+ * Replaces T000000 with T235900 like all day event into Anniversary event.
+ * The anniversary event is an event in which the X-EPOCAGENDAENTRYTYPE is set
+ * to ANNIVERSARY.
+ * In the anniversary event the end date should be the same as the start date
+ * with time T235959.
+ *
+ * But the phone can send the anniversary in two form:
+ * 1) DTSTART:20061020T000000
+ *    DTEND  :20061020T000000
+ * 2) DTSTART:20061020T000000
+ *    DTEND  :20061019T235900
+ * so, in the firts case, is needed to convert the end date into conventional
+ * format T235900 and, in the second case, is needed to set the end date like
+ * the start date.
+ *
+ * @param i the item to be processed
+ */
+void handleAnniversary(Item i) {
+
+    data = i.data.data;
+
+    if (data.indexOf("\r\nX-EPOCAGENDAENTRYTYPE:ANNIVERSARY") == - 1) {
+        return;
+    }
+
+    indStart = data.indexOf("\r\nDTSTART:");
+    indEnd   = data.indexOf("\r\nDTEND:"  );
+    if (indStart == -1 || indEnd == -1) {
+        return;
+    }
+
+    dtStart = data.substring(indStart + 10                      ,
+                             data.indexOf("\r\n", indStart + 10));
+
+    newData = new StringBuffer(data.substring(0, indEnd + 8))
+            .append(dtStart.substring(0, dtStart.indexOf("T")))
+            .append(TIMEENDALLADY)
+            .append(data.substring(data.indexOf("\r\n", indEnd + 8)))
+            ;
+
+     i.data.setData(newData.toString());
+}
+
+/**
+ * Replaces T000000 with T235900 like all day event into Memo event and
+ * subtracts one day by end date.
+ * The memo event is an event in which the X-EPOCAGENDAENTRYTYPE is set to EVENT.
+ *
+ * The phone may send a memo event with the end date set at the after day of the
+ * real end date set on the phone and with time T000000.
+ *
+ * For example, the phone can send an event with
+ *  X-EPOCAGENDAENTRYTYPE:EVENT
+ *  DTSTART:20070222T000000
+ *  DTEND  :20070223T000000 (even if in the phone was set as 20070222)
+ * so in this case is need to convert the end date to be able to consider the
+ * event as all day and subtracts one day by end date.
+ *
+ * @param i the item to be processed
+ */
+void handleMemo(Item i) {
+
+    data = i.data.data;
+
+    if (data.indexOf("\r\nX-EPOCAGENDAENTRYTYPE:EVENT") == - 1) {
+        return;
+    }
+
+    indEnd = data.indexOf("\r\nDTEND:");
+    if (indEnd == -1) {
+        return;
+    }
+
+    dtEnd = data.substring(indEnd + 8, data.indexOf("\r\n", indEnd + 8));
+    if (dtEnd.endsWith(TIMEZERO)) {
+
+        dtEnd = dtEnd.replace(TIMEZERO, TIMEENDALLADY);
+
+        try {
+            SimpleDateFormat format = new SimpleDateFormat();
+            format.applyPattern("yyyyMMdd'T'HHmmss");
+
+            Date     date = format.parse(dtEnd)   ;
+            Calendar cal  = Calendar.getInstance();
+            cal.setTime(date);
+            cal.add(Calendar.DATE, -1);
+
+            dtEnd = format.format(cal.getTime());
+
+        } catch (ParseException e) {
+            return;
+        }
+
+        newData = new StringBuffer(data.substring(0, indEnd + 8))
+                .append(dtEnd)
+                .append(data.substring(data.indexOf("\r\n", indEnd + 8)))
+                ;
+
+        i.data.setData(newData.toString());
+    }
+}

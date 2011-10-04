@@ -1,0 +1,239 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Capabilities;
+import com.funambol.framework.server.Sync4jDevice;
+import com.funambol.framework.server.inventory.*;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Defines the slot position of some groups of similar properties via the
+ * X-SYNCMLREF parameters.
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Replaces T235900 with T240000 in the end date of an all day event.
+ *
+ * @version $Id: SonyEricssonEPOCXout.bsh,v 1.1 2007/08/31 09:51:01 luigiafassina Exp $
+ */
+ 
+// ------------------------------------------------------------------- Constants
+private final String DTSTART = "DTSTART:";
+private final String DTEND   = "DTEND:"  ;
+private String CLIENT_MANUFACTURER = "Epoc Manufacturer";
+private String CLIENT_MODEL = "Epoc Model"  ;
+
+// ---------------------------------------------------------------- Private data
+//Addresses the correct EPOC Client that is in use
+private String clientMan = null;
+private String clientMod = null;
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/epoc");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SonyEricssonEPOCXout.postProcessMessage(...)");
+    }
+
+    clientMan = (String) processingContext.getSessionProperty(CLIENT_MANUFACTURER);
+    clientMod = (String) processingContext.getSessionProperty(CLIENT_MODEL);
+    
+    if (clientMan==null||clientMod==null) {
+        if (setEpocProperties(processingContext, message)==-1) {
+            return;
+        }
+    }
+    
+    if (log.isTraceEnabled()) {
+        log.trace("Manufacturer: " + clientMan);
+        log.trace("Model: " + clientMod);
+    }
+    
+    //Returns to the system if device is not a Sony Ericsson
+    if (!getEpocClient(clientMan, clientMod).equals("SE")) {
+        if (log.isTraceEnabled()) {
+            log.trace("Sony Ericsson EPOC Client not found: exit synclet (...)");
+        }
+        return;
+    } else {
+        if (log.isTraceEnabled()) {
+            log.trace("Sony Ericsson EPOC Client found: processing (...)");
+        }
+    }
+    
+    
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems);
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ *
+ */
+void processPIMItems(Map mapItems) {
+    
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessContacts(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessEvents(i);
+    }
+}
+
+/**
+ * Processes outgoing contacts.
+ * Defines the slot position of some groups of similar properties via the
+ * X-SYNCMLREF parameters.
+ *
+ * @param i the item content
+ *
+ */
+void postProcessContacts(Item i) {
+    if (log.isTraceEnabled()) {
+        log.trace("EPOCXout.postProcessContacts(...)");
+    }
+
+    data = i.data.data;
+    
+    data = replaceFirstOutProperty(data, "TEL;VOICE;HOME:", "TEL;VOICE;HOME;X-SYNCMLREF1:");
+    data = replaceFirstOutProperty(data, "TEL;VOICE;HOME:", "TEL;VOICE;HOME;X-SYNCMLREF2:");
+
+    data = replaceFirstOutProperty(data, "TEL;VOICE;WORK:", "TEL;VOICE;WORK;X-SYNCMLREF1:");
+    data = replaceOutProperty     (data, "TEL;WORK;PREF:",  "TEL;VOICE;WORK;X-SYNCMLREF2:");
+    data = replaceFirstOutProperty(data, "TEL;VOICE;WORK:", "TEL;VOICE;WORK;X-SYNCMLREF3:");
+    
+    data = replaceFirstOutProperty(data, "TEL;VOICE:",      "TEL;VOICE;X-SYNCMLREF1:");
+    data = replaceFirstOutProperty(data, "TEL;PREF;VOICE:", "TEL;VOICE;X-SYNCMLREF2:");
+    
+    Matcher emailFinder = Pattern.compile("\\nEMAIL;INTERNET(;[^:]*)?:").matcher(data);
+    StringBuffer sb = new StringBuffer();
+    while (emailFinder.find()) {
+        
+        if (emailFinder.group().matches("\\nEMAIL;INTERNET[^:]*;HOME[^:]*:")) {
+            String emailHome = 
+                    emailFinder.group().replaceAll(":", ";X-SYNCMLREF2:");
+            emailFinder.appendReplacement(sb, emailHome);
+            
+        } else if (emailFinder.group().matches("\\nEMAIL;INTERNET[^:]*;WORK[^:]*:")) {
+            String emailWork = 
+                    emailFinder.group().replaceAll(":", ";X-SYNCMLREF3:");
+            emailFinder.appendReplacement(sb, emailWork);
+            
+        } else if (emailFinder.group().matches("\\nEMAIL;INTERNET[^:]*:")) {
+            String emailOther = 
+                    emailFinder.group().replaceAll("\\nEMAIL;INTERNET", "\nEMAIL;INTERNET;HOME")
+                                       .replaceAll(":", ";X-SYNCMLREF1:");
+            emailFinder.appendReplacement(sb, emailOther);
+        } 
+    }
+    emailFinder.appendTail(sb);
+
+    i.data.data = sb.toString();
+}
+
+/**
+ * Processes outgoing events.
+ * Replaces T235900 with T240000 in the end date of an all day event.
+ *
+ * @param i the item content
+ *
+ */
+void postProcessEvents(Item i) {
+     if (log.isTraceEnabled()) {
+         log.trace("EPOCXout.postProcessEvents(...)");
+     }
+
+    i.data.data = fixAllDay(i.data.data);
+}
+
+/**
+ * Replaces T235900 with T240000 in the end date of an all day event.
+ *
+ * @param event the event content
+ *
+ * @return event with fixed all day
+ */
+String fixAllDay(String event) {
+
+  s = e = 0;
+  if ((s = event.indexOf(DTSTART)) != -1 &&
+      (e = event.indexOf(DTEND)  ) != -1   ) {
+
+      dtStart = event.substring(s, event.indexOf("\r\n", s));
+      dtEnd   = event.substring(e, event.indexOf("\r\n", e));
+
+      if (dtStart.indexOf("T000000") != -1 &&
+          dtEnd.indexOf("T235900")   != -1   ) {
+
+          dtEnd = dtEnd.replaceAll("T235900", "T240000");
+
+          StringBuffer sb = new StringBuffer(event.substring(0, e));
+          sb.append(dtEnd).append(event.substring(e + dtEnd.length()));
+
+          event = sb.toString();
+      }
+  }
+  return event;
+}
+
+void init() {
+    // Do nothing
+}

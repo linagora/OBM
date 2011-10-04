@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.1_01" class="java.beans.XMLDecoder">
+ <object class="com.funambol.server.admin.DBUserManager">
+  <void property="jndiDataSourceName">
+    <string>jdbc/fnblds</string>
+  </void>
+  <void property="sql">
+   <array class="java.lang.String" length="15">
+    <!-- SQL_SELECT_ROLES -->
+    <void index="0">
+     <string>select role, description from fnbl_role</string>
+    </void>
+    <!-- SQL_SELECT_USERS -->
+    <void index="1">
+     <string>select username, password, email, first_name, last_name from fnbl_user</string>
+    </void>
+    <!-- SQL_SELECT_USER_ROLES -->
+    <void index="2">
+     <string>select role from fnbl_user_role where username=?</string>
+    </void>
+    <!-- SQL_UPDATE_USER -->
+    <void index="3">
+     <string>update fnbl_user set password=?, email=?, first_name=?, last_name=?  where username=?</string>
+    </void>
+    <!-- SQL_INSERT_USER -->
+    <void index="4">
+     <string>insert into fnbl_user(username, password, email, first_name, last_name) values(?,?,?,?,?)</string>
+    </void>
+    <!-- SQL_DELETE_USER -->
+    <void index="5">
+     <string>delete from fnbl_user where username=?</string>
+    </void>
+    <!-- SQL_DELETE_USER_ROLES -->
+    <void index="6">
+     <string>delete from fnbl_user_role where username=?</string>
+    </void>
+    <!-- SQL_INSERT_USER_ROLES -->
+    <void index="7">
+     <string>insert into fnbl_user_role(role, username) values(?,?)</string>
+    </void>
+    <!-- SQL_DELETE_PRINCIPAL -->
+    <void index="8">
+     <string>delete from fnbl_principal where username=?</string>
+    </void>
+    <!-- SQL_SELECT_USER_PRINCIPALS -->
+    <void index="9">
+     <string>select id from fnbl_principal where username=?</string>
+    </void>
+    <!-- SQL_DELETE_CLIENT_MAPPING -->
+    <void index="10">
+     <string>delete from fnbl_client_mapping where principal=?</string>
+    </void>
+    <!-- SQL_DELETE_LAST_SYNC -->
+    <void index="11">
+     <string>delete from fnbl_last_sync where principal=?</string>
+    </void>
+    <!-- SQL_GET_USER -->
+    <void index="12">
+     <string>select username, email, first_name, last_name, password from fnbl_user where username = ?</string>
+    </void>
+    <!-- SQL_COUNT_USERS -->    
+    <void index="13">
+     <string>select count(*) as users from fnbl_user </string>
+    </void>
+    <!-- SQL_COUNT_ADMINISTRATORS -->    
+    <void index="14">
+     <string>select count(*) as administrators from fnbl_user u, fnbl_user_role r where u.username != ? and r.role = 'sync_administrator' and u.username = r.username</string>
+    </void>    
+   </array>
+  </void>
+ </object>
+</java>

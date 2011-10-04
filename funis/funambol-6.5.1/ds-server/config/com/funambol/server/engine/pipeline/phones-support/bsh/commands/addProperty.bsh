@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * This synclet adds the input property at the end of the data.
+ * A property is a uniquely named value (for examples TEL:12345).
+ *
+ * @version $Id: addProperty.bsh,v 1.3 2007/07/25 13:26:12 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+private final String CRLF = "\r\n";
+
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Adds the property at the end of the data. A property is a uniquely named
+ * value (for examples TEL:12345).
+ *
+ * @param data the data to modify
+ * @param property the property to add
+ *
+ * @return the modified data
+ */
+String addProperty(String data, String property) {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Add the property " + property);
+    }
+    
+    //
+    // Don't use lastIndexOf because if the data is a vcalendar, that method
+    // will return END:VCALENDAR and not END:VEVENT or END:VTODO.
+    //
+    int endPos = data.indexOf("\r\nEND:");
+    if (endPos == -1) {
+        endPos = data.indexOf("\nEND:");
+    }
+    StringBuffer missing = new StringBuffer(data.substring(0, endPos));
+
+    missing.append(CRLF)
+           .append(property)
+           .append(data.substring(endPos, data.length()))
+           ;
+
+    data = missing.toString();
+
+    return data;
+}

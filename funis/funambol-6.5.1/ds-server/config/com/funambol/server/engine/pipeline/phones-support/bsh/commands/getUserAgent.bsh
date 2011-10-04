@@ -1,0 +1,55 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * This synclet returns the user-agent from http request header.
+ *
+ * @version $Id: getUserAgent.bsh,v 1.2 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+
+import java.util.Iterator;
+import java.util.Map;
+
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+/**
+ * Returns the user-agent read from http request header.
+ *
+ * @param mpc the message processing context
+ * @return the user-agent
+ */
+String getUserAgent(MessageProcessingContext mpc) {
+
+    Map requestHeaders = mpc.getRequestProperty(mpc.PROPERTY_REQUEST_HEADERS);
+    String userAgent = null;
+    Iterator i = requestHeaders.keySet().iterator();
+    while (i.hasNext()) {
+        String h = (String)i.next();
+        if ("user-agent".equalsIgnoreCase(h)) {
+            userAgent = (String)requestHeaders.get(h);
+            break;
+        }
+    }
+    
+    if (log.isTraceEnabled()) {
+        log.trace("Found user-agent " + userAgent);
+    }
+    return userAgent;
+}

@@ -1,0 +1,180 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.io.UnsupportedEncodingException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.net.QuotedPrintableCodec;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Sync4jDevice;
+import com.funambol.framework.server.inventory.*;
+
+import com.funambol.server.config.*;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Remaps the 7 supported TEL properties to the predefined properties and slots.
+ * Removes all other TEL properties.
+ * Renames FN to SOUND and CATEGORIES to X-MOT-CAT.
+ *
+ * @version $Id: MotorolaV3xxout.bsh,v 1.1 2007/07/25 13:21:14 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+private final String PRINTABLE_CHARS = ";ENCODING=QUOTED-PRINTABLE;CHARSET=";
+
+// ---------------------------------------------------------------- Private data
+private QuotedPrintableCodec qp = new QuotedPrintableCodec();
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+private Map missingCardTokens;
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("MotorolaV3xxout.postProcessMessage(...)");
+    }
+
+    if (message.syncHdr.target.locURI != null) {
+        this.deviceId = message.syncHdr.target.locURI;
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems, message.syncHdr.target.locURI);
+
+    throw new StopProcessingException("MotorolaV3xxout Synclet finished");
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param deviId the device identifier
+ *
+ */
+void processPIMItems(Map mapItems, String deviceId) {
+    String softwareVersion = null;
+    
+    if (log.isTraceEnabled()) {
+        log.trace("MotorolaV3xxout.processPIMItems(...)");
+    }
+
+    //
+    // Cycle on VCARD list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessContact(i);
+    }
+}
+
+/**
+ * Processes outgoing contacts.
+ * Remaps the 7 supported TEL properties to the predefined properties and slots,
+ * putting them in the correct order in the end of the VCARD. All 7 properties
+ * must be present, therefore explicit empty slots are defined if necessary.
+ * Removes all other TEL properties.
+ * Renames FN to SOUND and CATEGORIES to X-MOT-CAT.
+ *
+ * @param i the item to process
+ *
+ */
+void postProcessContact(Item i) {
+
+    data = i.data.data;
+   
+    //
+    // Adds void tokens if they are missing in VCARD item
+    //
+    data = addVoidTokens(data, "END:VCARD", missingCardTokens);
+    
+    data = movePropertyToTheEnd(data, "TEL;VOICE"     );
+    data = keepFirstProperty   (data, "TEL;VOICE;HOME");
+    data = movePropertyToTheEnd(data, "TEL;VOICE;HOME");
+    data = movePropertyToTheEnd(data, "TEL;CELL"      );
+    data = keepFirstProperty   (data, "TEL;VOICE;WORK");
+    data = movePropertyToTheEnd(data, "TEL;VOICE;WORK");
+    data = movePropertyToTheEnd(data, "TEL;WORK;PREF" );
+    data = movePropertyToTheEnd(data, "TEL;FAX;HOME"  );
+    data = movePropertyToTheEnd(data, "TEL;FAX;WORK"  );
+   
+    data = replaceOutProperty(data, "TEL;VOICE:",     "TEL;VOICE;X-MOT-POSITION=1:"    );
+    data = replaceOutProperty(data, "TEL;VOICE;HOME", "TEL;VOICE;HOME;X-MOT-POSITION=2");
+    data = replaceOutProperty(data, "TEL;CELL:",      "TEL;CELL;X-MOT-POSITION=3:"     );
+    data = replaceOutProperty(data, "TEL;VOICE;WORK", "TEL;VOICE;WORK;X-MOT-POSITION=4");
+    data = replaceOutProperty(data, "TEL;WORK;PREF:", "TEL;WORK;PREF;X-MOT-POSITION=5:");
+    data = replaceOutProperty(data, "TEL;FAX;HOME:",  "TEL;FAX;HOME;X-MOT-POSITION=6:" );
+    data = replaceOutProperty(data, "TEL;FAX;WORK:",  "TEL;FAX;WORK;X-MOT-POSITION=7:" );
+
+    //
+    // Removes all other TEL properties
+    //
+    data = deleteOutProperty(data, "TEL;[^X]*:");
+    
+    data = replaceOutProperty(data, "FN",         "SOUND"    );
+    data = replaceOutProperty(data, "CATEGORIES", "X-MOT-CAT");
+   
+    i.data.data = data;
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    missingCardTokens  = new HashMap();
+    
+    missingCardTokens.put("\nTEL;VOICE"     , "TEL;VOICE:"     );
+    missingCardTokens.put("\nTEL;VOICE;HOME", "TEL;VOICE;HOME:");
+    missingCardTokens.put("\nTEL;CELL"      , "TEL;CELL:"      );
+    missingCardTokens.put("\nTEL;VOICE;WORK", "TEL;VOICE;WORK:");
+    missingCardTokens.put("\nTEL;WORK;PREF" , "TEL;WORK;PREF:" );
+    missingCardTokens.put("\nTEL;FAX;HOME"  , "TEL;FAX;HOME:"  );
+    missingCardTokens.put("\nTEL;FAX;WORK"  , "TEL;FAX;WORK:"  );
+}

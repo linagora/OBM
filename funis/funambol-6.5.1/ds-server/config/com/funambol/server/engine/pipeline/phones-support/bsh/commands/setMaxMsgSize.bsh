@@ -1,0 +1,37 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import com.funambol.framework.core.*;
+
+/**
+ * This synclet set the MaxMsgSize value.
+ * (Default value for Motorola devices should be 1850 bytes)
+ *
+ * @param the maximum size of the SyncML message accepted by the device
+ *
+ * @version $Id: setMaxMsgSize.bsh,v 1.1 2007/08/31 09:51:01 luigiafassina Exp $
+ */
+
+void setMaxMsgSize(SyncML message, int size) {
+
+    if (!message.SyncHdr.msgID.equals("1") &&
+        !message.SyncHdr.msgID.equals("2")   ) {
+        
+        message.SyncHdr.meta.setMaxMsgSize(size);
+    }
+}

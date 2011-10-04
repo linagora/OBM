@@ -1,0 +1,472 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.filter.*;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.security.Sync4jPrincipal;
+import com.funambol.framework.server.ClientMapping;
+import com.funambol.framework.server.ClientMappingEntry;
+import com.funambol.framework.server.store.PersistentStore;
+import com.funambol.framework.server.store.PreparedWhere;
+import com.funambol.framework.server.store.SQLHelperClause;
+
+import com.funambol.server.config.Configuration;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Handles anchors for every source to sync.
+ *
+ * Contacts:
+ * =========
+ * Removes any fax number other than TEL;FAX .
+ * Removes any work number other than TEL;WORK;PREF: .
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Sets dummy values for summary, location and description.
+ *
+ * . Todo
+ *   Sets dummy value for summary.
+ *
+ * @version $Id: SonyEricssonK750Iout.bsh,v 1.2 2007/08/31 10:04:18 luigiafassina Exp $
+ */
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+    if (log.isTraceEnabled()) {
+        log.trace("SonyEricssonK750Iout.postProcessMessage(...)");
+    }
+    
+    // Handles anchors
+    removeFastSyncLastAnchorMapEntry(message, processingContext);
+    if (isLastMessage(message)){
+        Map sourceMap =
+            processingContext.getSessionProperty("FAST_SYNC_LAST_ANCHOR_MAP");
+            
+        if (sourceMap != null) {
+            setLastAnchors("-1"                                        ,
+                           getPrincipals(message.syncHdr.target.locURI),
+                           sourceMap                                   );
+        }
+    }
+    
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems);
+    
+    throw new StopProcessingException("SonyEricssonK750Iout Synclet finished");
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ *
+ */
+void processPIMItems(Map mapItems) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessContacts(i);
+    }
+    
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessEvents(i);
+    }    
+    
+    //
+    // Cycle on vtodo list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VTODO)) {
+        postProcessVTodo(i);
+    }   
+}
+
+/**
+ * Processes outgoing contacts.
+ *
+ * Deletes any fax number other than TEL;FAX .
+ * Deletes any work number other than TEL;WORK;PREF: .
+ *
+ * @param i the item to process
+ */
+void postProcessContacts(Item i) {
+
+    data = i.data.data;
+
+    data = handleFaxNumbers (data);
+    data = handleWorkNumbers(data);
+    
+    i.data.data = data;
+}
+
+/**
+ * Processes outgoing events.
+ *
+ * Sets dummy values for summary, location and description.
+ *      
+ * @param i the item content
+ */
+void postProcessEvents(Item i) {
+    data = i.data.data;
+
+    data = setDummyValue(data, "SUMMARY"    , "SUMMARY"    );
+    data = setDummyValue(data, "LOCATION"   , "LOCATION"   );
+    data = setDummyValue(data, "DESCRIPTION", "DESCRIPTION");
+    data = deleteOutProperty(data, "CATEGORIES:");
+    
+    i.data.setData(data);
+}
+
+/**
+ * Processes outgoing vtodo.
+ *
+ * Sets dummy value for summary.
+ *
+ * @param i the item to be processed
+ */
+void postProcessVTodo(Item i) {
+    data = i.data.data;
+
+    data = setDummyValue(data, "SUMMARY", "SUMMARY");
+
+    i.data.setData(data);    
+}
+
+/**
+ * Deletes any fax number other than TEL;FAX;HOME token.
+ * 
+ * Notes about device  
+ * ==================
+ *
+ * On device it is possible to insert 0 or 1 "Fax" number.
+ * A vcard from the device for a contact with fax number, contains the token 
+ * TEL;FAX: , which is stored by the server as "other fax number".
+ * Given a vcard sent by the server, the device gets the last "fax number" that 
+ * appears in the vcard, regardless of its type. Thus, number duplications and
+ * unpredictable updates can occur.
+ * 
+ * Here is an example of such behaviors:
+ *  Insert a contact with a home and work fax on the server and sync.
+ *  Assuming the following vcard is sent by the server
+ *      ...   
+ *      TEL;FAX;WORK:2222 
+ *      TEL;FAX;HOME:1111
+ *      ...
+ *  then the value "1111" will be displaied by the device, just because it is 
+ *  the last fax number that appears in the vcard.
+ *  If the fax number is modified in the device ("111100") then, after sync,
+ *  3 fax numbers appears on the server:
+ *      home fax: 1111
+ *      work fax: 2222
+ *      other fax:111100
+ *  If the work fax number is modified (222200) on the server, while the others 
+ *  remain unchanged, and the following vcard is sent by the server during sync
+ *      ...   
+ *      TEL;FAX;HOME:1111
+ *      TEL;FAX:111100 
+ *      TEL;FAX;WORK:222200 
+ *      ...
+ *  then "222200" will appear on the device, while no changes were expected.
+ *
+ * In order to prevent those behaviors, any fax tokens other than TEL;FAX;HOME 
+ * are removed from the outgoing item. This is the conseguence of the input choice
+ * to consider the only fax number sent by the phone as the home fax number.
+ * 
+ * @param data the data item to process
+ * @return modified data
+ */ 
+String handleFaxNumbers(String data) {
+
+    data = deleteOutProperty(data, "TEL;FAX:");
+    data = deleteOutProperty(data, "TEL;FAX;WORK");
+
+    return data;
+}
+
+/**
+ * Deletes any work number other than TEL;VOICE;WORK: token.
+ *
+ * On device it is possible to insert 0 or 1 "Work" number.
+ * A vcard from the device for a contact with work number, contains the token
+ * TEL;WORK: , which is stored by the server as "business telephone number".
+ * Given a vcard sent by the server, the device gets the last "work number" that
+ * appears in the vcard, regardless of its type. Thus, number duplications and
+ * unpredictable updates can occur.
+ *
+ * Here is a round trip synchronization that shows such behavior:
+ * - from server to device:
+ *
+ *   create on server a contact with
+ *     work phone: 22
+ *     work main:  33
+ *
+ *   outgoing vcard fragment: --->  phones on device:
+ *   TEL;VOICE;WORK:22
+ *   TEL;WORK;PREF:33               Work: 33
+ *
+ *   Work phone on device is 33 just because is the last work number in the vcard.
+ *
+ * - from device to server:
+ *                                incoming vcard fragment:
+ *   work phone: 333              TEL;WORK:333             <---  Work: 333
+ *   work main:  33
+ *
+ * In order to give to the device work number an unique meaning, incoming Work
+ * phone is intended to be the "business telephone number".
+ * To do this, simply remove any work number other than TEL;VOICE;WORK: from the
+ * outgoing vcard, while no processing is necessary for the incoming vcard,
+ * because the wanted property is already sent by the device.
+ *
+ * @param data the data item to process
+ * @return the modified data
+ */
+String handleWorkNumbers(String data) {
+    data = deleteOutProperty(data, "TEL;WORK;PREF:");    
+}
+
+/**
+ * Removes entries from FAST_SYNC_LAST_ANCHOR_MAP map.
+ * 
+ * See method saveFastSyncLastAnchorMapEntry in SonyEriccsonK750Iin.bsh for 
+ * more info. 
+ *
+ * @param message the SyncML message to be processed
+ * @param mpc the message processing context
+ */
+void removeFastSyncLastAnchorMapEntry(SyncML                   message,
+                                      MessageProcessingContext mpc    ){
+    
+    Map map = null;
+    map = (Map)mpc.getSessionProperty("FAST_SYNC_LAST_ANCHOR_MAP");
+    if (map == null) {
+        return;
+    }
+    
+    List cmds = message.syncBody.commands;
+    for (AbstractCommand bodyc : cmds) {
+    
+        if (bodyc instanceof Alert) {
+            
+            Alert alert = (Alert)bodyc;
+            
+            //
+            // Checks the type of sync:
+            // if a slow sync is requested then the source for this alert has
+            // to be removed from the map, if it is present.
+            //
+            syncType = alert.data;
+            if (syncType == AlertCode.TWO_WAY) {
+                continue;
+            }
+
+            List items = alert.items;
+
+            for (Item item : items) {
+
+                //
+                // Extract source uri.
+                //
+                sourceURI = item.source.locURI;
+                if (sourceURI == null){
+                    continue;
+                }
+                
+                //
+                // Remove entry for key "sourceURI" from the map.
+                //
+                map.remove(sourceURI);
+                
+                if (log.isTraceEnabled()) {
+                    log.trace("Removed entry with key '" + sourceURI +
+                              "' from FAST_SYNC_LAST_ANCHOR_MAP");
+                }
+            }
+        }  
+    }
+}
+
+/**
+ * Checks if the given message is the last one sent by server.
+ *
+ * @param message the SyncML message to check
+ * @return true if message is the last one, false otherwise. 
+ */
+boolean isLastMessage(SyncML message) {
+    
+    //
+    // Checks if the message contains <final> tag.
+    //
+    if (!message.syncBody.isFinalMsg()){
+        return false;
+    }
+    
+    //
+    // Checks if the msgID is > 2
+    //
+    msgID = Integer.parseInt(message.syncHdr.msgID);
+    if (msgID <= 2){
+        return false;
+    }
+    
+    //
+    // Checks if the message contains only Status commands.
+    //
+    List cmds = message.syncBody.commands;
+    for (AbstractCommand bodyc : cmds) {
+    
+        if (!(bodyc instanceof Status)) {
+            return false;
+        }
+    }   
+
+    if (log.isTraceEnabled()) {
+        log.trace("Last message found!");
+    }
+    return true;
+}
+
+/**
+ * Sets the last anchor to the given value for all the given principal with the
+ * sync sources and last anchor given in a map.
+ * 
+ * @param newValue last anchor to set
+ * @param principals array of all the principals to update
+ * @param sourceMap map of (source,last anchor) to update
+ */ 
+void setLastAnchors(String newValue             ,
+                    Sync4jPrincipal[] principals,
+                    Map sourceMap               ) {
+                     
+    PersistentStore store = Configuration.getConfiguration().getStore();
+    
+    Iterator it = sourceMap.keySet().iterator();
+
+    String source = null;
+    String anchor = null;
+    
+    while (it.hasNext()) {
+        
+        source = (String)it.next();
+        anchor = (String)sourceMap.get(source);
+        
+        //
+        // Going through all the principals for this source
+        //
+        for (int j = 0; j < principals.length; j++) {
+
+            principal = principals[j];
+                         
+            //
+            // Getting all the mapping for this principal and source
+            //
+            clientMapping = new ClientMapping(principal, source);
+
+            // Note: 
+            //  cannot use method:
+            //      ClientMappingPersistanceStore.read(Object o, Clause clause)
+            //  with a clause to filter over last_anchor column because that
+            //  method does nothing.
+            //
+            store.read(clientMapping);
+            mappings = clientMapping.mapping;
+            
+            for (ClientMappingEntry entry : mappings) {
+                if (entry.lastAnchor.equals(anchor)) {
+                    clientMapping.updateLastAnchor(entry.guid, entry.luid, newValue);
+                }
+            }
+            
+            // Note:
+            //  method ClientMappingPersistanceStore.store updates only records
+            //  that are said to have been modified. Thus it is not possible to
+            //  modify last_anchor only setting its value, like:
+            //      entry.lastAnchor = newValue
+            //  but a specific method has to be invoked:
+            //      updateLastAnchor(entry.guid, entry.luid, newValue)
+            //  that say that such record has been modified
+            //
+            store.store(clientMapping);
+        }        
+    }
+}
+
+/**
+ * Gets all the principal for the given device id.
+ *  
+ * @param deviceId the device id
+ *
+ * @return an array of principals for given device id
+ */ 
+Sync4jPrincipal[] getPrincipals(String deviceId) {
+
+    Sync4jPrincipal[] principals = new Sync4jPrincipal[0];
+    
+    PersistentStore store = Configuration.getConfiguration().getStore();
+    
+    wc = new WhereClause("device"                 ,
+                         new String[] { deviceId },
+                         WhereClause.OPT_EQ       ,
+                         true
+    );
+
+    principals = (Sync4jPrincipal[])store.read(new Sync4jPrincipal(), wc);
+    
+    return principals;
+}
+
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

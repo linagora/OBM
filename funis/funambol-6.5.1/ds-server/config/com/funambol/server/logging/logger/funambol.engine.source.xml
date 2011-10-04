@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.5.0_08" class="java.beans.XMLDecoder"> 
+ <object class="com.funambol.framework.config.LoggerConfiguration"> 
+  <void property="inherit"> 
+   <boolean>true</boolean> 
+  </void> 
+  <void property="level"> 
+   <string>INFO</string> 
+  </void> 
+  <void property="name"> 
+   <string>funambol.engine.source</string> 
+  </void> 
+ </object> 
+</java> 

@@ -1,0 +1,236 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Processes the incoming vcard items and adds the missing tokens.
+ * Handles large objects.
+ * Replaces field TEL: with TEL;VOICE: token.
+ * Replaces field TEL;FAX: with TEL;FAX;HOME: token.
+ * Removes the command size.
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Processes the incoming vevent items and adds the missing tokens.
+ *   Handles large objects.
+ *   Removes the command size.
+ *
+ * @version $Id: SonyEricssonXin.bsh,v 1.8 2007/07/25 13:41:52 luigiafassina Exp $
+ */
+
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+private Map missingCardTokens  = null;
+private Map missingEventTokens = null;
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SonyEricssonXin.preProcessMessage(...)");
+    }
+
+    removeCommandSize(message);
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ *
+ */
+void processPIMItems(Map mapItems, PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        preProcessContact(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Replaces field TEL: with TEL;VOICE: token.
+ * Replaces field TEL;FAX with TEL;FAX;HOME token.
+ * Adds missing fields.
+ *
+ * @param i the item content
+ */
+void preProcessContact(Item i) {
+    data = i.data.data;
+
+    data = checkTel(data);
+    data = checkFax(data);
+    
+    //
+    // Adds void tokens if they are missing in VCARD item
+    //
+    i.data.data = addVoidTokens(data, "END:VCARD", missingCardTokens);
+}
+
+/**
+ * Initializes hashmap of contact and event properties.
+ */
+void init() {
+    missingCardTokens  = new HashMap();
+    missingEventTokens = new HashMap();
+
+    missingCardTokens.put("\r\nN"                   , "N:;;;;"         );
+    missingCardTokens.put("\r\nTEL;VOICE:"          , "TEL;VOICE:"     );
+    missingCardTokens.put("\r\nTEL;HOME:"           , "TEL;HOME:"      );
+    missingCardTokens.put("\r\nTEL;WORK:"           , "TEL;WORK:"      );
+    missingCardTokens.put("\r\nEMAIL;INTERNET;PREF" , "EMAIL;INTERNET:");
+    missingCardTokens.put("\r\nTEL;CELL:"           , "TEL;CELL:"      );
+    missingCardTokens.put("\r\nTEL;FAX;HOME:"       , "TEL;FAX;HOME:"  );
+    missingCardTokens.put("\r\nNOTE"                , "NOTE:"          );
+    missingCardTokens.put("\r\nADR;HOME"            , "ADR;HOME:;;;;;;");
+    missingCardTokens.put("\r\nADR;WORK"            , "ADR;WORK:;;;;;;");
+    missingCardTokens.put("\r\nURL"                 , "URL:"           );
+    missingCardTokens.put("\r\nBDAY:"               , "BDAY:"          );
+    missingCardTokens.put("\r\nORG"                 , "ORG:"           );
+    missingCardTokens.put("\r\nTITLE"               , "TITLE:"         );
+
+    missingEventTokens.put("\r\nDTSTART"     , "DTSTART:"    );
+    missingEventTokens.put("\r\nDTEND"       , "DTEND:"      );
+    missingEventTokens.put("\r\nSUMMARY"     , "SUMMARY:"    );
+    missingEventTokens.put("\r\nLOCATION"    , "LOCATION:"   );
+    missingEventTokens.put("\r\nDESCRIPTION" , "DESCRIPTION:");
+    missingEventTokens.put("\r\nCLASS"       , "CLASS:"      );
+    missingEventTokens.put("\r\nAALARM"      , "AALARM:"     );
+}
+
+/**
+ * Replaces field TEL: with TEL;VOICE: token.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String checkTel(String data) {
+
+    int index = data.indexOf("\nTEL:");
+
+    if( index != -1){
+        data = replace(data, "\nTEL:", "\nTEL;VOICE:");
+    }
+
+    return data;
+}
+
+/**
+ * Replaces field TEL;FAX with TEL;FAX;HOME token.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String checkFax(String data) {
+
+    int index = data.indexOf("\nTEL;FAX:");
+
+    if( index != -1){
+        data = replace(data, "\nTEL;FAX:", "\nTEL;FAX;HOME:");
+    }
+
+    return data;
+}
+
+/**
+ * Adds missing fields.
+ *
+ * @param i the item content
+ */
+void preProcessEvent(Item i) {
+
+    //
+    // Adds void tokens if they are missing in VEVENT item
+    //
+    content = addVoidTokens(i.data.data, "END:VEVENT", missingEventTokens);
+
+    i.data.data = content + "END:VCALENDAR\r\n";
+    
+}
+
+/**
+ * Replaces a pattern string.
+ *
+ * @param str the string to be modified
+ * @param pattern the pattern to be searched
+ * @param replace the replace substring
+ *
+ * @return the modified data
+ */
+String replace(String str, String pattern, String replace) {
+    int s = 0;
+    int e = 0;
+    StringBuffer result = new StringBuffer();
+
+    while ((e = str.indexOf(pattern, s)) >= 0) {
+        result.append(str.substring(s, e));
+        result.append(replace);
+        s = e + pattern.length();
+    }
+    result.append(str.substring(s));
+    return result.toString();
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.1_01" class="java.beans.XMLDecoder">
+ <object class="com.funambol.server.store.SyncSourcePersistentStore">
+  <void property="jndiDataSourceName">
+   <string>jdbc/fnblds</string>
+  </void>
+  <void property="sql">
+   <array class="java.lang.String" length="9">
+    <!-- SQL_GET_SOURCE -->
+    <void index="0">
+     <string>select uri, config from fnbl_sync_source where uri=?</string>
+    </void>
+    <!-- SQL_SELECT_ALL_SOURCES -->
+    <void index="1">
+     <string>select uri, config, sourcetype, name from fnbl_sync_source</string>
+    </void>
+    <!-- SQL_DELETE_CLIENT_MAPPING -->
+    <void index="2">
+     <string>delete from fnbl_client_mapping where principal=?</string>
+    </void>
+    <!-- SQL_DELETE_LAST_SYNC -->
+    <void index="3">
+     <string>delete from fnbl_last_sync where principal=?</string>
+    </void>
+    <!-- SQL_DELETE_SOURCE -->
+    <void index="4">
+     <string>delete from fnbl_sync_source where uri=?</string>
+    </void>
+    <!-- SQL_INSERT_SYNCSOURCE -->
+    <void index="5">
+     <string>insert into fnbl_sync_source values(?,?,?,?)</string>
+    </void>
+    <!-- SQL_UPDATE_SYNCSOURCE -->
+    <void index="6">
+     <string>update fnbl_sync_source set config=?, name=?, sourcetype=? where uri=?</string>
+    </void>
+    <!-- SQL_DELETE_SOURCE_CLIENT_MAPPING -->
+    <void index="7">
+     <string>delete from fnbl_client_mapping where sync_source=?</string>
+    </void>
+    <!-- SQL_DELETE_SOURCE_LAST_SYNC -->
+    <void index="8">
+     <string>delete from fnbl_last_sync where sync_source=?</string>
+    </void>
+   </array>
+  </void>
+ </object>
+</java>

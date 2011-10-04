@@ -1,0 +1,210 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Capabilities;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Moves some TEL properties to the end of the VCARD in a special order because 
+ * the devices don't behave properly at update time, otherwise.
+ *
+ * Calendars:
+ * ==========
+ * Does nothing.
+ *
+ * @version $Id: NokiaS60out.bsh,v 1.2 2007/08/31 09:58:22 luigiafassina Exp $
+ */
+ 
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param mpc the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext mpc,
+                        SyncML message              )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("NokiaS60out.postProcessMessage(...)");
+    }
+
+    // Retrieves the device model from the DB
+    Capabilities capabilities = deviceCapabilitiesLookup(
+            message.syncHdr.target.locURI);
+    
+    String model = null;
+    
+    if (capabilities != null) {
+        DevInf devInf = capabilities.getDevInf();
+        
+        if (devInf != null) {
+            model = devInf.getMod();            
+        }
+    }
+    
+    if (isInSeries60(model)) {
+    
+        if (log.isTraceEnabled()) {
+           log.trace(model + " belongs to the Series 60");
+        }
+    
+        // This map contains the three lists of items separated based on their type
+        PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+        Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+
+        processPIMItems(mapItems);
+    } else {
+        if (log.isTraceEnabled()) {
+            log.trace(model + " does not belong to the Series 60");
+        }
+    }
+	
+    throw new StopProcessingException("NokiaS60out Synclet finished");
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ */
+void processPIMItems(Map mapItems) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessVCard(i);
+    }
+    
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessVEvent(i);
+    }
+ 
+    //
+    // Cycle on vtodo list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VTODO)) {
+        postProcessVTodo(i);
+    }   
+}
+
+/**
+ * Processes outgoing contacts.
+ * 
+ * @param i the item to be processed
+ */
+void postProcessVCard(Item i) {
+
+    data = i.data.data;
+    
+    data = movePropertyToTheEnd(data, "TEL;VOICE;WORK");
+    data = movePropertyToTheEnd(data, "TEL;WORK;PREF");
+    data = movePropertyToTheEnd(data, "TEL;PREF;VOICE");
+    data = movePropertyToTheEnd(data, "TEL;VOICE");
+   
+    i.data.data = data;
+}
+
+/**
+ * Processes outgoing vevent.
+ *
+ * @param i the item to be processed
+ *
+ */
+void postProcessVEvent(Item i) {
+   // Do nothing
+}
+
+/**
+ * Processes outgoing vtodo.
+ *
+ * @param i the item to be processed
+ *
+ */
+void postProcessVTodo(Item i) {
+    // Do nothing
+}
+
+/**
+ * Called at synclet's initialization time.
+ */
+void init() {
+    // do nothing
+}
+
+/**
+ * Checks whether a given model is part of the Series 60.
+ *
+ * @param model as retrieved from the device capabilities
+ *
+ * @return true only if the model is part of the Series 60
+ */
+boolean isInSeries60(String model) {
+    
+    if (model == null) {
+        return false;
+    }
+     
+    String[] series60 = {
+        "Catalina",      // development name of model 7610
+        "9999",          // model 6630
+        "E61",
+        "N70(-\\d)?",   // N70, N70-1 etc.
+        "N73",
+        "N80",
+        "N91"
+    };
+    
+    for (String device : series60) {
+        if (model.matches(device)) {
+            return true;
+        }
+    }
+    
+    return false;
+
+}

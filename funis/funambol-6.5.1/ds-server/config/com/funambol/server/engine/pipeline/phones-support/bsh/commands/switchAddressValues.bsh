@@ -1,0 +1,82 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+/**
+ * This synclet switches the second with the third value in the address tokens
+ * (home, work or other type). The phone for any address, has Street 1 and
+ * Street 2. The phone sends the Street 1 in the second position of ADR token
+ * where, how specified in the VCard specification, should be the extended
+ * address (the server doesn't handle it) and it sends the Street 2 in the third
+ * position where, always how specified in the VCard specification, should be
+ * the principal street.
+ * This switch is done for all address types and only if the Street 1 is not
+ * empty.
+ *
+ * @version $Id: switchAddressValues.bsh,v 1.1 2007/07/25 13:21:15 luigiafassina Exp $
+ */
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Switches the second with the third value in the address tokens (home, work or
+ * other type).
+ *
+ * For examples:
+ *     ADR;HOME:;Mason Street;2730 Liberty Street;Redwood City;Ca;94063;Usa
+ * returns as
+ *     ADR;HOME:;2730 Liberty Street;Mason Street;Redwood City;Ca;94063;Usa
+ *
+ * Usage example:
+ *  moveAddressField("ADR;HOME:");
+ *
+ * @param data the data to modify
+ * @param property the property to move
+ *
+ * @return the modified data
+ */
+String switchAddressValues(String data, String property) {
+  
+    //
+	// The pattern should match the first two address fields after the property
+    // and then switch their order.
+	// Code is optimized to understand if the property has a charset information
+    // like ENCODING=QUOTED-PRINTABLE after the ADR;HOME property
+    Pattern p = Pattern.compile(property + "(;[^;]*(;[^;]*)?)?:([^;]*);([^;]*);([^;]*);.*");
+    Matcher m = p.matcher(data);
+    
+	if (!m.find()) {
+        return data;
+    }
+	
+	String v_charset = m.group(1);
+	String value1 = m.group(3);
+    String value2 = m.group(4); // First Address value 
+	String value3 = m.group(5); // Second Address value
+
+	if (v_charset == null) {
+		data = data.replaceFirst(property + ':' + value1 + ';' + value2 + ';' + value3, 
+								property + ':' + value1 + ';' + value3 + ';' + value2);
+	}
+    else {
+		data = data.replaceFirst(property + v_charset + ':' + value1 + ';' + value2 + ';' + value3, 
+								property + v_charset + ':' + value1 + ';' + value3 + ';' + value2);	
+	}
+	
+	return data;
+}

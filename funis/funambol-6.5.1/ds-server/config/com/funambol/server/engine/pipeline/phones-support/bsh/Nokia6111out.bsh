@@ -1,0 +1,404 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Removes all information from N token except for the first name and last name
+ * because the device is not able to handle a N token in the format
+ * N:Firstname;Lastname;;; .
+ * Handles the address tokens in order to send always three address (in the case
+ * in which exists almost one address) at the device. The address tokens must be
+ * sorted: first ADR:HOME, then ADR:WORK and then ADR: . In the phone is
+ * not possible to specify the addresses type, and so this is a workaround in
+ * order not to lose the information. In the phone is only possible to insert
+ * one address.
+ * Reduces the phone numbers to one for each of five different number types
+ * used by the device (main phone, cell phone, home phone, work phone, fax),
+ * removing all TEL properties but the first one for each supported type.
+ * Fixes the BDAY token format.
+ *
+ * Calendars:
+ * ==========
+ * Removes all information from AALARM token except the date/time because the
+ * device is not able to understand an AALARM in the format
+ * AALARM:20070601T084500;;; (the device ignores the token in this format).
+ *
+ * @version $Id: Nokia6111out.bsh,v 1.1 2007/07/25 13:21:14 luigiafassina Exp $
+ */
+ 
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param mpc the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext mpc,
+                        SyncML message              )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Nokia6111out.postProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    
+    processPIMItems(mapItems);
+	
+	throw new StopProcessingException("Nokia6111out Synclet finished");
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ */
+void processPIMItems(Map mapItems) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessVCard(i);
+    }
+    
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessVEvent(i);
+    }
+ 
+    //
+    // Cycle on vtodo list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VTODO)) {
+        postProcessVTodo(i);
+    }   
+}
+
+/**
+ * Processes outgoing contacts.
+ * 
+ * Handles fax tokens.
+ * Handles N token.
+ * Handles ADR tokens.
+ * Fixes BDAY token format.
+ *
+ * @param i the item to be processed
+ */
+void postProcessVCard(Item i) {
+
+    data = i.data.data;
+    
+    data = handleName(data);
+    data = handleAdr (data);
+    
+    data = deleteOutProperty(data, "TEL;CAR;VOICE:");
+    data = deleteOutProperty(data, "TEL;FAX:");
+    data = deleteOutProperty(data, "TEL;FAX;WORK:");
+    data = deleteOutProperty(data, "TEL;PAGER:");
+    data = deleteOutProperty(data, "TEL;PREF;VOICE:");
+    data = deleteOutProperty(data, "TEL;WORK;PREF:");
+    data = keepFirstProperty(data, "TEL;VOICE;HOME");
+    data = keepFirstProperty(data, "TEL;VOICE;WORK");
+    
+    i.data.data = fixBDay(data);
+}
+
+/**
+ * Processes outgoing vevent.
+ *
+ * Handles AALARM token.
+ *
+ * @param i the item to be processed
+ *
+ */
+void postProcessVEvent(Item i) {
+    i.data.data = handleAAlarm(i.data.data);
+}
+
+/**
+ * Processes outgoing vtodo.
+ *
+ * Handles AALARM token.
+ *
+ * @param i the item to be processed
+ *
+ */
+void postProcessVTodo(Item i) {
+    i.data.data = handleAAlarm(i.data.data);
+}
+
+
+/**
+ * Handles the ADR tokens.
+ *
+ * If at least one address exists then all 3 addresses (home, work, other)
+ * must be present in the data item into established order (home, work, other).
+ * The order of the ADR tokens is more important because there are some phones
+ * (like Nokia 61xx) that handle only one address and this address must be the
+ * ADR;HOME.
+ * If at least one address is not specified then it must be added with an
+ * empty value.
+ *   
+ * @param data the data item
+ *
+ * @return the data with adr (if needs)
+ */
+String handleAdr(String data) {
+    int found = data.indexOf("\r\nADR");
+    if (found != -1) {
+
+        StringBuffer sb =
+            new StringBuffer(data.substring(0, data.indexOf("\r\nEND:VCARD")));
+
+        addToken(sb, "ADR;HOME");
+        addToken(sb, "ADR;WORK");
+
+        String[] exclude = {"HOME", "WORK"};         
+        addOtherToken(sb, "ADR", exclude);
+
+        sb.append("\r\nEND:VCARD\r\n");
+        data = sb.toString();
+    }
+    return data;
+}
+
+/**
+ * Adds or moves at the end of data item the token specified in input.
+ * If the token doesn't exist into data, adding it else move it at the end of
+ * data.
+ *
+ * @param data the data item
+ * @param token the token to search
+ */
+void addToken(StringBuffer data, String token) {
+    start = data.indexOf("\r\n" + token);
+    if (start != -1) {
+        end   = data.indexOf("\r\n", start + 2);
+        value = data.substring(start, end);
+
+        data.delete(start, end);
+        data.append(value);
+    } else {
+        data.append("\r\n")
+            .append(token )
+            .append(token.charAt(token.length() - 1) == ':' ? "" : ":");
+    }
+}
+
+/**
+ * Adds or moves at the end of item data the token specified in input. Token
+ * specified in input is intended to be of type "other".
+ * If the token doesn't exists into data, adding it else move it at the end of
+ * data.
+ *
+ * @param data the data item
+ * @param token the token to search
+ * @param exclude string array which contains the non-other tokens to be excluded 
+ */    
+void addOtherToken(StringBuffer data, String token, String[] exclude){
+    start = data.indexOf("\r\n" + token);
+    
+    boolean isAdr = true;
+    if (start != -1) {
+        
+        startParam = start + 2 + token.length();
+        endParam   = data.indexOf(":", startParam);
+        
+        if (data.charAt(startParam) == ';'){
+            
+            params = data.substring(startParam, endParam);                       
+            
+            for (int i = 0; i < exclude.length; i++) {
+                if (params.indexOf(exclude[i]) != -1){
+                    isAdr = false;
+                    break;
+                }
+            }
+        }
+        
+        if (isAdr){
+            end   = data.indexOf("\r\n", start + 2);
+            value = data.substring(start, end);                
+            data.delete(start, end);
+            data.append(value);
+        }
+    }
+    
+    if (start != -1 && isAdr == false){
+        data.append("\r\n")
+            .append(token )
+            .append(':'   );
+    }
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}
+
+/**
+ * Removes information from N token except for the first name and last name 
+ * since device is not able to handle correctly a token in the format
+ * N:Firstname;Lastname;;; 
+ *
+ * @param data item data to process
+ *
+ * @return new item data  
+ *
+ */    
+String handleName(String data) {
+
+    int nameTokenStart = data.indexOf("\nN");
+    if (nameTokenStart != -1) {
+        
+        nameTokenValueStart = data.indexOf(':', nameTokenStart) + 1; 
+
+        nameTokenParams =
+            data.substring(nameTokenStart, nameTokenValueStart - 1);
+        nameTokenValueEnd = data.indexOf('\r', nameTokenStart);
+        nameTokenValue = data.substring(nameTokenValueStart, nameTokenValueEnd);
+        tail = data.substring(nameTokenValueEnd);
+
+        n   = 0;
+        end = 0;
+        String newNameTokenValue = null;
+        
+        for (int i = 0; i < nameTokenValue.length(); i++) {
+            if (nameTokenValue.charAt(i) == ';'){
+            
+      /**
+                 * The first value for N: token could be the empty value.
+                 *                  
+                 * Example:
+                 * N:Someone;Something;;; <-- first value is "Someone"
+                 * N:;Something;;;        <-- first value is the empty value
+                 * 
+                 * In this case the counter for the values to be passed to the 
+                 * device (that is: the variable n) must be immediatly increased.                                                                                     
+                 */                                                                   
+                if (i == 0){
+                    ++n;
+                    continue;
+                }
+            
+                if (nameTokenValue.charAt(i - 1) != '\\'){
+                    if (++n == 2){
+                        newNameTokenValue = 
+                                data.substring(nameTokenValueStart, nameTokenValueStart + i);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        newData = new StringBuffer();
+        newData.append(data.substring(0, nameTokenStart))
+               .append(nameTokenParams                  )
+               .append(':'                              )
+               .append(newNameTokenValue                )
+               .append(tail                             );
+        return newData.toString();
+    }
+    return data;
+}
+
+/**
+ * Removes information from AALARM token except the date/time because the
+ * device is not able to understand an AALARM in the format
+ * AALARM:20070601T084500;;; (the device ignores the token in this format).
+ *
+ * @param data the item data to process
+ * 
+ * @return the modified item data
+ */  
+String handleAAlarm(String data){
+
+    startAlarm = data.indexOf("\nAALARM");
+    
+    if (startAlarm != -1){
+        
+        endAlarm        = data.indexOf("\r", startAlarm);
+        alarmValueStart = data.indexOf(":" , startAlarm) + 1;
+        alarmValue      = data.substring(alarmValueStart, endAlarm);
+        alarmNewValue   = alarmValue.substring(0, alarmValue.indexOf(';'));
+                    
+        StringBuffer newData = new StringBuffer();
+                
+        newData.append(data.substring(0, startAlarm))
+               .append("\nAALARM:"                  )
+               .append(alarmNewValue                )
+               .append(data.substring(endAlarm)     )
+               ;
+        
+        return newData.toString();
+    }
+    
+    return data;
+}
+
+/**
+ * Fixes the BDAY token format.
+ * The server sends BDAY:yyyy-mm-dd but the device is not able to understand it.
+ * So, it is necessary to remove the - from BDAY token.
+ *
+ * @param data the item data to process
+ *
+ * @return the modified item data
+ */
+String fixBDay(String data) {
+
+    startBDay = data.indexOf("\nBDAY");
+
+    if (startBDay != -1) {
+        endBDay   = data.indexOf("\r", startBDay);
+        bdayValue = data.substring(startBDay, endBDay);
+        fixedBDayValue = bdayValue.replaceAll("-", "");
+        data = data.replace(bdayValue, fixedBDayValue);
+    }
+    return data;
+}

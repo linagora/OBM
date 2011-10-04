@@ -1,0 +1,206 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Handles large objects.
+ * Replaces the first TEL;FAX: with tokens TEL;FAX;HOME: and the second one
+ * with TEL;FAX;WORK: so the numbers are stored like Home Fax Number and
+ * Business Fax Number.
+ * Replaces the first TEL;PREF;VOICE: with tokens TEL;VOICE: the second remains
+ * the same, the third is replaced with TEL;WORK;PREF:
+ * Checks if the value of the field EMAIL;INTERNET is '-'. If so the value is
+ * deleted.
+ * Checks if the value of the field N has only one value or more separeted by
+ * semicolons. If there are no semicolon, they are added.
+ * Adds field ADR;HOME with empty value if not exists.
+ * Switches the second with the third value in the address tokens (home, work or
+ * other type).
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Handles large objects.
+ *   Adds field AALARM with empty value if not exists.
+ *
+  * @version $Id: MotorolaPEBLU6in.bsh,v 1.2 2007/08/31 09:56:06 luigiafassina Exp $
+ */
+
+// ------------------------------------------------------------------- Constants
+private Map missingCardTokens  = null;
+private Map missingEventTokens = null;
+
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+	
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("MotorolaPEBLU6in.preProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+	
+	//
+    // Retrieves the device from the db
+    //
+    //Sync4jDevice device = deviceLookup(message.syncHdr.source.locURI);
+
+    throw new StopProcessingException("MotorolaPEBLU6in Synclet finished");
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ * @param device the device information
+ *
+ */
+void processPIMItems(Map             mapItems       ,
+                     PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        preProcessContact(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Replaces the first TEL;FAX: with tokens TEL;FAX;HOME: and the second one
+ * with TEL;FAX;WORK: so the numbers are stored like Home Fax Number and
+ * Business Fax Number.
+ *
+ * Replaces the first TEL;PREF;VOICE: with tokens TEL;VOICE:, the second is 
+ * replaced with TEL;WORK;PREF:, the third remains the same
+ *
+ * Since the device allows to store two street names (Street1 and Street2) it's
+ * necessary to isolate the extended-address field and send to the server only the
+ * street-address field. Otherwise the street-address field is lost.
+ *
+ * Checks if the value of the field EMAIL;INTERNET is '-'. If so the value is
+ * deleted.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+void preProcessContact(Item i) {
+    data = i.data.data;
+    
+    data = replaceFirstInProperty(data, "TEL;FAX:"       , "TEL;FAX;HOME:" );
+    data = replaceFirstInProperty(data, "TEL;FAX:"       , "TEL;FAX;WORK:" );
+	
+    data = replaceFirstInProperty(data, "TEL;PREF;VOICE:", "TEL;VOICE:"    );
+    data = replaceFirstInProperty(data, "TEL;PREF;VOICE:", "TEL;WORK;PREF:");
+	
+    data = switchAddressValues(data, "ADR;HOME");
+	
+    data = replaceInProperty(data, "EMAIL;INTERNET:-", "EMAIL;INTERNET:");
+    
+    //Selects up to 3 emails an specifies them:
+    data = replaceFirstInProperty(data, "EMAIL;INTERNET:", "TMP_EMAIL;INTERNET:");
+    data = replaceFirstInProperty(data, "EMAIL;INTERNET:", "EMAIL;INTERNET;HOME:");
+    data = replaceFirstInProperty(data, "EMAIL;INTERNET:", "EMAIL;INTERNET;WORK:");
+    data = replaceFirstInProperty(data, "TMP_EMAIL;INTERNET:", "EMAIL;INTERNET:");
+    
+    //
+    // Adds void tokens if they are missing in VCARD item
+    //
+    i.data.data = addVoidTokens(data, "END:VCARD", missingCardTokens);
+}
+
+/**
+ * Processes incoming events.
+ *
+ * Check if there is the field AALARM: if not it will be add with empty value.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+void preProcessEvent(Item i) {
+    data = i.data.data;
+	
+	data = replaceInProperty(data, "CHARSET= UTF-8:" , "CHARSET=UTF-8:" );
+	//
+    // Adds void tokens if they are missing in VEVENT item
+    //
+    content = addVoidTokens(data, "END:VEVENT", missingEventTokens);
+
+    i.data.data = content + "END:VCALENDAR\r\n";
+}
+
+/**
+ * Initializes hashmap of contact and event properties.
+ */
+void init() {
+    missingCardTokens  = new HashMap();
+    missingEventTokens = new HashMap();
+
+    missingCardTokens.put("\r\nN"       , "N:;;;;"         );
+	
+    missingEventTokens.put("\r\nAALARM:", "AALARM:");	
+}

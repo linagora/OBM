@@ -1,0 +1,133 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Removes preferred tel voice number in order to avoid duplication on device.
+ * 
+ * @version $Id: Nokia9500out.bsh,v 1.1 2007/07/25 13:21:14 luigiafassina Exp $
+ */
+ 
+// ------------------------------------------------------------------- Constants
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Nokia9500out.postProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems);
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ *
+ */
+void processPIMItems(Map mapItems) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessContacts(i);
+    }
+}
+
+/**
+ * Processes outgoing contacts.
+ *
+ * Replaces empty home addresses with a Funambol generated one. This is because
+ * the phone drops empty address, plus it does not have the concept of
+ * "work" or "home" addresses; it translates any address into a LABEL. In
+ * the input pipeline, we handle such labels by position, therefore, in
+ * order to keep the order we need to make the phone not dropping the empty
+ * home address in the case there is also a work address.
+ *
+ * Replaces TEL;FAX;HOME: with token TEL;FAX: so the information is stored like
+ * Fax number.
+ *
+ * @param i the item to be processed
+ *
+ */
+void postProcessContacts(Item i) {
+    //
+    // Reformat fields before vCard has been sent
+    //
+    
+    if (log.isTraceEnabled()) {
+        log.trace("Manipulating Items (...)");
+    }
+    i.data.data = replaceOutProperty(i.data.data, "TEL;VOICE;HOME:", "TEL;HOME;VOICE:");
+    i.data.data = replaceOutProperty(i.data.data, "TEL;FAX;HOME:", "TEL;HOME;FAX:");
+    i.data.data = replaceOutProperty(i.data.data, "TEL;VOICE;WORK:", "TEL;WORK;VOICE:");
+    i.data.data = replaceOutProperty(i.data.data, "TEL;FAX;WORK:", "TEL;WORK;FAX:");
+    
+    i.data.data = movePropertyToTheEnd(i.data.data, "TITLE");
+    i.data.data = movePropertyToTheEnd(i.data.data, "ORG");
+    
+    i.data.data = movePropertyToTheEnd(i.data.data, "TEL;VOICE");
+    i.data.data = movePropertyToTheEnd(i.data.data, "TEL;PREF;VOICE");
+    i.data.data = movePropertyToTheEnd(i.data.data, "TEL;CELL");
+    i.data.data = movePropertyToTheEnd(i.data.data, "TEL;HOME;VOICE");
+    i.data.data = movePropertyToTheEnd(i.data.data, "TEL;HOME;FAX");
+    i.data.data = movePropertyToTheEnd(i.data.data, "TEL;WORK;PREF");
+    i.data.data = movePropertyToTheEnd(i.data.data, "TEL;WORK;VOICE");
+    i.data.data = movePropertyToTheEnd(i.data.data, "TEL;WORK;FAX");
+    
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

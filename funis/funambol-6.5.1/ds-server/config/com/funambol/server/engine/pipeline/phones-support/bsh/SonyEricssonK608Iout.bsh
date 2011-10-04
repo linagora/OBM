@@ -1,0 +1,157 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Removes the field TEL;PREF;VOICE: because it is not correctly handled by the
+ * phone.
+ * Removes all TEL;FAX tokens except TEL;FAX;HOME token.
+ * Removes the TEL;WORK;PREF token.
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Sets the empty tokens with dummy value.
+ *
+ * @version $Id: SonyEricssonK608Iout.bsh,v 1.3 2007/07/25 13:38:19 luigiafassina Exp $
+ */
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+    if (log.isTraceEnabled()) {
+        log.trace("SonyEricssonK608Iout.postProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems);
+    
+    throw new StopProcessingException("SonyEricssonK608Iout Synclet finished");
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ *
+ */
+void processPIMItems(Map mapItems) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessContact(i);
+    }
+    
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessEvent(i);
+    }    
+}
+
+/**
+ * Processes outgoing contacts.
+ *
+ * Removes the TEL;PREF;VOICE: token.
+ * Removes all TEL;FAX tokens except TEL;FAX;HOME token.
+ * Removes the TEL;WORK;PREF token.
+ *
+ * @param i the item content
+ *
+ */
+void postProcessContact(Item i) {
+    
+    data = i.data.data;
+
+    data = deleteOutProperty(data, "TEL;PREF;VOICE" );
+    data = deleteOutProperty(data, "TEL;FAX(;WORK)?:");
+    data = deleteOutProperty(data, "TEL;WORK;PREF");
+
+    i.data.data = data;
+}
+
+/**
+ * Processes outgoing events.
+ *
+ * Sets the empty tokens with dummy value.
+ *
+ * @param i the item content
+ *
+ */
+void postProcessEvent(Item i) {
+    i.data.data = setDummyProperties(i.data.data);
+}
+
+/**
+ * Sets the tokens with dummy value.
+ * For example:
+ *  the LOCATION:\r\n will be replaced with LOCATION:-\r\n
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String setDummyProperties(String data) {
+    HashMap mapTokens = new HashMap();
+    mapTokens.put("DESCRIPTION", "DESCRIPTION");
+    mapTokens.put("LOCATION"   , "LOCATION"   );
+    mapTokens.put("SUMMARY"    , "SUMMARY"    );
+
+    data = setDummyValues(data, mapTokens);
+    return data;
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

@@ -1,0 +1,250 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Sync4jDevice;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts
+ * ========
+ * Replaces field TEL;VOICE;WORK: with TEL;WORK: token.
+ * Replaces field TEL;VOICE;HOME:", "TEL;HOME:
+ * Removes field TEL;VOICE:\r\n
+ * Removes field ADR;HOME:;;;;;;
+ * Removes field TITLE:\r\n
+ * Removes field TEL:\r\n
+ * Removes field TEL;WORK;PREF:\r\n
+ * Removes field FN:\r\n
+ *
+ * Calendar
+ * ========
+ * . Event
+ * Fixes the dates so that the DST is applied accordingly to when the date is
+ * created and not when the date is converted from UTC by the phone.
+ * Drops field PRIORITY:
+ * Adds field DESCRIPTION: if it is missing
+ *
+ * @version $Id: SiemensS5Xout.bsh,v 1.5 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+ 
+// ------------------------------------------------------------------- Constants
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SiemesS5X.postProcessMessage(...)");
+    }
+
+    //
+    // Retrieves the device from the db
+    //
+    Sync4jDevice device = deviceLookup(message.syncHdr.target.locURI);
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems, device);
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param device the Sync4jDevice
+ *
+ */
+void processPIMItems(Map mapItems, Sync4jDevice device) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessContacts(i);
+    }
+
+    //
+    // If the device was not found, or there was no TZ associated to it,
+    // there is not much we can do...
+    //
+    if ((device == null) || (device.timeZone == null)) {
+        return;
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessEvents(i, device.timeZone);
+    }
+}
+
+/**
+ * Processes outgoing events.
+ * Fixes the dates so that the DST is applied accordingly to when the date is
+ * created and not when the date is converted from UTC by the phone.
+ * Drops field PRIORITY:
+ * Adds field DESCRIPTION: if it is missing
+ *
+ * @param i the Item to be processed
+ * @param tz device tz
+ *
+ */
+void postProcessEvents(Item i, String tz) {
+    if (log.isTraceEnabled()) {
+        log.trace("SiemesS5X.postProcessEvents(...)");
+    }
+
+    String data = i.data.data;
+
+    data = fixField      (data, "DTSTART:", tz);
+    data = fixField      (data, "DTEND:"  , tz);
+    data = dropPriority  (data);
+    data = addDescription(data);
+
+    i.data.data = data;
+}
+
+/**
+ * Fixes the date in the field specified by field.
+ *
+ * @param event the event content
+ * @param field the field - DSTART, DEND, ... to process
+ * @param tz device tz
+ *
+ * @return the new event content
+ */
+String fixField(String event, String field, tz) {
+  int s = event.indexOf(field);
+
+  if (s < 0) {
+    return event;
+  } else {
+    s += field.length();
+  }
+
+  int e = event.indexOf("Z", s);
+
+  if (e < 0) {
+    return event;
+  }
+
+  String value = event.substring(s, e);
+
+  return event.substring(0, s) + fixDST(value, tz, -1) + event.substring(e);
+}
+
+/**
+ * Processes outgoing contacts.
+ *
+ * Replaces field TEL;VOICE;WORK: with TEL;WORK: token.
+ * Replaces field TEL;VOICE;HOME:", "TEL;HOME:
+ * Removes field TEL;VOICE:\r\n
+ * Removes field ADR;HOME:;;;;;;
+ * Removes field TITLE:\r\n
+ * Removes field TEL:\r\n
+ * Removes field TEL;WORK;PREF:\r\n
+ * Removes field FN:\r\n
+ *
+ * @param i the Item to be processed
+ *
+ */
+void postProcessContacts(Item i) {
+    if (log.isTraceEnabled()) {
+        log.trace("SiemensS5X.postProcessContacts(...)");
+    }
+    
+    s = i.data.data;
+
+    s = s.replaceAll("TEL;VOICE;WORK:", "TEL;WORK:");
+    s = s.replaceAll("TEL;VOICE;HOME:", "TEL;HOME:");
+    s = s.replaceAll("TEL;VOICE:[^\r\n]*\r\n", "");
+    s = s.replaceAll("ADR;HOME:;;;;;;\r\n", "");
+    s = s.replaceAll("TITLE:[^\r\n]*\r\n", "");
+    s = s.replaceAll("TEL:[^\r\n]*\r\n", "");
+    s = s.replaceAll("TEL;WORK;PREF:[^\r\n]*\r\n", "");
+    //
+    // Note that FN makes the contact be refused on the S56
+    //
+    s = s.replaceAll("FN:[^\r\n]*\r\n", "");
+
+    i.data.data = s;
+}
+
+/**
+ * Drops field PRIORITY:
+ *
+ * @param data the item data
+ * @return the data without field PRIORITY:
+ */
+String dropPriority(String data) {
+    int priorityPosition = data.indexOf("PRIORITY:");
+    if (priorityPosition != -1) {
+        data = data.substring(0, priorityPosition - 1)                   +
+               data.substring(data.indexOf((char) 13,priorityPosition) + 1);
+    }
+
+    return data;
+}
+
+/**
+ * Adds field DESCRIPTION: if it is missing
+ *
+ * @param data the item data
+ *
+ * @return the data with field DESCRIPTION:
+ */
+String addDescription(String data) {
+    int descriptionPosition = data.indexOf("DESCRIPTION:");
+    if (descriptionPosition == -1) {
+        data = data.replaceAll("LOCATION:", "DESCRIPTION:\r\nLOCATION:");
+    }
+
+    return data;
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

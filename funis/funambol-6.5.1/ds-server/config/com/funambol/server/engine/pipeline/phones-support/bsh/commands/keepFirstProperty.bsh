@@ -1,0 +1,71 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+ 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+ 
+/**
+ * Removes all occurrences of a given one-line property but the first one.
+ *  
+ * Usage example:
+ *  the following vcard fragment:
+ *      ...
+ *      TEL;PREF:1234 
+ *      ..
+ *      TEL:6789  
+ *      ...    
+ *  is changed by the statement: 
+ *      keepFirstProperty(data, "TEL(;PREF)?", "TEL");
+ *  as follows:
+ *      ...
+ *      TEL:1234 
+ *      ...    
+ *
+ * @param data the data to modify
+ * @param oldProperty the property to replace (expressed as a regular expression)
+ * @param newProperty the property name to be set instead of the original one
+ *
+ * @return the modified data
+ *
+ * @version $Id: keepFirstProperty.bsh,v 1.1 2007/07/25 13:21:15 luigiafassina Exp $
+ */
+String keepFirstProperty(String data, String oldProperty, String newProperty) {
+
+	Pattern p = Pattern.compile("(\\r)?\\n" + oldProperty + ":[^\\r\\n]*");
+	Matcher m = p.matcher(data);
+	StringBuffer sb = new StringBuffer();
+        if (m.find()) {
+            String firstMatch = m.group();
+            if (newProperty != null) {
+                firstMatch = firstMatch.replaceFirst(oldProperty, newProperty);
+            }
+            m.appendReplacement(sb, firstMatch);
+            
+            while (m.find()) {
+                m.appendReplacement(sb, "");
+            }
+        }
+        m.appendTail(sb);
+
+    return sb.toString();
+}
+
+String keepFirstProperty(String data, String property) {
+
+	return keepFirstProperty(data, property, null);
+}

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<java version="1.4.2" class="java.beans.XMLDecoder">
+    <object class="com.funambol.server.config.ServerConfiguration">
+        <void property="engineConfiguration">
+            <object class="com.funambol.server.config.EngineConfiguration">
+                <void property="officer">
+                    <string>com/funambol/server/security/ObmOfficer.xml</string>
+                </void>
+                <void property="serverURI">
+                    <string>#funambol_uri#</string>
+                </void>
+                <void property="sessionHandler">
+                    <string>com.funambol.server.session.SyncSessionHandler</string>
+                </void>
+                <void property="strategy">
+                    <string>com/funambol/server/engine/Strategy.xml</string>
+                </void>
+                <void property="userManager">
+                    <string>com/funambol/server/admin/DBUserManager.xml</string>
+                </void>
+                <void property="minMaxMsgSize">
+                    <long>1800</long>
+                </void>
+                <void property="deviceInventory">
+                    <string>com/funambol/server/inventory/PSDeviceInventory.xml</string>
+                </void>
+                <void property="dataTransformerManager">
+                    <string>com/funambol/server/engine/transformer/DataTransformerManager.xml</string>
+                </void>
+                <void property="checkForUpdates">
+                    <boolean>false</boolean>
+                </void>
+            </object>
+        </void>
+        <void property="serverInfo">
+            <object class="com.funambol.framework.core.DevInf">
+                <object class="com.funambol.framework.core.VerDTD">
+                    <!-- verDTD                 -->
+                    <string>1.2</string>
+                </object>
+                <!-- man                    -->
+                <string>Funambol</string>
+                <!-- mod                    -->
+                <string>DS Server</string>
+                <!-- oem                    -->
+                <string>-</string>
+                <!-- fwV                    -->
+                <string>-</string>
+                <!-- swV                    -->
+                <string>6.5.1</string>
+                <!-- hwV                    -->
+                <string>-</string>
+                <!-- devID                  -->
+                <string>funambol</string>
+                <!-- devTyp                 -->
+                <string>server</string>
+                <!-- utc                    -->
+                <boolean>true</boolean>
+                <!-- supportLargeObjs       -->
+                <boolean>true</boolean>
+                <!-- supportNumberOfChanges -->
+                <boolean>true</boolean>
+                <array class="com.funambol.framework.core.DataStore" length="0"/>
+                <array class="com.funambol.framework.core.Ext" length="0"/>
+            </object>
+        </void>
+    </object>
+</java>

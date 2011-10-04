@@ -1,0 +1,171 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Calendars:
+ * ==========
+ * . Event
+ *   Sets the empty tokens with dummy value.
+ *
+ * @version $Id: SonyEricssonM600Iout.bsh,v 1.1 2007/08/31 09:51:01 luigiafassina Exp $
+ */
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SonyEricssonK800Iout.postProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems);
+
+    throw new StopProcessingException("SonyEricssonK800Iout Synclet finished");
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ */
+void processPIMItems(Map mapItems) {
+    
+    //
+    // Cycle on vCard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessVCard(i);
+    }
+    
+    //
+    // Cycle on vEvent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessVEvent(i);
+    }
+}
+
+/**
+ * Processes outgoing vEvent.
+ * Sets the correct X-EPOCAGENDAENTRYTYPE on the basis of the event's features,
+ * in order to categorize it in one of the M600i's event types: Appointment,
+ * Reminder (an instant event), Event (all-day event) or Anniversary (all-day
+ * event recurring yearly).
+ *
+ * @param i the item to process
+ */
+void postProcessVEvent(Item i) {
+    
+    data = i.data.data;
+    
+    String epocAgendaEntryType;
+    
+    if (data.indexOf("\r\nX-FUNAMBOL-ALLDAY:1\r\n") != -1) { // all-day event
+        if (data.indexOf("\r\nRRULE:YM1") != -1) { // yearly recurrence
+            epocAgendaEntryType = "ANNIVERSARY";
+        } else {
+            epocAgendaEntryType = "EVENT";
+        }
+    } else { // not-all-day event
+        epocAgendaEntryType = "APPOINTMENT";
+        Pattern p = Pattern.compile("\\r\\nDTSTART:([0-9]{8}T[0-9]{6}(Z)?)\\r\\n");
+        Matcher m = p.matcher(data);
+        if (m.find()) {
+            String start = m.group(1);
+            p = Pattern.compile("\r\\nDTEND:" + start + "\\r\\n");
+            m = p.matcher(data);
+            if (m.find()) { // DTSTART == DTEND
+                epocAgendaEntryType = "REMINDER";
+            }
+        }
+    }
+    data = addProperty(data, "X-EPOCAGENDAENTRYTYPE:" + epocAgendaEntryType);
+    
+    i.data.data = data;
+}
+
+/**
+ * Processes outgoing vCard.
+ * Remaps contact items and reduces multiple fields (TEL;VOICE;HOME and 
+ * TEL;VOICE;WORK) to one occurrence.
+ *
+ * @param i the item to process
+ */
+void postProcessVCard(Item i) {
+    
+    data = i.data.data;
+    
+    data = replaceOutProperty(data, "TEL;CELL:", "TEL;VOICE;CELL;X-SYNCMLREF1:");
+    data = replaceOutProperty(data, "TEL;VOICE:", "TEL;VOICE;X-SYNCMLREF1:");
+    data = replaceOutProperty(data, "TEL;PAGER:", "TEL;PAGER;X-SYNCMLREF1:");
+    data = replaceOutProperty(data, "TEL;PREF;VOICE:", "TEL;HOME;VOICE;CELL:");
+    data = keepFirstProperty(data, "TEL;VOICE;HOME", "TEL;HOME;VOICE");
+    data = keepFirstProperty(data, "TEL;VOICE;WORK", "TEL;WORK;VOICE;CELL;X-SYNCMLREF2");
+    data = replaceOutProperty(data, "TEL;WORK;PREF:", "TEL;WORK;VOICE;X-SYNCMLREF2:");
+
+    data = replaceOutProperty(data, "EMAIL;INTERNET:", "EMAIL;INTERNET;X-SYNCMLREF1:");
+    data = replaceOutProperty(data, "EMAIL;INTERNET;HOME:", "EMAIL;INTERNET;HOME;X-SYNCMLREF2:");
+    data = replaceOutProperty(data, "EMAIL;INTERNET;WORK:", "EMAIL;INTERNET;WORK;X-SYNCMLREF3:");
+    
+    data = replaceOutProperty(data, "URL;WORK", "X-FUNAMBOL-TEMP-URL;WORK;X-SYNCMLREF2");
+    data = replaceOutProperty(data, "URL;HOME", "X-FUNAMBOL-TEMP-URL;HOME");
+    data = replaceOutProperty(data, "URL", "URL;X-SYNCMLREF1");
+    data = data.replaceAll("\\nX-FUNAMBOL-TEMP-", "\n");
+    
+    i.data.data = data;
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

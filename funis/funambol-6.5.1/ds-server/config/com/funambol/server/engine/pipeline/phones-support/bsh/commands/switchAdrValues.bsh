@@ -1,0 +1,124 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+/**
+ * This synclet switches the second with the third value in the address tokens
+ * (home, work or other type). The phone for any address, has Street 1 and
+ * Street 2. The phone sends the Street 1 in the second position of ADR token
+ * where, how specified in the VCard specification, should be the extended
+ * address (the server doesn't handle it) and it sends the Street 2 in the third
+ * position where, always how specified in the VCard specification, should be
+ * the principal street.
+ * This switch is done for all address types and only if the Street 1 is not
+ * empty.
+ *
+ * @version $Id: switchAdrValues.bsh,v 1.3 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Switches the second with the third value in the address tokens (home, work or
+ * other type).
+ *
+ * For examples:
+ *     ADR;HOME:;Mason Street;2730 Liberty Street;Redwood City;Ca;94063;Usa
+ * returns as
+ *     ADR;HOME:;2730 Liberty Street;Mason Street;Redwood City;Ca;94063;Usa
+ *
+ * @param String data the data item
+ * @param checkFirstAdr if true is needs to check if the first address is not
+ *                      empty to switch the values, else if it false the values
+ *                      are switched always.
+ *
+ * @return the modified data
+ */
+String switchAdrValues(String data, boolean checkFirstAdr) {
+
+    int start, end = 0;
+    String line = null;
+    while ((start = data.indexOf("\nADR", end)) != -1) {
+        end = data.indexOf("\r", start + 1);
+
+        line = data.substring(start, end);
+        if (line.contains("ENCODING=QUOTED-PRINTABLE")) {
+            for (; data.charAt(end - 1) == '='; end = data.indexOf("\r", end + 1));
+            line = data.substring(start, end);
+        } else {
+            for (; data.charAt(end + 1) == ' '; end = data.indexOf("\r", end + 1));
+            line = data.substring(start, end);
+        }
+
+        int indColon  = line.indexOf(":");
+        String params = line.substring(0, indColon + 1);
+        StringBuffer tmpData = new StringBuffer(params);
+
+        int len = line.length();
+        char c;
+
+        StringBuffer firstAddress  = new StringBuffer();
+        StringBuffer secondAddress = new StringBuffer();
+
+        int count = 0;
+        for (int i = indColon + 1; i < len; i++) {
+            c = line.charAt(i);
+            if (count == 0 || count >= 3)  {
+                tmpData.append(c);
+            }
+            if (count == 1) {
+                firstAddress.append(c);
+            }
+            if (count == 2) {
+                secondAddress.append(c);
+            }
+            if (c == ';') {
+                if (line.charAt(i - 1) == '\\') {
+                    //
+                    // The ; is escaped...skipping it
+                    //
+                    continue;
+                }
+                count++;
+                if (count == 3) {
+                    //
+                    // If checkFirstAdr is true, is needs to check if the first
+                    // address is not empty to switch the values, otherwise
+                    // the values are switched always.
+                    //
+                    if (checkFirstAdr) {
+                        if (firstAddress.length() == 1) {
+                            tmpData.append(firstAddress).append(secondAddress);
+                        } else {
+                            tmpData.append(secondAddress).append(firstAddress);
+                        }
+                    } else {
+                        tmpData.append(secondAddress).append(firstAddress);
+                    }
+                }
+            }
+        }
+        line = tmpData.toString();
+
+        data = data.substring(0, start)
+             + line
+             + data.substring(end, data.length())
+             ;
+    }
+    return data;
+}

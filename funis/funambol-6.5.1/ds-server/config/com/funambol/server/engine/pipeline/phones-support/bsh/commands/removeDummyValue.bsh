@@ -1,0 +1,60 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * This synclet removes, from the data input, the dummy value for the specified
+ * token.
+ * For example, if the device sends a \r\nEMAIL:-\r\n, this synclet
+ * replaces it with \r\nEMAIL;INTERNET:\r\n without dummy value.
+ *
+ * There are some phones (like SonyEricsson K800i, Motorola KRZR K1, and so on)
+ * that are not able to understand the empty tokens (like LOCATION:) and so is
+ * not possible delete the value of the field on phone by server. To fix this
+ * phone bug, the server sends LOCATION:- and so, when phone sends the
+ * item is needs to remove the dummy value.
+ *
+ * @version $Id: removeDummyValue.bsh,v 1.2 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+private final String DUMMY_VAL = "-";
+
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Removes, from the input data, the dummy value for the specified property.
+ * For examples:
+ *     oldProperty EMAIL:- will be replaced with the newProperty EMAIL;INTERNET:
+ *     without the dummy value
+ * or
+ *     oldProperty TEL;VOICE:- will be replaced with the newProperty TEL;VOICE:
+ *     without the dummy value
+ *
+ * @param data the data to modify
+ * @param oldProperty the property with dummy value
+ * @param newProperty the new property to use for replace
+ *
+ * @return the modified data
+ */
+String removeDummyValue(String data, String oldProperty, String newProperty) {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Remove dummy value for " + oldProperty + DUMMY_VAL);
+    }
+
+    data = replaceInProperty(data, oldProperty + DUMMY_VAL, newProperty);
+    return data;
+}

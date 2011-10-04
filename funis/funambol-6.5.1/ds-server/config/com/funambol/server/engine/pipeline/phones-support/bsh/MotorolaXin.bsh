@@ -1,0 +1,355 @@
+/*
+ * Copyright (C) 2006-2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Capabilities;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Handles large objects.
+ * Replaces the first TEL;FAX: with tokens TEL;FAX;HOME: and the second one
+ * with TEL;FAX;WORK: so the numbers are stored like Home Fax Number and
+ * Business Fax Number.
+ * Replaces the first TEL;PREF;VOICE: with tokens TEL;VOICE: the second remains
+ * the same, the third is replaced with TEL;WORK;PREF:
+ * Checks if the value of the field EMAIL;INTERNET is '-'. If so the value is
+ * deleted.
+ * Checks if the value of the field N has only one value or more separeted by
+ * semicolons. If there are no semicolon, they are added.
+ * Adds field ADR;HOME with empty value if not exists.
+ * Switches the second with the third value in the address tokens (home, work or
+ * other type).
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Handles large objects.
+ *   Adds field AALARM with empty value if not exists.
+ *
+ * @version $Id: MotorolaXin.bsh,v 1.7 2007/08/31 09:57:24 luigiafassina Exp $
+ */
+ 
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("MotorolaXin.preProcessMessage(...)");
+    }
+
+    // Retrieves the device model from the DB
+    Capabilities capabilities = deviceCapabilitiesLookup(
+            message.syncHdr.source.locURI);
+    
+    String model = null;
+    
+    if (capabilities != null) {
+        DevInf devInf = capabilities.getDevInf();
+        
+        if (devInf != null) {
+            model = devInf.getMod();            
+        }
+    }
+
+    if(isInMotorolaV3family(model)) {
+        
+        if (log.isTraceEnabled()) {
+           log.trace(model + " belongs to the Motorola V3 family");
+        }
+        setMaxMsgSize(message, 1850);
+    }
+    
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+
+    throw new StopProcessingException("MotorolaXin Synclet finished");
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ *
+ */
+void processPIMItems(Map mapItems, PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        preProcessContact(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Processes incoming contacts.
+ * Handles the fax numbers, the phone numbers, the email internet, the name and
+ * the home address.
+ *
+ * @param i the Item to process
+ */
+void preProcessContact(Item i) {
+    data = i.data.data;
+
+    // checks if the data is already passed through this synclet
+    if(data.indexOf("\r\nTEL;WORK;PREF:") == -1){
+        data = replaceFaxNumber (data);
+        data = replaceMainPhoneNumber (data);
+        data = checkMail(data);
+        data = checkName(data);
+        data = checkHomeAddress(data);
+
+        i.data.setData(data);
+    }
+}
+
+/**
+ * Replaces the first TEL;FAX: with tokens TEL;FAX;HOME: and the second one
+ * with TEL;FAX;WORK: so the numbers are stored like Home Fax Number and
+ * Business Fax Number.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String replaceFaxNumber(String data) {
+    int faxPosition = data.indexOf("TEL;FAX:");
+    if (faxPosition != -1) {
+        data = data.substring (0, faxPosition)                +
+            "TEL;FAX;HOME:"                                   +
+            data.substring (faxPosition + "TEL;FAX:".length());
+    }
+    faxPosition = data.indexOf("TEL;FAX:");
+    if (faxPosition != -1) {
+        data = data.substring (0, faxPosition)                +
+            "TEL;FAX;WORK:"                                   +
+            data.substring (faxPosition + "TEL;FAX:".length());
+    }
+    return data;
+}
+
+/**
+ * Replaces the first TEL;PREF;VOICE: with tokens TEL;VOICE: the second remains
+ * the same, the third is replaced with TEL;WORK;PREF:
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String replaceMainPhoneNumber(String data) {
+
+	// finds and replaces first TEL;PREF;VOICE: field
+    int mainPosition = data.indexOf("TEL;PREF;VOICE:");
+    if (mainPosition != -1) {
+        data = data.substring (0, mainPosition)                       +
+               "TEL;VOICE:"                                           +
+               data.substring (mainPosition + "TEL;PREF;VOICE:".length());
+    }
+
+    // finds second TEL;PREF;VOICE: field
+    mainPosition = data.indexOf("TEL;PREF;VOICE:");
+
+    // finds and replaces third TEL;PREF;VOICE: field
+    if (mainPosition != -1) {
+        if(data.substring(mainPosition + 1).indexOf("TEL;PREF;VOICE:") != -1) {
+
+            mainPosition = mainPosition
+                         + data.substring(mainPosition + 1)
+                               .indexOf("TEL;PREF;VOICE:")
+                         + 1;
+
+            data = data.substring(0, mainPosition)
+                 + "TEL;WORK;PREF:"
+                 + data.substring(mainPosition + "TEL;PREF;VOICE:".length());
+            }
+        }
+
+    return data;
+}
+
+/**
+ * Checks if the value of the field EMAIL;INTERNET is '-'. If so the value is
+ * deleted.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String checkMail(String data) {
+
+	int index = data.indexOf("EMAIL;INTERNET:-");
+    if (index != -1) {
+        data = data.substring(0, index + 15)
+             + data.substring(index + 16, data.length());
+    }
+    return data;
+}
+
+/**
+ * Checks if the value of the field N has only one value or more separeted by
+ * semicolons. If there are no semicolon, they are added.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String checkName(String data) {
+
+    // creates a string containing only the N field
+    int indexStart = data.indexOf("\r\nN:");
+
+    if(indexStart != -1){
+        int indexEnd = data.indexOf("\r\n", indexStart + 2);
+        String name  = data.substring(indexStart, indexEnd);
+
+        if(name.indexOf(";") == -1){
+            data = data.substring(0, indexEnd) + ";;;;"
+                 + data.substring(indexEnd, data.length());
+        }
+    }
+
+    return data;
+}
+
+/**
+ * Checks if there is the field ADR;HOME. If not then add it with empty value.
+ * Switches the second with the third value in the address tokens (home, work or
+ * other type).
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String checkHomeAddress(String data) {
+    if (data.indexOf("ADR;HOME") == -1) {
+		// ADR;HOME field is not present so adds it with empty values
+        int endPos = data.indexOf("END:VCARD");
+        data = data.substring (0, endPos);
+        StringBuffer missing = new StringBuffer(data);
+        missing.append("ADR;HOME:;;;;;;\r\n");
+        missing.append("END:VCARD\r\n");
+        data = missing.toString();
+    } else {
+        data = switchAdrValues(data, true);
+	}
+    return data;
+}
+
+/**
+ * Processes incoming events.
+ *
+ * Check if there is the field AALARM: if not it will be add with empty value.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+void preProcessEvent(Item i) {
+
+    data = i.data.data;
+
+    data = data.replace("CHARSET= UTF-8:","CHARSET=UTF-8:");
+
+    int endPos = data.indexOf("END:VEVENT");
+    data = data.substring (0, endPos);
+    StringBuffer missing = new StringBuffer(data);
+
+    if (data.indexOf("\r\nAALARM") == -1) {
+        missing.append("AALARM:;;;").append("\r\n");
+    }
+
+    missing.append("END:VEVENT\r\nEND:VCALENDAR\r\n");
+    i.data.setData(missing.toString());
+}
+
+/**
+ * Checks whether a given model is part of the Motorola V3 family.
+ *
+ * @param model as retrieved from the device capabilities
+ *
+ * @return true only if the model is part of the Motorola V3 family
+ */
+boolean isInMotorolaV3family(String model) {
+    
+    if (model == null) {
+        return false;
+    }
+     
+    String[] V3family = {
+        "V3r",      //Motorola V3 RAZR (CLDC 1.1)
+        "V3"        //Motorola V3 RAZR (CDLC 1.0)
+    };
+    
+    for (String device : V3family) {
+        if (model.matches(device)) {
+            return true;
+        }
+    }
+    
+    return false;
+
+}
+
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

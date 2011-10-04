@@ -1,0 +1,59 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.Iterator;
+import java.util.Map;
+
+/**
+ * This synclet removes, from the data input, the dummy value for the specified
+ * list of tokens.
+ * For example, if the device sends a \r\nEMAIL:-\r\n, this synclet
+ * replaces it with \r\nEMAIL;INTERNET:\r\n without dummy value.
+ *
+ * There are some phones (like SonyEricsson K800i, Motorola KRZR K1, and so on)
+ * that are not able to understand the empty tokens (like LOCATION:) and so is
+ * not possible delete the value of the field on phone by server. To fix this
+ * phone bug, the server sends LOCATION:- and so, when phone sends the
+ * item is needs to remove the dummy value.
+ *
+ * @version $Id: removeDummyValues.bsh,v 1.2 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Removes the dummy values for the list of tokens.
+ *
+ * @param data the data to modify
+ * @param mapTokens the map with old token to replace with the new token without
+ *                  the dummy value
+ *
+ * @return the modified data
+ */
+String removeDummyValues(String data, Map mapTokens) {
+
+    String oldToken = null;
+    String newToken = null;
+
+    Iterator oldTokens = mapTokens.keySet().iterator();
+    while(oldTokens.hasNext()) {
+        oldToken = (String)oldTokens.next();
+        newToken = (String)mapTokens.get(oldToken);
+        data = removeDummyValue(data, oldToken, newToken);
+    }
+    return data;
+}

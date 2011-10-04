@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.0" class="java.beans.XMLDecoder">
+ <object class="com.funambol.server.security.DBOfficer">
+  <void property="clientAuth">
+   <string>syncml:auth-basic,syncml:auth-md5</string>
+  </void>
+  <void property="serverAuth">
+   <string>none</string>
+  </void>
+ </object>
+</java>

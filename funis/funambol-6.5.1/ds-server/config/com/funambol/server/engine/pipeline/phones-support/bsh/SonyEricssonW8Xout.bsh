@@ -1,0 +1,187 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * ==========
+ * Removes TEL:PAGER (empty or with value) token because the SonyEricsson W800i
+ * is not able to handle this token and so it interrupt the synchronization with
+ * an error.
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Sets the empty tokens with dummy value because SonyEricsson W800i and
+ *   SonyEricsson W850i are not able to handle those tokens: in fact, 
+ *   it doesn't delete the value of the field that corresponds to the empty 
+ *   token (and so the field remains set).
+ *
+ * @version $Id: SonyEricssonW8Xout.bsh,v 1.1 2007/07/25 13:21:14 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+private final String USER_AGENT_W800I = "SonyEricssonW800i";
+private final String USER_AGENT_W850I = "SonyEricssonW850i";
+
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SonyEricssonW8Xout.postProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    
+    //
+    // Find the user-agent from http request header
+    //
+    String userAgent = getUserAgent(processingContext);
+    
+    processPIMItems(mapItems, userAgent);
+
+    throw new StopProcessingException("SonyEricssonW8Xout Synclet finished");
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param userAgent the user-agent from http request header
+ */
+void processPIMItems(Map mapItems, String userAgent) {
+    
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessVCard(i);
+    }
+    
+    //
+    // Cycle on vevent list
+    //
+
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessVEvent(i, userAgent);
+    }
+	
+}
+
+/**
+ * Processes outgoing vcard.
+ *
+ * Removes TEL:PAGER (empty or with value) token because the phone is not able
+ * to handle this token and so it interrupt the synchronization with an error.
+ * 
+ * Removes TEL;FAX;WORK, TEL;WORK;PREF, TEL;PREF;VOICE in order to store on device
+ * only the properties of the Personal fields - the device can store only five telephone numbers
+ * 
+ * Replaces:
+ * TEL;VOICE 		with	TEL
+ * TEL;FAX;HOME 	with	TEL;FAX
+ * TEL;VOICE;HOME	with	TEL;HOME
+ * TEL;VOICE;WORK	with 	TEL;WORK
+ * in order to have a simmetric behaviour in Input and Output
+ *
+ * @param i the item to process
+ */
+void postProcessVCard(Item i) {
+    i.data.data = deleteOutProperty(i.data.data, "TEL;PAGER");
+	
+	i.data.data = deleteOutProperty(i.data.data, "TEL;FAX;WORK");
+	i.data.data = deleteOutProperty(i.data.data, "TEL;WORK;PREF");
+	i.data.data = deleteOutProperty(i.data.data, "TEL;PREF;VOICE");
+
+	i.data.data = replaceOutProperty(i.data.data, "TEL;VOICE"     , "TEL"     );
+	i.data.data = replaceOutProperty(i.data.data, "TEL;FAX;HOME"  , "TEL;FAX" );
+	i.data.data = replaceOutProperty(i.data.data, "TEL;VOICE;HOME", "TEL;HOME");
+	i.data.data = replaceOutProperty(i.data.data, "TEL;VOICE;WORK", "TEL;WORK");
+}
+
+/**
+ * Processes outgoing vevent.
+ *
+ * Sets the empty tokens with dummy value.
+ *
+ * @param i the item to process
+ * @param userAgent the user-agent from http request header
+ */
+void postProcessVEvent(Item i, String userAgent) {
+
+    if (userAgent.startsWith(USER_AGENT_W800I) ||
+		userAgent.startsWith(USER_AGENT_W850I)) {
+        i.data.data = setDummyProperties(i.data.data);
+    }
+}
+
+/**
+ * Sets the tokens with dummy value.
+ * For example:
+ *  the LOCATION:\r\n will be replaced with LOCATION:-\r\n
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String setDummyProperties(String data) {
+    HashMap mapTokens = new HashMap();
+    mapTokens.put("DESCRIPTION", "DESCRIPTION");
+    mapTokens.put("LOCATION"   , "LOCATION"   );
+    mapTokens.put("SUMMARY"    , "SUMMARY"    );
+
+    data = setDummyValues(data, mapTokens);
+    return data;
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

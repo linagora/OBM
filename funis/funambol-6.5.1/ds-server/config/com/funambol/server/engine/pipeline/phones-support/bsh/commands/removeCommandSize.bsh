@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+ 
+/**
+ * Sets the size to null in the meta for each command when the item contained in
+ * the command is not a large object.
+ * In the case of large object the item size is managed by the PIMItemsHandler
+ * method fixLargeObjectSize for each item. 
+ * 
+ * @param message the message to be managed.
+ *
+ * @version $Id: removeCommandSize.bsh,v 1.1 2007/07/25 13:21:15 luigiafassina Exp $
+ */    
+void removeCommandSize(SyncML message) {
+
+    List cmds = message.getSyncBody().getCommands();    
+    for (AbstractCommand bodyc : cmds) {
+
+        if (bodyc instanceof Sync) {
+
+            //
+            // Processes incoming commands to identifier and separate the items.
+            //
+            List syncCmds = ((Sync)bodyc).getCommands();
+            for (ItemizedCommand c : syncCmds) {
+
+                //
+                // Skip other commands than Add and Replace
+                //
+                if (!(Replace.COMMAND_NAME.equals(c.getName()) ||
+                    Add.COMMAND_NAME.equals(c.getName()))      ) {
+                    continue;
+                }
+
+                if (c.meta == null || c.meta.size == null) {
+                    continue;
+                }
+                
+                List items = c.getItems();
+                Item item = (Item)items.get(items.size() - 1);                
+                if (!item.isMoreData()) {
+                    c.meta.setSize(null);
+                }                
+            }
+        }
+    }
+}

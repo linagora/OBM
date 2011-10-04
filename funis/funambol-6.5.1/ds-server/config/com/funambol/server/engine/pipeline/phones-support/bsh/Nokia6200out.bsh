@@ -1,0 +1,135 @@
+/*
+ * Copyright (C) 2006-2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Replaces empty home addresses with a Funambol generated one.
+ * Replaces TEL;FAX;HOME: with token TEL;FAX: so the information is stored like
+ * Fax number.
+ *
+ * @version $Id: Nokia6200out.bsh,v 1.5 2007/06/18 13:34:04 luigiafassina Exp $
+ */
+ 
+// ------------------------------------------------------------------- Constants
+private final String EMPTY_ADDR_HOME = "ADR;HOME:;;;;;;"                 ;
+private final String EMPTY_ADDR_WORK = "ADR;WORK:;;;;;;"                 ;
+private final String FNBL_ADDR_HOME  = "ADR;HOME:;;Added by Funambol;;;;";
+private final String FNBL_ADDR_WORK  = "ADR;WORK:;;Added by Funambol;;;;";
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Nokia6200.postProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems);
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ *
+ */
+void processPIMItems(Map mapItems) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessContacts(i);
+    }
+}
+
+/**
+ * Processes outgoing contacts.
+ *
+ * Replaces empty home addresses with a Funambol generated one. This is because
+ * the phone drops empty address, plus it does not have the concept of
+ * "work" or "home" addresses; it translates any address into a LABEL. In
+ * the input pipeline, we handle such labels by position, therefore, in
+ * order to keep the order we need to make the phone not dropping the empty
+ * home address in the case there is also a work address.
+ *
+ * Replaces TEL;FAX;HOME: with token TEL;FAX: so the information is stored like
+ * Fax number.
+ *
+ * @param i the item to be processed
+ *
+ */
+void postProcessContacts(Item i) {
+    vCard = i.data.data;
+
+    //
+    // If the contact has an empty address, the phone would drop it,
+    // therefore we need to replace it with a dummy one
+    //
+    if (vCard.indexOf(EMPTY_ADDR_HOME) != -1) {
+        vCard = vCard.replaceAll(EMPTY_ADDR_HOME, FNBL_ADDR_HOME);
+    }
+
+    if (vCard.indexOf(EMPTY_ADDR_WORK) != -1) {
+        vCard = vCard.replaceAll(EMPTY_ADDR_WORK, FNBL_ADDR_WORK);
+    }
+
+    //
+    // Replaces TEL;FAX;HOME: with token TEL;FAX:
+    // so the information is stored like Fax number.
+    //
+    vCard = vCard.replaceAll("TEL;FAX;HOME:", "TEL;FAX:");
+
+    i.data.data = vCard;
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

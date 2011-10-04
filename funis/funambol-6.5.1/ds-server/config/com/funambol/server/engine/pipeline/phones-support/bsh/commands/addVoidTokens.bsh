@@ -1,0 +1,66 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+/**
+ * This command adds empty tokens if they are missing in the data item in order
+ * to force the deleting of the information.
+ *
+ * @version $Id: addVoidTokens.bsh,v 1.2 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Adds void tokens if it is missing in the input item.
+ *
+ * @param data the item's data
+ * @param endLabel the last tokens of the data
+ * @param mapTokens the Map with the void tokens to search
+ *
+ * @return the data with the void tokens if needs
+ */
+String addVoidTokens(String data, String endLabel, Map mapTokens) {
+
+    int endPos = data.indexOf(endLabel);
+    data = data.substring (0, endPos);
+    StringBuffer missing = new StringBuffer(data);
+
+    Iterator it = mapTokens.keySet().iterator();
+    String token      = null;
+    String tokenValue = null;
+    while (it.hasNext()) {
+        token      = (String)it.next();
+        tokenValue = (String)mapTokens.get(token);
+
+        if (data.indexOf(token) == -1) {
+            missing.append(tokenValue).append("\r\n");
+        }
+    }
+
+    missing.append(endLabel).append("\r\n");
+    return missing.toString();
+}

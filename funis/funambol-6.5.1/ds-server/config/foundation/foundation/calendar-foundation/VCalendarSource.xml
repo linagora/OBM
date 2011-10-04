@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.0" class="java.beans.XMLDecoder">
+ <object class="com.funambol.foundation.engine.source.PIMCalendarSyncSource">
+ <void property="name">
+   <string>cal</string>
+ </void>
+ <void property="sourceURI">
+   <string>cal</string>
+ </void>
+ <void property="entityType">
+   <class>com.funambol.common.pim.calendar.CalendarContent</class>
+ </void>     
+ <void property="info">
+   <object class="com.funambol.framework.engine.source.SyncSourceInfo">
+     <void property="supportedTypes">
+     <array class="com.funambol.framework.engine.source.ContentType" length="2">
+      <void index="0">
+       <object class="com.funambol.framework.engine.source.ContentType">
+        <void property="type">
+         <string>text/x-vcalendar</string>
+        </void>
+        <void property="version">
+         <string>1.0</string>
+        </void>
+       </object>
+      </void>
+      <void index="1">
+       <object class="com.funambol.framework.engine.source.ContentType">
+        <void property="type">
+         <string>text/calendar</string>
+        </void>
+        <void property="version">
+         <string>2.0</string>
+        </void>
+       </object>
+      </void>
+     </array>
+     </void>  <!-- supportedTypes -->
+     <void property="preferred">
+       <int>0</int>
+     </void>
+   </object>
+ </void> <!-- info -->
+ </object>
+</java>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+ <globalConfiguration>
+  <parameter name="adminPassword" value="admin"/>
+  <parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
+  <parameter name="sendXsiTypes" value="true"/>
+  <parameter name="sendMultiRefs" value="true"/>
+  <parameter name="sendXMLDeclaration" value="true"/>
+  <requestFlow>
+   <handler type="java:org.apache.axis.handlers.JWSHandler">
+    <parameter name="scope" value="session"/>
+   </handler>
+   <handler type="java:org.apache.axis.handlers.JWSHandler">
+    <parameter name="scope" value="request"/>
+    <parameter name="extension" value=".jwr"/>
+   </handler>
+  </requestFlow>
+ </globalConfiguration>
+ <handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
+ <handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
+ <handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
+ <service name="AdminService" provider="java:MSG">
+  <parameter name="allowedMethods" value="AdminService"/>
+  <parameter name="enableRemoteAdmin" value="false"/>
+  <parameter name="className" value="org.apache.axis.utils.Admin"/>
+  <namespace>http://xml.apache.org/axis/wsdd/</namespace>
+ </service>
+ <service name="Version" provider="java:RPC">
+  <parameter name="allowedMethods" value="getVersion"/>
+  <parameter name="className" value="org.apache.axis.Version"/>
+ </service>
+ <service name="admin" provider="java:RPC">
+  <parameter name="allowedMethods" value="*"/>
+  <parameter name="className" value="com.funambol.server.admin.ws.AdminWS"/>
+  <beanMapping qname="funambol:Sync4jPrincipal" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.security.Sync4jPrincipal"/>
+  <beanMapping qname="funambol:Sync4jUser" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.server.Sync4jUser"/>
+  <beanMapping qname="funambol:LastTimestamp" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.server.LastTimestamp"/>
+  <beanMapping qname="funambol:Sync4jDevice" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.server.Sync4jDevice"/>
+  <beanMapping qname="funambol:Sync4jModule" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.server.Sync4jModule"/>
+  <beanMapping qname="funambol:Sync4jConnector" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.server.Sync4jConnector"/>
+  <beanMapping qname="funambol:Sync4jSource" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.server.Sync4jSource"/>
+  <beanMapping qname="funambol:Sync4jLoggingConfig" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.config.LoggingConfiguration"/>
+  <beanMapping qname="funambol:Sync4jLoggerConfig" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.config.LoggerConfiguration"/>
+  <beanMapping qname="funambol:ServerConfiguration" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.server.config.ServerConfiguration"/>
+  <beanMapping qname="funambol:DevInf" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.DevInf"/>
+  <beanMapping qname="funambol:VerDTD" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.VerDTD"/>
+  <beanMapping qname="funambol:DataStore" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.DataStore"/>
+  <beanMapping qname="funambol:CTCap" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.CTCap"/>
+  <beanMapping qname="funambol:Ext" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.Ext"/>
+  <beanMapping qname="funambol:EngineConfiguration" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.server.config.EngineConfiguration"/>
+  <beanMapping qname="funambol:SourceRef" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.SourceRef"/>
+  <beanMapping qname="funambol:CTInfo" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.CTInfo"/>
+  <beanMapping qname="funambol:SyncCap" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.SyncCap"/>
+  <beanMapping qname="funambol:Capabilities" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.server.Capabilities"/>
+  <beanMapping qname="funambol:SyncType" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.SyncType"/>
+  <beanMapping qname="funambol:DSMem" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.DSMem"/>
+  <beanMapping qname="funambol:FilterCap" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.FilterCap"/>
+  <beanMapping qname="funambol:Property" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.Property"/>
+  <beanMapping qname="funambol:PropParam" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.framework.core.PropParam"/>
+  <beanMapping qname="funambol:Component" xmlns:funambol="urn:BeanService" languageSpecificType="java:com.funambol.server.update.Component"/>
+ </service>
+ <transport name="http">
+  <requestFlow>
+   <handler type="URLMapper"/>
+   <handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>
+   <handler type="java:com.funambol.server.admin.ws.axis.AdminAuthHandler"/>
+  </requestFlow>
+  <parameter name="qs:list" value="org.apache.axis.transport.http.QSListHandler"/>
+  <parameter name="qs:wsdl" value="org.apache.axis.transport.http.QSWSDLHandler"/>
+  <parameter name="qs:method" value="org.apache.axis.transport.http.QSMethodHandler"/>
+ </transport>
+ <transport name="local">
+  <responseFlow>
+   <handler type="LocalResponder"/>
+  </responseFlow>
+ </transport>
+</deployment>

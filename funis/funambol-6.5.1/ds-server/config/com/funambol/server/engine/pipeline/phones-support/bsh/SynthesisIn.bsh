@@ -1,0 +1,253 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Handles large objects.
+ * Replaces field TEL;FAX: with TEL;FAX;WORK: token.
+ * Replaces field EMAIL: with EMAIL;INTERNET: token.
+ * Replaces field TEL: with TEL;VOICE: token.
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Processes the incoming vevent items and adds the missing tokens.
+ *   Handles large objects.
+ *   Replaces T080000 with T000000 in the start date and replaces T180000 with
+ *   T235900 in the end date of an all day event.
+ *
+ * @version $Id: SynthesisIn.bsh,v 1.6 2007/07/25 13:44:18 luigiafassina Exp $
+ */
+
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+private Map missingEventTokens = null;
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SynthesisIn.preProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+
+    throw new StopProcessingException("Synthesis Synclet finished");
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ *
+ */
+void processPIMItems(Map mapItems, PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        preProcessContact(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Processes incoming contacts.
+ * Replaces field TEL;FAX: with TEL;FAX;WORK: token.
+ * Replaces field EMAIL: with EMAIL;INTERNET: token.
+ * Replaces field TEL: with TEL;VOICE: token.
+ *
+ * @param i the Item to process
+ */
+void preProcessContact(Item i) {
+    data = i.data.data;
+
+    data = changeFaxField(data);
+    data = changeEmailField(data);
+    data = changeTelVoice(data);
+
+    i.data.setData(data);
+}
+
+/**
+ * Processes incoming events.
+ *
+ * Adds missing fields.
+ * Replaces T080000 with T000000 in the start date and replaces T180000 with
+ * T235900 in the end date of an all day event.
+ *
+ *
+ * @param i the Item to process
+ */
+void preProcessEvent(Item i) {
+    
+    //
+    // Adds void tokens if they are missing in VEVENT item
+    //
+    content = addVoidTokens(i.data.data, "END:VEVENT", missingEventTokens);
+    i.data.data = content + "END:VCALENDAR\r\n";
+    
+    i.data.data = fixAllDay(i.data.data);
+}
+
+/**
+ * Replaces field TEL;FAX: with TEL;FAX;WORK: token.
+ *
+ * @param data the contact item
+ *
+ * @return the changed data
+ */
+String changeFaxField(String data){
+    int begin;
+
+    begin = data.indexOf("\r\nTEL;FAX:");
+
+    if(begin != -1){
+        data = data.replaceAll("\r\nTEL;FAX:", "\r\nTEL;FAX;WORK:");
+    }
+
+    return data;
+}
+
+/**
+ * Replaces field EMAIL: with EMAIL;INTERNET: token.
+ *
+ * @param data the contact item
+ *
+ * @return the changed data
+ */
+String changeEmailField(String data){
+    int begin;
+
+    begin = data.indexOf("\r\nEMAIL:");
+
+    if(begin != -1){
+        data = data.replaceAll("\r\nEMAIL:", "\r\nEMAIL;INTERNET:");
+    }
+
+    return data;
+}
+
+/**
+ * Replaces field TEL: with TEL;VOICE: token.
+ *
+ * @param data the contact item
+ *
+ * @return the changed data
+ */
+String changeTelVoice(String data){
+    int begin;
+
+    begin = data.indexOf("\r\nTEL:");
+
+    if(begin != -1){
+        data = data.replaceAll("\r\nTEL:", "\r\nTEL;VOICE:");
+    }
+
+    return data;
+}
+
+/**
+ * Initializes hashmap of event properties.
+ */
+void init() {
+    missingEventTokens = new HashMap();
+
+    missingEventTokens.put("\r\nLOCATION", "LOCATION:" );
+    missingEventTokens.put("\r\nAALARM"  , "AALARM:;;;");
+}
+
+/**
+ * Replaces T080000 with T000000 in the start date and replaces T180000 with
+ * T235900 in the end date of an all day event.
+ * The Palm Treo sends all day that starts at 8 AM and ends at 6 PM.
+ *
+ * @param data the event item
+ *
+ * @return the changed data
+ */
+String fixAllDay(String data) {
+
+  s = e = 0;
+  if ((s = data.indexOf("DTSTART")) != -1 &&
+      (e = data.indexOf("DTEND")  ) != -1   ) {
+
+      dtStart = data.substring(s, data.indexOf("\r\n", s));
+      dtEnd   = data.substring(e, data.indexOf("\r\n", e));
+
+      if (dtStart.endsWith("T080000") &&
+          dtEnd.endsWith("T180000")     ) {
+
+          dtStart = dtStart.replaceAll("T080000", "T000000");
+          dtEnd   = dtEnd.replaceAll("T180000", "T235900");
+
+          StringBuffer sb = new StringBuffer(data.substring(0, s));
+          sb.append(dtStart).append(data.substring(s + dtStart.length()));
+
+          sb = new StringBuffer(data.substring(0, e));
+          sb.append(dtEnd).append(data.substring(e + dtEnd.length()));
+
+          data = sb.toString();
+      }
+  }
+  return data;
+}

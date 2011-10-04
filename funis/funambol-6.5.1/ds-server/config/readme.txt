@@ -1,0 +1,1 @@
+This directory contains server JavaBeans configuration files.
