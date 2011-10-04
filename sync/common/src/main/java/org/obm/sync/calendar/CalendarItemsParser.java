@@ -1,0 +1,314 @@
+package org.obm.sync.calendar;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.obm.sync.base.Category;
+import org.obm.sync.items.AbstractItemsParser;
+import org.obm.sync.items.EventChanges;
+import org.obm.sync.utils.DOMUtils;
+import org.obm.sync.utils.DateHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import com.google.common.base.Strings;
+
+public class CalendarItemsParser extends AbstractItemsParser {
+
+	protected Logger logger = LoggerFactory.getLogger(getClass());
+
+	public EventChanges parseChanges(Document doc) {
+		EventChanges changes = new EventChanges();
+		Element root = doc.getDocumentElement();
+		Date lastSync = DateHelper.asDate(root.getAttribute("lastSync"));
+		changes.setLastSync(lastSync);
+		Element removed = DOMUtils.getUniqueElement(root, "removed");
+		Element updated = DOMUtils.getUniqueElement(root, "updated");
+
+		NodeList rmed = removed.getElementsByTagName("event");
+		List<DeletedEvent> removedIds = new ArrayList<DeletedEvent>(rmed
+				.getLength() + 1);
+		for (int i = 0; i < rmed.getLength(); i++) {
+			Element e = (Element) rmed.item(i);
+			removedIds.add(new DeletedEvent(
+					new EventObmId(e.getAttribute("id")), 
+					new EventExtId(e.getAttribute("extId"))));
+		}
+		changes.setDeletions(removedIds);
+
+		NodeList upd = updated.getElementsByTagName("event");
+		List<Event> updatedEvents = new ArrayList<Event>(upd.getLength() + 1);
+		for (int i = 0; i < upd.getLength(); i++) {
+			Element e = (Element) upd.item(i);
+			Event ev = parseEvent(e);
+			updatedEvents.add(ev);
+		}
+		changes.setUpdated(updatedEvents
+				.toArray(new Event[updatedEvents.size()]));
+
+		return changes;
+	}
+
+	public Event parseEvent(Element e) {
+		Event ev = new Event();
+		String id = e.getAttribute("id");
+		if (!Strings.isNullOrEmpty(id)) {
+			ev.setUid(new EventObmId(id));
+		}
+		ev.setInternalEvent(e.hasAttribute("isInternal") ? !"false".equals(e
+				.getAttribute("isInternal")) : true);
+		ev.setAllday(e.hasAttribute("allDay") ? "true".equals(e
+				.getAttribute("allDay")) : false);
+		ev.setType(EventType.valueOf(e.getAttribute("type")));
+		// The sequence is not repeated for an event exception
+		if (e.hasAttribute("sequence")) {
+			ev.setSequence(Integer.valueOf(e.getAttribute("sequence")));
+		}
+		ev.setExtId(new EventExtId(s(e, "extId")));
+		ev.setRecurrenceId(d(e, "recurrenceId"));
+
+		String opacity = DOMUtils.getElementTextInChildren(e, "opacity");
+		ev.setOpacity(EventOpacity.getValueOf(opacity));
+		ev.setTitle(s(e, "title"));
+		ev.setOwner(s(e, "owner"));
+		ev.setOwnerEmail(s(e, "ownerEmail"));
+		String tz = s(e, "tz");
+		if (tz == null || tz.trim().length() == 0) {
+			tz = "Europe/Paris";
+		}
+		ev.setTimezoneName(tz);
+		ev.setDescription(s(e, "description"));
+		ev.setDate(d(e, "date"));
+		ev.setPrivacy(i(e, "privacy"));
+		ev.setPriority(i(e, "priority"));
+		ev.setDuration(i(e, "duration"));
+		ev.setCategory(s(e, "category"));
+		ev.setLocation(s(e, "location"));
+		ev.setAlert(i(e, "alert"));
+		ev.setTimeUpdate(d(e, "timeupdate"));
+		ev.setTimeCreate(d(e, "timecreate"));
+
+		parseAttendees(ev, e);
+
+		Element rec = DOMUtils.getUniqueElementInChildren(e, "recurrence");
+		if (rec != null) {
+			parseRecurrence(ev, rec);
+		}
+
+		Element eventsExp = DOMUtils.getUniqueElement(e, "eventExceptions");
+		if (eventsExp != null) {
+			NodeList elems = eventsExp.getElementsByTagName("eventException");
+			for (int i = 0; i < elems.getLength(); i++) {
+				Event eexcept = parseEventException(ev, (Element) elems.item(i));
+				ev.getRecurrence().addEventException(eexcept);
+			}
+		}
+		return ev;
+	}
+
+	private Event parseEventException(Event eventReference, Element item) {
+		Event eexcept = parseEvent(item);
+		eexcept.setSequence(eventReference.getSequence());
+		eexcept.setExtId(eventReference.getExtId());
+		return eexcept;
+	}
+
+	private void parseAttendees(Event ev, Element e) {
+		Element ats = DOMUtils.getUniqueElementInChildren(e, "attendees");
+		ev.setAttendees(getAttendees(ats));
+	}
+
+	private List<Attendee> getAttendees(Element ats) {
+		String[][] atVals = DOMUtils.getAttributes(ats, "attendee",
+				new String[] { "displayName", "email", "state", "required",
+						"percent", "isOrganizer" });
+		List<Attendee> la = new ArrayList<Attendee>(atVals.length);
+		for (String[] attendee : atVals) {
+			Attendee at = new Attendee();
+			at.setDisplayName(attendee[0]);
+			at.setEmail(attendee[1]);
+			at.setState(ParticipationState.getValueOf(attendee[2]));
+			at.setRequired(ParticipationRole.valueOf(attendee[3]));
+			if (attendee[4] != null && !attendee[4].equals("")) {
+				at.setPercent(Integer.parseInt(attendee[4]));
+			} else {
+				at.setPercent(100);
+			}
+			if (attendee[5] != null) {
+				at.setOrganizer(Boolean.parseBoolean(attendee[5]));
+			}
+			la.add(at);
+		}
+		return la;
+
+	}
+
+	private void parseRecurrence(Event ev, Element rec) {
+		String kind = rec.getAttribute("kind");
+		EventRecurrence er = new EventRecurrence();
+		er.setKind(RecurrenceKind.lookup(kind));
+		if (er.getKind() != RecurrenceKind.none) {
+			if (rec.hasAttribute("end")) {
+				er.setEnd(DateHelper.asDate(rec.getAttribute("end")));
+			}
+			er.setFrequence(Integer.parseInt(rec.getAttribute("freq")));
+			er.setDays(rec.getAttribute("days"));
+			if (er.getDays() != null && !"".equals(er.getDays())
+					&& !"0000000".equals(er.getDays())) {
+				er.setKind(RecurrenceKind.weekly);
+				if (er.getFrequence() == 0) {
+					er.setFrequence(1);
+				}
+			}
+			String[] exDates = DOMUtils.getTexts(rec, "exception");
+			for (int i = 0; i < exDates.length; i++) {
+				er.addException(DateHelper.asDate(exDates[i]));
+
+			}
+		} else {
+			er.setEnd(new Date());
+		}
+		ev.setRecurrence(er);
+
+	}
+
+	public CalendarInfo[] parseInfos(Document doc) {
+		NodeList infosList = doc.getElementsByTagName("info");
+		CalendarInfo[] infos = new CalendarInfo[infosList.getLength()];
+		for (int i = 0; i < infosList.getLength(); i++) {
+			infos[i] = parseInfo((Element) infosList.item(i));
+		}
+		return infos;
+	}
+
+	private CalendarInfo parseInfo(Element item) {
+		CalendarInfo ci = new CalendarInfo();
+		ci.setFirstname(s(item, "first"));
+		ci.setLastname(s(item, "last"));
+		ci.setMail(s(item, "mail"));
+		ci.setUid(s(item, "uid"));
+		ci.setRead("true".equals(s(item, "read")));
+		ci.setWrite("true".equals(s(item, "write")));
+		return ci;
+	}
+
+	public List<Category> parseCategories(Element documentElement) {
+		NodeList nl = documentElement.getElementsByTagName("cat");
+		ArrayList<Category> ret = new ArrayList<Category>(nl.getLength());
+		for (int i = 0; i < nl.getLength(); i++) {
+			Element cat = (Element) nl.item(i);
+			Category c = new Category();
+			c.setId(Integer.parseInt(cat.getAttribute("id")));
+			c.setLabel(cat.getAttribute("label"));
+			ret.add(c);
+		}
+		return ret;
+	}
+
+	public List<Event> parseListEvents(Element documentElement) {
+		List<Event> ret = new LinkedList<Event>();
+		NodeList nl = documentElement.getElementsByTagName("event");
+		for (int i = 0; i < nl.getLength(); i++) {
+			Element e = (Element) nl.item(i);
+			ret.add(parseEvent(e));
+		}
+		return ret;
+	}
+
+	public List<EventTimeUpdate> parseListEventTimeUpdate(
+			Element documentElement) {
+		List<EventTimeUpdate> ret = new LinkedList<EventTimeUpdate>();
+		NodeList nl = documentElement.getElementsByTagName("eventTimeUpdate");
+		for (int i = 0; i < nl.getLength(); i++) {
+			Element e = (Element) nl.item(i);
+			ret.add(parseEventTimeUpdate(e));
+		}
+		return ret;
+	}
+
+	private EventTimeUpdate parseEventTimeUpdate(Element e) {
+		EventTimeUpdate ev = new EventTimeUpdate();
+		ev.setUid(e.getAttribute("id"));
+		ev.setExtId(s(e, "extId"));
+		ev.setTimeUpdate(d(e, "timeupdate"));
+		ev.setRecurrenceId(d(e, "recurrenceId"));
+		return ev;
+	}
+
+	public List<EventParticipationState> parseListEventParticipationState(
+			Element documentElement) {
+		List<EventParticipationState> ret = new LinkedList<EventParticipationState>();
+		NodeList nl = documentElement
+				.getElementsByTagName("eventParticipationState");
+		for (int i = 0; i < nl.getLength(); i++) {
+			Element e = (Element) nl.item(i);
+			ret.add(parseEventParticipationState(e));
+		}
+		return ret;
+	}
+
+	public EventParticipationState parseEventParticipationState(Element e) {
+		EventParticipationState eps = new EventParticipationState();
+		eps.setUid(e.getAttribute("id"));
+		eps.setTitle(s(e, "title"));
+		eps.setState(ParticipationState.getValueOf(s(e, "state")));
+		eps.setAlert(i(e, "alert"));
+		eps.setDate(d(e, "date"));
+		return eps;
+	}
+
+	public FreeBusyRequest parseFreeBusyRequest(Element e) {
+		FreeBusyRequest fb = new FreeBusyRequest();
+		fb.setUid(s(e, "uid"));
+		fb.setOwner(s(e, "owner"));
+		fb.setStart(d(e, "start"));
+		fb.setEnd(d(e, "end"));
+		Element ats = DOMUtils.getUniqueElementInChildren(e, "attendees");
+		List<Attendee> atts = getAttendees(ats);
+		for (Attendee att : atts) {
+			fb.addAttendee(att);
+		}
+		return fb;
+	}
+
+	public FreeBusy parseFreeBusy(Element e) {
+		FreeBusy fb = new FreeBusy();
+
+		fb.setUid(s(e, "uid"));
+		fb.setOwner(s(e, "owner"));
+		fb.setStart(d(e, "start"));
+		fb.setEnd(d(e, "end"));
+
+		List<Attendee> atts = getAttendees(e);
+		if (atts.size() > 0) {
+			fb.setAtt(atts.get(0));
+		}
+
+		NodeList nlines = e.getElementsByTagName("freebusyinterval");
+		for (int j = 0; j < nlines.getLength(); j++) {
+			FreeBusyInterval fbl = new FreeBusyInterval();
+			Element lineE = (Element) nlines.item(j);
+			fbl.setAllDay(b(lineE, "allDay"));
+			fbl.setStart(d(lineE, "start"));
+			fbl.setDuration(i(lineE, "duration"));
+			fb.addFreeBusyInterval(fbl);
+		}
+		return fb;
+	}
+
+	public List<FreeBusy> parseListFreeBusy(Element e) {
+		List<FreeBusy> ret = new LinkedList<FreeBusy>();
+		NodeList freebusys = e.getChildNodes();
+		for (int i = 0; i < freebusys.getLength(); i++) {
+			Element fbe = (Element) freebusys.item(i);
+			FreeBusy fb = parseFreeBusy(fbe);
+			ret.add(fb);
+		}
+		return ret;
+	}
+}

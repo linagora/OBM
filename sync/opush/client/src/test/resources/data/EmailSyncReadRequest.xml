@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sync xmlns="AirSync:" xmlns:Email="Email:">
+	<Collections>
+		<Collection>
+			<SyncKey>DEFAULT_INBOX_FOLDER</SyncKey>
+			<CollectionId>DEFAULT_INBOX_FOLDER</CollectionId>
+			<Commands>
+				<Change>
+					<ServerId>FILL_ME</ServerId>
+					<ApplicationData>
+						<Email:Read>0</Email:Read>
+					</ApplicationData>
+				</Change>
+			</Commands>
+		</Collection>
+	</Collections>
+</Sync>

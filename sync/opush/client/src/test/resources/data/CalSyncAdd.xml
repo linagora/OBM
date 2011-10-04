@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Sync xmlns:Calendar="pouic">
+	<Collections>
+		<Collection>
+			<SyncKey>DEFAULT_CALENDAR_FOLDER</SyncKey>
+			<CollectionId>DEFAULT_CALENDAR_FOLDER</CollectionId>
+			<Commands>
+				<Add>
+					<ClientId>RAND_ID</ClientId>
+					<ApplicationData>
+						<Calendar:TimeZone>xP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==</Calendar:TimeZone>
+						<Calendar:AllDayEvent>0</Calendar:AllDayEvent>
+						<Calendar:BusyStatus>2</Calendar:BusyStatus>
+						<Calendar:DTStamp>20090608T162705Z</Calendar:DTStamp>
+						<Calendar:EndTime>20090608T110000Z</Calendar:EndTime>
+						<Calendar:MeetingStatus>0</Calendar:MeetingStatus>
+						<Calendar:ReminderMinsBefore>15</Calendar:ReminderMinsBefore>
+						<Calendar:Subject>Daily pda10</Calendar:Subject>
+						<Calendar:StartTime>20090608T100000Z</Calendar:StartTime>
+						<Calendar:UID>040000008200E00074C5B7101A82E00800000000792AA3784DFC80EDFC43A1468AC46FB62EF4A20F0D46F467AEF399E0F4113B35</Calendar:UID>
+					</ApplicationData>
+				</Add>
+			</Commands>
+		</Collection>
+	</Collections>
+</Sync>

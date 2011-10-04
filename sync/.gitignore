@@ -1,0 +1,15 @@
+build.properties
+build/
+client-build/
+dist-client/
+dist/
+.project
+.classpath
+.settings
+*/target
+*eclipse-build*
+*.epoch
+*.out
+*.log
+*.tlog
+message-queue/data/

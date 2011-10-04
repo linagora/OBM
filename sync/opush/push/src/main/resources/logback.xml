@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration scan="true" scanPeriod="60 seconds">
+
+	<appender name="PROD" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <File>/var/log/opush/opush.log</File>
+                <layout>
+                        <pattern>%d{HH:mm:ss.SSS} [%-5level] {%logger{32}} [t%X{threadId}/c%X{command}/r%X{requestId}/%X{user}]:%msg%n</pattern>
+                </layout>
+                <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                        <maxIndex>10</maxIndex>
+                        <FileNamePattern>/var/log/opush/opush.log.%i</FileNamePattern>
+                </rollingPolicy>
+                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                        <MaxFileSize>30000KB</MaxFileSize>
+                </triggeringPolicy>
+        </appender>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout>
+			<pattern>
+				%d{HH:mm:ss.SSS} [%-5level] {%logger{32}} [%X{user}] : %msg%n
+			</pattern>
+		</layout>
+	</appender>
+ 
+	<appender name="SIFTING" class="ch.qos.logback.classic.sift.SiftingAppender">
+		<discriminator>
+			<Key>sessionId</Key>
+			<DefaultValue>no-session</DefaultValue>
+		</discriminator>
+		<sift>
+			<appender name="FILE-${user}" class="ch.qos.logback.core.FileAppender">
+				<File>logs/${sessionId}.log</File>
+				<Append>true</Append>
+				<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+					<evaluator>
+						<expression>
+							return (marker != null) &amp;&amp; 
+							(		marker.contains("ActiveSync")
+								||	marker.contains("ActiveSyncXmlRequest")
+								||	marker.contains("ActiveSyncRequestHeaders")
+								||  marker.contains("ActiveSyncRequestInfo")
+								||	marker.contains("ActiveSyncXmlResponse")
+								||	marker.contains("ActiveSyncResponseHeaders")
+								||	marker.contains("HttpRequest")
+							);
+						</expression>
+					</evaluator>
+					<OnMismatch>DENY</OnMismatch>
+					<OnMatch>NEUTRAL</OnMatch>
+				</filter>
+
+				<encoder class="org.obm.push.logging.XmlTechnicalLogEncoder">
+					<layout class="org.obm.push.logging.XmlTechnicalLogLayout" />
+				</encoder>
+			</appender>
+		</sift>
+	</appender>
+
+	<include file="/etc/opush/logback.xml" />
+
+	<root level="ERROR">
+		<appender-ref ref="PROD" />
+		<!--appender-ref ref="STDOUT" /-->
+		<!--<appender-ref ref="SIFTING" />-->
+	</root>
+
+</configuration>
