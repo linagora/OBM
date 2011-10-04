@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config>
+
+  <indexDefaults>
+    <useCompoundFile>false</useCompoundFile>
+    <mergeFactor>10</mergeFactor>
+    <ramBufferSizeMB>32</ramBufferSizeMB>
+    <maxFieldLength>10000</maxFieldLength>
+    <writeLockTimeout>1000</writeLockTimeout>
+    <commitLockTimeout>10000</commitLockTimeout>
+    <lockType>native</lockType>
+  </indexDefaults>
+
+
+  <updateHandler class="solr.DirectUpdateHandler2" />
+
+  <requestDispatcher handleSelect="true" >
+    <requestParsers enableRemoteStreaming="true" multipartUploadLimitInKB="20480" />
+  </requestDispatcher>
+  
+  <requestHandler name="standard" class="solr.StandardRequestHandler" default="true" />
+  <requestHandler name="/update" class="solr.XmlUpdateRequestHandler" />
+  <requestHandler name="/update/javabin" class="solr.BinaryUpdateRequestHandler" />
+  
+  <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers" />
+  <requestHandler name="/admin/ping" class="PingRequestHandler">
+    <lst name="defaults">
+      <str name="qt">standard</str>
+      <str name="q">solrpingquery</str>
+      <str name="echoParams">all</str>
+    </lst>
+  </requestHandler>
+
+</config>
