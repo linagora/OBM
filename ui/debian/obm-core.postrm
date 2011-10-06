@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+if [ -f /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+fi
+
+if [ "$1" = "purge" ]; then
+        rm -f /usr/share/obm/www/conf
+	rm -f /etc/obm/obm_conf.inc
+        rm -f /etc/obm/modules/module.inc
+        rm -f /etc/obm/themes/login.html.sample
+        # Remove my changes to the db.
+    	db_purge
+
+fi
+#DEBHELPER#
+
+exit 0

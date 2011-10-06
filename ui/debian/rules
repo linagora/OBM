@@ -1,0 +1,63 @@
+#!/usr/bin/make -f
+#sylvain.garcia@aliasource.fr
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+#PERL Configuartion build
+# If set to a true value then MakeMaker's prompt function will
+# # always return the default without waiting for user input.
+export PERL_MM_USE_DEFAULT=1
+
+#PACKAGE=$(shell dh_listpackages)
+
+TMPLIBPERLOBM     =$(CURDIR)/debian/libobm-perl
+DIRPMOBM   =$(CURDIR)/auto/libperl-OBM
+#/PERL
+
+##PERL BUILD
+#Build Addon : build libobm-perl
+build/libobm-perl::
+	(cd $(CURDIR)/debian; \
+	/bin/bash buildperl.sh $(TMPLIBPERLOBM) $(DIRPMOBM) makefile-pl)
+	(cd $(CURDIR)/debian; \
+	/bin/bash buildperl.sh $(TMPLIBPERLOBM) $(DIRPMOBM) make)
+	
+#Install Addon : install libobm-perl
+install/libobm-perl::
+	(cd $(CURDIR)/debian; \
+	/bin/bash buildperl.sh $(TMPLIBPERLOBM) $(DIRPMOBM) make-install)
+##/PERL BUILD
+ 
+
+#Clean Addons
+clean::
+	#1- clean libobm-perl
+	(cd $(CURDIR)/debian; \
+	/bin/bash buildperl.sh $(TMPLIBPERLOBM) $(DIRPMOBM) make-clean; \
+	rm -f MANIFEST Makefile.old Makefile)
+
+install/obm-storage::
+	(/bin/bash $(CURDIR)/debian/build_obm-storage.sh $(CURDIR))
+
+install/obm-ldap::
+	#generate schema file for install with obm-ldap.install
+	#dh_install can't rename file
+	cp ${CURDIR}/doc/conf/ldap_obm.schema.sample debian/obm.schema
+	cp ${CURDIR}/doc/conf/ldap_samba.schema.3.0.24.sample  debian/samba.schema
+
+install/obm-core::
+	(/bin/bash $(CURDIR)/debian/build_obm.sh $(CURDIR))
+
+install/obm-services::
+	cp ${CURDIR}/doc/conf/logrotate.obm-services.sample debian/obm-services.logrotate
+
+#	(cd $(CURDIR)/debian;  \
+#	IFS=$$'\n'; \
+#	for i in `ls -d obm-*`;\
+#	do \
+#	  if [ -d $$i ]; \
+#	    then 	\
+#	    rm -rf `find $$i -name '.svn'`; \
+#	  fi\
+#	done)
+

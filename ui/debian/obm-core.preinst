@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+#set -x
+
+. /usr/share/debconf/confmodule
+
+if [ -n "$2" ] ; then
+  dpkg --compare-versions "$2" lt "2.1.8" && { 
+
+    #modification des fichier de conf, lors d'un upgrade on deplace toute
+    #la conf dans /etc/obm/
+    
+    OLD_CONF=`find /usr/share/obm/www/conf/ -maxdepth 1 -mindepth 1 -type d`
+    
+    echo "-------OBM upgrade < 2.1.8--------"
+    echo "move OBM configuration files to /etc/obm"
+    for i in ${OLD_CONF}; do
+      cp -a $i /etc/obm/
+    done
+    echo "old configuration directory has renamed to /usr/share/obm/www/conf.old"
+    mv /usr/share/obm/www/conf /usr/share/obm/www/conf.old
+    #dossier de configuration obm
+    #ln -s /etc/obm /usr/share/obm/www/conf
+    
+    echo "done.\n"
+    echo "----------------------------------"
+  
+  }
+fi
+
+#DEBHELPER#
+
+exit 0

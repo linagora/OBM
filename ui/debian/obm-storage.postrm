@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+if [ -f /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+fi
+
+db_get obm-conf/dbtype
+OBM_DBTYPE=$RET
+
+if [ -f /usr/share/dbconfig-common/dpkg/postrm ]; then
+  if  [ ${OBM_DBTYPE} = "MYSQL" ] ; then
+    dbc_hardcoded_dbtype="mysql"
+  elif  [ ${OBM_DBTYPE} = "PGSQL" ] ; then
+    dbc_hardcoded_dbtype="pgsql"
+  fi
+  . /usr/share/dbconfig-common/dpkg/postrm
+   dbc_go obm-storage $@
+fi
+
+if [ "$1" = "purge" ]; then
+  rm -f /etc/obm-storage/debian-db-obm.conf
+  if which ucf >/dev/null 2>&1; then
+    ucf --purge /etc/obm-storage/debian-db-obm.conf
+  fi
+  # Remove my changes to the db.
+  db_purge
+fi
+
+#DEBHELPER#
+
+exit 0
+

@@ -1,0 +1,15 @@
+Source: obm-sync
+Section: net
+Priority: optional
+Maintainer: Ronan Lanore <ronan.lanore@obm.org>
+Build-Depends: cdbs, debhelper (>= 5.0), sun-java6-jdk, maven2
+Standards-Version: 3.8.3
+Homepage: http://www.obm.org
+
+
+Package: obm-sync
+Architecture: all
+Pre-Depends: obm-conf
+Depends: obm-munin-node
+Description: OBM Sync server
+ J2EE web application used to access OBM data from icedove, outlook, etc.

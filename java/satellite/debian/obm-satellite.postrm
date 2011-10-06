@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+. /usr/share/debconf/confmodule
+
+
+if [ "$1" = "purge" ]; then
+  rm -rf /var/run/obm
+  if [ -x "`which ucf 2>/dev/null`" ]; then
+    ucf --purge /etc/obm-satellite/obmSatellite.ini
+    ucfr --purge obm-satellite /etc/obm-satellite/obmSatellite.ini
+    ucf --purge /etc/obm-satellite/mods-available/cyrusPartition
+    ucfr --purge obm-satellite /etc/obm-satellite/mods-available/cyrusPartition
+    ucf --purge /etc/obm-satellite/mods-available/locator
+    ucfr --purge obm-satellite /etc/obm-satellite/mods-available/locator
+    ucf --purge /etc/obm-satellite/mods-available/postfixSmtpInMaps
+    ucfr --purge obm-satellite /etc/obm-satellite/mods-available/postfixSmtpInMaps
+    ucf --purge /etc/obm-satellite/mods-available/backupEntity
+    ucfr --purge obm-satellite /etc/obm-satellite/mods-available/backupEntity
+  fi
+  rm -f /etc/obm-satellite/obmSatellite.ini
+  rm -f /etc/obm-satellite/obmSatellite.ini-old
+  rm -f /etc/obm-satellite/mods-available/cyrusPartition
+  rm -f /etc/obm-satellite/mods-available/cyrusPartition-old
+  rm -f /etc/obm-satellite/mods-available/locator
+  rm -f /etc/obm-satellite/mods-available/locator-old
+  rm -f /etc/obm-satellite/mods-available/postfixSmtpInMaps
+  rm -f /etc/obm-satellite/mods-available/postfixSmtpInMaps-old
+  rm -f /etc/obm-satellite/mods-available/backupEntity
+  rm -f /etc/obm-satellite/mods-available/backupEntity-old
+  db_purge
+fi
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,71 @@
+#!/bin/sh
+set -e
+#set -x
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+FULL_NAME=`/bin/hostname -f`
+
+is_initial_configuration() { 
+  # Check if this is the initial configuration and not an upgrade of an 
+  # existing configuration 
+  # Usage: if is_initial_configuration "$@"; then ... fi from top level 
+
+  # Plain installation 
+  if [ "$1" = configure ] && [ -z "$2" ]; then 
+    return 0 
+  fi 
+  # Configuration via dpkg-reconfigure 
+  if [ "$1" = reconfigure ] || [ "$DEBCONF_RECONFIGURE" ]; then 
+    return 0 
+  fi 
+  return 1 
+}
+
+if is_initial_configuration "$@"; then
+  # Configuration main.cf OBM
+  cp /etc/postfix/main.cf /etc/postfix/main.cf.orig || true
+
+  if [ -e /usr/share/doc/obm-postfix/postfix_main.cf_-_SMTPin.2.3.x.sample.gz ]; then
+    zcat /usr/share/doc/obm-postfix/postfix_main.cf_-_SMTPin.2.3.x.sample.gz > /etc/postfix/main.cf
+  else
+    cat /usr/share/doc/obm-postfix/postfix_main.cf_-_SMTPin.2.3.x.sample > /etc/postfix/main.cf
+  fi
+
+  #configuration main.cf
+  /usr/sbin/postconf -e relayhost=""
+  /usr/sbin/postconf -e mynetworks="127.0.0.0/8"
+  /usr/sbin/postconf -e myhostname="${FULL_NAME}"
+
+  #generation des alias
+  newaliases
+
+  invoke-rc.d postfix restart || true
+
+fi
+
+echo -n "[obm-postfix] activate obm-satellite postfix module..."
+osenmod postfixSmtpInMaps
+invoke-rc.d obm-satellite restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+
+
+db_set obm-conf/module_obmmail true 
+db_go || true
+
+echo -n "[obm-postfix] update configuration file obm_conf.ini...."
+#Build /etc/obm/obm_conf.ini
+$(which perl) /usr/share/obm-conf/genobmconf.pl
+
+TEMPDIR=/var/run/obm/upgrades
+NEWFILE=$TEMPDIR/obm_conf.ini
+CONFIG=/etc/obm/obm_conf.ini
+ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
+ucfr obm-conf "$CONFIG"
+echo "[DONE]"
+
+
+#DEBHELPER#
+
+
+exit 0

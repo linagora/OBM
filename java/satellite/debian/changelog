@@ -1,0 +1,95 @@
+obm-satellite (2.4.0-rc7-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Tue, 30 Aug 2011 16:43:10 +0200
+
+obm-satellite (2.4.0-rc6-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Wed, 20 Jul 2011 16:17:31 +0200
+
+obm-satellite (2.4.0-rc5-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Mon, 11 Jul 2011 16:17:10 +0200
+
+obm-satellite (2.4.0-rc4-1) unstable; urgency=low
+
+  * Fix M#3042 search stoped at first ftp delegation found
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Mon, 11 Jul 2011 16:14:53 +0200
+
+obm-satellite (2.4.0-rc3-1) unstable; urgency=low
+
+  *  modify backupEntity.pm for M#2454
+
+ -- ronan lanore <ronan.lanore@obm.org>  Thu, 31 Mar 2011 17:13:11 +0200
+
+obm-satellite (2.4.0-rc2-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- ronan lanore <ronan.lanore@obm.org>  Mon, 21 Mar 2011 15:06:21 +0100
+
+obm-satellite (2.4.0-rc1-1) unstable; urgency=low
+
+  * add depends on : liblog-log4perl-perl
+  * add backupEntity config file, fixed #1198 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 15 Feb 2010 14:13:47 +0100
+
+obm-satellite (2.3.1-2) unstable; urgency=low
+
+  * fix rules for build on unstable, new cdbs version 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 29 Jan 2010 10:39:13 +0100
+
+obm-satellite (2.3.1-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 25 Jan 2010 11:26:35 +0100
+
+obm-satellite (2.3.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 04 Dec 2009 17:23:54 +0100
+
+obm-satellite (2.3.0~rc3-1) unstable; urgency=low
+
+  * bump to rc3
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 27 Nov 2009 09:58:19 +0100
+
+obm-satellite (2.3.0~rc2-1) unstable; urgency=low
+
+  * bump to rc2 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Sun, 22 Nov 2009 11:12:00 +0100
+
+obm-satellite (2.3.0~rc1-1) unstable; urgency=low
+
+  * bump to rc1 release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 13 Nov 2009 10:02:27 +0100
+
+obm-satellite (2.3.0~alpha1-1) unstable; urgency=low
+
+  * New upstream of obm-satellite, use http instead of telnet
+  * remove old templates
+ 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 16 Sep 2009 10:52:51 +0200
+
+obm-satellite (2.3.0-1) unstable; urgency=low
+
+  * Initial release.
+  * /etc/obm-satellite/obmSatellite.cf now handle by ucf (Closes: #330)
+  * add podebonf
+  * improve lintian test 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 24 Aug 2009 16:06:23 +0200

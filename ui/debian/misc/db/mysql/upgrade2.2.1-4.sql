@@ -1,0 +1,1 @@
+INSERT INTO SynchedContact (synchedcontact_contact_id,synchedcontact_user_id, synchedcontact_timestamp) SELECT contact_id, contact_usercreate, GREATEST(contact_timecreate, contact_timeupdate) FROM Contact LEFT JOIN SynchedContact ON contact_id = synchedcontact_contact_id WHERE synchedcontact_contact_id IS NULL AND contact_privacy = 1 AND contact_archive != 1;

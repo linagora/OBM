@@ -1,0 +1,64 @@
+#!/bin/bash
+
+set -e
+
+export JAVA_HOME=/usr/lib/jvm/java-6-sun
+test -d /usr/lib/jvm/java-1.6.0-openjdk && {
+    JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
+}
+test -d /usr/lib/jvm/java-openjdk && {
+    JAVA_HOME=/usr/lib/jvm/java-openjdk
+}
+
+FNBL_HOME=/usr/share/funambol-6.5.1
+
+#
+# Apply correct funambol server uri
+#
+if [ -e /usr/share/debconf/confmodule ]; then
+  . /usr/share/debconf/confmodule
+  db_get obm-conf/externalurl || true
+  OBM_EXTERNALURL="$RET"
+  OBM_EXTERNALPROTOCOL=`cat /etc/obm/obm_conf.ini | grep ^external-protocol | cut -d= -f2 | sed 's/ //'`
+else
+  OBM_EXTERNALURL=`cat /etc/obm/obm_conf.ini | grep ^external-url | cut -d= -f2 | sed 's/ //'`
+  OBM_EXTERNALPROTOCOL=`cat /etc/obm/obm_conf.ini | grep ^external-protocol | cut -d= -f2 | sed 's/ //'`
+fi
+OBM_EXTERNALPORT=`cat /etc/obm/obm_conf.ini | grep ^external-port | cut -d= -f2 | sed 's/ //'`
+
+if [ -z ${OBM_EXTERNALPORT} ]; then
+  funambol_uri="${OBM_EXTERNALPROTOCOL}://${OBM_EXTERNALURL}/funambol/ds"
+else
+  funambol_uri="${OBM_EXTERNALPROTOCOL}://${OBM_EXTERNALURL}/funambol/ds:${OBM_EXTERNALPORT}"
+fi
+
+cat ${FNBL_HOME}/Funambol.xml.template | \
+sed -e "s%#funambol_uri#%${funambol_uri}%"\
+> ${FNBL_HOME}/ds-server/config/Funambol.xml
+
+
+funambol_conf="/etc/obm/funambol_conf.ini"
+user=`cat ${funambol_conf} | grep "^user *=" | cut -d"=" -f2| sed -e 's/ //g'`
+password=`cat ${funambol_conf} | grep "^password *=" | cut -d"=" -f2| sed -e 's/ //g'| sed -e 's/"//g'`
+db=`cat ${funambol_conf} | grep "^db *=" | cut -d"=" -f2| sed -e 's/ //g'`
+host=`cat ${funambol_conf} | grep "^host *=" | cut -d"=" -f2| sed -e 's/ //g'`
+
+
+cat > /usr/share/obm-tomcat/applis/funambol.xml<<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<Context docBase="/usr/share/funambol-6.5.1/funambol" path="/funambol">
+<Resource auth="Container" 
+  driverClassName="org.postgresql.Driver"
+    name="jdbc/fnblds"
+    password="${password}"
+    type="javax.sql.DataSource"
+    url="jdbc:postgresql://${host:-localhost}/${db}"
+    username="${user}"
+    testWhileIdle="true"
+    validationQuery="SELECT 1"/>
+</Context>
+EOF
+
+#DEBHELPER#
+
+exit 0

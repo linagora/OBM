@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+#sylvain.garcia@obm.org
+
+include /usr/share/cdbs/1/class/perlmodule.mk
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+
+DEB_BUILDDIR := libperl-ObmSatellite
+DEB_SRCDIR := libperl-ObmSatellite
+DEB_MAKEMAKER_PACKAGE := libobmsatellite-perl
+
+install/obm-satellite::
+	# script init generation
+	( cd $(CURDIR)/debian; \
+	  cat $(CURDIR)/init-obmSatellite.sample.debian > obm-satellite.init)
+
+clean::
+#	debconf-updatepo
+
+install/obm-satellite::
+	cp ${CURDIR}/doc/conf/logrotate.obm-satellite.sample debian/obm-satellite.logrotate

@@ -1,0 +1,8 @@
+obmSatellite.pl usr/share/obm-satellite
+obmSatellite.ini.sample usr/share/obm-satellite/sample
+mods-available/cyrusPartition usr/share/obm-satellite/sample
+mods-available/locator usr/share/obm-satellite/sample
+mods-available/postfixSmtpInMaps usr/share/obm-satellite/sample
+mods-available/backupEntity usr/share/obm-satellite/sample
+osdismod usr/sbin
+osenmod usr/sbin

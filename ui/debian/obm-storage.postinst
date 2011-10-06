@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+#set -x
+
+. /usr/share/debconf/confmodule
+. /usr/share/dbconfig-common/dpkg/postinst
+
+db_get obm-conf/dbtype
+OBM_DBTYPE=$RET
+if  [ ${OBM_DBTYPE} = "MYSQL" ] ; then
+  dbc_hardcoded_dbtype="mysql"
+elif  [ ${OBM_DBTYPE} = "PGSQL" ] ; then
+  dbc_hardcoded_dbtype="pgsql"
+  dbc_pgsql_createdb_encoding="UTF8"
+  #replace _DBC_DBNAME_ in admin install script
+  #to ALTER DATABASE GMT
+  dbc_sql_substitutions="1"
+fi
+
+dbc_generate_include=template:/etc/obm-storage/debian-db-obm.conf
+dbc_generate_include_args="-o template_infile=/usr/share/obm-storage/debian/debian-db.conf.template"
+dbc_go obm-storage $@
+
+#DEBHELPER#
+
+exit 0

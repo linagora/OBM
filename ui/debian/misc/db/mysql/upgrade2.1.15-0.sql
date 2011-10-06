@@ -1,0 +1,1 @@
+UPDATE CalendarEvent SET calendarevent_usercreate=(SELECT MIN(userobm_id) FROM UserObm WHERE userobm_perms='admin' and userobm_domain_id=calendarevent_domain_id) WHERE calendarevent_usercreate not in (select userobm_id from UserObm);

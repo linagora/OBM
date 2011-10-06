@@ -1,0 +1,57 @@
+#!/bin/bash
+. /usr/share/debconf/confmodule
+
+pushd /var/solr/default
+rm -fr conf
+ln -s /etc/solr/conf/default conf
+popd
+
+pushd /var/solr/webmail
+rm -fr conf
+ln -s /etc/solr/conf/webmail conf
+popd
+
+pushd /var/solr/event
+rm -fr conf
+ln -s /etc/solr/conf/event conf
+popd
+
+pushd /var/solr/contact
+rm -fr conf
+ln -s /etc/solr/conf/contact conf
+popd
+
+if [ -n $2 ] && dpkg --compare-versions "$2" lt "2.3.7-1"; then
+  invoke-rc.d obm-tomcat stop 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+  rm -rf /var/solr/contact/data
+  reindex="true"
+fi
+
+[ -d /var/solr ] && chown -R jetty:adm /var/solr
+
+invoke-rc.d jetty status 3>1
+jetty_status=$?
+
+if [ $jetty_status -eq 0 ]; then
+	invoke-rc.d jetty restart	 3>1
+elif [ $jetty_status -ne 3 ]; then
+	echo "Jetty not correctly shutdown.\nPlease restart it manually to start using the obm-solr webapp.\n"
+	if [ ! -z $reindex ]; then
+		echo "Then launch data reindexing with /usr/share/obm-solr/obm_index_init.py"
+	fi
+else
+	invoke-rc.d jetty start 3>1
+fi
+
+if [ ! -z $reindex ]; then
+  echo "[obm-solr] start indexing obm data..."
+  sleep 5
+  /usr/share/obm-solr/obm_index_init.py || true
+  echo "[obm-solr] indexing data done."
+fi
+
+[ -f /etc/init.d/obm-solr ] && rm -f /etc/init.d/obm-solr
+
+ln -s /etc/init.d/jetty /etc/init.d/obm-solr
+
+exit 0

@@ -1,0 +1,12 @@
+Source: obm-caldav
+Section: net
+Priority: optional
+Maintainer: Sylvain Garcia <sylvain.garcia@obm.org>
+Build-Depends: cdbs, debhelper (>> 5.0.0), sun-java6-jdk, obm-eclipse (>=3.5.0-obm1), bash
+Standards-Version: 3.8.3
+
+Package: obm-caldav
+Architecture: all
+Depends: obm-conf, sun-java6-jdk
+Description: Caldav server for OBM
+  Contains Caldav server for OBM

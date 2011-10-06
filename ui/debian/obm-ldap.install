@@ -1,0 +1,2 @@
+debian/obm.schema etc/ldap/schema
+debian/samba.schema etc/ldap/schema

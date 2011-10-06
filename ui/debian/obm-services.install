@@ -1,0 +1,9 @@
+auto/update.pl usr/share/obm/www/auto/
+auto/testObmSatellite.pl usr/share/obm/www/auto/
+auto/changePasswd.pl usr/share/obm/www/auto/
+auto/updateSieve.pl usr/share/obm/www/auto/
+auto/updateCyrusAcl.pl usr/share/obm/www/auto/
+auto/ldapContacts.pl usr/share/obm/www/auto/
+auto/cyrusGetQuotaUse.pl usr/share/obm/www/auto/
+conf/automateLdapMapping.xml usr/share/obm/sample/
+scripts/2.3/update-2.2-2.3.ldap.pl usr/share/obm-services/updates
