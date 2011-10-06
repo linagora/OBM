@@ -1,0 +1,1026 @@
+----
+---- PostgreSQL database dump
+----
+--
+--SET client_encoding = 'UTF8';
+--SET check_function_bodies = false;
+--SET client_min_messages = warning;
+--
+----
+---- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
+----
+--
+--COMMENT ON SCHEMA public IS 'Standard public schema';
+--
+--
+--
+-- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: 
+--
+--
+--CREATE PROCEDURAL LANGUAGE plpgsql;
+--
+--
+--SET search_path = public, pg_catalog;
+--
+--SET default_tablespace = '';
+--
+--SET default_with_oids = false;
+
+--
+-- Name: fnbl_client_mapping; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_client_mapping (
+    principal bigint NOT NULL,
+    sync_source character varying(128) NOT NULL,
+    luid character varying(200) NOT NULL,
+    guid character varying(200) NOT NULL,
+    last_anchor character varying(20)
+);
+
+
+--ALTER TABLE public.fnbl_client_mapping OWNER TO funis;
+
+--
+-- Name: fnbl_connector; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_connector (
+    id character varying(128) NOT NULL,
+    name character varying(200) NOT NULL,
+    description character varying(200),
+    admin_class character varying(255)
+);
+
+
+--ALTER TABLE public.fnbl_connector OWNER TO funis;
+
+--
+-- Name: fnbl_connector_source_type; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_connector_source_type (
+    connector character varying(128) NOT NULL,
+    sourcetype character varying(128) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_connector_source_type OWNER TO funis;
+
+--
+-- Name: fnbl_device; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_device (
+    id character varying(128) NOT NULL,
+    description character varying(255),
+    "type" character varying(255),
+    client_nonce character varying(255),
+    server_nonce character varying(255),
+    server_password character varying(255),
+    timezone character varying(32),
+    convert_date character(1),
+    charset character varying(16),
+    address character varying(50),
+    msisdn character varying(50),
+    notification_builder character varying(255),
+    notification_sender character varying(255),
+    id_caps bigint
+);
+
+
+--ALTER TABLE public.fnbl_device OWNER TO funis;
+
+--
+-- Name: fnbl_device_caps; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_device_caps (
+    id bigint NOT NULL,
+    version character varying(16) NOT NULL,
+    man character varying(100),
+    model character varying(100),
+    fwv character varying(100),
+    swv character varying(100),
+    hwv character varying(100),
+    utc character(1) NOT NULL,
+    lo character(1) NOT NULL,
+    noc character(1) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_device_caps OWNER TO funis;
+
+--
+-- Name: fnbl_device_datastore; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_device_datastore (
+    id bigint NOT NULL,
+    caps bigint,
+    sourceref character varying(128) NOT NULL,
+    label character varying(128),
+    maxguidsize integer,
+    dsmem character(1) NOT NULL,
+    shs character(1) NOT NULL,
+    synccap character varying(32) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_device_datastore OWNER TO funis;
+
+--
+-- Name: fnbl_device_ext; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_device_ext (
+    id bigint NOT NULL,
+    caps bigint,
+    xname character varying(255),
+    xvalue character varying(255)
+);
+
+
+--ALTER TABLE public.fnbl_device_ext OWNER TO funis;
+
+--
+-- Name: fnbl_ds_ctcap; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_ds_ctcap (
+    id bigint NOT NULL,
+    datastore bigint NOT NULL,
+    "type" character varying(64) NOT NULL,
+    version character varying(16) NOT NULL,
+    field character(1) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_ds_ctcap OWNER TO funis;
+
+--
+-- Name: fnbl_ds_ctcap_prop; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_ds_ctcap_prop (
+    id bigint NOT NULL,
+    ctcap bigint NOT NULL,
+    name character varying(64) NOT NULL,
+    label character varying(128),
+    "type" character varying(32),
+    maxoccur integer,
+    maxsize integer,
+    truncated character(1) NOT NULL,
+    valenum character varying(255)
+);
+
+
+--ALTER TABLE public.fnbl_ds_ctcap_prop OWNER TO funis;
+
+--
+-- Name: fnbl_ds_ctcap_prop_param; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_ds_ctcap_prop_param (
+    property bigint NOT NULL,
+    name character varying(64) NOT NULL,
+    label character varying(128),
+    "type" character varying(32),
+    valenum character varying(255)
+);
+
+
+--ALTER TABLE public.fnbl_ds_ctcap_prop_param OWNER TO funis;
+
+--
+-- Name: fnbl_ds_cttype_rx; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_ds_cttype_rx (
+    datastore bigint NOT NULL,
+    "type" character varying(64) NOT NULL,
+    version character varying(16) NOT NULL,
+    preferred character(1) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_ds_cttype_rx OWNER TO funis;
+
+--
+-- Name: fnbl_ds_cttype_tx; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_ds_cttype_tx (
+    datastore bigint NOT NULL,
+    "type" character varying(64) NOT NULL,
+    version character varying(16) NOT NULL,
+    preferred character(1) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_ds_cttype_tx OWNER TO funis;
+
+--
+-- Name: fnbl_ds_filter_cap; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_ds_filter_cap (
+    datastore bigint NOT NULL,
+    "type" character varying(64) NOT NULL,
+    version character varying(16) NOT NULL,
+    keywords character varying(255),
+    properties character varying(255)
+);
+
+
+--ALTER TABLE public.fnbl_ds_filter_cap OWNER TO funis;
+
+--
+-- Name: fnbl_ds_filter_rx; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_ds_filter_rx (
+    datastore bigint NOT NULL,
+    "type" character varying(64) NOT NULL,
+    version character varying(16) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_ds_filter_rx OWNER TO funis;
+
+--
+-- Name: fnbl_ds_mem; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_ds_mem (
+    datastore bigint,
+    shared character(1) NOT NULL,
+    maxmem integer,
+    maxid integer
+);
+
+
+--ALTER TABLE public.fnbl_ds_mem OWNER TO funis;
+
+--
+-- Name: fnbl_id; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_id (
+    idspace character varying(30) NOT NULL,
+    counter bigint NOT NULL,
+    increment_by integer DEFAULT 100
+);
+
+
+--ALTER TABLE public.fnbl_id OWNER TO funis;
+
+--
+-- Name: fnbl_last_sync; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_last_sync (
+    principal bigint NOT NULL,
+    sync_source character varying(128) NOT NULL,
+    sync_type integer NOT NULL,
+    status integer,
+    last_anchor_server character varying(20),
+    last_anchor_client character varying(20),
+    start_sync bigint,
+    end_sync bigint
+);
+
+
+--ALTER TABLE public.fnbl_last_sync OWNER TO funis;
+
+--
+-- Name: fnbl_module; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_module (
+    id character varying(128) NOT NULL,
+    name character varying(200) NOT NULL,
+    description character varying(200)
+);
+
+
+--ALTER TABLE public.fnbl_module OWNER TO funis;
+
+--
+-- Name: fnbl_module_connector; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_module_connector (
+    module character varying(128) NOT NULL,
+    connector character varying(128) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_module_connector OWNER TO funis;
+
+--
+-- Name: fnbl_principal; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_principal (
+    username character varying(255) NOT NULL,
+    device character varying(128) NOT NULL,
+    id bigint NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_principal OWNER TO funis;
+
+--
+-- Name: fnbl_role; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_role (
+    "role" character varying(128) NOT NULL,
+    description character varying(200) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_role OWNER TO funis;
+
+--
+-- Name: fnbl_sync_source; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_sync_source (
+    uri character varying(128) NOT NULL,
+    config character varying(255) NOT NULL,
+    name character varying(200) NOT NULL,
+    sourcetype character varying(128) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_sync_source OWNER TO funis;
+
+--
+-- Name: fnbl_sync_source_type; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_sync_source_type (
+    id character varying(128) NOT NULL,
+    description character varying(200),
+    "class" character varying(255) NOT NULL,
+    admin_class character varying(255)
+);
+
+
+--ALTER TABLE public.fnbl_sync_source_type OWNER TO funis;
+
+--
+-- Name: fnbl_user; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_user (
+    username character varying(255) NOT NULL,
+    "password" character varying(255) NOT NULL,
+    email character varying(255),
+    first_name character varying(255),
+    last_name character varying(255)
+);
+
+
+--ALTER TABLE public.fnbl_user OWNER TO funis;
+
+--
+-- Name: fnbl_user_role; Type: TABLE; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE TABLE fnbl_user_role (
+    username character varying(255) NOT NULL,
+    "role" character varying(128) NOT NULL
+);
+
+
+--ALTER TABLE public.fnbl_user_role OWNER TO funis;
+
+--
+-- Data for Name: fnbl_client_mapping; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_client_mapping (principal, sync_source, luid, guid, last_anchor) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_connector; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_connector (id, name, description, admin_class) FROM stdin;
+obm	OBM Connector	OBM Connector	\N
+\.
+
+
+--
+-- Data for Name: fnbl_connector_source_type; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_connector_source_type (connector, sourcetype) FROM stdin;
+obm	obm-calendar
+obm	obm-contact
+obm	obm-task
+\.
+
+
+--
+-- Data for Name: fnbl_device; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_device (id, description, "type", client_nonce, server_nonce, server_password, timezone, convert_date, charset, address, msisdn, notification_builder, notification_sender, id_caps) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_device_caps; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_device_caps (id, version, man, model, fwv, swv, hwv, utc, lo, noc) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_device_datastore; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_device_datastore (id, caps, sourceref, label, maxguidsize, dsmem, shs, synccap) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_device_ext; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_device_ext (id, caps, xname, xvalue) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_ds_ctcap; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_ds_ctcap (id, datastore, "type", version, field) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_ds_ctcap_prop; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_ds_ctcap_prop (id, ctcap, name, label, "type", maxoccur, maxsize, truncated, valenum) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_ds_ctcap_prop_param; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_ds_ctcap_prop_param (property, name, label, "type", valenum) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_ds_cttype_rx; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_ds_cttype_rx (datastore, "type", version, preferred) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_ds_cttype_tx; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_ds_cttype_tx (datastore, "type", version, preferred) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_ds_filter_cap; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_ds_filter_cap (datastore, "type", version, keywords, properties) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_ds_filter_rx; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_ds_filter_rx (datastore, "type", version) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_ds_mem; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_ds_mem (datastore, shared, maxmem, maxid) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_id; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_id (idspace, counter, increment_by) FROM stdin;
+device	0	100
+principal	0	100
+guid	3	100
+datastore	0	100
+capability	0	100
+ext	0	100
+ctcap	0	100
+ctcap_property	0	100
+\.
+
+
+--
+-- Data for Name: fnbl_last_sync; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_last_sync (principal, sync_source, sync_type, status, last_anchor_server, last_anchor_client, start_sync, end_sync) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_module; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_module (id, name, description) FROM stdin;
+obm	obm	OBM Connector
+\.
+
+
+--
+-- Data for Name: fnbl_module_connector; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_module_connector (module, connector) FROM stdin;
+obm	obm
+\.
+
+
+--
+-- Data for Name: fnbl_principal; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_principal (username, device, id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: fnbl_role; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_role ("role", description) FROM stdin;
+sync_user	User
+sync_administrator	Administrator
+\.
+
+
+--
+-- Data for Name: fnbl_sync_source; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_sync_source (uri, config, name, sourcetype) FROM stdin;
+obm_book_vcard	obm/obm/obm-contact/obm_book_vcard.xml	obm_book_vcard	obm-contact
+obm_cal_ical	obm/obm/obm-calendar/obm_cal_ical.xml	obm_cal_ical	obm-calendar
+obm_task_ical	obm/obm/obm-task/obm_task_ical.xml	obm_task_ical	obm-task
+\.
+
+
+--
+-- Data for Name: fnbl_sync_source_type; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_sync_source_type (id, description, "class", admin_class) FROM stdin;
+obm-calendar	OBM Calendar SyncSource	fr.aliasource.funambol.engine.source.CalendarSyncSource	fr.aliasource.funambol.admin.ObmSyncSourceConfigPanel
+obm-contact	OBM Contact SyncSource	fr.aliasource.funambol.engine.source.ContactSyncSource	fr.aliasource.funambol.admin.ObmSyncSourceConfigPanel
+obm-task	OBM Task SyncSource	fr.aliasource.funambol.engine.source.TaskSyncSource	fr.aliasource.funambol.admin.ObmSyncSourceConfigPanel
+\.
+
+
+--
+-- Data for Name: fnbl_user; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_user (username, "password", email, first_name, last_name) FROM stdin;
+admin	lltUbBHM7oA=	admin@funambol.com	admin	admin
+guest	65GUmi03K6o=	guest@funambol.com	guest	guest
+\.
+
+
+--
+-- Data for Name: fnbl_user_role; Type: TABLE DATA; Schema: public; Owner: funis
+--
+
+COPY fnbl_user_role (username, "role") FROM stdin;
+admin	sync_administrator
+guest	sync_user
+\.
+
+
+--
+-- Name: pk_clientmapping; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_client_mapping
+    ADD CONSTRAINT pk_clientmapping PRIMARY KEY (principal, sync_source, luid, guid);
+
+
+--
+-- Name: pk_connector; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_connector
+    ADD CONSTRAINT pk_connector PRIMARY KEY (id);
+
+
+--
+-- Name: pk_connector_sst; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_connector_source_type
+    ADD CONSTRAINT pk_connector_sst PRIMARY KEY (connector, sourcetype);
+
+
+--
+-- Name: pk_dev_datastore; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_device_datastore
+    ADD CONSTRAINT pk_dev_datastore PRIMARY KEY (id);
+
+
+--
+-- Name: pk_dev_ext; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_device_ext
+    ADD CONSTRAINT pk_dev_ext PRIMARY KEY (id);
+
+
+--
+-- Name: pk_device; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_device
+    ADD CONSTRAINT pk_device PRIMARY KEY (id);
+
+
+--
+-- Name: pk_device_caps; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_device_caps
+    ADD CONSTRAINT pk_device_caps PRIMARY KEY (id);
+
+
+--
+-- Name: pk_ds_ctcap; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_ds_ctcap
+    ADD CONSTRAINT pk_ds_ctcap PRIMARY KEY (id);
+
+
+--
+-- Name: pk_ds_ctcap_prop; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_ds_ctcap_prop
+    ADD CONSTRAINT pk_ds_ctcap_prop PRIMARY KEY (id);
+
+
+--
+-- Name: pk_ds_cttype_rx; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_ds_cttype_rx
+    ADD CONSTRAINT pk_ds_cttype_rx PRIMARY KEY ("type", version, datastore);
+
+
+--
+-- Name: pk_ds_cttype_tx; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_ds_cttype_tx
+    ADD CONSTRAINT pk_ds_cttype_tx PRIMARY KEY ("type", version, datastore);
+
+
+--
+-- Name: pk_ds_filter_cap; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_ds_filter_cap
+    ADD CONSTRAINT pk_ds_filter_cap PRIMARY KEY ("type", version, datastore);
+
+
+--
+-- Name: pk_ds_filter_rx; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_ds_filter_rx
+    ADD CONSTRAINT pk_ds_filter_rx PRIMARY KEY ("type", version, datastore);
+
+
+--
+-- Name: pk_id; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_id
+    ADD CONSTRAINT pk_id PRIMARY KEY (idspace);
+
+
+--
+-- Name: pk_last_sync; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_last_sync
+    ADD CONSTRAINT pk_last_sync PRIMARY KEY (principal, sync_source);
+
+
+--
+-- Name: pk_mod_connector; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_module_connector
+    ADD CONSTRAINT pk_mod_connector PRIMARY KEY (module, connector);
+
+
+--
+-- Name: pk_module; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_module
+    ADD CONSTRAINT pk_module PRIMARY KEY (id);
+
+
+--
+-- Name: pk_principal; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_principal
+    ADD CONSTRAINT pk_principal PRIMARY KEY (id);
+
+
+--
+-- Name: pk_role; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_role
+    ADD CONSTRAINT pk_role PRIMARY KEY ("role");
+
+
+--
+-- Name: pk_sst; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_sync_source_type
+    ADD CONSTRAINT pk_sst PRIMARY KEY (id);
+
+
+--
+-- Name: pk_sync_source; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_sync_source
+    ADD CONSTRAINT pk_sync_source PRIMARY KEY (uri);
+
+
+--
+-- Name: pk_user; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_user
+    ADD CONSTRAINT pk_user PRIMARY KEY (username);
+
+
+--
+-- Name: pk_user_role; Type: CONSTRAINT; Schema: public; Owner: funis; Tablespace: 
+--
+
+ALTER TABLE ONLY fnbl_user_role
+    ADD CONSTRAINT pk_user_role PRIMARY KEY (username, "role");
+
+
+--
+-- Name: ind_ctcap; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_ctcap ON fnbl_ds_ctcap USING btree (datastore);
+
+
+--
+-- Name: ind_ctcap_prop; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_ctcap_prop ON fnbl_ds_ctcap_prop USING btree (ctcap);
+
+
+--
+-- Name: ind_ctcappropparam; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_ctcappropparam ON fnbl_ds_ctcap_prop_param USING btree (property);
+
+
+--
+-- Name: ind_cttype_rx; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_cttype_rx ON fnbl_ds_cttype_rx USING btree (datastore);
+
+
+--
+-- Name: ind_cttype_tx; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_cttype_tx ON fnbl_ds_cttype_tx USING btree (datastore);
+
+
+--
+-- Name: ind_datastore; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_datastore ON fnbl_device_datastore USING btree (caps);
+
+
+--
+-- Name: ind_device_ext; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_device_ext ON fnbl_device_ext USING btree (caps);
+
+
+--
+-- Name: ind_filter_cap; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_filter_cap ON fnbl_ds_filter_cap USING btree (datastore);
+
+
+--
+-- Name: ind_filter_rx; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_filter_rx ON fnbl_ds_filter_rx USING btree (datastore);
+
+
+--
+-- Name: ind_mem; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_mem ON fnbl_ds_mem USING btree (datastore);
+
+
+--
+-- Name: ind_principal; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_principal ON fnbl_principal USING btree (username, device);
+
+
+--
+-- Name: ind_user; Type: INDEX; Schema: public; Owner: funis; Tablespace: 
+--
+
+CREATE INDEX ind_user ON fnbl_user USING btree (username, "password");
+
+
+--
+-- Name: fk_ctcap_propparam; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_ds_ctcap_prop_param
+    ADD CONSTRAINT fk_ctcap_propparam FOREIGN KEY (property) REFERENCES fnbl_ds_ctcap_prop(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_dev_datastore; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_device_datastore
+    ADD CONSTRAINT fk_dev_datastore FOREIGN KEY (caps) REFERENCES fnbl_device_caps(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_dev_ext; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_device_ext
+    ADD CONSTRAINT fk_dev_ext FOREIGN KEY (caps) REFERENCES fnbl_device_caps(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_device; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_principal
+    ADD CONSTRAINT fk_device FOREIGN KEY (device) REFERENCES fnbl_device(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_ds_ctcap; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_ds_ctcap
+    ADD CONSTRAINT fk_ds_ctcap FOREIGN KEY (datastore) REFERENCES fnbl_device_datastore(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_ds_ctcap_prop; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_ds_ctcap_prop
+    ADD CONSTRAINT fk_ds_ctcap_prop FOREIGN KEY (ctcap) REFERENCES fnbl_ds_ctcap(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_ds_cttype_rx; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_ds_cttype_rx
+    ADD CONSTRAINT fk_ds_cttype_rx FOREIGN KEY (datastore) REFERENCES fnbl_device_datastore(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_ds_cttype_tx; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_ds_cttype_tx
+    ADD CONSTRAINT fk_ds_cttype_tx FOREIGN KEY (datastore) REFERENCES fnbl_device_datastore(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_ds_filter_cap; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_ds_filter_cap
+    ADD CONSTRAINT fk_ds_filter_cap FOREIGN KEY (datastore) REFERENCES fnbl_device_datastore(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_ds_filter_rx; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_ds_filter_rx
+    ADD CONSTRAINT fk_ds_filter_rx FOREIGN KEY (datastore) REFERENCES fnbl_device_datastore(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_ds_mem; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_ds_mem
+    ADD CONSTRAINT fk_ds_mem FOREIGN KEY (datastore) REFERENCES fnbl_device_datastore(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_principal; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_last_sync
+    ADD CONSTRAINT fk_principal FOREIGN KEY (principal) REFERENCES fnbl_principal(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_principal_cm; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_client_mapping
+    ADD CONSTRAINT fk_principal_cm FOREIGN KEY (principal) REFERENCES fnbl_principal(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_source; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_last_sync
+    ADD CONSTRAINT fk_source FOREIGN KEY (sync_source) REFERENCES fnbl_sync_source(uri) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_source_cm; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_client_mapping
+    ADD CONSTRAINT fk_source_cm FOREIGN KEY (sync_source) REFERENCES fnbl_sync_source(uri) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_userrole; Type: FK CONSTRAINT; Schema: public; Owner: funis
+--
+
+ALTER TABLE ONLY fnbl_user_role
+    ADD CONSTRAINT fk_userrole FOREIGN KEY (username) REFERENCES fnbl_user(username) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

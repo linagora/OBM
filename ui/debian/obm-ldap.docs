@@ -1,0 +1,5 @@
+doc/conf/ldap_obm.schema.sample
+doc/conf/ldap_samba.schema.3.0.24.sample
+doc/conf/ldap_slapd.conf.sample
+
+

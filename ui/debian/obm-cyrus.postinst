@@ -1,0 +1,153 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+LDAPSERVER=`grep "ldapServer" /etc/obm/obm_conf.ini | cut -d"=" -f2 | sed -e "s/ //g"`
+
+
+is_initial_configuration() { 
+  # Check if this is the initial configuration and not an upgrade of an 
+  # existing configuration 
+  # Usage: if is_initial_configuration "$@"; then ... fi from top level 
+
+  # Plain installation 
+  if [ "$1" = configure ] && [ -z "$2" ]; then 
+    return 0 
+  fi 
+  # Configuration via dpkg-reconfigure 
+  if [ "$1" = reconfigure ] || [ "$DEBCONF_RECONFIGURE" ]; then 
+    return 0 
+  fi 
+  return 1 
+}
+
+
+
+if is_initial_configuration "$@"; then
+  # Configuration de Cyrus/SASL
+  invoke-rc.d saslauthd stop || true
+  invoke-rc.d cyrus2.2 stop || true
+
+  echo -n "Configuration de Cyrus/SASL... "
+
+  #cyrus.conf
+  cp /etc/cyrus.conf /etc/cyrus.conf.orig || true
+  if [ -e /usr/share/doc/obm-cyrus/cyrus_cyrus.conf.sample.gz ]; then
+    zcat /usr/share/doc/obm-cyrus/cyrus_cyrus.conf.sample.gz > /etc/cyrus.conf
+  else
+    cat /usr/share/doc/obm-cyrus/cyrus_cyrus.conf.sample > /etc/cyrus.conf
+  fi
+
+  #imapd.conf
+  cp /etc/imapd.conf /etc/imapd.conf.orig || true
+  if [ -e /usr/share/doc/obm-cyrus/cyrus_imapd.conf.sample.gz ]; then
+    zcat /usr/share/doc/obm-cyrus/cyrus_imapd.conf.sample.gz > /etc/imapd.conf
+  else
+    cat /usr/share/doc/obm-cyrus/cyrus_imapd.conf.sample > /etc/imapd.conf
+  fi
+
+  #saslauthd.conf
+  if [ -e /etc/saslauthd.conf ]; then
+    cp /etc/saslauthd.conf /etc/saslauthd.conf.orig || true
+  fi
+  if [ -e /usr/share/doc/obm-cyrus/cyrus_saslauthd.conf.sample.gz ]; then
+    zcat /usr/share/doc/obm-cyrus/cyrus_saslauthd.conf.sample.gz > /etc/saslauthd.conf
+  else
+    cat /usr/share/doc/obm-cyrus/cyrus_saslauthd.conf.sample > /etc/saslauthd.conf
+  fi
+
+  #/etc/default/saslauthd
+  if [ -e /etc/default/saslauthd ]; then
+    cp /etc/default/saslauthd /etc/default/saslauthd.orig || true
+  fi
+  if [ -e /usr/share/doc/obm-cyrus/cyrus_saslauthd.sample.gz ]; then
+    zcat /usr/share/doc/obm-cyrus/cyrus_saslauthd.sample.gz > /etc/default/saslauthd
+  else
+    cat /usr/share/doc/obm-cyrus/cyrus_saslauthd.sample > /etc/default/saslauthd
+  fi
+
+  sed -i -e "s#_LDAP_SERVER_#${LDAPSERVER}#" /etc/saslauthd.conf
+
+  echo "done"
+  invoke-rc.d saslauthd start 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+  test -f /etc/init.d/cyrus2.2 && invoke-rc.d cyrus2.2 start 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+  test -f /etc/init.d/cyrus2.3 && invoke-rc.d cyrus2.3 start 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+
+fi
+
+if [ -n "$2" ] && dpkg --compare-versions "$2" lt 2.3.0-1; then
+  #we must upgrade cyrus configuration if is in singlenamspace(single  doamin)
+  imapd_file="/etc/imapd.conf"
+  saslauthd_file="/etc/saslauthd.conf"
+  SINGLE_NAME_SPACE="OK"
+  grep -i '^virtdomains.*userid' ${imapd_file} && SINGLE_NAME_SPACE="NOK"
+  if [ $SINGLE_NAME_SPACE = 'OK' ]; then
+    echo -n "[OBM-CYRUS] update imapd.conf ... "
+
+    cp ${imapd_file} ${imapd_file}_BEFORE_OBM_2.3_UPDATE
+    LDAPSERVER=`cat /etc/obm/obm_conf.ini | grep -i "ldapServer" | cut -d'=' -f2 | sed -e "s/ //g"`
+
+    DEFAULT_DOMAIN=`ldapsearch -x -h ${LDAPSERVER} '(dc=*)' | grep dn | grep -v 'dn: dc=local' | sed -e 's/dn: //' | sed -e 's/\,dc=local//' | cut -d"=" -f2`
+
+    sed -i -e 's/\(^virtdomains.*\)/###COMMENT_BY_UPGRADE##\1/' ${imapd_file}
+
+    echo "virtdomains: userid" >> ${imapd_file}
+    echo "defaultdomain: ${DEFAULT_DOMAIN}" >> ${imapd_file}
+    echo "DONE."
+
+    echo -n "[OBM-CYRUS] update saslauthd.conf ... "
+    cp ${saslauthd_file} ${saslauthd_file}_BEFORE_OBM_2.3_UPDATE
+    sed -i -e 's/\(^ldap_filter.*\)/###COMMENT_BY_UPGRADE##\1/' $saslauthd_file
+    ldap_filter="(|(&(|(mailBox=%U@%d)(mailBox=%U@<singleDomainName>))(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))"
+    echo "# Use this filter when migrating from an SingleNameSpace installation" >> ${saslauthd_file}
+    echo "# IMPORTANT : see 'defaultdomain' into '/etc/imapd.conf' too" >> ${saslauthd_file}
+    echo "# ie: migrating a single namespace installation, domain : foo.com" >> ${saslauthd_file}
+    echo "#     replace '<singleDomainName>' by 'foo.com'" >> ${saslauthd_file}
+    echo "ldap_filter: ${ldap_filter}" >> ${saslauthd_file}
+    echo "DONE."
+  fi
+fi
+
+
+echo -n "[obm-cyrus] activate obm-satellite cyrus module..."
+TEMPDIR=/var/run/obm/upgrades
+NEWFILE=${TEMPDIR}/cyrusPartition
+CONFIG=/etc/obm-satellite/mods-available/cyrusPartition
+TEMPLATE=/usr/share/obm-satellite/sample/cyrusPartition
+cp "${TEMPLATE}" "${NEWFILE}"
+if [ ! -e /etc/init.d/cyrus2.3 ]; then
+  echo "cyrusStartupScript = /etc/init.d/cyrus2.2" >> ${NEWFILE}
+fi
+ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
+ucfr obm-satellite "${CONFIG}"
+chmod 600 ${CONFIG}
+
+osenmod cyrusPartition
+osenmod backupEntity
+invoke-rc.d obm-satellite restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+
+db_set obm-conf/module_obmmail true 
+db_go || true
+
+echo -n "[obm-cyrus] update configuration file obm_conf.ini...."
+#Build /etc/obm/obm_conf.ini
+$(which perl) /usr/share/obm-conf/genobmconf.pl
+
+TEMPDIR=/var/run/obm/upgrades
+NEWFILE=$TEMPDIR/obm_conf.ini
+CONFIG=/etc/obm/obm_conf.ini
+ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
+ucfr obm-conf "$CONFIG"
+echo "[DONE]"
+
+
+
+#DEBHELPER#
+
+exit 0
+
+

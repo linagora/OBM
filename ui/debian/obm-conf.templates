@@ -1,0 +1,111 @@
+Template: obm-conf/ldapserver
+Type: string
+Default: 127.0.0.1
+Description: Host IP address for OBM LDAP server:
+ .
+ You have to set here the host IP address for the OBM LDAP server.
+
+Template: obm-conf/dbhost
+Type: string
+Default: 127.0.0.1
+Description: Host IP address for OBM database server:
+ .
+ You have to set here the host IP address for the OBM database server.
+
+Template: obm-conf/dbtype
+Type: select
+Choices: MYSQL, PGSQL
+Default: PGSQL
+Description: Type of OBM database server:
+ You can install OBM with MySQL or PostgreSQL
+
+Template: obm-conf/dbname
+Type: string
+Default: obm
+Description: OBM database name:
+ .
+ You have to set here the OBM database name.
+
+Template: obm-conf/dbuser
+Type: string
+Default: obm
+Description: OBM database user name:
+ .
+ You have to set here the name for the OBM Database user. This user is
+ used by obm-ui to access to the OBM database.
+
+Template: obm-conf/dbpasswd
+Type: password
+Description: OBM database user password:
+ .
+ You have to set here the password for the OBM database user. For
+ security reasons, it shouldn't be a blank password.
+
+Template: obm-conf/dbpasswd_verify
+Type: password
+Description: OBM database user password verify:
+ .
+ you must enter the password to verify.
+
+Template: obm-conf/passwords-do-not-match
+Type: note
+Description: Passwords do not match.
+ The passwords you supplied do not match.  Please try again.
+
+Template: obm-conf/externalurl
+Type: string
+default: extranet.mycompany.com
+Description: external url of OBM:
+ .
+ You have to set here the external URL of OBM.
+
+Template: obm-conf/externalprotocol
+Type: select
+Choices: http, https
+default: https
+Description: protocol to access to OBM:
+ .
+ You have to set here the external protocol of OBM.
+
+Template: obm-conf/infoexternalurl
+Type: text
+Description: configuration of external Url:
+ .
+ If you change external url you must reconfigure obm-funambol with:
+ dpkg-reconfigure obm-funambol and dpkg-reconfigure obm-certs.
+
+Template: obm-conf/module_obmldap
+Type: select
+Choices: true, false
+Default: false
+Description: OBM ldap module:
+ Activate obmldap module.
+
+Template: obm-conf/module_obmmail
+Type: select
+Choices: true, false
+Default: false
+Description: OBM mail module:
+ Activate obmmail module.
+
+Template: obm-conf/module_obmsamba
+Type: select
+Choices: true, false
+Default: false
+Description: OBM samba module:
+ Activate obmsamba module.
+
+Template: obm-conf/module_obmweb
+Type: select
+Choices: true, false
+Default: false
+Description: OBM web module
+ Activate obmweb module.
+
+Template: obm-conf/module_obmcontact
+Type: select
+Choices: true, false
+Default: false
+Description: OBM contact module:
+ Activate obmcontact module.
+

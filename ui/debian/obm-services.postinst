@@ -1,0 +1,49 @@
+#!/bin/sh
+set -e
+#set -x
+
+. /usr/share/debconf/confmodule
+
+
+is_initial_configuration() { 
+# Check if this is the initial configuration and not an upgrade of an 
+# existing configuration 
+# Usage: if is_initial_configuration "$@"; then ... fi from top level 
+
+	# Plain installation 
+	if [ "$1" = configure ] && [ -z "$2" ]; then 
+	        return 0 
+	fi 
+	# Configuration via dpkg-reconfigure 
+	if [ "$1" = reconfigure ] || [ "$DEBCONF_RECONFIGURE" ]; then 
+	        return 0 
+	fi 
+	return 1 
+}
+
+chown www-data:www-data /var/log/obm-services
+chmod 750 /var/log/obm-services
+chmod g+s /var/log/obm-services
+
+
+xml_mapping=/etc/obm/automateLdapMapping.xml
+
+TEMPDIR=/var/run/obm-services/upgrades
+NEWFILE=${TEMPDIR}/automateLdapMapping.xml
+CONFIG=${xml_mapping}
+
+mkdir -p "${TEMPDIR}"
+TEMPLATE=/usr/share/obm/sample/automateLdapMapping.xml
+cp "${TEMPLATE}" "${NEWFILE}"
+
+ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
+ucfr obm-services "${CONFIG}"
+
+if [ -n "$2" ] && dpkg --compare-versions "$2" lt 2.3.0-1; then
+  /usr/share/obm-services/updates/update-2.2-2.3.ldap.pl || true
+  /usr/share/obm/www/auto/update.pl --global --domain-global  || true
+fi
+#DEBHELPER#
+
+exit 0
+

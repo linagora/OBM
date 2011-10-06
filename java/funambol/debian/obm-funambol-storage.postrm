@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+if [ -f /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+fi
+if [ -f /usr/share/dbconfig-common/dpkg/postrm.pgsql ]; then
+	. /usr/share/dbconfig-common/dpkg/postrm.pgsql
+	dbc_go obm-funambol-storage $@
+fi
+
+if [ "$1" = "purge" ]; then
+   rm -f /etc/obm/funambol_conf.ini
+   if which ucf >/dev/null 2>&1; then
+      ucf --purge /etc/obm/funambol_conf.ini
+      db_purge
+   fi
+fi
+
+#DEBHELPER#
+
+exit 0
+

@@ -1,0 +1,41 @@
+obm-funambol (2.3.2-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 14 Jun 2010 14:05:48 +0200
+
+obm-funambol (2.3.1-1) unstable; urgency=low
+
+  * new upstream crap
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Mon, 15 Mar 2010 14:47:39 +0100
+
+obm-funambol (2.3.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 04 Dec 2009 17:20:07 +0100
+
+obm-funambol (2.3.0~rc3-1) unstable; urgency=low
+
+  * bump to rc3
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 27 Nov 2009 09:54:03 +0100
+
+obm-funambol (2.3.0~rc2-1) unstable; urgency=low
+
+  * bump to rc2
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Sun, 22 Nov 2009 11:09:11 +0100
+
+obm-funambol (2.3.0~rc1-1) unstable; urgency=low
+
+  * bump to rc1 release 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 13 Nov 2009 09:57:00 +0100
+
+obm-funambol (2.3.0~alpha1-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 31 Aug 2009 10:57:34 +0200

@@ -1,0 +1,22 @@
+Source: obm-tomcat
+Section: net
+Priority: optional
+Maintainer: Sylvain Garcia <sylvain.garcia@obm.org>
+Build-Depends-Indep: ant, ant-optional, sun-java6-jdk
+Build-Depends: cdbs, debhelper (>= 5.0)
+Standards-Version: 3.8.4
+Homepage: http://www.obm.org
+
+
+Package: obm-jdk
+Architecture: all
+Depends: sun-java6-jdk, ${misc:Depends}
+Description: Obm jdk
+ Jdk for obm.
+
+Package: obm-tomcat
+Architecture: all
+Depends: obm-jdk, libapr1, obm-munin-node, ${misc:Depends}
+Description: Obm tomcat server
+ Tomcat server configured for Obm.
+

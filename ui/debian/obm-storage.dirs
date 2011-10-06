@@ -1,0 +1,10 @@
+usr/share/dbconfig-common/data/obm-storage/install
+usr/share/dbconfig-common/data/obm-storage/install-dbadmin
+usr/share/dbconfig-common/data/obm-storage/upgrade/pgsql
+usr/share/dbconfig-common/data/obm-storage/upgrade/mysql
+usr/share/dbconfig-common/scripts/obm-storage/upgrade/pgsql
+usr/share/dbconfig-common/scripts/obm-storage/upgrade/mysql
+usr/share/dbconfig-common/scripts/obm-storage/install
+usr/share/obm-storage
+usr/share/obm-storage/debian
+etc/obm-storage

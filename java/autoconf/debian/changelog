@@ -1,0 +1,17 @@
+obm-autoconf (2.4.0-rc7-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Mon, 05 Sep 2011 14:17:39 +0200
+
+obm-autoconf (2.4.0-rc6-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Mon, 05 Sep 2011 14:13:45 +0200
+
+obm-autoconf (2.3.0~alpha1-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 01 Sep 2009 09:10:04 +0200

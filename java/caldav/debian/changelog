@@ -1,0 +1,96 @@
+obm-caldav (2.3.10-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 23 Jul 2010 15:02:14 +0200
+
+obm-caldav (2.3.9-1) unstable; urgency=low
+
+  * new upstream relase
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 30 Jun 2010 17:10:37 +0200
+
+obm-caldav (2.3.8-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 20 May 2010 17:35:30 +0200
+
+obm-caldav (2.3.7-1) unstable; urgency=low
+
+  *  new upstream version
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 28 Apr 2010 10:54:41 +0200
+
+obm-caldav (2.3.6-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 15 Apr 2010 09:43:46 +0200
+
+obm-caldav (2.3.5-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Tue, 16 Mar 2010 10:01:32 +0100
+
+obm-caldav (2.3.4-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Mon, 15 Mar 2010 10:19:11 +0100
+
+obm-caldav (2.3.3-2) unstable; urgency=low
+
+  * fix reset cache on update 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 25 Feb 2010 18:00:23 +0100
+
+obm-caldav (2.3.3-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 22 Feb 2010 18:32:19 +0100
+
+obm-caldav (2.3.2-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 22 Feb 2010 16:45:24 +0100
+
+obm-caldav (2.3.1-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 15 Feb 2010 12:01:12 +0100
+
+obm-caldav (2.3.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 04 Dec 2009 17:27:03 +0100
+
+obm-caldav (2.3.0~rc3-1) unstable; urgency=low
+
+  * bump to rc3 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 27 Nov 2009 10:01:31 +0100
+
+obm-caldav (2.3.0~rc2-1) unstable; urgency=low
+
+  * bump to rc2 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Sun, 22 Nov 2009 11:14:46 +0100
+
+obm-caldav (2.3.0~rc1-1) unstable; urgency=low
+
+  * bump to first public rc
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 13 Nov 2009 10:08:41 +0100
+
+obm-caldav (2.3.0~alpha1) unstable; urgency=low
+
+  * Initial release.
+  * version is alpha
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 25 Aug 2009 14:47:01 +0200

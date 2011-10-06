@@ -1,0 +1,46 @@
+#!/bin/bash
+
+#set -x
+set -e
+
+. /usr/share/debconf/confmodule
+
+is_initial_configuration() { 
+# Check if this is the initial configuration and not an upgrade of an 
+# existing configuration 
+# Usage: if is_initial_configuration "$@"; then ... fi from top level 
+
+	# Plain installation 
+	if [ "$1" = configure ] && [ -z "$2" ]; then 
+	        return 0 
+	fi 
+	# Configuration via dpkg-reconfigure 
+	if [ "$1" = reconfigure ] || [ "$DEBCONF_RECONFIGURE" ]; then 
+	        return 0 
+	fi 
+	return 1 
+} 
+
+TEMPDIR=/var/run/obm/upgrades
+NEWFILE=$TEMPDIR/obm_conf.ini
+CONFIG=/etc/obm/obm_conf.ini
+
+mkdir -p ${TEMPDIR}
+
+#remove old debconf variable
+if [ -n "$2" ] && dpkg --compare-versions "$2" lt 2.2.0-0; then
+  db_unregister obm-conf/mysqlserver || true
+  db_unregister obm-conf/mysqldb || true
+  db_unregister obm-conf/mysqluser || true
+  db_unregister obm-conf/mysqlpasswd || true
+fi
+
+#Build /etc/obm/obm_conf.ini
+$(which perl) /usr/share/obm-conf/genobmconf.pl
+
+ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
+ucfr obm-conf "$CONFIG"
+
+#DEBHELPER#
+
+exit 0
