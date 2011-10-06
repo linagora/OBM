@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+# Not buildable on etch
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+#include /usr/share/cdbs/1/class/ant.mk
+#include /usr/share/cdbs/1/rules/simple-patchsys.mk
+
+#JAVA_HOME := /usr/lib/jvm/java-1.5.0-sun/
+#ANT_HOME := /usr/share/ant
+
+#DEB_ANT_BUILD_TARGET := build 
+#DEB_ANT_INSTALL_TARGET := install

@@ -1,0 +1,13 @@
+Source: obm-ca
+Section: net
+Priority: optional
+Maintainer: Sylvain Garcia <sylvain.garcia@obm.org>
+Build-Depends: cdbs, debhelper (>> 5)
+Standards-Version: 3.8.0
+
+Package: obm-ca
+Architecture: all
+Depends: openssl
+Description: OBM CA management scripts
+ Script to manage a certification authority within obm
+
