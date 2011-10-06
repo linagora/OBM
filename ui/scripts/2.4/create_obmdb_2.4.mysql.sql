@@ -1344,7 +1344,7 @@ CREATE TABLE `Event` (
   `event_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
   `event_userupdate` int(8) default NULL,
   `event_usercreate` int(8) default NULL,
-  `event_ext_id` varchar(300) default '',
+  `event_ext_id` varchar(300) NOT NULL,
   `event_type` enum('VEVENT','VTODO','VJOURNAL','VFREEBUSY') default 'VEVENT',
   `event_origin` varchar(255) NOT NULL default '',
   `event_owner` int(8) default NULL,

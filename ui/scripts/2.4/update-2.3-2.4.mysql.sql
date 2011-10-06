@@ -325,6 +325,9 @@ DELETE FROM `opush_invitation_mapping`;
 ALTER TABLE `opush_invitation_mapping` MODIFY COLUMN `event_uid` INTEGER NOT NULL;
 ALTER TABLE `opush_invitation_mapping` ADD CONSTRAINT `opush_invitation_mapping_event_id_fkey` FOREIGN KEY (`event_uid`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE;
 
+UPDATE Event SET event_ext_id=UUID() WHERE event_ext_id IS NULL;
+ALTER TABLE Event MODIFY event_ext_id varchar(300) NOT NULL;
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 -- ----------------------------------------------------------------------------

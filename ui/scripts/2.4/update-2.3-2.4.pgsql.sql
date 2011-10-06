@@ -384,6 +384,16 @@ DELETE FROM opush_invitation_mapping;
 ALTER TABLE opush_invitation_mapping DROP COLUMN event_uid;
 ALTER TABLE opush_invitation_mapping ADD COLUMN event_uid INTEGER NOT NULL REFERENCES event(event_id) ON DELETE CASCADE;
 
+CREATE OR REPLACE FUNCTION generate_uuid()
+  RETURNS uuid AS
+$BODY$
+ SELECT CAST(md5(current_database()|| user ||current_timestamp ||random()) as uuid)
+$BODY$
+  LANGUAGE 'sql' VOLATILE
+
+UPDATE event SET event_ext_id=generate_uuid() WHERE event_ext_id IS NULL;
+ALTER TABLE event ALTER event_ext_id SET NOT NULL;
+
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';
