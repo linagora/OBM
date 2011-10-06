@@ -10,6 +10,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.store.SyncedCollectionDao;
 
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -55,8 +56,8 @@ public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implement
 	private Key buildKey(Credentials credentials, Device device, Integer collectionId) {
 		return new Key(credentials, device, collectionId);
 	}
-
-	private class Key implements Serializable {
+	
+	private static class Key implements Serializable {
 
 		private final Credentials credentials;
 		private final int collectionId;
@@ -70,46 +71,29 @@ public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implement
 		}
 
 		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + collectionId;
-			result = prime * result
-					+ ((credentials == null) ? 0 : credentials.hashCode());
-			result = prime * result
-					+ ((device == null) ? 0 : device.hashCode());
-			return result;
+		public int hashCode(){
+			return Objects.hashCode(credentials, collectionId, device);
+		}
+		
+		@Override
+		public boolean equals(Object object){
+			if (object instanceof Key) {
+				Key that = (Key) object;
+				return Objects.equal(this.credentials, that.credentials)
+					&& Objects.equal(this.collectionId, that.collectionId)
+					&& Objects.equal(this.device, that.device);
+			}
+			return false;
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Key other = (Key) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (collectionId != other.collectionId)
-				return false;
-			if (credentials == null) {
-				if (other.credentials != null)
-					return false;
-			} else if (!credentials.equals(other.credentials))
-				return false;
-			if (device == null) {
-				if (other.device != null)
-					return false;
-			} else if (!device.equals(other.device))
-				return false;
-			return true;
+		public String toString() {
+			return Objects.toStringHelper(this)
+				.add("credentials", credentials)
+				.add("collectionId", collectionId)
+				.add("device", device)
+				.toString();
 		}
-
-		private SyncedCollectionDaoEhcacheImpl getOuterType() {
-			return SyncedCollectionDaoEhcacheImpl.this;
-		}
+		
 	}
 }
