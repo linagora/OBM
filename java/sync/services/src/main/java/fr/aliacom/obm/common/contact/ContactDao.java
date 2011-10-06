@@ -481,7 +481,10 @@ public class ContactDao {
 			ps.setInt(1, c.getUid());
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				return new EventObmId(rs.getInt(1));
+				int eventObmId = rs.getInt(1);
+				if (!rs.wasNull()) {
+					return new EventObmId(eventObmId);
+				}
 			}
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
