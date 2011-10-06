@@ -27,7 +27,6 @@ import org.minig.imap.StoreClient;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.EmailNotFoundException;
 import org.obm.push.store.EmailDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,30 +48,10 @@ public class EmailSync implements IEmailSync {
 	@Override
 	public MailChanges getSync(StoreClient imapStore, Integer devId, SyncState state, Integer collectionId) throws DaoException {
 		Set<Email> emailsFromIMAP = getImapEmails(imapStore, state.getLastSync());
-		Set<Email> updateEmailsOnlyPDA = listEmailsSynced(devId, collectionId, emailsFromIMAP);
-		
-		MailChanges mailChanges = new MailChanges(new HashSet<Email>(), updateEmailsOnlyPDA, emailsFromIMAP);
+		Set<Email> emailsToSyncWithClient = emailDao.filterSyncedEmails(collectionId, devId, emailsFromIMAP);
+		MailChanges mailChanges = new MailChanges(new HashSet<Email>(), emailsToSyncWithClient, emailsFromIMAP);
 		loggerInfo(state.getLastSync(), emailsFromIMAP, mailChanges);
 		return mailChanges;
-	}
-
-	private Set<Email> listEmailsSynced(Integer devId, Integer collectionId, Set<Email> emailsFromIMAP) throws DaoException {
-		Set<Email> updateEmailsOnlyPDA = new HashSet<Email>();
-		for (Email email: emailsFromIMAP) {
-			if (!isEmailSynced(email, devId, collectionId)){
-				updateEmailsOnlyPDA.add(email);
-			}
-		}
-		return updateEmailsOnlyPDA;
-	}
-
-	private boolean isEmailSynced(Email email, Integer devId, Integer collectionId) throws DaoException {
-		try {
-			emailDao.getSyncedEmail(devId, collectionId, email.getUid());
-			return true;
-		} catch (EmailNotFoundException e) {
-			return false;
-		}
 	}
 
 	private void loggerInfo(Date syncStartDate, Set<Email> emailsFromIMAP, MailChanges mailChanges) {

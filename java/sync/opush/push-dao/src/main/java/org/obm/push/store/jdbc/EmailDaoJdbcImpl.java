@@ -19,6 +19,7 @@ import org.obm.push.exception.EmailNotFoundException;
 import org.obm.push.store.EmailDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.push.utils.jdbc.LongIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.LongSQLCollectionHelper;
 
 import com.google.common.collect.ImmutableSet;
@@ -134,6 +135,36 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			JDBCUtils.cleanup(null, insert, null);
 			JDBCUtils.cleanup(con, del, null);
 		}
+	}
+	
+	@Override
+	public Set<Email> filterSyncedEmails(int collectionId, int deviceId, Collection<Email> emails) throws DaoException {
+		Set<Email> filteredEmails = new HashSet<Email>();
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet evrs = null;
+		LongIndexedSQLCollectionHelper idList = new LongIndexedSQLCollectionHelper(emails);
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("SELECT mail_uid, is_read, timestamp FROM opush_sync_mail " +
+					"WHERE collection_id = ? AND device_id = ? AND mail_uid IN (" + idList.asPlaceHolders() + ")");
+			ps.setInt(1, collectionId);
+			ps.setInt(2, deviceId);
+			idList.insertValues(ps, 3);
+			evrs = ps.executeQuery();
+			if (evrs.next()) {
+				long uidDB = evrs.getLong("mail_uid");
+				boolean read = evrs.getBoolean("is_read");
+				Date date = evrs.getDate("timestamp");
+				Email email = new Email(uidDB, read, date);
+				filteredEmails.add(email);
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, evrs);
+		}
+		return filteredEmails;
 	}
 	
 	@Override

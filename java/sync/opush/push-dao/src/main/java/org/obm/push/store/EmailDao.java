@@ -25,6 +25,8 @@ public interface EmailDao {
 
 	Email getSyncedEmail(Integer devId, Integer collectionId, long uid) throws DaoException, EmailNotFoundException;
 
+	Set<Email> filterSyncedEmails(int collectionId, int device, Collection<Email> emails) throws DaoException;
+	
 	void update(Integer devId, Integer collectionId, Email email) throws DaoException;
 
 	void insert(Integer devId, Integer collectionId, Date lastSync, Email email) throws DaoException;
