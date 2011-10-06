@@ -1,0 +1,61 @@
+#!/bin/bash
+# CA management functions
+
+ca_root=/var/lib/obm-ca
+certs_out=/etc/obm/certs
+
+days="-days 3650"
+cadays="-days 7350"
+REQ="openssl req"
+CA="openssl ca"
+
+cakey=cakey.pem
+careq=careq.pem
+cacert=cacert.pem
+
+function newSignedCert() {
+    test $# -eq 1 || {
+	echo "usage: createcert.sh <CN>"
+	exit 1
+    }
+
+    mkdir -p ${certs_out}
+    cat ${ca_root}/cert.cnf.template | sed -e "s/CN=XXXXXXXXXX/CN=${1}/" \
+	> ${certs_out}/cert.cnf
+    $REQ -config ${certs_out}/cert.cnf -new -nodes -keyout ${certs_out}/$1_pk.pem -out ${certs_out}/$1_req.pem $days
+    rm -f ${certs_out}/cert.cnf
+    # sign with CA
+    $CA -config $ca_root/ca_nocn.cnf -policy policy_match $days -batch \
+	-out ${certs_out}/$1_signed.pem -infiles ${certs_out}/$1_req.pem
+    cat ${certs_out}/$1_pk.pem >> ${certs_out}/$1_signed.pem
+    rm ${certs_out}/$1_req.pem
+    rm ${certs_out}/$1_pk.pem
+}
+
+
+function newCA() {
+    rm -fr ${ca_root}
+    mkdir -p ${ca_root} 
+    mkdir -p ${ca_root}/certs 
+    mkdir -p ${ca_root}/crl 
+    mkdir -p ${ca_root}/newcerts
+    mkdir -p ${ca_root}/private
+    cp /usr/share/obm-ca/ca.cnf ${ca_root}
+    computed_ca_id=`date +%s`
+    sed -i -e "s%#CAID#%${computed_ca_id}%" ${ca_root}/ca.cnf
+    cp /usr/share/obm-ca/cert.cnf.template ${ca_root}
+    cat /usr/share/obm-ca/ca.cnf |grep -v "CN=" > ${ca_root}/ca_nocn.cnf
+    echo "00" > ${ca_root}/serial
+    touch ${ca_root}/index.txt
+
+    echo "Making CA certificate ..."
+
+    $REQ -config $ca_root/ca.cnf -new -keyout ${ca_root}/private/$cakey \
+	-out ${ca_root}/$careq
+    echo "Request for CA cert creation done."
+    $CA -config $ca_root/ca.cnf -out ${ca_root}/$cacert $cadays -batch \
+	-keyfile ${ca_root}/private/$cakey -selfsign \
+	-extensions v3_ca \
+	-infiles ${ca_root}/$careq 
+    echo "CA made"
+}
