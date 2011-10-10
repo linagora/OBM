@@ -184,7 +184,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			while (evrs.next()) {
 				long uidDB = evrs.getLong("mail_uid");
 				boolean read = evrs.getBoolean("is_read");
-				Date date = evrs.getDate("timestamp");
+				Date date = JDBCUtils.getDate(evrs, "timestamp");
 				Email email = new Email(uidDB, read, date);
 				alreadySyncedEmails.add(email);
 			}
@@ -214,7 +214,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			if (evrs.next()) {
 				long uidDB = evrs.getLong("mail_uid");
 				boolean read = evrs.getBoolean("is_read");
-				Date date = evrs.getDate("timestamp");
+				Date date = JDBCUtils.getDate(evrs, "timestamp");
 				email = new Email(uidDB, read, date);
 				return email;
 			}
@@ -242,7 +242,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			while (evrs.next()) {
 				long uid = evrs.getLong("mail_uid");
 				boolean read = evrs.getBoolean("is_read");
-				Date date = evrs.getDate("timestamp");
+				Date date = JDBCUtils.getDate(evrs, "timestamp");
 				uids.add(new Email(uid, read, date));
 			}
 		} catch (SQLException e) {
@@ -268,7 +268,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			while (evrs.next()) {
 				long uid = evrs.getLong("mail_uid");
 				boolean read = evrs.getBoolean("is_read");
-				Date date = evrs.getDate("timestamp");
+				Date date = JDBCUtils.getDate(evrs, "timestamp");
 				uids.add(new Email(uid, read, date));
 			}
 		} catch (SQLException e) {

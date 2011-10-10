@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 
 import javax.transaction.UserTransaction;
 
@@ -105,4 +106,7 @@ public class JDBCUtils {
 		}
 	}
 
+	public static Date getDate(ResultSet rs, String fieldName) throws SQLException {
+		return new Date(rs.getTimestamp(fieldName).getTime());
+	}
 }
