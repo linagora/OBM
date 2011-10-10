@@ -206,7 +206,7 @@ if ($cgp_show['module']['cv']) {
 if ($cgp_show['module']['todo']) {
   $modules['todo'] = array('Name'=> $l_module_todo,
                                   'Ico' => "$ico_todo",
-                                  'Url' => "$path/todo/todo_index.php",
+                                  'Url' => "$path/todo/todo_index.php?action=search",
                                   'Right'=> $cright_read);
 }
 if ($cgp_show['module']['publication']) {
