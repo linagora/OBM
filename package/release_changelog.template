@@ -1,0 +1,6 @@
+{package_name} ({version}) stable; urgency=low
+
+  * New upstream release.
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  {changelog_date}
+
