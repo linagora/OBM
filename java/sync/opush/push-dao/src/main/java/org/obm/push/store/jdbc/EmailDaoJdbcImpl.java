@@ -36,12 +36,12 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 	}
 
 	@Override
-	public void updatedSyncedEmails(Integer devId, Integer collectionId, Collection<Email> messages) throws DaoException {
-		updatedSyncedEmails(devId, collectionId, DateUtils.getCurrentDate(), messages);
+	public void markEmailsAsSynced(Integer devId, Integer collectionId, Collection<Email> messages) throws DaoException {
+		markEmailsAsSynced(devId, collectionId, DateUtils.getCurrentDate(), messages);
 	}
 
 	@Override
-	public void updatedSyncedEmails(Integer devId, Integer collectionId, Date lastSync, Collection<Email> emails) throws DaoException {
+	public void markEmailsAsSynced(Integer devId, Integer collectionId, Date lastSync, Collection<Email> emails) throws DaoException {
 		for (Email email: emails) {
 			try {
 				getSyncedEmail(devId, collectionId, email.getUid());

@@ -460,7 +460,7 @@ public class EmailManager implements IEmailManager {
 					}
 				});
 		try {
-			emailDao.updatedSyncedEmails(devId, collectionId, emails);
+			emailDao.markEmailsAsSynced(devId, collectionId, emails);
 		} catch (DaoException e) {
 			throw new DaoException("Error while adding messages in db", e);
 		}
@@ -485,7 +485,7 @@ public class EmailManager implements IEmailManager {
 		}
 		
 		if (updatedEmails != null && !updatedEmails.isEmpty()) {
-			emailDao.updatedSyncedEmails(devId, collectionId, lastSync, updatedEmails);
+			emailDao.markEmailsAsSynced(devId, collectionId, lastSync, updatedEmails);
 		}
 	}
 

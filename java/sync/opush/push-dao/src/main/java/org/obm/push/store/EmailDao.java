@@ -11,9 +11,9 @@ import org.obm.push.exception.EmailNotFoundException;
 
 public interface EmailDao {
 
-	void updatedSyncedEmails(Integer devId, Integer collectionId, Collection<Email> emails) throws DaoException;
+	void markEmailsAsSynced(Integer devId, Integer collectionId, Collection<Email> emails) throws DaoException;
 
-	void updatedSyncedEmails(Integer devId, Integer collectionId, Date lastSync, Collection<Email> messages) throws DaoException;
+	void markEmailsAsSynced(Integer devId, Integer collectionId, Date lastSync, Collection<Email> messages) throws DaoException;
 
 	void deleteSyncEmails(Integer devId, Integer collectionId, Collection<Long> mailUids) throws DaoException;
 
