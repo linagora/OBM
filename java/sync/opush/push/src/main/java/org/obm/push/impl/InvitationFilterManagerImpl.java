@@ -47,6 +47,17 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	}
 
 	@Override
+	public void removeInvitationStatus(Integer eventCollectionId, Integer emailCollectionId, Long mailUid) 
+			throws CollectionNotFoundException, ProcessingEmailException {
+		
+		try {
+			filtrageInvitationDao.removeInvitationStatus(eventCollectionId, emailCollectionId, mailUid);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		}
+	}
+	
+	@Override
 	public void handleMeetingResponse(BackendSession bs, Integer emailCollectionId, MSEmail invitation) throws DaoException {
 		try {
 			Integer eventCollectionId = calendarBackend.getCollectionId(bs);

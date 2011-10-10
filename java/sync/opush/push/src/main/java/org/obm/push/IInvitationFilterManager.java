@@ -28,4 +28,8 @@ public interface IInvitationFilterManager {
 	DataDelta filterInvitation(BackendSession bs, SyncState state, Integer emailCollectionId, DataDelta delta) throws DaoException,
 			ProcessingEmailException, CollectionNotFoundException;
 
+	void removeInvitationStatus(Integer eventCollectionId,
+			Integer emailCollectionId, Long mailUid)
+			throws CollectionNotFoundException, ProcessingEmailException;
+
 }

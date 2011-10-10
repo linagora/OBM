@@ -19,6 +19,7 @@ import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
 import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.IInvitationFilterManager;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
@@ -40,7 +41,6 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.FiltrageInvitationDao;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.FileUtils;
@@ -62,15 +62,16 @@ import com.google.inject.Singleton;
 public class MailBackend extends ObmSyncBackend {
 
 	private final IEmailManager emailManager;
-	private final FiltrageInvitationDao filtrageInvitationDao;
+	private final IInvitationFilterManager filterManager;
 
 	@Inject
-	/*package*/ MailBackend(IEmailManager emailManager,	CollectionDao collectionDao, FiltrageInvitationDao filtrageInvitationDao, 
+	/*package*/ MailBackend(IEmailManager emailManager,	CollectionDao collectionDao, 
+			IInvitationFilterManager filterManager, 
 			BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient)  {
 		
 		super(collectionDao, bookClient, calendarClient, todoClient);
 		this.emailManager = emailManager;
-		this.filtrageInvitationDao = filtrageInvitationDao;
+		this.filterManager = filterManager;
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
@@ -275,7 +276,7 @@ public class MailBackend extends ObmSyncBackend {
 		try {
 			String calPath = getDefaultCalendarName(bs);
 			Integer eventCollectionId = getCollectionIdFor(bs.getDevice(), calPath);
-			filtrageInvitationDao.removeInvitationStatus(eventCollectionId, emailCollectionId, mailUid);
+			filterManager.removeInvitationStatus(eventCollectionId, emailCollectionId, mailUid);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		}
