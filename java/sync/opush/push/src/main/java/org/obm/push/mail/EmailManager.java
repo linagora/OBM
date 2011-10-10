@@ -477,13 +477,15 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedToLong,
-			Collection<Email> updatedToLong) throws DaoException {
-		if (removedToLong != null && !removedToLong.isEmpty()) {
-			emailDao.deleteSyncEmails(devId, collectionId, lastSync, removedToLong);
+	public void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedEmailUids,
+			Collection<Email> updatedEmails) throws DaoException {
+		
+		if (removedEmailUids != null && !removedEmailUids.isEmpty()) {
+			emailDao.deleteSyncEmails(devId, collectionId, lastSync, removedEmailUids);
 		}
-		if (updatedToLong != null && !updatedToLong.isEmpty()) {
-			emailDao.updatedSyncedEmails(devId, collectionId, lastSync, updatedToLong);
+		
+		if (updatedEmails != null && !updatedEmails.isEmpty()) {
+			emailDao.updatedSyncedEmails(devId, collectionId, lastSync, updatedEmails);
 		}
 	}
 
