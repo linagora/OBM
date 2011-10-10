@@ -17,7 +17,6 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailNotFoundException;
 import org.obm.push.store.EmailDao;
-import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.push.utils.jdbc.LongIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.LongSQLCollectionHelper;
@@ -34,24 +33,54 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 	private EmailDaoJdbcImpl(DBCP dbcp) {
 		super(dbcp);
 	}
-
+	
 	@Override
-	public void markEmailsAsSynced(Integer devId, Integer collectionId, Collection<Email> messages) throws DaoException {
-		markEmailsAsSynced(devId, collectionId, DateUtils.getCurrentDate(), messages);
-	}
-
-	@Override
-	public void markEmailsAsSynced(Integer devId, Integer collectionId, Date lastSync, Collection<Email> emails) throws DaoException {
-		for (Email email: emails) {
-			try {
-				getSyncedEmail(devId, collectionId, email.getUid());
-				update(devId, collectionId, email);
-			} catch (EmailNotFoundException e) {
-				insert(devId, collectionId, lastSync, email);
+	public void createSyncEntries(Integer devId, Integer collectionId,	Set<Email> emailsToMarkAsSynced, Date lastSync) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("INSERT INTO opush_sync_mail (collection_id, device_id, mail_uid, timestamp) VALUES (?, ?, ?, ?)");
+			for (Email email: emailsToMarkAsSynced) {
+				ps.setInt(1, collectionId);
+				ps.setInt(2, devId);
+				ps.setLong(3, email.getUid());
+				ps.setTimestamp(4, new Timestamp(lastSync.getTime()));
+				ps.addBatch();
 			}
+			ps.executeBatch();
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, null);
 		}
 	}
-	
+
+	@Override
+	public void updateSyncEntriesStatus(Integer devId, Integer collectionId, Set<Email> alreadySyncedEmails) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("UPDATE opush_sync_mail SET is_read = ? WHERE collection_id = ? AND device_id = ? AND mail_uid = ?");
+			for (Email email: alreadySyncedEmails) {
+				ps.setBoolean(1, email.isRead());
+				ps.setInt(2, collectionId);
+				ps.setInt(3, devId);
+				ps.setLong(4, email.getUid());
+				ps.addBatch();
+			}
+			ps.executeBatch();
+			
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, null);
+		}
+	}
+
 	@Override
 	public void update(Integer devId, Integer collectionId, Email email) throws DaoException {
 		Connection con = null;
@@ -138,8 +167,8 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 	}
 	
 	@Override
-	public Set<Email> filterSyncedEmails(int collectionId, int deviceId, Collection<Email> emails) throws DaoException {
-		Set<Email> filteredEmails = new HashSet<Email>();
+	public Set<Email> alreadySyncedEmails(int collectionId, int deviceId, Collection<Email> emails) throws DaoException {
+		Set<Email> alreadySyncedEmails = new HashSet<Email>();
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet evrs = null;
@@ -152,19 +181,19 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			ps.setInt(2, deviceId);
 			idList.insertValues(ps, 3);
 			evrs = ps.executeQuery();
-			if (evrs.next()) {
+			while (evrs.next()) {
 				long uidDB = evrs.getLong("mail_uid");
 				boolean read = evrs.getBoolean("is_read");
 				Date date = evrs.getDate("timestamp");
 				Email email = new Email(uidDB, read, date);
-				filteredEmails.add(email);
+				alreadySyncedEmails.add(email);
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, evrs);
 		}
-		return filteredEmails;
+		return alreadySyncedEmails;
 	}
 	
 	@Override

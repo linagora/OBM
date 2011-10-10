@@ -31,6 +31,7 @@ import org.obm.push.store.EmailDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -48,8 +49,9 @@ public class EmailSync implements IEmailSync {
 	@Override
 	public MailChanges getSync(StoreClient imapStore, Integer devId, SyncState state, Integer collectionId) throws DaoException {
 		Set<Email> emailsFromIMAP = getImapEmails(imapStore, state.getLastSync());
-		Set<Email> emailsToSyncWithClient = emailDao.filterSyncedEmails(collectionId, devId, emailsFromIMAP);
-		MailChanges mailChanges = new MailChanges(new HashSet<Email>(), emailsToSyncWithClient, emailsFromIMAP);
+		Set<Email> alreadySyncedEmails = emailDao.alreadySyncedEmails(collectionId, devId, emailsFromIMAP);
+		Set<Email> emailsToSync = Sets.difference(emailsFromIMAP, alreadySyncedEmails);
+		MailChanges mailChanges = new MailChanges(new HashSet<Email>(), emailsToSync, emailsFromIMAP);
 		loggerInfo(state.getLastSync(), emailsFromIMAP, mailChanges);
 		return mailChanges;
 	}

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +49,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.store.EmailDao;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.slf4j.Logger;
@@ -56,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -460,12 +463,33 @@ public class EmailManager implements IEmailManager {
 					}
 				});
 		try {
-			emailDao.markEmailsAsSynced(devId, collectionId, emails);
+			markEmailsAsSynced(devId, collectionId, emails);
 		} catch (DaoException e) {
 			throw new DaoException("Error while adding messages in db", e);
 		}
 	}
 
+	public void markEmailsAsSynced(Integer devId, Integer collectionId, Collection<Email> messages) throws DaoException {
+		markEmailsAsSynced(devId, collectionId, DateUtils.getCurrentDate(), messages);
+	}
+
+	public void markEmailsAsSynced(Integer devId, Integer collectionId, Date lastSync, Collection<Email> emails) throws DaoException {
+		Set<Email> allEmailsToMark = Sets.newHashSet(emails);
+		Set<Email> alreadySyncedEmails = emailDao.alreadySyncedEmails(collectionId, devId, emails);
+		Set<Email> emailsToMarkAsSynced = filterOutAlreadySyncedEmails(allEmailsToMark, alreadySyncedEmails);
+		emailDao.updateSyncEntriesStatus(devId, collectionId, alreadySyncedEmails);
+		emailDao.createSyncEntries(devId, collectionId, emailsToMarkAsSynced, lastSync);
+	}
+
+	private Set<Email> filterOutAlreadySyncedEmails(Set<Email> allEmailsToMark, Set<Email> alreadySyncedEmails) {
+		return org.obm.push.utils.collection.Sets.difference(allEmailsToMark, alreadySyncedEmails, new Comparator<Email>() {
+			@Override
+			public int compare(Email o1, Email o2) {
+				return Long.valueOf(o1.getUid() - o2.getUid()).intValue();
+			}
+		});
+	}
+	
 	@Override
 	public boolean getLoginWithDomain() {
 		return loginWithDomain;
@@ -485,7 +509,7 @@ public class EmailManager implements IEmailManager {
 		}
 		
 		if (updatedEmails != null && !updatedEmails.isEmpty()) {
-			emailDao.markEmailsAsSynced(devId, collectionId, lastSync, updatedEmails);
+			markEmailsAsSynced(devId, collectionId, lastSync, updatedEmails);
 		}
 	}
 
