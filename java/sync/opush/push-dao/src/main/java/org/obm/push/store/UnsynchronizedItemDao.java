@@ -1,5 +1,6 @@
 package org.obm.push.store;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.obm.push.bean.Credentials;
@@ -8,16 +9,16 @@ import org.obm.push.bean.ItemChange;
 
 public interface UnsynchronizedItemDao {
 	
-	void storeItemToAdd(Credentials credentials, Device device, int collectionId, ItemChange ic);
+	void storeItemsToAdd(Credentials credentials, Device device, int collectionId, Collection<ItemChange> ic);
 
-	Set<ItemChange> listItemToAdd(Credentials credentials, Device device, int collectionId);
+	Set<ItemChange> listItemsToAdd(Credentials credentials, Device device, int collectionId);
 
-	void clearItemToAdd(Credentials credentials, Device device, int collectionId);
+	void clearItemsToAdd(Credentials credentials, Device device, int collectionId);
 	
-	void storeItemToRemove(Credentials credentials, Device device, int collectionId, ItemChange ic);
+	void storeItemsToRemove(Credentials credentials, Device device, int collectionId, Collection<ItemChange> ic);
 
-	Set<ItemChange> listItemToRemove(Credentials credentials, Device device, int collectionId);
+	Set<ItemChange> listItemsToRemove(Credentials credentials, Device device, int collectionId);
 
-	void clearItemToRemove(Credentials credentials, Device device, int collectionId);
+	void clearItemsToRemove(Credentials credentials, Device device, int collectionId);
 
 }

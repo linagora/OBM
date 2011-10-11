@@ -115,7 +115,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	private int listItemToAddSize(BackendSession bs, SyncCollection syncCollection) {
-		Set<ItemChange> listItemToAdd = unSynchronizedItemCache.listItemToAdd(bs.getCredentials(), 
+		Set<ItemChange> listItemToAdd = unSynchronizedItemCache.listItemsToAdd(bs.getCredentials(), 
 				bs.getDevice(), syncCollection.getCollectionId());
 		return listItemToAdd.size();
 	}

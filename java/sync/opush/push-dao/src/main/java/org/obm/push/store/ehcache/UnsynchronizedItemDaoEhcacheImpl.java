@@ -1,6 +1,7 @@
 package org.obm.push.store.ehcache;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.store.UnsynchronizedItemDao;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -29,51 +31,48 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 	}
 
 	@Override
-	public void storeItemToAdd(Credentials credentials, Device device, int collectionId, ItemChange ic) {
-		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
-		storeItem(ic, key);
-	}
-
-	@Override
-	public Set<ItemChange> listItemToAdd(Credentials credentials, Device device, int collectionId) {
+	public Set<ItemChange> listItemsToAdd(Credentials credentials, Device device, int collectionId) {
 		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
 		return listItem(key);
 	}
 
 	@Override
-	public void clearItemToAdd(Credentials credentials, Device device, int collectionId) {
+	public void clearItemsToAdd(Credentials credentials, Device device, int collectionId) {
 		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
-		clearItem(key);
+		clearItems(key);
 	}
 
 	@Override
-	public void storeItemToRemove(Credentials credentials, Device device, int collectionId, ItemChange ic) {
+	public void storeItemsToRemove(Credentials credentials, Device device, int collectionId, Collection<ItemChange> ic) {
 		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
-		storeItem(ic, key);
+		storeItems(ic, key);
 	}
 
 	@Override
-	public Set<ItemChange> listItemToRemove(Credentials credentials, Device device, int collectionId) {
+	public void storeItemsToAdd(Credentials credentials, Device device, int collectionId, Collection<ItemChange> ic) {
+		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
+		storeItems(ic, key);
+	}
+	
+	@Override
+	public Set<ItemChange> listItemsToRemove(Credentials credentials, Device device, int collectionId) {
 		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
 		return listItem(key);
 	}
 
 	@Override
-	public void clearItemToRemove(Credentials credentials, Device device, int collectionId) {
+	public void clearItemsToRemove(Credentials credentials, Device device, int collectionId) {
 		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
-		clearItem(key);
+		clearItems(key);
 	}
 
-	private void storeItem(ItemChange ic, Key key) {
-		Set<ItemChange> itemChanges = listItem(key);
-		itemChanges.add(ic);
+	private void storeItems(Collection<ItemChange> ic, Key key) {
+		HashSet<ItemChange> itemChanges = Sets.newHashSet(ic);
 		store.put( new Element(key, itemChanges) );
 	}
 	
-	private void clearItem(Key key) {
-		Set<ItemChange> itemChanges = listItem(key);
-		itemChanges.clear();
-		store.put( new Element(key, itemChanges) );
+	private void clearItems(Key key) {
+		store.put( new Element(key, Sets.newHashSet()) );
 	}
 	
 	private Set<ItemChange> listItem(Key key) {

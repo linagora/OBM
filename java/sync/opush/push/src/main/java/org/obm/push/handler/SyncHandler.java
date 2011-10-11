@@ -186,7 +186,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		DataDelta delta = null;
 		Date lastSync = null;
 		
-		int unSynchronizedItemNb = unSynchronizedItemCache.listItemToAdd(bs.getCredentials(), bs.getDevice(), c.getCollectionId()).size();
+		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(bs.getCredentials(), bs.getDevice(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
 			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getOptions().getFilterType(), c.getCollectionId());
 			lastSync = delta.getSyncDate();
@@ -204,23 +204,27 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private List<ItemChange> serializeDeletion(BackendSession bs, SyncCollection c, Map<String, String> processedClientIds, 
 			DataDelta delta) {
 		
-		Set<ItemChange> unSyncdeleted = unSynchronizedItemCache.listItemToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
+		Set<ItemChange> unSyncdeleted = unSynchronizedItemCache.listItemsToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
 		
 		if (delta != null && delta.getDeletions() != null && unSyncdeleted != null) {
 			delta.getDeletions().addAll(unSyncdeleted);
-			unSynchronizedItemCache.clearItemToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
+			unSynchronizedItemCache.clearItemsToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
 		}
 
+		ArrayList<ItemChange> toKeepForLaterSync = new ArrayList<ItemChange>();
+		
 		final List<ItemChange> itemChangesDeletion = new ArrayList<ItemChange>();
 		if (delta != null && delta.getDeletions() != null) {
 			for (ItemChange ic: delta.getDeletions()) {
 				if (processedClientIds.containsKey(ic.getServerId())) {
-					unSynchronizedItemCache.storeItemToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId(), ic);
+					toKeepForLaterSync.add(ic);
 				} else {
 					itemChangesDeletion.add(ic);
 				}
 			}
 		}
+		unSynchronizedItemCache.storeItemsToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId(), toKeepForLaterSync);
+		
 		return itemChangesDeletion;
 	}
 
@@ -237,8 +241,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			changed.addAll(delta.getChanges());
 		}
 		
-		changed.addAll(unSynchronizedItemCache.listItemToAdd(credentials, device, collectionId));
-		unSynchronizedItemCache.clearItemToAdd(credentials, device,collectionId);
+		changed.addAll(unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId));
+		unSynchronizedItemCache.clearItemsToAdd(credentials, device,collectionId);
 		
 		if (changed.size() <= windowSize) {
 			return changed;
@@ -263,13 +267,16 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			}
 		}
 
+		ArrayList<ItemChange> toKeepForLaterSync = new ArrayList<ItemChange>();
+		
 		int changedSize = changed.size();
 		for (int i = windowSize; i < changedSize; i++) {
 			ItemChange ic = changed.get(changed.size() - 1);
-			unSynchronizedItemCache.storeItemToAdd(credentials, device, collectionId, ic);
+			toKeepForLaterSync.add(ic);
 			changed.remove(ic);
 		}
 
+		unSynchronizedItemCache.storeItemsToAdd(credentials, device, collectionId, toKeepForLaterSync);
 		changed.addAll(changeByMobile);
 		c.setMoreAvailable(true);
 		

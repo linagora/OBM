@@ -16,6 +16,8 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 
+import com.google.common.collect.ImmutableList;
+
 import bitronix.tm.TransactionManagerServices;
 
 public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurationTest  {
@@ -45,14 +47,14 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	@Test
 	public void list() {
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 	}
 	
 	@Test
 	public void add() {
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, buildItemChange("test 1"));
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, ImmutableList.of(buildItemChange("test 1")));
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(1, itemChanges.size());
 		Assert.assertEquals("test 1", itemChanges.iterator().next().getServerId());
@@ -64,10 +66,10 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		ItemChange itemChange2 = buildItemChange("2");
 		ItemChange itemChange3 = buildItemChange("3");
 		
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange1);
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange2);
+		unSynchronizedItemImpl.storeItemsToAdd(
+				credentials, getFakeDeviceId(), 1, ImmutableList.of(itemChange1, itemChange2));
 		
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(2, itemChanges.size());
 		
@@ -82,12 +84,12 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		ItemChange itemChange2 = buildItemChange("test 1.2");
 		ItemChange itemChange21 = buildItemChange("test 2.1");
 		
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange1);
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange2);
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 2, itemChange21);
-		
-		Set<ItemChange> itemChangesOneCollection = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
-		Set<ItemChange> itemChangesTwoCollection = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 2);
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, 
+				ImmutableList.of(itemChange1, itemChange2));
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 2, 
+				ImmutableList.of(itemChange21));
+		Set<ItemChange> itemChangesOneCollection = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
+		Set<ItemChange> itemChangesTwoCollection = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 2);
 		
 		Assert.assertNotNull(itemChangesOneCollection);
 		Assert.assertEquals(2, itemChangesOneCollection.size());
@@ -105,10 +107,12 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		ItemChange itemChange2 = buildItemChange("test 2");
 		ItemChange itemChange3 = buildItemChange("test 3");
 		
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, itemChange1);
-		unSynchronizedItemImpl.storeItemToRemove(credentials, getFakeDeviceId(), 1, itemChange2);
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, 
+				ImmutableList.of(itemChange1));
+		unSynchronizedItemImpl.storeItemsToRemove(credentials, getFakeDeviceId(), 1, 
+				ImmutableList.of(itemChange2));
 		
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(1, itemChanges.size());
 		
@@ -119,10 +123,11 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	@Test
 	public void clear() {
-		unSynchronizedItemImpl.storeItemToAdd(credentials, getFakeDeviceId(), 1, buildItemChange("test 1"));
-		unSynchronizedItemImpl.clearItemToAdd(credentials, getFakeDeviceId(), 1);		
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, 
+				ImmutableList.of(buildItemChange("test 1")));
+		unSynchronizedItemImpl.clearItemsToAdd(credentials, getFakeDeviceId(), 1);		
 		
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemToAdd(credentials, getFakeDeviceId(), 1);
+		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(0, itemChanges.size());
 	}
