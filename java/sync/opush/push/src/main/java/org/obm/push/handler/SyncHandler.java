@@ -246,7 +246,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		logger.info("should send {} change(s)", changed.size());
 		int changeItem = changed.size() - c.getWindowSize();
-		logger.info("WindowsSize value is {} , {} changes will not send", 
+		logger.info("WindowsSize value is {} , {} changes will not be sent", 
 				new Object[]{ c.getWindowSize(), (changeItem < 0 ? 0 : changeItem) });
 
 		final Set<ItemChange> changeByMobile = new HashSet<ItemChange>();
