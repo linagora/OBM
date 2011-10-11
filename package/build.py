@@ -536,10 +536,11 @@ def build_argument_parser(args):
     parser.add_argument('-H', '--host', help='host to upload to',
             default='24/private')
 
-    parser.add_argument('-r', '--repository', help='repository',
+    parser.add_argument('-r', '--repository', help='URL of the source '
+            'repository, or path to a locally checkout repository',
             default=None)
 
-    parser.add_argument('-b', '--branch', help='branch',
+    parser.add_argument('-b', '--branch', help='branch to checkout',
             default=None)
 
     package_types = ['deb', 'rpm']
