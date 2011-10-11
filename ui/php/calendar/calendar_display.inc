@@ -1298,11 +1298,6 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     $dis_grid_action = "";
   } else {
     $dis_week = "<a href='javascript: void(0)' onclick='obm.calendarManager.showWeek($ts)'>$week_num</a>";
-    $dis_header_action = " 
-      onmouseover='if(obm.calendarManager) obm.calendarManager.newAlldayDummyEventHighlight(event);'
-      onmousedown='obm.calendarManager.newAlldayDummyEvent(event);'
-      onmouseup='obm.calendarManager.newAlldayDummyEvent(event);'
-      ondblclick='obm.calendarQuickForm.compute(event);'";
 
     $can_write_in_calendar = false;
     foreach ($calendar_entity as $type => $entity) {
@@ -1316,6 +1311,11 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
     if ($can_write_in_calendar) {
         $dis_grid_action = "
           onmousedown='obm.calendarManager.newDummyEvent(event);' 
+          ondblclick='obm.calendarQuickForm.compute(event);'";
+        $dis_header_action = " 
+          onmouseover='if(obm.calendarManager) obm.calendarManager.newAlldayDummyEventHighlight(event);'
+          onmousedown='obm.calendarManager.newAlldayDummyEvent(event);'
+          onmouseup='obm.calendarManager.newAlldayDummyEvent(event);'
           ondblclick='obm.calendarQuickForm.compute(event);'";
     }
   }
