@@ -115,14 +115,23 @@ class SCMManager(object):
             self.version = self._increment_tag(last_tag)
 
     def _get_tags(self):
-        output = subp.check_output(["git", "tag"], cwd=self.checkout_dir)
-        tags = [line for line in output.split("\n") if line]
+        proc = subp.Popen(["git", "tag"],
+		cwd=self.checkout_dir, stdout=subp.PIPE)
+        stdout, stderr = proc.communicate()
+        if proc.returncode != 0:
+            raise PackagingError("The git tag process failed with return "
+                    "code %d" % proc.returncode)
+        tags = [line for line in stdout.split("\n") if line]
         return tags
 
     def _get_sha1(self):
-        output = subp.check_output(["git", "rev-parse", "HEAD"],
-                cwd=self.checkout_dir)
-        sha1 = output.split("\n")[0]
+        proc = subp.Popen(["git", "rev-parse", "HEAD"],
+                cwd=self.checkout_dir, stdout=subp.PIPE)
+        stdout, stderr = proc.communicate()
+        if proc.returncode != 0:
+            raise PackagingError("The git rev-parse process failed with return "
+                    "code %d" % proc.returncode)
+        sha1 = stdout.split("\n")[0]
         return sha1
 
     def commit(self):
