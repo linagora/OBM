@@ -4,7 +4,7 @@
 	<groupId>com.linagora.obm</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<version>2.4.0-rc8</version>
+	<version>2.4.0-rc9-SNAPSHOT</version>
 	<name>obm-sync and opush 2.4 parent project</name>
 
 	<properties>
