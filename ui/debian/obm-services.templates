@@ -1,0 +1,26 @@
+Template: obm-services/info_upgrade_2_1_3
+Type: text
+Description: upgrade from OBM 2.1.3:
+ .
+ Verify your /etc/obm/obm_conf.ini with obm-samba = false if you don't have install obm-samba.
+ .
+ To fix things done by your previous version, you need to run
+ the command :
+ .
+ cd /usr/share/obm/www/auto/ && ./incrementalUpdate.pl --global --domain 0 && ./incrementalUpdate.pl --global --domain 0.
+ .
+ The domain number is id of your OBM Domain:
+ --domain 0 = global domain ;
+ --domain 1 = your first domain ;
+ --domain 2 = your second domain.
+
+Template: obm-services/info_upgrade_2_4
+Type: text
+Description: upgrade to 2.4
+ In order to update your installation you must run commands:
+ .
+ /usr/share/obm/www/auto/update.pl --domain-global --global
+ .
+ /usr/share/obm/www/auto/update.pl --domain 0 --global
+ .
+ For each Domain

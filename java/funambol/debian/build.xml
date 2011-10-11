@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="obm-java" default="install" basedir=".">
+
+  <target name="init">
+    <echo>Initializing project variables</echo>
+    <tstamp/>
+  </target>
+  
+  <target name="obm-funambol-storage">
+    <ant antfile="obm-funambol-storage/build.xml" target="dist" dir="../"/>    
+  </target>
+
+  <target name="obm-funambol">
+    <ant antfile="obm-funambol/build.xml" target="dist" dir="../"/>    
+  </target>
+  
+  <target name="funambol">
+    <ant antfile="funambol/build.xml" target="dist" dir="../"/>
+  </target>
+
+  <target name="build">
+  </target>
+
+  <target name="install" depends="funambol, obm-funambol">
+    <echo>Preparing distribution of ${ant.project.name}</echo>
+  </target>
+
+  <target name="clean" depends="init">
+    <echo>Cleaning...</echo>    
+    <delete dir="../${dist}"/>
+  </target>
+  
+</project>
+

@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+install/obm-sync::
+	(/bin/bash $(CURDIR)/debian/obm-sync-build.sh $(CURDIR))
+
+install/obm-locator::
+	(/bin/bash $(CURDIR)/debian/obm-locator-build.sh $(CURDIR))
+
+install/opush::
+	(/bin/bash $(CURDIR)/debian/opush-build.sh $(CURDIR))

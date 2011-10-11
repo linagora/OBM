@@ -1,0 +1,8 @@
+usr/share/obm-satellite
+usr/share/obm-satellite/sample
+var/run/obm
+var/log/obm-satellite
+etc/obm-satellite
+etc/obm-satellite/mods-available
+etc/obm-satellite/mods-enabled
+usr/sbin

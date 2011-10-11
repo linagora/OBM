@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+# Not buildable on etch because of builddep on sun-java6-jdk
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+JAVA_HOME := /usr/lib/jvm/java-6-sun
+# Do not generate crappy dependencies for unused libs
+DEB_DH_SHLIBDEPS_ARGS_obm-caldav := "-Xlib"
+
+build:
+	(JAVA_HOME=$(JAVA_HOME) /bin/bash $(CURDIR)/64_product_build.sh)
+
+install/obm-caldav::
+	( cd $(CURDIR)/debian; \
+	cat $(CURDIR)/sample/obm-caldav.init > obm-caldav.init)
+	tar xjfv obm-caldav.tar.bz2 -C $(CURDIR)/debian/obm-caldav/usr/share
+	rm -f $(CURDIR)/obm-caldav.tar.bz2

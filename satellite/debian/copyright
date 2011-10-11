@@ -1,0 +1,29 @@
+This package was debianized by Sylvain Garcia <sylvain.garcia@aliasource.fr> on
+Fri, 04 Apr 2008 17:03:01 +0200.
+
+It was downloaded from http://www.obm.org/
+
+Upstream Authors:
+	OBM developpers <obm@list.aliasource.fr>
+
+Copyright:
+	Copyright (c) 1997-2009 Aliasource - LINAGORA Group
+
+License:
+
+   This package is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 dated June, 1991.
+
+   This package is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this package; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301 USA
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL-2'.

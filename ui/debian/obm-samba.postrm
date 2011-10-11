@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+if test -e /usr/share/debconf/confmodule; then
+	. /usr/share/debconf/confmodule
+fi
+
+
+case "$1" in
+  purge|remove|failed-upgrade|abort-install|abort-upgrade|disappear)
+    ## Suppressionde la conf samba
+    db_set obm-conf/module_obmsamba false
+    db_go || true
+    echo -n "[obm-conf] update configuration file obm_conf.ini...."
+    #Build /etc/obm/obm_conf.ini
+    $(which perl) /usr/share/obm-conf/genobmconf.pl
+    TEMPDIR=/var/run/obm/upgrades
+    NEWFILE=$TEMPDIR/obm_conf.ini
+    CONFIG=/etc/obm/obm_conf.ini
+    ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
+    ucfr obm-conf "$CONFIG"
+    echo "[DONE]"
+
+    # Remove my changes to the db.
+    db_purge
+    ;;
+  upgrade)
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

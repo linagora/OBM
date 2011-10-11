@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+if [ -f /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+fi
+
+if [ "$1" = "purge" ]; then
+        rm -rf /var/run/obm
+	if [ -x "`which ucf 2>/dev/null`" ]; then
+		ucf --purge /etc/obm/obm_conf.ini
+	fi
+	if [ -x "`which ucfr 2>/dev/null`" ]; then
+		ucfr --purge obm-conf /etc/obm/obm_conf.ini
+	fi
+        rm -f /etc/obm/obm_conf.ini
+        rm -f /etc/obm/obm_conf.ini.ucf-old
+    	# Remove my changes to the db.
+    	db_purge
+
+fi
+
+#DEBHELPER#
+
+exit 0

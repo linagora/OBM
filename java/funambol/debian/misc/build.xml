@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- this runs from ".." -->
+
+<project name="obm-funambol-storage" default="dist" basedir=".">
+
+  <target name="dist">
+    <echo>Preparing ${ant.project.name} distribution...</echo>
+
+    <!-- destination directory -->
+    <property name="dd" 
+	      value="debian/${ant.project.name}/"/>
+
+    <mkdir dir="${dd}usr/share/dbconfig-common/data/obm-funambol-storage/install"/>
+    <mkdir dir="${dd}usr/share/dbconfig-common/data/obm-funambol-storage/upgrade"/>
+    <mkdir dir="${dd}usr/share/dbconfig-common/scripts/obm-funambol-storage/upgrade/pgsql"/>
+    <mkdir dir="${dd}usr/share/obm-funambol-storage"/>
+    <mkdir dir="${dd}usr/share/obm-funambol-storage/debian"/>
+
+
+    <property name="dest" 
+	      value="${dd}/usr/share/dbconfig-common/data/obm-funambol-storage/install"/>
+    <property name="template" 
+	      value="${dd}/usr/share/obm-funambol-storage/debian"/>
+
+
+    <copy todir="${dest}" 
+	  file="obm-funambol-storage/pgsql"/>
+    <copy todir="${template}" 
+	  file="obm-funambol-storage/debian-db.conf.template"/>
+
+
+    <echo>${ant.project.name} distribution done.</echo>
+  </target>
+  
+</project>

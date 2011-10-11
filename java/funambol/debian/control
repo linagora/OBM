@@ -1,0 +1,23 @@
+Source: obm-funambol
+Section: net
+Priority: optional
+Maintainer: Sylvain Garcia <sylvain.garcia@obm.org>
+Build-Depends-Indep: cdbs, ant, ant-optional, debhelper (>= 5.0), sun-java6-jdk
+Standards-Version: 3.8.3
+Homepage: http://www.obm.org
+
+Package: obm-funambol
+Architecture: all
+Depends: obm-funambol-storage (= ${binary:Version}), obm-munin-node
+Description: Funambol server with obm plugin
+ Plugin for funambol used to provide OBM data as syncml.
+
+Package: obm-funambol-storage
+Architecture: all
+Depends: dbconfig-common, postgresql-8.3, obm-munin-node
+Provides: obm-funambol-core
+Conflicts: obm-funambol-core
+Replaces: obm-funambol-core
+Description: Postgresql OBM funambol database
+ this package create postgres database OBM funambol.
+

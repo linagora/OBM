@@ -1,0 +1,5 @@
+{package_name} ({version}+git{year}{month}{day}-{hour}{minute}-{short_sha1}) experimental; urgency=low
+
+  * beta build only for test purpose - git revision {sha1}.
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  {changelog_date}

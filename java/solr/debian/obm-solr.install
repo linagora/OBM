@@ -1,0 +1,2 @@
+debian/solr.xml /usr/share/obm-tomcat/applis
+obm_index_init.py /usr/share/obm-solr

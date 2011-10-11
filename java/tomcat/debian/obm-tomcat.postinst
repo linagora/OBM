@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+list_appli="/usr/share/obm-tomcat/applis"
+tomcat_register_path="/usr/share/tomcat/conf/Catalina/localhost/"
+
+rm -f ${tomcat_register_path}/*
+
+if [ -d ${list_appli} ]; then
+  if find ${list_appli}/*.xml -maxdepth 0 -type f &>/dev/null; then
+    pushd ${tomcat_register_path}
+    for i in `ls ${list_appli}/*xml`; do
+	echo "publish $i into OBM tomcat server..."
+	ln -s $i .
+    done
+    popd
+  fi
+fi
+
+invoke-rc.d obm-tomcat restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+
+#DEBHELPER#
+
+exit 0
+
+

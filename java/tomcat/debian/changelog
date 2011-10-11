@@ -1,0 +1,77 @@
+obm-tomcat (2.4.0-rc7-1) unstable; urgency=low
+
+  * 2.4.0-rc7-1
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Tue, 30 Aug 2011 16:29:44 +0200
+
+obm-tomcat (2.4.0-rc6-1) unstable; urgency=low
+
+  * 2.4.0-rc6-1
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Wed, 20 Jul 2011 16:15:52 +0200
+
+obm-tomcat (2.4.0-rc5-1) unstable; urgency=low
+
+  * 2.4.0-rc5-1
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Mon, 11 Jul 2011 16:42:35 +0200
+
+obm-tomcat (2.4.0-rc4-1) unstable; urgency=low
+
+  * 2.4.0-rc4-1
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Mon, 11 Jul 2011 16:41:10 +0200
+
+obm-tomcat (2.4.0-rc3-1) unstable; urgency=low
+
+  * 2.4.0-rc3-1
+
+ -- ronan lanore <ronan.lanore@obm.org>  Thu, 31 Mar 2011 17:04:20 +0200
+
+obm-tomcat (2.4.0-rc2-1) unstable; urgency=low
+
+  * 2.4.0-rc2
+
+ -- ronan lanore <ronan.lanore@obm.org>  Mon, 21 Mar 2011 14:37:34 +0100
+
+obm-tomcat (2.4.0-rc1-1) unstable; urgency=low
+
+  * 2.4.0-rc1
+
+ -- ronan lanore <ronan.lanore@obm.org>  Thu, 10 Mar 2011 17:20:13 +0100
+
+obm-tomcat (2.3.0-2) unstable; urgency=low
+
+  * fixed # 1126 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 23 Mar 2010 10:44:49 +0100
+
+obm-tomcat (2.3.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 04 Dec 2009 15:30:45 +0100
+
+obm-tomcat (2.3.0~rc3-1) unstable; urgency=low
+
+  * rc3 release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 27 Nov 2009 09:49:29 +0100
+
+obm-tomcat (2.3.0~rc2-1) unstable; urgency=low
+
+  * rc2 release 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Sun, 22 Nov 2009 11:03:56 +0100
+
+obm-tomcat (2.3.0~rc1-1) unstable; urgency=low
+
+  * Bump to rc1 release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 13 Nov 2009 09:50:52 +0100
+
+obm-tomcat (2.3.0~alpha2-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 26 Aug 2009 15:16:44 +0200

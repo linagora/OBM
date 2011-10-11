@@ -1,0 +1,16 @@
+2007-12-03  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	CA management scripts, initial release
+	
+	* README:
+	* build.xml:
+	* buildca.sh:
+	* ca.cnf:
+	* camgr.lib:
+	* createcert.sh:
+	* debian/changelog:
+	* debian/compat:
+	* debian/control:
+	* debian/obm-ca.postinst:
+	* debian/rules:
+

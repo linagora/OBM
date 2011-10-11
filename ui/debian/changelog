@@ -1,0 +1,571 @@
+obm (2.4.0-rc7-1) stable; urgency=low
+
+  * New upstream version
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Tue, 30 Aug 2011 15:37:05 +0200
+
+obm (2.4.0-rc6-1) stable; urgency=low
+
+  * New upstream version
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Wed, 20 Jul 2011 14:59:11 +0200
+
+obm (2.4.0-rc5-1) stable; urgency=low
+
+  * pass to rc5 for dev need
+
+ -- ronan lanore <ronan.lanore@obm.org>  Mon, 11 Jul 2011 15:25:22 +0200
+
+obm (2.4.0-rc4-1) stable; urgency=low
+
+  * - Fix error sql !
+  * fix M#2979 : bug on default view
+  * add /
+  * correct ICS reply formatting
+  * bugfix: ensure array_merge second parameter is an array
+  * #M2471: configurable remote ics ttl & default to 60 secs
+  * OBMFULL-2434
+  * little bugfix (use of + to concatenate strings in PHP...)
+  * OBMFULL-649 It should be impossible to reserve a resource on free events
+  * OBMFULL-1795 [obmonline] SQL Error while trying to connect with a wrong password
+  * calling obm-sync for contacts freebusy infos (part of multisite freebusy implementation)
+  * OBMFULL-2387 Search users popup issue on multipage results (T5439)
+  * Fix Backup.php for M#3022
+  * Fix M#3022 permit backup on inactive user mailbox / user must have been defined
+  * BD table Category : add constraint on domain_id
+  * Fix OBMFULL-2338 IM#3005 Declined event are displayed in TB2 on vcard email reception
+  * Fixed XSS in external calendar handling
+  * OBMFULL-2364 Modification for the fields not to be truncated on the pdf summary available after user
+  * Javascript bug fix
+  * OBMFULL-2337 Modified part of the code to respect obm-ui naming conventions (no camel case)
+  * Finally put the three lines of js directly in the PHP instead of in a standalone js file
+  * Removed unnecessary lines of code and added a test to prevent a warning in some cases
+  * OBMFULL-2337 Modification for the owner to be the same that the organizer
+  * OBMFULL-2359 Hide information about event's owner
+  * OBMFULL-2353 Modification to prevent a user which has not write rights on a calendar from creating a
+  * OBMFULL-2354 Bug fix on event creation with full form
+  * OBMFULL-2354 Fixed a bug when there isn't any list of organizers
+  * OBMFULL-2354 Added a behaviour to the organizer list so that the list of attendees is updated when t
+  * fix M#2955 : max 80 characters for userobm_login
+  * Fixed a problem on my last commit done too hasty
+  * Javascript bug fix on mouseover on all day events area (in the calendar)
+  * JIRA 2334 : Add the possibility to modify the organizer with the new event's form
+  * fix M#2974(part 2) : User - CSV import
+  * fix M#2983 : Calendar - bug on update rights
+  * fix M#2974 : User - CSV import
+  * linked to M#2961 : modify userobm_kind column from varchar12 to varchar64
+  * regexp login pass to 256 max caracter
+  * fix db error on update 2.3 2.4 (eventtemplate_organizer)
+  * fix db error on category
+  * fix M#2984 : Contact - Bug on deleting
+  * add update BD scripts for 2.3.20
+  * fix M#2983 : Calendar - Rights on calendar sharing
+  * fix M#3009 : User - Common name lenght=256
+  * fix db error on event_sequence
+  * fix J#2267 part 2 : BD migration - error on SyncedAddressbook
+  * fix J#2267 first part : DB error on migration - Column already existing
+  * fix update bd errors
+  * fix M#2955 : lenghten firstname and lasname fields for a user
+  * Modification to index hasACalendar as true even if the uri isn't correct
+  * fix 2265 : error message when displaying a group
+  * fix J#2250 : bug on document link feature on project screen
+  * Removed forgotten debug informations source of a bug
+  * Value assignation to a configuration variable to fix a bug where an email wasn't sent at event creat
+  * Jira 2260 fix (problem about am/pm hours)
+  * Jira 2273 Mantis 2977 bug fix
+  * Fixed #2258 : SQL Error when affecting someone to an OBM project
+  * Added the eventtemplate_organizer field in update script from 2.3 to 2.4
+  * Merge modifications from 2.3 : rename scripts psql.sql into pgsql.sql
+  * fix M#2955 : User - Login lenght
+  * Jira 2176 : fixes a bug in certain cases of date range selections with mini calendar
+  * Fixed #2182
+  * Fixed #2173
+  * fix M#2898 : mailbox - delegation rights
+  * fix M#2897 (2): calendar - delegation rights
+  * fix M#2897 : Calendar - delegation rights
+  * Jira 2085 : Added an ics to the notification sent by obm-ui when changing participation state
+  * MERGE Jira 2087 (parent is Jira 2047) : Implementation of sequences in obm-ui
+  * Merge of modification concerning Jira 2158
+  * Fixed 'fax' field maxlength in the batch user search form
+  * Mail templates' text fine-tuning
+  * Mail templates' text fine-tuning
+  * Added event_sequence to DB update/creation scripts
+  * Fix order of table alteration
+  * Label modification for mantis 2892
+  * MERGE : Modification to export RFC compliant VALARMS at ics export
+
+
+ -- ronan lanore <ronan.lanore@obm.org>  Mon, 11 Jul 2011 15:06:39 +0200
+
+obm (2.4.0-rc3-2) stable; urgency=low
+
+  * Update build_obm-storage.sh psql to pgsql db update script
+
+ -- ronan lanore <ronan.lanore@obm.org>  Mon, 18 Apr 2011 12:13:20 +0200
+
+obm (2.4.0-rc3-1) stable; urgency=low
+
+  * add delegation attribut for obmMailshare objectClass
+  * Jira 1872 bug fix : userobm_timeupdate is not modified anymore on user login
+  * Fix #2036 : login page should use UTF-8 charset
+  * fixes sql error
+  * Modification to improve origin precision when importing events from an ics
+  * [JIRA #1987] update database for opush needs
+  * Mantis bug fix 2908 : problem caused by magic quotes on files containing quotes in their name
+  * Mantis bug fix 2890 : Modification to index the fact that a contact has a calendar uri or not
+  * Fixed #2028
+  * Modification of the message for vacations - see Mantis 2892
+  * Frontport of Jira 1995 (modification to display the organizer in obm ui)
+  * Modification to fix a bug with event templates for pgsql
+  * fix M#2921 : Groups - bug on import
+
+ -- ronan lanore <ronan.lanore@obm.org>  Thu, 31 Mar 2011 16:49:06 +0200
+
+obm (2.4.0-rc2-1) stable; urgency=low
+
+  * Fix x-obm-domain in ics
+
+ -- ronan lanore <ronan.lanore@obm.org>  Mon, 21 Mar 2011 14:14:04 +0100
+
+obm (2.4.0-rc1-1) stable; urgency=low
+
+  * delete obm-caldav dependency in obm-full
+  * first release for 2.4
+  * add app directory 
+  * add lib directory 
+  * add logrotate for obm-services
+  * add warning on update to execute automate in order to fix ldap. Closes:
+    #1213
+  * fixed update scripts 2.3 to 2.4 
+  * update slapd conf file on upgrade. Closes: #1275
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 27 Apr 2010 09:36:08 +0200
+
+obm (2.3.8-2) stable; urgency=low
+
+  * fix update bd 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 16 Jun 2010 14:55:40 +0200
+
+obm (2.3.8-1) stable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 14 Jun 2010 09:59:34 +0200
+
+obm (2.3.7-2) stable; urgency=low
+
+  * add update database for opush
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 26 May 2010 09:31:30 +0200
+
+obm (2.3.7-1) stable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 20 May 2010 17:12:01 +0200
+
+obm (2.3.6-1) stable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 28 Apr 2010 10:41:09 +0200
+
+obm (2.3.5-1) stable; urgency=low
+
+  * new upstream release
+  * move init script for solr, into obml-solr package
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 19 Apr 2010 08:55:29 +0200
+
+obm (2.3.4-1) stable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 14 Apr 2010 17:32:02 +0200
+
+obm (2.3.3-2) stable; urgency=low
+
+  * new release to fix mysql upgrade scripts
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Tue, 16 Mar 2010 14:19:24 +0100
+
+obm (2.3.3-1) stable; urgency=low
+
+  * new upstream release, fixed #1116
+  * fixed #1071 
+  * add upgrade of 2.3.1,2.3.2 into 2.3.3 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 08 Mar 2010 11:31:20 +0100
+
+obm (2.3.2-1) stable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 16 Feb 2010 13:48:42 +0100
+
+obm (2.3.1-1) stable; urgency=low
+
+  [ Thomas Cataldo ]
+  * Bump version so that hudson's package are 2.3.1~yyyy-1
+
+  [ Sylvain Garcia ]
+  * new upstream release 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 25 Jan 2010 10:47:49 +0100
+
+obm (2.3.0-1) stable; urgency=low
+
+  * new upstream release, first stable release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 04 Dec 2009 15:21:39 +0100
+
+obm (2.3.0~rc3-1) stable; urgency=low
+
+  * new upstream release
+  * 907 update 2.2 to 2.3 make update global
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 27 Nov 2009 09:10:24 +0100
+
+obm (2.3.0~rc2-1) stable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Sun, 22 Nov 2009 10:55:05 +0100
+
+obm (2.3.0~rc1-1) stable; urgency=low
+
+  * new upstream release rc1
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 13 Nov 2009 09:34:10 +0100
+
+obm (2.3.0~alpha1-1) stable; urgency=low
+
+  * new upstream version
+  * add obm-munin package
+  * remove obm-satellite from this src-package use own src  
+  * fix dash build 
+  * fix whil on tr for obm-conf.config 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 15 Oct 2009 11:11:26 +0200
+
+obm (2.2.14-1) stable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 14 Oct 2009 09:47:38 +0200
+
+obm (2.2.13-1) stable; urgency=low
+
+  * new upstream release 
+  * fix dash build
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 24 Sep 2009 22:11:15 +0200
+
+obm (2.2.12-2) stable; urgency=low
+
+  * new upstream release
+  * update db scrip
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 14 Sep 2009 12:22:16 +0200
+
+obm (2.2.11-1) stable; urgency=low
+
+  * new upstream release 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 01 Sep 2009 15:10:15 +0200
+
+obm (2.2.10-1) stable; urgency=low
+
+  * new upstream release
+  * update db scrip
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 27 Aug 2009 14:44:46 +0200
+
+obm (2.2.9-2) stable; urgency=low
+
+  * new updare script... 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 20 Aug 2009 16:48:45 +0200
+
+obm (2.2.9-1) stable; urgency=low
+
+  * New upstream version (Tourista in Maroco)
+  * add upgrade database to 2.2.9
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 20 Aug 2009 09:54:09 +0200
+
+obm (2.2.8-2) stable; urgency=low
+
+  * fix bug in upstream (version of release...), so new fake upstream :D
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 13 Aug 2009 17:15:52 +0200
+
+obm (2.2.8-1) stable; urgency=low
+
+  * new upstream fix some bug
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 12 Aug 2009 15:15:57 +0200
+
+obm (2.2.7-1) stable; urgency=low
+
+  * move database dependences on pre-depends 
+  * move dependence on php5-magik on recommends
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 20 Jul 2009 09:57:24 +0200
+
+obm (2.2.6-4) stable; urgency=low
+
+  * fix installation dump with all update 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 09 Jul 2009 20:32:22 +0200
+
+obm (2.2.6-3) stable; urgency=low
+
+  * add to script for update database (jump directly to -3 release)
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 09 Jul 2009 10:32:22 +0200
+
+obm (2.2.6-1) stable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 7 Jul 2009 15:45:27 +0200
+
+
+obm (2.2.5-2) stable; urgency=low
+
+  * add php-apc dependency
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Fri, 19 Jun 2009 15:03:44 +0200
+
+obm (2.2.5-1) stable; urgency=low
+
+  * new upstream release
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Tue, 16 Jun 2009 20:14:23 +0200
+
+obm (2.2.5~rc3-1) stable; urgency=low
+
+  * pre release
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Tue, 16 Jun 2009 15:55:42 +0200
+
+obm (2.2.5~rc1-2) stable; urgency=low
+
+  * upgrade number release 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 11 Jun 2009 10:27:49 +0200
+
+obm (2.2.5~rc1-1) stable; urgency=low
+
+  * new upstream
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 09 Jun 2009 11:14:20 +0200
+
+obm (2.2.4-1) stable; urgency=low
+
+  * new upstream release
+  * add depend on libio-socket-ssl-perl to support tls
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Fri, 29 May 2009 11:28:51 +0200
+
+obm (2.2.3-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Sun, 17 May 2009 22:56:14 +0200
+
+obm (2.2.2-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 11 May 2009 18:25:10 +0200
+
+obm (2.2.1-4) stable; urgency=low
+
+  * fix sql upgrade step two 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 23 Apr 2009 18:50:02 +0200
+
+obm (2.2.1-3) stable; urgency=low
+
+  * fix sql upgrade 2.2.0 to 2.2.1 
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Wed, 22 Apr 2009 16:28:24 +0200
+
+obm (2.2.1-2) stable; urgency=low
+
+  * fix compatibility with ubuntu intrepid
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 21 Apr 2009 17:44:00 +0200
+
+obm (2.2.1-1) stable; urgency=low
+
+  * new upstream release
+  * add update script to 2.2.1
+  * use vhost.sample of obm upstream
+  * add minig configuration for vhost
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 06 Apr 2009 11:17:20 +0200
+
+obm (2.2.0-1) stable; urgency=low
+
+  * new upstream relase, first stable release of 2.2
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Tue, 17 Mar 2009 12:20:16 +0100
+
+obm (2.2.0-1~rc2) stable; urgency=low
+
+  * bump version to first rc2 release
+  * new upstream release
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 23 Feb 2009 11:35:56 +0100
+
+
+obm (2.2.0-0) stable; urgency=low
+
+  * bump version to stable version to test upgrade
+  * fix some bugs on upgrade
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Thu, 26 Feb 2009 15:01:27 +0100
+
+obm (2.2.0~alpha1-1) stable; urgency=low
+
+  * bump version .
+  * improve obm-storage for postgres
+  * change sample for obm-satellite.cf
+  * clean many templates
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Mon, 27 Oct 2008 10:38:15 +0100
+
+obm (2.2.0~alpha1-0) stable; urgency=low
+
+  * bump version.
+  * add genobmconf.pl to configure /etc/obm/obm_conf.ini
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Mon, 23 Jun 2008 18:32:05 +0200
+
+obm (2.1.11-0) stable; urgency=low
+
+  * new upstream version
+
+ -- Sylvain Garcia <sylvain.garcia@obm.org>  Sat, 25 Oct 2008 16:36:15 +0200
+
+obm (2.1.10-1) stable; urgency=low
+
+  * fix  dpkg --compare-versions, thanks Tom
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 17 Jun 2008 17:43:26 +0200
+
+obm (2.1.10-0) stable; urgency=low
+  
+  * manage obm_conf.ini with ucf
+  * package obm-conf, obm-ldap use deconf variable to set obm-[module]
+  * add group admin, user, guest, host for samba
+  * improve lintian check
+  * change copyright
+  * new upstream
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Thu, 17 Apr 2008 19:27:39 +0200
+
+obm (2.1.9-0) stable; urgency=low
+
+  * new release
+  * improve conf files management obm-core
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 01 Apr 2008 17:09:51 +0200
+
+obm (2.1.8-1) stable; urgency=low
+
+  *fix upgrade obm-core.preinst 
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Fri, 21 Mar 2008 12:18:43 +0100
+obm (2.1.8-0) stable; urgency=low
+
+  * move all OBM configuration files to /etc/obm
+  * rename incrementalUpdate.pl to update.pl
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Wed, 19 Mar 2008 14:27:50 +0100
+
+obm (2.1.7-0) stable; urgency=low
+
+  * add updateCyrusAcl.pl to obm-satellite
+  * bugfix virtualhost in obm-ui s/bung/bug/
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Fri, 29 Feb 2008 14:54:10 +0100
+
+obm (2.1.6-0) stable; urgency=low
+
+  * New stable release
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Fri, 15 Feb 2008 15:31:04 +0100
+ 
+obm (2.1.5-0) stable; urgency=low
+
+  * Fix purge/remove package on obm-satellite
+  * move installscript rule to obm-services.install
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Mon, 04 Feb 2008 11:35:27 +0100
+
+obm (2.1.4-0) stable; urgency=low
+
+  * New upstream Release
+  * Fix purge/remove package
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 22 Jan 2008 15:13:43 +0100
+
+obm (2.1.3-1) stable; urgency=low
+
+  * add Samba Support
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 15 Jan 2008 14:48:18 +0100
+
+obm (2.1.2-0) stable; urgency=low
+
+  * release 2.1.2-0
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Fri, 04 Jan 2008 16:55:36 +0100
+
+obm (2.1.0-5) stable; urgency=low
+
+  *add cron manager with obm-ui 
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Thu, 20 Dec 2007 11:18:56 +0100
+
+obm (2.1.0-4) stable; urgency=low
+
+  * fix funambol reverse proxy-ing
+
+ -- Thomas Cataldo <thomas.cataldo@aliasource.fr>  Thu, 13 Dec 2007 16:20:25 +0100
+
+obm (2.1.0-3) stable; urgency=low
+
+  *obm-certs: pre-depends on obm-conf, require external-url in obm_conf.ini 
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 11 Dec 2007 15:21:47 +0100
+
+obm (2.1.0-2) stable; urgency=low
+
+  * obm-cert: generation du certificat sur external-url
+
+ -- sylvain garcia <sylvain.garcia@aliasource.fr>  Tue, 11 Dec 2007 14:41:15 +0100
+
+obm (2.1.0-1) stable; urgency=low
+
+  * obm-conf : prise en charge de la conf external url
+
+ -- sylvaing <sylvaing@panda.aliacom.local>  Tue, 11 Dec 2007 13:52:48 +0100
+
+obm (2.1-0) stable; urgency=low
+
+  * Maj du numero de version avec Version OBM
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 13 Nov 2007 10:52:19 +0100
+
+obm (1.0-1) stable; urgency=low
+
+  * Initial release.
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>  Tue, 11 Sep 2007 10:45:07 +0200
+

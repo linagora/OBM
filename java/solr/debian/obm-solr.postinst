@@ -1,0 +1,35 @@
+#!/bin/bash
+. /usr/share/debconf/confmodule
+
+pushd /var/solr/default
+rm -fr conf
+ln -s /etc/solr/conf/default conf
+popd
+
+pushd /var/solr/webmail
+rm -fr conf
+ln -s /etc/solr/conf/webmail conf
+popd
+
+pushd /var/solr/event
+rm -fr conf
+ln -s /etc/solr/conf/event conf
+popd
+
+pushd /var/solr/contact
+rm -fr conf
+ln -s /etc/solr/conf/contact conf
+popd
+
+if [ -n $2 ] && dpkg --compare-versions "$2" lt "2.3.7-1"; then
+  invoke-rc.d obm-tomcat stop 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+  rm -rf /var/solr/contact/data
+  invoke-rc.d obm-tomcat start 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+  echo "[obm-solr] start indexing obm data..."
+  sleep 5
+  /usr/share/obm-solr/obm_index_init.py || true
+  echo "[obm-solr] indexing data done."
+fi
+
+
+exit 0

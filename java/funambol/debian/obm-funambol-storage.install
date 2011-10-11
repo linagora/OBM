@@ -1,0 +1,2 @@
+debian/misc/pgsql usr/share/dbconfig-common/data/obm-funambol-storage/install
+debian/misc/debian-db.conf.template usr/share/obm-funambol-storage/debian

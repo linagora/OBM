@@ -1,0 +1,44 @@
+[ req ]
+default_bits = 2048
+encrypt_key = no
+distinguished_name = req_dn
+prompt = no
+
+[ req_dn ]
+C=FR
+ST=France
+O=Groupe LINAGORA
+OU=Aliasource
+CN=ca-obm-#CAID#.aliasource.fr
+
+[ ca ]
+default_ca      = obm
+
+[ obm ]
+dir=/var/lib/obm-ca
+certs           = $dir/certs            
+crl_dir         = $dir/crl              
+database        = $dir/index.txt        
+new_certs_dir   = $dir/newcerts         
+certificate     = $dir/cacert.pem       
+serial          = $dir/serial           
+crlnumber       = $dir/crlnumber        
+crl             = $dir/crl.pem          
+private_key     = $dir/private/cakey.pem
+default_md      = sha1
+policy          = policy_match
+
+# For the CA policy
+[ policy_match ]
+countryName             = match
+stateOrProvinceName     = match
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ v3_ca ]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer:always
+basicConstraints = CA:true
+nsCertType = sslCA

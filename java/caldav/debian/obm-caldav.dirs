@@ -1,0 +1,4 @@
+usr/share
+var/log/obm-caldav
+etc/obm-caldav
+var/lib/obm-caldav

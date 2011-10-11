@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+. /usr/share/debconf/confmodule
+
+case "$1" in
+	remove|failed-upgrade|abort-install|abort-upgrade|disappear)
+	;;
+	
+
+    upgrade)
+    ;;
+
+    purge)
+	sed -i -e "s/^# L'utilisateur 'www-data' a certains droits 'root'//" /etc/sudoers
+	sed -i -e "s#^www-data ALL= NOPASSWD: /bin/tar, /bin/chown www-data\\\:www-data backup\*\$##" /etc/sudoers
+	sed -i -e "s/^# L'utilisateur 'www-data' a certains droits 'cyrus'\$//" /etc/sudoers
+	sed -i -e "s#^www-data ALL= (cyrus) NOPASSWD: /bin/tar, /bin/rm -rf /var/spool/cyrus/\*, /bin/mkdir /var/spool/cyrus/\*, /usr/sbin/cyrreconstruct -r -f backup@\*\$##" /etc/sudoers
+
+    	# Remove my changes to the db.
+    	db_purge
+
+	;;	
+
+esac
+
+#DEBHELPER#
+
+exit 0
+

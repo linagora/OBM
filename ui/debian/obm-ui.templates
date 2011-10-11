@@ -1,0 +1,27 @@
+Template: obm-ui/virtualhostinstall
+Type: boolean
+Description: OBM virtualhost configuration?
+ .
+ OBM will desactivate the default virtualhost
+ to activate its own.
+ Note that the "port.conf" file will also be
+ replaced and some apache2 modules activated. If you don't want
+ to install OBM virtualhost on your server now, you can find an
+ exemple in /usr/share/doc/obm-ui/examples.
+
+Template: obm-ui/tomcat
+Type: string
+Default: 127.0.0.1
+Description: Host IP address for the OBM Tomcat server:
+ .
+ You have to set here the host IP address for the OBM tomcat server. 
+ Leave it blank if you are not using obm-sync / obm-funambol.
+
+Template: obm-ui/opush
+Type: string
+Default: 127.0.0.1
+Description: Host IP address for the O-PUSH server:
+ .
+ You have to set here the host IP address for the O-PUSH server. 
+ Leave it blank if you are not using opush.
+

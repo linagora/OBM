@@ -1,0 +1,44 @@
+obm-jetty (2.4.0-rc7-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Tue, 30 Aug 2011 16:34:11 +0200
+
+obm-jetty (2.4.0-rc6-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Wed, 20 Jul 2011 15:59:44 +0200
+
+obm-jetty (2.4.0-rc5-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Wed, 13 Jul 2011 11:06:46 +0200
+
+obm-jetty (2.4.0-rc4-4) unstable; urgency=low
+
+  * allow jetty to listen to all interfaces
+  * change the maner /etc/default/jetty is updated
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Tue, 12 Jul 2011 14:38:46 +0200
+
+obm-jetty (2.4.0-rc4-3) unstable; urgency=low
+
+  * disable compression of jetty.xml.sample
+
+ -- ronan lanore <ronan.lanore@obm.org>  Mon, 11 Jul 2011 17:51:09 +0200
+
+obm-jetty (2.4.0-rc4-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- ronan lanore <ronan.lanore@obm.org>  Mon, 11 Jul 2011 17:51:09 +0200
+
+obm-jetty (2.4.0-rc3-2) unstable; urgency=low
+
+  * new upstream release
+
+ -- ronan lanore <ronan.lanore@obm.org>  Fri, 1 Jul 2011 15:46:39 +0200
+
+

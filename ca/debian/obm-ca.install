@@ -1,0 +1,5 @@
+cert.cnf.template usr/share/obm-ca/
+ca.cnf usr/share/obm-ca/
+createcert.sh usr/share/obm-ca/
+buildca.sh usr/share/obm-ca/
+camgr.lib usr/share/obm-ca/

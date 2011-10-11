@@ -1,0 +1,45 @@
+#!/bin/sh
+
+#set -e
+#set -x
+
+. /usr/share/debconf/confmodule
+
+case "$1" in
+	remove|failed-upgrade|abort-install|abort-upgrade|disappear)
+
+		# Supression de la conf LDAP
+		mv /etc/ldap/slapd.conf.orig /etc/ldap/slapd.conf || true
+		mv /etc/ldap/ldap.conf.orig /etc/ldap/ldap.conf || true
+		#Now install/remove with obm-ldap.install
+                #rm -f /etc/ldap/schema/obm.schema || true
+	;;
+	
+
+    upgrade)
+    ;;
+
+    purge)
+    		# Supression de la conf LDAP
+		mv /etc/ldap/slapd.conf.orig /etc/ldap/slapd.conf || true
+		mv /etc/ldap/ldap.conf.orig /etc/ldap/ldap.conf || true
+		#Now install/remove with obm-ldap.install
+		#rm -f /etc/ldap/schema/obm.schema || true
+		#Supression de la BD LDAP
+		echo -n "Purging OpenLDAP database... "
+		rm -rf /var/lib/ldap/* || true
+		echo done
+		invoke-rc.d slapd stop || true
+		invoke-rc.d slapd start 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+                
+                db_set obm-conf/module_obmldap false
+                db_go || true
+                db_get obm-conf/module_obmldap
+                sed -i -e "s#^obm-ldap =.*#obm-ldap = ${RET}#" /etc/obm/obm_conf.ini || true
+
+	;;	
+esac
+
+#DEBHELPER#
+
+exit 0
