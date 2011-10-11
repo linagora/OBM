@@ -8,7 +8,9 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
@@ -26,6 +28,7 @@ import com.google.common.collect.Multimap;
 
 public abstract class AbstractClientImpl implements ISyncClient {
 
+	private static final int MAX_CONNECTIONS = 8;
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	protected final SyncClientException exceptionFactory;
 
@@ -49,12 +52,18 @@ public abstract class AbstractClientImpl implements ISyncClient {
 	}
 
 	private static HttpClient createHttpClient() {
-		HttpClient ret = new HttpClient();
+		MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = 
+				new MultiThreadedHttpConnectionManager();
+		HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+		params.setMaxTotalConnections(MAX_CONNECTIONS);
+		params.setDefaultMaxConnectionsPerHost(MAX_CONNECTIONS);
+		multiThreadedHttpConnectionManager.setParams(params);
+		HttpClient ret = new HttpClient(multiThreadedHttpConnectionManager);
 		ret.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, retryH);
 		return ret;
 	}
 
-	protected synchronized Document execute(AccessToken token, String action,
+	protected Document execute(AccessToken token, String action,
 			Multimap<String, String> parameters) {
 		
 		PostMethod pm = new PostMethod(getBackendUrl(token.getUserWithDomain()) + action);
@@ -73,42 +82,6 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		return null;
 	}
 
-	private class PMInputStream extends InputStream {
-
-		private InputStream delegate;
-		private PostMethod pm;
-
-		public PMInputStream(InputStream delegate, PostMethod pm) {
-			this.delegate = delegate;
-			this.pm = pm;
-		}
-
-		@Override
-		public int read() throws IOException {
-			return delegate.read();
-		}
-
-		@Override
-		public void close() throws IOException {
-			super.close();
-			pm.releaseConnection();
-		}
-
-	}
-
-	protected synchronized InputStream executeStream(AccessToken token, String action,
-			Multimap<String, String> parameters) {
-		PostMethod pm = new PostMethod(getBackendUrl(token.getUserWithDomain()) + action);
-		pm.setRequestHeader("Content-Type",
-				"application/x-www-form-urlencoded; charset=utf-8");
-		try {
-			return new PMInputStream(executeStream(pm, parameters), pm);
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return null;
-		}
-	}
-
 	protected void setToken(Multimap<String, String> parameters, AccessToken token) {
 		if (token != null) {
 			parameters.put("sid", token.getSessionId());
@@ -121,17 +94,13 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		return m;
 	}
 
-	private synchronized InputStream executeStream(PostMethod pm,
-			Multimap<String, String> parameters) {
+	private InputStream executeStream(PostMethod pm, Multimap<String, String> parameters) {
 		InputStream is = null;
 		try {
 			for (Entry<String, String> entry: parameters.entries()) {
 				pm.setParameter(entry.getKey(), entry.getValue());
 			}
-			int ret = 0;
-			synchronized (hc) {
-				ret = hc.executeMethod(pm);
-			}
+			int ret = hc.executeMethod(pm);
 			if (ret != HttpStatus.SC_OK) {
 				logger.error("method failed:\n" + pm.getStatusLine() + "\n"
 						+ pm.getResponseBodyAsString());
@@ -144,11 +113,14 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		return is;
 	}
 
-	protected synchronized void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
+	protected void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
 		PostMethod pm = new PostMethod(getBackendUrl(at.getUserWithDomain()) + action);
 		pm.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
-		executeStream(pm, parameters);
-		pm.releaseConnection();
+		try {
+			executeStream(pm, parameters);
+		} finally {
+			pm.releaseConnection();
+		}
 	}
 
 	public AccessToken login(String loginAtDomain, String password, String origin) {
