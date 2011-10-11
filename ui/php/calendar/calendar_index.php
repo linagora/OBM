@@ -278,7 +278,7 @@ if ($action == 'search') {
           $display['detail'] .= html_calendar_dis_conflict($params,$conflicts) ;
           $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
           $display['msg'] .= add_upload_warn_message_if_attachments();
-          $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view, $params['organizer']);
+          $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
         } else {
           // Insert "others attendees" as private contacts
           if ($params['others_attendees'] != "") {
