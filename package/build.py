@@ -593,11 +593,12 @@ def make_package_builder(packages, checkout_dir,
         deployer = PackageDeployer(args.host, packages_dir)
 
     pom_packages = []
+    pom_updater = None
     if not args.on_commit:
         for package in packages:
             if package.update_pom:
                 pom_packages.append(package)
-    pom_updater = PomUpdater(pom_packages)
+        pom_updater = PomUpdater(pom_packages)
 
 
     changelog_updater = None
@@ -665,6 +666,7 @@ def main():
     argument_parser = build_argument_parser(sys.argv)
     args = argument_parser.parse_args()
 
+    config = read_config(args.configuration_file)
     scm_repository = args.repository if args.repository else config.get('scm', 'repository')
     branch = None
     checkout_dir = None
@@ -683,7 +685,6 @@ def main():
 
     packages_dir = os.path.join(args.work_dir, args.package_type)
 
-    config = read_config(args.configuration_file)
     available_packages = read_packages(config, checkout_dir)
 
     package_names = set(args.packages)
