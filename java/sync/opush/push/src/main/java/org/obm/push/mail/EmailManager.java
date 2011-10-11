@@ -23,8 +23,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.columba.ristretto.message.Address;
@@ -58,6 +60,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -476,9 +479,22 @@ public class EmailManager implements IEmailManager {
 	public void markEmailsAsSynced(Integer devId, Integer collectionId, Date lastSync, Collection<Email> emails) throws DaoException {
 		Set<Email> allEmailsToMark = Sets.newHashSet(emails);
 		Set<Email> alreadySyncedEmails = emailDao.alreadySyncedEmails(collectionId, devId, emails);
-		Set<Email> emailsToMarkAsSynced = filterOutAlreadySyncedEmails(allEmailsToMark, alreadySyncedEmails);
-		emailDao.updateSyncEntriesStatus(devId, collectionId, alreadySyncedEmails);
-		emailDao.createSyncEntries(devId, collectionId, emailsToMarkAsSynced, lastSync);
+		Set<Email> modifiedEmails = findModifiedEmails(allEmailsToMark, alreadySyncedEmails);
+		Set<Email> emailsNeverTrackedBefore = filterOutAlreadySyncedEmails(allEmailsToMark, alreadySyncedEmails);
+		emailDao.updateSyncEntriesStatus(devId, collectionId, modifiedEmails);
+		emailDao.createSyncEntries(devId, collectionId, emailsNeverTrackedBefore, lastSync);
+	}
+
+	private Set<Email> findModifiedEmails(Set<Email> allEmailsToMark, Set<Email> alreadySyncedEmails) {
+		Map<Long, Email> indexedEmailsToMark = getEmailsAsUidTreeMap(allEmailsToMark);
+		HashSet<Email> modifiedEmails = Sets.newHashSet();
+		for (Email email: alreadySyncedEmails) {
+			Email modifiedEmail = indexedEmailsToMark.get(email.getUid());
+			if (modifiedEmail != null && !modifiedEmail.equals(email)) {
+				modifiedEmails.add(modifiedEmail);
+			}
+		}
+		return modifiedEmails;
 	}
 
 	private Set<Email> filterOutAlreadySyncedEmails(Set<Email> allEmailsToMark, Set<Email> alreadySyncedEmails) {
@@ -486,6 +502,15 @@ public class EmailManager implements IEmailManager {
 			@Override
 			public int compare(Email o1, Email o2) {
 				return Long.valueOf(o1.getUid() - o2.getUid()).intValue();
+			}
+		});
+	}
+	
+	private Map<Long, Email> getEmailsAsUidTreeMap(Set<Email> emails) {
+		return Maps.uniqueIndex(emails, new Function<Email, Long>() {
+			@Override
+			public Long apply(Email email) {
+				return email.getIndex();
 			}
 		});
 	}

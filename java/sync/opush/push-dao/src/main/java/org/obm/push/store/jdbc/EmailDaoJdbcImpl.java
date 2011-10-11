@@ -64,12 +64,14 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 		
 		try {
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("UPDATE opush_sync_mail SET is_read = ? WHERE collection_id = ? AND device_id = ? AND mail_uid = ?");
+			ps = con.prepareStatement("UPDATE opush_sync_mail SET is_read = ?, timestamp = ? WHERE collection_id = ? AND device_id = ? AND mail_uid = ?");
 			for (Email email: alreadySyncedEmails) {
-				ps.setBoolean(1, email.isRead());
-				ps.setInt(2, collectionId);
-				ps.setInt(3, devId);
-				ps.setLong(4, email.getUid());
+				int index = 1;
+				ps.setBoolean(index++, email.isRead());
+				ps.setTimestamp(index++, new Timestamp(email.getDate().getTime()));
+				ps.setInt(index++, collectionId);
+				ps.setInt(index++, devId);
+				ps.setLong(index++, email.getUid());
 				ps.addBatch();
 			}
 			ps.executeBatch();
@@ -89,11 +91,13 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 		try {
 			con = dbcp.getConnection();
 			
-			ps = con.prepareStatement("UPDATE opush_sync_mail SET is_read = ? WHERE collection_id = ? AND device_id = ? AND mail_uid = ?");
-			ps.setBoolean(1, email.isRead());
-			ps.setInt(2, collectionId);
-			ps.setInt(3, devId);
-			ps.setLong(4, email.getUid());
+			ps = con.prepareStatement("UPDATE opush_sync_mail SET is_read = ?, timestamp = ? WHERE collection_id = ? AND device_id = ? AND mail_uid = ?");
+			int index = 1;
+			ps.setBoolean(index++, email.isRead());
+			ps.setTimestamp(index++, new Timestamp(email.getDate().getTime()));
+			ps.setInt(index++, collectionId);
+			ps.setInt(index++, devId);
+			ps.setLong(index++, email.getUid());
 			
 			ps.execute();
 		} catch (SQLException e) {
