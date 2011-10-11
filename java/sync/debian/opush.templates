@@ -1,0 +1,7 @@
+Template: opush/syncperms
+Type: select
+Choices: true, false
+Default: true
+Description: opush default sync perms
+ Authorise synchronisation of unknown PDAs by default
+

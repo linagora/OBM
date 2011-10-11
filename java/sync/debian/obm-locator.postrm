@@ -7,9 +7,10 @@ jetty_status=$?
 if [[ $jetty_status -eq 0 && -f /etc/init.d/jetty ]]; then
 	invoke-rc.d jetty restart	
 elif [ $jetty_status -ne 3 ]; then
-	echo "Jetty not correctly shutdown.\nPlease restart it manually to stop using the obm-solr webapp.\n"
+	echo "Jetty not correctly shutdown.\nPlease restart it manually to stop using the obm-locator webapp.\n"
 fi
 
-[ -f /etc/init.d/obm-solr ] && unlink /etc/init.d/obm-solr
+[ -f /etc/init.d/obm-locator ] && unlink /etc/init.d/obm-locator
 
 exit 0
+

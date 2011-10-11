@@ -1,0 +1,3 @@
+var/lib/jetty/webapps/obm-locator
+var/log/obm-locator
+etc/obm-locator

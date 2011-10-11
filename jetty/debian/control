@@ -1,0 +1,13 @@
+Source: obm-jetty
+Section: net
+Priority: optional
+Maintainer: Thomas Sarboni <tsarboni@linagora.com>
+Build-Depends: cdbs, debhelper (>= 5.0)
+Standards-Version: 3.8.4
+
+Package: obm-jetty
+Architecture: all
+Pre-Depends: jetty
+Provides: obm-jetty
+Description: This package configures Jetty server. 
+ It allows Jetty Server to start after its install and changes the port. 
