@@ -9615,17 +9615,33 @@ Class CalendarPdfList Extends CalendarPdf{
 
  function cut_up_line($text) {
     $line_length = $this->max_length_details[$this->page_orientation][$this->font_size];
-    $array_word = explode(" ", $text);
+    $text = trim($text);
+    $array_line = explode("\n", $text);
     $i = 0;
-    foreach($array_word as $word){
-      if((strlen($ret[$i]) + strlen($word)) > $line_length){
-        $i = $i + 1;
+    foreach($array_line as $line){
+      $array_word = explode(" ", $line);
+      foreach($array_word as $word){
+        if(strlen($word) > $line_length) {
+   	  $array_cut_word = str_split($word, $line_length - 10);
+          foreach($array_cut_word as $cut_word){
+	    if( (strlen($ret[$i]) + strlen($cut_word)) > $line_length){
+              $i = $i + 1;
+            }
+            $ret[$i] .= $cut_word." ";
+          }
+        
+        } else {
+          if(((strlen($ret[$i]) + strlen($word)) > $line_length)){
+            $i = $i + 1;
+          }
+          $ret[$i] .= trim($word)." ";
+        }
       }
-      $ret[$i] .= $word." ";
+      $i = $i + 1;
     }
     return $ret;
   }
-
+ 
 } 
 /**
  * Generate email field  
