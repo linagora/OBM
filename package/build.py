@@ -142,8 +142,8 @@ class SCMManager(object):
         subp.check_call(["git", "commit", "-m", "Removed snapshots for "
             "%s release" % self.version, "-a"],
                 cwd=self.checkout_dir, env=self._git_env)
-        subp.check_call("git", "tag", "-a", self.version, "-m",
-                "Tagged for %s release" % self.version, env=self._git_env)
+        subp.check_call(["git", "tag", "-a", self.version, "-m",
+                "Tagged for %s release" % self.version], env=self._git_env)
         subp.check_call(["git", "push", "--tags", "origin", self.branch],
                 cwd=self.checkout_dir, env=self._git_env)
 
