@@ -666,7 +666,7 @@ def main():
             raise ValueError("The --branch option should not be set when "
                     "the SCM repository is a local directory")
         else:
-            branch = None
+            branch = "master"
     else: 
         checkout_dir = os.path.join(args.work_dir, "sources")
         branch = args.branch if args.branch else config.get('scm', 'branch')
