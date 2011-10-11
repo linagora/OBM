@@ -275,7 +275,7 @@ class ChangelogUpdater(object):
         version = self.scm_manager.version
 
         sha1 = self.scm_manager.sha1
-        short_sha1 = sha1[:9]
+        short_sha1 = sha1[:7]
 
         changelog_date = self.date.strftime("%a, %e %b %Y %H:%M:%S +0000")
         params = dict(package_name=package_name,
