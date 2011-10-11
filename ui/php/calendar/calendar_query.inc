@@ -4199,10 +4199,13 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resourcegroup'])).")
         $multidomain";
     }
-  $query = implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id"; 
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_no_repeat_events()');
-  $obm_q->xquery($query);
-  return $obm_q;
+  if($select != null) {
+    $query = implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id";
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_no_repeat_events()');
+    $obm_q->xquery($query);
+    return $obm_q;
+  }
+  return null;
 }
 
 
@@ -4358,11 +4361,13 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resourcegroup'])).")
         $multidomain";
     }
-
-  $query = implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id"; 
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_repeat_events()');
-  $obm_q->xquery($query);
-  return $obm_q;
+  if($select!= null){
+    $query = implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id"; 
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_repeat_events()');
+    $obm_q->xquery($query);
+    return $obm_q;
+  }
+  return null;
 }
 
 
@@ -4586,103 +4591,106 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
   $of = &OccurrenceFactory::getInstance();
   $of->setBegin($start);
   $of->setEnd($end);
+  if($nr_q != null) {
   while ($nr_q->next_record()) {
-    $id = $nr_q->f('event_id');
-    $title = $nr_q->f('event_title');
-    $privacy = $nr_q->f('event_privacy');
-    $description = $nr_q->f('event_description'); 
-    $properties = $nr_q->f('event_properties');
-    $location = $nr_q->f('event_location'); 
-    $category1 = $nr_q->f('eventcategory1_label');
-    $priority = $nr_q->f('event_priority');
-    $date = new Of_Date($nr_q->f('event_date'),'GMT');
-    $color = $nr_q->f('event_color');
-    $duration = $nr_q->f('event_duration');
-    $all_day = $nr_q->f('event_allday');
-    $entity = $nr_q->f('eventlink_entity');
-    $entity_id = $nr_q->f('eventlink_entity_id');
-    $entity_state = $nr_q->f('eventlink_state');
-    $owner = $nr_q->f('event_owner');
-    $owner_name = $nr_q->f('userobm_lastname').' '.$nr_q->f('userobm_firstname');
-    $timezone = $nr_q->f('event_timezone');
-    $opacity = $nr_q->f('event_opacity');
-    $tag = $nr_q->f('eventtag_id');
-    if (isset($of->events[$id])) {
-      $event = $of->events[$id];
-      if (!$unique) {
+      $id = $nr_q->f('event_id');
+      $title = $nr_q->f('event_title');
+      $privacy = $nr_q->f('event_privacy');
+      $description = $nr_q->f('event_description'); 
+      $properties = $nr_q->f('event_properties');
+      $location = $nr_q->f('event_location'); 
+      $category1 = $nr_q->f('eventcategory1_label');
+      $priority = $nr_q->f('event_priority');
+      $date = new Of_Date($nr_q->f('event_date'),'GMT');
+      $color = $nr_q->f('event_color');
+      $duration = $nr_q->f('event_duration');
+      $all_day = $nr_q->f('event_allday');
+      $entity = $nr_q->f('eventlink_entity');
+      $entity_id = $nr_q->f('eventlink_entity_id');
+      $entity_state = $nr_q->f('eventlink_state');
+      $owner = $nr_q->f('event_owner');
+      $owner_name = $nr_q->f('userobm_lastname').' '.$nr_q->f('userobm_firstname');
+      $timezone = $nr_q->f('event_timezone');
+      $opacity = $nr_q->f('event_opacity');
+      $tag = $nr_q->f('eventtag_id');
+      if (isset($of->events[$id])) {
+        $event = $of->events[$id];
+        if (!$unique) {
+          $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
+        }
+      } else {
+        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color,$opacity,$tag);
         $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
       }
-    } else {
-      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color,$opacity,$tag);
-      $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
     }
   }
-
   // Get all repeating events and construct occurences & events model
   $r_q = run_query_calendar_repeat_events($start,$end,$calendar_entity, $status, $category_filter,$events, $opac);
-  while ($r_q->next_record()) {
-    $id = $r_q->f('event_id');
-    $title = $r_q->f('event_title');
-    $privacy = $r_q->f('event_privacy');
-    $description = $r_q->f('event_description');
-    $properties = $r_q->f('event_properties');
-    $location = $r_q->f('event_location');
-    $category1 = $r_q->f('eventcategory1_label');
-    $date = new Of_Date($r_q->f('event_date'), 'GMT');
-    $duration = $r_q->f('event_duration');
-    $repeatkind = $r_q->f('event_repeatkind');
-    $endrepeat = new Of_Date($r_q->f('event_endrepeat'), 'GMT');
-    $entity = $r_q->f('eventlink_entity');
-    $all_day = $r_q->f('event_allday');
-    $color = $r_q->f('event_color');
-    $repeatfrequence = $r_q->f('event_repeatfrequence');
-    $repeatdays = $r_q->f('event_repeatdays');
-    $entity_id = $r_q->f('eventlink_entity_id');
-    $entity_state = $r_q->f('eventlink_state');
-    $all_day = $r_q->f('event_allday');    
-    $owner = $r_q->f('event_owner');
-    $owner_name = $r_q->f('userobm_lastname').' '.$r_q->f('userobm_firstname');
-    $timezone = $r_q->f('event_timezone');
-    $opacity = $r_q->f('event_opacity');
-    $tag = $r_q->f('eventtag_id');
-    if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
-      $endrepeat = $end;
-    }
-    $addOcc = true;
-    if (isset($of->events[$id])) {
-      $event = $of->events[$id];
-      if ($unique) {
-        $addOcc = false;
+  if($r_q != null) {
+    while ($r_q->next_record()) {
+      $id = $r_q->f('event_id');
+      $title = $r_q->f('event_title');
+      $privacy = $r_q->f('event_privacy');
+      $description = $r_q->f('event_description');
+      $properties = $r_q->f('event_properties');
+      $location = $r_q->f('event_location');
+      $category1 = $r_q->f('eventcategory1_label');
+      $date = new Of_Date($r_q->f('event_date'), 'GMT');
+      $duration = $r_q->f('event_duration');
+      $repeatkind = $r_q->f('event_repeatkind');
+      $endrepeat = new Of_Date($r_q->f('event_endrepeat'), 'GMT');
+      $entity = $r_q->f('eventlink_entity');
+      $all_day = $r_q->f('event_allday');
+      $color = $r_q->f('event_color');
+      $repeatfrequence = $r_q->f('event_repeatfrequence');
+      $repeatdays = $r_q->f('event_repeatdays');
+      $entity_id = $r_q->f('eventlink_entity_id');
+      $entity_state = $r_q->f('eventlink_state');
+      $all_day = $r_q->f('event_allday');    
+      $owner = $r_q->f('event_owner');
+      $owner_name = $r_q->f('userobm_lastname').' '.$r_q->f('userobm_firstname');
+      $timezone = $r_q->f('event_timezone');
+      $opacity = $r_q->f('event_opacity');
+      $tag = $r_q->f('eventtag_id');
+      if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
+        $endrepeat = $end;
       }
-    } else {
-      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color,$opacity,$tag);
-      $event->setTimezone($timezone);
-    }
-    $tz = new DateTimeZone($timezone);
-    $date->setTimezone($tz);
-    $event_start = clone $start;
-    $event_start->setTimezone($tz); 
-    $event_start->subSecond($duration)->setHour($date)->setMinute($date)->setSecond($date);
-    $event_end = ($end->compare($endrepeat) > 0)? clone $endrepeat: clone $end; 
-    $event_end->setTimezone($tz);
-    $event_end->setHour($date)->setMinute($date)->setSecond($date)->addSecond(1);
-    if ($addOcc) {
-      switch ($repeatkind) {
-      case 'daily' :
-        calendar_daily_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
-      case 'weekly' :
-        calendar_weekly_repeatition($date,$event_start,$event_end,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
-      case 'monthlybyday' :
-        $stored = calendar_monthlybyday_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
-      case 'monthlybydate' :
-        $stored = calendar_monthlybydate_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
-      case 'yearly' :
-        $stored = calendar_yearly_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
+      $addOcc = true;
+      if (isset($of->events[$id])) {
+        $event = $of->events[$id];
+        if ($unique) {
+          $addOcc = false;
+        }
+      } else {
+        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color,$opacity,$tag);
+        $event->setTimezone($timezone);
+      }
+      $tz = new DateTimeZone($timezone);
+      $date->setTimezone($tz);
+      $event_start = clone $start;
+      $event_start->setTimezone($tz); 
+      $event_start->subSecond($duration)->setHour($date)->setMinute($date)->setSecond($date);
+      $event_end = ($end->compare($endrepeat) > 0)? clone $endrepeat: clone $end; 
+      $event_end->setTimezone($tz);
+      $event_end->setHour($date)->setMinute($date)->setSecond($date)->addSecond(1);
+      if ($addOcc) {
+        switch ($repeatkind) {
+        case 'daily' :
+          calendar_daily_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          break;
+        case 'weekly' :
+          calendar_weekly_repeatition($date,$event_start,$event_end,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          break;
+        case 'monthlybyday' :
+          $stored = calendar_monthlybyday_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          break;
+        case 'monthlybydate' :
+          $stored = calendar_monthlybydate_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          break;
+        case 'yearly' :
+          $stored = calendar_yearly_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          break;
+        }
       }
     }
   }
