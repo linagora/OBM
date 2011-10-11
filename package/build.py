@@ -77,8 +77,6 @@ class SCMManager(object):
         Checks out the sources to *checkout_dir* and retrieves the tags and
         sha1.
         """
-        self.tags = self._get_tags()
-        self.sha1 = self._get_sha1()
         # Don't do a clone if the repository is the same as checkout dir, it
         # means that the repository is a local directory - in this case we
         # assume the checkout has already been performed
@@ -97,6 +95,9 @@ class SCMManager(object):
             subp.check_call(["git", "clone", "-b", self.branch, self.scm_repository,
                 checkout_dir_name], cwd=checkout_parent_dir,
                 env=self._git_env)
+
+        self.tags = self._get_tags()
+        self.sha1 = self._get_sha1()
 
         # Attempt to checkout the version, in case it is an existing git
         # revision or tag
