@@ -129,7 +129,8 @@ class SCMManager(object):
         """
         Commits and tags changes, and triggers a pull.
         """
-        subp.check_call(["git", "commit", "-a", "Removed snapshots"],
+        subp.check_call(["git", "commit", "-m", "Removed snapshots for "
+            "%s release" % self.version, "-a"],
                 cwd=self.checkout_dir, env=self._git_env)
         subp.check_call("git", "tag", "-a", self.version, "-m",
                 "Tagged for %s release" % self.version, env=self._git_env)
