@@ -560,7 +560,7 @@ def build_argument_parser(args):
     return parser
 
 def make_package_builder(packages, checkout_dir,
-        packages_dir, scm_repository, args, config):
+        packages_dir, scm_repository, branch, args, config):
     """
     Generates the :class:`PackageBuilder` instance. The parameters are:
         - *packages*: a list of :class:`Packager` objects to build 
@@ -568,11 +568,11 @@ def make_package_builder(packages, checkout_dir,
         - *packages_dir*: the directory where the packages will be built
           template
         - *scm_repository*: the URL or path of the SCM repository
+        - *branch*: the branch to checkout
         - *args*: an instance of :class:`argparse.Namespace`
         - *config*: an instance of :class:`ConfigParser.RawConfigParser`
     """
 
-    branch = args.branch if args.branch else config.get('scm', 'branch')
     scm_manager = SCMManager(scm_repository, branch, checkout_dir,
             args.release_version)
 
@@ -654,13 +654,21 @@ def main():
     args = argument_parser.parse_args()
 
     scm_repository = args.repository if args.repository else config.get('scm', 'repository')
+    branch = None
     checkout_dir = None
     if os.path.isdir(scm_repository):
         logging.info("The SCM repository is a local directory, no checkout "
                 "will be performed")
         checkout_dir = scm_repository
+        if args.branch is not None:
+            raise ValueError("The --branch option should not be set when "
+                    "the SCM repository is a local directory")
+        else:
+            branch = None
     else: 
         checkout_dir = os.path.join(args.work_dir, "sources")
+        branch = args.branch if args.branch else config.get('scm', 'branch')
+
     packages_dir = os.path.join(args.work_dir, args.package_type)
 
     config = read_config(args.configuration_file)
@@ -681,7 +689,7 @@ def main():
 
     package_builder = make_package_builder(packages, 
             checkout_dir, packages_dir, scm_repository,
-            args, config)
+            branch, args, config)
     package_builder.build()
 
 if __name__ == "__main__":
