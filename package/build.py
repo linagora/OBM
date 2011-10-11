@@ -477,7 +477,7 @@ class PackageBuilder(object):
 
         if self.deployer:
             self.deployer.deploy()
-            if self.pom_updaters and not is_rebuild:
+            if self.pom_updater and not is_rebuild:
                 self.scm_manager.commit()
 
 class PackagingError(StandardError):
