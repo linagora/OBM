@@ -8,7 +8,7 @@ Standards-Version: 3.7.8
 
 Package: obm-solr
 Architecture: all
-Depends: python-psycopg2, python-mysqldb, obm-conf
+Depends: obm-tomcat, python-psycopg2, python-mysqldb, obm-conf
 Description: Solr indexing server
  Solr is an indexing web service based on lucene, configured as
  multicore for holding minig-backend index.
