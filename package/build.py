@@ -96,6 +96,12 @@ class SCMManager(object):
                 checkout_dir_name], cwd=checkout_parent_dir,
                 env=self._git_env)
 
+<<<<<<< HEAD
+=======
+        self.tags = self._get_tags()
+        self.sha1 = self._get_sha1()
+
+>>>>>>> 19b108d8d661bcec2e9dc14d15fa9f4a482c313b
         # Attempt to checkout the version, in case it is an existing git
         # revision or tag
         if self.version:
@@ -111,6 +117,7 @@ class SCMManager(object):
         else:
             last_tag = self.tags[-1]
             self.version = self._increment_tag(last_tag)
+<<<<<<< HEAD
         self.tags = self._get_tags()
         self.sha1 = self._get_sha1()
 
@@ -123,6 +130,27 @@ class SCMManager(object):
         output = subp.check_output(["git", "rev-parse", "HEAD"],
                 cwd=self.checkout_dir)
         sha1 = output.split("\n")[0]
+=======
+
+    def _get_tags(self):
+        proc = subp.Popen(["git", "tag"],
+		cwd=self.checkout_dir, stdout=subp.PIPE)
+        stdout, stderr = proc.communicate()
+        if proc.returncode != 0:
+            raise PackagingError("The git tag process failed with return "
+                    "code %d" % proc.returncode)
+        tags = [line for line in stdout.split("\n") if line]
+        return tags
+
+    def _get_sha1(self):
+        proc = subp.Popen(["git", "rev-parse", "HEAD"],
+                cwd=self.checkout_dir, stdout=subp.PIPE)
+        stdout, stderr = proc.communicate()
+        if proc.returncode != 0:
+            raise PackagingError("The git rev-parse process failed with return "
+                    "code %d" % proc.returncode)
+        sha1 = stdout.split("\n")[0]
+>>>>>>> 19b108d8d661bcec2e9dc14d15fa9f4a482c313b
         return sha1
 
     def commit(self):
@@ -132,8 +160,13 @@ class SCMManager(object):
         subp.check_call(["git", "commit", "-m", "Removed snapshots for "
             "%s release" % self.version, "-a"],
                 cwd=self.checkout_dir, env=self._git_env)
+<<<<<<< HEAD
         subp.check_call("git", "tag", "-a", self.version, "-m",
                 "Tagged for %s release" % self.version, env=self._git_env)
+=======
+        subp.check_call(["git", "tag", "-a", self.version, "-m",
+                "Tagged for %s release" % self.version], env=self._git_env)
+>>>>>>> 19b108d8d661bcec2e9dc14d15fa9f4a482c313b
         subp.check_call(["git", "push", "--tags", "origin", self.branch],
                 cwd=self.checkout_dir, env=self._git_env)
 
@@ -583,11 +616,19 @@ def make_package_builder(packages, checkout_dir,
         deployer = PackageDeployer(args.host, packages_dir)
 
     pom_packages = []
+<<<<<<< HEAD
+=======
+    pom_updater = None
+>>>>>>> 19b108d8d661bcec2e9dc14d15fa9f4a482c313b
     if not args.on_commit:
         for package in packages:
             if package.update_pom:
                 pom_packages.append(package)
+<<<<<<< HEAD
     pom_updater = PomUpdater(pom_packages)
+=======
+        pom_updater = PomUpdater(pom_packages)
+>>>>>>> 19b108d8d661bcec2e9dc14d15fa9f4a482c313b
 
 
     changelog_updater = None
@@ -655,6 +696,10 @@ def main():
     argument_parser = build_argument_parser(sys.argv)
     args = argument_parser.parse_args()
 
+<<<<<<< HEAD
+=======
+    config = read_config(args.configuration_file)
+>>>>>>> 19b108d8d661bcec2e9dc14d15fa9f4a482c313b
     scm_repository = args.repository if args.repository else config.get('scm', 'repository')
     branch = None
     checkout_dir = None
@@ -673,7 +718,10 @@ def main():
 
     packages_dir = os.path.join(args.work_dir, args.package_type)
 
+<<<<<<< HEAD
     config = read_config(args.configuration_file)
+=======
+>>>>>>> 19b108d8d661bcec2e9dc14d15fa9f4a482c313b
     available_packages = read_packages(config, checkout_dir)
 
     package_names = set(args.packages)
