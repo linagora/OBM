@@ -317,7 +317,7 @@ class Packager(object):
         - *package_type*: should be either `deb` or `rpm`
         - *build_dir*: the path to the work directory where the packages will be
           built
-        - *scm_manager*: an instance of :class:`SMManager`
+        - *scm_manager*: an instance of :class:`SCMManager`
         - *changelog_updater*: an instance of :class:`ChangelogUpdater` (may be
           **None**)
     """
