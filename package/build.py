@@ -552,7 +552,7 @@ def build_argument_parser(args):
             'the packages will be built')
 
     goals = ['build', 'release']
-    parser.add_argument('goal', metavar='GOAL', help="action to do, maybe one of: %s" % \
+    parser.add_argument('goal', metavar='GOAL', help="action to do, may be one of: %s" % \
             (", ".join(goals)), choices=goals)
 
     parser.add_argument('packages', metavar='PACKAGES', nargs='+',
