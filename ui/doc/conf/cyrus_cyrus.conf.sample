@@ -9,7 +9,7 @@ START {
 	recover		cmd="/usr/sbin/ctl_cyrusdb -r"
   
 	# this is only necessary if idlemethod is set to "idled" in imapd.conf
-	#idled		cmd="idled"
+	idled		cmd="idled"
 
 	# this is useful on backend nodes of a Murder cluster
 	# it causes the backend to syncronize its mailbox list with

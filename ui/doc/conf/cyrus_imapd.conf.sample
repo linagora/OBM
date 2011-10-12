@@ -333,7 +333,7 @@ lmtpsocket: /var/run/cyrus/socket/lmtp
 # however it doesn't update as quickly as the idled backend does. "no"
 # turns off IDLE support. If set to "idled", you will also need to enable
 # the "idled" entry in cyrus.conf.
-idlemethod: poll
+idlemethod: idled
 
 # Unix domain socket that idled listens on.
 idlesocket: /var/run/cyrus/socket/idle
