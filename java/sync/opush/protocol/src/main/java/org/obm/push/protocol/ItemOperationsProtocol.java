@@ -51,19 +51,22 @@ public class ItemOperationsProtocol {
 
 	/* package */ Fetch buildFetch(Element root) {
 		Element fetchNode = DOMUtils.getUniqueElement(root, "Fetch");
-		StoreName storeName = StoreName.getValue(DOMUtils.getElementText(fetchNode,	"Store"));
-		String reference = DOMUtils.getElementText(fetchNode, "FileReference");
-		String collectionId = DOMUtils.getElementText(fetchNode, "CollectionId");
-		String serverId = DOMUtils.getElementText(fetchNode, "ServerId");
-		Integer type = Integer.getInteger(DOMUtils.getElementText(fetchNode, "Type"));
-		
-		Fetch fetch = new Fetch();
-		fetch.setStoreName(storeName);
-		fetch.setFileReference(reference);
-		fetch.setCollectionId(collectionId);
-		fetch.setServerId(serverId);
-		fetch.setType(type);
-		return fetch;
+		if (fetchNode != null) {
+			StoreName storeName = StoreName.getValue(DOMUtils.getElementText(fetchNode,	"Store"));
+			String reference = DOMUtils.getElementText(fetchNode, "FileReference");
+			String collectionId = DOMUtils.getElementText(fetchNode, "CollectionId");
+			String serverId = DOMUtils.getElementText(fetchNode, "ServerId");
+			Integer type = Integer.getInteger(DOMUtils.getElementText(fetchNode, "Type"));
+
+			Fetch fetch = new Fetch();
+			fetch.setStoreName(storeName);
+			fetch.setFileReference(reference);
+			fetch.setCollectionId(collectionId);
+			fetch.setServerId(serverId);
+			fetch.setType(type);
+			return fetch;
+		}
+		return null;
 	}
 
 	// <?xml version="1.0" encoding="UTF-8"?>
@@ -77,13 +80,16 @@ public class ItemOperationsProtocol {
 	// </ItemOperations>
 	private EmptyFolderContentsRequest buildEmptyFolderContents(Element root) {
 		Element emptyFolder = DOMUtils.getUniqueElement(root, "EmptyFolderContents");
-		int collectionId = Integer.valueOf(DOMUtils.getElementText(emptyFolder, "CollectionId"));
-		Element deleteSubFolderElem = DOMUtils.getUniqueElement(emptyFolder, "DeleteSubFolders");
-		
-		EmptyFolderContentsRequest emptyFolderContents = new EmptyFolderContentsRequest();
-		emptyFolderContents.setCollectionId(collectionId);
-		emptyFolderContents.setDeleteSubFolderElem(deleteSubFolderElem != null);
-		return emptyFolderContents;
+		if (emptyFolder != null) {
+			int collectionId = Integer.valueOf(DOMUtils.getElementText(emptyFolder, "CollectionId"));
+			Element deleteSubFolderElem = DOMUtils.getUniqueElement(emptyFolder, "DeleteSubFolders");
+
+			EmptyFolderContentsRequest emptyFolderContents = new EmptyFolderContentsRequest();
+			emptyFolderContents.setCollectionId(collectionId);
+			emptyFolderContents.setDeleteSubFolderElem(deleteSubFolderElem != null);
+			return emptyFolderContents;
+		}
+		return null;
 	}
 
 	private boolean isAcceptGZip(ActiveSyncRequest request) {
