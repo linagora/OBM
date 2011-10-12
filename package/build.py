@@ -610,7 +610,7 @@ def make_package_builder(packages, checkout_dir,
         for package in packages:
             if package.update_pom:
                 pom_packages.append(package)
-        pom_updater = PomUpdater(pom_packages)
+        pom_updater = None
 
 
     changelog_updater = None
