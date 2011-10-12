@@ -1,11 +1,13 @@
 package org.obm.push.data;
 
 
-import java.io.ByteArrayInputStream;
+import static org.obm.push.TestUtils.getXml;
+
 import java.io.IOException;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +17,7 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.protocol.data.CalendarDecoder;
-import org.obm.push.utils.DOMUtils;
+import org.obm.sync.calendar.EventExtId;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -98,8 +100,30 @@ private CalendarDecoder decoder;
 		Assert.assertEquals(type, att.getAttendeeType());
 	}
 	
-	private Document getXml(String data) throws SAXException, IOException, FactoryConfigurationError{
-		return DOMUtils.parse(new ByteArrayInputStream(data.getBytes()));
+	@Test
+	public void testDecodeUID() throws SAXException, IOException, FactoryConfigurationError {
+		String xml = "<ApplicationData>" 
+						+ "<AllDayEvent>0</AllDayEvent>"
+						+ "<StartTime>20100217T120000Z</StartTime>"
+						+ "<EndTime>20100217T130000Z</EndTime>"
+						+ "<DTStamp>20111012T075834Z</DTStamp>"
+						+ "<Subject>Déj Confort Inn</Subject>"
+						+ "<Sensitivity>2</Sensitivity>"
+						+ "<OrganizerEmail>xxx@linagora.com</OrganizerEmail>"
+						+ "<UID>63666534363435652d343136382d313032662d626535652d303031353137366637393232</UID>"
+						+ "<BusyStatus>2</BusyStatus>"
+						+ "<MeetingStatus>1</MeetingStatus>"
+						+ "<OrganizerName>Xxx XXX</OrganizerName>"
+						+ "</ApplicationData>";
+		
+		Document doc = getXml(xml);
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent) data;
+		Assertions.assertThat(event.getExtId())
+			.isNotNull()
+			.isInstanceOf(EventExtId.class)
+			.isEqualTo(new EventExtId("cfe4645e-4168-102f-be5e-0015176f7922"));
 	}
 	
 }

@@ -30,7 +30,7 @@ public class ItemOperationsProtocol {
 	private final EncoderFactory encoderFactory;
 
 	@Inject
-	private ItemOperationsProtocol(EncoderFactory encoderFactory) {
+	/* package */ ItemOperationsProtocol(EncoderFactory encoderFactory) {
 		this.encoderFactory = encoderFactory;
 	}
 	
@@ -49,7 +49,7 @@ public class ItemOperationsProtocol {
 		return itemOperationsRequest;
 	}
 
-	private Fetch buildFetch(Element root) {
+	/* package */ Fetch buildFetch(Element root) {
 		Element fetchNode = DOMUtils.getUniqueElement(root, "Fetch");
 		StoreName storeName = StoreName.getValue(DOMUtils.getElementText(fetchNode,	"Store"));
 		String reference = DOMUtils.getElementText(fetchNode, "FileReference");
