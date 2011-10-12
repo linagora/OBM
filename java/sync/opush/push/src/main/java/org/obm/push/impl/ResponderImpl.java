@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
+import org.obm.push.wbxml.WBXmlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -25,18 +26,22 @@ public class ResponderImpl implements Responder {
 	@Override
 	public void sendResponse(String defaultNamespace, Document doc) {
 		logger.debug("response: send response");
+		if (logger.isDebugEnabled()) {
+			DOMDumper.dumpXml(logger, doc);
+		}
+		
 		try {
-			if (logger.isDebugEnabled()) {
-				DOMDumper.dumpXml(logger, doc);
-			}
 			byte[] wbxml = WBXMLTools.toWbxml(defaultNamespace, doc);
 			resp.setContentType("application/vnd.ms-sync.wbxml");
 			resp.setContentLength(wbxml.length);
+			
 			ServletOutputStream out = resp.getOutputStream();
 			out.write(wbxml);
 			out.flush();
 			out.close();	
 		} catch (IOException e) {
+			logger.warn(e.getMessage(), e);
+		} catch (WBXmlException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}

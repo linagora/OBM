@@ -14,7 +14,7 @@ import org.xml.sax.SAXException;
 
 public class WBXMLToolsTest {
 	@Test
-	public void testToWbxmlWithAccents() throws IOException, SAXException, FactoryConfigurationError{
+	public void testToWbxmlWithAccents() throws IOException, SAXException, FactoryConfigurationError, WBXmlException{
 		String expectedString = "éàâè";
 		
 		String xmlActiveSync = 

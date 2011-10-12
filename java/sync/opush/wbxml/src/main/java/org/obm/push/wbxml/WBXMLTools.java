@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 
+import javax.xml.transform.TransformerException;
+
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.wbxml.parsers.WbxmlEncoder;
 import org.obm.push.wbxml.parsers.WbxmlParser;
@@ -95,7 +97,7 @@ public class WBXMLTools {
 	}
 
 	public static byte[] toWbxml(String defaultNamespace, Document doc)
-			throws IOException {
+			throws WBXmlException, IOException {
 		WbxmlEncoder encoder = new WbxmlEncoder(defaultNamespace);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
@@ -106,15 +108,12 @@ public class WBXMLTools {
 			encoder.convert(is, out);
 			byte[] ret = out.toByteArray();
 
-			// storeWbxml(ret);
-			// logger.info("reconverted version");
-			// DOMUtils.logDom(toXml(ret));
-
 			return ret;
-		} catch (Exception e) {
-			throw new IOException(e);
+		} catch (SAXException e) {
+			throw new WBXmlException("error during wbxml encoding", e);
+		} catch (TransformerException e) {
+			throw new WBXmlException("error during wbxml encoding", e);
 		}
-
 	}
 
 }
