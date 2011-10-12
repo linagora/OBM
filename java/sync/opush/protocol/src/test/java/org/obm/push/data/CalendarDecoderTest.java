@@ -125,5 +125,5 @@ public class CalendarDecoderTest {
 			.isNotNull()
 			.isInstanceOf(EventExtId.class)
 			.isEqualTo(new EventExtId("cfe4645e-4168-102f-be5e-0015176f7922"));
-	}	
+	}
 }
