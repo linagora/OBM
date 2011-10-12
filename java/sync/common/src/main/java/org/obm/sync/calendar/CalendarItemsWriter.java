@@ -102,7 +102,9 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 			createIfNotNull(e, "recurrenceId", DateHelper.asString(ev
 					.getRecurrenceId()));
 		}
-		createIfNotNull(e, "extId", ev.getExtId().serializeToString());
+		if (ev.getExtId() != null) {
+			createIfNotNull(e, "extId", ev.getExtId().serializeToString());
+		}
 		if(ev.getOpacity() == null){
 			ev.setOpacity(EventOpacity.OPAQUE);
 		}

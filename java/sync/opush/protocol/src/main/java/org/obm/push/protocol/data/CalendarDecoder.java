@@ -2,6 +2,8 @@ package org.obm.push.protocol.data;
 
 import java.util.ArrayList;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
@@ -30,9 +32,10 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 				syncData, "OrganizerName")));
 		calendar.setOrganizerEmail(parseDOMString(DOMUtils.getUniqueElement(
 				syncData, "OrganizerEmail")));
-		String extId = parseDOMString(DOMUtils.getUniqueElement(syncData, "UID"));
+		Element uidElement = DOMUtils.getUniqueElement(syncData, "UID");
+		EventExtId extId = getExtIdFromElement(uidElement);
 		if (extId != null) {
-			calendar.setExtId(new EventExtId(extId));
+			calendar.setExtId(extId);
 		}
 		calendar.setTimeZone(parseDOMTimeZone(DOMUtils.getUniqueElement(
 				syncData, "TimeZone")));
@@ -201,6 +204,19 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		}
 
 		return calendar;
+	}
+
+	private EventExtId getExtIdFromElement(Element uidElement) {
+		try {
+			String uidAsString = parseDOMString(uidElement);
+			if (uidAsString != null) {
+				String decodedUid = new String(Hex.decodeHex(uidAsString.toCharArray()));
+				return new EventExtId(decodedUid);
+			}
+		} catch (DecoderException e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
 	}
 
 	void setEventCalendar(MSEvent calendar, Element domSource) {

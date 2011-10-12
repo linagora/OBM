@@ -22,7 +22,8 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class CalendarDecoderTest {
-private CalendarDecoder decoder;
+	
+	private CalendarDecoder decoder;
 	
 	@Before
 	public void prepareEventConverter(){
@@ -124,6 +125,5 @@ private CalendarDecoder decoder;
 			.isNotNull()
 			.isInstanceOf(EventExtId.class)
 			.isEqualTo(new EventExtId("cfe4645e-4168-102f-be5e-0015176f7922"));
-	}
-	
+	}	
 }
