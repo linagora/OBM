@@ -54,4 +54,15 @@ function check_mailbox_update_rights($params) {
 }
 
 
+function get_user_login($id) {
+  global $cdg_sql;
+
+  $id = sql_parse_id($id, true);
+  $query = "SELECT userobm_login FROM UserObm WHERE userobm_id $id ";
+  display_debug_msg($query, $cdg_sql, 'get_user_login()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q->f('userobm_login');
+}
 </script>
