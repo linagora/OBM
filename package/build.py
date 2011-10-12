@@ -44,19 +44,25 @@ class SCMManager(object):
     committed, it can be either **None** (in which case the version used will be
     the last tag, with its number incremented), an existing revision or tag (in
     which case it will be checked out) or a commit object which does not exist yet.
+    The *push_to_remote* argument determines whether the changes will be pushed
+    to a remote repository.
     """
 
     GIT_CHECKOUT_FAILURE_CODE = 1
 
-    def __init__(self, scm_repository, branch, checkout_dir, version=None):
+    def __init__(self, scm_repository, branch, checkout_dir, push_to_remote,
+            version=None):
         self.scm_repository = scm_repository
         self.branch = branch
         self.checkout_dir = checkout_dir
+        self.push_to_remote = push_to_remote
         self.version = version
         self.is_existing_revision = None
         self.tags = None
         self.sha1 = None
         self._git_env = {'GIT_SSL_NO_VERIFY': '0'}
+        if 'HOME' in os.environ:
+            self._git_env['HOME'] = os.environ['HOME']
 
     def _increment_tag(self, last_tag):
 
@@ -143,9 +149,11 @@ class SCMManager(object):
             "%s release" % self.version, "-a"],
                 cwd=self.checkout_dir, env=self._git_env)
         subp.check_call(["git", "tag", "-a", self.version, "-m",
-                "Tagged for %s release" % self.version], env=self._git_env)
-        subp.check_call(["git", "push", "--tags", "origin", self.branch],
-                cwd=self.checkout_dir, env=self._git_env)
+                "Tagged for %s release" % self.version], env=self._git_env,
+                cwd=self.checkout_dir)
+        if self.push_to_remote:
+            subp.check_call(["git", "push", "--tags", "origin", self.branch],
+                    cwd=self.checkout_dir, env=self._git_env)
 
 class NS:
     def __init__(self, uri):
@@ -554,6 +562,10 @@ def build_argument_parser(args):
     parser.add_argument('-b', '--branch', help='branch to checkout',
             default=None)
 
+    parser.add_argument('--pushtoremote', help='push changes to '
+            'remote repository', default=False, action='store_true',
+            dest='push_to_remote')
+
     package_types = ['deb', 'rpm']
     parser.add_argument('-p', '--packagetype', metavar='PACKAGETYPE',
             help="package type, may be one of: %s" % ", ".join(package_types),
@@ -586,7 +598,7 @@ def make_package_builder(packages, checkout_dir,
     """
 
     scm_manager = SCMManager(scm_repository, branch, checkout_dir,
-            args.release_version)
+            args.push_to_remote, args.release_version)
 
     deployer = None
     if args.goal == 'release':
