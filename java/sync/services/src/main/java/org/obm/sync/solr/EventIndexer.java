@@ -2,7 +2,7 @@ package org.obm.sync.solr;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,7 +88,7 @@ public class EventIndexer implements Runnable {
 	private boolean doIndex() {
 		SolrInputDocument sid = new SolrInputDocument();
 
-		f(sid, "id", e.getUid());
+		f(sid, "id", e.getUid().getObmId());
 		f(sid, "timecreate", e.getTimeCreate());
 		f(sid, "timeupdate", e.getTimeUpdate());
 
@@ -132,14 +132,14 @@ public class EventIndexer implements Runnable {
 
 		Connection con = null;
 		ResultSet rs = null;
-		Statement st = null;
+		PreparedStatement st = null;
 		try {
 			con = obmHelper.getConnection();
-			st = con.createStatement();
+			st = con.prepareStatement("SELECT eventtag_label FROM Event " +
+                    "INNER JOIN EventTag ON event_tag_id=eventtag_id WHERE event_id=?");
 			// query tag...
-			rs = st.executeQuery("SELECT eventtag_label FROM Event "
-					+ "INNER JOIN EventTag ON event_tag_id=eventtag_id WHERE event_id="
-					+ e.getUid());
+			st.setInt(1, e.getUid().getObmId());
+			rs = st.executeQuery();
 			if (rs.next()) {
 				f(sid, "tag", rs.getString(1));
 			}

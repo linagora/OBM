@@ -123,7 +123,7 @@ public class SolrHelper {
 
 	public void delete(Event e) {
 		logger.info("[event " + e.getUid() + "] scheduled for solr removal");
-		Remover rm = new Remover(sEvent, e.getUid().toString());
+		Remover rm = new Remover(sEvent, Integer.toString(e.getUid().getObmId()));
 		executor.execute(rm);
 	}
 
