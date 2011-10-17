@@ -38,14 +38,14 @@
 	<repositories>
 		<repository>
 			<id>central</id>
-			<url>http://hudson-obm.linagora.com:8081/artifactory/repo</url>
+			<url>http://ci-obm.linagora.com/artifactory/repo</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 		<repository>
 			<id>snapshots</id>
-			<url>http://hudson-obm.linagora.com:8081/artifactory/repo</url>
+			<url>http://ci-obm.linagora.com/artifactory/repo</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
