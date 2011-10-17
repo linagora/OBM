@@ -1168,6 +1168,21 @@ function dis_calendar_draw($current_view, $ndays) {
   return dis_calendar_html_agenda($current_view, $calendar_entity, $writable_entity, $date, $end, $ndays, true);
 }
 
+/**
+ * Tests if the currently logged in user can write in a given calendar.
+ */
+function can_write_in_calendar($calendar_entity) {
+    $can_write_in_calendar = false;
+    foreach ($calendar_entity as $type => $entity) {
+      foreach ($entity as $id => $data) {
+        if (OBM_Acl::canWrite($GLOBALS[obm][uid], 'calendar', $id)) {
+            $can_write_in_calendar = true;
+            break;
+        }
+      }
+    }
+    return $can_write_in_calendar;
+}
 
 /**
  * Display the HTML calendar view
@@ -1299,15 +1314,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   } else {
     $dis_week = "<a href='javascript: void(0)' onclick='obm.calendarManager.showWeek($ts)'>$week_num</a>";
 
-    $can_write_in_calendar = false;
-    foreach ($calendar_entity as $type => $entity) {
-      foreach ($entity as $id => $data) {
-        if (OBM_Acl::canWrite($GLOBALS[obm][uid], 'calendar', $id)) {
-            $can_write_in_calendar = true;
-            break;
-        }
-      }
-    }
+    $can_write_in_calendar = can_write_in_calendar($calendar_entity);
     if ($can_write_in_calendar) {
         $dis_grid_action = "
           onmousedown='obm.calendarManager.newDummyEvent(event);' 
@@ -1440,7 +1447,6 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   $dis_week_time = "obm.vars.consts.weekTime = new Array();";
   $dis_weekbegin_time = "obm.vars.consts.weekBegin = new Array();";
   $tags = array();
-
   // calendar grid
   $weeks = 100/ceil((($end->getTimestamp() - $date->getTimestamp())/86400)/7);
 
@@ -1532,10 +1538,13 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
   if ($action == 'portlet') {
     $dis_header_action = "";
   } else {
-    $dis_header_action = "onmouseover='if(obm.calendarManager) obm.calendarManager.newAlldayDummyEventHighlight(event);'
-      onmousedown='obm.calendarManager.newAlldayDummyEvent(event);'
-      onmouseup='obm.calendarManager.newAlldayDummyEvent(event);'
-      ondblclick='obm.calendarQuickForm.compute(event);'";
+    $can_write_in_calendar = can_write_in_calendar($calendar_entity);
+    if ($can_write_in_calendar) {
+        $dis_header_action = "onmouseover='if(obm.calendarManager) obm.calendarManager.newAlldayDummyEventHighlight(event);'
+          onmousedown='obm.calendarManager.newAlldayDummyEvent(event);'
+          onmouseup='obm.calendarManager.newAlldayDummyEvent(event);'
+          ondblclick='obm.calendarQuickForm.compute(event);'";
+    }
   }
 
   $block = "
