@@ -79,13 +79,22 @@ public final class DOMUtils {
 	}
 
 	public static String getElementText(Element node) {
-		Text txtElem = (Text) node.getFirstChild();
-		if (txtElem == null) {
-			return null;
+		if (isTextElement(node)) {
+			Text txtElem = (Text) node.getFirstChild();
+			if (txtElem != null) {
+				return txtElem.getData();
+			}
 		}
-		return txtElem.getData();
+		return null;
 	}
 
+	private static boolean isTextElement(Element node) {
+		if (node.getFirstChild() instanceof Text) {
+			return true;
+		}
+		return false;
+	}
+	
 	public static String[] getTexts(Element root, String elementName) {
 		NodeList list = root.getElementsByTagName(elementName);
 		String[] ret = new String[list.getLength()];
