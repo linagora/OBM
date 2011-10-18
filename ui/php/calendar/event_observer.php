@@ -55,6 +55,7 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
   private $resource;
   private $contact;
   private $sequence;
+  private $ics_files = array();
 
 
   /**
@@ -71,6 +72,16 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
     $this->resource = array();
     $this->contact = array();
     $this->date_exception = array();
+  }
+
+  /**
+   * Delete all ICS file registered in this event
+   * @return void
+   */
+  public function __destruct() {
+    foreach ($this->ics_files as $ics_file) {
+      unlink($ics_file);
+    }
   }
 
   /**
@@ -238,6 +249,42 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
     }
   }
 
+  private function get_ics_file_key($method, $include_attachments = false) {
+    return $method . ($include_attachments ? '-include' : '-notinclude');
+  }
+
+  public static function generateIcs($event, $method, $userId, $include_attachments = false) {
+    include_once('obminclude/of/vcalendar/writer/ICS.php');
+    include_once('obminclude/of/vcalendar/reader/OBM.php');
+    
+    $reader = new Vcalendar_Reader_OBM(array('user' => array($userId => 'dummy')), array($event->id));
+    $document = $reader->getDocument($method, $include_attachments);
+    $writer = new Vcalendar_Writer_ICS();  
+    $writer->writeDocument($document);
+
+    $tmpFilename = secure_tmpname('.ics','ics_');
+    $res = fopen($tmpFilename, 'w');
+
+    if (!$res) {
+      throw new Exception('Unable to open file');
+    }
+    fputs($res, $writer->buffer);
+    fclose($res);
+    return $tmpFilename;
+  }
+
+  /**
+   * Return the ICS filename, generate the file if needed
+   * @param $method string The ICS METHOD (cf RFC5545) to use
+   * @param $include_attachments boolean Include documents links
+   */
+  public function getIcs($userId, $method, $include_attachments = false) {
+    $key = $this->get_ics_file_key($method, $include_attachments);
+    if ( !array_key_exists($key, $this->ics_files) || !file_exists($this->ics_files[$key]) ) {
+      $this->ics_files[$key] = OBM_Event::generateIcs($this, $method, $userId, $include_attachments);
+    }
+    return $this->ics_files[$key];
+  }
 }
 
 /**
@@ -363,10 +410,9 @@ class OBM_EventAttendee {
  * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
  * @license GPL 2.0
  */
-class OBM_EventFactory /*Implements OBM_Subject*/{
+class OBM_EventFactory extends OBM_ASubject {
 
   private static $instance;
-  private $observers;
   private $db;
  
   /**
@@ -376,7 +422,7 @@ class OBM_EventFactory /*Implements OBM_Subject*/{
    * @return void
    */
   protected function __construct() {
-    $this->observers = array();
+    parent::__construct();
     $this->db = new DB_OBM;
   }
  
@@ -392,32 +438,6 @@ class OBM_EventFactory /*Implements OBM_Subject*/{
       self::$instance = new self;
     }
     return self::$instance;
-  }
-
-
-  /**
-   * @see OBM_Subject::attach 
-   */
-  public function attach($observer) {
-    $this->observers[] = $observer;
-  }
-
-  /**
-   * @see OBM_Subject::detach 
-   */
-  public function detach($observer) {
-    $index = array_search($observer, $this->observers);
-    if($index !== false) {
-      unset($this->observers[$index]);
-    }
-  }
-  /**
-   * @see OBM_Subject::notify 
-   */
-  public function notify($old, $new) {
-    foreach($this->observers as $observer) {
-      $observer->update($old, $new);
-    }
   }
 
   /**
@@ -556,7 +576,7 @@ class OBM_EventFactory /*Implements OBM_Subject*/{
  * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
  * @license GPL 2.0
  */
-class OBM_EventMailObserver /*implements  OBM_Observer*/{
+class OBM_EventMailObserver implements  OBM_IObserver {
 
   private $mailer;
   private static $cache;
@@ -573,7 +593,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
   }
   
   /**
-   * @see OBM_Observer::update
+   * @see OBM_IObserver::update
    */
   public function update($old, $new) {
     if($old === null) {
@@ -656,6 +676,11 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
       run_query_increment_sequence($eventId);
     }
 */
+    // we send mail if the parameters we got through UI tells us so
+    if ( !$GLOBALS["send_notification_mail"] ) {
+        return ;
+    }
+
     if(!$this->mustBeSent($old, $new))
       return false;
 
@@ -992,3 +1017,114 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
   }
 }
 
+/**
+ * This class define a basic Observer.
+ * Any class can easily register any OBM_IObserver by subclassing OBM_ASubject.
+ */
+interface OBM_IObserver {
+  /**
+   * Function called when the subject is modified
+   * @param mixed $old A representation of the old version of the subject
+   * @param mixed $nex A representation of the new version of the subject
+   */
+  public function update($old, $new);
+}
+
+/**
+ * This class implements basic operations needed by a Subject.
+ */
+abstract class OBM_ASubject {
+  private $observers;
+
+  protected function __construct() {
+    $this->observers = array();
+  }
+
+  /**
+   * Register an OBM_IObserver
+   * @param OBM_IObserver $observer The observer to register
+   */
+  public function attach($observer) {
+    if (self::isObserver($observer)) {
+      $this->observers[] = $observer;
+    } else {
+      throw new OBM_ObserverException("This object does not implements OBM_IObserver (type is : " . get_class($observers) . ".\n");
+    }
+  }
+
+  /**
+   * Unregister an OBM_IObserver
+   * @param OBM_IObserver $observer The observer to unregister
+   */
+  public function detach($observer) {
+    if (self::isObserver($observer)) {
+      $index = array_search($observer, $this->observers);
+      if($index !== false) {
+        unset($this->observers[$index]);
+      }
+    } else {
+      throw new OBM_ObserverException("This object does not implements OBM_IObserver (type is : " . get_class($observers) . ".\n");
+    }
+  }
+
+  /**
+   * Notify all registered OBM_IObserver
+   * @param mixed $old Optional represensation of the subject before it has been changed.
+   * @param mixed $new Optional represensation of the subject after it has been changed.
+   */
+  public function notify($old = null, $new = null) {
+    foreach($this->observers as $observer) {
+      $observer->update($old, $new);
+    }
+  }
+
+  private static function isObserver($candidate) {
+    $array = class_implements($candidate);
+    $index = array_search('OBM_IObserver', $array);
+    return ($index !== false);
+  }
+}
+
+/**
+ * A simple Observer, which print OBM_Event properties into a file (useful for debug)
+ */
+class OBM_EventDebugObserver implements OBM_IObserver {
+
+  private $event_prop_names = array(
+                                    'id', 'uid', 'title', 'owner', 'opacity',
+                                    'allday', 'location', 'category1',
+                                    'privacy', 'date_begin', 'date_end',
+                                    'duration', 'priority', 'color',
+                                    'repeat_kind', 'repeatfrequency', 
+                                    'repeat_end', 'date_exception',
+                                    'description', 'event_duration', 
+                                    'repeat_days', 'user', 'resource', 'contact',
+                                    );
+
+  public function update($old, $new) {
+    $h = fopen("/tmp/debug", "a");
+    fputs($h, "OBM_EventDebugObserver->update :\n");
+    if ($old == null && $new == null) {
+      fputs($h, "BOTH null !\n");
+    }
+    if ($old != null) {
+      fputs($h, "\tOLD :\n");
+      foreach ($this->event_prop_names as $prop_name) {
+        $prop_value = $old->get($prop_name);
+        fputs($h, "\t$prop_name\t\t: $prop_value -\n");
+      }
+    }
+    if ($new != null) {
+      fputs($h, "\tNEW :\n");
+      foreach ($this->event_prop_names as $prop_name) {
+        $prop_value = $new->get($prop_name);
+        fputs($h, "\t$prop_name\t\t: $prop_value -\n");
+      }
+//       fputs($h, var_export($new));
+    }
+    fclose($h);
+  }
+
+}
+
+class OBM_ObserverException extends Exception {}

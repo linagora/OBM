@@ -98,7 +98,10 @@ if (isset($params['group_view']) && ($params['group_view']!=$current_view->get_g
 if ($set_date || !isset($_SESSION['cal_current_view'])) {
   $current_view->set_date($params['date']);
 }
-
+// Set the GLOBALS for email, checked by ??
+if (! isset($GLOBALS['send_notification_mail'])) {
+  $GLOBALS['send_notification_mail'] = isset($params['send_mail']) ? $params['send_mail'] : false;
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 $extra_css[] = $css_calendar;
@@ -144,6 +147,8 @@ $perm->check_permissions($module, $action);
 page_close();
 
 OBM_EventFactory::getInstance()->attach(new OBM_EventMailObserver());
+// For debugging purpose, this observer outputs in /tmp/debug
+// OBM_EventFactory::getInstance()->attach(new OBM_EventDebugObserver());
 
 
 // Category Filter 
@@ -208,6 +213,8 @@ if ($action == 'search') {
     $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
   } else {
     if (check_calendar_participation_decision($params)) {
+      //we want to send mails
+      $GLOBALS["send_notification_mail"] = true;
       run_query_calendar_insert_decision($params, $obm['uid']);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
@@ -648,6 +655,8 @@ if ($action == 'search') {
   if (empty($params['entity_id']) && $params['entity_kind'] == 'user') {
     $params['entity_id'] = $obm['uid'];
   }  
+  //we want to send mails
+  $GLOBALS["send_notification_mail"] = true;
   if (check_calendar_event_participation($params)) {
     if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
       $display['msg'] .= display_warn_msg("$l_event : $l_conflicts");

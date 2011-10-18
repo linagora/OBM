@@ -101,12 +101,12 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = $this->extractEventDetails($event, $this->from, '', $user);
 
     $this->parts[] = array(
-      'content' => file_get_contents($this->generateIcs($event, "reply"), 'r'),
+      'content' => file_get_contents($event->getIcs($userId,"reply"), 'r'),
       'content_type' => 'text/calendar; charset=UTF-8; method=REPLY',
       'encoding' => $this->icsEncoding
     );
     $this->attachments[] = array(
-      'content' => file_get_contents($this->generateIcs($event, "reply"), 'r'),
+      'content' => file_get_contents($event->getIcs($userId,"reply"), 'r'),
       'filename' => 'meeting.ics', 'content_type' => 'application/ics'
     );
   }
@@ -208,7 +208,7 @@ class CalendarMailer extends OBM_Mailer {
   
   protected function attachIcs($event, $method, $include_attachments = false) {
     if ($this->attachIcs) {
-      $ics_file = $this->generateIcs($event, $method, $include_attachments);
+      $ics_file = $event->getIcs($this->userId, $method, $include_attachments);
       $this->parts[] = array(
         'content' => fopen($ics_file, 'r'), 
         'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',
@@ -221,28 +221,6 @@ class CalendarMailer extends OBM_Mailer {
     }
   }
 
-  /**
-   * Perform the export meeting to the vCalendar format
-   */
-  private function generateIcs($event, $method, $include_attachments = false) {
-    include_once('obminclude/of/vcalendar/writer/ICS.php');
-    include_once('obminclude/of/vcalendar/reader/OBM.php');
-    
-    $reader = new Vcalendar_Reader_OBM(array('user' => array($this->userId => 'dummy')), array($event->id));
-    $document = $reader->getDocument($method, $include_attachments);
-    $writer = new Vcalendar_Writer_ICS();  
-    $writer->writeDocument($document);
-
-    $tmpFilename = secure_tmpname('.ics','ics_');
-    $res = fopen($tmpFilename, 'w');
-
-    if (!$res) {
-      throw new Exception('Unable to open file');
-    }
-    fputs($res, $writer->buffer);
-    fclose($res);
-    return $tmpFilename;
-  }
   
   private function extractEventDetails($event, $sender, $prefix = '', $target = null) {
     $contacts = $event->contact;

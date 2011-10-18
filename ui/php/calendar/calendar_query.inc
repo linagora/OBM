@@ -727,7 +727,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   run_query_calendar_solr_store($event_id);
 
   $calendar['calendar_id'] = $event_id;
-  if ($calendar['attendees_notification']) {
+  $GLOBALS['send_notification_mail'] = $calendar['attendees_notification'];
     $data = array ( 
       'id' => $event_id,
       'title' => "$calendar[title]" ,
@@ -750,9 +750,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
       'resource' => $resources,
       'contact' => $contacts
     );
-    OBM_EventFactory::getInstance()->create($data);
-  }
-
+  OBM_EventFactory::getInstance()->create($data);
   return $event_id;
 }
 
@@ -1854,12 +1852,15 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   run_query_calendar_solr_store($event_id);
 
 
-  // Send mail
-  if ($calendar['attendees_notification']) {
-    OBM_EventFactory::getInstance()->store(
-      OBM_EventFactory::getInstance()->getById($calendar['calendar_id']),
-      $oldEvent);
-  }
+// Send mail session var
+  $GLOBALS['send_notification_mail'] = $calendar['attendees_notification'];
+  // Notify Observers
+  OBM_EventFactory::getInstance()->store(
+            OBM_EventFactory::getInstance()->getById($calendar['calendar_id']),
+            $oldEvent
+           );
+
+
 
 }
 
@@ -2059,10 +2060,11 @@ function run_query_calendar_quick_event_update($calendar) {
 	// reload once again to have the correct sequence number
 	$newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   // Send mail
-  if ($calendar['send_mail']) {
-    
-    OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
-  }
+// Send mail session var
+  $GLOBALS['send_notification_mail'] = $calendar['send_mail'];
+  // Notify Observers
+  $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
+  OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
 }
 
 
@@ -2207,9 +2209,9 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   }
   run_query_update_description_with_attachments($event_entity_id);
 
-  if ($calendar['send_mail']) {
-    OBM_EventFactory::getInstance()->create(array('id' => $event_id));
-  }
+// Send Mail
+  $GLOBALS['send_notification_mail'] = $calendar['send_mail'];
+  OBM_EventFactory::getInstance()->create(array('id' => $event_id));
   
   return $event_id;
 }
@@ -2437,15 +2439,13 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(3)');
   $obm_q->query($query);
 
-  if ($new_id) {
-    if ($calendar['send_mail']) {
-      OBM_EventFactory::getInstance()->create(array('id' => $new_id));
-    }
-  }
-
+  // Send mail session var
+  $GLOBALS['send_notification_mail'] = $calendar['send_mail'];
+  // Notify Observers
+  $newException = OBM_EventFactory::getInstance()->getById($new_id);
+  OBM_EventFactory::getInstance()->store($newException,$oldEvent);
   // SOLR
   run_query_calendar_solr_store($new_id);
-
   return $new_id;
 }
 
@@ -3396,6 +3396,10 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
   $is_exception = $obm_q->f('event_is_exception');
 
   $event = OBM_EventFactory::getInstance()->getById($event_id);
+
+  // we prepare the ICS file bc we can't create it once the event is deleted from the database...
+  $icsFile = $event->getIcs($GLOBALS['obm']['uid'],"cancel",false);
+
   // If connectors in use
   if ($c_use_connectors) {
 
@@ -3438,9 +3442,10 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
   $obm_q->query($query);
   
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
-  if($force_sendmail || (isset($calendar['send_mail']) && $calendar['send_mail'])) {
-    OBM_EventFactory::getInstance()->delete($event);
-  }
+  // Send mail session var
+  $GLOBALS['send_notification_mail'] = ($force_sendmail || (isset($calendar['send_mail']) && $calendar['send_mail']));
+  // Notify Observers
+  OBM_EventFactory::getInstance()->delete($event);
   return $deleted_evt_ids;
 }
 
