@@ -1,4 +1,4 @@
-{package_name} ({version}~git{year}{month}{day}-{hour}{minute}-{short_sha1}) experimental; urgency=low
+{package_name} (2.4.0.0~rc10~git{year}{month}{day}-{hour}{minute}-{short_sha1}) experimental; urgency=low
 
   * beta build only for test purpose - git revision {sha1}.
 
