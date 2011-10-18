@@ -21,7 +21,7 @@ public class SearchProtocol {
 			throw new XMLValidationException();
 		}
 		ret.setStoreName(st);
-		ret.setQuery(DOMUtils.getElementText(documentElement, "Query"));
+		ret.setQuery( getQuery(documentElement) );
 		String range = DOMUtils.getElementText(documentElement, "Range");
 		if (!Strings.isNullOrEmpty(range)) {
 			int index = range.indexOf("-");
@@ -40,6 +40,20 @@ public class SearchProtocol {
 			}
 		}
 		return ret;
+	}
+
+	private String getQuery(Element documentElement) {
+		Element query = DOMUtils.getUniqueElement(documentElement, "Query");
+		if (query != null) {
+			String freeText = DOMUtils.getElementText(query, "FreeText");
+			if (freeText == null) {
+				freeText = DOMUtils.getElementText(documentElement, "Query");
+			}
+			if (freeText != null) {
+				return freeText;
+			}
+		}
+		return "";
 	}
 
 	public Document encodeResponse(SearchResponse response) {
