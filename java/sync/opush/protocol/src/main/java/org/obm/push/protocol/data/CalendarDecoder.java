@@ -2,6 +2,7 @@ package org.obm.push.protocol.data;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.List;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -134,26 +135,29 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		// Exceptions
 		containerNode = DOMUtils.getUniqueElement(syncData, "Exceptions");
 		if (containerNode != null) {
-			ArrayList<MSEvent> exceptions = new ArrayList<MSEvent>();
-			for (int i = 0, n = containerNode.getChildNodes().getLength(); i < n; i += 1) {
-				Element subnode = (Element) containerNode.getChildNodes().item(
-						i);
-				MSEvent exception = new MSEvent();
+		
+			NodeList exceptionsNodeList = containerNode.getElementsByTagName("Exception");
+			if (exceptionsNodeList != null) {
 
-				setEventCalendar(exception, subnode);
+				final List<MSEvent> exceptions = new ArrayList<MSEvent>();
+				for (int i = 0, n = exceptionsNodeList.getLength(); i < n; i += 1) {
+		
+					MSEvent exception = new MSEvent();
 
-				exception.setDeleted(parseDOMInt2Boolean(DOMUtils
-						.getUniqueElement(subnode, "ExceptionIsDeleted")));
-				exception.setExceptionStartTime(parseDOMDate(DOMUtils
-						.getUniqueElement(subnode, "ExceptionStartTime")));
-
-				exception.setMeetingStatus(getMeetingStatus(subnode));
-
-				exception.setSensitivity(getCalendarSensitivity(subnode));
-				exception.setBusyStatus(getCalendarBusyStatus(subnode));
-				exceptions.add(exception);
+					Element subnode = (Element) exceptionsNodeList.item(i);
+					setEventCalendar(exception, subnode);
+					exception.setDeleted(parseDOMInt2Boolean(DOMUtils
+							.getUniqueElement(subnode, "ExceptionIsDeleted")));
+					exception.setExceptionStartTime(parseDOMDate(DOMUtils
+							.getUniqueElement(subnode, "ExceptionStartTime")));
+					exception.setMeetingStatus(getMeetingStatus(subnode));
+					exception.setSensitivity(getCalendarSensitivity(subnode));
+					exception.setBusyStatus(getCalendarBusyStatus(subnode));
+					exceptions.add(exception);
+				}
+				
+				calendar.setExceptions(exceptions);
 			}
-			calendar.setExceptions(exceptions);
 		}
 
 		// Recurrence
