@@ -351,7 +351,7 @@ public class EventConverter implements ObmSyncCalendarConverter{
 	}
 	
 	
-	private Event convert(BackendSession bs, Event oldEvent, IApplicationData appliData, Boolean isObmInternalEvent) {
+	/* package */ private Event convert(BackendSession bs, Event oldEvent, IApplicationData appliData, Boolean isObmInternalEvent) {
 		MSEvent data = (MSEvent) appliData;
 		Event e = convertEventOne(bs, oldEvent, null, data, isObmInternalEvent);
 		e.setExtId(data.getExtId());
@@ -458,7 +458,7 @@ public class EventConverter implements ObmSyncCalendarConverter{
 				Attendee attendee = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
 				e.getAttendees().add(attendee);
 			} else {
-				e.getAttendees().add( getOrganizer(bs.getLoginAtDomain(), "") );
+				e.getAttendees().add( getOrganizer(bs.getLoginAtDomain(), null) );
 			}	
 		}
 	}

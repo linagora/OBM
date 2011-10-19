@@ -19,6 +19,7 @@ import org.obm.push.tnefconverter.RTFUtils;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.EventExtId;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class CalendarDecoder extends Decoder implements IDataDecoder {
 
@@ -59,72 +60,76 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 			// <AttendeeType>2</AttendeeType>
 			// </Attendee>
 
-			for (int i = 0, n = containerNode.getChildNodes().getLength(); i < n; i += 1) {
-				Element subnode = (Element) containerNode.getChildNodes().item(
-						i);
-				MSAttendee attendee = new MSAttendee();
+			NodeList attendeesNodeList = containerNode.getElementsByTagName("Attendee");
+			if (attendeesNodeList != null) {
+				
+				for (int i = 0, n = attendeesNodeList.getLength(); i < n; i += 1) {
+					
+					MSAttendee attendee = new MSAttendee();
+					Element attendeeEl = (Element) attendeesNodeList.item(i);
 
-				String email = parseDOMString(DOMUtils.getUniqueElement(
-						subnode, "Email"));
-				if (email == null || "".equals(email)) {
-					email = parseDOMString(DOMUtils.getUniqueElement(subnode,
-							"AttendeeEmail"));
-				}
-				attendee.setEmail(email);
+					String email = parseDOMString(DOMUtils.getUniqueElement(
+							attendeeEl, "Email"));
+					if (email == null || "".equals(email)) {
+						email = parseDOMString(DOMUtils.getUniqueElement(attendeeEl,
+								"AttendeeEmail"));
+					}
+					attendee.setEmail(email);
 
-				String name = parseDOMString(DOMUtils.getUniqueElement(subnode,
-						"Name"));
-				if (name == null || "".equals(name)) {
-					name = parseDOMString(DOMUtils.getUniqueElement(subnode,
-							"AttendeeName"));
-				}
-				attendee.setName(name);
+					String name = parseDOMString(DOMUtils.getUniqueElement(attendeeEl,
+							"Name"));
+					if (name == null || "".equals(name)) {
+						name = parseDOMString(DOMUtils.getUniqueElement(attendeeEl,
+								"AttendeeName"));
+					}
+					attendee.setName(name);
 
-				switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(subnode,
-						"AttendeeStatus"))) {
-				case 0:
-					attendee.setAttendeeStatus(AttendeeStatus.RESPONSE_UNKNOWN);
-					break;
-				case 2:
-					attendee.setAttendeeStatus(AttendeeStatus.TENTATIVE);
-					break;
-				case 3:
-					attendee.setAttendeeStatus(AttendeeStatus.ACCEPT);
-					break;
-				case 4:
-					attendee.setAttendeeStatus(AttendeeStatus.DECLINE);
-					break;
-				case 5:
-					attendee.setAttendeeStatus(AttendeeStatus.NOT_RESPONDED);
-					break;
-				}
+					switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(attendeeEl,
+							"AttendeeStatus"))) {
+					case 0:
+						attendee.setAttendeeStatus(AttendeeStatus.RESPONSE_UNKNOWN);
+						break;
+					case 2:
+						attendee.setAttendeeStatus(AttendeeStatus.TENTATIVE);
+						break;
+					case 3:
+						attendee.setAttendeeStatus(AttendeeStatus.ACCEPT);
+						break;
+					case 4:
+						attendee.setAttendeeStatus(AttendeeStatus.DECLINE);
+						break;
+					case 5:
+						attendee.setAttendeeStatus(AttendeeStatus.NOT_RESPONDED);
+						break;
+					}
 
-				if (attendee.getAttendeeStatus() != null) {
-					logger.info("parse attendeeStatus: "
-							+ attendee.getAttendeeStatus());
-				}
+					if (attendee.getAttendeeStatus() != null) {
+						logger.info("parse attendeeStatus: "
+								+ attendee.getAttendeeStatus());
+					}
 
-				switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(subnode,
-						"AttendeeType"))) {
-				case 1:
-					attendee.setAttendeeType(AttendeeType.REQUIRED);
-					break;
-				case 2:
-					attendee.setAttendeeType(AttendeeType.OPTIONAL);
-					break;
-				case 3:
-					attendee.setAttendeeType(AttendeeType.RESOURCE);
-					break;
-				}
+					switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(attendeeEl,
+							"AttendeeType"))) {
+					case 1:
+						attendee.setAttendeeType(AttendeeType.REQUIRED);
+						break;
+					case 2:
+						attendee.setAttendeeType(AttendeeType.OPTIONAL);
+						break;
+					case 3:
+						attendee.setAttendeeType(AttendeeType.RESOURCE);
+						break;
+					}
 
-				if (attendee.getAttendeeType() != null) {
-					logger.info("parse attendeeType: "
-							+ attendee.getAttendeeType());
+					if (attendee.getAttendeeType() != null) {
+						logger.info("parse attendeeType: "
+								+ attendee.getAttendeeType());
+					}
+					calendar.addAttendee(attendee);
 				}
-				calendar.addAttendee(attendee);
-			}
+			}	
 		}
-
+			
 		// Exceptions
 		containerNode = DOMUtils.getUniqueElement(syncData, "Exceptions");
 		if (containerNode != null) {
