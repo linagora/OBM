@@ -1181,7 +1181,7 @@ function run_query_update_description_with_attachments($event_entity_id)
   if (!empty($event_id)) {
     $new_description = get_event_desc_with_attachements(get_event_attachments_urls($event_id), get_event_description($event_id));
     $query_update_desc = "UPDATE Event
-    SET event_description = '$new_description'
+    SET event_description = '".addslashes($new_description)."'
     WHERE event_id = $event_id";
     $obm_q = new DB_OBM;
     $obm_q->query($query_update_desc);
