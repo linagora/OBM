@@ -363,7 +363,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			boolean hasImportantChanges = hasImportantChanges(before, event);
 			if (hasImportantChanges) {
-                changePartipationStateOnWritableCalendar(token, event);
+                changePartipationState(token, event);
             }
 
 			final Event after = calendarDao.modifyEventForcingSequence(
@@ -525,7 +525,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private Event createInternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
 		try{
-			changePartipationStateOnWritableCalendar(token, event);
+			changePartipationState(token, event);
 			Event ev = calendarDao.createEvent(token, calendar, event, true);
 			ev = calendarDao.findEventById(token, ev.getUid());
 			ObmUser user = userService.getUserFromAccessToken(token);
@@ -539,7 +539,7 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private void changePartipationStateOnWritableCalendar(AccessToken token, Event event){
+	private void changePartipationState(AccessToken token, Event event){
 		for (Attendee att: event.getAttendees()) {
 			if (!StringUtils.isEmpty(att.getEmail()) && helper.canWriteOnCalendar(token,  att.getEmail())) {
 				att.setCanWriteOnCalendar(true);
@@ -547,6 +547,7 @@ public class CalendarBindingImpl implements ICalendar {
 					att.setState(ParticipationState.ACCEPTED);
 				}
 			} else {
+				att.setState(ParticipationState.NEEDSACTION);
 				att.setCanWriteOnCalendar(false);
 			}
 		}

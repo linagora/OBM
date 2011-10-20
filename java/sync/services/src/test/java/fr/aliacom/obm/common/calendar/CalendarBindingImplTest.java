@@ -475,6 +475,66 @@ public class CalendarBindingImplTest {
 		Assert.assertEquals(ParticipationState.ACCEPTED, newEvent.getAttendees().get(0).getState());
 	}
 	
+	@Test
+	public void testAttendeeHasNoRightToWriteOnCalendar() throws FindException, ServerFault,
+			SQLException, EventNotFoundException {
+		String calendar = "cal1";
+		String domainName = "domain1";
+		String userEmail = "user@domain1";
+		EventExtId extId = new EventExtId("extId");
+		boolean updateAttendee = true;
+		boolean notification = false;
+
+		Attendee attendee = getFakeAttendee(userEmail);
+		attendee.setState(ParticipationState.ACCEPTED);
+
+		Event beforeEvent = new Event();
+		beforeEvent.setType(EventType.VEVENT);
+		beforeEvent.setInternalEvent(true);
+		beforeEvent.setExtId(extId);
+		beforeEvent.setSequence(0);
+
+		Event event = new Event();
+		event.setType(EventType.VEVENT);
+		event.setInternalEvent(true);
+		event.setExtId(extId);
+		event.addAttendee(attendee);
+		event.setSequence(1);
+
+		ObmUser obmUser = new ObmUser();
+		obmUser.setEmail(userEmail);
+
+		AccessToken accessToken = mockAccessToken(calendar, domainName);
+		Helper helper = mockRightsHelper(calendar, accessToken);
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		UserService userService = createMock(UserService.class);
+		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
+
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser)
+				.atLeastOnce();
+		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(
+				beforeEvent).atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(false)
+				.atLeastOnce();
+		expect(
+				calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
+						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
+		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).atLeastOnce();
+		eventChangeHandler.update(obmUser, beforeEvent, event, notification, true);
+
+		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
+				userService, calendarDao, null, helper, null);
+		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee,
+				notification);
+
+		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
+
+		Assert.assertEquals(ParticipationState.NEEDSACTION, newEvent.getAttendees().get(0)
+				.getState());
+	}
+
 	public void testDontSendEmailsAndDontUpdateStatusForUnimportantChanges() throws ServerFault, FindException, SQLException, EventNotFoundException {
 		String calendar = "cal1";
 		String domainName = "domain1";
