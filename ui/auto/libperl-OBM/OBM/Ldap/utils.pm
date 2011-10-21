@@ -44,10 +44,14 @@ sub _modifyAttr {
     }else {
         # La valeur de l'attribut doit être mise à jour
         my $ldapVal = $ldapEntry->get_value($attr);
-        utf8::upgrade($ldapVal);
-        utf8::encode($newValue);
+
+        # Cree de nouvelles valeurs pour comparaison, pour eviter des problemes de double encodages dans certains cas
+        my $ldapValCompare = $ldapVal;
+        utf8::upgrade($ldapValCompare);
+        my $newValueCompare = $newValue;
+        utf8::encode($newValueCompare);
         
-        if( $ldapVal ne $newValue ){
+        if( $ldapValCompare ne $newValueCompare ){
             $self->_log( 'mise à jour de l\'attribut LDAP \''.$attr.'\', avec la valeur \''.$newValue.'\'', 4 );
             $ldapEntry->replace( $attr => $newValue );
                     
