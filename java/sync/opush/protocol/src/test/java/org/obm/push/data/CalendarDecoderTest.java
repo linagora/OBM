@@ -103,6 +103,7 @@ public class CalendarDecoderTest {
 	
 	@Test
 	public void testDecodeUID() throws SAXException, IOException, FactoryConfigurationError {
+		String UID = "63666534363435652d343136382d313032662d626535652d303031353137366637393232";
 		String xml = "<ApplicationData>" 
 						+ "<AllDayEvent>0</AllDayEvent>"
 						+ "<StartTime>20100217T120000Z</StartTime>"
@@ -111,7 +112,7 @@ public class CalendarDecoderTest {
 						+ "<Subject>Déj Confort Inn</Subject>"
 						+ "<Sensitivity>2</Sensitivity>"
 						+ "<OrganizerEmail>xxx@linagora.com</OrganizerEmail>"
-						+ "<UID>63666534363435652d343136382d313032662d626535652d303031353137366637393232</UID>"
+						+ "<UID>" + UID + "</UID>"
 						+ "<BusyStatus>2</BusyStatus>"
 						+ "<MeetingStatus>1</MeetingStatus>"
 						+ "<OrganizerName>Xxx XXX</OrganizerName>"
@@ -125,5 +126,79 @@ public class CalendarDecoderTest {
 			.isNotNull()
 			.isInstanceOf(EventExtId.class)
 			.isEqualTo(new EventExtId("cfe4645e-4168-102f-be5e-0015176f7922"));
+
 	}
+	
+	@Test
+	public void testDecodeBadShortHexStringUID() throws SAXException, IOException, FactoryConfigurationError {
+		String badUID = "FFFFZ";
+		String xml = "<ApplicationData>" 
+						+ "<AllDayEvent>0</AllDayEvent>"
+						+ "<StartTime>20100217T120000Z</StartTime>"
+						+ "<EndTime>20100217T130000Z</EndTime>"
+						+ "<DTStamp>20111012T075834Z</DTStamp>"
+						+ "<Subject>Déj Confort Inn</Subject>"
+						+ "<Sensitivity>2</Sensitivity>"
+						+ "<OrganizerEmail>xxx@linagora.com</OrganizerEmail>"
+						+ "<UID>" + badUID + "</UID>"
+						+ "<BusyStatus>2</BusyStatus>"
+						+ "<MeetingStatus>1</MeetingStatus>"
+						+ "<OrganizerName>Xxx XXX</OrganizerName>"
+						+ "</ApplicationData>";
+		
+		Document doc = getXml(xml);
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent) data;
+		Assertions.assertThat(event.getExtId()).isNull();
+	}
+	
+	@Test
+	public void testDecodeBadHexStringUID() throws SAXException, IOException, FactoryConfigurationError {
+		String badUID = "84EE2F24CB8D46EB85824CE6754C0E2600000000000000000000000000000000";
+		String xml = "<ApplicationData>" 
+						+ "<AllDayEvent>0</AllDayEvent>"
+						+ "<StartTime>20100217T120000Z</StartTime>"
+						+ "<EndTime>20100217T130000Z</EndTime>"
+						+ "<DTStamp>20111012T075834Z</DTStamp>"
+						+ "<Subject>Déj Confort Inn</Subject>"
+						+ "<Sensitivity>2</Sensitivity>"
+						+ "<OrganizerEmail>xxx@linagora.com</OrganizerEmail>"
+						+ "<UID>" + badUID + "</UID>"
+						+ "<BusyStatus>2</BusyStatus>"
+						+ "<MeetingStatus>1</MeetingStatus>"
+						+ "<OrganizerName>Xxx XXX</OrganizerName>"
+						+ "</ApplicationData>";
+		
+		Document doc = getXml(xml);
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent) data;
+		Assertions.assertThat(event.getExtId()).isNull();
+	}
+	
+	@Test
+	public void testDecodeBadASCIIStringUID() throws SAXException, IOException, FactoryConfigurationError {
+		String badUID = "63666534363435652d343136382dé13032662d626535652d303031353137366637393232";
+		String xml = "<ApplicationData>" 
+						+ "<AllDayEvent>0</AllDayEvent>"
+						+ "<StartTime>20100217T120000Z</StartTime>"
+						+ "<EndTime>20100217T130000Z</EndTime>"
+						+ "<DTStamp>20111012T075834Z</DTStamp>"
+						+ "<Subject>Déj Confort Inn</Subject>"
+						+ "<Sensitivity>2</Sensitivity>"
+						+ "<OrganizerEmail>xxx@linagora.com</OrganizerEmail>"
+						+ "<UID>" + badUID + "</UID>"
+						+ "<BusyStatus>2</BusyStatus>"
+						+ "<MeetingStatus>1</MeetingStatus>"
+						+ "<OrganizerName>Xxx XXX</OrganizerName>"
+						+ "</ApplicationData>";
+		
+		Document doc = getXml(xml);
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent) data;
+		Assertions.assertThat(event.getExtId()).isNull();
+	}
+	
 }

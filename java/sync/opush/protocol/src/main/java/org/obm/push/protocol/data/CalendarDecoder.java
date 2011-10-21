@@ -1,6 +1,7 @@
 package org.obm.push.protocol.data;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -216,14 +217,16 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 			String uidAsString = parseDOMString(uidElement);
 			if (uidAsString != null) {
 				String decodedUid = new String(Hex.decodeHex(uidAsString.toCharArray()));
-				return new EventExtId(decodedUid);
+				return new EventExtId(UUID.fromString(decodedUid).toString());
 			}
 		} catch (DecoderException e) {
-			logger.error(e.getMessage(), e);
+			logger.warn(e.getMessage(), e);
+		} catch (IllegalArgumentException e) {
+			logger.warn(e.getMessage(), e);
 		}
 		return null;
 	}
-
+	
 	void setEventCalendar(MSEvent calendar, Element domSource) {
 		calendar.setLocation(parseDOMString(DOMUtils.getUniqueElement(
 				domSource, "Location")));
