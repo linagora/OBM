@@ -1,7 +1,8 @@
 package org.obm.push.calendar;
 
-import static org.junit.Assert.*;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.util.Properties;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +24,7 @@ import org.obm.push.protocol.data.CalendarDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.w3c.dom.Document;
@@ -33,7 +36,7 @@ public class EventConverterTest {
 
 	private EventConverter eventConverter;
 	private CalendarDecoder decoder;
-
+	
 	@Before
 	public void init() {
 		this.eventConverter = new EventConverter();
@@ -82,6 +85,29 @@ public class EventConverterTest {
 		checkAttendeeParticipationState(attendees);
 	}
 
+	@Test
+	public void testConvertUpdateOneOnlyExceptionEvent() throws SAXException, IOException, FactoryConfigurationError {
+		IApplicationData  oldData = getApplicationData("samecase/new-event-with-exception.xml");
+		Event oldEvent = eventConverter.convertAsInternal(buildBackendSession("jribiera@obm.lng.org"), oldData);
+		
+		IApplicationData  data = getApplicationData("samecase/update-one-exception-of-same-event.xml");
+
+		Event event = eventConverter.convertAsInternal(buildBackendSession("jribiera@obm.lng.org"), oldEvent, data);
+		Event excptEvtUpd = event.getRecurrence().getEventExceptions().get(0);
+
+		String UID = "cfe4645e-4168-102f-be5e-0015176f7922";
+		
+		Assertions.assertThat(event.getExtId())
+		.isNotNull()
+		.isInstanceOf(EventExtId.class)
+		.isEqualTo(new EventExtId(UID));
+		
+		Assertions.assertThat(excptEvtUpd.getExtId())
+		.isNotNull()
+		.isInstanceOf(EventExtId.class)
+		.isEqualTo(new EventExtId(UID));
+	}
+	
 	private List<Attendee> listAttendeesWithoutOrganizer(Attendee organizer, Event event) {
 		List<Attendee> attendees = Lists.newArrayList(event.getAttendees());
 		attendees.remove(organizer);

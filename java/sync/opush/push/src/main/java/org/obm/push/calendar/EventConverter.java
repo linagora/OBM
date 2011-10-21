@@ -21,6 +21,8 @@ import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
@@ -353,9 +355,13 @@ public class EventConverter implements ObmSyncCalendarConverter{
 	
 	/* package */ private Event convert(BackendSession bs, Event oldEvent, IApplicationData appliData, Boolean isObmInternalEvent) {
 		MSEvent data = (MSEvent) appliData;
+		EventExtId extId = data.getExtId();
+		EventObmId obmId = data.getObmId();
+		
 		Event e = convertEventOne(bs, oldEvent, null, data, isObmInternalEvent);
-		e.setExtId(data.getExtId());
-		e.setUid(data.getObmId());
+		e.setExtId(extId);
+		e.setUid(obmId);
+		
 		if(data.getObmSequence() != null){
 			e.setSequence(data.getObmSequence());
 		}
@@ -366,7 +372,11 @@ public class EventConverter implements ObmSyncCalendarConverter{
 			if (data.getExceptions() != null && !data.getExceptions().isEmpty()) {
 				for (MSEvent excep : data.getExceptions()) {
 					if (!excep.isDeletedException()) {
+						
 						Event obmEvent = convertEventOne(bs, oldEvent, e, excep, isObmInternalEvent);
+						obmEvent.setExtId(extId);
+						obmEvent.setUid(obmId);
+						
 						r.addEventException(obmEvent);
 					} else {
 						r.addException(excep.getExceptionStartTime());
