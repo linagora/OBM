@@ -24,7 +24,6 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.service.EventService;
@@ -562,22 +561,6 @@ public class CalendarBackend extends ObmSyncBackend {
 	public Integer getCollectionId (BackendSession bs) throws CollectionNotFoundException, DaoException {
 		String calPath = getDefaultCalendarName(bs);
 		return getCollectionIdFor(bs.getDevice(), calPath);
-	}
-
-	/**
-	 *  obm:\\adrien@test.tlse.lng\calendar\adrien@test.tlse.lng
-	 *  obm:\\adrien@test.tlse.lng\task\adrien@test.tlse.lng
-	 */
-	public FolderType getFolderType(String collectionPath) throws FolderTypeNotFoundException {
-		if (collectionPath != null) {
-			if(collectionPath.contains("calendar")){
-				return FolderType.DEFAULT_CALENDAR_FOLDER;
-			} 
-			if(collectionPath.contains("task")){
-				return FolderType.DEFAULT_TASKS_FOLDER;
-			}
-		}
-		throw new FolderTypeNotFoundException("The collection's path[ " + collectionPath + "] is invalid");
 	}
 
 	public Event getEventFromServerId(BackendSession bs, String serverId) {
