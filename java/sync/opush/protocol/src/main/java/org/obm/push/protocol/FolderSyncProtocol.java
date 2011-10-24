@@ -28,23 +28,38 @@ public class FolderSyncProtocol {
 	public Document encodeResponse(FolderSyncResponse folderSyncResponse) throws FactoryConfigurationError {
 		Document ret = DOMUtils.createDoc(null, "FolderSync");
 		Element root = ret.getDocumentElement();
+		
 		DOMUtils.createElementAndText(root, "Status", "1");
+		
 		Element sk = DOMUtils.createElement(root, "SyncKey");
+		sk.setTextContent(folderSyncResponse.getNewSyncKey());
+
 		Element changes = DOMUtils.createElement(root, "Changes");
 		DOMUtils.createElementAndText(changes, "Count", String.valueOf(folderSyncResponse.getCount()));
-		for (ItemChange sf: folderSyncResponse.getItemsAddedAndUpdated()) {
-			Element add = DOMUtils.createElement(changes, "Add");
-			addItemChange(add, sf);
+		
+		for (ItemChange itemChange: folderSyncResponse.getItemsAddedAndUpdated()) {
+			Element addedOrUpdated = null;
+			if (itemChange.isNew()) {
+				addedOrUpdated = DOMUtils.createElement(changes, "Add");
+			} else {
+				addedOrUpdated = DOMUtils.createElement(changes, "Update");
+			}
+			addItemChange(addedOrUpdated, itemChange);
 		}
-		sk.setTextContent(folderSyncResponse.getNewSyncKey());
+		
+		for (ItemChange itemChange: folderSyncResponse.getItemsDeleted()) {
+			Element deleted = DOMUtils.createElement(changes, "Delete");
+			DOMUtils.createElementAndText(deleted, "ServerId", itemChange.getServerId());
+		}
+		
 		return ret;
 	}
 
-	private void addItemChange(Element add, ItemChange sf) {
-		DOMUtils.createElementAndText(add, "ServerId", sf.getServerId());
-		DOMUtils.createElementAndText(add, "ParentId", sf.getParentId());
-		DOMUtils.createElementAndText(add, "DisplayName", sf.getDisplayName());
-		DOMUtils.createElementAndText(add, "Type", sf.getItemType()
+	private void addItemChange(Element addedOrUpdated, ItemChange itemChange) {
+		DOMUtils.createElementAndText(addedOrUpdated, "ServerId", itemChange.getServerId());
+		DOMUtils.createElementAndText(addedOrUpdated, "ParentId", itemChange.getParentId());
+		DOMUtils.createElementAndText(addedOrUpdated, "DisplayName", itemChange.getDisplayName());
+		DOMUtils.createElementAndText(addedOrUpdated, "Type", itemChange.getItemType()
 				.asIntString());
 	}
 
