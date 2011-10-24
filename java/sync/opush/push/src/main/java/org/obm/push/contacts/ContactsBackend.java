@@ -7,6 +7,7 @@ import java.util.List;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FolderType;
+import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.SyncState;
@@ -21,10 +22,13 @@ import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.Folder;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.calendar.TodoClient;
+import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChangesResponse;
+import org.obm.sync.items.FolderChanges;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -37,28 +41,61 @@ public class ContactsBackend extends ObmSyncBackend {
 		super(collectionDao, bookClient, calendarClient, todoClient);
 	}
 
-	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
-		List<ItemChange> ret = new LinkedList<ItemChange>();
+	public HierarchyItemsChanges getHierarchyChanges(BackendSession bs, Date lastSync) throws DaoException {
+		List<ItemChange> itemsChanged = new LinkedList<ItemChange>();
+		List<ItemChange> itemsDeleted = new LinkedList<ItemChange>();
+		try {
+			
+			AddressBookChangesResponse addressBooks = listAddressBooksChanges(bs, lastSync);
+			FolderChanges folderChanges = addressBooks.getBooksChanges();
+			
+			for (Folder folder: folderChanges.getUpdated()) {
+				itemsChanged.add( createItemChange(bs, folder) );
+			}
+			
+			for (Integer collectionId: folderChanges.getRemoved()) {
+				String toString = collectionIdToString(collectionId);
+				itemsDeleted.add( new ItemChange(toString) );
+			}
+			
+		} catch (UnknownObmSyncServerException e1) {
+			logger.error(e1.getMessage());
+		}
 
-		ItemChange ic = new ItemChange();
-		String col = "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\contacts";
+		return new HierarchyItemsChanges(itemsChanged, itemsDeleted);
+	}
+	
+	private AddressBookChangesResponse listAddressBooksChanges(BackendSession bs, Date lastSync) throws UnknownObmSyncServerException {
+		BookClient bc = getBookClient();
+		AccessToken token = login(bc, bs);
+		try {
+			return bc.getAddressBookSync(token, lastSync);
+		} catch (ServerFault e) {
+			throw new UnknownObmSyncServerException(e);
+		} finally {
+			bc.logout(token);
+		}
+	}
+	
+	private ItemChange createItemChange(BackendSession bs, Folder folder) throws DaoException {
+		ItemChange itemChange = new ItemChange();
+		String col = "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\" + folder.getName();
 		String serverId;
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
 			serverId = collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
 			serverId = createCollectionMapping(bs.getDevice(), col);
-			ic.setIsNew(true);
+			itemChange.setIsNew(true);
 		}
 
-		ic.setServerId(serverId);
-		ic.setParentId("0");
-		ic.setDisplayName(bs.getUser().getLoginAtDomain() + " contacts");
-		ic.setItemType(FolderType.DEFAULT_CONTACTS_FOLDER);
-		ret.add(ic);
-		return ret;
+		itemChange.setServerId(serverId);
+		itemChange.setParentId("0");
+		itemChange.setDisplayName(folder.getName());
+		itemChange.setItemType(FolderType.DEFAULT_CONTACTS_FOLDER);
+		return itemChange;
 	}
-
+	
 	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) throws UnknownObmSyncServerException {
 		BookClient bc = getBookClient();
 		AccessToken token = login(bc, bs);

@@ -1,11 +1,13 @@
 package org.obm.push;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
@@ -54,8 +56,8 @@ public class HierarchyExporter implements IHierarchyExporter {
 		}
 	}
 
-	private List<ItemChange> getContactsChanges(BackendSession bs) throws DaoException {
-		return contactsBackend.getHierarchyChanges(bs);
+	private HierarchyItemsChanges getContactsChanges(BackendSession bs, Date lastSync) throws DaoException {
+		return contactsBackend.getHierarchyChanges(bs, lastSync);
 	}
 
 	private List<ItemChange> getTasksChanges(BackendSession bs) throws DaoException {
@@ -71,13 +73,19 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 
 	@Override
-	public List<ItemChange> getChanged(BackendSession bs) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
-		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
-		changes.addAll(getCalendarChanges(bs));
-		changes.addAll(getMailChanges(bs));
-		changes.addAll(getContactsChanges(bs));
-		changes.addAll(getTasksChanges(bs));
-		return changes;
+	public HierarchyItemsChanges getChanged(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+		LinkedList<ItemChange> allItemsChanged = new LinkedList<ItemChange>();
+		
+		allItemsChanged.addAll(getCalendarChanges(bs));
+		allItemsChanged.addAll(getMailChanges(bs));
+		
+		HierarchyItemsChanges itemsContactChanged = getContactsChanges(bs, lastSync);
+		allItemsChanged.addAll(itemsContactChanged.getItemsAddedOrUpdated());
+		
+		allItemsChanged.addAll(getTasksChanges(bs));
+
+		return new HierarchyItemsChanges(
+				allItemsChanged, itemsContactChanged.getItemsDeleted());
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package org.obm.push.handler;
 
-import java.util.List;
+import java.util.Date;
 
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -10,7 +10,7 @@ import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncStatus;
-import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
@@ -26,9 +26,9 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Document;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -90,7 +90,9 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		DaoException, UnknownObmSyncServerException, InvalidServerId, CollectionNotFoundException {
 		
 		if (isFirstSync(folderSyncRequest)) {
-			return getFolderSyncResponse(bs);
+
+			return getFolderSyncResponse(bs, 
+					DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		} else {
 			
 			String syncKey = folderSyncRequest.getSyncKey();
@@ -98,7 +100,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			if (syncState == null) {
 				throw new InvalidSyncKeyException(syncKey);
 			}
-			return getFolderSyncResponse(bs);
+			return getFolderSyncResponse(bs, syncState.getLastSync());
 		}
 	}
 
@@ -106,18 +108,22 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		return folderSyncRequest.getSyncKey().equals("0");
 	}
 
-	private FolderSyncResponse getFolderSyncResponse(BackendSession bs) throws DaoException, CollectionNotFoundException, 
+	private FolderSyncResponse getFolderSyncResponse(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, 
 			UnknownObmSyncServerException, InvalidServerId {
 		
-		List<ItemChange> changed = getFolderChanges(bs);
-		ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
-		String newSyncKey = stMachine.allocateNewSyncKey(bs, getCollectionId(bs), null, changed, deleted);
-		return new FolderSyncResponse(changed, newSyncKey);
+		HierarchyItemsChanges hierarchyItemsChanges = getFolderChanges(bs, lastSync);
+		String newSyncKey = stMachine.allocateNewSyncKey(bs, getCollectionId(bs), null, 
+				hierarchyItemsChanges.getItemsAddedOrUpdated(),
+				hierarchyItemsChanges.getItemsDeleted());
+		
+		return new FolderSyncResponse(
+				hierarchyItemsChanges.getItemsAddedOrUpdated(), hierarchyItemsChanges.getItemsDeleted(), newSyncKey);
 	}
 
-	private List<ItemChange> getFolderChanges(BackendSession bs) 
+	private HierarchyItemsChanges getFolderChanges(BackendSession bs, Date lastSync) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
-		return hierarchyExporter.getChanged(bs);
+		
+		return hierarchyExporter.getChanged(bs, lastSync);
 	}
 	
 	private int getCollectionId(BackendSession bs) throws DaoException {

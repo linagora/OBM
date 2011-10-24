@@ -32,7 +32,7 @@ public class FolderSyncProtocol {
 		Element sk = DOMUtils.createElement(root, "SyncKey");
 		Element changes = DOMUtils.createElement(root, "Changes");
 		DOMUtils.createElementAndText(changes, "Count", String.valueOf(folderSyncResponse.getCount()));
-		for (ItemChange sf: folderSyncResponse.getItemChanges()) {
+		for (ItemChange sf: folderSyncResponse.getItemsAddedAndUpdated()) {
 			Element add = DOMUtils.createElement(changes, "Add");
 			addItemChange(add, sf);
 		}
