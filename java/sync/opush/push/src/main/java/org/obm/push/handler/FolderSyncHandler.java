@@ -72,6 +72,8 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
 		} catch (InvalidServerId e) {
 			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
+		} catch (CollectionNotFoundException e) {
+			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
 		}
 	}
 
@@ -92,8 +94,8 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		}
 	}
 	
-	private FolderSyncResponse doTheJob(BackendSession bs, FolderSyncRequest folderSyncRequest) throws
-			InvalidSyncKeyException, DaoException, UnknownObmSyncServerException, InvalidServerId {
+	private FolderSyncResponse doTheJob(BackendSession bs, FolderSyncRequest folderSyncRequest) throws InvalidSyncKeyException, 
+		DaoException, UnknownObmSyncServerException, InvalidServerId, CollectionNotFoundException {
 		
 		// FIXME we know that we do not monitor hierarchy, so just respond
 		// that nothing changed
@@ -102,25 +104,21 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		String rootFolderUrl = hierarchyExporter.getRootFolderUrl(bs);
 		int rootFolderCollectionId = getOrCreateRootFolderId(deviceId, rootFolderUrl);
 
-		try {
-			if (isFirstSync(folderSyncRequest)) {
-				List<ItemChange> changed = hierarchyExporter.getChanged(bs);
-				ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
-				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed, deleted);
-				return new FolderSyncResponse(changed, newSyncKey);
-			} else {
-				String syncKey = folderSyncRequest.getSyncKey();
-				SyncState syncState = stMachine.getSyncState(syncKey);
-				if (syncState == null) {
-					throw new InvalidSyncKeyException(syncKey);
-				}
-				ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
-				ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
-				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed, deleted);
-				return new FolderSyncResponse(changed, newSyncKey);
+		if (isFirstSync(folderSyncRequest)) {
+			List<ItemChange> changed = hierarchyExporter.getChanged(bs);
+			ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
+			String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed, deleted);
+			return new FolderSyncResponse(changed, newSyncKey);
+		} else {
+			String syncKey = folderSyncRequest.getSyncKey();
+			SyncState syncState = stMachine.getSyncState(syncKey);
+			if (syncState == null) {
+				throw new InvalidSyncKeyException(syncKey);
 			}
-		} catch (CollectionNotFoundException e) {
-			throw new DaoException(e);
+			ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
+			ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
+			String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed, deleted);
+			return new FolderSyncResponse(changed, newSyncKey);
 		}
 	}
 
