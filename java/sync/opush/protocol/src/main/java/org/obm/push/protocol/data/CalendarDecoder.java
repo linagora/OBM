@@ -1,8 +1,8 @@
 package org.obm.push.protocol.data;
 
 import java.util.ArrayList;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -217,20 +217,32 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 	}
 
 	private EventExtId getExtIdFromElement(Element uidElement) {
-		try {
-			String uidAsString = parseDOMString(uidElement);
-			if (uidAsString != null) {
-				String decodedUid = new String(Hex.decodeHex(uidAsString.toCharArray()));
-				return new EventExtId(UUID.fromString(decodedUid).toString());
+		String uidAsString = parseDOMString(uidElement);
+		if (uidAsString != null) {
+			String uuid = decodeHex(uidAsString);
+			try {
+				checkUUIDFormat(uuid);
+				return new EventExtId(uuid);
+			} catch (IllegalArgumentException e) {
+				logger.warn(e.getMessage(), e);
 			}
-		} catch (DecoderException e) {
-			logger.warn(e.getMessage(), e);
-		} catch (IllegalArgumentException e) {
-			logger.warn(e.getMessage(), e);
 		}
 		return null;
 	}
-	
+
+	private void checkUUIDFormat(String decodedUid) throws IllegalArgumentException {
+		UUID.fromString(decodedUid);
+	}
+
+	private String decodeHex(String uidAsString) {
+		try {
+			return new String(Hex.decodeHex(uidAsString.toCharArray()));
+		} catch (DecoderException ex) {
+			logger.warn(ex.getMessage(), ex);
+			return uidAsString;
+		}
+	}
+
 	void setEventCalendar(MSEvent calendar, Element domSource) {
 		calendar.setLocation(parseDOMString(DOMUtils.getUniqueElement(
 				domSource, "Location")));

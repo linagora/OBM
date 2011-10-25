@@ -104,22 +104,7 @@ public class CalendarDecoderTest {
 	@Test
 	public void testDecodeUID() throws SAXException, IOException, FactoryConfigurationError {
 		String UID = "63666534363435652d343136382d313032662d626535652d303031353137366637393232";
-		String xml = "<ApplicationData>" 
-						+ "<AllDayEvent>0</AllDayEvent>"
-						+ "<StartTime>20100217T120000Z</StartTime>"
-						+ "<EndTime>20100217T130000Z</EndTime>"
-						+ "<DTStamp>20111012T075834Z</DTStamp>"
-						+ "<Subject>Déj Confort Inn</Subject>"
-						+ "<Sensitivity>2</Sensitivity>"
-						+ "<OrganizerEmail>xxx@linagora.com</OrganizerEmail>"
-						+ "<UID>" + UID + "</UID>"
-						+ "<BusyStatus>2</BusyStatus>"
-						+ "<MeetingStatus>1</MeetingStatus>"
-						+ "<OrganizerName>Xxx XXX</OrganizerName>"
-						+ "</ApplicationData>";
-		
-		Document doc = getXml(xml);
-		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		IApplicationData  data = decode(UID);
 		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
 		MSEvent event = (MSEvent) data;
 		Assertions.assertThat(event.getExtId())
@@ -130,24 +115,21 @@ public class CalendarDecoderTest {
 	}
 	
 	@Test
+	public void testDecodeHexUIDValue() throws SAXException, IOException, FactoryConfigurationError {
+		String UID = "930865cb-f04e-447a-ab5a-3dac62695001";
+		IApplicationData  data = decode(UID);
+		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent) data;
+		Assertions.assertThat(event.getExtId())
+			.isNotNull()
+			.isInstanceOf(EventExtId.class)
+			.isEqualTo(new EventExtId("930865cb-f04e-447a-ab5a-3dac62695001"));
+	}
+	
+	@Test
 	public void testDecodeBadShortHexStringUID() throws SAXException, IOException, FactoryConfigurationError {
 		String badUID = "FFFFZ";
-		String xml = "<ApplicationData>" 
-						+ "<AllDayEvent>0</AllDayEvent>"
-						+ "<StartTime>20100217T120000Z</StartTime>"
-						+ "<EndTime>20100217T130000Z</EndTime>"
-						+ "<DTStamp>20111012T075834Z</DTStamp>"
-						+ "<Subject>Déj Confort Inn</Subject>"
-						+ "<Sensitivity>2</Sensitivity>"
-						+ "<OrganizerEmail>xxx@linagora.com</OrganizerEmail>"
-						+ "<UID>" + badUID + "</UID>"
-						+ "<BusyStatus>2</BusyStatus>"
-						+ "<MeetingStatus>1</MeetingStatus>"
-						+ "<OrganizerName>Xxx XXX</OrganizerName>"
-						+ "</ApplicationData>";
-		
-		Document doc = getXml(xml);
-		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		IApplicationData  data = decode(badUID);
 		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
 		MSEvent event = (MSEvent) data;
 		Assertions.assertThat(event.getExtId()).isNull();
@@ -156,22 +138,7 @@ public class CalendarDecoderTest {
 	@Test
 	public void testDecodeBadHexStringUID() throws SAXException, IOException, FactoryConfigurationError {
 		String badUID = "84EE2F24CB8D46EB85824CE6754C0E2600000000000000000000000000000000";
-		String xml = "<ApplicationData>" 
-						+ "<AllDayEvent>0</AllDayEvent>"
-						+ "<StartTime>20100217T120000Z</StartTime>"
-						+ "<EndTime>20100217T130000Z</EndTime>"
-						+ "<DTStamp>20111012T075834Z</DTStamp>"
-						+ "<Subject>Déj Confort Inn</Subject>"
-						+ "<Sensitivity>2</Sensitivity>"
-						+ "<OrganizerEmail>xxx@linagora.com</OrganizerEmail>"
-						+ "<UID>" + badUID + "</UID>"
-						+ "<BusyStatus>2</BusyStatus>"
-						+ "<MeetingStatus>1</MeetingStatus>"
-						+ "<OrganizerName>Xxx XXX</OrganizerName>"
-						+ "</ApplicationData>";
-		
-		Document doc = getXml(xml);
-		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		IApplicationData  data = decode(badUID);
 		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
 		MSEvent event = (MSEvent) data;
 		Assertions.assertThat(event.getExtId()).isNull();
@@ -180,6 +147,17 @@ public class CalendarDecoderTest {
 	@Test
 	public void testDecodeBadASCIIStringUID() throws SAXException, IOException, FactoryConfigurationError {
 		String badUID = "63666534363435652d343136382dé13032662d626535652d303031353137366637393232";
+		IApplicationData  data = decode(badUID);
+		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent) data;
+		Assertions.assertThat(event.getExtId()).isNull();
+	}
+
+	private IApplicationData decode(String uid) throws SAXException, IOException, FactoryConfigurationError {
+		return decoder.decode( getDocument(uid).getDocumentElement() );
+	}
+	
+	private Document getDocument(String uid) throws SAXException, IOException, FactoryConfigurationError {
 		String xml = "<ApplicationData>" 
 						+ "<AllDayEvent>0</AllDayEvent>"
 						+ "<StartTime>20100217T120000Z</StartTime>"
@@ -188,17 +166,12 @@ public class CalendarDecoderTest {
 						+ "<Subject>Déj Confort Inn</Subject>"
 						+ "<Sensitivity>2</Sensitivity>"
 						+ "<OrganizerEmail>xxx@linagora.com</OrganizerEmail>"
-						+ "<UID>" + badUID + "</UID>"
+						+ "<UID>" + uid + "</UID>"
 						+ "<BusyStatus>2</BusyStatus>"
 						+ "<MeetingStatus>1</MeetingStatus>"
 						+ "<OrganizerName>Xxx XXX</OrganizerName>"
 						+ "</ApplicationData>";
-		
-		Document doc = getXml(xml);
-		IApplicationData  data = decoder.decode(doc.getDocumentElement());
-		Assertions.assertThat(data).isNotNull().isInstanceOf(MSEvent.class);
-		MSEvent event = (MSEvent) data;
-		Assertions.assertThat(event.getExtId()).isNull();
+		return getXml(xml);
 	}
 	
 }
