@@ -565,14 +565,22 @@ function showErrorMessage(message) {
   showMessage('error',message);
 }
 
-function showMessage(klass, message) {
+function showErrorMessageCustomTimeout(message, timeout) {
+	showMessageWithTimeout('error', message, timeout);
+}
+
+function showMessageWithTimeout(klass, message, timeout) {
   var content = $('ajaxMessage');
   content.setStyle('display','block');
   new Element('p').addClass('message')
                   .addClass(klass)
                   .set('html', message)
                   .injectInside(content);
-  setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, 3000);
+  setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, timeout);
+}
+
+function showMessage(klass, message) {
+  showMessageWithTimeout(klass, message, 3000);
 }
 
 function overListBoxFix(overObject, forceDisplay) {

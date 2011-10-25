@@ -38,6 +38,10 @@
 // - rights_admin    -- access rights screen
 // - rights_update   -- Update calendar access rights
 ///////////////////////////////////////////////////////////////////////////////
+if (empty($_FILES) && empty($_POST) && isset($_SERVER['REQUEST_METHOD']) && strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
+	$post_max_size = ini_get('post_max_size');
+	$post_fatal_error = true;
+}
 $path = '..';
 $module = 'calendar';
 $obminclude = getenv('OBM_INCLUDE_VAR');
@@ -177,6 +181,9 @@ if ($action == 'search') {
 
 } elseif ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
+	if (isset($post_fatal_error)) {
+		$_SESSION['obm_message'] = "<script text='language/javascript'>showErrorMessageCustomTimeout(\"".phpStringToJsString($l_post_fatal_error)."\", 10000)</script>";
+	}
   $display['detail'] .= dis_calendar_calendar_view($params, $current_view);
 
 } elseif ($action == 'waiting_events') {
@@ -263,7 +270,7 @@ if ($action == 'search') {
     $entities['contact'] = array();
   }
   $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
-  if (check_user_defined_rules() && check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
+  if (check_user_defined_rules() && check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource']) && check_upload_errors()) {
     try {
       $conflicts = check_calendar_conflict($params, $entities);
       if ( $conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts)) ) {
@@ -322,7 +329,9 @@ if ($action == 'search') {
         $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
       }
   } else {
-    $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['msg'] .= add_upload_error_message_too_big();
+    $display['msg'] .= add_upload_error_message_other();
     $display['msg'] .= add_upload_warn_message_if_attachments();
     $extra_js_include[] = 'inplaceeditor.js';
     $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
@@ -398,7 +407,7 @@ if ($action == 'search') {
   }
   $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
 
-  if (check_user_defined_rules() && check_calendar_access($params["calendar_id"]) && check_calendar_data_form($params)) {
+  if (check_user_defined_rules() && check_calendar_access($params["calendar_id"]) && check_calendar_data_form($params) && check_upload_errors()) {
     try {
       $c = get_calendar_event_info($params['calendar_id'],false); 
       $conflicts = check_calendar_conflict($params, $entities);
@@ -454,7 +463,9 @@ if ($action == 'search') {
       $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
     }
   } else {
-    $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['msg'] .= add_upload_error_message_other();
+    $display['msg'] .= add_upload_error_message_too_big();
     $display['msg'] .= add_upload_warn_message_if_attachments();
     $extra_js_include[] = 'inplaceeditor.js';
     $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
@@ -2127,16 +2138,79 @@ function add_upload_warn_message_if_attachments()
 
   if (isset($_FILES['fi_other_files']['name']) && !empty($_FILES['fi_other_files']['name']) && is_array($_FILES['fi_other_files']['name'])) {
     $has_files = false;
-    foreach ($_FILES['fi_other_files']['name'] as $filename) {
-      if (!empty($filename)) {
+    foreach ($_FILES['fi_other_files']['name'] as $k => $filename) {
+      if (!empty($filename) && $_FILES['fi_other_files']['error'][$k] === UPLOAD_ERR_OK) {
         $has_files = true;
         $filename_list[] = $filename;
       }
     }
     if ($has_files) {
-      $result .= display_warn_msg("$l_other_files_detached (" . implode(", ", $filename_list) . ").");
+      $result .= display_warn_msg("$l_other_files_detached");
+      $result .= "<strong>" . display_warn_msg(implode(", ", $filename_list)) . "</strong>";
     }
   }
   return $result;
 }
+
+function check_upload_errors() {
+	global $err, $l_error_upload;
+
+	$no_errors = true;
+	if (isset($_FILES['fi_other_files']['name']) && !empty($_FILES['fi_other_files']['name']) && is_array($_FILES['fi_other_files']['name'])) {
+		foreach ($_FILES['fi_other_files']['name'] as $k => $filename) {
+			if (!empty($filename) && $_FILES['fi_other_files']['error'][$k] !== UPLOAD_ERR_OK) {
+				$no_errors = false;
+				$err['msg'] = $l_error_upload;
+			}
+		}
+	}
+	return $no_errors;
+}
+
+function add_upload_error_message_too_big()
+{
+	global $l_other_files_upload_error;
+
+	$result = '';
+	$filename_list = array();
+
+	if (isset($_FILES['fi_other_files']['name']) && !empty($_FILES['fi_other_files']['name']) && is_array($_FILES['fi_other_files']['name'])) {
+		$is_error = false;
+		foreach ($_FILES['fi_other_files']['name'] as $k => $filename) {
+			if (!empty($filename) && $_FILES['fi_other_files']['error'][$k] === UPLOAD_ERR_INI_SIZE) {
+				$is_error = true;
+				$filename_list[] = $filename;
+			}
+		}
+		if ($is_error) {
+			$result .= display_err_msg("$l_other_files_upload_error (" . ini_get('upload_max_filesize') . ") :");
+			$result .= "<strong>" . display_err_msg(implode(", ", $filename_list)) . "</strong>";
+		}
+	}
+	return $result;
+}
+
+function add_upload_error_message_other()
+{
+	global $l_other_files_upload_error_other;
+
+	$result = '';
+	$filename_list = array();
+
+	if (isset($_FILES['fi_other_files']['name']) && !empty($_FILES['fi_other_files']['name']) && is_array($_FILES['fi_other_files']['name'])) {
+		$is_error = false;
+		foreach ($_FILES['fi_other_files']['name'] as $k => $filename) {
+			if (!empty($filename) && $_FILES['fi_other_files']['error'][$k] !== UPLOAD_ERR_OK && $_FILES['fi_other_files']['error'][$k] !== UPLOAD_ERR_INI_SIZE) {
+				$is_error = true;
+				$filename_list[] = $filename;
+			}
+		}
+		if ($is_error) {
+			$result .= display_err_msg("$l_other_files_upload_error_other :");
+			$result .= "<strong>" . display_err_msg(implode(", ", $filename_list)) . "</strong>";
+		}
+	}
+	return $result;
+}
+
 ?>
