@@ -56,7 +56,7 @@ import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.EventChanges;
-import org.obm.sync.items.FolderChangesResponse;
+import org.obm.sync.items.FolderChanges;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
 import org.obm.sync.mailingList.MailingListItemsWriter;
@@ -368,10 +368,6 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendFolderChanges(FolderChangesResponse fc) {
-		return sendDom(biw.writeFolderChanges(fc));
-	}
-
 	public String sendFolder(Folder ret) {
 		String res = "";
 		try {
@@ -461,6 +457,10 @@ public class XmlResponder {
 
 	public void sendAddressBookChanges(AddressBookChangesResponse response) {
 		sendDom(biw.writeAddressBookChanges(response));
+	}
+
+	public void sendlistAddressBooksChanged(FolderChanges folderChanges) {
+		sendDom(biw.writeListAddressBooksChanged(folderChanges));
 	}
 
 }
