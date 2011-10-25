@@ -1,5 +1,7 @@
 package org.obm.sync.book;
 
+import com.google.common.base.Objects;
+
 public class Folder {
 
 	private Integer uid;
@@ -32,6 +34,15 @@ public class Folder {
 	
 	public void setOwnerDisplayName(String ownerDisplayName) {
 		this.ownerDisplayName = ownerDisplayName;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("uid", uid)
+			.add("name", name)
+			.add("ownerDisplayName", ownerDisplayName)
+			.toString();
 	}
 
 }
