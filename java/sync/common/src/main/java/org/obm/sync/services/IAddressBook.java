@@ -12,7 +12,7 @@ import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChangesResponse;
-import org.obm.sync.items.FolderChangesResponse;
+import org.obm.sync.items.FolderChanges;
 
 public interface IAddressBook {
 
@@ -121,12 +121,6 @@ public interface IAddressBook {
 			Contact contact) throws ServerFault;
 
 	/**
-	 * Get the list of folders that changed or were deleted since given date.
-	 */
-	FolderChangesResponse getFolderSync(AccessToken token, Date lastSync)
-			throws ServerFault;
-
-	/**
 	 * Search contacts in a group, based on a solr query
 	 */
 	List<Contact> searchContactInGroup(AccessToken token, AddressBook group,
@@ -134,5 +128,11 @@ public interface IAddressBook {
 
 
 	boolean unsubscribeBook(AccessToken token, Integer bookId) throws ServerFault;
+
+	/**
+	 * Get the list of folders that changed or were deleted since given date.
+	 * @throws ServerFault 
+	 */
+	FolderChanges listAddressBooksChanged(AccessToken token, Date timestamp) throws ServerFault;
 	
 }
