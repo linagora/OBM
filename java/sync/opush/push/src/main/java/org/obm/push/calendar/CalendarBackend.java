@@ -262,21 +262,13 @@ public class CalendarBackend extends ObmSyncBackend {
 			
 			Event oldEvent = null;
 			if (serverId != null) {
-				int idx = serverId.lastIndexOf(":");
-				eventId = new EventObmId(serverId.substring(idx + 1));
+				eventId = convertServerIdToEventObmId(serverId);
 				oldEvent = cc.getEventFromId(token, bs.getLoginAtDomain(), eventId);	
 			}
 
 			boolean isInternal = EventConverter.isInternalEvent(oldEvent, true);
-			if(isInternal){
-				event = converters.get(data.getType()).convertAsInternal(bs, oldEvent, data);
-			} else {
-				event = converters.get(data.getType()).convertAsExternal(bs, oldEvent, data);
-			}
+			event = convertMSEventToObmEvent(bs, data, oldEvent, isInternal);
 
-			Attendee att = new Attendee();
-			att.setEmail( cc.getUserEmail(token) );
-			
 			if (eventId != null) {
 				event.setUid(eventId);
 				setSequence(oldEvent, event);
@@ -306,6 +298,29 @@ public class CalendarBackend extends ObmSyncBackend {
 		}
 	}
 
+	private EventObmId convertServerIdToEventObmId(String serverId) {
+		int idx = serverId.lastIndexOf(":");
+		return new EventObmId(serverId.substring(idx + 1));
+	}
+
+	private Event convertMSEventToObmEvent(BackendSession bs,
+			IApplicationData data, Event oldEvent, boolean isInternal) {
+		if (isInternal) {
+			return converters.get(data.getType()).convertAsInternal(bs, oldEvent, data);
+		} else {
+			return converters.get(data.getType()).convertAsExternal(bs, oldEvent, data);
+		}
+	}
+
+	private Event convertMSEventToObmEvent(BackendSession bs, MSEvent event,
+			boolean isInternal) {
+		if (isInternal) {
+			return new EventConverter().convertAsInternal(bs, event);
+		} else {
+			return new EventConverter().convertAsExternal(bs, event);
+		}
+	}
+	
 	private EventObmId getEventIdFromExtId(AccessToken token, String collectionPath, AbstractEventSyncClient cc, Event event)
 			throws UnknownObmSyncServerException {
 		
@@ -371,12 +386,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			Event obmEvent = getEventFromExtId(bs, event, calCli, at);
 			
 			boolean isInternal = EventConverter.isInternalEvent(obmEvent, false);
-			Event newEvent = null;
-			if (isInternal) {
-				newEvent = new EventConverter().convertAsInternal(bs, event);
-			} else {
-				newEvent = new EventConverter().convertAsExternal(bs, event);
-			}
+			Event newEvent = convertMSEventToObmEvent(bs, event, isInternal);
 			
 			if (obmEvent == null) {
 				
