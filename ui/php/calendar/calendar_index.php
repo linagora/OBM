@@ -497,6 +497,9 @@ if ($action == 'search') {
         run_query_calendar_quick_event_update($params);
       } else {
         $id = run_query_calendar_event_exception_insert($params,$eve_q);
+        if ( !$id ) {
+	  $id = $params['calendar_id'];
+        }
       }
       json_build_html_event($params, $current_view, $id);
       $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$id";
