@@ -346,7 +346,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) throws EventNotFoundException, ServerFault {
-		if (event.getUid() == null) {
+		if (event.getUid() == null && event.getExtId() != null && event.getExtId().getExtId() != null) {
 			final Event currentEvent = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
 			if (currentEvent != null) {
 				event.setUid(currentEvent.getUid());
@@ -1129,7 +1129,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private boolean isEventExists(final AccessToken token, final String calendar, final Event event) throws FindException {
 		final ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
-		if (event.getExtId() != null) {
+		if (event.getExtId() != null && event.getExtId().getExtId() != null) {
 			final Event eventExist = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
 			if (eventExist != null) {
 				return true;
