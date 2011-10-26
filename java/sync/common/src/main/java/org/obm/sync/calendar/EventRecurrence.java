@@ -2,9 +2,13 @@ package org.obm.sync.calendar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
+
 import com.google.common.base.Objects;
 
 public class EventRecurrence {
@@ -94,6 +98,44 @@ public class EventRecurrence {
 		eventRecurrence.setFrequence(this.frequence);
 		eventRecurrence.setKind(this.kind);
 		return eventRecurrence;
+	}
+
+	public boolean hasImportantChanges(EventRecurrence recurrence) {
+		if (recurrence == null) {
+			return true;
+		}
+		if ( !(Objects.equal(this.end, recurrence.end)
+				&& Objects.equal(this.kind, recurrence.kind)
+				&& Objects.equal(this.frequence, recurrence.frequence)
+				&& (this.eventExceptions.size() == recurrence.eventExceptions.size())
+				&& (this.exceptions.size() == recurrence.exceptions.size())) ) {
+			return true;
+		}
+		return compareEventExceptionsChanges(recurrence);
+	}
+
+	private boolean compareEventExceptionsChanges(EventRecurrence recurrence) {
+		Iterator<Event> from = createEventIteratorSortedFromDate(this.eventExceptions);
+		Iterator<Event> to = createEventIteratorSortedFromDate(recurrence.getEventExceptions());
+		while (from.hasNext()) {
+			if (to.hasNext()) {
+				if (from.next().hasImportantChanges(to.next())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private Iterator<Event> createEventIteratorSortedFromDate(List<Event> events) {
+		TreeSet<Event> set = new TreeSet<Event>(new Comparator<Event>() {
+			@Override
+			public int compare(Event event0, Event event1) {
+				return event0.getDate().compareTo(event1.getDate());
+			}
+		});
+		set.addAll(events);
+		return set.iterator();
 	}
 	
 	@Override

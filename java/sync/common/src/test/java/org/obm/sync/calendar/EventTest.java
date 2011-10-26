@@ -217,6 +217,101 @@ public class EventTest {
 		Assert.assertFalse(newEvent.equals(eventCloned));
 	}
 	
+	@Test
+	public void testHasImportantChangesEvent() {
+		Event newEvent = createOneEvent(5);
+		EventRecurrence recurrence = createRecurrence(newEvent);
+		newEvent.setRecurrence(recurrence);
+	
+		Event updateEvent = newEvent.clone();
+		updateEvent.setDescription("Date updated");
+		Calendar calendarUpdate = Calendar.getInstance();
+		calendarUpdate.add(Calendar.HOUR, 4);
+		updateEvent.setDate(calendarUpdate.getTime());
+		
+		Assert.assertTrue(updateEvent.hasImportantChanges(newEvent));
+	}
+
+	@Test
+	public void testHasImportantChangesEventWithNothingModification() {
+		Event newEvent = createOneEvent(5);
+		EventRecurrence recurrence = createRecurrence(newEvent);
+		newEvent.setRecurrence(recurrence);
+	
+		Event updateEvent = newEvent.clone();
+		updateEvent.setDescription("there are not important changes");
+		Assert.assertFalse(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasImportantChangesEventAddAttendees() {
+		Event newEvent = createOneEvent(5);
+		EventRecurrence recurrence = createRecurrence(newEvent);
+		newEvent.setRecurrence(recurrence);
+	
+		Event updateEvent = newEvent.clone();
+		updateEvent.setAttendees(createAttendees(8));
+		
+		Assert.assertFalse(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasImportantChangesEventWithAddingAttendeeAndUpdatedLocation() {
+		Event newEvent = createOneEvent(5);
+		EventRecurrence recurrence = createRecurrence(newEvent);
+		newEvent.setRecurrence(recurrence);
+	
+		Event updateEvent = newEvent.clone();
+		updateEvent.setAttendees(createAttendees(6));
+		updateEvent.setLocation("to Paris");
+		
+		Assert.assertTrue(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasImportantChangesEventWithUpdatedRecurrence() {
+		Event newEvent = createOneEvent(5);
+		EventRecurrence recurrence = createRecurrence(newEvent);
+		newEvent.setRecurrence(recurrence);
+	
+		Event updateEvent = newEvent.clone();
+		EventRecurrence updateRecurrence = updateEvent.getRecurrence();
+		
+		Calendar calendarUpdate = Calendar.getInstance();
+		calendarUpdate.add(Calendar.HOUR, 4);
+		updateRecurrence.setEnd(calendarUpdate.getTime());
+		
+		Assert.assertTrue(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasImportantChangesEventWithUpdatedOneEventOfRecurrence() {
+		Event newEvent = createOneEvent(5);
+
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.HOUR, 10);
+		Event one = newEvent.clone();
+		one.setDate(cal.getTime());
+		
+		cal.add(Calendar.HOUR, 2);
+		Event two = newEvent.clone();
+		two.setDate(cal.getTime());
+		
+		EventRecurrence recurrence = createRecurrence(newEvent);
+		newEvent.setRecurrence(recurrence);
+		recurrence.getEventExceptions().add(one);
+		recurrence.getEventExceptions().add(two);
+		
+		Event updateEvent = newEvent.clone();
+		EventRecurrence updateRecurrence = updateEvent.getRecurrence();
+		
+		Calendar calendarUpdate = Calendar.getInstance();
+		calendarUpdate.add(Calendar.HOUR, 4);
+		updateRecurrence.getEventExceptions().get(0).setDate(calendarUpdate.getTime());
+		
+		Assert.assertTrue(updateEvent.hasImportantChanges(newEvent));
+	}
+	
 	private Event createOneEvent(int nbAttendees) {
 		Event event = new Event();
 		event.setAlert(10);

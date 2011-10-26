@@ -410,6 +410,22 @@ public class Event implements Indexed<Integer> {
 		return getUid().getIndex();
 	}
 	
+	public boolean hasImportantChanges(Event event) {
+		if ( !( Objects.equal(this.location, event.location)
+				&& Objects.equal(this.date, event.date)
+				&& Objects.equal(this.duration, event.duration)
+				&& Objects.equal(this.recurrenceId, event.recurrenceId)
+				&& Objects.equal(this.type, event.type)) ) {
+			return true;
+		}
+		
+		if (this.recurrence != null) {
+			return this.recurrence.hasImportantChanges(event.getRecurrence());
+		}
+		
+		return false;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(super.hashCode(), title, domain, description,
@@ -456,5 +472,5 @@ public class Event implements Indexed<Integer> {
 		}
 		return false;
 	}
-	
+
 }
