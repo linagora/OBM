@@ -167,7 +167,7 @@ public class CalendarItemsParserTest {
 	@Test
 	public void testParseExternalEvent() throws SAXException, IOException, FactoryConfigurationError {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" isInternal=\"false\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
 		"<timeupdate>1292580000000</timeupdate>" +
 		"<timecreate>1289988000000</timecreate>" +
 		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
@@ -198,8 +198,7 @@ public class CalendarItemsParserTest {
 		cal.setTimeInMillis(1295258400000L);
 		
 		
-		Assert.assertTrue(ev.isInternalEvent());
-//		Assert.assertFalse(ev.isInternalEvent());
+		Assert.assertFalse(ev.isInternalEvent());
 		Assert.assertEquals(cal.getTime(), ev.getDate());
 		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
