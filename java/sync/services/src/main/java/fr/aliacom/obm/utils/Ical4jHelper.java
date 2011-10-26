@@ -878,9 +878,9 @@ public class Ical4jHelper {
 
 	private void appendUidToICS(PropertyList prop, Event event,
 			EventExtId parentExtId) {
-		if (parentExtId != null && parentExtId.isDefined()) {
+		if (parentExtId != null && parentExtId.getExtId() != null) {
 			prop.add(new Uid(parentExtId.serializeToString()));
-		} else if (event.getExtId() != null && event.getExtId().isDefined()) {
+		} else if (event.getExtId() != null && event.getExtId().getExtId() != null) {
 			prop.add(new Uid(event.getExtId().serializeToString()));
 		} else {
 			throw new InvalidParameterException();

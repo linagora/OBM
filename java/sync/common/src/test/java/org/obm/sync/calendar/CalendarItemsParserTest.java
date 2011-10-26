@@ -234,6 +234,46 @@ public class CalendarItemsParserTest {
 	}
 
 	@Test
+	public void testParseExternalEventWithEmptyExtId() throws SAXException, IOException, FactoryConfigurationError {
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" isInternal=\"false\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<timeupdate>1292580000000</timeupdate>" +
+		"<timecreate>1289988000000</timecreate>" +
+		"<extId></extId>" +
+		"<opacity>OPAQUE</opacity>" +
+		"<title>fake rdv</title>" +
+		"<owner>john@do.fr</owner>" +
+		"<tz>Europe/Paris</tz>" +
+		"<date>1295258400000</date>" +
+		"<duration>3600</duration>" +
+		"<location>tlse</location>" +
+		"<alert>60</alert>" +
+		"<priority>0</priority>" +
+		"<privacy>0</privacy>" +
+		"<attendees/>" +
+		"</event>";
+		
+		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
+		Event ev = parser.parseEvent(doc.getDocumentElement());
+
+		Calendar cal = new GregorianCalendar();
+		cal.setTimeInMillis(1295258400000L);
+		
+		
+		Assert.assertFalse(ev.isInternalEvent());
+		Assert.assertEquals(cal.getTime(), ev.getDate());
+		Assert.assertNull(ev.getExtId().getExtId());
+		Assert.assertEquals("fake rdv", ev.getTitle());
+		Assert.assertEquals("john@do.fr", ev.getOwner());
+		Assert.assertEquals(3600, ev.getDuration());
+		Assert.assertEquals("tlse", ev.getLocation());
+		Assert.assertEquals(new Integer(60), ev.getAlert());
+		Assert.assertEquals(1295262000000L,ev.getEndDate().getTime());
+		Assert.assertEquals(1289988000000L,ev.getTimeCreate().getTime());
+		Assert.assertEquals(1292580000000L,ev.getTimeUpdate().getTime());
+	}
+	
+	@Test
 	public void testParseNullRecurrence() throws SAXException, IOException, FactoryConfigurationError {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +

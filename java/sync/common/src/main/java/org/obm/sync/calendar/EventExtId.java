@@ -10,7 +10,7 @@ public class EventExtId implements Serializable {
 	private final String extId;
 	
 	public EventExtId(String extId) {
-		this.extId = extId;
+		this.extId = Strings.emptyToNull(extId);
 	}
 	
 	public String getExtId() {
@@ -21,10 +21,6 @@ public class EventExtId implements Serializable {
 		return extId;
 	}
 
-	public boolean isDefined() {
-		return !Strings.isNullOrEmpty(extId);
-	}
-	
 	@Override
 	public final boolean equals(Object obj) {
 		if (obj instanceof EventExtId) {

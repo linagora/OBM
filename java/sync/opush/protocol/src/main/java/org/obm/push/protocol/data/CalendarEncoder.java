@@ -62,7 +62,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 		s(p, "Calendar:Subject", ev.getSubject());
 
 		EventExtId eventExtId = ev.getExtId();
-		if (eventExtId != null && eventExtId.isDefined()) {
+		if (eventExtId != null && eventExtId.getExtId() != null) {
 			String eventExtIdAsString = eventExtId.serializeToString();
 			if (isHex(eventExtIdAsString)) {
 				s(p, "Calendar:UID", eventExtIdAsString);
