@@ -62,6 +62,9 @@ EOF
     echo -n "Stop/Start Apache2... "
     invoke-rc.d apache2 restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
   fi
+elif [ -f "/etc/apache2/sites-available/obm.conf" ] ; then
+   # if the obm.conf file is already in place we just ensure there is a / at then end of the Opush Proxy
+   perl -i -pe's@/Microsoft-Server-ActiveSync$@/Microsoft-Server-ActiveSync/@g' /etc/apache2/sites-available/obm.conf
 fi
 
 if [ -n "$2" ] && dpkg --compare-versions "$2" lt 2.2.0-0; then
