@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.obm.push.utils.index.Indexed;
+import com.google.common.base.Objects;
 
 public class Event implements Indexed<Integer> {
 
@@ -254,6 +255,7 @@ public class Event implements Indexed<Integer> {
 		event.setCompletion(completion);
 		event.setDate(date);
 		event.setDescription(description);
+		event.setDomain(domain);
 		event.setDuration(duration);
 		event.setEntityId(entityId);
 		event.setExtId(extId);
@@ -265,8 +267,11 @@ public class Event implements Indexed<Integer> {
 		event.setPercent(percent);
 		event.setPriority(priority);
 		event.setPrivacy(privacy);
-		event.setRecurrence(recurrence);
+		if (recurrence != null) {
+			event.setRecurrence(recurrence.clone());
+		}
 		event.setTimeUpdate(timeUpdate);
+		event.setTimezoneName(timezoneName);
 		event.setTitle(title);
 		event.setType(type);
 		event.setUid(uid);
@@ -403,6 +408,53 @@ public class Event implements Indexed<Integer> {
 	@Override
 	public Integer getIndex() {
 		return getUid().getIndex();
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(super.hashCode(), title, domain, description,
+				uid, extId, privacy, owner, ownerDisplayName, ownerEmail,
+				location, date, duration, alert, category, priority, allday,
+				attendees, recurrence, type, completion, percent, opacity,
+				entityId, timeUpdate, timeCreate, timezoneName, recurrenceId,
+				internalEvent, sequence);
+	}
+	
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof Event) {
+			Event that = (Event) object;
+			return Objects.equal(this.title, that.title)
+				&& Objects.equal(this.domain, that.domain)
+				&& Objects.equal(this.description, that.description)
+				&& Objects.equal(this.uid, that.uid)
+				&& Objects.equal(this.extId, that.extId)
+				&& Objects.equal(this.privacy, that.privacy)
+				&& Objects.equal(this.owner, that.owner)
+				&& Objects.equal(this.ownerDisplayName, that.ownerDisplayName)
+				&& Objects.equal(this.ownerEmail, that.ownerEmail)
+				&& Objects.equal(this.location, that.location)
+				&& Objects.equal(this.date, that.date)
+				&& Objects.equal(this.duration, that.duration)
+				&& Objects.equal(this.alert, that.alert)
+				&& Objects.equal(this.category, that.category)
+				&& Objects.equal(this.priority, that.priority)
+				&& Objects.equal(this.allday, that.allday)
+				&& Objects.equal(this.attendees, that.attendees)
+				&& Objects.equal(this.recurrence, that.recurrence)
+				&& Objects.equal(this.type, that.type)
+				&& Objects.equal(this.completion, that.completion)
+				&& Objects.equal(this.percent, that.percent)
+				&& Objects.equal(this.opacity, that.opacity)
+				&& Objects.equal(this.entityId, that.entityId)
+				&& Objects.equal(this.timeUpdate, that.timeUpdate)
+				&& Objects.equal(this.timeCreate, that.timeCreate)
+				&& Objects.equal(this.timezoneName, that.timezoneName)
+				&& Objects.equal(this.recurrenceId, that.recurrenceId)
+				&& Objects.equal(this.internalEvent, that.internalEvent)
+				&& Objects.equal(this.sequence, that.sequence);
+		}
+		return false;
 	}
 	
 }

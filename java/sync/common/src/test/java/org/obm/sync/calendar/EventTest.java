@@ -1,5 +1,6 @@
 package org.obm.sync.calendar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -191,4 +192,98 @@ public class EventTest {
 		
 		Assert.assertEquals(false, event.exceptionModifiedSince(dateStart));
 	}
+	
+	@Test
+	public void testEventClone() {
+		Event newEvent = createOneEvent(5);
+		EventRecurrence recurrence = createRecurrence(newEvent);
+		newEvent.setRecurrence(recurrence);
+		
+		Event clone = newEvent.clone();
+		Assert.assertEquals(clone, newEvent);
+	}
+	
+	@Test
+	public void testEventRecurrenceClone() {
+		Event newEvent = createOneEvent(5);
+		EventRecurrence recurrence = createRecurrence(newEvent);
+		recurrence.setFrequence(10);
+		newEvent.setRecurrence(recurrence);
+		
+		Event eventCloned = newEvent.clone();
+		EventRecurrence recurrenceCloned = eventCloned.getRecurrence();
+		recurrenceCloned.setFrequence(25);
+		
+		Assert.assertFalse(newEvent.equals(eventCloned));
+	}
+	
+	private Event createOneEvent(int nbAttendees) {
+		Event event = new Event();
+		event.setAlert(10);
+		event.setAllday(true);
+		event.setAttendees( createAttendees(nbAttendees) );
+		event.setCategory("category");
+		event.setCompletion(new Date());
+		event.setDate(new Date());
+		event.setDescription("description");
+		event.setDomain("domain");
+		event.setDuration(10);
+		event.setEntityId(1);
+		event.setExtId(new EventExtId("1"));
+		event.setInternalEvent(true);
+		event.setLocation("location");
+		event.setOpacity(EventOpacity.OPAQUE);
+		event.setOwner("owner");
+		event.setOwnerDisplayName("owner displayname");
+		event.setOwnerEmail("owner email");
+		event.setPercent(1);
+		event.setPriority(1);
+		event.setPrivacy(1);
+		event.setSequence(0);
+		event.setTimeCreate(new Date());
+		event.setTimeUpdate(new Date());
+		event.setTimezoneName("timeZone");
+		event.setTitle("title");
+		event.setType(EventType.VEVENT);
+		event.setUid(new EventObmId(1));
+		
+		return event;
+	}
+	
+	private List<Attendee> createAttendees(int count) {
+		List<Attendee> attendees = new ArrayList<Attendee>();
+		for (int i = 0; i < count; i++) {
+			Attendee attendee = new Attendee();
+			attendee.setCanWriteOnCalendar(false);
+			attendee.setDisplayName("DisplayName" + i);
+			attendee.setEmail("email" + i + "@email.com");
+			attendee.setObmUser(true);
+			attendee.setOrganizer(isOrganizer(i));
+			attendee.setPercent(1);
+			attendee.setRequired(ParticipationRole.REQ);
+			attendee.setState(ParticipationState.NEEDSACTION);
+		}
+		return attendees;
+	}
+	
+	private boolean isOrganizer(int id) {
+		if (id == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private EventRecurrence createRecurrence(Event event) {
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setDays("days");
+		recurrence.setEnd(new Date());
+		recurrence.setFrequence(1);
+		List<Event> events = new LinkedList<Event>();
+		events.add(event.clone());
+		recurrence.setEventExceptions(events);
+		return recurrence;
+	}
+	
 }

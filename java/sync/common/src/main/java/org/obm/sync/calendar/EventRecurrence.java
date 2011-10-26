@@ -1,9 +1,11 @@
 package org.obm.sync.calendar;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import com.google.common.base.Objects;
 
 public class EventRecurrence {
 
@@ -78,4 +80,39 @@ public class EventRecurrence {
 	public void addEventException(Event eventException) {
 		this.eventExceptions.add(eventException);
 	}
+
+	public EventRecurrence clone() {
+		EventRecurrence eventRecurrence = new EventRecurrence();
+		eventRecurrence.setDays(this.days);
+		eventRecurrence.setEnd(this.end);
+		List<Event> eventExceptions = new ArrayList<Event>();
+		for (Event event: this.eventExceptions) {
+			eventExceptions.add(event.clone());
+		}
+		eventRecurrence.setEventExceptions(eventExceptions);
+		eventRecurrence.setExceptions(getExceptions());
+		eventRecurrence.setFrequence(this.frequence);
+		eventRecurrence.setKind(this.kind);
+		return eventRecurrence;
+	}
+	
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(days, end, frequence, kind, exceptions, eventExceptions);
+	}
+
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof EventRecurrence) {
+			EventRecurrence that = (EventRecurrence) object;
+			return Objects.equal(this.days, that.days)
+				&& Objects.equal(this.end, that.end)
+				&& Objects.equal(this.frequence, that.frequence)
+				&& Objects.equal(this.kind, that.kind)
+				&& Objects.equal(this.exceptions, that.exceptions)
+				&& Objects.equal(this.eventExceptions, that.eventExceptions);
+		}
+		return false;
+	}
+	
 }
