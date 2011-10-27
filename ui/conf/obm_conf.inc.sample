@@ -111,6 +111,13 @@ $ccalendar_send_ics = true;
 // Calendar ics attachment encoding (8bit, base64 or quoted-printable)
 $ccalendar_ics_encoding = 'base64';
 
+// Calendar send ics through stomp
+//$ccalendar_ics_eventStompObserver = true;
+//$stomp_host = '127.0.0.1';
+//$stomp_port = '61613';
+//$stomp_login = '';
+//$stomp_passcode = '';
+
 // Calendar hour fraction (minutes select granularity)
 $ccalendar_hour_fraction = 4;
 

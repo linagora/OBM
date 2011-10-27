@@ -28,6 +28,13 @@
  * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
  * @license GPL 2.0
  */
+
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if ($obminclude == '') $obminclude = 'obminclude';
+if( isset($GLOBALS['ccalendar_ics_eventStompObserver']) && $GLOBALS['ccalendar_ics_eventStompObserver']) {
+  include_once("$obminclude/stomp/Stomp.php");
+}
+
 class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
 
   private $id;
@@ -1125,6 +1132,35 @@ class OBM_EventDebugObserver implements OBM_IObserver {
     fclose($h);
   }
 
+}
+
+/**
+ * An OBM_IObserver that send message to the MQ
+ */
+class OBM_EventStompObserver implements OBM_IObserver {
+               
+       public function update($old, $new){
+               try {
+                       if ($new !== null) { // Update or Create
+                               $method = "request";
+                               $tmpFilename = $new->getIcs($userId, $method, false);
+                       } elseif ($old !== null) { // Delete
+                               $method = "cancel";
+                               $tmpFilename = $old->getIcs($userId, $method, false);
+                       } else {
+                               throw new OBM_ObserverException(__('$old and $new cannot be null at the same time in OBM_EventStompObserver'));
+                       }
+                                               
+                       $contentOfTmpFilename = fread(fopen($tmpFilename, "r"), filesize($tmpFilename));
+		       $stomp = new Stomp("tcp://".$GLOBALS['stomp_host'].":".$GLOBALS['stomp_port']); 
+                       $stomp->connect();
+                       $stomp->send("jms.topic.eventChanges", $contentOfTmpFilename, array('persistent'=>'true'));
+
+                       $stomp->disconnect();
+               } catch (StompException $e) {
+                       throw new OBM_ObserverException(__("An Exception was thrown during OBM_EventStompObserver->update " . $e->getMessage() . " -"));
+	       }
+       }
 }
 
 class OBM_ObserverException extends Exception {}

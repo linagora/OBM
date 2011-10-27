@@ -152,6 +152,13 @@ $ccalendar_send_ics = true;
 // Ics mime encoding for emails
 $ccalendar_ics_encoding = 'base64';
 
+// Calendar send ics through stomp
+//$ccalendar_ics_eventStompObserver = true;
+//$stomp_host = '127.0.0.1';
+//$stomp_port = '61613';
+//$stomp_login = '';
+//$stomp_passcode = '';
+
 // Remote calendar cache time to live
 $cremote_calendar_ics_ttl = 60;
 

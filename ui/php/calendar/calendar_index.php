@@ -147,6 +147,9 @@ $perm->check_permissions($module, $action);
 page_close();
 
 OBM_EventFactory::getInstance()->attach(new OBM_EventMailObserver());
+if( isset($GLOBALS['ccalendar_ics_eventStompObserver']) && $GLOBALS['ccalendar_ics_eventStompObserver']) {
+  OBM_EventFactory::getInstance()->attach(new OBM_EventStompObserver());
+}
 // For debugging purpose, this observer outputs in /tmp/debug
 // OBM_EventFactory::getInstance()->attach(new OBM_EventDebugObserver());
 
