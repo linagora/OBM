@@ -235,8 +235,9 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public FolderChanges listAddressBooksChanged(AccessToken token, Date timestamp) throws ServerFault {
+	public FolderChanges listAddressBooksChanged(AccessToken token, Date lastSync) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
+		params.put("lastSync", DateHelper.asString(lastSync));
 		Document doc = execute(token, "/book/listAddressBooksChanged", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseFolderChangesResponse(doc);

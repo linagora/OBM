@@ -236,6 +236,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		Document doc = null;
 		doc = DOMUtils.createDoc("http://www.obm.org/xsd/sync/folder-changes.xsd", "folder-changes");
 		Element root = doc.getDocumentElement();
+		root.setAttribute("lastSync", DateHelper.asString(folderChanges.getLastSync()));
 		createFolderChanges(folderChanges, root);
 		return doc;
 	}

@@ -56,7 +56,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 		}
 	}
 
-	private HierarchyItemsChanges getContactsChanges(BackendSession bs, Date lastSync) throws DaoException {
+	private HierarchyItemsChanges getContactsChanges(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException {
 		return contactsBackend.getHierarchyChanges(bs, lastSync);
 	}
 
@@ -85,9 +85,9 @@ public class HierarchyExporter implements IHierarchyExporter {
 		allItemsChanged.addAll(getTasksChanges(bs));
 
 		return new HierarchyItemsChanges(
-				allItemsChanged, itemsContactChanged.getItemsDeleted());
+				allItemsChanged, itemsContactChanged.getItemsDeleted(), itemsContactChanged.getLastSync());
 	}
-
+	
 	@Override
 	public int getRootFolderId(BackendSession bs) throws DaoException, CollectionNotFoundException {
 		return folderExporter.getServerIdFor(bs);

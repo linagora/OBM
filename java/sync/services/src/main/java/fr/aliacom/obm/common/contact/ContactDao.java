@@ -1630,4 +1630,17 @@ public class ContactDao {
 			obmHelper.cleanup(con, st, null);
 		}
 	}
+	
+	public Date getLastSync() throws ServerFault {
+		Connection con = null;
+		try {
+			con = obmHelper.getConnection();
+			return obmHelper.selectNow(con);
+		} catch (SQLException e) {
+			throw new ServerFault(e.getMessage());
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
+	}
+	
 }
