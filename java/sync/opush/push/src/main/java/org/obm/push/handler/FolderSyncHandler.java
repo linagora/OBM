@@ -100,7 +100,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			if (syncState == null) {
 				throw new InvalidSyncKeyException(syncKey);
 			}
-			return getFolderSyncResponse(bs, syncState.getLastSync());
+			return getFolderSyncContactsResponse(bs, syncState.getLastSync());
 		}
 	}
 
@@ -119,7 +119,16 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		return new FolderSyncResponse(
 				hierarchyItemsChanges.getItemsAddedOrUpdated(), hierarchyItemsChanges.getItemsDeleted(), newSyncKey);
 	}
+	
+	private FolderSyncResponse getFolderSyncContactsResponse(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, 
+		UnknownObmSyncServerException, InvalidServerId {
 
+		HierarchyItemsChanges hierarchyItemsChanges =  hierarchyExporter.getContactsChanged(bs, lastSync);
+		String newSyncKey = stMachine.allocateNewSyncKey(bs, getCollectionId(bs), hierarchyItemsChanges.getLastSync(), hierarchyItemsChanges.getItemsAddedOrUpdated());
+		return new FolderSyncResponse(
+				hierarchyItemsChanges.getItemsAddedOrUpdated(), hierarchyItemsChanges.getItemsDeleted(), newSyncKey);
+	}
+	
 	private HierarchyItemsChanges getFolderChanges(BackendSession bs, Date lastSync) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
 		
