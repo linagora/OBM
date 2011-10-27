@@ -81,27 +81,20 @@ public class ContactsBackend extends ObmSyncBackend {
 		this.contactConfiguration = contactConfiguration;
 	}
 
-	public HierarchyItemsChanges getHierarchyChanges(BackendSession bs, Date lastSync) throws DaoException {
+	public HierarchyItemsChanges getHierarchyChanges(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException {
 		List<ItemChange> itemsChanged = new LinkedList<ItemChange>();
 		List<ItemChange> itemsDeleted = new LinkedList<ItemChange>();
-		try {
-			
-			FolderChanges folderChanges = listAddressBooksChanged(bs, lastSync);
-			
-			for (Folder folder: folderChanges.getUpdated()) {
-				itemsChanged.add( createItemChange(bs, folder) );
-			}
-			
-			for (Integer collectionId: folderChanges.getRemoved()) {
-				String toString = collectionIdToString(collectionId);
-				itemsDeleted.add( new ItemChange(toString) );
-			}
-			
-		} catch (UnknownObmSyncServerException e1) {
-			logger.error(e1.getMessage());
+		FolderChanges folderChanges = listAddressBooksChanged(bs, lastSync);
+		
+		for (Folder folder: folderChanges.getUpdated()) {
+			itemsChanged.add( createItemChange(bs, folder) );
 		}
-
-		return new HierarchyItemsChanges(itemsChanged, itemsDeleted);
+		
+		for (Integer collectionId: folderChanges.getRemoved()) {
+			String toString = collectionIdToString(collectionId);
+			itemsDeleted.add( new ItemChange(toString) );
+		}
+		return new HierarchyItemsChanges(itemsChanged, itemsDeleted, folderChanges.getLastSync());
 	}
 	
 	private FolderChanges listAddressBooksChanged(BackendSession bs, Date lastSync) throws UnknownObmSyncServerException {
