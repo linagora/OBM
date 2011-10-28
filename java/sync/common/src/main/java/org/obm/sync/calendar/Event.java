@@ -427,8 +427,8 @@ public class Event implements Indexed<Integer> {
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hashCode(super.hashCode(), title, domain, description,
+	public final int hashCode() {
+		return Objects.hashCode(title, domain, description,
 				uid, extId, privacy, owner, ownerDisplayName, ownerEmail,
 				location, date, duration, alert, category, priority, allday,
 				attendees, recurrence, type, completion, percent, opacity,
@@ -437,7 +437,7 @@ public class Event implements Indexed<Integer> {
 	}
 	
 	@Override
-	public boolean equals(Object object) {
+	public final boolean equals(Object object) {
 		if (object instanceof Event) {
 			Event that = (Event) object;
 			return Objects.equal(this.title, that.title)
@@ -473,4 +473,14 @@ public class Event implements Indexed<Integer> {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("super", super.toString())
+			.add("title", title)
+			.add("uid", uid)
+			.add("date", date)
+			.toString();
+	}
+	
 }

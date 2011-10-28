@@ -7,26 +7,13 @@
 		<version>2.4.0-SNAPSHOT</version>
 	</parent>
 	
-	<artifactId>common</artifactId>
+	<artifactId>common-test</artifactId>
 	<packaging>jar</packaging>
-	<name>obm-sync common objects</name>
+	<name>common test classes</name>
 	<url>http://www.obm.org/</url>
 	<version>2.4.0-SNAPSHOT</version>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-nop</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -36,18 +23,13 @@
 			<artifactId>guice</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>configuration</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>utils</artifactId>
-			<version>${obm.version}</version>
+			<groupId>nl.jqno.equalsverifier</groupId>
+			<artifactId>equalsverifier</artifactId>
+			<version>1.0.2</version>
 		</dependency>
 	</dependencies>
 

@@ -32,7 +32,7 @@ public class EventObmId implements Indexed<Integer>, Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (obj instanceof EventObmId) {
 			EventObmId other = (EventObmId) obj;
 			return Objects.equal(obmId, other.obmId);
@@ -41,7 +41,7 @@ public class EventObmId implements Indexed<Integer>, Serializable {
 	}
 	
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return Objects.hashCode(obmId);
 	}
 	

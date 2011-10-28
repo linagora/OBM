@@ -1,14 +1,20 @@
 package org.obm.push.bean;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
+import org.junit.Before;
 import org.junit.Test;
+import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
 
 public class BeansTest {
 
+	private EqualsVerifierUtils equalsVerifierUtilsTest;
+	
+	@Before
+	public void init() {
+		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	}
+	
 	@Test
 	public void test() {
 		ImmutableList<Class<?>> list = 
@@ -41,14 +47,7 @@ public class BeansTest {
 					.add(SyncState.class)
 					.add(User.class)
 					.build();
-		for (Class<?> clazz: list) {
-			createEqualsVerifier(clazz).verify();
-		}
+		equalsVerifierUtilsTest.test(list);
 	}
-
-	private EqualsVerifier<?> createEqualsVerifier(Class<?> clazz) {
-		return EqualsVerifier.forClass(clazz).suppress(Warning.NONFINAL_FIELDS).debug();
-	}
-
 	
 }

@@ -139,12 +139,13 @@ public class EventRecurrence {
 	}
 	
 	@Override
-	public int hashCode(){
-		return Objects.hashCode(days, end, frequence, kind, exceptions, eventExceptions);
+	public final int hashCode() {
+		return Objects.hashCode(days, end, frequence, kind, exceptions,
+				eventExceptions);
 	}
 
 	@Override
-	public boolean equals(Object object){
+	public final boolean equals(Object object){
 		if (object instanceof EventRecurrence) {
 			EventRecurrence that = (EventRecurrence) object;
 			return Objects.equal(this.days, that.days)

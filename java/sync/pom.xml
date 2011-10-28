@@ -64,6 +64,7 @@
 		<module>utils</module>
 		<module>dbcp</module>
 		<module>annotations</module>
+		<module>common-test</module>
 	</modules>
 
 	<build>

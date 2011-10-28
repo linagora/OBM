@@ -26,7 +26,7 @@ public class EventExtId implements Serializable {
 	}
 	
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (obj instanceof EventExtId) {
 			EventExtId other = (EventExtId) obj;
 			return Objects.equal(extId, other.extId);
@@ -35,7 +35,7 @@ public class EventExtId implements Serializable {
 	}
 	
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return Objects.hashCode(extId);
 	}
 	
