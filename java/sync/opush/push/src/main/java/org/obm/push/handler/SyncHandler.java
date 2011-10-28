@@ -190,6 +190,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		if (unSynchronizedItemNb == 0) {
 			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getOptions().getFilterType(), c.getCollectionId());
 			lastSync = delta.getSyncDate();
+		} else {
+			lastSync = c.getSyncState().getLastSync();
 		}
 
 		List<ItemChange> changed = processWindowSize(c, delta, bs, processedClientIds);
