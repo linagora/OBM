@@ -127,6 +127,7 @@ class DelegationGroups extends CronJob {
     $q_delegation = of_delegation_query_insert_clauses('group_delegation', $delegation);
     $group_email = preg_replace('/Tous /', 'Tous', $groupName);
     $group_email = preg_replace('/\//', '-', $group_email);
+    $group_email = preg_replace('/\s/', '-', $group_email);
 
     $query = "INSERT INTO UGroup (
     group_timeupdate,
