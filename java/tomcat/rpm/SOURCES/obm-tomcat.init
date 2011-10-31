@@ -1,0 +1,98 @@
+#!/bin/bash
+# Tomcat init script
+#
+# chkconfig: 345 65 35
+# description: Tomcat automatic startup and shutdown for RHE
+
+set -e
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+export JAVA_HOME=/usr/lib/jvm/java-6-sun
+test -d /usr/lib/jvm/java-1.6.0-openjdk && {
+    JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
+}
+test -d /usr/lib/jvm/java-openjdk && {
+    JAVA_HOME=/usr/lib/jvm/java-openjdk
+}
+
+if [ -r /etc/sysconfig/i18n ]; then
+  . /etc/sysconfig/i18n
+  export LANG
+fi
+
+
+tomcat_pid=/var/run/obm_tomcat.pid
+tomcat_path=/usr/share/tomcat
+jps=$JAVA_HOME/bin/jps
+
+tomcat_running() {
+    test -f ${tomcat_pid} || return 1
+    supposed_pid=`cat ${tomcat_pid}`
+    ret=`$jps |grep -q ${supposed_pid}`
+    return $ret
+}
+
+start_tomcat() {
+    tomcat_running && {
+        echo "OBM Tomcat already running."
+        ret=0
+        return $ret
+    }
+
+    ${tomcat_path}/bin/catalina.sh start
+}
+
+stop_tomcat() {
+    tomcat_running || {
+        echo "OBM Tomcat not running."
+        ret=0
+        return $ret
+    }
+
+    kill `cat ${tomcat_pid}`
+    echo -n "Waiting for OBM Tomcat shutdown."
+    count=0
+    while tomcat_running; do
+	echo -n "."
+	sleep 0.5
+        count=$((${count}+1))
+        if [ ${count} -gt 10 ]; then
+          kill -9 `cat ${tomcat_pid}`
+        fi
+    done
+    rm -f ${tomcat_pid}
+    echo ""
+}
+
+status() {
+	if tomcat_running; then
+		echo "Tomcat is running"
+                ret=0
+                return $ret
+	else
+		echo "Tomcat is stopped"
+                ret=3
+                return $ret
+	fi
+}
+
+case "$1" in
+    start)
+        start_tomcat
+        ;;
+    
+    stop)
+        stop_tomcat
+        ;;
+	status)
+		status
+		;;
+    restart)
+        stop_tomcat
+        start_tomcat
+        ;;
+	*)
+		echo "Usage: $0 {start|stop|status|restart|reload}"
+esac
+
+exit $ret

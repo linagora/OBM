@@ -1,0 +1,12 @@
+diff -Nur -x '*.orig' -x '*~' obm-2.1.9/conf/obm_conf.inc.sample obm-2.1.9.new/conf/obm_conf.inc.sample
+--- obm-2.1.9/conf/obm_conf.inc.sample	2008-04-04 16:42:59.000000000 +0200
++++ obm-2.1.9.new/conf/obm_conf.inc.sample	2008-04-07 23:33:11.000000000 +0200
+@@ -15,7 +15,7 @@
+ // CGP_HOST IS DEPRECATED. See external-url,..
+ 
+ // Resources alias absolute path. (default value is '/images')
+-// $resources_path = "$cgp_host/images"; 
++$resources_path = "$cgp_host/images"; 
+ 
+ // Home page redirection
+ //$c_home_redirect = "$cgp_host" . 'calendar/calendar_index.php';

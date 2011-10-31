@@ -1,0 +1,59 @@
+#!/bin/bash
+set -e
+
+dbtype=`cat /etc/obm/obm_conf.ini | grep "^dbtype *=" | cut -d"=" -f2| sed -e 's/ //g'`
+user=`cat /etc/obm/obm_conf.ini | grep "^user *=" | cut -d"=" -f2| sed -e 's/ //g'`
+password=`cat /etc/obm/obm_conf.ini | grep "^password *=" | cut -d"=" -f2| sed -e 's/ //g'| sed -e 's/"//g'`
+db=`cat /etc/obm/obm_conf.ini | grep "^db *=" | cut -d"=" -f2| sed -e 's/ //g'`
+host=`cat /etc/obm/obm_conf.ini | grep "^host *=" | cut -d"=" -f2| sed -e 's/ //g'`
+
+max_connection=`cat /proc/cpuinfo | grep processor | wc -l`
+
+if [ ${dbtype} = 'MYSQL' ]; then
+  cat > /etc/obm-tomcat/applis/obm-sync.xml<<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<Context docBase="/usr/share/obm-sync/" path="/obm-sync">
+  <Resource auth="Container"
+            className="com.mysql.jdbc.Driver"
+            factory="fr.aliacom.jndi.DataSourceFactory"
+            login="${user}"
+            max="${max_connection}0"
+            name="jdbc/ObmDS"
+            password="${password}"
+            pingQuery="SELECT 1"
+            type="javax.sql.DataSource"
+            url="jdbc:mysql://${host}/${db}?relaxAutocommit=true&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false&amp;interactiveClient=true&amp;serverTimezone=GMT&amp;useGmtMillisForDatetime=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;characterSetResults=utf8&amp;connectionCollation=utf8_general_ci"/>
+  <ResourceLink global="UTransaction"
+                name="UserTransaction"
+                type="javax.transaction.UserTransaction"/>
+</Context>
+
+EOF
+else
+  cat > /etc/obm-tomcat/applis/obm-sync.xml<<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<Context docBase="/usr/share/obm-sync/" path="/obm-sync">
+  <Resource auth="Container"
+            className="org.postgresql.Driver"
+            factory="fr.aliacom.jndi.DataSourceFactory"
+            login="${user}"
+            max="${max_connection}0"
+            name="jdbc/ObmDS"
+            password="${password}"
+            pingQuery="SELECT 1"
+            type="javax.sql.DataSource"
+            url="jdbc:postgresql://${host}/${db}"/>
+  <ResourceLink global="UTransaction"
+                name="UserTransaction"
+                type="javax.transaction.UserTransaction"/>
+</Context>
+EOF
+
+fi
+
+#update tomcat application
+/usr/bin/obm-tomcat-trigger
+
+exit 0
+
+

@@ -1,0 +1,18 @@
+--- obm-2.1.9/conf/obm_conf.inc.sample	2008-04-04 16:42:59.000000000 +0200
++++ obm_conf.inc.sample.new	2008-04-08 16:19:16.000000000 +0200
+@@ -150,6 +150,7 @@
+     'default' => 1),
+   'module' => array (
+     'default' => $perm_admin,
++    'tools' => 0,
+     'domain' => 0),
+   'properties' => array (
+     'admin_realm' => array ('user', 'delegation')
+@@ -165,6 +166,7 @@
+     'default' => 1),
+   'module' => array (
+     'default' => $perm_admin,
++    'tools' => 0,
+     'domain' => 0),
+   'properties' => array (
+     'admin_realm' => array ('user', 'delegation', 'domain')

@@ -1,0 +1,14 @@
+During installation of obm-config you set the "externalurl" of OBM
+server. The ExternalUrl value is the address users will type in their
+browsers to access obm.
+
+Once installed and configured, simply open your webbrowser and go to
+http://<externalurl>/obm
+
+By default, the domain localhost.localdomain (obm1) is created.  Login
+is "admin" and password "admin".  For the global domain (to create
+other domain), login is "admin0" and password "admin".
+
+Please change all password to improve security.
+
+ -- Sylvain Garcia <sylvain.garcia@aliasource.fr>, Tue,  8 Apr 2008 18:43:33 +0200

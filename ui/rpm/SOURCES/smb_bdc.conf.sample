@@ -1,0 +1,36 @@
+[global]     
+    workgroup = SMB_DOMAINE
+    netbios name= %h
+    server string = Controleur du domaine SMB_DOMAINE
+    log level = 2
+    log file = /var/log/samba/smbd.log
+    max log size = 5000
+    security = user
+    encrypt passwords = yes
+    obey pam restrictions = No
+    username map = /etc/samba/smbusers
+    socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
+    local master = no
+    os level = 65
+    domain master = no
+    preferred master = no
+    domain logons = yes
+    logon script = \\%h\netlogon\logon.bat
+    logon path = \\%h\\%U\\.profile
+    logon drive = H:
+    wins support = no
+    dns proxy = no
+
+ ## PARAMETRE LDAP ##
+ ####################
+ # Lancez cette commande pour que Samba puisse lire et Ã©ire
+ # dans l'annuaire : smbpasswd -w mypassword
+    ldap suffix = dc=SMB_DOMAINE,dc=LDAP_SUFFIX
+    ldap machine suffix = ou=hosts
+    ldap user suffix = ou=users
+    ldap group suffix = ou=groups
+    ldap admin dn = uid=samba,ou=sysusers,dc=LDAP_SUFFIX
+    ldap ssl = no
+    ldap passwd sync = yes
+    passdb backend = ldapsam:"LDAP_SRV"
+

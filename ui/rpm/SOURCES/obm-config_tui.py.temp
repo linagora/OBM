@@ -1,0 +1,98 @@
+
+
+
+
+import os
+import sys
+import getopt
+import string
+import trace
+import types
+from snack import *
+
+
+#def config(screen):
+
+#def mysl(screen):
+
+#def postgresql(screen):
+
+#def service(screen):
+
+#def satellite(screen):
+
+def ldap(screen): 
+	t=TextboxReflowed(25,("LDAP configuration aim you to enable ldap module to deal with OBM application"))
+	bb=ButtonBar(screen,((("OK"),"ok"),(("Cancel"),"cancel")))
+	li=Listbox(5,width=25,returnExit=1)
+	li.append(("Serveur Hostname"), LDAP_HOSTNAME)
+	#li.append(("
+
+	g=GridForm(screen,("OBM LDAP Configuration"),1,3)
+	g.add(t,0,0)
+	g.add(li,0,1)
+	g.add(bb,0,2)
+	res=g.run()
+	screen.popWindow()
+
+
+ETHERNET = "toto"
+MODEM = "foo"
+ISDN = "foobar"
+
+def test(screen):
+    t=TextboxReflowed(25,("Main Configuration"))
+    bb=ButtonBar(screen,((("OK"),"ok"),(("Cancel"),"cancel")))
+    li=Listbox(8,width=19,returnExit=1)
+    li.append(("LDAP"), ETHERNET)
+    li.append(("MAIL"), MODEM)
+    li.append(("WEB"), ISDN)
+    #li.insert(("locahost"))
+    #cb=Checbox(2,
+	#Checkbox("LDAP util", isOn = 0)
+	
+    #li.append(("
+
+  #  machine = os.uname()[4]
+   # if machine == 's390' or machine == 's390x':
+    #    li.append(_("QETH"), QETH)
+
+    g=GridForm(screen,("OBM Main Configuration"),1,3)
+    g.add(t,0,0)
+    g.add(li,0,1)
+    g.add(bb,0,2)
+    res=g.run()
+    screen.popWindow()
+    #if bb.buttonPressed(res) != 'cancel':
+     #   todo=li.current()
+      #  df = NCDeviceFactory.getDeviceFactory()
+      #  dev = None
+      #  devclass = df.getDeviceClass(todo)
+      #  devlist = getDeviceList()
+      #  if not devclass: return -1
+      #  dev = devclass()
+      #  if dev:
+      #      i = devlist.addDevice()
+      #      devlist[i] = dev
+      #      return dev
+    #return -2
+
+
+screen = SnackScreen()
+
+test(screen)
+
+#if bb.buttonPressed(res) == 'LDAP':
+	#ldap(screen)
+
+#if bb.buttonPressed(test) = "cancel":
+screen.finish()
+sys.exit(code)
+       #print dev
+    #except SystemExit, code:
+      #  screen.finish()
+#        sys.exit()
+    #except:
+     #   screen.finish()
+#        raise
+

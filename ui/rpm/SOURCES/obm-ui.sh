@@ -1,0 +1,105 @@
+#!/bin/sh
+#+-------------------------------------------------------------------------+
+#|   Copyright (c) 1997-2009 OBM.org project members team                  |
+#|                                                                         |
+#|  This program is free software; you can redistribute it and/or          |
+#|  modify it under the terms of the GNU General Public License            |
+#|  as published by the Free Software Foundation; version 2                |
+#|  of the License.                                                        |
+#|                                                                         |
+#|  This program is distributed in the hope that it will be useful,        |
+#|  but WITHOUT ANY WARRANTY; without even the implied warranty of         |
+#|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          |
+#|  GNU General Public License for more details.                           | 
+#+-------------------------------------------------------------------------+
+#|  http://www.obm.org                                                     |
+#+-------------------------------------------------------------------------+
+
+
+REP_ETC_OBM="/etc/obm"
+FIC_RPM_CONF="${REP_ETC_OBM}/obm-rpm.conf"
+FIC_HTTPD_OBM="/etc/httpd/conf.d/obm.conf"
+FIC_CONF_OBM="${REP_ETC_OBM}/obm_conf.ini"
+FIC_CONF_OBM_INC="${REP_ETC_OBM}/obm_conf.inc"
+
+echo "================= OBM UI  configuration =================="
+echo 
+
+# Test de l'existance du fichier de conf obm-rpm.conf
+if [ -s $FIC_RPM_CONF ]; then
+        source $FIC_RPM_CONF
+else
+        echo "$0 (Err):Le fichier $FIC_RPM_CONF n'exite pas ou est vide"
+fi
+
+echo -e "Chose type of authentication: (database/ldap) [database] \c "
+read authentication
+if [ "x${authentication}" == "x" ]; then
+	authentication="database"
+elif [ "${authentication}" == "ldap" ]; then
+	while [ "x${ldap_server}" == "x" ]; do
+		echo -e "Enter the host name or IP of your ldap server: \c "
+		read ldap_server
+	done	
+	echo -e "Enter the suffix ldap: [dc=local] \c "
+	read ldap_suffix
+	if [ "x${ldap_suffix}" == "x" ]; then
+		ldap_suffix="dc=local"
+	fi
+	echo -e "Enter the filter ldap: [(&(uid=%u)(obmDomain=%d))] \c "
+	read ldap_filter
+	if [ "x${ldap_filter}" == "x" ]; then
+		ldap_filter="(&(uid=%u)(obmDomain=%d))"
+	fi
+fi
+
+# Modify obm_conf.ini for auth ldap
+if [ ${authentication} == "ldap" ];then
+	if [ ! -e "$FIC_CONF_OBM.old" ]; then
+	cp $FIC_CONF_OBM $FIC_CONF_OBM.old
+	fi
+	sed -i -e "s|^;auth-ldap-server.*|auth-ldap-server = ldap://${ldap_server}|" $FIC_CONF_OBM
+	sed -i -e "s/^;auth-ldap-basedn.*/auth-ldap-basedn = \"${ldap_suffix}\"/" $FIC_CONF_OBM
+	sed -i -e "s/; auth-ldap-filter.*/auth-ldap-filter = \"${ldap_filter}\"/" $FIC_CONF_OBM
+	sed -i -e "s|^//\$auth_kind='ldap';.*$|\$auth_kind='ldap'; |" $FIC_CONF_OBM_INC
+	
+fi
+
+if [ -e $FIC_HTTPD_OBM ]; then
+	echo "The $FIC_HTTPD_OBM file already exist"
+	echo -e "Do you want replace it? (y)es,(n)o ?\c"
+	read replace_httpd_conf
+	if [ "x$replace_httpd_conf" == "xy" ]; then
+		cp $FIC_HTTPD_OBM ${FIC_HTTPD_OBM}.old
+		sed -i -e "s/FULL_NAME/${EXTERNALURL}/" ${FIC_HTTPD_OBM}
+                sed -i -e "s%.*DocumentRoot.*%DocumentRoot /usr/share/obm/php%" ${FIC_HTTPD_OBM} 
+                sed -i -e "s%.*ErrorLog.*%ErrorLog /var/log/httpd/obm-error.log%" ${FIC_HTTPD_OBM} 
+                sed -i -e "s%.*CustomLog.*%CustomLog /var/log/httpd/obm-access.log common%" ${FIC_HTTPD_OBM} 
+                sed -i -e "s%.*Alias.*/images.*%Alias /images /usr/share/obm/resources%" ${FIC_HTTPD_OBM} 
+                sed -i -e "s%.*include_path.*%php_value include_path  \".:/usr/share/obm\"%" ${FIC_HTTPD_OBM} 
+                # Activation SSL dans la conf obm apache
+                #echo "Activation SSL directive to obm apache config"
+                #sed -i -e '/## SSL/ , /## End SSL/ s/#//' ${FIC_HTTPD_CONF}
+                #sed -i -e '/## Rewrite SLL/ , /## End Rewrite SLL/ s/#//' ${FIC_HTTPD_CONF}
+                #sed -i -e "s/^NameVirtualHost \*:80/NameVirtualHost *:443/" ${FIC_HTTPD_CONF}
+                #sed -i -e "s/^<VirtualHost \*:80>/<VirtualHost *:443>/" ${FIC_HTTPD_CONF}
+                echo "Activation Tomcat proxy"
+                echo -e "what is ip adress of OBM-TOMCAT server (obm-sync, funambol) ?\c"
+                read tomcat_server
+                sed -i -e "s%#obm#%%" ${FIC_HTTPD_OBM}
+                sed -i -e "s%_TOMCAT_SERVER_%${tomcat_server}%" ${FIC_HTTPD_OBM}
+                echo "Activation opush proxy"
+                echo -e "what is ip adress of OPUSH server ?\c"
+                read opush_server
+                sed -i -e "s%#opush#%%" ${FIC_HTTPD_OBM}
+                sed -i -e "s%_OPUSH_SERVER_%${opush_server}%" ${FIC_HTTPD_OBM}
+
+		/etc/init.d/httpd restart
+	fi
+else
+	echo "Une erreur est survenu lors de l'installation"
+	echo "car le fichier $FIC_HTTPD_OBM n'existe pas"
+fi
+
+echo
+echo -e "================= End of OBM UI configuration ==================\n"

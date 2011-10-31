@@ -1,0 +1,11 @@
+--- obm-2.1.9/obminclude/of/of_session.inc	2008-04-08 12:41:29.000000000 +0200
++++ obm-2.1.9.new/obminclude/of/of_session.inc	2008-04-08 16:56:51.000000000 +0200
+@@ -403,7 +403,7 @@
+             'domain' => $perm_admin,
+             'password' => $perm_admin,
+             'settings' => $perm_admin,
+-            'tools' => $perm_admin,
++            'tools' => 0,
+             'group' => $perm_user
+           ),
+           'properties' => array (

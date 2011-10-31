@@ -1,0 +1,64 @@
+#!/bin/bash
+# Copyright (C) 2009 Linagora Group.
+#
+# Authors:  Ronan Lanore <ronan.lanore@laliasource.fr>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+FIC_PDC=`rpm -qd obm-Samba | grep smb_pdc.conf.sample`
+FIC_BDC=`rpm -qd obm-Samba | grep smb_bdc.conf.sample`
+FIC_NSSWITCH="/etc/nsswitch.conf"
+FIC_LDAP="/etc/ldap.conf"
+FIC_SMB="/etc/samba/smb.conf"
+
+echo -e "================= OBM Samba configuration ==================\n"
+echo -e "o Please enter the name of your domain: \c "
+read smb_domain_name
+echo -e "o Please enter the SID of your domain: \c "
+read smb_domain_sid
+echo -e "o Please enter the suffix of your ldap: \c "
+read ldap_suffix
+echo -e "o Please enter LDAP server name (ldap://ldap1 ldap://ldap2) \c "
+read ldap_srv
+echo -e "o Please enter role of samba server (pdc/bdc) \c "
+read smb_role
+
+
+# write file nsswitch.conf
+cp $FIC_NSSWITCH $FIC_NSSWITCH.orig
+sed -i -e "s/^passwd:.*/passwd: files ldap/" $FIC_NSSWITCH
+sed -i -e "s/^group:.*/group: files ldap/" $FIC_NSSWITCH
+sed -i -e "s/^shadow:.*/shadow: files ldap/" $FIC_NSSWITCH
+
+# write file ldap.conf
+cp $FIC_LDAP $FIC_LDAP.orig
+sed -i -e "s/^base.*$/base dc=$smb_domain_name,dc=$ldap_suffix/" $FIC_LDAP
+sed -i -e "s/^#uri.*$/uri $ldap_srv/" $FIC_LDAP
+sed -i -e "s/^#ldap_version.*$/ldap_version 3/" $FIC_LDAP
+sed -i -e "s/^#nss_base_passwd.*$/nss_base_passwd         ou=users,dc=$smb_domain_name,dc=$ldap_suffix?one/" $FIC_LDAP
+sed -i -e "s/^#nss_base_passwd.*$/nss_base_passwd         ou=hosts,dc=$smb_domain_name,dc=$ldap_suffix?one/" $FIC_LDAP
+sed -i -e "s/^#nss_base_shadow.*$/nss_base_shadow         ou=users,dc=$smb_domain_name,dc=$ldap_suffix?one/" $FIC_LDAP
+sed -i -e "s/^#nss_base_group.*$/nss_base_group          ou=groups,dc=$smb_domain_name,dc=$ldap_suffix?one/" $FIC_LDAP
+
+# Write smb.conf for your config
+if [ $smb_role == "pdc" ];then
+	cp $FIC_PDC $FIC_SMB
+elif [ $smb_role == "bdc" ];then
+	cp $FIC_BDC $FIC_SMB
+else
+	echo "An error occur on role of samba server"
+	exit 1
+fi
+
