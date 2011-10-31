@@ -1,4 +1,4 @@
-{package_name} ({version}) stable; urgency=low
+{package_name} ({version}~{release}) stable; urgency=low
 
   * New upstream release.
 
