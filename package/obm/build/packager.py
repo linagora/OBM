@@ -108,11 +108,12 @@ class Packager(object):
             # If we're not building on RedHat/CentOS, we need to make sure we're
             # not going to take system directories from the current platform
             redefine_platform_params = distname != 'redhat'
+            topdir = os.path.abspath(os.path.join(self._target_dir, 'rpm'))
+            target_dir = os.path.abspath(self._target_dir)
             command = "rpmbuild -ba --nodeps --define '_topdir %s' " \
                 "--define '_rpmdir %s' --define '_srcrpmdir %s' " \
                 "--define 'obm_version %s' --define 'obm_release %s' " % \
-                (os.path.join(self._target_dir, 'rpm'), self._target_dir,
-                        self._target_dir, self.version, self.release)
+                (topdir, target_dir, target_dir, self.version, self.release)
             if redefine_platform_params:
                 # Override the Perl module destination directory
                 command += "--define 'perl_vendorlib " \
