@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.obm.push.utils.index.Indexed;
+
 import com.google.common.base.Objects;
 
 public class Event implements Indexed<Integer> {
@@ -411,19 +412,13 @@ public class Event implements Indexed<Integer> {
 	}
 	
 	public boolean hasImportantChanges(Event event) {
-		if ( !( Objects.equal(this.location, event.location)
-				&& Objects.equal(this.date, event.date)
-				&& Objects.equal(this.duration, event.duration)
-				&& Objects.equal(this.recurrenceId, event.recurrenceId)
-				&& Objects.equal(this.type, event.type)) ) {
-			return true;
+		ComparatorUsingEventHasImportantChanges comparator = new ComparatorUsingEventHasImportantChanges();
+		if (comparator.equals(this, event)) {
+			if (this.recurrence != null) {
+				return this.recurrence.hasImportantChanges(event.getRecurrence());
+			}
 		}
-		
-		if (this.recurrence != null) {
-			return this.recurrence.hasImportantChanges(event.getRecurrence());
-		}
-		
-		return false;
+		return true;
 	}
 
 	@Override

@@ -335,13 +335,13 @@ public class EventTest {
 		event.setPriority(1);
 		event.setPrivacy(1);
 		event.setSequence(0);
+		event.setRecurrenceId(new Date());
 		event.setTimeCreate(new Date());
 		event.setTimeUpdate(new Date());
 		event.setTimezoneName("timeZone");
 		event.setTitle("title");
 		event.setType(EventType.VEVENT);
 		event.setUid(new EventObmId(1));
-		
 		return event;
 	}
 	
