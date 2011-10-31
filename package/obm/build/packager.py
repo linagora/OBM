@@ -63,10 +63,13 @@ class Packager(object):
         archive_path = os.path.join(self._target_dir, "rpm", "SOURCES", archive_name)
         source_file_or_dirs = os.listdir(source_path)
         logging.info("Compressing sources to %s" % archive_path)
-        with tarfile.open(archive_path, mode='w:gz') as gzfd:
+        gzfd = tarfile.open(archive_path, mode='w:gz')
+        try:
             for source_file_or_dir in source_file_or_dirs:
                 path = os.path.join(source_path, source_file_or_dir)
                 gzfd.add(path, os.path.join(root, source_file_or_dir))
+        finally:
+            gzfd.close()
 
     def _copy(self):
         """
