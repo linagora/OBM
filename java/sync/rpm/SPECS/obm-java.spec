@@ -56,7 +56,7 @@ jetty configuration file for OBM
 %setup -q -n obm-java-%{version}
 
 %build
-LANG=en_US.UTF-8 mvn -T 4 clean install
+LANG=en_US.UTF-8 mvn clean install
 
 %install
 rm -rf $RPM_BUILD_ROOT
