@@ -133,11 +133,11 @@ cp /usr/share/doc/obm-jetty/jetty.xml.sample /etc/jetty6/jetty.xml
 /etc/init.d/jetty6 start > /dev/null 2>&1 || :
 
 %post -n opush
-/sbin/service jetty restart >/dev/null 2>&1 || :
+/sbin/service jetty6 restart >/dev/null 2>&1 || :
 
 %postun -n opush
 if [ "$1" -ge "1" ] ; then
-    /sbin/service jetty restart >/dev/null 2>&1 || :
+    /sbin/service jetty6 restart >/dev/null 2>&1 || :
 fi
 
 %post -n obm-locator
