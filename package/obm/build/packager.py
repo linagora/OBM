@@ -36,20 +36,25 @@ class Packager(object):
         """
         if self.package_type == 'deb':
             self._copy()
-            self._update_changelog()
+            self._update_deb_changelog()
         elif self.package_type == 'rpm':
             self._copy()
             self._tar_all_sources()
+            self._update_rpm_changelog()
         else:
             raise PackagingError("Unknown packaging type: %s" % \
                     self.package_type)
+
+    def _get_spec_path(self):
+        spec_path = os.path.join(self._target_dir, 'rpm', 'SPECS',
+                "%s.spec" % self.package.name)
+        return spec_path
 
     def _tar_all_sources(self):
         """
         Tars the sources for the RPM.
         """
-        spec_path = os.path.join(self._target_dir, 'rpm', 'SPECS',
-                "%s.spec" % self.package.name)
+        spec_path = self._get_spec_path()
         if self.package.sub_packages:
             for sub_package in self.package.sub_packages:
                 self._tar_sources(sub_package.name, spec_path,
@@ -80,7 +85,7 @@ class Packager(object):
             self.package.path, self._target_dir))
         shutil.copytree(self.package.path, self._target_dir)
 
-    def _update_changelog(self):
+    def _update_deb_changelog(self):
         """
         Triggers the overwrite of the changelog. The value of
         *changelog_update_mode* determines whether the changelog updated is the
@@ -94,6 +99,11 @@ class Packager(object):
                 raise PackagingError("No changelog for package %s (expected to "
                         "find one in %s)" % (self.package.name, changelog))
             self.changelog_updater.update(self.package.name, changelog)
+
+    def _update_rpm_changelog(self):
+        if self.changelog_updater:
+            spec = self._get_spec_path()
+            self.changelog_updater.update(self.package.name, spec)
 
     def build(self):
         """

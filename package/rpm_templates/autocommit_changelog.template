@@ -1,0 +1,2 @@
+* {changelog_date} Thomas Sarboni <tsarboni@linagora.com> - {package_name}-{version}-{release}
+- beta build only for test purpose - git revision {sha1}

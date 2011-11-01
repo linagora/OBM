@@ -1,26 +1,30 @@
-import datetime
 import string
 
 class ChangelogUpdater(object):
     """
-    This object updates the Debian changelog in autocommit mode. Its
+    This object updates the Debian changelog or RPM spec file in autocommit mode. Its
     constructor accepts the following parameters:
-        - *scm_manager*: an instance of :class:`SCMManager`
         - *changelog_template*: the path to a Debian changelog template
+        - *package_type*: one of `'deb'` or `'rpm'`
+        - *date*: an instance of :class:`datetime.datetime`, set to the time at
+          which we started building the packages
+        - *sha1*: the SHA1 of the build
         - *version*: the OBM version (ex: 2.4.0)
         - *release*: the OBM release (ex: rc10) 
-        - *mode*: one of `'replace'` or `'append'`. The first overwrites the
-          changelog with the instancied template, the second inserts the
-          contents of the instancied template at the top of the changelog.
-    
+        - *mode*: one of `'replace'`, `'append'` or `'no_update'`. The first
+          overwrites the changelog with the instancied template, the second
+          inserts the contents of the instancied template at the top of the
+          changelog, while `'no_update'` turns :method:`update` into a no-op.
     """
     REPLACE='replace'
     APPEND='append'
     NO_UPDATE='no_update'
 
 
-    def __init__(self, changelog_template, date, sha1, version, release, mode):
+    def __init__(self, changelog_template, package_type, date, sha1, version,
+            release, mode):
         self.changelog_template = changelog_template
+        self.package_type = package_type
         self.date = date
         self.sha1 = sha1
         self.version = version
@@ -38,7 +42,13 @@ class ChangelogUpdater(object):
         if self.mode == self.NO_UPDATE:
             return
 
-        changelog_date = self.date.strftime("%a, %e %b %Y %H:%M:%S +0000")
+        changelog_date = None
+        if self.package_type == 'deb':
+            changelog_date = self.date.strftime("%a, %e %b %Y %H:%M:%S +0000")
+        elif self.package_type == 'rpm':
+            changelog_date = self.date.strftime("%a %b %d %Y")
+        else:
+            raise ValueError("Unknown package type %s" % self.package_type)
         params = dict(package_name=package_name,
                 version=self.version,
                 release=self.release,
@@ -56,6 +66,14 @@ class ChangelogUpdater(object):
             template_content = template_fd.read()
         formatter = string.Formatter()
         changelog_content = formatter.format(template_content, **params)
+        if self.package_type == 'deb':
+            self._update_deb_changelog(changelog, changelog_content)
+        elif self.package_type == 'rpm':
+            self._update_rpm_spec(changelog, changelog_content)
+        else:
+            raise ValueError("Unknown package type %s" % self.package_type)
+
+    def _update_deb_changelog(self, changelog, changelog_content):
         if self.mode == self.REPLACE:
             with open(changelog, 'w') as changelog_fd:
                 changelog_fd.write(changelog_content)
@@ -69,3 +87,30 @@ class ChangelogUpdater(object):
                 changelog_fd.write(old_changelog_content)
         else:
             raise ValueError("Unknown mode value: %s" % self.mode)
+
+    def _update_rpm_spec(self, spec, changelog_content):
+        spec_content = None
+        with open(spec, 'r') as spec_fd:
+            spec_content = spec_fd.readlines()
+
+        in_changelog = False
+        seen_changelog = False
+        with open(spec, 'w') as spec_fd:
+            for i, line in enumerate(spec_content):
+                if line.startswith("%changelog") and seen_changelog:
+                    raise ValueError("Can't deal with more than one"
+                            "changelog section at line %d in %s" %
+                            (i + 1, spec))
+                # We reached the end of the changelog section. Well, maybe
+                if in_changelog and line.startswith("%"):
+                    in_changelog = False
+                # We discard the current line only when we are in replace mode
+                # in the changelog section
+                if not in_changelog or self.mode == self.APPEND:
+                    if line.startswith("%changelog"):
+                        in_changelog = True
+                        seen_changelog = True
+                        spec_fd.write(line)
+                        spec_fd.write(changelog_content)
+                    else:
+                        spec_fd.write(line)

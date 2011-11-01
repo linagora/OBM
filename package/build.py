@@ -112,8 +112,15 @@ def get_version_release(args, date, sha1):
                 hour=date.strftime("%H"),
                 minute=date.strftime("%M"),
                 short_sha1=short_sha1)
-        release = formatter.format("{obm_release}+git{year}{month}{day}-"
-                "{hour}{minute}-{short_sha1}", **params)
+        release = None
+        if args.package_type == 'deb':
+            release = formatter.format("{obm_release}+git{year}{month}{day}-"
+                    "{hour}{minute}-{short_sha1}", **params)
+        elif args.package_type == 'rpm':
+            release = formatter.format("{obm_release}+git{year}{month}{day}_"
+                    "{hour}{minute}_{short_sha1}", **params)
+        else:
+            raise ValueError("Unknown package type %s" % args.package_type)
     else:
         release = obm_release
     return version, release
@@ -137,8 +144,8 @@ def make_packagers(config, args, packages_dir, checkout_dir, packages):
     version, release = get_version_release(args, date, scm_manager.sha1)
 
     changelog_updater = ob.ChangelogUpdater(changelog_template=template,
-            date=date, sha1=scm_manager.sha1, mode=mode, version=version,
-            release=release)
+            package_type=args.package_type, date=date, sha1=scm_manager.sha1,
+            mode=mode, version=version, release=release)
 
     packagers = [ob.Packager(p, args.package_type, packages_dir,
         changelog_updater, version, release) for p in packages]
