@@ -101,7 +101,7 @@ def build_argument_parser(args):
 def get_version_release(args, date, sha1):
     obm_version = args.obm_version
     obm_release = args.obm_release
-    version = "%s.0" % obm_version
+    version = obm_version
     short_sha1 = sha1[:7]
     if args.on_commit: 
         formatter = string.Formatter()
