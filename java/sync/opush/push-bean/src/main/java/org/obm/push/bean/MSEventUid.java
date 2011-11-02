@@ -12,12 +12,12 @@ public class MSEventUid {
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		return Objects.hashCode(uid);
 	}
 	
 	@Override
-	public boolean equals(Object object){
+	public final boolean equals(Object object){
 		if (object instanceof MSEventUid) {
 			MSEventUid that = (MSEventUid) object;
 			return Objects.equal(this.uid, that.uid);

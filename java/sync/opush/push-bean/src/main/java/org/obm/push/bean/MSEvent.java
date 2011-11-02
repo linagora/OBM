@@ -21,6 +21,7 @@ public class MSEvent implements IApplicationData, Serializable {
 	private String subject;
 	private EventObmId obmId;
 	private EventExtId extId;
+	private MSEventUid uid;
 	private String description;
 	private Date created;
 	private Date lastUpdate;
@@ -257,6 +258,14 @@ public class MSEvent implements IApplicationData, Serializable {
 		this.obmSequence = obmSequence;
 	}
 	
+	public MSEventUid getUid() {
+		return uid;
+	}
+	
+	public void setUid(MSEventUid uid) {
+		this.uid = uid;
+	}
+	
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
@@ -285,6 +294,7 @@ public class MSEvent implements IApplicationData, Serializable {
 			.add("exceptionStartTime", exceptionStartTime)
 			.add("deletedException", deletedException)
 			.add("obmSequence", obmSequence)
+			.add("uid", uid)
 			.toString();
 	}
 
@@ -294,7 +304,7 @@ public class MSEvent implements IApplicationData, Serializable {
 				subject, obmId, extId, description, created, lastUpdate, dtStamp, 
 				endTime, startTime, allDayEvent, busyStatus, sensitivity, meetingStatus, 
 				reminder, categories, recurrence, exceptions, timeZone, exceptionStartTime, 
-				deletedException, obmSequence);
+				deletedException, obmSequence, uid);
 	}
 	
 	@Override
@@ -325,6 +335,7 @@ public class MSEvent implements IApplicationData, Serializable {
 				&& Objects.equal(this.timeZone, that.timeZone)
 				&& Objects.equal(this.exceptionStartTime, that.exceptionStartTime)
 				&& Objects.equal(this.deletedException, that.deletedException)
+				&& Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.obmSequence, that.obmSequence);
 		}
 		return false;
