@@ -52,6 +52,7 @@ import net.fortuna.ical4j.model.property.Trigger;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Description;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
@@ -92,12 +93,17 @@ public class Ical4jHelperTest {
 		}
 	}
 	
+	@BeforeClass
+	public static void setUpOnce() {
+		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+	}
+
 	private Ical4jHelper getIcal4jHelper(){
 		return new Ical4jHelper();
 	}
 
 	private Calendar getCalendar() {
-		return new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+		return new GregorianCalendar();
 	}
 	
 	protected ObmUser getDefaultObmUser() {
@@ -235,7 +241,6 @@ public class Ical4jHelperTest {
 		cal.set(Calendar.MILLISECOND, 0);
 
 		DtStart dtStart = new DtStart(new DateTime(cal.getTime()));
-
 		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) + 2);
 		DtEnd dtEnd = new DtEnd(new DateTime(cal.getTime()));
 
