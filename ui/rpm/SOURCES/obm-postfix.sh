@@ -21,6 +21,7 @@ FIC_MAIN="/etc/postfix/main.cf"
 FIC_RPM_CONF="${REP_ETC_OBM}/obm-rpm.conf"
 REP_DOC="/usr/share/doc"
 DOC_DIR=`rpm -qa |grep obm-postfix | cut -d"-" -f1-3`
+FIC_PID_POSTFIX="/var/spool/postfix/pid/master.pid"
 
 echo -e "================= OBM postfix configuration ==================\n"
 
@@ -70,6 +71,12 @@ if [ -e $FIC_MAIN ]; then
 else
 	echo "Une erreur est survenu lors de l'installation de postfix"
 	echo "car le fichier $FIC_MAIN n'existe pas"
+fi
+
+if [ ! -s $FIC_PID_POSTFIX ]; then
+	/etc/init.d/postfix start
+else
+	/etc/init.d/postfix restart
 fi
 
 echo
