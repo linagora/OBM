@@ -7,6 +7,12 @@
 	<version>2.4.0-SNAPSHOT</version>
 	<name>obm-sync and opush 2.4 parent project</name>
 
+	<inceptionYear>2000</inceptionYear>
+	<organization>
+	  <name>Linagora</name>
+	  <url>http://www.linagora.com</url>
+	</organization>
+
 	<properties>
 		<obm.version>2.4.0-SNAPSHOT</obm.version>
 

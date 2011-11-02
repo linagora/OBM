@@ -12,7 +12,21 @@
 	<packaging>jar</packaging>
 	<name>opush org.obm.mime</name>
 	<url>http://www.obm.org/</url>
-
+	
+	<licenses>
+		<license>
+			<name>GNU General Public License (GPL) version 2.0</name>
+			<url>http://www.gnu.org/licenses/gpl-2.0.html</url>
+		</license>
+		<license>
+			<name>GNU General Lesser Public License (LGPL) version 2.1</name>
+			<url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+		</license>
+		<license>
+			<name>Mozilla Public License Version 1.1</name>
+			<url>http://www.mozilla.org/MPL/MPL-1.1.html</url>
+		</license>
+	</licenses>
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>

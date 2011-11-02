@@ -14,6 +14,17 @@
 	<url>http://www.obm.org/</url>
 	<version>2.4.0-SNAPSHOT</version>
 
+	<licenses>
+		<license>
+			<name>GNU AFFERO GENERAL PUBLIC LICENSE Version 3</name>
+			<url>http://www.gnu.org/licenses/agpl-3.0.html</url>
+		</license>
+		<license>
+			<name>GNU General Public License (GPL) version 2.0</name>
+			<url>http://www.gnu.org/licenses/gpl-2.0.html</url>
+		</license>	
+	</licenses>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.easytesting</groupId>
