@@ -75,10 +75,12 @@ public class MailMessageLoader {
 	private final AbstractEventSyncClient calendarClient;
 	private final List<String> htmlMimeSubtypePriority;
 	private final StoreClient storeClient;
+	private final EventConverter eventConverter;
 	
-	public MailMessageLoader(final StoreClient store, final AbstractEventSyncClient calendarClient) {
+	public MailMessageLoader(final StoreClient store, final AbstractEventSyncClient calendarClient, EventConverter eventConverter) {
 		this.storeClient = store;
 		this.calendarClient = calendarClient;
+		this.eventConverter = eventConverter;
 		this.htmlMimeSubtypePriority = Arrays.asList("html", "plain", "calendar");
 	}
 
@@ -205,7 +207,7 @@ public class MailMessageLoader {
 				final List<Event> obmEvents = calendarClient.parseICS(at, ics);
 				if (obmEvents.size() > 0) {
 					final Event icsEvent = obmEvents.get(0);
-					return (MSEvent) new EventConverter().convert(bs, icsEvent);
+					return eventConverter.convert(bs, icsEvent, null);
 				}
 			} catch (Throwable e) {
 				logger.error(e.getMessage() + ", ics was:\n" + ics, e);

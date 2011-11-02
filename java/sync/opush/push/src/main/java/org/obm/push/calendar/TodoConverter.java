@@ -27,11 +27,11 @@ import com.google.common.base.Objects;
 /**
  * Convert events between OBM-Sync object model & Microsoft object model
  */
-public class TodoConverter implements ObmSyncCalendarConverter {
+public class TodoConverter {
 
 	private static final int TASK_IMPORTANCE_NORMAL = 1;
 
-	public IApplicationData convert(BackendSession bs, Event e) {
+	public IApplicationData convert(Event e) {
 		MSTask mse = new MSTask();
 
 		mse.setSubject(e.getTitle());
@@ -196,37 +196,13 @@ public class TodoConverter implements ObmSyncCalendarConverter {
 		return daysList;
 	}
 
-	@Override
-	public Event convertAsInternal(BackendSession bs, Event oldEvent,
-			IApplicationData data) {
-		return convert(bs, oldEvent, data, true);
-	}
-
-	@Override
-	public Event convertAsExternal(BackendSession bs, Event oldEvent,
-			IApplicationData data) {
-		return convert(bs, oldEvent, data, false);
-	}
-
-	@Override
-	public Event convertAsInternal(BackendSession bs, IApplicationData data) {
-		return convert(bs, null, data, true);
-	}
-
-	@Override
-	public Event convertAsExternal(BackendSession bs, IApplicationData data) {
-		return convert(bs, null, data, false);
-	}
-
-	private Event convert(BackendSession bs, Event oldEvent,
-			IApplicationData task, Boolean isObmInternalEvent) {
-		MSTask data = (MSTask) task;
+	public Event convert(BackendSession bs, Event oldEvent, MSTask task, Boolean isObmInternalEvent) {
 		Event e = new Event();
 		e.setInternalEvent(isObmInternalEvent);
 		if (oldEvent != null) {
 			e.setExtId(oldEvent.getExtId());
 			for (Attendee att : oldEvent.getAttendees()) {
-				if (data.getComplete()) {
+				if (task.getComplete()) {
 					att.setPercent(100);
 				} else if (att.getPercent() >= 100) {
 					att.setPercent(0);
@@ -235,17 +211,17 @@ public class TodoConverter implements ObmSyncCalendarConverter {
 			}
 		} else {
 			Attendee att = convertAttendee(bs, null);
-			if (data.getComplete()) {
+			if (task.getComplete()) {
 				att.setPercent(100);
 			}
 			e.addAttendee(att);
 		}
 		e.setType(EventType.VTODO);
-		e.setTitle(data.getSubject());
+		e.setTitle(task.getSubject());
 
-		e.setDescription(data.getDescription());
-		if (data.getUtcStartDate() != null) {
-			e.setDate(data.getUtcStartDate());
+		e.setDescription(task.getDescription());
+		if (task.getUtcStartDate() != null) {
+			e.setDate(task.getUtcStartDate());
 			e.setTimezoneName("GMT");
 		} else {
 			Calendar cal = Calendar.getInstance();
@@ -256,8 +232,8 @@ public class TodoConverter implements ObmSyncCalendarConverter {
 			e.setDate(cal.getTime());
 		}
 
-		e.setCompletion(data.getDateCompleted());
-		int importance = Objects.firstNonNull(data.getImportance(), TASK_IMPORTANCE_NORMAL);
+		e.setCompletion(task.getDateCompleted());
+		int importance = Objects.firstNonNull(task.getImportance(), TASK_IMPORTANCE_NORMAL);
 		switch (importance) {
 		case 0:
 			e.setPriority(1);
@@ -270,20 +246,20 @@ public class TodoConverter implements ObmSyncCalendarConverter {
 			e.setPriority(3);
 			break;
 		}
-		if (data.getReminderSet()) {
-			long alert = Math.abs(data.getUtcStartDate().getTime()
-					- data.getReminderTime().getTime());
+		if (task.getReminderSet()) {
+			long alert = Math.abs(task.getUtcStartDate().getTime()
+					- task.getReminderTime().getTime());
 			e.setAlert((int) alert);
 		}
 
-		e.setPrivacy(privacy(oldEvent, data.getSensitivity()));
+		e.setPrivacy(privacy(oldEvent, task.getSensitivity()));
 
-		if (data.getUtcDueDate() != null) {
-			long durmili = Math.abs(data.getUtcStartDate().getTime()
-					- data.getUtcDueDate().getTime());
+		if (task.getUtcDueDate() != null) {
+			long durmili = Math.abs(task.getUtcStartDate().getTime()
+					- task.getUtcDueDate().getTime());
 			e.setDuration((int) durmili / 1000);
 		}
-		e.setRecurrence(getRecurrence(data));
+		e.setRecurrence(getRecurrence(task));
 
 		return e;
 	}

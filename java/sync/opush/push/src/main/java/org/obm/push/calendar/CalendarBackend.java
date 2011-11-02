@@ -1,5 +1,6 @@
 package org.obm.push.calendar;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -15,6 +16,7 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSTask;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -33,7 +35,6 @@ import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
@@ -42,7 +43,6 @@ import org.obm.sync.client.calendar.TodoClient;
 import org.obm.sync.items.EventChanges;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -50,12 +50,16 @@ import com.google.inject.Singleton;
 @Singleton
 public class CalendarBackend extends ObmSyncBackend {
 
-	private final ImmutableMap<PIMDataType, ObmSyncCalendarConverter> converters;
+	private final EventConverter eventConverter;
+	private final TodoConverter todoConverter;
 
 	@Inject
-	private CalendarBackend(CollectionDao collectionDao, BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient) {
+	private CalendarBackend(CollectionDao collectionDao, 
+			BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient,
+			EventConverter eventConverter, TodoConverter todoConverter) {
 		super(collectionDao, bookClient, calendarClient, todoClient);
-		converters = ImmutableMap.of(PIMDataType.CALENDAR, new EventConverter(), PIMDataType.TASKS, new TodoConverter());
+		this.eventConverter = eventConverter;
+		this.todoConverter = todoConverter;
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) 
@@ -238,7 +242,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	private ItemChange createItemChangeToAddFromEvent(final BackendSession bs, final Integer collectionId, final Event event) {
 		ItemChange ic = new ItemChange();
 		ic.setServerId(getServerIdFor(collectionId, event.getObmId()));
-		IApplicationData ev = convertEvent(bs, event);
+		IApplicationData ev = convertObmObjectToMSObject(bs, event);
 		ic.setData(ev);
 		return ic;
 	}
@@ -267,7 +271,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			}
 
 			boolean isInternal = EventConverter.isInternalEvent(oldEvent, true);
-			event = convertMSEventToObmEvent(bs, data, oldEvent, isInternal);
+			event = convertMSObjectToObmObject(bs, data, oldEvent, isInternal);
 
 			if (eventId != null) {
 				event.setUid(eventId);
@@ -303,21 +307,15 @@ public class CalendarBackend extends ObmSyncBackend {
 		return new EventObmId(serverId.substring(idx + 1));
 	}
 
-	private Event convertMSEventToObmEvent(BackendSession bs,
+	private Event convertMSObjectToObmObject(BackendSession bs,
 			IApplicationData data, Event oldEvent, boolean isInternal) {
-		if (isInternal) {
-			return converters.get(data.getType()).convertAsInternal(bs, oldEvent, data);
-		} else {
-			return converters.get(data.getType()).convertAsExternal(bs, oldEvent, data);
-		}
-	}
-
-	private Event convertMSEventToObmEvent(BackendSession bs, MSEvent event,
-			boolean isInternal) {
-		if (isInternal) {
-			return new EventConverter().convertAsInternal(bs, event);
-		} else {
-			return new EventConverter().convertAsExternal(bs, event);
+		switch (data.getType()) {
+		case CALENDAR:
+			return eventConverter.convert(bs, oldEvent, (MSEvent) data, isInternal);
+		case TASKS:
+			return todoConverter.convert(bs, oldEvent, (MSTask) data, isInternal);
+		default:
+			throw new InvalidParameterException("Can't convert type " + data.getType());
 		}
 	}
 	
@@ -386,7 +384,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			Event obmEvent = getEventFromExtId(bs, event, calCli, at);
 			
 			boolean isInternal = EventConverter.isInternalEvent(obmEvent, false);
-			Event newEvent = convertMSEventToObmEvent(bs, event, isInternal);
+			Event newEvent = convertMSObjectToObmObject(bs, event, null, isInternal);
 			
 			if (obmEvent == null) {
 				
@@ -449,7 +447,7 @@ public class CalendarBackend extends ObmSyncBackend {
 				if (event != null) {
 					ItemChange ic = new ItemChange();
 					ic.setServerId(serverId);
-					IApplicationData ev = convertEvent(bs, event);
+					IApplicationData ev = convertObmObjectToMSObject(bs, event);
 					ic.setData(ev);
 					ret.add(ic);
 				}
@@ -483,11 +481,14 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	private IApplicationData convertEvent(BackendSession bs, Event e) {
-		if (EventType.VTODO.equals(e.getType())) {
-			return converters.get(PIMDataType.TASKS).convert(bs, e);
-		} else {
-			return converters.get(PIMDataType.CALENDAR).convert(bs, e);
+	private IApplicationData convertObmObjectToMSObject(BackendSession bs, Event e) {
+		switch (e.getType()) {
+		case VEVENT:
+			return eventConverter.convert(bs, e, null);
+		case VTODO:
+			return todoConverter.convert(e);
+		default:
+			throw new InvalidParameterException("can't convert type " + e.getType());
 		}
 	}
 	

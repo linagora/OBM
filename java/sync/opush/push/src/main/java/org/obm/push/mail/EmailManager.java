@@ -44,6 +44,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
+import org.obm.push.calendar.EventConverter;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
@@ -76,15 +77,19 @@ public class EmailManager implements IEmailManager {
 	private final EmailSync emailSync;
 	private final boolean loginWithDomain;
 	private final boolean activateTLS;
+	private final EventConverter eventConverter;
+
 	
 	@Inject
-	/*package*/ EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, SmtpSender smtpSender, 
-			EmailSync emailSync, LocatorService locatorService) {
+	/*package*/ EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, 
+			SmtpSender smtpSender, EmailSync emailSync, LocatorService locatorService,
+			EventConverter eventConverter) {
 		
 		this.emailSync = emailSync;
 		this.smtpProvider = smtpSender;
 		this.emailDao = emailDao;
 		this.locatorService = locatorService;
+		this.eventConverter = eventConverter;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.activateTLS = emailConfiguration.activateTls();
 	}
@@ -144,7 +149,7 @@ public class EmailManager implements IEmailManager {
 			login(store);
 			store.select(parseMailBoxName(store, collectionName));
 			
-			final MailMessageLoader mailLoader = new MailMessageLoader(store, calendarClient);
+			final MailMessageLoader mailLoader = new MailMessageLoader(store, calendarClient, eventConverter);
 			for (final Long uid: uids) {
 				final MSEmail email = mailLoader.fetch(collectionId, uid, bs);
 				if (email != null) {

@@ -13,9 +13,9 @@ import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
-import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.Recurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
@@ -33,10 +33,9 @@ import org.obm.sync.calendar.RecurrenceKind;
 /**
  * Convert events between OBM-Sync object model & Microsoft object model
  */
-public class EventConverter implements ObmSyncCalendarConverter{
+public class EventConverter {
 
-	@Override
-	public IApplicationData convert(BackendSession bs, Event e) {
+	public MSEvent convert(BackendSession bs, Event e, MSEventUid uid) {
 		MSEvent mse = new MSEvent();
 
 		mse.setSubject(e.getTitle());
@@ -45,7 +44,8 @@ public class EventConverter implements ObmSyncCalendarConverter{
 		mse.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
 		mse.setStartTime(e.getDate());
 		mse.setExceptionStartTime(e.getRecurrenceId());
-
+		mse.setUid(uid);
+		
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		c.setTimeInMillis(e.getDate().getTime());
 		c.add(Calendar.SECOND, e.getDuration());
@@ -118,7 +118,7 @@ public class EventConverter implements ObmSyncCalendarConverter{
 		}
 
 		for (Event excp : recurrence.getEventExceptions()) {
-			MSEvent e = (MSEvent) convert(bs, excp);
+			MSEvent e = convert(bs, excp, null);
 			ret.add(e);
 		}
 		return ret;
@@ -332,45 +332,23 @@ public class EventConverter implements ObmSyncCalendarConverter{
 		}
 	}
 	
-	@Override
-	public Event convertAsInternal(BackendSession bs, Event oldEvent, IApplicationData data) {
-		return convert(bs, oldEvent, data, true);
-	}
-
-	@Override
-	public Event convertAsExternal(BackendSession bs, Event oldEvent, IApplicationData data) {
-		return convert(bs, oldEvent, data, false);
-	}
-	
-	@Override
-	public Event convertAsInternal(BackendSession bs, IApplicationData data) {
-		return convert(bs, null, data, true);
-	}
-
-	@Override
-	public Event convertAsExternal(BackendSession bs, IApplicationData data) {
-		return convert(bs, null, data, false);
-	}
-	
-	
-	/* package */ private Event convert(BackendSession bs, Event oldEvent, IApplicationData appliData, Boolean isObmInternalEvent) {
-		MSEvent data = (MSEvent) appliData;
-		EventExtId extId = data.getExtId();
-		EventObmId obmId = data.getObmId();
+	public Event convert(BackendSession bs, Event oldEvent, MSEvent event, Boolean isObmInternalEvent) {
+		EventExtId extId = event.getExtId();
+		EventObmId obmId = event.getObmId();
 		
-		Event e = convertEventOne(bs, oldEvent, null, data, isObmInternalEvent);
+		Event e = convertEventOne(bs, oldEvent, null, event, isObmInternalEvent);
 		e.setExtId(extId);
 		e.setUid(obmId);
 		
-		if(data.getObmSequence() != null){
-			e.setSequence(data.getObmSequence());
+		if(event.getObmSequence() != null){
+			e.setSequence(event.getObmSequence());
 		}
 		
-		if (data.getRecurrence() != null) {
-			EventRecurrence r = getRecurrence(data);
+		if (event.getRecurrence() != null) {
+			EventRecurrence r = getRecurrence(event);
 			e.setRecurrence(r);
-			if (data.getExceptions() != null && !data.getExceptions().isEmpty()) {
-				for (MSEvent excep : data.getExceptions()) {
+			if (event.getExceptions() != null && !event.getExceptions().isEmpty()) {
+				for (MSEvent excep : event.getExceptions()) {
 					if (!excep.isDeletedException()) {
 						
 						Event obmEvent = convertEventOne(bs, oldEvent, e, excep, isObmInternalEvent);

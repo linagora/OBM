@@ -15,11 +15,13 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSEvent;
 import org.obm.push.protocol.data.CalendarDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Attendee;
@@ -49,7 +51,7 @@ public class EventConverterTest {
 		BackendSession backendSession = buildBackendSession(loginAtDomain);
 		
 		IApplicationData data = getApplicationData("HTC-Windows-Mobile-6.1-new_event.xml");
-		Event event = eventConverter.convertAsInternal(backendSession, data);
+		Event event = eventConverter.convert(backendSession, null, (MSEvent) data, true);
 		
 		Attendee organizer = event.findOrganizer();
 		List<Attendee> attendees = listAttendeesWithoutOrganizer(organizer, event);  
@@ -70,7 +72,7 @@ public class EventConverterTest {
 		BackendSession backendSession = buildBackendSession(loginAtDomain);
 		
 		IApplicationData data = getApplicationData("Galaxy-S-Android-2.3.4-new_event.xml");
-		Event event = eventConverter.convertAsInternal(backendSession, data);
+		Event event = eventConverter.convert(backendSession, null, (MSEvent) data, true);
 
 		Attendee organizer = event.findOrganizer();
 		List<Attendee> attendees = listAttendeesWithoutOrganizer(organizer, event); 
@@ -85,17 +87,18 @@ public class EventConverterTest {
 		checkAttendeeParticipationState(attendees);
 	}
 
+	@Ignore("FIXME for OBMFULL-2728")
 	@Test
 	public void testConvertUpdateOneOnlyExceptionEvent() throws SAXException, IOException, FactoryConfigurationError {
+		String UID = "cfe4645e-4168-102f-be5e-0015176f7922";
 		IApplicationData  oldData = getApplicationData("samecase/new-event-with-exception.xml");
-		Event oldEvent = eventConverter.convertAsInternal(buildBackendSession("jribiera@obm.lng.org"), oldData);
+		Event oldEvent = eventConverter.convert(buildBackendSession("jribiera@obm.lng.org"), null, (MSEvent) oldData, true);
 		
 		IApplicationData  data = getApplicationData("samecase/update-one-exception-of-same-event.xml");
 
-		Event event = eventConverter.convertAsInternal(buildBackendSession("jribiera@obm.lng.org"), oldEvent, data);
+		Event event = eventConverter.convert(buildBackendSession("jribiera@obm.lng.org"), oldEvent, (MSEvent) data, true);
 		Event excptEvtUpd = event.getRecurrence().getEventExceptions().get(0);
 
-		String UID = "cfe4645e-4168-102f-be5e-0015176f7922";
 		
 		Assertions.assertThat(event.getExtId())
 		.isNotNull()
