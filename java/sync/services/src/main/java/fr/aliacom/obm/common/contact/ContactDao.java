@@ -455,7 +455,7 @@ public class ContactDao {
 		Event e = calendarDao.findEventById(at, dateId);
 		e.setDate(date);
 		calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false, true);
-		return e.getUid();
+		return e.getObmId();
 	}
 
 
@@ -465,7 +465,7 @@ public class ContactDao {
 		logger.info("eventId == null");
 		Event e = calendarDao.createEvent(con, at, at.getUserWithDomain(),
 				getEvent(at, displayName(c), date), true);
-		return e.getUid();
+		return e.getObmId();
 	}
 
 

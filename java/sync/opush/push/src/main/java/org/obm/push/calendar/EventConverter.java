@@ -62,7 +62,7 @@ public class EventConverter implements ObmSyncCalendarConverter{
 			mse.setReminder(e.getAlert() / 60);
 		}
 		mse.setExtId(e.getExtId());
-		mse.setObmId(e.getUid());
+		mse.setObmId(e.getObmId());
 		mse.setBusyStatus(busyStatus(e.getOpacity()));
 		mse.setSensitivity(getSensitivity(e.getPrivacy()));
 		mse.setObmSequence(e.getSequence());

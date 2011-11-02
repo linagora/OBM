@@ -122,13 +122,13 @@ public class SolrHelper {
 	}
 
 	public void delete(Event e) {
-		logger.info("[event " + e.getUid() + "] scheduled for solr removal");
-		Remover rm = new Remover(sEvent, Integer.toString(e.getUid().getObmId()));
+		logger.info("[event " + e.getObmId() + "] scheduled for solr removal");
+		Remover rm = new Remover(sEvent, Integer.toString(e.getObmId().getObmId()));
 		executor.execute(rm);
 	}
 
 	public void createOrUpdate(Event ev) {
-		logger.info("[event " + ev.getUid() + "] scheduled for solr indexing");
+		logger.info("[event " + ev.getObmId() + "] scheduled for solr indexing");
 		EventIndexer ci = eventIndexerFactory.createIndexer(sEvent, domain, ev);
 		executor.execute(ci);
 	}

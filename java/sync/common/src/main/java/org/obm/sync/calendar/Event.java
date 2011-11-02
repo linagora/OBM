@@ -147,7 +147,7 @@ public class Event implements Indexed<Integer> {
 		this.location = location;
 	}
 
-	public EventObmId getUid() {
+	public EventObmId getObmId() {
 		return uid;
 	}
 
@@ -408,7 +408,7 @@ public class Event implements Indexed<Integer> {
 
 	@Override
 	public Integer getIndex() {
-		return getUid().getIndex();
+		return getObmId().getIndex();
 	}
 	
 	public boolean hasImportantChanges(Event event) {

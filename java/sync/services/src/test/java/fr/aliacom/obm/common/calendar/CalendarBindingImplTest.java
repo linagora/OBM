@@ -239,7 +239,7 @@ public class CalendarBindingImplTest {
 		
 		final Event event = createMock(Event.class);
 		expect(event.getExtId()).andReturn(eventExtId).atLeastOnce();
-		expect(event.getUid()).andReturn(null).atLeastOnce();
+		expect(event.getObmId()).andReturn(null).atLeastOnce();
 		expect(event.isInternalEvent()).andReturn(false).atLeastOnce();
 		expect(event.getTitle()).andReturn("title").atLeastOnce();
 		event.findAttendeeFromEmail(userEmail);
@@ -638,7 +638,7 @@ public class CalendarBindingImplTest {
 		EventExtId extId = new EventExtId("extId1");
 		
 		Event result = testParseICS(extId, null);
-		Assertions.assertThat(result.getUid()).isNull();
+		Assertions.assertThat(result.getObmId()).isNull();
 		Assertions.assertThat(result.getExtId()).isSameAs(extId);
 	}
 	
@@ -651,7 +651,7 @@ public class CalendarBindingImplTest {
 		EventExtId extId = new EventExtId("extId");
 		
 		Event result = testParseICS(extId, eventFromDao);
-		Assertions.assertThat(result.getUid()).isSameAs(eventObmId);
+		Assertions.assertThat(result.getObmId()).isSameAs(eventObmId);
 		Assertions.assertThat(result.getExtId()).isSameAs(extId);
 	}
 	

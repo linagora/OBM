@@ -84,7 +84,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		}
 		e.setAttribute("type", ev.getType().toString());
 		e.setAttribute("allDay", "" + ev.isAllday());
-		EventObmId eventId = ev.getUid();
+		EventObmId eventId = ev.getObmId();
 		if (eventId != null) {
 			e.setAttribute("id", eventId.serializeToString());
 		}

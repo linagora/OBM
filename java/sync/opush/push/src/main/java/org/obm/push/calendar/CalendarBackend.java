@@ -198,7 +198,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		
 		for (final Event event : events) {
 			if (!checkIfEventCanBeAdded(event, userEmail)) {
-				deletions.add(getItemChange(collectionId, event.getUid()));
+				deletions.add(getItemChange(collectionId, event.getObmId()));
 			}			
 		}
 		
@@ -237,7 +237,7 @@ public class CalendarBackend extends ObmSyncBackend {
 
 	private ItemChange createItemChangeToAddFromEvent(final BackendSession bs, final Integer collectionId, final Event event) {
 		ItemChange ic = new ItemChange();
-		ic.setServerId(getServerIdFor(collectionId, event.getUid()));
+		ic.setServerId(getServerIdFor(collectionId, event.getObmId()));
 		IApplicationData ev = convertEvent(bs, event);
 		ic.setData(ev);
 		return ic;
@@ -347,7 +347,7 @@ public class CalendarBackend extends ObmSyncBackend {
 				//FIXME: not transactional
 				String calendarName = parseCalendarName(collectionPath);
 				Event evr = getEventFromServerId(bc, token, calendarName, serverId);
-				bc.removeEventById(token, calendarName, evr.getUid(), evr.getSequence(), true);
+				bc.removeEventById(token, calendarName, evr.getObmId(), evr.getSequence(), true);
 			} catch (ServerFault e) {
 				throw new UnknownObmSyncServerException(e);
 			} catch (EventNotFoundException e) {
@@ -367,7 +367,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		try {
 			logger.info("handleMeetingResponse = {}", event.getObmId());
 			Event obmEvent = createOrModifyInvitationEvent(bs, event, calCli, at);
-			event.setObmId(obmEvent.getUid());
+			event.setObmId(obmEvent.getObmId());
 			event.setObmSequence(obmEvent.getSequence());
 			return updateUserStatus(bs, event, status, calCli, at);
 		} catch (UnknownObmSyncServerException e) {
@@ -401,7 +401,7 @@ public class CalendarBackend extends ObmSyncBackend {
 				
 			} else {
 			
-				newEvent.setUid(obmEvent.getUid());
+				newEvent.setUid(obmEvent.getObmId());
 				newEvent.setSequence(obmEvent.getSequence());
 				if(!obmEvent.isInternalEvent()){
 					logger.info("createOrModifyInvitationEvent : update event {}", event.getObmId());
@@ -499,7 +499,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			try {
 				Event event = calCli.getEventFromId(token, bs.getLoginAtDomain(), eventUid);
 				if (event != null) {
-					ret.add(getItemChange(collectionId, event.getUid()));
+					ret.add(getItemChange(collectionId, event.getObmId()));
 				}
 			} catch (ServerFault e) {
 				logger.error(e.getMessage(), e);

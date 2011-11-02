@@ -317,7 +317,7 @@ public class CalendarBindingImpl implements ICalendar {
 			final Event before = loadCurrentEvent(token, calendarUser, event);
 
 			if (before == null) {
-				logger.warn(LogUtils.prefix(token) + "Event[uid:"+ event.getUid() + "extId:" + event.getExtId() +
+				logger.warn(LogUtils.prefix(token) + "Event[uid:"+ event.getObmId() + "extId:" + event.getExtId() +
 						"] doesn't exist in database: : doing nothing");
 				return null;
 			}
@@ -346,14 +346,14 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) throws EventNotFoundException, ServerFault {
-		if (event.getUid() == null && event.getExtId() != null && event.getExtId().getExtId() != null) {
+		if (event.getObmId() == null && event.getExtId() != null && event.getExtId().getExtId() != null) {
 			final Event currentEvent = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
 			if (currentEvent != null) {
-				event.setUid(currentEvent.getUid());
+				event.setUid(currentEvent.getObmId());
 			}
 			return currentEvent;
 		} else {
-			return calendarDao.findEventById(token, event.getUid());
+			return calendarDao.findEventById(token, event.getObmId());
 		}
 	}
 
@@ -425,7 +425,7 @@ public class CalendarBindingImpl implements ICalendar {
 				throw new ServerFault(
 						"event creation without any data");
 			}
-			if (event.getUid() != null) {
+			if (event.getObmId() != null) {
 				logger.error(LogUtils.prefix(token)
 						+ "event creation with an event coming from OBM");
 				throw new ServerFault(
@@ -455,7 +455,7 @@ public class CalendarBindingImpl implements ICalendar {
 			} else {
 				ev = createExternalEvent(token, calendar, event, notification);
 			}
-			return ev.getUid();
+			return ev.getObmId();
 		} catch (FindException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -527,7 +527,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try{
 			changePartipationState(token, event);
 			Event ev = calendarDao.createEvent(token, calendar, event, true);
-			ev = calendarDao.findEventById(token, ev.getUid());
+			ev = calendarDao.findEventById(token, ev.getObmId());
 			ObmUser user = userService.getUserFromAccessToken(token);
 			eventChangeHandler.create(user, ev, notification);
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
@@ -604,7 +604,7 @@ public class CalendarBindingImpl implements ICalendar {
 				ParticipationChanges participationChanges = new ParticipationChanges(); 
 				participationChanges.setAttendees(event.getAttendees());
 				participationChanges.setEventExtId(event.getExtId());
-				participationChanges.setEventId(event.getUid());
+				participationChanges.setEventId(event.getObmId());
 				return participationChanges;
 			}
 		}).toArray(new ParticipationChanges[0]);
@@ -740,7 +740,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public EventObmId getEventObmIdFromExtId(AccessToken token, String calendar,
 			EventExtId extId) throws ServerFault, EventNotFoundException {
 		Event event = getEventFromExtId(token, calendar, extId);
-		return event.getUid();
+		return event.getObmId();
 	}
 
 	@Override
@@ -1203,7 +1203,7 @@ public class CalendarBindingImpl implements ICalendar {
 					}
 				}
 				else {
-					removeEventById(token, calendar, event.getUid(), event.getSequence() + 1, false);
+					removeEventById(token, calendar, event.getObmId(), event.getSequence() + 1, false);
 				}
 			}
 			

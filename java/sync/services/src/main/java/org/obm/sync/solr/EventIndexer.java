@@ -88,7 +88,7 @@ public class EventIndexer implements Runnable {
 	private boolean doIndex() {
 		SolrInputDocument sid = new SolrInputDocument();
 
-		f(sid, "id", e.getUid().getObmId());
+		f(sid, "id", e.getObmId().getObmId());
 		f(sid, "timecreate", e.getTimeCreate());
 		f(sid, "timeupdate", e.getTimeUpdate());
 
@@ -138,7 +138,7 @@ public class EventIndexer implements Runnable {
 			st = con.prepareStatement("SELECT eventtag_label FROM Event " +
                     "INNER JOIN EventTag ON event_tag_id=eventtag_id WHERE event_id=?");
 			// query tag...
-			st.setInt(1, e.getUid().getObmId());
+			st.setInt(1, e.getObmId().getObmId());
 			rs = st.executeQuery();
 			if (rs.next()) {
 				f(sid, "tag", rs.getString(1));
@@ -146,7 +146,7 @@ public class EventIndexer implements Runnable {
 
 			srv.add(sid);
 			srv.commit();
-			logger.info("[" + e.getUid() + "] indexed in SOLR");
+			logger.info("[" + e.getObmId() + "] indexed in SOLR");
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 		} finally {

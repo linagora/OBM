@@ -350,7 +350,7 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals(1, ev.getRecurrence().getEventExceptions().size());
 
 		Event evEx = ev.getRecurrence().getEventExceptions().get(0);
-		Assert.assertEquals(null, evEx.getUid());
+		Assert.assertEquals(null, evEx.getObmId());
 		Assert.assertEquals(new EventExtId("a7db3cd5-adf3-42f4-95f3-d0a7a9c01aa3"), evEx.getExtId());
 		Assert.assertEquals(false, evEx.isAllday());
 		Assert.assertEquals(EventType.VEVENT, evEx.getType());

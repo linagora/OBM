@@ -73,8 +73,8 @@ public class ContentsImporter implements IContentsImporter {
 		case CALENDAR:
 			Event event = calBackend.getEventFromServerId(bs, serverId);
 			calBackend.delete(bs, collectionId, serverId);
-			if (event.getUid() != null) {
-				invitationFilterManager.deleteFilteredEvent(collectionId, event.getUid());
+			if (event.getObmId() != null) {
+				invitationFilterManager.deleteFilteredEvent(collectionId, event.getObmId());
 			}
 			break;
 		case CONTACTS:

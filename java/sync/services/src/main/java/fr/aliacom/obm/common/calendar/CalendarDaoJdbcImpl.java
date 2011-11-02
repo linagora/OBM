@@ -349,7 +349,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			for (Event evExcept : eventException) {
 				created = createEvent(con, editor, calendar, evExcept, useObmUser);
 				newEvExcepts.add(created);
-				eventsEx.put(created.getUid(),
+				eventsEx.put(created.getObmId(),
 						evExcept.getRecurrenceId());
 			}
 
@@ -557,9 +557,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				String domainName = evrs.getString("domain_name");
 				
 				Map<EventObmId, Event> eventById = new HashMap<EventObmId, Event>();
-				eventById.put(event.getUid(), event);
+				eventById.put(event.getObmId(), event);
 			
-				IntegerIndexedSQLCollectionHelper eventIdSQLCollectionHelper = new IntegerIndexedSQLCollectionHelper(ImmutableList.of(event.getUid()));
+				IntegerIndexedSQLCollectionHelper eventIdSQLCollectionHelper = new IntegerIndexedSQLCollectionHelper(ImmutableList.of(event.getObmId()));
 				loadAttendeesAndAlerts(con, token, eventById, eventIdSQLCollectionHelper, domainName);
 				loadExceptions(con, cal, eventById, eventIdSQLCollectionHelper);
 				loadEventExceptions(con, token, eventById, eventIdSQLCollectionHelper);
@@ -988,7 +988,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					}
 
 					Event e = eventFromCursor(cal, evrs);
-					eventById.put(e.getUid(), e);
+					eventById.put(e.getObmId(), e);
 					changedEvent.add(e);
 				}
 			} catch (SQLException e) {
@@ -1307,7 +1307,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		if (token != null) {
 			for(Event event : eventById.values()){
 				int alert = 0;
-				for(AttendeeAlert att : userAttendeesByEventId.get(event.getUid())){
+				for(AttendeeAlert att : userAttendeesByEventId.get(event.getObmId())){
 					if (token.getObmId() == att.getEntityId()) {
 						if (att.getAlert() >= 0) {
 							alert = att.getAlert();
@@ -1348,7 +1348,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private void appendAttendeeToEvent(Map<EventObmId, Event> eventById, Multimap<EventObmId, AttendeeAlert> attendeesByEventId){
 		for(Event event : eventById.values()){
-			Collection<AttendeeAlert> atts = attendeesByEventId.get(event.getUid());
+			Collection<AttendeeAlert> atts = attendeesByEventId.get(event.getObmId());
 			event.addAttendees(atts);
 		}
 	}
@@ -1392,7 +1392,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				if (event != null) {
 					event.getRecurrence().addEventException(eventExcept);
 					changedEvent.add(eventExcept);
-					evenExcepttById.put(eventExcept.getUid(),
+					evenExcepttById.put(eventExcept.getObmId(),
 							eventExcept);
 				}
 			}
@@ -1453,7 +1453,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			boolean updateAttendees, int sequence, Boolean useObmUser) throws SQLException, FindException, ServerFault, EventNotFoundException {
 
 		logger.info("should modify event with title " + ev.getTitle()
-				+ " date: " + ev.getDate() + " id: " + ev.getUid());
+				+ " date: " + ev.getDate() + " id: " + ev.getObmId());
 		
 		Connection con = null;
 
@@ -1464,7 +1464,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(con, null, null);
 		}
 
-		Event event = findEventById(at, ev.getUid());
+		Event event = findEventById(at, ev.getObmId());
 		setAttendeeCanWriteOnCalendar(at, event);
 		return event;
 	}
@@ -1484,7 +1484,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			boolean updateAttendees, Boolean useObmUser) throws SQLException, FindException, EventNotFoundException, ServerFault {
 
 		logger.info("should modify event with title " + ev.getTitle()
-				+ " date: " + ev.getDate() + " id: " + ev.getUid());
+				+ " date: " + ev.getDate() + " id: " + ev.getObmId());
 		
 		Connection con = null;
 
@@ -1495,7 +1495,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(con, null, null);
 		}
 
-		return findEventById(at, ev.getUid());
+		return findEventById(at, ev.getObmId());
 	}
 
 	@Override
@@ -1510,7 +1510,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			boolean updateAttendees, int sequence, Boolean useObmUser)
 			throws SQLException, FindException, ServerFault, EventNotFoundException {
 		
-		Event old = findEventById(editor, ev.getUid());
+		Event old = findEventById(editor, ev.getObmId());
 		List<Attendee> attendeetoRemove = Lists.newArrayList(old.getAttendees());
 		attendeetoRemove.removeAll(ev.getAttendees());
 
@@ -1531,16 +1531,16 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			if (updateAttendees) {
 				updateAttendees(editor, con, calendar, ev, useObmUser);
-				markUpdated(con, ev.getUid());
+				markUpdated(con, ev.getObmId());
 			}
 			updateAlerts(editor, con, ev);
 
 			removeAllException(con, ev);
 
-			insertExceptions(editor, ev, con, ev.getUid());
+			insertExceptions(editor, ev, con, ev.getObmId());
 			if (ev.getRecurrence() != null) {
 				insertEventExceptions(editor, calendar, ev.getRecurrence()
-						.getEventExceptions(), con, ev.getUid(), useObmUser);
+						.getEventExceptions(), con, ev.getObmId(), useObmUser);
 			}
 		} finally {
 			obmHelper.cleanup(null, ps, null);
@@ -1600,7 +1600,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setString(19, ev.getDescription());
 		ps.setString(20, at.getOrigin());
 		ps.setInt(21, sequence);
-		ps.setInt(22, ev.getUid().getObmId());
+		ps.setInt(22, ev.getObmId().getObmId());
 		return ps;
 	}
 
@@ -1664,7 +1664,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					id = userDao
 							.contactEntityFromEmailQuery(con, at.getEmail());
 				}
-				ps.setInt(1, ev.getUid().getObmId());
+				ps.setInt(1, ev.getObmId().getObmId());
 				ps.setInt(2, id);
 				ps.addBatch();
 			}
@@ -1677,11 +1677,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private void removeAllException(Connection con, Event eventParent)
 			throws SQLException {
-		removeEventExceptions(con, eventParent.getUid());
+		removeEventExceptions(con, eventParent.getObmId());
 		PreparedStatement ps = null;
 		try {
 			ps = con.prepareStatement("delete from EventException where eventexception_parent_id=?");
-			ps.setInt(1, eventParent.getUid().getObmId());
+			ps.setInt(1, eventParent.getObmId().getObmId());
 			ps.executeUpdate();
 		} finally {
 			obmHelper.cleanup(null, ps, null);
@@ -1735,7 +1735,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					.prepareStatement("INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, "
 							+ "deletedevent_origin, deletedevent_type, deletedevent_timestamp, deletedevent_event_ext_id) "
 							+ "VALUES (?, ?, ?, ?, now(), ?)");
-			EventObmId databaseId = ev.getUid();
+			EventObmId databaseId = ev.getObmId();
 			for (Attendee at : ev.getAttendees()) {
 				Integer userId = userDao.userIdFromEmail(con,
 						at.getEmail(), token.getDomainId());
@@ -1807,7 +1807,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					c = contactDao.createContact(editor, con, c);
 					userEntity = c.getEntityId();
 				}
-				ps.setInt(1, ev.getUid().getObmId());
+				ps.setInt(1, ev.getObmId().getObmId());
 				ps.setInt(2, userEntity);
 				ps.setObject(3, getJdbcObjectParticipationState(at));
 				ps.setObject(4, getJdbcObjectParticipationRole(at));
@@ -1884,7 +1884,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						at.getRequired().getJdbcObject(obmHelper.getType()));
 				ps.setInt(idx++, updater.getObmId());
 				ps.setInt(idx++, at.getPercent());
-				ps.setInt(idx++, ev.getUid().getObmId());
+				ps.setInt(idx++, ev.getObmId().getObmId());
 				ps.setInt(idx++, userEntity);
 				ps.setInt(idx++, userEntity);
 				ps.addBatch();
@@ -1912,7 +1912,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				st.executeUpdate("delete from EventAlert where eventalert_user_id="
 						+ updater.getObmId()
 						+ " AND eventalert_event_id="
-						+ ev.getUid().getObmId());
+						+ ev.getObmId().getObmId());
 			} else {
 				int upd = st
 						.executeUpdate("update EventAlert set eventalert_duration="
@@ -1922,13 +1922,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 								+ " where eventalert_user_id="
 								+ updater.getObmId()
 								+ " AND eventalert_event_id="
-								+ ev.getUid().getObmId());
+								+ ev.getObmId().getObmId());
 				if (upd <= 0) {
 					st.executeUpdate("insert into EventAlert (eventalert_duration, eventalert_event_id, eventalert_usercreate, eventalert_user_id)"
 							+ " values ("
 							+ ev.getAlert()
 							+ ","
-							+ ev.getUid().getObmId()
+							+ ev.getObmId().getObmId()
 							+ ","
 							+ updater.getObmId()
 							+ "," + updater.getObmId() + " )");
@@ -1950,7 +1950,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				st.executeUpdate("delete from EventAlert where eventalert_user_id="
 						+ updater.getObmId()
 						+ " AND eventalert_event_id="
-						+ ev.getUid().getObmId());
+						+ ev.getObmId().getObmId());
 			} else {
 				int upd = st
 						.executeUpdate("update EventAlert set eventalert_duration="
@@ -1960,13 +1960,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 								+ " where eventalert_user_id="
 								+ updater.getObmId()
 								+ " AND eventalert_event_id="
-								+ ev.getUid().getObmId());
+								+ ev.getObmId().getObmId());
 				if (upd <= 0) {
 					st.executeUpdate("insert into EventAlert (eventalert_duration, eventalert_event_id, eventalert_usercreate, eventalert_user_id)"
 							+ " values ("
 							+ ev.getAlert()
 							+ ","
-							+ ev.getUid().getObmId()
+							+ ev.getObmId().getObmId()
 							+ ","
 							+ updater.getObmId()
 							+ "," + updater.getObmId() + " )");
@@ -2010,7 +2010,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				Calendar cal = getGMTCalendar();
 				Event ret = eventFromCursor(cal, evrs);
 				String domainName = evrs.getString("domain_name");
-				Map<EventObmId, Event> eventById = ImmutableMap.of(ret.getUid(), ret);
+				Map<EventObmId, Event> eventById = ImmutableMap.of(ret.getObmId(), ret);
 				IntegerIndexedSQLCollectionHelper eventIds = new IntegerIndexedSQLCollectionHelper(ImmutableList.of(ret));
 				loadAttendeesAndAlerts(con, token, eventById, eventIds, domainName);
 				loadExceptions(con, cal, eventById, eventIds);
@@ -2065,10 +2065,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evrs = evps.executeQuery();
 			while (evrs.next()) {
 				Event event = eventFromCursor(cal, evrs);
-				Set<Date> extDate = getAllDateEventException(con, event.getUid());
+				Set<Date> extDate = getAllDateEventException(con, event.getObmId());
 				Date recurDate = ical4jHelper.isInIntervalDate(event, startDate, endDate, extDate);
 				if (recurDate != null) {
-					eventById.put(event.getUid(), event);
+					eventById.put(event.getObmId(), event);
 					changedEvent.add(event);
 					ret.add(event);
 				}
@@ -2123,7 +2123,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			while (evrs.next()) {
 				Event event = eventFromCursor(cal, evrs);
-				eventById.put(event.getUid(), event);
+				eventById.put(event.getObmId(), event);
 				ret.add(event);
 			}
 			
@@ -2363,7 +2363,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			dev = con
 					.prepareStatement("INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_origin, deletedevent_timestamp, deletedevent_event_ext_id) "
 							+ "VALUES (?, ?, ?, now(), ?)");
-			EventObmId databaseId = ev.getUid();
+			EventObmId databaseId = ev.getObmId();
 			for (Attendee at : ev.getAttendees()) {
 				Integer userId = userDao.userIdFromEmail(con,
 						at.getEmail(), token.getDomainId());
