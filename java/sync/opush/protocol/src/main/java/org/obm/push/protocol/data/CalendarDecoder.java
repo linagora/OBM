@@ -2,10 +2,7 @@ package org.obm.push.protocol.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
@@ -14,12 +11,12 @@ import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.Recurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.tnefconverter.RTFUtils;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.calendar.EventExtId;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -35,11 +32,9 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 				syncData, "OrganizerName")));
 		calendar.setOrganizerEmail(parseDOMString(DOMUtils.getUniqueElement(
 				syncData, "OrganizerEmail")));
-		Element uidElement = DOMUtils.getUniqueElement(syncData, "UID");
-		EventExtId extId = getExtIdFromElement(uidElement);
-		if (extId != null) {
-			calendar.setExtId(extId);
-		}
+		calendar.setUid(
+				new MSEventUid(parseDOMString(DOMUtils.getUniqueElement(syncData, "UID"))));
+		
 		calendar.setTimeZone(parseDOMTimeZone(DOMUtils.getUniqueElement(
 				syncData, "TimeZone")));
 
@@ -214,33 +209,6 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		}
 
 		return calendar;
-	}
-
-	private EventExtId getExtIdFromElement(Element uidElement) {
-		String uidAsString = parseDOMString(uidElement);
-		if (uidAsString != null) {
-			String uuid = decodeHex(uidAsString);
-			try {
-				checkUUIDFormat(uuid);
-				return new EventExtId(uuid);
-			} catch (IllegalArgumentException e) {
-				logger.warn(e.getMessage(), e);
-			}
-		}
-		return null;
-	}
-
-	private void checkUUIDFormat(String decodedUid) throws IllegalArgumentException {
-		UUID.fromString(decodedUid);
-	}
-
-	private String decodeHex(String uidAsString) {
-		try {
-			return new String(Hex.decodeHex(uidAsString.toCharArray()));
-		} catch (DecoderException ex) {
-			logger.warn(ex.getMessage(), ex);
-			return uidAsString;
-		}
 	}
 
 	void setEventCalendar(MSEvent calendar, Element domSource) {
