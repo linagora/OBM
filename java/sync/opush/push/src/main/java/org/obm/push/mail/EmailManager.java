@@ -44,13 +44,13 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
-import org.obm.push.calendar.EventConverter;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.smtp.SmtpSender;
+import org.obm.push.service.EventService;
 import org.obm.push.store.EmailDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.FileUtils;
@@ -77,19 +77,19 @@ public class EmailManager implements IEmailManager {
 	private final EmailSync emailSync;
 	private final boolean loginWithDomain;
 	private final boolean activateTLS;
-	private final EventConverter eventConverter;
+	private final EventService eventService;
 
 	
 	@Inject
 	/*package*/ EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, EmailSync emailSync, LocatorService locatorService,
-			EventConverter eventConverter) {
+			EventService eventService) {
 		
 		this.emailSync = emailSync;
 		this.smtpProvider = smtpSender;
 		this.emailDao = emailDao;
 		this.locatorService = locatorService;
-		this.eventConverter = eventConverter;
+		this.eventService = eventService;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.activateTLS = emailConfiguration.activateTls();
 	}
@@ -149,7 +149,7 @@ public class EmailManager implements IEmailManager {
 			login(store);
 			store.select(parseMailBoxName(store, collectionName));
 			
-			final MailMessageLoader mailLoader = new MailMessageLoader(store, calendarClient, eventConverter);
+			final MailMessageLoader mailLoader = new MailMessageLoader(store, calendarClient, eventService);
 			for (final Long uid: uids) {
 				final MSEmail email = mailLoader.fetch(collectionId, uid, bs);
 				if (email != null) {

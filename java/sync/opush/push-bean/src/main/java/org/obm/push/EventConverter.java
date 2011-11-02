@@ -1,4 +1,4 @@
-package org.obm.push.calendar;
+package org.obm.push;
 
 import java.util.Calendar;
 import java.util.Date;

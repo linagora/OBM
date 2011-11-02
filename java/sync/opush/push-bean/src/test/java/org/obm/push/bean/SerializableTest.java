@@ -95,4 +95,9 @@ public class SerializableTest {
 		objectOutputStream.writeObject(obj);
 	}
 	
+	@Test
+	public void testMSEventUid() throws IOException {
+		MSEventUid msEventUid = new MSEventUid("totototo");
+		objectOutputStream.writeObject(msEventUid);
+	}
 }

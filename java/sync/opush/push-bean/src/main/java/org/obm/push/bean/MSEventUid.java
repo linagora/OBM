@@ -1,8 +1,10 @@
 package org.obm.push.bean;
 
+import java.io.Serializable;
+
 import com.google.common.base.Objects;
 
-public class MSEventUid {
+public class MSEventUid implements Serializable {
 
 	private final String uid;
 
@@ -11,6 +13,10 @@ public class MSEventUid {
 		this.uid = uid;
 	}
 
+	public String serializeToString() {
+		return uid;
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(uid);

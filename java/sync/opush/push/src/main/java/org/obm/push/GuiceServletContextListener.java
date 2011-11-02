@@ -21,8 +21,10 @@ import org.obm.push.backend.OBMBackend;
 import org.obm.push.mail.EmailManager;
 import org.obm.push.mail.IEmailManager;
 import org.obm.push.service.DeviceService;
+import org.obm.push.service.EventService;
 import org.obm.push.service.OpushSyncPermsConfigurationService;
 import org.obm.push.service.impl.DeviceServiceImpl;
+import org.obm.push.service.impl.EventServiceImpl;
 import org.obm.push.store.DaoModule;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
@@ -84,6 +86,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(SyncPermsConfigurationService.class).to(OpushSyncPermsConfigurationService.class);
 				bind(ItemTrackingDao.class).to(ItemTrackingDaoJdbcImpl.class);
 				bind(LocatorService.class).to(LocatorCache.class);
+				bind(EventService.class).to(EventServiceImpl.class);
 			}
     	}, new TransactionalModule(), new DaoModule(), new OpushServletModule());
     }

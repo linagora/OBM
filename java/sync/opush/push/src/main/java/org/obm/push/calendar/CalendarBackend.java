@@ -6,7 +6,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
+import org.obm.push.EventConverter;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
@@ -25,6 +27,7 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
+import org.obm.push.service.EventService;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -52,14 +55,16 @@ public class CalendarBackend extends ObmSyncBackend {
 
 	private final EventConverter eventConverter;
 	private final TodoConverter todoConverter;
+	private final EventService eventService;
 
 	@Inject
 	private CalendarBackend(CollectionDao collectionDao, 
 			BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient,
-			EventConverter eventConverter, TodoConverter todoConverter) {
+			EventConverter eventConverter, TodoConverter todoConverter, EventService eventService) {
 		super(collectionDao, bookClient, calendarClient, todoClient);
 		this.eventConverter = eventConverter;
 		this.todoConverter = todoConverter;
+		this.eventService = eventService;
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) 
@@ -187,11 +192,12 @@ public class CalendarBackend extends ObmSyncBackend {
 	}
 
 	private void addOrUpdateEventFilter(List<ItemChange> addUpd, Event[] events, String userEmail, 
-			Integer collectionId, BackendSession bs) {
+			Integer collectionId, BackendSession bs) throws DaoException {
 		
 		for (final Event event : events) {
 			if (checkIfEventCanBeAdded(event, userEmail) && event.getRecurrenceId() == null) {
-				ItemChange change = createItemChangeToAddFromEvent(bs, collectionId, event);
+				String serverId = getServerIdFor(collectionId, event.getObmId());
+				ItemChange change = createItemChangeToAddFromEvent(bs, event, serverId);
 				addUpd.add(change);
 			}			
 		}
@@ -216,7 +222,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	}
 
 	private void addOrRemoveEventFilter(List<ItemChange> addUpd, List<ItemChange> deletions, 
-			EventChanges eventChanges, String userEmail, Integer collectionId, BackendSession bs) {
+			EventChanges eventChanges, String userEmail, Integer collectionId, BackendSession bs) throws DaoException {
 		
 		addOrUpdateEventFilter(addUpd, eventChanges.getUpdated(), userEmail, collectionId, bs);
 		removeEventFilter(deletions, eventChanges.getUpdated(), eventChanges.getRemoved(), userEmail, collectionId);
@@ -239,9 +245,10 @@ public class CalendarBackend extends ObmSyncBackend {
 		return collectionPath.substring(slash + 1, at);
 	}
 
-	private ItemChange createItemChangeToAddFromEvent(final BackendSession bs, final Integer collectionId, final Event event) {
+	private ItemChange createItemChangeToAddFromEvent(final BackendSession bs, final Event event, String serverId) throws DaoException {
 		ItemChange ic = new ItemChange();
-		ic.setServerId(getServerIdFor(collectionId, event.getObmId()));
+		ic.setServerId(serverId);
+		
 		IApplicationData ev = convertObmObjectToMSObject(bs, event);
 		ic.setData(ev);
 		return ic;
@@ -278,7 +285,7 @@ public class CalendarBackend extends ObmSyncBackend {
 				setSequence(oldEvent, event);
 				cc.modifyEvent(token, parseCalendarName(collectionPath), event, true, true);
 			} else {
-				eventId = cc.createEvent(token, parseCalendarName(collectionPath), event, true);
+				eventId = createCalendarEntity(bs, cc, token, collectionPath, event, data);
 			}
 				
 		} catch (ServerFault e) {
@@ -302,6 +309,40 @@ public class CalendarBackend extends ObmSyncBackend {
 		}
 	}
 
+	private EventObmId createCalendarEntity(BackendSession bs, AbstractEventSyncClient cc,
+			AccessToken token, String collectionPath, Event event, IApplicationData data)
+			throws ServerFault, EventAlreadyExistException, DaoException {
+		switch (event.getType()) {
+		case VEVENT:
+			return createEvent(bs, cc, token, collectionPath, event, (MSEvent) data);
+		case VTODO:
+			return createTodo(cc, token, collectionPath, event);
+		default:
+			throw new InvalidParameterException("unsupported type " + event.getType());
+		}
+	}
+
+	private EventObmId createTodo(AbstractEventSyncClient cc,
+			AccessToken token, String collectionPath, Event event)
+			throws ServerFault, EventAlreadyExistException {
+		return cc.createEvent(token, parseCalendarName(collectionPath), event, true);
+	}
+
+	private EventObmId createEvent(BackendSession bs, AbstractEventSyncClient cc,
+			AccessToken token, String collectionPath, Event event, MSEvent msEvent)
+			throws ServerFault, EventAlreadyExistException, DaoException {
+		EventExtId eventExtId = generateExtId();
+		event.setExtId(eventExtId);
+		EventObmId eventId = cc.createEvent(token, parseCalendarName(collectionPath), event, true);
+		eventService.trackEventObmIdMSEventUidTranslation(eventId, msEvent.getUid(), bs.getDevice());
+		return eventId;
+	}
+
+	private EventExtId generateExtId() {
+		UUID uuid = UUID.randomUUID();
+		return new EventExtId(uuid.toString());
+	}
+	
 	private EventObmId convertServerIdToEventObmId(String serverId) {
 		int idx = serverId.lastIndexOf(":");
 		return new EventObmId(serverId.substring(idx + 1));
@@ -437,7 +478,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		}
 	}
 
-	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) {
+	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) throws DaoException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AbstractEventSyncClient calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		AccessToken token = login(calCli, bs);
@@ -445,10 +486,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			try {
 				Event event = getEventFromServerId(calCli, token, bs.getLoginAtDomain(), serverId);
 				if (event != null) {
-					ItemChange ic = new ItemChange();
-					ic.setServerId(serverId);
-					IApplicationData ev = convertObmObjectToMSObject(bs, event);
-					ic.setData(ev);
+					ItemChange ic = createItemChangeToAddFromEvent(bs, event, serverId);
 					ret.add(ic);
 				}
 			} catch (EventNotFoundException e) {
@@ -461,7 +499,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 	
-	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<EventObmId> uids) {
+	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<EventObmId> uids) throws DaoException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AbstractEventSyncClient calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		AccessToken token = login(calCli, bs);
@@ -469,7 +507,8 @@ public class CalendarBackend extends ObmSyncBackend {
 			try {
 				Event e = calCli.getEventFromId(token, bs.getLoginAtDomain(), itemId);
 				if (e != null) {
-					ret.add( createItemChangeToAddFromEvent(bs, collectionId, e) );
+					String serverId = getServerIdFor(collectionId, e.getObmId());
+					ret.add(createItemChangeToAddFromEvent(bs, e, serverId));
 				}
 			} catch (ServerFault e) {
 				logger.error(e.getMessage(), e);
@@ -481,14 +520,14 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	private IApplicationData convertObmObjectToMSObject(BackendSession bs, Event e) {
-		switch (e.getType()) {
+	private IApplicationData convertObmObjectToMSObject(BackendSession bs, Event event) throws DaoException {
+		switch (event.getType()) {
 		case VEVENT:
-			return eventConverter.convert(bs, e, null);
+			return eventService.convertEventToMSEvent(bs, event);
 		case VTODO:
-			return todoConverter.convert(e);
+			return todoConverter.convert(event);
 		default:
-			throw new InvalidParameterException("can't convert type " + e.getType());
+			throw new InvalidParameterException("can't convert type " + event.getType());
 		}
 	}
 	

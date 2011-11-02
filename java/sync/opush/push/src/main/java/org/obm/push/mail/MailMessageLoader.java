@@ -53,8 +53,8 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MessageClass;
 import org.obm.push.bean.MethodAttachment;
-import org.obm.push.calendar.EventConverter;
 import org.obm.push.impl.ObmSyncBackend;
+import org.obm.push.service.EventService;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
@@ -75,12 +75,12 @@ public class MailMessageLoader {
 	private final AbstractEventSyncClient calendarClient;
 	private final List<String> htmlMimeSubtypePriority;
 	private final StoreClient storeClient;
-	private final EventConverter eventConverter;
+	private final EventService eventService;
 	
-	public MailMessageLoader(final StoreClient store, final AbstractEventSyncClient calendarClient, EventConverter eventConverter) {
+	public MailMessageLoader(final StoreClient store, final AbstractEventSyncClient calendarClient, EventService eventService) {
 		this.storeClient = store;
 		this.calendarClient = calendarClient;
-		this.eventConverter = eventConverter;
+		this.eventService = eventService;
 		this.htmlMimeSubtypePriority = Arrays.asList("html", "plain", "calendar");
 	}
 
@@ -207,7 +207,7 @@ public class MailMessageLoader {
 				final List<Event> obmEvents = calendarClient.parseICS(at, ics);
 				if (obmEvents.size() > 0) {
 					final Event icsEvent = obmEvents.get(0);
-					return eventConverter.convert(bs, icsEvent, null);
+					return eventService.convertEventToMSEvent(bs, icsEvent);
 				}
 			} catch (Throwable e) {
 				logger.error(e.getMessage() + ", ics was:\n" + ics, e);
