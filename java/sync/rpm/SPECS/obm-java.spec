@@ -134,6 +134,7 @@ cp /usr/share/doc/obm-jetty/jetty.xml.sample /etc/jetty6/jetty.xml
 /etc/init.d/jetty6 start > /dev/null 2>&1 || :
 
 %post -n opush
+[ ! -f %{_sysconfdir}/opush/logback.xml ] && echo "<included/>" > %{_sysconfdir}/opush/logback.xml
 /sbin/service jetty6 restart >/dev/null 2>&1 || :
 
 %postun -n opush
