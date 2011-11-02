@@ -283,16 +283,6 @@ ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_opacity` enum('OPAQUE','TR
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_user_calendar` boolean default 0 AFTER eventtemplate_opacity;
 ALTER TABLE `EventTemplate` ADD COLUMN `eventtemplate_show_resource_calendar` boolean default 0 AFTER eventtemplate_show_user_calendar;
 
-CREATE TABLE `opush_synced_item` (
-       `device_id`        INTEGER NOT NULL,
-       `collection_id`	  INTEGER NOT NULL,
-       `item_id`          INTEGER NOT NULL,
-       KEY `opush_synced_item_device_id_opush_device_id_fkey` (`device_id`),
-       KEY `opush_synced_item_collection_id_opush_folder_mapping_id_fkey` (`collection_id`),
-       CONSTRAINT `opush_synced_item_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE,
-       CONSTRAINT `opush_synced_item_collection_id_opush_folder_mapping_id_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- store last sync dates
